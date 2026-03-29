@@ -10154,16 +10154,27 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 185,
+        "time": 604800,
+        "regions": [
+          "c605s1_region12"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 5,
+        "time": 302400,
         "regions": [
-          "c605s1_region12",
           "c605s1_region13"
         ]
       },
@@ -10198,14 +10209,26 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 185,
+        "time": 604800,
+        "regions": [
+          "c605s1_region12"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 5,
+        "time": 302400,
         "regions": [
           "c605s1_region13",
           "c605s1_region14",
@@ -10227,16 +10250,27 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 185,
+        "time": 604800,
+        "regions": [
+          "c605s1_region12"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 5,
+        "time": 302400,
         "regions": [
-          "c605s1_region12",
           "c605s1_region13",
           "c605s1_region15"
         ]

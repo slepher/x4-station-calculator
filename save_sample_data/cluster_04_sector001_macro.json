@@ -1798,16 +1798,27 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 76581,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 192000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 11502,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2073,31 +2084,53 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 74313,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 256000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 6849,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 54599,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 256000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 13193,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2129,16 +2162,27 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 66902,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 256000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 14657,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2170,31 +2214,53 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 62300,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 18517,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 75791,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 192000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 22247,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2226,31 +2292,53 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 50205,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 27334,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 34841,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 35222,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2269,31 +2357,53 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 70055,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 192000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 11349,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 10370,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 22247,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2325,31 +2435,53 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 73750,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 37767,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 93710,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 35222,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2420,16 +2552,27 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 93710,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 27334,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2656,16 +2799,27 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 3557,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 42264,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2697,31 +2851,53 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 80154,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 43756,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 92817,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 42264,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2766,16 +2942,27 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 76647,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 0,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 43756,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2898,16 +3085,27 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 93937,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 35222,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -2939,16 +3137,27 @@
       },
       {
         "yield_names": [
-          "medplus",
+          "medplus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 90559,
+        "time": 108000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 0,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 37767,
+        "time": 36000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11324,16 +11533,27 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 38051,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 192000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 974680,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11612,31 +11832,53 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 36925,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 256000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 580351,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 27307,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 256000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 1117961,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11668,16 +11910,27 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 35202,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 256000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 1241985,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11709,31 +11962,53 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 30955,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1569022,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 37663,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 192000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 1885089,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11765,31 +12040,53 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 24941,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 2316147,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 17307,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 2984533,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11808,31 +12105,53 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 34808,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 192000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 2039479,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 5147,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 1885089,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11864,31 +12183,53 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 36646,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 128000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 3200163,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 46562,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 128000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 2984533,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11933,16 +12274,27 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 6097,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 1569022,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -11961,16 +12313,27 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 46562,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 128000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 2316147,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -12197,16 +12560,27 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 10967,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 64000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 3581221,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -12238,31 +12612,53 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 39823,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 64000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 3707658,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 46120,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 64000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 3581221,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -12307,16 +12703,27 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 38086,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 0,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 3707658,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -12439,16 +12846,27 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 46677,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 64000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 2984533,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -12480,16 +12898,27 @@
       },
       {
         "yield_names": [
-          "lowminus",
+          "lowminus"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 45001,
+        "time": 72000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medplus"
         ],
         "x": 0,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 3200163,
+        "time": 144000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
@@ -14512,17 +14941,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 114165,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 192000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 243665,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -14800,32 +15240,54 @@
       },
       {
         "yield_names": [
-          "medlow",
-          "low"
+          "medlow"
         ],
         "x": 256000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 110789,
+        "time": 108000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medlow",
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 128000,
+        "max": 145085,
+        "time": 120000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 64000,
+        "max": 81943,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 256000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 279489,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -14856,17 +15318,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": 0,
+        "max": 105625,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 256000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 310493,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -14897,32 +15370,54 @@
       },
       {
         "yield_names": [
-          "medlow",
-          "low"
+          "medlow"
         ],
         "x": 192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 92877,
+        "time": 108000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medlow",
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 392250,
+        "time": 120000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 64000,
+        "max": 112993,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 192000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 471265,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -14953,32 +15448,54 @@
       },
       {
         "yield_names": [
-          "medlow",
-          "low"
+          "medlow"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 74843,
+        "time": 108000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medlow",
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 579032,
+        "time": 120000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 51938,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 746129,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -14996,32 +15513,54 @@
       },
       {
         "yield_names": [
-          "medlow",
-          "low"
+          "medlow"
         ],
         "x": 192000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 104438,
+        "time": 108000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medlow",
+          "low"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 0,
+        "max": 509864,
+        "time": 120000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -64000,
+        "max": 15453,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 471265,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -15052,32 +15591,54 @@
       },
       {
         "yield_names": [
-          "medlow",
-          "low"
+          "medlow"
         ],
         "x": 128000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 109950,
+        "time": 108000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medlow",
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 800040,
+        "time": 120000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 139707,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 746129,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -15121,17 +15682,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 18307,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 392250,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -15149,17 +15721,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 139707,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 579032,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -15385,17 +15968,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 32927,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 895305,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -15426,32 +16020,54 @@
       },
       {
         "yield_names": [
-          "medlow",
-          "low"
+          "medlow"
         ],
         "x": 64000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 119491,
+        "time": 108000,
         "regions": [
-          "region2_cluster_04_sector_001",
           "region3_cluster_04_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medlow",
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 926908,
+        "time": 120000,
+        "regions": [
+          "region2_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 138373,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 895305,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -15495,17 +16111,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -64000,
+        "max": 114265,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 926908,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -15627,17 +16254,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 140046,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 746129,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
@@ -15668,17 +16306,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 135009,
+        "time": 108000,
+        "regions": [
+          "region3_cluster_04_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 800040,
+        "time": 120000,
         "regions": [
-          "region2_cluster_04_sector_001",
-          "region3_cluster_04_sector_001"
+          "region2_cluster_04_sector_001"
         ]
       },
       {
