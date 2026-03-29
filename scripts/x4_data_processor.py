@@ -435,11 +435,17 @@ class X4PrecisionLoader:
                 color_defs[c_id] = f"#{r:02X}{g:02X}{b:02X}"
 
             # 2. 解析 resource_map_* 映射
+            # 特殊映射: mapping_id 后缀 → 实际 ware_id
+            resource_map_to_ware_id = {
+                'scrap': 'rawscrap',
+                'khaakscrap': 'rawkhaakscrap'
+            }
             for m in root.findall(".//mappings/mapping"):
                 mapping_id = m.get('id')
                 if mapping_id and mapping_id.startswith('resource_map_'):
                     # 提取 ware_id: resource_map_ore → ore
-                    ware_id = mapping_id.replace('resource_map_', '')
+                    extracted_id = mapping_id.replace('resource_map_', '')
+                    ware_id = resource_map_to_ware_id.get(extracted_id, extracted_id)
                     color_ref = m.get('ref')
                     if color_ref and color_ref in color_defs:
                         self.resource_map_colors[ware_id] = {
