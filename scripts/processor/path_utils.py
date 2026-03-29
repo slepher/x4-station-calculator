@@ -98,6 +98,8 @@ def build_output_paths(processed_assets_dir: str, folder_name: str) -> Dict[str,
         "factions": os.path.join(data_path, "factions.json"),
         "regions": os.path.join(data_path, "regions.json"),
         "regionyields": os.path.join(data_path, "regionyields.json"),
+        "regionyield_definitions": os.path.join(data_path, "regionyield_definitions.json"),
+        "resourceareas": os.path.join(data_path, "resourceareas.json"),
     }
 
 

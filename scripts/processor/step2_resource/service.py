@@ -32,6 +32,8 @@ from processor.step2_resource.estimator import (
 from processor.step2_resource.modern_processor import (
     migrate_resourcearea_definitions,
     migrate_sector_resourceareas,
+    load_regionyield_definitions_from_json,
+    extract_sector_regions_from_maps_data,
     build_sector_resource_summaries_from_resourceareas,
     build_resourceareas_json_payload,
 )
@@ -293,18 +295,29 @@ def _process_90plus_resources(
 ) -> Dict[str, object]:
     """处理 9.0+ 版本资源。
 
-    9.0+ 版本直接从 definition 读取 yield/respawn，无需复杂计算。
+    9.0+ 版本从 JSON 文件读取数据：
+    - regionyield_definitions.json: definition 定义
+    - maps.json 的 sector.regions: resourceareas 引用
     """
-    if regionyields_xml_path is None or mapdefaults_xml_path is None:
-        return {"status": "error", "message": "Missing XML paths for 9.0+ processing"}
+    regionyield_definitions_path = output_dir / "regionyield_definitions.json"
 
-    # 1. 解析 definitions
-    definitions = migrate_resourcearea_definitions(regionyields_xml_path)
+    if not regionyield_definitions_path.exists():
+        return {"status": "error", "message": f"Missing {regionyield_definitions_path}"}
 
-    # 2. 解析 sector resourceareas
-    sector_resource_areas = migrate_sector_resourceareas(mapdefaults_xml_path)
+    if not maps_json_path.exists():
+        return {"status": "error", "message": f"Missing {maps_json_path}"}
 
-    # 3. 过滤指定 sector
+    # 1. 从 JSON 加载 definitions
+    definitions = load_regionyield_definitions_from_json(regionyield_definitions_path)
+
+    # 2. 加载 maps.json（单次读取，同时提取 regions 和更新 resources）
+    with maps_json_path.open("r", encoding="utf-8") as f:
+        maps_data = json.load(f)
+
+    # 3. 从 maps_data 提取 sector.regions
+    sector_resource_areas = extract_sector_regions_from_maps_data(maps_data)
+
+    # 4. 过滤指定 sector
     if sector_id:
         sector_id_lower = sector_id.lower()
         sector_resource_areas = {
@@ -312,54 +325,41 @@ def _process_90plus_resources(
             if k.lower() == sector_id_lower
         }
 
-    # 4. 构建 resourceareas.json
+    # 5. 构建 resourceareas.json
     resourceareas = build_resourceareas_json_payload(
         sector_resource_areas,
         definitions,
     )
 
-    # 5. 聚合 sector.resources
+    # 6. 聚合 sector.resources
     sector_summaries = build_sector_resource_summaries_from_resourceareas(
         sector_resource_areas,
         definitions,
     )
 
-    # 6. 写入输出文件
+    # 7. 写入输出文件
     output_dir.mkdir(parents=True, exist_ok=True)
 
     resourceareas_path = output_dir / "resourceareas.json"
     with resourceareas_path.open("w", encoding="utf-8") as f:
         json.dump(resourceareas, f, indent=2)
 
-    # 7. 更新 maps.json 中的 sector.resources
-    if maps_json_path.exists():
-        with maps_json_path.open("r", encoding="utf-8") as f:
-            maps_data = json.load(f)
+    # 8. 更新 maps_data 的 sector.resources
+    clusters = maps_data.get("clusters", {})
+    for cluster_data in clusters.values():
+        if not isinstance(cluster_data, dict):
+            continue
+        sectors_dict = cluster_data.get("sectors", {})
+        for sector_macro, sector in sectors_dict.items():
+            if not isinstance(sector, dict):
+                continue
+            sector_macro_lower = sector_macro.lower()
+            if sector_macro_lower in sector_summaries:
+                sector["resources"] = sector_summaries[sector_macro_lower]
 
-        # 处理两种结构：sectors 数组或 clusters 嵌套
-        sectors_list = maps_data.get("sectors", [])
-        if sectors_list:
-            # 旧格式：顶层 sectors 数组
-            for sector in sectors_list:
-                sector_macro = sector.get("id", "").lower()
-                if sector_macro in sector_summaries:
-                    sector["resources"] = sector_summaries[sector_macro]
-        else:
-            # 新格式：clusters 嵌套结构
-            clusters = maps_data.get("clusters", {})
-            for cluster_data in clusters.values():
-                if not isinstance(cluster_data, dict):
-                    continue
-                sectors_dict = cluster_data.get("sectors", {})
-                for sector_macro, sector in sectors_dict.items():
-                    sector_macro_lower = sector_macro.lower()
-                    if sector_macro_lower in sector_summaries:
-                        sector["resources"] = sector_summaries[sector_macro_lower]
-
-        with maps_json_path.open("w", encoding="utf-8") as f:
-            json.dump(maps_data, f, indent=2)
-
-    # 8. 9.0+ 版本不需要计算逐格数据，跳过 resourcearea_blocks.json
+    # 9. 写回 maps.json
+    with maps_json_path.open("w", encoding="utf-8") as f:
+        json.dump(maps_data, f, indent=2)
 
     return {
         "status": "success",

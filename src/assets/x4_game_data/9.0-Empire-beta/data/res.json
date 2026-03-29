@@ -120,6 +120,8 @@
   },
   {
     "id": "rawkhaakscrap",
+    "color": "magenta_extra_bright_moderate_glow",
+    "color_rgb": "#FFCCFF",
     "name_en": "Allographyne Scrap",
     "name_zh-CN": "异构石墨炔废料",
     "name_zh-TW": "異構石墨炔廢料",
@@ -135,6 +137,8 @@
   },
   {
     "id": "rawscrap",
+    "color": "azure_extra_bright",
+    "color_rgb": "#CCEAFF",
     "name_en": "Raw Scrap",
     "name_zh-CN": "原始废料",
     "name_zh-TW": "原始廢料",

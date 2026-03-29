@@ -14,11 +14,9 @@
     --all-sectors
 
   # 处理所有星区（9.0+ 版本）
+  # 9.0+ 从 JSON 文件加载：regionyield_definitions.json 和 maps.json 的 sector.regions
   python scripts/x4_resource_processor.py \
-    --version 9.0 \
-    --regionyields-xml path/to/regionyields_final.xml \
-    --mapdefaults-xml path/to/mapdefaults_final.xml \
-    --all-sectors
+    --version 9.0
 
   # 单星区增量更新
   python scripts/x4_resource_processor.py \

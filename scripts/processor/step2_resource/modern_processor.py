@@ -9,6 +9,7 @@
 
 from __future__ import annotations
 
+import json
 import re
 from collections import defaultdict
 from pathlib import Path
@@ -133,6 +134,22 @@ def migrate_resourcearea_definitions(regionyields_xml_path: Path) -> Dict[str, d
     return definitions
 
 
+def load_regionyield_definitions_from_json(json_path: Path) -> Dict[str, dict]:
+    """从 regionyield_definitions.json 加载 definitions（按 id 索引）。
+
+    Args:
+        json_path: regionyield_definitions.json 文件路径
+
+    Returns:
+        按 definition id 索引的定义字典
+    """
+    if not json_path.exists():
+        return {}
+    with json_path.open("r", encoding="utf-8") as f:
+        definitions_list = json.load(f)
+    return {d.get("id", ""): d for d in definitions_list if d.get("id")}
+
+
 # =============================================================================
 # Sector ResourceAreas 解析
 # =============================================================================
@@ -177,6 +194,37 @@ def migrate_sector_resourceareas(mapdefaults_xml_path: Path) -> Dict[str, List[d
             sector_resource_areas[macro] = areas
 
     return sector_resource_areas
+
+
+def extract_sector_regions_from_maps_data(maps_data: dict) -> Dict[str, List[dict]]:
+    """从 maps.json 数据中提取各 sector 的 regions 引用。
+
+    Args:
+        maps_data: maps.json 加载后的字典数据
+
+    Returns:
+        按 sector macro（小写）索引的 regions 引用列表
+    """
+    sector_regions: Dict[str, List[dict]] = {}
+
+    clusters = maps_data.get("clusters", {})
+    for cluster_macro, cluster_data in clusters.items():
+        if not isinstance(cluster_data, dict):
+            continue
+
+        sectors_dict = cluster_data.get("sectors", {})
+        for sector_macro, sector in sectors_dict.items():
+            if not isinstance(sector, dict):
+                continue
+
+            regions = sector.get("regions", [])
+            if not regions:
+                continue
+
+            sector_macro_lower = sector_macro.lower()
+            sector_regions[sector_macro_lower] = regions
+
+    return sector_regions
 
 
 # =============================================================================
@@ -325,6 +373,8 @@ def build_resourceareas_json_payload(
 __all__ = [
     "migrate_resourcearea_definitions",
     "migrate_sector_resourceareas",
+    "load_regionyield_definitions_from_json",
+    "extract_sector_regions_from_maps_data",
     "build_sector_resource_summaries_from_resourceareas",
     "build_resourceareas_json_payload",
 ]
