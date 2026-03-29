@@ -35,6 +35,7 @@ from processor.step2_resource.modern_processor import (
     build_sector_resource_summaries_from_resourceareas,
     build_resourceareas_json_payload,
 )
+from processor.step2_resource.save_replay import calculate_save_resources_all
 
 
 def process_resources_for_version(
@@ -45,6 +46,7 @@ def process_resources_for_version(
     regions_json_path: Optional[Path] = None,
     sector_id: Optional[str] = None,
     force_recalc_per_block: bool = False,
+    save_sample_dir: Optional[Path] = None,
 ) -> Dict[str, object]:
     """根据版本处理资源计算。
 
@@ -82,6 +84,7 @@ def process_resources_for_version(
             output_dir=output_dir,
             sector_id=sector_id,
             force_recalc_per_block=force_recalc_per_block,
+            save_sample_dir=save_sample_dir,
         )
 
 
@@ -89,7 +92,7 @@ def _calculate_blocks_for_resourceareas(
     resourceareas: List[dict],
     regions_json_path: Path,
     sector_id: Optional[str] = None,
-) -> Dict[str, dict]:
+) -> Dict[tuple, dict]:
     """计算 resourcearea 的逐格数据。
 
     Args:
@@ -98,11 +101,11 @@ def _calculate_blocks_for_resourceareas(
         sector_id: 可选，仅处理指定 sector
 
     Returns:
-        计算结果，格式：{ref: {"ref": ..., "sector_id": ..., "total": {}, "tiles": {}}}
+        计算结果，格式：{(sector_id, ref): {"ref": ..., "sector_id": ..., "total": {}, "tiles": {}}}
     """
     from processor.step2_resource.per_block_bridge import calculate_resource_per_block
 
-    blocks_output: Dict[str, dict] = {}
+    blocks_output: Dict[tuple, dict] = {}
 
     # 加载 regions.json
     if not regions_json_path.exists():
@@ -140,9 +143,10 @@ def _calculate_blocks_for_resourceareas(
                     resourcedensity=resourcedensity,
                 )
 
-                # 初始化 region 数据（如果不存在）
-                if ref not in blocks_output:
-                    blocks_output[ref] = {
+                # 使用 (sector_id, ref) 作为复合主键
+                cache_key = (sector_id_val, ref)
+                if cache_key not in blocks_output:
+                    blocks_output[cache_key] = {
                         "ref": ref,
                         "sector_id": sector_id_val,
                         "total": {},
@@ -156,8 +160,8 @@ def _calculate_blocks_for_resourceareas(
                     tile_key = f"{tile_x}_{tile_y}_{tile_z}"
 
                     # 初始化 tile（如果不存在）
-                    if tile_key not in blocks_output[ref]["tiles"]:
-                        blocks_output[ref]["tiles"][tile_key] = {
+                    if tile_key not in blocks_output[cache_key]["tiles"]:
+                        blocks_output[cache_key]["tiles"][tile_key] = {
                             "x": tile_x,
                             "y": tile_y,
                             "z": tile_z,
@@ -170,26 +174,26 @@ def _calculate_blocks_for_resourceareas(
                         for field_result in tile.get("fields", []):
                             if field_result.get("ware") == ware:
                                 area_value = field_result.get("area_value", 0)
-                                blocks_output[ref]["tiles"][tile_key]["wares"][ware] = \
-                                    blocks_output[ref]["tiles"][tile_key]["wares"].get(ware, 0) + area_value
+                                blocks_output[cache_key]["tiles"][tile_key]["wares"][ware] = \
+                                    blocks_output[cache_key]["tiles"][tile_key]["wares"].get(ware, 0) + area_value
                                 # 同时累加到 total
-                                blocks_output[ref]["total"][ware] = \
-                                    blocks_output[ref]["total"].get(ware, 0) + area_value
+                                blocks_output[cache_key]["total"][ware] = \
+                                    blocks_output[cache_key]["total"].get(ware, 0) + area_value
                     # 气体资源：直接用 ware 名作为 key
                     elif ware in tile:
                         area_value = tile.get(ware, 0)
                         if area_value > 0:
-                            blocks_output[ref]["tiles"][tile_key]["wares"][ware] = \
-                                blocks_output[ref]["tiles"][tile_key]["wares"].get(ware, 0) + area_value
+                            blocks_output[cache_key]["tiles"][tile_key]["wares"][ware] = \
+                                blocks_output[cache_key]["tiles"][tile_key]["wares"].get(ware, 0) + area_value
                             # 同时累加到 total
-                            blocks_output[ref]["total"][ware] = \
-                                blocks_output[ref]["total"].get(ware, 0) + area_value
+                            blocks_output[cache_key]["total"][ware] = \
+                                blocks_output[cache_key]["total"].get(ware, 0) + area_value
 
     return blocks_output
 
 
 def _write_resourcearea_blocks(
-    blocks_data: Dict[str, dict],
+    blocks_data: Dict[tuple, dict],
     sector_id: Optional[str] = None,
 ) -> Optional[Path]:
     """写入 resourcearea_blocks.json 到 analysis/resources/。
@@ -197,7 +201,7 @@ def _write_resourcearea_blocks(
     新格式: {<sector_id>: [{ref, total, tiles}, ...]}
 
     Args:
-        blocks_data: 计算结果，格式：{ref: {...}}
+        blocks_data: 计算结果，格式：{(sector_id, ref): {...}}
         sector_id: 可选，仅输出指定 sector
 
     Returns:
@@ -247,8 +251,7 @@ def _write_resourcearea_blocks(
 
     # 将新数据按 sector_id 分组
     new_data: Dict[str, List[dict]] = {}
-    for ref, region_data in blocks_data.items():
-        sid = region_data.get("sector_id", "")
+    for (sid, ref), region_data in blocks_data.items():
         if sid:
             if sid not in new_data:
                 new_data[sid] = []
@@ -375,12 +378,14 @@ def _process_80_resources(
     output_dir: Path,
     sector_id: Optional[str],
     force_recalc_per_block: bool = False,
+    save_sample_dir: Optional[Path] = None,
 ) -> Dict[str, object]:
     """处理 8.0 版本资源。
 
     8.0 版本需要：
     1. 估算算法：计算理论储量
     2. 逐格算法：计算精确储量（默认从已有文件读取，除非强制重新计算）
+    3. 存档数据：提取真实 reserve/respawn（如果提供 save_sample_dir）
     """
     if regions_json_path is None:
         return {"status": "error", "message": "Missing regions.json path for 8.0 processing"}
@@ -397,7 +402,8 @@ def _process_80_resources(
     regions_by_id = {r.get("id"): r for r in regions_data if isinstance(r, dict)}
 
     # 尝试加载已有的 resourcearea_blocks.json（新格式：{<sector_id>: [{ref, total, tiles}, ...]}）
-    blocks_cache: Dict[str, dict] = {}
+    # 使用 (sector_id, ref) 作为复合主键，避免不同 sector 共享同一个 ref 导致覆盖
+    blocks_cache: Dict[tuple, dict] = {}
     blocks_file = ANALYSIS_RESOURCES_DIR / "resourcearea_blocks.json"
     if not force_recalc_per_block and blocks_file.exists():
         try:
@@ -412,13 +418,16 @@ def _process_80_resources(
                         for entry in regions:
                             ref = entry.get("ref", "")
                             if ref:
-                                blocks_cache[ref] = entry
+                                entry_with_sid = dict(entry)
+                                entry_with_sid["sector_id"] = sid
+                                blocks_cache[(sid, ref)] = entry_with_sid
                 else:
                     # 旧格式：{regions: [...]}
                     for entry in blocks_data.get("regions", []):
                         ref = entry.get("ref", "")
+                        sid = entry.get("sector_id", "")
                         if ref:
-                            blocks_cache[ref] = entry
+                            blocks_cache[(sid, ref)] = entry
         except Exception:
             blocks_cache = {}
 
@@ -536,14 +545,17 @@ def _process_80_resources(
 
     # 二阶段：逐格计算，更新 reserve/respawn
     # 默认从已有文件读取，除非强制重新计算或文件不存在
-    blocks_output: Dict[str, dict] = {}
+    # 使用 (sector_id, ref) 作为复合主键
+    blocks_output: Dict[tuple, dict] = {}
 
     # 检查是否需要重新计算：
     # 1. 强制重新计算
     # 2. 缓存为空
-    # 3. 全量更新（sector_id 为 None）但缓存不是完整的（只包含部分星区）
-    # 4. 指定了 sector 但缓存中没有该 sector 的数据
+    # 3. 指定了 sector 但缓存中没有该 sector 的数据
     need_recalc = force_recalc_per_block or not blocks_cache
+
+    # 计算缺失的星区（仅全量更新时）
+    missing_sectors: set = set()
     if not need_recalc and not sector_id:
         # 全量更新：检查缓存中的星区数是否匹配所有需要处理的星区
         cached_sectors = set()
@@ -554,10 +566,12 @@ def _process_80_resources(
                 cached_sectors = set(blocks_data_check.keys())
         except Exception:
             pass
-        # 如果缓存中的星区数不等于需要处理的星区数，需要重新计算
+        # 计算缺失的星区
         target_sectors = set(row.get("sector_id", "") for row in resourceareas_rows)
-        if cached_sectors != target_sectors:
+        missing_sectors = target_sectors - cached_sectors
+        if missing_sectors:
             need_recalc = True
+
     if sector_id and not need_recalc:
         # 检查指定 sector 的数据是否在缓存中
         sector_in_cache = False
@@ -572,36 +586,68 @@ def _process_80_resources(
             need_recalc = True
 
     if need_recalc:
-        # 重新执行逐格计算
+        # 计算缺失星区的数据
+        if missing_sectors:
+            # 只计算缺失的星区
+            rows_to_calc = [row for row in resourceareas_rows if row.get("sector_id") in missing_sectors]
+        else:
+            # 全部重新计算
+            rows_to_calc = resourceareas_rows
+
         blocks_output = _calculate_blocks_for_resourceareas(
-            resourceareas=[{"sector_id": row["sector_id"], "areas": [row]} for row in resourceareas_rows],
+            resourceareas=[{"sector_id": row["sector_id"], "areas": [row]} for row in rows_to_calc],
             regions_json_path=regions_json_path,
             sector_id=sector_id,
         )
 
-        # 更新 resourceareas_rows 中的 reserve/respawn
+        # 更新 resourceareas_rows 中的 reserve/respawn（新计算的数据）
         for row in resourceareas_rows:
+            sid = row.get("sector_id", "")
             ref = row.get("ref", "")
-            if ref not in blocks_output:
+            cache_key = (sid, ref)
+            if cache_key not in blocks_output:
                 continue
-            totals = blocks_output[ref].get("total", {})
+            totals = blocks_output[cache_key].get("total", {})
             resources = row.get("resources", [])
             for res in resources:
                 ware = res.get("ware", "")
                 if ware in totals:
                     total_reserve = totals[ware]
                     res["reserve"] = total_reserve
-                    # respawn 基于 delay 计算
                     delay = res.get("delay", 60.0)
                     if delay > 0:
                         res["respawn"] = round_to_int(total_reserve * 60.0 / delay)
                     else:
                         res["respawn"] = 0
+
+        # 如果只是计算缺失星区，还需要从缓存读取已有星区的数据
+        if missing_sectors:
+            for row in resourceareas_rows:
+                sid = row.get("sector_id", "")
+                if sid in missing_sectors:
+                    continue  # 已经在上面处理过了
+                ref = row.get("ref", "")
+                region_cache = blocks_cache.get((sid, ref), {})
+                if not region_cache:
+                    continue
+                cached_totals = region_cache.get("total", {})
+                resources = row.get("resources", [])
+                for res in resources:
+                    ware = res.get("ware", "")
+                    if ware in cached_totals:
+                        total_reserve = cached_totals[ware]
+                        res["reserve"] = total_reserve
+                        delay = res.get("delay", 60.0)
+                        if delay > 0:
+                            res["respawn"] = round_to_int(total_reserve * 60.0 / delay)
+                        else:
+                            res["respawn"] = 0
     else:
         # 从缓存读取（新格式：从 total 字段读取 ware 汇总值）
         for row in resourceareas_rows:
+            sid = row.get("sector_id", "")
             ref = row.get("ref", "")
-            region_cache = blocks_cache.get(ref, {})
+            region_cache = blocks_cache.get((sid, ref), {})
             if not region_cache:
                 continue
 
@@ -623,18 +669,19 @@ def _process_80_resources(
                         res["respawn"] = 0
 
         # 将缓存数据转换为 blocks_output 格式，用于写入文件
-        for ref, region_cache in blocks_cache.items():
-            blocks_output[ref] = {
+        for (sid, ref), region_cache in blocks_cache.items():
+            blocks_output[(sid, ref)] = {
                 "ref": ref,
-                "sector_id": region_cache.get("sector_id"),
+                "sector_id": sid,
                 "total": region_cache.get("total", {}),
                 "tiles": {f"{t['x']}_{t['y']}_{t['z']}": t for t in region_cache.get("tiles", [])},
             }
 
         # 更新 resourceareas_rows 中的 reserve/respawn
         for row in resourceareas_rows:
+            sid = row.get("sector_id", "")
             ref = row.get("ref", "")
-            region_cache = blocks_cache.get(ref, {})
+            region_cache = blocks_cache.get((sid, ref), {})
             if not region_cache:
                 continue
             cached_totals = region_cache.get("total", {})
@@ -709,6 +756,33 @@ def _process_80_resources(
     # 逐格计算完成后，重新聚合 sector_resources（包含正确的 reserve）
     sector_resources = aggregate_sector_resources_from_resourceareas(resourceareas_rows)
 
+    # 存档数据：提取真实 reserve/respawn
+    if save_sample_dir and save_sample_dir.exists():
+        save_resources = calculate_save_resources_all(save_sample_dir, sector_id)
+
+        for sector_id_key, ware_list in sector_resources.items():
+            sector_id_lower = sector_id_key.lower()
+            save_ware_map = save_resources.get(sector_id_lower, {})
+
+            for entry in ware_list:
+                ware = entry.get("ware", "")
+                save_data = save_ware_map.get(ware, {})
+
+                if save_data:
+                    entry["reserve"] = save_data.get("reserve", 0)
+                    entry["respawn"] = save_data.get("respawn", 0)
+
+    # 计算 rating：基于存档 respawn 或 replay_respawn
+    for sector_id_key, ware_list in sector_resources.items():
+        for entry in ware_list:
+            ware = entry.get("ware", "")
+            respawn_val = entry.get("respawn", 0)
+            if respawn_val > 0:
+                entry["rating"] = calculate_rating(respawn_val, ware)
+            else:
+                replay_respawn_val = entry.get("replay_respawn", 0)
+                entry["rating"] = calculate_rating(replay_respawn_val, ware)
+
     # 更新 maps.json 中的 sector.resources
     for cluster_data in clusters.values():
         if not isinstance(cluster_data, dict):
@@ -725,7 +799,42 @@ def _process_80_resources(
         json.dump(maps_data, f, indent=2)
 
     # 输出 resourcearea_blocks.json 到 analysis/resources/
-    blocks_path = _write_resourcearea_blocks(blocks_output, sector_id)
+    # 增量更新：需要保留其他 sector 的缓存数据
+    if need_recalc and (sector_id or missing_sectors):
+        # 从缓存文件加载其他 sector 的数据
+        blocks_file = ANALYSIS_RESOURCES_DIR / "resourcearea_blocks.json"
+        if blocks_file.exists():
+            try:
+                with blocks_file.open("r", encoding="utf-8") as f:
+                    cached_data = json.load(f)
+                if isinstance(cached_data, dict) and "regions" not in cached_data:
+                    # 合并缓存数据到 blocks_output
+                    for sid, regions in cached_data.items():
+                        # 跳过本次计算的星区
+                        skip = False
+                        if sector_id and sid.lower() == sector_id.lower():
+                            skip = True
+                        if sid in missing_sectors:
+                            skip = True
+                        if not skip:
+                            for region in regions:
+                                ref = region.get("ref", "")
+                                cache_key = (sid, ref)
+                                if ref and cache_key not in blocks_output:
+                                    blocks_output[cache_key] = {
+                                        "ref": ref,
+                                        "sector_id": sid,
+                                        "total": region.get("total", {}),
+                                        "tiles": {f"{t['x']}_{t['y']}_{t['z']}": t for t in region.get("tiles", [])},
+                                    }
+            except Exception:
+                pass
+
+    # 写入缓存文件：仅当重新计算时才写入
+    if need_recalc:
+        blocks_path = _write_resourcearea_blocks(blocks_output, sector_id)
+    else:
+        blocks_path = None
 
     return {
         "status": "success",

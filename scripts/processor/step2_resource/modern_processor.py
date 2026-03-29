@@ -235,7 +235,7 @@ def build_sector_resource_summaries_from_resourceareas(
         # 转换为兼容格式
         resources: List[dict] = []
         for ware, entry in sorted(by_ware.items()):
-            rating = calculate_rating(entry["respawn"])
+            rating = calculate_rating(entry["respawn"], ware)
             resources.append({
                 "ware": ware,
                 "reserve": round_to_int(entry["reserve"]),

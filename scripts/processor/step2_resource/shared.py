@@ -14,29 +14,46 @@ from processor.shared.utils.math_utils import round_to_int
 # Rating 计算
 # =============================================================================
 
-def calculate_rating(respawn: float) -> int:
+def calculate_rating(respawn: float, ware: str = "") -> int:
     """根据 respawn 值计算资源评级 (1-5 分)。
 
-    评级标准：
-    - 1 分 (低):   respawn < 30
-    - 2 分 (中低): 30 <= respawn < 100
-    - 3 分 (中):   100 <= respawn < 300
-    - 4 分 (中高): 300 <= respawn < 1000
-    - 5 分 (高):   respawn >= 1000
+    Nividium 使用基础阈值，其他矿物阈值放大 100 倍。
+
+    Nividium 评级标准：
+    - 1 分: respawn < 100
+    - 2 分: 100 ≤ respawn < 300
+    - 3 分: 300 ≤ respawn < 1000
+    - 4 分: 1000 ≤ respawn < 3000
+    - 5 分: respawn ≥ 3000
+
+    其他矿物（阈值 ×100）：
+    - 1 分: respawn < 10000
+    - 2 分: 10000 ≤ respawn < 30000
+    - 3 分: 30000 ≤ respawn < 100000
+    - 4 分: 100000 ≤ respawn < 300000
+    - 5 分: respawn ≥ 300000
 
     Args:
         respawn: 每小时回复量
+        ware: 资源类型（用于区分 nividium）
 
     Returns:
         评级 (1-5)
     """
-    if respawn < 30:
+    is_nividium = ware.lower() == "nividium"
+
+    if is_nividium:
+        threshold = respawn
+    else:
+        threshold = respawn / 100.0
+
+    if threshold < 100:
         return 1
-    elif respawn < 100:
+    elif threshold < 300:
         return 2
-    elif respawn < 300:
+    elif threshold < 1000:
         return 3
-    elif respawn < 1000:
+    elif threshold < 3000:
         return 4
     else:
         return 5
@@ -82,6 +99,11 @@ def aggregate_sector_resources_from_resourceareas(
 ) -> Dict[str, List[dict]]:
     """从 resourceareas_rows 聚合出 sector.resources。
 
+    输出字段：
+    - reserve/respawn: 预留给存档真实值（初始为 0）
+    - replay_reserve/replay_respawn: 逐格计算值
+    - theoretical_reserve/theoretical_respawn: 理论估算值
+
     Args:
         resourceareas_rows: resourceareas 行数据列表
 
@@ -111,17 +133,18 @@ def aggregate_sector_resources_from_resourceareas(
                 "ware": ware,
                 "reserve": 0.0,
                 "respawn": 0.0,
+                "replay_reserve": 0.0,
+                "replay_respawn": 0.0,
                 "theoretical_reserve": 0.0,
                 "theoretical_respawn": 0.0,
             })
 
-            # reserve 仅使用逐格计算值
+            # replay_reserve/replay_respawn 使用逐格计算值
             if "reserve" in res:
-                entry["reserve"] += res.get("reserve", 0) * amount
+                entry["replay_reserve"] += res.get("reserve", 0) * amount
 
-            # respawn 仅使用逐格计算值
             if "respawn" in res:
-                entry["respawn"] += res.get("respawn", 0) * amount
+                entry["replay_respawn"] += res.get("respawn", 0) * amount
 
             # theoretical_* 字段仅用于参考展示
             if "theoretical_reserve" in res:
@@ -132,14 +155,14 @@ def aggregate_sector_resources_from_resourceareas(
     for sector_id, ware_map in by_sector.items():
         result[sector_id] = []
         for e in sorted(ware_map.values(), key=lambda x: x["ware"]):
-            rating = calculate_rating(e["respawn"])
             entry = {
                 "ware": e["ware"],
                 "reserve": round_to_int(e["reserve"]),
                 "respawn": round_to_int(e["respawn"]),
-                "rating": rating,
+                "replay_reserve": round_to_int(e["replay_reserve"]),
+                "replay_respawn": round_to_int(e["replay_respawn"]),
+                "rating": 0,
             }
-            # 8.0 版本额外字段
             if e["theoretical_reserve"] != 0:
                 entry["theoretical_reserve"] = round_to_int(e["theoretical_reserve"])
             if e["theoretical_respawn"] != 0:

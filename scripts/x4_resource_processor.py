@@ -86,6 +86,11 @@ def main():
         action="store_true",
         help="强制重新计算逐格数据（默认从 analysis/resources/resourcearea_blocks.json 读取）",
     )
+    parser.add_argument(
+        "--save-sample-dir",
+        default="save_sample_data",
+        help="存档数据目录路径（默认 save_sample_data/）",
+    )
 
     args = parser.parse_args()
 
@@ -101,6 +106,8 @@ def main():
     sector_id = args.sector if args.sector else None
 
     # 执行处理
+    save_sample_dir_path = Path(args.save_sample_dir) if args.save_sample_dir else None
+
     result = process_resources_for_version(
         version=version,
         maps_json_path=maps_json_path,
@@ -109,6 +116,7 @@ def main():
         regions_json_path=regions_json_path,
         sector_id=sector_id,
         force_recalc_per_block=getattr(args, 'force_recalc_per_block', False),
+        save_sample_dir=save_sample_dir_path,
     )
 
     if result.get("status") == "error":
