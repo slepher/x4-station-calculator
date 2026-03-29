@@ -1269,6 +1269,1336 @@
       "gas_volume_km3": 6553600
     }
   ],
+  "Cluster_01_Sector002_macro": [
+    {
+      "ref": "p1_40km_ice_field",
+      "amount": 1,
+      "position": {
+        "x": -22494.0,
+        "y": 0.0,
+        "z": -144694.5
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 25000,
+          "linear": 2500
+        }
+      },
+      "lateral_factor": 0.9,
+      "radial_factor": 0.77,
+      "falloff_factor": 0.693,
+      "resources": [
+        {
+          "ware": "ice",
+          "resourcedensity": 15.0,
+          "theoretical_reserve": 102053,
+          "theoretical_respawn": 10205,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medium",
+          "reserve": 248583,
+          "respawn": 24858
+        }
+      ],
+      "solid_volume_km3": 9817
+    },
+    {
+      "ref": "p1_40km_hydrogen_field",
+      "amount": 1,
+      "position": {
+        "x": -98698.0,
+        "y": 0.0,
+        "z": -133897.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 25000,
+          "linear": 15500
+        }
+      },
+      "lateral_factor": 0.9,
+      "radial_factor": 0.77,
+      "falloff_factor": 0.693,
+      "resources": [
+        {
+          "ware": "hydrogen",
+          "resourcedensity": 250000.0,
+          "theoretical_reserve": 1559250,
+          "theoretical_respawn": 51975,
+          "delay": 1800.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medhigh",
+          "reserve": 346498,
+          "respawn": 11550
+        }
+      ],
+      "gas_volume_km3": 2359296
+    },
+    {
+      "ref": "p1_40km_helium_field",
+      "amount": 1,
+      "position": {
+        "x": -59638.0,
+        "y": 0.0,
+        "z": -143637.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 25000,
+          "linear": 15500
+        }
+      },
+      "lateral_factor": 0.9,
+      "radial_factor": 0.77,
+      "falloff_factor": 0.693,
+      "resources": [
+        {
+          "ware": "helium",
+          "resourcedensity": 50000.0,
+          "theoretical_reserve": 311850,
+          "theoretical_respawn": 10395,
+          "delay": 1800.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medhigh",
+          "reserve": 69298,
+          "respawn": 2310
+        }
+      ],
+      "gas_volume_km3": 2359296
+    },
+    {
+      "ref": "p1_40km_methane_field",
+      "amount": 1,
+      "position": {
+        "x": -22926.0,
+        "y": 0.0,
+        "z": -163076.5
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 25000,
+          "linear": 15500
+        }
+      },
+      "lateral_factor": 0.9,
+      "radial_factor": 0.77,
+      "falloff_factor": 0.693,
+      "resources": [
+        {
+          "ware": "methane",
+          "resourcedensity": 25000.0,
+          "theoretical_reserve": 155925,
+          "theoretical_respawn": 15593,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medium",
+          "reserve": 69296,
+          "respawn": 6930
+        }
+      ],
+      "gas_volume_km3": 2359296
+    },
+    {
+      "ref": "p1_40km_ice_field",
+      "amount": 1,
+      "position": {
+        "x": -63226.0,
+        "y": 0.0,
+        "z": -129391.5
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 25000,
+          "linear": 2500
+        }
+      },
+      "lateral_factor": 0.9,
+      "radial_factor": 0.77,
+      "falloff_factor": 0.693,
+      "resources": [
+        {
+          "ware": "ice",
+          "resourcedensity": 15.0,
+          "theoretical_reserve": 102053,
+          "theoretical_respawn": 10205,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medium",
+          "reserve": 248583,
+          "respawn": 24858
+        }
+      ],
+      "solid_volume_km3": 9817
+    },
+    {
+      "ref": "region_cluster_01_sector_002_a",
+      "amount": 1,
+      "position": {
+        "x": -24722.0,
+        "y": 0.0,
+        "z": 12325.0
+      },
+      "boundary": {
+        "class": "splinetube",
+        "size": {
+          "r": 12000,
+          "linear": 4649870
+        },
+        "spline": [
+          {
+            "x": -1670110.0,
+            "y": 31421.3,
+            "z": 1303920.0,
+            "tx": 0.793875,
+            "ty": 0.428193,
+            "tz": -0.431755,
+            "inlength": 0.0,
+            "outlength": 143867.0
+          },
+          {
+            "x": -1381570.0,
+            "y": 108330.0,
+            "z": 1057470.0,
+            "tx": 0.603818,
+            "ty": -0.0830723,
+            "tz": -0.792782,
+            "inlength": 129060.0,
+            "outlength": 129060.0
+          },
+          {
+            "x": -1201230.0,
+            "y": -30560.0,
+            "z": 690784.0,
+            "tx": 0.585066,
+            "ty": -0.00830522,
+            "tz": -0.810943,
+            "inlength": 121246.0,
+            "outlength": 121246.0
+          },
+          {
+            "x": -954775.0,
+            "y": 102332.0,
+            "z": 468370.0,
+            "tx": 0.854428,
+            "ty": 0.0907545,
+            "tz": -0.511582,
+            "inlength": 117302.0,
+            "outlength": 117302.0
+          },
+          {
+            "x": -600115.0,
+            "y": 32116.9,
+            "z": 330113.0,
+            "tx": 0.92983,
+            "ty": -0.120164,
+            "tz": -0.347817,
+            "inlength": 143371.0,
+            "outlength": 143371.0
+          },
+          {
+            "x": -155289.0,
+            "y": 0.0,
+            "z": 167811.0,
+            "tx": 0.849769,
+            "ty": -0.0382063,
+            "tz": -0.525769,
+            "inlength": 139116.0,
+            "outlength": 139116.0
+          },
+          {
+            "x": 109203.0,
+            "y": 0.0,
+            "z": -108703.0,
+            "tx": 0.696444,
+            "ty": -0.000164574,
+            "tz": -0.717611,
+            "inlength": 109106.0,
+            "outlength": 109106.0
+          },
+          {
+            "x": 301561.0,
+            "y": 0.0,
+            "z": -301061.0,
+            "tx": 0.75116,
+            "ty": 0.0722117,
+            "tz": -0.656159,
+            "inlength": 123880.0,
+            "outlength": 123880.0
+          },
+          {
+            "x": 668242.0,
+            "y": 53456.0,
+            "z": -595608.0,
+            "tx": 0.892235,
+            "ty": 0.0719789,
+            "tz": -0.445797,
+            "inlength": 179679.0,
+            "outlength": 179679.0
+          },
+          {
+            "x": 1263350.0,
+            "y": 77032.9,
+            "z": -781955.0,
+            "tx": 0.938084,
+            "ty": -0.0326186,
+            "tz": -0.344869,
+            "inlength": 188068.0,
+            "outlength": 188068.0
+          },
+          {
+            "x": 1726210.0,
+            "y": 16785.5,
+            "z": -986335.0,
+            "tx": 0.799189,
+            "ty": -0.137767,
+            "tz": -0.585079,
+            "inlength": 131697.0,
+            "outlength": 131697.0
+          },
+          {
+            "x": 1894520.0,
+            "y": -31437.1,
+            "z": -1244820.0,
+            "tx": 0.0726957,
+            "ty": -0.145854,
+            "tz": -0.986632,
+            "inlength": 96466.3,
+            "outlength": 0.0
+          }
+        ]
+      },
+      "lateral_factor": 1.1,
+      "radial_factor": 0.83825,
+      "falloff_factor": 0.92207,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 0.026,
+          "theoretical_reserve": 22212,
+          "theoretical_respawn": 2221,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "lowest",
+          "reserve": 403714,
+          "respawn": 40371
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 0.06,
+          "theoretical_reserve": 51258,
+          "theoretical_respawn": 2563,
+          "delay": 1200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "verylow",
+          "reserve": 931740,
+          "respawn": 46587
+        }
+      ],
+      "solid_volume_km3": 926493
+    },
+    {
+      "ref": "region_cluster_01_sector_002_b",
+      "amount": 1,
+      "position": {
+        "x": -261200.0,
+        "y": 0.0,
+        "z": 897699.0
+      },
+      "boundary": {
+        "class": "splinetube",
+        "size": {
+          "r": 12000,
+          "linear": 3026685
+        },
+        "spline": [
+          {
+            "x": 257041.0,
+            "y": 0.0,
+            "z": -830864.0,
+            "tx": -0.638388,
+            "ty": -0.0240925,
+            "tz": 0.769338,
+            "inlength": 0.0,
+            "outlength": 86557.7
+          },
+          {
+            "x": 138025.0,
+            "y": 0.0,
+            "z": -614086.0,
+            "tx": -0.296412,
+            "ty": 0.0266043,
+            "tz": 0.95469,
+            "inlength": 81590.8,
+            "outlength": 81590.8
+          },
+          {
+            "x": 112521.0,
+            "y": 12512.3,
+            "z": -363304.0,
+            "tx": 0.291798,
+            "ty": -0.114824,
+            "tz": 0.949563,
+            "inlength": 96888.7,
+            "outlength": 96888.7
+          },
+          {
+            "x": 305922.0,
+            "y": -66510.3,
+            "z": -61515.6,
+            "tx": 0.0753404,
+            "ty": -0.128084,
+            "tz": 0.988898,
+            "inlength": 76255.1,
+            "outlength": 76255.1
+          },
+          {
+            "x": 144402.0,
+            "y": -45753.9,
+            "z": 89378.9,
+            "tx": -0.98158,
+            "ty": 0.0860607,
+            "tz": 0.170573,
+            "inlength": 111579.0,
+            "outlength": 111579.0
+          },
+          {
+            "x": -350787.0,
+            "y": -9364.49,
+            "z": 55375.0,
+            "tx": -0.945618,
+            "ty": 0.0383984,
+            "tz": 0.323004,
+            "inlength": 120174.0,
+            "outlength": 120174.0
+          },
+          {
+            "x": -536748.0,
+            "y": -17777.8,
+            "z": 324222.0,
+            "tx": 0.635426,
+            "ty": 0.034923,
+            "tz": 0.771371,
+            "inlength": 93465.0,
+            "outlength": 93465.0
+          },
+          {
+            "x": 3070.31,
+            "y": 10013.0,
+            "z": 489993.0,
+            "tx": 0.624645,
+            "ty": -0.0733255,
+            "tz": 0.777459,
+            "inlength": 124928.0,
+            "outlength": 124928.0
+          },
+          {
+            "x": -73439.5,
+            "y": -73655.0,
+            "z": 910797.0,
+            "tx": -0.562266,
+            "ty": -0.203753,
+            "tz": 0.801462,
+            "inlength": 228050.0,
+            "outlength": 0.0
+          }
+        ]
+      },
+      "lateral_factor": 1.16,
+      "radial_factor": 0.83825,
+      "falloff_factor": 0.97237,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 0.026,
+          "theoretical_reserve": 23423,
+          "theoretical_respawn": 2342,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "lowest",
+          "reserve": 115684,
+          "respawn": 11568
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 0.06,
+          "theoretical_reserve": 54054,
+          "theoretical_respawn": 2703,
+          "delay": 1200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "verylow",
+          "reserve": 266982,
+          "respawn": 13349
+        }
+      ],
+      "solid_volume_km3": 926493
+    },
+    {
+      "ref": "region_cluster_01_sector_002_c",
+      "amount": 1,
+      "position": {
+        "x": 917448.0,
+        "y": 0.0,
+        "z": 920740.0
+      },
+      "boundary": {
+        "class": "splinetube",
+        "size": {
+          "r": 12000,
+          "linear": 3629928
+        },
+        "spline": [
+          {
+            "x": -980400.0,
+            "y": 0.0,
+            "z": -759537.0,
+            "tx": 0.569088,
+            "ty": -0.122626,
+            "tz": 0.813081,
+            "inlength": 0.0,
+            "outlength": 65037.4
+          },
+          {
+            "x": -678264.0,
+            "y": 0.0,
+            "z": -612687.0,
+            "tx": 0.963911,
+            "ty": 0.0472467,
+            "tz": 0.261997,
+            "inlength": 170651.0,
+            "outlength": 170651.0
+          },
+          {
+            "x": 6074.22,
+            "y": 47851.7,
+            "z": -489420.0,
+            "tx": 0.92084,
+            "ty": 0.00324062,
+            "tz": 0.389927,
+            "inlength": 178693.0,
+            "outlength": 178693.0
+          },
+          {
+            "x": 307863.0,
+            "y": 3852.28,
+            "z": -191882.0,
+            "tx": 0.26499,
+            "ty": 0.0332901,
+            "tz": 0.963676,
+            "inlength": 159582.0,
+            "outlength": 159582.0
+          },
+          {
+            "x": 261107.0,
+            "y": 79260.8,
+            "z": 432947.0,
+            "tx": -0.285522,
+            "ty": -0.0482356,
+            "tz": 0.957157,
+            "inlength": 177309.0,
+            "outlength": 177309.0
+          },
+          {
+            "x": 10324.2,
+            "y": -47079.4,
+            "z": 828248.0,
+            "tx": 0.845136,
+            "ty": -0.00935879,
+            "tz": 0.534469,
+            "inlength": 140352.0,
+            "outlength": 140352.0
+          },
+          {
+            "x": 975197.0,
+            "y": 73735.5,
+            "z": 879255.0,
+            "tx": 0.98529,
+            "ty": 0.153111,
+            "tz": -0.0758938,
+            "inlength": 532061.0,
+            "outlength": 0.0
+          }
+        ]
+      },
+      "lateral_factor": 1.16,
+      "radial_factor": 0.83825,
+      "falloff_factor": 0.97237,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 0.026,
+          "theoretical_reserve": 23423,
+          "theoretical_respawn": 2342,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "lowest",
+          "reserve": 140695,
+          "respawn": 14070
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 0.06,
+          "theoretical_reserve": 54054,
+          "theoretical_respawn": 2703,
+          "delay": 1200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "verylow",
+          "reserve": 324722,
+          "respawn": 16236
+        }
+      ],
+      "solid_volume_km3": 926493
+    },
+    {
+      "ref": "region_cluster_01_sector_002_d",
+      "amount": 1,
+      "position": {
+        "x": 1288360.0,
+        "y": 0.0,
+        "z": -262935.5
+      },
+      "boundary": {
+        "class": "splinetube",
+        "size": {
+          "r": 12000,
+          "linear": 3027791
+        },
+        "spline": [
+          {
+            "x": -1563800.0,
+            "y": 0.0,
+            "z": 287636.0,
+            "tx": 0.998124,
+            "ty": 0.0540584,
+            "tz": 0.0287442,
+            "inlength": 0.0,
+            "outlength": 222869.0
+          },
+          {
+            "x": -966510.0,
+            "y": 22887.7,
+            "z": 282010.0,
+            "tx": 0.998227,
+            "ty": 0.0179811,
+            "tz": -0.056749,
+            "inlength": 176063.0,
+            "outlength": 176063.0
+          },
+          {
+            "x": -509357.0,
+            "y": 19262.8,
+            "z": 226695.0,
+            "tx": 0.92442,
+            "ty": 0.0233787,
+            "tz": -0.380658,
+            "inlength": 160514.0,
+            "outlength": 160514.0
+          },
+          {
+            "x": -75800.8,
+            "y": 45444.6,
+            "z": -83594.2,
+            "tx": 0.859953,
+            "ty": 0.0373536,
+            "tz": -0.509004,
+            "inlength": 142373.0,
+            "outlength": 142373.0
+          },
+          {
+            "x": 225988.0,
+            "y": 51026.5,
+            "z": -206860.0,
+            "tx": 0.943053,
+            "ty": 0.0165158,
+            "tz": -0.332232,
+            "inlength": 137358.0,
+            "outlength": 137358.0
+          },
+          {
+            "x": 702049.0,
+            "y": 58789.7,
+            "z": -355629.0,
+            "tx": 0.759045,
+            "ty": -0.104883,
+            "tz": 0.642534,
+            "inlength": 107097.0,
+            "outlength": 107097.0
+          },
+          {
+            "x": 710549.0,
+            "y": -16794.4,
+            "z": 209693.0,
+            "tx": -0.235478,
+            "ty": -0.122566,
+            "tz": 0.96412,
+            "inlength": 318898.0,
+            "outlength": 0.0
+          }
+        ]
+      },
+      "lateral_factor": 1.16,
+      "radial_factor": 0.83825,
+      "falloff_factor": 0.97237,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 0.026,
+          "theoretical_reserve": 23423,
+          "theoretical_respawn": 2342,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "lowest",
+          "reserve": 295987,
+          "respawn": 29599
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 0.06,
+          "theoretical_reserve": 54054,
+          "theoretical_respawn": 2703,
+          "delay": 1200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "verylow",
+          "reserve": 683094,
+          "respawn": 34155
+        }
+      ],
+      "solid_volume_km3": 926493
+    },
+    {
+      "ref": "region_cluster_01_sector_002_e",
+      "amount": 1,
+      "position": {
+        "x": -6640.0,
+        "y": 0.0,
+        "z": -1141382.0
+      },
+      "boundary": {
+        "class": "splinetube",
+        "size": {
+          "r": 12000,
+          "linear": 2941985
+        },
+        "spline": [
+          {
+            "x": 60861.3,
+            "y": 0.0,
+            "z": 987056.0,
+            "tx": -0.714837,
+            "ty": -0.0324839,
+            "tz": -0.698536,
+            "inlength": 0.0,
+            "outlength": 208567.0
+          },
+          {
+            "x": -145227.0,
+            "y": -14563.2,
+            "z": 501564.0,
+            "tx": 0.0675904,
+            "ty": -0.0161389,
+            "tz": -0.997583,
+            "inlength": 178377.0,
+            "outlength": 178377.0
+          },
+          {
+            "x": 131059.0,
+            "y": -17602.4,
+            "z": -80760.3,
+            "tx": 0.507257,
+            "ty": -0.0497963,
+            "tz": -0.860355,
+            "inlength": 191356.0,
+            "outlength": 191356.0
+          },
+          {
+            "x": 432848.0,
+            "y": -71134.3,
+            "z": -488813.0,
+            "tx": -0.442173,
+            "ty": 0.115157,
+            "tz": -0.889506,
+            "inlength": 109070.0,
+            "outlength": 109070.0
+          },
+          {
+            "x": -157979.0,
+            "y": 57402.4,
+            "z": -663085.0,
+            "tx": -0.9189,
+            "ty": 0.0628602,
+            "tz": 0.38945,
+            "inlength": 138301.0,
+            "outlength": 138301.0
+          },
+          {
+            "x": -328000.0,
+            "y": -20540.0,
+            "z": -161521.0,
+            "tx": 0.0469676,
+            "ty": -0.210735,
+            "tz": 0.976414,
+            "inlength": 286587.0,
+            "outlength": 0.0
+          }
+        ]
+      },
+      "lateral_factor": 1.16,
+      "radial_factor": 0.83825,
+      "falloff_factor": 0.97237,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 0.06,
+          "theoretical_reserve": 54054,
+          "theoretical_respawn": 2703,
+          "delay": 1200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "verylow",
+          "reserve": 1058055,
+          "respawn": 52903
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 0.6,
+          "theoretical_reserve": 540537,
+          "theoretical_respawn": 18018,
+          "delay": 1800.0,
+          "gatherfactor": 1.0,
+          "yield_name": "low",
+          "reserve": 10581195,
+          "respawn": 352706
+        }
+      ],
+      "solid_volume_km3": 926493
+    },
+    {
+      "ref": "region_cluster_01_sector_002_f",
+      "amount": 1,
+      "position": {
+        "x": -578336.0,
+        "y": 0.0,
+        "z": -847385.5
+      },
+      "boundary": {
+        "class": "splinetube",
+        "size": {
+          "r": 12000,
+          "linear": 2305738
+        },
+        "spline": [
+          {
+            "x": 524234.0,
+            "y": 0.0,
+            "z": 704881.0,
+            "tx": -0.103204,
+            "ty": -0.137663,
+            "tz": -0.985088,
+            "inlength": 0.0,
+            "outlength": 75510.3
+          },
+          {
+            "x": 422221.0,
+            "y": 0.0,
+            "z": 509356.0,
+            "tx": -0.728821,
+            "ty": 0.126692,
+            "tz": -0.672881,
+            "inlength": 82862.8,
+            "outlength": 82862.8
+          },
+          {
+            "x": 162938.0,
+            "y": 62370.2,
+            "z": 369088.0,
+            "tx": -0.70269,
+            "ty": 0.101306,
+            "tz": -0.704247,
+            "inlength": 145516.0,
+            "outlength": 145516.0
+          },
+          {
+            "x": -189857.0,
+            "y": 88279.1,
+            "z": -106973.0,
+            "tx": -0.328088,
+            "ty": 0.0478272,
+            "tz": -0.943436,
+            "inlength": 166882.0,
+            "outlength": 166882.0
+          },
+          {
+            "x": -168605.0,
+            "y": 109693.0,
+            "z": -574533.0,
+            "tx": -0.568676,
+            "ty": -0.122473,
+            "tz": -0.813393,
+            "inlength": 163395.0,
+            "outlength": 163395.0
+          },
+          {
+            "x": -750930.0,
+            "y": -32300.0,
+            "z": -901824.0,
+            "tx": -0.933065,
+            "ty": -0.236081,
+            "tz": -0.271396,
+            "inlength": 315846.0,
+            "outlength": 0.0
+          }
+        ]
+      },
+      "lateral_factor": 1.16,
+      "radial_factor": 0.83825,
+      "falloff_factor": 0.97237,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 0.06,
+          "theoretical_reserve": 54054,
+          "theoretical_respawn": 2703,
+          "delay": 1200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "verylow",
+          "reserve": 400607,
+          "respawn": 20030
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 0.6,
+          "theoretical_reserve": 540537,
+          "theoretical_respawn": 18018,
+          "delay": 1800.0,
+          "gatherfactor": 1.0,
+          "yield_name": "low",
+          "reserve": 4006326,
+          "respawn": 133544
+        }
+      ],
+      "solid_volume_km3": 926493
+    },
+    {
+      "ref": "region_cluster_01_sector_002_g",
+      "amount": 1,
+      "position": {
+        "x": -1597356.0,
+        "y": 0.0,
+        "z": -540536.5
+      },
+      "boundary": {
+        "class": "splinetube",
+        "size": {
+          "r": 12000,
+          "linear": 8421676
+        },
+        "spline": [
+          {
+            "x": 1493280.0,
+            "y": 0.0,
+            "z": 401906.0,
+            "tx": -0.566909,
+            "ty": -0.36368,
+            "tz": -0.739156,
+            "inlength": 0.0,
+            "outlength": 222099.0
+          },
+          {
+            "x": 1067190.0,
+            "y": -108038.0,
+            "z": 160002.0,
+            "tx": -0.998159,
+            "ty": 0.0575362,
+            "tz": 0.0191737,
+            "inlength": 158419.0,
+            "outlength": 158419.0
+          },
+          {
+            "x": 544375.0,
+            "y": 52486.3,
+            "z": 419286.0,
+            "tx": -0.727328,
+            "ty": 0.103227,
+            "tz": 0.678482,
+            "inlength": 207632.0,
+            "outlength": 207632.0
+          },
+          {
+            "x": 157576.0,
+            "y": 19567.9,
+            "z": 1001610.0,
+            "tx": -0.914711,
+            "ty": -0.057663,
+            "tz": 0.399973,
+            "inlength": 197338.0,
+            "outlength": 197338.0
+          },
+          {
+            "x": -539514.0,
+            "y": -14579.4,
+            "z": 891096.0,
+            "tx": -0.589704,
+            "ty": 0.0505851,
+            "tz": -0.806034,
+            "inlength": 135910.0,
+            "outlength": 135910.0
+          },
+          {
+            "x": -326986.0,
+            "y": 60749.2,
+            "z": 347026.0,
+            "tx": -0.339972,
+            "ty": 0.123183,
+            "tz": -0.932333,
+            "inlength": 162583.0,
+            "outlength": 162583.0
+          },
+          {
+            "x": -871057.0,
+            "y": 104867.0,
+            "z": -18520.5,
+            "tx": 0.0506671,
+            "ty": -0.0191147,
+            "tz": -0.998533,
+            "inlength": 117083.0,
+            "outlength": 117083.0
+          },
+          {
+            "x": -288732.0,
+            "y": 48068.0,
+            "z": -354313.0,
+            "tx": 0.912941,
+            "ty": 0.0286582,
+            "tz": 0.407085,
+            "inlength": 154210.0,
+            "outlength": 154210.0
+          },
+          {
+            "x": -25197.3,
+            "y": 131527.0,
+            "z": 355527.0,
+            "tx": 0.863174,
+            "ty": 0.0732934,
+            "tz": 0.499558,
+            "inlength": 135848.0,
+            "outlength": 135848.0
+          },
+          {
+            "x": 416859.0,
+            "y": 106865.0,
+            "z": 49488.3,
+            "tx": 0.395832,
+            "ty": -0.212886,
+            "tz": -0.893307,
+            "inlength": 126893.0,
+            "outlength": 126893.0
+          },
+          {
+            "x": 276592.0,
+            "y": -29927.2,
+            "z": -324560.0,
+            "tx": -0.449672,
+            "ty": -0.0519326,
+            "tz": -0.891683,
+            "inlength": 161162.0,
+            "outlength": 161162.0
+          },
+          {
+            "x": -16697.3,
+            "y": 56496.2,
+            "z": -813373.0,
+            "tx": -0.677155,
+            "ty": 0.0497415,
+            "tz": -0.734157,
+            "inlength": 174154.0,
+            "outlength": 174154.0
+          },
+          {
+            "x": -433250.0,
+            "y": 21220.2,
+            "z": -1089660.0,
+            "tx": -0.992725,
+            "ty": -0.0178023,
+            "tz": -0.11908,
+            "inlength": 227618.0,
+            "outlength": 227618.0
+          },
+          {
+            "x": -1372620.0,
+            "y": 33058.2,
+            "z": -974893.0,
+            "tx": -0.967803,
+            "ty": 0.0285276,
+            "tz": 0.250087,
+            "inlength": 413576.0,
+            "outlength": 0.0
+          }
+        ]
+      },
+      "lateral_factor": 1.16,
+      "radial_factor": 0.83825,
+      "falloff_factor": 0.97237,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 0.026,
+          "theoretical_reserve": 23423,
+          "theoretical_respawn": 2342,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "lowest",
+          "reserve": 1640189,
+          "respawn": 164019
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 0.06,
+          "theoretical_reserve": 54054,
+          "theoretical_respawn": 2703,
+          "delay": 1200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "verylow",
+          "reserve": 3785338,
+          "respawn": 189267
+        }
+      ],
+      "solid_volume_km3": 926493
+    },
+    {
+      "ref": "region_cluster_01_sector_002_g",
+      "amount": 1,
+      "position": {
+        "x": 121418.0,
+        "y": 0.0,
+        "z": 44270.5
+      },
+      "boundary": {
+        "class": "splinetube",
+        "size": {
+          "r": 12000,
+          "linear": 8421676
+        },
+        "spline": [
+          {
+            "x": 1493280.0,
+            "y": 0.0,
+            "z": 401906.0,
+            "tx": -0.566909,
+            "ty": -0.36368,
+            "tz": -0.739156,
+            "inlength": 0.0,
+            "outlength": 222099.0
+          },
+          {
+            "x": 1067190.0,
+            "y": -108038.0,
+            "z": 160002.0,
+            "tx": -0.998159,
+            "ty": 0.0575362,
+            "tz": 0.0191737,
+            "inlength": 158419.0,
+            "outlength": 158419.0
+          },
+          {
+            "x": 544375.0,
+            "y": 52486.3,
+            "z": 419286.0,
+            "tx": -0.727328,
+            "ty": 0.103227,
+            "tz": 0.678482,
+            "inlength": 207632.0,
+            "outlength": 207632.0
+          },
+          {
+            "x": 157576.0,
+            "y": 19567.9,
+            "z": 1001610.0,
+            "tx": -0.914711,
+            "ty": -0.057663,
+            "tz": 0.399973,
+            "inlength": 197338.0,
+            "outlength": 197338.0
+          },
+          {
+            "x": -539514.0,
+            "y": -14579.4,
+            "z": 891096.0,
+            "tx": -0.589704,
+            "ty": 0.0505851,
+            "tz": -0.806034,
+            "inlength": 135910.0,
+            "outlength": 135910.0
+          },
+          {
+            "x": -326986.0,
+            "y": 60749.2,
+            "z": 347026.0,
+            "tx": -0.339972,
+            "ty": 0.123183,
+            "tz": -0.932333,
+            "inlength": 162583.0,
+            "outlength": 162583.0
+          },
+          {
+            "x": -871057.0,
+            "y": 104867.0,
+            "z": -18520.5,
+            "tx": 0.0506671,
+            "ty": -0.0191147,
+            "tz": -0.998533,
+            "inlength": 117083.0,
+            "outlength": 117083.0
+          },
+          {
+            "x": -288732.0,
+            "y": 48068.0,
+            "z": -354313.0,
+            "tx": 0.912941,
+            "ty": 0.0286582,
+            "tz": 0.407085,
+            "inlength": 154210.0,
+            "outlength": 154210.0
+          },
+          {
+            "x": -25197.3,
+            "y": 131527.0,
+            "z": 355527.0,
+            "tx": 0.863174,
+            "ty": 0.0732934,
+            "tz": 0.499558,
+            "inlength": 135848.0,
+            "outlength": 135848.0
+          },
+          {
+            "x": 416859.0,
+            "y": 106865.0,
+            "z": 49488.3,
+            "tx": 0.395832,
+            "ty": -0.212886,
+            "tz": -0.893307,
+            "inlength": 126893.0,
+            "outlength": 126893.0
+          },
+          {
+            "x": 276592.0,
+            "y": -29927.2,
+            "z": -324560.0,
+            "tx": -0.449672,
+            "ty": -0.0519326,
+            "tz": -0.891683,
+            "inlength": 161162.0,
+            "outlength": 161162.0
+          },
+          {
+            "x": -16697.3,
+            "y": 56496.2,
+            "z": -813373.0,
+            "tx": -0.677155,
+            "ty": 0.0497415,
+            "tz": -0.734157,
+            "inlength": 174154.0,
+            "outlength": 174154.0
+          },
+          {
+            "x": -433250.0,
+            "y": 21220.2,
+            "z": -1089660.0,
+            "tx": -0.992725,
+            "ty": -0.0178023,
+            "tz": -0.11908,
+            "inlength": 227618.0,
+            "outlength": 227618.0
+          },
+          {
+            "x": -1372620.0,
+            "y": 33058.2,
+            "z": -974893.0,
+            "tx": -0.967803,
+            "ty": 0.0285276,
+            "tz": 0.250087,
+            "inlength": 413576.0,
+            "outlength": 0.0
+          }
+        ]
+      },
+      "lateral_factor": 1.16,
+      "radial_factor": 0.83825,
+      "falloff_factor": 0.97237,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 0.026,
+          "theoretical_reserve": 23423,
+          "theoretical_respawn": 2342,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "lowest",
+          "reserve": 1640189,
+          "respawn": 164019
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 0.06,
+          "theoretical_reserve": 54054,
+          "theoretical_respawn": 2703,
+          "delay": 1200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "verylow",
+          "reserve": 3785338,
+          "respawn": 189267
+        }
+      ],
+      "solid_volume_km3": 926493
+    },
+    {
+      "ref": "p1_wreckfield_station_10km",
+      "amount": 1,
+      "position": {
+        "x": 354000.0,
+        "y": 22000.0,
+        "z": 17000.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 10000,
+          "linear": 3500
+        }
+      },
+      "lateral_factor": 0.99,
+      "radial_factor": 0.9125,
+      "falloff_factor": 0.90338,
+      "resources": [
+        {
+          "ware": "hydrogen",
+          "resourcedensity": 49500.0,
+          "theoretical_reserve": 402454,
+          "theoretical_respawn": 40245,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medium",
+          "reserve": 89434,
+          "respawn": 8943
+        },
+        {
+          "ware": "rawscrap",
+          "resourcedensity": 7.5,
+          "theoretical_reserve": 14900,
+          "theoretical_respawn": 213,
+          "delay": 4200.0,
+          "gatherfactor": 1.0,
+          "yield_name": "high",
+          "reserve": 14898,
+          "respawn": 213
+        }
+      ],
+      "solid_volume_km3": 2199,
+      "gas_volume_km3": 2359296
+    }
+  ],
   "Cluster_01_Sector003_macro": [
     {
       "ref": "p1_40km_asteroid_field",
@@ -66185,1336 +67515,6 @@
         }
       ],
       "gas_volume_km3": 11796480
-    }
-  ],
-  "Cluster_01_Sector002_macro": [
-    {
-      "ref": "p1_40km_ice_field",
-      "amount": 1,
-      "position": {
-        "x": -22494.0,
-        "y": 0.0,
-        "z": -144694.5
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 25000,
-          "linear": 2500
-        }
-      },
-      "lateral_factor": 0.9,
-      "radial_factor": 0.77,
-      "falloff_factor": 0.693,
-      "resources": [
-        {
-          "ware": "ice",
-          "resourcedensity": 15.0,
-          "theoretical_reserve": 102053,
-          "theoretical_respawn": 10205,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medium",
-          "reserve": 248583,
-          "respawn": 24858
-        }
-      ],
-      "solid_volume_km3": 9817
-    },
-    {
-      "ref": "p1_40km_hydrogen_field",
-      "amount": 1,
-      "position": {
-        "x": -98698.0,
-        "y": 0.0,
-        "z": -133897.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 25000,
-          "linear": 15500
-        }
-      },
-      "lateral_factor": 0.9,
-      "radial_factor": 0.77,
-      "falloff_factor": 0.693,
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "resourcedensity": 250000.0,
-          "theoretical_reserve": 1559250,
-          "theoretical_respawn": 51975,
-          "delay": 1800.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medhigh",
-          "reserve": 346498,
-          "respawn": 11550
-        }
-      ],
-      "gas_volume_km3": 2359296
-    },
-    {
-      "ref": "p1_40km_helium_field",
-      "amount": 1,
-      "position": {
-        "x": -59638.0,
-        "y": 0.0,
-        "z": -143637.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 25000,
-          "linear": 15500
-        }
-      },
-      "lateral_factor": 0.9,
-      "radial_factor": 0.77,
-      "falloff_factor": 0.693,
-      "resources": [
-        {
-          "ware": "helium",
-          "resourcedensity": 50000.0,
-          "theoretical_reserve": 311850,
-          "theoretical_respawn": 10395,
-          "delay": 1800.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medhigh",
-          "reserve": 69298,
-          "respawn": 2310
-        }
-      ],
-      "gas_volume_km3": 2359296
-    },
-    {
-      "ref": "p1_40km_methane_field",
-      "amount": 1,
-      "position": {
-        "x": -22926.0,
-        "y": 0.0,
-        "z": -163076.5
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 25000,
-          "linear": 15500
-        }
-      },
-      "lateral_factor": 0.9,
-      "radial_factor": 0.77,
-      "falloff_factor": 0.693,
-      "resources": [
-        {
-          "ware": "methane",
-          "resourcedensity": 25000.0,
-          "theoretical_reserve": 155925,
-          "theoretical_respawn": 15593,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medium",
-          "reserve": 69296,
-          "respawn": 6930
-        }
-      ],
-      "gas_volume_km3": 2359296
-    },
-    {
-      "ref": "p1_40km_ice_field",
-      "amount": 1,
-      "position": {
-        "x": -63226.0,
-        "y": 0.0,
-        "z": -129391.5
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 25000,
-          "linear": 2500
-        }
-      },
-      "lateral_factor": 0.9,
-      "radial_factor": 0.77,
-      "falloff_factor": 0.693,
-      "resources": [
-        {
-          "ware": "ice",
-          "resourcedensity": 15.0,
-          "theoretical_reserve": 102053,
-          "theoretical_respawn": 10205,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medium",
-          "reserve": 248583,
-          "respawn": 24858
-        }
-      ],
-      "solid_volume_km3": 9817
-    },
-    {
-      "ref": "region_cluster_01_sector_002_a",
-      "amount": 1,
-      "position": {
-        "x": -24722.0,
-        "y": 0.0,
-        "z": 12325.0
-      },
-      "boundary": {
-        "class": "splinetube",
-        "size": {
-          "r": 12000,
-          "linear": 4649870
-        },
-        "spline": [
-          {
-            "x": -1670110.0,
-            "y": 31421.3,
-            "z": 1303920.0,
-            "tx": 0.793875,
-            "ty": 0.428193,
-            "tz": -0.431755,
-            "inlength": 0.0,
-            "outlength": 143867.0
-          },
-          {
-            "x": -1381570.0,
-            "y": 108330.0,
-            "z": 1057470.0,
-            "tx": 0.603818,
-            "ty": -0.0830723,
-            "tz": -0.792782,
-            "inlength": 129060.0,
-            "outlength": 129060.0
-          },
-          {
-            "x": -1201230.0,
-            "y": -30560.0,
-            "z": 690784.0,
-            "tx": 0.585066,
-            "ty": -0.00830522,
-            "tz": -0.810943,
-            "inlength": 121246.0,
-            "outlength": 121246.0
-          },
-          {
-            "x": -954775.0,
-            "y": 102332.0,
-            "z": 468370.0,
-            "tx": 0.854428,
-            "ty": 0.0907545,
-            "tz": -0.511582,
-            "inlength": 117302.0,
-            "outlength": 117302.0
-          },
-          {
-            "x": -600115.0,
-            "y": 32116.9,
-            "z": 330113.0,
-            "tx": 0.92983,
-            "ty": -0.120164,
-            "tz": -0.347817,
-            "inlength": 143371.0,
-            "outlength": 143371.0
-          },
-          {
-            "x": -155289.0,
-            "y": 0.0,
-            "z": 167811.0,
-            "tx": 0.849769,
-            "ty": -0.0382063,
-            "tz": -0.525769,
-            "inlength": 139116.0,
-            "outlength": 139116.0
-          },
-          {
-            "x": 109203.0,
-            "y": 0.0,
-            "z": -108703.0,
-            "tx": 0.696444,
-            "ty": -0.000164574,
-            "tz": -0.717611,
-            "inlength": 109106.0,
-            "outlength": 109106.0
-          },
-          {
-            "x": 301561.0,
-            "y": 0.0,
-            "z": -301061.0,
-            "tx": 0.75116,
-            "ty": 0.0722117,
-            "tz": -0.656159,
-            "inlength": 123880.0,
-            "outlength": 123880.0
-          },
-          {
-            "x": 668242.0,
-            "y": 53456.0,
-            "z": -595608.0,
-            "tx": 0.892235,
-            "ty": 0.0719789,
-            "tz": -0.445797,
-            "inlength": 179679.0,
-            "outlength": 179679.0
-          },
-          {
-            "x": 1263350.0,
-            "y": 77032.9,
-            "z": -781955.0,
-            "tx": 0.938084,
-            "ty": -0.0326186,
-            "tz": -0.344869,
-            "inlength": 188068.0,
-            "outlength": 188068.0
-          },
-          {
-            "x": 1726210.0,
-            "y": 16785.5,
-            "z": -986335.0,
-            "tx": 0.799189,
-            "ty": -0.137767,
-            "tz": -0.585079,
-            "inlength": 131697.0,
-            "outlength": 131697.0
-          },
-          {
-            "x": 1894520.0,
-            "y": -31437.1,
-            "z": -1244820.0,
-            "tx": 0.0726957,
-            "ty": -0.145854,
-            "tz": -0.986632,
-            "inlength": 96466.3,
-            "outlength": 0.0
-          }
-        ]
-      },
-      "lateral_factor": 1.1,
-      "radial_factor": 0.83825,
-      "falloff_factor": 0.92207,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 0.026,
-          "theoretical_reserve": 22212,
-          "theoretical_respawn": 2221,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "lowest",
-          "reserve": 403714,
-          "respawn": 40371
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 0.06,
-          "theoretical_reserve": 51258,
-          "theoretical_respawn": 2563,
-          "delay": 1200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "verylow",
-          "reserve": 931740,
-          "respawn": 46587
-        }
-      ],
-      "solid_volume_km3": 926493
-    },
-    {
-      "ref": "region_cluster_01_sector_002_b",
-      "amount": 1,
-      "position": {
-        "x": -261200.0,
-        "y": 0.0,
-        "z": 897699.0
-      },
-      "boundary": {
-        "class": "splinetube",
-        "size": {
-          "r": 12000,
-          "linear": 3026685
-        },
-        "spline": [
-          {
-            "x": 257041.0,
-            "y": 0.0,
-            "z": -830864.0,
-            "tx": -0.638388,
-            "ty": -0.0240925,
-            "tz": 0.769338,
-            "inlength": 0.0,
-            "outlength": 86557.7
-          },
-          {
-            "x": 138025.0,
-            "y": 0.0,
-            "z": -614086.0,
-            "tx": -0.296412,
-            "ty": 0.0266043,
-            "tz": 0.95469,
-            "inlength": 81590.8,
-            "outlength": 81590.8
-          },
-          {
-            "x": 112521.0,
-            "y": 12512.3,
-            "z": -363304.0,
-            "tx": 0.291798,
-            "ty": -0.114824,
-            "tz": 0.949563,
-            "inlength": 96888.7,
-            "outlength": 96888.7
-          },
-          {
-            "x": 305922.0,
-            "y": -66510.3,
-            "z": -61515.6,
-            "tx": 0.0753404,
-            "ty": -0.128084,
-            "tz": 0.988898,
-            "inlength": 76255.1,
-            "outlength": 76255.1
-          },
-          {
-            "x": 144402.0,
-            "y": -45753.9,
-            "z": 89378.9,
-            "tx": -0.98158,
-            "ty": 0.0860607,
-            "tz": 0.170573,
-            "inlength": 111579.0,
-            "outlength": 111579.0
-          },
-          {
-            "x": -350787.0,
-            "y": -9364.49,
-            "z": 55375.0,
-            "tx": -0.945618,
-            "ty": 0.0383984,
-            "tz": 0.323004,
-            "inlength": 120174.0,
-            "outlength": 120174.0
-          },
-          {
-            "x": -536748.0,
-            "y": -17777.8,
-            "z": 324222.0,
-            "tx": 0.635426,
-            "ty": 0.034923,
-            "tz": 0.771371,
-            "inlength": 93465.0,
-            "outlength": 93465.0
-          },
-          {
-            "x": 3070.31,
-            "y": 10013.0,
-            "z": 489993.0,
-            "tx": 0.624645,
-            "ty": -0.0733255,
-            "tz": 0.777459,
-            "inlength": 124928.0,
-            "outlength": 124928.0
-          },
-          {
-            "x": -73439.5,
-            "y": -73655.0,
-            "z": 910797.0,
-            "tx": -0.562266,
-            "ty": -0.203753,
-            "tz": 0.801462,
-            "inlength": 228050.0,
-            "outlength": 0.0
-          }
-        ]
-      },
-      "lateral_factor": 1.16,
-      "radial_factor": 0.83825,
-      "falloff_factor": 0.97237,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 0.026,
-          "theoretical_reserve": 23423,
-          "theoretical_respawn": 2342,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "lowest",
-          "reserve": 115684,
-          "respawn": 11568
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 0.06,
-          "theoretical_reserve": 54054,
-          "theoretical_respawn": 2703,
-          "delay": 1200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "verylow",
-          "reserve": 266982,
-          "respawn": 13349
-        }
-      ],
-      "solid_volume_km3": 926493
-    },
-    {
-      "ref": "region_cluster_01_sector_002_c",
-      "amount": 1,
-      "position": {
-        "x": 917448.0,
-        "y": 0.0,
-        "z": 920740.0
-      },
-      "boundary": {
-        "class": "splinetube",
-        "size": {
-          "r": 12000,
-          "linear": 3629928
-        },
-        "spline": [
-          {
-            "x": -980400.0,
-            "y": 0.0,
-            "z": -759537.0,
-            "tx": 0.569088,
-            "ty": -0.122626,
-            "tz": 0.813081,
-            "inlength": 0.0,
-            "outlength": 65037.4
-          },
-          {
-            "x": -678264.0,
-            "y": 0.0,
-            "z": -612687.0,
-            "tx": 0.963911,
-            "ty": 0.0472467,
-            "tz": 0.261997,
-            "inlength": 170651.0,
-            "outlength": 170651.0
-          },
-          {
-            "x": 6074.22,
-            "y": 47851.7,
-            "z": -489420.0,
-            "tx": 0.92084,
-            "ty": 0.00324062,
-            "tz": 0.389927,
-            "inlength": 178693.0,
-            "outlength": 178693.0
-          },
-          {
-            "x": 307863.0,
-            "y": 3852.28,
-            "z": -191882.0,
-            "tx": 0.26499,
-            "ty": 0.0332901,
-            "tz": 0.963676,
-            "inlength": 159582.0,
-            "outlength": 159582.0
-          },
-          {
-            "x": 261107.0,
-            "y": 79260.8,
-            "z": 432947.0,
-            "tx": -0.285522,
-            "ty": -0.0482356,
-            "tz": 0.957157,
-            "inlength": 177309.0,
-            "outlength": 177309.0
-          },
-          {
-            "x": 10324.2,
-            "y": -47079.4,
-            "z": 828248.0,
-            "tx": 0.845136,
-            "ty": -0.00935879,
-            "tz": 0.534469,
-            "inlength": 140352.0,
-            "outlength": 140352.0
-          },
-          {
-            "x": 975197.0,
-            "y": 73735.5,
-            "z": 879255.0,
-            "tx": 0.98529,
-            "ty": 0.153111,
-            "tz": -0.0758938,
-            "inlength": 532061.0,
-            "outlength": 0.0
-          }
-        ]
-      },
-      "lateral_factor": 1.16,
-      "radial_factor": 0.83825,
-      "falloff_factor": 0.97237,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 0.026,
-          "theoretical_reserve": 23423,
-          "theoretical_respawn": 2342,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "lowest",
-          "reserve": 140695,
-          "respawn": 14070
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 0.06,
-          "theoretical_reserve": 54054,
-          "theoretical_respawn": 2703,
-          "delay": 1200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "verylow",
-          "reserve": 324722,
-          "respawn": 16236
-        }
-      ],
-      "solid_volume_km3": 926493
-    },
-    {
-      "ref": "region_cluster_01_sector_002_d",
-      "amount": 1,
-      "position": {
-        "x": 1288360.0,
-        "y": 0.0,
-        "z": -262935.5
-      },
-      "boundary": {
-        "class": "splinetube",
-        "size": {
-          "r": 12000,
-          "linear": 3027791
-        },
-        "spline": [
-          {
-            "x": -1563800.0,
-            "y": 0.0,
-            "z": 287636.0,
-            "tx": 0.998124,
-            "ty": 0.0540584,
-            "tz": 0.0287442,
-            "inlength": 0.0,
-            "outlength": 222869.0
-          },
-          {
-            "x": -966510.0,
-            "y": 22887.7,
-            "z": 282010.0,
-            "tx": 0.998227,
-            "ty": 0.0179811,
-            "tz": -0.056749,
-            "inlength": 176063.0,
-            "outlength": 176063.0
-          },
-          {
-            "x": -509357.0,
-            "y": 19262.8,
-            "z": 226695.0,
-            "tx": 0.92442,
-            "ty": 0.0233787,
-            "tz": -0.380658,
-            "inlength": 160514.0,
-            "outlength": 160514.0
-          },
-          {
-            "x": -75800.8,
-            "y": 45444.6,
-            "z": -83594.2,
-            "tx": 0.859953,
-            "ty": 0.0373536,
-            "tz": -0.509004,
-            "inlength": 142373.0,
-            "outlength": 142373.0
-          },
-          {
-            "x": 225988.0,
-            "y": 51026.5,
-            "z": -206860.0,
-            "tx": 0.943053,
-            "ty": 0.0165158,
-            "tz": -0.332232,
-            "inlength": 137358.0,
-            "outlength": 137358.0
-          },
-          {
-            "x": 702049.0,
-            "y": 58789.7,
-            "z": -355629.0,
-            "tx": 0.759045,
-            "ty": -0.104883,
-            "tz": 0.642534,
-            "inlength": 107097.0,
-            "outlength": 107097.0
-          },
-          {
-            "x": 710549.0,
-            "y": -16794.4,
-            "z": 209693.0,
-            "tx": -0.235478,
-            "ty": -0.122566,
-            "tz": 0.96412,
-            "inlength": 318898.0,
-            "outlength": 0.0
-          }
-        ]
-      },
-      "lateral_factor": 1.16,
-      "radial_factor": 0.83825,
-      "falloff_factor": 0.97237,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 0.026,
-          "theoretical_reserve": 23423,
-          "theoretical_respawn": 2342,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "lowest",
-          "reserve": 295987,
-          "respawn": 29599
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 0.06,
-          "theoretical_reserve": 54054,
-          "theoretical_respawn": 2703,
-          "delay": 1200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "verylow",
-          "reserve": 683094,
-          "respawn": 34155
-        }
-      ],
-      "solid_volume_km3": 926493
-    },
-    {
-      "ref": "region_cluster_01_sector_002_e",
-      "amount": 1,
-      "position": {
-        "x": -6640.0,
-        "y": 0.0,
-        "z": -1141382.0
-      },
-      "boundary": {
-        "class": "splinetube",
-        "size": {
-          "r": 12000,
-          "linear": 2941985
-        },
-        "spline": [
-          {
-            "x": 60861.3,
-            "y": 0.0,
-            "z": 987056.0,
-            "tx": -0.714837,
-            "ty": -0.0324839,
-            "tz": -0.698536,
-            "inlength": 0.0,
-            "outlength": 208567.0
-          },
-          {
-            "x": -145227.0,
-            "y": -14563.2,
-            "z": 501564.0,
-            "tx": 0.0675904,
-            "ty": -0.0161389,
-            "tz": -0.997583,
-            "inlength": 178377.0,
-            "outlength": 178377.0
-          },
-          {
-            "x": 131059.0,
-            "y": -17602.4,
-            "z": -80760.3,
-            "tx": 0.507257,
-            "ty": -0.0497963,
-            "tz": -0.860355,
-            "inlength": 191356.0,
-            "outlength": 191356.0
-          },
-          {
-            "x": 432848.0,
-            "y": -71134.3,
-            "z": -488813.0,
-            "tx": -0.442173,
-            "ty": 0.115157,
-            "tz": -0.889506,
-            "inlength": 109070.0,
-            "outlength": 109070.0
-          },
-          {
-            "x": -157979.0,
-            "y": 57402.4,
-            "z": -663085.0,
-            "tx": -0.9189,
-            "ty": 0.0628602,
-            "tz": 0.38945,
-            "inlength": 138301.0,
-            "outlength": 138301.0
-          },
-          {
-            "x": -328000.0,
-            "y": -20540.0,
-            "z": -161521.0,
-            "tx": 0.0469676,
-            "ty": -0.210735,
-            "tz": 0.976414,
-            "inlength": 286587.0,
-            "outlength": 0.0
-          }
-        ]
-      },
-      "lateral_factor": 1.16,
-      "radial_factor": 0.83825,
-      "falloff_factor": 0.97237,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 0.06,
-          "theoretical_reserve": 54054,
-          "theoretical_respawn": 2703,
-          "delay": 1200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "verylow",
-          "reserve": 1058055,
-          "respawn": 52903
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 0.6,
-          "theoretical_reserve": 540537,
-          "theoretical_respawn": 18018,
-          "delay": 1800.0,
-          "gatherfactor": 1.0,
-          "yield_name": "low",
-          "reserve": 10581195,
-          "respawn": 352706
-        }
-      ],
-      "solid_volume_km3": 926493
-    },
-    {
-      "ref": "region_cluster_01_sector_002_f",
-      "amount": 1,
-      "position": {
-        "x": -578336.0,
-        "y": 0.0,
-        "z": -847385.5
-      },
-      "boundary": {
-        "class": "splinetube",
-        "size": {
-          "r": 12000,
-          "linear": 2305738
-        },
-        "spline": [
-          {
-            "x": 524234.0,
-            "y": 0.0,
-            "z": 704881.0,
-            "tx": -0.103204,
-            "ty": -0.137663,
-            "tz": -0.985088,
-            "inlength": 0.0,
-            "outlength": 75510.3
-          },
-          {
-            "x": 422221.0,
-            "y": 0.0,
-            "z": 509356.0,
-            "tx": -0.728821,
-            "ty": 0.126692,
-            "tz": -0.672881,
-            "inlength": 82862.8,
-            "outlength": 82862.8
-          },
-          {
-            "x": 162938.0,
-            "y": 62370.2,
-            "z": 369088.0,
-            "tx": -0.70269,
-            "ty": 0.101306,
-            "tz": -0.704247,
-            "inlength": 145516.0,
-            "outlength": 145516.0
-          },
-          {
-            "x": -189857.0,
-            "y": 88279.1,
-            "z": -106973.0,
-            "tx": -0.328088,
-            "ty": 0.0478272,
-            "tz": -0.943436,
-            "inlength": 166882.0,
-            "outlength": 166882.0
-          },
-          {
-            "x": -168605.0,
-            "y": 109693.0,
-            "z": -574533.0,
-            "tx": -0.568676,
-            "ty": -0.122473,
-            "tz": -0.813393,
-            "inlength": 163395.0,
-            "outlength": 163395.0
-          },
-          {
-            "x": -750930.0,
-            "y": -32300.0,
-            "z": -901824.0,
-            "tx": -0.933065,
-            "ty": -0.236081,
-            "tz": -0.271396,
-            "inlength": 315846.0,
-            "outlength": 0.0
-          }
-        ]
-      },
-      "lateral_factor": 1.16,
-      "radial_factor": 0.83825,
-      "falloff_factor": 0.97237,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 0.06,
-          "theoretical_reserve": 54054,
-          "theoretical_respawn": 2703,
-          "delay": 1200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "verylow",
-          "reserve": 400607,
-          "respawn": 20030
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 0.6,
-          "theoretical_reserve": 540537,
-          "theoretical_respawn": 18018,
-          "delay": 1800.0,
-          "gatherfactor": 1.0,
-          "yield_name": "low",
-          "reserve": 4006326,
-          "respawn": 133544
-        }
-      ],
-      "solid_volume_km3": 926493
-    },
-    {
-      "ref": "region_cluster_01_sector_002_g",
-      "amount": 1,
-      "position": {
-        "x": -1597356.0,
-        "y": 0.0,
-        "z": -540536.5
-      },
-      "boundary": {
-        "class": "splinetube",
-        "size": {
-          "r": 12000,
-          "linear": 8421676
-        },
-        "spline": [
-          {
-            "x": 1493280.0,
-            "y": 0.0,
-            "z": 401906.0,
-            "tx": -0.566909,
-            "ty": -0.36368,
-            "tz": -0.739156,
-            "inlength": 0.0,
-            "outlength": 222099.0
-          },
-          {
-            "x": 1067190.0,
-            "y": -108038.0,
-            "z": 160002.0,
-            "tx": -0.998159,
-            "ty": 0.0575362,
-            "tz": 0.0191737,
-            "inlength": 158419.0,
-            "outlength": 158419.0
-          },
-          {
-            "x": 544375.0,
-            "y": 52486.3,
-            "z": 419286.0,
-            "tx": -0.727328,
-            "ty": 0.103227,
-            "tz": 0.678482,
-            "inlength": 207632.0,
-            "outlength": 207632.0
-          },
-          {
-            "x": 157576.0,
-            "y": 19567.9,
-            "z": 1001610.0,
-            "tx": -0.914711,
-            "ty": -0.057663,
-            "tz": 0.399973,
-            "inlength": 197338.0,
-            "outlength": 197338.0
-          },
-          {
-            "x": -539514.0,
-            "y": -14579.4,
-            "z": 891096.0,
-            "tx": -0.589704,
-            "ty": 0.0505851,
-            "tz": -0.806034,
-            "inlength": 135910.0,
-            "outlength": 135910.0
-          },
-          {
-            "x": -326986.0,
-            "y": 60749.2,
-            "z": 347026.0,
-            "tx": -0.339972,
-            "ty": 0.123183,
-            "tz": -0.932333,
-            "inlength": 162583.0,
-            "outlength": 162583.0
-          },
-          {
-            "x": -871057.0,
-            "y": 104867.0,
-            "z": -18520.5,
-            "tx": 0.0506671,
-            "ty": -0.0191147,
-            "tz": -0.998533,
-            "inlength": 117083.0,
-            "outlength": 117083.0
-          },
-          {
-            "x": -288732.0,
-            "y": 48068.0,
-            "z": -354313.0,
-            "tx": 0.912941,
-            "ty": 0.0286582,
-            "tz": 0.407085,
-            "inlength": 154210.0,
-            "outlength": 154210.0
-          },
-          {
-            "x": -25197.3,
-            "y": 131527.0,
-            "z": 355527.0,
-            "tx": 0.863174,
-            "ty": 0.0732934,
-            "tz": 0.499558,
-            "inlength": 135848.0,
-            "outlength": 135848.0
-          },
-          {
-            "x": 416859.0,
-            "y": 106865.0,
-            "z": 49488.3,
-            "tx": 0.395832,
-            "ty": -0.212886,
-            "tz": -0.893307,
-            "inlength": 126893.0,
-            "outlength": 126893.0
-          },
-          {
-            "x": 276592.0,
-            "y": -29927.2,
-            "z": -324560.0,
-            "tx": -0.449672,
-            "ty": -0.0519326,
-            "tz": -0.891683,
-            "inlength": 161162.0,
-            "outlength": 161162.0
-          },
-          {
-            "x": -16697.3,
-            "y": 56496.2,
-            "z": -813373.0,
-            "tx": -0.677155,
-            "ty": 0.0497415,
-            "tz": -0.734157,
-            "inlength": 174154.0,
-            "outlength": 174154.0
-          },
-          {
-            "x": -433250.0,
-            "y": 21220.2,
-            "z": -1089660.0,
-            "tx": -0.992725,
-            "ty": -0.0178023,
-            "tz": -0.11908,
-            "inlength": 227618.0,
-            "outlength": 227618.0
-          },
-          {
-            "x": -1372620.0,
-            "y": 33058.2,
-            "z": -974893.0,
-            "tx": -0.967803,
-            "ty": 0.0285276,
-            "tz": 0.250087,
-            "inlength": 413576.0,
-            "outlength": 0.0
-          }
-        ]
-      },
-      "lateral_factor": 1.16,
-      "radial_factor": 0.83825,
-      "falloff_factor": 0.97237,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 0.026,
-          "theoretical_reserve": 23423,
-          "theoretical_respawn": 2342,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "lowest",
-          "reserve": 1640189,
-          "respawn": 164019
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 0.06,
-          "theoretical_reserve": 54054,
-          "theoretical_respawn": 2703,
-          "delay": 1200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "verylow",
-          "reserve": 3785338,
-          "respawn": 189267
-        }
-      ],
-      "solid_volume_km3": 926493
-    },
-    {
-      "ref": "region_cluster_01_sector_002_g",
-      "amount": 1,
-      "position": {
-        "x": 121418.0,
-        "y": 0.0,
-        "z": 44270.5
-      },
-      "boundary": {
-        "class": "splinetube",
-        "size": {
-          "r": 12000,
-          "linear": 8421676
-        },
-        "spline": [
-          {
-            "x": 1493280.0,
-            "y": 0.0,
-            "z": 401906.0,
-            "tx": -0.566909,
-            "ty": -0.36368,
-            "tz": -0.739156,
-            "inlength": 0.0,
-            "outlength": 222099.0
-          },
-          {
-            "x": 1067190.0,
-            "y": -108038.0,
-            "z": 160002.0,
-            "tx": -0.998159,
-            "ty": 0.0575362,
-            "tz": 0.0191737,
-            "inlength": 158419.0,
-            "outlength": 158419.0
-          },
-          {
-            "x": 544375.0,
-            "y": 52486.3,
-            "z": 419286.0,
-            "tx": -0.727328,
-            "ty": 0.103227,
-            "tz": 0.678482,
-            "inlength": 207632.0,
-            "outlength": 207632.0
-          },
-          {
-            "x": 157576.0,
-            "y": 19567.9,
-            "z": 1001610.0,
-            "tx": -0.914711,
-            "ty": -0.057663,
-            "tz": 0.399973,
-            "inlength": 197338.0,
-            "outlength": 197338.0
-          },
-          {
-            "x": -539514.0,
-            "y": -14579.4,
-            "z": 891096.0,
-            "tx": -0.589704,
-            "ty": 0.0505851,
-            "tz": -0.806034,
-            "inlength": 135910.0,
-            "outlength": 135910.0
-          },
-          {
-            "x": -326986.0,
-            "y": 60749.2,
-            "z": 347026.0,
-            "tx": -0.339972,
-            "ty": 0.123183,
-            "tz": -0.932333,
-            "inlength": 162583.0,
-            "outlength": 162583.0
-          },
-          {
-            "x": -871057.0,
-            "y": 104867.0,
-            "z": -18520.5,
-            "tx": 0.0506671,
-            "ty": -0.0191147,
-            "tz": -0.998533,
-            "inlength": 117083.0,
-            "outlength": 117083.0
-          },
-          {
-            "x": -288732.0,
-            "y": 48068.0,
-            "z": -354313.0,
-            "tx": 0.912941,
-            "ty": 0.0286582,
-            "tz": 0.407085,
-            "inlength": 154210.0,
-            "outlength": 154210.0
-          },
-          {
-            "x": -25197.3,
-            "y": 131527.0,
-            "z": 355527.0,
-            "tx": 0.863174,
-            "ty": 0.0732934,
-            "tz": 0.499558,
-            "inlength": 135848.0,
-            "outlength": 135848.0
-          },
-          {
-            "x": 416859.0,
-            "y": 106865.0,
-            "z": 49488.3,
-            "tx": 0.395832,
-            "ty": -0.212886,
-            "tz": -0.893307,
-            "inlength": 126893.0,
-            "outlength": 126893.0
-          },
-          {
-            "x": 276592.0,
-            "y": -29927.2,
-            "z": -324560.0,
-            "tx": -0.449672,
-            "ty": -0.0519326,
-            "tz": -0.891683,
-            "inlength": 161162.0,
-            "outlength": 161162.0
-          },
-          {
-            "x": -16697.3,
-            "y": 56496.2,
-            "z": -813373.0,
-            "tx": -0.677155,
-            "ty": 0.0497415,
-            "tz": -0.734157,
-            "inlength": 174154.0,
-            "outlength": 174154.0
-          },
-          {
-            "x": -433250.0,
-            "y": 21220.2,
-            "z": -1089660.0,
-            "tx": -0.992725,
-            "ty": -0.0178023,
-            "tz": -0.11908,
-            "inlength": 227618.0,
-            "outlength": 227618.0
-          },
-          {
-            "x": -1372620.0,
-            "y": 33058.2,
-            "z": -974893.0,
-            "tx": -0.967803,
-            "ty": 0.0285276,
-            "tz": 0.250087,
-            "inlength": 413576.0,
-            "outlength": 0.0
-          }
-        ]
-      },
-      "lateral_factor": 1.16,
-      "radial_factor": 0.83825,
-      "falloff_factor": 0.97237,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 0.026,
-          "theoretical_reserve": 23423,
-          "theoretical_respawn": 2342,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "lowest",
-          "reserve": 1640189,
-          "respawn": 164019
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 0.06,
-          "theoretical_reserve": 54054,
-          "theoretical_respawn": 2703,
-          "delay": 1200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "verylow",
-          "reserve": 3785338,
-          "respawn": 189267
-        }
-      ],
-      "solid_volume_km3": 926493
-    },
-    {
-      "ref": "p1_wreckfield_station_10km",
-      "amount": 1,
-      "position": {
-        "x": 354000.0,
-        "y": 22000.0,
-        "z": 17000.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 10000,
-          "linear": 3500
-        }
-      },
-      "lateral_factor": 0.99,
-      "radial_factor": 0.9125,
-      "falloff_factor": 0.90338,
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "resourcedensity": 49500.0,
-          "theoretical_reserve": 402454,
-          "theoretical_respawn": 40245,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medium",
-          "reserve": 89434,
-          "respawn": 8943
-        },
-        {
-          "ware": "rawscrap",
-          "resourcedensity": 7.5,
-          "theoretical_reserve": 14900,
-          "theoretical_respawn": 213,
-          "delay": 4200.0,
-          "gatherfactor": 1.0,
-          "yield_name": "high",
-          "reserve": 14898,
-          "respawn": 213
-        }
-      ],
-      "solid_volume_km3": 2199,
-      "gas_volume_km3": 2359296
     }
   ]
 }
