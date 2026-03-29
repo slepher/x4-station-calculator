@@ -198,7 +198,7 @@ const resourceCandidates = computed(() =>
       score: selectedWareIds.value.length
         ? selectedWareIds.value.reduce((sum, ware) => {
             const resource = sector.resources.find((item) => item.ware === ware)
-            return sum + (resource?.level || 0)
+            return sum + (resource?.rating || 0)
           }, 0)
         : sunlightFilterEnabled.value
           ? sector.sunlight

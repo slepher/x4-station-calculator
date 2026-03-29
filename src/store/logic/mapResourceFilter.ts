@@ -33,8 +33,6 @@ export const YIELD_NAME_TO_RATING: Record<string, number> = {
 
 export type SectorResourceEntry = {
   ware: string
-  yield: string
-  level: number
   rating: number
 }
 
