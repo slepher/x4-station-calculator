@@ -212,7 +212,7 @@ const resourceCandidates = computed(() =>
       left.displayName.localeCompare(right.displayName) ||
       left.sectorId.localeCompare(right.sectorId)
     )
-    .slice(0, 10)
+    .slice(0, 9)
 )
 
 const resourceSectorFills = computed<Record<string, SectorResourceFill>>(() => {

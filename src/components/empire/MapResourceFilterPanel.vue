@@ -298,14 +298,16 @@ const onPanelClose = () => emit('panel-close')
 }
 
 :deep(.candidate-header) {
-  @apply mb-2 flex items-center justify-between text-xs uppercase tracking-[0.2em] text-amber-200/80;
+  @apply mb-2 flex items-center justify-between text-sm font-semibold text-amber-200/80;
+  letter-spacing: 0;
+  font-family: "Segoe UI", "PingFang SC", "Microsoft YaHei", "Noto Sans CJK SC", "Source Han Sans SC", "Helvetica Neue", Arial, sans-serif;
 }
 
 :deep(.candidate-count) {
   @apply rounded border border-amber-300/20 px-1.5 py-0.5 text-[11px] text-amber-100;
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum";
-  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-family: inherit;
 }
 
 :deep(.candidate-list) {
