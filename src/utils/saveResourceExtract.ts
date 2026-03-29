@@ -101,25 +101,24 @@ type RegionDefinition = {
   resources: ResourceDefinition[]
 }
 
-type ResourceAreaSector = {
-  sector_id: string
-  areas?: Array<{
-    ref?: string
-    position?: Partial<Vector3>
-    boundary?: {
-      class?: string
-      size?: Record<string, number>
-    }
-    resources?: Array<{
-      ware?: string
-      yield_name?: string
-      resourcedensity?: number
-      respawn?: number
-      falloff?: number
-      delay?: number
-    }>
+type ResourceAreaEntry = {
+  ref?: string
+  position?: Partial<Vector3>
+  boundary?: {
+    class?: string
+    size?: Record<string, number>
+  }
+  resources?: Array<{
+    ware?: string
+    yield_name?: string
+    resourcedensity?: number
+    respawn?: number
+    falloff?: number
+    delay?: number
   }>
 }
+
+type ResourceAreasData = Record<string, ResourceAreaEntry[]>
 
 type RegionYieldLookup = Record<
   string,
@@ -135,7 +134,7 @@ export type ExtractContext = {
       }
     >
   }
-  resourceAreasData: ResourceAreaSector[]
+  resourceAreasData: ResourceAreasData
   regionsData: Array<{
     id?: string
     boundary?: {
@@ -373,11 +372,11 @@ function buildSectorRegionAreas(
 ): Map<string, RegionArea[]> {
   const sectors = new Map<string, RegionArea[]>()
 
-  for (const sectorEntry of resourceAreasData) {
-    const sectorId = normalizeId(sectorEntry.sector_id)
+  for (const [sectorIdKey, areasEntries] of Object.entries(resourceAreasData)) {
+    const sectorId = normalizeId(sectorIdKey)
     const areas: RegionArea[] = []
 
-    for (const area of sectorEntry.areas ?? []) {
+    for (const area of areasEntries) {
       const ref = area.ref
       if (!ref) {
         continue
@@ -392,7 +391,7 @@ function buildSectorRegionAreas(
 
       const resources = (regionDefinition?.resources.length
         ? regionDefinition.resources
-        : (area.resources ?? []).flatMap((resource) => {
+        : (area.resources ?? []).flatMap((resource: NonNullable<typeof area.resources>[number]) => {
             if (!resource.ware || !resource.yield_name) {
               return []
             }
@@ -840,19 +839,15 @@ export function extractSectorResourcesFromComponentXml(
       if (!wareName) {
         continue
       }
-      const max = toNumber(wareNode.recharge?.max)
-      const time = toNumber(wareNode.recharge?.time)
-      const xmlYieldNames = [...(yieldsByWare[wareName] ?? [])]
+      const rechargeEntries = asArray(wareNode.recharge)
+      const xmlYieldNames = yieldsByWare[wareName] ?? []
 
-      if (!xmlYieldNames.length) {
-        const fallbackYieldName = findFallbackYieldName(yieldLookup, wareName, time)
-        if (fallbackYieldName) {
-          xmlYieldNames.push(fallbackYieldName)
-        }
-      }
+      for (let rechargeIndex = 0; rechargeIndex < rechargeEntries.length; rechargeIndex += 1) {
+        const rechargeEntry = rechargeEntries[rechargeIndex]
+        const max = toNumber(rechargeEntry?.max)
+        const time = toNumber(rechargeEntry?.time)
+        const yieldName = xmlYieldNames[rechargeIndex] ?? findFallbackYieldName(yieldLookup, wareName, time)
 
-      const yieldNames = xmlYieldNames.length ? xmlYieldNames : ['']
-      for (const yieldName of yieldNames) {
         results.push({
           x,
           y,
@@ -862,6 +857,24 @@ export function extractSectorResourcesFromComponentXml(
           time,
           yield_name: yieldName
         })
+      }
+
+      if (xmlYieldNames.length > rechargeEntries.length && rechargeEntries.length > 0) {
+        const lastRecharge = rechargeEntries[rechargeEntries.length - 1]
+        const max = toNumber(lastRecharge?.max)
+        const time = toNumber(lastRecharge?.time)
+        for (let extraIndex = rechargeEntries.length; extraIndex < xmlYieldNames.length; extraIndex += 1) {
+          const yieldName = xmlYieldNames[extraIndex] ?? ''
+          results.push({
+            x,
+            y,
+            z,
+            ware: wareName,
+            max,
+            time,
+            yield_name: yieldName
+          })
+        }
       }
     }
   }
@@ -1003,7 +1016,7 @@ export function buildSectorJson(
 
   for (const entry of data) {
     const wareName = entry.ware
-    const key = `${entry.x},${entry.y},${entry.z}`
+    const key = `${entry.x},${entry.y},${entry.z},${entry.max},${entry.time}`
 
     if (!wareMap.has(wareName)) {
       wareMap.set(wareName, new Map())
@@ -1013,8 +1026,7 @@ export function buildSectorJson(
     const existing = wareEntries.get(key)
 
     if (existing) {
-      // Merge yield_names if same position
-      if (!existing.yield_names.includes(entry.yield_name)) {
+      if (entry.yield_name && !existing.yield_names.includes(entry.yield_name)) {
         existing.yield_names.push(entry.yield_name)
       }
     } else {

@@ -1389,17 +1389,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 40809,
+        "time": 144000,
+        "regions": [
+          "region_cluster_29_sector_002"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": -128000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 10076,
+        "time": 72000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_29_sector_002"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -1508,17 +1519,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 40809,
+        "time": 144000,
+        "regions": [
+          "region_cluster_29_sector_002"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": -192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 8853,
+        "time": 72000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_29_sector_002"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -2162,17 +2184,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 40815,
+        "time": 144000,
+        "regions": [
+          "region_cluster_29_sector_002"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": -128000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 10075,
+        "time": 72000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_29_sector_002"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -2281,17 +2314,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 40815,
+        "time": 144000,
+        "regions": [
+          "region_cluster_29_sector_002"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": -192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 8854,
+        "time": 72000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_29_sector_002"
+          "p1_40km_asteroid_field"
         ]
       },
       {

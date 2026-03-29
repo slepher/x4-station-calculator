@@ -1973,17 +1973,28 @@
       },
       {
         "yield_names": [
-          "veryhigh",
+          "veryhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 0,
+        "max": 114510,
+        "time": 1080000,
+        "regions": [
+          "region_highyield_ore"
+        ]
+      },
+      {
+        "yield_names": [
           "lowminus"
         ],
         "x": 0,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 34878,
+        "time": 72000,
         "regions": [
-          "region_cluster_13_sector_001",
-          "region_highyield_ore"
+          "region_cluster_13_sector_001"
         ]
       },
       {

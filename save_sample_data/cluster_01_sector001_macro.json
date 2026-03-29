@@ -1692,46 +1692,79 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 128000,
+        "max": 134664,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 335802,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 386949,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 3475869,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 355338,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 3449730,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
@@ -1763,61 +1796,105 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 64000,
+        "max": 95166,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 3305373,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 0,
+        "max": 78162,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 3541377,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 321954,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 3991938,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 297903,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 4049577,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
@@ -1836,46 +1913,79 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": -64000,
+        "z": 128000,
+        "max": 135993,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": -64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1138392,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": -64000,
+        "z": 64000,
+        "max": 96444,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": -64000,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 1444572,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": -64000,
+        "z": 0,
+        "max": 80016,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": -64000,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 300378,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
@@ -1920,16 +2030,27 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": -64000,
+        "max": 77349,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 286740,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
@@ -1948,31 +2069,53 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 287463,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 2658144,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 274635,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 819153,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
@@ -2043,16 +2186,27 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -192000,
+        "max": 162216,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 1953993,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
@@ -2071,31 +2225,53 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": -64000,
+        "z": -64000,
+        "max": 79143,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 385740,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": 128000,
+        "y": -64000,
+        "z": -128000,
+        "max": 47223,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 2890269,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
@@ -3899,30 +4075,56 @@
       },
       {
         "yield_names": [
-          "medium",
-          "low"
+          "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 7641,
+        "time": 18000,
         "regions": [
           "region_cluster_01_sector_001_a"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 3091380,
+        "time": 36000,
+        "regions": [
+          "region_cluster_01_sector_001_b",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 188757,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 3340278,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a"
+          "region_cluster_01_sector_001_b",
+          "region_cluster_01_sector_001_c"
         ]
       },
       {
@@ -3979,30 +4181,56 @@
       },
       {
         "yield_names": [
-          "medium",
-          "low"
+          "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 248427,
+        "time": 18000,
         "regions": [
           "region_cluster_01_sector_001_a"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 315438,
+        "time": 36000,
+        "regions": [
+          "region_cluster_01_sector_001_b",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 228579,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 2489370,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a"
+          "region_cluster_01_sector_001_b",
+          "region_cluster_01_sector_001_c"
         ]
       },
       {
@@ -4189,46 +4417,79 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -128000,
+        "y": 64000,
+        "z": 128000,
+        "max": 9054,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1352934,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 30285,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 2541894,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 28644,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1934259,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -4403,30 +4664,56 @@
       },
       {
         "yield_names": [
-          "medium",
-          "low"
+          "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 79959,
+        "time": 18000,
         "regions": [
           "region_cluster_01_sector_001_a"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 2647599,
+        "time": 36000,
+        "regions": [
+          "region_cluster_01_sector_001_b",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 17349,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 3770715,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a"
+          "region_cluster_01_sector_001_b",
+          "region_cluster_01_sector_001_c"
         ]
       },
       {
@@ -4717,16 +5004,29 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -192000,
+        "y": 64000,
+        "z": 128000,
+        "max": 6342,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 341181,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a"
+          "region_cluster_01_sector_001_b",
+          "region_cluster_01_sector_001_c"
         ]
       },
       {
@@ -4744,16 +5044,27 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 37830,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 694047,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -4799,16 +5110,27 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 402123,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 3753243,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -5010,31 +5332,53 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 36885,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 4571988,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 488454,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 4919613,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -5105,16 +5449,27 @@
       },
       {
         "yield_names": [
-          "medium",
+          "medium"
+        ],
+        "x": -192000,
+        "y": -64000,
+        "z": -64000,
+        "max": 397209,
+        "time": 18000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 2623302,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -11744,33 +12099,55 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "medium"
+          "verylow"
         ],
         "x": 192000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 12633,
+        "time": 72000,
         "regions": [
-          "p1_40km_asteroid_field",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 40809,
+        "time": 144000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 3874,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 40809,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_c"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -11802,34 +12179,56 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "medium"
+          "verylow"
         ],
         "x": 128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 81618,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
           "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 29373,
+        "time": 72000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 81618,
+        "time": 144000,
+        "regions": [
+          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 28002,
+        "time": 72000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_c"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -11890,18 +12289,29 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 28831,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 40809,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_c"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -12041,18 +12451,29 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 22122,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 40809,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_c"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -13975,32 +14396,54 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "medium"
+          "verylow"
         ],
         "x": 64000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 36673,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
           "region_cluster_01_sector_001_a"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 12661,
+        "time": 72000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 40809,
+        "time": 144000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 20906,
+        "time": 72000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -14266,46 +14709,79 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 64000,
+        "z": 128000,
+        "max": 3620,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 5405,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 12114,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 10163,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 11456,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 7731,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -14480,17 +14956,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 13777,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 40809,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -14794,16 +15281,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 64000,
+        "z": 128000,
+        "max": 2531,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1354,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a"
+          "region_cluster_01_sector_001_b"
         ]
       },
       {
@@ -14821,16 +15320,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 15131,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 2769,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -14875,16 +15385,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 160849,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 15004,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -15085,47 +15606,80 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 14750,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 18281,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 195383,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 19674,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "veryhigh",
+          "veryhigh"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -64000,
+        "max": 182164,
+        "time": 108000,
+        "regions": [
+          "region_highyield_ore"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -256000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 114510,
+        "time": 1080000,
         "regions": [
-          "region_cluster_01_sector_001_b",
-          "region_highyield_ore"
+          "region_cluster_01_sector_001_b"
         ]
       },
       {
@@ -15182,16 +15736,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": -64000,
+        "z": -64000,
+        "max": 158882,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 10489,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
@@ -21780,33 +22345,55 @@
       },
       {
         "yield_names": [
-          "lowest",
-          "medium"
+          "lowest"
         ],
         "x": 192000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 5475,
+        "time": 36000,
         "regions": [
-          "p1_40km_asteroid_field",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 192000,
+        "max": 40815,
+        "time": 144000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 1680,
+        "time": 36000,
+        "regions": [
+          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 40815,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_c"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -21838,34 +22425,56 @@
       },
       {
         "yield_names": [
-          "lowest",
-          "medium"
+          "lowest"
         ],
         "x": 128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 81630,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
           "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_c"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 12723,
+        "time": 36000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 81630,
+        "time": 144000,
+        "regions": [
+          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 12132,
+        "time": 36000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_c"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -21926,18 +22535,29 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 12495,
+        "time": 36000,
+        "regions": [
+          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 40815,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_c"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -22077,18 +22697,29 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -64000,
+        "max": 9579,
+        "time": 36000,
+        "regions": [
+          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_c"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 40815,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_c"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -24011,32 +24642,54 @@
       },
       {
         "yield_names": [
-          "lowest",
-          "medium"
+          "lowest"
         ],
         "x": 64000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 36669,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
           "region_cluster_01_sector_001_a"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "medium"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 5487,
+        "time": 36000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 40815,
+        "time": 144000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 9051,
+        "time": 36000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -24302,47 +24955,80 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 64000,
+        "z": 128000,
+        "max": 360,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_b"
+        ]
+      },
+      {
+        "yield_names": [
           "lowest"
         ],
         "x": -128000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 2340,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 192000,
+        "max": 1212,
+        "time": 72000,
+        "regions": [
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "verylow",
           "lowest"
         ],
         "x": -128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 4404,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": 128000,
+        "max": 1143,
+        "time": 72000,
+        "regions": [
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "verylow",
           "lowest"
         ],
         "x": -128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 3348,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_b"
+          "region_cluster_01_sector_001_a"
         ]
       },
       {
@@ -24516,17 +25202,28 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -64000,
+        "max": 5967,
+        "time": 36000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 40815,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_001_a"
+          "p1_40km_asteroid_field"
         ]
       },
       {
@@ -24830,14 +25527,26 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 64000,
+        "z": 128000,
+        "max": 252,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_b"
+        ]
+      },
+      {
+        "yield_names": [
           "lowest"
         ],
         "x": -192000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 588,
+        "time": 36000,
         "regions": [
           "region_cluster_01_sector_001_a"
         ]
@@ -24857,17 +25566,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 128000,
+        "max": 1512,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_b"
+        ]
+      },
+      {
+        "yield_names": [
           "lowest"
         ],
         "x": -192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1200,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_b"
+          "region_cluster_01_sector_001_a"
         ]
       },
       {
@@ -24911,17 +25631,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": 0,
+        "max": 16080,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_b"
+        ]
+      },
+      {
+        "yield_names": [
           "lowest"
         ],
         "x": -192000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 6504,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_b"
+          "region_cluster_01_sector_001_a"
         ]
       },
       {
@@ -25121,32 +25852,54 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "lowest"
+          "verylow"
         ],
         "x": -192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 1467,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_001_a",
           "region_cluster_01_sector_001_b"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "lowest"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 7920,
+        "time": 36000,
+        "regions": [
+          "region_cluster_01_sector_001_a"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 19536,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_b"
+        ]
+      },
+      {
+        "yield_names": [
           "lowest"
         ],
         "x": -192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 8523,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_b"
+          "region_cluster_01_sector_001_a"
         ]
       },
       {
@@ -25216,17 +25969,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -192000,
+        "y": -64000,
+        "z": -64000,
+        "max": 15888,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_001_b"
+        ]
+      },
+      {
+        "yield_names": [
           "lowest"
         ],
         "x": -192000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 4539,
+        "time": 36000,
         "regions": [
-          "region_cluster_01_sector_001_a",
-          "region_cluster_01_sector_001_b"
+          "region_cluster_01_sector_001_a"
         ]
       },
       {

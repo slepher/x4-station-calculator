@@ -209902,17 +209902,28 @@
       },
       {
         "yield_names": [
-          "high",
+          "high"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 71549,
+        "time": 288000,
+        "regions": [
+          "region_c502s01_scrap"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 49500,
+        "time": 36000,
         "regions": [
-          "region_c502s01_base",
-          "region_c502s01_scrap"
+          "region_c502s01_base"
         ]
       },
       {
