@@ -1501,17 +1501,28 @@
       },
       {
         "yield_names": [
-          "veryhigh",
+          "veryhigh"
+        ],
+        "x": 576000,
+        "y": 0,
+        "z": 448000,
+        "max": 1232995,
+        "time": 144000,
+        "regions": [
+          "region_highyield_ore"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 576000,
         "y": 0,
         "z": 448000,
-        "max": 0,
-        "time": 0,
+        "max": 114510,
+        "time": 1080000,
         "regions": [
-          "region_cluster_37_sector_001",
-          "region_highyield_ore"
+          "region_cluster_37_sector_001"
         ]
       },
       {
@@ -3091,17 +3102,28 @@
       },
       {
         "yield_names": [
-          "veryhigh",
+          "veryhigh"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": 128000,
+        "max": 540253,
+        "time": 120000,
+        "regions": [
+          "region_highyield_silicon"
+        ]
+      },
+      {
+        "yield_names": [
           "medlow"
         ],
         "x": 192000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 114510,
+        "time": 1080000,
         "regions": [
-          "region_cluster_37_sector_001",
-          "region_highyield_silicon"
+          "region_cluster_37_sector_001"
         ]
       },
       {
