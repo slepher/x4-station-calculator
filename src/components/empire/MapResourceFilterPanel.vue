@@ -304,6 +304,8 @@ const onPanelClose = () => emit('panel-close')
 :deep(.candidate-count) {
   @apply rounded border border-amber-300/20 px-1.5 py-0.5 text-[11px] text-amber-100;
   font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+  font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
 }
 
 :deep(.candidate-list) {
