@@ -204,6 +204,7 @@ const onPanelClose = () => emit('panel-close')
 
 .resource-panel-body {
   @apply mt-3 min-h-0 flex-1 overflow-y-auto pr-1;
+  scrollbar-gutter: stable;
 }
 
 :deep(.custom-scrollbar) {
