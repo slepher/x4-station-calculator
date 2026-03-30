@@ -27,8 +27,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 485680,
+          "respawn": 12142
         },
         {
           "ware": "silicon",
@@ -38,8 +38,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 485692,
+          "respawn": 12142
         },
         {
           "ware": "nividium",
@@ -49,8 +49,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 72,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -82,8 +82,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 485680,
+          "respawn": 12142
         },
         {
           "ware": "silicon",
@@ -93,8 +93,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 485692,
+          "respawn": 12142
         },
         {
           "ware": "nividium",
@@ -104,8 +104,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 72,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -137,8 +137,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 485680,
+          "respawn": 12142
         },
         {
           "ware": "silicon",
@@ -148,8 +148,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 485692,
+          "respawn": 12142
         },
         {
           "ware": "nividium",
@@ -159,8 +159,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 72,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -192,8 +192,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 630227,
+          "respawn": 21008
         }
       ],
       "gas_volume_km3": 2359296
@@ -225,8 +225,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 485680,
+          "respawn": 12142
         },
         {
           "ware": "silicon",
@@ -236,8 +236,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 485692,
+          "respawn": 12142
         },
         {
           "ware": "nividium",
@@ -247,8 +247,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 72,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -1231,8 +1231,8 @@
           "delay": 18000.0,
           "gatherfactor": 1.0,
           "yield_name": "veryhigh",
-          "reserve": 229022,
-          "respawn": 763
+          "reserve": 114511,
+          "respawn": 382
         }
       ],
       "solid_volume_km3": 79
@@ -1297,8 +1297,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 248583,
+          "respawn": 24858
         }
       ],
       "solid_volume_km3": 9817
@@ -1330,8 +1330,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 346498,
+          "respawn": 11550
         }
       ],
       "gas_volume_km3": 2359296
@@ -1363,8 +1363,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 69298,
+          "respawn": 2310
         }
       ],
       "gas_volume_km3": 2359296
@@ -1396,8 +1396,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 69296,
+          "respawn": 6930
         }
       ],
       "gas_volume_km3": 2359296
@@ -1429,8 +1429,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 248583,
+          "respawn": 24858
         }
       ],
       "solid_volume_km3": 9817
@@ -2627,8 +2627,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 163209,
+          "respawn": 4080
         },
         {
           "ware": "silicon",
@@ -2638,8 +2638,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 163213,
+          "respawn": 4080
         },
         {
           "ware": "nividium",
@@ -2649,8 +2649,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 24,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -2682,8 +2682,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 1015034,
+          "respawn": 33834
         }
       ],
       "gas_volume_km3": 2359296
@@ -2715,8 +2715,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 1015034,
+          "respawn": 33834
         }
       ],
       "gas_volume_km3": 2359296
@@ -7304,8 +7304,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 188193,
+          "respawn": 18819
         }
       ],
       "solid_volume_km3": 9817
@@ -7337,8 +7337,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 119931,
+          "respawn": 2998
         },
         {
           "ware": "silicon",
@@ -7348,8 +7348,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 119933,
+          "respawn": 2998
         },
         {
           "ware": "nividium",
@@ -7359,8 +7359,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 18,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -11722,8 +11722,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 346498,
+          "respawn": 11550
         }
       ],
       "gas_volume_km3": 2359296
@@ -11755,8 +11755,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 69298,
+          "respawn": 2310
         }
       ],
       "gas_volume_km3": 2359296
@@ -11788,8 +11788,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 69296,
+          "respawn": 6930
         }
       ],
       "gas_volume_km3": 2359296
@@ -11821,8 +11821,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 119613,
+          "respawn": 2990
         },
         {
           "ware": "silicon",
@@ -11832,8 +11832,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 119616,
+          "respawn": 2990
         },
         {
           "ware": "nividium",
@@ -11843,8 +11843,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 18,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -11878,8 +11878,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 233881,
+          "respawn": 7796
         }
       ],
       "gas_volume_km3": 2359296
@@ -11911,8 +11911,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 692996,
+          "respawn": 23100
         }
       ],
       "gas_volume_km3": 2359296
@@ -11944,8 +11944,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 68714,
+          "respawn": 6871
         }
       ],
       "gas_volume_km3": 2359296
@@ -11977,8 +11977,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 233881,
+          "respawn": 7796
         }
       ],
       "gas_volume_km3": 2359296
@@ -12010,8 +12010,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 692996,
+          "respawn": 23100
         }
       ],
       "gas_volume_km3": 2359296
@@ -12137,8 +12137,8 @@
           "delay": 3600.0,
           "gatherfactor": 4.0,
           "yield_name": "high",
-          "reserve": 720712,
-          "respawn": 12012
+          "reserve": 360356,
+          "respawn": 6006
         }
       ],
       "gas_volume_km3": 2359296
@@ -12170,8 +12170,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 692996,
+          "respawn": 23100
         }
       ],
       "gas_volume_km3": 2359296
@@ -12203,8 +12203,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 738645,
+          "respawn": 73864
         }
       ],
       "solid_volume_km3": 9817
@@ -12236,8 +12236,8 @@
           "delay": 4800.0,
           "gatherfactor": 4.0,
           "yield_name": "highplus",
-          "reserve": 1819118,
-          "respawn": 22739
+          "reserve": 1039496,
+          "respawn": 12994
         }
       ],
       "gas_volume_km3": 2359296
@@ -12269,8 +12269,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 738645,
+          "respawn": 73864
         }
       ],
       "solid_volume_km3": 9817
@@ -12302,8 +12302,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 738645,
+          "respawn": 73864
         }
       ],
       "solid_volume_km3": 9817
@@ -12335,8 +12335,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 738645,
+          "respawn": 73864
         }
       ],
       "solid_volume_km3": 9817
@@ -12368,8 +12368,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 738645,
+          "respawn": 73864
         }
       ],
       "solid_volume_km3": 9817
@@ -17526,8 +17526,8 @@
           "delay": 18000.0,
           "gatherfactor": 1.0,
           "yield_name": "veryhigh",
-          "reserve": 229022,
-          "respawn": 763
+          "reserve": 114511,
+          "respawn": 382
         }
       ],
       "solid_volume_km3": 79
@@ -17561,8 +17561,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 297497,
+          "respawn": 29750
         }
       ],
       "solid_volume_km3": 9817
@@ -17594,8 +17594,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 138579,
+          "respawn": 4619
         }
       ],
       "gas_volume_km3": 2359296
@@ -17627,8 +17627,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 117763,
+          "respawn": 11776
         }
       ],
       "gas_volume_km3": 2359296
@@ -17660,8 +17660,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 117763,
+          "respawn": 11776
         }
       ],
       "gas_volume_km3": 2359296
@@ -17693,8 +17693,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 297497,
+          "respawn": 29750
         }
       ],
       "solid_volume_km3": 9817
@@ -17726,8 +17726,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 173249,
+          "respawn": 5775
         }
       ],
       "gas_volume_km3": 2359296
@@ -17761,8 +17761,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 497489,
+          "respawn": 49749
         }
       ],
       "solid_volume_km3": 9817
@@ -17794,8 +17794,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 497489,
+          "respawn": 49749
         }
       ],
       "solid_volume_km3": 9817
@@ -17827,8 +17827,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 497489,
+          "respawn": 49749
         }
       ],
       "solid_volume_km3": 9817
@@ -17860,8 +17860,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 398807,
+          "respawn": 9970
         },
         {
           "ware": "silicon",
@@ -17871,8 +17871,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 398816,
+          "respawn": 9970
         },
         {
           "ware": "nividium",
@@ -17882,8 +17882,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 59,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -17915,8 +17915,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 398807,
+          "respawn": 9970
         },
         {
           "ware": "silicon",
@@ -17926,8 +17926,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 398816,
+          "respawn": 9970
         },
         {
           "ware": "nividium",
@@ -17937,8 +17937,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 59,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -17970,8 +17970,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 398807,
+          "respawn": 9970
         },
         {
           "ware": "silicon",
@@ -17981,8 +17981,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 398816,
+          "respawn": 9970
         },
         {
           "ware": "nividium",
@@ -17992,8 +17992,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 59,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -18153,8 +18153,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 306150,
+          "respawn": 30615
         }
       ],
       "solid_volume_km3": 9817
@@ -18186,8 +18186,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 306150,
+          "respawn": 30615
         }
       ],
       "solid_volume_km3": 9817
@@ -18219,8 +18219,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 346498,
+          "respawn": 11550
         }
       ],
       "gas_volume_km3": 2359296
@@ -18252,8 +18252,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 158156,
+          "respawn": 3954
         },
         {
           "ware": "silicon",
@@ -18263,8 +18263,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 158160,
+          "respawn": 3954
         },
         {
           "ware": "nividium",
@@ -18274,8 +18274,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 24,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -18307,8 +18307,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 69296,
+          "respawn": 6930
         }
       ],
       "gas_volume_km3": 2359296
@@ -18340,8 +18340,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 130639,
+          "respawn": 4355
         }
       ],
       "gas_volume_km3": 2359296
@@ -18375,8 +18375,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 67157,
+          "respawn": 6716
         }
       ],
       "gas_volume_km3": 2359296
@@ -18408,8 +18408,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 173249,
+          "respawn": 5775
         }
       ],
       "gas_volume_km3": 2359296
@@ -18441,8 +18441,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 138596,
+          "respawn": 4620
         }
       ],
       "gas_volume_km3": 2359296
@@ -18474,8 +18474,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 197808,
+          "respawn": 4945
         },
         {
           "ware": "silicon",
@@ -18485,8 +18485,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 197812,
+          "respawn": 4945
         },
         {
           "ware": "nividium",
@@ -18496,8 +18496,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 29,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -18529,8 +18529,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 197808,
+          "respawn": 4945
         },
         {
           "ware": "silicon",
@@ -18540,8 +18540,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 197812,
+          "respawn": 4945
         },
         {
           "ware": "nividium",
@@ -18551,8 +18551,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 29,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -18586,8 +18586,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 68228,
+          "respawn": 6823
         }
       ],
       "gas_volume_km3": 2359296
@@ -18619,8 +18619,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 708134,
+          "respawn": 17703
         },
         {
           "ware": "silicon",
@@ -18630,8 +18630,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 708149,
+          "respawn": 17704
         },
         {
           "ware": "nividium",
@@ -18641,8 +18641,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 104,
+          "respawn": 1
         }
       ],
       "solid_volume_km3": 19635
@@ -18674,8 +18674,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 69298,
+          "respawn": 2310
         }
       ],
       "gas_volume_km3": 2359296
@@ -18707,8 +18707,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 708134,
+          "respawn": 17703
         },
         {
           "ware": "silicon",
@@ -18718,8 +18718,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 708149,
+          "respawn": 17704
         },
         {
           "ware": "nividium",
@@ -18729,8 +18729,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 104,
+          "respawn": 1
         }
       ],
       "solid_volume_km3": 19635
@@ -18762,8 +18762,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 346498,
+          "respawn": 11550
         }
       ],
       "gas_volume_km3": 2359296
@@ -18795,8 +18795,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 708134,
+          "respawn": 17703
         },
         {
           "ware": "silicon",
@@ -18806,8 +18806,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 708149,
+          "respawn": 17704
         },
         {
           "ware": "nividium",
@@ -18817,8 +18817,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 104,
+          "respawn": 1
         }
       ],
       "solid_volume_km3": 19635
@@ -18850,8 +18850,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 708134,
+          "respawn": 17703
         },
         {
           "ware": "silicon",
@@ -18861,8 +18861,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 708149,
+          "respawn": 17704
         },
         {
           "ware": "nividium",
@@ -18872,8 +18872,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 104,
+          "respawn": 1
         }
       ],
       "solid_volume_km3": 19635
@@ -18905,8 +18905,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 708134,
+          "respawn": 17703
         },
         {
           "ware": "silicon",
@@ -18916,8 +18916,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 708149,
+          "respawn": 17704
         },
         {
           "ware": "nividium",
@@ -18927,8 +18927,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 104,
+          "respawn": 1
         }
       ],
       "solid_volume_km3": 19635
@@ -18962,8 +18962,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 239279,
+          "respawn": 5982
         },
         {
           "ware": "silicon",
@@ -18973,8 +18973,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 239285,
+          "respawn": 5982
         },
         {
           "ware": "nividium",
@@ -18984,8 +18984,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 35,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -19017,8 +19017,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 239279,
+          "respawn": 5982
         },
         {
           "ware": "silicon",
@@ -19028,8 +19028,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 239285,
+          "respawn": 5982
         },
         {
           "ware": "nividium",
@@ -19039,8 +19039,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 35,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -19207,8 +19207,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 50726,
+          "respawn": 5073
         }
       ],
       "gas_volume_km3": 2359296
@@ -19240,8 +19240,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 641520,
+          "respawn": 21384
         }
       ],
       "gas_volume_km3": 2359296
@@ -19273,8 +19273,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 103882,
+          "respawn": 3463
         }
       ],
       "gas_volume_km3": 2359296
@@ -19306,8 +19306,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 393575,
+          "respawn": 9839
         },
         {
           "ware": "silicon",
@@ -19317,8 +19317,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 393582,
+          "respawn": 9840
         },
         {
           "ware": "nividium",
@@ -19328,8 +19328,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 59,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -19361,8 +19361,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 393575,
+          "respawn": 9839
         },
         {
           "ware": "silicon",
@@ -19372,8 +19372,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 393582,
+          "respawn": 9840
         },
         {
           "ware": "nividium",
@@ -19383,8 +19383,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 59,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -19416,8 +19416,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 393575,
+          "respawn": 9839
         },
         {
           "ware": "silicon",
@@ -19427,8 +19427,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 393582,
+          "respawn": 9840
         },
         {
           "ware": "nividium",
@@ -19438,8 +19438,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 59,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -19471,8 +19471,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 255125,
+          "respawn": 25512
         }
       ],
       "solid_volume_km3": 9817
@@ -19504,8 +19504,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 255125,
+          "respawn": 25512
         }
       ],
       "solid_volume_km3": 9817
@@ -19877,8 +19877,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 69022,
+          "respawn": 6902
         }
       ],
       "gas_volume_km3": 2359296
@@ -19910,8 +19910,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 69298,
+          "respawn": 2310
         }
       ],
       "gas_volume_km3": 2359296
@@ -19943,8 +19943,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 513079,
+          "respawn": 17103
         }
       ],
       "gas_volume_km3": 2359296
@@ -37385,8 +37385,8 @@
           "delay": 3600.0,
           "gatherfactor": 4.0,
           "yield_name": "high",
-          "reserve": 720712,
-          "respawn": 12012
+          "reserve": 180178,
+          "respawn": 3003
         }
       ],
       "gas_volume_km3": 2359296
@@ -37420,8 +37420,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 684146,
-          "respawn": 68415
+          "reserve": 34648,
+          "respawn": 3465
         }
       ],
       "gas_volume_km3": 2359296
@@ -37453,8 +37453,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136030,
-          "respawn": 78401
+          "reserve": 151838,
+          "respawn": 3796
         },
         {
           "ware": "silicon",
@@ -37464,8 +37464,8 @@
           "delay": 2400.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 3136097,
-          "respawn": 78402
+          "reserve": 151839,
+          "respawn": 3796
         },
         {
           "ware": "nividium",
@@ -37475,8 +37475,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 465,
-          "respawn": 3
+          "reserve": 23,
+          "respawn": 0
         }
       ],
       "solid_volume_km3": 19635
@@ -37508,8 +37508,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 172963,
+          "respawn": 5765
         }
       ],
       "gas_volume_km3": 2359296
@@ -37541,8 +37541,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 255125,
+          "respawn": 25512
         }
       ],
       "solid_volume_km3": 9817
@@ -37574,8 +37574,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 6431492,
-          "respawn": 214383
+          "reserve": 513150,
+          "respawn": 17105
         }
       ],
       "gas_volume_km3": 2359296
@@ -37607,8 +37607,8 @@
           "delay": 600.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 2786807,
-          "respawn": 278681
+          "reserve": 255125,
+          "respawn": 25512
         }
       ],
       "solid_volume_km3": 9817
@@ -37640,8 +37640,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "medhigh",
-          "reserve": 1195732,
-          "respawn": 39858
+          "reserve": 172963,
+          "respawn": 5765
         }
       ],
       "gas_volume_km3": 2359296
@@ -37835,8 +37835,8 @@
           "delay": 4200.0,
           "gatherfactor": 1.0,
           "yield_name": "high",
-          "reserve": 78131,
-          "respawn": 1116
+          "reserve": 47306,
+          "respawn": 676
         }
       ],
       "solid_volume_km3": 3701
@@ -38009,8 +38009,8 @@
           "delay": 4200.0,
           "gatherfactor": 1.0,
           "yield_name": "high",
-          "reserve": 78131,
-          "respawn": 1116
+          "reserve": 30825,
+          "respawn": 440
         }
       ],
       "solid_volume_km3": 3701
@@ -41905,9 +41905,7 @@
           "theoretical_respawn": 763,
           "delay": 18000.0,
           "gatherfactor": 1.0,
-          "yield_name": "veryhigh",
-          "reserve": 229022,
-          "respawn": 763
+          "yield_name": "veryhigh"
         }
       ],
       "solid_volume_km3": 79
@@ -45614,9 +45612,7 @@
           "theoretical_respawn": 763,
           "delay": 18000.0,
           "gatherfactor": 1.0,
-          "yield_name": "veryhigh",
-          "reserve": 114511,
-          "respawn": 382
+          "yield_name": "veryhigh"
         }
       ],
       "solid_volume_km3": 79
@@ -45647,9 +45643,7 @@
           "theoretical_respawn": 763,
           "delay": 18000.0,
           "gatherfactor": 1.0,
-          "yield_name": "veryhigh",
-          "reserve": 229022,
-          "respawn": 763
+          "yield_name": "veryhigh"
         }
       ],
       "solid_volume_km3": 79
@@ -45680,9 +45674,7 @@
           "theoretical_respawn": 763,
           "delay": 18000.0,
           "gatherfactor": 1.0,
-          "yield_name": "veryhigh",
-          "reserve": 229022,
-          "respawn": 763
+          "yield_name": "veryhigh"
         }
       ],
       "solid_volume_km3": 79
@@ -45713,9 +45705,7 @@
           "theoretical_respawn": 763,
           "delay": 18000.0,
           "gatherfactor": 1.0,
-          "yield_name": "veryhigh",
-          "reserve": 114511,
-          "respawn": 382
+          "yield_name": "veryhigh"
         }
       ],
       "solid_volume_km3": 79
@@ -46034,8 +46024,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "low",
-          "reserve": 216801336,
-          "respawn": 7226711
+          "reserve": 108400668,
+          "respawn": 3613356
         },
         {
           "ware": "silicon",
@@ -46045,8 +46035,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "low",
-          "reserve": 216802224,
-          "respawn": 7226741
+          "reserve": 108401112,
+          "respawn": 3613370
         },
         {
           "ware": "ice",
@@ -46056,8 +46046,8 @@
           "delay": 300.0,
           "gatherfactor": 1.0,
           "yield_name": "low",
-          "reserve": 542008328,
-          "respawn": 108401666
+          "reserve": 271004164,
+          "respawn": 54200833
         },
         {
           "ware": "nividium",
@@ -46067,8 +46057,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 360704,
-          "respawn": 2147
+          "reserve": 180352,
+          "respawn": 1074
         }
       ],
       "solid_volume_km3": 658839732
@@ -48096,8 +48086,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "low",
-          "reserve": 216801336,
-          "respawn": 7226711
+          "reserve": 108400668,
+          "respawn": 3613356
         },
         {
           "ware": "silicon",
@@ -48107,8 +48097,8 @@
           "delay": 1800.0,
           "gatherfactor": 1.0,
           "yield_name": "low",
-          "reserve": 216802224,
-          "respawn": 7226741
+          "reserve": 108401112,
+          "respawn": 3613370
         },
         {
           "ware": "ice",
@@ -48118,8 +48108,8 @@
           "delay": 300.0,
           "gatherfactor": 1.0,
           "yield_name": "low",
-          "reserve": 542008328,
-          "respawn": 108401666
+          "reserve": 271004164,
+          "respawn": 54200833
         },
         {
           "ware": "nividium",
@@ -48129,8 +48119,8 @@
           "delay": 10080.0,
           "gatherfactor": 1.0,
           "yield_name": "medium",
-          "reserve": 360704,
-          "respawn": 2147
+          "reserve": 180352,
+          "respawn": 1074
         }
       ],
       "solid_volume_km3": 658839732
@@ -52795,8 +52785,8 @@
           "delay": 3600.0,
           "gatherfactor": 4.0,
           "yield_name": "high",
-          "reserve": 720712,
-          "respawn": 12012
+          "reserve": 180178,
+          "respawn": 3003
         }
       ],
       "gas_volume_km3": 2359296
@@ -52828,8 +52818,8 @@
           "delay": 4800.0,
           "gatherfactor": 4.0,
           "yield_name": "highplus",
-          "reserve": 1819118,
-          "respawn": 22739
+          "reserve": 779622,
+          "respawn": 9745
         }
       ],
       "gas_volume_km3": 2359296
@@ -55122,173 +55112,6 @@
         }
       ],
       "solid_volume_km3": 1700141
-    }
-  ],
-  "Cluster_715_Sector001_macro": [
-    {
-      "ref": "region_cluster_715_sector_001_nebula_1",
-      "amount": 1,
-      "position": {
-        "x": 0.0,
-        "y": -20000.0,
-        "z": 0.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 350000,
-          "linear": 42000
-        }
-      },
-      "lateral_factor": 0.915,
-      "radial_factor": 0.95,
-      "falloff_factor": 0.86925,
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "resourcedensity": 6600.0,
-          "theoretical_reserve": 969561,
-          "theoretical_respawn": 193912,
-          "delay": 300.0,
-          "gatherfactor": 1.0,
-          "yield_name": "low",
-          "reserve": 577987,
-          "respawn": 115597
-        },
-        {
-          "ware": "helium",
-          "resourcedensity": 3000.0,
-          "theoretical_reserve": 440710,
-          "theoretical_respawn": 88142,
-          "delay": 300.0,
-          "gatherfactor": 1.0,
-          "yield_name": "low",
-          "reserve": 262701,
-          "respawn": 52540
-        },
-        {
-          "ware": "methane",
-          "resourcedensity": 2500.0,
-          "theoretical_reserve": 367258,
-          "theoretical_respawn": 73452,
-          "delay": 300.0,
-          "gatherfactor": 1.0,
-          "yield_name": "low",
-          "reserve": 218891,
-          "respawn": 43778
-        }
-      ],
-      "gas_volume_km3": 44302336
-    },
-    {
-      "ref": "region_cluster_715_sector_001_asteroids_1",
-      "amount": 1,
-      "position": {
-        "x": 0.0,
-        "y": -20000.0,
-        "z": 0.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 250000,
-          "linear": 42000
-        }
-      },
-      "lateral_factor": 0.915,
-      "radial_factor": 0.95,
-      "falloff_factor": 0.86925,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 60.0,
-          "theoretical_reserve": 860211265,
-          "theoretical_respawn": 14336854,
-          "delay": 3600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "high",
-          "reserve": 811873623,
-          "respawn": 13531227
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 120.0,
-          "theoretical_reserve": 1720422531,
-          "theoretical_respawn": 28673709,
-          "delay": 3600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "highplus",
-          "reserve": 1623747456,
-          "respawn": 27062458
-        },
-        {
-          "ware": "nividium",
-          "resourcedensity": 0.01,
-          "theoretical_reserve": 143369,
-          "theoretical_respawn": 427,
-          "delay": 20160.0,
-          "gatherfactor": 1.0,
-          "yield_name": "high",
-          "reserve": 135201,
-          "respawn": 402
-        }
-      ],
-      "solid_volume_km3": 16493361
-    },
-    {
-      "ref": "region_cluster_715_sector_001_nebula_2",
-      "amount": 1,
-      "position": {
-        "x": 0.0,
-        "y": -20000.0,
-        "z": 0.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 350000,
-          "linear": 42000
-        }
-      },
-      "lateral_factor": 0.915,
-      "radial_factor": 0.95,
-      "falloff_factor": 0.86925,
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "resourcedensity": 24000.0,
-          "theoretical_reserve": 3525678,
-          "theoretical_respawn": 352568,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medlow",
-          "reserve": 2101872,
-          "respawn": 210187
-        },
-        {
-          "ware": "helium",
-          "resourcedensity": 15000.0,
-          "theoretical_reserve": 2203549,
-          "theoretical_respawn": 220355,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medium",
-          "reserve": 1313669,
-          "respawn": 131367
-        },
-        {
-          "ware": "methane",
-          "resourcedensity": 52500.0,
-          "theoretical_reserve": 7712421,
-          "theoretical_respawn": 257081,
-          "delay": 1800.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medplus",
-          "reserve": 4597857,
-          "respawn": 153262
-        }
-      ],
-      "gas_volume_km3": 44302336
     }
   ],
   "Cluster_720_Sector001_macro": [
@@ -67525,6 +67348,173 @@
         }
       ],
       "gas_volume_km3": 11796480
+    }
+  ],
+  "Cluster_715_Sector001_macro": [
+    {
+      "ref": "region_cluster_715_sector_001_nebula_1",
+      "amount": 1,
+      "position": {
+        "x": 0.0,
+        "y": -20000.0,
+        "z": 0.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 350000,
+          "linear": 42000
+        }
+      },
+      "lateral_factor": 0.915,
+      "radial_factor": 0.95,
+      "falloff_factor": 0.86925,
+      "resources": [
+        {
+          "ware": "hydrogen",
+          "resourcedensity": 6600.0,
+          "theoretical_reserve": 969561,
+          "theoretical_respawn": 193912,
+          "delay": 300.0,
+          "gatherfactor": 1.0,
+          "yield_name": "low",
+          "reserve": 577987,
+          "respawn": 115597
+        },
+        {
+          "ware": "helium",
+          "resourcedensity": 3000.0,
+          "theoretical_reserve": 440710,
+          "theoretical_respawn": 88142,
+          "delay": 300.0,
+          "gatherfactor": 1.0,
+          "yield_name": "low",
+          "reserve": 262701,
+          "respawn": 52540
+        },
+        {
+          "ware": "methane",
+          "resourcedensity": 2500.0,
+          "theoretical_reserve": 367258,
+          "theoretical_respawn": 73452,
+          "delay": 300.0,
+          "gatherfactor": 1.0,
+          "yield_name": "low",
+          "reserve": 218891,
+          "respawn": 43778
+        }
+      ],
+      "gas_volume_km3": 44302336
+    },
+    {
+      "ref": "region_cluster_715_sector_001_asteroids_1",
+      "amount": 1,
+      "position": {
+        "x": 0.0,
+        "y": -20000.0,
+        "z": 0.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 250000,
+          "linear": 42000
+        }
+      },
+      "lateral_factor": 0.915,
+      "radial_factor": 0.95,
+      "falloff_factor": 0.86925,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 60.0,
+          "theoretical_reserve": 860211265,
+          "theoretical_respawn": 14336854,
+          "delay": 3600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "high",
+          "reserve": 811873623,
+          "respawn": 13531227
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 120.0,
+          "theoretical_reserve": 1720422531,
+          "theoretical_respawn": 28673709,
+          "delay": 3600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "highplus",
+          "reserve": 1623747456,
+          "respawn": 27062458
+        },
+        {
+          "ware": "nividium",
+          "resourcedensity": 0.01,
+          "theoretical_reserve": 143369,
+          "theoretical_respawn": 427,
+          "delay": 20160.0,
+          "gatherfactor": 1.0,
+          "yield_name": "high",
+          "reserve": 135201,
+          "respawn": 402
+        }
+      ],
+      "solid_volume_km3": 16493361
+    },
+    {
+      "ref": "region_cluster_715_sector_001_nebula_2",
+      "amount": 1,
+      "position": {
+        "x": 0.0,
+        "y": -20000.0,
+        "z": 0.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 350000,
+          "linear": 42000
+        }
+      },
+      "lateral_factor": 0.915,
+      "radial_factor": 0.95,
+      "falloff_factor": 0.86925,
+      "resources": [
+        {
+          "ware": "hydrogen",
+          "resourcedensity": 24000.0,
+          "theoretical_reserve": 3525678,
+          "theoretical_respawn": 352568,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medlow",
+          "reserve": 2101872,
+          "respawn": 210187
+        },
+        {
+          "ware": "helium",
+          "resourcedensity": 15000.0,
+          "theoretical_reserve": 2203549,
+          "theoretical_respawn": 220355,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medium",
+          "reserve": 1313669,
+          "respawn": 131367
+        },
+        {
+          "ware": "methane",
+          "resourcedensity": 52500.0,
+          "theoretical_reserve": 7712421,
+          "theoretical_respawn": 257081,
+          "delay": 1800.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medplus",
+          "reserve": 4597857,
+          "respawn": 153262
+        }
+      ],
+      "gas_volume_km3": 44302336
     }
   ]
 }

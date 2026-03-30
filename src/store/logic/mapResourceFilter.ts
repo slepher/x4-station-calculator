@@ -3,6 +3,9 @@ export type RegionYieldEntry = {
   yields: Array<{ name: string }>
 }
 
+export const RESOURCE_SORT_PRIORITY = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'rawkhaakscrap', 'nividium'] as const
+export type ResourceSortPriorityId = typeof RESOURCE_SORT_PRIORITY[number]
+
 export const FIXED_RESOURCE_YIELD_NAMES = ['low', 'midlow', 'medium', 'midhigh', 'high'] as const
 
 /**
@@ -30,8 +33,6 @@ export const YIELD_NAME_TO_RATING: Record<string, number> = {
 
 export type SectorResourceEntry = {
   ware: string
-  yield: string
-  level: number
   rating: number
 }
 
@@ -92,6 +93,30 @@ export const buildFixedYieldEntries = (wareIds: string[]): RegionYieldEntry[] =>
     ware,
     yields: FIXED_RESOURCE_YIELD_NAMES.map((name) => ({ name }))
   }))
+
+export const sortResourcesByPriority = (resourceIds: string[]): string[] => {
+  const prioritySet = new Set(RESOURCE_SORT_PRIORITY)
+  const prioritized: string[] = []
+  const others: string[] = []
+  
+  resourceIds.forEach((id) => {
+    if (prioritySet.has(id as ResourceSortPriorityId)) {
+      prioritized.push(id)
+    } else {
+      others.push(id)
+    }
+  })
+  
+  prioritized.sort((a, b) => {
+    const aIndex = RESOURCE_SORT_PRIORITY.indexOf(a as ResourceSortPriorityId)
+    const bIndex = RESOURCE_SORT_PRIORITY.indexOf(b as ResourceSortPriorityId)
+    return aIndex - bIndex
+  })
+  
+  others.sort()
+  
+  return [...prioritized, ...others]
+}
 
 export const buildYieldRanksByWare = (entries: RegionYieldEntry[]) => {
   const out: Record<string, Record<string, number>> = {}

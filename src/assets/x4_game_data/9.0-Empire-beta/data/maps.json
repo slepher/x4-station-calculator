@@ -45,6 +45,56 @@
             "x": 0.0,
             "z": 0.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 11
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 12
+            },
+            {
+              "ref": "sphere_tiny_ore_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_tiny_silicon_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -62,7 +112,7 @@
               "ware": "nividium",
               "reserve": 500,
               "respawn": 600,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -217,12 +267,70 @@
             "x": -21113958.0,
             "z": 7381814.5
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ice_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ice_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_methane_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_methane_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 9
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 11
+            },
+            {
+              "ref": "sphere_tiny_ore_veryhigh",
+              "amount": 9
+            },
+            {
+              "ref": "sphere_tiny_rawscrap_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_silicon_low",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_tiny_silicon_veryhigh",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 50000,
               "respawn": 85714,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "hydrogen",
@@ -234,13 +342,13 @@
               "ware": "ice",
               "reserve": 150000,
               "respawn": 205714,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "methane",
               "reserve": 35000,
               "respawn": 74000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -252,7 +360,7 @@
               "ware": "rawscrap",
               "reserve": 10000,
               "respawn": 24000,
-              "rating": 5
+              "rating": 2
             },
             {
               "ware": "silicon",
@@ -393,6 +501,44 @@
             "x": 38620000.0,
             "z": 53635320.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_tiny_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_low",
+              "amount": 9
+            },
+            {
+              "ref": "sphere_small_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_tiny_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_low",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_silicon_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_tiny_silicon_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -404,7 +550,7 @@
               "ware": "nividium",
               "reserve": 1000,
               "respawn": 800,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -617,6 +763,52 @@
             "x": 15000000.0,
             "z": 25980000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_tiny_silicon_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -821,30 +1013,56 @@
             "x": 30000000.0,
             "z": 17320000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ice_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_tiny_silicon_high",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
               "reserve": 200000,
               "respawn": 235714,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "nividium",
               "reserve": 1000,
               "respawn": 800,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
               "reserve": 150000,
               "respawn": 150000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "silicon",
               "reserve": 145000,
               "respawn": 255000,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -961,6 +1179,60 @@
             "x": 45000000.0,
             "z": -25980000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 10
+            },
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_nividium_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 11
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -976,8 +1248,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 25000,
-              "respawn": 10714,
+              "reserve": 10000,
+              "respawn": 5217,
               "rating": 5
             },
             {
@@ -1144,6 +1416,7 @@
             "x": 46046580.8125,
             "z": -46333148.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -1276,6 +1549,20 @@
             "x": 0.0,
             "z": -17320000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 11
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -1388,12 +1675,42 @@
             "x": -30000000.0,
             "z": 0.0
           },
+          "regions": [
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ore_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_silicon_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_helium_low",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 50000,
               "respawn": 100000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -1405,25 +1722,25 @@
               "ware": "methane",
               "reserve": 150000,
               "respawn": 150000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "nividium",
               "reserve": 1500,
               "respawn": 818,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
               "reserve": 50000,
               "respawn": 100000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "silicon",
               "reserve": 50000,
               "respawn": 120000,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -1538,12 +1855,34 @@
             "x": 17759560.0,
             "z": -5868100.5
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_verylow",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 100000,
               "respawn": 120000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -1555,7 +1894,7 @@
               "ware": "methane",
               "reserve": 100000,
               "respawn": 171429,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -1718,6 +2057,20 @@
             "x": -105000000.0,
             "z": 43300000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -1820,6 +2173,36 @@
             "x": -15000000.0,
             "z": 95260000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -2093,6 +2476,7 @@
             "x": 60000000.0,
             "z": 69280000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -2339,6 +2723,7 @@
             "x": 75000000.0,
             "z": -8660000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -2539,12 +2924,46 @@
             "x": -30000000.0,
             "z": -69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_methane_verylow",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 200000,
               "respawn": 240000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -2778,6 +3197,7 @@
             "x": -60000000.0,
             "z": -51960000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -2992,6 +3412,44 @@
             "x": -75000000.0,
             "z": -8660000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_nividium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -3267,6 +3725,7 @@
             "x": -90000000.0,
             "z": 34640000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -3501,18 +3960,44 @@
             "x": 90000000.0,
             "z": 69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ice_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_ice_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 100000,
               "respawn": 120000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
               "reserve": 175000,
               "respawn": 200000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ice",
@@ -3524,7 +4009,7 @@
               "ware": "methane",
               "reserve": 100000,
               "respawn": 171429,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -3730,18 +4215,44 @@
             "x": 199979864.0,
             "z": 69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_ice_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_silicon_high",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
               "reserve": 50000,
               "respawn": 75000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "nividium",
               "reserve": 500,
               "respawn": 600,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -3892,6 +4403,44 @@
             "x": 90000000.0,
             "z": 86600000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -4112,6 +4661,56 @@
             "x": 75000000.0,
             "z": 95260000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_nividium_veryhigh",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "methane",
@@ -4121,8 +4720,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 210000,
-              "respawn": 46429,
+              "reserve": 70000,
+              "respawn": 19143,
               "rating": 5
             },
             {
@@ -4284,18 +4883,72 @@
             "x": 75000000.0,
             "z": 25980000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_methane_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_silicon_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_helium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_helium_low",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 35000,
               "respawn": 84000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "hydrogen",
               "reserve": 200000,
               "respawn": 291429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ice",
@@ -4307,25 +4960,25 @@
               "ware": "methane",
               "reserve": 200000,
               "respawn": 291429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "nividium",
               "reserve": 500,
               "respawn": 600,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
               "reserve": 75000,
               "respawn": 125000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "silicon",
               "reserve": 80000,
               "respawn": 145714,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -4660,42 +5313,80 @@
             "x": 105000000.0,
             "z": -8660000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_verylow",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_ore_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_helium_high",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 135000,
               "respawn": 223929,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
               "reserve": 200000,
               "respawn": 291429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "methane",
               "reserve": 30000,
               "respawn": 72000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "nividium",
               "reserve": 500,
               "respawn": 600,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
               "reserve": 135000,
               "respawn": 172500,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "silicon",
               "reserve": 150000,
               "respawn": 150000,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -4876,12 +5567,54 @@
             "x": 217672928.0,
             "z": -8660000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_methane_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_ore_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_tiny_silicon_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 100000,
               "respawn": 120000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -4893,13 +5626,13 @@
               "ware": "methane",
               "reserve": 85000,
               "respawn": 138214,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "nividium",
               "reserve": 1000,
               "respawn": 800,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -5050,6 +5783,7 @@
             "x": 135000000.0,
             "z": -25980000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -5262,6 +5996,48 @@
             "x": 135000000.0,
             "z": -43300000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_rawscrap_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_rawscrap_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_silicon_medium",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -5273,7 +6049,7 @@
               "ware": "nividium",
               "reserve": 500,
               "respawn": 600,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -5424,6 +6200,32 @@
             "x": 134813100.59375,
             "z": 3410032.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -5588,6 +6390,7 @@
             "x": 30000000.0,
             "z": -51960000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -5870,6 +6673,7 @@
             "x": 60000000.0,
             "z": -86600000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -5989,12 +6793,58 @@
             "x": -45000000.0,
             "z": -60620000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ice_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_tiny_ice_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_tiny_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_silicon_verylow",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 100000,
               "respawn": 171429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -6012,13 +6862,13 @@
               "ware": "methane",
               "reserve": 25000,
               "respawn": 50000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "nividium",
               "reserve": 1500,
               "respawn": 818,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -6412,6 +7262,48 @@
             "x": -90000000.0,
             "z": -69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -6429,7 +7321,7 @@
               "ware": "rawscrap",
               "reserve": 150000,
               "respawn": 150000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "silicon",
@@ -6635,6 +7527,44 @@
             "x": -90000000.0,
             "z": -107135016.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -6791,6 +7721,40 @@
             "x": -120000000.0,
             "z": -51960000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_nividium_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_nividium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -6800,8 +7764,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 275000,
-              "respawn": 63571,
+              "reserve": 205000,
+              "respawn": 45588,
               "rating": 5
             },
             {
@@ -6927,6 +7891,52 @@
             "x": -93326018.0,
             "z": -107369964.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_verylow",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_nividium_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ore_verylow",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -6936,8 +7946,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 275000,
-              "respawn": 63571,
+              "reserve": 190000,
+              "respawn": 41429,
               "rating": 5
             },
             {
@@ -7099,12 +8109,66 @@
             "x": -150000000.0,
             "z": 34640000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_helium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_helium_low",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 75000,
               "respawn": 125000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -7126,8 +8190,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 3000,
-              "respawn": 2400,
+              "reserve": 10000,
+              "respawn": 4286,
               "rating": 5
             },
             {
@@ -7281,6 +8345,52 @@
             "x": -165000000.0,
             "z": 25980000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -7560,6 +8670,7 @@
             "x": -60000000.0,
             "z": 69280000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -7838,12 +8949,58 @@
             "x": 20377000.0,
             "z": 96438380.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_methane_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_nividium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_medium",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 150000,
               "respawn": 150000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -7855,19 +9012,19 @@
               "ware": "ice",
               "reserve": 200000,
               "respawn": 240000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "methane",
               "reserve": 20000,
               "respawn": 51000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "nividium",
-              "reserve": 7500,
-              "respawn": 2971,
-              "rating": 5
+              "reserve": 6000,
+              "respawn": 2704,
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -8021,6 +9178,7 @@
             "x": -90000000.0,
             "z": 69280000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -8136,6 +9294,24 @@
             "x": -120000000.0,
             "z": 103920000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 9
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_rawscrap_verylow",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -8147,7 +9323,7 @@
               "ware": "rawscrap",
               "reserve": 50000,
               "respawn": 75000,
-              "rating": 5
+              "rating": 3
             }
           ],
           "normalized": {
@@ -8276,6 +9452,56 @@
             "x": -60000000.0,
             "z": 103920000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_rawscrap_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 7
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -8299,7 +9525,7 @@
               "ware": "rawscrap",
               "reserve": 15000,
               "respawn": 36000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "silicon",
@@ -8598,6 +9824,32 @@
             "x": -60000000.0,
             "z": 137069454.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 9
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -8790,18 +10042,28 @@
             "x": -75000000.0,
             "z": 112580000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_rawscrap_low",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
               "reserve": 150000,
               "respawn": 257143,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "rawscrap",
               "reserve": 100000,
               "respawn": 120000,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -9008,6 +10270,7 @@
             "x": 45000000.0,
             "z": 77940000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9246,6 +10509,52 @@
             "x": -45000000.0,
             "z": -95260000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -9380,6 +10689,44 @@
             "x": -60000000.0,
             "z": -86600000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_verylow",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -9514,6 +10861,32 @@
             "x": 45000000.0,
             "z": -60620000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 10
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "methane",
@@ -9722,6 +11095,60 @@
             "x": 30000000.0,
             "z": -69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 9
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_nividium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_nividium_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -9743,8 +11170,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 325000,
-              "respawn": 79524,
+              "reserve": 42500,
+              "respawn": 17008,
               "rating": 5
             },
             {
@@ -9864,6 +11291,7 @@
             "x": 30000000.0,
             "z": 0.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -9969,6 +11397,40 @@
             "x": -90000000.0,
             "z": -17320000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "nividium",
@@ -10107,6 +11569,32 @@
             "x": -90000000.0,
             "z": 0.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -10229,6 +11717,7 @@
             "x": 120000000.0,
             "z": 0.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -10326,6 +11815,7 @@
             "x": 232672928.0,
             "z": 0.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -10452,6 +11942,7 @@
             "x": 120000000.0,
             "z": 17320000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -10547,6 +12038,52 @@
             "x": 0.0,
             "z": 103920000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_nividium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -10556,8 +12093,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 125000,
-              "respawn": 34286,
+              "reserve": 30000,
+              "respawn": 10952,
               "rating": 5
             },
             {
@@ -10677,6 +12214,52 @@
             "x": -15000000.0,
             "z": 112580000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_rawkhaakscrap_verylow",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_rawkhaakscrap_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_rawscrap_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_rawscrap_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_rawscrap_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -10688,7 +12271,7 @@
               "ware": "rawkhaakscrap",
               "reserve": 40000,
               "respawn": 96000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "rawscrap",
@@ -10869,12 +12452,74 @@
             "x": -90000000.0,
             "z": 86600000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_nividium_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_helium_low",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 160000,
               "respawn": 174000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -11001,6 +12646,72 @@
             "x": 60000000.0,
             "z": 34640000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_methane_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -11024,12 +12735,12 @@
               "ware": "methane",
               "reserve": 200000,
               "respawn": 291429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "nividium",
-              "reserve": 110000,
-              "respawn": 30286,
+              "reserve": 95000,
+              "respawn": 26286,
               "rating": 5
             },
             {
@@ -11153,6 +12864,64 @@
             "x": -150000000.0,
             "z": 51960000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_rawkhaakscrap_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_rawkhaakscrap_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_rawscrap_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 10
+            },
+            {
+              "ref": "sphere_small_rawscrap_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -11170,7 +12939,7 @@
               "ware": "rawkhaakscrap",
               "reserve": 35000,
               "respawn": 74000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "rawscrap",
@@ -11294,12 +13063,70 @@
             "x": -120000000.0,
             "z": -17320000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_methane_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_verylow",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 8
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 200000,
               "respawn": 291429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
@@ -11425,6 +13252,48 @@
             "x": 150000000.0,
             "z": -34640000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_verylow",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -11513,6 +13382,56 @@
             "x": 176673982.0,
             "z": -90049964.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_verylow",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_nividium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -11522,8 +13441,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 180000,
-              "respawn": 38952,
+              "reserve": 65000,
+              "respawn": 17085,
               "rating": 5
             },
             {
@@ -11671,6 +13590,72 @@
             "x": 60000000.0,
             "z": -103920000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ore_verylow",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -11852,6 +13837,44 @@
             "x": 105000000.0,
             "z": -95260000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -11863,7 +13886,7 @@
               "ware": "nividium",
               "reserve": 500,
               "respawn": 600,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -11968,6 +13991,48 @@
             "x": 120000000.0,
             "z": -69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_verylow",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_tiny_nividium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -11979,7 +14044,7 @@
               "ware": "nividium",
               "reserve": 3500,
               "respawn": 1400,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -12084,6 +14149,44 @@
             "x": 105000000.0,
             "z": -60620000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -12093,8 +14196,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 30000,
-              "respawn": 10588,
+              "reserve": 15000,
+              "respawn": 6429,
               "rating": 5
             },
             {
@@ -12215,6 +14318,72 @@
             "x": 90000000.0,
             "z": -34640000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -12371,6 +14540,7 @@
             "x": -60000000.0,
             "z": -103920000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -12464,6 +14634,72 @@
             "x": -120000000.0,
             "z": -69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_verylow",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -12485,8 +14721,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 125000,
-              "respawn": 35714,
+              "reserve": 20000,
+              "respawn": 8571,
               "rating": 5
             },
             {
@@ -12678,24 +14914,66 @@
             "x": -150000000.0,
             "z": -17320000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_tiny_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_rawscrap_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_tiny_rawscrap_veryhigh",
+              "amount": 7
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 100000,
               "respawn": 171429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "hydrogen",
               "reserve": 200000,
               "respawn": 291429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "methane",
               "reserve": 100000,
               "respawn": 171429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -12832,6 +15110,72 @@
             "x": -210000000.0,
             "z": 69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_silicon_verylow",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -12853,9 +15197,9 @@
             },
             {
               "ware": "nividium",
-              "reserve": 25000,
-              "respawn": 7143,
-              "rating": 5
+              "reserve": 5000,
+              "respawn": 2143,
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -12972,12 +15316,46 @@
             "x": -135000000.0,
             "z": -95260000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_tiny_methane_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_verylow",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "methane",
               "reserve": 5000,
               "respawn": 15000,
-              "rating": 5
+              "rating": 2
             },
             {
               "ware": "nividium",
@@ -13312,6 +15690,16 @@
             "x": -30000000.0,
             "z": -121240000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -13422,6 +15810,44 @@
             "x": -210000000.0,
             "z": -103920000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_rawkhaakscrap_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_rawkhaakscrap_verylow",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_rawscrap_verylow",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -13439,7 +15865,7 @@
               "ware": "rawkhaakscrap",
               "reserve": 60000,
               "respawn": 130000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "rawscrap",
@@ -13535,30 +15961,68 @@
             "x": -30000000.0,
             "z": -17320000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 50000,
               "respawn": 85714,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "hydrogen",
               "reserve": 120000,
               "respawn": 205000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "methane",
               "reserve": 100000,
               "respawn": 171429,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "nividium",
               "reserve": 500,
               "respawn": 600,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -13717,6 +16181,7 @@
             "x": -105000000.0,
             "z": 147220000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -13822,6 +16287,68 @@
             "x": -45000000.0,
             "z": 129900000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_hydrogen_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_nividium_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -13843,8 +16370,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 75000,
-              "respawn": 25000,
+              "reserve": 17500,
+              "respawn": 8199,
               "rating": 5
             },
             {
@@ -14012,6 +16539,44 @@
             "x": -45000000.0,
             "z": 147220000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -14150,6 +16715,7 @@
             "x": -120000000.0,
             "z": 138560000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14279,6 +16845,7 @@
             "x": 30000000.0,
             "z": 155880000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14422,6 +16989,7 @@
             "x": 45000000.0,
             "z": 147220000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14583,6 +17151,7 @@
             "x": 45000000.0,
             "z": 164540000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14726,6 +17295,7 @@
             "x": 120000000.0,
             "z": 103920000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -14865,6 +17435,7 @@
             "x": 120000000.0,
             "z": 86600000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -14964,6 +17535,7 @@
             "x": 101796238.0,
             "z": 100611029.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -15090,6 +17662,7 @@
             "x": 150000000.0,
             "z": 103920000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -15205,6 +17778,44 @@
             "x": 165000000.0,
             "z": 112580000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -15353,6 +17964,56 @@
             "x": 180000000.0,
             "z": 138560000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -15511,6 +18172,56 @@
             "x": 180000000.0,
             "z": 103920000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_helium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -15655,6 +18366,56 @@
             "x": 195000000.0,
             "z": 112580000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_helium_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -15775,6 +18536,20 @@
             "x": -45000000.0,
             "z": 164540000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_rawscrap_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_rawscrap_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_rawscrap_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "rawscrap",
@@ -15887,6 +18662,64 @@
             "x": -30000000.0,
             "z": 173200000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -16051,6 +18884,7 @@
             "x": 90000000.0,
             "z": 138560000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_a",
@@ -16140,6 +18974,20 @@
             "x": 80473124.0,
             "z": 163129310.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -16298,6 +19146,7 @@
             "x": 75000000.0,
             "z": 164540000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -16403,18 +19252,92 @@
             "x": 0.0,
             "z": 138560000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_hydrogen_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_hydrogen_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ice_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_methane_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_tiny_nividium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_rawkhaakscrap_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_rawkhaakscrap_verylow",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_rawscrap_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_tiny_rawscrap_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 50000,
               "respawn": 85714,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "hydrogen",
               "reserve": 150000,
               "respawn": 205714,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ice",
@@ -16426,13 +19349,13 @@
               "ware": "methane",
               "reserve": 75000,
               "respawn": 150000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "nividium",
               "reserve": 3500,
               "respawn": 1400,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -16444,7 +19367,7 @@
               "ware": "rawkhaakscrap",
               "reserve": 25000,
               "respawn": 66000,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "rawscrap",
@@ -16587,6 +19510,7 @@
             "x": 30000000.0,
             "z": 121240000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -16714,6 +19638,24 @@
             "x": 45000000.0,
             "z": 112580000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -16852,12 +19794,22 @@
             "x": 120000000.0,
             "z": 121240000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_rawscrap_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_rawscrap_medium",
+              "amount": 1
+            }
+          ],
           "resources": [
             {
               "ware": "rawscrap",
               "reserve": 150000,
               "respawn": 205714,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -16984,6 +19936,32 @@
             "x": -135000000.0,
             "z": 147220000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 7
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -17122,6 +20100,7 @@
             "x": -165000000.0,
             "z": 147220000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -17221,6 +20200,7 @@
             "x": -34773744.0,
             "z": 259364392.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -17347,6 +20327,7 @@
             "x": -180000000.0,
             "z": 155880000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -17450,6 +20431,32 @@
             "x": -43280992.0,
             "z": 159557055.75
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -17615,6 +20622,32 @@
             "x": 165000000.0,
             "z": 147220000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -17708,6 +20741,88 @@
             "x": -195000000.0,
             "z": 8660000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -17735,8 +20850,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 36000,
-              "respawn": 12400,
+              "reserve": 20000,
+              "respawn": 6143,
               "rating": 5
             },
             {
@@ -17864,6 +20979,7 @@
             "x": -210000000.0,
             "z": 17320000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -17991,6 +21107,7 @@
             "x": -225000000.0,
             "z": 25980000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -18104,6 +21221,7 @@
             "x": -210000000.0,
             "z": 34640000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -18202,6 +21320,7 @@
             "x": -210000000.0,
             "z": -141250496.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "dual_b",
@@ -18361,6 +21480,20 @@
             "x": -225000000.0,
             "z": 43300000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 7
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -18461,6 +21594,7 @@
             "x": -210000000.0,
             "z": -17320000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -18578,6 +21712,7 @@
             "x": -225000000.0,
             "z": -25980000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -18705,6 +21840,32 @@
             "x": -280073532.0,
             "z": -185381120.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 9
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_large_methane_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_methane_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -18794,6 +21955,64 @@
             "x": -257631400.0,
             "z": 108293000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 9
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_ice_verylow",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ice_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -18971,6 +22190,7 @@
             "x": -240000000.0,
             "z": -34640000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -19076,6 +22296,32 @@
             "x": -225000000.0,
             "z": -43300000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_helium_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -19214,6 +22460,7 @@
             "x": -240000000.0,
             "z": -51960000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -19319,6 +22566,72 @@
             "x": -120000000.0,
             "z": 69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_methane_verylow",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_helium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -19478,6 +22791,76 @@
             "x": -120000000.0,
             "z": 18225196.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_nividium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -19499,8 +22882,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 85000,
-              "respawn": 25714,
+              "reserve": 35000,
+              "respawn": 12731,
               "rating": 5
             },
             {
@@ -19632,6 +23015,88 @@
             "x": -165000000.0,
             "z": -77940000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_methane_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_methane_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -19661,7 +23126,7 @@
               "ware": "nividium",
               "reserve": 6500,
               "respawn": 2961,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -19804,6 +23269,68 @@
             "x": -180000000.0,
             "z": -86600000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -19980,6 +23507,7 @@
             "x": -195000000.0,
             "z": -77940000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -20131,6 +23659,88 @@
             "x": -255000000.0,
             "z": -60620000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_methane_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_nividium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_helium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -20158,8 +23768,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 110000,
-              "respawn": 30286,
+              "reserve": 55000,
+              "respawn": 16286,
               "rating": 5
             },
             {
@@ -20265,6 +23875,84 @@
             "x": 20038240.0,
             "z": 81086290.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_methane_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_tiny_nividium_veryhigh",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -20294,7 +23982,7 @@
               "ware": "nividium",
               "reserve": 5000,
               "respawn": 1667,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -20430,6 +24118,84 @@
             "x": -14013832.4,
             "z": -184824500.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ice_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ice_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_tiny_nividium_high",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -20459,7 +24225,7 @@
               "ware": "nividium",
               "reserve": 3500,
               "respawn": 1400,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -20549,6 +24315,80 @@
             "x": -125379200.0,
             "z": -19965560.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_methane_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_medium",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -20757,6 +24597,68 @@
             "x": -30000000.0,
             "z": 51960000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_large_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_nividium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 10
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 10
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -20772,8 +24674,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 225000,
-              "respawn": 63627,
+              "reserve": 45000,
+              "respawn": 14952,
               "rating": 5
             },
             {
@@ -20941,6 +24843,20 @@
             "x": -45000000.0,
             "z": 43300000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 9
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -21075,6 +24991,56 @@
             "x": -45000000.0,
             "z": 25980000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_tiny_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_ore_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_rawscrap_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_silicon_medium",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -21092,13 +25058,13 @@
               "ware": "nividium",
               "reserve": 1000,
               "respawn": 800,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
               "reserve": 150000,
               "respawn": 205714,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "rawscrap",
@@ -21110,7 +25076,7 @@
               "ware": "silicon",
               "reserve": 100000,
               "respawn": 171429,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -21241,6 +25207,40 @@
             "x": 180000000.0,
             "z": 69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_veryhigh",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_nividium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_veryhigh",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -21250,8 +25250,8 @@
             },
             {
               "ware": "nividium",
-              "reserve": 25000,
-              "respawn": 9059,
+              "reserve": 15000,
+              "respawn": 6286,
               "rating": 5
             },
             {
@@ -21333,10 +25333,13 @@
           "owner": "ownerless",
           "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.41,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "boronborder",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -21346,6 +25349,68 @@
             "x": -150000000.0,
             "z": 103920000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_helium_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -21452,10 +25517,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.83,
+            "economy": 0.25,
+            "security": 0.5,
+            "tags": [
+              "boronborder",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -21465,6 +25533,32 @@
             "x": -165000000.0,
             "z": 95260000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -21582,10 +25676,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.28,
+            "economy": 0.5,
+            "security": 0.75,
+            "tags": [
+              "boronborder",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -21595,6 +25692,44 @@
             "x": -180000000.0,
             "z": 86600000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_hydrogen_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 7
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -21728,10 +25863,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.12,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "boronborder",
+              "allowrandomanomaly"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -21741,6 +25879,12 @@
             "x": -180000000.0,
             "z": 69280000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_rawscrap_low",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "rawscrap",
@@ -21838,9 +25982,9 @@
           "owner": "ownerless",
           "owner_color": "#C0C0C0",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
+            "sunlight": 1.74,
+            "economy": 0.25,
+            "security": 0.25,
             "tags": []
           },
           "raw_local_pos": {
@@ -21851,24 +25995,38 @@
             "x": -195000000.0,
             "z": 112580000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_small_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_silicon_medium",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "nividium",
               "reserve": 2500,
               "respawn": 1304,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
               "reserve": 100000,
               "respawn": 120000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "silicon",
               "reserve": 150000,
               "respawn": 257143,
-              "rating": 5
+              "rating": 4
             }
           ],
           "normalized": {
@@ -22086,10 +26244,12 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.18,
+            "economy": 0.75,
+            "security": 0.75,
+            "tags": [
+              "boroncore"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -22099,6 +26259,7 @@
             "x": -225000000.0,
             "z": 129900000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -22284,10 +26445,12 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.18,
+            "economy": 0.75,
+            "security": 0.75,
+            "tags": [
+              "boroncore"
+            ]
           },
           "raw_local_pos": {
             "x": -622191.4,
@@ -22297,6 +26460,20 @@
             "x": -225622191.4,
             "z": 88156930.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_helium_high",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_helium_veryhigh",
+              "amount": 9
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -22599,10 +26776,12 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 1.18,
+            "economy": 0.75,
+            "security": 0.75,
+            "tags": [
+              "boroncore"
+            ]
           },
           "raw_local_pos": {
             "x": 59111760.0,
@@ -22612,6 +26791,7 @@
             "x": -165888240.0,
             "z": 127858730.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "triple_b",
@@ -22865,10 +27045,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.15,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "boroncore",
+              "boronpirate"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -22878,6 +27061,56 @@
             "x": -240000000.0,
             "z": 121240000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 8
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_methane_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_methane_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -23017,10 +27250,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 0.41,
+            "economy": 0.25,
+            "security": 0.25,
+            "tags": [
+              "boroncore",
+              "boronpirate"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -23030,6 +27266,36 @@
             "x": -225000000.0,
             "z": 112580000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_hydrogen_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_hydrogen_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "hydrogen",
@@ -23258,10 +27524,13 @@
           "owner": "boron",
           "owner_color": "#4DB5FF",
           "area": {
-            "sunlight": 0.0,
-            "economy": 0.0,
-            "security": 0.0,
-            "tags": []
+            "sunlight": 2.71,
+            "economy": 0.5,
+            "security": 0.25,
+            "tags": [
+              "boroncore",
+              "boronpirate"
+            ]
           },
           "raw_local_pos": {
             "x": 0.0,
@@ -23271,6 +27540,44 @@
             "x": -240000000.0,
             "z": 103920000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_helium_low",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_verylow",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -23518,6 +27825,7 @@
             "x": 150000000.0,
             "z": 17320000.0
           },
+          "regions": [],
           "resources": [],
           "normalized": {
             "template_kind": "single",
@@ -23633,6 +27941,68 @@
             "x": 165000000.0,
             "z": 8660000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_hydrogen_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_tiny_methane_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_tiny_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_high",
+              "amount": 6
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -23662,7 +28032,7 @@
               "ware": "nividium",
               "reserve": 500,
               "respawn": 600,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -23803,6 +28173,80 @@
             "x": 165000000.0,
             "z": -8660000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_helium_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_helium_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_hydrogen_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_hydrogen_medium",
+              "amount": 7
+            },
+            {
+              "ref": "sphere_small_hydrogen_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_methane_verylow",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_methane_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_methane_high",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_tiny_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_silicon_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
@@ -23832,7 +28276,7 @@
               "ware": "nividium",
               "reserve": 1000,
               "respawn": 800,
-              "rating": 4
+              "rating": 3
             },
             {
               "ware": "ore",
@@ -23975,6 +28419,36 @@
             "x": 15000000.0,
             "z": 60620000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_low",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -23986,7 +28460,7 @@
               "ware": "nividium",
               "reserve": 2500,
               "respawn": 1304,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -24133,6 +28607,48 @@
             "x": -120000000.0,
             "z": 34640000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_large_ice_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ice_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_nividium_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 6
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 4
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -24144,7 +28660,7 @@
               "ware": "nividium",
               "reserve": 2500,
               "respawn": 1304,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -24271,6 +28787,40 @@
             "x": -105000000.0,
             "z": 25980000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_ice_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ice_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_large_silicon_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_silicon_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_silicon_veryhigh",
+              "amount": 2
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -24390,6 +28940,44 @@
             "x": -45000000.0,
             "z": 95260000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_rawkhaakscrap_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_tiny_rawkhaakscrap_verylow",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_large_rawscrap_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_rawscrap_high",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_medium_silicon_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_small_silicon_medium",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ore",
@@ -24401,7 +28989,7 @@
               "ware": "rawkhaakscrap",
               "reserve": 60000,
               "respawn": 130000,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "rawscrap",
@@ -24510,6 +29098,32 @@
             "x": -150000000.0,
             "z": 0.0
           },
+          "regions": [
+            {
+              "ref": "sphere_medium_ice_verylow",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ice_high",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_methane_medium",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_small_nividium_verylow",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 2
+            },
+            {
+              "ref": "sphere_small_ore_high",
+              "amount": 3
+            }
+          ],
           "resources": [
             {
               "ware": "ice",
@@ -24521,13 +29135,13 @@
               "ware": "methane",
               "reserve": 150000,
               "respawn": 257143,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "nividium",
               "reserve": 1500,
               "respawn": 1059,
-              "rating": 5
+              "rating": 4
             },
             {
               "ware": "ore",
@@ -24628,12 +29242,42 @@
             "x": -45000000.0,
             "z": -8660000.0
           },
+          "regions": [
+            {
+              "ref": "sphere_small_helium_medium",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_large_ore_verylow",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_medium_ore_medium",
+              "amount": 5
+            },
+            {
+              "ref": "sphere_small_ore_veryhigh",
+              "amount": 3
+            },
+            {
+              "ref": "sphere_large_rawscrap_low",
+              "amount": 1
+            },
+            {
+              "ref": "sphere_medium_rawscrap_medium",
+              "amount": 4
+            },
+            {
+              "ref": "sphere_small_rawscrap_high",
+              "amount": 5
+            }
+          ],
           "resources": [
             {
               "ware": "helium",
               "reserve": 50000,
               "respawn": 85714,
-              "rating": 5
+              "rating": 3
             },
             {
               "ware": "ore",

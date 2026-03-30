@@ -8,7 +8,7 @@ import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { formatNumber } from '@/utils/numberFormatter'
-import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
+import { sortResourcesByPriority, type SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 
 type SearchSectorLayout = {
@@ -104,7 +104,6 @@ const clusterRefHeightPx = ref(142)
 const MAX_SCALE_MULTIPLIER = 2
 const TOOLTIP_OFFSET = 14
 const TOOLTIP_VIEWPORT_PADDING = 12
-const RESOURCE_ORDER = ['ore', 'silicon', 'ice', 'hydrogen', 'helium', 'methane', 'nividium', 'rawscrap'] as const
 
 const viewportRef = ref<HTMLDivElement | null>(null)
 const searchInputRef = ref<HTMLInputElement | null>(null)
@@ -163,6 +162,10 @@ const factionsById = computed(() => Object.fromEntries(
 const resourceColorByWare = computed(() => Object.fromEntries(
   (gameDataStore.res || []).map((entry: any) => [entry.id, entry.color_rgb || '#fbbf24'])
 ) as Record<string, string>)
+const availableResourceIds = computed(() =>
+  (gameDataStore.res || []).map((entry: any) => entry.id as string).filter((id) => id !== 'energycells')
+)
+const sortedResourceIds = computed(() => sortResourcesByPriority(availableResourceIds.value))
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
   const clusters = gameDataStore.maps?.clusters || {}
@@ -680,7 +683,7 @@ const createTooltipViewModel = (payload: SectorHoverPayload): TooltipViewModel =
     title: locale.value === 'en' ? payload.name : payload.displayName,
     ownerName: formatOwnerName(payload.owner),
     sunlightPercent: payload.sunlight,
-    resources: RESOURCE_ORDER
+    resources: sortedResourceIds.value
       .map((wareId) => payload.resources.find((item) => item.ware === wareId))
       .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
       .map((entry) => ({

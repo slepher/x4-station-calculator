@@ -3332,6 +3332,10 @@
     <t id="11688">Auswertungszeit Bergbau(followed by colon and added percentage)</t>
     <t id="11689">Potenzielle Ressource</t>
     <t id="11690">Erkannte Ressource</t>
+    <t id="11691">Introducing Priority Orders</t>
+    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
+    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
+    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Offline speichern</t>
     <t id="11702">Offline-Spielstand überschreiben</t>
@@ -3743,6 +3747,8 @@
     <t id="12786">AMD FSR Frame Generation</t>
     <t id="12787">Experimentelle verbesserte Controller-Unterstützung</t>
     <t id="12788">AMD FSR</t>
+    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
+    <t id="12790">Start New Open Universe</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Botschafts\-aktionen</t>
     <t id="12803">Diplomat</t>
@@ -3946,7 +3952,8 @@
     <t id="13324">Modul bestätigen</t>
     <t id="13325">Modulauswahl abbrechen</t>
     <t id="13326">Stationsmodell fokussieren</t>
-    <t id="13327">Queued Priority Order</t>
+    <t id="13327">Eingereihter Prioritätsbefehl</t>
+    <t id="13328">Gather Rate(of resources; header item for table column)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Auf Wiedersehen</t>
@@ -5382,6 +5389,8 @@
     <t id="993">Für eine genauere Einführung in die Flugmechaniken probiere den Tutorial-Spielstart "Flugschule" aus.</t>
     <t id="994">Hervorgehobene Gesprächsoptionen treiben die Handlung voran. Wenn du den ganzen Dialog hören möchtest, wähle zuerst die anderen Optionen aus.</t>
     <t id="995">Du kannst dieses und andere Tutorials erneut und in deinem eigenen Tempo spielen, indem du das Optionsmenü öffnest und TUTORIALS SPIELEN auswählst.("Options Menu" same as {1001,2600},  "Play Tutorials" same as {1001,12660})</t>
+    <t id="996">Platziere Ressourcen\-sonden in der Nähe ergiebiger Ressourcen\-felder. Wird die passende Ressource erkannt, bevorzugen deine Schürfer diesen Standort, bis er erschöpft ist.</t>
+    <t id="997">Zu viele Ressourcen\-sonden in einem Sektor verringern die Effizienz, setze sie gezielt ein. Sie sind rein optional. Deine Schürfer können Ressourcen auch eigenständig finden und abbauen.</t>
     <t id="1000">(Generic Hints)</t>
     <t id="1001">Du kannst dieses Tutorial im '{1001,8701}'-Menü abbrechen.</t>
     <t id="1002">Tutorial abgeschlossen!</t>
@@ -7385,6 +7394,8 @@
     <t id="5901">Ein Präsentations\-szenario von X4: Foundations</t>
     <t id="5902">Messeumgebung</t>
     <t id="5904">Willkommen bei X4!\n\nDiese fokussierte Demo wirft dich direkt ins Geschehen. Erlebe X4s großangelegte Weltraumschlachten hautnah, während du einer befreundeten Flotte beitrittst, Feinde abwehrst und eine belagerte Station an der Grenze verteidigst.\n\nStürze dich in intensive Nahkämpfe in der Nähe eines Sprungtors, unterstützt von mächtigen Großschiffen und automatischen Verteidigungsanlagen. Ohne Einrichtung oder Wartezeit kannst du direkt einsteigen, das Steuer übernehmen und die Dimensionen, Spannung und Schönheit des Weltraumkampfs in X4: Foundations erleben.</t>
+    <t id="5905">Tradeshow Playground</t>
+    <t id="5906">Welcome to X4!\n\nThis scenario drops you into a busy sector within a downscaled universe, giving you a taste of the immense scale and possibilities of X4: Foundations.</t>
     <t id="6000">Tutorial: Fortgeschrittenes Spiel</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">Rayma Sedim</t>
@@ -8229,7 +8240,7 @@
     <t id="4602">Festlegen, ob der Handel mit bestimmten Produkten auf dieser Station eingeschränkt sein soll.</t>
     <t id="4800">(Options menu range 26xx continued)</t>
     <t id="4801">Starte deine Reise als [mp:einsamer Pilot|fp:einsame Pilotin] und steige in einem großen, beständigen Universum zu einer galaktischen Macht auf, indem du deinen eigenen Weg mit optionalen Handlungs\-missionen wählst.</t>
-    <t id="4802">Neuen Spielenden wird empfohlen, zuerst die grundlegenden Tutorials zu absolvieren. Wir schlagen vor, anschließend Timelines auszuprobieren, aber wenn du eine Sandbox-Erfahrung vorziehst, kannst du danach auch direkt ins Offene Universum.</t>
+    <t id="4802">Neuen Spielenden wird empfohlen, zuerst die grundlegenden Tutorials zu absolvieren. Falls du eine Sandbox-Erfahrung vorziehst, kannst du auch direkt ins Offene Universum und die Tutorials ein andermal absolvieren.</t>
     <t id="4803">Dadurch wird dein letzter Spielstand im Offenen Universum fortgesetzt.\n\nBitte beachte, dass für Timelines kein Spielstand erforderlich ist.</t>
     <t id="4804">So kannst du einen von mehreren Spielständen auswählen, um im Offenen Universum fortzufahren.\n\nBitte beachte, dass für Timelines kein Spielstand erforderlich ist.</t>
     <t id="4805">Es gibt eine große Auswahl an Kurztutorials, die dir zeigen oder dich daran erinnern, wie die Aktivitäten im Spiel funktionieren.\n\nBeginne deine Reise hier und komm zurück, wenn du auf ein Problem stößt.</t>
@@ -8654,6 +8665,7 @@
     <t id="9929">Du kannst diese Option nicht auswählen, da dadurch eine Option abgewählt würde, die erforderlich ist, um einen Sektor freizuschalten, in dem du Eigentum platziert hast.</t>
     <t id="9930">Dieses benutzer\-definierte Spiel ist nicht auswählbar, da es eingeschränkte Objekte enthält, die du noch nicht freigeschaltet hast.</t>
     <t id="9931">Dieses benutzerdefinierte Spiel enthält Loadouts mit inkompatibler Ausrüstung. Inkompatible Ausrüstung wird nicht installiert.</t>
+    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">Das Annehmen dieser Mission bricht alle anderen Multiversum-Operationsmissionen ab.</t>
@@ -9276,6 +9288,8 @@
     <t id="902">Rette in Raumanzügen gestrandete Personen in bezeichnetem Gebiet.</t>
     <t id="911">Stationen besuchen</t>
     <t id="912">Besuche wichtige Stationen verschiedener Fraktionen.</t>
+    <t id="921">Prospektieren</t>
+    <t id="922">Finden Sie Ressourcen\-gebiete, markieren Sie sie mit Ressourcen\-sonden und sammeln Sie veraltete Sonden ein, um sie erneut aufzustellen.</t>
     <t id="10000">Weg abbrechen</t>
     <t id="10001">Abschluss steht kurz bevor</t>
     <t id="10002">Aktive Patrouille</t>
@@ -9439,6 +9453,7 @@
     <t id="10177">Verzögerung</t>
     <t id="10178">Waren \(Manuell\)</t>
     <t id="10179">Warenkorb</t>
+    <t id="10180">Max. aufgestellte Ressourcen\-sonden</t>
   </page>
   <page id="1042" title="Encyclopedia Data Texts" descr="Describes additional data in encyclopedia entries" voice="no">
     <t id="10011">Nichts</t>
@@ -11468,6 +11483,19 @@
     <t id="115">Oder du ignorierst all das und folgst einfach einem der vielen faszinierenden Handlungsstränge, konzentrierst dich auf Erkundung oder nimmst dir die unzähligen anderen im X-Universum verfügbaren Aktivitäten vor.</t>
     <t id="116">Du kannst deine Vorwärtsgeschwindigkeit mit den Tasten X und Y, dem Mausrad oder dem Schubhebel einstellen.</t>
     <t id="117">Sobald du ein Ziel ausgewählt hast, versucht das Zielsystem, es aufzuschalten. Sobald das Aufschalten erfolgt ist, kannst du mit der Taste R oder der Sekundärfeuertaste eine Rakete abfeuern.</t>
+    <t id="200">(Tradeshow Playground Scenario)</t>
+    <t id="201">Welcome to X4: Foundations, a living universe with hundreds of sectors connected by gates. These sectors can be explored, and contain thousands of ships and stations operating within a fully simulated economy. You can own and command everything, ranging from a single tiny fighter to a grand empire with merchant fleets and powerful capital ships, to shape your story.</t>
+    <t id="202">This scenario places you near one of the many hundreds of bustling space stations you'll find in our living universe, with traders delivering wares and miners gathering resources. \nRecently there have been skirmishes with the machine intelligence known as the Xenon pouring in from the nearby gate, disrupting the trade.</t>
+    <t id="211">(explore explanation)Leaving the station behind, you are free to explore the other sectors and factions. The full X-Universe contains hundreds of unique sectors inhabited by various factions and species, all with rich history.</t>
+    <t id="212">(fight explanation)The Gate network is not always safe. Between the machine intelligence known as the Xenon, pirates, warring factions and the occasional war profiteering opportunist, you will see clashes ranging from small skirmishes to giant fleet brawls.</t>
+    <t id="213">(mining explanation)Ships like these mine the raw resources that the majority of the economy is based on. Once delivered they are refined, moved to factories and eventually turned into the wares that can be used to build the ships and stations you see.</t>
+    <t id="214">(trading explanation)Traders, haulers and merchants transport wares between stations. They buy where goods are plentiful and sell them where they are scarce, keeping the gears of the economy turning.</t>
+    <t id="215">(shipyard construction)This ship is currently under construction using the wares created by other stations. It will soon defend this sector from any further incursions.</t>
+    <t id="216">(launch tube explanation)The station is launching fighters from its launch tubes to defend itself from incoming attackers.</t>
+    <t id="217">(station attack explanation)A hostile Xenon force is approaching. If they damage the station, the production of new ships could be severely limited.</t>
+    <t id="218">(criminal explanation)Criminals try to capitalise on transporting illicit wares for great profits by hiding in traffic around stations. These criminals can even run organised operations with their own stations and masked freighters.</t>
+    <t id="219">(explore suggestion)There are more sights to see and things to do. Try flying around and targeting different objects.</t>
+    <t id="220">X4: Foundations has so much more to offer. You can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe.</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
@@ -20360,7 +20388,6 @@
   <page id="10120" title="Mission Argon/Terran NPC Female 22 / Segaris diplomat" descr="Lines for Segaris Faction Diplomat" voice="yes">
     <t id="2001">(Begrüßung - neutral)Hallo!</t>
     <t id="2007">(Verabschiedung - neutral)Machen Sie's gut!</t>
-    <t id="2009">(Verabschiedung - Feind)Ist mir egal.</t>
     <t id="3000">(* Diplomat specific lines *)</t>
     <t id="3001">(Accepting invitation)Die Segaris-Pioniere nehmen Ihre Einladung gerne an. Ich treffe  bald in Ihrer Botschaft ein.</t>
     <t id="3002">(Diplomat Arrival Confirmation)Ich bin in Ihrer Botschaft eingetroffen.</t>
@@ -23863,6 +23890,7 @@
     <t id="36">Das machen wir später.</t>
     <t id="37">Schließen Sie die Karte.</t>
     <t id="38">Jetzt.(as in "do it now", comes some time after an instruction)</t>
+    <t id="39">Eine Sache noch.</t>
     <t id="1000">(Einleitung und medizinischer Check)</t>
     <t id="1001">Hallo. Ich bin Jace Winger, Ihr heutiger Fluglehrer. Wir gehen den gesamten Lehrplan durch, aber wenn Sie sich bereits mit den Grundlagen auskennen, können wir gerne darüber reden, Sachen zu überspringen.</t>
     <t id="1002">Bevor wir anfangen, muss ich noch ein paar routinemäßige Gesundheitschecks durchführen. Vorschriften, wie Sie sich denken können.(sprich den letzten Satz in entschuldigendem/ironischen Tonfall)</t>
@@ -24597,6 +24625,24 @@
     <t id="25040">Der Balken auf der rechten Seite zeigt an, wie erschöpft sie ist.</t>
     <t id="25041">Die Ressourcen füllen sich mit der Zeit wieder auf, aber wenn ein Feld fast leer ist, ist es wohl besser, sich in der Zwischenzeit eine Alternative zu suchen.</t>
     <t id="25042">Die fortgeschritteneren erfordern einen erfahreneren Piloten, ermöglichen aber den Einsatz in einer Reihe von Systemen.</t>
+    <t id="25043">Die farbigen Bereiche zeigen mögliche Ressourcen\-vorkommen an.</t>
+    <t id="25044">Öffnen Sie die Filter\-einstellungen für Bergbau.</t>
+    <t id="25045">Wählen Sie eine der hervorgehobenen Gasressourcen\-waren aus.</t>
+    <t id="25046">Die Farbe auf der Karte hat sich geändert, um die ausgewählte Ressource anzuzeigen.</t>
+    <t id="25047">Sie sehen jetzt nur noch mögliche Vorkommen dieser Ressource.(leichte Betonung auf "dieser Ressource")</t>
+    <t id="25048">Ändern Sie sein Standardverhalten zu Lokaler Automatischer Bergbau.</t>
+    <t id="25049">Konfigurieren Sie es so, dass es alle Gasressourcen in diesem Sektor abbaut.</t>
+    <t id="25050">Das Schiff wird nun versuchen, die Ressource zu finden, abzubauen und im angegebenen Sektor zu verkaufen.</t>
+    <t id="25051">Sie können ihre Aktivitäten mit Ressourcen\-sonden auch manueller steuern.</t>
+    <t id="25052">Stellen Sie eine Sonde in einer der Gasregionen auf.</t>
+    <t id="25053">Ihre Schürfer prüfen beim Festlegen der Abbauorte zuerst die Ressourcen\-sonden.</t>
+    <t id="25054">Je mehr Sonden Sie in einem Sektor aufstellen, desto länger dauert dieser Schritt. Nutzen Sie Sonden also mit Bedacht.</t>
+    <t id="25055">Sie können auch genau sehen, wo Ressourcen derzeit erkannt werden.</t>
+    <t id="25056">Wählen Sie erneut Ihren Gasschürfer aus und befehlen Sie ihm direkt, in einem der Gebiete mit erkannten Ressourcen abzubauen.</t>
+    <t id="25057">Ressourcen werden irgendwann erschöpft sein.</t>
+    <t id="25058">Sie werden sich mit der Zeit wieder auffüllen, aber vermutlich an einem anderen Ort.</t>
+    <t id="25059">Behalten Sie also Ihre Ressourcen\-sonden im Auge und entfernen oder stellen Sie nutzlos gewordene erneut auf.</t>
+    <t id="25060">Oder, wenn Sie Schiffe übrig haben, stellen Sie jemanden ab, um einen Sektor zu erkunden und die Positionen Ihrer Ressourcen\-sonden zu betreuen.</t>
     <t id="26000">(Station Building)</t>
     <t id="26001">Heute behandeln wir eine meiner fortgeschrittensten Lektionen: Entwerfen und Bauen von Stationen.</t>
     <t id="26002">Als erstes brauchen Sie einen Bauplatz.</t>
@@ -51536,7 +51582,7 @@
     <t id="1274">(S Blast Mortar Mk2){20111,5011} {20105,1251} {20111,201}</t>
     <t id="1275">(Blast Mortar){20105,1271}</t>
     <t id="1281">Bosonenlanze</t>
-    <t id="1282">Die Bosonen-Lanze der Split feuert ein einzelnes Hochgeschwindigkeitsgeschoss auf mittlere Entfernung ab. Im Gegensatz zu anderen Waffen verzichtet die Bosonen-Lanze auf automatische Zielverfolgung und ist statisch, sodass der Pilot sein Schiff drehen muss, um zu zielen. Aufgrund dieser Einschränkung wird die Bosonen-Lanze vor allem im Kampf gegen mittelgroße Schiffe oder zur Zerstörung der Oberflächenelemente von Großschiffen eingesetzt. Einige Piloten, die diese Waffe regelmäßig einsetzen, entwickelten Rituale, von denen sie sich eine Steigerung des Schadenspotenzials versprechen, um diesen Nachteil abzumildern.\n\nDie Bosonen-Lanze wurde eher kürzlich von den Split-Brüdern Ko t'Pa und Fyi t'Pa erfunden. Mit dem Wiederanschluss des Patriarchats von Zyarth an die Planetengemeinschaft erwarb das Patriarchat ihre Blaupause und entwickelte sie für die Massenproduktion weiter.\n\nDas bemerkenswerteste Merkmal der Mk2-Variante ist die Verdopplung der Schadensleistung.</t>
+    <t id="1282">Die Bosonenlanze der Split verschießt ein einzelnes Projektil mit sehr hoher Geschwindigkeit über große Entfernungen und erzeugt dabei nur vernachlässigbare Wärme. Ihre größte Beschränkung ist das aufwendige System zur Energie\-rückgewinnung, das lange Auflade\-intervalle erfordert und den Einsatz größerer Gimbal-Schwenkbereiche einschränkt.\n\nDaher wird die Bosonenlanze meist als Sekundärwaffe eingesetzt. Split-Jägerstaffeln stellen jedoch häufig ein einzelnes Schiff auf, das ausschließlich mit dieser Waffe ausgerüstet ist, um spezialisierte Abfang- und Erstangriffe durchzuführen.\n\nDie Bosonenlanze ist eine vergleichsweise neue Entwicklung aus der fortgeschrittenen Waffenforschung der Split. Nach der Wiederanbindung des Patriarchats Zyarth an die Gemeinschaft der Planeten erhielt das Patriarchat die ursprünglichen Baupläne und passte das Design für die großangelegte Produktion an.</t>
     <t id="1284">(SPL S Boson Lance Mk1){20202,303} {20111,5011} {20105,1281} {20111,101}</t>
     <t id="1285">(Boson Lance){20105,1281}</t>
     <t id="1291">(Boson Lance){20105,1281}</t>
@@ -51544,7 +51590,7 @@
     <t id="1294">(SPL S Boson Lance Mk2){20202,303} {20111,5011} {20105,1291} {20111,201}</t>
     <t id="1295">(Boson Lance){20105,1291}</t>
     <t id="1301">Tau-Beschleuniger</t>
-    <t id="1302">Der Tau-Beschleuniger kombiniert die rohe Zerstörungskraft einer raumschiffbasierten Schrotflinte mit der Einschüchterung durch schnelles Waffenfeuer - ein Markenzeichen der militärischen Kultur der Split. Obwohl er das Ergebnis eines ganz anderen Forschungszweigs ist, kann man ihn als die spezialisierte Version der Schrotbatterie der Split betrachten. Im Vergleich zu dieser leichter erhältlichen Waffe bietet der Tau-Beschleuniger höheren Energieausstoß und geringere Streuung, während seine effektive Reichweite sowie die Anzahl und Geschwindigkeit seiner Geschosse etwas geringer sind. Für die Kopfgeldjäger der Split, der Berufszweig, der am häufigsten von dieser Waffe Gebrauch macht, sind diese offensichtlichen Nachteile völlig unerheblich. Echte Split werden in der Tat jede Ausrede nutzen, um nahe an ihr Ziel heranzukommen und ihre Waffen mit voller Wucht zu entladen, bis sie überhitzen.\n\nDie Mk2-Variante verbessert Projektilgeschwindigkeit und Feuerrate, behält aber auf wundersame Weise die ursprüngliche Hitzestauungsrate bei.</t>
+    <t id="1302">Der Tau-Beschleuniger ist eine kinetische Kurzstreckenwaffe und für Gefechte mit hoher Durchschlagskraft optimiert. Das von den Split stammende Design gab ihm eine Zerstörungskraft ähnlich der Schrotbatterie, während seine hohe Feuerrate auf gegnerische Piloten eine demoralisierende Wirkung hat.\n\nIm Vergleich zur Schrotbatterie liefert der Tau-Beschleuniger eine höhere Energie pro Schuss sowie eine engere Projektilstreuung. Diese Vorteile werden jedoch durch geringere Effizienz bei der Wärmeabfuhr, kürzere effektive Reichweite sowie geringere Projektilanzahl bei reduzierter Geschwindigkeit ausgeglichen. Daher ist die Waffe vor allem auf kurze Distanz am wirkungsvollsten, wo ihre hohe Feuerrate exponierte Ziele schnell überwältigen kann, bevor thermische Grenzen erreicht werden.\n\nDer Tau-Beschleuniger ist unter Kopfgeldjägern der Split weit verbreitet, die Gefechten auf kurze Distanz zugeneigt sind. In diesem Einsatzkontext gelten seine thermischen Einschränkungen und die begrenzte Reichweite als akzeptabler Kompromiss für konzentrierte Feuerkraft und schnelle Ziel\-neutralisierung.</t>
     <t id="1304">(SPL S Tau Accelerator Mk1){20202,303} {20111,5011} {20105,1301} {20111,101}</t>
     <t id="1305">(Tau Accelerator){20105,1301}</t>
     <t id="1311">(Tau Accelerator){20105,1301}</t>
@@ -51552,7 +51598,7 @@
     <t id="1314">(SPL S Tau Accelerator Mk2){20202,303} {20111,5011} {20105,1311} {20111,201}</t>
     <t id="1315">(Tau Accelerator){20105,1311}</t>
     <t id="1321">Neutronen-Gatling</t>
-    <t id="1322">Die Neutronen-Gatling der Split ist eine Schnellfeuerwaffe mit kurzer Reichweite, vergleichbar mit dem Bolzenrepetierer. Ähnlich wie beim Bolzenrepetierer bewegt sich der konstante Strom von Projektilen recht langsam und erfordert vorausschauendes Zielen, um bewegliche Ziele zu treffen. Die Neutronen-Gatling ist für ihre hohe Schadensleistung bekannt, aber die geringe Genauigkeit und die merkliche Streuung erschweren das Treffen kleiner Ziele aus der Entfernung und zwingen die Piloten zur Distanzverringerung. Die nahkampfliebenden Split betrachten es als einen Teil der Jagd.\n\n Die Split entwickelten diese Waffe unter Berücksichtigung der psychologischen Auswirkungen auf Pilot und Ziel. Während sich die Piloten durch eine hohe Feuerrate über einen längeren Zeitraum hinweg ermächtigt fühlen, fühlen sich die Ziele durch die Lichtshow terrorisiert und müssen erraten, welche Geschosse sie treffen oder verfehlen könnten. Auch wenn es kein beabsichtigter Effekt des Designs ist, hilft die geringe Genauigkeit Piraten, ihre Beute einzuschüchtern, ohne sie merklich zu beschädigen. Die Neutronen-Gatling ist eine funktionale Waffe für den Kampf, aber wohl auch ein Mittel, um die Split-Kriegerkultur auszudrücken und Schrecken unter ihren vielen Feinden zu verbreiten.\n\nDie Mk2-Variante bietet einen höheren Schadensausstoß und eine höhere Feuerrate.</t>
+    <t id="1322">Die Neutronen-Gatling der Split ist eine schnelle Kurzstrecken-Projektilwaffe, vergleichbar mit dem Bolzenrepetierer. Wie ihr Gegenstück der Gemeinschaft der Planeten erzeugt sie einen kontinuierlichen Strom relativ langsamer Projektile, sodass beim Bekämpfen manövrierender Ziele vorgehalten werden muss. Das System verursacht durch seine Projektilstreuung hohen Kollateralschaden auf Kosten von Zielgenauigkeit und geringerer Wirksamkeit gegen kleinere Ziele, was Gefechte auf kurze Distanz begünstigt.\n\nDas Design der Waffe begünstigt Dauerfeuer und aggressive Gefechtsprofile und spiegelt damit die Kampfdoktrin der Split wider. Die hohe Feuermenge und anhaltende Schussfolge können trotz begrenzter Zielpräzision bei Begegnungen auf kurze Distanz erheblichen Druck erzeugen. Die Neutronen-Gatling ist zwar in erster Linie ein funktionales Waffensystem, wird aber häufig mit Gefechtsmustern in Verbindung gebracht, die auf psychologische Dominanz abzielen.</t>
     <t id="1324">(SPL S Neutron Gatling Mk1){20202,303} {20111,5011} {20105,1321} {20111,101}</t>
     <t id="1325">(Neutron Gatling){20105,1321}</t>
     <t id="1331">(Neutron Gatling){20105,1321}</t>
@@ -51568,7 +51614,7 @@
     <t id="1354">(SPL S Thermal Disintegrator Mk2){20202,303} {20111,5011} {20105,1351} {20111,201}</t>
     <t id="1355">(Thermal Disintegrator){20105,1351}</t>
     <t id="1361">Mesonenstrahler</t>
-    <t id="1362">Der Mesonenstrahler ist eine unglaublich mächtige und entsprechend teure Waffe, die einen einzigen transienten Strahl abfeuert, der fast augenblicklich trifft. Ähnlich wie andere Hochpräzisionswaffen verfolgt der Mesonenstrahler sein Ziel nicht automatisch, sondern verlässt sich auf die Zielfähigkeiten der Piloten. In anderer Hinsicht, einschließlich der mäßigen Reichweite, ähnelt er eher Strahlenwaffen wie dem Strahlenemitter. Der Mesonenstrahler muss nicht aufgeladen werden und kann theoretisch abgefeuert werden, ohne den Abzug loszulassen. Allerdings verhindert die maximale Wärmekapazität des Schiffes in der Regel diese Art der Nutzung. Wegen des extremen Energieverbrauchs und der Hitzeentwicklung der Waffe kann sie nur an Hochenergiewaffen-Halterungen angebracht werden.\n\nAus diversen Gründen hatte das terranische Militär schon lange mit der Idee einer übergroßen Laserkanone gespielt. Obwohl sie eine völlig neue, spezialisierte Plattform erfordert und ein abgrundtief verschwenderisches Energieprofil aufweist, stand das Potenzial einer solchen Waffe als Abschreckung nie in Frage. Zudem haben Superwaffen in der terranischen Populärkultur einen besonderen Stellenwert, und als die Zeit für die Entwicklung des ersten Prototyps in kleinem Maßstab gekommen war, war die öffentliche Unterstützung für das Projekt überwältigend. Vor diesem Hintergrund war der Mesonenstrahler der erste vorsichtige, aber entschlossene Schritt des Terranischen Protektorats zur Erfüllung einer lang gehegten Fantasie.\n\nIm Gegenzug zu den massiv gestiegenen Materialkosten gelingt es der Mk2-Variante, die Energieleistung der Waffe auf ein noch höheres Niveau anzuheben.</t>
+    <t id="1362">Der Mesonenstrahler ist eine Hochleistungs-Strahlenwaffe für Gefechte auf extreme Entfernungen. Er schießt einen einzelnen, kurzlebigen Strahl, der das Ziel mit relativistischer Geschwindigkeit trifft. Wie bei anderen hochpräzisen Systemen schränkt sein begrenzter Gimbal-Schwenkbereich die Wirksamkeit gegen nahe oder schnell manövrierende Ziele ein. Diese Einschränkung gleicht die Waffe weitgehend durch ihre für Langstrecken optimierte optische Konfiguration aus. Unterhalb der effektiven Reichweite verschlechtert sich die Strahlkohärenz schnell, was die Zerstörungskraft deutlich reduziert.\n\nWegen des außerordentlich hohen Energiebedarfs und der thermischen Belastung lässt sich der Mesonenstrahler nur auf Hochenergie-Waffenplattformen installieren.\n\nDas System orientiert sich konzeptionell an großangelegten Energiewaffen, die von der inzwischen aufgelösten Terranischen AGI Task Force erstmals untersucht wurden. Obwohl die Entwicklung einer völlig neuen Plattform nötig war und der Energieverbrauch noch immer vergleichsweise ineffizient ist, gilt der Mesonenstrahler als ausreichend wertvolle Langstrecken-Abschreckungs\-waffe, um diese Einschränkungen zu rechtfertigen. Er ist das erste operationelle Ergebnis dieses Programms und markiert einen gezielten ersten Schritt des Terranischen Protektorats zur Einführung super-schwerer gerichteter Energiewaffen.</t>
     <t id="1364">(TER S Meson Stream Mk1){20202,703} {20111,5011} {20105,1361} {20111,101}</t>
     <t id="1365">(Meson Stream){20105,1361}</t>
     <t id="1371">(Meson Stream){20105,1361}</t>
@@ -51576,7 +51622,7 @@
     <t id="1374">(TER S Meson Stream Mk2){20202,703} {20111,5011} {20105,1371} {20111,201}</t>
     <t id="1375">(Meson Stream){20105,1371}</t>
     <t id="1381">Protonen-Sperrfeuer</t>
-    <t id="1382">Das terranische Protonen-Sperrfeuer ist eine Kurzstreckenwaffe, die nur an Hochenergiewaffen-Halterungen angebracht werden kann. Es gilt als die terranische Hochenergievariante des Bolzenrepetierers der Planetengemeinschaft. Im Vergleich zum Bolzenrepetierer bietet das Protonen-Sperrfeuer eine höhere Schadensleistung und eine höhere Projektilgeschwindigkeit, büßt aber einen Teil seiner Reichweite ein. Das Sperrfeuer verursacht zwar insgesamt mehr Schaden, hat aber eine niedrigere Feuerrate und konzentriert sich darauf, bei seinen langen Salven stärkere Einzelgeschosse abzugeben. Seine größten Nachteile sind seine Kompatibilitätsbegrenzung, die es auf terranische Schiffsdesigns beschränkt, und die Tatsache, dass es im Vergleich zum schwächeren Bolzenrepetierer der Planetengemeinschaft doppelt so teuer ist. Das Protonen-Sperrfeuer ist eine Allzweckwaffe, die gegen die meisten vertretbaren Ziele gut funktioniert.\n\nMit der Wiedervereinigung der Planetengemeinschaft erwarb der Terranische Geheimdienst die Blaupause des Bolzenrepetierers. So konnten die terranischen Ingenieure ihn zum Protonen-Sperrfeuer entwickeln. Sie passten ihn so an, dass er mit terranischen Hochenergiewaffen-Halterungen kompatibel ist. Dies erhöhte seine Leistung effektiv und hinderte gleichzeitig die Planetengemeinschaft an seiner Nutzung.\n\nDie Mk2-Variante erhöht die Schadensleistung, obwohl sie die Feuerrate verringert, indem sie die einzelnen Projektile noch leistungsfähiger macht.</t>
+    <t id="1382">Das Terranische Protonen-Sperrfeuer ist ein Kurzstrecken-Waffensystem, das ausschließlich auf Hochenergie-Waffenplattformen eingesetzt werden kann. Es ist das terranische Hochenergie-Pendant zum Bolzenrepetierer der Gemeinschaft der Planeten. Im Vergleich zu ihrem Gegenstück der Gemeinschaft der Planeten bietet das Protonen-Sperrfeuer höheren Schaden und größere Projektil\-geschwindigkeit auf Kosten der effektiven Reichweite. Obwohl es insgesamt mehr Schaden verursacht, arbeitet es mit geringerer Feuerrate und setzt auf leistungsstärkere Einzelprojektile bei längeren Salven.\n\nDas System ist aufgrund der Montage\-restriktionen auf terranische Schiffsentwürfe beschränkt und hat deutlich höhere Anschaffungskosten als der Standard-Bolzenrepetierer. Trotz dieser Einschränkungen erfüllt das Protonen-Sperrfeuer eine Allzweckfunktion und erweist sich als effektiv gegen eine breite Palette von Zielprofilen.\n\nDas Terranischen Protonen-Sperrfeuer entstand nach der Wiederanbindung an die Gemeinschaft der Planeten. Der Terranische Geheimdienst erwarb die Baupläne des Bolzenrepetierers. Terranische Ingenieure konnten das Design verfeinern und Anpassungen für Hochenergie-Waffenplattformen entwickeln. Diese Modifikationen führten zu gesteigerter Leistung und erzeugten ein Waffensystem, das sich klar vom Bolzenrepetierer der Gemeinschaft der Planeten unterscheidet.</t>
     <t id="1384">(TER S Proton Barrage Mk1){20202,703} {20111,5011} {20105,1381} {20111,101}</t>
     <t id="1385">(Proton Barrage){20105,1381}</t>
     <t id="1391">(Proton Barrage){20105,1381}</t>
@@ -51584,7 +51630,7 @@
     <t id="1394">(TER S Proton Barrage Mk2){20202,703} {20111,5011} {20105,1391} {20111,201}</t>
     <t id="1395">(Proton Barrage){20105,1391}</t>
     <t id="1401">Kyonen-Emitter</t>
-    <t id="1402">Der Kyonen-Emitter der Kha'ak ist relativ schwach, aber verheerend genau. In Schwarmformation können die Kha'ak den Kyonen-Emitter in einer Anzahl einsetzen, die tödlich effektiv sein kann.</t>
+    <t id="1402">Der Kyonen-Emitter der Kha'ak bietet im Vergleich zu zeitgenössischen Strahlenwaffen eine begrenzte Einzelwirkung. Seine Effektivität beruht auf massierter Nutzung: In koordinierten Schwarm\-formationen können mehrere Emitter gleichzeitig eingesetzt werden, wodurch ein kumuliertes Schadensprofil entsteht, das trotz der mäßigen Leistung eines einzelnen Geräts die Ziele überwältigen kann.</t>
     <t id="1404">(KHA S Kyon Emitter Mk1){20202,903} {20111,5011} {20105,1401} {20111,101}</t>
     <t id="1405">(Kyon Emitter){20105,1401}</t>
     <t id="1411">Impulsprojektor</t>
@@ -51608,7 +51654,7 @@
     <t id="1454">(S Kinetic Projector Mk2){20111,5011} {20105,1451} {20111,201}</t>
     <t id="1455">(Kinetic Projector){20105,1441}</t>
     <t id="1461">(Pulse Laser){20105,1001}</t>
-    <t id="1462">Obwohl er denselben Namen trägt wie die im Sprungtornetzwerk am weitesten verbreitete Waffe, funktioniert der terranische Impulslaser auf eine etwas andere Weise. Er verzichtet auf die Verwendung von Clips für kurze Salven und setzt mehr auf die Kraft der einzelnen Projektile. Trotz der geringeren effektiven Reichweite der Waffe werden die mikroskopisch kleinen Partikel schneller beschleunigt und erreichen ihr Ziel wesentlich schneller. Daher kommt es schneller zu einem Wärmestau als bei dem nicht-terranischen Gegenstück, aber aufgrund der hohen Energieeffizienz des zugrundeliegenden Mechanismus ist eine Überhitzung unwahrscheinlich. Piloten, die diese Version des Impulslasers verwenden, werden also immer noch dafür belohnt, dass sie den Druck auf ihre Gegner aufrechterhalten und das Ziel während des gesamten Kampfes im Auge behalten.\n\nNach der Sprungtor\-neuausrichtung untersuchte das Terranische Protektorat schnell die militärischen Fähigkeiten seiner potenziellen Rivalen im neuen Sprungtor\-netzwerk und erwarb schon bald Blaupausen für die am weitesten verbreitete Waffe dieser Zeit: den Impulslaser. Die gut geölte Maschinerie des terranischen militärisch-industriellen Komplexes erkannte seine Vielseitigkeit und wunderbare Einfachheit und tat, was sie schon immer am besten konnte: Sie nahm umfangreiche Anpassungen an der vielversprechenden Technologie vor, um ihr eine eigene terranische Identität zu verleihen und den Nachbau zu verhindern. Das Ergebnis verhält sich in der Praxis immer noch wie ein Impulslaser. Obwohl man ihn anfangs als unbrauchbar für fremde Mächte betrachtete, rüstete man den Impulslaser entgegen aller Vorhersagen auf vielen anderen Schiffen mit nur minimalen Kompromissen nach.\n\nDie Mk2-Variante verbessert den Energieausstoß und die Feuerrate der Waffe erheblich, während die Hitzeentwicklung nur geringfügig zunimmt.</t>
+    <t id="1462">Der Terranische Pulslaser ist eine Variante der standardmäßigen pulsbasierten Waffe, die weit verbreitet im Sprungtor-Netzwerk eingesetzt wird, und verfügt über überlegene terranische Optik. Während seine effektive Reichweite kürzer ist als bei den meisten Implementierungen der Gemeinschaft der Planeten, verbessern höhere Projektil\-geschwindigkeit und die dadurch verkürzte Flugzeit die Treffer\-wahrscheinlichkeit insgesamt. Wie bei vergleichbaren Pulslasern begünstigt er Dauerfeuer und kontinuierliche Zielverfolgung gegenüber kurzen, schadensstarken Angriffen.\n\nNach der Neujustierung der Sprungtore prüfte das Terranische Protektorat zeitgenössische Bewaffnung und passte das bestehende Pulslaser-Design an terranische Fertigungs\-standards an. Das resultierende System bewahrt die Kernprinzipien der Waffe und integriert gleichzeitig strukturelle und optische Änderungen, die eine unautorisierte Reproduktion erschweren sollen. Obwohl das Design zunächst als ungeeignet für nicht-terranische Rüstungsanbieter galt, wurde es inzwischen in eine Vielzahl von Schiffen integriert, wobei nur geringfügige Kompromisse erforderlich waren.</t>
     <t id="1464">(TER S Pulse Laser Mk1){20202,703} {20111,5011} {20105,2001} {20111,101}</t>
     <t id="1465">(Pulse Laser){20105,2001}</t>
     <t id="1471">(Pulse Laser){20105,1001}</t>
@@ -51621,7 +51667,7 @@
     <t id="1484">(BOR S Phase Gun Mk1){20202,203} {20111,5011} {20105,1481} {20111,101}</t>
     <t id="1485">(Phase Gun){20105,1481}</t>
     <t id="1491">Bogenkanone</t>
-    <t id="1492">Die Bogen\-waffen der Boronen wurden entwickelt, um nicht nur Schaden anzurichten, sondern auch die Mobilität des Ziels zu beeinträchtigen. Der Bogen verschießt gezündete Ionen\-partikel, die beim Aufprall elektrische Entladungen verursachen. Dies beeinträchtigt die Schiffs\-systeme und ist besonders effektiv darin, Schilde zu zerstören, aber auch ungeschützten Zielen erheblichen Schaden an der Hülle zuzufügen. Die Geschützturm\-variante wurde als nützlich für zivile Schiffe gelobt, die nicht auf die Zerstörung von Angreifern abzielen, sondern versuchen, sie abzuschütteln. Die Bogen\-waffen wurden von der Militärischen Verteidigung des Königinnen\-reichs von Boron entwickelt und für den Einsatz im Feld freigegeben, gelten aber noch als experimentell.(Royal Boron Military Defence same as {20233,1021})</t>
+    <t id="1492">Bogenwaffen der Boronen sind Waffen der Utility-Klasse, die nicht nur Schaden verursachen, sondern auch die Zielsysteme eines Gegners beeinträchtigen. Sie verschießen ionisierte Partikel, die beim Auftreffen elektrische Entladungen auslösen. Im Gegensatz zu herkömmlichen Ionen-Waffen sind die entstehenden Energiefelder so kalibriert, dass sie empfindliche Sensor-schaltungen stören, statt Schilde zu schwächen.\n\nDie Turm-montierte Variante wird besonders auf zivilen Schiffen geschätzt, die Ausweichen über direkten Angriff priorisieren. Ursprünglich entwickelt und für den Feldeinsatz durch die Militärische Verteidigung des Königinnenreichs von Boron autorisiert, gelten Bogenwaffen weiterhin als experimentell (Royal Boron Military Defence same as {20233,1021}).</t>
     <t id="1493">Bogen</t>
     <t id="1494">(BOR S Arc Gun Mk1){20202,203} {20111,5011} {20105,1491} {20111,101}</t>
     <t id="1495">(Arc Gun){20105,1491}</t>
@@ -51652,7 +51698,7 @@
     <t id="1554">(ARG S Gamma HEPT Mk1){20202,103} {20111,5011} {20105,1551} {20111,101}</t>
     <t id="1555">(Gamma HEPT){20105,1551}</t>
     <t id="1561">Elektro\-magnetische Waffe</t>
-    <t id="1562">Der Einsatz elektro\-magnetischer Waffen verschafft der Erdflotte eine nahezu beispiellose Feuerkraft für ihre Schiffe. Diese Waffen nutzen leistungsstarke elektro\-magnetische Feldgeneratoren, um Plasmakugeln mit hoher Geschwindigkeit und verheerenden Ergebnissen zu schleudern.\n\nDie elektro\-magnetische Kanone ist zwar die kleinste dieser Waffenfamilie, hat aber eine beeindruckende Feuerrate, was sie zu einer soliden Wahl für Schiffe macht, die voraussichtlich in Nahkämpfe verwickelt werden.</t>
+    <t id="1562">Die Elektro\-magnetische Kanone ist ein Waffensystem der Erdflotte aus der Familie der e/m-Waffen. Diese Systeme arbeiten, indem sie hochenergetische elektro\-magnetische Felder erzeugen, um kleine Plasmakugeln zu verdichten und zu beschleunigen, wodurch die Projektile teilweise Schildabwehr umgehen können.\n\nAls kleinste Variante der Familie verfügt die Elektro\-magnetische Kanone über eine außergewöhnliche Feuerrate, womit sie sich für Schiffe eignet, für die ein Nahkampfszenario wahrscheinlich ist.</t>
     <t id="1563">Elektro\-magnetisch</t>
     <t id="1564">(TER S Electromagnetic Gun Mk1){20202,703} {20111,5011} {20105,1561} {20111,101}</t>
     <t id="1565">(Electromagnetic Gun){20105,1561}</t>
@@ -51890,7 +51936,7 @@
     <t id="2554">(BOR M Torpedo Launcher Mk1){20202,203} {20111,5021} {20105,2551} {20111,101}</t>
     <t id="2555">(Torpedo Launcher){20105,1161}</t>
     <t id="2561">Elektro\-magnetische Kanone</t>
-    <t id="2562">Der Einsatz elektromagnetischer Waffen bot der Erdflotte nahezu beispiellose Feuerkraft für ihre Schiffe. Diese Waffen nutzen leistungsstarke elektro\-magnetische Feld\-generatoren, um Plasmakugeln mit hoher Geschwindigkeit und verheerenden Ergebnissen zu schleudern.\n\nDie starke Wirkentfaltung der elektro\-magnetischen Kanone macht sie zu einer ausgezeichneten Wahl für Verteidigungs\-maßnahmen gegen mittelgroße Schiffe, da sie in der Lage ist, entscheidende, konzentrierte Schläge auszuführen, um die Bedrohung durch solche Gegner zu neutralisieren.</t>
+    <t id="2562">Die Elektro\-magnetische Kanone ist ein auf elektro\-magnetischer Beschleunigung basierendes Waffensystem der Erdflotte. Sie feuert hochenergetische, einzelne Plasmakugeln ab und nutzt elektromagnetische Feldgeneratoren, um diese zu verdichten und auf hohe Geschwindigkeit zu beschleunigen. Auf das Ziel wirkt so eine erhebliche Aufprallkraft ein.\n\nIm Vergleich zu Turm-montierten Varianten setzt das System auf konzentriertes, hochwirksames Feuer statt dauerhafte Druckausübung. Damit eignet es sich besonders für Verteidigungs\-gefechte gegen mittelgroße Schiffe, bei denen kontrollierte, entschlossene Treffer einzelne Bedrohungen neutralisieren können.</t>
     <t id="2563">Elektro\-magnetisch</t>
     <t id="2564">(TER M Electromagnetic Cannon Mk1){20202,703} {20111,5021} {20105,2561} {20111,101}</t>
     <t id="2565">(Electromagnetic Cannon){20105,2561}</t>
@@ -51949,7 +51995,7 @@
     <t id="3051">Terranische Hauptbatterie</t>
     <t id="3052">Sie ist groß. Sie ist schnell. Sie ist schlecht für die Gesundheit.\n\nDie terranische Hauptbatterie ist insofern einzigartig, als sie auf einer Vielzahl von Schiffen installiert werden kann, und ihr Einsatz hat das Potenzial, den Verlauf einer Schlacht zu verändern.\n\nEinige bezeichnen dieses schnell feuernde Protonen-Sperrfeuer als eine "zutiefst" offensive Waffe, die nur bei Operationen eingesetzt werden sollte, die extremste Gewalt erfordern.\n\nIn regelmäßigen Abständen wurden Versuche unternommen, einen ungesetzlichen Status für die terranische Hauptbatterie auszuhandeln. Die terranischen Behörden haben jedoch selbst rein sondierende diplomatische Dialoge, in denen diese Möglichkeit angesprochen wurde, abgelehnt.</t>
     <t id="3061">Ionen\-strahl-Werfer</t>
-    <t id="3062">Der Ionen\-strahl-Werfer ist die Haupt\-batterie des Rochen Zerstörers und der Stolz seines Entwicklers, Astrosicherheit der Eleius. Nach dem Aufladen zünden seine drei Läufe in schneller Folge und setzen einen ionisierten Strahl frei, der die Systeme des Zielschiffs angreift und seine Mobilität beeinträchtigt. Getreu der üblichen boronischen Waffen\-doktrin ist der Projektor effektiver bei der Erschöpfung der Schilde als bei der Beschädigung der Hülle, so dass vor allem schlecht abgeschirmte Split-Kampfschiffe schnell ungeschützt sind. Genau wie sein Träger, der Rochen Zerstörer, projiziert diese Waffe militärische Macht und verschafft den Boronen ihren Platz unter den Großmächten der Gemeinschaft der Planeten.(Eleius Astrosecurity same as {20233,1041})(Ray same as ship name, {20101,50201})</t>
+    <t id="3062">Der Ionenstrahl-Werfer dient als Primärbewaffnung des Rochen und stellt die Flaggschiff\-entwicklung von Astrosicherheit der Eleius dar. Nach einem kurzen Ladezyklus feuern seine drei Emitter in schneller Abfolge und bilden einen kontinuierlichen ionisierten Strahl. Beim Auftreffen stört die Entladung die Bordzielsysteme und schwächt die Manövrier\-fähigkeit, wodurch die Reaktionsfähigkeit des Ziels unter Beschuss reduziert wird.\n\nGemäß der Standarddoktrin der Boronen für defensive Waffensysteme priorisiert der Ionenstrahl-Werfer das Schwächen von Energieschilden über Hüllenschaden, was ihm erlaubt, schlecht geschützten Schiffen rasch ihren primären Schutz zu nehmen. (Eleius Astrosecurity same as {20233,1041})(Ray same as ship name, {20101,50201})</t>
     <t id="3064">(BOR Ray Ion Projector){20202,203} {20105,3061}</t>
     <t id="3071">Auslöscher Hauptbatterie</t>
     <t id="3072">Die Auslöscher Hauptbatterie(Obliterator Main Battery same as {20105,3071}) ist ein über\-ragendes Zeugnis der über\-wältigenden Zerstörungs-kraft, die die Kha'ak ausüben können. Diese furcht\-einflößende Partikel\-strahl\-kanone ist die Krönung der Bewaffnung gegen Großschiffe. Sie ist in der Lage, jeden, der es wagt, die Vorherrschaft der Kha'ak heraus\-zufordern, mit katastrophalen Verwüstungen zu überziehen.\n\nAuf Großkampfschiffe losgelassen, durchschneidet ihr sengender Strahl Schilde und Panzerung gleichermaßen mit gnadenloser Effizienz und reißt selbst die mächtigsten Schiffe entzwei. Dennoch ist es die furcht\-erregende Sekundär\-funktion der Waffe, die alle, die ihre entfesselte Wut sehen, mit Schrecken erfüllt. Wenn die Auslöscher Hauptbatterie durch Überladung an ihre Grenzen stößt, verwandelt sie sich in einen Planeten\-zerstörer, eine Waffe des Jüngsten Gerichts mit unvergleichlicher Vernichtungs\-kraft.</t>
@@ -51961,7 +52007,7 @@
     <t id="3092">Trotz größter Bemühungen der Konstrukteure konnte aufgrund des begrenzten Raums keine Primär\-waffe in die Sapporo eingebaut werden, ohne wesentliche Systeme zu überarbeiten. Um dies zu kompensieren, wurden jedoch viele Raketen\-start\-rampen eingebaut, was einen großen Geschoss\-verbund bereitstellt, der sonst nicht möglich gewesen wäre.\n\nDer Raketen\-verbund ist zwar etwas unorthodox als Haupt\-bewaffnung, bietet der Sapporo aber ein starkes Sperrfeuer, das viele Schiffe der Größe M und L aufs Korn nehmen kann. Sein hoher Wirkungsgrad verringert sich durch den begrenzten Platz, den die Besatzung zum manuellen Nachladen der Startrampen zur Verfügung hat, nur marginal.</t>
     <t id="3094">(TER Sapporo Launcher Array){20202,703} {20105,3091}</t>
     <t id="3101">Hyperion Hauptbatterie</t>
-    <t id="3102">Diese Waffenanlage ist eine Besonderheit der Hyperion. Sie hat Emitter, die verschiedene Zielkategorien angreifen können. Sie glänzt besonders beim Neutralisieren mittelgroßer Schiffe und Oberflächen\-elemente größerer Gegner und ist so ein echter Aktivposten bei taktischen Rückzügen. Mit hochpräziser Zielerfassung und anhaltender Feuerrate erreicht sie bei geringeren effektiven Reichweiten eine Feuerkraft, die der von Zerstörern nahekommt, und liegt damit in einer ähnlichen Leistungs\-kategorie wie die paranidische Odyssee.</t>
+    <t id="3102">Der Primärwaffenverbund der Hyperion ist einzigartig. Mehrere Emitter-Einheiten erlauben ihm, ein breites Zielspektrum abzudecken. Er ist für den Einsatz gegen Korvetten und exponierte Oberflächenelemente größerer Schiffe optimiert und sorgt für gleichmäßige Feuerabdeckung während taktischer Rückzugsmanöver. Hohe Zielgenauigkeit kombiniert mit anhaltender Feuerrate ermöglicht dem System, auf kürzeren effektiven Reichweiten Schadenswerte zu erzielen, die an Zerstörer-Batterien heranreichen.</t>
     <t id="3104">(PAR Hyperion Main Battery){20202,403} {20105,3101}</t>
     <t id="4000">(*Medium Turrets*)</t>
     <t id="4001">Pulsgeschütz</t>
@@ -52005,7 +52051,7 @@
     <t id="4074">(XEN M Shard Turret Mk1){20202,603} {20111,5021} {20105,4071} {20111,101}</t>
     <t id="4075">(Shard Mk1){20105,4073} {20111, 101}</t>
     <t id="4081">Bolzengeschütz</t>
-    <t id="4082">Das Bolzen\-geschütz gilt als Stützwaffe und wird von einigen Captains wegen seiner recht geringen Rotations\-geschwindig\-keit ausschließlich auf mittel\-große Ziele angesetzt. Modernere Taktiken beinhalten den Einsatz zur Unter\-drückung der Schild\-aufladung und zur Verhinderung der Aktivierung von Reise\-antrieben.</t>
+    <t id="4082">Das Bolzen-Geschütz ist ein kostengünstiges, defensives Waffensystem. Es wird häufig eingesetzt, um feindliche Jäger abzuwehren. Manche Betreiber nutzen das System ausschließlich zur Raketenabwehr, wobei das anhaltende Feuer zuverlässigen Punktschutz bietet.</t>
     <t id="4083">Bolzen</t>
     <t id="4084">(ARG M Bolt Turret Mk1){20202,103} {20111,5021} {20105,4081} {20111,101}</t>
     <t id="4085">(Bolt Mk1){20105,4083} {20111,101}</t>
@@ -52045,7 +52091,7 @@
     <t id="4154">(XEN M Plasma Turret Mk1){20202,603} {20111,5021} {20105,4151} {20111,101}</t>
     <t id="4155">(Plasma Mk1){20105,4153} {20111,101}</t>
     <t id="4161">Strahlengeschütz</t>
-    <t id="4162">Das Strahlen\-geschütz gilt als Einstiegs\-waffe und wird generell von Captains mit knappem Budget bevorzugt. Die Waffe zeichnet sich durch hohe Genauig\-keit aus, auch wenn der Schaden, den sie anrichten kann, begrenzt ist.</t>
+    <t id="4162">Das Strahlengeschütz ist ein Einstiegs‑Waffensystem zur Verteidigung, das Betreiber häufig wegen der geringen Anschaffungskosten wählen. Seine große effektive Reichweite und hohe Zielgenauigkeit machen es besonders geeignet für die Pflicht und Kür der Raketenabwehr. Zwar ist die Waffe gegen geschützte Ziele wirksam, doch nimmt der Schaden ab, sobald Schilde erschöpft sind, was ihre Effektivität gegen freiliegende Hüllenstrukturen einschränkt.</t>
     <t id="4163">Strahlenenergie</t>
     <t id="4164">(ARG M Beam Turret Mk1){20202,103} {20111,5021} {20105,4161} {20111,101}</t>
     <t id="4165">(Beam Mk1){20105,4163} {20111,101}</t>
@@ -52174,7 +52220,7 @@
     <t id="4423">(Flak){20105,4403}</t>
     <t id="4424">(SPL M Flak Turret Mk1){20202,303} {20111,5021} {20105,4421} {20111,101}</t>
     <t id="4425">(Flak Mk1){20105,4423} {20111,101}</t>
-    <t id="4426">{20105,4402}\n\nDie Split konnten zwar nicht mit der Genauigkeit des argonischen Modells mithalten, aber ihre Variante verfügt über höhere Munitions\-kapazität.</t>
+    <t id="4426">Das Flakgeschütz ist ein Nahkampf-Waffensystem, optimiert für den Einsatz gegen Jäger und ähnliche Ziele. Sein großer Explosionsradius verringert die Anforderungen an das Zielen auf kurze Entfernungen. Das System wurde aus Technologie der Argonischen Flotte rückentwickelt. Es erreicht zwar nicht die Zielpräzision des Originaldesigns, gleicht dies jedoch durch erhöhte Munitions\-kapazität aus. Trotz dieser Unterschiede deckt das Geschütz dieselbe Einsatzrolle und denselben Wirksamkeits\-bereich ab.\n\n</t>
     <t id="4481">Bosonengeschütz</t>
     <t id="4482">{20006,102}(No information available)</t>
     <t id="4483">Bosonen</t>
@@ -52338,7 +52384,7 @@
     <t id="5074">(XEN L Plasma Turret Mk1){20202,603} {20111,5031} {20105,5071} {20111,101}</t>
     <t id="5075">(Plasma Mk1){20105,5073} {20111,101}</t>
     <t id="5081">(Beam Turret){20105,4161}</t>
-    <t id="5082">{20105,4162}\n\nDas großformatige Strahlengeschütz ist eine aufgerüstete Version, aber seine Mängel im Vergleich zu anderen Waffen seiner Klasse bleiben offensichtlich.</t>
+    <t id="5082">{20105,4162}\n\nDas L-Strahlengeschütz ist eine verbesserte Variante des Standard-Systems. Es bietet eine höhere Anzahl an Emittern und längere Dauerleistung. Wie bei kleineren Varianten nimmt die Wirksamkeit gegen Hüllenstrukturen jedoch ab, sobald die Schilde vollständig erschöpft sind. In einzelnen, vorwärts gerichteten Konfigurationen wird das System dennoch häufig eingesetzt, um den Einsatz des Reiseantriebs zu stören.</t>
     <t id="5083">(Beam){20105,4163}</t>
     <t id="5084">(ARG L Beam Turret Mk1){20202,103} {20111,5031} {20105,5081} {20111,101}</t>
     <t id="5085">(Beam Mk1){20105,5083} {20111,101}</t>
@@ -52458,7 +52504,7 @@
     <t id="5314">(XEN L Positron Turret Mk1){20202,603} {20111,5031} {20105,5311} {20111,101}</t>
     <t id="5315">(Positron Mk1){20105,5313} {20111,101}</t>
     <t id="5321">(Graviton Turret){20105,4831}</t>
-    <t id="5322">Das Gravitonengeschütz der Xenon ist eine der effektivsten Geschütz\-turm\-waffen, die es gibt. Er bietet zwar wenig Reichweite, richtet aber mit seinen Hoch\-geschwindig\-keits\-projektilen massiven Schaden an.\n\nTerranische Waffen\-schmiede schweigen sich darüber aus, ob diese Technologie in die Entwicklung ihrer eigenen Waffen eingeflossen ist.</t>
+    <t id="5322">Das Gravitonen-Geschütz der Xenon gehört zu den effektivsten Geschützturm\-waffen zum Einsatz gegen Großschiffe. Er arbeitet nach exotischen Energieprinzipien und setzt dabei Zerstörungskraft über Zielgenauigkeit.\n\nTerranische Waffenhersteller haben sich geweigert, Stellung dazu zu nehmen, ob die Analyse der Gravitonen-Technologie der Xenon die Entwicklung eigener Schwerwaffen\-systeme beeinflusst hat.</t>
     <t id="5323">(Graviton){20105,4833}</t>
     <t id="5324">(XEN L Graviton Turret Mk1){20202,603} {20111,5031} {20105,5321} {20111,101}</t>
     <t id="5325">(Graviton Mk1){20105,5323} {20111,101}</t>
@@ -52468,7 +52514,7 @@
     <t id="5334">(TER L Pulse Turret Mk1){20202,703} {20111,5031} {20105,5331} {20111,101}</t>
     <t id="5335">(Pulse Mk1){20105,4323} {20111,101}</t>
     <t id="5341">(Bolt Turret){20105,4081}</t>
-    <t id="5342">{20105,4082}\n\nTerranischen Ingenieuren gelang es, das L Bolzengeschütz zu entwickeln und durch verschiedene Upgrades die taktischen Möglich\-keiten dieses Waffen\-systems für  die Kommandanten zu erweitern. In dem größeren Format lässt es als effektive Unterstützungs\-waffe in Gefechten mit Groß\-schiffen einsetzen.</t>
+    <t id="5342">Das Protonen-Sperrfeuer-Geschütz wird typischerweise als Unterstützungs\-waffe in Gefechten von Großschiffen eingesetzt und liefert ergänzendes Feuer gegen ausgewählte Ziele. Aufgrund seiner vergleichsweise begrenzten Dreh\-geschwindigkeit wird das System häufig mittelgroßen Schiffen zugewiesen, bei denen die Zielverfolgungs\-anforderungen geringer sind. In koordinierten Kampfeinsätzen dient das Geschütz außerdem dazu, die Schildregeneration zu unterdrücken und die Aktivierung von Reiseantrieben zu behindern.</t>
     <t id="5343">(Bolt){20105,4083}</t>
     <t id="5344">(TER L Bolt Turret Mk1){20202,703} {20111,5031} {20105,5341} {20111,101}</t>
     <t id="5345">(Bolt Mk1){20105,4343} {20111,101}</t>

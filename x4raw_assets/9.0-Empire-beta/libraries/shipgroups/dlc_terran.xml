@@ -80,9 +80,11 @@
   <group name="ter_fighter_s">
     <select macro="ship_ter_s_heavyfighter_01_a_macro" weight="10"/>
     <select macro="ship_ter_s_fighter_01_a_macro" weight="90"/>
+    <select macro="ship_ter_s_fighter_02_a_macro" weight="30"/>
   </group>
   <group name="ter_fighter_heavy_s">
     <select macro="ship_ter_s_heavyfighter_01_a_macro" weight="100"/>
+    <select macro="ship_ter_s_fighter_02_a_macro" weight="50"/>
   </group>
   <group name="ter_fighter_light_s">
     <select macro="ship_ter_s_fighter_01_a_macro" weight="100"/>
@@ -115,6 +117,7 @@
   </group>
   <group name="pio_scout_s">
     <select macro="ship_ter_s_scout_01_a_macro" weight="100"/>
+    <select macro="ship_ter_s_scout_02_a_macro" weight="50"/>
   </group>
 
   <!-- Yaki -->

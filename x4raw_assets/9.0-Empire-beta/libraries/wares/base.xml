@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Last exported: 09.03.2026 17:03:12-->
+<!--Last exported: 19.03.2026 19:38:41-->
 <wares>
   <production>
     <method id="argon" name="{20206,201}">
@@ -2938,7 +2938,7 @@
   </ware>
   <ware id="khaakalloy" name="{20201,7601}" description="{20201,7602}" group="hightech" transport="container" volume="20" tags="container economy transmutable">
     <price min="1260" average="1400" max="1540"/>
-    <production time="300" amount="200" method="recycling" name="{20206,1101}" tags="noplayerbuild recycling">
+    <production time="300" amount="100" method="recycling" name="{20206,1101}" tags="noplayerbuild recycling">
       <primary>
         <ware ware="energycells" amount="6000"/>
         <ware ware="khaakscrapmetal" amount="300"/>
@@ -10779,11 +10779,11 @@
     <owner faction="buccaneers"/>
   </ware>
   <ware id="ship_arg_l_destroyer_02_a" name="{20101,11004}" description="{20101,11014}" transport="ship" volume="1" tags="ship">
-    <price min="5000664" average="6250830" max="7500996"/>
+    <price min="8325747" average="9250830" max="10175913"/>
     <production time="218" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="1200"/>
-        <ware ware="hullparts" amount="5640"/>
+        <ware ware="energycells" amount="7227"/>
+        <ware ware="hullparts" amount="10512"/>
       </primary>
     </production>
     <component ref="ship_arg_l_destroyer_02_a_macro"/>
@@ -11756,11 +11756,11 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="ship_par_l_destroyer_02_a" name="{20101,30704}" description="{20101,30714}" transport="ship" volume="1" tags="ship">
-    <price min="4412478" average="5191150" max="5969823"/>
+    <price min="8812035" average="9791150" max="10770265"/>
     <production time="276" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="1066"/>
-        <ware ware="hullparts" amount="4886"/>
+        <ware ware="energycells" amount="7649"/>
+        <ware ware="hullparts" amount="11126"/>
       </primary>
     </production>
     <component ref="ship_par_l_destroyer_02_a_macro"/>
@@ -12422,11 +12422,11 @@
     <owner faction="ministry"/>
   </ware>
   <ware id="ship_tel_l_destroyer_02_a" name="{20101,20704}" description="{20101,20714}" transport="ship" volume="1" tags="ship">
-    <price min="5627892" average="7034866" max="8441839"/>
+    <price min="5431379" average="6034866" max="6638353"/>
     <production time="244" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="1300"/>
-        <ware ware="hullparts" amount="6350"/>
+        <ware ware="energycells" amount="4714"/>
+        <ware ware="hullparts" amount="6857"/>
       </primary>
     </production>
     <component ref="ship_tel_l_destroyer_02_a_macro"/>
@@ -13160,9 +13160,9 @@
     <price min="2067574" average="2432440" max="2797306"/>
     <production time="526" amount="1" method="default" name="{20206,601}" tags="noplayerbuild" dismantlefactor="9.3">
       <primary>
-        <ware ware="energycells" amount="2908"/>
-        <ware ware="ore" amount="2437"/>
-        <ware ware="silicon" amount="2447"/>
+        <ware ware="energycells" amount="4560"/>
+        <ware ware="ore" amount="2189"/>
+        <ware ware="silicon" amount="1403"/>
       </primary>
     </production>
     <component ref="ship_xen_xl_destroyer_01_a_macro"/>
@@ -15118,12 +15118,12 @@
     <icon active="ware_weaponcomponents" video="ware_weaponcomponents_macro"/>
   </ware>
   <ware id="weapon_arg_l_destroyer_01_mk1" name="{20105,3004}" description="{20105,3002}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
-    <price min="984814" average="1094238" max="1203662"/>
+    <price min="1254814" average="1394238" max="1533662"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedelectronics" amount="249"/>
-        <ware ware="energycells" amount="2256"/>
-        <ware ware="weaponcomponents" amount="253"/>
+        <ware ware="advancedelectronics" amount="317"/>
+        <ware ware="energycells" amount="2875"/>
+        <ware ware="weaponcomponents" amount="322"/>
       </primary>
     </production>
     <component ref="weapon_arg_l_destroyer_01_mk1_macro"/>

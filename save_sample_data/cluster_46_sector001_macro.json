@@ -56003,14 +56003,26 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 192000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 13555,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -56186,14 +56198,26 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 1069854,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 27951,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -56564,32 +56588,54 @@
       },
       {
         "yield_names": [
-          "medhigh",
-          "low"
+          "medhigh"
         ],
         "x": 128000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1212201,
+        "time": 144000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
+          "low"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 128000,
+        "max": 138299,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 64000,
+        "max": 1220093,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 68762,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -56620,17 +56666,28 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 0,
+        "max": 405311,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 49303,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -56700,44 +56757,78 @@
       },
       {
         "yield_names": [
-          "medhigh",
-          "low"
+          "medhigh"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1184530,
+        "time": 144000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 141553,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 983827,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 33834,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": -64000,
+        "z": 128000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
           "low"
         ],
         "x": 128000,
         "y": -64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 138299,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -56809,17 +56900,28 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 292802,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 23414,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -56928,14 +57030,26 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 192000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 16169,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -56955,14 +57069,26 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 64000,
+        "z": 192000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 925,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -57086,17 +57212,28 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 1016941,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 94688,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -57114,31 +57251,54 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": -64000,
+        "z": 192000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": -64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 37484,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 1333816,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 22693,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -57156,17 +57316,28 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 192000,
+        "max": 297598,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": -64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 10110,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -57431,43 +57602,78 @@
       },
       {
         "yield_names": [
-          "medhigh",
-          "low"
+          "medhigh"
         ],
         "x": 64000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1097991,
+        "time": 144000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
           "low"
         ],
         "x": 64000,
         "y": 64000,
-        "z": 64000,
-        "max": 0,
-        "time": 0,
+        "z": 128000,
+        "max": 7467,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 64000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 64000,
+        "max": 82794,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": 64000,
+        "z": 128000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 6968,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -57487,14 +57693,26 @@
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 0,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 64000,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 74757,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -57540,43 +57758,78 @@
       },
       {
         "yield_names": [
-          "medhigh",
-          "low"
+          "medhigh"
         ],
         "x": 64000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1176388,
+        "time": 144000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
           "low"
         ],
         "x": 64000,
         "y": 0,
-        "z": 64000,
-        "max": 0,
-        "time": 0,
+        "z": 128000,
+        "max": 29922,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 57779,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": -64000,
+        "z": 128000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": -64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 68468,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -57596,72 +57849,130 @@
       },
       {
         "yield_names": [
-          "medhigh",
-          "low"
+          "medhigh"
         ],
         "x": 0,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1311159,
+        "time": 144000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
           "low"
         ],
         "x": 0,
         "y": 0,
-        "z": 64000,
-        "max": 0,
-        "time": 0,
+        "z": 128000,
+        "max": 29925,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
-          "low"
+          "medhigh"
         ],
         "x": 0,
-        "y": -64000,
-        "z": 128000,
-        "max": 0,
-        "time": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 154102,
+        "time": 144000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
           "low"
         ],
         "x": 0,
-        "y": -64000,
+        "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 39359,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "medhigh",
+          "medhigh"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 128000,
+        "max": 1246716,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 128000,
+        "max": 18936,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 64000,
+        "max": 154102,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 64000,
+        "max": 21804,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medhigh"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 292802,
+        "time": 144000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 82148,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -94330,14 +94641,26 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 192000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 13673,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -94513,14 +94836,26 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 869,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 27865,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -94891,32 +95226,54 @@
       },
       {
         "yield_names": [
-          "lowest",
-          "low"
+          "lowest"
         ],
         "x": 128000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 984,
+        "time": 36000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "low"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 128000,
+        "max": 138304,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 64000,
+        "max": 991,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 67564,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -94947,17 +95304,28 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 0,
+        "max": 329,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 64000,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 48763,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -95027,44 +95395,78 @@
       },
       {
         "yield_names": [
-          "lowest",
-          "low"
+          "lowest"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 962,
+        "time": 36000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "low"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 141555,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 799,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 33368,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 128000,
+        "y": -64000,
+        "z": 128000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowest",
           "low"
         ],
         "x": 128000,
         "y": -64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 138304,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -95136,17 +95538,28 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 237,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 23469,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -95255,14 +95668,26 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 192000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 16460,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -95282,14 +95707,26 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 0,
+        "y": 64000,
+        "z": 192000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 945,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -95413,17 +95850,28 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 826,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 94617,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -95441,31 +95889,54 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 64000,
+        "y": -64000,
+        "z": 192000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": -64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 37373,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 1083,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 23189,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -95483,17 +95954,28 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 192000,
+        "max": 241,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": -64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 10335,
+        "time": 108000,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -95758,43 +96240,78 @@
       },
       {
         "yield_names": [
-          "lowest",
-          "low"
+          "lowest"
         ],
         "x": 64000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 892,
+        "time": 36000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowest",
           "low"
         ],
         "x": 64000,
         "y": 64000,
-        "z": 64000,
-        "max": 0,
-        "time": 0,
+        "z": 128000,
+        "max": 7411,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 64000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 64000,
+        "max": 81217,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 0,
+        "y": 64000,
+        "z": 128000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 6960,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -95814,14 +96331,26 @@
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 0,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 64000,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 73656,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -95867,43 +96396,78 @@
       },
       {
         "yield_names": [
-          "lowest",
-          "low"
+          "lowest"
         ],
         "x": 64000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 955,
+        "time": 36000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowest",
           "low"
         ],
         "x": 64000,
         "y": 0,
-        "z": 64000,
-        "max": 0,
-        "time": 0,
+        "z": 128000,
+        "max": 29526,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 64000,
+        "max": 57216,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 64000,
+        "y": -64000,
+        "z": 128000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": -64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 67620,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -95923,72 +96487,130 @@
       },
       {
         "yield_names": [
-          "lowest",
-          "low"
+          "lowest"
         ],
         "x": 0,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 1065,
+        "time": 36000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowest",
           "low"
         ],
         "x": 0,
         "y": 0,
-        "z": 64000,
-        "max": 0,
-        "time": 0,
+        "z": 128000,
+        "max": 29415,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "lowest",
-          "low"
+          "lowest"
         ],
         "x": 0,
-        "y": -64000,
-        "z": 128000,
-        "max": 0,
-        "time": 0,
+        "y": 0,
+        "z": 64000,
+        "max": 125,
+        "time": 36000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "lowest",
           "low"
         ],
         "x": 0,
-        "y": -64000,
+        "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 38771,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
       },
       {
         "yield_names": [
-          "lowest",
+          "lowest"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 128000,
+        "max": 1012,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 128000,
+        "max": 18882,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 64000,
+        "max": 125,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 64000,
+        "max": 21930,
+        "time": 108000,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "lowest"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 237,
+        "time": 36000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 81374,
+        "time": 108000,
         "regions": [
           "region_bigasteroids"
         ]
@@ -132462,14 +133084,26 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 192000,
+        "max": 20,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 40,
+        "time": 604800,
         "regions": [
           "region_bigasteroids"
         ]
@@ -132840,32 +133474,54 @@
       },
       {
         "yield_names": [
-          "medlow",
-          "medium"
+          "medlow"
         ],
         "x": 128000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 20,
+        "time": 432000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medlow",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 128000,
+        "max": 230,
+        "time": 604800,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 64000,
+        "max": 20,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 64000,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 55,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -132896,17 +133552,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 128000,
+        "y": 64000,
+        "z": 0,
+        "max": 5,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 64000,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 50,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -132976,32 +133643,54 @@
       },
       {
         "yield_names": [
-          "medlow",
-          "medium"
+          "medlow"
         ],
         "x": 128000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 20,
+        "time": 432000,
         "regions": [
-          "region_bigasteroids",
           "region_cluster_46_sector_001"
         ]
       },
       {
         "yield_names": [
-          "medlow",
+          "medium"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 128000,
+        "max": 235,
+        "time": 604800,
+        "regions": [
+          "region_bigasteroids"
+        ]
+      },
+      {
+        "yield_names": [
+          "medlow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 64000,
+        "max": 15,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 64000,
-        "max": 0,
-        "time": 0,
+        "max": 40,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133084,17 +133773,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": 0,
+        "max": 5,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 128000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 35,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133359,17 +134059,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 192000,
+        "max": 15,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 105,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133413,17 +134124,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 192000,
+        "max": 25,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 0,
         "y": 0,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 50,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133441,17 +134163,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 192000,
+        "max": 5,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 0,
         "y": -64000,
         "z": 192000,
-        "max": 0,
-        "time": 0,
+        "max": 40,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133742,17 +134475,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 64000,
+        "z": 128000,
+        "max": 20,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 10,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133848,17 +134592,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 128000,
+        "max": 20,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 40,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133902,17 +134657,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": 128000,
+        "max": 20,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 0,
         "y": 0,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 30,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133930,17 +134696,28 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": 128000,
+        "max": 20,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 0,
         "y": -64000,
         "z": 128000,
-        "max": 0,
-        "time": 0,
+        "max": 20,
+        "time": 604800,
         "regions": [
-          "region_bigasteroids",
-          "region_cluster_46_sector_001"
+          "region_bigasteroids"
         ]
       },
       {
@@ -133958,14 +134735,26 @@
       },
       {
         "yield_names": [
-          "medlow",
+          "medlow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": 0,
+        "max": 5,
+        "time": 432000,
+        "regions": [
+          "region_cluster_46_sector_001"
+        ]
+      },
+      {
+        "yield_names": [
           "medium"
         ],
         "x": 64000,
         "y": 0,
         "z": 0,
-        "max": 0,
-        "time": 0,
+        "max": 85,
+        "time": 604800,
         "regions": [
           "region_bigasteroids"
         ]

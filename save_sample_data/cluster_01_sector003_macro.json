@@ -2262,32 +2262,54 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 704000,
+        "y": 0,
+        "z": -256000,
+        "max": 17264,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 704000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 183958,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 640000,
+        "y": 64000,
+        "z": -256000,
+        "max": 15405,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 640000,
         "y": 64000,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 161684,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -2305,16 +2327,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 640000,
+        "y": 0,
+        "z": -256000,
+        "max": 19478,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 640000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 190753,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -2432,28 +2465,60 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 768000,
+        "y": 64000,
+        "z": -320000,
+        "max": 20201,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 768000,
         "y": 64000,
         "z": -320000,
-        "max": 0,
-        "time": 0,
+        "max": 117594,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 768000,
+        "y": 0,
+        "z": -320000,
+        "max": 2113,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 768000,
         "y": 0,
         "z": -320000,
-        "max": 0,
-        "time": 0,
+        "max": 145641,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
@@ -2512,17 +2577,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 704000,
+        "y": 64000,
+        "z": -320000,
+        "max": 20444,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 704000,
         "y": 64000,
         "z": -320000,
-        "max": 0,
-        "time": 0,
+        "max": 158396,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -2540,17 +2616,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 640000,
+        "y": 64000,
+        "z": -320000,
+        "max": 20653,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 640000,
         "y": 64000,
         "z": -320000,
-        "max": 0,
-        "time": 0,
+        "max": 27906,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -2664,91 +2751,158 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 576000,
         "y": 64000,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 17913,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
           "low"
+        ],
+        "x": 576000,
+        "y": 64000,
+        "z": -256000,
+        "max": 193267,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
         ],
         "x": 576000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 19975,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_c"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 576000,
+        "y": 0,
+        "z": -192000,
+        "max": 24008,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 576000,
+        "y": 0,
+        "z": -256000,
+        "max": 16151,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 576000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 195623,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 512000,
+        "y": 64000,
+        "z": -256000,
+        "max": 20941,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 512000,
         "y": 64000,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 182969,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
-        ]
-      },
-      {
-        "yield_names": [
-          "verylow",
-          "low"
-        ],
-        "x": 512000,
-        "y": 0,
-        "z": -192000,
-        "max": 0,
-        "time": 0,
-        "regions": [
-          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 512000,
+        "y": 0,
+        "z": -192000,
+        "max": 20291,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 512000,
+        "y": 0,
+        "z": -192000,
+        "max": 201209,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 512000,
+        "y": 0,
+        "z": -256000,
+        "max": 14202,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 512000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 200040,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -2939,76 +3093,133 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 448000,
         "y": 64000,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 5288,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 448000,
+        "y": 64000,
+        "z": -192000,
+        "max": 75001,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 448000,
+        "y": 64000,
+        "z": -256000,
+        "max": 20421,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 448000,
         "y": 64000,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 17173,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 448000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 19670,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_c",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 448000,
+        "y": 0,
+        "z": -192000,
+        "max": 191346,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 448000,
+        "y": 0,
+        "z": -256000,
+        "max": 20342,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 448000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 203153,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 384000,
+        "y": 64000,
+        "z": -192000,
+        "max": 17981,
+        "time": 72000,
+        "regions": [
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
           "low"
         ],
         "x": 384000,
         "y": 64000,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 2316,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -3026,29 +3237,56 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 384000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 13191,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 384000,
+        "y": 0,
+        "z": -192000,
+        "max": 207937,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 384000,
+        "y": 0,
+        "z": -256000,
+        "max": 10541,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 384000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 93818,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
@@ -3898,31 +4136,54 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 256000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 35973,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 44170,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 320000,
+        "y": 64000,
+        "z": -192000,
+        "max": 18263,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 320000,
         "y": 64000,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 128587,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -3944,57 +4205,116 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 320000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 18156,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -192000,
+        "max": 198215,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -256000,
+        "max": 16377,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 320000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 172315,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 64000,
+        "z": -192000,
+        "max": 176,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 256000,
         "y": 64000,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 50886,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -192000,
+        "max": 17156,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 256000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 181930,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
@@ -4141,19 +4461,41 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "medium",
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 33471,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 156266,
+        "time": 108000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 40809,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -4204,16 +4546,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 30110,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 149702,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -4236,17 +4589,44 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "medium",
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 12287,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 151267,
+        "time": 108000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 192000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 40809,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -4381,16 +4761,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 15484,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 136371,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -4423,17 +4814,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 19501,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 133247,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -4478,21 +4880,32 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 64000,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 6062,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_b",
           "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": -64000,
+        "z": -128000,
+        "max": 15134,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -4511,16 +4924,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": -128000,
+        "max": 11129,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 74651,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -4570,64 +4995,113 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 22851,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -64000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 135241,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -128000,
         "y": 64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
-        "regions": [
-          "region_cluster_01_sector_003_e"
-        ]
-      },
-      {
-        "yield_names": [
-          "verylow",
-          "low"
-        ],
-        "x": -128000,
-        "y": 0,
-        "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 114244,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -128000,
+        "y": 64000,
+        "z": -128000,
+        "max": 8236,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 42351,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 74967,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 23150,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 22749,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -4701,16 +5175,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -128000,
+        "y": -64000,
+        "z": -128000,
+        "max": 22630,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 5000,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -5305,36 +5791,58 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 30703,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_b",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 67759,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 21066,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 109601,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -5365,36 +5873,58 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -256000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 23540,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_b",
           "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -64000,
+        "max": 115713,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -128000,
+        "max": 30064,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -256000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 108601,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -5532,36 +6062,58 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -320000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 15631,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_b",
           "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -64000,
+        "max": 58139,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -128000,
+        "max": 25574,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -320000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 144008,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -5606,20 +6158,31 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -384000,
+        "y": 0,
+        "z": -128000,
+        "max": 47119,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -384000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 92258,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_b",
-          "region_cluster_01_sector_003_c",
-          "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -5992,32 +6555,54 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -576000,
+        "y": 0,
+        "z": -64000,
+        "max": 8988,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -576000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 14908,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -576000,
+        "y": 0,
+        "z": -128000,
+        "max": 13891,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -576000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 79221,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_c",
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -6049,16 +6634,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -640000,
+        "y": 0,
+        "z": -64000,
+        "max": 21269,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -640000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 15998,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -6721,16 +7317,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -704000,
+        "y": 0,
+        "z": -64000,
+        "max": 141788,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -704000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 16495,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -6749,16 +7356,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -768000,
+        "y": 0,
+        "z": -64000,
+        "max": 17410,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -768000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 16484,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -6790,30 +7408,53 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -704000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 71092,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_d"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -704000,
+        "y": -64000,
+        "z": -64000,
+        "max": 15608,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -768000,
+        "y": -64000,
+        "z": -64000,
+        "max": 71589,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -768000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 16676,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -6925,16 +7566,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -832000,
+        "y": 0,
+        "z": -64000,
+        "max": 23433,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -832000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 100726,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -6954,16 +7606,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -832000,
+        "y": -64000,
+        "z": -64000,
+        "max": 29398,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -832000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 151578,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -6995,16 +7658,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -896000,
+        "y": -64000,
+        "z": -64000,
+        "max": 16066,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -896000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 45520,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -7468,31 +8142,53 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -960000,
+        "y": -64000,
+        "z": -64000,
+        "max": 16670,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -960000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 142958,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -960000,
+        "y": -64000,
+        "z": -128000,
+        "max": 14603,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -960000,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 166005,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -9913,32 +10609,54 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 704000,
+        "y": 0,
+        "z": -256000,
+        "max": 17274,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 704000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 183963,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 640000,
+        "y": 64000,
+        "z": -256000,
+        "max": 15405,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 640000,
         "y": 64000,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 161691,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -9956,16 +10674,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 640000,
+        "y": 0,
+        "z": -256000,
+        "max": 19482,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 640000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 190755,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -10083,28 +10812,60 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 768000,
+        "y": 64000,
+        "z": -320000,
+        "max": 20208,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 768000,
         "y": 64000,
         "z": -320000,
-        "max": 0,
-        "time": 0,
+        "max": 117603,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 768000,
+        "y": 0,
+        "z": -320000,
+        "max": 2112,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 768000,
         "y": 0,
         "z": -320000,
-        "max": 0,
-        "time": 0,
+        "max": 145647,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
@@ -10163,17 +10924,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 704000,
+        "y": 64000,
+        "z": -320000,
+        "max": 20445,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 704000,
         "y": 64000,
         "z": -320000,
-        "max": 0,
-        "time": 0,
+        "max": 158403,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -10191,17 +10963,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 640000,
+        "y": 64000,
+        "z": -320000,
+        "max": 20658,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 640000,
         "y": 64000,
         "z": -320000,
-        "max": 0,
-        "time": 0,
+        "max": 27909,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -10315,91 +11098,158 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 576000,
         "y": 64000,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 17916,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
           "low"
+        ],
+        "x": 576000,
+        "y": 64000,
+        "z": -256000,
+        "max": 193278,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
         ],
         "x": 576000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 19977,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_c"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 576000,
+        "y": 0,
+        "z": -192000,
+        "max": 24015,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 576000,
+        "y": 0,
+        "z": -256000,
+        "max": 16152,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 576000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 195636,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 512000,
+        "y": 64000,
+        "z": -256000,
+        "max": 20946,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 512000,
         "y": 64000,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 182973,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
-        ]
-      },
-      {
-        "yield_names": [
-          "verylow",
-          "low"
-        ],
-        "x": 512000,
-        "y": 0,
-        "z": -192000,
-        "max": 0,
-        "time": 0,
-        "regions": [
-          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 512000,
+        "y": 0,
+        "z": -192000,
+        "max": 20295,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 512000,
+        "y": 0,
+        "z": -192000,
+        "max": 201210,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 512000,
+        "y": 0,
+        "z": -256000,
+        "max": 14205,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 512000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 200043,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -10590,76 +11440,133 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 448000,
         "y": 64000,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 5292,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 448000,
+        "y": 64000,
+        "z": -192000,
+        "max": 75006,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 448000,
+        "y": 64000,
+        "z": -256000,
+        "max": 20424,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 448000,
         "y": 64000,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 17178,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 448000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 19668,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_c",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 448000,
+        "y": 0,
+        "z": -192000,
+        "max": 191343,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 448000,
+        "y": 0,
+        "z": -256000,
+        "max": 20349,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 448000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 203157,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 384000,
+        "y": 64000,
+        "z": -192000,
+        "max": 17985,
+        "time": 72000,
+        "regions": [
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
           "low"
         ],
         "x": 384000,
         "y": 64000,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 2319,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -10677,29 +11584,56 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 384000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 13203,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 384000,
+        "y": 0,
+        "z": -192000,
+        "max": 207942,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 384000,
+        "y": 0,
+        "z": -256000,
+        "max": 10542,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 384000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 93828,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
@@ -11549,31 +12483,54 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 256000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 35979,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -128000,
+        "max": 44178,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 320000,
+        "y": 64000,
+        "z": -192000,
+        "max": 18267,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 320000,
         "y": 64000,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 128592,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -11595,57 +12552,116 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 320000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 18153,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -192000,
+        "max": 198216,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": 320000,
+        "y": 0,
+        "z": -256000,
+        "max": 16383,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 320000,
         "y": 0,
         "z": -256000,
-        "max": 0,
-        "time": 0,
+        "max": 172314,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 64000,
+        "z": -192000,
+        "max": 186,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 256000,
         "y": 64000,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 50895,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 256000,
+        "y": 0,
+        "z": -192000,
+        "max": 17160,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 256000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 181935,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_e"
         ]
@@ -11792,19 +12808,41 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "medium",
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 33480,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -128000,
+        "max": 156264,
+        "time": 108000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 40815,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -11855,16 +12893,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 128000,
+        "y": 0,
+        "z": -128000,
+        "max": 30114,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 128000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 149706,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -11887,17 +12936,44 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "medium",
+          "verylow"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 12297,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
+          "medium"
+        ],
+        "x": 192000,
+        "y": 0,
+        "z": -192000,
+        "max": 151269,
+        "time": 108000,
+        "regions": [
+          "p1_40km_asteroid_field"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 192000,
         "y": 0,
         "z": -192000,
-        "max": 0,
-        "time": 0,
+        "max": 40815,
+        "time": 144000,
         "regions": [
-          "p1_40km_asteroid_field",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -12032,16 +13108,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 64000,
+        "y": 0,
+        "z": -128000,
+        "max": 15486,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 64000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 136374,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -12074,17 +13161,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 0,
+        "y": 0,
+        "z": -128000,
+        "max": 19509,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 133248,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -12129,21 +13227,32 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": 64000,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 6069,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_b",
           "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": 64000,
+        "y": -64000,
+        "z": -128000,
+        "max": 15141,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -12162,16 +13271,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": 0,
+        "y": -64000,
+        "z": -128000,
+        "max": 11130,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": 0,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 74649,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -12221,64 +13342,113 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -64000,
+        "y": 0,
+        "z": -128000,
+        "max": 22863,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -64000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 135249,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -128000,
         "y": 64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
-        "regions": [
-          "region_cluster_01_sector_003_e"
-        ]
-      },
-      {
-        "yield_names": [
-          "verylow",
-          "low"
-        ],
-        "x": -128000,
-        "y": 0,
-        "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 114252,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -128000,
+        "y": 64000,
+        "z": -128000,
+        "max": 8238,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 42357,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a",
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
+          "low"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -64000,
+        "max": 74967,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -128000,
+        "y": 0,
+        "z": -128000,
+        "max": 23157,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 22752,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -12352,16 +13522,28 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -128000,
+        "y": -64000,
+        "z": -128000,
+        "max": 22632,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -128000,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 5004,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -12956,36 +14138,58 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -192000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 30711,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_b",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -64000,
+        "max": 67764,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -192000,
+        "y": 0,
+        "z": -128000,
+        "max": 21072,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -192000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 109605,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -13016,36 +14220,58 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -256000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 23550,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_b",
           "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -64000,
+        "max": 115713,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -256000,
+        "y": 0,
+        "z": -128000,
+        "max": 30069,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -256000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 108603,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -13183,36 +14409,58 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -320000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 15636,
+        "time": 72000,
         "regions": [
           "region_cluster_01_sector_003_b",
           "region_cluster_01_sector_003_c",
           "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
           "region_cluster_01_sector_003_f"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -64000,
+        "max": 58143,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -320000,
+        "y": 0,
+        "z": -128000,
+        "max": 25581,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -320000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 144012,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -13257,20 +14505,31 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -384000,
+        "y": 0,
+        "z": -128000,
+        "max": 47136,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_b",
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d",
+          "region_cluster_01_sector_003_f"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -384000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 92259,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_b",
-          "region_cluster_01_sector_003_c",
-          "region_cluster_01_sector_003_d",
-          "region_cluster_01_sector_003_e",
-          "region_cluster_01_sector_003_f"
+          "region_cluster_01_sector_003_e"
         ]
       },
       {
@@ -13643,32 +14902,54 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -576000,
+        "y": 0,
+        "z": -64000,
+        "max": 8994,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -576000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 14916,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -576000,
+        "y": 0,
+        "z": -128000,
+        "max": 13896,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_c",
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -576000,
         "y": 0,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 79230,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_c",
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -13700,16 +14981,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -640000,
+        "y": 0,
+        "z": -64000,
+        "max": 21273,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -640000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 16002,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -14372,16 +15664,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -704000,
+        "y": 0,
+        "z": -64000,
+        "max": 141789,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -704000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 16497,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -14400,16 +15703,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -768000,
+        "y": 0,
+        "z": -64000,
+        "max": 17415,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -768000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 16488,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -14441,30 +15755,53 @@
       },
       {
         "yield_names": [
-          "verylow",
-          "low"
+          "verylow"
         ],
         "x": -704000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 71094,
+        "time": 108000,
         "regions": [
           "region_cluster_01_sector_003_d"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "low"
+        ],
+        "x": -704000,
+        "y": -64000,
+        "z": -64000,
+        "max": 15609,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_e"
+        ]
+      },
+      {
+        "yield_names": [
+          "verylow"
+        ],
+        "x": -768000,
+        "y": -64000,
+        "z": -64000,
+        "max": 71589,
+        "time": 108000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -768000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 16677,
+        "time": 72000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -14576,16 +15913,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -832000,
+        "y": 0,
+        "z": -64000,
+        "max": 23439,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_d"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -832000,
         "y": 0,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 100722,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_d",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -14605,16 +15953,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -832000,
+        "y": -64000,
+        "z": -64000,
+        "max": 29409,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -832000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 151578,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -14646,16 +16005,27 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -896000,
+        "y": -64000,
+        "z": -64000,
+        "max": 16074,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -896000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 45528,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
@@ -15119,31 +16489,53 @@
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -960000,
+        "y": -64000,
+        "z": -64000,
+        "max": 16668,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -960000,
         "y": -64000,
         "z": -64000,
-        "max": 0,
-        "time": 0,
+        "max": 142965,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },
       {
         "yield_names": [
-          "verylow",
+          "verylow"
+        ],
+        "x": -960000,
+        "y": -64000,
+        "z": -128000,
+        "max": 14607,
+        "time": 72000,
+        "regions": [
+          "region_cluster_01_sector_003_a"
+        ]
+      },
+      {
+        "yield_names": [
           "low"
         ],
         "x": -960000,
         "y": -64000,
         "z": -128000,
-        "max": 0,
-        "time": 0,
+        "max": 166008,
+        "time": 108000,
         "regions": [
-          "region_cluster_01_sector_003_a",
           "region_cluster_01_sector_003_e"
         ]
       },

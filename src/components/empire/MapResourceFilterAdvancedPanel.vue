@@ -10,6 +10,7 @@ import {
   type AdvancedResourceTagGroup
 } from '@/store/logic/mapAdvancedResourceFilter'
 import {
+  sortResourcesByPriority,
   buildFixedYieldEntries,
   buildYieldRanksByWare,
   getSharedMinYieldName,
@@ -67,7 +68,6 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
-const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
 
 const formatYieldLabel = (yieldName: string) => {
   const levelKey = `map.yield_levels.${yieldName}`
@@ -82,8 +82,11 @@ const formatYieldLabel = (yieldName: string) => {
 
   return displayLevel
 }
-const regionYields = computed(() => buildFixedYieldEntries([...RESOURCE_ORDER]))
-// 使用 res.json 的 color_rgb 作为资源颜色（与 MapWorkbenchView.vue 保持一致）
+const availableResourceIds = computed(() =>
+  ((gameData.res || []) as Array<{ id: string }>).map((entry) => entry.id).filter((id) => id !== 'energycells')
+)
+const sortedResourceIds = computed(() => sortResourcesByPriority(availableResourceIds.value))
+const regionYields = computed(() => buildFixedYieldEntries(sortedResourceIds.value))
 const resourceColorsFromRes = computed<Record<string, string>>(() =>
   Object.fromEntries(((gameData.res || []) as Array<{ id: string; color_rgb?: string }>).map((entry) => [entry.id, entry.color_rgb || '#fbbf24']))
 )

@@ -188,11 +188,11 @@ falloff = lateral_factor × radial_factor
 
 | respawn 范围 | rating |
 |-------------|--------|
-| respawn < 30 | 1 |
-| 30 ≤ respawn < 100 | 2 |
-| 100 ≤ respawn < 300 | 3 |
-| 300 ≤ respawn < 1000 | 4 |
-| respawn ≥ 1000 | 5 |
+| respawn < 100 | 1 |
+| 30 ≤ respawn < 300 | 2 |
+| 100 ≤ respawn < 1000 | 3 |
+| 300 ≤ respawn < 3000 | 4 |
+| respawn ≥ 3000 | 5 |
 
 **注意：**
 - 此 rating 计算**仅用于 `sector.resources`**，不出现在 `resourceareas.json` 或 `regions.json` 中

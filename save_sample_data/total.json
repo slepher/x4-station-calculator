@@ -5,8 +5,8 @@
       "ware": {
         "ice": [
           {
-            "max": 278574567,
-            "cutted": 151991817,
+            "max": 356107011,
+            "cutted": 229524261,
             "regions": [
               {
                 "ref": "region_cluster_01_sector_001_a"
@@ -22,8 +22,8 @@
         ],
         "ore": [
           {
-            "max": 47643857,
-            "cutted": 9531729,
+            "max": 49223059,
+            "cutted": 11110931,
             "regions": [
               {
                 "ref": "p1_40km_asteroid_field"
@@ -45,8 +45,8 @@
         ],
         "silicon": [
           {
-            "max": 5622192,
-            "cutted": 1349364,
+            "max": 6238416,
+            "cutted": 1965588,
             "regions": [
               {
                 "ref": "p1_40km_asteroid_field"
@@ -101,8 +101,8 @@
       "ware": {
         "ore": [
           {
-            "max": 658472,
-            "cutted": 172300,
+            "max": 659509,
+            "cutted": 173116,
             "regions": [
               {
                 "ref": "region_cluster_01_sector_002_a"
@@ -128,8 +128,8 @@
             ]
           },
           {
-            "max": 3964908,
-            "cutted": 1097745,
+            "max": 4095528,
+            "cutted": 1188338,
             "regions": [
               {
                 "ref": "region_cluster_01_sector_002_a"
@@ -163,8 +163,8 @@
         ],
         "silicon": [
           {
-            "max": 1520943,
-            "cutted": 398010,
+            "max": 1694961,
+            "cutted": 447279,
             "regions": [
               {
                 "ref": "region_cluster_01_sector_002_a"
@@ -190,8 +190,8 @@
             ]
           },
           {
-            "max": 17441133,
-            "cutted": 5151246,
+            "max": 18328590,
+            "cutted": 5847489,
             "regions": [
               {
                 "ref": "region_cluster_01_sector_002_a"
@@ -294,8 +294,8 @@
       "ware": {
         "ore": [
           {
-            "max": 13278866,
-            "cutted": 4614925,
+            "max": 20883196,
+            "cutted": 8782802,
             "regions": [
               {
                 "ref": "p1_40km_asteroid_field"
@@ -323,8 +323,8 @@
         ],
         "silicon": [
           {
-            "max": 13281039,
-            "cutted": 4615797,
+            "max": 20885892,
+            "cutted": 8783982,
             "regions": [
               {
                 "ref": "p1_40km_asteroid_field"
@@ -477,8 +477,8 @@
       "ware": {
         "hydrogen": [
           {
-            "max": 8966185,
-            "cutted": 5074786,
+            "max": 10769452,
+            "cutted": 6878053,
             "regions": [
               {
                 "ref": "region2_cluster_04_sector_001"
@@ -522,8 +522,8 @@
         ],
         "ore": [
           {
-            "max": 84537719,
-            "cutted": 82548019,
+            "max": 132615221,
+            "cutted": 130625521,
             "regions": [
               {
                 "ref": "region2_cluster_04_sector_001"
@@ -536,8 +536,8 @@
         ],
         "silicon": [
           {
-            "max": 32482804,
-            "cutted": 26512206,
+            "max": 46292233,
+            "cutted": 40321635,
             "regions": [
               {
                 "ref": "region2_cluster_04_sector_001"
@@ -1409,8 +1409,8 @@
         ],
         "ore": [
           {
-            "max": 1545680,
-            "cutted": 1545680,
+            "max": 1580558,
+            "cutted": 1580558,
             "regions": [
               {
                 "ref": "region_cluster_13_sector_001"
@@ -1418,12 +1418,9 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 114510,
+            "cutted": 114510,
             "regions": [
-              {
-                "ref": "region_cluster_13_sector_001"
-              },
               {
                 "ref": "region_highyield_ore"
               }
@@ -2252,8 +2249,8 @@
         ],
         "silicon": [
           {
-            "max": 1241862,
-            "cutted": 1241862,
+            "max": 10576107,
+            "cutted": 10576107,
             "regions": [
               {
                 "ref": "region_cluster_27_sector_001"
@@ -2261,20 +2258,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
-            "regions": [
-              {
-                "ref": "region_cluster_27_sector_001"
-              },
-              {
-                "ref": "region2_cluster_27_sector_001"
-              }
-            ]
-          },
-          {
-            "max": 28006692,
-            "cutted": 28006692,
+            "max": 28546813,
+            "cutted": 28546813,
             "regions": [
               {
                 "ref": "region2_cluster_27_sector_001"
@@ -2284,8 +2269,8 @@
         ],
         "hydrogen": [
           {
-            "max": 776643,
-            "cutted": 776643,
+            "max": 1214274,
+            "cutted": 1214274,
             "regions": [
               {
                 "ref": "p1_40km_hydrogen_field"
@@ -2400,8 +2385,8 @@
         ],
         "nividium": [
           {
-            "max": 1235,
-            "cutted": 1235,
+            "max": 1550,
+            "cutted": 1550,
             "regions": [
               {
                 "ref": "region_cluster_28_sector_001"
@@ -2409,20 +2394,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
-            "regions": [
-              {
-                "ref": "region_cluster_28_sector_001"
-              },
-              {
-                "ref": "regionpart2_cluster_28_sector_001"
-              }
-            ]
-          },
-          {
-            "max": 23665,
-            "cutted": 23665,
+            "max": 28400,
+            "cutted": 28400,
             "regions": [
               {
                 "ref": "regionpart2_cluster_28_sector_001"
@@ -2432,8 +2405,8 @@
         ],
         "ore": [
           {
-            "max": 7597225,
-            "cutted": 7597225,
+            "max": 9538863,
+            "cutted": 9538863,
             "regions": [
               {
                 "ref": "region_cluster_28_sector_001"
@@ -2441,20 +2414,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
-            "regions": [
-              {
-                "ref": "region_cluster_28_sector_001"
-              },
-              {
-                "ref": "regionpart2_cluster_28_sector_001"
-              }
-            ]
-          },
-          {
-            "max": 61560,
-            "cutted": 61560,
+            "max": 73883,
+            "cutted": 73883,
             "regions": [
               {
                 "ref": "regionpart2_cluster_28_sector_001"
@@ -2464,8 +2425,8 @@
         ],
         "silicon": [
           {
-            "max": 7597233,
-            "cutted": 7597233,
+            "max": 9538875,
+            "cutted": 9538875,
             "regions": [
               {
                 "ref": "region_cluster_28_sector_001"
@@ -2473,20 +2434,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
-            "regions": [
-              {
-                "ref": "region_cluster_28_sector_001"
-              },
-              {
-                "ref": "regionpart2_cluster_28_sector_001"
-              }
-            ]
-          },
-          {
-            "max": 61602,
-            "cutted": 61602,
+            "max": 73932,
+            "cutted": 73932,
             "regions": [
               {
                 "ref": "regionpart2_cluster_28_sector_001"
@@ -2526,8 +2475,8 @@
         ],
         "ore": [
           {
-            "max": 486070,
-            "cutted": 486070,
+            "max": 586617,
+            "cutted": 586617,
             "regions": [
               {
                 "ref": "p1_40km_asteroid_field"
@@ -2540,8 +2489,8 @@
         ],
         "silicon": [
           {
-            "max": 486127,
-            "cutted": 486127,
+            "max": 586686,
+            "cutted": 586686,
             "regions": [
               {
                 "ref": "p1_40km_asteroid_field"
@@ -2871,7 +2820,7 @@
         ],
         "ore": [
           {
-            "max": 75222486,
+            "max": 75336996,
             "cutted": 38092316,
             "regions": [
               {
@@ -2880,12 +2829,9 @@
             ]
           },
           {
-            "max": 0,
+            "max": 1232995,
             "cutted": 0,
             "regions": [
-              {
-                "ref": "region_cluster_37_sector_001"
-              },
               {
                 "ref": "region_highyield_ore"
               }
@@ -2894,8 +2840,8 @@
         ],
         "silicon": [
           {
-            "max": 50430014,
-            "cutted": 24854597,
+            "max": 51084777,
+            "cutted": 25509360,
             "regions": [
               {
                 "ref": "region_cluster_37_sector_001"
@@ -2927,8 +2873,8 @@
         ],
         "hydrogen": [
           {
-            "max": 21914859,
-            "cutted": 8358157,
+            "max": 23483213,
+            "cutted": 9926511,
             "regions": [
               {
                 "ref": "region_cluster_38_sector_001"
@@ -2955,8 +2901,8 @@
         ],
         "nividium": [
           {
-            "max": 365790,
-            "cutted": 127800,
+            "max": 388985,
+            "cutted": 150995,
             "regions": [
               {
                 "ref": "region_cluster_38_sector_001"
@@ -2969,8 +2915,8 @@
         ],
         "ore": [
           {
-            "max": 31081444,
-            "cutted": 10991628,
+            "max": 32624292,
+            "cutted": 12419315,
             "regions": [
               {
                 "ref": "region_cluster_38_sector_001"
@@ -2986,8 +2932,8 @@
         ],
         "silicon": [
           {
-            "max": 14247142,
-            "cutted": 5129188,
+            "max": 15173361,
+            "cutted": 5824881,
             "regions": [
               {
                 "ref": "region_cluster_38_sector_001"
@@ -3832,8 +3778,8 @@
         ],
         "ore": [
           {
-            "max": 87369379,
-            "cutted": 27181652,
+            "max": 104697998,
+            "cutted": 44510271,
             "regions": [
               {
                 "ref": "region_bigasteroids"
@@ -3846,8 +3792,8 @@
         ],
         "silicon": [
           {
-            "max": 86977844,
-            "cutted": 27082835,
+            "max": 88320588,
+            "cutted": 28425579,
             "regions": [
               {
                 "ref": "region_bigasteroids"
@@ -3860,8 +3806,8 @@
         ],
         "nividium": [
           {
-            "max": 115900,
-            "cutted": 38110,
+            "max": 117200,
+            "cutted": 39410,
             "regions": [
               {
                 "ref": "region_bigasteroids"
@@ -3901,8 +3847,8 @@
       "ware": {
         "ice": [
           {
-            "max": 186006126,
-            "cutted": 60641775,
+            "max": 186650847,
+            "cutted": 61286496,
             "regions": [
               {
                 "ref": "region_bigasteroids"
@@ -3918,8 +3864,8 @@
         ],
         "ore": [
           {
-            "max": 88444521,
-            "cutted": 28256794,
+            "max": 88708145,
+            "cutted": 28520418,
             "regions": [
               {
                 "ref": "region_bigasteroids"
@@ -3935,8 +3881,8 @@
         ],
         "silicon": [
           {
-            "max": 88045080,
-            "cutted": 28150071,
+            "max": 88309035,
+            "cutted": 28414026,
             "regions": [
               {
                 "ref": "region_bigasteroids"
@@ -3952,8 +3898,8 @@
         ],
         "nividium": [
           {
-            "max": 116805,
-            "cutted": 39015,
+            "max": 117110,
+            "cutted": 39320,
             "regions": [
               {
                 "ref": "region_bigasteroids"
@@ -4136,8 +4082,8 @@
         ],
         "hydrogen": [
           {
-            "max": 1799995,
-            "cutted": 359999,
+            "max": 405413557,
+            "cutted": 86598036,
             "regions": [
               {
                 "ref": "wave_active"
@@ -4230,8 +4176,8 @@
         ],
         "hydrogen": [
           {
-            "max": 1879193,
-            "cutted": 79198,
+            "max": 403398048,
+            "cutted": 84458762,
             "regions": [
               {
                 "ref": ""
@@ -4263,8 +4209,8 @@
         ],
         "ore": [
           {
-            "max": 5538938,
-            "cutted": 1191579,
+            "max": 6263511,
+            "cutted": 1916152,
             "regions": [
               {
                 "ref": ""
@@ -4272,8 +4218,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 5441,
+            "cutted": 5441,
             "regions": [
               {
                 "ref": "s2_grav_small"
@@ -4281,8 +4227,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 251162,
+            "cutted": 251162,
             "regions": [
               {
                 "ref": "s2_grav_small_v2"
@@ -4290,8 +4236,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 10882,
+            "cutted": 10882,
             "regions": [
               {
                 "ref": "s2_grav_small"
@@ -4304,8 +4250,8 @@
         ],
         "silicon": [
           {
-            "max": 5539956,
-            "cutted": 1191798,
+            "max": 6264546,
+            "cutted": 1916388,
             "regions": [
               {
                 "ref": ""
@@ -4313,8 +4259,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 5442,
+            "cutted": 5442,
             "regions": [
               {
                 "ref": "s2_grav_small"
@@ -4322,8 +4268,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 251187,
+            "cutted": 251187,
             "regions": [
               {
                 "ref": "s2_grav_small_v2"
@@ -4331,8 +4277,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 10884,
+            "cutted": 10884,
             "regions": [
               {
                 "ref": "s2_grav_small"
@@ -4372,8 +4318,8 @@
         ],
         "hydrogen": [
           {
-            "max": 1799995,
-            "cutted": 0,
+            "max": 408774192,
+            "cutted": 89870646,
             "regions": [
               {
                 "ref": ""
@@ -4492,8 +4438,8 @@
       "ware": {
         "hydrogen": [
           {
-            "max": 1621966500,
-            "cutted": 33363000,
+            "max": 1622087549,
+            "cutted": 33484049,
             "regions": [
               {
                 "ref": "region_c502s01_base"
@@ -5204,8 +5150,8 @@
         ],
         "nividium": [
           {
-            "max": 2340,
-            "cutted": 2340,
+            "max": 2895,
+            "cutted": 2895,
             "regions": [
               {
                 "ref": "c605s1_region12"
@@ -5213,38 +5159,8 @@
             ]
           },
           {
-            "max": 0,
-            "cutted": 0,
-            "regions": [
-              {
-                "ref": "c605s1_region12"
-              },
-              {
-                "ref": "c605s1_region13"
-              },
-              {
-                "ref": "c605s1_region14"
-              },
-              {
-                "ref": "c605s1_region15"
-              },
-              {
-                "ref": "c605s1_region16"
-              },
-              {
-                "ref": "c605s1_region17"
-              },
-              {
-                "ref": "c605s1_region18"
-              },
-              {
-                "ref": "c605s1_region20"
-              }
-            ]
-          },
-          {
-            "max": 10,
-            "cutted": 10,
+            "max": 25,
+            "cutted": 25,
             "regions": [
               {
                 "ref": "c605s1_region13"
@@ -5924,8 +5840,8 @@
       "ware": {
         "ice": [
           {
-            "max": 56134149,
-            "cutted": 56134149,
+            "max": 75480183,
+            "cutted": 75480183,
             "regions": [
               {
                 "ref": "region_cluster_710_sector_001_asteroids_1"
@@ -5938,8 +5854,8 @@
         ],
         "ore": [
           {
-            "max": 132753643,
-            "cutted": 132753643,
+            "max": 190560571,
+            "cutted": 190560571,
             "regions": [
               {
                 "ref": "region_cluster_710_sector_001_asteroids_1"
@@ -5952,8 +5868,8 @@
         ],
         "silicon": [
           {
-            "max": 89779961,
-            "cutted": 89779961,
+            "max": 128574245,
+            "cutted": 128574245,
             "regions": [
               {
                 "ref": "region_cluster_710_sector_001_asteroids_1"
@@ -6205,8 +6121,8 @@
       "ware": {
         "helium": [
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 1576393,
+            "cutted": 1576393,
             "regions": [
               {
                 "ref": "region_cluster_715_sector_001_nebula_1"
@@ -6219,8 +6135,8 @@
         ],
         "hydrogen": [
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 2679906,
+            "cutted": 2679906,
             "regions": [
               {
                 "ref": "region_cluster_715_sector_001_nebula_1"
@@ -6233,8 +6149,8 @@
         ],
         "methane": [
           {
-            "max": 0,
-            "cutted": 0,
+            "max": 4816940,
+            "cutted": 4816940,
             "regions": [
               {
                 "ref": "region_cluster_715_sector_001_nebula_1"

@@ -3,6 +3,7 @@ import { computed, ref, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import {
+  sortResourcesByPriority,
   buildFixedYieldEntries,
   buildDefaultResourceFilters,
   buildSectorResourceFill,
@@ -59,9 +60,11 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
 
-const RESOURCE_ORDER = ['ore', 'silicon', 'methane', 'hydrogen', 'helium', 'ice', 'rawscrap', 'nividium'] as const
-const regionYields = computed(() => buildFixedYieldEntries([...RESOURCE_ORDER]))
-// 使用 res.json 的 color_rgb 作为资源颜色（与 MapWorkbenchView.vue 保持一致）
+const availableResourceIds = computed(() =>
+  ((gameData.res || []) as Array<{ id: string }>).map((entry) => entry.id).filter((id) => id !== 'energycells')
+)
+const sortedResourceIds = computed(() => sortResourcesByPriority(availableResourceIds.value))
+const regionYields = computed(() => buildFixedYieldEntries(sortedResourceIds.value))
 const resourceColorMap = computed<Record<string, string>>(() =>
   Object.fromEntries(((gameData.res || []) as Array<{ id: string; color_rgb?: string }>).map((entry) => [entry.id, entry.color_rgb || '#fbbf24']))
 )
@@ -75,7 +78,7 @@ const sunlightMinimum = ref(100)
 
 // Initialize resourceFilters when regionYields becomes available
 watchEffect(() => {
-  if (regionYields.value.length > 0 && Object.keys(resourceFilters.value).length === 0) {
+  if (sortedResourceIds.value.length > 0 && Object.keys(resourceFilters.value).length === 0) {
     resourceFilters.value = buildDefaultResourceFilters(regionYields.value)
   }
 })
@@ -195,7 +198,7 @@ const resourceCandidates = computed(() =>
       score: selectedWareIds.value.length
         ? selectedWareIds.value.reduce((sum, ware) => {
             const resource = sector.resources.find((item) => item.ware === ware)
-            return sum + (resource?.level || 0)
+            return sum + (resource?.rating || 0)
           }, 0)
         : sunlightFilterEnabled.value
           ? sector.sunlight
@@ -209,7 +212,7 @@ const resourceCandidates = computed(() =>
       left.displayName.localeCompare(right.displayName) ||
       left.sectorId.localeCompare(right.sectorId)
     )
-    .slice(0, 10)
+    .slice(0, 9)
 )
 
 const resourceSectorFills = computed<Record<string, SectorResourceFill>>(() => {

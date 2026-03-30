@@ -13,8 +13,16 @@ from pathlib import Path
 from typing import Dict, List, Any
 
 
+ALLOWED_TAGS = ("asteroid", "debris", "nebula")
+
+
 def parse_region_definitions(xml_path: Path) -> Dict[str, Dict[str, Any]]:
-    """解析 region_definitions XML，返回 field definitions。"""
+    """解析 region_definitions XML，返回 field definitions。
+
+    只处理 asteroid, debris, nebula 三种 tag：
+    - asteroid/debris: 提取固定 6 个属性 (tag, groupref, densityfactor, noisescale, seed, minnoisevalue, maxnoisevalue)
+    - nebula: 直接提取 XML 元素上的所有实际属性
+    """
     result = {}
     tree = ET.parse(xml_path)
     root = tree.getroot()
@@ -31,19 +39,39 @@ def parse_region_definitions(xml_path: Path) -> Dict[str, Dict[str, Any]]:
         if fields_elem is not None:
             for node in fields_elem:
                 tag = node.tag
-                groupref = node.get("groupref", "")
-                if not groupref:
-                    groupref = node.get("ref", tag)
+                # 只处理 asteroid, debris, nebula
+                if tag not in ALLOWED_TAGS:
+                    continue
 
-                fields.append({
-                    "tag": tag,
-                    "groupref": groupref,
-                    "densityfactor": float(node.get("densityfactor", "1.0")),
-                    "noisescale": float(node.get("noisescale", "15000.0")),
-                    "seed": node.get("seed", ""),
-                    "minnoisevalue": float(node.get("minnoisevalue", "0.0")),
-                    "maxnoisevalue": float(node.get("maxnoisevalue", "1.0")),
-                })
+                if tag in ("asteroid", "debris"):
+                    # 固定属性提取
+                    groupref = node.get("groupref", "")
+                    if not groupref:
+                        groupref = node.get("ref", tag)
+
+                    fields.append({
+                        "tag": tag,
+                        "groupref": groupref,
+                        "densityfactor": float(node.get("densityfactor", "1.0")),
+                        "noisescale": float(node.get("noisescale", "15000.0")),
+                        "seed": node.get("seed", ""),
+                        "minnoisevalue": float(node.get("minnoisevalue", "0.0")),
+                        "maxnoisevalue": float(node.get("maxnoisevalue", "1.0")),
+                    })
+                else:  # nebula
+                    # 直接提取所有属性
+                    field: Dict[str, Any] = {"tag": tag}
+                    for attr_name, attr_value in node.attrib.items():
+                        if attr_name in ("localred", "localgreen", "localblue",
+                                         "uniformred", "uniformgreen", "uniformblue"):
+                            field[attr_name] = int(attr_value)
+                        elif attr_name in ("localdensity", "uniformdensity"):
+                            field[attr_name] = float(attr_value)
+                        elif attr_name == "backgroundfog":
+                            field[attr_name] = attr_value.lower() == "true"
+                        else:
+                            field[attr_name] = attr_value
+                    fields.append(field)
 
         result[region_id] = {
             "density": density,

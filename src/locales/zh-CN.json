@@ -634,6 +634,7 @@
     "nividium": "N",
     "ore": "矿",
     "rawscrap": "废",
+    "rawkhaakscrap": "炔",
     "silicon": "硅"
   },
   "moduleNames": {

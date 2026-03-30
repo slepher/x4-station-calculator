@@ -3332,6 +3332,10 @@
     <t id="11688">Tempo de avaliação de mineração(followed by colon and added percentage)</t>
     <t id="11689">Recurso em Potencial</t>
     <t id="11690">Recurso Detectado</t>
+    <t id="11691">Introducing Priority Orders</t>
+    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
+    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
+    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Salvar off-line</t>
     <t id="11702">Gravar por cima do jogo salvo off-line</t>
@@ -3743,6 +3747,8 @@
     <t id="12786">Geração de Quadros AMD FSR</t>
     <t id="12787">Suporte Experimental Aprimorado para Controles</t>
     <t id="12788">AMD FSR</t>
+    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
+    <t id="12790">Start New Open Universe</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Ações da Embaixada</t>
     <t id="12803">Diplomata</t>
@@ -3946,7 +3952,8 @@
     <t id="13324">Confirmar Módulo</t>
     <t id="13325">Cancelar Seleção de Módulo</t>
     <t id="13326">Modelo de Estação de Foco</t>
-    <t id="13327">Queued Priority Order</t>
+    <t id="13327">Ordem de Prioridade na Fila</t>
+    <t id="13328">Gather Rate(of resources; header item for table column)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Tchau</t>
@@ -5382,6 +5389,8 @@
     <t id="993">Para uma introdução mais detalhada à mecânica de vôo, tente o tutorial inicial da Escola de Vôo (translate as 1021,7000).</t>
     <t id="994">As opções de diálogo destacadas fazem a história avançar. Se quiser ouvir todo o diálogo, selecione primeiro as outras opções.</t>
     <t id="995">Você pode reproduzir este tutorial e reproduzir outros tutoriais ao seu próprio ritmo, abrindo o Menu de Opções e selecionando "Reproduzir Tutoriais".</t>
+    <t id="996">Coloque sondas de recursos perto de áreas ricas em recursos. Se o recurso correto for detectado, seus mineradores darão preferência a esse local até que ele se esgote.</t>
+    <t id="997">Muitas sondas de recursos em um setor reduzem a eficiência, portanto, use-as com sabedoria. Elas são totalmente opcionais. Seus mineradores serão capazes de encontrar e extrair recursos por conta própria.</t>
     <t id="1000">(Generic Hints)</t>
     <t id="1001">Você pode abortar este tutorial no menu '{1001,8701}'.</t>
     <t id="1002">Tutorial Completo!</t>
@@ -7385,6 +7394,8 @@
     <t id="5901">Um cenário de demonstração de X4: Foundations</t>
     <t id="5902">Ambiente de Feira de Negócios</t>
     <t id="5904">Bem-vindo ao X4!\n\nEsta demonstração focada coloca você direto na ação. Sinta o gostinho das batalhas espaciais em larga escala de X4 ao se juntar a uma frota aliada, lutar contra forças inimigas e defender uma estação sitiada na fronteira.\n\nEnvolva-se em combates aéreos intensos perto de um Portal de Salto, apoiado por poderosas naves capitais e defesas automatizadas. Sem preparação ou tempo de inatividade, você está livre para entrar, assumir os controles e vivenciar a escala, a tensão e a beleza do combate espacial em X4: Foundations.</t>
+    <t id="5905">Parque de Negócios</t>
+    <t id="5906">Bem-vindo ao X4!\n\nEste cenário coloca você em um setor movimentado dentro de um universo em escala reduzida, dando a você uma amostra da imensa escala e das possibilidades de X4: Foundations.</t>
     <t id="6000">Tutorial: Jogo Avançado</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">Rayma Sedim</t>
@@ -8229,7 +8240,7 @@
     <t id="4602">Determinar se o comércio de produtos específicos nesta estação deve ser restrito.</t>
     <t id="4800">(Options menu range 26xx continued)</t>
     <t id="4801">Inicie sua jornada como um piloto solitário e torne-se uma potência galáctica em um universo grande e persistente, escolhendo seu próprio caminho com missões de história opcionais.</t>
-    <t id="4802">É recomendado que novos jogadores concluam os tutoriais básicos primeiro. Sugerimos, então, que se experimente o Timelines, mas se você preferir uma experiência sandbox, então você pode ir direto para o Universo Aberto.</t>
+    <t id="4802">É recomendado que novos jogadores concluam os tutoriais básicos primeiro. Mas se você preferir uma experiência sandbox, então você pode ir direto para o Universo Aberto.</t>
     <t id="4803">Isso dará continuidade ao seu jogo salvo mais recente no Universo Aberto.\n\nObserve que Timelines não exige um jogo salvo.</t>
     <t id="4804">Isso permitirá que você escolha um dos vários jogos salvos para continuar no Universo Aberto.\n\nObserve que Timelines não exige um jogo salvo.</t>
     <t id="4805">Há uma grande variedade de tutoriais rápidos disponíveis para ensinar ou lembrar como as atividades do jogo funcionarão.\n\nComece sua jornada aqui e volte sempre que tiver algum problema.</t>
@@ -8654,6 +8665,7 @@
     <t id="9929">Você não pode selecionar esta opção porque isso cancelaria a seleção de uma opção necessária para desbloquear um setor no qual você colocou uma propriedade.</t>
     <t id="9930">Este jogo customizado não pode ser escolhido porque contém objetos restritos que você ainda não desbloqueou.</t>
     <t id="9931">Este jogo personalizado contém configurações de equipamentos que incluem itens incompatíveis. Os itens incompatíveis não serão instalados.</t>
+    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(On-line)</t>
     <t id="11301">Aceitar esta missão abortará qualquer outra missão de operação multiverso.</t>
@@ -9276,6 +9288,8 @@
     <t id="902">Resgatar pessoas encalhadas em trajes espaciais na áreas específicas.</t>
     <t id="911">Visitar estações</t>
     <t id="912">Visitar estações importantes pertencentes a várias facções.</t>
+    <t id="921">Prospectar</t>
+    <t id="922">Localize áreas com recursos, marque-as com sondas de recursos, recolha e lance novamente sondas obsoletas.</t>
     <t id="10000">Abortar rota</t>
     <t id="10001">Acabando</t>
     <t id="10002">Patrulha ativa</t>
@@ -9439,6 +9453,7 @@
     <t id="10177">Atrasar</t>
     <t id="10178">Mercadorias \(Manual\)</t>
     <t id="10179">Cesta de mercadoria</t>
+    <t id="10180">Máximo de sondas de recursos implantadas</t>
   </page>
   <page id="1042" title="Encyclopedia Data Texts" descr="Describes additional data in encyclopedia entries" voice="no">
     <t id="10011">Nenhum</t>
@@ -11468,6 +11483,19 @@
     <t id="115">Ou você pode ignorar tudo isso e simplesmente seguir uma das muitas tramas fascinantes, concentrar-se na exploração ou experimentar as inúmeras outras atividades disponíveis no Universo X.</t>
     <t id="116">Você pode ajustar sua velocidade de avanço usando as teclas X e Y, a roda do mouse ou o manche do acelerador.</t>
     <t id="117">Após selecionar um alvo, o sistema de mira tentará travá-lo. Quando o travamento for alcançado, você poderá lançar um míssil com a tecla R ou o botão de disparo secundário.</t>
+    <t id="200">(Tradeshow Playground Scenario)</t>
+    <t id="201">Bem-vindo ao X4: Foundations, um universo vivo com centenas de setores conectados por portais. Esses setores podem ser explorados e contêm milhares de naves e estações operando dentro de uma economia totalmente simulada. Você pode possuir e comandar tudo, desde um pequeno caça até um grande império com frotas mercantes e poderosas naves capitais, tudo para moldar sua história.</t>
+    <t id="202">Este cenário coloca você perto de uma das centenas de estações espaciais movimentadas que você encontrará em nosso universo vivo, com comerciantes entregando mercadorias e mineradores coletando recursos. Recentemente, houve alguns conflitos com a inteligência artificial conhecida como Xenon, que invadiu o portal próximo daqui, interrompendo o comércio.</t>
+    <t id="211">(explore explanation)Ao deixar a estação para trás, você estará livre para explorar os outros setores e facções. O universo X completo contém centenas de setores únicos habitados por diversas facções e espécies, todos com uma história muito rica.</t>
+    <t id="212">(fight explanation)A rede Portais nem sempre é segura. Entre a inteligência artificial conhecida como Xenon, piratas, facções em guerra e o ocasional oportunista que lucra com a guerra, você verá confrontos que variam de pequenos conflitos até gigantescas batalhas com frotas.</t>
+    <t id="213">(mining explanation)Naves como essas extraem os recursos brutos que sustentam a maior parte da economia. Depois de entregues, esses recursos são refinados, levados para fábricas e, eventualmente, transformados nas mercadorias que podem ser usadas para construir as naves e estações que você vê.</t>
+    <t id="214">(trading explanation)Comerciantes, transportadores e mercadores movimentam mercadorias entre as estações. Eles compram onde os produtos são abundantes e os vendem onde são escassos, mantendo a engrenagem da economia em movimento.</t>
+    <t id="215">(shipyard construction)Esta nave está atualmente em construção, utilizando os recursos produzidos por outras estações. Em breve, ela defenderá este setor de quaisquer novas incursões.</t>
+    <t id="216">(launch tube explanation)A estação está lançando caças de seus tubos de lançamento para se defender de ataques inimigos.</t>
+    <t id="217">(station attack explanation)Uma força Xenon hostil está se aproximando. Se danificarem a estação, a produção de novas naves poderá ser severamente afetada.</t>
+    <t id="218">(criminal explanation)Criminosos tentam lucrar com o transporte de mercadorias ilícitas, escondendo-se no tráfego ao redor das estações para assim obter grandes lucros. Esses criminosos podem até mesmo comandar operações organizadas com suas próprias estações e cargueiros mascarados.</t>
+    <t id="219">(explore suggestion)Há muitos outros lugares para visitar e coisas para fazer. Experimente sobrevoar a área e mirar em diferentes objetos.</t>
+    <t id="220">X4: Foundations tem muito mais a oferecer. Você pode rapidamente ganhar dinheiro suficiente para ter uma frota de naves. Pode contratar outros pilotos para trabalharem para você e seguirem suas ordens. Deixe-os negociar ou minerar para ganhar dinheiro, enquanto você segue uma das muitas tramas ou realiza missões independentes espalhadas por esse vasto universo.</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
@@ -20360,7 +20388,6 @@
   <page id="10120" title="Mission Argon/Terran NPC Female 22 / Segaris diplomat" descr="Lines for Segaris Faction Diplomat" voice="yes">
     <t id="2001">(Greeting - neutral)Oi.</t>
     <t id="2007">(Goodbye - neutral)Boa sorte lá fora.</t>
-    <t id="2009">(Goodbye - enemy)Tanto faz.</t>
     <t id="3000">(* Diplomat specific lines *)</t>
     <t id="3001">(Accepting invitation)Os Pioneiros de Segaris aceitam com alegria o seu convite. Chegarei à sua embaixada em breve.</t>
     <t id="3002">(Diplomat Arrival Confirmation)Cheguei à sua embaixada.</t>
@@ -23863,6 +23890,7 @@
     <t id="36">Nós faremos isso depois.</t>
     <t id="37">Feche o mapa.</t>
     <t id="38">Agora.(as in "do it now", comes some time after an instruction)</t>
+    <t id="39">Uma última coisa.</t>
     <t id="1000">(Introduction and physical)</t>
     <t id="1001">Oi. Eu sou Jace Winger, seu instrutor de voo hoje. Nós vamos ver o programa de aulas completo, mas se você souber o básico, podemos saltar para frente.</t>
     <t id="1002">Antes de começarmos eu preciso fazer alguns testes físicos rotineiros. Regulamentos, sabe.(say the last sentence slightly apologetically)</t>
@@ -24597,6 +24625,24 @@
     <t id="25040">A barra à direita mostra o quanto ele está esgotado.</t>
     <t id="25041">Os recursos se reabastecem com o tempo, mas quando um campo está quase vazio, provavelmente é melhor encontrar uma alternativa enquanto isso acontece.</t>
     <t id="25042">Os mais avançados exigem um piloto mais experiente, mas permitem operar em um certo intervalo de sistemas.</t>
+    <t id="25043">As áreas coloridas indicam possíveis locais com recursos.</t>
+    <t id="25044">Abra as configurações do filtro de mineração.</t>
+    <t id="25045">Selecione um dos recursos de gás destacados.</t>
+    <t id="25046">A cor no mapa mudou para indicar o recurso selecionado.</t>
+    <t id="25047">Você também só vê possíveis locais para esse recurso agora.(slight emphasis on "this resource")</t>
+    <t id="25048">Alterar o comportamento padrão para Mineração Automática Local.</t>
+    <t id="25049">Configure-o para coletar quaisquer recursos de gás neste setor.</t>
+    <t id="25050">A nave agora tentará encontrar o recurso, coletá-lo e vendê-lo no setor especificado.</t>
+    <t id="25051">Você pode orientar as operações deles de forma manual com sondas de recursos.</t>
+    <t id="25052">Implante uma em uma das regiões de gás.</t>
+    <t id="25053">Seus mineradores verificarão primeiro as sondas de recursos ao determinar onde coletar recursos.</t>
+    <t id="25054">Quanto mais sondas você implantar em um setor, mais tempo essa etapa levará, portanto, use-as com sabedoria.</t>
+    <t id="25055">Você também pode ver exatamente onde os recursos estão sendo detectados no momento.</t>
+    <t id="25056">Selecione novamente sua mineradora de gás e, em seguida, dê uma ordem direta para que ela minere uma das áreas com recursos detectados.</t>
+    <t id="25057">Os recursos eventualmente se esgotarão.</t>
+    <t id="25058">Eles irão se regenerar com o tempo, mas provavelmente em um local diferente.</t>
+    <t id="25059">Portanto, fique de olho em suas sondas de recursos e remova ou reimplante aquelas que não são mais úteis.</t>
+    <t id="25060">Ou, se você tiver naves de sobra, designe alguém para prospectar um setor e manter o registro da localização de suas sondas de recursos.</t>
     <t id="26000">(Station Building)</t>
     <t id="26001">Hoje nós vamos cobrir uma das lições mais avançadas: projetar e construir estações.</t>
     <t id="26002">Para começar, você precisa de um terreno no espaço.</t>
@@ -51432,7 +51478,7 @@
     <t id="1014">(S Pulse Laser Mk2){20105,1011} {20111,201} {20111,5011}</t>
     <t id="1015">(Pulse Laser){20105,1011}</t>
     <t id="1021">Repetidor de Raios</t>
-    <t id="1022">O Repetidor de Raios oferece um equilíbrio entre dano e desempenho térmico, tornando-o uma escolha comum para uso geral. Ele é tipicamente posicionado como uma evolução do Laser de Pulso, mantendo a capacidade de disparo contínuo enquanto utiliza projéteis maiores e mais lentos. Isso permite rajadas prolongadas capazes de atingir alvos de tamanho comparável com eficácia, embora seu uso eficaz dependa de um controle disciplinado das rajadas e do gerenciamento do calor.\n\nA velocidade reduzida do projétil permite que naves menores e altamente ágeis evitem o fogo inimigo em condições favoráveis. Contra naves capitais, o Repetidor de Raios é adequado para desativar elementos de superfície expostos, como torres e geradores de escudo, embora sua eficácia contra estruturas do casco seja limitada.\n\nO projeto atual do Repetidor de Raios tem origem em programas de desenvolvimento militar Argon, baseados na tecnologia anterior do Acelerador de Massa, que remonta à era do conflito Kha'ak. Ao remover a capacidade de penetração de escudos e focar, em vez disso, na produção contínua de projéteis, o sistema resultante alcançou um perfil confiável para uso geral, que obteve ampla adoção entre as forças alinhadas à Federação.\n\n</t>
+    <t id="1022">O Repetidor de Raios oferece um equilíbrio entre dano e desempenho térmico, tornando-o uma escolha comum para uso geral. Ele é tipicamente posicionado como uma evolução do Laser de Pulso, mantendo a capacidade de disparo contínuo enquanto utiliza projéteis maiores e mais lentos. Isso permite rajadas prolongadas capazes de atingir alvos de tamanho comparável com eficácia, embora seu uso eficaz dependa de um controle disciplinado das rajadas e do gerenciamento do calor.\n\nA velocidade reduzida do projétil permite que naves menores e altamente ágeis evitem o fogo inimigo em condições favoráveis. Contra naves capitais, o Repetidor de Raios é adequado para desativar elementos de superfície expostos, como torres e geradores de escudo, embora sua eficácia contra estruturas do casco seja limitada.\n\nO projeto atual do Repetidor de Raios tem origem em programas de desenvolvimento militar Argon, baseados na tecnologia anterior do Acelerador de Massa, que remonta à era do conflito Kha'ak. Ao remover a capacidade de penetração de escudos e focar, em vez disso, na produção contínua de projéteis, o sistema resultante alcançou um perfil confiável para uso geral, que obteve ampla adoção entre as forças alinhadas à Federação.</t>
     <t id="1024">(S Bolt Repeater Mk1){20105,1021} {20111,101} {20111,5011}</t>
     <t id="1025">(Bolt Repeater){20105,1021}</t>
     <t id="1031">(Bolt Repeater){20105,1021}</t>
@@ -51524,7 +51570,7 @@
     <t id="1244">(S Burst Ray Mk1){20111,5011} {20105,1241} {20111,101}</t>
     <t id="1245">(Burst Ray){20105,1241}</t>
     <t id="1251">Morteiro de Explosão</t>
-    <t id="1252">A Massa Explosiva lança uma bola compactada de explosivos, cuidadosamente separada de uma camada de asteroide esmagado e superaquecido. Esta bolha giratória da perdição detona no impacto ou ao atingir seu alcance efetivo máximo. Seu raio de explosão decente, somado ao já alto dano por projétil, torna-a uma excelente escolha para derrubar os motores, torres e geradores de escudo de naves capitais. Muitas vezes é comparado ao Canhão de Plasma, uma arma bem comum na rede de Portais de Salto pós-realinhamento, porque tem a velocidade de projétil mais alta. Isso oferece aos pilotos desesperados a capacidade de enfrentar alvos menores quando necessário. No entanto, não é um canhão antiaéreo e, se possível, geralmente é aconselhável usar esta arma contra naves de médio porte, que não podem escapar de seu fogo.\n\nAntes que a Sagrada Ordem do Pontífice fosse oficialmente proclamada , seus constituintes começaram a experimentar equipamentos que fizessem uso eficiente dos recursos limitados disponíveis na época. Isso resultou em armas como a Massa Explosiva: surpreendentemente simples de produzir, pelo menos da perspectiva do intelecto superior dos Paranid, mas ao mesmo tempo brutalmente eficaz. Embora tenham recebido inicialmente a ordem de construir vigas mais fortes para seu efeito visual, os engenheiros colocaram sua fé no que mais acreditavam: máximo aproveitamento dos parâmetros de espaço. Como um paraíso ainda intocado pela interferência mortal, a Massa Explosiva funciona em perfeito equilíbrio, desde que sua calibração cuidadosa não seja perturbada. Surpreendentemente resistente a tentativas de engenharia reversa e aprimoramento por militares de potências estrangeiras, o mecanismo tende a sofrer drástica perda de eficiência se alguém ousar ajustar suas propriedades, mesmo de forma minúscula.\n\nA variante Mk2 é a exceção a esta regra, sendo uma criação dos mesmos engenheiros sacerdotes que projetaram o original. É uma atualização tão direta quanto possível, simplesmente oferecendo poder destrutivo significativamente aprimorado e dissipação de calor ligeiramente aprimorada.</t>
+    <t id="1252">O Morteiro Explosivo dispara uma carga compacta de alto explosivo encapsulada por material condrítico superaquecido. Um fusível de proximidade aciona a detonação perto do alvo, com um amplo raio de explosão que compensa a precisão limitada do sistema. A área afetada é suficiente para neutralizar múltiplos elementos de superfície em naves capitais com uma única descarga.\n\nEle é frequentemente visto como mais vantajoso do que o Canhão de Plasma devido à sua maior velocidade de projétil, permitindo o engajamento limitado de alvos menores quando necessário. No entanto, não é uma arma antiaérea e é mais eficazmente empregado contra naves de médio ou grande porte que não conseguem se esquivar facilmente do fogo inimigo.\n\nDesenvolvido antes da proclamação formal da Sagrada Ordem do Pontífice, o Morteiro Explosivo reflete os primeiros esforços Paranid para maximizar a eficácia em combate sob a capacidade industrial limitada. O resultado é uma arma que combina alto poder destrutivo com relativa simplicidade de fabricação.</t>
     <t id="1254">(S Blast Mortar Mk1){20111,5011} {20105,1251} {20111,101}</t>
     <t id="1255">(Blast Mortar){20105,1251}</t>
     <t id="1261">(Burst Ray){20105,1241}</t>
@@ -51536,7 +51582,7 @@
     <t id="1274">(S Blast Mortar Mk2){20111,5011} {20105,1251} {20111,201}</t>
     <t id="1275">(Blast Mortar){20105,1271}</t>
     <t id="1281">Lança de Bóson</t>
-    <t id="1282">A Lança de Bóson Split dispara um único projétil de alta velocidade a médio alcance. Ao contrário de outras armas, a Lança Bóson dispensa o rastreamento automático de alvos e é estática, exigindo que o piloto vire sua nave para mirar. Essa limitação faz com que a Lança Bóson seja mais usada em combates contra naves de tamanho médio ou para destruir os elementos superficiais de naves capitais. Na tentativa de mitigar isso, alguns pilotos que usam regularmente esta arma desenvolveram rituais que acreditam aumentar sua produção de danos.\n\nA Lança do Bóson foi inventada há relativamente pouco tempo, pelos irmãos Split Ko t'Pa e Fyi t'Pa. Com a reconexão do Patriarcado Zyarth com a Comunidade, o Patriarcado adquiriu seu projeto e o refinou para produção em massa.\n\nA característica mais notável da variante Mk2 é que ela dobra a produção de danos.</t>
+    <t id="1282">A Lança de Bóson Split dispara um único projétil de alta velocidade a uma longa distância, com emissão térmica insignificante. Sua principal limitação é o seu dispendioso sistema de recuperação de energia, que exige longos intervalos de recarga e restringe o uso contra conjuntos mais amplos.\n\nComo resultado, a Lança de Bósons é mais comumente empregada como arma secundária. Esquadrões de caças Split, no entanto, frequentemente designam uma única nave equipada exclusivamente com esta arma para interceptação especializada e engajamento inicial.\n\nA Lança de Bósons é um desenvolvimento relativamente recente, originário de pesquisas avançadas em armas Split. Após a reconexão do Patriarcado Zyarth com a Comunidade, o Patriarcado obteve os esquemas originais e adaptou o projeto para fabricação em larga escala.</t>
     <t id="1284">(S Boson Lance Mk1){20111,5011} {20105,1281} {20111,101}</t>
     <t id="1285">(Boson Lance){20105,1281}</t>
     <t id="1291">(Boson Lance){20105,1281}</t>
@@ -51544,7 +51590,7 @@
     <t id="1294">(S Boson Lance Mk2){20111,5011} {20105,1291} {20111,201}</t>
     <t id="1295">(Boson Lance){20105,1291}</t>
     <t id="1301">Acelerador de Tau</t>
-    <t id="1302">O Acelerador Tau combina o poder destrutivo bruto de uma espingarda acoplada a uma nave espacial com a intimidação por meio de disparos rápidos; uma marca registrada da cultura militar Split. Mesmo que seja o resultado de um ramo de pesquisa totalmente diferente, pode ser considerada como a versão especializada da Bateria de Estilhaços Split. Em comparação com esta arma mais prontamente disponível, o Acelerador Tau oferece uma maior produção de energia e uma propagação menor, enquanto seu alcance efetivo e o número e velocidade de seus projéteis são um tanto reduzidos. Para os caçadores de recompensas Split, a profissão em que o uso desta arma continua a ser a mais prevalente, essas desvantagens aparentes são totalmente imateriais. Na verdade, um verdadeiro Split aceitará ansiosamente qualquer desculpa para se aproximar de seu alvo e descarregar suas armas com força total até que elas superaquecem.\n\nA variante Mk2 melhora a velocidade do projétil e a taxa de tiro, enquanto milagrosamente mantém a taxa de acúmulo de calor original .</t>
+    <t id="1302">O Acelerador Tau é uma arma cinética de curto alcance otimizada para combates de alto impacto. Graças ao seu design Split, o Acelerador Tau oferece força destrutiva semelhante à da Bateria de Estilhaços, enquanto sua alta cadência de tiro produz um efeito desmoralizante nos combatentes inimigos.\n\nComparado à Bateria de Estilhaços, o Acelerador Tau oferece maior energia por disparo e uma dispersão de projéteis mais concentrada. Esses ganhos são compensados por uma menor eficiência de dissipação de calor, alcance efetivo mais curto e menor número de projéteis com velocidade reduzida. Como resultado, a arma é mais eficaz a curta distância, onde sua alta cadência de tiro pode rapidamente sobrecarregar alvos expostos antes que os limites térmicos sejam atingidos.\n\nO Acelerador Tau continua sendo de uso comum entre os caçadores de recompensas Split, para quem o combate a curta distância é prática padrão. Nesse contexto operacional, suas limitações térmicas e alcance limitado são considerados compensações aceitáveis em troca de poder de fogo concentrado e neutralização rápida de alvos.</t>
     <t id="1304">(S Tau Accelerator Mk1){20111,5011} {20105,1301} {20111,101}</t>
     <t id="1305">(Tau Accelerator){20105,1301}</t>
     <t id="1311">(Tau Accelerator){20105,1301}</t>
@@ -51552,7 +51598,7 @@
     <t id="1314">(S Tau Accelerator Mk2){20111,5011} {20105,1311} {20111,201}</t>
     <t id="1315">(Tau Accelerator){20105,1311}</t>
     <t id="1321">Metralhadora de Neutron</t>
-    <t id="1322">O Gatling de Neutron Split é uma arma de curto alcance e fogo rápido comparável ao Repetidor de Raios. Semelhante ao Repetidor de Raios, o fluxo constante de projéteis viaja bem devagar e requer mirar na trajetória para atingir alvos em movimento. O Gatling de Neutron é conhecido por sua alta produção de danos, mas a baixa precisão e a propagação perceptível podem tornar o acerto de pequenos alvos à distância bastante desafiador, forçando os pilotos a se aproximarem. Para os Split amantes das batalhas corpo a corpo, isso é considerado parte da caça.\n\nOs Split desenvolveram esta arma, levando em consideração os efeitos psicológicos do piloto e do alvo. Enquanto o piloto se sente fortalecido por ter uma alta taxa de tiro por um período prolongado, o alvo se sente aterrorizado pelo show de luzes e fica sem saber quais projéteis podem acertar ou errar. Apesar de não fazer parte do projeto pretendido, a baixa precisão ajuda os piratas a intimidar suas presas sem danificar visivelmente seu prêmio. É uma arma funcional para combate, mas sem dúvida também uma ferramenta que expressa a cultura guerreira dos Split e espalhar o terror entre seus muitos inimigos.\n\nA variante Mk2 oferece maior produção de dano e uma maior taxa de tiro.</t>
+    <t id="1322">A Metralhadora de Neutrons Split é uma arma de projéteis de curto alcance e disparo rápido, comparável à Metralhadora de Repetição de Raios. Assim como sua contraparte da Comunidade, ela produz um fluxo contínuo de projéteis relativamente lentos, exigindo antecipação ao atingir alvos em manobra. O sistema causa alto dano colateral devido à dispersão dos projéteis, ao custo de precisão limitada e eficácia reduzida contra alvos menores, favorecendo o combate a curta distância.\n\nO projeto da arma enfatiza fogo sustentado e perfis de engajamento agressivos, refletindo a doutrina de combate Split. Seu volume e persistência de fogo podem exercer pressão significativa durante confrontos a curta distância, apesar da precisão de mira limitada. Embora seja principalmente um sistema de combate funcional, a Metralhadora de Neutrons é frequentemente associada a padrões de engajamento que priorizam a dominação psicológica.</t>
     <t id="1324">(S Neutron Gatling Mk1){20111,5011} {20105,1321} {20111,101}</t>
     <t id="1325">(Neutron Gatling){20105,1321}</t>
     <t id="1331">(Neutron Gatling){20105,1321}</t>
@@ -51560,7 +51606,7 @@
     <t id="1334">(S Neutron Gatling Mk2){20111,5011} {20105,1331} {20111,201}</t>
     <t id="1335">(Neutron Gatling){20105,1331}</t>
     <t id="1341">Desintegrador Térmico</t>
-    <t id="1342">O Desintegrador Térmico Split é uma arma de curto alcance que penetra escudos. Depois de transpor os escudos, seus projéteis se fixam no alvo, causando danos com o passar do tempo. A maioria das variantes disponíveis dispara rajadas curtas interrompidas por uma pausa longa, mas a variante Mk2 PP permite fogo quase contínuo com apenas uma pequena pausa entre as recargas. Com apenas uma pequena vantagem de danos contra elementos de superfície protegidos, o Desintegrador Térmico continua sendo uma escolha sólida para uso geral.\n\nOs Split desenvolveram esta arma após experimentar tecnologias de penetração de escudo. Embora a meta passar totalmente pelos escudos não tenha sido alcançada, a adequação resultante para uso geral, junto com o benefício adicional de danos parciais contra escudos, torna-a uma arma amplamente usada.\n\nA variante Mk2 aumenta o dano e a taxa de tiro.</t>
+    <t id="1342">O Desintegrador Térmico Split é uma arma de curto alcance projetada para passar por blindagens. Ao impactar, seus projéteis aderem ao casco do alvo, infligindo danos térmicos contínuos ao longo do tempo. Esse efeito persistente pode interferir na regeneração dos escudos e dos motores de deslocamento.\n\nDesenvolvido por meio da pesquisa Split em tecnologias de penetração de escudos, o sistema não alcançou a destruição completa dos escudos. No entanto, sua capacidade confiável de passar, parcialmente, pelos escudos e sua versatilidade operacional provaram ser suficientes para uma ampla implantação.</t>
     <t id="1344">(S Thermal Disintegrator Mk1){20111,5011} {20105,1341} {20111,101}</t>
     <t id="1345">(Thermal Disintegrator){20105,1341}</t>
     <t id="1351">(Thermal Disintegrator){20105,1341}</t>
@@ -51568,7 +51614,7 @@
     <t id="1354">(S Thermal Disintegrator Mk2){20111,5011} {20105,1351} {20111,201}</t>
     <t id="1355">(Thermal Disintegrator){20105,1351}</t>
     <t id="1361">Fluxo de Méson</t>
-    <t id="1362">O Fluxo de Méson é uma arma incrivelmente poderosa, e correspondentemente cara, que dispara um único feixe transiente que atinge o alvo quase que instantaneamente. Semelhante a outras armas de alta precisão, o Fluxo de Méson não rastreia automaticamente seu alvo e depende da habilidade do piloto para mirar. Em outros aspectos, incluindo seu alcance moderado, ele se comporta de forma mais semelhante a armas de raio, como o Emissor de Feixe. O Fluxo de Méson não requer carregamento e pode, teoricamente, ser disparado sem se soltar o gatilho. No entanto, a capacidade máxima de calor da nave geralmente impede esse tipo de uso. Por causa do consumo extremo de energia e geração de calor da arma, ela só pode ser acoplada a suportes de arma de alta energia.\n\nPor vários motivos, os militares terrestres há muito brincavam com a ideia de um canhão laser de grandes dimensões. Apesar de exigir uma plataforma totalmente nova e especializada, e ter um perfil de energia abismalmente devastador, o potencial de tal arma como dissuasor nunca foi questionado. Além disso, as superarmas mantêm um lugar especial no coração da cultura popular terrestre, quando chegou a hora de desenvolver o primeiro protótipo em pequena escala, houve um grande apoio público para o projeto. Dessa forma, o Fluxo de Méson representou os primeiros passos cautelosos, embora determinados, do Protetorado Terrestre para cumprir uma fantasia longamente acalentada.\n\nEm troca do custo material massivamente elevado, a variante Mk2 consegue aumentar a produção de energia da arma para um nível ainda mais alto.</t>
+    <t id="1362">O Fluxo de Méson é uma arma de feixe de alta potência projetada para engajamentos de alcance extremo. Ele emite um único feixe transitório que atinge o alvo em velocidades relativísticas. Como ocorre com outros sistemas de alta precisão, seu alcance limitado restringe sua eficácia contra alvos próximos ou em movimento rápido. Essa limitação é amplamente mitigada pela configuração óptica da arma, otimizada para foco de longo alcance. Em distâncias abaixo de seu alcance efetivo, a coerência do feixe se degrada rapidamente, resultando em uma redução acentuada na potência destrutiva. Devido à sua demanda de energia e carga térmica excepcionalmente altas, o Fluxo de Méson Stream só pode ser instalado em montagens de armas de alta energia. O sistema se inspira em armas de energia direcionada de grande escala, exploradas inicialmente pela extinta Força-Tarefa AGI Terrestre. Embora tenha exigido o desenvolvimento de uma plataforma totalmente nova e opere com um perfil de energia notavelmente ineficiente, seu valor como dissuasor de longo alcance foi considerado suficiente para justificar essas restrições. O Fluxo de Méson representa o primeiro resultado operacional deste programa, marcando um passo inicial, porém deliberado, do Protetorado Terrestre rumo à implantação de armamentos de energia dirigida superpesados.</t>
     <t id="1364">(S Meson Stream Mk1){20111,5011} {20105,1361} {20111,101}</t>
     <t id="1365">(Meson Stream){20105,1361}</t>
     <t id="1371">(Meson Stream){20105,1361}</t>
@@ -51576,7 +51622,7 @@
     <t id="1374">(S Meson Stream Mk2){20111,5011} {20105,1371} {20111,201}</t>
     <t id="1375">(Meson Stream){20105,1371}</t>
     <t id="1381">Barragem de Próton</t>
-    <t id="1382">A Barragem de Próton Terrestre é uma arma de curto alcance que só pode ser acoplada a suportes para armas de alta energia. É considerada a variante terrestre de alta energia do Repetidor de Raios da Comunidade. Comparado com o Repetidor de Raios, a Barragem de Próton oferece maior produção de dano e velocidade de projétil, mas perde parte de seu alcance. Embora infrinja mais danos no total, a Barragem tem uma taxa de tiro mais baixa e se concentra em lançar projéteis individuais mais poderosos durante suas longas explosões. Suas principais desvantagens são a restrição de compatibilidade, que a limita aos designs de naves terrestres, e o fato de ser duas vezes mais cara quando comparado ao Repetidor de Raios da Comunidade, que é mais fraco. A Barragem de Próton é uma arma generalista que funciona bem contra a maioria dos alvos.\n\nCom a reconexão da Comunidade, o Serviço Secreto Terrestre adquiriu o esquema do Repetidor de Raios, permitindo que engenheiros terrestre desenvolvessem a Barragem de Prótons. Eles o ajustaram para ter compatibilidade com a montagem terrestre de alta energia, aumentando efetivamente seu poder, ao mesmo tempo em que evitam que a Comunidade o use.\n\nA variante Mk2 aumenta a produção de dano, apesar de reduzir a taxa de tiro, tornando os projéteis individuais mais poderosos ainda.</t>
+    <t id="1382">A Barragem de Prótons Terrestre é um sistema de armas de curto alcance compatível exclusivamente com montagens de armas de alta energia. Ela representa a contraparte terrestre de alta energia do Repetidor de Raios da Comunidade. Comparada à sua equivalente da Comunidade, a Barragem de Prótons oferece maior dano e velocidade do projétil, à custa de um alcance efetivo menor. Embora cause um dano geral maior, opera com uma cadência de tiro mais baixa, priorizando projéteis individuais mais potentes durante rajadas prolongadas.\n\nO sistema é restrito a projetos de naves terrestres devido aos requisitos de montagem e possui um custo de aquisição significativamente maior do que o Repetidor de Raios padrão. Apesar dessas limitações, a Barragem de Prótons cumpre uma função de propósito geral e apresenta desempenho eficaz em uma ampla gama de perfis de alvos.\n\nAs origens da Barragem de Prótons Terrestre remontam ao restabelecimento da conexão com a Comunidade, quando o Serviço Secreto Terrestre obteve os esquemas do Repetidor de Raios, permitindo que os engenheiros terrestres refinassem seu projeto e desenvolvessem ajustes para a capacidade de montagem de alta energia. Essas modificações resultaram em maior potência de saída, produzindo um sistema de armas distinto de seu predecessor da Comunidade.</t>
     <t id="1384">(S Proton Barrage Mk1){20111,5011} {20105,1381} {20111,101}</t>
     <t id="1385">(Proton Barrage){20105,1381}</t>
     <t id="1391">(Proton Barrage){20105,1381}</t>
@@ -51584,7 +51630,7 @@
     <t id="1394">(S Proton Barrage Mk2){20111,5011} {20105,1391} {20111,201}</t>
     <t id="1395">(Proton Barrage){20105,1391}</t>
     <t id="1401">Emissor de Kyon</t>
-    <t id="1402">O Emissor de Kyon Kha'ak é relativamente fraco, mas devastadoramente preciso. Em formação de enxame, os Kha'ak podem trazer o Emissor Kyon para serem usados em números que podem os tornam letalmente eficazes.</t>
+    <t id="1402">O Emissor de Kyon Kha'ak oferece potência individual limitada em comparação com as armas de feixe contemporâneas. Sua eficácia depende do uso em massa: quando empregado em formações coordenadas de enxame, múltiplos emissores podem ser utilizados simultaneamente, resultando em um perfil de dano cumulativo capaz de sobrecarregar alvos, apesar do desempenho modesto da arma quando usada isoladamente.</t>
     <t id="1404">(S Kyon Emitter Mk1){20111,5011} {20105,1401} {20111,101}</t>
     <t id="1405">(Kyon Emitter){20105,1401}</t>
     <t id="1411">Projetor de Impulso</t>
@@ -51608,7 +51654,7 @@
     <t id="1454">(S Kinetic Projector Mk2){20111,5011} {20105,1451} {20111,201}</t>
     <t id="1455">(Kinetic Projector){20105,1441}</t>
     <t id="1461">(Pulse Laser){20105,1001}</t>
-    <t id="1462">Embora tenha o mesmo nome que a arma mais amplamente disponível na rede de Portais de Salto, o Laser de Pulso Terreno funciona de forma ligeiramente diferente. Ele dispensa o uso de clipes para rajadas curtas e enfatiza mais a potência dos projéteis individuais. Apesar da faixa efetiva da arma ser reduzida, as partículas microscópicas são aceleradas mais rapidamente e atingem seus alvos muito mais rápido. O calor, portanto, acumula-se mais rapidamente do que em seu homólogo não-terreno, mas devido à extrema eficiência energética do mecanismo subjacente, o superaquecimento continua a ser um evento improvável. Como tal, os pilotos que usam esta versão do Laser de Pulso ainda são recompensados por manter a pressão sobre seus oponentes e permanecer no alvo durante toda a luta.\n\nApós o realinhamento, o protetorado terrestre rapidamente pesquisou as capacidades militares de seus rivais em potencial na nova rede de Portais de Salto e logo adquiriu esquemas para a arma mais difundida da época : o laser de pulso. Percebendo sua versatilidade e bela simplicidade, a bem lubrificada máquina do complexo militar-industrial terrestre fez o que sempre fez de melhor: fez ajustes extensos em tecnologia auspiciosa para dar-lhe uma identidade terrestre distinta e evitar a engenharia reversa. O resultado é que a arma ainda se comporta como um Laser de Pulso na prática, mas tornou-se virtualmente inutilizável por potências estrangeiras.\n\nA variante Mk2 melhora muito a produção de energia da arma e a taxa de fogo, enquanto aumenta apenas minimamente sua taxa de acúmulo de calor.</t>
+    <t id="1462">O Laser de Pulso Terrestre é uma variante da arma padrão baseada em pulsos, amplamente utilizada na rede de Portais de Salto, e incorpora a óptica superior Terrestre. Embora seu alcance efetivo seja menor do que a maioria das implementações da Comunidade, a maior velocidade do projétil e a consequente redução do tempo de voo melhoram a consistência geral dos acertos. Assim como armas de pulso comparáveis, ele prioriza fogo sustentado e rastreamento contínuo do alvo em vez de engajamentos curtos e de alto dano.\n\nApós o Realinhamento dos Portais, o Protetorado Terrestre avaliou os armamentos contemporâneos e adaptou o projeto existente do Laser de Pulso aos padrões de fabricação Terrestres. O sistema resultante preserva os princípios operacionais básicos da arma, incorporando alterações estruturais e ópticas destinadas a restringir a replicação não autorizada. Embora inicialmente considerado inadequado para uso por fornecedores de armas estrangeiros, o projeto foi posteriormente integrado a uma gama diversificada de naves com apenas pequenas concessões.</t>
     <t id="1464">(TER S Pulse Laser Mk1){20105,2001} {20111,101} {20202,703} {20111,5011}</t>
     <t id="1465">(Pulse Laser){20105,2001}</t>
     <t id="1471">(Pulse Laser){20105,1001}</t>
@@ -51621,7 +51667,7 @@
     <t id="1484">(BOR S Phase Gun Mk1){20105,1481} {20111,101} {20111,5011} {20202,203}</t>
     <t id="1485">(Phase Gun){20105,1481}</t>
     <t id="1491">Arma Arca</t>
-    <t id="1492">O armamento Arco Boron é um armamento utilitário desenvolvido não apenas para infligir danos, mas também para prejudicar a mobilidade do alvo. O Arco lança partículas de íons inflamados que causam uma descarga elétrica no impacto. Isso compromete os sistemas da nave e é especialmente eficaz para esgotar os escudos, ao mesmo tempo em que causa danos consideráveis ao casco de alvos não blindados. A variante da torre foi elogiada como útil para naves civis, que não visam destruir quem os ataca, mas querem afastá-los. O armamento Arco foi desenvolvido e liberado para uso em campo pela Defesa Militar Real Boron, mas ainda é considerado como experimental.(Royal Boron Military Defense igual a {20233,1021})</t>
+    <t id="1492">O armamento de Arco Boron é um armamento de classe utilitária projetado não apenas para infligir danos, mas também para prejudicar as capacidades de mira de um alvo. Ele dispara partículas ionizadas que desencadeiam descargas elétricas no impacto. Ao contrário das armas iônicas convencionais, os campos de energia resultantes são calibrados para interromper circuitos de sensores sensíveis, em vez de esgotar os escudos. A variante montada em torre é particularmente valorizada em embarcações civis, que priorizam a evasão em vez do combate direto. Originalmente desenvolvido e autorizado para uso em campo pela Defesa Militar Real de Boron, o armamento de Arco permanece classificado como experimental.</t>
     <t id="1493">Arco</t>
     <t id="1494">(BOR S Arc Gun Mk1){20105,1491} {20111,101} {20111,5011} {20202,203}</t>
     <t id="1495">(Arc Gun){20105,1491}</t>
@@ -51652,7 +51698,7 @@
     <t id="1554">(ARG S Gamma HEPT Mk1){20105,1551} {20111,101} {20202,103} {20111,5011}</t>
     <t id="1555">(Gamma HEPT){20105,1551}</t>
     <t id="1561">Arma Eletromagnética</t>
-    <t id="1562">O uso de armas eletromagnéticas proporcionou à Frota da Terra um poder de fogo quase sem igual para suas naves. Essas armas utilizam geradores de campo eletromagnético poderosos para propelir esferas de plasma em alta velocidade, com resultados devastadores.\n\nA Arma Eletromagnético, embora seja o menor desta família de armamento, ainda possui uma impressionante taxa de fogo, tornando-a uma escolha sólida para naves que esperam se envolver em combates de curta distância.</t>
+    <t id="1562">O Canhão Eletromagnético é um sistema de armas da Frota Terrestre pertencente à família de armamentos eletromagnéticos. Esses sistemas operam gerando campos eletromagnéticos de alta energia para compactar e acelerar pequenas esferas de plasma, resultando em projéteis capazes de contornar parcialmente as defesas de escudo.\n\nSendo a menor implementação dentro dessa família, o Canhão Eletromagnético mantém uma cadência de tiro excepcional, tornando-o adequado para naves destinadas a combates a curta distância.</t>
     <t id="1563">Eletromagnético</t>
     <t id="1564">(TER S Electromagnetic Gun Mk1){20105,1561} {20111,101} {20202,703} {20111,5011}</t>
     <t id="1565">(Electromagnetic Gun){20105,1561}</t>
@@ -51939,7 +51985,7 @@
     <t id="3012">O armeiro Ebmancketvahs considerou a bateria principal da Odysseus como o coroamento de sua carreira. Ele resolveu passar o tempo que fosse necessário em completo silêncio, mudando-se para uma casa de meditação no Santuário da Trindade para fazer um retiro que se estendeu por cinco anos.\n\nAo entregar os planos para o que se tornaria, talvez, a mais poderosa arma no arsenal Paranid, Ebmancketvahs foi festejado pelas autoridades eclesiásticas e existe, até hoje, uma estátua em sua homenagem no Santuário da Trindade.</t>
     <t id="3014">(PAR Odysseus Main Battery){20105,3011} {20202,403}</t>
     <t id="3021">Bateria Principal da Phoenix</t>
-    <t id="3022">Com a destroyer Phoenix pegando as tecnologia Boron e Paranid "emprestadas", não é surpreendente que a bateria principal tenha uma notável semelhança com a do Behemoth Argon.\n\nEmbora alguns afirmem que a tecnologia da arma principal do Behemoth foi roubada e copiada para o Phoenix, todos os que fizeram tais sugestões enfrentaram rapidamente uma intimação em um processo por difamação da Companhia Teladi. Um dos argumentos levantados em oposição a esses processos legais foi a semelhança da salva tripla encontrada na arma do Behemoth. Este recurso foi removido em revisões posteriores da arma Phoenix, com pouco alarde, e quando pressionados, os motivos dados foram o consumo excessivo de energia e o aquecimento insuficiente.\n\nConcluímos que as semelhanças de voleio triplo, recarga e especificações de energia são, sem dúvida, mera coincidência.</t>
+    <t id="3022">Os primeiros lotes de produção da destroyer Phoenix incorporaram sistemas de armas derivados de projetos Argon e Paranid. Embora prática, essa abordagem expôs a Companhia Teladi a prolongadas disputas legais, resultando em menor confiança em acordos de licenciamento externos. A questão foi finalmente resolvida fora dos tribunais, o que levou ao desenvolvimento acelerado de uma bateria principal proprietária derivada da tecnologia do Desintegrador de Múons. Oficialmente, essa nova arma foi anunciada como uma melhoria significativa em relação ao armamento principal do Behemoth; no entanto, avaliações comparativas indicaram desempenho amplamente equivalente. Suas características definidoras são herdadas de sistemas menores baseados em múons, causando dano aprimorado contra sistemas de escudo, ao mesmo tempo que inibem a recarga dos escudos e do motor de viagem. Embora essas propriedades estejam alinhadas com a doutrina de alta mobilidade da Phoenix, elas também foram utilizadas por operadores ilegais.</t>
     <t id="3024">(TEL Phoenix Main Battery){20105,3021} {20202,503}</t>
     <t id="3031">Bateria Principal Rattlesnake</t>
     <t id="3032">"Mova-se rapidamente e danifique as coisas" é mais do que um aforismo Split. É uma estratégia militar e uma filosofia de design; e totalmente aderido no desenvolvimento da Bateria Principal da Rattlesnake.\n\nCom seu alcance relativamente curto, os arquitetos militares claramente pretendiam estar no centro da batalha, em vez de lançar tiros de uma distância. Como tal, isso é recomendado apenas para aqueles com recursos para empregar os melhores pilotos.\n\nUma barragem de Rattlesnake aparecendo no meio de uma batalha certamente é considerada uma visão inspiradora, mas apenas por aqueles que observam de um local a uma distância segura.</t>
@@ -51949,7 +51995,7 @@
     <t id="3051">Bateria Principal Terrestre</t>
     <t id="3052">É grande. É rápida. Faz mal à sua saúde.\n\nA Bateria Principal Terrestre é única porque pode ser instalada em uma variedade de naves, e iniciar seu uso tem o potencial de mudar o curso de uma batalha.\n\nAlguns descrevem essa Barragem de Protons de tiro rápido como uma arma "profundamente" ofensiva, que só deve ser usada em operações que exijam o dano mais extremo.\n\nTentativas periódicas têm sido feitas na intenção de mudar o status da Bateria Principal Terrestre para ilegal. No entanto, as autoridades Terrestres rejeitaram até mesmo diálogos diplomáticos exploratórios que levantam essa possibilidade.</t>
     <t id="3061">Projetor de Raios de Ion</t>
-    <t id="3062">O Projetor de Ion é a bateria principal da Destroyer Ray e orgulho de seu desenvolvedor, a Astrosegurança Eleius. Uma vez carregado, seus três barris se inflamam em rápida sucessão, liberando um feixe ionizado que afeta os sistemas da nave-alvo e prejudica sua mobilidade. Seguindo a doutrina de armamento padrão Boron, o Projetor se mostra mais eficaz em esgotar escudos do que danificar o casco, deixando rapidamente naves de combate Split mal protegidas, em particular, totalmente desprotegidas. Assim como seu portador, a Destroyer Ray, esta arma projeta poderio militar e garante aos Boron seu lugar entre as grandes potências da Comunidade.(Eleius Astrosecurity same as {20233,1041})(Ray same as ship name, {20101,50201})</t>
+    <t id="3062">O Projetor de Íons da Ray serve como armamento principal do destroyer Ray e representa o principal desenvolvimento da Astrosegurança Eleius. Após um curto ciclo de carregamento, seus três emissores disparam em rápida sequência, formando um feixe ionizado contínuo. No impacto, a descarga interrompe os sistemas de mira a bordo e degrada o desempenho de manobra, reduzindo a capacidade do alvo de responder efetivamente sob fogo.\n\nDe acordo com a doutrina padrão de armas defensivas Boron, o Projetor de Íons da Ray prioriza a depleção do escudo de energia em vez de danos ao casco, permitindo que ele remova rapidamente a proteção primária de naves com blindagem deficiente.(Eleius Astrosecurity same as {20233,1041})(Ray same as ship name, {20101,50201})</t>
     <t id="3064">(BOR Ray Ion Projector){20105,3061} {20202,203}</t>
     <t id="3071">Bateria Principal Obliterator</t>
     <t id="3072">A Bateria Principal Obliterator(Obliterator Main Battery same as {20105,3071}) representa um testemunho imponente das avassaladoras capacidades destrutivas que os Kha'ak podem desencadear. Esta temível arma de feixe de partículas representa o ápice dos armamentos anti-nave capital, capaz de desencadear uma devastação cataclísmica sobre qualquer um que ouse desafiar a supremacia Kha'ak.\n\nQuando lançada contra naves capitais, seu feixe abrasador atravessa escudos e armaduras com eficiência implacável, facilmente destroçando até mesmo as mais poderosas naves. No entanto, é a aterradora função secundária da arma que desperta o medo nos corações de todos que testemunham sua fúria destruidora. Quando levada ao limite através da sobrecarga, a Bateria Principal Obliterator se transforma em um destruidor de planetas, uma arma do juízo final de devastação incomparável.</t>
@@ -51961,7 +52007,7 @@
     <t id="3092">Apesar dos melhores esforços do designer, nenhuma arma primária poderia ser instalada na Sapporo sem uma grande reformulação dos sistemas fundamentais, devido ao espaço limitado disponível. Para compensar isso, no entanto, muitos tubos de lançamento de mísseis foram inseridos, fornecendo uma grande matriz de ordenanças que de outra forma teriam sido impossíveis.\n\nEmbora um pouco heterodoxo como armamento principal, o conjunto de mísseis da Sapporo ainda fornece uma barragem poderosa, capaz de enfrentar muitas naves de tamanho M e G. Sua alta taxa de dano é apenas marginalmente diminuída pelo espaço limitado disponível para a tripulação recarregar manualmente os tubos de lançamento.</t>
     <t id="3094">(TER Sapporo Launcher Array){20105,3091} {20202,703}</t>
     <t id="3101">Bateria Principal da Hyperion</t>
-    <t id="3102">Exclusivamente para Hyperion, este conjunto de armas apresenta emissores capazes de atingir diversas categorias de alvos. É particularmente excelente na neutralização de naves de médio porte e elementos de superfície de combatentes maiores, tornando-se um recurso essencial para cobrir retiradas táticas. Com sua mira de alta precisão e taxa de disparo sustentada, ele fornece um poder de fogo que se aproxima do de naves da classe contratorpedeiro em alcances efetivos mais curtos, colocando-a em uma categoria de desempenho semelhante ao da Odyssey Paranid.</t>
+    <t id="3102">Exclusivo para a Hyperion, este conjunto de armas primárias integra múltiplas unidades emissoras para atingir uma ampla gama de alvos. É otimizado para engajar embarcações da classe corveta e elementos de superfície expostos em naves maiores, proporcionando cobertura de fogo consistente durante manobras de retirada tática. A alta precisão de mira, combinada com uma cadência de tiro sustentada, permite que o sistema cause danos comparáveis aos de baterias de destroyers em alcances efetivos mais curtos.</t>
     <t id="3104">(PAR Hyperion Main Battery){20105,3101} {20202,403}</t>
     <t id="4000">(*Medium Turrets*)</t>
     <t id="4001">Torre de Pulso</t>
@@ -52005,7 +52051,7 @@
     <t id="4074">(XEN M Shard Turret Mk1){20105,4071} {20111,101} {20202,603} {20111,5021}</t>
     <t id="4075">(Shard Mk1){20105,4073} {20111, 101}</t>
     <t id="4081">Torre de Raio</t>
-    <t id="4082">Considerada uma arma de apoio, alguns capitães treinam exclusivamente com a Torre de Raio em alvos de tamanho médio devido à sua velocidade de rotação relativamente baixa. Táticas mais avançadas incluem seu uso para suprimir a recarga de escudos e inibir a ativação do motor de viagem.</t>
+    <t id="4082">A Torre de Raios é um sistema de armas defensivas de baixo custo, comumente usado para deter alvos hostis da classe de caças. Alguns operadores empregam o sistema exclusivamente para funções de defesa antimíssil, onde seu poder de fogo contínuo proporciona proteção pontual confiável.</t>
     <t id="4083">Raio</t>
     <t id="4084">(ARG M Bolt Turret Mk1){20105,4081} {20111,101} {20202,103} {20111,5021}</t>
     <t id="4085">(Bolt Mk1){20105,4083} {20111,101}</t>
@@ -52045,7 +52091,7 @@
     <t id="4154">(XEN M Plasma Turret Mk1){20105,4151} {20111,101} {20202,603} {20111,5021}</t>
     <t id="4155">(Plasma Mk1){20105,4153} {20111,101}</t>
     <t id="4161">Torre de Feixe</t>
-    <t id="4162">Considerada uma opção de nível básico, a Torre de Feixe é geralmente preferida por capitães com restrições orçamentárias. Dito isto, a arma possui um alto nível de precisão, embora com limites para a quantidade de dano que pode infligir.</t>
+    <t id="4162">A Torre de Feixe é um sistema de armas defensivas de nível básico, geralmente escolhido pelos operadores devido ao seu baixo custo de aquisição. Seu amplo alcance efetivo e alta precisão de mira a tornam particularmente adequada para missões de defesa antimíssil. Embora a arma seja eficaz contra alvos blindados, seu poder de dano diminui à medida que os escudos são esgotados, limitando sua eficácia contra estruturas de casco expostas.</t>
     <t id="4163">Feixe</t>
     <t id="4164">(ARG M Beam Turret Mk1){20105,4161} {20111,101} {20202,103} {20111,5021}</t>
     <t id="4165">(Beam Mk1){20105,4163} {20111,101}</t>
@@ -52174,7 +52220,7 @@
     <t id="4423">(Flak){20105,4403}</t>
     <t id="4424">(SPL M Flak Turret Mk1){20202,303} {20111,5021} {20105,4421} {20111,101}</t>
     <t id="4425">(Flak Mk1){20105,4423} {20111,101}</t>
-    <t id="4426">{20105,4402}\n\nOs Split não conseguiram igualar a precisão do modelo Argon, no entanto, sua variação possui uma capacidade de munições melhor.</t>
+    <t id="4426">A Torre Antiaérea é um sistema de armas para combate a curta distância otimizado para atingir alvos de classe caça. Seu amplo raio de explosão reduz a necessidade de rastreamento em distâncias de engajamento curtas. Desenvolvida a partir de tecnologia da Frota Argon, o sistema não possui a mesma precisão de mira do projeto original, mas compensa com uma maior capacidade de munição. Apesar dessas diferenças, a torre mantém a mesma função operacional e alcance de eficácia.</t>
     <t id="4481">Torre de Bóson</t>
     <t id="4482">{20006,102}(No information available)</t>
     <t id="4483">Bóson</t>
@@ -52458,7 +52504,7 @@
     <t id="5314">(XEN L Positron Turret Mk1){20202,603} {20111,5031} {20105,5311} {20111,101}</t>
     <t id="5315">(Positron Mk1){20105,5313} {20111,101}</t>
     <t id="5321">(Graviton Turret){20105,4831}</t>
-    <t id="5322">A Torre Graviton Xenon é uma das armas de torre mais eficazes conhecidas. Apesar de não ter alcance, ele causa dano massivo usando um projétil de alta velocidade.\n\nOs armeiros Terrestres não admitem que essa tecnologia influenciou a engenharia de seus próprios armamentos.</t>
+    <t id="5322">A Torre de Gravitons Xenon está entre as armas de torre mais eficazes disponíveis para atingir alvos de classe capital. Ela opera com base em um princípio de energia exótico, priorizando o poder destrutivo em detrimento da precisão.\n\nOs fabricantes de armas terrestres se recusaram a comentar se a análise da tecnologia de grávitons Xenon influenciou o desenvolvimento de seus próprios sistemas de armas pesadas.</t>
     <t id="5323">(Graviton){20105,4833}</t>
     <t id="5324">(XEN L Graviton Turret Mk1){20202,603} {20111,5031} {20105,5321} {20111,101}</t>
     <t id="5325">(Graviton Mk1){20105,5323} {20111,101}</t>
@@ -52468,7 +52514,7 @@
     <t id="5334">(TER L Pulse Turret Mk1){20202,703} {20111,5031} {20105,5331} {20111,101}</t>
     <t id="5335">(Pulse Mk1){20105,4323} {20111,101}</t>
     <t id="5341">(Bolt Turret){20105,4081}</t>
-    <t id="5342">{20105,4082}\n\nOs engenheiros Terrestres conseguiram desenvolver a Torre de Raio Grande, com várias atualizações aumentando as opções táticas efetivas dos comandantes para este sistema de armas. No formato maior, pode ser considerada uma arma de apoio eficaz em confrontos com naves capitais.</t>
+    <t id="5342">A Torre de Barragem de Prótons é normalmente empregada como arma de apoio em combates entre naves capitais, fornecendo fogo suplementar contra alvos selecionados. Devido à sua velocidade de rotação relativamente limitada, os operadores frequentemente designam o sistema para naves de médio porte, onde os requisitos de rastreamento são menos exigentes. Em operações de combate coordenadas, a torre também é usada para suprimir a regeneração de escudos e inibir a ativação de motores de deslocamento.</t>
     <t id="5343">(Bolt){20105,4083}</t>
     <t id="5344">(TER L Bolt Turret Mk1){20202,703} {20111,5031} {20105,5341} {20111,101}</t>
     <t id="5345">(Bolt Mk1){20105,4343} {20111,101}</t>
@@ -52512,8 +52558,8 @@
     <t id="5423">(Kinetic){20105,4793}</t>
     <t id="5424">(TER L Kinetic Turret Mk1){20202,703} {20111,5031} {20105,5421} {20111,101}</t>
     <t id="5425">(Kinetic Mk1){20105,4793} {20111,101}</t>
-    <t id="5431">Lançador de Rede de Ion</t>
-    <t id="5432">O Lançador de Redes de Ion é um armamento utilitário desenvolvido pela Defesa Militar Real Boron, uma organização de pesquisa do governo conhecida por sua engenharia experimental. O Lançador de Redes dispara uma rajada de projéteis rápidos, que, independentemente do contato com o inimigo, explodem perto de sua posição alvo predeterminada. Cada explosão lança uma ampla rede, prejudicando a mobilidade das naves capturados. Embora as redes possam ser úteis para comprometer simultaneamente vários agressores, elas são menos úteis durante combates tumultuados, pois naves aliadas em contato próximo com as hostis podem ser prejudicadas junto com seus inimigos. Isso dificulta uma aplicação militar dentro de algumas composições de frota, e naves civis operando em sistemas remotos carecem da interface necessária para colocar em campo uma torre tão grande.(Royal Boron Military Defence same as {20233,1021})</t>
+    <t id="5431">Canhão Elétrico de Íons Cinéticos</t>
+    <t id="5432">O Canhão Elétrico de Íons Cinéticos é uma arma utilitária desenvolvida pela Royal Boron Military Defence, uma organização governamental de pesquisa com foco em engenharia experimental. Ele dispara projéteis explosivos de alta velocidade capazes de danificar múltiplos elementos de superfície simultaneamente. Além disso, a descarga iônica associada desativa os sensores e a mobilidade do alvo, incluindo os de naves de grande porte. (Royal Boron Military Defence igual a {20233,1021})</t>
     <t id="5433">Rede de Ion</t>
     <t id="5434">(BOR L Ion Net Launcher Mk1){20105,5431} {20111,101} {20111,5031} {20202,203}</t>
     <t id="5435">(Ion Net Launcher){20105,5431}</t>
@@ -61658,7 +61704,7 @@
     <t id="4901">Experimental Jump Drive</t>
     <t id="4902">Based on technology more widely available before the Jump Gate shutdown, this Jump Drive can be fitted into a small ship and be used to immediately travel to any Jump Gate or jump beacon known to the ship computer to which the Drive interfaces. The specific design of this Drive means it does not require fuel for a jump, but afterwards must be allowed to cool down before further use. However, with access to Jump Drive Coolant(see translation for 20201,16001), the cooldown process is much quicker, and the Drive can then be used immediately.</t>
     <t id="5001">Canhão Elétrico Mk1</t>
-    <t id="5002">Projetado para liberar sua bala em alta velocidade para causar danos significativos e quase imediatos ao seu alvo, esta implementação específica de um canhão elétrico também é equipada com um zoom automático que permite focar em alvos distantes quando o gatilho é puxado. Carregar a arma permitirá ao usuário especificar o nível de dano causado, e somente soltar o gatilho irá realmente disparar a bala. Isso torna o Railgun uma arma de atirador muito eficaz.</t>
+    <t id="5002">Projetado para liberar sua bala em alta velocidade para causar danos significativos e quase imediatos ao seu alvo, esta implementação específica de um canhão elétrico também é equipada com um zoom automático que permite focar em alvos distantes quando o gatilho é puxado. Carregar a arma permitirá ao usuário especificar o nível de dano causado, e somente soltar o gatilho irá realmente disparar a bala. Isso torna o Canhão Elétrico uma arma de atirador muito eficaz.</t>
     <t id="5101">Economy Analytics Software Mk1</t>
     <t id="5102">Focused on statistical analysis, this software uses trade offers collated in the ship computer to create detailed live graphs of supply and demand over the area known to the user, as well as collating and processing data on station storage, offer amounts and offer prices. This is designed to give the user a deeper understanding of the economy and greatly improve their trading and business decisions.</t>
   </page>

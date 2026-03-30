@@ -312,9 +312,9 @@
         <resourcearea amount="5" ref="sphere_large_ice_low"/>
         <resourcearea amount="6" ref="sphere_medium_ice_high"/>
         <resourcearea amount="8" ref="sphere_small_ice_high"/>
-        <resourcearea amount="1" ref="sphere_large_nividium_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="10" ref="sphere_small_nividium_high"/>
+        <resourcearea amount="1" ref="sphere_large_nividium_verylow"/>
+        <resourcearea amount="2" ref="sphere_medium_nividium_low"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="4" ref="sphere_large_ore_medium"/>
         <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
         <resourcearea amount="10" ref="sphere_small_ore_high"/>
@@ -397,7 +397,7 @@
         <resourcearea amount="5" ref="sphere_large_hydrogen_medium"/>
         <resourcearea amount="6" ref="sphere_medium_hydrogen_veryhigh"/>
         <resourcearea amount="1" ref="sphere_medium_nividium_verylow"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_high"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="2" ref="sphere_large_ore_medium"/>
         <resourcearea amount="7" ref="sphere_medium_ore_veryhigh"/>
         <resourcearea amount="3" ref="sphere_large_silicon_medium"/>

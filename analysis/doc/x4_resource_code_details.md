@@ -1,8 +1,22 @@
 # X4 资源运行时代码细节锚点
 
-本文只保留便于回到 Ghidra 复核的逆向锚点：函数地址、虚表槽位、关键偏移、属性 id、字符串/逻辑节点名。  
-逻辑结论见 [x4_resource_logic_conclusions.md](/home/slepher/project/x4-station-calculator/analysis/doc/x4_resource_logic_conclusions.md)。  
+本文只保留便于回到 Ghidra 复核的逆向锚点：函数地址、虚表槽位、关键偏移、属性 id、字符串/逻辑节点名。
+逻辑结论见 [x4_resource_logic_conclusions.md](/home/slepher/project/x4-station-calculator/analysis/doc/x4_resource_logic_conclusions.md)。
 旧文档 [x4_resource_runtime_reverse_chain.md](/home/slepher/project/x4-station-calculator/analysis/doc/x4_resource_runtime_reverse_chain.md) 保留不动，作为回测对照。
+
+## Debris Field 实现状态 (2024-03)
+
+**测试案例：** `Cluster_21_Sector001_macro` / `p1_wreckfield_xenon_teladi_battle_200km` / `rawscrap`
+
+**已验证：**
+- 权重计算公式正确，与存档误差 <0.01%
+- `resourcedensity` 必须按 ware 过滤，不能取 `resources[0]`
+- DebrisField 使用与 AsteroidField 相同的初始化函数 `FUN_140e842e0`
+
+**待调查：**
+- Tile 枚举策略差异：实现计算 39 tiles，存档仅 12 tiles
+- 存档中所有 tile 都在 y=0，但实现包含 y=-64000 的 tile
+- 可能的 C++ 枚举优化或额外过滤条件
 
 ## 1. 关键函数与职责
 
@@ -448,6 +462,51 @@ poly
 return ((sign - sign / poly^4) + 1) * 0.5
 ```
 
+## 9. Area Contribution：`FUN_140e84c30`
+
+- 函数：
+  - `FUN_140e84c30`
+- 作用：
+  - 计算 solid field 单个 64k area 的资源贡献值
+
+### 核心公式
+
+```text
+result = resourcepercentage * MultiplierB * noise * MultiplierA * falloff * clamp_factor
+```
+
+### `clamp_factor` 计算
+
+```text
+volume_sum = FUN_14093c2c0(field + 0x2b0)  // 体积累计（单位：km³）
+clamp_factor = min(volume_sum * 1e-9, 262144)
+```
+
+C++ 常量：
+- `DAT_142d7fb4c = 9.999999717180685e-10`（缩放因子）
+- `DAT_14329cc48 = 262144.0`（上限）
+
+### 体积累计 `FUN_14093c2c0`
+
+```text
+volume_sum = sum(asteroid.volume for asteroid in field.asteroids)
+```
+
+每个 asteroid 的 volume 通过虚槽 `+0x78` 获取。
+
+### 验证结果
+
+对 `p1_40km_ice_field` 的 replay 测试：
+
+| Tile | Save | Computed | Error |
+|------|------|----------|-------|
+| (128000, 0, 0) | 51021 | 51029 | +0.02% |
+| (128000, 0, 64000) | 47700 | 47705 | +0.01% |
+| (192000, 0, 0) | 51021 | 51029 | +0.02% |
+| (192000, 0, 64000) | 38442 | 38446 | +0.01% |
+
+结论：area contribution 公式已正确实现。
+
 所以快路径下：
 
 ```text
@@ -557,6 +616,51 @@ MultiplierA * MultiplierB * gate * (F(maxnoisevalue) - F(minnoisevalue))
     - `+0x10 -> 0x14093c620`
   - `COL(offset=0)`: `0x142dc1d00`
   - 当前还没有拿到指向其 `vfptr` 的直接 xref，不能继续把主表槽位写死。
+
+### `SplineTubeBoundary +0x38` 槽位语义修正
+
+**重要修正：** `FUN_14093eb60` 不是枚举函数，而是点包含检查函数。
+
+调用链：
+
+```text
+FUN_14070f330 (六边形网格枚举主函数)
+  -> FUN_14093b8b0 (遍历子边界列表)
+    -> FUN_14093eb60 (SplineTubeBoundary +0x38 槽位: 点包含检查)
+```
+
+#### `FUN_14070f330`：六边形网格枚举
+
+- 使用六边形网格公式：
+  - `X = col * 1.5 * size`
+  - `Z = row * size * sqrt(3) + (col % 2) * size * sqrt(3)/2`
+- 常量：
+  - `DAT_142d80234 = 1.5`
+  - `DAT_142d80300 = 1.7320508` (sqrt(3))
+  - `DAT_142d80044 = 0.8660254` (sqrt(3)/2)
+- 对每个网格点调用 `FUN_14093b8b0` 检查是否在边界内
+
+#### `FUN_14093b8b0`：边界列表遍历
+
+- 输入：边界列表、变换矩阵、网格坐标 (col, row)
+- 遍历子边界数组，调用每个边界的 `+0x38` 槽位
+- 返回：是否存在任一边界包含该点
+
+#### `FUN_14093eb60`：SplineTube 点包含检查
+
+- 输入：变换矩阵 (param_2)、网格坐标 (col, row)、尺寸
+- 处理流程：
+  1. 六边形网格坐标转世界坐标
+  2. 世界坐标转局部坐标（使用变换矩阵）
+  3. 查询样条线最近点
+  4. 计算 2D 距离（仅 XZ）
+  5. 判断是否在 tube 半径内
+- 返回：`bool`
+
+**注意：** 存档数据显示为方形网格（64k 间距），与 C++ 六边形网格不同。这表明可能存在：
+1. 不同的代码路径处理存档生成
+2. 六边形网格到方形网格的映射
+3. 或者枚举逻辑在更高层被覆盖
 
 注意：
 

@@ -1160,7 +1160,7 @@
     },
     "travel": {
       "charge": 18.0,
-      "thrust": 30.53,
+      "thrust": 27.48,
       "attack": 91.0,
       "release": 22.5
     }
@@ -1209,7 +1209,7 @@
     },
     "travel": {
       "charge": 16.0,
-      "thrust": 42.4,
+      "thrust": 38.16,
       "attack": 82.0,
       "release": 37.5
     }
@@ -1559,7 +1559,7 @@
     },
     "travel": {
       "charge": 0.0,
-      "thrust": 41.8,
+      "thrust": 37.62,
       "attack": 95.5,
       "release": 1.25
     }
@@ -2835,7 +2835,7 @@
     },
     "travel": {
       "charge": 14.0,
-      "thrust": 30.6,
+      "thrust": 27.54,
       "attack": 72.0,
       "release": 22.5
     }
@@ -2879,7 +2879,7 @@
     },
     "travel": {
       "charge": 12.0,
-      "thrust": 45.2,
+      "thrust": 40.68,
       "attack": 67.0,
       "release": 37.5
     }
@@ -3929,7 +3929,7 @@
     },
     "travel": {
       "charge": 15.0,
-      "thrust": 16.77,
+      "thrust": 15.44,
       "attack": 72.8,
       "release": 22.5
     }
@@ -3973,7 +3973,7 @@
     },
     "travel": {
       "charge": 15.0,
-      "thrust": 23.29,
+      "thrust": 21.45,
       "attack": 69.2,
       "release": 37.5
     }
@@ -5054,7 +5054,7 @@
     },
     "travel": {
       "charge": 9.0,
-      "thrust": 28.6,
+      "thrust": 25.74,
       "attack": 57.0,
       "release": 18.0
     }
@@ -5098,7 +5098,7 @@
     },
     "travel": {
       "charge": 8.0,
-      "thrust": 37.5,
+      "thrust": 33.75,
       "attack": 49.0,
       "release": 30.0
     }
@@ -5144,7 +5144,7 @@
     "travel": {
       "charge": 5.0,
       "thrust": 28.0,
-      "attack": 44.0,
+      "attack": 42.0,
       "release": 1.5
     }
   },
@@ -5239,9 +5239,9 @@
       "acceleration": 1.44
     },
     "travel": {
-      "charge": 3.5,
+      "charge": 3.0,
       "thrust": 38.0,
-      "attack": 39.6,
+      "attack": 37.6,
       "release": 2.5
     }
   },
@@ -6194,8 +6194,8 @@
     },
     "travel": {
       "charge": 5.0,
-      "thrust": 28.0,
-      "attack": 44.0,
+      "thrust": 26.6,
+      "attack": 42.0,
       "release": 1.5
     }
   },
@@ -6238,9 +6238,9 @@
       "acceleration": 1.44
     },
     "travel": {
-      "charge": 3.5,
-      "thrust": 38.0,
-      "attack": 39.6,
+      "charge": 3.0,
+      "thrust": 36.0,
+      "attack": 37.6,
       "release": 2.5
     }
   },
@@ -6465,10 +6465,10 @@
       "duration": 18.0,
       "recharge": 150.0,
       "thrust": 6.0,
-      "acceleration": 8.0
+      "acceleration": 7.0
     },
     "travel": {
-      "charge": 0.0,
+      "charge": 1.0,
       "thrust": 8.0,
       "attack": 20.0,
       "release": 10.0
@@ -6753,8 +6753,8 @@
     },
     "recharge": {
       "max": 5750.0,
-      "rate": 80.0,
-      "delay": 16.0
+      "rate": 78.0,
+      "delay": 14.0
     }
   },
   {
@@ -6792,8 +6792,8 @@
     },
     "recharge": {
       "max": 7475.0,
-      "rate": 112.0,
-      "delay": 16.0
+      "rate": 109.0,
+      "delay": 14.0
     }
   },
   {
@@ -6830,8 +6830,8 @@
     },
     "recharge": {
       "max": 5750.0,
-      "rate": 80.0,
-      "delay": 16.0
+      "rate": 78.0,
+      "delay": 14.0
     }
   },
   {
@@ -6869,8 +6869,8 @@
     },
     "recharge": {
       "max": 7475.0,
-      "rate": 112.0,
-      "delay": 16.0
+      "rate": 109.0,
+      "delay": 14.0
     }
   },
   {
@@ -7050,8 +7050,8 @@
     },
     "recharge": {
       "max": 148900.0,
-      "rate": 510.0,
-      "delay": 18.0
+      "rate": 550.0,
+      "delay": 17.0
     }
   },
   {
@@ -7183,8 +7183,8 @@
     },
     "recharge": {
       "max": 5250.0,
-      "rate": 80.0,
-      "delay": 11.2
+      "rate": 74.0,
+      "delay": 9.8
     }
   },
   {
@@ -7217,8 +7217,8 @@
     },
     "recharge": {
       "max": 6825.0,
-      "rate": 112.0,
-      "delay": 11.2
+      "rate": 102.0,
+      "delay": 9.8
     }
   },
   {
@@ -7251,8 +7251,8 @@
     },
     "recharge": {
       "max": 8400.0,
-      "rate": 160.0,
-      "delay": 11.2
+      "rate": 156.0,
+      "delay": 9.8
     }
   },
   {
@@ -7285,8 +7285,8 @@
     },
     "recharge": {
       "max": 5250.0,
-      "rate": 80.0,
-      "delay": 11.2
+      "rate": 74.0,
+      "delay": 9.8
     }
   },
   {
@@ -7319,8 +7319,8 @@
     },
     "recharge": {
       "max": 6825.0,
-      "rate": 112.0,
-      "delay": 11.2
+      "rate": 102.0,
+      "delay": 9.8
     }
   },
   {
@@ -7353,8 +7353,8 @@
     },
     "recharge": {
       "max": 8400.0,
-      "rate": 160.0,
-      "delay": 11.2
+      "rate": 156.0,
+      "delay": 9.8
     }
   },
   {
@@ -7484,8 +7484,8 @@
     },
     "recharge": {
       "max": 135955.0,
-      "rate": 536.0,
-      "delay": 12.6
+      "rate": 534.0,
+      "delay": 12.0
     }
   },
   {
@@ -7516,9 +7516,9 @@
       }
     },
     "recharge": {
-      "max": 162684.0,
-      "rate": 689.0,
-      "delay": 12.6
+      "max": 160427.0,
+      "rate": 715.0,
+      "delay": 12.0
     }
   },
   {
@@ -7559,7 +7559,7 @@
     "recharge": {
       "max": 8600.0,
       "rate": 102.0,
-      "delay": 16.0
+      "delay": 14.0
     }
   },
   {
@@ -7687,9 +7687,9 @@
     "size": "medium",
     "cost": {},
     "recharge": {
-      "max": 4632.0,
-      "rate": 25.0,
-      "delay": 0.57
+      "max": 4800.0,
+      "rate": 52.0,
+      "delay": 2.0
     }
   },
   {
@@ -7716,9 +7716,9 @@
     "size": "medium",
     "cost": {},
     "recharge": {
-      "max": 4632.0,
-      "rate": 25.0,
-      "delay": 0.57
+      "max": 4800.0,
+      "rate": 52.0,
+      "delay": 2.0
     }
   },
   {
@@ -7744,9 +7744,9 @@
     "size": "medium",
     "cost": {},
     "recharge": {
-      "max": 4500.0,
-      "rate": 25.0,
-      "delay": 0.6
+      "max": 4800.0,
+      "rate": 52.0,
+      "delay": 2.0
     }
   },
   {
@@ -7773,8 +7773,8 @@
     "cost": {},
     "recharge": {
       "max": 745.0,
-      "rate": 50.0,
-      "delay": 6.0
+      "rate": 40.0,
+      "delay": 2.0
     }
   },
   {
@@ -7835,7 +7835,7 @@
     "recharge": {
       "max": 38400.0,
       "rate": 365.0,
-      "delay": 9.0
+      "delay": 8.5
     }
   },
   {
@@ -7868,7 +7868,7 @@
     "recharge": {
       "max": 46080.0,
       "rate": 530.0,
-      "delay": 9.0
+      "delay": 8.5
     }
   },
   {
@@ -7901,8 +7901,8 @@
     },
     "recharge": {
       "max": 4000.0,
-      "rate": 104.0,
-      "delay": 11.7
+      "rate": 101.0,
+      "delay": 10.26
     }
   },
   {
@@ -7935,8 +7935,8 @@
     },
     "recharge": {
       "max": 5200.0,
-      "rate": 156.0,
-      "delay": 11.7
+      "rate": 152.0,
+      "delay": 10.26
     }
   },
   {
@@ -7969,8 +7969,8 @@
     },
     "recharge": {
       "max": 4000.0,
-      "rate": 104.0,
-      "delay": 11.7
+      "rate": 101.0,
+      "delay": 10.26
     }
   },
   {
@@ -8003,8 +8003,8 @@
     },
     "recharge": {
       "max": 5200.0,
-      "rate": 156.0,
-      "delay": 11.7
+      "rate": 152.0,
+      "delay": 10.26
     }
   },
   {
@@ -8167,8 +8167,8 @@
     },
     "recharge": {
       "max": 103585.0,
-      "rate": 663.0,
-      "delay": 11.5
+      "rate": 715.0,
+      "delay": 9.8
     }
   },
   {
@@ -8301,7 +8301,7 @@
     "recharge": {
       "max": 3700.0,
       "rate": 52.0,
-      "delay": 4.0
+      "delay": 3.5
     }
   },
   {
@@ -8334,8 +8334,8 @@
     },
     "recharge": {
       "max": 4810.0,
-      "rate": 73.0,
-      "delay": 4.0
+      "rate": 74.0,
+      "delay": 3.5
     }
   },
   {
@@ -8369,7 +8369,7 @@
     "recharge": {
       "max": 3700.0,
       "rate": 52.0,
-      "delay": 4.0
+      "delay": 3.5
     }
   },
   {
@@ -8402,8 +8402,8 @@
     },
     "recharge": {
       "max": 4810.0,
-      "rate": 73.0,
-      "delay": 4.0
+      "rate": 74.0,
+      "delay": 3.5
     }
   },
   {
@@ -8532,9 +8532,9 @@
       }
     },
     "recharge": {
-      "max": 98690.0,
-      "rate": 332.0,
-      "delay": 5.0
+      "max": 100800.0,
+      "rate": 390.0,
+      "delay": 3.8
     }
   },
   {
@@ -8637,8 +8637,8 @@
     },
     "recharge": {
       "max": 6500.0,
-      "rate": 64.0,
-      "delay": 17.6
+      "rate": 62.0,
+      "delay": 15.4
     }
   },
   {
@@ -8676,8 +8676,8 @@
     },
     "recharge": {
       "max": 8775.0,
-      "rate": 80.0,
-      "delay": 17.6
+      "rate": 78.0,
+      "delay": 15.4
     }
   },
   {
@@ -8714,8 +8714,8 @@
     },
     "recharge": {
       "max": 6500.0,
-      "rate": 64.0,
-      "delay": 17.6
+      "rate": 62.0,
+      "delay": 15.4
     }
   },
   {
@@ -8753,8 +8753,8 @@
     },
     "recharge": {
       "max": 8775.0,
-      "rate": 80.0,
-      "delay": 17.6
+      "rate": 74.0,
+      "delay": 15.4
     }
   },
   {
@@ -8917,8 +8917,8 @@
     },
     "recharge": {
       "max": 176742.0,
-      "rate": 408.0,
-      "delay": 20.0
+      "rate": 426.0,
+      "delay": 19.5
     }
   },
   {
@@ -9059,8 +9059,8 @@
     },
     "recharge": {
       "max": 57600.0,
-      "rate": 292.0,
-      "delay": 20.0
+      "rate": 162.0,
+      "delay": 7.0
     }
   },
   {
@@ -9139,8 +9139,8 @@
     },
     "recharge": {
       "max": 86400.0,
-      "rate": 616.0,
-      "delay": 20.0
+      "rate": 324.0,
+      "delay": 7.0
     }
   },
   {
@@ -9174,8 +9174,8 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 96.0,
-      "delay": 20.0
+      "rate": 90.0,
+      "delay": 18.0
     }
   },
   {
@@ -9209,8 +9209,8 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 134.0,
-      "delay": 20.0
+      "rate": 124.0,
+      "delay": 18.0
     }
   },
   {
@@ -9244,8 +9244,8 @@
     },
     "recharge": {
       "max": 9600.0,
-      "rate": 154.0,
-      "delay": 20.0
+      "rate": 150.0,
+      "delay": 18.0
     }
   },
   {
@@ -9279,8 +9279,8 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 96.0,
-      "delay": 20.0
+      "rate": 90.0,
+      "delay": 18.0
     }
   },
   {
@@ -9314,8 +9314,8 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 134.0,
-      "delay": 20.0
+      "rate": 124.0,
+      "delay": 18.0
     }
   },
   {
@@ -9349,8 +9349,8 @@
     },
     "recharge": {
       "max": 9600.0,
-      "rate": 154.0,
-      "delay": 20.0
+      "rate": 150.0,
+      "delay": 18.0
     }
   },
   {
@@ -9390,8 +9390,8 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 96.0,
-      "delay": 20.0
+      "rate": 90.0,
+      "delay": 18.0
     }
   },
   {
@@ -9431,8 +9431,8 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 134.0,
-      "delay": 20.0
+      "rate": 124.0,
+      "delay": 18.0
     }
   },
   {
@@ -9472,8 +9472,8 @@
     },
     "recharge": {
       "max": 9600.0,
-      "rate": 154.0,
-      "delay": 20.0
+      "rate": 150.0,
+      "delay": 18.0
     }
   },
   {
@@ -9513,8 +9513,8 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 96.0,
-      "delay": 20.0
+      "rate": 45.0,
+      "delay": 6.0
     }
   },
   {
@@ -9554,8 +9554,8 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 134.0,
-      "delay": 20.0
+      "rate": 64.0,
+      "delay": 6.0
     }
   },
   {
@@ -9595,8 +9595,8 @@
     },
     "recharge": {
       "max": 9600.0,
-      "rate": 154.0,
-      "delay": 20.0
+      "rate": 75.0,
+      "delay": 6.0
     }
   },
   {
@@ -9733,8 +9733,8 @@
     },
     "recharge": {
       "max": 1200.0,
-      "rate": 63.0,
-      "delay": 19.0
+      "rate": 28.0,
+      "delay": 7.0
     }
   },
   {
@@ -9807,8 +9807,8 @@
     },
     "recharge": {
       "max": 155377.0,
-      "rate": 612.0,
-      "delay": 22.8
+      "rate": 634.0,
+      "delay": 21.5
     }
   },
   {
@@ -9841,8 +9841,8 @@
     },
     "recharge": {
       "max": 185054.0,
-      "rate": 949.0,
-      "delay": 22.8
+      "rate": 944.0,
+      "delay": 21.5
     }
   },
   {
@@ -9880,7 +9880,7 @@
     "recharge": {
       "max": 45600.0,
       "rate": 356.0,
-      "delay": 20.7
+      "delay": 17.25
     }
   },
   {
@@ -9918,7 +9918,7 @@
     "recharge": {
       "max": 54355.0,
       "rate": 552.0,
-      "delay": 20.7
+      "delay": 17.25
     }
   },
   {
@@ -9956,7 +9956,7 @@
     "recharge": {
       "max": 48000.0,
       "rate": 356.0,
-      "delay": 20.7
+      "delay": 17.25
     }
   },
   {
@@ -9994,7 +9994,7 @@
     "recharge": {
       "max": 54720.0,
       "rate": 552.0,
-      "delay": 20.7
+      "delay": 17.25
     }
   },
   {
@@ -10027,8 +10027,8 @@
     },
     "recharge": {
       "max": 4750.0,
-      "rate": 106.0,
-      "delay": 18.4
+      "rate": 103.0,
+      "delay": 17.1
     }
   },
   {
@@ -10061,8 +10061,8 @@
     },
     "recharge": {
       "max": 5662.0,
-      "rate": 165.0,
-      "delay": 18.4
+      "rate": 161.0,
+      "delay": 17.1
     }
   },
   {
@@ -10124,8 +10124,8 @@
     },
     "recharge": {
       "max": 5662.0,
-      "rate": 165.0,
-      "delay": 18.4
+      "rate": 161.0,
+      "delay": 17.1
     }
   },
   {
@@ -10163,8 +10163,8 @@
     },
     "recharge": {
       "max": 4750.0,
-      "rate": 106.0,
-      "delay": 18.4
+      "rate": 103.0,
+      "delay": 17.1
     }
   },
   {
@@ -10201,9 +10201,9 @@
       }
     },
     "recharge": {
-      "max": 4750.0,
-      "rate": 106.0,
-      "delay": 18.4
+      "max": 5225.0,
+      "rate": 140.0,
+      "delay": 17.1
     }
   },
   {
@@ -10305,8 +10305,8 @@
       }
     },
     "recharge": {
-      "max": 950.0,
-      "rate": 66.0,
+      "max": 1188.0,
+      "rate": 99.0,
       "delay": 17.5
     }
   },
@@ -10340,7 +10340,7 @@
     "recharge": {
       "max": 86060.0,
       "rate": 240.0,
-      "delay": 20.7
+      "delay": 17.55
     }
   },
   {
@@ -10372,8 +10372,8 @@
     },
     "recharge": {
       "max": 123007.0,
-      "rate": 673.0,
-      "delay": 20.7
+      "rate": 700.0,
+      "delay": 17.55
     }
   },
   {
@@ -15487,7 +15487,7 @@
         "siliconcarbide": 3.0
       }
     },
-    "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
+    "bullet": "bullet_ter_turret_m_laser_01_mk1_macro"
   },
   {
     "id": "turret_ter_m_laser_02_mk1",
@@ -15519,7 +15519,7 @@
         "siliconcarbide": 3.0
       }
     },
-    "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
+    "bullet": "bullet_ter_turret_m_laser_01_mk1_macro"
   },
   {
     "id": "turret_ter_m_laser_03_mk1",
@@ -15940,9 +15940,9 @@
     "size": "large",
     "cost": {
       "default": {
-        "advancedelectronics": 249.0,
-        "energycells": 2256.0,
-        "weaponcomponents": 253.0
+        "advancedelectronics": 317.0,
+        "energycells": 2875.0,
+        "weaponcomponents": 322.0
       }
     },
     "bullet": "bullet_arg_l_laser_01_mk1_macro",
@@ -16151,9 +16151,9 @@
     "size": "large",
     "cost": {
       "default": {
-        "advancedelectronics": 76.0,
-        "energycells": 696.0,
-        "weaponcomponents": 78.0
+        "advancedelectronics": 213.0,
+        "energycells": 1934.0,
+        "weaponcomponents": 217.0
       }
     },
     "bullet": "bullet_bor_l_beam_01_mk1_macro",
@@ -16219,9 +16219,9 @@
     "size": "medium",
     "cost": {
       "default": {
-        "advancedelectronics": 17.0,
-        "energycells": 159.0,
-        "weaponcomponents": 17.0
+        "advancedelectronics": 38.0,
+        "energycells": 349.0,
+        "weaponcomponents": 39.0
       }
     },
     "bullet": "bullet_bor_m_flak_01_mk1_macro",
@@ -16287,9 +16287,9 @@
     "size": "medium",
     "cost": {
       "default": {
-        "advancedelectronics": 13.0,
-        "energycells": 121.0,
-        "weaponcomponents": 13.0
+        "advancedelectronics": 33.0,
+        "energycells": 303.0,
+        "weaponcomponents": 34.0
       }
     },
     "bullet": "bullet_bor_m_laser_01_mk1_macro",
@@ -16361,7 +16361,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 1.0,
-      "coolrate": 920.0
+      "coolrate": 940.0
     }
   },
   {
@@ -16420,9 +16420,9 @@
     "size": "small",
     "cost": {
       "default": {
-        "advancedelectronics": 11.0,
-        "energycells": 106.0,
-        "weaponcomponents": 11.0
+        "advancedelectronics": 25.0,
+        "energycells": 232.0,
+        "weaponcomponents": 26.0
       }
     },
     "bullet": "bullet_bor_s_arc_01_mk1_macro",
@@ -16488,9 +16488,9 @@
     "size": "small",
     "cost": {
       "default": {
-        "advancedelectronics": 14.0,
-        "energycells": 131.0,
-        "weaponcomponents": 14.0
+        "advancedelectronics": 29.0,
+        "energycells": 262.0,
+        "weaponcomponents": 29.0
       }
     },
     "bullet": "bullet_bor_s_gatling_01_mk1_macro",
@@ -16556,9 +16556,9 @@
     "size": "small",
     "cost": {
       "default": {
-        "advancedelectronics": 8.0,
-        "energycells": 81.0,
-        "weaponcomponents": 9.0
+        "advancedelectronics": 22.0,
+        "energycells": 202.0,
+        "weaponcomponents": 22.0
       }
     },
     "bullet": "bullet_bor_s_laser_01_mk1_macro",
@@ -17333,7 +17333,7 @@
     "bullet": "bullet_gen_m_plasma_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
+      "cooldelay": 1.8,
       "coolrate": 1000.0
     }
   },
@@ -17379,7 +17379,7 @@
     "bullet": "bullet_gen_m_plasma_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
+      "cooldelay": 1.8,
       "coolrate": 1000.0
     }
   },
@@ -18329,7 +18329,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 1.0,
-      "coolrate": 2400.0
+      "coolrate": 2500.0
     }
   },
   {
@@ -18375,7 +18375,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 1.0,
-      "coolrate": 2400.0
+      "coolrate": 2500.0
     }
   },
   {
@@ -18500,7 +18500,7 @@
     "bullet": "bullet_gen_s_plasma_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
+      "cooldelay": 1.8,
       "coolrate": 1000.0
     }
   },
@@ -18546,7 +18546,7 @@
     "bullet": "bullet_gen_s_plasma_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
+      "cooldelay": 1.8,
       "coolrate": 1000.0
     }
   },
@@ -18952,9 +18952,9 @@
     "size": "large",
     "cost": {
       "default": {
-        "advancedelectronics": 264.0,
-        "energycells": 2394.0,
-        "weaponcomponents": 268.0
+        "advancedelectronics": 241.0,
+        "energycells": 2187.0,
+        "weaponcomponents": 245.0
       }
     },
     "bullet": "bullet_par_l_laser_02_mk1_macro",
@@ -19134,8 +19134,8 @@
     "bullet": "bullet_pir_xl_laser_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
-      "coolrate": 2000.0
+      "cooldelay": 2.6,
+      "coolrate": 900.0
     }
   },
   {
@@ -19160,9 +19160,9 @@
     "size": "large",
     "cost": {
       "default": {
-        "advancedelectronics": 269.0,
-        "energycells": 2441.0,
-        "weaponcomponents": 274.0
+        "advancedelectronics": 338.0,
+        "energycells": 3060.0,
+        "weaponcomponents": 343.0
       }
     },
     "bullet": "bullet_spl_l_laser_01_mk1_macro",
@@ -19413,7 +19413,7 @@
     "bullet": "bullet_spl_m_sticky_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 3.5,
+      "cooldelay": 3.2,
       "coolrate": 1000.0
     }
   },
@@ -19448,7 +19448,7 @@
     "bullet": "bullet_spl_m_sticky_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 3.5,
+      "cooldelay": 3.2,
       "coolrate": 1000.0
     }
   },
@@ -19928,10 +19928,10 @@
     "size": "large",
     "cost": {
       "default": {
-        "computronicsubstrate": 108.0,
-        "energycells": 3731.0,
-        "metallicmicrolattice": 1194.0,
-        "siliconcarbide": 127.0
+        "computronicsubstrate": 86.0,
+        "energycells": 2950.0,
+        "metallicmicrolattice": 944.0,
+        "siliconcarbide": 100.0
       }
     },
     "bullet": "bullet_ter_l_gatling_01_mk1_macro",
@@ -20082,7 +20082,7 @@
     "bullet": "bullet_ter_m_gatling_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
+      "cooldelay": 0.5,
       "coolrate": 800.0
     }
   },
@@ -20117,7 +20117,7 @@
     "bullet": "bullet_ter_m_gatling_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
+      "cooldelay": 0.5,
       "coolrate": 800.0
     }
   },
@@ -20266,7 +20266,7 @@
     "bullet": "bullet_ter_s_beam_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 2.0,
+      "cooldelay": 1.5,
       "coolrate": 1000.0
     }
   },
@@ -20301,7 +20301,7 @@
     "bullet": "bullet_ter_s_beam_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 2.0,
+      "cooldelay": 1.5,
       "coolrate": 1000.0
     }
   },
@@ -20527,8 +20527,8 @@
     "bullet": "bullet_ter_s_plasma_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
-      "coolrate": 2200.0
+      "cooldelay": 0.5,
+      "coolrate": 2600.0
     }
   },
   {
@@ -20567,8 +20567,8 @@
     "bullet": "bullet_xen_m_beam_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 1.0,
-      "coolrate": 1500.0
+      "cooldelay": 2.5,
+      "coolrate": 1780.0
     }
   },
   {
