@@ -31,6 +31,22 @@ export const YIELD_NAME_TO_RATING: Record<string, number> = {
   high: 5
 }
 
+export const YIELD_THRESHOLDS_NIVIDUM: Record<string, { min: number; max: number | null }> = {
+  low: { min: 0, max: 100 },
+  midlow: { min: 100, max: 300 },
+  medium: { min: 300, max: 1000 },
+  midhigh: { min: 1000, max: 3000 },
+  high: { min: 3000, max: null }
+}
+
+export const YIELD_THRESHOLDS_NORMAL: Record<string, { min: number; max: number | null }> = {
+  low: { min: 0, max: 10000 },
+  midlow: { min: 10000, max: 30000 },
+  medium: { min: 30000, max: 100000 },
+  midhigh: { min: 100000, max: 300000 },
+  high: { min: 300000, max: null }
+}
+
 export type SectorResourceEntry = {
   ware: string
   rating: number

@@ -13,6 +13,8 @@ import {
   getSharedMinYieldName,
   isSectorMatchedByResources,
   MIXED_YIELD_VALUE,
+  YIELD_THRESHOLDS_NIVIDUM,
+  YIELD_THRESHOLDS_NORMAL,
   type SectorResourceEntry,
   type SectorResourceFill
 } from '@/store/logic/mapResourceFilter'
@@ -100,7 +102,7 @@ const getReadableTextColor = (hex: string | undefined) => {
   return luminance > 168 ? '#111827' : '#f8fafc'
 }
 
-const formatYieldLabel = (yieldName: string) => {
+const formatYieldLabel = (yieldName: string, wareId?: string) => {
   const levelKey = `map.yield_levels.${yieldName}`
   const levelText = t(levelKey)
   const fallbackLevel = yieldName === 'low' ? 'Low' :
@@ -111,7 +113,22 @@ const formatYieldLabel = (yieldName: string) => {
 
   const displayLevel = levelKey !== levelText ? levelText : fallbackLevel
 
-  return displayLevel
+  if (!wareId) return displayLevel
+
+  const isNividium = wareId.toLowerCase() === 'nividium'
+  const thresholds = isNividium ? YIELD_THRESHOLDS_NIVIDUM : YIELD_THRESHOLDS_NORMAL
+  const threshold = thresholds[yieldName]
+  if (!threshold) return displayLevel
+
+  const formatThresholdValue = (value: number) => {
+    if (isNividium) return value.toString()
+    return `${value / 1000}K`
+  }
+
+  if (threshold.max === null) {
+    return `${displayLevel}(${formatThresholdValue(threshold.min)}+)`
+  }
+  return `${displayLevel}(${formatThresholdValue(threshold.min)}-${formatThresholdValue(threshold.max)})`
 }
 
 const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
@@ -392,7 +409,7 @@ const isYieldBeyondReachable = (wareId: string) => {
             :value="yieldName"
             :disabled="isYieldOptionDisabled(wareId, yieldName)"
           >
-            {{ formatYieldLabel(yieldName) }}
+            {{ formatYieldLabel(yieldName, wareId) }}
           </option>
         </select>
         <span v-if="isYieldBeyondReachable(wareId)" class="config-warning">

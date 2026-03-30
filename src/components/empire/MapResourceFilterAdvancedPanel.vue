@@ -15,6 +15,8 @@ import {
   buildYieldRanksByWare,
   getSharedMinYieldName,
   MIXED_YIELD_VALUE,
+  YIELD_THRESHOLDS_NIVIDUM,
+  YIELD_THRESHOLDS_NORMAL,
   type SectorResourceFill,
   type SectorResourceEntry
 } from '@/store/logic/mapResourceFilter'
@@ -69,7 +71,7 @@ const emit = defineEmits<{
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
 
-const formatYieldLabel = (yieldName: string) => {
+const formatYieldLabel = (yieldName: string, wareId?: string) => {
   const levelKey = `map.yield_levels.${yieldName}`
   const levelText = t(levelKey)
   const fallbackLevel = yieldName === 'low' ? 'Low' :
@@ -80,7 +82,22 @@ const formatYieldLabel = (yieldName: string) => {
 
   const displayLevel = levelKey !== levelText ? levelText : fallbackLevel
 
-  return displayLevel
+  if (!wareId) return displayLevel
+
+  const isNividium = wareId.toLowerCase() === 'nividium'
+  const thresholds = isNividium ? YIELD_THRESHOLDS_NIVIDUM : YIELD_THRESHOLDS_NORMAL
+  const threshold = thresholds[yieldName]
+  if (!threshold) return displayLevel
+
+  const formatThresholdValue = (value: number) => {
+    if (isNividium) return value.toString()
+    return `${value / 1000}K`
+  }
+
+  if (threshold.max === null) {
+    return `${displayLevel}(${formatThresholdValue(threshold.min)}+)`
+  }
+  return `${displayLevel}(${formatThresholdValue(threshold.min)}-${formatThresholdValue(threshold.max)})`
 }
 const availableResourceIds = computed(() =>
   ((gameData.res || []) as Array<{ id: string }>).map((entry) => entry.id).filter((id) => id !== 'energycells')
@@ -505,7 +522,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
                   :key="yieldName"
                   :value="yieldName"
                 >
-                  {{ formatYieldLabel(yieldName) }}
+                  {{ formatYieldLabel(yieldName, wareId) }}
                 </option>
               </select>
             </label>

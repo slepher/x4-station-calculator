@@ -199,7 +199,7 @@ const onPanelClose = () => emit('panel-close')
 }
 
 .resource-close-btn {
-  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-300/35 bg-black/55 text-lg leading-none text-amber-100/75 transition-colors duration-150 hover:text-amber-50 hover:border-amber-200/70;
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-300/35 bg-black/55 text-lg leading-none text-amber-100/75 transition-colors duration-150 mr-3 hover:text-amber-50 hover:border-amber-200/70;
 }
 
 .resource-panel-body {
@@ -242,7 +242,7 @@ const onPanelClose = () => emit('panel-close')
 
 :deep(.resource-config-row) {
   @apply grid items-center gap-3;
-  grid-template-columns: minmax(0, 72px) minmax(0, 142px) minmax(0, 1fr);
+  grid-template-columns: minmax(0, 72px) minmax(155px, 1fr) minmax(0, 1fr);
   min-width: 0;
 }
 
@@ -257,6 +257,8 @@ const onPanelClose = () => emit('panel-close')
 :deep(.yield-select),
 :deep(.advanced-number-input) {
   @apply rounded-md border border-amber-300/30 bg-black/70 px-3 py-1 text-sm text-amber-50 outline-none;
+  width: 155px;
+  min-width: unset;
 }
 
 :deep(.sunlight-input) {
