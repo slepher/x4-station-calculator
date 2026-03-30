@@ -651,3 +651,166 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
     </div>
   </div>
 </template>
+
+<style scoped>
+.advanced-panel {
+  @apply flex flex-col gap-3;
+}
+
+.advanced-toolbar {
+  @apply flex flex-wrap items-center justify-between gap-2;
+}
+
+.advanced-inline-settings {
+  @apply flex w-full flex-wrap items-center gap-3 rounded-md border border-amber-300/15 bg-black/30 px-2 py-1;
+}
+
+.advanced-control {
+  @apply inline-flex items-center gap-2 text-xs text-amber-50;
+}
+
+.advanced-control.checkbox {
+  @apply pr-1;
+}
+
+.advanced-control.jump-control {
+  @apply pr-0;
+}
+
+.jump-input-wrap {
+  width: 78px;
+}
+
+.jump-input-wrap .sunlight-input {
+  min-width: 0;
+  padding-right: 2.55rem;
+  text-indent: 0;
+  text-align: center;
+}
+
+.jump-input-wrap .sunlight-suffix {
+  right: 1.3rem;
+  font-size: 0.75rem;
+}
+
+.jump-input-wrap .sunlight-stepper {
+  width: 0.95rem;
+}
+
+.jump-input-wrap .sunlight-step-btn {
+  width: 0.95rem;
+}
+
+.advanced-checkbox {
+  @apply h-3.5 w-3.5 rounded border-amber-300/35 bg-black/70 text-amber-300 focus:ring-0;
+}
+
+.advanced-refresh-btn,
+.advanced-add-btn,
+.group-action {
+  @apply rounded-md border border-amber-300/25 bg-amber-200/10 px-3 py-1.5 text-xs font-semibold text-amber-50 transition-colors duration-150 hover:bg-amber-200/20;
+}
+
+.advanced-refresh-btn {
+  @apply ml-auto shrink-0 whitespace-nowrap;
+}
+
+.group-action.danger {
+  @apply border-rose-300/25 text-rose-100 hover:bg-rose-300/15;
+}
+
+.advanced-pending {
+  @apply rounded-md border border-amber-300/20 bg-amber-200/10 px-3 py-2 text-xs text-amber-100/85;
+}
+
+.advanced-group-list {
+  @apply space-y-2;
+}
+
+.advanced-add-btn {
+  @apply self-start;
+}
+
+.advanced-group-card {
+  @apply rounded-md border border-amber-300/15 bg-black/30 p-2;
+}
+
+.advanced-group-card.expanded {
+  @apply border-amber-200/45 bg-black/45;
+}
+
+.advanced-group-line {
+  @apply flex flex-wrap items-start justify-between gap-2;
+}
+
+.advanced-group-summary,
+.advanced-group-tags {
+  @apply flex min-w-0 flex-1 flex-wrap gap-2;
+}
+
+.advanced-group-actions {
+  @apply flex shrink-0 items-center gap-2;
+}
+
+.summary-tag,
+.candidate-chip {
+  @apply rounded-md border border-amber-300/20 bg-amber-200/10 px-2 py-1 text-xs text-amber-50;
+}
+
+.summary-empty {
+  @apply text-xs text-amber-100/45;
+}
+
+.advanced-group-yields {
+  @apply mt-3 space-y-2;
+}
+
+.advanced-yield-row {
+  @apply flex items-center justify-between gap-3 text-sm text-amber-50;
+}
+
+.advanced-candidate-item {
+  @apply flex w-full items-start justify-between gap-3 border-b border-amber-300/10 px-3 py-2 text-left transition-colors duration-150 hover:bg-amber-300/10;
+}
+
+.advanced-candidate-item.selected {
+  @apply bg-amber-200/10;
+}
+
+.advanced-candidate-main {
+  @apply min-w-0 flex-1;
+}
+
+.advanced-candidate-row {
+  @apply flex items-start gap-2;
+}
+
+.advanced-candidate-meta {
+  @apply mt-1 flex items-start gap-2 text-[11px] text-amber-100/65;
+}
+
+.advanced-candidate-hubs {
+  @apply flex flex-wrap gap-2;
+}
+
+.candidate-chip-button {
+  @apply inline-flex items-center gap-1.5 cursor-pointer transition-colors duration-150 hover:bg-amber-200/20;
+}
+
+.advanced-candidate-chip-list {
+  @apply flex min-w-0 flex-1 flex-wrap gap-2;
+}
+
+.candidate-type-pill {
+  @apply inline-flex shrink-0 items-center justify-center gap-1.5 rounded-md border border-amber-300/20 bg-amber-200/10 px-2 py-1 text-xs text-amber-50;
+  min-width: 3.75rem;
+}
+
+.candidate-type-pill-icon {
+  @apply h-3.5 w-3.5 shrink-0 opacity-80;
+}
+
+.candidate-chip-badge {
+  @apply inline-flex h-4 min-w-4 items-center justify-center rounded-full border border-amber-200/30 bg-black/35 px-1 text-[10px] font-bold leading-none text-amber-50;
+}
+</style>
