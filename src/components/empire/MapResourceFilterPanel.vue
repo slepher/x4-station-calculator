@@ -173,7 +173,7 @@ const onPanelClose = () => emit('panel-close')
 }
 
 .resource-panel-shell {
-  @apply relative rounded-lg border border-amber-300/35 bg-black/75 p-3 shadow-2xl;
+  @apply relative rounded-lg border border-amber-300/35 bg-black/75 p-3 px-1.5 shadow-2xl;
   backdrop-filter: blur(8px);
 }
 
@@ -183,7 +183,7 @@ const onPanelClose = () => emit('panel-close')
 }
 
 .resource-panel-top {
-  @apply flex items-center justify-between gap-3 border-b border-amber-300/15 pb-3;
+  @apply flex items-center justify-between gap-3 border-b border-amber-300/15 pb-3 px-1.5;
 }
 
 .resource-mode-tabs {
@@ -199,12 +199,12 @@ const onPanelClose = () => emit('panel-close')
 }
 
 .resource-close-btn {
-  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-300/35 bg-black/55 text-lg leading-none text-amber-100/75 transition-colors duration-150 mr-3 hover:text-amber-50 hover:border-amber-200/70;
+  @apply flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-amber-300/35 bg-black/55 text-lg leading-none text-amber-100/75 transition-colors duration-150 mr-1.5 hover:text-amber-50 hover:border-amber-200/70;
 }
 
 .resource-panel-body {
-  @apply mt-3 min-h-0 flex-1 overflow-y-auto pr-1;
-  scrollbar-gutter: stable;
+  @apply mt-3 min-h-0 flex-1 overflow-y-auto;
+  scrollbar-gutter: stable both-edges;
 }
 
 :deep(.custom-scrollbar) {
