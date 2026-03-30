@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useMapStore } from '@/store/useMapStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { formatNumber } from '@/utils/numberFormatter'
-import { sortResourcesByPriority } from '@/store/logic/mapResourceFilter'
+import { sortResourcesByPriority, RATING_TO_YIELD_NAME } from '@/store/logic/mapResourceFilter'
 
 const props = defineProps<{
   sectorId: string
@@ -19,6 +19,20 @@ const sectorInfo = computed(() => mapStore.getSectorInfo(props.sectorId))
 const title = computed(() => sectorInfo.value?.displayName || props.sectorId)
 const ownerName = computed(() => sectorInfo.value?.owner || 'ownerless')
 const sunlightPercent = computed(() => sectorInfo.value?.sunlight || 0)
+
+const sunlightYieldInfo = computed(() => {
+  const percent = sunlightPercent.value
+  let yieldName = 'low'
+  if (percent >= 200) yieldName = 'high'
+  else if (percent >= 125) yieldName = 'midhigh'
+  else if (percent >= 80) yieldName = 'medium'
+  else if (percent >= 50) yieldName = 'midlow'
+  else yieldName = 'low'
+  return {
+    yieldName,
+    yieldLabel: t(`map.yield_levels.${yieldName}`)
+  }
+})
 const hasKhaakHive = computed(() => sectorInfo.value?.hasKhaakHive || false)
 const khaakHiveSourceNames = computed(() => sectorInfo.value?.khaakHiveSourceNames || [])
 
@@ -33,16 +47,21 @@ const resourceColorByWare = computed(() => {
 const resources = computed(() => {
   const sector = gameDataStore.maps?.clusters?.[sectorInfo.value?.clusterId || '']?.sectors?.[props.sectorId]
   if (!sector || !Array.isArray((sector as any).resources)) return []
-  const resourceList = (sector as any).resources as Array<{ ware: string; respawn?: number }>
+  const resourceList = (sector as any).resources as Array<{ ware: string; rating?: number; respawn?: number }>
   const sortedWareIds = sortResourcesByPriority(resourceList.map(r => r.ware))
   const resourceMap = Object.fromEntries(resourceList.map(r => [r.ware, r]))
   return sortedWareIds.map(wareId => {
     const entry = resourceMap[wareId]
+    const rating = entry?.rating ?? 1
+    const yieldName = RATING_TO_YIELD_NAME[rating] || 'low'
     return {
       wareId,
       label: gameDataStore.getWareDisplayName(wareId) || wareId,
       respawn: formatNumber(entry?.respawn ?? 0),
-      color: resourceColorByWare.value[wareId] || '#fbbf24'
+      color: resourceColorByWare.value[wareId] || '#fbbf24',
+      rating,
+      yieldName,
+      yieldLabel: t(`map.yield_levels.${yieldName}`)
     }
   })
 })
@@ -56,14 +75,14 @@ const resources = computed(() => {
     </header>
 
     <div class="sector-tooltip-grid">
-      <span class="resource-name">{{ t('map.resource_filter_sunlight') }}</span>
+      <span class="resource-name sunlight-name">{{ t('map.resource_filter_sunlight') }}</span>
       <span class="resource-value">{{ sunlightPercent }}{{ t('map.resource_filter_sunlight_suffix') }}</span>
-      <span class="resource-color sunlight-swatch"></span>
+      <span class="resource-rating">{{ sunlightYieldInfo.yieldLabel }}</span>
 
       <template v-for="resource in resources" :key="resource.wareId">
-        <span class="resource-name">{{ resource.label }}</span>
+        <span class="resource-name" :style="{ color: resource.color }">{{ resource.label }}</span>
         <span class="resource-value">{{ resource.respawn }}</span>
-        <span class="resource-color" :style="{ backgroundColor: resource.color }"></span>
+        <span class="resource-rating">{{ resource.yieldLabel }}</span>
       </template>
     </div>
 
@@ -129,6 +148,10 @@ const resources = computed(() => {
   color: rgba(255, 247, 237, 0.9);
 }
 
+.sunlight-name {
+  color: #facc15;
+}
+
 .resource-value {
   font-size: 13px;
   line-height: 1.2;
@@ -137,17 +160,11 @@ const resources = computed(() => {
   color: rgba(255, 247, 237, 0.82);
 }
 
-.resource-color {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
-  box-shadow:
-    inset 0 1px 0 rgba(255, 255, 255, 0.14),
-    0 0 0 1px rgba(255, 255, 255, 0.06);
-}
-
-.sunlight-swatch {
-  background: #facc15;
+.resource-rating {
+  font-size: 13px;
+  line-height: 1.2;
+  text-align: right;
+  color: rgba(255, 247, 237, 0.82);
 }
 
 .khaak-info {

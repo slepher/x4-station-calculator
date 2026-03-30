@@ -475,3 +475,9 @@ const isYieldBeyondReachable = (wareId: string) => {
     </div>
   </div>
 </template>
+
+<style scoped>
+.simple-panel {
+  @apply px-1.5;
+}
+</style>

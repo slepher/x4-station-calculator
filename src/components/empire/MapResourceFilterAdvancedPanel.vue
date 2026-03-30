@@ -654,7 +654,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
 
 <style scoped>
 .advanced-panel {
-  @apply flex flex-col gap-3;
+  @apply flex flex-col gap-3 px-1.5;
 }
 
 .advanced-toolbar {

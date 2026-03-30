@@ -173,7 +173,7 @@ const onPanelClose = () => emit('panel-close')
 }
 
 .resource-panel-shell {
-  @apply relative rounded-lg border border-amber-300/35 bg-black/75 p-3 px-1.5 shadow-2xl;
+  @apply relative rounded-lg border border-amber-300/35 bg-black/75 py-3 px-0 shadow-2xl;
   backdrop-filter: blur(8px);
 }
 
@@ -183,7 +183,7 @@ const onPanelClose = () => emit('panel-close')
 }
 
 .resource-panel-top {
-  @apply flex items-center justify-between gap-3 border-b border-amber-300/15 pb-3 px-1.5;
+  @apply flex items-center justify-between gap-3 border-b border-amber-300/15 pb-3 px-3;
 }
 
 .resource-mode-tabs {
