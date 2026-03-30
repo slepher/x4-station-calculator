@@ -1,7 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watchEffect } from 'vue'
+import { computed, ref, watch, watchEffect, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useEmpireStore } from '@/store/useEmpireStore'
+import { useLogicFlowStore } from '@/store/useLogicFlowStore'
+import { stationStateMap } from '@/store/state/StationStateMap'
+import type { SavedFlowGroup } from '@/types/x4'
 import {
   ADVANCED_SUNLIGHT_TAG_ID,
   buildAdvancedCandidates,
@@ -70,6 +74,8 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
+const empireStore = useEmpireStore()
+const logicFlowStore = useLogicFlowStore()
 
 const formatYieldLabel = (yieldName: string, wareId?: string) => {
   const levelKey = `map.yield_levels.${yieldName}`
@@ -131,6 +137,220 @@ const allowTransitApplied = ref(true)
 const expandedGroupId = ref<string | null>(draftTagGroups.value[0]?.id || null)
 const hasPendingRefresh = ref(true)
 const selectedCandidateKey = ref<string | null>(null)
+
+const loaderMenuOpen = ref(false)
+const loaderMenuRef = ref<HTMLElement | null>(null)
+const loaderTriggerRef = ref<HTMLElement | null>(null)
+const loaderMenuStyle = ref<Record<string, string>>({})
+const loadedSourceId = ref<string | null>(null)
+const loadedSourceType = ref<'sector' | 'logicflow' | null>(null)
+
+const loaderCurrentLabel = computed(() => {
+  if (!loadedSourceId.value) return t('map.resource_filter_loader_custom')
+  if (loadedSourceType.value === 'sector') {
+    const sector = empireStore.sectors.find(s => s.id === loadedSourceId.value)
+    return sector?.name || t('map.resource_filter_loader_custom')
+  }
+  if (loadedSourceType.value === 'logicflow') {
+    const plan = logicFlowStore.savedPlans.list.find(p => p.id === loadedSourceId.value)
+    return plan?.name || t('map.resource_filter_loader_custom')
+  }
+  return t('map.resource_filter_loader_custom')
+})
+
+const loadableSectors = computed(() => {
+  const sectors = empireStore.sectors
+  const stations = empireStore.activeEmpire?.stations || []
+  return sectors.filter(sector => {
+    const sectorStations = stations.filter(s => s.sectorId === sector.id)
+    return sectorStations.some(station => {
+      const flows = stationStateMap.getGroupedFlows(station.id)
+      return flows.rateGroups.resources.length > 0
+    })
+  }).map(sector => ({
+    id: sector.id,
+    name: sector.name
+  }))
+})
+
+const updateLoaderMenuPosition = () => {
+  const panel = document.querySelector('.resource-panel-shell')
+  const trigger = loaderTriggerRef.value
+  if (!panel || !trigger) return
+  
+  const panelRect = panel.getBoundingClientRect()
+  const triggerRect = trigger.getBoundingClientRect()
+  
+  loaderMenuStyle.value = {
+    position: 'fixed',
+    top: `${triggerRect.top}px`,
+    left: `${panelRect.right + 8}px`,
+    maxHeight: '300px'
+  }
+}
+
+const toggleLoaderMenu = () => {
+  loaderMenuOpen.value = !loaderMenuOpen.value
+  if (loaderMenuOpen.value) updateLoaderMenuPosition()
+}
+
+const closeLoaderMenu = () => {
+  loaderMenuOpen.value = false
+}
+
+const loadSectorStations = (sectorId: string) => {
+  const stations = empireStore.activeEmpire?.stations || []
+  const sectorStations = stations.filter(s => s.sectorId === sectorId)
+  
+  const newGroups: AdvancedResourceTagGroup[] = []
+  for (const station of sectorStations) {
+    const flows = stationStateMap.getGroupedFlows(station.id)
+    const resourceWares = flows.rateGroups.resources.map(f => f.wareId)
+    if (resourceWares.length === 0) continue
+    
+    const group = buildDefaultGroup()
+    group.tagIds = resourceWares
+    group.minYieldByWare = Object.fromEntries(
+      resourceWares.map(wareId => [wareId, 'low'])
+    )
+    newGroups.push(group)
+  }
+  
+  if (newGroups.length > 0) {
+    draftTagGroups.value = newGroups
+    loadedSourceId.value = sectorId
+    loadedSourceType.value = 'sector'
+    expandedGroupId.value = null
+    refreshCandidates()
+  }
+  
+  closeLoaderMenu()
+}
+
+const getTier0ResourcesForGroup = (savedGroup: SavedFlowGroup): string[] => {
+  const isolatedWareIds = new Set<string>()
+  const moduleOutputWareIds: string[] = []
+  
+  // Step 1: 从 SavedFlowNode 提取 isolated 和 module 信息
+  for (const node of savedGroup.nodes) {
+    if (node.isolated) {
+      isolatedWareIds.add(node.isolated)
+    } else if (node.module) {
+      const module = gameData.modulesMap[node.module]
+      if (module && module.outputs) {
+        const outputWareId = Object.keys(module.outputs)[0]
+        if (outputWareId) moduleOutputWareIds.push(outputWareId)
+      }
+    }
+  }
+  
+  const t0WareIds = new Set<string>()
+  const visited = new Set<string>()
+  
+  const effectiveLineage = savedGroup.isLocked 
+    ? (savedGroup.lockedLineage || 'default') 
+    : (savedGroup.subCategory || 'default')
+  
+  const trace = (wareId: string) => {
+    if (wareId === 'energycells') return
+    if (visited.has(wareId)) return
+    visited.add(wareId)
+    
+    const ware = gameData.waresMap[wareId]
+    if (!ware) return
+    
+    if (ware.tier === 0) {
+      t0WareIds.add(wareId)
+      return
+    }
+    
+    if (isolatedWareIds.has(wareId)) return
+    
+    const module = gameData.findModuleForWare(wareId, effectiveLineage)
+    if (module && module.inputs) {
+      Object.keys(module.inputs).forEach(inputWareId => {
+        trace(inputWareId)
+      })
+    }
+  }
+  
+  for (const wareId of moduleOutputWareIds) {
+    trace(wareId)
+  }
+  
+  return [...t0WareIds]
+}
+
+const loadableLogicFlowPlans = computed(() => {
+  const plans = logicFlowStore.savedPlans.list
+  return plans.filter(plan => {
+    return plan.groups.some(group => {
+      const tier0Resources = getTier0ResourcesForGroup(group)
+      return tier0Resources.length > 0
+    })
+  }).map(plan => ({
+    id: plan.id,
+    name: plan.name
+  }))
+})
+
+const loadLogicFlowPlan = (planId: string) => {
+  const plan = logicFlowStore.savedPlans.list.find(p => p.id === planId)
+  if (!plan) return
+  
+  const newGroups: AdvancedResourceTagGroup[] = []
+  for (const savedGroup of plan.groups) {
+    const tier0Resources = getTier0ResourcesForGroup(savedGroup)
+    if (tier0Resources.length === 0) continue
+    
+    const group = buildDefaultGroup()
+    group.tagIds = tier0Resources
+    group.minYieldByWare = Object.fromEntries(
+      tier0Resources.map(wareId => [wareId, 'low'])
+    )
+    newGroups.push(group)
+  }
+  
+  if (newGroups.length > 0) {
+    draftTagGroups.value = newGroups
+    loadedSourceId.value = planId
+    loadedSourceType.value = 'logicflow'
+    expandedGroupId.value = null
+    refreshCandidates()
+  }
+  
+  closeLoaderMenu()
+}
+
+const onLoaderGlobalPointerDown = (event: MouseEvent) => {
+  if (!loaderMenuOpen.value) return
+  const menuRoot = loaderMenuRef.value
+  if (!menuRoot) return
+  if (!(event.target instanceof Node)) return
+  if (menuRoot.contains(event.target)) return
+  closeLoaderMenu()
+}
+
+const onLoaderViewportChange = () => {
+  if (!loaderMenuOpen.value) return
+  updateLoaderMenuPosition()
+}
+
+watch(() => props.active, (active) => {
+  if (!active) closeLoaderMenu()
+})
+
+onMounted(() => {
+  document.addEventListener('mousedown', onLoaderGlobalPointerDown)
+  window.addEventListener('resize', onLoaderViewportChange)
+  window.addEventListener('scroll', onLoaderViewportChange, true)
+})
+
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', onLoaderGlobalPointerDown)
+  window.removeEventListener('resize', onLoaderViewportChange)
+  window.removeEventListener('scroll', onLoaderViewportChange, true)
+})
 
 const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
   ...regionYields.value
@@ -413,9 +633,24 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
 
 <template>
   <div class="advanced-panel">
-    <button type="button" class="advanced-add-btn" data-testid="map-resource-advanced-add-group" @click="addGroup">
-      {{ t('map.resource_filter_add_group') }}
-    </button>
+    <div class="advanced-top-row">
+      <button type="button" class="advanced-add-btn" data-testid="map-resource-advanced-add-group" @click="addGroup">
+        {{ t('map.resource_filter_add_group') }}
+      </button>
+
+      <button
+        type="button"
+        class="resource-group-loader-trigger"
+        data-testid="map-resource-advanced-loader-trigger"
+        ref="loaderTriggerRef"
+        @click="toggleLoaderMenu"
+      >
+        <span class="loader-trigger-label">{{ loaderCurrentLabel }}</span>
+        <svg class="h-3.5 w-3.5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+        </svg>
+      </button>
+    </div>
 
     <div class="advanced-group-list">
       <div
@@ -561,19 +796,20 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
           />
           <span>{{ t('map.resource_filter_allow_transit') }}</span>
         </label>
-
-        <button
-          type="button"
-          class="advanced-refresh-btn"
-          data-testid="map-resource-advanced-refresh"
-          @click="refreshCandidates"
-        >
-          {{ t('map.resource_filter_refresh') }}
-        </button>
       </div>
     </div>
 
-    <div v-if="hasPendingRefresh" class="advanced-pending">{{ t('map.resource_filter_pending_refresh') }}</div>
+    <div v-if="hasPendingRefresh" class="advanced-refresh-row">
+      <span class="advanced-pending">{{ t('map.resource_filter_pending_refresh') }}</span>
+      <button
+        type="button"
+        class="advanced-refresh-btn"
+        data-testid="map-resource-advanced-refresh"
+        @click="refreshCandidates"
+      >
+        {{ t('map.resource_filter_refresh') }}
+      </button>
+    </div>
 
     <div class="resource-candidate-box advanced-candidates">
       <div class="candidate-header">
@@ -649,12 +885,96 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
       </div>
       <div v-else class="resource-empty">{{ t('map.resource_filter_no_match') }}</div>
     </div>
+
+    <Teleport to="body">
+      <div
+        v-if="loaderMenuOpen"
+        class="resource-group-loader-menu"
+        ref="loaderMenuRef"
+        :style="loaderMenuStyle"
+        data-testid="map-resource-advanced-loader-menu"
+      >
+        <div class="loader-menu-group">
+          <div class="loader-menu-group-title">{{ t('map.resource_filter_loader_group_sectors') }}</div>
+          <button
+            v-for="sector in loadableSectors"
+            :key="sector.id"
+            type="button"
+            class="loader-menu-item"
+            :class="{ active: loadedSourceType === 'sector' && loadedSourceId === sector.id }"
+            :data-testid="`map-resource-advanced-loader-sector-${sector.id}`"
+            @click="loadSectorStations(sector.id)"
+          >
+            {{ sector.name }}
+          </button>
+          <div v-if="loadableSectors.length === 0" class="loader-menu-empty">
+            {{ t('map.resource_filter_loader_no_sectors') }}
+          </div>
+        </div>
+
+        <div class="loader-menu-group">
+          <div class="loader-menu-group-title">{{ t('map.resource_filter_loader_group_logicflow') }}</div>
+          <button
+            v-for="plan in loadableLogicFlowPlans"
+            :key="plan.id"
+            type="button"
+            class="loader-menu-item"
+            :class="{ active: loadedSourceType === 'logicflow' && loadedSourceId === plan.id }"
+            :data-testid="`map-resource-advanced-loader-logicflow-${plan.id}`"
+            @click="loadLogicFlowPlan(plan.id)"
+          >
+            {{ plan.name }}
+          </button>
+          <div v-if="loadableLogicFlowPlans.length === 0" class="loader-menu-empty">
+            {{ t('map.resource_filter_loader_no_logicflow') }}
+          </div>
+        </div>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <style scoped>
 .advanced-panel {
   @apply flex flex-col gap-3 px-1.5;
+}
+
+.advanced-top-row {
+  @apply flex items-center justify-between gap-2;
+}
+
+.resource-group-loader-trigger {
+  @apply inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-md border border-amber-400/40 text-amber-200/90 text-xs font-semibold bg-amber-200/5 hover:bg-amber-500/10 transition-colors;
+}
+
+.loader-trigger-label {
+  @apply whitespace-nowrap;
+}
+
+.resource-group-loader-menu {
+  @apply fixed z-[120] w-max min-w-40 max-h-64 overflow-y-auto rounded-md border border-amber-400/30 bg-slate-900/95 p-1 shadow-2xl;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.55) rgba(15, 23, 42, 0.25);
+}
+
+.loader-menu-group {
+  @apply py-1;
+}
+
+.loader-menu-group-title {
+  @apply px-2 py-1 text-xs font-semibold text-amber-200/70 uppercase tracking-wide;
+}
+
+.loader-menu-item {
+  @apply w-full text-left px-3 py-1.5 text-sm text-amber-50 rounded hover:bg-amber-500/15 transition-colors;
+}
+
+.loader-menu-item.active {
+  @apply bg-amber-500/20 text-amber-200;
+}
+
+.loader-menu-empty {
+  @apply px-3 py-2 text-xs text-amber-100/50 italic;
 }
 
 .advanced-toolbar {
@@ -677,30 +997,6 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
   @apply pr-0;
 }
 
-.jump-input-wrap {
-  width: 78px;
-}
-
-.jump-input-wrap .sunlight-input {
-  min-width: 0;
-  padding-right: 2.55rem;
-  text-indent: 0;
-  text-align: center;
-}
-
-.jump-input-wrap .sunlight-suffix {
-  right: 1.3rem;
-  font-size: 0.75rem;
-}
-
-.jump-input-wrap .sunlight-stepper {
-  width: 0.95rem;
-}
-
-.jump-input-wrap .sunlight-step-btn {
-  width: 0.95rem;
-}
-
 .advanced-checkbox {
   @apply h-3.5 w-3.5 rounded border-amber-300/35 bg-black/70 text-amber-300 focus:ring-0;
 }
@@ -719,8 +1015,16 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
   @apply border-rose-300/25 text-rose-100 hover:bg-rose-300/15;
 }
 
+.advanced-refresh-row {
+  @apply flex items-center justify-between gap-2;
+}
+
 .advanced-pending {
   @apply rounded-md border border-amber-300/20 bg-amber-200/10 px-3 py-2 text-xs text-amber-100/85;
+}
+
+.advanced-refresh-btn {
+  @apply shrink-0 whitespace-nowrap;
 }
 
 .advanced-group-list {
@@ -740,7 +1044,7 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
 }
 
 .advanced-group-line {
-  @apply flex flex-wrap items-start justify-between gap-2;
+  @apply flex flex-wrap items-center justify-between gap-2;
 }
 
 .advanced-group-summary,

@@ -258,7 +258,7 @@ const onPanelClose = () => emit('panel-close')
 :deep(.advanced-number-input) {
   @apply rounded-md border border-amber-300/30 bg-black/70 px-3 py-1 text-sm text-amber-50 outline-none;
   width: 155px;
-  min-width: unset;
+  min-width: 142px;
 }
 
 :deep(.sunlight-input) {
@@ -272,6 +272,30 @@ const onPanelClose = () => emit('panel-close')
 :deep(.sunlight-input-wrap) {
   @apply relative;
   width: 142px;
+}
+
+:deep(.jump-input-wrap) {
+  width: 78px;
+}
+
+:deep(.jump-input-wrap .sunlight-input) {
+  min-width: 0;
+  padding-right: 2.55rem;
+  text-indent: 0;
+  text-align: center;
+}
+
+:deep(.jump-input-wrap .sunlight-suffix) {
+  right: 1.3rem;
+  font-size: 0.75rem;
+}
+
+:deep(.jump-input-wrap .sunlight-stepper) {
+  width: 0.95rem;
+}
+
+:deep(.jump-input-wrap .sunlight-step-btn) {
+  width: 0.95rem;
 }
 
 :deep(.sunlight-suffix) {
