@@ -145,6 +145,8 @@
     "station_panel_drag_action": "拖到地图",
     "station_panel_clear_action": "清除位置",
     "station_panel_empty": "没有匹配对象",
+    "khaak_hive": "可能存在Khaak母巢",
+    "potential_khaak_hive_sector": "潜在Khaak母巢星区",
     "station_panel_hint": "拖到星区后可继续在地图上微调位置。",
     "yield_names": {
       "midlow": "中低",

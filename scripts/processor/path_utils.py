@@ -121,3 +121,17 @@ def get_map_xml_path(map_dir: str, xml_type: str) -> str:
         XML 文件路径，如：{map_dir}/galaxy/final.xml
     """
     return os.path.join(map_dir, xml_type, "final.xml")
+
+
+def get_md_xml(base_path: str, md_name: str) -> str:
+    """
+    获取 md 目录下的 XML 文件路径
+
+    Args:
+        base_path: 原始数据根目录
+        md_name: md 文件名，如 "khaak_activity"
+
+    Returns:
+        XML 文件路径，如：{base_path}/md/{md_name}/final.xml
+    """
+    return os.path.join(base_path, "md", md_name, "final.xml")

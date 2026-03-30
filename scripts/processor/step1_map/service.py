@@ -8,7 +8,7 @@ from pathlib import Path
 from typing import Dict, Optional, Any, Set
 
 from processor.i18n import get_i18n_registry, I18nRegistry
-from processor.path_utils import get_map_dir, get_library_xml
+from processor.path_utils import get_map_dir, get_library_xml, get_md_xml
 from processor.versioning import load_version_config
 from processor.step2_resource.model_detector import detect_map_resource_model
 from processor.step2_resource.modern_processor import (
@@ -63,6 +63,7 @@ def process_map_for_version(
     region_definitions_xml_path = Path(get_library_xml(base_path, "region_definitions"))
     regionobjectgroups_xml_path = Path(get_library_xml(base_path, "regionobjectgroups"))
     regionyields_xml_path = Path(get_library_xml(base_path, "regionyields"))
+    khaak_activity_xml_path = Path(get_md_xml(base_path, "khaak_activity"))
 
     # 构建 JSON 输出路径
     factions_output_path = Path(output_base) / "data" / "factions.json"
@@ -121,6 +122,7 @@ def process_map_for_version(
             sector_resource_areas=sector_resource_areas,
             definitions=definitions,
             dlc_order=dlc_order,
+            khaak_activity_xml_path=khaak_activity_xml_path,
         )
 
         # Step 1 不输出 resourceareas.json，由 Step 2 生成
@@ -165,6 +167,7 @@ def process_map_for_version(
             i18n_registry=registry,
             resource_model="regions",
             dlc_order=dlc_order,
+            khaak_activity_xml_path=khaak_activity_xml_path,
         )
 
         # 输出 regions.json

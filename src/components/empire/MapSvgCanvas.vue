@@ -41,6 +41,8 @@ type Sector = {
   shcon_anchors?: Record<string, Anchor>
   highways?: Record<string, Highway>
   cluster_gates?: Record<string, Gate>
+  has_khaak_hive?: boolean
+  khaak_hive_sources?: string[]
 }
 type Cluster = {
   id: string
@@ -76,6 +78,8 @@ type SectorHoverPayload = {
   owner: string
   sunlight: number
   resources: SectorResourceEntry[]
+  hasKhaakHive: boolean
+  khaakHiveSources: string[]
   anchorRect: {
     left: number
     top: number
@@ -741,6 +745,8 @@ const clusterPolygons = computed(() => {
       label: string
       labelY: number
       labelFontSize: number
+      hasKhaakHive: boolean
+      khaakHiveSources: string[]
     }>
     singleLabel?: string
     singleRadius?: number
@@ -772,6 +778,8 @@ const clusterPolygons = computed(() => {
       label: string
       labelY: number
       labelFontSize: number
+      hasKhaakHive: boolean
+      khaakHiveSources: string[]
     }> = []
     // 新方案：2-sector 和 3-sector 采用不同策略
     // 2-sector: 内层虚拟边框 0.95，sector 紧贴内层边框
@@ -814,7 +822,9 @@ const clusterPolygons = computed(() => {
         color: resolveOwnerColor(sector),
         label: displayName,
         labelY: baseLabelY,
-        labelFontSize: Math.max(MIN_SECTOR_LABEL_FONT_SIZE, SECTOR_LABEL_FONT_SIZE * sectorRadiusRatio)
+        labelFontSize: Math.max(MIN_SECTOR_LABEL_FONT_SIZE, SECTOR_LABEL_FONT_SIZE * sectorRadiusRatio),
+        hasKhaakHive: (sector as Sector).has_khaak_hive || false,
+        khaakHiveSources: (sector as Sector).khaak_hive_sources || []
       })
     })
 
@@ -1076,7 +1086,9 @@ watchEffect(() => {
             displayName: cluster.sectors[0]?.displayName || '',
             owner: cluster.sectors[0]?.owner || 'ownerless',
             sunlight: cluster.sectors[0]?.sunlight || 0,
-            resources: cluster.sectors[0]?.resources || []
+            resources: cluster.sectors[0]?.resources || [],
+            hasKhaakHive: cluster.sectors[0]?.hasKhaakHive || false,
+            khaakHiveSources: cluster.sectors[0]?.khaakHiveSources || []
           })"
           @mouseleave="emitSectorLeave(cluster.sectors[0]?.id || '')"
         >
@@ -1175,7 +1187,9 @@ watchEffect(() => {
                 displayName: sector.displayName,
                 owner: sector.owner,
                 sunlight: sector.sunlight,
-                resources: sector.resources
+                resources: sector.resources,
+                hasKhaakHive: sector.hasKhaakHive,
+                khaakHiveSources: sector.khaakHiveSources
               })"
               @mouseleave="emitSectorLeave(sector.id)"
             >

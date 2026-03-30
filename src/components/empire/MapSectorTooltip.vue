@@ -1,17 +1,51 @@
 <script setup lang="ts">
-defineProps<{
-  title: string
-  ownerName: string
-  sunlightPercent: number
-  resources: Array<{
-    wareId: string
-    label: string
-    respawnLabel: string
-    color: string
-  }>
-  sunlightLabel: string
-  sunlightSuffix: string
+import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import { useMapStore } from '@/store/useMapStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { formatNumber } from '@/utils/numberFormatter'
+import { sortResourcesByPriority } from '@/store/logic/mapResourceFilter'
+
+const props = defineProps<{
+  sectorId: string
 }>()
+
+const { t } = useI18n()
+const mapStore = useMapStore()
+const gameDataStore = useGameDataStore()
+
+const sectorInfo = computed(() => mapStore.getSectorInfo(props.sectorId))
+
+const title = computed(() => sectorInfo.value?.displayName || props.sectorId)
+const ownerName = computed(() => sectorInfo.value?.owner || 'ownerless')
+const sunlightPercent = computed(() => sectorInfo.value?.sunlight || 0)
+const hasKhaakHive = computed(() => sectorInfo.value?.hasKhaakHive || false)
+const khaakHiveSourceNames = computed(() => sectorInfo.value?.khaakHiveSourceNames || [])
+
+const resourceColorByWare = computed(() => {
+  const map: Record<string, string> = {}
+  for (const entry of gameDataStore.res || []) {
+    map[entry.id] = entry.color_rgb
+  }
+  return map
+})
+
+const resources = computed(() => {
+  const sector = gameDataStore.maps?.clusters?.[sectorInfo.value?.clusterId || '']?.sectors?.[props.sectorId]
+  if (!sector || !Array.isArray((sector as any).resources)) return []
+  const resourceList = (sector as any).resources as Array<{ ware: string; respawn?: number }>
+  const sortedWareIds = sortResourcesByPriority(resourceList.map(r => r.ware))
+  const resourceMap = Object.fromEntries(resourceList.map(r => [r.ware, r]))
+  return sortedWareIds.map(wareId => {
+    const entry = resourceMap[wareId]
+    return {
+      wareId,
+      label: gameDataStore.getWareDisplayName(wareId) || wareId,
+      respawn: formatNumber(entry?.respawn ?? 0),
+      color: resourceColorByWare.value[wareId] || '#fbbf24'
+    }
+  })
+})
 </script>
 
 <template>
@@ -22,15 +56,25 @@ defineProps<{
     </header>
 
     <div class="sector-tooltip-grid">
-      <span class="resource-name">{{ sunlightLabel }}</span>
-      <span class="resource-value">{{ sunlightPercent }}{{ sunlightSuffix }}</span>
+      <span class="resource-name">{{ t('map.resource_filter_sunlight') }}</span>
+      <span class="resource-value">{{ sunlightPercent }}{{ t('map.resource_filter_sunlight_suffix') }}</span>
       <span class="resource-color sunlight-swatch"></span>
 
       <template v-for="resource in resources" :key="resource.wareId">
         <span class="resource-name">{{ resource.label }}</span>
-        <span class="resource-value">{{ resource.respawnLabel }}</span>
+        <span class="resource-value">{{ resource.respawn }}</span>
         <span class="resource-color" :style="{ backgroundColor: resource.color }"></span>
       </template>
+    </div>
+
+    <div v-if="hasKhaakHive || khaakHiveSourceNames.length > 0" class="khaak-info">
+      <div v-if="hasKhaakHive" class="khaak-line">{{ t('map.khaak_hive') }}</div>
+      <div v-if="khaakHiveSourceNames.length > 0" class="khaak-sources-section">
+        <div class="khaak-label">{{ t('map.potential_khaak_hive_sector') }}:</div>
+        <div class="khaak-sources">
+          <span v-for="name in khaakHiveSourceNames" :key="name" class="khaak-source-item">{{ name }}</span>
+        </div>
+      </div>
     </div>
   </section>
 </template>
@@ -104,5 +148,37 @@ defineProps<{
 
 .sunlight-swatch {
   background: #facc15;
+}
+
+.khaak-info {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(252, 211, 77, 0.2);
+}
+
+.khaak-line {
+  font-size: 13px;
+  line-height: 1.4;
+  color: rgba(255, 247, 237, 0.9);
+}
+
+.khaak-label {
+  font-size: 12px;
+  color: rgba(255, 247, 237, 0.7);
+  margin-bottom: 4px;
+}
+
+.khaak-sources {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+}
+
+.khaak-source-item {
+  font-size: 12px;
+  color: rgba(255, 247, 237, 0.9);
+  background: rgba(252, 211, 77, 0.15);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 </style>

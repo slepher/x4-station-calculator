@@ -7,8 +7,7 @@ import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
-import { formatNumber } from '@/utils/numberFormatter'
-import { sortResourcesByPriority, type SectorResourceFill } from '@/store/logic/mapResourceFilter'
+import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 
 type SearchSectorLayout = {
@@ -48,13 +47,9 @@ type SectorHoverPayload = {
   displayName: string
   owner: string
   sunlight: number
-  resources: Array<{
-    ware: string
-    yield?: string
-    level?: number
-    respawn?: number
-    rating?: number
-  }>
+  resources: MapSectorResourceEntry[]
+  hasKhaakHive: boolean
+  khaakHiveSources: string[]
   anchorRect: {
     left: number
     top: number
@@ -64,19 +59,9 @@ type SectorHoverPayload = {
     height: number
   }
 }
-type TooltipResourceItem = {
-  wareId: string
-  label: string
-  respawnLabel: string
-  color: string
-}
 type TooltipPlacement = 'bottom' | 'top' | 'left' | 'right' | 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right'
 type TooltipViewModel = {
   sectorId: string
-  title: string
-  ownerName: string
-  sunlightPercent: number
-  resources: TooltipResourceItem[]
   anchorRect: SectorHoverPayload['anchorRect']
 }
 type PlacementOverlayItem = {
@@ -156,16 +141,6 @@ const lastMousePos = ref({ x: 0, y: 0 })
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
 const empireStore = useEmpireStore()
-const factionsById = computed(() => Object.fromEntries(
-  (gameDataStore.factions || []).map((entry: any) => [entry.id, entry])
-) as Record<string, { id: string; nameId: string }>)
-const resourceColorByWare = computed(() => Object.fromEntries(
-  (gameDataStore.res || []).map((entry: any) => [entry.id, entry.color_rgb || '#fbbf24'])
-) as Record<string, string>)
-const availableResourceIds = computed(() =>
-  (gameDataStore.res || []).map((entry: any) => entry.id as string).filter((id) => id !== 'energycells')
-)
-const sortedResourceIds = computed(() => sortResourcesByPriority(availableResourceIds.value))
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
   const clusters = gameDataStore.maps?.clusters || {}
@@ -506,13 +481,6 @@ const scheduleTooltipClose = () => {
   }, 90)
 }
 
-const formatOwnerName = (owner: string) => {
-  if (owner === 'ownerless') return t('map.ownerless_name')
-  const faction = factionsById.value[owner]!
-  if (te(faction.nameId)) return t(faction.nameId)
-  return t(faction.nameId)
-}
-
 const chooseTooltipPlacement = (
   anchor: SectorHoverPayload['anchorRect'],
   viewportWidth: number,
@@ -680,19 +648,7 @@ const scheduleZoomTooltipRestore = () => {
 
 const createTooltipViewModel = (payload: SectorHoverPayload): TooltipViewModel => ({
     sectorId: payload.sectorId,
-    title: locale.value === 'en' ? payload.name : payload.displayName,
-    ownerName: formatOwnerName(payload.owner),
-    sunlightPercent: payload.sunlight,
-    resources: sortedResourceIds.value
-      .map((wareId) => payload.resources.find((item) => item.ware === wareId))
-      .filter((entry): entry is NonNullable<typeof entry> => Boolean(entry))
-      .map((entry) => ({
-        wareId: entry.ware,
-        label: gameDataStore.getWareDisplayName(entry.ware) || (t(`res.${entry.ware}`) !== `res.${entry.ware}` ? t(`res.${entry.ware}`) : entry.ware),
-        respawnLabel: formatNumber(entry.respawn ?? 0),
-        color: resourceColorByWare.value[entry.ware] || '#fbbf24'
-      })),
-    anchorRect: payload.anchorRect
+    anchorRect: payload.anchorRect,
   })
 
 const onSectorHover = (payload: SectorHoverPayload) => {
@@ -1169,12 +1125,7 @@ onBeforeUnmount(() => {
           >
             <MapSectorTooltip
               ref="tooltipRef"
-              :title="hoveredSector.title"
-              :owner-name="hoveredSector.ownerName"
-              :sunlight-percent="hoveredSector.sunlightPercent"
-              :resources="hoveredSector.resources"
-              :sunlight-label="t('map.resource_filter_sunlight')"
-              :sunlight-suffix="t('map.resource_filter_sunlight_suffix')"
+              :sector-id="hoveredSector.sectorId"
             />
           </div>
         </div>

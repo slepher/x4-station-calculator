@@ -373,6 +373,11 @@
                 "sy": -0.6654130959301102
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_37_Sector001_macro"
           ]
         },
         "Cluster_01_Sector002_macro": {
@@ -803,6 +808,11 @@
                 "sy": -0.0
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_37_Sector001_macro"
           ]
         },
         "Cluster_01_Sector003_macro": {
@@ -1096,6 +1106,11 @@
                 "sy": 0.4051200734933053
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -1401,6 +1416,11 @@
                 "sy": -0.06070050953899609
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_45_Sector001_macro"
           ]
         }
       },
@@ -1590,6 +1610,11 @@
                 "sy": -0.38312386920038893
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -1874,7 +1899,12 @@
               ]
             }
           },
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_37_Sector001_macro"
+          ]
         },
         "Cluster_04_Sector002_macro": {
           "id": "Cluster_04_Sector002_macro",
@@ -1959,7 +1989,12 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_37_Sector001_macro"
+          ]
         }
       },
       "sector_links": {
@@ -2115,6 +2150,10 @@
                 "sy": -0.296030595658562
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         }
       },
@@ -2379,6 +2418,11 @@
                 "sy": 0.3659549975226995
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_28_Sector001_macro"
           ]
         },
         "Cluster_06_Sector002_macro": {
@@ -2605,6 +2649,10 @@
                 "sy": -0.3202051347232944
               }
             }
+          ],
+          "has_khaak_hive": true,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -2752,6 +2800,10 @@
                 "sy": -0.01966041787606014
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         }
       },
@@ -3054,6 +3106,12 @@
                 "sy": 0.1278891244020541
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_31_Sector001_macro",
+            "Cluster_45_Sector001_macro"
           ]
         }
       },
@@ -3301,6 +3359,11 @@
                 "sy": 0.08331306201904906
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro",
+            "Cluster_20_Sector001_macro"
           ]
         }
       },
@@ -3502,6 +3565,11 @@
                 "sy": -0.392585889736812
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro",
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -3887,6 +3955,12 @@
                 "sy": 0.895800157240596
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_35_Sector001_macro",
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -4102,6 +4176,12 @@
                 "sy": -0.5071777350969757
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_28_Sector001_macro",
+            "Cluster_35_Sector001_macro"
           ]
         }
       },
@@ -4431,6 +4511,11 @@
                 "sy": 0.2974090234084661
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -4666,6 +4751,12 @@
                 "sy": -0.2299743471202603
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_28_Sector001_macro",
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -5034,6 +5125,10 @@
                 "sy": -0.18770013253125986
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         },
         "Cluster_15_Sector002_macro": {
@@ -5261,6 +5356,10 @@
                 "sy": -0.26875961167360224
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -5534,7 +5633,9 @@
                 "sy": 0.39914953964399924
               }
             }
-          ]
+          ],
+          "has_khaak_hive": true,
+          "khaak_hive_sources": []
         }
       },
       "sector_links": {}
@@ -5739,6 +5840,10 @@
                 "sy": -0.42871906688337014
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -6240,6 +6345,12 @@
                 "sy": 0.5900110855521911
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro",
+            "Cluster_20_Sector001_macro",
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -6586,6 +6697,10 @@
                 "sy": 0.204074117465792
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
           ]
         },
         "Cluster_19_Sector002_macro": {
@@ -6865,6 +6980,10 @@
                 "sy": -0.3211258028343677
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
           ]
         }
       },
@@ -7101,7 +7220,9 @@
                 "sy": -0.5728672356990302
               }
             }
-          ]
+          ],
+          "has_khaak_hive": true,
+          "khaak_hive_sources": []
         }
       },
       "sector_links": {}
@@ -7357,6 +7478,10 @@
                 "sy": -0.1088542737039209
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
           ]
         },
         "Cluster_21_Sector002_macro": {
@@ -7499,6 +7624,10 @@
                 "sy": -0.37155757377267434
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
           ]
         }
       },
@@ -7805,6 +7934,11 @@
                 "sy": 0.1392986333862751
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -7925,6 +8059,10 @@
                 "sy": -0.550656331794582
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -8505,6 +8643,12 @@
                 "sy": 0.371410573899631
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_35_Sector001_macro",
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -8803,6 +8947,11 @@
                 "sy": -0.24199115517312889
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_35_Sector001_macro"
           ]
         },
         "Cluster_25_Sector002_macro": {
@@ -8941,6 +9090,11 @@
                 "sy": -0.4580866828593182
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_35_Sector001_macro"
           ]
         }
       },
@@ -9155,6 +9309,10 @@
                 "sy": -0.19682048205855213
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         },
         "Cluster_26_Sector002_macro": {
@@ -9313,6 +9471,10 @@
                 "sy": -0.5306711448445149
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -9650,6 +9812,11 @@
                 "sy": 0.16368911112453652
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -10003,6 +10170,10 @@
                 "sy": 0.4392345038422052
               }
             }
+          ],
+          "has_khaak_hive": true,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         }
       },
@@ -10307,6 +10478,12 @@
                 "sy": 0.27503248382313306
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_31_Sector001_macro",
+            "Cluster_45_Sector001_macro"
           ]
         },
         "Cluster_29_Sector002_macro": {
@@ -10600,6 +10777,12 @@
                 "sy": 0.1600520136044015
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_31_Sector001_macro",
+            "Cluster_45_Sector001_macro"
           ]
         }
       },
@@ -10739,6 +10922,10 @@
                 "sy": 0.053530377237466197
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -10921,7 +11108,9 @@
                 "sy": -0.23833067230983637
               }
             }
-          ]
+          ],
+          "has_khaak_hive": true,
+          "khaak_hive_sources": []
         }
       },
       "sector_links": {}
@@ -11322,6 +11511,10 @@
                 "sy": 0.34457807590702055
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         },
         "Cluster_32_Sector002_macro": {
@@ -11496,6 +11689,10 @@
                 "sy": -0.4320545262668225
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -11779,7 +11976,8 @@
                 "sy": -0.09061218270475414
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -12018,6 +12216,11 @@
                 "sy": -0.23274624590077292
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro",
+            "Cluster_45_Sector001_macro"
           ]
         }
       },
@@ -12186,7 +12389,9 @@
                 "sy": -0.23087107961559272
               }
             }
-          ]
+          ],
+          "has_khaak_hive": true,
+          "khaak_hive_sources": []
         }
       },
       "sector_links": {}
@@ -12350,6 +12555,11 @@
                 "sy": -0.5508764927364673
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_35_Sector001_macro"
           ]
         }
       },
@@ -12620,7 +12830,9 @@
                 "sy": -0.11146916760510821
               }
             }
-          ]
+          ],
+          "has_khaak_hive": true,
+          "khaak_hive_sources": []
         }
       },
       "sector_links": {}
@@ -12884,6 +13096,10 @@
                 "sy": -0.5599856467430278
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -12990,7 +13206,8 @@
                 "sy": -0.43369215399418987
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -13158,6 +13375,11 @@
                 "sy": -0.0
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -13306,6 +13528,10 @@
                 "sy": 0.5000743172340568
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         }
       },
@@ -13431,6 +13657,10 @@
                 "sy": -0.3883102348147212
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
           ]
         },
         "Cluster_42_Sector002_macro": {
@@ -13508,6 +13738,10 @@
                 "sy": -0.0
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
           ]
         }
       },
@@ -13675,6 +13909,10 @@
                 "sy": -0.5657729020581653
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
           ]
         }
       },
@@ -13839,6 +14077,10 @@
                 "sy": -0.0
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_45_Sector001_macro"
           ]
         }
       },
@@ -14055,7 +14297,9 @@
                 "sy": -0.3905425981198335
               }
             }
-          ]
+          ],
+          "has_khaak_hive": true,
+          "khaak_hive_sources": []
         }
       },
       "sector_links": {}
@@ -14245,6 +14489,10 @@
                 "sy": 0.5602722031610592
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -14475,6 +14723,10 @@
                 "sy": 0.13857165953442427
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
           ]
         }
       },
@@ -14644,7 +14896,12 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_28_Sector001_macro"
+          ]
         }
       },
       "sector_links": {}
@@ -14845,7 +15102,12 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_28_Sector001_macro"
+          ]
         }
       },
       "sector_links": {}
@@ -14992,7 +15254,11 @@
           },
           "cluster_gates": {},
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
+          ]
         },
         "Cluster_50_Sector002_macro": {
           "id": "Cluster_50_Sector002_macro",
@@ -15135,7 +15401,11 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_20_Sector001_macro"
+          ]
         }
       },
       "sector_links": {
@@ -15397,6 +15667,10 @@
                 "sy": -0.09744668012730623
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_37_Sector001_macro"
           ]
         }
       },
@@ -15562,7 +15836,8 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -15728,7 +16003,8 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -15893,7 +16169,8 @@
                 "sy": -0.23876388918097904
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -16124,7 +16401,8 @@
                 "sy": 0.5506207898597337
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -16218,6 +16496,10 @@
                 "sy": 0.20797726641813255
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_35_Sector001_macro"
           ]
         }
       },
@@ -16506,7 +16788,8 @@
                 "sy": 0.7741578163548622
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -16730,6 +17013,10 @@
                 "sy": 0.45740604782711053
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -16912,7 +17199,8 @@
                 "sy": -0.05184637621977062
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -17318,7 +17606,8 @@
                 "sy": 0.04977742315393306
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -17450,7 +17739,8 @@
                 "sy": 0.5960139411080532
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -17605,7 +17895,8 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -17858,6 +18149,11 @@
                 "sy": -0.24145625299899365
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_35_Sector001_macro"
           ]
         }
       },
@@ -17964,6 +18260,10 @@
                 "sy": 0.22917745599464848
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -18196,6 +18496,10 @@
                 "sy": 0.47862978134343565
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -18364,7 +18668,8 @@
                 "sy": 0.5582761208949969
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -18494,6 +18799,10 @@
                 "sy": 0.07240909282273679
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -18638,7 +18947,8 @@
                 "sy": 0.01801590478790991
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -18800,7 +19110,8 @@
                 "sy": -0.0
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -18944,7 +19255,8 @@
                 "sy": -0.06644475096781925
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -19084,6 +19396,10 @@
                 "sy": 0.016166326497719423
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -19209,6 +19525,10 @@
                 "sy": -0.24595389319870165
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         },
         "Cluster_408_Sector002_macro": {
@@ -19288,6 +19608,10 @@
                 "sy": -0.24618893021080573
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -19427,6 +19751,10 @@
                 "sy": -0.39328878475416085
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -19605,6 +19933,10 @@
                 "sy": -0.40382085814159363
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -19813,7 +20145,8 @@
                 "sy": -0.6577493352925592
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -19991,7 +20324,8 @@
                 "sy": -0.40940765542757507
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -20145,7 +20479,8 @@
                 "sy": 0.27252364937731777
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -20279,7 +20614,8 @@
                 "sy": -0.3811863369261018
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -20481,7 +20817,8 @@
                 "sy": -0.0
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -20596,7 +20933,8 @@
                 "sy": -0.20998309581966598
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         },
         "Cluster_416_Sector002_macro": {
           "id": "Cluster_416_Sector002_macro",
@@ -20728,7 +21066,8 @@
                 "sy": -0.0
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {
@@ -20857,7 +21196,8 @@
                 "sy": -0.45844526528518376
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -21116,7 +21456,8 @@
                 "sy": 0.3024200839742353
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -21244,7 +21585,8 @@
                 "sy": -0.2788800812348303
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -21408,6 +21750,10 @@
                 "sy": -0.41194464727724245
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -21562,6 +21908,10 @@
                 "sy": -0.366048684540277
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -21730,6 +22080,10 @@
                 "sy": -0.0
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -21855,6 +22209,10 @@
                 "sy": -0.3902368976858364
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         },
         "Cluster_423_Sector002_macro": {
@@ -21934,6 +22292,10 @@
                 "sy": 0.11898880014028013
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -22086,7 +22448,8 @@
                 "sy": 0.35449953574855875
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         },
         "Cluster_424_Sector002_macro": {
           "id": "Cluster_424_Sector002_macro",
@@ -22231,7 +22594,8 @@
                 "sy": -0.0
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {
@@ -22371,7 +22735,8 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -22573,6 +22938,10 @@
                 "sy": 0.32143073452403387
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -22703,7 +23072,8 @@
                 "sy": 0.5587516435129942
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -22817,7 +23187,8 @@
                 "sy": -0.20863730961154064
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -22941,7 +23312,8 @@
                 "sy": 0.4824950686655649
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         },
         "Cluster_104_Sector002_macro": {
           "id": "Cluster_104_Sector002_macro",
@@ -23053,7 +23425,8 @@
                 "sy": 0.4303913648025098
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {
@@ -23196,7 +23569,8 @@
                 "sy": 0.5157161157173993
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -23314,7 +23688,8 @@
                 "sy": -0.1955364220291461
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -23467,7 +23842,8 @@
                 "sy": -0.3076044007834754
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         },
         "Cluster_108_Sector002_macro": {
           "id": "Cluster_108_Sector002_macro",
@@ -23582,7 +23958,8 @@
                 "sy": -0.5130024107442496
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         },
         "Cluster_108_Sector003_macro": {
           "id": "Cluster_108_Sector003_macro",
@@ -23733,7 +24110,8 @@
                 "sy": -3.4236360474907177
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {
@@ -23884,7 +24262,8 @@
                 "sy": -0.27719989308653464
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -24048,7 +24427,8 @@
                 "sy": -0.028984376417705807
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -24154,7 +24534,8 @@
                 "sy": -0.03013529948832329
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -24380,6 +24761,10 @@
                 "sy": -0.384518766778944
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         },
         "Cluster_112_Sector002_macro": {
@@ -24539,6 +24924,10 @@
                 "sy": -0.0
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -24769,6 +25158,10 @@
                 "sy": -0.20419699573947328
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -24987,6 +25380,10 @@
                 "sy": 0.4197026834786111
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -25139,6 +25536,10 @@
                 "sy": 0.28157021424411155
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -25321,7 +25722,8 @@
                 "sy": -0.039318214353004685
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -25589,6 +25991,10 @@
                 "sy": 0.5050635604505197
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         },
         "Cluster_500_Sector002_macro": {
@@ -25746,6 +26152,10 @@
                 "sy": -0.38071249011379577
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         },
         "Cluster_500_Sector003_macro": {
@@ -25846,6 +26256,10 @@
                 "sy": -0.2641037549941306
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         }
       },
@@ -26114,6 +26528,11 @@
                 "sy": -0.1532980600651612
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro",
+            "Cluster_45_Sector001_macro"
           ]
         }
       },
@@ -26283,6 +26702,10 @@
                 "sy": -0.6409236758003578
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         }
       },
@@ -26522,6 +26945,10 @@
                 "sy": -0.003209083858115575
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
           ]
         }
       },
@@ -26695,7 +27122,8 @@
                 "sy": -0.0
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -26871,7 +27299,11 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
+          ]
         }
       },
       "sector_links": {}
@@ -27030,6 +27462,10 @@
                 "sy": -0.17414733107083855
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -27209,6 +27645,10 @@
                 "sy": -0.04253401028723649
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_31_Sector001_macro"
           ]
         }
       },
@@ -27344,6 +27784,10 @@
                 "sy": 0.14541739164254283
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_28_Sector001_macro"
           ]
         }
       },
@@ -27796,7 +28240,8 @@
               ]
             }
           },
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -28022,7 +28467,8 @@
                 "sy": -0.3816802796910709
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         },
         "Cluster_606_Sector002_macro": {
           "id": "Cluster_606_Sector002_macro",
@@ -28361,7 +28807,8 @@
                 "sy": 0.1797591970353102
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         },
         "Cluster_606_Sector003_macro": {
           "id": "Cluster_606_Sector003_macro",
@@ -28560,7 +29007,8 @@
                 "sy": -0.4333211352066199
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {
@@ -28810,7 +29258,8 @@
                 "sy": -0.12905929194384752
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -29084,7 +29533,8 @@
                 "sy": -0.06074210150544539
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -29362,7 +29812,8 @@
                 "sy": 0.13103001835986935
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -29478,6 +29929,10 @@
                 "sy": 0.17688964104017535
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -29757,6 +30212,10 @@
                 "sy": -0.17578693184229433
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_16_Sector001_macro"
           ]
         }
       },
@@ -29991,7 +30450,8 @@
                 "sy": -0.23967910451829705
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -30195,6 +30655,10 @@
                 "sy": -0.2561197602225907
               }
             }
+          ],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_45_Sector001_macro"
           ]
         }
       },
@@ -30399,7 +30863,8 @@
                 "sy": -0.09704943829871447
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -30548,7 +31013,11 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
+          ]
         }
       },
       "sector_links": {}
@@ -30708,7 +31177,8 @@
                 "sy": -0.06205151456677116
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -30876,7 +31346,8 @@
                 "sy": 0.6168731307327848
               }
             }
-          ]
+          ],
+          "has_khaak_hive": false
         }
       },
       "sector_links": {}
@@ -31037,7 +31508,11 @@
             }
           },
           "highways": {},
-          "stations": []
+          "stations": [],
+          "has_khaak_hive": false,
+          "khaak_hive_sources": [
+            "Cluster_06_Sector002_macro"
+          ]
         }
       },
       "sector_links": {}

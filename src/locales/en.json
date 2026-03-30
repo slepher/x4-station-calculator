@@ -145,6 +145,8 @@
     "station_panel_drag_action": "Drag to map",
     "station_panel_clear_action": "Clear location",
     "station_panel_empty": "No matching entries",
+    "khaak_hive": "Possible Khaak Hive",
+    "potential_khaak_hive_sector": "Potential Khaak Hive Sector",
     "station_panel_hint": "Drag to a sector, then continue dragging on the map to fine-tune.",
     "yield_names": {
       "midlow": "Mid Low",

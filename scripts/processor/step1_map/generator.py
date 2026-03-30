@@ -4,7 +4,7 @@ import math
 import re
 from collections import defaultdict
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import xml.etree.ElementTree as ET
 
@@ -122,6 +122,7 @@ def generate_map_data(
     dlc_order: Optional[List[str]] = None,
     sector_resource_areas: Optional[Dict[str, List[dict]]] = None,
     definitions: Optional[Dict[str, dict]] = None,
+    khaak_activity_xml_path: Optional[Path] = None,
 ) -> Dict[str, object]:
     """
     生成地图数据。
@@ -957,6 +958,27 @@ def generate_map_data(
             sector_links[link_id]["render"]["lane_count"] = count
 
     nested_clusters: Dict[str, dict] = {}
+    sectors_with_khaak_hive: Set[str] = set()
+
+    if khaak_activity_xml_path and khaak_activity_xml_path.exists():
+        khaak_root = parse_xml(khaak_activity_xml_path)
+        sector_macro_by_lower = {key.lower(): key for key in sectors.keys()}
+        patch_find_sectors = set()
+        for patch in khaak_root.findall(".//patch"):
+            for find_sector in patch.findall(".//find_sector"):
+                patch_find_sectors.add(find_sector)
+        for find_sector in khaak_root.findall(".//find_sector"):
+            if find_sector in patch_find_sectors:
+                continue
+            macro_attr = (find_sector.get("macro") or "").strip()
+            if not macro_attr:
+                continue
+            if macro_attr.startswith("macro."):
+                sector_macro_lower = macro_attr[6:]
+                sector_id = sector_macro_by_lower.get(sector_macro_lower.lower())
+                if sector_id:
+                    sectors_with_khaak_hive.add(sector_id)
+
     for cluster_id, cluster in clusters.items():
         nested_cluster = {
             key: value
@@ -980,6 +1002,7 @@ def generate_map_data(
         nested_sector["cluster_gates"] = {}
         nested_sector["highways"] = {}
         nested_sector["stations"] = []
+        nested_sector["has_khaak_hive"] = sector_id in sectors_with_khaak_hive
         nested_clusters[cluster_id]["sectors"][sector_id] = nested_sector
 
     for zone_id, zone in zones.items():
@@ -1050,6 +1073,51 @@ def generate_map_data(
         cluster_id = sectors[sector_id]["cluster_id"]
         if cluster_id and cluster_id in nested_clusters and sector_id in nested_clusters[cluster_id]["sectors"]:
             nested_clusters[cluster_id]["sectors"][sector_id]["stations"] = station_items
+
+    # 计算 khaak_hive_sources: 3 跳内的 hive 来源
+    # 1. 构建 cluster 邻接图
+    cluster_adj: Dict[str, Set[str]] = defaultdict(set)
+    for gate in cluster_links.values():
+        cluster_a = gate["cluster_id"]
+        cluster_b = gate["target_cluster_id"]
+        cluster_adj[cluster_a].add(cluster_b)
+        cluster_adj[cluster_b].add(cluster_a)
+
+    # 2. 找出所有 hive sector 和其所属 cluster
+    hive_sectors_by_cluster: Dict[str, List[str]] = defaultdict(list)
+    for cluster_id, cluster in nested_clusters.items():
+        for sector_id, sector in cluster.get("sectors", {}).items():
+            if sector.get("has_khaak_hive"):
+                hive_sectors_by_cluster[cluster_id].append(sector_id)
+
+    # 3. BFS 计算每个 cluster 到 hive cluster 的跳数
+    cluster_to_hive_sources: Dict[str, List[str]] = defaultdict(list)
+    for hive_cluster_id, hive_sector_ids in hive_sectors_by_cluster.items():
+        # BFS 找 3 跳内的 cluster
+        visited: Dict[str, int] = {hive_cluster_id: 0}
+        queue = [hive_cluster_id]
+        while queue:
+            current = queue.pop(0)
+            current_dist = visited[current]
+            if current_dist >= 3:
+                continue
+            for neighbor in cluster_adj.get(current, set()):
+                if neighbor not in visited:
+                    visited[neighbor] = current_dist + 1
+                    queue.append(neighbor)
+        # 为 3 跳内的 cluster 记录 hive 来源
+        for target_cluster_id, dist in visited.items():
+            if dist <= 3:
+                for hive_sector_id in hive_sector_ids:
+                    cluster_to_hive_sources[target_cluster_id].append(hive_sector_id)
+
+    # 4. 为每个 sector 添加 khaak_hive_sources
+    for cluster_id, source_list in cluster_to_hive_sources.items():
+        if cluster_id in nested_clusters:
+            for sector_id, sector in nested_clusters[cluster_id].get("sectors", {}).items():
+                # 排除自己作为自己的来源
+                filtered_sources = [s for s in source_list if s != sector_id]
+                sector["khaak_hive_sources"] = sorted(filtered_sources)
 
     payload = {
         "clusters": nested_clusters,
