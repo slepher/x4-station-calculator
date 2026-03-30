@@ -69,6 +69,13 @@
 - [x] 显示逻辑组网存档列表
 - [x] 支持两种来源的载入状态显示
 
+### 10. Optimize refresh button layout
+
+- [x] 将刷新按钮从 `advanced-toolbar` 移动到 `advanced-pending` 右侧
+- [x] 创建共享父元素 `.advanced-refresh-row`
+- [x] 当 `hasPendingRefresh === false` 时隐藏整个父元素
+- [x] 刷新按钮右对齐
+
 ## Dependencies
 
 - `useEmpireStore` - 获取星区和空间站数据

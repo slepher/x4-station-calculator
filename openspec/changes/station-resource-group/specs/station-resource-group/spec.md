@@ -87,6 +87,25 @@
 **前提** 用户选择某个逻辑组网存档
 **当** 需要创建资源组
 **那么** 遍历存档中每个 SavedFlowGroup
-**并且** 对每个 SavedFlowNode 获取初始 wareId
-**并且** 调用 `computeExpandUpstream` 展开获取所有节点
-**并且** 过滤出 tier0 资源（ware.tier === 0 && wareId !== 'energycells'）
+**并且** 收集 isolated 节点的 wareId 用于跳过展开
+**并且** 对每个 module 节点获取输出 wareId
+**并且** 递归展开获取 tier0 资源（跳过 isolated 节点的展开路径）
+**并且** 排除 energycells
+
+### Requirement: Refresh Button Layout
+
+刷新按钮与 pending 提示共享父元素，无待刷新时隐藏。
+
+#### Scenario: Show refresh row when pending
+
+**前提** 筛选条件已变更
+**当** 需要显示刷新提示
+**那么** 显示 `.advanced-refresh-row` 容器
+**并且** 左侧显示 pending 提示文本
+**并且** 右侧显示刷新按钮
+
+#### Scenario: Hide refresh row when not pending
+
+**前提** 筛选条件未变更或已刷新
+**当** 不需要刷新
+**那么** 隐藏整个 `.advanced-refresh-row` 容器
