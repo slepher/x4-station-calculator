@@ -334,6 +334,10 @@ const onPanelClose = () => emit('panel-close')
   @apply rounded-md border border-amber-300/20 bg-black/40 px-3 py-4 text-center text-xs text-amber-100/55;
 }
 
+:deep(.advanced-panel) {
+  @apply flex flex-col gap-3;
+}
+
 :deep(.advanced-toolbar) {
   @apply flex flex-wrap items-center justify-between gap-2;
 }
@@ -397,15 +401,15 @@ const onPanelClose = () => emit('panel-close')
 }
 
 :deep(.advanced-pending) {
-  @apply mt-2 rounded-md border border-amber-300/20 bg-amber-200/10 px-3 py-2 text-xs text-amber-100/85;
+  @apply rounded-md border border-amber-300/20 bg-amber-200/10 px-3 py-2 text-xs text-amber-100/85;
 }
 
 :deep(.advanced-group-list) {
-  @apply mt-3 space-y-2;
+  @apply space-y-2;
 }
 
 :deep(.advanced-add-btn) {
-  @apply mt-2;
+  @apply self-start;
 }
 
 :deep(.advanced-group-card) {
@@ -447,7 +451,6 @@ const onPanelClose = () => emit('panel-close')
 }
 
 :deep(.advanced-candidates) {
-  @apply mt-4;
 }
 
 :deep(.advanced-candidate-item) {

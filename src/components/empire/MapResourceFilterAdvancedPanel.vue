@@ -413,52 +413,9 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
 
 <template>
   <div class="advanced-panel">
-    <div class="advanced-toolbar">
-      <div class="advanced-inline-settings">
-        <div class="advanced-control jump-control">
-          <span>{{ t('map.resource_filter_jump_limit') }}</span>
-          <div class="sunlight-input-wrap jump-input-wrap">
-            <input
-              class="sunlight-input"
-              type="number"
-              min="1"
-              max="5"
-              step="1"
-              :value="jumpLimitDraft"
-              data-testid="map-resource-advanced-jump-limit"
-              @input="updateJumpLimit(Number(($event.target as HTMLInputElement).value || 1))"
-            />
-            <span class="sunlight-suffix">{{ t('map.resource_filter_jump_suffix') }}</span>
-            <div class="sunlight-stepper">
-              <button type="button" class="sunlight-step-btn" @click="stepJumpLimit(1)">▲</button>
-              <button type="button" class="sunlight-step-btn" @click="stepJumpLimit(-1)">▼</button>
-            </div>
-          </div>
-        </div>
-
-        <label class="advanced-control checkbox">
-          <input
-            v-model="allowTransitDraft"
-            class="advanced-checkbox"
-            type="checkbox"
-            data-testid="map-resource-advanced-allow-transit"
-            @change="markDirty"
-          />
-          <span>{{ t('map.resource_filter_allow_transit') }}</span>
-        </label>
-
-        <button
-          type="button"
-          class="advanced-refresh-btn"
-          data-testid="map-resource-advanced-refresh"
-          @click="refreshCandidates"
-        >
-          {{ t('map.resource_filter_refresh') }}
-        </button>
-      </div>
-    </div>
-
-    <div v-if="hasPendingRefresh" class="advanced-pending">{{ t('map.resource_filter_pending_refresh') }}</div>
+    <button type="button" class="advanced-add-btn" data-testid="map-resource-advanced-add-group" @click="addGroup">
+      {{ t('map.resource_filter_add_group') }}
+    </button>
 
     <div class="advanced-group-list">
       <div
@@ -571,9 +528,52 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
       </div>
     </div>
 
-    <button type="button" class="advanced-add-btn" data-testid="map-resource-advanced-add-group" @click="addGroup">
-      {{ t('map.resource_filter_add_group') }}
-    </button>
+    <div class="advanced-toolbar">
+      <div class="advanced-inline-settings">
+        <div class="advanced-control jump-control">
+          <span>{{ t('map.resource_filter_jump_limit') }}</span>
+          <div class="sunlight-input-wrap jump-input-wrap">
+            <input
+              class="sunlight-input"
+              type="number"
+              min="1"
+              max="5"
+              step="1"
+              :value="jumpLimitDraft"
+              data-testid="map-resource-advanced-jump-limit"
+              @input="updateJumpLimit(Number(($event.target as HTMLInputElement).value || 1))"
+            />
+            <span class="sunlight-suffix">{{ t('map.resource_filter_jump_suffix') }}</span>
+            <div class="sunlight-stepper">
+              <button type="button" class="sunlight-step-btn" @click="stepJumpLimit(1)">▲</button>
+              <button type="button" class="sunlight-step-btn" @click="stepJumpLimit(-1)">▼</button>
+            </div>
+          </div>
+        </div>
+
+        <label class="advanced-control checkbox">
+          <input
+            v-model="allowTransitDraft"
+            class="advanced-checkbox"
+            type="checkbox"
+            data-testid="map-resource-advanced-allow-transit"
+            @change="markDirty"
+          />
+          <span>{{ t('map.resource_filter_allow_transit') }}</span>
+        </label>
+
+        <button
+          type="button"
+          class="advanced-refresh-btn"
+          data-testid="map-resource-advanced-refresh"
+          @click="refreshCandidates"
+        >
+          {{ t('map.resource_filter_refresh') }}
+        </button>
+      </div>
+    </div>
+
+    <div v-if="hasPendingRefresh" class="advanced-pending">{{ t('map.resource_filter_pending_refresh') }}</div>
 
     <div class="resource-candidate-box advanced-candidates">
       <div class="candidate-header">
