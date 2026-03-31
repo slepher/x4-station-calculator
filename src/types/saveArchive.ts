@@ -1,5 +1,19 @@
 export type SaveSource = 'original' | 'imported'
 
+export interface ProgressInfo {
+  phase: 'receiving' | 'parsing' | 'finalizing' | 'done' | 'error'
+  inputBytesTotal: number
+  parsedBytesTotal: number
+  bufferedBytes: number
+  expectedTotalBytes: number
+  percent: number
+  tagCount: number
+  sectorCount: number
+  done: boolean
+  inputComplete: boolean
+  error: string | null
+}
+
 export interface SaveMeta {
   guid: string
   seed: number
@@ -7,7 +21,7 @@ export interface SaveMeta {
   playerName: string
   version: string
   filename: string
-  parser_version: 'v1'
+  parser_version: 'v1' | 'v2'
   source: SaveSource
 }
 
@@ -83,6 +97,11 @@ export type SaveParserProgress = {
   status: string
 }
 
+export type SaveParserRustProgress = {
+  type: 'progress'
+  data: ProgressInfo
+}
+
 export type SaveParserComplete = {
   type: 'complete'
   data: SaveArchive
@@ -93,7 +112,9 @@ export type SaveParserError = {
   message: string
 }
 
-export type SaveParserMessage = SaveParserProgress | SaveParserComplete | SaveParserError
+export type SaveParserRustMessage = SaveParserRustProgress | SaveParserComplete | SaveParserError
+
+export type SaveParserMessage = SaveParserProgress | SaveParserRustProgress | SaveParserComplete | SaveParserError
 
 export interface SaveParserConfig {
   sectorNames: Record<string, string>

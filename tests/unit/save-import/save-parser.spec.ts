@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createSaveParserRuntime } from '@/workers/saveParserSimplified.worker'
+import { createSaveParserRuntime } from '../../../src/workers/saveParserSimplified.worker'
 import { readFile } from 'node:fs/promises'
 
 describe('save parser core (simplified)', () => {
@@ -42,12 +42,12 @@ describe('save parser core (simplified)', () => {
   })
 })
 
-describe('save parser (Rust WASM)', () => {
-  it('parses xml into archive data', async () => {
-    const initWasm = (await import('@/wasm/save_parser.js')).default
-    const { SaveParser } = await import('@/wasm/save_parser.js')
+describe('save parser (Rust WASM v3)', () => {
+  it('parses xml with pump loop into archive data', async () => {
+    const initWasm = (await import('../../../src/wasm/save_parser.js')).default
+    const { SaveParser } = await import('../../../src/wasm/save_parser.js')
     
-    const wasmPath = new URL('../../src/wasm/save_parser_bg.wasm', import.meta.url)
+    const wasmPath = new URL('../../../src/wasm/save_parser_bg.wasm', import.meta.url)
     const wasmBinary = await readFile(wasmPath)
     await initWasm({ module_or_path: wasmBinary })
     
@@ -64,7 +64,17 @@ describe('save parser (Rust WASM)', () => {
       </component>
       </savegame>`
     
-    parser.feed(new TextEncoder().encode(xml))
+    const data = new TextEncoder().encode(xml)
+    parser.load_document(data)
+    
+    while (true) {
+      const hasMore = parser.pump(1000)
+      if (!hasMore) break
+    }
+    
+    const progress = JSON.parse(parser.progress_json())
+    expect(progress.phase).toBe('done')
+    
     const result = parser.finish('test.xml')
     const archive = JSON.parse(result)
     
@@ -72,7 +82,7 @@ describe('save parser (Rust WASM)', () => {
     expect(archive.meta.playerName).toBe('testplayer')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v1')
+    expect(archive.meta.parser_version).toBe('v3')
     expect(archive.isCompatible).toBe(true)
     expect(archive.sectors.test_sector_macro?.stations).toHaveLength(1)
     expect(archive.sectors.test_sector_macro?.stations[0]).toMatchObject({

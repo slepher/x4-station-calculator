@@ -492,7 +492,22 @@ if (hasWorkerRuntime()) {
     if (type !== 'parse' || !arrayBuffer) return
 
     try {
-      self.postMessage({ type: 'progress', status: 'Starting parse...' } as SaveParserMessage)
+      self.postMessage({ 
+        type: 'progress', 
+        data: { 
+          phase: 'receiving', 
+          percent: 0, 
+          tagCount: 0, 
+          sectorCount: 0, 
+          done: false, 
+          inputComplete: false, 
+          error: null,
+          inputBytesTotal: 0,
+          parsedBytesTotal: 0,
+          bufferedBytes: 0,
+          expectedTotalBytes: 0
+        } 
+      } as SaveParserMessage)
 
       const header = new Uint8Array(arrayBuffer.slice(0, 2))
       const isGzipped = header[0] === 0x1f && header[1] === 0x8b
@@ -500,24 +515,51 @@ if (hasWorkerRuntime()) {
       let textStream: ReadableStream<Uint8Array>
 
       if (isGzipped) {
-        self.postMessage({ type: 'progress', status: 'Decompressing...' } as SaveParserMessage)
+        self.postMessage({ 
+          type: 'progress', 
+          data: { 
+            phase: 'parsing', 
+            percent: 0, 
+            tagCount: 0, 
+            sectorCount: 0, 
+            done: false, 
+            inputComplete: false, 
+            error: null,
+            inputBytesTotal: 0,
+            parsedBytesTotal: 0,
+            bufferedBytes: 0,
+            expectedTotalBytes: 0
+          } 
+        } as SaveParserMessage)
         textStream = blob.stream().pipeThrough(new DecompressionStream('gzip'))
       } else {
         textStream = blob.stream()
       }
 
-      self.postMessage({ type: 'progress', status: 'Parsing XML...' } as SaveParserMessage)
-
       let lastReportedMB = -1
+      let totalBytesProcessed = 0
       const runtime = createSaveParserRuntime({
         progressIntervalMs: DEFAULT_PROGRESS_INTERVAL_MS,
         onProgress: (progress) => {
+          totalBytesProcessed = progress.bytesProcessed
           const currentMB = Math.floor(progress.bytesProcessed / (1024 * 1024))
           if (currentMB <= lastReportedMB) return
           lastReportedMB = currentMB
           self.postMessage({
             type: 'progress',
-            status: `Processing ... ${currentMB} MB, sectors ${progress.sectorsCount}`
+            data: {
+              phase: 'parsing',
+              percent: 0,
+              tagCount: progress.tagCount,
+              sectorCount: progress.sectorsCount,
+              done: false,
+              inputComplete: false,
+              error: null,
+              inputBytesTotal: progress.bytesProcessed,
+              parsedBytesTotal: progress.bytesProcessed,
+              bufferedBytes: 0,
+              expectedTotalBytes: 0
+            }
           } as SaveParserMessage)
         }
       })
@@ -536,6 +578,22 @@ if (hasWorkerRuntime()) {
       }
 
       const archive = runtime.close(filename || '')
+      self.postMessage({ 
+        type: 'progress', 
+        data: { 
+          phase: 'done', 
+          percent: 100, 
+          tagCount: runtime.getProgress().tagCount, 
+          sectorCount: runtime.getProgress().sectorsCount, 
+          done: true, 
+          inputComplete: true, 
+          error: null,
+          inputBytesTotal: totalBytesProcessed,
+          parsedBytesTotal: totalBytesProcessed,
+          bufferedBytes: 0,
+          expectedTotalBytes: totalBytesProcessed
+        } 
+      } as SaveParserMessage)
       self.postMessage({ type: 'complete', data: archive } as SaveParserMessage)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error'

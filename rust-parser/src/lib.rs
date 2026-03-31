@@ -1,6 +1,46 @@
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
+use std::io::Cursor;
 use wasm_bindgen::prelude::*;
+
+#[derive(Clone, Copy, Debug, Serialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
+enum ParsePhase {
+    Receiving,
+    Parsing,
+    Finalizing,
+    Done,
+    Error,
+}
+
+#[derive(Clone, Debug)]
+struct ParserError {
+    message: String,
+}
+
+impl ParserError {
+    fn new(message: impl Into<String>) -> Self {
+        Self {
+            message: message.into(),
+        }
+    }
+}
+
+#[derive(Clone, Serialize)]
+#[serde(rename_all = "camelCase")]
+struct ProgressInfo {
+    phase: ParsePhase,
+    input_bytes_total: usize,
+    parsed_bytes_total: usize,
+    buffered_bytes: usize,
+    expected_total_bytes: usize,
+    percent: f64,
+    tag_count: usize,
+    sector_count: usize,
+    done: bool,
+    input_complete: bool,
+    error: Option<String>,
+}
 
 #[derive(Clone, Serialize, Deserialize, Default)]
 struct Vector3 {
@@ -116,10 +156,20 @@ struct ArchiveMeta {
     source: String,
 }
 
-struct ComponentContext {
+#[derive(Clone, Default)]
+struct ComponentCtx {
     class: String,
-    attrs: HashMap<String, String>,
+    code: Option<String>,
+    macro_field: Option<String>,
+    owner: Option<String>,
+    known: bool,
+    knownto_player: bool,
     own_offset: Vector3,
+    has_blueprints: Option<bool>,
+    has_wares: Option<bool>,
+    has_signalleak: Option<bool>,
+    is_wreck: bool,
+    is_headquarter: bool,
 }
 
 fn parse_attrs<'a>(e: &'a quick_xml::events::BytesStart<'a>) -> HashMap<String, String> {
@@ -132,7 +182,7 @@ fn parse_attrs<'a>(e: &'a quick_xml::events::BytesStart<'a>) -> HashMap<String, 
     attrs
 }
 
-fn to_number(s: Option<&String>, fallback: f64) -> f64 {
+fn num(s: Option<&String>, fallback: f64) -> f64 {
     s.and_then(|v| v.parse::<f64>().ok()).unwrap_or(fallback)
 }
 
@@ -140,20 +190,20 @@ fn to_int(s: Option<&String>, fallback: i64) -> i64 {
     s.and_then(|v| v.parse::<i64>().ok()).unwrap_or(fallback)
 }
 
-fn normalize_version(v: &str) -> String {
+fn norm_ver(v: &str) -> String {
     let trimmed = v.trim();
     if trimmed.contains('.') {
         return trimmed.to_string();
     }
-    let num = trimmed.parse::<i64>().unwrap_or(0);
-    if num >= 100 {
-        format!("{:.1}", num as f64 / 100.0)
+    let n = trimmed.parse::<i64>().unwrap_or(0);
+    if n >= 100 {
+        format!("{:.1}", n as f64 / 100.0)
     } else {
-        format!("{:.1}", num as f64)
+        format!("{:.1}", n as f64)
     }
 }
 
-fn is_at_tags(path: &VecDeque<String>, tags: &[&str]) -> bool {
+fn at_tags(path: &VecDeque<String>, tags: &[&str]) -> bool {
     let n = tags.len();
     if path.len() < n {
         return false;
@@ -166,38 +216,45 @@ fn is_at_tags(path: &VecDeque<String>, tags: &[&str]) -> bool {
     true
 }
 
-fn build_datavault_flags(
-    attrs: &HashMap<String, String>,
-) -> (Option<bool>, Option<bool>, Option<bool>) {
-    let has_blueprints = attrs
+fn dv_flags(attrs: &HashMap<String, String>) -> (Option<bool>, Option<bool>, Option<bool>) {
+    let has_bp = attrs
         .get("has_blueprints")
         .map(|v| v == "1")
         .or_else(|| attrs.get("blueprints").map(|v| v == "1"));
-    let has_wares = attrs
+    let has_w = attrs
         .get("has_wares")
         .map(|v| v == "1")
         .or_else(|| attrs.get("wares").map(|v| v == "1"));
-    let has_signalleak = attrs
+    let has_sl = attrs
         .get("has_signalleak")
         .map(|v| v == "1")
         .or_else(|| attrs.get("signalleak").map(|v| v == "1"));
-    (has_blueprints, has_wares, has_signalleak)
+    (has_bp, has_w, has_sl)
 }
 
 #[wasm_bindgen]
 pub struct SaveParser {
+    reader: Option<quick_xml::Reader<Cursor<Vec<u8>>>>,
+    event_buf: Vec<u8>,
+
+    expected_total_bytes: usize,
+
     meta: Meta,
     sectors: HashMap<String, SectorData>,
     sector_stack: VecDeque<String>,
-    component_stack: VecDeque<ComponentContext>,
+    comp_stack: VecDeque<ComponentCtx>,
     path: VecDeque<String>,
-    tag_count: usize,
+    tags: usize,
 
-    current_station_owner: Option<String>,
-    current_station_modules: Vec<StationModule>,
-    current_entry_index: Option<i64>,
-    current_entry_ref: Option<String>,
-    current_entry_equipments: Vec<StationEquipment>,
+    phase: ParsePhase,
+    done: bool,
+    error: Option<ParserError>,
+
+    station_owner: Option<String>,
+    station_mods: Vec<StationModule>,
+    entry_idx: Option<i64>,
+    entry_ref: Option<String>,
+    entry_eq: Vec<StationEquipment>,
 }
 
 #[wasm_bindgen]
@@ -205,112 +262,257 @@ impl SaveParser {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Self {
+            reader: None,
+            event_buf: Vec::new(),
+            expected_total_bytes: 0,
+
             meta: Meta::default(),
             sectors: HashMap::new(),
             sector_stack: VecDeque::new(),
-            component_stack: VecDeque::new(),
+            comp_stack: VecDeque::new(),
             path: VecDeque::new(),
-            tag_count: 0,
-            current_station_owner: None,
-            current_station_modules: Vec::new(),
-            current_entry_index: None,
-            current_entry_ref: None,
-            current_entry_equipments: Vec::new(),
+            tags: 0,
+
+            phase: ParsePhase::Receiving,
+            done: false,
+            error: None,
+
+            station_owner: None,
+            station_mods: Vec::new(),
+            entry_idx: None,
+            entry_ref: None,
+            entry_eq: Vec::new(),
         }
     }
 
-    fn get_accumulated_position(&self) -> Vector3 {
-        let mut result = Vector3::default();
-        for component in &self.component_stack {
-            result.x += component.own_offset.x;
-            result.y += component.own_offset.y;
-            result.z += component.own_offset.z;
+    pub fn load_document(&mut self, input: &[u8]) -> Result<(), JsValue> {
+        if self.reader.is_some() {
+            return Err(JsValue::from_str("document already loaded"));
         }
-        result
+        if self.done || self.error.is_some() {
+            return Err(JsValue::from_str("parser is already finished"));
+        }
+
+        let mut reader = quick_xml::Reader::from_reader(Cursor::new(input.to_vec()));
+        reader.config_mut().trim_text(false);
+
+        self.expected_total_bytes = input.len();
+        self.reader = Some(reader);
+        self.phase = ParsePhase::Parsing;
+        Ok(())
     }
 
-    fn current_sector_data_mut(&mut self) -> Option<&mut SectorData> {
-        self.sector_stack
-            .back()
-            .and_then(|key| self.sectors.get_mut(key))
+    pub fn progress_json(&self) -> String {
+        let parsed_bytes_total = self
+            .reader
+            .as_ref()
+            .map(|r| r.buffer_position() as usize)
+            .unwrap_or(0);
+
+        let raw_pct = if self.expected_total_bytes == 0 {
+            0.0
+        } else {
+            parsed_bytes_total as f64 / self.expected_total_bytes as f64 * 100.0
+        };
+
+        let pct = match self.phase {
+            ParsePhase::Receiving => 0.0,
+            ParsePhase::Parsing => raw_pct.clamp(0.0, 99.0),
+            ParsePhase::Finalizing => 99.0,
+            ParsePhase::Done => 100.0,
+            ParsePhase::Error => raw_pct.clamp(0.0, 100.0),
+        };
+
+        serde_json::to_string(&ProgressInfo {
+            phase: self.phase,
+            input_bytes_total: self.expected_total_bytes,
+            parsed_bytes_total,
+            buffered_bytes: 0,
+            expected_total_bytes: self.expected_total_bytes,
+            percent: pct,
+            tag_count: self.tags,
+            sector_count: self.sectors.len(),
+            done: self.done,
+            input_complete: self.reader.is_some(),
+            error: self.error.as_ref().map(|e| e.message.clone()),
+        })
+        .unwrap_or_default()
     }
 
-    fn handle_open_tag(&mut self, name: &str, attrs: &HashMap<String, String>) {
-        self.tag_count += 1;
-        self.path.push_back(name.to_string());
+    pub fn pump(&mut self, max_events: usize) -> bool {
+        if self.done || self.error.is_some() {
+            return false;
+        }
 
-        if name == "component" {
-            let class = attrs.get("class").cloned().unwrap_or_default();
-            self.component_stack.push_back(ComponentContext {
-                class: class.clone(),
-                attrs: attrs.clone(),
-                own_offset: Vector3::default(),
-            });
+        let reader = match self.reader.as_mut() {
+            Some(r) => r,
+            None => return false,
+        };
 
-            if class == "sector" {
-                let macro_val = attrs
-                    .get("macro")
-                    .map(|s| s.to_lowercase())
-                    .unwrap_or_default();
-                self.sector_stack.push_back(macro_val.clone());
-                if !self.sectors.contains_key(&macro_val) {
-                    let is_known = attrs.get("known").map(|v| v == "1").unwrap_or(false)
-                        || attrs.get("knownto").map(|v| v == "player").unwrap_or(false);
-                    self.sectors.insert(
-                        macro_val.clone(),
-                        SectorData {
-                            name: macro_val,
-                            is_known,
-                            stations: Vec::new(),
-                            datavaults: Vec::new(),
-                            erlking_vaults: Vec::new(),
-                            abandoned_ships: Vec::new(),
-                        },
-                    );
+        let mut events: Vec<quick_xml::events::Event<'static>> = Vec::new();
+        let mut processed = 0usize;
+        let mut hit_eof = false;
+
+        while processed < max_events {
+            self.event_buf.clear();
+
+            match reader.read_event_into(&mut self.event_buf) {
+                Ok(quick_xml::events::Event::Start(e)) => {
+                    events.push(quick_xml::events::Event::Start(e.into_owned()));
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::Empty(e)) => {
+                    events.push(quick_xml::events::Event::Empty(e.into_owned()));
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::End(e)) => {
+                    events.push(quick_xml::events::Event::End(e.into_owned()));
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::Eof) => {
+                    hit_eof = true;
+                    break;
+                }
+                Ok(_) => {
+                    processed += 1;
+                }
+                Err(err) => {
+                    self.phase = ParsePhase::Error;
+                    self.error = Some(ParserError::new(format!("XML parse error: {err}")));
+                    return false;
                 }
             }
+        }
 
-            if class == "station" {
-                self.current_station_owner = attrs.get("owner").cloned();
-                self.current_station_modules = Vec::new();
+        for event in events {
+            match event {
+                quick_xml::events::Event::Start(e) => {
+                    let n = String::from_utf8_lossy(e.name().as_ref()).to_lowercase();
+                    let a = parse_attrs(&e);
+                    self.open(&n, &a);
+                }
+                quick_xml::events::Event::Empty(e) => {
+                    let n = String::from_utf8_lossy(e.name().as_ref()).to_lowercase();
+                    let a = parse_attrs(&e);
+                    self.open(&n, &a);
+                    self.close(&n);
+                }
+                quick_xml::events::Event::End(e) => {
+                    let n = String::from_utf8_lossy(e.name().as_ref()).to_lowercase();
+                    self.close(&n);
+                }
+                _ => {}
             }
         }
 
-        if is_at_tags(&self.path, &["component", "offset", "position"]) {
-            if let Some(component) = self.component_stack.back_mut() {
-                component.own_offset = Vector3 {
-                    x: to_number(attrs.get("x"), 0.0),
-                    y: to_number(attrs.get("y"), 0.0),
-                    z: to_number(attrs.get("z"), 0.0),
+        if hit_eof {
+            self.phase = ParsePhase::Finalizing;
+            self.done = true;
+            self.phase = ParsePhase::Done;
+            return false;
+        }
+
+        true
+    }
+
+    fn world_pos(&self) -> Vector3 {
+        self.comp_stack.iter().fold(Vector3::default(), |mut r, c| {
+            r.x += c.own_offset.x;
+            r.y += c.own_offset.y;
+            r.z += c.own_offset.z;
+            r
+        })
+    }
+
+    fn open(&mut self, name: &str, a: &HashMap<String, String>) {
+        self.tags += 1;
+        self.path.push_back(name.into());
+
+        if name == "component" {
+            let cls = a.get("class").cloned().unwrap_or_default();
+            let (bp, w, sl) = if cls == "datavault"
+                || a.get("macro")
+                    .map(|m| m.to_lowercase().contains("erlking_vault"))
+                    .unwrap_or(false)
+            {
+                dv_flags(a)
+            } else {
+                (None, None, None)
+            };
+            let ctx = ComponentCtx {
+                class: cls.clone(),
+                code: a.get("code").cloned(),
+                macro_field: a.get("macro").cloned(),
+                owner: a.get("owner").cloned(),
+                known: a.get("known").map(|v| v == "1").unwrap_or(false),
+                knownto_player: a.get("knownto").map(|v| v == "player").unwrap_or(false),
+                own_offset: Vector3::default(),
+                has_blueprints: bp,
+                has_wares: w,
+                has_signalleak: sl,
+                is_wreck: a.get("state").map(|v| v == "wreck").unwrap_or(false),
+                is_headquarter: a
+                    .get("factionheadquarters")
+                    .map(|v| v == "1")
+                    .unwrap_or(false),
+            };
+            self.comp_stack.push_back(ctx);
+
+            if cls == "sector" {
+                let m = a.get("macro").map(|s| s.to_lowercase()).unwrap_or_default();
+                self.sector_stack.push_back(m.clone());
+                self.sectors.entry(m.clone()).or_insert_with(|| SectorData {
+                    name: m,
+                    is_known: a.get("known") == Some(&"1".to_string())
+                        || a.get("knownto") == Some(&"player".to_string()),
+                    stations: Vec::new(),
+                    datavaults: Vec::new(),
+                    erlking_vaults: Vec::new(),
+                    abandoned_ships: Vec::new(),
+                });
+            }
+
+            if cls == "station" {
+                self.station_owner = a.get("owner").cloned();
+                self.station_mods.clear();
+            }
+        }
+
+        if at_tags(&self.path, &["component", "offset", "position"]) {
+            if let Some(c) = self.comp_stack.back_mut() {
+                c.own_offset = Vector3 {
+                    x: num(a.get("x"), 0.0),
+                    y: num(a.get("y"), 0.0),
+                    z: num(a.get("z"), 0.0),
                 };
             }
         }
 
-        if is_at_tags(&self.path, &["savegame", "info", "game"]) {
-            self.meta.guid = attrs.get("guid").cloned().unwrap_or_default();
-            self.meta.seed = to_int(attrs.get("seed"), 0);
-            self.meta.time = attrs
+        if at_tags(&self.path, &["savegame", "info", "game"]) {
+            self.meta.guid = a.get("guid").cloned().unwrap_or_default();
+            self.meta.seed = to_int(a.get("seed"), 0);
+            self.meta.time = a
                 .get("time")
                 .and_then(|v| v.parse::<f64>().ok())
                 .unwrap_or(0.0);
-            self.meta.version = attrs.get("version").cloned().unwrap_or_default();
+            self.meta.version = a.get("version").cloned().unwrap_or_default();
         }
 
-        if is_at_tags(&self.path, &["savegame", "info", "player"]) {
-            self.meta.player_name = attrs.get("name").cloned().unwrap_or_default();
+        if at_tags(&self.path, &["savegame", "info", "player"]) {
+            self.meta.player_name = a.get("name").cloned().unwrap_or_default();
         }
 
-        if is_at_tags(
+        if at_tags(
             &self.path,
             &["component", "construction", "sequence", "entry"],
-        ) && self.current_station_owner.as_deref() == Some("player")
+        ) && self.station_owner.as_deref() == Some("player")
         {
-            self.current_entry_index = Some(to_int(attrs.get("index"), 0));
-            self.current_entry_ref = attrs.get("macro").cloned();
-            self.current_entry_equipments = Vec::new();
+            self.entry_idx = Some(to_int(a.get("index"), 0));
+            self.entry_ref = a.get("macro").cloned();
+            self.entry_eq.clear();
         }
 
-        if is_at_tags(
+        if at_tags(
             &self.path,
             &[
                 "component",
@@ -321,17 +523,17 @@ impl SaveParser {
                 "groups",
                 "shields",
             ],
-        ) && self.current_entry_index.is_some()
+        ) && self.entry_idx.is_some()
         {
-            self.current_entry_equipments.push(StationEquipment {
-                equip_type: "shields".to_string(),
-                ref_field: attrs.get("macro").cloned().unwrap_or_default(),
-                group: attrs.get("group").cloned().unwrap_or_default(),
-                exact: to_int(attrs.get("exact"), 1),
+            self.entry_eq.push(StationEquipment {
+                equip_type: "shields".into(),
+                ref_field: a.get("macro").cloned().unwrap_or_default(),
+                group: a.get("group").cloned().unwrap_or_default(),
+                exact: to_int(a.get("exact"), 1),
             });
         }
 
-        if is_at_tags(
+        if at_tags(
             &self.path,
             &[
                 "component",
@@ -342,139 +544,111 @@ impl SaveParser {
                 "groups",
                 "turrets",
             ],
-        ) && self.current_entry_index.is_some()
+        ) && self.entry_idx.is_some()
         {
-            self.current_entry_equipments.push(StationEquipment {
-                equip_type: "turrets".to_string(),
-                ref_field: attrs.get("macro").cloned().unwrap_or_default(),
-                group: attrs.get("group").cloned().unwrap_or_default(),
-                exact: to_int(attrs.get("exact"), 1),
+            self.entry_eq.push(StationEquipment {
+                equip_type: "turrets".into(),
+                ref_field: a.get("macro").cloned().unwrap_or_default(),
+                group: a.get("group").cloned().unwrap_or_default(),
+                exact: to_int(a.get("exact"), 1),
             });
         }
     }
 
-    fn handle_close_tag(&mut self, name: &str) {
-        if name == "entry" && self.current_entry_index.is_some() && self.current_entry_ref.is_some()
-        {
-            let module = StationModule {
-                index: self.current_entry_index.unwrap(),
-                ref_field: self.current_entry_ref.clone().unwrap(),
-                equipments: self.current_entry_equipments.clone(),
-            };
-            self.current_station_modules.push(module);
-            self.current_entry_index = None;
-            self.current_entry_ref = None;
-            self.current_entry_equipments = Vec::new();
+    fn close(&mut self, name: &str) {
+        if name == "entry" && self.entry_idx.is_some() && self.entry_ref.is_some() {
+            self.station_mods.push(StationModule {
+                index: self.entry_idx.unwrap(),
+                ref_field: self.entry_ref.clone().unwrap(),
+                equipments: std::mem::take(&mut self.entry_eq),
+            });
+            self.entry_idx = None;
+            self.entry_ref = None;
         }
 
         if name == "component" {
-            let pos = self.get_accumulated_position();
+            let pos = self.world_pos();
+            let ctx = match self.comp_stack.back().cloned() {
+                Some(c) => c,
+                None => return,
+            };
 
-            let component_data = self
-                .component_stack
-                .back()
-                .map(|c| (c.class.clone(), c.attrs.clone()));
-
-            // Clone modules before potential mutable borrow
-            let modules_snapshot = self.current_station_modules.clone();
-
-            if let Some((class, attrs)) = component_data {
-                if let Some(sector_data) = self.current_sector_data_mut() {
-                    if class == "station" {
-                        let owner = attrs.get("owner").cloned().unwrap_or_default();
-                        let modules_clone = if owner == "player" && !modules_snapshot.is_empty() {
-                            modules_snapshot
-                        } else {
-                            Vec::new()
-                        };
-                        let entry = StationEntry {
-                            code: attrs.get("code").cloned().unwrap_or_default(),
-                            macro_field: attrs.get("macro").cloned().unwrap_or_default(),
-                            owner: owner,
-                            x: pos.x,
-                            y: pos.y,
-                            z: pos.z,
-                            is_wreck: if attrs.get("state").map(|v| v == "wreck").unwrap_or(false) {
-                                Some(true)
+            if let Some(sk) = self.sector_stack.back().cloned() {
+                if let Some(sd) = self.sectors.get_mut(&sk) {
+                    match ctx.class.as_str() {
+                        "station" => {
+                            let mods = if ctx.owner.as_deref() == Some("player") {
+                                std::mem::take(&mut self.station_mods)
                             } else {
-                                None
-                            },
-                            is_headquarter: if attrs
-                                .get("factionheadquarters")
-                                .map(|v| v == "1")
+                                Vec::new()
+                            };
+                            sd.stations.push(StationEntry {
+                                code: ctx.code.clone().unwrap_or_default(),
+                                macro_field: ctx.macro_field.clone().unwrap_or_default(),
+                                owner: ctx.owner.clone().unwrap_or_default(),
+                                x: pos.x,
+                                y: pos.y,
+                                z: pos.z,
+                                is_wreck: if ctx.is_wreck { Some(true) } else { None },
+                                is_headquarter: if ctx.is_headquarter { Some(true) } else { None },
+                                modules: mods,
+                            });
+                            self.station_owner = None;
+                            self.entry_idx = None;
+                            self.entry_ref = None;
+                        }
+                        "datavault" => {
+                            sd.datavaults.push(DatavaultEntry {
+                                code: ctx.code.clone().unwrap_or_default(),
+                                macro_field: ctx.macro_field.clone().unwrap_or_default(),
+                                owner: ctx.owner.clone().unwrap_or_default(),
+                                x: pos.x,
+                                y: pos.y,
+                                z: pos.z,
+                                has_blueprints: ctx.has_blueprints,
+                                has_wares: ctx.has_wares,
+                                has_signalleak: ctx.has_signalleak,
+                            });
+                        }
+                        "sector" => {
+                            self.sector_stack.pop_back();
+                        }
+                        _ => {
+                            if ctx
+                                .macro_field
+                                .as_ref()
+                                .map(|m| m.to_lowercase().contains("erlking_vault"))
                                 .unwrap_or(false)
                             {
-                                Some(true)
-                            } else {
-                                None
-                            },
-                            modules: modules_clone,
-                        };
-                        sector_data.stations.push(entry);
-                    } else if class == "datavault" {
-                        let (has_bp, has_w, has_sl) = build_datavault_flags(&attrs);
-                        let entry = DatavaultEntry {
-                            code: attrs.get("code").cloned().unwrap_or_default(),
-                            macro_field: attrs.get("macro").cloned().unwrap_or_default(),
-                            owner: attrs.get("owner").cloned().unwrap_or_default(),
-                            x: pos.x,
-                            y: pos.y,
-                            z: pos.z,
-                            has_blueprints: has_bp,
-                            has_wares: has_w,
-                            has_signalleak: has_sl,
-                        };
-                        sector_data.datavaults.push(entry);
-                    } else if attrs
-                        .get("macro")
-                        .map(|m| m.to_lowercase().contains("erlking_vault"))
-                        .unwrap_or(false)
-                    {
-                        let (has_bp, has_w, has_sl) = build_datavault_flags(&attrs);
-                        let entry = DatavaultEntry {
-                            code: attrs.get("code").cloned().unwrap_or_default(),
-                            macro_field: attrs.get("macro").cloned().unwrap_or_default(),
-                            owner: attrs.get("owner").cloned().unwrap_or_default(),
-                            x: pos.x,
-                            y: pos.y,
-                            z: pos.z,
-                            has_blueprints: has_bp,
-                            has_wares: has_w,
-                            has_signalleak: has_sl,
-                        };
-                        sector_data.erlking_vaults.push(entry);
-                    } else if class.starts_with("ship_")
-                        && attrs
-                            .get("owner")
-                            .map(|o| o == "ownerless")
-                            .unwrap_or(false)
-                    {
-                        let entry = AbandonedShipEntry {
-                            code: attrs.get("code").cloned().unwrap_or_default(),
-                            macro_field: attrs.get("macro").cloned().unwrap_or_default(),
-                            class: class.clone(),
-                            x: pos.x,
-                            y: pos.y,
-                            z: pos.z,
-                        };
-                        sector_data.abandoned_ships.push(entry);
+                                sd.erlking_vaults.push(DatavaultEntry {
+                                    code: ctx.code.clone().unwrap_or_default(),
+                                    macro_field: ctx.macro_field.clone().unwrap_or_default(),
+                                    owner: ctx.owner.clone().unwrap_or_default(),
+                                    x: pos.x,
+                                    y: pos.y,
+                                    z: pos.z,
+                                    has_blueprints: ctx.has_blueprints,
+                                    has_wares: ctx.has_wares,
+                                    has_signalleak: ctx.has_signalleak,
+                                });
+                            } else if ctx.class.starts_with("ship_")
+                                && ctx.owner.as_deref() == Some("ownerless")
+                            {
+                                sd.abandoned_ships.push(AbandonedShipEntry {
+                                    code: ctx.code.clone().unwrap_or_default(),
+                                    macro_field: ctx.macro_field.clone().unwrap_or_default(),
+                                    class: ctx.class.clone(),
+                                    x: pos.x,
+                                    y: pos.y,
+                                    z: pos.z,
+                                });
+                            }
+                        }
                     }
-                }
-
-                if class == "station" {
-                    self.current_station_owner = None;
-                    self.current_station_modules = Vec::new();
-                    self.current_entry_index = None;
-                    self.current_entry_ref = None;
-                    self.current_entry_equipments = Vec::new();
-                }
-
-                if class == "sector" {
-                    self.sector_stack.pop_back();
                 }
             }
 
-            self.component_stack.pop_back();
+            self.comp_stack.pop_back();
         }
 
         if self.path.back().map(|s| s.as_str()) == Some(name) {
@@ -482,80 +656,38 @@ impl SaveParser {
         }
     }
 
-    #[wasm_bindgen]
-    pub fn feed(&mut self, input: &[u8]) {
-        let mut reader = quick_xml::Reader::from_reader(input);
-        reader.config_mut().trim_text(false);
-
-        let mut buf = Vec::new();
-
-        loop {
-            match reader.read_event_into(&mut buf) {
-                Ok(quick_xml::events::Event::Start(e)) => {
-                    let name = String::from_utf8_lossy(e.name().0).to_lowercase();
-                    let attrs = parse_attrs(&e);
-                    self.handle_open_tag(&name, &attrs);
-                }
-                Ok(quick_xml::events::Event::Empty(e)) => {
-                    let name = String::from_utf8_lossy(e.name().0).to_lowercase();
-                    let attrs = parse_attrs(&e);
-                    self.handle_open_tag(&name, &attrs);
-                    self.handle_close_tag(&name);
-                }
-                Ok(quick_xml::events::Event::End(e)) => {
-                    let name = String::from_utf8_lossy(e.name().0).to_lowercase();
-                    self.handle_close_tag(&name);
-                }
-                Ok(quick_xml::events::Event::Eof) => break,
-                Err(_) => break,
-                _ => {}
-            }
-            buf.clear();
+    pub fn finish(&mut self, filename: &str) -> Result<String, JsValue> {
+        if let Some(err) = &self.error {
+            return Err(JsValue::from_str(&err.message));
         }
-    }
 
-    #[wasm_bindgen]
-    pub fn finish(&self, filename: &str) -> String {
-        let stripped_filename = filename
+        if !self.done {
+            return Err(JsValue::from_str(
+                "parser is not done yet; keep calling pump()",
+            ));
+        }
+
+        let f = filename
             .replace(".xml.gz", "")
             .replace(".gz", "")
             .replace(".xml", "");
 
-        let is_compatible = normalize_version(&self.meta.version) == normalize_version("8.0");
-
-        let archive = SaveArchive {
+        let json = serde_json::to_string(&SaveArchive {
             meta: ArchiveMeta {
                 guid: self.meta.guid.clone(),
                 seed: self.meta.seed,
                 time: self.meta.time,
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
-                filename: stripped_filename,
-                parser_version: "v1".to_string(),
-                source: "original".to_string(),
+                filename: f,
+                parser_version: "v3".into(),
+                source: "original".into(),
             },
             sectors: self.sectors.clone(),
-            isCompatible: is_compatible,
-        };
+            isCompatible: norm_ver(&self.meta.version) == norm_ver("8.0"),
+        })
+        .map_err(|e| JsValue::from_str(&format!("serialize error: {e}")))?;
 
-        serde_json::to_string(&archive)
-            .unwrap_or_else(|_| "{\"meta\":{},\"sectors\":{},\"isCompatible\":false}".to_string())
+        Ok(json)
     }
-
-    #[wasm_bindgen]
-    pub fn tag_count(&self) -> usize {
-        self.tag_count
-    }
-
-    #[wasm_bindgen]
-    pub fn sector_count(&self) -> usize {
-        self.sectors.len()
-    }
-}
-
-#[wasm_bindgen]
-pub fn parse_save(input: &[u8], filename: &str) -> String {
-    let mut parser = SaveParser::new();
-    parser.feed(input);
-    parser.finish(filename)
 }

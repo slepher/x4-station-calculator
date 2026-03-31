@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
-import type { SaveArchive, SaveParserMessage } from '@/types/saveArchive'
+import type { SaveArchive, SaveParserRustMessage } from '@/types/saveArchive'
 
 const { t } = useI18n()
 const saveStore = useSaveStore()
@@ -91,11 +91,17 @@ async function processXmlFile(file: File) {
       { type: 'module' }
     )
 
-    worker.onmessage = (e: MessageEvent<SaveParserMessage>) => {
+    worker.onmessage = (e: MessageEvent<SaveParserRustMessage>) => {
       const msg = e.data
 
       if (msg.type === 'progress') {
-        saveStore.setParsingState(true, msg.status, null)
+        const { percent, phase, sectorCount, error } = msg.data
+        const statusText = error
+          ? error
+          : phase === 'done'
+            ? t('save_import.finalizing')
+            : `${percent.toFixed(0)}% - ${sectorCount} sectors`
+        saveStore.setParsingState(true, statusText, null)
       } else if (msg.type === 'complete') {
         saveStore.addArchive(msg.data)
         saveStore.setParsingState(false, '', null)
@@ -150,7 +156,9 @@ async function processXmlFile(file: File) {
 
     <div v-if="saveStore.isParsing" class="parse-status">
       <div class="parse-progress">
-        <div class="spinner"></div>
+        <div class="progress-bar-container">
+          <div class="progress-bar" :style="{ width: '100%' }"></div>
+        </div>
         <span>{{ saveStore.parseProgress }}</span>
       </div>
     </div>
@@ -206,11 +214,15 @@ async function processXmlFile(file: File) {
 }
 
 .parse-progress {
-  @apply flex items-center gap-2 text-sm text-slate-400;
+  @apply flex items-center gap-3 text-sm text-slate-400;
 }
 
-.spinner {
-  @apply w-4 h-4 border-2 border-slate-600 border-t-blue-500 rounded-full animate-spin;
+.progress-bar-container {
+  @apply w-32 h-2 bg-slate-700 rounded overflow-hidden;
+}
+
+.progress-bar {
+  @apply h-full bg-blue-500 transition-all duration-300;
 }
 
 .parse-error {

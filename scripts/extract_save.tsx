@@ -101,7 +101,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string): Promise<S
   const gzip = isGzipFile(absoluteInput)
   const stat = fs.statSync(absoluteInput)
 
-  console.log(`[extract_save] parser: Rust WASM (experimental)`)
+  console.log(`[extract_save] parser: Rust WASM v3 (persistent reader)`)
   console.log(`[extract_save] input: ${absoluteInput}`)
   console.log(`[extract_save] output: ${absoluteOutput}`)
   console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
@@ -128,14 +128,37 @@ async function extractSaveWasm(inputPath: string, outputPath: string): Promise<S
   const totalBytes = inputBuffer.length
   console.log(`[extract_save] decompressed size: ${formatMB(totalBytes)} MB`)
 
-  console.log('[extract_save] parsing...')
+  parser.load_document(new Uint8Array(inputBuffer))
+
+  console.log('[extract_save] parsing with pump loop...')
   const start = performance.now()
-  parser.feed(new Uint8Array(inputBuffer))
-  const result = parser.finish(path.basename(absoluteInput))
+  
+  const MAX_EVENTS_PER_PUMP = 50000
+  let pumpCount = 0
+  let lastProgressLog = 0
+  
+  while (true) {
+    const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
+    pumpCount++
+    
+    const progressJson = parser.progress_json()
+    const progress = JSON.parse(progressJson)
+    
+    const currentMB = progress.parsedBytesTotal / (1024 * 1024)
+    if (currentMB - lastProgressLog >= 50 || pumpCount % 20 === 0 || !hasMore) {
+      console.log(
+        `[extract_save] pump #${pumpCount}: ${progress.percent.toFixed(1)}% parsed, ${formatMB(progress.parsedBytesTotal)} MB, ${progress.tagCount} tags, ${progress.sectorCount} sectors, phase=${progress.phase}`
+      )
+      lastProgressLog = currentMB
+    }
+    
+    if (!hasMore) break
+  }
+
   const elapsed = performance.now() - start
+  console.log(`[extract_save] parse time: ${elapsed.toFixed(0)}ms (${pumpCount} pump calls)`)
 
-  console.log(`[extract_save] parse time: ${elapsed.toFixed(2)}ms`)
-
+  const result = parser.finish(path.basename(absoluteInput))
   const archive: SaveArchive = JSON.parse(result)
   
   console.log(`[extract_save] done: sectors ${Object.keys(archive.sectors).length}, compatible=${archive.isCompatible}`)
