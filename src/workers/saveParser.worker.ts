@@ -5,6 +5,8 @@ import type {
   SaveParserMessage,
   SectorData,
   StationEntry,
+  StationModule,
+  StationEquipment,
   DatavaultEntry,
   AbandonedShipEntry
 } from '@/types/saveArchive'
@@ -34,14 +36,27 @@ export interface SaveParserProgressInfo {
   sectorsCount: number
 }
 
+export interface SaveParserProfileInfo {
+  feedMs: number
+  saxWriteMs: number
+  openTagMs: number
+  closeTagMs: number
+  openTagCount: number
+  closeTagCount: number
+}
+
 export interface SaveParserRuntime {
   feed: (text: string) => void
   close: () => SaveArchive
   getProgress: () => SaveParserProgressInfo
   getData: () => SaveData
+  getProfile?: () => SaveParserProfileInfo
 }
 
 const SAX_WRITE_CHUNK_SIZE = 64 * 1024
+const SAX_MAX_BUFFER_LENGTH = 8 * 1024
+const DEFAULT_PROGRESS_INTERVAL_MS = 500
+const saxWithBufferConfig = sax as typeof sax & { MAX_BUFFER_LENGTH: number }
 
 function stripSaveFileExtension(filename: string): string {
   return filename.replace(/(\.xml)?\.gz$/i, '').replace(/\.xml$/i, '')
@@ -55,6 +70,13 @@ class X4SaveParser {
   private currentSectorStack: string[] = []
   private componentStack: ComponentContext[] = []
   private tagCount = 0
+  private sectorsCount = 0
+
+  private currentStationOwner: string | null = null
+  private currentStationModules: StationModule[] = []
+  private currentEntryIndex: number | null = null
+  private currentEntryRef: string | null = null
+  private currentEntryEquipments: StationEquipment[] = []
 
   public data: SaveData
 
@@ -122,11 +144,17 @@ class X4SaveParser {
   }
 
   private isGameTag(): boolean {
-    return this.isAtTags('savegame', 'info', 'game')
+    return this.path.length >= 3
+      && this.path[this.path.length - 3]?.name === 'savegame'
+      && this.path[this.path.length - 2]?.name === 'info'
+      && this.path[this.path.length - 1]?.name === 'game'
   }
 
   private isPlayerTag(): boolean {
-    return this.isAtTags('savegame', 'info', 'player')
+    return this.path.length >= 3
+      && this.path[this.path.length - 3]?.name === 'savegame'
+      && this.path[this.path.length - 2]?.name === 'info'
+      && this.path[this.path.length - 1]?.name === 'player'
   }
 
   private isComponent(node: TagNode | undefined): boolean {
@@ -165,6 +193,18 @@ class X4SaveParser {
     return this.isAtTags('component', 'offset', 'position')
   }
 
+  private isEntryTag(): boolean {
+    return this.isAtTags('component', 'construction', 'sequence', 'entry')
+  }
+
+  private isShieldsTag(): boolean {
+    return this.isAtTags('component', 'construction', 'sequence', 'entry', 'upgrades', 'groups', 'shields')
+  }
+
+  private isTurretsTag(): boolean {
+    return this.isAtTags('component', 'construction', 'sequence', 'entry', 'upgrades', 'groups', 'turrets')
+  }
+
   private extractPositionFromCurrentTag(): Vector3 {
     const pos = this.currentNode()?.attributes || {}
     return {
@@ -177,6 +217,10 @@ class X4SaveParser {
   private getSectorName(macro: string): string {
     const rawName = this.sectorNames[macro] || macro
     return this.resolveName(rawName)
+  }
+
+  getSectorsCount(): number {
+    return this.sectorsCount
   }
 
   private getCurrentSectorData(): SectorData | null {
@@ -240,14 +284,22 @@ class X4SaveParser {
     if (this.isSector()) {
       const macro = String(attrib.macro || '').toLowerCase()
       this.currentSectorStack.push(macro)
-      this.data.sectors[macro] = this.data.sectors[macro] || {
-        name: this.getSectorName(macro),
-        is_known: attrib.known === '1' || attrib.knownto === 'player',
-        stations: [],
-        datavaults: [],
-        erlkingVaults: [],
-        abandonedShips: []
+      if (!this.data.sectors[macro]) {
+        this.data.sectors[macro] = {
+          name: this.getSectorName(macro),
+          is_known: attrib.known === '1' || attrib.knownto === 'player',
+          stations: [],
+          datavaults: [],
+          erlkingVaults: [],
+          abandonedShips: []
+        }
+        this.sectorsCount++
       }
+    }
+
+    if (this.isStation()) {
+      this.currentStationOwner = String(attrib.owner || '')
+      this.currentStationModules = []
     }
 
     if (this.isComponentPosition()) {
@@ -256,10 +308,48 @@ class X4SaveParser {
         component.ownOffset = this.extractPositionFromCurrentTag()
       }
     }
+
+    if (this.isEntryTag() && this.currentStationOwner === 'player') {
+      this.currentEntryIndex = this.toNumber(attrib.index)
+      this.currentEntryRef = String(attrib.macro || '')
+      this.currentEntryEquipments = []
+    }
+
+    if (this.isShieldsTag() && this.currentEntryIndex !== null) {
+      this.currentEntryEquipments.push({
+        type: 'shields',
+        ref: String(attrib.macro || ''),
+        group: String(attrib.group || ''),
+        exact: this.toNumber(attrib.exact, 1)
+      })
+    }
+
+    if (this.isTurretsTag() && this.currentEntryIndex !== null) {
+      this.currentEntryEquipments.push({
+        type: 'turrets',
+        ref: String(attrib.macro || ''),
+        group: String(attrib.group || ''),
+        exact: this.toNumber(attrib.exact, 1)
+      })
+    }
   }
 
   onCloseTag(name: string): void {
     const node = this.currentNode()
+
+    if (name === 'entry' && this.currentEntryIndex !== null && this.currentEntryRef !== null) {
+      const module: StationModule = {
+        index: this.currentEntryIndex,
+        ref: this.currentEntryRef
+      }
+      if (this.currentEntryEquipments.length > 0) {
+        module.equipments = this.currentEntryEquipments
+      }
+      this.currentStationModules.push(module)
+      this.currentEntryIndex = null
+      this.currentEntryRef = null
+      this.currentEntryEquipments = []
+    }
 
     if (node?.name === 'component') {
       const sectorData = this.getCurrentSectorData()
@@ -267,16 +357,22 @@ class X4SaveParser {
       const attrib = node.attributes
 
       if (this.isStation() && sectorData) {
+        const owner = String(attrib.owner || '')
         const entry: StationEntry = {
           code: String(attrib.code || ''),
           macro: String(attrib.macro || ''),
-          owner: String(attrib.owner || ''),
+          owner: owner,
           x: pos.x,
           y: pos.y,
           z: pos.z,
           is_wreck: attrib.state === 'wreck' || undefined,
           is_headquarter: attrib.factionheadquarters === '1' || undefined
         }
+
+        if (owner === 'player' && this.currentStationModules.length > 0) {
+          entry.modules = this.currentStationModules
+        }
+
         sectorData.stations.push(entry)
       } else if (this.isDatavault() && sectorData) {
         const entry: DatavaultEntry = {
@@ -312,6 +408,14 @@ class X4SaveParser {
         sectorData.abandonedShips.push(entry)
       }
 
+      if (this.isStation()) {
+        this.currentStationOwner = null
+        this.currentStationModules = []
+        this.currentEntryIndex = null
+        this.currentEntryRef = null
+        this.currentEntryEquipments = []
+      }
+
       if (node.attributes.class === 'sector') {
         this.currentSectorStack.pop()
       }
@@ -321,14 +425,6 @@ class X4SaveParser {
 
     if (this.path.length > 0 && this.path[this.path.length - 1]?.name === name) {
       this.path.pop()
-      return
-    }
-
-    for (let i = this.path.length - 1; i >= 0; i--) {
-      if (this.path[i]?.name === name) {
-        this.path.splice(i, 1)
-        break
-      }
     }
   }
 
@@ -365,54 +461,108 @@ export function createSaveParserRuntime(
   config: SaveParserConfig,
   options?: {
     onProgress?: (info: SaveParserProgressInfo) => void
+    progressIntervalMs?: number
+    profile?: boolean
   }
 ): SaveParserRuntime {
   const parser = new X4SaveParser(config)
+  const previousMaxBufferLength = saxWithBufferConfig.MAX_BUFFER_LENGTH
+  saxWithBufferConfig.MAX_BUFFER_LENGTH = Math.min(previousMaxBufferLength, SAX_MAX_BUFFER_LENGTH)
   const saxParser = sax.parser(false, { lowercase: true, position: false })
   let bytesProcessed = 0
+  let lastProgressAt = 0
+  const progressIntervalMs = options?.progressIntervalMs ?? DEFAULT_PROGRESS_INTERVAL_MS
+  const profileEnabled = options?.profile === true
+  const profile: SaveParserProfileInfo = {
+    feedMs: 0,
+    saxWriteMs: 0,
+    openTagMs: 0,
+    closeTagMs: 0,
+    openTagCount: 0,
+    closeTagCount: 0
+  }
 
   saxParser.onopentag = (node: TagNode) => {
+    if (!profileEnabled) {
+      parser.onOpenTag(node)
+      return
+    }
+    const t0 = performance.now()
     parser.onOpenTag(node)
+    profile.openTagMs += performance.now() - t0
+    profile.openTagCount++
   }
 
   saxParser.onclosetag = (name: string) => {
+    if (!profileEnabled) {
+      parser.onCloseTag(name)
+      return
+    }
+    const t0 = performance.now()
     parser.onCloseTag(name)
+    profile.closeTagMs += performance.now() - t0
+    profile.closeTagCount++
   }
+
+  // We never use XML text payloads in save import. Discarding them keeps
+  // sax's internal text/cdata/script buffers from doing unnecessary work.
+  saxParser.ontext = () => {}
+  saxParser.oncdata = () => {}
+  saxParser.onscript = () => {}
 
   saxParser.onerror = (err: Error) => {
     throw err
   }
 
-  const emitProgress = () => {
+  const getProgressInfo = (): SaveParserProgressInfo => ({
+    bytesProcessed,
+    tagCount: parser.getTagCount(),
+    sectorsCount: parser.getSectorsCount()
+  })
+
+  const emitProgress = (force = false) => {
+    const now = Date.now()
+    if (!force && now - lastProgressAt < progressIntervalMs) return
+    lastProgressAt = now
     options?.onProgress?.({
-      bytesProcessed,
-      tagCount: parser.getTagCount(),
-      sectorsCount: Object.keys(parser.data.sectors).length
+      ...getProgressInfo()
     })
   }
 
   return {
     feed(text: string) {
       if (!text) return
+      const feedStart = profileEnabled ? performance.now() : 0
       bytesProcessed += text.length
       for (let i = 0; i < text.length; i += SAX_WRITE_CHUNK_SIZE) {
-        saxParser.write(text.slice(i, i + SAX_WRITE_CHUNK_SIZE))
+        const chunk = text.slice(i, i + SAX_WRITE_CHUNK_SIZE)
+        if (!profileEnabled) {
+          saxParser.write(chunk)
+          continue
+        }
+        const writeStart = performance.now()
+        saxParser.write(chunk)
+        profile.saxWriteMs += performance.now() - writeStart
+      }
+      if (profileEnabled) {
+        profile.feedMs += performance.now() - feedStart
       }
       emitProgress()
     },
     close() {
       saxParser.close()
+      emitProgress(true)
+      saxWithBufferConfig.MAX_BUFFER_LENGTH = previousMaxBufferLength
       return buildSaveArchive(parser.data, config)
     },
     getProgress() {
-      return {
-        bytesProcessed,
-        tagCount: parser.getTagCount(),
-        sectorsCount: Object.keys(parser.data.sectors).length
-      }
+      return getProgressInfo()
     },
     getData() {
       return parser.data
+    },
+    getProfile() {
+      return profile
     }
   }
 }
@@ -460,25 +610,29 @@ if (hasWorkerRuntime()) {
 
       self.postMessage({ type: 'progress', status: 'Parsing XML...' } as SaveParserMessage)
 
-      const runtime = createSaveParserRuntime({ ...config, filename })
+      let lastReportedMB = -1
+      const runtime = createSaveParserRuntime(
+        { ...config, filename },
+        {
+          progressIntervalMs: DEFAULT_PROGRESS_INTERVAL_MS,
+          onProgress: (progress) => {
+            const currentMB = Math.floor(progress.bytesProcessed / (1024 * 1024))
+            if (currentMB <= lastReportedMB) return
+            lastReportedMB = currentMB
+            self.postMessage({
+              type: 'progress',
+              status: `Processing ... ${currentMB} MB, sectors ${progress.sectorsCount}`
+            } as SaveParserMessage)
+          }
+        }
+      )
       const reader = textStream.getReader()
       const decoder = new TextDecoder()
-      let lastReportedMB = -1
 
       while (true) {
         const { done, value } = await reader.read()
         if (done) break
         runtime.feed(decoder.decode(value, { stream: true }))
-
-        const progress = runtime.getProgress()
-        const currentMB = Math.floor(progress.bytesProcessed / (1024 * 1024))
-        if (currentMB > lastReportedMB) {
-          lastReportedMB = currentMB
-          self.postMessage({
-            type: 'progress',
-            status: `Processing ... ${currentMB} MB, sectors ${progress.sectorsCount}`
-          } as SaveParserMessage)
-        }
       }
 
       const tail = decoder.decode()

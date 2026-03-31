@@ -17,7 +17,8 @@ export default defineConfig({
   resolve: {
     alias: {
       // 关键配置：让 Vite 知道 @ 代表 src 目录
-      '@': path.resolve(__dirname, './src') 
+      '@': path.resolve(__dirname, './src'),
+      stream: path.resolve(__dirname, './src/shims/stream.ts')
     }
   },
   server: {

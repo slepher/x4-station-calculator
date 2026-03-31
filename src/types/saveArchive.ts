@@ -11,6 +11,19 @@ export interface SaveMeta {
   source: SaveSource
 }
 
+export interface StationEquipment {
+  type: 'shields' | 'turrets'
+  ref: string
+  group: string
+  exact: number
+}
+
+export interface StationModule {
+  index: number
+  ref: string
+  equipments?: StationEquipment[]
+}
+
 export interface StationEntry {
   code: string
   macro: string
@@ -20,6 +33,7 @@ export interface StationEntry {
   z: number
   is_wreck?: boolean
   is_headquarter?: boolean
+  modules?: StationModule[]
 }
 
 export interface DatavaultEntry {
