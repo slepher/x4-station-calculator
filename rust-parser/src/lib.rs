@@ -232,7 +232,8 @@ fn dv_flags(attrs: &HashMap<String, String>) -> (Option<bool>, Option<bool>, Opt
 #[wasm_bindgen]
 pub struct SaveParser {
     buffer: Vec<u8>,
-    consumed: usize,
+    /// Position in buffer that has been successfully committed (last_good_pos)
+    committed: usize,
     total_parsed: usize,
     input_bytes_received: usize,
 
@@ -263,7 +264,7 @@ impl SaveParser {
     pub fn new() -> Self {
         Self {
             buffer: Vec::new(),
-            consumed: 0,
+            committed: 0,
             total_parsed: 0,
             input_bytes_received: 0,
 
@@ -298,12 +299,13 @@ impl SaveParser {
             return;
         }
         if !chunk.is_empty() {
-            if self.consumed > 0 {
-                self.buffer.drain(..self.consumed);
-                self.consumed = 0;
+            // Drain committed bytes before adding new data
+            if self.committed > 0 {
+                self.buffer.drain(..self.committed);
+                self.committed = 0;
             }
-            self.input_bytes_received += chunk.len();
             self.buffer.extend_from_slice(chunk);
+            self.input_bytes_received += chunk.len();
             if self.phase == ParsePhase::Receiving {
                 self.phase = ParsePhase::Parsing;
             }
@@ -315,7 +317,7 @@ impl SaveParser {
     }
 
     pub fn progress_json(&self) -> String {
-        let buffered = self.buffer.len().saturating_sub(self.consumed);
+        let buffered = self.buffer.len().saturating_sub(self.committed);
         let raw_pct = if self.input_bytes_received == 0 {
             0.0
         } else {
@@ -351,7 +353,7 @@ impl SaveParser {
             return false;
         }
 
-        let available = self.buffer.len().saturating_sub(self.consumed);
+        let available = self.buffer.len().saturating_sub(self.committed);
         if available == 0 {
             if self.input_complete {
                 if !self.path.is_empty() {
@@ -370,9 +372,11 @@ impl SaveParser {
             return false;
         }
 
-        let start = self.consumed;
+        // Create reader starting from committed position
+        let start = self.committed;
         let mut reader = quick_xml::Reader::from_reader(&self.buffer[start..]);
         reader.config_mut().trim_text(false);
+        // Disable quick-xml's internal tag checking - we use our own path stack
         reader.config_mut().check_end_names = false;
         reader.config_mut().allow_unmatched_ends = true;
 
@@ -380,6 +384,7 @@ impl SaveParser {
         let mut processed = 0usize;
         let mut hit_eof = false;
 
+        // Track the position after the last successfully parsed complete event
         let mut last_good_pos = 0usize;
 
         while processed < max_events {
@@ -440,14 +445,19 @@ impl SaveParser {
                         )));
                         return false;
                     }
+                    // Input not complete - the error is likely due to truncated data
+                    // Stop here and keep the uncommitted tail for next pump()
                     break;
                 }
             }
         }
 
-        self.consumed = start + last_good_pos;
+        // Only advance committed position to last_good_pos
+        // This preserves incomplete tokens at the end of the buffer
+        self.committed = start + last_good_pos;
         self.total_parsed += last_good_pos;
 
+        // Process the collected events
         for event in events {
             if self.error.is_some() {
                 return false;
@@ -496,7 +506,8 @@ impl SaveParser {
             return false;
         }
 
-        self.buffer.len() > self.consumed || !self.input_complete
+        // Has more uncommitted data, or expecting more input
+        self.buffer.len() > self.committed || !self.input_complete
     }
 
     fn world_pos(&self) -> Vector3 {
