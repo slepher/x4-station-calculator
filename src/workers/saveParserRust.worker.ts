@@ -2,18 +2,6 @@ import type { SaveArchive, SaveParserMessage } from '@/types/saveArchive'
 import initWasm, { SaveParser } from '@/wasm/save_parser'
 import wasmUrl from '@/wasm/save_parser_bg.wasm?url'
 
-interface SaveParserProgressInfo {
-  bytesProcessed: number
-  tagCount: number
-  sectorsCount: number
-}
-
-interface SaveParserRuntime {
-  feed: (data: Uint8Array) => void
-  close: (filename: string) => SaveArchive
-  getProgress: () => SaveParserProgressInfo
-}
-
 let wasmInitialized = false
 
 async function ensureWasmInit() {
@@ -23,79 +11,32 @@ async function ensureWasmInit() {
   wasmInitialized = true
 }
 
-export async function createRustParserRuntime(
-  options?: {
-    onProgress?: (info: SaveParserProgressInfo) => void
-    progressIntervalMs?: number
-  }
-): Promise<SaveParserRuntime> {
-  await ensureWasmInit()
-  const parser = new SaveParser()
-  
-  let bytesProcessed = 0
-  let lastProgressAt = 0
-  const progressIntervalMs = options?.progressIntervalMs ?? 500
-  
-  const emitProgress = (force = false) => {
-    const now = Date.now()
-    if (!force && now - lastProgressAt < progressIntervalMs) return
-    lastProgressAt = now
-    options?.onProgress?.({
-      bytesProcessed,
-      tagCount: parser.tag_count(),
-      sectorsCount: parser.sector_count()
-    })
-  }
-  
-  return {
-    feed(data: Uint8Array) {
-      if (!data.length) return
-      parser.feed(data)
-      bytesProcessed += data.length
-      emitProgress()
-    },
-    
-    close(filename: string) {
-      const result = parser.finish(filename)
-      return JSON.parse(result) as SaveArchive
-    },
-    
-    getProgress() {
-      return {
-        bytesProcessed,
-        tagCount: parser.tag_count(),
-        sectorsCount: parser.sector_count()
-      }
-    }
-  }
-}
-
 if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: unknown }).importScripts === 'function') {
   self.onmessage = async (e: MessageEvent<{ type: string; arrayBuffer?: ArrayBuffer; filename?: string }>) => {
     const { type, arrayBuffer, filename } = e.data
     
     if (type !== 'parse' || !arrayBuffer) return
     
+    const postProgress = (status: string) => {
+      self.postMessage({ type: 'progress', status } as SaveParserMessage)
+    }
+    
     try {
-      self.postMessage({ type: 'progress', status: 'Initializing...' } as SaveParserMessage)
+      postProgress('Initializing WASM...')
       
-      const runtime = await createRustParserRuntime({
-        onProgress: (info) => {
-          self.postMessage({
-            type: 'progress',
-            status: `Processing ${Math.floor(info.bytesProcessed / 1024 / 1024)} MB`
-          } as SaveParserMessage)
-        }
-      })
+      await ensureWasmInit()
+      const parser = new SaveParser()
       
-      self.postMessage({ type: 'progress', status: 'Parsing...' } as SaveParserMessage)
+      postProgress('Checking file format...')
       
       const header = new Uint8Array(arrayBuffer.slice(0, 2))
       const isGzipped = header[0] === 0x1f && header[1] === 0x8b
       
       let data: Uint8Array
+      let totalMB: number
+      
       if (isGzipped) {
-        self.postMessage({ type: 'progress', status: 'Decompressing...' } as SaveParserMessage)
+        postProgress('Decompressing...')
         const ds = new DecompressionStream('gzip')
         const blob = new Blob([arrayBuffer])
         const decompressedStream = blob.stream().pipeThrough(ds)
@@ -108,21 +49,42 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
           if (value) chunks.push(value)
         }
         
-        const totalLength = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
-        const combined = new Uint8Array(totalLength)
+        const totalBytes = chunks.reduce((sum, chunk) => sum + chunk.length, 0)
+        totalMB = totalBytes / (1024 * 1024)
+        data = new Uint8Array(totalBytes)
         let offset = 0
         for (const chunk of chunks) {
-          combined.set(chunk, offset)
+          data.set(chunk, offset)
           offset += chunk.length
         }
-        
-        data = combined
       } else {
         data = new Uint8Array(arrayBuffer)
+        totalMB = data.length / (1024 * 1024)
       }
       
-      runtime.feed(data)
-      const archive = runtime.close(filename || '')
+      // Feed in chunks to provide progress feedback
+      const CHUNK_SIZE = 16 * 1024 * 1024 // 16MB chunks
+      const totalChunks = Math.ceil(data.length / CHUNK_SIZE)
+      
+      postProgress(`Parsing ${totalMB.toFixed(0)} MB (${totalChunks} chunks)...`)
+      
+      for (let i = 0; i < totalChunks; i++) {
+        const start = i * CHUNK_SIZE
+        const end = Math.min(start + CHUNK_SIZE, data.length)
+        const chunk = data.slice(start, end)
+        parser.feed(chunk)
+        
+        // Report progress after each chunk
+        const progress = ((i + 1) / totalChunks * 100).toFixed(0)
+        const sectors = parser.sector_count()
+        postProgress(`${progress}% parsed, ${sectors} sectors found`)
+      }
+      
+      const finalSectors = parser.sector_count()
+      postProgress(`Finalizing ${finalSectors} sectors...`)
+      
+      const result = parser.finish(filename || '')
+      const archive: SaveArchive = JSON.parse(result)
       
       self.postMessage({ type: 'complete', data: archive } as SaveParserMessage)
     } catch (error) {
