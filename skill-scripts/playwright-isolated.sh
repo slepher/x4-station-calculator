@@ -15,4 +15,4 @@ if [ $# -gt 0 ]; then
 fi
 
 # 核心修改：将找到的空闲端口作为环境变量注入，并将所有传入的参数 ("$@") 透传给 playwright
-PORT=$PORT pnpm exec playwright test "$@"
+PORT=$PORT npm exec playwright test "$@"
