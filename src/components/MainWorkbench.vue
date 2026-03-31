@@ -7,6 +7,7 @@ import ProductionWorkbenchView from './empire/ProductionWorkbenchView.vue'
 import LogicFlowWorkbenchView from './logic-flow/LogicFlowWorkbenchView.vue'
 import ShipBuildView from './ship-build/ShipBuildView.vue'
 import MapWorkbenchView from './empire/MapWorkbenchView.vue'
+import SaveImportView from './save/SaveImportView.vue'
 
 const store = useStationStore()
 const shipBuildStore = useShipBuildStore()
@@ -19,6 +20,7 @@ watchEffect(() => {
 const isProductionView = computed(() => shipBuildStore.activeView === 'production')
 const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
 const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
+const isSaveImportView = computed(() => shipBuildStore.activeView === 'save-import')
 
 </script>
 
@@ -43,6 +45,10 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
       <MapWorkbenchView />
     </div>
 
+    <div v-else-if="isSaveImportView" class="save-import-slot">
+      <SaveImportView />
+    </div>
+
     <div v-else class="flow-layout flex flex-col gap-6">
       <LogicFlowWorkbenchView />
     </div>
@@ -60,6 +66,10 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
 
 .maps-slot {
   @apply flex-1 min-h-0;
+}
+
+.save-import-slot {
+  @apply flex-1 min-h-0 flex flex-col;
 }
 
 .coming-soon-panel {
