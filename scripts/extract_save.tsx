@@ -101,7 +101,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string): Promise<S
   const gzip = isGzipFile(absoluteInput)
   const stat = fs.statSync(absoluteInput)
 
-  console.log(`[extract_save] parser: Rust WASM v3 (persistent reader)`)
+  console.log(`[extract_save] parser: Rust WASM v4 (streaming)`)
   console.log(`[extract_save] input: ${absoluteInput}`)
   console.log(`[extract_save] output: ${absoluteOutput}`)
   console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
@@ -116,47 +116,88 @@ async function extractSaveWasm(inputPath: string, outputPath: string): Promise<S
   await initWasm({ module_or_path: wasmBinary })
 
   const parser = new SaveParser()
-
-  console.log('[extract_save] reading file...')
-  let inputBuffer = fs.readFileSync(absoluteInput)
-
-  if (gzip) {
-    console.log('[extract_save] decompressing...')
-    inputBuffer = zlib.gunzipSync(inputBuffer)
-  }
-
-  const totalBytes = inputBuffer.length
-  console.log(`[extract_save] decompressed size: ${formatMB(totalBytes)} MB`)
-
-  parser.load_document(new Uint8Array(inputBuffer))
-
-  console.log('[extract_save] parsing with pump loop...')
   const start = performance.now()
   
-  const MAX_EVENTS_PER_PUMP = 50000
-  let pumpCount = 0
-  let lastProgressLog = 0
-  
-  while (true) {
-    const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
-    pumpCount++
+  if (gzip) {
+    console.log('[extract_save] decompressing...')
+    const compressed = fs.readFileSync(absoluteInput)
+    const decompressed = zlib.gunzipSync(compressed)
+    const totalBytes = decompressed.length
+    console.log(`[extract_save] decompressed size: ${formatMB(totalBytes)} MB`)
     
-    const progressJson = parser.progress_json()
-    const progress = JSON.parse(progressJson)
+    parser.set_expected_total_bytes(totalBytes)
     
-    const currentMB = progress.parsedBytesTotal / (1024 * 1024)
-    if (currentMB - lastProgressLog >= 50 || pumpCount % 20 === 0 || !hasMore) {
-      console.log(
-        `[extract_save] pump #${pumpCount}: ${progress.percent.toFixed(1)}% parsed, ${formatMB(progress.parsedBytesTotal)} MB, ${progress.tagCount} tags, ${progress.sectorCount} sectors, phase=${progress.phase}`
-      )
-      lastProgressLog = currentMB
+    const CHUNK_SIZE = 16 * 1024 * 1024
+    const MAX_EVENTS_PER_PUMP = 50000
+    let pumpCount = 0
+    let lastProgressLog = 0
+    
+    for (let offset = 0; offset < totalBytes; offset += CHUNK_SIZE) {
+      const end = Math.min(offset + CHUNK_SIZE, totalBytes)
+      const chunk = new Uint8Array(decompressed.slice(offset, end))
+      parser.push_chunk(chunk)
+      
+      while (true) {
+        const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
+        pumpCount++
+        
+        const progressJson = parser.progress_json()
+        const progress = JSON.parse(progressJson)
+        
+        const currentMB = progress.parsedBytesTotal / (1024 * 1024)
+        if (currentMB - lastProgressLog >= 50 || pumpCount % 20 === 0) {
+          console.log(
+            `[extract_save] pump #${pumpCount}: ${progress.percent.toFixed(1)}% parsed, ${formatMB(progress.parsedBytesTotal)} MB, ${progress.tagCount} tags, ${progress.sectorCount} sectors`
+          )
+          lastProgressLog = currentMB
+        }
+        
+        if (!hasMore) break
+      }
     }
     
-    if (!hasMore) break
+    parser.finish_input()
+    
+    while (true) {
+      const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
+      if (!hasMore) break
+    }
+  } else {
+    console.log('[extract_save] reading file...')
+    const inputBuffer = fs.readFileSync(absoluteInput)
+    const totalBytes = inputBuffer.length
+    console.log(`[extract_save] file size: ${formatMB(totalBytes)} MB`)
+
+    parser.set_expected_total_bytes(totalBytes)
+    parser.push_chunk(new Uint8Array(inputBuffer))
+    parser.finish_input()
+
+    console.log('[extract_save] parsing with pump loop...')
+    const MAX_EVENTS_PER_PUMP = 50000
+    let pumpCount = 0
+    let lastProgressLog = 0
+    
+    while (true) {
+      const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
+      pumpCount++
+      
+      const progressJson = parser.progress_json()
+      const progress = JSON.parse(progressJson)
+      
+      const currentMB = progress.parsedBytesTotal / (1024 * 1024)
+      if (currentMB - lastProgressLog >= 50 || pumpCount % 20 === 0 || !hasMore) {
+        console.log(
+          `[extract_save] pump #${pumpCount}: ${progress.percent.toFixed(1)}% parsed, ${formatMB(progress.parsedBytesTotal)} MB, ${progress.tagCount} tags, ${progress.sectorCount} sectors, phase=${progress.phase}`
+        )
+        lastProgressLog = currentMB
+      }
+      
+      if (!hasMore) break
+    }
   }
 
   const elapsed = performance.now() - start
-  console.log(`[extract_save] parse time: ${elapsed.toFixed(0)}ms (${pumpCount} pump calls)`)
+  console.log(`[extract_save] parse time: ${elapsed.toFixed(0)}ms`)
 
   const result = parser.finish(path.basename(absoluteInput))
   const archive: SaveArchive = JSON.parse(result)

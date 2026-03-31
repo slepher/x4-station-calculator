@@ -5,10 +5,12 @@ export class SaveParser {
     free(): void;
     [Symbol.dispose](): void;
     finish(filename: string): string;
-    load_document(input: Uint8Array): void;
+    finish_input(): void;
     constructor();
     progress_json(): string;
     pump(max_events: number): boolean;
+    push_chunk(chunk: Uint8Array): void;
+    set_expected_total_bytes(total: number): void;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -17,10 +19,12 @@ export interface InitOutput {
     readonly memory: WebAssembly.Memory;
     readonly __wbg_saveparser_free: (a: number, b: number) => void;
     readonly saveparser_finish: (a: number, b: number, c: number) => [number, number, number, number];
-    readonly saveparser_load_document: (a: number, b: number, c: number) => [number, number];
+    readonly saveparser_finish_input: (a: number) => void;
     readonly saveparser_new: () => number;
     readonly saveparser_progress_json: (a: number) => [number, number];
     readonly saveparser_pump: (a: number, b: number) => number;
+    readonly saveparser_push_chunk: (a: number, b: number, c: number) => void;
+    readonly saveparser_set_expected_total_bytes: (a: number, b: number) => void;
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

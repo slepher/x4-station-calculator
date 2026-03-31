@@ -35,16 +35,8 @@ export class SaveParser {
             wasm.__wbindgen_free(deferred3_0, deferred3_1, 1);
         }
     }
-    /**
-     * @param {Uint8Array} input
-     */
-    load_document(input) {
-        const ptr0 = passArray8ToWasm0(input, wasm.__wbindgen_malloc);
-        const len0 = WASM_VECTOR_LEN;
-        const ret = wasm.saveparser_load_document(this.__wbg_ptr, ptr0, len0);
-        if (ret[1]) {
-            throw takeFromExternrefTable0(ret[0]);
-        }
+    finish_input() {
+        wasm.saveparser_finish_input(this.__wbg_ptr);
     }
     constructor() {
         const ret = wasm.saveparser_new();
@@ -74,6 +66,20 @@ export class SaveParser {
     pump(max_events) {
         const ret = wasm.saveparser_pump(this.__wbg_ptr, max_events);
         return ret !== 0;
+    }
+    /**
+     * @param {Uint8Array} chunk
+     */
+    push_chunk(chunk) {
+        const ptr0 = passArray8ToWasm0(chunk, wasm.__wbindgen_malloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.saveparser_push_chunk(this.__wbg_ptr, ptr0, len0);
+    }
+    /**
+     * @param {number} total
+     */
+    set_expected_total_bytes(total) {
+        wasm.saveparser_set_expected_total_bytes(this.__wbg_ptr, total);
     }
 }
 if (Symbol.dispose) SaveParser.prototype[Symbol.dispose] = SaveParser.prototype.free;

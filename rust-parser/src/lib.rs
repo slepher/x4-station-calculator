@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
-use std::io::Cursor;
 use wasm_bindgen::prelude::*;
 
 #[derive(Clone, Copy, Debug, Serialize, PartialEq, Eq)]
@@ -162,8 +161,6 @@ struct ComponentCtx {
     code: Option<String>,
     macro_field: Option<String>,
     owner: Option<String>,
-    known: bool,
-    knownto_player: bool,
     own_offset: Vector3,
     has_blueprints: Option<bool>,
     has_wares: Option<bool>,
@@ -234,8 +231,9 @@ fn dv_flags(attrs: &HashMap<String, String>) -> (Option<bool>, Option<bool>, Opt
 
 #[wasm_bindgen]
 pub struct SaveParser {
-    reader: Option<quick_xml::Reader<Cursor<Vec<u8>>>>,
-    event_buf: Vec<u8>,
+    buffer: Vec<u8>,
+    consumed: usize,
+    total_parsed: usize,
 
     expected_total_bytes: usize,
 
@@ -247,6 +245,7 @@ pub struct SaveParser {
     tags: usize,
 
     phase: ParsePhase,
+    input_complete: bool,
     done: bool,
     error: Option<ParserError>,
 
@@ -262,8 +261,10 @@ impl SaveParser {
     #[wasm_bindgen(constructor)]
     pub fn new() -> Self {
         Self {
-            reader: None,
-            event_buf: Vec::new(),
+            buffer: Vec::new(),
+            consumed: 0,
+            total_parsed: 0,
+
             expected_total_bytes: 0,
 
             meta: Meta::default(),
@@ -274,6 +275,7 @@ impl SaveParser {
             tags: 0,
 
             phase: ParsePhase::Receiving,
+            input_complete: false,
             done: false,
             error: None,
 
@@ -285,34 +287,36 @@ impl SaveParser {
         }
     }
 
-    pub fn load_document(&mut self, input: &[u8]) -> Result<(), JsValue> {
-        if self.reader.is_some() {
-            return Err(JsValue::from_str("document already loaded"));
-        }
+    pub fn set_expected_total_bytes(&mut self, total: usize) {
+        self.expected_total_bytes = total;
+    }
+
+    pub fn push_chunk(&mut self, chunk: &[u8]) {
         if self.done || self.error.is_some() {
-            return Err(JsValue::from_str("parser is already finished"));
+            return;
         }
+        if !chunk.is_empty() {
+            if self.consumed > 0 {
+                self.buffer.drain(..self.consumed);
+                self.consumed = 0;
+            }
+            self.buffer.extend_from_slice(chunk);
+            if self.phase == ParsePhase::Receiving {
+                self.phase = ParsePhase::Parsing;
+            }
+        }
+    }
 
-        let mut reader = quick_xml::Reader::from_reader(Cursor::new(input.to_vec()));
-        reader.config_mut().trim_text(false);
-
-        self.expected_total_bytes = input.len();
-        self.reader = Some(reader);
-        self.phase = ParsePhase::Parsing;
-        Ok(())
+    pub fn finish_input(&mut self) {
+        self.input_complete = true;
     }
 
     pub fn progress_json(&self) -> String {
-        let parsed_bytes_total = self
-            .reader
-            .as_ref()
-            .map(|r| r.buffer_position() as usize)
-            .unwrap_or(0);
-
+        let buffered = self.buffer.len().saturating_sub(self.consumed);
         let raw_pct = if self.expected_total_bytes == 0 {
             0.0
         } else {
-            parsed_bytes_total as f64 / self.expected_total_bytes as f64 * 100.0
+            self.total_parsed as f64 / self.expected_total_bytes as f64 * 100.0
         };
 
         let pct = match self.phase {
@@ -325,15 +329,15 @@ impl SaveParser {
 
         serde_json::to_string(&ProgressInfo {
             phase: self.phase,
-            input_bytes_total: self.expected_total_bytes,
-            parsed_bytes_total,
-            buffered_bytes: 0,
+            input_bytes_total: self.buffer.len(),
+            parsed_bytes_total: self.total_parsed,
+            buffered_bytes: buffered,
             expected_total_bytes: self.expected_total_bytes,
             percent: pct,
             tag_count: self.tags,
             sector_count: self.sectors.len(),
             done: self.done,
-            input_complete: self.reader.is_some(),
+            input_complete: self.input_complete,
             error: self.error.as_ref().map(|e| e.message.clone()),
         })
         .unwrap_or_default()
@@ -344,19 +348,27 @@ impl SaveParser {
             return false;
         }
 
-        let reader = match self.reader.as_mut() {
-            Some(r) => r,
-            None => return false,
-        };
+        let available = self.buffer.len().saturating_sub(self.consumed);
+        if available == 0 {
+            if self.input_complete {
+                self.phase = ParsePhase::Finalizing;
+                self.done = true;
+                self.phase = ParsePhase::Done;
+            }
+            return false;
+        }
+
+        let start = self.consumed;
+        let mut reader = quick_xml::Reader::from_reader(&self.buffer[start..]);
+        reader.config_mut().trim_text(false);
 
         let mut events: Vec<quick_xml::events::Event<'static>> = Vec::new();
         let mut processed = 0usize;
         let mut hit_eof = false;
 
         while processed < max_events {
-            self.event_buf.clear();
-
-            match reader.read_event_into(&mut self.event_buf) {
+            let mut event_buf = Vec::new();
+            match reader.read_event_into(&mut event_buf) {
                 Ok(quick_xml::events::Event::Start(e)) => {
                     events.push(quick_xml::events::Event::Start(e.into_owned()));
                     processed += 1;
@@ -377,12 +389,19 @@ impl SaveParser {
                     processed += 1;
                 }
                 Err(err) => {
-                    self.phase = ParsePhase::Error;
-                    self.error = Some(ParserError::new(format!("XML parse error: {err}")));
-                    return false;
+                    if self.input_complete {
+                        self.phase = ParsePhase::Error;
+                        self.error = Some(ParserError::new(format!("XML parse error: {err}")));
+                        return false;
+                    }
+                    break;
                 }
             }
         }
+
+        let parsed = reader.buffer_position() as usize;
+        self.consumed = start + parsed;
+        self.total_parsed += parsed;
 
         for event in events {
             match event {
@@ -405,14 +424,14 @@ impl SaveParser {
             }
         }
 
-        if hit_eof {
+        if hit_eof && self.input_complete {
             self.phase = ParsePhase::Finalizing;
             self.done = true;
             self.phase = ParsePhase::Done;
             return false;
         }
 
-        true
+        self.buffer.len() > self.consumed || !self.input_complete
     }
 
     fn world_pos(&self) -> Vector3 {
@@ -444,8 +463,6 @@ impl SaveParser {
                 code: a.get("code").cloned(),
                 macro_field: a.get("macro").cloned(),
                 owner: a.get("owner").cloned(),
-                known: a.get("known").map(|v| v == "1").unwrap_or(false),
-                knownto_player: a.get("knownto").map(|v| v == "player").unwrap_or(false),
                 own_offset: Vector3::default(),
                 has_blueprints: bp,
                 has_wares: w,
@@ -680,7 +697,7 @@ impl SaveParser {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v3".into(),
+                parser_version: "v1".into(),
                 source: "original".into(),
             },
             sectors: self.sectors.clone(),

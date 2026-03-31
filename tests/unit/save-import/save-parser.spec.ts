@@ -42,7 +42,7 @@ describe('save parser core (simplified)', () => {
   })
 })
 
-describe('save parser (Rust WASM v3)', () => {
+describe('save parser (Rust WASM streaming)', () => {
   it('parses xml with pump loop into archive data', async () => {
     const initWasm = (await import('../../../src/wasm/save_parser.js')).default
     const { SaveParser } = await import('../../../src/wasm/save_parser.js')
@@ -65,7 +65,8 @@ describe('save parser (Rust WASM v3)', () => {
       </savegame>`
     
     const data = new TextEncoder().encode(xml)
-    parser.load_document(data)
+    parser.push_chunk(data)
+    parser.finish_input()
     
     while (true) {
       const hasMore = parser.pump(1000)
@@ -82,7 +83,7 @@ describe('save parser (Rust WASM v3)', () => {
     expect(archive.meta.playerName).toBe('testplayer')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v3')
+    expect(archive.meta.parser_version).toBe('v1')
     expect(archive.isCompatible).toBe(true)
     expect(archive.sectors.test_sector_macro?.stations).toHaveLength(1)
     expect(archive.sectors.test_sector_macro?.stations[0]).toMatchObject({
