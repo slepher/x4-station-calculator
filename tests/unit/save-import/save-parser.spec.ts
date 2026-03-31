@@ -1,5 +1,6 @@
+import { readFile } from 'node:fs/promises'
 import { describe, expect, it } from 'vitest'
-import { createSaveParserRuntime, parseSaveXmlChunks } from '@/workers/saveParser.worker'
+import { createSaveParserRuntime, parseSaveXmlChunks, SAVE_PARSER_WASM_URL } from '@/workers/saveParserWasm.worker'
 import type { SaveParserConfig } from '@/types/saveArchive'
 
 function createConfig(): SaveParserConfig {
@@ -36,7 +37,8 @@ describe('save parser core', () => {
       '</savegame>'
     ]
 
-    const runtime = createSaveParserRuntime(createConfig())
+    const wasmBytes = await readFile(SAVE_PARSER_WASM_URL)
+    const runtime = createSaveParserRuntime(createConfig(), { wasmSource: wasmBytes })
     const archive = await parseSaveXmlChunks(runtime, xml)
 
     expect(archive.meta.guid).toBe('GUID-1')

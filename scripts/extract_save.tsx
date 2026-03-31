@@ -1,10 +1,10 @@
 import fs from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import zlib from 'node:zlib'
-import { StringDecoder } from 'node:string_decoder'
 import mapsData from '../src/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
 import localeEn from '../src/assets/x4_game_data/8.0-Diplomacy/locales/en.json'
-import { createSaveParserRuntime } from '../src/workers/saveParser.worker'
+import { createSaveParserRuntime, SAVE_PARSER_WASM_URL } from '../src/workers/saveParserWasm.worker'
 import type { SaveArchive, SaveParserConfig } from '../src/types/saveArchive'
 
 function printUsage(): void {
@@ -92,12 +92,13 @@ async function extractSave(inputPath: string, outputPath: string): Promise<SaveA
 
   const sourceStream = fs.createReadStream(absoluteInput)
   const dataStream = gzip ? sourceStream.pipe(zlib.createGunzip()) : sourceStream
-  const decoder = new StringDecoder('utf8')
-  const runtime = createSaveParserRuntime({
+  const wasmBytes = await readFile(SAVE_PARSER_WASM_URL)
+  const runtime = await createSaveParserRuntime({
     ...buildConfig(),
     filename: path.basename(absoluteInput)
   }, {
     progressIntervalMs: 500,
+    wasmSource: wasmBytes,
     onProgress: (progress) => {
       console.log(
         `[extract_save] parsed ${formatMB(progress.bytesProcessed)} MB, tags ${progress.tagCount}, sectors ${progress.sectorsCount}`
@@ -118,13 +119,7 @@ async function extractSave(inputPath: string, outputPath: string): Promise<SaveA
   })
 
   for await (const chunk of dataStream as AsyncIterable<Buffer>) {
-    const text = decoder.write(chunk)
-    runtime.feed(text)
-  }
-
-  const tail = decoder.end()
-  if (tail) {
-    runtime.feed(tail)
+    runtime.feed(chunk)
   }
 
   const archive = runtime.close()
