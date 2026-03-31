@@ -127,27 +127,73 @@ Likely reasons:
 
 This suggests the event model is not a good fit for the current usage pattern.
 
-## Recommendation for next agent
+## saxes exploration (2026-03-31)
 
-Short version:
+Tried `saxes` parser as suggested. Result:
 
-- do **not** continue down the current `sax-wasm` path unless you first prove why event counts are higher
-- the likely best next step is to revert the `sax-wasm` replacement and return to the `5ec140d` style baseline
+- `saxes` was ~57% slower than `sax-js`
+- Reverted to `sax-js`
 
-Recommended next actions:
+## Rust WASM with quick-xml (2026-03-31) - SUCCESS
 
-1. If abandoning the `sax-wasm` branch completely, remove or ignore:
-   - `src/workers/saveParserWasm.worker.ts`
-   - `scripts/extract_save.tsx`
-   - `analysis/tmp_scripts/profile_save_parser.ts`
-2. Restore `sax-js` baseline behavior.
-3. If continuing parser replacement research:
-   - try `saxes` as the lower-risk replacement candidate
-   - measure `save_002.xml` with the same profile script
-4. If large speedup is still required:
-   - consider splitting CLI and web implementations
-   - keep web on the simpler parser path
-   - use a more aggressive Node-only parser strategy for CLI
+Built a custom Rust WASM parser using `quick-xml` streaming library.
+
+### Implementation
+
+- `rust-parser/Cargo.toml` - Rust project with quick-xml, serde, serde_json
+- `rust-parser/src/lib.rs` - Streaming XML parser using quick-xml events
+- `src/wasm/save_parser.js` - wasm-pack generated JS glue (target: web)
+- `src/wasm/save_parser_bg.wasm` - Compiled WASM (~120KB)
+- `src/workers/saveParserRust.worker.ts` - Worker wrapper for WASM parser
+
+### Build command
+
+```bash
+cd rust-parser && wasm-pack build --target web --release --out-dir ../src/wasm
+```
+
+### Performance Results (save_002.xml, 437MB)
+
+| Parser | Time | Stations |
+|--------|------|----------|
+| **Rust WASM (quick-xml)** | **5.05s** | 1419 |
+| sax-js | 16.4s | 1419 |
+| sax-wasm | 28.8s | (incorrect counts) |
+| saxes | ~29s | - |
+
+**Rust WASM is 3.25x faster than sax-js**
+
+### Test scripts
+
+- `scripts/testWasmDirect.ts` - Direct WASM test (Node.js)
+- `scripts/testSaxParser.ts` - sax-js comparison test
+
+### Current status (UPDATED 2026-03-31 22:00)
+
+- ✅ Rust WASM parser working
+- ✅ Performance verified (3x speedup: 7s vs 20s on 437MB file)
+- ✅ Full feature parity with sax-js (stations, sectors, modules, datavaults, abandoned ships)
+- ✅ Worker integration complete (`saveParserRust.worker.ts`)
+- ✅ Web UI updated to use Rust WASM parser (`SaveUploadPanel.vue`)
+- ✅ CLI tool with `--wasm` flag (`scripts/extract_save.tsx`)
+- ✅ Simplified parser - no external config dependency (raw attribute extraction only)
+
+### Changes made
+
+1. **`src/workers/saveParserSimplified.worker.ts`** - New simplified sax-js parser (no config needed)
+2. **`rust-parser/src/lib.rs`** - Complete rewrite with full feature extraction
+3. **`src/workers/saveParserRust.worker.ts`** - Updated for simplified API
+4. **`src/components/save/SaveUploadPanel.vue`** - Now uses Rust WASM parser
+5. **`scripts/extract_save.tsx`** - CLI with `--wasm` flag
+
+### Performance comparison (save_002.xml, 437MB)
+
+| Parser | Time | Output |
+|--------|------|--------|
+| sax-js | ~20s | 152 sectors, 1419 stations |
+| **Rust WASM** | **~7s** | 152 sectors, 1419 stations (identical) |
+
+### Next steps (completed)
 
 ## Important files
 

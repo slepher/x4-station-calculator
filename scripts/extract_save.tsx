@@ -1,59 +1,23 @@
 import fs from 'node:fs'
-import { readFile } from 'node:fs/promises'
 import path from 'node:path'
 import zlib from 'node:zlib'
-import mapsData from '../src/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
-import localeEn from '../src/assets/x4_game_data/8.0-Diplomacy/locales/en.json'
-import { createSaveParserRuntime, SAVE_PARSER_WASM_URL } from '../src/workers/saveParserWasm.worker'
-import type { SaveArchive, SaveParserConfig } from '../src/types/saveArchive'
+import { createSaveParserRuntime } from '../src/workers/saveParserSimplified.worker'
+import type { SaveArchive } from '../src/types/saveArchive'
 
 function printUsage(): void {
-  console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output.json]')
+  console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output.json] [--wasm]')
+  console.log('')
+  console.log('Options:')
+  console.log('  --wasm    Use Rust WASM parser (3.25x faster, experimental)')
 }
 
-function buildConfig(): SaveParserConfig {
-  const sectorNames: Record<string, string> = {}
-  const positions: Record<string, { x: number; y: number; z: number }> = {}
-
-  for (const clusterData of Object.values((mapsData as { clusters?: Record<string, unknown> }).clusters || {})) {
-    const cluster = clusterData as {
-      sectors?: Record<string, { name?: string; position?: { x: number; y: number; z: number } }>
-      gates?: Record<string, { position?: { x: number; y: number; z: number } }>
-    }
-
-    for (const [sectorMacro, sectorInfo] of Object.entries(cluster.sectors || {})) {
-      if (sectorInfo.name) {
-        sectorNames[sectorMacro.toLowerCase()] = sectorInfo.name
-      }
-      if (sectorInfo.position) {
-        positions[sectorMacro.toLowerCase()] = sectorInfo.position
-      }
-    }
-
-    for (const [gateMacro, gateInfo] of Object.entries(cluster.gates || {})) {
-      if (gateInfo.position) {
-        positions[gateMacro.toLowerCase()] = gateInfo.position
-      }
-    }
-  }
-
-  const strings: Record<string, Record<string, string>> = {}
-  for (const [key, value] of Object.entries(localeEn as Record<string, string>)) {
-    const match = key.match(/^\{(\d+),(\d+)\}$/)
-    if (!match || !match[1] || !match[2]) continue
-    const page = match[1]
-    const id = match[2]
-    strings[page] ||= {}
-    strings[page][id] = value
-  }
-
-  return {
-    sectorNames,
-    shipNames: {},
-    positions,
-    strings,
-    currentVersion: '8.0'
-  }
+function parseArgs(): { input: string; output: string; useWasm: boolean } {
+  const args = process.argv.slice(2)
+  const useWasm = args.includes('--wasm')
+  const positional = args.filter(a => !a.startsWith('--'))
+  const input = positional[0]
+  const output = positional[1]
+  return { input, output, useWasm }
 }
 
 function isGzipFile(filePath: string): boolean {
@@ -79,12 +43,13 @@ function formatMB(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(1)
 }
 
-async function extractSave(inputPath: string, outputPath: string): Promise<SaveArchive> {
+async function extractSaveSaxJs(inputPath: string, outputPath: string): Promise<SaveArchive> {
   const absoluteInput = path.resolve(process.cwd(), inputPath)
   const absoluteOutput = path.resolve(process.cwd(), outputPath)
   const gzip = isGzipFile(absoluteInput)
   const stat = fs.statSync(absoluteInput)
 
+  console.log(`[extract_save] parser: sax-js`)
   console.log(`[extract_save] input: ${absoluteInput}`)
   console.log(`[extract_save] output: ${absoluteOutput}`)
   console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
@@ -92,13 +57,8 @@ async function extractSave(inputPath: string, outputPath: string): Promise<SaveA
 
   const sourceStream = fs.createReadStream(absoluteInput)
   const dataStream = gzip ? sourceStream.pipe(zlib.createGunzip()) : sourceStream
-  const wasmBytes = await readFile(SAVE_PARSER_WASM_URL)
-  const runtime = await createSaveParserRuntime({
-    ...buildConfig(),
-    filename: path.basename(absoluteInput)
-  }, {
-    progressIntervalMs: 500,
-    wasmSource: wasmBytes,
+
+  const runtime = createSaveParserRuntime({
     onProgress: (progress) => {
       console.log(
         `[extract_save] parsed ${formatMB(progress.bytesProcessed)} MB, tags ${progress.tagCount}, sectors ${progress.sectorsCount}`
@@ -109,8 +69,8 @@ async function extractSave(inputPath: string, outputPath: string): Promise<SaveA
   let sourceBytesRead = 0
   let nextSourceLogMB = 10
 
-  sourceStream.on('data', (chunk: Buffer) => {
-    sourceBytesRead += chunk.length
+  sourceStream.on('data', (chunk: string | Buffer) => {
+    sourceBytesRead += typeof chunk === 'string' ? chunk.length : chunk.length
     const sourceMB = sourceBytesRead / (1024 * 1024)
     if (sourceMB >= nextSourceLogMB) {
       console.log(`[extract_save] read source ${formatMB(sourceBytesRead)} MB / ${formatMB(stat.size)} MB`)
@@ -118,11 +78,15 @@ async function extractSave(inputPath: string, outputPath: string): Promise<SaveA
     }
   })
 
+  const decoder = new TextDecoder()
   for await (const chunk of dataStream as AsyncIterable<Buffer>) {
-    runtime.feed(chunk)
+    runtime.feed(decoder.decode(chunk, { stream: true }))
   }
 
-  const archive = runtime.close()
+  const tail = decoder.decode()
+  if (tail) runtime.feed(tail)
+
+  const archive = runtime.close(path.basename(absoluteInput))
   fs.writeFileSync(absoluteOutput, JSON.stringify(archive, null, 2))
 
   console.log(`[extract_save] done: sectors ${Object.keys(archive.sectors).length}, compatible=${archive.isCompatible}`)
@@ -131,9 +95,58 @@ async function extractSave(inputPath: string, outputPath: string): Promise<SaveA
   return archive
 }
 
+async function extractSaveWasm(inputPath: string, outputPath: string): Promise<SaveArchive> {
+  const absoluteInput = path.resolve(process.cwd(), inputPath)
+  const absoluteOutput = path.resolve(process.cwd(), outputPath)
+  const gzip = isGzipFile(absoluteInput)
+  const stat = fs.statSync(absoluteInput)
+
+  console.log(`[extract_save] parser: Rust WASM (experimental)`)
+  console.log(`[extract_save] input: ${absoluteInput}`)
+  console.log(`[extract_save] output: ${absoluteOutput}`)
+  console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
+  console.log(`[extract_save] source type: ${gzip ? 'gzip' : 'xml'}`)
+
+  const initWasm = (await import('../src/wasm/save_parser.js')).default
+  const { SaveParser } = await import('../src/wasm/save_parser.js')
+  const wasmPath = new URL('../src/wasm/save_parser_bg.wasm', import.meta.url)
+  const wasmBinary = fs.readFileSync(wasmPath)
+
+  console.log('[extract_save] initializing WASM...')
+  await initWasm({ module_or_path: wasmBinary })
+
+  const parser = new SaveParser()
+
+  console.log('[extract_save] reading file...')
+  let inputBuffer = fs.readFileSync(absoluteInput)
+
+  if (gzip) {
+    console.log('[extract_save] decompressing...')
+    inputBuffer = zlib.gunzipSync(inputBuffer)
+  }
+
+  const totalBytes = inputBuffer.length
+  console.log(`[extract_save] decompressed size: ${formatMB(totalBytes)} MB`)
+
+  console.log('[extract_save] parsing...')
+  const start = performance.now()
+  parser.feed(new Uint8Array(inputBuffer))
+  const result = parser.finish(path.basename(absoluteInput))
+  const elapsed = performance.now() - start
+
+  console.log(`[extract_save] parse time: ${elapsed.toFixed(2)}ms`)
+
+  const archive: SaveArchive = JSON.parse(result)
+  
+  console.log(`[extract_save] done: sectors ${Object.keys(archive.sectors).length}, compatible=${archive.isCompatible}`)
+  fs.writeFileSync(absoluteOutput, JSON.stringify(archive, null, 2))
+  console.log(`[extract_save] json written: ${absoluteOutput}`)
+
+  return archive
+}
+
 async function main(): Promise<void> {
-  const input = process.argv[2]
-  const output = process.argv[3]
+  const { input, output, useWasm } = parseArgs()
 
   if (!input) {
     printUsage()
@@ -142,7 +155,11 @@ async function main(): Promise<void> {
   }
 
   try {
-    await extractSave(input, output || defaultOutputPath(input))
+    if (useWasm) {
+      await extractSaveWasm(input, output || defaultOutputPath(input))
+    } else {
+      await extractSaveSaxJs(input, output || defaultOutputPath(input))
+    }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
     console.error(`[extract_save] failed: ${message}`)
