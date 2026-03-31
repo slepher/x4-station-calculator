@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
+use std::io::Cursor;
 use wasm_bindgen::prelude::*;
 
 #[derive(Clone, Copy, Debug, Serialize, PartialEq, Eq)]
@@ -232,7 +233,7 @@ fn dv_flags(attrs: &HashMap<String, String>) -> (Option<bool>, Option<bool>, Opt
 #[wasm_bindgen]
 pub struct SaveParser {
     buffer: Vec<u8>,
-    consumed: usize,
+    reader: Option<quick_xml::Reader<Cursor<Vec<u8>>>>,
     total_parsed: usize,
 
     expected_total_bytes: usize,
@@ -262,7 +263,7 @@ impl SaveParser {
     pub fn new() -> Self {
         Self {
             buffer: Vec::new(),
-            consumed: 0,
+            reader: None,
             total_parsed: 0,
 
             expected_total_bytes: 0,
@@ -296,10 +297,6 @@ impl SaveParser {
             return;
         }
         if !chunk.is_empty() {
-            if self.consumed > 0 {
-                self.buffer.drain(..self.consumed);
-                self.consumed = 0;
-            }
             self.buffer.extend_from_slice(chunk);
             if self.phase == ParsePhase::Receiving {
                 self.phase = ParsePhase::Parsing;
@@ -312,11 +309,17 @@ impl SaveParser {
     }
 
     pub fn progress_json(&self) -> String {
-        let buffered = self.buffer.len().saturating_sub(self.consumed);
+        let buffered = self.buffer.len();
+        let parsed = self
+            .reader
+            .as_ref()
+            .map(|r| r.buffer_position() as usize)
+            .unwrap_or(0);
+
         let raw_pct = if self.expected_total_bytes == 0 {
             0.0
         } else {
-            self.total_parsed as f64 / self.expected_total_bytes as f64 * 100.0
+            parsed as f64 / self.expected_total_bytes as f64 * 100.0
         };
 
         let pct = match self.phase {
@@ -330,8 +333,8 @@ impl SaveParser {
         serde_json::to_string(&ProgressInfo {
             phase: self.phase,
             input_bytes_total: self.buffer.len(),
-            parsed_bytes_total: self.total_parsed,
-            buffered_bytes: buffered,
+            parsed_bytes_total: parsed,
+            buffered_bytes: buffered.saturating_sub(parsed),
             expected_total_bytes: self.expected_total_bytes,
             percent: pct,
             tag_count: self.tags,
@@ -348,19 +351,17 @@ impl SaveParser {
             return false;
         }
 
-        let available = self.buffer.len().saturating_sub(self.consumed);
-        if available == 0 {
-            if self.input_complete {
-                self.phase = ParsePhase::Finalizing;
-                self.done = true;
-                self.phase = ParsePhase::Done;
-            }
-            return false;
+        if self.reader.is_none() && self.input_complete && !self.buffer.is_empty() {
+            let buffer_clone = std::mem::take(&mut self.buffer);
+            let mut reader = quick_xml::Reader::from_reader(Cursor::new(buffer_clone));
+            reader.config_mut().trim_text(false);
+            self.reader = Some(reader);
         }
 
-        let start = self.consumed;
-        let mut reader = quick_xml::Reader::from_reader(&self.buffer[start..]);
-        reader.config_mut().trim_text(false);
+        let reader = match self.reader.as_mut() {
+            Some(r) => r,
+            None => return false,
+        };
 
         let mut events: Vec<quick_xml::events::Event<'static>> = Vec::new();
         let mut processed = 0usize;
@@ -389,19 +390,12 @@ impl SaveParser {
                     processed += 1;
                 }
                 Err(err) => {
-                    if self.input_complete {
-                        self.phase = ParsePhase::Error;
-                        self.error = Some(ParserError::new(format!("XML parse error: {err}")));
-                        return false;
-                    }
-                    break;
+                    self.phase = ParsePhase::Error;
+                    self.error = Some(ParserError::new(format!("XML parse error: {err}")));
+                    return false;
                 }
             }
         }
-
-        let parsed = reader.buffer_position() as usize;
-        self.consumed = start + parsed;
-        self.total_parsed += parsed;
 
         for event in events {
             match event {
@@ -424,14 +418,14 @@ impl SaveParser {
             }
         }
 
-        if hit_eof && self.input_complete {
+        if hit_eof {
             self.phase = ParsePhase::Finalizing;
             self.done = true;
             self.phase = ParsePhase::Done;
             return false;
         }
 
-        self.buffer.len() > self.consumed || !self.input_complete
+        true
     }
 
     fn world_pos(&self) -> Vector3 {
