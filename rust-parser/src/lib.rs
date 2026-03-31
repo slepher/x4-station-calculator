@@ -1,6 +1,5 @@
 use serde::{Deserialize, Serialize};
 use std::collections::{HashMap, VecDeque};
-use std::io::Cursor;
 use wasm_bindgen::prelude::*;
 
 #[derive(Clone, Copy, Debug, Serialize, PartialEq, Eq)]
@@ -233,8 +232,9 @@ fn dv_flags(attrs: &HashMap<String, String>) -> (Option<bool>, Option<bool>, Opt
 #[wasm_bindgen]
 pub struct SaveParser {
     buffer: Vec<u8>,
-    reader: Option<quick_xml::Reader<Cursor<Vec<u8>>>>,
+    consumed: usize,
     total_parsed: usize,
+    input_bytes_received: usize,
 
     expected_total_bytes: usize,
 
@@ -263,8 +263,9 @@ impl SaveParser {
     pub fn new() -> Self {
         Self {
             buffer: Vec::new(),
-            reader: None,
+            consumed: 0,
             total_parsed: 0,
+            input_bytes_received: 0,
 
             expected_total_bytes: 0,
 
@@ -297,6 +298,11 @@ impl SaveParser {
             return;
         }
         if !chunk.is_empty() {
+            if self.consumed > 0 {
+                self.buffer.drain(..self.consumed);
+                self.consumed = 0;
+            }
+            self.input_bytes_received += chunk.len();
             self.buffer.extend_from_slice(chunk);
             if self.phase == ParsePhase::Receiving {
                 self.phase = ParsePhase::Parsing;
@@ -309,17 +315,11 @@ impl SaveParser {
     }
 
     pub fn progress_json(&self) -> String {
-        let buffered = self.buffer.len();
-        let parsed = self
-            .reader
-            .as_ref()
-            .map(|r| r.buffer_position() as usize)
-            .unwrap_or(0);
-
-        let raw_pct = if self.expected_total_bytes == 0 {
+        let buffered = self.buffer.len().saturating_sub(self.consumed);
+        let raw_pct = if self.input_bytes_received == 0 {
             0.0
         } else {
-            parsed as f64 / self.expected_total_bytes as f64 * 100.0
+            self.total_parsed as f64 / self.input_bytes_received as f64 * 100.0
         };
 
         let pct = match self.phase {
@@ -332,9 +332,9 @@ impl SaveParser {
 
         serde_json::to_string(&ProgressInfo {
             phase: self.phase,
-            input_bytes_total: self.buffer.len(),
-            parsed_bytes_total: parsed,
-            buffered_bytes: buffered.saturating_sub(parsed),
+            input_bytes_total: self.input_bytes_received,
+            parsed_bytes_total: self.total_parsed,
+            buffered_bytes: buffered,
             expected_total_bytes: self.expected_total_bytes,
             percent: pct,
             tag_count: self.tags,
@@ -351,53 +351,108 @@ impl SaveParser {
             return false;
         }
 
-        if self.reader.is_none() && self.input_complete && !self.buffer.is_empty() {
-            let buffer_clone = std::mem::take(&mut self.buffer);
-            let mut reader = quick_xml::Reader::from_reader(Cursor::new(buffer_clone));
-            reader.config_mut().trim_text(false);
-            self.reader = Some(reader);
+        let available = self.buffer.len().saturating_sub(self.consumed);
+        if available == 0 {
+            if self.input_complete {
+                if !self.path.is_empty() {
+                    self.phase = ParsePhase::Error;
+                    self.error = Some(ParserError::new(format!(
+                        "XML ended before all tags were closed; remaining open path: {:?}",
+                        self.path
+                    )));
+                    return false;
+                }
+
+                self.phase = ParsePhase::Finalizing;
+                self.done = true;
+                self.phase = ParsePhase::Done;
+            }
+            return false;
         }
 
-        let reader = match self.reader.as_mut() {
-            Some(r) => r,
-            None => return false,
-        };
+        let start = self.consumed;
+        let mut reader = quick_xml::Reader::from_reader(&self.buffer[start..]);
+        reader.config_mut().trim_text(false);
+        reader.config_mut().check_end_names = false;
+        reader.config_mut().allow_unmatched_ends = true;
 
         let mut events: Vec<quick_xml::events::Event<'static>> = Vec::new();
         let mut processed = 0usize;
         let mut hit_eof = false;
 
+        let mut last_good_pos = 0usize;
+
         while processed < max_events {
             let mut event_buf = Vec::new();
+
             match reader.read_event_into(&mut event_buf) {
                 Ok(quick_xml::events::Event::Start(e)) => {
                     events.push(quick_xml::events::Event::Start(e.into_owned()));
+                    last_good_pos = reader.buffer_position() as usize;
                     processed += 1;
                 }
                 Ok(quick_xml::events::Event::Empty(e)) => {
                     events.push(quick_xml::events::Event::Empty(e.into_owned()));
+                    last_good_pos = reader.buffer_position() as usize;
                     processed += 1;
                 }
                 Ok(quick_xml::events::Event::End(e)) => {
                     events.push(quick_xml::events::Event::End(e.into_owned()));
+                    last_good_pos = reader.buffer_position() as usize;
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::Text(_)) => {
+                    last_good_pos = reader.buffer_position() as usize;
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::CData(_)) => {
+                    last_good_pos = reader.buffer_position() as usize;
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::Comment(_)) => {
+                    last_good_pos = reader.buffer_position() as usize;
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::Decl(_)) => {
+                    last_good_pos = reader.buffer_position() as usize;
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::PI(_)) => {
+                    last_good_pos = reader.buffer_position() as usize;
+                    processed += 1;
+                }
+                Ok(quick_xml::events::Event::DocType(_)) => {
+                    last_good_pos = reader.buffer_position() as usize;
                     processed += 1;
                 }
                 Ok(quick_xml::events::Event::Eof) => {
                     hit_eof = true;
                     break;
                 }
-                Ok(_) => {
-                    processed += 1;
-                }
                 Err(err) => {
-                    self.phase = ParsePhase::Error;
-                    self.error = Some(ParserError::new(format!("XML parse error: {err}")));
-                    return false;
+                    if self.input_complete {
+                        self.phase = ParsePhase::Error;
+                        self.error = Some(ParserError::new(format!(
+                            "XML parse error at {} MB: {} (path: {:?})",
+                            self.total_parsed / (1024 * 1024),
+                            err,
+                            self.path.iter().rev().take(5).collect::<Vec<_>>()
+                        )));
+                        return false;
+                    }
+                    break;
                 }
             }
         }
 
+        self.consumed = start + last_good_pos;
+        self.total_parsed += last_good_pos;
+
         for event in events {
+            if self.error.is_some() {
+                return false;
+            }
+
             match event {
                 quick_xml::events::Event::Start(e) => {
                     let n = String::from_utf8_lossy(e.name().as_ref()).to_lowercase();
@@ -408,6 +463,9 @@ impl SaveParser {
                     let n = String::from_utf8_lossy(e.name().as_ref()).to_lowercase();
                     let a = parse_attrs(&e);
                     self.open(&n, &a);
+                    if self.error.is_some() {
+                        return false;
+                    }
                     self.close(&n);
                 }
                 quick_xml::events::Event::End(e) => {
@@ -418,14 +476,27 @@ impl SaveParser {
             }
         }
 
-        if hit_eof {
+        if self.error.is_some() {
+            return false;
+        }
+
+        if hit_eof && self.input_complete {
+            if !self.path.is_empty() {
+                self.phase = ParsePhase::Error;
+                self.error = Some(ParserError::new(format!(
+                    "XML reached EOF with unclosed tags remaining: {:?}",
+                    self.path
+                )));
+                return false;
+            }
+
             self.phase = ParsePhase::Finalizing;
             self.done = true;
             self.phase = ParsePhase::Done;
             return false;
         }
 
-        true
+        self.buffer.len() > self.consumed || !self.input_complete
     }
 
     fn world_pos(&self) -> Vector3 {
@@ -567,6 +638,31 @@ impl SaveParser {
     }
 
     fn close(&mut self, name: &str) {
+        if self.done || self.error.is_some() {
+            return;
+        }
+
+        let expected = match self.path.back() {
+            Some(v) => v.as_str(),
+            None => {
+                self.phase = ParsePhase::Error;
+                self.error = Some(ParserError::new(format!(
+                    "XML close tag </{}> encountered with empty path stack",
+                    name
+                )));
+                return;
+            }
+        };
+
+        if expected != name {
+            self.phase = ParsePhase::Error;
+            self.error = Some(ParserError::new(format!(
+                "XML close mismatch: expected </{}> but got </{}>",
+                expected, name
+            )));
+            return;
+        }
+
         if name == "entry" && self.entry_idx.is_some() && self.entry_ref.is_some() {
             self.station_mods.push(StationModule {
                 index: self.entry_idx.unwrap(),
@@ -581,7 +677,13 @@ impl SaveParser {
             let pos = self.world_pos();
             let ctx = match self.comp_stack.back().cloned() {
                 Some(c) => c,
-                None => return,
+                None => {
+                    self.phase = ParsePhase::Error;
+                    self.error = Some(ParserError::new(
+                        "XML/component stack underflow while closing </component>",
+                    ));
+                    return;
+                }
             };
 
             if let Some(sk) = self.sector_stack.back().cloned() {
@@ -662,9 +764,7 @@ impl SaveParser {
             self.comp_stack.pop_back();
         }
 
-        if self.path.back().map(|s| s.as_str()) == Some(name) {
-            self.path.pop_back();
-        }
+        self.path.pop_back();
     }
 
     pub fn finish(&mut self, filename: &str) -> Result<String, JsValue> {

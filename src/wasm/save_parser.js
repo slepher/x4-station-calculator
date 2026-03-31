@@ -1,5 +1,3 @@
-/* @ts-self-types="./save_parser.d.ts" */
-
 export class SaveParser {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
