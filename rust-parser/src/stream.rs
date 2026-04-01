@@ -1,9 +1,11 @@
 use crate::core::SaveParserCore;
 use crate::model::{ParsePhase, ParserError, ProgressInfo, SaveArchive};
+use flate2::{Decompress, FlushDecompress, Status};
 use quick_xml::encoding::Decoder;
 use std::collections::HashMap;
 
 const CLI_PROGRESS_INTERVAL_MS: f64 = 1000.0;
+const DECOMPRESS_OUTPUT_CHUNK_SIZE: usize = 64 * 1024;
 
 #[cfg(target_arch = "wasm32")]
 fn now_ms() -> f64 {
@@ -38,6 +40,76 @@ fn parse_attrs<'a>(
     Ok(attrs)
 }
 
+fn parse_gzip_header_length(bytes: &[u8]) -> Result<Option<usize>, ParserError> {
+    if bytes.len() < 10 {
+        return Ok(None);
+    }
+    if bytes[0] != 0x1f || bytes[1] != 0x8b {
+        return Err(ParserError::parse_error("invalid gzip header magic"));
+    }
+    if bytes[2] != 8 {
+        return Err(ParserError::parse_error("unsupported gzip compression method"));
+    }
+
+    let flags = bytes[3];
+    let mut offset = 10usize;
+
+    if flags & 0x04 != 0 {
+        if bytes.len() < offset + 2 {
+            return Ok(None);
+        }
+        let xlen = u16::from_le_bytes([bytes[offset], bytes[offset + 1]]) as usize;
+        offset += 2;
+        if bytes.len() < offset + xlen {
+            return Ok(None);
+        }
+        offset += xlen;
+    }
+
+    if flags & 0x08 != 0 {
+        while offset < bytes.len() && bytes[offset] != 0 {
+            offset += 1;
+        }
+        if offset >= bytes.len() {
+            return Ok(None);
+        }
+        offset += 1;
+    }
+
+    if flags & 0x10 != 0 {
+        while offset < bytes.len() && bytes[offset] != 0 {
+            offset += 1;
+        }
+        if offset >= bytes.len() {
+            return Ok(None);
+        }
+        offset += 1;
+    }
+
+    if flags & 0x02 != 0 {
+        if bytes.len() < offset + 2 {
+            return Ok(None);
+        }
+        offset += 2;
+    }
+
+    Ok(Some(offset))
+}
+
+struct GzipInputState {
+    decompressor: Decompress,
+    header_parsed: bool,
+    pending_input: Vec<u8>,
+    trailer: Vec<u8>,
+    finished: bool,
+}
+
+enum InputMode {
+    Detecting(Vec<u8>),
+    Plain,
+    Gzip(GzipInputState),
+}
+
 pub(crate) struct StreamingSaveParser {
     buffer: Vec<u8>,
     committed: usize,
@@ -49,6 +121,7 @@ pub(crate) struct StreamingSaveParser {
     done: bool,
     error: Option<ParserError>,
     core: SaveParserCore,
+    input_mode: InputMode,
     last_reported_phase: Option<ParsePhase>,
     last_reported_percent_bucket: Option<u32>,
     last_reported_done: bool,
@@ -69,6 +142,7 @@ impl StreamingSaveParser {
             done: false,
             error: None,
             core: SaveParserCore::new(expected_version),
+            input_mode: InputMode::Detecting(Vec::new()),
             last_reported_phase: None,
             last_reported_percent_bucket: None,
             last_reported_done: false,
@@ -90,19 +164,37 @@ impl StreamingSaveParser {
             return;
         }
         if !chunk.is_empty() {
-            if self.committed > 0 {
-                self.buffer.drain(..self.committed);
-                self.committed = 0;
-            }
-            self.buffer.extend_from_slice(chunk);
             self.input_bytes_received += chunk.len();
             if self.phase == ParsePhase::Receiving {
                 self.phase = ParsePhase::Parsing;
             }
+            self.push_input_bytes(chunk);
         }
     }
 
     pub(crate) fn finish_input(&mut self) {
+        if self.done || self.error.is_some() {
+            self.input_complete = true;
+            return;
+        }
+        match &self.input_mode {
+            InputMode::Detecting(_) => {
+                let sniffed = match std::mem::replace(&mut self.input_mode, InputMode::Plain) {
+                    InputMode::Detecting(bytes) => bytes,
+                    _ => Vec::new(),
+                };
+                if !sniffed.is_empty() {
+                    self.append_plain_input(&sniffed);
+                }
+            }
+            InputMode::Gzip(_) => {
+                if let Err(err) = self.finish_gzip_input() {
+                    self.phase = ParsePhase::Error;
+                    self.error = Some(err);
+                }
+            }
+            InputMode::Plain => {}
+        }
         self.input_complete = true;
     }
 
@@ -331,5 +423,182 @@ impl StreamingSaveParser {
             ));
         }
         self.core.finish_archive(filename)
+    }
+
+    fn push_input_bytes(&mut self, chunk: &[u8]) {
+        if matches!(self.input_mode, InputMode::Plain) {
+            self.append_plain_input(chunk);
+            return;
+        }
+
+        if matches!(self.input_mode, InputMode::Gzip(_)) {
+            if let Err(err) = self.feed_gzip_input(chunk, false) {
+                self.phase = ParsePhase::Error;
+                self.error = Some(err);
+            }
+            return;
+        }
+
+        if let InputMode::Detecting(sniffed) = &mut self.input_mode {
+            sniffed.extend_from_slice(chunk);
+            if sniffed.len() < 2 {
+                return;
+            }
+        }
+
+        let sniffed = match std::mem::replace(&mut self.input_mode, InputMode::Plain) {
+            InputMode::Detecting(bytes) => bytes,
+            other => {
+                self.input_mode = other;
+                return;
+            }
+        };
+
+        let is_gzip = sniffed.len() >= 2 && sniffed[0] == 0x1f && sniffed[1] == 0x8b;
+        if is_gzip {
+            self.input_mode = InputMode::Gzip(
+                GzipInputState {
+                    decompressor: Decompress::new(false),
+                    header_parsed: false,
+                    pending_input: Vec::new(),
+                    trailer: Vec::new(),
+                    finished: false,
+                }
+            );
+            if let Err(err) = self.feed_gzip_input(&sniffed, false) {
+                self.phase = ParsePhase::Error;
+                self.error = Some(err);
+            }
+        } else {
+            self.input_mode = InputMode::Plain;
+            self.append_plain_input(&sniffed);
+        }
+    }
+
+    fn append_plain_input(&mut self, chunk: &[u8]) {
+        if self.committed > 0 {
+            self.buffer.drain(..self.committed);
+            self.committed = 0;
+        }
+        self.buffer.extend_from_slice(chunk);
+    }
+
+    fn feed_gzip_input(&mut self, chunk: &[u8], finish: bool) -> Result<(), ParserError> {
+        {
+            let InputMode::Gzip(state) = &mut self.input_mode else {
+                return Err(ParserError::parse_error("gzip input received without gzip mode"));
+            };
+            if !chunk.is_empty() {
+                state.pending_input.extend_from_slice(chunk);
+            }
+            if !state.header_parsed {
+                let header_len = match parse_gzip_header_length(&state.pending_input)? {
+                    Some(len) => len,
+                    None => {
+                        if finish {
+                            return Err(ParserError::parse_error("gzip header incomplete"));
+                        }
+                        return Ok(());
+                    }
+                };
+                state.pending_input.drain(..header_len);
+                state.header_parsed = true;
+            }
+        }
+
+        loop {
+            let mut output = [0u8; DECOMPRESS_OUTPUT_CHUNK_SIZE];
+            let mut produced_bytes: Vec<u8> = Vec::new();
+            let mut should_continue = false;
+            let mut finished_stream = false;
+
+            {
+                let InputMode::Gzip(state) = &mut self.input_mode else {
+                    return Err(ParserError::parse_error("gzip input received without gzip mode"));
+                };
+
+                if state.finished {
+                    if !state.pending_input.is_empty() {
+                        state.trailer.extend_from_slice(&state.pending_input);
+                        state.pending_input.clear();
+                    }
+                    finished_stream = true;
+                } else {
+                    let before_in = state.decompressor.total_in();
+                    let before_out = state.decompressor.total_out();
+                    let status = state
+                        .decompressor
+                        .decompress(
+                            &state.pending_input,
+                            &mut output,
+                            if finish {
+                                FlushDecompress::Finish
+                            } else {
+                                FlushDecompress::None
+                            },
+                        )
+                        .map_err(|err| ParserError::parse_error(format!("gzip decode error: {err}")))?;
+                    let consumed = (state.decompressor.total_in() - before_in) as usize;
+                    let produced = (state.decompressor.total_out() - before_out) as usize;
+
+                    if produced > 0 {
+                        produced_bytes.extend_from_slice(&output[..produced]);
+                    }
+                    state.pending_input.drain(..consumed);
+
+                    if matches!(status, Status::StreamEnd) {
+                        state.finished = true;
+                        if !state.pending_input.is_empty() {
+                            state.trailer.extend_from_slice(&state.pending_input);
+                            state.pending_input.clear();
+                        }
+                        finished_stream = true;
+                    } else if consumed == 0 && produced == 0 {
+                        if finish {
+                            return Err(ParserError::parse_error(
+                                "gzip stream ended before decompression completed",
+                            ));
+                        }
+                    } else {
+                        should_continue = !state.pending_input.is_empty()
+                            || produced == DECOMPRESS_OUTPUT_CHUNK_SIZE
+                            || (finish && (consumed > 0 || produced > 0));
+                    }
+                }
+
+                if finished_stream {
+                    if state.trailer.len() < 8 {
+                        if finish {
+                            return Err(ParserError::parse_error("gzip trailer incomplete"));
+                        }
+                    } else if state.trailer.len() > 8 {
+                        return Err(ParserError::parse_error(
+                            "multiple gzip members are not supported",
+                        ));
+                    }
+                }
+            }
+
+            if !produced_bytes.is_empty() {
+                self.append_plain_input(&produced_bytes);
+            }
+
+            if finished_stream {
+                let InputMode::Gzip(state) = &self.input_mode else {
+                    return Err(ParserError::parse_error("gzip state lost after decompression"));
+                };
+                if state.trailer.len() == 8 {
+                    return Ok(());
+                }
+            }
+
+            if !should_continue {
+                return Ok(());
+            }
+        }
+    }
+
+    fn finish_gzip_input(&mut self) -> Result<(), ParserError> {
+        self.feed_gzip_input(&[], true)
     }
 }

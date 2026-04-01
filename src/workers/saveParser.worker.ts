@@ -50,7 +50,7 @@ type SaveXmlCaptureKind = 'game' | 'player' | 'station' | 'datavault' | 'abandon
 
 const SAX_WRITE_CHUNK_SIZE = 64 * 1024
 const SAX_MAX_BUFFER_LENGTH = 8 * 1024
-const DEFAULT_PROGRESS_INTERVAL_MS = 500
+const DEFAULT_PROGRESS_INTERVAL_MS = 1000
 const saxWithBufferConfig = sax as typeof sax & { MAX_BUFFER_LENGTH: number }
 
 function stripSaveFileExtension(filename: string): string {

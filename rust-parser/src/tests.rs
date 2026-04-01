@@ -2,6 +2,9 @@
 mod tests {
     use crate::core::SaveParserCore;
     use crate::stream::StreamingSaveParser;
+    use flate2::write::GzEncoder;
+    use flate2::Compression;
+    use std::io::Write;
 
     #[test]
     fn parses_uppercase_station_attributes_like_js_parser() {
@@ -107,5 +110,29 @@ mod tests {
         let final_progress = parser.take_cli_progress_json();
         assert!(!final_progress.is_empty());
         assert!(final_progress.contains(r#""done":true"#));
+    }
+
+    #[test]
+    fn parses_gzip_input_stream_inside_rust_parser() {
+        let xml = r#"<savegame><info><game guid="GUID-3" seed="7" time="8" version="8.0"/><player name="gzip"/></info><component class="sector" macro="gzip_sector" known="1"><component class="station" macro="gzip_station" code="GZIP-1" owner="player"><offset><position x="11" y="22" z="33"/></offset></component></component></savegame>"#;
+        let mut encoder = GzEncoder::new(Vec::new(), Compression::default());
+        encoder.write_all(xml.as_bytes()).expect("write gzip");
+        let gzipped = encoder.finish().expect("finish gzip");
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.set_expected_total_bytes(xml.len());
+        for chunk in gzipped.chunks(9) {
+            parser.push_chunk(chunk);
+            let _ = parser.pump(64);
+        }
+        parser.finish_input();
+        while parser.pump(1024) {}
+
+        let archive = parser.finish_archive("gzip.xml.gz").expect("archive");
+        let station = &archive.sectors["gzip_sector"].stations[0];
+
+        assert_eq!(archive.meta.player_name, "gzip");
+        assert_eq!(station.code, "GZIP-1");
+        assert_eq!((station.x, station.y, station.z), (11.0, 22.0, 33.0));
     }
 }

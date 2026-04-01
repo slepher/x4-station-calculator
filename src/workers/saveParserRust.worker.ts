@@ -45,39 +45,6 @@ function pumpRustParser(options: {
   return true
 }
 
-export async function streamCompressedXmlToRustParser(options: {
-  parser: RustSaveParserLike
-  stream: ReadableStream<Uint8Array>
-  maxEventsPerPump: number
-  onProgress: (info: ProgressInfo) => void
-  onError: (progress: ProgressInfo) => boolean
-}) {
-  const reader = options.stream.getReader()
-
-  while (true) {
-    const { done, value } = await reader.read()
-    if (value && value.length > 0) {
-      options.parser.push_chunk(value)
-      const shouldContinue = pumpRustParser({
-        parser: options.parser,
-        maxEventsPerPump: options.maxEventsPerPump,
-        onProgress: options.onProgress,
-        onError: options.onError
-      })
-      if (!shouldContinue) return false
-    }
-    if (done) break
-  }
-
-  options.parser.finish_input()
-  return pumpRustParser({
-    parser: options.parser,
-    maxEventsPerPump: options.maxEventsPerPump,
-    onProgress: options.onProgress,
-    onError: options.onError
-  })
-}
-
 type WorkerInputMessage =
   | { type: 'parse_start'; filename?: string; currentVersion?: string; expectedTotalBytes?: number }
   | { type: 'parse_chunk'; chunk?: ArrayBuffer }
@@ -100,9 +67,6 @@ function createRustParseSession(options: {
   const MAX_EVENTS_PER_PUMP = 50000
   let finalized = false
   let failed = false
-  let isGzipped: boolean | null = null
-  let gzipWriter: WritableStreamDefaultWriter<Uint8Array> | null = null
-  let gzipTask: Promise<boolean> | null = null
 
   if (options.currentVersion) {
     options.parser.set_expected_version?.(options.currentVersion)
@@ -120,53 +84,20 @@ function createRustParseSession(options: {
     onProgress: options.postProgress,
     onError: handleParserError
   })
-
-  const ensureMode = (chunk: Uint8Array) => {
-    if (isGzipped !== null) return
-    isGzipped = chunk.length >= 2 && chunk[0] === 0x1f && chunk[1] === 0x8b
-
-    if (!isGzipped) {
-      options.parser.set_expected_total_bytes?.(options.expectedTotalBytes ?? 0)
-      return
-    }
-
-    const transform = new TransformStream<Uint8Array, Uint8Array>()
-    gzipWriter = transform.writable.getWriter()
-    gzipTask = streamCompressedXmlToRustParser({
-      parser: options.parser,
-      stream: transform.readable.pipeThrough(new DecompressionStream('gzip')),
-      maxEventsPerPump: MAX_EVENTS_PER_PUMP,
-      onProgress: options.postProgress,
-      onError: handleParserError
-    })
-  }
+  options.parser.set_expected_total_bytes?.(options.expectedTotalBytes ?? 0)
 
   return {
     async pushChunk(chunk: Uint8Array) {
       if (finalized || failed || chunk.length === 0) return false
-      ensureMode(chunk)
-
-      if (isGzipped) {
-        await gzipWriter?.write(chunk)
-        return !failed
-      }
-
       options.parser.push_chunk(chunk)
       return pumpNow()
     },
     async finish() {
       if (finalized || failed) return false
       finalized = true
-
-      if (isGzipped) {
-        await gzipWriter?.close()
-        const completed = await gzipTask
-        if (!completed || failed) return false
-      } else {
-        options.parser.finish_input()
-        const completed = pumpNow()
-        if (!completed || failed) return false
-      }
+      options.parser.finish_input()
+      const completed = pumpNow()
+      if (!completed || failed) return false
 
       const result = options.parser.finish(options.filename || '')
       const archive = JSON.parse(result)

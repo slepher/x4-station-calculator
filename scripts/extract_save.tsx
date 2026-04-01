@@ -598,9 +598,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
       console.log('[extract_save] decompressing...')
     }
 
-    const gunzip = zlib.createGunzip()
-    fs.createReadStream(absoluteInput).pipe(gunzip)
-    for await (const chunk of gunzip) {
+    for await (const chunk of fs.createReadStream(absoluteInput)) {
       parser.push_chunk(new Uint8Array(chunk as Buffer))
       pumpWasmParser({
         parser,
