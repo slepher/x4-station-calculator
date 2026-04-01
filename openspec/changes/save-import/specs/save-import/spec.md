@@ -106,9 +106,11 @@
 
 **那么** 立即停止解析
 
-**并且** 返回错误消息："Version mismatch: save version X does not match current game version Y"
+**并且** 返回错误消息："Version mismatch: save version X (x.x) does not match current game version Y (y.y)"
 
 **并且** 不加载该存档数据
+
+**并且** 不继续解析剩余存档内容
 
 ### Requirement: Save Archive Grouping
 

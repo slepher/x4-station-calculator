@@ -238,6 +238,8 @@ pub struct SaveParser {
     input_bytes_received: usize,
 
     expected_total_bytes: usize,
+    expected_version: Option<String>,
+    version_checked: bool,
 
     meta: Meta,
     sectors: HashMap<String, SectorData>,
@@ -269,6 +271,8 @@ impl SaveParser {
             input_bytes_received: 0,
 
             expected_total_bytes: 0,
+            expected_version: None,
+            version_checked: false,
 
             meta: Meta::default(),
             sectors: HashMap::new(),
@@ -292,6 +296,10 @@ impl SaveParser {
 
     pub fn set_expected_total_bytes(&mut self, total: usize) {
         self.expected_total_bytes = total;
+    }
+
+    pub fn set_expected_version(&mut self, version: &str) {
+        self.expected_version = Some(version.to_string());
     }
 
     pub fn push_chunk(&mut self, chunk: &[u8]) {
@@ -589,6 +597,22 @@ impl SaveParser {
                 .and_then(|v| v.parse::<f64>().ok())
                 .unwrap_or(0.0);
             self.meta.version = a.get("version").cloned().unwrap_or_default();
+
+            if !self.version_checked && !self.meta.version.is_empty() {
+                self.version_checked = true;
+                if let Some(expected) = &self.expected_version {
+                    let save_ver = norm_ver(&self.meta.version);
+                    let expected_ver = norm_ver(expected);
+                    if save_ver != expected_ver {
+                        self.phase = ParsePhase::Error;
+                        self.error = Some(ParserError::new(format!(
+                            "Version mismatch: save version {} ({}) does not match current game version {} ({})",
+                            self.meta.version, save_ver, expected, expected_ver
+                        )));
+                        return;
+                    }
+                }
+            }
         }
 
         if at_tags(&self.path, &["savegame", "info", "player"]) {
@@ -794,6 +818,12 @@ impl SaveParser {
             .replace(".gz", "")
             .replace(".xml", "");
 
+        let is_compatible = if let Some(expected) = &self.expected_version {
+            norm_ver(&self.meta.version) == norm_ver(expected)
+        } else {
+            norm_ver(&self.meta.version) == norm_ver("8.0")
+        };
+
         let json = serde_json::to_string(&SaveArchive {
             meta: ArchiveMeta {
                 guid: self.meta.guid.clone(),
@@ -806,7 +836,7 @@ impl SaveParser {
                 source: "original".into(),
             },
             sectors: self.sectors.clone(),
-            isCompatible: norm_ver(&self.meta.version) == norm_ver("8.0"),
+            isCompatible: is_compatible,
         })
         .map_err(|e| JsValue::from_str(&format!("serialize error: {e}")))?;
 

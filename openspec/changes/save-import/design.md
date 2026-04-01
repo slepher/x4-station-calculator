@@ -178,7 +178,7 @@ interface ArchiveGroup {
 - 可选性能分析（通过 `options.profile` 参数）
 - **版本校验**: Worker 接收 `currentVersion` 参数
   - SAX Worker: 解析到 `<game>` 标签时立即校验，不匹配则抛出错误停止解析
-  - Rust Worker: 解析完成后校验，不匹配则返回错误（可优化为早期校验）
+  - Rust Worker: 调用 `set_expected_version()` 设置期望版本，解析到 `<game>` 标签时立即校验，不匹配则设置错误状态
 
 **Worker消息格式**:
 ```typescript
@@ -353,6 +353,7 @@ function resolveName(s: string): string {
   - `finish(filename: string): string` - 完成解析，返回 JSON 字符串
   - `progress_json(): string` - 获取进度信息（ProgressInfo JSON）
   - `set_expected_total_bytes(total: number)` - 设置预期总字节数
+  - `set_expected_version(version: string)` - 设置期望版本（用于早期版本校验）
 - 使用流程:
   1. 创建 `SaveParser` 实例
   2. 调用 `push_chunk` 输入数据

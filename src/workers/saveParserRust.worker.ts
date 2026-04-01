@@ -4,16 +4,6 @@ import wasmUrl from '@/wasm/save_parser_bg.wasm?url'
 
 let wasmInitialized = false
 
-function normalizeVersion(v: string): string {
-  if (/^\d+\.\d+$/.test(v.trim())) {
-    const parsed = Number(v)
-    return Number.isFinite(parsed) ? parsed.toFixed(1) : v
-  }
-  const num = parseInt(v, 10)
-  if (Number.isNaN(num)) return v
-  return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
-}
-
 async function ensureWasmInit() {
   if (wasmInitialized) return
   const wasmBinary = await fetch(wasmUrl).then(r => r.arrayBuffer())
@@ -50,6 +40,10 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
 
       await ensureWasmInit()
       const parser = new SaveParser()
+      
+      if (expectedVersion) {
+        parser.set_expected_version(expectedVersion)
+      }
 
       const header = new Uint8Array(arrayBuffer.slice(0, 2))
       const isGzipped = header[0] === 0x1f && header[1] === 0x8b
@@ -113,19 +107,6 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
 
       const result = parser.finish(filename || '')
       const archive = JSON.parse(result)
-      
-      const archiveVersion = archive.meta?.version || ''
-      const normalizedArchive = normalizeVersion(archiveVersion)
-      const normalizedExpected = normalizeVersion(expectedVersion)
-      const isCompatible = normalizedArchive === normalizedExpected
-      
-      if (!isCompatible) {
-        self.postMessage({ 
-          type: 'error', 
-          message: `Version mismatch: save version ${archiveVersion} (${normalizedArchive}) does not match current game version ${expectedVersion} (${normalizedExpected})` 
-        } as SaveParserRustMessage)
-        return
-      }
       
       self.postMessage({ type: 'complete', data: archive } as SaveParserRustMessage)
     } catch (error) {
