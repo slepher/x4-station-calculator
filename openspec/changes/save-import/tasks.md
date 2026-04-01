@@ -24,8 +24,7 @@
 **Scope**: 实现流式XML解析Worker
 
 **Files**:
-- `src/workers/saveParser.worker.ts`
-- `src/utils/saveParserConfig.ts`
+- `src/workers/saveParserSimplified.worker.ts`
 
 **Steps**:
 1. 创建Worker脚本框架
@@ -33,10 +32,9 @@
 3. 实现SAX解析逻辑（参考x4-vault-finder）
 4. 提取目标对象：stations, datavaults, erlkingVaults, abandonedShips
 5. 实现坐标累加（position栈）
-6. 实现名称翻译（{page,id}替换）
-7. 提取存档元信息：guid, seed, time, playerName, version
-8. 实现进度报告机制
-9. 创建配置打包函数（strings/positions等）
+6. 提取存档元信息：guid, seed, time, playerName, version
+7. 实现进度报告机制
+8. 实现早期版本校验（解析到game标签时立即校验）
 
 ---
 

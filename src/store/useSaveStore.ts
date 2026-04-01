@@ -177,6 +177,13 @@ export const useSaveStore = defineStore('save', () => {
         return { success: false, error: 'Missing required meta fields' }
       }
 
+      if (!checkVersionCompatibility(meta.version)) {
+        return { 
+          success: false, 
+          error: `Version mismatch: save version ${meta.version} does not match current game version ${gameDataStore.currentVersion}` 
+        }
+      }
+
       if (!data.sectors || typeof data.sectors !== 'object') {
         return { success: false, error: 'Missing sectors data' }
       }
@@ -197,7 +204,7 @@ export const useSaveStore = defineStore('save', () => {
           source: 'imported'
         },
         sectors,
-        isCompatible: checkVersionCompatibility(meta.version)
+        isCompatible: true
       }
 
       addArchive(archive)

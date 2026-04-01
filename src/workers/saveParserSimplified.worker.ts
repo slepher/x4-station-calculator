@@ -56,6 +56,8 @@ class X4SaveParser {
   private componentStack: ComponentContext[] = []
   private tagCount = 0
   private sectorsCount = 0
+  private expectedVersion: string
+  private versionChecked = false
 
   private currentStationOwner: string | null = null
   private currentStationModules: StationModule[] = []
@@ -65,7 +67,8 @@ class X4SaveParser {
 
   public data: SaveData
 
-  constructor() {
+  constructor(expectedVersion: string) {
+    this.expectedVersion = expectedVersion
     this.data = {
       meta: { guid: '', seed: 0, time: 0, playerName: '', version: '' },
       sectors: {}
@@ -215,6 +218,15 @@ class X4SaveParser {
       this.data.meta.seed = this.toNumber(attrib.seed)
       this.data.meta.time = this.toNumber(attrib.time)
       this.data.meta.version = String(attrib.version || '')
+      
+      if (!this.versionChecked && this.data.meta.version) {
+        this.versionChecked = true
+        const saveVersion = normalizeVersion(this.data.meta.version)
+        const expected = normalizeVersion(this.expectedVersion)
+        if (saveVersion !== expected) {
+          throw new Error(`Version mismatch: save version ${this.data.meta.version} (${saveVersion}) does not match current game version ${this.expectedVersion} (${expected})`)
+        }
+      }
       return
     }
 
@@ -393,14 +405,14 @@ export function createSaveParserRuntime(
     currentVersion?: string
   }
 ): SaveParserRuntime {
-  const parser = new X4SaveParser()
+  const currentVersion = options?.currentVersion || '8.0'
+  const parser = new X4SaveParser(currentVersion)
   const previousMaxBufferLength = saxWithBufferConfig.MAX_BUFFER_LENGTH
   saxWithBufferConfig.MAX_BUFFER_LENGTH = Math.min(previousMaxBufferLength, SAX_MAX_BUFFER_LENGTH)
   const saxParser = sax.parser(false, { lowercase: true, position: false })
   let bytesProcessed = 0
   let lastProgressAt = 0
   const progressIntervalMs = options?.progressIntervalMs ?? DEFAULT_PROGRESS_INTERVAL_MS
-  const currentVersion = options?.currentVersion || '8.0'
 
   saxParser.onopentag = (node: TagNode) => {
     parser.onOpenTag(node)
@@ -583,15 +595,6 @@ if (hasWorkerRuntime()) {
       }
 
       const archive = runtime.close(filename || '')
-      
-      if (!archive.isCompatible) {
-        const archiveVersion = archive.meta.version
-        self.postMessage({ 
-          type: 'error', 
-          message: `Version mismatch: save version ${archiveVersion} does not match current game version ${expectedVersion}` 
-        } as SaveParserMessage)
-        return
-      }
       
       self.postMessage({ 
         type: 'progress', 

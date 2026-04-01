@@ -170,12 +170,14 @@ interface ArchiveGroup {
 
 **实现细节**:
 - Worker 脚本: `src/workers/saveParserRust.worker.ts`（Rust WASM）
-- Worker 脚本（备用）: `src/workers/saveParser.worker.ts`（SAX，未在UI中使用）
+- Worker 脚本（备用）: `src/workers/saveParserSimplified.worker.ts`（SAX，CLI工具使用）
 - 支持gzip检测并自动解压（`DecompressionStream`）
 - 向主线程报告 ProgressInfo 进度
 - 解析完成后一次性返回结果对象
 - 可选性能分析（通过 `options.profile` 参数）
-- **版本校验**: Worker 接收 `currentVersion` 参数，解析完成后立即校验版本，不匹配则返回错误
+- **版本校验**: Worker 接收 `currentVersion` 参数
+  - SAX Worker: 解析到 `<game>` 标签时立即校验，不匹配则抛出错误停止解析
+  - Rust Worker: 解析完成后立即校验，不匹配则返回错误
 
 **Worker消息格式**:
 ```typescript
@@ -374,8 +376,7 @@ src/
 │
 ├── workers/
 │   ├── saveParserRust.worker.ts        # Rust解析Worker（UI使用）
-│   ├── saveParser.worker.ts            # SAX解析Worker（完整版，备用）
-│   └── saveParserSimplified.worker.ts  # SAX解析Worker（简化版，CLI使用）
+│   └── saveParserSimplified.worker.ts   # SAX解析Worker（CLI使用）
 │
 ├── wasm/
 │   ├── save_parser.js                  # Rust WASM JS绑定
