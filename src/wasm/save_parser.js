@@ -89,6 +89,21 @@ export class SaveParser {
         const len0 = WASM_VECTOR_LEN;
         wasm.saveparser_set_expected_version(this.__wbg_ptr, ptr0, len0);
     }
+    /**
+     * @returns {string}
+     */
+    take_cli_progress_json() {
+        let deferred1_0;
+        let deferred1_1;
+        try {
+            const ret = wasm.saveparser_take_cli_progress_json(this.__wbg_ptr);
+            deferred1_0 = ret[0];
+            deferred1_1 = ret[1];
+            return getStringFromWasm0(ret[0], ret[1]);
+        } finally {
+            wasm.__wbindgen_free(deferred1_0, deferred1_1, 1);
+        }
+    }
 }
 if (Symbol.dispose) SaveParser.prototype[Symbol.dispose] = SaveParser.prototype.free;
 
@@ -97,6 +112,10 @@ function __wbg_get_imports() {
         __proto__: null,
         __wbg___wbindgen_throw_bd5a70920abf0236: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
+        },
+        __wbg_now_cd850b0a28a6e656: function() {
+            const ret = Date.now();
+            return ret;
         },
         __wbindgen_cast_0000000000000001: function(arg0, arg1) {
             // Cast intrinsic for `Ref(String) -> Externref`.
