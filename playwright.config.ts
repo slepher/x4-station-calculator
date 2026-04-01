@@ -7,7 +7,7 @@ import { createHash } from 'node:crypto';
 // 1. 防呆：Agent 忘了 build 时自动补救
 if (!fs.existsSync('./dist')) {
   console.log('🚧 未检测到 dist 目录，正在自动构建...');
-  execSync('pnpm build', { stdio: 'inherit' });
+  execSync('npm run build', { stdio: 'inherit' });
 }
 
 // 2. 核心魔法：根据当前工作区绝对路径，生成专属固定端口 (10000 ~ 50000 之间)
@@ -49,7 +49,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    // 💡 修复点 1：放弃 pnpm run，直接使用 pnpm exec 唤起底层 vite，确保参数 100% 传达！
+    // 💡 修复点 1：放弃 npm run，直接使用 npm exec 唤起底层 vite，确保参数 100% 传达！
     command: `vite preview --port ${port} --host 127.0.0.1 --strictPort`,
     reuseExistingServer: true,
     timeout: 30000,

@@ -95,7 +95,8 @@
     "production": "Quantified",
     "logical_flow": "Logical Flow",
     "ship_build": "Ship Build",
-    "maps": "Sector Map"
+    "maps": "Sector Map",
+    "save_import": "Save Sync"
   },
   "map": {
     "search_sector_placeholder": "Search sector",
@@ -677,5 +678,27 @@
     "error_parse_failed": "Failed to parse JSON file.",
     "error_no_module": "No importable modules found in this file.",
     "error_no_selection": "Select at least one module to import."
+  },
+  "save_import": {
+    "title": "Save Sync",
+    "drag_drop_hint": "Drag & drop save file or click to select",
+    "supported_formats": "Supports .xml, .xml.gz, .json formats",
+    "no_archives": "No archives, upload a save file",
+    "saves": "saves",
+    "archives_loaded": "archives loaded",
+    "version_mismatch": "Version mismatch",
+    "download_json": "Download JSON",
+    "remove_archive": "Remove archive",
+    "select_archive_hint": "Select an archive to view details",
+    "stations": "Stations",
+    "datavaults": "Data Vaults",
+    "erlking_vaults": "Erlking Vaults",
+    "abandoned_ships": "Abandoned Ships",
+    "wreck": "Wreck",
+    "unsupported_file_type": "Unsupported file type",
+    "loading_json": "Loading JSON...",
+    "import_failed": "Import failed",
+    "reading_file": "Reading file...",
+    "parse_failed": "Parse failed"
   }
 }

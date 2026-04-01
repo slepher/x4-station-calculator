@@ -82,7 +82,7 @@ export interface PreparedImportPayload {
 export interface ImportApplyOptions {
   mode: ImportMode
   selectedModules: Partial<Record<ImportModuleKey, boolean>>
-  currentView: 'production' | 'flow' | 'ship-build' | 'maps'
+  currentView: 'production' | 'flow' | 'ship-build' | 'maps' | 'save-import'
   payload: NormalizedImportPayload
   preparedPayload?: PreparedImportPayload
   gameDataStore: GameDataStoreLike
@@ -118,7 +118,7 @@ interface LogicFlowStoreLike {
 interface ShipBuildStoreLike {
   savedBlueprints: SavedShipBlueprintsState
   isDirty: boolean
-  activeView: 'production' | 'flow' | 'ship-build' | 'maps'
+  activeView: 'production' | 'flow' | 'ship-build' | 'maps' | 'save-import'
   shipMap?: MaybeWrapped<Map<string, unknown>>
   equipmentMap?: MaybeWrapped<Map<string, unknown>>
   consumablesMap?: MaybeWrapped<Map<string, unknown>>

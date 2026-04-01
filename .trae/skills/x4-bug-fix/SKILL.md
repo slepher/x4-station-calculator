@@ -58,7 +58,7 @@ Phase isolation:
    - if task is missing, delegate to `/x4:test-doc` to backfill unchecked (`[ ]`) task first
 2. **Write reproduction test (MANDATORY)**: Create a test in `tests/e2e/<change-name>/bug-<change-name>.spec.ts` that reproduces the bug.
 3. Run reproduction test (**evidence-only**, no result-apply):
-   - Execute the bug reproduction file directly (e.g., `pnpm exec playwright test tests/e2e/<change-name>/bug-<change-name>.spec.ts`)
+   - Execute the bug reproduction file directly (e.g., `npm exec playwright test tests/e2e/<change-name>/bug-<change-name>.spec.ts`)
    - Reproduction file MUST assert `修复前` expectations only; if it asserts `修复后`, treat test as invalid and fix test first
    - This step is for existence confirmation only; do **not** apply checklist updates to `test_tasks.md`
    - Test passes → bug exists (reproduced), NOT "already fixed" → Continue to step 6
