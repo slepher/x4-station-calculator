@@ -24,7 +24,7 @@
 **Scope**: 实现流式XML解析Worker
 
 **Files**:
-- `src/workers/saveParserSimplified.worker.ts`
+- `src/workers/saveParser.worker.ts`
 
 **Steps**:
 1. 创建Worker脚本框架

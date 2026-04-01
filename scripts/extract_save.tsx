@@ -1,7 +1,7 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import zlib from 'node:zlib'
-import { createSaveParserRuntime } from '../src/workers/saveParserSimplified.worker'
+import { createSaveParserRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
 
 function printUsage(): void {

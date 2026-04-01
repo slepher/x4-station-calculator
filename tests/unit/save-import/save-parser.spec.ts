@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { createSaveParserRuntime } from '../../../src/workers/saveParserSimplified.worker'
+import { createSaveParserRuntime } from '../../../src/workers/saveParser.worker'
 import { readFile } from 'node:fs/promises'
 
 describe('save parser core (simplified)', () => {

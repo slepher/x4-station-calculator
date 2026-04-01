@@ -170,14 +170,15 @@ interface ArchiveGroup {
 
 **实现细节**:
 - Worker 脚本: `src/workers/saveParserRust.worker.ts`（Rust WASM）
-- Worker 脚本（备用）: `src/workers/saveParserSimplified.worker.ts`（SAX，CLI工具使用）
+- Worker 脚本（备用）: `src/workers/saveParser.worker.ts`（SAX，CLI工具使用）
+- Rust 解析器源码: `rust-parser/`
 - 支持gzip检测并自动解压（`DecompressionStream`）
 - 向主线程报告 ProgressInfo 进度
 - 解析完成后一次性返回结果对象
 - 可选性能分析（通过 `options.profile` 参数）
 - **版本校验**: Worker 接收 `currentVersion` 参数
   - SAX Worker: 解析到 `<game>` 标签时立即校验，不匹配则抛出错误停止解析
-  - Rust Worker: 解析完成后立即校验，不匹配则返回错误
+  - Rust Worker: 解析完成后校验，不匹配则返回错误（可优化为早期校验）
 
 **Worker消息格式**:
 ```typescript
@@ -332,7 +333,7 @@ function resolveName(s: string): string {
 **实现细节**:
 - 用法: `npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz> [output.json] [--wasm]`
 - 支持两种解析器:
-  - 默认: sax-js 解析器（使用 `saveParserSimplified.worker.ts`）
+  - 默认: sax-js 解析器（使用 `saveParser.worker.ts`）
   - `--wasm`: Rust WASM 解析器（约 3.25x 更快，实验性）
 - 输入格式: `.xml`, `.xml.gz`, `.gz`
 - 输出格式: `.json`（符合导出格式规范）
@@ -376,7 +377,7 @@ src/
 │
 ├── workers/
 │   ├── saveParserRust.worker.ts        # Rust解析Worker（UI使用）
-│   └── saveParserSimplified.worker.ts   # SAX解析Worker（CLI使用）
+│   └── saveParser.worker.ts            # SAX解析Worker（CLI使用）
 │
 ├── wasm/
 │   ├── save_parser.js                  # Rust WASM JS绑定
@@ -397,39 +398,15 @@ src/
 
 scripts/
 └── extract_save.tsx                    # CLI提取工具
-```
-src/
-├── components/
-│   └── save/
-│       ├── SaveImportView.vue          # 主视图容器
-│       ├── SaveUploadPanel.vue         # 上传面板
-│       ├── SaveList.vue                # 存档列表
-│       ├── SaveListItem.vue            # 存档项（含下载按钮）
-│       ├── SaveDetailPanel.vue         # 详情面板
-│       └── SectorDetailList.vue        # Sector详情列表
-│
-├── store/
-│   └── useSaveStore.ts                 # 存档Store
-│
-│  ├── workers/
-│  │   ├── saveParserRust.worker.ts     # Rust解析Worker（UI使用）
-│  │   └── saveParser.worker.ts         # SAX解析Worker（备用）
-│
-│  ├── utils/
-│  │   └── saveParserConfig.ts          # Worker配置数据打包
-│  │   └── saveResourceExtract.ts       # 资源区域提取（独立模块）
-│
-├── utils/
-│   └── saveParserConfig.ts             # Worker配置数据打包
-│   └── saveJsonFormat.ts               # JSON格式校验/生成
-│
-├── types/
-│   └── saveArchive.ts                  # 存档数据类型定义
-│
-└── assets/
-│   └── x4_game_data/
-│       └── 8.0-Diplomacy/
-│           └── locales/                # strings表（用于翻译）
+
+rust-parser/                            # Rust WASM解析器源码
+├── Cargo.toml                          # Rust项目配置
+├── src/
+│   └── lib.rs                          # 解析器实现
+└── pkg/                                # 编译输出（wasm-pack）
+    ├── save_parser.js
+    ├── save_parser_bg.wasm
+    └── save_parser.d.ts
 ```
 
 ## Integration Points
