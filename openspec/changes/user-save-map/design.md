@@ -144,7 +144,39 @@ watch([isSavePanelOpen, selectedSaveArchive], () => {
 
 ---
 
-### D6: 星区 macro 映射
+### D6: 分类层点击职责拆分
+
+**决策**：分类层将“显示开关”和“进入详情”拆成两个独立交互。
+
+**规则**：
+- 左侧 checkbox 仅负责类别显隐
+- 分类整行文本区域和空白区域不再承担进入详情行为
+- 只有右侧箭头按钮负责进入 L3 坐标列表
+
+**理由**：
+- 避免用户想勾选时误进详情
+- 保持 checkbox 语义单一，降低状态歧义
+
+---
+
+### D7: 详情层临时可见类别
+
+**决策**：地图上的存档兴趣点可见类别，不再只由 checkbox 状态决定，而是取“checkbox 勾选类别 + 当前详情层激活类别”的并集。
+
+**实现要点**：
+- `MapSavePanel.vue` 维护当前 `selectedCategory`
+- 当 layer 进入 `coord` 时，将该类别通过事件上抛给 `MapWorkbenchView.vue`
+- `MapWorkbenchView.vue` 计算 `effectiveVisibleCategories`
+- 返回分类层、关闭面板、切换存档时，清空该临时类别
+
+**效果**：
+- 未勾选类别也可在 L3 中显示 marker，支持列表 focus
+- 返回 L2 后若 checkbox 仍未勾选，marker 自动消失
+- 不得自动修改 checkbox 本身
+
+---
+
+### D8: 星区 macro 映射
 
 **问题**：存档 `SectorData` 的 key 是星区 macro（如 `sector_macro_01`），需要映射到地图的 `sectorId`。
 
@@ -167,7 +199,7 @@ function getSectorIdFromMacro(macro: string): string | null {
 
 ---
 
-### D7: Focus 定位行为
+### D9: Focus 定位行为
 
 **决策**：点击坐标项时，调用类似 `focusPlacementOverlay` 的逻辑，但使用固定缩放比例（如 scale=1）。
 
@@ -216,10 +248,11 @@ MapWorkbenchView.vue
 | `MapWorkbenchView.vue` | 修改 | 添加存档按钮、状态管理、事件处理 |
 | `MapSavePanel.vue` | 新增 | 存档侧边栏主组件 |
 | `MapSaveArchiveList.vue` | 新增 | L1层存档列表 |
-| `MapSaveCategoryMenu.vue` | 新增 | L2层分类子菜单 |
+| `MapSaveCategoryMenu.vue` | 新增 | L2层分类子菜单，checkbox 与箭头职责分离 |
 | `MapSaveCoordList.vue` | 新增 | L3层坐标列表 |
 | `MapSaveBreadcrumb.vue` | 新增 | 面包屑导航 |
 | `MapSvgCanvas.vue` | 修改 | 支持兴趣点叠加层 |
 | `MapSavePoiTooltip.vue` | 新增 | 兴趣点tooltip |
 | `useSaveStore.ts` | 可能修改 | 添加分类数据计算方法 |
+| `savePoiVisibility.ts` | 新增 | 合并 checkbox 显示状态与详情层临时类别 |
 | `zh-CN.json` / `en.json` | 修改 | 添加新文案 |

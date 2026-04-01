@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { SavePoiOverlayItem } from './MapSavePanel.vue'
+import type { SavePoiOverlayItem } from '@/types/saveArchive'
 
 const props = defineProps<{
   poi: SavePoiOverlayItem

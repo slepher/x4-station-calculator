@@ -3,10 +3,10 @@ import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
-import type { ArchiveGroup, SaveArchive } from '@/types/saveArchive'
+import type { ArchiveGroup } from '@/types/saveArchive'
 
 const emit = defineEmits<{
-  (e: 'select', archive: SaveArchive): void
+  (e: 'select', payload: { guid: string; time: number }): void
 }>()
 
 const { t } = useI18n()
@@ -24,8 +24,8 @@ function formatTime(time: number): string {
   return `${hours}h ${minutes}m`
 }
 
-function onArchiveClick(_group: ArchiveGroup, archive: SaveArchive) {
-  emit('select', archive)
+function onArchiveClick(group: ArchiveGroup, time: number) {
+  emit('select', { guid: group.guid, time })
 }
 </script>
 
@@ -53,7 +53,7 @@ function onArchiveClick(_group: ArchiveGroup, archive: SaveArchive) {
             v-for="archive in group.saves"
             :key="archive.meta.time"
             class="save-item"
-            @click="onArchiveClick(group, archive)"
+            @click="onArchiveClick(group, archive.meta.time)"
           >
             <div class="save-info">
               <div class="save-time">{{ formatTime(archive.meta.time) }}</div>

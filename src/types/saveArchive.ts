@@ -104,6 +104,40 @@ export interface SaveArchive {
   isCompatible: boolean
 }
 
+export type SavePoiCategory = 'playerStation' | 'npcStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
+
+export type SavePoiVisibility = Record<SavePoiCategory, boolean>
+
+export interface SavePoiOverlayItem {
+  key: string
+  code: string
+  category: SavePoiCategory
+  owner?: string
+  sectorMacro: string
+  sectorName: string
+  pos: { x: number; z: number }
+}
+
+export interface SavePoiSectorGroup<T> {
+  sectorMacro: string
+  sectorName: string
+  items: T[]
+}
+
+export interface SavePoiCategoryData<T> {
+  key: SavePoiCategory
+  count: number
+  groups: SavePoiSectorGroup<T>[]
+}
+
+export interface SavePoiCategoryDataMap {
+  playerStation: SavePoiCategoryData<StationEntry>
+  npcStation: SavePoiCategoryData<StationEntry>
+  abandonedShip: SavePoiCategoryData<AbandonedShipEntry>
+  datavault: SavePoiCategoryData<DatavaultEntry>
+  erlkingVault: SavePoiCategoryData<DatavaultEntry>
+}
+
 export interface ArchiveGroup {
   guid: string
   playerName: string

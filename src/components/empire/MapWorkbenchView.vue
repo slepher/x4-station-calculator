@@ -5,13 +5,17 @@ import MapSvgCanvas from './MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
-import MapSavePanel, { type SavePoiVisibility, type SavePoiOverlayItem } from './MapSavePanel.vue'
+import MapSavePanel from './MapSavePanel.vue'
+import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
+import { focusOverlayInViewport } from './focusOverlayInViewport'
+import { resolveMapSectorByMacro } from './mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
-import type { SaveArchive } from '@/types/saveArchive'
+import { useSaveStore } from '@/store/useSaveStore'
+import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem } from '@/types/saveArchive'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -125,6 +129,7 @@ const isResourcePanelOpen = ref(false)
 const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
 const selectedSaveArchive = ref<SaveArchive | null>(null)
+const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const savePoiVisibility = ref<SavePoiVisibility>({
   playerStation: false,
   npcStation: false,
@@ -154,6 +159,7 @@ const lastMousePos = ref({ x: 0, y: 0 })
 
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
+const saveStore = useSaveStore()
 const empireStore = useEmpireStore()
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
@@ -258,93 +264,21 @@ const placementOverlays = computed<PlacementOverlayItem[]>(() => {
 
 const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
   if (!isSavePanelOpen.value || !selectedSaveArchive.value) return []
+  const activeCategories = getEffectiveVisibleSavePoiCategories(
+    savePoiVisibility.value,
+    activeSavePoiCategory.value
+  )
 
-  const overlays: SavePoiOverlayItem[] = []
-  const archive = selectedSaveArchive.value
-
-  for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
-    const sectorId = getSectorIdFromMacro(sectorMacro)
-    if (!sectorId) continue
-
-    const sectorData = sectorsById.value[sectorId]
-    if (!sectorData) continue
-
-    if (savePoiVisibility.value.playerStation) {
-      for (const station of sector.stations) {
-        if (station.owner === 'player') {
-          overlays.push({
-            key: `playerStation:${station.code}`,
-            code: station.code,
-            category: 'playerStation',
-            owner: station.owner,
-            sectorMacro,
-            sectorName: sectorData.displayName,
-            pos: { x: station.x, z: station.z }
-          })
-        }
+  return saveStore
+    .getArchivePoiOverlays(selectedSaveArchive.value, activeCategories)
+    .map((overlay) => {
+      const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, overlay.sectorMacro)
+      const sectorData = resolved ? sectorsById.value[resolved.sectorId] : null
+      return {
+        ...overlay,
+        sectorName: sectorData?.displayName || overlay.sectorName
       }
-    }
-
-    if (savePoiVisibility.value.npcStation) {
-      for (const station of sector.stations) {
-        if (station.owner !== 'player') {
-          overlays.push({
-            key: `npcStation:${station.code}`,
-            code: station.code,
-            category: 'npcStation',
-            owner: station.owner,
-            sectorMacro,
-            sectorName: sectorData.displayName,
-            pos: { x: station.x, z: station.z }
-          })
-        }
-      }
-    }
-
-    if (savePoiVisibility.value.abandonedShip) {
-      for (const ship of sector.abandonedShips) {
-        overlays.push({
-          key: `abandonedShip:${ship.code}`,
-          code: ship.code,
-          category: 'abandonedShip',
-          owner: undefined,
-          sectorMacro,
-          sectorName: sectorData.displayName,
-          pos: { x: ship.x, z: ship.z }
-        })
-      }
-    }
-
-    if (savePoiVisibility.value.datavault) {
-      for (const vault of sector.datavaults) {
-        overlays.push({
-          key: `datavault:${vault.code}`,
-          code: vault.code,
-          category: 'datavault',
-          owner: vault.owner,
-          sectorMacro,
-          sectorName: sectorData.displayName,
-          pos: { x: vault.x, z: vault.z }
-        })
-      }
-    }
-
-    if (savePoiVisibility.value.erlkingVault) {
-      for (const vault of sector.erlkingVaults) {
-        overlays.push({
-          key: `erlkingVault:${vault.code}`,
-          code: vault.code,
-          category: 'erlkingVault',
-          owner: vault.owner,
-          sectorMacro,
-          sectorName: sectorData.displayName,
-          pos: { x: vault.x, z: vault.z }
-        })
-      }
-    }
-  }
-
-  return overlays
+    })
 })
 
 const getViewportSize = () => {
@@ -840,18 +774,11 @@ const focusPlacementOverlay = async (placementKey: string) => {
     await nextTick()
   }
 
-  const overlay = viewport.querySelector<SVGGElement>(`[data-placement-key="${placementKey}"]`)
-  if (!overlay) return
-
-  const viewportRect = viewport.getBoundingClientRect()
-  const overlayRect = overlay.getBoundingClientRect()
-  const overlayCenterX = overlayRect.left - viewportRect.left + overlayRect.width / 2
-  const overlayCenterY = overlayRect.top - viewportRect.top + overlayRect.height / 2
-
-  clampPan(
-    panX.value + viewportRect.width / 2 - overlayCenterX,
-    panY.value + viewportRect.height / 2 - overlayCenterY
-  )
+  focusOverlayInViewport(viewport, `[data-placement-key="${placementKey}"]`, {
+    panX: panX.value,
+    panY: panY.value,
+    clampPan
+  })
 }
 
 const onSliderInput = (event: Event) => {
@@ -973,6 +900,7 @@ const onSavePanelOpen = () => {
 const onSavePanelClose = () => {
   isSavePanelOpen.value = false
   selectedSaveArchive.value = null
+  activeSavePoiCategory.value = null
   focusedSavePoiKey.value = null
   savePoiVisibility.value = {
     playerStation: false,
@@ -983,8 +911,16 @@ const onSavePanelClose = () => {
   }
 }
 
-const onSaveSelectArchive = (archive: SaveArchive) => {
-  selectedSaveArchive.value = archive
+const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
+  if (!payload) {
+    selectedSaveArchive.value = null
+    activeSavePoiCategory.value = null
+    return
+  }
+
+  await saveStore.selectArchive(payload.guid, payload.time)
+  selectedSaveArchive.value = saveStore.selectedArchive
+  activeSavePoiCategory.value = null
   savePoiVisibility.value = {
     playerStation: false,
     npcStation: false,
@@ -998,9 +934,13 @@ const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
   savePoiVisibility.value = visibility
 }
 
+const onSaveActiveCategoryChange = (category: SavePoiCategory | null) => {
+  activeSavePoiCategory.value = category
+}
+
 const onSavePoiFocus = async (poi: SavePoiOverlayItem) => {
-  const sectorId = getSectorIdFromMacro(poi.sectorMacro)
-  if (!sectorId) return
+  const viewport = viewportRef.value
+  if (!viewport) return
 
   const targetScale = scale.value < 1 ? clampScale(1) : scale.value
   if (targetScale !== scale.value) {
@@ -1008,64 +948,13 @@ const onSavePoiFocus = async (poi: SavePoiOverlayItem) => {
     syncSliderFromScale()
     await nextTick()
   }
-
-  const target = searchSectors.value.find(s => s.sectorId === sectorId)
-  if (!target) return
-
-  const sector = sectorsById.value[sectorId]
-  if (!sector || !sector.scalePerRadius) return
-
-  const clusterId = sector.clusterId
-  const cluster = gameDataStore.maps?.clusters?.[clusterId]
-  if (!cluster) return
-
-  const sectorNorm = (cluster.sectors as any)?.[sectorId]?.normalized
-  if (!sectorNorm) return
-
-  const ratioX = poi.pos.x * sector.scalePerRadius
-  const ratioY = -poi.pos.z * sector.scalePerRadius
-
-  const localRatio = { x: ratioX, y: ratioY }
-
-  const clusterRatio = sectorRatioToClusterRatio(sectorNorm, localRatio)
-  const clusterRadius = clusterRefHeightPx.value / 2
-  const center = { x: imageNaturalWidth.value / 2, y: imageNaturalHeight.value / 2 }
-  const screenPos = clusterRatioToScreen(center, clusterRadius, clusterRatio)
-
-  const { width: vw, height: vh } = getViewportSize()
-  if (vw && vh) {
-    clampPan(vw / 2 - screenPos.x, vh / 2 - screenPos.y)
-  }
-
   focusedSavePoiKey.value = poi.key
-}
-
-function getSectorIdFromMacro(macro: string): string | null {
-  const clusters = gameDataStore.maps?.clusters || {}
-  for (const cluster of Object.values(clusters)) {
-    for (const [sectorId, sector] of Object.entries(cluster.sectors || {})) {
-      if (sectorId === macro || (sector as any).macro === macro) {
-        return sectorId
-      }
-    }
-  }
-  return null
-}
-
-function sectorRatioToClusterRatio(sectorNorm: any, localRatio: { x: number; y: number }): { x: number; y: number } {
-  const cx = sectorNorm.center_x || 0
-  const cy = sectorNorm.center_y || 0
-  return {
-    x: cx + localRatio.x,
-    y: cy + localRatio.y
-  }
-}
-
-function clusterRatioToScreen(center: { x: number; y: number }, clusterRadius: number, ratio: { x: number; y: number }): { x: number; y: number } {
-  return {
-    x: center.x + ratio.x * clusterRadius,
-    y: center.y + ratio.y * clusterRadius
-  }
+  await nextTick()
+  focusOverlayInViewport(viewport, `[data-save-poi-key="${poi.key}"]`, {
+    panX: panX.value,
+    panY: panY.value,
+    clampPan
+  })
 }
 
 const onStationItemDragStart = (item: MapStationPanelItem) => {
@@ -1295,6 +1184,7 @@ onBeforeUnmount(() => {
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
         @visibility-change="onSaveVisibilityChange"
+        @active-category-change="onSaveActiveCategoryChange"
         @focus-poi="onSavePoiFocus"
       />
 

@@ -5,21 +5,7 @@ import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
 import MapSaveCoordList from './MapSaveCoordList.vue'
-import type { SaveArchive } from '@/types/saveArchive'
-
-export type SavePoiCategory = 'playerStation' | 'npcStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
-
-export type SavePoiVisibility = Record<SavePoiCategory, boolean>
-
-export interface SavePoiOverlayItem {
-  key: string
-  code: string
-  category: SavePoiCategory
-  owner?: string
-  sectorMacro: string
-  sectorName: string
-  pos: { x: number; z: number }
-}
+import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem } from '@/types/saveArchive'
 
 const props = defineProps<{
   open: boolean
@@ -29,8 +15,9 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'close'): void
-  (e: 'select-archive', archive: SaveArchive): void
+  (e: 'select-archive', payload: { guid: string; time: number } | null): void
   (e: 'visibility-change', visibility: SavePoiVisibility): void
+  (e: 'active-category-change', category: SavePoiCategory | null): void
   (e: 'focus-poi', poi: SavePoiOverlayItem): void
 }>()
 
@@ -81,21 +68,26 @@ function onBreadcrumbNavigate(key: string) {
   if (key === 'root') {
     layer.value = 'list'
     selectedCategory.value = null
-    emit('select-archive', null as any)
+    emit('active-category-change', null)
+    emit('select-archive', null)
   } else if (key === 'archive') {
     layer.value = 'category'
     selectedCategory.value = null
+    emit('active-category-change', null)
   }
 }
 
-function onArchiveSelect(archive: SaveArchive) {
-  emit('select-archive', archive)
+function onArchiveSelect(payload: { guid: string; time: number }) {
+  emit('select-archive', payload)
   layer.value = 'category'
+  selectedCategory.value = null
+  emit('active-category-change', null)
 }
 
 function onCategorySelect(category: SavePoiCategory) {
   selectedCategory.value = category
   layer.value = 'coord'
+  emit('active-category-change', category)
 }
 
 function onVisibilityChange(newVisibility: SavePoiVisibility) {
@@ -107,6 +99,7 @@ function onPoiFocus(poi: SavePoiOverlayItem) {
 }
 
 function onClose() {
+  emit('active-category-change', null)
   emit('close')
 }
 
@@ -114,6 +107,7 @@ watch(() => props.open, (open) => {
   if (!open) {
     layer.value = 'list'
     selectedCategory.value = null
+    emit('active-category-change', null)
   }
 })
 
@@ -121,6 +115,7 @@ watch(() => props.archive, (archive) => {
   if (!archive) {
     layer.value = 'list'
     selectedCategory.value = null
+    emit('active-category-change', null)
   } else if (layer.value === 'list') {
     layer.value = 'category'
   }

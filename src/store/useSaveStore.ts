@@ -1,6 +1,19 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { SaveArchive, ArchiveGroup, SectorData, SaveParserErrorDetail } from '@/types/saveArchive'
+import type {
+  SaveArchive,
+  ArchiveGroup,
+  SectorData,
+  SaveParserErrorDetail,
+  SavePoiCategory,
+  SavePoiCategoryData,
+  SavePoiCategoryDataMap,
+  SavePoiOverlayItem,
+  SavePoiSectorGroup,
+  StationEntry,
+  DatavaultEntry,
+  AbandonedShipEntry
+} from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
 import {
   saveArchiveToDB,
@@ -12,6 +25,7 @@ import {
 } from '@/db/saveArchiveDB'
 
 const CURRENT_PARSER_VERSION = 'v1'
+const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'abandonedShip', 'datavault', 'erlkingVault']
 
 function normalizeVersion(v: string): string {
   const trimmed = v.trim()
@@ -42,6 +56,78 @@ function createEmptySectorData(name: string): SectorData {
   }
 }
 
+function sortPoiGroups<T>(groups: SavePoiSectorGroup<T>[]): SavePoiSectorGroup<T>[] {
+  return groups.sort((a, b) => a.sectorName.localeCompare(b.sectorName))
+}
+
+function createPoiCategoryData<T>(
+  key: SavePoiCategory,
+  groups: SavePoiSectorGroup<T>[]
+): SavePoiCategoryData<T> {
+  return {
+    key,
+    count: groups.reduce((sum, group) => sum + group.items.length, 0),
+    groups: sortPoiGroups(groups)
+  }
+}
+
+function buildPoiGroups<T>(
+  sectors: Record<string, SectorData>,
+  extractor: (sector: SectorData) => T[]
+): SavePoiSectorGroup<T>[] {
+  return Object.entries(sectors)
+    .map(([sectorMacro, sector]) => ({
+      sectorMacro,
+      sectorName: sector.name,
+      items: extractor(sector)
+    }))
+    .filter((group) => group.items.length > 0)
+}
+
+function createOverlayItem(
+  category: SavePoiCategory,
+  sectorMacro: string,
+  sectorName: string,
+  item: StationEntry | DatavaultEntry | AbandonedShipEntry
+): SavePoiOverlayItem {
+  return {
+    key: `${category}:${item.code}`,
+    code: item.code,
+    category,
+    owner: 'owner' in item ? item.owner : undefined,
+    sectorMacro,
+    sectorName,
+    pos: { x: item.x, z: item.z }
+  }
+}
+
+export function deriveSavePoiCategoryData(archive: SaveArchive | null | undefined): SavePoiCategoryDataMap {
+  const sectors = archive?.sectors || {}
+
+  return {
+    playerStation: createPoiCategoryData('playerStation', buildPoiGroups(sectors, (sector) =>
+      sector.stations.filter((station) => station.owner === 'player')
+    )),
+    npcStation: createPoiCategoryData('npcStation', buildPoiGroups(sectors, (sector) =>
+      sector.stations.filter((station) => station.owner !== 'player' && station.is_headquarter === true)
+    )),
+    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (sector) => sector.abandonedShips)),
+    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (sector) => sector.datavaults)),
+    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (sector) => sector.erlkingVaults))
+  }
+}
+
+export function flattenSavePoiCategoryData(
+  data: SavePoiCategoryDataMap,
+  categories: SavePoiCategory[] = SAVE_POI_CATEGORIES
+): SavePoiOverlayItem[] {
+  return categories.flatMap((category) =>
+    data[category].groups.flatMap((group) =>
+      group.items.map((item) => createOverlayItem(category, group.sectorMacro, group.sectorName, item))
+    )
+  )
+}
+
 export const useSaveStore = defineStore('save', () => {
   const gameDataStore = useGameDataStore()
 
@@ -58,6 +144,14 @@ export const useSaveStore = defineStore('save', () => {
 
   const totalArchiveCount = computed<number>(() => {
     return archiveGroups.value.reduce((sum, group) => sum + group.saves.length, 0)
+  })
+
+  const selectedArchivePoiCategories = computed<SavePoiCategoryDataMap>(() => {
+    return deriveSavePoiCategoryData(selectedArchive.value)
+  })
+
+  const selectedArchivePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
+    return flattenSavePoiCategoryData(selectedArchivePoiCategories.value)
   })
 
   async function initialize(): Promise<void> {
@@ -338,6 +432,17 @@ export const useSaveStore = defineStore('save', () => {
     parseError.value = error
   }
 
+  function getArchivePoiCategories(archive: SaveArchive | null | undefined): SavePoiCategoryDataMap {
+    return deriveSavePoiCategoryData(archive)
+  }
+
+  function getArchivePoiOverlays(
+    archive: SaveArchive | null | undefined,
+    categories: SavePoiCategory[] = SAVE_POI_CATEGORIES
+  ): SavePoiOverlayItem[] {
+    return flattenSavePoiCategoryData(getArchivePoiCategories(archive), categories)
+  }
+
   return {
     archives,
     selectedArchive,
@@ -346,6 +451,8 @@ export const useSaveStore = defineStore('save', () => {
     parseError,
     archiveGroups,
     totalArchiveCount,
+    selectedArchivePoiCategories,
+    selectedArchivePoiOverlays,
     isInitialized,
     initialize,
     checkVersionCompatibility,
@@ -356,6 +463,8 @@ export const useSaveStore = defineStore('save', () => {
     clearAll,
     exportToJson,
     importFromJson,
-    setParsingState
+    setParsingState,
+    getArchivePoiCategories,
+    getArchivePoiOverlays
   }
 })

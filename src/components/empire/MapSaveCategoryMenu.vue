@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { SaveArchive } from '@/types/saveArchive'
-import type { SavePoiCategory, SavePoiVisibility } from './MapSavePanel.vue'
+import { useSaveStore } from '@/store/useSaveStore'
+import type { SaveArchive, SavePoiCategory, SavePoiVisibility } from '@/types/saveArchive'
 
 const props = defineProps<{
   archive: SaveArchive | null
@@ -15,6 +15,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
+const saveStore = useSaveStore()
 
 interface CategoryInfo {
   key: SavePoiCategory
@@ -23,33 +24,14 @@ interface CategoryInfo {
 }
 
 const categories = computed<CategoryInfo[]>(() => {
-  if (!props.archive) return []
-
-  let playerStations = 0
-  let npcStations = 0
-  let abandonedShips = 0
-  let datavaults = 0
-  let erlkingVaults = 0
-
-  for (const sector of Object.values(props.archive.sectors)) {
-    for (const station of sector.stations) {
-      if (station.owner === 'player') {
-        playerStations++
-      } else {
-        npcStations++
-      }
-    }
-    abandonedShips += sector.abandonedShips.length
-    datavaults += sector.datavaults.length
-    erlkingVaults += sector.erlkingVaults.length
-  }
+  const data = saveStore.getArchivePoiCategories(props.archive)
 
   return [
-    { key: 'playerStation', label: t('map.save_category_player_station'), count: playerStations },
-    { key: 'npcStation', label: t('map.save_category_npc_station'), count: npcStations },
-    { key: 'abandonedShip', label: t('map.save_category_abandoned_ship'), count: abandonedShips },
-    { key: 'datavault', label: t('map.save_category_datavault'), count: datavaults },
-    { key: 'erlkingVault', label: t('map.save_category_erlking_vault'), count: erlkingVaults }
+    { key: 'playerStation', label: t('map.save_category_player_station'), count: data.playerStation.count },
+    { key: 'npcStation', label: t('map.save_category_npc_station'), count: data.npcStation.count },
+    { key: 'abandonedShip', label: t('map.save_category_abandoned_ship'), count: data.abandonedShip.count },
+    { key: 'datavault', label: t('map.save_category_datavault'), count: data.datavault.count },
+    { key: 'erlkingVault', label: t('map.save_category_erlking_vault'), count: data.erlkingVault.count }
   ]
 })
 
@@ -58,7 +40,7 @@ function onCheckboxChange(category: SavePoiCategory, checked: boolean) {
   emit('visibility-change', newVisibility)
 }
 
-function onCategoryClick(category: SavePoiCategory) {
+function onCategorySelect(category: SavePoiCategory) {
   emit('select-category', category)
 }
 </script>
@@ -74,19 +56,24 @@ function onCategoryClick(category: SavePoiCategory) {
         v-for="cat in categories"
         :key="cat.key"
         class="category-item"
-        @click="onCategoryClick(cat.key)"
       >
         <label class="category-checkbox">
           <input
             type="checkbox"
             :checked="visibility[cat.key]"
             @change="onCheckboxChange(cat.key, ($event.target as HTMLInputElement).checked)"
-            @click.stop
           />
           <span class="category-label">{{ cat.label }}</span>
           <span class="category-count">({{ cat.count }})</span>
         </label>
-        <span class="category-arrow">→</span>
+        <button
+          class="category-arrow"
+          type="button"
+          :aria-label="`${cat.label} details`"
+          @click="onCategorySelect(cat.key)"
+        >
+          →
+        </button>
       </div>
     </div>
   </div>
@@ -106,7 +93,7 @@ function onCategoryClick(category: SavePoiCategory) {
 }
 
 .category-item {
-  @apply flex items-center justify-between p-3 rounded cursor-pointer bg-black/45 border border-amber-300/15 hover:bg-amber-200/5 hover:border-amber-200/45 transition-colors;
+  @apply flex items-center justify-between p-3 rounded bg-black/45 border border-amber-300/15 hover:bg-amber-200/5 hover:border-amber-200/45 transition-colors;
 }
 
 .category-checkbox {
@@ -126,6 +113,6 @@ function onCategoryClick(category: SavePoiCategory) {
 }
 
 .category-arrow {
-  @apply text-amber-200/55 text-sm;
+  @apply rounded border border-amber-300/20 px-2 py-1 text-sm text-amber-200/70 transition-colors hover:border-amber-200/50 hover:text-amber-50;
 }
 </style>

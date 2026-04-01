@@ -2,8 +2,10 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import type { SaveArchive, SectorData } from '@/types/saveArchive'
-import type { SavePoiCategory, SavePoiOverlayItem } from './MapSavePanel.vue'
+import { useSaveStore } from '@/store/useSaveStore'
+import { resolveMapSectorByMacro } from './mapSectorMacro'
+import { getLocalizedSectorQueryMatch } from './savePoiSearch'
+import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 
 const props = defineProps<{
   archive: SaveArchive | null
@@ -14,8 +16,9 @@ const emit = defineEmits<{
   (e: 'focus-poi', poi: SavePoiOverlayItem): void
 }>()
 
-const { t, te } = useI18n()
+const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
+const saveStore = useSaveStore()
 
 const searchQuery = ref('')
 
@@ -23,112 +26,78 @@ const normalizedQuery = computed(() => searchQuery.value.trim().toLowerCase())
 
 interface SectorPoiGroup {
   sectorMacro: string
+  rawSectorName: string
   sectorName: string
+  showRawSectorName: boolean
   pois: SavePoiOverlayItem[]
 }
 
 const poiGroups = computed<SectorPoiGroup[]>(() => {
-  if (!props.archive) return []
+  const categoryData = saveStore.getArchivePoiCategories(props.archive)[props.category]
 
-  const groups: Map<string, SectorPoiGroup> = new Map()
+  return categoryData.groups
+    .map((group) => {
+      const searchNames = getSectorSearchNames(group.sectorMacro, group.sectorName)
+      const match = getLocalizedSectorQueryMatch({
+        rawName: searchNames.rawName,
+        displayName: searchNames.displayName,
+        normalizedQuery: normalizedQuery.value,
+        locale: locale.value
+      })
 
-  for (const [sectorMacro, sector] of Object.entries(props.archive.sectors)) {
-    const pois = getSectorPois(sectorMacro, sector, props.category)
-    if (pois.length === 0) continue
-
-    const sectorName = getSectorDisplayName(sectorMacro, sector.name)
-    groups.set(sectorMacro, {
-      sectorMacro,
-      sectorName,
-      pois
+      return {
+        sectorMacro: group.sectorMacro,
+        rawSectorName: searchNames.rawName,
+        sectorName: searchNames.displayName,
+        showRawSectorName: locale.value !== 'en' && match.matchedRawName && !match.matchedDisplayName,
+        pois: group.items.map((item) => ({
+          key: `${props.category}:${item.code}`,
+          code: item.code,
+          category: props.category,
+          owner: 'owner' in item ? item.owner : undefined,
+          sectorMacro: group.sectorMacro,
+          sectorName: searchNames.displayName,
+          pos: { x: item.x, z: item.z }
+        }))
+      }
     })
-  }
-
-  return Array.from(groups.values()).sort((a, b) => a.sectorName.localeCompare(b.sectorName))
+    .sort((a, b) => a.sectorName.localeCompare(b.sectorName))
 })
 
 const filteredGroups = computed<SectorPoiGroup[]>(() => {
   if (!normalizedQuery.value) return poiGroups.value
 
-  return poiGroups.value.filter(group =>
-    group.sectorName.toLowerCase().includes(normalizedQuery.value)
+  return poiGroups.value.filter((group) =>
+    getLocalizedSectorQueryMatch({
+      rawName: group.rawSectorName,
+      displayName: group.sectorName,
+      normalizedQuery: normalizedQuery.value,
+      locale: locale.value
+    }).matched
   )
 })
 
-function getSectorDisplayName(sectorMacro: string, name: string): string {
+function getSectorSearchNames(sectorMacro: string, fallbackName: string): { rawName: string; displayName: string } {
   const clusters = gameDataStore.maps?.clusters || {}
-  for (const cluster of Object.values(clusters)) {
-    for (const [sectorId, sector] of Object.entries(cluster.sectors || {})) {
-      if (sectorId === sectorMacro || (sector as any).macro === sectorMacro) {
-        const nameId = (sector as any).nameId
-        if (nameId && te(nameId)) {
-          return t(nameId)
-        }
-        return (sector as any).name || name
+  const resolved = resolveMapSectorByMacro(clusters, sectorMacro)
+  if (resolved) {
+    const rawName = (resolved.sector as any).name || fallbackName
+    const nameId = (resolved.sector as any).nameId
+    if (nameId && te(nameId)) {
+      return {
+        rawName,
+        displayName: t(nameId)
       }
     }
-  }
-  return name
-}
-
-function getSectorPois(sectorMacro: string, sector: SectorData, category: SavePoiCategory): SavePoiOverlayItem[] {
-  const pois: SavePoiOverlayItem[] = []
-  const sectorName = sector.name
-
-  if (category === 'playerStation' || category === 'npcStation') {
-    const filtered = sector.stations.filter(s =>
-      category === 'playerStation' ? s.owner === 'player' : s.owner !== 'player'
-    )
-    for (const station of filtered) {
-      pois.push({
-        key: `${category}:${station.code}`,
-        code: station.code,
-        category,
-        owner: station.owner,
-        sectorMacro,
-        sectorName,
-        pos: { x: station.x, z: station.z }
-      })
-    }
-  } else if (category === 'abandonedShip') {
-    for (const ship of sector.abandonedShips) {
-      pois.push({
-        key: `${category}:${ship.code}`,
-        code: ship.code,
-        category,
-        owner: undefined,
-        sectorMacro,
-        sectorName,
-        pos: { x: ship.x, z: ship.z }
-      })
-    }
-  } else if (category === 'datavault') {
-    for (const vault of sector.datavaults) {
-      pois.push({
-        key: `${category}:${vault.code}`,
-        code: vault.code,
-        category,
-        owner: vault.owner,
-        sectorMacro,
-        sectorName,
-        pos: { x: vault.x, z: vault.z }
-      })
-    }
-  } else if (category === 'erlkingVault') {
-    for (const vault of sector.erlkingVaults) {
-      pois.push({
-        key: `${category}:${vault.code}`,
-        code: vault.code,
-        category,
-        owner: vault.owner,
-        sectorMacro,
-        sectorName,
-        pos: { x: vault.x, z: vault.z }
-      })
+    return {
+      rawName,
+      displayName: rawName
     }
   }
-
-  return pois
+  return {
+    rawName: fallbackName,
+    displayName: fallbackName
+  }
 }
 
 function formatCoord(value: number): string {
@@ -177,7 +146,10 @@ function onClearSearch() {
         :key="group.sectorMacro"
         class="poi-group"
       >
-        <div class="group-header">{{ group.sectorName }}</div>
+        <div class="group-header">
+          {{ group.sectorName }}
+          <span v-if="group.showRawSectorName" class="group-header-raw">({{ group.rawSectorName }})</span>
+        </div>
         <div class="poi-list">
           <div
             v-for="poi in group.pois"
@@ -229,6 +201,10 @@ function onClearSearch() {
 
 .group-header {
   @apply text-xs font-semibold uppercase tracking-wider text-amber-200/80 px-2;
+}
+
+.group-header-raw {
+  @apply text-amber-100/60 font-normal normal-case;
 }
 
 .poi-list {

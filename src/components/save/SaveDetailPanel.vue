@@ -2,13 +2,15 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ViewTabUI from '@/components/common/ViewTabUI.vue'
-import type { SaveArchive, SectorData, StationEntry, DatavaultEntry, AbandonedShipEntry } from '@/types/saveArchive'
+import { useSaveStore } from '@/store/useSaveStore'
+import type { SaveArchive, SavePoiCategory, StationEntry, DatavaultEntry, AbandonedShipEntry } from '@/types/saveArchive'
 
 const props = defineProps<{
   archive: SaveArchive | null
 }>()
 
 const { t } = useI18n()
+const saveStore = useSaveStore()
 const activeTab = ref('player-stations')
 
 const tabs = computed(() => [
@@ -23,66 +25,24 @@ function formatCoord(value: number): string {
   return (value / 1000).toFixed(1) + 'km'
 }
 
-interface SectorGroup<T> {
-  macro: string
-  name: string
-  items: T[]
-}
-
-function groupBySector<T>(
-  extractor: (sector: SectorData, macro: string) => T[],
-  sectors: Record<string, SectorData>
-): SectorGroup<T>[] {
-  return Object.entries(sectors)
-    .map(([macro, data]) => ({
-      macro,
-      name: data.name,
-      items: extractor(data, macro)
-    }))
-    .filter(group => group.items.length > 0)
-    .sort((a, b) => a.name.localeCompare(b.name))
-}
-
-const playerStationsData = computed(() => {
-  if (!props.archive) return []
-  return groupBySector((sector) => 
-    sector.stations.filter(s => s.owner === 'player'),
-    props.archive.sectors
-  )
-})
-
-const npcStationsData = computed(() => {
-  if (!props.archive) return []
-  return groupBySector((sector) =>
-    sector.stations.filter(s => s.owner !== 'player' && s.is_headquarter === true),
-    props.archive.sectors
-  )
-})
-
-const abandonedShipsData = computed(() => {
-  if (!props.archive) return []
-  return groupBySector((sector) => sector.abandonedShips, props.archive.sectors)
-})
-
-const datavaultsData = computed(() => {
-  if (!props.archive) return []
-  return groupBySector((sector) => sector.datavaults, props.archive.sectors)
-})
-
-const erlkingVaultsData = computed(() => {
-  if (!props.archive) return []
-  return groupBySector((sector) => sector.erlkingVaults, props.archive.sectors)
-})
-
+const categoryData = computed(() => saveStore.getArchivePoiCategories(props.archive))
 const tabData = computed(() => ({
-  'player-stations': playerStationsData.value,
-  'npc-stations': npcStationsData.value,
-  'abandoned-ships': abandonedShipsData.value,
-  'datavaults': datavaultsData.value,
-  'erlking-vaults': erlkingVaultsData.value,
+  'player-stations': categoryData.value.playerStation.groups,
+  'npc-stations': categoryData.value.npcStation.groups,
+  'abandoned-ships': categoryData.value.abandonedShip.groups,
+  'datavaults': categoryData.value.datavault.groups,
+  'erlking-vaults': categoryData.value.erlkingVault.groups,
 }))
 
 type TabKey = keyof typeof tabData.value
+type CategoryKeyByTab = Record<TabKey, SavePoiCategory>
+const categoryKeyByTab: CategoryKeyByTab = {
+  'player-stations': 'playerStation',
+  'npc-stations': 'npcStation',
+  'abandoned-ships': 'abandonedShip',
+  datavaults: 'datavault',
+  'erlking-vaults': 'erlkingVault'
+}
 
 const currentTabData = computed(() => tabData.value[activeTab.value as TabKey] || [])
 const hasData = computed(() => currentTabData.value.length > 0)
@@ -122,14 +82,14 @@ const hasData = computed(() => currentTabData.value.length > 0)
         </div>
 
         <div v-else class="sector-list">
-          <div v-for="sector in currentTabData" :key="sector.macro" class="sector-group">
+          <div v-for="sector in currentTabData" :key="sector.sectorMacro" class="sector-group">
             <div class="sector-header">
-              <span class="sector-name">{{ sector.name }}</span>
+              <span class="sector-name">{{ sector.sectorName }}</span>
               <span class="sector-count">{{ sector.items.length }}</span>
             </div>
 
             <div class="item-list">
-              <template v-if="activeTab === 'player-stations'">
+              <template v-if="categoryKeyByTab[activeTab as TabKey] === 'playerStation'">
                 <div v-for="item in sector.items" :key="(item as StationEntry).code" class="item-row">
                   <span class="item-code">{{ (item as StationEntry).code }}</span>
                   <span class="item-coords">({{ formatCoord((item as StationEntry).x) }}, {{ formatCoord((item as StationEntry).z) }})</span>
@@ -137,21 +97,21 @@ const hasData = computed(() => currentTabData.value.length > 0)
                 </div>
               </template>
 
-              <template v-if="activeTab === 'npc-stations'">
+              <template v-if="categoryKeyByTab[activeTab as TabKey] === 'npcStation'">
                 <div v-for="item in sector.items" :key="(item as StationEntry).code" class="item-row">
                   <span class="item-owner">{{ (item as StationEntry).owner || 'neutral' }}</span>
                   <span class="item-coords">({{ formatCoord((item as StationEntry).x) }}, {{ formatCoord((item as StationEntry).z) }})</span>
                 </div>
               </template>
 
-              <template v-if="activeTab === 'abandoned-ships'">
+              <template v-if="categoryKeyByTab[activeTab as TabKey] === 'abandonedShip'">
                 <div v-for="item in sector.items" :key="(item as AbandonedShipEntry).code" class="item-row">
                   <span class="item-class">{{ (item as AbandonedShipEntry).class }}</span>
                   <span class="item-coords">({{ formatCoord((item as AbandonedShipEntry).x) }}, {{ formatCoord((item as AbandonedShipEntry).z) }})</span>
                 </div>
               </template>
 
-              <template v-if="activeTab === 'datavaults' || activeTab === 'erlking-vaults'">
+              <template v-if="categoryKeyByTab[activeTab as TabKey] === 'datavault' || categoryKeyByTab[activeTab as TabKey] === 'erlkingVault'">
                 <div v-for="item in sector.items" :key="(item as DatavaultEntry).code" class="item-row">
                   <span class="item-coords">({{ formatCoord((item as DatavaultEntry).x) }}, {{ formatCoord((item as DatavaultEntry).z) }})</span>
                   <div class="item-marks">

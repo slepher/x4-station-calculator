@@ -2,6 +2,8 @@
 import { computed, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import type { SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
+import { resolveMapSectorByMacro } from './mapSectorMacro'
 import factoryIconUrl from '@/components/icon/factory.svg'
 import shipyardIconUrl from '@/components/icon/shipyard.svg'
 import tradestationIconUrl from '@/components/icon/tradestation.svg'
@@ -126,17 +128,6 @@ type PlacementPreview = {
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: PlacementLocation
 }
-type SavePoiCategory = 'playerStation' | 'npcStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
-type SavePoiOverlay = {
-  key: string
-  code: string
-  category: SavePoiCategory
-  owner?: string
-  sectorMacro: string
-  sectorName: string
-  pos: { x: number; z: number }
-}
-
 const FALLBACK_OWNER_COLOR = '#94a3b8'
 const SQRT3 = Math.sqrt(3)
 const SECTOR_LABEL_FONT_SIZE = 14
@@ -168,7 +159,7 @@ const props = withDefaults(defineProps<{
   placementPreview?: PlacementPreview | null
   draggingOverlayKey?: string | null
   focusedOverlayKey?: string | null
-  savePoiOverlays?: SavePoiOverlay[]
+  savePoiOverlays?: SavePoiOverlayItem[]
   focusedSavePoiKey?: string | null
 }>(), {
   searchHighlightedSectorIds: () => [],
@@ -191,7 +182,7 @@ const emit = defineEmits<{
   (e: 'sector-hover', payload: SectorHoverPayload): void
   (e: 'sector-leave', sectorId: string): void
   (e: 'overlay-pointerdown', payload: PlacementOverlay): void
-  (e: 'save-poi-pointerdown', payload: SavePoiOverlay): void
+  (e: 'save-poi-pointerdown', payload: SavePoiOverlayItem): void
 }>()
 const { t, te } = useI18n()
 const gameData = useGameDataStore()
@@ -982,12 +973,10 @@ const savePoiScreenItems = computed(() => {
   const { centers, clusterRadius } = layoutState.value
   return props.savePoiOverlays
     .map((poi) => {
-      const sectorId = getSectorIdFromMacro(poi.sectorMacro)
-      if (!sectorId) return null
-      const cluster = Object.values(clusters.value).find(c => c.sectors?.[sectorId])
-      if (!cluster) return null
-      const sector = cluster.sectors?.[sectorId]
-      const center = centers[cluster.id]
+      const resolved = resolveMapSectorByMacro(clusters.value, poi.sectorMacro)
+      if (!resolved) return null
+      const center = centers[resolved.clusterId]
+      const sector = resolved.sector as Sector
       const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
       const sectorRadiusRatio = Number(sector?.normalized?.sector_radius_ratio || 0)
       const sectorCenter = sector?.normalized?.center_offset_ratio
@@ -1006,19 +995,8 @@ const savePoiScreenItems = computed(() => {
         color: SAVE_POI_COLORS[poi.category]
       }
     })
-    .filter((item): item is SavePoiOverlay & { x: number; y: number; color: string } => !!item)
+    .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string } => !!item)
 })
-
-function getSectorIdFromMacro(macro: string): string | null {
-  for (const cluster of Object.values(clusters.value)) {
-    for (const [sectorId, sector] of Object.entries(cluster.sectors || {})) {
-      if (sectorId === macro || (sector as any).macro === macro) {
-        return sectorId
-      }
-    }
-  }
-  return null
-}
 const previewScreenItem = computed(() => {
   const preview = props.placementPreview
   if (!preview) return null
