@@ -2,6 +2,17 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { SaveArchive, ArchiveGroup, SectorData, SaveParserErrorDetail } from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
+import {
+  saveArchiveToDB,
+  loadArchiveListFromDB,
+  loadArchiveDetailFromDB,
+  removeArchiveFromDB,
+  clearAllArchivesFromDB,
+  removeOutdatedArchivesFromDB,
+  exportAllArchivesFromDB
+} from '@/db/saveArchiveDB'
+
+const CURRENT_PARSER_VERSION = 'v1'
 
 function normalizeVersion(v: string): string {
   const trimmed = v.trim()
@@ -40,6 +51,7 @@ export const useSaveStore = defineStore('save', () => {
   const isParsing = ref(false)
   const parseProgress = ref('')
   const parseError = ref<string | null>(null)
+  const isInitialized = ref(false)
 
   const archiveGroups = computed<ArchiveGroup[]>(() => {
     return Array.from(archives.value.values())
@@ -48,6 +60,53 @@ export const useSaveStore = defineStore('save', () => {
   const totalArchiveCount = computed<number>(() => {
     return archiveGroups.value.reduce((sum, group) => sum + group.saves.length, 0)
   })
+
+  async function initialize(): Promise<void> {
+    if (isInitialized.value) return
+    
+    try {
+      const removedCount = await removeOutdatedArchivesFromDB(CURRENT_PARSER_VERSION)
+      if (removedCount > 0) {
+        console.log(`[saveStore] removed ${removedCount} outdated archives`)
+      }
+      
+      const metaList = await loadArchiveListFromDB()
+      
+      for (const meta of metaList) {
+        const guid = meta.guid
+        const existingGroup = archives.value.get(guid)
+        
+        const stubArchive: SaveArchive = {
+          meta: {
+            guid: meta.guid,
+            seed: 0,
+            time: meta.time,
+            playerName: meta.playerName,
+            version: meta.version,
+            filename: meta.filename,
+            parser_version: meta.parser_version as 'v1' | 'v2',
+            source: meta.source
+          },
+          sectors: {},
+          isCompatible: meta.isCompatible
+        }
+        
+        if (existingGroup) {
+          existingGroup.saves.push(stubArchive)
+        } else {
+          archives.value.set(guid, {
+            guid,
+            playerName: meta.playerName,
+            saves: [stubArchive]
+          })
+        }
+      }
+      
+      isInitialized.value = true
+    } catch (error) {
+      console.error('[saveStore] initialization failed:', error)
+    }
+  }
 
   function checkVersionCompatibility(version: string): boolean {
     const normalizedVersion = normalizeVersion(version)
@@ -88,16 +147,33 @@ export const useSaveStore = defineStore('save', () => {
       }
       archives.value.set(guid, newGroup)
     }
+    
+    saveArchiveToDB(archive).catch(error => {
+      console.error('[saveStore] failed to persist archive:', error)
+    })
   }
 
-  function selectArchive(guid: string, time: number): void {
+  async function selectArchive(guid: string, time: number): Promise<void> {
     const group = archives.value.get(guid)
     if (!group) {
       selectedArchive.value = null
       return
     }
 
-    const archive = group.saves.find(s => s.meta.time === time)
+    let archive = group.saves.find(s => s.meta.time === time)
+    
+    if (archive && Object.keys(archive.sectors).length === 0) {
+      const id = `${guid}_${time}`
+      const fullArchive = await loadArchiveDetailFromDB(id)
+      if (fullArchive) {
+        const index = group.saves.findIndex(s => s.meta.time === time)
+        if (index >= 0) {
+          group.saves[index] = fullArchive
+          archive = fullArchive
+        }
+      }
+    }
+    
     selectedArchive.value = archive || null
   }
 
@@ -121,6 +197,10 @@ export const useSaveStore = defineStore('save', () => {
     if (selectedArchive.value?.meta.guid === guid && selectedArchive.value?.meta.time === time) {
       selectedArchive.value = null
     }
+    
+    removeArchiveFromDB(guid, time).catch(error => {
+      console.error('[saveStore] failed to remove archive from DB:', error)
+    })
   }
 
   function clearAll(): void {
@@ -129,13 +209,22 @@ export const useSaveStore = defineStore('save', () => {
     parseError.value = null
     parseProgress.value = ''
     isParsing.value = false
+    
+    clearAllArchivesFromDB().catch(error => {
+      console.error('[saveStore] failed to clear DB:', error)
+    })
   }
 
-  function exportToJson(guid: string, time: number): void {
-    const group = archives.value.get(guid)
-    if (!group) return
-
-    const archive = group.saves.find(s => s.meta.time === time)
+  async function exportToJson(guid: string, time: number): Promise<void> {
+    const id = `${guid}_${time}`
+    let archive = await loadArchiveDetailFromDB(id)
+    
+    if (!archive) {
+      const group = archives.value.get(guid)
+      if (!group) return
+      archive = group.saves.find(s => s.meta.time === time) || null
+    }
+    
     if (!archive) return
 
     const exportData = {
@@ -156,6 +245,23 @@ export const useSaveStore = defineStore('save', () => {
     link.click()
     document.body.removeChild(link)
 
+    URL.revokeObjectURL(url)
+  }
+  
+  async function exportAllToJson(): Promise<void> {
+    const jsonString = await exportAllArchivesFromDB()
+    const blob = new Blob([jsonString], { type: 'application/json' })
+    const url = URL.createObjectURL(blob)
+    
+    const fileName = `x4_save_archives_${new Date().toISOString().slice(0, 10)}.json`
+    
+    const link = document.createElement('a')
+    link.href = url
+    link.download = fileName
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    
     URL.revokeObjectURL(url)
   }
 
@@ -239,6 +345,8 @@ export const useSaveStore = defineStore('save', () => {
     parseError,
     archiveGroups,
     totalArchiveCount,
+    isInitialized,
+    initialize,
     checkVersionCompatibility,
     addArchive,
     selectArchive,
@@ -246,6 +354,7 @@ export const useSaveStore = defineStore('save', () => {
     removeArchive,
     clearAll,
     exportToJson,
+    exportAllToJson,
     importFromJson,
     setParsingState
   }

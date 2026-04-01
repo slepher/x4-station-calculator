@@ -701,6 +701,7 @@
     "import_failed": "Import failed",
     "reading_file": "Reading file...",
     "parse_failed": "Parse failed",
-    "parse_error": "Parse error: {message}"
+    "parse_error": "Parse error: {message}",
+    "export_all": "Export All"
   }
 }

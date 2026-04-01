@@ -19,16 +19,20 @@ function formatTime(time: number): string {
   return `${hours}h ${minutes}m`
 }
 
-function selectArchive(guid: string, time: number) {
-  saveStore.selectArchive(guid, time)
+async function selectArchive(guid: string, time: number) {
+  await saveStore.selectArchive(guid, time)
 }
 
-function downloadArchive(guid: string, time: number) {
-  saveStore.exportToJson(guid, time)
+async function downloadArchive(guid: string, time: number) {
+  await saveStore.exportToJson(guid, time)
 }
 
 function removeArchive(guid: string, time: number) {
   saveStore.removeArchive(guid, time)
+}
+
+async function exportAll() {
+  await saveStore.exportAllToJson()
 }
 
 function isSelected(guid: string, time: number): boolean {
@@ -41,8 +45,15 @@ function isSelected(guid: string, time: number): boolean {
     <div v-if="sortedGroups.length === 0" class="empty-hint">
       {{ t('save_import.no_archives') }}
     </div>
-
+    
     <div v-else class="archive-groups">
+      <div class="save-list-header">
+        <span class="total-count">{{ saveStore.totalArchiveCount }} {{ t('save_import.archives_loaded') }}</span>
+        <button class="export-all-btn" @click="exportAll">
+          {{ t('save_import.export_all') }}
+        </button>
+      </div>
+      
       <div v-for="group in sortedGroups" :key="group.guid" class="archive-group">
         <div class="group-header">
           <span class="player-name">{{ group.playerName }}</span>
