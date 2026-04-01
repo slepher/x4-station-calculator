@@ -7,39 +7,28 @@ X4 存档解析器的 Rust WASM 实现，用于高性能解析大型存档文件
 ### 前置要求
 
 - Rust 1.70+
-- wasm-bindgen: `cargo install wasm-bindgen-cli`
-- wasm-pack（可选）: `cargo install wasm-pack`
+- wasm-pack: `cargo install wasm-pack`
 
-### 方式一：使用 wasm-pack（推荐）
+### 快速构建
 
 ```bash
-# 进入 rust-parser 目录
-cd rust-parser
+# 在 rust-parser 目录执行
+./build.sh
 
-# 编译为 Web 目标
-wasm-pack build --target web --out-dir pkg
-
-# 复制到 src/wasm/ (项目使用)
-cp pkg/*.{js,wasm,d.ts} ../src/wasm/
+# 或手动执行
+wasm-pack build --target web --out-dir ../src/wasm --no-pack
+rm -f ../src/wasm/README.md ../src/wasm/.gitignore ../src/wasm/package.json
 ```
 
-### 方式二：使用 wasm-bindgen
+### 使用 wasm-bindgen（备选）
 
 ```bash
-# 进入 rust-parser 目录
 cd rust-parser
-
-# 编译 Rust 到 WASM
 cargo build --release --target wasm32-unknown-unknown
-
-# 生成 JS 绑定
 wasm-bindgen target/wasm32-unknown-unknown/release/save_parser.wasm \
   --target web \
-  --out-dir pkg \
+  --out-dir ../src/wasm \
   --out-name save_parser
-
-# 复制到 src/wasm/
-cp pkg/*.{js,wasm,d.ts} ../src/wasm/
 ```
 
 ## 项目结构
@@ -47,15 +36,16 @@ cp pkg/*.{js,wasm,d.ts} ../src/wasm/
 ```
 rust-parser/
 ├── Cargo.toml          # Rust 项目配置
+├── build.sh            # 构建脚本
 ├── src/
 │   └── lib.rs          # 解析器实现
-├── pkg/                # 编译输出（wasm-pack 生成）
-│   ├── save_parser.js          # JS 绑定
-│   ├── save_parser_bg.wasm     # WASM 二进制
-│   ├── save_parser.d.ts        # TypeScript 类型定义
-│   └── save_parser_bg.wasm.d.ts
 └── examples/
-    └── node_demo.rs    # Node.js 示例
+
+src/wasm/               # 编译输出目录
+├── save_parser.js
+├── save_parser_bg.wasm
+├── save_parser.d.ts
+└── save_parser_bg.wasm.d.ts
 ```
 
 ## API
