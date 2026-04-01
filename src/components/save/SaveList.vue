@@ -31,10 +31,6 @@ function removeArchive(guid: string, time: number) {
   saveStore.removeArchive(guid, time)
 }
 
-async function exportAll() {
-  await saveStore.exportAllToJson()
-}
-
 function isSelected(guid: string, time: number): boolean {
   return saveStore.selectedArchive?.meta.guid === guid && saveStore.selectedArchive?.meta.time === time
 }
@@ -47,13 +43,6 @@ function isSelected(guid: string, time: number): boolean {
     </div>
     
     <div v-else class="archive-groups">
-      <div class="save-list-header">
-        <span class="total-count">{{ saveStore.totalArchiveCount }} {{ t('save_import.archives_loaded') }}</span>
-        <button class="export-all-btn" @click="exportAll">
-          {{ t('save_import.export_all') }}
-        </button>
-      </div>
-      
       <div v-for="group in sortedGroups" :key="group.guid" class="archive-group">
         <div class="group-header">
           <span class="player-name">{{ group.playerName }}</span>

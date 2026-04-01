@@ -8,8 +8,7 @@ import {
   loadArchiveDetailFromDB,
   removeArchiveFromDB,
   clearAllArchivesFromDB,
-  removeOutdatedArchivesFromDB,
-  exportAllArchivesFromDB
+  removeOutdatedArchivesFromDB
 } from '@/db/saveArchiveDB'
 
 const CURRENT_PARSER_VERSION = 'v1'
@@ -247,23 +246,6 @@ export const useSaveStore = defineStore('save', () => {
 
     URL.revokeObjectURL(url)
   }
-  
-  async function exportAllToJson(): Promise<void> {
-    const jsonString = await exportAllArchivesFromDB()
-    const blob = new Blob([jsonString], { type: 'application/json' })
-    const url = URL.createObjectURL(blob)
-    
-    const fileName = `x4_save_archives_${new Date().toISOString().slice(0, 10)}.json`
-    
-    const link = document.createElement('a')
-    link.href = url
-    link.download = fileName
-    document.body.appendChild(link)
-    link.click()
-    document.body.removeChild(link)
-    
-    URL.revokeObjectURL(url)
-  }
 
   function importFromJson(jsonData: unknown): { success: boolean; error?: string; errorDetail?: SaveParserErrorDetail } {
     try {
@@ -354,7 +336,6 @@ export const useSaveStore = defineStore('save', () => {
     removeArchive,
     clearAll,
     exportToJson,
-    exportAllToJson,
     importFromJson,
     setParsingState
   }

@@ -685,7 +685,6 @@
     "supported_formats": "Supports .xml, .xml.gz, .json formats",
     "no_archives": "No archives, upload a save file",
     "saves": "saves",
-    "archives_loaded": "archives loaded",
     "version_mismatch": "Version mismatch",
     "version_mismatch_detail": "Save version {saveVersion} does not match current game version {expectedVersion}",
     "download_json": "Download JSON",
@@ -701,7 +700,6 @@
     "import_failed": "Import failed",
     "reading_file": "Reading file...",
     "parse_failed": "Parse failed",
-    "parse_error": "Parse error: {message}",
-    "export_all": "Export All"
+    "parse_error": "Parse error: {message}"
   }
 }

@@ -687,7 +687,6 @@
     "supported_formats": "支持 .xml, .xml.gz, .json 格式",
     "no_archives": "暂无存档，请上传存档文件",
     "saves": "个存档",
-    "archives_loaded": "个存档已加载",
     "version_mismatch": "版本不匹配",
     "version_mismatch_detail": "存档版本 {saveVersion} 与当前游戏版本 {expectedVersion} 不匹配",
     "download_json": "下载 JSON",
@@ -703,7 +702,6 @@
     "import_failed": "导入失败",
     "reading_file": "读取文件...",
     "parse_failed": "解析失败",
-    "parse_error": "解析错误: {message}",
-    "export_all": "导出全部"
+    "parse_error": "解析错误: {message}"
   }
 }

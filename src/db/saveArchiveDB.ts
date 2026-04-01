@@ -20,12 +20,6 @@ export interface ArchiveData {
   data: SaveArchive
 }
 
-export interface ExportData {
-  version: string
-  exportedAt: string
-  archives: SaveArchive[]
-}
-
 const DB_NAME = 'X4SaveArchiveDB'
 const DB_VERSION = 1
 
@@ -130,26 +124,6 @@ export async function removeOutdatedArchivesFromDB(currentParserVersion: string)
   })
   
   return ids.length
-}
-
-export async function exportArchiveFromDB(guid: string, time: number): Promise<string | null> {
-  const id = generateId(guid, time)
-  const archive = await loadArchiveDetailFromDB(id)
-  if (!archive) return null
-  return JSON.stringify(archive, null, 2)
-}
-
-export async function exportAllArchivesFromDB(): Promise<string> {
-  const database = getDB()
-  const allData = await database.archiveData.toArray()
-  
-  const exportData: ExportData = {
-    version: '1.0',
-    exportedAt: new Date().toISOString(),
-    archives: allData.map(r => r.data)
-  }
-  
-  return JSON.stringify(exportData, null, 2)
 }
 
 export async function getArchiveCountFromDB(): Promise<number> {
