@@ -699,6 +699,16 @@
     "loading_json": "Loading JSON...",
     "import_failed": "Import failed",
     "reading_file": "Reading file...",
-    "parse_failed": "Parse failed"
+    "parse_failed": "Parse failed",
+    "tab_player_stations": "Player Stations",
+    "tab_npc_stations": "NPC Stations",
+    "tab_abandoned_ships": "Abandoned Ships",
+    "tab_datavaults": "Datavaults",
+    "tab_erlking_vaults": "Erlking Vaults",
+    "hq_badge": "HQ",
+    "has_blueprints": "Blueprints",
+    "has_wares": "Wares",
+    "has_signalleak": "Signal",
+    "empty_tab": "No data"
   }
 }

@@ -1,29 +1,91 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { SaveArchive, SectorData } from '@/types/saveArchive'
+import ViewTabUI from '@/components/common/ViewTabUI.vue'
+import type { SaveArchive, SectorData, StationEntry, DatavaultEntry, AbandonedShipEntry } from '@/types/saveArchive'
 
 const props = defineProps<{
   archive: SaveArchive | null
 }>()
 
 const { t } = useI18n()
+const activeTab = ref('player-stations')
 
-const sortedSectors = computed(() => {
-  if (!props.archive) return []
-
-  return Object.entries(props.archive.sectors)
-    .map(([macro, data]) => ({ macro, ...data }))
-    .sort((a, b) => a.name.localeCompare(b.name))
-})
+const tabs = computed(() => [
+  { key: 'player-stations', label: t('save_import.tab_player_stations') },
+  { key: 'npc-stations', label: t('save_import.tab_npc_stations') },
+  { key: 'abandoned-ships', label: t('save_import.tab_abandoned_ships') },
+  { key: 'datavaults', label: t('save_import.tab_datavaults') },
+  { key: 'erlking-vaults', label: t('save_import.tab_erlking_vaults') },
+])
 
 function formatCoord(value: number): string {
   return (value / 1000).toFixed(1) + 'km'
 }
 
-function countItems(sector: SectorData): number {
-  return sector.stations.length + sector.datavaults.length + sector.erlkingVaults.length + sector.abandonedShips.length
+interface SectorGroup<T> {
+  macro: string
+  name: string
+  items: T[]
 }
+
+function groupBySector<T>(
+  extractor: (sector: SectorData, macro: string) => T[],
+  sectors: Record<string, SectorData>
+): SectorGroup<T>[] {
+  return Object.entries(sectors)
+    .map(([macro, data]) => ({
+      macro,
+      name: data.name,
+      items: extractor(data, macro)
+    }))
+    .filter(group => group.items.length > 0)
+    .sort((a, b) => a.name.localeCompare(b.name))
+}
+
+const playerStationsData = computed(() => {
+  if (!props.archive) return []
+  return groupBySector((sector) => 
+    sector.stations.filter(s => s.owner === 'player'),
+    props.archive.sectors
+  )
+})
+
+const npcStationsData = computed(() => {
+  if (!props.archive) return []
+  return groupBySector((sector) =>
+    sector.stations.filter(s => s.owner !== 'player' && s.is_headquarter === true),
+    props.archive.sectors
+  )
+})
+
+const abandonedShipsData = computed(() => {
+  if (!props.archive) return []
+  return groupBySector((sector) => sector.abandonedShips, props.archive.sectors)
+})
+
+const datavaultsData = computed(() => {
+  if (!props.archive) return []
+  return groupBySector((sector) => sector.datavaults, props.archive.sectors)
+})
+
+const erlkingVaultsData = computed(() => {
+  if (!props.archive) return []
+  return groupBySector((sector) => sector.erlkingVaults, props.archive.sectors)
+})
+
+const tabData = computed(() => ({
+  'player-stations': playerStationsData.value,
+  'npc-stations': npcStationsData.value,
+  'abandoned-ships': abandonedShipsData.value,
+  'datavaults': datavaultsData.value,
+  'erlking-vaults': erlkingVaultsData.value,
+}))
+
+type TabKey = keyof typeof tabData.value
+
+const currentTabData = computed(() => tabData.value[activeTab.value as TabKey] || [])
+const hasData = computed(() => currentTabData.value.length > 0)
 </script>
 
 <template>
@@ -46,56 +108,59 @@ function countItems(sector: SectorData): number {
             v{{ archive.meta.version }}
           </span>
         </div>
+        <ViewTabUI
+          v-model="activeTab"
+          :views="tabs"
+          ui-key="save-detail"
+          color-style="sky"
+        />
       </div>
 
-      <div class="sector-list">
-        <div v-for="sector in sortedSectors" :key="sector.macro" class="sector-item">
-          <div class="sector-header">
-            <span class="sector-name">{{ sector.name }}</span>
-            <span class="sector-count">{{ countItems(sector) }}</span>
-          </div>
+      <div class="tab-content">
+        <div v-if="!hasData" class="empty-tab">
+          {{ t('save_import.empty_tab') }}
+        </div>
 
-          <div class="sector-content">
-            <div v-if="sector.stations.length > 0" class="item-group">
-              <div class="group-title">{{ t('save_import.stations') }} ({{ sector.stations.length }})</div>
-              <div class="item-list">
-                <div v-for="station in sector.stations" :key="station.code" class="item-row">
-                  <span class="item-owner">{{ station.owner || 'neutral' }}</span>
-                  <span class="item-coords">({{ formatCoord(station.x) }}, {{ formatCoord(station.z) }})</span>
-                  <span v-if="station.is_wreck" class="item-tag wreck">{{ t('save_import.wreck') }}</span>
-                  <span v-if="station.is_headquarter" class="item-tag hq">HQ</span>
-                </div>
-              </div>
+        <div v-else class="sector-list">
+          <div v-for="sector in currentTabData" :key="sector.macro" class="sector-group">
+            <div class="sector-header">
+              <span class="sector-name">{{ sector.name }}</span>
+              <span class="sector-count">{{ sector.items.length }}</span>
             </div>
 
-            <div v-if="sector.datavaults.length > 0" class="item-group">
-              <div class="group-title">{{ t('save_import.datavaults') }} ({{ sector.datavaults.length }})</div>
-              <div class="item-list">
-                <div v-for="vault in sector.datavaults" :key="vault.code" class="item-row">
-                  <span class="item-owner">{{ vault.owner || 'neutral' }}</span>
-                  <span class="item-coords">({{ formatCoord(vault.x) }}, {{ formatCoord(vault.z) }})</span>
+            <div class="item-list">
+              <template v-if="activeTab === 'player-stations'">
+                <div v-for="item in sector.items" :key="(item as StationEntry).code" class="item-row">
+                  <span class="item-code">{{ (item as StationEntry).code }}</span>
+                  <span class="item-coords">({{ formatCoord((item as StationEntry).x) }}, {{ formatCoord((item as StationEntry).z) }})</span>
+                  <span v-if="(item as StationEntry).is_headquarter" class="item-tag hq">{{ t('save_import.hq_badge') }}</span>
                 </div>
-              </div>
-            </div>
+              </template>
 
-            <div v-if="sector.erlkingVaults.length > 0" class="item-group">
-              <div class="group-title">{{ t('save_import.erlking_vaults') }} ({{ sector.erlkingVaults.length }})</div>
-              <div class="item-list">
-                <div v-for="vault in sector.erlkingVaults" :key="vault.code" class="item-row">
-                  <span class="item-owner">{{ vault.owner || 'neutral' }}</span>
-                  <span class="item-coords">({{ formatCoord(vault.x) }}, {{ formatCoord(vault.z) }})</span>
+              <template v-if="activeTab === 'npc-stations'">
+                <div v-for="item in sector.items" :key="(item as StationEntry).code" class="item-row">
+                  <span class="item-owner">{{ (item as StationEntry).owner || 'neutral' }}</span>
+                  <span class="item-coords">({{ formatCoord((item as StationEntry).x) }}, {{ formatCoord((item as StationEntry).z) }})</span>
                 </div>
-              </div>
-            </div>
+              </template>
 
-            <div v-if="sector.abandonedShips.length > 0" class="item-group">
-              <div class="group-title">{{ t('save_import.abandoned_ships') }} ({{ sector.abandonedShips.length }})</div>
-              <div class="item-list">
-                <div v-for="ship in sector.abandonedShips" :key="ship.code" class="item-row">
-                  <span class="item-class">{{ ship.class }}</span>
-                  <span class="item-coords">({{ formatCoord(ship.x) }}, {{ formatCoord(ship.z) }})</span>
+              <template v-if="activeTab === 'abandoned-ships'">
+                <div v-for="item in sector.items" :key="(item as AbandonedShipEntry).code" class="item-row">
+                  <span class="item-class">{{ (item as AbandonedShipEntry).class }}</span>
+                  <span class="item-coords">({{ formatCoord((item as AbandonedShipEntry).x) }}, {{ formatCoord((item as AbandonedShipEntry).z) }})</span>
                 </div>
-              </div>
+              </template>
+
+              <template v-if="activeTab === 'datavaults' || activeTab === 'erlking-vaults'">
+                <div v-for="item in sector.items" :key="(item as DatavaultEntry).code" class="item-row">
+                  <span class="item-coords">({{ formatCoord((item as DatavaultEntry).x) }}, {{ formatCoord((item as DatavaultEntry).z) }})</span>
+                  <div class="item-marks">
+                    <span v-if="(item as DatavaultEntry).has_blueprints" class="mark-badge">{{ t('save_import.has_blueprints') }}</span>
+                    <span v-if="(item as DatavaultEntry).has_wares" class="mark-badge">{{ t('save_import.has_wares') }}</span>
+                    <span v-if="(item as DatavaultEntry).has_signalleak" class="mark-badge">{{ t('save_import.has_signalleak') }}</span>
+                  </div>
+                </div>
+              </template>
             </div>
           </div>
         </div>
@@ -122,7 +187,7 @@ function countItems(sector: SectorData): number {
 }
 
 .detail-header {
-  @apply p-3 border-b border-slate-700;
+  @apply flex items-center justify-between p-3 border-b border-slate-700 gap-2;
 }
 
 .meta-info {
@@ -141,12 +206,20 @@ function countItems(sector: SectorData): number {
   @apply bg-amber-500/20 text-amber-400;
 }
 
-.sector-list {
+.tab-content {
   @apply flex-1 overflow-y-auto p-2;
 }
 
-.sector-item {
-  @apply mb-2 rounded bg-slate-800/30;
+.empty-tab {
+  @apply text-sm text-slate-500 text-center py-4;
+}
+
+.sector-list {
+  @apply flex flex-col gap-2;
+}
+
+.sector-group {
+  @apply rounded bg-slate-800/30;
 }
 
 .sector-header {
@@ -161,24 +234,16 @@ function countItems(sector: SectorData): number {
   @apply px-1.5 py-0.5 text-xs rounded bg-slate-700 text-slate-400;
 }
 
-.sector-content {
-  @apply p-2;
-}
-
-.item-group {
-  @apply mb-2;
-}
-
-.group-title {
-  @apply text-xs text-slate-500 mb-1;
-}
-
 .item-list {
-  @apply flex flex-col gap-1;
+  @apply p-2 flex flex-col gap-1;
 }
 
 .item-row {
   @apply flex items-center gap-2 text-xs py-1 px-2 rounded hover:bg-slate-700/30;
+}
+
+.item-code {
+  @apply text-slate-300;
 }
 
 .item-owner {
@@ -197,11 +262,15 @@ function countItems(sector: SectorData): number {
   @apply px-1.5 py-0.5 text-xs rounded;
 }
 
-.item-tag.wreck {
-  @apply bg-red-500/20 text-red-400;
-}
-
 .item-tag.hq {
   @apply bg-emerald-500/20 text-emerald-400;
+}
+
+.item-marks {
+  @apply flex items-center gap-1;
+}
+
+.mark-badge {
+  @apply px-1.5 py-0.5 text-xs rounded bg-sky-500/20 text-sky-400;
 }
 </style>
