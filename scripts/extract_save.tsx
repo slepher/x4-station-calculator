@@ -2,6 +2,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import zlib from 'node:zlib'
 import sax from 'sax'
+import xmlFormat from 'xml-formatter'
 import { createSaveParserRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
 
@@ -238,7 +239,7 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
           sectorHasContent = true
           outputChunks.push(sectorOpenTag)
         }
-        outputChunks.push(`<component${attrStr}>`)
+        outputChunks.push(`<component${attrStr}></component>`)
       }
       return
     }
@@ -259,9 +260,7 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
       sectorHasContent = false
       sectorOpenTag = ''
     } else if (isInsideSector && depth > sectorDepth && name === 'component') {
-      if (sectorHasContent) {
-        outputChunks.push(`</component>`)
-      }
+      // Child component already closed in onopentag
     } else if (shouldOutput() && versionMatch) {
       outputChunks.push(`</${name}>`)
     }
@@ -270,16 +269,12 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
     depth--
   }
   
-  parser.ontext = (text: string) => {
-    if (shouldOutput() && versionMatch && text.trim()) {
-      outputChunks.push(escapeXml(text))
-    }
+  parser.ontext = (_text: string) => {
+    // Ignore text content
   }
   
-  parser.oncdata = (data: string) => {
-    if (shouldOutput() && versionMatch) {
-      outputChunks.push(`<![CDATA[${data}]]>`)
-    }
+  parser.oncdata = (_data: string) => {
+    // Ignore CDATA content
   }
   
   let sourceBytesRead = 0
@@ -305,7 +300,13 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
     throw new Error('Version mismatch')
   }
   
-  fs.writeFileSync(absoluteOutput, outputChunks.join(''))
+  const rawXml = outputChunks.join('')
+  const formattedXml = xmlFormat(rawXml, {
+    indentation: '  ',
+    collapseContent: true,
+    lineSeparator: '\n'
+  })
+  fs.writeFileSync(absoluteOutput, formattedXml + '\n')
   
   console.log(`[extract_save] done: ${sectorCount} sectors extracted`)
   console.log(`[extract_save] xml written: ${absoluteOutput}`)
