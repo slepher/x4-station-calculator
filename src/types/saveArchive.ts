@@ -12,6 +12,8 @@ export interface ProgressInfo {
   done: boolean
   inputComplete: boolean
   error: string | null
+  version?: string
+  versionMismatch?: boolean
 }
 
 export interface SaveMeta {

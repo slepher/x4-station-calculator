@@ -641,6 +641,15 @@ if (hasWorkerRuntime()) {
       }
 
       const archive = runtime.close()
+      
+      if (!archive.isCompatible) {
+        self.postMessage({ 
+          type: 'error', 
+          message: `Version mismatch: save version ${archive.meta.version} does not match current game version ${config.currentVersion}` 
+        } as SaveParserMessage)
+        return
+      }
+      
       self.postMessage({ type: 'complete', data: archive } as SaveParserMessage)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error'

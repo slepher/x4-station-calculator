@@ -40,17 +40,27 @@
 
 **那么** 启动流式解析（Rust Worker）
 
+**并且** 传入当前游戏版本用于校验
+
 **并且** 显示解析进度状态：
 - 百分比进度
 - 已解析sector数量
 - 当前阶段（receiving/parsing/finalizing/done/error）
 - 错误信息（如有）
 
-**当** 解析完成
+**当** 解析完成且版本匹配
 
 **那么** 存档数据添加到对应guid分组
 
 **并且** 存档列表更新显示
+
+**当** 解析完成但版本不匹配
+
+**那么** 返回版本错误
+
+**并且** 显示错误信息："Version mismatch: save version X does not match current game version Y"
+
+**并且** 不加载该存档
 
 #### Scenario: 上传已提取JSON文件
 

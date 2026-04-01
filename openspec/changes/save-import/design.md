@@ -175,6 +175,24 @@ interface ArchiveGroup {
 - 向主线程报告 ProgressInfo 进度
 - 解析完成后一次性返回结果对象
 - 可选性能分析（通过 `options.profile` 参数）
+- **版本校验**: Worker 接收 `currentVersion` 参数，解析完成后立即校验版本，不匹配则返回错误
+
+**Worker消息格式**:
+```typescript
+// 主线程 → Worker
+{
+  type: 'parse',
+  arrayBuffer: ArrayBuffer,
+  filename: string,
+  currentVersion: string  // 从 useGameDataStore.currentVersion 获取
+}
+
+// Worker → 主线程（版本不匹配）
+{
+  type: 'error',
+  message: 'Version mismatch: save version X does not match current game version Y'
+}
+```
 
 **替代方案**: SAX解析（`sax-js`）
 - 缺点: 性能较 Rust 版本慢

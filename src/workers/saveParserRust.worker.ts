@@ -4,6 +4,16 @@ import wasmUrl from '@/wasm/save_parser_bg.wasm?url'
 
 let wasmInitialized = false
 
+function normalizeVersion(v: string): string {
+  if (/^\d+\.\d+$/.test(v.trim())) {
+    const parsed = Number(v)
+    return Number.isFinite(parsed) ? parsed.toFixed(1) : v
+  }
+  const num = parseInt(v, 10)
+  if (Number.isNaN(num)) return v
+  return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
+}
+
 async function ensureWasmInit() {
   if (wasmInitialized) return
   const wasmBinary = await fetch(wasmUrl).then(r => r.arrayBuffer())
@@ -20,14 +30,16 @@ function getGzipUncompressedSize(buf: ArrayBuffer): number | null {
 }
 
 if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: unknown }).importScripts === 'function') {
-  self.onmessage = async (e: MessageEvent<{ type: string; arrayBuffer?: ArrayBuffer; filename?: string }>) => {
-    const { type, arrayBuffer, filename } = e.data
+  self.onmessage = async (e: MessageEvent<{ type: string; arrayBuffer?: ArrayBuffer; filename?: string; currentVersion?: string }>) => {
+    const { type, arrayBuffer, filename, currentVersion } = e.data
 
     if (type !== 'parse' || !arrayBuffer) return
 
     const postProgress = (info: ProgressInfo) => {
       self.postMessage({ type: 'progress', data: info } as SaveParserRustMessage)
     }
+
+    const expectedVersion = currentVersion || '8.0'
 
     try {
       postProgress({
@@ -101,6 +113,20 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
 
       const result = parser.finish(filename || '')
       const archive = JSON.parse(result)
+      
+      const archiveVersion = archive.meta?.version || ''
+      const normalizedArchive = normalizeVersion(archiveVersion)
+      const normalizedExpected = normalizeVersion(expectedVersion)
+      const isCompatible = normalizedArchive === normalizedExpected
+      
+      if (!isCompatible) {
+        self.postMessage({ 
+          type: 'error', 
+          message: `Version mismatch: save version ${archiveVersion} (${normalizedArchive}) does not match current game version ${expectedVersion} (${normalizedExpected})` 
+        } as SaveParserRustMessage)
+        return
+      }
+      
       self.postMessage({ type: 'complete', data: archive } as SaveParserRustMessage)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error'

@@ -390,6 +390,7 @@ export function createSaveParserRuntime(
   options?: {
     onProgress?: (info: SaveParserProgressInfo) => void
     progressIntervalMs?: number
+    currentVersion?: string
   }
 ): SaveParserRuntime {
   const parser = new X4SaveParser()
@@ -399,6 +400,7 @@ export function createSaveParserRuntime(
   let bytesProcessed = 0
   let lastProgressAt = 0
   const progressIntervalMs = options?.progressIntervalMs ?? DEFAULT_PROGRESS_INTERVAL_MS
+  const currentVersion = options?.currentVersion || '8.0'
 
   saxParser.onopentag = (node: TagNode) => {
     parser.onOpenTag(node)
@@ -453,7 +455,7 @@ export function createSaveParserRuntime(
           source: 'original'
         },
         sectors: parser.data.sectors,
-        isCompatible: normalizeVersion(parser.data.meta.version) === normalizeVersion('8.0')
+        isCompatible: normalizeVersion(parser.data.meta.version) === normalizeVersion(currentVersion)
       }
     },
     getProgress() {
@@ -475,7 +477,7 @@ export async function parseSaveXmlChunks(
   return runtime.close('')
 }
 
-type WorkerMessageData = { type: string; arrayBuffer?: ArrayBuffer; filename?: string }
+type WorkerMessageData = { type: string; arrayBuffer?: ArrayBuffer; filename?: string; currentVersion?: string }
 
 function hasWorkerRuntime(): boolean {
   const scope = globalThis as { postMessage?: unknown; self?: unknown; importScripts?: unknown }
@@ -487,9 +489,11 @@ function hasWorkerRuntime(): boolean {
 
 if (hasWorkerRuntime()) {
   self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
-    const { type, arrayBuffer, filename } = e.data
+    const { type, arrayBuffer, filename, currentVersion } = e.data
 
     if (type !== 'parse' || !arrayBuffer) return
+
+    const expectedVersion = currentVersion || '8.0'
 
     try {
       self.postMessage({ 
@@ -540,6 +544,7 @@ if (hasWorkerRuntime()) {
       let totalBytesProcessed = 0
       const runtime = createSaveParserRuntime({
         progressIntervalMs: DEFAULT_PROGRESS_INTERVAL_MS,
+        currentVersion: expectedVersion,
         onProgress: (progress) => {
           totalBytesProcessed = progress.bytesProcessed
           const currentMB = Math.floor(progress.bytesProcessed / (1024 * 1024))
@@ -578,6 +583,16 @@ if (hasWorkerRuntime()) {
       }
 
       const archive = runtime.close(filename || '')
+      
+      if (!archive.isCompatible) {
+        const archiveVersion = archive.meta.version
+        self.postMessage({ 
+          type: 'error', 
+          message: `Version mismatch: save version ${archiveVersion} does not match current game version ${expectedVersion}` 
+        } as SaveParserMessage)
+        return
+      }
+      
       self.postMessage({ 
         type: 'progress', 
         data: { 

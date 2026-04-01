@@ -2,10 +2,12 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import type { SaveArchive, SaveParserRustMessage } from '@/types/saveArchive'
 
 const { t } = useI18n()
 const saveStore = useSaveStore()
+const gameDataStore = useGameDataStore()
 
 const isDragging = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
@@ -118,7 +120,12 @@ async function processXmlFile(file: File) {
       worker.terminate()
     }
 
-    worker.postMessage({ type: 'parse', arrayBuffer, filename: file.name }, [arrayBuffer])
+    worker.postMessage({ 
+      type: 'parse', 
+      arrayBuffer, 
+      filename: file.name,
+      currentVersion: gameDataStore.currentVersion 
+    }, [arrayBuffer])
   } catch (e) {
     const message = e instanceof Error ? e.message : t('save_import.parse_failed')
     saveStore.setParsingState(false, '', message)
