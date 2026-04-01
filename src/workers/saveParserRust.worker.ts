@@ -87,6 +87,12 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
           const progressJson = parser.progress_json()
           const progress: ProgressInfo = JSON.parse(progressJson)
           postProgress(progress)
+          
+          if (progress.error) {
+            self.postMessage({ type: 'error', message: progress.error } as SaveParserRustMessage)
+            return
+          }
+          
           if (!hasMore) break
         }
       } else {
@@ -101,6 +107,12 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
           const progressJson = parser.progress_json()
           const progress: ProgressInfo = JSON.parse(progressJson)
           postProgress(progress)
+          
+          if (progress.error) {
+            self.postMessage({ type: 'error', message: progress.error } as SaveParserRustMessage)
+            return
+          }
+          
           if (!hasMore) break
         }
       }
@@ -110,7 +122,11 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
       
       self.postMessage({ type: 'complete', data: archive } as SaveParserRustMessage)
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error'
+      const message = error instanceof Error 
+        ? error.message 
+        : typeof error === 'string' 
+          ? error 
+          : 'Unknown error'
       self.postMessage({ type: 'error', message } as SaveParserRustMessage)
     }
   }
