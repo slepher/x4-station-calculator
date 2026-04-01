@@ -1,7 +1,19 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { SaveArchive, ArchiveGroup, SectorData } from '@/types/saveArchive'
+import type { SaveArchive, ArchiveGroup, SectorData, SaveParserErrorDetail } from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
+
+function normalizeVersion(v: string): string {
+  const trimmed = v.trim()
+  if (/^\d+\.\d+$/.test(trimmed)) {
+    const parsed = Number(trimmed)
+    return Number.isFinite(parsed) ? parsed.toFixed(1) : v
+  }
+
+  const num = parseInt(trimmed, 10)
+  if (isNaN(num)) return v
+  return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
+}
 
 function generateExportFileName(meta: SaveArchive['meta']): string {
   const safeName = meta.playerName.replace(/[^\w\-]/g, '_')
@@ -38,18 +50,6 @@ export const useSaveStore = defineStore('save', () => {
   })
 
   function checkVersionCompatibility(version: string): boolean {
-    const normalizeVersion = (v: string): string => {
-      const trimmed = v.trim()
-      if (/^\d+\.\d+$/.test(trimmed)) {
-        const parsed = Number(trimmed)
-        return Number.isFinite(parsed) ? parsed.toFixed(1) : v
-      }
-
-      const num = parseInt(trimmed, 10)
-      if (isNaN(num)) return v
-      return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
-    }
-
     const normalizedVersion = normalizeVersion(version)
     const currentVersion = normalizeVersion(gameDataStore.currentVersion)
     console.log('[checkVersionCompatibility] input version:', version, 'normalized:', normalizedVersion)
@@ -159,33 +159,43 @@ export const useSaveStore = defineStore('save', () => {
     URL.revokeObjectURL(url)
   }
 
-  function importFromJson(jsonData: unknown): { success: boolean; error?: string } {
+  function importFromJson(jsonData: unknown): { success: boolean; error?: string; errorDetail?: SaveParserErrorDetail } {
     try {
       if (!jsonData || typeof jsonData !== 'object') {
-        return { success: false, error: 'Invalid JSON format' }
+        return { success: false, error: 'Invalid JSON format', errorDetail: { type: 'parse_error', message: 'Invalid JSON format' } }
       }
 
       const data = jsonData as { meta?: unknown; sectors?: unknown }
 
       if (!data.meta || typeof data.meta !== 'object') {
-        return { success: false, error: 'Missing meta information' }
+        return { success: false, error: 'Missing meta information', errorDetail: { type: 'parse_error', message: 'Missing meta information' } }
       }
 
       const meta = data.meta as SaveArchive['meta']
 
       if (!meta.guid || !meta.seed || !meta.time || !meta.version) {
-        return { success: false, error: 'Missing required meta fields' }
+        return { success: false, error: 'Missing required meta fields', errorDetail: { type: 'parse_error', message: 'Missing required meta fields' } }
       }
 
-      if (!checkVersionCompatibility(meta.version)) {
+      const normalizedSaveVersion = normalizeVersion(meta.version)
+      const normalizedCurrentVersion = normalizeVersion(gameDataStore.currentVersion)
+      
+      if (normalizedSaveVersion !== normalizedCurrentVersion) {
         return { 
           success: false, 
-          error: `Version mismatch: save version ${meta.version} does not match current game version ${gameDataStore.currentVersion}` 
+          error: `Version mismatch: save version ${meta.version} does not match current game version ${gameDataStore.currentVersion}`,
+          errorDetail: {
+            type: 'version_mismatch',
+            save_version: meta.version,
+            save_version_normalized: normalizedSaveVersion,
+            expected_version: gameDataStore.currentVersion,
+            expected_version_normalized: normalizedCurrentVersion
+          }
         }
       }
 
       if (!data.sectors || typeof data.sectors !== 'object') {
-        return { success: false, error: 'Missing sectors data' }
+        return { success: false, error: 'Missing sectors data', errorDetail: { type: 'parse_error', message: 'Missing sectors data' } }
       }
 
       const sectors = data.sectors as Record<string, SectorData>
@@ -211,7 +221,7 @@ export const useSaveStore = defineStore('save', () => {
       return { success: true }
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown error'
-      return { success: false, error: message }
+      return { success: false, error: message, errorDetail: { type: 'parse_error', message } }
     }
   }
 

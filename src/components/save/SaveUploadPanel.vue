@@ -74,7 +74,20 @@ async function processJsonFile(file: File) {
         emit('upload-complete', saveStore.selectedArchive)
       }
     } else {
-      saveStore.setParsingState(false, '', result.error || t('save_import.import_failed'))
+      let errorMessage = result.error || t('save_import.import_failed')
+      
+      if (result.errorDetail?.type === 'version_mismatch') {
+        errorMessage = t('save_import.version_mismatch_detail', {
+          saveVersion: result.errorDetail.save_version_normalized,
+          expectedVersion: result.errorDetail.expected_version_normalized
+        })
+      } else if (result.errorDetail?.type === 'parse_error') {
+        errorMessage = t('save_import.parse_error', {
+          message: result.errorDetail.message
+        })
+      }
+      
+      saveStore.setParsingState(false, '', errorMessage)
     }
   } catch (e) {
     const message = e instanceof Error ? e.message : t('save_import.import_failed')
@@ -110,7 +123,20 @@ async function processXmlFile(file: File) {
         emit('upload-complete', msg.data)
         worker.terminate()
       } else if (msg.type === 'error') {
-        saveStore.setParsingState(false, '', msg.message || t('save_import.parse_failed'))
+        let errorMessage = msg.message || t('save_import.parse_failed')
+        
+        if (msg.detail?.type === 'version_mismatch') {
+          errorMessage = t('save_import.version_mismatch_detail', {
+            saveVersion: msg.detail.save_version_normalized,
+            expectedVersion: msg.detail.expected_version_normalized
+          })
+        } else if (msg.detail?.type === 'parse_error') {
+          errorMessage = t('save_import.parse_error', {
+            message: msg.detail.message
+          })
+        }
+        
+        saveStore.setParsingState(false, '', errorMessage)
         worker.terminate()
       }
     }

@@ -2,10 +2,10 @@ export type SaveSource = 'original' | 'imported'
 
 export interface VersionMismatchError {
   type: 'version_mismatch'
-  saveVersion: string
-  saveVersionNormalized: string
-  expectedVersion: string
-  expectedVersionNormalized: string
+  save_version: string
+  save_version_normalized: string
+  expected_version: string
+  expected_version_normalized: string
 }
 
 export interface ParseError {
