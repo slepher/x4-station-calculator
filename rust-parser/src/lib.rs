@@ -43,6 +43,10 @@ impl SaveParser {
         self.inner.progress_json()
     }
 
+    pub fn take_cli_progress_json(&mut self) -> String {
+        self.inner.take_cli_progress_json()
+    }
+
     pub fn pump(&mut self, max_events: usize) -> bool {
         self.inner.pump(max_events)
     }

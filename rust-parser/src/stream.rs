@@ -3,6 +3,23 @@ use crate::model::{ParsePhase, ParserError, ProgressInfo, SaveArchive};
 use quick_xml::encoding::Decoder;
 use std::collections::HashMap;
 
+const CLI_PROGRESS_INTERVAL_MS: f64 = 1000.0;
+
+#[cfg(target_arch = "wasm32")]
+fn now_ms() -> f64 {
+    js_sys::Date::now()
+}
+
+#[cfg(not(target_arch = "wasm32"))]
+fn now_ms() -> f64 {
+    use std::time::{SystemTime, UNIX_EPOCH};
+
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .map(|duration| duration.as_secs_f64() * 1000.0)
+        .unwrap_or(0.0)
+}
+
 fn parse_attrs<'a>(
     e: &'a quick_xml::events::BytesStart<'a>,
     decoder: Decoder,
@@ -32,6 +49,11 @@ pub(crate) struct StreamingSaveParser {
     done: bool,
     error: Option<ParserError>,
     core: SaveParserCore,
+    last_reported_phase: Option<ParsePhase>,
+    last_reported_percent_bucket: Option<u32>,
+    last_reported_done: bool,
+    last_reported_has_error: bool,
+    last_cli_reported_at_ms: Option<f64>,
 }
 
 impl StreamingSaveParser {
@@ -47,6 +69,11 @@ impl StreamingSaveParser {
             done: false,
             error: None,
             core: SaveParserCore::new(expected_version),
+            last_reported_phase: None,
+            last_reported_percent_bucket: None,
+            last_reported_done: false,
+            last_reported_has_error: false,
+            last_cli_reported_at_ms: None,
         }
     }
 
@@ -79,12 +106,17 @@ impl StreamingSaveParser {
         self.input_complete = true;
     }
 
-    pub(crate) fn progress_json(&self) -> String {
+    fn current_progress_info(&self) -> ProgressInfo {
         let buffered = self.buffer.len().saturating_sub(self.committed);
-        let raw_pct = if self.input_bytes_received == 0 {
+        let progress_total = if self.expected_total_bytes > 0 {
+            self.expected_total_bytes
+        } else {
+            self.input_bytes_received
+        };
+        let raw_pct = if progress_total == 0 {
             0.0
         } else {
-            self.total_parsed as f64 / self.input_bytes_received as f64 * 100.0
+            self.total_parsed as f64 / progress_total as f64 * 100.0
         };
         let pct = match self.phase {
             ParsePhase::Receiving => 0.0,
@@ -94,7 +126,7 @@ impl StreamingSaveParser {
             ParsePhase::Error => raw_pct.clamp(0.0, 100.0),
         };
 
-        serde_json::to_string(&ProgressInfo {
+        ProgressInfo {
             phase: self.phase,
             input_bytes_total: self.input_bytes_received,
             parsed_bytes_total: self.total_parsed,
@@ -107,8 +139,42 @@ impl StreamingSaveParser {
             input_complete: self.input_complete,
             error: self.error.as_ref().map(|e| e.to_string()),
             error_detail: self.error.as_ref().map(|e| e.detail.clone()),
-        })
-        .unwrap_or_default()
+        }
+    }
+
+    pub(crate) fn progress_json(&self) -> String {
+        serde_json::to_string(&self.current_progress_info()).unwrap_or_default()
+    }
+
+    pub(crate) fn take_cli_progress_json(&mut self) -> String {
+        let progress = self.current_progress_info();
+        let current_bucket = progress.percent.floor() as u32;
+        let has_error = progress.error.is_some();
+        let force_report = self.last_reported_phase.is_none()
+            || self.last_reported_phase != Some(progress.phase)
+            || self.last_reported_done != progress.done
+            || self.last_reported_has_error != has_error
+            || matches!(progress.phase, ParsePhase::Finalizing | ParsePhase::Done | ParsePhase::Error);
+
+        let now = now_ms();
+        let interval_elapsed = self
+            .last_cli_reported_at_ms
+            .map(|last| now - last >= CLI_PROGRESS_INTERVAL_MS)
+            .unwrap_or(true);
+        let bucket_changed = self.last_reported_percent_bucket != Some(current_bucket);
+        let should_report = force_report || (bucket_changed && interval_elapsed);
+
+        if !should_report {
+            return String::new();
+        }
+
+        self.last_reported_phase = Some(progress.phase);
+        self.last_reported_percent_bucket = Some(current_bucket);
+        self.last_reported_done = progress.done;
+        self.last_reported_has_error = has_error;
+        self.last_cli_reported_at_ms = Some(now);
+
+        serde_json::to_string(&progress).unwrap_or_default()
     }
 
     pub(crate) fn pump(&mut self, max_events: usize) -> bool {
@@ -144,6 +210,7 @@ impl StreamingSaveParser {
         let mut processed = 0usize;
         let mut hit_eof = false;
         let mut last_good_pos = 0usize;
+        let mut waiting_for_more_input = false;
 
         while processed < max_events {
             let mut event_buf = Vec::new();
@@ -192,6 +259,7 @@ impl StreamingSaveParser {
                         )));
                         return false;
                     }
+                    waiting_for_more_input = true;
                     break;
                 }
             }
@@ -246,7 +314,11 @@ impl StreamingSaveParser {
             return false;
         }
 
-        self.buffer.len() > self.committed || !self.input_complete
+        if !self.input_complete && (hit_eof || waiting_for_more_input) {
+            return false;
+        }
+
+        self.buffer.len() > self.committed
     }
 
     pub(crate) fn finish_archive(&self, filename: &str) -> Result<SaveArchive, ParserError> {

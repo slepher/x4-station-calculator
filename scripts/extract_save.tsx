@@ -129,11 +129,53 @@ function formatMB(bytes: number): string {
 }
 
 function getGzipUncompressedSize(buf: Buffer): number | null {
-  if (buf.length < 18) return null
-  if (buf[0] !== 0x1f || buf[1] !== 0x8b) return null
+  if (buf.length < 4) return null
   return buf.readUInt32LE(buf.length - 4)
 }
 
+function getGzipUncompressedSizeFromFile(filePath: string): number | null {
+  const stat = fs.statSync(filePath)
+  if (stat.size < 18) return null
+  const header = Buffer.alloc(2)
+  const trailer = Buffer.alloc(4)
+  const fd = fs.openSync(filePath, 'r')
+  try {
+    fs.readSync(fd, header, 0, 2, 0)
+    if (header[0] !== 0x1f || header[1] !== 0x8b) return null
+    fs.readSync(fd, trailer, 0, 4, stat.size - 4)
+  } finally {
+    fs.closeSync(fd)
+  }
+  return trailer.readUInt32LE(0)
+}
+
+function pumpWasmParser(options: {
+  parser: {
+    pump: (maxEvents: number) => boolean
+    progress_json: () => string
+    take_cli_progress_json?: () => string
+  }
+  maxEventsPerPump: number
+  onProgress: (progress: ProgressInfo) => void
+}): void {
+  while (true) {
+    const hasMore = options.parser.pump(options.maxEventsPerPump)
+    const cliProgressJson = options.parser.take_cli_progress_json?.() || ''
+    if (cliProgressJson) {
+      options.onProgress(JSON.parse(cliProgressJson) as ProgressInfo)
+    }
+    const progress = JSON.parse(options.parser.progress_json()) as ProgressInfo
+
+    if (progress.error) {
+      if (progress.errorDetail) {
+        console.error('[extract_save] error detail:', JSON.stringify(progress.errorDetail, null, 2))
+      }
+      throw new Error(progress.error)
+    }
+
+    if (!hasMore) return
+  }
+}
 
 export function createFilteredSaveXmlRuntime(options: FilteredXmlRuntimeOptions): FilteredXmlRuntime {
   return createSaveXmlFilterRuntime({
@@ -539,55 +581,52 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
   
   const start = performance.now()
 
-  let inputBuffer: Buffer
-  let totalBytes: number
-
-  if (gzip) {
-    console.log('[extract_save] decompressing...')
-    const compressed = fs.readFileSync(absoluteInput)
-    const expectedSize = getGzipUncompressedSize(compressed)
-    if (expectedSize && expectedSize > 0) {
-      parser.set_expected_total_bytes(expectedSize)
-    }
-    inputBuffer = zlib.gunzipSync(compressed)
-    totalBytes = inputBuffer.length
-    console.log(`[extract_save] decompressed size: ${formatMB(totalBytes)} MB`)
-  } else {
-    inputBuffer = fs.readFileSync(absoluteInput)
-    totalBytes = inputBuffer.length
-    parser.set_expected_total_bytes(totalBytes)
-    console.log(`[extract_save] file size: ${formatMB(totalBytes)} MB`)
-  }
-
-  parser.push_chunk(new Uint8Array(inputBuffer))
-  parser.finish_input()
-
   console.log('[extract_save] parsing...')
   const MAX_EVENTS_PER_PUMP = 50000
-  let pumpCount = 0
-
-  while (true) {
-    const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
-    pumpCount++
-
-    const progressJson = parser.progress_json()
-    const progress = JSON.parse(progressJson) as ProgressInfo
-
-    if (pumpCount % 20 === 0 || !hasMore) {
-      console.log(
-        `[extract_save] ${progress.percent.toFixed(1)}% parsed, ${formatMB(progress.parsedBytesTotal)} MB / ${formatMB(progress.inputBytesTotal)} MB, ${progress.tagCount} tags, ${progress.sectorCount} sectors`
-      )
-    }
-    
-    if (progress.error) {
-      if (progress.errorDetail) {
-        console.error('[extract_save] error detail:', JSON.stringify(progress.errorDetail, null, 2))
-      }
-      throw new Error(progress.error)
-    }
-
-    if (!hasMore) break
+  const reportProgress = (progress: ProgressInfo) => {
+    console.log(
+      `[extract_save] ${progress.percent.toFixed(1)}% parsed, ${formatMB(progress.parsedBytesTotal)} MB / ${formatMB(progress.expectedTotalBytes || progress.inputBytesTotal)} MB, ${progress.tagCount} tags, ${progress.sectorCount} sectors`
+    )
   }
+
+  if (gzip) {
+    const expectedSize = getGzipUncompressedSizeFromFile(absoluteInput)
+    if (expectedSize && expectedSize > 0) {
+      parser.set_expected_total_bytes(expectedSize)
+      console.log(`[extract_save] decompressed size: ${formatMB(expectedSize)} MB`)
+    } else {
+      console.log('[extract_save] decompressing...')
+    }
+
+    const gunzip = zlib.createGunzip()
+    fs.createReadStream(absoluteInput).pipe(gunzip)
+    for await (const chunk of gunzip) {
+      parser.push_chunk(new Uint8Array(chunk as Buffer))
+      pumpWasmParser({
+        parser,
+        maxEventsPerPump: MAX_EVENTS_PER_PUMP,
+        onProgress: reportProgress
+      })
+    }
+  } else {
+    parser.set_expected_total_bytes(stat.size)
+    console.log(`[extract_save] file size: ${formatMB(stat.size)} MB`)
+    for await (const chunk of fs.createReadStream(absoluteInput)) {
+      parser.push_chunk(new Uint8Array(chunk as Buffer))
+      pumpWasmParser({
+        parser,
+        maxEventsPerPump: MAX_EVENTS_PER_PUMP,
+        onProgress: reportProgress
+      })
+    }
+  }
+
+  parser.finish_input()
+  pumpWasmParser({
+    parser,
+    maxEventsPerPump: MAX_EVENTS_PER_PUMP,
+    onProgress: reportProgress
+  })
 
   const elapsed = performance.now() - start
   console.log(`[extract_save] parse time: ${elapsed.toFixed(0)}ms`)

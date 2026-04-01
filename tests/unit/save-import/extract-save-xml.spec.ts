@@ -232,4 +232,5 @@ describe('extract save xml filtering', () => {
     expect(result.xml).toContain('<position x="4" y="5" z="6"/>')
     expect(result.xml).toContain('<child foo="bar"/>')
   })
+
 })

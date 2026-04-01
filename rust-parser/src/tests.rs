@@ -55,4 +55,57 @@ mod tests {
         assert_eq!(module.equipments[0].ref_field, "shield_macro");
         assert_eq!(module.equipments[0].exact, 2);
     }
+
+    #[test]
+    fn progress_percent_uses_expected_total_bytes_when_available() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" known="1"></component></savegame>"#;
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.set_expected_total_bytes(xml.len() * 2);
+        parser.push_chunk(xml.as_bytes());
+        let _ = parser.pump(4096);
+
+        let progress: serde_json::Value =
+            serde_json::from_str(&parser.progress_json()).expect("progress json");
+
+        let percent = progress["percent"].as_f64().expect("percent");
+        assert!(percent > 40.0 && percent < 60.0, "percent was {percent}");
+    }
+
+    #[test]
+    fn pump_stops_when_waiting_for_more_stream_input() {
+        let partial = b"<savegame><info><game";
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(partial);
+
+        let has_more = parser.pump(4096);
+
+        assert!(!has_more);
+    }
+
+    #[test]
+    fn cli_progress_is_emitted_only_when_rust_progress_bucket_changes() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="station_macro" owner="player" code="AAA"><offset><position x="1" y="2" z="3"/></offset></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.set_expected_total_bytes(xml.len() * 100);
+        parser.push_chunk(xml.as_bytes());
+
+        let initial = parser.take_cli_progress_json();
+        assert!(!initial.is_empty());
+
+        let _ = parser.pump(1);
+        let progress_a = parser.take_cli_progress_json();
+
+        let _ = parser.pump(1);
+        let progress_b = parser.take_cli_progress_json();
+
+        assert!(progress_a.is_empty() || progress_b.is_empty());
+
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let final_progress = parser.take_cli_progress_json();
+        assert!(!final_progress.is_empty());
+        assert!(final_progress.contains(r#""done":true"#));
+    }
 }
