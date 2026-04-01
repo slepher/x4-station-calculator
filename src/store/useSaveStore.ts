@@ -63,6 +63,9 @@ export const useSaveStore = defineStore('save', () => {
   async function initialize(): Promise<void> {
     if (isInitialized.value) return
     
+    // Set initialized flag early to prevent concurrent calls
+    isInitialized.value = true
+    
     try {
       const removedCount = await removeOutdatedArchivesFromDB(CURRENT_PARSER_VERSION)
       if (removedCount > 0) {
@@ -70,6 +73,9 @@ export const useSaveStore = defineStore('save', () => {
       }
       
       const metaList = await loadArchiveListFromDB()
+      
+      // Clear existing data before loading to ensure idempotency
+      archives.value.clear()
       
       for (const meta of metaList) {
         const guid = meta.guid
@@ -91,7 +97,13 @@ export const useSaveStore = defineStore('save', () => {
         }
         
         if (existingGroup) {
-          existingGroup.saves.push(stubArchive)
+          // Check if this save already exists (by time)
+          const existingIndex = existingGroup.saves.findIndex(s => s.meta.time === meta.time)
+          if (existingIndex >= 0) {
+            existingGroup.saves[existingIndex] = stubArchive
+          } else {
+            existingGroup.saves.push(stubArchive)
+          }
         } else {
           archives.value.set(guid, {
             guid,
@@ -101,9 +113,16 @@ export const useSaveStore = defineStore('save', () => {
         }
       }
       
-      isInitialized.value = true
+      // Sort saves within each group by time (descending)
+      for (const group of archives.value.values()) {
+        group.saves.sort((a, b) => b.meta.time - a.meta.time)
+      }
+      
+      console.log(`[saveStore] initialized with ${archives.value.size} groups, ${metaList.length} total saves`)
     } catch (error) {
       console.error('[saveStore] initialization failed:', error)
+      // Reset flag on error to allow retry
+      isInitialized.value = false
     }
   }
 

@@ -179,7 +179,27 @@
       "medium": "Medium",
       "midhigh": "Mid High",
       "high": "High"
-    }
+    },
+    "save_panel_button": "Save",
+    "save_panel_close": "Close",
+    "save_panel_hint": "Check categories to show POIs on map. Click category for details.",
+    "save_breadcrumb_root": "Saves",
+    "save_archives_loaded": "archives loaded",
+    "save_no_archives": "No archives. Upload a save file.",
+    "save_saves": "saves",
+    "save_category_header": "Show POI categories:",
+    "save_category_player_station": "Player Stations",
+    "save_category_npc_station": "NPC Stations",
+    "save_category_abandoned_ship": "Abandoned Ships",
+    "save_category_datavault": "Data Vaults",
+    "save_category_erlking_vault": "Erlking Vaults",
+    "save_coord_search_placeholder": "Search sector...",
+    "save_coord_count": "coordinates",
+    "save_coord_empty": "No matching coordinates",
+    "save_poi_tooltip_category": "Category",
+    "save_poi_tooltip_owner": "Owner",
+    "save_poi_tooltip_code": "Code",
+    "save_poi_tooltip_coords": "Coords"
   },
   "ship_build": {
     "title": "Ship Build",

@@ -179,7 +179,27 @@
       "medium": "中",
       "midhigh": "中高",
       "high": "高"
-    }
+    },
+    "save_panel_button": "存档",
+    "save_panel_close": "关闭",
+    "save_panel_hint": "勾选分类在地图上显示兴趣点，点击分类查看详情。",
+    "save_breadcrumb_root": "存档",
+    "save_archives_loaded": "个存档已加载",
+    "save_no_archives": "暂无存档，请上传存档文件",
+    "save_saves": "个存档",
+    "save_category_header": "显示兴趣点类别:",
+    "save_category_player_station": "用户空间站",
+    "save_category_npc_station": "NPC据点",
+    "save_category_abandoned_ship": "弃船",
+    "save_category_datavault": "保险箱",
+    "save_category_erlking_vault": "妖王保险箱",
+    "save_coord_search_placeholder": "搜索星区...",
+    "save_coord_count": "个坐标点",
+    "save_coord_empty": "没有匹配的坐标点",
+    "save_poi_tooltip_category": "分类",
+    "save_poi_tooltip_owner": "所有者",
+    "save_poi_tooltip_code": "编号",
+    "save_poi_tooltip_coords": "坐标"
   },
   "ship_build": {
     "title": "船只建造",

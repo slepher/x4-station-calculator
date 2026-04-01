@@ -126,6 +126,16 @@ type PlacementPreview = {
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: PlacementLocation
 }
+type SavePoiCategory = 'playerStation' | 'npcStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
+type SavePoiOverlay = {
+  key: string
+  code: string
+  category: SavePoiCategory
+  owner?: string
+  sectorMacro: string
+  sectorName: string
+  pos: { x: number; z: number }
+}
 
 const FALLBACK_OWNER_COLOR = '#94a3b8'
 const SQRT3 = Math.sqrt(3)
@@ -158,6 +168,8 @@ const props = withDefaults(defineProps<{
   placementPreview?: PlacementPreview | null
   draggingOverlayKey?: string | null
   focusedOverlayKey?: string | null
+  savePoiOverlays?: SavePoiOverlay[]
+  focusedSavePoiKey?: string | null
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
@@ -168,7 +180,9 @@ const props = withDefaults(defineProps<{
   placementOverlays: () => [],
   placementPreview: null,
   draggingOverlayKey: null,
-  focusedOverlayKey: null
+  focusedOverlayKey: null,
+  savePoiOverlays: () => [],
+  focusedSavePoiKey: null
 })
 
 const emit = defineEmits<{
@@ -177,6 +191,7 @@ const emit = defineEmits<{
   (e: 'sector-hover', payload: SectorHoverPayload): void
   (e: 'sector-leave', sectorId: string): void
   (e: 'overlay-pointerdown', payload: PlacementOverlay): void
+  (e: 'save-poi-pointerdown', payload: SavePoiOverlay): void
 }>()
 const { t, te } = useI18n()
 const gameData = useGameDataStore()
@@ -954,6 +969,56 @@ const overlayScreenItems = computed(() => {
     })
     .filter((item): item is PlacementOverlay & { x: number; y: number } => !!item)
 })
+
+const SAVE_POI_COLORS: Record<SavePoiCategory, string> = {
+  playerStation: '#fbbf24',
+  npcStation: 'rgba(252, 211, 77, 0.6)',
+  abandonedShip: '#c084fc',
+  datavault: '#22d3ee',
+  erlkingVault: '#34d399'
+}
+
+const savePoiScreenItems = computed(() => {
+  const { centers, clusterRadius } = layoutState.value
+  return props.savePoiOverlays
+    .map((poi) => {
+      const sectorId = getSectorIdFromMacro(poi.sectorMacro)
+      if (!sectorId) return null
+      const cluster = Object.values(clusters.value).find(c => c.sectors?.[sectorId])
+      if (!cluster) return null
+      const sector = cluster.sectors?.[sectorId]
+      const center = centers[cluster.id]
+      const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
+      const sectorRadiusRatio = Number(sector?.normalized?.sector_radius_ratio || 0)
+      const sectorCenter = sector?.normalized?.center_offset_ratio
+      if (!center || !scalePerRadius || !sectorCenter || !sectorRadiusRatio) return null
+      const localRatio = {
+        x: poi.pos.x * scalePerRadius,
+        y: -poi.pos.z * scalePerRadius
+      }
+      const ratio = sectorRatioToClusterRatio(sector.normalized, localRatio)
+      if (!ratio) return null
+      const point = clusterRatioToScreen(center, clusterRadius, ratio)
+      return {
+        ...poi,
+        x: point.x,
+        y: point.y,
+        color: SAVE_POI_COLORS[poi.category]
+      }
+    })
+    .filter((item): item is SavePoiOverlay & { x: number; y: number; color: string } => !!item)
+})
+
+function getSectorIdFromMacro(macro: string): string | null {
+  for (const cluster of Object.values(clusters.value)) {
+    for (const [sectorId, sector] of Object.entries(cluster.sectors || {})) {
+      if (sectorId === macro || (sector as any).macro === macro) {
+        return sectorId
+      }
+    }
+  }
+  return null
+}
 const previewScreenItem = computed(() => {
   const preview = props.placementPreview
   if (!preview) return null
@@ -1311,6 +1376,21 @@ watchEffect(() => {
       </g>
     </g>
 
+    <g class="save-poi-overlays">
+      <g
+        v-for="poi in savePoiScreenItems"
+        :key="poi.key"
+        class="save-poi-marker"
+        :class="{ focused: focusedSavePoiKey === poi.key }"
+        :transform="`translate(${poi.x.toFixed(1)} ${poi.y.toFixed(1)})`"
+        :data-save-poi-key="poi.key"
+        @mousedown.stop="emit('save-poi-pointerdown', poi)"
+      >
+        <circle cx="0" cy="0" r="5" :fill="poi.color" stroke="#fff" stroke-width="1" />
+        <text x="0" y="-8" text-anchor="middle" class="save-poi-label">{{ poi.code }}</text>
+      </g>
+    </g>
+
     <g class="gates">
       <circle
         v-for="gate in gateCircles"
@@ -1390,5 +1470,20 @@ watchEffect(() => {
 
 .placement-preview {
   pointer-events: none;
+}
+
+.save-poi-marker {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.save-poi-marker.focused circle {
+  filter: drop-shadow(0 0 4px rgba(253, 230, 138, 0.95));
+}
+
+.save-poi-label {
+  fill: #fef3c7;
+  font-size: 9px;
+  font-family: Consolas, 'Courier New', monospace;
 }
 </style>

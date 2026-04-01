@@ -5,10 +5,13 @@ import MapSvgCanvas from './MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
+import MapSavePanel, { type SavePoiVisibility, type SavePoiOverlayItem } from './MapSavePanel.vue'
+import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
+import type { SaveArchive } from '@/types/saveArchive'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -120,6 +123,17 @@ const searchSectors = ref<SearchSectorLayout[]>([])
 const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
 const isStationPanelOpen = ref(false)
+const isSavePanelOpen = ref(false)
+const selectedSaveArchive = ref<SaveArchive | null>(null)
+const savePoiVisibility = ref<SavePoiVisibility>({
+  playerStation: false,
+  npcStation: false,
+  abandonedShip: false,
+  datavault: false,
+  erlkingVault: false
+})
+const focusedSavePoiKey = ref<string | null>(null)
+const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
 const resourcePrimaryColor = ref<string | null>(null)
 const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
@@ -240,6 +254,97 @@ const placementOverlays = computed<PlacementOverlayItem[]>(() => {
       icon: item.icon,
       location: item.location
     }))
+})
+
+const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
+  if (!isSavePanelOpen.value || !selectedSaveArchive.value) return []
+
+  const overlays: SavePoiOverlayItem[] = []
+  const archive = selectedSaveArchive.value
+
+  for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
+    const sectorId = getSectorIdFromMacro(sectorMacro)
+    if (!sectorId) continue
+
+    const sectorData = sectorsById.value[sectorId]
+    if (!sectorData) continue
+
+    if (savePoiVisibility.value.playerStation) {
+      for (const station of sector.stations) {
+        if (station.owner === 'player') {
+          overlays.push({
+            key: `playerStation:${station.code}`,
+            code: station.code,
+            category: 'playerStation',
+            owner: station.owner,
+            sectorMacro,
+            sectorName: sectorData.displayName,
+            pos: { x: station.x, z: station.z }
+          })
+        }
+      }
+    }
+
+    if (savePoiVisibility.value.npcStation) {
+      for (const station of sector.stations) {
+        if (station.owner !== 'player') {
+          overlays.push({
+            key: `npcStation:${station.code}`,
+            code: station.code,
+            category: 'npcStation',
+            owner: station.owner,
+            sectorMacro,
+            sectorName: sectorData.displayName,
+            pos: { x: station.x, z: station.z }
+          })
+        }
+      }
+    }
+
+    if (savePoiVisibility.value.abandonedShip) {
+      for (const ship of sector.abandonedShips) {
+        overlays.push({
+          key: `abandonedShip:${ship.code}`,
+          code: ship.code,
+          category: 'abandonedShip',
+          owner: undefined,
+          sectorMacro,
+          sectorName: sectorData.displayName,
+          pos: { x: ship.x, z: ship.z }
+        })
+      }
+    }
+
+    if (savePoiVisibility.value.datavault) {
+      for (const vault of sector.datavaults) {
+        overlays.push({
+          key: `datavault:${vault.code}`,
+          code: vault.code,
+          category: 'datavault',
+          owner: vault.owner,
+          sectorMacro,
+          sectorName: sectorData.displayName,
+          pos: { x: vault.x, z: vault.z }
+        })
+      }
+    }
+
+    if (savePoiVisibility.value.erlkingVault) {
+      for (const vault of sector.erlkingVaults) {
+        overlays.push({
+          key: `erlkingVault:${vault.code}`,
+          code: vault.code,
+          category: 'erlkingVault',
+          owner: vault.owner,
+          sectorMacro,
+          sectorName: sectorData.displayName,
+          pos: { x: vault.x, z: vault.z }
+        })
+      }
+    }
+  }
+
+  return overlays
 })
 
 const getViewportSize = () => {
@@ -833,6 +938,7 @@ const onResourcePrimaryColorChange = (color: string | null) => {
 
 const onResourcePanelOpen = () => {
   isStationPanelOpen.value = false
+  isSavePanelOpen.value = false
   clearPlacementState()
   isResourcePanelOpen.value = true
 }
@@ -847,6 +953,7 @@ const onResourcePanelClose = () => {
 
 const onStationPanelOpen = () => {
   isResourcePanelOpen.value = false
+  isSavePanelOpen.value = false
   isStationPanelOpen.value = true
 }
 
@@ -854,6 +961,111 @@ const onStationPanelClose = () => {
   isStationPanelOpen.value = false
   focusedPlacementKey.value = null
   clearPlacementState()
+}
+
+const onSavePanelOpen = () => {
+  isResourcePanelOpen.value = false
+  isStationPanelOpen.value = false
+  clearPlacementState()
+  isSavePanelOpen.value = true
+}
+
+const onSavePanelClose = () => {
+  isSavePanelOpen.value = false
+  selectedSaveArchive.value = null
+  focusedSavePoiKey.value = null
+  savePoiVisibility.value = {
+    playerStation: false,
+    npcStation: false,
+    abandonedShip: false,
+    datavault: false,
+    erlkingVault: false
+  }
+}
+
+const onSaveSelectArchive = (archive: SaveArchive) => {
+  selectedSaveArchive.value = archive
+  savePoiVisibility.value = {
+    playerStation: false,
+    npcStation: false,
+    abandonedShip: false,
+    datavault: false,
+    erlkingVault: false
+  }
+}
+
+const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
+  savePoiVisibility.value = visibility
+}
+
+const onSavePoiFocus = async (poi: SavePoiOverlayItem) => {
+  const sectorId = getSectorIdFromMacro(poi.sectorMacro)
+  if (!sectorId) return
+
+  const targetScale = scale.value < 1 ? clampScale(1) : scale.value
+  if (targetScale !== scale.value) {
+    scale.value = targetScale
+    syncSliderFromScale()
+    await nextTick()
+  }
+
+  const target = searchSectors.value.find(s => s.sectorId === sectorId)
+  if (!target) return
+
+  const sector = sectorsById.value[sectorId]
+  if (!sector || !sector.scalePerRadius) return
+
+  const clusterId = sector.clusterId
+  const cluster = gameDataStore.maps?.clusters?.[clusterId]
+  if (!cluster) return
+
+  const sectorNorm = (cluster.sectors as any)?.[sectorId]?.normalized
+  if (!sectorNorm) return
+
+  const ratioX = poi.pos.x * sector.scalePerRadius
+  const ratioY = -poi.pos.z * sector.scalePerRadius
+
+  const localRatio = { x: ratioX, y: ratioY }
+
+  const clusterRatio = sectorRatioToClusterRatio(sectorNorm, localRatio)
+  const clusterRadius = clusterRefHeightPx.value / 2
+  const center = { x: imageNaturalWidth.value / 2, y: imageNaturalHeight.value / 2 }
+  const screenPos = clusterRatioToScreen(center, clusterRadius, clusterRatio)
+
+  const { width: vw, height: vh } = getViewportSize()
+  if (vw && vh) {
+    clampPan(vw / 2 - screenPos.x, vh / 2 - screenPos.y)
+  }
+
+  focusedSavePoiKey.value = poi.key
+}
+
+function getSectorIdFromMacro(macro: string): string | null {
+  const clusters = gameDataStore.maps?.clusters || {}
+  for (const cluster of Object.values(clusters)) {
+    for (const [sectorId, sector] of Object.entries(cluster.sectors || {})) {
+      if (sectorId === macro || (sector as any).macro === macro) {
+        return sectorId
+      }
+    }
+  }
+  return null
+}
+
+function sectorRatioToClusterRatio(sectorNorm: any, localRatio: { x: number; y: number }): { x: number; y: number } {
+  const cx = sectorNorm.center_x || 0
+  const cy = sectorNorm.center_y || 0
+  return {
+    x: cx + localRatio.x,
+    y: cy + localRatio.y
+  }
+}
+
+function clusterRatioToScreen(center: { x: number; y: number }, clusterRadius: number, ratio: { x: number; y: number }): { x: number; y: number } {
+  return {
+    x: center.x + ratio.x * clusterRadius,
+    y: center.y + ratio.y * clusterRadius
+  }
 }
 
 const onStationItemDragStart = (item: MapStationPanelItem) => {
@@ -998,6 +1210,11 @@ const onOverlayPointerDown = (payload: {
   draggingOverlayKey.value = payload.key
 }
 
+const onSavePoiPointerDown = (poi: SavePoiOverlayItem) => {
+  focusedSavePoiKey.value = poi.key
+  savePoiTooltipItem.value = poi
+}
+
 watch(isResourcePanelOpen, async () => {
   await nextTick()
   recomputeScaleBounds()
@@ -1045,7 +1262,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="map-workbench" data-testid="map-workbench-view">
-    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen }">
+    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen, 'save-sidebar-active': isSavePanelOpen }">
       <MapResourceFilterPanel
         v-show="isResourcePanelOpen"
         :sector-layouts="searchSectors"
@@ -1069,6 +1286,16 @@ onBeforeUnmount(() => {
         @drag-end="onStationItemDragEnd"
         @clear-location="onStationItemClearLocation"
         @focus-item="onStationItemFocus"
+      />
+
+      <MapSavePanel
+        :open="isSavePanelOpen"
+        :archive="selectedSaveArchive"
+        :visibility="savePoiVisibility"
+        @close="onSavePanelClose"
+        @select-archive="onSaveSelectArchive"
+        @visibility-change="onSaveVisibilityChange"
+        @focus-poi="onSavePoiFocus"
       />
 
       <div class="map-shell">
@@ -1103,11 +1330,14 @@ onBeforeUnmount(() => {
               :placement-preview="isStationPanelOpen ? placementPreview : null"
               :dragging-overlay-key="draggingOverlayKey"
               :focused-overlay-key="focusedPlacementKey"
+              :save-poi-overlays="savePoiOverlays"
+              :focused-save-poi-key="focusedSavePoiKey"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @sector-hover="onSectorHover"
               @sector-leave="onSectorLeave"
               @overlay-pointerdown="onOverlayPointerDown"
+              @save-poi-pointerdown="onSavePoiPointerDown"
             />
           </div>
 
@@ -1127,6 +1357,21 @@ onBeforeUnmount(() => {
               ref="tooltipRef"
               :sector-id="hoveredSector.sectorId"
             />
+          </div>
+
+          <div
+            v-if="savePoiTooltipItem"
+            class="save-poi-tooltip-layer"
+            @mousedown.stop
+          >
+            <MapSavePoiTooltip :poi="savePoiTooltipItem" />
+            <button
+              class="tooltip-close"
+              type="button"
+              @click="savePoiTooltipItem = null"
+            >
+              ×
+            </button>
           </div>
         </div>
 
@@ -1238,6 +1483,26 @@ onBeforeUnmount(() => {
               />
             </svg>
           </button>
+
+          <button
+            type="button"
+            class="map-panel-tab"
+            :class="{ active: isSavePanelOpen }"
+            data-testid="map-save-panel-tab"
+            @click="onSavePanelOpen"
+          >
+            <span class="map-panel-tab-label">{{ t('map.save_panel_button') }}</span>
+            <svg class="map-panel-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              />
+            </svg>
+          </button>
         </div>
 
         <div class="zoom-panel right-6 bottom-5">
@@ -1282,6 +1547,10 @@ onBeforeUnmount(() => {
 }
 
 .map-layout.station-sidebar-active {
+  @apply gap-3;
+}
+
+.map-layout.save-sidebar-active {
   @apply gap-3;
 }
 
@@ -1439,5 +1708,13 @@ onBeforeUnmount(() => {
 .fade-slide-down-enter-from,
 .fade-slide-down-leave-to {
   @apply opacity-0 -translate-y-1;
+}
+
+.save-poi-tooltip-layer {
+  @apply absolute z-30 bottom-20 right-6 flex items-start gap-2;
+}
+
+.tooltip-close {
+  @apply w-6 h-6 flex items-center justify-center rounded-full bg-black/60 text-amber-100/60 hover:text-amber-50 hover:bg-black/80 transition-colors;
 }
 </style>
