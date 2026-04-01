@@ -1,6 +1,7 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import { createSaveParserRuntime } from '../../../src/workers/saveParser.worker'
 import { readFile } from 'node:fs/promises'
+import { streamCompressedXmlToRustParser } from '../../../src/workers/saveParserRust.worker'
 
 describe('save parser core (simplified)', () => {
   it('parses streamed xml chunks into archive data', async () => {
@@ -93,5 +94,53 @@ describe('save parser (Rust WASM streaming)', () => {
       y: 200,
       z: 300
     })
+  })
+
+  it('streams gzip chunks directly into rust parser without aggregating decompressed output', async () => {
+    const pushedChunks: string[] = []
+    const parser = {
+      push_chunk: vi.fn((chunk: Uint8Array) => {
+        pushedChunks.push(new TextDecoder().decode(chunk))
+      }),
+      pump: vi.fn(() => false),
+      progress_json: vi.fn(() => JSON.stringify({
+        phase: 'parsing',
+        percent: 50,
+        tagCount: 1,
+        sectorCount: 0,
+        done: false,
+        inputComplete: false,
+        error: null,
+        inputBytesTotal: 10,
+        parsedBytesTotal: 5,
+        bufferedBytes: 0,
+        expectedTotalBytes: 12
+      })),
+      finish_input: vi.fn()
+    }
+
+    const stream = new ReadableStream<Uint8Array>({
+      start(controller) {
+        controller.enqueue(new TextEncoder().encode('<save'))
+        controller.enqueue(new TextEncoder().encode('game/>'))
+        controller.close()
+      }
+    })
+    const onProgress = vi.fn()
+    const onError = vi.fn()
+
+    await streamCompressedXmlToRustParser({
+      parser,
+      stream,
+      maxEventsPerPump: 10,
+      onProgress,
+      onError
+    })
+
+    expect(parser.push_chunk).toHaveBeenCalledTimes(2)
+    expect(pushedChunks).toEqual(['<save', 'game/>'])
+    expect(parser.finish_input).toHaveBeenCalledTimes(1)
+    expect(onError).not.toHaveBeenCalled()
+    expect(onProgress).toHaveBeenCalled()
   })
 })

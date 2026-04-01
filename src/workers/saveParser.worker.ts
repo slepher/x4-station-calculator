@@ -41,6 +41,13 @@ export interface SaveParserRuntime {
   getData: () => SaveData
 }
 
+export interface SaveXmlFilterRuntime {
+  feed: (text: string) => void
+  close: () => { sectorCount: number }
+}
+
+type SaveXmlCaptureKind = 'game' | 'player' | 'station' | 'datavault' | 'abandonedShip'
+
 const SAX_WRITE_CHUNK_SIZE = 64 * 1024
 const SAX_MAX_BUFFER_LENGTH = 8 * 1024
 const DEFAULT_PROGRESS_INTERVAL_MS = 500
@@ -147,6 +154,11 @@ class X4SaveParser {
 
   private isComponentPosition(): boolean {
     return this.isAtTags('component', 'offset', 'position')
+  }
+
+  private currentPositionComponentNode(): TagNode | undefined {
+    if (!this.isComponentPosition()) return undefined
+    return this.path[this.path.length - 3]
   }
 
   private isEntryTag(): boolean {
@@ -385,6 +397,56 @@ class X4SaveParser {
   getTagCount(): number {
     return this.tagCount
   }
+
+  getCurrentXmlCaptureKind(): SaveXmlCaptureKind | null {
+    if (this.isGameTag()) return 'game'
+    if (this.isPlayerTag()) return 'player'
+    if (this.isStation()) return 'station'
+    if (this.isDatavault() || this.isErlkingVault()) return 'datavault'
+    if (this.isAbandonedShip()) return 'abandonedShip'
+    return null
+  }
+
+  shouldKeepCurrentNodeInXml(rootKind: SaveXmlCaptureKind): boolean {
+    if (rootKind === 'game' || rootKind === 'player') {
+      return false
+    }
+
+    const positionComponent = this.currentPositionComponentNode()
+    if (positionComponent) {
+      if (rootKind === 'station') {
+        return positionComponent.attributes.class === 'station'
+      }
+      if (rootKind === 'datavault') {
+        const macro = String(positionComponent.attributes.macro || '').toLowerCase()
+        return positionComponent.attributes.class === 'datavault' || macro.includes('erlking_vault')
+      }
+      if (rootKind === 'abandonedShip') {
+        const clazz = String(positionComponent.attributes.class || '')
+        const owner = String(positionComponent.attributes.owner || '')
+        return clazz.startsWith('ship_') && owner === 'ownerless'
+      }
+      return false
+    }
+
+    if (rootKind !== 'station') {
+      return false
+    }
+
+    if (this.isEntryTag() && this.currentStationOwner === 'player') {
+      return true
+    }
+
+    if (this.isShieldsTag() && this.currentEntryIndex !== null) {
+      return true
+    }
+
+    if (this.isTurretsTag() && this.currentEntryIndex !== null) {
+      return true
+    }
+
+    return false
+  }
 }
 
 export function normalizeVersion(v: string): string {
@@ -396,6 +458,192 @@ export function normalizeVersion(v: string): string {
   const num = parseInt(v, 10)
   if (Number.isNaN(num)) return v
   return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
+}
+
+function escapeXmlAttribute(value: unknown): string {
+  return String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+function serializeXmlAttributes(attributes: Record<string, unknown>): string {
+  const entries = Object.entries(attributes)
+  if (entries.length === 0) return ''
+  return ' ' + entries.map(([k, v]) => `${k}="${escapeXmlAttribute(v)}"`).join(' ')
+}
+
+type XmlCaptureNode = {
+  name: string
+  attrStr: string
+  depth: number
+  isSelfClosing: boolean
+}
+
+type XmlCaptureTreeNode = {
+  name: string
+  attrStr: string
+  selfClosing: boolean
+  selfRelevant: boolean
+  hasRelevantDescendant: boolean
+  children: XmlCaptureTreeNode[]
+}
+
+export function createSaveXmlFilterRuntime(options: {
+  currentVersion?: string | null
+  write: (chunk: string) => void
+}): SaveXmlFilterRuntime {
+  const currentVersion = options.currentVersion ?? null
+  const parser = new X4SaveParser(currentVersion)
+  const previousMaxBufferLength = saxWithBufferConfig.MAX_BUFFER_LENGTH
+  saxWithBufferConfig.MAX_BUFFER_LENGTH = Math.min(previousMaxBufferLength, SAX_MAX_BUFFER_LENGTH)
+  const saxParser = sax.parser(false, { lowercase: true, position: false })
+
+  const pathStack: XmlCaptureNode[] = []
+  const writtenAncestorKeys = new Set<string>()
+  let currentCaptureRoot: XmlCaptureNode | null = null
+  let currentCaptureKind: SaveXmlCaptureKind | null = null
+  let currentCaptureChildren: XmlCaptureTreeNode[] = []
+  let currentCaptureNodeStack: XmlCaptureTreeNode[] = []
+  let rootOpened = false
+  let rootName = ''
+
+  const serializeCaptureTree = (node: XmlCaptureTreeNode, absoluteDepth: number): string[] => {
+    const indent = '  '.repeat(absoluteDepth)
+    if (node.selfClosing && node.children.length === 0) {
+      return [`${indent}<${node.name}${node.attrStr}/>`]
+    }
+
+    const lines = [`${indent}<${node.name}${node.attrStr}>`]
+    for (const child of node.children) {
+      lines.push(...serializeCaptureTree(child, absoluteDepth + 1))
+    }
+    lines.push(`${indent}</${node.name}>`)
+    return lines
+  }
+
+  saxParser.onopentag = (node: TagNode) => {
+    const attrStr = serializeXmlAttributes(node.attributes)
+    const captureNode: XmlCaptureNode = {
+      name: node.name,
+      attrStr,
+      depth: pathStack.length + 1,
+      isSelfClosing: false
+    }
+
+    parser.onOpenTag(node)
+    captureNode.isSelfClosing = node.isSelfClosing === true
+    pathStack.push(captureNode)
+
+    if (!rootOpened) {
+      rootOpened = true
+      rootName = captureNode.name
+      options.write(`<?xml version="1.0" encoding="utf-8"?>\n`)
+      options.write(`<${captureNode.name}${captureNode.attrStr}>\n`)
+      return
+    }
+
+    const insideCapture = currentCaptureRoot !== null
+    if (insideCapture && currentCaptureKind !== null) {
+      currentCaptureNodeStack.push({
+        name: captureNode.name,
+        attrStr: captureNode.attrStr,
+        selfClosing: captureNode.isSelfClosing,
+        selfRelevant: parser.shouldKeepCurrentNodeInXml(currentCaptureKind),
+        hasRelevantDescendant: false,
+        children: []
+      })
+    }
+
+    const captureKind = parser.getCurrentXmlCaptureKind()
+    const isCaptureRoot = !insideCapture && captureKind !== null
+    if (isCaptureRoot) {
+      for (const ancestor of pathStack.slice(1, -1)) {
+        const key = `${ancestor.depth}:${ancestor.name}:${ancestor.attrStr}`
+        if (!writtenAncestorKeys.has(key)) {
+          writtenAncestorKeys.add(key)
+          options.write(`${'  '.repeat(Math.max(1, ancestor.depth - 1))}<${ancestor.name}${ancestor.attrStr}/>\n`)
+        }
+      }
+
+      currentCaptureRoot = captureNode
+      currentCaptureKind = captureKind
+      currentCaptureChildren = []
+      currentCaptureNodeStack = []
+
+      if (captureNode.isSelfClosing) {
+        options.write(`${'  '.repeat(Math.max(1, captureNode.depth - 1))}<${captureNode.name}${captureNode.attrStr}/>\n`)
+        currentCaptureRoot = null
+        currentCaptureKind = null
+      }
+    }
+  }
+
+  saxParser.ontext = () => {}
+  saxParser.oncdata = () => {}
+  saxParser.onscript = () => {}
+  saxParser.onerror = (err: Error) => {
+    throw err
+  }
+
+  saxParser.onclosetag = (name: string) => {
+    const currentNode = pathStack[pathStack.length - 1]
+
+    if (currentNode && currentCaptureRoot && currentNode !== currentCaptureRoot) {
+      const treeNode = currentCaptureNodeStack.pop()
+      if (treeNode && (treeNode.selfRelevant || treeNode.hasRelevantDescendant)) {
+        const parent = currentCaptureNodeStack[currentCaptureNodeStack.length - 1]
+        if (parent) {
+          parent.children.push(treeNode)
+          parent.hasRelevantDescendant = true
+        } else {
+          currentCaptureChildren.push(treeNode)
+        }
+      }
+    }
+
+    if (currentNode && currentCaptureRoot === currentNode) {
+      const rootIndent = '  '.repeat(Math.max(1, currentNode.depth - 1))
+      if (currentCaptureChildren.length > 0) {
+        options.write(`${rootIndent}<${currentNode.name}${currentNode.attrStr}>\n`)
+        for (const child of currentCaptureChildren) {
+          for (const line of serializeCaptureTree(child, currentNode.depth)) {
+            options.write(`${line}\n`)
+          }
+        }
+        options.write(`${rootIndent}</${name}>\n`)
+      } else {
+        options.write(`${rootIndent}<${currentNode.name}${currentNode.attrStr}/>\n`)
+      }
+      currentCaptureRoot = null
+      currentCaptureKind = null
+      currentCaptureChildren = []
+      currentCaptureNodeStack = []
+    }
+
+    parser.onCloseTag(name)
+    pathStack.pop()
+  }
+
+  return {
+    feed(text: string) {
+      if (!text) return
+      for (let i = 0; i < text.length; i += SAX_WRITE_CHUNK_SIZE) {
+        const chunk = text.slice(i, i + SAX_WRITE_CHUNK_SIZE)
+        saxParser.write(chunk)
+      }
+    },
+    close() {
+      saxParser.close()
+      saxWithBufferConfig.MAX_BUFFER_LENGTH = previousMaxBufferLength
+      if (rootOpened) {
+        options.write(`</${rootName}>\n`)
+      }
+      return { sectorCount: parser.getSectorsCount() }
+    }
+  }
 }
 
 export function createSaveParserRuntime(

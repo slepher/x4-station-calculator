@@ -3,6 +3,7 @@ import initWasm, { SaveParser } from '@/wasm/save_parser'
 import wasmUrl from '@/wasm/save_parser_bg.wasm?url'
 
 let wasmInitialized = false
+const PROGRESS_POST_INTERVAL_MS = 1000
 
 async function ensureWasmInit() {
   if (wasmInitialized) return
@@ -11,131 +12,247 @@ async function ensureWasmInit() {
   wasmInitialized = true
 }
 
-function getGzipUncompressedSize(buf: ArrayBuffer): number | null {
-  if (buf.byteLength < 18) return null
-  const bytes = new Uint8Array(buf)
-  if (bytes[0] !== 0x1f || bytes[1] !== 0x8b) return null
-  const view = new DataView(buf)
-  return view.getUint32(buf.byteLength - 4, true)
+type RustSaveParserLike = {
+  push_chunk: (chunk: Uint8Array) => void
+  pump: (maxEvents: number) => boolean
+  progress_json: () => string
+  finish_input: () => void
+  set_expected_version?: (version: string) => void
+  set_expected_total_bytes?: (total: number) => void
+}
+
+function pumpRustParser(options: {
+  parser: RustSaveParserLike
+  maxEventsPerPump: number
+  onProgress: (info: ProgressInfo) => void
+  onError: (progress: ProgressInfo) => boolean
+}) {
+  while (true) {
+    const hasMore = options.parser.pump(options.maxEventsPerPump)
+    const progress: ProgressInfo = JSON.parse(options.parser.progress_json())
+    options.onProgress(progress)
+
+    if (progress.error) {
+      if (options.onError(progress)) {
+        return false
+      }
+      return false
+    }
+
+    if (!hasMore) break
+  }
+
+  return true
+}
+
+export async function streamCompressedXmlToRustParser(options: {
+  parser: RustSaveParserLike
+  stream: ReadableStream<Uint8Array>
+  maxEventsPerPump: number
+  onProgress: (info: ProgressInfo) => void
+  onError: (progress: ProgressInfo) => boolean
+}) {
+  const reader = options.stream.getReader()
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (value && value.length > 0) {
+      options.parser.push_chunk(value)
+      const shouldContinue = pumpRustParser({
+        parser: options.parser,
+        maxEventsPerPump: options.maxEventsPerPump,
+        onProgress: options.onProgress,
+        onError: options.onError
+      })
+      if (!shouldContinue) return false
+    }
+    if (done) break
+  }
+
+  options.parser.finish_input()
+  return pumpRustParser({
+    parser: options.parser,
+    maxEventsPerPump: options.maxEventsPerPump,
+    onProgress: options.onProgress,
+    onError: options.onError
+  })
+}
+
+type WorkerInputMessage =
+  | { type: 'parse_start'; filename?: string; currentVersion?: string; expectedTotalBytes?: number }
+  | { type: 'parse_chunk'; chunk?: ArrayBuffer }
+  | { type: 'parse_end' }
+
+type RustParseSession = {
+  pushChunk: (chunk: Uint8Array) => Promise<boolean>
+  finish: () => Promise<boolean>
+}
+
+function createRustParseSession(options: {
+  parser: SaveParser
+  filename: string
+  currentVersion?: string
+  expectedTotalBytes?: number
+  postProgress: (info: ProgressInfo) => void
+  postComplete: (archive: unknown) => void
+  postError: (message: string, detail?: unknown) => void
+}): RustParseSession {
+  const MAX_EVENTS_PER_PUMP = 50000
+  let finalized = false
+  let failed = false
+  let isGzipped: boolean | null = null
+  let gzipWriter: WritableStreamDefaultWriter<Uint8Array> | null = null
+  let gzipTask: Promise<boolean> | null = null
+
+  if (options.currentVersion) {
+    options.parser.set_expected_version?.(options.currentVersion)
+  }
+
+  const handleParserError = (progress: ProgressInfo) => {
+    failed = true
+    options.postError(progress.error ?? 'Unknown error', progress.errorDetail)
+    return true
+  }
+
+  const pumpNow = () => pumpRustParser({
+    parser: options.parser,
+    maxEventsPerPump: MAX_EVENTS_PER_PUMP,
+    onProgress: options.postProgress,
+    onError: handleParserError
+  })
+
+  const ensureMode = (chunk: Uint8Array) => {
+    if (isGzipped !== null) return
+    isGzipped = chunk.length >= 2 && chunk[0] === 0x1f && chunk[1] === 0x8b
+
+    if (!isGzipped) {
+      options.parser.set_expected_total_bytes?.(options.expectedTotalBytes ?? 0)
+      return
+    }
+
+    const transform = new TransformStream<Uint8Array, Uint8Array>()
+    gzipWriter = transform.writable.getWriter()
+    gzipTask = streamCompressedXmlToRustParser({
+      parser: options.parser,
+      stream: transform.readable.pipeThrough(new DecompressionStream('gzip')),
+      maxEventsPerPump: MAX_EVENTS_PER_PUMP,
+      onProgress: options.postProgress,
+      onError: handleParserError
+    })
+  }
+
+  return {
+    async pushChunk(chunk: Uint8Array) {
+      if (finalized || failed || chunk.length === 0) return false
+      ensureMode(chunk)
+
+      if (isGzipped) {
+        await gzipWriter?.write(chunk)
+        return !failed
+      }
+
+      options.parser.push_chunk(chunk)
+      return pumpNow()
+    },
+    async finish() {
+      if (finalized || failed) return false
+      finalized = true
+
+      if (isGzipped) {
+        await gzipWriter?.close()
+        const completed = await gzipTask
+        if (!completed || failed) return false
+      } else {
+        options.parser.finish_input()
+        const completed = pumpNow()
+        if (!completed || failed) return false
+      }
+
+      const result = options.parser.finish(options.filename || '')
+      const archive = JSON.parse(result)
+      options.postComplete(archive)
+      return true
+    }
+  }
 }
 
 if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: unknown }).importScripts === 'function') {
-  self.onmessage = async (e: MessageEvent<{ type: string; arrayBuffer?: ArrayBuffer; filename?: string; currentVersion?: string }>) => {
-    const { type, arrayBuffer, filename, currentVersion } = e.data
+  let session: RustParseSession | null = null
+  let messageQueue = Promise.resolve()
+  let lastProgressPostedAt = 0
+  let lastProgressSnapshot: ProgressInfo | null = null
 
-    if (type !== 'parse' || !arrayBuffer) return
-
-    const postProgress = (info: ProgressInfo) => {
+  self.onmessage = (e: MessageEvent<WorkerInputMessage>) => {
+    const postProgress = (info: ProgressInfo, force = false) => {
+      lastProgressSnapshot = info
+      const now = Date.now()
+      if (!force && now - lastProgressPostedAt < PROGRESS_POST_INTERVAL_MS) return
+      lastProgressPostedAt = now
       self.postMessage({ type: 'progress', data: info } as SaveParserRustMessage)
     }
 
-    const expectedVersion = currentVersion || '8.0'
-
-    try {
-      postProgress({
-        phase: 'receiving', percent: 0, tagCount: 0, sectorCount: 0,
-        done: false, inputComplete: false, error: null,
-        inputBytesTotal: 0, parsedBytesTotal: 0, bufferedBytes: 0, expectedTotalBytes: 0
-      })
-
-      await ensureWasmInit()
-      const parser = new SaveParser()
-      
-      if (expectedVersion) {
-        parser.set_expected_version(expectedVersion)
-      }
-
-      const header = new Uint8Array(arrayBuffer.slice(0, 2))
-      const isGzipped = header[0] === 0x1f && header[1] === 0x8b
-
-      if (isGzipped) {
-        const expectedSize = getGzipUncompressedSize(arrayBuffer)
-        if (expectedSize && expectedSize > 0) {
-          parser.set_expected_total_bytes(expectedSize)
-        }
-
-        const ds = new DecompressionStream('gzip')
-        const blob = new Blob([arrayBuffer])
-        const decompressedStream = blob.stream().pipeThrough(ds)
-        const reader = decompressedStream.getReader()
-
-        const chunks: Uint8Array[] = []
-        let totalSize = 0
-
-        while (true) {
-          const { done, value } = await reader.read()
-          if (value) {
-            chunks.push(value)
-            totalSize += value.length
-          }
-          if (done) break
-        }
-
-        const decompressed = new Uint8Array(totalSize)
-        let offset = 0
-        for (const chunk of chunks) {
-          decompressed.set(chunk, offset)
-          offset += chunk.length
-        }
-
-        parser.push_chunk(decompressed)
-        parser.finish_input()
-
-        const MAX_EVENTS_PER_PUMP = 50000
-        while (true) {
-          const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
-          const progressJson = parser.progress_json()
-          const progress: ProgressInfo = JSON.parse(progressJson)
-          postProgress(progress)
-          
-          if (progress.error) {
-            self.postMessage({ 
-              type: 'error', 
-              message: progress.error,
-              detail: progress.errorDetail
-            } as SaveParserRustMessage)
-            return
-          }
-          
-          if (!hasMore) break
-        }
-      } else {
-        const data = new Uint8Array(arrayBuffer)
-        parser.set_expected_total_bytes(data.length)
-        parser.push_chunk(data)
-        parser.finish_input()
-
-        const MAX_EVENTS_PER_PUMP = 50000
-        while (true) {
-          const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
-          const progressJson = parser.progress_json()
-          const progress: ProgressInfo = JSON.parse(progressJson)
-          postProgress(progress)
-          
-          if (progress.error) {
-            self.postMessage({ 
-              type: 'error', 
-              message: progress.error,
-              detail: progress.errorDetail
-            } as SaveParserRustMessage)
-            return
-          }
-          
-          if (!hasMore) break
-        }
-      }
-
-      const result = parser.finish(filename || '')
-      const archive = JSON.parse(result)
-      
-      self.postMessage({ type: 'complete', data: archive } as SaveParserRustMessage)
-    } catch (error) {
-      const message = error instanceof Error 
-        ? error.message 
-        : typeof error === 'string' 
-          ? error 
-          : 'Unknown error'
-      self.postMessage({ type: 'error', message } as SaveParserRustMessage)
+    const postError = (message: string, detail?: unknown) => {
+      self.postMessage({ type: 'error', message, detail } as SaveParserRustMessage)
     }
+
+    const postComplete = (archive: unknown) => {
+      self.postMessage({ type: 'complete', data: archive } as SaveParserRustMessage)
+    }
+
+    messageQueue = messageQueue.then(async () => {
+      try {
+        if (e.data.type === 'parse_start') {
+          lastProgressPostedAt = 0
+          lastProgressSnapshot = null
+          postProgress({
+            phase: 'receiving', percent: 0, tagCount: 0, sectorCount: 0,
+            done: false, inputComplete: false, error: null,
+            inputBytesTotal: 0, parsedBytesTotal: 0, bufferedBytes: 0, expectedTotalBytes: 0
+          }, true)
+
+          await ensureWasmInit()
+          const parser = new SaveParser()
+          session = createRustParseSession({
+            parser,
+            filename: e.data.filename || '',
+            currentVersion: e.data.currentVersion || '8.0',
+            expectedTotalBytes: e.data.expectedTotalBytes,
+            postProgress,
+            postComplete,
+            postError
+          })
+          return
+        }
+
+        if (!session) return
+
+        if (e.data.type === 'parse_chunk') {
+          if (!e.data.chunk) return
+          await session.pushChunk(new Uint8Array(e.data.chunk))
+          return
+        }
+
+        if (e.data.type === 'parse_end') {
+          if (lastProgressSnapshot) {
+            postProgress({
+              ...lastProgressSnapshot,
+              phase: 'finalizing',
+              percent: Math.max(lastProgressSnapshot.percent, 99),
+              inputComplete: true
+            }, true)
+          }
+          await session.finish()
+          session = null
+        }
+      } catch (error) {
+        const message = error instanceof Error
+          ? error.message
+          : typeof error === 'string'
+            ? error
+            : 'Unknown error'
+        postError(message)
+        session = null
+      }
+    })
   }
 }
