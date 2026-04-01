@@ -7,9 +7,10 @@ X4 存档解析器的 Rust WASM 实现，用于高性能解析大型存档文件
 ### 前置要求
 
 - Rust 1.70+
-- wasm-pack: `cargo install wasm-pack`
+- wasm-bindgen: `cargo install wasm-bindgen-cli`
+- wasm-pack（可选）: `cargo install wasm-pack`
 
-### 编译命令
+### 方式一：使用 wasm-pack（推荐）
 
 ```bash
 # 进入 rust-parser 目录
@@ -22,14 +23,23 @@ wasm-pack build --target web --out-dir pkg
 cp pkg/*.{js,wasm,d.ts} ../src/wasm/
 ```
 
-### 编译选项
+### 方式二：使用 wasm-bindgen
 
 ```bash
-# 开发模式（包含调试信息，体积大）
-wasm-pack build --target web --out-dir pkg --dev
+# 进入 rust-parser 目录
+cd rust-parser
 
-# 发布模式（优化体积和性能）
-wasm-pack build --target web --out-dir pkg --release
+# 编译 Rust 到 WASM
+cargo build --release --target wasm32-unknown-unknown
+
+# 生成 JS 绑定
+wasm-bindgen target/wasm32-unknown-unknown/release/save_parser.wasm \
+  --target web \
+  --out-dir pkg \
+  --out-name save_parser
+
+# 复制到 src/wasm/
+cp pkg/*.{js,wasm,d.ts} ../src/wasm/
 ```
 
 ## 项目结构
