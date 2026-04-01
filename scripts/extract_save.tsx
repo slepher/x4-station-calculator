@@ -1,20 +1,23 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import zlib from 'node:zlib'
+import sax from 'sax'
 import { createSaveParserRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
 
 function printUsage(): void {
-  console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output.json] [options]')
+  console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output] [options]')
   console.log('')
   console.log('Options:')
   console.log('  --wasm         Use Rust WASM parser (3.25x faster, experimental)')
+  console.log('  --xml          Output as XML instead of JSON (extracts only relevant data)')
   console.log('  --version <v>  Expected game version (e.g., "8.0"). If not set, version check is skipped')
 }
 
-function parseArgs(): { input: string; output: string; useWasm: boolean; expectedVersion: string | null } {
+function parseArgs(): { input: string; output: string; useWasm: boolean; outputXml: boolean; expectedVersion: string | null } {
   const args = process.argv.slice(2)
   const useWasm = args.includes('--wasm')
+  const outputXml = args.includes('--xml')
   
   let expectedVersion: string | null = null
   const versionIndex = args.indexOf('--version')
@@ -22,7 +25,6 @@ function parseArgs(): { input: string; output: string; useWasm: boolean; expecte
     expectedVersion = args[versionIndex + 1]
   }
   
-  // Filter out options and their values
   const positional = args.filter((a, i) => {
     if (a.startsWith('--')) return false
     if (versionIndex !== -1 && (i === versionIndex + 1)) return false
@@ -31,7 +33,7 @@ function parseArgs(): { input: string; output: string; useWasm: boolean; expecte
   
   const input = positional[0]
   const output = positional[1]
-  return { input, output, useWasm, expectedVersion }
+  return { input, output, useWasm, outputXml, expectedVersion }
 }
 
 function isGzipFile(filePath: string): boolean {
@@ -46,11 +48,12 @@ function isGzipFile(filePath: string): boolean {
   }
 }
 
-function defaultOutputPath(inputPath: string): string {
-  if (inputPath.toLowerCase().endsWith('.xml.gz')) return inputPath.slice(0, -7) + '.json'
-  if (inputPath.toLowerCase().endsWith('.gz')) return inputPath.slice(0, -3) + '.json'
-  if (inputPath.toLowerCase().endsWith('.xml')) return inputPath.slice(0, -4) + '.json'
-  return inputPath + '.json'
+function defaultOutputPath(inputPath: string, outputXml: boolean): string {
+  const ext = outputXml ? '.xml' : '.json'
+  if (inputPath.toLowerCase().endsWith('.xml.gz')) return inputPath.slice(0, -7) + ext
+  if (inputPath.toLowerCase().endsWith('.gz')) return inputPath.slice(0, -3) + ext
+  if (inputPath.toLowerCase().endsWith('.xml')) return inputPath.slice(0, -4) + ext
+  return inputPath + ext
 }
 
 function formatMB(bytes: number): string {
@@ -119,6 +122,175 @@ async function extractSaveSaxJs(inputPath: string, outputPath: string, expectedV
   console.log(`[extract_save] json written: ${absoluteOutput}`)
 
   return archive
+}
+
+async function extractSaveToXml(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<void> {
+  const absoluteInput = path.resolve(process.cwd(), inputPath)
+  const absoluteOutput = path.resolve(process.cwd(), outputPath)
+  const gzip = isGzipFile(absoluteInput)
+  const stat = fs.statSync(absoluteInput)
+
+  console.log(`[extract_save] parser: sax-js (XML output)`)
+  console.log(`[extract_save] input: ${absoluteInput}`)
+  console.log(`[extract_save] output: ${absoluteOutput}`)
+  console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
+  console.log(`[extract_save] source type: ${gzip ? 'gzip' : 'xml'}`)
+  if (expectedVersion) {
+    console.log(`[extract_save] expected version: ${expectedVersion}`)
+  } else {
+    console.log(`[extract_save] version check: skipped`)
+  }
+
+  const sourceStream = fs.createReadStream(absoluteInput)
+  const dataStream = gzip ? sourceStream.pipe(zlib.createGunzip()) : sourceStream
+
+  const parser = sax.parser(false, { lowercase: true, position: false })
+  
+  const tagPath: string[] = []
+  let currentComponentClass: string | null = null
+  let isInsideSector = false
+  let depth = 0
+  let sectorDepth = 0
+  let sectorCount = 0
+  let versionChecked = false
+  let versionMatch = true
+  
+  const outputChunks: string[] = []
+  
+  function escapeXml(str: string): string {
+    return str
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&apos;')
+  }
+  
+  function normalizeVersion(v: string): string {
+    const trimmed = v.trim()
+    if (/^\d+\.\d+$/.test(trimmed)) {
+      const parsed = Number(trimmed)
+      return Number.isFinite(parsed) ? parsed.toFixed(1) : v
+    }
+    const num = parseInt(trimmed, 10)
+    if (isNaN(num)) return v
+    return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
+  }
+  
+  function shouldOutput(): boolean {
+    if (tagPath.length === 0) return false
+    
+    const currentPath = tagPath.join('/')
+    
+    // Always output savegame root and its direct children
+    if (tagPath.length === 1 && tagPath[0] === 'savegame') return true
+    if (tagPath.length === 2 && currentPath === 'savegame/info') return true
+    if (tagPath.length === 3 && (currentPath === 'savegame/info/game' || currentPath === 'savegame/info/player')) return true
+    if (tagPath.length === 2 && currentPath === 'savegame/components') return true
+    if (tagPath.length === 2 && currentPath === 'savegame/component') return false // components wrapper
+    
+    // Output sector components and their contents
+    if (isInsideSector) return true
+    
+    return false
+  }
+  
+  parser.onopentag = (node: sax.Tag) => {
+    tagPath.push(node.name)
+    depth++
+    
+    // Check version
+    if (tagPath.join('/') === 'savegame/info/game' && !versionChecked) {
+      versionChecked = true
+      const version = node.attributes.version as string
+      if (expectedVersion && version) {
+        const saveVer = normalizeVersion(version)
+        const expectedVer = normalizeVersion(expectedVersion)
+        if (saveVer !== expectedVer) {
+          console.error(`[extract_save] version mismatch: save ${version} (${saveVer}) != expected ${expectedVersion} (${expectedVer})`)
+          versionMatch = false
+        }
+      }
+    }
+    
+    // Track component class
+    if (node.name === 'component' && node.attributes.class) {
+      currentComponentClass = node.attributes.class as string
+      if (currentComponentClass === 'sector') {
+        isInsideSector = true
+        sectorDepth = depth
+        sectorCount++
+      }
+    }
+    
+    // Output tag if we should
+    if (shouldOutput() && versionMatch) {
+      const attrs = Object.entries(node.attributes)
+        .map(([k, v]) => `${k}="${escapeXml(String(v))}"`)
+        .join(' ')
+      const attrStr = attrs ? ` ${attrs}` : ''
+      outputChunks.push(`<${node.name}${attrStr}>`)
+    }
+  }
+  
+  parser.onclosetag = (name: string) => {
+    if (shouldOutput() && versionMatch) {
+      outputChunks.push(`</${name}>`)
+    }
+    
+    // Reset sector tracking
+    if (isInsideSector && depth === sectorDepth) {
+      isInsideSector = false
+      sectorDepth = 0
+    }
+    
+    if (name === 'component') {
+      currentComponentClass = null
+    }
+    
+    tagPath.pop()
+    depth--
+  }
+  
+  parser.ontext = (text: string) => {
+    if (shouldOutput() && versionMatch && text.trim()) {
+      outputChunks.push(escapeXml(text))
+    }
+  }
+  
+  parser.oncdata = (data: string) => {
+    if (shouldOutput() && versionMatch) {
+      outputChunks.push(`<![CDATA[${data}]]>`)
+    }
+  }
+  
+  let sourceBytesRead = 0
+  let nextSourceLogMB = 10
+  
+  sourceStream.on('data', (chunk: string | Buffer) => {
+    sourceBytesRead += typeof chunk === 'string' ? chunk.length : chunk.length
+    const sourceMB = sourceBytesRead / (1024 * 1024)
+    if (sourceMB >= nextSourceLogMB) {
+      console.log(`[extract_save] read source ${formatMB(sourceBytesRead)} MB / ${formatMB(stat.size)} MB, sectors: ${sectorCount}`)
+      nextSourceLogMB += 10
+    }
+  })
+
+  const decoder = new TextDecoder()
+  for await (const chunk of dataStream as AsyncIterable<Buffer>) {
+    parser.write(decoder.decode(chunk, { stream: true }))
+  }
+  
+  parser.close()
+  
+  if (!versionMatch) {
+    throw new Error('Version mismatch')
+  }
+  
+  fs.writeFileSync(absoluteOutput, outputChunks.join(''))
+  
+  console.log(`[extract_save] done: ${sectorCount} sectors extracted`)
+  console.log(`[extract_save] xml written: ${absoluteOutput}`)
 }
 
 async function extractSaveWasm(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<SaveArchive> {
@@ -217,7 +389,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
 }
 
 async function main(): Promise<void> {
-  const { input, output, useWasm, expectedVersion } = parseArgs()
+  const { input, output, useWasm, outputXml, expectedVersion } = parseArgs()
 
   if (!input) {
     printUsage()
@@ -226,10 +398,15 @@ async function main(): Promise<void> {
   }
 
   try {
-    if (useWasm) {
-      await extractSaveWasm(input, output || defaultOutputPath(input), expectedVersion)
+    if (outputXml) {
+      if (useWasm) {
+        console.error('[extract_save] --xml mode does not support --wasm, using JS parser')
+      }
+      await extractSaveToXml(input, output || defaultOutputPath(input, true), expectedVersion)
+    } else if (useWasm) {
+      await extractSaveWasm(input, output || defaultOutputPath(input, false), expectedVersion)
     } else {
-      await extractSaveSaxJs(input, output || defaultOutputPath(input), expectedVersion)
+      await extractSaveSaxJs(input, output || defaultOutputPath(input, false), expectedVersion)
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)
