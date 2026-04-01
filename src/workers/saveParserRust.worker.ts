@@ -19,6 +19,70 @@ function getGzipUncompressedSize(buf: ArrayBuffer): number | null {
   return view.getUint32(buf.byteLength - 4, true)
 }
 
+type RustSaveParserLike = {
+  push_chunk: (chunk: Uint8Array) => void
+  pump: (maxEvents: number) => boolean
+  progress_json: () => string
+  finish_input: () => void
+}
+
+function pumpRustParser(options: {
+  parser: RustSaveParserLike
+  maxEventsPerPump: number
+  onProgress: (info: ProgressInfo) => void
+  onError: (progress: ProgressInfo) => boolean
+}) {
+  while (true) {
+    const hasMore = options.parser.pump(options.maxEventsPerPump)
+    const progress: ProgressInfo = JSON.parse(options.parser.progress_json())
+    options.onProgress(progress)
+
+    if (progress.error) {
+      if (options.onError(progress)) {
+        return false
+      }
+      return false
+    }
+
+    if (!hasMore) break
+  }
+
+  return true
+}
+
+export async function streamCompressedXmlToRustParser(options: {
+  parser: RustSaveParserLike
+  stream: ReadableStream<Uint8Array>
+  maxEventsPerPump: number
+  onProgress: (info: ProgressInfo) => void
+  onError: (progress: ProgressInfo) => boolean
+}) {
+  const reader = options.stream.getReader()
+
+  while (true) {
+    const { done, value } = await reader.read()
+    if (value && value.length > 0) {
+      options.parser.push_chunk(value)
+      const shouldContinue = pumpRustParser({
+        parser: options.parser,
+        maxEventsPerPump: options.maxEventsPerPump,
+        onProgress: options.onProgress,
+        onError: options.onError
+      })
+      if (!shouldContinue) return false
+    }
+    if (done) break
+  }
+
+  options.parser.finish_input()
+  return pumpRustParser({
+    parser: options.parser,
+    maxEventsPerPump: options.maxEventsPerPump,
+    onProgress: options.onProgress,
+    onError: options.onError
+  })
+}
+
 if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: unknown }).importScripts === 'function') {
   self.onmessage = async (e: MessageEvent<{ type: string; arrayBuffer?: ArrayBuffer; filename?: string; currentVersion?: string }>) => {
     const { type, arrayBuffer, filename, currentVersion } = e.data
@@ -45,6 +109,16 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
         parser.set_expected_version(expectedVersion)
       }
 
+      const MAX_EVENTS_PER_PUMP = 50000
+      const postParserError = (progress: ProgressInfo) => {
+        self.postMessage({
+          type: 'error',
+          message: progress.error ?? 'Unknown error',
+          detail: progress.errorDetail
+        } as SaveParserRustMessage)
+        return true
+      }
+
       const header = new Uint8Array(arrayBuffer.slice(0, 2))
       const isGzipped = header[0] === 0x1f && header[1] === 0x8b
 
@@ -57,72 +131,27 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
         const ds = new DecompressionStream('gzip')
         const blob = new Blob([arrayBuffer])
         const decompressedStream = blob.stream().pipeThrough(ds)
-        const reader = decompressedStream.getReader()
-
-        const chunks: Uint8Array[] = []
-        let totalSize = 0
-
-        while (true) {
-          const { done, value } = await reader.read()
-          if (value) {
-            chunks.push(value)
-            totalSize += value.length
-          }
-          if (done) break
-        }
-
-        const decompressed = new Uint8Array(totalSize)
-        let offset = 0
-        for (const chunk of chunks) {
-          decompressed.set(chunk, offset)
-          offset += chunk.length
-        }
-
-        parser.push_chunk(decompressed)
-        parser.finish_input()
-
-        const MAX_EVENTS_PER_PUMP = 50000
-        while (true) {
-          const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
-          const progressJson = parser.progress_json()
-          const progress: ProgressInfo = JSON.parse(progressJson)
-          postProgress(progress)
-          
-          if (progress.error) {
-            self.postMessage({ 
-              type: 'error', 
-              message: progress.error,
-              detail: progress.errorDetail
-            } as SaveParserRustMessage)
-            return
-          }
-          
-          if (!hasMore) break
-        }
+        const completed = await streamCompressedXmlToRustParser({
+          parser,
+          stream: decompressedStream,
+          maxEventsPerPump: MAX_EVENTS_PER_PUMP,
+          onProgress: postProgress,
+          onError: postParserError
+        })
+        if (!completed) return
       } else {
         const data = new Uint8Array(arrayBuffer)
         parser.set_expected_total_bytes(data.length)
         parser.push_chunk(data)
         parser.finish_input()
 
-        const MAX_EVENTS_PER_PUMP = 50000
-        while (true) {
-          const hasMore = parser.pump(MAX_EVENTS_PER_PUMP)
-          const progressJson = parser.progress_json()
-          const progress: ProgressInfo = JSON.parse(progressJson)
-          postProgress(progress)
-          
-          if (progress.error) {
-            self.postMessage({ 
-              type: 'error', 
-              message: progress.error,
-              detail: progress.errorDetail
-            } as SaveParserRustMessage)
-            return
-          }
-          
-          if (!hasMore) break
-        }
+        const completed = pumpRustParser({
+          parser,
+          maxEventsPerPump: MAX_EVENTS_PER_PUMP,
+          onProgress: postProgress,
+          onError: postParserError
+        })
+        if (!completed) return
       }
 
       const result = parser.finish(filename || '')
