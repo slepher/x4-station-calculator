@@ -50,12 +50,24 @@
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
+│                 saveUploadStreaming.ts                           │
+│  - File.stream() / Blob.slice() 原始字节读取                    │
+│  - 发送 parse_start / parse_chunk / parse_end                   │
+│  - 从 gzip trailer 预读 expectedTotalBytes                      │
+│  - 不在 JS 侧执行 gunzip                                        │
+└─────────────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+┌─────────────────────────────────────────────────────────────────┐
 │                  Rust Parser Worker                              │
 │  - High-performance XML parsing (Rust WASM)                     │
+│  - Raw byte session handling (parse_start/chunk/end)            │
+│  - Incremental gunzip in WASM                                   │
 │  - Extract: stations, datavaults, erlkingVaults, ships          │
 │  - Accumulate coordinates (component offset stacking)           │
 │  - Translate names ({page,id} → strings table)                  │
 │  - Progress reporting (ProgressInfo)                            │
+│  - CLI progress gating from Rust side                           │
 │  - Optional performance profiling                               │
 └─────────────────────────────────────────────────────────────────┘
 ```
@@ -169,10 +181,17 @@ interface ArchiveGroup {
 **方案**: 使用 Rust Web Worker 执行高性能解析
 
 **实现细节**:
-- Worker 脚本: `src/workers/saveParserRust.worker.ts`（Rust WASM）
-- Worker 脚本（备用）: `src/workers/saveParser.worker.ts`（SAX，CLI工具使用）
+- Worker 脚本: `src/workers/saveParserRust.worker.ts`（UI 默认路径）
+- Worker 脚本（备用）: `src/workers/saveParser.worker.ts`（SAX / CLI 默认路径）
+- 上传桥接模块: `src/components/save/saveUploadStreaming.ts`
 - Rust 解析器源码: `rust-parser/`
-- 支持gzip检测并自动解压（`DecompressionStream`）
+- 上传链路采用三段式协议：
+  - `parse_start`: 发送 `filename/currentVersion/expectedTotalBytes`
+  - `parse_chunk`: 逐块发送原始文件字节
+  - `parse_end`: 通知输入结束
+- Web 端与 CLI 的 WASM 路径都只转发原始 `.xml` / `.xml.gz` 字节
+- gzip 检测、header/trailer 处理、增量 gunzip 全部在 Rust/WASM 内完成
+- Rust worker 内部维护 `RustParseSession`，负责 expected version / expected total bytes 设置、chunk 推进、`finalizing` 补发、进度节流与错误收尾
 - 向主线程报告 ProgressInfo 进度
 - 解析完成后一次性返回结果对象
 - 可选性能分析（通过 `options.profile` 参数）
@@ -184,10 +203,11 @@ interface ArchiveGroup {
 ```typescript
 // 主线程 → Worker
 {
-  type: 'parse',
-  arrayBuffer: ArrayBuffer,
+  type: 'parse_start' | 'parse_chunk' | 'parse_end',
   filename: string,
-  currentVersion: string  // 从 useGameDataStore.currentVersion 获取
+  currentVersion: string,  // 从 useGameDataStore.currentVersion 获取
+  expectedTotalBytes?: number,
+  chunk?: ArrayBuffer
 }
 
 // Worker → 主线程（版本不匹配）
@@ -290,8 +310,22 @@ function resolveName(s: string): string {
 - 版本映射: `800` → `8.0`
 - Store校验: `saveArchive.meta.version === gameDataStore.currentVersion`
 - 不匹配时: 设置 `isCompatible = false`，显示警告
+- Rust 与 SAX 两条解析链在未提供 `expected_version` 时都默认兼容，避免 UI / CLI 语义分叉
 
-### Decision 5: JSON Import/Export
+### Decision 5: Browser Upload Streaming
+
+**问题**: 浏览器侧上传超大存档时，若先 `arrayBuffer()` 或先 gunzip，会拉高主线程和 JS 内存峰值
+
+**方案**: 上传入口只负责原始字节流转发，不负责解压
+
+**实现细节**:
+- `SaveUploadPanel` 不直接持有整文件内容
+- `saveUploadStreaming.ts` 使用 `File.stream()` 优先读取原始字节
+- 若需要读取 gzip trailer 获取解压后总大小，只额外 `slice()` 尾部少量字节
+- 每个 chunk 直接 transfer 给 worker，避免重复复制
+- 浏览器端不再使用 `DecompressionStream('gzip')`
+
+### Decision 6: JSON Import/Export
 
 **问题**: 需支持导入已提取JSON和导出解析结果
 
@@ -302,7 +336,7 @@ function resolveName(s: string): string {
 - 导出时生成标准化JSON，使用 `URL.createObjectURL` + `<a download>`
 - 文件名: `{playerName}_{guid[:8]}_{time}.json`
 
-### Decision 6: Store Design
+### Decision 7: Store Design
 
 **问题**: 存档数据管理
 
@@ -324,7 +358,7 @@ function resolveName(s: string): string {
   - `checkVersionCompatibility(version)` - 版本兼容检查
   - `setParsingState(parsing, progress, error)` - 设置解析状态
 
-### Decision 7: CLI Extraction Tool
+### Decision 8: CLI Extraction Tool
 
 **问题**: 需要命令行工具进行批量存档提取
 
@@ -337,9 +371,11 @@ function resolveName(s: string): string {
   - `--wasm`: Rust WASM 解析器（约 3.25x 更快，实验性）
 - 输入格式: `.xml`, `.xml.gz`, `.gz`
 - 输出格式: `.json`（符合导出格式规范）
+- `--wasm` 路径直接转发原始文件字节给 Rust/WASM
+- CLI 不再自行推断或节流 WASM 进度，只消费 Rust 侧返回的 CLI progress
 - 进度报告: 解析进度、sector 数量、耗时
 
-### Decision 8: WASM Parser Module
+### Decision 9: WASM Parser Module
 
 **问题**: 需要高性能解析器处理大型存档
 
@@ -347,11 +383,16 @@ function resolveName(s: string): string {
 
 **实现细节**:
 - 位置: `src/wasm/`
+- Rust 实现按职责拆分：
+  - `rust-parser/src/model.rs` - 数据模型与错误类型
+  - `rust-parser/src/core.rs` - 业务状态机与 `SaveArchive` 聚合
+  - `rust-parser/src/stream.rs` - 流式 XML/gzip 输入、progress、pump
 - `SaveParser` 类:
   - `push_chunk(chunk: Uint8Array)` - 输入数据块
   - `pump(max_events: number): boolean` - 处理事件，返回是否还有更多
   - `finish(filename: string): string` - 完成解析，返回 JSON 字符串
   - `progress_json(): string` - 获取进度信息（ProgressInfo JSON）
+  - `take_cli_progress_json(): string | null` - 仅在 Rust 认为应上报时返回 CLI progress
   - `set_expected_total_bytes(total: number)` - 设置预期总字节数
   - `set_expected_version(version: string)` - 设置期望版本（用于早期版本校验）
 - 使用流程:
@@ -359,6 +400,27 @@ function resolveName(s: string): string {
   2. 调用 `push_chunk` 输入数据
   3. 循环调用 `pump` 处理事件
   4. 调用 `finish` 获取结果
+- gzip 输入模式:
+  - 自动探测 gzip header
+  - 在 Rust 内部用 `flate2::Decompress` 增量解压 raw deflate
+  - 在 `finish_input()` 阶段持续推进到 `StreamEnd`
+- attribute 语义对齐 JS 路径:
+  - key 统一转小写
+  - 进行 XML entity decode
+  - 未设置 `expected_version` 时默认兼容
+
+### Decision 10: Progress Semantics
+
+**问题**: UI 和 CLI 都需要进度，但两条链路不能各自发明不同语义
+
+**方案**: Rust/WASM 负责产生真实进度快照；UI 和 CLI 只消费，不重复推断
+
+**实现细节**:
+- UI worker 向主线程发送节流后的 `ProgressInfo`
+- `SaveUploadPanel` 文本状态读取 store 的 `parseProgress`
+- `SaveUploadPanel` 进度条宽度绑定本地 `parsePercent`，直接取 worker `percent`
+- CLI `--wasm` 只打印 Rust `take_cli_progress_json()` 返回的快照
+- Rust 侧负责 CLI progress 的时间/阶段节流，不在 `extract_save.tsx` 再追加第二套控制
 
 ## File Structure
 
@@ -368,6 +430,7 @@ src/
 │   └── save/
 │       ├── SaveImportView.vue          # 主视图容器
 │       ├── SaveUploadPanel.vue         # 上传面板
+│       ├── saveUploadStreaming.ts      # 原始字节流上传桥接
 │       ├── SaveList.vue                # 存档列表
 │       ├── SaveListItem.vue            # 存档项（含下载按钮）
 │       ├── SaveDetailPanel.vue         # 详情面板
@@ -403,7 +466,10 @@ scripts/
 rust-parser/                            # Rust WASM解析器源码
 ├── Cargo.toml                          # Rust项目配置
 ├── src/
-│   └── lib.rs                          # 解析器实现
+│   ├── lib.rs                          # WASM 导出包装
+│   ├── model.rs                        # 数据模型与错误类型
+│   ├── core.rs                         # 业务解析核心
+│   └── stream.rs                       # 流式输入、gunzip、progress
 └── pkg/                                # 编译输出（wasm-pack）
     ├── save_parser.js
     ├── save_parser_bg.wasm
@@ -432,8 +498,9 @@ rust-parser/                            # Rust WASM解析器源码
 ### Worker Performance
 
 - 预估100MB存档解析时间: 5-15秒
-- 进度报告频率: 每1MB报告一次
-- 内存占用: Worker内约50-100MB（流式处理）
+- UI 进度报告使用节流后的快照，避免高频主线程更新
+- CLI `--wasm` 进度由 Rust 侧统一控制
+- 内存占用: 以原始字节流 + Rust 内部解析缓冲为主，避免浏览器端完整 gunzip 缓冲
 
 ### Coordinate Accumulation
 

@@ -19,22 +19,28 @@
 
 ---
 
-### T2: SAX解析Worker
+### T2: 流式解析链路
 
-**Scope**: 实现流式XML解析Worker
+**Scope**: 实现原始字节上传、Rust/SAX 解析与流式进度链路
 
 **Files**:
+- `src/components/save/saveUploadStreaming.ts`
+- `src/workers/saveParserRust.worker.ts`
 - `src/workers/saveParser.worker.ts`
+- `rust-parser/src/model.rs`
+- `rust-parser/src/core.rs`
+- `rust-parser/src/stream.rs`
 
 **Steps**:
-1. 创建Worker脚本框架
-2. 实现gzip检测和自动解压
-3. 实现SAX解析逻辑（参考x4-vault-finder）
-4. 提取目标对象：stations, datavaults, erlkingVaults, abandonedShips
-5. 实现坐标累加（position栈）
-6. 提取存档元信息：guid, seed, time, playerName, version
-7. 实现进度报告机制
-8. 实现早期版本校验（解析到game标签时立即校验）
+1. 创建上传桥接模块，按 `parse_start / parse_chunk / parse_end` 协议发送原始文件字节
+2. 在 Rust worker 中维护解析会话，承接 `expectedTotalBytes/currentVersion`、chunk 推进与完成收尾
+3. 在 Rust 端实现 gzip 检测、header/trailer 处理与增量 gunzip，不再依赖浏览器 `DecompressionStream`
+4. 保留 SAX 解析链路作为备用/CLI 默认解析器
+5. 实现目标对象提取：stations, datavaults, erlkingVaults, abandonedShips
+6. 实现坐标累加（position 栈）
+7. 提取存档元信息：guid, seed, time, playerName, version
+8. 实现流式进度报告与 `finalizing` 阶段补发
+9. 实现早期版本校验（解析到 game 标签时立即校验）
 
 ---
 
@@ -50,10 +56,11 @@
 2. 创建文件选择按钮
 3. 支持 .xml, .xml.gz, .json 文件类型
 4. 文件上传后判断类型
-5. XML/XML.GZ → 启动Worker解析
+5. XML/XML.GZ → 启动流式上传并驱动 Worker 解析
 6. JSON → 直接加载（跳过解析）
 7. JSON导入时校验 `meta.version`
 8. 显示上传状态和进度
+9. 进度条宽度直接绑定 worker 返回的 `percent`
 
 ---
 
@@ -182,8 +189,10 @@
 
 **Steps**:
 1. 运行 `npm run build`
-2. 修复所有编译错误
-3. 重新运行build直到成功
+2. Rust 相关改动后运行 `cargo test`
+3. Rust 相关改动后运行 `./build.sh`
+4. 修复所有编译错误
+5. 重新运行build直到成功
 
 ## Task Dependencies
 

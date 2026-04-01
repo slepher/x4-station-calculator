@@ -17,6 +17,12 @@
   1. 原始存档文件（.xml 或 .xml.gz）：需要解析
   2. 已提取JSON文件：直接加载（跳过解析步骤）
 - 上传控件：拖拽区域 + 文件选择按钮
+- 原始存档上传使用浏览器 `File.stream()` 按块读取，不在主线程一次性读入完整文件
+- 上传链路采用三段式 worker 协议：
+  - `parse_start`：发送 `filename/currentVersion/expectedTotalBytes`
+  - `parse_chunk`：逐块发送原始文件字节
+  - `parse_end`：通知输入结束
+- gzip 文件的解压由 Rust/WASM 端完成，前端只转发原始 `.xml.gz` 字节，不再使用浏览器 `DecompressionStream` 预解压
 
 ### 存档分组逻辑
 | 字段 | 来源 | 作用 |
@@ -90,12 +96,19 @@
 - 坐标系统：游戏内米级，需累加component层级offset
 - 名称翻译：`{page,id}` 格式需查找strings表翻译为可读名称
 - JSON导入/导出使用浏览器原生下载API
+- Rust 解析路径需要同时承担：
+  - 原始 XML 流式解析
+  - `.xml.gz` 的增量 gunzip
+  - 真实解析进度输出
+- CLI `scripts/extract_save.tsx --wasm` 的进度输出必须完全依赖 Rust/WASM 侧返回，不在脚本层二次推断或补充节流语义
+- 上传面板进度条宽度必须直接映射 worker 返回的 `percent`，不能仅显示文本状态
 
 ## 边界
 
 ### In Scope
 - Tab新增与切换逻辑
 - 上传界面（原始存档 + JSON）
+- 上传流转发模块（原始字节 → worker）
 - 存档列表（按guid分组，按time降序）
 - 存档详情面板（空间站/vault/弃船列表）
 - JSON导出功能
@@ -103,6 +116,8 @@
 - 新增Store：`useSaveStore`
 - Vue组件目录：`src/components/save/`
 - SAX解析Worker
+- Rust WASM 解析Worker 会话层
+- Rust 端 gunzip 与 CLI progress 控制
 
 ### Out of Scope
 - 持久化到localStorage/IndexedDB（暂不实现）
@@ -125,6 +140,9 @@
 10. 每个存档项提供"下载JSON"按钮
 11. 点击下载按钮生成并下载JSON文件（包含完整meta和sectors数据）
 12. 解析大文件（100MB+）不阻塞UI
+13. 上传 `.xml.gz` 时浏览器端不再执行 JS gunzip，仍能正确完成导入
+14. 上传解析时进度文本与进度条宽度都随 worker 返回的 percent 正常更新
+15. `scripts/extract_save.tsx --wasm` 输出的进度频率与内容由 Rust 侧控制，脚本不再自行补充判断
 
 ## 未决项
 
