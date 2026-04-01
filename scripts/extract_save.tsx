@@ -1,10 +1,64 @@
 import fs from 'node:fs'
+import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import zlib from 'node:zlib'
 import sax from 'sax'
-import xmlFormat from 'xml-formatter'
-import { createSaveParserRuntime } from '../src/workers/saveParser.worker'
+import { createSaveParserRuntime, createSaveXmlFilterRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
+
+interface FilteredXmlResult {
+  xml: string
+  sectorCount: number
+}
+
+interface FilteredXmlRuntime {
+  feed: (xmlChunk: string) => void
+  close: () => { sectorCount: number }
+}
+
+interface FilteredXmlRuntimeOptions {
+  expectedVersion: string | null
+  write: (chunk: string) => void
+}
+
+interface QueryTag {
+  name: string
+  attributes: Record<string, string>
+}
+
+interface QueryXmlResult {
+  xml: string
+  matchCount: number
+}
+
+interface QueryXmlRuntime {
+  feed: (xmlChunk: string) => void
+  close: () => { matchCount: number }
+}
+
+interface QueryXmlRuntimeOptions {
+  query: QueryTag
+  write: (chunk: string) => void
+}
+
+interface QueryXmlNode {
+  name: string
+  attrStr: string
+  depth: number
+  isSelfClosing: boolean
+}
+
+interface QueryTreeNode {
+  name: string
+  attrStr: string
+  selfClosing: boolean
+  children: QueryTreeNode[]
+}
+
+interface QueryMatch {
+  ancestors: QueryXmlNode[]
+  root: QueryTreeNode
+}
 
 function printUsage(): void {
   console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output] [options]')
@@ -12,13 +66,18 @@ function printUsage(): void {
   console.log('Options:')
   console.log('  --wasm         Use Rust WASM parser (3.25x faster, experimental)')
   console.log('  --xml          Output as XML instead of JSON (extracts only relevant data)')
+  console.log('  --query-xml <q>  Output matching tags with full subtree and ancestor chain as XML')
   console.log('  --version <v>  Expected game version (e.g., "8.0"). If not set, version check is skipped')
 }
 
-function parseArgs(): { input: string; output: string; useWasm: boolean; outputXml: boolean; expectedVersion: string | null } {
+function parseArgs(): { input: string; output: string; useWasm: boolean; outputXml: boolean; queryXml: string | null; expectedVersion: string | null } {
   const args = process.argv.slice(2)
   const useWasm = args.includes('--wasm')
   const outputXml = args.includes('--xml')
+  const queryXmlIndex = args.indexOf('--query-xml')
+  const queryXml = queryXmlIndex !== -1 && args[queryXmlIndex + 1] && !args[queryXmlIndex + 1].startsWith('--')
+    ? args[queryXmlIndex + 1]
+    : null
   
   let expectedVersion: string | null = null
   const versionIndex = args.indexOf('--version')
@@ -29,12 +88,13 @@ function parseArgs(): { input: string; output: string; useWasm: boolean; outputX
   const positional = args.filter((a, i) => {
     if (a.startsWith('--')) return false
     if (versionIndex !== -1 && (i === versionIndex + 1)) return false
+    if (queryXmlIndex !== -1 && i === queryXmlIndex + 1) return false
     return true
   })
   
   const input = positional[0]
   const output = positional[1]
-  return { input, output, useWasm, outputXml, expectedVersion }
+  return { input, output, useWasm, outputXml, queryXml, expectedVersion }
 }
 
 function isGzipFile(filePath: string): boolean {
@@ -57,6 +117,13 @@ function defaultOutputPath(inputPath: string, outputXml: boolean): string {
   return inputPath + ext
 }
 
+function defaultQueryOutputPath(inputPath: string): string {
+  if (inputPath.toLowerCase().endsWith('.xml.gz')) return inputPath.slice(0, -7) + '.query.xml'
+  if (inputPath.toLowerCase().endsWith('.gz')) return inputPath.slice(0, -3) + '.query.xml'
+  if (inputPath.toLowerCase().endsWith('.xml')) return inputPath.slice(0, -4) + '.query.xml'
+  return inputPath + '.query.xml'
+}
+
 function formatMB(bytes: number): string {
   return (bytes / (1024 * 1024)).toFixed(1)
 }
@@ -65,6 +132,260 @@ function getGzipUncompressedSize(buf: Buffer): number | null {
   if (buf.length < 18) return null
   if (buf[0] !== 0x1f || buf[1] !== 0x8b) return null
   return buf.readUInt32LE(buf.length - 4)
+}
+
+
+export function createFilteredSaveXmlRuntime(options: FilteredXmlRuntimeOptions): FilteredXmlRuntime {
+  return createSaveXmlFilterRuntime({
+    currentVersion: options.expectedVersion,
+    write: options.write
+  })
+}
+
+export function extractFilteredSaveXmlFromString(xml: string, expectedVersion: string | null): FilteredXmlResult {
+  const output: string[] = []
+  const runtime = createFilteredSaveXmlRuntime({
+    expectedVersion,
+    write: (chunk) => output.push(chunk)
+  })
+  runtime.feed(xml)
+  const result = runtime.close()
+  return {
+    xml: output.join(''),
+    sectorCount: result.sectorCount
+  }
+}
+
+function escapeXmlAttribute(value: string): string {
+  return value
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;')
+}
+
+function serializeXmlAttributes(attributes: Record<string, string>): string {
+  const entries = Object.entries(attributes)
+  if (entries.length === 0) return ''
+  return ' ' + entries.map(([k, v]) => `${k}="${escapeXmlAttribute(v)}"`).join(' ')
+}
+
+export function parseQueryTag(query: string): QueryTag {
+  const trimmed = query.trim()
+  const inner = trimmed
+    .replace(/^<\s*/, '')
+    .replace(/\s*\/?>\s*$/, '')
+    .trim()
+
+  const nameMatch = inner.match(/^([^\s,]+)(.*)$/)
+  if (!nameMatch) {
+    throw new Error(`Invalid query tag: ${query}`)
+  }
+
+  const rawName = nameMatch[1].replace(/^\[/, '').replace(/\]$/, '')
+  const rest = nameMatch[2] || ''
+  const attributes: Record<string, string> = {}
+  const attrRegex = /([a-zA-Z0-9_:-]+)\s*=\s*"([^"]*)"|([a-zA-Z0-9_:-]+)\s*=\s*'([^']*)'/g
+  let match: RegExpExecArray | null
+  while ((match = attrRegex.exec(rest)) !== null) {
+    const key = (match[1] || match[3] || '').toLowerCase()
+    const value = match[2] ?? match[4] ?? ''
+    attributes[key] = value
+  }
+
+  return {
+    name: rawName.toLowerCase(),
+    attributes
+  }
+}
+
+function nodeMatchesQuery(node: QueryXmlNode, query: QueryTag): boolean {
+  if (node.name !== query.name) return false
+  for (const [key, value] of Object.entries(query.attributes)) {
+    const attrPattern = new RegExp(`${key}="([^"]*)"`)
+    const attrMatch = node.attrStr.match(attrPattern)
+    if (!attrMatch || attrMatch[1] !== value) return false
+  }
+  return true
+}
+
+function serializeQueryTree(node: QueryTreeNode, depth: number): string[] {
+  const indent = '  '.repeat(depth)
+  if (node.selfClosing && node.children.length === 0) {
+    return [`${indent}<${node.name}${node.attrStr}/>`]
+  }
+
+  const lines = [`${indent}<${node.name}${node.attrStr}>`]
+  for (const child of node.children) {
+    lines.push(...serializeQueryTree(child, depth + 1))
+  }
+  lines.push(`${indent}</${node.name}>`)
+  return lines
+}
+
+function writeAncestorChain(lines: string[], ancestors: QueryXmlNode[], root: QueryTreeNode, depth: number): void {
+  if (ancestors.length === 0) {
+    lines.push(...serializeQueryTree(root, depth))
+    return
+  }
+
+  const [head, ...tail] = ancestors
+  const indent = '  '.repeat(depth)
+  lines.push(`${indent}<${head.name}${head.attrStr}>`)
+  writeAncestorChain(lines, tail, root, depth + 1)
+  lines.push(`${indent}</${head.name}>`)
+}
+
+export function createQueryXmlRuntime(options: QueryXmlRuntimeOptions): QueryXmlRuntime {
+  const parser = sax.parser(false, { lowercase: true, position: false })
+  const pathStack: QueryXmlNode[] = []
+  const activeCaptures: Array<{ rootDepth: number; nodeStack: QueryTreeNode[]; ancestors: QueryXmlNode[] }> = []
+  const matches: QueryMatch[] = []
+
+  parser.onopentag = (node: sax.Tag) => {
+    const attrEntries = Object.entries(node.attributes).map(([k, v]) => [k.toLowerCase(), String(v)] as const)
+    const currentNode: QueryXmlNode = {
+      name: node.name,
+      attrStr: serializeXmlAttributes(Object.fromEntries(attrEntries)),
+      depth: pathStack.length + 1,
+      isSelfClosing: node.isSelfClosing === true
+    }
+    pathStack.push(currentNode)
+
+    for (const capture of activeCaptures) {
+      if (currentNode.depth <= capture.rootDepth) continue
+      const treeNode: QueryTreeNode = {
+        name: currentNode.name,
+        attrStr: currentNode.attrStr,
+        selfClosing: currentNode.isSelfClosing,
+        children: []
+      }
+      const parent = capture.nodeStack[capture.nodeStack.length - 1]
+      parent.children.push(treeNode)
+      if (!currentNode.isSelfClosing) {
+        capture.nodeStack.push(treeNode)
+      }
+    }
+
+    if (nodeMatchesQuery(currentNode, options.query)) {
+      const root: QueryTreeNode = {
+        name: currentNode.name,
+        attrStr: currentNode.attrStr,
+        selfClosing: currentNode.isSelfClosing,
+        children: []
+      }
+      const capture = {
+        rootDepth: currentNode.depth,
+        nodeStack: currentNode.isSelfClosing ? [] : [root],
+        ancestors: pathStack.slice(0, -1).map((ancestor) => ({ ...ancestor }))
+      }
+      matches.push({ ancestors: capture.ancestors, root })
+      if (!currentNode.isSelfClosing) {
+        activeCaptures.push(capture)
+      }
+    }
+  }
+
+  parser.ontext = () => {}
+  parser.oncdata = () => {}
+  parser.onerror = (err: Error) => {
+    throw err
+  }
+
+  parser.onclosetag = () => {
+    const currentNode = pathStack[pathStack.length - 1]
+    if (currentNode) {
+      for (let i = activeCaptures.length - 1; i >= 0; i--) {
+        const capture = activeCaptures[i]
+        if (currentNode.depth < capture.rootDepth) continue
+        if (currentNode.depth === capture.rootDepth) {
+          activeCaptures.splice(i, 1)
+          continue
+        }
+        if (!currentNode.isSelfClosing) {
+          capture.nodeStack.pop()
+        }
+      }
+    }
+    pathStack.pop()
+  }
+
+  return {
+    feed(xmlChunk: string) {
+      parser.write(xmlChunk)
+    },
+    close() {
+      parser.close()
+      options.write('<?xml version="1.0" encoding="utf-8"?>\n')
+      options.write('<query-results>\n')
+      matches.forEach((match, index) => {
+        const lines = [`  <match index="${index + 1}">`]
+        writeAncestorChain(lines, match.ancestors, match.root, 2)
+        lines.push('  </match>')
+        options.write(lines.join('\n') + '\n')
+      })
+      options.write('</query-results>\n')
+      return { matchCount: matches.length }
+    }
+  }
+}
+
+export function extractQueryXmlFromString(xml: string, query: string): QueryXmlResult {
+  const output: string[] = []
+  const runtime = createQueryXmlRuntime({
+    query: parseQueryTag(query),
+    write: (chunk) => output.push(chunk)
+  })
+  runtime.feed(xml)
+  const result = runtime.close()
+  return {
+    xml: output.join(''),
+    matchCount: result.matchCount
+  }
+}
+
+async function extractSaveQueryXml(inputPath: string, outputPath: string, query: string): Promise<void> {
+  const absoluteInput = path.resolve(process.cwd(), inputPath)
+  const absoluteOutput = path.resolve(process.cwd(), outputPath)
+  const gzip = isGzipFile(absoluteInput)
+  const stat = fs.statSync(absoluteInput)
+
+  console.log('[extract_save] parser: sax-js (query XML output)')
+  console.log(`[extract_save] input: ${absoluteInput}`)
+  console.log(`[extract_save] output: ${absoluteOutput}`)
+  console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
+  console.log(`[extract_save] source type: ${gzip ? 'gzip' : 'xml'}`)
+  console.log(`[extract_save] query: ${query}`)
+
+  const sourceStream = fs.createReadStream(absoluteInput)
+  const dataStream = gzip ? sourceStream.pipe(zlib.createGunzip()) : sourceStream
+  const outputFd = fs.openSync(absoluteOutput, 'w')
+  const runtime = createQueryXmlRuntime({
+    query: parseQueryTag(query),
+    write: (chunk) => {
+      fs.writeSync(outputFd, chunk)
+    }
+  })
+
+  const decoder = new TextDecoder()
+  for await (const chunk of dataStream as AsyncIterable<Buffer>) {
+    runtime.feed(decoder.decode(chunk, { stream: true }))
+  }
+
+  const tail = decoder.decode()
+  if (tail) {
+    runtime.feed(tail)
+  }
+
+  try {
+    const result = runtime.close()
+    console.log(`[extract_save] done: ${result.matchCount} matches`)
+  } finally {
+    fs.closeSync(outputFd)
+  }
+
+  console.log(`[extract_save] xml written: ${absoluteOutput}`)
 }
 
 async function extractSaveSaxJs(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<SaveArchive> {
@@ -145,148 +466,16 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
   const sourceStream = fs.createReadStream(absoluteInput)
   const dataStream = gzip ? sourceStream.pipe(zlib.createGunzip()) : sourceStream
 
-  const parser = sax.parser(false, { lowercase: true, position: false })
-  
-  const VALID_CHILD_CLASSES = ['station', 'datavault']
-  
-  interface TagNode {
-    name: string
-    attrStr: string
-    depth: number
-    children: TagNode[]
-    parent: TagNode | null
-    hasValidContent: boolean
-  }
-  
-  const root: TagNode = { name: '', attrStr: '', depth: 0, children: [], parent: null, hasValidContent: false }
-  let current: TagNode = root
-  let depth = 0
   let sectorCount = 0
-  let versionChecked = false
-  let versionMatch = true
-  let gameTag: TagNode | null = null
-  let playerTag: TagNode | null = null
-  
-  const outputChunks: string[] = []
-  
-  function escapeXml(str: string): string {
-    return str
-      .replace(/&/g, '&amp;')
-      .replace(/</g, '&lt;')
-      .replace(/>/g, '&gt;')
-      .replace(/"/g, '&quot;')
-      .replace(/'/g, '&apos;')
-  }
-  
-  function normalizeVersion(v: string): string {
-    const trimmed = v.trim()
-    if (/^\d+\.\d+$/.test(trimmed)) {
-      return trimmed
-    }
-    const num = parseInt(trimmed, 10)
-    if (isNaN(num)) return v
-    return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
-  }
-  
-  function isValidChild(node: TagNode): boolean {
-    if (node.name !== 'component') return false
-    const clazzMatch = node.attrStr.match(/class="([^"]+)"/)
-    if (!clazzMatch) return false
-    const clazz = clazzMatch[1]
-    if (VALID_CHILD_CLASSES.includes(clazz)) return true
-    if (clazz.startsWith('ship_') && node.attrStr.includes('owner="ownerless"')) return true
-    if (node.attrStr.toLowerCase().includes('erlking_vault')) return true
-    return false
-  }
-  
-  function markContentPath(node: TagNode): void {
-    let n: TagNode | null = node
-    while (n) {
-      n.hasValidContent = true
-      n = n.parent
-    }
-  }
-  
-  function outputTree(node: TagNode, insideValidChild: boolean = false): void {
-    if (!node.hasValidContent && !insideValidChild) return
-    
-    if (node.name) {
-      const hasContentChildren = node.children.some(c => c.hasValidContent)
-      const isSelfValid = isValidChild(node)
-      const shouldOutputContent = isSelfValid || hasContentChildren || insideValidChild
-      
-      if (shouldOutputContent) {
-        outputChunks.push(`<${node.name}${node.attrStr}>`)
-        for (const child of node.children) {
-          outputTree(child, isSelfValid || insideValidChild)
-        }
-        outputChunks.push(`</${node.name}>`)
-      } else {
-        outputChunks.push(`<${node.name}${node.attrStr}></${node.name}>`)
-      }
-    } else {
-      for (const child of node.children) {
-        outputTree(child, insideValidChild)
-      }
-    }
-  }
-  
-  parser.onopentag = (node: sax.Tag) => {
-    depth++
-    
-    const attrEntries = Object.entries(node.attributes)
-    const attrStr = attrEntries.length > 0 
-      ? ' ' + attrEntries.map(([k, v]) => `${k}="${escapeXml(String(v))}"`).join(' ')
-      : ''
-    
-    const tagNode: TagNode = {
-      name: node.name,
-      attrStr,
-      depth,
-      children: [],
-      parent: current,
-      hasValidContent: false
-    }
-    
-    current.children.push(tagNode)
-    current = tagNode
-    
-    if (node.name === 'game' && current.parent?.name === 'info') {
-      gameTag = tagNode
-      if (!versionChecked) {
-        versionChecked = true
-        const version = node.attributes.version as string
-        if (expectedVersion && version) {
-          const saveVer = normalizeVersion(version)
-          const expectedVer = normalizeVersion(expectedVersion)
-          if (saveVer !== expectedVer) {
-            console.error(`[extract_save] version mismatch: ${version} (${saveVer}) vs ${expectedVersion} (${expectedVer})`)
-            versionMatch = false
-          }
-        }
-      }
-    }
-    
-    if (node.name === 'player' && current.parent?.name === 'info') {
-      playerTag = tagNode
-    }
-    
-    if (isValidChild(tagNode)) {
-      markContentPath(tagNode)
-      sectorCount++
-    }
-  }
-  
-  parser.onclosetag = (_name: string) => {
-    current = current.parent || root
-    depth--
-  }
-  
-  parser.ontext = (_text: string) => {}
-  parser.oncdata = (_data: string) => {}
-  
   let sourceBytesRead = 0
   let nextSourceLogMB = 10
+  const outputFd = fs.openSync(absoluteOutput, 'w')
+  const runtime = createFilteredSaveXmlRuntime({
+    expectedVersion,
+    write: (chunk) => {
+      fs.writeSync(outputFd, chunk)
+    }
+  })
   
   sourceStream.on('data', (chunk: string | Buffer) => {
     sourceBytesRead += typeof chunk === 'string' ? chunk.length : chunk.length
@@ -299,30 +488,22 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
 
   const decoder = new TextDecoder()
   for await (const chunk of dataStream as AsyncIterable<Buffer>) {
-    parser.write(decoder.decode(chunk, { stream: true }))
+    runtime.feed(decoder.decode(chunk, { stream: true }))
   }
-  
-  parser.close()
-  
-  if (!versionMatch) {
-    throw new Error('Version mismatch')
+
+  const tail = decoder.decode()
+  if (tail) {
+    runtime.feed(tail)
   }
-  
-  if (gameTag) markContentPath(gameTag)
-  if (playerTag) markContentPath(playerTag)
-  
-  outputTree(root)
-  
-  const rawXml = outputChunks.join('')
-  const xmlWithDeclaration = '<?xml version="1.0" encoding="utf-8"?>' + rawXml
-  const formattedXml = xmlFormat(xmlWithDeclaration, {
-    indentation: '  ',
-    collapseContent: true,
-    lineSeparator: '\n'
-  })
-  fs.writeFileSync(absoluteOutput, formattedXml + '\n')
-  
-  console.log(`[extract_save] done: ${sectorCount} sectors extracted`)
+
+  try {
+    const result = runtime.close()
+    sectorCount = result.sectorCount
+  } finally {
+    fs.closeSync(outputFd)
+  }
+
+  console.log(`[extract_save] done: ${sectorCount} sectors`)
   console.log(`[extract_save] xml written: ${absoluteOutput}`)
 }
 
@@ -422,7 +603,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
 }
 
 async function main(): Promise<void> {
-  const { input, output, useWasm, outputXml, expectedVersion } = parseArgs()
+  const { input, output, useWasm, outputXml, queryXml, expectedVersion } = parseArgs()
 
   if (!input) {
     printUsage()
@@ -431,7 +612,9 @@ async function main(): Promise<void> {
   }
 
   try {
-    if (outputXml) {
+    if (queryXml) {
+      await extractSaveQueryXml(input, output || defaultQueryOutputPath(input), queryXml)
+    } else if (outputXml) {
       if (useWasm) {
         console.error('[extract_save] --xml mode does not support --wasm, using JS parser')
       }
@@ -448,4 +631,8 @@ async function main(): Promise<void> {
   }
 }
 
-void main()
+const isDirectExecution = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
+
+if (isDirectExecution) {
+  void main()
+}
