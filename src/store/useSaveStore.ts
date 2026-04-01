@@ -11,6 +11,9 @@ import type {
   SavePoiOverlayItem,
   SavePoiSectorGroup,
   StationEntry,
+  PlayerStationEntry,
+  FactionStationEntry,
+  NpcStationEntry,
   DatavaultEntry,
   AbandonedShipEntry
 } from '@/types/saveArchive'
@@ -49,7 +52,11 @@ function createEmptySectorData(name: string): SectorData {
   return {
     name,
     is_known: false,
-    stations: [],
+    owner: undefined,
+    playerStations: [],
+    xenonStations: [],
+    khaakStations: [],
+    npcStations: [],
     datavaults: [],
     erlkingVaults: [],
     abandonedShips: []
@@ -106,15 +113,74 @@ export function deriveSavePoiCategoryData(archive: SaveArchive | null | undefine
 
   return {
     playerStation: createPoiCategoryData('playerStation', buildPoiGroups(sectors, (sector) =>
-      sector.stations.filter((station) => station.owner === 'player')
+      sector.playerStations || []
     )),
     npcStation: createPoiCategoryData('npcStation', buildPoiGroups(sectors, (sector) =>
-      sector.stations.filter((station) => station.owner !== 'player' && station.is_headquarter === true)
+      [
+        ...(sector.npcStations || []),
+        ...(sector.xenonStations || []),
+        ...(sector.khaakStations || [])
+      ]
     )),
-    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (sector) => sector.abandonedShips)),
-    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (sector) => sector.datavaults)),
-    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (sector) => sector.erlkingVaults))
+    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (sector) => sector.abandonedShips || [])),
+    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (sector) => sector.datavaults || [])),
+    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (sector) => sector.erlkingVaults || []))
   }
+}
+
+function classifyLegacyStation(station: StationEntry): keyof Pick<SectorData, 'playerStations' | 'xenonStations' | 'khaakStations' | 'npcStations'> {
+  if (station.owner === 'player') return 'playerStations'
+  if (station.owner === 'xenon') return 'xenonStations'
+  if (station.owner === 'khaak') return 'khaakStations'
+  return 'npcStations'
+}
+
+function normalizeSectorData(
+  sectorId: string,
+  sector: SectorData & {
+    stations?: StationEntry[]
+    player_stations?: PlayerStationEntry[]
+    xenon_stations?: FactionStationEntry[]
+    khaak_stations?: FactionStationEntry[]
+    npc_stations?: NpcStationEntry[]
+  }
+): SectorData {
+  const normalized = createEmptySectorData(sector.name || sectorId)
+  normalized.is_known = Boolean(sector.is_known)
+  normalized.owner = sector.owner
+  normalized.datavaults = Array.isArray(sector.datavaults)
+    ? sector.datavaults.map((entry) => ({
+      ...entry,
+      unlocked: entry.unlocked === true,
+      wares: Array.isArray(entry.wares) ? entry.wares : []
+    }))
+    : []
+  normalized.erlkingVaults = Array.isArray(sector.erlkingVaults)
+    ? sector.erlkingVaults.map((entry) => ({
+      ...entry,
+      unlocked: entry.unlocked === true,
+      wares: Array.isArray(entry.wares) ? entry.wares : []
+    }))
+    : []
+  normalized.abandonedShips = Array.isArray(sector.abandonedShips) ? sector.abandonedShips : []
+
+  if (Array.isArray(sector.playerStations)) normalized.playerStations = sector.playerStations as PlayerStationEntry[]
+  else if (Array.isArray(sector.player_stations)) normalized.playerStations = sector.player_stations as PlayerStationEntry[]
+  if (Array.isArray(sector.xenonStations)) normalized.xenonStations = sector.xenonStations as FactionStationEntry[]
+  else if (Array.isArray(sector.xenon_stations)) normalized.xenonStations = sector.xenon_stations as FactionStationEntry[]
+  if (Array.isArray(sector.khaakStations)) normalized.khaakStations = sector.khaakStations as FactionStationEntry[]
+  else if (Array.isArray(sector.khaak_stations)) normalized.khaakStations = sector.khaak_stations as FactionStationEntry[]
+  if (Array.isArray(sector.npcStations)) normalized.npcStations = sector.npcStations as NpcStationEntry[]
+  else if (Array.isArray(sector.npc_stations)) normalized.npcStations = sector.npc_stations as NpcStationEntry[]
+
+  if (Array.isArray(sector.stations)) {
+    for (const station of sector.stations) {
+      const key = classifyLegacyStation(station)
+      ;(normalized[key] as StationEntry[]).push(station)
+    }
+  }
+
+  return normalized
 }
 
 export function flattenSavePoiCategoryData(
@@ -230,6 +296,9 @@ export const useSaveStore = defineStore('save', () => {
   }
 
   function addArchive(archive: SaveArchive): void {
+    archive.sectors = Object.fromEntries(
+      Object.entries(archive.sectors).map(([sectorId, sector]) => [sectorId, normalizeSectorData(sectorId, sector as SectorData & { stations?: StationEntry[] })])
+    )
     archive.isCompatible = checkVersionCompatibility(archive.meta.version)
 
     const guid = archive.meta.guid
@@ -278,6 +347,9 @@ export const useSaveStore = defineStore('save', () => {
       const id = `${guid}_${time}`
       const fullArchive = await loadArchiveDetailFromDB(id)
       if (fullArchive) {
+        fullArchive.sectors = Object.fromEntries(
+          Object.entries(fullArchive.sectors).map(([sectorId, sector]) => [sectorId, normalizeSectorData(sectorId, sector as SectorData & { stations?: StationEntry[] })])
+        )
         const index = group.saves.findIndex(s => s.meta.time === time)
         if (index >= 0) {
           group.saves[index] = fullArchive
@@ -399,12 +471,11 @@ export const useSaveStore = defineStore('save', () => {
         return { success: false, error: 'Missing sectors data', errorDetail: { type: 'parse_error', message: 'Missing sectors data' } }
       }
 
-      const sectors = data.sectors as Record<string, SectorData>
+      const sectorsInput = data.sectors as Record<string, SectorData & { stations?: StationEntry[] }>
+      const sectors: Record<string, SectorData> = {}
 
-      for (const [sectorId, sector] of Object.entries(sectors)) {
-        if (!sector.name) {
-          sectors[sectorId] = createEmptySectorData(sectorId)
-        }
+      for (const [sectorId, sector] of Object.entries(sectorsInput)) {
+        sectors[sectorId] = normalizeSectorData(sectorId, sector)
       }
 
       const archive: SaveArchive = {

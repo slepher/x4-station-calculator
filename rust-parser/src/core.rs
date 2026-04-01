@@ -1,6 +1,8 @@
 use crate::model::{
-    norm_ver, AbandonedShipEntry, ArchiveMeta, DatavaultEntry, Meta, ParserError, SaveArchive,
-    SectorData, StationEntry, StationEquipment, StationModule, Vector3,
+    norm_ver, AbandonedShipEntry, AggregatedStationModule, ArchiveMeta, DatavaultEntry,
+    DatavaultWareEntry, FactionStationEntry, Meta, NpcStationEntry, ParserError,
+    PlayerStationEntry, PlayerStationModule, SaveArchive, SectorData, StationBaseEntry,
+    StationEquipment, Vector3,
 };
 use std::collections::{HashMap, VecDeque};
 
@@ -16,6 +18,8 @@ struct ComponentCtx {
     has_signalleak: Option<bool>,
     is_wreck: bool,
     is_headquarter: bool,
+    unlocked: bool,
+    ware_totals: HashMap<String, i64>,
 }
 
 fn num(s: Option<&String>, fallback: f64) -> f64 {
@@ -67,7 +71,8 @@ pub(crate) struct SaveParserCore {
     tags: usize,
 
     station_owner: Option<String>,
-    station_mods: Vec<StationModule>,
+    player_station_mods: Vec<PlayerStationModule>,
+    npc_station_module_counts: HashMap<String, i64>,
     entry_idx: Option<i64>,
     entry_ref: Option<String>,
     entry_eq: Vec<StationEquipment>,
@@ -85,7 +90,8 @@ impl SaveParserCore {
             path: VecDeque::new(),
             tags: 0,
             station_owner: None,
-            station_mods: Vec::new(),
+            player_station_mods: Vec::new(),
+            npc_station_module_counts: HashMap::new(),
             entry_idx: None,
             entry_ref: None,
             entry_eq: Vec::new(),
@@ -137,6 +143,8 @@ impl SaveParserCore {
                     .get("factionheadquarters")
                     .map(|v| v == "1")
                     .unwrap_or(false),
+                unlocked: false,
+                ware_totals: HashMap::new(),
             });
 
             if cls == "sector" {
@@ -146,7 +154,11 @@ impl SaveParserCore {
                     name: m,
                     is_known: a.get("known") == Some(&"1".to_string())
                         || a.get("knownto") == Some(&"player".to_string()),
-                    stations: Vec::new(),
+                    owner: a.get("owner").cloned(),
+                    player_stations: Vec::new(),
+                    xenon_stations: Vec::new(),
+                    khaak_stations: Vec::new(),
+                    npc_stations: Vec::new(),
                     datavaults: Vec::new(),
                     erlking_vaults: Vec::new(),
                     abandoned_ships: Vec::new(),
@@ -155,7 +167,8 @@ impl SaveParserCore {
 
             if cls == "station" {
                 self.station_owner = a.get("owner").cloned();
-                self.station_mods.clear();
+                self.player_station_mods.clear();
+                self.npc_station_module_counts.clear();
             }
         }
 
@@ -202,11 +215,36 @@ impl SaveParserCore {
         if at_tags(
             &self.path,
             &["component", "construction", "sequence", "entry"],
-        ) && self.station_owner.as_deref() == Some("player")
+        )
         {
-            self.entry_idx = Some(to_int(a.get("index"), 0));
-            self.entry_ref = a.get("macro").cloned();
-            self.entry_eq.clear();
+            if self.station_owner.as_deref() == Some("player") {
+                self.entry_idx = Some(to_int(a.get("index"), 0));
+                self.entry_ref = a.get("macro").cloned();
+                self.entry_eq.clear();
+            } else if !matches!(
+                self.station_owner.as_deref(),
+                Some("player") | Some("xenon") | Some("khaak")
+            ) {
+                if let Some(macro_ref) = a.get("macro").cloned() {
+                    *self.npc_station_module_counts.entry(macro_ref).or_insert(0) += 1;
+                }
+            }
+        }
+
+        if name == "unlock" {
+            let state = a.get("state").map(|s| s.as_str()).unwrap_or_default();
+            if let Some(vault) = self.current_vault_ctx_mut() {
+                vault.unlocked = state == "unlocked";
+            }
+        }
+
+        if name == "ware" {
+            if let Some(vault) = self.current_collectable_vault_ctx_mut() {
+                if let Some(ware) = a.get("ware").cloned() {
+                    let amount = to_int(a.get("amount"), 1);
+                    *vault.ware_totals.entry(ware).or_insert(0) += amount;
+                }
+            }
         }
 
         if at_tags(
@@ -273,7 +311,7 @@ impl SaveParserCore {
         }
 
         if name == "entry" && self.entry_idx.is_some() && self.entry_ref.is_some() {
-            self.station_mods.push(StationModule {
+            self.player_station_mods.push(PlayerStationModule {
                 index: self.entry_idx.unwrap(),
                 ref_field: self.entry_ref.clone().unwrap(),
                 equipments: std::mem::take(&mut self.entry_eq),
@@ -292,12 +330,7 @@ impl SaveParserCore {
                 if let Some(sd) = self.sectors.get_mut(&sk) {
                     match ctx.class.as_str() {
                         "station" => {
-                            let mods = if ctx.owner.as_deref() == Some("player") {
-                                std::mem::take(&mut self.station_mods)
-                            } else {
-                                Vec::new()
-                            };
-                            sd.stations.push(StationEntry {
+                            let base = StationBaseEntry {
                                 code: ctx.code.clone().unwrap_or_default(),
                                 macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                 owner: ctx.owner.clone().unwrap_or_default(),
@@ -306,8 +339,25 @@ impl SaveParserCore {
                                 z: pos.z,
                                 is_wreck: if ctx.is_wreck { Some(true) } else { None },
                                 is_headquarter: if ctx.is_headquarter { Some(true) } else { None },
-                                modules: mods,
-                            });
+                            };
+
+                            match ctx.owner.as_deref() {
+                                Some("player") => sd.player_stations.push(PlayerStationEntry {
+                                    base,
+                                    modules: std::mem::take(&mut self.player_station_mods),
+                                }),
+                                Some("xenon") => sd.xenon_stations.push(FactionStationEntry { base }),
+                                Some("khaak") => sd.khaak_stations.push(FactionStationEntry { base }),
+                                _ => {
+                                    let mut modules = self
+                                        .npc_station_module_counts
+                                        .drain()
+                                        .map(|(ref_field, amount)| AggregatedStationModule { ref_field, amount })
+                                        .collect::<Vec<_>>();
+                                    modules.sort_by(|a, b| a.ref_field.cmp(&b.ref_field));
+                                    sd.npc_stations.push(NpcStationEntry { base, modules });
+                                }
+                            }
                             self.station_owner = None;
                             self.entry_idx = None;
                             self.entry_ref = None;
@@ -320,6 +370,8 @@ impl SaveParserCore {
                                 x: pos.x,
                                 y: pos.y,
                                 z: pos.z,
+                                unlocked: ctx.unlocked,
+                                wares: ware_entries(&ctx.ware_totals),
                                 has_blueprints: ctx.has_blueprints,
                                 has_wares: ctx.has_wares,
                                 has_signalleak: ctx.has_signalleak,
@@ -342,6 +394,8 @@ impl SaveParserCore {
                                     x: pos.x,
                                     y: pos.y,
                                     z: pos.z,
+                                    unlocked: ctx.unlocked,
+                                    wares: ware_entries(&ctx.ware_totals),
                                     has_blueprints: ctx.has_blueprints,
                                     has_wares: ctx.has_wares,
                                     has_signalleak: ctx.has_signalleak,
@@ -414,4 +468,35 @@ impl SaveParserCore {
             r
         })
     }
+
+    fn current_vault_ctx_mut(&mut self) -> Option<&mut ComponentCtx> {
+        self.comp_stack.iter_mut().rev().find(|ctx| {
+            ctx.class == "datavault"
+                || ctx
+                    .macro_field
+                    .as_ref()
+                    .map(|m| m.to_lowercase().contains("erlking_vault"))
+                    .unwrap_or(false)
+        })
+    }
+
+    fn current_collectable_vault_ctx_mut(&mut self) -> Option<&mut ComponentCtx> {
+        let has_collectable = self.comp_stack.iter().rev().any(|ctx| ctx.class == "collectablewares");
+        if !has_collectable {
+            return None;
+        }
+        self.current_vault_ctx_mut()
+    }
+}
+
+fn ware_entries(input: &HashMap<String, i64>) -> Vec<DatavaultWareEntry> {
+    let mut wares = input
+        .iter()
+        .map(|(ware, amount)| DatavaultWareEntry {
+            ware: ware.clone(),
+            amount: *amount,
+        })
+        .collect::<Vec<_>>();
+    wares.sort_by(|a, b| a.ware.cmp(&b.ware));
+    wares
 }

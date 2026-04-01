@@ -150,7 +150,24 @@
 
 从存档XML提取指定对象。
 
-#### Scenario: 提取所有空间站
+#### Scenario: 提取sector owner并组织分组
+
+**前提** 对象位于某个 `<component class="sector">` 内
+
+**当** 解析 sector 节点
+
+**那么** 提取以下字段：
+- `name`
+- `is_known`
+- `owner`
+
+**并且** 初始化以下 station 分组：
+- `playerStations`
+- `xenonStations`
+- `khaakStations`
+- `npcStations`
+
+#### Scenario: 提取所有空间站并按owner分类
 
 **前提** 存档解析开始
 
@@ -164,7 +181,11 @@
 - `is_wreck`: 是否残骸
 - `is_headquarter`: 是否HQ
 
-**并且** 不限制owner（提取所有空间站）
+**并且** 根据 `owner` 分类归入：
+- `playerStations`
+- `xenonStations`
+- `khaakStations`
+- `npcStations`
 
 **当** 空间站 `owner="player"`
 
@@ -178,6 +199,37 @@
     - `group`: 装备组名
     - `exact`: 数量
 
+#### Scenario: 提取普通NPC空间站模块聚合
+
+**前提** 存档解析开始
+
+**当** 解析 `<component class="station">`
+
+**并且** `owner!="player"`
+
+**并且** `owner!="xenon"`
+
+**并且** `owner!="khaak"`
+
+**那么** 额外提取聚合模块信息：
+- `modules`: 模块统计列表
+  - `ref`: 模块标识
+  - `amount`: 该模块在站内出现次数
+
+**并且** 不提取玩家站使用的 construction/equipment 明细结构
+
+#### Scenario: xenon与khaak空间站只做分类
+
+**前提** 存档解析开始
+
+**当** 解析 `<component class="station">`
+
+**并且** `owner="xenon"` 或 `owner="khaak"`
+
+**那么** 仅按 faction 分类归组
+
+**并且** 不提取 `modules: [{ ref, amount }]`
+
 #### Scenario: 提取Datavault
 
 **前提** 存档解析开始
@@ -189,9 +241,28 @@
 - `macro`
 - `owner`
 - `x, y, z`
+- `unlocked`
+- `wares`
 - `has_blueprints`
 - `has_wares`
 - `has_signalleak`
+
+#### Scenario: 提取Datavault解锁状态与战利品
+
+**前提** 存档解析开始
+
+**当** 解析 `<component class="datavault">`
+
+**那么** 查找其内部 `<unlock state="..."/>`
+
+**并且** 当 `state="unlocked"` 时输出 `unlocked=true`
+
+**并且** 当 `<unlock>` 不存在或 `state!="unlocked"` 时输出 `unlocked=false`
+
+**并且** 从其下 `class="collectablewares"` 子组件的 `<wares><ware .../></wares>` 提取聚合战利品：
+- `wares: [{ ware, amount }]`
+- 同名 `ware` 合并
+- `amount` 缺失按 `1` 处理
 
 #### Scenario: 提取Erlking Vault
 
@@ -204,11 +275,27 @@
 - `macro`
 - `owner`
 - `x, y, z`
+- `unlocked`
+- `wares`
 - `has_blueprints`
 - `has_wares`
 - `has_signalleak`
 
 **并且** 作为单独类型（不与datavault合并）
+
+#### Scenario: 提取Erlking Vault解锁状态与战利品
+
+**前提** 存档解析开始
+
+**当** 解析 `<component macro>` 包含 `erlking_vault`
+
+**那么** 按 datavault 相同规则提取：
+- `unlocked`
+- `wares: [{ ware, amount }]`
+
+**并且** 同名 `ware` 合并
+
+**并且** `amount` 缺失按 `1` 处理
 
 #### Scenario: 提取弃船
 
@@ -247,6 +334,22 @@
 **那么** 查找strings表翻译为可读名称
 
 **并且** 使用游戏数据中的locale映射
+
+### Requirement: Parser Capability Boundary
+
+JS parser 冻结为兼容/备用链路，后续业务演进仅进入 Rust/WASM 解析链。
+
+#### Scenario: 新增业务提取字段
+
+**前提** 需要新增 save-import 业务字段或分类逻辑
+
+**当** 更新解析实现
+
+**那么** 仅在 Rust/WASM 解析链中实现
+
+**并且** `src/workers/saveParser.worker.ts` 不再增加新的业务提取能力
+
+**并且** JS parser 只保留兼容、回退或 CLI 默认用途
 
 ### Requirement: Save Detail Display
 
@@ -486,3 +589,23 @@
 - `finish(filename: string): string`: 完成解析，返回JSON
 - `progress_json(): string`: 获取进度信息
 - `set_expected_total_bytes(total: number)`: 设置预期总字节数
+#### Scenario: 空数组字段省略输出
+
+**前提** 某个导出字段是数组类型
+
+**当** 该字段结果为空数组
+
+**那么** 省略该 key，不输出 `[]`
+
+**并且** 适用于 sector 下的：
+- `playerStations`
+- `xenonStations`
+- `khaakStations`
+- `npcStations`
+- `datavaults`
+- `erlkingVaults`
+- `abandonedShips`
+
+**并且** 也适用于条目内部的：
+- `modules`
+- `wares`

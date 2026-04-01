@@ -32,8 +32,8 @@ describe('save parser core (simplified)', () => {
     expect(archive.isCompatible).toBe(true)
     expect(archive.sectors.cluster_01_sector001_macro?.name).toBe('cluster_01_sector001_macro')
     expect(archive.sectors.cluster_01_sector001_macro?.is_known).toBe(true)
-    expect(archive.sectors.cluster_01_sector001_macro?.stations).toHaveLength(1)
-    expect(archive.sectors.cluster_01_sector001_macro?.stations[0]).toMatchObject({
+    expect(archive.sectors.cluster_01_sector001_macro?.npcStations).toHaveLength(1)
+    expect(archive.sectors.cluster_01_sector001_macro?.npcStations[0]).toMatchObject({
       code: 'station-1',
       owner: 'argon',
       x: 5,
@@ -86,14 +86,12 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.meta.filename).toBe('test')
     expect(archive.meta.parser_version).toBe('v1')
     expect(archive.isCompatible).toBe(true)
-    expect(archive.sectors.test_sector_macro?.stations).toHaveLength(1)
-    expect(archive.sectors.test_sector_macro?.stations[0]).toMatchObject({
-      code: 'TEST-001',
-      owner: 'player',
-      x: 100,
-      y: 200,
-      z: 300
-    })
+    expect(archive.sectors.test_sector_macro?.playerStations).toHaveLength(1)
+    expect(archive.sectors.test_sector_macro?.playerStations[0]?.code).toBe('TEST-001')
+    expect(archive.sectors.test_sector_macro?.playerStations[0]?.owner).toBe('player')
+    expect(archive.sectors.test_sector_macro?.playerStations[0]?.x).toBe(100)
+    expect(archive.sectors.test_sector_macro?.playerStations[0]?.y).toBe(200)
+    expect(archive.sectors.test_sector_macro?.playerStations[0]?.z).toBe(300)
   })
 
   it('parses gzip bytes directly in rust wasm parser', async () => {
@@ -129,12 +127,10 @@ describe('save parser (Rust WASM streaming)', () => {
 
     const archive = JSON.parse(parser.finish('gzip.xml.gz'))
     expect(archive.meta.playerName).toBe('gzip-player')
-    expect(archive.sectors.gzip_sector_macro?.stations[0]).toMatchObject({
-      code: 'GZIP-001',
-      owner: 'player',
-      x: 7,
-      y: 8,
-      z: 9
-    })
+    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.code).toBe('GZIP-001')
+    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.owner).toBe('player')
+    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.x).toBe(7)
+    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.y).toBe(8)
+    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.z).toBe(9)
   })
 })

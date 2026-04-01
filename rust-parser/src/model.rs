@@ -109,7 +109,7 @@ pub(crate) struct Meta {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub(crate) struct StationModule {
+pub(crate) struct PlayerStationModule {
     pub(crate) index: i64,
     #[serde(rename = "ref")]
     pub(crate) ref_field: String,
@@ -128,7 +128,7 @@ pub(crate) struct StationEquipment {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub(crate) struct StationEntry {
+pub(crate) struct StationBaseEntry {
     pub(crate) code: String,
     #[serde(rename = "macro")]
     pub(crate) macro_field: String,
@@ -140,8 +140,41 @@ pub(crate) struct StationEntry {
     pub(crate) is_wreck: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) is_headquarter: Option<bool>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct PlayerStationEntry {
+    #[serde(flatten)]
+    pub(crate) base: StationBaseEntry,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(crate) modules: Vec<StationModule>,
+    pub(crate) modules: Vec<PlayerStationModule>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct FactionStationEntry {
+    #[serde(flatten)]
+    pub(crate) base: StationBaseEntry,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct AggregatedStationModule {
+    #[serde(rename = "ref")]
+    pub(crate) ref_field: String,
+    pub(crate) amount: i64,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct NpcStationEntry {
+    #[serde(flatten)]
+    pub(crate) base: StationBaseEntry,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) modules: Vec<AggregatedStationModule>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct DatavaultWareEntry {
+    pub(crate) ware: String,
+    pub(crate) amount: i64,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -153,6 +186,9 @@ pub(crate) struct DatavaultEntry {
     pub(crate) x: f64,
     pub(crate) y: f64,
     pub(crate) z: f64,
+    pub(crate) unlocked: bool,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) wares: Vec<DatavaultWareEntry>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) has_blueprints: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -176,11 +212,23 @@ pub(crate) struct AbandonedShipEntry {
 pub(crate) struct SectorData {
     pub(crate) name: String,
     pub(crate) is_known: bool,
-    pub(crate) stations: Vec<StationEntry>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) owner: Option<String>,
+    #[serde(rename = "playerStations", skip_serializing_if = "Vec::is_empty")]
+    pub(crate) player_stations: Vec<PlayerStationEntry>,
+    #[serde(rename = "xenonStations", skip_serializing_if = "Vec::is_empty")]
+    pub(crate) xenon_stations: Vec<FactionStationEntry>,
+    #[serde(rename = "khaakStations", skip_serializing_if = "Vec::is_empty")]
+    pub(crate) khaak_stations: Vec<FactionStationEntry>,
+    #[serde(rename = "npcStations", skip_serializing_if = "Vec::is_empty")]
+    pub(crate) npc_stations: Vec<NpcStationEntry>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) datavaults: Vec<DatavaultEntry>,
     #[serde(rename = "erlkingVaults")]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) erlking_vaults: Vec<DatavaultEntry>,
     #[serde(rename = "abandonedShips")]
+    #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) abandoned_ships: Vec<AbandonedShipEntry>,
 }
 

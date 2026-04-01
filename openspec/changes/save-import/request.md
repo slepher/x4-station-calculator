@@ -42,16 +42,39 @@
 ### 存档解析目标
 从存档XML提取以下对象（按sector组织）：
 
-1. **所有空间站**：`component class="station"`（不限owner）
-   - 提取字段：`code, macro, owner, x/y/z, is_wreck, is_headquarter`
+1. **Sector元信息**：`component class="sector"`
+   - 提取字段：`name, is_known, owner`
    
-2. **Datavault**：`component class="datavault"`（单独类型）
+2. **所有空间站**：`component class="station"`（不限owner）
+   - 按 `owner` 分类输出：
+     - `playerStations`
+     - `xenonStations`
+     - `khaakStations`
+     - `npcStations`
+   - 基础字段：`code, macro, owner, x/y/z, is_wreck, is_headquarter`
+   - `owner="player"` 的 station 继续保留玩家站明细模块提取
+   - `owner!="player"` 且 `owner!="xenon"` 且 `owner!="khaak"` 的 station，额外提取所有 module 的聚合结果：
+     - `modules: [{ ref, amount }]`
+   - `owner="xenon"` 与 `owner="khaak"` 的 station 只做分类，不提取上述聚合 modules
+   
+3. **Datavault**：`component class="datavault"`（单独类型）
    - 提取字段：`code, macro, owner, x/y/z, has_blueprints, has_wares, has_signalleak`
+   - 额外提取：
+     - `unlocked`: 来自 `<unlock state="unlocked"/>`
+       - tag 不存在或 `state!="unlocked"` 时，固定输出 `false`
+     - `wares: [{ ware, amount }]`
+       - 从其下 `class="collectablewares"` 子组件的 `<wares><ware .../></wares>` 聚合
+       - 同名 `ware` 合并
+       - `amount` 缺失按 `1` 处理
    
-3. **Erlking Vault**：`macro` 含 `erlking_vault`（单独类型）
+4. **Erlking Vault**：`macro` 含 `erlking_vault`（单独类型）
    - 提取字段：`code, macro, owner, x/y/z, has_blueprints, has_wares, has_signalleak`
+   - 额外提取：
+     - `unlocked`
+     - `wares: [{ ware, amount }]`
+   - `unlocked` 与 `wares` 的提取/聚合规则与 datavault 相同
    
-4. **弃船**：`component class="ship_*" owner="ownerless"`
+5. **弃船**：`component class="ship_*" owner="ownerless"`
    - 提取字段：`code, macro, class, x/y/z`
 
 ### 导出JSON格式
@@ -69,14 +92,24 @@
     "sector_macro": {
       "name": "翻译后名称",
       "is_known": true,
-      "stations": [
+      "owner": "argon",
+      "playerStations": [
+        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [] }
+      ],
+      "xenonStations": [
         { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter" }
       ],
+      "khaakStations": [
+        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter" }
+      ],
+      "npcStations": [
+        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [{ "ref": "module_macro", "amount": 2 }] }
+      ],
       "datavaults": [
-        { "code", "macro", "owner", "x", "y", "z", "has_blueprints", "has_wares", "has_signalleak" }
+        { "code", "macro", "owner", "x", "y", "z", "has_blueprints", "has_wares", "has_signalleak", "unlocked": false, "wares": [{ "ware": "inv_spaceflyeggs", "amount": 4 }] }
       ],
       "erlkingVaults": [
-        { "code", "macro", "owner", "x", "y", "z", "has_blueprints", "has_wares", "has_signalleak" }
+        { "code", "macro", "owner", "x", "y", "z", "has_blueprints", "has_wares", "has_signalleak", "unlocked": true, "wares": [{ "ware": "modpart_highenergycatalyst", "amount": 1 }] }
       ],
       "abandonedShips": [
         { "code", "macro", "class", "x", "y", "z" }
@@ -85,6 +118,16 @@
   }
 }
 ```
+
+- 所有同类数组字段在结果为空时不输出对应 key，包括：
+  - `playerStations`
+  - `xenonStations`
+  - `khaakStations`
+  - `npcStations`
+  - `datavaults`
+  - `erlkingVaults`
+  - `abandonedShips`
+  - 以及条目内部的 `modules`、`wares`
 
 ### 异常/告警处理
 - 版本不匹配：显示警告，用户可选择继续加载或拒绝
@@ -96,6 +139,8 @@
 - 坐标系统：游戏内米级，需累加component层级offset
 - 名称翻译：`{page,id}` 格式需查找strings表翻译为可读名称
 - JSON导入/导出使用浏览器原生下载API
+- `src/workers/saveParser.worker.ts` 进入冻结状态，仅保留兼容/备用用途，不再添加新的业务提取功能
+- 后续新增业务字段、分类逻辑、结构调整只进入 Rust/WASM 解析链
 - Rust 解析路径需要同时承担：
   - 原始 XML 流式解析
   - `.xml.gz` 的增量 gunzip
@@ -118,6 +163,10 @@
 - SAX解析Worker
 - Rust WASM 解析Worker 会话层
 - Rust 端 gunzip 与 CLI progress 控制
+- sector owner 提取
+- station 按 `player/xenon/khaak/npc` 四组分类
+- npc station module 聚合提取（`modules: [{ ref, amount }]`）
+- datavault / erlking_vault 的 `unlocked` 与聚合 `wares`
 
 ### Out of Scope
 - 持久化到localStorage/IndexedDB（暂不实现）
@@ -143,6 +192,14 @@
 13. 上传 `.xml.gz` 时浏览器端不再执行 JS gunzip，仍能正确完成导入
 14. 上传解析时进度文本与进度条宽度都随 worker 返回的 percent 正常更新
 15. `scripts/extract_save.tsx --wasm` 输出的进度频率与内容由 Rust 侧控制，脚本不再自行补充判断
+16. 每个 sector 额外输出 `owner`
+17. station 按 `playerStations/xenonStations/khaakStations/npcStations` 分组输出
+18. `npcStations` 中的每个 station 额外输出聚合模块列表 `modules: [{ ref, amount }]`
+19. `src/workers/saveParser.worker.ts` 不再承担新的业务提取演进
+20. 每个 datavault / erlking_vault 额外输出 `unlocked`
+21. 每个 datavault / erlking_vault 额外输出聚合后的 `wares: [{ ware, amount }]`
+22. `<unlock>` 缺失或 `state!="unlocked"` 时，`unlocked=false`
+23. 所有空数组字段不输出对应 key
 
 ## 未决项
 

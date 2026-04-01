@@ -2,19 +2,26 @@
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import ViewTabUI from '@/components/common/ViewTabUI.vue'
-import { useSaveStore } from '@/store/useSaveStore'
-import type { SaveArchive, SavePoiCategory, StationEntry, DatavaultEntry, AbandonedShipEntry } from '@/types/saveArchive'
+import type {
+  SaveArchive,
+  PlayerStationEntry,
+  NpcStationEntry,
+  FactionStationEntry,
+  DatavaultEntry,
+  AbandonedShipEntry
+} from '@/types/saveArchive'
 
 const props = defineProps<{
   archive: SaveArchive | null
 }>()
 
 const { t } = useI18n()
-const saveStore = useSaveStore()
 const activeTab = ref('player-stations')
 
 const tabs = computed(() => [
   { key: 'player-stations', label: t('save_import.tab_player_stations') },
+  { key: 'xenon-stations', label: t('save_import.tab_xenon_stations') },
+  { key: 'khaak-stations', label: t('save_import.tab_khaak_stations') },
   { key: 'npc-stations', label: t('save_import.tab_npc_stations') },
   { key: 'abandoned-ships', label: t('save_import.tab_abandoned_ships') },
   { key: 'datavaults', label: t('save_import.tab_datavaults') },
@@ -25,27 +32,56 @@ function formatCoord(value: number): string {
   return (value / 1000).toFixed(1) + 'km'
 }
 
-const categoryData = computed(() => saveStore.getArchivePoiCategories(props.archive))
-const tabData = computed(() => ({
-  'player-stations': categoryData.value.playerStation.groups,
-  'npc-stations': categoryData.value.npcStation.groups,
-  'abandoned-ships': categoryData.value.abandonedShip.groups,
-  'datavaults': categoryData.value.datavault.groups,
-  'erlking-vaults': categoryData.value.erlkingVault.groups,
-}))
+type DetailTabKey =
+  | 'player-stations'
+  | 'xenon-stations'
+  | 'khaak-stations'
+  | 'npc-stations'
+  | 'abandoned-ships'
+  | 'datavaults'
+  | 'erlking-vaults'
 
-type TabKey = keyof typeof tabData.value
-type CategoryKeyByTab = Record<TabKey, SavePoiCategory>
-const categoryKeyByTab: CategoryKeyByTab = {
-  'player-stations': 'playerStation',
-  'npc-stations': 'npcStation',
-  'abandoned-ships': 'abandonedShip',
-  datavaults: 'datavault',
-  'erlking-vaults': 'erlkingVault'
+type DetailSectorGroup<T> = {
+  sectorMacro: string
+  sectorName: string
+  sectorOwner?: string
+  items: T[]
 }
 
-const currentTabData = computed(() => tabData.value[activeTab.value as TabKey] || [])
+function buildSectorGroups<T>(extractor: (sector: NonNullable<SaveArchive['sectors'][string]>) => T[]): DetailSectorGroup<T>[] {
+  const sectors = props.archive?.sectors || {}
+  return Object.entries(sectors)
+    .map(([sectorMacro, sector]) => ({
+      sectorMacro,
+      sectorName: sector.name,
+      sectorOwner: sector.owner,
+      items: extractor(sector)
+    }))
+    .filter((group) => group.items.length > 0)
+}
+
+const tabData = computed<Record<DetailTabKey, DetailSectorGroup<unknown>[]>>(() => ({
+  'player-stations': buildSectorGroups((sector) => sector.playerStations || []),
+  'xenon-stations': buildSectorGroups((sector) => sector.xenonStations || []),
+  'khaak-stations': buildSectorGroups((sector) => sector.khaakStations || []),
+  'npc-stations': buildSectorGroups((sector) => sector.npcStations || []),
+  'abandoned-ships': buildSectorGroups((sector) => sector.abandonedShips || []),
+  'datavaults': buildSectorGroups((sector) => sector.datavaults || []),
+  'erlking-vaults': buildSectorGroups((sector) => sector.erlkingVaults || [])
+}))
+
+const currentTabData = computed(() => tabData.value[activeTab.value as DetailTabKey] || [])
 const hasData = computed(() => currentTabData.value.length > 0)
+
+function formatWares(wares: DatavaultEntry['wares'] | undefined): string {
+  if (!wares || wares.length === 0) return ''
+  return wares.map((entry) => `${entry.ware} x${entry.amount}`).join(', ')
+}
+
+function formatNpcModules(modules: NpcStationEntry['modules'] | undefined): string {
+  if (!modules || modules.length === 0) return ''
+  return modules.map((entry) => `${entry.ref} x${entry.amount}`).join(', ')
+}
 </script>
 
 <template>
@@ -84,41 +120,60 @@ const hasData = computed(() => currentTabData.value.length > 0)
         <div v-else class="sector-list">
           <div v-for="sector in currentTabData" :key="sector.sectorMacro" class="sector-group">
             <div class="sector-header">
-              <span class="sector-name">{{ sector.sectorName }}</span>
+              <div class="sector-heading">
+                <span class="sector-name">{{ sector.sectorName }}</span>
+                <span v-if="sector.sectorOwner" class="sector-owner">{{ sector.sectorOwner }}</span>
+              </div>
               <span class="sector-count">{{ sector.items.length }}</span>
             </div>
 
             <div class="item-list">
-              <template v-if="categoryKeyByTab[activeTab as TabKey] === 'playerStation'">
-                <div v-for="item in sector.items" :key="(item as StationEntry).code" class="item-row">
-                  <span class="item-code">{{ (item as StationEntry).code }}</span>
-                  <span class="item-coords">({{ formatCoord((item as StationEntry).x) }}, {{ formatCoord((item as StationEntry).z) }})</span>
-                  <span v-if="(item as StationEntry).is_headquarter" class="item-tag hq">{{ t('save_import.hq_badge') }}</span>
+              <template v-if="activeTab === 'player-stations'">
+                <div v-for="item in sector.items" :key="(item as PlayerStationEntry).code" class="item-row">
+                  <span class="item-code">{{ (item as PlayerStationEntry).code }}</span>
+                  <span class="item-coords">({{ formatCoord((item as PlayerStationEntry).x) }}, {{ formatCoord((item as PlayerStationEntry).z) }})</span>
+                  <span v-if="(item as PlayerStationEntry).is_headquarter" class="item-tag hq">{{ t('save_import.hq_badge') }}</span>
                 </div>
               </template>
 
-              <template v-if="categoryKeyByTab[activeTab as TabKey] === 'npcStation'">
-                <div v-for="item in sector.items" :key="(item as StationEntry).code" class="item-row">
-                  <span class="item-owner">{{ (item as StationEntry).owner || 'neutral' }}</span>
-                  <span class="item-coords">({{ formatCoord((item as StationEntry).x) }}, {{ formatCoord((item as StationEntry).z) }})</span>
+              <template v-if="activeTab === 'xenon-stations' || activeTab === 'khaak-stations'">
+                <div v-for="item in sector.items" :key="(item as FactionStationEntry).code" class="item-row">
+                  <span class="item-owner">{{ (item as FactionStationEntry).owner || 'neutral' }}</span>
+                  <span class="item-coords">({{ formatCoord((item as FactionStationEntry).x) }}, {{ formatCoord((item as FactionStationEntry).z) }})</span>
                 </div>
               </template>
 
-              <template v-if="categoryKeyByTab[activeTab as TabKey] === 'abandonedShip'">
+              <template v-if="activeTab === 'npc-stations'">
+                <div v-for="item in sector.items" :key="(item as NpcStationEntry).code" class="item-row item-row-stacked">
+                  <div class="item-primary">
+                    <span class="item-owner">{{ (item as NpcStationEntry).owner || 'neutral' }}</span>
+                    <span class="item-coords">({{ formatCoord((item as NpcStationEntry).x) }}, {{ formatCoord((item as NpcStationEntry).z) }})</span>
+                  </div>
+                  <span v-if="formatNpcModules((item as NpcStationEntry).modules)" class="item-secondary">{{ formatNpcModules((item as NpcStationEntry).modules) }}</span>
+                </div>
+              </template>
+
+              <template v-if="activeTab === 'abandoned-ships'">
                 <div v-for="item in sector.items" :key="(item as AbandonedShipEntry).code" class="item-row">
                   <span class="item-class">{{ (item as AbandonedShipEntry).class }}</span>
                   <span class="item-coords">({{ formatCoord((item as AbandonedShipEntry).x) }}, {{ formatCoord((item as AbandonedShipEntry).z) }})</span>
                 </div>
               </template>
 
-              <template v-if="categoryKeyByTab[activeTab as TabKey] === 'datavault' || categoryKeyByTab[activeTab as TabKey] === 'erlkingVault'">
-                <div v-for="item in sector.items" :key="(item as DatavaultEntry).code" class="item-row">
-                  <span class="item-coords">({{ formatCoord((item as DatavaultEntry).x) }}, {{ formatCoord((item as DatavaultEntry).z) }})</span>
+              <template v-if="activeTab === 'datavaults' || activeTab === 'erlking-vaults'">
+                <div v-for="item in sector.items" :key="(item as DatavaultEntry).code" class="item-row item-row-stacked">
+                  <div class="item-primary">
+                    <span class="item-coords">({{ formatCoord((item as DatavaultEntry).x) }}, {{ formatCoord((item as DatavaultEntry).z) }})</span>
+                    <span class="item-tag" :class="(item as DatavaultEntry).unlocked ? 'item-tag-unlocked' : 'item-tag-locked'">
+                      {{ (item as DatavaultEntry).unlocked ? t('save_import.unlocked') : t('save_import.locked') }}
+                    </span>
+                  </div>
                   <div class="item-marks">
                     <span v-if="(item as DatavaultEntry).has_blueprints" class="mark-badge">{{ t('save_import.has_blueprints') }}</span>
                     <span v-if="(item as DatavaultEntry).has_wares" class="mark-badge">{{ t('save_import.has_wares') }}</span>
                     <span v-if="(item as DatavaultEntry).has_signalleak" class="mark-badge">{{ t('save_import.has_signalleak') }}</span>
                   </div>
+                  <span v-if="formatWares((item as DatavaultEntry).wares)" class="item-secondary">{{ formatWares((item as DatavaultEntry).wares) }}</span>
                 </div>
               </template>
             </div>
@@ -186,8 +241,16 @@ const hasData = computed(() => currentTabData.value.length > 0)
   @apply flex items-center justify-between px-3 py-2 bg-slate-800/50 rounded-t;
 }
 
+.sector-heading {
+  @apply flex items-center gap-2;
+}
+
 .sector-name {
   @apply text-sm font-medium text-slate-300;
+}
+
+.sector-owner {
+  @apply text-xs text-slate-500 uppercase;
 }
 
 .sector-count {
@@ -200,6 +263,18 @@ const hasData = computed(() => currentTabData.value.length > 0)
 
 .item-row {
   @apply flex items-center gap-2 text-xs py-1 px-2 rounded hover:bg-slate-700/30;
+}
+
+.item-row-stacked {
+  @apply flex-col items-start;
+}
+
+.item-primary {
+  @apply flex items-center gap-2;
+}
+
+.item-secondary {
+  @apply text-[11px] text-slate-500 break-all;
 }
 
 .item-code {
@@ -224,6 +299,14 @@ const hasData = computed(() => currentTabData.value.length > 0)
 
 .item-tag.hq {
   @apply bg-emerald-500/20 text-emerald-400;
+}
+
+.item-tag-unlocked {
+  @apply bg-emerald-500/20 text-emerald-400;
+}
+
+.item-tag-locked {
+  @apply bg-rose-500/20 text-rose-400;
 }
 
 .item-marks {

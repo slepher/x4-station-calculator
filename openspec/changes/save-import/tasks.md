@@ -35,12 +35,17 @@
 1. 创建上传桥接模块，按 `parse_start / parse_chunk / parse_end` 协议发送原始文件字节
 2. 在 Rust worker 中维护解析会话，承接 `expectedTotalBytes/currentVersion`、chunk 推进与完成收尾
 3. 在 Rust 端实现 gzip 检测、header/trailer 处理与增量 gunzip，不再依赖浏览器 `DecompressionStream`
-4. 保留 SAX 解析链路作为备用/CLI 默认解析器
-5. 实现目标对象提取：stations, datavaults, erlkingVaults, abandonedShips
-6. 实现坐标累加（position 栈）
-7. 提取存档元信息：guid, seed, time, playerName, version
-8. 实现流式进度报告与 `finalizing` 阶段补发
-9. 实现早期版本校验（解析到 game 标签时立即校验）
+4. 冻结 SAX 解析链路为备用/CLI 默认解析器，不再继续添加新的业务提取功能
+5. 在 Rust 解析链路中实现 sector `owner` 提取
+6. 在 Rust 解析链路中将 station 按 `player/xenon/khaak/npc` 四组分类，并输出为 `playerStations/xenonStations/khaakStations/npcStations`
+7. 在 Rust 解析链路中为 `npcStations` 提取聚合模块 `modules: [{ ref, amount }]`
+8. 在 Rust 解析链路中为 datavaults 与 erlkingVaults 提取 `unlocked`
+9. 在 Rust 解析链路中为 datavaults 与 erlkingVaults 提取聚合 `wares: [{ ware, amount }]`
+10. 保留目标对象提取：abandonedShips
+11. 实现坐标累加（position 栈）
+12. 提取存档元信息：guid, seed, time, playerName, version
+13. 实现流式进度报告与 `finalizing` 阶段补发
+14. 实现早期版本校验（解析到 game 标签时立即校验）
 
 ---
 
@@ -97,11 +102,13 @@
 2. 未选中时显示提示信息
 3. 选中后展示存档详情
 4. 按sector分组展示
-5. 展示stations列表（名称/坐标/owner）
-6. 展示datavaults列表
-7. 展示erlkingVaults列表（单独类型）
-8. 展示abandonedShips列表
-9. Sector名称显示翻译后名称
+5. 展示 sector `owner`
+6. 分别展示 `playerStations/xenonStations/khaakStations/npcStations`
+7. `npcStations` 显示聚合模块列表 `modules: [{ ref, amount }]`
+8. 展示 datavaults 的 `unlocked` 与聚合 `wares`
+9. 展示 erlkingVaults 的 `unlocked` 与聚合 `wares`
+10. 展示abandonedShips列表
+11. Sector名称显示翻译后名称
 
 ---
 
@@ -212,14 +219,14 @@ T11 (build) ← all tasks
 
 | Task | Status | Notes |
 |------|--------|-------|
-| T1 | pending | |
-| T2 | pending | |
+| T1 | completed | 类型与 store 已扩展到 sector owner、四类 station、datavault unlocked/wares 结构 |
+| T2 | completed | Rust 解析链已实现 station 分类、npc modules 聚合、datavault/erlking loot 提取；JS parser 冻结为兼容路径 |
 | T3 | pending | |
 | T4 | pending | |
-| T5 | pending | |
+| T5 | completed | SaveDetailPanel 已展示 sector owner、xenon/khaak/npc 分组与 vault unlocked/wares |
 | T6 | pending | |
 | T7 | pending | |
 | T8 | pending | |
 | T9 | pending | |
 | T10 | pending | |
-| T11 | pending | |
+| T11 | completed | 已执行 rust-parser/build.sh 与 npm run build |

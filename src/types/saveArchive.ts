@@ -50,13 +50,18 @@ export interface StationEquipment {
   exact: number
 }
 
-export interface StationModule {
+export interface PlayerStationModule {
   index: number
   ref: string
   equipments?: StationEquipment[]
 }
 
-export interface StationEntry {
+export interface AggregatedStationModule {
+  ref: string
+  amount: number
+}
+
+export interface StationBaseEntry {
   code: string
   macro: string
   owner: string
@@ -65,7 +70,23 @@ export interface StationEntry {
   z: number
   is_wreck?: boolean
   is_headquarter?: boolean
-  modules?: StationModule[]
+}
+
+export interface PlayerStationEntry extends StationBaseEntry {
+  modules?: PlayerStationModule[]
+}
+
+export interface NpcStationEntry extends StationBaseEntry {
+  modules?: AggregatedStationModule[]
+}
+
+export interface FactionStationEntry extends StationBaseEntry {}
+
+export type StationEntry = PlayerStationEntry | NpcStationEntry | FactionStationEntry
+
+export interface DatavaultWareEntry {
+  ware: string
+  amount: number
 }
 
 export interface DatavaultEntry {
@@ -75,6 +96,8 @@ export interface DatavaultEntry {
   x: number
   y: number
   z: number
+  unlocked: boolean
+  wares?: DatavaultWareEntry[]
   has_blueprints?: boolean
   has_wares?: boolean
   has_signalleak?: boolean
@@ -92,10 +115,14 @@ export interface AbandonedShipEntry {
 export interface SectorData {
   name: string
   is_known: boolean
-  stations: StationEntry[]
-  datavaults: DatavaultEntry[]
-  erlkingVaults: DatavaultEntry[]
-  abandonedShips: AbandonedShipEntry[]
+  owner?: string
+  playerStations?: PlayerStationEntry[]
+  xenonStations?: FactionStationEntry[]
+  khaakStations?: FactionStationEntry[]
+  npcStations?: NpcStationEntry[]
+  datavaults?: DatavaultEntry[]
+  erlkingVaults?: DatavaultEntry[]
+  abandonedShips?: AbandonedShipEntry[]
 }
 
 export interface SaveArchive {

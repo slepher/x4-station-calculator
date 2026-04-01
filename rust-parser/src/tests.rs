@@ -17,13 +17,13 @@ mod tests {
 
         let archive = parser.finish_archive("save.xml").expect("archive");
         let sector = archive.sectors.get("sec_alpha").expect("sector");
-        let station = sector.stations.first().expect("station");
+        let station = sector.player_stations.first().expect("station");
 
-        assert_eq!(station.owner, "player");
-        assert_eq!(station.code, "AAA");
-        assert_eq!(station.macro_field, "station_macro");
-        assert_eq!(station.is_headquarter, Some(true));
-        assert_eq!((station.x, station.y, station.z), (1.0, 2.0, 3.0));
+        assert_eq!(station.base.owner, "player");
+        assert_eq!(station.base.code, "AAA");
+        assert_eq!(station.base.macro_field, "station_macro");
+        assert_eq!(station.base.is_headquarter, Some(true));
+        assert_eq!((station.base.x, station.base.y, station.base.z), (1.0, 2.0, 3.0));
     }
 
     #[test]
@@ -49,10 +49,10 @@ mod tests {
         while parser.pump(8) {}
 
         let archive = parser.finish_archive("chunked.xml").expect("archive");
-        let station = &archive.sectors["sec_alpha"].stations[0];
+        let station = &archive.sectors["sec_alpha"].player_stations[0];
         let module = &station.modules[0];
 
-        assert_eq!((station.x, station.y, station.z), (4.0, 5.0, 6.0));
+        assert_eq!((station.base.x, station.base.y, station.base.z), (4.0, 5.0, 6.0));
         assert_eq!(module.index, 1);
         assert_eq!(module.ref_field, "mod_macro");
         assert_eq!(module.equipments[0].ref_field, "shield_macro");
@@ -129,10 +129,10 @@ mod tests {
         while parser.pump(1024) {}
 
         let archive = parser.finish_archive("gzip.xml.gz").expect("archive");
-        let station = &archive.sectors["gzip_sector"].stations[0];
+        let station = &archive.sectors["gzip_sector"].player_stations[0];
 
         assert_eq!(archive.meta.player_name, "gzip");
-        assert_eq!(station.code, "GZIP-1");
-        assert_eq!((station.x, station.y, station.z), (11.0, 22.0, 33.0));
+        assert_eq!(station.base.code, "GZIP-1");
+        assert_eq!((station.base.x, station.base.y, station.base.z), (11.0, 22.0, 33.0));
     }
 }

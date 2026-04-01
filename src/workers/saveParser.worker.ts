@@ -3,8 +3,11 @@ import type {
   SaveArchive,
   SaveParserMessage,
   SectorData,
-  StationEntry,
-  StationModule,
+  StationBaseEntry,
+  PlayerStationEntry,
+  FactionStationEntry,
+  NpcStationEntry,
+  PlayerStationModule,
   StationEquipment,
   DatavaultEntry,
   AbandonedShipEntry
@@ -67,7 +70,7 @@ class X4SaveParser {
   private versionChecked = false
 
   private currentStationOwner: string | null = null
-  private currentStationModules: StationModule[] = []
+  private currentStationModules: PlayerStationModule[] = []
   private currentEntryIndex: number | null = null
   private currentEntryRef: string | null = null
   private currentEntryEquipments: StationEquipment[] = []
@@ -254,7 +257,11 @@ class X4SaveParser {
         this.data.sectors[macro] = {
           name: macro,
           is_known: attrib.known === '1' || attrib.knownto === 'player',
-          stations: [],
+          owner: typeof attrib.owner === 'string' ? attrib.owner : undefined,
+          playerStations: [],
+          xenonStations: [],
+          khaakStations: [],
+          npcStations: [],
           datavaults: [],
           erlkingVaults: [],
           abandonedShips: []
@@ -304,7 +311,7 @@ class X4SaveParser {
     const node = this.currentNode()
 
     if (name === 'entry' && this.currentEntryIndex !== null && this.currentEntryRef !== null) {
-      const module: StationModule = {
+      const module: PlayerStationModule = {
         index: this.currentEntryIndex,
         ref: this.currentEntryRef
       }
@@ -324,7 +331,7 @@ class X4SaveParser {
 
       if (this.isStation() && sectorData) {
         const owner = String(attrib.owner || '')
-        const entry: StationEntry = {
+        const base: StationBaseEntry = {
           code: String(attrib.code || ''),
           macro: String(attrib.macro || ''),
           owner: owner,
@@ -335,11 +342,22 @@ class X4SaveParser {
           is_headquarter: attrib.factionheadquarters === '1' || undefined
         }
 
-        if (owner === 'player' && this.currentStationModules.length > 0) {
-          entry.modules = this.currentStationModules
+        if (owner === 'player') {
+          const entry: PlayerStationEntry = { ...base }
+          if (this.currentStationModules.length > 0) {
+            entry.modules = this.currentStationModules
+          }
+          sectorData.playerStations?.push(entry)
+        } else if (owner === 'xenon') {
+          const entry: FactionStationEntry = { ...base }
+          sectorData.xenonStations?.push(entry)
+        } else if (owner === 'khaak') {
+          const entry: FactionStationEntry = { ...base }
+          sectorData.khaakStations?.push(entry)
+        } else {
+          const entry: NpcStationEntry = { ...base }
+          sectorData.npcStations?.push(entry)
         }
-
-        sectorData.stations.push(entry)
       } else if (this.isDatavault() && sectorData) {
         const entry: DatavaultEntry = {
           code: String(attrib.code || ''),
@@ -348,9 +366,11 @@ class X4SaveParser {
           x: pos.x,
           y: pos.y,
           z: pos.z,
+          unlocked: false,
+          wares: [],
           ...this.buildDatavaultFlags(attrib)
         }
-        sectorData.datavaults.push(entry)
+        sectorData.datavaults?.push(entry)
       } else if (this.isErlkingVault() && sectorData) {
         const entry: DatavaultEntry = {
           code: String(attrib.code || ''),
@@ -359,9 +379,11 @@ class X4SaveParser {
           x: pos.x,
           y: pos.y,
           z: pos.z,
+          unlocked: false,
+          wares: [],
           ...this.buildDatavaultFlags(attrib)
         }
-        sectorData.erlkingVaults.push(entry)
+        sectorData.erlkingVaults?.push(entry)
       } else if (this.isAbandonedShip() && sectorData) {
         const entry: AbandonedShipEntry = {
           code: String(attrib.code || ''),
@@ -371,7 +393,7 @@ class X4SaveParser {
           y: pos.y,
           z: pos.z
         }
-        sectorData.abandonedShips.push(entry)
+        sectorData.abandonedShips?.push(entry)
       }
 
       if (this.isStation()) {
@@ -534,7 +556,7 @@ export function createSaveXmlFilterRuntime(options: {
     }
 
     parser.onOpenTag(node)
-    captureNode.isSelfClosing = node.isSelfClosing === true
+    captureNode.isSelfClosing = (node as TagNode & { isSelfClosing?: boolean }).isSelfClosing === true
     pathStack.push(captureNode)
 
     if (!rootOpened) {
@@ -693,6 +715,44 @@ export function createSaveParserRuntime(
     })
   }
 
+  const pruneArchive = (archive: SaveArchive): SaveArchive => {
+    const prunedSectors = Object.fromEntries(
+      Object.entries(archive.sectors).map(([sectorId, sector]) => {
+        const nextSector: SectorData = {
+          name: sector.name,
+          is_known: sector.is_known,
+          ...(sector.owner ? { owner: sector.owner } : {})
+        }
+
+        if (sector.playerStations?.length) nextSector.playerStations = sector.playerStations
+        if (sector.xenonStations?.length) nextSector.xenonStations = sector.xenonStations
+        if (sector.khaakStations?.length) nextSector.khaakStations = sector.khaakStations
+        if (sector.npcStations?.length) {
+          nextSector.npcStations = sector.npcStations.map((entry) => ({
+            ...entry,
+            ...(entry.modules && entry.modules.length > 0 ? { modules: entry.modules } : {})
+          }))
+        }
+        if (sector.datavaults?.length) {
+          nextSector.datavaults = sector.datavaults.map((entry) => ({
+            ...entry,
+            ...(entry.wares && entry.wares.length > 0 ? { wares: entry.wares } : {})
+          }))
+        }
+        if (sector.erlkingVaults?.length) {
+          nextSector.erlkingVaults = sector.erlkingVaults.map((entry) => ({
+            ...entry,
+            ...(entry.wares && entry.wares.length > 0 ? { wares: entry.wares } : {})
+          }))
+        }
+        if (sector.abandonedShips?.length) nextSector.abandonedShips = sector.abandonedShips
+        return [sectorId, nextSector]
+      })
+    )
+
+    return { ...archive, sectors: prunedSectors }
+  }
+
   return {
     feed(text: string) {
       if (!text) return
@@ -710,7 +770,7 @@ export function createSaveParserRuntime(
       const isCompatible = currentVersion !== null 
         ? normalizeVersion(parser.data.meta.version) === normalizeVersion(currentVersion)
         : true
-      return {
+      return pruneArchive({
         meta: {
           ...parser.data.meta,
           filename: stripSaveFileExtension(filename),
@@ -719,7 +779,7 @@ export function createSaveParserRuntime(
         },
         sectors: parser.data.sectors,
         isCompatible
-      }
+      })
     },
     getProgress() {
       return getProgressInfo()

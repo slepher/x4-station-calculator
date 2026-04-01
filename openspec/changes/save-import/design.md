@@ -109,13 +109,17 @@ interface ProgressInfo {
 interface SectorData {
   name: string            // 翻译后名称
   is_known: boolean       // 是否已知
-  stations: StationEntry[]
-  datavaults: DatavaultEntry[]
-  erlkingVaults: DatavaultEntry[]  // 同结构，单独类型
-  abandonedShips: AbandonedShipEntry[]
+  owner?: string
+  playerStations?: PlayerStationEntry[]
+  xenonStations?: FactionStationEntry[]
+  khaakStations?: FactionStationEntry[]
+  npcStations?: NpcStationEntry[]
+  datavaults?: DatavaultEntry[]
+  erlkingVaults?: DatavaultEntry[]  // 同结构，单独类型
+  abandonedShips?: AbandonedShipEntry[]
 }
 
-interface StationEntry {
+interface StationBaseEntry {
   code: string
   macro: string
   owner: string
@@ -124,13 +128,27 @@ interface StationEntry {
   z: number
   is_wreck?: boolean
   is_headquarter?: boolean
-  modules?: StationModule[]  // 仅owner=player时提取
 }
 
-interface StationModule {
+interface PlayerStationEntry extends StationBaseEntry {
+  modules?: PlayerStationModule[]
+}
+
+interface PlayerStationModule {
   index: number
   ref: string
   equipments?: StationEquipment[]
+}
+
+interface NpcStationEntry extends StationBaseEntry {
+  modules?: AggregatedStationModule[]
+}
+
+interface FactionStationEntry extends StationBaseEntry {}
+
+interface AggregatedStationModule {
+  ref: string
+  amount: number
 }
 
 interface StationEquipment {
@@ -147,9 +165,16 @@ interface DatavaultEntry {
   x: number
   y: number
   z: number
+  unlocked: boolean
+  wares?: DatavaultWareEntry[]
   has_blueprints?: boolean
   has_wares?: boolean
   has_signalleak?: boolean
+}
+
+interface DatavaultWareEntry {
+  ware: string
+  amount: number
 }
 
 interface AbandonedShipEntry {
@@ -185,6 +210,8 @@ interface ArchiveGroup {
 - Worker 脚本（备用）: `src/workers/saveParser.worker.ts`（SAX / CLI 默认路径）
 - 上传桥接模块: `src/components/save/saveUploadStreaming.ts`
 - Rust 解析器源码: `rust-parser/`
+- `src/workers/saveParser.worker.ts` 冻结为兼容/备用解析链，不再继续承载新的业务字段提取
+- 后续业务演进只进入 Rust/WASM 解析链
 - 上传链路采用三段式协议：
   - `parse_start`: 发送 `filename/currentVersion/expectedTotalBytes`
   - `parse_chunk`: 逐块发送原始文件字节
@@ -271,7 +298,49 @@ getCurrentPosition(): Vector3 {
 }
 ```
 
-### Decision 3: Name Translation
+### Decision 3: Sector And Station Classification
+
+**问题**: 现有 `stations[]` 平铺结构无法直接表达敌对势力、玩家与普通 NPC 的差异化业务需求
+
+**方案**: 在 sector 层补充 `owner`，并将 station 按 owner 拆成四组
+
+**实现细节**:
+- `component class="sector"` 额外提取 `owner` attribute
+- `component class="station"` 按 `owner` 进入：
+  - `playerStations`
+  - `xenonStations`
+  - `khaakStations`
+  - `npcStations`
+- `playerStations` 保留现有玩家站模块明细提取
+- `xenonStations` 与 `khaakStations` 只做分组，不追加 module 聚合
+- `npcStations` 额外提取所有 module 的聚合统计：
+  - `modules: [{ ref, amount }]`
+  - `ref` 为模块标识
+  - `amount` 为该模块在站内出现次数
+- 所有空数组字段在导出 JSON 中省略，不输出 `[]`
+
+### Decision 4: Datavault Loot Extraction
+
+**问题**: datavault 与 erlking_vault 除了坐标和布尔标记外，还需要表达是否已解锁以及内部可拾取战利品
+
+**方案**: 统一提取 `unlocked` 与聚合 `wares`
+
+**实现细节**:
+- 适用对象：
+  - `component class="datavault"`
+  - `macro` 包含 `erlking_vault`
+- `unlocked` 提取规则：
+  - 查找对象内部 `<unlock state="..."/>`
+  - 仅当 `state="unlocked"` 时输出 `true`
+  - tag 不存在或值不是 `unlocked` 时输出 `false`
+- `wares` 提取规则：
+  - 进入对象下 `class="collectablewares"` 子组件
+  - 扫描其 `<wares><ware .../></wares>`
+  - 输出 `wares: [{ ware, amount }]`
+  - 同名 `ware` 进行聚合
+  - `amount` 缺失按 `1` 处理
+
+### Decision 5: Name Translation
 
 **问题**: 存档名称使用 `{page,id}` 格式，需翻译
 
@@ -299,7 +368,7 @@ function resolveName(s: string): string {
 }
 ```
 
-### Decision 4: Version Validation
+### Decision 6: Version Validation
 
 **问题**: 存档版本需与当前游戏数据版本匹配
 
@@ -312,7 +381,7 @@ function resolveName(s: string): string {
 - 不匹配时: 设置 `isCompatible = false`，显示警告
 - Rust 与 SAX 两条解析链在未提供 `expected_version` 时都默认兼容，避免 UI / CLI 语义分叉
 
-### Decision 5: Browser Upload Streaming
+### Decision 7: Browser Upload Streaming
 
 **问题**: 浏览器侧上传超大存档时，若先 `arrayBuffer()` 或先 gunzip，会拉高主线程和 JS 内存峰值
 
@@ -325,7 +394,7 @@ function resolveName(s: string): string {
 - 每个 chunk 直接 transfer 给 worker，避免重复复制
 - 浏览器端不再使用 `DecompressionStream('gzip')`
 
-### Decision 6: JSON Import/Export
+### Decision 8: JSON Import/Export
 
 **问题**: 需支持导入已提取JSON和导出解析结果
 
@@ -336,7 +405,7 @@ function resolveName(s: string): string {
 - 导出时生成标准化JSON，使用 `URL.createObjectURL` + `<a download>`
 - 文件名: `{playerName}_{guid[:8]}_{time}.json`
 
-### Decision 7: Store Design
+### Decision 9: Store Design
 
 **问题**: 存档数据管理
 
@@ -358,7 +427,7 @@ function resolveName(s: string): string {
   - `checkVersionCompatibility(version)` - 版本兼容检查
   - `setParsingState(parsing, progress, error)` - 设置解析状态
 
-### Decision 8: CLI Extraction Tool
+### Decision 10: CLI Extraction Tool
 
 **问题**: 需要命令行工具进行批量存档提取
 
@@ -375,7 +444,7 @@ function resolveName(s: string): string {
 - CLI 不再自行推断或节流 WASM 进度，只消费 Rust 侧返回的 CLI progress
 - 进度报告: 解析进度、sector 数量、耗时
 
-### Decision 9: WASM Parser Module
+### Decision 11: WASM Parser Module
 
 **问题**: 需要高性能解析器处理大型存档
 
@@ -409,7 +478,7 @@ function resolveName(s: string): string {
   - 进行 XML entity decode
   - 未设置 `expected_version` 时默认兼容
 
-### Decision 10: Progress Semantics
+### Decision 12: Progress Semantics
 
 **问题**: UI 和 CLI 都需要进度，但两条链路不能各自发明不同语义
 
