@@ -49,7 +49,7 @@ function isGzipFile(filePath: string): boolean {
 }
 
 function defaultOutputPath(inputPath: string, outputXml: boolean): string {
-  const ext = outputXml ? '.xml' : '.json'
+  const ext = outputXml ? '.filtered.xml' : '.json'
   if (inputPath.toLowerCase().endsWith('.xml.gz')) return inputPath.slice(0, -7) + ext
   if (inputPath.toLowerCase().endsWith('.gz')) return inputPath.slice(0, -3) + ext
   if (inputPath.toLowerCase().endsWith('.xml')) return inputPath.slice(0, -4) + ext
@@ -147,15 +147,18 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
   const parser = sax.parser(false, { lowercase: true, position: false })
   
   const tagPath: string[] = []
-  let currentComponentClass: string | null = null
-  let isInsideSector = false
   let depth = 0
+  let isInsideSector = false
   let sectorDepth = 0
+  let sectorHasContent = false
+  let sectorOpenTag = ''
   let sectorCount = 0
   let versionChecked = false
   let versionMatch = true
   
   const outputChunks: string[] = []
+  
+  const SECTOR_CHILD_CLASSES = ['station', 'datavault']
   
   function escapeXml(str: string): string {
     return str
@@ -169,12 +172,21 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
   function normalizeVersion(v: string): string {
     const trimmed = v.trim()
     if (/^\d+\.\d+$/.test(trimmed)) {
-      const parsed = Number(trimmed)
-      return Number.isFinite(parsed) ? parsed.toFixed(1) : v
+      return trimmed
     }
     const num = parseInt(trimmed, 10)
     if (isNaN(num)) return v
     return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
+  }
+  
+  function isSectorChild(node: sax.Tag): boolean {
+    if (node.name !== 'component') return false
+    const clazz = node.attributes.class as string
+    if (SECTOR_CHILD_CLASSES.includes(clazz)) return true
+    if (clazz?.startsWith('ship_') && node.attributes.owner === 'ownerless') return true
+    const macro = node.attributes.macro as string
+    if (macro?.toLowerCase().includes('erlking_vault')) return true
+    return false
   }
   
   function shouldOutput(): boolean {
@@ -182,15 +194,10 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
     
     const currentPath = tagPath.join('/')
     
-    // Always output savegame root and its direct children
     if (tagPath.length === 1 && tagPath[0] === 'savegame') return true
     if (tagPath.length === 2 && currentPath === 'savegame/info') return true
     if (tagPath.length === 3 && (currentPath === 'savegame/info/game' || currentPath === 'savegame/info/player')) return true
     if (tagPath.length === 2 && currentPath === 'savegame/components') return true
-    if (tagPath.length === 2 && currentPath === 'savegame/component') return false // components wrapper
-    
-    // Output sector components and their contents
-    if (isInsideSector) return true
     
     return false
   }
@@ -199,7 +206,6 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
     tagPath.push(node.name)
     depth++
     
-    // Check version
     if (tagPath.join('/') === 'savegame/info/game' && !versionChecked) {
       versionChecked = true
       const version = node.attributes.version as string
@@ -207,45 +213,57 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
         const saveVer = normalizeVersion(version)
         const expectedVer = normalizeVersion(expectedVersion)
         if (saveVer !== expectedVer) {
-          console.error(`[extract_save] version mismatch: save ${version} (${saveVer}) != expected ${expectedVersion} (${expectedVer})`)
+          console.error(`[extract_save] version mismatch: ${version} (${saveVer}) vs ${expectedVersion} (${expectedVer})`)
           versionMatch = false
         }
       }
     }
     
-    // Track component class
-    if (node.name === 'component' && node.attributes.class) {
-      currentComponentClass = node.attributes.class as string
-      if (currentComponentClass === 'sector') {
-        isInsideSector = true
-        sectorDepth = depth
-        sectorCount++
-      }
+    const attrs = Object.entries(node.attributes)
+      .map(([k, v]) => `${k}="${escapeXml(String(v))}"`)
+      .join(' ')
+    const attrStr = attrs ? ` ${attrs}` : ''
+    
+    if (node.name === 'component' && node.attributes.class === 'sector') {
+      isInsideSector = true
+      sectorDepth = depth
+      sectorHasContent = false
+      sectorOpenTag = `<component${attrStr}>`
+      return
     }
     
-    // Output tag if we should
+    if (isInsideSector && depth > sectorDepth) {
+      if (isSectorChild(node)) {
+        if (!sectorHasContent) {
+          sectorHasContent = true
+          outputChunks.push(sectorOpenTag)
+        }
+        outputChunks.push(`<component${attrStr}>`)
+      }
+      return
+    }
+    
     if (shouldOutput() && versionMatch) {
-      const attrs = Object.entries(node.attributes)
-        .map(([k, v]) => `${k}="${escapeXml(String(v))}"`)
-        .join(' ')
-      const attrStr = attrs ? ` ${attrs}` : ''
       outputChunks.push(`<${node.name}${attrStr}>`)
     }
   }
   
   parser.onclosetag = (name: string) => {
-    if (shouldOutput() && versionMatch) {
-      outputChunks.push(`</${name}>`)
-    }
-    
-    // Reset sector tracking
     if (isInsideSector && depth === sectorDepth) {
+      if (sectorHasContent) {
+        outputChunks.push(`</component>`)
+        sectorCount++
+      }
       isInsideSector = false
       sectorDepth = 0
-    }
-    
-    if (name === 'component') {
-      currentComponentClass = null
+      sectorHasContent = false
+      sectorOpenTag = ''
+    } else if (isInsideSector && depth > sectorDepth && name === 'component') {
+      if (sectorHasContent) {
+        outputChunks.push(`</component>`)
+      }
+    } else if (shouldOutput() && versionMatch) {
+      outputChunks.push(`</${name}>`)
     }
     
     tagPath.pop()
