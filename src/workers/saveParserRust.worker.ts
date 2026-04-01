@@ -89,7 +89,11 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
           postProgress(progress)
           
           if (progress.error) {
-            self.postMessage({ type: 'error', message: progress.error } as SaveParserRustMessage)
+            self.postMessage({ 
+              type: 'error', 
+              message: progress.error,
+              detail: progress.errorDetail
+            } as SaveParserRustMessage)
             return
           }
           
@@ -109,7 +113,11 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
           postProgress(progress)
           
           if (progress.error) {
-            self.postMessage({ type: 'error', message: progress.error } as SaveParserRustMessage)
+            self.postMessage({ 
+              type: 'error', 
+              message: progress.error,
+              detail: progress.errorDetail
+            } as SaveParserRustMessage)
             return
           }
           

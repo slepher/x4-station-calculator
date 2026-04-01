@@ -1,5 +1,20 @@
 export type SaveSource = 'original' | 'imported'
 
+export interface VersionMismatchError {
+  type: 'version_mismatch'
+  saveVersion: string
+  saveVersionNormalized: string
+  expectedVersion: string
+  expectedVersionNormalized: string
+}
+
+export interface ParseError {
+  type: 'parse_error'
+  message: string
+}
+
+export type SaveParserErrorDetail = VersionMismatchError | ParseError
+
 export interface ProgressInfo {
   phase: 'receiving' | 'parsing' | 'finalizing' | 'done' | 'error'
   inputBytesTotal: number
@@ -12,6 +27,7 @@ export interface ProgressInfo {
   done: boolean
   inputComplete: boolean
   error: string | null
+  errorDetail?: SaveParserError
   version?: string
   versionMismatch?: boolean
 }
@@ -112,6 +128,7 @@ export type SaveParserComplete = {
 export type SaveParserError = {
   type: 'error'
   message: string
+  detail?: SaveParserErrorDetail
 }
 
 export type SaveParserRustMessage = SaveParserRustProgress | SaveParserComplete | SaveParserError

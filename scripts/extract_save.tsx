@@ -192,6 +192,13 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
         `[extract_save] ${progress.percent.toFixed(1)}% parsed, ${formatMB(progress.parsedBytesTotal)} MB / ${formatMB(progress.inputBytesTotal)} MB, ${progress.tagCount} tags, ${progress.sectorCount} sectors`
       )
     }
+    
+    if (progress.error) {
+      if (progress.errorDetail) {
+        console.error('[extract_save] error detail:', JSON.stringify(progress.errorDetail, null, 2))
+      }
+      throw new Error(progress.error)
+    }
 
     if (!hasMore) break
   }
