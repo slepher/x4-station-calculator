@@ -303,8 +303,81 @@ function resolveName(s: string): string {
   - `checkVersionCompatibility(version)` - 版本兼容检查
   - `setParsingState(parsing, progress, error)` - 设置解析状态
 
+### Decision 7: CLI Extraction Tool
+
+**问题**: 需要命令行工具进行批量存档提取
+
+**方案**: 提供 `scripts/extract_save.tsx` CLI 工具
+
+**实现细节**:
+- 用法: `npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz> [output.json] [--wasm]`
+- 支持两种解析器:
+  - 默认: sax-js 解析器（使用 `saveParserSimplified.worker.ts`）
+  - `--wasm`: Rust WASM 解析器（约 3.25x 更快，实验性）
+- 输入格式: `.xml`, `.xml.gz`, `.gz`
+- 输出格式: `.json`（符合导出格式规范）
+- 进度报告: 解析进度、sector 数量、耗时
+
+### Decision 8: WASM Parser Module
+
+**问题**: 需要高性能解析器处理大型存档
+
+**方案**: 使用 Rust 编译为 WebAssembly
+
+**实现细节**:
+- 位置: `src/wasm/`
+- `SaveParser` 类:
+  - `push_chunk(chunk: Uint8Array)` - 输入数据块
+  - `pump(max_events: number): boolean` - 处理事件，返回是否还有更多
+  - `finish(filename: string): string` - 完成解析，返回 JSON 字符串
+  - `progress_json(): string` - 获取进度信息（ProgressInfo JSON）
+  - `set_expected_total_bytes(total: number)` - 设置预期总字节数
+- 使用流程:
+  1. 创建 `SaveParser` 实例
+  2. 调用 `push_chunk` 输入数据
+  3. 循环调用 `pump` 处理事件
+  4. 调用 `finish` 获取结果
+
 ## File Structure
 
+```
+src/
+├── components/
+│   └── save/
+│       ├── SaveImportView.vue          # 主视图容器
+│       ├── SaveUploadPanel.vue         # 上传面板
+│       ├── SaveList.vue                # 存档列表
+│       ├── SaveListItem.vue            # 存档项（含下载按钮）
+│       ├── SaveDetailPanel.vue         # 详情面板
+│       └── SectorDetailList.vue        # Sector详情列表
+│
+├── store/
+│   └── useSaveStore.ts                 # 存档Store
+│
+├── workers/
+│   ├── saveParserRust.worker.ts        # Rust解析Worker（UI使用）
+│   ├── saveParser.worker.ts            # SAX解析Worker（完整版，备用）
+│   └── saveParserSimplified.worker.ts  # SAX解析Worker（简化版，CLI使用）
+│
+├── wasm/
+│   ├── save_parser.js                  # Rust WASM JS绑定
+│   ├── save_parser_bg.wasm             # Rust WASM二进制
+│   └── save_parser.d.ts                # 类型定义
+│
+├── utils/
+│   └── saveParserConfig.ts             # Worker配置数据打包
+│   └── saveResourceExtract.ts          # 资源区域提取（独立模块）
+│
+├── types/
+│   └── saveArchive.ts                  # 存档数据类型定义
+│
+└── assets/
+    └── x4_game_data/
+        └── 8.0-Diplomacy/
+            └── locales/                # strings表（用于翻译）
+
+scripts/
+└── extract_save.tsx                    # CLI提取工具
 ```
 src/
 ├── components/

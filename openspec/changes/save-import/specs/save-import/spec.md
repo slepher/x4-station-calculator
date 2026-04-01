@@ -429,3 +429,46 @@
 - `importFromJson(jsonData)`: 导入JSON（含校验）
 - `checkVersionCompatibility(version)`: 版本兼容检查
 - `setParsingState(parsing, progress, error)`: 设置解析状态
+
+### Requirement: CLI Extraction Tool
+
+提供命令行工具进行存档提取。
+
+#### Scenario: 使用CLI提取存档
+
+**前提** 用户已安装 Node.js 和项目依赖
+
+**当** 用户执行 `npm exec tsx scripts/extract_save.tsx <input.xml> [output.json]`
+
+**那么** 解析存档文件并生成 JSON
+
+**并且** 显示解析进度和统计信息
+
+**当** 用户添加 `--wasm` 参数
+
+**那么** 使用 Rust WASM 解析器（更快）
+
+#### Scenario: CLI输入输出格式
+
+**前提** 用户执行 CLI 工具
+
+**当** 输入文件为 `.xml` 或 `.xml.gz` 或 `.gz`
+
+**那么** 自动检测并处理
+
+**当** 未指定输出文件
+
+**那么** 使用默认输出路径：输入文件名替换扩展名为 `.json`
+
+#### Scenario: WASM解析器接口
+
+**前提** 使用 Rust WASM 解析器
+
+**当** 调用 `SaveParser` 类
+
+**那么** 支持以下方法：
+- `push_chunk(chunk: Uint8Array)`: 输入数据块
+- `pump(max_events: number): boolean`: 处理事件
+- `finish(filename: string): string`: 完成解析，返回JSON
+- `progress_json(): string`: 获取进度信息
+- `set_expected_total_bytes(total: number)`: 设置预期总字节数
