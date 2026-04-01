@@ -5,19 +5,33 @@ import { createSaveParserRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
 
 function printUsage(): void {
-  console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output.json] [--wasm]')
+  console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output.json] [options]')
   console.log('')
   console.log('Options:')
-  console.log('  --wasm    Use Rust WASM parser (3.25x faster, experimental)')
+  console.log('  --wasm         Use Rust WASM parser (3.25x faster, experimental)')
+  console.log('  --version <v>  Expected game version (e.g., "8.0"). If not set, version check is skipped')
 }
 
-function parseArgs(): { input: string; output: string; useWasm: boolean } {
+function parseArgs(): { input: string; output: string; useWasm: boolean; expectedVersion: string | null } {
   const args = process.argv.slice(2)
   const useWasm = args.includes('--wasm')
-  const positional = args.filter(a => !a.startsWith('--'))
+  
+  let expectedVersion: string | null = null
+  const versionIndex = args.indexOf('--version')
+  if (versionIndex !== -1 && args[versionIndex + 1] && !args[versionIndex + 1].startsWith('--')) {
+    expectedVersion = args[versionIndex + 1]
+  }
+  
+  // Filter out options and their values
+  const positional = args.filter((a, i) => {
+    if (a.startsWith('--')) return false
+    if (versionIndex !== -1 && (i === versionIndex + 1)) return false
+    return true
+  })
+  
   const input = positional[0]
   const output = positional[1]
-  return { input, output, useWasm }
+  return { input, output, useWasm, expectedVersion }
 }
 
 function isGzipFile(filePath: string): boolean {
@@ -49,7 +63,7 @@ function getGzipUncompressedSize(buf: Buffer): number | null {
   return buf.readUInt32LE(buf.length - 4)
 }
 
-async function extractSaveSaxJs(inputPath: string, outputPath: string): Promise<SaveArchive> {
+async function extractSaveSaxJs(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<SaveArchive> {
   const absoluteInput = path.resolve(process.cwd(), inputPath)
   const absoluteOutput = path.resolve(process.cwd(), outputPath)
   const gzip = isGzipFile(absoluteInput)
@@ -60,11 +74,17 @@ async function extractSaveSaxJs(inputPath: string, outputPath: string): Promise<
   console.log(`[extract_save] output: ${absoluteOutput}`)
   console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
   console.log(`[extract_save] source type: ${gzip ? 'gzip' : 'xml'}`)
+  if (expectedVersion) {
+    console.log(`[extract_save] expected version: ${expectedVersion}`)
+  } else {
+    console.log(`[extract_save] version check: skipped`)
+  }
 
   const sourceStream = fs.createReadStream(absoluteInput)
   const dataStream = gzip ? sourceStream.pipe(zlib.createGunzip()) : sourceStream
 
   const runtime = createSaveParserRuntime({
+    currentVersion: expectedVersion || undefined,
     onProgress: (progress) => {
       console.log(
         `[extract_save] parsed ${formatMB(progress.bytesProcessed)} MB, tags ${progress.tagCount}, sectors ${progress.sectorsCount}`
@@ -101,7 +121,7 @@ async function extractSaveSaxJs(inputPath: string, outputPath: string): Promise<
   return archive
 }
 
-async function extractSaveWasm(inputPath: string, outputPath: string): Promise<SaveArchive> {
+async function extractSaveWasm(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<SaveArchive> {
   const absoluteInput = path.resolve(process.cwd(), inputPath)
   const absoluteOutput = path.resolve(process.cwd(), outputPath)
   const gzip = isGzipFile(absoluteInput)
@@ -112,6 +132,11 @@ async function extractSaveWasm(inputPath: string, outputPath: string): Promise<S
   console.log(`[extract_save] output: ${absoluteOutput}`)
   console.log(`[extract_save] source size: ${formatMB(stat.size)} MB`)
   console.log(`[extract_save] source type: ${gzip ? 'gzip' : 'xml'}`)
+  if (expectedVersion) {
+    console.log(`[extract_save] expected version: ${expectedVersion}`)
+  } else {
+    console.log(`[extract_save] version check: skipped`)
+  }
 
   const initWasm = (await import('../src/wasm/save_parser.js')).default
   const { SaveParser } = await import('../src/wasm/save_parser.js')
@@ -121,6 +146,11 @@ async function extractSaveWasm(inputPath: string, outputPath: string): Promise<S
   await initWasm({ module_or_path: wasmBinary })
 
   const parser = new SaveParser()
+  
+  if (expectedVersion) {
+    parser.set_expected_version(expectedVersion)
+  }
+  
   const start = performance.now()
 
   let inputBuffer: Buffer
@@ -180,7 +210,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string): Promise<S
 }
 
 async function main(): Promise<void> {
-  const { input, output, useWasm } = parseArgs()
+  const { input, output, useWasm, expectedVersion } = parseArgs()
 
   if (!input) {
     printUsage()
@@ -190,9 +220,9 @@ async function main(): Promise<void> {
 
   try {
     if (useWasm) {
-      await extractSaveWasm(input, output || defaultOutputPath(input))
+      await extractSaveWasm(input, output || defaultOutputPath(input), expectedVersion)
     } else {
-      await extractSaveSaxJs(input, output || defaultOutputPath(input))
+      await extractSaveSaxJs(input, output || defaultOutputPath(input), expectedVersion)
     }
   } catch (error) {
     const message = error instanceof Error ? error.message : String(error)

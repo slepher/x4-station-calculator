@@ -56,7 +56,7 @@ class X4SaveParser {
   private componentStack: ComponentContext[] = []
   private tagCount = 0
   private sectorsCount = 0
-  private expectedVersion: string
+  private expectedVersion: string | null
   private versionChecked = false
 
   private currentStationOwner: string | null = null
@@ -67,7 +67,7 @@ class X4SaveParser {
 
   public data: SaveData
 
-  constructor(expectedVersion: string) {
+  constructor(expectedVersion: string | null) {
     this.expectedVersion = expectedVersion
     this.data = {
       meta: { guid: '', seed: 0, time: 0, playerName: '', version: '' },
@@ -219,7 +219,7 @@ class X4SaveParser {
       this.data.meta.time = this.toNumber(attrib.time)
       this.data.meta.version = String(attrib.version || '')
       
-      if (!this.versionChecked && this.data.meta.version) {
+      if (!this.versionChecked && this.data.meta.version && this.expectedVersion !== null) {
         this.versionChecked = true
         const saveVersion = normalizeVersion(this.data.meta.version)
         const expected = normalizeVersion(this.expectedVersion)
@@ -402,10 +402,10 @@ export function createSaveParserRuntime(
   options?: {
     onProgress?: (info: SaveParserProgressInfo) => void
     progressIntervalMs?: number
-    currentVersion?: string
+    currentVersion?: string | null
   }
 ): SaveParserRuntime {
-  const currentVersion = options?.currentVersion || '8.0'
+  const currentVersion = options?.currentVersion ?? null
   const parser = new X4SaveParser(currentVersion)
   const previousMaxBufferLength = saxWithBufferConfig.MAX_BUFFER_LENGTH
   saxWithBufferConfig.MAX_BUFFER_LENGTH = Math.min(previousMaxBufferLength, SAX_MAX_BUFFER_LENGTH)
@@ -459,6 +459,9 @@ export function createSaveParserRuntime(
       saxParser.close()
       emitProgress(true)
       saxWithBufferConfig.MAX_BUFFER_LENGTH = previousMaxBufferLength
+      const isCompatible = currentVersion !== null 
+        ? normalizeVersion(parser.data.meta.version) === normalizeVersion(currentVersion)
+        : true
       return {
         meta: {
           ...parser.data.meta,
@@ -467,7 +470,7 @@ export function createSaveParserRuntime(
           source: 'original'
         },
         sectors: parser.data.sectors,
-        isCompatible: normalizeVersion(parser.data.meta.version) === normalizeVersion(currentVersion)
+        isCompatible
       }
     },
     getProgress() {
