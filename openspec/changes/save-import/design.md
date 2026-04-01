@@ -31,20 +31,31 @@
 │                       useSaveStore                               │
 │  - archives: Map<guid, ArchiveGroup>                            │
 │  - selectedArchive: SaveArchive | null                          │
+│  - isParsing: boolean                                           │
+│  - parseProgress: string                                        │
+│  - parseError: string | null                                    │
+│  - archiveGroups: computed<ArchiveGroup[]>                      │
+│  - totalArchiveCount: computed<number>                          │
 │  - addArchive(save: SaveArchive)                                │
-│  - selectArchive(guid: string, seed: number)                    │
-│  - removeArchive(guid: string, seed: number)                    │
-│  - exportToJson(guid: string, seed: number)                     │
+│  - selectArchive(guid: string, time: number)                    │
+│  - clearSelection()                                             │
+│  - removeArchive(guid: string, time: number)                    │
+│  - clearAll()                                                   │
+│  - exportToJson(guid: string, time: number)                     │
+│  - importFromJson(jsonData: unknown)                            │
+│  - checkVersionCompatibility(version: string)                   │
+│  - setParsingState(parsing, progress, error)                    │
 └─────────────────────────────────────────────────────────────────┘
                               │
                               ▼
 ┌─────────────────────────────────────────────────────────────────┐
-│                  SAX Parser Worker                               │
-│  - Stream parse XML (gzip supported)                            │
+│                  Rust Parser Worker                              │
+│  - High-performance XML parsing (Rust WASM)                     │
 │  - Extract: stations, datavaults, erlkingVaults, ships          │
 │  - Accumulate coordinates (component offset stacking)           │
 │  - Translate names ({page,id} → strings table)                  │
-│  - Progress reporting                                           │
+│  - Progress reporting (ProgressInfo)                            │
+│  - Optional performance profiling                               │
 └─────────────────────────────────────────────────────────────────┘
 ```
 
@@ -60,10 +71,26 @@ interface SaveArchive {
     time: number          // 存档时间（游戏内秒）
     playerName: string    // 玩家名称（分组命名）
     version: string       // 游戏版本（如 "800"）
+    filename: string      // 存档文件名（去扩展名）
+    parser_version: 'v1' | 'v2'  // 解析器版本
     source: 'original' | 'imported'  // 来源类型
   }
   sectors: Record<string, SectorData>
   isCompatible: boolean   // 版本兼容状态
+}
+
+interface ProgressInfo {
+  phase: 'receiving' | 'parsing' | 'finalizing' | 'done' | 'error'
+  inputBytesTotal: number
+  parsedBytesTotal: number
+  bufferedBytes: number
+  expectedTotalBytes: number
+  percent: number
+  tagCount: number
+  sectorCount: number
+  done: boolean
+  inputComplete: boolean
+  error: string | null
 }
 
 interface SectorData {
@@ -84,6 +111,20 @@ interface StationEntry {
   z: number
   is_wreck?: boolean
   is_headquarter?: boolean
+  modules?: StationModule[]  // 仅owner=player时提取
+}
+
+interface StationModule {
+  index: number
+  ref: string
+  equipments?: StationEquipment[]
+}
+
+interface StationEquipment {
+  type: 'shields' | 'turrets'
+  ref: string
+  group: string
+  exact: number
 }
 
 interface DatavaultEntry {
@@ -120,23 +161,24 @@ interface ArchiveGroup {
 
 ## Key Decisions
 
-### Decision 1: SAX Worker Streaming
+### Decision 1: Rust Worker Streaming
 
 **问题**: 存档文件可达100MB+，直接解析会阻塞UI
 
-**方案**: 使用 Web Worker + SAX 流式解析
+**方案**: 使用 Rust Web Worker 执行高性能解析
 
 **实现细节**:
-- Worker 脚本: `src/workers/saveParser.worker.ts`
-- 使用 `sax-js` 或类似库流式解析XML
+- Worker 脚本: `src/workers/saveParserRust.worker.ts`（Rust WASM）
+- Worker 脚本（备用）: `src/workers/saveParser.worker.ts`（SAX，未在UI中使用）
 - 支持gzip检测并自动解压（`DecompressionStream`）
-- 每处理N MB向主线程报告进度
+- 向主线程报告 ProgressInfo 进度
 - 解析完成后一次性返回结果对象
+- 可选性能分析（通过 `options.profile` 参数）
 
-**替代方案**: DOM解析（`fast-xml-parser`）
-- 缺点: 内存占用高，100MB存档可能导致内存溢出
-- 优点: 解析更简单
-- 结论: 不采用，流式解析更适合大文件
+**替代方案**: SAX解析（`sax-js`）
+- 缺点: 性能较 Rust 版本慢
+- 优点: 纯JS实现，调试方便
+- 结论: 作为备用方案保留，UI使用Rust版本
 
 ### Decision 2: Coordinate Accumulation
 
@@ -236,7 +278,7 @@ function resolveName(s: string): string {
 **实现细节**:
 - 导入时校验 `meta.version`，跳过解析步骤
 - 导出时生成标准化JSON，使用 `URL.createObjectURL` + `<a download>`
-- 文件名: `{playerName}_{guid}_{seed}.json`
+- 文件名: `{playerName}_{guid[:8]}_{time}.json`
 
 ### Decision 6: Store Design
 
@@ -247,7 +289,18 @@ function resolveName(s: string): string {
 **实现细节**:
 - 不持久化（暂不实现localStorage/IndexedDB）
 - 数据仅在内存中存储
-- 提供方法: `addArchive`, `selectArchive`, `removeArchive`, `exportToJson`
+- 状态: `archives`, `selectedArchive`, `isParsing`, `parseProgress`, `parseError`
+- 计算属性: `archiveGroups`, `totalArchiveCount`
+- 方法:
+  - `addArchive(archive)` - 添加存档，含版本兼容检查
+  - `selectArchive(guid, time)` - 选中存档（使用time作为标识）
+  - `clearSelection()` - 清空选中状态
+  - `removeArchive(guid, time)` - 删除存档
+  - `clearAll()` - 清空所有存档和状态
+  - `exportToJson(guid, time)` - 导出JSON文件
+  - `importFromJson(jsonData)` - 导入JSON，含结构校验
+  - `checkVersionCompatibility(version)` - 版本兼容检查
+  - `setParsingState(parsing, progress, error)` - 设置解析状态
 
 ## File Structure
 
@@ -265,8 +318,13 @@ src/
 ├── store/
 │   └── useSaveStore.ts                 # 存档Store
 │
-├── workers/
-│   └── saveParser.worker.ts            # SAX解析Worker
+│  ├── workers/
+│  │   ├── saveParserRust.worker.ts     # Rust解析Worker（UI使用）
+│  │   └── saveParser.worker.ts         # SAX解析Worker（备用）
+│
+│  ├── utils/
+│  │   └── saveParserConfig.ts          # Worker配置数据打包
+│  │   └── saveResourceExtract.ts       # 资源区域提取（独立模块）
 │
 ├── utils/
 │   └── saveParserConfig.ts             # Worker配置数据打包
@@ -334,4 +392,4 @@ src/
 
 ### Duplicate Save
 
-- 同guid+seed视为更新，替换旧数据
+- 同guid+time视为更新，替换旧数据

@@ -112,15 +112,15 @@
 
 **并且** 每个存档项显示时间信息
 
-#### Scenario: 同guid同seed存档处理
+#### Scenario: 同guid同time存档处理
 
-**前提** 上传的存档 `guid` 和 `seed` 与已有存档相同
+**前提** 上传的存档 `guid` 和 `time` 与已有存档相同
 
 **当** 解析完成
 
 **那么** 视为同一存档的更新
 
-**并且** 替换旧数据（保留最新的 `time` 记录）
+**并且** 替换旧数据
 
 ### Requirement: Save Data Extraction
 
@@ -141,6 +141,18 @@
 - `is_headquarter`: 是否HQ
 
 **并且** 不限制owner（提取所有空间站）
+
+**当** 空间站 `owner="player"`
+
+**那么** 额外提取模块信息：
+- `modules`: 模块列表（从 construction/sequence/entry 提取）
+  - `index`: 模块序号
+  - `ref`: 模块macro引用
+  - `equipments`: 装备列表（可选）
+    - `type`: `shields` | `turrets`
+    - `ref`: 装备macro
+    - `group`: 装备组名
+    - `exact`: 数量
 
 #### Scenario: 提取Datavault
 
@@ -254,7 +266,7 @@
 
 **并且** 使用浏览器原生下载API触发下载
 
-**并且** 文件名建议：`{playerName}_{guid}_{seed}.json`
+**并且** 文件名格式：`{playerName}_{guid[:8]}_{time}.json`
 
 #### Scenario: JSON导出格式
 
@@ -272,6 +284,8 @@
     "time": 770722.838,
     "playerName": "slepher",
     "version": "800",
+    "filename": "save_001",
+    "parser_version": "v1",
     "source": "original"
   },
   "sectors": {
@@ -289,7 +303,7 @@
 
 ### Requirement: SAX Streaming Parser
 
-存档解析使用SAX流式解析避免阻塞UI。
+存档解析使用流式解析避免阻塞UI。
 
 #### Scenario: 流式解析大文件
 
@@ -297,17 +311,30 @@
 
 **当** 解析开始
 
-**那么** 使用Web Worker执行SAX解析
+**那么** 使用Rust Web Worker执行解析（替代SAX）
 
 **并且** 主线程不阻塞
 
-**并且** 显示解析进度（如 "Processing X MB..."）
+**并且** 显示解析进度（ProgressInfo）
 
 **当** 解析完成
 
 **那么** Worker返回解析结果
 
 **并且** 更新存档列表
+
+#### Scenario: 解析进度报告
+
+**前提** 解析进行中
+
+**当** Worker向主线程发送进度消息
+
+**那么** ProgressInfo 包含以下字段：
+- `phase`: `receiving` | `parsing` | `finalizing` | `done` | `error`
+- `percent`: 完成百分比
+- `sectorCount`: 已解析sector数
+- `tagCount`: 已处理标签数
+- `error`: 错误信息（如有）
 
 #### Scenario: 坐标累加计算
 
@@ -352,6 +379,11 @@
 **并且** 数据结构：
 - `archives`: Map<guid, ArchiveGroup>
 - `selectedArchive`: 当前选中存档
+- `isParsing`: 解析状态
+- `parseProgress`: 进度文本
+- `parseError`: 错误信息
+- `archiveGroups`: 分组列表（computed）
+- `totalArchiveCount`: 存档总数（computed）
 
 **并且** 不持久化（仅内存存储）
 
@@ -367,6 +399,23 @@
 - `saves`: SaveArchive[]（按time降序）
 
 **并且** SaveArchive 包含：
-- `meta`: 存档元信息
+- `meta`: 存档元信息（含 filename, parser_version）
 - `sectors`: 提取的sector数据
 - `isCompatible`: 版本兼容状态
+
+#### Scenario: Store方法
+
+**前提** Store已初始化
+
+**当** 调用Store方法
+
+**那么** 支持以下操作：
+- `addArchive(archive)`: 添加存档（含版本检查）
+- `selectArchive(guid, time)`: 选中存档
+- `clearSelection()`: 清空选中
+- `removeArchive(guid, time)`: 删除存档
+- `clearAll()`: 清空所有存档
+- `exportToJson(guid, time)`: 导出JSON
+- `importFromJson(jsonData)`: 导入JSON（含校验）
+- `checkVersionCompatibility(version)`: 版本兼容检查
+- `setParsingState(parsing, progress, error)`: 设置解析状态
