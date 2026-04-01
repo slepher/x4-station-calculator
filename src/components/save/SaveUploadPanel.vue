@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import type { SaveArchive, SaveParserRustMessage } from '@/types/saveArchive'
+import { streamFileToSaveParserWorker } from './saveUploadStreaming'
 
 const { t } = useI18n()
 const saveStore = useSaveStore()
@@ -11,6 +12,7 @@ const gameDataStore = useGameDataStore()
 
 const isDragging = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
+const parsePercent = ref(0)
 
 const emit = defineEmits<{
   (e: 'upload-complete', archive: SaveArchive): void
@@ -61,6 +63,7 @@ async function processFile(file: File) {
 }
 
 async function processJsonFile(file: File) {
+  parsePercent.value = 0
   saveStore.setParsingState(true, t('save_import.loading_json'), null)
 
   try {
@@ -96,11 +99,10 @@ async function processJsonFile(file: File) {
 }
 
 async function processXmlFile(file: File) {
+  parsePercent.value = 0
   saveStore.setParsingState(true, t('save_import.reading_file'), null)
 
   try {
-    const arrayBuffer = await file.arrayBuffer()
-
     const worker = new Worker(
       new URL('@/workers/saveParserRust.worker.ts', import.meta.url),
       { type: 'module' }
@@ -111,6 +113,7 @@ async function processXmlFile(file: File) {
 
       if (msg.type === 'progress') {
         const { percent, phase, sectorCount, error } = msg.data
+        parsePercent.value = Math.max(0, Math.min(100, percent))
         const statusText = error
           ? error
           : phase === 'done'
@@ -118,11 +121,13 @@ async function processXmlFile(file: File) {
             : `${percent.toFixed(0)}% - ${sectorCount} sectors`
         saveStore.setParsingState(true, statusText, null)
       } else if (msg.type === 'complete') {
+        parsePercent.value = 100
         saveStore.addArchive(msg.data)
         saveStore.setParsingState(false, '', null)
         emit('upload-complete', msg.data)
         worker.terminate()
       } else if (msg.type === 'error') {
+        parsePercent.value = 0
         let errorMessage = msg.message || t('save_import.parse_failed')
         
         if (msg.detail?.type === 'version_mismatch') {
@@ -142,16 +147,16 @@ async function processXmlFile(file: File) {
     }
 
     worker.onerror = (error) => {
+      parsePercent.value = 0
       saveStore.setParsingState(false, '', error.message || t('save_import.parse_failed'))
       worker.terminate()
     }
 
-    worker.postMessage({ 
-      type: 'parse', 
-      arrayBuffer, 
-      filename: file.name,
-      currentVersion: gameDataStore.currentVersion 
-    }, [arrayBuffer])
+    await streamFileToSaveParserWorker({
+      worker,
+      file,
+      currentVersion: gameDataStore.currentVersion
+    })
   } catch (e) {
     const message = e instanceof Error ? e.message : t('save_import.parse_failed')
     saveStore.setParsingState(false, '', message)
@@ -190,7 +195,7 @@ async function processXmlFile(file: File) {
     <div v-if="saveStore.isParsing" class="parse-status">
       <div class="parse-progress">
         <div class="progress-bar-container">
-          <div class="progress-bar" :style="{ width: '100%' }"></div>
+          <div class="progress-bar" :style="{ width: `${parsePercent}%` }"></div>
         </div>
         <span>{{ saveStore.parseProgress }}</span>
       </div>
