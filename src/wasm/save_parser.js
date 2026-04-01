@@ -1,5 +1,7 @@
 /* @ts-self-types="./save_parser.d.ts" */
 
+//#region exports
+
 export class SaveParser {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
@@ -19,6 +21,8 @@ export class SaveParser {
         let deferred3_0;
         let deferred3_1;
         try {
+            if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
+            _assertNum(this.__wbg_ptr);
             const ptr0 = passStringToWasm0(filename, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
             const len0 = WASM_VECTOR_LEN;
             const ret = wasm.saveparser_finish(this.__wbg_ptr, ptr0, len0);
@@ -36,6 +40,8 @@ export class SaveParser {
         }
     }
     finish_input() {
+        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
+        _assertNum(this.__wbg_ptr);
         wasm.saveparser_finish_input(this.__wbg_ptr);
     }
     constructor() {
@@ -51,6 +57,8 @@ export class SaveParser {
         let deferred1_0;
         let deferred1_1;
         try {
+            if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
+            _assertNum(this.__wbg_ptr);
             const ret = wasm.saveparser_progress_json(this.__wbg_ptr);
             deferred1_0 = ret[0];
             deferred1_1 = ret[1];
@@ -64,6 +72,9 @@ export class SaveParser {
      * @returns {boolean}
      */
     pump(max_events) {
+        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
+        _assertNum(this.__wbg_ptr);
+        _assertNum(max_events);
         const ret = wasm.saveparser_pump(this.__wbg_ptr, max_events);
         return ret !== 0;
     }
@@ -71,6 +82,8 @@ export class SaveParser {
      * @param {Uint8Array} chunk
      */
     push_chunk(chunk) {
+        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
+        _assertNum(this.__wbg_ptr);
         const ptr0 = passArray8ToWasm0(chunk, wasm.__wbindgen_malloc);
         const len0 = WASM_VECTOR_LEN;
         wasm.saveparser_push_chunk(this.__wbg_ptr, ptr0, len0);
@@ -79,12 +92,17 @@ export class SaveParser {
      * @param {number} total
      */
     set_expected_total_bytes(total) {
+        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
+        _assertNum(this.__wbg_ptr);
+        _assertNum(total);
         wasm.saveparser_set_expected_total_bytes(this.__wbg_ptr, total);
     }
     /**
      * @param {string} version
      */
     set_expected_version(version) {
+        if (this.__wbg_ptr == 0) throw new Error('Attempt to use a moved value');
+        _assertNum(this.__wbg_ptr);
         const ptr0 = passStringToWasm0(version, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
         const len0 = WASM_VECTOR_LEN;
         wasm.saveparser_set_expected_version(this.__wbg_ptr, ptr0, len0);
@@ -92,17 +110,21 @@ export class SaveParser {
 }
 if (Symbol.dispose) SaveParser.prototype[Symbol.dispose] = SaveParser.prototype.free;
 
+//#endregion
+
+//#region wasm imports
+
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
         __wbg___wbindgen_throw_bd5a70920abf0236: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
-        __wbindgen_cast_0000000000000001: function(arg0, arg1) {
+        __wbindgen_cast_0000000000000001: function() { return logError(function (arg0, arg1) {
             // Cast intrinsic for `Ref(String) -> Externref`.
             const ret = getStringFromWasm0(arg0, arg1);
             return ret;
-        },
+        }, arguments); },
         __wbindgen_init_externref_table: function() {
             const table = wasm.__wbindgen_externrefs;
             const offset = table.grow(4);
@@ -119,9 +141,17 @@ function __wbg_get_imports() {
     };
 }
 
+
+//#endregion
 const SaveParserFinalization = (typeof FinalizationRegistry === 'undefined')
     ? { register: () => {}, unregister: () => {} }
     : new FinalizationRegistry(ptr => wasm.__wbg_saveparser_free(ptr >>> 0, 1));
+
+
+//#region intrinsics
+function _assertNum(n) {
+    if (typeof(n) !== 'number') throw new Error(`expected a number argument, found ${typeof(n)}`);
+}
 
 function getStringFromWasm0(ptr, len) {
     ptr = ptr >>> 0;
@@ -136,6 +166,22 @@ function getUint8ArrayMemory0() {
     return cachedUint8ArrayMemory0;
 }
 
+function logError(f, args) {
+    try {
+        return f.apply(this, args);
+    } catch (e) {
+        let error = (function () {
+            try {
+                return e instanceof Error ? `${e.message}\n\nStack:\n${e.stack}` : e.toString();
+            } catch(_) {
+                return "<failed to stringify thrown value>";
+            }
+        }());
+        console.error("wasm-bindgen: imported JS function that was not marked as `catch` threw an error:", error);
+        throw e;
+    }
+}
+
 function passArray8ToWasm0(arg, malloc) {
     const ptr = malloc(arg.length * 1, 1) >>> 0;
     getUint8ArrayMemory0().set(arg, ptr / 1);
@@ -144,6 +190,7 @@ function passArray8ToWasm0(arg, malloc) {
 }
 
 function passStringToWasm0(arg, malloc, realloc) {
+    if (typeof(arg) !== 'string') throw new Error(`expected a string argument, found ${typeof(arg)}`);
     if (realloc === undefined) {
         const buf = cachedTextEncoder.encode(arg);
         const ptr = malloc(buf.length, 1) >>> 0;
@@ -171,7 +218,7 @@ function passStringToWasm0(arg, malloc, realloc) {
         ptr = realloc(ptr, len, len = offset + arg.length * 3, 1) >>> 0;
         const view = getUint8ArrayMemory0().subarray(ptr + offset, ptr + len);
         const ret = cachedTextEncoder.encodeInto(arg, view);
-
+        if (ret.read !== arg.length) throw new Error('failed to pass whole string');
         offset += ret.written;
         ptr = realloc(ptr, len, offset, 1) >>> 0;
     }
@@ -215,6 +262,10 @@ if (!('encodeInto' in cachedTextEncoder)) {
 
 let WASM_VECTOR_LEN = 0;
 
+
+//#endregion
+
+//#region wasm loading
 let wasmModule, wasm;
 function __wbg_finalize_init(instance, module) {
     wasm = instance.exports;
@@ -306,3 +357,5 @@ async function __wbg_init(module_or_path) {
 }
 
 export { initSync, __wbg_init as default };
+//#endregion
+export { wasm as __wasm }
