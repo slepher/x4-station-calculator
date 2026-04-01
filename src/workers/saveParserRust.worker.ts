@@ -20,14 +20,16 @@ function getGzipUncompressedSize(buf: ArrayBuffer): number | null {
 }
 
 if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: unknown }).importScripts === 'function') {
-  self.onmessage = async (e: MessageEvent<{ type: string; arrayBuffer?: ArrayBuffer; filename?: string }>) => {
-    const { type, arrayBuffer, filename } = e.data
+  self.onmessage = async (e: MessageEvent<{ type: string; arrayBuffer?: ArrayBuffer; filename?: string; currentVersion?: string }>) => {
+    const { type, arrayBuffer, filename, currentVersion } = e.data
 
     if (type !== 'parse' || !arrayBuffer) return
 
     const postProgress = (info: ProgressInfo) => {
       self.postMessage({ type: 'progress', data: info } as SaveParserRustMessage)
     }
+
+    const expectedVersion = currentVersion || '8.0'
 
     try {
       postProgress({
@@ -38,6 +40,10 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
 
       await ensureWasmInit()
       const parser = new SaveParser()
+      
+      if (expectedVersion) {
+        parser.set_expected_version(expectedVersion)
+      }
 
       const header = new Uint8Array(arrayBuffer.slice(0, 2))
       const isGzipped = header[0] === 0x1f && header[1] === 0x8b
@@ -81,6 +87,16 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
           const progressJson = parser.progress_json()
           const progress: ProgressInfo = JSON.parse(progressJson)
           postProgress(progress)
+          
+          if (progress.error) {
+            self.postMessage({ 
+              type: 'error', 
+              message: progress.error,
+              detail: progress.errorDetail
+            } as SaveParserRustMessage)
+            return
+          }
+          
           if (!hasMore) break
         }
       } else {
@@ -95,15 +111,30 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
           const progressJson = parser.progress_json()
           const progress: ProgressInfo = JSON.parse(progressJson)
           postProgress(progress)
+          
+          if (progress.error) {
+            self.postMessage({ 
+              type: 'error', 
+              message: progress.error,
+              detail: progress.errorDetail
+            } as SaveParserRustMessage)
+            return
+          }
+          
           if (!hasMore) break
         }
       }
 
       const result = parser.finish(filename || '')
       const archive = JSON.parse(result)
+      
       self.postMessage({ type: 'complete', data: archive } as SaveParserRustMessage)
     } catch (error) {
-      const message = error instanceof Error ? error.message : 'Unknown error'
+      const message = error instanceof Error 
+        ? error.message 
+        : typeof error === 'string' 
+          ? error 
+          : 'Unknown error'
       self.postMessage({ type: 'error', message } as SaveParserRustMessage)
     }
   }

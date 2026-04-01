@@ -1,7 +1,29 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
-import type { SaveArchive, ArchiveGroup, SectorData } from '@/types/saveArchive'
+import type { SaveArchive, ArchiveGroup, SectorData, SaveParserErrorDetail } from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
+import {
+  saveArchiveToDB,
+  loadArchiveListFromDB,
+  loadArchiveDetailFromDB,
+  removeArchiveFromDB,
+  clearAllArchivesFromDB,
+  removeOutdatedArchivesFromDB
+} from '@/db/saveArchiveDB'
+
+const CURRENT_PARSER_VERSION = 'v1'
+
+function normalizeVersion(v: string): string {
+  const trimmed = v.trim()
+  if (/^\d+\.\d+$/.test(trimmed)) {
+    const parsed = Number(trimmed)
+    return Number.isFinite(parsed) ? parsed.toFixed(1) : v
+  }
+
+  const num = parseInt(trimmed, 10)
+  if (isNaN(num)) return v
+  return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
+}
 
 function generateExportFileName(meta: SaveArchive['meta']): string {
   const safeName = meta.playerName.replace(/[^\w\-]/g, '_')
@@ -28,6 +50,7 @@ export const useSaveStore = defineStore('save', () => {
   const isParsing = ref(false)
   const parseProgress = ref('')
   const parseError = ref<string | null>(null)
+  const isInitialized = ref(false)
 
   const archiveGroups = computed<ArchiveGroup[]>(() => {
     return Array.from(archives.value.values())
@@ -37,19 +60,54 @@ export const useSaveStore = defineStore('save', () => {
     return archiveGroups.value.reduce((sum, group) => sum + group.saves.length, 0)
   })
 
-  function checkVersionCompatibility(version: string): boolean {
-    const normalizeVersion = (v: string): string => {
-      const trimmed = v.trim()
-      if (/^\d+\.\d+$/.test(trimmed)) {
-        const parsed = Number(trimmed)
-        return Number.isFinite(parsed) ? parsed.toFixed(1) : v
+  async function initialize(): Promise<void> {
+    if (isInitialized.value) return
+    
+    try {
+      const removedCount = await removeOutdatedArchivesFromDB(CURRENT_PARSER_VERSION)
+      if (removedCount > 0) {
+        console.log(`[saveStore] removed ${removedCount} outdated archives`)
       }
-
-      const num = parseInt(trimmed, 10)
-      if (isNaN(num)) return v
-      return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
+      
+      const metaList = await loadArchiveListFromDB()
+      
+      for (const meta of metaList) {
+        const guid = meta.guid
+        const existingGroup = archives.value.get(guid)
+        
+        const stubArchive: SaveArchive = {
+          meta: {
+            guid: meta.guid,
+            seed: 0,
+            time: meta.time,
+            playerName: meta.playerName,
+            version: meta.version,
+            filename: meta.filename,
+            parser_version: meta.parser_version as 'v1' | 'v2',
+            source: meta.source
+          },
+          sectors: {},
+          isCompatible: meta.isCompatible
+        }
+        
+        if (existingGroup) {
+          existingGroup.saves.push(stubArchive)
+        } else {
+          archives.value.set(guid, {
+            guid,
+            playerName: meta.playerName,
+            saves: [stubArchive]
+          })
+        }
+      }
+      
+      isInitialized.value = true
+    } catch (error) {
+      console.error('[saveStore] initialization failed:', error)
     }
+  }
 
+  function checkVersionCompatibility(version: string): boolean {
     const normalizedVersion = normalizeVersion(version)
     const currentVersion = normalizeVersion(gameDataStore.currentVersion)
     console.log('[checkVersionCompatibility] input version:', version, 'normalized:', normalizedVersion)
@@ -88,16 +146,33 @@ export const useSaveStore = defineStore('save', () => {
       }
       archives.value.set(guid, newGroup)
     }
+    
+    saveArchiveToDB(archive).catch(error => {
+      console.error('[saveStore] failed to persist archive:', error)
+    })
   }
 
-  function selectArchive(guid: string, time: number): void {
+  async function selectArchive(guid: string, time: number): Promise<void> {
     const group = archives.value.get(guid)
     if (!group) {
       selectedArchive.value = null
       return
     }
 
-    const archive = group.saves.find(s => s.meta.time === time)
+    let archive = group.saves.find(s => s.meta.time === time)
+    
+    if (archive && Object.keys(archive.sectors).length === 0) {
+      const id = `${guid}_${time}`
+      const fullArchive = await loadArchiveDetailFromDB(id)
+      if (fullArchive) {
+        const index = group.saves.findIndex(s => s.meta.time === time)
+        if (index >= 0) {
+          group.saves[index] = fullArchive
+          archive = fullArchive
+        }
+      }
+    }
+    
     selectedArchive.value = archive || null
   }
 
@@ -121,6 +196,10 @@ export const useSaveStore = defineStore('save', () => {
     if (selectedArchive.value?.meta.guid === guid && selectedArchive.value?.meta.time === time) {
       selectedArchive.value = null
     }
+    
+    removeArchiveFromDB(guid, time).catch(error => {
+      console.error('[saveStore] failed to remove archive from DB:', error)
+    })
   }
 
   function clearAll(): void {
@@ -129,13 +208,22 @@ export const useSaveStore = defineStore('save', () => {
     parseError.value = null
     parseProgress.value = ''
     isParsing.value = false
+    
+    clearAllArchivesFromDB().catch(error => {
+      console.error('[saveStore] failed to clear DB:', error)
+    })
   }
 
-  function exportToJson(guid: string, time: number): void {
-    const group = archives.value.get(guid)
-    if (!group) return
-
-    const archive = group.saves.find(s => s.meta.time === time)
+  async function exportToJson(guid: string, time: number): Promise<void> {
+    const id = `${guid}_${time}`
+    let archive = await loadArchiveDetailFromDB(id)
+    
+    if (!archive) {
+      const group = archives.value.get(guid)
+      if (!group) return
+      archive = group.saves.find(s => s.meta.time === time) || null
+    }
+    
     if (!archive) return
 
     const exportData = {
@@ -159,26 +247,43 @@ export const useSaveStore = defineStore('save', () => {
     URL.revokeObjectURL(url)
   }
 
-  function importFromJson(jsonData: unknown): { success: boolean; error?: string } {
+  function importFromJson(jsonData: unknown): { success: boolean; error?: string; errorDetail?: SaveParserErrorDetail } {
     try {
       if (!jsonData || typeof jsonData !== 'object') {
-        return { success: false, error: 'Invalid JSON format' }
+        return { success: false, error: 'Invalid JSON format', errorDetail: { type: 'parse_error', message: 'Invalid JSON format' } }
       }
 
       const data = jsonData as { meta?: unknown; sectors?: unknown }
 
       if (!data.meta || typeof data.meta !== 'object') {
-        return { success: false, error: 'Missing meta information' }
+        return { success: false, error: 'Missing meta information', errorDetail: { type: 'parse_error', message: 'Missing meta information' } }
       }
 
       const meta = data.meta as SaveArchive['meta']
 
       if (!meta.guid || !meta.seed || !meta.time || !meta.version) {
-        return { success: false, error: 'Missing required meta fields' }
+        return { success: false, error: 'Missing required meta fields', errorDetail: { type: 'parse_error', message: 'Missing required meta fields' } }
+      }
+
+      const normalizedSaveVersion = normalizeVersion(meta.version)
+      const normalizedCurrentVersion = normalizeVersion(gameDataStore.currentVersion)
+      
+      if (normalizedSaveVersion !== normalizedCurrentVersion) {
+        return { 
+          success: false, 
+          error: `Version mismatch: save version ${meta.version} does not match current game version ${gameDataStore.currentVersion}`,
+          errorDetail: {
+            type: 'version_mismatch',
+            save_version: meta.version,
+            save_version_normalized: normalizedSaveVersion,
+            expected_version: gameDataStore.currentVersion,
+            expected_version_normalized: normalizedCurrentVersion
+          }
+        }
       }
 
       if (!data.sectors || typeof data.sectors !== 'object') {
-        return { success: false, error: 'Missing sectors data' }
+        return { success: false, error: 'Missing sectors data', errorDetail: { type: 'parse_error', message: 'Missing sectors data' } }
       }
 
       const sectors = data.sectors as Record<string, SectorData>
@@ -197,14 +302,14 @@ export const useSaveStore = defineStore('save', () => {
           source: 'imported'
         },
         sectors,
-        isCompatible: checkVersionCompatibility(meta.version)
+        isCompatible: true
       }
 
       addArchive(archive)
       return { success: true }
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown error'
-      return { success: false, error: message }
+      return { success: false, error: message, errorDetail: { type: 'parse_error', message } }
     }
   }
 
@@ -222,6 +327,8 @@ export const useSaveStore = defineStore('save', () => {
     parseError,
     archiveGroups,
     totalArchiveCount,
+    isInitialized,
+    initialize,
     checkVersionCompatibility,
     addArchive,
     selectArchive,

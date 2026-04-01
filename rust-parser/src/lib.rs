@@ -12,15 +12,65 @@ enum ParsePhase {
     Error,
 }
 
+#[derive(Clone, Debug, Serialize)]
+#[serde(tag = "type", rename_all = "snake_case")]
+enum ErrorDetail {
+    VersionMismatch {
+        save_version: String,
+        save_version_normalized: String,
+        expected_version: String,
+        expected_version_normalized: String,
+    },
+    ParseError {
+        message: String,
+    },
+}
+
 #[derive(Clone, Debug)]
 struct ParserError {
-    message: String,
+    detail: ErrorDetail,
 }
 
 impl ParserError {
-    fn new(message: impl Into<String>) -> Self {
+    fn version_mismatch(
+        save_version: String,
+        save_version_normalized: String,
+        expected_version: String,
+        expected_version_normalized: String,
+    ) -> Self {
         Self {
-            message: message.into(),
+            detail: ErrorDetail::VersionMismatch {
+                save_version,
+                save_version_normalized,
+                expected_version,
+                expected_version_normalized,
+            },
+        }
+    }
+
+    fn parse_error(message: impl Into<String>) -> Self {
+        Self {
+            detail: ErrorDetail::ParseError {
+                message: message.into(),
+            },
+        }
+    }
+}
+
+impl std::fmt::Display for ParserError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match &self.detail {
+            ErrorDetail::VersionMismatch {
+                save_version,
+                save_version_normalized,
+                expected_version,
+                expected_version_normalized,
+            } => write!(
+                f,
+                "Version mismatch: save version {} ({}) does not match current game version {} ({})",
+                save_version, save_version_normalized, expected_version, expected_version_normalized
+            ),
+            ErrorDetail::ParseError { message } => write!(f, "{}", message),
         }
     }
 }
@@ -39,6 +89,7 @@ struct ProgressInfo {
     done: bool,
     input_complete: bool,
     error: Option<String>,
+    error_detail: Option<ErrorDetail>,
 }
 
 #[derive(Clone, Serialize, Deserialize, Default)]
@@ -138,7 +189,8 @@ struct SectorData {
 struct SaveArchive {
     meta: ArchiveMeta,
     sectors: HashMap<String, SectorData>,
-    isCompatible: bool,
+    #[serde(rename = "isCompatible")]
+    is_compatible: bool,
 }
 
 #[derive(Clone, Serialize)]
@@ -238,6 +290,8 @@ pub struct SaveParser {
     input_bytes_received: usize,
 
     expected_total_bytes: usize,
+    expected_version: Option<String>,
+    version_checked: bool,
 
     meta: Meta,
     sectors: HashMap<String, SectorData>,
@@ -269,6 +323,8 @@ impl SaveParser {
             input_bytes_received: 0,
 
             expected_total_bytes: 0,
+            expected_version: None,
+            version_checked: false,
 
             meta: Meta::default(),
             sectors: HashMap::new(),
@@ -292,6 +348,10 @@ impl SaveParser {
 
     pub fn set_expected_total_bytes(&mut self, total: usize) {
         self.expected_total_bytes = total;
+    }
+
+    pub fn set_expected_version(&mut self, version: &str) {
+        self.expected_version = Some(version.to_string());
     }
 
     pub fn push_chunk(&mut self, chunk: &[u8]) {
@@ -343,7 +403,8 @@ impl SaveParser {
             sector_count: self.sectors.len(),
             done: self.done,
             input_complete: self.input_complete,
-            error: self.error.as_ref().map(|e| e.message.clone()),
+            error: self.error.as_ref().map(|e| e.to_string()),
+            error_detail: self.error.as_ref().map(|e| e.detail.clone()),
         })
         .unwrap_or_default()
     }
@@ -358,7 +419,7 @@ impl SaveParser {
             if self.input_complete {
                 if !self.path.is_empty() {
                     self.phase = ParsePhase::Error;
-                    self.error = Some(ParserError::new(format!(
+                    self.error = Some(ParserError::parse_error(format!(
                         "XML ended before all tags were closed; remaining open path: {:?}",
                         self.path
                     )));
@@ -437,7 +498,7 @@ impl SaveParser {
                 Err(err) => {
                     if self.input_complete {
                         self.phase = ParsePhase::Error;
-                        self.error = Some(ParserError::new(format!(
+                        self.error = Some(ParserError::parse_error(format!(
                             "XML parse error at {} MB: {} (path: {:?})",
                             self.total_parsed / (1024 * 1024),
                             err,
@@ -493,7 +554,7 @@ impl SaveParser {
         if hit_eof && self.input_complete {
             if !self.path.is_empty() {
                 self.phase = ParsePhase::Error;
-                self.error = Some(ParserError::new(format!(
+                self.error = Some(ParserError::parse_error(format!(
                     "XML reached EOF with unclosed tags remaining: {:?}",
                     self.path
                 )));
@@ -589,6 +650,24 @@ impl SaveParser {
                 .and_then(|v| v.parse::<f64>().ok())
                 .unwrap_or(0.0);
             self.meta.version = a.get("version").cloned().unwrap_or_default();
+
+            if !self.version_checked && !self.meta.version.is_empty() {
+                self.version_checked = true;
+                if let Some(expected) = &self.expected_version {
+                    let save_ver = norm_ver(&self.meta.version);
+                    let expected_ver = norm_ver(expected);
+                    if save_ver != expected_ver {
+                        self.phase = ParsePhase::Error;
+                        self.error = Some(ParserError::version_mismatch(
+                            self.meta.version.clone(),
+                            save_ver,
+                            expected.clone(),
+                            expected_ver,
+                        ));
+                        return;
+                    }
+                }
+            }
         }
 
         if at_tags(&self.path, &["savegame", "info", "player"]) {
@@ -657,7 +736,7 @@ impl SaveParser {
             Some(v) => v.as_str(),
             None => {
                 self.phase = ParsePhase::Error;
-                self.error = Some(ParserError::new(format!(
+                self.error = Some(ParserError::parse_error(format!(
                     "XML close tag </{}> encountered with empty path stack",
                     name
                 )));
@@ -667,7 +746,7 @@ impl SaveParser {
 
         if expected != name {
             self.phase = ParsePhase::Error;
-            self.error = Some(ParserError::new(format!(
+            self.error = Some(ParserError::parse_error(format!(
                 "XML close mismatch: expected </{}> but got </{}>",
                 expected, name
             )));
@@ -690,7 +769,7 @@ impl SaveParser {
                 Some(c) => c,
                 None => {
                     self.phase = ParsePhase::Error;
-                    self.error = Some(ParserError::new(
+                    self.error = Some(ParserError::parse_error(
                         "XML/component stack underflow while closing </component>",
                     ));
                     return;
@@ -780,7 +859,7 @@ impl SaveParser {
 
     pub fn finish(&mut self, filename: &str) -> Result<String, JsValue> {
         if let Some(err) = &self.error {
-            return Err(JsValue::from_str(&err.message));
+            return Err(JsValue::from_str(&err.to_string()));
         }
 
         if !self.done {
@@ -794,6 +873,12 @@ impl SaveParser {
             .replace(".gz", "")
             .replace(".xml", "");
 
+        let is_compatible = if let Some(expected) = &self.expected_version {
+            norm_ver(&self.meta.version) == norm_ver(expected)
+        } else {
+            norm_ver(&self.meta.version) == norm_ver("8.0")
+        };
+
         let json = serde_json::to_string(&SaveArchive {
             meta: ArchiveMeta {
                 guid: self.meta.guid.clone(),
@@ -806,7 +891,7 @@ impl SaveParser {
                 source: "original".into(),
             },
             sectors: self.sectors.clone(),
-            isCompatible: norm_ver(&self.meta.version) == norm_ver("8.0"),
+            is_compatible,
         })
         .map_err(|e| JsValue::from_str(&format!("serialize error: {e}")))?;
 

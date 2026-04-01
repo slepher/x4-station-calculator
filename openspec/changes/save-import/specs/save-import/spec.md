@@ -40,17 +40,27 @@
 
 **那么** 启动流式解析（Rust Worker）
 
+**并且** 传入当前游戏版本用于校验
+
 **并且** 显示解析进度状态：
 - 百分比进度
 - 已解析sector数量
 - 当前阶段（receiving/parsing/finalizing/done/error）
 - 错误信息（如有）
 
-**当** 解析完成
+**当** 解析完成且版本匹配
 
 **那么** 存档数据添加到对应guid分组
 
 **并且** 存档列表更新显示
+
+**当** 解析完成但版本不匹配
+
+**那么** 返回版本错误
+
+**并且** 显示错误信息："Version mismatch: save version X does not match current game version Y"
+
+**并且** 不加载该存档
 
 #### Scenario: 上传已提取JSON文件
 
@@ -70,19 +80,19 @@
 
 **当** 版本不匹配
 
-**那么** 显示警告提示："存档版本不匹配，当前数据版本为X.X"
+**那么** 返回错误消息："Version mismatch: save version X does not match current game version Y"
 
-**并且** 用户可选择取消加载或继续加载（标记为不兼容）
+**并且** 不加载该存档数据
 
 ### Requirement: Version Validation
 
-存档版本必须与当前游戏数据版本匹配。
+存档版本必须与当前游戏数据版本匹配，版本不匹配时拒绝加载。
 
 #### Scenario: 版本匹配校验
 
 **前提** 存档包含 `version` 字段（如 `800`）
 
-**当** 解析存档时
+**当** 解析存档时（解析到 `<game>` 标签后立即校验）
 
 **那么** 校验 `version` 是否匹配 `useGameDataStore.currentVersion`
 
@@ -90,13 +100,17 @@
 
 **当** 版本匹配
 
-**那么** 正常加载存档
+**那么** 继续解析并加载存档
 
 **当** 版本不匹配
 
-**那么** 显示警告，禁止自动加载或标记为不兼容
+**那么** 立即停止解析
 
-**并且** 存档项显示版本不匹配标识
+**并且** 返回错误消息："Version mismatch: save version X (x.x) does not match current game version Y (y.y)"
+
+**并且** 不加载该存档数据
+
+**并且** 不继续解析剩余存档内容
 
 ### Requirement: Save Archive Grouping
 

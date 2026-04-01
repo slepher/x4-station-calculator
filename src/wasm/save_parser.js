@@ -1,3 +1,5 @@
+/* @ts-self-types="./save_parser.d.ts" */
+
 export class SaveParser {
     __destroy_into_raw() {
         const ptr = this.__wbg_ptr;
@@ -78,6 +80,14 @@ export class SaveParser {
      */
     set_expected_total_bytes(total) {
         wasm.saveparser_set_expected_total_bytes(this.__wbg_ptr, total);
+    }
+    /**
+     * @param {string} version
+     */
+    set_expected_version(version) {
+        const ptr0 = passStringToWasm0(version, wasm.__wbindgen_malloc, wasm.__wbindgen_realloc);
+        const len0 = WASM_VECTOR_LEN;
+        wasm.saveparser_set_expected_version(this.__wbg_ptr, ptr0, len0);
     }
 }
 if (Symbol.dispose) SaveParser.prototype[Symbol.dispose] = SaveParser.prototype.free;

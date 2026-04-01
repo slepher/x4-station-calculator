@@ -1,7 +1,6 @@
 import sax from 'sax'
 import type {
   SaveArchive,
-  SaveParserConfig,
   SaveParserMessage,
   SectorData,
   StationEntry,
@@ -15,7 +14,6 @@ type Vector3 = { x: number; y: number; z: number }
 type TagNode = { name: string; attributes: Record<string, unknown> }
 type ComponentContext = {
   attributes: Record<string, unknown>
-  macroOffset: Vector3
   ownOffset: Vector3
 }
 
@@ -36,21 +34,11 @@ export interface SaveParserProgressInfo {
   sectorsCount: number
 }
 
-export interface SaveParserProfileInfo {
-  feedMs: number
-  saxWriteMs: number
-  openTagMs: number
-  closeTagMs: number
-  openTagCount: number
-  closeTagCount: number
-}
-
 export interface SaveParserRuntime {
   feed: (text: string) => void
-  close: () => SaveArchive
+  close: (filename: string) => SaveArchive
   getProgress: () => SaveParserProgressInfo
   getData: () => SaveData
-  getProfile?: () => SaveParserProfileInfo
 }
 
 const SAX_WRITE_CHUNK_SIZE = 64 * 1024
@@ -63,14 +51,13 @@ function stripSaveFileExtension(filename: string): string {
 }
 
 class X4SaveParser {
-  private sectorNames: Record<string, string>
-  private strings: Record<string, Record<string, string>>
-  private positions: Record<string, Vector3>
   private path: TagNode[] = []
   private currentSectorStack: string[] = []
   private componentStack: ComponentContext[] = []
   private tagCount = 0
   private sectorsCount = 0
+  private expectedVersion: string | null
+  private versionChecked = false
 
   private currentStationOwner: string | null = null
   private currentStationModules: StationModule[] = []
@@ -80,43 +67,12 @@ class X4SaveParser {
 
   public data: SaveData
 
-  constructor(config: SaveParserConfig) {
-    this.sectorNames = config.sectorNames
-    this.strings = config.strings
-    this.positions = config.positions
-
+  constructor(expectedVersion: string | null) {
+    this.expectedVersion = expectedVersion
     this.data = {
       meta: { guid: '', seed: 0, time: 0, playerName: '', version: '' },
       sectors: {}
     }
-  }
-
-  private resolveName(value: string): string {
-    let s = value
-    const seen = new Set<string>()
-    const reference = /\{(\d*),\s*(\d+)\}/g
-
-    while (true) {
-      reference.lastIndex = 0
-      const match = reference.exec(s)
-      if (!match) break
-
-      const full = match[0]
-      const page = match[1] || '20'
-      const id = match[2]
-      if (!id) break
-
-      const key = `${page},${id}`
-      let replacement = ''
-      if (!seen.has(key)) {
-        seen.add(key)
-        replacement = this.strings[page]?.[id] || ''
-      }
-
-      s = s.replace(full, replacement)
-    }
-
-    return s.replace(/\([^)]*\)/g, '').trim()
   }
 
   private toNumber(value: unknown, fallback = 0): number {
@@ -214,11 +170,6 @@ class X4SaveParser {
     }
   }
 
-  private getSectorName(macro: string): string {
-    const rawName = this.sectorNames[macro] || macro
-    return this.resolveName(rawName)
-  }
-
   getSectorsCount(): number {
     return this.sectorsCount
   }
@@ -232,16 +183,11 @@ class X4SaveParser {
   private getAccumulatedPosition(): Vector3 {
     const result: Vector3 = { x: 0, y: 0, z: 0 }
     for (const component of this.componentStack) {
-      result.x += component.macroOffset.x + component.ownOffset.x
-      result.y += component.macroOffset.y + component.ownOffset.y
-      result.z += component.macroOffset.z + component.ownOffset.z
+      result.x += component.ownOffset.x
+      result.y += component.ownOffset.y
+      result.z += component.ownOffset.z
     }
     return result
-  }
-
-  private getMacroOffset(attrib: Record<string, unknown>): Vector3 {
-    const macro = String(attrib.macro || '').toLowerCase()
-    return macro ? this.positions[macro] || { x: 0, y: 0, z: 0 } : { x: 0, y: 0, z: 0 }
   }
 
   private buildDatavaultFlags(attrib: Record<string, unknown>): Pick<DatavaultEntry, 'has_blueprints' | 'has_wares' | 'has_signalleak'> {
@@ -263,7 +209,6 @@ class X4SaveParser {
     if (this.isComponent(this.currentNode())) {
       this.componentStack.push({
         attributes: attrib,
-        macroOffset: this.getMacroOffset(attrib),
         ownOffset: { x: 0, y: 0, z: 0 }
       })
     }
@@ -273,6 +218,15 @@ class X4SaveParser {
       this.data.meta.seed = this.toNumber(attrib.seed)
       this.data.meta.time = this.toNumber(attrib.time)
       this.data.meta.version = String(attrib.version || '')
+      
+      if (!this.versionChecked && this.data.meta.version && this.expectedVersion !== null) {
+        this.versionChecked = true
+        const saveVersion = normalizeVersion(this.data.meta.version)
+        const expected = normalizeVersion(this.expectedVersion)
+        if (saveVersion !== expected) {
+          throw new Error(`Version mismatch: save version ${this.data.meta.version} (${saveVersion}) does not match current game version ${this.expectedVersion} (${expected})`)
+        }
+      }
       return
     }
 
@@ -286,7 +240,7 @@ class X4SaveParser {
       this.currentSectorStack.push(macro)
       if (!this.data.sectors[macro]) {
         this.data.sectors[macro] = {
-          name: this.getSectorName(macro),
+          name: macro,
           is_known: attrib.known === '1' || attrib.knownto === 'player',
           stations: [],
           datavaults: [],
@@ -444,68 +398,30 @@ export function normalizeVersion(v: string): string {
   return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
 }
 
-export function buildSaveArchive(data: SaveData, config: SaveParserConfig): SaveArchive {
-  return {
-    meta: {
-      ...data.meta,
-      filename: stripSaveFileExtension(config.filename || ''),
-      parser_version: 'v1',
-      source: 'original'
-    },
-    sectors: data.sectors,
-    isCompatible: normalizeVersion(data.meta.version) === normalizeVersion(config.currentVersion)
-  }
-}
-
 export function createSaveParserRuntime(
-  config: SaveParserConfig,
   options?: {
     onProgress?: (info: SaveParserProgressInfo) => void
     progressIntervalMs?: number
-    profile?: boolean
+    currentVersion?: string | null
   }
 ): SaveParserRuntime {
-  const parser = new X4SaveParser(config)
+  const currentVersion = options?.currentVersion ?? null
+  const parser = new X4SaveParser(currentVersion)
   const previousMaxBufferLength = saxWithBufferConfig.MAX_BUFFER_LENGTH
   saxWithBufferConfig.MAX_BUFFER_LENGTH = Math.min(previousMaxBufferLength, SAX_MAX_BUFFER_LENGTH)
   const saxParser = sax.parser(false, { lowercase: true, position: false })
   let bytesProcessed = 0
   let lastProgressAt = 0
   const progressIntervalMs = options?.progressIntervalMs ?? DEFAULT_PROGRESS_INTERVAL_MS
-  const profileEnabled = options?.profile === true
-  const profile: SaveParserProfileInfo = {
-    feedMs: 0,
-    saxWriteMs: 0,
-    openTagMs: 0,
-    closeTagMs: 0,
-    openTagCount: 0,
-    closeTagCount: 0
-  }
 
   saxParser.onopentag = (node: TagNode) => {
-    if (!profileEnabled) {
-      parser.onOpenTag(node)
-      return
-    }
-    const t0 = performance.now()
     parser.onOpenTag(node)
-    profile.openTagMs += performance.now() - t0
-    profile.openTagCount++
   }
 
   saxParser.onclosetag = (name: string) => {
-    if (!profileEnabled) {
-      parser.onCloseTag(name)
-      return
-    }
-    const t0 = performance.now()
     parser.onCloseTag(name)
-    profile.closeTagMs += performance.now() - t0
-    profile.closeTagCount++
   }
 
-  // We never use XML text payloads in save import. Discarding them keeps
-  // sax's internal text/cdata/script buffers from doing unnecessary work.
   saxParser.ontext = () => {}
   saxParser.oncdata = () => {}
   saxParser.onscript = () => {}
@@ -532,37 +448,36 @@ export function createSaveParserRuntime(
   return {
     feed(text: string) {
       if (!text) return
-      const feedStart = profileEnabled ? performance.now() : 0
       bytesProcessed += text.length
       for (let i = 0; i < text.length; i += SAX_WRITE_CHUNK_SIZE) {
         const chunk = text.slice(i, i + SAX_WRITE_CHUNK_SIZE)
-        if (!profileEnabled) {
-          saxParser.write(chunk)
-          continue
-        }
-        const writeStart = performance.now()
         saxParser.write(chunk)
-        profile.saxWriteMs += performance.now() - writeStart
-      }
-      if (profileEnabled) {
-        profile.feedMs += performance.now() - feedStart
       }
       emitProgress()
     },
-    close() {
+    close(filename: string) {
       saxParser.close()
       emitProgress(true)
       saxWithBufferConfig.MAX_BUFFER_LENGTH = previousMaxBufferLength
-      return buildSaveArchive(parser.data, config)
+      const isCompatible = currentVersion !== null 
+        ? normalizeVersion(parser.data.meta.version) === normalizeVersion(currentVersion)
+        : true
+      return {
+        meta: {
+          ...parser.data.meta,
+          filename: stripSaveFileExtension(filename),
+          parser_version: 'v1',
+          source: 'original'
+        },
+        sectors: parser.data.sectors,
+        isCompatible
+      }
     },
     getProgress() {
       return getProgressInfo()
     },
     getData() {
       return parser.data
-    },
-    getProfile() {
-      return profile
     }
   }
 }
@@ -574,10 +489,10 @@ export async function parseSaveXmlChunks(
   for await (const chunk of chunks) {
     runtime.feed(chunk)
   }
-  return runtime.close()
+  return runtime.close('')
 }
 
-type WorkerMessageData = { type: string; arrayBuffer?: ArrayBuffer; config?: SaveParserConfig; filename?: string }
+type WorkerMessageData = { type: string; arrayBuffer?: ArrayBuffer; filename?: string; currentVersion?: string }
 
 function hasWorkerRuntime(): boolean {
   const scope = globalThis as { postMessage?: unknown; self?: unknown; importScripts?: unknown }
@@ -589,12 +504,29 @@ function hasWorkerRuntime(): boolean {
 
 if (hasWorkerRuntime()) {
   self.onmessage = async (e: MessageEvent<WorkerMessageData>) => {
-    const { type, arrayBuffer, config, filename } = e.data
+    const { type, arrayBuffer, filename, currentVersion } = e.data
 
-    if (type !== 'parse' || !arrayBuffer || !config) return
+    if (type !== 'parse' || !arrayBuffer) return
+
+    const expectedVersion = currentVersion || '8.0'
 
     try {
-      self.postMessage({ type: 'progress', status: 'Starting parse...' } as SaveParserMessage)
+      self.postMessage({ 
+        type: 'progress', 
+        data: { 
+          phase: 'receiving', 
+          percent: 0, 
+          tagCount: 0, 
+          sectorCount: 0, 
+          done: false, 
+          inputComplete: false, 
+          error: null,
+          inputBytesTotal: 0,
+          parsedBytesTotal: 0,
+          bufferedBytes: 0,
+          expectedTotalBytes: 0
+        } 
+      } as SaveParserMessage)
 
       const header = new Uint8Array(arrayBuffer.slice(0, 2))
       const isGzipped = header[0] === 0x1f && header[1] === 0x8b
@@ -602,30 +534,55 @@ if (hasWorkerRuntime()) {
       let textStream: ReadableStream<Uint8Array>
 
       if (isGzipped) {
-        self.postMessage({ type: 'progress', status: 'Decompressing...' } as SaveParserMessage)
+        self.postMessage({ 
+          type: 'progress', 
+          data: { 
+            phase: 'parsing', 
+            percent: 0, 
+            tagCount: 0, 
+            sectorCount: 0, 
+            done: false, 
+            inputComplete: false, 
+            error: null,
+            inputBytesTotal: 0,
+            parsedBytesTotal: 0,
+            bufferedBytes: 0,
+            expectedTotalBytes: 0
+          } 
+        } as SaveParserMessage)
         textStream = blob.stream().pipeThrough(new DecompressionStream('gzip'))
       } else {
         textStream = blob.stream()
       }
 
-      self.postMessage({ type: 'progress', status: 'Parsing XML...' } as SaveParserMessage)
-
       let lastReportedMB = -1
-      const runtime = createSaveParserRuntime(
-        { ...config, filename },
-        {
-          progressIntervalMs: DEFAULT_PROGRESS_INTERVAL_MS,
-          onProgress: (progress) => {
-            const currentMB = Math.floor(progress.bytesProcessed / (1024 * 1024))
-            if (currentMB <= lastReportedMB) return
-            lastReportedMB = currentMB
-            self.postMessage({
-              type: 'progress',
-              status: `Processing ... ${currentMB} MB, sectors ${progress.sectorsCount}`
-            } as SaveParserMessage)
-          }
+      let totalBytesProcessed = 0
+      const runtime = createSaveParserRuntime({
+        progressIntervalMs: DEFAULT_PROGRESS_INTERVAL_MS,
+        currentVersion: expectedVersion,
+        onProgress: (progress) => {
+          totalBytesProcessed = progress.bytesProcessed
+          const currentMB = Math.floor(progress.bytesProcessed / (1024 * 1024))
+          if (currentMB <= lastReportedMB) return
+          lastReportedMB = currentMB
+          self.postMessage({
+            type: 'progress',
+            data: {
+              phase: 'parsing',
+              percent: 0,
+              tagCount: progress.tagCount,
+              sectorCount: progress.sectorsCount,
+              done: false,
+              inputComplete: false,
+              error: null,
+              inputBytesTotal: progress.bytesProcessed,
+              parsedBytesTotal: progress.bytesProcessed,
+              bufferedBytes: 0,
+              expectedTotalBytes: 0
+            }
+          } as SaveParserMessage)
         }
-      )
+      })
       const reader = textStream.getReader()
       const decoder = new TextDecoder()
 
@@ -640,7 +597,24 @@ if (hasWorkerRuntime()) {
         runtime.feed(tail)
       }
 
-      const archive = runtime.close()
+      const archive = runtime.close(filename || '')
+      
+      self.postMessage({ 
+        type: 'progress', 
+        data: { 
+          phase: 'done', 
+          percent: 100, 
+          tagCount: runtime.getProgress().tagCount, 
+          sectorCount: runtime.getProgress().sectorsCount, 
+          done: true, 
+          inputComplete: true, 
+          error: null,
+          inputBytesTotal: totalBytesProcessed,
+          parsedBytesTotal: totalBytesProcessed,
+          bufferedBytes: 0,
+          expectedTotalBytes: totalBytesProcessed
+        } 
+      } as SaveParserMessage)
       self.postMessage({ type: 'complete', data: archive } as SaveParserMessage)
     } catch (error) {
       const message = error instanceof Error ? error.message : 'Unknown error'

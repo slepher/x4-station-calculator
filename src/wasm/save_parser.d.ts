@@ -11,6 +11,7 @@ export class SaveParser {
     pump(max_events: number): boolean;
     push_chunk(chunk: Uint8Array): void;
     set_expected_total_bytes(total: number): void;
+    set_expected_version(version: string): void;
 }
 
 export type InitInput = RequestInfo | URL | Response | BufferSource | WebAssembly.Module;
@@ -25,6 +26,7 @@ export interface InitOutput {
     readonly saveparser_pump: (a: number, b: number) => number;
     readonly saveparser_push_chunk: (a: number, b: number, c: number) => void;
     readonly saveparser_set_expected_total_bytes: (a: number, b: number) => void;
+    readonly saveparser_set_expected_version: (a: number, b: number, c: number) => void;
     readonly __wbindgen_externrefs: WebAssembly.Table;
     readonly __wbindgen_malloc: (a: number, b: number) => number;
     readonly __wbindgen_realloc: (a: number, b: number, c: number, d: number) => number;

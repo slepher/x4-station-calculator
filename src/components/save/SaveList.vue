@@ -19,12 +19,12 @@ function formatTime(time: number): string {
   return `${hours}h ${minutes}m`
 }
 
-function selectArchive(guid: string, time: number) {
-  saveStore.selectArchive(guid, time)
+async function selectArchive(guid: string, time: number) {
+  await saveStore.selectArchive(guid, time)
 }
 
-function downloadArchive(guid: string, time: number) {
-  saveStore.exportToJson(guid, time)
+async function downloadArchive(guid: string, time: number) {
+  await saveStore.exportToJson(guid, time)
 }
 
 function removeArchive(guid: string, time: number) {
@@ -41,7 +41,7 @@ function isSelected(guid: string, time: number): boolean {
     <div v-if="sortedGroups.length === 0" class="empty-hint">
       {{ t('save_import.no_archives') }}
     </div>
-
+    
     <div v-else class="archive-groups">
       <div v-for="group in sortedGroups" :key="group.guid" class="archive-group">
         <div class="group-header">
