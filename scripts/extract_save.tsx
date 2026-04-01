@@ -147,19 +147,27 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
 
   const parser = sax.parser(false, { lowercase: true, position: false })
   
-  const tagPath: string[] = []
+  const VALID_CHILD_CLASSES = ['station', 'datavault']
+  
+  interface TagNode {
+    name: string
+    attrStr: string
+    depth: number
+    children: TagNode[]
+    parent: TagNode | null
+    hasValidContent: boolean
+  }
+  
+  const root: TagNode = { name: '', attrStr: '', depth: 0, children: [], parent: null, hasValidContent: false }
+  let current: TagNode = root
   let depth = 0
-  let isInsideSector = false
-  let sectorDepth = 0
-  let sectorHasContent = false
-  let sectorOpenTag = ''
   let sectorCount = 0
   let versionChecked = false
   let versionMatch = true
+  let gameTag: TagNode | null = null
+  let playerTag: TagNode | null = null
   
   const outputChunks: string[] = []
-  
-  const SECTOR_CHILD_CLASSES = ['station', 'datavault']
   
   function escapeXml(str: string): string {
     return str
@@ -180,102 +188,102 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
     return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
   }
   
-  function isSectorChild(node: sax.Tag): boolean {
+  function isValidChild(node: TagNode): boolean {
     if (node.name !== 'component') return false
-    const clazz = node.attributes.class as string
-    if (SECTOR_CHILD_CLASSES.includes(clazz)) return true
-    if (clazz?.startsWith('ship_') && node.attributes.owner === 'ownerless') return true
-    const macro = node.attributes.macro as string
-    if (macro?.toLowerCase().includes('erlking_vault')) return true
+    const clazzMatch = node.attrStr.match(/class="([^"]+)"/)
+    if (!clazzMatch) return false
+    const clazz = clazzMatch[1]
+    if (VALID_CHILD_CLASSES.includes(clazz)) return true
+    if (clazz.startsWith('ship_') && node.attrStr.includes('owner="ownerless"')) return true
+    if (node.attrStr.toLowerCase().includes('erlking_vault')) return true
     return false
   }
   
-  function shouldOutput(): boolean {
-    if (tagPath.length === 0) return false
+  function markContentPath(node: TagNode): void {
+    let n: TagNode | null = node
+    while (n) {
+      n.hasValidContent = true
+      n = n.parent
+    }
+  }
+  
+  function outputTree(node: TagNode, insideValidChild: boolean = false): void {
+    if (!node.hasValidContent && !insideValidChild) return
     
-    const currentPath = tagPath.join('/')
-    
-    if (tagPath.length === 1 && tagPath[0] === 'savegame') return true
-    if (tagPath.length === 2 && currentPath === 'savegame/info') return true
-    if (tagPath.length === 3 && (currentPath === 'savegame/info/game' || currentPath === 'savegame/info/player')) return true
-    if (tagPath.length === 2 && currentPath === 'savegame/components') return true
-    
-    return false
+    if (node.name) {
+      const hasContentChildren = node.children.some(c => c.hasValidContent)
+      const isSelfValid = isValidChild(node)
+      const shouldOutputContent = isSelfValid || hasContentChildren || insideValidChild
+      
+      if (shouldOutputContent) {
+        outputChunks.push(`<${node.name}${node.attrStr}>`)
+        for (const child of node.children) {
+          outputTree(child, isSelfValid || insideValidChild)
+        }
+        outputChunks.push(`</${node.name}>`)
+      } else {
+        outputChunks.push(`<${node.name}${node.attrStr}></${node.name}>`)
+      }
+    } else {
+      for (const child of node.children) {
+        outputTree(child, insideValidChild)
+      }
+    }
   }
   
   parser.onopentag = (node: sax.Tag) => {
-    tagPath.push(node.name)
     depth++
     
-    if (tagPath.join('/') === 'savegame/info/game' && !versionChecked) {
-      versionChecked = true
-      const version = node.attributes.version as string
-      if (expectedVersion && version) {
-        const saveVer = normalizeVersion(version)
-        const expectedVer = normalizeVersion(expectedVersion)
-        if (saveVer !== expectedVer) {
-          console.error(`[extract_save] version mismatch: ${version} (${saveVer}) vs ${expectedVersion} (${expectedVer})`)
-          versionMatch = false
+    const attrEntries = Object.entries(node.attributes)
+    const attrStr = attrEntries.length > 0 
+      ? ' ' + attrEntries.map(([k, v]) => `${k}="${escapeXml(String(v))}"`).join(' ')
+      : ''
+    
+    const tagNode: TagNode = {
+      name: node.name,
+      attrStr,
+      depth,
+      children: [],
+      parent: current,
+      hasValidContent: false
+    }
+    
+    current.children.push(tagNode)
+    current = tagNode
+    
+    if (node.name === 'game' && current.parent?.name === 'info') {
+      gameTag = tagNode
+      if (!versionChecked) {
+        versionChecked = true
+        const version = node.attributes.version as string
+        if (expectedVersion && version) {
+          const saveVer = normalizeVersion(version)
+          const expectedVer = normalizeVersion(expectedVersion)
+          if (saveVer !== expectedVer) {
+            console.error(`[extract_save] version mismatch: ${version} (${saveVer}) vs ${expectedVersion} (${expectedVer})`)
+            versionMatch = false
+          }
         }
       }
     }
     
-    const attrs = Object.entries(node.attributes)
-      .map(([k, v]) => `${k}="${escapeXml(String(v))}"`)
-      .join(' ')
-    const attrStr = attrs ? ` ${attrs}` : ''
-    
-    if (node.name === 'component' && node.attributes.class === 'sector') {
-      isInsideSector = true
-      sectorDepth = depth
-      sectorHasContent = false
-      sectorOpenTag = `<component${attrStr}>`
-      return
+    if (node.name === 'player' && current.parent?.name === 'info') {
+      playerTag = tagNode
     }
     
-    if (isInsideSector && depth > sectorDepth) {
-      if (isSectorChild(node)) {
-        if (!sectorHasContent) {
-          sectorHasContent = true
-          outputChunks.push(sectorOpenTag)
-        }
-        outputChunks.push(`<component${attrStr}></component>`)
-      }
-      return
-    }
-    
-    if (shouldOutput() && versionMatch) {
-      outputChunks.push(`<${node.name}${attrStr}>`)
+    if (isValidChild(tagNode)) {
+      markContentPath(tagNode)
+      sectorCount++
     }
   }
   
-  parser.onclosetag = (name: string) => {
-    if (isInsideSector && depth === sectorDepth) {
-      if (sectorHasContent) {
-        outputChunks.push(`</component>`)
-        sectorCount++
-      }
-      isInsideSector = false
-      sectorDepth = 0
-      sectorHasContent = false
-      sectorOpenTag = ''
-    } else if (isInsideSector && depth > sectorDepth && name === 'component') {
-      // Child component already closed in onopentag
-    } else if (shouldOutput() && versionMatch) {
-      outputChunks.push(`</${name}>`)
-    }
-    
-    tagPath.pop()
+  parser.onclosetag = (_name: string) => {
+    current = current.parent || root
     depth--
   }
   
-  parser.ontext = (_text: string) => {
-    // Ignore text content
-  }
-  
-  parser.oncdata = (_data: string) => {
-    // Ignore CDATA content
-  }
+  parser.ontext = (_text: string) => {}
+  parser.oncdata = (_data: string) => {}
   
   let sourceBytesRead = 0
   let nextSourceLogMB = 10
@@ -300,8 +308,14 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
     throw new Error('Version mismatch')
   }
   
+  if (gameTag) markContentPath(gameTag)
+  if (playerTag) markContentPath(playerTag)
+  
+  outputTree(root)
+  
   const rawXml = outputChunks.join('')
-  const formattedXml = xmlFormat(rawXml, {
+  const xmlWithDeclaration = '<?xml version="1.0" encoding="utf-8"?>' + rawXml
+  const formattedXml = xmlFormat(xmlWithDeclaration, {
     indentation: '  ',
     collapseContent: true,
     lineSeparator: '\n'
