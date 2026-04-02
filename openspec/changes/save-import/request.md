@@ -59,16 +59,37 @@
      - `khaakStations`
      都提取所有 module 的聚合结果：
      - `modules: [{ ref, amount }]`
-   - `npcStations` 与 `xenonStations` 额外根据聚合 modules / station macro 计算：
-     - `isShipyard`
-     - `isWharf`
-     - `isEquipmentdock`
-     - `isTradestation`
-   - `khaakStations` 只提取聚合 modules，不参与上述 `is*` 判定
-   - `khaakStations` 额外根据 station `macro` 计算：
-     - `landmarks_kha_nest_` → `isNest`
-     - `landmarks_kha_hive_` → `isHive`
-   - 上述 `npc/xenon/khaak` 的派生判定暂定放在 `src/workers/saveParserRust.worker.ts` 层处理，不下沉到 `rust-parser/src/core.rs`
+    - `npcStations` 与 `xenonStations` 额外根据聚合 modules / station macro 计算：
+      - `isShipyard`
+      - `isWharf`
+      - `isEquipmentdock`
+      - `isTradestation`
+      - `isFactory`
+      - `isPiratebase`
+      - `isDefence`
+    - `khaakStations` 额外根据聚合 modules / station macro 计算：
+      - `isShipyard`
+      - `isWharf`
+      - `isEquipmentdock`
+      - `isTradestation`
+      - `isFactory`
+      - `isPiratebase`
+      - `isDefence`
+    - `khaakStations` 额外根据 station `macro` 计算：
+      - `landmarks_kha_nest_` → `isNest`
+      - `landmarks_kha_hive_` → `isHive`
+    - `playerStations` 额外根据聚合 modules / station macro 计算：
+      - `isShipyard`
+      - `isWharf`
+      - `isEquipmentdock`
+      - `isFactory`
+      - `isPiratebase`
+      - `isDefence`
+    - 所有 station 根据 `is*` 布尔值按优先级打上 `tag` 字段（位于 `StationBaseEntry`）：
+      - **npc/xenon** 优先级：`piratebase > shipyard > wharf > equipmentdock > tradestation > factory > defence` → 无匹配则 `factory`
+      - **khaak** 优先级：`hive > nest` → 无匹配则 `weaponplatform`
+      - **player** 优先级：`piratebase > shipyard > wharf > equipmentdock > factory > tradestation > defence` → 无匹配则 `factory`
+    - 上述 `npc/xenon/khaak/player` 的派生判定放在 `src/workers/saveParserRust.worker.ts` 层处理，不下沉到 `rust-parser/src/core.rs`
    
 3. **Datavault**：`component class="datavault"`（单独类型）
    - 提取字段：`code, macro, owner, x/y/z, has_blueprints, has_wares, has_signalleak`
@@ -179,8 +200,10 @@
 - sector owner 提取
 - station 按 `player/xenon/khaak/npc` 四组分类
 - `npcStations/xenonStations/khaakStations` 的聚合 modules 提取（`modules: [{ ref, amount }]`）
-- `npcStations/xenonStations` 的 `isShipyard/isWharf/isEquipmentdock/isTradestation` 判定
+- `npcStations/xenonStations` 的 `isShipyard/isWharf/isEquipmentdock/isTradestation/isFactory/isPiratebase/isDefence` 判定
 - `khaakStations` 的 `isNest/isHive` 宏判定
+- `playerStations` 的 `isShipyard/isWharf/isEquipmentdock/isFactory/isPiratebase/isDefence` 判定
+- 所有 station 的 `tag` 字段判定（按优先级）
 - datavault / erlking_vault 的 `unlocked` 与聚合 `wares`
 
 ### Out of Scope
@@ -215,9 +238,13 @@
 21. 每个 datavault / erlking_vault 额外输出聚合后的 `wares: [{ ware, amount }]`
 22. `<unlock>` 缺失或 `state!="unlocked"` 时，`unlocked=false`
 23. 所有空数组字段不输出对应 key
-24. `npcStations/xenonStations` 额外输出 `isShipyard/isWharf/isEquipmentdock/isTradestation`
-25. `khaakStations` 不参与上述 `is*` 判定
-26. `khaakStations` 额外输出 `isNest/isHive`
+24. `npcStations/xenonStations` 额外输出 `isShipyard/isWharf/isEquipmentdock/isTradestation/isFactory/isPiratebase/isDefence`
+25. `khaakStations` 额外输出 `isNest/isHive`
+26. `playerStations` 额外输出 `isShipyard/isWharf/isEquipmentdock/isFactory/isPiratebase/isDefence`
+27. 所有 station 输出 `tag` 字段，判定优先级：
+    - npc/xenon: `piratebase > shipyard > wharf > equipmentdock > tradestation > factory > defence` → 默认 `factory`
+    - khaak: `hive > nest` → 默认 `weaponplatform`
+    - player: `piratebase > shipyard > wharf > equipmentdock > factory > tradestation > defence` → 默认 `factory`
 
 ## 未决项
 

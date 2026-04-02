@@ -28,7 +28,7 @@ import {
 } from '@/db/saveArchiveDB'
 
 const CURRENT_PARSER_VERSION = 'v1'
-const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'abandonedShip', 'datavault', 'erlkingVault']
+const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'xenonStation', 'khaakStation', 'abandonedShip', 'datavault', 'erlkingVault']
 
 function normalizeVersion(v: string): string {
   const trimmed = v.trim()
@@ -97,14 +97,18 @@ function createOverlayItem(
   sectorName: string,
   item: StationEntry | DatavaultEntry | AbandonedShipEntry
 ): SavePoiOverlayItem {
+  const isStation = 'tag' in item || 'is_headquarter' in item
+  const owner = category === 'playerStation' ? 'player' : ('owner' in item ? item.owner : undefined)
   return {
     key: `${category}:${item.code}`,
     code: item.code,
     category,
-    owner: 'owner' in item ? item.owner : undefined,
+    owner,
     sectorMacro,
     sectorName,
-    pos: { x: item.x, z: item.z }
+    pos: { x: item.x, z: item.z },
+    tag: isStation && 'tag' in item ? item.tag : undefined,
+    is_headquarter: isStation && 'is_headquarter' in item ? item.is_headquarter : undefined
   }
 }
 
@@ -116,11 +120,13 @@ export function deriveSavePoiCategoryData(archive: SaveArchive | null | undefine
       sector.playerStations || []
     )),
     npcStation: createPoiCategoryData('npcStation', buildPoiGroups(sectors, (sector) =>
-      [
-        ...(sector.npcStations || []),
-        ...(sector.xenonStations || []),
-        ...(sector.khaakStations || [])
-      ]
+      (sector.npcStations || []).filter((station) => station.tag !== 'factory')
+    )),
+    xenonStation: createPoiCategoryData('xenonStation', buildPoiGroups(sectors, (sector) =>
+      sector.xenonStations || []
+    )),
+    khaakStation: createPoiCategoryData('khaakStation', buildPoiGroups(sectors, (sector) =>
+      sector.khaakStations || []
     )),
     abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (sector) => sector.abandonedShips || [])),
     datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (sector) => sector.datavaults || [])),

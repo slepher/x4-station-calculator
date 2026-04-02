@@ -37,7 +37,7 @@
 
 **前提** 存档列表中至少有一个存档
 **当** 用户点击某个存档项
-**那么** 侧边栏内容切换为 5 个分类子菜单
+**那么** 侧边栏内容切换为 7 个分类子菜单
 **并且** 面包屑显示"存档 → 存档名"
 **并且** 每个分类显示 checkbox 和数量统计
 
@@ -60,15 +60,17 @@
 
 ### Requirement: Save POI Category Classification
 
-存档中的兴趣点按 5 个分类展示，每个分类独立控制显示状态。
+存档中的兴趣点按 7 个分类展示，每个分类独立控制显示状态。
 
 #### Scenario: 用户查看分类子菜单
 
 **前提** 用户已进入某个存档的分类层（L2）
 **当** 用户查看分类列表
-**那么** 显示以下 5 个分类：
-- 用户空间站（`stations` 中 `owner === 'player'`）
-- NPC据点（`stations` 中 `owner !== 'player' && is_headquarter === true`）
+**那么** 显示以下 7 个分类：
+- 用户空间站（`playerStations`，无过滤）
+- NPC空间站（`npcStations`，过滤 `tag === 'factory'`）
+- XEN空间站（`xenonStations`，无过滤）
+- KHA空间站（`khaakStations`，无过滤）
 - 弃船（`abandonedShips`）
 - 保险箱（`datavaults`）
 - 妖王保险箱（`erlkingVaults`）
@@ -153,25 +155,100 @@
 
 ### Requirement: Save POI Map Markers
 
-存档兴趣点在地图上以小圆点标记显示，上方显示 code 标签。
+存档兴趣点在地图上使用 SVG 图标显示，上方显示 code 标签。
 
 #### Scenario: 兴趣点标记渲染
 
 **前提** 用户勾选了某个分类的 checkbox
 **当** 地图渲染兴趣点标记
-**那么** 每个兴趣点显示为小圆点
-**并且** 圆点上方显示该实体的 `code` 字段
+**那么** 每个兴趣点显示对应的 SVG 图标
+**并且** 图标上方显示该实体的 `code` 字段
 **并且** 不同分类使用不同颜色
+
+#### Scenario: 空间站图标规则
+
+**当** 地图渲染空间站兴趣点
+**那么** 图标选择遵循以下规则：
+
+**用户空间站（playerStation）**：
+- `is_headquarter === true` → 使用 `playerhq.svg`
+- 否则使用 `<tag>.svg`（如 `shipyard.svg`, `wharf.svg`, `factory.svg` 等）
+
+**NPC空间站（npcStation）**：
+- `is_headquarter === true` → 使用 `<tag>_headquarter.svg`
+- 否则使用 `<tag>.svg`
+
+**XEN空间站（xenonStation）**：
+- `is_headquarter === true` → 使用 `<tag>_headquarter.svg`
+- 否则使用 `<tag>.svg`
+
+**KHA空间站（khaakStation）**：
+- 使用 `<tag>.svg`（如 `hive.svg`, `nest.svg`, `weaponplatform.svg`）
+
+**非空间站类别（abandonedShip/datavault/erlkingVault）**：
+- 使用小圆点标记，保持现有渲染方式
 
 #### Scenario: 分类颜色区分
 
 **当** 不同分类的兴趣点同时显示在地图上
 **那么** 使用以下颜色区分：
 - 用户空间站：amber-400
-- NPC据点：amber-200/60
+- NPC空间站：amber-200/60
+- XEN空间站：red-400
+- KHA空间站：purple-500
 - 弃船：purple-400
 - 保险箱：cyan-400
 - 妖王保险箱：emerald-400
+
+---
+
+### Requirement: Faction Color Dyeing
+
+存档中的星区和空间站根据阵营颜色进行染色显示。
+
+#### Scenario: 星区阵营染色
+
+**前提** 用户已选择存档并勾选了某个分类
+**当** 存档中星区的 `owner` 字段存在
+**那么** 星区使用对应阵营的颜色渲染
+**并且** 颜色从 `factions.json` 的 `color` 字段获取
+
+#### Scenario: Cluster 阵营颜色计算
+
+**当** 计算整个 cluster 的颜色
+**那么** 若 cluster 内所有 sector 的 owner 相同，使用该阵营颜色
+**并且** 若 owner 不完全相同，使用 `ownerless` 颜色
+
+#### Scenario: 空间站图标阵营染色
+
+**前提** 空间站有 `owner` 字段
+**当** 渲染空间站图标
+**那么** 使用 SVG `feColorMatrix` filter 将图标染色为阵营颜色
+**并且** 白色图标会被转换为对应的阵营颜色
+
+#### Scenario: 高亮状态保持阵营颜色
+
+**前提** 用户点击定位空间站使其高亮
+**当** 空间站处于 `.focused` 状态
+**那么** 阵营颜色保持不变
+**并且** 额外显示 drop-shadow 高亮效果
+
+---
+
+### Requirement: Sector Tooltip Owner i18n
+
+星区 tooltip 中的 owner 显示使用阵营的本地化名称。
+
+#### Scenario: Tooltip 显示阵营名称
+
+**当** tooltip 显示星区 owner
+**那么** 使用阵营的 `nameId` 进行 i18n 翻译
+**并且** 若存档中存在 owner override，优先使用 override 的 owner
+
+#### Scenario: ownerless 显示
+
+**当** 星区无 owner 或 owner 为 ownerless
+**那么** 显示 `map.owner_ownerless` 翻译文本
 
 ---
 

@@ -4,9 +4,23 @@ import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import type { SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 import { resolveMapSectorByMacro } from './mapSectorMacro'
-import factoryIconUrl from '@/components/icon/factory.svg'
-import shipyardIconUrl from '@/components/icon/shipyard.svg'
-import tradestationIconUrl from '@/components/icon/tradestation.svg'
+import factoryIconUrl from '@/components/icons/factory.svg'
+import shipyardIconUrl from '@/components/icons/shipyard.svg'
+import tradestationIconUrl from '@/components/icons/tradestation.svg'
+import playerhqIconUrl from '@/components/icons/playerhq.svg'
+import wharfIconUrl from '@/components/icons/wharf.svg'
+import equipmentdockIconUrl from '@/components/icons/equipmentdock.svg'
+import defensestationIconUrl from '@/components/icons/defensestation.svg'
+import piratestationIconUrl from '@/components/icons/piratestation.svg'
+import hiveIconUrl from '@/components/icons/hive.svg'
+import weaponplatformIconUrl from '@/components/icons/weaponplatform.svg'
+import shipyardHeadquarterIconUrl from '@/components/icons/shipyard_headquarter.svg'
+import wharfHeadquarterIconUrl from '@/components/icons/wharf_headquarter.svg'
+import equipmentdockHeadquarterIconUrl from '@/components/icons/equipmentdock_headquarter.svg'
+import factoryHeadquarterIconUrl from '@/components/icons/factory_headquarter.svg'
+import tradestationHeadquarterIconUrl from '@/components/icons/tradestation_headquarter.svg'
+import defensestationHeadquarterIconUrl from '@/components/icons/defensestation_headquarter.svg'
+import piratestationHeadquarterIconUrl from '@/components/icons/piratestation_headquarter.svg'
 
 type Vec2 = { x: number; y: number }
 type LayoutConfig = { width: number; height: number; padX: number; padY: number; topPad: number }
@@ -161,6 +175,9 @@ const props = withDefaults(defineProps<{
   focusedOverlayKey?: string | null
   savePoiOverlays?: SavePoiOverlayItem[]
   focusedSavePoiKey?: string | null
+  sectorOwnerOverride?: Record<string, string>
+  clusterOwnerOverride?: Record<string, string>
+  factionColorMap?: Record<string, string>
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
@@ -173,7 +190,10 @@ const props = withDefaults(defineProps<{
   draggingOverlayKey: null,
   focusedOverlayKey: null,
   savePoiOverlays: () => [],
-  focusedSavePoiKey: null
+  focusedSavePoiKey: null,
+  sectorOwnerOverride: undefined,
+  clusterOwnerOverride: undefined,
+  factionColorMap: undefined
 })
 
 const emit = defineEmits<{
@@ -190,7 +210,21 @@ const gameData = useGameDataStore()
 const svgIdSafe = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_')
 const sectorClipId = (clusterId: string, sectorId: string) =>
   `sector-clip-${svgIdSafe(clusterId)}-${svgIdSafe(sectorId)}`
-const resolveOwnerColor = (node: { owner_color?: string }) => node.owner_color || FALLBACK_OWNER_COLOR
+const resolveOwnerColor = (node: { owner_color?: string }, sectorId?: string, clusterId?: string) => {
+  if (sectorId && props.sectorOwnerOverride && props.sectorOwnerOverride[sectorId]) {
+    const overrideOwner = props.sectorOwnerOverride[sectorId]
+    if (props.factionColorMap && props.factionColorMap[overrideOwner]) {
+      return props.factionColorMap[overrideOwner]
+    }
+  }
+  if (clusterId && props.clusterOwnerOverride && props.clusterOwnerOverride[clusterId]) {
+    const overrideOwner = props.clusterOwnerOverride[clusterId]
+    if (props.factionColorMap && props.factionColorMap[overrideOwner]) {
+      return props.factionColorMap[overrideOwner]
+    }
+  }
+  return node.owner_color || FALLBACK_OWNER_COLOR
+}
 const placementIconHref = (icon: 'factory' | 'shipyard' | 'tradestation') => {
   if (icon === 'shipyard') return shipyardIconUrl
   if (icon === 'tradestation') return tradestationIconUrl
@@ -766,7 +800,7 @@ const clusterPolygons = computed(() => {
     if (!cluster) return
     const center = centers[clusterId]
     if (!center) return
-    const color = resolveOwnerColor(cluster)
+    const color = resolveOwnerColor(cluster, undefined, clusterId)
     // 当 enforceDlcActivation=false 时，标记未激活的 DLC cluster
     const clusterDlcActive = gameData.isDlcActive(cluster.dlc_tag)
     const sectors: Array<{
@@ -825,7 +859,7 @@ const clusterPolygons = computed(() => {
         sx,
         sy,
         radius: baseRadius,
-        color: resolveOwnerColor(sector),
+        color: resolveOwnerColor(sector, sector.id, clusterId),
         label: displayName,
         labelY: baseLabelY,
         labelFontSize: Math.max(MIN_SECTOR_LABEL_FONT_SIZE, SECTOR_LABEL_FONT_SIZE * sectorRadiusRatio),
@@ -869,7 +903,7 @@ const gateCircles = computed(() => {
     if (!center) return
     const sectors = Object.values(cluster.sectors || {})
     sectors.forEach((sector) => {
-      const sectorColor = resolveOwnerColor(sector)
+      const sectorColor = resolveOwnerColor(sector, sector.id, clusterId)
       Object.entries(sector.cluster_gates || {}).forEach(([gateId, gate]) => {
         const ratio = gateClusterRatioFromRaw(gate, sector.normalized)
         if (!ratio) return
@@ -964,10 +998,88 @@ const overlayScreenItems = computed(() => {
 const SAVE_POI_COLORS: Record<SavePoiCategory, string> = {
   playerStation: '#fbbf24',
   npcStation: 'rgba(252, 211, 77, 0.6)',
+  xenonStation: '#f87171',
+  khaakStation: '#a855f7',
   abandonedShip: '#c084fc',
   datavault: '#22d3ee',
   erlkingVault: '#34d399'
 }
+
+const SAVE_POI_ICON_MAP: Record<string, string> = {
+  shipyard: shipyardIconUrl,
+  wharf: wharfIconUrl,
+  equipmentdock: equipmentdockIconUrl,
+  factory: factoryIconUrl,
+  tradestation: tradestationIconUrl,
+  defence: defensestationIconUrl,
+  defencestation: defensestationIconUrl,
+  piratebase: piratestationIconUrl,
+  piratestation: piratestationIconUrl,
+  hive: hiveIconUrl,
+  weaponplatform: weaponplatformIconUrl,
+  playerhq: playerhqIconUrl
+}
+
+const SAVE_POI_HEADQUARTER_ICON_MAP: Record<string, string> = {
+  shipyard: shipyardHeadquarterIconUrl,
+  wharf: wharfHeadquarterIconUrl,
+  equipmentdock: equipmentdockHeadquarterIconUrl,
+  factory: factoryHeadquarterIconUrl,
+  tradestation: tradestationHeadquarterIconUrl,
+  defence: defensestationHeadquarterIconUrl,
+  defencestation: defensestationHeadquarterIconUrl,
+  piratebase: piratestationHeadquarterIconUrl,
+  piratestation: piratestationHeadquarterIconUrl
+}
+
+function getSavePoiIconUrl(poi: SavePoiOverlayItem): string | null {
+  if (!poi.tag) return null
+  if (poi.category === 'playerStation' && poi.is_headquarter) {
+    return playerhqIconUrl
+  }
+  if (poi.is_headquarter) {
+    return SAVE_POI_HEADQUARTER_ICON_MAP[poi.tag] || SAVE_POI_ICON_MAP[poi.tag] || null
+  }
+  if (poi.tag === 'nest') {
+    return weaponplatformIconUrl
+  }
+  return SAVE_POI_ICON_MAP[poi.tag] || null
+}
+
+function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
+  const match = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
+  if (!match || !match[1] || !match[2] || !match[3]) return null
+  return {
+    r: parseInt(match[1], 16) / 255,
+    g: parseInt(match[2], 16) / 255,
+    b: parseInt(match[3], 16) / 255
+  }
+}
+
+function colorToFeColorMatrix(hex: string): string | null {
+  const rgb = hexToRgb(hex)
+  if (!rgb) return null
+  return `${rgb.r.toFixed(4)} 0 0 0 0  ${rgb.g.toFixed(4)} 0 0 0 0  ${rgb.b.toFixed(4)} 0 0 0 0  0 0 0 1 0`
+}
+
+const factionColorFilters = computed<Array<{ id: string; matrix: string }>>(() => {
+  if (!props.factionColorMap) return []
+  const filters: Array<{ id: string; matrix: string }> = []
+  const addedColors = new Set<string>()
+  
+  props.savePoiOverlays.forEach(poi => {
+    if (!poi.owner) return
+    const color = props.factionColorMap?.[poi.owner]
+    if (!color || addedColors.has(color)) return
+    const matrix = colorToFeColorMatrix(color)
+    if (!matrix) return
+    addedColors.add(color)
+    const safeId = svgIdSafe(color.replace('#', ''))
+    filters.push({ id: `faction-color-${safeId}`, matrix })
+  })
+  
+  return filters
+})
 
 const savePoiScreenItems = computed(() => {
   const { centers, clusterRadius } = layoutState.value
@@ -988,14 +1100,21 @@ const savePoiScreenItems = computed(() => {
       const ratio = sectorRatioToClusterRatio(sector.normalized, localRatio)
       if (!ratio) return null
       const point = clusterRatioToScreen(center, clusterRadius, ratio)
+      const factionColor = poi.owner && props.factionColorMap?.[poi.owner] 
+        ? props.factionColorMap[poi.owner] 
+        : null
+      const factionFilterId = factionColor 
+        ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` 
+        : null
       return {
         ...poi,
         x: point.x,
         y: point.y,
-        color: SAVE_POI_COLORS[poi.category]
+        color: SAVE_POI_COLORS[poi.category],
+        factionFilterId
       }
     })
-    .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string } => !!item)
+    .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null } => !!item)
 })
 const previewScreenItem = computed(() => {
   const preview = props.placementPreview
@@ -1068,6 +1187,29 @@ watchEffect(() => {
           <feMergeNode in="glow" />
           <feMergeNode in="SourceGraphic" />
         </feMerge>
+      </filter>
+      <filter
+        v-for="f in factionColorFilters"
+        :id="f.id"
+        :key="f.id"
+        x="-50%"
+        y="-50%"
+        width="200%"
+        height="200%"
+      >
+        <feColorMatrix type="matrix" :values="f.matrix" />
+      </filter>
+      <filter
+        v-for="f in factionColorFilters"
+        :id="`${f.id}-focused`"
+        :key="`${f.id}-focused`"
+        x="-50%"
+        y="-50%"
+        width="200%"
+        height="200%"
+      >
+        <feColorMatrix type="matrix" :values="f.matrix" result="colored" />
+        <feDropShadow in="colored" stdDeviation="2" flood-color="#fde68a" flood-opacity="0.8" />
       </filter>
       <clipPath v-for="clip in clipDefs" :id="clip.id" :key="clip.id">
         <polygon :points="clip.points" />
@@ -1150,9 +1292,9 @@ watchEffect(() => {
           </g>
           <polygon
             :points="hexPoints(cluster.cx, cluster.cy, cluster.singleRadius || 0)"
-            :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.color)"
+            :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
             :fill-opacity="sectorFillOpacity(cluster.sectors[0]?.id || '')"
-            :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.color)"
+            :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
             :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
             :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
             :filter="sectorFilter(cluster.sectors[0]?.id || '')"
@@ -1364,8 +1506,18 @@ watchEffect(() => {
         :data-save-poi-key="poi.key"
         @mousedown.stop="emit('save-poi-pointerdown', poi)"
       >
-        <circle cx="0" cy="0" r="5" :fill="poi.color" stroke="#fff" stroke-width="1" />
-        <text x="0" y="-8" text-anchor="middle" class="save-poi-label">{{ poi.code }}</text>
+        <image
+          v-if="getSavePoiIconUrl(poi)"
+          :href="getSavePoiIconUrl(poi)!"
+          :x="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
+          :y="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
+          :width="OVERLAY_ICON_SIZE"
+          :height="OVERLAY_ICON_SIZE"
+          preserveAspectRatio="xMidYMid meet"
+          :filter="poi.factionFilterId ? `url(#${poi.factionFilterId}${focusedSavePoiKey === poi.key ? '-focused' : ''})` : undefined"
+        />
+        <circle v-else cx="0" cy="0" r="5" :fill="poi.color" stroke="#fff" stroke-width="1" />
+        <text x="0" y="-12" text-anchor="middle" class="save-poi-label">{{ poi.code }}</text>
       </g>
     </g>
 

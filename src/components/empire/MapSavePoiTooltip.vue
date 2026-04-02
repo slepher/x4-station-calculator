@@ -12,6 +12,8 @@ const { t } = useI18n()
 const categoryLabels: Record<string, string> = {
   playerStation: 'map.save_category_player_station',
   npcStation: 'map.save_category_npc_station',
+  xenonStation: 'map.save_category_xenon_station',
+  khaakStation: 'map.save_category_khaak_station',
   abandonedShip: 'map.save_category_abandoned_ship',
   datavault: 'map.save_category_datavault',
   erlkingVault: 'map.save_category_erlking_vault'

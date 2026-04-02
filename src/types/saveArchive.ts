@@ -70,10 +70,17 @@ export interface StationBaseEntry {
   z: number
   is_wreck?: boolean
   is_headquarter?: boolean
+  tag?: string
 }
 
 export interface PlayerStationEntry extends StationBaseEntry {
   modules?: PlayerStationModule[]
+  isShipyard?: boolean
+  isWharf?: boolean
+  isEquipmentdock?: boolean
+  isFactory?: boolean
+  isPiratebase?: boolean
+  isDefence?: boolean
 }
 
 export interface NpcStationEntry extends StationBaseEntry {
@@ -82,6 +89,9 @@ export interface NpcStationEntry extends StationBaseEntry {
   isWharf?: boolean
   isEquipmentdock?: boolean
   isTradestation?: boolean
+  isFactory?: boolean
+  isPiratebase?: boolean
+  isDefence?: boolean
   isNest?: boolean
   isHive?: boolean
 }
@@ -92,6 +102,8 @@ export interface FactionStationEntry extends StationBaseEntry {
   isWharf?: boolean
   isEquipmentdock?: boolean
   isTradestation?: boolean
+  isPiratebase?: boolean
+  isDefence?: boolean
   isNest?: boolean
   isHive?: boolean
 }
@@ -145,7 +157,7 @@ export interface SaveArchive {
   isCompatible: boolean
 }
 
-export type SavePoiCategory = 'playerStation' | 'npcStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
+export type SavePoiCategory = 'playerStation' | 'npcStation' | 'xenonStation' | 'khaakStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
 
 export type SavePoiVisibility = Record<SavePoiCategory, boolean>
 
@@ -157,6 +169,8 @@ export interface SavePoiOverlayItem {
   sectorMacro: string
   sectorName: string
   pos: { x: number; z: number }
+  tag?: string
+  is_headquarter?: boolean
 }
 
 export interface SavePoiSectorGroup<T> {
@@ -174,6 +188,8 @@ export interface SavePoiCategoryData<T> {
 export interface SavePoiCategoryDataMap {
   playerStation: SavePoiCategoryData<StationEntry>
   npcStation: SavePoiCategoryData<StationEntry>
+  xenonStation: SavePoiCategoryData<StationEntry>
+  khaakStation: SavePoiCategoryData<StationEntry>
   abandonedShip: SavePoiCategoryData<AbandonedShipEntry>
   datavault: SavePoiCategoryData<DatavaultEntry>
   erlkingVault: SavePoiCategoryData<DatavaultEntry>

@@ -57,6 +57,8 @@ function getCategoryLabel(category: SavePoiCategory): string {
   const labels: Record<SavePoiCategory, string> = {
     playerStation: t('map.save_category_player_station'),
     npcStation: t('map.save_category_npc_station'),
+    xenonStation: t('map.save_category_xenon_station'),
+    khaakStation: t('map.save_category_khaak_station'),
     abandonedShip: t('map.save_category_abandoned_ship'),
     datavault: t('map.save_category_datavault'),
     erlkingVault: t('map.save_category_erlking_vault')
