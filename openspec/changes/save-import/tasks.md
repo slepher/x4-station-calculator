@@ -38,14 +38,18 @@
 4. 冻结 SAX 解析链路为备用/CLI 默认解析器，不再继续添加新的业务提取功能
 5. 在 Rust 解析链路中实现 sector `owner` 提取
 6. 在 Rust 解析链路中将 station 按 `player/xenon/khaak/npc` 四组分类，并输出为 `playerStations/xenonStations/khaakStations/npcStations`
-7. 在 Rust 解析链路中为 `npcStations` 提取聚合模块 `modules: [{ ref, amount }]`
-8. 在 Rust 解析链路中为 datavaults 与 erlkingVaults 提取 `unlocked`
-9. 在 Rust 解析链路中为 datavaults 与 erlkingVaults 提取聚合 `wares: [{ ware, amount }]`
-10. 保留目标对象提取：abandonedShips
-11. 实现坐标累加（position 栈）
-12. 提取存档元信息：guid, seed, time, playerName, version
-13. 实现流式进度报告与 `finalizing` 阶段补发
-14. 实现早期版本校验（解析到 game 标签时立即校验）
+7. 在 Rust 解析链路中为 `npcStations/xenonStations/khaakStations` 提取聚合模块 `modules: [{ ref, amount }]`
+8. 在 Rust 解析链路中为 `npcStations/xenonStations` 提取 `isShipyard/isWharf/isEquipmentdock/isTradestation`
+9. 保持 `khaakStations` 不参与上述 `is*` 判定
+10. 在 Rust 解析链路中为 `khaakStations` 提取 `isNest/isHive`
+11. 将上述 `npc/xenon/khaak` 的派生判定落实在 `src/workers/saveParserRust.worker.ts` 层，而不是 `rust-parser/src/core.rs`
+12. 在 Rust 解析链路中为 datavaults 与 erlkingVaults 提取 `unlocked`
+13. 在 Rust 解析链路中为 datavaults 与 erlkingVaults 提取聚合 `wares: [{ ware, amount }]`
+14. 保留目标对象提取：abandonedShips
+15. 实现坐标累加（position 栈）
+16. 提取存档元信息：guid, seed, time, playerName, version
+17. 实现流式进度报告与 `finalizing` 阶段补发
+18. 实现早期版本校验（解析到 game 标签时立即校验）
 
 ---
 
@@ -104,11 +108,13 @@
 4. 按sector分组展示
 5. 展示 sector `owner`
 6. 分别展示 `playerStations/xenonStations/khaakStations/npcStations`
-7. `npcStations` 显示聚合模块列表 `modules: [{ ref, amount }]`
-8. 展示 datavaults 的 `unlocked` 与聚合 `wares`
-9. 展示 erlkingVaults 的 `unlocked` 与聚合 `wares`
-10. 展示abandonedShips列表
-11. Sector名称显示翻译后名称
+7. `npcStations/xenonStations/khaakStations` 显示聚合模块列表 `modules: [{ ref, amount }]`
+8. `npcStations/xenonStations` 显示 `isShipyard/isWharf/isEquipmentdock/isTradestation`
+9. `khaakStations` 显示 `isNest/isHive`
+10. 展示 datavaults 的 `unlocked` 与聚合 `wares`
+11. 展示 erlkingVaults 的 `unlocked` 与聚合 `wares`
+12. 展示abandonedShips列表
+13. Sector名称显示翻译后名称
 
 ---
 
@@ -220,10 +226,10 @@ T11 (build) ← all tasks
 | Task | Status | Notes |
 |------|--------|-------|
 | T1 | completed | 类型与 store 已扩展到 sector owner、四类 station、datavault unlocked/wares 结构 |
-| T2 | completed | Rust 解析链已实现 station 分类、npc modules 聚合、datavault/erlking loot 提取；JS parser 冻结为兼容路径 |
+| T2 | completed | Rust 解析链已实现 station 分类、npc/xenon/khaak modules 聚合、datavault/erlking loot 提取；派生判定需求记录为后续在 saveParserRust.worker.ts 层处理；JS parser 冻结为兼容路径 |
 | T3 | pending | |
 | T4 | pending | |
-| T5 | completed | SaveDetailPanel 已展示 sector owner、xenon/khaak/npc 分组与 vault unlocked/wares |
+| T5 | completed | SaveDetailPanel 已展示 sector owner、xenon/khaak/npc 分组、聚合模块与 vault unlocked/wares；派生标记展示待 worker 层产出后接入 |
 | T6 | pending | |
 | T7 | pending | |
 | T8 | pending | |

@@ -78,9 +78,23 @@ export interface PlayerStationEntry extends StationBaseEntry {
 
 export interface NpcStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
+  isShipyard?: boolean
+  isWharf?: boolean
+  isEquipmentdock?: boolean
+  isTradestation?: boolean
+  isNest?: boolean
+  isHive?: boolean
 }
 
-export interface FactionStationEntry extends StationBaseEntry {}
+export interface FactionStationEntry extends StationBaseEntry {
+  modules?: AggregatedStationModule[]
+  isShipyard?: boolean
+  isWharf?: boolean
+  isEquipmentdock?: boolean
+  isTradestation?: boolean
+  isNest?: boolean
+  isHive?: boolean
+}
 
 export type StationEntry = PlayerStationEntry | NpcStationEntry | FactionStationEntry
 

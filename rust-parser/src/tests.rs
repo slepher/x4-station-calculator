@@ -135,4 +135,22 @@ mod tests {
         assert_eq!(station.base.code, "GZIP-1");
         assert_eq!((station.base.x, station.base.y, station.base.z), (11.0, 22.0, 33.0));
     }
+
+    #[test]
+    fn aggregates_modules_for_xenon_and_khaak_stations() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="xen_station" owner="xenon" code="XEN-1"><construction><sequence><entry index="1" macro="buildmodule_xen_ships_xl_macro"/><entry index="2" macro="buildmodule_xen_ships_xl_macro"/></sequence></construction></component><component class="station" macro="kha_station" owner="khaak" code="KHA-1"><construction><sequence><entry index="1" macro="module_khaak_special"/><entry index="2" macro="module_khaak_special"/></sequence></construction></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("factions.xml").expect("archive");
+        let sector = archive.sectors.get("sec_alpha").expect("sector");
+
+        assert_eq!(sector.xenon_stations[0].modules[0].ref_field, "buildmodule_xen_ships_xl_macro");
+        assert_eq!(sector.xenon_stations[0].modules[0].amount, 2);
+        assert_eq!(sector.khaak_stations[0].modules[0].ref_field, "module_khaak_special");
+        assert_eq!(sector.khaak_stations[0].modules[0].amount, 2);
+    }
 }

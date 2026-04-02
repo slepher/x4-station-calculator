@@ -734,6 +734,12 @@
     "has_blueprints": "Blueprints",
     "has_wares": "Wares",
     "has_signalleak": "Signal",
-    "empty_tab": "No data"
+    "empty_tab": "No data",
+    "station_flag_shipyard": "Shipyard",
+    "station_flag_wharf": "Wharf",
+    "station_flag_equipmentdock": "Equipment Dock",
+    "station_flag_tradestation": "Trade Station",
+    "station_flag_nest": "Nest",
+    "station_flag_hive": "Hive"
   }
 }
