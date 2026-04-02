@@ -154,6 +154,8 @@ pub(crate) struct PlayerStationEntry {
 pub(crate) struct FactionStationEntry {
     #[serde(flatten)]
     pub(crate) base: StationBaseEntry,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) modules: Vec<AggregatedStationModule>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createSaveParserRuntime } from '../../../src/workers/saveParser.worker'
+import { postProcessRustSaveArchive } from '../../../src/workers/saveParserRust.post'
 import { readFile } from 'node:fs/promises'
 import zlib from 'node:zlib'
 
@@ -132,5 +133,99 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.x).toBe(7)
     expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.y).toBe(8)
     expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.z).toBe(9)
+  })
+})
+
+describe('save parser rust worker enrichment', () => {
+  it('derives station flags in worker layer', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v1',
+        source: 'original'
+      },
+      isCompatible: true,
+      sectors: {
+        sec: {
+          name: 'sec',
+          is_known: true,
+          npcStations: [{
+            code: 'NPC',
+            macro: 'station_arg_factory_macro',
+            owner: 'argon',
+            x: 1,
+            y: 2,
+            z: 3,
+            modules: [{ ref: 'buildmodule_arg_ships_m_macro', amount: 2 }]
+          }],
+          xenonStations: [{
+            code: 'XEN',
+            macro: 'station_gen_tradestation_macro',
+            owner: 'xenon',
+            x: 4,
+            y: 5,
+            z: 6,
+            modules: [
+              { ref: 'buildmodule_xen_ships_xl_macro', amount: 1 },
+              { ref: 'buildmodule_xen_equip_macro', amount: 1 }
+            ]
+          }],
+          khaakStations: [{
+            code: 'KHA',
+            macro: 'landmarks_kha_hive_macro',
+            owner: 'khaak',
+            x: 7,
+            y: 8,
+            z: 9,
+            modules: [{ ref: 'module_khaak_special', amount: 1 }]
+          }]
+        }
+      }
+    })
+
+    expect(archive.sectors.sec.npcStations?.[0]).toMatchObject({
+      isWharf: true
+    })
+    expect(archive.sectors.sec.xenonStations?.[0]).toMatchObject({
+      isShipyard: true,
+      isEquipmentdock: true,
+      isTradestation: true
+    })
+    expect(archive.sectors.sec.khaakStations?.[0]).toMatchObject({
+      isHive: true
+    })
+    expect(archive.sectors.sec.khaakStations?.[0]?.isShipyard).toBeUndefined()
+  })
+
+  it('omits empty playerStations after post processing', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v1',
+        source: 'original'
+      },
+      isCompatible: true,
+      sectors: {
+        sec: {
+          name: 'sec',
+          is_known: true,
+          playerStations: [],
+          npcStations: []
+        }
+      }
+    })
+
+    expect(archive.sectors.sec.playerStations).toBeUndefined()
+    expect(archive.sectors.sec.npcStations).toBeUndefined()
   })
 })

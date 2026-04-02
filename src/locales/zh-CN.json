@@ -736,6 +736,12 @@
     "has_blueprints": "蓝图",
     "has_wares": "货物",
     "has_signalleak": "信号",
-    "empty_tab": "无数据"
+    "empty_tab": "无数据",
+    "station_flag_shipyard": "船坞",
+    "station_flag_wharf": "码头",
+    "station_flag_equipmentdock": "设备站",
+    "station_flag_tradestation": "贸易站",
+    "station_flag_nest": "巢穴",
+    "station_flag_hive": "蜂巢"
   }
 }

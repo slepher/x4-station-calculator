@@ -5,6 +5,7 @@ import zlib from 'node:zlib'
 import sax from 'sax'
 import { createSaveParserRuntime, createSaveXmlFilterRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
+import { postProcessRustSaveArchive } from '../src/workers/saveParserRust.post'
 
 interface FilteredXmlResult {
   xml: string
@@ -630,7 +631,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
   console.log(`[extract_save] parse time: ${elapsed.toFixed(0)}ms`)
 
   const result = parser.finish(path.basename(absoluteInput))
-  const archive: SaveArchive = JSON.parse(result)
+  const archive = postProcessRustSaveArchive(JSON.parse(result) as SaveArchive)
 
   console.log(`[extract_save] done: sectors ${Object.keys(archive.sectors).length}, compatible=${archive.isCompatible}`)
   fs.writeFileSync(absoluteOutput, JSON.stringify(archive, null, 2))

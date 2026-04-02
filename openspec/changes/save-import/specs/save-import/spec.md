@@ -199,17 +199,13 @@
     - `group`: 装备组名
     - `exact`: 数量
 
-#### Scenario: 提取普通NPC空间站模块聚合
+#### Scenario: 提取非玩家空间站模块聚合
 
 **前提** 存档解析开始
 
 **当** 解析 `<component class="station">`
 
 **并且** `owner!="player"`
-
-**并且** `owner!="xenon"`
-
-**并且** `owner!="khaak"`
 
 **那么** 额外提取聚合模块信息：
 - `modules`: 模块统计列表
@@ -218,17 +214,51 @@
 
 **并且** 不提取玩家站使用的 construction/equipment 明细结构
 
-#### Scenario: xenon与khaak空间站只做分类
+#### Scenario: npc与xenon空间站提取功能标记
 
 **前提** 存档解析开始
 
 **当** 解析 `<component class="station">`
 
-**并且** `owner="xenon"` 或 `owner="khaak"`
+**并且** `owner="xenon"` 或属于 `npcStations`
 
-**那么** 仅按 faction 分类归组
+**那么** 额外根据聚合模块 / station macro 输出：
+- `isShipyard`
+- `isWharf`
+- `isEquipmentdock`
+- `isTradestation`
 
-**并且** 不提取 `modules: [{ ref, amount }]`
+**并且** 判定规则为：
+- 模块包含 `buildmodule_*_ships_x` 或 `buildmodule_*_ships_xl` -> `isShipyard=true`
+- 模块包含 `buildmodule_*_ships_m` -> `isWharf=true`
+- 模块包含 `buildmodule_*_equip` -> `isEquipmentdock=true`
+- station `macro` 包含 `tradestation` -> `isTradestation=true`
+
+#### Scenario: khaak空间站不提取功能标记
+
+**前提** 存档解析开始
+
+**当** 解析 `<component class="station">`
+
+**并且** `owner="khaak"`
+
+**那么** 提取聚合 `modules: [{ ref, amount }]`
+
+**并且** 不输出 `isShipyard/isWharf/isEquipmentdock/isTradestation`
+
+#### Scenario: khaak空间站提取巢穴类型标记
+
+**前提** 存档解析开始
+
+**当** 解析 `<component class="station">`
+
+**并且** `owner="khaak"`
+
+**那么** 根据 station `macro` 输出：
+- `landmarks_kha_nest_` -> `isNest=true`
+- `landmarks_kha_hive_` -> `isHive=true`
+
+**并且** 该派生逻辑位于 `src/workers/saveParserRust.worker.ts` 层，而不是 Rust core 抽取层
 
 #### Scenario: 提取Datavault
 

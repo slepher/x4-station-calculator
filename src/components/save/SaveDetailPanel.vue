@@ -82,6 +82,18 @@ function formatNpcModules(modules: NpcStationEntry['modules'] | undefined): stri
   if (!modules || modules.length === 0) return ''
   return modules.map((entry) => `${entry.ref} x${entry.amount}`).join(', ')
 }
+
+function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string {
+  const flags = [
+    item.isShipyard ? t('save_import.station_flag_shipyard') : '',
+    item.isWharf ? t('save_import.station_flag_wharf') : '',
+    item.isEquipmentdock ? t('save_import.station_flag_equipmentdock') : '',
+    item.isTradestation ? t('save_import.station_flag_tradestation') : '',
+    item.isNest ? t('save_import.station_flag_nest') : '',
+    item.isHive ? t('save_import.station_flag_hive') : ''
+  ].filter(Boolean)
+  return flags.join(' · ')
+}
 </script>
 
 <template>
@@ -137,9 +149,13 @@ function formatNpcModules(modules: NpcStationEntry['modules'] | undefined): stri
               </template>
 
               <template v-if="activeTab === 'xenon-stations' || activeTab === 'khaak-stations'">
-                <div v-for="item in sector.items" :key="(item as FactionStationEntry).code" class="item-row">
-                  <span class="item-owner">{{ (item as FactionStationEntry).owner || 'neutral' }}</span>
-                  <span class="item-coords">({{ formatCoord((item as FactionStationEntry).x) }}, {{ formatCoord((item as FactionStationEntry).z) }})</span>
+                <div v-for="item in sector.items" :key="(item as FactionStationEntry).code" class="item-row item-row-stacked">
+                  <div class="item-primary">
+                    <span class="item-owner">{{ (item as FactionStationEntry).owner || 'neutral' }}</span>
+                    <span class="item-coords">({{ formatCoord((item as FactionStationEntry).x) }}, {{ formatCoord((item as FactionStationEntry).z) }})</span>
+                  </div>
+                  <span v-if="formatNpcModules((item as FactionStationEntry).modules)" class="item-secondary">{{ formatNpcModules((item as FactionStationEntry).modules) }}</span>
+                  <span v-if="formatStationFlags(item as FactionStationEntry)" class="item-secondary">{{ formatStationFlags(item as FactionStationEntry) }}</span>
                 </div>
               </template>
 
@@ -150,6 +166,7 @@ function formatNpcModules(modules: NpcStationEntry['modules'] | undefined): stri
                     <span class="item-coords">({{ formatCoord((item as NpcStationEntry).x) }}, {{ formatCoord((item as NpcStationEntry).z) }})</span>
                   </div>
                   <span v-if="formatNpcModules((item as NpcStationEntry).modules)" class="item-secondary">{{ formatNpcModules((item as NpcStationEntry).modules) }}</span>
+                  <span v-if="formatStationFlags(item as NpcStationEntry)" class="item-secondary">{{ formatStationFlags(item as NpcStationEntry) }}</span>
                 </div>
               </template>
 

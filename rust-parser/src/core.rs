@@ -221,10 +221,7 @@ impl SaveParserCore {
                 self.entry_idx = Some(to_int(a.get("index"), 0));
                 self.entry_ref = a.get("macro").cloned();
                 self.entry_eq.clear();
-            } else if !matches!(
-                self.station_owner.as_deref(),
-                Some("player") | Some("xenon") | Some("khaak")
-            ) {
+            } else if self.station_owner.is_some() {
                 if let Some(macro_ref) = a.get("macro").cloned() {
                     *self.npc_station_module_counts.entry(macro_ref).or_insert(0) += 1;
                 }
@@ -346,15 +343,16 @@ impl SaveParserCore {
                                     base,
                                     modules: std::mem::take(&mut self.player_station_mods),
                                 }),
-                                Some("xenon") => sd.xenon_stations.push(FactionStationEntry { base }),
-                                Some("khaak") => sd.khaak_stations.push(FactionStationEntry { base }),
+                                Some("xenon") => {
+                                    let modules = aggregated_modules(&mut self.npc_station_module_counts);
+                                    sd.xenon_stations.push(FactionStationEntry { base, modules });
+                                }
+                                Some("khaak") => {
+                                    let modules = aggregated_modules(&mut self.npc_station_module_counts);
+                                    sd.khaak_stations.push(FactionStationEntry { base, modules });
+                                }
                                 _ => {
-                                    let mut modules = self
-                                        .npc_station_module_counts
-                                        .drain()
-                                        .map(|(ref_field, amount)| AggregatedStationModule { ref_field, amount })
-                                        .collect::<Vec<_>>();
-                                    modules.sort_by(|a, b| a.ref_field.cmp(&b.ref_field));
+                                    let modules = aggregated_modules(&mut self.npc_station_module_counts);
                                     sd.npc_stations.push(NpcStationEntry { base, modules });
                                 }
                             }
@@ -499,4 +497,13 @@ fn ware_entries(input: &HashMap<String, i64>) -> Vec<DatavaultWareEntry> {
         .collect::<Vec<_>>();
     wares.sort_by(|a, b| a.ware.cmp(&b.ware));
     wares
+}
+
+fn aggregated_modules(input: &mut HashMap<String, i64>) -> Vec<AggregatedStationModule> {
+    let mut modules = input
+        .drain()
+        .map(|(ref_field, amount)| AggregatedStationModule { ref_field, amount })
+        .collect::<Vec<_>>();
+    modules.sort_by(|a, b| a.ref_field.cmp(&b.ref_field));
+    modules
 }

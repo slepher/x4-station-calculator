@@ -53,9 +53,22 @@
      - `npcStations`
    - 基础字段：`code, macro, owner, x/y/z, is_wreck, is_headquarter`
    - `owner="player"` 的 station 继续保留玩家站明细模块提取
-   - `owner!="player"` 且 `owner!="xenon"` 且 `owner!="khaak"` 的 station，额外提取所有 module 的聚合结果：
+   - `owner!="player"` 的 station 中：
+     - `npcStations`
+     - `xenonStations`
+     - `khaakStations`
+     都提取所有 module 的聚合结果：
      - `modules: [{ ref, amount }]`
-   - `owner="xenon"` 与 `owner="khaak"` 的 station 只做分类，不提取上述聚合 modules
+   - `npcStations` 与 `xenonStations` 额外根据聚合 modules / station macro 计算：
+     - `isShipyard`
+     - `isWharf`
+     - `isEquipmentdock`
+     - `isTradestation`
+   - `khaakStations` 只提取聚合 modules，不参与上述 `is*` 判定
+   - `khaakStations` 额外根据 station `macro` 计算：
+     - `landmarks_kha_nest_` → `isNest`
+     - `landmarks_kha_hive_` → `isHive`
+   - 上述 `npc/xenon/khaak` 的派生判定暂定放在 `src/workers/saveParserRust.worker.ts` 层处理，不下沉到 `rust-parser/src/core.rs`
    
 3. **Datavault**：`component class="datavault"`（单独类型）
    - 提取字段：`code, macro, owner, x/y/z, has_blueprints, has_wares, has_signalleak`
@@ -97,13 +110,13 @@
         { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [] }
       ],
       "xenonStations": [
-        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter" }
+        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [{ "ref": "buildmodule_xen_ships_xl", "amount": 1 }], "isShipyard": true }
       ],
       "khaakStations": [
-        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter" }
+        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [{ "ref": "module_khaak_special", "amount": 2 }], "isHive": true }
       ],
       "npcStations": [
-        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [{ "ref": "module_macro", "amount": 2 }] }
+        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [{ "ref": "buildmodule_arg_ships_m", "amount": 2 }], "isWharf": true }
       ],
       "datavaults": [
         { "code", "macro", "owner", "x", "y", "z", "has_blueprints", "has_wares", "has_signalleak", "unlocked": false, "wares": [{ "ware": "inv_spaceflyeggs", "amount": 4 }] }
@@ -165,7 +178,9 @@
 - Rust 端 gunzip 与 CLI progress 控制
 - sector owner 提取
 - station 按 `player/xenon/khaak/npc` 四组分类
-- npc station module 聚合提取（`modules: [{ ref, amount }]`）
+- `npcStations/xenonStations/khaakStations` 的聚合 modules 提取（`modules: [{ ref, amount }]`）
+- `npcStations/xenonStations` 的 `isShipyard/isWharf/isEquipmentdock/isTradestation` 判定
+- `khaakStations` 的 `isNest/isHive` 宏判定
 - datavault / erlking_vault 的 `unlocked` 与聚合 `wares`
 
 ### Out of Scope
@@ -194,12 +209,15 @@
 15. `scripts/extract_save.tsx --wasm` 输出的进度频率与内容由 Rust 侧控制，脚本不再自行补充判断
 16. 每个 sector 额外输出 `owner`
 17. station 按 `playerStations/xenonStations/khaakStations/npcStations` 分组输出
-18. `npcStations` 中的每个 station 额外输出聚合模块列表 `modules: [{ ref, amount }]`
+18. `npcStations/xenonStations/khaakStations` 中的每个 station 额外输出聚合模块列表 `modules: [{ ref, amount }]`
 19. `src/workers/saveParser.worker.ts` 不再承担新的业务提取演进
 20. 每个 datavault / erlking_vault 额外输出 `unlocked`
 21. 每个 datavault / erlking_vault 额外输出聚合后的 `wares: [{ ware, amount }]`
 22. `<unlock>` 缺失或 `state!="unlocked"` 时，`unlocked=false`
 23. 所有空数组字段不输出对应 key
+24. `npcStations/xenonStations` 额外输出 `isShipyard/isWharf/isEquipmentdock/isTradestation`
+25. `khaakStations` 不参与上述 `is*` 判定
+26. `khaakStations` 额外输出 `isNest/isHive`
 
 ## 未决项
 

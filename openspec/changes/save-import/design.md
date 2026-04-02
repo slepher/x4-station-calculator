@@ -142,9 +142,15 @@ interface PlayerStationModule {
 
 interface NpcStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
+  isShipyard?: boolean
+  isWharf?: boolean
+  isEquipmentdock?: boolean
+  isTradestation?: boolean
 }
 
-interface FactionStationEntry extends StationBaseEntry {}
+interface FactionStationEntry extends StationBaseEntry {
+  modules?: AggregatedStationModule[]
+}
 
 interface AggregatedStationModule {
   ref: string
@@ -312,11 +318,25 @@ getCurrentPosition(): Vector3 {
   - `khaakStations`
   - `npcStations`
 - `playerStations` 保留现有玩家站模块明细提取
-- `xenonStations` 与 `khaakStations` 只做分组，不追加 module 聚合
-- `npcStations` 额外提取所有 module 的聚合统计：
+- `npcStations`、`xenonStations`、`khaakStations` 额外提取所有 module 的聚合统计：
   - `modules: [{ ref, amount }]`
   - `ref` 为模块标识
   - `amount` 为该模块在站内出现次数
+- `npcStations` 与 `xenonStations` 额外基于聚合模块 / station macro 计算：
+  - `isShipyard`
+  - `isWharf`
+  - `isEquipmentdock`
+  - `isTradestation`
+- 判定规则：
+  - 模块包含 `buildmodule_*_ships_x` 或 `buildmodule_*_ships_xl` -> `isShipyard`
+  - 模块包含 `buildmodule_*_ships_m` -> `isWharf`
+  - 模块包含 `buildmodule_*_equip` -> `isEquipmentdock`
+  - station `macro` 包含 `tradestation` -> `isTradestation`
+- `khaakStations` 只保留聚合 modules，不参与上述 `is*` 判定
+- `khaakStations` 额外根据 station `macro` 输出：
+  - `landmarks_kha_nest_` -> `isNest`
+  - `landmarks_kha_hive_` -> `isHive`
+- 这些派生判定暂定放在 `src/workers/saveParserRust.worker.ts` 层完成，Rust core 继续只负责基础抽取与模块聚合
 - 所有空数组字段在导出 JSON 中省略，不输出 `[]`
 
 ### Decision 4: Datavault Loot Extraction
