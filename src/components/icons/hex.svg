@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" role="img" aria-label="Hex border icon">
+  <rect width="128" height="128" fill="#000"/>
+  <polygon
+    points="16,64 40,22.43 88,22.43 112,64 88,105.57 40,105.57"
+    fill="none"
+    stroke="#fff"
+    stroke-width="8"
+    stroke-linejoin="round"
+    stroke-linecap="round"
+  />
+</svg>
