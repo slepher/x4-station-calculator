@@ -1,27 +1,25 @@
 import math
 
 
-OUTER = [
-    (16.0, 64.0),
-    (40.0, 22.4307806183),
-    (88.0, 22.4307806183),
-    (112.0, 64.0),
-    (88.0, 105.5692193817),
-    (40.0, 105.5692193817),
-]
-
 CENTER = (64.0, 64.0)
-OUTER_RADIUS = 48.0
-OUTER_APOTHEM = OUTER_RADIUS * math.sqrt(3) / 2
+OUTER_RADIUS = 55.0
 BORDER = 8.0
-INNER_APOTHEM = OUTER_APOTHEM - BORDER
-INNER_RADIUS = 2 * INNER_APOTHEM / math.sqrt(3)
 NOTCH_LENGTH = 18.0
 NOTCH_DEPTH = 4.0
+NOTCH_TANGENT_BLEED = 1.0
 
 
-def fmt(point):
-    return tuple(round(v, 3) for v in point)
+def flat_top_hex_vertices(center, radius):
+    cx, cy = center
+    apothem = radius * math.sqrt(3) / 2
+    return [
+        (cx - radius, cy),
+        (cx - radius / 2, cy - apothem),
+        (cx + radius / 2, cy - apothem),
+        (cx + radius, cy),
+        (cx + radius / 2, cy + apothem),
+        (cx - radius / 2, cy + apothem),
+    ]
 
 
 def sub(a, b):
@@ -41,20 +39,15 @@ def norm(v):
     return (v[0] / length, v[1] / length)
 
 
-def inner_vertices():
-    scale = INNER_RADIUS / OUTER_RADIUS
-    result = []
-    for vertex in OUTER:
-        offset = sub(vertex, CENTER)
-        result.append(add(CENTER, mul(offset, scale)))
-    return result
+def fmt(point):
+    return tuple(round(v, 3) for v in point)
 
 
 def notch_polygon(a, b):
     tangent = norm(sub(b, a))
     inward = (-tangent[1], tangent[0])
     midpoint = ((a[0] + b[0]) / 2, (a[1] + b[1]) / 2)
-    half = NOTCH_LENGTH / 2
+    half = NOTCH_LENGTH / 2 + NOTCH_TANGENT_BLEED
     p1 = add(midpoint, mul(tangent, -half))
     p2 = add(midpoint, mul(tangent, half))
     p3 = add(p2, mul(inward, NOTCH_DEPTH))
@@ -62,11 +55,8 @@ def notch_polygon(a, b):
     return [p1, p2, p3, p4]
 
 
-print("inner")
-for point in inner_vertices():
-    print(fmt(point))
-
+outer = flat_top_hex_vertices(CENTER, OUTER_RADIUS)
+print("outer", [fmt(point) for point in outer])
 print("notches")
-for i in range(len(OUTER)):
-    polygon = notch_polygon(OUTER[i], OUTER[(i + 1) % len(OUTER)])
-    print([fmt(point) for point in polygon])
+for i in range(len(outer)):
+    print([fmt(point) for point in notch_polygon(outer[i], outer[(i + 1) % len(outer)])])
