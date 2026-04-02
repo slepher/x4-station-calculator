@@ -1,4 +1,3 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" shape-rendering="geometricPrecision">
-  <rect width="128" height="128" fill="#000"/>
   <path d="M 32 11 L 32 20 L 39 21 L 39 47 L 41 51 L 48 58 L 53 61 L 55 64 L 48 69 L 41 76 L 39 80 L 38 107 L 32 107 L 32 116 L 95 116 L 95 107 L 88 106 L 88 80 L 86 76 L 79 69 L 75 67 L 72 63 L 79 58 L 86 51 L 88 47 L 89 20 L 95 20 L 95 11 Z M 80 82 L 79 98 L 47 97 L 47 82 L 48 80 L 64 68 L 75 76 Z M 48 29 L 80 30 L 80 45 L 79 47 L 63 59 L 48 47 L 47 45 Z" fill="#fff" fill-rule="evenodd"/>
 </svg>
