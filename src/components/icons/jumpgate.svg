@@ -1,3 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="128" height="128" viewBox="0 0 128 128" shape-rendering="geometricPrecision">
-  <path d="M 28 100 L 36 108 L 38 108 L 64 83 L 89 108 L 91 108 L 99 99 L 64 64 Z M 27 40 L 22 51 L 20 64 L 23 79 L 27 87 L 30 89 L 35 83 L 31 77 L 29 70 L 29 57 L 31 50 L 36 42 L 42 36 L 57 29 L 70 29 L 76 31 L 85 36 L 93 45 L 98 57 L 98 70 L 92 84 L 98 89 L 100 87 L 106 72 L 107 64 L 106 55 L 100 40 L 87 27 L 72 21 L 55 21 L 40 27 Z" fill="#fff" fill-rule="evenodd"/>
+  <path d="M 28 100 L 36 108 L 38 108 L 64 83 L 89 108 L 91 108 L 99 99 L 64 64 Z" fill="#fff"/>
+  <path d="M 42.5 26.761
+           A 43 43 0 0 1 101.239 85.5
+           L 94.311 81.5
+           A 35 35 0 0 0 46.5 33.689
+           Z" fill="#fff"/>
+  <path d="M 26.761 85.5
+           A 43 43 0 0 1 85.5 26.761
+           L 81.5 33.689
+           A 35 35 0 0 0 33.689 81.5
+           Z" fill="#fff"/>
 </svg>
