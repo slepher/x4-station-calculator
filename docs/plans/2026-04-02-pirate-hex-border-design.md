@@ -4,8 +4,8 @@
 
 Extract the border language from the pirate station icons into two reusable SVG assets:
 
-- `hex.svg`: rounded regular hexagon border
-- `hex_headquarters.svg`: the same border with one rectangular cut removed from each side
+- `hexagon.svg`: rounded regular hexagon border
+- `hexagon_headquarter.svg`: the same border with one rectangular cut removed from each side
 
 ## Geometry
 
@@ -18,8 +18,8 @@ Extract the border language from the pirate station icons into two reusable SVG 
 
 ## Variants
 
-- `hex.svg` keeps the border continuous.
-- `hex_headquarters.svg` uses a mask to subtract one small rectangle from each edge, matching the interrupted-border feel of the existing headquarters icon.
+- `hexagon.svg` keeps the border continuous.
+- `hexagon_headquarter.svg` matches the interrupted-border feel of the existing headquarter icon.
 
 ## Rendering
 
