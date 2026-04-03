@@ -182,7 +182,7 @@ describe('save parser rust worker enrichment', () => {
               zones: {
                 Zone_Alpha: {
                   id: 'Zone_Alpha',
-                  position: { x: 100, y: 200, z: 300 }
+                  raw_sector_pos: { x: 100, y: 200, z: 300 }
                 }
               }
             }
@@ -191,13 +191,87 @@ describe('save parser rust worker enrichment', () => {
       }
     })
 
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position).toEqual({
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position).toMatchObject({
       x: 110,
-      y: 220,
+      y: 20,
       z: 330
     })
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(0.2409979253022731, 12)
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty).toBeCloseTo(-0.7229937759068192, 12)
     expect(archive.meta.post_processor_version).toBe('v2')
     expect(archive.isValid).toBe(true)
+  })
+
+  it('recenters imported positions using the snapped bounding-box center of all zone points in the sector', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v2',
+        source: 'original'
+      },
+      isCompatible: true,
+      isValid: true,
+      sectors: {
+        cluster_01_sector001_macro: {
+          name: 'cluster_01_sector001_macro',
+          is_known: true,
+          npcStations: [{
+            code: 'NPC',
+            macro: 'station_arg_factory_macro',
+            owner: 'argon',
+            x: 1,
+            y: 2,
+            z: 3,
+            relative_position: { x: 5000, y: 0, z: 0 },
+            zone_id: 'zone_right'
+          }]
+        }
+      }
+    }, undefined, {
+      clusters: {
+        cluster_01: {
+          id: 'cluster_01',
+          nameId: '',
+          name: 'Cluster 01',
+          dlc_tag: 'base',
+          owner: 'argon',
+          owner_color: '#8899aa',
+          sectors: {
+            Cluster_01_Sector001_macro: {
+              id: 'Cluster_01_Sector001_macro',
+              cluster_id: 'cluster_01',
+              nameId: '',
+              name: 'Sector',
+              owner: 'argon',
+              owner_color: '#8899aa',
+              zones: {
+                Zone_Left: {
+                  id: 'Zone_Left',
+                  raw_sector_pos: { x: 70000, y: 0, z: 0 }
+                },
+                Zone_Right: {
+                  id: 'Zone_Right',
+                  raw_sector_pos: { x: 90000, y: 0, z: 0 }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position).toMatchObject({
+      x: 31000,
+      y: 0,
+      z: 0
+    })
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(0.8260550005328491, 12)
+    expect(Object.is(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty, -0) ? 0 : archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty).toBe(0)
   })
 
   it('derives station flags in worker layer', () => {

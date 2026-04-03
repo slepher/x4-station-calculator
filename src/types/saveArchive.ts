@@ -78,7 +78,7 @@ export interface StationBaseEntry {
   owner: string
   relative_position: { x: number; y: number; z: number }
   zone_id?: string
-  position: { x: number; y: number; z: number }
+  position: { x: number; y: number; z: number; tx?: number; ty?: number }
   is_wreck?: boolean
   is_headquarter?: boolean
   tag?: string
@@ -140,7 +140,7 @@ export interface DatavaultEntry {
   owner: string
   relative_position: { x: number; y: number; z: number }
   zone_id?: string
-  position: { x: number; y: number; z: number }
+  position: { x: number; y: number; z: number; tx?: number; ty?: number }
   unlocked: boolean
   wares?: DatavaultWareEntry[]
   has_blueprints?: boolean
@@ -154,7 +154,7 @@ export interface AbandonedShipEntry {
   class: string
   relative_position: { x: number; y: number; z: number }
   zone_id?: string
-  position: { x: number; y: number; z: number }
+  position: { x: number; y: number; z: number; tx?: number; ty?: number }
 }
 
 export interface SectorData {
@@ -188,7 +188,7 @@ export interface SavePoiOverlayItem {
   owner?: string
   sectorMacro: string
   sectorName: string
-  pos: { x: number; z: number }
+  position: { x: number; z: number; tx?: number; ty?: number }
   tag?: string
   factoryGroup?: string
   is_headquarter?: boolean

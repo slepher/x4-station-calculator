@@ -11,6 +11,8 @@ const props = defineProps<{
   open: boolean
   archive: SaveArchive | null
   visibility: SavePoiVisibility
+  excludeConditionalSmallStations: boolean
+  isClusterOverview: boolean
 }>()
 
 const emit = defineEmits<{
@@ -18,6 +20,7 @@ const emit = defineEmits<{
   (e: 'select-archive', payload: { guid: string; time: number } | null): void
   (e: 'visibility-change', visibility: SavePoiVisibility): void
   (e: 'active-category-change', category: SavePoiCategory | null): void
+  (e: 'exclude-conditional-small-stations-change', value: boolean): void
   (e: 'focus-poi', poi: SavePoiOverlayItem): void
 }>()
 
@@ -100,6 +103,10 @@ function onPoiFocus(poi: SavePoiOverlayItem) {
   emit('focus-poi', poi)
 }
 
+function onExcludeConditionalSmallStationsChange(event: Event) {
+  emit('exclude-conditional-small-stations-change', (event.target as HTMLInputElement).checked)
+}
+
 function onClose() {
   emit('active-category-change', null)
   emit('close')
@@ -148,6 +155,8 @@ watch(() => props.archive, (archive) => {
         v-else-if="layer === 'category'"
         :archive="archive"
         :visibility="visibility"
+        :exclude-conditional-small-stations="excludeConditionalSmallStations"
+        :is-cluster-overview="isClusterOverview"
         @visibility-change="onVisibilityChange"
         @select-category="onCategorySelect"
       />
@@ -156,9 +165,20 @@ watch(() => props.archive, (archive) => {
         v-else-if="layer === 'coord'"
         :archive="archive"
         :category="selectedCategory!"
+        :exclude-conditional-small-stations="excludeConditionalSmallStations"
+        :is-cluster-overview="isClusterOverview"
         @focus-poi="onPoiFocus"
       />
     </div>
+
+    <label v-if="archive" class="map-save-panel__toggle">
+      <input
+        type="checkbox"
+        :checked="excludeConditionalSmallStations"
+        @change="onExcludeConditionalSmallStationsChange"
+      />
+      <span>{{ t('map.save_exclude_small_station_toggle') }}</span>
+    </label>
 
     <div class="map-save-panel__hint">
       {{ t('map.save_panel_hint') }}
@@ -203,5 +223,13 @@ watch(() => props.archive, (archive) => {
 
 .map-save-panel__hint {
   @apply pt-2 text-xs text-amber-100/60;
+}
+
+.map-save-panel__toggle {
+  @apply mt-3 flex items-center gap-2 text-sm text-amber-100/85;
+}
+
+.map-save-panel__toggle input[type="checkbox"] {
+  @apply h-4 w-4 accent-amber-400 rounded border-amber-300/30;
 }
 </style>

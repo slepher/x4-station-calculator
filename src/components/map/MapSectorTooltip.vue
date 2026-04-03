@@ -86,6 +86,16 @@ const resources = computed(() => {
     }
   })
 })
+
+const sectorCenterPos = computed(() => {
+  const sector = gameDataStore.maps?.clusters?.[sectorInfo.value?.clusterId || '']?.sectors?.[props.sectorId] as
+    | { raw_center_pos?: { x?: number; y?: number; z?: number } }
+    | undefined
+  const center = sector?.raw_center_pos
+  if (center?.x === undefined || center?.z === undefined) return null
+  const formatKm = (value: number) => `${Math.round(value / 1000)}km`
+  return `(${formatKm(center.x)}, ${formatKm(center.z)})`
+})
 </script>
 
 <template>
@@ -105,6 +115,11 @@ const resources = computed(() => {
         <span class="resource-value">{{ resource.respawn }}</span>
         <span class="resource-rating">{{ resource.yieldLabel }}</span>
       </template>
+    </div>
+
+    <div v-if="sectorCenterPos" class="sector-center-line">
+      <span class="sector-center-label">{{ t('map.sector_center_coords') }}</span>
+      <span class="sector-center-value" data-testid="map-sector-tooltip-center">{{ sectorCenterPos }}</span>
     </div>
 
     <div v-if="hasKhaakHive || khaakHiveSourceNames.length > 0" class="khaak-info">
@@ -186,6 +201,26 @@ const resources = computed(() => {
   line-height: 1.2;
   text-align: right;
   color: rgba(255, 247, 237, 0.82);
+}
+
+.sector-center-line {
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(252, 211, 77, 0.2);
+  display: grid;
+  gap: 4px;
+}
+
+.sector-center-label {
+  font-size: 12px;
+  color: rgba(255, 247, 237, 0.7);
+}
+
+.sector-center-value {
+  font-size: 12px;
+  line-height: 1.35;
+  color: rgba(255, 247, 237, 0.92);
+  font-family: Consolas, 'Courier New', monospace;
 }
 
 .khaak-info {

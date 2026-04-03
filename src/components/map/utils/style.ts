@@ -31,7 +31,8 @@ export const OVERLAY_ICON_SIZE = 18
 export const SMALL_ICON_SIZE = 9
 export const PREVIEW_ICON_SIZE = 20
 export const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
-const LARGE_ICON_TYPES = ['shipyard', 'wharf', 'tradestation', 'equipmentdock', 'playerhq', 'hive']
+const LARGE_ICON_TYPES = ['shipyard', 'wharf', 'tradestation', 'equipmentdock', 'playerhq', 'hive', 'piratebase']
+const CONDITIONAL_SMALL_ICON_CATEGORIES = new Set(['npcStation', 'xenonStation', 'khaakStation'])
 
 export const SAVE_POI_COLORS: SavePoiColorMap = {
   playerStation: '#fbbf24',
@@ -114,6 +115,14 @@ export function getSavePoiIconSize(poi: SavePoiOverlayItem): number {
     return OVERLAY_ICON_SIZE
   }
   return SMALL_ICON_SIZE
+}
+
+export function isLargeSavePoiIcon(poi: SavePoiOverlayItem): boolean {
+  return Boolean(poi.tag && LARGE_ICON_TYPES.includes(poi.tag))
+}
+
+export function shouldHideSavePoiSmallIconAtClusterOverview(poi: SavePoiOverlayItem): boolean {
+  return CONDITIONAL_SMALL_ICON_CATEGORIES.has(poi.category) && !isLargeSavePoiIcon(poi)
 }
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {

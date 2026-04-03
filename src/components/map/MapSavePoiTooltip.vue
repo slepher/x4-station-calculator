@@ -45,7 +45,7 @@ function formatCoord(value: number): string {
     </div>
     <div class="tooltip-row">
       <span class="tooltip-label">{{ t('map.save_poi_tooltip_coords') }}:</span>
-      <span class="tooltip-value">({{ formatCoord(poi.pos.x) }}, {{ formatCoord(poi.pos.z) }})</span>
+      <span class="tooltip-value">({{ formatCoord(poi.position.x) }}, {{ formatCoord(poi.position.z) }})</span>
     </div>
     <div class="tooltip-row">
       <span class="tooltip-label">星区:</span>

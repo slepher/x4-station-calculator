@@ -10,6 +10,8 @@ import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { resolveMapSectorByMacro } from './mapSectorMacro'
+import { getSectorScalePerRadius } from '@/components/map/utils/coordinates'
+import { shouldHideSavePoiSmallIconAtClusterOverview } from '@/components/map/utils/style'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
@@ -109,6 +111,7 @@ const minScale = ref(1)
 const maxScale = ref(4)
 const scale = ref(0)
 const zoomPercent = ref(0)
+const clusterVisibilityThresholdPx = ref(0)
 
 const panX = ref(0)
 const panY = ref(0)
@@ -130,6 +133,7 @@ const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
 const selectedSaveArchive = ref<SaveArchive | null>(null)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
+const excludeConditionalSmallStations = ref(true)
 const savePoiVisibility = ref<SavePoiVisibility>({
   playerStation: false,
   npcStation: false,
@@ -180,7 +184,7 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
         displayName,
         sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100),
         resources: Array.isArray(sector.resources) ? sector.resources : [],
-        scalePerRadius: Number(sector.normalized?.scale_per_radius || 0)
+        scalePerRadius: getSectorScalePerRadius(sector as any)
       }
     })
   })
@@ -270,9 +274,17 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
     savePoiVisibility.value,
     activeSavePoiCategory.value
   )
+  const isClusterOverview =
+    clusterVisibilityThresholdPx.value > 0 &&
+    clusterRefHeightPx.value * scale.value <= clusterVisibilityThresholdPx.value
+  const shouldCullHiddenSmallIcons = isDragging.value || isClusterOverview
 
   return saveStore
-    .getArchivePoiOverlays(selectedSaveArchive.value, activeCategories)
+    .getArchivePoiOverlays(selectedSaveArchive.value, activeCategories, {
+      excludeConditionalSmallStations: excludeConditionalSmallStations.value,
+      isClusterOverview
+    })
+    .filter((overlay) => !shouldCullHiddenSmallIcons || !shouldHideSavePoiSmallIconAtClusterOverview(overlay))
     .map((overlay) => {
       const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, overlay.sectorMacro)
       const sectorData = resolved ? sectorsById.value[resolved.sectorId] : null
@@ -281,6 +293,22 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
         sectorName: sectorData?.displayName || overlay.sectorName
       }
     })
+})
+
+const isClusterOverview = computed(() =>
+  clusterVisibilityThresholdPx.value > 0 &&
+  clusterRefHeightPx.value * scale.value <= clusterVisibilityThresholdPx.value
+)
+
+const savePoiViewportContentBounds = computed(() => {
+  const { width, height } = getViewportSize()
+  if (!width || !height || !scale.value) return null
+  return {
+    left: (-panX.value) / scale.value,
+    top: (-panY.value) / scale.value,
+    right: (width - panX.value) / scale.value,
+    bottom: (height - panY.value) / scale.value
+  }
 })
 
 const sectorOwnerOverride = computed<Record<string, string> | undefined>(() => {
@@ -394,8 +422,8 @@ const syncSliderFromScale = () => {
 
 const recomputeScaleBounds = () => {
   if (!imageNaturalWidth.value || !imageNaturalHeight.value) return
-  const { width: vw } = getViewportSize()
-  if (!vw) return
+  const { width: vw, height: vh } = getViewportSize()
+  if (!vw || !vh) return
 
   const fitByWidth = vw / imageNaturalWidth.value
   const nextMin = fitByWidth
@@ -405,6 +433,7 @@ const recomputeScaleBounds = () => {
 
   minScale.value = nextMin
   maxScale.value = nextMax
+  clusterVisibilityThresholdPx.value = Math.min(vw, vh) / 3
   scale.value = clampScale(scale.value || nextMin)
   syncSliderFromScale()
   clampPan(panX.value, panY.value)
@@ -1235,10 +1264,13 @@ onBeforeUnmount(() => {
         :open="isSavePanelOpen"
         :archive="selectedSaveArchive"
         :visibility="savePoiVisibility"
+        :exclude-conditional-small-stations="excludeConditionalSmallStations"
+        :is-cluster-overview="isClusterOverview"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
         @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
+        @exclude-conditional-small-stations-change="excludeConditionalSmallStations = $event"
         @focus-poi="onSavePoiFocus"
       />
 
@@ -1272,9 +1304,16 @@ onBeforeUnmount(() => {
               :selected-sector-id="selectedSectorId"
               :placement-overlays="placementOverlays"
               :placement-preview="isStationPanelOpen ? placementPreview : null"
+              :is-dragging="isDragging"
               :dragging-overlay-key="draggingOverlayKey"
               :focused-overlay-key="focusedPlacementKey"
               :save-poi-overlays="savePoiOverlays"
+              :viewport-content-bounds="savePoiViewportContentBounds"
+              :min-scale="minScale"
+              :max-scale="maxScale"
+              :current-scale="scale"
+              :zoom-progress="zoomPercent / 100"
+              :cluster-visibility-threshold-px="clusterVisibilityThresholdPx"
               :focused-save-poi-key="focusedSavePoiKey"
               :sector-owner-override="sectorOwnerOverride"
               :cluster-owner-override="clusterOwnerOverride"

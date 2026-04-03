@@ -8,7 +8,6 @@ import {
   MAP_FONT_FAMILY,
   OVERLAY_ICON_SIZE,
   PREVIEW_ICON_SIZE,
-  getSavePoiIconSize,
   getSavePoiIconUrl,
   placementIconHref,
   svgIdSafe
@@ -62,9 +61,21 @@ const props = withDefaults(defineProps<{
   selectedSectorId?: string | null
   placementOverlays?: PlacementOverlay[]
   placementPreview?: PlacementPreview | null
+  isDragging?: boolean
   draggingOverlayKey?: string | null
   focusedOverlayKey?: string | null
   savePoiOverlays?: SavePoiOverlayItem[]
+  viewportContentBounds?: {
+    left: number
+    top: number
+    right: number
+    bottom: number
+  } | null
+  minScale?: number
+  maxScale?: number
+  currentScale?: number
+  zoomProgress?: number
+  clusterVisibilityThresholdPx?: number
   focusedSavePoiKey?: string | null
   sectorOwnerOverride?: Record<string, string>
   clusterOwnerOverride?: Record<string, string>
@@ -78,9 +89,16 @@ const props = withDefaults(defineProps<{
   selectedSectorId: null,
   placementOverlays: () => [],
   placementPreview: null,
+  isDragging: false,
   draggingOverlayKey: null,
   focusedOverlayKey: null,
   savePoiOverlays: () => [],
+  viewportContentBounds: null,
+  minScale: 1,
+  maxScale: 1,
+  currentScale: 1,
+  zoomProgress: 0,
+  clusterVisibilityThresholdPx: 0,
   focusedSavePoiKey: null,
   sectorOwnerOverride: undefined,
   clusterOwnerOverride: undefined,
@@ -150,6 +168,7 @@ const emitSectorLeave = (sectorId: string) => {
 const placementOverlaysRef = toRef(props, 'placementOverlays')
 const placementPreviewRef = toRef(props, 'placementPreview')
 const savePoiOverlaysRef = toRef(props, 'savePoiOverlays')
+const viewportContentBoundsRef = toRef(props, 'viewportContentBounds')
 const factionColorMapRef = toRef(props, 'factionColorMap')
 
 const {
@@ -225,6 +244,13 @@ const {
   placementOverlays: placementOverlaysRef,
   placementPreview: placementPreviewRef,
   savePoiOverlays: savePoiOverlaysRef,
+  viewportContentBounds: viewportContentBoundsRef,
+  minScale: toRef(props, 'minScale'),
+  maxScale: toRef(props, 'maxScale'),
+  currentScale: toRef(props, 'currentScale'),
+  zoomProgress: toRef(props, 'zoomProgress'),
+  clusterVisibilityThresholdPx: toRef(props, 'clusterVisibilityThresholdPx'),
+  isDragging: toRef(props, 'isDragging'),
   factionColorMap: factionColorMapRef
 })
 
@@ -348,7 +374,6 @@ watchEffect(() => {
       :preview-icon-size="PREVIEW_ICON_SIZE"
       :placement-icon-href="placementIconHref"
       :get-save-poi-icon-url="getSavePoiIconUrl"
-      :get-save-poi-icon-size="getSavePoiIconSize"
       @overlay-pointerdown="emit('overlay-pointerdown', $event)"
       @save-poi-pointerdown="emit('save-poi-pointerdown', $event)"
     />

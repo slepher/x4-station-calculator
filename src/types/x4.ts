@@ -896,15 +896,15 @@ export interface X4MapSector {
   }
   raw_local_pos?: { x: number; z: number }
   raw_world_pos?: { x: number; z: number }
+  raw_center_pos?: { x: number; y: number; z: number }
   normalized?: {
     axial?: { q: number; r: number }
     pixel_basis?: { x: number; y: number }
   }
   zones?: Record<string, {
     id: string
-    position: { x: number; y: number; z: number }
     kind?: 'zone' | 'shcon'
-    raw_sector_pos?: { x: number; z: number; sx?: number; sy?: number }
+    raw_sector_pos?: { x: number; y: number; z: number; sx?: number; sy?: number }
   }>
 }
 

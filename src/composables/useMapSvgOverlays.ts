@@ -1,10 +1,21 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
-import { clusterRatioToScreen, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
-import { SAVE_POI_COLORS, colorToFeColorMatrix, svgIdSafe } from '@/components/map/utils/style'
+import { clusterRatioToScreen, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
+import {
+  OVERLAY_ICON_SIZE,
+  SMALL_ICON_SIZE,
+  SAVE_POI_COLORS,
+  colorToFeColorMatrix,
+  isLargeSavePoiIcon,
+  shouldHideSavePoiSmallIconAtClusterOverview,
+  svgIdSafe
+} from '@/components/map/utils/style'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
 import type { Cluster, PlacementOverlay, PlacementPreview, Sector } from '@/components/map/types'
 import type { MapSvgLayoutState } from './useMapSvgLayout'
+
+const SAVE_POI_VIEWPORT_MARGIN = 24
+const LARGE_ICON_MAX_CLUSTER_SCALE = 0.5
 
 export function useMapSvgOverlays(args: {
   clusters: ComputedRef<Record<string, Cluster>>
@@ -12,8 +23,25 @@ export function useMapSvgOverlays(args: {
   placementOverlays: Ref<PlacementOverlay[]>
   placementPreview: Ref<PlacementPreview | null>
   savePoiOverlays: Ref<SavePoiOverlayItem[]>
+  viewportContentBounds: Ref<{
+    left: number
+    top: number
+    right: number
+    bottom: number
+  } | null>
+  minScale: Ref<number>
+  maxScale: Ref<number>
+  currentScale: Ref<number>
+  zoomProgress: Ref<number>
+  clusterVisibilityThresholdPx: Ref<number>
+  isDragging: Ref<boolean>
   factionColorMap: Ref<Record<string, string> | undefined>
 }) {
+  const resolveSectorScreenRatio = (sector: Sector, point?: { x: number; z: number } | null) => {
+    if (!point) return null
+    return sectorRatioToClusterRatio(sector.normalized, sectorPointToLocalRatio(sector, point))
+  }
+
   const overlayScreenItems = computed(() => {
     const { centers, clusterRadius } = args.layoutState.value
     return args.placementOverlays.value
@@ -21,14 +49,8 @@ export function useMapSvgOverlays(args: {
         const cluster = args.clusters.value[overlay.location.cluster_id]
         const sector = cluster?.sectors?.[overlay.location.sector_id]
         const center = centers[overlay.location.cluster_id]
-        const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
-        const sectorRadiusRatio = Number(sector?.normalized?.sector_radius_ratio || 0)
-        const sectorCenter = sector?.normalized?.center_offset_ratio
-        if (!cluster || !sector || !center || !scalePerRadius || !sectorCenter || !sectorRadiusRatio) return null
-        const ratio = sectorRatioToClusterRatio(sector.normalized, {
-          x: overlay.location.pos.x * scalePerRadius,
-          y: -overlay.location.pos.z * scalePerRadius
-        })
+        if (!cluster || !sector || !center) return null
+        const ratio = resolveSectorScreenRatio(sector, overlay.location.pos)
         if (!ratio) return null
         const point = clusterRatioToScreen(center, clusterRadius, ratio)
         return { ...overlay, x: point.x, y: point.y }
@@ -56,32 +78,64 @@ export function useMapSvgOverlays(args: {
   const savePoiScreenItems = computed(() => {
     const { centers, clusterRadius } = args.layoutState.value
     const factionColorMap = args.factionColorMap.value
+    const viewportBounds = args.viewportContentBounds.value
+    const clusterDisplayDiameterPx = clusterRadius * 2 * args.currentScale.value
+    const clampedScale = Math.max(args.currentScale.value, 1e-6)
+    const halfClusterScreenSizeAtThreshold = clusterRadius * LARGE_ICON_MAX_CLUSTER_SCALE
+    const maxScaleScreenSize = OVERLAY_ICON_SIZE * args.maxScale.value
+    const largeIconScreenSize = args.currentScale.value <= LARGE_ICON_MAX_CLUSTER_SCALE
+      ? clusterRadius * args.currentScale.value
+      : halfClusterScreenSizeAtThreshold + (maxScaleScreenSize - halfClusterScreenSizeAtThreshold) * Math.max(
+        0,
+        Math.min(
+          1,
+          (args.currentScale.value - LARGE_ICON_MAX_CLUSTER_SCALE) /
+            Math.max(args.maxScale.value - LARGE_ICON_MAX_CLUSTER_SCALE, 1e-6)
+        )
+      )
+    const hideConditionalSmallIcons =
+      args.isDragging.value ||
+      (args.clusterVisibilityThresholdPx.value > 0 &&
+        clusterDisplayDiameterPx <= args.clusterVisibilityThresholdPx.value)
     return args.savePoiOverlays.value
       .map((poi) => {
         const resolved = resolveMapSectorByMacro(args.clusters.value, poi.sectorMacro)
         if (!resolved) return null
         const center = centers[resolved.clusterId]
         const sector = resolved.sector as Sector
-        const scalePerRadius = Number(sector.normalized?.scale_per_radius || 0)
         const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
         const sectorCenter = sector.normalized?.center_offset_ratio
-        if (!center || !scalePerRadius || !sectorCenter || !sectorRadiusRatio) return null
+        if (!center || poi.position.tx === undefined || poi.position.ty === undefined || !sectorCenter || !sectorRadiusRatio) return null
+        if (hideConditionalSmallIcons && shouldHideSavePoiSmallIconAtClusterOverview(poi)) return null
         const ratio = sectorRatioToClusterRatio(sector.normalized, {
-          x: poi.pos.x * scalePerRadius,
-          y: -poi.pos.z * scalePerRadius
+          x: poi.position.tx,
+          y: poi.position.ty
         })
         if (!ratio) return null
         const point = clusterRatioToScreen(center, clusterRadius, ratio)
+        if (viewportBounds) {
+          const withinX =
+            point.x >= viewportBounds.left - SAVE_POI_VIEWPORT_MARGIN &&
+            point.x <= viewportBounds.right + SAVE_POI_VIEWPORT_MARGIN
+          const withinY =
+            point.y >= viewportBounds.top - SAVE_POI_VIEWPORT_MARGIN &&
+            point.y <= viewportBounds.bottom + SAVE_POI_VIEWPORT_MARGIN
+          if (!withinX || !withinY) return null
+        }
         const factionColor = poi.owner && factionColorMap?.[poi.owner] ? factionColorMap[poi.owner] : null
+        const iconSize = isLargeSavePoiIcon(poi)
+          ? largeIconScreenSize / clampedScale
+          : SMALL_ICON_SIZE
         return {
           ...poi,
           x: point.x,
           y: point.y,
           color: SAVE_POI_COLORS[poi.category],
-          factionFilterId: factionColor ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` : null
+          factionFilterId: factionColor ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` : null,
+          iconSize
         }
       })
-      .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null } => !!item)
+      .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number } => !!item)
   })
 
   const previewScreenItem = computed(() => {
@@ -90,12 +144,8 @@ export function useMapSvgOverlays(args: {
     const cluster = args.clusters.value[preview.location.cluster_id]
     const sector = cluster?.sectors?.[preview.location.sector_id]
     const center = args.layoutState.value.centers[preview.location.cluster_id]
-    const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
-    if (!cluster || !sector || !center || !scalePerRadius) return null
-    const ratio = sectorRatioToClusterRatio(sector.normalized, {
-      x: preview.location.pos.x * scalePerRadius,
-      y: -preview.location.pos.z * scalePerRadius
-    })
+    if (!cluster || !sector || !center) return null
+    const ratio = resolveSectorScreenRatio(sector, preview.location.pos)
     if (!ratio) return null
     const point = clusterRatioToScreen(center, args.layoutState.value.clusterRadius, ratio)
     return { ...preview, x: point.x, y: point.y }

@@ -1,6 +1,6 @@
 import { computed, type ComputedRef } from 'vue'
 import { buildHighwayPathPoints, catmullRomToBezierPath, clipPolylineToConvexPolygon, hexVertices } from '@/components/map/utils/geometry'
-import { clusterRatioToScreen, gateClusterRatioFromRaw, getSectorViewportTransform, sectorLocalRatioToScreen, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
+import { clusterRatioToScreen, gateClusterRatioFromRaw, getSectorViewportTransform, sectorLocalRatioToScreen, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
 import type { Cluster, Vec2 } from '@/components/map/types'
 import type { MapSvgLayoutState } from './useMapSvgLayout'
 
@@ -31,8 +31,8 @@ export function useMapSvgLinks(args: {
         if (!sectorA || !sectorB || !link.from_zone_id || !link.to_zone_id) return
         const fromRaw = sectorA.zones?.[link.from_zone_id]?.raw_sector_pos
         const toRaw = sectorB.zones?.[link.to_zone_id]?.raw_sector_pos
-        const fromRatio = fromRaw?.sx !== undefined && fromRaw?.sy !== undefined ? { x: fromRaw.sx, y: fromRaw.sy } : null
-        const toRatio = toRaw?.sx !== undefined && toRaw?.sy !== undefined ? { x: toRaw.sx, y: toRaw.sy } : null
+        const fromRatio = sectorPointToLocalRatio(sectorA, fromRaw)
+        const toRatio = sectorPointToLocalRatio(sectorB, toRaw)
         const startRatio = sectorRatioToClusterRatio(sectorA.normalized, fromRatio)
         const endRatio = sectorRatioToClusterRatio(sectorB.normalized, toRatio)
         if (!startRatio || !endRatio) return
@@ -62,19 +62,17 @@ export function useMapSvgLinks(args: {
         const sectorHex = hexVertices(transform.center.x, transform.center.y, transform.sectorRadius)
 
         Object.entries(sector.highways || {}).forEach(([highwayId, highway]) => {
-          const entry = highway.entry
-          const exit = highway.exit
+          const entry = highway.entry_pos || highway.entry
+          const exit = highway.exit_pos || highway.exit
           if (!entry || !exit) return
-          if (entry.sx === undefined || entry.sy === undefined || exit.sx === undefined || exit.sy === undefined) return
 
-          const start = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: entry.sx, y: entry.sy })
-          const end = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: exit.sx, y: exit.sy })
+          const start = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, sectorPointToLocalRatio(sector, entry))
+          const end = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, sectorPointToLocalRatio(sector, exit))
           if (!start || !end) return
 
           const middlePoints: Vec2[] = []
-          ;(highway.spline || []).forEach((point) => {
-            if (point.sx === undefined || point.sy === undefined) return
-            const screenPoint = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: point.sx, y: point.sy })
+          ;((highway.spline || []) as Array<{ x?: number; z?: number; sx?: number; sy?: number }>).forEach((point) => {
+            const screenPoint = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, sectorPointToLocalRatio(sector, point))
             if (screenPoint) middlePoints.push(screenPoint)
           })
 
@@ -116,7 +114,7 @@ export function useMapSvgLinks(args: {
       sectors.forEach((sector) => {
         const sectorColor = args.resolveOwnerColor(sector, sector.id, clusterId)
         Object.entries(sector.cluster_gates || {}).forEach(([gateId, gate]) => {
-          const ratio = gateClusterRatioFromRaw(gate, sector.normalized)
+          const ratio = gateClusterRatioFromRaw(gate, sector)
           if (!ratio) return
           rows.push({
             id: `${clusterId}:${sector.id}:${gateId}`,
