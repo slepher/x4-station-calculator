@@ -10,6 +10,7 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useStationStore } from '@/store/useStationStore'
 import { useSaveStore } from '@/store/useSaveStore'
+import { useMapStore } from '@/store/useMapStore'
 
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
@@ -17,6 +18,7 @@ const empireStore = useEmpireStore()
 const shipBuildStore = useShipBuildStore()
 const stationStore = useStationStore()
 const saveStore = useSaveStore()
+const mapStore = useMapStore()
 
 const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
 const isInitializing = ref(true)
@@ -35,6 +37,7 @@ async function initializeApp() {
     await Promise.all([
       empireStore.initialize(),
       logicFlowStore.init(),
+      mapStore.initialize(),
       shipBuildStore.initialize(),
       saveStore.initialize()
     ])

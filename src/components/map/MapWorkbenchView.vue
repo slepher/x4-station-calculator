@@ -9,10 +9,10 @@ import MapSavePanel from './MapSavePanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
-import { resolveMapSectorByMacro } from './mapSectorMacro'
 import { getSectorScalePerRadius } from '@/components/map/utils/coordinates'
 import { shouldHideSavePoiSmallIconAtClusterOverview } from '@/components/map/utils/style'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useMapStore } from '@/store/useMapStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
@@ -173,6 +173,7 @@ const lastMousePos = ref({ x: 0, y: 0 })
 
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
+const mapStore = useMapStore()
 const saveStore = useSaveStore()
 const empireStore = useEmpireStore()
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
@@ -282,19 +283,14 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
     savePoiVisibility.value,
     activeSavePoiCategory.value
   )
-  const isClusterOverview =
-    clusterVisibilityThresholdPx.value > 0 &&
-    clusterRefHeightPx.value * scale.value <= clusterVisibilityThresholdPx.value
-  const shouldCullHiddenSmallIcons = isClusterOverview
 
   return saveStore
     .getArchivePoiOverlays(selectedSaveArchive.value, activeCategories, {
-      excludeConditionalSmallStations: excludeConditionalSmallStations.value,
-      isClusterOverview
+      excludeConditionalSmallStations: excludeConditionalSmallStations.value
     })
-    .filter((overlay) => !shouldCullHiddenSmallIcons || !shouldHideSavePoiSmallIconAtClusterOverview(overlay))
     .map((overlay) => {
-      const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, overlay.sectorMacro)
+      const resolved = mapStore.resolveSectorByMacro?.(overlay.sectorMacro) ||
+        resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, overlay.sectorMacro)
       const sectorData = resolved ? sectorsById.value[resolved.sectorId] : null
       return {
         ...overlay,
@@ -331,7 +327,7 @@ const sectorOwnerOverride = computed<Record<string, string> | undefined>(() => {
   let hasOverride = false
   Object.entries(selectedSaveArchive.value.sectors).forEach(([macro, sector]) => {
     if (sector.owner) {
-      const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, macro)
+      const resolved = mapStore.resolveSectorByMacro(macro)
       if (resolved?.sectorId) {
         map[resolved.sectorId] = sector.owner
         hasOverride = true
@@ -1347,7 +1343,8 @@ onBeforeUnmount(() => {
               :dragging-overlay-key="draggingOverlayKey"
               :focused-overlay-key="focusedPlacementKey"
               :save-poi-overlays="savePoiOverlays"
-              :viewport-content-bounds="savePoiViewportContentBounds"
+              :viewport-content-bounds="liveSavePoiViewportContentBounds"
+              :sector-viewport-content-bounds="savePoiViewportContentBounds"
               :min-scale="minScale"
               :max-scale="maxScale"
               :current-scale="scale"

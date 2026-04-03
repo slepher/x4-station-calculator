@@ -2,8 +2,8 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useMapStore } from '@/store/useMapStore'
 import { useSaveStore } from '@/store/useSaveStore'
-import { resolveMapSectorByMacro } from './mapSectorMacro'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 
@@ -19,6 +19,7 @@ const emit = defineEmits<{
 
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
+const mapStore = useMapStore()
 const saveStore = useSaveStore()
 
 const searchQuery = ref('')
@@ -86,8 +87,7 @@ const filteredGroups = computed<SectorPoiGroup[]>(() => {
 })
 
 function getSectorSearchNames(sectorMacro: string, fallbackName: string): { rawName: string; displayName: string } {
-  const clusters = gameDataStore.maps?.clusters || {}
-  const resolved = resolveMapSectorByMacro(clusters, sectorMacro)
+  const resolved = mapStore.resolveSectorByMacro(sectorMacro)
   if (resolved) {
     const rawName = (resolved.sector as any).name || fallbackName
     const nameId = (resolved.sector as any).nameId

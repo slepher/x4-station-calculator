@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { nextTick, toRef, watch, watchEffect } from 'vue'
+import { toRef, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
@@ -72,6 +72,12 @@ const props = withDefaults(defineProps<{
     right: number
     bottom: number
   } | null
+  sectorViewportContentBounds?: {
+    left: number
+    top: number
+    right: number
+    bottom: number
+  } | null
   minScale?: number
   maxScale?: number
   currentScale?: number
@@ -96,6 +102,7 @@ const props = withDefaults(defineProps<{
   focusedOverlayKey: null,
   savePoiOverlays: () => [],
   viewportContentBounds: null,
+  sectorViewportContentBounds: null,
   minScale: 1,
   maxScale: 1,
   currentScale: 1,
@@ -171,6 +178,7 @@ const placementOverlaysRef = toRef(props, 'placementOverlays')
 const placementPreviewRef = toRef(props, 'placementPreview')
 const savePoiOverlaysRef = toRef(props, 'savePoiOverlays')
 const viewportContentBoundsRef = toRef(props, 'viewportContentBounds')
+const sectorViewportContentBoundsRef = toRef(props, 'sectorViewportContentBounds')
 const factionColorMapRef = toRef(props, 'factionColorMap')
 
 const {
@@ -248,6 +256,7 @@ const {
   placementPreview: placementPreviewRef,
   savePoiOverlays: savePoiOverlaysRef,
   viewportContentBounds: viewportContentBoundsRef,
+  sectorViewportContentBounds: sectorViewportContentBoundsRef,
   minScale: toRef(props, 'minScale'),
   maxScale: toRef(props, 'maxScale'),
   currentScale: toRef(props, 'currentScale'),
@@ -264,18 +273,6 @@ watchEffect(() => {
     clusterRefHeight: layoutState.value.clusterRadius * 2
   })
   emit('sector-layout', sectorLayouts.value)
-})
-
-watch([toRef(props, 'isDragging'), toRef(props, 'isZooming')], async ([dragging, zooming], [wasDragging, wasZooming]) => {
-  const finishedDragging = wasDragging && !dragging
-  const finishedZooming = wasZooming && !zooming
-  if (!finishedDragging && !finishedZooming) return
-  await nextTick()
-  const stats = savePoiDebugStats.value
-  console.info('[map-save-poi]', {
-    sectorCount: stats.sectorCount,
-    participatingPoiCount: stats.participatingPoiCount
-  })
 })
 </script>
 
