@@ -1,7 +1,7 @@
 use crate::model::{
-    norm_ver, AbandonedShipEntry, AggregatedStationModule, ArchiveMeta, DatavaultEntry,
-    DatavaultWareEntry, FactionStationEntry, Meta, NpcStationEntry, ParserError,
-    PlayerStationEntry, PlayerStationModule, SaveArchive, SectorData, StationBaseEntry,
+    norm_ver, AbandonedShipEntry, AggregatedEquipment, AggregatedStationModule, ArchiveMeta,
+    DatavaultEntry, DatavaultWareEntry, FactionStationEntry, Meta, NpcStationEntry, ParserError,
+    PlayerStationConstruction, PlayerStationEntry, SaveArchive, SectorData, StationBaseEntry,
     StationEquipment, Vector3,
 };
 use std::collections::{HashMap, VecDeque};
@@ -71,10 +71,12 @@ pub(crate) struct SaveParserCore {
     tags: usize,
 
     station_owner: Option<String>,
-    player_station_mods: Vec<PlayerStationModule>,
+    player_station_constructions: Vec<PlayerStationConstruction>,
     npc_station_module_counts: HashMap<String, i64>,
+    npc_station_equipment_totals: HashMap<(String, String), i64>,
     entry_idx: Option<i64>,
     entry_ref: Option<String>,
+    entry_predecessor: Option<i64>,
     entry_eq: Vec<StationEquipment>,
 }
 
@@ -90,10 +92,12 @@ impl SaveParserCore {
             path: VecDeque::new(),
             tags: 0,
             station_owner: None,
-            player_station_mods: Vec::new(),
+            player_station_constructions: Vec::new(),
             npc_station_module_counts: HashMap::new(),
+            npc_station_equipment_totals: HashMap::new(),
             entry_idx: None,
             entry_ref: None,
+            entry_predecessor: None,
             entry_eq: Vec::new(),
         }
     }
@@ -167,8 +171,9 @@ impl SaveParserCore {
 
             if cls == "station" {
                 self.station_owner = a.get("owner").cloned();
-                self.player_station_mods.clear();
+                self.player_station_constructions.clear();
                 self.npc_station_module_counts.clear();
+                self.npc_station_equipment_totals.clear();
             }
         }
 
@@ -215,17 +220,32 @@ impl SaveParserCore {
         if at_tags(
             &self.path,
             &["component", "construction", "sequence", "entry"],
-        )
-        {
+        ) {
             if self.station_owner.as_deref() == Some("player") {
                 self.entry_idx = Some(to_int(a.get("index"), 0));
                 self.entry_ref = a.get("macro").cloned();
+                self.entry_predecessor = None;
                 self.entry_eq.clear();
             } else if self.station_owner.is_some() {
                 if let Some(macro_ref) = a.get("macro").cloned() {
                     *self.npc_station_module_counts.entry(macro_ref).or_insert(0) += 1;
                 }
+                self.entry_idx = Some(to_int(a.get("index"), 0));
+                self.entry_eq.clear();
             }
+        }
+
+        if at_tags(
+            &self.path,
+            &[
+                "component",
+                "construction",
+                "sequence",
+                "entry",
+                "predecessor",
+            ],
+        ) {
+            self.entry_predecessor = Some(to_int(a.get("index"), 0));
         }
 
         if name == "unlock" {
@@ -257,12 +277,22 @@ impl SaveParserCore {
             ],
         ) && self.entry_idx.is_some()
         {
-            self.entry_eq.push(StationEquipment {
-                equip_type: "shields".into(),
-                ref_field: a.get("macro").cloned().unwrap_or_default(),
-                group: a.get("group").cloned().unwrap_or_default(),
-                exact: to_int(a.get("exact"), 1),
-            });
+            if self.station_owner.as_deref() == Some("player") {
+                self.entry_eq.push(StationEquipment {
+                    equip_type: "shields".into(),
+                    ref_field: a.get("macro").cloned().unwrap_or_default(),
+                    group: a.get("group").cloned().unwrap_or_default(),
+                    exact: to_int(a.get("exact"), 1),
+                });
+            } else if self.station_owner.is_some() {
+                let equip_type = "shields".to_string();
+                let ref_field = a.get("macro").cloned().unwrap_or_default();
+                let amount = to_int(a.get("exact"), 1);
+                *self
+                    .npc_station_equipment_totals
+                    .entry((equip_type, ref_field))
+                    .or_insert(0) += amount;
+            }
         }
 
         if at_tags(
@@ -278,12 +308,22 @@ impl SaveParserCore {
             ],
         ) && self.entry_idx.is_some()
         {
-            self.entry_eq.push(StationEquipment {
-                equip_type: "turrets".into(),
-                ref_field: a.get("macro").cloned().unwrap_or_default(),
-                group: a.get("group").cloned().unwrap_or_default(),
-                exact: to_int(a.get("exact"), 1),
-            });
+            if self.station_owner.as_deref() == Some("player") {
+                self.entry_eq.push(StationEquipment {
+                    equip_type: "turrets".into(),
+                    ref_field: a.get("macro").cloned().unwrap_or_default(),
+                    group: a.get("group").cloned().unwrap_or_default(),
+                    exact: to_int(a.get("exact"), 1),
+                });
+            } else if self.station_owner.is_some() {
+                let equip_type = "turrets".to_string();
+                let ref_field = a.get("macro").cloned().unwrap_or_default();
+                let amount = to_int(a.get("exact"), 1);
+                *self
+                    .npc_station_equipment_totals
+                    .entry((equip_type, ref_field))
+                    .or_insert(0) += amount;
+            }
         }
 
         Ok(())
@@ -307,14 +347,21 @@ impl SaveParserCore {
             )));
         }
 
-        if name == "entry" && self.entry_idx.is_some() && self.entry_ref.is_some() {
-            self.player_station_mods.push(PlayerStationModule {
-                index: self.entry_idx.unwrap(),
-                ref_field: self.entry_ref.clone().unwrap(),
-                equipments: std::mem::take(&mut self.entry_eq),
-            });
+        if name == "entry"
+            && self.entry_idx.is_some()
+            && self.entry_ref.is_some()
+            && self.station_owner.as_deref() == Some("player")
+        {
+            self.player_station_constructions
+                .push(PlayerStationConstruction {
+                    index: self.entry_idx.unwrap(),
+                    ref_field: self.entry_ref.clone().unwrap(),
+                    predecessor: self.entry_predecessor,
+                    equipments: std::mem::take(&mut self.entry_eq),
+                });
             self.entry_idx = None;
             self.entry_ref = None;
+            self.entry_predecessor = None;
         }
 
         if name == "component" {
@@ -339,21 +386,55 @@ impl SaveParserCore {
                             };
 
                             match ctx.owner.as_deref() {
-                                Some("player") => sd.player_stations.push(PlayerStationEntry {
-                                    base,
-                                    modules: std::mem::take(&mut self.player_station_mods),
-                                }),
+                                Some("player") => {
+                                    let constructions =
+                                        std::mem::take(&mut self.player_station_constructions);
+                                    let modules =
+                                        aggregated_modules_from_constructions(&constructions);
+                                    let equipments =
+                                        aggregated_equipments_from_constructions(&constructions);
+                                    sd.player_stations.push(PlayerStationEntry {
+                                        base,
+                                        constructions,
+                                        modules,
+                                        equipments,
+                                    })
+                                }
                                 Some("xenon") => {
-                                    let modules = aggregated_modules(&mut self.npc_station_module_counts);
-                                    sd.xenon_stations.push(FactionStationEntry { base, modules });
+                                    let modules =
+                                        aggregated_modules(&mut self.npc_station_module_counts);
+                                    let equipments = aggregated_equipments(
+                                        &mut self.npc_station_equipment_totals,
+                                    );
+                                    sd.xenon_stations.push(FactionStationEntry {
+                                        base,
+                                        modules,
+                                        equipments,
+                                    });
                                 }
                                 Some("khaak") => {
-                                    let modules = aggregated_modules(&mut self.npc_station_module_counts);
-                                    sd.khaak_stations.push(FactionStationEntry { base, modules });
+                                    let modules =
+                                        aggregated_modules(&mut self.npc_station_module_counts);
+                                    let equipments = aggregated_equipments(
+                                        &mut self.npc_station_equipment_totals,
+                                    );
+                                    sd.khaak_stations.push(FactionStationEntry {
+                                        base,
+                                        modules,
+                                        equipments,
+                                    });
                                 }
                                 _ => {
-                                    let modules = aggregated_modules(&mut self.npc_station_module_counts);
-                                    sd.npc_stations.push(NpcStationEntry { base, modules });
+                                    let modules =
+                                        aggregated_modules(&mut self.npc_station_module_counts);
+                                    let equipments = aggregated_equipments(
+                                        &mut self.npc_station_equipment_totals,
+                                    );
+                                    sd.npc_stations.push(NpcStationEntry {
+                                        base,
+                                        modules,
+                                        equipments,
+                                    });
                                 }
                             }
                             self.station_owner = None;
@@ -479,7 +560,11 @@ impl SaveParserCore {
     }
 
     fn current_collectable_vault_ctx_mut(&mut self) -> Option<&mut ComponentCtx> {
-        let has_collectable = self.comp_stack.iter().rev().any(|ctx| ctx.class == "collectablewares");
+        let has_collectable = self
+            .comp_stack
+            .iter()
+            .rev()
+            .any(|ctx| ctx.class == "collectablewares");
         if !has_collectable {
             return None;
         }
@@ -506,4 +591,41 @@ fn aggregated_modules(input: &mut HashMap<String, i64>) -> Vec<AggregatedStation
         .collect::<Vec<_>>();
     modules.sort_by(|a, b| a.ref_field.cmp(&b.ref_field));
     modules
+}
+
+fn aggregated_equipments(input: &mut HashMap<(String, String), i64>) -> Vec<AggregatedEquipment> {
+    let mut equipments = input
+        .drain()
+        .map(|((equip_type, ref_field), amount)| AggregatedEquipment {
+            equip_type,
+            ref_field,
+            amount,
+        })
+        .collect::<Vec<_>>();
+    equipments.sort_by(|a, b| (&a.equip_type, &a.ref_field).cmp(&(&b.equip_type, &b.ref_field)));
+    equipments
+}
+
+fn aggregated_modules_from_constructions(
+    constructions: &[PlayerStationConstruction],
+) -> Vec<AggregatedStationModule> {
+    let mut counts: HashMap<String, i64> = HashMap::new();
+    for c in constructions {
+        *counts.entry(c.ref_field.clone()).or_insert(0) += 1;
+    }
+    aggregated_modules(&mut counts)
+}
+
+fn aggregated_equipments_from_constructions(
+    constructions: &[PlayerStationConstruction],
+) -> Vec<AggregatedEquipment> {
+    let mut totals: HashMap<(String, String), i64> = HashMap::new();
+    for c in constructions {
+        for e in &c.equipments {
+            *totals
+                .entry((e.equip_type.clone(), e.ref_field.clone()))
+                .or_insert(0) += e.exact;
+        }
+    }
+    aggregated_equipments(&mut totals)
 }

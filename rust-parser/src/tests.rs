@@ -23,7 +23,10 @@ mod tests {
         assert_eq!(station.base.code, "AAA");
         assert_eq!(station.base.macro_field, "station_macro");
         assert_eq!(station.base.is_headquarter, Some(true));
-        assert_eq!((station.base.x, station.base.y, station.base.z), (1.0, 2.0, 3.0));
+        assert_eq!(
+            (station.base.x, station.base.y, station.base.z),
+            (1.0, 2.0, 3.0)
+        );
     }
 
     #[test]
@@ -50,13 +53,20 @@ mod tests {
 
         let archive = parser.finish_archive("chunked.xml").expect("archive");
         let station = &archive.sectors["sec_alpha"].player_stations[0];
-        let module = &station.modules[0];
+        let construction = &station.constructions[0];
 
-        assert_eq!((station.base.x, station.base.y, station.base.z), (4.0, 5.0, 6.0));
-        assert_eq!(module.index, 1);
-        assert_eq!(module.ref_field, "mod_macro");
-        assert_eq!(module.equipments[0].ref_field, "shield_macro");
-        assert_eq!(module.equipments[0].exact, 2);
+        assert_eq!(
+            (station.base.x, station.base.y, station.base.z),
+            (4.0, 5.0, 6.0)
+        );
+        assert_eq!(construction.index, 1);
+        assert_eq!(construction.ref_field, "mod_macro");
+        assert_eq!(construction.equipments[0].ref_field, "shield_macro");
+        assert_eq!(construction.equipments[0].exact, 2);
+        assert_eq!(station.modules[0].ref_field, "mod_macro");
+        assert_eq!(station.modules[0].amount, 1);
+        assert_eq!(station.equipments[0].ref_field, "shield_macro");
+        assert_eq!(station.equipments[0].amount, 2);
     }
 
     #[test]
@@ -133,7 +143,10 @@ mod tests {
 
         assert_eq!(archive.meta.player_name, "gzip");
         assert_eq!(station.base.code, "GZIP-1");
-        assert_eq!((station.base.x, station.base.y, station.base.z), (11.0, 22.0, 33.0));
+        assert_eq!(
+            (station.base.x, station.base.y, station.base.z),
+            (11.0, 22.0, 33.0)
+        );
     }
 
     #[test]
@@ -148,9 +161,60 @@ mod tests {
         let archive = parser.finish_archive("factions.xml").expect("archive");
         let sector = archive.sectors.get("sec_alpha").expect("sector");
 
-        assert_eq!(sector.xenon_stations[0].modules[0].ref_field, "buildmodule_xen_ships_xl_macro");
+        assert_eq!(
+            sector.xenon_stations[0].modules[0].ref_field,
+            "buildmodule_xen_ships_xl_macro"
+        );
         assert_eq!(sector.xenon_stations[0].modules[0].amount, 2);
-        assert_eq!(sector.khaak_stations[0].modules[0].ref_field, "module_khaak_special");
+        assert_eq!(
+            sector.khaak_stations[0].modules[0].ref_field,
+            "module_khaak_special"
+        );
         assert_eq!(sector.khaak_stations[0].modules[0].amount, 2);
+    }
+
+    #[test]
+    fn extracts_predecessor_from_player_station_construction() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="station_macro" owner="player" code="AAA"><construction><sequence><entry index="1" macro="dock_macro"/><entry index="2" macro="storage_macro"><predecessor index="1" connection="connectionsnap001"/></entry></sequence></construction></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("predecessor.xml").expect("archive");
+        let station = &archive.sectors["sec_alpha"].player_stations[0];
+
+        assert_eq!(station.constructions.len(), 2);
+        assert_eq!(station.constructions[0].index, 1);
+        assert_eq!(station.constructions[0].ref_field, "dock_macro");
+        assert_eq!(station.constructions[0].predecessor, None);
+        assert_eq!(station.constructions[1].index, 2);
+        assert_eq!(station.constructions[1].ref_field, "storage_macro");
+        assert_eq!(station.constructions[1].predecessor, Some(1));
+    }
+
+    #[test]
+    fn aggregates_equipments_for_npc_stations() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="npc_station" owner="argony" code="NPC-1"><construction><sequence><entry index="1" macro="module_dock"><upgrades><groups><shields macro="shield_macro" group="g1" exact="3"/><turrets macro="turret_macro" group="g2" exact="5"/></groups></upgrades></entry><entry index="2" macro="module_dock"><upgrades><groups><shields macro="shield_macro" group="g1" exact="2"/></groups></upgrades></entry></sequence></construction></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("npc_equip.xml").expect("archive");
+        let station = &archive.sectors["sec_alpha"].npc_stations[0];
+
+        assert_eq!(station.modules.len(), 1);
+        assert_eq!(station.modules[0].ref_field, "module_dock");
+        assert_eq!(station.modules[0].amount, 2);
+        assert_eq!(station.equipments.len(), 2);
+        assert_eq!(station.equipments[0].equip_type, "shields");
+        assert_eq!(station.equipments[0].ref_field, "shield_macro");
+        assert_eq!(station.equipments[0].amount, 5);
+        assert_eq!(station.equipments[1].equip_type, "turrets");
+        assert_eq!(station.equipments[1].ref_field, "turret_macro");
+        assert_eq!(station.equipments[1].amount, 5);
     }
 }

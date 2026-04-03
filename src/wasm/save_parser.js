@@ -110,10 +110,10 @@ if (Symbol.dispose) SaveParser.prototype[Symbol.dispose] = SaveParser.prototype.
 function __wbg_get_imports() {
     const import0 = {
         __proto__: null,
-        __wbg___wbindgen_throw_bd5a70920abf0236: function(arg0, arg1) {
+        __wbg___wbindgen_throw_81fc77679af83bc6: function(arg0, arg1) {
             throw new Error(getStringFromWasm0(arg0, arg1));
         },
-        __wbg_now_cd850b0a28a6e656: function() {
+        __wbg_now_88621c9c9a4f3ffc: function() {
             const ret = Date.now();
             return ret;
         },

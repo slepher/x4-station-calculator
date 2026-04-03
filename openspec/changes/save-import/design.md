@@ -131,17 +131,21 @@ interface StationBaseEntry {
 }
 
 interface PlayerStationEntry extends StationBaseEntry {
-  modules?: PlayerStationModule[]
+  constructions?: PlayerStationConstruction[]
+  modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
 }
 
-interface PlayerStationModule {
+interface PlayerStationConstruction {
   index: number
   ref: string
+  predecessor?: number
   equipments?: StationEquipment[]
 }
 
 interface NpcStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean
@@ -150,9 +154,16 @@ interface NpcStationEntry extends StationBaseEntry {
 
 interface FactionStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
 }
 
 interface AggregatedStationModule {
+  ref: string
+  amount: number
+}
+
+interface AggregatedEquipment {
+  type: 'shields' | 'turrets'
   ref: string
   amount: number
 }

@@ -109,12 +109,24 @@ pub(crate) struct Meta {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
-pub(crate) struct PlayerStationModule {
+#[serde(rename_all = "camelCase")]
+pub(crate) struct PlayerStationConstruction {
     pub(crate) index: i64,
     #[serde(rename = "ref")]
     pub(crate) ref_field: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) predecessor: Option<i64>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) equipments: Vec<StationEquipment>,
+}
+
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct AggregatedEquipment {
+    #[serde(rename = "type")]
+    pub(crate) equip_type: String,
+    #[serde(rename = "ref")]
+    pub(crate) ref_field: String,
+    pub(crate) amount: i64,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -147,7 +159,11 @@ pub(crate) struct PlayerStationEntry {
     #[serde(flatten)]
     pub(crate) base: StationBaseEntry,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub(crate) modules: Vec<PlayerStationModule>,
+    pub(crate) constructions: Vec<PlayerStationConstruction>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) modules: Vec<AggregatedStationModule>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) equipments: Vec<AggregatedEquipment>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -156,6 +172,8 @@ pub(crate) struct FactionStationEntry {
     pub(crate) base: StationBaseEntry,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) modules: Vec<AggregatedStationModule>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) equipments: Vec<AggregatedEquipment>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -171,6 +189,8 @@ pub(crate) struct NpcStationEntry {
     pub(crate) base: StationBaseEntry,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) modules: Vec<AggregatedStationModule>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) equipments: Vec<AggregatedEquipment>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

@@ -50,13 +50,20 @@ export interface StationEquipment {
   exact: number
 }
 
-export interface PlayerStationModule {
+export interface PlayerStationConstruction {
   index: number
   ref: string
+  predecessor?: number
   equipments?: StationEquipment[]
 }
 
 export interface AggregatedStationModule {
+  ref: string
+  amount: number
+}
+
+export interface AggregatedEquipment {
+  type: 'shields' | 'turrets'
   ref: string
   amount: number
 }
@@ -74,7 +81,9 @@ export interface StationBaseEntry {
 }
 
 export interface PlayerStationEntry extends StationBaseEntry {
-  modules?: PlayerStationModule[]
+  constructions?: PlayerStationConstruction[]
+  modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean
@@ -85,6 +94,7 @@ export interface PlayerStationEntry extends StationBaseEntry {
 
 export interface NpcStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean
@@ -98,6 +108,7 @@ export interface NpcStationEntry extends StationBaseEntry {
 
 export interface FactionStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean

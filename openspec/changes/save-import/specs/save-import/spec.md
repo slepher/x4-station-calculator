@@ -190,14 +190,22 @@
 **当** 空间站 `owner="player"`
 
 **那么** 额外提取模块信息：
-- `modules`: 模块列表（从 construction/sequence/entry 提取）
+- `constructions`: 模块列表（从 construction/sequence/entry 提取）
   - `index`: 模块序号
   - `ref`: 模块macro引用
+  - `predecessor`: 前驱模块序号（可选，从 `<predecessor index="...">` 提取）
   - `equipments`: 装备列表（可选）
     - `type`: `shields` | `turrets`
     - `ref`: 装备macro
     - `group`: 装备组名
     - `exact`: 数量
+- `modules`: 聚合模块统计
+  - `ref`: 模块标识
+  - `amount`: 该模块在站内出现次数
+- `equipments`: 聚合装备统计
+  - `type`: `shields` | `turrets`
+  - `ref`: 装备macro
+  - `amount`: 该装备总数（exact聚合）
 
 #### Scenario: 提取非玩家空间站模块聚合
 
@@ -211,6 +219,10 @@
 - `modules`: 模块统计列表
   - `ref`: 模块标识
   - `amount`: 该模块在站内出现次数
+- `equipments`: 聚合装备统计
+  - `type`: `shields` | `turrets`
+  - `ref`: 装备macro
+  - `amount`: 该装备总数（exact聚合）
 
 **并且** 不提取玩家站使用的 construction/equipment 明细结构
 
