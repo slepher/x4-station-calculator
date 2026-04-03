@@ -6,7 +6,7 @@ import StatusMonitor from './StatusMonitor.vue'
 import ProductionWorkbenchView from './empire/ProductionWorkbenchView.vue'
 import LogicFlowWorkbenchView from './logic-flow/LogicFlowWorkbenchView.vue'
 import ShipBuildView from './ship-build/ShipBuildView.vue'
-import MapWorkbenchView from './empire/MapWorkbenchView.vue'
+import MapWorkbenchView from './map/MapWorkbenchView.vue'
 import SaveImportView from './save/SaveImportView.vue'
 
 const store = useStationStore()
