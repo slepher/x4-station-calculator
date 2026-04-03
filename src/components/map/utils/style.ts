@@ -31,7 +31,7 @@ export const OVERLAY_ICON_SIZE = 18
 export const SMALL_ICON_SIZE = 9
 export const PREVIEW_ICON_SIZE = 20
 export const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
-const LARGE_ICON_TYPES = ['shipyard', 'wharf', 'tradestation', 'equipmentdock', 'playerhq', 'hive', 'piratebase']
+const LARGE_ICON_TYPES = ['shipyard', 'wharf', 'tradestation', 'equipmentdock', 'playerhq', 'hive', 'nest', 'piratebase']
 const CONDITIONAL_SMALL_ICON_CATEGORIES = new Set(['npcStation', 'xenonStation', 'khaakStation'])
 
 export const SAVE_POI_COLORS: SavePoiColorMap = {

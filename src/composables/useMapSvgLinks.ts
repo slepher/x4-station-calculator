@@ -9,6 +9,9 @@ export type MapHighwaySegment = { id: string; type: 'path' | 'line'; d?: string;
 export type MapGateCircle = { id: string; point: Vec2; r: number; color: string; clusterId: string; targetClusterId?: string }
 export type MapCrossClusterGateLine = { id: string; left: Vec2; right: Vec2 }
 
+const GATE_ICON_RADIUS_SCALE = 3
+const GATE_LINE_MARGIN = 0.6
+
 export function useMapSvgLinks(args: {
   clusters: ComputedRef<Record<string, Cluster>>
   regionIds: ComputedRef<string[]>
@@ -132,12 +135,13 @@ export function useMapSvgLinks(args: {
 
   const crossClusterGateLines = computed<MapCrossClusterGateLine[]>(() => {
     const rows: MapCrossClusterGateLine[] = []
-    const gateIndex: Record<string, { clusterId: string; targetClusterId?: string; point: Vec2 }> = {}
+    const gateIndex: Record<string, { clusterId: string; targetClusterId?: string; point: Vec2; r: number }> = {}
     gateCircles.value.forEach((gate) => {
       gateIndex[gate.id] = {
         clusterId: gate.clusterId,
         targetClusterId: gate.targetClusterId,
-        point: gate.point
+        point: gate.point,
+        r: gate.r
       }
     })
 
@@ -150,10 +154,26 @@ export function useMapSvgLinks(args: {
         other.targetClusterId === gate.clusterId
       )?.[0]
       if (!reverseId) return
+      const reverseGate = gateIndex[reverseId]
+      if (!reverseGate) return
+      const dx = reverseGate.point.x - gate.point.x
+      const dy = reverseGate.point.y - gate.point.y
+      const length = Math.hypot(dx, dy)
+      if (!length) return
+      const ux = dx / length
+      const uy = dy / length
+      const leftInset = gate.r * GATE_ICON_RADIUS_SCALE + GATE_LINE_MARGIN
+      const rightInset = reverseGate.r * GATE_ICON_RADIUS_SCALE + GATE_LINE_MARGIN
       rows.push({
         id: `${gateId}<->${reverseId}`,
-        left: gate.point,
-        right: gateIndex[reverseId]?.point || gate.point
+        left: {
+          x: gate.point.x + ux * leftInset,
+          y: gate.point.y + uy * leftInset
+        },
+        right: {
+          x: reverseGate.point.x - ux * rightInset,
+          y: reverseGate.point.y - uy * rightInset
+        }
       })
       used.add(gateId)
       used.add(reverseId)

@@ -10,6 +10,7 @@ import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { getSectorScalePerRadius } from '@/components/map/utils/coordinates'
+import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { shouldHideSavePoiSmallIconAtClusterOverview } from '@/components/map/utils/style'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
@@ -1043,17 +1044,42 @@ const onSaveActiveCategoryChange = (category: SavePoiCategory | null) => {
   activeSavePoiCategory.value = category
 }
 
+const resolveSavePoiContentPoint = (poi: SavePoiOverlayItem) => {
+  if (poi.position.tx === undefined || poi.position.ty === undefined) return null
+  const resolved = mapStore.resolveSectorByMacro?.(poi.sectorMacro) ||
+    resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, poi.sectorMacro)
+  if (!resolved) return null
+  const sectorLayout = searchSectors.value.find((item) => item.sectorId === resolved.sectorId)
+  if (!sectorLayout) return null
+  return {
+    x: sectorLayout.centerX + poi.position.tx * sectorLayout.radius,
+    y: sectorLayout.centerY + poi.position.ty * sectorLayout.radius
+  }
+}
+
 const onSavePoiFocus = async (poi: SavePoiOverlayItem) => {
   const viewport = viewportRef.value
   if (!viewport) return
 
-  const targetScale = scale.value < 1 ? clampScale(1) : scale.value
+  const targetScale = maxScale.value
   if (targetScale !== scale.value) {
     scale.value = targetScale
     syncSliderFromScale()
     await nextTick()
   }
   focusedSavePoiKey.value = poi.key
+  savePoiTooltipItem.value = poi
+
+  const contentPoint = resolveSavePoiContentPoint(poi)
+  if (contentPoint) {
+    const viewportRect = viewport.getBoundingClientRect()
+    clampPan(
+      viewportRect.width / 2 - contentPoint.x * scale.value,
+      viewportRect.height / 2 - contentPoint.y * scale.value
+    )
+    return
+  }
+
   await nextTick()
   focusOverlayInViewport(viewport, `[data-save-poi-key="${poi.key}"]`, {
     panX: panX.value,
@@ -1214,6 +1240,11 @@ const onOverlayPointerDown = (payload: {
 const onSavePoiPointerDown = (poi: SavePoiOverlayItem) => {
   focusedSavePoiKey.value = poi.key
   savePoiTooltipItem.value = poi
+}
+
+const closeSavePoiTooltip = () => {
+  savePoiTooltipItem.value = null
+  focusedSavePoiKey.value = null
 }
 
 watch(isResourcePanelOpen, async () => {
@@ -1382,20 +1413,6 @@ onBeforeUnmount(() => {
             />
           </div>
 
-          <div
-            v-if="savePoiTooltipItem"
-            class="save-poi-tooltip-layer"
-            @mousedown.stop
-          >
-            <MapSavePoiTooltip :poi="savePoiTooltipItem" />
-            <button
-              class="tooltip-close"
-              type="button"
-              @click="savePoiTooltipItem = null"
-            >
-              ×
-            </button>
-          </div>
         </div>
 
         <div class="map-search-panel left-6 top-5" @mousedown.stop>
@@ -1528,20 +1545,29 @@ onBeforeUnmount(() => {
           </button>
         </div>
 
-        <div class="zoom-panel right-6 bottom-5">
-          <div class="zoom-label-row">
-            <span class="zoom-label">{{ t('map.scale') }}</span>
-            <span class="zoom-value">{{ displayScaleText }}</span>
+        <div class="map-right-stack" @mousedown.stop>
+          <div
+            v-if="savePoiTooltipItem"
+            class="save-poi-tooltip-layer"
+          >
+            <MapSavePoiTooltip :poi="savePoiTooltipItem" @close="closeSavePoiTooltip" />
           </div>
-          <input
-            class="zoom-slider"
-            type="range"
-            min="0"
-            max="100"
-            step="0.5"
-            :value="zoomPercent"
-            @input="onSliderInput"
-          />
+
+          <div class="zoom-panel">
+            <div class="zoom-label-row">
+              <span class="zoom-label">{{ t('map.scale') }}</span>
+              <span class="zoom-value">{{ displayScaleText }}</span>
+            </div>
+            <input
+              class="zoom-slider"
+              type="range"
+              min="0"
+              max="100"
+              step="0.5"
+              :value="zoomPercent"
+              @input="onSliderInput"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -1701,8 +1727,12 @@ onBeforeUnmount(() => {
   @apply px-3 py-4 text-center text-xs text-amber-100/55;
 }
 
+.map-right-stack {
+  @apply absolute right-6 bottom-5 z-30 flex flex-col items-end gap-2;
+}
+
 .zoom-panel {
-  @apply absolute z-10 rounded-md border border-amber-300/40 bg-black/70 px-3 py-2;
+  @apply rounded-md border border-amber-300/40 bg-black/70 px-3 py-2;
   width: 220px;
   backdrop-filter: blur(4px);
 }
@@ -1734,10 +1764,6 @@ onBeforeUnmount(() => {
 }
 
 .save-poi-tooltip-layer {
-  @apply absolute z-30 bottom-20 right-6 flex items-start gap-2;
-}
-
-.tooltip-close {
-  @apply w-6 h-6 flex items-center justify-center rounded-full bg-black/60 text-amber-100/60 hover:text-amber-50 hover:bg-black/80 transition-colors;
+  @apply w-auto;
 }
 </style>

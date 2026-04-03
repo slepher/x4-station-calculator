@@ -188,7 +188,7 @@ export interface SavePoiOverlayItem {
   owner?: string
   sectorMacro: string
   sectorName: string
-  position: { x: number; z: number; tx?: number; ty?: number }
+  position: { x: number; y: number; z: number; tx?: number; ty?: number }
   tag?: string
   factoryGroup?: string
   is_headquarter?: boolean

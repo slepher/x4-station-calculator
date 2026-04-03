@@ -113,7 +113,7 @@ function createOverlayItem(
     owner,
     sectorMacro,
     sectorName,
-    position: { x: item.position.x, z: item.position.z, tx: item.position.tx, ty: item.position.ty },
+    position: { x: item.position.x, y: item.position.y, z: item.position.z, tx: item.position.tx, ty: item.position.ty },
     tag: isStation && 'tag' in item ? item.tag : undefined,
     factoryGroup: isStation && 'factoryGroup' in item ? item.factoryGroup : undefined,
     is_headquarter: isStation && 'is_headquarter' in item ? item.is_headquarter : undefined
