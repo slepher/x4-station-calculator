@@ -232,6 +232,8 @@
 - `src/workers/saveParserRust.worker.ts`（更新导入）
 - `src/components/save/SaveUploadPanel.vue`（直接调用后处理）
 - `src/types/saveArchive.ts`（扩展 AggregatedStationModule 类型）
+- `rust-parser/src/model.rs`（StationBaseEntry/DatavaultEntry/AbandonedShipEntry 类型更新）
+- `rust-parser/src/core.rs`（zone tracking 逻辑）
 
 **Steps**:
 1. [x] 重命名文件 saveParserRust.post.ts → saveParser.post.ts
@@ -255,10 +257,25 @@
 9. [x] 定义 `CURRENT_POST_PROCESSOR_VERSION = "v2"`
 10. [x] `postProcessRustSaveArchive` 写入 `post_processor_version`
 11. [x] `postProcessRustSaveArchive` 计算 `isValid`
-12. [x] 基于 `zone_id + maps.zones` 补全最终 `position`
-13. [x] `zone_id` 查表统一使用小写
-14. [x] 兼容 `maps.zones` 对象结构
-15. [x] 停止依赖独立 `shcon_anchors`
+12. [x] Rust parser 类型更新：
+    - StationBaseEntry: x/y/z 改为 relative_position: Vector3
+    - StationBaseEntry: 新增 zone_id: Option<String>
+    - DatavaultEntry: x/y/z 改为 relative_position: Vector3, 新增 zone_id
+    - AbandonedShipEntry: x/y/z 改为 relative_position: Vector3, 新增 zone_id
+13. [x] Rust parser zone tracking:
+    - SaveParserCore 新增 current_zone_macro: Option<String>
+    - on_open_tag: class='zone' 时记录 macro
+    - on_close_tag: zone 出栈时清空 current_zone_macro
+    - 创建实体时从 current_zone_macro 获取 zone_id
+14. [x] 基于 `zone_id + maps.zones` 补全最终 `position`
+    - loadMaps() 函数加载 maps.json
+    - buildZoneLookup() 构建 sectorId -> zoneId -> position 映射
+    - calculateFinalPosition() 计算 zone.position + relative_position
+    - 无 zone_id 时 position = relative_position
+15. [x] `zone_id` 查表统一使用小写
+16. [x] 兼容 `maps.zones` 对象结构
+17. [x] 停止依赖独立 `shcon_anchors`
+18. [x] X4MapSector 类型新增 zones?: Array<{ ref, position }> 字段
 
 ---
 

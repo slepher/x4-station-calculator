@@ -142,6 +142,40 @@
 
 ---
 
+## Phase 7: 图标映射与大小调整
+
+### T7.1 factoryGroup 图标映射
+
+- [x] 当 station.tag === 'factory' 时，使用 station.factoryGroup 匹配图标
+- [x] factoryGroup 优先顺序：shiptech → hightech → refined → pharmaceutical → food → agricultural → water → energy
+- [x] factoryGroup 匹配失败或为 'factory' 时，使用 fallback 图标
+- [x] SavePoiOverlayItem 新增 factoryGroup?: string 字段
+- [x] useSaveStore.ts 传递 factoryGroup 字段
+- [x] MapSvgCanvas.vue 导入 factoryGroup 图标（shiptech/hightech/refined/pharmaceutical/food/agricultural/water/energy.svg）
+
+### T7.2 defencemodule 图标映射
+
+- [x] MapSvgCanvas.vue: 添加 defencemodule → defensestationIconUrl 映射
+- [x] 移除旧的 defence/defencestation 映射（统一使用 defencemodule）
+- [x] 更新 SAVE_POI_ICON_MAP 和 SAVE_POI_HEADQUARTER_ICON_MAP
+
+### T7.3 图标大小动态调整
+
+- [x] MapSvgCanvas.vue: 新增 SMALL_ICON_SIZE = 9 (原大小的 1/2)
+- [x] MapSvgCanvas.vue: 新增 LARGE_ICON_TYPES = ['shipyard', 'wharf', 'tradestation', 'equipmentdock', 'playerhq', 'hive']
+- [x] MapSvgCanvas.vue: 新增 getSavePoiIconSize() 函数
+- [x] 动态设置图标大小：大图标 (18px) vs 小图标 (9px)
+- [x] 大图标类型：shipyard, wharf, tradestation, equipmentdock, playerhq, hive
+- [x] 小图标类型：factory, defencemodule, piratestation, weaponplatform 等所有其他类型
+
+### T7.4 NPC 空间站展示调整
+
+- [x] useSaveStore.ts: 移除 tag !== 'factory' 过滤，展示所有 NPC 空间站
+- [x] MapSaveCoordList.vue: 使用 position.x, position.z 替代 item.x, item.z
+- [x] SaveDetailPanel.vue: 使用 position.x, position.z 替代 item.x, item.z
+
+---
+
 ## Task Dependencies
 
 ```
