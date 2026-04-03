@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRef, watchEffect } from 'vue'
+import { nextTick, toRef, watch, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
@@ -62,6 +62,7 @@ const props = withDefaults(defineProps<{
   placementOverlays?: PlacementOverlay[]
   placementPreview?: PlacementPreview | null
   isDragging?: boolean
+  isZooming?: boolean
   draggingOverlayKey?: string | null
   focusedOverlayKey?: string | null
   savePoiOverlays?: SavePoiOverlayItem[]
@@ -90,6 +91,7 @@ const props = withDefaults(defineProps<{
   placementOverlays: () => [],
   placementPreview: null,
   isDragging: false,
+  isZooming: false,
   draggingOverlayKey: null,
   focusedOverlayKey: null,
   savePoiOverlays: () => [],
@@ -237,7 +239,8 @@ const {
   overlayScreenItems,
   factionColorFilters,
   savePoiScreenItems,
-  previewScreenItem
+  previewScreenItem,
+  savePoiDebugStats
 } = useMapSvgOverlays({
   clusters,
   layoutState,
@@ -261,6 +264,18 @@ watchEffect(() => {
     clusterRefHeight: layoutState.value.clusterRadius * 2
   })
   emit('sector-layout', sectorLayouts.value)
+})
+
+watch([toRef(props, 'isDragging'), toRef(props, 'isZooming')], async ([dragging, zooming], [wasDragging, wasZooming]) => {
+  const finishedDragging = wasDragging && !dragging
+  const finishedZooming = wasZooming && !zooming
+  if (!finishedDragging && !finishedZooming) return
+  await nextTick()
+  const stats = savePoiDebugStats.value
+  console.info('[map-save-poi]', {
+    sectorCount: stats.sectorCount,
+    participatingPoiCount: stats.participatingPoiCount
+  })
 })
 </script>
 

@@ -1,6 +1,6 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
-import { clusterRatioToScreen, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
+import { clusterRatioToScreen, getSectorViewportTransform, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
 import {
   OVERLAY_ICON_SIZE,
   SMALL_ICON_SIZE,
@@ -16,6 +16,7 @@ import type { MapSvgLayoutState } from './useMapSvgLayout'
 
 const SAVE_POI_VIEWPORT_MARGIN = 24
 const LARGE_ICON_MAX_CLUSTER_SCALE = 0.5
+const SECTOR_VIEWPORT_MARGIN = 48
 
 export function useMapSvgOverlays(args: {
   clusters: ComputedRef<Record<string, Cluster>>
@@ -40,6 +41,35 @@ export function useMapSvgOverlays(args: {
   const resolveSectorScreenRatio = (sector: Sector, point?: { x: number; z: number } | null) => {
     if (!point) return null
     return sectorRatioToClusterRatio(sector.normalized, sectorPointToLocalRatio(sector, point))
+  }
+
+  const buildVisibleSectorKeys = (
+    viewportBounds: {
+      left: number
+      top: number
+      right: number
+      bottom: number
+    } | null,
+    centers: Record<string, { x: number; y: number }>,
+    clusterRadius: number
+  ) => {
+    const visibleSectorKeys = new Set<string>()
+    if (!viewportBounds) return visibleSectorKeys
+    Object.entries(args.clusters.value).forEach(([clusterId, cluster]) => {
+      const center = centers[clusterId]
+      if (!center) return
+      Object.values(cluster.sectors || {}).forEach((sector) => {
+        const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
+        const verticalRadius = transform.sectorRadius * (Math.sqrt(3) / 2)
+        const visible =
+          transform.center.x + transform.sectorRadius >= viewportBounds.left - SECTOR_VIEWPORT_MARGIN &&
+          transform.center.x - transform.sectorRadius <= viewportBounds.right + SECTOR_VIEWPORT_MARGIN &&
+          transform.center.y + verticalRadius >= viewportBounds.top - SECTOR_VIEWPORT_MARGIN &&
+          transform.center.y - verticalRadius <= viewportBounds.bottom + SECTOR_VIEWPORT_MARGIN
+        if (visible) visibleSectorKeys.add(`${clusterId}:${sector.id}`)
+      })
+    })
+    return visibleSectorKeys
   }
 
   const overlayScreenItems = computed(() => {
@@ -94,19 +124,30 @@ export function useMapSvgOverlays(args: {
         )
       )
     const hideConditionalSmallIcons =
-      args.isDragging.value ||
-      (args.clusterVisibilityThresholdPx.value > 0 &&
-        clusterDisplayDiameterPx <= args.clusterVisibilityThresholdPx.value)
-    return args.savePoiOverlays.value
+      args.clusterVisibilityThresholdPx.value > 0 &&
+      clusterDisplayDiameterPx <= args.clusterVisibilityThresholdPx.value
+    const visibleSectorKeys = buildVisibleSectorKeys(viewportBounds, centers, clusterRadius)
+    const candidatePois = args.savePoiOverlays.value.filter((poi) => {
+      if (!viewportBounds || !shouldHideSavePoiSmallIconAtClusterOverview(poi)) return true
+      const resolved = resolveMapSectorByMacro(args.clusters.value, poi.sectorMacro)
+      if (!resolved) return false
+      return visibleSectorKeys.has(`${resolved.clusterId}:${resolved.sector.id}`)
+    })
+
+    return candidatePois
       .map((poi) => {
         const resolved = resolveMapSectorByMacro(args.clusters.value, poi.sectorMacro)
         if (!resolved) return null
+        const cluster = args.clusters.value[resolved.clusterId]
         const center = centers[resolved.clusterId]
         const sector = resolved.sector as Sector
         const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
         const sectorCenter = sector.normalized?.center_offset_ratio
         if (!center || poi.position.tx === undefined || poi.position.ty === undefined || !sectorCenter || !sectorRadiusRatio) return null
         if (hideConditionalSmallIcons && shouldHideSavePoiSmallIconAtClusterOverview(poi)) return null
+        if (viewportBounds && shouldHideSavePoiSmallIconAtClusterOverview(poi) && cluster) {
+          if (!visibleSectorKeys.has(`${resolved.clusterId}:${sector.id}`)) return null
+        }
         const ratio = sectorRatioToClusterRatio(sector.normalized, {
           x: poi.position.tx,
           y: poi.position.ty
@@ -138,6 +179,36 @@ export function useMapSvgOverlays(args: {
       .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number } => !!item)
   })
 
+  const savePoiDebugStats = computed(() => {
+    const { centers, clusterRadius } = args.layoutState.value
+    const viewportBounds = args.viewportContentBounds.value
+    const clusterDisplayDiameterPx = clusterRadius * 2 * args.currentScale.value
+    const hideConditionalSmallIcons =
+      args.clusterVisibilityThresholdPx.value > 0 &&
+      clusterDisplayDiameterPx <= args.clusterVisibilityThresholdPx.value
+    const visibleSectorKeys = buildVisibleSectorKeys(viewportBounds, centers, clusterRadius)
+    let participatingPoiCount = 0
+
+    const candidatePois = args.savePoiOverlays.value.filter((poi) => {
+      if (!viewportBounds || !shouldHideSavePoiSmallIconAtClusterOverview(poi)) return true
+      const resolved = resolveMapSectorByMacro(args.clusters.value, poi.sectorMacro)
+      if (!resolved) return false
+      return visibleSectorKeys.has(`${resolved.clusterId}:${resolved.sector.id}`)
+    })
+
+    candidatePois.forEach((poi) => {
+      const resolved = resolveMapSectorByMacro(args.clusters.value, poi.sectorMacro)
+      if (!resolved) return
+      if (hideConditionalSmallIcons && shouldHideSavePoiSmallIconAtClusterOverview(poi)) return
+      participatingPoiCount += 1
+    })
+
+    return {
+      sectorCount: visibleSectorKeys.size,
+      participatingPoiCount
+    }
+  })
+
   const previewScreenItem = computed(() => {
     const preview = args.placementPreview.value
     if (!preview) return null
@@ -155,6 +226,7 @@ export function useMapSvgOverlays(args: {
     overlayScreenItems,
     factionColorFilters,
     savePoiScreenItems,
-    previewScreenItem
+    previewScreenItem,
+    savePoiDebugStats
   }
 }

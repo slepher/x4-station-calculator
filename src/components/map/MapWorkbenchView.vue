@@ -117,6 +117,7 @@ const panX = ref(0)
 const panY = ref(0)
 
 const isDragging = ref(false)
+const isZooming = ref(false)
 const dragStartX = ref(0)
 const dragStartY = ref(0)
 const dragOriginX = ref(0)
@@ -145,6 +146,12 @@ const savePoiVisibility = ref<SavePoiVisibility>({
 })
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
+const settledSavePoiViewportContentBounds = ref<{
+  left: number
+  top: number
+  right: number
+  bottom: number
+} | null>(null)
 const resourcePrimaryColor = ref<string | null>(null)
 const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
@@ -161,6 +168,7 @@ const tooltipPosition = ref({ left: 0, top: 0 })
 const tooltipMeasuredSize = ref({ width: 0, height: 0 })
 const tooltipHideTimer = ref<number | null>(null)
 const zoomRestoreTimer = ref<number | null>(null)
+const zoomSettleTimer = ref<number | null>(null)
 const lastMousePos = ref({ x: 0, y: 0 })
 
 const { t, te, locale } = useI18n()
@@ -277,7 +285,7 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
   const isClusterOverview =
     clusterVisibilityThresholdPx.value > 0 &&
     clusterRefHeightPx.value * scale.value <= clusterVisibilityThresholdPx.value
-  const shouldCullHiddenSmallIcons = isDragging.value || isClusterOverview
+  const shouldCullHiddenSmallIcons = isClusterOverview
 
   return saveStore
     .getArchivePoiOverlays(selectedSaveArchive.value, activeCategories, {
@@ -300,7 +308,7 @@ const isClusterOverview = computed(() =>
   clusterRefHeightPx.value * scale.value <= clusterVisibilityThresholdPx.value
 )
 
-const savePoiViewportContentBounds = computed(() => {
+const liveSavePoiViewportContentBounds = computed(() => {
   const { width, height } = getViewportSize()
   if (!width || !height || !scale.value) return null
   return {
@@ -310,6 +318,12 @@ const savePoiViewportContentBounds = computed(() => {
     bottom: (height - panY.value) / scale.value
   }
 })
+
+const savePoiViewportContentBounds = computed(() =>
+  (isDragging.value || isZooming.value)
+    ? settledSavePoiViewportContentBounds.value
+    : liveSavePoiViewportContentBounds.value
+)
 
 const sectorOwnerOverride = computed<Record<string, string> | undefined>(() => {
   if (!isSavePanelOpen.value || !selectedSaveArchive.value) return undefined
@@ -522,6 +536,18 @@ const clearZoomRestoreTimer = () => {
     window.clearTimeout(zoomRestoreTimer.value)
     zoomRestoreTimer.value = null
   }
+}
+
+const clearZoomSettleTimer = () => {
+  if (zoomSettleTimer.value !== null) {
+    window.clearTimeout(zoomSettleTimer.value)
+    zoomSettleTimer.value = null
+  }
+}
+
+const settleZoomViewport = () => {
+  isZooming.value = false
+  settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
 }
 
 const clearBrowserSelection = () => {
@@ -1122,16 +1148,23 @@ const onWheel = (event: WheelEvent) => {
   const nextScale = clampScale(scale.value * factor)
   if (nextScale === scale.value) return
 
+  isZooming.value = true
+  clearZoomSettleTimer()
   scale.value = nextScale
   const nextPanX = mouseX - contentX * nextScale
   const nextPanY = mouseY - contentY * nextScale
   clampPan(nextPanX, nextPanY)
   syncSliderFromScale()
+  zoomSettleTimer.value = window.setTimeout(() => {
+    settleZoomViewport()
+    zoomSettleTimer.value = null
+  }, 120)
   scheduleZoomTooltipRestore()
 }
 
 const stopDrag = () => {
   isDragging.value = false
+  settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
   if (!draggingPlacementItem.value) return
   if (placementPreview.value) {
     applyLocationToItem(draggingPlacementItem.value, placementPreview.value.location)
@@ -1213,6 +1246,11 @@ watch(hoveredSector, () => {
   void syncTooltipMeasurement()
 })
 
+watch(liveSavePoiViewportContentBounds, (bounds) => {
+  if (isDragging.value || isZooming.value) return
+  settledSavePoiViewportContentBounds.value = bounds
+}, { immediate: true })
+
 onMounted(() => {
   window.addEventListener('resize', onResize)
   if (typeof ResizeObserver !== 'undefined' && viewportRef.value) {
@@ -1229,6 +1267,7 @@ onBeforeUnmount(() => {
   viewportResizeObserver.value = null
   clearTooltipHideTimer()
   clearZoomRestoreTimer()
+  clearZoomSettleTimer()
 })
 </script>
 
@@ -1305,6 +1344,7 @@ onBeforeUnmount(() => {
               :placement-overlays="placementOverlays"
               :placement-preview="isStationPanelOpen ? placementPreview : null"
               :is-dragging="isDragging"
+              :is-zooming="isZooming"
               :dragging-overlay-key="draggingOverlayKey"
               :focused-overlay-key="focusedPlacementKey"
               :save-poi-overlays="savePoiOverlays"
