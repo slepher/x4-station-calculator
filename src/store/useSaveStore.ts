@@ -60,6 +60,10 @@ function createEmptySectorData(name: string): SectorData {
     name,
     is_known: false,
     owner: undefined,
+    scale_per_radius: undefined,
+    clusterGates: [],
+    superhighwayGates: [],
+    highways: [],
     playerStations: [],
     xenonStations: [],
     khaakStations: [],
@@ -178,6 +182,10 @@ function normalizeSectorData(
   const normalized = createEmptySectorData(sector.name || sectorId)
   normalized.is_known = Boolean(sector.is_known)
   normalized.owner = sector.owner
+  normalized.scale_per_radius = typeof sector.scale_per_radius === 'number' ? sector.scale_per_radius : undefined
+  normalized.clusterGates = Array.isArray(sector.clusterGates) ? sector.clusterGates : []
+  normalized.superhighwayGates = Array.isArray(sector.superhighwayGates) ? sector.superhighwayGates : []
+  normalized.highways = Array.isArray(sector.highways) ? sector.highways : []
   normalized.datavaults = Array.isArray(sector.datavaults)
     ? sector.datavaults.map((entry) => ({
       ...entry,
@@ -248,7 +256,13 @@ function createStubArchiveFromMeta(meta: {
       version: meta.version,
       filename: meta.filename,
       parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
-      post_processor_version: meta.post_processor_version === 'v1' ? 'v1' : meta.post_processor_version === 'v2' ? 'v2' : undefined,
+      post_processor_version: meta.post_processor_version === 'v1'
+        ? 'v1'
+        : meta.post_processor_version === 'v2'
+          ? 'v2'
+          : meta.post_processor_version === 'v3' || meta.post_processor_version === 'v4'
+            ? 'v3'
+            : undefined,
       source: meta.source
     },
     sectors: {},
@@ -553,6 +567,8 @@ export const useSaveStore = defineStore('save', () => {
             ? 'v1'
             : meta.post_processor_version === 'v2'
               ? 'v2'
+              : meta.post_processor_version === 'v3' || meta.post_processor_version === 'v4'
+                ? 'v3'
               : undefined,
           source: 'imported'
         },

@@ -2,7 +2,7 @@
 import { toRef, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import type { SavePoiOverlayItem } from '@/types/saveArchive'
+import type { SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
 import {
   FALLBACK_OWNER_COLOR,
   MAP_FONT_FAMILY,
@@ -66,6 +66,7 @@ const props = withDefaults(defineProps<{
   draggingOverlayKey?: string | null
   focusedOverlayKey?: string | null
   savePoiOverlays?: SavePoiOverlayItem[]
+  saveSectors?: Record<string, SectorData> | undefined
   viewportContentBounds?: {
     left: number
     top: number
@@ -101,6 +102,7 @@ const props = withDefaults(defineProps<{
   draggingOverlayKey: null,
   focusedOverlayKey: null,
   savePoiOverlays: () => [],
+  saveSectors: undefined,
   viewportContentBounds: null,
   sectorViewportContentBounds: null,
   minScale: 1,
@@ -177,6 +179,7 @@ const emitSectorLeave = (sectorId: string) => {
 const placementOverlaysRef = toRef(props, 'placementOverlays')
 const placementPreviewRef = toRef(props, 'placementPreview')
 const savePoiOverlaysRef = toRef(props, 'savePoiOverlays')
+const saveSectorsRef = toRef(props, 'saveSectors')
 const viewportContentBoundsRef = toRef(props, 'viewportContentBounds')
 const sectorViewportContentBoundsRef = toRef(props, 'sectorViewportContentBounds')
 const factionColorMapRef = toRef(props, 'factionColorMap')
@@ -237,6 +240,7 @@ const {
   crossClusterGateLines
 } = useMapSvgLinks({
   clusters,
+  saveSectors: saveSectorsRef,
   regionIds,
   layoutState,
   resolveOwnerColor,

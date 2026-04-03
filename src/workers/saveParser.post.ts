@@ -3,6 +3,10 @@ import type {
   FactionStationEntry,
   NpcStationEntry,
   PlayerStationEntry,
+  SaveSectorClusterGateEntry,
+  SaveSectorHighwayEntry,
+  SaveSectorStaticPosition,
+  SaveSectorSuperhighwayGateEntry,
   SaveArchive,
   SectorData
 } from '@/types/saveArchive'
@@ -29,8 +33,32 @@ interface SectorScaleLookup {
   [sectorId: string]: number
 }
 
+interface SectorScaleBasisLookup {
+  [sectorId: string]: {
+    hex_inner_ratio: number
+    extent_ratio: number
+    fallback_scale_per_radius: number
+  }
+}
+
+interface SectorStaticScalePointsLookup {
+  [sectorId: string]: Array<{ x: number; z: number }>
+}
+
+interface SectorStaticClusterGateLookup {
+  [sectorId: string]: SaveSectorClusterGateEntry[]
+}
+
+interface SectorStaticSuperhighwayGateLookup {
+  [sectorId: string]: SaveSectorSuperhighwayGateEntry[]
+}
+
+interface SectorStaticHighwayLookup {
+  [sectorId: string]: SaveSectorHighwayEntry[]
+}
+
 export const CURRENT_PARSER_VERSION = 'v2' as const
-export const CURRENT_POST_PROCESSOR_VERSION = 'v2' as const
+export const CURRENT_POST_PROCESSOR_VERSION = 'v4' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
 const DEFAULT_EXTENT_RATIO = 0.8
@@ -118,8 +146,29 @@ function buildSectorCenterLookup(maps: X4Map | undefined): SectorCenterLookup {
   return lookup
 }
 
-function buildSectorScaleLookup(maps: X4Map | undefined): SectorScaleLookup {
-  const lookup: SectorScaleLookup = {}
+function buildSectorScaleBasisLookup(maps: X4Map | undefined): SectorScaleBasisLookup {
+  const lookup: SectorScaleBasisLookup = {}
+  if (!maps) return lookup
+
+  for (const cluster of Object.values(maps.clusters || {})) {
+    for (const [sectorId, sector] of Object.entries(cluster?.sectors || {})) {
+      const normalized = sector.normalized as {
+        scale_basis?: { hex_inner_ratio?: number; extent_ratio?: number }
+        scale_per_radius?: number
+      } | undefined
+      lookup[sectorId.toLowerCase()] = {
+        hex_inner_ratio: Number(normalized?.scale_basis?.hex_inner_ratio || DEFAULT_HEX_INNER_RATIO),
+        extent_ratio: Number(normalized?.scale_basis?.extent_ratio || DEFAULT_EXTENT_RATIO),
+        fallback_scale_per_radius: Number(normalized?.scale_per_radius || 0)
+      }
+    }
+  }
+
+  return lookup
+}
+
+function buildSectorStaticScalePointsLookup(maps: X4Map | undefined): SectorStaticScalePointsLookup {
+  const lookup: SectorStaticScalePointsLookup = {}
   if (!maps) return lookup
 
   for (const cluster of Object.values(maps.clusters || {})) {
@@ -135,25 +184,7 @@ function buildSectorScaleLookup(maps: X4Map | undefined): SectorScaleLookup {
           points.push({ x: gate.raw_local_pos.x, z: gate.raw_local_pos.z })
         }
       })
-
-      if (!points.length) {
-        lookup[sectorId.toLowerCase()] = Number(sector.normalized?.scale_per_radius || 0)
-        continue
-      }
-
-      const centerX = sector.raw_center_pos?.x !== undefined
-        ? sector.raw_center_pos.x
-        : snapToSectorCenterGrid((Math.min(...points.map((point) => point.x)) + Math.max(...points.map((point) => point.x))) / 2)
-      const centerZ = sector.raw_center_pos?.z !== undefined
-        ? sector.raw_center_pos.z
-        : snapToSectorCenterGrid((Math.min(...points.map((point) => point.z)) + Math.max(...points.map((point) => point.z))) / 2)
-      const maxExtent = Math.max(
-        1,
-        ...points.map((point) => Math.hypot(point.x - centerX, point.z - centerZ))
-      )
-      const innerRatio = Number((sector.normalized as { scale_basis?: { hex_inner_ratio?: number } } | undefined)?.scale_basis?.hex_inner_ratio || DEFAULT_HEX_INNER_RATIO)
-      const extentRatio = Number((sector.normalized as { scale_basis?: { extent_ratio?: number } } | undefined)?.scale_basis?.extent_ratio || DEFAULT_EXTENT_RATIO)
-      lookup[sectorId.toLowerCase()] = (innerRatio * extentRatio) / maxExtent
+      lookup[sectorId.toLowerCase()] = points
     }
   }
 
@@ -184,32 +215,230 @@ function calculateFinalPosition(
   sectorCenterLookup: SectorCenterLookup
 ): Vector3 {
   const basePosition = relativePosition || { x: 0, y: 0, z: 0 }
-  const sectorCenter = sectorCenterLookup[sectorId.toLowerCase()] || { x: 0, y: 0, z: 0 }
   if (!zoneId) {
-    return subtractVectors(basePosition, sectorCenter)
+    return basePosition
   }
   
   const sectorZones = zoneLookup[sectorId.toLowerCase()]
   if (!sectorZones) {
-    return subtractVectors(basePosition, sectorCenter)
+    return basePosition
   }
   
   const zonePosition = sectorZones[zoneId.toLowerCase()]
   if (!zonePosition) {
-    return subtractVectors(basePosition, sectorCenter)
+    return basePosition
   }
 
-  return subtractVectors(addVectors(zonePosition, basePosition), sectorCenter)
+  return addVectors(zonePosition, basePosition)
 }
 
-function withTransformPosition(position: Vector3, sectorId: string, sectorScaleLookup: SectorScaleLookup): Vector3 & { tx?: number; ty?: number } {
+function withTransformPosition(
+  position: Vector3,
+  sectorId: string,
+  sectorScaleLookup: SectorScaleLookup,
+  sectorCenterLookup: SectorCenterLookup
+): Vector3 & { tx?: number; ty?: number } {
   const scale = sectorScaleLookup[sectorId.toLowerCase()] || 0
   if (!scale) return position
+  const sectorCenter = sectorCenterLookup[sectorId.toLowerCase()] || { x: 0, y: 0, z: 0 }
   return {
     ...position,
-    tx: position.x * scale,
-    ty: -position.z * scale
+    tx: (position.x - sectorCenter.x) * scale,
+    ty: -(position.z - sectorCenter.z) * scale
   }
+}
+
+function collectSectorArchivePoiPoints(
+  sector: SectorData,
+  sectorId: string,
+  zoneLookup: ZoneLookup,
+  sectorCenterLookup: SectorCenterLookup
+): Array<{ x: number; z: number }> {
+  const points: Array<{ x: number; z: number }> = []
+  const appendPoint = (relativePosition: Vector3 | undefined, zoneId?: string) => {
+    const position = calculateFinalPosition(relativePosition, zoneId, sectorId, zoneLookup, sectorCenterLookup)
+    points.push({ x: position.x, z: position.z })
+  }
+
+  sector.playerStations?.forEach((station) => appendPoint(station.relative_position, station.zone_id))
+  sector.npcStations?.forEach((station) => appendPoint(station.relative_position, station.zone_id))
+  sector.xenonStations?.forEach((station) => appendPoint(station.relative_position, station.zone_id))
+  sector.khaakStations?.forEach((station) => appendPoint(station.relative_position, station.zone_id))
+  sector.datavaults?.forEach((vault) => appendPoint(vault.relative_position, vault.zone_id))
+  sector.erlkingVaults?.forEach((vault) => appendPoint(vault.relative_position, vault.zone_id))
+  sector.abandonedShips?.forEach((ship) => appendPoint(ship.relative_position, ship.zone_id))
+
+  return points
+}
+
+function buildArchiveSectorScaleLookup(
+  archive: SaveArchive,
+  maps: X4Map | undefined,
+  zoneLookup: ZoneLookup,
+  sectorCenterLookup: SectorCenterLookup
+): SectorScaleLookup {
+  const lookup: SectorScaleLookup = {}
+  const staticScalePointsLookup = buildSectorStaticScalePointsLookup(maps)
+  const scaleBasisLookup = buildSectorScaleBasisLookup(maps)
+
+  for (const [sectorId, sector] of Object.entries(archive.sectors || {})) {
+    const sectorKey = sectorId.toLowerCase()
+    const points = [
+      ...(staticScalePointsLookup[sectorKey] || []),
+      ...collectSectorArchivePoiPoints(sector, sectorId, zoneLookup, sectorCenterLookup)
+    ]
+    const scaleBasis = scaleBasisLookup[sectorKey]
+
+    if (!points.length) {
+      lookup[sectorKey] = scaleBasis?.fallback_scale_per_radius || 0
+      continue
+    }
+
+    const sectorCenter = sectorCenterLookup[sectorKey] || { x: 0, y: 0, z: 0 }
+    const maxExtent = Math.max(
+      1,
+      ...points.map((point) => Math.hypot(point.x - sectorCenter.x, point.z - sectorCenter.z))
+    )
+    const innerRatio = scaleBasis?.hex_inner_ratio || DEFAULT_HEX_INNER_RATIO
+    const extentRatio = scaleBasis?.extent_ratio || DEFAULT_EXTENT_RATIO
+    lookup[sectorKey] = (innerRatio * extentRatio) / maxExtent
+  }
+
+  return lookup
+}
+
+function buildSectorStaticClusterGateLookup(
+  maps: X4Map | undefined,
+  sectorScaleLookup: SectorScaleLookup,
+  sectorCenterLookup: SectorCenterLookup
+): SectorStaticClusterGateLookup {
+  const lookup: SectorStaticClusterGateLookup = {}
+  if (!maps) return lookup
+
+  for (const cluster of Object.values(maps.clusters || {})) {
+    for (const [sectorId, sector] of Object.entries(cluster?.sectors || {})) {
+      lookup[sectorId.toLowerCase()] = Object.entries(sector?.cluster_gates || {}).flatMap(([gateId, gate]) => {
+        if (gate.raw_local_pos?.x === undefined || gate.raw_local_pos?.z === undefined) return []
+        const position = {
+          x: gate.raw_local_pos.x,
+          y: 0,
+          z: gate.raw_local_pos.z
+        }
+        return [{
+          id: gateId,
+          target_cluster_id: gate.target_cluster_id,
+          position: withTransformPosition(position, sectorId, sectorScaleLookup, sectorCenterLookup)
+        }]
+      })
+    }
+  }
+
+  return lookup
+}
+
+function buildSectorStaticSuperhighwayGateLookup(
+  maps: X4Map | undefined,
+  sectorScaleLookup: SectorScaleLookup,
+  sectorCenterLookup: SectorCenterLookup
+): SectorStaticSuperhighwayGateLookup {
+  const lookup: SectorStaticSuperhighwayGateLookup = {}
+  if (!maps) return lookup
+
+  for (const cluster of Object.values(maps.clusters || {})) {
+    const sectors = cluster?.sectors || {}
+    Object.keys(sectors).forEach((sectorId) => {
+      lookup[sectorId.toLowerCase()] ||= []
+    })
+
+    Object.entries(cluster?.sector_links || {}).forEach(([linkId, link]) => {
+      const sectorA = link.sector_a_id ? sectors[link.sector_a_id] : undefined
+      const sectorB = link.sector_b_id ? sectors[link.sector_b_id] : undefined
+      const zoneA = sectorA && link.from_zone_id ? sectorA.zones?.[link.from_zone_id] : undefined
+      const zoneB = sectorB && link.to_zone_id ? sectorB.zones?.[link.to_zone_id] : undefined
+
+      if (sectorA && zoneA?.raw_sector_pos?.x !== undefined && zoneA.raw_sector_pos?.z !== undefined) {
+        const position = {
+          x: zoneA.raw_sector_pos.x,
+          y: zoneA.raw_sector_pos.y || 0,
+          z: zoneA.raw_sector_pos.z
+        }
+        lookup[sectorA.id.toLowerCase()].push({
+          id: `${linkId}:from`,
+          link_id: linkId,
+          zone_id: link.from_zone_id || '',
+          target_sector_id: sectorB?.id,
+          position: withTransformPosition(position, sectorA.id, sectorScaleLookup, sectorCenterLookup)
+        })
+      }
+
+      if (sectorB && zoneB?.raw_sector_pos?.x !== undefined && zoneB.raw_sector_pos?.z !== undefined) {
+        const position = {
+          x: zoneB.raw_sector_pos.x,
+          y: zoneB.raw_sector_pos.y || 0,
+          z: zoneB.raw_sector_pos.z
+        }
+        lookup[sectorB.id.toLowerCase()].push({
+          id: `${linkId}:to`,
+          link_id: linkId,
+          zone_id: link.to_zone_id || '',
+          target_sector_id: sectorA?.id,
+          position: withTransformPosition(position, sectorB.id, sectorScaleLookup, sectorCenterLookup)
+        })
+      }
+    })
+  }
+
+  return lookup
+}
+
+function buildSectorStaticHighwayLookup(
+  maps: X4Map | undefined,
+  sectorScaleLookup: SectorScaleLookup,
+  sectorCenterLookup: SectorCenterLookup
+): SectorStaticHighwayLookup {
+  const lookup: SectorStaticHighwayLookup = {}
+  if (!maps) return lookup
+
+  const toPosition = (position: Vector3, sectorId: string): SaveSectorStaticPosition =>
+    withTransformPosition(position, sectorId, sectorScaleLookup, sectorCenterLookup)
+
+  for (const cluster of Object.values(maps.clusters || {})) {
+    for (const [sectorId, sector] of Object.entries(cluster?.sectors || {})) {
+      lookup[sectorId.toLowerCase()] = Object.entries(sector?.highways || {}).flatMap(([highwayId, highway]) => {
+        const entry = highway.entry_pos || highway.entry
+        const exit = highway.exit_pos || highway.exit
+        if (!entry || !exit) return []
+
+        return [{
+          id: highwayId,
+          entry: toPosition({
+            x: entry.x ?? 0,
+            y: entry.y ?? 0,
+            z: entry.z ?? 0
+          }, sectorId),
+          exit: toPosition({
+            x: exit.x ?? 0,
+            y: exit.y ?? 0,
+            z: exit.z ?? 0
+          }, sectorId),
+          spline: Array.isArray(highway.spline)
+            ? highway.spline
+              .filter((point): point is Vector3 =>
+                typeof point?.x === 'number' &&
+                typeof point?.z === 'number'
+              )
+              .map((point) => toPosition({
+                x: point.x,
+                y: point.y ?? 0,
+                z: point.z
+              }, sectorId))
+            : []
+        }]
+      })
+    }
+  }
+
+  return lookup
 }
 
 function enrichModulesWithGameData(
@@ -297,7 +526,7 @@ function enrichPlayerStation(
     sectorId,
     zoneLookup,
     sectorCenterLookup
-  ), sectorId, sectorScaleLookup)
+  ), sectorId, sectorScaleLookup, sectorCenterLookup)
   
   return {
     ...station,
@@ -349,7 +578,7 @@ function enrichNpcStation(
     sectorId,
     zoneLookup,
     sectorCenterLookup
-  ), sectorId, sectorScaleLookup)
+  ), sectorId, sectorScaleLookup, sectorCenterLookup)
   
   return {
     ...station,
@@ -403,7 +632,7 @@ function enrichFactionStation(
       sectorId,
       zoneLookup,
       sectorCenterLookup
-    ), sectorId, sectorScaleLookup)
+    ), sectorId, sectorScaleLookup, sectorCenterLookup)
     
     return {
       ...station,
@@ -431,7 +660,7 @@ function enrichFactionStation(
     sectorId,
     zoneLookup,
     sectorCenterLookup
-  ), sectorId, sectorScaleLookup)
+  ), sectorId, sectorScaleLookup, sectorCenterLookup)
   
   return {
     ...station,
@@ -446,9 +675,13 @@ function stripEmptySectorArrays(sector: SectorData): SectorData {
   const nextSector: SectorData = {
     name: sector.name,
     is_known: sector.is_known,
-    owner: sector.owner
+    owner: sector.owner,
+    scale_per_radius: sector.scale_per_radius
   }
   
+  if (sector.clusterGates?.length) nextSector.clusterGates = sector.clusterGates
+  if (sector.superhighwayGates?.length) nextSector.superhighwayGates = sector.superhighwayGates
+  if (sector.highways?.length) nextSector.highways = sector.highways
   if (sector.playerStations?.length) nextSector.playerStations = sector.playerStations
   if (sector.xenonStations?.length) nextSector.xenonStations = sector.xenonStations
   if (sector.khaakStations?.length) nextSector.khaakStations = sector.khaakStations
@@ -467,12 +700,19 @@ export function postProcessRustSaveArchive(
 ): SaveArchive {
   const zoneLookup = buildZoneLookup(maps)
   const sectorCenterLookup = buildSectorCenterLookup(maps)
-  const sectorScaleLookup = buildSectorScaleLookup(maps)
+  const sectorScaleLookup = buildArchiveSectorScaleLookup(archive, maps, zoneLookup, sectorCenterLookup)
+  const sectorStaticClusterGateLookup = buildSectorStaticClusterGateLookup(maps, sectorScaleLookup, sectorCenterLookup)
+  const sectorStaticSuperhighwayGateLookup = buildSectorStaticSuperhighwayGateLookup(maps, sectorScaleLookup, sectorCenterLookup)
+  const sectorStaticHighwayLookup = buildSectorStaticHighwayLookup(maps, sectorScaleLookup, sectorCenterLookup)
   
   const sectors = Object.fromEntries(
     Object.entries(archive.sectors).map(([sectorMacro, sector]) => {
       let enrichedSector: SectorData = {
         ...sector,
+        scale_per_radius: sectorScaleLookup[sectorMacro.toLowerCase()] || undefined,
+        clusterGates: sectorStaticClusterGateLookup[sectorMacro.toLowerCase()] || [],
+        superhighwayGates: sectorStaticSuperhighwayGateLookup[sectorMacro.toLowerCase()] || [],
+        highways: sectorStaticHighwayLookup[sectorMacro.toLowerCase()] || [],
         playerStations: sector.playerStations?.map((station) => {
           const enrichedModules = modulesByMacroId 
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
@@ -504,7 +744,7 @@ export function postProcessRustSaveArchive(
             sectorMacro,
             zoneLookup,
             sectorCenterLookup
-          ), sectorMacro, sectorScaleLookup)
+          ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           return { ...vault, position }
         }),
         erlkingVaults: sector.erlkingVaults?.map((vault) => {
@@ -514,7 +754,7 @@ export function postProcessRustSaveArchive(
             sectorMacro,
             zoneLookup,
             sectorCenterLookup
-          ), sectorMacro, sectorScaleLookup)
+          ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           return { ...vault, position }
         }),
         abandonedShips: sector.abandonedShips?.map((ship) => {
@@ -524,7 +764,7 @@ export function postProcessRustSaveArchive(
             sectorMacro,
             zoneLookup,
             sectorCenterLookup
-          ), sectorMacro, sectorScaleLookup)
+          ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           return { ...ship, position }
         })
       }

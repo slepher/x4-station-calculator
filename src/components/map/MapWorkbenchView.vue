@@ -18,7 +18,7 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 import { useSaveStore } from '@/store/useSaveStore'
-import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem } from '@/types/saveArchive'
+import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -298,6 +298,23 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
         sectorName: sectorData?.displayName || overlay.sectorName
       }
     })
+})
+
+const saveSectorLinkOverrides = computed<Record<string, SectorData> | undefined>(() => {
+  if (!isSavePanelOpen.value || !selectedSaveArchive.value) return undefined
+  const next: Record<string, SectorData> = {}
+  let hasItems = false
+
+  Object.entries(selectedSaveArchive.value.sectors).forEach(([sectorMacro, sector]) => {
+    if ((sector.clusterGates?.length || 0) === 0 && (sector.superhighwayGates?.length || 0) === 0) return
+    const resolved = mapStore.resolveSectorByMacro?.(sectorMacro) ||
+      resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
+    if (!resolved?.sectorId) return
+    next[resolved.sectorId] = sector
+    hasItems = true
+  })
+
+  return hasItems ? next : undefined
 })
 
 const isClusterOverview = computed(() =>
@@ -1374,6 +1391,7 @@ onBeforeUnmount(() => {
               :dragging-overlay-key="draggingOverlayKey"
               :focused-overlay-key="focusedPlacementKey"
               :save-poi-overlays="savePoiOverlays"
+              :save-sectors="saveSectorLinkOverrides"
               :viewport-content-bounds="liveSavePoiViewportContentBounds"
               :sector-viewport-content-bounds="savePoiViewportContentBounds"
               :min-scale="minScale"

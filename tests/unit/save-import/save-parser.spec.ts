@@ -193,12 +193,13 @@ describe('save parser rust worker enrichment', () => {
 
     expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position).toMatchObject({
       x: 110,
-      y: 20,
+      y: 220,
       z: 330
     })
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(0.2409979253022731, 12)
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty).toBeCloseTo(-0.7229937759068192, 12)
-    expect(archive.meta.post_processor_version).toBe('v2')
+    const expectedScale = ((Math.sqrt(3) / 2) * 0.8) / Math.hypot(110, 330)
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(110 * expectedScale, 12)
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty).toBeCloseTo(-330 * expectedScale, 12)
+    expect(archive.meta.post_processor_version).toBe('v4')
     expect(archive.isValid).toBe(true)
   })
 
@@ -266,12 +267,122 @@ describe('save parser rust worker enrichment', () => {
     })
 
     expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position).toMatchObject({
-      x: 31000,
+      x: 95000,
       y: 0,
       z: 0
     })
-    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(0.8260550005328491, 12)
+    const expectedScale = ((Math.sqrt(3) / 2) * 0.8) / 31000
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(31000 * expectedScale, 12)
     expect(Object.is(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty, -0) ? 0 : archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty).toBe(0)
+  })
+
+  it('recomputes sector scale from save poi plus maps zone/gate/highway points and writes static gate data into save', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v2',
+        source: 'original'
+      },
+      isCompatible: true,
+      isValid: true,
+      sectors: {
+        sec: {
+          name: 'sec',
+          is_known: true,
+          npcStations: [{
+            code: 'NPC',
+            macro: 'station_arg_factory_macro',
+            owner: 'argon',
+            relative_position: { x: 350, y: 50, z: 0 }
+          }]
+        }
+      }
+    }, undefined, {
+      clusters: {
+        cluster_01: {
+          id: 'cluster_01',
+          sectors: {
+            sec: {
+              id: 'sec',
+              name: 'Sector',
+              zones: {
+                zone_a: {
+                  raw_sector_pos: { x: 0, y: 0, z: 0 }
+                },
+                zone_b: {
+                  raw_sector_pos: { x: 100, y: 0, z: 0 }
+                }
+              },
+              cluster_gates: {
+                gate_a: {
+                  target_cluster_id: 'cluster_02',
+                  raw_local_pos: { x: 300, z: 0 }
+                }
+              },
+              highways: {
+                hwy_a: {
+                  entry_pos: { x: 400, y: 10, z: 0 },
+                  exit_pos: { x: 500, y: 20, z: 0 },
+                  spline: [
+                    { x: 430, y: 15, z: 10 },
+                    { x: 470, y: 18, z: -10 }
+                  ]
+                }
+              }
+            }
+          },
+          sector_links: {
+            link_a: {
+              sector_a_id: 'sec',
+              sector_b_id: 'sec',
+              from_zone_id: 'zone_a',
+              to_zone_id: 'zone_b'
+            }
+          }
+        }
+      }
+    } as any)
+
+    expect(archive.sectors.sec.scale_per_radius).toBeCloseTo((Math.sqrt(3) / 2 * 0.8) / 350, 12)
+    expect(archive.sectors.sec.npcStations?.[0]?.position.tx).toBeCloseTo((Math.sqrt(3) / 2 * 0.8), 12)
+    expect(archive.sectors.sec.clusterGates).toHaveLength(1)
+    expect(archive.sectors.sec.clusterGates?.[0]).toMatchObject({
+      id: 'gate_a',
+      target_cluster_id: 'cluster_02',
+      position: { x: 300, y: 0, z: 0 }
+    })
+    expect(archive.sectors.sec.clusterGates?.[0]?.position.tx).toBeCloseTo(((Math.sqrt(3) / 2) * 0.8 / 350) * 300, 12)
+    expect(archive.sectors.sec.superhighwayGates).toHaveLength(2)
+    expect(archive.sectors.sec.superhighwayGates?.[0]?.position).toMatchObject({
+      x: 0,
+      y: 0,
+      z: 0
+    })
+    expect(archive.sectors.sec.superhighwayGates?.[1]?.position).toMatchObject({
+      x: 100,
+      y: 0,
+      z: 0
+    })
+    expect(archive.sectors.sec.superhighwayGates?.[0]?.position.tx).toBeDefined()
+    expect(archive.sectors.sec.highways).toHaveLength(1)
+    expect(archive.sectors.sec.highways?.[0]).toMatchObject({
+      id: 'hwy_a',
+      entry: { x: 400, y: 10, z: 0 },
+      exit: { x: 500, y: 20, z: 0 }
+    })
+    expect(archive.sectors.sec.highways?.[0]?.spline).toHaveLength(2)
+    expect(archive.sectors.sec.highways?.[0]?.spline?.[0]).toMatchObject({
+      x: 430,
+      y: 15,
+      z: 10
+    })
+    expect(archive.sectors.sec.highways?.[0]?.entry.tx).toBeDefined()
+    expect(archive.sectors.sec.highways?.[0]?.spline?.[0]?.tx).toBeDefined()
   })
 
   it('derives station flags in worker layer', () => {
