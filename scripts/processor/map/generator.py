@@ -356,8 +356,8 @@ def generate_map_data(
                 "cluster_id": cluster_macro,
                 "macro": highway_macro,
                 "raw_local_pos": pos_from(conn),
-                "zone_a_id": pair[0],
-                "zone_b_id": pair[1],
+                "zone_a_id": pair[0].lower(),
+                "zone_b_id": pair[1].lower(),
                 "geometry": sechighway_geometry.get(highway_macro, {"entry_pos": {"x": 0.0, "z": 0.0}, "exit_pos": {"x": 0.0, "z": 0.0}, "spline": []}),
             }
             if link_id not in clusters[cluster_macro]["sector_link_ids"]:
@@ -390,6 +390,7 @@ def generate_map_data(
             "raw_local_pos": raw_local,
             "raw_world_pos": vec_add(cluster_raw, raw_local),
             "zone_ids": [],
+            "zones": {},
             "cluster_gate_ids": [],
             "highway_ids": [],
         }
@@ -399,7 +400,12 @@ def generate_map_data(
             if not zone_macro:
                 continue
             zone_offsets_by_sector[sector_macro][zone_macro] = pos_from(conn)
-            sectors[sector_macro]["zone_ids"].append(zone_macro)
+            zone_key = zone_macro.lower()
+            sectors[sector_macro]["zone_ids"].append(zone_key)
+            sectors[sector_macro]["zones"][zone_key] = {
+                "id": zone_key,
+                "position": pos3d_from(conn),
+            }
         for conn in sector_macro_node.findall("./connections/connection[@ref='zonehighways']"):
             macro_node = conn.find("./macro")
             highway_macro = macro_node.get("ref") if macro_node is not None else None
@@ -426,8 +432,8 @@ def generate_map_data(
                 "sector_id": sector_macro,
                 "macro": highway_macro,
                 "name": connection_name,
-                "from_zone_id": entry_zone_id,
-                "to_zone_id": exit_zone_id,
+                "from_zone_id": entry_zone_id.lower() if entry_zone_id else None,
+                "to_zone_id": exit_zone_id.lower() if exit_zone_id else None,
                 "from_zone_connection": entry_conn,
                 "to_zone_connection": exit_conn,
                 "instance_offset": instance_offset,
@@ -695,10 +701,11 @@ def generate_map_data(
                     break
             if sector_id is None:
                 continue
+            zone_key = zone_macro.lower()
             raw_local = zone_offsets_by_sector[sector_id][zone_macro]
             zone_kind = "shcon" if SHCON_ZONE_RE.fullmatch(zone_macro or "") else "zone"
-            zones[zone_macro] = {
-                "id": zone_macro,
+            zones[zone_key] = {
+                "id": zone_key,
                 "sector_id": sector_id,
                 "name": "",
                 "kind": zone_kind,
@@ -709,19 +716,19 @@ def generate_map_data(
                 conn_name = conn.get("name") or conn.get("ref") or ""
                 match = CLUSTER_GATE_RE.fullmatch(conn_name)
                 if match:
-                    gate_id = f"{zone_macro}:{conn_name}"
+                    gate_id = f"{zone_key}:{conn_name}"
                     gate_raw = vec_add(raw_local, pos_from(conn))
                     cluster_links[gate_id] = {
                         "id": gate_id,
                         "kind": "cluster_gate",
                         "sector_id": sector_id,
                         "cluster_id": sectors[sector_id]["cluster_id"],
-                        "zone_id": zone_macro,
+                        "zone_id": zone_key,
                         "name": conn_name,
                         "target_cluster_id": f"Cluster_{int(match.group(2)):02d}_macro",
                         "raw_local_pos": gate_raw,
                     }
-                    zones[zone_macro]["cluster_gate_ids"].append(gate_id)
+                    zones[zone_key]["cluster_gate_ids"].append(gate_id)
                     sectors[sector_id]["cluster_gate_ids"].append(gate_id)
                     continue
 
@@ -976,7 +983,6 @@ def generate_map_data(
             for key, value in sector.items()
             if key not in {"zone_ids", "cluster_gate_ids", "highway_ids"}
         }
-        nested_sector["shcon_anchors"] = {}
         nested_sector["cluster_gates"] = {}
         nested_sector["highways"] = {}
         nested_sector["stations"] = []
@@ -985,12 +991,9 @@ def generate_map_data(
     for zone_id, zone in zones.items():
         sector_id = zone["sector_id"]
         cluster_id = sectors[sector_id]["cluster_id"]
-        if zone["kind"] != "shcon":
-            continue
-        nested_clusters[cluster_id]["sectors"][sector_id]["shcon_anchors"][zone_id] = {
-            "id": zone_id,
-            "raw_sector_pos": zone["raw_local_pos"],
-        }
+        zone_entry = nested_clusters[cluster_id]["sectors"][sector_id]["zones"].setdefault(zone_id, {"id": zone_id})
+        zone_entry["kind"] = zone["kind"]
+        zone_entry["raw_sector_pos"] = zone["raw_local_pos"]
 
     for gate_id, gate in cluster_links.items():
         cluster_id = gate["cluster_id"]

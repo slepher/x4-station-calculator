@@ -71,6 +71,7 @@ pub(crate) struct SaveParserCore {
     tags: usize,
 
     station_owner: Option<String>,
+    current_zone_macro: Option<String>,
     player_station_constructions: Vec<PlayerStationConstruction>,
     npc_station_module_counts: HashMap<String, i64>,
     npc_station_equipment_totals: HashMap<(String, String), i64>,
@@ -92,6 +93,7 @@ impl SaveParserCore {
             path: VecDeque::new(),
             tags: 0,
             station_owner: None,
+            current_zone_macro: None,
             player_station_constructions: Vec::new(),
             npc_station_module_counts: HashMap::new(),
             npc_station_equipment_totals: HashMap::new(),
@@ -174,6 +176,10 @@ impl SaveParserCore {
                 self.player_station_constructions.clear();
                 self.npc_station_module_counts.clear();
                 self.npc_station_equipment_totals.clear();
+            }
+
+            if cls == "zone" {
+                self.current_zone_macro = a.get("macro").cloned();
             }
         }
 
@@ -374,13 +380,17 @@ impl SaveParserCore {
                 if let Some(sd) = self.sectors.get_mut(&sk) {
                     match ctx.class.as_str() {
                         "station" => {
+                            let zone_id = self.current_zone_macro.clone();
                             let base = StationBaseEntry {
                                 code: ctx.code.clone().unwrap_or_default(),
                                 macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                 owner: ctx.owner.clone().unwrap_or_default(),
-                                x: pos.x,
-                                y: pos.y,
-                                z: pos.z,
+                                relative_position: Vector3 {
+                                    x: pos.x,
+                                    y: pos.y,
+                                    z: pos.z,
+                                },
+                                zone_id,
                                 is_wreck: if ctx.is_wreck { Some(true) } else { None },
                                 is_headquarter: if ctx.is_headquarter { Some(true) } else { None },
                             };
@@ -442,13 +452,17 @@ impl SaveParserCore {
                             self.entry_ref = None;
                         }
                         "datavault" => {
+                            let zone_id = self.current_zone_macro.clone();
                             sd.datavaults.push(DatavaultEntry {
                                 code: ctx.code.clone().unwrap_or_default(),
                                 macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                 owner: ctx.owner.clone().unwrap_or_default(),
-                                x: pos.x,
-                                y: pos.y,
-                                z: pos.z,
+                                relative_position: Vector3 {
+                                    x: pos.x,
+                                    y: pos.y,
+                                    z: pos.z,
+                                },
+                                zone_id,
                                 unlocked: ctx.unlocked,
                                 wares: ware_entries(&ctx.ware_totals),
                                 has_blueprints: ctx.has_blueprints,
@@ -459,6 +473,9 @@ impl SaveParserCore {
                         "sector" => {
                             self.sector_stack.pop_back();
                         }
+                        "zone" => {
+                            self.current_zone_macro = None;
+                        }
                         _ => {
                             if ctx
                                 .macro_field
@@ -466,13 +483,17 @@ impl SaveParserCore {
                                 .map(|m| m.to_lowercase().contains("erlking_vault"))
                                 .unwrap_or(false)
                             {
+                                let zone_id = self.current_zone_macro.clone();
                                 sd.erlking_vaults.push(DatavaultEntry {
                                     code: ctx.code.clone().unwrap_or_default(),
                                     macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                     owner: ctx.owner.clone().unwrap_or_default(),
-                                    x: pos.x,
-                                    y: pos.y,
-                                    z: pos.z,
+                                    relative_position: Vector3 {
+                                        x: pos.x,
+                                        y: pos.y,
+                                        z: pos.z,
+                                    },
+                                    zone_id,
                                     unlocked: ctx.unlocked,
                                     wares: ware_entries(&ctx.ware_totals),
                                     has_blueprints: ctx.has_blueprints,
@@ -482,13 +503,17 @@ impl SaveParserCore {
                             } else if ctx.class.starts_with("ship_")
                                 && ctx.owner.as_deref() == Some("ownerless")
                             {
+                                let zone_id = self.current_zone_macro.clone();
                                 sd.abandoned_ships.push(AbandonedShipEntry {
                                     code: ctx.code.clone().unwrap_or_default(),
                                     macro_field: ctx.macro_field.clone().unwrap_or_default(),
                                     class: ctx.class.clone(),
-                                    x: pos.x,
-                                    y: pos.y,
-                                    z: pos.z,
+                                    relative_position: Vector3 {
+                                        x: pos.x,
+                                        y: pos.y,
+                                        z: pos.z,
+                                    },
+                                    zone_id,
                                 });
                             }
                         }
@@ -531,11 +556,13 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v1".into(),
+                parser_version: "v2".into(),
+                post_processor_version: None,
                 source: "original".into(),
             },
             sectors: self.sectors.clone(),
             is_compatible,
+            is_valid: true,
         })
     }
 

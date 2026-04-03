@@ -5,6 +5,7 @@ import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import type { SaveArchive, SaveParserRustMessage } from '@/types/saveArchive'
 import { streamFileToSaveParserWorker } from './saveUploadStreaming'
+import { postProcessRustSaveArchive } from '@/workers/saveParser.post'
 
 const { t } = useI18n()
 const saveStore = useSaveStore()
@@ -122,9 +123,14 @@ async function processXmlFile(file: File) {
         saveStore.setParsingState(true, statusText, null)
       } else if (msg.type === 'complete') {
         parsePercent.value = 100
-        saveStore.addArchive(msg.data)
+        const processedArchive = postProcessRustSaveArchive(
+          msg.data, 
+          gameDataStore.modulesByMacroId,
+          gameDataStore.maps
+        )
+        saveStore.addArchive(processedArchive)
         saveStore.setParsingState(false, '', null)
-        emit('upload-complete', msg.data)
+        emit('upload-complete', processedArchive)
         worker.terminate()
       } else if (msg.type === 'error') {
         parsePercent.value = 0

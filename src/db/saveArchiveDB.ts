@@ -9,8 +9,10 @@ export interface ArchiveMeta {
   version: string
   filename: string
   parser_version: string
+  post_processor_version?: string
   source: 'original' | 'imported'
   isCompatible: boolean
+  isValid: boolean
   createdAt: Date
   sectorCount: number
 }
@@ -21,7 +23,7 @@ export interface ArchiveData {
 }
 
 const DB_NAME = 'X4SaveArchiveDB'
-const DB_VERSION = 1
+const DB_VERSION = 2
 
 class X4SaveDB extends Dexie {
   archives!: Table<ArchiveMeta>
@@ -29,8 +31,12 @@ class X4SaveDB extends Dexie {
 
   constructor() {
     super(DB_NAME)
-    this.version(DB_VERSION).stores({
+    this.version(1).stores({
       archives: 'id, guid, playerName, time, createdAt, parser_version',
+      archiveData: 'id'
+    })
+    this.version(DB_VERSION).stores({
+      archives: 'id, guid, playerName, time, createdAt, parser_version, post_processor_version, isValid',
       archiveData: 'id'
     })
   }
@@ -61,8 +67,10 @@ export async function saveArchiveToDB(archive: SaveArchive): Promise<void> {
     version: archive.meta.version,
     filename: archive.meta.filename,
     parser_version: archive.meta.parser_version,
+    post_processor_version: archive.meta.post_processor_version,
     source: archive.meta.source,
     isCompatible: archive.isCompatible,
+    isValid: archive.isValid,
     createdAt: new Date(),
     sectorCount: Object.keys(archive.sectors).length
   }
@@ -105,25 +113,6 @@ export async function clearAllArchivesFromDB(): Promise<void> {
     await database.archives.clear()
     await database.archiveData.clear()
   })
-}
-
-export async function removeOutdatedArchivesFromDB(currentParserVersion: string): Promise<number> {
-  const database = getDB()
-  const outdated = await database.archives
-    .where('parser_version')
-    .notEqual(currentParserVersion)
-    .toArray()
-  
-  if (outdated.length === 0) return 0
-  
-  const ids = outdated.map(m => m.id)
-  
-  await database.transaction('rw', [database.archives, database.archiveData], async () => {
-    await database.archives.bulkDelete(ids)
-    await database.archiveData.bulkDelete(ids)
-  })
-  
-  return ids.length
 }
 
 export async function getArchiveCountFromDB(): Promise<number> {

@@ -14,6 +14,14 @@ import defensestationIconUrl from '@/components/icons/defensestation.svg'
 import piratestationIconUrl from '@/components/icons/piratestation.svg'
 import hiveIconUrl from '@/components/icons/hive.svg'
 import weaponplatformIconUrl from '@/components/icons/weaponplatform.svg'
+import shiptechIconUrl from '@/components/icons/shiptech.svg'
+import hightechIconUrl from '@/components/icons/hightech.svg'
+import refinedIconUrl from '@/components/icons/refined.svg'
+import pharmaceuticalIconUrl from '@/components/icons/pharmaceutical.svg'
+import foodIconUrl from '@/components/icons/food.svg'
+import agriculturalIconUrl from '@/components/icons/agricultural.svg'
+import waterIconUrl from '@/components/icons/water.svg'
+import energyIconUrl from '@/components/icons/energy.svg'
 import shipyardHeadquarterIconUrl from '@/components/icons/shipyard_headquarter.svg'
 import wharfHeadquarterIconUrl from '@/components/icons/wharf_headquarter.svg'
 import equipmentdockHeadquarterIconUrl from '@/components/icons/equipmentdock_headquarter.svg'
@@ -30,7 +38,7 @@ type Ratio = { x: number; y: number }
 type HighwayPoint = { sx?: number; sy?: number }
 type Highway = { entry?: HighwayPoint; exit?: HighwayPoint; spline?: HighwayPoint[] }
 type Gate = { id?: string; target_cluster_id?: string; raw_local_pos?: { sx?: number; sy?: number } }
-type Anchor = { raw_sector_pos?: { sx?: number; sy?: number } }
+type Zone = { raw_sector_pos?: { sx?: number; sy?: number } }
 type SectorLink = {
   id: string
   sector_a_id?: string
@@ -54,7 +62,7 @@ type Sector = {
     sector_radius_ratio?: number
     scale_per_radius?: number
   }
-  shcon_anchors?: Record<string, Anchor>
+  zones?: Record<string, Zone>
   highways?: Record<string, Highway>
   cluster_gates?: Record<string, Gate>
   has_khaak_hive?: boolean
@@ -157,7 +165,9 @@ const SEARCH_HIGHLIGHT_FILTER_ID = 'map-search-sector-glow'
 const RESOURCE_HIGHLIGHT_FILTER_ID = 'map-resource-sector-glow'
 const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
 const OVERLAY_ICON_SIZE = 18
+const SMALL_ICON_SIZE = 9
 const PREVIEW_ICON_SIZE = 20
+const LARGE_ICON_TYPES = ['shipyard', 'wharf', 'tradestation', 'equipmentdock', 'playerhq', 'hive']
 const INNER_CLUSTER_PADDING_2SEC = 0.965  // 2-sector 内层边框 padding
 const INNER_CLUSTER_PADDING_3SEC = 0.98  // 3-sector 内层边框 padding
 const SECTOR_SCALE_3SEC = 0.97  // 3-sector sector 相对于内层的缩放
@@ -432,6 +442,45 @@ const clusterRatioToScreen = (center: Vec2, clusterRadius: number, ratio: Ratio)
   y: center.y + ratio.y * clusterRadius
 })
 
+const getSectorViewportTransform = (cluster: Cluster, center: Vec2, clusterRadius: number, sector: Sector) => {
+  const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
+  const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
+  const sectorCount = Object.keys(cluster.sectors || {}).length
+  let innerPadding = 1
+  let sectorScale = 1
+  if (sectorCount === 2) {
+    innerPadding = INNER_CLUSTER_PADDING_2SEC
+    sectorScale = INNER_CLUSTER_PADDING_2SEC
+  } else if (sectorCount === 3) {
+    innerPadding = INNER_CLUSTER_PADDING_3SEC
+    sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC
+  }
+
+  return {
+    center: {
+      x: center.x + ratio.x * clusterRadius * innerPadding,
+      y: center.y + ratio.y * clusterRadius * innerPadding
+    },
+    sectorRadius: sectorRadiusRatio * clusterRadius * sectorScale,
+    sectorRadiusRatio
+  }
+}
+
+const sectorLocalRatioToScreen = (
+  cluster: Cluster,
+  center: Vec2,
+  clusterRadius: number,
+  sector: Sector,
+  localRatio?: Ratio | null
+): Vec2 | null => {
+  if (!localRatio) return null
+  const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
+  return {
+    x: transform.center.x + localRatio.x * transform.sectorRadius,
+    y: transform.center.y + localRatio.y * transform.sectorRadius
+  }
+}
+
 const gateClusterRatioFromRaw = (gate: Gate, sectorNorm: Sector['normalized']): Ratio | null => {
   const raw = gate.raw_local_pos || {}
   if (raw.sx === undefined || raw.sy === undefined) return null
@@ -622,25 +671,10 @@ const clipDefs = computed(() => {
     const center = centers[clusterId]
     if (!center) return
     Object.values(cluster.sectors || {}).forEach((sector) => {
-      const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
-      const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      // 根据 sector 数量确定内层 padding
-      const sectorCount = Object.keys(cluster.sectors || {}).length
-      let innerPadding = 1
-      let sectorScale = 1
-      if (sectorCount === 2) {
-        innerPadding = INNER_CLUSTER_PADDING_2SEC
-        sectorScale = INNER_CLUSTER_PADDING_2SEC  // 2-sector: sector 紧贴内层
-      } else if (sectorCount === 3) {
-        innerPadding = INNER_CLUSTER_PADDING_3SEC
-        sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC  // 3-sector: 双层缩放
-      }
-      const sx = center.x + ratio.x * clusterRadius * innerPadding
-      const sy = center.y + ratio.y * clusterRadius * innerPadding
-      const sectorRadius = sectorRadiusRatio * clusterRadius * sectorScale
+      const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
       defs.push({
         id: sectorClipId(clusterId, sector.id),
-        points: hexPoints(sx, sy, sectorRadius)
+        points: hexPoints(transform.center.x, transform.center.y, transform.sectorRadius)
       })
     })
   })
@@ -661,10 +695,8 @@ const sectorLinkLines = computed(() => {
       const sectorA = sectors[link.sector_a_id || '']
       const sectorB = sectors[link.sector_b_id || '']
       if (!sectorA || !sectorB || !link.from_zone_id || !link.to_zone_id) return
-      const fromAnchor = sectorA.shcon_anchors?.[link.from_zone_id]
-      const toAnchor = sectorB.shcon_anchors?.[link.to_zone_id]
-      const fromRaw = fromAnchor?.raw_sector_pos
-      const toRaw = toAnchor?.raw_sector_pos
+      const fromRaw = sectorA.zones?.[link.from_zone_id]?.raw_sector_pos
+      const toRaw = sectorB.zones?.[link.to_zone_id]?.raw_sector_pos
       const fromRatio = (fromRaw?.sx !== undefined && fromRaw?.sy !== undefined)
         ? { x: fromRaw.sx, y: fromRaw.sy }
         : null
@@ -696,23 +728,8 @@ const highwaySegments = computed(() => {
     if (!center) return
     const sectors = cluster.sectors || {}
     Object.values(sectors).forEach((sector) => {
-      const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
-      const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      // 根据 sector 数量确定内层 padding
-      const sectorCount = Object.keys(cluster.sectors || {}).length
-      let innerPadding = 1
-      let sectorScale = 1
-      if (sectorCount === 2) {
-        innerPadding = INNER_CLUSTER_PADDING_2SEC
-        sectorScale = INNER_CLUSTER_PADDING_2SEC
-      } else if (sectorCount === 3) {
-        innerPadding = INNER_CLUSTER_PADDING_3SEC
-        sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC
-      }
-      const sx = center.x + ratio.x * clusterRadius * innerPadding
-      const sy = center.y + ratio.y * clusterRadius * innerPadding
-      const sectorRadius = sectorRadiusRatio * clusterRadius * sectorScale
-      const sectorHex = hexVertices(sx, sy, sectorRadius)
+      const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
+      const sectorHex = hexVertices(transform.center.x, transform.center.y, transform.sectorRadius)
 
       Object.entries(sector.highways || {}).forEach(([highwayId, highway]) => {
         const entry = highway.entry
@@ -720,21 +737,15 @@ const highwaySegments = computed(() => {
         if (!entry || !exit) return
         if (entry.sx === undefined || entry.sy === undefined || exit.sx === undefined || exit.sy === undefined) return
 
-        const centerRatio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
-        const startRatio: Ratio = { x: centerRatio.x + entry.sx * sectorRadiusRatio, y: centerRatio.y + entry.sy * sectorRadiusRatio }
-        const endRatio: Ratio = { x: centerRatio.x + exit.sx * sectorRadiusRatio, y: centerRatio.y + exit.sy * sectorRadiusRatio }
-        const start = clusterRatioToScreen(center, clusterRadius, startRatio)
-        const end = clusterRatioToScreen(center, clusterRadius, endRatio)
+        const start = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: entry.sx, y: entry.sy })
+        const end = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: exit.sx, y: exit.sy })
+        if (!start || !end) return
 
         const middlePoints: Vec2[] = []
         ;(highway.spline || []).forEach((point) => {
           if (point.sx === undefined || point.sy === undefined) return
-          middlePoints.push(
-            clusterRatioToScreen(center, clusterRadius, {
-              x: centerRatio.x + point.sx * sectorRadiusRatio,
-              y: centerRatio.y + point.sy * sectorRadiusRatio
-            })
-          )
+          const screenPoint = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: point.sx, y: point.sy })
+          if (screenPoint) middlePoints.push(screenPoint)
         })
 
         const pathPoints = buildHighwayPathPoints(start, end, middlePoints)
@@ -1011,13 +1022,20 @@ const SAVE_POI_ICON_MAP: Record<string, string> = {
   equipmentdock: equipmentdockIconUrl,
   factory: factoryIconUrl,
   tradestation: tradestationIconUrl,
-  defence: defensestationIconUrl,
-  defencestation: defensestationIconUrl,
+  defencemodule: defensestationIconUrl,
   piratebase: piratestationIconUrl,
   piratestation: piratestationIconUrl,
   hive: hiveIconUrl,
   weaponplatform: weaponplatformIconUrl,
-  playerhq: playerhqIconUrl
+  playerhq: playerhqIconUrl,
+  shiptech: shiptechIconUrl,
+  hightech: hightechIconUrl,
+  refined: refinedIconUrl,
+  pharmaceutical: pharmaceuticalIconUrl,
+  food: foodIconUrl,
+  agricultural: agriculturalIconUrl,
+  water: waterIconUrl,
+  energy: energyIconUrl
 }
 
 const SAVE_POI_HEADQUARTER_ICON_MAP: Record<string, string> = {
@@ -1033,17 +1051,34 @@ const SAVE_POI_HEADQUARTER_ICON_MAP: Record<string, string> = {
 }
 
 function getSavePoiIconUrl(poi: SavePoiOverlayItem): string | null {
-  if (!poi.tag) return null
   if (poi.category === 'playerStation' && poi.is_headquarter) {
     return playerhqIconUrl
   }
-  if (poi.is_headquarter) {
+  
+  if (poi.is_headquarter && poi.tag) {
     return SAVE_POI_HEADQUARTER_ICON_MAP[poi.tag] || SAVE_POI_ICON_MAP[poi.tag] || null
   }
+  
   if (poi.tag === 'nest') {
     return weaponplatformIconUrl
   }
-  return SAVE_POI_ICON_MAP[poi.tag] || null
+  
+  if (poi.tag === 'factory' && poi.factoryGroup) {
+    return SAVE_POI_ICON_MAP[poi.factoryGroup] || factoryIconUrl
+  }
+  
+  if (poi.tag) {
+    return SAVE_POI_ICON_MAP[poi.tag] || null
+  }
+  
+  return null
+}
+
+function getSavePoiIconSize(poi: SavePoiOverlayItem): number {
+  if (poi.tag && LARGE_ICON_TYPES.includes(poi.tag)) {
+    return OVERLAY_ICON_SIZE
+  }
+  return SMALL_ICON_SIZE
 }
 
 function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
@@ -1509,10 +1544,10 @@ watchEffect(() => {
         <image
           v-if="getSavePoiIconUrl(poi)"
           :href="getSavePoiIconUrl(poi)!"
-          :x="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
-          :y="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
-          :width="OVERLAY_ICON_SIZE"
-          :height="OVERLAY_ICON_SIZE"
+          :x="(-getSavePoiIconSize(poi) / 2).toFixed(1)"
+          :y="(-getSavePoiIconSize(poi) / 2).toFixed(1)"
+          :width="getSavePoiIconSize(poi)"
+          :height="getSavePoiIconSize(poi)"
           preserveAspectRatio="xMidYMid meet"
           :filter="poi.factionFilterId ? `url(#${poi.factionFilterId}${focusedSavePoiKey === poi.key ? '-focused' : ''})` : undefined"
         />

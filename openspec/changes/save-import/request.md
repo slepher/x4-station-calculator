@@ -2,7 +2,7 @@
 
 ## 目标
 
-新增"存档同步"Tab，支持上传X4存档文件或导入已提取JSON，解析并展示空间站、vault、弃船等信息，支持导出提取结果为JSON文件。
+新增"存档同步"Tab，支持上传X4存档文件或导入已提取JSON，解析并展示空间站、vault、弃船等信息，支持导出提取结果为JSON文件，并通过 IndexedDB 保存可版本化恢复的缓存结果。
 
 ## 已确认方案（审核重点）
 
@@ -39,6 +39,25 @@
 - 不匹配时：显示警告提示，禁止加载或标记为不兼容
 - JSON导入时同样校验 `meta.version`
 
+### parser/post-processor 版本规则
+- `meta` 需要同时携带：
+  - `parser_version`: parser 处理后的原始数据版本
+  - `post_processor_version`: 二次后处理后的数据版本
+- 当前版本基线：
+  - `parser_version = "v2"`
+  - `post_processor_version = "v2"`
+- `parser_version` 在 Rust parser 与 TS 后处理链路中都要有定义并保持一致
+
+### IndexedDB 恢复规则
+- Save Import 数据持久化到 IndexedDB
+- 读取缓存时：
+  - 若 `parser_version` 不匹配当前版本：该存档标记为 `isValid = false`
+  - 若 `parser_version` 匹配但 `post_processor_version` 不匹配：直接基于已缓存的 parser 原始数据重新执行一次 `postProcess`
+- 无效存档保留在一级列表中，但不再视为可信内容：
+  - 页面显示“无效存档”
+  - 地图侧不允许进入二级菜单
+  - 用户需要重新导入原始存档文件
+
 ### 存档解析目标
 从存档XML提取以下对象（按sector组织）：
 
@@ -51,7 +70,7 @@
      - `xenonStations`
      - `khaakStations`
      - `npcStations`
-   - 基础字段：`code, macro, owner, x/y/z, is_wreck, is_headquarter`
+   - 基础字段：`code, macro, owner, relative_position, position, zone_id, is_wreck, is_headquarter`
    - `owner="player"` 的 station 继续保留玩家站明细模块提取
    - `owner!="player"` 的 station 中：
      - `npcStations`
@@ -92,7 +111,7 @@
     - 上述 `npc/xenon/khaak/player` 的派生判定放在 `src/workers/saveParserRust.worker.ts` 层处理，不下沉到 `rust-parser/src/core.rs`
    
 3. **Datavault**：`component class="datavault"`（单独类型）
-   - 提取字段：`code, macro, owner, x/y/z, has_blueprints, has_wares, has_signalleak`
+   - 提取字段：`code, macro, owner, relative_position, position, zone_id, has_blueprints, has_wares, has_signalleak`
    - 额外提取：
      - `unlocked`: 来自 `<unlock state="unlocked"/>`
        - tag 不存在或 `state!="unlocked"` 时，固定输出 `false`
@@ -102,14 +121,21 @@
        - `amount` 缺失按 `1` 处理
    
 4. **Erlking Vault**：`macro` 含 `erlking_vault`（单独类型）
-   - 提取字段：`code, macro, owner, x/y/z, has_blueprints, has_wares, has_signalleak`
+   - 提取字段：`code, macro, owner, relative_position, position, zone_id, has_blueprints, has_wares, has_signalleak`
    - 额外提取：
      - `unlocked`
      - `wares: [{ ware, amount }]`
    - `unlocked` 与 `wares` 的提取/聚合规则与 datavault 相同
    
 5. **弃船**：`component class="ship_*" owner="ownerless"`
-   - 提取字段：`code, macro, class, x/y/z`
+   - 提取字段：`code, macro, class, relative_position, position, zone_id`
+
+### 地图坐标补全与 zone 规则
+- parser 原始数据输出 `relative_position`
+- 后处理根据 `zone_id + maps.zones` 补出最终 `position`
+- `maps` 处理链路中的 `zone_id` 统一小写
+- `maps.zones` 已由数组改为对象：`zones: { [ref]: zone }`
+- 原有 `shcon_anchors` 已并回 `zones`，相关消费方全部改为直接使用 `zones`
 
 ### 导出JSON格式
 ```json
@@ -120,6 +146,8 @@
     "time": 770722.838,
     "playerName": "slepher",
     "version": "800",
+    "parser_version": "v2",
+    "post_processor_version": "v2",
     "source": "original"
   },
   "sectors": {
@@ -128,25 +156,25 @@
       "is_known": true,
       "owner": "argon",
       "playerStations": [
-        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [] }
+        { "code", "macro", "owner", "relative_position", "position", "zone_id", "is_wreck", "is_headquarter", "modules": [] }
       ],
       "xenonStations": [
-        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [{ "ref": "buildmodule_xen_ships_xl", "amount": 1 }], "isShipyard": true }
+        { "code", "macro", "owner", "relative_position", "position", "zone_id", "is_wreck", "is_headquarter", "modules": [{ "ref": "buildmodule_xen_ships_xl", "amount": 1 }], "isShipyard": true }
       ],
       "khaakStations": [
-        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [{ "ref": "module_khaak_special", "amount": 2 }], "isHive": true }
+        { "code", "macro", "owner", "relative_position", "position", "zone_id", "is_wreck", "is_headquarter", "modules": [{ "ref": "module_khaak_special", "amount": 2 }], "isHive": true }
       ],
       "npcStations": [
-        { "code", "macro", "owner", "x", "y", "z", "is_wreck", "is_headquarter", "modules": [{ "ref": "buildmodule_arg_ships_m", "amount": 2 }], "isWharf": true }
+        { "code", "macro", "owner", "relative_position", "position", "zone_id", "is_wreck", "is_headquarter", "modules": [{ "ref": "buildmodule_arg_ships_m", "amount": 2 }], "isWharf": true }
       ],
       "datavaults": [
-        { "code", "macro", "owner", "x", "y", "z", "has_blueprints", "has_wares", "has_signalleak", "unlocked": false, "wares": [{ "ware": "inv_spaceflyeggs", "amount": 4 }] }
+        { "code", "macro", "owner", "relative_position", "position", "zone_id", "has_blueprints", "has_wares", "has_signalleak", "unlocked": false, "wares": [{ "ware": "inv_spaceflyeggs", "amount": 4 }] }
       ],
       "erlkingVaults": [
-        { "code", "macro", "owner", "x", "y", "z", "has_blueprints", "has_wares", "has_signalleak", "unlocked": true, "wares": [{ "ware": "modpart_highenergycatalyst", "amount": 1 }] }
+        { "code", "macro", "owner", "relative_position", "position", "zone_id", "has_blueprints", "has_wares", "has_signalleak", "unlocked": true, "wares": [{ "ware": "modpart_highenergycatalyst", "amount": 1 }] }
       ],
       "abandonedShips": [
-        { "code", "macro", "class", "x", "y", "z" }
+        { "code", "macro", "class", "relative_position", "position", "zone_id" }
       ]
     }
   }
@@ -205,9 +233,14 @@
 - `playerStations` 的 `isShipyard/isWharf/isEquipmentdock/isFactory/isPiratebase/isDefence` 判定
 - 所有 station 的 `tag` 字段判定（按优先级）
 - datavault / erlking_vault 的 `unlocked` 与聚合 `wares`
+- IndexedDB 持久化与恢复
+- `parser_version/post_processor_version` 双层版本管理
+- `isValid` 无效存档标记与页面展示
+- 基于 `zone_id + maps.zones` 的最终坐标补全
+- `zones` 对象结构与小写 `zone_id` 兼容
+- `shcon_anchors` 并回 `zones` 后的消费方迁移
 
 ### Out of Scope
-- 持久化到localStorage/IndexedDB（暂不实现）
 - 显示其他存档内容（船只、资源区、 gates等）
 - 与现有规划数据联动（如导入空间站到帝国管理）
 - 提取玩家位置

@@ -145,9 +145,9 @@ pub(crate) struct StationBaseEntry {
     #[serde(rename = "macro")]
     pub(crate) macro_field: String,
     pub(crate) owner: String,
-    pub(crate) x: f64,
-    pub(crate) y: f64,
-    pub(crate) z: f64,
+    pub(crate) relative_position: Vector3,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) zone_id: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) is_wreck: Option<bool>,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -205,9 +205,9 @@ pub(crate) struct DatavaultEntry {
     #[serde(rename = "macro")]
     pub(crate) macro_field: String,
     pub(crate) owner: String,
-    pub(crate) x: f64,
-    pub(crate) y: f64,
-    pub(crate) z: f64,
+    pub(crate) relative_position: Vector3,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) zone_id: Option<String>,
     pub(crate) unlocked: bool,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) wares: Vec<DatavaultWareEntry>,
@@ -225,9 +225,9 @@ pub(crate) struct AbandonedShipEntry {
     #[serde(rename = "macro")]
     pub(crate) macro_field: String,
     pub(crate) class: String,
-    pub(crate) x: f64,
-    pub(crate) y: f64,
-    pub(crate) z: f64,
+    pub(crate) relative_position: Vector3,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) zone_id: Option<String>,
 }
 
 #[derive(Clone, Serialize, Default)]
@@ -260,6 +260,8 @@ pub(crate) struct SaveArchive {
     pub(crate) sectors: HashMap<String, SectorData>,
     #[serde(rename = "isCompatible")]
     pub(crate) is_compatible: bool,
+    #[serde(rename = "isValid")]
+    pub(crate) is_valid: bool,
 }
 
 #[derive(Clone, Serialize)]
@@ -273,6 +275,8 @@ pub(crate) struct ArchiveMeta {
     pub(crate) filename: String,
     #[serde(rename = "parser_version")]
     pub(crate) parser_version: String,
+    #[serde(rename = "post_processor_version", skip_serializing_if = "Option::is_none")]
+    pub(crate) post_processor_version: Option<String>,
     pub(crate) source: String,
 }
 

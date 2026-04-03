@@ -55114,6 +55114,173 @@
       "solid_volume_km3": 1700141
     }
   ],
+  "Cluster_715_Sector001_macro": [
+    {
+      "ref": "region_cluster_715_sector_001_nebula_1",
+      "amount": 1,
+      "position": {
+        "x": 0.0,
+        "y": -20000.0,
+        "z": 0.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 350000,
+          "linear": 42000
+        }
+      },
+      "lateral_factor": 0.915,
+      "radial_factor": 0.95,
+      "falloff_factor": 0.86925,
+      "resources": [
+        {
+          "ware": "hydrogen",
+          "resourcedensity": 6600.0,
+          "theoretical_reserve": 969561,
+          "theoretical_respawn": 193912,
+          "delay": 300.0,
+          "gatherfactor": 1.0,
+          "yield_name": "low",
+          "reserve": 577987,
+          "respawn": 115597
+        },
+        {
+          "ware": "helium",
+          "resourcedensity": 3000.0,
+          "theoretical_reserve": 440710,
+          "theoretical_respawn": 88142,
+          "delay": 300.0,
+          "gatherfactor": 1.0,
+          "yield_name": "low",
+          "reserve": 262701,
+          "respawn": 52540
+        },
+        {
+          "ware": "methane",
+          "resourcedensity": 2500.0,
+          "theoretical_reserve": 367258,
+          "theoretical_respawn": 73452,
+          "delay": 300.0,
+          "gatherfactor": 1.0,
+          "yield_name": "low",
+          "reserve": 218891,
+          "respawn": 43778
+        }
+      ],
+      "gas_volume_km3": 44302336
+    },
+    {
+      "ref": "region_cluster_715_sector_001_asteroids_1",
+      "amount": 1,
+      "position": {
+        "x": 0.0,
+        "y": -20000.0,
+        "z": 0.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 250000,
+          "linear": 42000
+        }
+      },
+      "lateral_factor": 0.915,
+      "radial_factor": 0.95,
+      "falloff_factor": 0.86925,
+      "resources": [
+        {
+          "ware": "ore",
+          "resourcedensity": 60.0,
+          "theoretical_reserve": 860211265,
+          "theoretical_respawn": 14336854,
+          "delay": 3600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "high",
+          "reserve": 811873623,
+          "respawn": 13531227
+        },
+        {
+          "ware": "silicon",
+          "resourcedensity": 120.0,
+          "theoretical_reserve": 1720422531,
+          "theoretical_respawn": 28673709,
+          "delay": 3600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "highplus",
+          "reserve": 1623747456,
+          "respawn": 27062458
+        },
+        {
+          "ware": "nividium",
+          "resourcedensity": 0.01,
+          "theoretical_reserve": 143369,
+          "theoretical_respawn": 427,
+          "delay": 20160.0,
+          "gatherfactor": 1.0,
+          "yield_name": "high",
+          "reserve": 135201,
+          "respawn": 402
+        }
+      ],
+      "solid_volume_km3": 16493361
+    },
+    {
+      "ref": "region_cluster_715_sector_001_nebula_2",
+      "amount": 1,
+      "position": {
+        "x": 0.0,
+        "y": -20000.0,
+        "z": 0.0
+      },
+      "boundary": {
+        "class": "cylinder",
+        "size": {
+          "r": 350000,
+          "linear": 42000
+        }
+      },
+      "lateral_factor": 0.915,
+      "radial_factor": 0.95,
+      "falloff_factor": 0.86925,
+      "resources": [
+        {
+          "ware": "hydrogen",
+          "resourcedensity": 24000.0,
+          "theoretical_reserve": 3525678,
+          "theoretical_respawn": 352568,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medlow",
+          "reserve": 2101872,
+          "respawn": 210187
+        },
+        {
+          "ware": "helium",
+          "resourcedensity": 15000.0,
+          "theoretical_reserve": 2203549,
+          "theoretical_respawn": 220355,
+          "delay": 600.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medium",
+          "reserve": 1313669,
+          "respawn": 131367
+        },
+        {
+          "ware": "methane",
+          "resourcedensity": 52500.0,
+          "theoretical_reserve": 7712421,
+          "theoretical_respawn": 257081,
+          "delay": 1800.0,
+          "gatherfactor": 1.0,
+          "yield_name": "medplus",
+          "reserve": 4597857,
+          "respawn": 153262
+        }
+      ],
+      "gas_volume_km3": 44302336
+    }
+  ],
   "Cluster_720_Sector001_macro": [
     {
       "ref": "region_cluster_720_sector_001_nebula_1",
@@ -67348,173 +67515,6 @@
         }
       ],
       "gas_volume_km3": 11796480
-    }
-  ],
-  "Cluster_715_Sector001_macro": [
-    {
-      "ref": "region_cluster_715_sector_001_nebula_1",
-      "amount": 1,
-      "position": {
-        "x": 0.0,
-        "y": -20000.0,
-        "z": 0.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 350000,
-          "linear": 42000
-        }
-      },
-      "lateral_factor": 0.915,
-      "radial_factor": 0.95,
-      "falloff_factor": 0.86925,
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "resourcedensity": 6600.0,
-          "theoretical_reserve": 969561,
-          "theoretical_respawn": 193912,
-          "delay": 300.0,
-          "gatherfactor": 1.0,
-          "yield_name": "low",
-          "reserve": 577987,
-          "respawn": 115597
-        },
-        {
-          "ware": "helium",
-          "resourcedensity": 3000.0,
-          "theoretical_reserve": 440710,
-          "theoretical_respawn": 88142,
-          "delay": 300.0,
-          "gatherfactor": 1.0,
-          "yield_name": "low",
-          "reserve": 262701,
-          "respawn": 52540
-        },
-        {
-          "ware": "methane",
-          "resourcedensity": 2500.0,
-          "theoretical_reserve": 367258,
-          "theoretical_respawn": 73452,
-          "delay": 300.0,
-          "gatherfactor": 1.0,
-          "yield_name": "low",
-          "reserve": 218891,
-          "respawn": 43778
-        }
-      ],
-      "gas_volume_km3": 44302336
-    },
-    {
-      "ref": "region_cluster_715_sector_001_asteroids_1",
-      "amount": 1,
-      "position": {
-        "x": 0.0,
-        "y": -20000.0,
-        "z": 0.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 250000,
-          "linear": 42000
-        }
-      },
-      "lateral_factor": 0.915,
-      "radial_factor": 0.95,
-      "falloff_factor": 0.86925,
-      "resources": [
-        {
-          "ware": "ore",
-          "resourcedensity": 60.0,
-          "theoretical_reserve": 860211265,
-          "theoretical_respawn": 14336854,
-          "delay": 3600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "high",
-          "reserve": 811873623,
-          "respawn": 13531227
-        },
-        {
-          "ware": "silicon",
-          "resourcedensity": 120.0,
-          "theoretical_reserve": 1720422531,
-          "theoretical_respawn": 28673709,
-          "delay": 3600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "highplus",
-          "reserve": 1623747456,
-          "respawn": 27062458
-        },
-        {
-          "ware": "nividium",
-          "resourcedensity": 0.01,
-          "theoretical_reserve": 143369,
-          "theoretical_respawn": 427,
-          "delay": 20160.0,
-          "gatherfactor": 1.0,
-          "yield_name": "high",
-          "reserve": 135201,
-          "respawn": 402
-        }
-      ],
-      "solid_volume_km3": 16493361
-    },
-    {
-      "ref": "region_cluster_715_sector_001_nebula_2",
-      "amount": 1,
-      "position": {
-        "x": 0.0,
-        "y": -20000.0,
-        "z": 0.0
-      },
-      "boundary": {
-        "class": "cylinder",
-        "size": {
-          "r": 350000,
-          "linear": 42000
-        }
-      },
-      "lateral_factor": 0.915,
-      "radial_factor": 0.95,
-      "falloff_factor": 0.86925,
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "resourcedensity": 24000.0,
-          "theoretical_reserve": 3525678,
-          "theoretical_respawn": 352568,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medlow",
-          "reserve": 2101872,
-          "respawn": 210187
-        },
-        {
-          "ware": "helium",
-          "resourcedensity": 15000.0,
-          "theoretical_reserve": 2203549,
-          "theoretical_respawn": 220355,
-          "delay": 600.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medium",
-          "reserve": 1313669,
-          "respawn": 131367
-        },
-        {
-          "ware": "methane",
-          "resourcedensity": 52500.0,
-          "theoretical_reserve": 7712421,
-          "theoretical_respawn": 257081,
-          "delay": 1800.0,
-          "gatherfactor": 1.0,
-          "yield_name": "medplus",
-          "reserve": 4597857,
-          "respawn": 153262
-        }
-      ],
-      "gas_volume_km3": 44302336
     }
   ]
 }

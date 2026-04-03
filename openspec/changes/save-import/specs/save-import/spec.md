@@ -84,6 +84,32 @@
 
 **并且** 不加载该存档数据
 
+### Requirement: Archive Version Metadata
+
+存档必须同时记录 parser 原始数据版本和后处理版本。
+
+#### Scenario: parser 输出原始数据版本
+
+**前提** 用户上传原始 `.xml` 或 `.xml.gz` 存档
+
+**当** parser 完成原始解析
+
+**那么** 输出的 `meta.parser_version` 必须等于当前 parser 基线版本
+
+**并且** 当前 parser 基线版本为 `v2`
+
+#### Scenario: postProcess 输出最终版本
+
+**前提** parser 已输出原始存档对象
+
+**当** TS 后处理完成
+
+**那么** 最终存档必须写入 `meta.post_processor_version`
+
+**并且** 当前后处理基线版本为 `v2`
+
+**并且** 最终存档必须包含 `isValid`
+
 ### Requirement: Version Validation
 
 存档版本必须与当前游戏数据版本匹配，版本不匹配时拒绝加载。
@@ -146,6 +172,64 @@
 
 **并且** 替换旧数据
 
+### Requirement: IndexedDB Recovery
+
+IndexedDB 中的缓存存档必须按版本规则恢复，而不是一律删除。
+
+#### Scenario: parser_version 不匹配时标记无效
+
+**前提** IndexedDB 中存在一条存档记录
+
+**并且** 该记录的 `meta.parser_version` 不等于当前 parser 基线版本
+
+**当** Save Store 初始化并加载缓存
+
+**那么** 保留该条记录在一级列表中可见
+
+**并且** 将该条记录标记为 `isValid=false`
+
+**并且** 不自动重跑 postProcess
+
+#### Scenario: post_processor_version 不匹配时自动重跑
+
+**前提** IndexedDB 中存在一条存档记录
+
+**并且** 该记录的 `meta.parser_version` 等于当前 parser 基线版本
+
+**并且** 该记录的 `meta.post_processor_version` 不等于当前后处理基线版本
+
+**当** Save Store 初始化并加载缓存
+
+**那么** 读取完整存档详情
+
+**并且** 基于已缓存的 parser 原始数据重新执行一次 `postProcess`
+
+**并且** 用新结果覆盖回写 IndexedDB
+
+### Requirement: Invalid Archive Interaction
+
+无效存档必须显式展示，但不能继续进入依赖其内容数据的深层交互。
+
+#### Scenario: Save Import 页面展示无效存档
+
+**前提** 某条存档 `isValid=false`
+
+**当** 用户查看 Save Import 列表或详情区
+
+**那么** 页面显示“无效存档”标记
+
+**并且** 详情区显示需要重新导入原始存档的提示
+
+#### Scenario: 地图侧无效存档禁止进入二级菜单
+
+**前提** 某条存档 `isValid=false`
+
+**当** 用户在地图侧存档列表点击该存档
+
+**那么** 不触发进入分类二级菜单
+
+**并且** 该项呈现禁用态和原因提示
+
 ### Requirement: Save Data Extraction
 
 从存档XML提取指定对象。
@@ -166,6 +250,30 @@
 - `xenonStations`
 - `khaakStations`
 - `npcStations`
+
+#### Scenario: 基于 zone 数据补全最终坐标
+
+**前提** parser 已提取对象的层级 offset
+
+**当** 后处理空间站、datavault、erlkingVault、abandonedShip 坐标
+
+**那么** 原始数据必须保留 `relative_position`
+
+**并且** 若存在 `zone_id`，则使用 `zone_id + maps.zones` 计算最终 `position`
+
+**并且** 若缺失 `zone_id` 或 map 查表失败，则 `position = relative_position`
+
+#### Scenario: maps.zones 作为统一 zone 数据源
+
+**前提** 后处理或地图渲染需要读取 zone 数据
+
+**当** 读取 `maps.json`
+
+**那么** `zones` 必须是对象结构
+
+**并且** `zone_id` 与 `zones` 主键统一使用小写
+
+**并且** 不再依赖独立 `shcon_anchors`
 
 #### Scenario: 提取所有空间站并按owner分类
 
@@ -454,14 +562,18 @@ JS parser 冻结为兼容/备用链路，后续业务演进仅进入 Rust/WASM �
     "playerName": "slepher",
     "version": "800",
     "filename": "save_001",
-    "parser_version": "v1",
+    "parser_version": "v2",
+    "post_processor_version": "v2",
     "source": "original"
   },
   "sectors": {
     "sector_macro": {
       "name": "翻译后名称",
       "is_known": true,
-      "stations": [...],
+      "playerStations": [...],
+      "xenonStations": [...],
+      "khaakStations": [...],
+      "npcStations": [...],
       "datavaults": [...],
       "erlkingVaults": [...],
       "abandonedShips": [...]
@@ -568,9 +680,10 @@ JS parser 冻结为兼容/备用链路，后续业务演进仅进入 Rust/WASM �
 - `saves`: SaveArchive[]（按time降序）
 
 **并且** SaveArchive 包含：
-- `meta`: 存档元信息（含 filename, parser_version）
+- `meta`: 存档元信息（含 filename, parser_version, post_processor_version）
 - `sectors`: 提取的sector数据
 - `isCompatible`: 版本兼容状态
+- `isValid`: parser_version 是否仍被当前版本接受
 
 #### Scenario: Store方法
 

@@ -40,6 +40,7 @@ export interface SaveMeta {
   version: string
   filename: string
   parser_version: 'v1' | 'v2'
+  post_processor_version?: 'v1' | 'v2'
   source: SaveSource
 }
 
@@ -60,6 +61,9 @@ export interface PlayerStationConstruction {
 export interface AggregatedStationModule {
   ref: string
   amount: number
+  module_id?: string
+  type?: string
+  group?: string
 }
 
 export interface AggregatedEquipment {
@@ -72,9 +76,9 @@ export interface StationBaseEntry {
   code: string
   macro: string
   owner: string
-  x: number
-  y: number
-  z: number
+  relative_position: { x: number; y: number; z: number }
+  zone_id?: string
+  position: { x: number; y: number; z: number }
   is_wreck?: boolean
   is_headquarter?: boolean
   tag?: string
@@ -88,8 +92,9 @@ export interface PlayerStationEntry extends StationBaseEntry {
   isWharf?: boolean
   isEquipmentdock?: boolean
   isFactory?: boolean
+  factoryGroup?: string
   isPiratebase?: boolean
-  isDefence?: boolean
+  isDefencemodule?: boolean
 }
 
 export interface NpcStationEntry extends StationBaseEntry {
@@ -100,8 +105,9 @@ export interface NpcStationEntry extends StationBaseEntry {
   isEquipmentdock?: boolean
   isTradestation?: boolean
   isFactory?: boolean
+  factoryGroup?: string
   isPiratebase?: boolean
-  isDefence?: boolean
+  isDefencemodule?: boolean
   isNest?: boolean
   isHive?: boolean
 }
@@ -113,8 +119,10 @@ export interface FactionStationEntry extends StationBaseEntry {
   isWharf?: boolean
   isEquipmentdock?: boolean
   isTradestation?: boolean
+  isFactory?: boolean
+  factoryGroup?: string
   isPiratebase?: boolean
-  isDefence?: boolean
+  isDefencemodule?: boolean
   isNest?: boolean
   isHive?: boolean
 }
@@ -130,9 +138,9 @@ export interface DatavaultEntry {
   code: string
   macro: string
   owner: string
-  x: number
-  y: number
-  z: number
+  relative_position: { x: number; y: number; z: number }
+  zone_id?: string
+  position: { x: number; y: number; z: number }
   unlocked: boolean
   wares?: DatavaultWareEntry[]
   has_blueprints?: boolean
@@ -144,9 +152,9 @@ export interface AbandonedShipEntry {
   code: string
   macro: string
   class: string
-  x: number
-  y: number
-  z: number
+  relative_position: { x: number; y: number; z: number }
+  zone_id?: string
+  position: { x: number; y: number; z: number }
 }
 
 export interface SectorData {
@@ -166,6 +174,7 @@ export interface SaveArchive {
   meta: SaveMeta
   sectors: Record<string, SectorData>
   isCompatible: boolean
+  isValid: boolean
 }
 
 export type SavePoiCategory = 'playerStation' | 'npcStation' | 'xenonStation' | 'khaakStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
@@ -181,6 +190,7 @@ export interface SavePoiOverlayItem {
   sectorName: string
   pos: { x: number; z: number }
   tag?: string
+  factoryGroup?: string
   is_headquarter?: boolean
 }
 
