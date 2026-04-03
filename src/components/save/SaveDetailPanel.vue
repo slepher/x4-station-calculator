@@ -109,6 +109,9 @@ function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string
       <div class="detail-header">
         <div class="meta-info">
           <span class="player-name">{{ archive.meta.playerName }}</span>
+          <span v-if="!archive.isValid" class="version-badge invalid">
+            {{ t('save_import.invalid_archive') }}
+          </span>
           <span v-if="!archive.isCompatible" class="version-badge warning">
             {{ t('save_import.version_mismatch') }} ({{ archive.meta.version }})
           </span>
@@ -125,6 +128,9 @@ function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string
       </div>
 
       <div class="tab-content">
+        <div v-if="!archive.isValid" class="invalid-note">
+          {{ t('save_import.invalid_archive_detail') }}
+        </div>
         <div v-if="!hasData" class="empty-tab">
           {{ t('save_import.empty_tab') }}
         </div>
@@ -143,7 +149,7 @@ function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string
               <template v-if="activeTab === 'player-stations'">
                 <div v-for="item in sector.items" :key="(item as PlayerStationEntry).code" class="item-row">
                   <span class="item-code">{{ (item as PlayerStationEntry).code }}</span>
-                  <span class="item-coords">({{ formatCoord((item as PlayerStationEntry).x) }}, {{ formatCoord((item as PlayerStationEntry).z) }})</span>
+                  <span class="item-coords">({{ formatCoord((item as PlayerStationEntry).position.x) }}, {{ formatCoord((item as PlayerStationEntry).position.z) }})</span>
                   <span v-if="(item as PlayerStationEntry).is_headquarter" class="item-tag hq">{{ t('save_import.hq_badge') }}</span>
                 </div>
               </template>
@@ -152,7 +158,7 @@ function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string
                 <div v-for="item in sector.items" :key="(item as FactionStationEntry).code" class="item-row item-row-stacked">
                   <div class="item-primary">
                     <span class="item-owner">{{ (item as FactionStationEntry).owner || 'neutral' }}</span>
-                    <span class="item-coords">({{ formatCoord((item as FactionStationEntry).x) }}, {{ formatCoord((item as FactionStationEntry).z) }})</span>
+                    <span class="item-coords">({{ formatCoord((item as FactionStationEntry).position.x) }}, {{ formatCoord((item as FactionStationEntry).position.z) }})</span>
                   </div>
                   <span v-if="formatNpcModules((item as FactionStationEntry).modules)" class="item-secondary">{{ formatNpcModules((item as FactionStationEntry).modules) }}</span>
                   <span v-if="formatStationFlags(item as FactionStationEntry)" class="item-secondary">{{ formatStationFlags(item as FactionStationEntry) }}</span>
@@ -163,7 +169,7 @@ function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string
                 <div v-for="item in sector.items" :key="(item as NpcStationEntry).code" class="item-row item-row-stacked">
                   <div class="item-primary">
                     <span class="item-owner">{{ (item as NpcStationEntry).owner || 'neutral' }}</span>
-                    <span class="item-coords">({{ formatCoord((item as NpcStationEntry).x) }}, {{ formatCoord((item as NpcStationEntry).z) }})</span>
+                    <span class="item-coords">({{ formatCoord((item as NpcStationEntry).position.x) }}, {{ formatCoord((item as NpcStationEntry).position.z) }})</span>
                   </div>
                   <span v-if="formatNpcModules((item as NpcStationEntry).modules)" class="item-secondary">{{ formatNpcModules((item as NpcStationEntry).modules) }}</span>
                   <span v-if="formatStationFlags(item as NpcStationEntry)" class="item-secondary">{{ formatStationFlags(item as NpcStationEntry) }}</span>
@@ -173,14 +179,14 @@ function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string
               <template v-if="activeTab === 'abandoned-ships'">
                 <div v-for="item in sector.items" :key="(item as AbandonedShipEntry).code" class="item-row">
                   <span class="item-class">{{ (item as AbandonedShipEntry).class }}</span>
-                  <span class="item-coords">({{ formatCoord((item as AbandonedShipEntry).x) }}, {{ formatCoord((item as AbandonedShipEntry).z) }})</span>
+                  <span class="item-coords">({{ formatCoord((item as AbandonedShipEntry).position.x) }}, {{ formatCoord((item as AbandonedShipEntry).position.z) }})</span>
                 </div>
               </template>
 
               <template v-if="activeTab === 'datavaults' || activeTab === 'erlking-vaults'">
                 <div v-for="item in sector.items" :key="(item as DatavaultEntry).code" class="item-row item-row-stacked">
                   <div class="item-primary">
-                    <span class="item-coords">({{ formatCoord((item as DatavaultEntry).x) }}, {{ formatCoord((item as DatavaultEntry).z) }})</span>
+                    <span class="item-coords">({{ formatCoord((item as DatavaultEntry).position.x) }}, {{ formatCoord((item as DatavaultEntry).position.z) }})</span>
                     <span class="item-tag" :class="(item as DatavaultEntry).unlocked ? 'item-tag-unlocked' : 'item-tag-locked'">
                       {{ (item as DatavaultEntry).unlocked ? t('save_import.unlocked') : t('save_import.locked') }}
                     </span>
@@ -238,12 +244,20 @@ function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string
   @apply bg-amber-500/20 text-amber-400;
 }
 
+.version-badge.invalid {
+  @apply bg-red-500/20 text-red-300;
+}
+
 .tab-content {
   @apply flex-1 overflow-y-auto p-2;
 }
 
 .empty-tab {
   @apply text-sm text-slate-500 text-center py-4;
+}
+
+.invalid-note {
+  @apply mb-2 rounded border border-red-500/30 bg-red-500/10 px-3 py-2 text-sm text-red-200;
 }
 
 .sector-list {

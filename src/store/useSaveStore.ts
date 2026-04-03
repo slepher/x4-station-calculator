@@ -23,12 +23,14 @@ import {
   loadArchiveListFromDB,
   loadArchiveDetailFromDB,
   removeArchiveFromDB,
-  clearAllArchivesFromDB,
-  removeOutdatedArchivesFromDB
+  clearAllArchivesFromDB
 } from '@/db/saveArchiveDB'
-
-const CURRENT_PARSER_VERSION = 'v1'
-const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'abandonedShip', 'datavault', 'erlkingVault']
+import {
+  CURRENT_PARSER_VERSION,
+  CURRENT_POST_PROCESSOR_VERSION,
+  postProcessRustSaveArchive
+} from '@/workers/saveParser.post'
+const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'xenonStation', 'khaakStation', 'abandonedShip', 'datavault', 'erlkingVault']
 
 function normalizeVersion(v: string): string {
   const trimmed = v.trim()
@@ -97,14 +99,19 @@ function createOverlayItem(
   sectorName: string,
   item: StationEntry | DatavaultEntry | AbandonedShipEntry
 ): SavePoiOverlayItem {
+  const isStation = 'tag' in item || 'is_headquarter' in item
+  const owner = category === 'playerStation' ? 'player' : ('owner' in item ? item.owner : undefined)
   return {
     key: `${category}:${item.code}`,
     code: item.code,
     category,
-    owner: 'owner' in item ? item.owner : undefined,
+    owner,
     sectorMacro,
     sectorName,
-    pos: { x: item.x, z: item.z }
+    pos: { x: item.position.x, z: item.position.z },
+    tag: isStation && 'tag' in item ? item.tag : undefined,
+    factoryGroup: isStation && 'factoryGroup' in item ? item.factoryGroup : undefined,
+    is_headquarter: isStation && 'is_headquarter' in item ? item.is_headquarter : undefined
   }
 }
 
@@ -116,11 +123,13 @@ export function deriveSavePoiCategoryData(archive: SaveArchive | null | undefine
       sector.playerStations || []
     )),
     npcStation: createPoiCategoryData('npcStation', buildPoiGroups(sectors, (sector) =>
-      [
-        ...(sector.npcStations || []),
-        ...(sector.xenonStations || []),
-        ...(sector.khaakStations || [])
-      ]
+      sector.npcStations || []
+    )),
+    xenonStation: createPoiCategoryData('xenonStation', buildPoiGroups(sectors, (sector) =>
+      sector.xenonStations || []
+    )),
+    khaakStation: createPoiCategoryData('khaakStation', buildPoiGroups(sectors, (sector) =>
+      sector.khaakStations || []
     )),
     abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (sector) => sector.abandonedShips || [])),
     datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (sector) => sector.datavaults || [])),
@@ -194,6 +203,39 @@ export function flattenSavePoiCategoryData(
   )
 }
 
+function isArchiveParserVersionValid(archive: Pick<SaveArchive, 'meta'>): boolean {
+  return archive.meta.parser_version === CURRENT_PARSER_VERSION
+}
+
+function createStubArchiveFromMeta(meta: {
+  guid: string
+  time: number
+  playerName: string
+  version: string
+  filename: string
+  parser_version: string
+  post_processor_version?: string
+  source: 'original' | 'imported'
+  isCompatible: boolean
+}): SaveArchive {
+  return {
+    meta: {
+      guid: meta.guid,
+      seed: 0,
+      time: meta.time,
+      playerName: meta.playerName,
+      version: meta.version,
+      filename: meta.filename,
+      parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
+      post_processor_version: meta.post_processor_version === 'v1' ? 'v1' : meta.post_processor_version === 'v2' ? 'v2' : undefined,
+      source: meta.source
+    },
+    sectors: {},
+    isCompatible: meta.isCompatible,
+    isValid: meta.parser_version === CURRENT_PARSER_VERSION
+  }
+}
+
 export const useSaveStore = defineStore('save', () => {
   const gameDataStore = useGameDataStore()
 
@@ -227,48 +269,49 @@ export const useSaveStore = defineStore('save', () => {
     isInitialized.value = true
     
     try {
-      const removedCount = await removeOutdatedArchivesFromDB(CURRENT_PARSER_VERSION)
-      if (removedCount > 0) {
-        console.log(`[saveStore] removed ${removedCount} outdated archives`)
-      }
-      
       const metaList = await loadArchiveListFromDB()
       
       // Clear existing data before loading to ensure idempotency
       archives.value.clear()
       
       for (const meta of metaList) {
+        let archiveForList = createStubArchiveFromMeta(meta)
+        const parserVersionValid = archiveForList.isValid
+        const postProcessorUpToDate = meta.post_processor_version === CURRENT_POST_PROCESSOR_VERSION
+
+        if (parserVersionValid && !postProcessorUpToDate) {
+          const fullArchive = await loadArchiveDetailFromDB(meta.id)
+          if (fullArchive) {
+            const reprocessedArchive = postProcessRustSaveArchive(
+              fullArchive,
+              gameDataStore.modulesByMacroId,
+              gameDataStore.maps
+            )
+            reprocessedArchive.isCompatible = checkVersionCompatibility(reprocessedArchive.meta.version)
+            await saveArchiveToDB(reprocessedArchive)
+            archiveForList = {
+              ...reprocessedArchive,
+              sectors: {}
+            }
+          }
+        }
+
         const guid = meta.guid
         const existingGroup = archives.value.get(guid)
-        
-        const stubArchive: SaveArchive = {
-          meta: {
-            guid: meta.guid,
-            seed: 0,
-            time: meta.time,
-            playerName: meta.playerName,
-            version: meta.version,
-            filename: meta.filename,
-            parser_version: meta.parser_version as 'v1' | 'v2',
-            source: meta.source
-          },
-          sectors: {},
-          isCompatible: meta.isCompatible
-        }
-        
+
         if (existingGroup) {
           // Check if this save already exists (by time)
           const existingIndex = existingGroup.saves.findIndex(s => s.meta.time === meta.time)
           if (existingIndex >= 0) {
-            existingGroup.saves[existingIndex] = stubArchive
+            existingGroup.saves[existingIndex] = archiveForList
           } else {
-            existingGroup.saves.push(stubArchive)
+            existingGroup.saves.push(archiveForList)
           }
         } else {
           archives.value.set(guid, {
             guid,
             playerName: meta.playerName,
-            saves: [stubArchive]
+            saves: [archiveForList]
           })
         }
       }
@@ -300,6 +343,7 @@ export const useSaveStore = defineStore('save', () => {
       Object.entries(archive.sectors).map(([sectorId, sector]) => [sectorId, normalizeSectorData(sectorId, sector as SectorData & { stations?: StationEntry[] })])
     )
     archive.isCompatible = checkVersionCompatibility(archive.meta.version)
+    archive.isValid = isArchiveParserVersionValid(archive)
 
     const guid = archive.meta.guid
     const existingGroup = archives.value.get(guid)
@@ -347,6 +391,7 @@ export const useSaveStore = defineStore('save', () => {
       const id = `${guid}_${time}`
       const fullArchive = await loadArchiveDetailFromDB(id)
       if (fullArchive) {
+        fullArchive.isValid = isArchiveParserVersionValid(fullArchive)
         fullArchive.sectors = Object.fromEntries(
           Object.entries(fullArchive.sectors).map(([sectorId, sector]) => [sectorId, normalizeSectorData(sectorId, sector as SectorData & { stations?: StationEntry[] })])
         )
@@ -482,14 +527,24 @@ export const useSaveStore = defineStore('save', () => {
         meta: {
           ...meta,
           filename: typeof meta.filename === 'string' ? meta.filename : '',
-          parser_version: meta.parser_version === 'v1' ? 'v1' : 'v1',
+          parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
+          post_processor_version: meta.post_processor_version === 'v1'
+            ? 'v1'
+            : meta.post_processor_version === 'v2'
+              ? 'v2'
+              : undefined,
           source: 'imported'
         },
         sectors,
-        isCompatible: true
+        isCompatible: true,
+        isValid: meta.parser_version === CURRENT_PARSER_VERSION
       }
 
-      addArchive(archive)
+      const finalArchive = archive.meta.post_processor_version === CURRENT_POST_PROCESSOR_VERSION
+        ? archive
+        : postProcessRustSaveArchive(archive, gameDataStore.modulesByMacroId, gameDataStore.maps)
+
+      addArchive(finalArchive)
       return { success: true }
     } catch (e) {
       const message = e instanceof Error ? e.message : 'Unknown error'

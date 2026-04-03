@@ -57,7 +57,7 @@ const poiGroups = computed<SectorPoiGroup[]>(() => {
           owner: 'owner' in item ? item.owner : undefined,
           sectorMacro: group.sectorMacro,
           sectorName: searchNames.displayName,
-          pos: { x: item.x, z: item.z }
+          pos: { x: item.position.x, z: item.position.z }
         }))
       }
     })

@@ -15,7 +15,12 @@
 2. 定义 `ArchiveGroup` 类型
 3. 创建 `useSaveStore` (Pinia)
 4. 实现 `addArchive`, `selectArchive`, `removeArchive`, `exportToJson` 方法
-5. 不实现持久化（仅内存存储）
+5. 实现 IndexedDB 持久化与列表/详情读取
+6. 为 `SaveArchive.meta` 增加 `parser_version/post_processor_version`
+7. 为 `SaveArchive` 增加 `isValid`
+8. 在初始化时按版本规则恢复缓存：
+   - `parser_version` 不匹配 → 标记无效
+   - `post_processor_version` 不匹配 → 自动重跑 `postProcess`
 
 ---
 
@@ -50,6 +55,7 @@
 16. 提取存档元信息：guid, seed, time, playerName, version
 17. 实现流式进度报告与 `finalizing` 阶段补发
 18. 实现早期版本校验（解析到 game 标签时立即校验）
+19. Rust parser 原始输出写入 `parser_version = v2`
 
 ---
 
@@ -70,6 +76,7 @@
 7. JSON导入时校验 `meta.version`
 8. 显示上传状态和进度
 9. 进度条宽度直接绑定 worker 返回的 `percent`
+10. XML 导入完成后统一经过 TS `postProcess` 再写入 Store/DB
 
 ---
 
@@ -90,6 +97,7 @@
 6. 显示版本兼容状态（不匹配时标记）
 7. 点击存档项触发选中事件
 8. 每个存档项提供"下载JSON"按钮
+9. 显示 `isValid` 无效存档状态
 
 ---
 
@@ -115,6 +123,7 @@
 11. 展示 erlkingVaults 的 `unlocked` 与聚合 `wares`
 12. 展示abandonedShips列表
 13. Sector名称显示翻译后名称
+14. `isValid=false` 时显示需要重新导入的提示
 
 ---
 
@@ -193,10 +202,105 @@
 2. 新增上传相关文本（拖拽提示、文件类型等）
 3. 新增列表相关文本（时间格式、版本提示等）
 4. 新增详情相关文本（sector、类型名称等）
+5. 新增无效存档相关文本与提示
 
 ---
 
-### T11: 构建验证
+### T11: CLI --skip-post 参数
+
+**Scope**: extract_save.tsx 增加 --skip-post 参数
+
+**Files**:
+- `scripts/extract_save.tsx`
+
+**Steps**:
+1. [x] 在 parseArgs 中添加 `--skip-post` 参数解析
+2. [x] 在 printUsage 中添加参数说明
+3. [x] extractSaveWasm 中根据 skipPost 决定是否调用 postProcessRustSaveArchive
+4. [x] skipPost=true 时输出原始解析数据（未经过后处理）
+5. [x] loadModulesByMacroId 函数：根据版本号加载 modules.json，构建 modulesByMacroId 映射
+6. [x] postProcessRustSaveArchive 接收 modulesByMacroId 参数进行 module 信息填充
+
+---
+
+### T12: saveParser.post.ts 重构
+
+**Scope**: 后处理逻辑重构，从 worker 移到上传流程
+
+**Files**:
+- `src/workers/saveParserRust.post.ts` → `src/workers/saveParser.post.ts`（重命名）
+- `src/workers/saveParserRust.worker.ts`（更新导入）
+- `src/components/save/SaveUploadPanel.vue`（直接调用后处理）
+- `src/types/saveArchive.ts`（扩展 AggregatedStationModule 类型）
+- `rust-parser/src/model.rs`（StationBaseEntry/DatavaultEntry/AbandonedShipEntry 类型更新）
+- `rust-parser/src/core.rs`（zone tracking 逻辑）
+
+**Steps**:
+1. [x] 重命名文件 saveParserRust.post.ts → saveParser.post.ts
+2. [x] 更新所有导入引用
+3. [x] AggregatedStationModule 新增可选字段：module_id, type, group
+4. [x] 新增函数 enrichModulesWithGameData(modules, modulesByMacroId)
+   - 遍历 modules，根据 ref (macro) 匹配 modulesByMacroId
+   - 匹配成功：填充 module_id, type, group
+   - 匹配失败：字段保持 undefined
+5. [x] 修改 postProcessRustSaveArchive 签名，接收 modulesByMacroId 参数
+6. [x] 修改 tag 判断逻辑：
+   - isFactory: 改为检查 modules 中是否有 type === 'production'
+   - factoryGroup: 新增字段，按优先顺序匹配（shiptech → hightech → refined → pharmaceutical → food → agricultural → water → energy → 'factory'）
+   - isDefencemodule: 改为检查 modules 中是否有 type === 'defencemodule'
+   - tag 优先级调整为：piratebase → shipyard → wharf → equipmentdock → factory → tradestation → defencemodule → fallback
+7. [x] SaveUploadPanel.vue 中：
+   - worker 完成后获取原始 archive
+   - 调用 postProcessRustSaveArchive(archive, gameDataStore.modulesByMacroId)
+   - emit 处理后的 archive
+8. [x] 定义 `CURRENT_PARSER_VERSION = "v2"`
+9. [x] 定义 `CURRENT_POST_PROCESSOR_VERSION = "v2"`
+10. [x] `postProcessRustSaveArchive` 写入 `post_processor_version`
+11. [x] `postProcessRustSaveArchive` 计算 `isValid`
+12. [x] Rust parser 类型更新：
+    - StationBaseEntry: x/y/z 改为 relative_position: Vector3
+    - StationBaseEntry: 新增 zone_id: Option<String>
+    - DatavaultEntry: x/y/z 改为 relative_position: Vector3, 新增 zone_id
+    - AbandonedShipEntry: x/y/z 改为 relative_position: Vector3, 新增 zone_id
+13. [x] Rust parser zone tracking:
+    - SaveParserCore 新增 current_zone_macro: Option<String>
+    - on_open_tag: class='zone' 时记录 macro
+    - on_close_tag: zone 出栈时清空 current_zone_macro
+    - 创建实体时从 current_zone_macro 获取 zone_id
+14. [x] 基于 `zone_id + maps.zones` 补全最终 `position`
+    - loadMaps() 函数加载 maps.json
+    - buildZoneLookup() 构建 sectorId -> zoneId -> position 映射
+    - calculateFinalPosition() 计算 zone.position + relative_position
+    - 无 zone_id 时 position = relative_position
+15. [x] `zone_id` 查表统一使用小写
+16. [x] 兼容 `maps.zones` 对象结构
+17. [x] 停止依赖独立 `shcon_anchors`
+18. [x] X4MapSector 类型新增 zones?: Array<{ ref, position }> 字段
+
+---
+
+### T13: 地图数据与消费方同步
+
+**Scope**: 同步 maps 结构迁移到 save-import 相关链路
+
+**Files**:
+- `scripts/processor/map/generator.py`
+- `scripts/processor/step1_map/generator.py`
+- `scripts/x4_data_map_processor.py`
+- `src/assets/x4_game_data/*/data/maps.json`
+- `src/components/empire/MapSaveArchiveList.vue`
+
+**Steps**:
+1. [x] 将 `zones` 从数组改为对象，主键为 `ref/id`
+2. [x] 将 map 处理链路中的 `zone_id` 统一为小写
+3. [x] 将 `shcon_anchors` 并回 `zones`
+4. [x] 修改所有消费 `shcon_anchors` 的代码为直接消费 `zones`
+5. [x] 地图侧对无效存档显示禁用态
+6. [x] 地图侧无效存档不可进入二级菜单
+
+---
+
+### T14: 构建验证
 
 **Scope**: 确保构建成功
 
@@ -218,7 +322,7 @@ T5 (detail) → T6
 T6 (view) → T7, T8
 T9 (export) → T4
 T10 (i18n) → T7
-T11 (build) ← all tasks
+T14 (build) ← all tasks
 ```
 
 ## Progress Tracking
@@ -235,4 +339,7 @@ T11 (build) ← all tasks
 | T8 | pending | |
 | T9 | pending | |
 | T10 | pending | |
-| T11 | completed | 已执行 rust-parser/build.sh 与 npm run build |
+| T11 | completed | 已支持 CLI `--skip-post` 与 postProcess 拆分 |
+| T12 | completed | `saveParser.post.ts` 已承接版本常量、坐标后处理、模块 enrich 与 `isValid` 生成 |
+| T13 | completed | `zones/shcon_anchors` 迁移完成，地图侧无效存档已禁止进入二级菜单 |
+| T14 | completed | 已执行 rust-parser/build.sh；相关单测已覆盖版本恢复与无效存档交互 |

@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import factoryIconUrl from '@/components/icon/factory.svg'
-import shipyardIconUrl from '@/components/icon/shipyard.svg'
-import tradestationIconUrl from '@/components/icon/tradestation.svg'
+import factoryIconUrl from '@/components/icons/factory.svg'
+import shipyardIconUrl from '@/components/icons/shipyard.svg'
+import tradestationIconUrl from '@/components/icons/tradestation.svg'
 
 type StationPanelFilter = 'all' | 'station' | 'sector' | 'unplaced' | 'placed'
 type PlacementIcon = 'factory' | 'shipyard' | 'tradestation'

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { createSaveParserRuntime } from '../../../src/workers/saveParser.worker'
-import { postProcessRustSaveArchive } from '../../../src/workers/saveParserRust.post'
+import { postProcessRustSaveArchive } from '../../../src/workers/saveParser.post'
 import { readFile } from 'node:fs/promises'
 import zlib from 'node:zlib'
 
@@ -29,17 +29,16 @@ describe('save parser core (simplified)', () => {
     expect(archive.meta.playerName).toBe('slepher')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test_save')
-    expect(archive.meta.parser_version).toBe('v1')
+    expect(archive.meta.parser_version).toBe('v2')
     expect(archive.isCompatible).toBe(true)
+    expect(archive.isValid).toBe(true)
     expect(archive.sectors.cluster_01_sector001_macro?.name).toBe('cluster_01_sector001_macro')
     expect(archive.sectors.cluster_01_sector001_macro?.is_known).toBe(true)
     expect(archive.sectors.cluster_01_sector001_macro?.npcStations).toHaveLength(1)
     expect(archive.sectors.cluster_01_sector001_macro?.npcStations[0]).toMatchObject({
       code: 'station-1',
       owner: 'argon',
-      x: 5,
-      y: 6,
-      z: 7
+      relative_position: { x: 5, y: 6, z: 7 }
     })
   })
 })
@@ -85,14 +84,12 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.meta.playerName).toBe('testplayer')
     expect(archive.meta.version).toBe('800')
     expect(archive.meta.filename).toBe('test')
-    expect(archive.meta.parser_version).toBe('v1')
+    expect(archive.meta.parser_version).toBe('v2')
     expect(archive.isCompatible).toBe(true)
     expect(archive.sectors.test_sector_macro?.playerStations).toHaveLength(1)
     expect(archive.sectors.test_sector_macro?.playerStations[0]?.code).toBe('TEST-001')
     expect(archive.sectors.test_sector_macro?.playerStations[0]?.owner).toBe('player')
-    expect(archive.sectors.test_sector_macro?.playerStations[0]?.x).toBe(100)
-    expect(archive.sectors.test_sector_macro?.playerStations[0]?.y).toBe(200)
-    expect(archive.sectors.test_sector_macro?.playerStations[0]?.z).toBe(300)
+    expect(archive.sectors.test_sector_macro?.playerStations[0]?.relative_position).toEqual({ x: 100, y: 200, z: 300 })
   })
 
   it('parses gzip bytes directly in rust wasm parser', async () => {
@@ -130,13 +127,79 @@ describe('save parser (Rust WASM streaming)', () => {
     expect(archive.meta.playerName).toBe('gzip-player')
     expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.code).toBe('GZIP-001')
     expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.owner).toBe('player')
-    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.x).toBe(7)
-    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.y).toBe(8)
-    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.z).toBe(9)
+    expect(archive.sectors.gzip_sector_macro?.playerStations[0]?.relative_position).toEqual({ x: 7, y: 8, z: 9 })
   })
 })
 
 describe('save parser rust worker enrichment', () => {
+  it('resolves zone-relative positions from zone dictionaries', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v2',
+        source: 'original'
+      },
+      isCompatible: true,
+      isValid: true,
+      sectors: {
+        cluster_01_sector001_macro: {
+          name: 'cluster_01_sector001_macro',
+          is_known: true,
+          npcStations: [{
+            code: 'NPC',
+            macro: 'station_arg_factory_macro',
+            owner: 'argon',
+            x: 1,
+            y: 2,
+            z: 3,
+            relative_position: { x: 10, y: 20, z: 30 },
+            zone_id: 'zone_alpha'
+          }]
+        }
+      }
+    }, undefined, {
+      clusters: {
+        cluster_01: {
+          id: 'cluster_01',
+          nameId: '',
+          name: 'Cluster 01',
+          dlc_tag: 'base',
+          owner: 'argon',
+          owner_color: '#8899aa',
+          sectors: {
+            Cluster_01_Sector001_macro: {
+              id: 'Cluster_01_Sector001_macro',
+              cluster_id: 'cluster_01',
+              nameId: '',
+              name: 'Sector',
+              owner: 'argon',
+              owner_color: '#8899aa',
+              zones: {
+                Zone_Alpha: {
+                  id: 'Zone_Alpha',
+                  position: { x: 100, y: 200, z: 300 }
+                }
+              }
+            }
+          }
+        }
+      }
+    })
+
+    expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position).toEqual({
+      x: 110,
+      y: 220,
+      z: 330
+    })
+    expect(archive.meta.post_processor_version).toBe('v2')
+    expect(archive.isValid).toBe(true)
+  })
+
   it('derives station flags in worker layer', () => {
     const archive = postProcessRustSaveArchive({
       meta: {
@@ -146,10 +209,11 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v1',
+        parser_version: 'v2',
         source: 'original'
       },
       isCompatible: true,
+      isValid: true,
       sectors: {
         sec: {
           name: 'sec',
@@ -211,10 +275,11 @@ describe('save parser rust worker enrichment', () => {
         playerName: 'p',
         version: '800',
         filename: 'f',
-        parser_version: 'v1',
+        parser_version: 'v2',
         source: 'original'
       },
       isCompatible: true,
+      isValid: true,
       sectors: {
         sec: {
           name: 'sec',

@@ -8,16 +8,37 @@ import { sortResourcesByPriority, RATING_TO_YIELD_NAME } from '@/store/logic/map
 
 const props = defineProps<{
   sectorId: string
+  sectorOwnerOverride?: Record<string, string>
 }>()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const mapStore = useMapStore()
 const gameDataStore = useGameDataStore()
 
 const sectorInfo = computed(() => mapStore.getSectorInfo(props.sectorId))
 
 const title = computed(() => sectorInfo.value?.displayName || props.sectorId)
-const ownerName = computed(() => sectorInfo.value?.owner || 'ownerless')
+
+const overrideOwner = computed(() => {
+  if (props.sectorOwnerOverride && props.sectorOwnerOverride[props.sectorId]) {
+    return props.sectorOwnerOverride[props.sectorId]
+  }
+  return null
+})
+
+const ownerRaw = computed(() => overrideOwner.value || sectorInfo.value?.owner || 'ownerless')
+
+const ownerName = computed(() => {
+  const owner = ownerRaw.value
+  if (owner === 'ownerless') return t('map.owner_ownerless')
+  
+  const faction = gameDataStore.factions?.find(f => f.id === owner)
+  if (faction?.nameId && te(faction.nameId)) {
+    return t(faction.nameId)
+  }
+  return faction?.name || owner
+})
+
 const sunlightPercent = computed(() => sectorInfo.value?.sunlight || 0)
 
 const sunlightYieldInfo = computed(() => {

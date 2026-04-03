@@ -60,6 +60,9 @@ function isSelected(guid: string, time: number): boolean {
             <div class="save-info">
               <div class="save-time">{{ formatTime(archive.meta.time) }}</div>
               <div class="save-meta">
+                <span v-if="!archive.isValid" class="invalid-warning">
+                  {{ t('save_import.invalid_archive') }}
+                </span>
                 <span v-if="!archive.isCompatible" class="version-warning">
                   {{ t('save_import.version_mismatch') }}
                 </span>
@@ -149,6 +152,10 @@ function isSelected(guid: string, time: number): boolean {
 
 .version-warning {
   @apply text-amber-400;
+}
+
+.invalid-warning {
+  @apply text-red-400;
 }
 
 .save-version {

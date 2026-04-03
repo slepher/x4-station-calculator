@@ -29,6 +29,8 @@ const categories = computed<CategoryInfo[]>(() => {
   return [
     { key: 'playerStation', label: t('map.save_category_player_station'), count: data.playerStation.count },
     { key: 'npcStation', label: t('map.save_category_npc_station'), count: data.npcStation.count },
+    { key: 'xenonStation', label: t('map.save_category_xenon_station'), count: data.xenonStation.count },
+    { key: 'khaakStation', label: t('map.save_category_khaak_station'), count: data.khaakStation.count },
     { key: 'abandonedShip', label: t('map.save_category_abandoned_ship'), count: data.abandonedShip.count },
     { key: 'datavault', label: t('map.save_category_datavault'), count: data.datavault.count },
     { key: 'erlkingVault', label: t('map.save_category_erlking_vault'), count: data.erlkingVault.count }

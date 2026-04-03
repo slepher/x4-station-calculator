@@ -86,10 +86,12 @@ interface SaveArchive {
     version: string       // 游戏版本（如 "800"）
     filename: string      // 存档文件名（去扩展名）
     parser_version: 'v1' | 'v2'  // 解析器版本
+    post_processor_version?: 'v1' | 'v2'  // 后处理版本
     source: 'original' | 'imported'  // 来源类型
   }
   sectors: Record<string, SectorData>
   isCompatible: boolean   // 版本兼容状态
+  isValid: boolean        // parser_version 是否仍被当前代码接受
 }
 
 interface ProgressInfo {
@@ -123,25 +125,29 @@ interface StationBaseEntry {
   code: string
   macro: string
   owner: string
-  x: number
-  y: number
-  z: number
+  relative_position: { x: number; y: number; z: number }
+  position: { x: number; y: number; z: number }
+  zone_id?: string
   is_wreck?: boolean
   is_headquarter?: boolean
 }
 
 interface PlayerStationEntry extends StationBaseEntry {
-  modules?: PlayerStationModule[]
+  constructions?: PlayerStationConstruction[]
+  modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
 }
 
-interface PlayerStationModule {
+interface PlayerStationConstruction {
   index: number
   ref: string
+  predecessor?: number
   equipments?: StationEquipment[]
 }
 
 interface NpcStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean
@@ -150,9 +156,16 @@ interface NpcStationEntry extends StationBaseEntry {
 
 interface FactionStationEntry extends StationBaseEntry {
   modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
 }
 
 interface AggregatedStationModule {
+  ref: string
+  amount: number
+}
+
+interface AggregatedEquipment {
+  type: 'shields' | 'turrets'
   ref: string
   amount: number
 }
@@ -168,9 +181,9 @@ interface DatavaultEntry {
   code: string
   macro: string
   owner: string
-  x: number
-  y: number
-  z: number
+  relative_position: { x: number; y: number; z: number }
+  position: { x: number; y: number; z: number }
+  zone_id?: string
   unlocked: boolean
   wares?: DatavaultWareEntry[]
   has_blueprints?: boolean
@@ -187,9 +200,9 @@ interface AbandonedShipEntry {
   code: string
   macro: string
   class: string  // ship_xs, ship_s, ship_m, etc.
-  x: number
-  y: number
-  z: number
+  relative_position: { x: number; y: number; z: number }
+  position: { x: number; y: number; z: number }
+  zone_id?: string
 }
 ```
 
@@ -200,6 +213,37 @@ interface ArchiveGroup {
   guid: string
   playerName: string
   saves: SaveArchive[]  // 按 time 降序
+}
+```
+
+### ArchiveMeta（IndexedDB 列表元数据）
+
+```typescript
+interface ArchiveMeta {
+  id: string
+  guid: string
+  time: number
+  playerName: string
+  version: string
+  filename: string
+  parser_version: string
+  post_processor_version?: string
+  source: 'original' | 'imported'
+  isCompatible: boolean
+  isValid: boolean
+  createdAt: Date
+  sectorCount: number
+}
+```
+
+### Map zones 数据
+
+```typescript
+interface X4Sector {
+  zones?: Record<string, {
+    id: string
+    position: { x: number; y: number; z: number }
+  }>
 }
 ```
 
@@ -231,6 +275,8 @@ interface ArchiveGroup {
 - **版本校验**: Worker 接收 `currentVersion` 参数
   - SAX Worker: 解析到 `<game>` 标签时立即校验，不匹配则抛出错误停止解析
   - Rust Worker: 调用 `set_expected_version()` 设置期望版本，解析到 `<game>` 标签时立即校验，不匹配则设置错误状态
+- Rust parser 原始输出负责写入 `parser_version`
+- TS 后处理负责写入 `post_processor_version`、计算 `isValid`、补全最终 `position`
 
 **Worker消息格式**:
 ```typescript
@@ -249,6 +295,41 @@ interface ArchiveGroup {
   message: 'Version mismatch: save version X does not match current game version Y'
 }
 ```
+
+### Decision 2: parser/post-processor 双层版本管理
+
+**问题**: 单一版本号无法区分“原始 parser 产物过期”和“后处理逻辑过期”。
+
+**方案**:
+- `parser_version` 表示 parser 原始产物版本
+- `post_processor_version` 表示二次后处理产物版本
+
+**实现细节**:
+- 当前版本基线：
+  - `parser_version = "v2"`
+  - `post_processor_version = "v2"`
+- IndexedDB 恢复时：
+  - `parser_version` 不匹配：保留存档，但标记 `isValid = false`
+  - `parser_version` 匹配且 `post_processor_version` 不匹配：自动重跑一次 `postProcess`
+
+### Decision 3: 无效存档不可进入深层消费界面
+
+**问题**: 旧 parser 产物不可信，但直接删除缓存会丢失列表上下文。
+
+**方案**:
+- 一级列表保留无效存档
+- 详情区域明确提示需要重新导入
+- 地图侧无效存档不可进入二级菜单
+
+### Decision 4: 基于 maps.zones 统一补坐标
+
+**问题**: parser 只能得到组件相对位置，不能保证是星区最终坐标；同时 `shcon_anchors` 与 `zones` 并存会增加消费复杂度。
+
+**方案**:
+- 原始数据保留 `relative_position`
+- 后处理使用 `zone_id + maps.zones` 计算最终 `position`
+- `zones` 改为对象结构，主键和 `zone_id` 统一小写
+- `shcon_anchors` 并回 `zones`
 
 **替代方案**: SAX解析（`sax-js`）
 - 缺点: 性能较 Rust 版本慢
@@ -432,8 +513,7 @@ function resolveName(s: string): string {
 **方案**: 新增 `useSaveStore`（Pinia）
 
 **实现细节**:
-- 不持久化（暂不实现localStorage/IndexedDB）
-- 数据仅在内存中存储
+- 使用 IndexedDB 持久化列表元数据与完整存档详情
 - 状态: `archives`, `selectedArchive`, `isParsing`, `parseProgress`, `parseError`
 - 计算属性: `archiveGroups`, `totalArchiveCount`
 - 方法:

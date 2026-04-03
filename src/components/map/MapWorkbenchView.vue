@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import MapSvgCanvas from './MapSvgCanvas.vue'
+import MapSvgCanvas from '@/components/map/MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
@@ -133,6 +133,8 @@ const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const savePoiVisibility = ref<SavePoiVisibility>({
   playerStation: false,
   npcStation: false,
+  xenonStation: false,
+  khaakStation: false,
   abandonedShip: false,
   datavault: false,
   erlkingVault: false
@@ -279,6 +281,54 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
         sectorName: sectorData?.displayName || overlay.sectorName
       }
     })
+})
+
+const sectorOwnerOverride = computed<Record<string, string> | undefined>(() => {
+  if (!isSavePanelOpen.value || !selectedSaveArchive.value) return undefined
+  const map: Record<string, string> = {}
+  let hasOverride = false
+  Object.entries(selectedSaveArchive.value.sectors).forEach(([macro, sector]) => {
+    if (sector.owner) {
+      const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, macro)
+      if (resolved?.sectorId) {
+        map[resolved.sectorId] = sector.owner
+        hasOverride = true
+      }
+    }
+  })
+  return hasOverride ? map : undefined
+})
+
+const clusterOwnerOverride = computed<Record<string, string> | undefined>(() => {
+  if (!sectorOwnerOverride.value) return undefined
+  const clusters = gameDataStore.maps?.clusters || {}
+  const result: Record<string, string> = {}
+  
+  for (const [clusterId, cluster] of Object.entries(clusters)) {
+    const sectorIds = Object.keys(cluster.sectors || {})
+    if (sectorIds.length === 0) continue
+    
+    const owners = sectorIds
+      .map(id => sectorOwnerOverride.value?.[id])
+      .filter((o): o is string => !!o)
+    
+    if (owners.length === sectorIds.length && owners.length > 0) {
+      const firstOwner = owners[0]!
+      if (owners.every(o => o === firstOwner)) {
+        result[clusterId] = firstOwner
+      } else {
+        result[clusterId] = 'ownerless'
+      }
+    } else if (owners.length > 0) {
+      result[clusterId] = 'ownerless'
+    }
+  }
+  
+  return Object.keys(result).length > 0 ? result : undefined
+})
+
+const factionColorMap = computed<Record<string, string> | undefined>(() => {
+  return gameDataStore.factionColorMap
 })
 
 const getViewportSize = () => {
@@ -905,6 +955,8 @@ const onSavePanelClose = () => {
   savePoiVisibility.value = {
     playerStation: false,
     npcStation: false,
+    xenonStation: false,
+    khaakStation: false,
     abandonedShip: false,
     datavault: false,
     erlkingVault: false
@@ -924,6 +976,8 @@ const onSaveSelectArchive = async (payload: { guid: string; time: number } | nul
   savePoiVisibility.value = {
     playerStation: false,
     npcStation: false,
+    xenonStation: false,
+    khaakStation: false,
     abandonedShip: false,
     datavault: false,
     erlkingVault: false
@@ -1222,6 +1276,9 @@ onBeforeUnmount(() => {
               :focused-overlay-key="focusedPlacementKey"
               :save-poi-overlays="savePoiOverlays"
               :focused-save-poi-key="focusedSavePoiKey"
+              :sector-owner-override="sectorOwnerOverride"
+              :cluster-owner-override="clusterOwnerOverride"
+              :faction-color-map="factionColorMap"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @sector-hover="onSectorHover"
@@ -1246,6 +1303,7 @@ onBeforeUnmount(() => {
             <MapSectorTooltip
               ref="tooltipRef"
               :sector-id="hoveredSector.sectorId"
+              :sector-owner-override="sectorOwnerOverride"
             />
           </div>
 

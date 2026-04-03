@@ -5,7 +5,8 @@ import zlib from 'node:zlib'
 import sax from 'sax'
 import { createSaveParserRuntime, createSaveXmlFilterRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
-import { postProcessRustSaveArchive } from '../src/workers/saveParserRust.post'
+import { postProcessRustSaveArchive } from '../src/workers/saveParser.post'
+import type { X4Module, X4Map } from '../src/types/x4'
 
 interface FilteredXmlResult {
   xml: string
@@ -69,12 +70,14 @@ function printUsage(): void {
   console.log('  --xml          Output as XML instead of JSON (extracts only relevant data)')
   console.log('  --query-xml <q>  Output matching tags with full subtree and ancestor chain as XML')
   console.log('  --version <v>  Expected game version (e.g., "8.0"). If not set, version check is skipped')
+  console.log('  --skip-post    Skip post-processing (output raw parsed data without tag inference)')
 }
 
-function parseArgs(): { input: string; output: string; useWasm: boolean; outputXml: boolean; queryXml: string | null; expectedVersion: string | null } {
+function parseArgs(): { input: string; output: string; useWasm: boolean; outputXml: boolean; queryXml: string | null; expectedVersion: string | null; skipPost: boolean } {
   const args = process.argv.slice(2)
   const useWasm = args.includes('--wasm')
   const outputXml = args.includes('--xml')
+  const skipPost = args.includes('--skip-post')
   const queryXmlIndex = args.indexOf('--query-xml')
   const queryXml = queryXmlIndex !== -1 && args[queryXmlIndex + 1] && !args[queryXmlIndex + 1].startsWith('--')
     ? args[queryXmlIndex + 1]
@@ -95,7 +98,7 @@ function parseArgs(): { input: string; output: string; useWasm: boolean; outputX
   
   const input = positional[0]
   const output = positional[1]
-  return { input, output, useWasm, outputXml, queryXml, expectedVersion }
+  return { input, output, useWasm, outputXml, queryXml, expectedVersion, skipPost }
 }
 
 function isGzipFile(filePath: string): boolean {
@@ -148,6 +151,88 @@ function getGzipUncompressedSizeFromFile(filePath: string): number | null {
     fs.closeSync(fd)
   }
   return trailer.readUInt32LE(0)
+}
+
+function loadModulesByMacroId(version: string | null): Record<string, X4Module> | undefined {
+  if (!version) return undefined
+  
+  const versionConfigPath = path.resolve(process.cwd(), 'src/assets/versions.json')
+  if (!fs.existsSync(versionConfigPath)) {
+    console.warn(`[extract_save] versions.json not found at ${versionConfigPath}, skipping module enrichment`)
+    return undefined
+  }
+  
+  const versionConfig = JSON.parse(fs.readFileSync(versionConfigPath, 'utf-8'))
+  const versionInfo = versionConfig.versions?.find((v: { version: string }) => String(v.version) === version)
+  if (!versionInfo) {
+    console.warn(`[extract_save] version ${version} not found in versions.json, skipping module enrichment`)
+    return undefined
+  }
+  
+  const folderName = versionInfo.folder_name || version
+  const modulesPath = path.resolve(process.cwd(), `src/assets/x4_game_data/${folderName}/data/modules.json`)
+  
+  if (!fs.existsSync(modulesPath)) {
+    console.warn(`[extract_save] modules.json not found at ${modulesPath}, skipping module enrichment`)
+    return undefined
+  }
+  
+  const modules: X4Module[] = JSON.parse(fs.readFileSync(modulesPath, 'utf-8'))
+  const modulesByMacroId: Record<string, X4Module> = {}
+  
+  for (const module of modules) {
+    if (module.macroId && module.isPlayerBlueprint) {
+      modulesByMacroId[module.macroId] = module
+    }
+  }
+  
+  console.log(`[extract_save] loaded ${Object.keys(modulesByMacroId).length} modules for version ${version}`)
+  return modulesByMacroId
+}
+
+function loadMaps(version: string | null): X4Map | undefined {
+  if (!version) return undefined
+  
+  const versionConfigPath = path.resolve(process.cwd(), 'src/assets/versions.json')
+  if (!fs.existsSync(versionConfigPath)) {
+    console.warn(`[extract_save] versions.json not found at ${versionConfigPath}, skipping maps loading`)
+    return undefined
+  }
+  
+  const versionConfig = JSON.parse(fs.readFileSync(versionConfigPath, 'utf-8'))
+  const versionInfo = versionConfig.versions?.find((v: { version: string }) => String(v.version) === version)
+  if (!versionInfo) {
+    console.warn(`[extract_save] version ${version} not found in versions.json, skipping maps loading`)
+    return undefined
+  }
+  
+  const folderName = versionInfo.folder_name || version
+  const mapsPath = path.resolve(process.cwd(), `src/assets/x4_game_data/${folderName}/data/maps.json`)
+  
+  if (!fs.existsSync(mapsPath)) {
+    console.warn(`[extract_save] maps.json not found at ${mapsPath}, skipping maps loading`)
+    return undefined
+  }
+  
+  const maps: X4Map = JSON.parse(fs.readFileSync(mapsPath, 'utf-8'))
+  
+  const clusterCount = Object.keys(maps.clusters).length
+  let sectorCount = 0
+  let zoneCount = 0
+  
+  for (const clusterId in maps.clusters) {
+    const cluster = maps.clusters[clusterId]
+    for (const sectorId in cluster.sectors) {
+      sectorCount++
+      const sector = cluster.sectors[sectorId]
+      if (sector.zones) {
+        zoneCount += Object.keys(sector.zones).length
+      }
+    }
+  }
+  
+  console.log(`[extract_save] loaded maps for version ${version}: ${clusterCount} clusters, ${sectorCount} sectors, ${zoneCount} zones`)
+  return maps
 }
 
 function pumpWasmParser(options: {
@@ -550,7 +635,7 @@ async function extractSaveToXml(inputPath: string, outputPath: string, expectedV
   console.log(`[extract_save] xml written: ${absoluteOutput}`)
 }
 
-async function extractSaveWasm(inputPath: string, outputPath: string, expectedVersion: string | null): Promise<SaveArchive> {
+async function extractSaveWasm(inputPath: string, outputPath: string, expectedVersion: string | null, skipPost: boolean): Promise<SaveArchive> {
   const absoluteInput = path.resolve(process.cwd(), inputPath)
   const absoluteOutput = path.resolve(process.cwd(), outputPath)
   const gzip = isGzipFile(absoluteInput)
@@ -565,6 +650,9 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
     console.log(`[extract_save] expected version: ${expectedVersion}`)
   } else {
     console.log(`[extract_save] version check: skipped`)
+  }
+  if (skipPost) {
+    console.log(`[extract_save] post-processing: skipped`)
   }
 
   const initWasm = (await import('../src/wasm/save_parser.js')).default
@@ -631,7 +719,16 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
   console.log(`[extract_save] parse time: ${elapsed.toFixed(0)}ms`)
 
   const result = parser.finish(path.basename(absoluteInput))
-  const archive = postProcessRustSaveArchive(JSON.parse(result) as SaveArchive)
+  const rawArchive = JSON.parse(result) as SaveArchive
+  
+  let archive: SaveArchive
+  if (skipPost) {
+    archive = rawArchive
+  } else {
+    const modulesByMacroId = loadModulesByMacroId(expectedVersion)
+    const maps = loadMaps(expectedVersion)
+    archive = postProcessRustSaveArchive(rawArchive, modulesByMacroId, maps)
+  }
 
   console.log(`[extract_save] done: sectors ${Object.keys(archive.sectors).length}, compatible=${archive.isCompatible}`)
   fs.writeFileSync(absoluteOutput, JSON.stringify(archive, null, 2))
@@ -641,7 +738,7 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
 }
 
 async function main(): Promise<void> {
-  const { input, output, useWasm, outputXml, queryXml, expectedVersion } = parseArgs()
+  const { input, output, useWasm, outputXml, queryXml, expectedVersion, skipPost } = parseArgs()
 
   if (!input) {
     printUsage()
@@ -658,7 +755,7 @@ async function main(): Promise<void> {
       }
       await extractSaveToXml(input, output || defaultOutputPath(input, true), expectedVersion)
     } else if (useWasm) {
-      await extractSaveWasm(input, output || defaultOutputPath(input, false), expectedVersion)
+      await extractSaveWasm(input, output || defaultOutputPath(input, false), expectedVersion, skipPost)
     } else {
       await extractSaveSaxJs(input, output || defaultOutputPath(input, false), expectedVersion)
     }

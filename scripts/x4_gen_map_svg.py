@@ -310,10 +310,10 @@ def render_from_maps_json(input_path: str, output_path: str, include_all: bool =
                     continue
                 sector_a = sectors[sector_a_id]
                 sector_b = sectors[sector_b_id]
-                from_anchor = sector_a.get('shcon_anchors', {}).get(from_zone_id)
-                to_anchor = sector_b.get('shcon_anchors', {}).get(to_zone_id)
-                from_raw = from_anchor.get('raw_sector_pos') if from_anchor else None
-                to_raw = to_anchor.get('raw_sector_pos') if to_anchor else None
+                from_zone = sector_a.get('zones', {}).get(from_zone_id)
+                to_zone = sector_b.get('zones', {}).get(to_zone_id)
+                from_raw = from_zone.get('raw_sector_pos') if from_zone else None
+                to_raw = to_zone.get('raw_sector_pos') if to_zone else None
                 from_local_ratio = {"x": from_raw["sx"], "y": from_raw["sy"]} if from_raw and "sx" in from_raw and "sy" in from_raw else None
                 to_local_ratio = {"x": to_raw["sx"], "y": to_raw["sy"]} if to_raw and "sx" in to_raw and "sy" in to_raw else None
                 start_cluster_ratio = sector_ratio_to_cluster_ratio(sector_a.get("normalized", {}), from_local_ratio)

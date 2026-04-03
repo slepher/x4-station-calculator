@@ -5,7 +5,6 @@ import type {
 } from '@/types/saveArchive'
 import initWasm, { SaveParser } from '@/wasm/save_parser'
 import wasmUrl from '@/wasm/save_parser_bg.wasm?url'
-import { postProcessRustSaveArchive } from './saveParserRust.post'
 
 let wasmInitialized = false
 const PROGRESS_POST_INTERVAL_MS = 1000
@@ -105,7 +104,7 @@ function createRustParseSession(options: {
       if (!completed || failed) return false
 
       const result = options.parser.finish(options.filename || '')
-      const archive = postProcessRustSaveArchive(JSON.parse(result) as SaveArchive)
+      const archive = JSON.parse(result) as SaveArchive
       options.postComplete(archive)
       return true
     }

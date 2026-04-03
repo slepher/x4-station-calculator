@@ -84,6 +84,14 @@ export const useGameDataStore = defineStore('gameData', () => {
   const dlcs = ref<X4Dlc[]>([])
   const dlcSetting = ref<X4SettingStorage>({})
 
+  const factionColorMap = computed<Record<string, string>>(() => {
+    const map: Record<string, string> = {}
+    factions.value.forEach(f => {
+      if (f.id && f.color) map[f.id] = f.color
+    })
+    return map
+  })
+
   // Version computed
   const currentVersionConfig = computed<VersionConfig | undefined>(() => {
     return versionsConfig.value.find(
@@ -520,6 +528,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     dlcSetting,
     needsDlcSetup,
     enforceDlcActivation,
+    factionColorMap,
     // Methods
     getStorageKey,
     setVersion,

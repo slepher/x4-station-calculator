@@ -7,7 +7,7 @@ import type {
   PlayerStationEntry,
   FactionStationEntry,
   NpcStationEntry,
-  PlayerStationModule,
+  PlayerStationConstruction,
   StationEquipment,
   DatavaultEntry,
   AbandonedShipEntry
@@ -70,7 +70,7 @@ class X4SaveParser {
   private versionChecked = false
 
   private currentStationOwner: string | null = null
-  private currentStationModules: PlayerStationModule[] = []
+  private currentStationModules: PlayerStationConstruction[] = []
   private currentEntryIndex: number | null = null
   private currentEntryRef: string | null = null
   private currentEntryEquipments: StationEquipment[] = []
@@ -311,14 +311,14 @@ class X4SaveParser {
     const node = this.currentNode()
 
     if (name === 'entry' && this.currentEntryIndex !== null && this.currentEntryRef !== null) {
-      const module: PlayerStationModule = {
+      const construction: PlayerStationConstruction = {
         index: this.currentEntryIndex,
         ref: this.currentEntryRef
       }
       if (this.currentEntryEquipments.length > 0) {
-        module.equipments = this.currentEntryEquipments
+        construction.equipments = this.currentEntryEquipments
       }
-      this.currentStationModules.push(module)
+      this.currentStationModules.push(construction)
       this.currentEntryIndex = null
       this.currentEntryRef = null
       this.currentEntryEquipments = []
@@ -331,13 +331,13 @@ class X4SaveParser {
 
       if (this.isStation() && sectorData) {
         const owner = String(attrib.owner || '')
+        const relativePosition = { x: pos.x, y: pos.y, z: pos.z }
         const base: StationBaseEntry = {
           code: String(attrib.code || ''),
           macro: String(attrib.macro || ''),
           owner: owner,
-          x: pos.x,
-          y: pos.y,
-          z: pos.z,
+          relative_position: relativePosition,
+          position: relativePosition,
           is_wreck: attrib.state === 'wreck' || undefined,
           is_headquarter: attrib.factionheadquarters === '1' || undefined
         }
@@ -345,7 +345,7 @@ class X4SaveParser {
         if (owner === 'player') {
           const entry: PlayerStationEntry = { ...base }
           if (this.currentStationModules.length > 0) {
-            entry.modules = this.currentStationModules
+            entry.constructions = this.currentStationModules
           }
           sectorData.playerStations?.push(entry)
         } else if (owner === 'xenon') {
@@ -359,39 +359,39 @@ class X4SaveParser {
           sectorData.npcStations?.push(entry)
         }
       } else if (this.isDatavault() && sectorData) {
+        const relativePosition = { x: pos.x, y: pos.y, z: pos.z }
         const entry: DatavaultEntry = {
           code: String(attrib.code || ''),
           macro: String(attrib.macro || ''),
           owner: String(attrib.owner || ''),
-          x: pos.x,
-          y: pos.y,
-          z: pos.z,
+          relative_position: relativePosition,
+          position: relativePosition,
           unlocked: false,
           wares: [],
           ...this.buildDatavaultFlags(attrib)
         }
         sectorData.datavaults?.push(entry)
       } else if (this.isErlkingVault() && sectorData) {
+        const relativePosition = { x: pos.x, y: pos.y, z: pos.z }
         const entry: DatavaultEntry = {
           code: String(attrib.code || ''),
           macro: String(attrib.macro || ''),
           owner: String(attrib.owner || ''),
-          x: pos.x,
-          y: pos.y,
-          z: pos.z,
+          relative_position: relativePosition,
+          position: relativePosition,
           unlocked: false,
           wares: [],
           ...this.buildDatavaultFlags(attrib)
         }
         sectorData.erlkingVaults?.push(entry)
       } else if (this.isAbandonedShip() && sectorData) {
+        const relativePosition = { x: pos.x, y: pos.y, z: pos.z }
         const entry: AbandonedShipEntry = {
           code: String(attrib.code || ''),
           macro: String(attrib.macro || ''),
           class: String(attrib.class || ''),
-          x: pos.x,
-          y: pos.y,
-          z: pos.z
+          relative_position: relativePosition,
+          position: relativePosition
         }
         sectorData.abandonedShips?.push(entry)
       }
@@ -774,11 +774,12 @@ export function createSaveParserRuntime(
         meta: {
           ...parser.data.meta,
           filename: stripSaveFileExtension(filename),
-          parser_version: 'v1',
+          parser_version: 'v2',
           source: 'original'
         },
         sectors: parser.data.sectors,
-        isCompatible
+        isCompatible,
+        isValid: true
       })
     },
     getProgress() {

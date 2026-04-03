@@ -31,11 +31,13 @@ const selectedSaveArchive = ref<SaveArchive | null>(null)
 
 // 分类显示状态（checkbox）
 const savePoiVisibility = ref<Record<string, boolean>>({
-  playerStations: false,
-  npcStations: false,
-  abandonedShips: false,
-  datavaults: false,
-  erlkingVaults: false
+  playerStation: false,
+  npcStation: false,
+  xenonStation: false,
+  khaakStation: false,
+  abandonedShip: false,
+  datavault: false,
+  erlkingVault: false
 })
 
 // 聚焦的兴趣点key
@@ -92,19 +94,29 @@ const focusedSavePoiKey = ref<string | null>(null)
 **决策**：新增 `SavePoiOverlay` 类型，与现有 `PlacementOverlay` 共存但独立管理。
 
 ```typescript
-type SavePoiCategory = 'playerStation' | 'npcStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
+type SavePoiCategory = 'playerStation' | 'npcStation' | 'xenonStation' | 'khaakStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
 
-interface SavePoiOverlay {
+interface SavePoiOverlayItem {
   key: string              // `${category}:${code}`
   code: string             // 实体 code，显示在标记上方
   category: SavePoiCategory
   owner?: string
   sectorMacro: string      // 星区 macro，用于坐标转换
+  sectorName: string
   pos: { x: number; z: number }
+  tag?: string             // 空间站类型标签，用于图标选择
+  is_headquarter?: boolean // 是否为总部，影响图标选择
 }
 ```
 
 **渲染**：在 `MapSvgCanvas.vue` 中新增 `<g class="save-poi-overlays">` 层，与 `<g class="station-overlays">` 分离。
+
+**图标选择逻辑**：
+- 空间站类别根据 `tag` 和 `is_headquarter` 选择 SVG 图标
+- `playerStation` + `is_headquarter=true` → `playerhq.svg`
+- 其他空间站 + `is_headquarter=true` → `<tag>_headquarter.svg`
+- 空间站 + `is_headquarter=false` → `<tag>.svg`
+- 非空间站类别保持小圆点渲染
 
 ---
 
@@ -115,7 +127,9 @@ interface SavePoiOverlay {
 | 分类 | 颜色类 | SVG颜色值 |
 |------|--------|-----------|
 | 用户空间站 | amber-400 | #fbbf24 |
-| NPC据点 | amber-200/60 | rgba(252, 211, 77, 0.6) |
+| NPC空间站 | amber-200/60 | rgba(252, 211, 77, 0.6) |
+| XEN空间站 | red-400 | #f87171 |
+| KHA空间站 | purple-500 | #a855f7 |
 | 弃船 | purple-400 | #c084fc |
 | 保险箱 | cyan-400 | #22d3ee |
 | 妖王保险箱 | emerald-400 | #34d399 |
@@ -132,11 +146,13 @@ watch([isSavePanelOpen, selectedSaveArchive], () => {
   if (isSavePanelOpen.value && selectedSaveArchive.value) {
     // 进入分类层时重置
     savePoiVisibility.value = {
-      playerStations: false,
-      npcStations: false,
-      abandonedShips: false,
-      datavaults: false,
-      erlkingVaults: false
+      playerStation: false,
+      npcStation: false,
+      xenonStation: false,
+      khaakStation: false,
+      abandonedShip: false,
+      datavault: false,
+      erlkingVault: false
     }
   }
 })
@@ -256,3 +272,87 @@ MapWorkbenchView.vue
 | `useSaveStore.ts` | 可能修改 | 添加分类数据计算方法 |
 | `savePoiVisibility.ts` | 新增 | 合并 checkbox 显示状态与详情层临时类别 |
 | `zh-CN.json` / `en.json` | 修改 | 添加新文案 |
+
+---
+
+### D10: 阵营颜色染色
+
+**决策**：使用 SVG `feColorMatrix` filter 对图标进行阵营颜色染色。
+
+**数据来源**：
+- `factionColorMap` 从 `factions.json` 提取：`{ [factionId]: color }`
+- 如 `player` → `#4DFF4D`，`argon` → `#0069B3`
+
+**颜色转换算法**：
+```typescript
+function colorToFeColorMatrix(hex: string): string {
+  const rgb = hexToRgb(hex)
+  return `${rgb.r} 0 0 0 0  ${rgb.g} 0 0 0 0  ${rgb.b} 0 0 0 0  0 0 0 1 0`
+}
+```
+
+**渲染方式**：
+- 为每个阵营颜色生成一个 SVG filter
+- 图标通过 `filter="url(#faction-color-xxx)"` 应用颜色
+
+---
+
+### D11: 星区/Cluster Owner Override
+
+**决策**：从存档提取 owner 映射，覆盖地图默认颜色。
+
+**实现**：
+```typescript
+// sectorOwnerOverride: sectorId -> owner
+const sectorOwnerOverride = computed(() => {
+  // 从存档 sectors 提取 owner
+})
+
+// clusterOwnerOverride: clusterId -> owner
+const clusterOwnerOverride = computed(() => {
+  // 若所有 sector owner 相同，使用该 owner
+  // 否则使用 'ownerless'
+})
+```
+
+**resolveOwnerColor 优先级**：
+1. sector owner override
+2. cluster owner override
+3. 默认 owner_color
+
+---
+
+### D12: 高亮状态保持阵营颜色
+
+**问题**：CSS `.focused` 的 `filter` 会覆盖 SVG 内联 filter。
+
+**决策**：创建两套 SVG filter：
+- `faction-color-xxx` - 只有阵营颜色
+- `faction-color-xxx-focused` - 阵营颜色 + drop-shadow 高亮
+
+**模板选择**：
+```vue
+:filter="poi.factionFilterId ? 
+  `url(#${poi.factionFilterId}${isFocused ? '-focused' : ''})` : 
+  undefined"
+```
+
+---
+
+### D13: Tooltip Owner i18n
+
+**决策**：使用 faction 的 `nameId` 进行本地化翻译。
+
+**实现**：
+```typescript
+const ownerName = computed(() => {
+  const owner = overrideOwner || sectorInfo.value?.owner || 'ownerless'
+  if (owner === 'ownerless') return t('map.owner_ownerless')
+  
+  const faction = gameDataStore.factions?.find(f => f.id === owner)
+  if (faction?.nameId && te(faction.nameId)) {
+    return t(faction.nameId)
+  }
+  return faction?.name || owner
+})
+```

@@ -25,7 +25,13 @@ function formatTime(time: number): string {
 }
 
 function onArchiveClick(group: ArchiveGroup, time: number) {
+  const archive = group.saves.find((item) => item.meta.time === time)
+  if (!archive || !archive.isValid) return
   emit('select', { guid: group.guid, time })
+}
+
+function canSelectArchive(valid: boolean): boolean {
+  return valid
 }
 </script>
 
@@ -53,11 +59,16 @@ function onArchiveClick(group: ArchiveGroup, time: number) {
             v-for="archive in group.saves"
             :key="archive.meta.time"
             class="save-item"
+            :class="{ 'save-item-disabled': !canSelectArchive(archive.isValid) }"
+            :title="!archive.isValid ? t('map.save_invalid_archive_hint') : undefined"
             @click="onArchiveClick(group, archive.meta.time)"
           >
             <div class="save-info">
               <div class="save-time">{{ formatTime(archive.meta.time) }}</div>
               <div class="save-meta">
+                <span v-if="!archive.isValid" class="invalid-warning">
+                  {{ t('save_import.invalid_archive') }}
+                </span>
                 <span v-if="!archive.isCompatible" class="version-warning">
                   {{ t('save_import.version_mismatch') }}
                 </span>
@@ -112,6 +123,14 @@ function onArchiveClick(group: ArchiveGroup, time: number) {
   @apply flex items-center justify-between p-2 rounded cursor-pointer bg-black/45 border border-amber-300/15 hover:bg-amber-200/5 hover:border-amber-200/45 transition-colors;
 }
 
+.save-item-disabled {
+  @apply cursor-not-allowed opacity-60;
+}
+
+.save-item-disabled:hover {
+  @apply bg-black/45 border-amber-300/15;
+}
+
 .save-info {
   @apply flex flex-col gap-0.5;
 }
@@ -126,6 +145,10 @@ function onArchiveClick(group: ArchiveGroup, time: number) {
 
 .version-warning {
   @apply text-amber-400;
+}
+
+.invalid-warning {
+  @apply text-red-400;
 }
 
 .save-filename {
