@@ -1,99 +1,33 @@
 <script setup lang="ts">
-import { computed, watchEffect } from 'vue'
+import { toRef, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import type { SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
-import { resolveMapSectorByMacro } from './mapSectorMacro'
-import factoryIconUrl from '@/components/icons/factory.svg'
-import shipyardIconUrl from '@/components/icons/shipyard.svg'
-import tradestationIconUrl from '@/components/icons/tradestation.svg'
-import playerhqIconUrl from '@/components/icons/playerhq.svg'
-import wharfIconUrl from '@/components/icons/wharf.svg'
-import equipmentdockIconUrl from '@/components/icons/equipmentdock.svg'
-import defensestationIconUrl from '@/components/icons/defensestation.svg'
-import piratestationIconUrl from '@/components/icons/piratestation.svg'
-import hiveIconUrl from '@/components/icons/hive.svg'
-import weaponplatformIconUrl from '@/components/icons/weaponplatform.svg'
-import shiptechIconUrl from '@/components/icons/shiptech.svg'
-import hightechIconUrl from '@/components/icons/hightech.svg'
-import refinedIconUrl from '@/components/icons/refined.svg'
-import pharmaceuticalIconUrl from '@/components/icons/pharmaceutical.svg'
-import foodIconUrl from '@/components/icons/food.svg'
-import agriculturalIconUrl from '@/components/icons/agricultural.svg'
-import waterIconUrl from '@/components/icons/water.svg'
-import energyIconUrl from '@/components/icons/energy.svg'
-import shipyardHeadquarterIconUrl from '@/components/icons/shipyard_headquarter.svg'
-import wharfHeadquarterIconUrl from '@/components/icons/wharf_headquarter.svg'
-import equipmentdockHeadquarterIconUrl from '@/components/icons/equipmentdock_headquarter.svg'
-import factoryHeadquarterIconUrl from '@/components/icons/factory_headquarter.svg'
-import tradestationHeadquarterIconUrl from '@/components/icons/tradestation_headquarter.svg'
-import defensestationHeadquarterIconUrl from '@/components/icons/defensestation_headquarter.svg'
-import piratestationHeadquarterIconUrl from '@/components/icons/piratestation_headquarter.svg'
-
-type Vec2 = { x: number; y: number }
-type LayoutConfig = { width: number; height: number; padX: number; padY: number; topPad: number }
-type FitState = { minX: number; minY: number; scale: number; offsetX: number; offsetY: number }
-type Ratio = { x: number; y: number }
-
-type HighwayPoint = { sx?: number; sy?: number }
-type Highway = { entry?: HighwayPoint; exit?: HighwayPoint; spline?: HighwayPoint[] }
-type Gate = { id?: string; target_cluster_id?: string; raw_local_pos?: { sx?: number; sy?: number } }
-type Zone = { raw_sector_pos?: { sx?: number; sy?: number } }
-type SectorLink = {
-  id: string
-  sector_a_id?: string
-  sector_b_id?: string
-  from_zone_id?: string
-  to_zone_id?: string
-  render?: { lane_count?: number; lane_index?: number }
-}
-type Sector = {
-  id: string
-  nameId?: string
-  name?: string
-  owner?: string
-  owner_color?: string
-  area?: {
-    sunlight?: number
-  }
-  resources?: SectorResourceEntry[]
-  normalized?: {
-    center_offset_ratio?: Ratio
-    sector_radius_ratio?: number
-    scale_per_radius?: number
-  }
-  zones?: Record<string, Zone>
-  highways?: Record<string, Highway>
-  cluster_gates?: Record<string, Gate>
-  has_khaak_hive?: boolean
-  khaak_hive_sources?: string[]
-}
-type Cluster = {
-  id: string
-  nameId?: string
-  name?: string
-  owner?: string
-  owner_color?: string
-  dlc_tag?: string
-  normalized?: { pixel_basis?: Vec2 }
-  sectors?: Record<string, Sector>
-  sector_links?: Record<string, SectorLink>
-}
-type SearchSectorLayout = {
-  sectorId: string
-  clusterId: string
-  name: string
-  displayName: string
-  centerX: number
-  centerY: number
-  radius: number
-  verticalExtent: number
-}
-type SectorResourceEntry = {
-  ware: string
-  yield?: string
-  level?: number
-}
+import type { SavePoiOverlayItem } from '@/types/saveArchive'
+import {
+  FALLBACK_OWNER_COLOR,
+  MAP_FONT_FAMILY,
+  OVERLAY_ICON_SIZE,
+  PREVIEW_ICON_SIZE,
+  getSavePoiIconSize,
+  getSavePoiIconUrl,
+  placementIconHref,
+  svgIdSafe
+} from '@/components/map/utils/style'
+import { hexPoints } from '@/components/map/utils/geometry'
+import type {
+  PlacementOverlay,
+  PlacementPreview,
+  SearchSectorLayout,
+  SectorResourceEntry,
+  SectorResourceFill
+} from '@/components/map/types'
+import { useMapSvgLayout } from '@/composables/useMapSvgLayout'
+import { useMapSvgLinks } from '@/composables/useMapSvgLinks'
+import { useMapSvgOverlays } from '@/composables/useMapSvgOverlays'
+import { useMapSvgSectors } from '@/composables/useMapSvgSectors'
+import MapLinkLayer from '@/components/map/layers/MapLinkLayer.vue'
+import MapOverlayLayer from '@/components/map/layers/MapOverlayLayer.vue'
+import MapSectorLayer from '@/components/map/layers/MapSectorLayer.vue'
 type SectorHoverPayload = {
   sectorId: string
   clusterId: string
@@ -113,64 +47,11 @@ type SectorHoverPayload = {
     height: number
   }
 }
-type SectorResourceColorSlice = {
-  ware: string
-  color: string
-  share: number
-}
-type SectorResourceFill =
-  | {
-      mode: 'solid'
-      ware: string
-      color: string
-    }
-  | {
-      mode: 'pie'
-      slices: SectorResourceColorSlice[]
-    }
-type PlacementLocation = {
-  cluster_id: string
-  sector_id: string
-  pos: {
-    x: number
-    z: number
-  }
-}
-type PlacementOverlay = {
-  key: string
-  id: string
-  kind: 'station' | 'sector'
-  name: string
-  icon: 'factory' | 'shipyard' | 'tradestation'
-  location: PlacementLocation
-}
-type PlacementPreview = {
-  kind: 'station' | 'sector'
-  name: string
-  icon: 'factory' | 'shipyard' | 'tradestation'
-  location: PlacementLocation
-}
-const FALLBACK_OWNER_COLOR = '#94a3b8'
-const SQRT3 = Math.sqrt(3)
 const SECTOR_LABEL_FONT_SIZE = 14
-const SINGLE_SECTOR_LABEL_FONT_SIZE = 18
-const MIN_SECTOR_LABEL_FONT_SIZE = 8
-const HEX_TOP_EDGE_RATIO = SQRT3 / 2
-const MULTI_SECTOR_LABEL_PAD_RATIO = 0.03
-const MULTI_SECTOR_LABEL_PAD_MIN_PX = 2
-const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
-const CANVAS_SCALE_FACTOR = 1.8
 const STARGATE_VISUAL_SCALE = 1.5
 const SEARCH_HIGHLIGHT_FILTER_ID = 'map-search-sector-glow'
 const RESOURCE_HIGHLIGHT_FILTER_ID = 'map-resource-sector-glow'
 const SEARCH_SELECTED_FILTER_ID = 'map-search-sector-selected-glow'
-const OVERLAY_ICON_SIZE = 18
-const SMALL_ICON_SIZE = 9
-const PREVIEW_ICON_SIZE = 20
-const LARGE_ICON_TYPES = ['shipyard', 'wharf', 'tradestation', 'equipmentdock', 'playerhq', 'hive']
-const INNER_CLUSTER_PADDING_2SEC = 0.965  // 2-sector 内层边框 padding
-const INNER_CLUSTER_PADDING_3SEC = 0.98  // 3-sector 内层边框 padding
-const SECTOR_SCALE_3SEC = 0.97  // 3-sector sector 相对于内层的缩放
 
 const props = withDefaults(defineProps<{
   searchHighlightedSectorIds?: string[]
@@ -217,7 +98,6 @@ const emit = defineEmits<{
 const { t, te } = useI18n()
 const gameData = useGameDataStore()
 
-const svgIdSafe = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_')
 const sectorClipId = (clusterId: string, sectorId: string) =>
   `sector-clip-${svgIdSafe(clusterId)}-${svgIdSafe(sectorId)}`
 const resolveOwnerColor = (node: { owner_color?: string }, sectorId?: string, clusterId?: string) => {
@@ -234,11 +114,6 @@ const resolveOwnerColor = (node: { owner_color?: string }, sectorId?: string, cl
     }
   }
   return node.owner_color || FALLBACK_OWNER_COLOR
-}
-const placementIconHref = (icon: 'factory' | 'shipyard' | 'tradestation') => {
-  if (icon === 'shipyard') return shipyardIconUrl
-  if (icon === 'tradestation') return tradestationIconUrl
-  return factoryIconUrl
 }
 
 const resolveName = (nameId?: string, fallback?: string) => {
@@ -272,936 +147,85 @@ const emitSectorLeave = (sectorId: string) => {
   emit('sector-leave', sectorId)
 }
 
-const hexPoints = (cx: number, cy: number, radius: number) => {
-  const points: string[] = []
-  for (let index = 0; index < 6; index += 1) {
-    const angle = (Math.PI / 180) * (60 * index)
-    const px = cx + radius * Math.cos(angle)
-    const py = cy + radius * Math.sin(angle)
-    points.push(`${px.toFixed(1)},${py.toFixed(1)}`)
-  }
-  return points.join(' ')
-}
+const placementOverlaysRef = toRef(props, 'placementOverlays')
+const placementPreviewRef = toRef(props, 'placementPreview')
+const savePoiOverlaysRef = toRef(props, 'savePoiOverlays')
+const factionColorMapRef = toRef(props, 'factionColorMap')
 
-const hexVertices = (cx: number, cy: number, radius: number): Vec2[] => {
-  const vertices: Vec2[] = []
-  for (let index = 0; index < 6; index += 1) {
-    const angle = (Math.PI / 180) * (60 * index)
-    vertices.push({ x: cx + radius * Math.cos(angle), y: cy + radius * Math.sin(angle) })
-  }
-  return vertices
-}
-
-const fitWorldToScreen = (points: Vec2[], cfg: LayoutConfig): FitState => {
-  const minX = Math.min(...points.map((p) => p.x), 0)
-  const maxX = Math.max(...points.map((p) => p.x), 1)
-  const minY = Math.min(...points.map((p) => -p.y), 0)
-  const maxY = Math.max(...points.map((p) => -p.y), 1)
-
-  const availableW = cfg.width - cfg.padX * 2
-  const availableH = cfg.height - cfg.padY * 2 - cfg.topPad
-  const worldW = Math.max(maxX - minX, 1)
-  const worldH = Math.max(maxY - minY, 1)
-  const scale = Math.min(availableW / worldW, availableH / worldH)
-  const offsetX = cfg.padX + (availableW - worldW * scale) / 2
-  const offsetY = cfg.padY + cfg.topPad + (availableH - worldH * scale) / 2
-  return { minX, minY, scale, offsetX, offsetY }
-}
-
-const clusterCenterScreen = (cluster: Cluster, fit: FitState): Vec2 => {
-  const basis = cluster.normalized?.pixel_basis || { x: 0, y: 0 }
-  return {
-    x: fit.offsetX + (basis.x - fit.minX) * fit.scale,
-    y: fit.offsetY + ((-basis.y) - fit.minY) * fit.scale
-  }
-}
-
-const minCenterDistance = (centers: Record<string, Vec2>) => {
-  const values = Object.values(centers)
-  if (values.length < 2) return 1
-  let best = Number.POSITIVE_INFINITY
-  for (let idx = 0; idx < values.length; idx += 1) {
-    for (let j = idx + 1; j < values.length; j += 1) {
-      const left = values[idx]!
-      const right = values[j]!
-      const dist = Math.hypot(left.x - right.x, left.y - right.y)
-      if (dist < best) best = dist
-    }
-  }
-  return Number.isFinite(best) ? best : 1
-}
-
-const computeClusterRadius = (centers: Record<string, Vec2>) => {
-  const minDistance = minCenterDistance(centers)
-  return Math.max(82, Math.min(126, minDistance / SQRT3))
-}
-
-const scaledLayoutConfig = (cfg: LayoutConfig, factor: number): LayoutConfig => ({
-  width: cfg.width * factor,
-  height: cfg.height * factor,
-  padX: cfg.padX * factor,
-  padY: cfg.padY * factor,
-  topPad: cfg.topPad * factor
+const {
+  clusters,
+  regionIds,
+  layoutState,
+  clipDefs,
+  canvasWidth,
+  canvasHeight
+} = useMapSvgLayout({
+  gameData,
+  sectorClipId
 })
 
-const catmullRomToBezierPath = (points: Vec2[]) => {
-  if (points.length < 2) return ''
-  if (points.length === 2) {
-    const p0 = points[0]!
-    const p1 = points[1]!
-    return `M ${p0.x.toFixed(1)},${p0.y.toFixed(1)} L ${p1.x.toFixed(1)},${p1.y.toFixed(1)}`
-  }
-  const start = points[0]!
-  const path: string[] = [`M ${start.x.toFixed(1)},${start.y.toFixed(1)}`]
-  const count = points.length
-  for (let index = 0; index < count - 1; index += 1) {
-    const p0 = points[index - 1] || points[index]!
-    const p1 = points[index]!
-    const p2 = points[index + 1]!
-    const p3 = points[index + 2] || points[index + 1]!
-    const c1x = p1.x + (p2.x - p0.x) / 6
-    const c1y = p1.y + (p2.y - p0.y) / 6
-    const c2x = p2.x - (p3.x - p1.x) / 6
-    const c2y = p2.y - (p3.y - p1.y) / 6
-    path.push(
-      `C ${c1x.toFixed(1)},${c1y.toFixed(1)} ${c2x.toFixed(1)},${c2y.toFixed(1)} ${p2.x.toFixed(1)},${p2.y.toFixed(1)}`
-    )
-  }
-  return path.join(' ')
-}
-
-const buildHighwayPathPoints = (start: Vec2, end: Vec2, middle: Vec2[], eps = 0.1) => {
-  const points: Vec2[] = [start]
-  middle.forEach((point) => {
-    if (Math.hypot(point.x - start.x, point.y - start.y) <= eps) return
-    if (Math.hypot(point.x - end.x, point.y - end.y) <= eps) return
-    points.push(point)
-  })
-  points.push(end)
-  const deduped: Vec2[] = []
-  points.forEach((point) => {
-    if (!deduped.length) {
-      deduped.push(point)
-      return
-    }
-    const prev = deduped[deduped.length - 1]
-    if (!prev) return
-    if (Math.hypot(point.x - prev.x, point.y - prev.y) > eps) deduped.push(point)
-  })
-  return deduped
-}
-
-const clipSegmentToConvexPolygon = (p0: Vec2, p1: Vec2, polygon: Vec2[]): [Vec2, Vec2] | null => {
-  const dx = p1.x - p0.x
-  const dy = p1.y - p0.y
-  let tEnter = 0
-  let tLeave = 1
-  const eps = 1e-9
-
-  for (let index = 0; index < polygon.length; index += 1) {
-    const a = polygon[index]
-    const b = polygon[(index + 1) % polygon.length]
-    if (!a || !b) continue
-    const ex = b.x - a.x
-    const ey = b.y - a.y
-
-    const c = ex * (p0.y - a.y) - ey * (p0.x - a.x)
-    const d = ex * dy - ey * dx
-    const n = -c
-
-    if (Math.abs(d) <= eps) {
-      if (c < -eps) return null
-      continue
-    }
-
-    const t = n / d
-    if (d > 0) tEnter = Math.max(tEnter, t)
-    else tLeave = Math.min(tLeave, t)
-    if (tEnter - tLeave > eps) return null
-  }
-
-  return [
-    { x: p0.x + dx * tEnter, y: p0.y + dy * tEnter },
-    { x: p0.x + dx * tLeave, y: p0.y + dy * tLeave }
-  ]
-}
-
-const samePoint = (left: Vec2, right: Vec2, eps = 0.25) =>
-  Math.hypot(left.x - right.x, left.y - right.y) <= eps
-
-const clipPolylineToConvexPolygon = (points: Vec2[], polygon: Vec2[]) => {
-  const chains: Vec2[][] = []
-
-  for (let index = 0; index < points.length - 1; index += 1) {
-    const start = points[index]
-    const end = points[index + 1]
-    if (!start || !end) continue
-    const clipped = clipSegmentToConvexPolygon(start, end, polygon)
-    if (!clipped) continue
-
-    const lastChain = chains[chains.length - 1]
-    if (lastChain && samePoint(lastChain[lastChain.length - 1]!, clipped[0])) {
-      if (!samePoint(lastChain[lastChain.length - 1]!, clipped[1])) {
-        lastChain.push(clipped[1])
-      }
-      continue
-    }
-
-    chains.push(
-      samePoint(clipped[0], clipped[1])
-        ? [clipped[0]]
-        : [clipped[0], clipped[1]]
-    )
-  }
-
-  return chains
-}
-
-const sectorRatioToClusterRatio = (sectorNorm: Sector['normalized'], localRatio?: Ratio | null): Ratio | null => {
-  if (!localRatio) return null
-  const center = sectorNorm?.center_offset_ratio
-  const radiusRatio = sectorNorm?.sector_radius_ratio
-  if (!center || radiusRatio === undefined) return null
-  return {
-    x: center.x + localRatio.x * radiusRatio,
-    y: center.y + localRatio.y * radiusRatio
-  }
-}
-
-const clusterRatioToScreen = (center: Vec2, clusterRadius: number, ratio: Ratio): Vec2 => ({
-  x: center.x + ratio.x * clusterRadius,
-  y: center.y + ratio.y * clusterRadius
+const {
+  shouldRenderResourceOverlay,
+  sectorFillOpacity,
+  sectorStrokeWidth,
+  sectorStrokeOpacity,
+  sectorLabelFill,
+  sectorLabelWeight,
+  sectorFilter: sectorFilterState,
+  sectorFillColor,
+  sectorStrokeColor,
+  buildPieSliceGeometries,
+  buildResourceGroupBadgeGeometries,
+  clusterPolygons,
+  sectorLayouts
+} = useMapSvgSectors({
+  gameData,
+  clusters,
+  regionIds,
+  layoutState,
+  searchHighlightedSectorIds: toRef(props, 'searchHighlightedSectorIds'),
+  resourceHighlightedSectorIds: toRef(props, 'resourceHighlightedSectorIds'),
+  resourceSectorFills: toRef(props, 'resourceSectorFills'),
+  resourceSectorGroupBadges: toRef(props, 'resourceSectorGroupBadges'),
+  resourceFillColorOverride: toRef(props, 'resourceFillColorOverride'),
+  selectedSectorId: toRef(props, 'selectedSectorId'),
+  resolveName,
+  resolveOwnerColor
 })
 
-const getSectorViewportTransform = (cluster: Cluster, center: Vec2, clusterRadius: number, sector: Sector) => {
-  const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
-  const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-  const sectorCount = Object.keys(cluster.sectors || {}).length
-  let innerPadding = 1
-  let sectorScale = 1
-  if (sectorCount === 2) {
-    innerPadding = INNER_CLUSTER_PADDING_2SEC
-    sectorScale = INNER_CLUSTER_PADDING_2SEC
-  } else if (sectorCount === 3) {
-    innerPadding = INNER_CLUSTER_PADDING_3SEC
-    sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC
-  }
-
-  return {
-    center: {
-      x: center.x + ratio.x * clusterRadius * innerPadding,
-      y: center.y + ratio.y * clusterRadius * innerPadding
-    },
-    sectorRadius: sectorRadiusRatio * clusterRadius * sectorScale,
-    sectorRadiusRatio
-  }
-}
-
-const sectorLocalRatioToScreen = (
-  cluster: Cluster,
-  center: Vec2,
-  clusterRadius: number,
-  sector: Sector,
-  localRatio?: Ratio | null
-): Vec2 | null => {
-  if (!localRatio) return null
-  const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
-  return {
-    x: transform.center.x + localRatio.x * transform.sectorRadius,
-    y: transform.center.y + localRatio.y * transform.sectorRadius
-  }
-}
-
-const gateClusterRatioFromRaw = (gate: Gate, sectorNorm: Sector['normalized']): Ratio | null => {
-  const raw = gate.raw_local_pos || {}
-  if (raw.sx === undefined || raw.sy === undefined) return null
-  return sectorRatioToClusterRatio(sectorNorm, { x: raw.sx, y: raw.sy })
-}
-
-const clusters = computed<Record<string, Cluster>>(() => {
-  const allClusters = (gameData.maps as unknown as { clusters: Record<string, Cluster> })?.clusters || {}
-  if (!gameData.enforceDlcActivation) return allClusters
-
-  return Object.fromEntries(
-    Object.entries(allClusters).filter(([, cluster]) =>
-      gameData.isDlcActive(cluster.dlc_tag)
-    )
-  )
-})
-
-// 所有 clusters（用于布局计算，保持位置稳定）
-const allClusters = computed<Record<string, Cluster>>(() => {
-  return (gameData.maps as unknown as { clusters: Record<string, Cluster> })?.clusters || {}
-})
-
-const regionIds = computed(() => Object.keys(clusters.value))
-const searchHighlightedSectorIdSet = computed(() => new Set(props.searchHighlightedSectorIds))
-const resourceHighlightedSectorIdSet = computed(() => new Set(props.resourceHighlightedSectorIds))
-const isSelectedSector = (sectorId: string) => props.selectedSectorId === sectorId
-const isResourceFilterActive = computed(() =>
-  Object.keys(props.resourceSectorFills || {}).length > 0 || resourceHighlightedSectorIdSet.value.size > 0 || Boolean(props.resourceFillColorOverride)
-)
-const getSectorVisualState = (sectorId: string) => {
-  if (isSelectedSector(sectorId)) return 'selected'
-  if (searchHighlightedSectorIdSet.value.has(sectorId)) return 'search'
-  if (resourceHighlightedSectorIdSet.value.has(sectorId)) return 'resource'
-  return 'default'
-}
-const shouldRenderResourceOverlay = (sectorId: string) => {
-  const state = getSectorVisualState(sectorId)
-  return state === 'resource' || state === 'selected'
-}
-const getResourceFill = (sectorId: string) => props.resourceSectorFills?.[sectorId] || null
-const getResourceGroupBadges = (sectorId: string) => props.resourceSectorGroupBadges?.[sectorId] || []
-const hasPieFill = (sectorId: string) => getResourceFill(sectorId)?.mode === 'pie'
-const sectorFillOpacity = (sectorId: string) => {
-  const state = getSectorVisualState(sectorId)
-  if (isResourceFilterActive.value && state === 'default') return 0
-  if (hasPieFill(sectorId) && (state === 'resource' || state === 'selected')) return 0
-  if (state === 'selected') return 0.28
-  if (state === 'search') return 0.18
-  if (state === 'resource') return 0.15
-  return 0.08
-}
-const sectorStrokeWidth = (sectorId: string, defaultValue: number) => {
-  const state = getSectorVisualState(sectorId)
-  if (state === 'selected') return defaultValue + 0.9
-  if (state === 'search') return defaultValue + 0.45
-  if (state === 'resource') return defaultValue + 0.25
-  return defaultValue
-}
-const sectorStrokeOpacity = (sectorId: string, defaultValue: number) => {
-  const state = getSectorVisualState(sectorId)
-  if (state === 'selected') return 1
-  if (state === 'search') return Math.min(1, defaultValue + 0.08)
-  if (state === 'resource') return Math.min(1, defaultValue + 0.03)
-  return defaultValue
-}
-const sectorLabelFill = (sectorId: string) => {
-  const state = getSectorVisualState(sectorId)
-  if (state === 'selected' || state === 'search') return '#fef3c7'
-  if (state === 'resource') return '#fce7f3'
-  return '#f8fafc'
-}
-const sectorLabelWeight = (sectorId: string) => getSectorVisualState(sectorId) === 'default' ? 500 : 700
 const sectorFilter = (sectorId: string) => {
-  if (isSelectedSector(sectorId)) return `url(#${SEARCH_SELECTED_FILTER_ID})`
-  if (searchHighlightedSectorIdSet.value.has(sectorId)) return `url(#${SEARCH_HIGHLIGHT_FILTER_ID})`
-  if (resourceHighlightedSectorIdSet.value.has(sectorId)) return `url(#${RESOURCE_HIGHLIGHT_FILTER_ID})`
+  const state = sectorFilterState(sectorId)
+  if (state === 'selected') return `url(#${SEARCH_SELECTED_FILTER_ID})`
+  if (state === 'search') return `url(#${SEARCH_HIGHLIGHT_FILTER_ID})`
+  if (state === 'resource') return `url(#${RESOURCE_HIGHLIGHT_FILTER_ID})`
   return undefined
 }
-const sectorFillColor = (sectorId: string, defaultColor: string) => {
-  if (!isResourceFilterActive.value) return defaultColor
-  const fill = getResourceFill(sectorId)
-  if (fill?.mode === 'solid' && resourceHighlightedSectorIdSet.value.has(sectorId)) return fill.color
-  if (fill?.mode === 'pie' && resourceHighlightedSectorIdSet.value.has(sectorId)) return 'transparent'
-  if (resourceHighlightedSectorIdSet.value.has(sectorId)) return props.resourceFillColorOverride || defaultColor
-  return 'transparent'
-}
-const sectorStrokeColor = (sectorId: string, defaultColor: string) => {
-  if (!isResourceFilterActive.value) return defaultColor
-  if (resourceHighlightedSectorIdSet.value.has(sectorId)) return props.resourceFillColorOverride || defaultColor
-  return defaultColor
-}
-const polarToCartesian = (cx: number, cy: number, radius: number, angleDeg: number) => {
-  const angleRad = (Math.PI / 180) * angleDeg
-  return {
-    x: cx + radius * Math.cos(angleRad),
-    y: cy + radius * Math.sin(angleRad)
-  }
-}
-const describePieSlicePath = (cx: number, cy: number, radius: number, startAngle: number, sweepAngle: number) => {
-  const start = polarToCartesian(cx, cy, radius, startAngle)
-  const end = polarToCartesian(cx, cy, radius, startAngle + sweepAngle)
-  const largeArcFlag = sweepAngle > 180 ? 1 : 0
-  return [
-    `M ${cx.toFixed(1)} ${cy.toFixed(1)}`,
-    `L ${start.x.toFixed(1)} ${start.y.toFixed(1)}`,
-    `A ${radius.toFixed(1)} ${radius.toFixed(1)} 0 ${largeArcFlag} 1 ${end.x.toFixed(1)} ${end.y.toFixed(1)}`,
-    'Z'
-  ].join(' ')
-}
-const buildPieSliceGeometries = (sectorId: string, cx: number, cy: number, radius: number) => {
-  const fill = getResourceFill(sectorId)
-  if (!fill || fill.mode !== 'pie' || !shouldRenderResourceOverlay(sectorId)) return []
-  let startAngle = -90
-  return fill.slices.map((slice, index) => {
-    const sweepAngle = index === fill.slices.length - 1
-      ? 360 - (startAngle + 90)
-      : Math.max(0, Math.min(360, slice.share * 360))
-    const path = describePieSlicePath(cx, cy, radius, startAngle, sweepAngle)
-    startAngle += sweepAngle
-    return {
-      ware: slice.ware,
-      color: slice.color,
-      path
-    }
-  })
-}
 
-const buildResourceGroupBadgeGeometries = (sectorId: string, cx: number, cy: number, radius: number) => {
-  if (!shouldRenderResourceOverlay(sectorId)) return []
-  const badges = getResourceGroupBadges(sectorId)
-  if (!badges.length) return []
-
-  const badgeWidth = Math.max(12, radius * 0.32)
-  const badgeHeight = Math.max(12, radius * 0.24)
-  const gap = Math.max(4, radius * 0.1)
-  const totalWidth = badges.length * badgeWidth + Math.max(0, badges.length - 1) * gap
-  const startX = cx - totalWidth / 2
-  const y = cy + radius * 0.52
-
-  return badges.map((label, index) => ({
-    key: `${sectorId}-${label}-${index}`,
-    label,
-    x: startX + index * (badgeWidth + gap),
-    y,
-    width: badgeWidth,
-    height: badgeHeight
-  }))
-}
-
-const layoutState = computed(() => {
-  let cfg: LayoutConfig = {
-    width: 3600 * CANVAS_SCALE_FACTOR,
-    height: 2600 * CANVAS_SCALE_FACTOR,
-    padX: 180 * CANVAS_SCALE_FACTOR,
-    padY: 180 * CANVAS_SCALE_FACTOR,
-    topPad: 140 * CANVAS_SCALE_FACTOR
-  }
-  // 使用全部 clusters 计算边界（方案A：保持位置稳定）
-  const points = Object.values(allClusters.value).map((cluster) => cluster.normalized?.pixel_basis || { x: 0, y: 0 })
-  let fit = fitWorldToScreen(points, cfg)
-  let centers: Record<string, Vec2> = {}
-  // 为全部 clusters 计算中心点（包括被过滤的）
-  Object.entries(allClusters.value).forEach(([clusterId, cluster]) => {
-    centers[clusterId] = clusterCenterScreen(cluster, fit)
-  })
-
-  const minDistance = minCenterDistance(centers)
-  const clusterRadiusInitial = computeClusterRadius(centers)
-  const requiredDistance = SQRT3 * clusterRadiusInitial
-  if (minDistance < requiredDistance) {
-    cfg = scaledLayoutConfig(cfg, requiredDistance / minDistance)
-    fit = fitWorldToScreen(points, cfg)
-    centers = {}
-    Object.entries(allClusters.value).forEach(([clusterId, cluster]) => {
-      centers[clusterId] = clusterCenterScreen(cluster, fit)
-    })
-  }
-  const clusterRadius = computeClusterRadius(centers)
-  return { cfg, fit, centers, clusterRadius }
+const {
+  sectorLinkLines,
+  highwaySegments,
+  gateCircles,
+  crossClusterGateLines
+} = useMapSvgLinks({
+  clusters,
+  regionIds,
+  layoutState,
+  resolveOwnerColor,
+  stargateVisualScale: STARGATE_VISUAL_SCALE
 })
 
-const clipDefs = computed(() => {
-  const defs: Array<{ id: string; points: string }> = []
-  const { centers, clusterRadius } = layoutState.value
-  regionIds.value.forEach((clusterId) => {
-    const cluster = clusters.value[clusterId]
-    if (!cluster) return
-    const center = centers[clusterId]
-    if (!center) return
-    Object.values(cluster.sectors || {}).forEach((sector) => {
-      const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
-      defs.push({
-        id: sectorClipId(clusterId, sector.id),
-        points: hexPoints(transform.center.x, transform.center.y, transform.sectorRadius)
-      })
-    })
-  })
-  return defs
-})
-
-const sectorLinkLines = computed(() => {
-  const rows: Array<{ id: string; start: Vec2; end: Vec2 }> = []
-  const { centers, clusterRadius } = layoutState.value
-
-  regionIds.value.forEach((clusterId) => {
-    const cluster = clusters.value[clusterId]
-    if (!cluster) return
-    const center = centers[clusterId]
-    if (!center) return
-    const sectors = cluster.sectors || {}
-    Object.values(cluster.sector_links || {}).forEach((link) => {
-      const sectorA = sectors[link.sector_a_id || '']
-      const sectorB = sectors[link.sector_b_id || '']
-      if (!sectorA || !sectorB || !link.from_zone_id || !link.to_zone_id) return
-      const fromRaw = sectorA.zones?.[link.from_zone_id]?.raw_sector_pos
-      const toRaw = sectorB.zones?.[link.to_zone_id]?.raw_sector_pos
-      const fromRatio = (fromRaw?.sx !== undefined && fromRaw?.sy !== undefined)
-        ? { x: fromRaw.sx, y: fromRaw.sy }
-        : null
-      const toRatio = (toRaw?.sx !== undefined && toRaw?.sy !== undefined)
-        ? { x: toRaw.sx, y: toRaw.sy }
-        : null
-      const startRatio = sectorRatioToClusterRatio(sectorA.normalized, fromRatio)
-      const endRatio = sectorRatioToClusterRatio(sectorB.normalized, toRatio)
-      if (!startRatio || !endRatio) return
-
-      let start = clusterRatioToScreen(center, clusterRadius, startRatio)
-      let end = clusterRatioToScreen(center, clusterRadius, endRatio)
-
-      rows.push({ id: link.id, start, end })
-    })
-  })
-
-  return rows
-})
-
-const highwaySegments = computed(() => {
-  const rows: Array<{ id: string; type: 'path' | 'line'; d?: string; start?: Vec2; end?: Vec2 }> = []
-  const { centers, clusterRadius } = layoutState.value
-
-  regionIds.value.forEach((clusterId) => {
-    const cluster = clusters.value[clusterId]
-    if (!cluster) return
-    const center = centers[clusterId]
-    if (!center) return
-    const sectors = cluster.sectors || {}
-    Object.values(sectors).forEach((sector) => {
-      const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
-      const sectorHex = hexVertices(transform.center.x, transform.center.y, transform.sectorRadius)
-
-      Object.entries(sector.highways || {}).forEach(([highwayId, highway]) => {
-        const entry = highway.entry
-        const exit = highway.exit
-        if (!entry || !exit) return
-        if (entry.sx === undefined || entry.sy === undefined || exit.sx === undefined || exit.sy === undefined) return
-
-        const start = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: entry.sx, y: entry.sy })
-        const end = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: exit.sx, y: exit.sy })
-        if (!start || !end) return
-
-        const middlePoints: Vec2[] = []
-        ;(highway.spline || []).forEach((point) => {
-          if (point.sx === undefined || point.sy === undefined) return
-          const screenPoint = sectorLocalRatioToScreen(cluster, center, clusterRadius, sector, { x: point.sx, y: point.sy })
-          if (screenPoint) middlePoints.push(screenPoint)
-        })
-
-        const pathPoints = buildHighwayPathPoints(start, end, middlePoints)
-        const visibleChains = clipPolylineToConvexPolygon(pathPoints, sectorHex)
-        visibleChains.forEach((chain, index) => {
-          if (chain.length >= 3) {
-            rows.push({
-              id: `${sector.id}:${highwayId}:path:${index}`,
-              type: 'path',
-              d: catmullRomToBezierPath(chain)
-            })
-            return
-          }
-          if (chain.length === 2) {
-            rows.push({
-              id: `${sector.id}:${highwayId}:line:${index}`,
-              type: 'line',
-              start: chain[0],
-              end: chain[1]
-            })
-          }
-        })
-      })
-    })
-  })
-  return rows
-})
-
-const clusterPolygons = computed(() => {
-  const rows: Array<{
-    id: string
-    cx: number
-    cy: number
-    color: string
-    clusterRadius: number
-    isDlcActive?: boolean
-    sectors: Array<{
-      id: string
-      clusterId: string
-      name: string
-      displayName: string
-      owner: string
-      sunlight: number
-      resources: SectorResourceEntry[]
-      sx: number
-      sy: number
-      radius: number
-      color: string
-      label: string
-      labelY: number
-      labelFontSize: number
-      hasKhaakHive: boolean
-      khaakHiveSources: string[]
-    }>
-    singleLabel?: string
-    singleRadius?: number
-    singleLabelY?: number
-    singleLabelFontSize?: number
-  }> = []
-  const { centers, clusterRadius } = layoutState.value
-
-  regionIds.value.forEach((clusterId) => {
-    const cluster = clusters.value[clusterId]
-    if (!cluster) return
-    const center = centers[clusterId]
-    if (!center) return
-    const color = resolveOwnerColor(cluster, undefined, clusterId)
-    // 当 enforceDlcActivation=false 时，标记未激活的 DLC cluster
-    const clusterDlcActive = gameData.isDlcActive(cluster.dlc_tag)
-    const sectors: Array<{
-      id: string
-      clusterId: string
-      name: string
-      displayName: string
-      owner: string
-      sunlight: number
-      resources: SectorResourceEntry[]
-      sx: number
-      sy: number
-      radius: number
-      color: string
-      label: string
-      labelY: number
-      labelFontSize: number
-      hasKhaakHive: boolean
-      khaakHiveSources: string[]
-    }> = []
-    // 新方案：2-sector 和 3-sector 采用不同策略
-    // 2-sector: 内层虚拟边框 0.95，sector 紧贴内层边框
-    // 3-sector: 内层虚拟边框 0.98，sector 0.98 相对于内层
-    const sectorCount = Object.keys(cluster.sectors || {}).length
-    let innerPadding = 1
-    let sectorScale = 1
-    if (sectorCount === 2) {
-      innerPadding = INNER_CLUSTER_PADDING_2SEC
-      sectorScale = INNER_CLUSTER_PADDING_2SEC
-    } else if (sectorCount === 3) {
-      innerPadding = INNER_CLUSTER_PADDING_3SEC
-      sectorScale = INNER_CLUSTER_PADDING_3SEC * SECTOR_SCALE_3SEC
-    }
-
-    Object.values(cluster.sectors || {}).forEach((sector) => {
-      const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
-      const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-      // 应用内层 padding 到位置和大小
-      const baseRadius = Number(sector.normalized?.sector_radius_ratio || 0) * clusterRadius * sectorScale
-      const sx = center.x + ratio.x * clusterRadius * innerPadding
-      const sy = center.y + ratio.y * clusterRadius * innerPadding
-      const topEdgeY = sy - baseRadius * HEX_TOP_EDGE_RATIO
-      const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, baseRadius * MULTI_SECTOR_LABEL_PAD_RATIO)
-      const baseLabelY = topEdgeY + pad
-      const displayName = resolveName(sector.nameId, sector.name || sector.id)
-      sectors.push({
-        id: sector.id,
-        clusterId,
-        name: sector.name || sector.id,
-        displayName,
-        owner: sector.owner || cluster.owner || 'ownerless',
-        sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100),
-        resources: Array.isArray((sector as { resources?: SectorResourceEntry[] }).resources)
-          ? (sector as { resources?: SectorResourceEntry[] }).resources || []
-          : [],
-        sx,
-        sy,
-        radius: baseRadius,
-        color: resolveOwnerColor(sector, sector.id, clusterId),
-        label: displayName,
-        labelY: baseLabelY,
-        labelFontSize: Math.max(MIN_SECTOR_LABEL_FONT_SIZE, SECTOR_LABEL_FONT_SIZE * sectorRadiusRatio),
-        hasKhaakHive: (sector as Sector).has_khaak_hive || false,
-        khaakHiveSources: (sector as Sector).khaak_hive_sources || []
-      })
-    })
-
-    if (sectors.length === 1) {
-      const singleRadius = sectors[0]!.radius
-      const topEdgeY = center.y - singleRadius * HEX_TOP_EDGE_RATIO
-      const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, singleRadius * MULTI_SECTOR_LABEL_PAD_RATIO)
-      rows.push({
-        id: clusterId,
-        cx: center.x,
-        cy: center.y,
-        color,
-        clusterRadius,
-        isDlcActive: clusterDlcActive,
-        sectors,
-        singleLabel: sectors[0]!.label,
-        singleRadius,
-        singleLabelY: topEdgeY + pad,
-        singleLabelFontSize: SINGLE_SECTOR_LABEL_FONT_SIZE
-      })
-      return
-    }
-
-    rows.push({ id: clusterId, cx: center.x, cy: center.y, color, clusterRadius, isDlcActive: clusterDlcActive, sectors })
-  })
-  return rows
-})
-
-const gateCircles = computed(() => {
-  const rows: Array<{ id: string; point: Vec2; r: number; color: string; clusterId: string; targetClusterId?: string }> = []
-  const { centers, clusterRadius } = layoutState.value
-  regionIds.value.forEach((clusterId) => {
-    const cluster = clusters.value[clusterId]
-    if (!cluster) return
-    const center = centers[clusterId]
-    if (!center) return
-    const sectors = Object.values(cluster.sectors || {})
-    sectors.forEach((sector) => {
-      const sectorColor = resolveOwnerColor(sector, sector.id, clusterId)
-      Object.entries(sector.cluster_gates || {}).forEach(([gateId, gate]) => {
-        const ratio = gateClusterRatioFromRaw(gate, sector.normalized)
-        if (!ratio) return
-        rows.push({
-          id: `${clusterId}:${sector.id}:${gateId}`,
-          point: clusterRatioToScreen(center, clusterRadius, ratio),
-          r: (sectors.length === 1 ? 1.1 : 0.8) * STARGATE_VISUAL_SCALE,
-          color: sectorColor,
-          clusterId,
-          targetClusterId: gate.target_cluster_id
-        })
-      })
-    })
-  })
-  return rows
-})
-
-const crossClusterGateLines = computed(() => {
-  const rows: Array<{ id: string; left: Vec2; right: Vec2 }> = []
-  const gateIndex: Record<string, { clusterId: string; targetClusterId?: string; point: Vec2 }> = {}
-  gateCircles.value.forEach((gate) => {
-    const key = gate.id
-    gateIndex[key] = {
-      clusterId: gate.clusterId,
-      targetClusterId: gate.targetClusterId,
-      point: gate.point
-    }
-  })
-  const used = new Set<string>()
-  Object.entries(gateIndex).forEach(([gateId, gate]) => {
-    if (used.has(gateId)) return
-    const reverseId = Object.entries(gateIndex).find(([otherId, other]) =>
-      !used.has(otherId) &&
-      other.clusterId === gate.targetClusterId &&
-      other.targetClusterId === gate.clusterId
-    )?.[0]
-    if (!reverseId) return
-    rows.push({
-      id: `${gateId}<->${reverseId}`,
-      left: gate.point,
-      right: gateIndex[reverseId]?.point || gate.point
-    })
-    used.add(gateId)
-    used.add(reverseId)
-  })
-  return rows
-})
-
-const canvasWidth = computed(() => layoutState.value.cfg.width)
-const canvasHeight = computed(() => layoutState.value.cfg.height)
-const sectorLayouts = computed<SearchSectorLayout[]>(() =>
-  clusterPolygons.value.flatMap((cluster) =>
-    cluster.sectors.map((sector) => ({
-      sectorId: sector.id,
-      clusterId: sector.clusterId,
-      name: sector.name,
-      displayName: sector.displayName,
-      centerX: sector.sx,
-      centerY: sector.sy,
-      radius: sector.radius,
-      verticalExtent: sector.radius * HEX_TOP_EDGE_RATIO
-    }))
-  )
-)
-const overlayScreenItems = computed(() => {
-  const { centers, clusterRadius } = layoutState.value
-  return props.placementOverlays
-    .map((overlay) => {
-      const cluster = clusters.value[overlay.location.cluster_id]
-      const sector = cluster?.sectors?.[overlay.location.sector_id]
-      const center = centers[overlay.location.cluster_id]
-      const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
-      const sectorRadiusRatio = Number(sector?.normalized?.sector_radius_ratio || 0)
-      const sectorCenter = sector?.normalized?.center_offset_ratio
-      if (!cluster || !sector || !center || !scalePerRadius || !sectorCenter || !sectorRadiusRatio) return null
-      const localRatio = {
-        x: overlay.location.pos.x * scalePerRadius,
-        y: -overlay.location.pos.z * scalePerRadius
-      }
-      const ratio = sectorRatioToClusterRatio(sector.normalized, localRatio)
-      if (!ratio) return null
-      const point = clusterRatioToScreen(center, clusterRadius, ratio)
-      return {
-        ...overlay,
-        x: point.x,
-        y: point.y
-      }
-    })
-    .filter((item): item is PlacementOverlay & { x: number; y: number } => !!item)
-})
-
-const SAVE_POI_COLORS: Record<SavePoiCategory, string> = {
-  playerStation: '#fbbf24',
-  npcStation: 'rgba(252, 211, 77, 0.6)',
-  xenonStation: '#f87171',
-  khaakStation: '#a855f7',
-  abandonedShip: '#c084fc',
-  datavault: '#22d3ee',
-  erlkingVault: '#34d399'
-}
-
-const SAVE_POI_ICON_MAP: Record<string, string> = {
-  shipyard: shipyardIconUrl,
-  wharf: wharfIconUrl,
-  equipmentdock: equipmentdockIconUrl,
-  factory: factoryIconUrl,
-  tradestation: tradestationIconUrl,
-  defencemodule: defensestationIconUrl,
-  piratebase: piratestationIconUrl,
-  piratestation: piratestationIconUrl,
-  hive: hiveIconUrl,
-  weaponplatform: weaponplatformIconUrl,
-  playerhq: playerhqIconUrl,
-  shiptech: shiptechIconUrl,
-  hightech: hightechIconUrl,
-  refined: refinedIconUrl,
-  pharmaceutical: pharmaceuticalIconUrl,
-  food: foodIconUrl,
-  agricultural: agriculturalIconUrl,
-  water: waterIconUrl,
-  energy: energyIconUrl
-}
-
-const SAVE_POI_HEADQUARTER_ICON_MAP: Record<string, string> = {
-  shipyard: shipyardHeadquarterIconUrl,
-  wharf: wharfHeadquarterIconUrl,
-  equipmentdock: equipmentdockHeadquarterIconUrl,
-  factory: factoryHeadquarterIconUrl,
-  tradestation: tradestationHeadquarterIconUrl,
-  defence: defensestationHeadquarterIconUrl,
-  defencestation: defensestationHeadquarterIconUrl,
-  piratebase: piratestationHeadquarterIconUrl,
-  piratestation: piratestationHeadquarterIconUrl
-}
-
-function getSavePoiIconUrl(poi: SavePoiOverlayItem): string | null {
-  if (poi.category === 'playerStation' && poi.is_headquarter) {
-    return playerhqIconUrl
-  }
-  
-  if (poi.is_headquarter && poi.tag) {
-    return SAVE_POI_HEADQUARTER_ICON_MAP[poi.tag] || SAVE_POI_ICON_MAP[poi.tag] || null
-  }
-  
-  if (poi.tag === 'nest') {
-    return weaponplatformIconUrl
-  }
-  
-  if (poi.tag === 'factory' && poi.factoryGroup) {
-    return SAVE_POI_ICON_MAP[poi.factoryGroup] || factoryIconUrl
-  }
-  
-  if (poi.tag) {
-    return SAVE_POI_ICON_MAP[poi.tag] || null
-  }
-  
-  return null
-}
-
-function getSavePoiIconSize(poi: SavePoiOverlayItem): number {
-  if (poi.tag && LARGE_ICON_TYPES.includes(poi.tag)) {
-    return OVERLAY_ICON_SIZE
-  }
-  return SMALL_ICON_SIZE
-}
-
-function hexToRgb(hex: string): { r: number; g: number; b: number } | null {
-  const match = hex.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i)
-  if (!match || !match[1] || !match[2] || !match[3]) return null
-  return {
-    r: parseInt(match[1], 16) / 255,
-    g: parseInt(match[2], 16) / 255,
-    b: parseInt(match[3], 16) / 255
-  }
-}
-
-function colorToFeColorMatrix(hex: string): string | null {
-  const rgb = hexToRgb(hex)
-  if (!rgb) return null
-  return `${rgb.r.toFixed(4)} 0 0 0 0  ${rgb.g.toFixed(4)} 0 0 0 0  ${rgb.b.toFixed(4)} 0 0 0 0  0 0 0 1 0`
-}
-
-const factionColorFilters = computed<Array<{ id: string; matrix: string }>>(() => {
-  if (!props.factionColorMap) return []
-  const filters: Array<{ id: string; matrix: string }> = []
-  const addedColors = new Set<string>()
-  
-  props.savePoiOverlays.forEach(poi => {
-    if (!poi.owner) return
-    const color = props.factionColorMap?.[poi.owner]
-    if (!color || addedColors.has(color)) return
-    const matrix = colorToFeColorMatrix(color)
-    if (!matrix) return
-    addedColors.add(color)
-    const safeId = svgIdSafe(color.replace('#', ''))
-    filters.push({ id: `faction-color-${safeId}`, matrix })
-  })
-  
-  return filters
-})
-
-const savePoiScreenItems = computed(() => {
-  const { centers, clusterRadius } = layoutState.value
-  return props.savePoiOverlays
-    .map((poi) => {
-      const resolved = resolveMapSectorByMacro(clusters.value, poi.sectorMacro)
-      if (!resolved) return null
-      const center = centers[resolved.clusterId]
-      const sector = resolved.sector as Sector
-      const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
-      const sectorRadiusRatio = Number(sector?.normalized?.sector_radius_ratio || 0)
-      const sectorCenter = sector?.normalized?.center_offset_ratio
-      if (!center || !scalePerRadius || !sectorCenter || !sectorRadiusRatio) return null
-      const localRatio = {
-        x: poi.pos.x * scalePerRadius,
-        y: -poi.pos.z * scalePerRadius
-      }
-      const ratio = sectorRatioToClusterRatio(sector.normalized, localRatio)
-      if (!ratio) return null
-      const point = clusterRatioToScreen(center, clusterRadius, ratio)
-      const factionColor = poi.owner && props.factionColorMap?.[poi.owner] 
-        ? props.factionColorMap[poi.owner] 
-        : null
-      const factionFilterId = factionColor 
-        ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` 
-        : null
-      return {
-        ...poi,
-        x: point.x,
-        y: point.y,
-        color: SAVE_POI_COLORS[poi.category],
-        factionFilterId
-      }
-    })
-    .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null } => !!item)
-})
-const previewScreenItem = computed(() => {
-  const preview = props.placementPreview
-  if (!preview) return null
-  const cluster = clusters.value[preview.location.cluster_id]
-  const sector = cluster?.sectors?.[preview.location.sector_id]
-  const center = layoutState.value.centers[preview.location.cluster_id]
-  const scalePerRadius = Number(sector?.normalized?.scale_per_radius || 0)
-  if (!cluster || !sector || !center || !scalePerRadius) return null
-  const ratio = sectorRatioToClusterRatio(sector.normalized, {
-    x: preview.location.pos.x * scalePerRadius,
-    y: -preview.location.pos.z * scalePerRadius
-  })
-  if (!ratio) return null
-  const point = clusterRatioToScreen(center, layoutState.value.clusterRadius, ratio)
-  return {
-    ...preview,
-    x: point.x,
-    y: point.y
-  }
+const {
+  overlayScreenItems,
+  factionColorFilters,
+  savePoiScreenItems,
+  previewScreenItem
+} = useMapSvgOverlays({
+  clusters,
+  layoutState,
+  placementOverlays: placementOverlaysRef,
+  placementPreview: placementPreviewRef,
+  savePoiOverlays: savePoiOverlaysRef,
+  factionColorMap: factionColorMapRef
 })
 
 watchEffect(() => {
@@ -1283,341 +307,51 @@ watchEffect(() => {
       </clipPath>
     </defs>
 
-    <g class="sector-links">
-      <template v-for="link in sectorLinkLines" :key="link.id">
-        <line
-          :x1="link.start.x.toFixed(1)"
-          :y1="link.start.y.toFixed(1)"
-          :x2="link.end.x.toFixed(1)"
-          :y2="link.end.y.toFixed(1)"
-          stroke="#1d4ed8"
-          stroke-width="0.4"
-          stroke-opacity="0.95"
-        />
-        <circle :cx="link.start.x.toFixed(1)" :cy="link.start.y.toFixed(1)" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-        <circle :cx="link.end.x.toFixed(1)" :cy="link.end.y.toFixed(1)" r="0.7" fill="#1d4ed8" stroke="#dbeafe" stroke-width="0.4" />
-      </template>
-    </g>
+    <MapLinkLayer
+      :sector-link-lines="sectorLinkLines"
+      :highway-segments="highwaySegments"
+      :gate-circles="gateCircles"
+      :cross-cluster-gate-lines="crossClusterGateLines"
+      :stargate-visual-scale="STARGATE_VISUAL_SCALE"
+    />
 
-    <g class="highways">
-      <template v-for="segment in highwaySegments" :key="segment.id">
-        <path
-          v-if="segment.type === 'path'"
-          :d="segment.d"
-          fill="none"
-          stroke="#0ea5e9"
-          stroke-width="0.45"
-          stroke-opacity="0.92"
-        />
-        <line
-          v-else
-          :x1="segment.start?.x.toFixed(1)"
-          :y1="segment.start?.y.toFixed(1)"
-          :x2="segment.end?.x.toFixed(1)"
-          :y2="segment.end?.y.toFixed(1)"
-          stroke="#0ea5e9"
-          stroke-width="0.45"
-          stroke-opacity="0.92"
-        />
-      </template>
-    </g>
+    <MapSectorLayer
+      :cluster-polygons="clusterPolygons"
+      :game-data-enforce-dlc-activation="gameData.enforceDlcActivation"
+      :sector-label-font-size="SECTOR_LABEL_FONT_SIZE"
+      :map-font-family="MAP_FONT_FAMILY"
+      :sector-clip-id="sectorClipId"
+      :hex-points="hexPoints"
+      :should-render-resource-overlay="shouldRenderResourceOverlay"
+      :build-pie-slice-geometries="buildPieSliceGeometries"
+      :build-resource-group-badge-geometries="buildResourceGroupBadgeGeometries"
+      :sector-fill-color="sectorFillColor"
+      :sector-fill-opacity="sectorFillOpacity"
+      :sector-stroke-color="sectorStrokeColor"
+      :sector-stroke-width="sectorStrokeWidth"
+      :sector-stroke-opacity="sectorStrokeOpacity"
+      :sector-filter="sectorFilter"
+      :sector-label-weight="sectorLabelWeight"
+      :sector-label-fill="sectorLabelFill"
+      @sector-hover="emitSectorHover"
+      @sector-leave="emitSectorLeave"
+    />
 
-    <g class="clusters">
-      <template v-for="cluster in clusterPolygons" :key="cluster.id">
-        <g
-          v-if="cluster.sectors.length === 1"
-          class="sector-hover-target"
-          :data-sector-hover-id="cluster.sectors[0]?.id || ''"
-          :data-map-sector-id="cluster.sectors[0]?.id || ''"
-          :data-cluster-id="cluster.id"
-          @mouseenter="emitSectorHover($event, {
-            sectorId: cluster.sectors[0]?.id || '',
-            clusterId: cluster.sectors[0]?.clusterId || cluster.id,
-            name: cluster.sectors[0]?.name || '',
-            displayName: cluster.sectors[0]?.displayName || '',
-            owner: cluster.sectors[0]?.owner || 'ownerless',
-            sunlight: cluster.sectors[0]?.sunlight || 0,
-            resources: cluster.sectors[0]?.resources || [],
-            hasKhaakHive: cluster.sectors[0]?.hasKhaakHive || false,
-            khaakHiveSources: cluster.sectors[0]?.khaakHiveSources || []
-          })"
-          @mouseleave="emitSectorLeave(cluster.sectors[0]?.id || '')"
-        >
-          <g
-            v-if="cluster.sectors[0] && shouldRenderResourceOverlay(cluster.sectors[0].id)"
-            :clip-path="`url(#${sectorClipId(cluster.id, cluster.sectors[0].id)})`"
-          >
-            <path
-              v-for="slice in buildPieSliceGeometries(cluster.sectors[0].id, cluster.cx, cluster.cy, cluster.singleRadius || 0)"
-              :key="`${cluster.sectors[0]?.id}-${slice.ware}`"
-              data-testid="resource-pie-slice"
-              :d="slice.path"
-              :fill="slice.color"
-              fill-opacity="0.95"
-            />
-          </g>
-          <polygon
-            :points="hexPoints(cluster.cx, cluster.cy, cluster.singleRadius || 0)"
-            :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
-            :fill-opacity="sectorFillOpacity(cluster.sectors[0]?.id || '')"
-            :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
-            :stroke-width="sectorStrokeWidth(cluster.sectors[0]?.id || '', 2.8)"
-            :stroke-opacity="sectorStrokeOpacity(cluster.sectors[0]?.id || '', 0.95)"
-            :filter="sectorFilter(cluster.sectors[0]?.id || '')"
-            class="sector-polygon"
-            :data-sector-id="cluster.sectors[0]?.id || ''"
-            :data-cluster-id="cluster.id"
-            :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
-          />
-          <text
-            :x="cluster.cx.toFixed(1)"
-            :y="(cluster.singleLabelY || 0).toFixed(1)"
-            text-anchor="middle"
-            dominant-baseline="text-before-edge"
-            alignment-baseline="text-before-edge"
-            :font-size="(cluster.singleLabelFontSize || SECTOR_LABEL_FONT_SIZE).toFixed(1)"
-            :font-family="MAP_FONT_FAMILY"
-            :font-weight="sectorLabelWeight(cluster.sectors[0]?.id || '')"
-            :fill="sectorLabelFill(cluster.sectors[0]?.id || '')"
-            :data-cluster-id="cluster.id"
-          >
-            {{ cluster.singleLabel }}
-          </text>
-          <g
-            v-for="badge in buildResourceGroupBadgeGeometries(cluster.sectors[0]?.id || '', cluster.cx, cluster.cy, cluster.singleRadius || 0)"
-            :key="badge.key"
-            data-testid="resource-group-badge"
-          >
-            <rect
-              :x="badge.x.toFixed(1)"
-              :y="badge.y.toFixed(1)"
-              :width="badge.width.toFixed(1)"
-              :height="badge.height.toFixed(1)"
-              rx="4"
-              ry="4"
-              fill="rgba(5, 5, 5, 0.78)"
-              stroke="rgba(251, 191, 36, 0.38)"
-            />
-            <text
-              :x="(badge.x + badge.width / 2).toFixed(1)"
-              :y="(badge.y + badge.height / 2).toFixed(1)"
-              :data-testid="`resource-group-badge-${cluster.sectors[0]?.id || ''}-${badge.label}`"
-              text-anchor="middle"
-              dominant-baseline="middle"
-              alignment-baseline="middle"
-              :font-size="Math.max(8, (badge.height * 0.7)).toFixed(1)"
-              :font-family="MAP_FONT_FAMILY"
-              font-weight="700"
-              fill="#fef3c7"
-            >
-              {{ badge.label }}
-            </text>
-          </g>
-        </g>
-        <template v-else>
-          <polygon
-            :points="hexPoints(cluster.cx, cluster.cy, cluster.clusterRadius)"
-            fill="none"
-            :stroke="cluster.color"
-            stroke-width="2.8"
-            stroke-opacity="0.95"
-            class="cluster-polygon"
-            :data-cluster-id="cluster.id"
-            :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
-          />
-          <template v-for="sector in cluster.sectors" :key="sector.id">
-            <g
-              class="sector-hover-target"
-              :data-sector-hover-id="sector.id"
-              :data-map-sector-id="sector.id"
-              :data-cluster-id="cluster.id"
-              @mouseenter="emitSectorHover($event, {
-                sectorId: sector.id,
-                clusterId: sector.clusterId,
-                name: sector.name,
-                displayName: sector.displayName,
-                owner: sector.owner,
-                sunlight: sector.sunlight,
-                resources: sector.resources,
-                hasKhaakHive: sector.hasKhaakHive,
-                khaakHiveSources: sector.khaakHiveSources
-              })"
-              @mouseleave="emitSectorLeave(sector.id)"
-            >
-              <g
-                v-if="shouldRenderResourceOverlay(sector.id)"
-                :clip-path="`url(#${sectorClipId(cluster.id, sector.id)})`"
-              >
-                <path
-                  v-for="slice in buildPieSliceGeometries(sector.id, sector.sx, sector.sy, sector.radius)"
-                  :key="`${sector.id}-${slice.ware}`"
-                  data-testid="resource-pie-slice"
-                  :d="slice.path"
-                  :fill="slice.color"
-                  fill-opacity="0.95"
-                />
-              </g>
-              <polygon
-                :points="hexPoints(sector.sx, sector.sy, sector.radius)"
-                :fill="sectorFillColor(sector.id, sector.color)"
-                :fill-opacity="sectorFillOpacity(sector.id)"
-                :stroke="sectorStrokeColor(sector.id, sector.color)"
-                :stroke-width="sectorStrokeWidth(sector.id, 2.2)"
-                :stroke-opacity="sectorStrokeOpacity(sector.id, 0.9)"
-                :filter="sectorFilter(sector.id)"
-                class="sector-polygon"
-                :data-sector-id="sector.id"
-                :data-cluster-id="cluster.id"
-                :stroke-dasharray="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
-                :stroke-dashoffset="!gameData.enforceDlcActivation && cluster.isDlcActive === false ? ((sector.sx + sector.sy) % 10).toFixed(1) : undefined"
-              />
-              <text
-                :x="sector.sx.toFixed(1)"
-                :y="sector.labelY.toFixed(1)"
-                text-anchor="middle"
-                dominant-baseline="text-before-edge"
-                alignment-baseline="text-before-edge"
-                :font-size="sector.labelFontSize.toFixed(1)"
-                :font-family="MAP_FONT_FAMILY"
-                :font-weight="sectorLabelWeight(sector.id)"
-                :fill="sectorLabelFill(sector.id)"
-                :data-sector-id="sector.id"
-                :data-cluster-id="cluster.id"
-              >
-                {{ sector.label }}
-              </text>
-              <g
-                v-for="badge in buildResourceGroupBadgeGeometries(sector.id, sector.sx, sector.sy, sector.radius)"
-                :key="badge.key"
-                data-testid="resource-group-badge"
-              >
-                <rect
-                  :x="badge.x.toFixed(1)"
-                  :y="badge.y.toFixed(1)"
-                  :width="badge.width.toFixed(1)"
-                  :height="badge.height.toFixed(1)"
-                  rx="4"
-                  ry="4"
-                  fill="rgba(5, 5, 5, 0.78)"
-                  stroke="rgba(251, 191, 36, 0.38)"
-                />
-                <text
-                  :x="(badge.x + badge.width / 2).toFixed(1)"
-                  :y="(badge.y + badge.height / 2).toFixed(1)"
-                  :data-testid="`resource-group-badge-${sector.id}-${badge.label}`"
-                  text-anchor="middle"
-                  dominant-baseline="middle"
-                  alignment-baseline="middle"
-                  :font-size="Math.max(8, (badge.height * 0.7)).toFixed(1)"
-                  :font-family="MAP_FONT_FAMILY"
-                  font-weight="700"
-                  fill="#fef3c7"
-                >
-                  {{ badge.label }}
-                </text>
-              </g>
-            </g>
-          </template>
-        </template>
-      </template>
-    </g>
-
-    <g class="station-overlays">
-      <g
-        v-for="overlay in overlayScreenItems"
-        :key="overlay.key"
-        class="placement-overlay"
-        :class="{
-          dragging: draggingOverlayKey === overlay.key,
-          focused: focusedOverlayKey === overlay.key
-        }"
-        :transform="`translate(${overlay.x.toFixed(1)} ${overlay.y.toFixed(1)})`"
-        :data-placement-key="overlay.key"
-        @mousedown.stop="emit('overlay-pointerdown', overlay)"
-      >
-        <image
-          :href="placementIconHref(overlay.icon)"
-          :x="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
-          :y="(-OVERLAY_ICON_SIZE / 2).toFixed(1)"
-          :width="OVERLAY_ICON_SIZE"
-          :height="OVERLAY_ICON_SIZE"
-          preserveAspectRatio="xMidYMid meet"
-        />
-        <text x="0" y="-12" text-anchor="middle">{{ overlay.name }}</text>
-      </g>
-      <g
-        v-if="previewScreenItem"
-        class="placement-preview"
-        :transform="`translate(${previewScreenItem.x.toFixed(1)} ${previewScreenItem.y.toFixed(1)})`"
-      >
-        <image
-          :href="placementIconHref(previewScreenItem.icon)"
-          :x="(-PREVIEW_ICON_SIZE / 2).toFixed(1)"
-          :y="(-PREVIEW_ICON_SIZE / 2).toFixed(1)"
-          :width="PREVIEW_ICON_SIZE"
-          :height="PREVIEW_ICON_SIZE"
-          preserveAspectRatio="xMidYMid meet"
-        />
-        <text x="0" y="-13" text-anchor="middle">{{ previewScreenItem.name }}</text>
-      </g>
-    </g>
-
-    <g class="save-poi-overlays">
-      <g
-        v-for="poi in savePoiScreenItems"
-        :key="poi.key"
-        class="save-poi-marker"
-        :class="{ focused: focusedSavePoiKey === poi.key }"
-        :transform="`translate(${poi.x.toFixed(1)} ${poi.y.toFixed(1)})`"
-        :data-save-poi-key="poi.key"
-        @mousedown.stop="emit('save-poi-pointerdown', poi)"
-      >
-        <image
-          v-if="getSavePoiIconUrl(poi)"
-          :href="getSavePoiIconUrl(poi)!"
-          :x="(-getSavePoiIconSize(poi) / 2).toFixed(1)"
-          :y="(-getSavePoiIconSize(poi) / 2).toFixed(1)"
-          :width="getSavePoiIconSize(poi)"
-          :height="getSavePoiIconSize(poi)"
-          preserveAspectRatio="xMidYMid meet"
-          :filter="poi.factionFilterId ? `url(#${poi.factionFilterId}${focusedSavePoiKey === poi.key ? '-focused' : ''})` : undefined"
-        />
-        <circle v-else cx="0" cy="0" r="5" :fill="poi.color" stroke="#fff" stroke-width="1" />
-        <text x="0" y="-12" text-anchor="middle" class="save-poi-label">{{ poi.code }}</text>
-      </g>
-    </g>
-
-    <g class="gates">
-      <circle
-        v-for="gate in gateCircles"
-        :key="gate.id"
-        class="gate-circle"
-        :data-gate-id="gate.id"
-        :data-cluster-id="gate.clusterId"
-        :cx="gate.point.x.toFixed(1)"
-        :cy="gate.point.y.toFixed(1)"
-        :r="gate.r.toFixed(1)"
-        :fill="gate.color"
-        stroke="#ffffff"
-        :stroke-width="(0.3 * STARGATE_VISUAL_SCALE).toFixed(2)"
-      />
-    </g>
-
-    <g class="cross-links">
-      <line
-        v-for="line in crossClusterGateLines"
-        :key="line.id"
-        class="gate-path"
-        :data-gate-line-id="line.id"
-        :x1="line.left.x.toFixed(1)"
-        :y1="line.left.y.toFixed(1)"
-        :x2="line.right.x.toFixed(1)"
-        :y2="line.right.y.toFixed(1)"
-        stroke="#e5e7eb"
-        :stroke-width="(0.6 * STARGATE_VISUAL_SCALE).toFixed(2)"
-        stroke-opacity="0.85"
-      />
-    </g>
+    <MapOverlayLayer
+      :overlay-screen-items="overlayScreenItems"
+      :preview-screen-item="previewScreenItem"
+      :save-poi-screen-items="savePoiScreenItems"
+      :dragging-overlay-key="draggingOverlayKey"
+      :focused-overlay-key="focusedOverlayKey"
+      :focused-save-poi-key="focusedSavePoiKey"
+      :overlay-icon-size="OVERLAY_ICON_SIZE"
+      :preview-icon-size="PREVIEW_ICON_SIZE"
+      :placement-icon-href="placementIconHref"
+      :get-save-poi-icon-url="getSavePoiIconUrl"
+      :get-save-poi-icon-size="getSavePoiIconSize"
+      @overlay-pointerdown="emit('overlay-pointerdown', $event)"
+      @save-poi-pointerdown="emit('save-poi-pointerdown', $event)"
+    />
   </svg>
 </template>
 
@@ -1626,60 +360,5 @@ watchEffect(() => {
   display: block;
   user-select: none;
   pointer-events: none;
-}
-
-.sector-hover-target {
-  pointer-events: auto;
-}
-
-.placement-overlay {
-  pointer-events: auto;
-  cursor: grab;
-}
-
-.placement-overlay image,
-.placement-preview image {
-  overflow: visible;
-}
-
-.placement-overlay.dragging {
-  opacity: 0.18;
-  pointer-events: none;
-}
-
-.placement-overlay.focused image {
-  filter:
-    drop-shadow(0 0 4px rgba(253, 230, 138, 0.95))
-    drop-shadow(0 0 10px rgba(245, 158, 11, 0.7));
-}
-
-.placement-overlay.focused text {
-  fill: #fff7d6;
-}
-
-.placement-overlay text,
-.placement-preview text {
-  fill: #fef3c7;
-  font-size: 10px;
-  font-family: Consolas, 'Courier New', monospace;
-}
-
-.placement-preview {
-  pointer-events: none;
-}
-
-.save-poi-marker {
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-.save-poi-marker.focused circle {
-  filter: drop-shadow(0 0 4px rgba(253, 230, 138, 0.95));
-}
-
-.save-poi-label {
-  fill: #fef3c7;
-  font-size: 9px;
-  font-family: Consolas, 'Courier New', monospace;
 }
 </style>
