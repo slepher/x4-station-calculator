@@ -426,6 +426,37 @@ const clipSegmentToConvexPolygon = (p0: Vec2, p1: Vec2, polygon: Vec2[]): [Vec2,
   ]
 }
 
+const samePoint = (left: Vec2, right: Vec2, eps = 0.25) =>
+  Math.hypot(left.x - right.x, left.y - right.y) <= eps
+
+const clipPolylineToConvexPolygon = (points: Vec2[], polygon: Vec2[]) => {
+  const chains: Vec2[][] = []
+
+  for (let index = 0; index < points.length - 1; index += 1) {
+    const start = points[index]
+    const end = points[index + 1]
+    if (!start || !end) continue
+    const clipped = clipSegmentToConvexPolygon(start, end, polygon)
+    if (!clipped) continue
+
+    const lastChain = chains[chains.length - 1]
+    if (lastChain && samePoint(lastChain[lastChain.length - 1]!, clipped[0])) {
+      if (!samePoint(lastChain[lastChain.length - 1]!, clipped[1])) {
+        lastChain.push(clipped[1])
+      }
+      continue
+    }
+
+    chains.push(
+      samePoint(clipped[0], clipped[1])
+        ? [clipped[0]]
+        : [clipped[0], clipped[1]]
+    )
+  }
+
+  return chains
+}
+
 const sectorRatioToClusterRatio = (sectorNorm: Sector['normalized'], localRatio?: Ratio | null): Ratio | null => {
   if (!localRatio) return null
   const center = sectorNorm?.center_offset_ratio
@@ -718,7 +749,7 @@ const sectorLinkLines = computed(() => {
 })
 
 const highwaySegments = computed(() => {
-  const rows: Array<{ id: string; type: 'path' | 'line'; d?: string; start?: Vec2; end?: Vec2; clipId?: string }> = []
+  const rows: Array<{ id: string; type: 'path' | 'line'; d?: string; start?: Vec2; end?: Vec2 }> = []
   const { centers, clusterRadius } = layoutState.value
 
   regionIds.value.forEach((clusterId) => {
@@ -749,23 +780,24 @@ const highwaySegments = computed(() => {
         })
 
         const pathPoints = buildHighwayPathPoints(start, end, middlePoints)
-        const clipId = sectorClipId(clusterId, sector.id)
-        if (pathPoints.length >= 3) {
-          rows.push({
-            id: `${sector.id}:${highwayId}:path`,
-            type: 'path',
-            d: catmullRomToBezierPath(pathPoints),
-            clipId
-          })
-          return
-        }
-        const clipped = clipSegmentToConvexPolygon(start, end, sectorHex)
-        if (!clipped) return
-        rows.push({
-          id: `${sector.id}:${highwayId}:line`,
-          type: 'line',
-          start: clipped[0],
-          end: clipped[1]
+        const visibleChains = clipPolylineToConvexPolygon(pathPoints, sectorHex)
+        visibleChains.forEach((chain, index) => {
+          if (chain.length >= 3) {
+            rows.push({
+              id: `${sector.id}:${highwayId}:path:${index}`,
+              type: 'path',
+              d: catmullRomToBezierPath(chain)
+            })
+            return
+          }
+          if (chain.length === 2) {
+            rows.push({
+              id: `${sector.id}:${highwayId}:line:${index}`,
+              type: 'line',
+              start: chain[0],
+              end: chain[1]
+            })
+          }
         })
       })
     })
@@ -1272,7 +1304,6 @@ watchEffect(() => {
         <path
           v-if="segment.type === 'path'"
           :d="segment.d"
-          :clip-path="`url(#${segment.clipId})`"
           fill="none"
           stroke="#0ea5e9"
           stroke-width="0.45"
