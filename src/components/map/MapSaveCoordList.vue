@@ -11,7 +11,6 @@ const props = defineProps<{
   archive: SaveArchive | null
   category: SavePoiCategory
   excludeConditionalSmallStations: boolean
-  isClusterOverview: boolean
 }>()
 
 const emit = defineEmits<{
@@ -36,8 +35,7 @@ interface SectorPoiGroup {
 
 const poiGroups = computed<SectorPoiGroup[]>(() => {
   const categoryData = saveStore.getArchivePoiCategories(props.archive, {
-    excludeConditionalSmallStations: props.excludeConditionalSmallStations,
-    isClusterOverview: props.isClusterOverview
+    excludeConditionalSmallStations: props.excludeConditionalSmallStations
   })[props.category]
 
   return categoryData.groups

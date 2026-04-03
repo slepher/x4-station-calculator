@@ -8,7 +8,6 @@ const props = defineProps<{
   archive: SaveArchive | null
   visibility: SavePoiVisibility
   excludeConditionalSmallStations: boolean
-  isClusterOverview: boolean
 }>()
 
 const emit = defineEmits<{
@@ -27,8 +26,7 @@ interface CategoryInfo {
 
 const categories = computed<CategoryInfo[]>(() => {
   const data = saveStore.getArchivePoiCategories(props.archive, {
-    excludeConditionalSmallStations: props.excludeConditionalSmallStations,
-    isClusterOverview: props.isClusterOverview
+    excludeConditionalSmallStations: props.excludeConditionalSmallStations
   })
 
   return [

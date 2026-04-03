@@ -12,7 +12,6 @@ const props = defineProps<{
   archive: SaveArchive | null
   visibility: SavePoiVisibility
   excludeConditionalSmallStations: boolean
-  isClusterOverview: boolean
 }>()
 
 const emit = defineEmits<{
@@ -156,7 +155,6 @@ watch(() => props.archive, (archive) => {
         :archive="archive"
         :visibility="visibility"
         :exclude-conditional-small-stations="excludeConditionalSmallStations"
-        :is-cluster-overview="isClusterOverview"
         @visibility-change="onVisibilityChange"
         @select-category="onCategorySelect"
       />
@@ -166,7 +164,6 @@ watch(() => props.archive, (archive) => {
         :archive="archive"
         :category="selectedCategory!"
         :exclude-conditional-small-stations="excludeConditionalSmallStations"
-        :is-cluster-overview="isClusterOverview"
         @focus-poi="onPoiFocus"
       />
     </div>

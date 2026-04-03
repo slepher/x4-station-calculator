@@ -1304,7 +1304,6 @@ onBeforeUnmount(() => {
         :archive="selectedSaveArchive"
         :visibility="savePoiVisibility"
         :exclude-conditional-small-stations="excludeConditionalSmallStations"
-        :is-cluster-overview="isClusterOverview"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
         @visibility-change="onSaveVisibilityChange"
