@@ -73,7 +73,6 @@ function onBreadcrumbNavigate(key: string) {
     layer.value = 'list'
     selectedCategory.value = null
     emit('active-category-change', null)
-    emit('select-archive', null)
   } else if (key === 'archive') {
     layer.value = 'category'
     selectedCategory.value = null
