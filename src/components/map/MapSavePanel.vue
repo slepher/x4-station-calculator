@@ -132,8 +132,6 @@ watch(() => props.archive, (archive) => {
     layer.value = 'list'
     selectedCategory.value = null
     emit('active-category-change', null)
-  } else if (layer.value === 'list') {
-    layer.value = 'category'
   }
 })
 </script>
