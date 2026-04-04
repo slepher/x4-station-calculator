@@ -22,6 +22,7 @@ describe('MapSavePoiScreenLayer', () => {
           factionFilterId: null,
           iconSize: 9
         }],
+        factionFilters: [],
         focusedSavePoiKey: null,
         screenScale: 2,
         panX: 10,
@@ -54,6 +55,7 @@ describe('MapSavePoiScreenLayer', () => {
           factionFilterId: null,
           iconSize: 9
         }],
+        factionFilters: [],
         focusedSavePoiKey: 'npc-1',
         screenScale: 1,
         panX: 0,
@@ -84,6 +86,7 @@ describe('MapSavePoiScreenLayer', () => {
     const wrapper = mount(MapSavePoiScreenLayer, {
       props: {
         items: [item],
+        factionFilters: [],
         focusedSavePoiKey: null,
         screenScale: 1,
         panX: 0,
@@ -94,5 +97,37 @@ describe('MapSavePoiScreenLayer', () => {
 
     await wrapper.get('.save-poi-marker').trigger('mousedown')
     expect(wrapper.emitted('save-poi-pointerdown')?.[0]?.[0].key).toBe('npc-2')
+  })
+
+  it('applies faction color filters to icon images', () => {
+    const wrapper = mount(MapSavePoiScreenLayer, {
+      props: {
+        items: [{
+          key: 'npc-3',
+          code: 'NPC-3',
+          category: 'npcStation',
+          sectorMacro: 'sector_alpha_macro',
+          sectorName: 'Alpha',
+          position: { x: 0, z: 0 },
+          x: 50,
+          y: 60,
+          color: '#ff9900',
+          factionFilterId: 'faction-color-argon',
+          iconSize: 9
+        }],
+        factionFilters: [{
+          id: 'faction-color-argon',
+          matrix: '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 1 0'
+        }],
+        focusedSavePoiKey: null,
+        screenScale: 1,
+        panX: 0,
+        panY: 0,
+        getSavePoiIconUrl: () => '/poi.svg'
+      }
+    })
+
+    expect(wrapper.find('#faction-color-argon').exists()).toBe(true)
+    expect(wrapper.get('.save-poi-icon-image').attributes('style')).toContain('filter: url(#faction-color-argon);')
   })
 })

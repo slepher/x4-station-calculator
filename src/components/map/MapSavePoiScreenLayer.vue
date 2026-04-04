@@ -13,6 +13,7 @@ type SavePoiScreenItem = SavePoiOverlayItem & {
 
 const props = defineProps<{
   items: SavePoiScreenItem[]
+  factionFilters: Array<{ id: string; matrix: string }>
   focusedSavePoiKey: string | null
   screenScale: number
   panX: number
@@ -38,10 +39,35 @@ const screenItems = computed(() => {
 
 const normalItems = computed(() => screenItems.value.filter((poi) => poi.key !== props.focusedSavePoiKey))
 const focusedItem = computed(() => screenItems.value.find((poi) => poi.key === props.focusedSavePoiKey))
+
+const iconFilter = (poi: SavePoiScreenItem, focused = false) => {
+  const filters: string[] = []
+  if (poi.factionFilterId) filters.push(`url(#${poi.factionFilterId})`)
+  if (focused) {
+    filters.push('drop-shadow(0 0 4px rgba(253, 230, 138, 0.95))')
+    filters.push('drop-shadow(0 0 10px rgba(245, 158, 11, 0.7))')
+  }
+  return filters.length ? filters.join(' ') : undefined
+}
 </script>
 
 <template>
   <div class="save-poi-screen-layer">
+    <svg class="save-poi-filter-defs" aria-hidden="true" focusable="false">
+      <defs>
+        <filter
+          v-for="filterDef in factionFilters"
+          :id="filterDef.id"
+          :key="filterDef.id"
+          x="-50%"
+          y="-50%"
+          width="200%"
+          height="200%"
+        >
+          <feColorMatrix type="matrix" :values="filterDef.matrix" />
+        </filter>
+      </defs>
+    </svg>
     <button
       v-for="poi in normalItems"
       :key="poi.key"
@@ -58,6 +84,7 @@ const focusedItem = computed(() => screenItems.value.find((poi) => poi.key === p
         :alt="poi.code || poi.sectorName || poi.key"
         :width="poi.screenSize"
         :height="poi.screenSize"
+        :style="{ filter: iconFilter(poi) }"
         draggable="false"
       >
       <span
@@ -85,6 +112,7 @@ const focusedItem = computed(() => screenItems.value.find((poi) => poi.key === p
         :alt="focusedItem.code || focusedItem.sectorName || focusedItem.key"
         :width="focusedItem.screenSize"
         :height="focusedItem.screenSize"
+        :style="{ filter: iconFilter(focusedItem, true) }"
         draggable="false"
       >
       <span
@@ -106,6 +134,13 @@ const focusedItem = computed(() => screenItems.value.find((poi) => poi.key === p
   inset: 0;
   z-index: 1;
   pointer-events: none;
+  overflow: hidden;
+}
+
+.save-poi-filter-defs {
+  position: absolute;
+  width: 0;
+  height: 0;
   overflow: hidden;
 }
 
@@ -133,9 +168,4 @@ const focusedItem = computed(() => screenItems.value.find((poi) => poi.key === p
   border-radius: 9999px;
 }
 
-.save-poi-marker.focused {
-  filter:
-    drop-shadow(0 0 4px rgba(253, 230, 138, 0.95))
-    drop-shadow(0 0 10px rgba(245, 158, 11, 0.7));
-}
 </style>

@@ -137,6 +137,7 @@ const isSavePanelOpen = ref(false)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
+const savePoiFactionFilters = ref<Array<{ id: string; matrix: string }>>([])
 const savePoiScreenItems = ref<Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }>>([])
 const settledSavePoiViewportContentBounds = ref<{
   left: number
@@ -1250,6 +1251,10 @@ const onSavePoiScreenItemsChange = (
   savePoiScreenItems.value = items
 }
 
+const onSavePoiFactionFiltersChange = (filters: Array<{ id: string; matrix: string }>) => {
+  savePoiFactionFilters.value = filters
+}
+
 const closeSavePoiTooltip = () => {
   savePoiTooltipItem.value = null
   focusedSavePoiKey.value = null
@@ -1364,6 +1369,7 @@ onBeforeUnmount(() => {
         >
           <MapSavePoiScreenLayer
             :items="savePoiScreenItems"
+            :faction-filters="savePoiFactionFilters"
             :focused-save-poi-key="focusedSavePoiKey"
             :screen-scale="scale"
             :pan-x="panX"
@@ -1403,6 +1409,7 @@ onBeforeUnmount(() => {
               :sector-owner-override="sectorOwnerOverride"
               :cluster-owner-override="clusterOwnerOverride"
               :faction-color-map="factionColorMap"
+              @save-poi-faction-filters="onSavePoiFactionFiltersChange"
               @save-poi-screen-items="onSavePoiScreenItemsChange"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
