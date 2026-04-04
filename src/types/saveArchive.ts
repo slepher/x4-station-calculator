@@ -40,7 +40,7 @@ export interface SaveMeta {
   version: string
   filename: string
   parser_version: 'v1' | 'v2'
-  post_processor_version?: 'v1' | 'v2' | 'v3' | 'v4' | 'v5' | 'v6' | 'v7'
+  post_processor_version?: string
   source: SaveSource
 }
 

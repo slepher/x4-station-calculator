@@ -59,7 +59,7 @@ interface SectorStaticHighwayLookup {
 }
 
 export const CURRENT_PARSER_VERSION = 'v2' as const
-export const CURRENT_POST_PROCESSOR_VERSION = 'v7' as const
+export const CURRENT_POST_PROCESSOR_VERSION = 'v8' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
 const DEFAULT_EXTENT_RATIO = 0.8
@@ -528,7 +528,7 @@ function enrichPlayerStation(
   const factoryGroup = getFactoryGroup(modules)
   const isTradestation = macro.includes('tradestation')
   const isDefencemodule = modules.some((m) => m.type === 'defencemodule')
-  const isHeadquarter = macro.includes('player_hq_') || station.is_headquarter
+  const isHeadquarter = hasModulePattern(modules, ['player_hq_']) || station.is_headquarter
   
   let tag: string | undefined
   if (isPiratebase) tag = 'piratestation'
