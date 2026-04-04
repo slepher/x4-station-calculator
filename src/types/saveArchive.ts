@@ -258,6 +258,7 @@ export interface SavePoiOverlayItem {
   class?: string
   purpose?: string
   shipId?: string
+  unlocked?: boolean
 }
 
 export interface SavePoiSectorGroup<T> {

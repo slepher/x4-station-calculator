@@ -37,6 +37,8 @@ import shipSTradeIconUrl from '@/components/icons/ships/ship_s_trade_01.svg'
 import shipXLBuildIconUrl from '@/components/icons/ships/ship_xl_build_01.svg'
 import shipXLFightIconUrl from '@/components/icons/ships/ship_xl_fight_01.svg'
 import shipXLAuxiliaryIconUrl from '@/components/icons/ships/ship_xl_auxiliary_01.svg'
+import vaultLockedIconUrl from '@/components/icons/vault_locked.svg'
+import vaultUnlockedIconUrl from '@/components/icons/vault_unlocked.svg'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
 import type { SavePoiColorMap } from '../types'
 
@@ -54,8 +56,8 @@ export const SAVE_POI_COLORS: SavePoiColorMap = {
   xenonStation: '#f87171',
   khaakStation: '#a855f7',
   abandonedShip: '#c084fc',
-  datavault: '#22d3ee',
-  erlkingVault: '#34d399'
+  datavault: '#fbbf24',
+  erlkingVault: '#f97316'
 }
 
 const SAVE_POI_ICON_MAP: Record<string, string> = {
@@ -132,6 +134,10 @@ export function getSavePoiIconUrl(poi: SavePoiOverlayItem): string | null {
     if (iconUrl) {
       return iconUrl
     }
+  }
+
+  if (poi.category === 'datavault' || poi.category === 'erlkingVault') {
+    return poi.unlocked ? vaultUnlockedIconUrl : vaultLockedIconUrl
   }
 
   if (poi.category === 'playerStation' && poi.is_headquarter) {

@@ -189,6 +189,7 @@ export function createOverlayItem(
   const isStation = 'tag' in item || 'is_headquarter' in item
   const owner = category === 'playerStation' ? 'player' : ('owner' in item ? item.owner : undefined)
   const isAbandonedShip = category === 'abandonedShip' && 'class' in item
+  const isVault = category === 'datavault' || category === 'erlkingVault'
   return {
     key: `${category}:${item.code}`,
     code: item.code,
@@ -202,7 +203,8 @@ export function createOverlayItem(
     is_headquarter: isStation && 'is_headquarter' in item ? item.is_headquarter : undefined,
     class: isAbandonedShip ? item.class : undefined,
     purpose: isAbandonedShip && 'purpose' in item ? item.purpose : undefined,
-    shipId: isAbandonedShip && 'shipId' in item ? item.shipId : undefined
+    shipId: isAbandonedShip && 'shipId' in item ? item.shipId : undefined,
+    unlocked: isVault && 'unlocked' in item ? item.unlocked : undefined
   }
 }
 
