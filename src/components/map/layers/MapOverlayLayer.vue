@@ -74,17 +74,19 @@ function isSmallPoi(poi: SavePoiOverlayItem & { iconSize?: number }) {
       :data-save-poi-key="poi.key"
       @mousedown.stop="emit('save-poi-pointerdown', poi)"
     >
-      <image
-        v-if="getSavePoiIconUrl(poi)"
-        :href="getSavePoiIconUrl(poi)!"
-        :x="(-(poi.iconSize || SMALL_ICON_SIZE) / 2).toFixed(1)"
-        :y="(-(poi.iconSize || SMALL_ICON_SIZE) / 2).toFixed(1)"
-        :width="poi.iconSize || SMALL_ICON_SIZE"
-        :height="poi.iconSize || SMALL_ICON_SIZE"
-        :filter="poi.factionFilterId ? `url(#${poi.factionFilterId})` : undefined"
-        preserveAspectRatio="xMidYMid meet"
-      />
-      <circle v-else cx="0" cy="0" r="5" :fill="poi.color" stroke="#fff" stroke-width="1" />
+      <g class="save-poi-icon">
+        <image
+          v-if="getSavePoiIconUrl(poi)"
+          :href="getSavePoiIconUrl(poi)!"
+          :x="(-(poi.iconSize || SMALL_ICON_SIZE) / 2).toFixed(1)"
+          :y="(-(poi.iconSize || SMALL_ICON_SIZE) / 2).toFixed(1)"
+          :width="poi.iconSize || SMALL_ICON_SIZE"
+          :height="poi.iconSize || SMALL_ICON_SIZE"
+          :filter="poi.factionFilterId ? `url(#${poi.factionFilterId})` : undefined"
+          preserveAspectRatio="xMidYMid meet"
+        />
+        <circle v-else cx="0" cy="0" r="5" :fill="poi.color" stroke="#fff" stroke-width="1" />
+      </g>
       <text
         x="0"
         :y="isSmallPoi(poi) ? -6 : -12"
@@ -140,14 +142,10 @@ function isSmallPoi(poi: SavePoiOverlayItem & { iconSize?: number }) {
   cursor: pointer;
 }
 
-.save-poi-marker.focused image {
+.save-poi-marker.focused .save-poi-icon {
   filter:
     drop-shadow(0 0 4px rgba(253, 230, 138, 0.95))
     drop-shadow(0 0 10px rgba(245, 158, 11, 0.7));
-}
-
-.save-poi-marker.focused circle {
-  filter: drop-shadow(0 0 4px rgba(253, 230, 138, 0.95));
 }
 
 .save-poi-marker.focused .save-poi-label {

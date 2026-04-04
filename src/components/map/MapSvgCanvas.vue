@@ -331,18 +331,6 @@ watchEffect(() => {
       >
         <feColorMatrix type="matrix" :values="f.matrix" />
       </filter>
-      <filter
-        v-for="f in factionColorFilters"
-        :id="`${f.id}-focused`"
-        :key="`${f.id}-focused`"
-        x="-50%"
-        y="-50%"
-        width="200%"
-        height="200%"
-      >
-        <feColorMatrix type="matrix" :values="f.matrix" result="colored" />
-        <feDropShadow in="colored" stdDeviation="2" flood-color="#fde68a" flood-opacity="0.8" />
-      </filter>
       <clipPath v-for="clip in clipDefs" :id="clip.id" :key="clip.id">
         <polygon :points="clip.points" />
       </clipPath>

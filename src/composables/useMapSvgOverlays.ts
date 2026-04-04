@@ -163,14 +163,31 @@ export function useMapSvgOverlays(args: {
       .filter((item): item is PlacementOverlay & { x: number; y: number } => !!item)
   })
 
+  function getVaultFactionId(poi: SavePoiOverlayItem): string | null {
+    if (poi.category === 'erlkingVault') {
+      return poi.unlocked ? 'player' : 'loanshark'
+    }
+    if (poi.category === 'datavault') {
+      return poi.unlocked ? 'player' : 'kaori'
+    }
+    return null
+  }
+
+  function getPoiFactionId(poi: SavePoiOverlayItem): string | null {
+    const vaultFaction = getVaultFactionId(poi)
+    if (vaultFaction) return vaultFaction
+    return poi.owner || null
+  }
+
   const factionColorFilters = computed<Array<{ id: string; matrix: string }>>(() => {
     const factionColorMap = args.factionColorMap.value
     if (!factionColorMap) return []
     const filters: Array<{ id: string; matrix: string }> = []
     const addedColors = new Set<string>()
     args.savePoiOverlays.value.forEach((poi) => {
-      if (!poi.owner) return
-      const color = factionColorMap[poi.owner]
+      const factionId = getPoiFactionId(poi)
+      if (!factionId) return
+      const color = factionColorMap[factionId]
       if (!color || addedColors.has(color)) return
       const matrix = colorToFeColorMatrix(color)
       if (!matrix) return
@@ -242,16 +259,21 @@ export function useMapSvgOverlays(args: {
             point.y <= viewportBounds.bottom + SAVE_POI_VIEWPORT_MARGIN
           if (!withinX || !withinY) return null
         }
-        const factionColor = poi.owner && factionColorMap?.[poi.owner] ? factionColorMap[poi.owner] : null
         const iconSize = isLargeSavePoiIcon(poi)
           ? largeIconScreenSize / clampedScale
           : SMALL_ICON_SIZE
+
+        const factionId = getPoiFactionId(poi)
+        const factionColor = factionId && factionColorMap?.[factionId] ? factionColorMap[factionId] : null
+        const poiColor = factionColor || SAVE_POI_COLORS[poi.category]
+        const poiFilterId = factionColor ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` : null
+
         return {
           ...poi,
           x: point.x,
           y: point.y,
-          color: SAVE_POI_COLORS[poi.category],
-          factionFilterId: factionColor ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` : null,
+          color: poiColor,
+          factionFilterId: poiFilterId,
           iconSize
         }
       })
