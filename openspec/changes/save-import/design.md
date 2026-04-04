@@ -420,6 +420,14 @@ getCurrentPosition(): Vector3 {
 - 这些派生判定暂定放在 `src/workers/saveParserRust.worker.ts` 层完成，Rust core 继续只负责基础抽取与模块聚合
 - 所有空数组字段在导出 JSON 中省略，不输出 `[]`
 
+**is_headquarter 判定规则**：
+- 仅对 `playerStations` 生效
+- 判定条件（满足任一）：
+  1. station 的 modules 中存在 `ref` 包含 `player_hq_` 字符串
+  2. station 对象本身已有 `is_headquarter = true`（parser 阶段识别）
+- 判定位置：`src/workers/saveParser.post.ts` 的 `enrichPlayerStation` 函数
+- 注意：检查的是 **module 的 ref/macro**，而非 station 的 macro
+
 ### Decision 4: Datavault Loot Extraction
 
 **问题**: datavault 与 erlking_vault 除了坐标和布尔标记外，还需要表达是否已解锁以及内部可拾取战利品
