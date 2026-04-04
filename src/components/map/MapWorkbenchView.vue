@@ -11,7 +11,6 @@ import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { getSectorScalePerRadius } from '@/components/map/utils/coordinates'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
-import { shouldHideSavePoiSmallIconAtClusterOverview } from '@/components/map/utils/style'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
@@ -135,16 +134,6 @@ const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
 const selectedSaveArchive = ref<SaveArchive | null>(null)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
-const excludeConditionalSmallStations = ref(true)
-const savePoiVisibility = ref<SavePoiVisibility>({
-  playerStation: false,
-  npcStation: false,
-  xenonStation: false,
-  khaakStation: false,
-  abandonedShip: false,
-  datavault: false,
-  erlkingVault: false
-})
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
 const settledSavePoiViewportContentBounds = ref<{
@@ -278,15 +267,29 @@ const placementOverlays = computed<PlacementOverlayItem[]>(() => {
     }))
 })
 
+const activeMapArchive = computed<SaveArchive | null>(() =>
+  saveStore.selectedArchive || selectedSaveArchive.value
+)
+
+const excludeConditionalSmallStations = computed({
+  get: () => saveStore.savedArchivesState.settings.excludeConditionalSmallStations,
+  set: (value: boolean) => saveStore.updateSettings({ excludeConditionalSmallStations: value })
+})
+
+const savePoiVisibility = computed<SavePoiVisibility>({
+  get: () => saveStore.savedArchivesState.settings.visibility,
+  set: (value) => saveStore.updateSettings({ visibility: value })
+})
+
 const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
-  if (!isSavePanelOpen.value || !selectedSaveArchive.value) return []
+  if (!activeMapArchive.value) return []
   const activeCategories = getEffectiveVisibleSavePoiCategories(
     savePoiVisibility.value,
     activeSavePoiCategory.value
   )
 
   return saveStore
-    .getArchivePoiOverlays(selectedSaveArchive.value, activeCategories, {
+    .getArchivePoiOverlays(activeMapArchive.value, activeCategories, {
       excludeConditionalSmallStations: excludeConditionalSmallStations.value
     })
     .map((overlay) => {
@@ -301,11 +304,11 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
 })
 
 const saveSectorLinkOverrides = computed<Record<string, SectorData> | undefined>(() => {
-  if (!isSavePanelOpen.value || !selectedSaveArchive.value) return undefined
+  if (!activeMapArchive.value) return undefined
   const next: Record<string, SectorData> = {}
   let hasItems = false
 
-  Object.entries(selectedSaveArchive.value.sectors).forEach(([sectorMacro, sector]) => {
+  Object.entries(activeMapArchive.value.sectors).forEach(([sectorMacro, sector]) => {
     if ((sector.clusterGates?.length || 0) === 0 && (sector.superhighwayGates?.length || 0) === 0) return
     const resolved = mapStore.resolveSectorByMacro?.(sectorMacro) ||
       resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
@@ -316,11 +319,6 @@ const saveSectorLinkOverrides = computed<Record<string, SectorData> | undefined>
 
   return hasItems ? next : undefined
 })
-
-const isClusterOverview = computed(() =>
-  clusterVisibilityThresholdPx.value > 0 &&
-  clusterRefHeightPx.value * scale.value <= clusterVisibilityThresholdPx.value
-)
 
 const liveSavePoiViewportContentBounds = computed(() => {
   const { width, height } = getViewportSize()
@@ -340,10 +338,10 @@ const savePoiViewportContentBounds = computed(() =>
 )
 
 const sectorOwnerOverride = computed<Record<string, string> | undefined>(() => {
-  if (!isSavePanelOpen.value || !selectedSaveArchive.value) return undefined
+  if (!activeMapArchive.value) return undefined
   const map: Record<string, string> = {}
   let hasOverride = false
-  Object.entries(selectedSaveArchive.value.sectors).forEach(([macro, sector]) => {
+  Object.entries(activeMapArchive.value.sectors).forEach(([macro, sector]) => {
     if (sector.owner) {
       const resolved = mapStore.resolveSectorByMacro(macro)
       if (resolved?.sectorId) {
@@ -1018,18 +1016,8 @@ const onSavePanelOpen = () => {
 
 const onSavePanelClose = () => {
   isSavePanelOpen.value = false
-  selectedSaveArchive.value = null
   activeSavePoiCategory.value = null
   focusedSavePoiKey.value = null
-  savePoiVisibility.value = {
-    playerStation: false,
-    npcStation: false,
-    xenonStation: false,
-    khaakStation: false,
-    abandonedShip: false,
-    datavault: false,
-    erlkingVault: false
-  }
 }
 
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
@@ -1042,15 +1030,6 @@ const onSaveSelectArchive = async (payload: { guid: string; time: number } | nul
   await saveStore.selectArchive(payload.guid, payload.time)
   selectedSaveArchive.value = saveStore.selectedArchive
   activeSavePoiCategory.value = null
-  savePoiVisibility.value = {
-    playerStation: false,
-    npcStation: false,
-    xenonStation: false,
-    khaakStation: false,
-    abandonedShip: false,
-    datavault: false,
-    erlkingVault: false
-  }
 }
 
 const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
@@ -1345,7 +1324,7 @@ onBeforeUnmount(() => {
 
       <MapSavePanel
         :open="isSavePanelOpen"
-        :archive="selectedSaveArchive"
+        :archive="activeMapArchive"
         :visibility="savePoiVisibility"
         :exclude-conditional-small-stations="excludeConditionalSmallStations"
         @close="onSavePanelClose"

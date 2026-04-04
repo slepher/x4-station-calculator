@@ -858,6 +858,7 @@ export interface VersionConfig {
     logic_flow: string
     ship_blueprints: string
     setting: string
+    save_archives: string
   }
 }
 
@@ -881,6 +882,7 @@ export interface X4SettingStorage {
 
 export interface X4MapSector {
   id: string
+  macro?: string
   cluster_id: string
   nameId: string
   name: string
@@ -898,12 +900,40 @@ export interface X4MapSector {
   normalized?: {
     axial?: { q: number; r: number }
     pixel_basis?: { x: number; y: number }
+    center_offset_ratio?: { x: number; y: number }
+    sector_radius_ratio?: number
+    scale_per_radius?: number
+    scale_basis?: {
+      hex_inner_ratio?: number
+      extent_ratio?: number
+    }
   }
   zones?: Record<string, {
     id: string
     kind?: 'zone' | 'shcon'
     raw_sector_pos?: { x: number; y: number; z: number; sx?: number; sy?: number }
   }>
+  highways?: Record<string, {
+    entry?: { x?: number; y?: number; z?: number; sx?: number; sy?: number }
+    exit?: { x?: number; y?: number; z?: number; sx?: number; sy?: number }
+    entry_pos?: { x?: number; y?: number; z?: number }
+    exit_pos?: { x?: number; y?: number; z?: number }
+    spline?: Array<{ x?: number; y?: number; z?: number; sx?: number; sy?: number }>
+  }>
+  cluster_gates?: Record<string, {
+    id?: string
+    target_cluster_id?: string
+    raw_local_pos?: { x?: number; y?: number; z?: number; sx?: number; sy?: number }
+  }>
+  resources?: Array<{
+    ware: string
+    yield?: string
+    level?: number
+    respawn?: number
+    rating?: number
+  }>
+  has_khaak_hive?: boolean
+  khaak_hive_sources?: string[]
 }
 
 export interface X4MapCluster {
@@ -919,6 +949,14 @@ export interface X4MapCluster {
     pixel_basis?: { x: number; y: number }
   }
   sectors: Record<string, X4MapSector>
+  sector_links?: Record<string, {
+    id: string
+    sector_a_id: string
+    sector_b_id: string
+    from_zone_id?: string
+    to_zone_id?: string
+    render?: { lane_count?: number; lane_index?: number }
+  }>
 }
 
 export interface X4Map {

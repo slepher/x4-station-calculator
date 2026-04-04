@@ -1,7 +1,7 @@
-import { computed, type ComputedRef } from 'vue'
+import { computed, type ComputedRef, type Ref } from 'vue'
 import { buildHighwayPathPoints, catmullRomToBezierPath, clipPolylineToConvexPolygon, hexVertices } from '@/components/map/utils/geometry'
 import { clusterRatioToScreen, gateClusterRatioFromRaw, getSectorViewportTransform, sectorLocalRatioToScreen, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
-import type { Cluster, Vec2 } from '@/components/map/types'
+import type { Cluster, Sector, Vec2 } from '@/components/map/types'
 import type { MapSvgLayoutState } from './useMapSvgLayout'
 import type { SectorData } from '@/types/saveArchive'
 
@@ -15,7 +15,7 @@ const GATE_LINE_MARGIN = 0.6
 
 export function useMapSvgLinks(args: {
   clusters: ComputedRef<Record<string, Cluster>>
-  saveSectors?: ComputedRef<Record<string, SectorData> | undefined>
+  saveSectors?: Ref<Record<string, SectorData> | undefined>
   regionIds: ComputedRef<string[]>
   layoutState: ComputedRef<MapSvgLayoutState>
   resolveOwnerColor: (node: { owner_color?: string }, sectorId?: string, clusterId?: string) => string
@@ -25,7 +25,7 @@ export function useMapSvgLinks(args: {
     savedSector: SectorData | undefined,
     linkId: string,
     zoneId: string,
-    sector: Cluster['sectors'][string]
+    sector: Sector
   ) => {
     const match = (savedSector?.superhighwayGates || []).find((gate) =>
       gate.link_id === linkId &&
@@ -43,7 +43,7 @@ export function useMapSvgLinks(args: {
   const getSavedClusterGateRatio = (
     savedSector: SectorData | undefined,
     gateId: string,
-    sector: Cluster['sectors'][string]
+    sector: Sector
   ) => {
     const match = (savedSector?.clusterGates || []).find((gate) =>
       gate.id === gateId &&

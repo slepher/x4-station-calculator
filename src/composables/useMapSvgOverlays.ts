@@ -184,7 +184,6 @@ export function useMapSvgOverlays(args: {
     const { centers, clusterRadius } = args.layoutState.value
     const factionColorMap = args.factionColorMap.value
     const viewportBounds = args.viewportContentBounds.value
-    const clusterDisplayDiameterPx = clusterRadius * 2 * args.currentScale.value
     const clampedScale = Math.max(args.currentScale.value, 1e-6)
     const halfClusterScreenSizeAtThreshold = clusterRadius * LARGE_ICON_MAX_CLUSTER_SCALE
     const maxScaleScreenSize = OVERLAY_ICON_SIZE * args.maxScale.value
@@ -256,7 +255,7 @@ export function useMapSvgOverlays(args: {
           iconSize
         }
       })
-      .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number } => !!item)
+      .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize: number } => item !== null)
   })
 
   const savePoiDebugStats = computed(() => {
@@ -291,10 +290,7 @@ export function useMapSvgOverlays(args: {
       participatingPoiCount
     }
     const logKey = `${stats.sectorCount}:${stats.participatingPoiCount}`
-    if (lastLoggedSavePoiDebugKey.value !== logKey) {
-      lastLoggedSavePoiDebugKey.value = logKey
-      console.info('[map-save-poi]', stats)
-    }
+    lastLoggedSavePoiDebugKey.value = logKey
     return stats
   })
 

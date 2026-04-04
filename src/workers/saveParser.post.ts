@@ -225,20 +225,11 @@ function addVectors(a: Vector3, b: Vector3): Vector3 {
   }
 }
 
-function subtractVectors(a: Vector3, b: Vector3): Vector3 {
-  return {
-    x: a.x - b.x,
-    y: a.y - b.y,
-    z: a.z - b.z
-  }
-}
-
 function calculateFinalPosition(
   relativePosition: Vector3 | undefined,
   zoneId: string | undefined,
   sectorId: string,
-  zoneLookup: ZoneLookup,
-  sectorCenterLookup: SectorCenterLookup
+  zoneLookup: ZoneLookup
 ): Vector3 {
   const basePosition = relativePosition || { x: 0, y: 0, z: 0 }
   if (!zoneId) {
@@ -277,12 +268,11 @@ function withTransformPosition(
 function collectSectorArchivePoiPoints(
   sector: SectorData,
   sectorId: string,
-  zoneLookup: ZoneLookup,
-  sectorCenterLookup: SectorCenterLookup
+  zoneLookup: ZoneLookup
 ): Array<{ x: number; z: number }> {
   const points: Array<{ x: number; z: number }> = []
   const appendPoint = (relativePosition: Vector3 | undefined, zoneId?: string) => {
-    const position = calculateFinalPosition(relativePosition, zoneId, sectorId, zoneLookup, sectorCenterLookup)
+    const position = calculateFinalPosition(relativePosition, zoneId, sectorId, zoneLookup)
     points.push({ x: position.x, z: position.z })
   }
 
@@ -311,7 +301,7 @@ function buildArchiveSectorScaleLookup(
     const sectorKey = sectorId.toLowerCase()
     const points = [
       ...(staticScalePointsLookup[sectorKey] || []),
-      ...collectSectorArchivePoiPoints(sector, sectorId, zoneLookup, sectorCenterLookup)
+      ...collectSectorArchivePoiPoints(sector, sectorId, zoneLookup)
     ]
     const scaleBasis = scaleBasisLookup[sectorKey]
 
@@ -388,7 +378,9 @@ function buildSectorStaticSuperhighwayGateLookup(
           y: zoneA.raw_sector_pos.y || 0,
           z: zoneA.raw_sector_pos.z
         }
-        lookup[sectorA.id.toLowerCase()].push({
+        const sectorAKey = sectorA.id.toLowerCase()
+        lookup[sectorAKey] ||= []
+        lookup[sectorAKey].push({
           id: `${linkId}:from`,
           link_id: linkId,
           zone_id: link.from_zone_id || '',
@@ -403,7 +395,9 @@ function buildSectorStaticSuperhighwayGateLookup(
           y: zoneB.raw_sector_pos.y || 0,
           z: zoneB.raw_sector_pos.z
         }
-        lookup[sectorB.id.toLowerCase()].push({
+        const sectorBKey = sectorB.id.toLowerCase()
+        lookup[sectorBKey] ||= []
+        lookup[sectorBKey].push({
           id: `${linkId}:to`,
           link_id: linkId,
           zone_id: link.to_zone_id || '',
@@ -550,8 +544,7 @@ function enrichPlayerStation(
     station.relative_position,
     station.zone_id,
     sectorId,
-    zoneLookup,
-    sectorCenterLookup
+    zoneLookup
   ), sectorId, sectorScaleLookup, sectorCenterLookup)
   
   return {
@@ -602,8 +595,7 @@ function enrichNpcStation(
     station.relative_position,
     station.zone_id,
     sectorId,
-    zoneLookup,
-    sectorCenterLookup
+    zoneLookup
   ), sectorId, sectorScaleLookup, sectorCenterLookup)
   
   return {
@@ -656,8 +648,7 @@ function enrichFactionStation(
       station.relative_position,
       station.zone_id,
       sectorId,
-      zoneLookup,
-      sectorCenterLookup
+      zoneLookup
     ), sectorId, sectorScaleLookup, sectorCenterLookup)
     
     return {
@@ -684,8 +675,7 @@ function enrichFactionStation(
     station.relative_position,
     station.zone_id,
     sectorId,
-    zoneLookup,
-    sectorCenterLookup
+    zoneLookup
   ), sectorId, sectorScaleLookup, sectorCenterLookup)
   
   return {
@@ -768,8 +758,7 @@ export function postProcessRustSaveArchive(
             vault.relative_position,
             vault.zone_id,
             sectorMacro,
-            zoneLookup,
-            sectorCenterLookup
+            zoneLookup
           ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           return { ...vault, position }
         }),
@@ -778,8 +767,7 @@ export function postProcessRustSaveArchive(
             vault.relative_position,
             vault.zone_id,
             sectorMacro,
-            zoneLookup,
-            sectorCenterLookup
+            zoneLookup
           ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           return { ...vault, position }
         }),
@@ -790,8 +778,7 @@ export function postProcessRustSaveArchive(
             ship.relative_position,
             ship.zone_id,
             sectorMacro,
-            zoneLookup,
-            sectorCenterLookup
+            zoneLookup
           ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           const shipEntry = SHIP_LOOKUP[ship.macro]
           return { ...ship, position, shipId: shipEntry?.id, purpose: shipEntry?.purpose }

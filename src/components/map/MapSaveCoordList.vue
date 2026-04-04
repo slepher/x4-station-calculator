@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useSaveStore, createOverlayItem } from '@/store/useSaveStore'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
@@ -18,7 +17,6 @@ const emit = defineEmits<{
 }>()
 
 const { t, te, locale } = useI18n()
-const gameDataStore = useGameDataStore()
 const mapStore = useMapStore()
 const saveStore = useSaveStore()
 

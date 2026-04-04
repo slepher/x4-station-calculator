@@ -251,8 +251,7 @@ const {
   overlayScreenItems,
   factionColorFilters,
   savePoiScreenItems,
-  previewScreenItem,
-  savePoiDebugStats
+  previewScreenItem
 } = useMapSvgOverlays({
   clusters,
   layoutState,
