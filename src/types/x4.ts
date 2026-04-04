@@ -860,6 +860,7 @@ export interface VersionConfig {
     logic_flow: string
     ship_blueprints: string
     setting: string
+    save_archives: string
   }
 }
 

@@ -177,6 +177,28 @@ export interface SaveArchive {
   isValid: boolean
 }
 
+export interface ArchiveMeta {
+  id: string
+  guid: string
+  time: number
+  playerName: string
+  version: string
+  filename: string
+  parser_version: string
+  post_processor_version?: string
+  source: SaveSource
+  isCompatible: boolean
+  isValid: boolean
+  createdAt: Date
+  sectorCount: number
+}
+
+export interface SavedSaveArchivesState {
+  version: number
+  activeArchiveId: string | null
+  list: ArchiveMeta[]
+}
+
 export type SavePoiCategory = 'playerStation' | 'npcStation' | 'xenonStation' | 'khaakStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
 
 export type SavePoiVisibility = Record<SavePoiCategory, boolean>

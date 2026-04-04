@@ -3,6 +3,8 @@ import { ref, computed } from 'vue'
 import type {
   SaveArchive,
   ArchiveGroup,
+  ArchiveMeta,
+  SavedSaveArchivesState,
   SectorData,
   SaveParserErrorDetail,
   SavePoiCategory,
@@ -19,18 +21,21 @@ import type {
 } from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
 import {
-  saveArchiveToDB,
-  loadArchiveListFromDB,
+  clearArchivesFromDB,
+  clearLegacySaveDB,
+  createArchiveId,
   loadArchiveDetailFromDB,
   removeArchiveFromDB,
-  clearAllArchivesFromDB
+  saveArchiveToDB
 } from '@/db/saveArchiveDB'
 import {
   CURRENT_PARSER_VERSION,
   CURRENT_POST_PROCESSOR_VERSION,
   postProcessRustSaveArchive
 } from '@/workers/saveParser.post'
+
 const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'xenonStation', 'khaakStation', 'abandonedShip', 'datavault', 'erlkingVault']
+const SAVE_ARCHIVES_STATE_VERSION = 1
 
 function normalizeVersion(v: string): string {
   const trimmed = v.trim()
@@ -62,6 +67,37 @@ function createEmptySectorData(name: string): SectorData {
     datavaults: [],
     erlkingVaults: [],
     abandonedShips: []
+  }
+}
+
+function createEmptySaveArchivesState(): SavedSaveArchivesState {
+  return {
+    version: SAVE_ARCHIVES_STATE_VERSION,
+    activeArchiveId: null,
+    list: []
+  }
+}
+
+function migrateSaveArchivesStateToCurrent(raw: unknown): SavedSaveArchivesState {
+  if (!raw || typeof raw !== 'object') {
+    return createEmptySaveArchivesState()
+  }
+
+  const parsed = raw as Partial<SavedSaveArchivesState>
+  const list = Array.isArray(parsed.list)
+    ? parsed.list
+      .filter((item): item is ArchiveMeta => Boolean(item && typeof item === 'object'))
+      .map((item) => ({
+        ...item,
+        id: typeof item.id === 'string' ? item.id : createArchiveId(item.guid, item.time),
+        createdAt: item.createdAt instanceof Date ? item.createdAt : new Date(item.createdAt)
+      }))
+    : []
+
+  return {
+    version: SAVE_ARCHIVES_STATE_VERSION,
+    activeArchiveId: typeof parsed.activeArchiveId === 'string' ? parsed.activeArchiveId : null,
+    list
   }
 }
 
@@ -207,17 +243,7 @@ function isArchiveParserVersionValid(archive: Pick<SaveArchive, 'meta'>): boolea
   return archive.meta.parser_version === CURRENT_PARSER_VERSION
 }
 
-function createStubArchiveFromMeta(meta: {
-  guid: string
-  time: number
-  playerName: string
-  version: string
-  filename: string
-  parser_version: string
-  post_processor_version?: string
-  source: 'original' | 'imported'
-  isCompatible: boolean
-}): SaveArchive {
+function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
   return {
     meta: {
       guid: meta.guid,
@@ -236,9 +262,118 @@ function createStubArchiveFromMeta(meta: {
   }
 }
 
+function upsertArchiveMeta(list: ArchiveMeta[], meta: ArchiveMeta): ArchiveMeta[] {
+  const next = [...list]
+  const index = next.findIndex((item) => item.id === meta.id)
+  if (index >= 0) next[index] = meta
+  else next.push(meta)
+  next.sort((a, b) => b.time - a.time)
+  return next
+}
+
+function removeArchiveMeta(list: ArchiveMeta[], archiveId: string): ArchiveMeta[] {
+  return list.filter((item) => item.id !== archiveId)
+}
+
+function buildArchiveGroups(metaList: ArchiveMeta[]): Map<string, ArchiveGroup> {
+  const groups = new Map<string, ArchiveGroup>()
+
+  for (const meta of metaList) {
+    const archive = createStubArchiveFromMeta(meta)
+    const existing = groups.get(meta.guid)
+    if (existing) {
+      existing.saves.push(archive)
+      existing.saves.sort((a, b) => b.meta.time - a.meta.time)
+      if (meta.playerName) existing.playerName = meta.playerName
+    } else {
+      groups.set(meta.guid, {
+        guid: meta.guid,
+        playerName: meta.playerName,
+        saves: [archive]
+      })
+    }
+  }
+
+  return groups
+}
+
 export const useSaveStore = defineStore('save', () => {
   const gameDataStore = useGameDataStore()
 
+  function getStorageKey(): string {
+    return gameDataStore.getStorageKey('save_archives')
+  }
+
+  function getAllSaveStorageKeys(): string[] {
+    const configs = gameDataStore.versionsConfig || []
+    const keys = configs
+      .map((config) => config.storage_keys.save_archives)
+      .filter((key): key is string => typeof key === 'string' && key.length > 0)
+    return keys.length > 0 ? keys : ['x4_save_archives']
+  }
+
+  function writeSavedState() {
+    localStorage.setItem(getStorageKey(), JSON.stringify(savedArchivesState.value))
+  }
+
+  function rebuildArchivesFromState() {
+    archives.value = buildArchiveGroups(savedArchivesState.value.list)
+  }
+
+  function buildArchiveMeta(archive: SaveArchive, existingCreatedAt?: Date): ArchiveMeta {
+    return {
+      id: createArchiveId(archive.meta.guid, archive.meta.time),
+      guid: archive.meta.guid,
+      time: archive.meta.time,
+      playerName: archive.meta.playerName,
+      version: archive.meta.version,
+      filename: archive.meta.filename,
+      parser_version: archive.meta.parser_version,
+      post_processor_version: archive.meta.post_processor_version,
+      source: archive.meta.source,
+      isCompatible: archive.isCompatible,
+      isValid: archive.isValid,
+      createdAt: existingCreatedAt || new Date(),
+      sectorCount: Object.keys(archive.sectors).length
+    }
+  }
+
+  async function restoreSelectedArchive(archiveId: string): Promise<void> {
+    const fullArchive = await loadArchiveDetailFromDB(getStorageKey(), archiveId)
+    if (!fullArchive) {
+      selectedArchive.value = null
+      savedArchivesState.value.activeArchiveId = null
+      writeSavedState()
+      return
+    }
+
+    fullArchive.isValid = isArchiveParserVersionValid(fullArchive)
+    fullArchive.sectors = Object.fromEntries(
+      Object.entries(fullArchive.sectors).map(([sectorId, sector]) => [sectorId, normalizeSectorData(sectorId, sector as SectorData & { stations?: StationEntry[] })])
+    )
+
+    if (fullArchive.isValid && fullArchive.meta.post_processor_version !== CURRENT_POST_PROCESSOR_VERSION) {
+      const reprocessedArchive = postProcessRustSaveArchive(
+        fullArchive,
+        gameDataStore.modulesByMacroId,
+        gameDataStore.maps
+      )
+      reprocessedArchive.isCompatible = checkVersionCompatibility(reprocessedArchive.meta.version)
+      reprocessedArchive.isValid = isArchiveParserVersionValid(reprocessedArchive)
+      await saveArchiveToDB(getStorageKey(), reprocessedArchive)
+      const existingMeta = savedArchivesState.value.list.find((item) => item.id === archiveId)
+      const nextMeta = buildArchiveMeta(reprocessedArchive, existingMeta?.createdAt)
+      savedArchivesState.value.list = upsertArchiveMeta(savedArchivesState.value.list, nextMeta)
+      writeSavedState()
+      rebuildArchivesFromState()
+      selectedArchive.value = reprocessedArchive
+      return
+    }
+
+    selectedArchive.value = fullArchive
+  }
+
+  const savedArchivesState = ref<SavedSaveArchivesState>(createEmptySaveArchivesState())
   const archives = ref<Map<string, ArchiveGroup>>(new Map())
   const selectedArchive = ref<SaveArchive | null>(null)
   const isParsing = ref(false)
@@ -251,7 +386,7 @@ export const useSaveStore = defineStore('save', () => {
   })
 
   const totalArchiveCount = computed<number>(() => {
-    return archiveGroups.value.reduce((sum, group) => sum + group.saves.length, 0)
+    return savedArchivesState.value.list.length
   })
 
   const selectedArchivePoiCategories = computed<SavePoiCategoryDataMap>(() => {
@@ -264,67 +399,27 @@ export const useSaveStore = defineStore('save', () => {
 
   async function initialize(): Promise<void> {
     if (isInitialized.value) return
-    
-    // Set initialized flag early to prevent concurrent calls
     isInitialized.value = true
-    
+
     try {
-      const metaList = await loadArchiveListFromDB()
-      
-      // Clear existing data before loading to ensure idempotency
-      archives.value.clear()
-      
-      for (const meta of metaList) {
-        let archiveForList = createStubArchiveFromMeta(meta)
-        const parserVersionValid = archiveForList.isValid
-        const postProcessorUpToDate = meta.post_processor_version === CURRENT_POST_PROCESSOR_VERSION
-
-        if (parserVersionValid && !postProcessorUpToDate) {
-          const fullArchive = await loadArchiveDetailFromDB(meta.id)
-          if (fullArchive) {
-            const reprocessedArchive = postProcessRustSaveArchive(
-              fullArchive,
-              gameDataStore.modulesByMacroId,
-              gameDataStore.maps
-            )
-            reprocessedArchive.isCompatible = checkVersionCompatibility(reprocessedArchive.meta.version)
-            await saveArchiveToDB(reprocessedArchive)
-            archiveForList = {
-              ...reprocessedArchive,
-              sectors: {}
-            }
-          }
-        }
-
-        const guid = meta.guid
-        const existingGroup = archives.value.get(guid)
-
-        if (existingGroup) {
-          // Check if this save already exists (by time)
-          const existingIndex = existingGroup.saves.findIndex(s => s.meta.time === meta.time)
-          if (existingIndex >= 0) {
-            existingGroup.saves[existingIndex] = archiveForList
-          } else {
-            existingGroup.saves.push(archiveForList)
-          }
-        } else {
-          archives.value.set(guid, {
-            guid,
-            playerName: meta.playerName,
-            saves: [archiveForList]
-          })
-        }
+      const allKeysMissing = getAllSaveStorageKeys().every((key) => localStorage.getItem(key) === null)
+      if (allKeysMissing) {
+        await clearLegacySaveDB()
       }
-      
-      // Sort saves within each group by time (descending)
-      for (const group of archives.value.values()) {
-        group.saves.sort((a, b) => b.meta.time - a.meta.time)
+
+      const stored = localStorage.getItem(getStorageKey())
+      savedArchivesState.value = stored
+        ? migrateSaveArchivesStateToCurrent(JSON.parse(stored))
+        : createEmptySaveArchivesState()
+
+      rebuildArchivesFromState()
+      selectedArchive.value = null
+
+      if (savedArchivesState.value.activeArchiveId) {
+        await restoreSelectedArchive(savedArchivesState.value.activeArchiveId)
       }
-      
-      console.log(`[saveStore] initialized with ${archives.value.size} groups, ${metaList.length} total saves`)
     } catch (error) {
       console.error('[saveStore] initialization failed:', error)
-      // Reset flag on error to allow retry
       isInitialized.value = false
     }
   }
@@ -345,115 +440,83 @@ export const useSaveStore = defineStore('save', () => {
     archive.isCompatible = checkVersionCompatibility(archive.meta.version)
     archive.isValid = isArchiveParserVersionValid(archive)
 
-    const guid = archive.meta.guid
-    const existingGroup = archives.value.get(guid)
+    const archiveId = createArchiveId(archive.meta.guid, archive.meta.time)
+    const existingMeta = savedArchivesState.value.list.find((item) => item.id === archiveId)
+    const nextMeta = buildArchiveMeta(archive, existingMeta?.createdAt)
+    savedArchivesState.value.list = upsertArchiveMeta(savedArchivesState.value.list, nextMeta)
+    savedArchivesState.value.activeArchiveId = archiveId
+    writeSavedState()
+    rebuildArchivesFromState()
+    selectedArchive.value = archive
 
-    if (existingGroup) {
-      const existingIndex = existingGroup.saves.findIndex(
-        s => s.meta.time === archive.meta.time
-      )
-
-      if (existingIndex >= 0) {
-        existingGroup.saves[existingIndex] = archive
-      } else {
-        existingGroup.saves.push(archive)
-      }
-
-      existingGroup.saves.sort((a, b) => b.meta.time - a.meta.time)
-
-      if (archive.meta.playerName && archive.meta.playerName !== existingGroup.playerName) {
-        existingGroup.playerName = archive.meta.playerName
-      }
-    } else {
-      const newGroup: ArchiveGroup = {
-        guid,
-        playerName: archive.meta.playerName || 'Unknown',
-        saves: [archive]
-      }
-      archives.value.set(guid, newGroup)
-    }
-    
-    saveArchiveToDB(archive).catch(error => {
+    saveArchiveToDB(getStorageKey(), archive).catch(error => {
       console.error('[saveStore] failed to persist archive:', error)
     })
   }
 
   async function selectArchive(guid: string, time: number): Promise<void> {
-    const group = archives.value.get(guid)
-    if (!group) {
+    const archiveId = createArchiveId(guid, time)
+    const exists = savedArchivesState.value.list.some((item) => item.id === archiveId)
+    if (!exists) {
       selectedArchive.value = null
       return
     }
 
-    let archive = group.saves.find(s => s.meta.time === time)
-    
-    if (archive && Object.keys(archive.sectors).length === 0) {
-      const id = `${guid}_${time}`
-      const fullArchive = await loadArchiveDetailFromDB(id)
-      if (fullArchive) {
-        fullArchive.isValid = isArchiveParserVersionValid(fullArchive)
-        fullArchive.sectors = Object.fromEntries(
-          Object.entries(fullArchive.sectors).map(([sectorId, sector]) => [sectorId, normalizeSectorData(sectorId, sector as SectorData & { stations?: StationEntry[] })])
-        )
-        const index = group.saves.findIndex(s => s.meta.time === time)
-        if (index >= 0) {
-          group.saves[index] = fullArchive
-          archive = fullArchive
-        }
-      }
-    }
-    
-    selectedArchive.value = archive || null
+    savedArchivesState.value.activeArchiveId = archiveId
+    writeSavedState()
+    await restoreSelectedArchive(archiveId)
   }
 
   function clearSelection(): void {
     selectedArchive.value = null
+    savedArchivesState.value.activeArchiveId = null
+    writeSavedState()
   }
 
   function removeArchive(guid: string, time: number): void {
-    const group = archives.value.get(guid)
-    if (!group) return
+    const archiveId = createArchiveId(guid, time)
+    const exists = savedArchivesState.value.list.some((item) => item.id === archiveId)
+    if (!exists) return
 
-    const index = group.saves.findIndex(s => s.meta.time === time)
-    if (index >= 0) {
-      group.saves.splice(index, 1)
+    savedArchivesState.value.list = removeArchiveMeta(savedArchivesState.value.list, archiveId)
+    if (savedArchivesState.value.activeArchiveId === archiveId) {
+      savedArchivesState.value.activeArchiveId = null
     }
-
-    if (group.saves.length === 0) {
-      archives.value.delete(guid)
-    }
-
     if (selectedArchive.value?.meta.guid === guid && selectedArchive.value?.meta.time === time) {
       selectedArchive.value = null
     }
-    
-    removeArchiveFromDB(guid, time).catch(error => {
+    writeSavedState()
+    rebuildArchivesFromState()
+
+    removeArchiveFromDB(getStorageKey(), archiveId).catch(error => {
       console.error('[saveStore] failed to remove archive from DB:', error)
     })
   }
 
   function clearAll(): void {
+    savedArchivesState.value = createEmptySaveArchivesState()
     archives.value.clear()
     selectedArchive.value = null
     parseError.value = null
     parseProgress.value = ''
     isParsing.value = false
-    
-    clearAllArchivesFromDB().catch(error => {
+    writeSavedState()
+
+    clearArchivesFromDB(getStorageKey()).catch(error => {
       console.error('[saveStore] failed to clear DB:', error)
     })
   }
 
   async function exportToJson(guid: string, time: number): Promise<void> {
-    const id = `${guid}_${time}`
-    let archive = await loadArchiveDetailFromDB(id)
-    
+    const archiveId = createArchiveId(guid, time)
+    let archive = await loadArchiveDetailFromDB(getStorageKey(), archiveId)
+
     if (!archive) {
       const group = archives.value.get(guid)
       if (!group) return
       archive = group.saves.find(s => s.meta.time === time) || null
     }
-    
+
     if (!archive) return
 
     const exportData = {
@@ -497,10 +560,10 @@ export const useSaveStore = defineStore('save', () => {
 
       const normalizedSaveVersion = normalizeVersion(meta.version)
       const normalizedCurrentVersion = normalizeVersion(gameDataStore.currentVersion)
-      
+
       if (normalizedSaveVersion !== normalizedCurrentVersion) {
-        return { 
-          success: false, 
+        return {
+          success: false,
           error: `Version mismatch: save version ${meta.version} does not match current game version ${gameDataStore.currentVersion}`,
           errorDetail: {
             type: 'version_mismatch',
@@ -571,6 +634,7 @@ export const useSaveStore = defineStore('save', () => {
 
   return {
     archives,
+    savedArchivesState,
     selectedArchive,
     isParsing,
     parseProgress,
