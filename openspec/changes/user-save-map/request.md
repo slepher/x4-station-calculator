@@ -27,11 +27,19 @@
 
 | 序号 | 分类名 | 数据来源 | 筛选条件 |
 |------|--------|----------|----------|
-| 1 | 用户空间站 | `stations` | `owner === 'player'` |
-| 2 | NPC据点 | `stations` | `owner !== 'player' && is_headquarter === true` |
+| 1 | 玩家空间站 | `stations` | `owner === 'player'` |
+| 2 | 势力空间站 | `stations` | `owner !== 'player' && is_headquarter === true` |
 | 3 | 弃船 | `abandonedShips` | 全部 |
-| 4 | 保险箱 | `datavaults` | 全部 |
-| 5 | 妖王保险箱 | `erlkingVaults` | 全部 |
+| 4 | 日志数据仓库 | `datavaults` | 全部 |
+| 5 | 妖王配件数据仓库 | `erlkingVaults` | 全部 |
+
+**is_headquarter 判定规则**：
+- 仅对玩家空间站（`owner === 'player'`）生效
+- 判定条件（满足任一）：
+  1. station 的 modules 中存在 `ref` 包含 `player_hq_` 字符串
+  2. station 对象本身已有 `is_headquarter = true`（parser 阶段识别）
+- 判定位置：`src/workers/saveParser.post.ts` 的 `enrichPlayerStation` 函数
+- 注意：检查的是 **module 的 ref/macro**，而非 station 的 macro
 
 ### Checkbox 显示控制
 

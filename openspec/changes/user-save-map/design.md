@@ -464,4 +464,48 @@ export function createOverlayItem(
   item: StationEntry | DatavaultEntry | AbandonedShipEntry
 ): SavePoiOverlayItem
 ```
+
+---
+
+### D18: POI Rendering Order
+
+**决策**：高亮的 POI 必须在 z-index 上位于最上方，不被其他 POI 遮挡。
+
+**实现**：
+- 在 `MapOverlayLayer.vue` 中将 POI 分为两组：
+  - `normalPoiItems`：非高亮的 POI
+  - `focusedPoiItem`：高亮的 POI
+- 渲染顺序：先渲染非高亮，再渲染高亮
+- SVG 中后渲染的元素位于上层，确保高亮 POI 不被遮挡
+
+---
+
+### D19: POI Text Display
+
+**决策**：移除所有 POI 上方的文字显示。
+
+**理由**：
+- 简化地图视图，避免文字重叠
+- 用户可通过点击 POI 查看 tooltip 获取详细信息
+
+---
+
+### D20: POI Category i18n
+
+**决策**：统一 POI 分类名称的 i18n。
+
+**中文名称**：
+- 用户空间站 → 玩家空间站
+- NPC据点 → 势力空间站
+- XEN空间站 → Xenon空间站
+- KHA空间站 → Khaak空间站
+- 保险箱 → 日志数据仓库
+- 妖王保险箱 → 妖王配件数据仓库
+
+**英文名称**：
+- NPC Stations → Faction Stations
+- XEN Stations → Xenon Stations
+- KHA Stations → Khaak Stations
+
+**注意**：Khaak 不带撇号（不是 Kha'ak）
 ```
