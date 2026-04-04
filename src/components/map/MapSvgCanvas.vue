@@ -2,13 +2,12 @@
 import { toRef, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import type { SavePoiOverlayItem } from '@/types/saveArchive'
+import type { SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
 import {
   FALLBACK_OWNER_COLOR,
   MAP_FONT_FAMILY,
   OVERLAY_ICON_SIZE,
   PREVIEW_ICON_SIZE,
-  getSavePoiIconSize,
   getSavePoiIconUrl,
   placementIconHref,
   svgIdSafe
@@ -62,9 +61,29 @@ const props = withDefaults(defineProps<{
   selectedSectorId?: string | null
   placementOverlays?: PlacementOverlay[]
   placementPreview?: PlacementPreview | null
+  isDragging?: boolean
+  isZooming?: boolean
   draggingOverlayKey?: string | null
   focusedOverlayKey?: string | null
   savePoiOverlays?: SavePoiOverlayItem[]
+  saveSectors?: Record<string, SectorData> | undefined
+  viewportContentBounds?: {
+    left: number
+    top: number
+    right: number
+    bottom: number
+  } | null
+  sectorViewportContentBounds?: {
+    left: number
+    top: number
+    right: number
+    bottom: number
+  } | null
+  minScale?: number
+  maxScale?: number
+  currentScale?: number
+  zoomProgress?: number
+  clusterVisibilityThresholdPx?: number
   focusedSavePoiKey?: string | null
   sectorOwnerOverride?: Record<string, string>
   clusterOwnerOverride?: Record<string, string>
@@ -78,9 +97,19 @@ const props = withDefaults(defineProps<{
   selectedSectorId: null,
   placementOverlays: () => [],
   placementPreview: null,
+  isDragging: false,
+  isZooming: false,
   draggingOverlayKey: null,
   focusedOverlayKey: null,
   savePoiOverlays: () => [],
+  saveSectors: undefined,
+  viewportContentBounds: null,
+  sectorViewportContentBounds: null,
+  minScale: 1,
+  maxScale: 1,
+  currentScale: 1,
+  zoomProgress: 0,
+  clusterVisibilityThresholdPx: 0,
   focusedSavePoiKey: null,
   sectorOwnerOverride: undefined,
   clusterOwnerOverride: undefined,
@@ -150,6 +179,9 @@ const emitSectorLeave = (sectorId: string) => {
 const placementOverlaysRef = toRef(props, 'placementOverlays')
 const placementPreviewRef = toRef(props, 'placementPreview')
 const savePoiOverlaysRef = toRef(props, 'savePoiOverlays')
+const saveSectorsRef = toRef(props, 'saveSectors')
+const viewportContentBoundsRef = toRef(props, 'viewportContentBounds')
+const sectorViewportContentBoundsRef = toRef(props, 'sectorViewportContentBounds')
 const factionColorMapRef = toRef(props, 'factionColorMap')
 
 const {
@@ -208,6 +240,7 @@ const {
   crossClusterGateLines
 } = useMapSvgLinks({
   clusters,
+  saveSectors: saveSectorsRef,
   regionIds,
   layoutState,
   resolveOwnerColor,
@@ -225,6 +258,14 @@ const {
   placementOverlays: placementOverlaysRef,
   placementPreview: placementPreviewRef,
   savePoiOverlays: savePoiOverlaysRef,
+  viewportContentBounds: viewportContentBoundsRef,
+  sectorViewportContentBounds: sectorViewportContentBoundsRef,
+  minScale: toRef(props, 'minScale'),
+  maxScale: toRef(props, 'maxScale'),
+  currentScale: toRef(props, 'currentScale'),
+  zoomProgress: toRef(props, 'zoomProgress'),
+  clusterVisibilityThresholdPx: toRef(props, 'clusterVisibilityThresholdPx'),
+  isDragging: toRef(props, 'isDragging'),
   factionColorMap: factionColorMapRef
 })
 
@@ -348,7 +389,6 @@ watchEffect(() => {
       :preview-icon-size="PREVIEW_ICON_SIZE"
       :placement-icon-href="placementIconHref"
       :get-save-poi-icon-url="getSavePoiIconUrl"
-      :get-save-poi-icon-size="getSavePoiIconSize"
       @overlay-pointerdown="emit('overlay-pointerdown', $event)"
       @save-poi-pointerdown="emit('save-poi-pointerdown', $event)"
     />

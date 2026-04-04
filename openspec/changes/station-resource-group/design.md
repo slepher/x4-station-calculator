@@ -65,58 +65,64 @@ useLogicFlowStore()
 
 ### 5. tier0 资源获取算法
 
-使用 `computeExpandUpstream` 展开 SavedFlowGroup：
+参照 `computeExpandUpstream` 实现 `getTier0ResourcesForGroup`：
 
 ```typescript
-function getTier0ResourcesForGroup(
-  savedGroup: SavedFlowGroup,
-  gameData: GameDataStore
-): string[] {
-  // 1. 获取初始 wareIds
-  const wareIds: string[] = []
+function getTier0ResourcesForGroup(savedGroup: SavedFlowGroup): string[] {
+  const isolatedWareIds = new Set<string>()
+  const moduleOutputWareIds: string[] = []
+  
+  // 1. 提取 isolated 和 module 信息
   for (const node of savedGroup.nodes) {
     if (node.isolated) {
-      wareIds.push(node.isolated)
+      isolatedWareIds.add(node.isolated)
     } else if (node.module) {
       const module = gameData.modulesMap[node.module]
-      const outputWareId = Object.keys(module.outputs)[0]
-      if (outputWareId) wareIds.push(outputWareId)
+      if (module && module.outputs) {
+        const outputWareId = Object.keys(module.outputs)[0]
+        if (outputWareId) moduleOutputWareIds.push(outputWareId)
+      }
     }
   }
   
-  // 2. 构建 ExpandContext
-  const ctx: ExpandContext = {
-    waresMap: gameData.waresMap,
-    modulesMap: gameData.modulesMap,
-    modulesByOutputMap: gameData.modulesByOutputMap
+  // 2. 递归展开获取 tier0
+  const tier0WareIds = new Set<string>()
+  const visited = new Set<string>()
+  
+  const trace = (wareId: string) => {
+    if (wareId === 'energycells') return
+    if (visited.has(wareId)) return
+    visited.add(wareId)
+    
+    const ware = gameData.waresMap[wareId]
+    if (!ware) return
+    
+    // tier0 资源：添加到结果
+    if (ware.tier === 0) {
+      tier0WareIds.add(wareId)
+      return
+    }
+    
+    // isolated 节点：停止展开
+    if (isolatedWareIds.has(wareId)) return
+    
+    // 找模块，递归展开 inputs
+    const lineage = savedGroup.isLocked 
+      ? (savedGroup.lockedLineage || 'default') 
+      : (savedGroup.subCategory || 'default')
+    const module = gameData.findModuleForWare(wareId, lineage)
+    if (module && module.inputs) {
+      Object.keys(module.inputs).forEach(inputWareId => {
+        trace(inputWareId)
+      })
+    }
   }
   
-  // 3. 构建 GroupSnapshot
-  const groupSnapshot: GroupSnapshot = {
-    id: savedGroup.id,
-    nodes: [],
-    isLocked: savedGroup.isLocked,
-    lockedLineage: savedGroup.lockedLineage,
-    subCategory: savedGroup.subCategory
+  for (const wareId of moduleOutputWareIds) {
+    trace(wareId)
   }
   
-  // 4. 展开并收集 tier0 资源
-  const allNodes: FlowNode[] = []
-  for (const wareId of wareIds) {
-    const result = computeExpandUpstream(ctx, groupSnapshot, wareId, 'manual')
-    allNodes.push(...result.newNodes)
-    groupSnapshot.nodes.push(...result.newNodes)
-  }
-  
-  // 5. 过滤 tier0
-  const tier0WareIds = allNodes
-    .filter(n => {
-      const ware = gameData.waresMap[n.wareId]
-      return ware && ware.tier === 0 && n.wareId !== 'energycells'
-    })
-    .map(n => n.wareId)
-  
-  return [...new Set(tier0WareIds)]
+  return [...tier0WareIds]
 }
 ```
 
@@ -132,6 +138,12 @@ function getTier0ResourcesForGroup(
 - 两个分组标题："星区"和"逻辑组网"
 - 菜单项：`loader-menu-item`
 - 当前选中项高亮
+
+### 刷新按钮布局
+
+- 刷新按钮与 pending 提示共享父元素 `.advanced-refresh-row`
+- 使用 `justify-between` 布局，pending 左对齐，按钮右对齐
+- 当 `hasPendingRefresh === false` 时，整个容器隐藏
 
 ### 样式参考
 
@@ -154,5 +166,17 @@ function getTier0ResourcesForGroup(
 
 .loader-menu-item.active {
   @apply bg-amber-500/20 text-amber-200;
+}
+
+.advanced-refresh-row {
+  @apply flex items-center justify-between gap-2;
+}
+
+.advanced-pending {
+  @apply rounded-md border border-amber-300/20 bg-amber-200/10 px-3 py-2 text-xs text-amber-100/85;
+}
+
+.advanced-refresh-btn {
+  @apply shrink-0 whitespace-nowrap;
 }
 ```

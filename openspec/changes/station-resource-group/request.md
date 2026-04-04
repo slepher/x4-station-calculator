@@ -39,20 +39,18 @@
 
 ### tier0 资源获取流程
 
-1. 遍历 `SavedFlowGroup.nodes`：
-   - `isolated`: `node.isolated` 就是 wareId
+1. 提取 isolated 节点和 module 节点：
+   - `isolated`: 收集到 isolated 集合，用于展开时跳过
    - `module`: 从 `gameData.modulesMap[node.module]` 获取第一个输出 wareId
 
-2. 构建展开上下文：
-   - `ExpandContext`: `{ waresMap, modulesMap, modulesByOutputMap }`（从 `useGameDataStore`）
-   - `GroupSnapshot`: 从 `SavedFlowGroup` 转换
+2. 展开获取 tier0 资源（参照 `computeExpandUpstream`）：
+   - 对每个初始 wareId 递归展开
+   - 如果是 tier0：添加到结果
+   - 如果是 isolated：停止展开（isolated 节点由用户自行管理供应）
+   - 如果是 tier1+：找模块，递归展开 inputs
 
-3. 调用展开算法：
-   - 对每个初始 wareId 调用 `computeExpandUpstream(ctx, groupSnapshot, wareId, 'manual')`
-   - 收集所有 `result.newNodes`
-
-4. 过滤 tier0 资源：
-   - `ware.tier === 0 && wareId !== 'energycells'`
+3. 过滤：
+   - 排除 `energycells`
 
 ### 载入行为
 
@@ -85,6 +83,13 @@
 - 如果某个组展开后没有 tier0 资源，则不为该组创建资源组
 - 如果某个存档的所有组都没有 tier0 资源，则该存档不出现在载入列表中
 
+### 刷新按钮布局
+
+- 将刷新按钮从 `advanced-toolbar` 移动到 `advanced-pending` 右侧
+- 创建共享父元素 `.advanced-refresh-row`
+- 当 `hasPendingRefresh === false` 时，隐藏整个父元素
+- 刷新按钮右对齐
+
 ## 边界
 
 ### In Scope
@@ -113,6 +118,7 @@
 7. 按钮显示当前状态（自定义/载入项名称）
 8. 下拉菜单在面板右侧显示，不遮挡面板内容
 9. 载入后自动刷新候选
+10. 刷新按钮在 pending 提示右侧，无待刷新时隐藏
 
 ## 未决项
 

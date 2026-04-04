@@ -9,13 +9,15 @@ import MapSavePanel from './MapSavePanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
-import { resolveMapSectorByMacro } from './mapSectorMacro'
+import { getSectorScalePerRadius } from '@/components/map/utils/coordinates'
+import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useMapStore } from '@/store/useMapStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 import { useSaveStore } from '@/store/useSaveStore'
-import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem } from '@/types/saveArchive'
+import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -109,11 +111,13 @@ const minScale = ref(1)
 const maxScale = ref(4)
 const scale = ref(0)
 const zoomPercent = ref(0)
+const clusterVisibilityThresholdPx = ref(0)
 
 const panX = ref(0)
 const panY = ref(0)
 
 const isDragging = ref(false)
+const isZooming = ref(false)
 const dragStartX = ref(0)
 const dragStartY = ref(0)
 const dragOriginX = ref(0)
@@ -130,6 +134,7 @@ const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
 const selectedSaveArchive = ref<SaveArchive | null>(null)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
+const excludeConditionalSmallStations = ref(true)
 const savePoiVisibility = ref<SavePoiVisibility>({
   playerStation: false,
   npcStation: false,
@@ -141,6 +146,12 @@ const savePoiVisibility = ref<SavePoiVisibility>({
 })
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
+const settledSavePoiViewportContentBounds = ref<{
+  left: number
+  top: number
+  right: number
+  bottom: number
+} | null>(null)
 const resourcePrimaryColor = ref<string | null>(null)
 const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
@@ -157,10 +168,12 @@ const tooltipPosition = ref({ left: 0, top: 0 })
 const tooltipMeasuredSize = ref({ width: 0, height: 0 })
 const tooltipHideTimer = ref<number | null>(null)
 const zoomRestoreTimer = ref<number | null>(null)
+const zoomSettleTimer = ref<number | null>(null)
 const lastMousePos = ref({ x: 0, y: 0 })
 
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
+const mapStore = useMapStore()
 const saveStore = useSaveStore()
 const empireStore = useEmpireStore()
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
@@ -180,7 +193,7 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
         displayName,
         sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100),
         resources: Array.isArray(sector.resources) ? sector.resources : [],
-        scalePerRadius: Number(sector.normalized?.scale_per_radius || 0)
+        scalePerRadius: getSectorScalePerRadius(sector as any)
       }
     })
   })
@@ -272,9 +285,12 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
   )
 
   return saveStore
-    .getArchivePoiOverlays(selectedSaveArchive.value, activeCategories)
+    .getArchivePoiOverlays(selectedSaveArchive.value, activeCategories, {
+      excludeConditionalSmallStations: excludeConditionalSmallStations.value
+    })
     .map((overlay) => {
-      const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, overlay.sectorMacro)
+      const resolved = mapStore.resolveSectorByMacro?.(overlay.sectorMacro) ||
+        resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, overlay.sectorMacro)
       const sectorData = resolved ? sectorsById.value[resolved.sectorId] : null
       return {
         ...overlay,
@@ -283,13 +299,47 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
     })
 })
 
+const saveSectorLinkOverrides = computed<Record<string, SectorData> | undefined>(() => {
+  if (!isSavePanelOpen.value || !selectedSaveArchive.value) return undefined
+  const next: Record<string, SectorData> = {}
+  let hasItems = false
+
+  Object.entries(selectedSaveArchive.value.sectors).forEach(([sectorMacro, sector]) => {
+    if ((sector.clusterGates?.length || 0) === 0 && (sector.superhighwayGates?.length || 0) === 0) return
+    const resolved = mapStore.resolveSectorByMacro?.(sectorMacro) ||
+      resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
+    if (!resolved?.sectorId) return
+    next[resolved.sectorId] = sector
+    hasItems = true
+  })
+
+  return hasItems ? next : undefined
+})
+
+const liveSavePoiViewportContentBounds = computed(() => {
+  const { width, height } = getViewportSize()
+  if (!width || !height || !scale.value) return null
+  return {
+    left: (-panX.value) / scale.value,
+    top: (-panY.value) / scale.value,
+    right: (width - panX.value) / scale.value,
+    bottom: (height - panY.value) / scale.value
+  }
+})
+
+const savePoiViewportContentBounds = computed(() =>
+  (isDragging.value || isZooming.value)
+    ? settledSavePoiViewportContentBounds.value
+    : liveSavePoiViewportContentBounds.value
+)
+
 const sectorOwnerOverride = computed<Record<string, string> | undefined>(() => {
   if (!isSavePanelOpen.value || !selectedSaveArchive.value) return undefined
   const map: Record<string, string> = {}
   let hasOverride = false
   Object.entries(selectedSaveArchive.value.sectors).forEach(([macro, sector]) => {
     if (sector.owner) {
-      const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, macro)
+      const resolved = mapStore.resolveSectorByMacro(macro)
       if (resolved?.sectorId) {
         map[resolved.sectorId] = sector.owner
         hasOverride = true
@@ -394,8 +444,8 @@ const syncSliderFromScale = () => {
 
 const recomputeScaleBounds = () => {
   if (!imageNaturalWidth.value || !imageNaturalHeight.value) return
-  const { width: vw } = getViewportSize()
-  if (!vw) return
+  const { width: vw, height: vh } = getViewportSize()
+  if (!vw || !vh) return
 
   const fitByWidth = vw / imageNaturalWidth.value
   const nextMin = fitByWidth
@@ -405,6 +455,7 @@ const recomputeScaleBounds = () => {
 
   minScale.value = nextMin
   maxScale.value = nextMax
+  clusterVisibilityThresholdPx.value = Math.min(vw, vh) / 3
   scale.value = clampScale(scale.value || nextMin)
   syncSliderFromScale()
   clampPan(panX.value, panY.value)
@@ -493,6 +544,18 @@ const clearZoomRestoreTimer = () => {
     window.clearTimeout(zoomRestoreTimer.value)
     zoomRestoreTimer.value = null
   }
+}
+
+const clearZoomSettleTimer = () => {
+  if (zoomSettleTimer.value !== null) {
+    window.clearTimeout(zoomSettleTimer.value)
+    zoomSettleTimer.value = null
+  }
+}
+
+const settleZoomViewport = () => {
+  isZooming.value = false
+  settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
 }
 
 const clearBrowserSelection = () => {
@@ -992,17 +1055,42 @@ const onSaveActiveCategoryChange = (category: SavePoiCategory | null) => {
   activeSavePoiCategory.value = category
 }
 
+const resolveSavePoiContentPoint = (poi: SavePoiOverlayItem) => {
+  if (poi.position.tx === undefined || poi.position.ty === undefined) return null
+  const resolved = mapStore.resolveSectorByMacro?.(poi.sectorMacro) ||
+    resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, poi.sectorMacro)
+  if (!resolved) return null
+  const sectorLayout = searchSectors.value.find((item) => item.sectorId === resolved.sectorId)
+  if (!sectorLayout) return null
+  return {
+    x: sectorLayout.centerX + poi.position.tx * sectorLayout.radius,
+    y: sectorLayout.centerY + poi.position.ty * sectorLayout.radius
+  }
+}
+
 const onSavePoiFocus = async (poi: SavePoiOverlayItem) => {
   const viewport = viewportRef.value
   if (!viewport) return
 
-  const targetScale = scale.value < 1 ? clampScale(1) : scale.value
+  const targetScale = maxScale.value
   if (targetScale !== scale.value) {
     scale.value = targetScale
     syncSliderFromScale()
     await nextTick()
   }
   focusedSavePoiKey.value = poi.key
+  savePoiTooltipItem.value = poi
+
+  const contentPoint = resolveSavePoiContentPoint(poi)
+  if (contentPoint) {
+    const viewportRect = viewport.getBoundingClientRect()
+    clampPan(
+      viewportRect.width / 2 - contentPoint.x * scale.value,
+      viewportRect.height / 2 - contentPoint.y * scale.value
+    )
+    return
+  }
+
   await nextTick()
   focusOverlayInViewport(viewport, `[data-save-poi-key="${poi.key}"]`, {
     panX: panX.value,
@@ -1093,16 +1181,23 @@ const onWheel = (event: WheelEvent) => {
   const nextScale = clampScale(scale.value * factor)
   if (nextScale === scale.value) return
 
+  isZooming.value = true
+  clearZoomSettleTimer()
   scale.value = nextScale
   const nextPanX = mouseX - contentX * nextScale
   const nextPanY = mouseY - contentY * nextScale
   clampPan(nextPanX, nextPanY)
   syncSliderFromScale()
+  zoomSettleTimer.value = window.setTimeout(() => {
+    settleZoomViewport()
+    zoomSettleTimer.value = null
+  }, 120)
   scheduleZoomTooltipRestore()
 }
 
 const stopDrag = () => {
   isDragging.value = false
+  settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
   if (!draggingPlacementItem.value) return
   if (placementPreview.value) {
     applyLocationToItem(draggingPlacementItem.value, placementPreview.value.location)
@@ -1158,6 +1253,11 @@ const onSavePoiPointerDown = (poi: SavePoiOverlayItem) => {
   savePoiTooltipItem.value = poi
 }
 
+const closeSavePoiTooltip = () => {
+  savePoiTooltipItem.value = null
+  focusedSavePoiKey.value = null
+}
+
 watch(isResourcePanelOpen, async () => {
   await nextTick()
   recomputeScaleBounds()
@@ -1184,6 +1284,11 @@ watch(hoveredSector, () => {
   void syncTooltipMeasurement()
 })
 
+watch(liveSavePoiViewportContentBounds, (bounds) => {
+  if (isDragging.value || isZooming.value) return
+  settledSavePoiViewportContentBounds.value = bounds
+}, { immediate: true })
+
 onMounted(() => {
   window.addEventListener('resize', onResize)
   if (typeof ResizeObserver !== 'undefined' && viewportRef.value) {
@@ -1200,6 +1305,7 @@ onBeforeUnmount(() => {
   viewportResizeObserver.value = null
   clearTooltipHideTimer()
   clearZoomRestoreTimer()
+  clearZoomSettleTimer()
 })
 </script>
 
@@ -1235,10 +1341,12 @@ onBeforeUnmount(() => {
         :open="isSavePanelOpen"
         :archive="selectedSaveArchive"
         :visibility="savePoiVisibility"
+        :exclude-conditional-small-stations="excludeConditionalSmallStations"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
         @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
+        @exclude-conditional-small-stations-change="excludeConditionalSmallStations = $event"
         @focus-poi="onSavePoiFocus"
       />
 
@@ -1272,9 +1380,19 @@ onBeforeUnmount(() => {
               :selected-sector-id="selectedSectorId"
               :placement-overlays="placementOverlays"
               :placement-preview="isStationPanelOpen ? placementPreview : null"
+              :is-dragging="isDragging"
+              :is-zooming="isZooming"
               :dragging-overlay-key="draggingOverlayKey"
               :focused-overlay-key="focusedPlacementKey"
               :save-poi-overlays="savePoiOverlays"
+              :save-sectors="saveSectorLinkOverrides"
+              :viewport-content-bounds="liveSavePoiViewportContentBounds"
+              :sector-viewport-content-bounds="savePoiViewportContentBounds"
+              :min-scale="minScale"
+              :max-scale="maxScale"
+              :current-scale="scale"
+              :zoom-progress="zoomPercent / 100"
+              :cluster-visibility-threshold-px="clusterVisibilityThresholdPx"
               :focused-save-poi-key="focusedSavePoiKey"
               :sector-owner-override="sectorOwnerOverride"
               :cluster-owner-override="clusterOwnerOverride"
@@ -1307,20 +1425,6 @@ onBeforeUnmount(() => {
             />
           </div>
 
-          <div
-            v-if="savePoiTooltipItem"
-            class="save-poi-tooltip-layer"
-            @mousedown.stop
-          >
-            <MapSavePoiTooltip :poi="savePoiTooltipItem" />
-            <button
-              class="tooltip-close"
-              type="button"
-              @click="savePoiTooltipItem = null"
-            >
-              ×
-            </button>
-          </div>
         </div>
 
         <div class="map-search-panel left-6 top-5" @mousedown.stop>
@@ -1453,20 +1557,29 @@ onBeforeUnmount(() => {
           </button>
         </div>
 
-        <div class="zoom-panel right-6 bottom-5">
-          <div class="zoom-label-row">
-            <span class="zoom-label">{{ t('map.scale') }}</span>
-            <span class="zoom-value">{{ displayScaleText }}</span>
+        <div class="map-right-stack" @mousedown.stop>
+          <div
+            v-if="savePoiTooltipItem"
+            class="save-poi-tooltip-layer"
+          >
+            <MapSavePoiTooltip :poi="savePoiTooltipItem" @close="closeSavePoiTooltip" />
           </div>
-          <input
-            class="zoom-slider"
-            type="range"
-            min="0"
-            max="100"
-            step="0.5"
-            :value="zoomPercent"
-            @input="onSliderInput"
-          />
+
+          <div class="zoom-panel">
+            <div class="zoom-label-row">
+              <span class="zoom-label">{{ t('map.scale') }}</span>
+              <span class="zoom-value">{{ displayScaleText }}</span>
+            </div>
+            <input
+              class="zoom-slider"
+              type="range"
+              min="0"
+              max="100"
+              step="0.5"
+              :value="zoomPercent"
+              @input="onSliderInput"
+            />
+          </div>
         </div>
       </div>
     </div>
@@ -1626,8 +1739,12 @@ onBeforeUnmount(() => {
   @apply px-3 py-4 text-center text-xs text-amber-100/55;
 }
 
+.map-right-stack {
+  @apply absolute right-6 bottom-5 z-30 flex flex-col items-end gap-2;
+}
+
 .zoom-panel {
-  @apply absolute z-10 rounded-md border border-amber-300/40 bg-black/70 px-3 py-2;
+  @apply rounded-md border border-amber-300/40 bg-black/70 px-3 py-2;
   width: 220px;
   backdrop-filter: blur(4px);
 }
@@ -1659,10 +1776,6 @@ onBeforeUnmount(() => {
 }
 
 .save-poi-tooltip-layer {
-  @apply absolute z-30 bottom-20 right-6 flex items-start gap-2;
-}
-
-.tooltip-close {
-  @apply w-6 h-6 flex items-center justify-center rounded-full bg-black/60 text-amber-100/60 hover:text-amber-50 hover:bg-black/80 transition-colors;
+  @apply w-auto;
 }
 </style>

@@ -33,9 +33,13 @@ import {
   CURRENT_POST_PROCESSOR_VERSION,
   postProcessRustSaveArchive
 } from '@/workers/saveParser.post'
-
+import { shouldHideSavePoiSmallIconAtClusterOverview } from '@/components/map/utils/style'
 const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'xenonStation', 'khaakStation', 'abandonedShip', 'datavault', 'erlkingVault']
 const SAVE_ARCHIVES_STATE_VERSION = 1
+
+type SavePoiFilterOptions = {
+  excludeConditionalSmallStations?: boolean
+}
 
 function normalizeVersion(v: string): string {
   const trimmed = v.trim()
@@ -60,6 +64,10 @@ function createEmptySectorData(name: string): SectorData {
     name,
     is_known: false,
     owner: undefined,
+    scale_per_radius: undefined,
+    clusterGates: [],
+    superhighwayGates: [],
+    highways: [],
     playerStations: [],
     xenonStations: [],
     khaakStations: [],
@@ -118,13 +126,13 @@ function createPoiCategoryData<T>(
 
 function buildPoiGroups<T>(
   sectors: Record<string, SectorData>,
-  extractor: (sector: SectorData) => T[]
+  extractor: (sectorMacro: string, sector: SectorData) => T[]
 ): SavePoiSectorGroup<T>[] {
   return Object.entries(sectors)
     .map(([sectorMacro, sector]) => ({
       sectorMacro,
       sectorName: sector.name,
-      items: extractor(sector)
+      items: extractor(sectorMacro, sector)
     }))
     .filter((group) => group.items.length > 0)
 }
@@ -144,32 +152,48 @@ function createOverlayItem(
     owner,
     sectorMacro,
     sectorName,
-    pos: { x: item.position.x, z: item.position.z },
+    position: { x: item.position.x, y: item.position.y, z: item.position.z, tx: item.position.tx, ty: item.position.ty },
     tag: isStation && 'tag' in item ? item.tag : undefined,
     factoryGroup: isStation && 'factoryGroup' in item ? item.factoryGroup : undefined,
     is_headquarter: isStation && 'is_headquarter' in item ? item.is_headquarter : undefined
   }
 }
 
-export function deriveSavePoiCategoryData(archive: SaveArchive | null | undefined): SavePoiCategoryDataMap {
+function shouldIncludePoiItem(
+  category: SavePoiCategory,
+  sectorMacro: string,
+  sectorName: string,
+  item: StationEntry | DatavaultEntry | AbandonedShipEntry,
+  options?: SavePoiFilterOptions
+): boolean {
+  if (!options?.excludeConditionalSmallStations) return true
+  return !shouldHideSavePoiSmallIconAtClusterOverview(
+    createOverlayItem(category, sectorMacro, sectorName, item)
+  )
+}
+
+export function deriveSavePoiCategoryData(
+  archive: SaveArchive | null | undefined,
+  options?: SavePoiFilterOptions
+): SavePoiCategoryDataMap {
   const sectors = archive?.sectors || {}
 
   return {
-    playerStation: createPoiCategoryData('playerStation', buildPoiGroups(sectors, (sector) =>
-      sector.playerStations || []
+    playerStation: createPoiCategoryData('playerStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
+      (sector.playerStations || []).filter((item) => shouldIncludePoiItem('playerStation', sectorMacro, sector.name, item, options))
     )),
-    npcStation: createPoiCategoryData('npcStation', buildPoiGroups(sectors, (sector) =>
-      sector.npcStations || []
+    npcStation: createPoiCategoryData('npcStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
+      (sector.npcStations || []).filter((item) => shouldIncludePoiItem('npcStation', sectorMacro, sector.name, item, options))
     )),
-    xenonStation: createPoiCategoryData('xenonStation', buildPoiGroups(sectors, (sector) =>
-      sector.xenonStations || []
+    xenonStation: createPoiCategoryData('xenonStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
+      (sector.xenonStations || []).filter((item) => shouldIncludePoiItem('xenonStation', sectorMacro, sector.name, item, options))
     )),
-    khaakStation: createPoiCategoryData('khaakStation', buildPoiGroups(sectors, (sector) =>
-      sector.khaakStations || []
+    khaakStation: createPoiCategoryData('khaakStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
+      (sector.khaakStations || []).filter((item) => shouldIncludePoiItem('khaakStation', sectorMacro, sector.name, item, options))
     )),
-    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (sector) => sector.abandonedShips || [])),
-    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (sector) => sector.datavaults || [])),
-    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (sector) => sector.erlkingVaults || []))
+    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.abandonedShips || [])),
+    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.datavaults || [])),
+    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.erlkingVaults || []))
   }
 }
 
@@ -193,6 +217,10 @@ function normalizeSectorData(
   const normalized = createEmptySectorData(sector.name || sectorId)
   normalized.is_known = Boolean(sector.is_known)
   normalized.owner = sector.owner
+  normalized.scale_per_radius = typeof sector.scale_per_radius === 'number' ? sector.scale_per_radius : undefined
+  normalized.clusterGates = Array.isArray(sector.clusterGates) ? sector.clusterGates : []
+  normalized.superhighwayGates = Array.isArray(sector.superhighwayGates) ? sector.superhighwayGates : []
+  normalized.highways = Array.isArray(sector.highways) ? sector.highways : []
   normalized.datavaults = Array.isArray(sector.datavaults)
     ? sector.datavaults.map((entry) => ({
       ...entry,
@@ -253,7 +281,13 @@ function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
       version: meta.version,
       filename: meta.filename,
       parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
-      post_processor_version: meta.post_processor_version === 'v1' ? 'v1' : meta.post_processor_version === 'v2' ? 'v2' : undefined,
+      post_processor_version: meta.post_processor_version === 'v1'
+        ? 'v1'
+        : meta.post_processor_version === 'v2'
+          ? 'v2'
+          : meta.post_processor_version === 'v3' || meta.post_processor_version === 'v4'
+            ? 'v3'
+            : undefined,
       source: meta.source
     },
     sectors: {},
@@ -595,6 +629,8 @@ export const useSaveStore = defineStore('save', () => {
             ? 'v1'
             : meta.post_processor_version === 'v2'
               ? 'v2'
+              : meta.post_processor_version === 'v3' || meta.post_processor_version === 'v4'
+                ? 'v3'
               : undefined,
           source: 'imported'
         },
@@ -621,15 +657,19 @@ export const useSaveStore = defineStore('save', () => {
     parseError.value = error
   }
 
-  function getArchivePoiCategories(archive: SaveArchive | null | undefined): SavePoiCategoryDataMap {
-    return deriveSavePoiCategoryData(archive)
+  function getArchivePoiCategories(
+    archive: SaveArchive | null | undefined,
+    options?: SavePoiFilterOptions
+  ): SavePoiCategoryDataMap {
+    return deriveSavePoiCategoryData(archive, options)
   }
 
   function getArchivePoiOverlays(
     archive: SaveArchive | null | undefined,
-    categories: SavePoiCategory[] = SAVE_POI_CATEGORIES
+    categories: SavePoiCategory[] = SAVE_POI_CATEGORIES,
+    options?: SavePoiFilterOptions
   ): SavePoiOverlayItem[] {
-    return flattenSavePoiCategoryData(getArchivePoiCategories(archive), categories)
+    return flattenSavePoiCategoryData(getArchivePoiCategories(archive, options), categories)
   }
 
   return {

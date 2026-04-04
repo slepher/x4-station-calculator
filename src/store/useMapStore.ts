@@ -1,7 +1,9 @@
 import { defineStore } from 'pinia'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { useI18n } from 'vue-i18n'
+import type { X4MapSector } from '@/types/x4'
+import type { ResolvedMapSector } from '@/components/map/mapSectorMacro'
 
 type SectorInfo = {
   id: string
@@ -17,6 +19,7 @@ type SectorInfo = {
 export const useMapStore = defineStore('map', () => {
   const { t, te } = useI18n()
   const gameDataStore = useGameDataStore()
+  const sectorMacroIndex = ref<Map<string, ResolvedMapSector<X4MapSector>>>(new Map())
 
   const sectorsById = computed<Record<string, SectorInfo>>(() => {
     const out: Record<string, SectorInfo> = {}
@@ -61,6 +64,37 @@ export const useMapStore = defineStore('map', () => {
     return out
   })
 
+  function normalizeMacro(value: string | null | undefined): string {
+    return (value || '').trim().toLowerCase()
+  }
+
+  function initialize() {
+    const nextIndex = new Map<string, ResolvedMapSector<X4MapSector>>()
+    const clusters = gameDataStore.maps?.clusters || {}
+
+    Object.entries(clusters).forEach(([clusterId, cluster]) => {
+      if (gameDataStore.enforceDlcActivation && !gameDataStore.isDlcActive(cluster.dlc_tag)) {
+        return
+      }
+      Object.entries(cluster.sectors || {}).forEach(([sectorId, sector]) => {
+        const resolved = { clusterId, sectorId, sector }
+        const normalizedSectorId = normalizeMacro(sectorId)
+        if (normalizedSectorId) nextIndex.set(normalizedSectorId, resolved)
+
+        const normalizedSectorMacro = normalizeMacro(sector.macro || sector.id)
+        if (normalizedSectorMacro) nextIndex.set(normalizedSectorMacro, resolved)
+      })
+    })
+
+    sectorMacroIndex.value = nextIndex
+  }
+
+  function resolveSectorByMacro(macro: string | null | undefined): ResolvedMapSector<X4MapSector> | null {
+    const normalizedMacro = normalizeMacro(macro)
+    if (!normalizedMacro) return null
+    return sectorMacroIndex.value.get(normalizedMacro) || null
+  }
+
   function getSectorInfo(sectorId: string): SectorInfo | undefined {
     return sectorsById.value[sectorId]
   }
@@ -70,7 +104,9 @@ export const useMapStore = defineStore('map', () => {
   }
 
   return {
+    initialize,
     sectorsById,
+    resolveSectorByMacro,
     getSectorInfo,
     getSectorDisplayName
   }

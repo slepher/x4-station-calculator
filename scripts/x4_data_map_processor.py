@@ -2789,12 +2789,11 @@ def generate_map_data(
                 zone_macro = macro_node.get("ref") if macro_node is not None else None
                 if not zone_macro:
                     continue
-                zone_offsets_by_sector[sector_macro][zone_macro] = pos_from(conn)
+                zone_offsets_by_sector[sector_macro][zone_macro] = pos3d_from(conn)
                 zone_key = zone_macro.lower()
                 sectors[sector_macro]["zone_ids"].append(zone_key)
                 sectors[sector_macro]["zones"][zone_key] = {
                     "id": zone_key,
-                    "position": pos3d_from(conn),
                 }
             for conn in sector_macro_node.findall("./connections/connection[@ref='zonehighways']"):
                 macro_node = conn.find("./macro")
@@ -3147,13 +3146,18 @@ def generate_map_data(
         if sector["cluster_id"]:
             cluster_to_sectors[sector["cluster_id"]].append(sector_id)
 
+    def snap_sector_center(value: float) -> float:
+        return round(value / 64000.0) * 64000.0
+
     sector_point_sets: Dict[str, Dict[str, Dict[str, float]]] = defaultdict(dict)
+    sector_zone_points: Dict[str, List[Dict[str, float]]] = defaultdict(list)
     for sector_id, sector in sectors.items():
         for gate_id in sector["cluster_gate_ids"]:
             sector_point_sets[sector_id][gate_id] = cluster_links[gate_id]["raw_local_pos"]
     for zone_id, zone in zones.items():
-        if zone["kind"] == "shcon":
-            sector_point_sets[zone["sector_id"]][zone_id] = zone["raw_local_pos"]
+        sector_point_sets[zone["sector_id"]][zone_id] = zone["raw_local_pos"]
+        sector_zone_points[zone["sector_id"]].append(zone["raw_local_pos"])
+    sector_centers: Dict[str, Dict[str, float]] = {}
     for cluster_id, sector_ids in cluster_to_sectors.items():
         local_positions = {sector_id: sectors[sector_id]["raw_local_pos"] for sector_id in sector_ids}
         template_kind, slot_map, slot_positions = choose_sector_template(local_positions)
@@ -3162,7 +3166,23 @@ def generate_map_data(
             slot_name = slot_map.get(sector_id, "single")
             offset_ratio = slot_positions.get(slot_name, {"x": 0.0, "y": 0.0})
             point_set = sector_point_sets.get(sector_id, {})
-            max_extent = max((math.hypot(point["x"], point["z"]) for point in point_set.values()), default=1.0)
+            zone_points = sector_zone_points.get(sector_id, [])
+            if zone_points:
+                min_x = min(point["x"] for point in zone_points)
+                max_x = max(point["x"] for point in zone_points)
+                min_z = min(point["z"] for point in zone_points)
+                max_z = max(point["z"] for point in zone_points)
+                min_y = min(point.get("y", 0.0) for point in zone_points)
+                max_y = max(point.get("y", 0.0) for point in zone_points)
+                sector_center = {"x": snap_sector_center((min_x + max_x) / 2.0), "y": (min_y + max_y) / 2.0, "z": snap_sector_center((min_z + max_z) / 2.0)}
+            else:
+                sector_center = {"x": 0.0, "y": 0.0, "z": 0.0}
+            sector_centers[sector_id] = sector_center
+            centered_points = [
+                {"x": point["x"] - sector_center["x"], "z": point["z"] - sector_center["z"]}
+                for point in point_set.values()
+            ]
+            max_extent = max((math.hypot(point["x"], point["z"]) for point in centered_points), default=1.0)
             inner_ratio = math.sqrt(3.0) / 2.0
             extent_ratio = 0.8
             scale_per_radius = (inner_ratio * extent_ratio) / max(1.0, max_extent)
@@ -3178,45 +3198,50 @@ def generate_map_data(
                     "max_extent": max_extent,
                 },
             }
+            sectors[sector_id]["raw_center_pos"] = {"x": sector_center["x"], "y": sector_center["y"], "z": sector_center["z"]}
 
     for gate_id, gate in cluster_links.items():
         sector_id = gate["sector_id"]
         sector_norm = sectors[sector_id]["normalized"]
         scale_per_radius = sector_norm["scale_per_radius"]
+        sector_center = sector_centers.get(sector_id, {"x": 0.0, "y": 0.0, "z": 0.0})
         raw = gate["raw_local_pos"]
         gate["raw_local_pos"] = {
             "x": raw["x"],
             "z": raw["z"],
-            "sx": raw["x"] * scale_per_radius,
-            "sy": -raw["z"] * scale_per_radius,
+            "sx": (raw["x"] - sector_center["x"]) * scale_per_radius,
+            "sy": -(raw["z"] - sector_center["z"]) * scale_per_radius,
         }
 
     for zone_id, zone in zones.items():
         sector_id = zone["sector_id"]
         sector_norm = sectors[sector_id]["normalized"]
         scale_per_radius = sector_norm["scale_per_radius"]
+        sector_center = sector_centers.get(sector_id, {"x": 0.0, "y": 0.0, "z": 0.0})
         raw = zone["raw_local_pos"]
         zone["raw_local_pos"] = {
             "x": raw["x"],
+            "y": raw.get("y", 0.0),
             "z": raw["z"],
-            "sx": raw["x"] * scale_per_radius,
-            "sy": -raw["z"] * scale_per_radius,
+            "sx": (raw["x"] - sector_center["x"]) * scale_per_radius,
+            "sy": -(raw["z"] - sector_center["z"]) * scale_per_radius,
         }
 
     for highway_id, highway in sector_highways.items():
         sector_id = highway["sector_id"]
         sector_norm = sectors[sector_id]["normalized"]
         scale_per_radius = sector_norm["scale_per_radius"]
+        sector_center = sector_centers.get(sector_id, {"x": 0.0, "y": 0.0, "z": 0.0})
         highway["entry_sr"] = {
-            "sx": highway["entry_pos"]["x"] * scale_per_radius,
-            "sy": -highway["entry_pos"]["z"] * scale_per_radius,
+            "sx": (highway["entry_pos"]["x"] - sector_center["x"]) * scale_per_radius,
+            "sy": -(highway["entry_pos"]["z"] - sector_center["z"]) * scale_per_radius,
         }
         highway["exit_sr"] = {
-            "sx": highway["exit_pos"]["x"] * scale_per_radius,
-            "sy": -highway["exit_pos"]["z"] * scale_per_radius,
+            "sx": (highway["exit_pos"]["x"] - sector_center["x"]) * scale_per_radius,
+            "sy": -(highway["exit_pos"]["z"] - sector_center["z"]) * scale_per_radius,
         }
         highway["spline_sr"] = [
-            {"sx": point["x"] * scale_per_radius, "sy": -point["z"] * scale_per_radius}
+            {"sx": (point["x"] - sector_center["x"]) * scale_per_radius, "sy": -(point["z"] - sector_center["z"]) * scale_per_radius}
             for point in highway["spline"]
         ]
 
@@ -3271,11 +3296,12 @@ def generate_map_data(
 
             sector_norm = sectors[sector_id]["normalized"]
             scale_per_radius = sector_norm["scale_per_radius"]
+            sector_center = sector_centers.get(sector_id, {"x": 0.0, "z": 0.0})
             station_sector_pos = {
                 "x": raw_sector_pos["x"],
                 "z": raw_sector_pos["z"],
-                "sx": raw_sector_pos["x"] * scale_per_radius,
-                "sy": -raw_sector_pos["z"] * scale_per_radius,
+                "sx": (raw_sector_pos["x"] - sector_center["x"]) * scale_per_radius,
+                "sy": -(raw_sector_pos["z"] - sector_center["z"]) * scale_per_radius,
             }
 
             select = station_node.find("./station/select")
@@ -3389,13 +3415,30 @@ def generate_map_data(
         if not cluster_id or cluster_id not in nested_clusters:
             continue
         nested_sector = {
-            key: value
-            for key, value in sector.items()
-            if key not in {"zone_ids", "cluster_gate_ids", "highway_ids"}
+            "id": sector.get("id"),
+            "cluster_id": sector.get("cluster_id"),
+            "nameId": sector.get("nameId"),
+            "name": sector.get("name"),
+            "owner": sector.get("owner"),
+            "owner_color": sector.get("owner_color"),
+            "area": sector.get("area"),
+            "raw_local_pos": sector.get("raw_local_pos"),
+            "raw_world_pos": sector.get("raw_world_pos"),
+            "raw_center_pos": sector.get("raw_center_pos"),
+            "normalized": sector.get("normalized"),
+            "zones": sector.get("zones", {}),
         }
         nested_sector["cluster_gates"] = {}
         nested_sector["highways"] = {}
         nested_sector["stations"] = []
+        if "has_khaak_hive" in sector:
+            nested_sector["has_khaak_hive"] = sector.get("has_khaak_hive")
+        if "khaak_hive_sources" in sector:
+            nested_sector["khaak_hive_sources"] = sector.get("khaak_hive_sources")
+        if "regions" in sector:
+            nested_sector["regions"] = sector.get("regions")
+        if "resources" in sector:
+            nested_sector["resources"] = sector.get("resources")
         nested_clusters[cluster_id]["sectors"][sector_id] = nested_sector
 
     for zone_id, zone in zones.items():

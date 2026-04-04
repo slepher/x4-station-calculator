@@ -40,8 +40,37 @@ export interface SaveMeta {
   version: string
   filename: string
   parser_version: 'v1' | 'v2'
-  post_processor_version?: 'v1' | 'v2'
+  post_processor_version?: 'v1' | 'v2' | 'v3' | 'v4'
   source: SaveSource
+}
+
+export interface SaveSectorStaticPosition {
+  x: number
+  y: number
+  z: number
+  tx?: number
+  ty?: number
+}
+
+export interface SaveSectorClusterGateEntry {
+  id: string
+  target_cluster_id?: string
+  position: SaveSectorStaticPosition
+}
+
+export interface SaveSectorSuperhighwayGateEntry {
+  id: string
+  link_id: string
+  zone_id: string
+  target_sector_id?: string
+  position: SaveSectorStaticPosition
+}
+
+export interface SaveSectorHighwayEntry {
+  id: string
+  entry: SaveSectorStaticPosition
+  exit: SaveSectorStaticPosition
+  spline?: SaveSectorStaticPosition[]
 }
 
 export interface StationEquipment {
@@ -78,7 +107,7 @@ export interface StationBaseEntry {
   owner: string
   relative_position: { x: number; y: number; z: number }
   zone_id?: string
-  position: { x: number; y: number; z: number }
+  position: SaveSectorStaticPosition
   is_wreck?: boolean
   is_headquarter?: boolean
   tag?: string
@@ -140,7 +169,7 @@ export interface DatavaultEntry {
   owner: string
   relative_position: { x: number; y: number; z: number }
   zone_id?: string
-  position: { x: number; y: number; z: number }
+  position: SaveSectorStaticPosition
   unlocked: boolean
   wares?: DatavaultWareEntry[]
   has_blueprints?: boolean
@@ -154,13 +183,17 @@ export interface AbandonedShipEntry {
   class: string
   relative_position: { x: number; y: number; z: number }
   zone_id?: string
-  position: { x: number; y: number; z: number }
+  position: SaveSectorStaticPosition
 }
 
 export interface SectorData {
   name: string
   is_known: boolean
   owner?: string
+  scale_per_radius?: number
+  clusterGates?: SaveSectorClusterGateEntry[]
+  superhighwayGates?: SaveSectorSuperhighwayGateEntry[]
+  highways?: SaveSectorHighwayEntry[]
   playerStations?: PlayerStationEntry[]
   xenonStations?: FactionStationEntry[]
   khaakStations?: FactionStationEntry[]
@@ -210,7 +243,7 @@ export interface SavePoiOverlayItem {
   owner?: string
   sectorMacro: string
   sectorName: string
-  pos: { x: number; z: number }
+  position: SaveSectorStaticPosition
   tag?: string
   factoryGroup?: string
   is_headquarter?: boolean
