@@ -20,7 +20,7 @@ import type {
   SectorResourceFill
 } from '@/components/map/types'
 import { useMapSvgLayout } from '@/composables/useMapSvgLayout'
-import { useMapSvgLinks } from '@/composables/useMapSvgLinks'
+import { useMapSvgLinks, type MapGateCircle, type MapSectorLinkLine } from '@/composables/useMapSvgLinks'
 import { useMapSvgOverlays } from '@/composables/useMapSvgOverlays'
 import { useMapSvgSectors } from '@/composables/useMapSvgSectors'
 import MapLinkLayer from '@/components/map/layers/MapLinkLayer.vue'
@@ -119,6 +119,7 @@ const emit = defineEmits<{
   (e: 'sector-hover', payload: SectorHoverPayload): void
   (e: 'sector-leave', sectorId: string): void
   (e: 'overlay-pointerdown', payload: PlacementOverlay): void
+  (e: 'screen-link-icons', payload: { sectorLinkLines: MapSectorLinkLine[]; gateCircles: MapGateCircle[] }): void
   (e: 'save-poi-faction-filters', payload: Array<{ id: string; matrix: string }>): void
   (e: 'save-poi-screen-items', payload: Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }>): void
 }>()
@@ -274,6 +275,10 @@ watchEffect(() => {
     clusterRefHeight: layoutState.value.clusterRadius * 2
   })
   emit('sector-layout', sectorLayouts.value)
+  emit('screen-link-icons', {
+    sectorLinkLines: sectorLinkLines.value,
+    gateCircles: gateCircles.value
+  })
   emit('save-poi-faction-filters', factionColorFilters.value)
   emit('save-poi-screen-items', savePoiScreenItems.value)
 })

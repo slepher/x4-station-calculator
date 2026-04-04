@@ -8,6 +8,7 @@ import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue
 import MapSavePanel from './MapSavePanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
+import MapLinkIconScreenLayer from './MapLinkIconScreenLayer.vue'
 import MapSavePoiScreenLayer from './MapSavePoiScreenLayer.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { getSectorScalePerRadius } from '@/components/map/utils/coordinates'
@@ -20,6 +21,7 @@ import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 import { useSaveStore } from '@/store/useSaveStore'
 import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
+import type { MapGateCircle, MapSectorLinkLine } from '@/composables/useMapSvgLinks'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -137,6 +139,8 @@ const isSavePanelOpen = ref(false)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
+const screenSectorLinkLines = ref<MapSectorLinkLine[]>([])
+const screenGateCircles = ref<MapGateCircle[]>([])
 const savePoiFactionFilters = ref<Array<{ id: string; matrix: string }>>([])
 const savePoiScreenItems = ref<Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }>>([])
 const settledSavePoiViewportContentBounds = ref<{
@@ -1255,6 +1259,11 @@ const onSavePoiFactionFiltersChange = (filters: Array<{ id: string; matrix: stri
   savePoiFactionFilters.value = filters
 }
 
+const onScreenLinkIconsChange = (payload: { sectorLinkLines: MapSectorLinkLine[]; gateCircles: MapGateCircle[] }) => {
+  screenSectorLinkLines.value = payload.sectorLinkLines
+  screenGateCircles.value = payload.gateCircles
+}
+
 const closeSavePoiTooltip = () => {
   savePoiTooltipItem.value = null
   focusedSavePoiKey.value = null
@@ -1367,6 +1376,14 @@ onBeforeUnmount(() => {
           @dragover="onViewportDragOver"
           @drop="onViewportDrop"
         >
+          <MapLinkIconScreenLayer
+            :sector-link-lines="screenSectorLinkLines"
+            :gate-circles="screenGateCircles"
+            :screen-scale="scale"
+            :pan-x="panX"
+            :pan-y="panY"
+            :stargate-visual-scale="1.5"
+          />
           <MapSavePoiScreenLayer
             :items="savePoiScreenItems"
             :faction-filters="savePoiFactionFilters"
@@ -1409,6 +1426,7 @@ onBeforeUnmount(() => {
               :sector-owner-override="sectorOwnerOverride"
               :cluster-owner-override="clusterOwnerOverride"
               :faction-color-map="factionColorMap"
+              @screen-link-icons="onScreenLinkIconsChange"
               @save-poi-faction-filters="onSavePoiFactionFiltersChange"
               @save-poi-screen-items="onSavePoiScreenItemsChange"
               @content-size="onCanvasSize"
