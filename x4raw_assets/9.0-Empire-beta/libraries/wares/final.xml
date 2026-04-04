@@ -3059,7 +3059,7 @@
     </sources>
   </ware>
   <ware id="inv_spacedyepizza" name="{20201,56501}" description="{20201,56502}" group="luxuryitem" transport="inventory" volume="1" tags="bribe crafting inventory">
-    <price min="9241" average="10871" max="120502"/>
+    <price min="9241" average="10871" max="12502"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
         <ware ware="inv_cahoonas" amount="3"/>

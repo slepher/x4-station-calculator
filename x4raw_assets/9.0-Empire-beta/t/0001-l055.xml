@@ -67813,7 +67813,7 @@
     <t id="8202">(Description)Agora que a paz entre as facções Paranid finalmente foi alcançada, Boso Ta e Dal Busta estão ansiosos para começar a etapa final do plano. Volte ao seu Quartel General para receber instruções detalhadas.</t>
     <t id="8203">(Description for female player){30220,8202}</t>
     <t id="8204">(Reward)Unificação Paranid</t>
-    <t id="8205">(Description update)Dal Busta e Boso Ta revelaram a etapa final de seu plano para facilitar a unificação Paranid. Em primeiro lugar, os regentes do Conclave Sagrado (o mesmo que {20103,2201}) exigem uma vasta quantidade de itens de construção e… itens relacionados com o embelezamento de seu interior para transformá-lo em um palácio digno de um Pontífice. Em segundo lugar, Boso Ta exigirá suprimentos científicos e uma quantidade substancial de financiamento para continuar sua pesquisa sobre os casulos Paranid roubados e ajudar Kromancketslat a encontrar o candidato perfeito para o Terceiro Pontífice.</t>
+    <t id="8205">(Description update)Dal Busta e Boso Ta revelaram a etapa final de seu plano para facilitar a unificação Paranid. Em primeiro lugar, os regentes do Conclave Sagrado (o mesmo que {20103,2201}) exigem uma vasta quantidade de itens de construção e... itens relacionados com o embelezamento de seu interior para transformá-lo em um palácio digno de um Pontífice. Em segundo lugar, Boso Ta exigirá suprimentos científicos e uma quantidade substancial de financiamento para continuar sua pesquisa sobre os casulos Paranid roubados e ajudar Kromancketslat a encontrar o candidato perfeito para o Terceiro Pontífice.</t>
     <t id="8206">(Description update for female player){30220,8205}</t>
     <t id="8207">(Diplomatic and economic effect info)Unificar a Ordem Sagrada do Pontífice e o Reino Divino dos Paranid sob uma Trindade de Pontífices trará estabilidade ao reino Paranid, fortalecendo-o contra possíveis rivais.</t>
     <t id="8208">(Diplomatic and economic effect info 2)A dissolução do paradoxo geométrico servirá para aplacar a antiga Ordem Sagrada do Pontífice, terminando a guerra contra Argon e provavelmente levando a uma demanda geral reduzida por equipamento militar.</t>
@@ -68052,8 +68052,8 @@
     <t id="1156">(Player Choice)Sobre as Famílias Livres...</t>
     <t id="1157">(Player Choice)E quanto a Família Tkr?</t>
     <t id="1158">(Player Choice)As Famílias se opõe ao controle do Patriarcado?</t>
-    <t id="1159">(Player Choice)Na presença patriarcal…</t>
-    <t id="1160">(Player Choice)Sobre escravidão…</t>
+    <t id="1159">(Player Choice)Na presença patriarcal...</t>
+    <t id="1160">(Player Choice)Sobre escravidão...</t>
     <t id="1161">(Player Choice)A escravidão um dia será abolida??</t>
     <t id="1162">(Tooltip for an unselectable Player Choice)Consiga informações o suficiente.</t>
     <t id="1170">(Objective - Transport: NPC-Name )em uma Nave Tamanho P</t>
