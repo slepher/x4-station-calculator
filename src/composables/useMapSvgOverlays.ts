@@ -261,7 +261,7 @@ export function useMapSvgOverlays(args: {
         }
         const iconSize = isLargeSavePoiIcon(poi)
           ? largeIconScreenSize / clampedScale
-          : SMALL_ICON_SIZE * Math.max(1, clampedScale)
+          : SMALL_ICON_SIZE
 
         const factionId = getPoiFactionId(poi)
         const factionColor = factionId && factionColorMap?.[factionId] ? factionColorMap[factionId] : null
