@@ -832,8 +832,8 @@
     "amount": 1,
     "lifetime": 9.5,
     "range": 12000.0,
-    "explosive": 935.0,
-    "reload": 7.5,
+    "explosive": 1100.0,
+    "reload": 8.0,
     "hull": 1.0,
     "resilience": 0.977,
     "ammunition": 1
@@ -873,11 +873,11 @@
     },
     "amount": 1,
     "lifetime": 10.0,
-    "range": 5000.0,
-    "explosive": 840.0,
+    "range": 6000.0,
+    "explosive": 940.0,
     "reload": 1.0,
     "hull": 1.0,
-    "resilience": 0.96,
+    "resilience": 0.95,
     "ammunition": 2
   },
   {
@@ -948,10 +948,10 @@
       }
     },
     "amount": 1,
-    "lifetime": 14.0,
+    "lifetime": 15.0,
     "range": 8000.0,
-    "explosive": 700.0,
-    "reload": 4.0,
+    "explosive": 820.0,
+    "reload": 6.0,
     "hull": 1.0,
     "resilience": 1.0,
     "ammunition": 1
