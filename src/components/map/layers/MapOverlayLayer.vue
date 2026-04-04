@@ -22,7 +22,11 @@ const emit = defineEmits<{
 }>()
 
 function isSmallPoi(poi: SavePoiOverlayItem & { iconSize?: number }) {
-  return (poi.iconSize || SMALL_ICON_SIZE) <= SMALL_ICON_SIZE
+  return poi.iconSize !== undefined && poi.iconSize < SMALL_ICON_SIZE
+}
+
+function isStationPoi(poi: SavePoiOverlayItem): boolean {
+  return poi.category === 'playerStation' || poi.category === 'npcStation' || poi.category === 'xenonStation' || poi.category === 'khaakStation'
 }
 </script>
 
@@ -88,6 +92,7 @@ function isSmallPoi(poi: SavePoiOverlayItem & { iconSize?: number }) {
         <circle v-else cx="0" cy="0" r="5" :fill="poi.color" stroke="#fff" stroke-width="1" />
       </g>
       <text
+        v-if="!isStationPoi(poi)"
         x="0"
         :y="isSmallPoi(poi) ? -6 : -12"
         text-anchor="middle"
