@@ -3,6 +3,8 @@ import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useMapStore } from '@/store/useMapStore'
 import { useSaveStore, createOverlayItem } from '@/store/useSaveStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 
@@ -19,6 +21,8 @@ const emit = defineEmits<{
 const { t, te, locale } = useI18n()
 const mapStore = useMapStore()
 const saveStore = useSaveStore()
+const gameData = useGameDataStore()
+const { translateShip } = useX4I18n()
 
 const searchQuery = ref('')
 
@@ -94,8 +98,16 @@ function getSectorSearchNames(sectorMacro: string, fallbackName: string): { rawN
   }
 }
 
-function formatCoord(value: number): string {
-  return (value / 1000).toFixed(1) + 'km'
+function getShipName(poi: SavePoiOverlayItem): string {
+  if (poi.category !== 'abandonedShip' || !poi.shipId) return poi.code
+  
+  const ships = gameData.gameData?.ships
+  if (!ships) return poi.code
+  
+  const ship = ships.find((s) => s.id === poi.shipId)
+  if (!ship) return poi.code
+  
+  return translateShip(ship)
 }
 
 function onPoiClick(poi: SavePoiOverlayItem) {
@@ -151,8 +163,7 @@ function onClearSearch() {
             class="poi-item"
             @click="onPoiClick(poi)"
           >
-            <span class="poi-code">{{ poi.code }}</span>
-            <span class="poi-coords">({{ formatCoord(poi.position.x) }}, {{ formatCoord(poi.position.z) }})</span>
+            <span class="poi-code">{{ poi.category === 'abandonedShip' ? getShipName(poi) : poi.code }}</span>
           </div>
         </div>
       </div>

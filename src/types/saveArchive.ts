@@ -258,6 +258,7 @@ export interface SavePoiOverlayItem {
   class?: string
   purpose?: string
   shipId?: string
+  macro?: string
   unlocked?: boolean
 }
 

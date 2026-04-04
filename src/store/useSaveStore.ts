@@ -204,6 +204,7 @@ export function createOverlayItem(
     class: isAbandonedShip ? item.class : undefined,
     purpose: isAbandonedShip && 'purpose' in item ? item.purpose : undefined,
     shipId: isAbandonedShip && 'shipId' in item ? item.shipId : undefined,
+    macro: isAbandonedShip ? item.macro : undefined,
     unlocked: isVault && 'unlocked' in item ? item.unlocked : undefined
   }
 }
