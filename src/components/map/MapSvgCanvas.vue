@@ -8,7 +8,6 @@ import {
   MAP_FONT_FAMILY,
   OVERLAY_ICON_SIZE,
   PREVIEW_ICON_SIZE,
-  getSavePoiIconUrl,
   placementIconHref,
   svgIdSafe
 } from '@/components/map/utils/style'
@@ -84,7 +83,6 @@ const props = withDefaults(defineProps<{
   currentScale?: number
   zoomProgress?: number
   clusterVisibilityThresholdPx?: number
-  focusedSavePoiKey?: string | null
   sectorOwnerOverride?: Record<string, string>
   clusterOwnerOverride?: Record<string, string>
   factionColorMap?: Record<string, string>
@@ -110,7 +108,6 @@ const props = withDefaults(defineProps<{
   currentScale: 1,
   zoomProgress: 0,
   clusterVisibilityThresholdPx: 0,
-  focusedSavePoiKey: null,
   sectorOwnerOverride: undefined,
   clusterOwnerOverride: undefined,
   factionColorMap: undefined
@@ -122,7 +119,7 @@ const emit = defineEmits<{
   (e: 'sector-hover', payload: SectorHoverPayload): void
   (e: 'sector-leave', sectorId: string): void
   (e: 'overlay-pointerdown', payload: PlacementOverlay): void
-  (e: 'save-poi-pointerdown', payload: SavePoiOverlayItem): void
+  (e: 'save-poi-screen-items', payload: Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }>): void
 }>()
 const { t, te } = useI18n()
 const gameData = useGameDataStore()
@@ -276,6 +273,7 @@ watchEffect(() => {
     clusterRefHeight: layoutState.value.clusterRadius * 2
   })
   emit('sector-layout', sectorLayouts.value)
+  emit('save-poi-screen-items', savePoiScreenItems.value)
 })
 </script>
 
@@ -369,16 +367,12 @@ watchEffect(() => {
     <MapOverlayLayer
       :overlay-screen-items="overlayScreenItems"
       :preview-screen-item="previewScreenItem"
-      :save-poi-screen-items="savePoiScreenItems"
       :dragging-overlay-key="draggingOverlayKey"
       :focused-overlay-key="focusedOverlayKey"
-      :focused-save-poi-key="focusedSavePoiKey"
       :overlay-icon-size="OVERLAY_ICON_SIZE"
       :preview-icon-size="PREVIEW_ICON_SIZE"
       :placement-icon-href="placementIconHref"
-      :get-save-poi-icon-url="getSavePoiIconUrl"
       @overlay-pointerdown="emit('overlay-pointerdown', $event)"
-      @save-poi-pointerdown="emit('save-poi-pointerdown', $event)"
     />
   </svg>
 </template>

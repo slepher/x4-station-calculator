@@ -8,9 +8,11 @@ import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue
 import MapSavePanel from './MapSavePanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
+import MapSavePoiScreenLayer from './MapSavePoiScreenLayer.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { getSectorScalePerRadius } from '@/components/map/utils/coordinates'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
+import { getSavePoiIconUrl } from '@/components/map/utils/style'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
@@ -135,6 +137,7 @@ const isSavePanelOpen = ref(false)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
+const savePoiScreenItems = ref<Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }>>([])
 const settledSavePoiViewportContentBounds = ref<{
   left: number
   top: number
@@ -1241,6 +1244,12 @@ const onSavePoiPointerDown = (poi: SavePoiOverlayItem) => {
   savePoiTooltipItem.value = poi
 }
 
+const onSavePoiScreenItemsChange = (
+  items: Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }>
+) => {
+  savePoiScreenItems.value = items
+}
+
 const closeSavePoiTooltip = () => {
   savePoiTooltipItem.value = null
   focusedSavePoiKey.value = null
@@ -1353,6 +1362,15 @@ onBeforeUnmount(() => {
           @dragover="onViewportDragOver"
           @drop="onViewportDrop"
         >
+          <MapSavePoiScreenLayer
+            :items="savePoiScreenItems"
+            :focused-save-poi-key="focusedSavePoiKey"
+            :screen-scale="scale"
+            :pan-x="panX"
+            :pan-y="panY"
+            :get-save-poi-icon-url="getSavePoiIconUrl"
+            @save-poi-pointerdown="onSavePoiPointerDown"
+          />
           <div
             class="map-content"
             :style="{
@@ -1382,16 +1400,15 @@ onBeforeUnmount(() => {
               :current-scale="scale"
               :zoom-progress="zoomPercent / 100"
               :cluster-visibility-threshold-px="clusterVisibilityThresholdPx"
-              :focused-save-poi-key="focusedSavePoiKey"
               :sector-owner-override="sectorOwnerOverride"
               :cluster-owner-override="clusterOwnerOverride"
               :faction-color-map="factionColorMap"
+              @save-poi-screen-items="onSavePoiScreenItemsChange"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @sector-hover="onSectorHover"
               @sector-leave="onSectorLeave"
               @overlay-pointerdown="onOverlayPointerDown"
-              @save-poi-pointerdown="onSavePoiPointerDown"
             />
           </div>
 
