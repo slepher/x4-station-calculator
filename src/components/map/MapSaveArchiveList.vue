@@ -7,6 +7,7 @@ import type { ArchiveGroup } from '@/types/saveArchive'
 
 const emit = defineEmits<{
   (e: 'select', payload: { guid: string; time: number } | null): void
+  (e: 'select-and-navigate', payload: { guid: string; time: number }): void
 }>()
 
 const { t } = useI18n()
@@ -38,6 +39,12 @@ function onArchiveClick(group: ArchiveGroup, time: number) {
   const archive = group.saves.find((item) => item.meta.time === time)
   if (!archive || !archive.isValid) return
   emit('select', { guid: group.guid, time })
+}
+
+function onArchiveNavigate(group: ArchiveGroup, time: number) {
+  const archive = group.saves.find((item) => item.meta.time === time)
+  if (!archive || !archive.isValid) return
+  emit('select-and-navigate', { guid: group.guid, time })
 }
 
 function canSelectArchive(valid: boolean): boolean {
@@ -89,9 +96,8 @@ function canSelectArchive(valid: boolean): boolean {
               'save-item-active': activeArchiveId === createArchiveId(group.guid, archive.meta.time)
             }"
             :title="!archive.isValid ? t('map.save_invalid_archive_hint') : undefined"
-            @click="onArchiveClick(group, archive.meta.time)"
           >
-            <div class="save-info">
+            <div class="save-info" @click="onArchiveClick(group, archive.meta.time)">
               <div class="save-time">{{ formatTime(archive.meta.time) }}</div>
               <div class="save-meta">
                 <span v-if="!archive.isValid" class="invalid-warning">
@@ -103,6 +109,15 @@ function canSelectArchive(valid: boolean): boolean {
                 <span class="save-filename">{{ archive.meta.filename }}</span>
               </div>
             </div>
+            <button
+              v-if="canSelectArchive(archive.isValid)"
+              class="save-arrow"
+              type="button"
+              :aria-label="`${formatTime(archive.meta.time)} details`"
+              @click="onArchiveNavigate(group, archive.meta.time)"
+            >
+              →
+            </button>
           </div>
         </div>
       </div>
@@ -168,7 +183,11 @@ function canSelectArchive(valid: boolean): boolean {
 }
 
 .save-info {
-  @apply flex flex-col gap-0.5;
+  @apply flex flex-col gap-0.5 flex-1 cursor-pointer;
+}
+
+.save-arrow {
+  @apply rounded border border-amber-300/20 px-2 py-1 text-sm text-amber-200/70 transition-colors hover:border-amber-200/50 hover:text-amber-50;
 }
 
 .save-time {

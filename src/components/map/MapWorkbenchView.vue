@@ -1030,6 +1030,11 @@ const onSaveSelectArchive = async (payload: { guid: string; time: number } | nul
   activeSavePoiCategory.value = null
 }
 
+const onSaveSelectArchiveAndNavigate = async (payload: { guid: string; time: number }) => {
+  await saveStore.selectArchive(payload.guid, payload.time)
+  activeSavePoiCategory.value = null
+}
+
 const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
   savePoiVisibility.value = visibility
 }
@@ -1327,6 +1332,7 @@ onBeforeUnmount(() => {
         :exclude-conditional-small-stations="excludeConditionalSmallStations"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
+        @select-archive-and-navigate="onSaveSelectArchiveAndNavigate"
         @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
         @exclude-conditional-small-stations-change="excludeConditionalSmallStations = $event"

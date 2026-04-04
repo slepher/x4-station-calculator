@@ -17,6 +17,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'select-archive', payload: { guid: string; time: number } | null): void
+  (e: 'select-archive-and-navigate', payload: { guid: string; time: number }): void
   (e: 'visibility-change', visibility: SavePoiVisibility): void
   (e: 'active-category-change', category: SavePoiCategory | null): void
   (e: 'exclude-conditional-small-stations-change', value: boolean): void
@@ -82,11 +83,13 @@ function onBreadcrumbNavigate(key: string) {
 
 function onArchiveSelect(payload: { guid: string; time: number } | null) {
   emit('select-archive', payload)
-  if (payload) {
-    layer.value = 'category'
-    selectedCategory.value = null
-    emit('active-category-change', null)
-  }
+}
+
+function onArchiveSelectAndNavigate(payload: { guid: string; time: number }) {
+  emit('select-archive-and-navigate', payload)
+  layer.value = 'category'
+  selectedCategory.value = null
+  emit('active-category-change', null)
 }
 
 function onCategorySelect(category: SavePoiCategory) {
@@ -153,6 +156,7 @@ watch(() => props.archive, (archive) => {
       <MapSaveArchiveList
         v-if="layer === 'list'"
         @select="onArchiveSelect"
+        @select-and-navigate="onArchiveSelectAndNavigate"
       />
 
       <MapSaveCategoryMenu
