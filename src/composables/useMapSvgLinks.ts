@@ -58,14 +58,13 @@ export function useMapSvgLinks(args: {
   }
 
   const getSavedHighwayPointRatio = (
-    point: { tx?: number; ty?: number } | undefined,
-    sector: Cluster['sectors'][string]
+    point: { tx?: number; ty?: number } | undefined
   ) => {
     if (!point || !Number.isFinite(point.tx) || !Number.isFinite(point.ty)) return null
-    return sectorRatioToClusterRatio(sector.normalized, {
+    return {
       x: point.tx!,
       y: point.ty!
-    })
+    }
   }
 
   const sectorLinkLines = computed<MapSectorLinkLine[]>(() => {
@@ -129,14 +128,14 @@ export function useMapSvgLinks(args: {
             center,
             clusterRadius,
             sector,
-            getSavedHighwayPointRatio(savedHighway?.entry, sector) || sectorPointToLocalRatio(sector, entry)
+            getSavedHighwayPointRatio(savedHighway?.entry) || sectorPointToLocalRatio(sector, entry)
           )
           const end = sectorLocalRatioToScreen(
             cluster,
             center,
             clusterRadius,
             sector,
-            getSavedHighwayPointRatio(savedHighway?.exit, sector) || sectorPointToLocalRatio(sector, exit)
+            getSavedHighwayPointRatio(savedHighway?.exit) || sectorPointToLocalRatio(sector, exit)
           )
           if (!start || !end) return
 
@@ -147,7 +146,7 @@ export function useMapSvgLinks(args: {
               center,
               clusterRadius,
               sector,
-              getSavedHighwayPointRatio(point, sector) || sectorPointToLocalRatio(sector, point)
+              getSavedHighwayPointRatio(point) || sectorPointToLocalRatio(sector, point)
             )
             if (screenPoint) middlePoints.push(screenPoint)
           })
