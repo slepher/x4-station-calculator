@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { toRef, watchEffect } from 'vue'
+import { computed, toRef, watchEffect } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import type { SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
@@ -8,6 +8,7 @@ import {
   MAP_FONT_FAMILY,
   OVERLAY_ICON_SIZE,
   PREVIEW_ICON_SIZE,
+  getSavePoiIconUrl,
   placementIconHref,
   svgIdSafe
 } from '@/components/map/utils/style'
@@ -20,7 +21,7 @@ import type {
   SectorResourceFill
 } from '@/components/map/types'
 import { useMapSvgLayout } from '@/composables/useMapSvgLayout'
-import { useMapSvgLinks, type MapGateCircle, type MapSectorLinkLine } from '@/composables/useMapSvgLinks'
+import { useMapSvgLinks } from '@/composables/useMapSvgLinks'
 import { useMapSvgOverlays } from '@/composables/useMapSvgOverlays'
 import { useMapSvgSectors } from '@/composables/useMapSvgSectors'
 import MapLinkLayer from '@/components/map/layers/MapLinkLayer.vue'
@@ -83,6 +84,15 @@ const props = withDefaults(defineProps<{
   currentScale?: number
   zoomProgress?: number
   clusterVisibilityThresholdPx?: number
+  focusedSavePoiKey?: string | null
+  viewportWidth?: number
+  viewportHeight?: number
+  viewBoxBounds?: {
+    left: number
+    top: number
+    width: number
+    height: number
+  } | null
   sectorOwnerOverride?: Record<string, string>
   clusterOwnerOverride?: Record<string, string>
   factionColorMap?: Record<string, string>
@@ -108,6 +118,10 @@ const props = withDefaults(defineProps<{
   currentScale: 1,
   zoomProgress: 0,
   clusterVisibilityThresholdPx: 0,
+  focusedSavePoiKey: null,
+  viewportWidth: 0,
+  viewportHeight: 0,
+  viewBoxBounds: null,
   sectorOwnerOverride: undefined,
   clusterOwnerOverride: undefined,
   factionColorMap: undefined
@@ -119,9 +133,7 @@ const emit = defineEmits<{
   (e: 'sector-hover', payload: SectorHoverPayload): void
   (e: 'sector-leave', sectorId: string): void
   (e: 'overlay-pointerdown', payload: PlacementOverlay): void
-  (e: 'screen-link-icons', payload: { sectorLinkLines: MapSectorLinkLine[]; gateCircles: MapGateCircle[] }): void
-  (e: 'save-poi-faction-filters', payload: Array<{ id: string; matrix: string }>): void
-  (e: 'save-poi-screen-items', payload: Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }>): void
+  (e: 'save-poi-pointerdown', payload: SavePoiOverlayItem): void
 }>()
 const { t, te } = useI18n()
 const gameData = useGameDataStore()
@@ -182,6 +194,7 @@ const saveSectorsRef = toRef(props, 'saveSectors')
 const viewportContentBoundsRef = toRef(props, 'viewportContentBounds')
 const sectorViewportContentBoundsRef = toRef(props, 'sectorViewportContentBounds')
 const factionColorMapRef = toRef(props, 'factionColorMap')
+const focusedSavePoiKeyRef = toRef(props, 'focusedSavePoiKey')
 
 const {
   clusters,
@@ -268,6 +281,16 @@ const {
   factionColorMap: factionColorMapRef
 })
 
+const renderedWidth = computed(() => props.viewportWidth || canvasWidth.value)
+const renderedHeight = computed(() => props.viewportHeight || canvasHeight.value)
+const renderedViewBox = computed(() => {
+  const bounds = props.viewBoxBounds
+  if (bounds && bounds.width > 0 && bounds.height > 0) {
+    return `${bounds.left.toFixed(1)} ${bounds.top.toFixed(1)} ${bounds.width.toFixed(1)} ${bounds.height.toFixed(1)}`
+  }
+  return `0 0 ${canvasWidth.value.toFixed(1)} ${canvasHeight.value.toFixed(1)}`
+})
+
 watchEffect(() => {
   emit('content-size', {
     width: canvasWidth.value,
@@ -275,12 +298,6 @@ watchEffect(() => {
     clusterRefHeight: layoutState.value.clusterRadius * 2
   })
   emit('sector-layout', sectorLayouts.value)
-  emit('screen-link-icons', {
-    sectorLinkLines: sectorLinkLines.value,
-    gateCircles: gateCircles.value
-  })
-  emit('save-poi-faction-filters', factionColorFilters.value)
-  emit('save-poi-screen-items', savePoiScreenItems.value)
 })
 </script>
 
@@ -288,9 +305,9 @@ watchEffect(() => {
   <svg
     class="map-svg"
     data-testid="map-svg-canvas"
-    :width="Math.round(canvasWidth)"
-    :height="Math.round(canvasHeight)"
-    :viewBox="`0 0 ${canvasWidth.toFixed(1)} ${canvasHeight.toFixed(1)}`"
+    :width="Math.round(renderedWidth)"
+    :height="Math.round(renderedHeight)"
+    :viewBox="renderedViewBox"
     xmlns="http://www.w3.org/2000/svg"
   >
     <rect width="100%" height="100%" fill="#050505" />
@@ -374,12 +391,16 @@ watchEffect(() => {
     <MapOverlayLayer
       :overlay-screen-items="overlayScreenItems"
       :preview-screen-item="previewScreenItem"
+      :save-poi-screen-items="savePoiScreenItems"
       :dragging-overlay-key="draggingOverlayKey"
       :focused-overlay-key="focusedOverlayKey"
+      :focused-save-poi-key="focusedSavePoiKeyRef"
       :overlay-icon-size="OVERLAY_ICON_SIZE"
       :preview-icon-size="PREVIEW_ICON_SIZE"
       :placement-icon-href="placementIconHref"
+      :get-save-poi-icon-url="getSavePoiIconUrl"
       @overlay-pointerdown="emit('overlay-pointerdown', $event)"
+      @save-poi-pointerdown="emit('save-poi-pointerdown', $event)"
     />
   </svg>
 </template>

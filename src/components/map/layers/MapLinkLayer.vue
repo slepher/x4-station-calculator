@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import jumpgateIconUrl from '@/components/icons/jumpgate.svg'
+import superhighwayIconUrl from '@/components/icons/superhighway.svg'
 import type {
   MapCrossClusterGateLine,
   MapGateCircle,
@@ -27,6 +29,22 @@ defineProps<{
         stroke-width="0.4"
         stroke-opacity="0.95"
       />
+      <image
+        :href="superhighwayIconUrl"
+        :x="(link.start.x - 2.1 * stargateVisualScale).toFixed(1)"
+        :y="(link.start.y - 2.1 * stargateVisualScale).toFixed(1)"
+        :width="(4.2 * stargateVisualScale).toFixed(1)"
+        :height="(4.2 * stargateVisualScale).toFixed(1)"
+        preserveAspectRatio="xMidYMid meet"
+      />
+      <image
+        :href="superhighwayIconUrl"
+        :x="(link.end.x - 1.575 * stargateVisualScale).toFixed(1)"
+        :y="(link.end.y - 1.575 * stargateVisualScale).toFixed(1)"
+        :width="(3.15 * stargateVisualScale).toFixed(1)"
+        :height="(3.15 * stargateVisualScale).toFixed(1)"
+        preserveAspectRatio="xMidYMid meet"
+      />
     </template>
   </g>
 
@@ -53,7 +71,21 @@ defineProps<{
     </template>
   </g>
 
-  <g class="gates" />
+  <g class="gates">
+    <image
+      v-for="gate in gateCircles"
+      :key="gate.id"
+      class="gate-circle"
+      :data-gate-id="gate.id"
+      :data-cluster-id="gate.clusterId"
+      :href="jumpgateIconUrl"
+      :x="(gate.point.x - gate.r * 3).toFixed(1)"
+      :y="(gate.point.y - gate.r * 3).toFixed(1)"
+      :width="(gate.r * 6).toFixed(1)"
+      :height="(gate.r * 6).toFixed(1)"
+      preserveAspectRatio="xMidYMid meet"
+    />
+  </g>
 
   <g class="cross-links">
     <line

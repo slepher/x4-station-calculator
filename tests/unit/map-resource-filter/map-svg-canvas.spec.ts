@@ -130,6 +130,50 @@ describe('MapSvgCanvas resource pie fill', () => {
     const lines = wrapper.findAll('g.sector-links line')
     expect(lines).toHaveLength(1)
     expect(lines[0]?.attributes('x1')).not.toBe(lines[0]?.attributes('x2'))
+    expect(wrapper.findAll('g.sector-links image')).toHaveLength(2)
+  })
+
+  it('renders gate icons inside the svg gates layer', () => {
+    const gameData = useGameDataStore()
+    gameData.maps = {
+      clusters: {
+        cluster_01: {
+          id: 'cluster_01',
+          name: 'Cluster 01',
+          owner: 'argon',
+          owner_color: '#8899aa',
+          dlc_tag: 'base',
+          normalized: { pixel_basis: { x: 0, y: 0 } },
+          sectors: {
+            sector_alpha: {
+              id: 'sector_alpha',
+              cluster_id: 'cluster_01',
+              name: 'Alpha',
+              owner: 'argon',
+              owner_color: '#8899aa',
+              area: { sunlight: 1.2 },
+              resources: [],
+              normalized: {
+                center_offset_ratio: { x: 0, y: 0 },
+                sector_radius_ratio: 0.5,
+                scale_per_radius: 1
+              },
+              cluster_gates: {
+                gate_1: {
+                  id: 'gate_1',
+                  raw_local_pos: { sx: 0.2, sy: 0.1 }
+                }
+              }
+            }
+          }
+        }
+      }
+    } as never
+
+    const wrapper = mount(MapSvgCanvas)
+    const gate = wrapper.get('g.gates image.gate-circle')
+    expect(gate.attributes('data-gate-id')).toContain('gate_1')
+    expect(gate.attributes('data-cluster-id')).toBe('cluster_01')
   })
 
   it('maps sector highways into the same scaled sector space as the clip polygon', () => {
