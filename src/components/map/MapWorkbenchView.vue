@@ -132,7 +132,6 @@ const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
 const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
-const selectedSaveArchive = ref<SaveArchive | null>(null)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
@@ -268,7 +267,7 @@ const placementOverlays = computed<PlacementOverlayItem[]>(() => {
 })
 
 const activeMapArchive = computed<SaveArchive | null>(() =>
-  saveStore.selectedArchive || selectedSaveArchive.value
+  saveStore.selectedArchive
 )
 
 const excludeConditionalSmallStations = computed({
@@ -1022,13 +1021,11 @@ const onSavePanelClose = () => {
 
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
   if (!payload) {
-    selectedSaveArchive.value = null
     activeSavePoiCategory.value = null
     return
   }
 
   await saveStore.selectArchive(payload.guid, payload.time)
-  selectedSaveArchive.value = saveStore.selectedArchive
   activeSavePoiCategory.value = null
 }
 
