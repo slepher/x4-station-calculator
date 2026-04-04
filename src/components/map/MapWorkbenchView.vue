@@ -95,7 +95,7 @@ type DraggingPlacementItem = {
 }
 
 const clusterRefHeightPx = ref(142)
-const MAX_SCALE_MULTIPLIER = 2
+const MAX_SCALE_MULTIPLIER = 4
 const TOOLTIP_OFFSET = 14
 const TOOLTIP_VIEWPORT_PADDING = 12
 
