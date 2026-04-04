@@ -408,6 +408,17 @@ export const useEmpireStore = defineStore('empire', () => {
     migrated.warnings.forEach((warning) => console.warn('[EmpireStore][Migration]', warning))
 
     savedEmpires.value = migrated.state
+    
+    if (migrated.state.list.length === 0) {
+      const defaultEmpire = createDefaultEmpire('')
+      savedEmpires.value.list.push(defaultEmpire)
+      savedEmpires.value.activeId = defaultEmpire.id
+      activeEmpire.value = JSON.parse(JSON.stringify(defaultEmpire))
+      activeStationId.value = null
+      takeSnapshot()
+      return
+    }
+    
     if (migrated.state.activeId) {
       const empire = migrated.state.list.find(e => e.id === migrated.state.activeId)
       if (empire) {
@@ -437,7 +448,6 @@ export const useEmpireStore = defineStore('empire', () => {
         if (isValidTabId(sessionTabId)) {
           activeStationId.value = sessionTabId
         } else if (migrated.state.activeStationId === null) {
-          // Persisted overview state should survive reload.
           activeStationId.value = null
         } else if (isValidTabId(migrated.state.activeStationId)) {
           activeStationId.value = migrated.state.activeStationId

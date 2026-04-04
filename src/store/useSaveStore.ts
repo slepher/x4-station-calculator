@@ -398,6 +398,25 @@ export const useSaveStore = defineStore('save', () => {
     archives.value = buildArchiveGroups(savedArchivesState.value.list)
   }
 
+  function loadData(data: SavedSaveArchivesState) {
+    savedArchivesState.value = migrateSaveArchivesStateToCurrent(data)
+    writeSavedState()
+    rebuildArchivesFromState()
+    selectedArchive.value = null
+  }
+
+  async function loadDataAndRestore(data: SavedSaveArchivesState): Promise<void> {
+    savedArchivesState.value = migrateSaveArchivesStateToCurrent(data)
+    writeSavedState()
+    rebuildArchivesFromState()
+    
+    if (savedArchivesState.value.activeArchiveId) {
+      await restoreSelectedArchive(savedArchivesState.value.activeArchiveId)
+    } else {
+      selectedArchive.value = null
+    }
+  }
+
   function updateSettings(patch: Partial<SaveArchiveSettings>) {
     savedArchivesState.value.settings = {
       ...savedArchivesState.value.settings,
@@ -750,6 +769,9 @@ export const useSaveStore = defineStore('save', () => {
     setParsingState,
     updateSettings,
     getArchivePoiCategories,
-    getArchivePoiOverlays
+    getArchivePoiOverlays,
+    loadData,
+    loadDataAndRestore,
+    restoreSelectedArchive
   }
 })

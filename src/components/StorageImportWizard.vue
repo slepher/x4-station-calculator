@@ -5,6 +5,7 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useSaveStore } from '@/store/useSaveStore'
 import { useStatusStore } from '@/store/useStatusStore'
 import {
   applyImportPayload,
@@ -30,6 +31,7 @@ const empireStore = useEmpireStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
+const saveStore = useSaveStore()
 const statusStore = useStatusStore()
 
 const fileName = ref('')
@@ -41,7 +43,8 @@ const mode = ref<'overwrite' | 'incremental'>('overwrite')
 const selectedModules = ref<Record<ImportModuleKey, boolean>>({
   x4_empire_data: false,
   x4_logic_flow_plans: false,
-  x4_ship_blueprints: false
+  x4_ship_blueprints: false,
+  x4_save_archives: false
 })
 
 const hasParsedPayload = computed(() => parsedPayload.value !== null)
@@ -51,7 +54,7 @@ const sanitizeSummaries = computed(() => preparedPayload.value?.sanitizeSummarie
 
 const setDefaultSelections = (selectAll: boolean) => {
   const keys = new Set(availableKeys.value)
-  ;(['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints'] as ImportModuleKey[]).forEach((key) => {
+  ;(['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints', 'x4_save_archives'] as ImportModuleKey[]).forEach((key) => {
     selectedModules.value[key] = selectAll ? keys.has(key) : selectedModules.value[key] && keys.has(key)
   })
 }
@@ -69,7 +72,8 @@ watch(
     selectedModules.value = {
       x4_empire_data: false,
       x4_logic_flow_plans: false,
-      x4_ship_blueprints: false
+      x4_ship_blueprints: false,
+      x4_save_archives: false
     }
   }
 )
@@ -89,6 +93,8 @@ const moduleTitle = (key: ImportModuleKey) => {
       return t('moduleNames.flow')
     case 'x4_ship_blueprints':
       return t('moduleNames.ship')
+    case 'x4_save_archives':
+      return t('moduleNames.save')
     default:
       return key
   }
@@ -140,10 +146,10 @@ const onPickFile = async (event: Event) => {
   }
 }
 
-const handleApplyImport = () => {
+const handleApplyImport = async () => {
   if (!parsedPayload.value || !preparedPayload.value) return
 
-  const result = applyImportPayload({
+  const result = await applyImportPayload({
     mode: mode.value,
     selectedModules: selectedModules.value,
     currentView: shipBuildStore.activeView,
@@ -152,7 +158,8 @@ const handleApplyImport = () => {
     gameDataStore,
     empireStore,
     logicFlowStore,
-    shipBuildStore
+    shipBuildStore,
+    saveStore
   })
 
   if (result.applied.length === 0) {

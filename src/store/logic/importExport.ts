@@ -12,23 +12,47 @@ import type {
   ShipBlueprint,
   ShipBlueprintBucket,
   X4Ship,
-  X4Equipment
+  X4Equipment,
+  X4Map
 } from '@/types/x4'
+import type {
+  SavedSaveArchivesState,
+  SaveArchive,
+  ArchiveMeta
+} from '@/types/saveArchive'
+import {
+  loadArchiveDetailFromDB,
+  clearArchivesFromDB,
+  saveArchiveToDB,
+  createArchiveId
+} from '@/db/saveArchiveDB'
+import {
+  CURRENT_PARSER_VERSION,
+  CURRENT_POST_PROCESSOR_VERSION,
+  postProcessRustSaveArchive
+} from '@/workers/saveParser.post'
 import { migrateEmpireStateToCurrent, migrateFlowStateToCurrent, migrateShipBlueprintStateToCurrent } from './stateMigrations'
 import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from './storageVersions'
 import { normalizeSectorLinkKey, parseSectorLinkKey } from './sectorLinks'
 
 export type ImportMode = 'overwrite' | 'incremental'
-export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints'
+export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints' | 'x4_save_archives'
 
 const EMPIRE_KEY: ImportModuleKey = 'x4_empire_data'
 const FLOW_KEY: ImportModuleKey = 'x4_logic_flow_plans'
 const SHIP_KEY: ImportModuleKey = 'x4_ship_blueprints'
+const SAVE_KEY: ImportModuleKey = 'x4_save_archives'
 
 const STORAGE_KEY_MAP: Record<ImportModuleKey, string> = {
   [EMPIRE_KEY]: 'x4_empire_data',
   [FLOW_KEY]: 'x4_logic_flow_plans',
-  [SHIP_KEY]: 'x4_ship_blueprints'
+  [SHIP_KEY]: 'x4_ship_blueprints',
+  [SAVE_KEY]: 'x4_save_archives'
+}
+
+export interface SaveArchiveExportData {
+  state: SavedSaveArchivesState
+  archives: SaveArchive[]
 }
 
 const DEFAULT_IMPORT_GAME_VSN = '8.0'
@@ -89,6 +113,7 @@ export interface ImportApplyOptions {
   empireStore: EmpireStoreLike
   logicFlowStore: LogicFlowStoreLike
   shipBuildStore: ShipBuildStoreLike
+  saveStore?: SaveStoreLike
 }
 
 export interface ImportApplyResult {
@@ -133,9 +158,18 @@ interface ShipBuildStoreLike {
 interface GameDataStoreLike {
   modulesMap: Record<string, X4Module>
   modulesByMacroId?: Record<string, X4Module>
+  maps?: X4Map
   currentVersion?: string
   isBeta?: boolean
-  getStorageKey?: (module: 'empire' | 'logic_flow' | 'ship_blueprints') => string
+  getStorageKey?: (module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'save_archives') => string
+}
+
+interface SaveStoreLike {
+  savedArchivesState: SavedSaveArchivesState
+  selectedArchive: SaveArchive | null
+  isInitialized: boolean
+  loadDataAndRestore: (data: SavedSaveArchivesState) => Promise<void>
+  restoreSelectedArchive: (archiveId: string) => Promise<void>
 }
 
 interface ShipSlotRequirement {
@@ -229,7 +263,8 @@ function getStorageKey(moduleKey: ImportModuleKey, gameDataStore?: GameDataStore
   if (!gameDataStore?.getStorageKey) return STORAGE_KEY_MAP[moduleKey]
   if (moduleKey === EMPIRE_KEY) return gameDataStore.getStorageKey('empire')
   if (moduleKey === FLOW_KEY) return gameDataStore.getStorageKey('logic_flow')
-  return gameDataStore.getStorageKey('ship_blueprints')
+  if (moduleKey === SHIP_KEY) return gameDataStore.getStorageKey('ship_blueprints')
+  return gameDataStore.getStorageKey('save_archives')
 }
 
 function buildSanitizeSummary(key: ImportModuleKey, detailMap: Record<string, number>): ImportSanitizeSummary | null {
@@ -251,6 +286,12 @@ function isFlowState(value: unknown): value is SavedFlowPlansState {
 function isShipState(value: unknown): value is Record<string, unknown> {
   if (!isObject(value)) return false
   return Array.isArray(value.list) || Array.isArray(value.ships)
+}
+
+function isSaveExportData(value: unknown): value is SaveArchiveExportData {
+  if (!isObject(value)) return false
+  const data = value as Record<string, unknown>
+  return isObject(data.state) && Array.isArray(data.archives)
 }
 
 type CoercedEmpireState = SavedEmpiresState | V1StorageState
@@ -291,6 +332,30 @@ function coerceFlowState(value: unknown): SavedFlowPlansState | null {
 function coerceShipState(value: unknown): Record<string, unknown> | null {
   if (!isShipState(value)) return null
   return deepClone(value as Record<string, unknown>)
+}
+
+function coerceSaveExportData(value: unknown): SaveArchiveExportData | null {
+  if (!isSaveExportData(value)) return null
+  const data = value as SaveArchiveExportData
+  const state = deepClone(data.state)
+  state.list = state.list.map(item => ({
+    ...item,
+    createdAt: item.createdAt instanceof Date ? item.createdAt : new Date(item.createdAt)
+  }))
+  return {
+    state,
+    archives: deepClone(data.archives)
+  }
+}
+
+const SAVE_ARCHIVES_STATE_VERSION = 1
+
+function migrateSaveArchivesStateToCurrent(input: SavedSaveArchivesState): { state: SavedSaveArchivesState; warnings: string[] } {
+  const version = input.version || 1
+  if (version === SAVE_ARCHIVES_STATE_VERSION) {
+    return { state: deepClone(input), warnings: [] }
+  }
+  return { state: deepClone(input), warnings: [] }
 }
 
 function migrateEmpireState(input: CoercedEmpireState, gameDataStore: GameDataStoreLike): { state: SavedEmpiresState; warnings: string[] } {
@@ -510,14 +575,16 @@ function getImportModulesFromRaw(raw: unknown): Partial<Record<ImportModuleKey, 
     return {
       [EMPIRE_KEY]: raw.data[EMPIRE_KEY],
       [FLOW_KEY]: raw.data[FLOW_KEY],
-      [SHIP_KEY]: raw.data[SHIP_KEY]
+      [SHIP_KEY]: raw.data[SHIP_KEY],
+      [SAVE_KEY]: raw.data[SAVE_KEY]
     }
   }
 
   return {
     [EMPIRE_KEY]: raw[EMPIRE_KEY],
     [FLOW_KEY]: raw[FLOW_KEY],
-    [SHIP_KEY]: raw[SHIP_KEY]
+    [SHIP_KEY]: raw[SHIP_KEY],
+    [SAVE_KEY]: raw[SAVE_KEY]
   }
 }
 
@@ -534,6 +601,7 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
   const empire = coerceEmpireState(payload.modules[EMPIRE_KEY])
   const flow = coerceFlowState(payload.modules[FLOW_KEY])
   const ship = coerceShipState(payload.modules[SHIP_KEY])
+  const save = coerceSaveExportData(payload.modules[SAVE_KEY])
 
   if (empire) stats.push({ key: EMPIRE_KEY, count: empire.list.length })
   if (flow) stats.push({ key: FLOW_KEY, count: flow.list.length })
@@ -541,6 +609,9 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
     const migrated = migrateShipBlueprintStateToCurrent(ship)
     const count = migrated.state.ships.reduce((sum, bucket) => sum + bucket.blueprints.length, 0)
     stats.push({ key: SHIP_KEY, count })
+  }
+  if (save) {
+    stats.push({ key: SAVE_KEY, count: save.state.list.length })
   }
 
   return stats
@@ -748,6 +819,88 @@ function sanitizeShipState(input: SavedShipBlueprintsState, shipBuildStore: Ship
   }
 }
 
+function normalizeVersion(v: string): string {
+  const trimmed = v.trim()
+  if (/^\d+\.\d+$/.test(trimmed)) {
+    const parsed = Number(trimmed)
+    return Number.isFinite(parsed) ? parsed.toFixed(1) : v
+  }
+  const num = parseInt(trimmed, 10)
+  if (isNaN(num)) return v
+  return num >= 100 ? (num / 100).toFixed(1) : num.toFixed(1)
+}
+
+interface SanitizeSaveResult {
+  state: SavedSaveArchivesState
+  validArchives: SaveArchive[]
+  skippedCount: number
+  skippedDetails: string[]
+}
+
+function sanitizeSaveArchives(
+  input: SaveArchiveExportData,
+  gameDataStore: GameDataStoreLike
+): SanitizeSaveResult {
+  const currentVersion = normalizeVersion(gameDataStore.currentVersion || DEFAULT_IMPORT_GAME_VSN)
+  const validArchives: SaveArchive[] = []
+  const validMetas: ArchiveMeta[] = []
+  const skippedDetails: string[] = []
+
+  for (const archive of input.archives) {
+    const archiveVersion = normalizeVersion(archive.meta.version)
+    if (archiveVersion !== currentVersion) {
+      skippedDetails.push(`[${archive.meta.playerName}] ${archive.meta.filename}: version mismatch (${archive.meta.version} vs ${gameDataStore.currentVersion})`)
+      continue
+    }
+
+    if (archive.meta.parser_version !== CURRENT_PARSER_VERSION) {
+      skippedDetails.push(`[${archive.meta.playerName}] ${archive.meta.filename}: parser_version mismatch (${archive.meta.parser_version} vs ${CURRENT_PARSER_VERSION})`)
+      continue
+    }
+
+    validArchives.push(archive)
+    const meta = input.state.list.find(m => m.id === createArchiveId(archive.meta.guid, archive.meta.time))
+    if (meta) {
+      validMetas.push(meta)
+    }
+  }
+
+  const activeArchiveId = input.state.activeArchiveId && validMetas.some(m => m.id === input.state.activeArchiveId)
+    ? input.state.activeArchiveId
+    : (validMetas[0]?.id || null)
+
+  return {
+    state: {
+      version: input.state.version,
+      activeArchiveId,
+      list: validMetas,
+      settings: input.state.settings
+    },
+    validArchives,
+    skippedCount: skippedDetails.length,
+    skippedDetails
+  }
+}
+
+function reprocessSaveArchives(
+  archives: SaveArchive[],
+  gameDataStore: GameDataStoreLike
+): SaveArchive[] {
+  const modulesByMacroId = gameDataStore.modulesByMacroId || {}
+  const maps = gameDataStore.maps
+
+  return archives.map(archive => {
+    if (archive.meta.post_processor_version === CURRENT_POST_PROCESSOR_VERSION) {
+      return archive
+    }
+
+    const reprocessed = postProcessRustSaveArchive(archive, modulesByMacroId, maps)
+    reprocessed.meta.post_processor_version = CURRENT_POST_PROCESSOR_VERSION
+    reprocessed.isValid = archive.meta.parser_version === CURRENT_PARSER_VERSION
+    return reprocessed
+  })
+}
+
 export function prepareImportPayload(
   payload: NormalizedImportPayload,
   gameDataStore: GameDataStoreLike,
@@ -789,6 +942,27 @@ export function prepareImportPayload(
       count: sanitized.state.ships.reduce((sum, bucket) => sum + bucket.blueprints.length, 0)
     })
     if (sanitized.summary) sanitizeSummaries.push(sanitized.summary)
+  }
+
+  const save = coerceSaveExportData(payload.modules[SAVE_KEY])
+  if (save) {
+    const migrated = migrateSaveArchivesStateToCurrent(save.state)
+    warnings.push(...migrated.warnings)
+    const sanitized = sanitizeSaveArchives({ state: migrated.state, archives: save.archives }, gameDataStore)
+    const reprocessed = reprocessSaveArchives(sanitized.validArchives, gameDataStore)
+    preparedModules[SAVE_KEY] = {
+      state: sanitized.state,
+      archives: reprocessed
+    }
+    moduleStats.push({ key: SAVE_KEY, count: sanitized.state.list.length })
+    if (sanitized.skippedCount > 0) {
+      sanitizeSummaries.push({
+        key: SAVE_KEY,
+        removed: sanitized.skippedCount,
+        details: [{ kind: 'archivesSkipped', count: sanitized.skippedCount }]
+      })
+      warnings.push(...sanitized.skippedDetails)
+    }
   }
 
   return {
@@ -834,6 +1008,49 @@ export function buildExportPayload(
       [SHIP_KEY]: deepClone(migratedShip.state)
     }
   }
+}
+
+export async function buildSaveExportData(
+  state: SavedSaveArchivesState,
+  gameDataStore: GameDataStoreLike
+): Promise<SaveArchiveExportData> {
+  const scopeKey = getStorageKey(SAVE_KEY, gameDataStore)
+  const archives: SaveArchive[] = []
+
+  for (const meta of state.list) {
+    const archive = await loadArchiveDetailFromDB(scopeKey, meta.id)
+    if (archive) {
+      archives.push(archive)
+    }
+  }
+
+  return {
+    state: deepClone(state),
+    archives
+  }
+}
+
+export async function buildExportPayloadWithSave(
+  empire: SavedEmpiresState,
+  flow: SavedFlowPlansState,
+  ship: SavedShipBlueprintsState,
+  save: SavedSaveArchivesState | null,
+  gameDataStore?: GameDataStoreLike
+) {
+  const basePayload = buildExportPayload(empire, flow, ship, gameDataStore)
+
+  if (save && save.list.length > 0) {
+    const saveExportData = await buildSaveExportData(save, gameDataStore || { modulesMap: {} })
+    return {
+      ...basePayload,
+      data: {
+        ...basePayload.data,
+        [SAVE_KEY]: saveExportData
+      }
+    }
+  }
+
+  return basePayload
 }
 
 export function triggerJsonDownload(filename: string, data: unknown) {
@@ -973,19 +1190,86 @@ function applyShipImport(options: ImportApplyOptions, warnings: string[]): boole
   return true
 }
 
-export function applyImportPayload(options: ImportApplyOptions): ImportApplyResult {
+async function applySaveImport(options: ImportApplyOptions, warnings: string[]): Promise<boolean> {
+  const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
+  const saveData = preparedPayload.preparedModules[SAVE_KEY] as { state: SavedSaveArchivesState; archives: SaveArchive[] } | undefined
+  if (!saveData) return false
+
+  const scopeKey = getStorageKey(SAVE_KEY, options.gameDataStore)
+  const defaultSettings = {
+    visibility: {
+      playerStation: false,
+      npcStation: false,
+      xenonStation: false,
+      khaakStation: false,
+      abandonedShip: false,
+      datavault: false,
+      erlkingVault: false
+    },
+    excludeConditionalSmallStations: true
+  }
+  const currentState = options.saveStore?.savedArchivesState || { version: 1, activeArchiveId: null, list: [], settings: defaultSettings }
+
+  let nextState: SavedSaveArchivesState
+  let nextArchives: SaveArchive[]
+
+  if (options.mode === 'overwrite') {
+    await clearArchivesFromDB(scopeKey)
+    nextState = saveData.state
+    nextArchives = saveData.archives
+  } else {
+    const mergedList = [...currentState.list]
+    for (const meta of saveData.state.list) {
+      const existingIndex = mergedList.findIndex(m => m.id === meta.id)
+      if (existingIndex >= 0) {
+        mergedList[existingIndex] = meta
+      } else {
+        mergedList.push(meta)
+      }
+    }
+
+    const canUpdateActive = !currentState.activeArchiveId || !options.saveStore?.selectedArchive
+    nextState = {
+      version: saveData.state.version,
+      activeArchiveId: canUpdateActive && saveData.state.activeArchiveId ? saveData.state.activeArchiveId : currentState.activeArchiveId,
+      list: mergedList,
+      settings: currentState.settings
+    }
+    nextArchives = saveData.archives
+  }
+
+  if (!nextState.activeArchiveId && nextState.list.length > 0) {
+    nextState.activeArchiveId = nextState.list[0]?.id || null
+    warnings.push('Save activeArchiveId was missing; fallback to first archive.')
+  }
+
+  persistModule(SAVE_KEY, nextState, options.gameDataStore)
+
+  for (const archive of nextArchives) {
+    const serializedArchive = JSON.parse(JSON.stringify(archive))
+    await saveArchiveToDB(scopeKey, serializedArchive)
+  }
+
+  if (options.saveStore) {
+    await options.saveStore.loadDataAndRestore(nextState)
+  }
+
+  return true
+}
+
+export async function applyImportPayload(options: ImportApplyOptions): Promise<ImportApplyResult> {
   const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
   const warnings: string[] = [...preparedPayload.warnings]
   const applied: ImportModuleKey[] = []
   const skipped: ImportModuleKey[] = []
 
-  const entries: Array<{ key: ImportModuleKey; run: () => boolean }> = [
+  const syncEntries: Array<{ key: ImportModuleKey; run: () => boolean }> = [
     { key: EMPIRE_KEY, run: () => applyEmpireImport(options, warnings) },
     { key: FLOW_KEY, run: () => applyFlowImport(options, warnings) },
     { key: SHIP_KEY, run: () => applyShipImport(options, warnings) }
   ]
 
-  entries.forEach(({ key, run }) => {
+  syncEntries.forEach(({ key, run }) => {
     if (!options.selectedModules[key]) {
       skipped.push(key)
       return
@@ -999,6 +1283,18 @@ export function applyImportPayload(options: ImportApplyOptions): ImportApplyResu
     skipped.push(key)
     warnings.push(`${key} payload is missing or invalid.`)
   })
+
+  if (options.selectedModules[SAVE_KEY]) {
+    const saveApplied = await applySaveImport(options, warnings)
+    if (saveApplied) {
+      applied.push(SAVE_KEY)
+    } else {
+      skipped.push(SAVE_KEY)
+      warnings.push(`${SAVE_KEY} payload is missing or invalid.`)
+    }
+  } else {
+    skipped.push(SAVE_KEY)
+  }
 
   return {
     applied,
