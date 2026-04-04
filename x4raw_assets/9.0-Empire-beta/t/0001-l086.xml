@@ -3953,7 +3953,7 @@
     <t id="13325">取消选中模块</t>
     <t id="13326">聚焦空间站模型</t>
     <t id="13327">队列中的优先指令</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">收集速率(of resources; header item for table column)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">再见</t>

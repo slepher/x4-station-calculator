@@ -9791,7 +9791,7 @@
     <t id="52">"Najednou mi došlo, že ten malý hrášek, krásný a modrý, je Země. Zvedl jsem palec, zavřel jedno oko a palec mi vymazal planetu Zemi. Necítil jsem se jako obr. Cítil jsem se velmi, velmi malý." \n\n- Neil Armstrong \(1930-2012\)</t>
     <t id="53">"Zaměření naší pozornosti pouze na pozemské záležitosti by bylo omezením lidského ducha." \n\n- Stephen Hawking \(1942-2018\)</t>
     <t id="54">"Science-fiction včera, fakta dnes, zastaralé zítra." \n\n- Otto O. Binder \(1911-1974\)</t>
-    <t id="55">"Křídla budou existovat! Pokud se mi jejich vytvoření nezdaří, podaří se to jiným. Duch nemůže zemřít; a člověk, jenž vše pozná, bude mít křídla…" \n\n- Leonardo da Vinci \(1452-1519\)</t>
+    <t id="55">"Křídla budou existovat! Pokud se mi jejich vytvoření nezdaří, podaří se to jiným. Duch nemůže zemřít; a člověk, jenž vše pozná, bude mít křídla..." \n\n- Leonardo da Vinci \(1452-1519\)</t>
     <t id="56">"Lidská mysl a duch rostou s prostorem, ve kterém mohou fungovat." \n\n- Krafft A. Ehricke \(1917-1984\)</t>
     <t id="57">"Důležité je nepřestat se ptát." \n\n- Albert Einstein \(1879-1955\)</t>
     <t id="58">"Ty bys donutil loď plout proti větru a proudům tím, že bys pod její palubou zapálil oheň... Na takové nesmysly nemám čas." \n\n- Napoleon Bonaparte \(1769-1821\)</t>
@@ -42310,7 +42310,7 @@
     <t id="30401031">(Teladi)(Navigátor)Gravidar detekuje více kontaktů.(neutrální)</t>
     <t id="30401032">(Teladi)(Navigátor)Je na záchytném kurzu.(nervózní)</t>
     <t id="30401033">(Teladi)(Navigátor)Detekováno několik malých plavidel (klid, jako konstatování faktu)</t>
-    <t id="30401034">(Teladi)(Navigátor?)Už zůstaly jen trosky…...</t>
+    <t id="30401034">(Teladi)(Navigátor?)Už zůstaly jen trosky...</t>
     <t id="30401035">(Teladi)(Navigátor?)Žádné další prioritní cíle.</t>
   </page>
   <page id="10502" title="Teladi NPC 2 / Ministry rep" descr="Lines for Teladi NPC 2" voice="yes">
@@ -46968,7 +46968,7 @@
     <t id="302550323">{,302550317}</t>
     <t id="302550324">{,302550316}</t>
     <t id="302550325">{,302550319}</t>
-    <t id="302550326">Kolego! Moje šupiny jsou pořád bledé, ale… byl jste skvělý. O jednu překážku méně!</t>
+    <t id="302550326">Kolego! Moje šupiny jsou pořád bledé, ale... byl jste skvělý. O jednu překážku méně!</t>
     <t id="302550327">Těch pilotů je mi líto... byli oklamáni.</t>
     <t id="302550328">Podvedl jste mého dobrého kolegu, aby si myslel, že převážíte dokumenty?</t>
     <t id="302550329">Udělal jste s nimi krátký proces, kolego! Na důchodce výjimečné!</t>
@@ -63672,7 +63672,7 @@
     <t id="12">(Nižší: )Štíty cíle</t>
     <t id="13">(scan:)Zranitelný bod</t>
     <t id="14">(scan:)Zranitelné body</t>
-    <t id="50">(Oznámení o skenování)Navazování spojení…</t>
+    <t id="50">(Oznámení o skenování)Navazování spojení...</t>
     <t id="51">Systémy byly úspěšně narušeny.</t>
     <t id="52">Uzamčení se podařilo obejít.</t>
     <t id="103">(objective)specifikace odpovídající lodi</t>

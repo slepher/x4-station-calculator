@@ -9726,7 +9726,7 @@
     <t id="7000">(Envoy Pack)</t>
     <t id="7003">https://www.gog.com/game/x4_envoy_pack</t>
     <t id="7011">Anonimowe źródła dyplomatyczne przesłały raporty o broni, która mogłaby potencjalnie zniszczyć gwiazdę. Przesada? Miejmy nadzieję, że tak!</t>
-    <t id="7021">Premiera produktu! Ten zupełnie nowy statek klasy Wysłannik spełni wszystkie twoje dyplomatyczne potrzeby… i nie tylko!</t>
+    <t id="7021">Premiera produktu! Ten zupełnie nowy statek klasy Wysłannik spełni wszystkie twoje dyplomatyczne potrzeby... i nie tylko!</t>
     <t id="7031">Zagrożenie sprzed Ciemności znów daje o sobie znać. Sama dyplomacja może nie wystarczyć, by je powstrzymać.</t>
   </page>
   <page id="1098" title="Demo Texts" descr="0" voice="no">
@@ -10075,7 +10075,7 @@
     <t id="923">Ten statek jest zadokowany. Nie można aktywować autopilota.</t>
     <t id="924">Nie pilotujesz tego statku. Nie można aktywować autopilota.</t>
     <t id="925">Niewłaściwy cel. Deaktywacja autopilota.</t>
-    <t id="1001">(@voice sample length should be as close to 15s as possible)Napęd skokowy aktywuje się za 10%...20...30...40...50%...60...70...80...90…Skok...</t>
+    <t id="1001">(@voice sample length should be as close to 15s as possible)Napęd skokowy aktywuje się za 10%...20...30...40...50%...60...70...80...90...Skok...</t>
     <t id="1002">Skok przerwany.</t>
     <t id="1003">Skok zakończony.</t>
     <t id="1004">Ostrzeżenie! Napęd skokowy niestabilny.</t>
@@ -21687,7 +21687,7 @@
     <t id="30220620">Z pomocą tego, bramy monumentu powinny się dla ciebie otworzyć.</t>
     <t id="30220621">(spoken to female player 'you'){10151,30220620}</t>
     <t id="30220622">A co do drugiej rzeczy...</t>
-    <t id="30220623">Ta struktura z pewnością musi zawierać kilka punktów, które są…(slight pause before 'vital')niezbędne dla jej integralności.</t>
+    <t id="30220623">Ta struktura z pewnością musi zawierać kilka punktów, które są...(slight pause before 'vital')niezbędne dla jej integralności.</t>
     <t id="30220624">Ufam, że będziesz wiedział, co robić, gdy je spotkasz.</t>
     <t id="30220625">(spoken to female player 'you')Ufam, że będziesz wiedziała, co robić, gdy je spotkasz.</t>
     <t id="30220626">Wróć do mnie, kiedy skończysz, żebyśmy mogli razem cieszyć się widowiskiem.</t>

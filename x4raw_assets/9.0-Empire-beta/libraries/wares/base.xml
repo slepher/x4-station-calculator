@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Last exported: 19.03.2026 19:38:41-->
+<!--Last exported: 27.03.2026 01:15:06-->
 <wares>
   <production>
     <method id="argon" name="{20206,201}">
@@ -2774,7 +2774,7 @@
     </sources>
   </ware>
   <ware id="inv_spacedyepizza" name="{20201,56501}" description="{20201,56502}" group="luxuryitem" transport="inventory" volume="1" tags="bribe crafting inventory">
-    <price min="9241" average="10871" max="120502"/>
+    <price min="9241" average="10871" max="12502"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
         <ware ware="inv_cahoonas" amount="3"/>

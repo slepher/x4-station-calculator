@@ -2923,6 +2923,33 @@
   <entry name="impact_par_l_beam_01_mk1" value="assets\fx\weaponFx\impact_par_l_beam_01_mk1"/>
   <entry name="muzzle_tel_l_beam_01_mk1" value="assets\fx\weaponFx\muzzle_tel_l_beam_01_mk1"/>
   <entry name="impact_tel_l_beam_01_mk1" value="assets\fx\weaponFx\impact_tel_l_beam_01_mk1"/>
+  <entry name="test_etienne_turret_ven_m_laser_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_ven_m_laser_02_mk1"/>
+  <entry name="test_etienne_turret_xen_m_laser_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_xen_m_laser_02_mk1"/>
+  <entry name="test_etienne_turret_ter_m_mining_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_ter_m_mining_02_mk1"/>
+  <entry name="test_etienne_turret_arg_m_beam_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_m_beam_02_mk1"/>
+  <entry name="test_etienne_turret_arg_m_laser_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_m_laser_02_mk1"/>
+  <entry name="test_etienne_turret_arg_m_plasma_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_m_plasma_02_mk1"/>
+  <entry name="test_etienne_turret_par_m_beam_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_par_m_beam_02_mk1"/>
+  <entry name="test_etienne_turret_par_m_gatling_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_par_m_gatling_02_mk1"/>
+  <entry name="test_etienne_turret_par_m_laser_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_par_m_laser_02_mk1"/>
+  <entry name="test_etienne_turret_par_m_mining_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_par_m_mining_02_mk1"/>
+  <entry name="test_etienne_turret_par_m_shotgun_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_par_m_shotgun_02_mk1"/>
+  <entry name="test_etienne_turret_pir_m_gatling_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_pir_m_gatling_02_mk1"/>
+  <entry name="test_etienne_turret_tel_m_beam_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_tel_m_beam_02_mk1"/>
+  <entry name="test_etienne_turret_tel_m_gatling_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_tel_m_gatling_02_mk1"/>
+  <entry name="test_etienne_turret_tel_m_laser_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_tel_m_laser_02_mk1"/>
+  <entry name="test_etienne_turret_tel_m_mining_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_tel_m_mining_02_mk1"/>
+  <entry name="test_etienne_turret_tel_m_plasma_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_tel_m_plasma_02_mk1"/>
+  <entry name="test_etienne_turret_tel_m_shotgun_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_tel_m_shotgun_02_mk1"/>
+  <entry name="test_etienne_turret_ter_m_beam_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_ter_m_beam_02_mk1"/>
+  <entry name="test_etienne_turret_ter_m_gatling_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_ter_m_gatling_02_mk1"/>
+  <entry name="test_etienne_turret_ter_m_laser_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_ter_m_laser_02_mk1"/>
+  <entry name="test_etienne_turret_spl_m_beam_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_beam_02_mk1"/>
+  <entry name="test_etienne_turret_spl_m_flak_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_flak_02_mk1"/>
+  <entry name="test_etienne_turret_spl_m_gatling_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_gatling_02_mk1"/>
+  <entry name="test_etienne_turret_spl_m_laser_02_mk2" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_laser_02_mk2"/>
+  <entry name="test_etienne_turret_spl_m_plasma_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_plasma_02_mk1"/>
+  <entry name="test_etienne_turret_spl_m_shotgun_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_shotgun_02_mk1"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>

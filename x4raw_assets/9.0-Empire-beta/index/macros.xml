@@ -2874,6 +2874,7 @@
   <entry name="muzzle_gen_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_gen_l_beam_01_mk1_macro"/>
   <entry name="muzzle_par_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_par_l_beam_01_mk1_macro"/>
   <entry name="muzzle_tel_l_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_tel_l_beam_01_mk1_macro"/>
+  <entry name="room_gen_repair_01_macro" value="assets\interiors\rooms\macros\room_gen_repair_01_macro"/>
   <entry name="cluster_sm_split_macro" value="extensions\ego_dlc_split\assets\environments\cluster\macros\cluster_sm_split_macro"/>
   <entry name="cluster_400_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>
   <entry name="cluster_401_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>

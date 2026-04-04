@@ -9726,7 +9726,7 @@
     <t id="7000">(Envoy Pack)</t>
     <t id="7003">https://www.gog.com/game/x4_envoy_pack</t>
     <t id="7011">Anonyme diplomatische Quellen berichten von einer Waffe mit dem Potenzial, einen Stern zu zerstören. Eine Übertreibung? Wir hoffen es sehr!</t>
-    <t id="7021">Produktstart! Dieses brandneue Schiff der Emissär-Klasse erfüllt all deine diplomatischen Bedürfnisse… und noch so viel mehr!</t>
+    <t id="7021">Produktstart! Dieses brandneue Schiff der Emissär-Klasse erfüllt all deine diplomatischen Bedürfnisse... und noch so viel mehr!</t>
     <t id="7031">Eine Bedrohung aus der Zeit vor Der Dunkelheit erhebt erneut ihr Haupt. Diplomatie allein reicht womöglich nicht aus, um sie zu entschärfen.</t>
   </page>
   <page id="1098" title="Demo Texts" descr="0" voice="no">
@@ -10812,7 +10812,7 @@
     <t id="302931023">Das war ... mal was anderes.</t>
     <t id="302931024">Anstrengend ... und aufregend zugleich!</t>
     <t id="302931025">Worum ging's da? Muss bald wieder eintauchen!</t>
-    <t id="302931026">Ich kann die SPÜREN, JEDES MAL! Es ZERREISST MICH … und dann bin ich ... bin ich wieder ganz.</t>
+    <t id="302931026">Ich kann die SPÜREN, JEDES MAL! Es ZERREISST MICH ... und dann bin ich ... bin ich wieder ganz.</t>
     <t id="302931027">Für den Ruhm bin ich nicht hier, also müssen es die Credits sein, oder?</t>
     <t id="302931028">Wieder am Ausgangspunkt! Aber ein Teil von mir ist ... drüben geblieben ...</t>
     <t id="302931029">Bin fast ohnmächtig geworden vom Übergang, aber ich KANN jetzt noch nicht langsamer werden.</t>
@@ -11104,7 +11104,7 @@
     <t id="302931023">Das war ... mal was anderes.</t>
     <t id="302931024">Anstrengend ... und aufregend zugleich!</t>
     <t id="302931025">Worum ging's da? Muss bald wieder eintauchen!</t>
-    <t id="302931026">Ich kann die SPÜREN, JEDES MAL! Es ZERREISST MICH … und dann bin ich ... bin ich wieder ganz.</t>
+    <t id="302931026">Ich kann die SPÜREN, JEDES MAL! Es ZERREISST MICH ... und dann bin ich ... bin ich wieder ganz.</t>
     <t id="302931027">Für den Ruhm bin ich nicht hier, also müssen es die Credits sein, oder?</t>
     <t id="302931028">Wieder am Ausgangspunkt! Aber ein Teil von mir ist ... drüben geblieben ...</t>
     <t id="302931029">Bin fast ohnmächtig geworden vom Übergang, aber ich KANN jetzt noch nicht langsamer werden.</t>
@@ -11394,7 +11394,7 @@
     <t id="302931023">Das war ... mal was anderes.</t>
     <t id="302931024">Anstrengend ... und aufregend zugleich!</t>
     <t id="302931025">Worum ging's da? Muss bald wieder eintauchen!</t>
-    <t id="302931026">Ich kann die SPÜREN, JEDES MAL! Es ZERREISST MICH … und dann bin ich ... bin ich wieder ganz.</t>
+    <t id="302931026">Ich kann die SPÜREN, JEDES MAL! Es ZERREISST MICH ... und dann bin ich ... bin ich wieder ganz.</t>
     <t id="302931027">Für den Ruhm bin ich nicht hier, also müssen es die Credits sein, oder?</t>
     <t id="302931028">Wieder am Ausgangspunkt! Aber ein Teil von mir ist ... drüben geblieben ...</t>
     <t id="302931029">Bin fast ohnmächtig geworden vom Übergang, aber ich KANN jetzt noch nicht langsamer werden.</t>
@@ -69543,7 +69543,7 @@
     <t id="26005">{30135,105}</t>
     <t id="26007">{30135,107}</t>
     <t id="27001">{30233,5001}</t>
-    <t id="27002">(Description, addressing the player, writes in lowercase like in a chat app)ich muss mit Ihnen über ihre nächsten aufgaben sprechen. was meinen Sie damit, dass Ihre auftragsliste leer ist? mein team hat ständig mit zeitdruck zu kämpfen, also hat sie sicher jemand um hilfe gebeten. [ms:ihr einziger ansprechpartner|fs:ihre einzige ansprechpartnerin] in der abteilung bin ich? jetzt, wo Sie es erwähnen … das könnte tatsächlich stimmen. nun, dann lassen Sie mich mal einen blick auf unsere lagerbestände werfen ... nein, wir haben ihre letzte lieferung immer noch nicht durch. na ja. es kann sicher nicht schaden, etwas reserve zu haben, nur für den fall. kümmern sie sich bitte darum</t>
+    <t id="27002">(Description, addressing the player, writes in lowercase like in a chat app)ich muss mit Ihnen über ihre nächsten aufgaben sprechen. was meinen Sie damit, dass Ihre auftragsliste leer ist? mein team hat ständig mit zeitdruck zu kämpfen, also hat sie sicher jemand um hilfe gebeten. [ms:ihr einziger ansprechpartner|fs:ihre einzige ansprechpartnerin] in der abteilung bin ich? jetzt, wo Sie es erwähnen ... das könnte tatsächlich stimmen. nun, dann lassen Sie mich mal einen blick auf unsere lagerbestände werfen ... nein, wir haben ihre letzte lieferung immer noch nicht durch. na ja. es kann sicher nicht schaden, etwas reserve zu haben, nur für den fall. kümmern sie sich bitte darum</t>
     <t id="27003">{30135,103}</t>
     <t id="27004">{30135,104}</t>
     <t id="27005">{30135,105}</t>

@@ -9445,14 +9445,14 @@
       <connection name="con_weapon_02" tags="combat medium weapon xenon symmetry symmetry_left symmetry_2 "/>
       <connection name="con_weapon_03" tags="combat medium weapon xenon symmetry symmetry_right symmetry_2 "/>
       <connection name="con_weapon_04" tags="combat medium weapon xenon symmetry symmetry_right symmetry_1 "/>
-      <connection name="ConnectionForanim_door" tags="anim_cockpit animation detail_xl forceoutline iklink part platformcollision "/>
+      <connection name="ConnectionForanim_door" tags="anim_cockpit animation detail_xl forceoutline part platformcollision "/>
       <connection name="ConnectionForanim_elevator_rail" group="elevator_01 " tags="animation detail_l envmap_cockpit forceoutline part platformcollision visible_inside "/>
       <connection name="ConnectionForanim_evevator_monitor" group="elevator_01 " tags="allow_nongroup_triggers anim_cockpit animation detail_xl elevator_button envmap_cockpit forceoutline part platformcollision require_docked trigger_interact ui "/>
       <connection name="ConnectionForanim_hatch" tags="anim_dockdoor animation detail_xl forceoutline nocollision part "/>
       <connection name="ConnectionFordetail_l_elevator" group="elevator_01 " tags="anim_cockpit animation detail_l elevator envmap_cockpit forceoutline navmesh_blocking part platformcollision require_docked trigger_interact ui visible_inside "/>
       <connection name="ConnectionFordetail_m_cockpit" tags="detail_xs envmap_cockpit forceoutline nocollision part visible_inside "/>
       <connection name="ConnectionFordetail_s_cockpitglassinside" tags="detail_m envmap_cockpit noshadowcaster part platformcollision visible_inside "/>
-      <connection name="ConnectionFordetail_xl_elevator_button_top" group=" elevator_01 " tags="allow_nongroup_triggers anim_cockpit detail_xl elevator_button envmap_cockpit forceoutline part platformcollision require_docked trigger_interact ui visible_inside "/>
+      <connection name="ConnectionFordetail_xl_elevator_button_top" group=" elevator_01 " tags="allow_nongroup_triggers detail_xl elevator_button envmap_cockpit forceoutline part platformcollision require_docked trigger_interact ui visible_inside "/>
       <connection name="ConnectionFordetails_m_main" tags="detail_l engineeffect forceoutline part platformcollision "/>
       <connection name="ConnectionForfx_decals_cockpit" tags="detail_xs envmap_cockpit forceoutline fx nocollision part visible_inside "/>
       <connection name="ConnectionForfx_exhaust_01" tags="animation detail_l engineeffect fx nocollision part speedscale_forward textureanimation useobjectrotation "/>
@@ -9460,30 +9460,31 @@
       <connection name="ConnectionForpart_main" tags="animation engineeffect part "/>
       <connection name="ConnectionForanim_screeneffect_01" group="  " tags="anim_cockpit_active animation detail_m envmap_cockpit nocollision part textureanimation visible_inside "/>
       <connection name="ConnectionForanim_screentext_01" group=" " tags="anim_cockpit_active animation detail_m iklink nocollision part textureanimation visible_inside " parent="anim_screeneffect_01"/>
-      <connection name="ConnectionForanim_lightcone_01001" tags="anim_cockpit animation detail_l fx nocollision part textureanimation visible_inside "/>
-      <connection name="ConnectionForanim_door_left2960076931136" group=" transporter_01" tags="envmap_cockpit part visible_inside "/>
-      <connection name="ConnectionFordetail_m_decals_left2960076938048" group=" transporter_01 " tags="envmap_cockpit part visible_inside " parent="anim_door_left"/>
-      <connection name="ConnectionForanim_door_right2960076933568" group=" transporter_01" tags="envmap_cockpit part visible_inside "/>
-      <connection name="ConnectionFordetail_m_decals_right2960076943552" group=" transporter_01 " tags="envmap_cockpit part visible_inside " parent="anim_door_right"/>
-      <connection name="ConnectionFordetail_l_button2960076944448" group=" transporter_01" tags="envmap_cockpit part visible_inside "/>
-      <connection name="ConnectionForpart_chair_010012960076946496" group="  gunnercontrol " tags="envmap_cockpit part visible_inside "/>
-      <connection name="ConnectionForpart_chair_020012960076940736" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_01001"/>
-      <connection name="ConnectionForpart_chair_030012960076932800" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_02001"/>
-      <connection name="ConnectionForpart_chair_040012960076934848" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_03001"/>
-      <connection name="ConnectionForpart_chair_050012960076943168" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04001"/>
-      <connection name="ConnectionForpart_chair_060012960076947008" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_05001"/>
-      <connection name="ConnectionForpart_chair_070012960076945984" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04001"/>
-      <connection name="ConnectionForpart_trackball2961921422784" group="  gunnercontrol " tags="envmap_cockpit part " parent="part_chair_07001"/>
-      <connection name="ConnectionForpart_chair_012960076945472" group=" pilotcontrol " tags="envmap_cockpit part visible_inside "/>
-      <connection name="ConnectionForpart_chair_022960076938816" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_01"/>
-      <connection name="ConnectionForpart_chair_032960076931520" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_02"/>
-      <connection name="ConnectionForpart_chair_042960076932160" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_03"/>
-      <connection name="ConnectionForpart_chair_052960076944832" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04"/>
-      <connection name="ConnectionForpart_chair_062960076941248" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_05"/>
-      <connection name="ConnectionForpart_chair_072960076937408" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04"/>
-      <connection name="ConnectionForpart_trackball0012960076945344" group=" pilotcontrol " tags="envmap_cockpit part " parent="part_chair_07"/>
-      <connection name="ConnectionForpart_main0012960076939712" group=" transporter_01" tags="envmap_cockpit location_cockpit part visible_inside "/>
-      <connection name="ConnectionFordetail_m_decals2960076937152" group=" transporter_01 " tags="envmap_cockpit part " parent="part_main001"/>
+      <connection name="ConnectionForanim_lightcone_01" tags="anim_cockpit animation detail_l fx nocollision part textureanimation visible_inside "/>
+      <connection name="enginealign" tags="enginealign "/>
+      <connection name="ConnectionForanim_door_left2893297801408" group=" transporter_01" tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionFordetail_m_decals_left2893297801664" group=" transporter_01 " tags="envmap_cockpit part visible_inside " parent="anim_door_left"/>
+      <connection name="ConnectionForanim_door_right2893297801280" group=" transporter_01" tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionFordetail_m_decals_right2893297801536" group=" transporter_01 " tags="envmap_cockpit part visible_inside " parent="anim_door_right"/>
+      <connection name="ConnectionFordetail_l_button2893297801152" group=" transporter_01" tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionForpart_chair_010012893297803456" group="  gunnercontrol " tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionForpart_chair_020012893297803584" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_01001"/>
+      <connection name="ConnectionForpart_chair_030012893297804224" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_02001"/>
+      <connection name="ConnectionForpart_chair_040012893297804096" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_03001"/>
+      <connection name="ConnectionForpart_chair_050012893297803968" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04001"/>
+      <connection name="ConnectionForpart_chair_060012893297803840" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_05001"/>
+      <connection name="ConnectionForpart_chair_070012893297803712" group="  gunnercontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04001"/>
+      <connection name="ConnectionForpart_trackball2893297804352" group="  gunnercontrol " tags="envmap_cockpit part " parent="part_chair_07001"/>
+      <connection name="ConnectionForpart_chair_012893297803072" group=" pilotcontrol " tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionForpart_chair_022893297802944" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_01"/>
+      <connection name="ConnectionForpart_chair_032893297802816" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_02"/>
+      <connection name="ConnectionForpart_chair_042893297802688" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_03"/>
+      <connection name="ConnectionForpart_chair_052893297802560" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04"/>
+      <connection name="ConnectionForpart_chair_062893297802432" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_05"/>
+      <connection name="ConnectionForpart_chair_072893297802304" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04"/>
+      <connection name="ConnectionForpart_trackball0012893297803200" group=" pilotcontrol " tags="envmap_cockpit part " parent="part_chair_07"/>
+      <connection name="ConnectionForpart_main0012893297800896" group=" transporter_01" tags="envmap_cockpit location_cockpit part visible_inside "/>
+      <connection name="ConnectionFordetail_m_decals2893297801792" group=" transporter_01 " tags="envmap_cockpit part " parent="part_main001"/>
     </connections>
   </component>
   <component name="ship_xen_m_corvette_02" class="ship_m">
@@ -9671,17 +9672,17 @@
       <connection name="ConnectionForfx_exhaust_03" tags="animation detail_l engineeffect fx nocollision part speedscale_forward textureanimation useobjectrotation "/>
       <connection name="ConnectionForanim_shipcontrol_01" group="  " tags="animation detail_xl envmap_cockpit nocollision part textureanimation visible_inside "/>
       <connection name="enginealign" tags="enginealign "/>
-      <connection name="ConnectionFordetail_l_airlock1718159786176" group=" " tags="envmap_cockpit part visible_inside "/>
-      <connection name="ConnectionFordetail_l_door1718159790272" group=" cabin_01" tags="envmap_cockpit part visible_inside "/>
-      <connection name="ConnectionFordetail_xl_switch1718159792320" group=" " tags="envmap_cockpit part visible_inside "/>
-      <connection name="ConnectionForpart_chair_011718159790400" group=" pilotcontrol " tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionFordetail_l_airlock1746218936896" group=" " tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionFordetail_l_door1746218936768" group=" cabin_01" tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionFordetail_xl_switch1746218936640" group=" " tags="envmap_cockpit part visible_inside "/>
+      <connection name="ConnectionForpart_chair_011746218937664" group=" pilotcontrol " tags="envmap_cockpit part visible_inside "/>
       <connection name="con_control_01" group="pilotcontrol " tags="pilot npc sit_pilot envmap_cockpit " value="-1" parent="part_chair_01"/>
-      <connection name="ConnectionForpart_chair_021718159788736" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_01"/>
-      <connection name="ConnectionForpart_chair_031718159795264" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_02"/>
-      <connection name="ConnectionForpart_chair_041718159787072" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_03"/>
-      <connection name="ConnectionForpart_chair_051718159788992" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04"/>
-      <connection name="ConnectionForpart_chair_061718159791296" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_05"/>
-      <connection name="ConnectionForpart_chair_071718159786688" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04"/>
+      <connection name="ConnectionForpart_chair_021746218937536" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_01"/>
+      <connection name="ConnectionForpart_chair_031746218937408" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_02"/>
+      <connection name="ConnectionForpart_chair_041746218937280" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_03"/>
+      <connection name="ConnectionForpart_chair_051746218937152" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04"/>
+      <connection name="ConnectionForpart_chair_061746218937024" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_05"/>
+      <connection name="ConnectionForpart_chair_071746218936512" group=" pilotcontrol " tags="envmap_cockpit part visible_inside " parent="part_chair_04"/>
     </connections>
   </component>
   <component name="ship_xen_s_scout_01" class="ship_s">
