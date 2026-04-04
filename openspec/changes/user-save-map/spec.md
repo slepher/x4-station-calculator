@@ -186,7 +186,41 @@
 - 使用 `<tag>.svg`（如 `hive.svg`, `nest.svg`, `weaponplatform.svg`）
 
 **非空间站类别（abandonedShip/datavault/erlkingVault）**：
-- 使用小圆点标记，保持现有渲染方式
+- 弃船（abandonedShip）使用飞船类型图标（根据 class + purpose）
+- 保险箱/妖王保险箱使用小圆点标记
+
+#### Scenario: Abandoned Ship Icon Selection
+
+**当** 地图渲染弃船兴趣点
+**那么** 图标选择遵循以下规则：
+
+**数据准备**：
+- 存档中的 `ship.macro` 匹配 `ships.json` 中的 `macro` 字段
+- 从匹配的 ship 数据获取 `id` (shipId) 和 `purposePrimary` (purpose)
+- 无法匹配的弃船在 postProcessor 中过滤掉
+
+**图标选择**：
+- 根据 `class` + `purpose` 选择图标：`ship_{size}_{purpose}_01.svg`
+- 示例：`ship_s` + `fight` → `ship_s_fight_01.svg`
+- 示例：`ship_xl` + `build` → `ship_xl_build_01.svg`
+
+**支持的组合**：
+| class | purpose | 图标 |
+|-------|---------|------|
+| ship_l | fight | ship_l_fight_01.svg |
+| ship_l | mine | ship_l_mine_01.svg |
+| ship_l | trade | ship_l_trade_01.svg |
+| ship_l | dismantling | ship_l_dismantling_01.svg |
+| ship_m | fight | ship_m_fight_01.svg |
+| ship_m | mine | ship_m_mine_01.svg |
+| ship_m | trade | ship_m_trade_01.svg |
+| ship_m | salvage | ship_m_salvage_01.svg |
+| ship_s | fight | ship_s_fight_01.svg |
+| ship_s | mine | ship_s_mine_01.svg |
+| ship_s | trade | ship_s_trade_01.svg |
+| ship_xl | build | ship_xl_build_01.svg |
+| ship_xl | fight | ship_xl_fight_01.svg |
+| ship_xl | auxiliary | ship_xl_auxiliary_01.svg |
 
 #### Scenario: 分类颜色区分
 
@@ -279,6 +313,15 @@
 - code
 - 坐标值
 **并且** tooltip 样式与地图现有 tooltip 一致
+
+#### Scenario: Abandoned Ship Tooltip Ship Name
+
+**前提** 用户点击弃船兴趣点标记
+**当** 弃船有对应的 shipId
+**那么** tooltip 显示 i18n 化的飞船名称
+**并且** 使用 ship 的 nameId 进行翻译
+**并且** 若 nameId 无翻译，使用 ship.name
+**并且** 若无法找到 ship 数据，显示 shipId
 
 ---
 

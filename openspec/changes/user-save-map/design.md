@@ -356,3 +356,112 @@ const ownerName = computed(() => {
   return faction?.name || owner
 })
 ```
+
+---
+
+### D14: Abandoned Ship Icon Mapping
+
+**决策**：弃船使用飞船类型图标替代圆点，根据 `class` + `purpose` 选择对应 SVG。
+
+**图标命名规范**：
+```
+ship_{size}_{purpose}_01.svg
+```
+- size: `l`, `m`, `s`, `xl`, `xs`
+- purpose: `fight`, `mine`, `trade`, `build`, `dismantling`, `salvage`, `auxiliary`
+
+**映射表**：
+```typescript
+SHIP_CLASS_PURPOSE_ICON_MAP = {
+  'ship_l': {
+    fight: ship_l_fight_01.svg,
+    mine: ship_l_mine_01.svg,
+    trade: ship_l_trade_01.svg,
+    dismantling: ship_l_dismantling_01.svg
+  },
+  'ship_m': {
+    fight: ship_m_fight_01.svg,
+    mine: ship_m_mine_01.svg,
+    trade: ship_m_trade_01.svg,
+    salvage: ship_m_salvage_01.svg
+  },
+  'ship_s': {
+    fight: ship_s_fight_01.svg,
+    mine: ship_s_mine_01.svg,
+    trade: ship_s_trade_01.svg
+  },
+  'ship_xl': {
+    build: ship_xl_build_01.svg,
+    fight: ship_xl_fight_01.svg,
+    auxiliary: ship_xl_auxiliary_01.svg
+  }
+}
+```
+
+**过滤规则**：
+- 仅处理在 `ships.json` 中能找到对应 macro 的弃船
+- 找不到 ship 数据的弃船在 postProcessor 中过滤掉
+
+---
+
+### D15: Abandoned Ship Data Enhancement
+
+**决策**：在 saveParser.post.ts 中为弃船添加 `shipId` 和 `purpose` 字段。
+
+**数据来源**：
+- `ships.json` 中的 `macro` 字段用于匹配存档中的 `ship.macro`
+- 从匹配的 ship 数据中提取 `id` 作为 `shipId`，`purposePrimary` 作为 `purpose`
+
+**类型定义**：
+```typescript
+interface AbandonedShipEntry {
+  code: string
+  macro: string
+  class: string
+  shipId?: string    // 新增：飞船 ID，用于 i18n
+  purpose?: string   // 新增：用途，用于图标选择
+  relative_position: { x: number; y: number; z: number }
+  zone_id?: string
+  position: SaveSectorStaticPosition
+}
+```
+
+---
+
+### D16: Abandoned Ship Tooltip Enhancement
+
+**决策**：弃船 tooltip 显示 i18n 化的飞船名称。
+
+**实现**：
+```typescript
+const shipName = computed(() => {
+  if (poi.category !== 'abandonedShip' || !poi.shipId) return null
+  const ship = shipBuildStore.shipMap.get(poi.shipId)
+  if (!ship) return poi.shipId
+  if (ship.nameId && te(ship.nameId)) {
+    return t(ship.nameId)
+  }
+  return ship.name || poi.shipId
+})
+```
+
+---
+
+### D17: Unified Overlay Item Creation
+
+**决策**：使用统一的 `createOverlayItem` 函数构建 `SavePoiOverlayItem`。
+
+**理由**：
+- 确保 MapSaveCoordList 和 MapSvgCanvas 使用相同的数据结构
+- 避免 tooltip 内容不一致
+
+**实现**：
+```typescript
+export function createOverlayItem(
+  category: SavePoiCategory,
+  sectorMacro: string,
+  sectorName: string,
+  item: StationEntry | DatavaultEntry | AbandonedShipEntry
+): SavePoiOverlayItem
+```
+```

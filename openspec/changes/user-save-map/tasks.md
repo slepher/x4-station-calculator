@@ -176,6 +176,53 @@
 
 ---
 
+## Phase 8: Abandoned Ship Icon & Info Enhancement
+
+### T8.1 Ship Icon File Organization
+
+- [x] 创建 `src/components/icons/ships/` 目录
+- [x] 移动 `ship_*` 图标文件到 ships/ 子目录
+- [x] 重命名图标文件以匹配 purposePrimary：
+  - `ship_l_compactor_01.svg` → `ship_l_dismantling_01.svg`
+  - `ship_m_tug_01.svg` → `ship_m_salvage_01.svg`
+- [x] 创建 `ship_xl_auxiliary_01.svg` (从 neutral 复制)
+
+### T8.2 Ship Data Macro Field
+
+- [x] x4_data_processor.py: ships.json 添加 `macro` 字段
+- [x] types/x4.ts: X4Ship 添加 `macro?: string`
+- [x] store/logic/useGameData.ts: ShipBuildDatas 添加 `shipByMacroMap`
+
+### T8.3 Abandoned Ship Purpose Assignment
+
+- [x] saveParser.post.ts: 引入 ships.json
+- [x] 构建 SHIP_LOOKUP (macro → { id, purpose })
+- [x] 处理 abandonedShips 时添加 shipId 和 purpose 字段
+- [x] 过滤无法匹配 ship 数据的弃船
+- [x] 升级 post_processor_version 到 v7
+
+### T8.4 Abandoned Ship Icon Display
+
+- [x] style.ts: 导入船类图标
+- [x] style.ts: 构建 SHIP_CLASS_PURPOSE_ICON_MAP
+- [x] style.ts: getSavePoiIconUrl 支持 abandonedShip 类别
+- [x] types/saveArchive.ts: AbandonedShipEntry 添加 shipId/purpose
+- [x] types/saveArchive.ts: SavePoiOverlayItem 添加 class/purpose/shipId
+
+### T8.5 Abandoned Ship Tooltip i18n
+
+- [x] MapSavePoiTooltip.vue: 添加 shipName computed
+- [x] MapSavePoiTooltip.vue: 显示飞船名称行
+- [x] locales: 添加 save_poi_tooltip_ship_name 和 save_poi_tooltip_sector
+
+### T8.6 Unified Overlay Item Creation
+
+- [x] useSaveStore.ts: 导出 createOverlayItem 函数
+- [x] MapSaveCoordList.vue: 使用 createOverlayItem 替代手动构建
+- [x] 确保列表和地图 tooltip 数据一致
+
+---
+
 ## Task Dependencies
 
 ```
