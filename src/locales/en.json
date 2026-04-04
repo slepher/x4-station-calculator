@@ -190,6 +190,8 @@
     "save_breadcrumb_root": "Saves",
     "save_archives_loaded": "archives loaded",
     "save_no_archives": "No archives. Upload a save file.",
+    "save_default_map": "Default Map",
+    "save_default_map_hint": "Show default sector owners and resources",
     "save_saves": "saves",
     "save_category_header": "Show POI categories:",
     "save_category_player_station": "Player Stations",

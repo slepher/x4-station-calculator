@@ -190,6 +190,8 @@
     "save_breadcrumb_root": "存档",
     "save_archives_loaded": "个存档已加载",
     "save_no_archives": "暂无存档，请上传存档文件",
+    "save_default_map": "默认地图",
+    "save_default_map_hint": "显示默认星区所有者和资源",
     "save_saves": "个存档",
     "save_category_header": "显示兴趣点类别:",
     "save_category_player_station": "用户空间站",

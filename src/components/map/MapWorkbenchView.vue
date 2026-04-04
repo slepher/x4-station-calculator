@@ -1021,6 +1021,7 @@ const onSavePanelClose = () => {
 
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
   if (!payload) {
+    saveStore.clearSelection()
     activeSavePoiCategory.value = null
     return
   }

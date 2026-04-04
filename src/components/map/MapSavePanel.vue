@@ -81,11 +81,13 @@ function onBreadcrumbNavigate(key: string) {
   }
 }
 
-function onArchiveSelect(payload: { guid: string; time: number }) {
+function onArchiveSelect(payload: { guid: string; time: number } | null) {
   emit('select-archive', payload)
-  layer.value = 'category'
-  selectedCategory.value = null
-  emit('active-category-change', null)
+  if (payload) {
+    layer.value = 'category'
+    selectedCategory.value = null
+    emit('active-category-change', null)
+  }
 }
 
 function onCategorySelect(category: SavePoiCategory) {

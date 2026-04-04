@@ -6,7 +6,7 @@ import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import type { ArchiveGroup } from '@/types/saveArchive'
 
 const emit = defineEmits<{
-  (e: 'select', payload: { guid: string; time: number }): void
+  (e: 'select', payload: { guid: string; time: number } | null): void
 }>()
 
 const { t } = useI18n()
@@ -18,10 +18,20 @@ const sortedGroups = computed<ArchiveGroup[]>(() => {
   })
 })
 
+const activeArchiveId = computed(() => saveStore.savedArchivesState.activeArchiveId)
+
+function createArchiveId(guid: string, time: number): string {
+  return `${guid}_${time}`
+}
+
 function formatTime(time: number): string {
   const hours = Math.floor(time / 3600)
   const minutes = Math.floor((time % 3600) / 60)
   return `${hours}h ${minutes}m`
+}
+
+function onDefaultMapClick() {
+  emit('select', null)
 }
 
 function onArchiveClick(group: ArchiveGroup, time: number) {
@@ -43,6 +53,21 @@ function canSelectArchive(valid: boolean): boolean {
       {{ saveStore.totalArchiveCount }} {{ t('map.save_archives_loaded') }}
     </div>
 
+    <div class="archive-groups">
+      <div
+        class="save-item default-map-item"
+        :class="{ 'save-item-active': !activeArchiveId }"
+        @click="onDefaultMapClick"
+      >
+        <div class="save-info">
+          <div class="save-time">{{ t('map.save_default_map') }}</div>
+          <div class="save-meta">
+            <span class="save-filename">{{ t('map.save_default_map_hint') }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div v-if="sortedGroups.length === 0" class="empty-hint">
       {{ t('map.save_no_archives') }}
     </div>
@@ -59,7 +84,10 @@ function canSelectArchive(valid: boolean): boolean {
             v-for="archive in group.saves"
             :key="archive.meta.time"
             class="save-item"
-            :class="{ 'save-item-disabled': !canSelectArchive(archive.isValid) }"
+            :class="{
+              'save-item-disabled': !canSelectArchive(archive.isValid),
+              'save-item-active': activeArchiveId === createArchiveId(group.guid, archive.meta.time)
+            }"
             :title="!archive.isValid ? t('map.save_invalid_archive_hint') : undefined"
             @click="onArchiveClick(group, archive.meta.time)"
           >
@@ -123,12 +151,20 @@ function canSelectArchive(valid: boolean): boolean {
   @apply flex items-center justify-between p-2 rounded cursor-pointer bg-black/45 border border-amber-300/15 hover:bg-amber-200/5 hover:border-amber-200/45 transition-colors;
 }
 
+.save-item-active {
+  @apply bg-amber-500/15 border-amber-400/60;
+}
+
 .save-item-disabled {
   @apply cursor-not-allowed opacity-60;
 }
 
 .save-item-disabled:hover {
   @apply bg-black/45 border-amber-300/15;
+}
+
+.default-map-item {
+  @apply mb-2;
 }
 
 .save-info {
