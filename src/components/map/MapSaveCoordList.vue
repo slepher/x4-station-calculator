@@ -2,14 +2,15 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useMapStore } from '@/store/useMapStore'
 import { useSaveStore } from '@/store/useSaveStore'
-import { resolveMapSectorByMacro } from './mapSectorMacro'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 
 const props = defineProps<{
   archive: SaveArchive | null
   category: SavePoiCategory
+  excludeConditionalSmallStations: boolean
 }>()
 
 const emit = defineEmits<{
@@ -18,6 +19,7 @@ const emit = defineEmits<{
 
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
+const mapStore = useMapStore()
 const saveStore = useSaveStore()
 
 const searchQuery = ref('')
@@ -33,7 +35,9 @@ interface SectorPoiGroup {
 }
 
 const poiGroups = computed<SectorPoiGroup[]>(() => {
-  const categoryData = saveStore.getArchivePoiCategories(props.archive)[props.category]
+  const categoryData = saveStore.getArchivePoiCategories(props.archive, {
+    excludeConditionalSmallStations: props.excludeConditionalSmallStations
+  })[props.category]
 
   return categoryData.groups
     .map((group) => {
@@ -50,17 +54,22 @@ const poiGroups = computed<SectorPoiGroup[]>(() => {
         rawSectorName: searchNames.rawName,
         sectorName: searchNames.displayName,
         showRawSectorName: locale.value !== 'en' && match.matchedRawName && !match.matchedDisplayName,
-        pois: group.items.map((item) => ({
-          key: `${props.category}:${item.code}`,
-          code: item.code,
-          category: props.category,
-          owner: 'owner' in item ? item.owner : undefined,
-          sectorMacro: group.sectorMacro,
-          sectorName: searchNames.displayName,
-          pos: { x: item.position.x, z: item.position.z }
-        }))
+        pois: group.items
+          .map((item) => ({
+            key: `${props.category}:${item.code}`,
+            code: item.code,
+            category: props.category,
+            owner: 'owner' in item ? item.owner : undefined,
+            sectorMacro: group.sectorMacro,
+            sectorName: searchNames.displayName,
+            position: { x: item.position.x, y: item.position.y, z: item.position.z, tx: item.position.tx, ty: item.position.ty },
+            tag: 'tag' in item ? item.tag : undefined,
+            factoryGroup: 'factoryGroup' in item ? item.factoryGroup : undefined,
+            is_headquarter: 'is_headquarter' in item ? item.is_headquarter : undefined
+          }))
       }
     })
+    .filter((group) => group.pois.length > 0)
     .sort((a, b) => a.sectorName.localeCompare(b.sectorName))
 })
 
@@ -78,8 +87,7 @@ const filteredGroups = computed<SectorPoiGroup[]>(() => {
 })
 
 function getSectorSearchNames(sectorMacro: string, fallbackName: string): { rawName: string; displayName: string } {
-  const clusters = gameDataStore.maps?.clusters || {}
-  const resolved = resolveMapSectorByMacro(clusters, sectorMacro)
+  const resolved = mapStore.resolveSectorByMacro(sectorMacro)
   if (resolved) {
     const rawName = (resolved.sector as any).name || fallbackName
     const nameId = (resolved.sector as any).nameId
@@ -158,7 +166,7 @@ function onClearSearch() {
             @click="onPoiClick(poi)"
           >
             <span class="poi-code">{{ poi.code }}</span>
-            <span class="poi-coords">({{ formatCoord(poi.pos.x) }}, {{ formatCoord(poi.pos.z) }})</span>
+            <span class="poi-coords">({{ formatCoord(poi.position.x) }}, {{ formatCoord(poi.position.z) }})</span>
           </div>
         </div>
       </div>

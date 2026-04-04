@@ -1,11 +1,12 @@
 <script setup lang="ts">
+import { SMALL_ICON_SIZE } from '@/components/map/utils/style'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
 import type { PlacementOverlay, PlacementPreview } from '@/components/map/types'
 
 defineProps<{
   overlayScreenItems: Array<PlacementOverlay & { x: number; y: number }>
   previewScreenItem: (PlacementPreview & { x: number; y: number }) | null
-  savePoiScreenItems: Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null }>
+  savePoiScreenItems: Array<SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }>
   draggingOverlayKey: string | null
   focusedOverlayKey: string | null
   focusedSavePoiKey: string | null
@@ -13,13 +14,16 @@ defineProps<{
   previewIconSize: number
   placementIconHref: (icon: 'factory' | 'shipyard' | 'tradestation') => string
   getSavePoiIconUrl: (poi: SavePoiOverlayItem) => string | null
-  getSavePoiIconSize: (poi: SavePoiOverlayItem) => number
 }>()
 
 const emit = defineEmits<{
   (e: 'overlay-pointerdown', payload: PlacementOverlay & { x: number; y: number }): void
-  (e: 'save-poi-pointerdown', payload: SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null }): void
+  (e: 'save-poi-pointerdown', payload: SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize?: number }): void
 }>()
+
+function isSmallPoi(poi: SavePoiOverlayItem & { iconSize?: number }) {
+  return (poi.iconSize || SMALL_ICON_SIZE) <= SMALL_ICON_SIZE
+}
 </script>
 
 <template>
@@ -73,15 +77,23 @@ const emit = defineEmits<{
       <image
         v-if="getSavePoiIconUrl(poi)"
         :href="getSavePoiIconUrl(poi)!"
-        :x="(-getSavePoiIconSize(poi) / 2).toFixed(1)"
-        :y="(-getSavePoiIconSize(poi) / 2).toFixed(1)"
-        :width="getSavePoiIconSize(poi)"
-        :height="getSavePoiIconSize(poi)"
+        :x="(-(poi.iconSize || SMALL_ICON_SIZE) / 2).toFixed(1)"
+        :y="(-(poi.iconSize || SMALL_ICON_SIZE) / 2).toFixed(1)"
+        :width="poi.iconSize || SMALL_ICON_SIZE"
+        :height="poi.iconSize || SMALL_ICON_SIZE"
+        :filter="poi.factionFilterId ? `url(#${poi.factionFilterId})` : undefined"
         preserveAspectRatio="xMidYMid meet"
-        :filter="poi.factionFilterId ? `url(#${poi.factionFilterId}${focusedSavePoiKey === poi.key ? '-focused' : ''})` : undefined"
       />
       <circle v-else cx="0" cy="0" r="5" :fill="poi.color" stroke="#fff" stroke-width="1" />
-      <text x="0" y="-12" text-anchor="middle" class="save-poi-label">{{ poi.code }}</text>
+      <text
+        x="0"
+        :y="isSmallPoi(poi) ? -6 : -12"
+        text-anchor="middle"
+        class="save-poi-label"
+        :class="{ small: isSmallPoi(poi) }"
+      >
+        {{ poi.code }}
+      </text>
     </g>
   </g>
 </template>
@@ -128,13 +140,27 @@ const emit = defineEmits<{
   cursor: pointer;
 }
 
+.save-poi-marker.focused image {
+  filter:
+    drop-shadow(0 0 4px rgba(253, 230, 138, 0.95))
+    drop-shadow(0 0 10px rgba(245, 158, 11, 0.7));
+}
+
 .save-poi-marker.focused circle {
   filter: drop-shadow(0 0 4px rgba(253, 230, 138, 0.95));
+}
+
+.save-poi-marker.focused .save-poi-label {
+  fill: #fff7d6;
 }
 
 .save-poi-label {
   fill: #fef3c7;
   font-size: 9px;
   font-family: Consolas, 'Courier New', monospace;
+}
+
+.save-poi-label.small {
+  font-size: 6px;
 }
 </style>

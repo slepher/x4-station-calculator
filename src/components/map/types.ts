@@ -19,10 +19,22 @@ export type FitState = {
   offsetY: number
 }
 
-export type HighwayPoint = { sx?: number; sy?: number }
-export type Highway = { entry?: HighwayPoint; exit?: HighwayPoint; spline?: HighwayPoint[] }
-export type Gate = { id?: string; target_cluster_id?: string; raw_local_pos?: { sx?: number; sy?: number } }
-export type Zone = { raw_sector_pos?: { sx?: number; sy?: number } }
+export type HighwayPoint = { x?: number; z?: number; sx?: number; sy?: number }
+export type Highway = {
+  entry?: HighwayPoint
+  exit?: HighwayPoint
+  spline?: HighwayPoint[]
+  entry_pos?: { x?: number; z?: number }
+  exit_pos?: { x?: number; z?: number }
+}
+export type Gate = {
+  id?: string
+  target_cluster_id?: string
+  raw_local_pos?: { x?: number; z?: number; sx?: number; sy?: number }
+}
+export type Zone = {
+  raw_sector_pos?: { x?: number; y?: number; z?: number; sx?: number; sy?: number }
+}
 
 export type SectorLink = {
   id: string
@@ -49,6 +61,7 @@ export type Sector = {
   area?: {
     sunlight?: number
   }
+  raw_center_pos?: { x: number; y: number; z: number }
   resources?: SectorResourceEntry[]
   normalized?: {
     center_offset_ratio?: Ratio

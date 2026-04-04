@@ -29,7 +29,7 @@ const archive: SaveArchive = {
           macro: 'station_player',
           owner: 'player',
           relative_position: { x: 1000, y: 0, z: 2000 },
-          position: { x: 1000, y: 0, z: 2000 }
+          position: { x: 1000, y: 0, z: 2000, tx: 0.1, ty: -0.2 }
         }
       ],
       npcStations: [
@@ -38,7 +38,7 @@ const archive: SaveArchive = {
           macro: 'station_npc_hq',
           owner: 'argon',
           relative_position: { x: 3000, y: 0, z: 4000 },
-          position: { x: 3000, y: 0, z: 4000 },
+          position: { x: 3000, y: 0, z: 4000, tx: 0.3, ty: -0.4 },
           tag: 'tradestation'
         },
         {
@@ -46,7 +46,7 @@ const archive: SaveArchive = {
           macro: 'station_npc',
           owner: 'argon',
           relative_position: { x: 5000, y: 0, z: 6000 },
-          position: { x: 5000, y: 0, z: 6000 },
+          position: { x: 5000, y: 0, z: 6000, tx: 0.5, ty: -0.6 },
           tag: 'shipyard'
         }
       ],
@@ -56,7 +56,7 @@ const archive: SaveArchive = {
           macro: 'datavault_macro',
           owner: 'neutral',
           relative_position: { x: 7000, y: 0, z: 8000 },
-          position: { x: 7000, y: 0, z: 8000 },
+          position: { x: 7000, y: 0, z: 8000, tx: 0.7, ty: -0.8 },
           unlocked: false,
           has_blueprints: true
         }
@@ -67,7 +67,7 @@ const archive: SaveArchive = {
           macro: 'erlking_macro',
           owner: 'neutral',
           relative_position: { x: 9000, y: 0, z: 10000 },
-          position: { x: 9000, y: 0, z: 10000 },
+          position: { x: 9000, y: 0, z: 10000, tx: 0.9, ty: -1.0 },
           unlocked: false,
           has_wares: true
         }
@@ -78,7 +78,7 @@ const archive: SaveArchive = {
           macro: 'ship_macro',
           class: 'fighter',
           relative_position: { x: 11000, y: 0, z: 12000 },
-          position: { x: 11000, y: 0, z: 12000 }
+          position: { x: 11000, y: 0, z: 12000, tx: 1.1, ty: -1.2 }
         }
       ]
     },
@@ -129,5 +129,6 @@ describe('user-save-map save POI derivation', () => {
       'erlkingVault:EK-01'
     ])
     expect(overlays.every((item) => item.sectorName === 'Alpha')).toBe(true)
+    expect(overlays[0]?.position).toEqual({ x: 1000, z: 2000, tx: 0.1, ty: -0.2 })
   })
 })
