@@ -89,7 +89,19 @@ describe('save store versioning', () => {
           createdAt: new Date('2026-04-04T00:00:00.000Z'),
           sectorCount: 0
         }
-      ]
+      ],
+      settings: {
+        visibility: {
+          playerStation: false,
+          npcStation: false,
+          xenonStation: false,
+          khaakStation: false,
+          abandonedShip: false,
+          datavault: false,
+          erlkingVault: false
+        },
+        excludeConditionalSmallStations: true
+      }
     })
 
     const saveStore = useSaveStore()
@@ -120,7 +132,19 @@ describe('save store versioning', () => {
           createdAt: new Date('2026-04-04T00:00:00.000Z'),
           sectorCount: 1
         }
-      ]
+      ],
+      settings: {
+        visibility: {
+          playerStation: false,
+          npcStation: false,
+          xenonStation: false,
+          khaakStation: false,
+          abandonedShip: false,
+          datavault: false,
+          erlkingVault: false
+        },
+        excludeConditionalSmallStations: true
+      }
     })
     dbMocks.loadArchiveDetailFromDB.mockResolvedValue({
       meta: {
@@ -182,7 +206,19 @@ describe('save store versioning', () => {
           createdAt: new Date('2026-04-04T00:00:00.000Z'),
           sectorCount: 1
         }
-      ]
+      ],
+      settings: {
+        visibility: {
+          playerStation: false,
+          npcStation: false,
+          xenonStation: false,
+          khaakStation: false,
+          abandonedShip: false,
+          datavault: false,
+          erlkingVault: false
+        },
+        excludeConditionalSmallStations: true
+      }
     })
     dbMocks.loadArchiveDetailFromDB.mockResolvedValue(null)
 
@@ -192,6 +228,35 @@ describe('save store versioning', () => {
     expect(saveStore.selectedArchive).toBeNull()
     expect(saveStore.savedArchivesState.activeArchiveId).toBeNull()
     const persisted = JSON.parse(localStorage.getItem('x4_save_archives') || '{}') as SavedSaveArchivesState
+    expect(persisted.activeArchiveId).toBeNull()
+  })
+
+  it('migrates missing settings to defaults and persists updated settings separately from archive selection', async () => {
+    localStorage.setItem('x4_save_archives', JSON.stringify({
+      version: 1,
+      activeArchiveId: null,
+      list: []
+    }))
+
+    const saveStore = useSaveStore()
+    await saveStore.initialize()
+
+    expect(saveStore.savedArchivesState.settings.excludeConditionalSmallStations).toBe(true)
+    expect(saveStore.savedArchivesState.settings.visibility.playerStation).toBe(false)
+
+    saveStore.updateSettings({
+      excludeConditionalSmallStations: false,
+      visibility: {
+        ...saveStore.savedArchivesState.settings.visibility,
+        playerStation: true,
+        datavault: true
+      }
+    })
+
+    const persisted = JSON.parse(localStorage.getItem('x4_save_archives') || '{}') as SavedSaveArchivesState
+    expect(persisted.settings.excludeConditionalSmallStations).toBe(false)
+    expect(persisted.settings.visibility.playerStation).toBe(true)
+    expect(persisted.settings.visibility.datavault).toBe(true)
     expect(persisted.activeArchiveId).toBeNull()
   })
 })

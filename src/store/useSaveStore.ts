@@ -5,6 +5,7 @@ import type {
   ArchiveGroup,
   ArchiveMeta,
   SavedSaveArchivesState,
+  SaveArchiveSettings,
   SectorData,
   SaveParserErrorDetail,
   SavePoiCategory,
@@ -82,7 +83,47 @@ function createEmptySaveArchivesState(): SavedSaveArchivesState {
   return {
     version: SAVE_ARCHIVES_STATE_VERSION,
     activeArchiveId: null,
-    list: []
+    list: [],
+    settings: createDefaultSaveArchiveSettings()
+  }
+}
+
+function createDefaultSavePoiVisibility(): Record<SavePoiCategory, boolean> {
+  return {
+    playerStation: false,
+    npcStation: false,
+    xenonStation: false,
+    khaakStation: false,
+    abandonedShip: false,
+    datavault: false,
+    erlkingVault: false
+  }
+}
+
+function createDefaultSaveArchiveSettings(): SaveArchiveSettings {
+  return {
+    visibility: createDefaultSavePoiVisibility(),
+    excludeConditionalSmallStations: true
+  }
+}
+
+function migrateSaveArchiveSettingsToCurrent(raw: unknown): SaveArchiveSettings {
+  const defaults = createDefaultSaveArchiveSettings()
+  if (!raw || typeof raw !== 'object') return defaults
+
+  const parsed = raw as Partial<SaveArchiveSettings>
+  const visibility = parsed.visibility && typeof parsed.visibility === 'object'
+    ? {
+      ...defaults.visibility,
+      ...Object.fromEntries(
+        SAVE_POI_CATEGORIES.map((category) => [category, parsed.visibility?.[category] === true])
+      )
+    }
+    : defaults.visibility
+
+  return {
+    visibility,
+    excludeConditionalSmallStations: parsed.excludeConditionalSmallStations !== false
   }
 }
 
@@ -105,7 +146,8 @@ function migrateSaveArchivesStateToCurrent(raw: unknown): SavedSaveArchivesState
   return {
     version: SAVE_ARCHIVES_STATE_VERSION,
     activeArchiveId: typeof parsed.activeArchiveId === 'string' ? parsed.activeArchiveId : null,
-    list
+    list,
+    settings: migrateSaveArchiveSettingsToCurrent(parsed.settings)
   }
 }
 
@@ -354,6 +396,14 @@ export const useSaveStore = defineStore('save', () => {
     archives.value = buildArchiveGroups(savedArchivesState.value.list)
   }
 
+  function updateSettings(patch: Partial<SaveArchiveSettings>) {
+    savedArchivesState.value.settings = {
+      ...savedArchivesState.value.settings,
+      ...patch
+    }
+    writeSavedState()
+  }
+
   function buildArchiveMeta(archive: SaveArchive, existingCreatedAt?: Date): ArchiveMeta {
     return {
       id: createArchiveId(archive.meta.guid, archive.meta.time),
@@ -528,7 +578,9 @@ export const useSaveStore = defineStore('save', () => {
   }
 
   function clearAll(): void {
+    const settings = savedArchivesState.value.settings
     savedArchivesState.value = createEmptySaveArchivesState()
+    savedArchivesState.value.settings = settings
     archives.value.clear()
     selectedArchive.value = null
     parseError.value = null
@@ -694,6 +746,7 @@ export const useSaveStore = defineStore('save', () => {
     exportToJson,
     importFromJson,
     setParsingState,
+    updateSettings,
     getArchivePoiCategories,
     getArchivePoiOverlays
   }

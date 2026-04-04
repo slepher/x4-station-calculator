@@ -230,11 +230,17 @@ export interface SavedSaveArchivesState {
   version: number
   activeArchiveId: string | null
   list: ArchiveMeta[]
+  settings: SaveArchiveSettings
 }
 
 export type SavePoiCategory = 'playerStation' | 'npcStation' | 'xenonStation' | 'khaakStation' | 'abandonedShip' | 'datavault' | 'erlkingVault'
 
 export type SavePoiVisibility = Record<SavePoiCategory, boolean>
+
+export interface SaveArchiveSettings {
+  visibility: SavePoiVisibility
+  excludeConditionalSmallStations: boolean
+}
 
 export interface SavePoiOverlayItem {
   key: string

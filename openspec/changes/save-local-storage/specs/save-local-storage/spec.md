@@ -12,7 +12,7 @@ Save Store MUST 使用当前游戏版本配置中的 save storage key，将存�
 - **前提** 当前游戏版本已经通过 `useGameDataStore` 选择并生效
 - **当** Save Store 读取或写入存档目录状态
 - **那么** 它 MUST 使用当前版本配置下的 save storage key
-- **并且** 该状态 MUST 包含 `version`、`activeArchiveId` 与全部 `ArchiveMeta`
+- **并且** 该状态 MUST 包含 `version`、`activeArchiveId`、全部 `ArchiveMeta` 与 save 地图 settings
 
 #### Scenario: Isolate Save Directory Across Game Versions
 - **前提** 用户在两个不同游戏版本下都导入过存档
@@ -36,6 +36,27 @@ Save Store MUST 将当前激活存档作为版本化目录状态的一部分持�
 - **当** Save Store 初始化或选择该存档
 - **那么** Save Store SHALL 清空无效的 `activeArchiveId`
 - **并且** SHALL 回写修正后的目录状态到当前版本作用域
+
+### Requirement: Save Map Settings SHALL Be Persisted Per Version Scope And Not Per Archive
+存档面板中的地图展示 settings MUST 保存在当前版本作用域的 save localStorage 状态中，并且 MUST NOT 绑定到具体 archive。
+
+#### Scenario: Persist Save Checkbox Settings Across Panel Close
+- **前提** 用户已经在存档面板中修改了 POI 分类 checkbox 或“删除条件小站点” checkbox
+- **当** 用户关闭存档面板
+- **那么** Save Store SHALL 保留当前版本作用域下的这些 settings
+- **并且** 下次重新打开面板时 SHALL 恢复同样的勾选状态
+
+#### Scenario: Persist Save Checkbox Settings Across Archive Switch
+- **前提** 用户已经在当前版本作用域下设置了存档面板 checkbox 状态
+- **当** 用户切换激活存档
+- **那么** 系统 SHALL 继续使用同一份当前版本作用域下的 settings
+- **并且** SHALL NOT 因 archive 切换而重置这些 checkbox
+
+#### Scenario: Keep Save Checkbox Settings When Clearing Archives
+- **前提** 当前版本作用域下已经存在 save 地图 settings
+- **当** 用户执行清空存档目录与正文
+- **那么** 系统 SHALL 清空存档目录与正文
+- **并且** SHALL 保留当前版本作用域下的 save 地图 settings
 
 ### Requirement: Save Archive Body SHALL Be Stored In IndexedDB Only
 完整 `SaveArchive` 正文 MUST 只保存在 IndexedDB，不再作为目录状态写入 `localStorage`。
@@ -76,6 +97,23 @@ Save Store 的清空行为 MUST 只影响当前版本作用域。
 - **当** 用户在当前版本执行清空
 - **那么** Save Store SHALL 只清空当前版本作用域下的目录状态与正文
 - **并且** 不得删除其他版本作用域的 Save 数据
+- **并且** SHALL 保留当前版本作用域下的 save 地图 settings
+
+### Requirement: Maps View SHALL Use Active Archive Without Forcing Save Panel Open
+进入 `maps` 视图时，如果当前版本作用域存在可恢复的激活存档，地图主画布 MUST 直接基于该存档渲染；存档面板 MUST NOT 因此自动展开。
+
+#### Scenario: Render Maps View From Active Archive
+- **前提** 当前版本作用域下存在有效的 `activeArchiveId`
+- **并且** 对应正文可以从 IndexedDB 恢复
+- **当** 用户进入 `maps` 视图
+- **那么** 地图主画布 SHALL 使用该激活存档的数据渲染
+- **并且** 用户无需再次手动选择该存档
+
+#### Scenario: Do Not Auto Open Save Panel When Maps View Uses Active Archive
+- **前提** `maps` 视图已经基于激活存档渲染
+- **当** 页面完成进入或刷新恢复
+- **那么** 存档面板 SHALL 保持关闭
+- **并且** 只有用户主动打开时才显示面板 UI
 
 ### Requirement: Legacy Save DB SHALL Be Cleaned When No Scoped Save Keys Exist
 在未正式上线阶段，系统 MUST 使用“无 save localStorage key 时清理旧 DB”的策略替代数据迁移。

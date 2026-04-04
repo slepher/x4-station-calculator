@@ -24,7 +24,11 @@
   - `version`
   - `activeArchiveId`
   - `list: ArchiveMeta[]`
+- 该状态对象还必须包含 save 地图设置：
+  - 各 POI 分类 checkbox 的可见性状态
+  - “删除条件小站点” checkbox 状态
 - 不将 `activeArchiveId` 单独拆成第二个 key。
+- 这些 save 地图设置属于当前版本作用域下的 save settings，不绑定具体某一条 archive。
 
 ### 4. IndexedDB 正文结构
 - IndexedDB 仅保存完整 `SaveArchive`。
@@ -52,14 +56,25 @@
 - 清空时：
   - 仅清空当前版本作用域下的 Save 数据
   - 不影响其他版本作用域的数据
+  - 不应清空当前版本作用域下的 save 地图设置
 
-### 7. 旧结构处理策略
+### 7. 地图界面与激活存档的关系
+- 进入星区 `maps` 视图时，如果当前版本作用域存在激活存档，地图主画布应直接基于该存档渲染。
+- 该行为依赖 save localStorage 中持久化的 `activeArchiveId` 恢复结果。
+- 地图进入存档态时，不应自动展开存档面板。
+
+### 8. Save 地图设置行为
+- 存档面板中的 POI 分类可见性 checkbox 与“删除条件小站点” checkbox 需要持久化到 save localStorage。
+- 这些设置在关闭存档面板、切换当前激活存档、刷新页面后都应保持。
+- 这些设置只按当前游戏版本作用域隔离，不随单条 archive 切换而重置。
+
+### 9. 旧结构处理策略
 - 当前功能尚未正式上线，不需要实现旧结构到新结构的数据迁移。
 - 若所有版本作用域下的 save localStorage key 都不存在，则视为没有可信的 save 目录状态。
 - 在该条件下，初始化时直接清理旧 save IndexedDB 对应表或整个 save DB。
 - 该清理逻辑只用于旧结构兜底，不作为日常清空当前版本数据的行为入口。
 
-### 8. 与现有 Save Import 版本校验规则的关系
+### 10. 与现有 Save Import 版本校验规则的关系
 - 本次仅调整 Save Import 的持久化分层和恢复入口，不改变现有：
   - `parser_version` 判定规则
   - `post_processor_version` 判定规则
@@ -71,8 +86,10 @@
 ### In Scope
 - 为 save 模块新增版本化 `storage_keys`
 - 将 `ArchiveMeta[] + activeArchiveId` 改为版本化 `localStorage` 持久化
+- 将 save 地图设置一并纳入版本化 `localStorage` 状态
 - 将 IndexedDB 收敛为仅保存正文 `SaveArchive`
 - 调整 Save Store 初始化、选择、删除、清空逻辑
+- 调整地图页在存在激活存档时的默认渲染入口
 - 增加“所有 save localStorage key 均不存在时清理旧 IndexedDB”的兜底逻辑
 
 ### Out of Scope
@@ -84,13 +101,16 @@
 ## 验收标准（DoD）
 1. Save 模块具有与其他 store 一样的版本化 `storage_keys` 配置入口。
 2. 当前版本下的存档列表与 `activeArchiveId` 存在于 `localStorage`，而不是从 IndexedDB 列表表恢复。
-3. 当前版本切换后，只能看到该版本作用域下的全部存档，不会看到其他版本存档。
-4. 完整 `SaveArchive` 正文只保存在 IndexedDB。
-5. 选中某条存档并刷新页面后，可从当前版本作用域恢复 `activeArchiveId` 与对应正文。
-6. 删除存档后，其目录状态与正文都会从当前版本作用域中移除。
-7. 清空 Save 数据时，只影响当前版本作用域，不影响其他版本。
-8. 当所有 save localStorage key 都不存在时，旧 save IndexedDB 会被自动清理。
-9. 现有 `parser_version / post_processor_version / isCompatible / isValid` 语义保持不变。
+3. 当前版本下的 save 地图设置存在于 `localStorage`，且不与具体 archive 绑定。
+4. 当前版本切换后，只能看到该版本作用域下的全部存档，不会看到其他版本存档。
+5. 完整 `SaveArchive` 正文只保存在 IndexedDB。
+6. 选中某条存档并刷新页面后，可从当前版本作用域恢复 `activeArchiveId` 与对应正文。
+7. 进入 `maps` 视图时，若存在激活存档，地图应直接按该存档渲染，但不自动打开存档面板。
+8. 关闭存档面板、切换激活存档或执行 `clearAll()` 后，save 地图设置仍保持当前版本作用域下的持久化值。
+9. 删除存档后，其目录状态与正文都会从当前版本作用域中移除。
+10. 清空 Save 数据时，只影响当前版本作用域的存档目录与正文，不影响其他版本，也不重置 save 地图设置。
+11. 当所有 save localStorage key 都不存在时，旧 save IndexedDB 会被自动清理。
+12. 现有 `parser_version / post_processor_version / isCompatible / isValid` 语义保持不变。
 
 ## 未决项
 无。

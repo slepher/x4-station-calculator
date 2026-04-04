@@ -32,6 +32,7 @@ interface SavedSaveArchivesState {
   version: number
   activeArchiveId: string | null
   list: ArchiveMeta[]
+  settings: SaveArchiveSettings
 }
 ```
 
@@ -39,13 +40,30 @@ interface SavedSaveArchivesState {
 - `version` 是 save 目录状态自身的 schema 版本，用于后续本模块演进
 - `activeArchiveId` 表示当前版本作用域下的激活存档
 - `list` 保存当前版本作用域下的全部 `ArchiveMeta`
+- `settings` 保存当前版本作用域下的 save 地图 UI 选项
 
 ### 2.2 为什么不拆两个 key
 - 现有 `empire / flow / ship blueprints` 都采用“一份状态对象，一个 key”的模式。
 - Save 模块拆成 `meta key + active key` 会破坏项目内一致性，也会增加初始化和修复逻辑复杂度。
 - 因此 `activeArchiveId` 必须跟 `list` 一起持久化。
 
-### 2.3 ArchiveMeta 的职责
+### 2.3 SaveArchiveSettings 的职责
+`settings` 用于保存“当前版本下的 save 地图展示偏好”，而不是某条存档自己的状态：
+
+```ts
+interface SaveArchiveSettings {
+  visibility: SavePoiVisibility
+  excludeConditionalSmallStations: boolean
+}
+```
+
+约束：
+- `visibility` 保存各个 POI 分类 checkbox 的状态
+- `excludeConditionalSmallStations` 保存“删除条件小站点” checkbox 状态
+- 这些值在关闭面板、切换激活存档、刷新页面后都应保持
+- 这些值只受版本作用域隔离，不受 archive 切换影响
+
+### 2.4 ArchiveMeta 的职责
 - `ArchiveMeta` 负责左侧列表和恢复入口所需的轻量信息。
 - 其中保留现有业务字段：
   - `guid`
@@ -110,6 +128,7 @@ archiveData: 'id, scopeKey, archiveId'
 核心变化是：
 - 左侧列表来自 `savedArchivesState.list`
 - 当前选中项恢复入口来自 `savedArchivesState.activeArchiveId`
+- 存档面板 checkbox 状态来自 `savedArchivesState.settings`
 - 完整正文来自 IndexedDB
 
 ### 4.2 初始化流程
@@ -119,8 +138,9 @@ archiveData: 'id, scopeKey, archiveId'
 2. 执行 legacy cleanup gate
 3. 从 `localStorage[scopeKey]` 读取 `SavedSaveArchivesState`
 4. 若读取失败或为空，则初始化为空状态
-5. 若 `activeArchiveId` 存在，则从 IndexedDB 读取正文
-6. 若正文不存在，则清空无效的 `activeArchiveId` 并回写 `localStorage`
+5. 若旧状态中缺少 `settings`，则迁移补默认值并回写
+6. 若 `activeArchiveId` 存在，则从 IndexedDB 读取正文
+7. 若正文不存在，则清空无效的 `activeArchiveId` 并回写 `localStorage`
 
 初始化阶段不再从 IndexedDB 全量扫描 meta 列表。
 
@@ -166,12 +186,27 @@ archiveData: 'id, scopeKey, archiveId'
 `clearAll()`：
 
 1. 重置当前作用域下的 `SavedSaveArchivesState`
-2. 清空 `selectedArchive`
-3. 保留解析 UI 的重置逻辑
-4. 回写当前作用域的空状态
-5. 删除当前作用域下的全部正文
+2. 保留当前作用域下已有的 `settings`
+3. 清空 `selectedArchive`
+4. 保留解析 UI 的重置逻辑
+5. 回写当前作用域的空状态
+6. 删除当前作用域下的全部正文
 
 这里必须只清当前 `scopeKey`，不能删除其他版本作用域的数据。
+
+### 4.7 maps 视图与激活存档
+地图页需要把“当前地图是否按存档渲染”和“存档面板是否展开”拆成两个状态来源：
+
+- 地图渲染来源：
+  - 优先使用 `saveStore.selectedArchive`
+  - 若已恢复激活存档，则进入 `maps` 时直接按该存档渲染 overlays / sector override
+- 面板 UI 状态：
+  - 仅由 `isSavePanelOpen` 控制
+  - 不因为激活存档恢复而自动打开
+
+这样可以满足：
+- 进入 `maps` 时自动回到激活存档的地图态
+- 但不会自动弹出存档面板
 
 ## 5. 旧结构清理设计
 
@@ -244,3 +279,9 @@ archiveData: 'id, scopeKey, archiveId'
 - 对策：
   - 目录状态单独维护 `version`
   - 预留 `migrateSaveArchivesStateToCurrent` 之类的入口
+
+### 风险 5：面板设置误绑定到 archive
+- 如果 checkbox 仍然存在于地图页局部 `ref`，切换 archive 或关闭面板时容易被重置。
+- 对策：
+  - 统一从 `savedArchivesState.settings` 读取与写回
+  - UI 层不再把这些 checkbox 当作单条 archive 的局部状态
