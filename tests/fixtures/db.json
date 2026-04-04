@@ -44,6 +44,11 @@
               "secondaryProductBufferHours": 2,
               "transportShipCapacity": 62000
             },
+            "location": {
+              "cluster_id": "Cluster_01_macro",
+              "sector_id": "Cluster_01_Sector001_macro",
+              "pos": { "x": 50000, "z": 100000 }
+            },
             "lastUpdated": 1772453451902,
             "lockedWares": [
               "quantumtubes"
