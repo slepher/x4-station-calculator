@@ -205,7 +205,9 @@
     "save_poi_tooltip_category": "Category",
     "save_poi_tooltip_owner": "Owner",
     "save_poi_tooltip_code": "Code",
-    "save_poi_tooltip_coords": "Coords"
+    "save_poi_tooltip_coords": "Coords",
+    "save_poi_tooltip_ship_name": "Ship",
+    "save_poi_tooltip_sector": "Sector"
   },
   "ship_build": {
     "title": "Ship Build",

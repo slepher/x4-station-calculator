@@ -40,7 +40,7 @@ export interface SaveMeta {
   version: string
   filename: string
   parser_version: 'v1' | 'v2'
-  post_processor_version?: 'v1' | 'v2' | 'v3' | 'v4'
+  post_processor_version?: 'v1' | 'v2' | 'v3' | 'v4' | 'v5' | 'v6' | 'v7'
   source: SaveSource
 }
 
@@ -181,6 +181,8 @@ export interface AbandonedShipEntry {
   code: string
   macro: string
   class: string
+  shipId?: string
+  purpose?: string
   relative_position: { x: number; y: number; z: number }
   zone_id?: string
   position: SaveSectorStaticPosition
@@ -225,6 +227,9 @@ export interface SavePoiOverlayItem {
   tag?: string
   factoryGroup?: string
   is_headquarter?: boolean
+  class?: string
+  purpose?: string
+  shipId?: string
 }
 
 export interface SavePoiSectorGroup<T> {

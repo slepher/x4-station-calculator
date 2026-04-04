@@ -205,7 +205,9 @@
     "save_poi_tooltip_category": "分类",
     "save_poi_tooltip_owner": "所有者",
     "save_poi_tooltip_code": "编号",
-    "save_poi_tooltip_coords": "坐标"
+    "save_poi_tooltip_coords": "坐标",
+    "save_poi_tooltip_ship_name": "飞船",
+    "save_poi_tooltip_sector": "星区"
   },
   "ship_build": {
     "title": "船只建造",

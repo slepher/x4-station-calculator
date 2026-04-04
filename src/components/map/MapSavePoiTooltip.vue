@@ -2,6 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
 
 const props = defineProps<{
@@ -14,6 +15,7 @@ const emit = defineEmits<{
 
 const { t, te } = useI18n()
 const gameDataStore = useGameDataStore()
+const shipBuildStore = useShipBuildStore()
 
 const categoryLabels: Record<string, string> = {
   playerStation: 'map.save_category_player_station',
@@ -45,6 +47,16 @@ const ownerLabel = computed(() => {
   }
   return faction?.name || owner
 })
+
+const shipName = computed(() => {
+  if (props.poi.category !== 'abandonedShip' || !props.poi.shipId) return null
+  const ship = shipBuildStore.shipMap.get(props.poi.shipId)
+  if (!ship) return props.poi.shipId
+  if (ship.nameId && te(ship.nameId)) {
+    return t(ship.nameId)
+  }
+  return ship.name || props.poi.shipId
+})
 </script>
 
 <template>
@@ -56,12 +68,16 @@ const ownerLabel = computed(() => {
       </div>
       <button class="tooltip-close" type="button" @click="emit('close')">×</button>
     </div>
+    <div v-if="shipName" class="tooltip-row">
+      <span class="tooltip-label">{{ t('map.save_poi_tooltip_ship_name') }}:</span>
+      <span class="tooltip-value">{{ shipName }}</span>
+    </div>
     <div v-if="poi.owner" class="tooltip-row">
       <span class="tooltip-label">{{ t('map.save_poi_tooltip_owner') }}:</span>
       <span class="tooltip-value">{{ ownerLabel }}</span>
     </div>
     <div class="tooltip-row">
-      <span class="tooltip-label">星区:</span>
+      <span class="tooltip-label">{{ t('map.save_poi_tooltip_sector') }}:</span>
       <span class="tooltip-value">{{ poi.sectorName }}</span>
     </div>
     <div class="tooltip-divider" />

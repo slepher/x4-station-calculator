@@ -67,6 +67,7 @@ export interface X4ShipSlotGroup {
  */
 export interface X4Ship {
   id: string;
+  macro?: string;
   nameId: string;
   name: string;
   dlc_tag: string;
@@ -85,11 +86,8 @@ export interface X4Ship {
     groups: X4ShipSlotGroup[];
   }>;
   storage: { missile: number; unit: number; countermeasure: number; deployable: number };
-  /** 货物存储 - 从 ship_connection_macros class=storage 汇总 */
   cargo: Array<{ type: 'container' | 'solid' | 'liquid' | 'condensate'; capacity: number }>;
-  /** 外部停机坪 - 从 ship_connection_macros class=dockingbay/dockarea 汇总 */
   dockarea: Array<{ size: 'dock_xs' | 'dock_s' | 'dock_m' | 'spacesuit'; capacity: number }>;
-  /** 内部停机坪 - 从 ship_connection_macros class=dockingbay(storage=1) 汇总 */
   shipstorage: Array<{ size: 'dock_xs' | 'dock_s' | 'dock_m'; capacity: number }>;
   crew: { capacity: number };
   hull: number;

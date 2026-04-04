@@ -27,6 +27,7 @@ export type LocalizedX4Module = X4Module & { localeName: string }
 export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
 export type ShipBuildDatas = {
   shipMap: Map<string, X4Ship>
+  shipByMacroMap: Map<string, X4Ship>
   raceMap: Map<string, X4ShipRace>
   typeMap: Map<string, X4ShipType>
   equipmentMap: Map<string, X4Equipment>
@@ -161,7 +162,13 @@ export function getShipBuildRawData(data: GameDataFiles): ShipBuildRawData {
 
 export function buildShipBuildDatas(payload: ShipBuildRawData): ShipBuildDatas {
   const shipMap = new Map<string, X4Ship>()
-  payload.ships.forEach((ship) => shipMap.set(ship.id, ship))
+  const shipByMacroMap = new Map<string, X4Ship>()
+  payload.ships.forEach((ship) => {
+    shipMap.set(ship.id, ship)
+    if (ship.macro) {
+      shipByMacroMap.set(ship.macro, ship)
+    }
+  })
 
   const raceMap = new Map<string, X4ShipRace>()
   payload.races.forEach((race) => raceMap.set(race.id, race))
@@ -174,6 +181,7 @@ export function buildShipBuildDatas(payload: ShipBuildRawData): ShipBuildDatas {
 
   return {
     shipMap,
+    shipByMacroMap,
     raceMap,
     typeMap,
     equipmentMap,

@@ -23,6 +23,20 @@ import factoryHeadquarterIconUrl from '@/components/icons/factory_headquarter.sv
 import tradestationHeadquarterIconUrl from '@/components/icons/tradestation_headquarter.svg'
 import defensestationHeadquarterIconUrl from '@/components/icons/defensestation_headquarter.svg'
 import piratestationHeadquarterIconUrl from '@/components/icons/piratestation_headquarter.svg'
+import shipLFightIconUrl from '@/components/icons/ships/ship_l_fight_01.svg'
+import shipLMineIconUrl from '@/components/icons/ships/ship_l_mine_01.svg'
+import shipLTradeIconUrl from '@/components/icons/ships/ship_l_trade_01.svg'
+import shipLDismantlingIconUrl from '@/components/icons/ships/ship_l_dismantling_01.svg'
+import shipMFightIconUrl from '@/components/icons/ships/ship_m_fight_01.svg'
+import shipMMineIconUrl from '@/components/icons/ships/ship_m_mine_01.svg'
+import shipMTradeIconUrl from '@/components/icons/ships/ship_m_trade_01.svg'
+import shipMSalvageIconUrl from '@/components/icons/ships/ship_m_salvage_01.svg'
+import shipSFightIconUrl from '@/components/icons/ships/ship_s_fight_01.svg'
+import shipSMineIconUrl from '@/components/icons/ships/ship_s_mine_01.svg'
+import shipSTradeIconUrl from '@/components/icons/ships/ship_s_trade_01.svg'
+import shipXLBuildIconUrl from '@/components/icons/ships/ship_xl_build_01.svg'
+import shipXLFightIconUrl from '@/components/icons/ships/ship_xl_fight_01.svg'
+import shipXLAuxiliaryIconUrl from '@/components/icons/ships/ship_xl_auxiliary_01.svg'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
 import type { SavePoiColorMap } from '../types'
 
@@ -78,6 +92,31 @@ const SAVE_POI_HEADQUARTER_ICON_MAP: Record<string, string> = {
   piratestation: piratestationHeadquarterIconUrl
 }
 
+const SHIP_CLASS_PURPOSE_ICON_MAP: Record<string, Record<string, string>> = {
+  ship_l: {
+    fight: shipLFightIconUrl,
+    mine: shipLMineIconUrl,
+    trade: shipLTradeIconUrl,
+    dismantling: shipLDismantlingIconUrl
+  },
+  ship_m: {
+    fight: shipMFightIconUrl,
+    mine: shipMMineIconUrl,
+    trade: shipMTradeIconUrl,
+    salvage: shipMSalvageIconUrl
+  },
+  ship_s: {
+    fight: shipSFightIconUrl,
+    mine: shipSMineIconUrl,
+    trade: shipSTradeIconUrl
+  },
+  ship_xl: {
+    build: shipXLBuildIconUrl,
+    fight: shipXLFightIconUrl,
+    auxiliary: shipXLAuxiliaryIconUrl
+  }
+}
+
 export const svgIdSafe = (value: string) => value.replace(/[^a-zA-Z0-9_-]/g, '_')
 
 export const placementIconHref = (icon: 'factory' | 'shipyard' | 'tradestation') => {
@@ -87,6 +126,14 @@ export const placementIconHref = (icon: 'factory' | 'shipyard' | 'tradestation')
 }
 
 export function getSavePoiIconUrl(poi: SavePoiOverlayItem): string | null {
+  if (poi.category === 'abandonedShip' && poi.class && poi.purpose) {
+    const classIcons = SHIP_CLASS_PURPOSE_ICON_MAP[poi.class]
+    const iconUrl = classIcons?.[poi.purpose]
+    if (iconUrl) {
+      return iconUrl
+    }
+  }
+
   if (poi.category === 'playerStation' && poi.is_headquarter) {
     return playerhqIconUrl
   }

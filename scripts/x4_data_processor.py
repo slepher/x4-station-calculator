@@ -1463,24 +1463,48 @@ class X4PrecisionLoader:
         if ship_defaults is None:
             ship_defaults = {}
         ship_slot_extract_failures = []
+        debug_macros = ['ship_tel_s_racer_01_a_macro', 'ship_tel_s_racer_01_a']
         for ship_macro, info in ship_macros.items():
+            if ship_macro in debug_macros:
+                print(f"\n🔍 [DEBUG] Processing {ship_macro}")
+                print(f"   info keys: {list(info.keys())}")
+                print(f"   component: {info.get('component')}")
+                print(f"   class: {info.get('class')}")
+                print(f"   crew: {info.get('crew')}")
+            
             comp_ref = info.get('component')
             ship_class = info.get('class')
             defaults = ship_defaults.get(ship_class, {})
             ware_id = self.component_to_ware.get(ship_macro)
+            
+            if ship_macro in debug_macros:
+                print(f"   ware_id from component_to_ware: {ware_id}")
+            
             if not ware_id:
+                if ship_macro in debug_macros:
+                    print(f"   ❌ Filtered: no ware_id found")
                 continue
             ware_info = self.ware_index.get(ware_id, {})
+            
+            if ship_macro in debug_macros:
+                print(f"   ware_info transport: {ware_info.get('transport')}")
+                print(f"   ware_info tags: {ware_info.get('tags')}")
+            
             if ware_info.get('transport') != 'ship':
+                if ship_macro in debug_macros:
+                    print(f"   ❌ Filtered: transport != 'ship'")
                 continue
             tags = self._split_tags(ware_info.get('tags', ''))
             if "noblueprint" in tags:
+                if ship_macro in debug_macros:
+                    print(f"   ❌ Filtered: noblueprint in tags")
                 continue
             name_id = ware_info.get('nameId', ware_id)
             if name_id:
                 self.needed_raw_names.add(name_id)
             ship_entry = {
                 "id": ware_id,
+                "macro": ship_macro,
                 "nameId": name_id,
                 "name": name_id,
                 "dlc_tag": self.ware_dlc_tags.get(ware_id, "base"),
@@ -1496,7 +1520,17 @@ class X4PrecisionLoader:
             }
             production = ship_entry["production"]
             ship_entry["noplayerbuild"] = (not production) or all(p.get("noplayerbuild") for p in production)
-            if not self._crew_capacity_gt0(info) or not self._has_cockpit_connection(comp_ref):
+            
+            crew_ok = self._crew_capacity_gt0(info)
+            cockpit_ok = self._has_cockpit_connection(comp_ref)
+            
+            if ship_macro in debug_macros:
+                print(f"   crew_capacity_gt0: {crew_ok}")
+                print(f"   has_cockpit_connection: {cockpit_ok}")
+            
+            if not crew_ok or not cockpit_ok:
+                if ship_macro in debug_macros:
+                    print(f"   ❌ Filtered: crew_ok={crew_ok}, cockpit_ok={cockpit_ok}")
                 continue
             ship_type = info.get('shipType')
             ship_entry["type"] = ship_type

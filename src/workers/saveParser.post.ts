@@ -12,6 +12,7 @@ import type {
 } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
 import type { X4Map } from '@/types/x4'
+import shipsData from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 
 interface Vector3 {
   x: number
@@ -58,7 +59,7 @@ interface SectorStaticHighwayLookup {
 }
 
 export const CURRENT_PARSER_VERSION = 'v2' as const
-export const CURRENT_POST_PROCESSOR_VERSION = 'v4' as const
+export const CURRENT_POST_PROCESSOR_VERSION = 'v7' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
 const DEFAULT_EXTENT_RATIO = 0.8
@@ -77,6 +78,31 @@ const FACTORY_GROUP_PRIORITY = [
   'water',
   'energy'
 ]
+
+interface ShipLookupEntry {
+  id: string
+  purpose: string
+}
+
+interface ShipLookup {
+  [macro: string]: ShipLookupEntry
+}
+
+function buildShipLookup(): ShipLookup {
+  const lookup: ShipLookup = {}
+  const ships = shipsData as Array<{ id: string; macro?: string; purposePrimary?: string }>
+  for (const ship of ships) {
+    if (ship.macro && ship.purposePrimary) {
+      lookup[ship.macro] = {
+        id: ship.id,
+        purpose: ship.purposePrimary
+      }
+    }
+  }
+  return lookup
+}
+
+const SHIP_LOOKUP = buildShipLookup()
 
 function buildZoneLookup(maps: X4Map | undefined): ZoneLookup {
   const lookup: ZoneLookup = {}
@@ -757,7 +783,9 @@ export function postProcessRustSaveArchive(
           ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           return { ...vault, position }
         }),
-        abandonedShips: sector.abandonedShips?.map((ship) => {
+        abandonedShips: sector.abandonedShips?.filter((ship) => {
+          return SHIP_LOOKUP[ship.macro] !== undefined
+        }).map((ship) => {
           const position = withTransformPosition(calculateFinalPosition(
             ship.relative_position,
             ship.zone_id,
@@ -765,7 +793,8 @@ export function postProcessRustSaveArchive(
             zoneLookup,
             sectorCenterLookup
           ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
-          return { ...ship, position }
+          const shipEntry = SHIP_LOOKUP[ship.macro]
+          return { ...ship, position, shipId: shipEntry?.id, purpose: shipEntry?.purpose }
         })
       }
       

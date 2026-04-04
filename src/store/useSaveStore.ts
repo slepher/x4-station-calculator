@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type {
   SaveArchive,
+  SaveMeta,
   ArchiveGroup,
   SectorData,
   SaveParserErrorDetail,
@@ -102,7 +103,7 @@ function buildPoiGroups<T>(
     .filter((group) => group.items.length > 0)
 }
 
-function createOverlayItem(
+export function createOverlayItem(
   category: SavePoiCategory,
   sectorMacro: string,
   sectorName: string,
@@ -110,6 +111,7 @@ function createOverlayItem(
 ): SavePoiOverlayItem {
   const isStation = 'tag' in item || 'is_headquarter' in item
   const owner = category === 'playerStation' ? 'player' : ('owner' in item ? item.owner : undefined)
+  const isAbandonedShip = category === 'abandonedShip' && 'class' in item
   return {
     key: `${category}:${item.code}`,
     code: item.code,
@@ -120,7 +122,10 @@ function createOverlayItem(
     position: { x: item.position.x, y: item.position.y, z: item.position.z, tx: item.position.tx, ty: item.position.ty },
     tag: isStation && 'tag' in item ? item.tag : undefined,
     factoryGroup: isStation && 'factoryGroup' in item ? item.factoryGroup : undefined,
-    is_headquarter: isStation && 'is_headquarter' in item ? item.is_headquarter : undefined
+    is_headquarter: isStation && 'is_headquarter' in item ? item.is_headquarter : undefined,
+    class: isAbandonedShip ? item.class : undefined,
+    purpose: isAbandonedShip && 'purpose' in item ? item.purpose : undefined,
+    shipId: isAbandonedShip && 'shipId' in item ? item.shipId : undefined
   }
 }
 
@@ -256,13 +261,7 @@ function createStubArchiveFromMeta(meta: {
       version: meta.version,
       filename: meta.filename,
       parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
-      post_processor_version: meta.post_processor_version === 'v1'
-        ? 'v1'
-        : meta.post_processor_version === 'v2'
-          ? 'v2'
-          : meta.post_processor_version === 'v3' || meta.post_processor_version === 'v4'
-            ? 'v3'
-            : undefined,
+      post_processor_version: meta.post_processor_version as SaveMeta['post_processor_version'],
       source: meta.source
     },
     sectors: {},

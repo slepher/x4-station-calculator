@@ -122,6 +122,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   }))
 
   const shipMap = computed(() => shipBuildDatas.value.shipMap)
+  const shipByMacroMap = computed(() => shipBuildDatas.value.shipByMacroMap)
   const raceMap = computed(() => shipBuildDatas.value.raceMap)
   const typeMap = computed(() => shipBuildDatas.value.typeMap)
   const equipmentMap = computed(() => shipBuildDatas.value.equipmentMap)
@@ -1715,6 +1716,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     drones,
     missiles,
     shipMap,
+    shipByMacroMap,
     raceMap,
     typeMap,
     equipmentMap,

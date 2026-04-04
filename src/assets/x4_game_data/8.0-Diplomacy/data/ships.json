@@ -1,6 +1,7 @@
 [
   {
     "id": "ship_arg_l_destroyer_01_a",
+    "macro": "ship_arg_l_destroyer_01_a_macro",
     "nameId": "{20101,11002}",
     "name": "Behemoth Vanguard",
     "dlc_tag": "base",
@@ -352,6 +353,7 @@
   },
   {
     "id": "ship_arg_l_destroyer_01_b",
+    "macro": "ship_arg_l_destroyer_01_b_macro",
     "nameId": "{20101,11003}",
     "name": "Behemoth Sentinel",
     "dlc_tag": "base",
@@ -703,6 +705,7 @@
   },
   {
     "id": "ship_arg_l_destroyer_02_a",
+    "macro": "ship_arg_l_destroyer_02_a_macro",
     "nameId": "{20101,11004}",
     "name": "Behemoth E",
     "dlc_tag": "base",
@@ -1054,6 +1057,7 @@
   },
   {
     "id": "ship_arg_l_miner_liquid_01_a",
+    "macro": "ship_arg_l_miner_liquid_01_a_macro",
     "nameId": "{20101,11104}",
     "name": "Magnetar Vanguard",
     "dlc_tag": "base",
@@ -1342,6 +1346,7 @@
   },
   {
     "id": "ship_arg_l_miner_liquid_01_b",
+    "macro": "ship_arg_l_miner_liquid_01_b_macro",
     "nameId": "{20101,11105}",
     "name": "Magnetar Sentinel",
     "dlc_tag": "base",
@@ -1630,6 +1635,7 @@
   },
   {
     "id": "ship_arg_l_miner_solid_01_a",
+    "macro": "ship_arg_l_miner_solid_01_a_macro",
     "nameId": "{20101,11102}",
     "name": "Magnetar Vanguard",
     "dlc_tag": "base",
@@ -1940,6 +1946,7 @@
   },
   {
     "id": "ship_arg_l_miner_solid_01_b",
+    "macro": "ship_arg_l_miner_solid_01_b_macro",
     "nameId": "{20101,11103}",
     "name": "Magnetar Sentinel",
     "dlc_tag": "base",
@@ -2250,6 +2257,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_01_a",
+    "macro": "ship_arg_l_trans_container_01_a_macro",
     "nameId": "{20101,11202}",
     "name": "Veles Vanguard",
     "dlc_tag": "base",
@@ -2512,6 +2520,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_01_b",
+    "macro": "ship_arg_l_trans_container_01_b_macro",
     "nameId": "{20101,11203}",
     "name": "Veles Sentinel",
     "dlc_tag": "base",
@@ -2774,6 +2783,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_02_a",
+    "macro": "ship_arg_l_trans_container_02_a_macro",
     "nameId": "{20101,11802}",
     "name": "Mokosi Vanguard",
     "dlc_tag": "base",
@@ -3036,6 +3046,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_02_b",
+    "macro": "ship_arg_l_trans_container_02_b_macro",
     "nameId": "{20101,11803}",
     "name": "Mokosi Sentinel",
     "dlc_tag": "base",
@@ -3298,6 +3309,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_03_a",
+    "macro": "ship_arg_l_trans_container_03_a_macro",
     "nameId": "{20101,12302}",
     "name": "Incarcatura Vanguard",
     "dlc_tag": "base",
@@ -3560,6 +3572,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_03_b",
+    "macro": "ship_arg_l_trans_container_03_b_macro",
     "nameId": "{20101,12303}",
     "name": "Incarcatura Sentinel",
     "dlc_tag": "base",
@@ -3822,6 +3835,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_04_a",
+    "macro": "ship_arg_l_trans_container_04_a_macro",
     "nameId": "{20101,12402}",
     "name": "Shuyaku Vanguard",
     "dlc_tag": "base",
@@ -4130,6 +4144,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_04_b",
+    "macro": "ship_arg_l_trans_container_04_b_macro",
     "nameId": "{20101,12403}",
     "name": "Shuyaku Sentinel",
     "dlc_tag": "base",
@@ -4438,6 +4453,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_05_a",
+    "macro": "ship_arg_l_trans_container_05_a_macro",
     "nameId": "{20101,12502}",
     "name": "Sonra Vanguard",
     "dlc_tag": "base",
@@ -4746,6 +4762,7 @@
   },
   {
     "id": "ship_arg_l_trans_container_05_b",
+    "macro": "ship_arg_l_trans_container_05_b_macro",
     "nameId": "{20101,12503}",
     "name": "Sonra Sentinel",
     "dlc_tag": "base",
@@ -5054,6 +5071,7 @@
   },
   {
     "id": "ship_arg_m_bomber_01_a",
+    "macro": "ship_arg_m_bomber_01_a_macro",
     "nameId": "{20101,10503}",
     "name": "Minotaur Vanguard",
     "dlc_tag": "base",
@@ -5302,6 +5320,7 @@
   },
   {
     "id": "ship_arg_m_bomber_01_b",
+    "macro": "ship_arg_m_bomber_01_b_macro",
     "nameId": "{20101,10504}",
     "name": "Minotaur Sentinel",
     "dlc_tag": "base",
@@ -5550,6 +5569,7 @@
   },
   {
     "id": "ship_arg_m_bomber_02_a",
+    "macro": "ship_arg_m_bomber_02_a_macro",
     "nameId": "{20101,10502}",
     "name": "Minotaur Raider",
     "dlc_tag": "base",
@@ -5770,6 +5790,7 @@
   },
   {
     "id": "ship_arg_m_frigate_01_a",
+    "macro": "ship_arg_m_frigate_01_a_macro",
     "nameId": "{20101,10602}",
     "name": "Cerberus Vanguard",
     "dlc_tag": "base",
@@ -6051,6 +6072,7 @@
   },
   {
     "id": "ship_arg_m_frigate_01_b",
+    "macro": "ship_arg_m_frigate_01_b_macro",
     "nameId": "{20101,10603}",
     "name": "Cerberus Sentinel",
     "dlc_tag": "base",
@@ -6332,6 +6354,7 @@
   },
   {
     "id": "ship_arg_m_miner_liquid_01_a",
+    "macro": "ship_arg_m_miner_liquid_01_a_macro",
     "nameId": "{20101,10902}",
     "name": "Sunder Vanguard",
     "dlc_tag": "base",
@@ -6506,6 +6529,7 @@
   },
   {
     "id": "ship_arg_m_miner_liquid_01_b",
+    "macro": "ship_arg_m_miner_liquid_01_b_macro",
     "nameId": "{20101,10903}",
     "name": "Sunder Sentinel",
     "dlc_tag": "base",
@@ -6680,6 +6704,7 @@
   },
   {
     "id": "ship_arg_m_miner_solid_01_a",
+    "macro": "ship_arg_m_miner_solid_01_a_macro",
     "nameId": "{20101,10802}",
     "name": "Drill Vanguard",
     "dlc_tag": "base",
@@ -6879,6 +6904,7 @@
   },
   {
     "id": "ship_arg_m_miner_solid_01_b",
+    "macro": "ship_arg_m_miner_solid_01_b_macro",
     "nameId": "{20101,10803}",
     "name": "Drill Sentinel",
     "dlc_tag": "base",
@@ -7078,6 +7104,7 @@
   },
   {
     "id": "ship_arg_m_trans_container_01_a",
+    "macro": "ship_arg_m_trans_container_01_a_macro",
     "nameId": "{20101,10702}",
     "name": "Mercury Vanguard",
     "dlc_tag": "base",
@@ -7249,6 +7276,7 @@
   },
   {
     "id": "ship_arg_m_trans_container_01_b",
+    "macro": "ship_arg_m_trans_container_01_b_macro",
     "nameId": "{20101,10703}",
     "name": "Mercury Sentinel",
     "dlc_tag": "base",
@@ -7420,6 +7448,7 @@
   },
   {
     "id": "ship_arg_m_trans_container_02_a",
+    "macro": "ship_arg_m_trans_container_02_a_macro",
     "nameId": "{20101,11702}",
     "name": "Ides Vanguard",
     "dlc_tag": "base",
@@ -7591,6 +7620,7 @@
   },
   {
     "id": "ship_arg_m_trans_container_02_b",
+    "macro": "ship_arg_m_trans_container_02_b_macro",
     "nameId": "{20101,11703}",
     "name": "Ides Sentinel",
     "dlc_tag": "base",
@@ -7762,6 +7792,7 @@
   },
   {
     "id": "ship_arg_s_fighter_01_a",
+    "macro": "ship_arg_s_fighter_01_a_macro",
     "nameId": "{20101,10302}",
     "name": "Nova Vanguard",
     "dlc_tag": "base",
@@ -7945,6 +7976,7 @@
   },
   {
     "id": "ship_arg_s_fighter_01_b",
+    "macro": "ship_arg_s_fighter_01_b_macro",
     "nameId": "{20101,10303}",
     "name": "Nova Sentinel",
     "dlc_tag": "base",
@@ -8128,6 +8160,7 @@
   },
   {
     "id": "ship_arg_s_fighter_02_a",
+    "macro": "ship_arg_s_fighter_02_a_macro",
     "nameId": "{20101,11902}",
     "name": "Elite Vanguard",
     "dlc_tag": "base",
@@ -8285,6 +8318,7 @@
   },
   {
     "id": "ship_arg_s_fighter_02_b",
+    "macro": "ship_arg_s_fighter_02_b_macro",
     "nameId": "{20101,11903}",
     "name": "Elite Sentinel",
     "dlc_tag": "base",
@@ -8442,6 +8476,7 @@
   },
   {
     "id": "ship_arg_s_fighter_03_a",
+    "macro": "ship_arg_s_fighter_03_a_macro",
     "nameId": "{20101,12602}",
     "name": "Pulsar Vanguard",
     "dlc_tag": "base",
@@ -8693,6 +8728,7 @@
   },
   {
     "id": "ship_arg_s_fighter_04_a",
+    "macro": "ship_arg_s_fighter_04_a_macro",
     "nameId": "{20101,12702}",
     "name": "Quasar Vanguard",
     "dlc_tag": "base",
@@ -8904,6 +8940,7 @@
   },
   {
     "id": "ship_arg_s_heavyfighter_01_a",
+    "macro": "ship_arg_s_heavyfighter_01_a_macro",
     "nameId": "{20101,10402}",
     "name": "Eclipse Vanguard",
     "dlc_tag": "base",
@@ -9128,6 +9165,7 @@
   },
   {
     "id": "ship_arg_s_heavyfighter_01_b",
+    "macro": "ship_arg_s_heavyfighter_01_b_macro",
     "nameId": "{20101,10403}",
     "name": "Eclipse Sentinel",
     "dlc_tag": "base",
@@ -9352,6 +9390,7 @@
   },
   {
     "id": "ship_arg_s_heavyfighter_02_a",
+    "macro": "ship_arg_s_heavyfighter_02_a_macro",
     "nameId": "{20101,10402}",
     "name": "Eclipse Vanguard",
     "dlc_tag": "base",
@@ -9576,6 +9615,7 @@
   },
   {
     "id": "ship_arg_s_miner_solid_01_a",
+    "macro": "ship_arg_s_miner_solid_01_a_macro",
     "nameId": "{20101,11604}",
     "name": "Courier",
     "dlc_tag": "base",
@@ -9761,6 +9801,7 @@
   },
   {
     "id": "ship_arg_s_scout_01_a",
+    "macro": "ship_arg_s_scout_01_a_macro",
     "nameId": "{20101,10102}",
     "name": "Discoverer Vanguard",
     "dlc_tag": "base",
@@ -9944,6 +9985,7 @@
   },
   {
     "id": "ship_arg_s_scout_01_b",
+    "macro": "ship_arg_s_scout_01_b_macro",
     "nameId": "{20101,10103}",
     "name": "Discoverer Sentinel",
     "dlc_tag": "base",
@@ -10127,6 +10169,7 @@
   },
   {
     "id": "ship_arg_s_trans_container_01_a",
+    "macro": "ship_arg_s_trans_container_01_a_macro",
     "nameId": "{20101,11602}",
     "name": "Courier Vanguard",
     "dlc_tag": "base",
@@ -10308,6 +10351,7 @@
   },
   {
     "id": "ship_arg_s_trans_container_01_b",
+    "macro": "ship_arg_s_trans_container_01_b_macro",
     "nameId": "{20101,11603}",
     "name": "Courier Sentinel",
     "dlc_tag": "base",
@@ -10489,6 +10533,7 @@
   },
   {
     "id": "ship_arg_s_trans_container_02_a",
+    "macro": "ship_arg_s_trans_container_02_a_macro",
     "nameId": "{20101,12902}",
     "name": "Callisto Vanguard",
     "dlc_tag": "base",
@@ -10672,6 +10717,7 @@
   },
   {
     "id": "ship_arg_s_trans_container_02_b",
+    "macro": "ship_arg_s_trans_container_02_b_macro",
     "nameId": "{20101,12903}",
     "name": "Callisto Sentinel",
     "dlc_tag": "base",
@@ -10855,6 +10901,7 @@
   },
   {
     "id": "ship_arg_xl_builder_01_a",
+    "macro": "ship_arg_xl_builder_01_a_macro",
     "nameId": "{20101,11402}",
     "name": "Mammoth Vanguard",
     "dlc_tag": "base",
@@ -11127,6 +11174,7 @@
   },
   {
     "id": "ship_arg_xl_builder_01_b",
+    "macro": "ship_arg_xl_builder_01_b_macro",
     "nameId": "{20101,11403}",
     "name": "Mammoth Sentinel",
     "dlc_tag": "base",
@@ -11399,6 +11447,7 @@
   },
   {
     "id": "ship_arg_xl_carrier_01_a",
+    "macro": "ship_arg_xl_carrier_01_a_macro",
     "nameId": "{20101,11302}",
     "name": "Colossus Vanguard",
     "dlc_tag": "base",
@@ -11796,6 +11845,7 @@
   },
   {
     "id": "ship_arg_xl_carrier_01_b",
+    "macro": "ship_arg_xl_carrier_01_b_macro",
     "nameId": "{20101,11303}",
     "name": "Colossus Sentinel",
     "dlc_tag": "base",
@@ -12193,6 +12243,7 @@
   },
   {
     "id": "ship_arg_xl_carrier_02_a",
+    "macro": "ship_arg_xl_carrier_02_a_macro",
     "nameId": "{20101,11304}",
     "name": "Colossus E",
     "dlc_tag": "base",
@@ -12590,6 +12641,7 @@
   },
   {
     "id": "ship_arg_xl_resupplier_01_a",
+    "macro": "ship_arg_xl_resupplier_01_a_macro",
     "nameId": "{20101,11502}",
     "name": "Nomad Vanguard",
     "dlc_tag": "base",
@@ -12860,6 +12912,7 @@
   },
   {
     "id": "ship_arg_xl_resupplier_01_b",
+    "macro": "ship_arg_xl_resupplier_01_b_macro",
     "nameId": "{20101,11503}",
     "name": "Nomad Sentinel",
     "dlc_tag": "base",
@@ -13130,6 +13183,7 @@
   },
   {
     "id": "ship_atf_l_destroyer_01_a",
+    "macro": "ship_atf_l_destroyer_01_a_macro",
     "nameId": "{20101,66901}",
     "name": "Syn",
     "dlc_tag": "dlc_terran",
@@ -13580,6 +13634,7 @@
   },
   {
     "id": "ship_atf_xl_battleship_01_a",
+    "macro": "ship_atf_xl_battleship_01_a_macro",
     "nameId": "{20101,66601}",
     "name": "Asgard",
     "dlc_tag": "dlc_terran",
@@ -14083,6 +14138,7 @@
   },
   {
     "id": "ship_bor_l_carrier_01_a",
+    "macro": "ship_bor_l_carrier_01_a_macro",
     "nameId": "{20101,51801}",
     "name": "Guppy",
     "dlc_tag": "dlc_boron",
@@ -14462,6 +14518,7 @@
   },
   {
     "id": "ship_bor_l_destroyer_01_a",
+    "macro": "ship_bor_l_destroyer_01_a_macro",
     "nameId": "{20101,50201}",
     "name": "Ray",
     "dlc_tag": "dlc_boron",
@@ -14861,6 +14918,7 @@
   },
   {
     "id": "ship_bor_l_miner_liquid_01_a",
+    "macro": "ship_bor_l_miner_liquid_01_a_macro",
     "nameId": "{20101,53103}",
     "name": "Rorqual",
     "dlc_tag": "dlc_boron",
@@ -15093,6 +15151,7 @@
   },
   {
     "id": "ship_bor_l_miner_solid_01_a",
+    "macro": "ship_bor_l_miner_solid_01_a_macro",
     "nameId": "{20101,53102}",
     "name": "Rorqual",
     "dlc_tag": "dlc_boron",
@@ -15368,6 +15427,7 @@
   },
   {
     "id": "ship_bor_l_trans_container_01_a",
+    "macro": "ship_bor_l_trans_container_01_a_macro",
     "nameId": "{20101,51401}",
     "name": "Sturgeon",
     "dlc_tag": "dlc_boron",
@@ -15688,6 +15748,7 @@
   },
   {
     "id": "ship_bor_m_corvette_01_a",
+    "macro": "ship_bor_m_corvette_01_a_macro",
     "nameId": "{20101,51001}",
     "name": "Hydra",
     "dlc_tag": "dlc_boron",
@@ -15988,6 +16049,7 @@
   },
   {
     "id": "ship_bor_m_gunboat_01_a",
+    "macro": "ship_bor_m_gunboat_01_a_macro",
     "nameId": "{20101,51101}",
     "name": "Thresher",
     "dlc_tag": "dlc_boron",
@@ -16291,6 +16353,7 @@
   },
   {
     "id": "ship_bor_m_miner_liquid_01_a",
+    "macro": "ship_bor_m_miner_liquid_01_a_macro",
     "nameId": "{20101,52203}",
     "name": "Porpoise",
     "dlc_tag": "dlc_boron",
@@ -16503,6 +16566,7 @@
   },
   {
     "id": "ship_bor_m_miner_solid_01_a",
+    "macro": "ship_bor_m_miner_solid_01_a_macro",
     "nameId": "{20101,52202}",
     "name": "Porpoise",
     "dlc_tag": "dlc_boron",
@@ -16738,6 +16802,7 @@
   },
   {
     "id": "ship_bor_m_trans_container_01_a",
+    "macro": "ship_bor_m_trans_container_01_a_macro",
     "nameId": "{20101,50501}",
     "name": "Dolphin",
     "dlc_tag": "dlc_boron",
@@ -16933,6 +16998,7 @@
   },
   {
     "id": "ship_bor_s_fighter_01_a",
+    "macro": "ship_bor_s_fighter_01_a_macro",
     "nameId": "{20101,50801}",
     "name": "Mako",
     "dlc_tag": "dlc_boron",
@@ -17117,6 +17183,7 @@
   },
   {
     "id": "ship_bor_s_heavyfighter_01_a",
+    "macro": "ship_bor_s_heavyfighter_01_a_macro",
     "nameId": "{20101,50601}",
     "name": "Barracuda",
     "dlc_tag": "dlc_boron",
@@ -17329,6 +17396,7 @@
   },
   {
     "id": "ship_bor_s_miner_solid_01_a",
+    "macro": "ship_bor_s_miner_solid_01_a_macro",
     "nameId": "{20101,52702}",
     "name": "Grouper",
     "dlc_tag": "dlc_boron",
@@ -17503,6 +17571,7 @@
   },
   {
     "id": "ship_bor_s_scout_01_a",
+    "macro": "ship_bor_s_scout_01_a_macro",
     "nameId": "{20101,52501}",
     "name": "Piranha",
     "dlc_tag": "dlc_boron",
@@ -17673,6 +17742,7 @@
   },
   {
     "id": "ship_bor_s_scout_02_a",
+    "macro": "ship_bor_s_scout_02_a_macro",
     "nameId": "{20101,53001}",
     "name": "Irukandji",
     "dlc_tag": "dlc_boron",
@@ -17855,6 +17925,7 @@
   },
   {
     "id": "ship_bor_s_trans_container_01_a",
+    "macro": "ship_bor_s_trans_container_01_a_macro",
     "nameId": "{20101,51901}",
     "name": "Terrapin",
     "dlc_tag": "dlc_boron",
@@ -18003,6 +18074,7 @@
   },
   {
     "id": "ship_bor_xl_builder_01_a",
+    "macro": "ship_bor_xl_builder_01_a_macro",
     "nameId": "{20101,52901}",
     "name": "Walrus",
     "dlc_tag": "dlc_boron",
@@ -18322,6 +18394,7 @@
   },
   {
     "id": "ship_bor_xl_carrier_01_a",
+    "macro": "ship_bor_xl_carrier_01_a_macro",
     "nameId": "{20101,50101}",
     "name": "Shark",
     "dlc_tag": "dlc_boron",
@@ -18721,6 +18794,7 @@
   },
   {
     "id": "ship_bor_xl_resupplier_01_a",
+    "macro": "ship_bor_xl_resupplier_01_a_macro",
     "nameId": "{20101,50401}",
     "name": "Orca",
     "dlc_tag": "dlc_boron",
@@ -19050,6 +19124,7 @@
   },
   {
     "id": "ship_gen_m_corvette_01",
+    "macro": "ship_gen_m_corvette_01_macro",
     "nameId": "{20101,123601}",
     "name": "Envoy",
     "dlc_tag": "dlc_mini_02",
@@ -19341,6 +19416,7 @@
   },
   {
     "id": "ship_gen_m_corvette_02",
+    "macro": "ship_gen_m_corvette_02_macro",
     "nameId": "{20101,123701}",
     "name": "Cypher",
     "dlc_tag": "dlc_mini_02",
@@ -19632,6 +19708,7 @@
   },
   {
     "id": "ship_gen_m_tugboat_01_a",
+    "macro": "ship_gen_m_tugboat_01_a_macro",
     "nameId": "{20101,13601}",
     "name": "Manticore",
     "dlc_tag": "base",
@@ -19874,6 +19951,7 @@
   },
   {
     "id": "ship_gen_s_fighter_01_a",
+    "macro": "ship_gen_s_fighter_01_a_macro",
     "nameId": "{20101,120302}",
     "name": "Nodan Vanguard",
     "dlc_tag": "base",
@@ -20069,6 +20147,7 @@
   },
   {
     "id": "ship_gen_s_fighter_01_b",
+    "macro": "ship_gen_s_fighter_01_b_macro",
     "nameId": "{20101,120303}",
     "name": "Nodan Sentinel",
     "dlc_tag": "base",
@@ -20264,6 +20343,7 @@
   },
   {
     "id": "ship_par_l_destroyer_01_a",
+    "macro": "ship_par_l_destroyer_01_a_macro",
     "nameId": "{20101,30702}",
     "name": "Odysseus Vanguard",
     "dlc_tag": "base",
@@ -20679,6 +20759,7 @@
   },
   {
     "id": "ship_par_l_destroyer_01_b",
+    "macro": "ship_par_l_destroyer_01_b_macro",
     "nameId": "{20101,30703}",
     "name": "Odysseus Sentinel",
     "dlc_tag": "base",
@@ -21094,6 +21175,7 @@
   },
   {
     "id": "ship_par_l_destroyer_02_a",
+    "macro": "ship_par_l_destroyer_02_a_macro",
     "nameId": "{20101,30704}",
     "name": "Odysseus E",
     "dlc_tag": "base",
@@ -21509,6 +21591,7 @@
   },
   {
     "id": "ship_par_l_expeditionary_01_a",
+    "macro": "ship_par_l_expeditionary_01_a_macro",
     "nameId": "{20101,33101}",
     "name": "Hyperion",
     "dlc_tag": "dlc_mini_01",
@@ -21845,6 +21928,7 @@
   },
   {
     "id": "ship_par_l_miner_liquid_01_a",
+    "macro": "ship_par_l_miner_liquid_01_a_macro",
     "nameId": "{20101,30904}",
     "name": "Chthonios Vanguard",
     "dlc_tag": "base",
@@ -22075,6 +22159,7 @@
   },
   {
     "id": "ship_par_l_miner_liquid_01_b",
+    "macro": "ship_par_l_miner_liquid_01_b_macro",
     "nameId": "{20101,30905}",
     "name": "Chthonios Sentinel",
     "dlc_tag": "base",
@@ -22305,6 +22390,7 @@
   },
   {
     "id": "ship_par_l_miner_liquid_02_a",
+    "macro": "ship_par_l_miner_liquid_02_a_macro",
     "nameId": "{20101,30907}",
     "name": "Chthonios E",
     "dlc_tag": "base",
@@ -22535,6 +22621,7 @@
   },
   {
     "id": "ship_par_l_miner_solid_01_a",
+    "macro": "ship_par_l_miner_solid_01_a_macro",
     "nameId": "{20101,30902}",
     "name": "Chthonios Vanguard",
     "dlc_tag": "base",
@@ -22791,6 +22878,7 @@
   },
   {
     "id": "ship_par_l_miner_solid_01_b",
+    "macro": "ship_par_l_miner_solid_01_b_macro",
     "nameId": "{20101,30903}",
     "name": "Chthonios Sentinel",
     "dlc_tag": "base",
@@ -23047,6 +23135,7 @@
   },
   {
     "id": "ship_par_l_miner_solid_02_a",
+    "macro": "ship_par_l_miner_solid_02_a_macro",
     "nameId": "{20101,30906}",
     "name": "Chthonios E",
     "dlc_tag": "base",
@@ -23303,6 +23392,7 @@
   },
   {
     "id": "ship_par_l_trans_container_01_a",
+    "macro": "ship_par_l_trans_container_01_a_macro",
     "nameId": "{20101,30802}",
     "name": "Helios Vanguard",
     "dlc_tag": "base",
@@ -23576,6 +23666,7 @@
   },
   {
     "id": "ship_par_l_trans_container_01_b",
+    "macro": "ship_par_l_trans_container_01_b_macro",
     "nameId": "{20101,30803}",
     "name": "Helios Sentinel",
     "dlc_tag": "base",
@@ -23849,6 +23940,7 @@
   },
   {
     "id": "ship_par_l_trans_container_02_a",
+    "macro": "ship_par_l_trans_container_02_a_macro",
     "nameId": "{20101,31402}",
     "name": "Selene Vanguard",
     "dlc_tag": "base",
@@ -24122,6 +24214,7 @@
   },
   {
     "id": "ship_par_l_trans_container_02_b",
+    "macro": "ship_par_l_trans_container_02_b_macro",
     "nameId": "{20101,31403}",
     "name": "Selene Sentinel",
     "dlc_tag": "base",
@@ -24395,6 +24488,7 @@
   },
   {
     "id": "ship_par_l_trans_container_03_a",
+    "macro": "ship_par_l_trans_container_03_a_macro",
     "nameId": "{20101,30804}",
     "name": "Helios E",
     "dlc_tag": "base",
@@ -24668,6 +24762,7 @@
   },
   {
     "id": "ship_par_m_corvette_01_a",
+    "macro": "ship_par_m_corvette_01_a_macro",
     "nameId": "{20101,30302}",
     "name": "Nemesis Vanguard",
     "dlc_tag": "base",
@@ -24930,6 +25025,7 @@
   },
   {
     "id": "ship_par_m_corvette_01_b",
+    "macro": "ship_par_m_corvette_01_b_macro",
     "nameId": "{20101,30303}",
     "name": "Nemesis Sentinel",
     "dlc_tag": "base",
@@ -25192,6 +25288,7 @@
   },
   {
     "id": "ship_par_m_frigate_01_a",
+    "macro": "ship_par_m_frigate_01_a_macro",
     "nameId": "{20101,30402}",
     "name": "Gorgon Vanguard",
     "dlc_tag": "base",
@@ -25485,6 +25582,7 @@
   },
   {
     "id": "ship_par_m_frigate_01_b",
+    "macro": "ship_par_m_frigate_01_b_macro",
     "nameId": "{20101,30403}",
     "name": "Gorgon Sentinel",
     "dlc_tag": "base",
@@ -25778,6 +25876,7 @@
   },
   {
     "id": "ship_par_m_miner_liquid_01_a",
+    "macro": "ship_par_m_miner_liquid_01_a_macro",
     "nameId": "{20101,30604}",
     "name": "Plutus Vanguard",
     "dlc_tag": "base",
@@ -25952,6 +26051,7 @@
   },
   {
     "id": "ship_par_m_miner_liquid_01_b",
+    "macro": "ship_par_m_miner_liquid_01_b_macro",
     "nameId": "{20101,30605}",
     "name": "Plutus Sentinel",
     "dlc_tag": "base",
@@ -26126,6 +26226,7 @@
   },
   {
     "id": "ship_par_m_miner_solid_01_a",
+    "macro": "ship_par_m_miner_solid_01_a_macro",
     "nameId": "{20101,30602}",
     "name": "Plutus Vanguard",
     "dlc_tag": "base",
@@ -26325,6 +26426,7 @@
   },
   {
     "id": "ship_par_m_miner_solid_01_b",
+    "macro": "ship_par_m_miner_solid_01_b_macro",
     "nameId": "{20101,30603}",
     "name": "Plutus Sentinel",
     "dlc_tag": "base",
@@ -26524,6 +26626,7 @@
   },
   {
     "id": "ship_par_m_trans_container_01_a",
+    "macro": "ship_par_m_trans_container_01_a_macro",
     "nameId": "{20101,30502}",
     "name": "Demeter Vanguard",
     "dlc_tag": "base",
@@ -26681,6 +26784,7 @@
   },
   {
     "id": "ship_par_m_trans_container_01_b",
+    "macro": "ship_par_m_trans_container_01_b_macro",
     "nameId": "{20101,30503}",
     "name": "Demeter Sentinel",
     "dlc_tag": "base",
@@ -26838,6 +26942,7 @@
   },
   {
     "id": "ship_par_m_trans_container_02_a",
+    "macro": "ship_par_m_trans_container_02_a_macro",
     "nameId": "{20101,31302}",
     "name": "Hermes Vanguard",
     "dlc_tag": "base",
@@ -26995,6 +27100,7 @@
   },
   {
     "id": "ship_par_m_trans_container_02_b",
+    "macro": "ship_par_m_trans_container_02_b_macro",
     "nameId": "{20101,31303}",
     "name": "Hermes Sentinel",
     "dlc_tag": "base",
@@ -27152,6 +27258,7 @@
   },
   {
     "id": "ship_par_m_trans_container_03_a",
+    "macro": "ship_par_m_trans_container_03_a_macro",
     "nameId": "{20101,32601}",
     "name": "Prometheus",
     "dlc_tag": "base",
@@ -27400,6 +27507,7 @@
   },
   {
     "id": "ship_par_s_fighter_01_a",
+    "macro": "ship_par_s_fighter_01_a_macro",
     "nameId": "{20101,30202}",
     "name": "Perseus Vanguard",
     "dlc_tag": "base",
@@ -27595,6 +27703,7 @@
   },
   {
     "id": "ship_par_s_fighter_01_b",
+    "macro": "ship_par_s_fighter_01_b_macro",
     "nameId": "{20101,30203}",
     "name": "Perseus Sentinel",
     "dlc_tag": "base",
@@ -27790,6 +27899,7 @@
   },
   {
     "id": "ship_par_s_fighter_02_a",
+    "macro": "ship_par_s_fighter_02_a_macro",
     "nameId": "{20101,31502}",
     "name": "Theseus Vanguard",
     "dlc_tag": "base",
@@ -27987,6 +28097,7 @@
   },
   {
     "id": "ship_par_s_fighter_02_b",
+    "macro": "ship_par_s_fighter_02_b_macro",
     "nameId": "{20101,31503}",
     "name": "Theseus Sentinel",
     "dlc_tag": "base",
@@ -28184,6 +28295,7 @@
   },
   {
     "id": "ship_par_s_heavyfighter_01_a",
+    "macro": "ship_par_s_heavyfighter_01_a_macro",
     "nameId": "{20101,31801}",
     "name": "Ares",
     "dlc_tag": "base",
@@ -28433,6 +28545,7 @@
   },
   {
     "id": "ship_par_s_miner_solid_01_a",
+    "macro": "ship_par_s_miner_solid_01_a_macro",
     "nameId": "{20101, 32504}",
     "name": "Tethys",
     "dlc_tag": "base",
@@ -28633,6 +28746,7 @@
   },
   {
     "id": "ship_par_s_scout_01_a",
+    "macro": "ship_par_s_scout_01_a_macro",
     "nameId": "{20101,30102}",
     "name": "Pegasus Vanguard",
     "dlc_tag": "base",
@@ -28814,6 +28928,7 @@
   },
   {
     "id": "ship_par_s_scout_01_b",
+    "macro": "ship_par_s_scout_01_b_macro",
     "nameId": "{20101,30103}",
     "name": "Pegasus Sentinel",
     "dlc_tag": "base",
@@ -28995,6 +29110,7 @@
   },
   {
     "id": "ship_par_s_trans_container_01_a",
+    "macro": "ship_par_s_trans_container_01_a_macro",
     "nameId": "{20101, 32502}",
     "name": "Tethys Vanguard",
     "dlc_tag": "base",
@@ -29190,6 +29306,7 @@
   },
   {
     "id": "ship_par_s_trans_container_01_b",
+    "macro": "ship_par_s_trans_container_01_b_macro",
     "nameId": "{20101, 32503}",
     "name": "Tethys Sentinel",
     "dlc_tag": "base",
@@ -29385,6 +29502,7 @@
   },
   {
     "id": "ship_par_xl_builder_01_a",
+    "macro": "ship_par_xl_builder_01_a_macro",
     "nameId": "{20101,31102}",
     "name": "Heracles Vanguard",
     "dlc_tag": "base",
@@ -29657,6 +29775,7 @@
   },
   {
     "id": "ship_par_xl_builder_01_b",
+    "macro": "ship_par_xl_builder_01_b_macro",
     "nameId": "{20101,31103}",
     "name": "Heracles Sentinel",
     "dlc_tag": "base",
@@ -29929,6 +30048,7 @@
   },
   {
     "id": "ship_par_xl_carrier_01_a",
+    "macro": "ship_par_xl_carrier_01_a_macro",
     "nameId": "{20101,31002}",
     "name": "Zeus Vanguard",
     "dlc_tag": "base",
@@ -30337,6 +30457,7 @@
   },
   {
     "id": "ship_par_xl_carrier_01_b",
+    "macro": "ship_par_xl_carrier_01_b_macro",
     "nameId": "{20101,31003}",
     "name": "Zeus Sentinel",
     "dlc_tag": "base",
@@ -30745,6 +30866,7 @@
   },
   {
     "id": "ship_par_xl_carrier_02_a",
+    "macro": "ship_par_xl_carrier_02_a_macro",
     "nameId": "{20101,31004}",
     "name": "Zeus E",
     "dlc_tag": "base",
@@ -31153,6 +31275,7 @@
   },
   {
     "id": "ship_par_xl_resupplier_01_a",
+    "macro": "ship_par_xl_resupplier_01_a_macro",
     "nameId": "{20101,31202}",
     "name": "Atlas Vanguard",
     "dlc_tag": "base",
@@ -31423,6 +31546,7 @@
   },
   {
     "id": "ship_par_xl_resupplier_01_b",
+    "macro": "ship_par_xl_resupplier_01_b_macro",
     "nameId": "{20101,31203}",
     "name": "Atlas Sentinel",
     "dlc_tag": "base",
@@ -31693,6 +31817,7 @@
   },
   {
     "id": "ship_par_xl_resupplier_02_a",
+    "macro": "ship_par_xl_resupplier_02_a_macro",
     "nameId": "{20101,31204}",
     "name": "Atlas E",
     "dlc_tag": "base",
@@ -31963,6 +32088,7 @@
   },
   {
     "id": "ship_pir_l_miner_solid_01_a",
+    "macro": "ship_pir_l_miner_solid_01_a_macro",
     "nameId": "{20101,81601}",
     "name": "Donia",
     "dlc_tag": "dlc_pirate",
@@ -32236,6 +32362,7 @@
   },
   {
     "id": "ship_pir_l_scavenger_01_a",
+    "macro": "ship_pir_l_scavenger_01_a_macro",
     "nameId": "{20101,81501}",
     "name": "Barbarossa",
     "dlc_tag": "dlc_pirate",
@@ -32576,6 +32703,7 @@
   },
   {
     "id": "ship_pir_l_scrapper_01",
+    "macro": "ship_pir_l_scrapper_01_macro",
     "nameId": "{20101,81201}",
     "name": "Teuta",
     "dlc_tag": "dlc_pirate",
@@ -32780,6 +32908,7 @@
   },
   {
     "id": "ship_pir_s_fighter_01_a",
+    "macro": "ship_pir_s_fighter_01_a_macro",
     "nameId": "{20101,81801}",
     "name": "Kyd",
     "dlc_tag": "dlc_pirate",
@@ -32963,6 +33092,7 @@
   },
   {
     "id": "ship_pir_s_fighter_02_a",
+    "macro": "ship_pir_s_fighter_02_a_macro",
     "nameId": "{20101,82801}",
     "name": "Lux",
     "dlc_tag": "dlc_pirate",
@@ -33158,6 +33288,7 @@
   },
   {
     "id": "ship_pir_s_heavyfighter_01_a",
+    "macro": "ship_pir_s_heavyfighter_01_a_macro",
     "nameId": "{20101,82901}",
     "name": "Shih",
     "dlc_tag": "dlc_pirate",
@@ -33395,6 +33526,7 @@
   },
   {
     "id": "ship_pir_s_trans_condensate_01_a",
+    "macro": "ship_pir_s_trans_condensate_01_a_macro",
     "nameId": "{20101,81903}",
     "name": "Raleigh",
     "dlc_tag": "dlc_pirate",
@@ -33564,6 +33696,7 @@
   },
   {
     "id": "ship_pir_s_trans_container_01_a",
+    "macro": "ship_pir_s_trans_container_01_a_macro",
     "nameId": "{20101,81902}",
     "name": "Raleigh",
     "dlc_tag": "dlc_pirate",
@@ -33733,6 +33866,7 @@
   },
   {
     "id": "ship_pir_xl_battleship_01_a",
+    "macro": "ship_pir_xl_battleship_01_a_macro",
     "nameId": "{20101,121101}",
     "name": "Erlking",
     "dlc_tag": "dlc_pirate",
@@ -34133,6 +34267,7 @@
   },
   {
     "id": "ship_pir_xl_builder_01",
+    "macro": "ship_pir_xl_builder_01_macro",
     "nameId": "{20101,81101}",
     "name": "Gannascus",
     "dlc_tag": "dlc_pirate",
@@ -34405,6 +34540,7 @@
   },
   {
     "id": "ship_spl_l_destroyer_01_a",
+    "macro": "ship_spl_l_destroyer_01_a_macro",
     "nameId": "{20101,42801}",
     "name": "Rattlesnake",
     "dlc_tag": "dlc_split",
@@ -34800,6 +34936,7 @@
   },
   {
     "id": "ship_spl_l_miner_liquid_01_a",
+    "macro": "ship_spl_l_miner_liquid_01_a_macro",
     "nameId": "{20101,41907}",
     "name": "Wyvern",
     "dlc_tag": "dlc_split",
@@ -35053,6 +35190,7 @@
   },
   {
     "id": "ship_spl_l_miner_solid_01_a",
+    "macro": "ship_spl_l_miner_solid_01_a_macro",
     "nameId": "{20101,41906}",
     "name": "Wyvern",
     "dlc_tag": "dlc_split",
@@ -35349,6 +35487,7 @@
   },
   {
     "id": "ship_spl_l_trans_container_01_a",
+    "macro": "ship_spl_l_trans_container_01_a_macro",
     "nameId": "{20101,42401}",
     "name": "Buffalo",
     "dlc_tag": "dlc_split",
@@ -35645,6 +35784,7 @@
   },
   {
     "id": "ship_spl_m_corvette_01_a",
+    "macro": "ship_spl_m_corvette_01_a_macro",
     "nameId": "{20101,40601}",
     "name": "Dragon",
     "dlc_tag": "dlc_split",
@@ -35908,6 +36048,7 @@
   },
   {
     "id": "ship_spl_m_corvette_01_b",
+    "macro": "ship_spl_m_corvette_01_b_macro",
     "nameId": "{20101,40604}",
     "name": "Dragon Raider",
     "dlc_tag": "dlc_split",
@@ -36171,6 +36312,7 @@
   },
   {
     "id": "ship_spl_m_frigate_01_a",
+    "macro": "ship_spl_m_frigate_01_a_macro",
     "nameId": "{20101,41401}",
     "name": "Cobra",
     "dlc_tag": "dlc_split",
@@ -36465,6 +36607,7 @@
   },
   {
     "id": "ship_spl_m_miner_liquid_01_a",
+    "macro": "ship_spl_m_miner_liquid_01_a_macro",
     "nameId": "{20101,42007}",
     "name": "Alligator",
     "dlc_tag": "dlc_split",
@@ -36651,6 +36794,7 @@
   },
   {
     "id": "ship_spl_m_miner_solid_01_a",
+    "macro": "ship_spl_m_miner_solid_01_a_macro",
     "nameId": "{20101,42006}",
     "name": "Alligator",
     "dlc_tag": "dlc_split",
@@ -36877,6 +37021,7 @@
   },
   {
     "id": "ship_spl_m_trans_container_01_a",
+    "macro": "ship_spl_m_trans_container_01_a_macro",
     "nameId": "{20101,41601}",
     "name": "Boa",
     "dlc_tag": "dlc_split",
@@ -37060,6 +37205,7 @@
   },
   {
     "id": "ship_spl_s_fighter_01_a",
+    "macro": "ship_spl_s_fighter_01_a_macro",
     "nameId": "{20101,40301}",
     "name": "Mamba",
     "dlc_tag": "dlc_split",
@@ -37256,6 +37402,7 @@
   },
   {
     "id": "ship_spl_s_fighter_02_a",
+    "macro": "ship_spl_s_fighter_02_a_macro",
     "nameId": "{20101,41101}",
     "name": "Asp",
     "dlc_tag": "dlc_split",
@@ -37453,6 +37600,7 @@
   },
   {
     "id": "ship_spl_s_fighter_02_b",
+    "macro": "ship_spl_s_fighter_02_b_macro",
     "nameId": "{20101,41104}",
     "name": "Asp Raider",
     "dlc_tag": "dlc_split",
@@ -37650,6 +37798,7 @@
   },
   {
     "id": "ship_spl_s_heavyfighter_01_a",
+    "macro": "ship_spl_s_heavyfighter_01_a_macro",
     "nameId": "{20101,41001}",
     "name": "Chimera",
     "dlc_tag": "dlc_split",
@@ -37899,6 +38048,7 @@
   },
   {
     "id": "ship_spl_s_heavyfighter_02_a",
+    "macro": "ship_spl_s_heavyfighter_02_a_macro",
     "nameId": "{20101,42701}",
     "name": "Balaur",
     "dlc_tag": "dlc_split",
@@ -38122,6 +38272,7 @@
   },
   {
     "id": "ship_spl_s_miner_solid_01_a",
+    "macro": "ship_spl_s_miner_solid_01_a_macro",
     "nameId": "{20101,42104}",
     "name": "Tuatara",
     "dlc_tag": "dlc_split",
@@ -38322,6 +38473,7 @@
   },
   {
     "id": "ship_spl_s_scout_01_a",
+    "macro": "ship_spl_s_scout_01_a_macro",
     "nameId": "{20101,40701}",
     "name": "Jaguar",
     "dlc_tag": "dlc_split",
@@ -38479,6 +38631,7 @@
   },
   {
     "id": "ship_spl_s_trans_container_01_a",
+    "macro": "ship_spl_s_trans_container_01_a_macro",
     "nameId": "{20101,42101}",
     "name": "Tuatara",
     "dlc_tag": "dlc_split",
@@ -38674,6 +38827,7 @@
   },
   {
     "id": "ship_spl_xl_builder_01_a",
+    "macro": "ship_spl_xl_builder_01_a_macro",
     "nameId": "{20101,40501}",
     "name": "Elephant",
     "dlc_tag": "dlc_split",
@@ -38946,6 +39100,7 @@
   },
   {
     "id": "ship_spl_xl_carrier_01_a",
+    "macro": "ship_spl_xl_carrier_01_a_macro",
     "nameId": "{20101,40101}",
     "name": "Raptor",
     "dlc_tag": "dlc_split",
@@ -39546,6 +39701,7 @@
   },
   {
     "id": "ship_spl_xl_resupplier_01_a",
+    "macro": "ship_spl_xl_resupplier_01_a_macro",
     "nameId": "{20101,42601}",
     "name": "Monitor",
     "dlc_tag": "dlc_split",
@@ -39850,6 +40006,7 @@
   },
   {
     "id": "ship_tel_l_destroyer_01_a",
+    "macro": "ship_tel_l_destroyer_01_a_macro",
     "nameId": "{20101,20702}",
     "name": "Phoenix Vanguard",
     "dlc_tag": "base",
@@ -40250,6 +40407,7 @@
   },
   {
     "id": "ship_tel_l_destroyer_01_b",
+    "macro": "ship_tel_l_destroyer_01_b_macro",
     "nameId": "{20101,20703}",
     "name": "Phoenix Sentinel",
     "dlc_tag": "base",
@@ -40650,6 +40808,7 @@
   },
   {
     "id": "ship_tel_l_destroyer_02_a",
+    "macro": "ship_tel_l_destroyer_02_a_macro",
     "nameId": "{20101,20704}",
     "name": "Phoenix E",
     "dlc_tag": "base",
@@ -41047,6 +41206,7 @@
   },
   {
     "id": "ship_tel_l_miner_liquid_01_a",
+    "macro": "ship_tel_l_miner_liquid_01_a_macro",
     "nameId": "{20101,20904}",
     "name": "Crane Vanguard",
     "dlc_tag": "base",
@@ -41373,6 +41533,7 @@
   },
   {
     "id": "ship_tel_l_miner_liquid_01_b",
+    "macro": "ship_tel_l_miner_liquid_01_b_macro",
     "nameId": "{20101,20905}",
     "name": "Crane Sentinel",
     "dlc_tag": "base",
@@ -41699,6 +41860,7 @@
   },
   {
     "id": "ship_tel_l_miner_liquid_02_a",
+    "macro": "ship_tel_l_miner_liquid_02_a_macro",
     "nameId": "{20101,20907}",
     "name": "Crane E",
     "dlc_tag": "base",
@@ -42022,6 +42184,7 @@
   },
   {
     "id": "ship_tel_l_miner_solid_01_a",
+    "macro": "ship_tel_l_miner_solid_01_a_macro",
     "nameId": "{20101,20902}",
     "name": "Crane Vanguard",
     "dlc_tag": "base",
@@ -42348,6 +42511,7 @@
   },
   {
     "id": "ship_tel_l_miner_solid_01_b",
+    "macro": "ship_tel_l_miner_solid_01_b_macro",
     "nameId": "{20101,20903}",
     "name": "Crane Sentinel",
     "dlc_tag": "base",
@@ -42674,6 +42838,7 @@
   },
   {
     "id": "ship_tel_l_miner_solid_02_a",
+    "macro": "ship_tel_l_miner_solid_02_a_macro",
     "nameId": "{20101,20906}",
     "name": "Crane E",
     "dlc_tag": "base",
@@ -42997,6 +43162,7 @@
   },
   {
     "id": "ship_tel_l_trans_container_01_a",
+    "macro": "ship_tel_l_trans_container_01_a_macro",
     "nameId": "{20101,20802}",
     "name": "Pelican Vanguard",
     "dlc_tag": "base",
@@ -43320,6 +43486,7 @@
   },
   {
     "id": "ship_tel_l_trans_container_01_b",
+    "macro": "ship_tel_l_trans_container_01_b_macro",
     "nameId": "{20101,20803}",
     "name": "Pelican Sentinel",
     "dlc_tag": "base",
@@ -43643,6 +43810,7 @@
   },
   {
     "id": "ship_tel_l_trans_container_02_a",
+    "macro": "ship_tel_l_trans_container_02_a_macro",
     "nameId": "{20101,21402}",
     "name": "Heron Vanguard",
     "dlc_tag": "base",
@@ -43966,6 +44134,7 @@
   },
   {
     "id": "ship_tel_l_trans_container_02_b",
+    "macro": "ship_tel_l_trans_container_02_b_macro",
     "nameId": "{20101,21403}",
     "name": "Heron Sentinel",
     "dlc_tag": "base",
@@ -44289,6 +44458,7 @@
   },
   {
     "id": "ship_tel_l_trans_container_03_a",
+    "macro": "ship_tel_l_trans_container_03_a_macro",
     "nameId": "{20101,21404}",
     "name": "Heron E",
     "dlc_tag": "base",
@@ -44609,6 +44779,7 @@
   },
   {
     "id": "ship_tel_m_bomber_01_a",
+    "macro": "ship_tel_m_bomber_01_a_macro",
     "nameId": "{20101,20302}",
     "name": "Peregrine Vanguard",
     "dlc_tag": "base",
@@ -44882,6 +45053,7 @@
   },
   {
     "id": "ship_tel_m_bomber_01_b",
+    "macro": "ship_tel_m_bomber_01_b_macro",
     "nameId": "{20101,20303}",
     "name": "Peregrine Sentinel",
     "dlc_tag": "base",
@@ -45155,6 +45327,7 @@
   },
   {
     "id": "ship_tel_m_frigate_01_a",
+    "macro": "ship_tel_m_frigate_01_a_macro",
     "nameId": "{20101,20402}",
     "name": "Osprey Vanguard",
     "dlc_tag": "base",
@@ -45436,6 +45609,7 @@
   },
   {
     "id": "ship_tel_m_frigate_01_b",
+    "macro": "ship_tel_m_frigate_01_b_macro",
     "nameId": "{20101,20403}",
     "name": "Osprey Sentinel",
     "dlc_tag": "base",
@@ -45717,6 +45891,7 @@
   },
   {
     "id": "ship_tel_m_miner_liquid_01_a",
+    "macro": "ship_tel_m_miner_liquid_01_a_macro",
     "nameId": "{20101,20604}",
     "name": "Manorina Vanguard",
     "dlc_tag": "base",
@@ -45904,6 +46079,7 @@
   },
   {
     "id": "ship_tel_m_miner_liquid_01_b",
+    "macro": "ship_tel_m_miner_liquid_01_b_macro",
     "nameId": "{20101,20605}",
     "name": "Manorina Sentinel",
     "dlc_tag": "base",
@@ -46091,6 +46267,7 @@
   },
   {
     "id": "ship_tel_m_miner_solid_01_a",
+    "macro": "ship_tel_m_miner_solid_01_a_macro",
     "nameId": "{20101,20602}",
     "name": "Manorina Vanguard",
     "dlc_tag": "base",
@@ -46303,6 +46480,7 @@
   },
   {
     "id": "ship_tel_m_miner_solid_01_b",
+    "macro": "ship_tel_m_miner_solid_01_b_macro",
     "nameId": "{20101,20603}",
     "name": "Manorina Sentinel",
     "dlc_tag": "base",
@@ -46515,6 +46693,7 @@
   },
   {
     "id": "ship_tel_m_trans_container_01_a",
+    "macro": "ship_tel_m_trans_container_01_a_macro",
     "nameId": "{20101,20502}",
     "name": "Vulture Vanguard",
     "dlc_tag": "base",
@@ -46685,6 +46864,7 @@
   },
   {
     "id": "ship_tel_m_trans_container_01_b",
+    "macro": "ship_tel_m_trans_container_01_b_macro",
     "nameId": "{20101,20503}",
     "name": "Vulture Sentinel",
     "dlc_tag": "base",
@@ -46855,6 +47035,7 @@
   },
   {
     "id": "ship_tel_m_trans_container_02_a",
+    "macro": "ship_tel_m_trans_container_02_a_macro",
     "nameId": "{20101,21302}",
     "name": "Tern Vanguard",
     "dlc_tag": "base",
@@ -47025,6 +47206,7 @@
   },
   {
     "id": "ship_tel_m_trans_container_02_b",
+    "macro": "ship_tel_m_trans_container_02_b_macro",
     "nameId": "{20101,21303}",
     "name": "Tern Sentinel",
     "dlc_tag": "base",
@@ -47195,6 +47377,7 @@
   },
   {
     "id": "ship_tel_m_trans_container_03_a",
+    "macro": "ship_tel_m_trans_container_03_a_macro",
     "nameId": "{20101,21802}",
     "name": "Cormorant Vanguard",
     "dlc_tag": "base",
@@ -47413,6 +47596,7 @@
   },
   {
     "id": "ship_tel_s_fighter_01_a",
+    "macro": "ship_tel_s_fighter_01_a_macro",
     "nameId": "{20101,20202}",
     "name": "Falcon Vanguard",
     "dlc_tag": "base",
@@ -47609,6 +47793,7 @@
   },
   {
     "id": "ship_tel_s_fighter_01_b",
+    "macro": "ship_tel_s_fighter_01_b_macro",
     "nameId": "{20101,20203}",
     "name": "Falcon Sentinel",
     "dlc_tag": "base",
@@ -47805,6 +47990,7 @@
   },
   {
     "id": "ship_tel_s_fighter_02_a",
+    "macro": "ship_tel_s_fighter_02_a_macro",
     "nameId": "{20101, 21602}",
     "name": "Buzzard Vanguard",
     "dlc_tag": "base",
@@ -48015,6 +48201,7 @@
   },
   {
     "id": "ship_tel_s_fighter_02_b",
+    "macro": "ship_tel_s_fighter_02_b_macro",
     "nameId": "{20101, 21603}",
     "name": "Buzzard Sentinel",
     "dlc_tag": "base",
@@ -48225,6 +48412,7 @@
   },
   {
     "id": "ship_tel_s_miner_solid_01_a",
+    "macro": "ship_tel_s_miner_solid_01_a_macro",
     "nameId": "{20101, 22604}",
     "name": "Magpie",
     "dlc_tag": "base",
@@ -48411,6 +48599,7 @@
   },
   {
     "id": "ship_tel_s_scout_01_a",
+    "macro": "ship_tel_s_scout_01_a_macro",
     "nameId": "{20101,20102}",
     "name": "Kestrel Vanguard",
     "dlc_tag": "base",
@@ -48580,6 +48769,7 @@
   },
   {
     "id": "ship_tel_s_scout_01_b",
+    "macro": "ship_tel_s_scout_01_b_macro",
     "nameId": "{20101,20103}",
     "name": "Kestrel Sentinel",
     "dlc_tag": "base",
@@ -48749,6 +48939,7 @@
   },
   {
     "id": "ship_tel_s_scout_02_a",
+    "macro": "ship_tel_s_scout_02_a_macro",
     "nameId": "{20101,22202}",
     "name": "Guillemot Vanguard",
     "dlc_tag": "base",
@@ -48942,6 +49133,7 @@
   },
   {
     "id": "ship_tel_s_scout_02_b",
+    "macro": "ship_tel_s_scout_02_b_macro",
     "nameId": "{20101,22203}",
     "name": "Guillemot Sentinel",
     "dlc_tag": "base",
@@ -49135,6 +49327,7 @@
   },
   {
     "id": "ship_tel_s_trans_container_01_a",
+    "macro": "ship_tel_s_trans_container_01_a_macro",
     "nameId": "{20101, 22602}",
     "name": "Magpie Vanguard",
     "dlc_tag": "base",
@@ -49317,6 +49510,7 @@
   },
   {
     "id": "ship_tel_s_trans_container_01_b",
+    "macro": "ship_tel_s_trans_container_01_b_macro",
     "nameId": "{20101, 22603}",
     "name": "Magpie Sentinel",
     "dlc_tag": "base",
@@ -49499,6 +49693,7 @@
   },
   {
     "id": "ship_tel_xl_builder_01_a",
+    "macro": "ship_tel_xl_builder_01_a_macro",
     "nameId": "{20101,21102}",
     "name": "Albatross Vanguard",
     "dlc_tag": "base",
@@ -49771,6 +49966,7 @@
   },
   {
     "id": "ship_tel_xl_builder_01_b",
+    "macro": "ship_tel_xl_builder_01_b_macro",
     "nameId": "{20101,21103}",
     "name": "Albatross Sentinel",
     "dlc_tag": "base",
@@ -50043,6 +50239,7 @@
   },
   {
     "id": "ship_tel_xl_carrier_01_a",
+    "macro": "ship_tel_xl_carrier_01_a_macro",
     "nameId": "{20101,21002}",
     "name": "Condor Vanguard",
     "dlc_tag": "base",
@@ -50451,6 +50648,7 @@
   },
   {
     "id": "ship_tel_xl_carrier_01_b",
+    "macro": "ship_tel_xl_carrier_01_b_macro",
     "nameId": "{20101,21003}",
     "name": "Condor Sentinel",
     "dlc_tag": "base",
@@ -50859,6 +51057,7 @@
   },
   {
     "id": "ship_tel_xl_resupplier_01_a",
+    "macro": "ship_tel_xl_resupplier_01_a_macro",
     "nameId": "{20101,21202}",
     "name": "Stork Vanguard",
     "dlc_tag": "base",
@@ -51244,6 +51443,7 @@
   },
   {
     "id": "ship_tel_xl_resupplier_01_b",
+    "macro": "ship_tel_xl_resupplier_01_b_macro",
     "nameId": "{20101,21203}",
     "name": "Stork Sentinel",
     "dlc_tag": "base",
@@ -51629,6 +51829,7 @@
   },
   {
     "id": "ship_ter_l_destroyer_01_a",
+    "macro": "ship_ter_l_destroyer_01_a_macro",
     "nameId": "{20101,60201}",
     "name": "Osaka",
     "dlc_tag": "dlc_terran",
@@ -52049,6 +52250,7 @@
   },
   {
     "id": "ship_ter_l_flagship_01_a",
+    "macro": "ship_ter_l_flagship_01_a_macro",
     "nameId": "{20101,62701}",
     "name": "Sapporo",
     "dlc_tag": "dlc_timelines",
@@ -52341,6 +52543,7 @@
   },
   {
     "id": "ship_ter_l_miner_liquid_01_a",
+    "macro": "ship_ter_l_miner_liquid_01_a_macro",
     "nameId": "{20101,63503}",
     "name": "Hokkaido",
     "dlc_tag": "dlc_terran",
@@ -52618,6 +52821,7 @@
   },
   {
     "id": "ship_ter_l_miner_solid_01_a",
+    "macro": "ship_ter_l_miner_solid_01_a_macro",
     "nameId": "{20101,63502}",
     "name": "Hokkaido",
     "dlc_tag": "dlc_terran",
@@ -52917,6 +53121,7 @@
   },
   {
     "id": "ship_ter_l_trans_container_01_a",
+    "macro": "ship_ter_l_trans_container_01_a_macro",
     "nameId": "{20101,63601}",
     "name": "Okinawa",
     "dlc_tag": "dlc_terran",
@@ -53203,6 +53408,7 @@
   },
   {
     "id": "ship_ter_m_corvette_01_a",
+    "macro": "ship_ter_m_corvette_01_a_macro",
     "nameId": "{20101,60801}",
     "name": "Katana",
     "dlc_tag": "dlc_terran",
@@ -53468,6 +53674,7 @@
   },
   {
     "id": "ship_ter_m_corvette_02_a",
+    "macro": "ship_ter_m_corvette_02_a_macro",
     "nameId": "{20101,64801}",
     "name": "Odachi",
     "dlc_tag": "dlc_timelines",
@@ -53725,6 +53932,7 @@
   },
   {
     "id": "ship_ter_m_frigate_01_a",
+    "macro": "ship_ter_m_frigate_01_a_macro",
     "nameId": "{20101,61301}",
     "name": "Falx",
     "dlc_tag": "dlc_terran",
@@ -54046,6 +54254,7 @@
   },
   {
     "id": "ship_ter_m_gunboat_01_a",
+    "macro": "ship_ter_m_gunboat_01_a_macro",
     "nameId": "{20101,61601}",
     "name": "Jian",
     "dlc_tag": "dlc_terran",
@@ -54322,6 +54531,7 @@
   },
   {
     "id": "ship_ter_m_miner_liquid_01_a",
+    "macro": "ship_ter_m_miner_liquid_01_a_macro",
     "nameId": "{20101,62103}",
     "name": "Bolo",
     "dlc_tag": "dlc_terran",
@@ -54509,6 +54719,7 @@
   },
   {
     "id": "ship_ter_m_miner_solid_01_a",
+    "macro": "ship_ter_m_miner_solid_01_a_macro",
     "nameId": "{20101,62102}",
     "name": "Bolo",
     "dlc_tag": "dlc_terran",
@@ -54721,6 +54932,7 @@
   },
   {
     "id": "ship_ter_m_trans_container_01_a",
+    "macro": "ship_ter_m_trans_container_01_a_macro",
     "nameId": "{20101,63201}",
     "name": "Baldric",
     "dlc_tag": "dlc_terran",
@@ -54905,6 +55117,7 @@
   },
   {
     "id": "ship_ter_s_fighter_01_a",
+    "macro": "ship_ter_s_fighter_01_a_macro",
     "nameId": "{20101,62201}",
     "name": "Kukri",
     "dlc_tag": "dlc_terran",
@@ -55094,6 +55307,7 @@
   },
   {
     "id": "ship_ter_s_fighter_02_a",
+    "macro": "ship_ter_s_fighter_02_a_macro",
     "nameId": "{20101,62601}",
     "name": "Kalis",
     "dlc_tag": "dlc_terran",
@@ -55319,6 +55533,7 @@
   },
   {
     "id": "ship_ter_s_fighter_03_a",
+    "macro": "ship_ter_s_fighter_03_a_macro",
     "nameId": "{20101,62401}",
     "name": "Takoba",
     "dlc_tag": "dlc_terran",
@@ -55530,6 +55745,7 @@
   },
   {
     "id": "ship_ter_s_fighter_04_a",
+    "macro": "ship_ter_s_fighter_04_a_macro",
     "nameId": "{20101,60401}",
     "name": "Cutlass",
     "dlc_tag": "dlc_timelines",
@@ -55723,6 +55939,7 @@
   },
   {
     "id": "ship_ter_s_heavyfighter_01_a",
+    "macro": "ship_ter_s_heavyfighter_01_a_macro",
     "nameId": "{20101,61401}",
     "name": "Gladius",
     "dlc_tag": "dlc_terran",
@@ -55952,6 +56169,7 @@
   },
   {
     "id": "ship_ter_s_miner_solid_01_a",
+    "macro": "ship_ter_s_miner_solid_01_a_macro",
     "nameId": "{20101,61802}",
     "name": "Kopis",
     "dlc_tag": "dlc_terran",
@@ -56114,6 +56332,7 @@
   },
   {
     "id": "ship_ter_s_scout_01_a",
+    "macro": "ship_ter_s_scout_01_a_macro",
     "nameId": "{20101,60701}",
     "name": "Rapier",
     "dlc_tag": "dlc_terran",
@@ -56273,6 +56492,7 @@
   },
   {
     "id": "ship_ter_s_scout_02_a",
+    "macro": "ship_ter_s_scout_02_a_macro",
     "nameId": "{20101,62301}",
     "name": "Nimcha",
     "dlc_tag": "dlc_terran",
@@ -56457,6 +56677,7 @@
   },
   {
     "id": "ship_ter_s_trans_container_01_a",
+    "macro": "ship_ter_s_trans_container_01_a_macro",
     "nameId": "{20101,63101}",
     "name": "Frog",
     "dlc_tag": "dlc_terran",
@@ -56593,6 +56814,7 @@
   },
   {
     "id": "ship_ter_s_xperimental_01_a",
+    "macro": "ship_ter_s_xperimental_01_a_macro",
     "nameId": "{20101,122801}",
     "name": "Xperimental Shuttle",
     "dlc_tag": "dlc_timelines",
@@ -56837,6 +57059,7 @@
   },
   {
     "id": "ship_ter_xl_builder_01_a",
+    "macro": "ship_ter_xl_builder_01_a_macro",
     "nameId": "{20101,63701}",
     "name": "Kyushu",
     "dlc_tag": "dlc_terran",
@@ -57110,6 +57333,7 @@
   },
   {
     "id": "ship_ter_xl_carrier_01_a",
+    "macro": "ship_ter_xl_carrier_01_a_macro",
     "nameId": "{20101,60101}",
     "name": "Tokyo",
     "dlc_tag": "dlc_terran",
@@ -57531,6 +57755,7 @@
   },
   {
     "id": "ship_ter_xl_resupplier_01_a",
+    "macro": "ship_ter_xl_resupplier_01_a_macro",
     "nameId": "{20101,63401}",
     "name": "Honshu",
     "dlc_tag": "dlc_terran",
@@ -57859,6 +58084,7 @@
   },
   {
     "id": "ship_xen_l_terraformer_01_a",
+    "macro": "ship_xen_l_terraformer_01_a_macro",
     "nameId": "{20101,72001}",
     "name": "H",
     "dlc_tag": "base",
@@ -58265,6 +58491,7 @@
   },
   {
     "id": "ship_xen_m_corvette_01_a",
+    "macro": "ship_xen_m_corvette_01_a_macro",
     "nameId": "{20101,71601}",
     "name": "B",
     "dlc_tag": "base",
@@ -58465,6 +58692,7 @@
   },
   {
     "id": "ship_xen_m_corvette_02_a",
+    "macro": "ship_xen_m_corvette_02_a_macro",
     "nameId": "{20101,70302}",
     "name": "PE",
     "dlc_tag": "base",
@@ -58722,6 +58950,7 @@
   },
   {
     "id": "ship_xen_m_miner_solid_01_a",
+    "macro": "ship_xen_m_miner_solid_01_a_macro",
     "nameId": "{20101,70402}",
     "name": "SE",
     "dlc_tag": "base",
@@ -58915,6 +59144,7 @@
   },
   {
     "id": "ship_xen_s_heavyfighter_01_a",
+    "macro": "ship_xen_s_heavyfighter_01_a_macro",
     "nameId": "{20101,71801}",
     "name": "F",
     "dlc_tag": "base",
@@ -59150,6 +59380,7 @@
   },
   {
     "id": "ship_yak_m_corvette_01_a",
+    "macro": "ship_yak_m_corvette_01_a_macro",
     "nameId": "{20101,87001}",
     "name": "Kuraokami",
     "dlc_tag": "dlc_terran",
@@ -59420,6 +59651,7 @@
   },
   {
     "id": "ship_yak_s_fighter_01_a",
+    "macro": "ship_yak_s_fighter_01_a_macro",
     "nameId": "{20101,86701}",
     "name": "Moreya",
     "dlc_tag": "dlc_terran",
