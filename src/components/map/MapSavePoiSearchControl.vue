@@ -2,6 +2,7 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import type { SearchState, SearchTag } from './savePoiSearchFilter'
 import type { LocalizedX4Module, X4MapSector } from '@/types/x4'
 
@@ -11,6 +12,7 @@ const emit = defineEmits<{
 
 const { t, te } = useI18n()
 const gameData = useGameDataStore()
+const { translateFaction } = useX4I18n()
 
 type SearchCategory = 'product' | 'module' | 'faction' | 'sector'
 
@@ -100,13 +102,6 @@ function searchModules(query: string): SearchTag[] {
   return results
 }
 
-function getFactionLabel(faction: { nameId: string; name: string; id: string }): string {
-  if (faction.nameId && te(faction.nameId)) {
-    return t(faction.nameId)
-  }
-  return faction.name || faction.id
-}
-
 function searchFactions(query: string): SearchTag[] {
   const normalized = query.toLowerCase()
   const results: SearchTag[] = []
@@ -116,7 +111,7 @@ function searchFactions(query: string): SearchTag[] {
     if (seen.has(faction.id)) continue
     seen.add(faction.id)
     
-    const label = getFactionLabel(faction)
+    const label = translateFaction(faction)
     const name = label.toLowerCase()
     const id = faction.id.toLowerCase()
     
