@@ -24,10 +24,6 @@ interface SavePoiLabelContext {
   localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
 }
 
-function translateModuleGroup(groupId: string, context: SavePoiLabelContext): string {
-  return context.localizedModuleGroupsMap[groupId]?.localeName || groupId
-}
-
 export function getNpcStationPoiLabel(
   poi: SavePoiOverlayItem,
   context: SavePoiLabelContext
@@ -60,8 +56,9 @@ export function getNpcStationPoiLabel(
     return poi.profileName || profile
   }
 
-  if (poi.tag && NPC_TAG_LABEL_KEYS[poi.tag]) {
-    return context.t(NPC_TAG_LABEL_KEYS[poi.tag])
+  const npcTagLabelKey = poi.tag ? NPC_TAG_LABEL_KEYS[poi.tag] : undefined
+  if (npcTagLabelKey) {
+    return context.t(npcTagLabelKey)
   }
 
   if (poi.category === 'xenonStation') return context.t('map.save_category_xenon_station')
