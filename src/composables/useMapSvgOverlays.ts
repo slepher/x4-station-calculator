@@ -9,7 +9,7 @@ import {
   svgIdSafe
 } from '@/components/map/utils/style'
 import {
-  MAP_ICON_SIZES,
+  getMapSavePoiBaseIconSize,
   getMapDynamicLargePoiIconSize,
   isLargeMapSavePoiIcon
 } from '@/components/map/utils/mapIconConfig'
@@ -255,7 +255,7 @@ export function useMapSvgOverlays(args: {
         }
         const iconSize = isLargeMapSavePoiIcon(poi)
           ? largeIconScreenSize / clampedScale
-          : MAP_ICON_SIZES.savePoiSmall
+          : getMapSavePoiBaseIconSize(poi)
 
         const factionId = getPoiFactionId(poi)
         const factionColor = factionId && factionColorMap?.[factionId] ? factionColorMap[factionId] : null

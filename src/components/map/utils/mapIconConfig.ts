@@ -3,13 +3,14 @@ import type { SavePoiOverlayItem } from '@/types/saveArchive'
 export const MAP_ICON_SIZES = {
   placement: 18,
   preview: 20,
-  savePoiLarge: 18,
-  savePoiSmall: 9
+  savePoiLarge: 10,
+  savePoiSmall: 6,
+  savePoiSpecial: 8
 } as const
 
 export const MAP_LINK_ICON_SIZES = {
-  superhighwayStart: 4.2,
-  superhighwayEnd: 3.15,
+  superhighwayStart: 3,
+  superhighwayEnd: 2,
   gateDiameterMultiplier: 6,
   crossLinkStroke: 0.6
 } as const
@@ -27,6 +28,9 @@ export function isLargeMapSavePoiIcon(poi: SavePoiOverlayItem): boolean {
 }
 
 export function getMapSavePoiBaseIconSize(poi: SavePoiOverlayItem): number {
+  if (poi.category === 'abandonedShip' || poi.category === 'datavault' || poi.category === 'erlkingVault') {
+    return MAP_ICON_SIZES.savePoiSpecial
+  }
   return isLargeMapSavePoiIcon(poi) ? MAP_ICON_SIZES.savePoiLarge : MAP_ICON_SIZES.savePoiSmall
 }
 
@@ -53,8 +57,8 @@ export function getMapDynamicLargePoiIconSize(args: {
   return halfClusterScreenSizeAtThreshold + (maxScaleScreenSize - halfClusterScreenSizeAtThreshold) * progress
 }
 
-export function getMapSuperhighwayEndpointIconSize(stargateVisualScale: number, end: 'start' | 'end'): number {
-  return (end === 'start' ? MAP_LINK_ICON_SIZES.superhighwayStart : MAP_LINK_ICON_SIZES.superhighwayEnd) * stargateVisualScale
+export function getMapSuperhighwayEndpointIconSize(_stargateVisualScale: number, end: 'start' | 'end'): number {
+  return end === 'start' ? MAP_LINK_ICON_SIZES.superhighwayStart : MAP_LINK_ICON_SIZES.superhighwayEnd
 }
 
 export function getMapSuperhighwayEndpointIconOffset(stargateVisualScale: number, end: 'start' | 'end'): number {
@@ -65,7 +69,8 @@ export function getMapGateRadius(args: {
   sectorCount: number
   stargateVisualScale: number
 }): number {
-  return (args.sectorCount === 1 ? 1.1 : 0.8) * args.stargateVisualScale
+  void args
+  return 4 / MAP_LINK_ICON_SIZES.gateDiameterMultiplier
 }
 
 export function getMapGateIconDiameter(radius: number): number {
