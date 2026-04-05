@@ -174,7 +174,8 @@ function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]):
     version: raw.version,
     activeId,
     activeStationId,
-    list
+    list,
+    savePlans: raw.savePlans
   }
 }
 
@@ -204,7 +205,8 @@ export function migrateEmpireStateToCurrent(
       version: typeof inState.version === 'number' ? inState.version : 2,
       activeId: inState.activeId || null,
       activeStationId: inState.activeStationId || null,
-      list: deepClone(inState.list || [])
+      list: deepClone(inState.list || []),
+      savePlans: inState.savePlans ? deepClone(inState.savePlans) : undefined
     }
   }
 
