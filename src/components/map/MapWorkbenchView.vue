@@ -9,7 +9,7 @@ import MapSavePanel from './MapSavePanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
-import { getSectorScalePerRadius } from '@/components/map/utils/coordinates'
+import { getSectorScalePerRadius, sectorLocalRatioToRawPoint } from '@/components/map/utils/coordinates'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
@@ -590,13 +590,20 @@ const resolveLocationFromSectorElement = (sectorElement: SVGGraphicsElement, cli
   if (!radius) return null
   const ratioX = (clientX - centerX) / radius
   const ratioY = (clientY - centerY) / radius
+  const sector = gameDataStore.maps?.clusters?.[mapSector.clusterId]?.sectors?.[sectorId]
   const rawScale = 1 / mapSector.scalePerRadius
+  const rawPoint = sector
+    ? sectorLocalRatioToRawPoint(sector, {
+        x: ratioX,
+        y: ratioY
+      })
+    : null
   return {
     cluster_id: mapSector.clusterId,
     sector_id: sectorId,
     pos: {
-      x: Math.round(ratioX * rawScale),
-      z: Math.round(-ratioY * rawScale)
+      x: Math.round(rawPoint?.x ?? (ratioX * rawScale)),
+      z: Math.round(rawPoint?.z ?? (-ratioY * rawScale))
     },
     sunlight: mapSector.sunlight,
     resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))

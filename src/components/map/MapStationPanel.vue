@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import factoryIconUrl from '@/components/icons/factory.svg'
 import shipyardIconUrl from '@/components/icons/shipyard.svg'
@@ -89,39 +89,65 @@ const iconUrlByType: Record<PlacementIcon, string> = {
   tradestation: tradestationIconUrl
 }
 
-const onDragStart = (event: DragEvent, item: MapStationPanelItem) => {
-  if (event.dataTransfer) {
-    event.dataTransfer.setData('application/x-map-station-item', JSON.stringify({ id: item.id, kind: item.kind }))
-    event.dataTransfer.effectAllowed = 'move'
-    const iconUrl = iconUrlByType[item.icon]
-    if (iconUrl && typeof document !== 'undefined') {
-      const dragGhost = document.createElement('div')
-      dragGhost.style.position = 'fixed'
-      dragGhost.style.left = '-9999px'
-      dragGhost.style.top = '-9999px'
-      dragGhost.style.width = '18px'
-      dragGhost.style.height = '18px'
-      dragGhost.style.backgroundImage = `url("${iconUrl}")`
-      dragGhost.style.backgroundPosition = 'center'
-      dragGhost.style.backgroundRepeat = 'no-repeat'
-      dragGhost.style.backgroundSize = 'contain'
-      dragGhost.style.pointerEvents = 'none'
-      document.body.appendChild(dragGhost)
-      event.dataTransfer.setDragImage(dragGhost, 9, 9)
-      window.setTimeout(() => dragGhost.remove(), 0)
-    }
-  }
-  emit('drag-start', item)
+const DRAG_START_THRESHOLD_PX = 4
+
+const pendingDrag = ref<{
+  item: MapStationPanelItem
+  startX: number
+  startY: number
+} | null>(null)
+const activeDragItemId = ref<string | null>(null)
+
+const clearPendingDrag = () => {
+  pendingDrag.value = null
 }
 
-const onDragEnd = () => {
+const finishActiveDrag = () => {
+  if (!activeDragItemId.value) return
+  activeDragItemId.value = null
   emit('drag-end')
 }
+
+const onWindowMouseMove = (event: MouseEvent) => {
+  if (!pendingDrag.value || activeDragItemId.value) return
+  const dx = event.clientX - pendingDrag.value.startX
+  const dy = event.clientY - pendingDrag.value.startY
+  if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
+  activeDragItemId.value = pendingDrag.value.item.id
+  emit('drag-start', pendingDrag.value.item)
+}
+
+const onWindowMouseUp = () => {
+  clearPendingDrag()
+  finishActiveDrag()
+}
+
+const onItemMouseDown = (event: MouseEvent, item: MapStationPanelItem) => {
+  if (event.button !== 0) return
+  pendingDrag.value = {
+    item,
+    startX: event.clientX,
+    startY: event.clientY
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('mousemove', onWindowMouseMove)
+  window.addEventListener('mouseup', onWindowMouseUp)
+}
+
+onBeforeUnmount(() => {
+  if (typeof window === 'undefined') return
+  window.removeEventListener('mousemove', onWindowMouseMove)
+  window.removeEventListener('mouseup', onWindowMouseUp)
+})
 
 watch(() => props.open, (open) => {
   if (!open) {
     searchQuery.value = ''
     activeFilter.value = 'all'
+    clearPendingDrag()
+    finishActiveDrag()
   }
 })
 </script>
@@ -185,11 +211,9 @@ watch(() => props.open, (open) => {
             v-for="item in group.items"
             :key="`${item.kind}:${item.id}`"
             class="map-station-panel__item"
-            :class="{ 'map-station-panel__item--placed': !!item.location }"
+            :class="{ 'map-station-panel__item--placed': !!item.location, 'map-station-panel__item--dragging': activeDragItemId === item.id }"
             :data-testid="`station-item-${item.id}`"
-            draggable="true"
-            @dragstart="onDragStart($event, item)"
-            @dragend="onDragEnd"
+            @mousedown="onItemMouseDown($event, item)"
             @click="item.location ? emit('focus-item', item) : undefined"
           >
             <div class="map-station-panel__item-main">
@@ -315,10 +339,15 @@ watch(() => props.open, (open) => {
 
 .map-station-panel__item {
   @apply flex items-center justify-between gap-3 rounded border border-amber-300/15 bg-black/45 px-3 py-3;
+  cursor: grab;
 }
 
 .map-station-panel__item--placed {
   @apply cursor-pointer transition-colors duration-150 hover:border-amber-200/45 hover:bg-amber-200/5;
+}
+
+.map-station-panel__item--dragging {
+  cursor: grabbing;
 }
 
 .map-station-panel__item-main {

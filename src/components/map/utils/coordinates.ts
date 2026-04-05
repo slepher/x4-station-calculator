@@ -16,7 +16,7 @@ type SectorRawPoint = {
 
 const snapToSectorCenterGrid = (value: number) => Math.round(value / SECTOR_CENTER_GRID) * SECTOR_CENTER_GRID
 
-const getSectorZoneBoundingCenter = (sector: Sector) => {
+export const getSectorZoneBoundingCenter = (sector: Sector) => {
   if (sector.raw_center_pos?.x !== undefined && sector.raw_center_pos?.z !== undefined) {
     return {
       x: sector.raw_center_pos.x,
@@ -62,6 +62,19 @@ export const sectorPointToLocalRatio = (sector: Sector, point: SectorRawPoint): 
   }
 
   return null
+}
+
+export const sectorLocalRatioToRawPoint = (sector: Sector, localRatio?: Ratio | null): { x: number; z: number } | null => {
+  if (!localRatio) return null
+
+  const scalePerRadius = getSectorScalePerRadius(sector)
+  if (!scalePerRadius) return null
+
+  const center = getSectorZoneBoundingCenter(sector)
+  return {
+    x: center.x + localRatio.x / scalePerRadius,
+    z: center.z - localRatio.y / scalePerRadius
+  }
 }
 
 export const getSectorScalePerRadius = (sector: Sector): number => {

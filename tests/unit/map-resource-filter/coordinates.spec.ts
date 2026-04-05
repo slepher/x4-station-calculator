@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { getSectorScalePerRadius, sectorPointToLocalRatio } from '@/components/map/utils/coordinates'
+import { getSectorScalePerRadius, sectorLocalRatioToRawPoint, sectorPointToLocalRatio } from '@/components/map/utils/coordinates'
 
 describe('sector coordinate normalization', () => {
   it('snaps the sector center to the nearest 64000 grid before projecting local ratios', () => {
@@ -52,5 +52,25 @@ describe('sector coordinate normalization', () => {
     const ratio = sectorPointToLocalRatio(sector, { x: 90000, z: 0 })
     expect(ratio?.x).toBeCloseTo(0.6928203230275509, 12)
     expect(Object.is(ratio?.y, -0) ? 0 : ratio?.y).toBe(0)
+  })
+
+  it('restores raw coordinates from local ratios around a non-zero sector center', () => {
+    const sector = {
+      id: 'sector_alpha',
+      raw_center_pos: { x: 64000, y: 0, z: 128000 },
+      normalized: {
+        scale_per_radius: 0.001
+      }
+    } as any
+
+    const rawPoint = sectorLocalRatioToRawPoint(sector, {
+      x: 0.4,
+      y: 0.25
+    })
+
+    expect(rawPoint).toEqual({
+      x: 64400,
+      z: 127750
+    })
   })
 })
