@@ -199,12 +199,12 @@ binding UI 放在 `MapWorkbenchView`，原因：
     1. **绑定星区**（前提条件）：将选中的 save 星区绑定到帝国星区
        - 可选择现有帝国星区
        - 可选择新建帝国星区
-       - 绑定完成后显示该帝国星区的空闲空间站列表
+       - 绑定完成后显示该帝国星区的空闲空间站列表（已绑定 save 站的 empire station 不显示）
     2. **绑定空间站**（任选顺序）：
        - 绑定空间站：将 coverage 内的 save 玩家站绑定到该帝国星区下的已有 empire station
        - 导入空间站：将 coverage 内的 save 玩家站导入为新的 empire station
        - 绑定中转站：将该帝国星区的 empire station 绑定到 save tradestation
-  - 顶部选择跳数（0-5）
+  - 顶部选择跳数（0-5）和存档时间
   - 主列表展示该星区 `N` 跳以内**且有玩家空间站**的星区列表（POI 风格）
   - 每个星区下显示其玩家空间站
   - 地图自动缩放到显示所有有玩家空间站的可达星区
@@ -242,8 +242,20 @@ binding UI 放在 `MapWorkbenchView`，原因：
 - 跳数变化时：
   - 重新计算覆盖范围内的星区（有玩家空间站的）
   - 发出 `fit-sectors` 事件缩放地图以显示所有这些星区
+- 存档时间切换：
+  - 使用 gameGuid 对应存档组的最新存档作为默认值
+  - 切换时间点只影响解析结果，不影响 binding 身份
+- 空闲站拖拽：
+  - 从空闲站列表拖拽到地图时，位置写入 `StationSaveBinding.position`
+  - 不修改 `EmpirePlan.location`
 - 存档数据的 sectorMacro 与游戏数据的 sectorId 存在大小写差异：
   - 在 `buildSectorGraph` 中统一小写化处理
+
+### 4.5 数据约束
+
+- 一个 save 玩家站在同一 `SaveBindingPlan` 内只能绑定到一个 empire station（store 层强制）
+- `bindStationToSaveStation()` 返回 boolean 表示是否成功
+- 存档时间回退：`selectedArchiveTime === null` 时使用 gameGuid 对应存档组的最新存档
 
 ## 5. Store Action 设计
 

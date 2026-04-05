@@ -23,7 +23,7 @@
 - [x] 4.2 新增 `selectedArchiveTime` 切换 action
 - [x] 4.3 新增 group hub binding 的绑定、解绑、跳数更新 action
 - [x] 4.4 新增已有 empire station 与 save 玩家站的绑定、解绑 action
-- [x] 4.5 实现"一个 save 玩家站在同一 `SaveBindingPlan` 内只能绑定到一个 empire station"的占用校验
+- [x] 4.5 实现"一个 save 玩家站在同一 `SaveBindingPlan` 内只能绑定到一个 empire station"的占用校验（store 层强制）
 - [x] 4.6 新增 station binding `position` 的写入、清除与更新 action
 
 - [x] 5. 直接导入 save station
@@ -32,10 +32,10 @@
 - [x] 5.3 导入完成后为新 station 建立 `StationSaveBinding`
 
 - [x] 6. 空闲 empire station 直接放置
-- [x] 6.1 在目标帝国星区下提供空闲 empire station 列表
+- [x] 6.1 在目标帝国星区下提供空闲 empire station 列表（排除已绑定 save 站的）
 - [x] 6.2 支持将空闲 empire station 直接拖拽到地图（UI 交互）
 - [x] 6.3 拖拽后按小空间站尺寸渲染（复用现有 placement preview）
-- [x] 6.4 将拖拽得到的 `position: { x, y, z }` 写入 binding，调用 `setStationBindingPosition`
+- [x] 6.4 将拖拽得到的 `position: { x, y, z }` 写入 binding，不写入 `EmpirePlan`
 
 - [x] 7. Binding selector / composable
 - [x] 7.1 新增统一的 binding view-model 层，拼接 `empireStore + saveStore + mapStore`
@@ -60,8 +60,12 @@
 - [x] 10. 列表与操作区 UI
 - [x] 10.1 第一段显示 binding plan 选择与创建
 - [x] 10.2 第二段显示 save 星区列表（带搜索、空间站标签）
-- [x] 10.3 第三段显示过滤后的星区与空间站列表（POI 风格）
+- [x] 10.3 第三段显示过滤后的星区与空间站列表（POI 风格，只显示有玩家站的星区）
 
 - [x] 11. 构建验证
 - [x] 11.1 完成所有实现后执行 `npm run build`
 - [x] 11.2 构建通过
+
+- [x] 12. 审查问题修复
+- [x] 12.1 修复 selectedArchiveTime 回退逻辑，使用 gameGuid 最新存档
+- [x] 12.2 bindStationToSaveStation() 添加占用校验并返回 boolean

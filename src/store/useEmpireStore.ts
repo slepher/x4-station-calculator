@@ -1102,9 +1102,16 @@ export const useEmpireStore = defineStore('empire', () => {
     saveStationCode: string
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
-  }): void {
+  }): boolean {
     const plan = getBindingPlanByKey(input.bindingKey)
-    if (!plan) return
+    if (!plan) return false
+
+    const alreadyBoundStation = plan.stationBindings.find(
+      (b) => b.saveStationCode === input.saveStationCode && b.stationId !== input.stationId
+    )
+    if (alreadyBoundStation) {
+      return false
+    }
 
     const existingIndex = plan.stationBindings.findIndex(
       (binding) => binding.stationId === input.stationId
@@ -1122,6 +1129,8 @@ export const useEmpireStore = defineStore('empire', () => {
     } else {
       plan.stationBindings.push(newBinding)
     }
+
+    return true
   }
 
   function clearStationBinding(bindingKey: string, stationId: string): void {

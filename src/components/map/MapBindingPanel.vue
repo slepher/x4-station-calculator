@@ -101,17 +101,19 @@ const activeBindingPlan = computed<SaveBindingPlan | null>(() => {
 
 const activeArchive = computed<SaveArchive | null>(() => {
   const binding = activeBindingPlan.value
-  if (!binding) return saveStore.selectedArchive
-
-  const time = binding.selectedArchiveTime
-  if (time === null) return saveStore.selectedArchive
+  if (!binding) return null
 
   const guid = binding.gameGuid
   const group = saveStore.archives.get(guid)
-  if (!group) return saveStore.selectedArchive
+  if (!group) return null
+
+  const time = binding.selectedArchiveTime
+  if (time === null) {
+    return group.saves[0] || null
+  }
 
   const archive = group.saves.find((s) => s.meta.time === time)
-  return archive ?? saveStore.selectedArchive
+  return archive ?? group.saves[0] ?? null
 })
 
 interface SectorWithStations {
