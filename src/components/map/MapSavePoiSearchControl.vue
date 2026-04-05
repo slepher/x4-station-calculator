@@ -229,6 +229,19 @@ watch(sectorJumpLimit, () => {
     emitSearchChange()
   }
 })
+
+function stepJumpLimit(delta: number) {
+  const next = sectorJumpLimit.value + delta
+  if (next >= 0 && next <= 8) {
+    sectorJumpLimit.value = next
+  }
+}
+
+function updateJumpLimit(value: number) {
+  if (value >= 0 && value <= 8) {
+    sectorJumpLimit.value = value
+  }
+}
 </script>
 
 <template>
@@ -238,6 +251,7 @@ watch(sectorJumpLimit, () => {
         <input
           v-model="searchInput"
           class="search-input"
+          :class="{ 'with-jump-control': selectedCategory === 'sector' }"
           :placeholder="placeholder"
           type="text"
           @blur="hideSuggestions"
@@ -253,6 +267,21 @@ watch(sectorJumpLimit, () => {
           <option value="faction">{{ categoryLabels.faction }}</option>
           <option value="sector">{{ categoryLabels.sector }}</option>
         </select>
+        <template v-if="selectedCategory === 'sector'">
+          <span class="jump-suffix">{{ t('map.poi_search_jump_suffix') }}</span>
+          <div class="jump-stepper">
+            <button type="button" class="jump-step-btn" @click="stepJumpLimit(1)">▲</button>
+            <button type="button" class="jump-step-btn" @click="stepJumpLimit(-1)">▼</button>
+          </div>
+          <input
+            :value="sectorJumpLimit"
+            class="jump-input"
+            type="number"
+            min="0"
+            max="8"
+            @input="updateJumpLimit(Number(($event.target as HTMLInputElement).value || 0))"
+          />
+        </template>
         <div v-if="showSuggestions" class="suggestions-list">
           <div
             v-for="tag in suggestions"
@@ -264,17 +293,6 @@ watch(sectorJumpLimit, () => {
           </div>
         </div>
       </div>
-    </div>
-
-    <div v-if="selectedCategory === 'sector' && sectorTags.length > 0" class="jump-limit-row">
-      <label class="jump-limit-label">{{ t('map.poi_search_jump_limit') }}</label>
-      <input
-        v-model.number="sectorJumpLimit"
-        class="jump-limit-input"
-        type="number"
-        min="0"
-        max="8"
-      />
     </div>
 
     <div v-if="productModuleTags.length > 0 || factionTags.length > 0 || sectorTags.length > 0" class="tags-area">
@@ -323,12 +341,49 @@ watch(sectorJumpLimit, () => {
   @apply h-10 w-full rounded border border-amber-300/30 bg-black/60 pl-3 pr-24 text-sm text-amber-50 outline-none;
 }
 
+.search-input.with-jump-control {
+  padding-right: 7.5rem;
+}
+
 .category-select {
   @apply absolute right-0 h-8 my-1 w-20 rounded border-l border-amber-300/30 bg-transparent pl-2 pr-6 text-xs text-amber-100 outline-none cursor-pointer appearance-none;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fcd34d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 4px center;
   background-size: 14px;
+}
+
+.search-input.with-jump-control ~ .category-select {
+  right: 78px;
+}
+
+.jump-input {
+  @apply absolute right-20 h-8 my-1 w-8 rounded-l border-l border-amber-300/30 bg-transparent px-1 text-center text-sm text-amber-50 outline-none;
+  min-width: 0;
+  -moz-appearance: textfield;
+}
+
+.jump-input::-webkit-outer-spin-button,
+.jump-input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.jump-suffix {
+  @apply pointer-events-none absolute right-28 top-1/2 -translate-y-1/2 text-xs font-semibold text-amber-100/90;
+}
+
+.jump-stepper {
+  @apply absolute right-20 top-1/2 flex -translate-y-1/2 flex-col overflow-hidden rounded-r-md rounded-l-sm border border-amber-300/25 bg-black/80;
+  width: 14px;
+}
+
+.jump-step-btn {
+  @apply flex h-3.5 w-3.5 items-center justify-center bg-amber-200/10 text-[9px] leading-none text-amber-100/85 transition-colors duration-150 hover:bg-amber-200/20 hover:text-amber-50;
+}
+
+.jump-step-btn + .jump-step-btn {
+  @apply border-t border-amber-300/20;
 }
 
 .suggestions-list {
@@ -338,18 +393,6 @@ watch(sectorJumpLimit, () => {
 
 .suggestion-item {
   @apply px-3 py-2 text-sm text-amber-50 cursor-pointer hover:bg-amber-200/10 transition-colors;
-}
-
-.jump-limit-row {
-  @apply flex items-center gap-2;
-}
-
-.jump-limit-label {
-  @apply text-xs text-amber-200/80;
-}
-
-.jump-limit-input {
-  @apply w-16 h-8 rounded border border-amber-300/30 bg-black/60 px-2 text-sm text-amber-50 outline-none;
 }
 
 .tags-area {
