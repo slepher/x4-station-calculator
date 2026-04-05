@@ -104,6 +104,15 @@ const activeArchive = computed<SaveArchive | null>(() => {
   if (!binding) return null
 
   const guid = binding.gameGuid
+  const selected = saveStore.selectedArchive
+  
+  if (selected && selected.meta.guid === guid) {
+    const time = binding.selectedArchiveTime
+    if (time === null || selected.meta.time === time) {
+      return selected
+    }
+  }
+
   const group = saveStore.archives.get(guid)
   if (!group) return null
 
@@ -345,10 +354,20 @@ function getStationLabel(station: PlayerStationEntry): string {
   return t('map.save_category_player_station')
 }
 
-function selectBindingPlan(plan: SaveBindingPlan | null) {
+async function selectBindingPlan(plan: SaveBindingPlan | null) {
   selectedBindingKey.value = plan?.key || null
   if (plan && activeEmpireId.value) {
     empireStore.selectSaveBindingPlan(activeEmpireId.value, plan.key)
+    
+    const selected = saveStore.selectedArchive
+    if (!selected || selected.meta.guid !== plan.gameGuid) {
+      const group = saveStore.archives.get(plan.gameGuid)
+      if (group && group.saves[0]) {
+        const time = plan.selectedArchiveTime ?? group.saves[0].meta.time
+        await saveStore.selectArchive(plan.gameGuid, time)
+      }
+    }
+    
     stage.value = 'select-sector'
   } else {
     stage.value = 'select-binding'
@@ -415,10 +434,17 @@ function clearGroupBinding() {
   empireStore.clearSectorGroupHubBinding(selectedBindingKey.value, selectedSectorGroupId.value)
 }
 
-function selectArchiveTime(time: number | null) {
-  if (!selectedBindingKey.value) return
+async function selectArchiveTime(time: number | null) {
+  if (!selectedBindingKey.value || !activeBindingPlan.value) return
 
   empireStore.setSelectedArchiveTime(selectedBindingKey.value, time)
+  
+  const guid = activeBindingPlan.value.gameGuid
+  const group = saveStore.archives.get(guid)
+  if (group && group.saves[0]) {
+    const targetTime = time ?? group.saves[0].meta.time
+    await saveStore.selectArchive(guid, targetTime)
+  }
 }
 
 const clearPendingDrag = () => {
@@ -481,11 +507,11 @@ function stepJumpLimit(delta: number) {
   updateJumpLimit(selectedJumpRange.value + delta)
 }
 
-function createNewBindingPlan(gameGuid: string) {
+async function createNewBindingPlan(gameGuid: string) {
   if (!activeEmpireId.value) return
 
   const plan = empireStore.createSaveBindingPlan(activeEmpireId.value, gameGuid)
-  selectBindingPlan(plan)
+  await selectBindingPlan(plan)
 }
 
 function importSaveStation(saveStation: PlayerStationEntry, sectorMacro: string) {
