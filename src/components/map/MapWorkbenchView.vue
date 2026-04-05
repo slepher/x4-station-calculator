@@ -6,6 +6,7 @@ import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
 import MapSavePanel from './MapSavePanel.vue'
+import MapBindingPanel from './MapBindingPanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
@@ -132,6 +133,7 @@ const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
 const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
+const isBindingPanelOpen = ref(false)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
@@ -993,6 +995,7 @@ const onResourcePrimaryColorChange = (color: string | null) => {
 const onResourcePanelOpen = () => {
   isStationPanelOpen.value = false
   isSavePanelOpen.value = false
+  isBindingPanelOpen.value = false
   clearPlacementState()
   isResourcePanelOpen.value = true
 }
@@ -1008,6 +1011,7 @@ const onResourcePanelClose = () => {
 const onStationPanelOpen = () => {
   isResourcePanelOpen.value = false
   isSavePanelOpen.value = false
+  isBindingPanelOpen.value = false
   isStationPanelOpen.value = true
 }
 
@@ -1020,6 +1024,7 @@ const onStationPanelClose = () => {
 const onSavePanelOpen = () => {
   isResourcePanelOpen.value = false
   isStationPanelOpen.value = false
+  isBindingPanelOpen.value = false
   clearPlacementState()
   isSavePanelOpen.value = true
 }
@@ -1028,6 +1033,40 @@ const onSavePanelClose = () => {
   isSavePanelOpen.value = false
   activeSavePoiCategory.value = null
   focusedSavePoiKey.value = null
+}
+
+const onBindingPanelOpen = () => {
+  isResourcePanelOpen.value = false
+  isStationPanelOpen.value = false
+  isSavePanelOpen.value = false
+  clearPlacementState()
+  isBindingPanelOpen.value = true
+}
+
+const onBindingPanelClose = () => {
+  isBindingPanelOpen.value = false
+}
+
+const onBindingFocusSector = (sectorMacro: string) => {
+  const resolved = mapStore.resolveSectorByMacro?.(sectorMacro) ||
+    resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
+  if (resolved?.sectorId) {
+    focusSector(resolved.sectorId)
+  }
+}
+
+const onBindingFitSectors = (sectorMacros: string[]) => {
+  const sectorIds = sectorMacros
+    .map((macro) => {
+      const resolved = mapStore.resolveSectorByMacro?.(macro) ||
+        resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, macro)
+      return resolved?.sectorId
+    })
+    .filter((id): id is string => Boolean(id))
+  
+  if (sectorIds.length > 0) {
+    fitSectors(sectorIds)
+  }
 }
 
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
@@ -1310,7 +1349,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="map-workbench" data-testid="map-workbench-view">
-    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen, 'save-sidebar-active': isSavePanelOpen }">
+    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen, 'save-sidebar-active': isSavePanelOpen, 'binding-sidebar-active': isBindingPanelOpen }">
       <MapResourceFilterPanel
         v-show="isResourcePanelOpen"
         :sector-layouts="searchSectors"
@@ -1346,6 +1385,13 @@ onBeforeUnmount(() => {
         @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
         @focus-poi="onSavePoiFocus"
+      />
+
+      <MapBindingPanel
+        :open="isBindingPanelOpen"
+        @close="onBindingPanelClose"
+        @focus-sector="onBindingFocusSector"
+        @fit-sectors="onBindingFitSectors"
       />
 
       <div class="map-shell">
@@ -1552,6 +1598,26 @@ onBeforeUnmount(() => {
               />
             </svg>
           </button>
+
+          <button
+            type="button"
+            class="map-panel-tab"
+            :class="{ active: isBindingPanelOpen }"
+            data-testid="map-binding-panel-tab"
+            @click="onBindingPanelOpen"
+          >
+            <span class="map-panel-tab-label">{{ t('map.binding_panel_tab') }}</span>
+            <svg class="map-panel-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              />
+            </svg>
+          </button>
         </div>
 
         <div class="map-right-stack" @mousedown.stop>
@@ -1609,6 +1675,10 @@ onBeforeUnmount(() => {
 }
 
 .map-layout.save-sidebar-active {
+  @apply gap-3;
+}
+
+.map-layout.binding-sidebar-active {
   @apply gap-3;
 }
 

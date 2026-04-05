@@ -102,23 +102,29 @@ export const buildSectorGraph = (clusters: Record<string, {
   const sectorGateTargets: Record<string, Set<string>> = {}
   const sectorsByCluster: Record<string, string[]> = {}
 
+  const normalizeKey = (key: string) => key.toLowerCase()
+
   Object.entries(clusters).forEach(([clusterId, cluster]) => {
-    sectorsByCluster[clusterId] ||= []
+    const normalizedClusterId = normalizeKey(clusterId)
+    sectorsByCluster[normalizedClusterId] ||= []
     Object.values(cluster.sectors || {}).forEach((sector) => {
-      graph[sector.id] ||= new Set<string>()
-      sectorClusterIdMap[sector.id] = clusterId
-      sectorsByCluster[clusterId]!.push(sector.id)
-      sectorGateTargets[sector.id] ||= new Set<string>()
+      const normalizedSectorId = normalizeKey(sector.id)
+      graph[normalizedSectorId] ||= new Set<string>()
+      sectorClusterIdMap[normalizedSectorId] = normalizedClusterId
+      sectorsByCluster[normalizedClusterId]!.push(normalizedSectorId)
+      sectorGateTargets[normalizedSectorId] ||= new Set<string>()
       Object.values(sector.cluster_gates || {}).forEach((gate) => {
-        if (gate.target_cluster_id) sectorGateTargets[sector.id]!.add(gate.target_cluster_id)
+        if (gate.target_cluster_id) sectorGateTargets[normalizedSectorId]!.add(normalizeKey(gate.target_cluster_id))
       })
     })
 
     Object.values(cluster.sector_links || {}).forEach((link) => {
-      graph[link.sector_a_id] ||= new Set<string>()
-      graph[link.sector_b_id] ||= new Set<string>()
-      graph[link.sector_a_id]!.add(link.sector_b_id)
-      graph[link.sector_b_id]!.add(link.sector_a_id)
+      const normalizedA = normalizeKey(link.sector_a_id)
+      const normalizedB = normalizeKey(link.sector_b_id)
+      graph[normalizedA] ||= new Set<string>()
+      graph[normalizedB] ||= new Set<string>()
+      graph[normalizedA]!.add(normalizedB)
+      graph[normalizedB]!.add(normalizedA)
     })
   })
 

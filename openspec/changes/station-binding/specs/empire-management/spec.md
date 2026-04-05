@@ -1,17 +1,17 @@
 # Empire Management Specification
 
 ## Purpose
-扩展帝国管理能力，使 empire 可以通过独立 `SaveBinding` 关系层与某个 `gameGuid` 建立稳定关联，并在不污染 empire 本体的前提下保存 group / station 级 save 映射。
+扩展帝国管理能力，使 empire 可以通过 `SavedEmpiresState.savePlans` 顶层关系层与某个 `gameGuid` 建立稳定关联，并在不污染单个 `EmpirePlan` 本体的前提下保存 group / station 级 save 映射。
 
 ## ADDED Requirements
 
 ### Requirement: Independent Save Binding Layer
-系统 MUST 使用独立于 `EmpirePlan` 本体的 `SaveBinding` 持久化层保存 save 关系。
+系统 MUST 使用 `SavedEmpiresState.savePlans` 顶层字段保存 save 关系，而不是把关系字段写入单个 `EmpirePlan`。
 
 #### Scenario: 保存独立 binding
 - **前提** 用户为某个 empire 建立了 save binding
 - **当** 系统执行保存
-- **那么** 系统 SHALL 将 binding 数据写入独立的 `empireSavePlan` 持久化结构
+- **那么** 系统 SHALL 将 binding 数据写入 `SavedEmpiresState.savePlans`
 - **并且** 系统 SHALL NOT 将这些关系字段写入 `EmpirePlan` 或 `StationPlan` 本体
 
 ### Requirement: Save Binding Unique Key

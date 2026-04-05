@@ -23,8 +23,8 @@
   - 提供按 `gameGuid + time` 读取 archive、save `tradestation`、玩家空间站 POI 与查找能力
 - `useMapStore`
   - 提供 sector 邻接图、sector 定位与跳数搜索能力
-- `useEmpireSavePlanStore`
-  - 独立保存 `SaveBindingPlan`
+- `useEmpireStore`
+  - 在 `SavedEmpiresState.savePlans` 中保存 `SaveBindingPlan`
   - 负责 `empireId + gameGuid` 唯一键下的 binding 持久化
 
 ### 1.2 派生查询层
@@ -43,7 +43,7 @@
 - 当前帝国星区下的空闲 empire station 列表
 - 当前 time 下的失效结果与非法原因
 
-该层统一从 `empireStore + saveStore + mapStore + empireSavePlanStore` 派生，不允许页面组件自己分散拼接。
+该层统一从 `empireStore + saveStore + mapStore` 派生，不允许页面组件自己分散拼接。
 
 ### 1.3 交互状态层
 
@@ -63,12 +63,20 @@
 
 ## 2. 数据模型
 
-### 2.1 EmpireSavePlan State
+### 2.1 SavedEmpiresState 扩展
 
-新增独立持久化结构：
+在现有 `SavedEmpiresState` 根对象下增加同级字段：
 
 ```ts
-interface EmpireSavePlanState {
+interface SavedEmpiresState {
+  version: number
+  activeId: string | null
+  activeStationId: string | null
+  list: EmpirePlan[]
+  savePlans?: SaveBindingPlanState
+}
+
+interface SaveBindingPlanState {
   version: number
   activeBindingKeyByEmpire: Record<string, string | null>
   list: SaveBindingPlan[]
@@ -219,9 +227,9 @@ binding UI 放在 `MapWorkbenchView`，原因：
 
 ## 5. Store Action 设计
 
-### 5.1 EmpireSavePlanStore
+### 5.1 EmpireStore 中的 SavePlans Action
 
-需要提供明确命令式 action：
+`useEmpireStore` 需要提供明确命令式 action：
 
 - `createSaveBindingPlan(empireId, gameGuid)`
 - `selectSaveBindingPlan(empireId, bindingKey)`
@@ -233,9 +241,7 @@ binding UI 放在 `MapWorkbenchView`，原因：
 - `clearStationBinding(bindingKey, stationId)`
 - `setStationBindingPosition(bindingKey, stationId, position)`
 
-### 5.2 EmpireStore
-
-继续负责：
+同时继续负责：
 
 - `createStation(...)`
 - 将从 save 导入的 station 变成独立 empire station 本体
@@ -247,7 +253,7 @@ binding UI 放在 `MapWorkbenchView`，原因：
 1. 用户在某个 `SaveBindingPlan` 视角下选中 coverage 内的 save 玩家站
 2. inspector 点击“导入为新站”
 3. `empireStore.createStation(...)` 创建新的 empire station
-4. `empireSavePlanStore.bindStationToSaveStation(...)` 为该新站补一条 `StationSaveBinding`
+4. `empireStore.bindStationToSaveStation(...)` 为该新站补一条 `StationSaveBinding`
 5. 若用户随后在地图上调整位置，位置写入 `StationSaveBinding.position`
 
 这里不需要额外导入记录表，因为后续关系仍然只通过 `StationSaveBinding` 表达。
@@ -259,7 +265,7 @@ binding UI 放在 `MapWorkbenchView`，原因：
 1. 用户在第二段中选择目标帝国星区
 2. 在底部空闲 station 列表中拖拽某个 empire station 到地图
 3. 地图按小空间站尺寸显示该 station
-4. `empireSavePlanStore.setStationBindingPosition(...)` 写入 `position: { x, y, z }`
+4. `empireStore.setStationBindingPosition(...)` 写入 `position: { x, y, z }`
 5. 该位置只存在于 binding 中，不写入 `EmpirePlan`
 
 ## 6. 数据流
@@ -273,7 +279,7 @@ binding UI 放在 `MapWorkbenchView`，原因：
 5. 地图自动缩放到过滤范围
 6. 用户选择目标帝国星区
 7. 用户执行绑定已有站、导入新站、绑定中转或拖拽空闲站
-8. store action 写入 group / station binding 或 `position`
+8. `empireStore` action 写入 group / station binding 或 `position`
 9. selector 自动重算候选、地图显示与当前 time 下的解析状态
 
 ### 6.2 关键约束
@@ -286,9 +292,9 @@ binding UI 放在 `MapWorkbenchView`，原因：
 
 ## 7. 风险与对策
 
-### 7.1 风险：binding 与 empire 本体耦合
+### 7.1 风险：binding 与单个 empire plan 本体耦合
 
-- 对策：独立 `EmpireSavePlanState` 持久化，不把关系字段塞进 `EmpirePlan`
+- 对策：将 binding 放在 `SavedEmpiresState.savePlans` 顶层字段，不把关系字段塞进 `EmpirePlan`
 
 ### 7.2 风险：archive time 被误当作 binding 身份
 

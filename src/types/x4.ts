@@ -466,6 +466,13 @@ export interface SavedEmpiresState {
   activeId: string | null;
   activeStationId: string | null;
   list: EmpirePlan[];
+  savePlans?: SaveBindingPlanState;
+}
+
+export interface SaveBindingPlanState {
+  version: number;
+  activeBindingKeyByEmpire: Record<string, string | null>;
+  list: SaveBindingPlan[];
 }
 
 /**
@@ -1090,4 +1097,36 @@ export interface X4ShipSlot {
   slot: string
   size: string
   count: number
+}
+
+export interface GroupSaveBinding {
+  sectorGroupId: string
+  tradestationCode: string
+  sectorMacro: string
+  jumpRange: number
+  coverageSectorMacros: string[]
+}
+
+export interface StationSaveBinding {
+  stationId: string
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+export interface SaveBindingPlan {
+  key: string
+  empireId: string
+  gameGuid: string
+  selectedArchiveTime: number | null
+  groupBindings: GroupSaveBinding[]
+  stationBindings: StationSaveBinding[]
+}
+
+export interface ResolvedGroupSaveBinding extends GroupSaveBinding {
+  status: 'ok' | 'missing_at_selected_time'
+}
+
+export interface ResolvedStationSaveBinding extends StationSaveBinding {
+  status: 'ok' | 'missing_at_selected_time'
 }
