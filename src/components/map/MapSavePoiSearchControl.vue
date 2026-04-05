@@ -3,8 +3,8 @@ import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import { useLocalizedNameMatch } from '@/composables/useLocalizedNameMatch'
 import type { SearchState, SearchTag } from './savePoiSearchFilter'
-import type { LocalizedX4Module, X4MapSector } from '@/types/x4'
 
 const emit = defineEmits<{
   (e: 'search-change', state: SearchState & { sectorJumpLimit?: number }): void
@@ -13,6 +13,7 @@ const emit = defineEmits<{
 const { t, te } = useI18n()
 const gameData = useGameDataStore()
 const { translateFaction } = useX4I18n()
+const { match, formatLabel } = useLocalizedNameMatch()
 
 type SearchCategory = 'product' | 'module' | 'faction' | 'sector'
 
@@ -35,33 +36,34 @@ const categoryOptions: { value: SearchCategory; label: string }[] = [
   { value: 'sector', label: 'map.poi_search_category_sector' }
 ]
 
-const productionModulesList = computed<LocalizedX4Module[]>(() => {
-  const modules = Object.values(gameData.localizedModulesMap)
+const productionModulesList = computed(() => {
+  const modules = Object.values(gameData.modulesMap)
   return modules.filter(
     (m) => m.type === 'production' && Object.keys(m.outputs || {}).length > 0
   )
 })
 
-const sectorsList = computed<{ id: string; label: string }[]>(() => {
-  const sectors: { id: string; label: string }[] = []
+const sectorsList = computed(() => {
+  const sectors: { id: string; englishName: string; localizedName: string }[] = []
   const maps = gameData.maps
   if (!maps || !maps.clusters) return sectors
 
   for (const cluster of Object.values(maps.clusters)) {
     for (const sector of Object.values(cluster.sectors || {})) {
-      const label = getSectorLabel(sector)
-      sectors.push({ id: sector.macro || sector.id, label })
+      const englishName = sector.name || sector.id
+      let localizedName = englishName
+      if (sector.nameId && te(sector.nameId)) {
+        localizedName = t(sector.nameId)
+      }
+      sectors.push({
+        id: sector.macro || sector.id,
+        englishName,
+        localizedName
+      })
     }
   }
-  return sectors.sort((a, b) => a.label.localeCompare(b.label))
+  return sectors.sort((a, b) => a.localizedName.localeCompare(b.localizedName))
 })
-
-function getSectorLabel(sector: X4MapSector): string {
-  if (sector.nameId && te(sector.nameId)) {
-    return t(sector.nameId)
-  }
-  return sector.name || sector.id
-}
 
 const categoryLabels = computed(() => ({
   product: t('map.poi_search_category_product'),
@@ -88,16 +90,18 @@ function toggleCategoryDropdown() {
 }
 
 function searchProducts(query: string): SearchTag[] {
-  const normalized = query.toLowerCase()
   const results: SearchTag[] = []
-  const wares = Object.values(gameData.localizedWaresMap)
-  for (const ware of wares) {
-    const name = ware.localeName?.toLowerCase() || ware.id.toLowerCase()
-    if (name.includes(normalized)) {
+  
+  for (const ware of Object.values(gameData.waresMap)) {
+    const englishName = ware.name || ware.id
+    const localizedName = gameData.localizedWaresMap[ware.id]?.localeName || englishName
+    const result = match({ englishName, localizedName, query })
+    
+    if (result.matched) {
       results.push({
         category: 'product',
         id: ware.id,
-        label: ware.localeName || ware.id
+        label: formatLabel(englishName, localizedName, query)
       })
     }
     if (results.length >= 10) break
@@ -106,15 +110,18 @@ function searchProducts(query: string): SearchTag[] {
 }
 
 function searchModules(query: string): SearchTag[] {
-  const normalized = query.toLowerCase()
   const results: SearchTag[] = []
+  
   for (const module of productionModulesList.value) {
-    const name = module.localeName?.toLowerCase() || module.id.toLowerCase()
-    if (name.includes(normalized)) {
+    const englishName = module.name || module.id
+    const localizedName = gameData.localizedModulesMap[module.id]?.localeName || englishName
+    const result = match({ englishName, localizedName, query })
+    
+    if (result.matched) {
       results.push({
         category: 'module',
         id: module.id,
-        label: module.localeName || module.id
+        label: formatLabel(englishName, localizedName, query)
       })
     }
     if (results.length >= 10) break
@@ -123,19 +130,18 @@ function searchModules(query: string): SearchTag[] {
 }
 
 function searchFactions(query: string): SearchTag[] {
-  const normalized = query.toLowerCase()
   const results: SearchTag[] = []
   
   for (const faction of gameData.factions) {
-    const label = translateFaction(faction)
-    const name = label.toLowerCase()
-    const id = faction.id.toLowerCase()
+    const englishName = faction.name || faction.id
+    const localizedName = translateFaction(faction)
+    const result = match({ englishName, localizedName, query })
     
-    if (name.includes(normalized) || id.includes(normalized)) {
+    if (result.matched) {
       results.push({
         category: 'faction',
         id: faction.id,
-        label: label
+        label: formatLabel(englishName, localizedName, query)
       })
     }
     if (results.length >= 10) break
@@ -144,15 +150,20 @@ function searchFactions(query: string): SearchTag[] {
 }
 
 function searchSectors(query: string): SearchTag[] {
-  const normalized = query.toLowerCase()
   const results: SearchTag[] = []
+  
   for (const sector of sectorsList.value) {
-    const name = sector.label.toLowerCase()
-    if (name.includes(normalized)) {
+    const result = match({ 
+      englishName: sector.englishName, 
+      localizedName: sector.localizedName, 
+      query 
+    })
+    
+    if (result.matched) {
       results.push({
         category: 'sector',
         id: sector.id,
-        label: sector.label
+        label: formatLabel(sector.englishName, sector.localizedName, query)
       })
     }
     if (results.length >= 10) break
