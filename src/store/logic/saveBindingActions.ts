@@ -1,153 +1,152 @@
-import type { Ref } from 'vue'
+import { type Ref } from 'vue'
 import type {
-  SavedEmpiresState,
-  SaveBindingPlanState,
+  EmpirePlan,
   SaveBindingPlan,
   GroupSaveBinding,
   StationSaveBinding
 } from '@/types/x4'
 import type { PlayerStationEntry } from '@/types/saveArchive'
 
-function createSaveBindingKey(empireId: string, gameGuid: string): string {
-  return `${empireId}:${gameGuid}`
+function createDefaultSaveBindingPlan(gameGuid: string): SaveBindingPlan {
+  return {
+    gameGuid,
+    active: true,
+    selectedArchiveTime: null,
+    groupBindings: []
+  }
 }
 
-function createDefaultSaveBindingPlan(empireId: string, gameGuid: string): SaveBindingPlan {
+function createDefaultGroupSaveBinding(sectorGroupId: string): GroupSaveBinding {
   return {
-    key: createSaveBindingKey(empireId, gameGuid),
-    empireId,
-    gameGuid,
-    selectedArchiveTime: null,
-    groupBindings: [],
+    sectorGroupId,
+    jumpRange: 3,
+    coverageSectorMacros: [],
     stationBindings: []
   }
 }
 
-function createDefaultSaveBindingPlanState(): SaveBindingPlanState {
-  return {
-    version: 1,
-    activeBindingKeyByEmpire: {},
-    list: []
-  }
-}
-
 export interface SaveBindingActions {
-  savePlans: Readonly<Ref<SaveBindingPlanState>>
-  bindingPlans: Readonly<Ref<SaveBindingPlan[]>>
-  getBindingPlanByKey: (bindingKey: string) => SaveBindingPlan | null
-  getActiveBindingKeyForEmpire: (empireId: string) => string | null
-  getActiveBindingPlanForEmpire: (empireId: string) => SaveBindingPlan | null
-  getBindingPlansForEmpire: (empireId: string) => SaveBindingPlan[]
-  createSaveBindingPlan: (empireId: string, gameGuid: string) => SaveBindingPlan
-  selectSaveBindingPlan: (empireId: string, bindingKey: string | null) => void
-  setSelectedArchiveTime: (bindingKey: string, archiveTime: number | null) => void
-  bindSectorGroupHub: (input: {
-    bindingKey: string
+  getActiveBinding: () => SaveBindingPlan | null
+  getBindingByGameGuid: (gameGuid: string) => SaveBindingPlan | null
+  createBinding: (gameGuid: string) => SaveBindingPlan
+  setActiveBinding: (gameGuid: string | null) => void
+  setSelectedArchiveTime: (gameGuid: string, archiveTime: number | null) => void
+  bindSectorGroup: (input: {
+    gameGuid: string
     sectorGroupId: string
-    tradestationCode: string
-    sectorMacro: string
+    sectorMacro?: string
     jumpRange: number
     coverageSectorMacros: string[]
   }) => void
-  updateSectorGroupJumpRange: (bindingKey: string, sectorGroupId: string, jumpRange: number) => void
-  clearSectorGroupHubBinding: (bindingKey: string, sectorGroupId: string) => void
+  updateSectorGroupJumpRange: (gameGuid: string, sectorGroupId: string, jumpRange: number) => void
+  clearSectorGroupBinding: (gameGuid: string, sectorGroupId: string) => void
+  getGroupBinding: (gameGuid: string, sectorGroupId: string) => GroupSaveBinding | null
+  setTradestationBinding: (input: {
+    gameGuid: string
+    sectorGroupId: string
+    saveStationCode?: string
+    position?: { x: number; y: number; z: number }
+  }) => void
+  clearTradestationBinding: (gameGuid: string, sectorGroupId: string) => void
   bindStationToSaveStation: (input: {
-    bindingKey: string
+    gameGuid: string
+    sectorGroupId: string
     stationId: string
     saveStationCode: string
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }) => boolean
-  clearStationBinding: (bindingKey: string, stationId: string) => void
-  setStationBindingPosition: (bindingKey: string, stationId: string, position: { x: number; y: number; z: number } | null) => void
-  isSaveStationAlreadyBound: (bindingKey: string, saveStationCode: string) => boolean
+  clearStationBinding: (gameGuid: string, sectorGroupId: string, stationId: string) => void
+  setStationBindingPosition: (gameGuid: string, sectorGroupId: string, stationId: string, position: { x: number; y: number; z: number } | null) => void
+  isSaveStationAlreadyBound: (gameGuid: string, sectorGroupId: string, saveStationCode: string) => boolean
   importSaveStationAsBinding: (input: {
-    bindingKey: string
+    gameGuid: string
+    sectorGroupId: string
     stationId: string
     saveStation: PlayerStationEntry
     sectorMacro: string
   }) => void
-  deleteBindingPlan: (bindingKey: string) => void
-  deleteBindingPlansForEmpire: (empireId: string) => void
+  deleteBinding: (gameGuid: string) => void
+  setFreeSectorBinding: (input: {
+    gameGuid: string
+    sectorGroupId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+    jumpRange?: number
+    coverageSectorMacros?: string[]
+  }) => void
+  setFreeStationBinding: (input: {
+    gameGuid: string
+    sectorGroupId: string
+    stationId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }) => void
 }
 
 export function createSaveBindingActions(
-  savedEmpires: Ref<SavedEmpiresState>,
+  activeEmpire: Ref<EmpirePlan | null>,
   onDirty: () => void
 ): SaveBindingActions {
-  const savePlans = computed<SaveBindingPlanState>(() => {
-    return savedEmpires.value.savePlans || createDefaultSaveBindingPlanState()
-  })
-
-  const bindingPlans = computed<SaveBindingPlan[]>(() => savePlans.value.list)
-
-  function getBindingPlanByKey(bindingKey: string): SaveBindingPlan | null {
-    return savePlans.value.list.find((plan) => plan.key === bindingKey) || null
+  function getBindings(): SaveBindingPlan[] {
+    return activeEmpire.value?.saveBindings || []
   }
 
-  function getActiveBindingKeyForEmpire(empireId: string): string | null {
-    return savePlans.value.activeBindingKeyByEmpire[empireId] || null
+  function getActiveBinding(): SaveBindingPlan | null {
+    return getBindings().find((b) => b.active) || null
   }
 
-  function getActiveBindingPlanForEmpire(empireId: string): SaveBindingPlan | null {
-    const bindingKey = getActiveBindingKeyForEmpire(empireId)
-    if (!bindingKey) return null
-    return getBindingPlanByKey(bindingKey)
+  function getBindingByGameGuid(gameGuid: string): SaveBindingPlan | null {
+    return getBindings().find((b) => b.gameGuid === gameGuid) || null
   }
 
-  function getBindingPlansForEmpire(empireId: string): SaveBindingPlan[] {
-    return savePlans.value.list.filter((plan) => plan.empireId === empireId)
-  }
-
-  function createSaveBindingPlan(empireId: string, gameGuid: string): SaveBindingPlan {
-    const existing = savePlans.value.list.find(
-      (plan) => plan.empireId === empireId && plan.gameGuid === gameGuid
-    )
-    if (existing) return existing
-
-    const newPlan = createDefaultSaveBindingPlan(empireId, gameGuid)
-    if (!savedEmpires.value.savePlans) {
-      savedEmpires.value.savePlans = createDefaultSaveBindingPlanState()
+  function createBinding(gameGuid: string): SaveBindingPlan {
+    if (!activeEmpire.value) {
+      throw new Error('No active empire')
     }
-    savedEmpires.value.savePlans.list.push(newPlan)
-    savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId] = newPlan.key
+
+    const existing = getBindingByGameGuid(gameGuid)
+    if (existing) {
+      if (!existing.active) {
+        getBindings().forEach((b) => { b.active = false })
+        existing.active = true
+        onDirty()
+      }
+      return existing
+    }
+
+    const newPlan = createDefaultSaveBindingPlan(gameGuid)
+    if (!activeEmpire.value.saveBindings) {
+      activeEmpire.value.saveBindings = []
+    }
+    getBindings().forEach((b) => { b.active = false })
+    activeEmpire.value.saveBindings.push(newPlan)
     onDirty()
     return newPlan
   }
 
-  function selectSaveBindingPlan(empireId: string, bindingKey: string | null): void {
-    if (!savedEmpires.value.savePlans) {
-      savedEmpires.value.savePlans = createDefaultSaveBindingPlanState()
-    }
-    if (bindingKey === null) {
-      savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId] = null
-      onDirty()
-      return
-    }
-
-    const plan = getBindingPlanByKey(bindingKey)
-    if (!plan || plan.empireId !== empireId) return
-
-    savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId] = bindingKey
+  function setActiveBinding(gameGuid: string | null): void {
+    getBindings().forEach((b) => {
+      b.active = b.gameGuid === gameGuid
+    })
     onDirty()
   }
 
-  function setSelectedArchiveTime(bindingKey: string, archiveTime: number | null): void {
-    const plan = getBindingPlanByKey(bindingKey)
+  function setSelectedArchiveTime(gameGuid: string, archiveTime: number | null): void {
+    const plan = getBindingByGameGuid(gameGuid)
     if (!plan) return
     plan.selectedArchiveTime = archiveTime
     onDirty()
   }
 
-  function bindSectorGroupHub(input: {
-    bindingKey: string
+  function bindSectorGroup(input: {
+    gameGuid: string
     sectorGroupId: string
-    tradestationCode: string
-    sectorMacro: string
+    sectorMacro?: string
     jumpRange: number
     coverageSectorMacros: string[]
   }): void {
-    const plan = getBindingPlanByKey(input.bindingKey)
+    const plan = getBindingByGameGuid(input.gameGuid)
     if (!plan) return
 
     const existingIndex = plan.groupBindings.findIndex(
@@ -156,22 +155,28 @@ export function createSaveBindingActions(
 
     const newBinding: GroupSaveBinding = {
       sectorGroupId: input.sectorGroupId,
-      tradestationCode: input.tradestationCode,
       sectorMacro: input.sectorMacro,
       jumpRange: input.jumpRange,
-      coverageSectorMacros: input.coverageSectorMacros
+      coverageSectorMacros: input.coverageSectorMacros,
+      stationBindings: []
     }
 
     if (existingIndex >= 0) {
-      plan.groupBindings[existingIndex] = newBinding
+      const existing = plan.groupBindings[existingIndex]
+      if (existing) {
+        newBinding.tradestationCode = existing.tradestationCode
+        newBinding.tradestationBinding = existing.tradestationBinding
+        newBinding.stationBindings = existing.stationBindings
+        plan.groupBindings[existingIndex] = newBinding
+      }
     } else {
       plan.groupBindings.push(newBinding)
     }
     onDirty()
   }
 
-  function updateSectorGroupJumpRange(bindingKey: string, sectorGroupId: string, jumpRange: number): void {
-    const plan = getBindingPlanByKey(bindingKey)
+  function updateSectorGroupJumpRange(gameGuid: string, sectorGroupId: string, jumpRange: number): void {
+    const plan = getBindingByGameGuid(gameGuid)
     if (!plan) return
 
     const binding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
@@ -181,32 +186,84 @@ export function createSaveBindingActions(
     onDirty()
   }
 
-  function clearSectorGroupHubBinding(bindingKey: string, sectorGroupId: string): void {
-    const plan = getBindingPlanByKey(bindingKey)
+  function clearSectorGroupBinding(gameGuid: string, sectorGroupId: string): void {
+    const plan = getBindingByGameGuid(gameGuid)
     if (!plan) return
 
     plan.groupBindings = plan.groupBindings.filter((b) => b.sectorGroupId !== sectorGroupId)
     onDirty()
   }
 
+  function getGroupBinding(gameGuid: string, sectorGroupId: string): GroupSaveBinding | null {
+    const plan = getBindingByGameGuid(gameGuid)
+    if (!plan) return null
+    return plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId) || null
+  }
+
+  function setTradestationBinding(input: {
+    gameGuid: string
+    sectorGroupId: string
+    saveStationCode?: string
+    position?: { x: number; y: number; z: number }
+  }): void {
+    const plan = getBindingByGameGuid(input.gameGuid)
+    if (!plan) return
+
+    let groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === input.sectorGroupId)
+    if (!groupBinding) {
+      groupBinding = createDefaultGroupSaveBinding(input.sectorGroupId)
+      plan.groupBindings.push(groupBinding)
+    }
+
+    if (input.saveStationCode !== undefined) {
+      groupBinding.tradestationCode = input.saveStationCode
+    }
+    if (input.position) {
+      if (!groupBinding.tradestationBinding) {
+        groupBinding.tradestationBinding = { stationId: `tradestation_${input.sectorGroupId}` }
+      }
+      groupBinding.tradestationBinding.position = input.position
+    }
+    onDirty()
+  }
+
+  function clearTradestationBinding(gameGuid: string, sectorGroupId: string): void {
+    const plan = getBindingByGameGuid(gameGuid)
+    if (!plan) return
+
+    const groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
+    if (!groupBinding) return
+
+    delete groupBinding.tradestationCode
+    delete groupBinding.tradestationBinding
+    onDirty()
+  }
+
   function bindStationToSaveStation(input: {
-    bindingKey: string
+    gameGuid: string
+    sectorGroupId: string
     stationId: string
     saveStationCode: string
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }): boolean {
-    const plan = getBindingPlanByKey(input.bindingKey)
+    const plan = getBindingByGameGuid(input.gameGuid)
     if (!plan) return false
 
-    const alreadyBoundStation = plan.stationBindings.find(
+    let groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === input.sectorGroupId)
+    if (!groupBinding) {
+      groupBinding = createDefaultGroupSaveBinding(input.sectorGroupId)
+      plan.groupBindings.push(groupBinding)
+    }
+
+    const alreadyBoundStation = groupBinding.stationBindings.find(
       (b) => b.saveStationCode === input.saveStationCode && b.stationId !== input.stationId
     )
     if (alreadyBoundStation) {
       return false
     }
 
-    const existingIndex = plan.stationBindings.findIndex(
+    const existingIndex = groupBinding.stationBindings.findIndex(
       (binding) => binding.stationId === input.stationId
     )
 
@@ -218,31 +275,44 @@ export function createSaveBindingActions(
     }
 
     if (existingIndex >= 0) {
-      plan.stationBindings[existingIndex] = newBinding
+      groupBinding.stationBindings[existingIndex] = newBinding
     } else {
-      plan.stationBindings.push(newBinding)
+      groupBinding.stationBindings.push(newBinding)
     }
 
     onDirty()
     return true
   }
 
-  function clearStationBinding(bindingKey: string, stationId: string): void {
-    const plan = getBindingPlanByKey(bindingKey)
+  function clearStationBinding(gameGuid: string, sectorGroupId: string, stationId: string): void {
+    const plan = getBindingByGameGuid(gameGuid)
     if (!plan) return
 
-    plan.stationBindings = plan.stationBindings.filter((b) => b.stationId !== stationId)
+    const groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
+    if (!groupBinding) return
+
+    groupBinding.stationBindings = groupBinding.stationBindings.filter((b) => b.stationId !== stationId)
     onDirty()
   }
 
-  function setStationBindingPosition(bindingKey: string, stationId: string, position: { x: number; y: number; z: number } | null): void {
-    const plan = getBindingPlanByKey(bindingKey)
+  function setStationBindingPosition(gameGuid: string, sectorGroupId: string, stationId: string, position: { x: number; y: number; z: number } | null): void {
+    const plan = getBindingByGameGuid(gameGuid)
     if (!plan) return
 
-    const binding = plan.stationBindings.find((b) => b.stationId === stationId)
+    let groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
+    if (!groupBinding) {
+      if (position) {
+        groupBinding = createDefaultGroupSaveBinding(sectorGroupId)
+        plan.groupBindings.push(groupBinding)
+      } else {
+        return
+      }
+    }
+
+    const binding = groupBinding.stationBindings.find((b) => b.stationId === stationId)
     if (!binding) {
       if (position) {
-        plan.stationBindings.push({
+        groupBinding.stationBindings.push({
           stationId,
           position
         })
@@ -257,23 +327,33 @@ export function createSaveBindingActions(
     onDirty()
   }
 
-  function isSaveStationAlreadyBound(bindingKey: string, saveStationCode: string): boolean {
-    const plan = getBindingPlanByKey(bindingKey)
+  function isSaveStationAlreadyBound(gameGuid: string, sectorGroupId: string, saveStationCode: string): boolean {
+    const plan = getBindingByGameGuid(gameGuid)
     if (!plan) return false
 
-    return plan.stationBindings.some((b) => b.saveStationCode === saveStationCode)
+    const groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
+    if (!groupBinding) return false
+
+    return groupBinding.stationBindings.some((b) => b.saveStationCode === saveStationCode)
   }
 
   function importSaveStationAsBinding(input: {
-    bindingKey: string
+    gameGuid: string
+    sectorGroupId: string
     stationId: string
     saveStation: PlayerStationEntry
     sectorMacro: string
   }): void {
-    const plan = getBindingPlanByKey(input.bindingKey)
+    const plan = getBindingByGameGuid(input.gameGuid)
     if (!plan) return
 
-    const existing = plan.stationBindings.find((b) => b.stationId === input.stationId)
+    let groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === input.sectorGroupId)
+    if (!groupBinding) {
+      groupBinding = createDefaultGroupSaveBinding(input.sectorGroupId)
+      plan.groupBindings.push(groupBinding)
+    }
+
+    const existing = groupBinding.stationBindings.find((b) => b.stationId === input.stationId)
     if (existing) return
 
     const newBinding: StationSaveBinding = {
@@ -287,53 +367,101 @@ export function createSaveBindingActions(
       }
     }
 
-    plan.stationBindings.push(newBinding)
+    groupBinding.stationBindings.push(newBinding)
     onDirty()
   }
 
-  function deleteBindingPlan(bindingKey: string): void {
-    const plan = getBindingPlanByKey(bindingKey)
+  function deleteBinding(gameGuid: string): void {
+    if (!activeEmpire.value?.saveBindings) return
+    activeEmpire.value.saveBindings = activeEmpire.value.saveBindings.filter(
+      (b) => b.gameGuid !== gameGuid
+    )
+    onDirty()
+  }
+
+  function setFreeSectorBinding(input: {
+    gameGuid: string
+    sectorGroupId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+    jumpRange?: number
+    coverageSectorMacros?: string[]
+  }): void {
+    const plan = getBindingByGameGuid(input.gameGuid)
     if (!plan) return
 
-    if (savedEmpires.value.savePlans) {
-      savedEmpires.value.savePlans.list = savedEmpires.value.savePlans.list.filter((p) => p.key !== bindingKey)
-
-      const empireId = plan.empireId
-      if (savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId] === bindingKey) {
-        savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId] = null
-      }
+    let groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === input.sectorGroupId)
+    if (!groupBinding) {
+      groupBinding = createDefaultGroupSaveBinding(input.sectorGroupId)
+      plan.groupBindings.push(groupBinding)
     }
+
+    groupBinding.sectorMacro = input.sectorMacro
+    groupBinding.jumpRange = input.jumpRange ?? 3
+    groupBinding.coverageSectorMacros = input.coverageSectorMacros ?? []
+    groupBinding.free = true
+
+    if (!groupBinding.tradestationBinding) {
+      groupBinding.tradestationBinding = { stationId: `tradestation_${input.sectorGroupId}` }
+    }
+    groupBinding.tradestationBinding.position = input.position
     onDirty()
   }
 
-  function deleteBindingPlansForEmpire(empireId: string): void {
-    if (savedEmpires.value.savePlans) {
-      savedEmpires.value.savePlans.list = savedEmpires.value.savePlans.list.filter((p) => p.empireId !== empireId)
-      delete savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId]
+  function setFreeStationBinding(input: {
+    gameGuid: string
+    sectorGroupId: string
+    stationId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }): void {
+    const plan = getBindingByGameGuid(input.gameGuid)
+    if (!plan) return
+
+    let groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === input.sectorGroupId)
+    if (!groupBinding) {
+      groupBinding = createDefaultGroupSaveBinding(input.sectorGroupId)
+      plan.groupBindings.push(groupBinding)
     }
+
+    const existingIndex = groupBinding.stationBindings.findIndex(
+      (b) => b.stationId === input.stationId
+    )
+
+    const newBinding: StationSaveBinding = {
+      stationId: input.stationId,
+      sectorMacro: input.sectorMacro,
+      position: input.position,
+      free: true
+    }
+
+    if (existingIndex >= 0) {
+      groupBinding.stationBindings[existingIndex] = newBinding
+    } else {
+      groupBinding.stationBindings.push(newBinding)
+    }
+    onDirty()
   }
 
   return {
-    savePlans: savePlans as Readonly<Ref<SaveBindingPlanState>>,
-    bindingPlans: bindingPlans as Readonly<Ref<SaveBindingPlan[]>>,
-    getBindingPlanByKey,
-    getActiveBindingKeyForEmpire,
-    getActiveBindingPlanForEmpire,
-    getBindingPlansForEmpire,
-    createSaveBindingPlan,
-    selectSaveBindingPlan,
+    getActiveBinding,
+    getBindingByGameGuid,
+    createBinding,
+    setActiveBinding,
     setSelectedArchiveTime,
-    bindSectorGroupHub,
+    bindSectorGroup,
     updateSectorGroupJumpRange,
-    clearSectorGroupHubBinding,
+    clearSectorGroupBinding,
+    getGroupBinding,
+    setTradestationBinding,
+    clearTradestationBinding,
     bindStationToSaveStation,
     clearStationBinding,
     setStationBindingPosition,
     isSaveStationAlreadyBound,
     importSaveStationAsBinding,
-    deleteBindingPlan,
-    deleteBindingPlansForEmpire
+    deleteBinding,
+    setFreeSectorBinding,
+    setFreeStationBinding
   }
 }
-
-import { computed } from 'vue'

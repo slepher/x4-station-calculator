@@ -9,7 +9,7 @@ import shipyardIconUrl from '@/components/icons/shipyard.svg'
 import tradestationIconUrl from '@/components/icons/tradestation.svg'
 import { useSectorNameFilter } from '@/composables/useSectorNameFilter'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
-import type { SaveBindingPlan, StationPlan, SectorPlan } from '@/types/x4'
+import type { SaveBindingPlan, StationPlan, SectorPlan, StationSaveBinding, SavedModule } from '@/types/x4'
 import type { PlayerStationEntry, SaveArchive } from '@/types/saveArchive'
 import {
   getCoverageSectors,
@@ -17,6 +17,9 @@ import {
   resolveStationSaveBinding,
   type SectorCoverageResult
 } from '@/store/logic/saveBindingUtils'
+import { resolveModuleId } from '@/store/logic/blueprintParser'
+import { sortModulesBySearchPriority } from '@/store/logic/searchModule'
+import { resolveMapSectorByMacro } from './mapSectorMacro'
 
 type PanelStage = 'select-binding' | 'select-sector' | 'select-station'
 type PlacementIcon = 'factory' | 'shipyard' | 'tradestation'
@@ -42,6 +45,7 @@ export interface IdleStationItem {
   station: StationPlan
   sectorGroupId: string
   sectorGroupName: string
+  sectorMacro?: string
 }
 
 const props = defineProps<{
@@ -52,17 +56,19 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'focus-sector', sectorId: string): void
   (e: 'fit-sectors', sectorIds: string[]): void
-  (e: 'drag-station-start', payload: { stationId: string; bindingKey: string; name: string; icon: 'factory' | 'shipyard' }): void
+  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard'; coverageSectorMacros: string[] }): void
   (e: 'drag-station-end'): void
+  (e: 'drag-free-sector-start', payload: { sectorGroupId: string; name: string; gameGuid: string }): void
+  (e: 'drag-free-sector-end'): void
 }>()
 
-const { t, locale } = useI18n()
+const { t, te, locale } = useI18n()
 const empireStore = useEmpireStore()
 const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
 
 const stage = ref<PanelStage>('select-binding')
-const selectedBindingKey = ref<string | null>(null)
+const selectedGameGuid = ref<string | null>(null)
 const selectedSaveSectorMacro = ref<string | null>(null)
 const selectedJumpRange = ref(3)
 const selectedSectorGroupId = ref<string | null>(null)
@@ -70,6 +76,9 @@ const importStationName = ref('')
 const sectorSearchQuery = ref('')
 const newSectorName = ref('')
 const showNewSectorInput = ref(false)
+const bindingSaveStation = ref<PlayerStationEntry | null>(null)
+const bindingSectorMacro = ref<string | null>(null)
+const selectedEmpireStationId = ref<string | null>(null)
 
 const pendingDrag = ref<{
   item: IdleStationItem
@@ -77,6 +86,13 @@ const pendingDrag = ref<{
   startY: number
 } | null>(null)
 const activeDragStationId = ref<string | null>(null)
+
+const pendingFreeSectorDrag = ref<{
+  sector: { id: string; name: string }
+  startX: number
+  startY: number
+} | null>(null)
+const activeDragFreeSectorId = ref<string | null>(null)
 
 const { getSectorDisplayName, normalizedQuery } = useSectorNameFilter(sectorSearchQuery)
 
@@ -86,17 +102,33 @@ const iconUrlByType: Record<PlacementIcon, string> = {
   tradestation: tradestationIconUrl
 }
 
-const activeEmpireId = computed(() => empireStore.activeEmpire?.id || null)
 const activeEmpire = computed(() => empireStore.activeEmpire)
 
+watch(activeEmpire, async (empire) => {
+  if (empire?.saveBindings) {
+    const activeBinding = empire.saveBindings.find((b) => b.active)
+    if (activeBinding && !selectedGameGuid.value) {
+      selectedGameGuid.value = activeBinding.gameGuid
+      const selected = saveStore.selectedArchive
+      if (!selected || selected.meta.guid !== activeBinding.gameGuid) {
+        const group = saveStore.archives.get(activeBinding.gameGuid)
+        if (group && group.saves[0]) {
+          const time = activeBinding.selectedArchiveTime ?? group.saves[0].meta.time
+          await saveStore.selectArchive(activeBinding.gameGuid, time)
+        }
+      }
+      stage.value = 'select-sector'
+    }
+  }
+}, { immediate: true })
+
 const bindingPlans = computed<SaveBindingPlan[]>(() => {
-  if (!activeEmpireId.value) return []
-  return empireStore.getBindingPlansForEmpire(activeEmpireId.value)
+  return activeEmpire.value?.saveBindings || []
 })
 
 const activeBindingPlan = computed<SaveBindingPlan | null>(() => {
-  if (!selectedBindingKey.value) return null
-  return empireStore.getBindingPlanByKey(selectedBindingKey.value)
+  if (!selectedGameGuid.value) return null
+  return activeEmpire.value?.saveBindings?.find((b) => b.gameGuid === selectedGameGuid.value) || null
 })
 
 const activeArchive = computed<SaveArchive | null>(() => {
@@ -252,6 +284,22 @@ const empireSectors = computed<SectorPlan[]>(() => {
   return [...(activeEmpire.value.sectors || [])].sort((a, b) => (a.order || 0) - (b.order || 0))
 })
 
+const freeEmpireSectors = computed<{ id: string; name: string; sectorMacro?: string }[]>(() => {
+  if (!activeEmpire.value || !activeBindingPlan.value) return []
+  
+  return (activeEmpire.value.sectors || [])
+    .map((s) => {
+      const groupBinding = activeBindingPlan.value?.groupBindings.find(
+        (b) => b.sectorGroupId === s.id
+      )
+      return {
+        id: s.id,
+        name: s.name,
+        sectorMacro: groupBinding?.sectorMacro
+      }
+    })
+})
+
 const sortedArchiveGroups = computed(() => {
   return [...saveStore.archiveGroups].sort((a, b) => {
     return a.playerName.localeCompare(b.playerName)
@@ -275,20 +323,22 @@ function hasExistingBinding(gameGuid: string): boolean {
 const idleStations = computed<IdleStationItem[]>(() => {
   if (!activeEmpire.value || !selectedSectorGroupId.value) return []
 
-  const stationBindings = activeBindingPlan.value?.stationBindings || []
+  const stationBindings = currentGroupBinding.value?.stationBindings || []
   const sectorStations = activeEmpire.value.stations.filter((s) => s.sectorId === selectedSectorGroupId.value)
 
   return sectorStations
     .filter((station) => {
-      const binding = stationBindings.find((b) => b.stationId === station.id)
+      const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
       return !binding?.saveStationCode
     })
     .map((station) => {
       const sector = empireSectors.value.find((s) => s.id === station.sectorId)
+      const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
       return {
         station,
         sectorGroupId: station.sectorId || '',
-        sectorGroupName: sector?.name || ''
+        sectorGroupName: sector?.name || '',
+        sectorMacro: binding?.sectorMacro
       }
     })
 })
@@ -301,6 +351,19 @@ const currentGroupBinding = computed(() => {
 const isSectorBound = computed(() => {
   return currentGroupBinding.value !== null
 })
+
+function isSaveSectorBound(sectorMacro: string): boolean {
+  if (!activeBindingPlan.value) return false
+  return activeBindingPlan.value.groupBindings.some((b) => b.sectorMacro === sectorMacro)
+}
+
+function getBoundSectorGroupName(sectorMacro: string): string | null {
+  if (!activeBindingPlan.value) return null
+  const binding = activeBindingPlan.value.groupBindings.find((b) => b.sectorMacro === sectorMacro)
+  if (!binding) return null
+  const sector = empireSectors.value.find((s) => s.id === binding.sectorGroupId)
+  return sector?.name || null
+}
 
 const tradeStationsInSelectedSector = computed(() => {
   if (!activeArchive.value || !selectedSaveSectorMacro.value) return []
@@ -325,18 +388,8 @@ const availableArchiveTimes = computed(() => {
 })
 
 const stationBindingsInGroup = computed(() => {
-  if (!activeBindingPlan.value) return []
-
-  const stationBindings = activeBindingPlan.value.stationBindings
-  if (!selectedSectorGroupId.value) return stationBindings
-
-  const sectorStationIds = new Set(
-    activeEmpire.value?.stations
-      .filter((s) => s.sectorId === selectedSectorGroupId.value)
-      .map((s) => s.id) || []
-  )
-
-  return stationBindings.filter((b) => sectorStationIds.has(b.stationId))
+  if (!currentGroupBinding.value) return []
+  return currentGroupBinding.value.stationBindings
 })
 
 function getStationLabel(station: PlayerStationEntry): string {
@@ -375,9 +428,9 @@ function getStationLabel(station: PlayerStationEntry): string {
 }
 
 async function selectBindingPlan(plan: SaveBindingPlan | null) {
-  selectedBindingKey.value = plan?.key || null
-  if (plan && activeEmpireId.value) {
-    empireStore.selectSaveBindingPlan(activeEmpireId.value, plan.key)
+  selectedGameGuid.value = plan?.gameGuid || null
+  if (plan) {
+    empireStore.setActiveBinding(plan.gameGuid)
     
     const selected = saveStore.selectedArchive
     if (!selected || selected.meta.guid !== plan.gameGuid) {
@@ -398,7 +451,36 @@ function selectSaveSector(sectorMacro: string) {
   selectedSaveSectorMacro.value = sectorMacro
   stage.value = 'select-station'
 
+  if (activeBindingPlan.value) {
+    const existingBinding = activeBindingPlan.value.groupBindings.find(
+      (b) => b.sectorMacro === sectorMacro
+    )
+    if (existingBinding) {
+      selectedSectorGroupId.value = existingBinding.sectorGroupId
+      selectedJumpRange.value = existingBinding.jumpRange
+    } else {
+      selectedSectorGroupId.value = null
+      selectedJumpRange.value = 3
+    }
+  }
+
   emit('focus-sector', sectorMacro)
+}
+
+function selectFreeSector(sectorGroupId: string) {
+  selectedSectorGroupId.value = sectorGroupId
+  selectedSaveSectorMacro.value = null
+  stage.value = 'select-station'
+}
+
+const onFreeSectorMouseDown = (event: MouseEvent, sector: { id: string; name: string }) => {
+  if (event.button !== 0) return
+  if (!selectedGameGuid.value) return
+  pendingFreeSectorDrag.value = {
+    sector,
+    startX: event.clientX,
+    startY: event.clientY
+  }
 }
 
 function showCreateNewSector() {
@@ -420,15 +502,14 @@ function createAndBindNewSector() {
 }
 
 function bindSectorToGroup(sectorGroupId: string) {
-  if (!selectedBindingKey.value || !selectedSaveSectorMacro.value) return
+  if (!selectedGameGuid.value || !selectedSaveSectorMacro.value) return
 
   selectedSectorGroupId.value = sectorGroupId
   showNewSectorInput.value = false
 
-  empireStore.bindSectorGroupHub({
-    bindingKey: selectedBindingKey.value,
+  empireStore.bindSectorGroup({
+    gameGuid: selectedGameGuid.value,
     sectorGroupId,
-    tradestationCode: '',
     sectorMacro: selectedSaveSectorMacro.value,
     jumpRange: selectedJumpRange.value,
     coverageSectorMacros: coverageSectors.value.map((s) => s.sectorMacro)
@@ -436,28 +517,25 @@ function bindSectorToGroup(sectorGroupId: string) {
 }
 
 function bindTradeStation(tradestationCode: string) {
-  if (!selectedBindingKey.value || !selectedSectorGroupId.value || !selectedSaveSectorMacro.value) return
+  if (!selectedGameGuid.value || !selectedSectorGroupId.value || !selectedSaveSectorMacro.value) return
 
-  empireStore.bindSectorGroupHub({
-    bindingKey: selectedBindingKey.value,
+  empireStore.setTradestationBinding({
+    gameGuid: selectedGameGuid.value,
     sectorGroupId: selectedSectorGroupId.value,
-    tradestationCode,
-    sectorMacro: selectedSaveSectorMacro.value,
-    jumpRange: selectedJumpRange.value,
-    coverageSectorMacros: coverageSectors.value.map((s) => s.sectorMacro)
+    saveStationCode: tradestationCode
   })
 }
 
 function clearGroupBinding() {
-  if (!selectedBindingKey.value || !selectedSectorGroupId.value) return
+  if (!selectedGameGuid.value || !selectedSectorGroupId.value) return
 
-  empireStore.clearSectorGroupHubBinding(selectedBindingKey.value, selectedSectorGroupId.value)
+  empireStore.clearSectorGroupBinding(selectedGameGuid.value, selectedSectorGroupId.value)
 }
 
 async function selectArchiveTime(time: number | null) {
-  if (!selectedBindingKey.value || !activeBindingPlan.value) return
+  if (!selectedGameGuid.value || !activeBindingPlan.value) return
 
-  empireStore.setSelectedArchiveTime(selectedBindingKey.value, time)
+  empireStore.setSelectedArchiveTime(selectedGameGuid.value, time)
   
   const guid = activeBindingPlan.value.gameGuid
   const group = saveStore.archives.get(guid)
@@ -469,26 +547,48 @@ async function selectArchiveTime(time: number | null) {
 
 const clearPendingDrag = () => {
   pendingDrag.value = null
+  pendingFreeSectorDrag.value = null
 }
 
 const finishActiveDrag = () => {
-  if (!activeDragStationId.value) return
-  activeDragStationId.value = null
-  emit('drag-station-end')
+  if (activeDragStationId.value) {
+    activeDragStationId.value = null
+    emit('drag-station-end')
+  }
+  if (activeDragFreeSectorId.value) {
+    activeDragFreeSectorId.value = null
+    emit('drag-free-sector-end')
+  }
 }
 
 const onWindowMouseMove = (event: MouseEvent) => {
-  if (!pendingDrag.value || activeDragStationId.value) return
-  const dx = event.clientX - pendingDrag.value.startX
-  const dy = event.clientY - pendingDrag.value.startY
-  if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
-  activeDragStationId.value = pendingDrag.value.item.station.id
-  emit('drag-station-start', {
-    stationId: pendingDrag.value.item.station.id,
-    bindingKey: selectedBindingKey.value!,
-    name: pendingDrag.value.item.station.name,
-    icon: pendingDrag.value.item.station.type === 'shipyard' ? 'shipyard' : 'factory'
-  })
+  if (pendingDrag.value && !activeDragStationId.value) {
+    const dx = event.clientX - pendingDrag.value.startX
+    const dy = event.clientY - pendingDrag.value.startY
+    if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
+    activeDragStationId.value = pendingDrag.value.item.station.id
+    const groupBinding = currentGroupBinding.value
+    emit('drag-station-start', {
+      stationId: pendingDrag.value.item.station.id,
+      gameGuid: selectedGameGuid.value!,
+      sectorGroupId: pendingDrag.value.item.sectorGroupId,
+      name: pendingDrag.value.item.station.name,
+      icon: pendingDrag.value.item.station.type === 'shipyard' ? 'shipyard' : 'factory',
+      coverageSectorMacros: groupBinding?.coverageSectorMacros || []
+    })
+  }
+  
+  if (pendingFreeSectorDrag.value && !activeDragFreeSectorId.value) {
+    const dx = event.clientX - pendingFreeSectorDrag.value.startX
+    const dy = event.clientY - pendingFreeSectorDrag.value.startY
+    if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
+    activeDragFreeSectorId.value = pendingFreeSectorDrag.value.sector.id
+    emit('drag-free-sector-start', {
+      sectorGroupId: pendingFreeSectorDrag.value.sector.id,
+      name: pendingFreeSectorDrag.value.sector.name,
+      gameGuid: selectedGameGuid.value!
+    })
+  }
 }
 
 const onWindowMouseUp = () => {
@@ -498,7 +598,7 @@ const onWindowMouseUp = () => {
 
 const onIdleStationMouseDown = (event: MouseEvent, item: IdleStationItem) => {
   if (event.button !== 0) return
-  if (!selectedBindingKey.value) return
+  if (!selectedGameGuid.value) return
   pendingDrag.value = {
     item,
     startX: event.clientX,
@@ -528,35 +628,63 @@ function stepJumpLimit(delta: number) {
 }
 
 async function selectOrCreateBinding(gameGuid: string, time: number | null) {
-  if (!activeEmpireId.value) return
-
   let plan = getExistingBindingPlan(gameGuid)
   
   if (!plan) {
-    plan = empireStore.createSaveBindingPlan(activeEmpireId.value, gameGuid)
+    plan = empireStore.createBinding(gameGuid)
   }
   
   if (time !== null && plan.selectedArchiveTime !== time) {
-    empireStore.setSelectedArchiveTime(plan.key, time)
+    empireStore.setSelectedArchiveTime(plan.gameGuid, time)
   }
   
   await selectBindingPlan(plan)
 }
 
 function importSaveStation(saveStation: PlayerStationEntry, sectorMacro: string) {
-  if (!selectedBindingKey.value || !activeEmpire.value) return
+  if (!selectedGameGuid.value || !activeEmpire.value || !selectedSectorGroupId.value) return
 
   const name = importStationName.value || saveStation.code
   const newStation = empireStore.createStation(name, 'industrial')
 
   if (!newStation) return
 
-  if (selectedSectorGroupId.value) {
-    empireStore.moveStationToSector(newStation.id, selectedSectorGroupId.value)
+  empireStore.moveStationToSector(newStation.id, selectedSectorGroupId.value)
+
+  if (saveStation.modules && saveStation.modules.length > 0) {
+    const moduleInfos: { id: string; count: number; group?: string; tier?: number; name?: string }[] = []
+    for (const mod of saveStation.modules) {
+      const resolvedId = resolveModuleId(
+        mod.ref,
+        gameDataStore.modulesMap,
+        gameDataStore.modulesByMacroId
+      )
+      if (resolvedId) {
+        const moduleData = gameDataStore.modulesMap[resolvedId]
+        moduleInfos.push({
+          id: resolvedId,
+          count: mod.amount,
+          group: moduleData?.group,
+          tier: moduleData?.tier,
+          name: moduleData?.name
+        })
+      }
+    }
+    
+    if (moduleInfos.length > 0) {
+      sortModulesBySearchPriority(moduleInfos, gameDataStore.localizedModuleGroupsMap || {})
+      
+      const modules: SavedModule[] = moduleInfos.map(m => ({
+        id: m.id,
+        count: m.count
+      }))
+      empireStore.updateStationModules(newStation.id, modules)
+    }
   }
 
   empireStore.importSaveStationAsBinding({
-    bindingKey: selectedBindingKey.value,
+    gameGuid: selectedGameGuid.value,
+    sectorGroupId: selectedSectorGroupId.value,
     stationId: newStation.id,
     saveStation,
     sectorMacro
@@ -566,13 +694,13 @@ function importSaveStation(saveStation: PlayerStationEntry, sectorMacro: string)
 }
 
 function clearStationBinding(stationId: string) {
-  if (!selectedBindingKey.value) return
+  if (!selectedGameGuid.value || !selectedSectorGroupId.value) return
 
-  empireStore.clearStationBinding(selectedBindingKey.value, stationId)
+  empireStore.clearStationBinding(selectedGameGuid.value, selectedSectorGroupId.value, stationId)
 }
 
 function getStationBinding(stationId: string) {
-  return activeBindingPlan.value?.stationBindings.find((b) => b.stationId === stationId)
+  return currentGroupBinding.value?.stationBindings.find((b: StationSaveBinding) => b.stationId === stationId)
 }
 
 function getStationBindingStatus(stationId: string): 'ok' | 'missing' | 'none' {
@@ -584,9 +712,43 @@ function getStationBindingStatus(stationId: string): 'ok' | 'missing' | 'none' {
 }
 
 function isSaveStationBound(saveStationCode: string): boolean {
-  const bindingKey = activeBindingPlan.value?.key
-  if (!bindingKey) return false
-  return empireStore.isSaveStationAlreadyBound(bindingKey, saveStationCode)
+  const gameGuid = activeBindingPlan.value?.gameGuid
+  const sectorGroupId = selectedSectorGroupId.value
+  if (!gameGuid || !sectorGroupId) return false
+  return empireStore.isSaveStationAlreadyBound(gameGuid, sectorGroupId, saveStationCode)
+}
+
+function startBindSaveStation(station: PlayerStationEntry, sectorMacro: string) {
+  bindingSaveStation.value = station
+  bindingSectorMacro.value = sectorMacro
+  selectedEmpireStationId.value = null
+}
+
+function cancelBindSaveStation() {
+  bindingSaveStation.value = null
+  bindingSectorMacro.value = null
+  selectedEmpireStationId.value = null
+}
+
+function confirmBindSaveStation() {
+  if (!bindingSaveStation.value || !selectedEmpireStationId.value || !selectedGameGuid.value || !selectedSectorGroupId.value) return
+  
+  const success = empireStore.bindStationToSaveStation({
+    gameGuid: selectedGameGuid.value,
+    sectorGroupId: selectedSectorGroupId.value,
+    stationId: selectedEmpireStationId.value,
+    saveStationCode: bindingSaveStation.value.code,
+    sectorMacro: bindingSectorMacro.value || undefined,
+    position: {
+      x: bindingSaveStation.value.position.x,
+      y: bindingSaveStation.value.position.y,
+      z: bindingSaveStation.value.position.z
+    }
+  })
+  
+  if (success) {
+    cancelBindSaveStation()
+  }
 }
 
 function goBack() {
@@ -596,7 +758,7 @@ function goBack() {
     selectedSectorGroupId.value = null
   } else if (stage.value === 'select-sector') {
     stage.value = 'select-binding'
-    selectedBindingKey.value = null
+    selectedGameGuid.value = null
   }
 }
 
@@ -604,10 +766,34 @@ function close() {
   emit('close')
 }
 
+function getSectorMacroDisplayName(sectorMacro: string): string {
+  const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
+  if (resolved?.sectorId) {
+    const cluster = gameDataStore.maps?.clusters?.[resolved.clusterId]
+    const sector = cluster?.sectors?.[resolved.sectorId]
+    if (sector) {
+      const nameId = sector.nameId
+      if (nameId && te(nameId)) return t(nameId)
+      return sector.name || sector.id
+    }
+  }
+  return sectorMacro
+}
+
+function clearFreeSectorBinding(sectorGroupId: string) {
+  if (!selectedGameGuid.value) return
+  empireStore.clearSectorGroupBinding(selectedGameGuid.value, sectorGroupId)
+}
+
+function clearFreeStationBinding(stationId: string) {
+  if (!selectedGameGuid.value || !selectedSectorGroupId.value) return
+  empireStore.clearStationBinding(selectedGameGuid.value, selectedSectorGroupId.value, stationId)
+}
+
 watch(() => props.open, (open) => {
   if (!open) {
     stage.value = 'select-binding'
-    selectedBindingKey.value = null
+    selectedGameGuid.value = null
     selectedSaveSectorMacro.value = null
     selectedJumpRange.value = 3
     selectedSectorGroupId.value = null
@@ -737,8 +923,12 @@ watch(coverageSectorsWithStations, (sectors) => {
                 <span class="sector-name">
                   {{ sector.sectorName }}
                   <span v-if="sector.showRawSectorName" class="sector-header-raw">({{ sector.rawSectorName }})</span>
+                  <span v-if="isSaveSectorBound(sector.sectorMacro)" class="sector-bound-badge">{{ t('map.binding_sector_bound') }}</span>
                 </span>
                 <span class="sector-count">{{ sector.stations.length }}</span>
+              </div>
+              <div v-if="isSaveSectorBound(sector.sectorMacro)" class="sector-bound-info">
+                {{ t('map.binding_bound_to') }}: {{ getBoundSectorGroupName(sector.sectorMacro) }}
               </div>
               <div class="station-tags">
                 <span
@@ -750,6 +940,48 @@ watch(coverageSectorsWithStations, (sectors) => {
                 </span>
               </div>
             </button>
+          </div>
+        </div>
+
+        <!-- Free Empire Sectors -->
+        <div v-if="freeEmpireSectors.length > 0" class="free-sectors">
+          <div class="free-sectors-header">{{ t('map.binding_free_sectors') }}</div>
+          <div class="free-sectors-list">
+            <div
+              v-for="sector in freeEmpireSectors"
+              :key="sector.id"
+              class="free-sector-card"
+              :class="{ 'free-sector-card--dragging': activeDragFreeSectorId === sector.id, 'free-sector-card--bound': !!sector.sectorMacro }"
+              @mousedown="onFreeSectorMouseDown($event, sector)"
+              @click="selectFreeSector(sector.id)"
+            >
+              <div class="free-sector-content">
+                <div class="free-sector-name">{{ sector.name }}</div>
+                <div v-if="sector.sectorMacro" class="free-sector-target">
+                  <span class="free-sector-target-tag">{{ getSectorMacroDisplayName(sector.sectorMacro) }}</span>
+                  <button
+                    class="free-sector-clear"
+                    type="button"
+                    :title="t('map.station_panel_clear_action')"
+                    :aria-label="t('map.station_panel_clear_action')"
+                    @click.stop="clearFreeSectorBinding(sector.id)"
+                  >
+                    <svg viewBox="0 0 24 24" aria-hidden="true">
+                      <path
+                        d="M6.5 6.5l11 11M17.5 6.5l-11 11"
+                        fill="none"
+                        stroke="currentColor"
+                        stroke-linecap="round"
+                        stroke-width="2"
+                      />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div class="free-sector-handle" aria-hidden="true">
+                <span></span><span></span><span></span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -903,6 +1135,14 @@ watch(coverageSectorsWithStations, (sectors) => {
                       v-if="!isSaveStationBound(station.code)"
                       class="poi-action"
                       type="button"
+                      @click="startBindSaveStation(station, sector.sectorMacro)"
+                    >
+                      {{ t('map.binding_bind') }}
+                    </button>
+                    <button
+                      v-if="!isSaveStationBound(station.code)"
+                      class="poi-action poi-action--secondary"
+                      type="button"
                       @click="importSaveStation(station, sector.sectorMacro)"
                     >
                       {{ t('map.binding_import') }}
@@ -913,6 +1153,35 @@ watch(coverageSectorsWithStations, (sectors) => {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bind Save Station Dialog -->
+        <div v-if="bindingSaveStation" class="bind-dialog">
+          <div class="bind-dialog-header">
+            <span class="bind-dialog-title">{{ t('map.binding_select_empire_station') }}</span>
+            <span class="bind-dialog-save-name">{{ bindingSaveStation.code }}</span>
+          </div>
+          <div class="bind-dialog-content">
+            <select v-model="selectedEmpireStationId" class="bind-dialog-select">
+              <option :value="null" disabled>{{ t('map.binding_select_station_placeholder') }}</option>
+              <option v-for="item in idleStations" :key="item.station.id" :value="item.station.id">
+                {{ item.station.name }}
+              </option>
+            </select>
+            <div class="bind-dialog-actions">
+              <button type="button" class="bind-dialog-btn bind-dialog-btn--cancel" @click="cancelBindSaveStation">
+                {{ t('map.binding_cancel') }}
+              </button>
+              <button
+                type="button"
+                class="bind-dialog-btn bind-dialog-btn--confirm"
+                :disabled="!selectedEmpireStationId"
+                @click="confirmBindSaveStation"
+              >
+                {{ t('map.binding_confirm') }}
+              </button>
             </div>
           </div>
         </div>
@@ -948,7 +1217,7 @@ watch(coverageSectorsWithStations, (sectors) => {
               v-for="item in idleStations"
               :key="item.station.id"
               class="map-binding-panel__station-item"
-              :class="{ 'map-binding-panel__station-item--dragging': activeDragStationId === item.station.id }"
+              :class="{ 'map-binding-panel__station-item--dragging': activeDragStationId === item.station.id, 'map-binding-panel__station-item--bound': !!item.sectorMacro }"
               @mousedown="onIdleStationMouseDown($event, item)"
             >
               <div class="map-binding-panel__station-info">
@@ -957,7 +1226,29 @@ watch(coverageSectorsWithStations, (sectors) => {
                   :src="iconUrlByType[item.station.type === 'shipyard' ? 'shipyard' : 'factory']"
                   alt=""
                 />
-                <div class="map-binding-panel__station-name">{{ item.station.name }}</div>
+                <div class="map-binding-panel__station-main">
+                  <div class="map-binding-panel__station-name">{{ item.station.name }}</div>
+                  <div v-if="item.sectorMacro" class="map-binding-panel__station-target">
+                    <span class="map-binding-panel__station-target-tag">{{ getSectorMacroDisplayName(item.sectorMacro) }}</span>
+                    <button
+                      class="map-binding-panel__station-target-clear"
+                      type="button"
+                      :title="t('map.station_panel_clear_action')"
+                      :aria-label="t('map.station_panel_clear_action')"
+                      @click.stop="clearFreeStationBinding(item.station.id)"
+                    >
+                      <svg viewBox="0 0 24 24" aria-hidden="true">
+                        <path
+                          d="M6.5 6.5l11 11M17.5 6.5l-11 11"
+                          fill="none"
+                          stroke="currentColor"
+                          stroke-linecap="round"
+                          stroke-width="2"
+                        />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
               </div>
               <div class="map-binding-panel__station-actions">
                 <div class="map-binding-panel__handle" aria-hidden="true">
@@ -1074,7 +1365,15 @@ watch(coverageSectorsWithStations, (sectors) => {
 }
 
 .sector-name {
-  @apply text-sm font-medium text-amber-50;
+  @apply text-sm font-medium text-amber-50 flex items-center gap-2;
+}
+
+.sector-bound-badge {
+  @apply px-1.5 py-0.5 rounded text-xs bg-green-500/20 text-green-300 border border-green-400/30;
+}
+
+.sector-bound-info {
+  @apply text-xs text-green-300/70 mt-1;
 }
 
 .sector-header-raw {
@@ -1502,5 +1801,141 @@ watch(coverageSectorsWithStations, (sectors) => {
 
 .map-binding-panel__handle span {
   @apply block h-0.5 w-4 rounded-full bg-amber-100/40;
+}
+
+.bind-dialog {
+  @apply mb-4 rounded-lg border border-amber-300/30 bg-black/60 p-4;
+}
+
+.bind-dialog-header {
+  @apply mb-3 flex items-center justify-between;
+}
+
+.bind-dialog-title {
+  @apply text-sm font-medium text-amber-100;
+}
+
+.bind-dialog-save-name {
+  @apply text-xs text-amber-100/60;
+}
+
+.bind-dialog-content {
+  @apply flex flex-col gap-3;
+}
+
+.bind-dialog-select {
+  @apply w-full rounded border border-amber-300/30 bg-black/70 px-3 py-2 text-sm text-amber-50 outline-none;
+}
+
+.bind-dialog-actions {
+  @apply flex justify-end gap-2;
+}
+
+.bind-dialog-btn {
+  @apply rounded px-3 py-1.5 text-sm font-medium transition-colors;
+}
+
+.bind-dialog-btn--cancel {
+  @apply border border-amber-300/30 bg-transparent text-amber-100 hover:bg-amber-200/10;
+}
+
+.bind-dialog-btn--confirm {
+  @apply bg-amber-200/20 text-amber-50 hover:bg-amber-200/30;
+}
+
+.bind-dialog-btn--confirm:disabled {
+  @apply cursor-not-allowed opacity-50;
+}
+
+.poi-action--secondary {
+  @apply border border-amber-300/20 bg-transparent text-amber-100/80;
+}
+
+.poi-action--secondary:hover {
+  @apply border-amber-200/40 bg-amber-200/10 text-amber-50;
+}
+
+.free-sectors {
+  @apply mt-4 border-t border-amber-300/20 pt-4;
+}
+
+.free-sectors-header {
+  @apply mb-2 text-xs font-semibold uppercase tracking-[0.14em] text-amber-200/80;
+}
+
+.free-sectors-list {
+  @apply flex flex-col gap-2;
+}
+
+.free-sector-card {
+  @apply cursor-grab flex items-center justify-between gap-2 rounded border border-amber-300/20 bg-black/40 p-3 transition-colors hover:border-amber-200/40 hover:bg-black/60;
+}
+
+.free-sector-card--dragging {
+  @apply opacity-50 border-amber-200/60 bg-amber-200/10;
+}
+
+.free-sector-content {
+  @apply flex flex-col gap-1 min-w-0;
+}
+
+.free-sector-name {
+  @apply text-sm font-medium text-amber-50;
+}
+
+.free-sector-position {
+  @apply text-xs text-emerald-300/70;
+}
+
+.free-sector-handle {
+  @apply flex flex-col gap-0.5 shrink-0;
+}
+
+.free-sector-handle span {
+  @apply block h-0.5 w-4 rounded-full bg-amber-100/40;
+}
+
+.free-sector-card--bound {
+  @apply border-amber-300/30 bg-amber-200/5;
+}
+
+.free-sector-target {
+  @apply flex items-center gap-1.5 mt-1;
+}
+
+.free-sector-target-tag {
+  @apply inline-flex items-center rounded-full border border-amber-300/20 bg-amber-200/10 px-2 py-0.5 text-[11px] leading-4 text-amber-100/75;
+}
+
+.free-sector-clear {
+  @apply inline-flex h-4 w-4 shrink-0 items-center justify-center self-center rounded text-amber-100/55 transition-colors duration-150 hover:text-amber-50;
+}
+
+.free-sector-clear svg {
+  @apply h-3 w-3;
+}
+
+.map-binding-panel__station-item--bound {
+  @apply border-amber-300/30 bg-amber-200/5;
+}
+
+.map-binding-panel__station-main {
+  @apply min-w-0 flex-1;
+}
+
+.map-binding-panel__station-target {
+  @apply flex items-center gap-1.5 mt-0.5;
+}
+
+.map-binding-panel__station-target-tag {
+  @apply inline-flex items-center rounded-full border border-amber-300/20 bg-amber-200/10 px-2 py-0.5 text-[11px] leading-4 text-amber-100/75;
+}
+
+.map-binding-panel__station-target-clear {
+  @apply inline-flex h-4 w-4 shrink-0 items-center justify-center self-center rounded text-amber-100/55 transition-colors duration-150 hover:text-amber-50;
+}
+
+.map-binding-panel__station-target-clear svg {
+  @apply h-3 w-3;
 }
 </style>

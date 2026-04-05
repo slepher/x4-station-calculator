@@ -54,3 +54,15 @@ export function resolveMapSectorByMacro<TSector extends object>(
   if (!resolved) return null
   return resolved as ResolvedMapSector<TSector>
 }
+
+export function resolveSectorMacroById<TSector extends object>(
+  clusters: Record<string, MapClusterLike<TSector>>,
+  clusterId: string,
+  sectorId: string
+): string | null {
+  const cluster = clusters[clusterId]
+  if (!cluster) return null
+  const sector = cluster.sectors?.[sectorId]
+  if (!sector) return null
+  return (sector as { macro?: string | null }).macro || sectorId
+}

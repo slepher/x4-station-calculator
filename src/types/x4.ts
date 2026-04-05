@@ -456,23 +456,14 @@ export interface EmpirePlan {
   sectors?: SectorPlan[];
   sectorLinks?: string[];
   stations: StationPlan[];
+  saveBindings?: SaveBindingPlan[];
 }
 
-/**
- * Empire 持久化存储状态
- */
 export interface SavedEmpiresState {
   version: number;
   activeId: string | null;
   activeStationId: string | null;
   list: EmpirePlan[];
-  savePlans?: SaveBindingPlanState;
-}
-
-export interface SaveBindingPlanState {
-  version: number;
-  activeBindingKeyByEmpire: Record<string, string | null>;
-  list: SaveBindingPlan[];
 }
 
 /**
@@ -1101,10 +1092,13 @@ export interface X4ShipSlot {
 
 export interface GroupSaveBinding {
   sectorGroupId: string
-  tradestationCode: string
-  sectorMacro: string
+  tradestationCode?: string
+  sectorMacro?: string
   jumpRange: number
   coverageSectorMacros: string[]
+  tradestationBinding?: StationSaveBinding
+  stationBindings: StationSaveBinding[]
+  free?: boolean
 }
 
 export interface StationSaveBinding {
@@ -1112,15 +1106,14 @@ export interface StationSaveBinding {
   saveStationCode?: string
   sectorMacro?: string
   position?: { x: number; y: number; z: number }
+  free?: boolean
 }
 
 export interface SaveBindingPlan {
-  key: string
-  empireId: string
   gameGuid: string
+  active: boolean
   selectedArchiveTime: number | null
   groupBindings: GroupSaveBinding[]
-  stationBindings: StationSaveBinding[]
 }
 
 export interface ResolvedGroupSaveBinding extends GroupSaveBinding {

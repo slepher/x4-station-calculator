@@ -98,6 +98,7 @@ export const useEmpireStore = defineStore('empire', () => {
 
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
+  const bindingDirtyMarker = ref(0)
 
   const savedEmpires = ref<SavedEmpiresState>({ version: CURRENT_EMPIRE_VERSION, activeId: null, activeStationId: null, list: [] })
   const version = computed(() => savedEmpires.value.version)
@@ -388,13 +389,8 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function serializeEmpireForDirtyCheck() {
-    const empireSavePlans = activeEmpireId.value && savedEmpires.value.savePlans
-      ? savedEmpires.value.savePlans.list.filter((p) => p.empireId === activeEmpireId.value)
-      : []
-    
     return JSON.stringify({
-      activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null,
-      savePlans: empireSavePlans
+      activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null
     })
   }
 
@@ -466,7 +462,8 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function saveToStorage() {
-    localStorage.setItem(getStorageKey(), JSON.stringify(savedEmpires.value))
+    const data = JSON.stringify(savedEmpires.value)
+    localStorage.setItem(getStorageKey(), data)
   }
 
   function saveEmpire() {
@@ -941,6 +938,7 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   const isDirty = computed(() => {
+    void bindingDirtyMarker.value
     if (isEmptyForSave()) return false
     const current = serializeEmpireForDirtyCheck()
     return current !== lastSavedSnapshot.value
@@ -966,7 +964,11 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   // ========== SavePlans Binding Actions ==========
-  const bindingActions = createSaveBindingActions(savedEmpires, takeSnapshot)
+  function onBindingDirty() {
+    bindingDirtyMarker.value++
+  }
+
+  const bindingActions = createSaveBindingActions(activeEmpire, onBindingDirty)
 
   // ========== End SavePlans Binding Actions ==========
 
@@ -1090,25 +1092,25 @@ export const useEmpireStore = defineStore('empire', () => {
     resetEmpireWithDefaultName,
     takeSnapshot,
     initialize,
-    // SavePlans binding
-    savePlans: bindingActions.savePlans,
-    bindingPlans: bindingActions.bindingPlans,
-    getBindingPlanByKey: bindingActions.getBindingPlanByKey,
-    getActiveBindingKeyForEmpire: bindingActions.getActiveBindingKeyForEmpire,
-    getActiveBindingPlanForEmpire: bindingActions.getActiveBindingPlanForEmpire,
-    getBindingPlansForEmpire: bindingActions.getBindingPlansForEmpire,
-    createSaveBindingPlan: bindingActions.createSaveBindingPlan,
-    selectSaveBindingPlan: bindingActions.selectSaveBindingPlan,
+    // SaveBindings
+    getActiveBinding: bindingActions.getActiveBinding,
+    getBindingByGameGuid: bindingActions.getBindingByGameGuid,
+    createBinding: bindingActions.createBinding,
+    setActiveBinding: bindingActions.setActiveBinding,
     setSelectedArchiveTime: bindingActions.setSelectedArchiveTime,
-    bindSectorGroupHub: bindingActions.bindSectorGroupHub,
+    bindSectorGroup: bindingActions.bindSectorGroup,
     updateSectorGroupJumpRange: bindingActions.updateSectorGroupJumpRange,
-    clearSectorGroupHubBinding: bindingActions.clearSectorGroupHubBinding,
+    clearSectorGroupBinding: bindingActions.clearSectorGroupBinding,
+    getGroupBinding: bindingActions.getGroupBinding,
+    setTradestationBinding: bindingActions.setTradestationBinding,
+    clearTradestationBinding: bindingActions.clearTradestationBinding,
     bindStationToSaveStation: bindingActions.bindStationToSaveStation,
     clearStationBinding: bindingActions.clearStationBinding,
     setStationBindingPosition: bindingActions.setStationBindingPosition,
     isSaveStationAlreadyBound: bindingActions.isSaveStationAlreadyBound,
     importSaveStationAsBinding: bindingActions.importSaveStationAsBinding,
-    deleteBindingPlan: bindingActions.deleteBindingPlan,
-    deleteBindingPlansForEmpire: bindingActions.deleteBindingPlansForEmpire
+    deleteBinding: bindingActions.deleteBinding,
+    setFreeSectorBinding: bindingActions.setFreeSectorBinding,
+    setFreeStationBinding: bindingActions.setFreeStationBinding
   }
 })
