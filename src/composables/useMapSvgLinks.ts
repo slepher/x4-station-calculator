@@ -1,6 +1,7 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
 import { buildHighwayPathPoints, catmullRomToBezierPath, clipPolylineToConvexPolygon, hexVertices } from '@/components/map/utils/geometry'
 import { clusterRatioToScreen, gateClusterRatioFromRaw, getSectorViewportTransform, sectorLocalRatioToScreen, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
+import { getMapGateRadius } from '@/components/map/utils/mapIconConfig'
 import type { Cluster, Sector, Vec2 } from '@/components/map/types'
 import type { MapSvgLayoutState } from './useMapSvgLayout'
 import type { SectorData } from '@/types/saveArchive'
@@ -195,7 +196,10 @@ export function useMapSvgLinks(args: {
           rows.push({
             id: `${clusterId}:${sector.id}:${gateId}`,
             point: clusterRatioToScreen(center, clusterRadius, ratio),
-            r: (sectors.length === 1 ? 1.1 : 0.8) * args.stargateVisualScale,
+            r: getMapGateRadius({
+              sectorCount: sectors.length,
+              stargateVisualScale: args.stargateVisualScale
+            }),
             color: sectorColor,
             clusterId,
             targetClusterId: gate.target_cluster_id

@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import jumpgateIconUrl from '@/components/icons/jumpgate.svg'
 import superhighwayIconUrl from '@/components/icons/superhighway.svg'
+import {
+  getMapCrossLinkStrokeWidth,
+  getMapGateIconDiameter,
+  getMapSuperhighwayEndpointIconOffset,
+  getMapSuperhighwayEndpointIconSize
+} from '@/components/map/utils/mapIconConfig'
 import type {
   MapCrossClusterGateLine,
   MapGateCircle,
@@ -31,18 +37,18 @@ defineProps<{
       />
       <image
         :href="superhighwayIconUrl"
-        :x="(link.start.x - 2.1 * stargateVisualScale).toFixed(1)"
-        :y="(link.start.y - 2.1 * stargateVisualScale).toFixed(1)"
-        :width="(4.2 * stargateVisualScale).toFixed(1)"
-        :height="(4.2 * stargateVisualScale).toFixed(1)"
+        :x="(link.start.x - getMapSuperhighwayEndpointIconOffset(stargateVisualScale, 'start')).toFixed(1)"
+        :y="(link.start.y - getMapSuperhighwayEndpointIconOffset(stargateVisualScale, 'start')).toFixed(1)"
+        :width="getMapSuperhighwayEndpointIconSize(stargateVisualScale, 'start').toFixed(1)"
+        :height="getMapSuperhighwayEndpointIconSize(stargateVisualScale, 'start').toFixed(1)"
         preserveAspectRatio="xMidYMid meet"
       />
       <image
         :href="superhighwayIconUrl"
-        :x="(link.end.x - 1.575 * stargateVisualScale).toFixed(1)"
-        :y="(link.end.y - 1.575 * stargateVisualScale).toFixed(1)"
-        :width="(3.15 * stargateVisualScale).toFixed(1)"
-        :height="(3.15 * stargateVisualScale).toFixed(1)"
+        :x="(link.end.x - getMapSuperhighwayEndpointIconOffset(stargateVisualScale, 'end')).toFixed(1)"
+        :y="(link.end.y - getMapSuperhighwayEndpointIconOffset(stargateVisualScale, 'end')).toFixed(1)"
+        :width="getMapSuperhighwayEndpointIconSize(stargateVisualScale, 'end').toFixed(1)"
+        :height="getMapSuperhighwayEndpointIconSize(stargateVisualScale, 'end').toFixed(1)"
         preserveAspectRatio="xMidYMid meet"
       />
     </template>
@@ -79,10 +85,10 @@ defineProps<{
       :data-gate-id="gate.id"
       :data-cluster-id="gate.clusterId"
       :href="jumpgateIconUrl"
-      :x="(gate.point.x - gate.r * 3).toFixed(1)"
-      :y="(gate.point.y - gate.r * 3).toFixed(1)"
-      :width="(gate.r * 6).toFixed(1)"
-      :height="(gate.r * 6).toFixed(1)"
+      :x="(gate.point.x - getMapGateIconDiameter(gate.r) / 2).toFixed(1)"
+      :y="(gate.point.y - getMapGateIconDiameter(gate.r) / 2).toFixed(1)"
+      :width="getMapGateIconDiameter(gate.r).toFixed(1)"
+      :height="getMapGateIconDiameter(gate.r).toFixed(1)"
       preserveAspectRatio="xMidYMid meet"
     />
   </g>
@@ -98,7 +104,7 @@ defineProps<{
       :x2="line.right.x.toFixed(1)"
       :y2="line.right.y.toFixed(1)"
       stroke="#e5e7eb"
-      :stroke-width="(0.6 * stargateVisualScale).toFixed(2)"
+      :stroke-width="getMapCrossLinkStrokeWidth(stargateVisualScale).toFixed(2)"
       stroke-opacity="0.85"
     />
   </g>

@@ -3,21 +3,22 @@ import { getActivePinia } from 'pinia'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { clusterRatioToScreen, getSectorViewportTransform, sectorPointToLocalRatio, sectorRatioToClusterRatio } from '@/components/map/utils/coordinates'
 import {
-  OVERLAY_ICON_SIZE,
-  SMALL_ICON_SIZE,
   SAVE_POI_COLORS,
   colorToFeColorMatrix,
-  isLargeSavePoiIcon,
   shouldHideSavePoiSmallIconAtClusterOverview,
   svgIdSafe
 } from '@/components/map/utils/style'
+import {
+  MAP_ICON_SIZES,
+  getMapDynamicLargePoiIconSize,
+  isLargeMapSavePoiIcon
+} from '@/components/map/utils/mapIconConfig'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
 import type { Cluster, PlacementOverlay, PlacementPreview, Sector } from '@/components/map/types'
 import type { MapSvgLayoutState } from './useMapSvgLayout'
 import { useMapStore } from '@/store/useMapStore'
 
 const SAVE_POI_VIEWPORT_MARGIN = 24
-const LARGE_ICON_MAX_CLUSTER_SCALE = 0.5
 const SECTOR_VIEWPORT_MARGIN = 48
 const SECTOR_VIEWPORT_SETTLE_MS = 120
 
@@ -202,18 +203,11 @@ export function useMapSvgOverlays(args: {
     const factionColorMap = args.factionColorMap.value
     const viewportBounds = args.viewportContentBounds.value
     const clampedScale = Math.max(args.currentScale.value, 1e-6)
-    const halfClusterScreenSizeAtThreshold = clusterRadius * LARGE_ICON_MAX_CLUSTER_SCALE
-    const maxScaleScreenSize = OVERLAY_ICON_SIZE * args.maxScale.value
-    const largeIconScreenSize = args.currentScale.value <= LARGE_ICON_MAX_CLUSTER_SCALE
-      ? clusterRadius * args.currentScale.value
-      : halfClusterScreenSizeAtThreshold + (maxScaleScreenSize - halfClusterScreenSizeAtThreshold) * Math.max(
-        0,
-        Math.min(
-          1,
-          (args.currentScale.value - LARGE_ICON_MAX_CLUSTER_SCALE) /
-            Math.max(args.maxScale.value - LARGE_ICON_MAX_CLUSTER_SCALE, 1e-6)
-        )
-      )
+    const largeIconScreenSize = getMapDynamicLargePoiIconSize({
+      clusterRadius,
+      currentScale: args.currentScale.value,
+      maxScale: args.maxScale.value
+    })
     const hideConditionalSmallIcons = isClusterOverview.value
     const activeVisibleSectorKeys = visibleSectorKeys.value
     const alwaysVisiblePois = args.savePoiOverlays.value.filter((poi) => !shouldHideSavePoiSmallIconAtClusterOverview(poi))
@@ -259,9 +253,9 @@ export function useMapSvgOverlays(args: {
             point.y <= viewportBounds.bottom + SAVE_POI_VIEWPORT_MARGIN
           if (!withinX || !withinY) return null
         }
-        const iconSize = isLargeSavePoiIcon(poi)
+        const iconSize = isLargeMapSavePoiIcon(poi)
           ? largeIconScreenSize / clampedScale
-          : SMALL_ICON_SIZE
+          : MAP_ICON_SIZES.savePoiSmall
 
         const factionId = getPoiFactionId(poi)
         const factionColor = factionId && factionColorMap?.[factionId] ? factionColorMap[factionId] : null

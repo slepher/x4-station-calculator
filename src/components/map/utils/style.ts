@@ -41,13 +41,17 @@ import vaultLockedIconUrl from '@/components/icons/vault_locked.svg'
 import vaultUnlockedIconUrl from '@/components/icons/vault_unlocked.svg'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
 import type { SavePoiColorMap } from '../types'
+import {
+  MAP_ICON_SIZES,
+  getMapSavePoiBaseIconSize,
+  isLargeMapSavePoiIcon
+} from './mapIconConfig'
 
 export const FALLBACK_OWNER_COLOR = '#94a3b8'
-export const OVERLAY_ICON_SIZE = 18
-export const SMALL_ICON_SIZE = 9
-export const PREVIEW_ICON_SIZE = 20
+export const OVERLAY_ICON_SIZE = MAP_ICON_SIZES.placement
+export const SMALL_ICON_SIZE = MAP_ICON_SIZES.savePoiSmall
+export const PREVIEW_ICON_SIZE = MAP_ICON_SIZES.preview
 export const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
-const LARGE_ICON_TYPES = ['shipyard', 'wharf', 'tradestation', 'equipmentdock', 'playerhq', 'hive', 'nest', 'piratebase']
 const CONDITIONAL_SMALL_ICON_CATEGORIES = new Set(['npcStation', 'xenonStation', 'khaakStation'])
 
 export const SAVE_POI_COLORS: SavePoiColorMap = {
@@ -164,14 +168,11 @@ export function getSavePoiIconUrl(poi: SavePoiOverlayItem): string | null {
 }
 
 export function getSavePoiIconSize(poi: SavePoiOverlayItem): number {
-  if (poi.tag && LARGE_ICON_TYPES.includes(poi.tag)) {
-    return OVERLAY_ICON_SIZE
-  }
-  return SMALL_ICON_SIZE
+  return getMapSavePoiBaseIconSize(poi)
 }
 
 export function isLargeSavePoiIcon(poi: SavePoiOverlayItem): boolean {
-  return Boolean(poi.tag && LARGE_ICON_TYPES.includes(poi.tag))
+  return isLargeMapSavePoiIcon(poi)
 }
 
 export function shouldHideSavePoiSmallIconAtClusterOverview(poi: SavePoiOverlayItem): boolean {

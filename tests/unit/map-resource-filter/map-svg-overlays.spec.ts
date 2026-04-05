@@ -145,6 +145,66 @@ describe('useMapSvgOverlays save POI culling', () => {
     expect(overlays.savePoiScreenItems.value.map((item) => item.key)).toEqual(['npc-large', 'vault'])
   })
 
+  it('treats player headquarter POIs as large icons', () => {
+    const clusters = computed(() => ({
+      cluster_01: {
+        id: 'cluster_01',
+        normalized: { pixel_basis: { x: 0, y: 0 } },
+        sectors: {
+          sector_alpha: {
+            id: 'sector_alpha',
+            macro: 'sector_alpha_macro',
+            normalized: {
+              center_offset_ratio: { x: 0, y: 0 },
+              sector_radius_ratio: 1
+            }
+          }
+        }
+      }
+    }))
+
+    const layoutState = computed(() => ({
+      cfg: { width: 1000, height: 1000, padX: 0, padY: 0, topPad: 0 },
+      fit: { minX: 0, minY: 0, scale: 1, offsetX: 0, offsetY: 0 },
+      centers: {
+        cluster_01: { x: 500, y: 500 }
+      },
+      clusterRadius: 100
+    }))
+
+    const overlays = useMapSvgOverlays({
+      clusters,
+      layoutState,
+      placementOverlays: ref([]),
+      placementPreview: ref(null),
+      savePoiOverlays: ref([{
+        key: 'player-hq',
+        code: 'HQ',
+        category: 'playerStation' as const,
+        owner: 'player',
+        is_headquarter: true,
+        sectorMacro: 'sector_alpha_macro',
+        sectorName: 'Alpha',
+        position: { x: 0, z: 0, tx: 0, ty: 0 }
+      }]),
+      viewportContentBounds: ref({
+        left: 350,
+        top: 350,
+        right: 650,
+        bottom: 650
+      }),
+      minScale: ref(0.6),
+      maxScale: ref(1.2),
+      currentScale: ref(1),
+      zoomProgress: ref(0),
+      clusterVisibilityThresholdPx: ref(0),
+      isDragging: ref(false),
+      factionColorMap: ref(undefined)
+    })
+
+    expect((overlays.savePoiScreenItems.value[0]?.iconSize || 0)).toBeGreaterThan(9)
+  })
+
   it('builds faction color filters for visible save POI owners', () => {
     const clusters = computed(() => ({
       cluster_01: {
