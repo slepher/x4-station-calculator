@@ -24,8 +24,16 @@ const productModuleTags = ref<SearchTag[]>([])
 const factionTags = ref<SearchTag[]>([])
 const sectorTags = ref<SearchTag[]>([])
 const sectorJumpLimit = ref(5)
+const showCategoryDropdown = ref(false)
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
+
+const categoryOptions: { value: SearchCategory; label: string }[] = [
+  { value: 'product', label: 'map.poi_search_category_product' },
+  { value: 'module', label: 'map.poi_search_category_module' },
+  { value: 'faction', label: 'map.poi_search_category_faction' },
+  { value: 'sector', label: 'map.poi_search_category_sector' }
+]
 
 const productionModulesList = computed<LocalizedX4Module[]>(() => {
   const modules = Object.values(gameData.localizedModulesMap)
@@ -62,10 +70,22 @@ const categoryLabels = computed(() => ({
   sector: t('map.poi_search_category_sector')
 }))
 
+const currentCategoryLabel = computed(() => categoryLabels.value[selectedCategory.value])
+
 const placeholder = computed(() => {
   const labels = categoryLabels.value
   return t('map.poi_search_placeholder', { category: labels[selectedCategory.value] })
 })
+
+function selectCategory(value: SearchCategory) {
+  selectedCategory.value = value
+  showCategoryDropdown.value = false
+  onCategoryChange()
+}
+
+function toggleCategoryDropdown() {
+  showCategoryDropdown.value = !showCategoryDropdown.value
+}
 
 function searchProducts(query: string): SearchTag[] {
   const normalized = query.toLowerCase()
@@ -281,16 +301,29 @@ function updateJumpLimit(value: number) {
             </div>
             <div class="divider"></div>
           </template>
-          <select
-            v-model="selectedCategory"
-            class="category-select"
-            @change="onCategoryChange"
-          >
-            <option value="product">{{ categoryLabels.product }}</option>
-            <option value="module">{{ categoryLabels.module }}</option>
-            <option value="faction">{{ categoryLabels.faction }}</option>
-            <option value="sector">{{ categoryLabels.sector }}</option>
-          </select>
+          <div class="category-dropdown-wrapper">
+            <div
+              class="category-select-trigger"
+              @click="toggleCategoryDropdown"
+            >
+              {{ currentCategoryLabel }}
+              <svg class="category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+              </svg>
+            </div>
+            <div v-if="showCategoryDropdown" class="category-dropdown">
+              <div
+                v-for="option in categoryOptions"
+                :key="option.value"
+                class="category-option"
+                :class="{ active: selectedCategory === option.value }"
+                @click="selectCategory(option.value)"
+              >
+                <span class="category-check">{{ selectedCategory === option.value ? '✓' : '' }}</span>
+                {{ t(option.label) }}
+              </div>
+            </div>
+          </div>
         </div>
         <div v-if="showSuggestions" class="suggestions-list">
           <div
@@ -395,12 +428,34 @@ function updateJumpLimit(value: number) {
   @apply w-px h-6 mx-2 bg-amber-300/20;
 }
 
-.category-select {
-  @apply h-8 w-16 rounded bg-transparent pl-1 pr-5 text-xs text-amber-100 outline-none cursor-pointer appearance-none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fcd34d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 2px center;
-  background-size: 12px;
+.category-dropdown-wrapper {
+  @apply relative;
+}
+
+.category-select-trigger {
+  @apply h-8 w-16 flex items-center justify-between px-2 text-xs text-amber-100 cursor-pointer;
+}
+
+.category-arrow {
+  @apply w-3 h-3 text-amber-100/80;
+}
+
+.category-dropdown {
+  @apply absolute top-full right-0 mt-1 rounded border border-amber-300/30 bg-black/90 overflow-hidden z-20;
+  min-width: 80px;
+  backdrop-filter: blur(8px);
+}
+
+.category-option {
+  @apply flex items-center gap-2 px-3 py-2 text-sm text-amber-50 cursor-pointer hover:bg-amber-200/10 transition-colors;
+}
+
+.category-option.active {
+  @apply bg-amber-200/10;
+}
+
+.category-check {
+  @apply w-4 text-amber-200;
 }
 
 .suggestions-list {
