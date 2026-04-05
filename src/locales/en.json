@@ -256,7 +256,17 @@
     "binding_status_missing": "Missing at this time",
     "binding_footer_hint": "Changes are saved when you save the empire.",
     "binding_panel_tab": "Binding",
-    "binding_archive_time": "Archive Time"
+    "binding_archive_time": "Archive Time",
+    "binding_bound_to": "Bound to",
+    "binding_bind": "Bind",
+    "binding_import": "Import",
+    "binding_already_bound": "Bound",
+    "binding_select_empire_station": "Select Empire Station",
+    "binding_select_station_placeholder": "Select a station...",
+    "binding_cancel": "Cancel",
+    "binding_confirm": "Confirm",
+    "binding_free_sectors": "Free Sectors",
+    "binding_position_set": "Position set"
   },
   "ship_build": {
     "title": "Ship Build",

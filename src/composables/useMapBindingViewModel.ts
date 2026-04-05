@@ -71,7 +71,7 @@ export interface MapBindingViewModel {
   getEmpireStationsForSector: (sectorGroupId: string) => EmpireStationBindingInfo[]
   getIdleEmpireStations: () => EmpireStationBindingInfo[]
   getGroupBindings: () => GroupBindingInfo[]
-  isSaveStationBound: (saveStationCode: string) => boolean
+  isSaveStationBound: (sectorGroupId: string, saveStationCode: string) => boolean
   resolveStationBinding: (binding: StationSaveBinding) => ResolvedStationSaveBinding
   resolveGroupBinding: (binding: GroupSaveBinding) => ResolvedGroupSaveBinding
 }
@@ -82,15 +82,11 @@ export function useMapBindingViewModel(): MapBindingViewModel {
   const gameDataStore = useGameDataStore()
 
   const activeBindingPlan = computed<SaveBindingPlan | null>(() => {
-    const empireId = empireStore.activeEmpireId
-    if (!empireId) return null
-    return empireStore.getActiveBindingPlanForEmpire(empireId)
+    return empireStore.getActiveBinding()
   })
 
   const bindingPlansForEmpire = computed<SaveBindingPlan[]>(() => {
-    const empireId = empireStore.activeEmpireId
-    if (!empireId) return []
-    return empireStore.getBindingPlansForEmpire(empireId)
+    return empireStore.activeEmpire?.saveBindings || []
   })
 
   const selectedArchiveTime = computed<number | null>(() => {
@@ -149,14 +145,25 @@ export function useMapBindingViewModel(): MapBindingViewModel {
 
   function getStationCandidates(coverageSectors: SectorCoverageResult[]): SaveStationCandidate[] {
     const { playerStations } = getFilteredStationsForCoverage(coverageSectors)
-    const bindingKey = activeBindingPlan.value?.key
+    const bindingKey = activeBindingPlan.value?.gameGuid
+
+    const allBoundCodes = new Set<string>()
+    if (bindingKey && activeBindingPlan.value) {
+      for (const group of activeBindingPlan.value.groupBindings) {
+        for (const binding of group.stationBindings) {
+          if (binding.saveStationCode) {
+            allBoundCodes.add(binding.saveStationCode)
+          }
+        }
+      }
+    }
 
     return playerStations.map((item) => ({
       station: item.station,
       sectorMacro: item.sectorMacro,
       sectorName: item.sectorName,
       distance: item.distance,
-      isAlreadyBound: bindingKey ? empireStore.isSaveStationAlreadyBound(bindingKey, item.station.code) : false
+      isAlreadyBound: allBoundCodes.has(item.station.code)
     }))
   }
 
@@ -165,12 +172,16 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     if (!empire) return []
 
     const stations = empire.stations.filter((s) => s.sectorId === sectorGroupId)
-    const bindingKey = activeBindingPlan.value?.key
+    const bindingKey = activeBindingPlan.value?.gameGuid
     const archive = getActiveArchive()
 
+    const groupBinding = bindingKey
+      ? (activeBindingPlan.value?.groupBindings || []).find((b) => b.sectorGroupId === sectorGroupId) || null
+      : null
+
     return stations.map((station) => {
-      const rawBinding = bindingKey
-        ? (activeBindingPlan.value?.stationBindings || []).find((b) => b.stationId === station.id) || null
+      const rawBinding = groupBinding
+        ? (groupBinding.stationBindings || []).find((b: StationSaveBinding) => b.stationId === station.id) || null
         : null
 
       const binding = rawBinding ? resolveStationSaveBinding(rawBinding, archive) : null
@@ -185,7 +196,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     const empire = empireStore.activeEmpire
     if (!empire) return []
 
-    const bindingKey = activeBindingPlan.value?.key
+    const bindingKey = activeBindingPlan.value?.gameGuid
     if (!bindingKey) {
       return empire.stations.map((station) => ({
         station,
@@ -195,11 +206,15 @@ export function useMapBindingViewModel(): MapBindingViewModel {
       }))
     }
 
-    const stationBindings = activeBindingPlan.value?.stationBindings || []
+    const allStationBindings: StationSaveBinding[] = []
+    for (const group of activeBindingPlan.value?.groupBindings || []) {
+      allStationBindings.push(...group.stationBindings)
+    }
+
     const archive = getActiveArchive()
 
     return empire.stations.map((station) => {
-      const rawBinding = stationBindings.find((b) => b.stationId === station.id) || null
+      const rawBinding = allStationBindings.find((b: StationSaveBinding) => b.stationId === station.id) || null
       const binding = rawBinding ? resolveStationSaveBinding(rawBinding, archive) : null
       const isIdle = !rawBinding?.saveStationCode
       const hasPosition = Boolean(rawBinding?.position)
@@ -213,7 +228,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     if (!empire) return []
 
     const sectors = empire.sectors || []
-    const bindingKey = activeBindingPlan.value?.key
+    const bindingKey = activeBindingPlan.value?.gameGuid
     const archive = getActiveArchive()
     const { sectorGraph, sectorClusterMap } = getSectorGraphAndClusterMap()
 
@@ -223,7 +238,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
         : null
 
       const binding = rawBinding ? resolveGroupSaveBinding(rawBinding, archive) : null
-      const coverageSectorMacros = rawBinding
+      const coverageSectorMacros = rawBinding?.sectorMacro
         ? calculateCoverageSectorMacros(rawBinding.sectorMacro, rawBinding.jumpRange, sectorGraph, sectorClusterMap)
         : []
 
@@ -231,10 +246,10 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     })
   }
 
-  function isSaveStationBound(saveStationCode: string): boolean {
-    const bindingKey = activeBindingPlan.value?.key
+  function isSaveStationBound(sectorGroupId: string, saveStationCode: string): boolean {
+    const bindingKey = activeBindingPlan.value?.gameGuid
     if (!bindingKey) return false
-    return empireStore.isSaveStationAlreadyBound(bindingKey, saveStationCode)
+    return empireStore.isSaveStationAlreadyBound(bindingKey, sectorGroupId, saveStationCode)
   }
 
   function resolveStationBinding(binding: StationSaveBinding): ResolvedStationSaveBinding {

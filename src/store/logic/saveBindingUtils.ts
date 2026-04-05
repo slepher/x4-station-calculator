@@ -41,13 +41,21 @@ export function resolveGroupSaveBinding(
     return { ...binding, status: 'missing_at_selected_time' }
   }
 
+  if (!binding.sectorMacro) {
+    return { ...binding, status: 'missing_at_selected_time' }
+  }
+
   const sector = archive.sectors[binding.sectorMacro]
   if (!sector) {
     return { ...binding, status: 'missing_at_selected_time' }
   }
 
+  if (!binding.tradestationCode) {
+    return { ...binding, status: 'missing_at_selected_time' }
+  }
+
   const tradestation = (sector.npcStations || []).find(
-    (station) => station.code === binding.tradestationCode && station.isTradestation
+    (station) => station.code === binding.tradestationCode && station.isTradestation === true
   )
 
   if (!tradestation) {

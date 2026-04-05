@@ -256,7 +256,17 @@
     "binding_status_missing": "当前时间点失效",
     "binding_footer_hint": "变更将在保存帝国时持久化。",
     "binding_panel_tab": "绑定",
-    "binding_archive_time": "存档时间"
+    "binding_archive_time": "存档时间",
+    "binding_bound_to": "已绑定到",
+    "binding_bind": "绑定",
+    "binding_import": "导入",
+    "binding_already_bound": "已绑定",
+    "binding_select_empire_station": "选择帝国空间站",
+    "binding_select_station_placeholder": "选择空间站...",
+    "binding_cancel": "取消",
+    "binding_confirm": "确认",
+    "binding_free_sectors": "自由星区",
+    "binding_position_set": "已设置位置"
   },
   "ship_build": {
     "title": "船只建造",
