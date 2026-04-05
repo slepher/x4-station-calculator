@@ -230,6 +230,11 @@ When merging a worktree branch into develop:
 - Do NOT push to remote unless explicitly requested
 - Example workflow: commit on branch → switch to develop → merge branch
 
+### Git Command Concurrency
+- **禁止并行执行会写入 git index 的 git 命令**，例如 `git add`、`git commit`、`git merge`
+- 这类命令必须串行执行：前一个完成后才能执行下一个
+- 原因：并行执行容易触发 `.git/index.lock` 冲突
+
 ## Analysis Scripts
 
 分析脚本目录：`analysis/`
