@@ -415,8 +415,13 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function serializeEmpireForDirtyCheck() {
+    const empireSavePlans = activeEmpireId.value
+      ? savePlans.value.list.filter((p) => p.empireId === activeEmpireId.value)
+      : []
+    
     return JSON.stringify({
-      activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null
+      activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null,
+      savePlans: empireSavePlans
     })
   }
 
@@ -1025,6 +1030,7 @@ export const useEmpireStore = defineStore('empire', () => {
     }
     savedEmpires.value.savePlans.list.push(newPlan)
     savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId] = newPlan.key
+    takeSnapshot()
     return newPlan
   }
 
@@ -1034,6 +1040,7 @@ export const useEmpireStore = defineStore('empire', () => {
     }
     if (bindingKey === null) {
       savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId] = null
+      takeSnapshot()
       return
     }
 
@@ -1041,12 +1048,14 @@ export const useEmpireStore = defineStore('empire', () => {
     if (!plan || plan.empireId !== empireId) return
 
     savedEmpires.value.savePlans.activeBindingKeyByEmpire[empireId] = bindingKey
+    takeSnapshot()
   }
 
   function setSelectedArchiveTime(bindingKey: string, archiveTime: number | null): void {
     const plan = getBindingPlanByKey(bindingKey)
     if (!plan) return
     plan.selectedArchiveTime = archiveTime
+    takeSnapshot()
   }
 
   function bindSectorGroupHub(input: {
@@ -1077,6 +1086,7 @@ export const useEmpireStore = defineStore('empire', () => {
     } else {
       plan.groupBindings.push(newBinding)
     }
+    takeSnapshot()
   }
 
   function updateSectorGroupJumpRange(bindingKey: string, sectorGroupId: string, jumpRange: number): void {
@@ -1087,6 +1097,7 @@ export const useEmpireStore = defineStore('empire', () => {
     if (!binding) return
 
     binding.jumpRange = jumpRange
+    takeSnapshot()
   }
 
   function clearSectorGroupHubBinding(bindingKey: string, sectorGroupId: string): void {
@@ -1094,6 +1105,7 @@ export const useEmpireStore = defineStore('empire', () => {
     if (!plan) return
 
     plan.groupBindings = plan.groupBindings.filter((b) => b.sectorGroupId !== sectorGroupId)
+    takeSnapshot()
   }
 
   function bindStationToSaveStation(input: {
@@ -1130,6 +1142,7 @@ export const useEmpireStore = defineStore('empire', () => {
       plan.stationBindings.push(newBinding)
     }
 
+    takeSnapshot()
     return true
   }
 
@@ -1138,6 +1151,7 @@ export const useEmpireStore = defineStore('empire', () => {
     if (!plan) return
 
     plan.stationBindings = plan.stationBindings.filter((b) => b.stationId !== stationId)
+    takeSnapshot()
   }
 
   function setStationBindingPosition(bindingKey: string, stationId: string, position: { x: number; y: number; z: number } | null): void {
@@ -1159,6 +1173,7 @@ export const useEmpireStore = defineStore('empire', () => {
         delete binding.position
       }
     }
+    takeSnapshot()
   }
 
   function isSaveStationAlreadyBound(bindingKey: string, saveStationCode: string): boolean {
