@@ -185,10 +185,12 @@ binding UI 放在 `MapWorkbenchView`，原因：
 
 ### 4.2 三段式布局
 
-- 第一段：选择/创建 binding plan
-  - 显示当前 empire 的所有 `SaveBindingPlan`
-  - 提供创建新 binding 的入口（基于 gameGuid）
-  - 用户选择后进入第二段
+- 第一段：选择存档
+  - 显示按 gameGuid 分组的存档列表
+  - 每个分组显示玩家名称、存档数量
+  - 点击分组标题进入，绑定到最新 time
+  - 点击具体存档进入，绑定到对应 time
+  - 已有绑定的存档显示"已绑定"标记
 - 第二段：选择 save sector
   - 展示"存档用户所在空间站所属的所有星区"列表
   - 每个星区显示空间站数量和空间站标签

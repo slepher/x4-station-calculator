@@ -252,6 +252,26 @@ const empireSectors = computed<SectorPlan[]>(() => {
   return [...(activeEmpire.value.sectors || [])].sort((a, b) => (a.order || 0) - (b.order || 0))
 })
 
+const sortedArchiveGroups = computed(() => {
+  return [...saveStore.archiveGroups].sort((a, b) => {
+    return a.playerName.localeCompare(b.playerName)
+  })
+})
+
+function formatTime(time: number): string {
+  const hours = Math.floor(time / 3600)
+  const minutes = Math.floor((time % 3600) / 60)
+  return `${hours}h ${minutes}m`
+}
+
+function getExistingBindingPlan(gameGuid: string): SaveBindingPlan | null {
+  return bindingPlans.value.find((p) => p.gameGuid === gameGuid) || null
+}
+
+function hasExistingBinding(gameGuid: string): boolean {
+  return bindingPlans.value.some((p) => p.gameGuid === gameGuid)
+}
+
 const idleStations = computed<IdleStationItem[]>(() => {
   if (!activeEmpire.value || !selectedSectorGroupId.value) return []
 
@@ -507,10 +527,19 @@ function stepJumpLimit(delta: number) {
   updateJumpLimit(selectedJumpRange.value + delta)
 }
 
-async function createNewBindingPlan(gameGuid: string) {
+async function selectOrCreateBinding(gameGuid: string, time: number | null) {
   if (!activeEmpireId.value) return
 
-  const plan = empireStore.createSaveBindingPlan(activeEmpireId.value, gameGuid)
+  let plan = getExistingBindingPlan(gameGuid)
+  
+  if (!plan) {
+    plan = empireStore.createSaveBindingPlan(activeEmpireId.value, gameGuid)
+  }
+  
+  if (time !== null && plan.selectedArchiveTime !== time) {
+    empireStore.setSelectedArchiveTime(plan.key, time)
+  }
+  
   await selectBindingPlan(plan)
 }
 
@@ -622,39 +651,46 @@ watch(coverageSectorsWithStations, (sectors) => {
     </div>
 
     <div class="map-binding-panel__body scrollbar-thin">
-      <!-- Stage 1: Select Binding Plan -->
+      <!-- Stage 1: Select Save Archive -->
       <div v-if="stage === 'select-binding'" class="map-binding-panel__section">
-        <div class="map-binding-panel__hint">{{ t('map.binding_select_plan_hint') }}</div>
-
-        <div v-if="bindingPlans.length > 0" class="map-binding-panel__list">
-          <button
-            v-for="plan in bindingPlans"
-            :key="plan.key"
-            class="map-binding-panel__item"
-            type="button"
-            @click="selectBindingPlan(plan)"
-          >
-            <div class="map-binding-panel__item-name">{{ plan.gameGuid.slice(0, 8) }}...</div>
-            <div class="map-binding-panel__item-meta">{{ t('map.binding_group_count', { count: plan.groupBindings.length }) }}</div>
-          </button>
+        <div v-if="sortedArchiveGroups.length === 0" class="map-binding-panel__empty">
+          {{ t('map.binding_no_saves') }}
         </div>
-
-        <div class="map-binding-panel__divider">{{ t('map.binding_or_create') }}</div>
-
-        <div class="map-binding-panel__create-section">
-          <div class="map-binding-panel__hint">{{ t('map.binding_create_hint') }}</div>
-          <button
-            v-for="[guid] in saveStore.archives"
-            :key="guid"
-            class="map-binding-panel__item map-binding-panel__item--create"
-            type="button"
-            @click="createNewBindingPlan(guid)"
+        
+        <div v-else class="archive-groups">
+          <div
+            v-for="group in sortedArchiveGroups"
+            :key="group.guid"
+            class="archive-group"
           >
-            <div class="map-binding-panel__item-name">{{ t('map.binding_bind_to_save') }}</div>
-            <div class="map-binding-panel__item-meta">{{ guid.slice(0, 12) }}...</div>
-          </button>
-          <div v-if="saveStore.archives.size === 0" class="map-binding-panel__empty">
-            {{ t('map.binding_no_saves') }}
+            <button
+              class="archive-group-header"
+              type="button"
+              @click="selectOrCreateBinding(group.guid, null)"
+            >
+              <span class="player-name">{{ group.playerName }}</span>
+              <span class="archive-count">{{ group.saves.length }} {{ t('map.binding_station_count', { count: group.saves.length }) }}</span>
+              <span v-if="hasExistingBinding(group.guid)" class="bound-badge">{{ t('map.binding_sector_bound') }}</span>
+            </button>
+
+            <div class="archive-items">
+              <button
+                v-for="archive in group.saves"
+                :key="archive.meta.time"
+                class="archive-item"
+                :class="{ 'archive-item--bound': getExistingBindingPlan(group.guid)?.selectedArchiveTime === archive.meta.time }"
+                type="button"
+                @click="selectOrCreateBinding(group.guid, archive.meta.time)"
+              >
+                <div class="archive-info">
+                  <div class="archive-time">{{ formatTime(archive.meta.time) }}</div>
+                  <div class="archive-meta">{{ archive.meta.filename }}</div>
+                </div>
+                <span v-if="getExistingBindingPlan(group.guid)?.selectedArchiveTime === archive.meta.time" class="bound-tag">
+                  {{ t('map.binding_sector_bound') }}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -1402,6 +1438,58 @@ watch(coverageSectorsWithStations, (sectors) => {
 
 .archive-select {
   @apply h-8 rounded border border-amber-300/30 bg-black/60 px-2 text-sm text-amber-50 outline-none;
+}
+
+.archive-groups {
+  @apply flex flex-col gap-3;
+}
+
+.archive-group {
+  @apply flex flex-col gap-1;
+}
+
+.archive-group-header {
+  @apply flex items-center gap-2 rounded border border-amber-300/20 bg-amber-200/10 px-3 py-2 text-left transition-colors hover:border-amber-200/40 hover:bg-amber-200/15;
+}
+
+.player-name {
+  @apply text-sm font-medium text-amber-50;
+}
+
+.archive-count {
+  @apply text-xs text-amber-100/60;
+}
+
+.bound-badge {
+  @apply ml-auto rounded bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-300;
+}
+
+.archive-items {
+  @apply ml-2 flex flex-col gap-1 border-l border-amber-300/20 pl-2;
+}
+
+.archive-item {
+  @apply flex items-center justify-between gap-2 rounded border border-amber-300/15 bg-black/30 px-3 py-1.5 text-left transition-colors hover:border-amber-200/30 hover:bg-amber-200/5;
+}
+
+.archive-item--bound {
+  @apply border-emerald-400/30 bg-emerald-500/5;
+}
+
+.archive-info {
+  @apply flex min-w-0 flex-col;
+}
+
+.archive-time {
+  @apply text-sm text-amber-50;
+}
+
+.archive-meta {
+  @apply truncate text-xs text-amber-100/50;
+}
+
+.bound-tag {
+  @apply shrink-0 rounded bg-emerald-500/20 px-2 py-0.5 text-xs text-emerald-300;
 }
 
 .map-binding-panel__station-item--dragging {
