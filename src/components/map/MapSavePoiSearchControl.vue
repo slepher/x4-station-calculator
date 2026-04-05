@@ -6,7 +6,7 @@ import type { SearchState, SearchTag } from './savePoiSearchFilter'
 import type { LocalizedX4Module, X4MapSector } from '@/types/x4'
 
 const emit = defineEmits<{
-  (e: 'search-change', state: SearchState): void
+  (e: 'search-change', state: SearchState & { sectorJumpLimit?: number }): void
 }>()
 
 const { t, te } = useI18n()
@@ -21,6 +21,7 @@ const showSuggestions = ref(false)
 const productModuleTags = ref<SearchTag[]>([])
 const factionTags = ref<SearchTag[]>([])
 const sectorTags = ref<SearchTag[]>([])
+const sectorJumpLimit = ref(5)
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 
@@ -206,7 +207,8 @@ function emitSearchChange() {
   emit('search-change', {
     productModuleTags: productModuleTags.value,
     factionTags: factionTags.value,
-    sectorTags: sectorTags.value
+    sectorTags: sectorTags.value,
+    sectorJumpLimit: sectorJumpLimit.value
   })
 }
 
@@ -216,23 +218,22 @@ function hideSuggestions() {
 
 function getTagDisplay(tag: SearchTag): string {
   const labels = categoryLabels.value
+  if (tag.category === 'sector') {
+    return `${labels.sector}${sectorJumpLimit.value}${t('map.poi_search_jump_suffix')}:${tag.label}`
+  }
   return `${labels[tag.category]}:${tag.label}`
 }
+
+watch(sectorJumpLimit, () => {
+  if (sectorTags.value.length > 0) {
+    emitSearchChange()
+  }
+})
 </script>
 
 <template>
   <div class="poi-search-control">
     <div class="search-row">
-      <select
-        v-model="selectedCategory"
-        class="category-select"
-        @change="onCategoryChange"
-      >
-        <option value="product">{{ categoryLabels.product }}</option>
-        <option value="module">{{ categoryLabels.module }}</option>
-        <option value="faction">{{ categoryLabels.faction }}</option>
-        <option value="sector">{{ categoryLabels.sector }}</option>
-      </select>
       <div class="input-wrapper">
         <input
           v-model="searchInput"
@@ -242,6 +243,16 @@ function getTagDisplay(tag: SearchTag): string {
           @blur="hideSuggestions"
           @focus="searchInput.trim() && performSearch()"
         />
+        <select
+          v-model="selectedCategory"
+          class="category-select"
+          @change="onCategoryChange"
+        >
+          <option value="product">{{ categoryLabels.product }}</option>
+          <option value="module">{{ categoryLabels.module }}</option>
+          <option value="faction">{{ categoryLabels.faction }}</option>
+          <option value="sector">{{ categoryLabels.sector }}</option>
+        </select>
         <div v-if="showSuggestions" class="suggestions-list">
           <div
             v-for="tag in suggestions"
@@ -253,6 +264,17 @@ function getTagDisplay(tag: SearchTag): string {
           </div>
         </div>
       </div>
+    </div>
+
+    <div v-if="selectedCategory === 'sector' && sectorTags.length > 0" class="jump-limit-row">
+      <label class="jump-limit-label">{{ t('map.poi_search_jump_limit') }}</label>
+      <input
+        v-model.number="sectorJumpLimit"
+        class="jump-limit-input"
+        type="number"
+        min="0"
+        max="8"
+      />
     </div>
 
     <div v-if="productModuleTags.length > 0 || factionTags.length > 0 || sectorTags.length > 0" class="tags-area">
@@ -293,16 +315,20 @@ function getTagDisplay(tag: SearchTag): string {
   @apply flex gap-2;
 }
 
-.category-select {
-  @apply w-20 h-10 rounded border border-amber-300/30 bg-black/60 px-2 text-sm text-amber-50 outline-none cursor-pointer;
-}
-
 .input-wrapper {
-  @apply relative flex-1;
+  @apply relative flex-1 flex items-center;
 }
 
 .search-input {
-  @apply h-10 w-full rounded border border-amber-300/30 bg-black/60 px-3 text-sm text-amber-50 outline-none;
+  @apply h-10 w-full rounded border border-amber-300/30 bg-black/60 pl-3 pr-24 text-sm text-amber-50 outline-none;
+}
+
+.category-select {
+  @apply absolute right-0 h-8 my-1 w-20 rounded border-l border-amber-300/30 bg-transparent pl-2 pr-6 text-xs text-amber-100 outline-none cursor-pointer appearance-none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fcd34d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 4px center;
+  background-size: 14px;
 }
 
 .suggestions-list {
@@ -312,6 +338,18 @@ function getTagDisplay(tag: SearchTag): string {
 
 .suggestion-item {
   @apply px-3 py-2 text-sm text-amber-50 cursor-pointer hover:bg-amber-200/10 transition-colors;
+}
+
+.jump-limit-row {
+  @apply flex items-center gap-2;
+}
+
+.jump-limit-label {
+  @apply text-xs text-amber-200/80;
+}
+
+.jump-limit-input {
+  @apply w-16 h-8 rounded border border-amber-300/30 bg-black/60 px-2 text-sm text-amber-50 outline-none;
 }
 
 .tags-area {

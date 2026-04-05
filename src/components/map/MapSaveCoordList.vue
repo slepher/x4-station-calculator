@@ -33,10 +33,11 @@ const gameData = useGameDataStore()
 const { translateShip } = useX4I18n()
 
 const searchQuery = ref('')
-const searchState = ref<SearchState>({
+const searchState = ref<SearchState & { sectorJumpLimit?: number }>({
   productModuleTags: [],
   factionTags: [],
-  sectorTags: []
+  sectorTags: [],
+  sectorJumpLimit: 5
 })
 
 const isStationCategory = computed(() => {
@@ -63,7 +64,8 @@ const reachableSectorMacros = computed(() => {
   if (searchState.value.sectorTags.length === 0) {
     return new Set<string>()
   }
-  return buildReachableSectorMacros(searchState.value.sectorTags, gameData.maps, 5)
+  const jumpLimit = searchState.value.sectorJumpLimit ?? 5
+  return buildReachableSectorMacros(searchState.value.sectorTags, gameData.maps, jumpLimit)
 })
 
 const poiGroups = computed<SectorPoiGroup[]>(() => {
@@ -167,7 +169,7 @@ function onClearSearch() {
   searchQuery.value = ''
 }
 
-function onSearchChange(newState: SearchState) {
+function onSearchChange(newState: SearchState & { sectorJumpLimit?: number }) {
   searchState.value = newState
 }
 

@@ -208,6 +208,8 @@
     "poi_search_category_faction": "Faction",
     "poi_search_category_sector": "Sector",
     "poi_search_placeholder": "Search {category}...",
+    "poi_search_jump_limit": "Jump Limit",
+    "poi_search_jump_suffix": "j",
     "save_poi_tooltip_category": "Category",
     "save_poi_tooltip_owner": "Owner",
     "save_poi_tooltip_code": "Code",
