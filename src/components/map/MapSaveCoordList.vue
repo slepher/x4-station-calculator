@@ -6,7 +6,15 @@ import { useSaveStore, createOverlayItem } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
-import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
+import MapSavePoiSearchControl from './MapSavePoiSearchControl.vue'
+import {
+  filterStationBySearchState,
+  isSearchStateEmpty,
+  buildReachableSectorMacros,
+  isSectorReachable
+} from './savePoiSearchFilter'
+import type { SearchState } from './savePoiSearchFilter'
+import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem, StationEntry } from '@/types/saveArchive'
 import { getStationPoiLabel } from './savePoiLabel'
 
 const props = defineProps<{
@@ -25,6 +33,20 @@ const gameData = useGameDataStore()
 const { translateShip } = useX4I18n()
 
 const searchQuery = ref('')
+const searchState = ref<SearchState>({
+  productModuleTags: [],
+  factionTags: [],
+  sectorTags: []
+})
+
+const isStationCategory = computed(() => {
+  return (
+    props.category === 'npcStation' ||
+    props.category === 'playerStation' ||
+    props.category === 'xenonStation' ||
+    props.category === 'khaakStation'
+  )
+})
 
 const normalizedQuery = computed(() => searchQuery.value.trim().toLowerCase())
 
@@ -34,28 +56,30 @@ interface SectorPoiGroup {
   sectorName: string
   showRawSectorName: boolean
   pois: SavePoiOverlayItem[]
+  rawItems?: StationEntry[]
 }
 
+const reachableSectorMacros = computed(() => {
+  if (searchState.value.sectorTags.length === 0) {
+    return new Set<string>()
+  }
+  return buildReachableSectorMacros(searchState.value.sectorTags, gameData.maps, 5)
+})
+
 const poiGroups = computed<SectorPoiGroup[]>(() => {
-  const categoryData = saveStore.getArchivePoiCategories(props.archive, {
-  })[props.category]
+  const categoryData = saveStore.getArchivePoiCategories(props.archive, {})[props.category]
 
   return categoryData.groups
     .map((group) => {
       const searchNames = getSectorSearchNames(group.sectorMacro, group.sectorName)
-      const match = getLocalizedSectorQueryMatch({
-        rawName: searchNames.rawName,
-        displayName: searchNames.displayName,
-        normalizedQuery: normalizedQuery.value,
-        locale: locale.value
-      })
 
       return {
         sectorMacro: group.sectorMacro,
         rawSectorName: searchNames.rawName,
         sectorName: searchNames.displayName,
-        showRawSectorName: locale.value !== 'en' && match.matchedRawName && !match.matchedDisplayName,
-        pois: group.items.map((item) => createOverlayItem(props.category, group.sectorMacro, searchNames.displayName, item))
+        showRawSectorName: false,
+        pois: group.items.map((item) => createOverlayItem(props.category, group.sectorMacro, searchNames.displayName, item)),
+        rawItems: group.items as StationEntry[]
       }
     })
     .filter((group) => group.pois.length > 0)
@@ -63,16 +87,42 @@ const poiGroups = computed<SectorPoiGroup[]>(() => {
 })
 
 const filteredGroups = computed<SectorPoiGroup[]>(() => {
-  if (!normalizedQuery.value) return poiGroups.value
+  let groups = poiGroups.value
 
-  return poiGroups.value.filter((group) =>
-    getLocalizedSectorQueryMatch({
-      rawName: group.rawSectorName,
-      displayName: group.sectorName,
-      normalizedQuery: normalizedQuery.value,
-      locale: locale.value
-    }).matched
-  )
+  if (!isStationCategory.value && normalizedQuery.value) {
+    groups = groups.filter((group) =>
+      getLocalizedSectorQueryMatch({
+        rawName: group.rawSectorName,
+        displayName: group.sectorName,
+        normalizedQuery: normalizedQuery.value,
+        locale: locale.value
+      }).matched
+    )
+  }
+
+  if (isStationCategory.value && !isSearchStateEmpty(searchState.value)) {
+    if (reachableSectorMacros.value.size > 0) {
+      groups = groups.filter((group) => isSectorReachable(group.sectorMacro, reachableSectorMacros.value))
+    }
+
+    if (searchState.value.productModuleTags.length > 0 || searchState.value.factionTags.length > 0) {
+      const modulesByMacroId = gameData.modulesByMacroId
+      groups = groups.map((group) => {
+        const filteredItems = (group.rawItems || []).filter((item) =>
+          filterStationBySearchState(item, searchState.value, modulesByMacroId)
+        )
+        return {
+          ...group,
+          pois: filteredItems.map((item) =>
+            createOverlayItem(props.category, group.sectorMacro, group.sectorName, item)
+          ),
+          rawItems: filteredItems
+        }
+      }).filter((group) => group.pois.length > 0)
+    }
+  }
+
+  return groups
 })
 
 function getSectorSearchNames(sectorMacro: string, fallbackName: string): { rawName: string; displayName: string } {
@@ -117,6 +167,10 @@ function onClearSearch() {
   searchQuery.value = ''
 }
 
+function onSearchChange(newState: SearchState) {
+  searchState.value = newState
+}
+
 function getPoiLabel(poi: SavePoiOverlayItem): string {
   if (poi.category === 'abandonedShip') return getShipName(poi)
   if (
@@ -137,7 +191,12 @@ function getPoiLabel(poi: SavePoiOverlayItem): string {
 
 <template>
   <div class="save-coord-list">
-    <div class="search-wrap">
+    <MapSavePoiSearchControl
+      v-if="isStationCategory"
+      @search-change="onSearchChange"
+    />
+
+    <div v-if="!isStationCategory" class="search-wrap">
       <input
         v-model="searchQuery"
         class="search-input"
