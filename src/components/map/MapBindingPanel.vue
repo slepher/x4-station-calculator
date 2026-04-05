@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveStore } from '@/store/useSaveStore'
@@ -20,6 +20,8 @@ import {
 
 type PanelStage = 'select-binding' | 'select-sector' | 'select-station'
 type PlacementIcon = 'factory' | 'shipyard' | 'tradestation'
+
+const DRAG_START_THRESHOLD_PX = 5
 
 export interface SaveSectorItem {
   sectorMacro: string
@@ -50,6 +52,8 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'focus-sector', sectorId: string): void
   (e: 'fit-sectors', sectorIds: string[]): void
+  (e: 'drag-station-start', payload: { stationId: string; bindingKey: string; name: string; icon: 'factory' | 'shipyard' }): void
+  (e: 'drag-station-end'): void
 }>()
 
 const { t, locale } = useI18n()
@@ -64,6 +68,15 @@ const selectedJumpRange = ref(3)
 const selectedSectorGroupId = ref<string | null>(null)
 const importStationName = ref('')
 const sectorSearchQuery = ref('')
+const newSectorName = ref('')
+const showNewSectorInput = ref(false)
+
+const pendingDrag = ref<{
+  item: IdleStationItem
+  startX: number
+  startY: number
+} | null>(null)
+const activeDragStationId = ref<string | null>(null)
 
 const { getSectorDisplayName, normalizedQuery } = useSectorNameFilter(sectorSearchQuery)
 
@@ -185,11 +198,8 @@ const coverageSectors = computed<SectorCoverageResult[]>(() => {
   const { sectorGraph, sectorClusterMap } = sectorGraphData.value
 
   const normalizedStart = selectedSaveSectorMacro.value.toLowerCase()
-  console.log('[coverageSectors] macro:', selectedSaveSectorMacro.value, 'normalized:', normalizedStart, 'graphKeys:', Object.keys(sectorGraph).slice(0, 5))
 
-  const result = getCoverageSectors(normalizedStart, selectedJumpRange.value, sectorGraph, sectorClusterMap)
-  console.log('[coverageSectors] jumpRange:', selectedJumpRange.value, 'result:', result.length, result.map(s => s.sectorMacro))
-  return result
+  return getCoverageSectors(normalizedStart, selectedJumpRange.value, sectorGraph, sectorClusterMap)
 })
 
 const coverageSectorsWithStations = computed<SectorWithStations[]>(() => {
@@ -223,8 +233,6 @@ const coverageSectorsWithStations = computed<SectorWithStations[]>(() => {
     return a.sectorName.localeCompare(b.sectorName)
   })
 
-  console.log('[coverageSectorsWithStations] jumpRange:', selectedJumpRange.value, 'result:', sorted.length, sorted.map(s => ({ macro: s.sectorMacro, stations: s.stations.length, distance: s.distance })))
-
   return sorted
 })
 
@@ -252,6 +260,37 @@ const idleStations = computed<IdleStationItem[]>(() => {
         sectorGroupName: sector?.name || ''
       }
     })
+})
+
+const currentGroupBinding = computed(() => {
+  if (!activeBindingPlan.value || !selectedSectorGroupId.value) return null
+  return activeBindingPlan.value.groupBindings.find((b) => b.sectorGroupId === selectedSectorGroupId.value) || null
+})
+
+const isSectorBound = computed(() => {
+  return currentGroupBinding.value !== null
+})
+
+const tradeStationsInSelectedSector = computed(() => {
+  if (!activeArchive.value || !selectedSaveSectorMacro.value) return []
+  
+  const sector = activeArchive.value.sectors[selectedSaveSectorMacro.value]
+  if (!sector) return []
+  
+  return (sector.npcStations || []).filter((s) => s.isTradestation)
+})
+
+const availableArchiveTimes = computed(() => {
+  if (!activeBindingPlan.value) return []
+  
+  const guid = activeBindingPlan.value.gameGuid
+  const group = saveStore.archives.get(guid)
+  if (!group) return []
+  
+  return group.saves.map((s) => ({
+    time: s.meta.time,
+    label: new Date(s.meta.time * 1000).toLocaleString()
+  })).sort((a, b) => b.time - a.time)
 })
 
 const stationBindingsInGroup = computed(() => {
@@ -321,16 +360,119 @@ function selectSaveSector(sectorMacro: string) {
   emit('focus-sector', sectorMacro)
 }
 
-function selectSectorGroup(sectorGroupId: string) {
-  selectedSectorGroupId.value = sectorGroupId
+function showCreateNewSector() {
+  showNewSectorInput.value = true
+  newSectorName.value = ''
 }
+
+function createAndBindNewSector() {
+  if (!activeEmpire.value || !newSectorName.value.trim()) return
+
+  const sectorName = newSectorName.value.trim()
+  const newSector = empireStore.createSector(sectorName)
+  
+  if (newSector) {
+    bindSectorToGroup(newSector.id)
+    newSectorName.value = ''
+    showNewSectorInput.value = false
+  }
+}
+
+function bindSectorToGroup(sectorGroupId: string) {
+  if (!selectedBindingKey.value || !selectedSaveSectorMacro.value) return
+
+  selectedSectorGroupId.value = sectorGroupId
+  showNewSectorInput.value = false
+
+  empireStore.bindSectorGroupHub({
+    bindingKey: selectedBindingKey.value,
+    sectorGroupId,
+    tradestationCode: '',
+    sectorMacro: selectedSaveSectorMacro.value,
+    jumpRange: selectedJumpRange.value,
+    coverageSectorMacros: coverageSectors.value.map((s) => s.sectorMacro)
+  })
+}
+
+function bindTradeStation(tradestationCode: string) {
+  if (!selectedBindingKey.value || !selectedSectorGroupId.value || !selectedSaveSectorMacro.value) return
+
+  empireStore.bindSectorGroupHub({
+    bindingKey: selectedBindingKey.value,
+    sectorGroupId: selectedSectorGroupId.value,
+    tradestationCode,
+    sectorMacro: selectedSaveSectorMacro.value,
+    jumpRange: selectedJumpRange.value,
+    coverageSectorMacros: coverageSectors.value.map((s) => s.sectorMacro)
+  })
+}
+
+function clearGroupBinding() {
+  if (!selectedBindingKey.value || !selectedSectorGroupId.value) return
+
+  empireStore.clearSectorGroupHubBinding(selectedBindingKey.value, selectedSectorGroupId.value)
+}
+
+function selectArchiveTime(time: number | null) {
+  if (!selectedBindingKey.value) return
+
+  empireStore.setSelectedArchiveTime(selectedBindingKey.value, time)
+}
+
+const clearPendingDrag = () => {
+  pendingDrag.value = null
+}
+
+const finishActiveDrag = () => {
+  if (!activeDragStationId.value) return
+  activeDragStationId.value = null
+  emit('drag-station-end')
+}
+
+const onWindowMouseMove = (event: MouseEvent) => {
+  if (!pendingDrag.value || activeDragStationId.value) return
+  const dx = event.clientX - pendingDrag.value.startX
+  const dy = event.clientY - pendingDrag.value.startY
+  if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
+  activeDragStationId.value = pendingDrag.value.item.station.id
+  emit('drag-station-start', {
+    stationId: pendingDrag.value.item.station.id,
+    bindingKey: selectedBindingKey.value!,
+    name: pendingDrag.value.item.station.name,
+    icon: pendingDrag.value.item.station.type === 'shipyard' ? 'shipyard' : 'factory'
+  })
+}
+
+const onWindowMouseUp = () => {
+  clearPendingDrag()
+  finishActiveDrag()
+}
+
+const onIdleStationMouseDown = (event: MouseEvent, item: IdleStationItem) => {
+  if (event.button !== 0) return
+  if (!selectedBindingKey.value) return
+  pendingDrag.value = {
+    item,
+    startX: event.clientX,
+    startY: event.clientY
+  }
+}
+
+if (typeof window !== 'undefined') {
+  window.addEventListener('mousemove', onWindowMouseMove)
+  window.addEventListener('mouseup', onWindowMouseUp)
+}
+
+onBeforeUnmount(() => {
+  if (typeof window === 'undefined') return
+  window.removeEventListener('mousemove', onWindowMouseMove)
+  window.removeEventListener('mouseup', onWindowMouseUp)
+})
 
 const clampJumpLimit = (value: number) => Math.min(5, Math.max(0, Math.round(value)))
 
 function updateJumpLimit(nextValue: number) {
-  const clamped = clampJumpLimit(nextValue)
-  console.log('[updateJumpLimit] from:', selectedJumpRange.value, 'to:', clamped)
-  selectedJumpRange.value = clamped
+  selectedJumpRange.value = clampJumpLimit(nextValue)
 }
 
 function stepJumpLimit(delta: number) {
@@ -417,7 +559,6 @@ watch(() => props.open, (open) => {
 })
 
 watch(coverageSectorsWithStations, (sectors) => {
-  console.log('[watch coverageSectorsWithStations] stage:', stage.value, 'sectors:', sectors.length)
   if (stage.value === 'select-station' && sectors.length > 0) {
     emit('fit-sectors', sectors.map(s => s.sectorMacro))
   }
@@ -549,11 +690,30 @@ watch(coverageSectorsWithStations, (sectors) => {
         </div>
       </div>
 
-      <!-- Stage 3: Select Station & Bind -->
+      <!-- Stage 3: Bind Stations -->
       <div v-else-if="stage === 'select-station'" class="map-binding-panel__section">
+        <!-- Archive Time Selector -->
+        <div v-if="availableArchiveTimes.length > 1" class="archive-time">
+          <label class="label">{{ t('map.binding_archive_time') }}</label>
+          <select
+            class="archive-select"
+            :value="activeBindingPlan?.selectedArchiveTime || ''"
+            @change="selectArchiveTime(Number(($event.target as HTMLSelectElement).value) || null)"
+          >
+            <option value="">最新</option>
+            <option
+              v-for="item in availableArchiveTimes"
+              :key="item.time"
+              :value="item.time"
+            >
+              {{ item.label }}
+            </option>
+          </select>
+        </div>
+
         <!-- Jump Range Selector -->
         <div class="jump-range">
-          <label class="label">{{ t('map.resource_filter_jump_limit') }}</label>
+          <label class="label">{{ t('map.binding_jump_range') }}</label>
           <div class="jump-input-wrap">
             <input
               class="jump-input"
@@ -573,87 +733,159 @@ watch(coverageSectorsWithStations, (sectors) => {
           </div>
         </div>
 
-        <!-- Sector Group Selector -->
-        <div class="map-binding-panel__sector-group">
-          <label class="map-binding-panel__label">{{ t('map.binding_sector_group') }}</label>
-          <div class="map-binding-panel__sector-options">
-            <button
-              v-for="sector in empireSectors"
-              :key="sector.id"
-              class="map-binding-panel__sector-btn"
-              :class="{ active: selectedSectorGroupId === sector.id }"
-              type="button"
-              @click="selectSectorGroup(sector.id)"
-            >
-              {{ sector.name }}
-            </button>
+        <!-- Step 1: Bind Sector Group -->
+        <div class="bind-step">
+          <div class="bind-step-header">
+            <span class="bind-step-number">1</span>
+            <span class="bind-step-title">{{ t('map.binding_sector_group') }}</span>
+            <span v-if="isSectorBound" class="bind-step-status bind-step-status--done">{{ t('map.binding_sector_bound') }}</span>
+          </div>
+          
+          <div v-if="!isSectorBound" class="bind-step-content">
+            <div class="map-binding-panel__sector-options">
+              <button
+                v-for="sector in empireSectors"
+                :key="sector.id"
+                class="map-binding-panel__sector-btn"
+                type="button"
+                @click="bindSectorToGroup(sector.id)"
+              >
+                {{ sector.name }}
+              </button>
+            </div>
+            <div class="bind-new-sector">
+              <button
+                v-if="!showNewSectorInput"
+                class="map-binding-panel__sector-btn map-binding-panel__sector-btn--new"
+                type="button"
+                @click="showCreateNewSector"
+              >
+                + {{ t('map.binding_new_sector') }}
+              </button>
+              <div v-else class="new-sector-form">
+                <input
+                  v-model="newSectorName"
+                  class="new-sector-input"
+                  type="text"
+                  :placeholder="t('map.binding_new_sector_name')"
+                />
+                <button
+                  class="new-sector-create"
+                  type="button"
+                  :disabled="!newSectorName.trim()"
+                  @click="createAndBindNewSector"
+                >
+                  {{ t('map.binding_bind_sector') }}
+                </button>
+              </div>
+            </div>
+          </div>
+          <div v-else class="bind-step-content">
+            <span class="sector-bound-name">{{ empireSectors.find(s => s.id === selectedSectorGroupId)?.name }}</span>
+            <button class="bind-step-clear" type="button" @click="clearGroupBinding">×</button>
           </div>
         </div>
 
-        <!-- Coverage Sectors with Stations (POI Style) -->
-        <div class="poi-groups">
-          <div class="poi-stats">
-            {{ coverageSectorsWithStations.reduce((sum, s) => sum + s.stations.length, 0) }} {{ t('map.save_coord_count') }}
-          </div>
-          
-          <div v-if="coverageSectorsWithStations.length === 0" class="map-binding-panel__empty">
-            {{ t('map.binding_no_stations') }}
+        <!-- Step 2: Coverage Sectors with Stations (POI Style) -->
+        <div class="bind-step" :class="{ 'bind-step--disabled': !isSectorBound }">
+          <div class="bind-step-header">
+            <span class="bind-step-number">2</span>
+            <span class="bind-step-title">{{ t('map.binding_save_stations') }}</span>
           </div>
 
-          <div
-            v-for="sector in coverageSectorsWithStations"
-            :key="sector.sectorMacro"
-            class="poi-group"
-          >
-            <div class="poi-header">
-              <span class="poi-name">
-                {{ sector.sectorName }}
-                <span v-if="sector.showRawSectorName" class="poi-header-raw">({{ sector.rawSectorName }})</span>
-              </span>
-              <span class="poi-distance">{{ sector.distance }}j</span>
+          <div v-if="!isSectorBound" class="bind-step-hint">
+            {{ t('map.binding_sector_not_bound') }}
+          </div>
+
+          <div v-else class="poi-groups">
+            <div class="poi-stats">
+              {{ coverageSectorsWithStations.reduce((sum, s) => sum + s.stations.length, 0) }} {{ t('map.save_coord_count') }}
             </div>
-            <div class="poi-list">
-              <div
-                v-for="station in sector.stations"
-                :key="station.code"
-                class="poi-item"
-                :class="{ 'poi-item--bound': isSaveStationBound(station.code) }"
-              >
-                <div class="poi-text">
-                  <div class="poi-title-row">
-                    <span class="poi-code">{{ getStationLabel(station) }}</span>
-                    <span v-if="station.is_headquarter" class="poi-badge">
-                      {{ t('map.save_station_headquarter') }}
+            
+            <div v-if="coverageSectorsWithStations.length === 0" class="map-binding-panel__empty">
+              {{ t('map.binding_no_stations') }}
+            </div>
+
+            <div
+              v-for="sector in coverageSectorsWithStations"
+              :key="sector.sectorMacro"
+              class="poi-group"
+            >
+              <div class="poi-header">
+                <span class="poi-name">
+                  {{ sector.sectorName }}
+                  <span v-if="sector.showRawSectorName" class="poi-header-raw">({{ sector.rawSectorName }})</span>
+                </span>
+                <span class="poi-distance">{{ sector.distance }}j</span>
+              </div>
+              <div class="poi-list">
+                <div
+                  v-for="station in sector.stations"
+                  :key="station.code"
+                  class="poi-item"
+                  :class="{ 'poi-item--bound': isSaveStationBound(station.code) }"
+                >
+                  <div class="poi-text">
+                    <div class="poi-title-row">
+                      <span class="poi-code">{{ getStationLabel(station) }}</span>
+                      <span v-if="station.is_headquarter" class="poi-badge">
+                        {{ t('map.save_station_headquarter') }}
+                      </span>
+                    </div>
+                    <span class="poi-subcode">{{ station.code }}</span>
+                  </div>
+                  <div class="poi-actions">
+                    <button
+                      v-if="!isSaveStationBound(station.code)"
+                      class="poi-action"
+                      type="button"
+                      @click="importSaveStation(station, sector.sectorMacro)"
+                    >
+                      {{ t('map.binding_import') }}
+                    </button>
+                    <span v-else class="poi-bound-tag">
+                      {{ t('map.binding_already_bound') }}
                     </span>
                   </div>
-                  <span class="poi-subcode">{{ station.code }}</span>
-                </div>
-                <div class="poi-actions">
-                  <button
-                    v-if="selectedSectorGroupId && !isSaveStationBound(station.code)"
-                    class="poi-action"
-                    type="button"
-                    @click="importSaveStation(station, sector.sectorMacro)"
-                  >
-                    {{ t('map.binding_import') }}
-                  </button>
-                  <span v-else-if="isSaveStationBound(station.code)" class="poi-bound-tag">
-                    {{ t('map.binding_already_bound') }}
-                  </span>
                 </div>
               </div>
             </div>
           </div>
         </div>
 
+        <!-- Step 3: Trade Station Binding -->
+        <div v-if="isSectorBound && tradeStationsInSelectedSector.length > 0" class="bind-step">
+          <div class="bind-step-header">
+            <span class="bind-step-number">3</span>
+            <span class="bind-step-title">{{ t('map.binding_bind_tradestation') }}</span>
+            <span v-if="currentGroupBinding?.tradestationCode" class="bind-step-status bind-step-status--done">{{ t('map.binding_tradestation_bound') }}</span>
+          </div>
+          
+          <div v-if="!currentGroupBinding?.tradestationCode" class="bind-step-content">
+            <div class="tradestation-options">
+              <button
+                v-for="ts in tradeStationsInSelectedSector"
+                :key="ts.code"
+                class="tradestation-btn"
+                type="button"
+                @click="bindTradeStation(ts.code)"
+              >
+                {{ ts.code }}
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Idle Stations -->
-        <div v-if="selectedSectorGroupId && idleStations.length > 0" class="map-binding-panel__idle">
+        <div v-if="isSectorBound && idleStations.length > 0" class="map-binding-panel__idle">
           <div class="map-binding-panel__subsection">{{ t('map.binding_idle_stations') }}</div>
           <div class="map-binding-panel__list map-binding-panel__list--compact">
             <div
               v-for="item in idleStations"
               :key="item.station.id"
               class="map-binding-panel__station-item"
+              :class="{ 'map-binding-panel__station-item--dragging': activeDragStationId === item.station.id }"
+              @mousedown="onIdleStationMouseDown($event, item)"
             >
               <div class="map-binding-panel__station-info">
                 <img
@@ -664,14 +896,16 @@ watch(coverageSectorsWithStations, (sectors) => {
                 <div class="map-binding-panel__station-name">{{ item.station.name }}</div>
               </div>
               <div class="map-binding-panel__station-actions">
-                <span class="map-binding-panel__hint-tag">{{ t('map.binding_drag_hint') }}</span>
+                <div class="map-binding-panel__handle" aria-hidden="true">
+                  <span></span><span></span><span></span>
+                </div>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Existing Bindings -->
-        <div v-if="stationBindingsInGroup.length > 0" class="map-binding-panel__bindings">
+        <div v-if="isSectorBound && stationBindingsInGroup.length > 0" class="map-binding-panel__bindings">
           <div class="map-binding-panel__subsection">{{ t('map.binding_existing_bindings') }}</div>
           <div class="map-binding-panel__list map-binding-panel__list--compact">
             <div
@@ -1056,5 +1290,101 @@ watch(coverageSectorsWithStations, (sectors) => {
 
 .poi-bound-tag {
   @apply rounded bg-amber-200/10 px-2 py-1 text-xs text-amber-100/60;
+}
+
+.bind-step {
+  @apply flex flex-col gap-2;
+}
+
+.bind-step--disabled {
+  @apply opacity-50 pointer-events-none;
+}
+
+.bind-step-header {
+  @apply flex items-center gap-2;
+}
+
+.bind-step-number {
+  @apply flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-amber-200/20 text-xs font-semibold text-amber-100;
+}
+
+.bind-step-title {
+  @apply text-sm font-medium text-amber-50;
+}
+
+.bind-step-status {
+  @apply text-xs;
+}
+
+.bind-step-status--done {
+  @apply text-emerald-400;
+}
+
+.bind-step-content {
+  @apply flex flex-col gap-2;
+}
+
+.bind-step-hint {
+  @apply text-xs text-amber-100/50;
+}
+
+.bind-step-clear {
+  @apply h-5 w-5 rounded text-amber-100/50 transition-colors duration-150 hover:bg-amber-200/20 hover:text-amber-50;
+}
+
+.sector-bound-name {
+  @apply text-sm text-amber-100;
+}
+
+.bind-new-sector {
+  @apply flex flex-col gap-2;
+}
+
+.new-sector-form {
+  @apply flex gap-2;
+}
+
+.new-sector-input {
+  @apply flex-1 rounded border border-amber-300/30 bg-black/60 px-2 py-1 text-sm text-amber-50 outline-none;
+}
+
+.new-sector-create {
+  @apply rounded border border-amber-300/30 bg-amber-200/10 px-3 py-1 text-xs text-amber-100 transition-colors duration-150 hover:border-amber-200/60 hover:bg-amber-200/20;
+}
+
+.new-sector-create:disabled {
+  @apply opacity-50 pointer-events-none;
+}
+
+.tradestation-options {
+  @apply flex flex-wrap gap-1;
+}
+
+.tradestation-btn {
+  @apply rounded border border-amber-300/20 px-2 py-1 text-xs text-amber-100 transition-colors duration-150 hover:border-amber-200/50 hover:bg-amber-200/10;
+}
+
+.map-binding-panel__sector-btn--new {
+  @apply border-dashed;
+}
+
+.archive-time {
+  @apply flex flex-col gap-1;
+}
+
+.archive-select {
+  @apply h-8 rounded border border-amber-300/30 bg-black/60 px-2 text-sm text-amber-50 outline-none;
+}
+
+.map-binding-panel__station-item--dragging {
+  @apply opacity-50;
+}
+
+.map-binding-panel__handle {
+  @apply flex flex-col gap-0.5;
+}
+
+.map-binding-panel__handle span {
+  @apply block h-0.5 w-4 rounded-full bg-amber-100/40;
 }
 </style>

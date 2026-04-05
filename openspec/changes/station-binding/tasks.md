@@ -31,11 +31,11 @@
 - [x] 5.2 导入时调用 `empireStore.createStation(...)` 创建独立 empire station
 - [x] 5.3 导入完成后为新 station 建立 `StationSaveBinding`
 
-- [ ] 6. 空闲 empire station 直接放置
+- [x] 6. 空闲 empire station 直接放置
 - [x] 6.1 在目标帝国星区下提供空闲 empire station 列表
-- [ ] 6.2 支持将空闲 empire station 直接拖拽到地图（UI 交互）
-- [ ] 6.3 拖拽后按小空间站尺寸渲染
-- [ ] 6.4 将拖拽得到的 `position: { x, y, z }` 写入 binding，调用 `setStationBindingPosition`
+- [x] 6.2 支持将空闲 empire station 直接拖拽到地图（UI 交互）
+- [x] 6.3 拖拽后按小空间站尺寸渲染（复用现有 placement preview）
+- [x] 6.4 将拖拽得到的 `position: { x, y, z }` 写入 binding，调用 `setStationBindingPosition`
 
 - [x] 7. Binding selector / composable
 - [x] 7.1 新增统一的 binding view-model 层，拼接 `empireStore + saveStore + mapStore`
@@ -44,20 +44,24 @@
 - [x] 7.4 输出目标帝国星区下的可绑定 empire station 与空闲 station 列表
 - [x] 7.5 输出当前 `selectedArchiveTime` 下的 binding 失效提示
 
-- [ ] 8. 地图工作台交互
+- [x] 8. 地图工作台交互
 - [x] 8.1 用 binding 界面替换地图上原帝国空间站弹出界面
-- [ ] 8.2 提供 `selectedArchiveTime` 切换入口（UI 下拉选择不同存档时间）
-- [x] 8.3 实现"三段式"流程：选择 binding -> save 星区列表 -> 跳数过滤结果
+- [x] 8.2 提供 `selectedArchiveTime` 切换入口（UI 下拉选择不同存档时间）
+- [x] 8.3 实现"三段式"流程：选择 binding -> save 星区列表 -> 绑定操作
 - [x] 8.4 进入第三段后自动缩放/平移地图到过滤星区最大范围
-- [ ] 8.5 实现 Bind Hub Mode：为 sectorGroup 绑定 save tradestation 并计算 coverage
 
-- [x] 9. 列表与操作区 UI
-- [x] 9.1 第一段显示 binding plan 选择与创建
-- [x] 9.2 第二段显示 save 星区列表（带搜索、空间站标签）
-- [x] 9.3 第三段显示过滤后的星区与空间站列表（POI 风格）
-- [x] 9.4 底部显示空闲 empire station 列表
-- [x] 9.5 提供解绑与"当前 time 下失效"提示
+- [x] 9. Stage 3 绑定流程
+- [x] 9.1 绑定星区：将 save 星区绑定到帝国星区（选择现有或新建）
+- [x] 9.2 绑定星区后显示该帝国星区的空闲空间站列表
+- [x] 9.3 绑定中转站：将 empire station 绑定到 save tradestation
+- [x] 9.4 绑定空间站：将 save 玩家站绑定到已有 empire station
+- [x] 9.5 导入空间站：将 save 玩家站导入为新 empire station
 
-- [ ] 10. 构建验证
-- [ ] 10.1 完成所有实现后执行 `npm run build`
-- [ ] 10.2 若构建失败，修复后重新构建直至通过或记录 blocker
+- [x] 10. 列表与操作区 UI
+- [x] 10.1 第一段显示 binding plan 选择与创建
+- [x] 10.2 第二段显示 save 星区列表（带搜索、空间站标签）
+- [x] 10.3 第三段显示过滤后的星区与空间站列表（POI 风格）
+
+- [x] 11. 构建验证
+- [x] 11.1 完成所有实现后执行 `npm run build`
+- [x] 11.2 构建通过

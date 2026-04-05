@@ -148,6 +148,7 @@ const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
 const draggingPlacementItem = ref<DraggingPlacementItem | null>(null)
 const draggingOverlayKey = ref<string | null>(null)
+const draggingBindingKey = ref<string | null>(null)
 const focusedPlacementKey = ref<string | null>(null)
 const placementPreview = ref<PlacementPreview | null>(null)
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
@@ -626,7 +627,15 @@ const clearPlacementState = () => {
 
 const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocation) => {
   if (item.kind === 'station') {
-    empireStore.setStationLocation(item.id, location)
+    if (draggingBindingKey.value) {
+      empireStore.setStationBindingPosition(draggingBindingKey.value, item.id, {
+        x: location.pos.x,
+        y: 0,
+        z: location.pos.z
+      })
+    } else {
+      empireStore.setStationLocation(item.id, location)
+    }
     return
   }
   empireStore.setSectorLocation(item.id, location)
@@ -1069,6 +1078,22 @@ const onBindingFitSectors = (sectorMacros: string[]) => {
   }
 }
 
+const onBindingDragStationStart = (payload: { stationId: string; bindingKey: string; name: string; icon: 'factory' | 'shipyard' }) => {
+  draggingPlacementItem.value = {
+    id: payload.stationId,
+    kind: 'station',
+    name: payload.name,
+    icon: payload.icon
+  }
+  draggingOverlayKey.value = null
+  draggingBindingKey.value = payload.bindingKey
+}
+
+const onBindingDragStationEnd = () => {
+  clearPlacementState()
+  draggingBindingKey.value = null
+}
+
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
   if (!payload) {
     saveStore.clearSelection()
@@ -1392,6 +1417,8 @@ onBeforeUnmount(() => {
         @close="onBindingPanelClose"
         @focus-sector="onBindingFocusSector"
         @fit-sectors="onBindingFitSectors"
+        @drag-station-start="onBindingDragStationStart"
+        @drag-station-end="onBindingDragStationEnd"
       />
 
       <div class="map-shell">
