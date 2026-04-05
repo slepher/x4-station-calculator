@@ -105,12 +105,8 @@ function searchModules(query: string): SearchTag[] {
 function searchFactions(query: string): SearchTag[] {
   const normalized = query.toLowerCase()
   const results: SearchTag[] = []
-  const seen = new Set<string>()
   
   for (const faction of gameData.factions) {
-    if (seen.has(faction.id)) continue
-    seen.add(faction.id)
-    
     const label = translateFaction(faction)
     const name = label.toLowerCase()
     const id = faction.id.toLowerCase()
