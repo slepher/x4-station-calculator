@@ -155,7 +155,10 @@ function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]):
       name: empire.name || `Empire ${empireIndex + 1}`,
       sectors,
       sectorLinks,
-      stations
+      stations,
+      saveBindings: Array.isArray((empire as EmpirePlan).saveBindings)
+        ? deepClone((empire as EmpirePlan).saveBindings)
+        : []
     }
   })
 

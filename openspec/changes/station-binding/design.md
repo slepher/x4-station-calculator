@@ -199,8 +199,13 @@ binding UI 放在 `MapWorkbenchView`，原因：
 - 第二段：选择 save sector
   - 展示"存档用户所在空间站所属的所有星区"列表
   - 每个星区显示空间站数量和空间站标签
+  - 已绑定的星区显示 `binding_already_bound` 徽章和 `binding_bound_to: <group name>` 信息
   - 支持搜索过滤
   - 用户点击某个星区后进入第三段
+  - **Free Empire Sectors 列表**：显示所有帝国星区（无论是否已绑定）
+    - 已绑定的星区显示星区 tag（从 `sectorMacro` 解析）和清除按钮（x）
+    - 点击星区卡片进入第三段
+    - 支持拖拽到地图放置
 - 第三段：绑定操作与地图联动
   - **绑定流程（有序依赖）：**
     1. **绑定星区**（前提条件）：将选中的 save 星区绑定到帝国星区
@@ -209,6 +214,8 @@ binding UI 放在 `MapWorkbenchView`，原因：
        - 绑定完成后显示该帝国星区的空闲空间站列表（已绑定 save 站的 empire station 不显示）
     2. **绑定空间站**（任选顺序）：
        - 绑定空间站：将 coverage 内的 save 玩家站绑定到该帝国星区下的已有 empire station
+         - 点击"Bind"按钮弹出选择框，从 idle stations 中选择目标 empire station
+         - 确认后调用 `bindStationToSaveStation` 写入绑定
        - 导入空间站：将 coverage 内的 save 玩家站导入为新的 empire station
        - 绑定中转站：将该帝国星区的 empire station 绑定到 save tradestation
   - 顶部选择跳数（0-5）和存档时间
@@ -263,6 +270,10 @@ binding UI 放在 `MapWorkbenchView`，原因：
 - 一个 save 玩家站在同一 `SaveBindingPlan` 内只能绑定到一个 empire station（store 层强制）
 - `bindStationToSaveStation()` 返回 boolean 表示是否成功
 - 存档时间回退：`selectedArchiveTime === null` 时使用 gameGuid 对应存档组的最新存档
+- `isSaveStationBound(sectorGroupId, saveStationCode)` 需要传入 `sectorGroupId` 参数，因为绑定是按 group 组织的
+- `getStationCandidates` 收集所有 group 的 bound codes 进行去重判断
+- `resolveGroupSaveBinding` 增强校验：`sectorMacro` 和 `tradestationCode` 缺失时返回 `missing_at_selected_time`
+- `isTradestation` 判断改为严格 `=== true`
 
 ### 4.6 Free Sector/Station 拖拽行为
 
@@ -285,20 +296,29 @@ binding UI 放在 `MapWorkbenchView`，原因：
 
 ## 5. Store Action 设计
 
-### 5.1 EmpireStore 中的 SavePlans Action
+### 5.1 EmpireStore 中的 SaveBindings Action
 
 `useEmpireStore` 需要提供明确命令式 action（均以 `gameGuid` 为标识符）：
 
 - `createBinding(gameGuid)` - 创建新的 SaveBindingPlan
 - `getBindingByGameGuid(gameGuid)` - 获取指定 gameGuid 的 binding
 - `getActiveBinding()` - 获取当前激活的 binding
+- `setActiveBinding(gameGuid)` - 设置当前激活的 binding
 - `setSelectedArchiveTime(gameGuid, archiveTime)` - 切换存档时间视角
-- `bindSectorGroupHub(input)` - 绑定星区组的中转站
+- `bindSectorGroup(input)` - 绑定星区组（设置 sectorMacro、jumpRange、coverageSectorMacros）
 - `updateSectorGroupJumpRange(gameGuid, sectorGroupId, jumpRange)` - 更新跳数范围
-- `clearSectorGroupHubBinding(gameGuid, sectorGroupId)` - 清除星区组的中转站绑定
+- `clearSectorGroupBinding(gameGuid, sectorGroupId)` - 清除整个 group binding
+- `getGroupBinding(gameGuid, sectorGroupId)` - 获取指定 group binding
+- `setTradestationBinding(input)` - 设置中转站绑定（saveStationCode）
+- `clearTradestationBinding(gameGuid, sectorGroupId)` - 清除中转站绑定
 - `bindStationToSaveStation(input)` - 绑定 empire station 到 save 玩家站
 - `clearStationBinding(gameGuid, sectorGroupId, stationId)` - 清除 station 绑定
 - `setStationBindingPosition(gameGuid, sectorGroupId, stationId, position)` - 设置 station 的地图位置
+- `setFreeSectorBinding(input)` - 设置 free sector 绑定（sectorMacro、position、free=true）
+- `setFreeStationBinding(input)` - 设置 free station 绑定（sectorMacro、position、free=true）
+- `isSaveStationAlreadyBound(gameGuid, sectorGroupId, saveStationCode)` - 检查 save 站是否已绑定
+- `importSaveStationAsBinding(input)` - 导入 save 站为 binding
+- `deleteBinding(gameGuid)` - 删除整个 binding plan
 
 同时继续负责：
 
@@ -356,7 +376,11 @@ free empire station 拖拽时的落点限制：
 6. 地图自动缩放到过滤范围
 7. **绑定空间站**（任选顺序）：
    - 绑定 save 玩家站到已有 empire station
+     - 点击"Bind"按钮弹出选择框
+     - 从 idle stations 下拉列表中选择目标 empire station
+     - 确认后调用 `bindStationToSaveStation` 写入绑定
    - 导入 save 玩家站为新 empire station
+     - 点击"Import"按钮直接创建新站并写入 binding
    - 绑定 empire station 到 save tradestation
 8. `empireStore` action 写入 group / station binding
 9. selector 自动重算候选、地图显示与当前 time 下的解析状态
@@ -394,3 +418,9 @@ free empire station 拖拽时的落点限制：
 ### 7.5 风险：coverage 计算与高级资源的跳数口径不一致
 
 - 对策：直接复用高级资源功能已有的 `N` 跳拓扑定义与实现口径，避免出现两套 sector 可达性语义
+
+### 7.6 风险：saveBindings 在迁移时被丢弃
+
+- 对策：`normalizeEmpireStateShape` 必须保留 `saveBindings` 字段
+- `migrateEmpireStateToCurrent` 链路中不能丢失 binding 数据
+- 用户点击 Save 时 `saveEmpire()` 会序列化整个 `activeEmpire`（包含 `saveBindings`）到 localStorage
