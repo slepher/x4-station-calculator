@@ -193,7 +193,7 @@ async function processXmlFile(file: File) {
         ref="fileInput"
         type="file"
         class="hidden"
-        accept=".xml,.xml.gz,.json"
+        accept=".xml,.gz,application/gzip,.json"
         @change="handleFileSelect"
       />
     </div>

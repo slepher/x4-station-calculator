@@ -35,13 +35,10 @@ import {
   CURRENT_POST_PROCESSOR_VERSION,
   postProcessRustSaveArchive
 } from '@/workers/saveParser.post'
-import { shouldHideSavePoiSmallIconAtClusterOverview } from '@/components/map/utils/style'
 const SAVE_POI_CATEGORIES: SavePoiCategory[] = ['playerStation', 'npcStation', 'xenonStation', 'khaakStation', 'abandonedShip', 'datavault', 'erlkingVault']
 const SAVE_ARCHIVES_STATE_VERSION = 1
 
-type SavePoiFilterOptions = {
-  excludeConditionalSmallStations?: boolean
-}
+type SavePoiFilterOptions = Record<string, never>
 
 function normalizeVersion(v: string): string {
   const trimmed = v.trim()
@@ -103,8 +100,7 @@ function createDefaultSavePoiVisibility(): Record<SavePoiCategory, boolean> {
 
 function createDefaultSaveArchiveSettings(): SaveArchiveSettings {
   return {
-    visibility: createDefaultSavePoiVisibility(),
-    excludeConditionalSmallStations: true
+    visibility: createDefaultSavePoiVisibility()
   }
 }
 
@@ -123,8 +119,7 @@ function migrateSaveArchiveSettingsToCurrent(raw: unknown): SaveArchiveSettings 
     : defaults.visibility
 
   return {
-    visibility,
-    excludeConditionalSmallStations: parsed.excludeConditionalSmallStations !== false
+    visibility
   }
 }
 
@@ -200,6 +195,8 @@ export function createOverlayItem(
     position: { x: item.position.x, y: item.position.y, z: item.position.z, tx: item.position.tx, ty: item.position.ty },
     tag: isStation && 'tag' in item ? item.tag : undefined,
     factoryGroup: isStation && 'factoryGroup' in item ? item.factoryGroup : undefined,
+    productionProfile: isStation && 'productionProfile' in item ? item.productionProfile : undefined,
+    profileName: isStation && 'profileName' in item ? item.profileName : undefined,
     is_headquarter: isStation && 'is_headquarter' in item ? item.is_headquarter : undefined,
     class: isAbandonedShip ? item.class : undefined,
     purpose: isAbandonedShip && 'purpose' in item ? item.purpose : undefined,
@@ -216,10 +213,12 @@ function shouldIncludePoiItem(
   item: StationEntry | DatavaultEntry | AbandonedShipEntry,
   options?: SavePoiFilterOptions
 ): boolean {
-  if (!options?.excludeConditionalSmallStations) return true
-  return !shouldHideSavePoiSmallIconAtClusterOverview(
-    createOverlayItem(category, sectorMacro, sectorName, item)
-  )
+  void category
+  void sectorMacro
+  void sectorName
+  void item
+  void options
+  return true
 }
 
 export function deriveSavePoiCategoryData(

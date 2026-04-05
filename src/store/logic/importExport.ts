@@ -1205,8 +1205,7 @@ async function applySaveImport(options: ImportApplyOptions, warnings: string[]):
       abandonedShip: false,
       datavault: false,
       erlkingVault: false
-    },
-    excludeConditionalSmallStations: true
+    }
   }
   const currentState = options.saveStore?.savedArchivesState || { version: 1, activeArchiveId: null, list: [], settings: defaultSettings }
 

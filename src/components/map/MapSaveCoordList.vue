@@ -7,11 +7,11 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
+import { getStationPoiLabel } from './savePoiLabel'
 
 const props = defineProps<{
   archive: SaveArchive | null
   category: SavePoiCategory
-  excludeConditionalSmallStations: boolean
 }>()
 
 const emit = defineEmits<{
@@ -38,7 +38,6 @@ interface SectorPoiGroup {
 
 const poiGroups = computed<SectorPoiGroup[]>(() => {
   const categoryData = saveStore.getArchivePoiCategories(props.archive, {
-    excludeConditionalSmallStations: props.excludeConditionalSmallStations
   })[props.category]
 
   return categoryData.groups
@@ -117,6 +116,23 @@ function onPoiClick(poi: SavePoiOverlayItem) {
 function onClearSearch() {
   searchQuery.value = ''
 }
+
+function getPoiLabel(poi: SavePoiOverlayItem): string {
+  if (poi.category === 'abandonedShip') return getShipName(poi)
+  if (
+    poi.category === 'npcStation' ||
+    poi.category === 'playerStation' ||
+    poi.category === 'xenonStation' ||
+    poi.category === 'khaakStation'
+  ) {
+    return getStationPoiLabel(poi, {
+      t,
+      localizedModulesMap: gameData.localizedModulesMap,
+      localizedModuleGroupsMap: gameData.localizedModuleGroupsMap
+    })
+  }
+  return poi.code
+}
 </script>
 
 <template>
@@ -163,7 +179,21 @@ function onClearSearch() {
             class="poi-item"
             @click="onPoiClick(poi)"
           >
-            <span class="poi-code">{{ poi.category === 'abandonedShip' ? getShipName(poi) : poi.code }}</span>
+            <div class="poi-text">
+              <div class="poi-title-row">
+                <span class="poi-code">{{ getPoiLabel(poi) }}</span>
+                <span
+                  v-if="(poi.category === 'playerStation' || poi.category === 'npcStation' || poi.category === 'xenonStation' || poi.category === 'khaakStation') && poi.is_headquarter"
+                  class="poi-badge"
+                >
+                  {{ t('map.save_station_headquarter') }}
+                </span>
+              </div>
+              <span
+                v-if="poi.category === 'npcStation' || poi.category === 'playerStation' || poi.category === 'xenonStation' || poi.category === 'khaakStation'"
+                class="poi-subcode"
+              >{{ poi.code }}</span>
+            </div>
           </div>
         </div>
       </div>
@@ -220,8 +250,24 @@ function onClearSearch() {
   @apply flex items-center gap-2 p-2 rounded cursor-pointer bg-black/45 border border-amber-300/15 hover:bg-amber-200/5 hover:border-amber-200/45 transition-colors;
 }
 
+.poi-text {
+  @apply flex min-w-0 flex-col;
+}
+
+.poi-title-row {
+  @apply flex min-w-0 items-center gap-2;
+}
+
 .poi-code {
-  @apply text-sm text-amber-50 font-medium;
+  @apply truncate text-sm text-amber-50;
+}
+
+.poi-badge {
+  @apply shrink-0 rounded-full border border-emerald-400/30 bg-emerald-500/20 px-2 py-0.5 text-xs font-medium text-emerald-300;
+}
+
+.poi-subcode {
+  @apply text-xs text-amber-100/55;
 }
 
 .poi-coords {

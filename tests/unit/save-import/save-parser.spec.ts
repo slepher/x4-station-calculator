@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import { createSaveParserRuntime } from '../../../src/workers/saveParser.worker'
-import { postProcessRustSaveArchive } from '../../../src/workers/saveParser.post'
+import {
+  CURRENT_POST_PROCESSOR_VERSION,
+  postProcessRustSaveArchive
+} from '../../../src/workers/saveParser.post'
 import { readFile } from 'node:fs/promises'
 import zlib from 'node:zlib'
 
@@ -199,8 +202,205 @@ describe('save parser rust worker enrichment', () => {
     const expectedScale = ((Math.sqrt(3) / 2) * 0.8) / Math.hypot(110, 330)
     expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.tx).toBeCloseTo(110 * expectedScale, 12)
     expect(archive.sectors.cluster_01_sector001_macro.npcStations?.[0]?.position.ty).toBeCloseTo(-330 * expectedScale, 12)
-    expect(archive.meta.post_processor_version).toBe('v4')
+    expect(archive.meta.post_processor_version).toBe(CURRENT_POST_PROCESSOR_VERSION)
     expect(archive.isValid).toBe(true)
+  })
+
+  it('derives npc productionProfile and profileName from production modules', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v2',
+        source: 'original'
+      },
+      isCompatible: true,
+      isValid: true,
+      sectors: {
+        sec: {
+          name: 'sec',
+          is_known: true,
+          npcStations: [
+            {
+              code: 'ENERGY',
+              macro: 'station_energy_macro',
+              owner: 'argon',
+              relative_position: { x: 0, y: 0, z: 0 },
+              modules: [{ ref: 'energy_macro', amount: 1 }]
+            },
+            {
+              code: 'GROUP',
+              macro: 'station_group_macro',
+              owner: 'argon',
+              relative_position: { x: 0, y: 0, z: 0 },
+              modules: [
+                { ref: 'energy_macro', amount: 1 },
+                { ref: 'refined_a_macro', amount: 1 },
+                { ref: 'refined_b_macro', amount: 1 }
+              ]
+            },
+            {
+              code: 'CLUSTER',
+              macro: 'station_cluster_macro',
+              owner: 'argon',
+              relative_position: { x: 0, y: 0, z: 0 },
+              modules: [
+                { ref: 'hightech_macro', amount: 1 },
+                { ref: 'refined_a_macro', amount: 1 },
+                { ref: 'shiptech_macro', amount: 1 }
+              ]
+            },
+            {
+              code: 'MIXED',
+              macro: 'station_mixed_macro',
+              owner: 'argon',
+              relative_position: { x: 0, y: 0, z: 0 },
+              modules: [
+                { ref: 'hightech_macro', amount: 1 },
+                { ref: 'food_macro', amount: 1 }
+              ]
+            }
+          ]
+        }
+      }
+    }, {
+      energy_macro: {
+        id: 'module_gen_prod_energycells_01',
+        macroId: 'energy_macro',
+        wareId: 'module_gen_prod_energycells_01',
+        nameId: '',
+        name: 'Energy Cells Production',
+        type: 'production',
+        group: 'energy'
+      } as any,
+      refined_a_macro: {
+        id: 'module_gen_prod_refinedmetals_01',
+        macroId: 'refined_a_macro',
+        wareId: 'module_gen_prod_refinedmetals_01',
+        nameId: '',
+        name: 'Refined Metals Production',
+        type: 'production',
+        group: 'refined'
+      } as any,
+      refined_b_macro: {
+        id: 'module_gen_prod_graphene_01',
+        macroId: 'refined_b_macro',
+        wareId: 'module_gen_prod_graphene_01',
+        nameId: '',
+        name: 'Graphene Production',
+        type: 'production',
+        group: 'refined'
+      } as any,
+      hightech_macro: {
+        id: 'module_gen_prod_microchips_01',
+        macroId: 'hightech_macro',
+        wareId: 'module_gen_prod_microchips_01',
+        nameId: '',
+        name: 'Microchips Production',
+        type: 'production',
+        group: 'hightech'
+      } as any,
+      shiptech_macro: {
+        id: 'module_gen_prod_hullparts_01',
+        macroId: 'shiptech_macro',
+        wareId: 'module_gen_prod_hullparts_01',
+        nameId: '',
+        name: 'Hull Parts Production',
+        type: 'production',
+        group: 'shiptech'
+      } as any,
+      food_macro: {
+        id: 'module_arg_prod_foodrations_01',
+        macroId: 'food_macro',
+        wareId: 'module_arg_prod_foodrations_01',
+        nameId: '',
+        name: 'Food Rations Production',
+        type: 'production',
+        group: 'food'
+      } as any
+    })
+
+    expect(archive.sectors.sec.npcStations?.find((station) => station.code === 'ENERGY')).toMatchObject({
+      productionProfile: 'module_gen_prod_energycells_01',
+      profileName: 'Energy Cells Production'
+    })
+    expect(archive.sectors.sec.npcStations?.find((station) => station.code === 'GROUP')).toMatchObject({
+      productionProfile: 'refined',
+      profileName: 'refined'
+    })
+    expect(archive.sectors.sec.npcStations?.find((station) => station.code === 'CLUSTER')).toMatchObject({
+      productionProfile: 'shiptech',
+      profileName: 'shiptech'
+    })
+    expect(archive.sectors.sec.npcStations?.find((station) => station.code === 'MIXED')).toMatchObject({
+      productionProfile: 'mixed',
+      profileName: 'Mixed Production'
+    })
+  })
+
+  it('derives player station productionProfile and preserves headquarters flag', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v2',
+        source: 'original'
+      },
+      isCompatible: true,
+      isValid: true,
+      sectors: {
+        sec: {
+          name: 'sec',
+          is_known: true,
+          playerStations: [
+            {
+              code: 'PHQ',
+              macro: 'station_player_hq_macro',
+              owner: 'player',
+              is_headquarter: true,
+              relative_position: { x: 0, y: 0, z: 0 },
+              modules: [
+                { ref: 'energy_macro', amount: 1 },
+                { ref: 'refined_macro', amount: 1 }
+              ]
+            }
+          ]
+        }
+      }
+    }, {
+      energy_macro: {
+        id: 'module_gen_prod_energycells_01',
+        macroId: 'energy_macro',
+        wareId: 'module_gen_prod_energycells_01',
+        nameId: '',
+        name: 'Energy Cells Production',
+        type: 'production',
+        group: 'energy'
+      } as any,
+      refined_macro: {
+        id: 'module_gen_prod_refinedmetals_01',
+        macroId: 'refined_macro',
+        wareId: 'module_gen_prod_refinedmetals_01',
+        nameId: '',
+        name: 'Refined Metals Production',
+        type: 'production',
+        group: 'refined'
+      } as any
+    })
+
+    expect(archive.sectors.sec.playerStations?.[0]).toMatchObject({
+      is_headquarter: true,
+      productionProfile: 'module_gen_prod_refinedmetals_01',
+      profileName: 'Refined Metals Production'
+    })
   })
 
   it('recenters imported positions using the snapped bounding-box center of all zone points in the sector', () => {

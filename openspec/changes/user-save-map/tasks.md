@@ -174,6 +174,19 @@
 - [x] MapSaveCoordList.vue: 使用 position.x, position.z 替代 item.x, item.z
 - [x] SaveDetailPanel.vue: 使用 position.x, position.z 替代 item.x, item.z
 
+### T7.5 Save 面板视觉统一
+
+- [x] MapSavePanel.vue: scrollbar 样式与 resource 面板统一
+- [x] MapSavePanel.vue: 外层、头部、内容区边距与 resource 面板对齐
+
+### T7.6 移除“小条件站点过滤”用户选项
+
+- [x] 移除 MapSavePanel.vue 中“剔除小条件站点” checkbox
+- [x] 移除 SaveArchiveSettings 中 `excludeConditionalSmallStations`
+- [x] useSaveStore.ts: 分类统计与坐标列表不再按该选项过滤
+- [x] MapWorkbenchView.vue: 移除相关 computed / props / events
+- [x] locales / tests: 删除旧文案与旧用例前提
+
 ---
 
 ## Phase 8: Abandoned Ship Icon & Info Enhancement
@@ -220,6 +233,21 @@
 - [x] useSaveStore.ts: 导出 createOverlayItem 函数
 - [x] MapSaveCoordList.vue: 使用 createOverlayItem 替代手动构建
 - [x] 确保列表和地图 tooltip 数据一致
+
+### T8.7 Station productionProfile & unified naming
+
+- [x] saveParser.post.ts: 为 `npcStations` 生成 `productionProfile/profileName`
+- [x] saveParser.post.ts: 为 `playerStations` 生成 `productionProfile/profileName`
+- [x] saveParser.post.ts: `single_cluster` 在处理阶段按优先级落单个 group id，不保留整条链
+- [x] saveParser.post.ts: `xenonStations` / `khaakStations` 不走 `productionProfile`
+- [x] saveParser.post.ts: 升级 `CURRENT_POST_PROCESSOR_VERSION` 到 `v9`
+- [x] types/saveArchive.ts: 为站点与 `SavePoiOverlayItem` 补充 `productionProfile/profileName`
+- [x] savePoiLabel.ts: 抽取统一的站点 i18n 命名解析
+- [x] factory: module id 使用 module i18n，group id 使用 module_group i18n
+- [x] mixed: 使用“综合体”界面文案
+- [x] `weaponplatform`: 使用“武器平台”界面文案
+- [x] `playerStation && is_headquarter=true`: 主名称直接显示“总部”
+- [x] 所有 `is_headquarter=true` 空间站：列表显示绿色“总部”药丸，tooltip 额外显示“总部”行
 
 ---
 

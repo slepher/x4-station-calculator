@@ -68,7 +68,7 @@
 **当** 用户查看分类列表
 **那么** 显示以下 7 个分类：
 - 用户空间站（`playerStations`，无过滤）
-- NPC空间站（`npcStations`，过滤 `tag === 'factory'`）
+- NPC空间站（`npcStations`，无过滤）
 - XEN空间站（`xenonStations`，无过滤）
 - KHA空间站（`khaakStations`，无过滤）
 - 弃船（`abandonedShips`）
@@ -102,6 +102,13 @@
 **前提** 某分类已勾选，兴趣点已显示在地图上
 **当** 用户取消勾选该分类的 checkbox
 **那么** 该分类的所有兴趣点从地图上移除
+
+#### Scenario: 分类数量统计不再受小条件站点过滤影响
+
+**前提** 用户在分类层（L2）
+**当** 分类列表渲染数量
+**那么** 统计基于完整 POI 数据
+**并且** 不存在“剔除小条件站点”用户开关
 
 #### Scenario: checkbox默认状态
 
@@ -137,6 +144,13 @@
 **那么** 坐标按星区名称分组显示
 **并且** 每个坐标项显示 `code` 和坐标值
 **并且** 顶部显示搜索框
+
+#### Scenario: 坐标列表显示完整空间站集合
+
+**前提** 用户进入任意空间站分类的坐标列表层（L3）
+**当** 列表渲染完成
+**那么** 显示该分类全部空间站
+**并且** 不因历史“小条件站点”选项而过滤
 
 #### Scenario: 用户搜索星区
 
@@ -313,6 +327,70 @@
 - code
 - 坐标值
 **并且** tooltip 样式与地图现有 tooltip 一致
+
+#### Scenario: 空间站 tooltip 显示统一本地化命名
+
+**前提** 用户点击 player/npc/xenon/khaak 空间站兴趣点
+**当** tooltip 显示副标题
+**那么** player/npc 空间站按统一站点命名规则显示本地化名称
+**并且** xenon/khaak 空间站使用相同命名入口，但不依赖 `productionProfile`
+
+#### Scenario: 玩家总部名称优先显示总部
+
+**前提** `playerStation.is_headquarter = true`
+**当** 列表项或 tooltip 解析空间站主名称
+**那么** 主名称显示“总部”
+
+#### Scenario: 所有总部空间站显示总部标签
+
+**前提** 任意空间站满足 `is_headquarter = true`
+**当** 列表项和 tooltip 渲染
+**那么** 列表中显示绿色“总部”药丸标签
+**并且** tooltip 中额外显示一行“总部”
+
+---
+
+### Requirement: Save Station Production Profile Naming
+
+玩家与 NPC 空间站的工厂命名基于生产画像生成，用于地图 POI 列表和 tooltip。
+
+#### Scenario: 单一生产模块使用模块本地化名称
+
+**前提** 空间站 `tag = "factory"` 且 `productionProfile` 为单个 `module_id`
+**当** 解析站点名称
+**那么** 使用对应游戏 module 的 i18n 名称
+
+#### Scenario: 单一生产组使用模块组本地化名称
+
+**前提** 空间站 `tag = "factory"` 且 `productionProfile` 为单个 `group id`
+**当** 解析站点名称
+**那么** 使用对应游戏 module_group 的 i18n 名称
+
+#### Scenario: 同簇多组按优先级落单个 group id
+
+**前提** 玩家或 NPC 工厂空间站的生产模块分布在同一优先级簇内
+**当** post-process 计算 `productionProfile`
+**那么** 结果为单个优先级最高的 `group id`
+**并且** 不得保留整条优先级链字符串
+
+#### Scenario: mixed 使用综合体文案
+
+**前提** 空间站 `tag = "factory"` 且 `productionProfile = "mixed"`
+**当** 解析站点名称
+**那么** 显示“综合体”对应的界面 i18n
+
+#### Scenario: xenon 与 khaak 不生成 productionProfile
+
+**前提** 空间站类别为 `xenonStation` 或 `khaakStation`
+**当** post-process 处理站点
+**那么** 不生成 `productionProfile`
+**并且** 命名解析仍通过统一站点 i18n 入口进行
+
+#### Scenario: khaak weaponplatform 使用武器平台文案
+
+**前提** `khaakStation.tag = "weaponplatform"`
+**当** 解析站点名称
+**那么** 使用“武器平台”对应的界面 i18n
 
 #### Scenario: Abandoned Ship Tooltip Ship Name
 

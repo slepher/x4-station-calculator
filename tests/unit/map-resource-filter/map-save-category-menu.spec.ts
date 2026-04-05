@@ -35,7 +35,7 @@ describe('MapSaveCategoryMenu', () => {
     setActivePinia(createPinia())
   })
 
-  it('counts only persistent POIs in category totals when culling is enabled', () => {
+  it('counts all station POIs in category totals', () => {
     const archive: SaveArchive = {
       meta: {
         guid: 'g1',
@@ -79,8 +79,6 @@ describe('MapSaveCategoryMenu', () => {
     const wrapper = mount(MapSaveCategoryMenu, {
       props: {
         archive,
-        excludeConditionalSmallStations: true,
-        isClusterOverview: false,
         visibility: {
           playerStation: false,
           npcStation: false,
@@ -94,7 +92,6 @@ describe('MapSaveCategoryMenu', () => {
     })
 
     expect(wrapper.text()).toContain('map.save_category_npc_station')
-    expect(wrapper.text()).toContain('(1)')
-    expect(wrapper.text()).not.toContain('(2)')
+    expect(wrapper.text()).toContain('(2)')
   })
 })

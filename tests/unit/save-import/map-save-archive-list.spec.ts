@@ -33,8 +33,7 @@ const createMockStore = (overrides = {}) => ({
         abandonedShip: false,
         datavault: false,
         erlkingVault: false
-      },
-      excludeConditionalSmallStations: false
+      }
     }
   },
   ...overrides
@@ -173,8 +172,7 @@ describe('MapSaveArchiveList active archive highlighting', () => {
             abandonedShip: false,
             datavault: false,
             erlkingVault: false
-          },
-          excludeConditionalSmallStations: false
+          }
         }
       }
     })

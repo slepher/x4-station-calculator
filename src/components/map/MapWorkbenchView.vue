@@ -270,11 +270,6 @@ const activeMapArchive = computed<SaveArchive | null>(() =>
   saveStore.selectedArchive
 )
 
-const excludeConditionalSmallStations = computed({
-  get: () => saveStore.savedArchivesState.settings.excludeConditionalSmallStations,
-  set: (value: boolean) => saveStore.updateSettings({ excludeConditionalSmallStations: value })
-})
-
 const savePoiVisibility = computed<SavePoiVisibility>({
   get: () => saveStore.savedArchivesState.settings.visibility,
   set: (value) => saveStore.updateSettings({ visibility: value })
@@ -288,9 +283,7 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
   )
 
   return saveStore
-    .getArchivePoiOverlays(activeMapArchive.value, activeCategories, {
-      excludeConditionalSmallStations: excludeConditionalSmallStations.value
-    })
+    .getArchivePoiOverlays(activeMapArchive.value, activeCategories)
     .map((overlay) => {
       const resolved = mapStore.resolveSectorByMacro?.(overlay.sectorMacro) ||
         resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, overlay.sectorMacro)
@@ -1340,13 +1333,11 @@ onBeforeUnmount(() => {
         :open="isSavePanelOpen"
         :archive="activeMapArchive"
         :visibility="savePoiVisibility"
-        :exclude-conditional-small-stations="excludeConditionalSmallStations"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
         @select-archive-and-navigate="onSaveSelectArchiveAndNavigate"
         @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
-        @exclude-conditional-small-stations-change="excludeConditionalSmallStations = $event"
         @focus-poi="onSavePoiFocus"
       />
 

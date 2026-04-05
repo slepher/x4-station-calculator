@@ -99,8 +99,7 @@ describe('save store versioning', () => {
           abandonedShip: false,
           datavault: false,
           erlkingVault: false
-        },
-        excludeConditionalSmallStations: true
+        }
       }
     })
 
@@ -142,8 +141,7 @@ describe('save store versioning', () => {
           abandonedShip: false,
           datavault: false,
           erlkingVault: false
-        },
-        excludeConditionalSmallStations: true
+        }
       }
     })
     dbMocks.loadArchiveDetailFromDB.mockResolvedValue({
@@ -216,8 +214,7 @@ describe('save store versioning', () => {
           abandonedShip: false,
           datavault: false,
           erlkingVault: false
-        },
-        excludeConditionalSmallStations: true
+        }
       }
     })
     dbMocks.loadArchiveDetailFromDB.mockResolvedValue(null)
@@ -241,11 +238,9 @@ describe('save store versioning', () => {
     const saveStore = useSaveStore()
     await saveStore.initialize()
 
-    expect(saveStore.savedArchivesState.settings.excludeConditionalSmallStations).toBe(true)
     expect(saveStore.savedArchivesState.settings.visibility.playerStation).toBe(false)
 
     saveStore.updateSettings({
-      excludeConditionalSmallStations: false,
       visibility: {
         ...saveStore.savedArchivesState.settings.visibility,
         playerStation: true,
@@ -254,7 +249,6 @@ describe('save store versioning', () => {
     })
 
     const persisted = JSON.parse(localStorage.getItem('x4_save_archives') || '{}') as SavedSaveArchivesState
-    expect(persisted.settings.excludeConditionalSmallStations).toBe(false)
     expect(persisted.settings.visibility.playerStation).toBe(true)
     expect(persisted.settings.visibility.datavault).toBe(true)
     expect(persisted.activeArchiveId).toBeNull()

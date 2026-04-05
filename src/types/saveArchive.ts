@@ -95,6 +95,8 @@ export interface AggregatedStationModule {
   group?: string
 }
 
+export type NpcProductionProfile = string
+
 export interface AggregatedEquipment {
   type: 'shields' | 'turrets'
   ref: string
@@ -122,6 +124,8 @@ export interface PlayerStationEntry extends StationBaseEntry {
   isEquipmentdock?: boolean
   isFactory?: boolean
   factoryGroup?: string
+  productionProfile?: NpcProductionProfile
+  profileName?: string
   isPiratebase?: boolean
   isDefencemodule?: boolean
 }
@@ -135,6 +139,8 @@ export interface NpcStationEntry extends StationBaseEntry {
   isTradestation?: boolean
   isFactory?: boolean
   factoryGroup?: string
+  productionProfile?: NpcProductionProfile
+  profileName?: string
   isPiratebase?: boolean
   isDefencemodule?: boolean
   isNest?: boolean
@@ -241,7 +247,6 @@ export type SavePoiVisibility = Record<SavePoiCategory, boolean>
 
 export interface SaveArchiveSettings {
   visibility: SavePoiVisibility
-  excludeConditionalSmallStations: boolean
 }
 
 export interface SavePoiOverlayItem {
@@ -254,6 +259,8 @@ export interface SavePoiOverlayItem {
   position: SaveSectorStaticPosition
   tag?: string
   factoryGroup?: string
+  productionProfile?: string
+  profileName?: string
   is_headquarter?: boolean
   class?: string
   purpose?: string

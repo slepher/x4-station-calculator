@@ -105,6 +105,8 @@ interface SavePoiOverlayItem {
   sectorName: string
   pos: { x: number; z: number }
   tag?: string             // 空间站类型标签，用于图标选择
+  productionProfile?: string
+  profileName?: string
   is_headquarter?: boolean // 是否为总部，影响图标选择
 }
 ```
@@ -157,6 +159,51 @@ watch([isSavePanelOpen, selectedSaveArchive], () => {
   }
 })
 ```
+
+---
+
+### D5.1: 移除“小条件站点过滤”用户选项
+
+**决策**：移除 save 面板中的“剔除小条件站点”开关，分类菜单、坐标列表、POI 列表统计始终显示完整数据。
+
+**说明**：
+- 该选项最初用于用户侧性能开关，但当前不再暴露给用户
+- `SaveArchiveSettings` 中仅保留 `visibility`
+- 地图覆盖层内部如仍需按视口做小图标动态隐藏，属于渲染层优化，不再由用户设置驱动
+
+---
+
+### D5.2: 空间站生产画像与 i18n 命名
+
+**决策**：在 post-process 阶段为玩家/NPC 空间站生成 `productionProfile`，并在 save POI 列表与 tooltip 统一使用同一命名解析函数。
+
+**范围**：
+- `playerStations`：计算 `productionProfile` / `profileName`
+- `npcStations`：计算 `productionProfile` / `profileName`
+- `xenonStations` / `khaakStations`：不计算 `productionProfile`
+
+**productionProfile 规则**：
+- 单一生产模块：写 `module_id`
+- 同组多模块：写单个 `group id`
+- 同簇多组：不保留整条优先级链，直接按优先级落单个 `group id`
+  - 技术簇：`shiptech > hightech > refined`
+  - 生活簇：`pharmaceutical > agricultural > food > water`
+- 跨簇混合：写 `mixed`
+- `energy` 从分组判断中剔除；若仅有 `energycells` 生产，则仍按单模块处理
+
+**显示规则**：
+- `tag="factory"`:
+  - `module_id` → 使用游戏 module i18n
+  - `group id` → 使用游戏 module_group i18n
+  - `mixed` → 使用界面 i18n “综合体”
+- `tag!="factory"`：使用 tag 对应的界面 i18n
+- `khaakStation` 的 `tag="weaponplatform"` → 使用“武器平台”
+
+**总部特例**：
+- `playerStation && is_headquarter=true`：主名称直接显示“总部”
+- 所有空间站（player/npc/xenon/khaak）若 `is_headquarter=true`：
+  - 列表显示绿色药丸“总部”标签
+  - tooltip 额外显示一行“总部”
 
 ---
 

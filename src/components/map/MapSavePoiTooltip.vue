@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
+import { getStationPoiLabel } from './savePoiLabel'
 
 const props = defineProps<{
   poi: SavePoiOverlayItem
@@ -30,6 +31,22 @@ const categoryLabels: Record<string, string> = {
 const categoryLabel = computed(() => {
   const key = categoryLabels[props.poi.category]
   return key ? t(key) : props.poi.category
+})
+
+const subtitleLabel = computed(() => {
+  if (
+    props.poi.category === 'npcStation' ||
+    props.poi.category === 'playerStation' ||
+    props.poi.category === 'xenonStation' ||
+    props.poi.category === 'khaakStation'
+  ) {
+    return getStationPoiLabel(props.poi, {
+      t,
+      localizedModulesMap: gameDataStore.localizedModulesMap,
+      localizedModuleGroupsMap: gameDataStore.localizedModuleGroupsMap
+    })
+  }
+  return categoryLabel.value
 })
 
 function formatCoordKm(value: number | undefined): string {
@@ -64,13 +81,20 @@ const shipName = computed(() => {
     <div class="tooltip-header">
       <div class="tooltip-title-block">
         <div class="tooltip-title">{{ poi.code }}</div>
-        <div class="tooltip-subtitle">{{ categoryLabel }}</div>
+        <div class="tooltip-subtitle">{{ subtitleLabel }}</div>
       </div>
       <button class="tooltip-close" type="button" @click="emit('close')">×</button>
     </div>
     <div v-if="shipName" class="tooltip-row">
       <span class="tooltip-label">{{ t('map.save_poi_tooltip_ship_name') }}:</span>
       <span class="tooltip-value">{{ shipName }}</span>
+    </div>
+    <div
+      v-if="(poi.category === 'playerStation' || poi.category === 'npcStation' || poi.category === 'xenonStation' || poi.category === 'khaakStation') && poi.is_headquarter"
+      class="tooltip-row"
+    >
+      <span class="tooltip-label">{{ t('map.save_station_headquarter') }}:</span>
+      <span class="tooltip-value">{{ t('map.save_station_headquarter') }}</span>
     </div>
     <div v-if="poi.owner" class="tooltip-row">
       <span class="tooltip-label">{{ t('map.save_poi_tooltip_owner') }}:</span>

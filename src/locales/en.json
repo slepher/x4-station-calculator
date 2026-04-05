@@ -185,7 +185,6 @@
     "save_panel_button": "Save",
     "save_panel_close": "Close",
     "save_panel_hint": "Check categories to show POIs on map. Click category for details.",
-    "save_exclude_small_station_toggle": "Exclude conditional small stations",
     "save_invalid_archive_hint": "This archive is invalid and cannot open category details. Re-import the raw save file.",
     "save_breadcrumb_root": "Saves",
     "save_archives_loaded": "archives loaded",
@@ -209,7 +208,19 @@
     "save_poi_tooltip_code": "Code",
     "save_poi_tooltip_coords": "Coords",
     "save_poi_tooltip_ship_name": "Ship",
-    "save_poi_tooltip_sector": "Sector"
+    "save_poi_tooltip_sector": "Sector",
+    "save_npc_profile_mixed": "Complex",
+    "save_station_headquarter": "Headquarters",
+    "save_npc_tag_factory": "Factory",
+    "save_npc_tag_shipyard": "Shipyard",
+    "save_npc_tag_wharf": "Wharf",
+    "save_npc_tag_equipmentdock": "Equipment Dock",
+    "save_npc_tag_tradestation": "Trade Station",
+    "save_npc_tag_piratebase": "Pirate Base",
+    "save_npc_tag_defencemodule": "Defense Station",
+    "save_npc_tag_weaponplatform": "Weapon Platform",
+    "save_npc_tag_nest": "Nest",
+    "save_npc_tag_hive": "Hive"
   },
   "ship_build": {
     "title": "Ship Build",

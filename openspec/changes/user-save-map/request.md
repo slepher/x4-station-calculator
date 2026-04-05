@@ -18,20 +18,22 @@
 | 层级 | 内容 | 面包屑显示 |
 |------|------|-----------|
 | L1 | 存档列表（含上传功能） | 存档 |
-| L2 | 5个分类子菜单（带checkbox） | 存档 → 存档名 |
+| L2 | 7个分类子菜单（带checkbox） | 存档 → 存档名 |
 | L3 | 坐标列表（按星区分组，带搜索） | 存档 → 存档名 → 分类名 |
 
-### 5个分类子菜单
+### 7个分类子菜单
 
-将 `stations` 按 `owner` 字段拆分：
+按 post-process 后的兴趣点分组展示：
 
 | 序号 | 分类名 | 数据来源 | 筛选条件 |
 |------|--------|----------|----------|
-| 1 | 玩家空间站 | `stations` | `owner === 'player'` |
-| 2 | 势力空间站 | `stations` | `owner !== 'player' && is_headquarter === true` |
-| 3 | 弃船 | `abandonedShips` | 全部 |
-| 4 | 日志数据仓库 | `datavaults` | 全部 |
-| 5 | 妖王配件数据仓库 | `erlkingVaults` | 全部 |
+| 1 | 玩家空间站 | `playerStations` | 全部 |
+| 2 | 势力空间站 | `npcStations` | 全部 |
+| 3 | Xenon空间站 | `xenonStations` | 全部 |
+| 4 | Khaak空间站 | `khaakStations` | 全部 |
+| 5 | 弃船 | `abandonedShips` | 全部 |
+| 6 | 日志数据仓库 | `datavaults` | 全部 |
+| 7 | 妖王配件数据仓库 | `erlkingVaults` | 全部 |
 
 **is_headquarter 判定规则**：
 - 仅对玩家空间站（`owner === 'player'`）生效
@@ -68,6 +70,30 @@
 - 点击地图上兴趣点 → 显示 tooltip
 - Tooltip 内容：分类名、owner、坐标、code 等
 
+### 空间站命名与生产画像
+
+- 对 `playerStations` 与 `npcStations` 在 post-process 阶段补充 `productionProfile` / `profileName`
+- `xenonStations` 与 `khaakStations` 不计算 `productionProfile`
+- `productionProfile` 规则：
+  - 单一生产模块：写 `module_id`
+  - 同一 `group` 的多种生产模块：写单个 `group id`
+  - 落在同一优先级簇的多 `group`：按优先级落单个 `group id`
+    - 技术簇优先级：`shiptech > hightech > refined`
+    - 生活簇优先级：`pharmaceutical > agricultural > food > water`
+  - 跨簇混合：写 `mixed`
+- `energy` 不参与分组判断；若仅生产 `energycells`，仍按单一模块处理
+- 地图 POI 列表与 tooltip 使用同一套 i18n 命名规则：
+  - `tag="factory"`:
+    - `module_id` → 游戏 module i18n
+    - `group id` → 游戏 module_group i18n
+    - `mixed` → 显示“综合体”
+  - `tag!="factory"`：使用 tag 对应的界面 i18n
+  - `khaakStation` 的 `tag="weaponplatform"` → 显示“武器平台”
+- `is_headquarter=true` 时：
+  - 玩家空间站名称直接显示“总部”
+  - 所有空间站在列表中额外显示绿色“总部”药丸标签
+  - 所有空间站在 tooltip 中额外显示一行“总部”
+
 ### UI风格
 
 - 复用地图现有 amber/深色主题
@@ -97,7 +123,7 @@
 
 1. 地图底部显示"存档"按钮，与"资源/空间站"按钮并列
 2. 点击存档按钮，侧边栏显示存档上传区域和存档分组列表
-3. 点击存档项，侧边栏切换为 5 个分类子菜单，面包屑显示"存档 → 存档名"
+3. 点击存档项，侧边栏切换为 7 个分类子菜单，面包屑显示"存档 → 存档名"
 4. 勾选 checkbox，对应类别的兴趣点显示在地图上（小圆点标记）
 5. 取消勾选 checkbox，对应类别的兴趣点从地图上移除
 6. 点击分类右侧箭头按钮，侧边栏切换为坐标列表（按星区分组），面包屑显示"存档 → 存档名 → 分类名"
@@ -108,7 +134,9 @@
 11. 点击地图上兴趣点，显示 tooltip（包含分类名、owner、坐标等基本信息）
 12. 面包屑导航可点击返回上一层
 13. 各分类使用不同颜色标记区分
-14. UI 风格与地图现有 amber/深色主题一致
+14. 玩家/NPC 空间站在地图 POI 列表与 tooltip 中按 `productionProfile` 规则显示本地化命名
+15. 玩家总部名称显示为“总部”，所有 `is_headquarter=true` 的空间站额外显示“总部”标签与 tooltip 行
+16. UI 风格与地图现有 amber/深色主题一致，save 面板 scrollbar 与 resource 面板统一
 
 ## 未决项
 

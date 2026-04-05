@@ -50,7 +50,7 @@ describe('MapSaveCoordList', () => {
     setActivePinia(createPinia())
   })
 
-  it('filters non-persistent small station icons from the displayed POI list when culling is enabled', () => {
+  it('shows all station POIs without culling small conditional icons', () => {
     const archive: SaveArchive = {
       meta: {
         guid: 'g1',
@@ -94,14 +94,13 @@ describe('MapSaveCoordList', () => {
     const wrapper = mount(MapSaveCoordList, {
       props: {
         archive,
-        category: 'npcStation',
-        excludeConditionalSmallStations: true
+        category: 'npcStation'
       }
     })
 
     const text = wrapper.text()
     expect(text).toContain('SHIP')
-    expect(text).not.toContain('FAC')
+    expect(text).toContain('FAC')
   })
 
   it('shows localized ship name for abandoned ships instead of code', async () => {
@@ -141,8 +140,7 @@ describe('MapSaveCoordList', () => {
     const wrapper = mount(MapSaveCoordList, {
       props: {
         archive,
-        category: 'abandonedShip',
-        excludeConditionalSmallStations: false
+        category: 'abandonedShip'
       }
     })
 
@@ -189,8 +187,7 @@ describe('MapSaveCoordList', () => {
     const wrapper = mount(MapSaveCoordList, {
       props: {
         archive,
-        category: 'abandonedShip',
-        excludeConditionalSmallStations: false
+        category: 'abandonedShip'
       }
     })
 

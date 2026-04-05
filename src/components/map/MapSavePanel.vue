@@ -11,7 +11,6 @@ const props = defineProps<{
   open: boolean
   archive: SaveArchive | null
   visibility: SavePoiVisibility
-  excludeConditionalSmallStations: boolean
 }>()
 
 const emit = defineEmits<{
@@ -20,7 +19,6 @@ const emit = defineEmits<{
   (e: 'select-archive-and-navigate', payload: { guid: string; time: number }): void
   (e: 'visibility-change', visibility: SavePoiVisibility): void
   (e: 'active-category-change', category: SavePoiCategory | null): void
-  (e: 'exclude-conditional-small-stations-change', value: boolean): void
   (e: 'focus-poi', poi: SavePoiOverlayItem): void
 }>()
 
@@ -106,10 +104,6 @@ function onPoiFocus(poi: SavePoiOverlayItem) {
   emit('focus-poi', poi)
 }
 
-function onExcludeConditionalSmallStationsChange(event: Event) {
-  emit('exclude-conditional-small-stations-change', (event.target as HTMLInputElement).checked)
-}
-
 function onClose() {
   emit('active-category-change', null)
   emit('close')
@@ -161,7 +155,6 @@ watch(() => props.archive, (archive) => {
         v-else-if="layer === 'category'"
         :archive="archive"
         :visibility="visibility"
-        :exclude-conditional-small-stations="excludeConditionalSmallStations"
         @visibility-change="onVisibilityChange"
         @select-category="onCategorySelect"
       />
@@ -170,19 +163,9 @@ watch(() => props.archive, (archive) => {
         v-else-if="layer === 'coord'"
         :archive="archive"
         :category="selectedCategory!"
-        :exclude-conditional-small-stations="excludeConditionalSmallStations"
         @focus-poi="onPoiFocus"
       />
     </div>
-
-    <label v-if="archive" class="map-save-panel__toggle">
-      <input
-        type="checkbox"
-        :checked="excludeConditionalSmallStations"
-        @change="onExcludeConditionalSmallStationsChange"
-      />
-      <span>{{ t('map.save_exclude_small_station_toggle') }}</span>
-    </label>
 
     <div class="map-save-panel__hint">
       {{ t('map.save_panel_hint') }}
@@ -192,12 +175,12 @@ watch(() => props.archive, (archive) => {
 
 <style scoped>
 .map-save-panel {
-  @apply flex h-full w-[360px] shrink-0 flex-col overflow-hidden rounded-lg border border-amber-300/35 bg-black/80 p-4 text-amber-50;
-  backdrop-filter: blur(10px);
+  @apply flex h-full w-[360px] shrink-0 flex-col overflow-hidden rounded-lg border border-amber-300/35 bg-black/60 py-3 px-0 text-amber-50;
+  backdrop-filter: blur(8px);
 }
 
 .map-save-panel__header {
-  @apply mb-3 flex shrink-0 items-center justify-between gap-3;
+  @apply mb-3 flex shrink-0 items-center justify-between gap-3 border-b border-amber-300/15 px-3 pb-3;
 }
 
 .map-save-panel__close {
@@ -205,35 +188,30 @@ watch(() => props.archive, (archive) => {
 }
 
 .map-save-panel__body {
-  @apply min-h-0 flex-1 overflow-y-auto pr-1;
-  scrollbar-color: rgba(251, 191, 36, 0.5) rgba(255, 255, 255, 0.06);
+  @apply min-h-0 flex-1 overflow-y-auto px-3;
+  scrollbar-gutter: stable both-edges;
+  scrollbar-color: rgba(251, 191, 36, 0.55) rgba(15, 23, 42, 0.25);
   scrollbar-width: thin;
 }
 
 .map-save-panel__body::-webkit-scrollbar {
-  width: 10px;
+  width: 6px;
 }
 
 .map-save-panel__body::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.05);
-  border-radius: 9999px;
+  @apply rounded-full bg-slate-900/35;
 }
 
 .map-save-panel__body::-webkit-scrollbar-thumb {
-  background: linear-gradient(180deg, rgba(252, 211, 77, 0.65), rgba(245, 158, 11, 0.55));
-  border-radius: 9999px;
-  border: 2px solid rgba(0, 0, 0, 0.35);
+  @apply rounded-full bg-amber-300/45;
+}
+
+.map-save-panel__body::-webkit-scrollbar-thumb:hover {
+  @apply bg-amber-200/60;
 }
 
 .map-save-panel__hint {
-  @apply pt-2 text-xs text-amber-100/60;
+  @apply px-3 pt-2 text-xs text-amber-100/60;
 }
 
-.map-save-panel__toggle {
-  @apply mt-3 flex items-center gap-2 text-sm text-amber-100/85;
-}
-
-.map-save-panel__toggle input[type="checkbox"] {
-  @apply h-4 w-4 accent-amber-400 rounded border-amber-300/30;
-}
 </style>

@@ -185,7 +185,6 @@
     "save_panel_button": "存档",
     "save_panel_close": "关闭",
     "save_panel_hint": "勾选分类在地图上显示兴趣点，点击分类查看详情。",
-    "save_exclude_small_station_toggle": "剔除条件小站点",
     "save_invalid_archive_hint": "该存档已无效，不能进入分类详情。请重新导入原始存档文件。",
     "save_breadcrumb_root": "存档",
     "save_archives_loaded": "个存档已加载",
@@ -209,7 +208,19 @@
     "save_poi_tooltip_code": "编号",
     "save_poi_tooltip_coords": "坐标",
     "save_poi_tooltip_ship_name": "飞船",
-    "save_poi_tooltip_sector": "星区"
+    "save_poi_tooltip_sector": "星区",
+    "save_npc_profile_mixed": "综合体",
+    "save_station_headquarter": "总部",
+    "save_npc_tag_factory": "工厂",
+    "save_npc_tag_shipyard": "船厂",
+    "save_npc_tag_wharf": "码头",
+    "save_npc_tag_equipmentdock": "设备站",
+    "save_npc_tag_tradestation": "贸易站",
+    "save_npc_tag_piratebase": "海盗基地",
+    "save_npc_tag_defencemodule": "防御平台",
+    "save_npc_tag_weaponplatform": "武器平台",
+    "save_npc_tag_nest": "巢穴",
+    "save_npc_tag_hive": "蜂巢"
   },
   "ship_build": {
     "title": "船只建造",
