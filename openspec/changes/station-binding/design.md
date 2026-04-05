@@ -1,0 +1,309 @@
+# station-binding 设计说明
+
+## 设计目标
+
+在不污染现有 `EmpirePlan` / `StationPlan` 本体的前提下，引入独立的 `SaveBinding` 关系层，并用它替换原地图上的 empire station 弹出放置工作流，使地图工作台能够完成：
+
+- empire 绑定某个 `gameGuid`
+- 在该 binding 视角下，为 `sectorGroup` 绑定 save `tradestation`
+- 基于 hub binding 计算 `N` 跳 coverage
+- 将 coverage 内 save 玩家空间站绑定到已有 empire station
+- 或直接导入为新的 empire station
+- 或将空闲 empire station 直接拖拽到地图上并仅在 binding 里保存位置
+- 在同一 `gameGuid` 的不同 `archiveTime` 间切换视角，并提示当前 time 下的 binding 失效
+
+## 1. 架构分层
+
+### 1.1 基础事实层
+
+- `useEmpireStore`
+  - 保存 `sectorGroup`、group 内 station、hub station
+  - 提供新建 empire station 的能力
+- `useSaveStore`
+  - 提供按 `gameGuid + time` 读取 archive、save `tradestation`、玩家空间站 POI 与查找能力
+- `useMapStore`
+  - 提供 sector 邻接图、sector 定位与跳数搜索能力
+- `useEmpireSavePlanStore`
+  - 独立保存 `SaveBindingPlan`
+  - 负责 `empireId + gameGuid` 唯一键下的 binding 持久化
+
+### 1.2 派生查询层
+
+新增 binding selector/composable，例如 `useMapBindingViewModel`，负责：
+
+- 当前 empire 的 `SaveBindingPlan` 列表与当前激活 binding
+- 当前 binding 视角对应的 `selectedArchiveTime`
+- “用户所在空间站所属星区”列表
+- 某个选中 save 星区在指定跳数下的过滤星区列表、空间站列表与地图包围盒
+- 当前 group binding 与 station binding
+- save `tradestation` 候选列表
+- `jumpRange` 对应的 `coverageSectorMacros`
+- 当前 group 下各规划站的合法候选 save 玩家站
+- coverage 内可直接导入的新站候选
+- 当前帝国星区下的空闲 empire station 列表
+- 当前 time 下的失效结果与非法原因
+
+该层统一从 `empireStore + saveStore + mapStore + empireSavePlanStore` 派生，不允许页面组件自己分散拼接。
+
+### 1.3 交互状态层
+
+交互态保留在地图工作台本地，例如 `MapWorkbenchView`：
+
+- `bindingMode: 'idle' | 'bind-hub' | 'bind-station'`
+- `selectedBindingKey`
+- `selectedSectorGroupId`
+- `selectedSaveSectorMacro`
+- `selectedJumpRange`
+- `selectedStationId`
+- `previewHubPoiKey`
+- `previewCoverageSectorMacros`
+- `previewStationPoiKey`
+
+这类状态不进入持久化。
+
+## 2. 数据模型
+
+### 2.1 EmpireSavePlan State
+
+新增独立持久化结构：
+
+```ts
+interface EmpireSavePlanState {
+  version: number
+  activeBindingKeyByEmpire: Record<string, string | null>
+  list: SaveBindingPlan[]
+}
+```
+
+### 2.2 SaveBindingPlan
+
+```ts
+interface SaveBindingPlan {
+  key: string // `${empireId}:${gameGuid}`
+  empireId: string
+  gameGuid: string
+  selectedArchiveTime: number | null
+  groupBindings: GroupSaveBinding[]
+  stationBindings: StationSaveBinding[]
+}
+```
+
+语义约束：
+
+- `key = empireId + gameGuid`
+- `selectedArchiveTime` 只是当前查看快照，不参与唯一键
+- 同一 empire 下可有多个 `gameGuid` binding
+
+### 2.3 Group Binding
+
+```ts
+interface GroupSaveBinding {
+  sectorGroupId: string
+  tradestationCode: string
+  sectorMacro: string
+  jumpRange: number
+  coverageSectorMacros: string[]
+}
+```
+
+语义约束：
+
+- 一个 `sectorGroup` 在同一个 `SaveBindingPlan` 内最多绑定一个 save `tradestation`
+- `coverageSectorMacros` 是 group 级持久化快照
+
+### 2.4 Station Binding
+
+```ts
+interface StationSaveBinding {
+  stationId: string
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+```
+
+语义约束：
+
+- 一个 empire station 在同一个 `SaveBindingPlan` 内最多绑定一个 save 玩家站
+- 一个 save 玩家站在同一个 `SaveBindingPlan` 内最多绑定到一个 empire station
+- 当 `saveStationCode` 为空且存在 `position` 时，表示该 empire station 作为空闲站被直接放置到地图上
+- 当 `saveStationCode` 存在且目标在当前 time 下失效时，`position` 仍可单独用于地图显示
+
+### 2.5 时间态解析结果
+
+`missing / stale` 不写入持久化结构，而作为运行态派生结果：
+
+```ts
+interface ResolvedGroupSaveBinding extends GroupSaveBinding {
+  status: 'ok' | 'missing_at_selected_time'
+}
+
+interface ResolvedStationSaveBinding extends StationSaveBinding {
+  status: 'ok' | 'missing_at_selected_time'
+}
+```
+
+这样切换 `selectedArchiveTime` 时，只变化解析结果，不改写 binding 本体。
+
+## 3. Coverage 算法
+
+### 3.1 输入
+
+- 当前 `SaveBindingPlan` 下某个 `GroupSaveBinding` 的 `sectorMacro`
+- 用户配置的 `jumpRange`
+- 地图 store 提供的 sector 邻接图
+
+### 3.2 输出
+
+- `coverageSectorMacros: string[]`
+
+### 3.3 算法原则
+
+- 采用 sector 图上的 BFS / 最短跳数搜索
+- 起点星区跳数为 `0`
+- 满足 `distance <= jumpRange` 的 sector 全部计入 coverage
+- 输出需去重并保持稳定顺序，便于 diff 与持久化
+- `N` 跳拓扑定义与高级资源功能保持一致，复用同一套 cluster / sector 可达性规则
+
+## 4. UI 组织
+
+### 4.1 宿主位置
+
+binding UI 放在 `MapWorkbenchView`，原因：
+
+- 当前地图工作台已经同时具备规划 overlay 与 save POI
+- binding 动作依赖地图空间上下文，不适合塞进普通表单弹窗
+- 可以直接复用现有 map pan / focus / overlay / tooltip 基础能力
+
+### 4.2 两段式布局
+
+- 第一段：save 星区列表
+  - 展示“存档用户所在空间站所属的所有星区”列表
+  - 用户点击某个星区后进入第二段
+- 第二段：过滤结果与地图联动
+  - 顶部选择跳数
+  - 主列表展示该星区 `N` 跳以内的星区与空间站
+  - 地图自动缩放/平移到可显示全部过滤星区的最大范围
+  - 用户再选择目标帝国星区
+  - 底部展示该帝国星区下的空闲 empire station 列表
+  - 右侧或下方操作区提供：
+    - 绑定到已有 empire station
+    - 导入为新的 empire station
+    - 绑定帝国星区中转
+    - 将空闲 empire station 拖到地图
+
+### 4.3 模式切换
+
+#### Bind Hub Mode
+
+- 用户先选中一个 `SaveBindingPlan`
+- 再选中一个 `sectorGroup`
+- 地图主打亮 save `tradestation` 候选
+- 点击候选后，右侧 inspector 显示：
+  - `stationCode`
+  - 所在 sector
+  - 当前 `jumpRange`
+  - 预计 coverage
+- 确认后写入 `GroupSaveBinding`
+
+#### Bind Station Mode
+
+- 用户先选中一个 `SaveBindingPlan`
+- 再选中某个 save 星区，并设置跳数
+- 地图主打亮过滤范围内的 save 玩家站与星区范围
+- 用户再选中目标帝国星区
+- 操作区提供三类动作：
+  - 绑定到该帝国星区下的已有 empire station
+  - 导入为新的 empire station
+  - 将空闲 empire station 直接拖拽到地图
+
+## 5. Store Action 设计
+
+### 5.1 EmpireSavePlanStore
+
+需要提供明确命令式 action：
+
+- `createSaveBindingPlan(empireId, gameGuid)`
+- `selectSaveBindingPlan(empireId, bindingKey)`
+- `setSelectedArchiveTime(bindingKey, archiveTime)`
+- `bindSectorGroupHub(input)`
+- `updateSectorGroupJumpRange(bindingKey, sectorGroupId, jumpRange)`
+- `clearSectorGroupHubBinding(bindingKey, sectorGroupId)`
+- `bindStationToSaveStation(input)`
+- `clearStationBinding(bindingKey, stationId)`
+- `setStationBindingPosition(bindingKey, stationId, position)`
+
+### 5.2 EmpireStore
+
+继续负责：
+
+- `createStation(...)`
+- 将从 save 导入的 station 变成独立 empire station 本体
+
+### 5.3 直接导入新站
+
+从 save 导入新站的流程：
+
+1. 用户在某个 `SaveBindingPlan` 视角下选中 coverage 内的 save 玩家站
+2. inspector 点击“导入为新站”
+3. `empireStore.createStation(...)` 创建新的 empire station
+4. `empireSavePlanStore.bindStationToSaveStation(...)` 为该新站补一条 `StationSaveBinding`
+5. 若用户随后在地图上调整位置，位置写入 `StationSaveBinding.position`
+
+这里不需要额外导入记录表，因为后续关系仍然只通过 `StationSaveBinding` 表达。
+
+### 5.4 空闲站直接放置
+
+空闲 empire station 直接拖拽到地图的流程：
+
+1. 用户在第二段中选择目标帝国星区
+2. 在底部空闲 station 列表中拖拽某个 empire station 到地图
+3. 地图按小空间站尺寸显示该 station
+4. `empireSavePlanStore.setStationBindingPosition(...)` 写入 `position: { x, y, z }`
+5. 该位置只存在于 binding 中，不写入 `EmpirePlan`
+
+## 6. 数据流
+
+### 6.1 单向流
+
+1. 用户选择当前 `SaveBindingPlan`
+2. 用户从第一段进入某个 save 星区
+3. 用户设置跳数
+4. selector 计算过滤星区、空间站列表与地图包围盒
+5. 地图自动缩放到过滤范围
+6. 用户选择目标帝国星区
+7. 用户执行绑定已有站、导入新站、绑定中转或拖拽空闲站
+8. store action 写入 group / station binding 或 `position`
+9. selector 自动重算候选、地图显示与当前 time 下的解析状态
+
+### 6.2 关键约束
+
+- 地图不是业务真相来源，只是选择器
+- inspector 不直接持久化对象快照
+- `selectedArchiveTime` 的切换只影响解析结果，不影响 binding 身份
+- 当前 time 下找不到对象时，只提示失效，不自动删关系
+- empire station 的地图位置真相在 binding 中，而不在 `EmpirePlan`
+
+## 7. 风险与对策
+
+### 7.1 风险：binding 与 empire 本体耦合
+
+- 对策：独立 `EmpireSavePlanState` 持久化，不把关系字段塞进 `EmpirePlan`
+
+### 7.2 风险：archive time 被误当作 binding 身份
+
+- 对策：明确 `key = empireId + gameGuid`
+- `selectedArchiveTime` 只作视角字段，严禁参与唯一键
+
+### 7.3 风险：导入新站后又需要追踪来源
+
+- 对策：不加额外导入记录表；只要导入后立即建立 `StationSaveBinding`，后续关系就已足够表达
+
+### 7.4 风险：当前 time 缺失对象导致用户误以为关系丢失
+
+- 对策：UI 明确显示“当前 time 下失效”
+- 严禁在 archive 中找不到对象时自动解绑
+
+### 7.5 风险：coverage 计算与高级资源的跳数口径不一致
+
+- 对策：直接复用高级资源功能已有的 `N` 跳拓扑定义与实现口径，避免出现两套 sector 可达性语义
