@@ -100,16 +100,31 @@ function searchModules(query: string): SearchTag[] {
   return results
 }
 
+function getFactionLabel(faction: { nameId: string; name: string; id: string }): string {
+  if (faction.nameId && te(faction.nameId)) {
+    return t(faction.nameId)
+  }
+  return faction.name || faction.id
+}
+
 function searchFactions(query: string): SearchTag[] {
   const normalized = query.toLowerCase()
   const results: SearchTag[] = []
+  const seen = new Set<string>()
+  
   for (const faction of gameData.factions) {
-    const name = faction.name?.toLowerCase() || faction.id.toLowerCase()
-    if (name.includes(normalized)) {
+    if (seen.has(faction.id)) continue
+    seen.add(faction.id)
+    
+    const label = getFactionLabel(faction)
+    const name = label.toLowerCase()
+    const id = faction.id.toLowerCase()
+    
+    if (name.includes(normalized) || id.includes(normalized)) {
       results.push({
         category: 'faction',
         id: faction.id,
-        label: faction.name || faction.id
+        label: label
       })
     }
     if (results.length >= 10) break
@@ -238,9 +253,8 @@ function stepJumpLimit(delta: number) {
 }
 
 function updateJumpLimit(value: number) {
-  if (value >= 0 && value <= 8) {
-    sectorJumpLimit.value = value
-  }
+  const num = Math.max(0, Math.min(8, value))
+  sectorJumpLimit.value = num
 }
 </script>
 
@@ -251,37 +265,42 @@ function updateJumpLimit(value: number) {
         <input
           v-model="searchInput"
           class="search-input"
-          :class="{ 'with-jump-control': selectedCategory === 'sector' }"
+          :class="{ 'sector-mode': selectedCategory === 'sector' }"
           :placeholder="placeholder"
           type="text"
           @blur="hideSuggestions"
           @focus="searchInput.trim() && performSearch()"
         />
-        <select
-          v-model="selectedCategory"
-          class="category-select"
-          @change="onCategoryChange"
-        >
-          <option value="product">{{ categoryLabels.product }}</option>
-          <option value="module">{{ categoryLabels.module }}</option>
-          <option value="faction">{{ categoryLabels.faction }}</option>
-          <option value="sector">{{ categoryLabels.sector }}</option>
-        </select>
-        <template v-if="selectedCategory === 'sector'">
-          <span class="jump-suffix">{{ t('map.poi_search_jump_suffix') }}</span>
-          <div class="jump-stepper">
-            <button type="button" class="jump-step-btn" @click="stepJumpLimit(1)">▲</button>
-            <button type="button" class="jump-step-btn" @click="stepJumpLimit(-1)">▼</button>
-          </div>
-          <input
-            :value="sectorJumpLimit"
-            class="jump-input"
-            type="number"
-            min="0"
-            max="8"
-            @input="updateJumpLimit(Number(($event.target as HTMLInputElement).value || 0))"
-          />
-        </template>
+        <div class="right-controls">
+          <template v-if="selectedCategory === 'sector'">
+            <div class="jump-wrap">
+              <input
+                :value="sectorJumpLimit"
+                class="jump-input"
+                type="number"
+                min="0"
+                max="8"
+                @input="updateJumpLimit(Number(($event.target as HTMLInputElement).value || 0))"
+              />
+              <span class="jump-suffix">{{ t('map.poi_search_jump_suffix') }}</span>
+              <div class="jump-stepper">
+                <button type="button" class="jump-step-btn" @click="stepJumpLimit(1)">▲</button>
+                <button type="button" class="jump-step-btn" @click="stepJumpLimit(-1)">▼</button>
+              </div>
+            </div>
+            <div class="divider"></div>
+          </template>
+          <select
+            v-model="selectedCategory"
+            class="category-select"
+            @change="onCategoryChange"
+          >
+            <option value="product">{{ categoryLabels.product }}</option>
+            <option value="module">{{ categoryLabels.module }}</option>
+            <option value="faction">{{ categoryLabels.faction }}</option>
+            <option value="sector">{{ categoryLabels.sector }}</option>
+          </select>
+        </div>
         <div v-if="showSuggestions" class="suggestions-list">
           <div
             v-for="tag in suggestions"
@@ -330,7 +349,7 @@ function updateJumpLimit(value: number) {
 }
 
 .search-row {
-  @apply flex gap-2;
+  @apply flex;
 }
 
 .input-wrapper {
@@ -338,27 +357,23 @@ function updateJumpLimit(value: number) {
 }
 
 .search-input {
-  @apply h-10 w-full rounded border border-amber-300/30 bg-black/60 pl-3 pr-24 text-sm text-amber-50 outline-none;
+  @apply h-10 w-full rounded border border-amber-300/30 bg-black/60 pl-3 pr-20 text-sm text-amber-50 outline-none;
 }
 
-.search-input.with-jump-control {
-  padding-right: 7.5rem;
+.search-input.sector-mode {
+  padding-right: 10rem;
 }
 
-.category-select {
-  @apply absolute right-0 h-8 my-1 w-20 rounded border-l border-amber-300/30 bg-transparent pl-2 pr-6 text-xs text-amber-100 outline-none cursor-pointer appearance-none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fcd34d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
-  background-repeat: no-repeat;
-  background-position: right 4px center;
-  background-size: 14px;
+.right-controls {
+  @apply absolute right-0 top-0 bottom-0 flex items-center gap-0;
 }
 
-.search-input.with-jump-control ~ .category-select {
-  right: 78px;
+.jump-wrap {
+  @apply flex items-center rounded border border-amber-300/30 bg-black/40 overflow-hidden;
 }
 
 .jump-input {
-  @apply absolute right-20 h-8 my-1 w-8 rounded-l border-l border-amber-300/30 bg-transparent px-1 text-center text-sm text-amber-50 outline-none;
+  @apply w-7 h-8 bg-transparent px-1 text-center text-sm text-amber-50 outline-none;
   min-width: 0;
   -moz-appearance: textfield;
 }
@@ -370,20 +385,31 @@ function updateJumpLimit(value: number) {
 }
 
 .jump-suffix {
-  @apply pointer-events-none absolute right-28 top-1/2 -translate-y-1/2 text-xs font-semibold text-amber-100/90;
+  @apply text-xs font-medium text-amber-100/80 mr-1;
 }
 
 .jump-stepper {
-  @apply absolute right-20 top-1/2 flex -translate-y-1/2 flex-col overflow-hidden rounded-r-md rounded-l-sm border border-amber-300/25 bg-black/80;
-  width: 14px;
+  @apply flex flex-col border-l border-amber-300/20 bg-black/40;
 }
 
 .jump-step-btn {
-  @apply flex h-3.5 w-3.5 items-center justify-center bg-amber-200/10 text-[9px] leading-none text-amber-100/85 transition-colors duration-150 hover:bg-amber-200/20 hover:text-amber-50;
+  @apply flex h-4 w-4 items-center justify-center text-[9px] leading-none text-amber-100/70 transition-colors duration-150 hover:bg-amber-200/10 hover:text-amber-50;
 }
 
 .jump-step-btn + .jump-step-btn {
   @apply border-t border-amber-300/20;
+}
+
+.divider {
+  @apply w-px h-6 mx-2 bg-amber-300/20;
+}
+
+.category-select {
+  @apply h-8 w-16 rounded bg-transparent pl-1 pr-5 text-xs text-amber-100 outline-none cursor-pointer appearance-none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 24 24' stroke='%23fcd34d'%3E%3Cpath stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M19 9l-7 7-7-7'%3E%3C/path%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 2px center;
+  background-size: 12px;
 }
 
 .suggestions-list {
