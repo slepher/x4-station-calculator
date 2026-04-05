@@ -195,14 +195,20 @@ binding UI 放在 `MapWorkbenchView`，原因：
   - 支持搜索过滤
   - 用户点击某个星区后进入第三段
 - 第三段：绑定操作与地图联动
+  - **绑定流程（有序依赖）：**
+    1. **绑定星区**（前提条件）：将选中的 save 星区绑定到帝国星区
+       - 可选择现有帝国星区
+       - 可选择新建帝国星区
+       - 绑定完成后显示该帝国星区的空闲空间站列表
+    2. **绑定空间站**（任选顺序）：
+       - 绑定空间站：将 coverage 内的 save 玩家站绑定到该帝国星区下的已有 empire station
+       - 导入空间站：将 coverage 内的 save 玩家站导入为新的 empire station
+       - 绑定中转站：将该帝国星区的 empire station 绑定到 save tradestation
   - 顶部选择跳数（0-5）
-  - 选择目标帝国星区
   - 主列表展示该星区 `N` 跳以内**且有玩家空间站**的星区列表（POI 风格）
   - 每个星区下显示其玩家空间站
   - 地图自动缩放到显示所有有玩家空间站的可达星区
   - 选中的星区作为地图中心
-  - 提供绑定、导入新站操作
-  - 底部展示该帝国星区下的空闲 empire station 列表
 
 ### 4.3 模式切换
 
@@ -287,13 +293,16 @@ binding UI 放在 `MapWorkbenchView`，原因：
 ### 6.1 单向流
 
 1. 用户选择当前 `SaveBindingPlan`
-2. 用户从第一段进入某个 save 星区
-3. 用户设置跳数
-4. selector 计算过滤星区、空间站列表与地图包围盒
-5. 地图自动缩放到过滤范围
-6. 用户选择目标帝国星区
-7. 用户执行绑定已有站、导入新站、绑定中转或拖拽空闲站
-8. `empireStore` action 写入 group / station binding 或 `position`
+2. 用户从第二段选择某个 save 星区，进入第三段
+3. **绑定星区**：用户将 save 星区绑定到帝国星区（选择现有或新建）
+4. 用户设置跳数
+5. selector 计算过滤星区、空间站列表与地图包围盒
+6. 地图自动缩放到过滤范围
+7. **绑定空间站**（任选顺序）：
+   - 绑定 save 玩家站到已有 empire station
+   - 导入 save 玩家站为新 empire station
+   - 绑定 empire station 到 save tradestation
+8. `empireStore` action 写入 group / station binding
 9. selector 自动重算候选、地图显示与当前 time 下的解析状态
 
 ### 6.2 关键约束
