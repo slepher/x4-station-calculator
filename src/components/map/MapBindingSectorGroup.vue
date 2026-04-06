@@ -156,14 +156,28 @@ const empireSectorItems = computed(() => {
     const groupBinding = activeBindingPlan.value?.groupBindings.find(
       (b) => b.sectorGroupId === sector.id
     )
+    
+    // 如果当前正在编辑此星区，使用 draft 数据
+    if (expandedSectorId.value === sector.id) {
+      return {
+        id: sector.id,
+        name: sector.name,
+        isBound: !!groupBinding,
+        sectorMacro: groupBinding?.sectorMacro || null,
+        coverageMacros: draftCoverage.value,
+        jumpRange: draftJumpRange.value,
+        expanded: true
+      }
+    }
+    
     return {
       id: sector.id,
       name: sector.name,
       isBound: !!groupBinding,
       sectorMacro: groupBinding?.sectorMacro || null,
       coverageMacros: groupBinding?.coverageSectorMacros || [],
-      jumpRange: groupBinding?.jumpRange || 3,
-      expanded: expandedSectorId.value === sector.id
+      jumpRange: groupBinding?.jumpRange || 2,
+      expanded: false
     }
   })
 })
