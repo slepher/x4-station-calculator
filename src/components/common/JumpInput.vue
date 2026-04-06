@@ -12,6 +12,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: 'update:modelValue', value: number): void
+  (e: 'change', payload: { oldValue: number; newValue: number }): void
 }>()
 
 const { t } = useI18n()
@@ -21,15 +22,21 @@ const maxValue = computed(() => props.max ?? 8)
 const suffixText = computed(() => props.suffix ?? t('map.resource_filter_jump_suffix'))
 
 function step(delta: number) {
-  const next = props.modelValue + delta
+  const oldValue = props.modelValue
+  const next = oldValue + delta
   if (next >= minValue.value && next <= maxValue.value) {
     emit('update:modelValue', next)
+    emit('change', { oldValue, newValue: next })
   }
 }
 
 function update(value: number) {
+  const oldValue = props.modelValue
   const num = Math.max(minValue.value, Math.min(maxValue.value, value))
   emit('update:modelValue', num)
+  if (num !== oldValue) {
+    emit('change', { oldValue, newValue: num })
+  }
 }
 </script>
 
