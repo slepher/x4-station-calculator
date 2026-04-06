@@ -825,7 +825,7 @@ onMounted(() => {
 }
 
 .bind-menu {
-  @apply fixed z-[100] min-w-[200px] overflow-y-auto rounded-lg border-2 border-amber-400 bg-black/95 py-2 shadow-2xl;
+  @apply fixed z-[100] min-w-[40px] overflow-y-auto rounded-lg border-2 border-amber-400 bg-black/95 py-2 shadow-2xl;
   backdrop-filter: blur(12px);
 }
 

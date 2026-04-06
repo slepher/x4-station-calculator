@@ -144,12 +144,12 @@ watch(() => props.open, (open) => {
 
 <style scoped>
 .map-binding-panel {
-  @apply flex h-full w-[360px] shrink-0 flex-col overflow-hidden rounded-lg border border-amber-300/35 bg-black/80 p-4 text-amber-50;
-  backdrop-filter: blur(10px);
+  @apply flex h-full w-[360px] shrink-0 flex-col overflow-hidden rounded-lg border border-amber-300/35 bg-black/60 py-3 px-0 text-amber-50;
+  backdrop-filter: blur(8px);
 }
 
 .map-binding-panel__header {
-  @apply mb-3 flex shrink-0 items-center justify-between gap-3;
+  @apply mb-3 flex shrink-0 items-center justify-between gap-3 border-b border-amber-300/15 px-3 pb-3;
 }
 
 .map-binding-panel__nav {
@@ -165,18 +165,35 @@ watch(() => props.open, (open) => {
 }
 
 .map-binding-panel__close {
-  @apply rounded-lg border border-amber-300/20 px-2 py-1 text-xs text-amber-100/60 transition-colors hover:border-amber-200/40 hover:text-amber-50;
+  @apply rounded border border-amber-300/30 bg-transparent px-2 py-1 text-xs text-amber-100 transition-colors duration-150 hover:border-amber-200/60 hover:text-amber-50;
 }
 
 .map-binding-panel__body {
-  @apply flex-1 overflow-y-auto;
+  @apply min-h-0 flex-1 overflow-y-auto px-3;
+  scrollbar-gutter: stable both-edges;
+  scrollbar-color: rgba(251, 191, 36, 0.55) rgba(15, 23, 42, 0.25);
+  scrollbar-width: thin;
+}
+
+.map-binding-panel__body::-webkit-scrollbar {
+  width: 6px;
+}
+
+.map-binding-panel__body::-webkit-scrollbar-track {
+  @apply rounded-full bg-slate-900/35;
+}
+
+.map-binding-panel__body::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-amber-300/45;
+}
+
+.map-binding-panel__body::-webkit-scrollbar-thumb:hover {
+  @apply bg-amber-200/60;
 }
 
 .map-binding-panel__footer {
-  @apply mt-3 shrink-0 border-t border-amber-300/15 pt-3;
-}
-
-.map-binding-panel__hint {
-  @apply text-xs text-amber-100/40;
+  @apply px-3 pt-2 text-xs text-amber-100/60;
+  border-top: 1px solid rgba(251, 191, 36, 0.15);
+  margin-top: auto;
 }
 </style>

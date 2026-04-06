@@ -159,6 +159,7 @@ const empireSectorItems = computed(() => {
       id: sector.id,
       name: sector.name,
       isBound: !!groupBinding,
+      sectorMacro: groupBinding?.sectorMacro || null,
       coverageMacros: groupBinding?.coverageSectorMacros || [],
       jumpRange: groupBinding?.jumpRange || 3,
       expanded: expandedSectorId.value === sector.id
@@ -179,6 +180,54 @@ const unboundSaveSectors = computed(() => {
 const visibleMapSectors = computed<string[]>(() => {
   // TODO: 实现地图可见面积超过50%的星区计算
   return []
+})
+
+// 候选星区：跳数范围内但不在覆盖星区中的地图星区
+const candidateSectors = computed(() => {
+  const currentBinding = activeBindingPlan.value?.groupBindings.find(
+    b => b.sectorGroupId === expandedSectorId.value
+  )
+  
+  // 获取当前 anchor 和跳数
+  let anchorMacro: string
+  let jumpRange: number
+  
+  if (expandedSectorId.value === bindMenuTargetSectorId.value && bindMenuTargetSectorId.value) {
+    // 刚从菜单点击进入配置，使用 draft 值
+    anchorMacro = currentBinding?.sectorMacro || ''
+    jumpRange = draftJumpRange.value
+  } else if (currentBinding?.sectorMacro) {
+    // 已有绑定，使用当前配置
+    anchorMacro = currentBinding.sectorMacro
+    jumpRange = currentBinding.jumpRange
+  } else {
+    return []
+  }
+  
+  if (!anchorMacro) return []
+  
+  // 获取跳数范围内的所有地图星区
+  const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
+  const coverageResult = getCoverageSectors(
+    anchorMacro.toLowerCase(), 
+    jumpRange, 
+    sectorGraphData.sectorGraph, 
+    sectorGraphData.sectorClusterMap
+  )
+  
+  // 覆盖星区集合
+  const coverageSet = new Set(draftCoverage.value.map(m => m.toLowerCase()))
+  
+  // 候选星区：跳数范围内 - 覆盖星区（所有地图星区）
+  const candidates: string[] = []
+  for (const sector of coverageResult) {
+    const macroLower = sector.sectorMacro.toLowerCase()
+    if (!coverageSet.has(macroLower) && macroLower !== anchorMacro.toLowerCase()) {
+      candidates.push(sector.sectorMacro)
+    }
+  }
+  
+  return candidates
 })
 
 function isSaveSectorBound(sectorMacro: string): boolean {
@@ -313,6 +362,58 @@ function unbindSector(sectorId: string) {
   empireStore.clearSectorGroupBinding(props.gameGuid, sectorId)
 }
 
+function isCurrentBoundSector(sectorMacro: string): boolean {
+  if (!bindMenuTargetSectorId.value) return false
+  const groupBinding = activeBindingPlan.value?.groupBindings.find(
+    b => b.sectorGroupId === bindMenuTargetSectorId.value
+  )
+  return groupBinding?.sectorMacro?.toLowerCase() === sectorMacro.toLowerCase()
+}
+
+function unbindCurrentSector() {
+  if (bindMenuTargetSectorId.value) {
+    empireStore.clearSectorGroupBinding(props.gameGuid, bindMenuTargetSectorId.value)
+    closeBindMenu()
+  }
+}
+
+function onMenuSectorClick(sectorMacro: string) {
+  const currentBinding = activeBindingPlan.value?.groupBindings.find(
+    b => b.sectorGroupId === bindMenuTargetSectorId.value
+  )
+  
+  if (currentBinding?.sectorMacro?.toLowerCase() === sectorMacro.toLowerCase()) {
+    // 点击已选星区，保持现有配置
+    draftJumpRange.value = currentBinding.jumpRange
+    draftCoverage.value = [...(currentBinding.coverageSectorMacros || [])]
+    draftExcluded.value = []
+  } else {
+    // 点击新星区，重新计算 coverage（跳数不变）
+    // 覆盖星区 = 跳数范围内所有 save sector
+    const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
+    const coverageResult = getCoverageSectors(sectorMacro.toLowerCase(), draftJumpRange.value, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
+    
+    // 从跳数范围内的星区中筛选出 save sector
+    const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
+    draftCoverage.value = coverageResult
+      .map(s => s.sectorMacro)
+      .filter(m => saveSectorMacros.has(m.toLowerCase()))
+    draftExcluded.value = []
+  }
+  
+  expandedSectorId.value = bindMenuTargetSectorId.value
+  
+  empireStore.bindSectorGroup({
+    gameGuid: props.gameGuid,
+    sectorGroupId: bindMenuTargetSectorId.value!,
+    sectorMacro,
+    jumpRange: draftJumpRange.value,
+    coverageSectorMacros: draftCoverage.value
+  })
+  
+  closeBindMenu()
+}
+
 function cancelBinding(sectorId: string) {
   empireStore.clearSectorGroupBinding(props.gameGuid, sectorId)
   expandedSectorId.value = null
@@ -351,16 +452,18 @@ function excludeFromCoverage(sectorMacro: string) {
   const index = draftCoverage.value.indexOf(sectorMacro)
   if (index >= 0) {
     draftCoverage.value.splice(index, 1)
-    draftExcluded.value.push(sectorMacro)
   }
 }
 
-function includeToCoverage(sectorMacro: string) {
-  const index = draftExcluded.value.indexOf(sectorMacro)
-  if (index >= 0) {
-    draftExcluded.value.splice(index, 1)
+function addToCoverage(sectorMacro: string) {
+  if (!draftCoverage.value.includes(sectorMacro)) {
     draftCoverage.value.push(sectorMacro)
   }
+}
+
+// @ts-ignore - Used in template
+function includeToCoverage(sectorMacro: string) {
+  addToCoverage(sectorMacro)
 }
 
 watch(() => props.gameGuid, () => {
@@ -410,11 +513,14 @@ onBeforeUnmount(() => {
           </button>
           <button
             v-else-if="!sector.expanded"
-            class="unbind-btn"
+            class="bound-sector-btn"
             type="button"
-            @click.stop="unbindSector(sector.id)"
+            @click.stop="toggleBindMenu($event, sector.id)"
           >
-            {{ t('map.binding_unbind') }}
+            {{ sector.sectorMacro ? getSectorMacroDisplayName(sector.sectorMacro) : t('map.binding_bind') }}
+            <svg class="bound-btn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+            </svg>
           </button>
           <template v-else>
             <button class="cancel-btn" type="button" @click.stop="cancelBinding(sector.id)">{{ t('map.binding_cancel') }}</button>
@@ -451,15 +557,15 @@ onBeforeUnmount(() => {
           </div>
 
           <div class="config-row">
-            <label class="config-label">{{ t('map.binding_excluded_sectors') }}</label>
+            <label class="config-label">{{ t('map.binding_candidate_sectors') }}</label>
             <div class="pill-list">
               <span
-                v-for="macro in draftExcluded"
+                v-for="macro in candidateSectors"
                 :key="macro"
-                class="pill pill--excluded"
+                class="pill pill--candidate"
               >
                 {{ getSectorMacroDisplayName(macro) }}
-                <button class="pill-plus" type="button" @click.stop="includeToCoverage(macro)">+</button>
+                <button class="pill-plus" type="button" @click.stop="addToCoverage(macro)">+</button>
               </span>
             </div>
           </div>
@@ -549,21 +655,32 @@ onBeforeUnmount(() => {
       >
         <div class="bind-menu-group">
           <div class="bind-menu-group-title">{{ t('map.binding_save_sector_candidates') }}</div>
-          <template v-if="unboundSaveSectors.length <= 10">
+          <template v-if="filteredSaveSectors.length <= 10">
             <button
-              v-for="sector in unboundSaveSectors"
+              v-for="sector in filteredSaveSectors"
               :key="sector.sectorMacro"
               type="button"
               class="bind-menu-item"
-              @click="selectSaveSectorForBinding(sector.sectorMacro)"
+              :class="{ active: isCurrentBoundSector(sector.sectorMacro) }"
+              @click="onMenuSectorClick(sector.sectorMacro)"
             >
-              {{ sector.sectorName }}
+              <span>{{ sector.sectorName }}</span>
+              <button
+                v-if="isCurrentBoundSector(sector.sectorMacro)"
+                class="bind-menu-item-unbind"
+                type="button"
+                @click.stop="unbindCurrentSector()"
+              >
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3 w-3">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
             </button>
           </template>
           <div v-else class="bind-menu-hint">
             {{ t('map.binding_filter_hint_search') }}
           </div>
-          <div v-if="unboundSaveSectors.length === 0" class="bind-menu-empty">
+          <div v-if="filteredSaveSectors.length === 0" class="bind-menu-empty">
             {{ t('map.binding_no_unbound_sectors') }}
           </div>
         </div>
@@ -658,6 +775,14 @@ onBeforeUnmount(() => {
   @apply rounded border border-red-300/30 bg-red-200/10 px-2 py-1 text-xs text-red-200;
 }
 
+.bound-sector-btn {
+  @apply inline-flex items-center gap-1 whitespace-nowrap rounded border border-amber-300/30 bg-amber-200/10 px-2 py-1 text-xs text-amber-100;
+}
+
+.bound-btn-chevron {
+  @apply h-3 w-3;
+}
+
 .cancel-btn {
   @apply rounded border border-amber-300/30 bg-transparent px-2 py-1 text-xs text-amber-100;
 }
@@ -695,6 +820,10 @@ onBeforeUnmount(() => {
 }
 
 .pill--excluded {
+  @apply border-amber-300/20 bg-transparent text-amber-100/60;
+}
+
+.pill--candidate {
   @apply border-amber-300/20 bg-transparent text-amber-100/60;
 }
 
@@ -752,8 +881,26 @@ onBeforeUnmount(() => {
 }
 
 .bind-menu {
-  @apply fixed z-[100] min-w-[200px] overflow-y-auto rounded-lg border-2 border-amber-400 bg-black/95 py-2 shadow-2xl;
+  @apply fixed z-[100] min-w-[40px] w-auto max-h-[300px] overflow-y-auto rounded-lg border-2 border-amber-400 bg-black/95 py-2 shadow-2xl;
   backdrop-filter: blur(12px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.55) transparent;
+}
+
+.bind-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.bind-menu::-webkit-scrollbar-track {
+  @apply rounded-full bg-slate-900/35;
+}
+
+.bind-menu::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-amber-300/45;
+}
+
+.bind-menu::-webkit-scrollbar-thumb:hover {
+  @apply bg-amber-200/60;
 }
 
 .bind-menu-group {
@@ -765,7 +912,15 @@ onBeforeUnmount(() => {
 }
 
 .bind-menu-item {
-  @apply w-full rounded px-3 py-2 text-left text-sm text-amber-100 transition-colors hover:bg-amber-200/10;
+  @apply flex items-center justify-between whitespace-nowrap rounded px-3 py-2 text-left text-sm text-amber-100 transition-colors hover:bg-amber-200/10;
+}
+
+.bind-menu-item.active {
+  @apply bg-amber-200/15 text-amber-50;
+}
+
+.bind-menu-item-unbind {
+  @apply ml-2 inline-flex h-4 w-4 items-center justify-center rounded text-amber-100/55 hover:text-amber-50;
 }
 
 .bind-menu-hint {
