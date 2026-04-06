@@ -5,7 +5,7 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
-import { getCoverageSectors, buildSectorGraphFromMaps, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
+import { resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
 import type { StationSaveBinding, StationPlan } from '@/types/x4'
 import type { PlayerStationEntry } from '@/types/saveArchive'
 import factoryIconUrl from '@/components/icons/factory.svg'
@@ -67,48 +67,50 @@ const currentGroupBinding = computed(() => {
 })
 
 const activeArchive = computed(() => {
-  if (!activeBindingPlan.value) return null
-  const guid = activeBindingPlan.value.gameGuid
-  const time = activeBindingPlan.value.selectedArchiveTime
+  const binding = activeBindingPlan.value
+  if (!binding) return null
+
+  const guid = binding.gameGuid
+  const selected = saveStore.selectedArchive
+
+  // 优先使用已选中的存档
+  if (selected && selected.meta.guid === guid) {
+    const time = binding.selectedArchiveTime
+    if (time === null || selected.meta.time === time) {
+      return selected
+    }
+  }
+
   const group = saveStore.archives.get(guid)
   if (!group) return null
+
+  const time = binding.selectedArchiveTime
   if (time === null || time === undefined) {
     return group.saves[0] || null
   }
   return group.saves.find((s) => s.meta.time === time) || group.saves[0] || null
 })
 
-const sectorGraphData = computed(() => {
-  return buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
-})
-
-const coverageSectors = computed(() => {
-  if (!currentGroupBinding.value?.sectorMacro) return []
-  const jumpRange = currentGroupBinding.value.jumpRange || 2
-  return getCoverageSectors(currentGroupBinding.value.sectorMacro, jumpRange, sectorGraphData.value.sectorGraph, sectorGraphData.value.sectorClusterMap)
-})
-
 const coverageSectorsWithStations = computed<SectorWithStations[]>(() => {
-  if (!activeArchive.value || !currentGroupBinding.value?.sectorMacro) return []
+  if (!activeArchive.value || !currentGroupBinding.value) return []
 
-  const anchorMacro = currentGroupBinding.value.sectorMacro.toLowerCase()
-  const coverageSet = new Set(coverageSectors.value.map(s => s.sectorMacro.toLowerCase()))
-  const distanceMap = new Map(coverageSectors.value.map(s => [s.sectorMacro.toLowerCase(), s.distance]))
+  const anchorMacro = currentGroupBinding.value.sectorMacro
+  const coverageMacros = currentGroupBinding.value.coverageSectorMacros || []
   
-  // 包含定位星区本身（distance=0）
-  coverageSet.add(anchorMacro)
-  distanceMap.set(anchorMacro, 0)
-
+  // 合并：定位星区 + 覆盖星区
+  const allMacros = new Set<string>()
+  if (anchorMacro) allMacros.add(anchorMacro.toLowerCase())
+  coverageMacros.forEach(m => allMacros.add(m.toLowerCase()))
+  
   const results: SectorWithStations[] = []
 
   for (const [sectorMacro, sector] of Object.entries(activeArchive.value.sectors)) {
     const normalizedMacro = sectorMacro.toLowerCase()
-    if (!coverageSet.has(normalizedMacro)) continue
+    if (!allMacros.has(normalizedMacro)) continue
 
     const stations = sector.playerStations || []
     if (stations.length === 0) continue
 
-    const distance = distanceMap.get(normalizedMacro) ?? 0
     const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
     let sectorName = sector.name || sectorMacro
     if (resolved?.sectorId) {
@@ -117,6 +119,13 @@ const coverageSectorsWithStations = computed<SectorWithStations[]>(() => {
       if (mapSector?.nameId && te(mapSector.nameId)) {
         sectorName = t(mapSector.nameId)
       }
+    }
+
+    // 计算距离
+    let distance = 0
+    if (anchorMacro && sectorMacro.toLowerCase() !== anchorMacro.toLowerCase()) {
+      const idx = coverageMacros.findIndex(m => m.toLowerCase() === sectorMacro.toLowerCase())
+      distance = idx >= 0 ? idx + 1 : 999
     }
 
     results.push({

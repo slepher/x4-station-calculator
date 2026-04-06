@@ -448,26 +448,18 @@ function confirmBinding(sectorId: string) {
 
 function updateDraftJumpRange(newValue: number, _oldValue?: number) {
   const oldValue = _oldValue ?? draft.value.jumpRange
-  console.log(`[updateDraftJumpRange] Jump change: ${oldValue} -> ${newValue}`)
   
-  if (!draft.value.anchorSectorMacro) {
-    console.log('[updateDraftJumpRange] No anchor sector, returning')
-    return
-  }
+  if (!draft.value.anchorSectorMacro) return
   
   const anchorMacro = draft.value.anchorSectorMacro.toLowerCase()
-  console.log(`[updateDraftJumpRange] Anchor: ${anchorMacro}`)
-  
   const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
   
   // 获取按跳数分组的星区
   const coverageByJump = new Map<number, { macro: string; isSaveSector: boolean }[]>()
   for (let jump = 1; jump <= Math.max(oldValue, newValue); jump++) {
     const result = getCoverageSectors(anchorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
-    console.log(`[updateDraftJumpRange] Raw result for jump ${jump}:`, result.map(s => ({ macro: s.sectorMacro, distance: s.distance })))
     
     const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
-    console.log(`[updateDraftJumpRange] Save sectors:`, Array.from(saveSectorMacros))
     
     // 筛选 save sector 并排除 anchor
     const sectorsAtJump = result
@@ -476,7 +468,6 @@ function updateDraftJumpRange(newValue: number, _oldValue?: number) {
         const mLower = m.toLowerCase()
         const isSave = saveSectorMacros.has(mLower)
         const isAnchor = mLower === anchorMacro
-        console.log(`[updateDraftJumpRange] Checking ${m}: isSave=${isSave}, isAnchor=${isAnchor}`)
         return isSave && !isAnchor
       })
       .map(m => ({
@@ -485,7 +476,6 @@ function updateDraftJumpRange(newValue: number, _oldValue?: number) {
       }))
     
     coverageByJump.set(jump, sectorsAtJump)
-    console.log(`[updateDraftJumpRange] Filtered sectors at jump ${jump}:`, sectorsAtJump)
   }
   
   draft.value.jumpRange = newValue
@@ -497,17 +487,14 @@ function updateDraftJumpRange(newValue: number, _oldValue?: number) {
       const sectorsAtJump = coverageByJump.get(jump) || []
       sectorsAtJump.forEach(s => oldCoverageSet.add(s.macro.toLowerCase()))
     }
-    console.log(`[updateDraftJumpRange] Old coverage (jumps 1-${oldValue}):`, Array.from(oldCoverageSet))
     
     const newCoverageSet = new Set<string>()
     for (let jump = 1; jump <= newValue; jump++) {
       const sectorsAtJump = coverageByJump.get(jump) || []
       sectorsAtJump.forEach(s => newCoverageSet.add(s.macro.toLowerCase()))
     }
-    console.log(`[updateDraftJumpRange] New coverage (jumps 1-${newValue}):`, Array.from(newCoverageSet))
     
     // 添加只在 newCoverage 中但不在 oldCoverage 中的星区
-    let addedCount = 0
     for (const sectorLower of newCoverageSet) {
       if (!oldCoverageSet.has(sectorLower)) {
         // 找到原始大小写的 sectorMacro
@@ -515,15 +502,10 @@ function updateDraftJumpRange(newValue: number, _oldValue?: number) {
           .flat()
           .find(s => s.macro.toLowerCase() === sectorLower)?.macro
         if (originalMacro && !draft.value.coverage.some(m => m.toLowerCase() === sectorLower)) {
-          console.log(`[updateDraftJumpRange] Adding to coverage: ${originalMacro}`)
           draft.value.coverage.push(originalMacro)
-          addedCount++
-        } else {
-          console.log(`[updateDraftJumpRange] Skipped (already in coverage): ${originalMacro}`)
         }
       }
     }
-    console.log(`[updateDraftJumpRange] Total added: ${addedCount}`)
     draft.value.jumpRange = newValue
   } else if (newValue < oldValue) {
     // 跳数减少：移除超出跳数的星区
@@ -538,9 +520,6 @@ function updateDraftJumpRange(newValue: number, _oldValue?: number) {
     // 只保留在范围内的星区
     draft.value.coverage = draft.value.coverage.filter(m => sectorsToKeep.has(m.toLowerCase()))
     draft.value.jumpRange = newValue
-  } else {
-    // 如果跳数不变，不做任何操作
-    console.log('[updateDraftJumpRange] Jump unchanged, no action')
   }
 }
 
