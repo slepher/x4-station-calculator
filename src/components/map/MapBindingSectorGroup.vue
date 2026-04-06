@@ -35,6 +35,13 @@ const draftJumpRange = ref(2)
 const draftCoverage = ref<string[]>([])
 const draftExcluded = ref<string[]>([])
 
+// 备份状态用于取消恢复
+const backupState = ref<{
+  jumpRange: number
+  coverage: string[]
+  excluded: string[]
+} | null>(null)
+
 const bindMenuOpen = ref(false)
 const bindMenuRef = ref<HTMLElement | null>(null)
 const bindMenuStyle = ref<Record<string, string>>({})
@@ -231,6 +238,20 @@ const candidateSectors = computed(() => {
   return candidates
 })
 
+// 检查星区是否已归属其他 group（作为定位或覆盖）
+function isSectorBoundToOtherGroup(sectorMacro: string, currentGroupId: string): boolean {
+  if (!activeBindingPlan.value) return false
+  const macroLower = sectorMacro.toLowerCase()
+  
+  return activeBindingPlan.value.groupBindings.some(b => {
+    if (b.sectorGroupId === currentGroupId) return false
+    // 检查是否是其他 group 的定位星区
+    if (b.sectorMacro?.toLowerCase() === macroLower) return true
+    // 检查是否是其他 group 的覆盖星区
+    return b.coverageSectorMacros?.some(m => m.toLowerCase() === macroLower)
+  })
+}
+
 function isSaveSectorBound(sectorMacro: string): boolean {
   if (!activeBindingPlan.value) return false
   const groupBinding = activeBindingPlan.value.groupBindings.find(
@@ -241,12 +262,27 @@ function isSaveSectorBound(sectorMacro: string): boolean {
 
 function getBoundSectorGroupName(sectorMacro: string): string | null {
   if (!activeBindingPlan.value) return null
-  const groupBinding = activeBindingPlan.value.groupBindings.find(
-    (b) => b.coverageSectorMacros?.some(m => m.toLowerCase() === sectorMacro.toLowerCase())
+  const macroLower = sectorMacro.toLowerCase()
+  
+  // 先检查是否是某 group 的定位星区
+  const anchorBinding = activeBindingPlan.value.groupBindings.find(
+    (b) => b.sectorMacro?.toLowerCase() === macroLower
   )
-  if (!groupBinding) return null
-  const sector = empireSectors.value.find((s) => s.id === groupBinding.sectorGroupId)
-  return sector?.name || null
+  if (anchorBinding) {
+    const sector = empireSectors.value.find((s) => s.id === anchorBinding.sectorGroupId)
+    return sector?.name || null
+  }
+  
+  // 再检查是否是某 group 的覆盖星区
+  const groupBinding = activeBindingPlan.value.groupBindings.find(
+    (b) => b.coverageSectorMacros?.some(m => m.toLowerCase() === macroLower)
+  )
+  if (groupBinding) {
+    const sector = empireSectors.value.find((s) => s.id === groupBinding.sectorGroupId)
+    return sector?.name || null
+  }
+  
+  return null
 }
 
 function getStationLabel(station: PlayerStationEntry): string {
@@ -407,6 +443,13 @@ function onMenuSectorClick(sectorMacro: string) {
   
   expandedSectorId.value = bindMenuTargetSectorId.value
   
+  // 备份当前状态用于取消恢复
+  backupState.value = {
+    jumpRange: draftJumpRange.value,
+    coverage: [...draftCoverage.value],
+    excluded: [...draftExcluded.value]
+  }
+  
   empireStore.bindSectorGroup({
     gameGuid: props.gameGuid,
     sectorGroupId: bindMenuTargetSectorId.value!,
@@ -419,7 +462,29 @@ function onMenuSectorClick(sectorMacro: string) {
 }
 
 function cancelBinding(sectorId: string) {
-  empireStore.clearSectorGroupBinding(props.gameGuid, sectorId)
+  // 恢复备份状态
+  if (backupState.value) {
+    draftJumpRange.value = backupState.value.jumpRange
+    draftCoverage.value = [...backupState.value.coverage]
+    draftExcluded.value = [...backupState.value.excluded]
+    
+    // 恢复 store 中的绑定
+    const currentBinding = activeBindingPlan.value?.groupBindings.find(
+      b => b.sectorGroupId === sectorId
+    )
+    if (currentBinding?.sectorMacro) {
+      empireStore.bindSectorGroup({
+        gameGuid: props.gameGuid,
+        sectorGroupId: sectorId,
+        sectorMacro: currentBinding.sectorMacro,
+        jumpRange: backupState.value.jumpRange,
+        coverageSectorMacros: backupState.value.coverage
+      })
+    }
+    
+    backupState.value = null
+  }
+  
   expandedSectorId.value = null
 }
 
@@ -689,10 +754,19 @@ onBeforeUnmount(() => {
                   <span
                     v-for="macro in getCandidateSectorsAtJump(jump)"
                     :key="macro"
-                    class="pill pill--candidate"
+                    class="pill"
+                    :class="{ 
+                      'pill--candidate': !isSectorBoundToOtherGroup(macro, sector.id),
+                      'pill--orange': isSectorBoundToOtherGroup(macro, sector.id)
+                    }"
                   >
                     {{ getSectorMacroDisplayName(macro) }}
-                    <button class="pill-plus" type="button" @click.stop="addToCoverage(macro)">+</button>
+                    <button 
+                      v-if="!isSectorBoundToOtherGroup(macro, sector.id)"
+                      class="pill-plus" 
+                      type="button" 
+                      @click.stop="addToCoverage(macro)"
+                    >+</button>
                   </span>
                 </div>
               </div>
@@ -790,7 +864,11 @@ onBeforeUnmount(() => {
               :key="sector.sectorMacro"
               type="button"
               class="bind-menu-item"
-              :class="{ active: isCurrentBoundSector(sector.sectorMacro) }"
+              :class="{ 
+                active: isCurrentBoundSector(sector.sectorMacro),
+                orange: isSectorBoundToOtherGroup(sector.sectorMacro, bindMenuTargetSectorId || '')
+              }"
+              :disabled="isSectorBoundToOtherGroup(sector.sectorMacro, bindMenuTargetSectorId || '')"
               @click="onMenuSectorClick(sector.sectorMacro)"
             >
               <span>{{ sector.sectorName }}</span>
@@ -988,6 +1066,10 @@ onBeforeUnmount(() => {
   @apply border-amber-300/20 bg-transparent text-amber-100/60;
 }
 
+.pill--orange {
+  @apply border-orange-300/30 bg-orange-200/10 text-orange-200;
+}
+
 .pill--small {
   @apply border-amber-300/20 bg-amber-200/5 text-amber-100/75;
 }
@@ -1078,6 +1160,18 @@ onBeforeUnmount(() => {
 
 .bind-menu-item.active {
   @apply bg-amber-200/15 text-amber-50;
+}
+
+.bind-menu-item.orange {
+  @apply text-orange-200;
+}
+
+.bind-menu-item.orange:hover {
+  @apply bg-transparent;
+}
+
+.bind-menu-item:disabled {
+  @apply cursor-not-allowed opacity-50;
 }
 
 .bind-menu-item-unbind {
