@@ -559,12 +559,9 @@ function updateDraftJumpRange(newValue: number) {
 
 // 获取指定跳数的覆盖星区
 function getCoverageSectorsAtJump(jump: number): string[] {
-  const currentBinding = activeBindingPlan.value?.groupBindings.find(
-    b => b.sectorGroupId === draft.value.sectorGroupId
-  )
-  if (!currentBinding?.sectorMacro) return []
+  if (!draft.value.anchorSectorMacro) return []
   
-  const anchorMacro = currentBinding.sectorMacro.toLowerCase()
+  const anchorMacro = draft.value.anchorSectorMacro.toLowerCase()
   const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
   
   // 获取当前跳数的结果
@@ -595,12 +592,9 @@ function getCoverageSectorsAtJump(jump: number): string[] {
 
 // 获取指定跳数的候选星区
 function getCandidateSectorsAtJump(jump: number): string[] {
-  const currentBinding = activeBindingPlan.value?.groupBindings.find(
-    b => b.sectorGroupId === draft.value.sectorGroupId
-  )
-  if (!currentBinding?.sectorMacro) return []
+  if (!draft.value.anchorSectorMacro) return []
   
-  const anchorMacro = currentBinding.sectorMacro.toLowerCase()
+  const anchorMacro = draft.value.anchorSectorMacro.toLowerCase()
   const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
   
   // 获取当前跳数的结果
