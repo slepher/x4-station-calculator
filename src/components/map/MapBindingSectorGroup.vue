@@ -533,11 +533,29 @@ function updateDraftJumpRange(newValue: number) {
   }
   
   if (newValue > oldValue) {
-    // 跳数增加：添加新跳数的 save sector
-    const newSectors = coverageByJump.get(newValue) || []
-    for (const sector of newSectors) {
-      if (!draft.value.coverage.includes(sector)) {
-        draft.value.coverage.push(sector)
+    // 跳数增加：添加新跳数范围内但不在旧跳数范围内的 save sector
+    const oldCoverageSet = new Set<string>()
+    for (let jump = 1; jump <= oldValue; jump++) {
+      const sectorsAtJump = coverageByJump.get(jump) || []
+      sectorsAtJump.forEach(s => oldCoverageSet.add(s.toLowerCase()))
+    }
+    
+    const newCoverageSet = new Set<string>()
+    for (let jump = 1; jump <= newValue; jump++) {
+      const sectorsAtJump = coverageByJump.get(jump) || []
+      sectorsAtJump.forEach(s => newCoverageSet.add(s.toLowerCase()))
+    }
+    
+    // 添加只在 newCoverage 中但不在 oldCoverage 中的星区
+    for (const sector of newCoverageSet) {
+      if (!oldCoverageSet.has(sector)) {
+        // 找到原始大小写的 sectorMacro
+        const originalMacro = Array.from(coverageByJump.values())
+          .flat()
+          .find(m => m.toLowerCase() === sector)
+        if (originalMacro && !draft.value.coverage.some(m => m.toLowerCase() === sector)) {
+          draft.value.coverage.push(originalMacro)
+        }
       }
     }
   } else if (newValue < oldValue) {
