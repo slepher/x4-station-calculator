@@ -77,7 +77,6 @@
       <relation faction="terran" relation="-0.032"/>
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.0032"/>
-      <relation faction="terran" relation="-0.032"/>
     </relations>
   </faction>
   <faction id="alliance" name="{20203,801}" description="{20203,802}" shortname="{20203,803}" prefixname="{20203,804}" spacename="{20203,805}" homespacename="{20203,806}" primaryrace="paranid" behaviourset="default" tags="economic privateloadout privateship protective standard watchdoguser" policefaction="paranid">
@@ -126,7 +125,6 @@
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="0.1"/>
       <relation faction="boron" relation="0.1"/>
-      <relation faction="terran" relation="0.1"/>
     </relations>
   </faction>
   <faction id="antigone" name="{20203,301}" description="{20203,302}" shortname="{20203,303}" prefixname="{20203,304}" spacename="{20203,305}" homespacename="{20203,306}" primaryrace="argon" behaviourset="default" tags="claimspace economic police privateloadout privateship protective publicship standard watchdoguser" policefaction="argon">
@@ -177,7 +175,6 @@
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.032"/>
       <relation faction="boron" relation="0.032"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
   </faction>
   <faction id="argon" name="{20203,201}" description="{20203,202}" shortname="{20203,203}" prefixname="{20203,204}" spacename="{20203,205}" homespacename="{20203,206}" primaryrace="argon" behaviourset="default" tags="claimspace economic police privateloadout privateship protective publicloadout publicship standard watchdoguser" policefaction="argon">
@@ -227,7 +224,6 @@
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.032"/>
       <relation faction="boron" relation="0.5"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
   </faction>
   <faction id="buccaneers" name="{20203,2401}" description="{20203,2402}" shortname="{20203,2403}" prefixname="{20203,2404}" spacename="{20203,2405}" homespacename="{20203,2406}" primaryrace="paranid" behaviourset="default" tags="claimspace economic pirate plunder privateloadout privateship protective watchdoguser">
@@ -289,7 +285,6 @@
       <relation faction="loanshark" relation="-0.032"/>
       <relation faction="scavenger" relation="-0.032"/>
       <relation faction="boron" relation="-0.032"/>
-      <relation faction="terran" relation="-0.032"/>
     </relations>
   </faction>
   <faction id="civilian" name="{20203,10301}" description="{20203,10302}" prefixname="{20203,10304}" behaviourset="default" tags="hidden">
@@ -334,7 +329,6 @@
       <relation faction="scavenger" relation="-0.5"/>
       <relation faction="boron" relation="-0.5"/>
       <relation faction="kaori" relation="-0.5"/>
-      <relation faction="terran" relation="-0.5"/>
     </relations>
   </faction>
   <faction id="hatikvah" name="{20203,901}" description="{20203,902}" shortname="{20203,903}" prefixname="{20203,904}" spacename="{20203,905}" homespacename="{20203,906}" primaryrace="argon" behaviourset="default" tags="claimspace economic pirate plunder privateloadout privateship protective watchdoguser">
@@ -423,7 +417,6 @@
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.032"/>
       <relation faction="boron" relation="-0.1"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
   </faction>
   <faction id="holyorderfanatic" name="{20203,2601}" description="{20203,2602}" shortname="{20203,2603}" prefixname="{20203,2604}" spacename="{20203,2605}" homespacename="{20203,2606}" primaryrace="paranid" behaviourset="default" tags="privateloadout hidden">
@@ -454,7 +447,6 @@
       <relation faction="loanshark" relation="-1"/>
       <relation faction="scavenger" relation="-1"/>
       <relation faction="boron" relation="-0.1"/>
-      <relation faction="terran" relation="-1"/>
     </relations>
   </faction>
   <faction id="khaak" name="{20203,1501}" description="{20203,1502}" shortname="{20203,1503}" prefixname="{20203,1504}" spacename="{20203,1505}" homespacename="{20203,1506}" primaryrace="khaak" behaviourset="khaak" tags="aggressive nodiplomacyselection noresupply notradeoffer privateloadout privateship">
@@ -491,7 +483,6 @@
       <relation faction="scavenger" relation="-1"/>
       <relation faction="boron" relation="-1"/>
       <relation faction="kaori" relation="-1"/>
-      <relation faction="terran" relation="-1"/>
     </relations>
     <signals>
       <response signal="policehalt" response="attack"/>
@@ -543,7 +534,6 @@
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.1"/>
       <relation faction="boron" relation="0.032"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
   </faction>
   <faction id="outlaw" name="{20203,10101}" description="{20203,10102}" prefixname="{20203,10104}" behaviourset="default" tags="hidden">
@@ -578,7 +568,6 @@
       <relation faction="scavenger" relation="-0.032"/>
       <relation faction="boron" relation="-0.032"/>
       <relation faction="kaori" relation="-0.032"/>
-      <relation faction="terran" relation="-0.032"/>
     </relations>
   </faction>
   <faction id="ownerless" behaviourset="default" tags="hidden">
@@ -627,7 +616,6 @@
       <relation faction="terran" relation="-0.011"/>
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.032"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
   </faction>
   <faction id="scaleplate" name="{20203,1001}" description="{20203,1002}" shortname="{20203,1003}" prefixname="{20203,1004}" spacename="{20203,1005}" homespacename="{20203,1006}" primaryrace="teladi" behaviourset="default" tags="economic pirate plunder privateloadout privateship protective watchdoguser">
@@ -686,7 +674,6 @@
       <relation faction="scavenger" relation="-0.32"/>
       <relation faction="boron" relation="-0.32"/>
       <relation faction="kaori" relation="-0.32"/>
-      <relation faction="terran" relation="-0.32"/>
     </relations>
     <signals>
       <response signal="foundlockbox" response="collect"/>
@@ -721,7 +708,6 @@
       <relation faction="scavenger" relation="-0.06"/>
       <relation faction="boron" relation="-0.06"/>
       <relation faction="kaori" relation="-0.06"/>
-      <relation faction="terran" relation="-0.06"/>
     </relations>
   </faction>
   <faction id="teladi" name="{20203,601}" description="{20203,602}" shortname="{20203,603}" prefixname="{20203,604}" spacename="{20203,605}" homespacename="{20203,606}" primaryrace="teladi" behaviourset="default" tags="claimspace economic privateloadout privateship protective publicloadout publicship standard watchdoguser" policefaction="ministry">
@@ -805,7 +791,6 @@
       <relation faction="terran" relation="-0.011"/>
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.032"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
   </faction>
   <faction id="visitor" name="{20203,20101}" description="{20203,20102}" prefixname="{20203,20104}" behaviourset="default" tags="visitor hidden">
@@ -853,7 +838,6 @@
       <relation faction="scavenger" relation="-1"/>
       <relation faction="boron" relation="-1"/>
       <relation faction="kaori" relation="-1"/>
-      <relation faction="terran" relation="-1"/>
     </relations>
     <signals>
       <response signal="policehalt" response="attack"/>
@@ -908,7 +892,6 @@
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.032"/>
       <relation faction="boron" relation="-0.032"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
   </faction>
   <faction id="fallensplit" name="{20203,1701}" description="{20203,1702}" shortname="{20203,1703}" prefixname="{20203,1704}" spacename="{20203,1705}" homespacename="{20203,1706}" primaryrace="split" behaviourset="default" tags="noresupply pirate plunder privateloadout privateship">
@@ -950,7 +933,6 @@
       <relation faction="loanshark" relation="-0.32"/>
       <relation faction="scavenger" relation="-0.32"/>
       <relation faction="boron" relation="-0.32"/>
-      <relation faction="terran" relation="-0.32"/>
     </relations>
     <signals>
       <response signal="policehalt" response="attack"/>
@@ -993,7 +975,6 @@
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.032"/>
       <relation faction="boron" relation="-0.1"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
     <signals>
       <response signal="policehalt" response="attack"/>
@@ -1038,7 +1019,6 @@
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="loanshark" relation="-0.032"/>
       <relation faction="boron" relation="-0.32"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
   </faction>
   <faction id="pioneers" name="{20203,2901}" description="{20203,2902}" shortname="{20203,2903}" prefixname="{20203,2904}" spacename="{20203,2905}" homespacename="{20203,2906}" primaryrace="terran" behaviourset="default" tags="claimspace economic privateloadout privateship protective standard">
@@ -1085,7 +1065,6 @@
       <relation faction="yaki" relation="-0.011"/>
       <relation faction="loanshark" relation="-0.032"/>
       <relation faction="boron" relation="0.032"/>
-      <relation faction="terran" relation="0.1"/>
     </relations>
   </faction>
   <faction id="terran" name="{20203,3001}" description="{20203,3002}" shortname="{20203,3003}" prefixname="{20203,3004}" spacename="{20203,3005}" homespacename="{20203,3006}" primaryrace="terran" behaviourset="default" tags="claimspace economic police privateloadout privateship protective standard watchdoguser" policefaction="terran">
@@ -1186,7 +1165,6 @@
       <relation faction="scavenger" relation="-0.32"/>
       <relation faction="boron" relation="-0.32"/>
       <relation faction="kaori" relation="-0.32"/>
-      <relation faction="terran" relation="-1"/>
     </relations>
     <signals>
       <response signal="foundabandonedship" response="claim"/>
@@ -1241,7 +1219,6 @@
       <relation faction="xenon" relation="-1"/>
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="boron" relation="-0.032"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
     <buildrules method="closedloop"/>
   </faction>
@@ -1280,7 +1257,6 @@
       <relation faction="xenon" relation="-1"/>
       <relation faction="yaki" relation="-0.32"/>
       <relation faction="boron" relation="0.032"/>
-      <relation faction="terran" relation="-0.011"/>
     </relations>
     <buildrules method="closedloop"/>
   </faction>
@@ -1337,38 +1313,6 @@
       <relation faction="terran" relation="-0.032"/>
       <relation faction="xenon" relation="-1"/>
       <relation faction="yaki" relation="-0.32"/>
-      <relation faction="terran" relation="-0.032"/>
-    </relations>
-  </faction>
-  <faction id="terran" name="{20203,3001}" description="{20203,3002}" shortname="{20203,3003}" prefixname="{20203,3004}" spacename="{20203,3005}" homespacename="{20203,3006}" primaryrace="terran" behaviourset="default" tags="claimspace economic police protective watchdoguser privateloadout privateship" policefaction="terran">
-    <color ref="faction_terran"/>
-    <icon active="faction_terran" inactive="faction_terran" banner="diplomacy_banner_terran"/>
-    <relations>
-      <relation faction="alliance" relation="0.1"/>
-      <relation faction="antigone" relation="-0.011"/>
-      <relation faction="argon" relation="-0.011"/>
-      <relation faction="boron" relation="-0.032"/>
-      <relation faction="buccaneers" relation="-0.032"/>
-      <relation faction="court" relation="-0.011"/>
-      <relation faction="criminal" relation="-0.5"/>
-      <relation faction="fallensplit" relation="-0.32"/>
-      <relation faction="freesplit" relation="-0.011"/>
-      <relation faction="holyorder" relation="-0.011"/>
-      <relation faction="holyorderfanatic" relation="-1"/>
-      <relation faction="khaak" relation="-1"/>
-      <relation faction="loanshark" relation="-0.011"/>
-      <relation faction="ministry" relation="-0.011"/>
-      <relation faction="outlaw" relation="-0.032"/>
-      <relation faction="paranid" relation="-0.011"/>
-      <relation faction="pioneers" relation="0.1"/>
-      <relation faction="player" relation="-0.032"/>
-      <relation faction="scaleplate" relation="-0.32"/>
-      <relation faction="scavenger" relation="-0.011"/>
-      <relation faction="smuggler" relation="-0.06"/>
-      <relation faction="split" relation="-0.011"/>
-      <relation faction="trinity" relation="-0.011"/>
-      <relation faction="xenon" relation="-1"/>
-      <relation faction="yaki" relation="-1"/>
     </relations>
   </faction>
   <faction id="kaori" name="{20203,3601}" description="{20203,3602}" shortname="{20203,3603}" prefixname="{20203,3604}" spacename="{20203,3605}" homespacename="{20203,3606}" primaryrace="argon" behaviourset="default" tags="barterships barterwares claimspace economic noblueprintsale nolicencesale noplayerbuyships noplayersellships notradeoffer privateloadout privateship protective standard">

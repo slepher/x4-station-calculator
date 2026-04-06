@@ -459,23 +459,6 @@
     "claimspace": true
   },
   {
-    "id": "terran",
-    "name": "Terran Protectorate",
-    "nameId": "{20203,3001}",
-    "tags": [
-      "claimspace",
-      "economic",
-      "police",
-      "protective",
-      "watchdoguser",
-      "privateloadout",
-      "privateship"
-    ],
-    "color_name": "faction_terran",
-    "color": "#99D5FF",
-    "claimspace": true
-  },
-  {
     "id": "trinity",
     "name": "Realm of the Trinity",
     "nameId": "{20203,2301}",
