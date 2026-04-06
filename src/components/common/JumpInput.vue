@@ -54,7 +54,7 @@ function update(value: number) {
 
 <style scoped>
 .jump-input-wrapper {
-  @apply flex items-center rounded border border-amber-300/30 bg-black/40 overflow-hidden;
+  @apply flex items-center w-fit rounded border border-amber-300/30 bg-black/40 overflow-hidden;
 }
 
 .jump-input-wrapper.disabled {
