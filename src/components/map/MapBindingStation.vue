@@ -6,7 +6,6 @@ import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getCoverageSectors, buildSectorGraphFromMaps, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
-import JumpInput from '@/components/common/JumpInput.vue'
 import type { StationSaveBinding, StationPlan } from '@/types/x4'
 import type { PlayerStationEntry } from '@/types/saveArchive'
 import factoryIconUrl from '@/components/icons/factory.svg'
@@ -36,7 +35,6 @@ const empireStore = useEmpireStore()
 const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
 
-const selectedJumpRange = ref(3)
 const importStationName = ref('')
 
 const bindMenuOpen = ref(false)
@@ -86,14 +84,20 @@ const sectorGraphData = computed(() => {
 
 const coverageSectors = computed(() => {
   if (!currentGroupBinding.value?.sectorMacro) return []
-  return getCoverageSectors(currentGroupBinding.value.sectorMacro, selectedJumpRange.value, sectorGraphData.value.sectorGraph, sectorGraphData.value.sectorClusterMap)
+  const jumpRange = currentGroupBinding.value.jumpRange || 2
+  return getCoverageSectors(currentGroupBinding.value.sectorMacro, jumpRange, sectorGraphData.value.sectorGraph, sectorGraphData.value.sectorClusterMap)
 })
 
 const coverageSectorsWithStations = computed<SectorWithStations[]>(() => {
-  if (!activeArchive.value || coverageSectors.value.length === 0) return []
+  if (!activeArchive.value || !currentGroupBinding.value?.sectorMacro) return []
 
+  const anchorMacro = currentGroupBinding.value.sectorMacro.toLowerCase()
   const coverageSet = new Set(coverageSectors.value.map(s => s.sectorMacro.toLowerCase()))
   const distanceMap = new Map(coverageSectors.value.map(s => [s.sectorMacro.toLowerCase(), s.distance]))
+  
+  // 包含定位星区本身（distance=0）
+  coverageSet.add(anchorMacro)
+  distanceMap.set(anchorMacro, 0)
 
   const results: SectorWithStations[] = []
 
@@ -215,16 +219,6 @@ function getBindButtonLabel(saveStationCode: string): string {
     return station?.name || t('map.binding_bind')
   }
   return t('map.binding_bind')
-}
-
-function updateJumpLimit(value: number) {
-  selectedJumpRange.value = value
-  empireStore.updateSectorGroupJumpRange(props.gameGuid, props.sectorGroupId, selectedJumpRange.value)
-}
-
-// @ts-ignore - Used in template
-function stepJumpLimit(delta: number) {
-  updateJumpLimit(selectedJumpRange.value + delta)
 }
 
 function updateBindMenuPosition() {
@@ -454,21 +448,10 @@ onMounted(() => {
 
 <template>
   <div class="binding-station">
-    <!-- Jump Range Selector -->
-    <div class="jump-range">
-      <label class="label">{{ t('map.binding_jump_range') }}</label>
-      <JumpInput
-        v-model="selectedJumpRange"
-        :min="0"
-        :max="5"
-        @update:model-value="updateJumpLimit"
-      />
-    </div>
-
-    <!-- Current Group Info -->
-    <div class="current-group">
-      <span class="group-label">{{ t('map.binding_sector_group') }}:</span>
-      <span class="group-name">{{ activeEmpire?.sectors?.find(s => s.id === props.sectorGroupId)?.name }}</span>
+    <!-- Sector Title -->
+    <div class="sector-title">
+      <span class="sector-name">{{ currentGroupBinding?.sectorMacro ? getSectorMacroDisplayName(currentGroupBinding.sectorMacro) : '-' }}</span>
+      <span class="sector-bind-label">{{ t('map.binding_bind_to_sector') }} {{ activeEmpire?.sectors?.find(s => s.id === props.sectorGroupId)?.name }}</span>
     </div>
 
     <!-- Save Stations -->
@@ -666,6 +649,18 @@ onMounted(() => {
 
 .group-name {
   @apply text-amber-50;
+}
+
+.sector-title {
+  @apply flex items-baseline gap-2;
+}
+
+.sector-name {
+  @apply text-base font-semibold text-amber-50;
+}
+
+.sector-bind-label {
+  @apply text-xs text-amber-100/50;
 }
 
 .section-header {

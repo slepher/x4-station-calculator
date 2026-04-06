@@ -266,6 +266,7 @@
     "binding_archive_time": "Archive Time",
     "binding_bound_to": "Bound to",
     "binding_bind": "Bind",
+    "binding_bind_to_sector": "Bind to",
     "binding_import": "Import",
     "binding_already_bound": "Bound",
     "binding_select_empire_station": "Select Empire Station",
