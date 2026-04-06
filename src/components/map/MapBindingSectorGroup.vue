@@ -714,7 +714,7 @@ onBeforeUnmount(() => {
           <div class="config-header-row">
             <div class="anchor-sector">
               <label class="config-label">{{ t('map.binding_anchor_sector') }}</label>
-              <span class="anchor-name">{{ sector.sectorMacro ? getSectorMacroDisplayName(sector.sectorMacro) : '-' }}</span>
+              <span class="anchor-name">{{ draft.anchorSectorMacro ? getSectorMacroDisplayName(draft.anchorSectorMacro) : '-' }}</span>
             </div>
             <div class="jump-control">
               <label class="config-label">{{ t('map.binding_jump_range') }}</label>
