@@ -713,7 +713,7 @@ onBeforeUnmount(() => {
             type="button"
             @click.stop="toggleBindMenu($event, sector.id)"
           >
-            {{ sector.sectorMacro ? getSectorMacroDisplayName(sector.sectorMacro) : t('map.binding_bind') }}
+            {{ t('map.binding_already_bound') }}
             <svg class="bound-btn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
             </svg>
