@@ -6,6 +6,7 @@ import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getCoverageSectors, buildSectorGraphFromMaps, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
+import JumpInput from '@/components/common/JumpInput.vue'
 import type { StationSaveBinding, StationPlan } from '@/types/x4'
 import type { PlayerStationEntry } from '@/types/saveArchive'
 import factoryIconUrl from '@/components/icons/factory.svg'
@@ -186,10 +187,11 @@ function getBindButtonLabel(saveStationCode: string): string {
 }
 
 function updateJumpLimit(value: number) {
-  selectedJumpRange.value = Math.max(0, Math.min(5, value))
+  selectedJumpRange.value = value
   empireStore.updateSectorGroupJumpRange(props.gameGuid, props.sectorGroupId, selectedJumpRange.value)
 }
 
+// @ts-ignore - Used in template
 function stepJumpLimit(delta: number) {
   updateJumpLimit(selectedJumpRange.value + delta)
 }
@@ -424,22 +426,12 @@ onMounted(() => {
     <!-- Jump Range Selector -->
     <div class="jump-range">
       <label class="label">{{ t('map.binding_jump_range') }}</label>
-      <div class="jump-input-wrap">
-        <input
-          class="jump-input"
-          type="number"
-          min="0"
-          max="5"
-          step="1"
-          :value="selectedJumpRange"
-          @input="updateJumpLimit(Number(($event.target as HTMLInputElement).value) || 0)"
-        />
-        <span class="jump-suffix">{{ t('map.resource_filter_jump_suffix') }}</span>
-        <div class="jump-stepper">
-          <button type="button" class="jump-step" @click="stepJumpLimit(1)">▲</button>
-          <button type="button" class="jump-step" @click="stepJumpLimit(-1)">▼</button>
-        </div>
-      </div>
+      <JumpInput
+        v-model="selectedJumpRange"
+        :min="0"
+        :max="5"
+        @update:model-value="updateJumpLimit"
+      />
     </div>
 
     <!-- Current Group Info -->
@@ -630,26 +622,6 @@ onMounted(() => {
 
 .label {
   @apply text-xs text-amber-100/60;
-}
-
-.jump-input-wrap {
-  @apply flex items-center gap-1;
-}
-
-.jump-input {
-  @apply w-16 rounded border border-amber-300/30 bg-black/50 px-2 py-1 text-sm text-amber-50;
-}
-
-.jump-suffix {
-  @apply text-xs text-amber-100/50;
-}
-
-.jump-stepper {
-  @apply flex flex-col;
-}
-
-.jump-step {
-  @apply text-xs text-amber-100/60 hover:text-amber-50;
 }
 
 .current-group {

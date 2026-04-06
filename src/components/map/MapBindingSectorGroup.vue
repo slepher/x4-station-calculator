@@ -8,6 +8,7 @@ import { useSectorNameFilter } from '@/composables/useSectorNameFilter'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 import { getCoverageSectors, buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from './mapSectorMacro'
+import JumpInput from '@/components/common/JumpInput.vue'
 import type { SaveBindingPlan, SectorPlan } from '@/types/x4'
 import type { PlayerStationEntry, SaveArchive } from '@/types/saveArchive'
 
@@ -437,7 +438,7 @@ function confirmBinding(sectorId: string) {
 }
 
 function updateDraftJumpRange(value: number) {
-  draftJumpRange.value = Math.max(0, Math.min(5, value))
+  draftJumpRange.value = value
   
   const currentBinding = activeBindingPlan.value?.groupBindings.find(b => b.sectorGroupId === expandedSectorId.value)
   if (currentBinding?.sectorMacro) {
@@ -532,13 +533,11 @@ onBeforeUnmount(() => {
         <div v-if="sector.expanded" class="empire-sector-config">
           <div class="config-row">
             <label class="config-label">{{ t('map.binding_jump_range') }}</label>
-            <input
-              class="jump-input"
-              type="number"
-              min="0"
-              max="5"
-              :value="draftJumpRange"
-              @input="updateDraftJumpRange(Number(($event.target as HTMLInputElement).value) || 0)"
+            <JumpInput
+              v-model="draftJumpRange"
+              :min="0"
+              :max="5"
+              @update:model-value="updateDraftJumpRange"
             />
           </div>
 
@@ -801,10 +800,6 @@ onBeforeUnmount(() => {
 
 .config-label {
   @apply text-xs text-amber-100/60;
-}
-
-.jump-input {
-  @apply w-20 rounded border border-amber-300/30 bg-black/50 px-2 py-1 text-sm text-amber-50;
 }
 
 .coverage-pills {

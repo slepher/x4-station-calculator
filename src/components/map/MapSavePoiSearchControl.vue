@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useLocalizedNameMatch } from '@/composables/useLocalizedNameMatch'
+import JumpInput from '@/components/common/JumpInput.vue'
 import type { SearchState, SearchTag } from './savePoiSearchFilter'
 
 const emit = defineEmits<{
@@ -266,18 +267,6 @@ watch(sectorJumpLimit, () => {
     emitSearchChange()
   }
 })
-
-function stepJumpLimit(delta: number) {
-  const next = sectorJumpLimit.value + delta
-  if (next >= 0 && next <= 8) {
-    sectorJumpLimit.value = next
-  }
-}
-
-function updateJumpLimit(value: number) {
-  const num = Math.max(0, Math.min(8, value))
-  sectorJumpLimit.value = num
-}
 </script>
 
 <template>
@@ -295,21 +284,12 @@ function updateJumpLimit(value: number) {
         />
         <div class="right-controls">
           <template v-if="selectedCategory === 'sector'">
-            <div class="jump-wrap">
-              <input
-                :value="sectorJumpLimit"
-                class="jump-input"
-                type="number"
-                min="0"
-                max="8"
-                @input="updateJumpLimit(Number(($event.target as HTMLInputElement).value || 0))"
-              />
-              <span class="jump-suffix">{{ t('map.poi_search_jump_suffix') }}</span>
-              <div class="jump-stepper">
-                <button type="button" class="jump-step-btn" @click="stepJumpLimit(1)">▲</button>
-                <button type="button" class="jump-step-btn" @click="stepJumpLimit(-1)">▼</button>
-              </div>
-            </div>
+            <JumpInput
+              v-model="sectorJumpLimit"
+              :min="0"
+              :max="8"
+              suffix="j"
+            />
             <div class="divider"></div>
           </template>
           <div class="category-dropdown-wrapper">
@@ -401,38 +381,6 @@ function updateJumpLimit(value: number) {
 
 .right-controls {
   @apply absolute right-0 top-0 bottom-0 flex items-center gap-0;
-}
-
-.jump-wrap {
-  @apply flex items-center rounded border border-amber-300/30 bg-black/40 overflow-hidden;
-}
-
-.jump-input {
-  @apply w-7 h-8 bg-transparent px-1 text-center text-sm text-amber-50 outline-none;
-  min-width: 0;
-  -moz-appearance: textfield;
-}
-
-.jump-input::-webkit-outer-spin-button,
-.jump-input::-webkit-inner-spin-button {
-  -webkit-appearance: none;
-  margin: 0;
-}
-
-.jump-suffix {
-  @apply text-xs font-medium text-amber-100/80 mr-1;
-}
-
-.jump-stepper {
-  @apply flex flex-col border-l border-amber-300/20 bg-black/40;
-}
-
-.jump-step-btn {
-  @apply flex h-4 w-4 items-center justify-center text-[9px] leading-none text-amber-100/70 transition-colors duration-150 hover:bg-amber-200/10 hover:text-amber-50;
-}
-
-.jump-step-btn + .jump-step-btn {
-  @apply border-t border-amber-300/20;
 }
 
 .divider {
