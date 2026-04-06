@@ -256,11 +256,11 @@ export function createSaveBindingActions(
       plan.groupBindings.push(groupBinding)
     }
 
-    const alreadyBoundStation = groupBinding.stationBindings.find(
+    const alreadyBoundStationIndex = groupBinding.stationBindings.findIndex(
       (b) => b.saveStationCode === input.saveStationCode && b.stationId !== input.stationId
     )
-    if (alreadyBoundStation) {
-      return false
+    if (alreadyBoundStationIndex >= 0) {
+      groupBinding.stationBindings.splice(alreadyBoundStationIndex, 1)
     }
 
     const existingIndex = groupBinding.stationBindings.findIndex(

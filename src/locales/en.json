@@ -266,7 +266,10 @@
     "binding_cancel": "Cancel",
     "binding_confirm": "Confirm",
     "binding_free_sectors": "Free Sectors",
-    "binding_position_set": "Position set"
+    "binding_position_set": "Position set",
+    "binding_save_station": "Save Station",
+    "binding_no_idle_stations": "No idle stations",
+    "binding_import_as_new": "Import as new station"
   },
   "ship_build": {
     "title": "Ship Build",
