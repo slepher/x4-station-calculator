@@ -1,8 +1,10 @@
 <script setup lang="ts">
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEmpireStore } from '@/store/useEmpireStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveStore } from '@/store/useSaveStore'
+import { resolveMapSectorByMacro } from './utils/mapSectorMacro'
 import MapBindingSelectArchive from './MapBindingSelectArchive.vue'
 import MapBindingSectorGroup from './MapBindingSectorGroup.vue'
 import MapBindingStation from './MapBindingStation.vue'
@@ -21,13 +23,56 @@ const emit = defineEmits<{
   (e: 'drag-station-end'): void
 }>()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 const empireStore = useEmpireStore()
 const saveStore = useSaveStore()
+const gameDataStore = useGameDataStore()
 
 const stage = ref<PanelStage>('select-binding')
 const selectedGameGuid = ref<string | null>(null)
 const selectedSectorGroupId = ref<string | null>(null)
+
+const activeBindingPlan = computed(() => {
+  if (!selectedGameGuid.value) return null
+  return empireStore.activeEmpire?.saveBindings?.find((p) => p.gameGuid === selectedGameGuid.value) || null
+})
+
+const currentGroupBinding = computed(() => {
+  if (!activeBindingPlan.value || !selectedSectorGroupId.value) return null
+  return activeBindingPlan.value.groupBindings.find((b) => b.sectorGroupId === selectedSectorGroupId.value) || null
+})
+
+const empireSectorName = computed(() => {
+  if (!selectedSectorGroupId.value) return null
+  const sector = empireStore.activeEmpire?.sectors?.find(s => s.id === selectedSectorGroupId.value)
+  return sector?.name || null
+})
+
+const anchorSectorName = computed(() => {
+  const sectorMacro = currentGroupBinding.value?.sectorMacro
+  if (!sectorMacro) return null
+  const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
+  if (resolved?.sectorId) {
+    const cluster = gameDataStore.maps?.clusters?.[resolved.clusterId]
+    const sector = cluster?.sectors?.[resolved.sectorId]
+    if (sector?.nameId && te(sector.nameId)) return t(sector.nameId)
+    return sector?.name || null
+  }
+  return null
+})
+
+const panelTitle = computed(() => {
+  if (stage.value === 'select-binding') {
+    return t('map.binding_title')
+  }
+  if (stage.value === 'select-sector') {
+    return t('map.binding_sector_group')
+  }
+  // step 3: "<定位星区> 绑定 <帝国星区组>"
+  const anchor = anchorSectorName.value || '-'
+  const group = empireSectorName.value || '-'
+  return `${anchor} ${t('map.binding_bind_to_sector')} ${group}`
+})
 
 function onSelectArchive(payload: { gameGuid: string; time: number | null }) {
   const existingBinding = empireStore.activeEmpire?.saveBindings?.find(
@@ -93,9 +138,7 @@ watch(() => props.open, (open) => {
           ←
         </button>
         <div class="map-binding-panel__title">
-          {{ stage === 'select-binding' ? t('map.binding_title') :
-             stage === 'select-sector' ? t('map.binding_sector_group') :
-             t('map.binding_select_station') }}
+          {{ panelTitle }}
         </div>
       </div>
       <button

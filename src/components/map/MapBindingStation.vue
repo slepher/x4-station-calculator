@@ -448,12 +448,6 @@ onMounted(() => {
 
 <template>
   <div class="binding-station">
-    <!-- Sector Title -->
-    <div class="sector-title">
-      <span class="sector-name">{{ currentGroupBinding?.sectorMacro ? getSectorMacroDisplayName(currentGroupBinding.sectorMacro) : '-' }}</span>
-      <span class="sector-bind-label">{{ t('map.binding_bind_to_sector') }} {{ activeEmpire?.sectors?.find(s => s.id === props.sectorGroupId)?.name }}</span>
-    </div>
-
     <!-- Save Stations -->
     <div class="section-header">{{ t('map.binding_save_stations') }}</div>
     <div class="poi-groups">
@@ -649,18 +643,6 @@ onMounted(() => {
 
 .group-name {
   @apply text-amber-50;
-}
-
-.sector-title {
-  @apply flex items-baseline gap-2;
-}
-
-.sector-name {
-  @apply text-base font-semibold text-amber-50;
-}
-
-.sector-bind-label {
-  @apply text-xs text-amber-100/50;
 }
 
 .section-header {
