@@ -339,6 +339,11 @@ function updateBindMenuPosition() {
 }
 
 function toggleBindMenu(event: MouseEvent, sectorId: string) {
+  // 如果有其他星区正在编辑，先取消它
+  if (expandedSectorId.value && expandedSectorId.value !== sectorId) {
+    cancelBinding(expandedSectorId.value)
+  }
+  
   if (bindMenuOpen.value && bindMenuTargetSectorId.value === sectorId) {
     closeBindMenu()
   } else {
@@ -420,12 +425,12 @@ function onMenuSectorClick(sectorMacro: string) {
   )
   
   if (currentBinding?.sectorMacro?.toLowerCase() === sectorMacro.toLowerCase()) {
-    // 点击已选星区，保持现有配置
+    // 点击已选星区，继承之前的跳数和覆盖配置
     draftJumpRange.value = currentBinding.jumpRange
     draftCoverage.value = [...(currentBinding.coverageSectorMacros || [])]
     draftExcluded.value = []
   } else {
-    // 点击新星区，重新计算 coverage（跳数不变）
+    // 点击新星区，继承之前的跳数，重新计算 coverage
     // 覆盖星区 = 跳数范围内所有 save sector（不包括 anchor）
     const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
     const coverageResult = getCoverageSectors(sectorMacro.toLowerCase(), draftJumpRange.value, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
