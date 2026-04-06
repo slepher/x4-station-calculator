@@ -163,7 +163,38 @@ const stationBindingsInGroup = computed(() => {
 })
 
 function getStationLabel(station: PlayerStationEntry): string {
-  return station.code.split('_').pop() || station.code
+  if (station.is_headquarter) {
+    return t('map.save_station_headquarter')
+  }
+
+  if (station.tag === 'factory') {
+    const profile = station.productionProfile
+    if (!profile) return t('map.save_npc_tag_factory')
+
+    if (profile === 'mixed') return t('map.save_npc_profile_mixed')
+
+    const localizedModule = gameDataStore.localizedModulesMap?.[profile]
+    if (localizedModule?.localeName) return localizedModule.localeName
+
+    const localizedGroup = gameDataStore.localizedModuleGroupsMap?.[profile]
+    if (localizedGroup?.localeName) return localizedGroup.localeName
+
+    return station.profileName || profile
+  }
+
+  const tagLabelKeys: Record<string, string> = {
+    shipyard: 'map.save_npc_tag_shipyard',
+    wharf: 'map.save_npc_tag_wharf',
+    equipmentdock: 'map.save_npc_tag_equipmentdock',
+    tradestation: 'map.save_npc_tag_tradestation',
+    piratebase: 'map.save_npc_tag_piratebase',
+    defencemodule: 'map.save_npc_tag_defencemodule'
+  }
+
+  const labelKey = station.tag ? tagLabelKeys[station.tag] : undefined
+  if (labelKey) return t(labelKey)
+
+  return t('map.save_category_player_station')
 }
 
 function isSaveStationBound(saveStationCode: string): boolean {
@@ -466,6 +497,7 @@ onMounted(() => {
             :key="station.code"
             class="poi-item"
             :class="{ 'poi-item--bound': isSaveStationBound(station.code) }"
+            @click="emit('focus-sector', sector.sectorMacro)"
           >
             <div class="poi-text">
               <div class="poi-title-row">
@@ -479,7 +511,7 @@ onMounted(() => {
                 class="poi-action"
                 :class="{ 'poi-action--bound': isSaveStationBound(station.code) }"
                 type="button"
-                @click="toggleBindMenu($event, station, sector.sectorMacro)"
+                @click.stop="toggleBindMenu($event, station, sector.sectorMacro)"
               >
                 {{ getBindButtonLabel(station.code) }}
                 <svg class="poi-action-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -673,7 +705,7 @@ onMounted(() => {
 }
 
 .poi-item {
-  @apply flex items-center justify-between gap-2 rounded border border-amber-300/15 bg-black/45 p-2;
+  @apply flex items-center justify-between gap-2 rounded border border-amber-300/15 bg-black/45 p-2 cursor-pointer transition-colors hover:border-amber-200/30;
 }
 
 .poi-item--bound {
