@@ -512,10 +512,9 @@ function updateDraftJumpRange(newValue: number) {
   const oldValue = draft.value.jumpRange
   draft.value.jumpRange = newValue
   
-  const currentBinding = activeBindingPlan.value?.groupBindings.find(b => b.sectorGroupId === draft.value.sectorGroupId)
-  if (!currentBinding?.sectorMacro) return
+  if (!draft.value.anchorSectorMacro) return
   
-  const anchorMacro = currentBinding.sectorMacro.toLowerCase()
+  const anchorMacro = draft.value.anchorSectorMacro.toLowerCase()
   const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
   
   // 获取按跳数分组的星区
