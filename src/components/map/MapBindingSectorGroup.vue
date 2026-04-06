@@ -31,7 +31,7 @@ const sectorSearchQuery = ref('')
 const { getSectorDisplayName, normalizedQuery } = useSectorNameFilter(sectorSearchQuery)
 
 const expandedSectorId = ref<string | null>(null)
-const draftJumpRange = ref(3)
+const draftJumpRange = ref(2)
 const draftCoverage = ref<string[]>([])
 const draftExcluded = ref<string[]>([])
 
@@ -390,15 +390,18 @@ function onMenuSectorClick(sectorMacro: string) {
     draftExcluded.value = []
   } else {
     // 点击新星区，重新计算 coverage（跳数不变）
-    // 覆盖星区 = 跳数范围内所有 save sector
+    // 覆盖星区 = 跳数范围内所有 save sector（不包括 anchor）
     const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
     const coverageResult = getCoverageSectors(sectorMacro.toLowerCase(), draftJumpRange.value, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
     
-    // 从跳数范围内的星区中筛选出 save sector
+    // 从跳数范围内的星区中筛选出 save sector，排除 anchor
     const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
     draftCoverage.value = coverageResult
       .map(s => s.sectorMacro)
-      .filter(m => saveSectorMacros.has(m.toLowerCase()))
+      .filter(m => {
+        const mLower = m.toLowerCase()
+        return saveSectorMacros.has(mLower) && mLower !== sectorMacro.toLowerCase()
+      })
     draftExcluded.value = []
   }
   
@@ -437,16 +440,122 @@ function confirmBinding(sectorId: string) {
   expandedSectorId.value = null
 }
 
-function updateDraftJumpRange(value: number) {
-  draftJumpRange.value = value
+function updateDraftJumpRange(newValue: number) {
+  const oldValue = draftJumpRange.value
+  draftJumpRange.value = newValue
   
   const currentBinding = activeBindingPlan.value?.groupBindings.find(b => b.sectorGroupId === expandedSectorId.value)
-  if (currentBinding?.sectorMacro) {
-    const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
-    const coverage = getCoverageSectors(currentBinding.sectorMacro.toLowerCase(), draftJumpRange.value, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
-    const excludedSet = new Set(draftExcluded.value)
-    draftCoverage.value = coverage.map(s => s.sectorMacro).filter(m => !excludedSet.has(m))
+  if (!currentBinding?.sectorMacro) return
+  
+  const anchorMacro = currentBinding.sectorMacro.toLowerCase()
+  const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
+  
+  // 获取按跳数分组的星区
+  const coverageByJump = new Map<number, string[]>()
+  for (let jump = 1; jump <= Math.max(oldValue, newValue); jump++) {
+    const result = getCoverageSectors(anchorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
+    const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
+    // 筛选 save sector 并排除 anchor
+    const saveSectorsAtJump = result
+      .map(s => s.sectorMacro)
+      .filter(m => {
+        const mLower = m.toLowerCase()
+        return saveSectorMacros.has(mLower) && mLower !== anchorMacro
+      })
+    coverageByJump.set(jump, saveSectorsAtJump)
   }
+  
+  if (newValue > oldValue) {
+    // 跳数增加：添加新跳数的 save sector
+    const newSectors = coverageByJump.get(newValue) || []
+    for (const sector of newSectors) {
+      if (!draftCoverage.value.includes(sector)) {
+        draftCoverage.value.push(sector)
+      }
+    }
+  } else if (newValue < oldValue) {
+    // 跳数减少：移除超出跳数的星区
+    const sectorsToKeep = new Set<string>()
+    
+    // 收集0到newValue跳的所有星区
+    for (let jump = 1; jump <= newValue; jump++) {
+      const sectorsAtJump = coverageByJump.get(jump) || []
+      sectorsAtJump.forEach(s => sectorsToKeep.add(s.toLowerCase()))
+    }
+    
+    // 只保留在范围内的星区
+    draftCoverage.value = draftCoverage.value.filter(m => sectorsToKeep.has(m.toLowerCase()))
+  }
+  // 如果跳数不变，不做任何操作
+}
+
+// 获取指定跳数的覆盖星区
+function getCoverageSectorsAtJump(jump: number): string[] {
+  const currentBinding = activeBindingPlan.value?.groupBindings.find(
+    b => b.sectorGroupId === expandedSectorId.value
+  )
+  if (!currentBinding?.sectorMacro) return []
+  
+  const anchorMacro = currentBinding.sectorMacro.toLowerCase()
+  const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
+  
+  // 获取当前跳数的结果
+  const result = getCoverageSectors(anchorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
+  
+  // 获取前一跳的结果（用于计算差值）
+  const prevResult = jump > 1 
+    ? getCoverageSectors(anchorMacro, jump - 1, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
+    : []
+  
+  const prevMacros = new Set(prevResult.map(s => s.sectorMacro.toLowerCase()))
+  
+  // 筛选：在当前跳但不在前一跳的 save sector（不包括 anchor）
+  const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
+  const sectorsAtJump = result
+    .map(s => s.sectorMacro)
+    .filter(m => {
+      const mLower = m.toLowerCase()
+      return saveSectorMacros.has(mLower) && 
+             mLower !== anchorMacro && 
+             !prevMacros.has(mLower)
+    })
+  
+  // 返回在当前 coverage 中的星区
+  const coverageSet = new Set(draftCoverage.value.map(m => m.toLowerCase()))
+  return sectorsAtJump.filter(m => coverageSet.has(m.toLowerCase()))
+}
+
+// 获取指定跳数的候选星区
+function getCandidateSectorsAtJump(jump: number): string[] {
+  const currentBinding = activeBindingPlan.value?.groupBindings.find(
+    b => b.sectorGroupId === expandedSectorId.value
+  )
+  if (!currentBinding?.sectorMacro) return []
+  
+  const anchorMacro = currentBinding.sectorMacro.toLowerCase()
+  const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
+  
+  // 获取当前跳数的结果
+  const result = getCoverageSectors(anchorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
+  
+  // 获取前一跳的结果
+  const prevResult = jump > 1 
+    ? getCoverageSectors(anchorMacro, jump - 1, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
+    : []
+  
+  const prevMacros = new Set(prevResult.map(s => s.sectorMacro.toLowerCase()))
+  
+  // 筛选：在当前跳但不在前一跳的地图星区（不包括 anchor）
+  const sectorsAtJump = result
+    .map(s => s.sectorMacro)
+    .filter(m => {
+      const mLower = m.toLowerCase()
+      return mLower !== anchorMacro && !prevMacros.has(mLower)
+    })
+  
+  // 返回不在 coverage 中的星区
+  const coverageSet = new Set(draftCoverage.value.map(m => m.toLowerCase()))
+  return sectorsAtJump.filter(m => !coverageSet.has(m.toLowerCase()))
 }
 
 function excludeFromCoverage(sectorMacro: string) {
@@ -524,48 +633,69 @@ onBeforeUnmount(() => {
             </svg>
           </button>
           <template v-else>
-            <button class="cancel-btn" type="button" @click.stop="cancelBinding(sector.id)">{{ t('map.binding_cancel') }}</button>
-            <button class="confirm-btn" type="button" @click.stop="confirmBinding(sector.id)">{{ t('map.binding_confirm') }}</button>
+            <div class="header-actions">
+              <button class="cancel-btn" type="button" @click.stop="cancelBinding(sector.id)">{{ t('map.binding_cancel') }}</button>
+              <button class="confirm-btn" type="button" @click.stop="confirmBinding(sector.id)">{{ t('map.binding_confirm') }}</button>
+            </div>
           </template>
         </div>
 
         <!-- Expanded Configuration -->
         <div v-if="sector.expanded" class="empire-sector-config">
-          <div class="config-row">
-            <label class="config-label">{{ t('map.binding_jump_range') }}</label>
-            <JumpInput
-              v-model="draftJumpRange"
-              :min="0"
-              :max="5"
-              @update:model-value="updateDraftJumpRange"
-            />
-          </div>
-
-          <div class="config-row">
-            <label class="config-label">{{ t('map.binding_coverage_sectors') }}</label>
-            <div class="pill-list">
-              <span
-                v-for="macro in draftCoverage"
-                :key="macro"
-                class="pill pill--coverage"
-              >
-                {{ getSectorMacroDisplayName(macro) }}
-                <button class="pill-x" type="button" @click.stop="excludeFromCoverage(macro)">×</button>
-              </span>
+          <!-- Anchor Sector and Jump Range -->
+          <div class="config-header-row">
+            <div class="anchor-sector">
+              <label class="config-label">{{ t('map.binding_anchor_sector') }}</label>
+              <span class="anchor-name">{{ sector.sectorMacro ? getSectorMacroDisplayName(sector.sectorMacro) : '-' }}</span>
+            </div>
+            <div class="jump-control">
+              <label class="config-label">{{ t('map.binding_jump_range') }}</label>
+              <JumpInput
+                v-model="draftJumpRange"
+                :min="0"
+                :max="5"
+                @update:model-value="updateDraftJumpRange"
+              />
             </div>
           </div>
 
-          <div class="config-row">
+          <!-- Coverage Sectors by Jump -->
+          <div class="config-section">
+            <label class="config-label">{{ t('map.binding_coverage_sectors') }}</label>
+            <div v-for="jump in draftJumpRange" :key="jump" class="jump-group">
+              <div v-if="getCoverageSectorsAtJump(jump).length > 0" class="jump-group-header">
+                <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+                <div class="pill-list">
+                  <span
+                    v-for="macro in getCoverageSectorsAtJump(jump)"
+                    :key="macro"
+                    class="pill pill--coverage"
+                  >
+                    {{ getSectorMacroDisplayName(macro) }}
+                    <button class="pill-x" type="button" @click.stop="excludeFromCoverage(macro)">×</button>
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Candidate Sectors by Jump -->
+          <div class="config-section">
             <label class="config-label">{{ t('map.binding_candidate_sectors') }}</label>
-            <div class="pill-list">
-              <span
-                v-for="macro in candidateSectors"
-                :key="macro"
-                class="pill pill--candidate"
-              >
-                {{ getSectorMacroDisplayName(macro) }}
-                <button class="pill-plus" type="button" @click.stop="addToCoverage(macro)">+</button>
-              </span>
+            <div v-for="jump in draftJumpRange" :key="jump" class="jump-group">
+              <div v-if="getCandidateSectorsAtJump(jump).length > 0" class="jump-group-header">
+                <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+                <div class="pill-list">
+                  <span
+                    v-for="macro in getCandidateSectorsAtJump(jump)"
+                    :key="macro"
+                    class="pill pill--candidate"
+                  >
+                    {{ getSectorMacroDisplayName(macro) }}
+                    <button class="pill-plus" type="button" @click.stop="addToCoverage(macro)">+</button>
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -782,6 +912,10 @@ onBeforeUnmount(() => {
   @apply h-3 w-3;
 }
 
+.header-actions {
+  @apply flex items-center gap-0.5;
+}
+
 .cancel-btn {
   @apply rounded border border-amber-300/30 bg-transparent px-2 py-1 text-xs text-amber-100;
 }
@@ -792,6 +926,38 @@ onBeforeUnmount(() => {
 
 .empire-sector-config {
   @apply mt-3 flex flex-col gap-3 border-t border-amber-300/15 pt-3;
+}
+
+.config-header-row {
+  @apply flex items-center justify-between gap-4;
+}
+
+.anchor-sector {
+  @apply flex flex-col gap-1;
+}
+
+.anchor-name {
+  @apply text-sm text-amber-100;
+}
+
+.jump-control {
+  @apply flex flex-col gap-1 items-end;
+}
+
+.config-section {
+  @apply flex flex-col gap-2;
+}
+
+.jump-group {
+  @apply flex flex-col gap-1;
+}
+
+.jump-group-header {
+  @apply flex items-start gap-2;
+}
+
+.jump-number {
+  @apply shrink-0 text-xs text-amber-100/50 w-8;
 }
 
 .config-row {

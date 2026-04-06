@@ -283,6 +283,7 @@
     "binding_coverage_sectors": "覆盖星区",
     "binding_excluded_sectors": "排除星区",
     "binding_candidate_sectors": "候选星区",
+    "binding_anchor_sector": "定位星区",
     "binding_save_sectors": "存档星区",
     "binding_save_sector_candidates": "存档星区候选",
     "binding_sector_count": "个星区",

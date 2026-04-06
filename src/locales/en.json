@@ -283,6 +283,7 @@
     "binding_coverage_sectors": "Coverage Sectors",
     "binding_excluded_sectors": "Excluded Sectors",
     "binding_candidate_sectors": "Candidate Sectors",
+    "binding_anchor_sector": "Anchor Sector",
     "binding_save_sectors": "Save Sectors",
     "binding_save_sector_candidates": "Save Sector Candidates",
     "binding_sector_count": "sectors",
