@@ -35,13 +35,6 @@ const draftJumpRange = ref(2)
 const draftCoverage = ref<string[]>([])
 const draftExcluded = ref<string[]>([])
 
-// 备份状态用于取消恢复
-const backupState = ref<{
-  jumpRange: number
-  coverage: string[]
-  excluded: string[]
-} | null>(null)
-
 const bindMenuOpen = ref(false)
 const bindMenuRef = ref<HTMLElement | null>(null)
 const bindMenuStyle = ref<Record<string, string>>({})
@@ -448,48 +441,12 @@ function onMenuSectorClick(sectorMacro: string) {
   
   expandedSectorId.value = bindMenuTargetSectorId.value
   
-  // 备份当前状态用于取消恢复
-  backupState.value = {
-    jumpRange: draftJumpRange.value,
-    coverage: [...draftCoverage.value],
-    excluded: [...draftExcluded.value]
-  }
-  
-  empireStore.bindSectorGroup({
-    gameGuid: props.gameGuid,
-    sectorGroupId: bindMenuTargetSectorId.value!,
-    sectorMacro,
-    jumpRange: draftJumpRange.value,
-    coverageSectorMacros: draftCoverage.value
-  })
-  
+  // 编辑时不写入 store，只在 draft 中操作
   closeBindMenu()
 }
 
 function cancelBinding(sectorId: string) {
-  // 恢复备份状态
-  if (backupState.value) {
-    draftJumpRange.value = backupState.value.jumpRange
-    draftCoverage.value = [...backupState.value.coverage]
-    draftExcluded.value = [...backupState.value.excluded]
-    
-    // 恢复 store 中的绑定
-    const currentBinding = activeBindingPlan.value?.groupBindings.find(
-      b => b.sectorGroupId === sectorId
-    )
-    if (currentBinding?.sectorMacro) {
-      empireStore.bindSectorGroup({
-        gameGuid: props.gameGuid,
-        sectorGroupId: sectorId,
-        sectorMacro: currentBinding.sectorMacro,
-        jumpRange: backupState.value.jumpRange,
-        coverageSectorMacros: backupState.value.coverage
-      })
-    }
-    
-    backupState.value = null
-  }
-  
+  // 直接关闭编辑状态，丢弃 draft 数据
   expandedSectorId.value = null
 }
 
