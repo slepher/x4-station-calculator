@@ -14,18 +14,43 @@ Implementation of the station-binding feature for X4 Station Calculator, allowin
   - `MapBindingStation.vue` - Stage 3: Station binding
 
 #### 2. Data Model
-- Unified `BindingDraftState` interface:
+
+##### 2.1 Unified Draft State (Major Refactoring)
+- **Before**: Scattered draft variables
+  - `const draftJumpRange = ref(2)`
+  - `const draftCoverage = ref<string[]>([])`
+  - `const draftExcluded = ref<string[]>([])`
+  - `const expandedSectorId = ref<string | null>(null)`
+  - `const backupState = ref(...)` (for cancel/restore)
+
+- **After**: Unified `BindingDraftState` interface
   ```typescript
   interface BindingDraftState {
     sectorGroupId: string | null      // Empire sector being edited
     anchorSectorMacro: string | null  // Save sector (anchor)
-    jumpRange: number                 // Coverage jump range
+    jumpRange: number                 // Coverage jump range (default: 2)
     coverage: string[]                // Covered sectors
     excluded: string[]                // Excluded sectors
   }
+  
+  const draft = ref<BindingDraftState>({
+    sectorGroupId: null,
+    anchorSectorMacro: null,
+    jumpRange: 2,
+    coverage: [],
+    excluded: []
+  })
   ```
-- Draft data isolated from store data
-- Store only updated on confirm, not during editing
+
+##### 2.2 Draft Management Functions
+- `closeDraft()` - Reset draft to initial state
+- `isDraftOpen()` - Check if any sector is being edited
+
+##### 2.3 Key Design Changes
+- **Draft Isolation**: Edit operations only modify `draft`, not store
+- **No Backup Mechanism**: Cancel simply discards draft data
+- **Store Update on Confirm Only**: `empireStore.bindSectorGroup()` called only on "确认"
+- **localStorage Independent**: Draft data never saved to localStorage
 
 #### 3. UI Features
 - **Anchor Sector Display**: Shows bound save sector name
