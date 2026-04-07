@@ -227,7 +227,8 @@
     "save_npc_tag_defencemodule": "防御平台",
     "save_npc_tag_weaponplatform": "武器平台",
     "save_npc_tag_nest": "巢穴",
-    "save_npc_tag_hive": "蜂巢"
+    "save_npc_tag_hive": "蜂巢",
+    "poi_visibility_toggle": "POI显示"
   },
   "ship_build": {
     "title": "船只建造",
