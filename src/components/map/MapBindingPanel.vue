@@ -2,9 +2,8 @@
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEmpireStore } from '@/store/useEmpireStore'
-import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveStore } from '@/store/useSaveStore'
-import { resolveMapSectorByMacro } from './utils/mapSectorMacro'
+import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapBindingSelectArchive from './MapBindingSelectArchive.vue'
 import MapBindingSectorGroup from './MapBindingSectorGroup.vue'
 import MapBindingStation from './MapBindingStation.vue'
@@ -24,24 +23,22 @@ const emit = defineEmits<{
   (e: 'drag-station-end'): void
 }>()
 
-const { t, te } = useI18n()
+const { t } = useI18n()
 const empireStore = useEmpireStore()
 const saveStore = useSaveStore()
-const gameDataStore = useGameDataStore()
 
 const stage = ref<PanelStage>('select-binding')
 const selectedGameGuid = ref<string | null>(null)
 const selectedSectorGroupId = ref<string | null>(null)
+const previewGameGuid = ref<string | null>(null)
+const previewTime = ref<number | null>(null)
+const initialArchiveSelection = ref<{ guid: string; time: number } | null>(null)
 
-const activeBindingPlan = computed(() => {
-  if (!selectedGameGuid.value) return null
-  return empireStore.activeEmpire?.saveBindings?.find((p) => p.gameGuid === selectedGameGuid.value) || null
-})
-
-const currentGroupBinding = computed(() => {
-  if (!activeBindingPlan.value || !selectedSectorGroupId.value) return null
-  return activeBindingPlan.value.groupBindings.find((b) => b.sectorGroupId === selectedSectorGroupId.value) || null
-})
+interface BreadcrumbItem {
+  key: string
+  label: string
+  clickable?: boolean
+}
 
 const empireSectorName = computed(() => {
   if (!selectedSectorGroupId.value) return null
@@ -49,33 +46,64 @@ const empireSectorName = computed(() => {
   return sector?.name || null
 })
 
-const anchorSectorName = computed(() => {
-  const sectorMacro = currentGroupBinding.value?.sectorMacro
-  if (!sectorMacro) return null
-  const maps = gameDataStore.maps
-  const resolved = resolveMapSectorByMacro(maps || { clusters: {}, sectors: {} }, sectorMacro)
-  if (resolved?.sectorId) {
-    const sector = maps?.sectors?.[resolved.sectorId]
-    if (sector?.nameId && te(sector.nameId)) return t(sector.nameId)
-    return sector?.name || null
-  }
-  return null
+const selectedPlayerName = computed(() => {
+  if (!selectedGameGuid.value) return null
+  const group = (saveStore.archiveGroups || []).find((item) => item.guid === selectedGameGuid.value)
+  return group?.playerName || null
 })
 
-const panelTitle = computed(() => {
-  if (stage.value === 'select-binding') {
-    return t('map.binding_title')
+const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
+  const items: BreadcrumbItem[] = [
+    { key: 'root', label: t('map.binding_title') }
+  ]
+
+  if (stage.value !== 'select-binding' && selectedPlayerName.value) {
+    items.push({
+      key: 'player',
+      label: selectedPlayerName.value,
+      clickable: stage.value === 'select-station'
+    })
   }
-  if (stage.value === 'select-sector') {
-    return t('map.binding_sector_group')
+
+  if (stage.value === 'select-station' && empireSectorName.value) {
+    items.push({
+      key: 'sector',
+      label: empireSectorName.value,
+      clickable: false
+    })
   }
-  // step 3: "<定位星区> 绑定 <帝国星区组>"
-  const anchor = anchorSectorName.value || '-'
-  const group = empireSectorName.value || '-'
-  return `${anchor} ${t('map.binding_bind_to_sector')} ${group}`
+
+  return items
 })
 
-function onSelectArchive(payload: { gameGuid: string; time: number | null }) {
+function getLatestTime(gameGuid: string): number | null {
+  const group = saveStore.archives.get(gameGuid)
+  return group?.saves[0]?.meta.time ?? null
+}
+
+async function restoreArchiveAfterPreviewExit() {
+  const binding = empireStore.getActiveBinding?.() || null
+  if (binding?.gameGuid) {
+    const time = binding.selectedArchiveTime ?? getLatestTime(binding.gameGuid)
+    if (time !== null) {
+      await saveStore.selectArchive(binding.gameGuid, time)
+      return
+    }
+  }
+
+  const initial = initialArchiveSelection.value
+  if (initial) {
+    await saveStore.selectArchive(initial.guid, initial.time)
+  }
+}
+
+async function onPreviewArchive(payload: { gameGuid: string; time: number }) {
+  previewGameGuid.value = payload.gameGuid
+  previewTime.value = payload.time
+  await saveStore.selectArchive(payload.gameGuid, payload.time)
+}
+
+async function onBindArchive(payload: { gameGuid: string; time: number | null }) {
   const existingBinding = empireStore.activeEmpire?.saveBindings?.find(
     (p) => p.gameGuid === payload.gameGuid
   )
@@ -86,14 +114,17 @@ function onSelectArchive(payload: { gameGuid: string; time: number | null }) {
 
   if (payload.time !== null) {
     empireStore.setSelectedArchiveTime(payload.gameGuid, payload.time)
-    saveStore.selectArchive(payload.gameGuid, payload.time)
+    await saveStore.selectArchive(payload.gameGuid, payload.time)
   } else {
-    const group = saveStore.archives.get(payload.gameGuid)
-    if (group && group.saves[0]) {
-      saveStore.selectArchive(payload.gameGuid, group.saves[0].meta.time)
+    empireStore.setSelectedArchiveTime(payload.gameGuid, null)
+    const latestTime = getLatestTime(payload.gameGuid)
+    if (latestTime !== null) {
+      await saveStore.selectArchive(payload.gameGuid, latestTime)
     }
   }
 
+  previewGameGuid.value = null
+  previewTime.value = null
   selectedGameGuid.value = payload.gameGuid
   stage.value = 'select-sector'
 }
@@ -103,25 +134,35 @@ function onSelectGroup(sectorGroupId: string) {
   stage.value = 'select-station'
 }
 
-function goBack() {
-  if (stage.value === 'select-station') {
-    stage.value = 'select-sector'
-    selectedSectorGroupId.value = null
-  } else if (stage.value === 'select-sector') {
-    stage.value = 'select-binding'
-    selectedGameGuid.value = null
-  }
-}
-
 function close() {
   emit('close')
 }
 
-watch(() => props.open, (open) => {
-  if (!open) {
+async function onBreadcrumbNavigate(key: string) {
+  if (key === 'root') {
     stage.value = 'select-binding'
     selectedGameGuid.value = null
     selectedSectorGroupId.value = null
+    await restoreArchiveAfterPreviewExit()
+  } else if (key === 'player') {
+    stage.value = 'select-sector'
+    selectedSectorGroupId.value = null
+  }
+}
+
+watch(() => props.open, (open) => {
+  if (open) {
+    initialArchiveSelection.value = saveStore.selectedArchive
+      ? { guid: saveStore.selectedArchive.meta.guid, time: saveStore.selectedArchive.meta.time }
+      : null
+  }
+  if (!open) {
+    void restoreArchiveAfterPreviewExit()
+    stage.value = 'select-binding'
+    selectedGameGuid.value = null
+    selectedSectorGroupId.value = null
+    previewGameGuid.value = null
+    previewTime.value = null
   }
 })
 
@@ -137,19 +178,7 @@ watch([stage, selectedGameGuid, selectedSectorGroupId, () => props.open], () => 
 <template>
   <aside v-show="open" class="map-binding-panel" data-testid="map-binding-panel">
     <div class="map-binding-panel__header">
-      <div class="map-binding-panel__nav">
-        <button
-          v-if="stage !== 'select-binding'"
-          class="map-binding-panel__back"
-          type="button"
-          @click="goBack"
-        >
-          ←
-        </button>
-        <div class="map-binding-panel__title">
-          {{ panelTitle }}
-        </div>
-      </div>
+      <MapSaveBreadcrumb :items="breadcrumbItems" @navigate="onBreadcrumbNavigate" />
       <button
         class="map-binding-panel__close"
         data-testid="map-binding-panel-close"
@@ -164,7 +193,10 @@ watch([stage, selectedGameGuid, selectedSectorGroupId, () => props.open], () => 
       <!-- Stage 1: Select Archive -->
       <MapBindingSelectArchive
         v-if="stage === 'select-binding'"
-        @select="onSelectArchive"
+        :preview-game-guid="previewGameGuid"
+        :preview-time="previewTime"
+        @preview="onPreviewArchive"
+        @bind="onBindArchive"
       />
 
       <!-- Stage 2: Sector Group Management -->
@@ -202,18 +234,6 @@ watch([stage, selectedGameGuid, selectedSectorGroupId, () => props.open], () => 
 
 .map-binding-panel__header {
   @apply mb-3 flex shrink-0 items-center justify-between gap-3 border-b border-amber-300/15 px-3 pb-3;
-}
-
-.map-binding-panel__nav {
-  @apply flex items-center gap-2;
-}
-
-.map-binding-panel__back {
-  @apply rounded-lg px-2 py-1 text-lg text-amber-100/60 transition-colors hover:bg-amber-200/10 hover:text-amber-50;
-}
-
-.map-binding-panel__title {
-  @apply text-sm font-semibold text-amber-50;
 }
 
 .map-binding-panel__close {

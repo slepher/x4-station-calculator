@@ -142,3 +142,36 @@
 - [x] 21.7 非可拖拽状态下点击 binding POI 打开与 save POI 同构的 tooltip
 - [x] 21.8 binding POI 标题显示 empire 星区名或空间站名，不显示内部 id
 - [x] 21.9 虚线六边形外框贴合 save POI 本体六边形边框
+
+- [ ] 22. Step 3 显示收敛与去重
+- [ ] 22.1 调整 Step 3 星区内列表：save station 作为主显示对象，正常绑定且当前 time 可解析的 empire station 不再独立显示
+- [ ] 22.2 删除底部“已有绑定列表”类重复 UI，确保 Step 3 只有一套星区内明细来源
+- [ ] 22.3 为“有 `position`、无 `saveStationCode`”的 empire station 增加独立补位项显示，包含空间站名称和 `x,z` 坐标
+- [ ] 22.4 为“有 `position`、有 `saveStationCode` 且当前 time 失效”的 empire station 增加独立补位项显示，且仅提供解绑动作
+- [ ] 22.5 禁止失效绑定对象作为绑定菜单候选复用；已绑定到其他 save station 的对象统一置灰不可点击
+- [ ] 22.6 为绑定菜单中的“已放置未绑定” empire station 增加区别于自由站点的背景样式
+- [ ] 22.7 调整绑定完成后的收敛行为：当 save station 绑定到“有 `position`、无 `saveStationCode`”的 empire station 时，用 save station 位置覆盖原 `position`，并移除其独立补位项与地图独立 binding POI
+
+- [ ] 23. Step 2 交互重构与连接星区编辑
+- [ ] 23.1 调整 Step 2 收缩态 empire sector 条目交互：主体不再承担点击展开，改为明确的“绑定”按钮进入展开态
+- [ ] 23.2 为 Step 2 收缩态 empire sector 条目补齐四类交互点：排序手柄、Step 3 按钮、定位星区药丸、绑定按钮
+- [ ] 23.3 增加单星区编辑模式约束：存在展开态星区时，所有排序手柄与 Step 3 按钮失效，且通过“确定 / 取消”退出展开态
+- [ ] 23.4 将“创建星区”入口放到 Step 2 收缩态列表层，而非展开态
+- [ ] 23.5 在 Step 2 展开编辑态支持修改单个 empire sector 名字
+- [ ] 23.6 为 `GroupSaveBinding` 增加连接星区持久化字段，存储双向 empire sector 连接关系，替代未来将废弃的旧 empire-level 连接语义
+- [ ] 23.7 基于定位星区实现 5 跳内 empire sector 候选搜索；未绑定定位星区的 empire sector 不参与连接候选计算
+- [ ] 23.8 在 Step 2 展开编辑态新增“连接星区”区块，按跳数分组显示绿色已连接与红色未连接药丸，并支持 `x` 取消 / `+` 连接
+- [ ] 23.9 实现连接关系双向同步：A 与 B 建立或取消连接时，双方 `groupBinding` 的连接数据同时更新
+- [ ] 23.10 调整 Step 2 收缩态结果展示：只显示已连接星区，不显示未连接星区和连接操作按钮
+- [ ] 23.11 调整 empire sector 下属 map 星区药丸样式，为药丸之间增加可读间距
+- [ ] 23.12 调整下方存档星区列表摘要：显示星区数量，不再显示坐标点数量
+- [ ] 23.13 调整下方存档星区的空间站展示：改用 tooltip 同源名称、按同名聚合、数量大于 1 时显示 `xN`
+- [ ] 23.14 调整下方存档星区列表行为：不再承担进入 Step 3 的职责，仅保留参考与定位信息
+
+- [ ] 24. Step 1 标题与查看/绑定交互重构
+- [ ] 24.1 将 binding 面板标题改为与存档面板一致的面包屑结构，三级分别对应 Step 1、Step 2 玩家名、Step 3 empire sector 名
+- [ ] 24.2 调整 Step 1 普通点击 `time` 的行为：切换 POI 到该 `time`、高亮该条目，但不修改 binding，也不自动进入 Step 2
+- [ ] 24.3 为 Step 1 `title` 和具体 `time` 条目增加 hover“绑定”按钮；点击后创建/更新 binding，并立即进入 Step 2
+- [ ] 24.4 支持 `title` 绑定到最新 `time` 与具体 `time` 绑定到指定存档的两种显式绑定动作
+- [ ] 24.5 增加 Step 1 查看状态管理：查看状态仅在进入 Step 2/3 时生效，停留在 Step 1 或关闭面板时恢复到最近一次绑定操作对应的 `time`
+- [ ] 24.6 调整 Step 1 `已绑定` tag 规则：保持现有卡片样式，仅通过实边/虚边区分“绑定到最新”与“绑定到具体 time”

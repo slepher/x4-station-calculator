@@ -4,8 +4,14 @@ import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 
+const props = defineProps<{
+  previewGameGuid: string | null
+  previewTime: number | null
+}>()
+
 const emit = defineEmits<{
-  (e: 'select', payload: { gameGuid: string; time: number | null }): void
+  (e: 'preview', payload: { gameGuid: string; time: number }): void
+  (e: 'bind', payload: { gameGuid: string; time: number | null }): void
 }>()
 
 const { t } = useI18n()
@@ -34,8 +40,40 @@ function getExistingBindingPlan(gameGuid: string) {
   return bindingPlans.value.find((p) => p.gameGuid === gameGuid) || null
 }
 
-function selectOrCreateBinding(gameGuid: string, time: number | null) {
-  emit('select', { gameGuid, time })
+function getLatestArchiveTime(gameGuid: string): number | null {
+  const group = sortedArchiveGroups.value.find((item) => item.guid === gameGuid)
+  return group?.saves[0]?.meta.time ?? null
+}
+
+function isPreviewed(gameGuid: string, time: number): boolean {
+  return props.previewGameGuid === gameGuid && props.previewTime === time
+}
+
+function isTitleBoundToLatest(gameGuid: string): boolean {
+  const plan = getExistingBindingPlan(gameGuid)
+  return Boolean(plan) && (plan?.selectedArchiveTime === null || plan?.selectedArchiveTime === undefined)
+}
+
+function isTitleBoundToSpecificTime(gameGuid: string): boolean {
+  const plan = getExistingBindingPlan(gameGuid)
+  return Boolean(plan) && plan?.selectedArchiveTime !== null && plan?.selectedArchiveTime !== undefined
+}
+
+function isTimeBoundToSpecificTime(gameGuid: string, time: number): boolean {
+  const plan = getExistingBindingPlan(gameGuid)
+  return plan?.selectedArchiveTime === time
+}
+
+function isLatestTimeMirroringTitleBinding(gameGuid: string, time: number): boolean {
+  return isTitleBoundToLatest(gameGuid) && getLatestArchiveTime(gameGuid) === time
+}
+
+function previewArchive(gameGuid: string, time: number) {
+  emit('preview', { gameGuid, time })
+}
+
+function bindArchive(gameGuid: string, time: number | null) {
+  emit('bind', { gameGuid, time })
 }
 </script>
 
@@ -51,33 +89,70 @@ function selectOrCreateBinding(gameGuid: string, time: number | null) {
         :key="group.guid"
         class="archive-group"
       >
-        <button
+        <div
           class="archive-group-header"
-          type="button"
-          @click="selectOrCreateBinding(group.guid, null)"
         >
           <span class="player-name">{{ group.playerName }}</span>
           <span class="archive-count">{{ group.saves.length }} {{ t('map.binding_station_count', { count: group.saves.length }) }}</span>
-          <span v-if="hasExistingBinding(group.guid)" class="bound-badge">{{ t('map.binding_sector_bound') }}</span>
-        </button>
+          <span
+            v-if="hasExistingBinding(group.guid)"
+            data-testid="binding-archive-title-bound"
+            class="bound-badge"
+            :class="{
+              'bound-badge--solid': isTitleBoundToLatest(group.guid),
+              'bound-badge--dashed': isTitleBoundToSpecificTime(group.guid)
+            }"
+          >
+            {{ t('map.binding_sector_bound') }}
+          </span>
+          <button
+            class="archive-bind-action"
+            data-testid="binding-archive-bind-latest"
+            type="button"
+            @click.stop="bindArchive(group.guid, null)"
+          >
+            {{ t('map.binding_bind') }}
+          </button>
+        </div>
 
         <div class="archive-items">
-          <button
+          <div
             v-for="archive in group.saves"
             :key="archive.meta.time"
             class="archive-item"
-            :class="{ 'archive-item--bound': getExistingBindingPlan(group.guid)?.selectedArchiveTime === archive.meta.time }"
-            type="button"
-            @click="selectOrCreateBinding(group.guid, archive.meta.time)"
+            :class="{
+              'archive-item--preview': isPreviewed(group.guid, archive.meta.time),
+              'archive-item--bound': isTimeBoundToSpecificTime(group.guid, archive.meta.time)
+            }"
+            data-testid="binding-archive-time"
+            role="button"
+            tabindex="0"
+            @click="previewArchive(group.guid, archive.meta.time)"
           >
             <div class="archive-info">
               <div class="archive-time">{{ formatTime(archive.meta.time) }}</div>
               <div class="archive-meta">{{ archive.meta.filename }}</div>
             </div>
-            <span v-if="getExistingBindingPlan(group.guid)?.selectedArchiveTime === archive.meta.time" class="bound-tag">
+            <span
+              v-if="isTimeBoundToSpecificTime(group.guid, archive.meta.time) || isLatestTimeMirroringTitleBinding(group.guid, archive.meta.time)"
+              data-testid="binding-archive-time-bound"
+              class="bound-tag"
+              :class="{
+                'bound-tag--solid': isTimeBoundToSpecificTime(group.guid, archive.meta.time),
+                'bound-tag--dashed': isLatestTimeMirroringTitleBinding(group.guid, archive.meta.time)
+              }"
+            >
               {{ t('map.binding_sector_bound') }}
             </span>
-          </button>
+            <button
+              class="archive-bind-action archive-bind-action--item"
+              data-testid="binding-archive-bind-time"
+              type="button"
+              @click.stop="bindArchive(group.guid, archive.meta.time)"
+            >
+              {{ t('map.binding_bind') }}
+            </button>
+          </div>
         </div>
       </div>
     </div>
@@ -110,7 +185,15 @@ function selectOrCreateBinding(gameGuid: string, time: number | null) {
 }
 
 .bound-badge {
-  @apply rounded-full bg-amber-200/20 px-2 py-0.5 text-xs text-amber-100;
+  @apply rounded-full border border-amber-300/35 bg-amber-200/20 px-2 py-0.5 text-xs text-amber-100;
+}
+
+.bound-badge--solid {
+  @apply border-solid;
+}
+
+.bound-badge--dashed {
+  @apply border-dashed;
 }
 
 .archive-items {
@@ -119,10 +202,15 @@ function selectOrCreateBinding(gameGuid: string, time: number | null) {
 
 .archive-item {
   @apply flex items-center justify-between gap-2 rounded border border-amber-300/15 bg-black/30 px-3 py-2 text-left transition-colors hover:border-amber-200/30 hover:bg-amber-200/5;
+  position: relative;
 }
 
 .archive-item--bound {
   @apply border-amber-200/40 bg-amber-200/10;
+}
+
+.archive-item--preview {
+  @apply border-amber-200/45 bg-amber-200/10;
 }
 
 .archive-info {
@@ -138,6 +226,27 @@ function selectOrCreateBinding(gameGuid: string, time: number | null) {
 }
 
 .bound-tag {
-  @apply rounded bg-amber-200/20 px-2 py-0.5 text-xs text-amber-100;
+  @apply rounded border border-amber-300/35 bg-amber-200/20 px-2 py-0.5 text-xs text-amber-100;
+}
+
+.bound-tag--solid {
+  @apply border-solid;
+}
+
+.bound-tag--dashed {
+  @apply border-dashed;
+}
+
+.archive-bind-action {
+  @apply rounded border border-amber-300/30 bg-black/40 px-2 py-1 text-xs text-amber-100 opacity-0 transition-opacity duration-150 hover:border-amber-200/50 hover:text-amber-50;
+}
+
+.archive-group-header:hover .archive-bind-action,
+.archive-item:hover .archive-bind-action {
+  @apply opacity-100;
+}
+
+.archive-bind-action--item {
+  @apply shrink-0;
 }
 </style>

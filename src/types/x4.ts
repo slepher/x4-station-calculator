@@ -1096,6 +1096,7 @@ export interface GroupSaveBinding {
   sectorMacro?: string
   jumpRange: number
   coverageSectorMacros: CoverageSectorEntry[]
+  connectedSectorGroupIds?: string[]
   tradestationBinding?: StationSaveBinding
   stationBindings: StationSaveBinding[]
   free?: boolean

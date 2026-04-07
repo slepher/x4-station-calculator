@@ -1109,6 +1109,7 @@ export const useEmpireStore = defineStore('empire', () => {
     setSelectedArchiveTime: bindingActions.setSelectedArchiveTime,
     bindSectorGroup: bindingActions.bindSectorGroup,
     updateSectorGroupJumpRange: bindingActions.updateSectorGroupJumpRange,
+    setGroupConnection: bindingActions.setGroupConnection,
     clearSectorGroupBinding: bindingActions.clearSectorGroupBinding,
     getGroupBinding: bindingActions.getGroupBinding,
     setTradestationBinding: bindingActions.setTradestationBinding,

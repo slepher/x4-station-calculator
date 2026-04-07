@@ -209,19 +209,42 @@ binding UI 放在 `MapWorkbenchView`，原因：
 ### 4.2 三段式布局
 
 - 第一段：选择存档
+  - 标题使用面包屑结构，而不是单一返回按钮：
+    - Step 1：存档选择
+    - Step 2：玩家名
+    - Step 3：empire sector 名
   - 显示按 gameGuid 分组的存档列表
   - 每个分组显示玩家名称、存档数量
-  - 点击分组标题进入，绑定到最新 time
-  - 点击具体存档进入，绑定到对应 time
-  - 已有绑定的存档显示"已绑定"标记
+  - 普通点击具体 `time`：
+    - 立即切换地图 POI 到该 `time`
+    - 将该 `time` 标记为当前查看高亮
+    - 不修改 binding
+    - 不自动进入 Step 2
+  - `title` 和具体 `time` 均在 hover 时显示“绑定”按钮：
+    - 点击 `title` 的按钮：绑定到最新 `time`，然后进入 Step 2
+    - 点击具体 `time` 的按钮：绑定到该 `time`，然后进入 Step 2
+    - 若当前 guid 尚无 binding，则首次点击时创建 binding
+  - 查看状态只在后续进入 Step 2 / Step 3 时生效；若停留在 Step 1 或关闭面板，则退出查看状态并恢复到最近一次绑定操作对应的 `time`
+  - `已绑定` tag 保持现有视觉样式，只通过边框区分：
+    - 绑定到最新：`title` 为实边 `已绑定`，最新 `time` 为虚边 `已绑定`
+    - 绑定到具体 time：具体 `time` 为实边 `已绑定`，`title` 为虚边 `已绑定`
 - 第二段：星区组管理
   - **列表结构**：
     - 上方：帝国星区列表（empire sectors）
     - 下方：存档星区列表（save sectors）
   - **帝国星区项**：
     - 显示名称
-    - 未绑定：显示"绑定"按钮
-    - 已绑定：显示"取消绑定"按钮 + 覆盖范围星区药丸
+    - 收缩态操作点固定为四类：
+      - 拖拽手柄：仅用于调整星区顺序
+      - Step 3 按钮：直接进入该 empire sector 的 Step 3
+      - 定位星区药丸：点击后在地图上 focus 当前定位星区
+      - 绑定按钮：进入该 empire sector 的展开编辑态
+    - 标题/主体区域本身不承担点击展开、进入 Step 3 或地图定位职责
+    - 收缩态支持创建新 empire sector；“创建星区”属于列表层能力，不属于单个星区展开态
+    - 只要存在展开态星区，就进入单星区编辑模式：
+      - 所有拖拽手柄失效
+      - 所有 Step 3 按钮失效
+      - 只能通过当前展开项的“确定 / 取消”退出
   - **绑定按钮弹出菜单**：
     - 组1：存档星区候选
       - 显示经过搜索框筛选且未绑定的存档星区
@@ -230,14 +253,32 @@ binding UI 放在 `MapWorkbenchView`，原因：
       - 显示地图上可见面积超过 50% 的星区
       - 超过 10 个时提示"请调整地图缩放以缩小候选范围"
   - **绑定后展开**：
+    - 该态只负责当前单个 empire sector 的数据编辑，不承担 Step 3 跳转和排序能力
+    - 可修改星区名字
     - 跳数选择器（0-5）
     - 覆盖范围星区：跳数范围内的 save 星区，显示为药丸，点击 x 移到备选
     - 备选覆盖星区：跳数范围内的其他星区，显示为药丸，点击 + 移到覆盖范围
+    - 新增“连接星区”区块：
+      - 基于当前 empire sector 的定位星区，自动搜集 5 跳以内的其他 empire sector
+      - 仅纳入已经绑定定位星区的 empire sector
+      - 候选按跳数分组显示
+      - 绿色药丸表示已连接，显示 `x` 用于取消连接
+      - 红色药丸表示未连接，显示 `+` 用于建立连接
+      - 连接关系是双向的，A 与 B 建立或取消连接时，双方的 `groupBinding` 均需同步更新
     - 取消 | 确定 按钮
+  - **收缩态结果展示**：
+    - 绑定完成后只显示已连接星区
+    - 不显示未连接星区
+    - 不显示 `+` / `x` 操作按钮
+    - empire sector 下属的 map 星区药丸之间需要保留可读的间距
   - **存档星区项**：
-    - 显示名称 + 空间站数量
+    - 显示名称
+    - 列表汇总显示星区数量，不再显示坐标点数量
+    - 星区项不再承担进入 Step 3 的职责
     - 已绑定时显示药丸标签：`归属: <帝国星区名>`
     - 不再显示"已绑定"徽章
+    - 空间站显示使用与 tooltip 同源的名称，而非 `code`
+    - 同名空间站按名称聚合；数量大于 1 时显示 `xN`
   - 支持搜索过滤存档星区
 - 第三段：绑定空间站
   - **空间站状态判断（基于 binding 数据）**：
@@ -257,7 +298,9 @@ binding UI 放在 `MapWorkbenchView`，原因：
       - 显示定位星区（`sectorMacro`）+ 覆盖星区（`coverageSectorMacros`）
       - 每个星区用药丸表示，点击药丸 focus 到对应星区
       - 即使星区没有 save 空间站，也显示星区药丸
-      - 星区下显示空间站：save 玩家站 + 已放置的 free station + 已放置虚拟补给站（并排显示）
+      - 每个星区下以 save 玩家站为主显示对象
+      - 同一星区下不再并排完整重复展示“正常绑定的 empire station”
+      - 只有需要额外处理的 empire 对象才作为 save station 之外的补位项独立显示
   
   - **Save Station 绑定对象**：
     - 可选条目：
@@ -268,11 +311,32 @@ binding UI 放在 `MapWorkbenchView`，原因：
     - 绑定限制：
       - 虚拟补给站（3、4）只能被定位星区的 save station 绑定
       - 绑定对象不可以重叠：一个 save station 只能绑定一个对象，一个对象只能被一个 save station 绑定
+      - 已绑定到其他 save station 的 empire station，无论其 `saveStationCode` 在当前 time 是否失效，均视为已占用并在菜单中置灰，不允许复用
+    - save station 行保持现有“绑定”按钮作为唯一主入口，不增加额外的复杂绑定摘要块
+    - save station 行不展开 empire station 的独立完整卡片；绑定结果只通过按钮文本/菜单上下文体现
+    - 绑定菜单中的“已放置未绑定” empire station 需要使用不同背景色，以区别于自由 empire station
+
+  - **星区内补位项显示规则**：
+    - 星区内除 save station 外，仅额外显示两类 empire 对象：
+      1. 有 `position`、无 `saveStationCode` 的 empire station
+      2. 有 `position`、有 `saveStationCode` 且当前 `archiveTime` 下失效的 empire station
+    - 对于（1）：
+      - 列表项显示空间站名称与 `x,z` 坐标
+      - 使用区别于 save station 的背景色，表达“已放置未绑定”
+      - 可作为 save station 绑定菜单候选
+    - 对于（2）：
+      - 列表项显示空间站名称与“失效”状态
+      - 仅提供“解绑”动作
+      - 不允许拖拽重定位
+      - 不允许作为其他 save station 的候选绑定对象
+    - 正常绑定且当前 time 可解析的 empire station 不作为独立列表项显示，避免与 save station 形成重复 UI
   
   - **绑定/放置操作**：
     - Empire Station 绑定 save station：
       - 创建/更新 `stationBinding`（`saveStationCode` + `sectorMacro` + `position`）
       - 同时设置 `station.sectorId = sectorGroupId`（兼容性）
+      - 若目标 empire station 原先属于“有 `position`、无 `saveStationCode`”状态，则绑定时使用 save station 的位置覆盖原 `position`
+      - 绑定完成后，该 empire station 从星区内的独立补位项与地图独立 binding POI 中移除
     - Empire Station 拖拽到地图：
       - 创建 `stationBinding`（`sectorMacro` + `position`）
       - 同时设置 `station.sectorId = sectorGroupId`（兼容性）
@@ -304,7 +368,7 @@ binding UI 放在 `MapWorkbenchView`，原因：
     - 空间站的星区归属基于 `saveBindings` 数据，而非 `station.sectorId`
     - 只有在绑定 save station 或拖拽到地图时，空间站才归属于某个星区
     - `station.sectorId` 是为了兼容性考虑，绑定界面不以这个为准
-  - 已有绑定列表（保持原样显示）
+  - 删除底部“已有绑定列表”这类第二套重复明细；Step 3 的可见明细以星区内 save station 和异常/补位项为唯一来源
 
 ### 4.3 Draft 状态管理（编辑期隔离）
 

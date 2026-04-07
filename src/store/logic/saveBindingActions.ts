@@ -22,6 +22,7 @@ function createDefaultGroupSaveBinding(sectorGroupId: string): GroupSaveBinding 
     sectorGroupId,
     jumpRange: 3,
     coverageSectorMacros: [],
+    connectedSectorGroupIds: [],
     stationBindings: []
   }
 }
@@ -40,6 +41,7 @@ export interface SaveBindingActions {
     coverageSectorMacros: CoverageSectorEntry[]
   }) => void
   updateSectorGroupJumpRange: (gameGuid: string, sectorGroupId: string, jumpRange: number) => void
+  setGroupConnection: (gameGuid: string, sourceSectorGroupId: string, targetSectorGroupId: string, connected: boolean) => void
   clearSectorGroupBinding: (gameGuid: string, sectorGroupId: string) => void
   getGroupBinding: (gameGuid: string, sectorGroupId: string) => GroupSaveBinding | null
   setTradestationBinding: (input: {
@@ -169,12 +171,14 @@ export function createSaveBindingActions(
       sectorMacro: input.sectorMacro,
       jumpRange: input.jumpRange,
       coverageSectorMacros: input.coverageSectorMacros,
+      connectedSectorGroupIds: [],
       stationBindings: []
     }
 
     if (existingIndex >= 0) {
       const existing = plan.groupBindings[existingIndex]
       if (existing) {
+        newBinding.connectedSectorGroupIds = [...(existing.connectedSectorGroupIds || [])]
         newBinding.tradestationCode = existing.tradestationCode
         newBinding.tradestationBinding = existing.tradestationBinding
         newBinding.stationBindings = existing.stationBindings
@@ -197,10 +201,47 @@ export function createSaveBindingActions(
     onDirty()
   }
 
+  function setGroupConnection(gameGuid: string, sourceSectorGroupId: string, targetSectorGroupId: string, connected: boolean): void {
+    if (sourceSectorGroupId === targetSectorGroupId) return
+    const plan = getBindingByGameGuid(gameGuid)
+    if (!plan) return
+
+    let sourceBinding = plan.groupBindings.find((binding) => binding.sectorGroupId === sourceSectorGroupId)
+    if (!sourceBinding) {
+      sourceBinding = createDefaultGroupSaveBinding(sourceSectorGroupId)
+      plan.groupBindings.push(sourceBinding)
+    }
+
+    let targetBinding = plan.groupBindings.find((binding) => binding.sectorGroupId === targetSectorGroupId)
+    if (!targetBinding) {
+      targetBinding = createDefaultGroupSaveBinding(targetSectorGroupId)
+      plan.groupBindings.push(targetBinding)
+    }
+
+    const nextSource = new Set(sourceBinding.connectedSectorGroupIds || [])
+    const nextTarget = new Set(targetBinding.connectedSectorGroupIds || [])
+
+    if (connected) {
+      nextSource.add(targetSectorGroupId)
+      nextTarget.add(sourceSectorGroupId)
+    } else {
+      nextSource.delete(targetSectorGroupId)
+      nextTarget.delete(sourceSectorGroupId)
+    }
+
+    sourceBinding.connectedSectorGroupIds = Array.from(nextSource)
+    targetBinding.connectedSectorGroupIds = Array.from(nextTarget)
+    onDirty()
+  }
+
   function clearSectorGroupBinding(gameGuid: string, sectorGroupId: string): void {
     const plan = getBindingByGameGuid(gameGuid)
     if (!plan) return
 
+    plan.groupBindings.forEach((binding) => {
+      if (!binding.connectedSectorGroupIds?.length) return
+      binding.connectedSectorGroupIds = binding.connectedSectorGroupIds.filter((id) => id !== sectorGroupId)
+    })
     plan.groupBindings = plan.groupBindings.filter((b) => b.sectorGroupId !== sectorGroupId)
     onDirty()
   }
@@ -524,6 +565,7 @@ export function createSaveBindingActions(
     setSelectedArchiveTime,
     bindSectorGroup,
     updateSectorGroupJumpRange,
+    setGroupConnection,
     clearSectorGroupBinding,
     getGroupBinding,
     setTradestationBinding,

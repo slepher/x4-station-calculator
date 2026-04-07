@@ -80,16 +80,81 @@
 
 - binding 界面需要地图参考，应放在 `MapWorkbenchView` 所在地图工作台内，而不是普通表单弹窗。
 - binding 界面直接替换地图上原先“帝国空间站弹出界面”；不再单独支持 empire station 的独立拖拽工作流。
+- binding 面板标题采用与存档面板一致的面包屑结构，三级分别对应：
+  - Step 1：存档选择
+  - Step 2：玩家名
+  - Step 3：empire sector 名
 - UI 组织采用“两段式”：
   - 第一段：列出“存档中用户所在空间站所属的所有星区”列表
   - 第二段：进入某个星区后，选择跳数并查看该星区 `N` 跳以内的星区与空间站列表
+- Step 1 中普通点击某个 `time` 条目，只表示进入该 `time` 的查看状态：
+  - 立即将地图 POI 切换到该 `time` 对应的存档内容
+  - 将该 `time` 条目标记为当前高亮
+  - 不修改 binding
+  - 不自动进入 Step 2
+- Step 1 中 `title` 与具体 `time` 条目都存在 hover 出现的“绑定”按钮：
+  - 点击 `title` 的按钮：表示将当前 guid 绑定到最新 `time`
+  - 点击具体 `time` 的按钮：表示将当前 guid 绑定到该 `time`
+  - 若该 guid 还没有 binding，则首次点击时创建 binding
+  - 点击任一绑定按钮后，立即进入 Step 2，开始编辑 binding
+- Step 1 的“查看状态”只在后续进入 Step 2 / Step 3 时生效；若停留在 Step 1 或关闭 binding 面板，则视为退出查看状态。
+- 一旦退出查看状态，地图 POI 与后续解析基线立刻恢复为最近一次绑定操作对应的 `time`。
+- Step 1 中 `已绑定` tag 不改变现有样式结构，只区分实边与虚边：
+  - 若绑定到最新 `time`：`title` 显示实边 `已绑定`，最新 `time` 显示虚边 `已绑定`
+  - 若绑定到具体 `time`：该 `time` 显示实边 `已绑定`，`title` 显示虚边 `已绑定`
 - 进入第二段后，地图需要自动缩放/平移到“能容纳所有过滤星区的最大范围”。
 - 在第二段中，用户选择目标帝国星区后，系统给出：
   - 可绑定的帝国空间站列表
   - 可直接导入的新 station 操作
   - 帝国星区中转绑定操作
   - 底部“空闲帝国空间站”列表，可直接拖拽到地图上
+- Step 2 中下方存档星区列表只作为参考与筛选信息，不再承担进入某个帝国星区 Step 3 的职责。
+- Step 2 中进入 Step 3 的责任收敛到上方 empire sector 条目；收缩态下每个 empire sector 条目存在四类交互点：
+  - 拖拽手柄：仅用于调整星区顺序
+  - Step 3 按钮：直接进入该 empire sector 的 Step 3
+  - 定位星区药丸：点击后在地图上定位到该 empire sector 当前绑定的定位星区
+  - 绑定按钮：进入该 empire sector 的展开编辑态
+- Step 2 中 empire sector 标题/主体区域本身不承担点击展开、进入 Step 3 或地图定位的职责。
+- Step 2 一旦存在展开态星区，就进入单星区编辑模式：
+  - 所有 empire sector 的拖拽排序手柄失效
+  - 所有 Step 3 按钮失效
+  - 只能编辑当前展开的单个星区，并通过“确定 / 取消”退出展开态
+- Step 2 的“创建星区”按钮和星区顺序调整属于收缩态列表层能力，不属于展开态的单星区编辑能力。
+- Step 2 展开编辑态只负责当前星区的单体数据编辑，包括：
+  - 修改星区名字
+  - 修改定位星区
+  - 修改跳数与 coverage
+  - 修改连接星区
+- Step 2 展开编辑态新增“连接星区”区块：
+  - 基于当前 empire sector 的定位星区，自动搜集 5 跳以内的其他 empire sector
+  - 仅统计已绑定定位星区的其他 empire sector；未绑定定位星区的不参与连接候选计算
+  - 按跳数分组显示连接候选
+  - 绿色药丸表示已连接，显示 `x` 用于取消连接
+  - 红色药丸表示未连接，显示 `+` 用于建立连接
+  - 连接关系是双向的；若 `A <-> B` 已连接，则 A 和 B 的展开编辑态中都要将对方显示为已连接
+  - 连接星区的语义沿用帝国连接星区概念，但数据保存到 `saveBinding.groupBinding` 中，而不是旧的帝国连接字段
+- Step 2 收缩态中，已绑定的 empire sector 结果区只显示“已连接星区”，不显示未连接星区，也不显示 `+` / `x` 操作按钮。
+- Step 2 中 empire sector 下属的 map 星区药丸之间需要保留适当间距，避免当前紧贴显示。
+- Step 2 中下方存档星区列表不再显示坐标点数量，而改为显示星区数量类汇总。
+- Step 2 中下方存档星区列表里的空间站信息不再显示 `code`，而改为显示与 tooltip 一致的空间站名称；同名空间站需要聚合展示，数量大于 1 时显示 `xN`。
 - 底部空闲 empire station 拖拽到地图后，显示大小与小空间站一致，其位置只保存到 binding 数据，不写入 `EmpirePlan`。
+- Step 3 继续以 `map sector` 作为分组轴，不改成按 station 状态分组。
+- Step 3 的主显示对象是 save 玩家站；每个 sector 下始终先显示 save station 列表，并继续使用现有“绑定”按钮作为唯一主入口，不额外增加复杂绑定摘要区。
+- Step 3 中正常绑定且当前 `archiveTime` 下可解析的 empire station，不再作为独立列表项重复显示；它们只通过对应 save station 的绑定按钮/菜单语义体现。
+- Step 3 中只有两类 empire station 允许作为 save station 之外的独立列表项补充显示：
+  - 有 `position`、无 `saveStationCode` 的 empire station
+  - 有 `position`、有 `saveStationCode`，但当前 `archiveTime` 下目标失效的 empire station
+- 对于有 `position`、无 `saveStationCode` 的 empire station，列表项需要显示空间站名称以及 `x,z` 坐标，并使用区别于普通 save station 的背景色。
+- 对于有 `position`、有 `saveStationCode` 且当前 time 失效的 empire station，列表项只提供“解绑”动作，不允许拖拽重定位，也不允许作为其他 save station 的候选绑定对象。
+- save station 的绑定菜单中，候选对象分为三类：
+  - 自由 empire station：可点击绑定
+  - 有 `position`、无 `saveStationCode` 的 empire station：可点击绑定，并使用不同背景色标识“已放置未绑定”
+  - 已绑定到其他 save station 的 empire station：无论当前 `saveStationCode` 是否失效，都必须置灰且不可点击
+- 当 save station 绑定到“有 `position`、无 `saveStationCode`”的 empire station 时：
+  - 使用 save station 的位置覆盖该 empire station 原有 `position`
+  - 写入 `saveStationCode`
+  - 该 empire station 从 Step 3 的独立异常/补位列表中移除
+  - 地图上的独立 binding POI 同步移除，只保留与 save station 关系对应的呈现
 - binding 产生的地图 POI 在视觉上需要与 save POI 使用同一套类型、owner 与尺寸语义：
   - 普通 binding station 的类型判定复用 `parser.post.ts` 中玩家 station 的分类逻辑
   - `owner` 固定视为 `player`
@@ -149,6 +214,20 @@
 11. binding POI 常驻显示，但显示受 `playerStation` 可见性设置控制，且仅在对应 `sectorGroup` 的 Step 3 上下文中可拖拽
 12. 非可拖动状态下点击 binding POI 会弹出和 save POI 同构的 tooltip
 13. binding POI 的标题使用 empire 星区名或空间站名，不显示内部 id
+14. Step 3 中正常绑定且当前 time 可解析的 empire station 不会作为独立列表项重复出现，只通过对应 save station 的绑定按钮/菜单体现
+15. Step 3 中有 `position`、无 `saveStationCode` 的 empire station 会以独立补位项显示空间站名称与 `x,z` 坐标，并可作为 save station 绑定菜单候选
+16. Step 3 中有 `position`、有 `saveStationCode` 且当前 time 失效的 empire station 只显示失效状态与解绑入口，不允许拖拽重定位
+17. save station 的绑定菜单会将已绑定到其他 save station 的 empire station 置灰且不可点击，且该限制不因当前 time 失效而放宽
+18. Step 2 中下方存档星区列表不再承担进入 Step 3 的职责；进入 Step 3 只能从对应 empire sector 条目的 Step 3 按钮发起
+19. Step 2 中一旦存在展开态星区，排序手柄与 Step 3 按钮均失效，用户只能编辑当前展开星区并通过“确定 / 取消”退出
+20. Step 2 展开编辑态会新增“连接星区”区块，基于定位星区自动收集 5 跳内、已绑定定位星区的其他 empire sector，并按跳数分组显示
+21. Step 2 中连接星区关系为双向关系，语义沿用帝国连接星区，但持久化位置改为 `saveBinding.groupBinding`
+22. Step 2 收缩态只显示已连接星区结果，不显示未连接星区与连接操作按钮
+23. Step 2 下方存档星区列表中的空间站显示改为 tooltip 同源名称并按同名聚合，数量大于 1 时显示 `xN`
+24. Step 1 中普通点击 `time` 会切换 POI 并高亮该 `time`，但不会修改 binding，也不会自动进入 Step 2
+25. Step 1 中点击 `title` 或 `time` 的 hover“绑定”按钮会创建/更新 binding，并立即进入 Step 2
+26. Step 1 的查看状态只在进入 Step 2/3 时生效；停留在 Step 1 或关闭绑定面板均视为退出查看状态
+27. Step 1 中 `已绑定` tag 仅通过实边/虚边区分“绑定到最新”与“绑定到具体 time”，不改变现有卡片样式结构
 
 ## 未决项
 
