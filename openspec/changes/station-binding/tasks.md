@@ -131,3 +131,11 @@
 - [x] 20. 构建验证
 - [x] 20.1 完成实现后执行 `npm run build`
 - [x] 20.2 构建通过
+
+- [x] 21. Binding POI 视觉与拖拽权限对齐
+- [x] 21.1 普通 binding station 的类型判定复用 `parser.post.ts` 玩家 station 逻辑
+- [x] 21.2 虚拟中转站按 `tradestation` 类型处理
+- [x] 21.3 binding POI 的 owner / 图标大小 / 图标规则与 save POI 对齐
+- [x] 21.4 binding POI 常驻显示，并受 `playerStation` 可见性设置控制
+- [x] 21.5 binding POI 仅在所属 `sectorGroup` 的 Step 3 中允许拖拽
+- [x] 21.6 binding POI 增加虚线六边形外框，作为与 save POI 的唯一视觉差异

@@ -48,10 +48,6 @@ const activeDragKey = ref<string | null>(null)
 const DRAG_START_THRESHOLD_PX = 4
 const suppressNextSectorFocus = ref(false)
 
-const logBindingDrag = (stage: string, detail?: Record<string, unknown>) => {
-  console.log('[MapBindingStation][Drag]', stage, detail || {})
-}
-
 const iconUrlByType = {
   factory: factoryIconUrl,
   shipyard: shipyardIconUrl
@@ -525,11 +521,6 @@ const allStationsForMenu = computed(() => {
 function onVirtualTradestationMouseDown(event: MouseEvent) {
   if (event.button !== 0) return
   event.preventDefault()
-  logBindingDrag('mousedown:virtual-tradestation', {
-    sectorGroupId: props.sectorGroupId,
-    x: event.clientX,
-    y: event.clientY
-  })
   pendingDrag.value = {
     key: '__virtual_tradestation__',
     payload: {
@@ -551,12 +542,6 @@ function onVirtualTradestationMouseDown(event: MouseEvent) {
 function onFreeStationMouseDown(event: MouseEvent, item: { station: StationPlan; sectorGroupId: string }) {
   if (event.button !== 0) return
   event.preventDefault()
-  logBindingDrag('mousedown:free-station', {
-    stationId: item.station.id,
-    sectorGroupId: props.sectorGroupId,
-    x: event.clientX,
-    y: event.clientY
-  })
   pendingDrag.value = {
     key: item.station.id,
     payload: {
@@ -575,12 +560,7 @@ function onFreeStationMouseDown(event: MouseEvent, item: { station: StationPlan;
 function onPlacedFreeStationMouseDown(event: MouseEvent, placed: { stationId: string }) {
   if (event.button !== 0) return
   const station = activeEmpire.value?.stations.find((item) => item.id === placed.stationId)
-  if (!station) {
-    logBindingDrag('mousedown:placed-station:missing-station', {
-      stationId: placed.stationId
-    })
-    return
-  }
+  if (!station) return
   onFreeStationMouseDown(event, {
     station,
     sectorGroupId: props.sectorGroupId
@@ -588,19 +568,11 @@ function onPlacedFreeStationMouseDown(event: MouseEvent, placed: { stationId: st
 }
 
 const clearPendingDrag = () => {
-  if (pendingDrag.value) {
-    logBindingDrag('pending:clear', {
-      key: pendingDrag.value.key
-    })
-  }
   pendingDrag.value = null
 }
 
 const finishActiveDrag = () => {
   if (!activeDragKey.value) return
-  logBindingDrag('active:finish', {
-    key: activeDragKey.value
-  })
   suppressNextSectorFocus.value = true
   window.setTimeout(() => {
     suppressNextSectorFocus.value = false
@@ -611,7 +583,6 @@ const finishActiveDrag = () => {
 
 function onSectorItemClick(sectorMacro: string) {
   if (suppressNextSectorFocus.value) {
-    logBindingDrag('click:suppressed-after-drag', { sectorMacro })
     suppressNextSectorFocus.value = false
     return
   }
@@ -629,20 +600,11 @@ const onWindowMouseMove = (event: MouseEvent) => {
   const dx = event.clientX - pendingDrag.value.startX
   const dy = event.clientY - pendingDrag.value.startY
   if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
-  logBindingDrag('threshold:passed', {
-    key: pendingDrag.value.key,
-    dx,
-    dy
-  })
   activeDragKey.value = pendingDrag.value.key
   emit('drag-station-start', pendingDrag.value.payload)
 }
 
 const onWindowMouseUp = () => {
-  logBindingDrag('window:mouseup', {
-    pendingKey: pendingDrag.value?.key || null,
-    activeKey: activeDragKey.value
-  })
   clearPendingDrag()
   finishActiveDrag()
 }

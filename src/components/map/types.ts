@@ -1,4 +1,4 @@
-import type { SavePoiCategory } from '@/types/saveArchive'
+import type { SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 
 export type Vec2 = { x: number; y: number }
 export type Ratio = { x: number; y: number }
@@ -133,6 +133,8 @@ export type PlacementOverlay = {
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: PlacementLocation
   localRatio?: Ratio
+  draggable?: boolean
+  savePoiVisual?: SavePoiOverlayItem
 }
 
 export type PlacementPreview = {
@@ -141,6 +143,7 @@ export type PlacementPreview = {
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: PlacementLocation
   localRatio?: Ratio
+  savePoiVisual?: SavePoiOverlayItem
 }
 
 export type SavePoiColorMap = Record<SavePoiCategory, string>

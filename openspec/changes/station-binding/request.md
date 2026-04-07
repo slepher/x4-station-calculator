@@ -90,6 +90,14 @@
   - 帝国星区中转绑定操作
   - 底部“空闲帝国空间站”列表，可直接拖拽到地图上
 - 底部空闲 empire station 拖拽到地图后，显示大小与小空间站一致，其位置只保存到 binding 数据，不写入 `EmpirePlan`。
+- binding 产生的地图 POI 在视觉上需要与 save POI 使用同一套类型、owner 与尺寸语义：
+  - 普通 binding station 的类型判定复用 `parser.post.ts` 中玩家 station 的分类逻辑
+  - `owner` 固定视为 `player`
+  - 虚拟中转站按 `tradestation` 类型处理
+  - binding POI 与 save POI 的唯一区别是额外增加一层虚线六边形外框
+- binding POI 需要像 save POI 一样常驻显示，不依赖当前是否正在执行拖拽。
+- binding POI 的常驻显示受 save POI 的 `playerStation` 可见性设置控制。
+- 但 binding POI 只有在其所属 `sectorGroup` 的 Step 3 上下文内才允许拖拽；在其他上下文中仅显示，不可拖动。
 
 ### 9. 数据流组织
 
@@ -135,6 +143,8 @@
 7. 用户可以将过滤范围内的 save 玩家空间站绑定到已有 empire station，或直接导入为新的 empire station
 8. 用户可以把空闲 empire station 直接拖拽到地图上，位置写入 binding 数据而不是 `EmpirePlan`
 9. 对于已绑定或已放置的 empire station，系统会把 `position: { x, y, z }` 保存在 binding 数据中，使绑定失效后坐标仍可单独生效
+10. binding POI 的图标类型、owner 与尺寸语义与 save POI 保持一致，仅额外显示虚线六边形外框
+11. binding POI 常驻显示，但显示受 `playerStation` 可见性设置控制，且仅在对应 `sectorGroup` 的 Step 3 上下文中可拖拽
 
 ## 未决项
 

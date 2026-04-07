@@ -12,6 +12,12 @@ import type {
 } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
 import type { X4Map } from '@/types/x4'
+import {
+  classifyPlayerStationPoi,
+  getFactoryGroup,
+  getProductionProfile,
+  hasModulePattern
+} from '@/store/logic/stationPoiSemantics'
 import shipsData from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 
 interface Vector3 {
@@ -63,27 +69,9 @@ export const CURRENT_POST_PROCESSOR_VERSION = 'v9' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
 const DEFAULT_EXTENT_RATIO = 0.8
-const ENERGY_GROUP = 'energy'
-const MIXED_PRODUCTION_PROFILE = 'mixed'
-const TECH_CLUSTER_GROUPS = ['shiptech', 'hightech', 'refined'] as const
-const LIFE_CLUSTER_GROUPS = ['pharmaceutical', 'agricultural', 'food', 'water'] as const
-const TECH_CLUSTER_GROUP_SET = new Set<string>(TECH_CLUSTER_GROUPS)
-const LIFE_CLUSTER_GROUP_SET = new Set<string>(LIFE_CLUSTER_GROUPS)
-
 function snapToSectorCenterGrid(value: number): number {
   return Math.round(value / SECTOR_CENTER_GRID) * SECTOR_CENTER_GRID
 }
-
-const FACTORY_GROUP_PRIORITY = [
-  'shiptech',
-  'hightech',
-  'refined',
-  'pharmaceutical',
-  'food',
-  'agricultural',
-  'water',
-  'energy'
-]
 
 interface ShipLookupEntry {
   id: string
@@ -471,104 +459,6 @@ function enrichModulesWithGameData(
   })
 }
 
-function getFactoryGroup(
-  modules: AggregatedStationModule[] | undefined
-): string {
-  if (!modules || modules.length === 0) return 'factory'
-  
-  const productionModules = modules.filter((m) => m.type === 'production')
-  if (productionModules.length === 0) return 'factory'
-  
-  const groups = productionModules.map((m) => m.group).filter((g): g is string => Boolean(g))
-  
-  for (const priorityGroup of FACTORY_GROUP_PRIORITY) {
-    if (groups.includes(priorityGroup)) {
-      return priorityGroup
-    }
-  }
-  
-  return 'factory'
-}
-
-function getPrimaryProductionModule(
-  modules: AggregatedStationModule[] | undefined
-): AggregatedStationModule | undefined {
-  if (!modules?.length) return undefined
-
-  const productionModules = modules.filter((module) => module.type === 'production')
-  if (!productionModules.length) return undefined
-
-  const nonEnergyModules = productionModules.filter((module) => module.group !== ENERGY_GROUP)
-  if (nonEnergyModules.length === 1) return nonEnergyModules[0]
-  if (nonEnergyModules.length > 1) return undefined
-
-  const energyModule = productionModules.find((module) => module.module_id === 'module_gen_prod_energycells_01')
-  return energyModule || productionModules[0]
-}
-
-function getProductionProfile(
-  modules: AggregatedStationModule[] | undefined,
-  modulesByMacroId?: Record<string, X4Module>
-): { productionProfile?: string; profileName?: string } {
-  if (!modules?.length) return {}
-
-  const productionModules = modules.filter((module) => module.type === 'production')
-  if (!productionModules.length) return {}
-
-  const nonEnergyModules = productionModules.filter((module) => module.group !== ENERGY_GROUP)
-  const nonEnergyGroups = [...new Set(nonEnergyModules.map((module) => module.group).filter((group): group is string => Boolean(group)))]
-
-  if (nonEnergyModules.length === 1 || nonEnergyModules.length === 0) {
-    const primaryModule = getPrimaryProductionModule(modules)
-    if (!primaryModule?.module_id) return {}
-    const moduleName = modulesByMacroId?.[primaryModule.ref]?.name
-    return {
-      productionProfile: primaryModule.module_id,
-      profileName: moduleName || primaryModule.module_id
-    }
-  }
-
-  if (nonEnergyGroups.length === 1) {
-    return {
-      productionProfile: nonEnergyGroups[0],
-      profileName: nonEnergyGroups[0]
-    }
-  }
-
-  const isTechCluster = nonEnergyGroups.every((group) => TECH_CLUSTER_GROUP_SET.has(group))
-  if (isTechCluster) {
-    const primaryGroup = TECH_CLUSTER_GROUPS.find((group) => nonEnergyGroups.includes(group))
-    if (!primaryGroup) return {}
-    return {
-      productionProfile: primaryGroup,
-      profileName: primaryGroup
-    }
-  }
-
-  const isLifeCluster = nonEnergyGroups.every((group) => LIFE_CLUSTER_GROUP_SET.has(group))
-  if (isLifeCluster) {
-    const primaryGroup = LIFE_CLUSTER_GROUPS.find((group) => nonEnergyGroups.includes(group))
-    if (!primaryGroup) return {}
-    return {
-      productionProfile: primaryGroup,
-      profileName: primaryGroup
-    }
-  }
-
-  return {
-    productionProfile: MIXED_PRODUCTION_PROFILE,
-    profileName: 'Mixed Production'
-  }
-}
-
-function hasModulePattern(modules: AggregatedStationModule[] | undefined, patterns: string[]): boolean {
-  if (!modules || modules.length === 0) return false
-  return modules.some((module) => {
-    const ref = module.ref.toLowerCase()
-    return patterns.some((pattern) => ref.includes(pattern))
-  })
-}
-
 function enrichPlayerStation(
   station: PlayerStationEntry,
   sectorId: string,
@@ -578,27 +468,12 @@ function enrichPlayerStation(
   modulesByMacroId?: Record<string, X4Module>
 ): PlayerStationEntry {
   const modules = station.modules || []
-  const macro = station.macro.toLowerCase()
-  
-  const isPiratebase = macro.includes('_piratebase')
-  const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_xl', '_ships_x_', '_ships_x'])
-  const isWharf = hasModulePattern(modules, ['_ships_m_', '_ships_m'])
-  const isEquipmentdock = hasModulePattern(modules, ['_equip'])
-  const isFactory = modules.some((m) => m.type === 'production')
-  const factoryGroup = getFactoryGroup(modules)
-  const isTradestation = macro.includes('tradestation')
-  const isDefencemodule = modules.some((m) => m.type === 'defencemodule')
-  const isHeadquarter = hasModulePattern(modules, ['player_hq_']) || station.is_headquarter
-  
-  let tag: string | undefined
-  if (isPiratebase) tag = 'piratestation'
-  else if (isShipyard) tag = 'shipyard'
-  else if (isWharf) tag = 'wharf'
-  else if (isEquipmentdock) tag = 'equipmentdock'
-  else if (isFactory) tag = 'factory'
-  else if (isTradestation) tag = 'tradestation'
-  else if (isDefencemodule) tag = 'defencemodule'
-  else tag = 'factory'
+  const classification = classifyPlayerStationPoi({
+    macro: station.macro,
+    modules,
+    isHeadquarter: station.is_headquarter,
+    modulesByMacroId
+  })
   
   const position = withTransformPosition(calculateFinalPosition(
     station.relative_position,
@@ -611,17 +486,17 @@ function enrichPlayerStation(
   return {
     ...station,
     position,
-    isShipyard: isShipyard || undefined,
-    isWharf: isWharf || undefined,
-    isEquipmentdock: isEquipmentdock || undefined,
-    isFactory: isFactory || undefined,
-    factoryGroup: factoryGroup !== 'factory' ? factoryGroup : undefined,
+    isShipyard: classification.isShipyard,
+    isWharf: classification.isWharf,
+    isEquipmentdock: classification.isEquipmentdock,
+    isFactory: classification.isFactory,
+    factoryGroup: classification.factoryGroup,
     productionProfile,
     profileName,
-    isPiratebase: isPiratebase || undefined,
-    isDefencemodule: isDefencemodule || undefined,
-    is_headquarter: isHeadquarter || undefined,
-    tag
+    isPiratebase: classification.isPiratebase,
+    isDefencemodule: classification.isDefencemodule,
+    is_headquarter: classification.is_headquarter,
+    tag: classification.tag
   }
 }
 
