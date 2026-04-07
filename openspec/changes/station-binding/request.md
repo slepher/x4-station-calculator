@@ -9,7 +9,7 @@
 ### 1. 绑定层定位
 
 - binding 作为附加关系层，而不是 `EmpirePlan` / `StationPlan` / `sectorGroup` 的本体属性。
-- `SaveBinding` 独立保存在 `empireSavePlan` localStorage 中，与 empire 同级持久化，但不写入 empire 本体。
+- `SaveBinding` 保存在 `x4_empire_data` 的根对象中，作为 `SavedEmpiresState.savePlans` 顶层同级字段存在，但不写入单个 `EmpirePlan` 本体。
 - 规划本体继续只保存规划数据；save 关系、当前 save 视角与失效提示全部放在独立 binding 层处理。
 
 ### 2. SaveBinding 唯一键与时间视角
@@ -96,8 +96,7 @@
 - 基础事实层：
   - `saveStore` 提供 archive、save POI、候选实体
   - `mapStore` 提供地图拓扑、sector 邻接、跳数搜索、定位能力
-  - `empireStore` 提供 `sectorGroup`、group 内 stations、station 新建能力
-  - 新增 `empireSavePlanStore` 提供独立 binding 持久化结果
+  - `empireStore` 提供 `sectorGroup`、group 内 stations、station 新建能力，以及 `SavedEmpiresState.savePlans` 的读写
 - 派生查询层：
   - 新增 binding selector/composable，统一拼接当前 binding 视角、用户所在星区列表、过滤后的 `N` 跳星区/空间站、候选 empire station 与非法原因
 - 交互状态层：
@@ -127,7 +126,7 @@
 
 ## 验收标准（DoD）
 
-1. 系统存在独立于 empire 本体的 `SaveBinding` 持久化层，并以 `empireId + gameGuid` 作为单个 binding 的唯一键
+1. 系统在 `SavedEmpiresState` 根对象下存在 `savePlans` 顶层字段，并以 `empireId + gameGuid` 作为单个 binding 的唯一键
 2. 用户可以在同一 empire 下创建多个 save binding 视角，并在这些视角间切换
 3. 用户进入某个 save 星区后，可以设置跳数并得到该星区 `N` 跳以内的星区与空间站列表
 4. 地图会自动缩放/平移到能显示所有过滤星区的最大范围

@@ -23,6 +23,7 @@ import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOu
 import { buildTransitHubViewModel } from './logic/transitHubViewModel'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './logic/stationGapViewModel'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
+import { createSaveBindingActions } from './logic/saveBindingActions'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
 import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
 import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, parseSectorLinkKey } from './logic/sectorLinks'
@@ -97,6 +98,7 @@ export const useEmpireStore = defineStore('empire', () => {
 
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
+  const bindingDirtyMarker = ref(0)
 
   const savedEmpires = ref<SavedEmpiresState>({ version: CURRENT_EMPIRE_VERSION, activeId: null, activeStationId: null, list: [] })
   const version = computed(() => savedEmpires.value.version)
@@ -460,7 +462,8 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function saveToStorage() {
-    localStorage.setItem(getStorageKey(), JSON.stringify(savedEmpires.value))
+    const data = JSON.stringify(savedEmpires.value)
+    localStorage.setItem(getStorageKey(), data)
   }
 
   function saveEmpire() {
@@ -928,6 +931,14 @@ export const useEmpireStore = defineStore('empire', () => {
     }
   }
 
+  function updateStationSector(stationId: string, sectorId: string | null) {
+    const station = getStationById(stationId)
+    if (station) {
+      station.sectorId = sectorId || undefined
+      station.lastUpdated = Date.now()
+    }
+  }
+
   function updateEmpireName(name: string) {
     if (activeEmpire.value) {
       activeEmpire.value.name = name
@@ -935,6 +946,7 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   const isDirty = computed(() => {
+    void bindingDirtyMarker.value
     if (isEmptyForSave()) return false
     const current = serializeEmpireForDirtyCheck()
     return current !== lastSavedSnapshot.value
@@ -958,6 +970,15 @@ export const useEmpireStore = defineStore('empire', () => {
   function resetEmpireWithDefaultName(defaultName: string = '') {
     return createEmpire(defaultName)
   }
+
+  // ========== SavePlans Binding Actions ==========
+  function onBindingDirty() {
+    bindingDirtyMarker.value++
+  }
+
+  const bindingActions = createSaveBindingActions(activeEmpire, onBindingDirty, updateStationSector)
+
+  // ========== End SavePlans Binding Actions ==========
 
   async function initialize() {
     console.log('[EmpireStore] Initializing...')
@@ -1074,10 +1095,33 @@ export const useEmpireStore = defineStore('empire', () => {
     getStationById,
     updateStationSettings,
     updateStationModules,
+    updateStationSector,
     updateEmpireName,
     shouldConfirmBeforeEmpireReset,
     resetEmpireWithDefaultName,
     takeSnapshot,
-    initialize
+    initialize,
+    // SaveBindings
+    getActiveBinding: bindingActions.getActiveBinding,
+    getBindingByGameGuid: bindingActions.getBindingByGameGuid,
+    createBinding: bindingActions.createBinding,
+    setActiveBinding: bindingActions.setActiveBinding,
+    setSelectedArchiveTime: bindingActions.setSelectedArchiveTime,
+    bindSectorGroup: bindingActions.bindSectorGroup,
+    updateSectorGroupJumpRange: bindingActions.updateSectorGroupJumpRange,
+    clearSectorGroupBinding: bindingActions.clearSectorGroupBinding,
+    getGroupBinding: bindingActions.getGroupBinding,
+    setTradestationBinding: bindingActions.setTradestationBinding,
+    clearTradestationBinding: bindingActions.clearTradestationBinding,
+    bindTradestationToSaveStation: bindingActions.bindTradestationToSaveStation,
+    clearTradestationCode: bindingActions.clearTradestationCode,
+    bindStationToSaveStation: bindingActions.bindStationToSaveStation,
+    clearStationBinding: bindingActions.clearStationBinding,
+    setStationBindingPosition: bindingActions.setStationBindingPosition,
+    isSaveStationAlreadyBound: bindingActions.isSaveStationAlreadyBound,
+    importSaveStationAsBinding: bindingActions.importSaveStationAsBinding,
+    deleteBinding: bindingActions.deleteBinding,
+    setFreeSectorBinding: bindingActions.setFreeSectorBinding,
+    setFreeStationBinding: bindingActions.setFreeStationBinding
   }
 })

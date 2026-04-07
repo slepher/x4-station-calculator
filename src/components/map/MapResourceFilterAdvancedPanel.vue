@@ -9,10 +9,10 @@ import type { SavedFlowGroup } from '@/types/x4'
 import {
   ADVANCED_SUNLIGHT_TAG_ID,
   buildAdvancedCandidates,
-  buildSectorGraph,
   type AdvancedResourceSector,
   type AdvancedResourceTagGroup
 } from '@/store/logic/mapAdvancedResourceFilter'
+import { buildSectorGraph } from '@/store/logic/mapSectorGraph'
 import {
   sortResourcesByPriority,
   buildFixedYieldEntries,

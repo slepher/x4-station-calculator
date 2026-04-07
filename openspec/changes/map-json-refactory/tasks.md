@@ -42,11 +42,20 @@
 - [x] 更新 `src/components/map/**` 中对 cluster / sector 结构的访问
 - [x] 更新 `src/utils/mapSearch.ts` 与 `MapWorkbenchView.vue` 中的 cluster id / sector id 假设
 - [x] 更新 `src/store/logic/mapAdvancedResourceFilter.ts` 对 cluster gate / sector 图的读取方式
+- [x] 将共享 sector 图构建 / BFS 逻辑从 `mapAdvancedResourceFilter.ts` 抽离到独立 helper，避免 `station-binding` 继续耦合 resource filter 模块
+- [x] 更新 `savePoiSearchFilter`、`MapResourceFilterAdvancedPanel` 与相关单测到新的共享拓扑 helper
 
 ### T3.3 修改 save parser 与导入导出相关逻辑
 
 - [x] 更新 `src/workers/saveParser.post.ts` 中 zone、sector center、scale basis 等 lookup 构建逻辑
 - [ ] 更新 `src/store/logic/importExport.ts` 等直接持有 `X4Map` 的使用点
+
+### T3.4 修改 `station-binding` 对新结构的依赖
+
+- [x] 更新 `MapBindingPanel.vue`、`MapBindingSectorGroup.vue`、`MapBindingStation.vue` 对 sector 明细的读取方式，统一改为顶层 `maps.sectors`
+- [x] 更新 `saveBindingUtils.ts` 与 `useMapBindingViewModel.ts`，使 coverage 图构建基于 `clusters + sectors`
+- [x] 去除 `station-binding` 组件内分散的 `sectorMacro.toLowerCase()` 比较，改为直接比较规范化后的小写 macro/id
+- [ ] 复查 `station-binding` 与高级资源页是否仍存在共享拓扑 helper 抽离后的行为回归；若存在，转为独立 bug 处理
 
 ## Phase 4: 脚本与分析工具同步
 
@@ -69,9 +78,10 @@
 
 - [ ] 更新 map-search、map-resource-filter、map-tooltip、user-save-map 等相关测试断言
 - [ ] 确认测试描述与夹具结构不再引用旧格式
+- [x] 更新 `advanced-resource-filter` 单测中对 `buildSectorGraph` 的旧结构 mock，改为新结构输入
 
 ## Task Dependencies
 
 ```text
-T1.1 -> T1.2 -> T2.1 -> T2.2 -> T3.1 -> T3.2 -> T3.3 -> T4.1 -> T5.1 -> T5.2
+T1.1 -> T1.2 -> T2.1 -> T2.2 -> T3.1 -> T3.2 -> T3.3 -> T3.4 -> T4.1 -> T5.1 -> T5.2
 ```

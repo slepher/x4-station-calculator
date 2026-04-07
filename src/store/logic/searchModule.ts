@@ -5,18 +5,44 @@ import type {
   ModuleGroupResult
 } from '@/types/x4'
 
-const TYPE_PRIORITY: Record<string, number> = {
+export const TYPE_PRIORITY: Record<string, number> = {
   production: 1,
   processingmodule: 2,
   habitation: 3,
   storage: 4
 }
 
-const GROUP_PRIORITY: Record<string, number> = {
+export const GROUP_PRIORITY: Record<string, number> = {
   shiptech: 1,
   hightech: 2,
   refined: 3,
   energy: 4
+}
+
+export function sortModulesBySearchPriority(
+  modules: { id: string; group?: string; tier?: number; name?: string }[],
+  localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
+): void {
+  modules.sort((a, b) => {
+    const typeA = localizedModuleGroupsMap[a.group || '']?.type || a.group || 'others'
+    const typeB = localizedModuleGroupsMap[b.group || '']?.type || b.group || 'others'
+
+    const pTypeA = TYPE_PRIORITY[typeA] || 99
+    const pTypeB = TYPE_PRIORITY[typeB] || 99
+    if (pTypeA !== pTypeB) return pTypeA - pTypeB
+
+    const pGroupA = GROUP_PRIORITY[a.group || ''] || 99
+    const pGroupB = GROUP_PRIORITY[b.group || ''] || 99
+    if (pGroupA !== pGroupB) return pGroupA - pGroupB
+
+    const tierA = a.tier || 0
+    const tierB = b.tier || 0
+    if (tierA !== tierB) return tierA - tierB
+
+    const nameA = a.name || a.id
+    const nameB = b.name || b.id
+    return nameA.localeCompare(nameB)
+  })
 }
 
 /**

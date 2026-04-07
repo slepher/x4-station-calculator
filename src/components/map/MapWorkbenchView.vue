@@ -6,11 +6,12 @@ import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
 import MapSavePanel from './MapSavePanel.vue'
+import MapBindingPanel from './MapBindingPanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
 import { getSectorScalePerRadius, sectorLocalRatioToRawPoint } from '@/components/map/utils/coordinates'
-import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
+import { resolveMapSectorByMacro, resolveSectorMacroById } from '@/components/map/utils/mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
@@ -132,6 +133,7 @@ const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
 const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
+const isBindingPanelOpen = ref(false)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
@@ -146,6 +148,12 @@ const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
 const draggingPlacementItem = ref<DraggingPlacementItem | null>(null)
 const draggingOverlayKey = ref<string | null>(null)
+const draggingBindingKey = ref<string | null>(null)
+const draggingSectorGroupId = ref<string | null>(null)
+const draggingFreeSector = ref<{ sectorGroupId: string; name: string } | null>(null)
+const draggingFreeStation = ref<{ stationId: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' } | null>(null)
+const draggingVirtualTradestation = ref<{ sectorGroupId: string; name: string } | null>(null)
+const draggingCoverageSectorMacros = ref<Set<string>>(new Set())
 const focusedPlacementKey = ref<string | null>(null)
 const placementPreview = ref<PlacementPreview | null>(null)
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
@@ -195,6 +203,12 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
 
 const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
+const isFreeStationDropForbidden = computed(() => {
+  if ((!draggingFreeStation.value && !draggingVirtualTradestation.value) || !placementPreview.value) return false
+  const location = placementPreview.value.location
+  const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
+  return sectorMacro ? !draggingCoverageSectorMacros.value.has(sectorMacro) : true
+})
 const stationPanelItems = computed<MapStationPanelItem[]>(() => {
   const empire = empireStore.activeEmpire
   if (!empire) return []
@@ -268,6 +282,70 @@ const placementOverlays = computed<PlacementOverlayItem[]>(() => {
       icon: item.icon,
       location: item.location
     }))
+})
+
+const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
+  if (!isBindingPanelOpen.value) return []
+  const empire = empireStore.activeEmpire
+  if (!empire) return []
+
+  const overlays: PlacementOverlayItem[] = []
+  const bindings = empire.saveBindings || []
+
+  for (const plan of bindings) {
+    for (const group of plan.groupBindings) {
+      if (group.tradestationBinding?.position && group.sectorMacro) {
+        const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, group.sectorMacro)
+        if (resolved) {
+          overlays.push({
+            key: `binding:tradestation:${group.sectorGroupId}`,
+            id: group.tradestationBinding.stationId,
+            kind: 'sector',
+            name: empire.sectors?.find(s => s.id === group.sectorGroupId)?.name || group.sectorGroupId,
+            icon: 'tradestation',
+            location: {
+              cluster_id: resolved.clusterId,
+              sector_id: resolved.sectorId,
+              pos: {
+                x: group.tradestationBinding.position.x,
+                z: group.tradestationBinding.position.z
+              },
+              sunlight: 0,
+              resources: []
+            }
+          })
+        }
+      }
+
+      for (const stationBinding of group.stationBindings) {
+        if (stationBinding.position && stationBinding.sectorMacro) {
+          const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationBinding.sectorMacro)
+          if (resolved) {
+            const station = empire.stations?.find(s => s.id === stationBinding.stationId)
+            overlays.push({
+              key: `binding:station:${stationBinding.stationId}`,
+              id: stationBinding.stationId,
+              kind: 'station',
+              name: station?.name || stationBinding.stationId,
+              icon: station?.type === 'shipyard' ? 'shipyard' : 'factory',
+              location: {
+                cluster_id: resolved.clusterId,
+                sector_id: resolved.sectorId,
+                pos: {
+                  x: stationBinding.position.x,
+                  z: stationBinding.position.z
+                },
+                sunlight: 0,
+                resources: []
+              }
+            })
+          }
+        }
+      }
+    }
+  }
+
+  return overlays
 })
 
 const activeMapArchive = computed<SaveArchive | null>(() =>
@@ -629,12 +707,26 @@ const resolveLocationAtPointer = (clientX: number, clientY: number): EntityLocat
 const clearPlacementState = () => {
   draggingPlacementItem.value = null
   draggingOverlayKey.value = null
+  draggingBindingKey.value = null
+  draggingSectorGroupId.value = null
+  draggingFreeSector.value = null
+  draggingFreeStation.value = null
+  draggingVirtualTradestation.value = null
+  draggingCoverageSectorMacros.value = new Set()
   placementPreview.value = null
 }
 
 const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocation) => {
   if (item.kind === 'station') {
-    empireStore.setStationLocation(item.id, location)
+    if (draggingBindingKey.value && draggingSectorGroupId.value) {
+      empireStore.setStationBindingPosition(draggingBindingKey.value, draggingSectorGroupId.value, item.id, {
+        x: location.pos.x,
+        y: 0,
+        z: location.pos.z
+      })
+    } else {
+      empireStore.setStationLocation(item.id, location)
+    }
     return
   }
   empireStore.setSectorLocation(item.id, location)
@@ -1003,6 +1095,7 @@ const onResourcePrimaryColorChange = (color: string | null) => {
 const onResourcePanelOpen = () => {
   isStationPanelOpen.value = false
   isSavePanelOpen.value = false
+  isBindingPanelOpen.value = false
   clearPlacementState()
   isResourcePanelOpen.value = true
 }
@@ -1018,6 +1111,7 @@ const onResourcePanelClose = () => {
 const onStationPanelOpen = () => {
   isResourcePanelOpen.value = false
   isSavePanelOpen.value = false
+  isBindingPanelOpen.value = false
   isStationPanelOpen.value = true
 }
 
@@ -1030,6 +1124,7 @@ const onStationPanelClose = () => {
 const onSavePanelOpen = () => {
   isResourcePanelOpen.value = false
   isStationPanelOpen.value = false
+  isBindingPanelOpen.value = false
   clearPlacementState()
   isSavePanelOpen.value = true
 }
@@ -1038,6 +1133,85 @@ const onSavePanelClose = () => {
   isSavePanelOpen.value = false
   activeSavePoiCategory.value = null
   focusedSavePoiKey.value = null
+}
+
+const onBindingPanelOpen = () => {
+  isResourcePanelOpen.value = false
+  isStationPanelOpen.value = false
+  isSavePanelOpen.value = false
+  clearPlacementState()
+  isBindingPanelOpen.value = true
+}
+
+const onBindingPanelClose = () => {
+  isBindingPanelOpen.value = false
+}
+
+const onBindingFocusSector = (sectorMacro: string) => {
+  const resolved = mapStore.resolveSectorByMacro?.(sectorMacro) ||
+    resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, sectorMacro)
+  if (resolved?.sectorId) {
+    focusSector(resolved.sectorId)
+  }
+}
+
+const onBindingFitSectors = (sectorMacros: string[]) => {
+  const sectorIds = sectorMacros
+    .map((macro) => {
+      const resolved = mapStore.resolveSectorByMacro?.(macro) ||
+        resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, macro)
+      return resolved?.sectorId
+    })
+    .filter((id): id is string => Boolean(id))
+  
+  if (sectorIds.length > 0) {
+    fitSectors(sectorIds)
+  }
+}
+
+const onBindingDragStationStart = (payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }) => {
+  if (payload.isVirtualTradestation) {
+    draggingVirtualTradestation.value = {
+      sectorGroupId: payload.sectorGroupId,
+      name: payload.name
+    }
+  } else {
+    draggingFreeStation.value = {
+      stationId: payload.stationId,
+      sectorGroupId: payload.sectorGroupId,
+      name: payload.name,
+      icon: payload.icon as 'factory' | 'shipyard'
+    }
+  }
+  draggingBindingKey.value = payload.gameGuid
+  draggingSectorGroupId.value = payload.sectorGroupId
+  draggingCoverageSectorMacros.value = new Set(payload.coverageSectorMacros.map(entry => entry.ref))
+  draggingPlacementItem.value = null
+  draggingOverlayKey.value = null
+  draggingFreeSector.value = null
+}
+
+const onBindingDragStationEnd = () => {
+  clearPlacementState()
+  draggingBindingKey.value = null
+  draggingSectorGroupId.value = null
+  draggingFreeStation.value = null
+  draggingVirtualTradestation.value = null
+  draggingCoverageSectorMacros.value = new Set()
+}
+
+const onBindingDragFreeSectorStart = (payload: { sectorGroupId: string; name: string; gameGuid: string }) => {
+  draggingFreeSector.value = {
+    sectorGroupId: payload.sectorGroupId,
+    name: payload.name
+  }
+  draggingBindingKey.value = payload.gameGuid
+  draggingPlacementItem.value = null
+  draggingOverlayKey.value = null
+}
+
+const onBindingDragFreeSectorEnd = () => {
+  clearPlacementState()
 }
 
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
@@ -1156,7 +1330,7 @@ const onMouseDown = (event: MouseEvent) => {
 
 const onMouseMove = (event: MouseEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
-  if (draggingPlacementItem.value && isStationPanelOpen.value) {
+  if (draggingPlacementItem.value && (isStationPanelOpen.value || isBindingPanelOpen.value)) {
     const location = resolveLocationAtPointer(event.clientX, event.clientY)
     placementPreview.value = location ? {
       kind: draggingPlacementItem.value.kind,
@@ -1164,6 +1338,42 @@ const onMouseMove = (event: MouseEvent) => {
       icon: draggingPlacementItem.value.icon,
       location
     } : null
+  } else if (draggingFreeSector.value && isBindingPanelOpen.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    placementPreview.value = location ? {
+      kind: 'sector',
+      name: draggingFreeSector.value.name,
+      icon: 'tradestation',
+      location
+    } : null
+  } else if (draggingVirtualTradestation.value && isBindingPanelOpen.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    if (location) {
+      const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
+      const isAllowed = sectorMacro ? draggingCoverageSectorMacros.value.has(sectorMacro) : false
+      placementPreview.value = isAllowed ? {
+        kind: 'station',
+        name: draggingVirtualTradestation.value.name,
+        icon: 'tradestation',
+        location
+      } : null
+    } else {
+      placementPreview.value = null
+    }
+  } else if (draggingFreeStation.value && isBindingPanelOpen.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    if (location) {
+      const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
+      const isAllowed = sectorMacro ? draggingCoverageSectorMacros.value.has(sectorMacro) : false
+      placementPreview.value = isAllowed ? {
+        kind: 'station',
+        name: draggingFreeStation.value.name,
+        icon: draggingFreeStation.value.icon,
+        location
+      } : null
+    } else {
+      placementPreview.value = null
+    }
   }
   if (!isDragging.value) return
   const dx = event.clientX - dragStartX.value
@@ -1210,9 +1420,48 @@ const onWheel = (event: WheelEvent) => {
 const stopDrag = () => {
   isDragging.value = false
   settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
-  if (!draggingPlacementItem.value) return
-  if (placementPreview.value) {
+  if (draggingPlacementItem.value && placementPreview.value) {
     applyLocationToItem(draggingPlacementItem.value, placementPreview.value.location)
+  } else if (draggingFreeSector.value && placementPreview.value && draggingBindingKey.value) {
+    empireStore.setFreeSectorBinding({
+      gameGuid: draggingBindingKey.value,
+      sectorGroupId: draggingFreeSector.value.sectorGroupId,
+      sectorMacro: placementPreview.value.location.sector_id,
+      position: {
+        x: placementPreview.value.location.pos.x,
+        y: 0,
+        z: placementPreview.value.location.pos.z
+      }
+    })
+  } else if (draggingVirtualTradestation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
+    const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
+    if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
+      empireStore.setTradestationBinding({
+        gameGuid: draggingBindingKey.value,
+        sectorGroupId: draggingSectorGroupId.value,
+        sectorMacro,
+        position: {
+          x: placementPreview.value.location.pos.x,
+          y: 0,
+          z: placementPreview.value.location.pos.z
+        }
+      })
+    }
+  } else if (draggingFreeStation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
+    const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
+    if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
+      empireStore.setFreeStationBinding({
+        gameGuid: draggingBindingKey.value,
+        sectorGroupId: draggingSectorGroupId.value,
+        stationId: draggingFreeStation.value.stationId,
+        sectorMacro,
+        position: {
+          x: placementPreview.value.location.pos.x,
+          y: 0,
+          z: placementPreview.value.location.pos.z
+        }
+      })
+    }
   }
   clearPlacementState()
 }
@@ -1223,23 +1472,50 @@ const onResize = () => {
 }
 
 const onViewportDragOver = (event: DragEvent) => {
-  if (!draggingPlacementItem.value || !isStationPanelOpen.value) return
+  if (!isStationPanelOpen.value && !isBindingPanelOpen.value) return
   event.preventDefault()
-  const location = resolveLocationAtPointer(event.clientX, event.clientY)
-  placementPreview.value = location ? {
-    kind: draggingPlacementItem.value.kind,
-    name: draggingPlacementItem.value.name,
-    icon: draggingPlacementItem.value.icon,
-    location
-  } : null
+  
+  if (draggingPlacementItem.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    placementPreview.value = location ? {
+      kind: draggingPlacementItem.value.kind,
+      name: draggingPlacementItem.value.name,
+      icon: draggingPlacementItem.value.icon,
+      location
+    } : null
+  } else if (draggingFreeSector.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    placementPreview.value = location ? {
+      kind: 'sector',
+      name: draggingFreeSector.value.name,
+      icon: 'tradestation',
+      location
+    } : null
+  }
 }
 
 const onViewportDrop = (event: DragEvent) => {
-  if (!draggingPlacementItem.value || !isStationPanelOpen.value) return
+  if (!isStationPanelOpen.value && !isBindingPanelOpen.value) return
   event.preventDefault()
+  
   const location = resolveLocationAtPointer(event.clientX, event.clientY)
-  if (location) {
+  if (!location) {
+    clearPlacementState()
+    return
+  }
+  
+  if (draggingPlacementItem.value) {
     applyLocationToItem(draggingPlacementItem.value, location)
+  } else if (draggingFreeSector.value && draggingBindingKey.value) {
+    empireStore.setTradestationBinding({
+      gameGuid: draggingBindingKey.value,
+      sectorGroupId: draggingFreeSector.value.sectorGroupId,
+      position: {
+        x: location.pos.x,
+        y: 0,
+        z: location.pos.z
+      }
+    })
   }
   clearPlacementState()
 }
@@ -1323,7 +1599,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="map-workbench" data-testid="map-workbench-view">
-    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen, 'save-sidebar-active': isSavePanelOpen }">
+    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen, 'save-sidebar-active': isSavePanelOpen, 'binding-sidebar-active': isBindingPanelOpen }">
       <MapResourceFilterPanel
         v-show="isResourcePanelOpen"
         :sector-layouts="searchSectors"
@@ -1361,12 +1637,23 @@ onBeforeUnmount(() => {
         @focus-poi="onSavePoiFocus"
       />
 
+      <MapBindingPanel
+        :open="isBindingPanelOpen"
+        @close="onBindingPanelClose"
+        @focus-sector="onBindingFocusSector"
+        @fit-sectors="onBindingFitSectors"
+        @drag-station-start="onBindingDragStationStart"
+        @drag-station-end="onBindingDragStationEnd"
+        @drag-free-sector-start="onBindingDragFreeSectorStart"
+        @drag-free-sector-end="onBindingDragFreeSectorEnd"
+      />
+
       <div class="map-shell">
         <div
           ref="viewportRef"
           class="map-viewport"
           data-testid="map-viewport"
-          :class="{ dragging: isDragging }"
+          :class="{ dragging: isDragging, 'drop-forbidden': isFreeStationDropForbidden }"
           @mousedown="onMouseDown"
           @mousemove="onMouseMove"
           @mouseup="stopDrag"
@@ -1388,8 +1675,8 @@ onBeforeUnmount(() => {
               :resource-sector-group-badges="resourceSectorGroupBadges"
               :resource-fill-color-override="resourcePrimaryColor"
               :selected-sector-id="selectedSectorId"
-              :placement-overlays="placementOverlays"
-              :placement-preview="isStationPanelOpen ? placementPreview : null"
+              :placement-overlays="[...placementOverlays, ...bindingOverlays]"
+              :placement-preview="(isStationPanelOpen || isBindingPanelOpen) ? placementPreview : null"
               :is-dragging="isDragging"
               :is-zooming="isZooming"
               :dragging-overlay-key="draggingOverlayKey"
@@ -1565,6 +1852,26 @@ onBeforeUnmount(() => {
               />
             </svg>
           </button>
+
+          <button
+            type="button"
+            class="map-panel-tab"
+            :class="{ active: isBindingPanelOpen }"
+            data-testid="map-binding-panel-tab"
+            @click="onBindingPanelOpen"
+          >
+            <span class="map-panel-tab-label">{{ t('map.binding_panel_tab') }}</span>
+            <svg class="map-panel-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
+              <path
+                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
+                fill="none"
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.8"
+              />
+            </svg>
+          </button>
         </div>
 
         <div class="map-right-stack" @mousedown.stop>
@@ -1625,6 +1932,10 @@ onBeforeUnmount(() => {
   @apply gap-3;
 }
 
+.map-layout.binding-sidebar-active {
+  @apply gap-3;
+}
+
 .map-viewport {
   @apply relative w-full overflow-hidden cursor-grab;
   height: 100%;
@@ -1634,6 +1945,10 @@ onBeforeUnmount(() => {
 .map-viewport.dragging {
   @apply cursor-grabbing;
   user-select: none;
+}
+
+.map-viewport.drop-forbidden {
+  cursor: not-allowed;
 }
 
 .map-viewport.dragging * {
