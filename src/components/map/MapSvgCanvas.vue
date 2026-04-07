@@ -198,6 +198,7 @@ const focusedSavePoiKeyRef = toRef(props, 'focusedSavePoiKey')
 
 const {
   clusters,
+  sectors,
   regionIds,
   layoutState,
   clipDefs,
@@ -225,6 +226,7 @@ const {
 } = useMapSvgSectors({
   gameData,
   clusters,
+  sectors,
   regionIds,
   layoutState,
   searchHighlightedSectorIds: toRef(props, 'searchHighlightedSectorIds'),
@@ -252,6 +254,7 @@ const {
   crossClusterGateLines
 } = useMapSvgLinks({
   clusters,
+  sectors,
   saveSectors: saveSectorsRef,
   regionIds,
   layoutState,
@@ -266,6 +269,7 @@ const {
   previewScreenItem
 } = useMapSvgOverlays({
   clusters,
+  sectors,
   layoutState,
   placementOverlays: placementOverlaysRef,
   placementPreview: placementPreviewRef,

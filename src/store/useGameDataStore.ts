@@ -74,7 +74,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const missiles = ref<X4Missile[]>([])
   const drones = ref<X4Drone[]>([])
   const consumables = ref<X4Consumable[]>([])
-  const maps = ref<X4Map>({ clusters: {} })
+  const maps = ref<X4Map>({ clusters: {}, sectors: {} })
   const regionyields = ref<X4RegionYield[]>([])
   const res = ref<X4Res[]>([])
   const factions = ref<X4Faction[]>([])

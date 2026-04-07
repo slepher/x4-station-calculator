@@ -58,11 +58,11 @@ export function buildReachableSectorMacros(
   maps: X4Map | undefined,
   maxJumps: number
 ): Set<string> {
-  if (!maps || !maps.clusters || sectorTags.length === 0) {
+  if (!maps || !maps.clusters || !maps.sectors || sectorTags.length === 0) {
     return new Set()
   }
 
-  const { graph, sectorClusterMap } = buildSectorGraph(maps.clusters)
+  const { graph, sectorClusterMap } = buildSectorGraph(maps.clusters, maps.sectors)
   const reachableSectorIds = new Set<string>()
 
   for (const tag of sectorTags) {
@@ -88,12 +88,10 @@ export function isSectorReachable(
 
 function findSectorIdByMacro(maps: X4Map, sectorMacro: string): string | null {
   const normalizedTarget = sectorMacro.toLowerCase()
-  for (const cluster of Object.values(maps.clusters)) {
-    for (const sector of Object.values(cluster.sectors || {})) {
-      const sectorMacroLower = (sector.macro || sector.id).toLowerCase()
-      if (sectorMacroLower === normalizedTarget) {
-        return sector.id
-      }
+  for (const sector of Object.values(maps.sectors || {})) {
+    const sectorMacroLower = (sector.macro || sector.id).toLowerCase()
+    if (sectorMacroLower === normalizedTarget) {
+      return sector.id
     }
   }
   return null

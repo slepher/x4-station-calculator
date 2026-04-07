@@ -1,7 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
 import { fitWorldToScreen, computeClusterRadius, minCenterDistance, hexPoints } from '@/components/map/utils/geometry'
 import { getSectorViewportTransform } from '@/components/map/utils/coordinates'
-import type { Cluster, LayoutConfig, SearchSectorLayout, Vec2 } from '@/components/map/types'
+import type { Cluster, LayoutConfig, SearchSectorLayout, Sector, Vec2 } from '@/components/map/types'
 
 const SQRT3 = Math.sqrt(3)
 const CANVAS_SCALE_FACTOR = 1.8
@@ -59,6 +59,10 @@ export function useMapSvgLayout(args: {
     )
   })
 
+  const sectors = computed<Record<string, Sector>>(() => {
+    return (args.gameData.maps as unknown as { sectors: Record<string, Sector> })?.sectors || {}
+  })
+
   const allClusters = computed<Record<string, Cluster>>(() => {
     return (args.gameData.maps as unknown as { clusters: Record<string, Cluster> })?.clusters || {}
   })
@@ -107,7 +111,9 @@ export function useMapSvgLayout(args: {
       const cluster = clusters.value[clusterId]
       const center = centers[clusterId]
       if (!cluster || !center) return
-      Object.values(cluster.sectors || {}).forEach((sector) => {
+      ;(cluster.sectors || []).forEach((sectorId) => {
+        const sector = sectors.value[sectorId]
+        if (!sector) return
         const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
         defs.push({
           id: args.sectorClipId(clusterId, sector.id),
@@ -138,6 +144,7 @@ export function useMapSvgLayout(args: {
 
   return {
     clusters,
+    sectors,
     allClusters,
     regionIds,
     layoutState,

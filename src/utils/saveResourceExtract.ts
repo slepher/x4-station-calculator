@@ -130,9 +130,10 @@ export type ExtractContext = {
     clusters?: Record<
       string,
       {
-        sectors?: Record<string, unknown>
+        sectors?: string[]
       }
     >
+    sectors?: Record<string, unknown>
   }
   resourceAreasData: ResourceAreasData
   regionsData: Array<{
@@ -773,13 +774,7 @@ function buildRegionOverlapComponents(
 }
 
 export function loadMapsSectors(context: ExtractContext): string[] {
-  const sectors: string[] = []
-  for (const clusterData of Object.values(context.mapsData.clusters ?? {})) {
-    for (const sectorId of Object.keys(clusterData.sectors ?? {})) {
-      sectors.push(normalizeId(sectorId))
-    }
-  }
-  return sectors
+  return Object.keys(context.mapsData.sectors ?? {}).map(normalizeId)
 }
 
 export function extractSectorResourcesFromComponentXml(

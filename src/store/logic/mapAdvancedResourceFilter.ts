@@ -91,11 +91,12 @@ const breadthFirstReachable = (
 }
 
 export const buildSectorGraph = (clusters: Record<string, {
-  sectors?: Record<string, {
-    id: string
-    cluster_gates?: Record<string, { target_cluster_id?: string }>
-  }>
+  sectors?: string[]
   sector_links?: Record<string, { sector_a_id: string; sector_b_id: string }>
+}>, sectors: Record<string, {
+  id: string
+  cluster_id?: string
+  cluster_gates?: Record<string, { target_cluster_id?: string }>
 }>) => {
   const graph: Record<string, Set<string>> = {}
   const sectorClusterIdMap: Record<string, string> = {}
@@ -104,9 +105,11 @@ export const buildSectorGraph = (clusters: Record<string, {
 
   Object.entries(clusters).forEach(([clusterId, cluster]) => {
     sectorsByCluster[clusterId] ||= []
-    Object.values(cluster.sectors || {}).forEach((sector) => {
+    ;(cluster.sectors || []).forEach((sectorId) => {
+      const sector = sectors[sectorId]
+      if (!sector) return
       graph[sector.id] ||= new Set<string>()
-      sectorClusterIdMap[sector.id] = clusterId
+      sectorClusterIdMap[sector.id] = sector.cluster_id || clusterId
       sectorsByCluster[clusterId]!.push(sector.id)
       sectorGateTargets[sector.id] ||= new Set<string>()
       Object.values(sector.cluster_gates || {}).forEach((gate) => {

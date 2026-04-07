@@ -370,13 +370,17 @@ const resourceCatalog = computed<ResourceCatalogItem[]>(() => [
 
 const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[]; sunlight: number }>>(() => {
   const out: Record<string, { resources: SectorResourceEntry[]; sunlight: number }> = {}
-  const clusters = gameData.maps?.clusters || {}
+  const maps = gameData.maps
+  const clusters = maps?.clusters || {}
+  const sectors = maps?.sectors || {}
   Object.values(clusters).forEach((cluster) => {
     // DLC filter: skip clusters from inactive DLC
     if (gameData.enforceDlcActivation && !gameData.isDlcActive(cluster.dlc_tag)) {
       return
     }
-    Object.values(cluster.sectors || {}).forEach((sector: any) => {
+    ;(cluster.sectors || []).forEach((sectorId) => {
+      const sector = sectors[sectorId] as any
+      if (!sector) return
       out[sector.id] = {
         resources: Array.isArray(sector.resources) ? sector.resources : [],
         sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100)
@@ -386,7 +390,7 @@ const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[
   return out
 })
 
-const sectorGraphResult = computed(() => buildSectorGraph(gameData.maps?.clusters || {}))
+const sectorGraphResult = computed(() => buildSectorGraph(gameData.maps?.clusters || {}, gameData.maps?.sectors || {}))
 const sectorGraph = computed(() => sectorGraphResult.value.graph)
 const sectorClusterMap = computed(() => sectorGraphResult.value.sectorClusterMap)
 

@@ -24,6 +24,7 @@ const SECTOR_VIEWPORT_SETTLE_MS = 120
 
 export function useMapSvgOverlays(args: {
   clusters: ComputedRef<Record<string, Cluster>>
+  sectors: ComputedRef<Record<string, Sector>>
   layoutState: ComputedRef<MapSvgLayoutState>
   placementOverlays: Ref<PlacementOverlay[]>
   placementPreview: Ref<PlacementPreview | null>
@@ -72,7 +73,10 @@ export function useMapSvgOverlays(args: {
   }
 
   const resolveSectorByMacro = (macro: string | null | undefined) =>
-    mapStore?.resolveSectorByMacro(macro) || resolveMapSectorByMacro(args.clusters.value, macro)
+    mapStore?.resolveSectorByMacro(macro) || resolveMapSectorByMacro({
+      clusters: args.clusters.value,
+      sectors: args.sectors.value
+    }, macro)
 
   const buildVisibleSectorKeys = (
     viewportBounds: {
@@ -89,7 +93,9 @@ export function useMapSvgOverlays(args: {
     Object.entries(args.clusters.value).forEach(([clusterId, cluster]) => {
       const center = centers[clusterId]
       if (!center) return
-      Object.values(cluster.sectors || {}).forEach((sector) => {
+      ;(cluster.sectors || []).forEach((sectorId) => {
+        const sector = args.sectors.value[sectorId]
+        if (!sector) return
         const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
         const verticalRadius = transform.sectorRadius * (Math.sqrt(3) / 2)
         const visible =
@@ -153,7 +159,7 @@ export function useMapSvgOverlays(args: {
     return args.placementOverlays.value
       .map((overlay) => {
         const cluster = args.clusters.value[overlay.location.cluster_id]
-        const sector = cluster?.sectors?.[overlay.location.sector_id]
+        const sector = args.sectors.value[overlay.location.sector_id]
         const center = centers[overlay.location.cluster_id]
         if (!cluster || !sector || !center) return null
         const ratio = resolveSectorScreenRatio(sector, overlay.location.pos)
@@ -314,7 +320,7 @@ export function useMapSvgOverlays(args: {
     const preview = args.placementPreview.value
     if (!preview) return null
     const cluster = args.clusters.value[preview.location.cluster_id]
-    const sector = cluster?.sectors?.[preview.location.sector_id]
+    const sector = args.sectors.value[preview.location.sector_id]
     const center = args.layoutState.value.centers[preview.location.cluster_id]
     if (!cluster || !sector || !center) return null
     const ratio = resolveSectorScreenRatio(sector, preview.location.pos)

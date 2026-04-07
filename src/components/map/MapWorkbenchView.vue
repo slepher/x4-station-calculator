@@ -167,13 +167,17 @@ const saveStore = useSaveStore()
 const empireStore = useEmpireStore()
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
-  const clusters = gameDataStore.maps?.clusters || {}
+  const maps = gameDataStore.maps
+  const clusters = maps?.clusters || {}
+  const sectors = maps?.sectors || {}
   Object.entries(clusters).forEach(([clusterId, cluster]) => {
     // DLC filter: skip clusters from inactive DLC
     if (gameDataStore.enforceDlcActivation && !gameDataStore.isDlcActive(cluster.dlc_tag)) {
       return
     }
-    Object.values(cluster.sectors || {}).forEach((sector: any) => {
+    ;(cluster.sectors || []).forEach((sectorId) => {
+      const sector = sectors[sectorId] as any
+      if (!sector) return
       const displayName = sector.nameId && te(sector.nameId) ? t(sector.nameId) : (sector.name || sector.id)
       out[sector.id] = {
         id: sector.id,
@@ -286,7 +290,10 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
     .getArchivePoiOverlays(activeMapArchive.value, activeCategories)
     .map((overlay) => {
       const resolved = mapStore.resolveSectorByMacro?.(overlay.sectorMacro) ||
-        resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, overlay.sectorMacro)
+        resolveMapSectorByMacro({
+          clusters: gameDataStore.maps?.clusters || {},
+          sectors: gameDataStore.maps?.sectors || {}
+        }, overlay.sectorMacro)
       const sectorData = resolved ? sectorsById.value[resolved.sectorId] : null
       return {
         ...overlay,
@@ -303,7 +310,10 @@ const saveSectorLinkOverrides = computed<Record<string, SectorData> | undefined>
   Object.entries(activeMapArchive.value.sectors).forEach(([sectorMacro, sector]) => {
     if ((sector.clusterGates?.length || 0) === 0 && (sector.superhighwayGates?.length || 0) === 0) return
     const resolved = mapStore.resolveSectorByMacro?.(sectorMacro) ||
-      resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
+      resolveMapSectorByMacro({
+        clusters: gameDataStore.maps?.clusters || {},
+        sectors: gameDataStore.maps?.sectors || {}
+      }, sectorMacro)
     if (!resolved?.sectorId) return
     next[resolved.sectorId] = sector
     hasItems = true
@@ -351,7 +361,7 @@ const clusterOwnerOverride = computed<Record<string, string> | undefined>(() => 
   const result: Record<string, string> = {}
   
   for (const [clusterId, cluster] of Object.entries(clusters)) {
-    const sectorIds = Object.keys(cluster.sectors || {})
+    const sectorIds = cluster.sectors || []
     if (sectorIds.length === 0) continue
     
     const owners = sectorIds
@@ -590,7 +600,7 @@ const resolveLocationFromSectorElement = (sectorElement: SVGGraphicsElement, cli
   if (!radius) return null
   const ratioX = (clientX - centerX) / radius
   const ratioY = (clientY - centerY) / radius
-  const sector = gameDataStore.maps?.clusters?.[mapSector.clusterId]?.sectors?.[sectorId]
+  const sector = gameDataStore.maps?.sectors?.[sectorId]
   const rawScale = 1 / mapSector.scalePerRadius
   const rawPoint = sector
     ? sectorLocalRatioToRawPoint(sector, {
@@ -1057,7 +1067,10 @@ const onSaveActiveCategoryChange = (category: SavePoiCategory | null) => {
 const resolveSavePoiContentPoint = (poi: SavePoiOverlayItem) => {
   if (poi.position.tx === undefined || poi.position.ty === undefined) return null
   const resolved = mapStore.resolveSectorByMacro?.(poi.sectorMacro) ||
-    resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, poi.sectorMacro)
+    resolveMapSectorByMacro({
+      clusters: gameDataStore.maps?.clusters || {},
+      sectors: gameDataStore.maps?.sectors || {}
+    }, poi.sectorMacro)
   if (!resolved) return null
   const sectorLayout = searchSectors.value.find((item) => item.sectorId === resolved.sectorId)
   if (!sectorLayout) return null

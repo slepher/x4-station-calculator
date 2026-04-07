@@ -46,21 +46,19 @@ const productionModulesList = computed(() => {
 const sectorsList = computed(() => {
   const sectors: { id: string; englishName: string; localizedName: string }[] = []
   const maps = gameData.maps
-  if (!maps || !maps.clusters) return sectors
+  if (!maps?.sectors) return sectors
 
-  for (const cluster of Object.values(maps.clusters)) {
-    for (const sector of Object.values(cluster.sectors || {})) {
-      const englishName = sector.name || sector.id
-      let localizedName = englishName
-      if (sector.nameId && te(sector.nameId)) {
-        localizedName = t(sector.nameId)
-      }
-      sectors.push({
-        id: sector.macro || sector.id,
-        englishName,
-        localizedName
-      })
+  for (const sector of Object.values(maps.sectors)) {
+    const englishName = sector.name || sector.id
+    let localizedName = englishName
+    if (sector.nameId && te(sector.nameId)) {
+      localizedName = t(sector.nameId)
     }
+    sectors.push({
+      id: sector.macro || sector.id,
+      englishName,
+      localizedName
+    })
   }
   return sectors.sort((a, b) => a.localizedName.localeCompare(b.localizedName))
 })

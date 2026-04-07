@@ -217,19 +217,11 @@ function loadMaps(version: string | null): X4Map | undefined {
   const maps: X4Map = JSON.parse(fs.readFileSync(mapsPath, 'utf-8'))
   
   const clusterCount = Object.keys(maps.clusters).length
-  let sectorCount = 0
-  let zoneCount = 0
-  
-  for (const clusterId in maps.clusters) {
-    const cluster = maps.clusters[clusterId]
-    for (const sectorId in cluster.sectors) {
-      sectorCount++
-      const sector = cluster.sectors[sectorId]
-      if (sector.zones) {
-        zoneCount += Object.keys(sector.zones).length
-      }
-    }
-  }
+  const sectorCount = Object.keys(maps.sectors || {}).length
+  const zoneCount = Object.values(maps.sectors || {}).reduce(
+    (sum, sector) => sum + Object.keys(sector.zones || {}).length,
+    0
+  )
   
   console.log(`[extract_save] loaded maps for version ${version}: ${clusterCount} clusters, ${sectorCount} sectors, ${zoneCount} zones`)
   return maps

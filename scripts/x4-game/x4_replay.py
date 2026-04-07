@@ -138,14 +138,11 @@ def find_region_position_from_maps(sector_id: str, region_id: str) -> dict | Non
         Position dict with x, y, z or None if not found
     """
     maps_data = load_json_data("maps.json")
-
-    for cluster_id, cluster in maps_data.get("clusters", {}).items():
-        for sec_id, sector in cluster.get("sectors", {}).items():
-            if sec_id != sector_id:
-                continue
-            for region in sector.get("regions", []):
-                if region.get("ref") == region_id:
-                    return region.get("position")
+    sector = maps_data.get("sectors", {}).get(sector_id)
+    if sector:
+        for region in sector.get("regions", []):
+            if region.get("ref") == region_id:
+                return region.get("position")
 
     return None
 
@@ -154,14 +151,11 @@ def find_region_instances_from_maps(sector_id: str, region_id: str) -> list[dict
     """Find every placement of a region ref inside one sector."""
     maps_data = load_json_data("maps.json")
     instances: list[dict] = []
-
-    for cluster in maps_data.get("clusters", {}).values():
-        for sec_id, sector in cluster.get("sectors", {}).items():
-            if sec_id != sector_id:
-                continue
-            for region in sector.get("regions", []):
-                if region.get("ref") == region_id:
-                    instances.append(region)
+    sector = maps_data.get("sectors", {}).get(sector_id)
+    if sector:
+        for region in sector.get("regions", []):
+            if region.get("ref") == region_id:
+                instances.append(region)
 
     return instances
 

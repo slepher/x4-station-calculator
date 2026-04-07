@@ -948,7 +948,7 @@ export interface X4MapCluster {
     axial?: { q: number; r: number }
     pixel_basis?: { x: number; y: number }
   }
-  sectors: Record<string, X4MapSector>
+  sectors: string[]
   sector_links?: Record<string, {
     id: string
     sector_a_id: string
@@ -960,13 +960,8 @@ export interface X4MapCluster {
 }
 
 export interface X4Map {
-  meta?: {
-    version?: string
-    source_map_dir?: string
-    mapdefaults_xml?: string
-    structure?: string
-  }
   clusters: Record<string, X4MapCluster>
+  sectors: Record<string, X4MapSector>
 }
 
 // --- Region Yield Types ---

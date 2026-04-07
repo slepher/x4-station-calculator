@@ -1,5 +1,11 @@
-type MapClusterLike<TSector extends object> = {
-  sectors?: Record<string, TSector>
+type MapClusterLike = {
+  sectors?: string[]
+}
+
+type MapSectorLike = {
+  id?: string
+  macro?: string | null
+  cluster_id?: string | null
 }
 
 export interface ResolvedMapSector<TSector extends object> {
@@ -12,29 +18,34 @@ function normalizeMacro(value: string | null | undefined): string {
   return (value || '').trim().toLowerCase()
 }
 
-type CachedResolvedMapSector = {
+type CachedResolvedMapSector<TSector extends object> = {
   clusterId: string
   sectorId: string
-  sector: object
+  sector: TSector
 }
 
-const sectorMacroIndexCache = new WeakMap<object, Map<string, CachedResolvedMapSector>>()
+const sectorMacroIndexCache = new WeakMap<object, Map<string, CachedResolvedMapSector<object>>>()
 
 function getSectorMacroIndex<TSector extends object>(
-  clusters: Record<string, MapClusterLike<TSector>>
-): Map<string, CachedResolvedMapSector> {
-  const cacheKey = clusters as object
+  maps: {
+    clusters: Record<string, MapClusterLike>
+    sectors?: Record<string, TSector>
+  }
+): Map<string, CachedResolvedMapSector<TSector>> {
+  const cacheKey = maps as object
   const cached = sectorMacroIndexCache.get(cacheKey)
-  if (cached) return cached
+  if (cached) return cached as Map<string, CachedResolvedMapSector<TSector>>
 
-  const index = new Map<string, CachedResolvedMapSector>()
-  for (const [clusterId, cluster] of Object.entries(clusters)) {
-    for (const [sectorId, sector] of Object.entries(cluster.sectors || {})) {
-      const resolved: CachedResolvedMapSector = { clusterId, sectorId, sector }
+  const index = new Map<string, CachedResolvedMapSector<TSector>>()
+  for (const [clusterId, cluster] of Object.entries(maps.clusters)) {
+    for (const sectorId of cluster.sectors || []) {
+      const sector = maps.sectors?.[sectorId]
+      if (!sector) continue
+      const resolved: CachedResolvedMapSector<TSector> = { clusterId, sectorId, sector }
       const normalizedSectorId = normalizeMacro(sectorId)
       if (normalizedSectorId) index.set(normalizedSectorId, resolved)
 
-      const sectorMacro = (sector as { macro?: string | null }).macro
+      const sectorMacro = (sector as MapSectorLike).macro
       const normalizedSectorMacro = normalizeMacro(sectorMacro)
       if (normalizedSectorMacro) index.set(normalizedSectorMacro, resolved)
     }
@@ -45,12 +56,15 @@ function getSectorMacroIndex<TSector extends object>(
 }
 
 export function resolveMapSectorByMacro<TSector extends object>(
-  clusters: Record<string, MapClusterLike<TSector>>,
+  maps: {
+    clusters: Record<string, MapClusterLike>
+    sectors?: Record<string, TSector>
+  },
   macro: string | null | undefined
 ): ResolvedMapSector<TSector> | null {
   const normalizedMacro = normalizeMacro(macro)
   if (!normalizedMacro) return null
-  const resolved = getSectorMacroIndex(clusters).get(normalizedMacro)
+  const resolved = getSectorMacroIndex(maps).get(normalizedMacro)
   if (!resolved) return null
   return resolved as ResolvedMapSector<TSector>
 }

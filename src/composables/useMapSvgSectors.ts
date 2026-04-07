@@ -1,6 +1,6 @@
 import { computed, type ComputedRef, type Ref } from 'vue'
 import { getSectorViewportTransform } from '@/components/map/utils/coordinates'
-import type { Cluster, SearchSectorLayout, SectorResourceEntry, SectorResourceFill } from '@/components/map/types'
+import type { Cluster, SearchSectorLayout, Sector, SectorResourceEntry, SectorResourceFill } from '@/components/map/types'
 import type { MapSvgLayoutState } from './useMapSvgLayout'
 
 const SQRT3 = Math.sqrt(3)
@@ -84,6 +84,7 @@ export function useMapSvgSectors(args: {
     isDlcActive: (tag?: string) => boolean
   }
   clusters: ComputedRef<Record<string, Cluster>>
+  sectors: ComputedRef<Record<string, Sector>>
   regionIds: ComputedRef<string[]>
   layoutState: ComputedRef<MapSvgLayoutState>
   searchHighlightedSectorIds: Ref<string[]>
@@ -224,7 +225,9 @@ export function useMapSvgSectors(args: {
       const clusterDlcActive = args.gameData.isDlcActive(cluster.dlc_tag)
       const sectors: MapSectorPolygonCluster['sectors'] = []
 
-      Object.values(cluster.sectors || {}).forEach((sector) => {
+      ;(cluster.sectors || []).forEach((sectorId) => {
+        const sector = args.sectors.value[sectorId] as Sector | undefined
+        if (!sector) return
         const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
         const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
         const topEdgeY = transform.center.y - transform.sectorRadius * HEX_TOP_EDGE_RATIO

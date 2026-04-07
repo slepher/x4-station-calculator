@@ -66,7 +66,7 @@ const resourceColorByWare = computed(() => {
 })
 
 const resources = computed(() => {
-  const sector = gameDataStore.maps?.clusters?.[sectorInfo.value?.clusterId || '']?.sectors?.[props.sectorId]
+  const sector = gameDataStore.maps?.sectors?.[props.sectorId]
   if (!sector || !Array.isArray((sector as any).resources)) return []
   const resourceList = (sector as any).resources as Array<{ ware: string; rating?: number; respawn?: number }>
   const sortedWareIds = sortResourcesByPriority(resourceList.map(r => r.ware))
@@ -88,7 +88,7 @@ const resources = computed(() => {
 })
 
 const sectorCenterPos = computed(() => {
-  const sector = gameDataStore.maps?.clusters?.[sectorInfo.value?.clusterId || '']?.sectors?.[props.sectorId] as
+  const sector = gameDataStore.maps?.sectors?.[props.sectorId] as
     | { raw_center_pos?: { x?: number; y?: number; z?: number } }
     | undefined
   const center = sector?.raw_center_pos

@@ -2,17 +2,23 @@ import type { SaveParserConfig } from '@/types/saveArchive'
 import mapsData from '@/assets/x4_game_data/8.0-Diplomacy/data/maps.json'
 import localeEn from '@/assets/x4_game_data/8.0-Diplomacy/locales/en.json'
 
+type StaticMapsData = {
+  sectors?: Record<string, {
+    name?: string
+    raw_center_pos?: { x: number; y: number; z: number }
+    cluster_gates?: Record<string, { raw_local_pos?: { x?: number; y?: number; z?: number } }>
+  }>
+}
+
+const typedMapsData = mapsData as unknown as StaticMapsData
+
 function loadSectorNames(): Record<string, string> {
   const sectorNames: Record<string, string> = {}
 
-  for (const [, clusterData] of Object.entries(mapsData.clusters || {})) {
-    const cluster = clusterData as { sectors?: Record<string, { name?: string }> }
-    for (const [sectorMacro, sectorInfo] of Object.entries(cluster.sectors || {})) {
-      const sector = sectorInfo as { name?: string }
-      if (sector.name) {
-        const key = sectorMacro.toLowerCase()
-        sectorNames[key] = sector.name
-      }
+  for (const [sectorId, sectorInfo] of Object.entries(typedMapsData.sectors || {})) {
+    const sector = sectorInfo as { name?: string }
+    if (sector.name) {
+      sectorNames[sectorId.toLowerCase()] = sector.name
     }
   }
 
@@ -26,25 +32,24 @@ function loadShipNames(): Record<string, string> {
 function loadPositions(): Record<string, { x: number; y: number; z: number }> {
   const positions: Record<string, { x: number; y: number; z: number }> = {}
 
-  for (const [, clusterData] of Object.entries(mapsData.clusters || {})) {
-    const cluster = clusterData as {
-      sectors?: Record<string, { position?: { x: number; y: number; z: number } }>
-      gates?: Record<string, { position?: { x: number; y: number; z: number } }>
+  for (const [sectorId, sectorInfo] of Object.entries(typedMapsData.sectors || {})) {
+    const sector = sectorInfo as {
+      raw_center_pos?: { x: number; y: number; z: number }
+      cluster_gates?: Record<string, { raw_local_pos?: { x?: number; y?: number; z?: number } }>
     }
 
-    for (const [sectorMacro, sectorInfo] of Object.entries(cluster.sectors || {})) {
-      const sector = sectorInfo as { position?: { x: number; y: number; z: number } }
-      if (sector.position) {
-        const key = sectorMacro.toLowerCase()
-        positions[key] = sector.position
-      }
+    if (sector.raw_center_pos) {
+      positions[sectorId.toLowerCase()] = sector.raw_center_pos
     }
 
-    for (const [gateMacro, gateInfo] of Object.entries(cluster.gates || {})) {
-      const gate = gateInfo as { position?: { x: number; y: number; z: number } }
-      if (gate.position) {
-        const key = gateMacro.toLowerCase()
-        positions[key] = gate.position
+    for (const [gateId, gateInfo] of Object.entries(sector.cluster_gates || {})) {
+      const position = gateInfo.raw_local_pos
+      if (position?.x !== undefined && position?.y !== undefined && position?.z !== undefined) {
+        positions[`${sectorId.toLowerCase()}:${gateId.toLowerCase()}`] = {
+          x: position.x,
+          y: position.y,
+          z: position.z
+        }
       }
     }
   }

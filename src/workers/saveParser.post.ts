@@ -113,25 +113,18 @@ const SHIP_LOOKUP = buildShipLookup()
 function buildZoneLookup(maps: X4Map | undefined): ZoneLookup {
   const lookup: ZoneLookup = {}
   if (!maps) return lookup
-  
-  for (const clusterId in maps.clusters) {
-    const cluster = maps.clusters[clusterId]
-    if (!cluster) continue
-    
-    for (const sectorId in cluster.sectors) {
-      const sector = cluster.sectors[sectorId]
-      if (!sector || !sector.zones) continue
-      
-      const normalizedSectorId = sectorId.toLowerCase()
-      lookup[normalizedSectorId] = {}
-      for (const [zoneId, zone] of Object.entries(sector.zones)) {
-        const rawSectorPos = zone.raw_sector_pos
-        if (!rawSectorPos || rawSectorPos.x === undefined || rawSectorPos.y === undefined || rawSectorPos.z === undefined) continue
-        lookup[normalizedSectorId][zoneId.toLowerCase()] = {
-          x: rawSectorPos.x,
-          y: rawSectorPos.y,
-          z: rawSectorPos.z
-        }
+
+  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+    if (!sector?.zones) continue
+    const normalizedSectorId = sectorId.toLowerCase()
+    lookup[normalizedSectorId] = {}
+    for (const [zoneId, zone] of Object.entries(sector.zones)) {
+      const rawSectorPos = zone.raw_sector_pos
+      if (!rawSectorPos || rawSectorPos.x === undefined || rawSectorPos.y === undefined || rawSectorPos.z === undefined) continue
+      lookup[normalizedSectorId][zoneId.toLowerCase()] = {
+        x: rawSectorPos.x,
+        y: rawSectorPos.y,
+        z: rawSectorPos.z
       }
     }
   }
@@ -143,35 +136,33 @@ function buildSectorCenterLookup(maps: X4Map | undefined): SectorCenterLookup {
   const lookup: SectorCenterLookup = {}
   if (!maps) return lookup
 
-  for (const cluster of Object.values(maps.clusters || {})) {
-    for (const [sectorId, sector] of Object.entries(cluster?.sectors || {})) {
-      if (sector.raw_center_pos?.x !== undefined && sector.raw_center_pos?.y !== undefined && sector.raw_center_pos?.z !== undefined) {
-        lookup[sectorId.toLowerCase()] = {
-          x: sector.raw_center_pos.x,
-          y: sector.raw_center_pos.y,
-          z: sector.raw_center_pos.z
-        }
-        continue
-      }
-
-      const positions = Object.values(sector?.zones || {})
-        .map((zone) => zone.raw_sector_pos)
-        .filter((position): position is Vector3 => Boolean(position))
-
-      if (!positions.length) continue
-
-      const minX = Math.min(...positions.map((position) => position.x))
-      const maxX = Math.max(...positions.map((position) => position.x))
-      const minY = Math.min(...positions.map((position) => position.y))
-      const maxY = Math.max(...positions.map((position) => position.y))
-      const minZ = Math.min(...positions.map((position) => position.z))
-      const maxZ = Math.max(...positions.map((position) => position.z))
-
+  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+    if (sector.raw_center_pos?.x !== undefined && sector.raw_center_pos?.y !== undefined && sector.raw_center_pos?.z !== undefined) {
       lookup[sectorId.toLowerCase()] = {
-        x: snapToSectorCenterGrid((minX + maxX) / 2),
-        y: (minY + maxY) / 2,
-        z: snapToSectorCenterGrid((minZ + maxZ) / 2)
+        x: sector.raw_center_pos.x,
+        y: sector.raw_center_pos.y,
+        z: sector.raw_center_pos.z
       }
+      continue
+    }
+
+    const positions = Object.values(sector?.zones || {})
+      .map((zone) => zone.raw_sector_pos)
+      .filter((position): position is Vector3 => Boolean(position))
+
+    if (!positions.length) continue
+
+    const minX = Math.min(...positions.map((position) => position.x))
+    const maxX = Math.max(...positions.map((position) => position.x))
+    const minY = Math.min(...positions.map((position) => position.y))
+    const maxY = Math.max(...positions.map((position) => position.y))
+    const minZ = Math.min(...positions.map((position) => position.z))
+    const maxZ = Math.max(...positions.map((position) => position.z))
+
+    lookup[sectorId.toLowerCase()] = {
+      x: snapToSectorCenterGrid((minX + maxX) / 2),
+      y: (minY + maxY) / 2,
+      z: snapToSectorCenterGrid((minZ + maxZ) / 2)
     }
   }
 
@@ -182,17 +173,15 @@ function buildSectorScaleBasisLookup(maps: X4Map | undefined): SectorScaleBasisL
   const lookup: SectorScaleBasisLookup = {}
   if (!maps) return lookup
 
-  for (const cluster of Object.values(maps.clusters || {})) {
-    for (const [sectorId, sector] of Object.entries(cluster?.sectors || {})) {
-      const normalized = sector.normalized as {
-        scale_basis?: { hex_inner_ratio?: number; extent_ratio?: number }
-        scale_per_radius?: number
-      } | undefined
-      lookup[sectorId.toLowerCase()] = {
-        hex_inner_ratio: Number(normalized?.scale_basis?.hex_inner_ratio || DEFAULT_HEX_INNER_RATIO),
-        extent_ratio: Number(normalized?.scale_basis?.extent_ratio || DEFAULT_EXTENT_RATIO),
-        fallback_scale_per_radius: Number(normalized?.scale_per_radius || 0)
-      }
+  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+    const normalized = sector.normalized as {
+      scale_basis?: { hex_inner_ratio?: number; extent_ratio?: number }
+      scale_per_radius?: number
+    } | undefined
+    lookup[sectorId.toLowerCase()] = {
+      hex_inner_ratio: Number(normalized?.scale_basis?.hex_inner_ratio || DEFAULT_HEX_INNER_RATIO),
+      extent_ratio: Number(normalized?.scale_basis?.extent_ratio || DEFAULT_EXTENT_RATIO),
+      fallback_scale_per_radius: Number(normalized?.scale_per_radius || 0)
     }
   }
 
@@ -203,21 +192,19 @@ function buildSectorStaticScalePointsLookup(maps: X4Map | undefined): SectorStat
   const lookup: SectorStaticScalePointsLookup = {}
   if (!maps) return lookup
 
-  for (const cluster of Object.values(maps.clusters || {})) {
-    for (const [sectorId, sector] of Object.entries(cluster?.sectors || {})) {
-      const points: Array<{ x: number; z: number }> = []
-      Object.values(sector?.zones || {}).forEach((zone) => {
-        if (zone.raw_sector_pos?.x !== undefined && zone.raw_sector_pos?.z !== undefined) {
-          points.push({ x: zone.raw_sector_pos.x, z: zone.raw_sector_pos.z })
-        }
-      })
-      Object.values(sector?.cluster_gates || {}).forEach((gate) => {
-        if (gate.raw_local_pos?.x !== undefined && gate.raw_local_pos?.z !== undefined) {
-          points.push({ x: gate.raw_local_pos.x, z: gate.raw_local_pos.z })
-        }
-      })
-      lookup[sectorId.toLowerCase()] = points
-    }
+  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+    const points: Array<{ x: number; z: number }> = []
+    Object.values(sector?.zones || {}).forEach((zone) => {
+      if (zone.raw_sector_pos?.x !== undefined && zone.raw_sector_pos?.z !== undefined) {
+        points.push({ x: zone.raw_sector_pos.x, z: zone.raw_sector_pos.z })
+      }
+    })
+    Object.values(sector?.cluster_gates || {}).forEach((gate) => {
+      if (gate.raw_local_pos?.x !== undefined && gate.raw_local_pos?.z !== undefined) {
+        points.push({ x: gate.raw_local_pos.x, z: gate.raw_local_pos.z })
+      }
+    })
+    lookup[sectorId.toLowerCase()] = points
   }
 
   return lookup
@@ -337,22 +324,20 @@ function buildSectorStaticClusterGateLookup(
   const lookup: SectorStaticClusterGateLookup = {}
   if (!maps) return lookup
 
-  for (const cluster of Object.values(maps.clusters || {})) {
-    for (const [sectorId, sector] of Object.entries(cluster?.sectors || {})) {
-      lookup[sectorId.toLowerCase()] = Object.entries(sector?.cluster_gates || {}).flatMap(([gateId, gate]) => {
-        if (gate.raw_local_pos?.x === undefined || gate.raw_local_pos?.z === undefined) return []
-        const position = {
-          x: gate.raw_local_pos.x,
-          y: 0,
-          z: gate.raw_local_pos.z
-        }
-        return [{
-          id: gateId,
-          target_cluster_id: gate.target_cluster_id,
-          position: withTransformPosition(position, sectorId, sectorScaleLookup, sectorCenterLookup)
-        }]
-      })
-    }
+  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+    lookup[sectorId.toLowerCase()] = Object.entries(sector?.cluster_gates || {}).flatMap(([gateId, gate]) => {
+      if (gate.raw_local_pos?.x === undefined || gate.raw_local_pos?.z === undefined) return []
+      const position = {
+        x: gate.raw_local_pos.x,
+        y: 0,
+        z: gate.raw_local_pos.z
+      }
+      return [{
+        id: gateId,
+        target_cluster_id: gate.target_cluster_id,
+        position: withTransformPosition(position, sectorId, sectorScaleLookup, sectorCenterLookup)
+      }]
+    })
   }
 
   return lookup
@@ -367,14 +352,13 @@ function buildSectorStaticSuperhighwayGateLookup(
   if (!maps) return lookup
 
   for (const cluster of Object.values(maps.clusters || {})) {
-    const sectors = cluster?.sectors || {}
-    Object.keys(sectors).forEach((sectorId) => {
+    ;(cluster?.sectors || []).forEach((sectorId) => {
       lookup[sectorId.toLowerCase()] ||= []
     })
 
     Object.entries(cluster?.sector_links || {}).forEach(([linkId, link]) => {
-      const sectorA = link.sector_a_id ? sectors[link.sector_a_id] : undefined
-      const sectorB = link.sector_b_id ? sectors[link.sector_b_id] : undefined
+      const sectorA = link.sector_a_id ? maps.sectors?.[link.sector_a_id] : undefined
+      const sectorB = link.sector_b_id ? maps.sectors?.[link.sector_b_id] : undefined
       const zoneA = sectorA && link.from_zone_id ? sectorA.zones?.[link.from_zone_id] : undefined
       const zoneB = sectorB && link.to_zone_id ? sectorB.zones?.[link.to_zone_id] : undefined
 
@@ -428,40 +412,38 @@ function buildSectorStaticHighwayLookup(
   const toPosition = (position: Vector3, sectorId: string): SaveSectorStaticPosition =>
     withTransformPosition(position, sectorId, sectorScaleLookup, sectorCenterLookup)
 
-  for (const cluster of Object.values(maps.clusters || {})) {
-    for (const [sectorId, sector] of Object.entries(cluster?.sectors || {})) {
-      lookup[sectorId.toLowerCase()] = Object.entries(sector?.highways || {}).flatMap(([highwayId, highway]) => {
-        const entry = highway.entry_pos || highway.entry
-        const exit = highway.exit_pos || highway.exit
-        if (!entry || !exit) return []
+  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+    lookup[sectorId.toLowerCase()] = Object.entries(sector?.highways || {}).flatMap(([highwayId, highway]) => {
+      const entry = highway.entry_pos || highway.entry
+      const exit = highway.exit_pos || highway.exit
+      if (!entry || !exit) return []
 
-        return [{
-          id: highwayId,
-          entry: toPosition({
-            x: entry.x ?? 0,
-            y: entry.y ?? 0,
-            z: entry.z ?? 0
-          }, sectorId),
-          exit: toPosition({
-            x: exit.x ?? 0,
-            y: exit.y ?? 0,
-            z: exit.z ?? 0
-          }, sectorId),
-          spline: Array.isArray(highway.spline)
-            ? highway.spline
-              .filter((point): point is Vector3 =>
-                typeof point?.x === 'number' &&
-                typeof point?.z === 'number'
-              )
-              .map((point) => toPosition({
-                x: point.x,
-                y: point.y ?? 0,
-                z: point.z
-              }, sectorId))
-            : []
-        }]
-      })
-    }
+      return [{
+        id: highwayId,
+        entry: toPosition({
+          x: entry.x ?? 0,
+          y: entry.y ?? 0,
+          z: entry.z ?? 0
+        }, sectorId),
+        exit: toPosition({
+          x: exit.x ?? 0,
+          y: exit.y ?? 0,
+          z: exit.z ?? 0
+        }, sectorId),
+        spline: Array.isArray(highway.spline)
+          ? highway.spline
+            .filter((point): point is Vector3 =>
+              typeof point?.x === 'number' &&
+              typeof point?.z === 'number'
+            )
+            .map((point) => toPosition({
+              x: point.x,
+              y: point.y ?? 0,
+              z: point.z
+            }, sectorId))
+          : []
+      }]
+    })
   }
 
   return lookup

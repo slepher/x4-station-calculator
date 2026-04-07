@@ -130,7 +130,7 @@ export const clusterRatioToScreen = (center: Vec2, clusterRadius: number, ratio:
 export const getSectorViewportTransform = (cluster: Cluster, center: Vec2, clusterRadius: number, sector: Sector) => {
   const ratio = sector.normalized?.center_offset_ratio || { x: 0, y: 0 }
   const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-  const sectorCount = Object.keys(cluster.sectors || {}).length
+  const sectorCount = cluster.sectors?.length || 0
   let innerPadding = 1
   let sectorScale = 1
   if (sectorCount === 2) {

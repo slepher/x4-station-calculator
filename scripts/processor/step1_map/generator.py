@@ -1168,8 +1168,60 @@ def generate_map_data(
                 filtered_sources = [s for s in source_list if s != sector_id]
                 sector["khaak_hive_sources"] = sorted(filtered_sources)
 
+    def _lower(value):
+        return value.lower() if isinstance(value, str) else value
+
+    payload_clusters: Dict[str, dict] = {}
+    payload_sectors: Dict[str, dict] = {}
+
+    for cluster_id, cluster in nested_clusters.items():
+        normalized_cluster_id = _lower(cluster_id)
+        payload_clusters[normalized_cluster_id] = {
+            **cluster,
+            "id": _lower(cluster.get("id", cluster_id)),
+            "sectors": sorted(_lower(sector_id) for sector_id in cluster.get("sectors", {}).keys()),
+            "sector_links": {
+                _lower(link_id): {
+                    **link,
+                    "id": _lower(link.get("id")),
+                    "sector_a_id": _lower(link.get("sector_a_id")),
+                    "sector_b_id": _lower(link.get("sector_b_id")),
+                    "from_zone_id": _lower(link.get("from_zone_id")),
+                    "to_zone_id": _lower(link.get("to_zone_id")),
+                }
+                for link_id, link in cluster.get("sector_links", {}).items()
+            },
+        }
+
+        for sector_id, sector in cluster.get("sectors", {}).items():
+            payload_sectors[_lower(sector_id)] = {
+                **sector,
+                "id": _lower(sector.get("id", sector_id)),
+                "cluster_id": _lower(sector.get("cluster_id", cluster_id)),
+                "cluster_gates": {
+                    _lower(gate_id): {
+                        **gate,
+                        "id": _lower(gate.get("id")),
+                        "target_cluster_id": _lower(gate.get("target_cluster_id")),
+                        "zone_id": _lower(gate.get("zone_id")),
+                    }
+                    for gate_id, gate in sector.get("cluster_gates", {}).items()
+                },
+                "highways": {
+                    _lower(highway_id): {
+                        **highway,
+                        "macro": _lower(highway.get("macro")),
+                        "from_zone_id": _lower(highway.get("from_zone_id")),
+                        "to_zone_id": _lower(highway.get("to_zone_id")),
+                    }
+                    for highway_id, highway in sector.get("highways", {}).items()
+                },
+                "khaak_hive_sources": sorted(_lower(source_id) for source_id in sector.get("khaak_hive_sources", [])),
+            }
+
     payload = {
-        "clusters": nested_clusters,
+        "clusters": payload_clusters,
+        "sectors": payload_sectors,
     }
     name_ids = sorted(
         {

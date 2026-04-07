@@ -16,6 +16,7 @@ const GATE_LINE_MARGIN = 0.6
 
 export function useMapSvgLinks(args: {
   clusters: ComputedRef<Record<string, Cluster>>
+  sectors: ComputedRef<Record<string, Sector>>
   saveSectors?: Ref<Record<string, SectorData> | undefined>
   regionIds: ComputedRef<string[]>
   layoutState: ComputedRef<MapSvgLayoutState>
@@ -76,10 +77,9 @@ export function useMapSvgLinks(args: {
       const cluster = args.clusters.value[clusterId]
       const center = centers[clusterId]
       if (!cluster || !center) return
-      const sectors = cluster.sectors || {}
       Object.values(cluster.sector_links || {}).forEach((link) => {
-        const sectorA = sectors[link.sector_a_id || '']
-        const sectorB = sectors[link.sector_b_id || '']
+        const sectorA = args.sectors.value[link.sector_a_id || '']
+        const sectorB = args.sectors.value[link.sector_b_id || '']
         if (!sectorA || !sectorB || !link.from_zone_id || !link.to_zone_id) return
         const savedSectorA = args.saveSectors?.value?.[sectorA.id]
         const savedSectorB = args.saveSectors?.value?.[sectorB.id]
@@ -113,7 +113,9 @@ export function useMapSvgLinks(args: {
       const center = centers[clusterId]
       if (!cluster || !center) return
 
-      Object.values(cluster.sectors || {}).forEach((sector) => {
+      ;(cluster.sectors || []).forEach((sectorId) => {
+        const sector = args.sectors.value[sectorId]
+        if (!sector) return
         const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
         const sectorHex = hexVertices(transform.center.x, transform.center.y, transform.sectorRadius)
         const savedSector = args.saveSectors?.value?.[sector.id]
@@ -186,8 +188,10 @@ export function useMapSvgLinks(args: {
       const cluster = args.clusters.value[clusterId]
       const center = centers[clusterId]
       if (!cluster || !center) return
-      const sectors = Object.values(cluster.sectors || {})
-      sectors.forEach((sector) => {
+      const clusterSectors = (cluster.sectors || [])
+        .map((sectorId) => args.sectors.value[sectorId])
+        .filter((sector): sector is Sector => Boolean(sector))
+      clusterSectors.forEach((sector) => {
         const sectorColor = args.resolveOwnerColor(sector, sector.id, clusterId)
         const savedSector = args.saveSectors?.value?.[sector.id]
         Object.entries(sector.cluster_gates || {}).forEach(([gateId, gate]) => {
@@ -197,7 +201,7 @@ export function useMapSvgLinks(args: {
             id: `${clusterId}:${sector.id}:${gateId}`,
             point: clusterRatioToScreen(center, clusterRadius, ratio),
             r: getMapGateRadius({
-              sectorCount: sectors.length,
+              sectorCount: clusterSectors.length,
               stargateVisualScale: args.stargateVisualScale
             }),
             color: sectorColor,

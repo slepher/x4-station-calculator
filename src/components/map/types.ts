@@ -54,6 +54,7 @@ export type SectorResourceEntry = {
 export type Sector = {
   id: string
   macro?: string
+  cluster_id?: string
   nameId?: string
   name?: string
   owner?: string
@@ -83,7 +84,7 @@ export type Cluster = {
   owner_color?: string
   dlc_tag?: string
   normalized?: { pixel_basis?: Vec2 }
-  sectors?: Record<string, Sector>
+  sectors?: string[]
   sector_links?: Record<string, SectorLink>
 }
 

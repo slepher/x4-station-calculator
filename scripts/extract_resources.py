@@ -23,13 +23,7 @@ def load_maps_sectors():
     with open(MAPS_JSON, 'r', encoding='utf-8') as f:
         maps_data = json.load(f)
 
-    sectors = []
-    for cluster_id, cluster_data in maps_data.get('clusters', {}).items():
-        for sector_id, sector_data in cluster_data.get('sectors', {}).items():
-            # Normalize to lowercase
-            sectors.append(sector_id.lower())
-
-    return sectors
+    return [sector_id.lower() for sector_id in maps_data.get('sectors', {}).keys()]
 
 
 def load_region_yields():

@@ -23,14 +23,18 @@ export const useMapStore = defineStore('map', () => {
 
   const sectorsById = computed<Record<string, SectorInfo>>(() => {
     const out: Record<string, SectorInfo> = {}
-    const clusters = gameDataStore.maps?.clusters || {}
+    const maps = gameDataStore.maps
+    const clusters = maps?.clusters || {}
+    const sectors = maps?.sectors || {}
     
     // 第一遍：建立所有 sector 基本信息
     Object.entries(clusters).forEach(([clusterId, cluster]) => {
       if (gameDataStore.enforceDlcActivation && !gameDataStore.isDlcActive(cluster.dlc_tag)) {
         return
       }
-      Object.values(cluster.sectors || {}).forEach((sector: any) => {
+      ;(cluster.sectors || []).forEach((sectorId) => {
+        const sector = sectors[sectorId] as X4MapSector | undefined
+        if (!sector) return
         const displayName = sector.nameId && te(sector.nameId) ? t(sector.nameId) : (sector.name || sector.id)
         out[sector.id] = {
           id: sector.id,
@@ -50,7 +54,9 @@ export const useMapStore = defineStore('map', () => {
       if (gameDataStore.enforceDlcActivation && !gameDataStore.isDlcActive(cluster.dlc_tag)) {
         return
       }
-      Object.values(cluster.sectors || {}).forEach((sector: any) => {
+      ;(cluster.sectors || []).forEach((sectorId) => {
+        const sector = sectors[sectorId] as X4MapSector | undefined
+        if (!sector) return
         const sectorInfo = out[sector.id]
         if (!sectorInfo) return
         const sourceIds: string[] = sector.khaak_hive_sources || []
@@ -70,13 +76,17 @@ export const useMapStore = defineStore('map', () => {
 
   function initialize() {
     const nextIndex = new Map<string, ResolvedMapSector<X4MapSector>>()
-    const clusters = gameDataStore.maps?.clusters || {}
+    const maps = gameDataStore.maps
+    const clusters = maps?.clusters || {}
+    const sectors = maps?.sectors || {}
 
     Object.entries(clusters).forEach(([clusterId, cluster]) => {
       if (gameDataStore.enforceDlcActivation && !gameDataStore.isDlcActive(cluster.dlc_tag)) {
         return
       }
-      Object.entries(cluster.sectors || {}).forEach(([sectorId, sector]) => {
+      ;(cluster.sectors || []).forEach((sectorId) => {
+        const sector = sectors[sectorId]
+        if (!sector) return
         const resolved = { clusterId, sectorId, sector }
         const normalizedSectorId = normalizeMacro(sectorId)
         if (normalizedSectorId) nextIndex.set(normalizedSectorId, resolved)
