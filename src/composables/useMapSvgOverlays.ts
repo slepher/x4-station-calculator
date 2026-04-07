@@ -162,7 +162,9 @@ export function useMapSvgOverlays(args: {
         const sector = args.sectors.value[overlay.location.sector_id]
         const center = centers[overlay.location.cluster_id]
         if (!cluster || !sector || !center) return null
-        const ratio = resolveSectorScreenRatio(sector, overlay.location.pos)
+        const ratio = overlay.localRatio
+          ? sectorRatioToClusterRatio(sector.normalized, overlay.localRatio)
+          : resolveSectorScreenRatio(sector, overlay.location.pos)
         if (!ratio) return null
         const point = clusterRatioToScreen(center, clusterRadius, ratio)
         return { ...overlay, x: point.x, y: point.y }
@@ -323,7 +325,9 @@ export function useMapSvgOverlays(args: {
     const sector = args.sectors.value[preview.location.sector_id]
     const center = args.layoutState.value.centers[preview.location.cluster_id]
     if (!cluster || !sector || !center) return null
-    const ratio = resolveSectorScreenRatio(sector, preview.location.pos)
+    const ratio = preview.localRatio
+      ? sectorRatioToClusterRatio(sector.normalized, preview.localRatio)
+      : resolveSectorScreenRatio(sector, preview.location.pos)
     if (!ratio) return null
     const point = clusterRatioToScreen(center, args.layoutState.value.clusterRadius, ratio)
     return { ...preview, x: point.x, y: point.y }

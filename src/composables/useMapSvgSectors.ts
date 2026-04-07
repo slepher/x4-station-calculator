@@ -288,10 +288,10 @@ export function useMapSvgSectors(args: {
         clusterId: sector.clusterId,
         name: sector.name,
         displayName: sector.displayName,
-        centerX: sector.sx,
-        centerY: sector.sy,
-        radius: sector.radius,
-        verticalExtent: sector.radius * HEX_TOP_EDGE_RATIO
+        centerX: cluster.sectors.length === 1 ? cluster.cx : sector.sx,
+        centerY: cluster.sectors.length === 1 ? cluster.cy : sector.sy,
+        radius: cluster.sectors.length === 1 ? (cluster.singleRadius || sector.radius) : sector.radius,
+        verticalExtent: (cluster.sectors.length === 1 ? (cluster.singleRadius || sector.radius) : sector.radius) * HEX_TOP_EDGE_RATIO
       }))
     )
   )

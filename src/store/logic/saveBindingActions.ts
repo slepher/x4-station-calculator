@@ -497,12 +497,14 @@ export function createSaveBindingActions(
     const existingIndex = groupBinding.stationBindings.findIndex(
       (b) => b.stationId === input.stationId
     )
+    const existingBinding = existingIndex >= 0 ? groupBinding.stationBindings[existingIndex] : undefined
 
     const newBinding: StationSaveBinding = {
       stationId: input.stationId,
+      saveStationCode: existingBinding?.saveStationCode,
       sectorMacro: input.sectorMacro,
       position: input.position,
-      free: true
+      free: existingBinding?.free ?? true
     }
 
     if (existingIndex >= 0) {
@@ -510,6 +512,7 @@ export function createSaveBindingActions(
     } else {
       groupBinding.stationBindings.push(newBinding)
     }
+    updateStationSector(input.stationId, input.sectorGroupId)
     onDirty()
   }
 

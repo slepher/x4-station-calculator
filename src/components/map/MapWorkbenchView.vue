@@ -10,7 +10,8 @@ import MapBindingPanel from './MapBindingPanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
-import { getSectorScalePerRadius, sectorLocalRatioToRawPoint } from '@/components/map/utils/coordinates'
+import { getSectorScalePerRadius, getSectorZoneBoundingCenter, sectorLocalRatioToRawPoint } from '@/components/map/utils/coordinates'
+import { hexVertices } from '@/components/map/utils/geometry'
 import { resolveMapSectorByMacro, resolveSectorMacroById } from '@/components/map/utils/mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
@@ -81,12 +82,19 @@ type PlacementOverlayItem = {
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: EntityLocation
+  binding?: {
+    gameGuid: string
+    sectorGroupId: string
+    coverageSectorMacros: string[]
+    isVirtualTradestation?: boolean
+  }
 }
 type PlacementPreview = {
   kind: 'station' | 'sector'
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: EntityLocation
+  localRatio?: { x: number; y: number }
 }
 type DraggingPlacementItem = {
   id: string
@@ -167,6 +175,7 @@ const tooltipHideTimer = ref<number | null>(null)
 const zoomRestoreTimer = ref<number | null>(null)
 const zoomSettleTimer = ref<number | null>(null)
 const lastMousePos = ref({ x: 0, y: 0 })
+const lastBindingPreviewLogState = ref<'idle' | 'valid' | 'invalid'>('idle')
 
 const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
@@ -204,11 +213,116 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
 const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
 const isFreeStationDropForbidden = computed(() => {
-  if ((!draggingFreeStation.value && !draggingVirtualTradestation.value) || !placementPreview.value) return false
+  if (!draggingFreeStation.value && !draggingVirtualTradestation.value && !draggingFreeSector.value) return false
+  if (!placementPreview.value) return true
+  if (draggingFreeSector.value) return false
   const location = placementPreview.value.location
   const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
   return sectorMacro ? !draggingCoverageSectorMacros.value.has(sectorMacro) : true
 })
+const activeBindingDragPreview = computed<{
+  kind: 'station'
+  name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
+} | null>(() => {
+  if (draggingVirtualTradestation.value) {
+    return {
+      kind: 'station',
+      name: draggingVirtualTradestation.value.name,
+      icon: 'tradestation'
+    }
+  }
+  if (draggingFreeStation.value) {
+    return {
+      kind: 'station',
+      name: draggingFreeStation.value.name,
+      icon: draggingFreeStation.value.icon
+    }
+  }
+  return null
+})
+
+const logBindingWorkbench = (stage: string, detail?: Record<string, unknown>) => {
+  console.log('[MapWorkbench][BindingDrag]', stage, detail || {})
+}
+
+const logBindingFormula = (stage: string, detail?: Record<string, unknown>) => {
+  console.log('[MapWorkbench][BindingFormula]', stage, detail || {})
+}
+
+const roundFormulaNumber = (value: number | undefined | null, digits = 6) => {
+  if (typeof value !== 'number' || !Number.isFinite(value)) return value ?? null
+  return Number(value.toFixed(digits))
+}
+
+const resolveBindingArchive = (gameGuid: string | null) => {
+  if (!gameGuid) return null
+  const binding = empireStore.activeEmpire?.saveBindings?.find((item) => item.gameGuid === gameGuid) || null
+  const selected = saveStore.selectedArchive
+  if (selected && selected.meta.guid === gameGuid) {
+    if (binding?.selectedArchiveTime === null || binding?.selectedArchiveTime === undefined || selected.meta.time === binding?.selectedArchiveTime) {
+      return selected
+    }
+  }
+  const group = saveStore.archives.get(gameGuid)
+  if (!group) return null
+  const selectedTime = binding?.selectedArchiveTime
+  if (selectedTime === null || selectedTime === undefined) return group.saves[0] || null
+  return group.saves.find((save) => save.meta.time === selectedTime) || group.saves[0] || null
+}
+
+const resolveSaveSectorScalePerRadius = (gameGuid: string | null, sectorMacro: string | null) => {
+  if (!gameGuid || !sectorMacro) return 0
+  return resolveBindingArchive(gameGuid)?.sectors[sectorMacro]?.scale_per_radius || 0
+}
+
+const buildSaveSectorLocalRatio = (
+  sectorId: string,
+  position: { x: number; z: number },
+  saveScalePerRadius?: number
+) => {
+  if (!saveScalePerRadius) return undefined
+  const sector = gameDataStore.maps?.sectors?.[sectorId]
+  if (!sector) return undefined
+  const center = getSectorZoneBoundingCenter(sector as Parameters<typeof getSectorZoneBoundingCenter>[0])
+  return {
+    x: (position.x - center.x) * saveScalePerRadius,
+    y: -(position.z - center.z) * saveScalePerRadius
+  }
+}
+
+const buildRawPositionWithScale = (
+  sectorId: string,
+  localRatio: { x: number; y: number },
+  scalePerRadius?: number
+) => {
+  if (!scalePerRadius) return null
+  const sector = gameDataStore.maps?.sectors?.[sectorId]
+  if (!sector) return null
+  const center = getSectorZoneBoundingCenter(sector as Parameters<typeof getSectorZoneBoundingCenter>[0])
+  return {
+    x: Math.round(center.x + localRatio.x / scalePerRadius),
+    z: Math.round(center.z - localRatio.y / scalePerRadius)
+  }
+}
+
+const buildBindingPreview = (
+  _gameGuid: string | null,
+  location: EntityLocation,
+  localRatio: { x: number; y: number } | undefined,
+  input: {
+    kind: 'station' | 'sector'
+    name: string
+    icon: 'factory' | 'shipyard' | 'tradestation'
+  }
+): PlacementPreview | null => {
+  return {
+    ...input,
+    location,
+    localRatio
+  }
+}
+
 const stationPanelItems = computed<MapStationPanelItem[]>(() => {
   const empire = empireStore.activeEmpire
   if (!empire) return []
@@ -293,10 +407,17 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
   const bindings = empire.saveBindings || []
 
   for (const plan of bindings) {
+    const archive = resolveBindingArchive(plan.gameGuid)
     for (const group of plan.groupBindings) {
+      const coverageSectorMacros = Array.from(new Set([
+        ...(group.sectorMacro ? [group.sectorMacro] : []),
+        ...(group.coverageSectorMacros || []).map((entry) => entry.ref)
+      ]))
+
       if (group.tradestationBinding?.position && group.sectorMacro) {
         const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, group.sectorMacro)
         if (resolved) {
+          const saveScalePerRadius = archive?.sectors[group.sectorMacro]?.scale_per_radius
           overlays.push({
             key: `binding:tradestation:${group.sectorGroupId}`,
             id: group.tradestationBinding.stationId,
@@ -312,15 +433,27 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
               },
               sunlight: 0,
               resources: []
+            },
+            localRatio: buildSaveSectorLocalRatio(resolved.sectorId, {
+              x: group.tradestationBinding.position.x,
+              z: group.tradestationBinding.position.z
+            }, saveScalePerRadius),
+            binding: {
+              gameGuid: plan.gameGuid,
+              sectorGroupId: group.sectorGroupId,
+              coverageSectorMacros,
+              isVirtualTradestation: true
             }
           })
         }
       }
 
       for (const stationBinding of group.stationBindings) {
+        if (stationBinding.saveStationCode) continue
         if (stationBinding.position && stationBinding.sectorMacro) {
           const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationBinding.sectorMacro)
           if (resolved) {
+            const saveScalePerRadius = archive?.sectors[stationBinding.sectorMacro]?.scale_per_radius
             const station = empire.stations?.find(s => s.id === stationBinding.stationId)
             overlays.push({
               key: `binding:station:${stationBinding.stationId}`,
@@ -337,6 +470,15 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
                 },
                 sunlight: 0,
                 resources: []
+              },
+              localRatio: buildSaveSectorLocalRatio(resolved.sectorId, {
+                x: stationBinding.position.x,
+                z: stationBinding.position.z
+              }, saveScalePerRadius),
+              binding: {
+                gameGuid: plan.gameGuid,
+                sectorGroupId: group.sectorGroupId,
+                coverageSectorMacros
               }
             })
           }
@@ -665,43 +807,199 @@ const getSectorElementAtPointer = (clientX: number, clientY: number) => {
   return element.closest('[data-map-sector-id], [data-sector-hover-id]') as SVGGraphicsElement | null
 }
 
-const resolveLocationFromSectorElement = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number): EntityLocation | null => {
+const pointInPolygon = (point: { x: number; y: number }, polygon: Array<{ x: number; y: number }>) => {
+  let inside = false
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const a = polygon[i]
+    const b = polygon[j]
+    if (!a || !b) continue
+    const intersects = ((a.y > point.y) !== (b.y > point.y)) &&
+      (point.x < ((b.x - a.x) * (point.y - a.y)) / ((b.y - a.y) || Number.EPSILON) + a.x)
+    if (intersects) inside = !inside
+  }
+  return inside
+}
+
+const resolveSvgPointAtClient = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number) => {
+  const svg = sectorElement.ownerSVGElement
+  if (!svg) return null
+  const ctm = svg.getScreenCTM()
+  if (!ctm) return null
+  const point = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse())
+  return { x: point.x, y: point.y }
+}
+
+const resolveSectorPointerSample = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number) => {
   const sectorId = sectorElement.getAttribute('data-map-sector-id') || sectorElement.getAttribute('data-sector-hover-id')
   if (!sectorId) return null
   const mapSector = sectorsById.value[sectorId]
   if (!mapSector || !mapSector.scalePerRadius) return null
-  const rect = sectorElement.getBoundingClientRect()
-  if (!rect.width || !rect.height) return null
-  const centerX = rect.left + rect.width / 2
-  const centerY = rect.top + rect.height / 2
-  const radius = rect.width / 2
-  if (!radius) return null
-  const ratioX = (clientX - centerX) / radius
-  const ratioY = (clientY - centerY) / radius
+  const layout = searchSectors.value.find((item) => item.sectorId === sectorId)
+  if (!layout || !layout.radius) return null
+  const svgPoint = resolveSvgPointAtClient(sectorElement, clientX, clientY)
+  if (!svgPoint) return null
+  const localRatio = {
+    x: (svgPoint.x - layout.centerX) / layout.radius,
+    y: (svgPoint.y - layout.centerY) / layout.radius
+  }
+  const localHex = hexVertices(0, 0, 1)
+  if (!pointInPolygon(localRatio, localHex)) return null
   const sector = gameDataStore.maps?.sectors?.[sectorId]
   const rawScale = 1 / mapSector.scalePerRadius
-  const rawPoint = sector
-    ? sectorLocalRatioToRawPoint(sector, {
-        x: ratioX,
-        y: ratioY
-      })
+  const rawPoint = sector ? sectorLocalRatioToRawPoint(sector, localRatio) : null
+  const sectorCenter = sector
+    ? getSectorZoneBoundingCenter(sector as Parameters<typeof getSectorZoneBoundingCenter>[0])
     : null
+  logBindingFormula('pointer->raw', {
+    clientX,
+    clientY,
+    sectorId,
+    svgPointX: roundFormulaNumber(svgPoint.x, 3),
+    svgPointY: roundFormulaNumber(svgPoint.y, 3),
+    layoutCenterX: roundFormulaNumber(layout.centerX, 3),
+    layoutCenterY: roundFormulaNumber(layout.centerY, 3),
+    layoutRadius: roundFormulaNumber(layout.radius, 3),
+    localRatioX: roundFormulaNumber(localRatio.x),
+    localRatioY: roundFormulaNumber(localRatio.y),
+    mapScalePerRadius: roundFormulaNumber(mapSector.scalePerRadius, 12),
+    sectorCenterX: sectorCenter?.x ?? null,
+    sectorCenterZ: sectorCenter?.z ?? null,
+    rawPositionX: Math.round(rawPoint?.x ?? (localRatio.x * rawScale)),
+    rawPositionZ: Math.round(rawPoint?.z ?? (-localRatio.y * rawScale))
+  })
   return {
-    cluster_id: mapSector.clusterId,
-    sector_id: sectorId,
-    pos: {
-      x: Math.round(rawPoint?.x ?? (ratioX * rawScale)),
-      z: Math.round(rawPoint?.z ?? (-ratioY * rawScale))
-    },
-    sunlight: mapSector.sunlight,
-    resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+    localRatio,
+    location: {
+      cluster_id: mapSector.clusterId,
+      sector_id: sectorId,
+      pos: {
+        x: Math.round(rawPoint?.x ?? (localRatio.x * rawScale)),
+        z: Math.round(rawPoint?.z ?? (-localRatio.y * rawScale))
+      },
+      sunlight: mapSector.sunlight,
+      resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+    } satisfies EntityLocation
   }
+}
+
+const resolveLocationFromSectorElement = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number): EntityLocation | null => {
+  return resolveSectorPointerSample(sectorElement, clientX, clientY)?.location || null
 }
 
 const resolveLocationAtPointer = (clientX: number, clientY: number): EntityLocation | null => {
   const sectorElement = getSectorElementAtPointer(clientX, clientY)
   if (!sectorElement) return null
   return resolveLocationFromSectorElement(sectorElement, clientX, clientY)
+}
+
+const resolveLocationSampleAtPointer = (clientX: number, clientY: number) => {
+  const sectorElement = getSectorElementAtPointer(clientX, clientY)
+  if (!sectorElement) return null
+  return resolveSectorPointerSample(sectorElement, clientX, clientY)
+}
+
+const resolveBindingLocationSampleAtPointer = (clientX: number, clientY: number) => {
+  const sample = resolveLocationSampleAtPointer(clientX, clientY)
+  if (!sample) return null
+  const sectorMacro = resolveSectorMacroById(
+    gameDataStore.maps || { clusters: {}, sectors: {} },
+    sample.location.cluster_id,
+    sample.location.sector_id
+  )
+  if (!sectorMacro) {
+    return { sample, sectorMacro: null }
+  }
+  const saveScalePerRadius = resolveSaveSectorScalePerRadius(draggingBindingKey.value, sectorMacro)
+  const saveRawPosition = buildRawPositionWithScale(sample.location.sector_id, sample.localRatio, saveScalePerRadius)
+  const bindingSample = saveRawPosition
+    ? {
+        localRatio: sample.localRatio,
+        location: {
+          ...sample.location,
+          pos: saveRawPosition
+        }
+      }
+    : sample
+  logBindingFormula('pointer->save-raw', {
+    gameGuid: draggingBindingKey.value,
+    sectorMacro,
+    sectorId: sample.location.sector_id,
+    localRatioX: roundFormulaNumber(sample.localRatio.x),
+    localRatioY: roundFormulaNumber(sample.localRatio.y),
+    saveScalePerRadius: roundFormulaNumber(saveScalePerRadius, 12),
+    saveRawPositionX: bindingSample.location.pos.x,
+    saveRawPositionZ: bindingSample.location.pos.z
+  })
+  return {
+    sample: bindingSample,
+    sectorMacro
+  }
+}
+
+const resolveBindingPreviewAtPointer = (clientX: number, clientY: number): PlacementPreview | null => {
+  if (!activeBindingDragPreview.value) return null
+  const bindingSampleResult = resolveBindingLocationSampleAtPointer(clientX, clientY)
+  if (!bindingSampleResult) {
+    if (lastBindingPreviewLogState.value !== 'invalid') {
+      logBindingWorkbench('preview:missing-location', {
+        x: clientX,
+        y: clientY
+      })
+      lastBindingPreviewLogState.value = 'invalid'
+    }
+    return null
+  }
+  const { sample, sectorMacro } = bindingSampleResult
+  const location = sample.location
+  if (!sectorMacro || !draggingCoverageSectorMacros.value.has(sectorMacro)) {
+    if (lastBindingPreviewLogState.value !== 'invalid') {
+      logBindingWorkbench('preview:forbidden-sector', {
+        clusterId: location.cluster_id,
+        sectorId: location.sector_id,
+        sectorMacro: sectorMacro || null,
+        coverage: Array.from(draggingCoverageSectorMacros.value)
+      })
+      lastBindingPreviewLogState.value = 'invalid'
+    }
+    return null
+  }
+  if (lastBindingPreviewLogState.value !== 'valid') {
+    logBindingWorkbench('preview:valid', {
+      clusterId: location.cluster_id,
+      sectorId: location.sector_id,
+      sectorMacro
+    })
+    lastBindingPreviewLogState.value = 'valid'
+  }
+  const previewLocalRatio = sample.localRatio
+  const layout = searchSectors.value.find((item) => item.sectorId === location.sector_id)
+  const saveScalePerRadius = resolveSaveSectorScalePerRadius(draggingBindingKey.value, sectorMacro)
+  const projectedScreen = previewLocalRatio && layout ? {
+    x: layout.centerX + previewLocalRatio.x * layout.radius,
+    y: layout.centerY + previewLocalRatio.y * layout.radius
+  } : null
+  logBindingFormula('raw->save-preview', {
+    gameGuid: draggingBindingKey.value,
+    sectorMacro,
+    sectorId: location.sector_id,
+    rawPositionX: location.pos.x,
+    rawPositionZ: location.pos.z,
+    saveScalePerRadius: roundFormulaNumber(saveScalePerRadius, 12),
+    previewLocalRatioX: roundFormulaNumber(previewLocalRatio?.x),
+    previewLocalRatioY: roundFormulaNumber(previewLocalRatio?.y),
+    projectedScreenX: roundFormulaNumber(projectedScreen?.x, 3),
+    projectedScreenY: roundFormulaNumber(projectedScreen?.y, 3),
+    pointerScreenX: roundFormulaNumber(lastMousePos.value.x, 3),
+    pointerScreenY: roundFormulaNumber(lastMousePos.value.y, 3),
+    screenDeltaX: projectedScreen ? roundFormulaNumber(projectedScreen.x - lastMousePos.value.x, 3) : null,
+    screenDeltaY: projectedScreen ? roundFormulaNumber(projectedScreen.y - lastMousePos.value.y, 3) : null
+  })
+  return buildBindingPreview(
+    draggingBindingKey.value,
+    location,
+    sample.localRatio,
+    activeBindingDragPreview.value
+  )
 }
 
 const clearPlacementState = () => {
@@ -1170,6 +1468,12 @@ const onBindingFitSectors = (sectorMacros: string[]) => {
 }
 
 const onBindingDragStationStart = (payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }) => {
+  logBindingWorkbench('start', {
+    stationId: payload.stationId,
+    sectorGroupId: payload.sectorGroupId,
+    isVirtualTradestation: !!payload.isVirtualTradestation,
+    coverage: payload.coverageSectorMacros.map((entry) => entry.ref)
+  })
   if (payload.isVirtualTradestation) {
     draggingVirtualTradestation.value = {
       sectorGroupId: payload.sectorGroupId,
@@ -1189,9 +1493,15 @@ const onBindingDragStationStart = (payload: { stationId: string; gameGuid: strin
   draggingPlacementItem.value = null
   draggingOverlayKey.value = null
   draggingFreeSector.value = null
+  lastBindingPreviewLogState.value = 'idle'
 }
 
 const onBindingDragStationEnd = () => {
+  logBindingWorkbench('end', {
+    draggingBindingKey: draggingBindingKey.value,
+    draggingSectorGroupId: draggingSectorGroupId.value,
+    hasPreview: !!placementPreview.value
+  })
   clearPlacementState()
   draggingBindingKey.value = null
   draggingSectorGroupId.value = null
@@ -1339,41 +1649,43 @@ const onMouseMove = (event: MouseEvent) => {
       location
     } : null
   } else if (draggingFreeSector.value && isBindingPanelOpen.value) {
-    const location = resolveLocationAtPointer(event.clientX, event.clientY)
-    placementPreview.value = location ? {
-      kind: 'sector',
-      name: draggingFreeSector.value.name,
-      icon: 'tradestation',
-      location
-    } : null
-  } else if (draggingVirtualTradestation.value && isBindingPanelOpen.value) {
-    const location = resolveLocationAtPointer(event.clientX, event.clientY)
-    if (location) {
-      const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
-      const isAllowed = sectorMacro ? draggingCoverageSectorMacros.value.has(sectorMacro) : false
-      placementPreview.value = isAllowed ? {
-        kind: 'station',
-        name: draggingVirtualTradestation.value.name,
-        icon: 'tradestation',
-        location
+    const bindingSampleResult = resolveBindingLocationSampleAtPointer(event.clientX, event.clientY)
+    const sample = bindingSampleResult?.sample || null
+    const sectorMacro = bindingSampleResult?.sectorMacro || null
+    const layout = sample
+      ? searchSectors.value.find((item) => item.sectorId === sample.location.sector_id)
+      : null
+    if (sample) {
+      const projectedScreen = sample.localRatio && layout ? {
+        x: layout.centerX + sample.localRatio.x * layout.radius,
+        y: layout.centerY + sample.localRatio.y * layout.radius
       } : null
-    } else {
-      placementPreview.value = null
+      logBindingFormula('raw->save-preview:sector', {
+        gameGuid: draggingBindingKey.value,
+        sectorMacro,
+        sectorId: sample.location.sector_id,
+        rawPositionX: sample.location.pos.x,
+        rawPositionZ: sample.location.pos.z,
+        saveScalePerRadius: roundFormulaNumber(resolveSaveSectorScalePerRadius(draggingBindingKey.value, sectorMacro), 12),
+        previewLocalRatioX: roundFormulaNumber(sample.localRatio?.x),
+        previewLocalRatioY: roundFormulaNumber(sample.localRatio?.y),
+        projectedScreenX: roundFormulaNumber(projectedScreen?.x, 3),
+        projectedScreenY: roundFormulaNumber(projectedScreen?.y, 3),
+        pointerScreenX: roundFormulaNumber(lastMousePos.value.x, 3),
+        pointerScreenY: roundFormulaNumber(lastMousePos.value.y, 3),
+        screenDeltaX: projectedScreen ? roundFormulaNumber(projectedScreen.x - lastMousePos.value.x, 3) : null,
+        screenDeltaY: projectedScreen ? roundFormulaNumber(projectedScreen.y - lastMousePos.value.y, 3) : null
+      })
     }
-  } else if (draggingFreeStation.value && isBindingPanelOpen.value) {
-    const location = resolveLocationAtPointer(event.clientX, event.clientY)
-    if (location) {
-      const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
-      const isAllowed = sectorMacro ? draggingCoverageSectorMacros.value.has(sectorMacro) : false
-      placementPreview.value = isAllowed ? {
-        kind: 'station',
-        name: draggingFreeStation.value.name,
-        icon: draggingFreeStation.value.icon,
-        location
-      } : null
-    } else {
-      placementPreview.value = null
-    }
+    placementPreview.value = sample
+      ? buildBindingPreview(draggingBindingKey.value, sample.location, sample.localRatio, {
+          kind: 'sector',
+          name: draggingFreeSector.value.name,
+          icon: 'tradestation'
+        })
+      : null
+  } else if (activeBindingDragPreview.value && isBindingPanelOpen.value) {
+    placementPreview.value = resolveBindingPreviewAtPointer(event.clientX, event.clientY)
   }
   if (!isDragging.value) return
   const dx = event.clientX - dragStartX.value
@@ -1423,10 +1735,19 @@ const stopDrag = () => {
   if (draggingPlacementItem.value && placementPreview.value) {
     applyLocationToItem(draggingPlacementItem.value, placementPreview.value.location)
   } else if (draggingFreeSector.value && placementPreview.value && draggingBindingKey.value) {
+    const sectorMacro = resolveSectorMacroById(
+      gameDataStore.maps || { clusters: {}, sectors: {} },
+      placementPreview.value.location.cluster_id,
+      placementPreview.value.location.sector_id
+    )
+    if (!sectorMacro) {
+      clearPlacementState()
+      return
+    }
     empireStore.setFreeSectorBinding({
       gameGuid: draggingBindingKey.value,
       sectorGroupId: draggingFreeSector.value.sectorGroupId,
-      sectorMacro: placementPreview.value.location.sector_id,
+      sectorMacro,
       position: {
         x: placementPreview.value.location.pos.x,
         y: 0,
@@ -1436,6 +1757,11 @@ const stopDrag = () => {
   } else if (draggingVirtualTradestation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
     const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
     if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
+      logBindingWorkbench('commit:virtual-tradestation', {
+        sectorGroupId: draggingSectorGroupId.value,
+        sectorMacro,
+        position: placementPreview.value.location.pos
+      })
       empireStore.setTradestationBinding({
         gameGuid: draggingBindingKey.value,
         sectorGroupId: draggingSectorGroupId.value,
@@ -1450,6 +1776,12 @@ const stopDrag = () => {
   } else if (draggingFreeStation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
     const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
     if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
+      logBindingWorkbench('commit:free-station', {
+        stationId: draggingFreeStation.value.stationId,
+        sectorGroupId: draggingSectorGroupId.value,
+        sectorMacro,
+        position: placementPreview.value.location.pos
+      })
       empireStore.setFreeStationBinding({
         gameGuid: draggingBindingKey.value,
         sectorGroupId: draggingSectorGroupId.value,
@@ -1462,7 +1794,16 @@ const stopDrag = () => {
         }
       })
     }
+  } else if (draggingVirtualTradestation.value || draggingFreeStation.value) {
+    logBindingWorkbench('commit:skipped', {
+      hasPreview: !!placementPreview.value,
+      draggingBindingKey: draggingBindingKey.value,
+      draggingSectorGroupId: draggingSectorGroupId.value,
+      freeStationId: draggingFreeStation.value?.stationId || null,
+      isVirtualTradestation: !!draggingVirtualTradestation.value
+    })
   }
+  lastBindingPreviewLogState.value = 'idle'
   clearPlacementState()
 }
 
@@ -1526,7 +1867,46 @@ const onOverlayPointerDown = (payload: {
   kind: 'station' | 'sector'
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
+  binding?: {
+    gameGuid: string
+    sectorGroupId: string
+    coverageSectorMacros: string[]
+    isVirtualTradestation?: boolean
+  }
 }) => {
+  if (payload.binding) {
+    logBindingWorkbench('overlay:start', {
+      key: payload.key,
+      id: payload.id,
+      sectorGroupId: payload.binding.sectorGroupId,
+      isVirtualTradestation: !!payload.binding.isVirtualTradestation,
+      coverage: payload.binding.coverageSectorMacros
+    })
+    draggingPlacementItem.value = null
+    draggingBindingKey.value = payload.binding.gameGuid
+    draggingSectorGroupId.value = payload.binding.sectorGroupId
+    draggingCoverageSectorMacros.value = new Set(payload.binding.coverageSectorMacros)
+    draggingOverlayKey.value = payload.key
+    draggingFreeSector.value = null
+    lastBindingPreviewLogState.value = 'idle'
+    if (payload.binding.isVirtualTradestation) {
+      draggingFreeStation.value = null
+      draggingVirtualTradestation.value = {
+        sectorGroupId: payload.binding.sectorGroupId,
+        name: payload.name
+      }
+    } else {
+      draggingVirtualTradestation.value = null
+      draggingFreeStation.value = {
+        stationId: payload.id,
+        sectorGroupId: payload.binding.sectorGroupId,
+        name: payload.name,
+        icon: payload.icon as 'factory' | 'shipyard'
+      }
+    }
+    return
+  }
+
   draggingPlacementItem.value = {
     id: payload.id,
     kind: payload.kind,
@@ -1949,6 +2329,10 @@ onBeforeUnmount(() => {
 
 .map-viewport.drop-forbidden {
   cursor: not-allowed;
+}
+
+.map-viewport.drop-forbidden * {
+  cursor: not-allowed !important;
 }
 
 .map-viewport.dragging * {

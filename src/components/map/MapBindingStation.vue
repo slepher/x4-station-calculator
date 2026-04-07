@@ -39,14 +39,18 @@ const bindMenuSectorMacro = ref<string | null>(null)
 const bindMenuTriggerEl = ref<HTMLElement | null>(null)
 
 const pendingDrag = ref<{
-  type: 'station' | 'virtualTradestation'
-  item?: { station: StationPlan; sectorGroupId: string; sectorGroupName: string }
+  key: string
+  payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }
   startX: number
   startY: number
 } | null>(null)
-const activeDragStationId = ref<string | null>(null)
-const activeDragVirtualTradestation = ref(false)
+const activeDragKey = ref<string | null>(null)
 const DRAG_START_THRESHOLD_PX = 4
+const suppressNextSectorFocus = ref(false)
+
+const logBindingDrag = (stage: string, detail?: Record<string, unknown>) => {
+  console.log('[MapBindingStation][Drag]', stage, detail || {})
+}
 
 const iconUrlByType = {
   factory: factoryIconUrl,
@@ -220,6 +224,26 @@ const stationBindingsInGroup = computed(() => {
   if (!currentGroupBinding.value) return []
   return currentGroupBinding.value.stationBindings
 })
+
+function buildStationDragCoverage(): { ref: string; jump: number }[] {
+  const entries = currentGroupBinding.value?.coverageSectorMacros || []
+  const anchorMacro = currentGroupBinding.value?.sectorMacro
+  const next: { ref: string; jump: number }[] = []
+  const seen = new Set<string>()
+
+  if (anchorMacro) {
+    next.push({ ref: anchorMacro, jump: 0 })
+    seen.add(anchorMacro)
+  }
+
+  entries.forEach((entry) => {
+    if (seen.has(entry.ref)) return
+    seen.add(entry.ref)
+    next.push(entry)
+  })
+
+  return next
+}
 
 function getStationLabel(station: PlayerStationEntry): string {
   if (station.is_headquarter) {
@@ -499,83 +523,144 @@ const allStationsForMenu = computed(() => {
 })
 
 function onVirtualTradestationMouseDown(event: MouseEvent) {
+  if (event.button !== 0) return
+  event.preventDefault()
+  logBindingDrag('mousedown:virtual-tradestation', {
+    sectorGroupId: props.sectorGroupId,
+    x: event.clientX,
+    y: event.clientY
+  })
   pendingDrag.value = {
-    type: 'virtualTradestation',
+    key: '__virtual_tradestation__',
+    payload: {
+      stationId: '__virtual_tradestation__',
+      gameGuid: props.gameGuid,
+      sectorGroupId: props.sectorGroupId,
+      name: t('map.binding_tradestation_virtual'),
+      icon: 'tradestation',
+      coverageSectorMacros: currentGroupBinding.value?.sectorMacro
+        ? [{ ref: currentGroupBinding.value.sectorMacro, jump: 0 }]
+        : [],
+      isVirtualTradestation: true
+    },
     startX: event.clientX,
     startY: event.clientY
   }
 }
 
 function onFreeStationMouseDown(event: MouseEvent, item: { station: StationPlan; sectorGroupId: string }) {
+  if (event.button !== 0) return
+  event.preventDefault()
+  logBindingDrag('mousedown:free-station', {
+    stationId: item.station.id,
+    sectorGroupId: props.sectorGroupId,
+    x: event.clientX,
+    y: event.clientY
+  })
   pendingDrag.value = {
-    type: 'station',
-    item: { ...item, sectorGroupName: '' },
+    key: item.station.id,
+    payload: {
+      stationId: item.station.id,
+      gameGuid: props.gameGuid,
+      sectorGroupId: props.sectorGroupId,
+      name: item.station.name,
+      icon: item.station.type === 'shipyard' ? 'shipyard' : 'factory',
+      coverageSectorMacros: buildStationDragCoverage()
+    },
     startX: event.clientX,
     startY: event.clientY
   }
 }
 
+function onPlacedFreeStationMouseDown(event: MouseEvent, placed: { stationId: string }) {
+  if (event.button !== 0) return
+  const station = activeEmpire.value?.stations.find((item) => item.id === placed.stationId)
+  if (!station) {
+    logBindingDrag('mousedown:placed-station:missing-station', {
+      stationId: placed.stationId
+    })
+    return
+  }
+  onFreeStationMouseDown(event, {
+    station,
+    sectorGroupId: props.sectorGroupId
+  })
+}
+
+const clearPendingDrag = () => {
+  if (pendingDrag.value) {
+    logBindingDrag('pending:clear', {
+      key: pendingDrag.value.key
+    })
+  }
+  pendingDrag.value = null
+}
+
+const finishActiveDrag = () => {
+  if (!activeDragKey.value) return
+  logBindingDrag('active:finish', {
+    key: activeDragKey.value
+  })
+  suppressNextSectorFocus.value = true
+  window.setTimeout(() => {
+    suppressNextSectorFocus.value = false
+  }, 0)
+  activeDragKey.value = null
+  emit('drag-station-end')
+}
+
+function onSectorItemClick(sectorMacro: string) {
+  if (suppressNextSectorFocus.value) {
+    logBindingDrag('click:suppressed-after-drag', { sectorMacro })
+    suppressNextSectorFocus.value = false
+    return
+  }
+  emit('focus-sector', sectorMacro)
+}
+
 watch(() => props.sectorGroupId, () => {
   closeBindMenu()
+  clearPendingDrag()
+  finishActiveDrag()
 })
+
+const onWindowMouseMove = (event: MouseEvent) => {
+  if (!pendingDrag.value || activeDragKey.value) return
+  const dx = event.clientX - pendingDrag.value.startX
+  const dy = event.clientY - pendingDrag.value.startY
+  if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
+  logBindingDrag('threshold:passed', {
+    key: pendingDrag.value.key,
+    dx,
+    dy
+  })
+  activeDragKey.value = pendingDrag.value.key
+  emit('drag-station-start', pendingDrag.value.payload)
+}
+
+const onWindowMouseUp = () => {
+  logBindingDrag('window:mouseup', {
+    pendingKey: pendingDrag.value?.key || null,
+    activeKey: activeDragKey.value
+  })
+  clearPendingDrag()
+  finishActiveDrag()
+}
 
 onMounted(() => {
   document.addEventListener('mousedown', onBindMenuGlobalPointerDown)
   window.addEventListener('resize', onBindMenuViewportChange)
   window.addEventListener('scroll', onBindMenuViewportChange, true)
-
-  const onWindowMouseMove = (event: MouseEvent) => {
-    if (!pendingDrag.value) return
-    
-    const dx = event.clientX - pendingDrag.value.startX
-    const dy = event.clientY - pendingDrag.value.startY
-    if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
-    
-    if (pendingDrag.value.type === 'virtualTradestation') {
-      if (!activeDragVirtualTradestation.value) {
-        activeDragVirtualTradestation.value = true
-        emit('drag-station-start', {
-          stationId: '__virtual_tradestation__',
-          gameGuid: props.gameGuid,
-          sectorGroupId: props.sectorGroupId,
-          name: t('map.binding_tradestation_virtual'),
-          icon: 'tradestation',
-          coverageSectorMacros: currentGroupBinding.value?.sectorMacro ? [{ ref: currentGroupBinding.value.sectorMacro, jump: 0 }] : [],
-          isVirtualTradestation: true
-        })
-      }
-    } else if (pendingDrag.value.type === 'station' && pendingDrag.value.item && !activeDragStationId.value) {
-      activeDragStationId.value = pendingDrag.value.item.station.id
-      emit('drag-station-start', {
-        stationId: pendingDrag.value.item.station.id,
-        gameGuid: props.gameGuid,
-        sectorGroupId: props.sectorGroupId,
-        name: pendingDrag.value.item.station.name,
-        icon: pendingDrag.value.item.station.type === 'shipyard' ? 'shipyard' : 'factory',
-        coverageSectorMacros: currentGroupBinding.value?.coverageSectorMacros || []
-      })
-    }
-  }
-
-  const onWindowMouseUp = () => {
-    if (activeDragStationId.value || activeDragVirtualTradestation.value) {
-      emit('drag-station-end')
-    }
-    pendingDrag.value = null
-    activeDragStationId.value = null
-    activeDragVirtualTradestation.value = false
-  }
-
   window.addEventListener('mousemove', onWindowMouseMove)
   window.addEventListener('mouseup', onWindowMouseUp)
+})
 
-  onBeforeUnmount(() => {
-    document.removeEventListener('mousedown', onBindMenuGlobalPointerDown)
-    window.removeEventListener('resize', onBindMenuViewportChange)
-    window.removeEventListener('scroll', onBindMenuViewportChange, true)
-    window.removeEventListener('mousemove', onWindowMouseMove)
-    window.removeEventListener('mouseup', onWindowMouseUp)
-  })
+onBeforeUnmount(() => {
+  document.removeEventListener('mousedown', onBindMenuGlobalPointerDown)
+  window.removeEventListener('resize', onBindMenuViewportChange)
+  window.removeEventListener('scroll', onBindMenuViewportChange, true)
+  window.removeEventListener('mousemove', onWindowMouseMove)
+  window.removeEventListener('mouseup', onWindowMouseUp)
 })
 </script>
 
@@ -591,6 +676,7 @@ onMounted(() => {
       <div
         v-if="virtualTradestation"
         class="free-station-item free-station-item--virtual"
+        :class="{ 'free-station-item--dragging': activeDragKey === '__virtual_tradestation__' }"
         @mousedown="onVirtualTradestationMouseDown($event)"
       >
         <div class="station-icon-wrap">
@@ -611,7 +697,7 @@ onMounted(() => {
         :key="item.station.id"
         class="free-station-item"
         :class="{
-          'free-station-item--dragging': activeDragStationId === item.station.id,
+          'free-station-item--dragging': activeDragKey === item.station.id,
           'free-station-item--orphan': item.type === 'orphan'
         }"
         @mousedown="onFreeStationMouseDown($event, item)"
@@ -663,7 +749,7 @@ onMounted(() => {
             :key="station.code"
             class="station-item"
             :class="{ 'station-item--bound': isSaveStationBound(station.code) }"
-            @click="emit('focus-sector', sector.sectorMacro)"
+            @click="onSectorItemClick(sector.sectorMacro)"
           >
             <div class="station-text">
               <div class="station-title-row">
@@ -692,7 +778,9 @@ onMounted(() => {
             v-for="placed in sector.placedFreeStations"
             :key="placed.stationId"
             class="station-item station-item--placed"
-            @click="emit('focus-sector', sector.sectorMacro)"
+            :class="{ 'station-item--dragging': activeDragKey === placed.stationId }"
+            @mousedown="onPlacedFreeStationMouseDown($event, placed)"
+            @click="onSectorItemClick(sector.sectorMacro)"
           >
             <img class="placed-icon" :src="factoryIconUrl" alt="" />
             <div class="station-text">
@@ -705,7 +793,9 @@ onMounted(() => {
           <div
             v-if="sector.hasPlacedVirtualTradestation"
             class="station-item station-item--placed station-item--tradestation"
-            @click="emit('focus-sector', sector.sectorMacro)"
+            :class="{ 'station-item--dragging': activeDragKey === '__virtual_tradestation__' }"
+            @mousedown="onVirtualTradestationMouseDown($event)"
+            @click="onSectorItemClick(sector.sectorMacro)"
           >
             <img class="placed-icon" :src="tradestationIconUrl" alt="" />
             <div class="station-text">
@@ -826,6 +916,7 @@ onMounted(() => {
 
 .free-station-item {
   @apply flex items-center gap-2 rounded border border-amber-300/15 bg-black/30 p-2 cursor-grab transition-colors hover:border-amber-200/30;
+  user-select: none;
 }
 
 .free-station-item--dragging {
@@ -908,6 +999,7 @@ onMounted(() => {
 /* Station Items */
 .station-item {
   @apply flex items-center justify-between gap-2 rounded border border-amber-300/10 bg-black/25 p-2 cursor-pointer transition-colors hover:border-amber-200/25;
+  user-select: none;
 }
 
 .station-item--bound {

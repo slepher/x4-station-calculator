@@ -132,6 +132,7 @@ export type PlacementOverlay = {
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: PlacementLocation
+  localRatio?: Ratio
 }
 
 export type PlacementPreview = {
@@ -139,6 +140,7 @@ export type PlacementPreview = {
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: PlacementLocation
+  localRatio?: Ratio
 }
 
 export type SavePoiColorMap = Record<SavePoiCategory, string>
