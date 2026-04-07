@@ -10,7 +10,7 @@ import MapBindingPanel from './MapBindingPanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
-import { getSectorScalePerRadius, getSectorZoneBoundingCenter, sectorLocalRatioToRawPoint } from '@/components/map/utils/coordinates'
+import { getSectorScalePerRadius, getSectorZoneBoundingCenter, sectorLocalRatioToRawPointWithScale, sectorPointToLocalRatioWithScale } from '@/components/map/utils/coordinates'
 import { hexVertices } from '@/components/map/utils/geometry'
 import { resolveMapSectorByMacro, resolveSectorMacroById } from '@/components/map/utils/mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -281,29 +281,13 @@ const buildSaveSectorLocalRatio = (
   position: { x: number; z: number },
   saveScalePerRadius?: number
 ) => {
-  if (!saveScalePerRadius) return undefined
   const sector = gameDataStore.maps?.sectors?.[sectorId]
   if (!sector) return undefined
-  const center = getSectorZoneBoundingCenter(sector as Parameters<typeof getSectorZoneBoundingCenter>[0])
-  return {
-    x: (position.x - center.x) * saveScalePerRadius,
-    y: -(position.z - center.z) * saveScalePerRadius
-  }
-}
-
-const buildRawPositionWithScale = (
-  sectorId: string,
-  localRatio: { x: number; y: number },
-  scalePerRadius?: number
-) => {
-  if (!scalePerRadius) return null
-  const sector = gameDataStore.maps?.sectors?.[sectorId]
-  if (!sector) return null
-  const center = getSectorZoneBoundingCenter(sector as Parameters<typeof getSectorZoneBoundingCenter>[0])
-  return {
-    x: Math.round(center.x + localRatio.x / scalePerRadius),
-    z: Math.round(center.z - localRatio.y / scalePerRadius)
-  }
+  return sectorPointToLocalRatioWithScale(
+    sector as Parameters<typeof sectorPointToLocalRatioWithScale>[0],
+    position,
+    { scalePerRadius: saveScalePerRadius }
+  ) || undefined
 }
 
 const buildBindingPreview = (
@@ -829,11 +813,11 @@ const resolveSvgPointAtClient = (sectorElement: SVGGraphicsElement, clientX: num
   return { x: point.x, y: point.y }
 }
 
-const resolveSectorPointerSample = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number) => {
+const resolveSectorPointerGeometrySample = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number) => {
   const sectorId = sectorElement.getAttribute('data-map-sector-id') || sectorElement.getAttribute('data-sector-hover-id')
   if (!sectorId) return null
   const mapSector = sectorsById.value[sectorId]
-  if (!mapSector || !mapSector.scalePerRadius) return null
+  if (!mapSector) return null
   const layout = searchSectors.value.find((item) => item.sectorId === sectorId)
   if (!layout || !layout.radius) return null
   const svgPoint = resolveSvgPointAtClient(sectorElement, clientX, clientY)
@@ -844,9 +828,21 @@ const resolveSectorPointerSample = (sectorElement: SVGGraphicsElement, clientX: 
   }
   const localHex = hexVertices(0, 0, 1)
   if (!pointInPolygon(localRatio, localHex)) return null
+  return {
+    sectorId,
+    mapSector,
+    layout,
+    svgPoint,
+    localRatio
+  }
+}
+
+const resolveSectorPointerSample = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number) => {
+  const geometrySample = resolveSectorPointerGeometrySample(sectorElement, clientX, clientY)
+  if (!geometrySample) return null
+  const { sectorId, mapSector, layout, svgPoint, localRatio } = geometrySample
   const sector = gameDataStore.maps?.sectors?.[sectorId]
-  const rawScale = 1 / mapSector.scalePerRadius
-  const rawPoint = sector ? sectorLocalRatioToRawPoint(sector, localRatio) : null
+  const rawPoint = sector ? sectorLocalRatioToRawPointWithScale(sector, localRatio) : null
   const sectorCenter = sector
     ? getSectorZoneBoundingCenter(sector as Parameters<typeof getSectorZoneBoundingCenter>[0])
     : null
@@ -864,8 +860,8 @@ const resolveSectorPointerSample = (sectorElement: SVGGraphicsElement, clientX: 
     mapScalePerRadius: roundFormulaNumber(mapSector.scalePerRadius, 12),
     sectorCenterX: sectorCenter?.x ?? null,
     sectorCenterZ: sectorCenter?.z ?? null,
-    rawPositionX: Math.round(rawPoint?.x ?? (localRatio.x * rawScale)),
-    rawPositionZ: Math.round(rawPoint?.z ?? (-localRatio.y * rawScale))
+    rawPositionX: Math.round(rawPoint?.x ?? 0),
+    rawPositionZ: Math.round(rawPoint?.z ?? 0)
   })
   return {
     localRatio,
@@ -873,8 +869,8 @@ const resolveSectorPointerSample = (sectorElement: SVGGraphicsElement, clientX: 
       cluster_id: mapSector.clusterId,
       sector_id: sectorId,
       pos: {
-        x: Math.round(rawPoint?.x ?? (localRatio.x * rawScale)),
-        z: Math.round(rawPoint?.z ?? (-localRatio.y * rawScale))
+        x: Math.round(rawPoint?.x ?? 0),
+        z: Math.round(rawPoint?.z ?? 0)
       },
       sunlight: mapSector.sunlight,
       resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
@@ -899,34 +895,70 @@ const resolveLocationSampleAtPointer = (clientX: number, clientY: number) => {
 }
 
 const resolveBindingLocationSampleAtPointer = (clientX: number, clientY: number) => {
-  const sample = resolveLocationSampleAtPointer(clientX, clientY)
-  if (!sample) return null
+  const sectorElement = getSectorElementAtPointer(clientX, clientY)
+  if (!sectorElement) return null
+  const geometrySample = resolveSectorPointerGeometrySample(sectorElement, clientX, clientY)
+  if (!geometrySample) return null
+  const { sectorId, mapSector, localRatio } = geometrySample
   const sectorMacro = resolveSectorMacroById(
     gameDataStore.maps || { clusters: {}, sectors: {} },
-    sample.location.cluster_id,
-    sample.location.sector_id
+    mapSector.clusterId,
+    sectorId
   )
   if (!sectorMacro) {
-    return { sample, sectorMacro: null }
+    const sector = gameDataStore.maps?.sectors?.[sectorId]
+    const fallbackRawPosition = sector
+      ? sectorLocalRatioToRawPointWithScale(sector as Parameters<typeof sectorLocalRatioToRawPointWithScale>[0], localRatio)
+      : null
+    return {
+      sample: {
+        localRatio,
+        location: {
+          cluster_id: mapSector.clusterId,
+          sector_id: sectorId,
+          pos: {
+            x: Math.round(fallbackRawPosition?.x ?? 0),
+            z: Math.round(fallbackRawPosition?.z ?? 0)
+          },
+          sunlight: mapSector.sunlight,
+          resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+        } satisfies EntityLocation
+      },
+      sectorMacro: null
+    }
   }
   const saveScalePerRadius = resolveSaveSectorScalePerRadius(draggingBindingKey.value, sectorMacro)
-  const saveRawPosition = buildRawPositionWithScale(sample.location.sector_id, sample.localRatio, saveScalePerRadius)
-  const bindingSample = saveRawPosition
-    ? {
-        localRatio: sample.localRatio,
-        location: {
-          ...sample.location,
-          pos: saveRawPosition
-        }
-      }
-    : sample
+  const sector = gameDataStore.maps?.sectors?.[sectorId]
+  const effectiveScalePerRadius = saveScalePerRadius || mapSector.scalePerRadius
+  const resolvedRawPosition = sector
+    ? sectorLocalRatioToRawPointWithScale(
+        sector as Parameters<typeof sectorLocalRatioToRawPointWithScale>[0],
+        localRatio,
+        { scalePerRadius: effectiveScalePerRadius }
+      )
+    : null
+  const bindingSample = {
+    localRatio,
+    location: {
+      cluster_id: mapSector.clusterId,
+      sector_id: sectorId,
+      pos: {
+        x: Math.round(resolvedRawPosition?.x ?? 0),
+        z: Math.round(resolvedRawPosition?.z ?? 0)
+      },
+      sunlight: mapSector.sunlight,
+      resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+    } satisfies EntityLocation
+  }
   logBindingFormula('pointer->save-raw', {
     gameGuid: draggingBindingKey.value,
     sectorMacro,
-    sectorId: sample.location.sector_id,
-    localRatioX: roundFormulaNumber(sample.localRatio.x),
-    localRatioY: roundFormulaNumber(sample.localRatio.y),
+    sectorId,
+    localRatioX: roundFormulaNumber(localRatio.x),
+    localRatioY: roundFormulaNumber(localRatio.y),
     saveScalePerRadius: roundFormulaNumber(saveScalePerRadius, 12),
+    fallbackMapScalePerRadius: roundFormulaNumber(mapSector.scalePerRadius, 12),
+    effectiveScalePerRadius: roundFormulaNumber(effectiveScalePerRadius, 12),
     saveRawPositionX: bindingSample.location.pos.x,
     saveRawPositionZ: bindingSample.location.pos.z
   })
@@ -1549,7 +1581,17 @@ const onSaveActiveCategoryChange = (category: SavePoiCategory | null) => {
 }
 
 const resolveSavePoiContentPoint = (poi: SavePoiOverlayItem) => {
-  if (poi.position.tx === undefined || poi.position.ty === undefined) return null
+  if (poi.position.tx === undefined || poi.position.ty === undefined) {
+    console.error('[MapWorkbench][SavePoiData] missing-tx-ty', {
+      key: poi.key,
+      code: poi.code,
+      category: poi.category,
+      sectorMacro: poi.sectorMacro,
+      hasTx: poi.position.tx !== undefined,
+      hasTy: poi.position.ty !== undefined
+    })
+    return null
+  }
   const resolved = mapStore.resolveSectorByMacro?.(poi.sectorMacro) ||
     resolveMapSectorByMacro({
       clusters: gameDataStore.maps?.clusters || {},

@@ -59,6 +59,7 @@ export function useMapSvgOverlays(args: {
   } | null>(null)
   const sectorViewportSettleTimer = ref<number | null>(null)
   const lastLoggedSavePoiDebugKey = ref<string | null>(null)
+  const loggedSavePoiDataErrors = new Set<string>()
 
   const clearSectorViewportSettleTimer = () => {
     if (sectorViewportSettleTimer.value !== null) {
@@ -77,6 +78,20 @@ export function useMapSvgOverlays(args: {
       clusters: args.clusters.value,
       sectors: args.sectors.value
     }, macro)
+
+  const logSavePoiDataError = (poi: SavePoiOverlayItem, reason: string) => {
+    const key = `${poi.key}:${reason}`
+    if (loggedSavePoiDataErrors.has(key)) return
+    loggedSavePoiDataErrors.add(key)
+    console.error('[MapOverlay][SavePoiData]', reason, {
+      key: poi.key,
+      code: poi.code,
+      category: poi.category,
+      sectorMacro: poi.sectorMacro,
+      hasTx: poi.position.tx !== undefined,
+      hasTy: poi.position.ty !== undefined
+    })
+  }
 
   const buildVisibleSectorKeys = (
     viewportBounds: {
@@ -241,7 +256,14 @@ export function useMapSvgOverlays(args: {
         const sector = resolved.sector as Sector
         const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
         const sectorCenter = sector.normalized?.center_offset_ratio
-        if (!center || poi.position.tx === undefined || poi.position.ty === undefined || !sectorCenter || !sectorRadiusRatio) return null
+        if (poi.position.tx === undefined || poi.position.ty === undefined) {
+          logSavePoiDataError(poi, 'missing-tx-ty')
+          return null
+        }
+        if (!center || !sectorCenter || !sectorRadiusRatio) {
+          logSavePoiDataError(poi, 'missing-sector-layout')
+          return null
+        }
         if (hideConditionalSmallIcons && shouldHideSavePoiSmallIconAtClusterOverview(poi)) return null
         if (!hideConditionalSmallIcons && activeVisibleSectorKeys && viewportBounds && shouldHideSavePoiSmallIconAtClusterOverview(poi) && cluster) {
           if (!activeVisibleSectorKeys.has(`${resolved.clusterId}:${sector.id}`)) return null
