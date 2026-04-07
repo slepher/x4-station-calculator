@@ -271,22 +271,64 @@ const resolveBindingArchive = (gameGuid: string | null) => {
   return group.saves.find((save) => save.meta.time === selectedTime) || group.saves[0] || null
 }
 
-const resolveSaveSectorScalePerRadius = (gameGuid: string | null, sectorMacro: string | null) => {
-  if (!gameGuid || !sectorMacro) return 0
-  return resolveBindingArchive(gameGuid)?.sectors[sectorMacro]?.scale_per_radius || 0
+const loggedBindingDataErrors = new Set<string>()
+
+const logBindingDataError = (reason: string, detail: Record<string, unknown>) => {
+  const key = `${reason}:${detail.gameGuid || 'none'}:${detail.sectorMacro || detail.sectorId || 'none'}`
+  if (loggedBindingDataErrors.has(key)) return
+  loggedBindingDataErrors.add(key)
+  console.error('[MapWorkbench][BindingData]', reason, detail)
+}
+
+const resolveBindingScaleContext = (gameGuid: string | null, sectorMacro: string | null, sectorId?: string) => {
+  const mapSector = sectorId ? gameDataStore.maps?.sectors?.[sectorId] : null
+  const mapScalePerRadius = mapSector ? getSectorScalePerRadius(mapSector as Parameters<typeof getSectorScalePerRadius>[0]) : 0
+  if (!gameGuid || !sectorMacro) {
+    return {
+      scalePerRadius: mapScalePerRadius,
+      source: 'map' as const
+    }
+  }
+  const archiveSector = resolveBindingArchive(gameGuid)?.sectors?.[sectorMacro]
+  if (!archiveSector) {
+    return {
+      scalePerRadius: mapScalePerRadius,
+      source: 'map-fallback-missing-archive-sector' as const
+    }
+  }
+  if (typeof archiveSector.scale_per_radius === 'number' && Number.isFinite(archiveSector.scale_per_radius) && archiveSector.scale_per_radius > 0) {
+    return {
+      scalePerRadius: archiveSector.scale_per_radius,
+      source: 'archive' as const
+    }
+  }
+  logBindingDataError('archive-sector-missing-scale', {
+    gameGuid,
+    sectorMacro,
+    sectorId,
+    hasArchiveSector: true,
+    archiveScalePerRadius: archiveSector.scale_per_radius ?? null,
+    mapScalePerRadius
+  })
+  return {
+    scalePerRadius: 0,
+    source: 'archive-missing-scale' as const
+  }
 }
 
 const buildSaveSectorLocalRatio = (
+  gameGuid: string | null,
+  sectorMacro: string | null,
   sectorId: string,
-  position: { x: number; z: number },
-  saveScalePerRadius?: number
+  position: { x: number; z: number }
 ) => {
   const sector = gameDataStore.maps?.sectors?.[sectorId]
   if (!sector) return undefined
+  const scaleContext = resolveBindingScaleContext(gameGuid, sectorMacro, sectorId)
   return sectorPointToLocalRatioWithScale(
     sector as Parameters<typeof sectorPointToLocalRatioWithScale>[0],
     position,
-    { scalePerRadius: saveScalePerRadius }
+    { scalePerRadius: scaleContext.scalePerRadius }
   ) || undefined
 }
 
@@ -401,7 +443,6 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
       if (group.tradestationBinding?.position && group.sectorMacro) {
         const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, group.sectorMacro)
         if (resolved) {
-          const saveScalePerRadius = archive?.sectors[group.sectorMacro]?.scale_per_radius
           overlays.push({
             key: `binding:tradestation:${group.sectorGroupId}`,
             id: group.tradestationBinding.stationId,
@@ -418,10 +459,10 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
               sunlight: 0,
               resources: []
             },
-            localRatio: buildSaveSectorLocalRatio(resolved.sectorId, {
+            localRatio: buildSaveSectorLocalRatio(plan.gameGuid, group.sectorMacro, resolved.sectorId, {
               x: group.tradestationBinding.position.x,
               z: group.tradestationBinding.position.z
-            }, saveScalePerRadius),
+            }),
             binding: {
               gameGuid: plan.gameGuid,
               sectorGroupId: group.sectorGroupId,
@@ -437,7 +478,6 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
         if (stationBinding.position && stationBinding.sectorMacro) {
           const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationBinding.sectorMacro)
           if (resolved) {
-            const saveScalePerRadius = archive?.sectors[stationBinding.sectorMacro]?.scale_per_radius
             const station = empire.stations?.find(s => s.id === stationBinding.stationId)
             overlays.push({
               key: `binding:station:${stationBinding.stationId}`,
@@ -455,10 +495,10 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
                 sunlight: 0,
                 resources: []
               },
-              localRatio: buildSaveSectorLocalRatio(resolved.sectorId, {
+              localRatio: buildSaveSectorLocalRatio(plan.gameGuid, stationBinding.sectorMacro, resolved.sectorId, {
                 x: stationBinding.position.x,
                 z: stationBinding.position.z
-              }, saveScalePerRadius),
+              }),
               binding: {
                 gameGuid: plan.gameGuid,
                 sectorGroupId: group.sectorGroupId,
@@ -927,9 +967,9 @@ const resolveBindingLocationSampleAtPointer = (clientX: number, clientY: number)
       sectorMacro: null
     }
   }
-  const saveScalePerRadius = resolveSaveSectorScalePerRadius(draggingBindingKey.value, sectorMacro)
   const sector = gameDataStore.maps?.sectors?.[sectorId]
-  const effectiveScalePerRadius = saveScalePerRadius || mapSector.scalePerRadius
+  const scaleContext = resolveBindingScaleContext(draggingBindingKey.value, sectorMacro, sectorId)
+  const effectiveScalePerRadius = scaleContext.scalePerRadius
   const resolvedRawPosition = sector
     ? sectorLocalRatioToRawPointWithScale(
         sector as Parameters<typeof sectorLocalRatioToRawPointWithScale>[0],
@@ -956,9 +996,10 @@ const resolveBindingLocationSampleAtPointer = (clientX: number, clientY: number)
     sectorId,
     localRatioX: roundFormulaNumber(localRatio.x),
     localRatioY: roundFormulaNumber(localRatio.y),
-    saveScalePerRadius: roundFormulaNumber(saveScalePerRadius, 12),
+    saveScalePerRadius: roundFormulaNumber(scaleContext.source === 'archive' ? scaleContext.scalePerRadius : 0, 12),
     fallbackMapScalePerRadius: roundFormulaNumber(mapSector.scalePerRadius, 12),
     effectiveScalePerRadius: roundFormulaNumber(effectiveScalePerRadius, 12),
+    scaleSource: scaleContext.source,
     saveRawPositionX: bindingSample.location.pos.x,
     saveRawPositionZ: bindingSample.location.pos.z
   })
@@ -1005,7 +1046,7 @@ const resolveBindingPreviewAtPointer = (clientX: number, clientY: number): Place
   }
   const previewLocalRatio = sample.localRatio
   const layout = searchSectors.value.find((item) => item.sectorId === location.sector_id)
-  const saveScalePerRadius = resolveSaveSectorScalePerRadius(draggingBindingKey.value, sectorMacro)
+  const scaleContext = resolveBindingScaleContext(draggingBindingKey.value, sectorMacro, location.sector_id)
   const projectedScreen = previewLocalRatio && layout ? {
     x: layout.centerX + previewLocalRatio.x * layout.radius,
     y: layout.centerY + previewLocalRatio.y * layout.radius
@@ -1016,7 +1057,9 @@ const resolveBindingPreviewAtPointer = (clientX: number, clientY: number): Place
     sectorId: location.sector_id,
     rawPositionX: location.pos.x,
     rawPositionZ: location.pos.z,
-    saveScalePerRadius: roundFormulaNumber(saveScalePerRadius, 12),
+    saveScalePerRadius: roundFormulaNumber(scaleContext.source === 'archive' ? scaleContext.scalePerRadius : 0, 12),
+    effectiveScalePerRadius: roundFormulaNumber(scaleContext.scalePerRadius, 12),
+    scaleSource: scaleContext.source,
     previewLocalRatioX: roundFormulaNumber(previewLocalRatio?.x),
     previewLocalRatioY: roundFormulaNumber(previewLocalRatio?.y),
     projectedScreenX: roundFormulaNumber(projectedScreen?.x, 3),
@@ -1708,7 +1751,11 @@ const onMouseMove = (event: MouseEvent) => {
         sectorId: sample.location.sector_id,
         rawPositionX: sample.location.pos.x,
         rawPositionZ: sample.location.pos.z,
-        saveScalePerRadius: roundFormulaNumber(resolveSaveSectorScalePerRadius(draggingBindingKey.value, sectorMacro), 12),
+        saveScalePerRadius: roundFormulaNumber(resolveBindingScaleContext(draggingBindingKey.value, sectorMacro, sample.location.sector_id).source === 'archive'
+          ? resolveBindingScaleContext(draggingBindingKey.value, sectorMacro, sample.location.sector_id).scalePerRadius
+          : 0, 12),
+        effectiveScalePerRadius: roundFormulaNumber(resolveBindingScaleContext(draggingBindingKey.value, sectorMacro, sample.location.sector_id).scalePerRadius, 12),
+        scaleSource: resolveBindingScaleContext(draggingBindingKey.value, sectorMacro, sample.location.sector_id).source,
         previewLocalRatioX: roundFormulaNumber(sample.localRatio?.x),
         previewLocalRatioY: roundFormulaNumber(sample.localRatio?.y),
         projectedScreenX: roundFormulaNumber(projectedScreen?.x, 3),

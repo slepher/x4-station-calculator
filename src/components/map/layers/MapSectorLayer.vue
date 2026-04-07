@@ -67,7 +67,7 @@ const emit = defineEmits<{
           :clip-path="`url(#${sectorClipId(cluster.id, cluster.sectors[0].id)})`"
         >
           <path
-            v-for="slice in buildPieSliceGeometries(cluster.sectors[0].id, cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+            v-for="slice in buildPieSliceGeometries(cluster.sectors[0].id, cluster.sectors[0].sx, cluster.sectors[0].sy, cluster.sectors[0].radius)"
             :key="`${cluster.sectors[0]?.id}-${slice.ware}`"
             data-testid="resource-pie-slice"
             :d="slice.path"
@@ -76,7 +76,7 @@ const emit = defineEmits<{
           />
         </g>
         <polygon
-          :points="hexPoints(cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+          :points="hexPoints(cluster.sectors[0]?.sx || cluster.cx, cluster.sectors[0]?.sy || cluster.cy, cluster.sectors[0]?.radius || cluster.singleRadius || 0)"
           :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
           :fill-opacity="sectorFillOpacity(cluster.sectors[0]?.id || '')"
           :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
@@ -89,8 +89,8 @@ const emit = defineEmits<{
           :stroke-dasharray="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
         />
         <text
-          :x="cluster.cx.toFixed(1)"
-          :y="(cluster.singleLabelY || 0).toFixed(1)"
+          :x="(cluster.sectors[0]?.sx || cluster.cx).toFixed(1)"
+          :y="(cluster.singleLabelY || cluster.sectors[0]?.labelY || 0).toFixed(1)"
           text-anchor="middle"
           dominant-baseline="text-before-edge"
           alignment-baseline="text-before-edge"
@@ -103,7 +103,7 @@ const emit = defineEmits<{
           {{ cluster.singleLabel }}
         </text>
         <g
-          v-for="badge in buildResourceGroupBadgeGeometries(cluster.sectors[0]?.id || '', cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+          v-for="badge in buildResourceGroupBadgeGeometries(cluster.sectors[0]?.id || '', cluster.sectors[0]?.sx || cluster.cx, cluster.sectors[0]?.sy || cluster.cy, cluster.sectors[0]?.radius || cluster.singleRadius || 0)"
           :key="badge.key"
           data-testid="resource-group-badge"
         >
