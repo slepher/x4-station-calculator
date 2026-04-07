@@ -19,7 +19,7 @@ const emit = defineEmits<{
   (e: 'close'): void
   (e: 'focus-sector', sectorId: string): void
   (e: 'fit-sectors', sectorIds: string[]): void
-  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard'; coverageSectorMacros: string[] }): void
+  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }): void
   (e: 'drag-station-end'): void
 }>()
 

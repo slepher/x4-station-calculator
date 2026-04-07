@@ -9,19 +9,19 @@ import type {
   ResolvedGroupSaveBinding,
   ResolvedStationSaveBinding,
   SectorPlan,
-  StationPlan
+  StationPlan,
+  CoverageSectorEntry
 } from '@/types/x4'
 import type { PlayerStationEntry, SaveArchive } from '@/types/saveArchive'
 import {
-  calculateCoverageSectorMacros,
   resolveGroupSaveBinding,
   resolveStationSaveBinding,
   getSaveSectorsWithPlayerStations,
   getCoverageSectors,
-  getFilteredSaveStations,
   buildSectorGraphFromMaps,
   type SectorCoverageResult,
-  type FilteredSaveStationsResult
+  type FilteredSaveStationsResult,
+  getFilteredSaveStations
 } from '@/store/logic/saveBindingUtils'
 
 export interface SaveSectorInfo {
@@ -55,7 +55,7 @@ export interface EmpireStationBindingInfo {
 export interface GroupBindingInfo {
   group: SectorPlan
   binding: ResolvedGroupSaveBinding | null
-  coverageSectorMacros: string[]
+  coverageSectorMacros: CoverageSectorEntry[]
 }
 
 export interface MapBindingViewModel {
@@ -230,7 +230,6 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     const sectors = empire.sectors || []
     const bindingKey = activeBindingPlan.value?.gameGuid
     const archive = getActiveArchive()
-    const { sectorGraph, sectorClusterMap } = getSectorGraphAndClusterMap()
 
     return sectors.map((group) => {
       const rawBinding = bindingKey
@@ -238,9 +237,8 @@ export function useMapBindingViewModel(): MapBindingViewModel {
         : null
 
       const binding = rawBinding ? resolveGroupSaveBinding(rawBinding, archive) : null
-      const coverageSectorMacros = rawBinding?.sectorMacro
-        ? calculateCoverageSectorMacros(rawBinding.sectorMacro, rawBinding.jumpRange, sectorGraph, sectorClusterMap)
-        : []
+      // Use stored coverage entries directly instead of recalculating
+      const coverageSectorMacros = rawBinding?.coverageSectorMacros || []
 
       return { group, binding, coverageSectorMacros }
     })

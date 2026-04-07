@@ -931,6 +931,14 @@ export const useEmpireStore = defineStore('empire', () => {
     }
   }
 
+  function updateStationSector(stationId: string, sectorId: string | null) {
+    const station = getStationById(stationId)
+    if (station) {
+      station.sectorId = sectorId || undefined
+      station.lastUpdated = Date.now()
+    }
+  }
+
   function updateEmpireName(name: string) {
     if (activeEmpire.value) {
       activeEmpire.value.name = name
@@ -968,7 +976,7 @@ export const useEmpireStore = defineStore('empire', () => {
     bindingDirtyMarker.value++
   }
 
-  const bindingActions = createSaveBindingActions(activeEmpire, onBindingDirty)
+  const bindingActions = createSaveBindingActions(activeEmpire, onBindingDirty, updateStationSector)
 
   // ========== End SavePlans Binding Actions ==========
 
@@ -1087,6 +1095,7 @@ export const useEmpireStore = defineStore('empire', () => {
     getStationById,
     updateStationSettings,
     updateStationModules,
+    updateStationSector,
     updateEmpireName,
     shouldConfirmBeforeEmpireReset,
     resetEmpireWithDefaultName,
@@ -1104,6 +1113,8 @@ export const useEmpireStore = defineStore('empire', () => {
     getGroupBinding: bindingActions.getGroupBinding,
     setTradestationBinding: bindingActions.setTradestationBinding,
     clearTradestationBinding: bindingActions.clearTradestationBinding,
+    bindTradestationToSaveStation: bindingActions.bindTradestationToSaveStation,
+    clearTradestationCode: bindingActions.clearTradestationCode,
     bindStationToSaveStation: bindingActions.bindStationToSaveStation,
     clearStationBinding: bindingActions.clearStationBinding,
     setStationBindingPosition: bindingActions.setStationBindingPosition,

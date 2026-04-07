@@ -9,7 +9,7 @@ import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 import { getCoverageSectors, buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from './mapSectorMacro'
 import JumpInput from '@/components/common/JumpInput.vue'
-import type { SaveBindingPlan, SectorPlan } from '@/types/x4'
+import type { SaveBindingPlan, SectorPlan, CoverageSectorEntry } from '@/types/x4'
 import type { PlayerStationEntry, SaveArchive } from '@/types/saveArchive'
 
 const props = defineProps<{
@@ -68,11 +68,16 @@ const activeArchive = computed<SaveArchive | null>(() => {
   return archive ?? group.saves[0] ?? null
 })
 
+interface CoverageDraftEntry {
+  ref: string
+  jump: number
+}
+
 interface BindingDraftState {
   sectorGroupId: string | null
   anchorSectorMacro: string | null
   jumpRange: number
-  coverage: string[]
+  coverage: CoverageDraftEntry[]
 }
 
 const initialDraftState = (): BindingDraftState => ({
@@ -217,7 +222,7 @@ function isSectorBoundToOtherGroup(sectorMacro: string, currentGroupId: string):
     // 检查是否是其他 group 的定位星区
     if (b.sectorMacro?.toLowerCase() === macroLower) return true
     // 检查是否是其他 group 的覆盖星区
-    return b.coverageSectorMacros?.some(m => m.toLowerCase() === macroLower)
+    return b.coverageSectorMacros?.some(entry => entry.ref.toLowerCase() === macroLower)
   })
 }
 
@@ -233,7 +238,7 @@ function isSaveSectorBound(sectorMacro: string): boolean {
   
   // 检查是否是覆盖星区
   const isCoverage = activeBindingPlan.value.groupBindings.some(
-    b => b.coverageSectorMacros?.some(m => m.toLowerCase() === macroLower)
+    b => b.coverageSectorMacros?.some(entry => entry.ref.toLowerCase() === macroLower)
   )
   return isCoverage
 }
@@ -253,7 +258,7 @@ function getBoundSectorGroupName(sectorMacro: string): string | null {
   
   // 再检查是否是某 group 的覆盖星区
   const groupBinding = activeBindingPlan.value.groupBindings.find(
-    (b) => b.coverageSectorMacros?.some(m => m.toLowerCase() === macroLower)
+    (b) => b.coverageSectorMacros?.some(entry => entry.ref.toLowerCase() === macroLower)
   )
   if (groupBinding) {
     const sector = empireSectors.value.find((s) => s.id === groupBinding.sectorGroupId)
@@ -285,7 +290,7 @@ function getSectorMacroDisplayName(sectorMacro: string): string {
 
 function selectSaveSector(sectorMacro: string) {
   const groupBinding = activeBindingPlan.value?.groupBindings.find(
-    (b) => b.coverageSectorMacros?.some(m => m.toLowerCase() === sectorMacro.toLowerCase())
+    (b) => b.coverageSectorMacros?.some(entry => entry.ref.toLowerCase() === sectorMacro.toLowerCase())
   )
   if (groupBinding) {
     emit('select-group', groupBinding.sectorGroupId)
@@ -357,9 +362,20 @@ function selectSaveSectorForBinding(sectorMacro: string) {
   if (!bindMenuTargetSectorId.value) return
 
   const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
-  const coverage = getCoverageSectors(sectorMacro.toLowerCase(), draft.value.jumpRange, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
 
-  draft.value.coverage = coverage.map(s => s.sectorMacro)
+  // Build coverage entries with jump distance
+  const sectorJumpMap = new Map<string, number>()
+  for (let jump = 1; jump <= draft.value.jumpRange; jump++) {
+    const result = getCoverageSectors(sectorMacro.toLowerCase(), jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
+    for (const s of result) {
+      const mLower = s.sectorMacro.toLowerCase()
+      if (mLower !== sectorMacro.toLowerCase() && !sectorJumpMap.has(mLower)) {
+        sectorJumpMap.set(mLower, jump)
+      }
+    }
+  }
+  
+  draft.value.coverage = Array.from(sectorJumpMap.entries()).map(([ref, jump]) => ({ ref, jump }))
   draft.value.sectorGroupId = bindMenuTargetSectorId.value
   draft.value.anchorSectorMacro = sectorMacro
 
@@ -406,16 +422,24 @@ function onMenuSectorClick(sectorMacro: string) {
     // 点击新星区，继承之前的跳数，重新计算 coverage
     // 覆盖星区 = 跳数范围内所有 save sector（不包括 anchor）
     const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
-    const coverageResult = getCoverageSectors(sectorMacro.toLowerCase(), draft.value.jumpRange, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
     
-    // 从跳数范围内的星区中筛选出 save sector，排除 anchor
+    // Build coverage entries with jump distance
+    const sectorJumpMap = new Map<string, number>()
+    for (let jump = 1; jump <= draft.value.jumpRange; jump++) {
+      const result = getCoverageSectors(sectorMacro.toLowerCase(), jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
+      for (const s of result) {
+        const mLower = s.sectorMacro.toLowerCase()
+        if (mLower !== sectorMacro.toLowerCase() && !sectorJumpMap.has(mLower)) {
+          sectorJumpMap.set(mLower, jump)
+        }
+      }
+    }
+    
+    // 筛选 save sector
     const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
-    draft.value.coverage = coverageResult
-      .map(s => s.sectorMacro)
-      .filter(m => {
-        const mLower = m.toLowerCase()
-        return saveSectorMacros.has(mLower) && mLower !== sectorMacro.toLowerCase()
-      })
+    draft.value.coverage = Array.from(sectorJumpMap.entries())
+      .filter(([ref]) => saveSectorMacros.has(ref.toLowerCase()))
+      .map(([ref, jump]) => ({ ref, jump }))
   }
   
   draft.value.sectorGroupId = bindMenuTargetSectorId.value
@@ -454,135 +478,56 @@ function updateDraftJumpRange(newValue: number, _oldValue?: number) {
   const anchorMacro = draft.value.anchorSectorMacro.toLowerCase()
   const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
   
-  // 获取按跳数分组的星区
-  const coverageByJump = new Map<number, { macro: string; isSaveSector: boolean }[]>()
-  for (let jump = 1; jump <= Math.max(oldValue, newValue); jump++) {
+  // 获取每个星区的实际跳数
+  const sectorJumpMap = new Map<string, number>()
+  for (let jump = 1; jump <= Math.max(oldValue, newValue, 5); jump++) {
     const result = getCoverageSectors(anchorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
-    
-    const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
-    
-    // 筛选 save sector 并排除 anchor
-    const sectorsAtJump = result
-      .map(s => s.sectorMacro)
-      .filter(m => {
-        const mLower = m.toLowerCase()
-        const isSave = saveSectorMacros.has(mLower)
-        const isAnchor = mLower === anchorMacro
-        return isSave && !isAnchor
-      })
-      .map(m => ({
-        macro: m,
-        isSaveSector: saveSectorMacros.has(m.toLowerCase())
-      }))
-    
-    coverageByJump.set(jump, sectorsAtJump)
+    for (const s of result) {
+      const mLower = s.sectorMacro.toLowerCase()
+      if (mLower !== anchorMacro && !sectorJumpMap.has(mLower)) {
+        sectorJumpMap.set(mLower, jump)
+      }
+    }
   }
+  
+  // 获取 save sector 列表（用于自动添加）
+  const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
   
   draft.value.jumpRange = newValue
   
   if (newValue > oldValue) {
     // 跳数增加：添加新跳数范围内但不在旧跳数范围内的 save sector
-    const oldCoverageSet = new Set<string>()
-    for (let jump = 1; jump <= oldValue; jump++) {
-      const sectorsAtJump = coverageByJump.get(jump) || []
-      sectorsAtJump.forEach(s => oldCoverageSet.add(s.macro.toLowerCase()))
-    }
-    
-    const newCoverageSet = new Set<string>()
-    for (let jump = 1; jump <= newValue; jump++) {
-      const sectorsAtJump = coverageByJump.get(jump) || []
-      sectorsAtJump.forEach(s => newCoverageSet.add(s.macro.toLowerCase()))
-    }
-    
-    // 添加只在 newCoverage 中但不在 oldCoverage 中的星区
-    for (const sectorLower of newCoverageSet) {
-      if (!oldCoverageSet.has(sectorLower)) {
-        // 找到原始大小写的 sectorMacro
-        const originalMacro = Array.from(coverageByJump.values())
-          .flat()
-          .find(s => s.macro.toLowerCase() === sectorLower)?.macro
-        if (originalMacro && !draft.value.coverage.some(m => m.toLowerCase() === sectorLower)) {
-          draft.value.coverage.push(originalMacro)
+    for (const [sectorLower, jump] of sectorJumpMap) {
+      if (jump > oldValue && jump <= newValue && saveSectorMacros.has(sectorLower)) {
+        if (!draft.value.coverage.some(c => c.ref.toLowerCase() === sectorLower)) {
+          const originalMacro = Array.from(sectorJumpMap.keys()).find(k => k.toLowerCase() === sectorLower)
+          if (originalMacro) {
+            draft.value.coverage.push({ ref: originalMacro, jump })
+          }
         }
       }
     }
-    draft.value.jumpRange = newValue
   } else if (newValue < oldValue) {
     // 跳数减少：移除超出跳数的星区
-    const sectorsToKeep = new Set<string>()
-    
-    // 收集0到newValue跳的所有星区
-    for (let jump = 1; jump <= newValue; jump++) {
-      const sectorsAtJump = coverageByJump.get(jump) || []
-      sectorsAtJump.forEach(s => sectorsToKeep.add(s.macro.toLowerCase()))
-    }
-    
-    // 只保留在范围内的星区
-    draft.value.coverage = draft.value.coverage.filter(m => sectorsToKeep.has(m.toLowerCase()))
-    draft.value.jumpRange = newValue
+    draft.value.coverage = draft.value.coverage.filter(c => c.jump <= newValue)
   }
 }
 
 // 获取指定跳数的覆盖星区
 function getCoverageSectorsAtJump(jump: number): string[] {
-  if (!draft.value.anchorSectorMacro) return []
-  
-  const anchorMacro = draft.value.anchorSectorMacro.toLowerCase()
-  const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
-  
-  // 获取当前跳数的结果
-  const result = getCoverageSectors(anchorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
-  
-  // 获取前一跳的结果（用于计算差值）
-  const prevResult = jump > 1 
-    ? getCoverageSectors(anchorMacro, jump - 1, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
-    : []
-  
-  const prevMacros = new Set(prevResult.map(s => s.sectorMacro.toLowerCase()))
-  
-  // 筛选：在当前跳但不在前一跳的 save sector（不包括 anchor）
-  const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro.toLowerCase()))
-  const sectorsAtJump = result
-    .map(s => s.sectorMacro)
-    .filter(m => {
-      const mLower = m.toLowerCase()
-      return saveSectorMacros.has(mLower) && 
-             mLower !== anchorMacro && 
-             !prevMacros.has(mLower)
-    })
-  
-  // 返回在当前 coverage 中的星区
-  const coverageSet = new Set(draft.value.coverage.map(m => m.toLowerCase()))
-  return sectorsAtJump.filter(m => coverageSet.has(m.toLowerCase()))
+  return draft.value.coverage
+    .filter(c => c.jump === jump)
+    .map(c => c.ref)
 }
 
 // 获取非展开状态下按跳数分组的覆盖星区
-function getCollapsedCoverageByJump(anchorMacro: string, jumpRange: number, coverageMacros: string[]): Map<number, string[]> {
+function getCollapsedCoverageByJump(coverageEntries: CoverageSectorEntry[]): Map<number, string[]> {
   const result = new Map<number, string[]>()
-  if (!anchorMacro) return result
   
-  const anchorLower = anchorMacro.toLowerCase()
-  const coverageSet = new Set(coverageMacros.map(m => m.toLowerCase()))
-  const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {})
-  
-  const prevMacros = new Set<string>()
-  
-  for (let jump = 1; jump <= jumpRange; jump++) {
-    const coverageResult = getCoverageSectors(anchorLower, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
-    
-    // 当前跳的星区（不包括前一跳）
-    const sectorsAtJump: string[] = []
-    for (const s of coverageResult) {
-      const macroLower = s.sectorMacro.toLowerCase()
-      if (macroLower !== anchorLower && !prevMacros.has(macroLower) && coverageSet.has(macroLower)) {
-        sectorsAtJump.push(s.sectorMacro)
-        prevMacros.add(macroLower)
-      }
-    }
-    
-    if (sectorsAtJump.length > 0) {
-      result.set(jump, sectorsAtJump)
-    }
+  for (const entry of coverageEntries) {
+    const macros = result.get(entry.jump) || []
+    macros.push(entry.ref)
+    result.set(entry.jump, macros)
   }
   
   return result
@@ -614,20 +559,20 @@ function getCandidateSectorsAtJump(jump: number): string[] {
     })
   
   // 返回不在 coverage 中的星区
-  const coverageSet = new Set(draft.value.coverage.map(m => m.toLowerCase()))
-  return sectorsAtJump.filter(m => !coverageSet.has(m.toLowerCase()))
+  const coverageRefs = new Set(draft.value.coverage.map(c => c.ref.toLowerCase()))
+  return sectorsAtJump.filter(m => !coverageRefs.has(m.toLowerCase()))
 }
 
 function excludeFromCoverage(sectorMacro: string) {
-  const index = draft.value.coverage.indexOf(sectorMacro)
+  const index = draft.value.coverage.findIndex(c => c.ref.toLowerCase() === sectorMacro.toLowerCase())
   if (index >= 0) {
     draft.value.coverage.splice(index, 1)
   }
 }
 
-function addToCoverage(sectorMacro: string) {
-  if (!draft.value.coverage.includes(sectorMacro)) {
-    draft.value.coverage.push(sectorMacro)
+function addToCoverage(sectorMacro: string, jump: number) {
+  if (!draft.value.coverage.some(c => c.ref.toLowerCase() === sectorMacro.toLowerCase())) {
+    draft.value.coverage.push({ ref: sectorMacro, jump })
   }
 }
 
@@ -769,7 +714,7 @@ onBeforeUnmount(() => {
                       v-if="!isSectorBoundToOtherGroup(macro, sector.id)"
                       class="pill-plus" 
                       type="button" 
-                      @click.stop="addToCoverage(macro)"
+                      @click.stop="addToCoverage(macro, jump)"
                     >+</button>
                   </span>
                 </div>
@@ -796,10 +741,10 @@ onBeforeUnmount(() => {
               :key="jump"
               class="collapsed-pill-row"
             >
-              <template v-if="getCollapsedCoverageByJump(sector.sectorMacro!, sector.jumpRange, sector.coverageMacros).get(jump)?.length">
+              <template v-if="getCollapsedCoverageByJump(sector.coverageMacros).get(jump)?.length">
                 <span class="jump-label">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <span
-                  v-for="macro in getCollapsedCoverageByJump(sector.sectorMacro!, sector.jumpRange, sector.coverageMacros).get(jump)"
+                  v-for="macro in getCollapsedCoverageByJump(sector.coverageMacros).get(jump)"
                   :key="macro"
                   class="pill pill--small pill--clickable"
                   @click.stop="focusSectorByMacro(macro)"

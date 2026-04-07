@@ -10,13 +10,7 @@ import type { StationSaveBinding, StationPlan } from '@/types/x4'
 import type { PlayerStationEntry } from '@/types/saveArchive'
 import factoryIconUrl from '@/components/icons/factory.svg'
 import shipyardIconUrl from '@/components/icons/shipyard.svg'
-
-type SectorWithStations = {
-  sectorMacro: string
-  sectorName: string
-  distance: number
-  stations: PlayerStationEntry[]
-}
+import tradestationIconUrl from '@/components/icons/tradestation.svg'
 
 const props = defineProps<{
   gameGuid: string
@@ -26,7 +20,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'focus-sector', sectorId: string): void
   (e: 'fit-sectors', sectorIds: string[]): void
-  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard'; coverageSectorMacros: string[] }): void
+  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }): void
   (e: 'drag-station-end'): void
 }>()
 
@@ -45,11 +39,13 @@ const bindMenuSectorMacro = ref<string | null>(null)
 const bindMenuTriggerEl = ref<HTMLElement | null>(null)
 
 const pendingDrag = ref<{
-  item: { station: StationPlan; sectorGroupId: string; sectorGroupName: string }
+  type: 'station' | 'virtualTradestation'
+  item?: { station: StationPlan; sectorGroupId: string; sectorGroupName: string }
   startX: number
   startY: number
 } | null>(null)
 const activeDragStationId = ref<string | null>(null)
+const activeDragVirtualTradestation = ref(false)
 const DRAG_START_THRESHOLD_PX = 4
 
 const iconUrlByType = {
@@ -91,83 +87,134 @@ const activeArchive = computed(() => {
   return group.saves.find((s) => s.meta.time === time) || group.saves[0] || null
 })
 
-const coverageSectorsWithStations = computed<SectorWithStations[]>(() => {
-  if (!activeArchive.value || !currentGroupBinding.value) return []
+const freeStations = computed(() => {
+  if (!activeEmpire.value) return []
+
+  const stationBindings = currentGroupBinding.value?.stationBindings || []
+  
+  // 所有没有 stationBinding 的 empire station 都是自由空间站
+  const freeEmpireStations = activeEmpire.value.stations
+    .filter((station) => {
+      const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
+      return !binding
+    })
+    .map((station) => ({
+      station,
+      sectorGroupId: station.sectorId || '',
+      sectorGroupName: '',
+      sectorMacro: undefined,
+      type: station.sectorId ? 'empire' as const : 'orphan' as const
+    }))
+
+  return freeEmpireStations
+})
+
+const virtualTradestation = computed(() => {
+  if (!currentGroupBinding.value) return null
+  
+  // 未放置 = 无 tradestationBinding
+  if (!currentGroupBinding.value.tradestationBinding) {
+    return {
+      type: 'virtual' as const,
+      name: t('map.binding_tradestation_virtual')
+    }
+  }
+  return null
+})
+
+const anchorAndCoverageSectors = computed(() => {
+  if (!currentGroupBinding.value) return []
 
   const anchorMacro = currentGroupBinding.value.sectorMacro
-  const coverageMacros = currentGroupBinding.value.coverageSectorMacros || []
+  const coverageEntries = currentGroupBinding.value.coverageSectorMacros || []
   
-  // 合并：定位星区 + 覆盖星区
-  const allMacros = new Set<string>()
-  if (anchorMacro) allMacros.add(anchorMacro.toLowerCase())
-  coverageMacros.forEach(m => allMacros.add(m.toLowerCase()))
+  // Build unique sector macros from anchor and coverage entries
+  const allMacros: string[] = []
+  if (anchorMacro) allMacros.push(anchorMacro)
+  coverageEntries.forEach(entry => {
+    if (!allMacros.some(existing => existing.toLowerCase() === entry.ref.toLowerCase())) {
+      allMacros.push(entry.ref)
+    }
+  })
   
-  const results: SectorWithStations[] = []
+  // Build a map from macro to jump distance
+  const macroJumpMap = new Map<string, number>()
+  coverageEntries.forEach(entry => {
+    macroJumpMap.set(entry.ref.toLowerCase(), entry.jump)
+  })
+  
+  const results: Array<{
+    sectorMacro: string
+    sectorName: string
+    isAnchor: boolean
+    distance: number
+    saveStations: PlayerStationEntry[]
+    placedFreeStations: Array<{ stationId: string; stationName: string; sectorMacro: string }>
+    hasPlacedVirtualTradestation: boolean
+  }> = []
 
-  for (const [sectorMacro, sector] of Object.entries(activeArchive.value.sectors)) {
+  for (const sectorMacro of allMacros) {
     const normalizedMacro = sectorMacro.toLowerCase()
-    if (!allMacros.has(normalizedMacro)) continue
-
-    const stations = sector.playerStations || []
-    if (stations.length === 0) continue
-
+    const isAnchor = !!(anchorMacro && normalizedMacro === anchorMacro.toLowerCase())
+    
     const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
-    let sectorName = sector.name || sectorMacro
+    let sectorName = sectorMacro
     if (resolved?.sectorId) {
       const cluster = gameDataStore.maps?.clusters?.[resolved.clusterId]
       const mapSector = cluster?.sectors?.[resolved.sectorId]
       if (mapSector?.nameId && te(mapSector.nameId)) {
         sectorName = t(mapSector.nameId)
+      } else if (mapSector?.name) {
+        sectorName = mapSector.name
       }
     }
 
-    // 计算距离
-    let distance = 0
-    if (anchorMacro && sectorMacro.toLowerCase() !== anchorMacro.toLowerCase()) {
-      const idx = coverageMacros.findIndex(m => m.toLowerCase() === sectorMacro.toLowerCase())
-      distance = idx >= 0 ? idx + 1 : 999
+    // Use jump from coverage entry, or 0 for anchor
+    const distance = isAnchor ? 0 : (macroJumpMap.get(normalizedMacro) || 0)
+
+    const saveStations: PlayerStationEntry[] = []
+    if (activeArchive.value) {
+      const sectorData = activeArchive.value.sectors[sectorMacro]
+      if (sectorData?.playerStations) {
+        saveStations.push(...sectorData.playerStations)
+      }
     }
+
+    const placedFreeStations: Array<{ stationId: string; stationName: string; sectorMacro: string }> = []
+    const stationBindings = currentGroupBinding.value.stationBindings || []
+    for (const binding of stationBindings) {
+      if (binding.sectorMacro?.toLowerCase() === normalizedMacro && binding.position) {
+        const station = activeEmpire.value?.stations.find(s => s.id === binding.stationId)
+        if (station) {
+          placedFreeStations.push({
+            stationId: station.id,
+            stationName: station.name,
+            sectorMacro: binding.sectorMacro
+          })
+        }
+      }
+    }
+
+    // Check if virtual tradestation is placed in this sector
+    const tb = currentGroupBinding.value.tradestationBinding
+    const hasPlacedVirtualTradestation = !!(tb?.position && tb.sectorMacro?.toLowerCase() === normalizedMacro)
 
     results.push({
       sectorMacro,
       sectorName,
+      isAnchor,
       distance,
-      stations
+      saveStations,
+      placedFreeStations,
+      hasPlacedVirtualTradestation
     })
   }
 
-  return results.sort((a, b) => a.distance - b.distance)
-})
-
-const idleStations = computed(() => {
-  if (!activeEmpire.value || !props.sectorGroupId) return []
-
-  const stationBindings = currentGroupBinding.value?.stationBindings || []
-  const sectorStations = activeEmpire.value.stations.filter((s) => s.sectorId === props.sectorGroupId)
-
-  return sectorStations
-    .filter((station) => {
-      const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
-      return !binding?.saveStationCode
-    })
-    .map((station) => {
-      const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
-      return {
-        station,
-        sectorGroupId: station.sectorId || '',
-        sectorGroupName: '',
-        sectorMacro: binding?.sectorMacro
-      }
-    })
-})
-
-const tradeStationsInSelectedSector = computed(() => {
-  if (!activeArchive.value || !currentGroupBinding.value?.sectorMacro) return []
-  
-  const sectorData = activeArchive.value.sectors[currentGroupBinding.value.sectorMacro]
-  if (!sectorData) return []
-  
-  return (sectorData.npcStations || []).filter((s) => s.isTradestation)
+  return results.sort((a, b) => {
+    if (a.isAnchor) return -1
+    if (b.isAnchor) return 1
+    return a.distance - b.distance
+  })
 })
 
 const stationBindingsInGroup = computed(() => {
@@ -305,6 +352,27 @@ function bindToStation(stationId: string) {
   closeBindMenu()
 }
 
+function bindToVirtualTradestation() {
+  if (!bindMenuSaveStation.value) return
+
+  const tb = currentGroupBinding.value?.tradestationBinding
+  const sectorMacro = tb?.sectorMacro || bindMenuSectorMacro.value || currentGroupBinding.value?.sectorMacro
+  
+  empireStore.bindTradestationToSaveStation({
+    gameGuid: props.gameGuid,
+    sectorGroupId: props.sectorGroupId,
+    saveStationCode: bindMenuSaveStation.value.code,
+    sectorMacro: sectorMacro || undefined,
+    position: tb?.position || {
+      x: bindMenuSaveStation.value.position.x,
+      y: bindMenuSaveStation.value.position.y,
+      z: bindMenuSaveStation.value.position.z
+    }
+  })
+
+  closeBindMenu()
+}
+
 function unbindStation(stationId: string) {
   empireStore.clearStationBinding(props.gameGuid, props.sectorGroupId, stationId)
 }
@@ -334,17 +402,12 @@ function importSaveStationFromMenu() {
   importSaveStation(bindMenuSaveStation.value, bindMenuSectorMacro.value)
 }
 
-function bindTradeStation(code: string) {
-  if (!currentGroupBinding.value) return
-  empireStore.setTradestationBinding({
-    gameGuid: props.gameGuid,
-    sectorGroupId: props.sectorGroupId,
-    saveStationCode: code
-  })
-}
-
 function clearFreeStationBinding(stationId: string) {
   empireStore.clearStationBinding(props.gameGuid, props.sectorGroupId, stationId)
+}
+
+function clearVirtualTradestationBinding() {
+  empireStore.clearTradestationBinding(props.gameGuid, props.sectorGroupId)
 }
 
 function getStationBindingStatus(stationId: string): 'ok' | 'missing' | 'none' {
@@ -354,32 +417,32 @@ function getStationBindingStatus(stationId: string): 'ok' | 'missing' | 'none' {
   return resolved.status === 'ok' ? 'ok' : 'missing'
 }
 
-function getSectorMacroDisplayName(sectorMacro: string): string {
-  const resolved = resolveMapSectorByMacro(gameDataStore.maps?.clusters || {}, sectorMacro)
-  if (resolved?.sectorId) {
-    const cluster = gameDataStore.maps?.clusters?.[resolved.clusterId]
-    const sector = cluster?.sectors?.[resolved.sectorId]
-    if (sector?.nameId && te(sector.nameId)) return t(sector.nameId)
-    return sector?.name || sectorMacro
-  }
-  return sectorMacro
-}
-
 const allStationsForMenu = computed(() => {
   if (!activeEmpire.value || !props.sectorGroupId) return []
 
   const stationBindings = currentGroupBinding.value?.stationBindings || []
-  const sectorStations = activeEmpire.value.stations.filter((s) => s.sectorId === props.sectorGroupId)
-
+  
+  // 所有 empire station
   const boundStationId = bindMenuSaveStation.value
     ? stationBindings.find((b: StationSaveBinding) => b.saveStationCode === bindMenuSaveStation.value?.code)?.stationId
     : null
 
-  const items: { station: StationPlan; sectorGroupId: string; sectorGroupName: string; sectorMacro?: string }[] = []
+  const items: Array<{ 
+    station: StationPlan
+    sectorGroupId: string
+    sectorGroupName: string
+    sectorMacro?: string
+  } | {
+    type: 'virtualTradestation'
+    name: string
+    sectorGroupId: string
+    sectorMacro?: string
+  }> = []
 
-  for (const station of sectorStations) {
+  // 1. 已放置但未绑定的空间站（有 stationBinding，无 saveStationCode）
+  for (const station of activeEmpire.value.stations) {
     const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
-
+    
     if (station.id === boundStationId) {
       items.push({
         station,
@@ -387,12 +450,48 @@ const allStationsForMenu = computed(() => {
         sectorGroupName: '',
         sectorMacro: binding?.sectorMacro
       })
-    } else if (!binding?.saveStationCode) {
+    } else if (binding && !binding.saveStationCode) {
       items.push({
         station,
         sectorGroupId: station.sectorId || '',
         sectorGroupName: '',
         sectorMacro: binding?.sectorMacro
+      })
+    } else if (!binding) {
+      // 2. 自由空间站（没有 stationBinding）
+      items.push({
+        station,
+        sectorGroupId: station.sectorId || '',
+        sectorGroupName: '',
+        sectorMacro: undefined
+      })
+    }
+  }
+
+  // 3. 已放置未绑定的虚拟补给站（有 position，无 tradestationCode）
+  // 4. 未放置的虚拟补给站（无 tradestationBinding）
+  // 只有定位星区的 save station 可以绑定虚拟补给站
+  const anchorMacro = currentGroupBinding.value?.sectorMacro
+  const tb = currentGroupBinding.value?.tradestationBinding
+  const tradestationCode = currentGroupBinding.value?.tradestationCode
+  const isAnchorSector = bindMenuSectorMacro.value?.toLowerCase() === anchorMacro?.toLowerCase()
+  
+  if (isAnchorSector) {
+    if (tb?.position && !tradestationCode) {
+      // 已放置未绑定
+      items.push({
+        type: 'virtualTradestation',
+        name: t('map.binding_tradestation_virtual'),
+        sectorGroupId: props.sectorGroupId,
+        sectorMacro: tb.sectorMacro
+      })
+    } else if (!tb) {
+      // 未放置
+      items.push({
+        type: 'virtualTradestation',
+        name: t('map.binding_tradestation_virtual'),
+        sectorGroupId: props.sectorGroupId,
+        sectorMacro: undefined
       })
     }
   }
@@ -400,8 +499,17 @@ const allStationsForMenu = computed(() => {
   return items
 })
 
-function onIdleStationMouseDown(event: MouseEvent, item: { station: StationPlan; sectorGroupId: string }) {
+function onVirtualTradestationMouseDown(event: MouseEvent) {
   pendingDrag.value = {
+    type: 'virtualTradestation',
+    startX: event.clientX,
+    startY: event.clientY
+  }
+}
+
+function onFreeStationMouseDown(event: MouseEvent, item: { station: StationPlan; sectorGroupId: string }) {
+  pendingDrag.value = {
+    type: 'station',
     item: { ...item, sectorGroupName: '' },
     startX: event.clientX,
     startY: event.clientY
@@ -418,10 +526,26 @@ onMounted(() => {
   window.addEventListener('scroll', onBindMenuViewportChange, true)
 
   const onWindowMouseMove = (event: MouseEvent) => {
-    if (pendingDrag.value && !activeDragStationId.value) {
-      const dx = event.clientX - pendingDrag.value.startX
-      const dy = event.clientY - pendingDrag.value.startY
-      if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
+    if (!pendingDrag.value) return
+    
+    const dx = event.clientX - pendingDrag.value.startX
+    const dy = event.clientY - pendingDrag.value.startY
+    if (Math.hypot(dx, dy) < DRAG_START_THRESHOLD_PX) return
+    
+    if (pendingDrag.value.type === 'virtualTradestation') {
+      if (!activeDragVirtualTradestation.value) {
+        activeDragVirtualTradestation.value = true
+        emit('drag-station-start', {
+          stationId: '__virtual_tradestation__',
+          gameGuid: props.gameGuid,
+          sectorGroupId: props.sectorGroupId,
+          name: t('map.binding_tradestation_virtual'),
+          icon: 'tradestation',
+          coverageSectorMacros: currentGroupBinding.value?.sectorMacro ? [{ ref: currentGroupBinding.value.sectorMacro, jump: 0 }] : [],
+          isVirtualTradestation: true
+        })
+      }
+    } else if (pendingDrag.value.type === 'station' && pendingDrag.value.item && !activeDragStationId.value) {
       activeDragStationId.value = pendingDrag.value.item.station.id
       emit('drag-station-start', {
         stationId: pendingDrag.value.item.station.id,
@@ -435,11 +559,12 @@ onMounted(() => {
   }
 
   const onWindowMouseUp = () => {
-    if (activeDragStationId.value) {
+    if (activeDragStationId.value || activeDragVirtualTradestation.value) {
       emit('drag-station-end')
     }
     pendingDrag.value = null
     activeDragStationId.value = null
+    activeDragVirtualTradestation.value = false
   }
 
   window.addEventListener('mousemove', onWindowMouseMove)
@@ -457,101 +582,141 @@ onMounted(() => {
 
 <template>
   <div class="binding-station">
-    <!-- Save Stations -->
-    <div class="section-header">{{ t('map.binding_save_stations') }}</div>
-    <div class="poi-groups">
-      <div class="poi-stats">
-        {{ coverageSectorsWithStations.reduce((sum, s) => sum + s.stations.length, 0) }} {{ t('map.save_coord_count') }}
-      </div>
-
-      <div v-if="coverageSectorsWithStations.length === 0" class="empty-hint">
-        {{ t('map.binding_no_stations') }}
-      </div>
-
+    <!-- Free Stations (Top) -->
+    <div class="section-header">{{ t('map.binding_free_stations') }}</div>
+    <div v-if="freeStations.length === 0 && !virtualTradestation" class="empty-hint">
+      {{ t('map.binding_no_stations') }}
+    </div>
+    <div v-else class="free-stations">
+      <!-- Virtual Trade Station -->
       <div
-        v-for="sector in coverageSectorsWithStations"
-        :key="sector.sectorMacro"
-        class="poi-group"
+        v-if="virtualTradestation"
+        class="free-station-item free-station-item--virtual"
+        @mousedown="onVirtualTradestationMouseDown($event)"
       >
-        <div class="poi-header">
-          <span class="poi-name">{{ sector.sectorName }}</span>
-          <span class="poi-distance">{{ sector.distance }}j</span>
+        <div class="station-icon-wrap">
+          <img class="station-icon" :src="tradestationIconUrl" alt="" />
         </div>
-        <div class="poi-list">
-          <div
-            v-for="station in sector.stations"
-            :key="station.code"
-            class="poi-item"
-            :class="{ 'poi-item--bound': isSaveStationBound(station.code) }"
+        <div class="station-info">
+          <div class="station-name">{{ virtualTradestation.name }}</div>
+          <div class="station-type">{{ t('map.binding_tradestation_virtual') }}</div>
+        </div>
+        <div class="station-handle">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+
+      <!-- Empire Free Stations -->
+      <div
+        v-for="item in freeStations"
+        :key="item.station.id"
+        class="free-station-item"
+        :class="{
+          'free-station-item--dragging': activeDragStationId === item.station.id,
+          'free-station-item--orphan': item.type === 'orphan'
+        }"
+        @mousedown="onFreeStationMouseDown($event, item)"
+      >
+        <img
+          class="station-icon"
+          :src="iconUrlByType[item.station.type === 'shipyard' ? 'shipyard' : 'factory']"
+          alt=""
+        />
+        <div class="station-info">
+          <div class="station-name">{{ item.station.name }}</div>
+          <div v-if="item.type === 'orphan'" class="station-type">
+            {{ t('map.binding_sector_not_bound') }}
+          </div>
+        </div>
+        <div class="station-handle">
+          <span></span><span></span><span></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Anchor & Coverage Sectors (Bottom) -->
+    <div class="section-header">{{ t('map.binding_anchor_and_coverage_sectors') }}</div>
+    <div v-if="anchorAndCoverageSectors.length === 0" class="empty-hint">
+      {{ t('map.binding_no_stations') }}
+    </div>
+    <div v-else class="sector-groups">
+      <div
+        v-for="sector in anchorAndCoverageSectors"
+        :key="sector.sectorMacro"
+        class="sector-group"
+      >
+        <div class="sector-header">
+          <span
+            class="sector-pill"
+            :class="{ 'sector-pill--anchor': sector.isAnchor }"
             @click="emit('focus-sector', sector.sectorMacro)"
           >
-            <div class="poi-text">
-              <div class="poi-title-row">
-                <span class="poi-code">{{ getStationLabel(station) }}</span>
-                <span v-if="station.is_headquarter" class="poi-badge">HQ</span>
+            {{ sector.sectorName }}
+          </span>
+          <span v-if="!sector.isAnchor" class="sector-distance">{{ sector.distance }}j</span>
+        </div>
+
+        <!-- Sector Stations (Save + Placed Free + Placed Virtual Tradestation) -->
+        <div v-if="sector.saveStations.length > 0 || sector.placedFreeStations.length > 0 || sector.hasPlacedVirtualTradestation" class="sector-stations">
+          <!-- Save Stations -->
+          <div
+            v-for="station in sector.saveStations"
+            :key="station.code"
+            class="station-item"
+            :class="{ 'station-item--bound': isSaveStationBound(station.code) }"
+            @click="emit('focus-sector', sector.sectorMacro)"
+          >
+            <div class="station-text">
+              <div class="station-title-row">
+                <span class="station-label">{{ getStationLabel(station) }}</span>
+                <span v-if="station.is_headquarter" class="station-badge">HQ</span>
               </div>
-              <span class="poi-subcode">{{ station.code }}</span>
+              <span class="station-code">{{ station.code }}</span>
             </div>
-            <div class="poi-actions">
+            <div class="station-actions">
               <button
-                class="poi-action"
-                :class="{ 'poi-action--bound': isSaveStationBound(station.code) }"
+                class="station-action"
+                :class="{ 'station-action--bound': isSaveStationBound(station.code) }"
                 type="button"
                 @click.stop="toggleBindMenu($event, station, sector.sectorMacro)"
               >
                 {{ getBindButtonLabel(station.code) }}
-                <svg class="poi-action-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <svg class="action-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
                 </svg>
               </button>
             </div>
           </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Trade Station Binding -->
-    <div v-if="tradeStationsInSelectedSector.length > 0" class="section">
-      <div class="section-header">{{ t('map.binding_bind_tradestation') }}</div>
-      <div class="tradestation-options">
-        <button
-          v-for="ts in tradeStationsInSelectedSector"
-          :key="ts.code"
-          class="tradestation-btn"
-          type="button"
-          @click="bindTradeStation(ts.code)"
-        >
-          {{ ts.code }}
-        </button>
-      </div>
-    </div>
-
-    <!-- Idle Stations -->
-    <div v-if="idleStations.length > 0" class="section">
-      <div class="section-header">{{ t('map.binding_idle_stations') }}</div>
-      <div class="idle-stations">
-        <div
-          v-for="item in idleStations"
-          :key="item.station.id"
-          class="idle-station-item"
-          :class="{ 'idle-station-item--dragging': activeDragStationId === item.station.id, 'idle-station-item--bound': !!item.sectorMacro }"
-          @mousedown="onIdleStationMouseDown($event, item)"
-        >
-          <img
-            class="station-icon"
-            :src="iconUrlByType[item.station.type === 'shipyard' ? 'shipyard' : 'factory']"
-            alt=""
-          />
-          <div class="station-info">
-            <div class="station-name">{{ item.station.name }}</div>
-            <div v-if="item.sectorMacro" class="station-tag">
-              {{ getSectorMacroDisplayName(item.sectorMacro) }}
-              <button class="tag-clear" type="button" @click.stop="clearFreeStationBinding(item.station.id)">×</button>
+          <!-- Placed Free Stations -->
+          <div
+            v-for="placed in sector.placedFreeStations"
+            :key="placed.stationId"
+            class="station-item station-item--placed"
+            @click="emit('focus-sector', sector.sectorMacro)"
+          >
+            <img class="placed-icon" :src="factoryIconUrl" alt="" />
+            <div class="station-text">
+              <span class="station-label">{{ placed.stationName }}</span>
             </div>
+            <button class="placed-clear" type="button" @click.stop="clearFreeStationBinding(placed.stationId)">×</button>
           </div>
-          <div class="station-handle">
-            <span></span><span></span><span></span>
+
+          <!-- Placed Virtual Tradestation -->
+          <div
+            v-if="sector.hasPlacedVirtualTradestation"
+            class="station-item station-item--placed station-item--tradestation"
+            @click="emit('focus-sector', sector.sectorMacro)"
+          >
+            <img class="placed-icon" :src="tradestationIconUrl" alt="" />
+            <div class="station-text">
+              <span class="station-label">{{ t('map.binding_tradestation_virtual') }}</span>
+            </div>
+            <button class="placed-clear" type="button" @click.stop="clearVirtualTradestationBinding()">×</button>
           </div>
+        </div>
+        <div v-else class="sector-empty">
+          <span class="empty-text">{{ t('map.binding_no_stations') }}</span>
         </div>
       </div>
     </div>
@@ -588,27 +753,40 @@ onMounted(() => {
         :style="bindMenuStyle"
       >
         <div class="bind-menu-group">
-          <div class="bind-menu-group-title">{{ t('map.binding_idle_stations') }}</div>
-          <button
-            v-for="item in allStationsForMenu"
-            :key="item.station.id"
-            type="button"
-            class="bind-menu-item"
-            :class="{ active: bindMenuSaveStation && getBoundEmpireStation(bindMenuSaveStation.code)?.id === item.station.id }"
-            @click="bindToStation(item.station.id)"
-          >
-            <span class="bind-menu-item-name">{{ item.station.name }}</span>
+          <div class="bind-menu-group-title">{{ t('map.binding_free_stations') }}</div>
+          <template v-for="item in allStationsForMenu" :key="'station' in item ? item.station.id : 'virtual-ts'">
+            <!-- Empire Station -->
             <button
-              v-if="bindMenuSaveStation && getBoundEmpireStation(bindMenuSaveStation.code)?.id === item.station.id"
-              class="bind-menu-item-unbind"
+              v-if="'station' in item"
               type="button"
-              @click.stop="unbindStation(item.station.id)"
+              class="bind-menu-item"
+              :class="{ active: bindMenuSaveStation && getBoundEmpireStation(bindMenuSaveStation.code)?.id === item.station.id }"
+              @click="bindToStation(item.station.id)"
             >
-              <svg viewBox="0 0 24 24" aria-hidden="true">
-                <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
-              </svg>
+              <span class="bind-menu-item-name">{{ item.station.name }}</span>
+              <button
+                v-if="bindMenuSaveStation && getBoundEmpireStation(bindMenuSaveStation.code)?.id === item.station.id"
+                class="bind-menu-item-unbind"
+                type="button"
+                @click.stop="unbindStation(item.station.id)"
+              >
+                <svg viewBox="0 0 24 24" aria-hidden="true">
+                  <path d="M6.5 6.5l11 11M17.5 6.5l-11 11" fill="none" stroke="currentColor" stroke-linecap="round" stroke-width="2" />
+                </svg>
+              </button>
             </button>
-          </button>
+            <!-- Virtual Tradestation -->
+            <button
+              v-else
+              type="button"
+              class="bind-menu-item bind-menu-item--tradestation"
+              :class="{ active: bindMenuSaveStation && currentGroupBinding?.tradestationCode === bindMenuSaveStation.code }"
+              @click="bindToVirtualTradestation()"
+            >
+              <span class="bind-menu-item-name">{{ item.name }}</span>
+              <span class="bind-menu-item-type">{{ t('map.binding_tradestation_virtual') }}</span>
+            </button>
+          </template>
           <div v-if="allStationsForMenu.length === 0" class="bind-menu-empty">
             {{ t('map.binding_no_idle_stations') }}
           </div>
@@ -634,128 +812,37 @@ onMounted(() => {
   @apply flex flex-col gap-3;
 }
 
-.jump-range {
-  @apply flex items-center gap-2;
-}
-
-.label {
-  @apply text-xs text-amber-100/60;
-}
-
-.current-group {
-  @apply text-sm text-amber-100/60;
-}
-
-.group-label {
-  @apply text-amber-100/40;
-}
-
-.group-name {
-  @apply text-amber-50;
-}
-
 .section-header {
   @apply text-xs font-semibold uppercase tracking-wider text-amber-100/60;
-}
-
-.poi-groups {
-  @apply flex flex-col gap-2;
-}
-
-.poi-stats {
-  @apply text-xs text-amber-100/50;
 }
 
 .empty-hint {
   @apply text-center text-sm text-amber-100/40;
 }
 
-.poi-group {
+/* Free Stations */
+.free-stations {
   @apply flex flex-col gap-1;
 }
 
-.poi-header {
-  @apply flex items-center justify-between text-xs;
+.free-station-item {
+  @apply flex items-center gap-2 rounded border border-amber-300/15 bg-black/30 p-2 cursor-grab transition-colors hover:border-amber-200/30;
 }
 
-.poi-name {
-  @apply text-amber-100;
+.free-station-item--dragging {
+  @apply opacity-50 cursor-grabbing;
 }
 
-.poi-distance {
-  @apply text-amber-100/50;
+.free-station-item--virtual {
+  @apply border-amber-400/30 bg-amber-200/5;
 }
 
-.poi-list {
-  @apply flex flex-col gap-1;
+.free-station-item--orphan {
+  @apply border-orange-300/20;
 }
 
-.poi-item {
-  @apply flex items-center justify-between gap-2 rounded border border-amber-300/15 bg-black/45 p-2 cursor-pointer transition-colors hover:border-amber-200/30;
-}
-
-.poi-item--bound {
-  @apply border-amber-200/30;
-}
-
-.poi-text {
-  @apply flex flex-col gap-0.5;
-}
-
-.poi-title-row {
-  @apply flex items-center gap-1;
-}
-
-.poi-code {
-  @apply text-sm text-amber-50;
-}
-
-.poi-badge {
-  @apply rounded-full border border-emerald-400/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] text-emerald-300;
-}
-
-.poi-subcode {
-  @apply text-xs text-amber-100/50;
-}
-
-.poi-actions {
-  @apply flex items-center gap-1;
-}
-
-.poi-action {
-  @apply inline-flex items-center whitespace-nowrap rounded border border-amber-300/30 bg-amber-200/10 px-2 py-1 text-xs text-amber-100;
-}
-
-.poi-action--bound {
-  @apply border-amber-200/50 bg-amber-200/15 text-amber-50;
-}
-
-.poi-action-chevron {
-  @apply ml-1 h-3 w-3;
-}
-
-.section {
-  @apply flex flex-col gap-2;
-}
-
-.tradestation-options {
-  @apply flex flex-wrap gap-1;
-}
-
-.tradestation-btn {
-  @apply rounded border border-amber-300/20 bg-black/30 px-2 py-1 text-xs text-amber-100;
-}
-
-.idle-stations {
-  @apply flex flex-col gap-1;
-}
-
-.idle-station-item {
-  @apply flex items-center gap-2 rounded border border-amber-300/15 bg-black/30 p-2;
-}
-
-.idle-station-item--bound {
-  @apply border-amber-300/30 bg-amber-200/5;
+.station-icon-wrap {
+  @apply flex items-center justify-center;
 }
 
 .station-icon {
@@ -770,12 +857,8 @@ onMounted(() => {
   @apply text-sm text-amber-100;
 }
 
-.station-tag {
-  @apply mt-0.5 flex items-center gap-1 text-xs text-amber-100/60;
-}
-
-.tag-clear {
-  @apply text-amber-100/40 hover:text-amber-50;
+.station-type {
+  @apply mt-0.5 text-xs text-amber-100/50;
 }
 
 .station-handle {
@@ -784,6 +867,105 @@ onMounted(() => {
 
 .station-handle span {
   @apply block h-0.5 w-4 rounded-full bg-amber-100;
+}
+
+/* Sector Groups */
+.sector-groups {
+  @apply flex flex-col gap-2;
+}
+
+.sector-group {
+  @apply rounded border border-amber-300/15 bg-black/30 p-2;
+}
+
+.sector-header {
+  @apply flex items-center justify-between gap-2 mb-2;
+}
+
+.sector-pill {
+  @apply inline-flex items-center rounded-full border border-amber-300/25 bg-amber-200/10 px-2.5 py-1 text-sm text-amber-100 cursor-pointer transition-colors hover:bg-amber-200/20 hover:text-amber-50;
+}
+
+.sector-pill--anchor {
+  @apply border-amber-400/40 bg-amber-300/15 text-amber-50 font-medium;
+}
+
+.sector-distance {
+  @apply text-xs text-amber-100/50;
+}
+
+.sector-stations {
+  @apply flex flex-col gap-1;
+}
+
+.sector-empty {
+  @apply py-2 text-center;
+}
+
+.empty-text {
+  @apply text-xs text-amber-100/40;
+}
+
+/* Station Items */
+.station-item {
+  @apply flex items-center justify-between gap-2 rounded border border-amber-300/10 bg-black/25 p-2 cursor-pointer transition-colors hover:border-amber-200/25;
+}
+
+.station-item--bound {
+  @apply border-amber-200/30;
+}
+
+.station-item--placed {
+  @apply border-emerald-300/20 bg-emerald-900/10;
+}
+
+.station-text {
+  @apply flex flex-col gap-0.5;
+}
+
+.station-title-row {
+  @apply flex items-center gap-1;
+}
+
+.station-label {
+  @apply text-sm text-amber-50;
+}
+
+.station-badge {
+  @apply rounded-full border border-emerald-400/30 bg-emerald-500/20 px-1.5 py-0.5 text-[10px] text-emerald-300;
+}
+
+.station-code {
+  @apply text-xs text-amber-100/50;
+}
+
+.station-actions {
+  @apply flex items-center gap-1;
+}
+
+.station-action {
+  @apply inline-flex items-center whitespace-nowrap rounded border border-amber-300/30 bg-amber-200/10 px-2 py-1 text-xs text-amber-100;
+}
+
+.station-action--bound {
+  @apply border-amber-200/50 bg-amber-200/15 text-amber-50;
+}
+
+.action-chevron {
+  @apply ml-1 h-3 w-3;
+}
+
+.placed-icon {
+  @apply h-4 w-4;
+}
+
+.placed-clear {
+  @apply text-amber-100/40 hover:text-amber-50;
+}
+
+/* Existing Bindings */
+.section {
+  @apply flex flex-col gap-2;
 }
 
 .existing-bindings {
@@ -814,6 +996,7 @@ onMounted(() => {
   @apply text-amber-100/40 hover:text-amber-50;
 }
 
+/* Bind Menu */
 .bind-menu {
   @apply fixed z-[100] min-w-[40px] overflow-y-auto rounded-lg border-2 border-amber-400 bg-black/95 py-2 shadow-2xl;
   backdrop-filter: blur(12px);

@@ -152,6 +152,7 @@ const draggingBindingKey = ref<string | null>(null)
 const draggingSectorGroupId = ref<string | null>(null)
 const draggingFreeSector = ref<{ sectorGroupId: string; name: string } | null>(null)
 const draggingFreeStation = ref<{ stationId: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' } | null>(null)
+const draggingVirtualTradestation = ref<{ sectorGroupId: string; name: string } | null>(null)
 const draggingCoverageSectorMacros = ref<Set<string>>(new Set())
 const focusedPlacementKey = ref<string | null>(null)
 const placementPreview = ref<PlacementPreview | null>(null)
@@ -199,7 +200,7 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
 const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
 const isFreeStationDropForbidden = computed(() => {
-  if (!draggingFreeStation.value || !placementPreview.value) return false
+  if ((!draggingFreeStation.value && !draggingVirtualTradestation.value) || !placementPreview.value) return false
   const location = placementPreview.value.location
   const sectorMacro = resolveSectorMacroById(gameDataStore.maps?.clusters || {}, location.cluster_id, location.sector_id)
   return sectorMacro ? !draggingCoverageSectorMacros.value.has(sectorMacro.toLowerCase()) : true
@@ -700,6 +701,7 @@ const clearPlacementState = () => {
   draggingSectorGroupId.value = null
   draggingFreeSector.value = null
   draggingFreeStation.value = null
+  draggingVirtualTradestation.value = null
   draggingCoverageSectorMacros.value = new Set()
   placementPreview.value = null
 }
@@ -1157,16 +1159,23 @@ const onBindingFitSectors = (sectorMacros: string[]) => {
   }
 }
 
-const onBindingDragStationStart = (payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard'; coverageSectorMacros: string[] }) => {
-  draggingFreeStation.value = {
-    stationId: payload.stationId,
-    sectorGroupId: payload.sectorGroupId,
-    name: payload.name,
-    icon: payload.icon
+const onBindingDragStationStart = (payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }) => {
+  if (payload.isVirtualTradestation) {
+    draggingVirtualTradestation.value = {
+      sectorGroupId: payload.sectorGroupId,
+      name: payload.name
+    }
+  } else {
+    draggingFreeStation.value = {
+      stationId: payload.stationId,
+      sectorGroupId: payload.sectorGroupId,
+      name: payload.name,
+      icon: payload.icon as 'factory' | 'shipyard'
+    }
   }
   draggingBindingKey.value = payload.gameGuid
   draggingSectorGroupId.value = payload.sectorGroupId
-  draggingCoverageSectorMacros.value = new Set(payload.coverageSectorMacros.map(m => m.toLowerCase()))
+  draggingCoverageSectorMacros.value = new Set(payload.coverageSectorMacros.map(entry => entry.ref.toLowerCase()))
   draggingPlacementItem.value = null
   draggingOverlayKey.value = null
   draggingFreeSector.value = null
@@ -1177,6 +1186,7 @@ const onBindingDragStationEnd = () => {
   draggingBindingKey.value = null
   draggingSectorGroupId.value = null
   draggingFreeStation.value = null
+  draggingVirtualTradestation.value = null
   draggingCoverageSectorMacros.value = new Set()
 }
 
@@ -1323,6 +1333,20 @@ const onMouseMove = (event: MouseEvent) => {
       icon: 'tradestation',
       location
     } : null
+  } else if (draggingVirtualTradestation.value && isBindingPanelOpen.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    if (location) {
+      const sectorMacro = resolveSectorMacroById(gameDataStore.maps?.clusters || {}, location.cluster_id, location.sector_id)
+      const isAllowed = sectorMacro ? draggingCoverageSectorMacros.value.has(sectorMacro.toLowerCase()) : false
+      placementPreview.value = isAllowed ? {
+        kind: 'station',
+        name: draggingVirtualTradestation.value.name,
+        icon: 'tradestation',
+        location
+      } : null
+    } else {
+      placementPreview.value = null
+    }
   } else if (draggingFreeStation.value && isBindingPanelOpen.value) {
     const location = resolveLocationAtPointer(event.clientX, event.clientY)
     if (location) {
@@ -1396,6 +1420,20 @@ const stopDrag = () => {
         z: placementPreview.value.location.pos.z
       }
     })
+  } else if (draggingVirtualTradestation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
+    const sectorMacro = resolveSectorMacroById(gameDataStore.maps?.clusters || {}, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
+    if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro.toLowerCase())) {
+      empireStore.setTradestationBinding({
+        gameGuid: draggingBindingKey.value,
+        sectorGroupId: draggingSectorGroupId.value,
+        sectorMacro,
+        position: {
+          x: placementPreview.value.location.pos.x,
+          y: 0,
+          z: placementPreview.value.location.pos.z
+        }
+      })
+    }
   } else if (draggingFreeStation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
     const sectorMacro = resolveSectorMacroById(gameDataStore.maps?.clusters || {}, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
     if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro.toLowerCase())) {

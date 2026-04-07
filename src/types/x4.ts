@@ -1090,12 +1090,17 @@ export interface X4ShipSlot {
   count: number
 }
 
+export interface CoverageSectorEntry {
+  ref: string
+  jump: number
+}
+
 export interface GroupSaveBinding {
   sectorGroupId: string
   tradestationCode?: string
   sectorMacro?: string
   jumpRange: number
-  coverageSectorMacros: string[]
+  coverageSectorMacros: CoverageSectorEntry[]
   tradestationBinding?: StationSaveBinding
   stationBindings: StationSaveBinding[]
   free?: boolean

@@ -222,14 +222,63 @@ binding UI 放在 `MapWorkbenchView`，原因：
     - 不再显示"已绑定"徽章
   - 支持搜索过滤存档星区
 - 第三段：绑定空间站
-  - 跳数选择器（0-5）
-  - Step 1: 绑定星区组（已在第二段完成，此处仅显示当前绑定状态）
-  - Step 2: 存档空间站
-    - 显示覆盖范围内的 save 玩家站
-    - 绑定/导入菜单同前
-  - Step 3: 绑定中转站（可选）
-  - 空闲空间站列表
-  - 已有绑定列表
+  - **空间站状态判断（基于 binding 数据）**：
+    - 自由空间站：无 `stationBinding`（未绑定、未放置）
+    - 已放置未绑定：有 `stationBinding`，无 `saveStationCode`（已拖拽到地图，但未绑定 save station）
+    - 已绑定：有 `stationBinding`，有 `saveStationCode`（已绑定 save station）
+    - 虚拟补给站未放置：无 `tradestationBinding`
+    - 虚拟补给站已放置：有 `tradestationBinding`，有 `position`，无 `tradestationCode`
+    - 虚拟补给站已绑定：有 `tradestationBinding`，有 `position`，有 `tradestationCode`
+  
+  - **列表结构调整**：
+    - 上方：自由空间站列表
+      - 无 `stationBinding` 的 empire station
+      - 无 `sectorId` 的 empire station（orphan，兼容性判断）
+      - 未放置的虚拟补给站：无 `tradestationBinding`
+    - 下方：定位星区和范围星区列表
+      - 显示定位星区（`sectorMacro`）+ 覆盖星区（`coverageSectorMacros`）
+      - 每个星区用药丸表示，点击药丸 focus 到对应星区
+      - 即使星区没有 save 空间站，也显示星区药丸
+      - 星区下显示空间站：save 玩家站 + 已放置的 free station + 已放置虚拟补给站（并排显示）
+  
+  - **Save Station 绑定对象**：
+    - 可选条目：
+      1. 本星区已放置但未绑定的空间站：有 `stationBinding` 但没有 `saveStationCode`
+      2. 自由空间站：没有 `stationBinding`
+      3. 已放置未绑定的虚拟补给站：有 `tradestationBinding` + `position`，无 `tradestationCode`
+      4. 未放置的虚拟补给站：无 `tradestationBinding`
+    - 绑定限制：
+      - 虚拟补给站（3、4）只能被定位星区的 save station 绑定
+      - 绑定对象不可以重叠：一个 save station 只能绑定一个对象，一个对象只能被一个 save station 绑定
+  
+  - **绑定/放置操作**：
+    - Empire Station 绑定 save station：
+      - 创建/更新 `stationBinding`（`saveStationCode` + `sectorMacro` + `position`）
+      - 同时设置 `station.sectorId = sectorGroupId`（兼容性）
+    - Empire Station 拖拽到地图：
+      - 创建 `stationBinding`（`sectorMacro` + `position`）
+      - 同时设置 `station.sectorId = sectorGroupId`（兼容性）
+    - 虚拟补给站拖拽到地图：
+      - 创建/更新 `tradestationBinding`（`sectorMacro` + `position`）
+      - 限制：只能放置在定位星区（`anchorSectorMacro`）
+    - 虚拟补给站绑定 save station：
+      - 未放置：创建 `tradestationBinding`（`position` + `sectorMacro` + `tradestationCode`）
+      - 已放置：设置 `tradestationCode`
+  
+  - **取消/移除操作**：
+    - Empire Station 取消绑定/移除：
+      - 清除整个 `stationBinding`
+      - 同时清空 `station.sectorId`
+    - 虚拟补给站移除：
+      - 清除整个 `tradestationBinding`
+    - 虚拟补给站取消绑定：
+      - 清除 `tradestationCode`（保留 `position`，回到已放置状态）
+  
+  - **空间站归属原则**：
+    - 空间站的星区归属基于 `saveBindings` 数据，而非 `station.sectorId`
+    - 只有在绑定 save station 或拖拽到地图时，空间站才归属于某个星区
+    - `station.sectorId` 是为了兼容性考虑，绑定界面不以这个为准
+  - 已有绑定列表（保持原样显示）
 
 ### 4.3 Draft 状态管理（编辑期隔离）
 
@@ -237,12 +286,16 @@ binding UI 放在 `MapWorkbenchView`，原因：
 
 #### Draft State 结构
 ```typescript
+interface CoverageDraftEntry {
+  ref: string    // sectorMacro
+  jump: number   // 跳数距离
+}
+
 interface BindingDraftState {
   sectorGroupId: string | null      // 当前编辑的帝国星区
   anchorSectorMacro: string | null  // 定位星区（save sector）
   jumpRange: number                 // 跳数（默认：2）
-  coverage: string[]                // 覆盖星区列表
-  excluded: string[]                // 排除星区列表
+  coverage: CoverageDraftEntry[]    // 覆盖星区列表（包含跳数信息）
 }
 ```
 

@@ -3,7 +3,8 @@ import type {
   EmpirePlan,
   SaveBindingPlan,
   GroupSaveBinding,
-  StationSaveBinding
+  StationSaveBinding,
+  CoverageSectorEntry
 } from '@/types/x4'
 import type { PlayerStationEntry } from '@/types/saveArchive'
 
@@ -36,7 +37,7 @@ export interface SaveBindingActions {
     sectorGroupId: string
     sectorMacro?: string
     jumpRange: number
-    coverageSectorMacros: string[]
+    coverageSectorMacros: CoverageSectorEntry[]
   }) => void
   updateSectorGroupJumpRange: (gameGuid: string, sectorGroupId: string, jumpRange: number) => void
   clearSectorGroupBinding: (gameGuid: string, sectorGroupId: string) => void
@@ -45,9 +46,18 @@ export interface SaveBindingActions {
     gameGuid: string
     sectorGroupId: string
     saveStationCode?: string
+    sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }) => void
   clearTradestationBinding: (gameGuid: string, sectorGroupId: string) => void
+  bindTradestationToSaveStation: (input: {
+    gameGuid: string
+    sectorGroupId: string
+    saveStationCode: string
+    sectorMacro?: string
+    position?: { x: number; y: number; z: number }
+  }) => void
+  clearTradestationCode: (gameGuid: string, sectorGroupId: string) => void
   bindStationToSaveStation: (input: {
     gameGuid: string
     sectorGroupId: string
@@ -73,7 +83,7 @@ export interface SaveBindingActions {
     sectorMacro: string
     position: { x: number; y: number; z: number }
     jumpRange?: number
-    coverageSectorMacros?: string[]
+    coverageSectorMacros?: CoverageSectorEntry[]
   }) => void
   setFreeStationBinding: (input: {
     gameGuid: string
@@ -86,7 +96,8 @@ export interface SaveBindingActions {
 
 export function createSaveBindingActions(
   activeEmpire: Ref<EmpirePlan | null>,
-  onDirty: () => void
+  onDirty: () => void,
+  updateStationSector: (stationId: string, sectorId: string | null) => void
 ): SaveBindingActions {
   function getBindings(): SaveBindingPlan[] {
     return activeEmpire.value?.saveBindings || []
@@ -144,7 +155,7 @@ export function createSaveBindingActions(
     sectorGroupId: string
     sectorMacro?: string
     jumpRange: number
-    coverageSectorMacros: string[]
+    coverageSectorMacros: CoverageSectorEntry[]
   }): void {
     const plan = getBindingByGameGuid(input.gameGuid)
     if (!plan) return
@@ -204,6 +215,7 @@ export function createSaveBindingActions(
     gameGuid: string
     sectorGroupId: string
     saveStationCode?: string
+    sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }): void {
     const plan = getBindingByGameGuid(input.gameGuid)
@@ -217,6 +229,12 @@ export function createSaveBindingActions(
 
     if (input.saveStationCode !== undefined) {
       groupBinding.tradestationCode = input.saveStationCode
+    }
+    if (input.sectorMacro !== undefined) {
+      if (!groupBinding.tradestationBinding) {
+        groupBinding.tradestationBinding = { stationId: `tradestation_${input.sectorGroupId}` }
+      }
+      groupBinding.tradestationBinding.sectorMacro = input.sectorMacro
     }
     if (input.position) {
       if (!groupBinding.tradestationBinding) {
@@ -236,6 +254,51 @@ export function createSaveBindingActions(
 
     delete groupBinding.tradestationCode
     delete groupBinding.tradestationBinding
+    onDirty()
+  }
+
+  function bindTradestationToSaveStation(input: {
+    gameGuid: string
+    sectorGroupId: string
+    saveStationCode: string
+    sectorMacro?: string
+    position?: { x: number; y: number; z: number }
+  }): void {
+    const plan = getBindingByGameGuid(input.gameGuid)
+    if (!plan) return
+
+    let groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === input.sectorGroupId)
+    if (!groupBinding) {
+      groupBinding = createDefaultGroupSaveBinding(input.sectorGroupId)
+      plan.groupBindings.push(groupBinding)
+    }
+
+    // Create or update tradestationBinding
+    if (!groupBinding.tradestationBinding) {
+      groupBinding.tradestationBinding = { stationId: `tradestation_${input.sectorGroupId}` }
+    }
+
+    groupBinding.tradestationCode = input.saveStationCode
+    
+    if (input.sectorMacro) {
+      groupBinding.tradestationBinding.sectorMacro = input.sectorMacro
+    }
+    if (input.position) {
+      groupBinding.tradestationBinding.position = input.position
+    }
+
+    onDirty()
+  }
+
+  function clearTradestationCode(gameGuid: string, sectorGroupId: string): void {
+    const plan = getBindingByGameGuid(gameGuid)
+    if (!plan) return
+
+    const groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
+    if (!groupBinding) return
+
+    delete groupBinding.tradestationCode
+    // Keep position, only clear the binding
     onDirty()
   }
 
@@ -280,6 +343,9 @@ export function createSaveBindingActions(
       groupBinding.stationBindings.push(newBinding)
     }
 
+    // Update station.sectorId for compatibility
+    updateStationSector(input.stationId, input.sectorGroupId)
+
     onDirty()
     return true
   }
@@ -292,6 +358,10 @@ export function createSaveBindingActions(
     if (!groupBinding) return
 
     groupBinding.stationBindings = groupBinding.stationBindings.filter((b) => b.stationId !== stationId)
+    
+    // Clear station.sectorId
+    updateStationSector(stationId, null)
+    
     onDirty()
   }
 
@@ -385,7 +455,7 @@ export function createSaveBindingActions(
     sectorMacro: string
     position: { x: number; y: number; z: number }
     jumpRange?: number
-    coverageSectorMacros?: string[]
+    coverageSectorMacros?: CoverageSectorEntry[]
   }): void {
     const plan = getBindingByGameGuid(input.gameGuid)
     if (!plan) return
@@ -455,6 +525,8 @@ export function createSaveBindingActions(
     getGroupBinding,
     setTradestationBinding,
     clearTradestationBinding,
+    bindTradestationToSaveStation,
+    clearTradestationCode,
     bindStationToSaveStation,
     clearStationBinding,
     setStationBindingPosition,

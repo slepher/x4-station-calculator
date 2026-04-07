@@ -95,3 +95,39 @@
 - [x] 14.11 修复：切换编辑星区时显示新定位星区
 - [x] 14.12 修复：跳数变更时正确计算覆盖星区
 - [x] 14.13 修复：候选星区显示其他组绑定的橙色药丸
+
+- [x] 15. Stage 3 自由空间站与星区列表重构
+- [x] 15.1 重构列表结构：上方自由空间站列表，下方定位星区和范围星区列表
+- [x] 15.2 修改"空闲空间站"为"自由空间站"命名（i18n）
+- [x] 15.3 自由空间站列表：包含无 stationBinding 的 empire station、无 sectorId 的 station、未放置的虚拟中转站
+- [x] 15.4 定位星区和范围星区列表：每个星区用药丸显示，点击可 focus
+- [x] 15.5 星区下显示：save 玩家站 + 已放置的 free station（并排）
+- [x] 15.6 即使星区没有 save 空间站，也显示星区药丸
+- [x] 15.7 拖拽放置后：空间站从自由列表移到对应星区下显示
+
+- [x] 16. 虚拟中转站限制
+- [x] 16.1 虚拟中转站只能拖拽到定位星区（sectorMacro）
+- [x] 16.2 落点检查：鼠标位置 sectorMacro 必须等于定位星区
+- [x] 16.3 绑定限制：只能与定位星区下的 save 空间站绑定
+
+- [x] 17. 构建验证
+- [x] 17.1 完成实现后执行 `npm run build`
+- [x] 17.2 构建通过
+
+- [x] 18. Coverage 格式重构
+- [x] 18.1 修改 `CoverageSectorEntry` 类型：`{ref: string, jump: number}`
+- [x] 18.2 更新 draft 和 binding 中的 coverage 格式
+- [x] 18.3 更新相关 computed 和函数
+
+- [x] 19. 绑定规则完善
+- [x] 19.1 更新 freeStations computed：判断基于 stationBinding 而非 sectorId
+- [x] 19.2 更新绑定菜单候选对象：包含已放置未绑定空间站、自由空间站、虚拟补给站
+- [x] 19.3 绑定对象不可重叠校验（已在 bindStationToSaveStation 中实现）
+- [x] 19.4 虚拟补给站绑定 save station 支持
+- [x] 19.5 绑定/移除时同步更新 station.sectorId
+- [x] 19.6 已放置虚拟补给站显示在星区下
+- [x] 19.7 已放置虚拟补给站可被定位星区的 save station 绑定
+
+- [x] 20. 构建验证
+- [x] 20.1 完成实现后执行 `npm run build`
+- [x] 20.2 构建通过
