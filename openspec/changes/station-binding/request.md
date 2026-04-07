@@ -95,9 +95,11 @@
   - `owner` 固定视为 `player`
   - 虚拟中转站按 `tradestation` 类型处理
   - binding POI 与 save POI 的唯一区别是额外增加一层虚线六边形外框
+  - 虚拟中转站标题显示对应的 empire 星区名，普通 binding station 标题显示空间站名，不显示内部 id
 - binding POI 需要像 save POI 一样常驻显示，不依赖当前是否正在执行拖拽。
 - binding POI 的常驻显示受 save POI 的 `playerStation` 可见性设置控制。
 - 但 binding POI 只有在其所属 `sectorGroup` 的 Step 3 上下文内才允许拖拽；在其他上下文中仅显示，不可拖动。
+- 非可拖动状态下，点击 binding POI 仍需要像 save POI 一样弹出 tooltip。
 
 ### 9. 数据流组织
 
@@ -145,6 +147,8 @@
 9. 对于已绑定或已放置的 empire station，系统会把 `position: { x, y, z }` 保存在 binding 数据中，使绑定失效后坐标仍可单独生效
 10. binding POI 的图标类型、owner 与尺寸语义与 save POI 保持一致，仅额外显示虚线六边形外框
 11. binding POI 常驻显示，但显示受 `playerStation` 可见性设置控制，且仅在对应 `sectorGroup` 的 Step 3 上下文中可拖拽
+12. 非可拖动状态下点击 binding POI 会弹出和 save POI 同构的 tooltip
+13. binding POI 的标题使用 empire 星区名或空间站名，不显示内部 id
 
 ## 未决项
 

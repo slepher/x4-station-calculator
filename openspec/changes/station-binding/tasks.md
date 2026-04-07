@@ -139,3 +139,6 @@
 - [x] 21.4 binding POI 常驻显示，并受 `playerStation` 可见性设置控制
 - [x] 21.5 binding POI 仅在所属 `sectorGroup` 的 Step 3 中允许拖拽
 - [x] 21.6 binding POI 增加虚线六边形外框，作为与 save POI 的唯一视觉差异
+- [x] 21.7 非可拖拽状态下点击 binding POI 打开与 save POI 同构的 tooltip
+- [x] 21.8 binding POI 标题显示 empire 星区名或空间站名，不显示内部 id
+- [x] 21.9 虚线六边形外框贴合 save POI 本体六边形边框

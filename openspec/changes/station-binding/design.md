@@ -68,12 +68,17 @@
 - binding POI 的显示条件与拖拽条件分离：
   - 显示：当前 binding 视角存在对应 binding 数据时常驻显示，并受 save POI 的 `playerStation` 可见性设置控制
   - 拖拽：仅在该 POI 所属 `sectorGroup` 的 Step 3 上下文中开放
+  - 点击：当当前 POI 不可拖拽时，点击进入与 save POI 相同的 tooltip 展示流程
 - binding POI 的视觉语义与 save POI 对齐：
   - `owner` 固定按 `player` 处理
   - 普通 binding station 的 `tag/factoryGroup/productionProfile/profileName` 复用 `parser.post.ts` 中玩家 station 的分类逻辑
   - 虚拟中转站强制视为 `tradestation`
   - 图标大小、图标类型与大/小图标规则复用 save POI
   - 相比 save POI，仅额外增加一层虚线六边形外框
+  - 虚线六边形外框需要贴合 save POI 本体六边形边框，不按图标包围盒估算
+  - tooltip 标题使用用户可读名称：
+    - 虚拟中转站显示对应 empire 星区名
+    - 普通 binding station 显示空间站名
 
 ## 2. 数据模型
 
@@ -283,6 +288,8 @@ binding UI 放在 `MapWorkbenchView`，原因：
     - 图标语义、大小与颜色规则与 save POI 保持一致
     - 仅在所属 `sectorGroup` 的 Step 3 中可拖拽重定位
     - 在其他 stage 或其他 `sectorGroup` 上下文中仅显示，不响应拖拽
+    - 在不可拖拽状态下，点击 POI 会打开与 save POI 同构的 tooltip
+    - tooltip 标题使用 empire 星区名或空间站名，不显示内部 id
   
   - **取消/移除操作**：
     - Empire Station 取消绑定/移除：
