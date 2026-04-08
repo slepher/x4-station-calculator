@@ -50,15 +50,16 @@ export function resolveGroupSaveBinding(
     return { ...binding, status: 'missing_at_selected_time' }
   }
 
-  if (!binding.tradestationCode) {
+  const saveStationCode = binding.tradestationBinding?.saveStationCode
+  if (!saveStationCode) {
     return { ...binding, status: 'missing_at_selected_time' }
   }
 
-  const tradestation = (sector.npcStations || []).find(
-    (station) => station.code === binding.tradestationCode && station.isTradestation === true
+  const boundSaveStation = (sector.playerStations || []).find(
+    (station) => station.code === saveStationCode
   )
 
-  if (!tradestation) {
+  if (!boundSaveStation) {
     return { ...binding, status: 'missing_at_selected_time' }
   }
 

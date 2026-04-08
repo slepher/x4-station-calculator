@@ -60,6 +60,7 @@ export interface SaveBindingActions {
     position?: { x: number; y: number; z: number }
   }) => void
   clearTradestationCode: (gameGuid: string, sectorGroupId: string) => void
+  clearStationCode: (gameGuid: string, sectorGroupId: string, stationId: string) => void
   bindStationToSaveStation: (input: {
     gameGuid: string
     sectorGroupId: string
@@ -179,7 +180,6 @@ export function createSaveBindingActions(
       const existing = plan.groupBindings[existingIndex]
       if (existing) {
         newBinding.connectedSectorGroupIds = [...(existing.connectedSectorGroupIds || [])]
-        newBinding.tradestationCode = existing.tradestationCode
         newBinding.tradestationBinding = existing.tradestationBinding
         newBinding.stationBindings = existing.stationBindings
         plan.groupBindings[existingIndex] = newBinding
@@ -269,7 +269,10 @@ export function createSaveBindingActions(
     }
 
     if (input.saveStationCode !== undefined) {
-      groupBinding.tradestationCode = input.saveStationCode
+      if (!groupBinding.tradestationBinding) {
+        groupBinding.tradestationBinding = { stationId: `tradestation_${input.sectorGroupId}` }
+      }
+      groupBinding.tradestationBinding.saveStationCode = input.saveStationCode
     }
     if (input.sectorMacro !== undefined) {
       if (!groupBinding.tradestationBinding) {
@@ -293,7 +296,6 @@ export function createSaveBindingActions(
     const groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
     if (!groupBinding) return
 
-    delete groupBinding.tradestationCode
     delete groupBinding.tradestationBinding
     onDirty()
   }
@@ -319,7 +321,10 @@ export function createSaveBindingActions(
       groupBinding.tradestationBinding = { stationId: `tradestation_${input.sectorGroupId}` }
     }
 
-    groupBinding.tradestationCode = input.saveStationCode
+    groupBinding.stationBindings = groupBinding.stationBindings.filter(
+      (binding) => binding.saveStationCode !== input.saveStationCode
+    )
+    groupBinding.tradestationBinding.saveStationCode = input.saveStationCode
     
     if (input.sectorMacro) {
       groupBinding.tradestationBinding.sectorMacro = input.sectorMacro
@@ -338,8 +343,25 @@ export function createSaveBindingActions(
     const groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
     if (!groupBinding) return
 
-    delete groupBinding.tradestationCode
-    // Keep position, only clear the binding
+    delete groupBinding.tradestationBinding
+    onDirty()
+  }
+
+  function clearStationCode(gameGuid: string, sectorGroupId: string, stationId: string): void {
+    const plan = getBindingByGameGuid(gameGuid)
+    if (!plan) return
+
+    const groupBinding = plan.groupBindings.find((b) => b.sectorGroupId === sectorGroupId)
+    if (!groupBinding) return
+
+    const binding = groupBinding.stationBindings.find((b) => b.stationId === stationId)
+    if (!binding) return
+
+    delete binding.saveStationCode
+    if (!binding.position) {
+      groupBinding.stationBindings = groupBinding.stationBindings.filter((b) => b.stationId !== stationId)
+      updateStationSector(stationId, null)
+    }
     onDirty()
   }
 
@@ -365,6 +387,10 @@ export function createSaveBindingActions(
     )
     if (alreadyBoundStationIndex >= 0) {
       groupBinding.stationBindings.splice(alreadyBoundStationIndex, 1)
+    }
+
+    if (groupBinding.tradestationBinding?.saveStationCode === input.saveStationCode) {
+      delete groupBinding.tradestationBinding
     }
 
     const existingIndex = groupBinding.stationBindings.findIndex(
@@ -432,7 +458,12 @@ export function createSaveBindingActions(
       if (position) {
         binding.position = position
       } else {
-        delete binding.position
+        if (binding.saveStationCode) {
+          delete binding.position
+        } else {
+          groupBinding.stationBindings = groupBinding.stationBindings.filter((b) => b.stationId !== stationId)
+          updateStationSector(stationId, null)
+        }
       }
     }
     onDirty()
@@ -510,7 +541,6 @@ export function createSaveBindingActions(
     groupBinding.sectorMacro = input.sectorMacro
     groupBinding.jumpRange = input.jumpRange ?? 3
     groupBinding.coverageSectorMacros = input.coverageSectorMacros ?? []
-    groupBinding.free = true
 
     if (!groupBinding.tradestationBinding) {
       groupBinding.tradestationBinding = { stationId: `tradestation_${input.sectorGroupId}` }
@@ -544,8 +574,7 @@ export function createSaveBindingActions(
       stationId: input.stationId,
       saveStationCode: existingBinding?.saveStationCode,
       sectorMacro: input.sectorMacro,
-      position: input.position,
-      free: existingBinding?.free ?? true
+      position: input.position
     }
 
     if (existingIndex >= 0) {
@@ -572,6 +601,7 @@ export function createSaveBindingActions(
     clearTradestationBinding,
     bindTradestationToSaveStation,
     clearTradestationCode,
+    clearStationCode,
     bindStationToSaveStation,
     clearStationBinding,
     setStationBindingPosition,

@@ -5,11 +5,12 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
-import { resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
+import { getSavePoiIconUrl } from '@/components/map/utils/style'
+import { resolveGroupSaveBinding, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
+import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import type { StationSaveBinding, StationPlan } from '@/types/x4'
-import type { PlayerStationEntry } from '@/types/saveArchive'
+import type { PlayerStationEntry, SavePoiOverlayItem } from '@/types/saveArchive'
 import factoryIconUrl from '@/components/icons/factory.svg'
-import shipyardIconUrl from '@/components/icons/shipyard.svg'
 import tradestationIconUrl from '@/components/icons/tradestation.svg'
 
 const props = defineProps<{
@@ -47,11 +48,6 @@ const pendingDrag = ref<{
 const activeDragKey = ref<string | null>(null)
 const DRAG_START_THRESHOLD_PX = 4
 const suppressNextSectorFocus = ref(false)
-
-const iconUrlByType = {
-  factory: factoryIconUrl,
-  shipyard: shipyardIconUrl
-}
 
 const activeEmpire = computed(() => empireStore.activeEmpire)
 const activeBindingPlan = computed(() => {
@@ -100,10 +96,9 @@ const freeStations = computed(() => {
     })
     .map((station) => ({
       station,
-      sectorGroupId: station.sectorId || '',
+      sectorGroupId: '',
       sectorGroupName: '',
-      sectorMacro: undefined,
-      type: station.sectorId ? 'empire' as const : 'orphan' as const
+      sectorMacro: undefined
     }))
 
   return freeEmpireStations
@@ -152,6 +147,8 @@ const anchorAndCoverageSectors = computed(() => {
     placedFreeStations: Array<{ stationId: string; stationName: string; sectorMacro: string; position: { x: number; y: number; z: number } }>
     missingBoundStations: Array<{ stationId: string; stationName: string }>
     hasPlacedVirtualTradestation: boolean
+    hasMissingVirtualTradestation: boolean
+    placedVirtualTradestationPosition?: { x: number; y: number; z: number }
   }> = []
 
   for (const sectorMacro of allMacros) {
@@ -205,7 +202,20 @@ const anchorAndCoverageSectors = computed(() => {
 
     // Check if virtual tradestation is placed in this sector
     const tb = currentGroupBinding.value.tradestationBinding
-    const hasPlacedVirtualTradestation = !!(tb?.position && tb.sectorMacro === sectorMacro)
+    const resolvedTradestation = currentGroupBinding.value
+      ? resolveGroupSaveBinding(currentGroupBinding.value, activeArchive.value)
+      : null
+    const hasPlacedVirtualTradestation = !!(
+      tb?.position &&
+      tb.sectorMacro === sectorMacro &&
+      !tb.saveStationCode
+    )
+    const hasMissingVirtualTradestation = !!(
+      tb?.position &&
+      tb.sectorMacro === sectorMacro &&
+      tb.saveStationCode &&
+      resolvedTradestation?.status === 'missing_at_selected_time'
+    )
 
     results.push({
       sectorMacro,
@@ -215,7 +225,9 @@ const anchorAndCoverageSectors = computed(() => {
       saveStations,
       placedFreeStations,
       missingBoundStations,
-      hasPlacedVirtualTradestation
+      hasPlacedVirtualTradestation,
+      hasMissingVirtualTradestation,
+      placedVirtualTradestationPosition: hasPlacedVirtualTradestation ? tb?.position : undefined
     })
   }
 
@@ -281,7 +293,72 @@ function getStationLabel(station: PlayerStationEntry): string {
   return t('map.save_category_player_station')
 }
 
+function getSaveStationIcon(station: PlayerStationEntry): string {
+  const poiLike: SavePoiOverlayItem = {
+    key: `binding-save-station:${station.code}`,
+    code: station.code,
+    category: 'playerStation',
+    owner: 'player',
+    sectorMacro: '',
+    sectorName: '',
+    position: {
+      x: station.position.x,
+      y: station.position.y,
+      z: station.position.z
+    },
+    tag: station.tag,
+    factoryGroup: station.factoryGroup,
+    productionProfile: station.productionProfile,
+    profileName: station.profileName,
+    is_headquarter: station.is_headquarter
+  }
+  return getSavePoiIconUrl(poiLike) || factoryIconUrl
+}
+
+function getEmpireStationIcon(station: StationPlan | undefined | null): string {
+  if (!station) return factoryIconUrl
+
+  const aggregatedModules = buildAggregatedModulesFromStationPlan(
+    station,
+    gameDataStore.modulesMap || {}
+  )
+  const modulesByMacroId = Object.fromEntries(
+    aggregatedModules
+      .map((module) => {
+        const matched = gameDataStore.modulesByMacroId?.[module.ref]
+        return matched ? [module.ref, matched] : null
+      })
+      .filter((entry): entry is [string, NonNullable<typeof gameDataStore.modulesByMacroId>[string]] => Boolean(entry))
+  )
+  const classification = classifyPlayerStationPoi({
+    modules: aggregatedModules,
+    modulesByMacroId,
+    isHeadquarter: false
+  })
+
+  const poiLike: SavePoiOverlayItem = {
+    key: `binding-empire-station:${station.id}`,
+    code: station.name,
+    category: 'playerStation',
+    owner: 'player',
+    sectorMacro: '',
+    sectorName: '',
+    position: { x: 0, y: 0, z: 0 },
+    tag: classification.tag,
+    factoryGroup: classification.factoryGroup,
+    productionProfile: classification.productionProfile,
+    profileName: classification.profileName,
+    is_headquarter: classification.is_headquarter
+  }
+  return getSavePoiIconUrl(poiLike) || factoryIconUrl
+}
+
+function getEmpireStationIconById(stationId: string): string {
+  return getEmpireStationIcon(activeEmpire.value?.stations.find((station) => station.id === stationId))
+}
+
 function isSaveStationBound(saveStationCode: string): boolean {
+  if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) return true
   return empireStore.isSaveStationAlreadyBound(props.gameGuid, props.sectorGroupId, saveStationCode)
 }
 
@@ -294,6 +371,9 @@ function getBoundEmpireStation(saveStationCode: string): StationPlan | null {
 }
 
 function getBindButtonLabel(saveStationCode: string): string {
+  if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) {
+    return t('map.binding_tradestation_virtual')
+  }
   if (isSaveStationBound(saveStationCode)) {
     const station = getBoundEmpireStation(saveStationCode)
     return station?.name || t('map.binding_bind')
@@ -398,7 +478,7 @@ function bindToVirtualTradestation() {
 }
 
 function unbindStation(stationId: string) {
-  empireStore.clearStationBinding(props.gameGuid, props.sectorGroupId, stationId)
+  empireStore.clearStationCode(props.gameGuid, props.sectorGroupId, stationId)
 }
 
 function importSaveStation(station: PlayerStationEntry, sectorMacro: string) {
@@ -502,16 +582,16 @@ const allStationsForMenu = computed(() => {
     }
   }
 
-  // 3. 已放置未绑定的虚拟补给站（有 position，无 tradestationCode）
+  // 3. 已放置未绑定的虚拟补给站（有 position，无 saveStationCode）
   // 4. 未放置的虚拟补给站（无 tradestationBinding）
   // 只有定位星区的 save station 可以绑定虚拟补给站
   const anchorMacro = currentGroupBinding.value?.sectorMacro
   const tb = currentGroupBinding.value?.tradestationBinding
-  const tradestationCode = currentGroupBinding.value?.tradestationCode
+  const tradestationSaveStationCode = currentGroupBinding.value?.tradestationBinding?.saveStationCode
   const isAnchorSector = bindMenuSectorMacro.value === anchorMacro
   
   if (isAnchorSector) {
-    if (tb?.position && !tradestationCode) {
+    if (tb?.position && !tradestationSaveStationCode) {
       items.push({
         type: 'virtualTradestation',
         name: t('map.binding_tradestation_virtual'),
@@ -519,13 +599,14 @@ const allStationsForMenu = computed(() => {
         sectorMacro: tb.sectorMacro,
         placed: true
       })
-    } else if (tb?.position && tradestationCode) {
+    } else if (tb?.position && tradestationSaveStationCode) {
+      const isCurrentSaveStation = bindMenuSaveStation.value?.code === tradestationSaveStationCode
       items.push({
         type: 'virtualTradestation',
         name: t('map.binding_tradestation_virtual'),
         sectorGroupId: props.sectorGroupId,
         sectorMacro: tb.sectorMacro,
-        disabled: true,
+        disabled: !isCurrentSaveStation,
         placed: true
       })
     } else if (!tb) {
@@ -664,12 +745,9 @@ onBeforeUnmount(() => {
         :class="{ 'free-station-item--dragging': activeDragKey === '__virtual_tradestation__' }"
         @mousedown="onVirtualTradestationMouseDown($event)"
       >
-        <div class="station-icon-wrap">
-          <img class="station-icon" :src="tradestationIconUrl" alt="" />
-        </div>
+        <img class="entry-icon" :src="tradestationIconUrl" alt="" />
         <div class="station-info">
           <div class="station-name">{{ virtualTradestation.name }}</div>
-          <div class="station-type">{{ t('map.binding_tradestation_virtual') }}</div>
         </div>
         <div class="station-handle">
           <span></span><span></span><span></span>
@@ -681,22 +759,16 @@ onBeforeUnmount(() => {
         v-for="item in freeStations"
         :key="item.station.id"
         class="free-station-item"
-        :class="{
-          'free-station-item--dragging': activeDragKey === item.station.id,
-          'free-station-item--orphan': item.type === 'orphan'
-        }"
+        :class="{ 'free-station-item--dragging': activeDragKey === item.station.id }"
         @mousedown="onFreeStationMouseDown($event, item)"
       >
         <img
-          class="station-icon"
-          :src="iconUrlByType[item.station.type === 'shipyard' ? 'shipyard' : 'factory']"
+          class="entry-icon"
+          :src="getEmpireStationIcon(item.station)"
           alt=""
         />
         <div class="station-info">
           <div class="station-name">{{ item.station.name }}</div>
-          <div v-if="item.type === 'orphan'" class="station-type">
-            {{ t('map.binding_sector_not_bound') }}
-          </div>
         </div>
         <div class="station-handle">
           <span></span><span></span><span></span>
@@ -726,7 +798,7 @@ onBeforeUnmount(() => {
           <span v-if="!sector.isAnchor" class="sector-distance">{{ sector.distance }}j</span>
         </div>
 
-        <div v-if="sector.saveStations.length > 0 || sector.placedFreeStations.length > 0 || sector.missingBoundStations.length > 0 || sector.hasPlacedVirtualTradestation" class="sector-stations">
+        <div v-if="sector.saveStations.length > 0 || sector.placedFreeStations.length > 0 || sector.missingBoundStations.length > 0 || sector.hasPlacedVirtualTradestation || sector.hasMissingVirtualTradestation" class="sector-stations">
           <!-- Save Stations -->
           <div
             v-for="station in sector.saveStations"
@@ -735,6 +807,7 @@ onBeforeUnmount(() => {
             :class="{ 'station-item--bound': isSaveStationBound(station.code) }"
             @click="onSectorItemClick(sector.sectorMacro)"
           >
+            <img class="entry-icon" :src="getSaveStationIcon(station)" alt="" />
             <div class="station-text">
               <div class="station-title-row">
                 <span class="station-label">{{ getStationLabel(station) }}</span>
@@ -766,7 +839,7 @@ onBeforeUnmount(() => {
             @mousedown="onPlacedFreeStationMouseDown($event, placed)"
             @click="onSectorItemClick(sector.sectorMacro)"
           >
-            <img class="placed-icon" :src="factoryIconUrl" alt="" />
+            <img class="entry-icon" :src="getEmpireStationIconById(placed.stationId)" alt="" />
             <div class="station-text">
               <span class="station-label">{{ placed.stationName }}</span>
               <span class="station-code">x: {{ formatCoordKm(placed.position.x) }} / z: {{ formatCoordKm(placed.position.z) }}</span>
@@ -779,7 +852,7 @@ onBeforeUnmount(() => {
             :key="`missing-${missing.stationId}`"
             class="station-item station-item--missing"
           >
-            <img class="placed-icon" :src="factoryIconUrl" alt="" />
+            <img class="entry-icon" :src="getEmpireStationIconById(missing.stationId)" alt="" />
             <div class="station-text">
               <span class="station-label">{{ missing.stationName }}</span>
               <span class="station-code">{{ t('map.binding_status_missing') }}</span>
@@ -795,11 +868,27 @@ onBeforeUnmount(() => {
             @mousedown="onVirtualTradestationMouseDown($event)"
             @click="onSectorItemClick(sector.sectorMacro)"
           >
-            <img class="placed-icon" :src="tradestationIconUrl" alt="" />
+            <img class="entry-icon" :src="tradestationIconUrl" alt="" />
             <div class="station-text">
               <span class="station-label">{{ t('map.binding_tradestation_virtual') }}</span>
+              <span v-if="sector.placedVirtualTradestationPosition" class="station-code">
+                x: {{ formatCoordKm(sector.placedVirtualTradestationPosition.x) }} / z:
+                {{ formatCoordKm(sector.placedVirtualTradestationPosition.z) }}
+              </span>
             </div>
             <button class="placed-clear" type="button" @click.stop="clearVirtualTradestationBinding()">×</button>
+          </div>
+
+          <div
+            v-if="sector.hasMissingVirtualTradestation"
+            class="station-item station-item--missing station-item--tradestation"
+          >
+            <img class="entry-icon" :src="tradestationIconUrl" alt="" />
+            <div class="station-text">
+              <span class="station-label">{{ t('map.binding_tradestation_virtual') }}</span>
+              <span class="station-code">{{ t('map.binding_status_missing') }}</span>
+            </div>
+            <button class="placed-clear" type="button" @click.stop="empireStore.clearTradestationCode(props.gameGuid, props.sectorGroupId)">×</button>
           </div>
         </div>
         <div v-else class="sector-empty">
@@ -841,7 +930,7 @@ onBeforeUnmount(() => {
               type="button"
               class="bind-menu-item bind-menu-item--tradestation"
               :class="{
-                active: bindMenuSaveStation && currentGroupBinding?.tradestationCode === bindMenuSaveStation.code,
+                active: bindMenuSaveStation && currentGroupBinding?.tradestationBinding?.saveStationCode === bindMenuSaveStation.code,
                 'bind-menu-item--placed': item.placed,
                 'bind-menu-item--disabled': item.disabled
               }"
@@ -903,16 +992,8 @@ onBeforeUnmount(() => {
   @apply border-amber-400/30 bg-amber-200/5;
 }
 
-.free-station-item--orphan {
-  @apply border-orange-300/20;
-}
-
-.station-icon-wrap {
-  @apply flex items-center justify-center;
-}
-
-.station-icon {
-  @apply h-5 w-5;
+.entry-icon {
+  @apply h-8 w-8 shrink-0;
 }
 
 .station-info {
@@ -991,7 +1072,7 @@ onBeforeUnmount(() => {
 }
 
 .station-text {
-  @apply flex flex-col gap-0.5;
+  @apply flex min-w-0 flex-1 flex-col justify-center gap-0.5;
 }
 
 .station-title-row {
@@ -999,7 +1080,7 @@ onBeforeUnmount(() => {
 }
 
 .station-label {
-  @apply text-sm text-amber-50;
+  @apply truncate text-sm text-amber-50;
 }
 
 .station-badge {
@@ -1011,7 +1092,7 @@ onBeforeUnmount(() => {
 }
 
 .station-actions {
-  @apply flex items-center gap-1;
+  @apply ml-2 flex items-center gap-1;
 }
 
 .station-action {
@@ -1026,12 +1107,8 @@ onBeforeUnmount(() => {
   @apply ml-1 h-3 w-3;
 }
 
-.placed-icon {
-  @apply h-4 w-4;
-}
-
 .placed-clear {
-  @apply text-amber-100/40 hover:text-amber-50;
+  @apply ml-2 inline-flex h-8 w-8 items-center justify-center rounded border border-transparent text-amber-100/40 transition-colors hover:border-amber-200/15 hover:bg-amber-200/5 hover:text-amber-50;
 }
 
 /* Bind Menu */

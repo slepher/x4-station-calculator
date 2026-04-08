@@ -1092,14 +1092,12 @@ export interface CoverageSectorEntry {
 
 export interface GroupSaveBinding {
   sectorGroupId: string
-  tradestationCode?: string
   sectorMacro?: string
   jumpRange: number
   coverageSectorMacros: CoverageSectorEntry[]
   connectedSectorGroupIds?: string[]
   tradestationBinding?: StationSaveBinding
   stationBindings: StationSaveBinding[]
-  free?: boolean
 }
 
 export interface StationSaveBinding {
@@ -1107,7 +1105,6 @@ export interface StationSaveBinding {
   saveStationCode?: string
   sectorMacro?: string
   position?: { x: number; y: number; z: number }
-  free?: boolean
 }
 
 export interface SaveBindingPlan {

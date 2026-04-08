@@ -5,7 +5,6 @@ import MapSvgCanvas from '@/components/map/MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapSavePanel from './MapSavePanel.vue'
-import MapBindingPanel from './MapBindingPanel.vue'
 import MapSavePoiVisibilityControl from './MapSavePoiVisibilityControl.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
@@ -453,7 +452,7 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
         ...(group.coverageSectorMacros || []).map((entry) => entry.ref)
       ]))
 
-      if (group.tradestationBinding?.position && group.sectorMacro) {
+      if (group.tradestationBinding?.position && group.sectorMacro && !group.tradestationBinding.saveStationCode) {
         const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, group.sectorMacro)
         if (resolved) {
           overlays.push({
@@ -1421,12 +1420,9 @@ const onSavePanelOpen = () => {
 
 const onSavePanelClose = () => {
   isSavePanelOpen.value = false
+  isBindingPanelOpen.value = false
   activeSavePoiCategory.value = null
   focusedSavePoiKey.value = null
-}
-
-const onBindingPanelClose = () => {
-  isBindingPanelOpen.value = false
   bindingContextGameGuid.value = null
   bindingContextStage.value = 'select-binding'
   dragEnabledBindingSectorGroupId.value = null
@@ -1438,6 +1434,7 @@ const onBindingContextChange = (payload: {
   gameGuid: string | null
   sectorGroupId: string | null
 }) => {
+  isBindingPanelOpen.value = payload.stage !== 'select-binding'
   bindingContextStage.value = payload.stage
   bindingContextGameGuid.value = payload.gameGuid
   dragEnabledBindingSectorGroupId.value = payload.stage === 'select-station'
@@ -1498,20 +1495,6 @@ const onBindingDragStationEnd = () => {
   draggingCoverageSectorMacros.value = new Set()
 }
 
-const onBindingDragFreeSectorStart = (payload: { sectorGroupId: string; name: string; gameGuid: string }) => {
-  draggingFreeSector.value = {
-    sectorGroupId: payload.sectorGroupId,
-    name: payload.name
-  }
-  draggingBindingKey.value = payload.gameGuid
-  draggingPlacementItem.value = null
-  draggingOverlayKey.value = null
-}
-
-const onBindingDragFreeSectorEnd = () => {
-  clearPlacementState()
-}
-
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
   if (!payload) {
     saveStore.clearSelection()
@@ -1519,7 +1502,7 @@ const onSaveSelectArchive = async (payload: { guid: string; time: number } | nul
     return
   }
 
-  await saveStore.selectArchive(payload.guid, payload.time)
+  await saveStore.previewArchive(payload.guid, payload.time)
   activeSavePoiCategory.value = null
 }
 
@@ -1916,18 +1899,11 @@ onBeforeUnmount(() => {
         @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
         @focus-poi="onSavePoiFocus"
-      />
-
-      <MapBindingPanel
-        :open="isBindingPanelOpen"
-        @close="onBindingPanelClose"
         @context-change="onBindingContextChange"
         @focus-sector="onBindingFocusSector"
         @fit-sectors="onBindingFitSectors"
         @drag-station-start="onBindingDragStationStart"
         @drag-station-end="onBindingDragStationEnd"
-        @drag-free-sector-start="onBindingDragFreeSectorStart"
-        @drag-free-sector-end="onBindingDragFreeSectorEnd"
       />
 
       <div class="map-shell">

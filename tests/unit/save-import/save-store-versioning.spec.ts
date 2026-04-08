@@ -1,3 +1,6 @@
+/**
+ * @vitest-environment jsdom
+ */
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
 import type { SaveArchive, SavedSaveArchivesState } from '@/types/saveArchive'
@@ -226,6 +229,300 @@ describe('save store versioning', () => {
     expect(saveStore.savedArchivesState.activeArchiveId).toBeNull()
     const persisted = JSON.parse(localStorage.getItem('x4_save_archives') || '{}') as SavedSaveArchivesState
     expect(persisted.activeArchiveId).toBeNull()
+  })
+
+  it('restores guid-level activeArchiveId to the latest archive in that guid group', async () => {
+    setSavedState({
+      version: 1,
+      activeArchiveId: 'g',
+      list: [
+        {
+          id: 'g_10',
+          guid: 'g',
+          time: 10,
+          playerName: 'Tester',
+          version: '8.0',
+          filename: 'save_010.xml',
+          parser_version: 'v2',
+          post_processor_version: 'v2',
+          source: 'original',
+          isCompatible: true,
+          isValid: true,
+          createdAt: new Date('2026-04-04T00:00:00.000Z'),
+          sectorCount: 1
+        },
+        {
+          id: 'g_20',
+          guid: 'g',
+          time: 20,
+          playerName: 'Tester',
+          version: '8.0',
+          filename: 'save_020.xml',
+          parser_version: 'v2',
+          post_processor_version: 'v2',
+          source: 'original',
+          isCompatible: true,
+          isValid: true,
+          createdAt: new Date('2026-04-04T00:00:00.000Z'),
+          sectorCount: 1
+        }
+      ],
+      settings: {
+        visibility: {
+          playerStation: false,
+          npcStation: false,
+          xenonStation: false,
+          khaakStation: false,
+          abandonedShip: false,
+          datavault: false,
+          erlkingVault: false
+        }
+      }
+    })
+    dbMocks.loadArchiveDetailFromDB.mockResolvedValue({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 20,
+        playerName: 'Tester',
+        version: '8.0',
+        filename: 'save_020.xml',
+        parser_version: 'v2',
+        post_processor_version: 'v2',
+        source: 'original'
+      },
+      sectors: {
+        cluster_01_sector001_macro: {
+          name: 'Sector',
+          is_known: true
+        }
+      },
+      isCompatible: true,
+      isValid: true
+    } satisfies SaveArchive)
+
+    const saveStore = useSaveStore()
+    await saveStore.initialize()
+
+    expect(dbMocks.loadArchiveDetailFromDB).toHaveBeenCalledWith('x4_save_archives', 'g_20')
+    expect(saveStore.savedArchivesState.activeArchiveId).toBe('g')
+    expect(saveStore.selectedArchive?.meta.time).toBe(20)
+  })
+
+  it('previews a specific archive without overwriting a guid-level activeArchiveId', async () => {
+    setSavedState({
+      version: 1,
+      activeArchiveId: 'g',
+      list: [
+        {
+          id: 'g_10',
+          guid: 'g',
+          time: 10,
+          playerName: 'Tester',
+          version: '8.0',
+          filename: 'save_010.xml',
+          parser_version: 'v2',
+          post_processor_version: 'v2',
+          source: 'original',
+          isCompatible: true,
+          isValid: true,
+          createdAt: new Date('2026-04-04T00:00:00.000Z'),
+          sectorCount: 1
+        },
+        {
+          id: 'g_20',
+          guid: 'g',
+          time: 20,
+          playerName: 'Tester',
+          version: '8.0',
+          filename: 'save_020.xml',
+          parser_version: 'v2',
+          post_processor_version: 'v2',
+          source: 'original',
+          isCompatible: true,
+          isValid: true,
+          createdAt: new Date('2026-04-04T00:00:00.000Z'),
+          sectorCount: 1
+        }
+      ],
+      settings: {
+        visibility: {
+          playerStation: false,
+          npcStation: false,
+          xenonStation: false,
+          khaakStation: false,
+          abandonedShip: false,
+          datavault: false,
+          erlkingVault: false
+        }
+      }
+    })
+
+    dbMocks.loadArchiveDetailFromDB
+      .mockResolvedValueOnce({
+        meta: {
+          guid: 'g',
+          seed: 1,
+          time: 20,
+          playerName: 'Tester',
+          version: '8.0',
+          filename: 'save_020.xml',
+          parser_version: 'v2',
+          post_processor_version: 'v2',
+          source: 'original'
+        },
+        sectors: {
+          cluster_01_sector001_macro: {
+            name: 'Sector',
+            is_known: true
+          }
+        },
+        isCompatible: true,
+        isValid: true
+      } satisfies SaveArchive)
+      .mockResolvedValueOnce({
+        meta: {
+          guid: 'g',
+          seed: 1,
+          time: 10,
+          playerName: 'Tester',
+          version: '8.0',
+          filename: 'save_010.xml',
+          parser_version: 'v2',
+          post_processor_version: 'v2',
+          source: 'original'
+        },
+        sectors: {
+          cluster_01_sector001_macro: {
+            name: 'Sector',
+            is_known: true
+          }
+        },
+        isCompatible: true,
+        isValid: true
+      } satisfies SaveArchive)
+
+    const saveStore = useSaveStore()
+    await saveStore.initialize()
+    await saveStore.previewArchive('g', 10)
+
+    expect(saveStore.savedArchivesState.activeArchiveId).toBe('g')
+    expect(saveStore.selectedArchive?.meta.time).toBe(10)
+  })
+
+  it('keeps the latest selected archive when older restore requests finish later', async () => {
+    setSavedState({
+      version: 1,
+      activeArchiveId: null,
+      list: [
+        {
+          id: 'g_10',
+          guid: 'g',
+          time: 10,
+          playerName: 'Tester',
+          version: '8.0',
+          filename: 'save_010.xml',
+          parser_version: 'v2',
+          post_processor_version: 'v2',
+          source: 'original',
+          isCompatible: true,
+          isValid: true,
+          createdAt: new Date('2026-04-04T00:00:00.000Z'),
+          sectorCount: 1
+        },
+        {
+          id: 'g_20',
+          guid: 'g',
+          time: 20,
+          playerName: 'Tester',
+          version: '8.0',
+          filename: 'save_020.xml',
+          parser_version: 'v2',
+          post_processor_version: 'v2',
+          source: 'original',
+          isCompatible: true,
+          isValid: true,
+          createdAt: new Date('2026-04-04T00:00:00.000Z'),
+          sectorCount: 1
+        }
+      ],
+      settings: {
+        visibility: {
+          playerStation: false,
+          npcStation: false,
+          xenonStation: false,
+          khaakStation: false,
+          abandonedShip: false,
+          datavault: false,
+          erlkingVault: false
+        }
+      }
+    })
+
+    let resolveFirst: ((value: SaveArchive) => void) | null = null
+    let resolveSecond: ((value: SaveArchive) => void) | null = null
+    dbMocks.loadArchiveDetailFromDB
+      .mockImplementationOnce(() => new Promise<SaveArchive>((resolve) => {
+        resolveFirst = resolve
+      }))
+      .mockImplementationOnce(() => new Promise<SaveArchive>((resolve) => {
+        resolveSecond = resolve
+      }))
+
+    const saveStore = useSaveStore()
+    await saveStore.initialize()
+
+    const firstSelect = saveStore.selectArchive('g', 10)
+    const secondSelect = saveStore.selectArchive('g', 20)
+
+    resolveSecond?.({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 20,
+        playerName: 'Tester',
+        version: '8.0',
+        filename: 'save_020.xml',
+        parser_version: 'v2',
+        post_processor_version: 'v2',
+        source: 'original'
+      },
+      sectors: {
+        cluster_01_sector001_macro: {
+          name: 'Sector',
+          is_known: true
+        }
+      },
+      isCompatible: true,
+      isValid: true
+    } satisfies SaveArchive)
+    await secondSelect
+
+    resolveFirst?.({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 10,
+        playerName: 'Tester',
+        version: '8.0',
+        filename: 'save_010.xml',
+        parser_version: 'v2',
+        post_processor_version: 'v2',
+        source: 'original'
+      },
+      sectors: {
+        cluster_01_sector001_macro: {
+          name: 'Sector',
+          is_known: true
+        }
+      },
+      isCompatible: true,
+      isValid: true
+    } satisfies SaveArchive)
+    await firstSelect
+
+    expect(saveStore.savedArchivesState.activeArchiveId).toBe('g_20')
+    expect(saveStore.selectedArchive?.meta.time).toBe(20)
   })
 
   it('migrates missing settings to defaults and persists updated settings separately from archive selection', async () => {

@@ -65,4 +65,170 @@ describe('saveBindingActions connected sector groups', () => {
     const bindingB = actions.getGroupBinding('g-1', 'b')
     expect(bindingB?.connectedSectorGroupIds || []).toEqual([])
   })
+
+  it('binding a save station to a normal station releases the virtual tradestation binding for the same code', () => {
+    const activeEmpire = ref({
+      id: 'empire-1',
+      name: 'Empire',
+      sectors: [{ id: 'a', name: 'A', order: 0 }],
+      stations: [{ id: 'station-1', name: 'S1' }],
+      saveBindings: [
+        {
+          gameGuid: 'g-1',
+          active: true,
+          selectedArchiveTime: null,
+          groupBindings: [
+            {
+              sectorGroupId: 'a',
+              jumpRange: 2,
+              coverageSectorMacros: [],
+              tradestationBinding: {
+                stationId: 'tradestation_a',
+                saveStationCode: 'save_1',
+                sectorMacro: 'sector_a',
+                position: { x: 1, y: 0, z: 2 }
+              },
+              stationBindings: []
+            }
+          ]
+        }
+      ]
+    } as any)
+
+    const actions = createSaveBindingActions(activeEmpire, vi.fn(), vi.fn())
+
+    actions.bindStationToSaveStation({
+      gameGuid: 'g-1',
+      sectorGroupId: 'a',
+      stationId: 'station-1',
+      saveStationCode: 'save_1',
+      sectorMacro: 'sector_a',
+      position: { x: 1, y: 0, z: 2 }
+    })
+
+    const binding = actions.getGroupBinding('g-1', 'a')
+    expect(binding?.tradestationBinding).toBeUndefined()
+    expect(binding?.stationBindings[0]?.saveStationCode).toBe('save_1')
+  })
+
+  it('binding a save station to virtual tradestation removes normal station bindings for the same code', () => {
+    const activeEmpire = ref({
+      id: 'empire-1',
+      name: 'Empire',
+      sectors: [{ id: 'a', name: 'A', order: 0 }],
+      stations: [{ id: 'station-1', name: 'S1' }],
+      saveBindings: [
+        {
+          gameGuid: 'g-1',
+          active: true,
+          selectedArchiveTime: null,
+          groupBindings: [
+            {
+              sectorGroupId: 'a',
+              jumpRange: 2,
+              coverageSectorMacros: [],
+              stationBindings: [
+                {
+                  stationId: 'station-1',
+                  saveStationCode: 'save_1',
+                  sectorMacro: 'sector_a',
+                  position: { x: 1, y: 0, z: 2 }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    } as any)
+
+    const actions = createSaveBindingActions(activeEmpire, vi.fn(), vi.fn())
+
+    actions.bindTradestationToSaveStation({
+      gameGuid: 'g-1',
+      sectorGroupId: 'a',
+      saveStationCode: 'save_1',
+      sectorMacro: 'sector_a',
+      position: { x: 3, y: 0, z: 4 }
+    })
+
+    const binding = actions.getGroupBinding('g-1', 'a')
+    expect(binding?.tradestationBinding?.saveStationCode).toBe('save_1')
+    expect(binding?.stationBindings).toEqual([])
+  })
+
+  it('clears empty station bindings instead of leaving no-code/no-position records', () => {
+    const updateStationSector = vi.fn()
+    const activeEmpire = ref({
+      id: 'empire-1',
+      name: 'Empire',
+      sectors: [{ id: 'a', name: 'A', order: 0 }],
+      stations: [{ id: 'station-1', name: 'S1' }],
+      saveBindings: [
+        {
+          gameGuid: 'g-1',
+          active: true,
+          selectedArchiveTime: null,
+          groupBindings: [
+            {
+              sectorGroupId: 'a',
+              jumpRange: 2,
+              coverageSectorMacros: [],
+              stationBindings: [
+                {
+                  stationId: 'station-1',
+                  sectorMacro: 'sector_a',
+                  position: { x: 1, y: 0, z: 2 }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    } as any)
+
+    const actions = createSaveBindingActions(activeEmpire, vi.fn(), updateStationSector)
+
+    actions.clearStationCode('g-1', 'a', 'station-1')
+    actions.setStationBindingPosition('g-1', 'a', 'station-1', null)
+
+    const binding = actions.getGroupBinding('g-1', 'a')
+    expect(binding?.stationBindings).toEqual([])
+    expect(updateStationSector).toHaveBeenCalledWith('station-1', null)
+  })
+
+  it('clears empty virtual tradestation binding instead of leaving code-less shell records', () => {
+    const activeEmpire = ref({
+      id: 'empire-1',
+      name: 'Empire',
+      sectors: [{ id: 'a', name: 'A', order: 0 }],
+      stations: [],
+      saveBindings: [
+        {
+          gameGuid: 'g-1',
+          active: true,
+          selectedArchiveTime: null,
+          groupBindings: [
+            {
+              sectorGroupId: 'a',
+              jumpRange: 2,
+              coverageSectorMacros: [],
+              tradestationBinding: {
+                stationId: 'tradestation_a',
+                saveStationCode: 'save_1'
+              },
+              stationBindings: []
+            }
+          ]
+        }
+      ]
+    } as any)
+
+    const actions = createSaveBindingActions(activeEmpire, vi.fn(), vi.fn())
+
+    actions.clearTradestationCode('g-1', 'a')
+
+    const binding = actions.getGroupBinding('g-1', 'a')
+    expect(binding?.tradestationBinding?.saveStationCode).toBeUndefined()
+    expect(binding?.tradestationBinding).toBeUndefined()
+  })
 })

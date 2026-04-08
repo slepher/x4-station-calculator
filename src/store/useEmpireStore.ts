@@ -1133,6 +1133,7 @@ export const useEmpireStore = defineStore('empire', () => {
     clearTradestationBinding: bindingActions.clearTradestationBinding,
     bindTradestationToSaveStation: bindingActions.bindTradestationToSaveStation,
     clearTradestationCode: bindingActions.clearTradestationCode,
+    clearStationCode: bindingActions.clearStationCode,
     bindStationToSaveStation: bindingActions.bindStationToSaveStation,
     clearStationBinding: bindingActions.clearStationBinding,
     setStationBindingPosition: bindingActions.setStationBindingPosition,

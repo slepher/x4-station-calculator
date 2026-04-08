@@ -104,6 +104,12 @@ function createDefaultSaveArchiveSettings(): SaveArchiveSettings {
   }
 }
 
+function getLatestArchiveMetaForGuid(list: ArchiveMeta[], guid: string): ArchiveMeta | null {
+  const matches = list.filter((item) => item.guid === guid)
+  if (matches.length === 0) return null
+  return [...matches].sort((a, b) => b.time - a.time)[0] || null
+}
+
 function migrateSaveArchiveSettingsToCurrent(raw: unknown): SaveArchiveSettings {
   const defaults = createDefaultSaveArchiveSettings()
   if (!raw || typeof raw !== 'object') return defaults
@@ -442,8 +448,24 @@ export const useSaveStore = defineStore('save', () => {
     }
   }
 
+  let archiveRestoreRequestId = 0
+
   async function restoreSelectedArchive(archiveId: string): Promise<void> {
-    const fullArchive = await loadArchiveDetailFromDB(getStorageKey(), archiveId)
+    const requestId = ++archiveRestoreRequestId
+    const resolvedArchiveId = savedArchivesState.value.list.some((item) => item.id === archiveId)
+      ? archiveId
+      : getLatestArchiveMetaForGuid(savedArchivesState.value.list, archiveId)?.id || null
+
+    if (!resolvedArchiveId) {
+      if (requestId !== archiveRestoreRequestId) return
+      selectedArchive.value = null
+      savedArchivesState.value.activeArchiveId = null
+      writeSavedState()
+      return
+    }
+
+    const fullArchive = await loadArchiveDetailFromDB(getStorageKey(), resolvedArchiveId)
+    if (requestId !== archiveRestoreRequestId) return
     if (!fullArchive) {
       selectedArchive.value = null
       savedArchivesState.value.activeArchiveId = null
@@ -465,11 +487,12 @@ export const useSaveStore = defineStore('save', () => {
       reprocessedArchive.isCompatible = checkVersionCompatibility(reprocessedArchive.meta.version)
       reprocessedArchive.isValid = isArchiveParserVersionValid(reprocessedArchive)
       await saveArchiveToDB(getStorageKey(), reprocessedArchive)
-      const existingMeta = savedArchivesState.value.list.find((item) => item.id === archiveId)
+      const existingMeta = savedArchivesState.value.list.find((item) => item.id === resolvedArchiveId)
       const nextMeta = buildArchiveMeta(reprocessedArchive, existingMeta?.createdAt)
       savedArchivesState.value.list = upsertArchiveMeta(savedArchivesState.value.list, nextMeta)
       writeSavedState()
       rebuildArchivesFromState()
+      if (requestId !== archiveRestoreRequestId) return
       selectedArchive.value = reprocessedArchive
       return
     }
@@ -571,6 +594,29 @@ export const useSaveStore = defineStore('save', () => {
     await restoreSelectedArchive(archiveId)
   }
 
+  async function selectArchiveGroup(guid: string): Promise<void> {
+    const latestMeta = getLatestArchiveMetaForGuid(savedArchivesState.value.list, guid)
+    if (!latestMeta) {
+      selectedArchive.value = null
+      return
+    }
+
+    savedArchivesState.value.activeArchiveId = guid
+    writeSavedState()
+    await restoreSelectedArchive(guid)
+  }
+
+  async function previewArchive(guid: string, time: number): Promise<void> {
+    const archiveId = createArchiveId(guid, time)
+    const exists = savedArchivesState.value.list.some((item) => item.id === archiveId)
+    if (!exists) {
+      selectedArchive.value = null
+      return
+    }
+
+    await restoreSelectedArchive(archiveId)
+  }
+
   function clearSelection(): void {
     selectedArchive.value = null
     savedArchivesState.value.activeArchiveId = null
@@ -585,6 +631,9 @@ export const useSaveStore = defineStore('save', () => {
     savedArchivesState.value.list = removeArchiveMeta(savedArchivesState.value.list, archiveId)
     if (savedArchivesState.value.activeArchiveId === archiveId) {
       savedArchivesState.value.activeArchiveId = null
+    } else if (savedArchivesState.value.activeArchiveId === guid) {
+      const remaining = savedArchivesState.value.list.filter((item) => item.id !== archiveId && item.guid === guid)
+      savedArchivesState.value.activeArchiveId = remaining.length > 0 ? guid : null
     }
     if (selectedArchive.value?.meta.guid === guid && selectedArchive.value?.meta.time === time) {
       selectedArchive.value = null
@@ -760,6 +809,8 @@ export const useSaveStore = defineStore('save', () => {
     checkVersionCompatibility,
     addArchive,
     selectArchive,
+    selectArchiveGroup,
+    previewArchive,
     clearSelection,
     removeArchive,
     clearAll,
