@@ -344,9 +344,10 @@ function getSectorMacroDisplayName(sectorMacro: string): string {
 }
 
 function updateBindMenuPosition() {
-  const panel = document.querySelector('.map-binding-panel')
+  const panel = document.querySelector('.map-save-panel, .map-binding-panel')
   const trigger = bindMenuTriggerEl.value
-  if (!panel || !trigger) {
+  const anchor = (trigger?.closest('.empire-sector-item') as HTMLElement | null) || trigger
+  if (!panel || !trigger || !anchor) {
     bindMenuStyle.value = {
       position: 'fixed',
       top: '100px',
@@ -357,11 +358,20 @@ function updateBindMenuPosition() {
   }
 
   const panelRect = panel.getBoundingClientRect()
-  const triggerRect = trigger.getBoundingClientRect()
+  const anchorRect = anchor.getBoundingClientRect()
+  const menuHeight = bindMenuRef.value?.offsetHeight || 300
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0
+  const spaceBelow = viewportHeight - anchorRect.bottom
+  const spaceAbove = anchorRect.top
+  const preferUpward = spaceBelow < menuHeight && spaceAbove > spaceBelow
+  const rawTop = preferUpward
+    ? anchorRect.bottom - menuHeight
+    : anchorRect.top
+  const top = Math.max(8, Math.min(rawTop, Math.max(8, viewportHeight - menuHeight - 8)))
 
   bindMenuStyle.value = {
     position: 'fixed',
-    top: `${triggerRect.top}px`,
+    top: `${top}px`,
     left: `${panelRect.right + 8}px`,
     maxHeight: '300px'
   }

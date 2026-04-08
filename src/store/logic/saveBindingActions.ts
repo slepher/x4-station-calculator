@@ -321,9 +321,13 @@ export function createSaveBindingActions(
       groupBinding.tradestationBinding = { stationId: `tradestation_${input.sectorGroupId}` }
     }
 
+    const releasedStationIds = groupBinding.stationBindings
+      .filter((binding) => binding.saveStationCode === input.saveStationCode)
+      .map((binding) => binding.stationId)
     groupBinding.stationBindings = groupBinding.stationBindings.filter(
       (binding) => binding.saveStationCode !== input.saveStationCode
     )
+    releasedStationIds.forEach((stationId) => updateStationSector(stationId, null))
     groupBinding.tradestationBinding.saveStationCode = input.saveStationCode
     
     if (input.sectorMacro) {
@@ -386,7 +390,10 @@ export function createSaveBindingActions(
       (b) => b.saveStationCode === input.saveStationCode && b.stationId !== input.stationId
     )
     if (alreadyBoundStationIndex >= 0) {
-      groupBinding.stationBindings.splice(alreadyBoundStationIndex, 1)
+      const released = groupBinding.stationBindings.splice(alreadyBoundStationIndex, 1)[0]
+      if (released) {
+        updateStationSector(released.stationId, null)
+      }
     }
 
     if (groupBinding.tradestationBinding?.saveStationCode === input.saveStationCode) {
@@ -497,6 +504,16 @@ export function createSaveBindingActions(
 
     const existing = groupBinding.stationBindings.find((b) => b.stationId === input.stationId)
     if (existing) return
+
+    const releasedStationIds = groupBinding.stationBindings
+      .filter((b) => b.saveStationCode === input.saveStation.code)
+      .map((b) => b.stationId)
+    groupBinding.stationBindings = groupBinding.stationBindings.filter((b) => b.saveStationCode !== input.saveStation.code)
+    releasedStationIds.forEach((stationId) => updateStationSector(stationId, null))
+
+    if (groupBinding.tradestationBinding?.saveStationCode === input.saveStation.code) {
+      delete groupBinding.tradestationBinding
+    }
 
     const newBinding: StationSaveBinding = {
       stationId: input.stationId,

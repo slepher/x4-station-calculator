@@ -53,6 +53,7 @@ describe('MapBindingStation', () => {
   const clearTradestationBinding = vi.fn()
   const clearTradestationCode = vi.fn()
   const isSaveStationAlreadyBound = vi.fn()
+  const updateStationModules = vi.fn()
 
   function mountComponent() {
     return mount(MapBindingStation, {
@@ -134,6 +135,7 @@ describe('MapBindingStation', () => {
       clearStationCode,
       clearTradestationBinding,
       clearTradestationCode,
+      updateStationModules,
       isSaveStationAlreadyBound,
       createStation: vi.fn(() => ({ id: 'new-station' })),
       importSaveStationAsBinding: vi.fn()
@@ -181,6 +183,7 @@ describe('MapBindingStation', () => {
       clearStationCode,
       clearTradestationBinding,
       clearTradestationCode,
+      updateStationModules,
       isSaveStationAlreadyBound: vi.fn((guid: string, sectorGroupId: string, code: string) => code === 'save_1'),
       createStation: vi.fn(() => ({ id: 'new-station' })),
       importSaveStationAsBinding: vi.fn()
@@ -242,6 +245,7 @@ describe('MapBindingStation', () => {
       clearStationCode,
       clearTradestationBinding,
       clearTradestationCode,
+      updateStationModules,
       isSaveStationAlreadyBound,
       createStation: vi.fn(() => ({ id: 'new-station' })),
       importSaveStationAsBinding: vi.fn()
@@ -255,11 +259,11 @@ describe('MapBindingStation', () => {
 
     const missingStationClear = wrapper.findAll('.station-item--missing .placed-clear')[0]
     await missingStationClear.trigger('click')
-    expect(clearStationCode).toHaveBeenCalledWith('g-1', 'group-a', 'station-missing')
+    expect(clearStationBinding).toHaveBeenCalledWith('g-1', 'group-a', 'station-missing')
 
     const missingTradeClear = wrapper.findAll('.station-item--missing .placed-clear')[1]
     await missingTradeClear.trigger('click')
-    expect(clearTradestationCode).toHaveBeenCalledWith('g-1', 'group-a')
+    expect(clearTradestationBinding).toHaveBeenCalledWith('g-1', 'group-a')
   })
 
   it('renders placed-unbound virtual tradestation with x/z coordinates', () => {
@@ -354,6 +358,7 @@ describe('MapBindingStation', () => {
       clearStationCode,
       clearTradestationBinding,
       clearTradestationCode,
+      updateStationModules,
       isSaveStationAlreadyBound: vi.fn((guid: string, sectorGroupId: string, code: string) => code === 'save_1' || code === 'save_2'),
       createStation: vi.fn(() => ({ id: 'new-station' })),
       importSaveStationAsBinding: vi.fn()
@@ -369,7 +374,147 @@ describe('MapBindingStation', () => {
 
     expect(currentItem?.classes()).toContain('active')
     expect(placedItem?.classes()).toContain('bind-menu-item--placed')
+    expect(placedItem?.classes()).toContain('bind-menu-item--disabled')
+    expect(placedItem?.attributes('disabled')).toBeDefined()
     expect(otherItem?.classes()).toContain('bind-menu-item--disabled')
     expect(otherItem?.attributes('disabled')).toBeDefined()
+  })
+
+  it('imports modules using search picker order and module_id only', async () => {
+    vi.mocked(useSaveStore).mockReturnValue({
+      selectedArchive: {
+        meta: { guid: 'g-1', time: 1000 },
+        sectors: {
+          sector_a: {
+            playerStations: [
+              {
+                code: 'save_1',
+                tag: 'factory',
+                owner: 'player',
+                macro: 'player_macro_1',
+                position: { x: 1000, y: 0, z: 2000 },
+                modules: [
+                  { ref: 'macro-storage', module_id: 'module_storage', amount: 1 },
+                  { ref: 'macro-hightech', module_id: 'module_hightech', amount: 1 },
+                  { ref: 'macro-ignored', amount: 5 }
+                ]
+              }
+            ]
+          }
+        }
+      },
+      archives: new Map()
+    } as any)
+
+    vi.mocked(useGameDataStore).mockReturnValue({
+      maps: {
+        clusters: {},
+        sectors: {
+          sector_a: { name: 'Sector A' }
+        }
+      },
+      localizedModulesMap: {
+        module_storage: { id: 'module_storage', group: 'containerstorage', tier: 0, localeName: 'Storage' },
+        module_hightech: { id: 'module_hightech', group: 'hightech', tier: 0, localeName: 'Hightech' }
+      },
+      localizedModuleGroupsMap: {
+        hightech: { id: 'hightech', localeName: 'Hightech', type: 'production' },
+        containerstorage: { id: 'containerstorage', localeName: 'Storage', type: 'storage' }
+      }
+    } as any)
+
+    const importSaveStationAsBinding = vi.fn()
+    vi.mocked(useEmpireStore).mockReturnValue({
+      activeEmpire: {
+        stations: [],
+        saveBindings: [
+          {
+            gameGuid: 'g-1',
+            selectedArchiveTime: 1000,
+            groupBindings: [
+              {
+                sectorGroupId: 'group-a',
+                sectorMacro: 'sector_a',
+                jumpRange: 0,
+                coverageSectorMacros: [],
+                stationBindings: []
+              }
+            ]
+          }
+        ]
+      },
+      bindStationToSaveStation,
+      bindTradestationToSaveStation,
+      clearStationBinding,
+      clearStationCode,
+      clearTradestationBinding,
+      clearTradestationCode,
+      updateStationModules,
+      isSaveStationAlreadyBound,
+      createStation: vi.fn(() => ({ id: 'new-station' })),
+      importSaveStationAsBinding
+    } as any)
+
+    const wrapper = mountComponent()
+    await wrapper.find('.station-action').trigger('click')
+    await wrapper.find('.bind-menu-item--import').trigger('click')
+
+    expect(updateStationModules).toHaveBeenCalledWith('new-station', [
+      { id: 'module_hightech', count: 1 },
+      { id: 'module_storage', count: 1 }
+    ])
+    expect(importSaveStationAsBinding).toHaveBeenCalled()
+  })
+
+  it('marks dangling station binding as error and allows clearing from menu', async () => {
+    vi.mocked(useEmpireStore).mockReturnValue({
+      activeEmpire: {
+        stations: [],
+        saveBindings: [
+          {
+            gameGuid: 'g-1',
+            selectedArchiveTime: 1000,
+            groupBindings: [
+              {
+                sectorGroupId: 'group-a',
+                sectorMacro: 'sector_a',
+                jumpRange: 0,
+                coverageSectorMacros: [],
+                stationBindings: [
+                  {
+                    stationId: 'missing-station',
+                    saveStationCode: 'save_1',
+                    sectorMacro: 'sector_a',
+                    position: { x: 1000, y: 0, z: 2000 }
+                  }
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      bindStationToSaveStation,
+      bindTradestationToSaveStation,
+      clearStationBinding,
+      clearStationCode,
+      clearTradestationBinding,
+      clearTradestationCode,
+      updateStationModules,
+      isSaveStationAlreadyBound: vi.fn(() => true),
+      createStation: vi.fn(() => ({ id: 'new-station' })),
+      importSaveStationAsBinding: vi.fn()
+    } as any)
+
+    const wrapper = mountComponent()
+    const action = wrapper.find('.station-action')
+    expect(action.classes()).toContain('station-action--error')
+    expect(action.text()).toContain('map.binding_status_error')
+
+    await action.trigger('click')
+    expect(wrapper.text()).toContain('map.binding_abnormal_station')
+
+    const clearBtn = wrapper.find('.bind-menu-item--error .bind-menu-item-clear')
+    await clearBtn.trigger('click')
+    expect(clearStationBinding).toHaveBeenCalledWith('g-1', 'group-a', 'missing-station')
   })
 })

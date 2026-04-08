@@ -8,7 +8,8 @@ import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSavePoiIconUrl } from '@/components/map/utils/style'
 import { resolveGroupSaveBinding, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
-import type { StationSaveBinding, StationPlan } from '@/types/x4'
+import { compareModulesByPickerOrder } from '@/store/logic/searchModule'
+import type { SavedModule, StationSaveBinding, StationPlan } from '@/types/x4'
 import type { PlayerStationEntry, SavePoiOverlayItem } from '@/types/saveArchive'
 import factoryIconUrl from '@/components/icons/factory.svg'
 import tradestationIconUrl from '@/components/icons/tradestation.svg'
@@ -38,6 +39,7 @@ const bindMenuStyle = ref<Record<string, string>>({})
 const bindMenuSaveStation = ref<PlayerStationEntry | null>(null)
 const bindMenuSectorMacro = ref<string | null>(null)
 const bindMenuTriggerEl = ref<HTMLElement | null>(null)
+const bindMenuAnchorEl = ref<HTMLElement | null>(null)
 
 const pendingDrag = ref<{
   key: string
@@ -362,17 +364,31 @@ function isSaveStationBound(saveStationCode: string): boolean {
   return empireStore.isSaveStationAlreadyBound(props.gameGuid, props.sectorGroupId, saveStationCode)
 }
 
-function getBoundEmpireStation(saveStationCode: string): StationPlan | null {
-  const binding = currentGroupBinding.value?.stationBindings.find(
+function getBoundStationBinding(saveStationCode: string): StationSaveBinding | null {
+  return currentGroupBinding.value?.stationBindings.find(
     (b: StationSaveBinding) => b.saveStationCode === saveStationCode
-  )
+  ) || null
+}
+
+function getBoundEmpireStation(saveStationCode: string): StationPlan | null {
+  const binding = getBoundStationBinding(saveStationCode)
   if (!binding) return null
   return activeEmpire.value?.stations?.find((s) => s.id === binding.stationId) || null
+}
+
+function hasDanglingBoundStation(saveStationCode: string): boolean {
+  if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) return false
+  const binding = getBoundStationBinding(saveStationCode)
+  if (!binding) return false
+  return !getBoundEmpireStation(saveStationCode)
 }
 
 function getBindButtonLabel(saveStationCode: string): string {
   if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) {
     return t('map.binding_tradestation_virtual')
+  }
+  if (hasDanglingBoundStation(saveStationCode)) {
+    return t('map.binding_status_error')
   }
   if (isSaveStationBound(saveStationCode)) {
     const station = getBoundEmpireStation(saveStationCode)
@@ -382,9 +398,10 @@ function getBindButtonLabel(saveStationCode: string): string {
 }
 
 function updateBindMenuPosition() {
-  const panel = document.querySelector('.map-binding-panel')
+  const panel = document.querySelector('.map-save-panel, .map-binding-panel')
   const trigger = bindMenuTriggerEl.value
-  if (!panel || !trigger) {
+  const anchor = bindMenuAnchorEl.value || (trigger?.closest('.station-item') as HTMLElement | null)
+  if (!panel || !trigger || !anchor) {
     bindMenuStyle.value = {
       position: 'fixed',
       top: '100px',
@@ -395,11 +412,20 @@ function updateBindMenuPosition() {
   }
 
   const panelRect = panel.getBoundingClientRect()
-  const triggerRect = trigger.getBoundingClientRect()
+  const anchorRect = anchor.getBoundingClientRect()
+  const menuHeight = bindMenuRef.value?.offsetHeight || 300
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0
+  const spaceBelow = viewportHeight - anchorRect.bottom
+  const spaceAbove = anchorRect.top
+  const preferUpward = spaceBelow < menuHeight && spaceAbove > spaceBelow
+  const rawTop = preferUpward
+    ? anchorRect.bottom - menuHeight
+    : anchorRect.top
+  const top = Math.max(8, Math.min(rawTop, Math.max(8, viewportHeight - menuHeight - 8)))
 
   bindMenuStyle.value = {
     position: 'fixed',
-    top: `${triggerRect.top}px`,
+    top: `${top}px`,
     left: `${panelRect.right + 8}px`,
     maxHeight: '300px'
   }
@@ -409,6 +435,7 @@ function toggleBindMenu(event: MouseEvent, station: PlayerStationEntry, sectorMa
   bindMenuSaveStation.value = station
   bindMenuSectorMacro.value = sectorMacro
   bindMenuTriggerEl.value = event.currentTarget as HTMLElement
+  bindMenuAnchorEl.value = (event.currentTarget as HTMLElement)?.closest('.station-item') as HTMLElement | null
   bindMenuOpen.value = !bindMenuOpen.value
   if (bindMenuOpen.value) {
     nextTick(() => updateBindMenuPosition())
@@ -419,6 +446,8 @@ function closeBindMenu() {
   bindMenuOpen.value = false
   bindMenuSaveStation.value = null
   bindMenuSectorMacro.value = null
+  bindMenuTriggerEl.value = null
+  bindMenuAnchorEl.value = null
 }
 
 function onBindMenuGlobalPointerDown(event: MouseEvent) {
@@ -477,8 +506,24 @@ function bindToVirtualTradestation() {
   closeBindMenu()
 }
 
+function clearCurrentSaveStationBinding() {
+  const saveStationCode = bindMenuSaveStation.value?.code
+  if (!saveStationCode) return
+
+  if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) {
+    empireStore.clearTradestationBinding(props.gameGuid, props.sectorGroupId)
+    closeBindMenu()
+    return
+  }
+
+  const boundBinding = getBoundStationBinding(saveStationCode)
+  if (!boundBinding) return
+  empireStore.clearStationBinding(props.gameGuid, props.sectorGroupId, boundBinding.stationId)
+  closeBindMenu()
+}
+
 function unbindStation(stationId: string) {
-  empireStore.clearStationCode(props.gameGuid, props.sectorGroupId, stationId)
+  empireStore.clearStationBinding(props.gameGuid, props.sectorGroupId, stationId)
 }
 
 function importSaveStation(station: PlayerStationEntry, sectorMacro: string) {
@@ -488,6 +533,29 @@ function importSaveStation(station: PlayerStationEntry, sectorMacro: string) {
   if (!newStation) return
 
   newStation.sectorId = props.sectorGroupId
+  const importedModules: SavedModule[] = (station.modules || [])
+    .filter((module) => Boolean(module?.module_id) && Number(module.amount) > 0)
+    .map((module) => {
+      const id = module.module_id as string
+      return {
+        id,
+        count: module.amount
+      }
+    })
+  importedModules.sort((a, b) => {
+    const moduleA = gameDataStore.localizedModulesMap?.[a.id]
+    const moduleB = gameDataStore.localizedModulesMap?.[b.id]
+    if (!moduleA || !moduleB) return a.id.localeCompare(b.id)
+    return compareModulesByPickerOrder(
+      moduleA,
+      moduleB,
+      gameDataStore.localizedModuleGroupsMap || {}
+    )
+  })
+
+  if (importedModules.length > 0 && empireStore.updateStationModules) {
+    empireStore.updateStationModules(newStation.id, importedModules)
+  }
 
   empireStore.importSaveStationAsBinding({
     gameGuid: props.gameGuid,
@@ -561,6 +629,7 @@ const allStationsForMenu = computed(() => {
         sectorGroupId: station.sectorId || '',
         sectorGroupName: '',
         sectorMacro: binding?.sectorMacro,
+        disabled: true,
         placed: Boolean(binding?.position)
       })
     } else if (binding?.saveStationCode) {
@@ -597,6 +666,7 @@ const allStationsForMenu = computed(() => {
         name: t('map.binding_tradestation_virtual'),
         sectorGroupId: props.sectorGroupId,
         sectorMacro: tb.sectorMacro,
+        disabled: true,
         placed: true
       })
     } else if (tb?.position && tradestationSaveStationCode) {
@@ -818,7 +888,7 @@ onBeforeUnmount(() => {
             <div class="station-actions">
               <button
                 class="station-action"
-                :class="{ 'station-action--bound': isSaveStationBound(station.code) }"
+                :class="{ 'station-action--bound': isSaveStationBound(station.code), 'station-action--error': hasDanglingBoundStation(station.code) }"
                 type="button"
                 @click.stop="toggleBindMenu($event, station, sector.sectorMacro)"
               >
@@ -888,7 +958,7 @@ onBeforeUnmount(() => {
               <span class="station-label">{{ t('map.binding_tradestation_virtual') }}</span>
               <span class="station-code">{{ t('map.binding_status_missing') }}</span>
             </div>
-            <button class="placed-clear" type="button" @click.stop="empireStore.clearTradestationCode(props.gameGuid, props.sectorGroupId)">×</button>
+            <button class="placed-clear" type="button" @click.stop="empireStore.clearTradestationBinding(props.gameGuid, props.sectorGroupId)">×</button>
           </div>
         </div>
         <div v-else class="sector-empty">
@@ -907,6 +977,21 @@ onBeforeUnmount(() => {
       >
         <div class="bind-menu-group">
           <div class="bind-menu-group-title">{{ t('map.binding_free_stations') }}</div>
+          <button
+            v-if="bindMenuSaveStation && hasDanglingBoundStation(bindMenuSaveStation.code)"
+            type="button"
+            class="bind-menu-item bind-menu-item--error"
+            @click.prevent
+          >
+            <span class="bind-menu-item-name">{{ t('map.binding_abnormal_station') }}</span>
+            <span class="bind-menu-item-side">
+              <button
+                type="button"
+                class="bind-menu-item-clear"
+                @click.stop="clearCurrentSaveStationBinding"
+              >×</button>
+            </span>
+          </button>
           <template v-for="item in allStationsForMenu" :key="'station' in item ? item.station.id : 'virtual-ts'">
             <!-- Empire Station -->
             <button
@@ -922,7 +1007,14 @@ onBeforeUnmount(() => {
               @click="bindToStation(item.station.id)"
             >
               <span class="bind-menu-item-name">{{ item.station.name }}</span>
-              <span v-if="item.placed" class="bind-menu-item-type">{{ t('map.binding_position_set') }}</span>
+              <span class="bind-menu-item-side">
+                <button
+                  v-if="bindMenuSaveStation && getBoundEmpireStation(bindMenuSaveStation.code)?.id === item.station.id"
+                  type="button"
+                  class="bind-menu-item-clear"
+                  @click.stop="clearCurrentSaveStationBinding"
+                >×</button>
+              </span>
             </button>
             <!-- Virtual Tradestation -->
             <button
@@ -938,7 +1030,14 @@ onBeforeUnmount(() => {
               @click="bindToVirtualTradestation()"
             >
               <span class="bind-menu-item-name">{{ item.name }}</span>
-              <span class="bind-menu-item-type">{{ t('map.binding_tradestation_virtual') }}</span>
+              <span class="bind-menu-item-side">
+                <button
+                  v-if="bindMenuSaveStation && currentGroupBinding?.tradestationBinding?.saveStationCode === bindMenuSaveStation.code"
+                  type="button"
+                  class="bind-menu-item-clear"
+                  @click.stop="clearCurrentSaveStationBinding"
+                >×</button>
+              </span>
             </button>
           </template>
           <div v-if="allStationsForMenu.length === 0" class="bind-menu-empty">
@@ -1103,6 +1202,10 @@ onBeforeUnmount(() => {
   @apply border-amber-200/50 bg-amber-200/15 text-amber-50;
 }
 
+.station-action--error {
+  @apply border-rose-400/45 bg-rose-500/15 text-rose-200;
+}
+
 .action-chevron {
   @apply ml-1 h-3 w-3;
 }
@@ -1115,6 +1218,24 @@ onBeforeUnmount(() => {
 .bind-menu {
   @apply fixed z-[100] min-w-[40px] overflow-y-auto rounded-lg border-2 border-amber-400 bg-black/95 py-2 shadow-2xl;
   backdrop-filter: blur(12px);
+  scrollbar-width: thin;
+  scrollbar-color: rgba(251, 191, 36, 0.55) transparent;
+}
+
+.bind-menu::-webkit-scrollbar {
+  width: 6px;
+}
+
+.bind-menu::-webkit-scrollbar-track {
+  @apply rounded-full bg-slate-900/35;
+}
+
+.bind-menu::-webkit-scrollbar-thumb {
+  @apply rounded-full bg-amber-300/45;
+}
+
+.bind-menu::-webkit-scrollbar-thumb:hover {
+  @apply bg-amber-200/60;
 }
 
 .bind-menu-group {
@@ -1133,6 +1254,10 @@ onBeforeUnmount(() => {
   @apply bg-amber-200/15 text-amber-50;
 }
 
+.bind-menu-item--error {
+  @apply bg-rose-500/10 text-rose-200 hover:bg-rose-500/10;
+}
+
 .bind-menu-item--placed {
   @apply bg-sky-900/25;
 }
@@ -1142,11 +1267,7 @@ onBeforeUnmount(() => {
 }
 
 .bind-menu-item--disabled {
-  @apply cursor-not-allowed opacity-45 hover:bg-transparent;
-}
-
-.bind-menu-item-type {
-  @apply text-xs text-amber-100/55;
+  @apply cursor-pointer opacity-45 hover:bg-transparent;
 }
 
 .bind-menu-item--import {
@@ -1155,5 +1276,13 @@ onBeforeUnmount(() => {
 
 .bind-menu-empty {
   @apply px-3 py-2 text-xs text-amber-100/40;
+}
+
+.bind-menu-item-side {
+  @apply ml-2 flex items-center gap-2;
+}
+
+.bind-menu-item-clear {
+  @apply inline-flex h-5 w-5 cursor-pointer items-center justify-center rounded text-base leading-none text-amber-100/55 transition-colors hover:bg-amber-200/10 hover:text-amber-50;
 }
 </style>

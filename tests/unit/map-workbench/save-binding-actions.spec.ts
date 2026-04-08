@@ -231,4 +231,60 @@ describe('saveBindingActions connected sector groups', () => {
     expect(binding?.tradestationBinding?.saveStationCode).toBeUndefined()
     expect(binding?.tradestationBinding).toBeUndefined()
   })
+
+  it('replaces dangling abnormal station binding when importing a save station for the same code', () => {
+    const updateStationSector = vi.fn()
+    const activeEmpire = ref({
+      id: 'empire-1',
+      name: 'Empire',
+      sectors: [{ id: 'a', name: 'A', order: 0 }],
+      stations: [{ id: 'new-station', name: 'Imported' }],
+      saveBindings: [
+        {
+          gameGuid: 'g-1',
+          active: true,
+          selectedArchiveTime: null,
+          groupBindings: [
+            {
+              sectorGroupId: 'a',
+              jumpRange: 2,
+              coverageSectorMacros: [],
+              stationBindings: [
+                {
+                  stationId: 'missing-station',
+                  saveStationCode: 'save_1',
+                  sectorMacro: 'sector_a',
+                  position: { x: 1, y: 0, z: 2 }
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    } as any)
+
+    const actions = createSaveBindingActions(activeEmpire, vi.fn(), updateStationSector)
+
+    actions.importSaveStationAsBinding({
+      gameGuid: 'g-1',
+      sectorGroupId: 'a',
+      stationId: 'new-station',
+      saveStation: {
+        code: 'save_1',
+        position: { x: 10, y: 0, z: 20 }
+      } as any,
+      sectorMacro: 'sector_a'
+    })
+
+    const binding = actions.getGroupBinding('g-1', 'a')
+    expect(binding?.stationBindings).toEqual([
+      {
+        stationId: 'new-station',
+        saveStationCode: 'save_1',
+        sectorMacro: 'sector_a',
+        position: { x: 10, y: 0, z: 20 }
+      }
+    ])
+    expect(updateStationSector).toHaveBeenCalledWith('missing-station', null)
+  })
 })

@@ -172,6 +172,7 @@ function onGroupTitleClick(group: ArchiveGroup) {
               :data-testid="shouldShowGroupPoiActive(group) ? 'save-group-poi-active' : 'save-group-poi'"
               type="button"
               :aria-label="`${group.playerName} poi`"
+              :title="t('map.save_archive_open_poi')"
               @click.stop="onArchiveNavigate(group, null)"
             >
               <svg class="save-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
@@ -186,6 +187,7 @@ function onGroupTitleClick(group: ArchiveGroup) {
               :data-testid="shouldShowGroupBindActive(group) ? 'save-group-bind-active' : 'save-group-bind'"
               type="button"
               :aria-label="`${group.playerName} bind`"
+              :title="t('map.save_archive_bind')"
               @click.stop="onArchiveBind(group, null)"
             >
               <svg class="save-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
@@ -228,6 +230,7 @@ function onGroupTitleClick(group: ArchiveGroup) {
                 :data-testid="shouldShowTimePoiActive(group, archive.meta.time) ? 'save-time-poi-active' : 'save-time-poi'"
                 type="button"
                 :aria-label="`${formatTime(archive.meta.time)} poi`"
+                :title="t('map.save_archive_open_poi')"
                 @click.stop="onArchiveNavigate(group, archive.meta.time)"
               >
                 <svg class="save-icon-svg" viewBox="0 0 24 24" aria-hidden="true">
@@ -242,6 +245,7 @@ function onGroupTitleClick(group: ArchiveGroup) {
                 :data-testid="shouldShowTimeBindActive(group, archive.meta.time) ? 'save-time-bind-active' : 'save-time-bind'"
                 type="button"
                 :aria-label="`${formatTime(archive.meta.time)} bind`"
+                :title="t('map.save_archive_bind')"
                 @click.stop="onArchiveBind(group, archive.meta.time)"
               >
                 <svg class="save-icon-svg" viewBox="0 0 24 24" aria-hidden="true">

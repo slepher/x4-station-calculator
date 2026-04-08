@@ -45,14 +45,24 @@
 - Step 3 继续以 `map sector` 为分组轴。
 - save station 为主显示对象。
 - 正常绑定且当前 time 可解析的 empire station 不再重复独立显示。
+- `StationSaveBinding` 与虚拟中转站 binding 统一使用相同的 binding 结构；不存在记录即视为自由站点。
 - 仅两类 empire station 作为补位项显示：
   - 有 `position`、无 `saveStationCode`
   - 有 `position`、有 `saveStationCode`，但当前 time 失效
 - 失效绑定对象只能解绑，不能拖拽重定位。
+- `解绑` 与 `转绑` 都清理旧 binding 数据，旧对象直接回归自由，不再保留“已放置未绑定”的过渡状态。
 - 绑定菜单区分：
   - 自由站点
   - 已放置未绑定站点
   - 已绑定到其他 save station 的置灰站点
+- 已拖拽到地图但未绑定的自由站点在菜单中也视为不可绑定候选，仅用背景色和置灰区分，不再显示“已设置位置 / 虚拟中转站”等备注文字。
+- Step 3 绑定菜单与对应 `station-item` 做 Y 轴对齐；当向下空间不足时改为向上弹出，并保持菜单底边与触发条目底边齐平。
+- Step 3 菜单滚动条样式与 Step 2 绑定菜单保持一致。
+- 从 save station 导入新建 empire station 时，只使用 save parser 提供的 `module_id` 导入全部模块，不回退到 `ref`。
+- 若 save station 当前指向的 `stationBinding` 对应 empire station 已不存在，则按钮显示红色 `绑定异常`，仍允许重新绑定。
+- 异常绑定菜单中额外显示一条“异常空间站”，并提供 `x` 清理这条坏 binding。
+- 从异常绑定状态导入/重绑到新 empire station 时，旧的坏 binding 必须先释放，再落入新 binding。
+- Step 3 导入模块的顺序应与模块搜索面板默认顺序一致，但应通过共享排序规则实现，而不是拍平搜索面板结果复用。
 
 ### 5. Binding POI 与地图行为
 

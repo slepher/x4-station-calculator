@@ -45,3 +45,13 @@
 - [x] 22.7 绑定后以 save station 结果视图收敛，placed 补位项从列表中消失
 - [x] 22.8 移除 Step 3 的第二套重复详情来源
 - [x] 22.9 同一 empire station 不再同时作为 placed 项与 bound 项重复显示
+- [x] 22.10 普通 empire 站与虚拟中转站统一为同一套 binding 结构，不再依赖 `free` 字段
+- [x] 22.11 Step 3 的解绑与转绑统一改为清理旧 binding，旧对象直接回归自由
+- [x] 22.12 Step 3 绑定菜单只用背景色和置灰表达状态，去掉“已设置位置/虚拟中转站”等备注文字
+- [x] 22.13 已拖拽到地图但未绑定的候选在菜单中也视为不可绑定
+- [x] 22.14 Step 3 绑定菜单 Y 轴对齐 `station-item`，并在空间不足时改为向上弹出
+- [x] 22.15 Step 3 绑定菜单滚动条样式与 Step 2 统一
+- [x] 22.16 从 Step 3 导入 save station 时仅使用 `module_id` 导入全部模块
+- [x] 22.17 save station 指向不存在 empire station 时显示“绑定异常”，并允许在菜单中清理坏 binding
+- [x] 22.18 从异常绑定状态导入/转绑时，先释放旧坏 binding 再落入新 binding
+- [x] 22.19 模块搜索面板与 Step 3 导入共享默认排序规则，不再通过拍平搜索结果复用排序

@@ -277,9 +277,6 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
       />
     </div>
 
-    <div class="map-save-panel__hint">
-      {{ t('map.save_panel_hint') }}
-    </div>
   </aside>
 </template>
 
@@ -320,7 +317,4 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
   @apply bg-amber-200/60;
 }
 
-.map-save-panel__hint {
-  @apply px-3 pt-2 text-xs text-amber-100/60;
-}
 </style>
