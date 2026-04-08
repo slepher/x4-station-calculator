@@ -5,19 +5,17 @@ import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
 import MapSaveCoordList from './MapSaveCoordList.vue'
-import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem } from '@/types/saveArchive'
+import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 
 const props = defineProps<{
   open: boolean
   archive: SaveArchive | null
-  visibility: SavePoiVisibility
 }>()
 
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'select-archive', payload: { guid: string; time: number } | null): void
   (e: 'select-archive-and-navigate', payload: { guid: string; time: number }): void
-  (e: 'visibility-change', visibility: SavePoiVisibility): void
   (e: 'active-category-change', category: SavePoiCategory | null): void
   (e: 'focus-poi', poi: SavePoiOverlayItem): void
 }>()
@@ -96,10 +94,6 @@ function onCategorySelect(category: SavePoiCategory) {
   emit('active-category-change', category)
 }
 
-function onVisibilityChange(newVisibility: SavePoiVisibility) {
-  emit('visibility-change', newVisibility)
-}
-
 function onPoiFocus(poi: SavePoiOverlayItem) {
   emit('focus-poi', poi)
 }
@@ -154,8 +148,6 @@ watch(() => props.archive, (archive) => {
       <MapSaveCategoryMenu
         v-else-if="layer === 'category'"
         :archive="archive"
-        :visibility="visibility"
-        @visibility-change="onVisibilityChange"
         @select-category="onCategorySelect"
       />
 

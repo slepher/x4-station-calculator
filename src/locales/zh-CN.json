@@ -305,7 +305,8 @@
     "binding_filter_hint_zoom": "请缩小地图范围",
     "binding_no_visible_sectors": "无可见星区",
     "binding_belongs_to": "归属",
-    "binding_save_station_headquarter": "总部"
+    "binding_save_station_headquarter": "总部",
+    "poi_visibility_toggle": "POI显示"
   },
   "ship_build": {
     "title": "船只建造",

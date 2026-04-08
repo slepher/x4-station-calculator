@@ -251,6 +251,45 @@
 
 ---
 
+## Phase 9: POI 显示控制转移到右上角
+
+### T9.1 创建 MapSavePoiVisibilityControl.vue
+
+- [x] 创建组件文件
+- [x] 实现折叠/展开状态切换
+- [x] 显示 7 个分类 checkbox 列表
+- [x] 样式与左上角/左下角/右下角控件一致
+- [x] Props: visibility, archive
+- [x] Emit: visibility-change
+
+### T9.2 修改 MapSaveCategoryMenu.vue
+
+- [x] 移除 checkbox 相关代码
+- [x] 移除 onCheckboxChange 函数
+- [x] 移除 visibility-change emit
+- [x] 移除 checkbox 相关 CSS
+- [x] 保留分类列表、数量统计、箭头按钮
+
+### T9.3 修改 MapSavePanel.vue
+
+- [x] 移除 visibility prop 传递给 MapSaveCategoryMenu
+- [x] 移除 @visibility-change 监听
+- [x] 保留 @select-category 事件
+
+### T9.4 修改 MapWorkbenchView.vue
+
+- [x] 添加 MapSavePoiVisibilityControl 组件到右上角
+- [x] 传递 visibility 和 activeMapArchive props
+- [x] 监听 visibility-change 事件
+- [x] 添加显示条件：activeMapArchive 存在时显示
+
+### T9.5 添加 i18n 文案
+
+- [x] zh-CN.json: 添加 map.poi_visibility_toggle
+- [x] en.json: 添加 map.poi_visibility_toggle
+
+---
+
 ## Task Dependencies
 
 ```
@@ -263,6 +302,9 @@ T3.2 ─> T3.1
 T4.1 ─> T4.2 ─> T4.3 ─> T5.2
 T5.1 ─> T5.2
 T6.1 ─> T6.2 ─> T6.3
+T9.1 ─> T9.4
+T9.2 ─> T9.3 ─> T9.4
+T9.5 ─> T9.1
 ```
 
 ---
@@ -277,4 +319,5 @@ T6.1 ─> T6.2 ─> T6.3
 | Phase 4 | T4.1 - T4.3 | 2h |
 | Phase 5 | T5.1 - T5.2 | 1h |
 | Phase 6 | T6.1 - T6.3 | 1h |
-| **Total** | 17 tasks | **~9h** |
+| Phase 9 | T9.1 - T9.5 | 1h |
+| **Total** | 22 tasks | **~10h** |

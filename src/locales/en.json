@@ -305,7 +305,8 @@
     "binding_filter_hint_zoom": "Zoom in to reduce visible range",
     "binding_no_visible_sectors": "No visible sectors",
     "binding_belongs_to": "Belongs to",
-    "binding_save_station_headquarter": "HQ"
+    "binding_save_station_headquarter": "HQ",
+    "poi_visibility_toggle": "POI Display"
   },
   "ship_build": {
     "title": "Ship Build",
