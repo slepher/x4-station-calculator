@@ -17,7 +17,6 @@ type SectorHoverPayload = {
 defineProps<{
   clusterPolygons: MapSectorPolygonCluster[]
   gameDataEnforceDlcActivation: boolean
-  sectorLabelFontSize: number
   mapFontFamily: string
   sectorClipId: (clusterId: string, sectorId: string) => string
   hexPoints: (cx: number, cy: number, radius: number) => string
@@ -30,9 +29,6 @@ defineProps<{
   sectorStrokeWidth: (sectorId: string, defaultValue: number) => number
   sectorStrokeOpacity: (sectorId: string, defaultValue: number) => number
   sectorFilter: (sectorId: string) => string | undefined
-  sectorLabelWeight: (sectorId: string) => number
-  sectorLabelFill: (sectorId: string) => string
-  showSectorLabels?: boolean
   showResourceBadges?: boolean
 }>()
 
@@ -90,22 +86,6 @@ const emit = defineEmits<{
           :data-cluster-id="cluster.id"
           :stroke-dasharray="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
         />
-        <text
-          v-if="showSectorLabels !== false"
-          class="sector-label"
-          :x="(cluster.sectors[0]?.sx || cluster.cx).toFixed(1)"
-          :y="(cluster.singleLabelY || cluster.sectors[0]?.labelY || 0).toFixed(1)"
-          text-anchor="middle"
-          dominant-baseline="text-before-edge"
-          alignment-baseline="text-before-edge"
-          :font-size="(cluster.singleLabelFontSize || sectorLabelFontSize).toFixed(1)"
-          :font-family="mapFontFamily"
-          :font-weight="sectorLabelWeight(cluster.sectors[0]?.id || '')"
-          :fill="sectorLabelFill(cluster.sectors[0]?.id || '')"
-          :data-cluster-id="cluster.id"
-        >
-          {{ cluster.singleLabel }}
-        </text>
         <g
           v-if="showResourceBadges !== false"
           class="resource-badge"
@@ -196,23 +176,6 @@ const emit = defineEmits<{
               :stroke-dasharray="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
               :stroke-dashoffset="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? ((sector.sx + sector.sy) % 10).toFixed(1) : undefined"
             />
-            <text
-              v-if="showSectorLabels !== false"
-              class="sector-label"
-              :x="sector.sx.toFixed(1)"
-              :y="sector.labelY.toFixed(1)"
-              text-anchor="middle"
-              dominant-baseline="text-before-edge"
-              alignment-baseline="text-before-edge"
-              :font-size="sector.labelFontSize.toFixed(1)"
-              :font-family="mapFontFamily"
-              :font-weight="sectorLabelWeight(sector.id)"
-              :fill="sectorLabelFill(sector.id)"
-              :data-sector-id="sector.id"
-              :data-cluster-id="cluster.id"
-            >
-              {{ sector.label }}
-            </text>
             <g
               v-if="showResourceBadges !== false"
               class="resource-badge"

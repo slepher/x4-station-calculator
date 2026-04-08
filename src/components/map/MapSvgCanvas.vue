@@ -26,6 +26,7 @@ import { useMapSvgOverlays } from '@/composables/useMapSvgOverlays'
 import { useMapSvgSectors } from '@/composables/useMapSvgSectors'
 import MapLinkLayer from '@/components/map/layers/MapLinkLayer.vue'
 import MapOverlayLayer from '@/components/map/layers/MapOverlayLayer.vue'
+import MapSectorLabelLayer from '@/components/map/layers/MapSectorLabelLayer.vue'
 import MapSectorLayer from '@/components/map/layers/MapSectorLayer.vue'
 type SectorHoverPayload = {
   sectorId: string
@@ -405,7 +406,6 @@ watchEffect(() => {
     <MapSectorLayer
       :cluster-polygons="clusterPolygons"
       :game-data-enforce-dlc-activation="gameData.enforceDlcActivation"
-      :sector-label-font-size="SECTOR_LABEL_FONT_SIZE"
       :map-font-family="MAP_FONT_FAMILY"
       :sector-clip-id="sectorClipId"
       :hex-points="hexPoints"
@@ -418,12 +418,18 @@ watchEffect(() => {
       :sector-stroke-width="sectorStrokeWidth"
       :sector-stroke-opacity="sectorStrokeOpacity"
       :sector-filter="sectorFilter"
-      :sector-label-weight="sectorLabelWeight"
-      :sector-label-fill="sectorLabelFill"
-      :show-sector-labels="showSectorLabels"
       :show-resource-badges="showResourceBadges"
       @sector-hover="emitSectorHover"
       @sector-leave="emitSectorLeave"
+    />
+
+    <MapSectorLabelLayer
+      v-if="showSectorLabels && !isZooming"
+      :cluster-polygons="clusterPolygons"
+      :sector-label-font-size="SECTOR_LABEL_FONT_SIZE"
+      :map-font-family="MAP_FONT_FAMILY"
+      :sector-label-weight="sectorLabelWeight"
+      :sector-label-fill="sectorLabelFill"
     />
 
     <MapOverlayLayer

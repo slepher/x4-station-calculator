@@ -871,6 +871,15 @@ const settleZoomViewport = () => {
   settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
 }
 
+const triggerZoomSettling = () => {
+  isZooming.value = true
+  clearZoomSettleTimer()
+  zoomSettleTimer.value = window.setTimeout(() => {
+    settleZoomViewport()
+    zoomSettleTimer.value = null
+  }, 120)
+}
+
 const clearBrowserSelection = () => {
   const selection = window.getSelection?.()
   if (!selection) return
@@ -1333,6 +1342,7 @@ const onSliderInput = (event: Event) => {
   const input = event.target as HTMLInputElement
   const value = Number(input.value)
   zoomPercent.value = value
+  triggerZoomSettling()
   applyScaleFromSlider(value)
 }
 
@@ -1658,17 +1668,12 @@ const onWheel = (event: WheelEvent) => {
   const nextScale = clampScale(scale.value * factor)
   if (nextScale === scale.value) return
 
-  isZooming.value = true
-  clearZoomSettleTimer()
+  triggerZoomSettling()
   scale.value = nextScale
   const nextPanX = mouseX - contentX * nextScale
   const nextPanY = mouseY - contentY * nextScale
   clampPan(nextPanX, nextPanY)
   syncSliderFromScale()
-  zoomSettleTimer.value = window.setTimeout(() => {
-    settleZoomViewport()
-    zoomSettleTimer.value = null
-  }, 120)
   scheduleZoomTooltipRestore()
 }
 
