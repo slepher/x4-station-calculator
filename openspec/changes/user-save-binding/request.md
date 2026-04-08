@@ -39,6 +39,10 @@
   - 覆盖星区 / 候选星区 / 连接星区
   - 底部删除 / 取消 / 确认
 - 连接星区基于定位星区 5 跳内其他已定位 empire sector 自动计算，并双向保存到 `groupBinding`。
+- 若某个 map sector 已被其他 empire sector 用作定位星区或 coverage：
+  - 不能进入当前 empire sector 的 coverage
+  - 但仍显示在 candidate 列表中
+  - 且不显示 `+`，只作为锁定候选展示
 
 ### 4. Step 3 空间站绑定
 

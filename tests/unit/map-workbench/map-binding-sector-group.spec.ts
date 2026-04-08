@@ -374,7 +374,10 @@ describe('MapBindingSectorGroup', () => {
 
     await wrapper.get('.bind-btn').trigger('click')
 
-    const coverageSection = wrapper.findAll('.config-section')[1]
+    const coverageSection = wrapper.findAll('.config-section').find((section) =>
+      section.text().includes('map.binding_coverage_sectors')
+    )
+    expect(coverageSection).toBeTruthy()
     expect(coverageSection.text()).toContain('3map.resource_filter_jump_suffix')
     expect(coverageSection.text()).not.toContain('1map.resource_filter_jump_suffix')
     expect(coverageSection.text()).not.toContain('2map.resource_filter_jump_suffix')
@@ -445,5 +448,73 @@ describe('MapBindingSectorGroup', () => {
     await wrapper.get('.bind-btn').trigger('click')
 
     expect(wrapper.find('.jump-group-grid--content-label').exists()).toBe(true)
+  })
+
+  it('excludes other groups anchor and coverage sectors from current draft coverage but keeps them visible as locked candidates', async () => {
+    vi.mocked(useEmpireStore).mockReturnValue({
+      activeEmpire: {
+        sectors: [
+          { id: 'group-a', name: 'Alpha', order: 0 },
+          { id: 'group-b', name: 'Beta', order: 1 }
+        ],
+        saveBindings: [
+          {
+            gameGuid: 'g-1',
+            selectedArchiveTime: 1000,
+            groupBindings: [
+              {
+                sectorGroupId: 'group-a',
+                sectorMacro: 'anchor_a',
+                jumpRange: 4,
+                coverageSectorMacros: [
+                  { ref: 'coverage_a1', jump: 1 },
+                  { ref: 'anchor_b', jump: 4 }
+                ],
+                connectedSectorGroupIds: [],
+                stationBindings: []
+              },
+              {
+                sectorGroupId: 'group-b',
+                sectorMacro: 'anchor_b',
+                jumpRange: 2,
+                coverageSectorMacros: [],
+                connectedSectorGroupIds: [],
+                stationBindings: []
+              }
+            ]
+          }
+        ]
+      },
+      createSector,
+      reorderSectors,
+      renameSector,
+      bindSectorGroup,
+      setGroupConnection,
+      clearSectorGroupBinding,
+      deleteSector: vi.fn()
+    } as any)
+
+    const wrapper = mount(MapBindingSectorGroup, {
+      props: { gameGuid: 'g-1' },
+      global: { stubs: { Teleport: true } }
+    })
+
+    await wrapper.get('.bind-btn').trigger('click')
+
+    const coverageSection = wrapper.findAll('.config-section').find((section) =>
+      section.text().includes('map.binding_coverage_sectors')
+    )
+    const candidateSection = wrapper.findAll('.config-section').find((section) =>
+      section.text().includes('map.binding_candidate_sectors')
+    )
+
+    expect(coverageSection).toBeTruthy()
+    expect(candidateSection).toBeTruthy()
+    expect(coverageSection.text()).toContain('Coverage A1')
+    expect(coverageSection.text()).not.toContain('Anchor B')
+    expect(candidateSection.text()).toContain('Anchor B')
+    const lockedCandidate = wrapper.findAll('.pill--orange').find((pill) => pill.text().includes('Anchor B'))
+    expect(lockedCandidate).toBeTruthy()
+    expect(lockedCandidate?.text()).not.toContain('+')
   })
 })

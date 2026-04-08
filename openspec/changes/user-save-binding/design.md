@@ -45,6 +45,13 @@
 - Step 2 管理 empire sector 结构、定位星区、coverage、连接星区。
 - Step 3 管理 save station 与 empire station 的绑定、失效态与 placement。
 
+### D3.1: Step 2 的候选星区与 coverage 需要区分“锁定可见”和“可加入”
+
+- 若某个 map sector 已被其他 empire sector 占用为定位星区或 coverage，该 map sector 不能进入当前 draft 的 coverage。
+- 这类 map sector 仍然保留在 candidate 星区列表中，避免用户误以为它在跳数范围内消失。
+- candidate 列表中的这类项使用锁定样式展示，但不显示 `+`，也不能加入 coverage。
+- 当前 empire sector 自己已有的 coverage 在打开编辑时会保留，不受这条跨组占用规则误伤。
+
 ### D4: Step 3 的普通站与虚拟中转站统一收敛到同一套 binding 语义
 
 - 普通 empire 站与虚拟中转站都以“是否存在 binding 记录、是否存在 `saveStationCode`”判断自由 / 已放置 / 已绑定。

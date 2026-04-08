@@ -309,6 +309,24 @@ function getBoundSectorGroupName(sectorMacro: string): string | null {
   return null
 }
 
+function getOtherGroupOccupiedSectorMacros(currentGroupId: string | null): Set<string> {
+  const occupied = new Set<string>()
+  if (!activeBindingPlan.value) return occupied
+
+  activeBindingPlan.value.groupBindings.forEach((binding) => {
+    if (binding.sectorGroupId === currentGroupId) return
+    if (binding.sectorMacro) occupied.add(binding.sectorMacro)
+    ;(binding.coverageSectorMacros || []).forEach((entry) => occupied.add(entry.ref))
+  })
+
+  return occupied
+}
+
+function sanitizeDraftCoverageEntries(entries: CoverageSectorEntry[], currentGroupId: string | null = draft.value.sectorGroupId): CoverageDraftEntry[] {
+  const occupied = getOtherGroupOccupiedSectorMacros(currentGroupId)
+  return entries.filter((entry) => !occupied.has(entry.ref))
+}
+
 function getStationDisplayName(station: PlayerStationEntry): string {
   return getStationPoiLabel({
     key: `playerStation:${station.code}`,
@@ -425,7 +443,9 @@ function selectSaveSectorForBinding(sectorMacro: string) {
     }
   }
   
-  draft.value.coverage = Array.from(sectorJumpMap.entries()).map(([ref, jump]) => ({ ref, jump }))
+  draft.value.coverage = sanitizeDraftCoverageEntries(
+    Array.from(sectorJumpMap.entries()).map(([ref, jump]) => ({ ref, jump }))
+  , bindMenuTargetSectorId.value)
   draft.value.sectorGroupId = bindMenuTargetSectorId.value
   draft.value.anchorSectorMacro = sectorMacro
 
@@ -459,7 +479,7 @@ function onMenuSectorClick(sectorMacro: string) {
   if (currentBinding?.sectorMacro === sectorMacro) {
     // 点击已选星区，继承之前的跳数和覆盖配置
     draft.value.jumpRange = currentBinding.jumpRange
-    draft.value.coverage = [...(currentBinding.coverageSectorMacros || [])]
+    draft.value.coverage = sanitizeDraftCoverageEntries([...(currentBinding.coverageSectorMacros || [])], bindMenuTargetSectorId.value)
   } else {
     // 点击新星区，继承之前的跳数，重新计算 coverage
     // 覆盖星区 = 跳数范围内所有 save sector（不包括 anchor）
@@ -478,9 +498,11 @@ function onMenuSectorClick(sectorMacro: string) {
     
     // 筛选 save sector
     const saveSectorMacros = new Set(saveSectors.value.map(s => s.sectorMacro))
-    draft.value.coverage = Array.from(sectorJumpMap.entries())
-      .filter(([ref]) => saveSectorMacros.has(ref))
-      .map(([ref, jump]) => ({ ref, jump }))
+    draft.value.coverage = sanitizeDraftCoverageEntries(
+      Array.from(sectorJumpMap.entries())
+        .filter(([ref]) => saveSectorMacros.has(ref))
+        .map(([ref, jump]) => ({ ref, jump }))
+    , bindMenuTargetSectorId.value)
   }
   
   draft.value.sectorGroupId = bindMenuTargetSectorId.value
@@ -505,7 +527,7 @@ function openDraft(sectorId: string) {
     name: sector?.name || '',
     anchorSectorMacro: currentBinding?.sectorMacro || null,
     jumpRange: currentBinding?.jumpRange || 2,
-    coverage: [...(currentBinding?.coverageSectorMacros || [])],
+    coverage: sanitizeDraftCoverageEntries([...(currentBinding?.coverageSectorMacros || [])], sectorId),
     connectedSectorGroupIds: [...(currentBinding?.connectedSectorGroupIds || [])]
   }
 }
@@ -587,7 +609,9 @@ function updateDraftJumpRange(newValue: number, _oldValue?: number) {
     for (const [sectorMacro, jump] of sectorJumpMap) {
       if (jump > oldValue && jump <= newValue && saveSectorMacros.has(sectorMacro)) {
         if (!draft.value.coverage.some(c => c.ref === sectorMacro)) {
-          draft.value.coverage.push({ ref: sectorMacro, jump })
+          if (!getOtherGroupOccupiedSectorMacros(draft.value.sectorGroupId).has(sectorMacro)) {
+            draft.value.coverage.push({ ref: sectorMacro, jump })
+          }
         }
       }
     }
@@ -665,6 +689,7 @@ function excludeFromCoverage(sectorMacro: string) {
 }
 
 function addToCoverage(sectorMacro: string, jump: number) {
+  if (getOtherGroupOccupiedSectorMacros(draft.value.sectorGroupId).has(sectorMacro)) return
   if (!draft.value.coverage.some(c => c.ref === sectorMacro)) {
     draft.value.coverage.push({ ref: sectorMacro, jump })
   }

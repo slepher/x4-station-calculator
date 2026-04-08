@@ -55,3 +55,4 @@
 - [x] 22.17 save station 指向不存在 empire station 时显示“绑定异常”，并允许在菜单中清理坏 binding
 - [x] 22.18 从异常绑定状态导入/转绑时，先释放旧坏 binding 再落入新 binding
 - [x] 22.19 模块搜索面板与 Step 3 导入共享默认排序规则，不再通过拍平搜索结果复用排序
+- [x] 23.21 Step 2 中被其他 empire sector 占用的定位/范围星区不能进入当前 coverage，但仍显示在 candidate 中且不显示 `+`
