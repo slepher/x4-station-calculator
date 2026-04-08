@@ -841,7 +841,7 @@ onBeforeUnmount(() => {
       >
         <div class="empire-sector-header">
           <div class="sector-title">
-            <button v-if="!sector.expanded" class="sector-drag-handle" type="button" :disabled="isDraftOpen()" :title="t('map.binding_reorder_sector')">
+            <button v-if="!sector.expanded" class="sector-drag-handle sector-drag-handle--content-width" type="button" :disabled="isDraftOpen()" :title="t('map.binding_reorder_sector')">
               ⋮⋮
             </button>
             <input
@@ -919,8 +919,8 @@ onBeforeUnmount(() => {
           <div class="config-section">
             <label class="config-label">{{ t('map.binding_coverage_sectors') }}</label>
             <div v-for="jump in getCoverageJumps()" :key="jump" class="jump-group">
-              <div class="jump-group-header">
-                <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+              <div class="jump-group-grid jump-group-grid--content-label jump-group-grid--pill-height-source jump-group-grid--compact-gap">
+                <span class="jump-number jump-number--pill-height">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <div class="pill-list">
                   <span
                     v-for="macro in getCoverageSectorsAtJump(jump)"
@@ -940,8 +940,8 @@ onBeforeUnmount(() => {
           <div class="config-section">
             <label class="config-label">{{ t('map.binding_candidate_sectors') }}</label>
             <div v-for="jump in getCandidateJumps()" :key="jump" class="jump-group">
-              <div class="jump-group-header">
-                <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+              <div class="jump-group-grid jump-group-grid--content-label jump-group-grid--pill-height-source jump-group-grid--compact-gap">
+                <span class="jump-number jump-number--pill-height">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <div class="pill-list">
                   <span
                     v-for="macro in getCandidateSectorsAtJump(jump)"
@@ -969,8 +969,8 @@ onBeforeUnmount(() => {
           <div v-if="getConnectedSectorCandidates().length > 0" class="config-section">
             <label class="config-label">{{ t('map.binding_connected_sectors') }}</label>
             <div v-for="jump in getConnectedCandidateJumps()" :key="`link-${jump}`" class="jump-group">
-              <div class="jump-group-header">
-                <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+              <div class="jump-group-grid jump-group-grid--content-label jump-group-grid--pill-height-source jump-group-grid--compact-gap">
+                <span class="jump-number jump-number--pill-height">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <div class="pill-list">
                   <span
                     v-for="candidate in getConnectedCandidatesAtJump(jump)"
@@ -1018,57 +1018,67 @@ onBeforeUnmount(() => {
 
         <!-- Collapsed Binding Pills -->
         <div v-else-if="sector.isBound && sector.sectorMacro" class="collapsed-binding-pills">
-          <div class="collapsed-anchor-row">
-            <span class="pill pill--anchor pill--clickable" @click.stop="focusSectorByMacro(sector.sectorMacro)">
-              {{ getSectorMacroDisplayName(sector.sectorMacro) }}
-            </span>
+          <div class="collapsed-binding-body collapsed-binding-body--flush">
+            <div class="collapsed-anchor-row">
+              <span class="pill pill--anchor pill--clickable" @click.stop="focusSectorByMacro(sector.sectorMacro)">
+                {{ getSectorMacroDisplayName(sector.sectorMacro) }}
+              </span>
+            </div>
+            <template v-if="sector.coverageMacros.length > 0">
+              <div
+                v-for="jump in sector.jumpRange"
+                :key="jump"
+                class="collapsed-pill-row"
+              >
+                <template v-if="getCollapsedCoverageByJump(sector.coverageMacros).get(jump)?.length || getCollapsedConnectedAtJump(sector.id, jump).length">
+                  <div class="jump-group-grid jump-group-grid--content-label jump-group-grid--pill-height-source jump-group-grid--compact-gap collapsed-jump-group-grid">
+                    <span class="jump-number jump-number--pill-height">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+                    <div class="pill-list">
+                      <span
+                        v-for="macro in getCollapsedCoverageByJump(sector.coverageMacros).get(jump)"
+                        :key="macro"
+                        class="pill pill--small pill--clickable"
+                        @click.stop="focusSectorByMacro(macro)"
+                      >
+                        {{ getSectorMacroDisplayName(macro) }}
+                      </span>
+                      <span
+                        v-for="connected in getCollapsedConnectedAtJump(sector.id, jump)"
+                        :key="connected.sectorId"
+                        class="pill pill--small pill--connected pill--clickable"
+                        @click.stop="focusSectorByMacro(connected.sectorMacro)"
+                      >
+                        {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
+                      </span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
+            <template v-if="getCollapsedConnectedJumps(sector.id).length > 0">
+              <div
+                v-for="jump in getCollapsedConnectedJumps(sector.id).filter((value) => value > sector.jumpRange)"
+                :key="`connected-${jump}`"
+                class="collapsed-pill-row"
+              >
+                <template v-if="getCollapsedConnectedAtJump(sector.id, jump).length">
+                  <div class="jump-group-grid jump-group-grid--content-label jump-group-grid--pill-height-source jump-group-grid--compact-gap collapsed-jump-group-grid">
+                    <span class="jump-number jump-number--pill-height">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+                    <div class="pill-list">
+                      <span
+                        v-for="connected in getCollapsedConnectedAtJump(sector.id, jump)"
+                        :key="connected.sectorId"
+                        class="pill pill--small pill--connected pill--clickable"
+                        @click.stop="focusSectorByMacro(connected.sectorMacro)"
+                      >
+                        {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
+                      </span>
+                    </div>
+                  </div>
+                </template>
+              </div>
+            </template>
           </div>
-          <template v-if="sector.coverageMacros.length > 0">
-            <div
-              v-for="jump in sector.jumpRange"
-              :key="jump"
-              class="collapsed-pill-row"
-            >
-              <template v-if="getCollapsedCoverageByJump(sector.coverageMacros).get(jump)?.length || getCollapsedConnectedAtJump(sector.id, jump).length">
-                <span class="jump-label">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
-                <span
-                  v-for="macro in getCollapsedCoverageByJump(sector.coverageMacros).get(jump)"
-                  :key="macro"
-                  class="pill pill--small pill--clickable"
-                  @click.stop="focusSectorByMacro(macro)"
-                >
-                  {{ getSectorMacroDisplayName(macro) }}
-                </span>
-                <span
-                  v-for="connected in getCollapsedConnectedAtJump(sector.id, jump)"
-                  :key="connected.sectorId"
-                  class="pill pill--small pill--connected pill--clickable"
-                  @click.stop="focusSectorByMacro(connected.sectorMacro)"
-                >
-                  {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
-                </span>
-              </template>
-            </div>
-          </template>
-          <template v-if="getCollapsedConnectedJumps(sector.id).length > 0">
-            <div
-              v-for="jump in getCollapsedConnectedJumps(sector.id).filter((value) => value > sector.jumpRange)"
-              :key="`connected-${jump}`"
-              class="collapsed-pill-row"
-            >
-              <template v-if="getCollapsedConnectedAtJump(sector.id, jump).length">
-                <span class="jump-label">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
-                <span
-                  v-for="connected in getCollapsedConnectedAtJump(sector.id, jump)"
-                  :key="connected.sectorId"
-                  class="pill pill--small pill--connected pill--clickable"
-                  @click.stop="focusSectorByMacro(connected.sectorMacro)"
-                >
-                  {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
-                </span>
-              </template>
-            </div>
-          </template>
         </div>
       </div>
       </template>
@@ -1261,7 +1271,11 @@ onBeforeUnmount(() => {
 }
 
 .sector-drag-handle {
-  @apply inline-flex h-7 w-7 items-center justify-center rounded bg-transparent text-xs text-amber-100/70 disabled:cursor-not-allowed disabled:opacity-40;
+  @apply inline-flex items-center justify-center rounded bg-transparent text-xs text-amber-100/70 disabled:cursor-not-allowed disabled:opacity-40;
+}
+
+.sector-drag-handle--content-width {
+  @apply h-7 px-0.5;
 }
 
 .sector-name-input {
@@ -1314,16 +1328,32 @@ onBeforeUnmount(() => {
   @apply flex flex-col gap-1;
 }
 
-.jump-group-header {
-  @apply flex items-center gap-2;
+.jump-group-grid {
+  @apply grid items-start;
+}
+
+.jump-group-grid--content-label {
+  grid-template-columns: max-content minmax(0, 1fr);
+}
+
+.jump-group-grid--pill-height-source {
+  --binding-pill-height: 1.375rem;
+}
+
+.jump-group-grid--compact-gap {
+  column-gap: 0.375rem;
 }
 
 .pill-list {
-  @apply flex flex-wrap items-center gap-2;
+  @apply flex min-w-0 flex-wrap items-center gap-2;
 }
 
 .jump-number {
-  @apply shrink-0 self-center text-xs text-amber-100/50 w-8;
+  @apply inline-flex items-center text-xs text-amber-100/50;
+}
+
+.jump-number--pill-height {
+  height: var(--binding-pill-height);
 }
 
 .config-label {
@@ -1338,12 +1368,20 @@ onBeforeUnmount(() => {
   @apply mt-2 flex flex-col gap-1;
 }
 
+.collapsed-binding-body {
+  @apply flex flex-col gap-1;
+}
+
+.collapsed-binding-body--flush {
+  @apply ml-0;
+}
+
 .collapsed-anchor-row {
-  @apply flex items-center justify-between gap-2;
+  @apply flex items-center gap-2;
 }
 
 .collapsed-pill-row {
-  @apply flex flex-wrap gap-1 items-center;
+  @apply flex flex-col gap-1;
 }
 
 .row-label {
@@ -1356,6 +1394,7 @@ onBeforeUnmount(() => {
 
 .pill {
   @apply inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs;
+  min-height: var(--binding-pill-height);
 }
 
 .pill--clickable {

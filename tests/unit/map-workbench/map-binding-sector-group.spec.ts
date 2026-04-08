@@ -192,6 +192,29 @@ describe('MapBindingSectorGroup', () => {
     expect(firstItem.find('.detail-icon-btn').attributes('title')).toBe('map.binding_view_detail')
   })
 
+  it('uses shared grid layout without extra left inset for collapsed binding content', () => {
+    const wrapper = mount(MapBindingSectorGroup, {
+      props: { gameGuid: 'g-1' },
+      global: { stubs: { Teleport: true } }
+    })
+
+    const firstItem = wrapper.findAll('.empire-sector-item')[0]
+
+    expect(firstItem.find('.collapsed-binding-body').exists()).toBe(true)
+    expect(firstItem.find('.collapsed-binding-body--flush').exists()).toBe(true)
+    expect(firstItem.findAll('.collapsed-jump-group-grid').length).toBeGreaterThan(0)
+  })
+
+  it('uses content-width drag handle instead of a fixed square handle', () => {
+    const wrapper = mount(MapBindingSectorGroup, {
+      props: { gameGuid: 'g-1' },
+      global: { stubs: { Teleport: true } }
+    })
+
+    const firstItem = wrapper.findAll('.empire-sector-item')[0]
+    expect(firstItem.find('.sector-drag-handle--content-width').exists()).toBe(true)
+  })
+
   it('uses tooltip-equivalent station labels in save sector list instead of raw codes', () => {
     vi.mocked(useSaveStore).mockReturnValue({
       selectedArchive: {
@@ -379,7 +402,7 @@ describe('MapBindingSectorGroup', () => {
     expect(wrapper.emitted('focus-sector')).toEqual([['anchor_b']])
   })
 
-  it('uses the same jump row alignment model for connected sectors as other sections', async () => {
+  it('renders expanded jump groups with the shared grid layout instead of header rows', async () => {
     const wrapper = mount(MapBindingSectorGroup, {
       props: { gameGuid: 'g-1' },
       global: { stubs: { Teleport: true } }
@@ -387,7 +410,40 @@ describe('MapBindingSectorGroup', () => {
 
     await wrapper.get('.bind-btn').trigger('click')
 
-    expect(wrapper.find('.connected-jump-group-header').exists()).toBe(false)
-    expect(wrapper.find('.connected-jump-number').exists()).toBe(false)
+    expect(wrapper.findAll('.jump-group-grid').length).toBeGreaterThan(0)
+    expect(wrapper.find('.jump-group-header').exists()).toBe(false)
+  })
+
+  it('stores shared pill-height token on the expanded jump grid container', async () => {
+    const wrapper = mount(MapBindingSectorGroup, {
+      props: { gameGuid: 'g-1' },
+      global: { stubs: { Teleport: true } }
+    })
+
+    await wrapper.get('.bind-btn').trigger('click')
+
+    expect(wrapper.findAll('.jump-group-grid--pill-height-source').length).toBeGreaterThan(0)
+  })
+
+  it('uses compact horizontal gap between jump labels and pill content', async () => {
+    const wrapper = mount(MapBindingSectorGroup, {
+      props: { gameGuid: 'g-1' },
+      global: { stubs: { Teleport: true } }
+    })
+
+    await wrapper.get('.bind-btn').trigger('click')
+
+    expect(wrapper.find('.jump-group-grid--compact-gap').exists()).toBe(true)
+  })
+
+  it('uses content-sized label column instead of fixed 2rem jump column', async () => {
+    const wrapper = mount(MapBindingSectorGroup, {
+      props: { gameGuid: 'g-1' },
+      global: { stubs: { Teleport: true } }
+    })
+
+    await wrapper.get('.bind-btn').trigger('click')
+
+    expect(wrapper.find('.jump-group-grid--content-label').exists()).toBe(true)
   })
 })
