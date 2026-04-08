@@ -6,6 +6,7 @@ import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapSavePanel from './MapSavePanel.vue'
 import MapSavePoiVisibilityControl from './MapSavePoiVisibilityControl.vue'
+import MapSvgDiagnosticVisibilityControl from './MapSvgDiagnosticVisibilityControl.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
@@ -111,11 +112,13 @@ const clusterRefHeightPx = ref(142)
 const MAX_SCALE_MULTIPLIER = 4
 const TOOLTIP_OFFSET = 14
 const TOOLTIP_VIEWPORT_PADDING = 12
+const ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT = true
 
 const viewportRef = ref<HTMLDivElement | null>(null)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const tooltipRef = ref<InstanceType<typeof MapSectorTooltip> | null>(null)
 const viewportResizeObserver = ref<ResizeObserver | null>(null)
+const viewportSize = ref({ width: 0, height: 0 })
 
 const imageNaturalWidth = ref(0)
 const imageNaturalHeight = ref(0)
@@ -148,6 +151,11 @@ const isBindingPanelOpen = ref(false)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
+const mapDiagnosticVisibility = ref({
+  sectorLabels: true,
+  sectorLinks: true,
+  resourceBadges: true
+})
 const settledSavePoiViewportContentBounds = ref<{
   left: number
   top: number
@@ -608,7 +616,7 @@ const saveSectorLinkOverrides = computed<Record<string, SectorData> | undefined>
 })
 
 const liveSavePoiViewportContentBounds = computed(() => {
-  const { width, height } = getViewportSize()
+  const { width, height } = viewportSize.value
   if (!width || !height || !scale.value) return null
   return {
     left: (-panX.value) / scale.value,
@@ -672,17 +680,20 @@ const factionColorMap = computed<Record<string, string> | undefined>(() => {
   return gameDataStore.factionColorMap
 })
 
-const getViewportSize = () => {
+const updateViewportSize = () => {
   const viewport = viewportRef.value
-  if (!viewport) return { width: 0, height: 0 }
-  return {
+  if (!viewport) {
+    viewportSize.value = { width: 0, height: 0 }
+    return
+  }
+  viewportSize.value = {
     width: viewport.clientWidth,
     height: viewport.clientHeight
   }
 }
 
 const mapViewBoxBounds = computed(() => {
-  const { width, height } = getViewportSize()
+  const { width, height } = viewportSize.value
   if (!width || !height || !scale.value) return null
   return {
     left: (-panX.value) / scale.value,
@@ -695,7 +706,7 @@ const mapViewBoxBounds = computed(() => {
 const clampScale = (next: number) => Math.min(maxScale.value, Math.max(minScale.value, next))
 
 const clampPan = (nextX: number, nextY: number) => {
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   const scaledW = imageNaturalWidth.value * scale.value
   const scaledH = imageNaturalHeight.value * scale.value
 
@@ -721,7 +732,7 @@ const clampPan = (nextX: number, nextY: number) => {
 }
 
 const applyScaleFromSlider = (value: number) => {
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const ratio = value / 100
@@ -746,7 +757,7 @@ const syncSliderFromScale = () => {
 
 const recomputeScaleBounds = () => {
   if (!imageNaturalWidth.value || !imageNaturalHeight.value) return
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const fitByWidth = vw / imageNaturalWidth.value
@@ -1119,6 +1130,7 @@ const chooseTooltipPlacement = (
 }
 
 const positionTooltip = () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   if (!hoveredSector.value || !viewportRef.value) return
 
   const viewportRect = viewportRef.value.getBoundingClientRect()
@@ -1190,6 +1202,7 @@ const positionTooltip = () => {
 }
 
 const syncTooltipMeasurement = async () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   if (!hoveredSector.value) return
   await nextTick()
   const el = tooltipRef.value?.$el as HTMLElement | undefined
@@ -1201,6 +1214,7 @@ const syncTooltipMeasurement = async () => {
 }
 
 const showTooltipFromSectorElement = async (sectorElement: SVGGraphicsElement) => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   const sectorId = sectorElement.getAttribute('data-sector-hover-id')
   if (!sectorId) return
 
@@ -1227,6 +1241,7 @@ const showTooltipFromSectorElement = async (sectorElement: SVGGraphicsElement) =
 }
 
 const scheduleZoomTooltipRestore = () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   clearZoomRestoreTimer()
   zoomRestoreTimer.value = window.setTimeout(() => {
     zoomRestoreTimer.value = null
@@ -1271,7 +1286,7 @@ const onTooltipMouseLeave = () => {
 const focusSector = (sectorId: string) => {
   const target = searchSectors.value.find((item) => item.sectorId === sectorId)
   if (!target) return
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const targetScale = scale.value < 1 ? clampScale(1) : scale.value
@@ -1286,7 +1301,7 @@ const fitSectors = (sectorIds: string[]) => {
     .filter((item): item is SearchSectorLayout => Boolean(item))
   if (!targets.length) return
 
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const minX = Math.min(...targets.map((item) => item.centerX - item.radius))
@@ -1510,6 +1525,14 @@ const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
   savePoiVisibility.value = visibility
 }
 
+const onMapDiagnosticVisibilityChange = (visibility: {
+  sectorLabels: boolean
+  sectorLinks: boolean
+  resourceBadges: boolean
+}) => {
+  mapDiagnosticVisibility.value = visibility
+}
+
 const onSaveActiveCategoryChange = (category: SavePoiCategory | null) => {
   activeSavePoiCategory.value = category
 }
@@ -1619,7 +1642,7 @@ const onWheel = (event: WheelEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
   closeTooltip()
 
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const rect = viewportRef.value?.getBoundingClientRect()
@@ -1708,6 +1731,7 @@ const stopDrag = () => {
 }
 
 const onResize = () => {
+  updateViewportSize()
   recomputeScaleBounds()
   closeTooltip()
 }
@@ -1835,12 +1859,14 @@ watch(isResourcePanelOpen, async () => {
 })
 
 watch(locale, () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   if (!hoveredSectorSource.value) return
   hoveredSector.value = createTooltipViewModel(hoveredSectorSource.value)
   void syncTooltipMeasurement()
 })
 
 watch(hoveredSector, () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   if (!hoveredSector.value) {
     tooltipMeasuredSize.value = { width: 0, height: 0 }
     return
@@ -1854,9 +1880,11 @@ watch(liveSavePoiViewportContentBounds, (bounds) => {
 }, { immediate: true })
 
 onMounted(() => {
+  updateViewportSize()
   window.addEventListener('resize', onResize)
   if (typeof ResizeObserver !== 'undefined' && viewportRef.value) {
     viewportResizeObserver.value = new ResizeObserver(() => {
+      updateViewportSize()
       recomputeScaleBounds()
     })
     viewportResizeObserver.value.observe(viewportRef.value)
@@ -1924,8 +1952,8 @@ onBeforeUnmount(() => {
             class="map-content"
           >
             <MapSvgCanvas
-              :viewport-width="getViewportSize().width"
-              :viewport-height="getViewportSize().height"
+              :viewport-width="viewportSize.width"
+              :viewport-height="viewportSize.height"
               :view-box-bounds="mapViewBoxBounds"
               :search-highlighted-sector-ids="searchHighlightedSectorIds"
               :resource-highlighted-sector-ids="resourceHighlightedSectorIds"
@@ -1952,6 +1980,9 @@ onBeforeUnmount(() => {
               :sector-owner-override="sectorOwnerOverride"
               :cluster-owner-override="clusterOwnerOverride"
               :faction-color-map="factionColorMap"
+              :show-sector-labels="mapDiagnosticVisibility.sectorLabels"
+              :show-sector-links="mapDiagnosticVisibility.sectorLinks"
+              :show-resource-badges="mapDiagnosticVisibility.resourceBadges"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @sector-hover="onSectorHover"
@@ -1982,11 +2013,18 @@ onBeforeUnmount(() => {
 
         </div>
 
-        <MapSavePoiVisibilityControl
-          :visibility="savePoiVisibility"
-          :archive="activeMapArchive"
-          @visibility-change="onSaveVisibilityChange"
-        />
+        <div class="map-top-right-controls">
+          <MapSvgDiagnosticVisibilityControl
+            :visibility="mapDiagnosticVisibility"
+            @visibility-change="onMapDiagnosticVisibilityChange"
+          />
+
+          <MapSavePoiVisibilityControl
+            :visibility="savePoiVisibility"
+            :archive="activeMapArchive"
+            @visibility-change="onSaveVisibilityChange"
+          />
+        </div>
 
         <div class="map-search-panel left-6 top-5" @mousedown.stop>
           <div class="search-box group" :class="{ focused: isSearchFocused }">
@@ -2194,6 +2232,10 @@ onBeforeUnmount(() => {
 .map-search-panel {
   @apply absolute z-10;
   width: 220px;
+}
+
+.map-top-right-controls {
+  @apply absolute right-6 top-5 z-10 flex items-start gap-2;
 }
 
 .map-resource-entry-btn {

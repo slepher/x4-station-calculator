@@ -96,6 +96,9 @@ const props = withDefaults(defineProps<{
   sectorOwnerOverride?: Record<string, string>
   clusterOwnerOverride?: Record<string, string>
   factionColorMap?: Record<string, string>
+  showSectorLabels?: boolean
+  showSectorLinks?: boolean
+  showResourceBadges?: boolean
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
@@ -124,7 +127,10 @@ const props = withDefaults(defineProps<{
   viewBoxBounds: null,
   sectorOwnerOverride: undefined,
   clusterOwnerOverride: undefined,
-  factionColorMap: undefined
+  factionColorMap: undefined,
+  showSectorLabels: true,
+  showSectorLinks: true,
+  showResourceBadges: true
 })
 
 const emit = defineEmits<{
@@ -295,6 +301,24 @@ const renderedViewBox = computed(() => {
   return `0 0 ${canvasWidth.value.toFixed(1)} ${canvasHeight.value.toFixed(1)}`
 })
 
+const renderedBackgroundRect = computed(() => {
+  const bounds = props.viewBoxBounds
+  if (bounds && bounds.width > 0 && bounds.height > 0) {
+    return {
+      x: bounds.left,
+      y: bounds.top,
+      width: bounds.width,
+      height: bounds.height
+    }
+  }
+  return {
+    x: 0,
+    y: 0,
+    width: canvasWidth.value,
+    height: canvasHeight.value
+  }
+})
+
 watchEffect(() => {
   emit('content-size', {
     width: canvasWidth.value,
@@ -308,13 +332,20 @@ watchEffect(() => {
 <template>
   <svg
     class="map-svg"
+    :class="{ 'zooming-text-hidden': isZooming }"
     data-testid="map-svg-canvas"
     :width="Math.round(renderedWidth)"
     :height="Math.round(renderedHeight)"
     :viewBox="renderedViewBox"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <rect width="100%" height="100%" fill="#050505" />
+    <rect
+      :x="renderedBackgroundRect.x.toFixed(1)"
+      :y="renderedBackgroundRect.y.toFixed(1)"
+      :width="renderedBackgroundRect.width.toFixed(1)"
+      :height="renderedBackgroundRect.height.toFixed(1)"
+      fill="#050505"
+    />
     <defs>
       <filter :id="SEARCH_HIGHLIGHT_FILTER_ID" x="-40%" y="-40%" width="180%" height="180%">
         <feMorphology in="SourceAlpha" operator="dilate" radius="0.8" result="spread" />
@@ -363,6 +394,7 @@ watchEffect(() => {
     </defs>
 
     <MapLinkLayer
+      :visible="showSectorLinks"
       :sector-link-lines="sectorLinkLines"
       :highway-segments="highwaySegments"
       :gate-circles="gateCircles"
@@ -388,6 +420,8 @@ watchEffect(() => {
       :sector-filter="sectorFilter"
       :sector-label-weight="sectorLabelWeight"
       :sector-label-fill="sectorLabelFill"
+      :show-sector-labels="showSectorLabels"
+      :show-resource-badges="showResourceBadges"
       @sector-hover="emitSectorHover"
       @sector-leave="emitSectorLeave"
     />
@@ -414,5 +448,10 @@ watchEffect(() => {
   display: block;
   user-select: none;
   pointer-events: none;
+}
+
+.map-svg.zooming-text-hidden :deep(.sector-label),
+.map-svg.zooming-text-hidden :deep(.resource-badge) {
+  display: none;
 }
 </style>

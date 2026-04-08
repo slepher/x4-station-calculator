@@ -92,9 +92,7 @@ function onCheckboxChange(category: SavePoiCategory, checked: boolean) {
 
 <style scoped>
 .poi-visibility-control {
-  @apply absolute z-10;
-  right: 1.5rem;
-  top: 1.25rem;
+  @apply relative shrink-0;
 }
 
 .toggle-btn {

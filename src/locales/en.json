@@ -310,7 +310,11 @@
     "binding_no_visible_sectors": "No visible sectors",
     "binding_belongs_to": "Belongs to",
     "binding_save_station_headquarter": "HQ",
-    "poi_visibility_toggle": "POI Display"
+    "poi_visibility_toggle": "POI Display",
+    "debug_visibility_toggle": "Map Layers",
+    "debug_visibility_sector_labels": "Sector Labels",
+    "debug_visibility_sector_links": "Sector Links",
+    "debug_visibility_resource_badges": "Resource Badges"
   },
   "ship_build": {
     "title": "Ship Build",

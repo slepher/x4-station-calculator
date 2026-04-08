@@ -310,7 +310,11 @@
     "binding_no_visible_sectors": "无可见星区",
     "binding_belongs_to": "归属",
     "binding_save_station_headquarter": "总部",
-    "poi_visibility_toggle": "POI显示"
+    "poi_visibility_toggle": "POI显示",
+    "debug_visibility_toggle": "地图图层",
+    "debug_visibility_sector_labels": "星区文本",
+    "debug_visibility_sector_links": "星区连线",
+    "debug_visibility_resource_badges": "资源标签"
   },
   "ship_build": {
     "title": "船只建造",

@@ -32,6 +32,8 @@ defineProps<{
   sectorFilter: (sectorId: string) => string | undefined
   sectorLabelWeight: (sectorId: string) => number
   sectorLabelFill: (sectorId: string) => string
+  showSectorLabels?: boolean
+  showResourceBadges?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -89,6 +91,8 @@ const emit = defineEmits<{
           :stroke-dasharray="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
         />
         <text
+          v-if="showSectorLabels !== false"
+          class="sector-label"
           :x="(cluster.sectors[0]?.sx || cluster.cx).toFixed(1)"
           :y="(cluster.singleLabelY || cluster.sectors[0]?.labelY || 0).toFixed(1)"
           text-anchor="middle"
@@ -103,6 +107,8 @@ const emit = defineEmits<{
           {{ cluster.singleLabel }}
         </text>
         <g
+          v-if="showResourceBadges !== false"
+          class="resource-badge"
           v-for="badge in buildResourceGroupBadgeGeometries(cluster.sectors[0]?.id || '', cluster.sectors[0]?.sx || cluster.cx, cluster.sectors[0]?.sy || cluster.cy, cluster.sectors[0]?.radius || cluster.singleRadius || 0)"
           :key="badge.key"
           data-testid="resource-group-badge"
@@ -117,8 +123,8 @@ const emit = defineEmits<{
             fill="rgba(5, 5, 5, 0.78)"
             stroke="rgba(251, 191, 36, 0.38)"
           />
-          <text
-            :x="(badge.x + badge.width / 2).toFixed(1)"
+            <text
+              :x="(badge.x + badge.width / 2).toFixed(1)"
             :y="(badge.y + badge.height / 2).toFixed(1)"
             :data-testid="`resource-group-badge-${cluster.sectors[0]?.id || ''}-${badge.label}`"
             text-anchor="middle"
@@ -191,6 +197,8 @@ const emit = defineEmits<{
               :stroke-dashoffset="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? ((sector.sx + sector.sy) % 10).toFixed(1) : undefined"
             />
             <text
+              v-if="showSectorLabels !== false"
+              class="sector-label"
               :x="sector.sx.toFixed(1)"
               :y="sector.labelY.toFixed(1)"
               text-anchor="middle"
@@ -206,6 +214,8 @@ const emit = defineEmits<{
               {{ sector.label }}
             </text>
             <g
+              v-if="showResourceBadges !== false"
+              class="resource-badge"
               v-for="badge in buildResourceGroupBadgeGeometries(sector.id, sector.sx, sector.sy, sector.radius)"
               :key="badge.key"
               data-testid="resource-group-badge"
