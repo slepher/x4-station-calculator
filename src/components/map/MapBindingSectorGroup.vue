@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import draggable from 'vuedraggable'
-import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, type ComponentPublicInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveStore } from '@/store/useSaveStore'
@@ -110,6 +110,10 @@ function isDraftOpen(): boolean {
 
 function setSectorItemEl(sectorId: string, el: Element | null) {
   sectorItemEls.value[sectorId] = el instanceof HTMLElement ? el : null
+}
+
+function resolveSectorItemEl(el: Element | ComponentPublicInstance | null) {
+  return el instanceof globalThis.HTMLElement ? el : null
 }
 
 function focusDraftItemIntoView() {
@@ -835,7 +839,7 @@ onBeforeUnmount(() => {
     >
       <template #item="{ element: sector }">
       <div
-        :ref="(el) => setSectorItemEl(sector.id, el)"
+        :ref="(el) => setSectorItemEl(sector.id, resolveSectorItemEl(el))"
         class="empire-sector-item"
         :class="{ expanded: sector.expanded, bound: sector.isBound }"
       >

@@ -114,8 +114,8 @@ watch(() => props.open, (open) => {
     layer.value = 'list'
     selectedCategory.value = null
     emit('active-category-change', null)
-  } else if (props.archive) {
-    layer.value = 'category'
+  } else {
+    layer.value = 'list'
     selectedCategory.value = null
     emit('active-category-change', null)
   }

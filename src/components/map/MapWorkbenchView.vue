@@ -4,7 +4,6 @@ import { useI18n } from 'vue-i18n'
 import MapSvgCanvas from '@/components/map/MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
-import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
 import MapSavePanel from './MapSavePanel.vue'
 import MapBindingPanel from './MapBindingPanel.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
@@ -52,7 +51,6 @@ type MapSectorDataset = {
   resources: MapSectorResourceEntry[]
   scalePerRadius: number
 }
-const UNASSIGNED_STATION_GROUP_ID = '__unassigned__'
 type SectorHoverPayload = {
   sectorId: string
   clusterId: string
@@ -145,7 +143,6 @@ const selectedSectorSource = ref<'search' | 'resource' | null>(null)
 const searchSectors = ref<SearchSectorLayout[]>([])
 const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
-const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
 const isBindingPanelOpen = ref(false)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
@@ -439,81 +436,6 @@ const buildBindingPreview = (
     localRatio
   }
 }
-
-const stationPanelItems = computed<MapStationPanelItem[]>(() => {
-  const empire = empireStore.activeEmpire
-  if (!empire) return []
-  const sortedSectors = [...(empire.sectors || [])].sort((left, right) => (left.order || 0) - (right.order || 0))
-  const items: MapStationPanelItem[] = []
-
-  sortedSectors.forEach((sector) => {
-    items.push({
-      id: sector.id,
-      kind: 'sector',
-      name: sector.name,
-      icon: 'tradestation',
-      groupId: sector.id,
-      groupName: sector.name,
-      targetSectorName: sector.location ? (sectorsById.value[sector.location.sector_id]?.displayName || sector.location.sector_id) : undefined,
-      location: sector.location
-    })
-
-    ;(empire.stations || [])
-      .filter((station) => station.sectorId === sector.id)
-      .forEach((station) => {
-        const targetSectorId = station.location?.sector_id
-        const isAddressInactive = gameDataStore.enforceDlcActivation &&
-          targetSectorId !== undefined &&
-          sectorsById.value[targetSectorId] === undefined
-        items.push({
-          id: station.id,
-          kind: 'station',
-          name: station.name,
-          icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
-          groupId: sector.id,
-          groupName: sector.name,
-          targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
-          location: station.location,
-          isAddressInactive
-        })
-      })
-  })
-
-  ;(empire.stations || [])
-    .filter((station) => !station.sectorId)
-    .forEach((station) => {
-      const targetSectorId = station.location?.sector_id
-      const isAddressInactive = gameDataStore.enforceDlcActivation &&
-        targetSectorId !== undefined &&
-        sectorsById.value[targetSectorId] === undefined
-      items.push({
-        id: station.id,
-        kind: 'station',
-        name: station.name,
-        icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
-        groupId: UNASSIGNED_STATION_GROUP_ID,
-        groupName: t('sectorManagement.unassigned'),
-        targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
-        location: station.location,
-        isAddressInactive
-      })
-    })
-
-  return items
-})
-const placementOverlays = computed<PlacementOverlayItem[]>(() => {
-  if (!isStationPanelOpen.value) return []
-  return stationPanelItems.value
-    .filter((item): item is MapStationPanelItem & { location: EntityLocation } => Boolean(item.location))
-    .map((item) => ({
-      key: `${item.kind}:${item.id}`,
-      id: item.id,
-      kind: item.kind,
-      name: item.name,
-      icon: item.icon,
-      location: item.location
-    }))
-})
 
 const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
   const empire = empireStore.activeEmpire
@@ -1392,24 +1314,6 @@ const fitSectors = (sectorIds: string[]) => {
   clampPan(vw * 0.5 - centerX * targetScale, vh * 0.5 - centerY * targetScale)
 }
 
-const focusPlacementOverlay = async (placementKey: string) => {
-  const viewport = viewportRef.value
-  if (!viewport) return
-
-  const targetScale = scale.value < 1 ? clampScale(1) : scale.value
-  if (targetScale !== scale.value) {
-    scale.value = targetScale
-    syncSliderFromScale()
-    await nextTick()
-  }
-
-  focusOverlayInViewport(viewport, `[data-placement-key="${placementKey}"]`, {
-    panX: panX.value,
-    panY: panY.value,
-    clampPan
-  })
-}
-
 const onSliderInput = (event: Event) => {
   const input = event.target as HTMLInputElement
   const value = Number(input.value)
@@ -1493,7 +1397,6 @@ const onResourcePrimaryColorChange = (color: string | null) => {
 }
 
 const onResourcePanelOpen = () => {
-  isStationPanelOpen.value = false
   isSavePanelOpen.value = false
   isBindingPanelOpen.value = false
   clearPlacementState()
@@ -1508,22 +1411,8 @@ const onResourcePanelClose = () => {
   resourcePrimaryColor.value = null
 }
 
-const onStationPanelOpen = () => {
-  isResourcePanelOpen.value = false
-  isSavePanelOpen.value = false
-  isBindingPanelOpen.value = false
-  isStationPanelOpen.value = true
-}
-
-const onStationPanelClose = () => {
-  isStationPanelOpen.value = false
-  focusedPlacementKey.value = null
-  clearPlacementState()
-}
-
 const onSavePanelOpen = () => {
   isResourcePanelOpen.value = false
-  isStationPanelOpen.value = false
   isBindingPanelOpen.value = false
   clearPlacementState()
   isSavePanelOpen.value = true
@@ -1533,14 +1422,6 @@ const onSavePanelClose = () => {
   isSavePanelOpen.value = false
   activeSavePoiCategory.value = null
   focusedSavePoiKey.value = null
-}
-
-const onBindingPanelOpen = () => {
-  isResourcePanelOpen.value = false
-  isStationPanelOpen.value = false
-  isSavePanelOpen.value = false
-  clearPlacementState()
-  isBindingPanelOpen.value = true
 }
 
 const onBindingPanelClose = () => {
@@ -1641,11 +1522,6 @@ const onSaveSelectArchive = async (payload: { guid: string; time: number } | nul
   activeSavePoiCategory.value = null
 }
 
-const onSaveSelectArchiveAndNavigate = async (payload: { guid: string; time: number }) => {
-  await saveStore.selectArchive(payload.guid, payload.time)
-  activeSavePoiCategory.value = null
-}
-
 const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
   savePoiVisibility.value = visibility
 }
@@ -1711,36 +1587,6 @@ const onSavePoiFocus = async (poi: SavePoiOverlayItem) => {
   })
 }
 
-const onStationItemDragStart = (item: MapStationPanelItem) => {
-  draggingPlacementItem.value = {
-    id: item.id,
-    kind: item.kind,
-    name: item.name,
-    icon: item.icon
-  }
-  draggingOverlayKey.value = item.location ? `${item.kind}:${item.id}` : null
-}
-
-const onStationItemDragEnd = () => {
-  clearPlacementState()
-}
-
-const onStationItemClearLocation = (item: MapStationPanelItem) => {
-  if (item.kind === 'station') {
-    empireStore.clearStationLocation(item.id)
-    return
-  }
-  empireStore.clearSectorLocation(item.id)
-}
-
-const onStationItemFocus = (item: MapStationPanelItem) => {
-  if (!item.location) return
-  selectedSectorId.value = null
-  selectedSectorSource.value = null
-  focusedPlacementKey.value = `${item.kind}:${item.id}`
-  void focusPlacementOverlay(focusedPlacementKey.value)
-}
-
 const onMouseDown = (event: MouseEvent) => {
   if (draggingPlacementItem.value) return
   if (event.button !== 0) return
@@ -1756,7 +1602,7 @@ const onMouseDown = (event: MouseEvent) => {
 
 const onMouseMove = (event: MouseEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
-  if (draggingPlacementItem.value && (isStationPanelOpen.value || isBindingPanelOpen.value)) {
+  if (draggingPlacementItem.value && isBindingPanelOpen.value) {
     const location = resolveLocationAtPointer(event.clientX, event.clientY)
     placementPreview.value = location ? {
       kind: draggingPlacementItem.value.kind,
@@ -1883,7 +1729,7 @@ const onResize = () => {
 }
 
 const onViewportDragOver = (event: DragEvent) => {
-  if (!isStationPanelOpen.value && !isBindingPanelOpen.value) return
+  if (!isBindingPanelOpen.value) return
   event.preventDefault()
   
   if (draggingPlacementItem.value) {
@@ -1906,7 +1752,7 @@ const onViewportDragOver = (event: DragEvent) => {
 }
 
 const onViewportDrop = (event: DragEvent) => {
-  if (!isStationPanelOpen.value && !isBindingPanelOpen.value) return
+  if (!isBindingPanelOpen.value) return
   event.preventDefault()
   
   const location = resolveLocationAtPointer(event.clientX, event.clientY)
@@ -2004,12 +1850,6 @@ watch(isResourcePanelOpen, async () => {
   closeTooltip()
 })
 
-watch(isStationPanelOpen, async (open) => {
-  if (!open) clearPlacementState()
-  await nextTick()
-  recomputeScaleBounds()
-})
-
 watch(locale, () => {
   if (!hoveredSectorSource.value) return
   hoveredSector.value = createTooltipViewModel(hoveredSectorSource.value)
@@ -2051,7 +1891,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="map-workbench" data-testid="map-workbench-view">
-    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen, 'save-sidebar-active': isSavePanelOpen, 'binding-sidebar-active': isBindingPanelOpen }">
+    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'save-sidebar-active': isSavePanelOpen, 'binding-sidebar-active': isBindingPanelOpen }">
       <MapResourceFilterPanel
         v-show="isResourcePanelOpen"
         :sector-layouts="searchSectors"
@@ -2067,23 +1907,12 @@ onBeforeUnmount(() => {
         @panel-close="onResourcePanelClose"
       />
 
-      <MapStationPanel
-        :open="isStationPanelOpen"
-        :items="stationPanelItems"
-        @close="onStationPanelClose"
-        @drag-start="onStationItemDragStart"
-        @drag-end="onStationItemDragEnd"
-        @clear-location="onStationItemClearLocation"
-        @focus-item="onStationItemFocus"
-      />
-
       <MapSavePanel
         :open="isSavePanelOpen"
         :archive="activeMapArchive"
         :visibility="savePoiVisibility"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
-        @select-archive-and-navigate="onSaveSelectArchiveAndNavigate"
         @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
         @focus-poi="onSavePoiFocus"
@@ -2128,8 +1957,8 @@ onBeforeUnmount(() => {
               :resource-sector-group-badges="resourceSectorGroupBadges"
               :resource-fill-color-override="resourcePrimaryColor"
               :selected-sector-id="selectedSectorId"
-              :placement-overlays="[...placementOverlays, ...bindingOverlays]"
-              :placement-preview="(isStationPanelOpen || isBindingPanelOpen) ? placementPreview : null"
+              :placement-overlays="bindingOverlays"
+              :placement-preview="isBindingPanelOpen ? placementPreview : null"
               :is-dragging="isDragging"
               :is-zooming="isZooming"
               :dragging-overlay-key="draggingOverlayKey"
@@ -2269,26 +2098,6 @@ onBeforeUnmount(() => {
           <button
             type="button"
             class="map-panel-tab"
-            :class="{ active: isStationPanelOpen }"
-            data-testid="map-station-entry-button"
-            @click="onStationPanelOpen"
-          >
-            <span class="map-panel-tab-label">{{ t('map.station_panel_button') }}</span>
-            <svg class="map-panel-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 3l7 4v10l-7 4-7-4V7l7-4zm0 4.2L8 9.4v5.2l4 2.2 4-2.2V9.4l-4-2.2z"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.6"
-              />
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            class="map-panel-tab"
             :class="{ active: isSavePanelOpen }"
             data-testid="map-save-panel-tab"
             @click="onSavePanelOpen"
@@ -2306,25 +2115,6 @@ onBeforeUnmount(() => {
             </svg>
           </button>
 
-          <button
-            type="button"
-            class="map-panel-tab"
-            :class="{ active: isBindingPanelOpen }"
-            data-testid="map-binding-panel-tab"
-            @click="onBindingPanelOpen"
-          >
-            <span class="map-panel-tab-label">{{ t('map.binding_panel_tab') }}</span>
-            <svg class="map-panel-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.8"
-              />
-            </svg>
-          </button>
         </div>
 
         <div class="map-right-stack" @mousedown.stop>
@@ -2374,10 +2164,6 @@ onBeforeUnmount(() => {
 }
 
 .map-layout.sidebar-active {
-  @apply gap-3;
-}
-
-.map-layout.station-sidebar-active {
   @apply gap-3;
 }
 
