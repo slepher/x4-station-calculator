@@ -730,11 +730,28 @@ export const useEmpireStore = defineStore('empire', () => {
     return true
   }
 
-  function deleteSector(sectorId: string) {
+  function deleteSector(sectorId: string, gameGuid?: string) {
     if (!activeEmpire.value) return false
     const sectorList = activeEmpire.value.sectors || []
     const idx = sectorList.findIndex((item) => item.id === sectorId)
     if (idx === -1) return false
+
+    if (Array.isArray(activeEmpire.value.saveBindings)) {
+      activeEmpire.value.saveBindings.forEach((plan) => {
+        if (gameGuid && plan.gameGuid !== gameGuid) return
+        const removedBinding = plan.groupBindings.find((binding) => binding.sectorGroupId === sectorId)
+        plan.groupBindings = plan.groupBindings
+          .filter((binding) => binding.sectorGroupId !== sectorId)
+          .map((binding) => ({
+            ...binding,
+            connectedSectorGroupIds: (binding.connectedSectorGroupIds || []).filter((id) => id !== sectorId)
+          }))
+        if (removedBinding) {
+          bindingDirtyMarker.value++
+        }
+      })
+    }
+
     sectorList.splice(idx, 1)
     sectorList.forEach((sector, order) => {
       sector.order = order

@@ -9,7 +9,7 @@ import { useSectorNameFilter } from '@/composables/useSectorNameFilter'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 import { getCoverageSectors, buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from './mapSectorMacro'
-import { createOverlayItem } from '@/store/useSaveStore'
+import { getStationPoiLabel } from './savePoiLabel'
 import JumpInput from '@/components/common/JumpInput.vue'
 import type { SaveBindingPlan, SectorPlan, CoverageSectorEntry } from '@/types/x4'
 import type { PlayerStationEntry, SaveArchive } from '@/types/saveArchive'
@@ -37,6 +37,7 @@ const bindMenuRef = ref<HTMLElement | null>(null)
 const bindMenuStyle = ref<Record<string, string>>({})
 const bindMenuTargetSectorId = ref<string | null>(null)
 const bindMenuTriggerEl = ref<HTMLElement | null>(null)
+const sectorItemEls = ref<Record<string, HTMLElement | null>>({})
 
 const activeEmpire = computed(() => empireStore.activeEmpire)
 
@@ -77,6 +78,7 @@ interface CoverageDraftEntry {
 
 interface BindingDraftState {
   sectorGroupId: string | null
+  isNew: boolean
   name: string
   anchorSectorMacro: string | null
   jumpRange: number
@@ -86,6 +88,7 @@ interface BindingDraftState {
 
 const initialDraftState = (): BindingDraftState => ({
   sectorGroupId: null,
+  isNew: false,
   name: '',
   anchorSectorMacro: null,
   jumpRange: 2,
@@ -94,6 +97,7 @@ const initialDraftState = (): BindingDraftState => ({
 })
 
 const draft = ref<BindingDraftState>(initialDraftState())
+const deleteConfirmOpen = ref(false)
 
 // Helper functions for draft management
 function closeDraft() {
@@ -102,6 +106,22 @@ function closeDraft() {
 
 function isDraftOpen(): boolean {
   return draft.value.sectorGroupId !== null
+}
+
+function setSectorItemEl(sectorId: string, el: Element | null) {
+  sectorItemEls.value[sectorId] = el instanceof HTMLElement ? el : null
+}
+
+function focusDraftItemIntoView() {
+  const sectorId = draft.value.sectorGroupId
+  if (!sectorId) return
+  const el = sectorItemEls.value[sectorId]
+  if (!el || typeof el.scrollIntoView !== 'function') return
+  el.scrollIntoView({
+    block: 'nearest',
+    inline: 'nearest',
+    behavior: 'smooth'
+  })
 }
 
 interface SectorWithStations {
@@ -188,7 +208,7 @@ const empireSectors = computed<SectorPlan[]>(() => {
 })
 
 const empireSectorItems = computed(() => {
-  return empireSectors.value.map(sector => {
+  const items = empireSectors.value.map(sector => {
     const groupBinding = activeBindingPlan.value?.groupBindings.find(
       (b) => b.sectorGroupId === sector.id
     )
@@ -199,7 +219,7 @@ const empireSectorItems = computed(() => {
         id: sector.id,
         name: sector.name,
         isBound: !!groupBinding,
-        sectorMacro: groupBinding?.sectorMacro || null,
+        sectorMacro: draft.value.anchorSectorMacro,
         coverageMacros: draft.value.coverage,
         connectedSectorGroupIds: draft.value.connectedSectorGroupIds,
         jumpRange: draft.value.jumpRange,
@@ -218,6 +238,21 @@ const empireSectorItems = computed(() => {
       expanded: false
     }
   })
+
+  if (draft.value.isNew && draft.value.sectorGroupId) {
+    items.push({
+      id: draft.value.sectorGroupId,
+      name: draft.value.name || t('map.binding_new_sector_name'),
+      isBound: false,
+      sectorMacro: draft.value.anchorSectorMacro,
+      coverageMacros: draft.value.coverage,
+      connectedSectorGroupIds: draft.value.connectedSectorGroupIds,
+      jumpRange: draft.value.jumpRange,
+      expanded: true
+    })
+  }
+
+  return items
 })
 
 // TODO: 实现地图可见面积超过50%的星区计算
@@ -271,8 +306,24 @@ function getBoundSectorGroupName(sectorMacro: string): string | null {
 }
 
 function getStationDisplayName(station: PlayerStationEntry): string {
-  const poi = createOverlayItem('playerStation', '', '', station)
-  return poi.code
+  return getStationPoiLabel({
+    key: `playerStation:${station.code}`,
+    code: station.code,
+    category: 'playerStation',
+    owner: 'player',
+    sectorMacro: '',
+    sectorName: '',
+    position: station.position,
+    tag: station.tag,
+    factoryGroup: station.factoryGroup,
+    productionProfile: station.productionProfile,
+    profileName: station.profileName,
+    is_headquarter: station.is_headquarter
+  }, {
+    t,
+    localizedModulesMap: gameDataStore.localizedModulesMap || {},
+    localizedModuleGroupsMap: gameDataStore.localizedModuleGroupsMap || {}
+  })
 }
 
 function getSectorMacroDisplayName(sectorMacro: string): string {
@@ -364,14 +415,6 @@ function selectSaveSectorForBinding(sectorMacro: string) {
   draft.value.sectorGroupId = bindMenuTargetSectorId.value
   draft.value.anchorSectorMacro = sectorMacro
 
-  empireStore.bindSectorGroup({
-    gameGuid: props.gameGuid,
-    sectorGroupId: bindMenuTargetSectorId.value,
-    sectorMacro,
-    jumpRange: draft.value.jumpRange,
-    coverageSectorMacros: draft.value.coverage
-  })
-
   closeBindMenu()
 }
 
@@ -387,15 +430,13 @@ function isCurrentBoundSector(sectorMacro: string): boolean {
   return groupBinding?.sectorMacro === sectorMacro
 }
 
-function unbindCurrentSector() {
-  if (bindMenuTargetSectorId.value) {
-    empireStore.clearSectorGroupBinding(props.gameGuid, bindMenuTargetSectorId.value)
-    closeBindMenu()
-  }
+function isDraftBoundSector(sectorMacro: string): boolean {
+  return draft.value.anchorSectorMacro === sectorMacro
 }
 
 function onMenuSectorClick(sectorMacro: string) {
   if (!bindMenuTargetSectorId.value) return
+  if (isDraftBoundSector(sectorMacro)) return
   const currentSector = empireSectors.value.find((item) => item.id === bindMenuTargetSectorId.value)
   const currentBinding = activeBindingPlan.value?.groupBindings.find(
     b => b.sectorGroupId === bindMenuTargetSectorId.value
@@ -429,6 +470,7 @@ function onMenuSectorClick(sectorMacro: string) {
   }
   
   draft.value.sectorGroupId = bindMenuTargetSectorId.value
+  draft.value.isNew = !currentSector
   draft.value.name = currentSector?.name || draft.value.name
   draft.value.anchorSectorMacro = sectorMacro
   draft.value.connectedSectorGroupIds = [...(currentBinding?.connectedSectorGroupIds || [])]
@@ -445,6 +487,7 @@ function openDraft(sectorId: string) {
   )
   draft.value = {
     sectorGroupId: sectorId,
+    isNew: false,
     name: sector?.name || '',
     anchorSectorMacro: currentBinding?.sectorMacro || null,
     jumpRange: currentBinding?.jumpRange || 2,
@@ -455,25 +498,38 @@ function openDraft(sectorId: string) {
 
 function cancelBinding(_sectorId: string) {
   // 直接关闭编辑状态，丢弃 draft 数据
+  deleteConfirmOpen.value = false
   closeDraft()
   closeBindMenu()
 }
 
 function confirmBinding(sectorId: string) {
-  empireStore.renameSector(sectorId, draft.value.name.trim() || draft.value.name)
-
   if (!draft.value.anchorSectorMacro) {
     closeDraft()
     return
   }
-  
-  const previousBinding = activeBindingPlan.value?.groupBindings.find((binding) => binding.sectorGroupId === sectorId)
+
+  const resolvedName = (draft.value.name || '').trim()
+  let resolvedSectorId = sectorId
+
+  if (draft.value.isNew) {
+    const created = empireStore.createSector(resolvedName)
+    if (!created) {
+      closeDraft()
+      return
+    }
+    resolvedSectorId = created.id
+  } else {
+    empireStore.renameSector(sectorId, resolvedName || draft.value.name)
+  }
+
+  const previousBinding = activeBindingPlan.value?.groupBindings.find((binding) => binding.sectorGroupId === resolvedSectorId)
   const previousConnections = new Set(previousBinding?.connectedSectorGroupIds || [])
   const nextConnections = new Set(draft.value.connectedSectorGroupIds)
 
   empireStore.bindSectorGroup({
     gameGuid: props.gameGuid,
-    sectorGroupId: sectorId,
+    sectorGroupId: resolvedSectorId,
     sectorMacro: draft.value.anchorSectorMacro,
     jumpRange: draft.value.jumpRange,
     coverageSectorMacros: draft.value.coverage
@@ -481,9 +537,10 @@ function confirmBinding(sectorId: string) {
 
   const relatedSectorIds = new Set([...previousConnections, ...nextConnections])
   relatedSectorIds.forEach((relatedSectorId) => {
-    empireStore.setGroupConnection(props.gameGuid, sectorId, relatedSectorId, nextConnections.has(relatedSectorId))
+    empireStore.setGroupConnection(props.gameGuid, resolvedSectorId, relatedSectorId, nextConnections.has(relatedSectorId))
   })
 
+  deleteConfirmOpen.value = false
   closeDraft()
 }
 
@@ -533,6 +590,10 @@ function getCoverageSectorsAtJump(jump: number): string[] {
     .map(c => c.ref)
 }
 
+function getCoverageJumps() {
+  return Array.from(new Set(draft.value.coverage.map((entry) => entry.jump))).sort((a, b) => a - b)
+}
+
 function getCollapsedCoverageByJump(coverageEntries: CoverageSectorEntry[]): Map<number, string[]> {
   const result = new Map<number, string[]>()
 
@@ -572,6 +633,16 @@ function getCandidateSectorsAtJump(jump: number): string[] {
   return sectorsAtJump.filter(m => !coverageRefs.has(m))
 }
 
+function getCandidateJumps() {
+  const jumps: number[] = []
+  for (let jump = 1; jump <= draft.value.jumpRange; jump++) {
+    if (getCandidateSectorsAtJump(jump).length > 0) {
+      jumps.push(jump)
+    }
+  }
+  return jumps
+}
+
 function excludeFromCoverage(sectorMacro: string) {
   const index = draft.value.coverage.findIndex(c => c.ref === sectorMacro)
   if (index >= 0) {
@@ -586,9 +657,16 @@ function addToCoverage(sectorMacro: string, jump: number) {
 }
 
 function createSectorAndEdit() {
-  const sector = empireStore.createSector()
-  if (!sector) return
-  openDraft(sector.id)
+  if (isDraftOpen()) return
+  draft.value = {
+    sectorGroupId: `draft:${crypto.randomUUID()}`,
+    isNew: true,
+    name: '',
+    anchorSectorMacro: null,
+    jumpRange: 2,
+    coverage: [],
+    connectedSectorGroupIds: []
+  }
 }
 
 function applySectorOrder(items: Array<{ id: string }>) {
@@ -613,6 +691,7 @@ function getConnectedSectorCandidates() {
       return {
         sectorId: sector.id,
         name: sector.name,
+        sectorMacro: anchorMacro,
         jump,
         isConnected: draft.value.connectedSectorGroupIds.includes(sector.id)
       }
@@ -621,11 +700,15 @@ function getConnectedSectorCandidates() {
     .sort((left, right) => {
       if (left!.jump !== right!.jump) return left!.jump - right!.jump
       return left!.name.localeCompare(right!.name)
-    }) as Array<{ sectorId: string; name: string; jump: number; isConnected: boolean }>
+    }) as Array<{ sectorId: string; name: string; sectorMacro: string; jump: number; isConnected: boolean }>
 }
 
 function getConnectedCandidatesAtJump(jump: number) {
   return getConnectedSectorCandidates().filter((item) => item.jump === jump)
+}
+
+function getConnectedCandidateJumps() {
+  return Array.from(new Set(getConnectedSectorCandidates().map((item) => item.jump))).sort((a, b) => a - b)
 }
 
 function toggleDraftConnection(sectorId: string, connected: boolean) {
@@ -654,6 +737,7 @@ function getCollapsedConnectedSectors(sectorId: string) {
       return {
         sectorId: connectedId,
         name: sector.name,
+        sectorMacro: targetBinding.sectorMacro,
         jump: distanceMap.get(targetBinding.sectorMacro) || 0
       }
     })
@@ -661,11 +745,15 @@ function getCollapsedConnectedSectors(sectorId: string) {
     .sort((left, right) => {
       if (left!.jump !== right!.jump) return left!.jump - right!.jump
       return left!.name.localeCompare(right!.name)
-    }) as Array<{ sectorId: string; name: string; jump: number }>
+    }) as Array<{ sectorId: string; name: string; sectorMacro: string; jump: number }>
 }
 
 function getCollapsedConnectedAtJump(sectorId: string, jump: number) {
   return getCollapsedConnectedSectors(sectorId).filter((item) => item.jump === jump)
+}
+
+function getCollapsedConnectedJumps(sectorId: string) {
+  return Array.from(new Set(getCollapsedConnectedSectors(sectorId).map((item) => item.jump))).sort((a, b) => a - b)
 }
 
 function getSaveSectorStationGroups(stations: PlayerStationEntry[]): AggregatedStationName[] {
@@ -683,8 +771,31 @@ function focusSectorByMacro(sectorMacro: string) {
   emit('focus-sector', sectorMacro)
 }
 
+function requestDeleteCurrentSector() {
+  if (draft.value.isNew) return
+  deleteConfirmOpen.value = true
+}
+
+function cancelDeleteCurrentSector() {
+  deleteConfirmOpen.value = false
+}
+
+function confirmDeleteCurrentSector() {
+  if (!draft.value.sectorGroupId || draft.value.isNew) return
+  empireStore.deleteSector(draft.value.sectorGroupId, props.gameGuid)
+  deleteConfirmOpen.value = false
+  closeDraft()
+  closeBindMenu()
+}
+
 watch(() => props.gameGuid, () => {
   closeBindMenu()
+})
+
+watch(() => draft.value.sectorGroupId, async (sectorId) => {
+  if (!sectorId) return
+  await nextTick()
+  focusDraftItemIntoView()
 })
 
 onMounted(() => {
@@ -709,7 +820,7 @@ onBeforeUnmount(() => {
         {{ t('map.binding_new_sector') }}
       </button>
     </div>
-    <div v-if="empireSectors.length === 0" class="empty-hint">
+    <div v-if="empireSectorItems.length === 0" class="empty-hint">
       {{ t('map.binding_no_empire_sectors') }}
     </div>
     <draggable
@@ -724,55 +835,57 @@ onBeforeUnmount(() => {
     >
       <template #item="{ element: sector }">
       <div
+        :ref="(el) => setSectorItemEl(sector.id, el)"
         class="empire-sector-item"
         :class="{ expanded: sector.expanded, bound: sector.isBound }"
       >
         <div class="empire-sector-header">
           <div class="sector-title">
-            <button
-              v-if="!sector.expanded"
-              class="sector-drag-handle"
-              type="button"
-              :disabled="isDraftOpen()"
-              :title="t('map.binding_reorder_sector')"
-            >
+            <button v-if="!sector.expanded" class="sector-drag-handle" type="button" :disabled="isDraftOpen()" :title="t('map.binding_reorder_sector')">
               ⋮⋮
             </button>
-            <span class="empire-sector-name">{{ sector.name }}</span>
+            <input
+              v-if="sector.expanded"
+              v-model="draft.name"
+              class="sector-name-input"
+              type="text"
+              :placeholder="t('map.binding_new_sector_name')"
+            />
+            <span v-else class="empire-sector-name">{{ sector.name }}</span>
           </div>
           <template v-if="sector.expanded">
             <div class="header-actions">
-              <button class="cancel-btn" type="button" @click.stop="cancelBinding(sector.id)">{{ t('map.binding_cancel') }}</button>
-              <button class="confirm-btn" type="button" @click.stop="confirmBinding(sector.id)">{{ t('map.binding_confirm') }}</button>
+              <button class="anchor-select-btn" type="button" @click.stop="openAnchorSelector($event, sector.id)">
+                {{ t('map.binding_bind_sector') }}&gt;
+              </button>
             </div>
           </template>
           <div v-else class="header-actions">
             <button
               v-if="sector.sectorMacro"
-              class="anchor-pill-btn"
-              type="button"
-              @click.stop="focusSectorByMacro(sector.sectorMacro)"
-            >
-              {{ getSectorMacroDisplayName(sector.sectorMacro) }}
-            </button>
-            <button
-              class="step3-btn"
-              type="button"
-              :disabled="isDraftOpen() || !sector.sectorMacro"
-              @click.stop="emit('select-group', sector.id)"
-            >
-              {{ t('map.binding_step_3') }}
-            </button>
-            <button
-              class="bind-btn"
+              class="detail-icon-btn"
               type="button"
               :disabled="isDraftOpen()"
-              @click.stop="openDraft(sector.id)"
+              :title="t('map.binding_view_detail')"
+              :aria-label="t('map.binding_view_detail')"
+              @click.stop="emit('select-group', sector.id)"
             >
-              {{ sector.isBound ? t('map.binding_already_bound') : t('map.binding_bind') }}
-              <svg class="bound-btn-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+              <svg viewBox="0 0 24 24" class="detail-icon" aria-hidden="true">
+                <path
+                  d="M5 6.5C5 5.67 5.67 5 6.5 5H17.5C18.33 5 19 5.67 19 6.5V17.5C19 18.33 18.33 19 17.5 19H6.5C5.67 19 5 18.33 5 17.5V6.5Z"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                />
+                <path d="M8 9H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M8 12H16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
+                <path d="M8 15H13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" />
               </svg>
+            </button>
+            <button class="bind-btn" type="button" :disabled="isDraftOpen()" @click.stop="openDraft(sector.id)">
+              {{ t('map.binding_edit') }}
             </button>
           </div>
         </div>
@@ -780,19 +893,8 @@ onBeforeUnmount(() => {
         <!-- Expanded Configuration -->
         <div v-if="sector.expanded" class="empire-sector-config">
           <div class="config-section">
-            <label class="config-label">{{ t('map.binding_new_sector_name') }}</label>
-            <input
-              v-model="draft.name"
-              class="sector-name-input"
-              type="text"
-              :placeholder="t('map.binding_new_sector_name')"
-            />
-          </div>
-
-          <!-- Anchor Sector and Jump Range -->
-          <div class="config-header-row">
-            <div class="anchor-sector">
-              <label class="config-label">{{ t('map.binding_anchor_sector') }}</label>
+            <label class="config-label">{{ t('map.binding_anchor_sector') }}</label>
+            <div class="anchor-row">
               <span
                 v-if="draft.anchorSectorMacro"
                 class="pill pill--anchor pill--clickable"
@@ -801,27 +903,23 @@ onBeforeUnmount(() => {
                 {{ getSectorMacroDisplayName(draft.anchorSectorMacro) }}
               </span>
               <span v-else class="anchor-name">-</span>
-              <button class="anchor-select-btn" type="button" @click.stop="openAnchorSelector($event, sector.id)">
-                {{ t('map.binding_bind_sector') }}
-              </button>
-            </div>
-            <div class="jump-control">
-              <label class="config-label">{{ t('map.binding_jump_range') }}</label>
-              <JumpInput
-                v-model="draft.jumpRange"
-                :min="0"
-                :max="5"
-                @update:model-value="updateDraftJumpRange"
-                @change="({ oldValue, newValue }) => updateDraftJumpRange(newValue, oldValue)"
-              />
+              <div class="jump-control-inline">
+                <JumpInput
+                  v-model="draft.jumpRange"
+                  :min="0"
+                  :max="5"
+                  @update:model-value="updateDraftJumpRange"
+                  @change="({ oldValue, newValue }) => updateDraftJumpRange(newValue, oldValue)"
+                />
+              </div>
             </div>
           </div>
 
           <!-- Coverage Sectors by Jump -->
           <div class="config-section">
             <label class="config-label">{{ t('map.binding_coverage_sectors') }}</label>
-            <div v-for="jump in draft.jumpRange" :key="jump" class="jump-group">
-              <div v-if="getCoverageSectorsAtJump(jump).length > 0" class="jump-group-header">
+            <div v-for="jump in getCoverageJumps()" :key="jump" class="jump-group">
+              <div class="jump-group-header">
                 <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <div class="pill-list">
                   <span
@@ -841,8 +939,8 @@ onBeforeUnmount(() => {
           <!-- Candidate Sectors by Jump -->
           <div class="config-section">
             <label class="config-label">{{ t('map.binding_candidate_sectors') }}</label>
-            <div v-for="jump in draft.jumpRange" :key="jump" class="jump-group">
-              <div v-if="getCandidateSectorsAtJump(jump).length > 0" class="jump-group-header">
+            <div v-for="jump in getCandidateJumps()" :key="jump" class="jump-group">
+              <div class="jump-group-header">
                 <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <div class="pill-list">
                   <span
@@ -868,19 +966,20 @@ onBeforeUnmount(() => {
             </div>
           </div>
 
-          <div class="config-section">
+          <div v-if="getConnectedSectorCandidates().length > 0" class="config-section">
             <label class="config-label">{{ t('map.binding_connected_sectors') }}</label>
-            <div v-for="jump in 5" :key="`link-${jump}`" class="jump-group">
-              <div v-if="getConnectedCandidatesAtJump(jump).length > 0" class="jump-group-header">
+            <div v-for="jump in getConnectedCandidateJumps()" :key="`link-${jump}`" class="jump-group">
+              <div class="jump-group-header">
                 <span class="jump-number">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <div class="pill-list">
                   <span
                     v-for="candidate in getConnectedCandidatesAtJump(jump)"
                     :key="candidate.sectorId"
-                    class="pill"
+                    class="pill pill--clickable"
                     :class="candidate.isConnected ? 'pill--connected' : 'pill--disconnected'"
+                    @click.stop="focusSectorByMacro(candidate.sectorMacro)"
                   >
-                    {{ candidate.name }}
+                    {{ candidate.name }}:{{ getSectorMacroDisplayName(candidate.sectorMacro) }}
                     <button
                       class="pill-plus"
                       type="button"
@@ -893,15 +992,34 @@ onBeforeUnmount(() => {
               </div>
             </div>
           </div>
+          <div v-if="deleteConfirmOpen && !draft.isNew" class="delete-confirm">
+            <span class="delete-confirm-text">{{ t('map.binding_delete_sector_confirm') }}</span>
+            <div class="delete-confirm-actions">
+              <button class="cancel-btn" type="button" @click.stop="cancelDeleteCurrentSector">{{ t('map.binding_cancel') }}</button>
+              <button class="delete-confirm-btn" type="button" @click.stop="confirmDeleteCurrentSector">{{ t('map.binding_delete') }}</button>
+            </div>
+          </div>
+
+          <div class="edit-footer">
+            <button
+              v-if="!draft.isNew"
+              class="delete-btn"
+              type="button"
+              @click.stop="requestDeleteCurrentSector"
+            >
+              {{ t('map.binding_delete') }}
+            </button>
+            <div class="edit-footer-actions">
+              <button class="cancel-btn" type="button" @click.stop="cancelBinding(sector.id)">{{ t('map.binding_cancel') }}</button>
+              <button class="confirm-btn" type="button" @click.stop="confirmBinding(sector.id)">{{ t('map.binding_confirm') }}</button>
+            </div>
+          </div>
         </div>
 
         <!-- Collapsed Binding Pills -->
         <div v-else-if="sector.isBound && sector.sectorMacro" class="collapsed-binding-pills">
-          <div class="collapsed-pill-row">
-            <span
-              class="pill pill--anchor pill--clickable"
-              @click.stop="focusSectorByMacro(sector.sectorMacro)"
-            >
+          <div class="collapsed-anchor-row">
+            <span class="pill pill--anchor pill--clickable" @click.stop="focusSectorByMacro(sector.sectorMacro)">
               {{ getSectorMacroDisplayName(sector.sectorMacro) }}
             </span>
           </div>
@@ -911,7 +1029,7 @@ onBeforeUnmount(() => {
               :key="jump"
               class="collapsed-pill-row"
             >
-              <template v-if="getCollapsedCoverageByJump(sector.coverageMacros).get(jump)?.length">
+              <template v-if="getCollapsedCoverageByJump(sector.coverageMacros).get(jump)?.length || getCollapsedConnectedAtJump(sector.id, jump).length">
                 <span class="jump-label">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <span
                   v-for="macro in getCollapsedCoverageByJump(sector.coverageMacros).get(jump)"
@@ -921,24 +1039,32 @@ onBeforeUnmount(() => {
                 >
                   {{ getSectorMacroDisplayName(macro) }}
                 </span>
+                <span
+                  v-for="connected in getCollapsedConnectedAtJump(sector.id, jump)"
+                  :key="connected.sectorId"
+                  class="pill pill--small pill--connected pill--clickable"
+                  @click.stop="focusSectorByMacro(connected.sectorMacro)"
+                >
+                  {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
+                </span>
               </template>
             </div>
           </template>
-          <template v-if="sector.connectedSectorGroupIds.length > 0">
+          <template v-if="getCollapsedConnectedJumps(sector.id).length > 0">
             <div
-              v-for="jump in 5"
+              v-for="jump in getCollapsedConnectedJumps(sector.id).filter((value) => value > sector.jumpRange)"
               :key="`connected-${jump}`"
               class="collapsed-pill-row"
             >
               <template v-if="getCollapsedConnectedAtJump(sector.id, jump).length">
-                <span class="row-label">{{ t('map.binding_connected_sectors') }}</span>
                 <span class="jump-label">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
                 <span
                   v-for="connected in getCollapsedConnectedAtJump(sector.id, jump)"
                   :key="connected.sectorId"
-                  class="pill pill--small pill--connected"
+                  class="pill pill--small pill--connected pill--clickable"
+                  @click.stop="focusSectorByMacro(connected.sectorMacro)"
                 >
-                  {{ connected.name }}
+                  {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
                 </span>
               </template>
             </div>
@@ -1023,22 +1149,13 @@ onBeforeUnmount(() => {
               class="bind-menu-item"
               :class="{ 
                 active: isCurrentBoundSector(sector.sectorMacro),
+                'draft-active': isDraftBoundSector(sector.sectorMacro),
                 orange: isSectorBoundToOtherGroup(sector.sectorMacro, bindMenuTargetSectorId || '')
               }"
               :disabled="isSectorBoundToOtherGroup(sector.sectorMacro, bindMenuTargetSectorId || '')"
               @click="onMenuSectorClick(sector.sectorMacro)"
             >
               <span>{{ sector.sectorName }}</span>
-              <button
-                v-if="isCurrentBoundSector(sector.sectorMacro)"
-                class="bind-menu-item-unbind"
-                type="button"
-                @click.stop="unbindCurrentSector()"
-              >
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="h-3 w-3">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
             </button>
           </template>
           <div v-else class="bind-menu-hint">
@@ -1128,15 +1245,23 @@ onBeforeUnmount(() => {
 }
 
 .sector-title {
-  @apply flex min-w-0 items-center gap-2;
+  @apply flex min-w-0 flex-1 items-center gap-2;
 }
 
 .empire-sector-name {
   @apply truncate text-sm text-amber-100;
 }
 
+.detail-icon-btn {
+  @apply inline-flex h-7 w-7 items-center justify-center rounded text-amber-100/65 transition-colors hover:bg-amber-200/10 hover:text-amber-50 disabled:cursor-not-allowed disabled:opacity-40;
+}
+
+.detail-icon {
+  @apply h-4 w-4;
+}
+
 .sector-drag-handle {
-  @apply inline-flex h-7 w-7 items-center justify-center rounded border border-amber-300/20 bg-black/30 text-xs text-amber-100/70 disabled:cursor-not-allowed disabled:opacity-40;
+  @apply inline-flex h-7 w-7 items-center justify-center rounded bg-transparent text-xs text-amber-100/70 disabled:cursor-not-allowed disabled:opacity-40;
 }
 
 .sector-name-input {
@@ -1144,15 +1269,7 @@ onBeforeUnmount(() => {
 }
 
 .bind-btn {
-  @apply inline-flex items-center gap-1 whitespace-nowrap rounded border border-amber-300/30 bg-amber-200/10 px-2 py-1 text-xs text-amber-100;
-}
-
-.bind-btn-chevron {
-  @apply h-3 w-3;
-}
-
-.bound-btn-chevron {
-  @apply h-3 w-3;
+  @apply inline-flex items-center whitespace-nowrap rounded border border-amber-300/30 bg-amber-200/10 px-2 py-1 text-xs text-amber-100;
 }
 
 .header-actions {
@@ -1177,20 +1294,16 @@ onBeforeUnmount(() => {
   @apply mt-3 flex flex-col gap-3 border-t border-amber-300/15 pt-3;
 }
 
-.config-header-row {
-  @apply flex items-center justify-between gap-4;
-}
-
-.anchor-sector {
-  @apply flex flex-col gap-1;
-}
-
 .anchor-name {
   @apply text-sm text-amber-100;
 }
 
-.jump-control {
-  @apply flex flex-col gap-1 items-end;
+.anchor-row {
+  @apply flex items-center justify-between gap-3;
+}
+
+.jump-control-inline {
+  @apply ml-auto;
 }
 
 .config-section {
@@ -1202,15 +1315,15 @@ onBeforeUnmount(() => {
 }
 
 .jump-group-header {
-  @apply flex items-start gap-2;
+  @apply flex items-center gap-2;
 }
 
 .pill-list {
-  @apply flex flex-wrap gap-2;
+  @apply flex flex-wrap items-center gap-2;
 }
 
 .jump-number {
-  @apply shrink-0 text-xs text-amber-100/50 w-8;
+  @apply shrink-0 self-center text-xs text-amber-100/50 w-8;
 }
 
 .config-label {
@@ -1223,6 +1336,10 @@ onBeforeUnmount(() => {
 
 .collapsed-binding-pills {
   @apply mt-2 flex flex-col gap-1;
+}
+
+.collapsed-anchor-row {
+  @apply flex items-center justify-between gap-2;
 }
 
 .collapsed-pill-row {
@@ -1365,6 +1482,10 @@ onBeforeUnmount(() => {
   @apply bg-amber-200/15 text-amber-50;
 }
 
+.bind-menu-item.draft-active {
+  @apply border border-amber-200/50 bg-amber-200/10 text-amber-50;
+}
+
 .bind-menu-item.orange {
   @apply text-orange-200;
 }
@@ -1377,15 +1498,39 @@ onBeforeUnmount(() => {
   @apply cursor-not-allowed opacity-50;
 }
 
-.bind-menu-item-unbind {
-  @apply ml-2 inline-flex h-4 w-4 items-center justify-center rounded text-amber-100/55 hover:text-amber-50;
-}
-
 .bind-menu-hint {
   @apply px-3 py-2 text-xs text-amber-100/50;
 }
 
 .bind-menu-empty {
   @apply px-3 py-2 text-xs text-amber-100/40;
+}
+
+.edit-footer {
+  @apply mt-2 flex items-center justify-between gap-3 border-t border-amber-300/15 pt-3;
+}
+
+.edit-footer-actions {
+  @apply ml-auto flex items-center gap-2;
+}
+
+.delete-btn {
+  @apply inline-flex items-center rounded border border-rose-300/40 bg-rose-500/10 px-3 py-1 text-sm text-rose-200 transition-colors hover:border-rose-200/60 hover:bg-rose-500/15 hover:text-rose-100;
+}
+
+.delete-confirm {
+  @apply rounded border border-rose-300/35 bg-rose-500/10 p-3 text-sm text-rose-100;
+}
+
+.delete-confirm-text {
+  @apply block;
+}
+
+.delete-confirm-actions {
+  @apply mt-2 flex justify-end gap-2;
+}
+
+.delete-confirm-btn {
+  @apply rounded border border-rose-300/40 bg-rose-500/15 px-3 py-1 text-xs text-rose-100;
 }
 </style>
