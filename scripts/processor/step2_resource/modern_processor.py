@@ -207,6 +207,19 @@ def extract_sector_regions_from_maps_data(maps_data: dict) -> Dict[str, List[dic
     """
     sector_regions: Dict[str, List[dict]] = {}
 
+    sectors = maps_data.get("sectors", {})
+    if isinstance(sectors, dict):
+        for sector_macro, sector in sectors.items():
+            if not isinstance(sector, dict):
+                continue
+
+            regions = sector.get("regions", [])
+            if not regions:
+                continue
+
+            sector_regions[sector_macro.lower()] = regions
+        return sector_regions
+
     clusters = maps_data.get("clusters", {})
     for cluster_macro, cluster_data in clusters.items():
         if not isinstance(cluster_data, dict):

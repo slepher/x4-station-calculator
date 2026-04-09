@@ -2701,11 +2701,11 @@ Resource Area Yield level
         <resourcearea amount="3" ref="sphere_small_methane_veryhigh"/>
         <resourcearea amount="1" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_high"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_high"/>
         <resourcearea amount="6" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_verylow"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_low"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
+        <resourcearea amount="8" ref="sphere_small_silicon_veryhigh"/>
       </resourceareas>
       <area sunlight="0.71" economy="0.25" security="0.1" tags="allowrandomanomaly"/>
       <worlds>
@@ -2744,11 +2744,11 @@ Resource Area Yield level
         <resourcearea amount="1" ref="sphere_tiny_methane_verylow"/>
         <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
         <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="2" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="4" ref="sphere_small_ore_high"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_verylow"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="4" ref="sphere_medium_ore_high"/>
+        <resourcearea amount="5" ref="sphere_small_ore_high"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
+        <resourcearea amount="6" ref="sphere_small_silicon_high"/>
       </resourceareas>
       <area sunlight="0.89" economy="0.25" security="0.1" tags="allowrandomanomaly"/>
       <worlds>

@@ -1597,7 +1597,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="argon"/>
-      <cargo max="42000" tags="liquid"/>
+      <cargo max="52000" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -1605,7 +1605,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="argon"/>
-      <cargo max="50400" tags="liquid"/>
+      <cargo max="57200" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -1613,7 +1613,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="argon"/>
-      <cargo max="40000" tags="solid"/>
+      <cargo max="50800" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -1621,7 +1621,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="argon"/>
-      <cargo max="50400" tags="solid"/>
+      <cargo max="57200" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2013,14 +2013,14 @@
   <macro name="storage_bor_l_miner_liquid_01_a_macro" class="storage">
     <component ref="generic_storage"/>
     <properties>
-      <cargo max="42000" tags="liquid"/>
+      <cargo max="49600" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
   <macro name="storage_bor_l_miner_solid_01_a_macro" class="storage">
     <component ref="generic_storage"/>
     <properties>
-      <cargo max="40000" tags="solid"/>
+      <cargo max="48500" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2216,7 +2216,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="paranid"/>
-      <cargo max="32000" tags="liquid"/>
+      <cargo max="43500" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2224,7 +2224,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="paranid"/>
-      <cargo max="38400" tags="liquid"/>
+      <cargo max="47500" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2232,7 +2232,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="paranid"/>
-      <cargo max="35200" tags="liquid"/>
+      <cargo max="45100" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2240,7 +2240,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="paranid"/>
-      <cargo max="32000" tags="solid"/>
+      <cargo max="43500" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2248,7 +2248,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="paranid"/>
-      <cargo max="38400" tags="solid"/>
+      <cargo max="47500" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2256,7 +2256,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="paranid"/>
-      <cargo max="34960" tags="solid"/>
+      <cargo max="44960" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2533,7 +2533,7 @@
   <macro name="storage_pir_l_miner_solid_01_a_macro" class="storage">
     <component ref="generic_storage"/>
     <properties>
-      <cargo max="34000" tags="solid"/>
+      <cargo max="45000" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2605,7 +2605,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="split"/>
-      <cargo max="22000" tags="liquid"/>
+      <cargo max="37000" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2613,7 +2613,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="split"/>
-      <cargo max="20000" tags="solid"/>
+      <cargo max="35800" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2801,7 +2801,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="teladi"/>
-      <cargo max="44000" tags="liquid"/>
+      <cargo max="52600" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2809,14 +2809,14 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="teladi"/>
-      <cargo max="52800" tags="liquid"/>
+      <cargo max="58000" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
   <macro name="storage_tel_l_miner_liquid_02_a_macro" class="storage">
     <component ref="generic_storage"/>
     <properties>
-      <cargo max="54000" tags="liquid"/>
+      <cargo max="58500" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2824,7 +2824,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="teladi"/>
-      <cargo max="48000" tags="solid"/>
+      <cargo max="54800" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -2832,14 +2832,14 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="teladi"/>
-      <cargo max="57600" tags="solid"/>
+      <cargo max="60800" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
   <macro name="storage_tel_l_miner_solid_02_a_macro" class="storage">
     <component ref="generic_storage"/>
     <properties>
-      <cargo max="50000" tags="solid"/>
+      <cargo max="56300" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -3133,7 +3133,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="terran"/>
-      <cargo max="38000" tags="liquid"/>
+      <cargo max="51300" tags="liquid"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -3141,7 +3141,7 @@
     <component ref="generic_storage"/>
     <properties>
       <identification makerrace="terran"/>
-      <cargo max="38000" tags="solid"/>
+      <cargo max="51300" tags="solid"/>
       <hull integrated="1"/>
     </properties>
   </macro>

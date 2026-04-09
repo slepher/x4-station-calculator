@@ -2304,7 +2304,7 @@
       <ship type="heavyfighter"/>
       <sound_occlusion inside="0.5"/>
       <modifiers>
-        <weapon heat="1.5"/>
+        <weapon heat="1.4"/>
       </modifiers>
     </properties>
     <connections>
@@ -7462,7 +7462,7 @@
         <forward_boost accel="0.4" ratio="3"/>
         <forward_travel accel="0.4" decel="0.9" ratio="3"/>
         <strafe value="0.6"/>
-        <angular value="0.6"/>
+        <angular value="0.4"/>
       </jerk>
       <explosiondamage value="1000" shield="5000" shielddisruption="10"/>
       <storage countermeasure="0" missile="0" unit="0" deployable="0"/>
@@ -7482,7 +7482,7 @@
       </sounds>
       <physics mass="304.423">
         <inertia pitch="400" yaw="400" roll="400"/>
-        <drag forward="49.181" reverse="196.725" horizontal="99.05" vertical="99.05" pitch="127.885" yaw="127.885" roll="127.885"/>
+        <drag forward="49.181" reverse="196.725" horizontal="99.05" vertical="99.05" pitch="175" yaw="175" roll="166"/>
       </physics>
       <thruster tags="large"/>
       <loadouts>
@@ -8929,7 +8929,7 @@
       </jerk>
       <explosiondamage value="500" shield="2500"/>
       <storage missile="0"/>
-      <hull max="12000"/>
+      <hull max="13200"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -12269,7 +12269,7 @@
       </jerk>
       <explosiondamage value="500" shield="2500"/>
       <storage missile="2"/>
-      <hull max="17000"/>
+      <hull max="18500"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -12296,7 +12296,7 @@
       <ship type="corvette" prestige="20"/>
       <sound_occlusion inside="0.4"/>
       <modifiers>
-        <weapon heat="1.5"/>
+        <weapon heat="1.4"/>
       </modifiers>
     </properties>
     <connections>
@@ -12337,7 +12337,7 @@
       </jerk>
       <explosiondamage value="500" shield="2500"/>
       <storage missile="2"/>
-      <hull max="10000"/>
+      <hull max="11500"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -12361,7 +12361,7 @@
       <ship type="corvette" prestige="20"/>
       <sound_occlusion inside="0.4"/>
       <modifiers>
-        <weapon heat="1.5"/>
+        <weapon heat="1.4"/>
       </modifiers>
     </properties>
     <connections>
@@ -12869,7 +12869,7 @@
       <physics mass="12">
         <inertia pitch="3.4" yaw="3.4" roll="3.4"/>
         <drag forward="5.9" reverse="35.14" horizontal="6" vertical="6" pitch="4.3" yaw="4.3" roll="4.096"/>
-        <accfactors reverse="0.8" horizontal="0.95" vertical="0.95"/>
+        <accfactors reverse="0.85"/>
       </physics>
       <thruster tags="small"/>
       <ship type="heavyfighter"/>
@@ -13776,7 +13776,7 @@
       </jerk>
       <explosiondamage value="1200" shield="6000" shielddisruption="10"/>
       <storage missile="40" unit="100"/>
-      <hull max="202000"/>
+      <hull max="212800"/>
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -13790,7 +13790,7 @@
       <people capacity="128"/>
       <physics mass="1120">
         <inertia pitch="1850" yaw="1850" roll="1300"/>
-        <drag forward="189" reverse="800" horizontal="170" vertical="170" pitch="800" yaw="800" roll="880"/>
+        <drag forward="185" reverse="800" horizontal="170" vertical="170" pitch="800" yaw="800" roll="880"/>
       </physics>
       <thruster tags="extralarge"/>
       <ship type="resupplier"/>
@@ -17773,9 +17773,9 @@
       </steeringcurve>
       <purpose primary="fight"/>
       <people capacity="75"/>
-      <physics mass="180">
+      <physics mass="188">
         <inertia pitch="160" yaw="160" roll="130"/>
-        <drag forward="56" reverse="252" horizontal="37" vertical="37" pitch="84" yaw="100.5" roll="69"/>
+        <drag forward="52.64" reverse="237" horizontal="37" vertical="37" pitch="82" yaw="100.1" roll="69"/>
         <accfactors horizontal="1.2" vertical="1.2"/>
       </physics>
       <thruster tags="large"/>
@@ -20809,7 +20809,7 @@
       <people capacity="1"/>
       <physics mass="46.638">
         <inertia pitch="7.17" yaw="7.17" roll="5.736"/>
-        <drag forward="7.788" reverse="31.151" horizontal="26.364" vertical="26.364" pitch="14.159" yaw="14.159" roll="14.159"/>
+        <drag forward="6.77" reverse="30.47" horizontal="26.364" vertical="26.364" pitch="14.159" yaw="14.159" roll="14.159"/>
       </physics>
       <thruster tags="medium"/>
       <ship type="miner" prestige="10"/>

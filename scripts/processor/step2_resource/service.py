@@ -40,6 +40,40 @@ from processor.step2_resource.modern_processor import (
 from processor.step2_resource.save_replay import calculate_save_resources_all
 
 
+def _iter_maps_sectors(maps_data: dict):
+    """统一遍历 maps.json 中的 sector 数据。
+
+    兼容两种结构：
+    - 新结构：顶层 maps_data["sectors"] = {sector_id: sector_data}
+    - 旧结构：maps_data["clusters"][...]["sectors"] = {sector_id: sector_data}
+    """
+    sectors = maps_data.get("sectors", {})
+    if isinstance(sectors, dict):
+        return sectors.items()
+
+    collected: Dict[str, dict] = {}
+    clusters = maps_data.get("clusters", {})
+    if not isinstance(clusters, dict):
+        return collected.items()
+
+    for cluster_data in clusters.values():
+        if not isinstance(cluster_data, dict):
+            continue
+        cluster_sectors = cluster_data.get("sectors", {})
+        if not isinstance(cluster_sectors, dict):
+            continue
+        for sector_macro, sector in cluster_sectors.items():
+            if isinstance(sector, dict):
+                collected[sector_macro] = sector
+
+    return collected.items()
+
+
+def _normalize_sector_id(sector_id: str) -> str:
+    """统一 sector_id 比较键。"""
+    return sector_id.lower() if isinstance(sector_id, str) else ""
+
+
 def process_resources_for_version(
     version: str,
     maps_json_path: Path,
@@ -345,17 +379,12 @@ def _process_90plus_resources(
         json.dump(resourceareas, f, indent=2)
 
     # 8. 更新 maps_data 的 sector.resources
-    clusters = maps_data.get("clusters", {})
-    for cluster_data in clusters.values():
-        if not isinstance(cluster_data, dict):
+    for sector_macro, sector in _iter_maps_sectors(maps_data):
+        if not isinstance(sector, dict):
             continue
-        sectors_dict = cluster_data.get("sectors", {})
-        for sector_macro, sector in sectors_dict.items():
-            if not isinstance(sector, dict):
-                continue
-            sector_macro_lower = sector_macro.lower()
-            if sector_macro_lower in sector_summaries:
-                sector["resources"] = sector_summaries[sector_macro_lower]
+        sector_macro_lower = sector_macro.lower()
+        if sector_macro_lower in sector_summaries:
+            sector["resources"] = sector_summaries[sector_macro_lower]
 
     # 9. 写回 maps.json
     with maps_json_path.open("w", encoding="utf-8") as f:
@@ -415,17 +444,18 @@ def _process_80_resources(
                 if "regions" not in blocks_data:
                     # 新格式：按 sector_id 分组
                     for sid, regions in blocks_data.items():
+                        sid_normalized = _normalize_sector_id(sid)
                         for entry in regions:
                             ref = entry.get("ref", "")
                             if ref:
                                 entry_with_sid = dict(entry)
-                                entry_with_sid["sector_id"] = sid
-                                blocks_cache[(sid, ref)] = entry_with_sid
+                                entry_with_sid["sector_id"] = sid_normalized
+                                blocks_cache[(sid_normalized, ref)] = entry_with_sid
                 else:
                     # 旧格式：{regions: [...]}
                     for entry in blocks_data.get("regions", []):
                         ref = entry.get("ref", "")
-                        sid = entry.get("sector_id", "")
+                        sid = _normalize_sector_id(entry.get("sector_id", ""))
                         if ref:
                             blocks_cache[(sid, ref)] = entry
         except Exception:
@@ -434,111 +464,104 @@ def _process_80_resources(
     # 处理每个 sector
     resourceareas_rows: List[dict] = []
 
-    # 遍历 clusters -> sectors 结构
-    clusters = maps_data.get("clusters", {})
-    for cluster_macro, cluster_data in clusters.items():
-        if not isinstance(cluster_data, dict):
+    for sector_macro, sector in _iter_maps_sectors(maps_data):
+        if not isinstance(sector, dict):
             continue
 
-        sectors_dict = cluster_data.get("sectors", {})
-        for sector_macro, sector in sectors_dict.items():
-            if not isinstance(sector, dict):
-                continue
+        current_sector_id = sector.get("id", sector_macro)
 
-            current_sector_id = sector.get("id", sector_macro)
+        # 过滤指定 sector
+        if sector_id and current_sector_id.lower() != sector_id.lower():
+            continue
 
-            # 过滤指定 sector
-            if sector_id and current_sector_id.lower() != sector_id.lower():
-                continue
+        cluster_id = sector.get("cluster_id", "")
+        sector_regions = sector.get("regions", [])
 
-            cluster_id = cluster_macro
-            sector_regions = sector.get("regions", [])
+        for region_ref in sector_regions:
+            ref = region_ref.get("ref", "")
+            amount = region_ref.get("amount", 1)
+            position = region_ref.get("position", {})
 
-            for region_ref in sector_regions:
-                ref = region_ref.get("ref", "")
-                amount = region_ref.get("amount", 1)
-                position = region_ref.get("position", {})
+            region_template = regions_by_id.get(ref, {})
+            # 使用 regions.json 中的 boundary（包含完整的 spline 数据）
+            boundary = region_template.get("boundary", {})
+            resources = region_template.get("resources", [])
+            falloff = region_template.get("falloff", {})
 
-                region_template = regions_by_id.get(ref, {})
-                # 使用 regions.json 中的 boundary（包含完整的 spline 数据）
-                boundary = region_template.get("boundary", {})
-                resources = region_template.get("resources", [])
-                falloff = region_template.get("falloff", {})
+            # 计算 falloff 因子
+            lateral_factor, radial_factor, falloff_factor = calculate_falloff_factors(falloff)
 
-                # 计算 falloff 因子
-                lateral_factor, radial_factor, falloff_factor = calculate_falloff_factors(falloff)
+            # 计算体积
+            solid_volume_km3 = 0.0
+            gas_volume_km3 = 0.0
 
-                # 计算体积
-                solid_volume_km3 = 0.0
-                gas_volume_km3 = 0.0
+            # 计算每个资源的储量
+            calculated_resources: List[dict] = []
 
-                # 计算每个资源的储量
-                calculated_resources: List[dict] = []
+            for res in resources:
+                ware = res.get("ware", "")
+                resourcedensity = res.get("resourcedensity", 1.0)
+                delay = res.get("delay", 60.0)
+                gatherfactor = res.get("gatherfactor", 1.0)
+                yield_name = res.get("yield_name", "")
 
-                for res in resources:
-                    ware = res.get("ware", "")
-                    resourcedensity = res.get("resourcedensity", 1.0)
-                    delay = res.get("delay", 60.0)
-                    gatherfactor = res.get("gatherfactor", 1.0)
-                    yield_name = res.get("yield_name", "")
+                if is_gas_ware(ware):
+                    # 气体资源
+                    _, gas_volume_km3 = calculate_gas_volume_km3(
+                        region_pos=position,
+                        boundary=boundary,
+                    )
+                    theoretical_reserve, theoretical_respawn = estimate_gas_yield(
+                        region_pos=position,
+                        boundary=boundary,
+                        falloff_factor=falloff_factor,
+                        resourcedensity=resourcedensity,
+                        replenishtime=delay,
+                    )
+                else:
+                    # 固体资源
+                    solid_volume_km3 = calculate_solid_volume_km3(boundary=boundary)
+                    theoretical_reserve, theoretical_respawn = estimate_solid_yield(
+                        boundary=boundary,
+                        falloff_factor=falloff_factor,
+                        resourcedensity=resourcedensity,
+                        replenishtime=delay,
+                    )
 
-                    if is_gas_ware(ware):
-                        # 气体资源
-                        _, gas_volume_km3 = calculate_gas_volume_km3(
-                            region_pos=position,
-                            boundary=boundary,
-                        )
-                        theoretical_reserve, theoretical_respawn = estimate_gas_yield(
-                            region_pos=position,
-                            boundary=boundary,
-                            falloff_factor=falloff_factor,
-                            resourcedensity=resourcedensity,
-                            replenishtime=delay,
-                        )
-                    else:
-                        # 固体资源
-                        solid_volume_km3 = calculate_solid_volume_km3(boundary=boundary)
-                        theoretical_reserve, theoretical_respawn = estimate_solid_yield(
-                            boundary=boundary,
-                            falloff_factor=falloff_factor,
-                            resourcedensity=resourcedensity,
-                            replenishtime=delay,
-                        )
-
-                    resource_entry = {
-                        "ware": ware,
-                        "resourcedensity": resourcedensity,
-                        "theoretical_reserve": round_to_int(theoretical_reserve),
-                        "theoretical_respawn": round_to_int(theoretical_respawn),
-                        "delay": delay,
-                        "gatherfactor": gatherfactor,
-                    }
-                    if yield_name:
-                        resource_entry["yield_name"] = yield_name
-                    calculated_resources.append(resource_entry)
-
-                # 构建 area 数据
-                area_data = {
-                    "ref": ref,
-                    "amount": amount,
-                    "position": position,
-                    "boundary": boundary,
-                    "lateral_factor": round_significant(lateral_factor),
-                    "radial_factor": round_significant(radial_factor),
-                    "falloff_factor": round_significant(falloff_factor),
+                resource_entry = {
+                    "ware": ware,
+                    "resourcedensity": resourcedensity,
+                    "theoretical_reserve": round_to_int(theoretical_reserve),
+                    "theoretical_respawn": round_to_int(theoretical_respawn),
+                    "delay": delay,
+                    "gatherfactor": gatherfactor,
                 }
-                # 添加体积字段（仅当有值时）
-                if solid_volume_km3 > 0:
-                    area_data["solid_volume_km3"] = round_to_int(solid_volume_km3)
-                if gas_volume_km3 > 0:
-                    area_data["gas_volume_km3"] = round_to_int(gas_volume_km3)
-                area_data["resources"] = calculated_resources
+                if yield_name:
+                    resource_entry["yield_name"] = yield_name
+                calculated_resources.append(resource_entry)
 
-                resourceareas_rows.append({
-                    "cluster_id": cluster_id,
-                    "sector_id": current_sector_id,
-                    **area_data,
-                })
+            # 构建 area 数据
+            area_data = {
+                "ref": ref,
+                "amount": amount,
+                "position": position,
+                "boundary": boundary,
+                "lateral_factor": round_significant(lateral_factor),
+                "radial_factor": round_significant(radial_factor),
+                "falloff_factor": round_significant(falloff_factor),
+            }
+            # 添加体积字段（仅当有值时）
+            if solid_volume_km3 > 0:
+                area_data["solid_volume_km3"] = round_to_int(solid_volume_km3)
+            if gas_volume_km3 > 0:
+                area_data["gas_volume_km3"] = round_to_int(gas_volume_km3)
+            area_data["resources"] = calculated_resources
+
+            resourceareas_rows.append({
+                "cluster_id": cluster_id,
+                "sector_id": current_sector_id,
+                **area_data,
+            })
 
     # 聚合 sector.resources
     sector_resources = aggregate_sector_resources_from_resourceareas(resourceareas_rows)
@@ -563,11 +586,11 @@ def _process_80_resources(
             with blocks_file.open("r", encoding="utf-8") as f:
                 blocks_data_check = json.load(f)
             if isinstance(blocks_data_check, dict) and "regions" not in blocks_data_check:
-                cached_sectors = set(blocks_data_check.keys())
+                cached_sectors = {_normalize_sector_id(k) for k in blocks_data_check.keys()}
         except Exception:
             pass
         # 计算缺失的星区
-        target_sectors = set(row.get("sector_id", "") for row in resourceareas_rows)
+        target_sectors = {_normalize_sector_id(row.get("sector_id", "")) for row in resourceareas_rows}
         missing_sectors = target_sectors - cached_sectors
         if missing_sectors:
             need_recalc = True
@@ -579,7 +602,9 @@ def _process_80_resources(
             with blocks_file.open("r", encoding="utf-8") as f:
                 blocks_data_check = json.load(f)
             if isinstance(blocks_data_check, dict) and "regions" not in blocks_data_check:
-                sector_in_cache = sector_id.lower() in [k.lower() for k in blocks_data_check.keys()]
+                sector_in_cache = _normalize_sector_id(sector_id) in {
+                    _normalize_sector_id(k) for k in blocks_data_check.keys()
+                }
         except Exception:
             pass
         if not sector_in_cache:
@@ -589,7 +614,10 @@ def _process_80_resources(
         # 计算缺失星区的数据
         if missing_sectors:
             # 只计算缺失的星区
-            rows_to_calc = [row for row in resourceareas_rows if row.get("sector_id") in missing_sectors]
+            rows_to_calc = [
+                row for row in resourceareas_rows
+                if _normalize_sector_id(row.get("sector_id", "")) in missing_sectors
+            ]
         else:
             # 全部重新计算
             rows_to_calc = resourceareas_rows
@@ -624,10 +652,11 @@ def _process_80_resources(
         if missing_sectors:
             for row in resourceareas_rows:
                 sid = row.get("sector_id", "")
-                if sid in missing_sectors:
+                sid_normalized = _normalize_sector_id(sid)
+                if sid_normalized in missing_sectors:
                     continue  # 已经在上面处理过了
                 ref = row.get("ref", "")
-                region_cache = blocks_cache.get((sid, ref), {})
+                region_cache = blocks_cache.get((sid_normalized, ref), {})
                 if not region_cache:
                     continue
                 cached_totals = region_cache.get("total", {})
@@ -646,8 +675,9 @@ def _process_80_resources(
         # 从缓存读取（新格式：从 total 字段读取 ware 汇总值）
         for row in resourceareas_rows:
             sid = row.get("sector_id", "")
+            sid_normalized = _normalize_sector_id(sid)
             ref = row.get("ref", "")
-            region_cache = blocks_cache.get((sid, ref), {})
+            region_cache = blocks_cache.get((sid_normalized, ref), {})
             if not region_cache:
                 continue
 
@@ -680,8 +710,9 @@ def _process_80_resources(
         # 更新 resourceareas_rows 中的 reserve/respawn
         for row in resourceareas_rows:
             sid = row.get("sector_id", "")
+            sid_normalized = _normalize_sector_id(sid)
             ref = row.get("ref", "")
-            region_cache = blocks_cache.get((sid, ref), {})
+            region_cache = blocks_cache.get((sid_normalized, ref), {})
             if not region_cache:
                 continue
             cached_totals = region_cache.get("total", {})
@@ -784,16 +815,12 @@ def _process_80_resources(
                 entry["rating"] = calculate_rating(replay_respawn_val, ware)
 
     # 更新 maps.json 中的 sector.resources
-    for cluster_data in clusters.values():
-        if not isinstance(cluster_data, dict):
+    for sector_macro, sector in _iter_maps_sectors(maps_data):
+        if not isinstance(sector, dict):
             continue
-        sectors_dict = cluster_data.get("sectors", {})
-        for sector_macro, sector in sectors_dict.items():
-            if not isinstance(sector, dict):
-                continue
-            current_sector_id = sector.get("id", sector_macro)
-            if current_sector_id in sector_resources:
-                sector["resources"] = sector_resources[current_sector_id]
+        current_sector_id = sector.get("id", sector_macro)
+        if current_sector_id in sector_resources:
+            sector["resources"] = sector_resources[current_sector_id]
 
     with maps_json_path.open("w", encoding="utf-8") as f:
         json.dump(maps_data, f, indent=2)
@@ -810,20 +837,21 @@ def _process_80_resources(
                 if isinstance(cached_data, dict) and "regions" not in cached_data:
                     # 合并缓存数据到 blocks_output
                     for sid, regions in cached_data.items():
+                        sid_normalized = _normalize_sector_id(sid)
                         # 跳过本次计算的星区
                         skip = False
-                        if sector_id and sid.lower() == sector_id.lower():
+                        if sector_id and sid_normalized == _normalize_sector_id(sector_id):
                             skip = True
-                        if sid in missing_sectors:
+                        if sid_normalized in missing_sectors:
                             skip = True
                         if not skip:
                             for region in regions:
                                 ref = region.get("ref", "")
-                                cache_key = (sid, ref)
+                                cache_key = (sid_normalized, ref)
                                 if ref and cache_key not in blocks_output:
                                     blocks_output[cache_key] = {
                                         "ref": ref,
-                                        "sector_id": sid,
+                                        "sector_id": sid_normalized,
                                         "total": region.get("total", {}),
                                         "tiles": {f"{t['x']}_{t['y']}_{t['z']}": t for t in region.get("tiles", [])},
                                     }
