@@ -263,9 +263,28 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
             return False
         return any(node.get('if') for node in root if isinstance(node.tag, str))
 
+    def should_bypass_if_condition(op_node):
+        if op_node.tag != 'add':
+            return False
+        condition = op_node.get('if')
+        if condition not in {
+            "/wares/production/method[@id='terran']",
+            "/wares/production/method[@id='closedloop']",
+        }:
+            return False
+        sel = op_node.get('sel') or ''
+        if not (sel.startswith("/wares/ware[@id='") and sel.endswith("']")):
+            return False
+        children = [child for child in op_node if isinstance(child.tag, str)]
+        if not children:
+            return False
+        return all(child.tag == 'production' for child in children)
+
     def evaluate_patch_condition(temp_tree, op_node):
         condition = op_node.get('if')
         if not condition:
+            return True
+        if should_bypass_if_condition(op_node):
             return True
         attempts = [condition]
         if condition.startswith('/'):
@@ -343,6 +362,16 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
         return attrib_name
 
     def apply_custom_patch_op(op_node, target_node, optype):
+        def append_near_same_tag(parent_node, child_node):
+            insert_at = None
+            for idx, existing in enumerate(parent_node):
+                if existing.tag == child_node.tag:
+                    insert_at = idx + 1
+            if insert_at is None:
+                parent_node.append(child_node)
+            else:
+                parent_node.insert(insert_at, child_node)
+
         if optype == 'text':
             if op_node.tag == 'add':
                 raise ValueError('text add not supported')
@@ -371,7 +400,8 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
             pos = op_node.get('pos')
             children = deepcopy(op_node.getchildren())
             if pos is None:
-                target_node.extend(children)
+                for child in children:
+                    append_near_same_tag(target_node, child)
                 return
             if pos == 'prepend':
                 for child in reversed(children):
