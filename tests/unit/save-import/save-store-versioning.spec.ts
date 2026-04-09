@@ -27,7 +27,7 @@ const postProcessMocks = vi.hoisted(() => ({
     ...archive,
     meta: {
       ...archive.meta,
-      parser_version: 'v2',
+      parser_version: 'v3',
       post_processor_version: 'v2'
     },
     isValid: true
@@ -35,7 +35,7 @@ const postProcessMocks = vi.hoisted(() => ({
 }))
 
 vi.mock('@/workers/saveParser.post', () => ({
-  CURRENT_PARSER_VERSION: 'v2',
+  CURRENT_PARSER_VERSION: 'v3',
   CURRENT_POST_PROCESSOR_VERSION: 'v2',
   postProcessRustSaveArchive: postProcessMocks.postProcessRustSaveArchive
 }))
@@ -126,7 +126,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v1',
           source: 'original',
           isCompatible: true,
@@ -155,7 +155,7 @@ describe('save store versioning', () => {
         playerName: 'Tester',
         version: '8.0',
         filename: 'save.xml',
-        parser_version: 'v2',
+        parser_version: 'v3',
         post_processor_version: 'v1',
         source: 'original'
       },
@@ -199,7 +199,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -243,7 +243,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_010.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -258,7 +258,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_020.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -287,7 +287,7 @@ describe('save store versioning', () => {
         playerName: 'Tester',
         version: '8.0',
         filename: 'save_020.xml',
-        parser_version: 'v2',
+        parser_version: 'v3',
         post_processor_version: 'v2',
         source: 'original'
       },
@@ -321,7 +321,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_010.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -336,7 +336,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_020.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -367,7 +367,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_020.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original'
         },
@@ -388,7 +388,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_010.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original'
         },
@@ -422,7 +422,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_010.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -437,7 +437,7 @@ describe('save store versioning', () => {
           playerName: 'Tester',
           version: '8.0',
           filename: 'save_020.xml',
-          parser_version: 'v2',
+          parser_version: 'v3',
           post_processor_version: 'v2',
           source: 'original',
           isCompatible: true,
@@ -483,7 +483,7 @@ describe('save store versioning', () => {
         playerName: 'Tester',
         version: '8.0',
         filename: 'save_020.xml',
-        parser_version: 'v2',
+        parser_version: 'v3',
         post_processor_version: 'v2',
         source: 'original'
       },
@@ -506,7 +506,7 @@ describe('save store versioning', () => {
         playerName: 'Tester',
         version: '8.0',
         filename: 'save_010.xml',
-        parser_version: 'v2',
+        parser_version: 'v3',
         post_processor_version: 'v2',
         source: 'original'
       },

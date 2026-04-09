@@ -1,8 +1,10 @@
 import type {
   AggregatedStationModule,
+  CodeMap,
   FactionStationEntry,
   NpcStationEntry,
   PlayerStationEntry,
+  AggregatedEquipment,
   SaveSectorClusterGateEntry,
   SaveSectorHighwayEntry,
   SaveSectorStaticPosition,
@@ -11,7 +13,7 @@ import type {
   SectorData
 } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
-import type { X4Map } from '@/types/x4'
+import type { X4Equipment, X4Map } from '@/types/x4'
 import {
   classifyPlayerStationPoi,
   getFactoryGroup,
@@ -19,6 +21,7 @@ import {
   hasModulePattern
 } from '@/store/logic/stationPoiSemantics'
 import shipsData from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
+import equipmentsData from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 
 interface Vector3 {
   x: number
@@ -64,7 +67,7 @@ interface SectorStaticHighwayLookup {
   [sectorId: string]: SaveSectorHighwayEntry[]
 }
 
-export const CURRENT_PARSER_VERSION = 'v2' as const
+export const CURRENT_PARSER_VERSION = 'v3' as const
 export const CURRENT_POST_PROCESSOR_VERSION = 'v9' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
@@ -82,6 +85,76 @@ interface ShipLookup {
   [macro: string]: ShipLookupEntry
 }
 
+interface MapZone {
+  raw_sector_pos?: Vector3
+}
+
+interface MapGate {
+  raw_local_pos?: Vector3
+  target_cluster_id?: string
+  target_sector_id?: string
+}
+
+interface MapHighwayEndpoint {
+  x?: number
+  y?: number
+  z?: number
+}
+
+interface MapHighway {
+  entry_pos?: MapHighwayEndpoint
+  entry?: MapHighwayEndpoint
+  exit_pos?: MapHighwayEndpoint
+  exit?: MapHighwayEndpoint
+  spline?: MapHighwayEndpoint[]
+}
+
+interface MapSector {
+  id?: string
+  raw_center_pos?: Vector3
+  normalized?: {
+    scale_basis?: { hex_inner_ratio?: number; extent_ratio?: number }
+    scale_per_radius?: number
+  }
+  zones?: Record<string, MapZone>
+  cluster_gates?: Record<string, MapGate>
+  highways?: Record<string, MapHighway>
+}
+
+function recordValues<T>(record: Record<string, T> | undefined): T[] {
+  return record ? Object.values(record) : []
+}
+
+function mapByCode<T extends { code: string }>(items: T[]): Record<string, T> {
+  return Object.fromEntries(items.map((item) => [item.code, item]))
+}
+
+function equipmentIdFromRef(ref: string): string {
+  return ref.endsWith('_macro') ? ref.slice(0, -6) : ref
+}
+
+function buildEquipmentLookup(): Record<string, X4Equipment> {
+  const lookup: Record<string, X4Equipment> = {}
+  for (const equipment of equipmentsData as X4Equipment[]) {
+    lookup[`${equipment.id}_macro`] = equipment
+  }
+  return lookup
+}
+
+function getMapsSectors(maps: X4Map | undefined): Record<string, MapSector> {
+  if (!maps) return {}
+  if (maps.sectors && Object.keys(maps.sectors).length > 0) {
+    return maps.sectors as Record<string, MapSector>
+  }
+
+  const sectors: Record<string, MapSector> = {}
+  for (const cluster of Object.values(maps.clusters || {})) {
+    if (!cluster?.sectors || Array.isArray(cluster.sectors)) continue
+    Object.assign(sectors, cluster.sectors as Record<string, MapSector>)
+  }
+  return sectors
+}
+
 function buildShipLookup(): ShipLookup {
   const lookup: ShipLookup = {}
   const ships = shipsData as Array<{ id: string; macro?: string; purposePrimary?: string }>
@@ -97,12 +170,13 @@ function buildShipLookup(): ShipLookup {
 }
 
 const SHIP_LOOKUP = buildShipLookup()
+const EQUIPMENT_LOOKUP = buildEquipmentLookup()
 
 function buildZoneLookup(maps: X4Map | undefined): ZoneLookup {
   const lookup: ZoneLookup = {}
   if (!maps) return lookup
 
-  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+  for (const [sectorId, sector] of Object.entries(getMapsSectors(maps))) {
     if (!sector?.zones) continue
     const normalizedSectorId = sectorId.toLowerCase()
     lookup[normalizedSectorId] = {}
@@ -124,7 +198,7 @@ function buildSectorCenterLookup(maps: X4Map | undefined): SectorCenterLookup {
   const lookup: SectorCenterLookup = {}
   if (!maps) return lookup
 
-  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+  for (const [sectorId, sector] of Object.entries(getMapsSectors(maps))) {
     if (sector.raw_center_pos?.x !== undefined && sector.raw_center_pos?.y !== undefined && sector.raw_center_pos?.z !== undefined) {
       lookup[sectorId.toLowerCase()] = {
         x: sector.raw_center_pos.x,
@@ -161,11 +235,8 @@ function buildSectorScaleBasisLookup(maps: X4Map | undefined): SectorScaleBasisL
   const lookup: SectorScaleBasisLookup = {}
   if (!maps) return lookup
 
-  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
-    const normalized = sector.normalized as {
-      scale_basis?: { hex_inner_ratio?: number; extent_ratio?: number }
-      scale_per_radius?: number
-    } | undefined
+  for (const [sectorId, sector] of Object.entries(getMapsSectors(maps))) {
+    const normalized = sector.normalized
     lookup[sectorId.toLowerCase()] = {
       hex_inner_ratio: Number(normalized?.scale_basis?.hex_inner_ratio || DEFAULT_HEX_INNER_RATIO),
       extent_ratio: Number(normalized?.scale_basis?.extent_ratio || DEFAULT_EXTENT_RATIO),
@@ -180,7 +251,7 @@ function buildSectorStaticScalePointsLookup(maps: X4Map | undefined): SectorStat
   const lookup: SectorStaticScalePointsLookup = {}
   if (!maps) return lookup
 
-  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+  for (const [sectorId, sector] of Object.entries(getMapsSectors(maps))) {
     const points: Array<{ x: number; z: number }> = []
     Object.values(sector?.zones || {}).forEach((zone) => {
       if (zone.raw_sector_pos?.x !== undefined && zone.raw_sector_pos?.z !== undefined) {
@@ -257,13 +328,13 @@ function collectSectorArchivePoiPoints(
     points.push({ x: position.x, z: position.z })
   }
 
-  sector.playerStations?.forEach((station) => appendPoint(station.relative_position, station.zone_id))
-  sector.npcStations?.forEach((station) => appendPoint(station.relative_position, station.zone_id))
-  sector.xenonStations?.forEach((station) => appendPoint(station.relative_position, station.zone_id))
-  sector.khaakStations?.forEach((station) => appendPoint(station.relative_position, station.zone_id))
-  sector.datavaults?.forEach((vault) => appendPoint(vault.relative_position, vault.zone_id))
-  sector.erlkingVaults?.forEach((vault) => appendPoint(vault.relative_position, vault.zone_id))
-  sector.abandonedShips?.forEach((ship) => appendPoint(ship.relative_position, ship.zone_id))
+  recordValues(sector.player_stations).forEach((station) => appendPoint(station.relative_position, station.zone_id))
+  recordValues(sector.npc_stations).forEach((station) => appendPoint(station.relative_position, station.zone_id))
+  recordValues(sector.xenon_stations).forEach((station) => appendPoint(station.relative_position, station.zone_id))
+  recordValues(sector.khaak_stations).forEach((station) => appendPoint(station.relative_position, station.zone_id))
+  recordValues(sector.datavaults).forEach((vault) => appendPoint(vault.relative_position, vault.zone_id))
+  recordValues(sector.erlking_vaults).forEach((vault) => appendPoint(vault.relative_position, vault.zone_id))
+  recordValues(sector.abandoned_ships).forEach((ship) => appendPoint(ship.relative_position, ship.zone_id))
 
   return points
 }
@@ -312,7 +383,7 @@ function buildSectorStaticClusterGateLookup(
   const lookup: SectorStaticClusterGateLookup = {}
   if (!maps) return lookup
 
-  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+  for (const [sectorId, sector] of Object.entries(getMapsSectors(maps))) {
     lookup[sectorId.toLowerCase()] = Object.entries(sector?.cluster_gates || {}).flatMap(([gateId, gate]) => {
       if (gate.raw_local_pos?.x === undefined || gate.raw_local_pos?.z === undefined) return []
       const position = {
@@ -339,14 +410,18 @@ function buildSectorStaticSuperhighwayGateLookup(
   const lookup: SectorStaticSuperhighwayGateLookup = {}
   if (!maps) return lookup
 
+  const sectors = getMapsSectors(maps)
   for (const cluster of Object.values(maps.clusters || {})) {
-    ;(cluster?.sectors || []).forEach((sectorId) => {
+    const sectorIds = Array.isArray(cluster?.sectors)
+      ? cluster.sectors
+      : Object.keys(cluster?.sectors || {})
+    sectorIds.forEach((sectorId) => {
       lookup[sectorId.toLowerCase()] ||= []
     })
 
     Object.entries(cluster?.sector_links || {}).forEach(([linkId, link]) => {
-      const sectorA = link.sector_a_id ? maps.sectors?.[link.sector_a_id] : undefined
-      const sectorB = link.sector_b_id ? maps.sectors?.[link.sector_b_id] : undefined
+      const sectorA = link.sector_a_id ? sectors[link.sector_a_id] : undefined
+      const sectorB = link.sector_b_id ? sectors[link.sector_b_id] : undefined
       const zoneA = sectorA && link.from_zone_id ? sectorA.zones?.[link.from_zone_id] : undefined
       const zoneB = sectorB && link.to_zone_id ? sectorB.zones?.[link.to_zone_id] : undefined
 
@@ -356,14 +431,15 @@ function buildSectorStaticSuperhighwayGateLookup(
           y: zoneA.raw_sector_pos.y || 0,
           z: zoneA.raw_sector_pos.z
         }
-        const sectorAKey = sectorA.id.toLowerCase()
+        const sectorAId = sectorA.id || link.sector_a_id || ''
+        const sectorAKey = sectorAId.toLowerCase()
         lookup[sectorAKey] ||= []
         lookup[sectorAKey].push({
           id: `${linkId}:from`,
           link_id: linkId,
           zone_id: link.from_zone_id || '',
           target_sector_id: sectorB?.id,
-          position: withTransformPosition(position, sectorA.id, sectorScaleLookup, sectorCenterLookup)
+          position: withTransformPosition(position, sectorAId, sectorScaleLookup, sectorCenterLookup)
         })
       }
 
@@ -373,14 +449,15 @@ function buildSectorStaticSuperhighwayGateLookup(
           y: zoneB.raw_sector_pos.y || 0,
           z: zoneB.raw_sector_pos.z
         }
-        const sectorBKey = sectorB.id.toLowerCase()
+        const sectorBId = sectorB.id || link.sector_b_id || ''
+        const sectorBKey = sectorBId.toLowerCase()
         lookup[sectorBKey] ||= []
         lookup[sectorBKey].push({
           id: `${linkId}:to`,
           link_id: linkId,
           zone_id: link.to_zone_id || '',
           target_sector_id: sectorA?.id,
-          position: withTransformPosition(position, sectorB.id, sectorScaleLookup, sectorCenterLookup)
+          position: withTransformPosition(position, sectorBId, sectorScaleLookup, sectorCenterLookup)
         })
       }
     })
@@ -400,7 +477,7 @@ function buildSectorStaticHighwayLookup(
   const toPosition = (position: Vector3, sectorId: string): SaveSectorStaticPosition =>
     withTransformPosition(position, sectorId, sectorScaleLookup, sectorCenterLookup)
 
-  for (const [sectorId, sector] of Object.entries(maps.sectors || {})) {
+  for (const [sectorId, sector] of Object.entries(getMapsSectors(maps))) {
     lookup[sectorId.toLowerCase()] = Object.entries(sector?.highways || {}).flatMap(([highwayId, highway]) => {
       const entry = highway.entry_pos || highway.entry
       const exit = highway.exit_pos || highway.exit
@@ -438,25 +515,39 @@ function buildSectorStaticHighwayLookup(
 }
 
 function enrichModulesWithGameData(
-  modules: AggregatedStationModule[] | undefined,
+  modules: CodeMap<AggregatedStationModule> | undefined,
   modulesByMacroId: Record<string, X4Module>
-): AggregatedStationModule[] | undefined {
-  if (!modules || modules.length === 0) return modules
-  
-  return modules.map((module) => {
+): CodeMap<AggregatedStationModule> | undefined {
+  if (!modules || Object.keys(modules).length === 0) return modules
+
+  return Object.fromEntries(Object.entries(modules).map(([ref, module]) => {
     const matchedModule = modulesByMacroId[module.ref]
-    
+
     if (!matchedModule) {
-      return module
+      return [ref, module]
     }
-    
-    return {
+
+    return [ref, {
       ...module,
       module_id: matchedModule.id,
       type: matchedModule.type,
       group: matchedModule.group
-    }
-  })
+    }]
+  }))
+}
+
+function enrichEquipmentsWithGameData(
+  equipments: CodeMap<AggregatedEquipment> | undefined
+): CodeMap<AggregatedEquipment> | undefined {
+  if (!equipments || Object.keys(equipments).length === 0) return equipments
+
+  return Object.fromEntries(Object.entries(equipments).map(([ref, equipment]) => {
+    const matchedEquipment = EQUIPMENT_LOOKUP[equipment.ref]
+    return [ref, {
+      ...equipment,
+      equipment_id: matchedEquipment?.id || equipmentIdFromRef(equipment.ref)
+    }]
+  }))
 }
 
 function enrichPlayerStation(
@@ -467,7 +558,7 @@ function enrichPlayerStation(
   sectorScaleLookup: SectorScaleLookup,
   modulesByMacroId?: Record<string, X4Module>
 ): PlayerStationEntry {
-  const modules = station.modules || []
+  const modules = station.modules || {}
   const classification = classifyPlayerStationPoi({
     macro: station.macro,
     modules,
@@ -485,6 +576,7 @@ function enrichPlayerStation(
   
   return {
     ...station,
+    equipments: enrichEquipmentsWithGameData(station.equipments),
     position,
     isShipyard: classification.isShipyard,
     isWharf: classification.isWharf,
@@ -508,17 +600,18 @@ function enrichNpcStation(
   sectorScaleLookup: SectorScaleLookup,
   modulesByMacroId?: Record<string, X4Module>
 ): NpcStationEntry {
-  const modules = station.modules || []
+  const modules = station.modules || {}
+  const moduleValues = Object.values(modules)
   const macro = station.macro.toLowerCase()
   
   const isPiratebase = macro.includes('_piratebase')
   const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_xl', '_ships_x_', '_ships_x'])
   const isWharf = hasModulePattern(modules, ['_ships_m_', '_ships_m'])
   const isEquipmentdock = hasModulePattern(modules, ['_equip'])
-  const isFactory = modules.some((m) => m.type === 'production')
+  const isFactory = moduleValues.some((m) => m.type === 'production')
   const factoryGroup = getFactoryGroup(modules)
   const isTradestation = macro.includes('tradestation')
-  const isDefencemodule = modules.some((m) => m.type === 'defencemodule')
+  const isDefencemodule = moduleValues.some((m) => m.type === 'defencemodule')
   
   let tag: string | undefined
   if (isPiratebase) tag = 'piratebase'
@@ -540,6 +633,7 @@ function enrichNpcStation(
   
   return {
     ...station,
+    equipments: enrichEquipmentsWithGameData(station.equipments),
     position,
     isShipyard: isShipyard || undefined,
     isWharf: isWharf || undefined,
@@ -563,7 +657,8 @@ function enrichFactionStation(
   sectorCenterLookup: SectorCenterLookup,
   sectorScaleLookup: SectorScaleLookup
 ): FactionStationEntry {
-  const modules = station.modules || []
+  const modules = station.modules || {}
+  const moduleValues = Object.values(modules)
   const macro = station.macro.toLowerCase()
   
   if (owner === 'xenon') {
@@ -571,10 +666,10 @@ function enrichFactionStation(
     const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_xl', '_ships_x_', '_ships_x'])
     const isWharf = hasModulePattern(modules, ['_ships_m_', '_ships_m'])
     const isEquipmentdock = hasModulePattern(modules, ['_equip'])
-    const isFactory = modules.some((m) => m.type === 'production')
+    const isFactory = moduleValues.some((m) => m.type === 'production')
     const factoryGroup = getFactoryGroup(modules)
     const isTradestation = macro.includes('tradestation')
-    const isDefencemodule = modules.some((m) => m.type === 'defencemodule')
+    const isDefencemodule = moduleValues.some((m) => m.type === 'defencemodule')
     
     let tag: string | undefined
     if (isPiratebase) tag = 'piratebase'
@@ -595,6 +690,7 @@ function enrichFactionStation(
     
     return {
       ...station,
+      equipments: enrichEquipmentsWithGameData(station.equipments),
       position,
       isShipyard: isShipyard || undefined,
       isWharf: isWharf || undefined,
@@ -622,6 +718,7 @@ function enrichFactionStation(
   
   return {
     ...station,
+    equipments: enrichEquipmentsWithGameData(station.equipments),
     position,
     isNest: isNest || undefined,
     isHive: isHive || undefined,
@@ -629,7 +726,11 @@ function enrichFactionStation(
   }
 }
 
-function stripEmptySectorArrays(sector: SectorData): SectorData {
+function hasEntries<T>(record: Record<string, T> | undefined): boolean {
+  return Boolean(record && Object.keys(record).length > 0)
+}
+
+function stripEmptySectorCollections(sector: SectorData): SectorData {
   const nextSector: SectorData = {
     name: sector.name,
     is_known: sector.is_known,
@@ -640,15 +741,58 @@ function stripEmptySectorArrays(sector: SectorData): SectorData {
   if (sector.clusterGates?.length) nextSector.clusterGates = sector.clusterGates
   if (sector.superhighwayGates?.length) nextSector.superhighwayGates = sector.superhighwayGates
   if (sector.highways?.length) nextSector.highways = sector.highways
-  if (sector.playerStations?.length) nextSector.playerStations = sector.playerStations
-  if (sector.xenonStations?.length) nextSector.xenonStations = sector.xenonStations
-  if (sector.khaakStations?.length) nextSector.khaakStations = sector.khaakStations
-  if (sector.npcStations?.length) nextSector.npcStations = sector.npcStations
-  if (sector.datavaults?.length) nextSector.datavaults = sector.datavaults
-  if (sector.erlkingVaults?.length) nextSector.erlkingVaults = sector.erlkingVaults
-  if (sector.abandonedShips?.length) nextSector.abandonedShips = sector.abandonedShips
+  if (hasEntries(sector.player_stations)) nextSector.player_stations = sector.player_stations
+  if (hasEntries(sector.xenon_stations)) nextSector.xenon_stations = sector.xenon_stations
+  if (hasEntries(sector.khaak_stations)) nextSector.khaak_stations = sector.khaak_stations
+  if (hasEntries(sector.npc_stations)) nextSector.npc_stations = sector.npc_stations
+  if (hasEntries(sector.player_buildstorages)) nextSector.player_buildstorages = sector.player_buildstorages
+  if (hasEntries(sector.datavaults)) nextSector.datavaults = sector.datavaults
+  if (hasEntries(sector.erlking_vaults)) nextSector.erlking_vaults = sector.erlking_vaults
+  if (hasEntries(sector.abandoned_ships)) nextSector.abandoned_ships = sector.abandoned_ships
   
   return nextSector
+}
+
+function attachSectorBuildstorages(sector: SectorData): SectorData {
+  const buildstorages = recordValues(sector.player_buildstorages)
+  if (!buildstorages.length) return sector
+  if (!hasEntries(sector.player_stations)) {
+    return {
+      ...sector,
+      player_buildstorages: mapByCode(buildstorages)
+    }
+  }
+
+  const stationById = new Map<string, PlayerStationEntry>()
+  for (const station of recordValues(sector.player_stations)) {
+    if (!station.component_id || stationById.has(station.component_id)) continue
+    stationById.set(station.component_id, station)
+  }
+
+  const buildstorageCodeByStationId = new Map<string, string>()
+  const linkedBuildstorages = buildstorages.map((buildstorage) => {
+    const stationId = buildstorage.target_station_component_id
+    const station = stationId ? stationById.get(stationId) : undefined
+    if (stationId && station?.code && !buildstorageCodeByStationId.has(stationId)) {
+      buildstorageCodeByStationId.set(stationId, buildstorage.code)
+    }
+
+    return {
+      ...buildstorage,
+      station_code: station?.code
+    }
+  })
+
+  return {
+    ...sector,
+    player_buildstorages: mapByCode(linkedBuildstorages),
+    player_stations: mapByCode(recordValues(sector.player_stations).map((station) => ({
+      ...station,
+      buildstorage_code: station.component_id
+        ? buildstorageCodeByStationId.get(station.component_id)
+        : undefined
+    })))
+  }
 }
 
 export function postProcessRustSaveArchive(
@@ -671,45 +815,55 @@ export function postProcessRustSaveArchive(
         clusterGates: sectorStaticClusterGateLookup[sectorMacro.toLowerCase()] || [],
         superhighwayGates: sectorStaticSuperhighwayGateLookup[sectorMacro.toLowerCase()] || [],
         highways: sectorStaticHighwayLookup[sectorMacro.toLowerCase()] || [],
-        playerStations: sector.playerStations?.map((station) => {
+        player_stations: mapByCode(recordValues(sector.player_stations).map((station) => {
           const enrichedModules = modulesByMacroId 
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
             : station.modules
           return enrichPlayerStation(
-            { ...station, modules: enrichedModules },
+            { ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments) },
             sectorMacro,
             zoneLookup,
             sectorCenterLookup,
             sectorScaleLookup,
             modulesByMacroId
           )
-        }),
-        npcStations: sector.npcStations?.map((station) => {
+        })),
+        npc_stations: mapByCode(recordValues(sector.npc_stations).map((station) => {
           const enrichedModules = modulesByMacroId
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
             : station.modules
           return enrichNpcStation(
-            { ...station, modules: enrichedModules },
+            { ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments) },
             sectorMacro,
             zoneLookup,
             sectorCenterLookup,
             sectorScaleLookup,
             modulesByMacroId
           )
-        }),
-        xenonStations: sector.xenonStations?.map((station) => {
+        })),
+        xenon_stations: mapByCode(recordValues(sector.xenon_stations).map((station) => {
           const enrichedModules = modulesByMacroId
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
             : station.modules
-          return enrichFactionStation({ ...station, modules: enrichedModules }, 'xenon', sectorMacro, zoneLookup, sectorCenterLookup, sectorScaleLookup)
-        }),
-        khaakStations: sector.khaakStations?.map((station) => {
+          return enrichFactionStation({ ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments) }, 'xenon', sectorMacro, zoneLookup, sectorCenterLookup, sectorScaleLookup)
+        })),
+        khaak_stations: mapByCode(recordValues(sector.khaak_stations).map((station) => {
           const enrichedModules = modulesByMacroId
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
             : station.modules
-          return enrichFactionStation({ ...station, modules: enrichedModules }, 'khaak', sectorMacro, zoneLookup, sectorCenterLookup, sectorScaleLookup)
-        }),
-        datavaults: sector.datavaults?.map((vault) => {
+          return enrichFactionStation({ ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments) }, 'khaak', sectorMacro, zoneLookup, sectorCenterLookup, sectorScaleLookup)
+        })),
+        player_buildstorages: mapByCode(recordValues(sector.player_buildstorages).map((buildstorage) => {
+          const enrichedModules = modulesByMacroId
+            ? enrichModulesWithGameData(buildstorage.modules, modulesByMacroId)
+            : buildstorage.modules
+          return {
+            ...buildstorage,
+            modules: enrichedModules,
+            equipments: enrichEquipmentsWithGameData(buildstorage.equipments)
+          }
+        })),
+        datavaults: mapByCode(recordValues(sector.datavaults).map((vault) => {
           const position = withTransformPosition(calculateFinalPosition(
             vault.relative_position,
             vault.zone_id,
@@ -717,8 +871,8 @@ export function postProcessRustSaveArchive(
             zoneLookup
           ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           return { ...vault, position }
-        }),
-        erlkingVaults: sector.erlkingVaults?.map((vault) => {
+        })),
+        erlking_vaults: mapByCode(recordValues(sector.erlking_vaults).map((vault) => {
           const position = withTransformPosition(calculateFinalPosition(
             vault.relative_position,
             vault.zone_id,
@@ -726,8 +880,8 @@ export function postProcessRustSaveArchive(
             zoneLookup
           ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           return { ...vault, position }
-        }),
-        abandonedShips: sector.abandonedShips?.filter((ship) => {
+        })),
+        abandoned_ships: mapByCode(recordValues(sector.abandoned_ships).filter((ship) => {
           return SHIP_LOOKUP[ship.macro] !== undefined
         }).map((ship) => {
           const position = withTransformPosition(calculateFinalPosition(
@@ -738,10 +892,12 @@ export function postProcessRustSaveArchive(
           ), sectorMacro, sectorScaleLookup, sectorCenterLookup)
           const shipEntry = SHIP_LOOKUP[ship.macro]
           return { ...ship, position, shipId: shipEntry?.id, purpose: shipEntry?.purpose }
-        })
+        }))
       }
+
+      enrichedSector = attachSectorBuildstorages(enrichedSector)
       
-      return [sectorMacro, stripEmptySectorArrays(enrichedSector)]
+      return [sectorMacro, stripEmptySectorCollections(enrichedSector)]
     })
   )
   

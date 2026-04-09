@@ -19,8 +19,8 @@ export function matchStationByProduct(
   wareId: string,
   modulesByMacroId: Record<string, X4Module>
 ): boolean {
-  const modules = station.modules
-  if (!modules || modules.length === 0) return false
+  const modules = station.modules ? Object.values(station.modules) : []
+  if (modules.length === 0) return false
 
   for (const module of modules) {
     const x4Module = modulesByMacroId[module.ref] || modulesByMacroId[module.module_id || '']
@@ -35,8 +35,8 @@ export function matchStationByModule(
   station: StationEntry,
   moduleId: string
 ): boolean {
-  const modules = station.modules
-  if (!modules || modules.length === 0) return false
+  const modules = station.modules ? Object.values(station.modules) : []
+  if (modules.length === 0) return false
 
   for (const module of modules) {
     if (module.module_id === moduleId || module.ref === moduleId) {

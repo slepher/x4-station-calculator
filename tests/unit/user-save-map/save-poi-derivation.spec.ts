@@ -23,17 +23,17 @@ const archive: SaveArchive = {
     sector_alpha_macro: {
       name: 'Alpha',
       is_known: true,
-      playerStations: [
-        {
+      player_stations: {
+        'P-01': {
           code: 'P-01',
           macro: 'station_player',
           owner: 'player',
           relative_position: { x: 1000, y: 0, z: 2000 },
           position: { x: 1000, y: 0, z: 2000, tx: 0.1, ty: -0.2 }
         }
-      ],
-      npcStations: [
-        {
+      },
+      npc_stations: {
+        'N-HQ-01': {
           code: 'N-HQ-01',
           macro: 'station_npc_hq',
           owner: 'argon',
@@ -41,7 +41,7 @@ const archive: SaveArchive = {
           position: { x: 3000, y: 0, z: 4000, tx: 0.3, ty: -0.4 },
           tag: 'tradestation'
         },
-        {
+        'N-01': {
           code: 'N-01',
           macro: 'station_npc',
           owner: 'argon',
@@ -49,9 +49,9 @@ const archive: SaveArchive = {
           position: { x: 5000, y: 0, z: 6000, tx: 0.5, ty: -0.6 },
           tag: 'shipyard'
         }
-      ],
-      datavaults: [
-        {
+      },
+      datavaults: {
+        'DV-01': {
           code: 'DV-01',
           macro: 'datavault_macro',
           owner: 'neutral',
@@ -60,9 +60,9 @@ const archive: SaveArchive = {
           unlocked: false,
           has_blueprints: true
         }
-      ],
-      erlkingVaults: [
-        {
+      },
+      erlking_vaults: {
+        'EK-01': {
           code: 'EK-01',
           macro: 'erlking_macro',
           owner: 'neutral',
@@ -71,25 +71,25 @@ const archive: SaveArchive = {
           unlocked: false,
           has_wares: true
         }
-      ],
-      abandonedShips: [
-        {
+      },
+      abandoned_ships: {
+        'AS-01': {
           code: 'AS-01',
           macro: 'ship_macro',
           class: 'fighter',
           relative_position: { x: 11000, y: 0, z: 12000 },
           position: { x: 11000, y: 0, z: 12000, tx: 1.1, ty: -1.2 }
         }
-      ]
+      }
     },
     sector_empty_macro: {
       name: 'Empty',
       is_known: true,
-      playerStations: [],
-      npcStations: [],
-      datavaults: [],
-      erlkingVaults: [],
-      abandonedShips: []
+      player_stations: {},
+      npc_stations: {},
+      datavaults: {},
+      erlking_vaults: {},
+      abandoned_ships: {}
     }
   }
 }
@@ -129,6 +129,6 @@ describe('user-save-map save POI derivation', () => {
       'erlkingVault:EK-01'
     ])
     expect(overlays.every((item) => item.sectorName === 'Alpha')).toBe(true)
-    expect(overlays[0]?.position).toEqual({ x: 1000, z: 2000, tx: 0.1, ty: -0.2 })
+    expect(overlays[0]?.position).toEqual({ x: 1000, y: 0, z: 2000, tx: 0.1, ty: -0.2 })
   })
 })

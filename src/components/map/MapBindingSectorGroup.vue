@@ -71,6 +71,10 @@ const activeArchive = computed<SaveArchive | null>(() => {
   return archive ?? group.saves[0] ?? null
 })
 
+function recordValues<T>(record: Record<string, T> | undefined): T[] {
+  return record ? Object.values(record) : []
+}
+
 interface CoverageDraftEntry {
   ref: string
   jump: number
@@ -147,7 +151,7 @@ const saveSectors = computed<SectorWithStations[]>(() => {
   const sectorsMap = new Map<string, PlayerStationEntry[]>()
 
   for (const [sectorMacro, sector] of Object.entries(activeArchive.value.sectors)) {
-    const stations = sector.playerStations || []
+    const stations = recordValues(sector.player_stations)
     if (stations.length > 0) {
       sectorsMap.set(sectorMacro, stations)
     }

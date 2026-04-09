@@ -59,7 +59,7 @@ describe('MapSaveCoordList', () => {
         playerName: 'Player',
         version: '8.0',
         filename: 'save.xml.gz',
-        parser_version: 'v2',
+        parser_version: 'v3',
         post_processor_version: 'v2',
         source: 'original'
       },
@@ -67,8 +67,8 @@ describe('MapSaveCoordList', () => {
         sector_alpha_macro: {
           name: 'Alpha',
           is_known: true,
-          npcStations: [
-            {
+          npc_stations: {
+            FAC: {
               code: 'FAC',
               macro: 'fac_macro',
               owner: 'argon',
@@ -76,7 +76,7 @@ describe('MapSaveCoordList', () => {
               position: { x: 0, y: 0, z: 0, tx: 0, ty: 0 },
               tag: 'factory'
             },
-            {
+            SHIP: {
               code: 'SHIP',
               macro: 'ship_macro',
               owner: 'argon',
@@ -84,7 +84,7 @@ describe('MapSaveCoordList', () => {
               position: { x: 1000, y: 0, z: 2000, tx: 0, ty: 0 },
               tag: 'shipyard'
             }
-          ]
+          }
         }
       },
       isCompatible: true,
@@ -112,7 +112,7 @@ describe('MapSaveCoordList', () => {
         playerName: 'Player',
         version: '8.0',
         filename: 'save.xml.gz',
-        parser_version: 'v2',
+        parser_version: 'v3',
         post_processor_version: 'v7',
         source: 'original'
       },
@@ -120,8 +120,8 @@ describe('MapSaveCoordList', () => {
         sector_alpha_macro: {
           name: 'Alpha',
           is_known: true,
-          abandonedShips: [
-            {
+          abandoned_ships: {
+            'SHIP-001': {
               code: 'SHIP-001',
               macro: 'ship_ter_m_corvette_02_a_macro',
               class: 'corvette',
@@ -130,7 +130,7 @@ describe('MapSaveCoordList', () => {
               relative_position: { x: 0, y: 0, z: 0 },
               position: { x: 0, y: 0, z: 0, tx: 0, ty: 0 }
             }
-          ]
+          }
         }
       },
       isCompatible: true,
@@ -159,7 +159,7 @@ describe('MapSaveCoordList', () => {
         playerName: 'Player',
         version: '8.0',
         filename: 'save.xml.gz',
-        parser_version: 'v2',
+        parser_version: 'v3',
         post_processor_version: 'v7',
         source: 'original'
       },
@@ -167,8 +167,8 @@ describe('MapSaveCoordList', () => {
         sector_alpha_macro: {
           name: 'Alpha',
           is_known: true,
-          abandonedShips: [
-            {
+          abandoned_ships: {
+            'SHIP-001': {
               code: 'SHIP-001',
               macro: 'ship_ter_m_corvette_02_a_macro',
               class: 'corvette',
@@ -177,7 +177,7 @@ describe('MapSaveCoordList', () => {
               relative_position: { x: 1000, y: 0, z: 2000 },
               position: { x: 1000, y: 0, z: 2000, tx: 0, ty: 0 }
             }
-          ]
+          }
         }
       },
       isCompatible: true,

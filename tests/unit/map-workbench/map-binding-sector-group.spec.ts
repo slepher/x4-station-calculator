@@ -222,8 +222,8 @@ describe('MapBindingSectorGroup', () => {
         sectors: {
           save_sector_1: {
             name: 'Save Sector 1',
-            playerStations: [
-              {
+            player_stations: {
+              'AVE-937': {
                 code: 'AVE-937',
                 profileName: 'Antimatter Cell Factory',
                 productionProfile: 'factory_antimatter',
@@ -233,7 +233,7 @@ describe('MapBindingSectorGroup', () => {
                 relative_position: { x: 0, y: 0, z: 0 },
                 position: { x: 0, y: 0, z: 0 }
               },
-              {
+              'AVE-938': {
                 code: 'AVE-938',
                 profileName: 'Antimatter Cell Factory',
                 productionProfile: 'factory_antimatter',
@@ -243,7 +243,7 @@ describe('MapBindingSectorGroup', () => {
                 relative_position: { x: 0, y: 0, z: 0 },
                 position: { x: 0, y: 0, z: 0 }
               }
-            ]
+            }
           }
         }
       },

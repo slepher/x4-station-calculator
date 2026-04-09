@@ -391,9 +391,9 @@ const buildBindingSavePoiVisual = (input: {
   }
 
   const station = input.station
-  const aggregatedModules = station ? buildAggregatedModulesFromStationPlan(station, gameDataStore.modulesMap) : []
+  const aggregatedModules = station ? buildAggregatedModulesFromStationPlan(station, gameDataStore.modulesMap) : {}
   const modulesByMacroId = Object.fromEntries(
-    aggregatedModules
+    Object.values(aggregatedModules)
       .map((module) => {
         const matched = gameDataStore.modulesByMacroId[module.ref]
         return matched ? [module.ref, matched] : null

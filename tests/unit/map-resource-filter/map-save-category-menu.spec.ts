@@ -44,7 +44,7 @@ describe('MapSaveCategoryMenu', () => {
         playerName: 'Player',
         version: '8.0',
         filename: 'save.xml.gz',
-        parser_version: 'v2',
+        parser_version: 'v3',
         post_processor_version: 'v2',
         source: 'original'
       },
@@ -52,8 +52,8 @@ describe('MapSaveCategoryMenu', () => {
         sector_alpha_macro: {
           name: 'Alpha',
           is_known: true,
-          npcStations: [
-            {
+          npc_stations: {
+            FAC: {
               code: 'FAC',
               macro: 'fac_macro',
               owner: 'argon',
@@ -61,7 +61,7 @@ describe('MapSaveCategoryMenu', () => {
               position: { x: 0, y: 0, z: 0, tx: 0, ty: 0 },
               tag: 'factory'
             },
-            {
+            SHIP: {
               code: 'SHIP',
               macro: 'ship_macro',
               owner: 'argon',
@@ -69,7 +69,7 @@ describe('MapSaveCategoryMenu', () => {
               position: { x: 1000, y: 0, z: 2000, tx: 0, ty: 0 },
               tag: 'shipyard'
             }
-          ]
+          }
         }
       },
       isCompatible: true,

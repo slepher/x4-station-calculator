@@ -32,3 +32,47 @@
 - **前提** 用户已进入某个 empire sector 的 Step 3
 - **当** 用户通过 save station 的绑定入口选择候选 empire station
 - **那么** 系统 SHALL 建立或更新对应 station binding
+
+### Requirement: Save Parser Exposes Station Buildstorage Reference
+
+系统 MUST 为 player station 和 buildstorage 保留各自顶层结果，并通过 code 建立引用。
+
+#### Scenario: parser 解析存在 inprogress build 的 player station
+- **前提** save 中某个 `component[@class="buildstorage"][@owner="player"]` 存在 `buildtasks/inprogress/build`
+- **并且** `build/@component` 命中某个 `component[@class="station"]/@id`
+- **当** 系统完成 save parser 提取
+- **那么** 对应 `playerStation` SHALL 包含 `component_id`
+- **并且** SHALL 包含 station 自己的 `cargo`
+- **并且** SHALL 包含 station 自己的 `reservation`
+- **并且** SHALL 通过 `buildstorage_code` 保存关联的 buildstorage code
+- **并且** 对应 `buildstorage` SHALL 保留在同一 sector 的 `player_buildstorages` 中
+- **并且** 对应 `buildstorage` SHALL 通过 `station_code` 保存关联的 station code
+
+#### Scenario: parser 为 buildstorage 提供简洁结构
+- **前提** save 中某个 player buildstorage 已命中 player station
+- **当** 系统完成 save parser 提取
+- **那么** `buildstorage` SHALL 包含：
+  - `component_id`
+  - `cargo`
+  - `reservation`
+  - `constructions`
+  - `modules`
+  - `equipments`
+  - `progress`
+- **并且** `component_id` 与 `constructions[].id` SHALL 去掉外层 `[]`
+- **并且** `constructions[].equipments` SHALL 被保留
+- **并且** `progress` SHALL 仅包含 `start`、`end`、`sequenceindex`
+- **并且** 系统 SHALL 不解析 `buildtasks/queue/build`
+
+#### Scenario: parser collections use snake_case code maps
+- **当前提** 系统完成 save parser 提取
+- **那么** `SectorData` 中按 `code` 唯一的实体集合 SHALL 使用 `snake_case`
+- **并且** `player_stations` / `npc_stations` / `xenon_stations` / `khaak_stations` / `player_buildstorages` / `datavaults` / `erlking_vaults` / `abandoned_ships` SHALL 为 `Record<code, entry>`
+- **并且** `modules` / `equipments` SHALL 为 `Record<ref, entry>`
+
+#### Scenario: parser post enriches module and equipment ids
+- **前提** Rust parser 已输出原始聚合 `modules` / `equipments`
+- **当** 系统执行 `postProcessRustSaveArchive()`
+- **那么** 所有 station 与 `player_buildstorage` 的 `modules[*]` SHALL 补充 `module_id`
+- **并且** 所有 station 与 `player_buildstorage` 的 `equipments[*]` SHALL 补充 `equipment_id`
+- **并且** `constructions[*].equipments[*]` SHALL 保持 parser 原样，不在 post 中 enrich

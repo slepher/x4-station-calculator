@@ -100,6 +100,186 @@
   - 组内模块排序使用同一套 tier/name 规则
 - 搜索面板和 Step 3 导入都调用这套共享 comparator，避免“导入靠拍平 UI 结果”带来的隐性漂移。
 
+### D11: save parser 为 player station 与 buildstorage 保留顶层对象和 code 引用
+
+- `save parser` 为 `player station` 和 `buildstorage` 都保留顶层对象输出。
+- `PlayerStationEntry` 新增：
+  - `component_id`
+  - `cargo`
+  - `reservation`
+  - `buildstorage_code`
+- `BuildStorageEntry` 新增：
+  - `station_code`
+- `cargo` 表示 station 自己 storage module 的 `cargo/ware` 聚合。
+- `reservation` 表示 station 自己 `trade/reservations/reservation/@amount` 的按 `ware` 聚合。
+- `player station` 与 `buildstorage` 只通过 `code` 互相引用，不做对象嵌套，也不与 station 自己的 `cargo` / `reservation` 混合。
+
+### D12: buildstorage 只解析 inprogress，不解析 queue
+
+- `buildstorage` 关联 station 只使用：
+  - `buildstorage/buildtasks/inprogress/build/@component = station/@id`
+- 不使用 `station/listeners/listener[@event="killed"]` 作为 fallback 关联。
+- 不解析 `buildstorage/buildtasks/queue/build`。
+- 命中关联时：
+  - `playerStation.buildstorage_code = buildstorage.code`
+  - `buildstorage.station_code = playerStation.code`
+- 未命中关联时，`buildstorage` 仍保留在 sector 顶层 `player_buildstorages` 中。
+
+### D13: buildstorage 的 constructions 与 progress 分离
+
+- `playerStation.constructions[]` 继续沿用现有结构，但新增：
+  - `id`
+- `buildstorage.constructions[]` 也使用同构结构：
+  - `id`
+  - `index`
+  - `ref`
+  - `predecessor`
+- `buildstorage.progress` 不挂在 `constructions[]` 条目下，而是挂在 `buildstorage` 本体下。
+- `buildstorage.progress` 来源固定为：
+  - `buildstorage/connections/connection/component[@class="buildmodule"]/connections/connection/component[@class="buildprocessor"]/build`
+- `buildstorage.progress` 仅保留：
+  - `start`
+  - `end`
+  - `sequenceindex`
+
+### D14: 输出 id 去掉外层中括号
+
+- parser 输出到 JSON 的 `id`/`component_id`/`target_station_component_id` 等字段统一去掉外层 `[]`。
+- 例如：
+  - `[0x4646c]` -> `0x4646c`
+  - `[0x1f5e]` -> `0x1f5e`
+
+### D15: parser 输出字段命名收敛到简洁名词
+
+- `SaveArchive` / `SectorData` 协议层统一使用 `snake_case`。
+- `SectorData` 下按 `code` 唯一的实体集合统一改为 map：
+  - `player_stations`
+  - `npc_stations`
+  - `xenon_stations`
+  - `khaak_stations`
+  - `player_buildstorages`
+  - `datavaults`
+  - `erlking_vaults`
+  - `abandoned_ships`
+- 这些集合的 JSON 结构为 `Record<code, entry>`，不再使用数组。
+
+- `playerStation.cargo`
+  - station storage cargo 聚合
+- `playerStation.reservation`
+  - station reservation 聚合
+- `playerStation.buildstorage_code`
+  - 关联的 buildstorage code 引用
+- `buildstorage.cargo`
+  - buildstorage cargo 聚合
+- `buildstorage.reservation`
+  - buildstorage reservation 聚合
+- `buildstorage.constructions`
+  - buildstorage `inprogress build/sequence/entry`
+- `buildstorage.progress`
+  - buildstorage 当前建造进度
+- `buildstorage.station_code`
+  - 关联的 station code 引用
+
+### D16: parser 结构草案
+
+```ts
+interface WareAmount {
+  ware: string
+  amount: number
+}
+
+interface PlayerStationConstruction {
+  id?: string
+  index: number
+  ref: string
+  predecessor?: number
+  equipments?: StationEquipment[]
+}
+
+interface AggregatedStationModule {
+  ref: string
+  amount: number
+  module_id?: string
+  type?: string
+  group?: string
+}
+
+interface AggregatedEquipment {
+  type: 'shields' | 'turrets'
+  ref: string
+  amount: number
+  equipment_id?: string
+}
+
+interface BuildProgress {
+  start?: number
+  end?: number
+  sequenceindex?: number
+}
+
+interface BuildStorageEntry {
+  component_id: string
+  code: string
+  owner: string
+  relative_position: { x: number; y: number; z: number }
+  zone_id?: string
+  cargo?: WareAmount[]
+  reservation?: WareAmount[]
+  station_code?: string
+  target_station_component_id?: string
+  constructions?: PlayerStationConstruction[]
+  modules?: Record<string, AggregatedStationModule>
+  equipments?: Record<string, AggregatedEquipment>
+  progress?: BuildProgress
+}
+
+interface PlayerStationEntry extends StationBaseEntry {
+  component_id?: string
+  cargo?: WareAmount[]
+  reservation?: WareAmount[]
+  buildstorage_code?: string
+  modules?: Record<string, AggregatedStationModule>
+  equipments?: Record<string, AggregatedEquipment>
+}
+
+interface SectorData {
+  player_stations?: Record<string, PlayerStationEntry>
+  npc_stations?: Record<string, NpcStationEntry>
+  xenon_stations?: Record<string, FactionStationEntry>
+  khaak_stations?: Record<string, FactionStationEntry>
+  player_buildstorages?: Record<string, BuildStorageEntry>
+  datavaults?: Record<string, DatavaultEntry>
+  erlking_vaults?: Record<string, DatavaultEntry>
+  abandoned_ships?: Record<string, AbandonedShipEntry>
+}
+```
+
+### D17: module / equipment 聚合统一改为以 ref 为 key 的 map
+
+- `player_stations` / `npc_stations` / `xenon_stations` / `khaak_stations` 的：
+  - `modules`
+  - `equipments`
+  统一改为 `Record<ref, entry>`
+- `player_buildstorages` 也新增：
+  - `modules`
+  - `equipments`
+  同样使用 `Record<ref, entry>`
+- `player_buildstorages[*].constructions[*]` 与 `player_stations[*].constructions[*]` 使用同构结构，因此也保留：
+  - `equipments`
+
+### D18: module_id / equipment_id 在 post 中 enrich
+
+- Rust parser 只输出原始聚合：
+  - `modules[ref].ref/amount`
+  - `equipments[ref].ref/amount/type`
+  - `constructions[*].equipments[*].ref/type/group/exact`
+- `postProcessRustSaveArchive()` 负责 enrich：
+  - `modules[*].module_id`
+  - `modules[*].type`
+  - `modules[*].group`
+  - `equipments[*].equipment_id`
+- `constructions[*].equipments[*]` 保持 parser 原样，不在 post 中 enrich
+
 ## 任务映射来源
 
 - 主要来自旧 `station-binding` change 的 1-24 号任务

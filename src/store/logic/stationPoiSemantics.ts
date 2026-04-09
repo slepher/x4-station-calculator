@@ -1,4 +1,4 @@
-import type { AggregatedStationModule } from '@/types/saveArchive'
+import type { AggregatedStationModule, CodeMap } from '@/types/saveArchive'
 import type { SavedModule, StationPlan, X4Module } from '@/types/x4'
 
 const ENERGY_GROUP = 'energy'
@@ -36,26 +36,32 @@ export type StationPoiClassification = {
 export function buildAggregatedModulesFromStationPlan(
   station: StationPlan,
   modulesMap: Record<string, X4Module>
-): AggregatedStationModule[] {
-  return (station.modules || []).flatMap((module: SavedModule) => {
+): CodeMap<AggregatedStationModule> {
+  return Object.fromEntries((station.modules || []).flatMap((module: SavedModule) => {
     const resolved = modulesMap[module.id]
     if (!resolved) return []
-    return [{
+    return [[resolved.macroId, {
       ref: resolved.macroId,
       amount: module.count,
       module_id: resolved.id,
       type: resolved.type,
       group: resolved.group
-    }]
-  })
+    }]]
+  }))
+}
+
+function moduleValues(modules: CodeMap<AggregatedStationModule> | AggregatedStationModule[] | undefined): AggregatedStationModule[] {
+  if (!modules) return []
+  return Array.isArray(modules) ? modules : Object.values(modules)
 }
 
 export function getFactoryGroup(
-  modules: AggregatedStationModule[] | undefined
+  modules: CodeMap<AggregatedStationModule> | AggregatedStationModule[] | undefined
 ): string {
-  if (!modules || modules.length === 0) return 'factory'
+  const entries = moduleValues(modules)
+  if (entries.length === 0) return 'factory'
 
-  const productionModules = modules.filter((m) => m.type === 'production')
+  const productionModules = entries.filter((m) => m.type === 'production')
   if (productionModules.length === 0) return 'factory'
 
   const groups = productionModules.map((m) => m.group).filter((g): g is string => Boolean(g))
@@ -70,11 +76,12 @@ export function getFactoryGroup(
 }
 
 function getPrimaryProductionModule(
-  modules: AggregatedStationModule[] | undefined
+  modules: CodeMap<AggregatedStationModule> | AggregatedStationModule[] | undefined
 ): AggregatedStationModule | undefined {
-  if (!modules?.length) return undefined
+  const entries = moduleValues(modules)
+  if (!entries.length) return undefined
 
-  const productionModules = modules.filter((module) => module.type === 'production')
+  const productionModules = entries.filter((module) => module.type === 'production')
   if (!productionModules.length) return undefined
 
   const nonEnergyModules = productionModules.filter((module) => module.group !== ENERGY_GROUP)
@@ -86,19 +93,20 @@ function getPrimaryProductionModule(
 }
 
 export function getProductionProfile(
-  modules: AggregatedStationModule[] | undefined,
+  modules: CodeMap<AggregatedStationModule> | AggregatedStationModule[] | undefined,
   modulesByMacroId?: Record<string, X4Module>
 ): { productionProfile?: string; profileName?: string } {
-  if (!modules?.length) return {}
+  const entries = moduleValues(modules)
+  if (!entries.length) return {}
 
-  const productionModules = modules.filter((module) => module.type === 'production')
+  const productionModules = entries.filter((module) => module.type === 'production')
   if (!productionModules.length) return {}
 
   const nonEnergyModules = productionModules.filter((module) => module.group !== ENERGY_GROUP)
   const nonEnergyGroups = [...new Set(nonEnergyModules.map((module) => module.group).filter((group): group is string => Boolean(group)))]
 
   if (nonEnergyModules.length === 1 || nonEnergyModules.length === 0) {
-    const primaryModule = getPrimaryProductionModule(modules)
+    const primaryModule = getPrimaryProductionModule(entries)
     if (!primaryModule?.module_id) return {}
     const moduleName = modulesByMacroId?.[primaryModule.ref]?.name
     return {
@@ -138,9 +146,10 @@ export function getProductionProfile(
   }
 }
 
-export function hasModulePattern(modules: AggregatedStationModule[] | undefined, patterns: string[]): boolean {
-  if (!modules || modules.length === 0) return false
-  return modules.some((module) => {
+export function hasModulePattern(modules: CodeMap<AggregatedStationModule> | AggregatedStationModule[] | undefined, patterns: string[]): boolean {
+  const entries = moduleValues(modules)
+  if (entries.length === 0) return false
+  return entries.some((module) => {
     const ref = module.ref.toLowerCase()
     return patterns.some((pattern) => ref.includes(pattern))
   })
@@ -148,11 +157,11 @@ export function hasModulePattern(modules: AggregatedStationModule[] | undefined,
 
 export function classifyPlayerStationPoi(args: {
   macro?: string | null
-  modules?: AggregatedStationModule[]
+  modules?: CodeMap<AggregatedStationModule> | AggregatedStationModule[]
   isHeadquarter?: boolean
   modulesByMacroId?: Record<string, X4Module>
 }): StationPoiClassification {
-  const modules = args.modules || []
+  const modules = moduleValues(args.modules)
   const macro = (args.macro || '').toLowerCase()
 
   const isPiratebase = macro.includes('_piratebase')

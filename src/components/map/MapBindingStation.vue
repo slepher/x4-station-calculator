@@ -85,6 +85,10 @@ const activeArchive = computed(() => {
   return group.saves.find((s) => s.meta.time === time) || group.saves[0] || null
 })
 
+function recordValues<T>(record: Record<string, T> | undefined): T[] {
+  return record ? Object.values(record) : []
+}
+
 const freeStations = computed(() => {
   if (!activeEmpire.value) return []
 
@@ -174,8 +178,8 @@ const anchorAndCoverageSectors = computed(() => {
     const saveStations: PlayerStationEntry[] = []
     if (activeArchive.value) {
       const sectorData = activeArchive.value.sectors[sectorMacro]
-      if (sectorData?.playerStations) {
-        saveStations.push(...sectorData.playerStations)
+      if (sectorData?.player_stations) {
+        saveStations.push(...recordValues(sectorData.player_stations))
       }
     }
 
@@ -325,7 +329,7 @@ function getEmpireStationIcon(station: StationPlan | undefined | null): string {
     gameDataStore.modulesMap || {}
   )
   const modulesByMacroId = Object.fromEntries(
-    aggregatedModules
+    Object.values(aggregatedModules)
       .map((module) => {
         const matched = gameDataStore.modulesByMacroId?.[module.ref]
         return matched ? [module.ref, matched] : null
@@ -533,7 +537,7 @@ function importSaveStation(station: PlayerStationEntry, sectorMacro: string) {
   if (!newStation) return
 
   newStation.sectorId = props.sectorGroupId
-  const importedModules: SavedModule[] = (station.modules || [])
+  const importedModules: SavedModule[] = Object.values(station.modules || {})
     .filter((module) => Boolean(module?.module_id) && Number(module.amount) > 0)
     .map((module) => {
       const id = module.module_id as string

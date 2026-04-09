@@ -17,14 +17,18 @@ mod tests {
 
         let archive = parser.finish_archive("save.xml").expect("archive");
         let sector = archive.sectors.get("sec_alpha").expect("sector");
-        let station = sector.player_stations.first().expect("station");
+        let station = sector.player_stations.get("AAA").expect("station");
 
         assert_eq!(station.base.owner, "player");
         assert_eq!(station.base.code, "AAA");
         assert_eq!(station.base.macro_field, "station_macro");
         assert_eq!(station.base.is_headquarter, Some(true));
         assert_eq!(
-            (station.base.x, station.base.y, station.base.z),
+            (
+                station.base.relative_position.x,
+                station.base.relative_position.y,
+                station.base.relative_position.z,
+            ),
             (1.0, 2.0, 3.0)
         );
     }
@@ -52,21 +56,25 @@ mod tests {
         while parser.pump(8) {}
 
         let archive = parser.finish_archive("chunked.xml").expect("archive");
-        let station = &archive.sectors["sec_alpha"].player_stations[0];
+        let station = archive.sectors["sec_alpha"].player_stations.get("AAA").expect("station");
         let construction = &station.constructions[0];
 
         assert_eq!(
-            (station.base.x, station.base.y, station.base.z),
+            (
+                station.base.relative_position.x,
+                station.base.relative_position.y,
+                station.base.relative_position.z,
+            ),
             (4.0, 5.0, 6.0)
         );
         assert_eq!(construction.index, 1);
         assert_eq!(construction.ref_field, "mod_macro");
         assert_eq!(construction.equipments[0].ref_field, "shield_macro");
         assert_eq!(construction.equipments[0].exact, 2);
-        assert_eq!(station.modules[0].ref_field, "mod_macro");
-        assert_eq!(station.modules[0].amount, 1);
-        assert_eq!(station.equipments[0].ref_field, "shield_macro");
-        assert_eq!(station.equipments[0].amount, 2);
+        assert_eq!(station.modules.get("mod_macro").map(|m| m.ref_field.as_str()), Some("mod_macro"));
+        assert_eq!(station.modules.get("mod_macro").map(|m| m.amount), Some(1));
+        assert_eq!(station.equipments.get("shield_macro").map(|m| m.ref_field.as_str()), Some("shield_macro"));
+        assert_eq!(station.equipments.get("shield_macro").map(|m| m.amount), Some(2));
     }
 
     #[test]
@@ -139,12 +147,16 @@ mod tests {
         while parser.pump(1024) {}
 
         let archive = parser.finish_archive("gzip.xml.gz").expect("archive");
-        let station = &archive.sectors["gzip_sector"].player_stations[0];
+        let station = archive.sectors["gzip_sector"].player_stations.get("GZIP-1").expect("station");
 
         assert_eq!(archive.meta.player_name, "gzip");
         assert_eq!(station.base.code, "GZIP-1");
         assert_eq!(
-            (station.base.x, station.base.y, station.base.z),
+            (
+                station.base.relative_position.x,
+                station.base.relative_position.y,
+                station.base.relative_position.z,
+            ),
             (11.0, 22.0, 33.0)
         );
     }
@@ -162,15 +174,15 @@ mod tests {
         let sector = archive.sectors.get("sec_alpha").expect("sector");
 
         assert_eq!(
-            sector.xenon_stations[0].modules[0].ref_field,
+            sector.xenon_stations["XEN-1"].modules["buildmodule_xen_ships_xl_macro"].ref_field,
             "buildmodule_xen_ships_xl_macro"
         );
-        assert_eq!(sector.xenon_stations[0].modules[0].amount, 2);
+        assert_eq!(sector.xenon_stations["XEN-1"].modules["buildmodule_xen_ships_xl_macro"].amount, 2);
         assert_eq!(
-            sector.khaak_stations[0].modules[0].ref_field,
+            sector.khaak_stations["KHA-1"].modules["module_khaak_special"].ref_field,
             "module_khaak_special"
         );
-        assert_eq!(sector.khaak_stations[0].modules[0].amount, 2);
+        assert_eq!(sector.khaak_stations["KHA-1"].modules["module_khaak_special"].amount, 2);
     }
 
     #[test]
@@ -183,7 +195,7 @@ mod tests {
         while parser.pump(4096) {}
 
         let archive = parser.finish_archive("predecessor.xml").expect("archive");
-        let station = &archive.sectors["sec_alpha"].player_stations[0];
+        let station = archive.sectors["sec_alpha"].player_stations.get("AAA").expect("station");
 
         assert_eq!(station.constructions.len(), 2);
         assert_eq!(station.constructions[0].index, 1);
@@ -204,17 +216,59 @@ mod tests {
         while parser.pump(4096) {}
 
         let archive = parser.finish_archive("npc_equip.xml").expect("archive");
-        let station = &archive.sectors["sec_alpha"].npc_stations[0];
+        let station = archive.sectors["sec_alpha"].npc_stations.get("NPC-1").expect("station");
 
         assert_eq!(station.modules.len(), 1);
-        assert_eq!(station.modules[0].ref_field, "module_dock");
-        assert_eq!(station.modules[0].amount, 2);
+        assert_eq!(station.modules.get("module_dock").map(|m| m.ref_field.as_str()), Some("module_dock"));
+        assert_eq!(station.modules.get("module_dock").map(|m| m.amount), Some(2));
         assert_eq!(station.equipments.len(), 2);
-        assert_eq!(station.equipments[0].equip_type, "shields");
-        assert_eq!(station.equipments[0].ref_field, "shield_macro");
-        assert_eq!(station.equipments[0].amount, 5);
-        assert_eq!(station.equipments[1].equip_type, "turrets");
-        assert_eq!(station.equipments[1].ref_field, "turret_macro");
-        assert_eq!(station.equipments[1].amount, 5);
+        assert_eq!(station.equipments.get("shield_macro").map(|m| m.equip_type.as_str()), Some("shields"));
+        assert_eq!(station.equipments.get("shield_macro").map(|m| m.ref_field.as_str()), Some("shield_macro"));
+        assert_eq!(station.equipments.get("shield_macro").map(|m| m.amount), Some(5));
+        assert_eq!(station.equipments.get("turret_macro").map(|m| m.equip_type.as_str()), Some("turrets"));
+        assert_eq!(station.equipments.get("turret_macro").map(|m| m.ref_field.as_str()), Some("turret_macro"));
+        assert_eq!(station.equipments.get("turret_macro").map(|m| m.amount), Some(5));
+    }
+
+    #[test]
+    fn extracts_station_cargo_reservation_and_buildstorage_fields() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="station_macro" owner="player" code="AAA" id="[0xstation]"><connections><connection connection="modules"><component class="storage" macro="storage_macro" id="[0xstorage]"><cargo><ware ware="energycells" amount="12"/><ware ware="energycells" amount="8"/><ware ware="hullparts" amount="5"/></cargo></component></connection></connections><trade><reservations><reservation ware="energycells" amount="4"/><reservation ware="claytronics" amount="2"/></reservations></trade><construction><sequence><entry id="[0xentry1]" index="1" macro="dock_macro"><upgrades><groups><shields macro="shield_macro" group="g1" exact="2"/></groups></upgrades></entry></sequence></construction></component><component class="buildstorage" macro="buildstorage_macro" owner="player" code="FIX-1" id="[0xbuilder]"><trade><reservations><reservation ware="hullparts" amount="7"/></reservations></trade><cargo><ware ware="hullparts" amount="9"/></cargo><buildtasks><inprogress><build id="[0xbuild]" builder="[0xbuilder]" component="[0xstation]"><sequence><entry id="[0xentry1]" index="1" macro="dock_macro"><upgrades><groups><turrets macro="turret_macro" group="g2" exact="3"/></groups></upgrades></entry></sequence></build></inprogress></buildtasks><connections><connection connection="con_buildmodule01"><component class="buildmodule" macro="buildmodule_macro" id="[0xbuildmodule]"><connections><connection connection="buildprocessorconnection_01"><component class="buildprocessor" macro="buildprocessor_macro" id="[0xprocessor]"><build start="10" end="20" sequenceindex="1"/></component></connection></connections></component></connection></connections></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("buildstorage.xml").expect("archive");
+        let sector = archive.sectors.get("sec_alpha").expect("sector");
+        let station = sector.player_stations.get("AAA").expect("station");
+        let buildstorage = sector.player_buildstorages.get("FIX-1").expect("buildstorage");
+
+        assert_eq!(station.component_id.as_deref(), Some("0xstation"));
+        assert_eq!(station.constructions[0].id.as_deref(), Some("0xentry1"));
+        assert_eq!(station.constructions[0].equipments[0].ref_field, "shield_macro");
+        assert_eq!(station.cargo.len(), 2);
+        assert_eq!(station.cargo[0].ware, "energycells");
+        assert_eq!(station.cargo[0].amount, 20);
+        assert_eq!(station.reservation.len(), 2);
+        assert_eq!(station.modules.get("dock_macro").map(|m| m.amount), Some(1));
+        assert_eq!(station.equipments.get("shield_macro").map(|m| m.amount), Some(2));
+        assert_eq!(buildstorage.component_id, "0xbuilder");
+        assert_eq!(buildstorage.target_station_component_id.as_deref(), Some("0xstation"));
+        assert_eq!(buildstorage.cargo[0].ware, "hullparts");
+        assert_eq!(buildstorage.cargo[0].amount, 9);
+        assert_eq!(buildstorage.reservation[0].ware, "hullparts");
+        assert_eq!(buildstorage.reservation[0].amount, 7);
+        assert_eq!(buildstorage.constructions[0].id.as_deref(), Some("0xentry1"));
+        assert_eq!(buildstorage.constructions[0].equipments[0].ref_field, "turret_macro");
+        assert_eq!(buildstorage.modules.get("dock_macro").map(|m| m.amount), Some(1));
+        assert_eq!(buildstorage.equipments.get("turret_macro").map(|m| m.amount), Some(3));
+        assert_eq!(buildstorage.station_code, None);
+        assert_eq!(buildstorage.progress.as_ref().and_then(|v| v.start), Some(10.0));
+        assert_eq!(buildstorage.progress.as_ref().and_then(|v| v.end), Some(20.0));
+        assert_eq!(
+            buildstorage.progress.as_ref().and_then(|v| v.sequenceindex),
+            Some(1)
+        );
     }
 }

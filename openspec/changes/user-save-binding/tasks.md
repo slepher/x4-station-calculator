@@ -56,3 +56,18 @@
 - [x] 22.18 从异常绑定状态导入/转绑时，先释放旧坏 binding 再落入新 binding
 - [x] 22.19 模块搜索面板与 Step 3 导入共享默认排序规则，不再通过拍平搜索结果复用排序
 - [x] 23.21 Step 2 中被其他 empire sector 占用的定位/范围星区不能进入当前 coverage，但仍显示在 candidate 中且不显示 `+`
+
+## Save Parser Shape
+
+- [ ] P1. 为 `PlayerStationConstruction` 增加 `id`
+- [ ] P2. 为 `player station` 增加 `component_id` / `cargo` / `reservation`
+- [ ] P3. 为 `player station` 增加 `buildstorage_code`，并保留 sector 顶层 `player_buildstorages`
+- [ ] P4. `buildstorage` 仅解析 `inprogress`，输出 `cargo` / `reservation` / `constructions` / `progress`
+- [ ] P5. `buildstorage.progress` 仅保留 `start` / `end` / `sequenceindex`
+- [ ] P6. 使用 `buildstorage/buildtasks/inprogress/build/@component = station/@id` 建立 `station_code/buildstorage_code` 引用
+- [ ] P7. parser 输出的 `id` / `component_id` 去掉外层 `[]`
+- [ ] P8. `SectorData` 下按 `code` 唯一的实体集合改为 `snake_case` 的 map
+- [ ] P9. `BuildStorageRef` 重命名为 `BuildStorageEntry`
+- [ ] P10. `player_buildstorages[*].constructions[*]` 补齐 `equipments`
+- [ ] P11. 所有 station / player_buildstorage 的 `modules` / `equipments` 改为 `Record<ref, entry>`
+- [ ] P12. `postProcessRustSaveArchive()` 为 `modules` 补 `module_id`，为 `equipments` 补 `equipment_id`

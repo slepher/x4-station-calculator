@@ -1,6 +1,10 @@
 import type { GroupSaveBinding, StationSaveBinding, ResolvedGroupSaveBinding, ResolvedStationSaveBinding } from '@/types/x4'
-import type { SaveArchive, PlayerStationEntry, NpcStationEntry } from '@/types/saveArchive'
+import type { SaveArchive, PlayerStationEntry, NpcStationEntry, CodeMap } from '@/types/saveArchive'
 import { buildSectorGraph } from './mapSectorGraph'
+
+function recordValues<T>(record: CodeMap<T> | undefined): T[] {
+  return record ? Object.values(record) : []
+}
 
 export function calculateCoverageSectorMacros(
   sectorMacro: string,
@@ -55,9 +59,7 @@ export function resolveGroupSaveBinding(
     return { ...binding, status: 'missing_at_selected_time' }
   }
 
-  const boundSaveStation = (sector.playerStations || []).find(
-    (station) => station.code === saveStationCode
-  )
+  const boundSaveStation = sector.player_stations?.[saveStationCode]
 
   if (!boundSaveStation) {
     return { ...binding, status: 'missing_at_selected_time' }
@@ -91,9 +93,7 @@ export function resolveStationSaveBinding(
     return { ...binding, status: 'missing_at_selected_time' }
   }
 
-  const playerStation = (sector.playerStations || []).find(
-    (station) => station.code === binding.saveStationCode
-  )
+  const playerStation = sector.player_stations?.[binding.saveStationCode]
 
   if (!playerStation) {
     return { ...binding, status: 'missing_at_selected_time' }
@@ -121,7 +121,7 @@ export function findPlayerStationByCode(
   if (!archive || !stationCode) return null
 
   for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
-    const station = (sector.playerStations || []).find((s) => s.code === stationCode)
+    const station = sector.player_stations?.[stationCode]
     if (station) {
       return {
         station,
@@ -141,9 +141,8 @@ export function findTradeStationByCode(
   if (!archive || !stationCode) return null
 
   for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
-    const station = (sector.npcStations || []).find(
-      (s) => s.code === stationCode && s.isTradestation
-    )
+    const station = sector.npc_stations?.[stationCode]
+    if (station && !station.isTradestation) continue
     if (station) {
       return {
         station,
@@ -163,7 +162,7 @@ export function getPlayerStationsInSector(
   if (!archive || !sectorMacro) return []
   const sector = archive.sectors[sectorMacro]
   if (!sector) return []
-  return sector.playerStations || []
+  return recordValues(sector.player_stations)
 }
 
 export function getTradeStationsInSector(
@@ -173,7 +172,7 @@ export function getTradeStationsInSector(
   if (!archive || !sectorMacro) return []
   const sector = archive.sectors[sectorMacro]
   if (!sector) return []
-  return (sector.npcStations || []).filter((s) => s.isTradestation)
+  return recordValues(sector.npc_stations).filter((s) => s.isTradestation)
 }
 
 export interface SaveSectorWithStations {
@@ -193,8 +192,8 @@ export function getSaveSectorsWithPlayerStations(
   const results: SaveSectorWithStations[] = []
 
   for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
-    const playerStations = sector.playerStations || []
-    const tradeStations = (sector.npcStations || []).filter((s) => s.isTradestation)
+    const playerStations = recordValues(sector.player_stations)
+    const tradeStations = recordValues(sector.npc_stations).filter((s) => s.isTradestation)
 
     if (playerStations.length > 0 || tradeStations.length > 0) {
       results.push({
@@ -299,7 +298,7 @@ export function getFilteredSaveStations(
 
     const distance = distanceMap.get(sectorMacro) ?? 0
     const sectorName = sector.name || sectorMacro
-    const stations = sector.playerStations || []
+    const stations = recordValues(sector.player_stations)
 
     if (stations.length > 0) {
       sectorsMap.set(sectorMacro, { sectorName, distance, stations })

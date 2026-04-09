@@ -77,22 +77,22 @@ describe('MapBindingStation', () => {
         meta: { guid: 'g-1', time: 1000 },
         sectors: {
           sector_a: {
-            playerStations: [
-              {
+            player_stations: {
+              save_1: {
                 code: 'save_1',
                 tag: 'factory',
                 owner: 'player',
                 macro: 'player_macro_1',
                 position: { x: 1000, y: 0, z: 2000 }
               },
-              {
+              save_2: {
                 code: 'save_2',
                 tag: 'factory',
                 owner: 'player',
                 macro: 'player_macro_2',
                 position: { x: 3000, y: 0, z: 4000 }
               }
-            ]
+            }
           }
         }
       },
@@ -386,8 +386,8 @@ describe('MapBindingStation', () => {
         meta: { guid: 'g-1', time: 1000 },
         sectors: {
           sector_a: {
-            playerStations: [
-              {
+            player_stations: {
+              save_1: {
                 code: 'save_1',
                 tag: 'factory',
                 owner: 'player',
@@ -399,7 +399,7 @@ describe('MapBindingStation', () => {
                   { ref: 'macro-ignored', amount: 5 }
                 ]
               }
-            ]
+            }
           }
         }
       },

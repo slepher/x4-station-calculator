@@ -15,11 +15,9 @@ import type {
   SavePoiOverlayItem,
   SavePoiSectorGroup,
   StationEntry,
-  PlayerStationEntry,
-  FactionStationEntry,
-  NpcStationEntry,
   DatavaultEntry,
-  AbandonedShipEntry
+  AbandonedShipEntry,
+  CodeMap
 } from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
 import {
@@ -67,14 +65,19 @@ function createEmptySectorData(name: string): SectorData {
     clusterGates: [],
     superhighwayGates: [],
     highways: [],
-    playerStations: [],
-    xenonStations: [],
-    khaakStations: [],
-    npcStations: [],
-    datavaults: [],
-    erlkingVaults: [],
-    abandonedShips: []
+    player_stations: {},
+    xenon_stations: {},
+    khaak_stations: {},
+    npc_stations: {},
+    player_buildstorages: {},
+    datavaults: {},
+    erlking_vaults: {},
+    abandoned_ships: {}
   }
+}
+
+function recordValues<T>(record: CodeMap<T> | undefined): T[] {
+  return record ? Object.values(record) : []
 }
 
 function createEmptySaveArchivesState(): SavedSaveArchivesState {
@@ -235,39 +238,26 @@ export function deriveSavePoiCategoryData(
 
   return {
     playerStation: createPoiCategoryData('playerStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
-      (sector.playerStations || []).filter((item) => shouldIncludePoiItem('playerStation', sectorMacro, sector.name, item, options))
+      recordValues(sector.player_stations).filter((item) => shouldIncludePoiItem('playerStation', sectorMacro, sector.name, item, options))
     )),
     npcStation: createPoiCategoryData('npcStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
-      (sector.npcStations || []).filter((item) => shouldIncludePoiItem('npcStation', sectorMacro, sector.name, item, options))
+      recordValues(sector.npc_stations).filter((item) => shouldIncludePoiItem('npcStation', sectorMacro, sector.name, item, options))
     )),
     xenonStation: createPoiCategoryData('xenonStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
-      (sector.xenonStations || []).filter((item) => shouldIncludePoiItem('xenonStation', sectorMacro, sector.name, item, options))
+      recordValues(sector.xenon_stations).filter((item) => shouldIncludePoiItem('xenonStation', sectorMacro, sector.name, item, options))
     )),
     khaakStation: createPoiCategoryData('khaakStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
-      (sector.khaakStations || []).filter((item) => shouldIncludePoiItem('khaakStation', sectorMacro, sector.name, item, options))
+      recordValues(sector.khaak_stations).filter((item) => shouldIncludePoiItem('khaakStation', sectorMacro, sector.name, item, options))
     )),
-    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.abandonedShips || [])),
-    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.datavaults || [])),
-    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.erlkingVaults || []))
+    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (_sectorMacro, sector) => recordValues(sector.abandoned_ships))),
+    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (_sectorMacro, sector) => recordValues(sector.datavaults))),
+    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (_sectorMacro, sector) => recordValues(sector.erlking_vaults)))
   }
-}
-
-function classifyLegacyStation(station: StationEntry): keyof Pick<SectorData, 'playerStations' | 'xenonStations' | 'khaakStations' | 'npcStations'> {
-  if (station.owner === 'player') return 'playerStations'
-  if (station.owner === 'xenon') return 'xenonStations'
-  if (station.owner === 'khaak') return 'khaakStations'
-  return 'npcStations'
 }
 
 function normalizeSectorData(
   sectorId: string,
-  sector: SectorData & {
-    stations?: StationEntry[]
-    player_stations?: PlayerStationEntry[]
-    xenon_stations?: FactionStationEntry[]
-    khaak_stations?: FactionStationEntry[]
-    npc_stations?: NpcStationEntry[]
-  }
+  sector: SectorData
 ): SectorData {
   const normalized = createEmptySectorData(sector.name || sectorId)
   normalized.is_known = Boolean(sector.is_known)
@@ -276,37 +266,14 @@ function normalizeSectorData(
   normalized.clusterGates = Array.isArray(sector.clusterGates) ? sector.clusterGates : []
   normalized.superhighwayGates = Array.isArray(sector.superhighwayGates) ? sector.superhighwayGates : []
   normalized.highways = Array.isArray(sector.highways) ? sector.highways : []
-  normalized.datavaults = Array.isArray(sector.datavaults)
-    ? sector.datavaults.map((entry) => ({
-      ...entry,
-      unlocked: entry.unlocked === true,
-      wares: Array.isArray(entry.wares) ? entry.wares : []
-    }))
-    : []
-  normalized.erlkingVaults = Array.isArray(sector.erlkingVaults)
-    ? sector.erlkingVaults.map((entry) => ({
-      ...entry,
-      unlocked: entry.unlocked === true,
-      wares: Array.isArray(entry.wares) ? entry.wares : []
-    }))
-    : []
-  normalized.abandonedShips = Array.isArray(sector.abandonedShips) ? sector.abandonedShips : []
-
-  if (Array.isArray(sector.playerStations)) normalized.playerStations = sector.playerStations as PlayerStationEntry[]
-  else if (Array.isArray(sector.player_stations)) normalized.playerStations = sector.player_stations as PlayerStationEntry[]
-  if (Array.isArray(sector.xenonStations)) normalized.xenonStations = sector.xenonStations as FactionStationEntry[]
-  else if (Array.isArray(sector.xenon_stations)) normalized.xenonStations = sector.xenon_stations as FactionStationEntry[]
-  if (Array.isArray(sector.khaakStations)) normalized.khaakStations = sector.khaakStations as FactionStationEntry[]
-  else if (Array.isArray(sector.khaak_stations)) normalized.khaakStations = sector.khaak_stations as FactionStationEntry[]
-  if (Array.isArray(sector.npcStations)) normalized.npcStations = sector.npcStations as NpcStationEntry[]
-  else if (Array.isArray(sector.npc_stations)) normalized.npcStations = sector.npc_stations as NpcStationEntry[]
-
-  if (Array.isArray(sector.stations)) {
-    for (const station of sector.stations) {
-      const key = classifyLegacyStation(station)
-      ;(normalized[key] as StationEntry[]).push(station)
-    }
-  }
+  normalized.datavaults = sector.datavaults || {}
+  normalized.erlking_vaults = sector.erlking_vaults || {}
+  normalized.abandoned_ships = sector.abandoned_ships || {}
+  normalized.player_stations = sector.player_stations || {}
+  normalized.xenon_stations = sector.xenon_stations || {}
+  normalized.khaak_stations = sector.khaak_stations || {}
+  normalized.npc_stations = sector.npc_stations || {}
+  normalized.player_buildstorages = sector.player_buildstorages || {}
 
   return normalized
 }
@@ -335,7 +302,11 @@ function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
       playerName: meta.playerName,
       version: meta.version,
       filename: meta.filename,
-      parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
+      parser_version: meta.parser_version === 'v1'
+        ? 'v1'
+        : meta.parser_version === 'v2'
+          ? 'v2'
+          : 'v3',
       post_processor_version: meta.post_processor_version as SaveMeta['post_processor_version'],
       source: meta.source
     },
@@ -745,7 +716,11 @@ export const useSaveStore = defineStore('save', () => {
         meta: {
           ...meta,
           filename: typeof meta.filename === 'string' ? meta.filename : '',
-          parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
+          parser_version: meta.parser_version === 'v1'
+            ? 'v1'
+            : meta.parser_version === 'v2'
+              ? 'v2'
+              : 'v3',
           post_processor_version: meta.post_processor_version === 'v1'
             ? 'v1'
             : meta.post_processor_version === 'v2'
