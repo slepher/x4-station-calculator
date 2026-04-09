@@ -25410,14 +25410,6 @@
     <restriction licence="capitalequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="20" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="28"/>
-        <ware ware="energycells" amount="1650"/>
-        <ware ware="metallicmicrolattice" amount="245"/>
-        <ware ware="siliconcarbide" amount="45"/>
-      </primary>
-    </production>
   </ware>
   <ware id="engine_ter_m_virtual_01_mk1" name="{20107,2844}" description="{20107,2842}" group="engines" transport="equipment" volume="1" tags="engine equipment nocustomgamestart nodiplomacyblueprint">
     <price min="76478" average="95598" max="114717"/>
@@ -25433,14 +25425,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="15" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="3"/>
-        <ware ware="energycells" amount="265"/>
-        <ware ware="metallicmicrolattice" amount="38"/>
-        <ware ware="siliconcarbide" amount="5"/>
-      </primary>
-    </production>
   </ware>
   <ware id="engine_ter_s_virtual_01_mk1" name="{20107,1854}" description="{20107,1852}" group="engines" transport="equipment" volume="1" tags="engine equipment nocustomgamestart nodiplomacyblueprint">
     <price min="15563" average="19453" max="23344"/>
@@ -25455,13 +25439,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="energycells" amount="155"/>
-        <ware ware="metallicmicrolattice" amount="15"/>
-        <ware ware="siliconcarbide" amount="4"/>
-      </primary>
-    </production>
   </ware>
   <ware id="engine_xen_xl_mothership_01_allround_mk1" name="{20107,9024}" description="{20107,9022}" group="engines" transport="equipment" volume="1" tags="engine equipment noplayerblueprint">
     <price min="498332" average="600400" max="702468"/>
@@ -25491,19 +25468,6 @@
     <restriction licence="capitalequipment"/>
     <use threshold="0"/>
     <owner faction="ownerless"/>
-    <production time="3" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="energycells" amount="7"/>
-        <ware ware="hullparts" amount="1"/>
-      </primary>
-    </production>
-    <production time="3" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="energycells" amount="8"/>
-        <ware ware="metallicmicrolattice" amount="6"/>
-        <ware ware="siliconcarbide" amount="1"/>
-      </primary>
-    </production>
   </ware>
   <ware id="missile_flagship_light_mk1" name="{20105,6314}" description="{20105,6312}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
     <price min="1400" average="1680" max="1950"/>
@@ -25519,19 +25483,6 @@
     <restriction licence="capitalequipment"/>
     <use threshold="0"/>
     <owner faction="ownerless"/>
-    <production time="3" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="energycells" amount="4"/>
-        <ware ware="hullparts" amount="1"/>
-      </primary>
-    </production>
-    <production time="3" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="energycells" amount="8"/>
-        <ware ware="metallicmicrolattice" amount="5"/>
-        <ware ware="siliconcarbide" amount="1"/>
-      </primary>
-    </production>
   </ware>
   <ware id="module_conn_arg_antigonearc_01" name="{20104,55101}" description="{20104,55102}" transport="container" volume="1" tags="module rewarded">
     <price min="160148" average="188410" max="216671"/>
@@ -25770,13 +25721,6 @@
     <restriction licence="capitalequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="20" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="5"/>
-        <ware ware="energycells" amount="385"/>
-        <ware ware="metallicmicrolattice" amount="15"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_l_standard_02_mk2" name="{20106,3174}" description="{20106,3172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="494028" average="548920" max="603812"/>
@@ -25791,14 +25735,6 @@
     <restriction licence="capitalequipment"/>
     <use threshold="0.25"/>
     <owner faction="terran"/>
-    <production time="20" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="22"/>
-        <ware ware="energycells" amount="1115"/>
-        <ware ware="metallicmicrolattice" amount="165"/>
-        <ware ware="siliconcarbide" amount="14"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_l_standard_02_mk3" name="{20106,3184}" description="{20106,3182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="1294817" average="1523314" max="1751811"/>
@@ -25813,14 +25749,6 @@
     <restriction licence="capitalequipment"/>
     <use threshold="0.55"/>
     <owner faction="terran"/>
-    <production time="20" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="58"/>
-        <ware ware="energycells" amount="2415"/>
-        <ware ware="metallicmicrolattice" amount="490"/>
-        <ware ware="siliconcarbide" amount="42"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_m_standard_04_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="69473" average="86842" max="104210"/>
@@ -25835,14 +25763,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="3"/>
-        <ware ware="energycells" amount="212"/>
-        <ware ware="metallicmicrolattice" amount="23"/>
-        <ware ware="siliconcarbide" amount="4"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_m_standard_04_mk2" name="{20106,2184}" description="{20106,2182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="129373" average="161716" max="194059"/>
@@ -25857,14 +25777,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0.25"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="4"/>
-        <ware ware="energycells" amount="285"/>
-        <ware ware="metallicmicrolattice" amount="32"/>
-        <ware ware="siliconcarbide" amount="20"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_m_standard_04_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="566175" average="707718" max="849262"/>
@@ -25879,14 +25791,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0.55"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="9"/>
-        <ware ware="energycells" amount="1645"/>
-        <ware ware="metallicmicrolattice" amount="15"/>
-        <ware ware="siliconcarbide" amount="135"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_m_virtual_01_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="69473" average="86842" max="104210"/>
@@ -25902,14 +25806,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="3"/>
-        <ware ware="energycells" amount="368"/>
-        <ware ware="metallicmicrolattice" amount="27"/>
-        <ware ware="siliconcarbide" amount="2"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_m_virtual_01_mk2" name="{20106,2184}" description="{20106,2182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="129373" average="161716" max="185975"/>
@@ -25925,14 +25821,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0.25"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="4"/>
-        <ware ware="energycells" amount="1475"/>
-        <ware ware="metallicmicrolattice" amount="155"/>
-        <ware ware="siliconcarbide" amount="2"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_m_virtual_01_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="566175" average="707718" max="849262"/>
@@ -25948,14 +25836,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0.55"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="26"/>
-        <ware ware="energycells" amount="1855"/>
-        <ware ware="metallicmicrolattice" amount="187"/>
-        <ware ware="siliconcarbide" amount="18"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_s_virtual_01_mk1" name="{20106,1224}" description="{20106,1222}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="11811" average="14763" max="17716"/>
@@ -25970,14 +25850,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="1"/>
-        <ware ware="energycells" amount="83"/>
-        <ware ware="metallicmicrolattice" amount="20"/>
-        <ware ware="siliconcarbide" amount="2"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_ter_s_xperimental_01_mk5" name="{20106,1264}" description="{20106,1262}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="389810" average="458600" max="527390"/>
@@ -25993,14 +25865,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="15"/>
-        <ware ware="energycells" amount="2225"/>
-        <ware ware="metallicmicrolattice" amount="215"/>
-        <ware ware="siliconcarbide" amount="13"/>
-      </primary>
-    </production>
   </ware>
   <ware id="shield_xen_xl_mothership_01_mk1" name="{20106,9024}" description="{20106,9022}" group="shields" transport="equipment" volume="1" tags="equipment noplayerblueprint shield">
     <price min="320048" average="385600" max="451152"/>
@@ -26075,13 +25939,6 @@
     <component ref="ship_ter_l_flagship_01_a_macro"/>
     <restriction licence="capitalship"/>
     <owner faction="ownerless"/>
-    <production time="187" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="124"/>
-        <ware ware="energycells" amount="1365"/>
-        <ware ware="metallicmicrolattice" amount="315"/>
-      </primary>
-    </production>
   </ware>
   <ware id="ship_ter_m_corvette_02_a" name="{20101,64801}" description="{20101,64811}" transport="ship" volume="1" tags="nocustomgamestart ship">
     <price min="1128622" average="1410777" max="1692933"/>
@@ -26094,13 +25951,6 @@
     <component ref="ship_ter_m_corvette_02_a_macro"/>
     <restriction licence="militaryship"/>
     <owner faction="ownerless"/>
-    <production time="15" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="24"/>
-        <ware ware="energycells" amount="285"/>
-        <ware ware="metallicmicrolattice" amount="42"/>
-      </primary>
-    </production>
   </ware>
   <ware id="ship_ter_s_fighter_04_a" name="{20101,60401}" description="{20101,60411}" transport="ship" volume="1" tags="nocustomgamestart ship">
     <price min="275041" average="343801" max="412561"/>
@@ -26113,13 +25963,6 @@
     <component ref="ship_ter_s_fighter_04_a_macro"/>
     <restriction licence="militaryship"/>
     <owner faction="ownerless"/>
-    <production time="15" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="7"/>
-        <ware ware="energycells" amount="85"/>
-        <ware ware="metallicmicrolattice" amount="25"/>
-      </primary>
-    </production>
   </ware>
   <ware id="ship_ter_s_xperimental_01_a" name="{20101,122801}" description="{20101,122811}" transport="ship" volume="1" tags="limited nocustomgamestart ship">
     <price min="1058607" average="1323258" max="1587910"/>
@@ -26132,14 +25975,6 @@
     <component ref="ship_ter_s_xperimental_01_a_macro"/>
     <restriction licence="militaryship"/>
     <owner faction="ownerless"/>
-    <production time="60" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="18"/>
-        <ware ware="energycells" amount="1785"/>
-        <ware ware="metallicmicrolattice" amount="155"/>
-        <ware ware="siliconcarbide" amount="15"/>
-      </primary>
-    </production>
   </ware>
   <ware id="ship_xen_xl_mothership_01" name="{20101,72101}" description="{20101,72111}" transport="ship" volume="1" tags="noplayerblueprint ship">
     <price min="13039000" average="15340000" max="17641000"/>
@@ -26167,14 +26002,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="2"/>
-        <ware ware="energycells" amount="75"/>
-        <ware ware="metallicmicrolattice" amount="8"/>
-        <ware ware="siliconcarbide" amount="3"/>
-      </primary>
-    </production>
   </ware>
   <ware id="turret_ter_m_laser_04_mk1" name="{20105,7014}" description="{20105,7012}" group="turrets" transport="equipment" volume="1" tags="equipment missiononly turret">
     <price min="43104" average="51933" max="60762"/>
@@ -26189,14 +26016,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="2"/>
-        <ware ware="energycells" amount="75"/>
-        <ware ware="metallicmicrolattice" amount="8"/>
-        <ware ware="siliconcarbide" amount="3"/>
-      </primary>
-    </production>
   </ware>
   <ware id="turret_xen_xl_battleship_01_mk1" name="{20105,9074}" description="{20105,9072}" group="turrets" transport="equipment" volume="1" tags="equipment noplayerblueprint turret">
     <price min="40670" average="49000" max="57330"/>
@@ -26234,14 +26053,6 @@
     <restriction licence="capitalequipment"/>
     <use threshold="0"/>
     <owner faction="ownerless"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="121"/>
-        <ware ware="energycells" amount="345"/>
-        <ware ware="metallicmicrolattice" amount="485"/>
-        <ware ware="siliconcarbide" amount="98"/>
-      </primary>
-    </production>
   </ware>
   <ware id="weapon_ter_m_laser_02_mk1" name="{20105,2564}" description="{20105,2562}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
     <price min="82456" average="109941" max="140725"/>
@@ -26256,14 +26067,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="4"/>
-        <ware ware="energycells" amount="367"/>
-        <ware ware="metallicmicrolattice" amount="28"/>
-        <ware ware="siliconcarbide" amount="3"/>
-      </primary>
-    </production>
   </ware>
   <ware id="weapon_ter_s_laser_02_mk1" name="{20105,1564}" description="{20105,1562}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
     <price min="29605" average="39474" max="50527"/>
@@ -26278,14 +26081,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="1"/>
-        <ware ware="energycells" amount="65"/>
-        <ware ware="metallicmicrolattice" amount="23"/>
-        <ware ware="siliconcarbide" amount="4"/>
-      </primary>
-    </production>
   </ware>
   <ware id="weapon_ter_s_plasma_01_mk1" name="{20105,1554}" description="{20105,1552}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
     <price min="49210" average="65613" max="83985"/>
@@ -26300,14 +26095,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="terran"/>
-    <production time="10" amount="1" method="terran" name="{20206,901}">
-      <primary>
-        <ware ware="computronicsubstrate" amount="3"/>
-        <ware ware="energycells" amount="65"/>
-        <ware ware="metallicmicrolattice" amount="4"/>
-        <ware ware="siliconcarbide" amount="2"/>
-      </primary>
-    </production>
   </ware>
   <ware id="ship_par_l_expeditionary_01_a" name="{20101,33101}" description="{20101,33111}" transport="ship" volume="1" tags="hiddenwithoutlicence ship">
     <price min="2905313" average="3418015" max="3930717"/>
@@ -26353,13 +26140,6 @@
     <restriction licence="envoy_access"/>
     <use threshold="0"/>
     <owner faction="argon"/>
-    <production time="15" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="10"/>
-        <ware ware="energycells" amount="197"/>
-        <ware ware="hullparts" amount="60"/>
-      </primary>
-    </production>
   </ware>
   <ware id="engine_arg_m_corvette_01_mk2" name="{20107,9054}" description="{20107,9052}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
     <price min="489379" average="575740" max="662101"/>
@@ -26375,13 +26155,6 @@
     <restriction licence="envoy_access"/>
     <use threshold="0.7"/>
     <owner faction="argon"/>
-    <production time="15" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="25"/>
-        <ware ware="energycells" amount="341"/>
-        <ware ware="hullparts" amount="144"/>
-      </primary>
-    </production>
   </ware>
   <ware id="engine_tel_m_corvette_01_mk1" name="{20107,9044}" description="{20107,9042}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
     <price min="171139" average="201340" max="231541"/>
@@ -26398,13 +26171,6 @@
     <use threshold="0"/>
     <owner faction="ministry"/>
     <owner faction="scaleplate"/>
-    <production time="15" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="8"/>
-        <ware ware="energycells" amount="208"/>
-        <ware ware="hullparts" amount="50"/>
-      </primary>
-    </production>
   </ware>
   <ware id="engine_tel_m_corvette_01_mk2" name="{20107,9064}" description="{20107,9062}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
     <price min="410729" average="483210" max="555692"/>
@@ -26420,13 +26186,6 @@
     <restriction licence="envoy_access"/>
     <use threshold="0.7"/>
     <owner faction="ministry"/>
-    <production time="15" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="21"/>
-        <ware ware="energycells" amount="271"/>
-        <ware ware="hullparts" amount="121"/>
-      </primary>
-    </production>
   </ware>
   <ware id="research_ship_gen_m_corvette_02" name="{20216,4001}" description="{20216,4002}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
     <price min="1" average="1" max="1"/>
@@ -26455,13 +26214,6 @@
     <owner faction="argon"/>
     <owner faction="ministry"/>
     <owner faction="scaleplate"/>
-    <production time="20" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="3"/>
-        <ware ware="energycells" amount="69"/>
-        <ware ware="hullparts" amount="18"/>
-      </primary>
-    </production>
   </ware>
   <ware id="ship_gen_m_corvette_01" name="{20101,123601}" description="{20101,123611}" transport="ship" volume="1" tags="hiddenwithoutlicence onlyownerbuild ship">
     <price min="1083822" average="1275085" max="1466348"/>
@@ -26475,13 +26227,6 @@
     <restriction licence="envoy_access"/>
     <owner faction="argon"/>
     <owner faction="ministry"/>
-    <production time="26" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="75"/>
-        <ware ware="energycells" amount="798"/>
-        <ware ware="hullparts" amount="427"/>
-      </primary>
-    </production>
   </ware>
   <ware id="ship_gen_m_corvette_02" name="{20101,123701}" description="{20101,123711}" transport="ship" volume="1" tags="hiddenwithoutlicence nocustomgamestart nodiplomacyblueprint ship">
     <price min="777444" average="914640" max="1051836"/>
@@ -26494,13 +26239,6 @@
     <component ref="ship_gen_m_corvette_02_macro"/>
     <restriction licence="envoy_access"/>
     <owner faction="scaleplate"/>
-    <production time="19" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="54"/>
-        <ware ware="energycells" amount="587"/>
-        <ware ware="hullparts" amount="308"/>
-      </primary>
-    </production>
   </ware>
   <ware id="turret_gen_m_disabler_01_mk1" name="{20105,7044}" description="{20105,7042}" group="turrets" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild turret">
     <price min="10061" average="60363" max="67070"/>
@@ -26515,13 +26253,6 @@
     <restriction licence="envoy_access"/>
     <use threshold="0"/>
     <owner faction="ministry"/>
-    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="2"/>
-        <ware ware="energycells" amount="158"/>
-        <ware ware="hullparts" amount="17"/>
-      </primary>
-    </production>
   </ware>
   <ware id="turret_gen_m_gatling_01_mk1" name="{20105,7054}" description="{20105,7052}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="36999" average="41110" max="45221"/>
@@ -26536,13 +26267,6 @@
     <restriction licence="generaluseequipment"/>
     <use threshold="0"/>
     <owner faction="scaleplate"/>
-    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="1"/>
-        <ware ware="energycells" amount="79"/>
-        <ware ware="hullparts" amount="7"/>
-      </primary>
-    </production>
   </ware>
   <ware id="turret_gen_m_shieldpierce_01_mk1" name="{20105,7034}" description="{20105,7032}" group="turrets" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild turret">
     <price min="75456" average="83840" max="92224"/>
@@ -26557,13 +26281,6 @@
     <restriction licence="envoy_access"/>
     <use threshold="0"/>
     <owner faction="argon"/>
-    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="3"/>
-        <ware ware="energycells" amount="137"/>
-        <ware ware="hullparts" amount="20"/>
-      </primary>
-    </production>
   </ware>
   <ware id="weapon_gen_m_disabler_01_mk1" name="{20105,2594}" description="{20105,2592}" group="weapons" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild weapon">
     <price min="399870" average="444300" max="488730"/>
@@ -26579,13 +26296,6 @@
     <use threshold="0"/>
     <owner faction="ministry"/>
     <owner faction="scaleplate"/>
-    <production time="20" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="19"/>
-        <ware ware="energycells" amount="283"/>
-        <ware ware="hullparts" amount="111"/>
-      </primary>
-    </production>
   </ware>
   <ware id="weapon_gen_m_shieldpierce_01_mk1" name="{20105,2584}" description="{20105,2582}" group="weapons" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild weapon">
     <price min="300659" average="334065" max="334065"/>
@@ -26600,12 +26310,5 @@
     <restriction licence="envoy_access"/>
     <use threshold="0"/>
     <owner faction="argon"/>
-    <production time="20" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="14"/>
-        <ware ware="energycells" amount="232"/>
-        <ware ware="hullparts" amount="82"/>
-      </primary>
-    </production>
   </ware>
 </wares>

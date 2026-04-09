@@ -470,7 +470,7 @@
     
     <!-- Gaian Prophecy -->
     <!-- scientific gamestart player HQ -->
-    <station id="x4ep1_gamestart_scientist_hq" race="terran" owner="pioneers" type="headquarters" encyclopedia="true">
+    <station id="x4ep1_gamestart_scientist_hq_coh" race="terran" owner="pioneers" type="headquarters" encyclopedia="true">
       <quotas>
         <quota galaxy="1" zone="1" gamestart="x4ep1_gamestart_terran1" />
         <quota galaxy="1" zone="1" gamestart="x4ep1_gamestart_terran2" />
