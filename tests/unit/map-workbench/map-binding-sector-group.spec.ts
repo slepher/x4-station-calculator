@@ -393,6 +393,16 @@ describe('MapBindingSectorGroup', () => {
     expect(firstItem.text()).toContain('Beta:Anchor B')
   })
 
+  it('shows connected sectors in collapsed state even when there is no coverage', () => {
+    const wrapper = mount(MapBindingSectorGroup, {
+      props: { gameGuid: 'g-1' },
+      global: { stubs: { Teleport: true } }
+    })
+
+    const secondItem = wrapper.findAll('.empire-sector-item')[1]
+    expect(secondItem.text()).toContain('Alpha:Anchor A')
+  })
+
   it('focuses sector when clicking a connected sector pill', async () => {
     const wrapper = mount(MapBindingSectorGroup, {
       props: { gameGuid: 'g-1' },

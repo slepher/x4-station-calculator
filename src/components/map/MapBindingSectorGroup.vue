@@ -1063,37 +1063,35 @@ onBeforeUnmount(() => {
                 {{ getSectorMacroDisplayName(sector.sectorMacro) }}
               </span>
             </div>
-            <template v-if="sector.coverageMacros.length > 0">
-              <div
-                v-for="jump in sector.jumpRange"
-                :key="jump"
-                class="collapsed-pill-row"
-              >
-                <template v-if="getCollapsedCoverageByJump(sector.coverageMacros).get(jump)?.length || getCollapsedConnectedAtJump(sector.id, jump).length">
-                  <div class="jump-group-grid jump-group-grid--content-label jump-group-grid--pill-height-source jump-group-grid--compact-gap collapsed-jump-group-grid">
-                    <span class="jump-number jump-number--pill-height">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
-                    <div class="pill-list">
-                      <span
-                        v-for="macro in getCollapsedCoverageByJump(sector.coverageMacros).get(jump)"
-                        :key="macro"
-                        class="pill pill--small pill--clickable"
-                        @click.stop="focusSectorByMacro(macro)"
-                      >
-                        {{ getSectorMacroDisplayName(macro) }}
-                      </span>
-                      <span
-                        v-for="connected in getCollapsedConnectedAtJump(sector.id, jump)"
-                        :key="connected.sectorId"
-                        class="pill pill--small pill--connected pill--clickable"
-                        @click.stop="focusSectorByMacro(connected.sectorMacro)"
-                      >
-                        {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
-                      </span>
-                    </div>
+            <div
+              v-for="jump in sector.jumpRange"
+              :key="jump"
+              class="collapsed-pill-row"
+            >
+              <template v-if="getCollapsedCoverageByJump(sector.coverageMacros).get(jump)?.length || getCollapsedConnectedAtJump(sector.id, jump).length">
+                <div class="jump-group-grid jump-group-grid--content-label jump-group-grid--pill-height-source jump-group-grid--compact-gap collapsed-jump-group-grid">
+                  <span class="jump-number jump-number--pill-height">{{ jump }}{{ t('map.resource_filter_jump_suffix') }}</span>
+                  <div class="pill-list">
+                    <span
+                      v-for="macro in getCollapsedCoverageByJump(sector.coverageMacros).get(jump)"
+                      :key="macro"
+                      class="pill pill--small pill--clickable"
+                      @click.stop="focusSectorByMacro(macro)"
+                    >
+                      {{ getSectorMacroDisplayName(macro) }}
+                    </span>
+                    <span
+                      v-for="connected in getCollapsedConnectedAtJump(sector.id, jump)"
+                      :key="connected.sectorId"
+                      class="pill pill--small pill--connected pill--clickable"
+                      @click.stop="focusSectorByMacro(connected.sectorMacro)"
+                    >
+                      {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
+                    </span>
                   </div>
-                </template>
-              </div>
-            </template>
+                </div>
+              </template>
+            </div>
             <template v-if="getCollapsedConnectedJumps(sector.id).length > 0">
               <div
                 v-for="jump in getCollapsedConnectedJumps(sector.id).filter((value) => value > sector.jumpRange)"

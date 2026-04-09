@@ -331,9 +331,9 @@ watchEffect(() => {
 </script>
 
 <template>
+  <div class="map-svg-stage" :style="{ width: `${Math.round(renderedWidth)}px`, height: `${Math.round(renderedHeight)}px` }">
   <svg
     class="map-svg"
-    :class="{ 'zooming-text-hidden': isZooming }"
     data-testid="map-svg-canvas"
     :width="Math.round(renderedWidth)"
     :height="Math.round(renderedHeight)"
@@ -423,15 +423,6 @@ watchEffect(() => {
       @sector-leave="emitSectorLeave"
     />
 
-    <MapSectorLabelLayer
-      v-if="showSectorLabels && !isZooming"
-      :cluster-polygons="clusterPolygons"
-      :sector-label-font-size="SECTOR_LABEL_FONT_SIZE"
-      :map-font-family="MAP_FONT_FAMILY"
-      :sector-label-weight="sectorLabelWeight"
-      :sector-label-fill="sectorLabelFill"
-    />
-
     <MapOverlayLayer
       :overlay-screen-items="overlayScreenItems"
       :preview-screen-item="previewScreenItem"
@@ -447,17 +438,30 @@ watchEffect(() => {
       @save-poi-pointerdown="emit('save-poi-pointerdown', $event)"
     />
   </svg>
+
+    <MapSectorLabelLayer
+      v-if="showSectorLabels && !isZooming"
+      :cluster-polygons="clusterPolygons"
+      :sector-label-font-size="SECTOR_LABEL_FONT_SIZE"
+      :map-font-family="MAP_FONT_FAMILY"
+      :sector-label-weight="sectorLabelWeight"
+      :sector-label-fill="sectorLabelFill"
+      :viewport-width="renderedWidth"
+      :viewport-height="renderedHeight"
+      :view-box-bounds="viewBoxBounds"
+    />
+  </div>
 </template>
 
 <style scoped>
+.map-svg-stage {
+  position: relative;
+  display: block;
+}
+
 .map-svg {
   display: block;
   user-select: none;
   pointer-events: none;
-}
-
-.map-svg.zooming-text-hidden :deep(.sector-label),
-.map-svg.zooming-text-hidden :deep(.resource-badge) {
-  display: none;
 }
 </style>
