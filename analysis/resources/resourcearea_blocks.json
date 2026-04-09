@@ -301212,5 +301212,14 @@
         }
       ]
     }
+  ],
+  "cluster_01_sector001_macro": [
+    {
+      "ref": "region_alpha",
+      "total": {
+        "ore": 120
+      },
+      "tiles": []
+    }
   ]
 }
