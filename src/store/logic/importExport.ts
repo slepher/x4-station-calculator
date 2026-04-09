@@ -865,7 +865,10 @@ function sanitizeSaveArchives(
     }
   }
 
-  const activeArchiveId = input.state.activeArchiveId && validMetas.some(m => m.id === input.state.activeArchiveId)
+  const activeArchiveId = input.state.activeArchiveId && (
+    validMetas.some(m => m.id === input.state.activeArchiveId) ||
+    validMetas.some(m => m.guid === input.state.activeArchiveId)
+  )
     ? input.state.activeArchiveId
     : (validMetas[0]?.id || null)
 

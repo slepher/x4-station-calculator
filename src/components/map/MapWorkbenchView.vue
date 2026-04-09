@@ -4,14 +4,15 @@ import { useI18n } from 'vue-i18n'
 import MapSvgCanvas from '@/components/map/MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
-import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
 import MapSavePanel from './MapSavePanel.vue'
 import MapSavePoiVisibilityControl from './MapSavePoiVisibilityControl.vue'
+import MapSvgDiagnosticVisibilityControl from './MapSvgDiagnosticVisibilityControl.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
-import { getSectorScalePerRadius, sectorLocalRatioToRawPoint } from '@/components/map/utils/coordinates'
-import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
+import { getSectorScalePerRadius, sectorLocalRatioToRawPointWithScale, sectorPointToLocalRatioWithScale } from '@/components/map/utils/coordinates'
+import { hexVertices } from '@/components/map/utils/geometry'
+import { resolveMapSectorByMacro, resolveSectorMacroById } from '@/components/map/utils/mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
@@ -19,6 +20,8 @@ import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 import { useSaveStore } from '@/store/useSaveStore'
 import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
+import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
+import type { StationPlan } from '@/types/x4'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -49,7 +52,6 @@ type MapSectorDataset = {
   resources: MapSectorResourceEntry[]
   scalePerRadius: number
 }
-const UNASSIGNED_STATION_GROUP_ID = '__unassigned__'
 type SectorHoverPayload = {
   sectorId: string
   clusterId: string
@@ -81,12 +83,23 @@ type PlacementOverlayItem = {
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: EntityLocation
+  localRatio?: { x: number; y: number }
+  draggable?: boolean
+  savePoiVisual?: SavePoiOverlayItem
+  binding?: {
+    gameGuid: string
+    sectorGroupId: string
+    coverageSectorMacros: string[]
+    isVirtualTradestation?: boolean
+  }
 }
 type PlacementPreview = {
   kind: 'station' | 'sector'
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
   location: EntityLocation
+  localRatio?: { x: number; y: number }
+  savePoiVisual?: SavePoiOverlayItem
 }
 type DraggingPlacementItem = {
   id: string
@@ -99,11 +112,13 @@ const clusterRefHeightPx = ref(142)
 const MAX_SCALE_MULTIPLIER = 4
 const TOOLTIP_OFFSET = 14
 const TOOLTIP_VIEWPORT_PADDING = 12
+const ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT = true
 
 const viewportRef = ref<HTMLDivElement | null>(null)
 const searchInputRef = ref<HTMLInputElement | null>(null)
 const tooltipRef = ref<InstanceType<typeof MapSectorTooltip> | null>(null)
 const viewportResizeObserver = ref<ResizeObserver | null>(null)
+const viewportSize = ref({ width: 0, height: 0 })
 
 const imageNaturalWidth = ref(0)
 const imageNaturalHeight = ref(0)
@@ -131,11 +146,16 @@ const selectedSectorSource = ref<'search' | 'resource' | null>(null)
 const searchSectors = ref<SearchSectorLayout[]>([])
 const resourceHighlightedSectorIds = ref<string[]>([])
 const isResourcePanelOpen = ref(false)
-const isStationPanelOpen = ref(false)
 const isSavePanelOpen = ref(false)
+const isBindingPanelOpen = ref(false)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
+const mapDiagnosticVisibility = ref({
+  sectorLabels: true,
+  sectorLinks: true,
+  resourceBadges: true
+})
 const settledSavePoiViewportContentBounds = ref<{
   left: number
   top: number
@@ -147,6 +167,15 @@ const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
 const draggingPlacementItem = ref<DraggingPlacementItem | null>(null)
 const draggingOverlayKey = ref<string | null>(null)
+const draggingBindingKey = ref<string | null>(null)
+const draggingSectorGroupId = ref<string | null>(null)
+const draggingFreeSector = ref<{ sectorGroupId: string; name: string } | null>(null)
+const draggingFreeStation = ref<{ stationId: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' } | null>(null)
+const draggingVirtualTradestation = ref<{ sectorGroupId: string; name: string } | null>(null)
+const draggingCoverageSectorMacros = ref<Set<string>>(new Set())
+const bindingContextGameGuid = ref<string | null>(null)
+const bindingContextStage = ref<'select-binding' | 'select-sector' | 'select-station'>('select-binding')
+const dragEnabledBindingSectorGroupId = ref<string | null>(null)
 const focusedPlacementKey = ref<string | null>(null)
 const placementPreview = ref<PlacementPreview | null>(null)
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
@@ -196,79 +225,342 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
 
 const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
-const stationPanelItems = computed<MapStationPanelItem[]>(() => {
-  const empire = empireStore.activeEmpire
-  if (!empire) return []
-  const sortedSectors = [...(empire.sectors || [])].sort((left, right) => (left.order || 0) - (right.order || 0))
-  const items: MapStationPanelItem[] = []
-
-  sortedSectors.forEach((sector) => {
-    items.push({
-      id: sector.id,
-      kind: 'sector',
-      name: sector.name,
+const isFreeStationDropForbidden = computed(() => {
+  if (!draggingFreeStation.value && !draggingVirtualTradestation.value && !draggingFreeSector.value) return false
+  if (!placementPreview.value) return true
+  if (draggingFreeSector.value) return false
+  const location = placementPreview.value.location
+  const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
+  return sectorMacro ? !draggingCoverageSectorMacros.value.has(sectorMacro) : true
+})
+const activeBindingDragPreview = computed<{
+  kind: 'station'
+  name: string
+  icon: 'factory' | 'shipyard' | 'tradestation'
+  savePoiVisual?: SavePoiOverlayItem
+} | null>(() => {
+  if (draggingVirtualTradestation.value) {
+    const sectorMacro = Array.from(draggingCoverageSectorMacros.value)[0] || ''
+    return {
+      kind: 'station',
+      name: draggingVirtualTradestation.value.name,
       icon: 'tradestation',
-      groupId: sector.id,
-      groupName: sector.name,
-      targetSectorName: sector.location ? (sectorsById.value[sector.location.sector_id]?.displayName || sector.location.sector_id) : undefined,
-      location: sector.location
-    })
-
-    ;(empire.stations || [])
-      .filter((station) => station.sectorId === sector.id)
-      .forEach((station) => {
-        const targetSectorId = station.location?.sector_id
-        const isAddressInactive = gameDataStore.enforceDlcActivation &&
-          targetSectorId !== undefined &&
-          sectorsById.value[targetSectorId] === undefined
-        items.push({
-          id: station.id,
-          kind: 'station',
-          name: station.name,
-          icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
-          groupId: sector.id,
-          groupName: sector.name,
-          targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
-          location: station.location,
-          isAddressInactive
-        })
+      savePoiVisual: buildBindingSavePoiVisual({
+        key: `preview:tradestation:${draggingVirtualTradestation.value.sectorGroupId}`,
+        code: `preview:tradestation:${draggingVirtualTradestation.value.sectorGroupId}`,
+        sectorMacro,
+        position: { x: 0, z: 0 },
+        isVirtualTradestation: true,
+        sectorGroupId: draggingVirtualTradestation.value.sectorGroupId
       })
+    }
+  }
+  if (draggingFreeStation.value) {
+    const station = empireStore.activeEmpire?.stations?.find((item) => item.id === draggingFreeStation.value?.stationId) || null
+    const sectorMacro = Array.from(draggingCoverageSectorMacros.value)[0] || ''
+    return {
+      kind: 'station',
+      name: draggingFreeStation.value.name,
+      icon: draggingFreeStation.value.icon,
+      savePoiVisual: buildBindingSavePoiVisual({
+        key: `preview:station:${draggingFreeStation.value.stationId}`,
+        code: station?.name || draggingFreeStation.value.stationId,
+        sectorMacro,
+        position: { x: 0, z: 0 },
+        station
+      })
+    }
+  }
+  return null
+})
+
+const resolveBindingArchive = (gameGuid: string | null) => {
+  if (!gameGuid) return null
+  const binding = empireStore.activeEmpire?.saveBindings?.find((item) => item.gameGuid === gameGuid) || null
+  const selected = saveStore.selectedArchive
+  if (selected && selected.meta.guid === gameGuid) {
+    if (binding?.selectedArchiveTime === null || binding?.selectedArchiveTime === undefined || selected.meta.time === binding?.selectedArchiveTime) {
+      return selected
+    }
+  }
+  const group = saveStore.archives.get(gameGuid)
+  if (!group) return null
+  const selectedTime = binding?.selectedArchiveTime
+  if (selectedTime === null || selectedTime === undefined) return group.saves[0] || null
+  return group.saves.find((save) => save.meta.time === selectedTime) || group.saves[0] || null
+}
+
+const loggedBindingDataErrors = new Set<string>()
+
+const logBindingDataError = (reason: string, detail: Record<string, unknown>) => {
+  const key = `${reason}:${detail.gameGuid || 'none'}:${detail.sectorMacro || detail.sectorId || 'none'}`
+  if (loggedBindingDataErrors.has(key)) return
+  loggedBindingDataErrors.add(key)
+  console.error('[MapWorkbench][BindingData]', reason, detail)
+}
+
+const resolveBindingScaleContext = (gameGuid: string | null, sectorMacro: string | null, sectorId?: string) => {
+  const mapSector = sectorId ? gameDataStore.maps?.sectors?.[sectorId] : null
+  const mapScalePerRadius = mapSector ? getSectorScalePerRadius(mapSector as Parameters<typeof getSectorScalePerRadius>[0]) : 0
+  if (!gameGuid || !sectorMacro) {
+    return {
+      scalePerRadius: mapScalePerRadius,
+      source: 'map' as const
+    }
+  }
+  const archiveSector = resolveBindingArchive(gameGuid)?.sectors?.[sectorMacro]
+  if (!archiveSector) {
+    return {
+      scalePerRadius: mapScalePerRadius,
+      source: 'map-fallback-missing-archive-sector' as const
+    }
+  }
+  if (typeof archiveSector.scale_per_radius === 'number' && Number.isFinite(archiveSector.scale_per_radius) && archiveSector.scale_per_radius > 0) {
+    return {
+      scalePerRadius: archiveSector.scale_per_radius,
+      source: 'archive' as const
+    }
+  }
+  logBindingDataError('archive-sector-missing-scale', {
+    gameGuid,
+    sectorMacro,
+    sectorId,
+    hasArchiveSector: true,
+    archiveScalePerRadius: archiveSector.scale_per_radius ?? null,
+    mapScalePerRadius
+  })
+  return {
+    scalePerRadius: 0,
+    source: 'archive-missing-scale' as const
+  }
+}
+
+const buildSaveSectorLocalRatio = (
+  gameGuid: string | null,
+  sectorMacro: string | null,
+  sectorId: string,
+  position: { x: number; z: number }
+) => {
+  const sector = gameDataStore.maps?.sectors?.[sectorId]
+  if (!sector) return undefined
+  const scaleContext = resolveBindingScaleContext(gameGuid, sectorMacro, sectorId)
+  return sectorPointToLocalRatioWithScale(
+    sector as Parameters<typeof sectorPointToLocalRatioWithScale>[0],
+    position,
+    { scalePerRadius: scaleContext.scalePerRadius }
+  ) || undefined
+}
+
+const resolveSectorDisplayNameByMacro = (sectorMacro: string) => {
+  const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, sectorMacro)
+  if (!resolved?.sectorId) return sectorMacro
+  const sector = gameDataStore.maps?.sectors?.[resolved.sectorId]
+  if (sector?.nameId && te(sector.nameId)) return t(sector.nameId)
+  return sector?.name || sectorMacro
+}
+
+const resolveEmpireSectorGroupName = (sectorGroupId: string) =>
+  empireStore.activeEmpire?.sectors?.find((sector) => sector.id === sectorGroupId)?.name || sectorGroupId
+
+const buildBindingSavePoiVisual = (input: {
+  key: string
+  code: string
+  sectorMacro: string
+  position: { x: number; y?: number; z: number; tx?: number; ty?: number }
+  station?: StationPlan | null
+  isVirtualTradestation?: boolean
+  sectorGroupId?: string
+}): SavePoiOverlayItem => {
+  if (input.isVirtualTradestation) {
+    return {
+      key: input.key,
+      code: input.sectorGroupId ? resolveEmpireSectorGroupName(input.sectorGroupId) : input.code,
+      category: 'playerStation',
+      owner: 'player',
+      sectorMacro: input.sectorMacro,
+      sectorName: resolveSectorDisplayNameByMacro(input.sectorMacro),
+      position: {
+        x: input.position.x,
+        y: input.position.y || 0,
+        z: input.position.z,
+        tx: input.position.tx,
+        ty: input.position.ty
+      },
+      tag: 'tradestation'
+    }
+  }
+
+  const station = input.station
+  const aggregatedModules = station ? buildAggregatedModulesFromStationPlan(station, gameDataStore.modulesMap) : []
+  const modulesByMacroId = Object.fromEntries(
+    aggregatedModules
+      .map((module) => {
+        const matched = gameDataStore.modulesByMacroId[module.ref]
+        return matched ? [module.ref, matched] : null
+      })
+      .filter((entry): entry is [string, typeof gameDataStore.modulesByMacroId[string]] => Boolean(entry))
+  )
+  const classification = classifyPlayerStationPoi({
+    modules: aggregatedModules,
+    modulesByMacroId
   })
 
-  ;(empire.stations || [])
-    .filter((station) => !station.sectorId)
-    .forEach((station) => {
-      const targetSectorId = station.location?.sector_id
-      const isAddressInactive = gameDataStore.enforceDlcActivation &&
-        targetSectorId !== undefined &&
-        sectorsById.value[targetSectorId] === undefined
-      items.push({
-        id: station.id,
-        kind: 'station',
-        name: station.name,
-        icon: station.type === 'shipyard' ? 'shipyard' : 'factory',
-        groupId: UNASSIGNED_STATION_GROUP_ID,
-        groupName: t('sectorManagement.unassigned'),
-        targetSectorName: station.location ? (sectorsById.value[station.location.sector_id]?.displayName || station.location.sector_id) : undefined,
-        location: station.location,
-        isAddressInactive
-      })
-    })
+  return {
+    key: input.key,
+    code: input.code,
+    category: 'playerStation',
+    owner: 'player',
+    sectorMacro: input.sectorMacro,
+    sectorName: resolveSectorDisplayNameByMacro(input.sectorMacro),
+    position: {
+      x: input.position.x,
+      y: input.position.y || 0,
+      z: input.position.z,
+      tx: input.position.tx,
+      ty: input.position.ty
+    },
+    tag: classification.tag,
+    factoryGroup: classification.factoryGroup,
+    productionProfile: classification.productionProfile,
+    profileName: classification.profileName,
+    is_headquarter: classification.is_headquarter
+  }
+}
 
-  return items
-})
-const placementOverlays = computed<PlacementOverlayItem[]>(() => {
-  if (!isStationPanelOpen.value) return []
-  return stationPanelItems.value
-    .filter((item): item is MapStationPanelItem & { location: EntityLocation } => Boolean(item.location))
-    .map((item) => ({
-      key: `${item.kind}:${item.id}`,
-      id: item.id,
-      kind: item.kind,
-      name: item.name,
-      icon: item.icon,
-      location: item.location
-    }))
+const buildBindingPreview = (
+  _gameGuid: string | null,
+  location: EntityLocation,
+  localRatio: { x: number; y: number } | undefined,
+  input: {
+    kind: 'station' | 'sector'
+    name: string
+    icon: 'factory' | 'shipyard' | 'tradestation'
+    savePoiVisual?: SavePoiOverlayItem
+  }
+): PlacementPreview | null => {
+  return {
+    ...input,
+    location,
+    localRatio
+  }
+}
+
+const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
+  const empire = empireStore.activeEmpire
+  if (!empire) return []
+  if (!savePoiVisibility.value.playerStation) return []
+  const activePlan = (empire.saveBindings || []).find((plan) => plan.active) || null
+  if (!activePlan) return []
+
+  const overlays: PlacementOverlayItem[] = []
+  for (const plan of [activePlan]) {
+    for (const group of plan.groupBindings) {
+      const coverageSectorMacros = Array.from(new Set([
+        ...(group.sectorMacro ? [group.sectorMacro] : []),
+        ...(group.coverageSectorMacros || []).map((entry) => entry.ref)
+      ]))
+
+      if (group.tradestationBinding?.position && group.sectorMacro && !group.tradestationBinding.saveStationCode) {
+        const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, group.sectorMacro)
+        if (resolved) {
+          overlays.push({
+            key: `binding:tradestation:${group.sectorGroupId}`,
+            id: group.tradestationBinding.stationId,
+            kind: 'sector',
+            name: empire.sectors?.find(s => s.id === group.sectorGroupId)?.name || group.sectorGroupId,
+            icon: 'tradestation',
+            location: {
+              cluster_id: resolved.clusterId,
+              sector_id: resolved.sectorId,
+              pos: {
+                x: group.tradestationBinding.position.x,
+                z: group.tradestationBinding.position.z
+              },
+              sunlight: 0,
+              resources: []
+            },
+            localRatio: buildSaveSectorLocalRatio(plan.gameGuid, group.sectorMacro, resolved.sectorId, {
+              x: group.tradestationBinding.position.x,
+              z: group.tradestationBinding.position.z
+            }),
+            draggable: isBindingPanelOpen.value &&
+              bindingContextStage.value === 'select-station' &&
+              dragEnabledBindingSectorGroupId.value === group.sectorGroupId &&
+              bindingContextGameGuid.value === plan.gameGuid,
+            savePoiVisual: buildBindingSavePoiVisual({
+              key: `binding:tradestation:${group.sectorGroupId}`,
+              code: empire.sectors?.find(s => s.id === group.sectorGroupId)?.name || group.sectorGroupId,
+              sectorMacro: group.sectorMacro,
+              position: {
+                x: group.tradestationBinding.position.x,
+                z: group.tradestationBinding.position.z
+              },
+              isVirtualTradestation: true,
+              sectorGroupId: group.sectorGroupId
+            }),
+            binding: {
+              gameGuid: plan.gameGuid,
+              sectorGroupId: group.sectorGroupId,
+              coverageSectorMacros,
+              isVirtualTradestation: true
+            }
+          })
+        }
+      }
+
+      for (const stationBinding of group.stationBindings) {
+        if (stationBinding.saveStationCode) continue
+        if (stationBinding.position && stationBinding.sectorMacro) {
+          const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationBinding.sectorMacro)
+          if (resolved) {
+            const station = empire.stations?.find(s => s.id === stationBinding.stationId)
+            overlays.push({
+              key: `binding:station:${stationBinding.stationId}`,
+              id: stationBinding.stationId,
+              kind: 'station',
+              name: station?.name || stationBinding.stationId,
+              icon: station?.type === 'shipyard' ? 'shipyard' : 'factory',
+              location: {
+                cluster_id: resolved.clusterId,
+                sector_id: resolved.sectorId,
+                pos: {
+                  x: stationBinding.position.x,
+                  z: stationBinding.position.z
+                },
+                sunlight: 0,
+                resources: []
+              },
+              localRatio: buildSaveSectorLocalRatio(plan.gameGuid, stationBinding.sectorMacro, resolved.sectorId, {
+                x: stationBinding.position.x,
+                z: stationBinding.position.z
+              }),
+              draggable: isBindingPanelOpen.value &&
+                bindingContextStage.value === 'select-station' &&
+                dragEnabledBindingSectorGroupId.value === group.sectorGroupId &&
+                bindingContextGameGuid.value === plan.gameGuid,
+              savePoiVisual: buildBindingSavePoiVisual({
+                key: `binding:station:${stationBinding.stationId}`,
+                code: station?.name || stationBinding.stationId,
+                sectorMacro: stationBinding.sectorMacro,
+                position: {
+                  x: stationBinding.position.x,
+                  z: stationBinding.position.z
+                },
+                station
+              }),
+              binding: {
+                gameGuid: plan.gameGuid,
+                sectorGroupId: group.sectorGroupId,
+                coverageSectorMacros
+              }
+            })
+          }
+        }
+      }
+    }
+  }
+
+  return overlays
 })
 
 const activeMapArchive = computed<SaveArchive | null>(() =>
@@ -324,7 +616,7 @@ const saveSectorLinkOverrides = computed<Record<string, SectorData> | undefined>
 })
 
 const liveSavePoiViewportContentBounds = computed(() => {
-  const { width, height } = getViewportSize()
+  const { width, height } = viewportSize.value
   if (!width || !height || !scale.value) return null
   return {
     left: (-panX.value) / scale.value,
@@ -388,17 +680,20 @@ const factionColorMap = computed<Record<string, string> | undefined>(() => {
   return gameDataStore.factionColorMap
 })
 
-const getViewportSize = () => {
+const updateViewportSize = () => {
   const viewport = viewportRef.value
-  if (!viewport) return { width: 0, height: 0 }
-  return {
+  if (!viewport) {
+    viewportSize.value = { width: 0, height: 0 }
+    return
+  }
+  viewportSize.value = {
     width: viewport.clientWidth,
     height: viewport.clientHeight
   }
 }
 
 const mapViewBoxBounds = computed(() => {
-  const { width, height } = getViewportSize()
+  const { width, height } = viewportSize.value
   if (!width || !height || !scale.value) return null
   return {
     left: (-panX.value) / scale.value,
@@ -411,7 +706,7 @@ const mapViewBoxBounds = computed(() => {
 const clampScale = (next: number) => Math.min(maxScale.value, Math.max(minScale.value, next))
 
 const clampPan = (nextX: number, nextY: number) => {
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   const scaledW = imageNaturalWidth.value * scale.value
   const scaledH = imageNaturalHeight.value * scale.value
 
@@ -437,7 +732,7 @@ const clampPan = (nextX: number, nextY: number) => {
 }
 
 const applyScaleFromSlider = (value: number) => {
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const ratio = value / 100
@@ -462,7 +757,7 @@ const syncSliderFromScale = () => {
 
 const recomputeScaleBounds = () => {
   if (!imageNaturalWidth.value || !imageNaturalHeight.value) return
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const fitByWidth = vw / imageNaturalWidth.value
@@ -576,6 +871,15 @@ const settleZoomViewport = () => {
   settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
 }
 
+const triggerZoomSettling = () => {
+  isZooming.value = true
+  clearZoomSettleTimer()
+  zoomSettleTimer.value = window.setTimeout(() => {
+    settleZoomViewport()
+    zoomSettleTimer.value = null
+  }, 120)
+}
+
 const clearBrowserSelection = () => {
   const selection = window.getSelection?.()
   if (!selection) return
@@ -588,37 +892,75 @@ const getSectorElementAtPointer = (clientX: number, clientY: number) => {
   return element.closest('[data-map-sector-id], [data-sector-hover-id]') as SVGGraphicsElement | null
 }
 
-const resolveLocationFromSectorElement = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number): EntityLocation | null => {
+const pointInPolygon = (point: { x: number; y: number }, polygon: Array<{ x: number; y: number }>) => {
+  let inside = false
+  for (let i = 0, j = polygon.length - 1; i < polygon.length; j = i++) {
+    const a = polygon[i]
+    const b = polygon[j]
+    if (!a || !b) continue
+    const intersects = ((a.y > point.y) !== (b.y > point.y)) &&
+      (point.x < ((b.x - a.x) * (point.y - a.y)) / ((b.y - a.y) || Number.EPSILON) + a.x)
+    if (intersects) inside = !inside
+  }
+  return inside
+}
+
+const resolveSvgPointAtClient = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number) => {
+  const svg = sectorElement.ownerSVGElement
+  if (!svg) return null
+  const ctm = svg.getScreenCTM()
+  if (!ctm) return null
+  const point = new DOMPoint(clientX, clientY).matrixTransform(ctm.inverse())
+  return { x: point.x, y: point.y }
+}
+
+const resolveSectorPointerGeometrySample = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number) => {
   const sectorId = sectorElement.getAttribute('data-map-sector-id') || sectorElement.getAttribute('data-sector-hover-id')
   if (!sectorId) return null
   const mapSector = sectorsById.value[sectorId]
-  if (!mapSector || !mapSector.scalePerRadius) return null
-  const rect = sectorElement.getBoundingClientRect()
-  if (!rect.width || !rect.height) return null
-  const centerX = rect.left + rect.width / 2
-  const centerY = rect.top + rect.height / 2
-  const radius = rect.width / 2
-  if (!radius) return null
-  const ratioX = (clientX - centerX) / radius
-  const ratioY = (clientY - centerY) / radius
-  const sector = gameDataStore.maps?.sectors?.[sectorId]
-  const rawScale = 1 / mapSector.scalePerRadius
-  const rawPoint = sector
-    ? sectorLocalRatioToRawPoint(sector, {
-        x: ratioX,
-        y: ratioY
-      })
-    : null
-  return {
-    cluster_id: mapSector.clusterId,
-    sector_id: sectorId,
-    pos: {
-      x: Math.round(rawPoint?.x ?? (ratioX * rawScale)),
-      z: Math.round(rawPoint?.z ?? (-ratioY * rawScale))
-    },
-    sunlight: mapSector.sunlight,
-    resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+  if (!mapSector) return null
+  const layout = searchSectors.value.find((item) => item.sectorId === sectorId)
+  if (!layout || !layout.radius) return null
+  const svgPoint = resolveSvgPointAtClient(sectorElement, clientX, clientY)
+  if (!svgPoint) return null
+  const localRatio = {
+    x: (svgPoint.x - layout.centerX) / layout.radius,
+    y: (svgPoint.y - layout.centerY) / layout.radius
   }
+  const localHex = hexVertices(0, 0, 1)
+  if (!pointInPolygon(localRatio, localHex)) return null
+  return {
+    sectorId,
+    mapSector,
+    layout,
+    svgPoint,
+    localRatio
+  }
+}
+
+const resolveSectorPointerSample = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number) => {
+  const geometrySample = resolveSectorPointerGeometrySample(sectorElement, clientX, clientY)
+  if (!geometrySample) return null
+  const { sectorId, mapSector, localRatio } = geometrySample
+  const sector = gameDataStore.maps?.sectors?.[sectorId]
+  const rawPoint = sector ? sectorLocalRatioToRawPointWithScale(sector, localRatio) : null
+  return {
+    localRatio,
+    location: {
+      cluster_id: mapSector.clusterId,
+      sector_id: sectorId,
+      pos: {
+        x: Math.round(rawPoint?.x ?? 0),
+        z: Math.round(rawPoint?.z ?? 0)
+      },
+      sunlight: mapSector.sunlight,
+      resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+    } satisfies EntityLocation
+  }
+}
+
+const resolveLocationFromSectorElement = (sectorElement: SVGGraphicsElement, clientX: number, clientY: number): EntityLocation | null => {
+  return resolveSectorPointerSample(sectorElement, clientX, clientY)?.location || null
 }
 
 const resolveLocationAtPointer = (clientX: number, clientY: number): EntityLocation | null => {
@@ -627,15 +969,106 @@ const resolveLocationAtPointer = (clientX: number, clientY: number): EntityLocat
   return resolveLocationFromSectorElement(sectorElement, clientX, clientY)
 }
 
+const resolveBindingLocationSampleAtPointer = (clientX: number, clientY: number) => {
+  const sectorElement = getSectorElementAtPointer(clientX, clientY)
+  if (!sectorElement) return null
+  const geometrySample = resolveSectorPointerGeometrySample(sectorElement, clientX, clientY)
+  if (!geometrySample) return null
+  const { sectorId, mapSector, localRatio } = geometrySample
+  const sectorMacro = resolveSectorMacroById(
+    gameDataStore.maps || { clusters: {}, sectors: {} },
+    mapSector.clusterId,
+    sectorId
+  )
+  if (!sectorMacro) {
+    const sector = gameDataStore.maps?.sectors?.[sectorId]
+    const fallbackRawPosition = sector
+      ? sectorLocalRatioToRawPointWithScale(sector as Parameters<typeof sectorLocalRatioToRawPointWithScale>[0], localRatio)
+      : null
+    return {
+      sample: {
+        localRatio,
+        location: {
+          cluster_id: mapSector.clusterId,
+          sector_id: sectorId,
+          pos: {
+            x: Math.round(fallbackRawPosition?.x ?? 0),
+            z: Math.round(fallbackRawPosition?.z ?? 0)
+          },
+          sunlight: mapSector.sunlight,
+          resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+        } satisfies EntityLocation
+      },
+      sectorMacro: null
+    }
+  }
+  const sector = gameDataStore.maps?.sectors?.[sectorId]
+  const scaleContext = resolveBindingScaleContext(draggingBindingKey.value, sectorMacro, sectorId)
+  const effectiveScalePerRadius = scaleContext.scalePerRadius
+  const resolvedRawPosition = sector
+    ? sectorLocalRatioToRawPointWithScale(
+        sector as Parameters<typeof sectorLocalRatioToRawPointWithScale>[0],
+        localRatio,
+        { scalePerRadius: effectiveScalePerRadius }
+      )
+    : null
+  const bindingSample = {
+    localRatio,
+    location: {
+      cluster_id: mapSector.clusterId,
+      sector_id: sectorId,
+      pos: {
+        x: Math.round(resolvedRawPosition?.x ?? 0),
+        z: Math.round(resolvedRawPosition?.z ?? 0)
+      },
+      sunlight: mapSector.sunlight,
+      resources: Array.from(new Set(mapSector.resources.map((entry) => entry.ware)))
+    } satisfies EntityLocation
+  }
+  return {
+    sample: bindingSample,
+    sectorMacro
+  }
+}
+
+const resolveBindingPreviewAtPointer = (clientX: number, clientY: number): PlacementPreview | null => {
+  if (!activeBindingDragPreview.value) return null
+  const bindingSampleResult = resolveBindingLocationSampleAtPointer(clientX, clientY)
+  if (!bindingSampleResult) return null
+  const { sample, sectorMacro } = bindingSampleResult
+  const location = sample.location
+  if (!sectorMacro || !draggingCoverageSectorMacros.value.has(sectorMacro)) return null
+  return buildBindingPreview(
+    draggingBindingKey.value,
+    location,
+    sample.localRatio,
+    activeBindingDragPreview.value
+  )
+}
+
 const clearPlacementState = () => {
   draggingPlacementItem.value = null
   draggingOverlayKey.value = null
+  draggingBindingKey.value = null
+  draggingSectorGroupId.value = null
+  draggingFreeSector.value = null
+  draggingFreeStation.value = null
+  draggingVirtualTradestation.value = null
+  draggingCoverageSectorMacros.value = new Set()
   placementPreview.value = null
 }
 
 const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocation) => {
   if (item.kind === 'station') {
-    empireStore.setStationLocation(item.id, location)
+    if (draggingBindingKey.value && draggingSectorGroupId.value) {
+      empireStore.setStationBindingPosition(draggingBindingKey.value, draggingSectorGroupId.value, item.id, {
+        x: location.pos.x,
+        y: 0,
+        z: location.pos.z
+      })
+    } else {
+      empireStore.setStationLocation(item.id, location)
+    }
     return
   }
   empireStore.setSectorLocation(item.id, location)
@@ -706,6 +1139,7 @@ const chooseTooltipPlacement = (
 }
 
 const positionTooltip = () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   if (!hoveredSector.value || !viewportRef.value) return
 
   const viewportRect = viewportRef.value.getBoundingClientRect()
@@ -777,6 +1211,7 @@ const positionTooltip = () => {
 }
 
 const syncTooltipMeasurement = async () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   if (!hoveredSector.value) return
   await nextTick()
   const el = tooltipRef.value?.$el as HTMLElement | undefined
@@ -788,6 +1223,7 @@ const syncTooltipMeasurement = async () => {
 }
 
 const showTooltipFromSectorElement = async (sectorElement: SVGGraphicsElement) => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   const sectorId = sectorElement.getAttribute('data-sector-hover-id')
   if (!sectorId) return
 
@@ -814,6 +1250,7 @@ const showTooltipFromSectorElement = async (sectorElement: SVGGraphicsElement) =
 }
 
 const scheduleZoomTooltipRestore = () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   clearZoomRestoreTimer()
   zoomRestoreTimer.value = window.setTimeout(() => {
     zoomRestoreTimer.value = null
@@ -858,7 +1295,7 @@ const onTooltipMouseLeave = () => {
 const focusSector = (sectorId: string) => {
   const target = searchSectors.value.find((item) => item.sectorId === sectorId)
   if (!target) return
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const targetScale = scale.value < 1 ? clampScale(1) : scale.value
@@ -873,7 +1310,7 @@ const fitSectors = (sectorIds: string[]) => {
     .filter((item): item is SearchSectorLayout => Boolean(item))
   if (!targets.length) return
 
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const minX = Math.min(...targets.map((item) => item.centerX - item.radius))
@@ -901,28 +1338,11 @@ const fitSectors = (sectorIds: string[]) => {
   clampPan(vw * 0.5 - centerX * targetScale, vh * 0.5 - centerY * targetScale)
 }
 
-const focusPlacementOverlay = async (placementKey: string) => {
-  const viewport = viewportRef.value
-  if (!viewport) return
-
-  const targetScale = scale.value < 1 ? clampScale(1) : scale.value
-  if (targetScale !== scale.value) {
-    scale.value = targetScale
-    syncSliderFromScale()
-    await nextTick()
-  }
-
-  focusOverlayInViewport(viewport, `[data-placement-key="${placementKey}"]`, {
-    panX: panX.value,
-    panY: panY.value,
-    clampPan
-  })
-}
-
 const onSliderInput = (event: Event) => {
   const input = event.target as HTMLInputElement
   const value = Number(input.value)
   zoomPercent.value = value
+  triggerZoomSettling()
   applyScaleFromSlider(value)
 }
 
@@ -1002,8 +1422,8 @@ const onResourcePrimaryColorChange = (color: string | null) => {
 }
 
 const onResourcePanelOpen = () => {
-  isStationPanelOpen.value = false
   isSavePanelOpen.value = false
+  isBindingPanelOpen.value = false
   clearPlacementState()
   isResourcePanelOpen.value = true
 }
@@ -1016,29 +1436,88 @@ const onResourcePanelClose = () => {
   resourcePrimaryColor.value = null
 }
 
-const onStationPanelOpen = () => {
-  isResourcePanelOpen.value = false
-  isSavePanelOpen.value = false
-  isStationPanelOpen.value = true
-}
-
-const onStationPanelClose = () => {
-  isStationPanelOpen.value = false
-  focusedPlacementKey.value = null
-  clearPlacementState()
-}
-
 const onSavePanelOpen = () => {
   isResourcePanelOpen.value = false
-  isStationPanelOpen.value = false
+  isBindingPanelOpen.value = false
   clearPlacementState()
   isSavePanelOpen.value = true
 }
 
 const onSavePanelClose = () => {
   isSavePanelOpen.value = false
+  isBindingPanelOpen.value = false
   activeSavePoiCategory.value = null
   focusedSavePoiKey.value = null
+  bindingContextGameGuid.value = null
+  bindingContextStage.value = 'select-binding'
+  dragEnabledBindingSectorGroupId.value = null
+  clearPlacementState()
+}
+
+const onBindingContextChange = (payload: {
+  stage: 'select-binding' | 'select-sector' | 'select-station'
+  gameGuid: string | null
+  sectorGroupId: string | null
+}) => {
+  isBindingPanelOpen.value = payload.stage !== 'select-binding'
+  bindingContextStage.value = payload.stage
+  bindingContextGameGuid.value = payload.gameGuid
+  dragEnabledBindingSectorGroupId.value = payload.stage === 'select-station'
+    ? payload.sectorGroupId
+    : null
+}
+
+const onBindingFocusSector = (sectorMacro: string) => {
+  const resolved = mapStore.resolveSectorByMacro?.(sectorMacro) ||
+    resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, sectorMacro)
+  if (resolved?.sectorId) {
+    focusSector(resolved.sectorId)
+  }
+}
+
+const onBindingFitSectors = (sectorMacros: string[]) => {
+  const sectorIds = sectorMacros
+    .map((macro) => {
+      const resolved = mapStore.resolveSectorByMacro?.(macro) ||
+        resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, macro)
+      return resolved?.sectorId
+    })
+    .filter((id): id is string => Boolean(id))
+  
+  if (sectorIds.length > 0) {
+    fitSectors(sectorIds)
+  }
+}
+
+const onBindingDragStationStart = (payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }) => {
+  if (payload.isVirtualTradestation) {
+    draggingVirtualTradestation.value = {
+      sectorGroupId: payload.sectorGroupId,
+      name: payload.name
+    }
+  } else {
+    draggingFreeStation.value = {
+      stationId: payload.stationId,
+      sectorGroupId: payload.sectorGroupId,
+      name: payload.name,
+      icon: payload.icon as 'factory' | 'shipyard'
+    }
+  }
+  draggingBindingKey.value = payload.gameGuid
+  draggingSectorGroupId.value = payload.sectorGroupId
+  draggingCoverageSectorMacros.value = new Set(payload.coverageSectorMacros.map(entry => entry.ref))
+  draggingPlacementItem.value = null
+  draggingOverlayKey.value = null
+  draggingFreeSector.value = null
+}
+
+const onBindingDragStationEnd = () => {
+  clearPlacementState()
+  draggingBindingKey.value = null
+  draggingSectorGroupId.value = null
+  draggingFreeStation.value = null
+  draggingVirtualTradestation.value = null
+  draggingCoverageSectorMacros.value = new Set()
 }
 
 const onSaveSelectArchive = async (payload: { guid: string; time: number } | null) => {
@@ -1048,12 +1527,7 @@ const onSaveSelectArchive = async (payload: { guid: string; time: number } | nul
     return
   }
 
-  await saveStore.selectArchive(payload.guid, payload.time)
-  activeSavePoiCategory.value = null
-}
-
-const onSaveSelectArchiveAndNavigate = async (payload: { guid: string; time: number }) => {
-  await saveStore.selectArchive(payload.guid, payload.time)
+  await saveStore.previewArchive(payload.guid, payload.time)
   activeSavePoiCategory.value = null
 }
 
@@ -1061,12 +1535,30 @@ const onSaveVisibilityChange = (visibility: SavePoiVisibility) => {
   savePoiVisibility.value = visibility
 }
 
+const onMapDiagnosticVisibilityChange = (visibility: {
+  sectorLabels: boolean
+  sectorLinks: boolean
+  resourceBadges: boolean
+}) => {
+  mapDiagnosticVisibility.value = visibility
+}
+
 const onSaveActiveCategoryChange = (category: SavePoiCategory | null) => {
   activeSavePoiCategory.value = category
 }
 
 const resolveSavePoiContentPoint = (poi: SavePoiOverlayItem) => {
-  if (poi.position.tx === undefined || poi.position.ty === undefined) return null
+  if (poi.position.tx === undefined || poi.position.ty === undefined) {
+    console.error('[MapWorkbench][SavePoiData] missing-tx-ty', {
+      key: poi.key,
+      code: poi.code,
+      category: poi.category,
+      sectorMacro: poi.sectorMacro,
+      hasTx: poi.position.tx !== undefined,
+      hasTy: poi.position.ty !== undefined
+    })
+    return null
+  }
   const resolved = mapStore.resolveSectorByMacro?.(poi.sectorMacro) ||
     resolveMapSectorByMacro({
       clusters: gameDataStore.maps?.clusters || {},
@@ -1112,36 +1604,6 @@ const onSavePoiFocus = async (poi: SavePoiOverlayItem) => {
   })
 }
 
-const onStationItemDragStart = (item: MapStationPanelItem) => {
-  draggingPlacementItem.value = {
-    id: item.id,
-    kind: item.kind,
-    name: item.name,
-    icon: item.icon
-  }
-  draggingOverlayKey.value = item.location ? `${item.kind}:${item.id}` : null
-}
-
-const onStationItemDragEnd = () => {
-  clearPlacementState()
-}
-
-const onStationItemClearLocation = (item: MapStationPanelItem) => {
-  if (item.kind === 'station') {
-    empireStore.clearStationLocation(item.id)
-    return
-  }
-  empireStore.clearSectorLocation(item.id)
-}
-
-const onStationItemFocus = (item: MapStationPanelItem) => {
-  if (!item.location) return
-  selectedSectorId.value = null
-  selectedSectorSource.value = null
-  focusedPlacementKey.value = `${item.kind}:${item.id}`
-  void focusPlacementOverlay(focusedPlacementKey.value)
-}
-
 const onMouseDown = (event: MouseEvent) => {
   if (draggingPlacementItem.value) return
   if (event.button !== 0) return
@@ -1157,7 +1619,7 @@ const onMouseDown = (event: MouseEvent) => {
 
 const onMouseMove = (event: MouseEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
-  if (draggingPlacementItem.value && isStationPanelOpen.value) {
+  if (draggingPlacementItem.value && isBindingPanelOpen.value) {
     const location = resolveLocationAtPointer(event.clientX, event.clientY)
     placementPreview.value = location ? {
       kind: draggingPlacementItem.value.kind,
@@ -1165,6 +1627,18 @@ const onMouseMove = (event: MouseEvent) => {
       icon: draggingPlacementItem.value.icon,
       location
     } : null
+  } else if (draggingFreeSector.value && isBindingPanelOpen.value) {
+    const bindingSampleResult = resolveBindingLocationSampleAtPointer(event.clientX, event.clientY)
+    const sample = bindingSampleResult?.sample || null
+    placementPreview.value = sample
+      ? buildBindingPreview(draggingBindingKey.value, sample.location, sample.localRatio, {
+          kind: 'sector',
+          name: draggingFreeSector.value.name,
+          icon: 'tradestation'
+        })
+      : null
+  } else if (activeBindingDragPreview.value && isBindingPanelOpen.value) {
+    placementPreview.value = resolveBindingPreviewAtPointer(event.clientX, event.clientY)
   }
   if (!isDragging.value) return
   const dx = event.clientX - dragStartX.value
@@ -1178,7 +1652,7 @@ const onWheel = (event: WheelEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
   closeTooltip()
 
-  const { width: vw, height: vh } = getViewportSize()
+  const { width: vw, height: vh } = viewportSize.value
   if (!vw || !vh) return
 
   const rect = viewportRef.value?.getBoundingClientRect()
@@ -1194,53 +1668,124 @@ const onWheel = (event: WheelEvent) => {
   const nextScale = clampScale(scale.value * factor)
   if (nextScale === scale.value) return
 
-  isZooming.value = true
-  clearZoomSettleTimer()
+  triggerZoomSettling()
   scale.value = nextScale
   const nextPanX = mouseX - contentX * nextScale
   const nextPanY = mouseY - contentY * nextScale
   clampPan(nextPanX, nextPanY)
   syncSliderFromScale()
-  zoomSettleTimer.value = window.setTimeout(() => {
-    settleZoomViewport()
-    zoomSettleTimer.value = null
-  }, 120)
   scheduleZoomTooltipRestore()
 }
 
 const stopDrag = () => {
   isDragging.value = false
   settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
-  if (!draggingPlacementItem.value) return
-  if (placementPreview.value) {
+  if (draggingPlacementItem.value && placementPreview.value) {
     applyLocationToItem(draggingPlacementItem.value, placementPreview.value.location)
+  } else if (draggingFreeSector.value && placementPreview.value && draggingBindingKey.value) {
+    const sectorMacro = resolveSectorMacroById(
+      gameDataStore.maps || { clusters: {}, sectors: {} },
+      placementPreview.value.location.cluster_id,
+      placementPreview.value.location.sector_id
+    )
+    if (!sectorMacro) {
+      clearPlacementState()
+      return
+    }
+    empireStore.setFreeSectorBinding({
+      gameGuid: draggingBindingKey.value,
+      sectorGroupId: draggingFreeSector.value.sectorGroupId,
+      sectorMacro,
+      position: {
+        x: placementPreview.value.location.pos.x,
+        y: 0,
+        z: placementPreview.value.location.pos.z
+      }
+    })
+  } else if (draggingVirtualTradestation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
+    const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
+    if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
+      empireStore.setTradestationBinding({
+        gameGuid: draggingBindingKey.value,
+        sectorGroupId: draggingSectorGroupId.value,
+        sectorMacro,
+        position: {
+          x: placementPreview.value.location.pos.x,
+          y: 0,
+          z: placementPreview.value.location.pos.z
+        }
+      })
+    }
+  } else if (draggingFreeStation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
+    const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
+    if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
+      empireStore.setFreeStationBinding({
+        gameGuid: draggingBindingKey.value,
+        sectorGroupId: draggingSectorGroupId.value,
+        stationId: draggingFreeStation.value.stationId,
+        sectorMacro,
+        position: {
+          x: placementPreview.value.location.pos.x,
+          y: 0,
+          z: placementPreview.value.location.pos.z
+        }
+      })
+    }
   }
   clearPlacementState()
 }
 
 const onResize = () => {
+  updateViewportSize()
   recomputeScaleBounds()
   closeTooltip()
 }
 
 const onViewportDragOver = (event: DragEvent) => {
-  if (!draggingPlacementItem.value || !isStationPanelOpen.value) return
+  if (!isBindingPanelOpen.value) return
   event.preventDefault()
-  const location = resolveLocationAtPointer(event.clientX, event.clientY)
-  placementPreview.value = location ? {
-    kind: draggingPlacementItem.value.kind,
-    name: draggingPlacementItem.value.name,
-    icon: draggingPlacementItem.value.icon,
-    location
-  } : null
+  
+  if (draggingPlacementItem.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    placementPreview.value = location ? {
+      kind: draggingPlacementItem.value.kind,
+      name: draggingPlacementItem.value.name,
+      icon: draggingPlacementItem.value.icon,
+      location
+    } : null
+  } else if (draggingFreeSector.value) {
+    const location = resolveLocationAtPointer(event.clientX, event.clientY)
+    placementPreview.value = location ? {
+      kind: 'sector',
+      name: draggingFreeSector.value.name,
+      icon: 'tradestation',
+      location
+    } : null
+  }
 }
 
 const onViewportDrop = (event: DragEvent) => {
-  if (!draggingPlacementItem.value || !isStationPanelOpen.value) return
+  if (!isBindingPanelOpen.value) return
   event.preventDefault()
+  
   const location = resolveLocationAtPointer(event.clientX, event.clientY)
-  if (location) {
+  if (!location) {
+    clearPlacementState()
+    return
+  }
+  
+  if (draggingPlacementItem.value) {
     applyLocationToItem(draggingPlacementItem.value, location)
+  } else if (draggingFreeSector.value && draggingBindingKey.value) {
+    empireStore.setTradestationBinding({
+      gameGuid: draggingBindingKey.value,
+      sectorGroupId: draggingFreeSector.value.sectorGroupId,
+      position: {
+        x: location.pos.x,
+        y: 0,
+        z: location.pos.z
+      }
+    })
   }
   clearPlacementState()
 }
@@ -1251,7 +1796,48 @@ const onOverlayPointerDown = (payload: {
   kind: 'station' | 'sector'
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
+  draggable?: boolean
+  savePoiVisual?: SavePoiOverlayItem
+  binding?: {
+    gameGuid: string
+    sectorGroupId: string
+    coverageSectorMacros: string[]
+    isVirtualTradestation?: boolean
+  }
 }) => {
+  if (payload.binding) {
+    if (!payload.draggable) {
+      if (payload.savePoiVisual) {
+        focusedSavePoiKey.value = payload.savePoiVisual.key
+        savePoiTooltipItem.value = payload.savePoiVisual
+      }
+      return
+    }
+    draggingPlacementItem.value = null
+    draggingBindingKey.value = payload.binding.gameGuid
+    draggingSectorGroupId.value = payload.binding.sectorGroupId
+    draggingCoverageSectorMacros.value = new Set(payload.binding.coverageSectorMacros)
+    draggingOverlayKey.value = payload.key
+    draggingFreeSector.value = null
+    if (payload.binding.isVirtualTradestation) {
+      draggingFreeStation.value = null
+      draggingVirtualTradestation.value = {
+        sectorGroupId: payload.binding.sectorGroupId,
+        name: payload.name
+      }
+    } else {
+      draggingVirtualTradestation.value = null
+      draggingFreeStation.value = {
+        stationId: payload.id,
+        sectorGroupId: payload.binding.sectorGroupId,
+        name: payload.name,
+        icon: payload.icon as 'factory' | 'shipyard'
+      }
+    }
+    return
+  }
+
+  closeSavePoiTooltip()
   draggingPlacementItem.value = {
     id: payload.id,
     kind: payload.kind,
@@ -1277,19 +1863,15 @@ watch(isResourcePanelOpen, async () => {
   closeTooltip()
 })
 
-watch(isStationPanelOpen, async (open) => {
-  if (!open) clearPlacementState()
-  await nextTick()
-  recomputeScaleBounds()
-})
-
 watch(locale, () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   if (!hoveredSectorSource.value) return
   hoveredSector.value = createTooltipViewModel(hoveredSectorSource.value)
   void syncTooltipMeasurement()
 })
 
 watch(hoveredSector, () => {
+  if (!ENABLE_MAP_SECTOR_TOOLTIP_MEASUREMENT) return
   if (!hoveredSector.value) {
     tooltipMeasuredSize.value = { width: 0, height: 0 }
     return
@@ -1303,9 +1885,11 @@ watch(liveSavePoiViewportContentBounds, (bounds) => {
 }, { immediate: true })
 
 onMounted(() => {
+  updateViewportSize()
   window.addEventListener('resize', onResize)
   if (typeof ResizeObserver !== 'undefined' && viewportRef.value) {
     viewportResizeObserver.value = new ResizeObserver(() => {
+      updateViewportSize()
       recomputeScaleBounds()
     })
     viewportResizeObserver.value.observe(viewportRef.value)
@@ -1324,7 +1908,7 @@ onBeforeUnmount(() => {
 
 <template>
   <section class="map-workbench" data-testid="map-workbench-view">
-    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'station-sidebar-active': isStationPanelOpen, 'save-sidebar-active': isSavePanelOpen }">
+    <div class="map-layout" :class="{ 'sidebar-active': isResourcePanelOpen, 'save-sidebar-active': isSavePanelOpen, 'binding-sidebar-active': isBindingPanelOpen }">
       <MapResourceFilterPanel
         v-show="isResourcePanelOpen"
         :sector-layouts="searchSectors"
@@ -1340,24 +1924,19 @@ onBeforeUnmount(() => {
         @panel-close="onResourcePanelClose"
       />
 
-      <MapStationPanel
-        :open="isStationPanelOpen"
-        :items="stationPanelItems"
-        @close="onStationPanelClose"
-        @drag-start="onStationItemDragStart"
-        @drag-end="onStationItemDragEnd"
-        @clear-location="onStationItemClearLocation"
-        @focus-item="onStationItemFocus"
-      />
-
       <MapSavePanel
         :open="isSavePanelOpen"
         :archive="activeMapArchive"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
-        @select-archive-and-navigate="onSaveSelectArchiveAndNavigate"
+        @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
         @focus-poi="onSavePoiFocus"
+        @context-change="onBindingContextChange"
+        @focus-sector="onBindingFocusSector"
+        @fit-sectors="onBindingFitSectors"
+        @drag-station-start="onBindingDragStationStart"
+        @drag-station-end="onBindingDragStationEnd"
       />
 
       <div class="map-shell">
@@ -1365,7 +1944,7 @@ onBeforeUnmount(() => {
           ref="viewportRef"
           class="map-viewport"
           data-testid="map-viewport"
-          :class="{ dragging: isDragging }"
+          :class="{ dragging: isDragging, 'drop-forbidden': isFreeStationDropForbidden }"
           @mousedown="onMouseDown"
           @mousemove="onMouseMove"
           @mouseup="stopDrag"
@@ -1378,8 +1957,8 @@ onBeforeUnmount(() => {
             class="map-content"
           >
             <MapSvgCanvas
-              :viewport-width="getViewportSize().width"
-              :viewport-height="getViewportSize().height"
+              :viewport-width="viewportSize.width"
+              :viewport-height="viewportSize.height"
               :view-box-bounds="mapViewBoxBounds"
               :search-highlighted-sector-ids="searchHighlightedSectorIds"
               :resource-highlighted-sector-ids="resourceHighlightedSectorIds"
@@ -1387,8 +1966,8 @@ onBeforeUnmount(() => {
               :resource-sector-group-badges="resourceSectorGroupBadges"
               :resource-fill-color-override="resourcePrimaryColor"
               :selected-sector-id="selectedSectorId"
-              :placement-overlays="placementOverlays"
-              :placement-preview="isStationPanelOpen ? placementPreview : null"
+              :placement-overlays="bindingOverlays"
+              :placement-preview="isBindingPanelOpen ? placementPreview : null"
               :is-dragging="isDragging"
               :is-zooming="isZooming"
               :dragging-overlay-key="draggingOverlayKey"
@@ -1406,6 +1985,9 @@ onBeforeUnmount(() => {
               :sector-owner-override="sectorOwnerOverride"
               :cluster-owner-override="clusterOwnerOverride"
               :faction-color-map="factionColorMap"
+              :show-sector-labels="mapDiagnosticVisibility.sectorLabels"
+              :show-sector-links="mapDiagnosticVisibility.sectorLinks"
+              :show-resource-badges="mapDiagnosticVisibility.resourceBadges"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
               @sector-hover="onSectorHover"
@@ -1436,11 +2018,18 @@ onBeforeUnmount(() => {
 
         </div>
 
-        <MapSavePoiVisibilityControl
-          :visibility="savePoiVisibility"
-          :archive="activeMapArchive"
-          @visibility-change="onSaveVisibilityChange"
-        />
+        <div class="map-top-right-controls">
+          <MapSvgDiagnosticVisibilityControl
+            :visibility="mapDiagnosticVisibility"
+            @visibility-change="onMapDiagnosticVisibilityChange"
+          />
+
+          <MapSavePoiVisibilityControl
+            :visibility="savePoiVisibility"
+            :archive="activeMapArchive"
+            @visibility-change="onSaveVisibilityChange"
+          />
+        </div>
 
         <div class="map-search-panel left-6 top-5" @mousedown.stop>
           <div class="search-box group" :class="{ focused: isSearchFocused }">
@@ -1534,26 +2123,6 @@ onBeforeUnmount(() => {
           <button
             type="button"
             class="map-panel-tab"
-            :class="{ active: isStationPanelOpen }"
-            data-testid="map-station-entry-button"
-            @click="onStationPanelOpen"
-          >
-            <span class="map-panel-tab-label">{{ t('map.station_panel_button') }}</span>
-            <svg class="map-panel-tab-icon" viewBox="0 0 24 24" aria-hidden="true">
-              <path
-                d="M12 3l7 4v10l-7 4-7-4V7l7-4zm0 4.2L8 9.4v5.2l4 2.2 4-2.2V9.4l-4-2.2z"
-                fill="none"
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="1.6"
-              />
-            </svg>
-          </button>
-
-          <button
-            type="button"
-            class="map-panel-tab"
             :class="{ active: isSavePanelOpen }"
             data-testid="map-save-panel-tab"
             @click="onSavePanelOpen"
@@ -1570,6 +2139,7 @@ onBeforeUnmount(() => {
               />
             </svg>
           </button>
+
         </div>
 
         <div class="map-right-stack" @mousedown.stop>
@@ -1622,11 +2192,11 @@ onBeforeUnmount(() => {
   @apply gap-3;
 }
 
-.map-layout.station-sidebar-active {
+.map-layout.save-sidebar-active {
   @apply gap-3;
 }
 
-.map-layout.save-sidebar-active {
+.map-layout.binding-sidebar-active {
   @apply gap-3;
 }
 
@@ -1639,6 +2209,14 @@ onBeforeUnmount(() => {
 .map-viewport.dragging {
   @apply cursor-grabbing;
   user-select: none;
+}
+
+.map-viewport.drop-forbidden {
+  cursor: not-allowed;
+}
+
+.map-viewport.drop-forbidden * {
+  cursor: not-allowed !important;
 }
 
 .map-viewport.dragging * {
@@ -1659,6 +2237,10 @@ onBeforeUnmount(() => {
 .map-search-panel {
   @apply absolute z-10;
   width: 220px;
+}
+
+.map-top-right-controls {
+  @apply absolute right-6 top-5 z-10 flex items-start gap-2;
 }
 
 .map-resource-entry-btn {

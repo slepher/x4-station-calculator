@@ -1,11 +1,18 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useEmpireStore } from '@/store/useEmpireStore'
+import { useSaveStore } from '@/store/useSaveStore'
 import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
 import MapSaveCoordList from './MapSaveCoordList.vue'
+import MapBindingSectorGroup from './MapBindingSectorGroup.vue'
+import MapBindingStation from './MapBindingStation.vue'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
+
+type BindingStage = 'select-binding' | 'select-sector' | 'select-station'
+type PanelLayer = 'list' | 'category' | 'coord' | 'binding-sector' | 'binding-station'
 
 const props = defineProps<{
   open: boolean
@@ -15,33 +22,54 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'close'): void
   (e: 'select-archive', payload: { guid: string; time: number } | null): void
-  (e: 'select-archive-and-navigate', payload: { guid: string; time: number }): void
   (e: 'active-category-change', category: SavePoiCategory | null): void
   (e: 'focus-poi', poi: SavePoiOverlayItem): void
+  (e: 'focus-sector', sectorId: string): void
+  (e: 'fit-sectors', sectorIds: string[]): void
+  (e: 'context-change', payload: { stage: BindingStage; gameGuid: string | null; sectorGroupId: string | null }): void
+  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }): void
+  (e: 'drag-station-end'): void
 }>()
 
 const { t } = useI18n()
-
-type PanelLayer = 'list' | 'category' | 'coord'
+const saveStore = useSaveStore()
+const empireStore = useEmpireStore()
 
 const layer = ref<PanelLayer>('list')
 const selectedCategory = ref<SavePoiCategory | null>(null)
-
+const selectedBindingGameGuid = ref<string | null>(null)
+const selectedSectorGroupId = ref<string | null>(null)
 interface BreadcrumbItem {
   key: string
   label: string
   clickable?: boolean
 }
 
+const bindingPlayerName = computed(() => {
+  if (!selectedBindingGameGuid.value) return null
+  return saveStore.archiveGroups.find((item) => item.guid === selectedBindingGameGuid.value)?.playerName || null
+})
+
+const bindingSectorName = computed(() => {
+  if (!selectedSectorGroupId.value) return null
+  return empireStore.activeEmpire?.sectors?.find((item) => item.id === selectedSectorGroupId.value)?.name || null
+})
+
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
   const items: BreadcrumbItem[] = [{ key: 'root', label: t('map.save_breadcrumb_root') }]
-  if (props.archive && layer.value !== 'list') {
+
+  if (layer.value === 'category' && props.archive) {
+    items.push({ key: 'archive', label: props.archive.meta.playerName, clickable: true })
+  }
+
+  if ((layer.value === 'binding-sector' || layer.value === 'binding-station') && bindingPlayerName.value) {
     items.push({
-      key: 'archive',
-      label: props.archive.meta.playerName,
-      clickable: true
+      key: 'binding',
+      label: `${bindingPlayerName.value} ${t('map.binding_title')}`,
+      clickable: layer.value === 'binding-station'
     })
   }
+
   if (selectedCategory.value && layer.value === 'coord') {
     items.push({
       key: 'category',
@@ -49,6 +77,11 @@ const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
       clickable: true
     })
   }
+
+  if (layer.value === 'binding-station' && bindingSectorName.value) {
+    items.push({ key: 'sector', label: bindingSectorName.value })
+  }
+
   return items
 })
 
@@ -65,27 +98,78 @@ function getCategoryLabel(category: SavePoiCategory): string {
   return labels[category]
 }
 
+function getLatestTime(gameGuid: string): number | null {
+  const group = saveStore.archives.get(gameGuid)
+  return group?.saves[0]?.meta.time ?? null
+}
+
+function resetToList() {
+  layer.value = 'list'
+  selectedCategory.value = null
+  selectedBindingGameGuid.value = null
+  selectedSectorGroupId.value = null
+  emit('active-category-change', null)
+}
+
 function onBreadcrumbNavigate(key: string) {
   if (key === 'root') {
-    layer.value = 'list'
-    selectedCategory.value = null
-    emit('active-category-change', null)
+    resetToList()
   } else if (key === 'archive') {
     layer.value = 'category'
     selectedCategory.value = null
     emit('active-category-change', null)
+  } else if (key === 'binding') {
+    layer.value = 'binding-sector'
+    selectedSectorGroupId.value = null
   }
 }
 
-function onArchiveSelect(payload: { guid: string; time: number } | null) {
+async function onArchiveSelect(payload: { guid: string; time: number } | null) {
+  if (payload) {
+    await saveStore.selectArchive(payload.guid, payload.time)
+  }
   emit('select-archive', payload)
 }
 
-function onArchiveSelectAndNavigate(payload: { guid: string; time: number }) {
-  emit('select-archive-and-navigate', payload)
+async function onArchiveSelectGroup(payload: { guid: string }) {
+  await saveStore.selectArchiveGroup(payload.guid)
+}
+
+async function onArchiveNavigate(payload: { guid: string; time: number | null }) {
+  if (payload.time === null) {
+    await saveStore.selectArchiveGroup(payload.guid)
+  } else {
+    await saveStore.selectArchive(payload.guid, payload.time)
+    emit('select-archive', { guid: payload.guid, time: payload.time })
+  }
+
   layer.value = 'category'
   selectedCategory.value = null
   emit('active-category-change', null)
+}
+
+async function onArchiveBind(payload: { guid: string; time: number | null }) {
+  const existingBinding = empireStore.activeEmpire?.saveBindings?.find((item) => item.gameGuid === payload.guid)
+  if (!existingBinding) {
+    empireStore.createBinding(payload.guid)
+  }
+
+  empireStore.setSelectedArchiveTime(payload.guid, payload.time)
+
+  const effectiveTime = payload.time ?? getLatestTime(payload.guid)
+  if (payload.time === null) {
+    await saveStore.selectArchiveGroup(payload.guid)
+    if (effectiveTime !== null) {
+      emit('select-archive', { guid: payload.guid, time: effectiveTime })
+    }
+  } else if (effectiveTime !== null) {
+    await saveStore.selectArchive(payload.guid, effectiveTime)
+    emit('select-archive', { guid: payload.guid, time: effectiveTime })
+  }
+
+  selectedBindingGameGuid.value = payload.guid
+  selectedSectorGroupId.value = null
+  layer.value = 'binding-sector'
 }
 
 function onCategorySelect(category: SavePoiCategory) {
@@ -98,30 +182,44 @@ function onPoiFocus(poi: SavePoiOverlayItem) {
   emit('focus-poi', poi)
 }
 
+function onSelectBindingGroup(sectorGroupId: string) {
+  selectedSectorGroupId.value = sectorGroupId
+  layer.value = 'binding-station'
+}
+
 function onClose() {
   emit('active-category-change', null)
   emit('close')
 }
 
 watch(() => props.open, (open) => {
-  if (!open) {
-    layer.value = 'list'
-    selectedCategory.value = null
-    emit('active-category-change', null)
-  } else if (props.archive) {
-    layer.value = 'category'
-    selectedCategory.value = null
-    emit('active-category-change', null)
+  if (open) {
+    resetToList()
+    return
   }
+
+  resetToList()
 })
 
 watch(() => props.archive, (archive) => {
-  if (!archive) {
-    layer.value = 'list'
-    selectedCategory.value = null
-    emit('active-category-change', null)
+  if (!archive && (layer.value === 'category' || layer.value === 'coord')) {
+    resetToList()
   }
 })
+
+watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open], () => {
+  const stage: BindingStage = !props.open || (layer.value !== 'binding-sector' && layer.value !== 'binding-station')
+    ? 'select-binding'
+    : layer.value === 'binding-station'
+      ? 'select-station'
+      : 'select-sector'
+
+  emit('context-change', {
+    stage,
+    gameGuid: props.open ? selectedBindingGameGuid.value : null,
+    sectorGroupId: props.open ? selectedSectorGroupId.value : null
+  })
+}, { immediate: true })
 </script>
 
 <template>
@@ -142,7 +240,9 @@ watch(() => props.archive, (archive) => {
       <MapSaveArchiveList
         v-if="layer === 'list'"
         @select="onArchiveSelect"
-        @select-and-navigate="onArchiveSelectAndNavigate"
+        @select-group="onArchiveSelectGroup"
+        @navigate="onArchiveNavigate"
+        @bind="onArchiveBind"
       />
 
       <MapSaveCategoryMenu
@@ -157,17 +257,32 @@ watch(() => props.archive, (archive) => {
         :category="selectedCategory!"
         @focus-poi="onPoiFocus"
       />
+
+      <MapBindingSectorGroup
+        v-else-if="layer === 'binding-sector' && selectedBindingGameGuid"
+        :game-guid="selectedBindingGameGuid"
+        @select-group="onSelectBindingGroup"
+        @focus-sector="emit('focus-sector', $event)"
+        @fit-sectors="emit('fit-sectors', $event)"
+      />
+
+      <MapBindingStation
+        v-else-if="layer === 'binding-station' && selectedBindingGameGuid && selectedSectorGroupId"
+        :game-guid="selectedBindingGameGuid"
+        :sector-group-id="selectedSectorGroupId"
+        @focus-sector="emit('focus-sector', $event)"
+        @fit-sectors="emit('fit-sectors', $event)"
+        @drag-station-start="emit('drag-station-start', $event)"
+        @drag-station-end="emit('drag-station-end')"
+      />
     </div>
 
-    <div class="map-save-panel__hint">
-      {{ t('map.save_panel_hint') }}
-    </div>
   </aside>
 </template>
 
 <style scoped>
 .map-save-panel {
-  @apply flex h-full w-[360px] shrink-0 flex-col overflow-hidden rounded-lg border border-amber-300/35 bg-black/60 py-3 px-0 text-amber-50;
+  @apply flex h-full w-[360px] shrink-0 flex-col overflow-hidden rounded-lg border border-amber-300/35 bg-black/60 px-0 py-3 text-amber-50;
   backdrop-filter: blur(8px);
 }
 
@@ -200,10 +315,6 @@ watch(() => props.archive, (archive) => {
 
 .map-save-panel__body::-webkit-scrollbar-thumb:hover {
   @apply bg-amber-200/60;
-}
-
-.map-save-panel__hint {
-  @apply px-3 pt-2 text-xs text-amber-100/60;
 }
 
 </style>

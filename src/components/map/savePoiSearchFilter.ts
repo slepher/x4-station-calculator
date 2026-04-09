@@ -1,6 +1,6 @@
 import type { StationEntry } from '@/types/saveArchive'
 import type { X4Module, X4Map } from '@/types/x4'
-import { buildSectorGraph } from '@/store/logic/mapAdvancedResourceFilter'
+import { breadthFirstReachable, buildSectorGraph } from '@/store/logic/mapSectorGraph'
 
 export interface SearchTag {
   category: 'product' | 'module' | 'faction' | 'sector'
@@ -95,35 +95,6 @@ function findSectorIdByMacro(maps: X4Map, sectorMacro: string): string | null {
     }
   }
   return null
-}
-
-function breadthFirstReachable(
-  graph: Record<string, string[]>,
-  start: string,
-  maxDepth: number,
-  sectorClusterMap: Record<string, string>
-): Record<string, number> {
-  const distances: Record<string, number> = { [start]: 0 }
-  const queue = [start]
-  let index = 0
-
-  while (index < queue.length) {
-    const current = queue[index++]!
-    const currentDepth = distances[current] || 0
-    const currentClusterId = sectorClusterMap[current]
-
-    ;(graph[current] || []).forEach((next) => {
-      if (distances[next] !== undefined) return
-      const nextClusterId = sectorClusterMap[next]
-      const depthIncrease = (currentClusterId && nextClusterId && currentClusterId !== nextClusterId) ? 1 : 0
-      const newDepth = currentDepth + depthIncrease
-      if (newDepth > maxDepth) return
-      distances[next] = newDepth
-      queue.push(next)
-    })
-  }
-
-  return distances
 }
 
 export function filterStationBySearchState(

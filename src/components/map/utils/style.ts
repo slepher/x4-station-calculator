@@ -51,7 +51,7 @@ export const FALLBACK_OWNER_COLOR = '#94a3b8'
 export const OVERLAY_ICON_SIZE = MAP_ICON_SIZES.placement
 export const SMALL_ICON_SIZE = MAP_ICON_SIZES.savePoiSmall
 export const PREVIEW_ICON_SIZE = MAP_ICON_SIZES.preview
-export const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
+export const MAP_FONT_FAMILY = "'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', 'Source Han Sans SC', sans-serif"
 const CONDITIONAL_SMALL_ICON_CATEGORIES = new Set(['npcStation', 'xenonStation', 'khaakStation'])
 
 export const SAVE_POI_COLORS: SavePoiColorMap = {

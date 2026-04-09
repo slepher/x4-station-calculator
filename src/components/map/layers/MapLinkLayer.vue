@@ -20,11 +20,12 @@ defineProps<{
   gateCircles: MapGateCircle[]
   crossClusterGateLines: MapCrossClusterGateLine[]
   stargateVisualScale: number
+  visible?: boolean
 }>()
 </script>
 
 <template>
-  <g class="sector-links">
+  <g v-if="visible !== false" class="sector-links">
     <template v-for="link in sectorLinkLines" :key="link.id">
       <line
         :x1="link.start.x.toFixed(1)"
@@ -54,7 +55,7 @@ defineProps<{
     </template>
   </g>
 
-  <g class="highways">
+  <g v-if="visible !== false" class="highways">
     <template v-for="segment in highwaySegments" :key="segment.id">
       <path
         v-if="segment.type === 'path'"
@@ -77,7 +78,7 @@ defineProps<{
     </template>
   </g>
 
-  <g class="gates">
+  <g v-if="visible !== false" class="gates">
     <image
       v-for="gate in gateCircles"
       :key="gate.id"
@@ -93,7 +94,7 @@ defineProps<{
     />
   </g>
 
-  <g class="cross-links">
+  <g v-if="visible !== false" class="cross-links">
     <line
       v-for="line in crossClusterGateLines"
       :key="line.id"

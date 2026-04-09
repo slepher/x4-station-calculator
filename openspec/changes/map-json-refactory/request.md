@@ -36,10 +36,17 @@
 ### 4. 生成链路同步切换
 
 - `maps.json` 生成脚本直接输出新结构，而不是先产旧结构再转换。
-- 资源提取、save 解析辅助、地图渲染、地图搜索、resource filter、导入导出、分析脚本与测试 fixture 同步切换到新结构。
+- 资源提取、save 解析辅助、地图渲染、地图搜索、resource filter、station-binding、导入导出、分析脚本与测试 fixture 同步切换到新结构。
 - 本次重构完成后，仓库内不应残留对旧 `cluster.sectors` 主结构的运行时依赖。
 
-### 5. 实施方式
+### 5. `station-binding` 适配约束
+
+- `station-binding` 相关代码不得再从 `cluster.sectors[sectorId]` 读取 sector 明细，必须统一从顶层 `maps.sectors[sectorId]` 读取。
+- `station-binding` 的 coverage 计算、sector/macro 解析与 POI 拖拽限制必须复用共享 map 拓扑 helper，而不是把拓扑逻辑继续留在 resource filter 文件里。
+- `station-binding` 本地比较逻辑不再额外做 `sectorMacro.toLowerCase()` 归一化；地图数据与持久化 binding 中的 macro/id 以小写规范值直接比较。
+- 如果在完成结构适配后仍出现资源页候选数下降等行为回归，则按独立 bug 处理，而不是作为 map-json 结构切换的预期差异接受。
+
+### 6. 实施方式
 
 - 先修改类型定义，明确新 `X4Map` 结构与引用字段小写约束。
 - 再修改 `maps.json` 生成脚本与已有静态数据产物。
@@ -71,8 +78,9 @@
 4. `cluster-id`、`sector-id` 及其内部引用字段全部统一为小写，并由类型与实现共同约束。
 5. `src/utils/saveParserConfig.ts`、`src/utils/saveResourceExtract.ts`、地图渲染/搜索逻辑、save parser 相关逻辑已切换到新结构。
 6. `scripts/x4_data_map_processor.py` 及相关处理链路直接生成新结构，不保留旧结构输出路径。
-7. 与 `maps.json` 直接相关的测试、fixture、mock 数据已同步更新，不再混用旧大小写与旧结构。
-8. 仓库中不存在仅为兼容旧 `maps.json` 结构而保留的运行时桥接代码。
+7. `station-binding` 的 sector 读取、coverage 计算和拖拽落点校验已切换到新结构，并去除本地大小写归一化比较。
+8. 与 `maps.json` 直接相关的测试、fixture、mock 数据已同步更新，不再混用旧大小写与旧结构。
+9. 仓库中不存在仅为兼容旧 `maps.json` 结构而保留的运行时桥接代码。
 
 ## 未决项
 

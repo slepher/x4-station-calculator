@@ -17,7 +17,6 @@ type SectorHoverPayload = {
 defineProps<{
   clusterPolygons: MapSectorPolygonCluster[]
   gameDataEnforceDlcActivation: boolean
-  sectorLabelFontSize: number
   mapFontFamily: string
   sectorClipId: (clusterId: string, sectorId: string) => string
   hexPoints: (cx: number, cy: number, radius: number) => string
@@ -30,8 +29,7 @@ defineProps<{
   sectorStrokeWidth: (sectorId: string, defaultValue: number) => number
   sectorStrokeOpacity: (sectorId: string, defaultValue: number) => number
   sectorFilter: (sectorId: string) => string | undefined
-  sectorLabelWeight: (sectorId: string) => number
-  sectorLabelFill: (sectorId: string) => string
+  showResourceBadges?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -67,7 +65,7 @@ const emit = defineEmits<{
           :clip-path="`url(#${sectorClipId(cluster.id, cluster.sectors[0].id)})`"
         >
           <path
-            v-for="slice in buildPieSliceGeometries(cluster.sectors[0].id, cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+            v-for="slice in buildPieSliceGeometries(cluster.sectors[0].id, cluster.sectors[0].sx, cluster.sectors[0].sy, cluster.sectors[0].radius)"
             :key="`${cluster.sectors[0]?.id}-${slice.ware}`"
             data-testid="resource-pie-slice"
             :d="slice.path"
@@ -76,7 +74,7 @@ const emit = defineEmits<{
           />
         </g>
         <polygon
-          :points="hexPoints(cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+          :points="hexPoints(cluster.sectors[0]?.sx || cluster.cx, cluster.sectors[0]?.sy || cluster.cy, cluster.sectors[0]?.radius || cluster.singleRadius || 0)"
           :fill="sectorFillColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
           :fill-opacity="sectorFillOpacity(cluster.sectors[0]?.id || '')"
           :stroke="sectorStrokeColor(cluster.sectors[0]?.id || '', cluster.sectors[0]?.color || cluster.color)"
@@ -88,22 +86,10 @@ const emit = defineEmits<{
           :data-cluster-id="cluster.id"
           :stroke-dasharray="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
         />
-        <text
-          :x="cluster.cx.toFixed(1)"
-          :y="(cluster.singleLabelY || 0).toFixed(1)"
-          text-anchor="middle"
-          dominant-baseline="text-before-edge"
-          alignment-baseline="text-before-edge"
-          :font-size="(cluster.singleLabelFontSize || sectorLabelFontSize).toFixed(1)"
-          :font-family="mapFontFamily"
-          :font-weight="sectorLabelWeight(cluster.sectors[0]?.id || '')"
-          :fill="sectorLabelFill(cluster.sectors[0]?.id || '')"
-          :data-cluster-id="cluster.id"
-        >
-          {{ cluster.singleLabel }}
-        </text>
         <g
-          v-for="badge in buildResourceGroupBadgeGeometries(cluster.sectors[0]?.id || '', cluster.cx, cluster.cy, cluster.singleRadius || 0)"
+          v-if="showResourceBadges !== false"
+          class="resource-badge"
+          v-for="badge in buildResourceGroupBadgeGeometries(cluster.sectors[0]?.id || '', cluster.sectors[0]?.sx || cluster.cx, cluster.sectors[0]?.sy || cluster.cy, cluster.sectors[0]?.radius || cluster.singleRadius || 0)"
           :key="badge.key"
           data-testid="resource-group-badge"
         >
@@ -117,8 +103,8 @@ const emit = defineEmits<{
             fill="rgba(5, 5, 5, 0.78)"
             stroke="rgba(251, 191, 36, 0.38)"
           />
-          <text
-            :x="(badge.x + badge.width / 2).toFixed(1)"
+            <text
+              :x="(badge.x + badge.width / 2).toFixed(1)"
             :y="(badge.y + badge.height / 2).toFixed(1)"
             :data-testid="`resource-group-badge-${cluster.sectors[0]?.id || ''}-${badge.label}`"
             text-anchor="middle"
@@ -190,22 +176,9 @@ const emit = defineEmits<{
               :stroke-dasharray="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? '6,4' : undefined"
               :stroke-dashoffset="!gameDataEnforceDlcActivation && cluster.isDlcActive === false ? ((sector.sx + sector.sy) % 10).toFixed(1) : undefined"
             />
-            <text
-              :x="sector.sx.toFixed(1)"
-              :y="sector.labelY.toFixed(1)"
-              text-anchor="middle"
-              dominant-baseline="text-before-edge"
-              alignment-baseline="text-before-edge"
-              :font-size="sector.labelFontSize.toFixed(1)"
-              :font-family="mapFontFamily"
-              :font-weight="sectorLabelWeight(sector.id)"
-              :fill="sectorLabelFill(sector.id)"
-              :data-sector-id="sector.id"
-              :data-cluster-id="cluster.id"
-            >
-              {{ sector.label }}
-            </text>
             <g
+              v-if="showResourceBadges !== false"
+              class="resource-badge"
               v-for="badge in buildResourceGroupBadgeGeometries(sector.id, sector.sx, sector.sy, sector.radius)"
               :key="badge.key"
               data-testid="resource-group-badge"

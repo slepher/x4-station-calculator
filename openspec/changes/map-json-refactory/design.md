@@ -106,6 +106,26 @@
 - 否则运行时与脚本会分别依赖不同数据形状，留下长期尾巴。
 - 你的要求是一次性重构完成，不留手尾。
 
+### D6: 将 sector 图构建抽为共享 helper，避免业务模块夹带拓扑逻辑
+
+**决策**：把 sector 图构建与 BFS 可达性从 `mapAdvancedResourceFilter.ts` 中抽离为共享 map 拓扑 helper，由 resource filter、POI 搜索、station-binding 等共同复用。
+
+**理由**：
+
+- `station-binding` 的 coverage 计算复用了高级资源筛选的跳数语义，但这不应导致拓扑逻辑继续寄存在 resource filter 模块里。
+- 拓扑逻辑留在业务模块内，会把结构重构、业务需求和回归排查耦合在一起。
+- 抽离后可以更清楚地区分“map-json 结构适配”和“具体业务行为回归”。
+
+### D7: `station-binding` 按规范值精确比较 macro/id，不再局部重复归一化
+
+**决策**：`station-binding` 内部的 coverage、sector 归属判断、拖拽落点校验统一直接比较规范化后的小写 macro/id；不在组件里继续散落 `toLowerCase()` 对比。
+
+**理由**：
+
+- `map-json-refactory` 已把地图数据源与引用字段统一到小写。
+- `station-binding` 自己追加归一化会掩盖旧结构残留和非规范值来源，让问题难以定位。
+- 但共享 helper 的行为变更必须单独验证；如果抽离后仍出现资源页候选减少，这应当被视为独立 bug，而不是强行归因给结构重构。
+
 ## Impacted Areas
 
 ### 运行时代码
@@ -119,6 +139,9 @@
 - `src/utils/mapSearch.ts`
 - `src/components/map/**`
 - `src/store/logic/mapAdvancedResourceFilter.ts`
+- `src/store/logic/mapSectorGraph.ts`
+- `src/store/logic/saveBindingUtils.ts`
+- `src/composables/useMapBindingViewModel.ts`
 - `src/workers/saveParser.post.ts`
 - `src/store/logic/importExport.ts`
 
@@ -153,4 +176,5 @@
 
 - 类型改动后通过编译错误定位所有旧访问方式。
 - `maps.json` 生成结果确认不存在顶层大写 key 与 cluster 内嵌 sector 主结构。
-- 地图渲染、地图搜索、save parser 配置与 resource 提取至少完成构建级验证。
+- 地图渲染、地图搜索、save parser 配置、resource 提取与 station-binding 覆盖计算至少完成构建级验证。
+- 对共享拓扑 helper 的抽离需要额外检查高级资源页候选数是否保持一致；若结构重整后仍下降，则转为独立 bug 修复。

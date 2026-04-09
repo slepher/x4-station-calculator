@@ -26,6 +26,7 @@ import { useMapSvgOverlays } from '@/composables/useMapSvgOverlays'
 import { useMapSvgSectors } from '@/composables/useMapSvgSectors'
 import MapLinkLayer from '@/components/map/layers/MapLinkLayer.vue'
 import MapOverlayLayer from '@/components/map/layers/MapOverlayLayer.vue'
+import MapSectorLabelLayer from '@/components/map/layers/MapSectorLabelLayer.vue'
 import MapSectorLayer from '@/components/map/layers/MapSectorLayer.vue'
 type SectorHoverPayload = {
   sectorId: string
@@ -96,6 +97,9 @@ const props = withDefaults(defineProps<{
   sectorOwnerOverride?: Record<string, string>
   clusterOwnerOverride?: Record<string, string>
   factionColorMap?: Record<string, string>
+  showSectorLabels?: boolean
+  showSectorLinks?: boolean
+  showResourceBadges?: boolean
 }>(), {
   searchHighlightedSectorIds: () => [],
   resourceHighlightedSectorIds: () => [],
@@ -124,7 +128,10 @@ const props = withDefaults(defineProps<{
   viewBoxBounds: null,
   sectorOwnerOverride: undefined,
   clusterOwnerOverride: undefined,
-  factionColorMap: undefined
+  factionColorMap: undefined,
+  showSectorLabels: true,
+  showSectorLinks: true,
+  showResourceBadges: true
 })
 
 const emit = defineEmits<{
@@ -295,6 +302,24 @@ const renderedViewBox = computed(() => {
   return `0 0 ${canvasWidth.value.toFixed(1)} ${canvasHeight.value.toFixed(1)}`
 })
 
+const renderedBackgroundRect = computed(() => {
+  const bounds = props.viewBoxBounds
+  if (bounds && bounds.width > 0 && bounds.height > 0) {
+    return {
+      x: bounds.left,
+      y: bounds.top,
+      width: bounds.width,
+      height: bounds.height
+    }
+  }
+  return {
+    x: 0,
+    y: 0,
+    width: canvasWidth.value,
+    height: canvasHeight.value
+  }
+})
+
 watchEffect(() => {
   emit('content-size', {
     width: canvasWidth.value,
@@ -306,6 +331,7 @@ watchEffect(() => {
 </script>
 
 <template>
+  <div class="map-svg-stage" :style="{ width: `${Math.round(renderedWidth)}px`, height: `${Math.round(renderedHeight)}px` }">
   <svg
     class="map-svg"
     data-testid="map-svg-canvas"
@@ -314,7 +340,13 @@ watchEffect(() => {
     :viewBox="renderedViewBox"
     xmlns="http://www.w3.org/2000/svg"
   >
-    <rect width="100%" height="100%" fill="#050505" />
+    <rect
+      :x="renderedBackgroundRect.x.toFixed(1)"
+      :y="renderedBackgroundRect.y.toFixed(1)"
+      :width="renderedBackgroundRect.width.toFixed(1)"
+      :height="renderedBackgroundRect.height.toFixed(1)"
+      fill="#050505"
+    />
     <defs>
       <filter :id="SEARCH_HIGHLIGHT_FILTER_ID" x="-40%" y="-40%" width="180%" height="180%">
         <feMorphology in="SourceAlpha" operator="dilate" radius="0.8" result="spread" />
@@ -363,6 +395,7 @@ watchEffect(() => {
     </defs>
 
     <MapLinkLayer
+      :visible="showSectorLinks"
       :sector-link-lines="sectorLinkLines"
       :highway-segments="highwaySegments"
       :gate-circles="gateCircles"
@@ -373,7 +406,6 @@ watchEffect(() => {
     <MapSectorLayer
       :cluster-polygons="clusterPolygons"
       :game-data-enforce-dlc-activation="gameData.enforceDlcActivation"
-      :sector-label-font-size="SECTOR_LABEL_FONT_SIZE"
       :map-font-family="MAP_FONT_FAMILY"
       :sector-clip-id="sectorClipId"
       :hex-points="hexPoints"
@@ -386,8 +418,7 @@ watchEffect(() => {
       :sector-stroke-width="sectorStrokeWidth"
       :sector-stroke-opacity="sectorStrokeOpacity"
       :sector-filter="sectorFilter"
-      :sector-label-weight="sectorLabelWeight"
-      :sector-label-fill="sectorLabelFill"
+      :show-resource-badges="showResourceBadges"
       @sector-hover="emitSectorHover"
       @sector-leave="emitSectorLeave"
     />
@@ -407,9 +438,27 @@ watchEffect(() => {
       @save-poi-pointerdown="emit('save-poi-pointerdown', $event)"
     />
   </svg>
+
+    <MapSectorLabelLayer
+      v-if="showSectorLabels && !isZooming"
+      :cluster-polygons="clusterPolygons"
+      :sector-label-font-size="SECTOR_LABEL_FONT_SIZE"
+      :map-font-family="MAP_FONT_FAMILY"
+      :sector-label-weight="sectorLabelWeight"
+      :sector-label-fill="sectorLabelFill"
+      :viewport-width="renderedWidth"
+      :viewport-height="renderedHeight"
+      :view-box-bounds="viewBoxBounds"
+    />
+  </div>
 </template>
 
 <style scoped>
+.map-svg-stage {
+  position: relative;
+  display: block;
+}
+
 .map-svg {
   display: block;
   user-select: none;

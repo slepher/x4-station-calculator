@@ -82,7 +82,7 @@ vi.mock('@/store/useEmpireStore', () => ({
   })
 }))
 
-import MapWorkbenchView from '@/components/empire/MapWorkbenchView.vue'
+import MapWorkbenchView from '@/components/map/MapWorkbenchView.vue'
 
 const hoverPayload = {
   sectorId: 'sector_alpha',

@@ -5,11 +5,11 @@ import { describe, expect, it, beforeEach } from 'vitest'
 import {
   matchSectorToTagGroup,
   buildAdvancedCandidates,
-  buildSectorGraph,
   ADVANCED_SUNLIGHT_TAG_ID,
   type AdvancedResourceTagGroup,
   type AdvancedResourceSector
 } from '@/store/logic/mapAdvancedResourceFilter'
+import { buildSectorGraph } from '@/store/logic/mapSectorGraph'
 import { buildYieldRanksByWare, YIELD_NAME_TO_RATING, type RegionYieldEntry } from '@/store/logic/mapResourceFilter'
 
 const regionYields: RegionYieldEntry[] = [
@@ -205,29 +205,31 @@ describe('1.5 buildSectorGraph: 跨 cluster 连通', () => {
     // 1.5.1 传入包含 cluster_gates 的地图数据，验证返回的图中包含跨 cluster 的双向连通边 #期望: [graph 包含跨 cluster 邻居]
     const clusters = {
       cluster1: {
-        sectors: {
-          s1: {
-            id: 's1',
-            cluster_gates: {
-              g1: { target_cluster_id: 'cluster2' }
-            }
-          }
-        },
+        sectors: ['s1'],
         sector_links: {}
       },
       cluster2: {
-        sectors: {
-          s2: {
-            id: 's2',
-            cluster_gates: {
-              g2: { target_cluster_id: 'cluster1' }
-            }
-          }
-        },
+        sectors: ['s2'],
         sector_links: {}
       }
     }
-    const { graph } = buildSectorGraph(clusters as any)
+    const sectors = {
+      s1: {
+        id: 's1',
+        cluster_id: 'cluster1',
+        cluster_gates: {
+          g1: { target_cluster_id: 'cluster2' }
+        }
+      },
+      s2: {
+        id: 's2',
+        cluster_id: 'cluster2',
+        cluster_gates: {
+          g2: { target_cluster_id: 'cluster1' }
+        }
+      }
+    }
+    const { graph } = buildSectorGraph(clusters as any, sectors as any)
     expect(graph.s1).toContain('s2')
     expect(graph.s2).toContain('s1')
   })
