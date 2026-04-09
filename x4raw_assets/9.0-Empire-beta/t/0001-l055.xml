@@ -2719,6 +2719,7 @@
     <t id="9654">Módulo de Produção</t>
     <t id="9655">Multiplicador de Aceleração do Impulso</t>
     <t id="9656">Interrompe a recarga de escudos G e GG.</t>
+    <t id="9657">Unknown production method</t>
     <t id="9700">(User question)</t>
     <t id="9701">Hackeamento</t>
     <t id="9702">Você está prestes a hackear.</t>
@@ -3332,10 +3333,10 @@
     <t id="11688">Tempo de avaliação de mineração(followed by colon and added percentage)</t>
     <t id="11689">Recurso em Potencial</t>
     <t id="11690">Recurso Detectado</t>
-    <t id="11691">Introducing Priority Orders</t>
-    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
-    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
-    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
+    <t id="11691">Apresentando Ordens Prioritárias</t>
+    <t id="11692">Agora você pode usar teclas modificadoras para dar ordens enfileiradas \(%s($INPUT_MODIFIER_ICON$)\) e prioritárias \(%s($INPUT_MODIFIER_ICON$)\) diretamente do mapa ou do menu de Interação. Por padrão, as ordens enviadas às naves sem o uso dessas teclas modificadoras substituirão qualquer ordem enfileirada anteriormente.</t>
+    <t id="11693">Se preferir o comportamento antigo, você pode alterar a configuração "Comportamento de Ordem Padrão" no menu "Configurações do Jogo" para "Fila", de forma que pressionar %s($INPUT_MODIFIER_ICON$) enquanto usa o menu de Interação sobrescreva a ordem em vez de adicioná-la à fila.</t>
+    <t id="11694">Pressione Sim se desejar experimentar o novo comportamento padrão do modificador ou Não se desejar manter o comportamento antigo e usar %s($INPUT_MODIFIER_ICON$) para sobrescrever as ordens.</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Salvar off-line</t>
     <t id="11702">Gravar por cima do jogo salvo off-line</t>
@@ -8665,7 +8666,7 @@
     <t id="9929">Você não pode selecionar esta opção porque isso cancelaria a seleção de uma opção necessária para desbloquear um setor no qual você colocou uma propriedade.</t>
     <t id="9930">Este jogo customizado não pode ser escolhido porque contém objetos restritos que você ainda não desbloqueou.</t>
     <t id="9931">Este jogo personalizado contém configurações de equipamentos que incluem itens incompatíveis. Os itens incompatíveis não serão instalados.</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">Este jogo personalizado contém itens ou esquemas que não são mais válidos. Os itens afetados não serão utilizados.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(On-line)</t>
     <t id="11301">Aceitar esta missão abortará qualquer outra missão de operação multiverso.</t>
@@ -20375,7 +20376,7 @@
     <t id="302960232">Não me passou despercebido que você vem manipulando facções proativamente há algum tempo! Mas você já ouviu falar do Protocolo Nulo?</t>
     <t id="302960233">Ele permite que seus agentes façam seu trabalho de forma independente, criando um cenário político que fica em constante mudança.</t>
     <t id="302960234">Se quiser, podemos pedir que Boso Ta elabore um plano de pesquisa. Me avise!</t>
-    <t id="302960235">Olá. A pesquisa sobre o Protocolo Nulo foi concluída — parabéns! Agora você pode enviar um agente para usar o Protocolo na prática.</t>
+    <t id="302960235">Olá. A pesquisa sobre o Protocolo Nulo foi concluída - parabéns! Agora você pode enviar um agente para usar o Protocolo na prática.</t>
     <t id="302960236">E não se preocupe: se as coisas começarem a sair do controle, você pode sempre desistir de tudo.</t>
     <t id="302960237">Sim, tenho uma pista sobre um novo agente promissor. Estou enviando as informações para você agora.</t>
     <t id="302960238">Desculpe, todos estão mantendo discrição. Ainda não tenho nenhuma pista nova.</t>
@@ -30968,7 +30969,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)Acabei de ser recebido pela equipe da sua embaixada.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)Quão verdadeiramente e completamente lamentável.</t>
     <t id="3004">(Player requests military support)Não se preocupem! Estamos enviando nossas melhores naves militares neste exato momento!</t>
-    <t id="3005">(Faction military support has ended)É com profundo pesar que informo que precisamos retirar nosso apoio militar — por enquanto.</t>
+    <t id="3005">(Faction military support has ended)É com profundo pesar que informo que precisamos retirar nosso apoio militar - por enquanto.</t>
     <t id="12106">(Promotion ceremony - intro)Estamos felizes que tenha comparecido pessoalmente.</t>
     <t id="12107">(Promotion ceremony - cntd, friendly)Acompanhamos suas conquistas com muito interesse e acreditamos que você merece uma recompensa.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)Estamos felizes por você ter se mostrado um grande defensor da Rainha. Você merece o maior respeito e reconhecimento.</t>
@@ -36736,7 +36737,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)O representante de todos os Paranid unidos passou pela sua porta.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)Você se desviou demais do caminho! A retribuição te encontrará eventualmente!</t>
     <t id="3004">(Player requests military support)O Reino da Trindade está preparado para ajudá-lo, desde que os Pontífices o vejam com bons olhos.</t>
-    <t id="3005">(Faction military support has ended)Fiel [mp:servidor|fp:servidora]! Nosso apoio militar deve chegar ao fim — por enquanto.</t>
+    <t id="3005">(Faction military support has ended)Fiel [mp:servidor|fp:servidora]! Nosso apoio militar deve chegar ao fim - por enquanto.</t>
     <t id="12100">(* Faction Representative *)</t>
     <t id="12101">(Neutral greeting)Seja bem-vindo à nossa fronteira.</t>
     <t id="12102">(Friendly greeting)Que a luz das estrelas esteja sobre você.</t>
@@ -46847,7 +46848,7 @@
     <t id="3002">(Diplomat Arrival Confirmation)Cheguei ao quartel-general da sua companhia.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)Que pena! Todos nós lamentaremos a perda desse lucro em potencial.</t>
     <t id="3004">(Player requests military support)A Companhia considerou que é do seu interesse apoiar seus esforços militares.</t>
-    <t id="3005">(Faction military support has ended)Nosso apoio militar chegou ao fim — por enquanto. Esperamos ter conseguido facilitar seus planos de ganhar dinheiro.</t>
+    <t id="3005">(Faction military support has ended)Nosso apoio militar chegou ao fim - por enquanto. Esperamos ter conseguido facilitar seus planos de ganhar dinheiro.</t>
     <t id="12106">(Promotion ceremony - intro)É um prazer me encontrar com você pessoalmente.</t>
     <t id="12107">(Promotion ceremony - cntd, friendly)Acompanhamos suas ações com muito interesse e acreditamos que você merece investimentos.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)Ficamos felizes que nosso interesse inicial em você não tenha sido em vão. Seus resultados merecem uma recompensa.</t>
@@ -51191,7 +51192,7 @@
     <t id="74902">{20006,102}(No information available)</t>
     <t id="74903">(1-Dock Short){20104,71109}</t>
     <t id="75001">Showroom para Naves Pequenas 01</t>
-    <t id="75002">Vamos ser francos, possuir uma nave espacial é uma necessidade em quase todas as regiões civilizadas do espaço, não importa o quão densamente povoadas os dados oficiais do censo as façam parecer. Possuir duas naves espaciais diferencia o empreendedor da classe média, o proprietário privado. No entanto, possuir três, seis, doze — ou quantas forem — naves espaciais eleva o distinto cavalheiro à classe alta, ao 1% que pode. E se formos honestos, que multimilionário, bilionário, quadrilionário colocaria suas reluzentes e valiosas naves espaciais em um estacionamento em órbita de alguma lua insignificante em um sistema estelar esquecido por Deus, para nunca serem apreciadas por ninguém? Isso mesmo, ninguém!\n\nA regra da riqueza é a seguinte: se você a tem, mostre. Coloque-a em um salão lustroso, tenha seu casco polido por um exército de mãos robóticas requintadas, banhado em luzes ofuscantes por um raio laser vindo de cima. E então, se você tiver seu interesse romântico para jantar, ou seu potencial parceiro de negócios - ou seu avô ou avó, aliás - ostente seus veículos de luxo.\n\nVocê merece!</t>
+    <t id="75002">Vamos ser francos, possuir uma nave espacial é uma necessidade em quase todas as regiões civilizadas do espaço, não importa o quão densamente povoadas os dados oficiais do censo as façam parecer. Possuir duas naves espaciais diferencia o empreendedor da classe média, o proprietário privado. No entanto, possuir três, seis, doze - ou quantas forem - naves espaciais eleva o distinto cavalheiro à classe alta, ao 1% que pode. E se formos honestos, que multimilionário, bilionário, quadrilionário colocaria suas reluzentes e valiosas naves espaciais em um estacionamento em órbita de alguma lua insignificante em um sistema estelar esquecido por Deus, para nunca serem apreciadas por ninguém? Isso mesmo, ninguém!\n\nA regra da riqueza é a seguinte: se você a tem, mostre. Coloque-a em um salão lustroso, tenha seu casco polido por um exército de mãos robóticas requintadas, banhado em luzes ofuscantes por um raio laser vindo de cima. E então, se você tiver seu interesse romântico para jantar, ou seu potencial parceiro de negócios - ou seu avô ou avó, aliás - ostente seus veículos de luxo.\n\nVocê merece!</t>
     <t id="75003">Showroom PP 01</t>
     <t id="75101">Showroom para Naves Pequenas 02</t>
     <t id="75102">{20104,75002}</t>

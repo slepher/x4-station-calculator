@@ -468,7 +468,7 @@
         <quota galaxy="1" zone="1"/>
       </quotas>
       <location class="zone" macro="zone002_cluster_14_sector001_macro"/>
-      <position x="-13617.273" y="0" z="19778.223" pitch="0" roll="0"/>
+      <position x="-13617.273" y="0" z="19778.223" pitch="0" roll="0" yaw="315"/>
       <station>
         <select faction="argon" tags="[shipyard]"/>
         <loadout>
@@ -481,7 +481,7 @@
         <quota galaxy="1" zone="1"/>
       </quotas>
       <location class="sector" macro="cluster_14_sector001_macro"/>
-      <position x="75500" y="0" z="43800" pitch="0" roll="0"/>
+      <position x="75500" y="0" z="43800" pitch="0" roll="0" yaw="0"/>
       <station>
         <select faction="argon" tags="[wharf]"/>
         <loadout>
@@ -519,6 +519,19 @@
       </quotas>
       <location class="sector" macro="cluster_06_sector002_macro"/>
       <position x="-48800" y="0" z="27800" pitch="0" roll="0"/>
+      <station>
+        <select faction="argon" tags="[tradestation]"/>
+        <loadout>
+          <level exact="0.75"/>
+        </loadout>
+      </station>
+    </station>
+    <station id="tradestation_argon_02" race="argon" owner="argon" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" zone="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_08_sector001_macro"/>
+      <position x="14000" y="0" z="-26500" pitch="0" roll="0"/>
       <station>
         <select faction="argon" tags="[tradestation]"/>
         <loadout>
@@ -605,7 +618,7 @@
         <quota galaxy="1" zone="1"/>
       </quotas>
       <location class="sector" macro="cluster_28_sector001_macro"/>
-      <position x="-33600" y="0" z="-27500" pitch="0" roll="0"/>
+      <position x="-33600" y="0" z="-27500" pitch="0" roll="0" yaw="0"/>
       <station>
         <select faction="antigone" tags="[shipyard]"/>
         <loadout>
@@ -618,7 +631,7 @@
         <quota galaxy="1" zone="1"/>
       </quotas>
       <location class="sector" macro="cluster_28_sector001_macro"/>
-      <position x="105000" y="0" z="12300" pitch="0" roll="0"/>
+      <position x="92500" y="0" z="22800" pitch="0" roll="0" yaw="90"/>
       <station>
         <select faction="antigone" tags="[wharf]"/>
         <loadout>
@@ -639,12 +652,25 @@
         </loadout>
       </station>
     </station>
-    <station id="tradestation_antigone" race="argon" owner="antigone" type="tradingstation">
+    <station id="tradestation_antigone_01" race="argon" owner="antigone" type="tradingstation">
       <quotas>
         <quota galaxy="1" zone="1"/>
       </quotas>
       <location class="sector" macro="cluster_27_sector001_macro"/>
       <position x="103700" y="0" z="122700" pitch="0" roll="0"/>
+      <station>
+        <select faction="antigone" tags="[tradestation]"/>
+        <loadout>
+          <level exact="0.75"/>
+        </loadout>
+      </station>
+    </station>
+    <station id="tradestation_antigone_02" race="argon" owner="antigone" type="tradingstation">
+      <quotas>
+        <quota galaxy="1" zone="1"/>
+      </quotas>
+      <location class="sector" macro="cluster_40_sector001_macro"/>
+      <position x="-33700" y="0" z="47500" pitch="0" roll="0"/>
       <station>
         <select faction="antigone" tags="[tradestation]"/>
         <loadout>

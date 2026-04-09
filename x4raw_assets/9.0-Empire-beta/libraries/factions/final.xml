@@ -329,6 +329,7 @@
       <relation faction="scavenger" relation="-0.5"/>
       <relation faction="boron" relation="-0.5"/>
       <relation faction="kaori" relation="-0.5"/>
+      <relation faction="terran" relation="-0.5"/>
     </relations>
   </faction>
   <faction id="hatikvah" name="{20203,901}" description="{20203,902}" shortname="{20203,903}" prefixname="{20203,904}" spacename="{20203,905}" homespacename="{20203,906}" primaryrace="argon" behaviourset="default" tags="claimspace economic pirate plunder privateloadout privateship protective watchdoguser">
@@ -483,6 +484,7 @@
       <relation faction="scavenger" relation="-1"/>
       <relation faction="boron" relation="-1"/>
       <relation faction="kaori" relation="-1"/>
+      <relation faction="terran" relation="-1"/>
     </relations>
     <signals>
       <response signal="policehalt" response="attack"/>
@@ -568,6 +570,7 @@
       <relation faction="scavenger" relation="-0.032"/>
       <relation faction="boron" relation="-0.032"/>
       <relation faction="kaori" relation="-0.032"/>
+      <relation faction="terran" relation="-0.032"/>
     </relations>
   </faction>
   <faction id="ownerless" behaviourset="default" tags="hidden">
@@ -674,6 +677,7 @@
       <relation faction="scavenger" relation="-0.32"/>
       <relation faction="boron" relation="-0.32"/>
       <relation faction="kaori" relation="-0.32"/>
+      <relation faction="terran" relation="-0.32"/>
     </relations>
     <signals>
       <response signal="foundlockbox" response="collect"/>
@@ -708,6 +712,7 @@
       <relation faction="scavenger" relation="-0.06"/>
       <relation faction="boron" relation="-0.06"/>
       <relation faction="kaori" relation="-0.06"/>
+      <relation faction="terran" relation="-0.06"/>
     </relations>
   </faction>
   <faction id="teladi" name="{20203,601}" description="{20203,602}" shortname="{20203,603}" prefixname="{20203,604}" spacename="{20203,605}" homespacename="{20203,606}" primaryrace="teladi" behaviourset="default" tags="claimspace economic privateloadout privateship protective publicloadout publicship standard watchdoguser" policefaction="ministry">
@@ -838,6 +843,7 @@
       <relation faction="scavenger" relation="-1"/>
       <relation faction="boron" relation="-1"/>
       <relation faction="kaori" relation="-1"/>
+      <relation faction="terran" relation="-1"/>
     </relations>
     <signals>
       <response signal="policehalt" response="attack"/>
@@ -1165,6 +1171,7 @@
       <relation faction="scavenger" relation="-0.32"/>
       <relation faction="boron" relation="-0.32"/>
       <relation faction="kaori" relation="-0.32"/>
+      <relation faction="terran" relation="-1"/>
     </relations>
     <signals>
       <response signal="foundabandonedship" response="claim"/>

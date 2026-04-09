@@ -91,9 +91,9 @@
       <reload time="14"/>
       <damage value="286" shield="154" shielddisruption="10" repair="0"/>
       <effects>
-        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
-        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
-        <launch ref="muzzle_turret_gen_m_beam_01_mk1"/>
+        <bigobjectimpact inside="impact_arg_l_beam_01_mk1_bigobject_inside" ref="impact_arg_l_beam_01_mk1_bigobject"/>
+        <impact inside="impact_arg_l_beam_01_mk1_inside" ref="impact_arg_l_beam_01_mk1"/>
+        <launch ref="muzzle_turret_arg_l_beam_01_mk1"/>
       </effects>
       <sounds>
         <firing ref="turret_beam_muzzle"/>
@@ -1158,13 +1158,13 @@
   <macro name="bullet_kha_l_beam_02_mk1_macro" class="bullet">
     <component ref="bullet_kha_l_beam_02_mk1"/>
     <properties>
-      <bullet speed="30000" lifetime="4" range="14000" amount="1" barrelamount="1" angle="0" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1" chargetime="5.5" heatwhilecharging="0" firewhenfullcharge="1" forcecooldownaftershot="1"/>
-      <heat value="2000"/>
-      <reload time="10"/>
-      <damage value="90000" shielddisruption="10" repair="0"/>
+      <bullet speed="30000" lifetime="4" range="14000" amount="1" barrelamount="1" angle="0.4" maxhits="1" ricochet="0" restitution="1" scale="1" attach="1" chargetime="5.5" heatwhilecharging="0" firewhenfullcharge="1" forcecooldownaftershot="1"/>
+      <heat value="2490"/>
+      <reload time="14"/>
+      <damage value="66000" shielddisruption="10" repair="0"/>
       <effects>
-        <impact ref="impact_kha_l_beam_01_mk1" inside="impact_kha_l_beam_01_mk1_inside"/>
-        <bigobjectimpact ref="impact_kha_l_beam_01_mk1_bigobject" inside="impact_kha_l_beam_01_mk1_bigobject_inside"/>
+        <bigobjectimpact inside="impact_kha_l_beam_01_mk1_bigobject_inside" ref="impact_kha_l_beam_01_mk1_bigobject"/>
+        <impact inside="impact_kha_l_beam_01_mk1_inside" ref="impact_kha_l_beam_01_mk1"/>
         <launch ref="muzzle_kha_l_destroyer_01_mk1"/>
       </effects>
       <sounds>
@@ -1183,9 +1183,9 @@
         <multiplier traveldrive="1.5"/>
       </damage>
       <effects>
-        <bigobjectimpact inside="impact_gen_m_beam_01_mk1_bigobject_inside" ref="impact_gen_m_beam_01_mk1_bigobject"/>
-        <impact inside="impact_gen_m_beam_01_mk1_inside" ref="impact_gen_m_beam_01_mk1"/>
-        <launch ref="muzzle_gen_m_beam_01_mk1"/>
+        <bigobjectimpact inside="impact_kha_m_beam_01_mk1_bigobject_inside" ref="impact_kha_m_beam_01_mk1_bigobject"/>
+        <impact inside="impact_kha_m_beam_01_mk1_inside" ref="impact_kha_m_beam_01_mk1"/>
+        <launch ref="muzzle_kha_m_beam_01_mk1"/>
       </effects>
       <sounds>
         <firing ref="wpn_beam_khaak"/>
@@ -1201,9 +1201,9 @@
       <reload time="0.9"/>
       <damage value="292" repair="0"/>
       <effects>
-        <bigobjectimpact inside="impact_gen_s_beam_01_mk1_bigobject_inside" ref="impact_gen_s_beam_01_mk1_bigobject"/>
-        <impact inside="impact_gen_s_beam_01_mk1_inside" ref="impact_gen_s_beam_01_mk1"/>
-        <launch ref="muzzle_gen_s_beam_01_mk1"/>
+        <bigobjectimpact inside="impact_kha_s_beam_01_mk1_bigobject_inside" ref="impact_kha_s_beam_01_mk1_bigobject"/>
+        <impact inside="impact_kha_s_beam_01_mk1_inside" ref="impact_kha_s_beam_01_mk1"/>
+        <launch ref="muzzle_kha_s_beam_01_mk1"/>
       </effects>
       <sounds>
         <firing ref="wpn_beam_khaak"/>
@@ -1474,12 +1474,12 @@
     <component ref="bullet_gen_m_gatling_01_mk1"/>
     <properties>
       <ammunition value="26" reload="6"/>
-      <bullet speed="2800" lifetime="2.6" amount="1" barrelamount="2" icon="weapon_gatling_mk1" timediff="0.025" angle="0.3" maxhits="1" scale="0" attach="0"/>
+      <bullet speed="3200" lifetime="2.25" amount="1" barrelamount="2" icon="weapon_gatling_mk1" timediff="0.01" angle="0.3" maxhits="1" scale="0" attach="0"/>
       <reload rate="10"/>
       <damage value="28" repair="0"/>
       <effects>
-        <bigobjectimpact ref="impact_gen_s_gatling_01_mk1_bigobject" inside="impact_gen_s_gatling_01_mk1_bigobject_inside"/>
-        <impact ref="impact_gen_s_gatling_01_mk1" inside="impact_gen_s_gatling_01_mk1_inside"/>
+        <bigobjectimpact inside="impact_gen_s_gatling_01_mk1_bigobject_inside" ref="impact_gen_s_gatling_01_mk1_bigobject"/>
+        <impact inside="impact_gen_s_gatling_01_mk1_inside" ref="impact_gen_s_gatling_01_mk1"/>
         <launch ref="muzzle_turret_gen_m_gatling_01_mk1"/>
       </effects>
       <weapon system="turret_shortrange"/>
@@ -1487,7 +1487,7 @@
         <time>
           <point position="0.3" value="1"/>
           <point position="0.5" value="0.7"/>
-          <point position="1" value="0.2"/>
+          <point position="1" value="0.3"/>
         </time>
       </damagecurves>
     </properties>
@@ -2030,9 +2030,9 @@
       <reload time="14"/>
       <damage value="286" shield="154" shielddisruption="10" repair="0"/>
       <effects>
-        <impact ref="impact_gen_m_beam_01_mk1" inside="impact_gen_m_beam_01_mk1_inside"/>
-        <bigobjectimpact ref="impact_gen_m_beam_01_mk1_bigobject" inside="impact_gen_m_beam_01_mk1_bigobject_inside"/>
-        <launch ref="muzzle_turret_gen_m_beam_01_mk1"/>
+        <bigobjectimpact inside="impact_tel_l_beam_01_mk1_bigobject_inside" ref="impact_tel_l_beam_01_mk1_bigobject"/>
+        <impact inside="impact_tel_l_beam_01_mk1_inside" ref="impact_tel_l_beam_01_mk1"/>
+        <launch ref="muzzle_turret_tel_l_beam_01_mk1"/>
       </effects>
       <sounds>
         <firing ref="turret_beam_muzzle"/>
@@ -2366,9 +2366,9 @@
     <component ref="bullet_ter_s_laser_02_mk1"/>
     <properties>
       <bullet speed="2700" lifetime="1" barrelamount="1" timediff="0.08" angle="0.24" maxhits="1" ricochet="0" restitution="1" scale="0" attach="0"/>
-      <heat value="900"/>
-      <reload rate="1.2"/>
-      <damage value="180" hull="60" repair="0"/>
+      <heat value="765"/>
+      <reload rate="1.4"/>
+      <damage value="110" hull="70" repair="0"/>
       <effects>
         <bigobjectimpact inside="impact_ter_s_laser_02_mk1_bigobject_inside" ref="impact_ter_s_laser_02_mk1_bigobject"/>
         <impact inside="impact_ter_s_laser_02_mk1_inside" ref="impact_ter_s_laser_02_mk1"/>
@@ -2421,7 +2421,7 @@
     <component ref="bullet_ter_l_gatling_01_mk1"/>
     <properties>
       <ammunition value="32" reload="6.2"/>
-      <bullet speed="2200" lifetime="2.273" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.03" angle="0.58" maxhits="1" scale="0" attach="0"/>
+      <bullet speed="2300" lifetime="2.52" amount="1" barrelamount="1" icon="weapon_gatling_mk1" timediff="0.03" angle="0.65" maxhits="1" scale="0" attach="0"/>
       <reload rate="4.5"/>
       <damage value="206" shielddisruption="10" repair="0"/>
       <effects>

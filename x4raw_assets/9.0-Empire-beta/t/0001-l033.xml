@@ -1599,7 +1599,7 @@
     <t id="7791">Intérieurs de station globaux</t>
     <t id="7792">Transaction</t>
     <t id="7793">Détail</t>
-    <t id="7794">Age(ou Ancienneté, à vérifier en jeu)</t>
+    <t id="7794">Âge</t>
     <t id="7795">Paiement d'un achat</t>
     <t id="7796">Recette d'une vente</t>
     <t id="7797">Salaire de mission</t>
@@ -1671,7 +1671,7 @@
     <t id="7864">M/S</t>
     <t id="7865">Actions</t>
     <t id="7866">Récupérer les objets largués</t>
-    <t id="7867">Récupérer les largages</t>
+    <t id="7867">Récupérer l'objet largué</t>
     <t id="7868">Ce vaisseau est parti en aventure</t>
     <t id="7869">Ailiers : attaquez ma cible</t>
     <t id="7870">Ailiers : stoppez et arrêtez de tirer</t>
@@ -2598,8 +2598,8 @@
     <t id="9333">Votre vaisseau actuel vous attendra quand le pilote de relève prendra le relais</t>
     <t id="9334">Si vous êtes sur le même vaisseau ou la même station, ce vaisseau vous attendra avant de décoller</t>
     <t id="9400">Personnel</t>
-    <t id="9401">Ordre mis dans la liste</t>
-    <t id="9402">Ordres mis dans la liste</t>
+    <t id="9401">Ordre mis en attente</t>
+    <t id="9402">Ordres mis en attente</t>
     <t id="9403">Pilote de secours</t>
     <t id="9404">Liste complète des membres d'équipage</t>
     <t id="9405">Laisser</t>
@@ -2719,6 +2719,7 @@
     <t id="9654">Module de protection</t>
     <t id="9655">Facteur d'accélération \(Turbo\)</t>
     <t id="9656">Perturbe la régénération des boucliers de tailles L et XL</t>
+    <t id="9657">Unknown production method</t>
     <t id="9700">(User question)</t>
     <t id="9701">Piratage</t>
     <t id="9702">Vous êtes sur le point de pirater</t>
@@ -2937,9 +2938,9 @@
     <t id="11147">Désactiver le remplacement des vaisseaux perdus</t>
     <t id="11148">Retirer le vaisseau de remplacement</t>
     <t id="11149">Supprimer le dépôt de construction</t>
-    <t id="11150">File d'attente des ordres=</t>
+    <t id="11150">File d'attente des ordres</t>
     <t id="11151">Ordre prioritaire</t>
-    <t id="11152">Ajouter aux ordres prioritaires</t>
+    <t id="11152">Mettre l'ordre prioritaire en attente</t>
     <t id="11153">Écraser la file d'attente</t>
     <t id="11154">Amarrer sur le Hall d'exposition</t>
     <t id="11155">Ordonner au vaisseau de s'amarrer ici</t>
@@ -3325,16 +3326,16 @@
     <t id="11681">Prioritaire( ordre)</t>
     <t id="11682">Le comportement par défaut des ordres a été mis à jour. Désormais, tout nouvel ordre remplace la file d'attente au lieu de s'y ajouter.</t>
     <t id="11683">Les ordres peuvent toujours être mis en file d'attente ou devenir prioritaires en utilisant des touches de modification.</t>
-    <t id="11684">Le comportement de mise en file d'attente par défaut peut être modifié à tout moment via le paramètre "Comportement des ordres par défaut"({1001,12783}) dans les options du jeu.</t>
+    <t id="11684">Le comportement de mise en attente par défaut peut être modifié à tout moment via le paramètre "Comportement d'ordre par défaut"({1001,12783}) dans les options du jeu.</t>
     <t id="11685">Voulez-vous essayer le nouveau comportement par défaut maintenant ?</t>
     <t id="11686">Paramètres commerciaux de la plateforme de minage</t>
     <t id="11687">Sondes de ressources présentes dans le secteur(toujours au moins 2, le texte est suivi par : et par le nombre de sondes)</t>
     <t id="11688">Temps d'évaluation des ressources(suivi par : et le pourcentage, il s'agit d'un facteur appliqué au temps)</t>
     <t id="11689">Gisement potentiel</t>
     <t id="11690">Gisement détecté</t>
-    <t id="11691">Introduction des ordres prioritaires</t>
-    <t id="11692">Vous pouvez désormais utiliser des touches de modification pour donner des ordres en file d'attente (%s($INPUT_MODIFIER_ICON$)\N- et des ordres prioritaires (%s($INPUT_MODIFIER_ICON$)\N-) directement depuis la carte ou depuis le menu Interagir. Par défaut, les ordres donnés aux vaisseaux sans utiliser ces touches de modification écraseront désormais tout ordre précédemment mis en file d'attente.</t>
-    <t id="11693">Si vous préférez l'ancien comportement, vous pouvez changer le paramètre Comportement des ordres par défaut dans le menu Paramètres, de sorte que l'appui sur %s($INPUT_MODIFIER_ICON$) lors de l'utilisation du menu Interaciont écrasera la commande au lieu de l'ajouter à la file d'attente.</t>
+    <t id="11691">Présentation des ordres prioritaires</t>
+    <t id="11692">Vous pouvez désormais utiliser des touches de modification pour donner des ordres mis en attente \(%s($INPUT_MODIFIER_ICON$)\) ou prioritaires \(%s($INPUT_MODIFIER_ICON$)\) directement depuis la carte ou le menu d'interaction. Par défaut, les ordres donnés aux vaisseaux sans utiliser ces touches écraseront désormais tout ordre précédemment mis en attente.</t>
+    <t id="11693">Si vous préférez l'ancien comportement, vous pouvez changer le paramètre "Comportement d'ordre par défaut" dans le menu des Paramètres du jeu sur "Mettre en attente". Ainsi, appuyer sur %s($INPUT_MODIFIER_ICON$) tout en utilisant le menu d'interaction écrasera les ordres au lieu de l'ajouter à la file d'attente.</t>
     <t id="11694">Appuyez sur Oui si vous souhaitez essayer le nouveau comportement par défaut, ou sur Non si vous souhaitez conserver l'ancien comportement et utiliser %s($INPUT_MODIFIER_ICON$) pour écraser les ordres.</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Sauvegarde locale</t>
@@ -3741,8 +3742,8 @@
     <t id="12780">Eclats lumineux</t>
     <t id="12781">Génération de trame dynamique</t>
     <t id="12782">Extension désactivée</t>
-    <t id="12783">Comportement par défaut des ordres</t>
-    <t id="12784">Ajouter à la file</t>
+    <t id="12783">Comportement d'ordre par défaut</t>
+    <t id="12784">Mettre en attente</t>
     <t id="12785">Écraser la file</t>
     <t id="12786">Génération d'images AMD FSR</t>
     <t id="12787">Amélioration expérimentale du support manette</t>
@@ -3953,7 +3954,7 @@
     <t id="13325">Annuler la sélection du module</t>
     <t id="13326">Centrer sur la station</t>
     <t id="13327">Ordre prioritaire en attente</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">Vitesse de collecte</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Au revoir</t>
@@ -4876,7 +4877,7 @@
     <t id="132">{1005,168} / {1006,22} \(Souris\)</t>
     <t id="133">Suspendre l'assistance de vol</t>
     <t id="134">Priorité des ordres du menu contextuel</t>
-    <t id="135">Les ordres du menu contextuel conservent la file d'attente</t>
+    <t id="135">Interagir avec le menu conserve la file d'attente(je mettrais : "Interagir avec le menu conserve la séquence d'ordre", mais j'ai pas vu en jeu ce que c'était exactement, je fais un mix des deux)</t>
     <t id="136">Carte : Réinitialiser la position</t>
     <t id="137">Carte : Réinitialiser l'orientation</t>
     <t id="138">Carte : Sélectionner</t>
@@ -7394,7 +7395,7 @@
     <t id="5901">Un scénario de démonstration de X4: Foundations</t>
     <t id="5902">Résumé de la démonstration</t>
     <t id="5904">Bienvenue sur X4 !\n\nCette démo ciblée vous plonge directement dans l'action. Découvrez un aperçu des batailles spatiales à grande échelle de X4 en rejoignant une flotte alliée prête à repousser des forces ennemies, et défendez une station frontalière assiégée.\n\Engagez-vous dans des combats acharnés à proximité d'un Portail de Saut, soutenu par de puissants vaisseaux capitaux et des systèmes de défense automatisés. Sans préparation ni temps mort, lancez-vous dans l'aventure, prenez les commandes pour expérimenter la démesure, la tension et la beauté des combats spatiaux dans X4: Foundations.</t>
-    <t id="5905">Univers de démonstration</t>
+    <t id="5905">Scénario de démonstration</t>
     <t id="5906">Bienvenue dans X4 !\n\nCe scénario vous plonge dans un secteur animé au sein d'un univers réduit, vous offrant un avant-goût de l'échelle démesurée et des possibilités infinies de X4: Foundations.</t>
     <t id="6000">Tutoriel : Gameplay Avancé</t>
     <t id="6001">{1021,6101}</t>
@@ -9094,7 +9095,7 @@
     <t id="50">Commerce</t>
     <t id="60">Minage</t>
     <t id="70">Coordination</t>
-    <t id="80">Collecter les débris</t>
+    <t id="80">Récupération</t>
   </page>
   <page id="1039" title="Order States" descr="Describes the different states an AI order can be in" voice="no">
     <t id="1">importe</t>
@@ -9264,8 +9265,8 @@
     <t id="782">Transfert des travailleurs entre des stations.</t>
     <t id="791">Fournit un service journalier</t>
     <t id="792">Agit comme service de transport journalier pour les travailleurs entre les stations d'un secteur.</t>
-    <t id="801">Collecter les débris</t>
-    <t id="802">Collecter les cubes de débris métalliques ou les petites épaves pour les remorquer vers une station de recyclage des débris métalliques.</t>
+    <t id="801">Récupérer les débris</t>
+    <t id="802">Récupérer les cubes de débris métalliques ou les petites épaves pour les remorquer vers une station de recyclage des débris métalliques.</t>
     <t id="811">Livrer les débris</t>
     <t id="812">Livrer les débris remorqués à une station de recyclage des débris métalliques.</t>
     <t id="821">Collection des débris automatique</t>
@@ -9622,7 +9623,7 @@
     <t id="157">Ce type de vaisseau ne peut pas construire de stations.</t>
     <t id="158">Ce type de vaisseau ne peut pas miner.</t>
     <t id="159">Ce type de vaisseau ne peut pas ravitailler des vaisseaux.</t>
-    <t id="160">Ce type de vaisseau ne peut pas collecter ou traiter de débris.</t>
+    <t id="160">Ce type de vaisseau ne peut pas récupérer ou traiter de débris.</t>
     <t id="161">Impossible d'attaquer en raison de l'Ordre forcé d'ouvrir le feu.(se réfère à {1001,7753})</t>
     <t id="162">Aucun subordonné affecté au minage.</t>
   </page>
@@ -11465,7 +11466,7 @@
     <t id="302950129">Encore et encore, jusqu'à ce que je puisse vous faire changer d'avis.</t>
   </page>
   <page id="10097" title="Demo Speaker" descr="Lines for the Demo Speaker" voice="yes">
-    <t id="100">Bienvenue dans cette démonstration de X4: Foundations — une simulation spatiale de grande envergure dans laquelle vous pouvez piloter personnellement des centaines de vaisseaux différents, des plus petits appareils aux gigantesques vaisseaux de ligne.</t>
+    <t id="100">Bienvenue dans cette démonstration de X4: Foundations - une simulation spatiale de grande envergure dans laquelle vous pouvez piloter personnellement des centaines de vaisseaux différents, des plus petits appareils aux gigantesques vaisseaux de ligne.</t>
     <t id="101">Vous vous trouvez actuellement sur le pont d'un vaisseau de ligne qui ne vous appartient pas encore. À la place, vous allez être [mp:invité|fp:invitée] à piloter un vaisseau plus petit, en cours de chargement sur un quai d'amarrage de taille S.</t>
     <t id="102">Please follow the orange line and walk to the elevator.</t>
     <t id="103">Veuillez vous diriger vers la sortie et cliquer sur le panneau à votre droite pour sélectionner le quai.</t>
@@ -51191,7 +51192,7 @@
     <t id="74902">{20006,102}(No information available)</t>
     <t id="74903">(1-Dock Short){20104,71109}</t>
     <t id="75001">Hall d'exposition de petits vaisseaux 01</t>
-    <t id="75002">Soyons honnêtes : posséder un vaisseau spatial est une nécessité dans presque toutes les régions civilisées de l'espace, peu importe la densité de population que les recensements officiels laissent paraître. En posséder deux différencie l'entrepreneur du simple propriétaire privé issu de la classe moyenne. Cependant, en posséder trois, six, douze — ou peu importe le nombre — élève l'être distingué aux rangs de la haute société, ce fameux "un pour cent" qui en a les moyens. Et soyons francs, quel multi-millionnaire, milliardaire ou quadrillionnaire placerait ses vaisseaux étincelants les plus précieux sur une orbite de parking autour d'une lune insignifiante dans un système stellaire oublié de tous, sans que personne ne puisse jamais les admirer ? Aucun, c'est exact !\n\nLa règle d'or du bling-bling est la suivante : si vous le possédez, affichez-le. Placez-le dans un hall lustré, faites polir sa coque par une armée de mains robotiques délicates, et baignez-le dans les lumières aveuglantes de projecteurs lasers. Et alors, quand vous recevrez votre conquête amoureuse pour dîner, votre futur partenaire commercial — ou même votre vénérable aïeul — faites-les parader devant vos véhicules de luxe.\n\nVous l'avez mérité !</t>
+    <t id="75002">Soyons honnêtes : posséder un vaisseau spatial est une nécessité dans presque toutes les régions civilisées de l'espace, peu importe la densité de population que les recensements officiels laissent paraître. En posséder deux différencie l'entrepreneur du simple propriétaire privé issu de la classe moyenne. Cependant, en posséder trois, six, douze - ou peu importe le nombre - élève l'être distingué aux rangs de la haute société, ce fameux "un pour cent" qui en a les moyens. Et soyons francs, quel multi-millionnaire, milliardaire ou quadrillionnaire placerait ses vaisseaux étincelants les plus précieux sur une orbite de parking autour d'une lune insignifiante dans un système stellaire oublié de tous, sans que personne ne puisse jamais les admirer ? Aucun, c'est exact !\n\nLa règle d'or du bling-bling est la suivante : si vous le possédez, affichez-le. Placez-le dans un hall lustré, faites polir sa coque par une armée de mains robotiques délicates, et baignez-le dans les lumières aveuglantes de projecteurs lasers. Et alors, quand vous recevrez votre conquête amoureuse pour dîner, votre futur partenaire commercial - ou même votre vénérable aïeul - faites-les parader devant vos véhicules de luxe.\n\nVous l'avez mérité !</t>
     <t id="75003">Hall d'exposition S 01</t>
     <t id="75101">Hall d'exposition de petits vaisseaux 02</t>
     <t id="75102">{20104,75002}</t>
@@ -51478,7 +51479,7 @@
     <t id="1014">(Laser à impulsions S Mk2){20105,1011} {20111,5011} {20111,201}</t>
     <t id="1015">(Pulse Laser){20105,1011}</t>
     <t id="1021">Répéteur de projectiles</t>
-    <t id="1022">Le répéteur de projectiles offre un équilibre entre puissance de frappe et performance thermique, ce qui en fait un choix courant pour un usage polyvalent. Il se positionne généralement comme une évolution du laser à impulsions, conservant une capacité de tir soutenu tout en utilisant des projectiles plus larges et plus lents. Cela permet des rafales prolongées capables d'engager efficacement des cibles de taille comparable, bien que son utilisation dépende d'un contrôle rigoureux des salves et de la gestion de la chaleur.\n\nLa vitesse réduite des projectiles permet aux vaisseaux plus petits et agiles d'esquiver les tirs dans des conditions favorables. Contre les vaisseaux capitaux, le répéteur à projectiles est adapté pour neutraliser les éléments de surface exposés tels que les tourelles et les générateurs de boucliers, mais son efficacité contre les structures de coque demeure limitée.\n\nLa conception actuelle du répéteur à projectiles provient des programmes de développement militaire Argons, basés sur l'ancienne technologie du Conducteur de masse remontant à l'époque du conflit Kha'ak. En supprimant la capacité de pénétration des boucliers pour se concentrer sur un débit de projectiles continu, le système a atteint un profil polyvalent et fiable qui a été largement adopté par les forces alliées à la Fédération.</t>
+    <t id="1022">Le répéteur de projectiles offre un équilibre entre puissance de frappe et performance thermique, ce qui en fait un choix courant pour un usage polyvalent. Il se positionne généralement comme une évolution du laser à impulsions, conservant une capacité de tir soutenu tout en utilisant des projectiles plus larges et plus lents. Cela permet des rafales prolongées capables d'engager efficacement des cibles de taille comparable, bien que son utilisation dépende d'un contrôle rigoureux des salves et de la gestion de la chaleur.\n\nLa vitesse réduite des projectiles permet aux vaisseaux plus petits et agiles d'esquiver les tirs dans des conditions favorables. Contre les vaisseaux capitaux, le répéteur de projectiles est adapté pour neutraliser les éléments de surface exposés tels que les tourelles et les générateurs de boucliers, mais son efficacité contre les structures de coque demeure limitée.\n\nLa conception actuelle du répéteur de projectiles provient des programmes de développement militaire Argons, basés sur l'ancienne technologie du Conducteur de masse remontant à l'époque du conflit Kha'ak. En supprimant la capacité de pénétration des boucliers pour se concentrer sur un débit de projectiles continu, le système a atteint un profil polyvalent et fiable qui a été largement adopté par les forces alliées à la Fédération.</t>
     <t id="1024">(Répéteur de projectiles S Mk1){20105,1021} {20111,5011} {20111,101}</t>
     <t id="1025">(Bolt Repeater){20105,1021}</t>
     <t id="1031">(Bolt Repeater){20105,1021}</t>
@@ -51486,7 +51487,7 @@
     <t id="1034">(Répéteur de projectiles S Mk2){20105,1031} {20111,5011} {20111,201}</t>
     <t id="1035">(Bolt Repeater){20105,1031}</t>
     <t id="1041">Batterie à éclats</t>
-    <t id="1042">La batterie à éclats est un système d'armement cinétique à courte portée, caractérisé par la projection simultanée de multiples projectiles. Cette configuration compense sa précision et sa portée limitée par des dégâts élevés, tant sur les boucliers que sur les coques. Techniquement, le système dérive du répéteur à projectiles bien que la nécessité d'une plus large ouverture du canon et d'un espacement accru des projectiles entraîne une consommation d'énergie supérieure.\n\nEn termes de dégâts bruts, la batterie à éclats est souvent comparée au canon à plasma, bien qu'elle occupe un rôle tactique différent. Elle s'avère particulièrement efficace contre les cibles plus imposantes et lentes, comme les vaisseaux de taille M, moins aptes à esquiver la dispersion de ses projectiles. L'arme est également idéale pour engager les éléments de surface des vaisseaux capitaux en exploitant les angles morts de leurs tourelles défensives.</t>
+    <t id="1042">La batterie à éclats est un système d'armement cinétique à courte portée, caractérisé par la projection simultanée de multiples projectiles. Cette configuration compense sa précision et sa portée limitée par des dégâts élevés, tant sur les boucliers que sur les coques. Techniquement, le système dérive du répéteur de projectiles bien que la nécessité d'une plus large ouverture du canon et d'un espacement accru des projectiles entraîne une consommation d'énergie supérieure.\n\nEn termes de dégâts bruts, la batterie à éclats est souvent comparée au canon à plasma, bien qu'elle occupe un rôle tactique différent. Elle s'avère particulièrement efficace contre les cibles plus imposantes et lentes, comme les vaisseaux de taille M, moins aptes à esquiver la dispersion de ses projectiles. L'arme est également idéale pour engager les éléments de surface des vaisseaux capitaux en exploitant les angles morts de leurs tourelles défensives.</t>
     <t id="1044">(Batterie à éclats S Mk1){20105,1041} {20111,5011} {20111,101}</t>
     <t id="1045">(Shard Battery){20105,1041}</t>
     <t id="1051">(Shard Battery){20105,1041}</t>
@@ -51598,7 +51599,7 @@
     <t id="1314">(SPL Accélérateur Tau S Mk2){20202,303} {20105,1311} {20111,5011} {20111,201}</t>
     <t id="1315">(Tau Accelerator){20105,1311}</t>
     <t id="1321">Gatling à neutrons</t>
-    <t id="1322">La gatling à neutrons split est une arme à projectiles de courte portée et à cadence rapide, comparable au répéteur à projectiles. Comme son homologue de la Communauté des planètes, elle produit un flux continu de projectiles relativement lents, d'anticiper la trajectoire lors d'engagements contre des cibles agiles. Le système inflige d'importants dégâts collatéraux du fait de la dispersion des projectiles et de sa précision limitée, ce qui réduit son efficacité contre les petites cibles, ou favorisant dans ce cas le combat rapproché.\n\nLa conception de l'arme privilégie le tir soutenu et les profils d'engagement agressifs, reflétant la doctrine de combat split. Son volume et sa persistance de tir peuvent exercer une pression significative lors des rencontres à courte portée, malgré une précision de visée limitée. Bien qu'il s'agisse avant tout d'un système de combat fonctionnel, la gatling à neutrons est souvent associée à des tactiques qui privilégient la domination psychologique.</t>
+    <t id="1322">La gatling à neutrons split est une arme à projectiles de courte portée et à cadence rapide, comparable au répéteur de projectiles. Comme son homologue de la Communauté des planètes, elle produit un flux continu de projectiles relativement lents, nécessitant d'anticiper la trajectoire lors d'engagements contre des cibles agiles. Le système inflige d'importants dégâts collatéraux du fait de la dispersion des projectiles et de sa précision limitée, ce qui réduit son efficacité contre les petites cibles, ou favorisant dans ce cas le combat rapproché.\n\nLa conception de l'arme privilégie le tir soutenu et les profils d'engagement agressifs, reflétant la doctrine de combat split. Son volume et sa persistance de tir peuvent exercer une pression significative lors des rencontres à courte portée, malgré une précision de visée limitée. Bien qu'il s'agisse avant tout d'un système de combat fonctionnel, la gatling à neutrons est souvent associée à des tactiques requérant la domination psychologique sur l'adversaire.</t>
     <t id="1324">(SPL Gatling à neutrons S Mk1){20202,303} {20105,1321} {20111,5011} {20111,101}</t>
     <t id="1325">(Neutron Gatling){20105,1321}</t>
     <t id="1331">(Neutron Gatling){20105,1321}</t>
@@ -51614,7 +51615,7 @@
     <t id="1354">(SPL Désintégrateur thermique S Mk2){20202,303} {20105,1351} {20111,5011} {20111,201}</t>
     <t id="1355">(Thermal Disintegrator){20105,1351}</t>
     <t id="1361">Flux de mésons</t>
-    <t id="1362">Le flux de mésons est une arme à faisceau de haute puissance conçue pour les engagements à portée extrême. Il émet un faisceau éphémère unique qui atteint la cible à une vitesse relativiste. Comme pour d'autres systèmes de haute précision, son débattement limité restreint son efficacité contre les cibles proches ou rapides. Cette limitation est largement compensée par la configuration optique de l'arme, optimisée pour la focalisation à longue portée. En deçà de sa portée efficace, la cohérence du faisceau se dégrade rapidement, résultant en une réduction drastique de sa puissance destructrice.\n\nEn raison de sa demande énergétique et de sa charge thermique exceptionnellement élevées, le flux de mésons ne peut être installé que sur des supports d'armes à haute énergie.\n\nLe système emprunte son concept aux armes à focalisation d'énergie de grande envergure explorées pour la première fois par l'ancienne Force d'Intervention anti-IAG \(FII\). Bien qu'il ait nécessité le développement d'une plateforme entièrement nouvelle et qu'il fonctionne avec un profil énergétique notablement inefficace, sa valeur en tant que moyen de dissuasion à longue portée a été jugée suffisante pour passer outre ces contraintes. Le flux de mésons représente le premier résultat opérationnel de ce programme, marquant une première initiale du Protectorat Terrien vers le déploiement d'armements à focalisation d'énergie super-lourdes.</t>
+    <t id="1362">Le flux de mésons est une arme à faisceau de haute puissance conçue pour les engagements à portée extrême. Il émet un faisceau éphémère unique qui atteint la cible à une vitesse relativiste. Comme pour d'autres systèmes de haute précision, son débattement limité restreint son efficacité contre les cibles proches ou rapides. Cette limitation est largement compensée par la configuration optique de l'arme, optimisée pour la focalisation à longue portée. En deçà de sa portée efficace, la cohérence du faisceau se dégrade rapidement, résultant en une réduction drastique de sa puissance destructrice.\n\nEn raison de sa demande énergétique et de sa charge thermique exceptionnellement élevées, le flux de mésons ne peut être installé que sur des supports d'armes à haute énergie.\n\nLe système emprunte son concept aux armes à focalisation d'énergie de grande envergure explorées pour la première fois par l'ancienne Force d'Intervention anti-IAG \(FII\). Bien qu'il ait nécessité le développement d'une plateforme entièrement nouvelle et qu'il fonctionne avec un profil énergétique notablement inefficace, sa valeur en tant que moyen de dissuasion à longue portée a été jugée suffisante pour passer outre ces contraintes. Le flux de mésons représente le premier résultat opérationnel de ce programme, marquant une première étape du Protectorat Terrien vers le déploiement d'armements à focalisation d'énergie super-lourdes.</t>
     <t id="1364">(TER S Meson Stream Mk1){20202,703} {20105,1361} {20111,5011} {20111,101}</t>
     <t id="1365">(Meson Stream){20105,1361}</t>
     <t id="1371">(Meson Stream){20105,1361}</t>
@@ -51622,7 +51623,7 @@
     <t id="1374">(TER S Meson Stream Mk2){20202,703} {20105,1371} {20111,5011} {20111,201}</t>
     <t id="1375">(Meson Stream){20105,1371}</t>
     <t id="1381">Barrage à protons</t>
-    <t id="1382">Le barrage à protons terrien est un système d'armement à courte portée, exclusivement compatible avec les supports d'armes à haute énergie. Il constitue la contrepartie terrienne à haute énergie du répéteur de projectiles de la Communauté des planètes . Comparé à son homologue de la Communauté, le barrage à protons offre des dégâts et une vitesse de projectile accrus, au détriment de sa portée effective. Bien qu'il inflige des dégâts globaux plus importants, sa cadence de tir est plus faible, privilégiant des projectiles individuels plus puissants lors de rafales soutenues.\n\nLe système est réservé aux types de vaisseaux terriens en raison des exigences liées au point d'emport, et son coût d'acquisition est nettement plus élevé que celui du Répéteur de projectiles standard. Malgré ces contraintes, le barrage à protons remplit un rôle polyvalent et s'avère efficace contre une large gamme de cibles.\n\nLes origines du barrage à protons terrien remontent à la reconnexion avec la Communauté des planètes, lorsque les Services Secrets Terriens obtinrent les plans de conception du répéteur de projectiles. Cela permit aux ingénieurs terriens d'en perfectionner le concept et de l'adapter aux supports à haute énergie. Ces modifications entraînèrent une augmentation de la puissance délivrée, aboutissant à un système d'armement distinct de son prédécesseur de la Communauté.</t>
+    <t id="1382">Le barrage à protons terrien est un système d'armement à courte portée, exclusivement compatible avec les supports d'armes à haute énergie. Il constitue la contrepartie terrienne à haute énergie du répéteur de projectiles de la Communauté des planètes . Comparé à son homologue de la Communauté, le barrage à protons offre des dégâts et une vitesse de projectile accrus, au détriment de sa portée effective. Bien qu'il inflige des dégâts globaux plus importants, sa cadence de tir est plus faible, privilégiant des projectiles individuels plus puissants lors de rafales soutenues.\n\nLe système est réservé aux types de vaisseaux terriens en raison des exigences liées au point d'emport, et son coût d'acquisition est nettement plus élevé que celui du Répéteur de projectiles standard. Malgré ces contraintes, le barrage à protons remplit un rôle polyvalent et s'avère efficace contre une large gamme de cibles.\n\nLes origines du barrage à protons terrien remontent à la reconnexion avec la Communauté des planètes, lorsque les services secrets terriens obtinrent les plans de conception du répéteur de projectiles. Cela permit aux ingénieurs terriens d'en perfectionner le concept et de l'adapter aux supports à haute énergie. Ces modifications entraînèrent une augmentation de la puissance délivrée, aboutissant à un système d'armement distinct de son prédécesseur de la Communauté.</t>
     <t id="1384">(TER S Proton Barrage Mk1){20202,703} {20105,1381} {20111,5011} {20111,101}</t>
     <t id="1385">(Proton Barrage){20105,1381}</t>
     <t id="1391">(Proton Barrage){20105,1381}</t>
@@ -51654,7 +51655,7 @@
     <t id="1454">(Projecteur cinétique S Mk2){20105,1451} {20111,5011} {20111,201}</t>
     <t id="1455">(Kinetic Projector){20105,1441}</t>
     <t id="1461">(Pulse Laser){20105,1001}</t>
-    <t id="1462">Le laser à impulsions terrien est une variante de l'arme à impulsions standard largement déployée à travers le réseau de portails, intégrant des systèmes optiques terriens supérieurs. Bien que sa portée effective soit plus courte que celle de la plupart des versions de la Communauté des planètes, une vitesse de projectile plus élevée et la réduction du temps de vol qui en découle améliorent la précision globale. Comme pour les armes à impulsions comparables, il privilégie un feu soutenu et un verrouillage continu de la cible plutôt que des engagements courts à hauts dégâts.\n\nAprès le réalignement des portails, le Protectorat Terrien effectua une évaluation des armements contemporains et adapta la conception actuelle du Laser à impulsions aux normes de fabrication terriennes. Le système résultant préserve les principes de fonctionnement de base de l'arme tout en intégrant des modifications structurelles et optiques destinées à empêcher toute rétro-ingénierie non autorisée. Bien qu'initialement jugé inadapté à une utilisation par des fournisseurs d'armes étrangers, sa conception a depuis été intégrée à une vaste gamme de vaisseaux moyennant des ajustements mineurs.</t>
+    <t id="1462">Le laser à impulsions terrien est une variante de l'arme à impulsions standard largement déployée à travers le réseau de portails, intégrant des systèmes optiques terriens supérieurs. Bien que sa portée effective soit plus courte que celle de la plupart des versions de la Communauté des planètes, une vitesse de projectile plus élevée et la réduction du temps de vol qui en découle améliorent la précision globale. Comme pour les armes à impulsions comparables, il privilégie un feu soutenu et un verrouillage continu de la cible plutôt que des engagements courts à hauts dégâts.\n\nSuite au réalignement des portails, le Protectorat Terrien effectua une évaluation des armements contemporains et adapta la conception actuelle du Laser à impulsions aux normes de fabrication terriennes. Le système résultant préserve les principes de fonctionnement de base de l'arme tout en intégrant des modifications structurelles et optiques destinées à empêcher toute rétro-ingénierie non autorisée. Bien qu'initialement jugée inadapté à une utilisation par des fournisseurs d'armes étrangers, sa conception a depuis été intégrée à une vaste gamme de vaisseaux moyennant des ajustements mineurs.</t>
     <t id="1464">(TER S Pulse Laser Mk1){20202,703} {20105,2001} {20111,5011} {20111,101}</t>
     <t id="1465">(Pulse Laser){20105,2001}</t>
     <t id="1471">(Pulse Laser){20105,1001}</t>
@@ -51667,7 +51668,7 @@
     <t id="1484">(BOR Phaseur S Mk1){20202,203} {20105,1481} {20111,5011} {20111,101}</t>
     <t id="1485">(Canon à Effet de Phase){20105,1481}</t>
     <t id="1491">Canon éclair</t>
-    <t id="1492">Les armes à éclairs boronnes appartiennent à une classe d'équipements utilitaires dont le but, outre l'infliction de dommages, est de paralyser les systèmes de visée adverses. Des particules ionisées génèrent, lors du contact, des décharges électriques ciblées. À l'inverse des technologies ioniques classiques, les flux énergétiques sont ici calibrés pour saturer les circuits de détection fins plutôt que pour consumer les boucliers.\n\nSa version en tourelle est fort appréciée des équipages civils privilégiant la fuite à la confrontation. Bien qu'initialement conçu et validé pour le service actif par la Défense Militaire royale boronne, les armes à éclairs conservent encore leur statut de technologie expérimentale.</t>
+    <t id="1492">Les armes à éclairs boronnes appartiennent à une classe d'équipements utilitaires dont le but, outre l'infliction de dommages, est de paralyser les systèmes de visée adverses. Des particules ionisées génèrent, lors du contact, des décharges électriques ciblées. À l'inverse des technologies ioniques classiques, les flux énergétiques sont ici calibrés pour saturer les circuits de détection plutôt que pour consumer les boucliers.\n\nSa version en tourelle est fort appréciée des équipages civils privilégiant la fuite à la confrontation. Bien qu'initialement conçues et validées pour le service actif par la Défense militaire royale boronne, les armes à éclairs conservent encore leur statut de technologie expérimentale.</t>
     <t id="1493">Éclair</t>
     <t id="1494">(BOR Canon éclair S Mk1){20202,203} {20105,1491} {20111,5011} {20111,101}</t>
     <t id="1495">(Arc Gun){20105,1491}</t>
@@ -51698,7 +51699,7 @@
     <t id="1554">{20202,103} {20111,5011} {20105,1551} {20111,101}</t>
     <t id="1555">(Gamma HEPT){20105,1551}</t>
     <t id="1561">Canon électromagnétique</t>
-    <t id="1562">Le canon électromagnétique est un système d'armement de la Flotte Terrienne appartenant à la famille des armements e/m. Ces systèmes fonctionnent en générant des champs électromagnétiques de haute énergie pour compacter et accélérer de petites sphères de plasma, produisant des projectiles capables de contourner partiellement les boucliers.\n\nEn tant que plus petite version au sein de cette famille, le canon électromagnétique maintient une cadence de tir exceptionnelle, ce qui le rend idéal pour les vaisseaux destinés au combat rapproché.</t>
+    <t id="1562">Le canon électromagnétique est un système d'armement de la flotte terrienne appartenant à la famille des armements e/m. Ces systèmes fonctionnent en générant des champs électromagnétiques de haute énergie pour compacter et accélérer de petites sphères de plasma, produisant des projectiles capables de contourner partiellement les boucliers.\n\nEn tant que plus petite version au sein de cette famille, le canon électromagnétique maintient une cadence de tir exceptionnelle, ce qui le rend idéal pour les vaisseaux destinés au combat rapproché.</t>
     <t id="1563">Électromagnétique</t>
     <t id="1564">{20202,703} {20111,5011} {20105,1561} {20111,101}</t>
     <t id="1565">(Electromagnetic Gun){20105,1561}</t>
@@ -51936,7 +51937,7 @@
     <t id="2554">(BOR Lanceur de torpilles M Mk1){20202,203} {20105,2551} {20111,5021} {20111,101}</t>
     <t id="2555">(Torpedo Launcher){20105,1161}</t>
     <t id="2561">Obusier électromagnétique</t>
-    <t id="2562">Le canon électromagnétique est un système d'armement de la Flotte Terrienne basé sur la technologie d'accélération électromagnétique, conçu pour projeter des projectiles de plasma distincts à haute énergie. Il utilise des générateurs de champs électromagnétiques pour compacter et accélérer des sphères de plasma à haute vélocité, ce qui produit une force d'impact considérable sur la cible.\n\nComparé aux variantes montées sur tourelle, ce système privilégie un feu concentré à fort impact plutôt qu'une pression continue. Cela le rend particulièrement adapté aux engagements défensifs contre des vaisseaux de taille moyenne, où des frappes contrôlées et décisives peuvent être appliquées pour neutraliser des menaces individuelles.</t>
+    <t id="2562">Le canon électromagnétique est un système d'armement de la flotte terrienne basé sur la technologie d'accélération électromagnétique, conçue pour projeter des projectiles de plasma distincts à haute énergie. Il utilise des générateurs de champs électromagnétiques pour compacter et accélérer des sphères de plasma à haute vélocité, ce qui produit une force d'impact considérable sur la cible.\n\nComparé aux variantes montées sur tourelle, ce système privilégie un feu concentré à fort impact plutôt qu'une pression continue. Cela le rend particulièrement adapté aux engagements défensifs contre des vaisseaux de taille moyenne, où des frappes contrôlées et décisives peuvent être appliquées pour neutraliser des menaces individuelles.</t>
     <t id="2563">Électromagnétique</t>
     <t id="2564">{20202,703} {20111,5021} {20105,2561} {20111,101}</t>
     <t id="2565">(Electromagnetic Cannon){20105,2561}</t>
@@ -51985,7 +51986,7 @@
     <t id="3012">L'armurier Ebmancketvahs considérait la batterie principale de l'Odyssée comme le couronnement de sa carrière. Il décida de passer le temps qu'il lui fallait dans l'isolement le plus complet, s'installant dans un lieu de culte dans Sanctuaire de la Trinité pour une retraite qui dura cinq ans.\n\nLorsqu'il livra les plans de ce qui allait devenir, sans doute, l'arme la plus puissante de l'arsenal Paranide, Ebmancketvahs fut fêté par les autorités ecclésiastiques et il existe, à ce jour, une statue en son honneur dans Sanctuaire de la Trinité.</t>
     <t id="3014">(PAR Odysseus Main Battery){20202,403} {20105,3011}</t>
     <t id="3021">Batterie principale du Phénix</t>
-    <t id="3022">Les premières séries de production du destroyer Phénix intégraient des systèmes d'armement dérivés de conceptions argonnes et paranides. Bien qu'expéditive, cette approche a exposé la Compagnie Teladi à de longs litiges juridiques, entraînant une perte de confiance envers les accords de licence externes. L'affaire fut finalement réglée à l'amiable, précipitant le développement d'une batterie principale propriétaire dérivée de la technologie du Désintégrateur de muons.\n\nOfficiellement, cette nouvelle arme fut présentée comme une amélioration significative par rapport à l'armement principal du Béhémoth ; cependant, les évaluations comparatives indiquent des performances globalement équivalentes. Ses caractéristiques distinctives, héritées des systèmes à muons plus petits, permettent d'infliger des dégâts accrus aux boucliers tout en empêchant leur recharge ainsi que celle du moteur de voyage. Bien que ces propriétés correspondent à la doctrine de haute mobilité du Phénix, elles sont également prisées par les opérateurs illégaux.</t>
+    <t id="3022">Les premières séries de production du destroyer Phénix intégraient des systèmes d'armement dérivés de conceptions argonnes et paranides. Bien qu'expéditive, cette approche exposa la Compagnie Teladi à de longs litiges juridiques, entraînant une perte de confiance envers les accords de licence externes. L'affaire fut finalement réglée à l'amiable, précipitant le développement d'une batterie principale propriétaire dérivée de la technologie du Désintégrateur de muons.\n\nOfficiellement, cette nouvelle arme fut présentée comme une amélioration significative par rapport à l'armement principal du Béhémoth ; cependant, les évaluations comparatives indiquent des performances globalement équivalentes. Ses caractéristiques distinctives, héritées des systèmes à muons plus petits, permettent d'infliger des dégâts accrus aux boucliers tout en empêchant leur recharge ainsi que celle du moteur de voyage. Bien que ces propriétés correspondent à la doctrine de haute mobilité du Phénix, elles sont également prisées par les opérateurs illégaux.</t>
     <t id="3024">(TEL Phoenix Main Battery){20202,503} {20105,3021}</t>
     <t id="3031">Batterie principale du Crotale</t>
     <t id="3032">"Bouger rapidement et faire des dégâts" est plus qu'un aphorisme Split. Il s'agit à la fois d'une stratégie militaire et d'une philosophie de conception qui fut scrupuleusement respectée lors du développement de la batterie principale du Crotale.\n\nAvec sa portée relativement courte, les architectes militaires ont clairement envisagé un placement au centre de la bataille, plutôt que de lancer des projectiles depuis sa périphérie. Par conséquent, cette arme n'est recommandée qu'à ceux qui disposent des ressources nécessaires à l'emploi des meilleurs pilotes.\n\nUn tir de barrage de Crotale apparaissant au milieu d'une escarmouche est certainement considéré comme un spectacle impressionnant, mais seulement par ceux qui l'observent à une distance sûre.</t>
@@ -52220,7 +52221,7 @@
     <t id="4423">(Flak){20105,4403}</t>
     <t id="4424">(SPL Tourelle anti-aérienne M Mk1){20202,303} {20105,4421} {20111,5021} {20111,101}</t>
     <t id="4425">(Flak Mk1){20105,4423} {20111,101}</t>
-    <t id="4426">La Tourelle anti-aérienne est un système d'armement de proximité optimisé pour engager des cibles de classe chasseur. Son large rayon de déflagration réduit les exigences de précision à courte distance. Issue d'une rétro-ingénierie de la technologie de la Flotte Argone, ce système n'égale pas la précision de visée de la conception originale, mais compense cette lacune par une capacité de munitions accrue. Malgré ces différences, la tourelle conserve le même rôle opérationnel et la même enveloppe de performance.</t>
+    <t id="4426">La tourelle anti-aérienne est un système d'armement de proximité optimisé pour engager des cibles de classe chasseur. Son large rayon de déflagration réduit les exigences de précision à courte distance. Issue d'une rétro-ingénierie de la technologie de la flotte argonne, ce système n'égale pas la précision de visée de la conception originale, mais compense cette lacune par une capacité de munitions accrue. Malgré ces différences, la tourelle conserve le même rôle opérationnel et la même enveloppe de performance.</t>
     <t id="4481">Tourelle Boson</t>
     <t id="4482">{20006,102}(No information available)</t>
     <t id="4483">Boson</t>
@@ -52384,7 +52385,7 @@
     <t id="5074">(XEN L Plasma Turret Mk1){20202,603} {20105,5071} {20111,5031} {20111,101}</t>
     <t id="5075">(Plasma Mk1){20105,5073} {20111,101}</t>
     <t id="5081">(Beam Turret){20105,4161}</t>
-    <t id="5082">{20105,4162}\n\nLa Tourelle à rayons L est une variante améliorée du système standard, offrant une capacité d'émission accrue et un rendement continu plus élevé. Cependant, comme pour les variantes plus petites, son efficacité contre les structures de coque est réduite une fois les boucliers entièrement épuisés. Dans des configurations uniques orientées vers l'avant, le système est néanmoins couramment employé pour interrompre le fonctionnement des moteurs de voyage.</t>
+    <t id="5082">{20105,4162}\n\nLa tourelle à rayons L est une variante améliorée du système standard, offrant une capacité d'émission accrue et un rendement continu plus élevé. Cependant, comme pour les variantes plus petites, son efficacité contre les structures de coque est réduite une fois les boucliers entièrement épuisés. Dans des configurations uniques orientées vers l'avant, le système est néanmoins couramment employé pour interrompre le fonctionnement des moteurs de voyage.</t>
     <t id="5083">(Beam){20105,4163}</t>
     <t id="5084">(ARG L Beam Turret Mk1){20202,103} {20105,5081} {20111,5031} {20111,101}</t>
     <t id="5085">(Beam Mk1){20105,5083} {20111,101}</t>
@@ -52504,7 +52505,7 @@
     <t id="5314">(XEN L Positron Turret Mk1){20202,603} {20105,5311} {20111,5031} {20111,101}</t>
     <t id="5315">(Positron Mk1){20105,5313} {20111,101}</t>
     <t id="5321">(Graviton Turret){20105,4831}</t>
-    <t id="5322">La tourelle à gravitons Xénon figure parmi les systèmes d'arme montée sur tourelle les plus efficaces que l'on connaisse pour engager des cibles de classe capitale. Elle repose sur un principe énergétique exotique, privilégiant la puissance de destruction au détriment de la précision.\n\nLes fabricants d'armes terriens ont refusé de préciser si des études sur les technologies à gravitons xénon ont pu influencer le développement de leurs propres systèmes d'armement lourd.</t>
+    <t id="5322">La tourelle à gravitons Xénon figure parmi les systèmes d'arme montés sur tourelle les plus efficaces que l'on connaisse pour engager des cibles de classe capitale. Elle repose sur un principe énergétique exotique, privilégiant la puissance de destruction au détriment de la précision.\n\nLes fabricants d'armes terriens ont refusé de préciser si des études sur les technologies à gravitons xénon ont pu influencer le développement de leurs propres systèmes d'armement lourd.</t>
     <t id="5323">(Graviton){20105,4833}</t>
     <t id="5324">(XEN L Graviton Turret Mk1){20202,603} {20105,5321} {20111,5031} {20111,101}</t>
     <t id="5325">(Graviton Mk1){20105,5323} {20111,101}</t>
@@ -52559,7 +52560,7 @@
     <t id="5424">(TER L Kinetic Turret Mk1){20202,703} {20105,5421} {20111,5031} {20111,101}</t>
     <t id="5425">(Kinetic Mk1){20105,4793} {20111,101}</t>
     <t id="5431">Canon électro-magnétique à ions cinétique</t>
-    <t id="5432">Le canon électro-magnétique à ions cinétiques est une arme utilitaire développée par la Défense Militaire Royale Boronne, une organisation de recherche gouvernementale spécialisée dans l'ingénierie expérimentale. Il tire des projectiles rapides, qui explosent de façon à endommager simultanément plusieurs éléments de surface. De plus, la décharge ionique associée neutralise les capteurs et la mobilité de la cible, y compris sur les vaisseaux de classe Capital.</t>
+    <t id="5432">Le canon électro-magnétique à ions cinétiques est une arme utilitaire développée par la Défense militaire royale boronne, une organisation de recherche gouvernementale spécialisée dans l'ingénierie expérimentale. Il tire des projectiles rapides, qui explosent de façon à endommager simultanément plusieurs éléments de surface. De plus, la décharge ionique associée neutralise les capteurs et la mobilité de la cible, y compris sur les vaisseaux de classe Capital.</t>
     <t id="5433">Champ ionique</t>
     <t id="5434">(BOR Canon électro-magnétique à ions cinétique L Mk1){20202,203} {20105,5431} {20111,5031} {20111,101}</t>
     <t id="5435">(Ion Net Launcher){20105,5431}</t>
@@ -52621,7 +52622,7 @@
     <t id="6012">(Obsolète){20105,6002}\n\nLe missile léger sourd-muet Mk2 est la version supérieure au Mk1. L'augmentation des performances par rapport à sa version plus abordable peut faire toute la différence entre la victoire et l'éjection d'urgence.</t>
     <t id="6014">(Obsolète)(Missile sourd-muet Léger Mk2){20105,6011} {20111,5201} {20111,201}</t>
     <t id="6021">(Dumbfire Missile){20105,6001}</t>
-    <t id="6022">Bien que plus puissante que les versions plus légères, la roquette lourde reste un choix d'armement économique qui permet aux pilotes de frapper bien au-delà de leur catégorie. Un compromis sur les performances du propulseur a permis d'intégrer une ogive nettement plus massive.\n\nDéployée depuis un lanceur standard Mk1 ou Mk2, un piston à gaz éjecte la munition du tube de lancement, après quoi le propulseur s'allume une fois la distance de sécurité confirmée. Cette combinaison améliore la sécurité, prévient les incendies accidentels en cas d'enrayement de l'arme et réduit considérablement les coûts de maintenance.\n\nÀ l'instar de sa variante plus abordable et moins puissante, cette roquette utilise un simple détonateur à percussion doublé d'une minuterie de secours. Cependant, la roquette lourde dispose de deux composants d'ogive distincts placés en tandem directement derrière le détonateur. Lors de l'impact, la charge précurseure détonne immédiatement, projetant un dard superchauffé capable de percer la coque externe de la plupart des vaisseaux. Quelques microsecondes après le précurseur, la charge principale, bien plus volumineuse, déclenche un explosif conventionnel, causant des dégâts potentiellement catastrophiques aux petits vaisseaux et des dommages importants aux plus grands. Si l'arme ne parvient pas à toucher sa cible, elle poursuit sa course en ligne droite jusqu'à l'expiration de sa minuterie embarquée, point auquel elle s'autodétruit en toute sécurité.</t>
+    <t id="6022">Bien que plus puissante que les versions plus légères, la roquette lourde reste un choix d'armement économique qui permet aux pilotes de frapper bien au-dessus de leur catégorie. Un compromis sur les performances du propulseur a permis d'intégrer une ogive nettement plus massive.\n\nDéployée depuis un lanceur standard Mk1 ou Mk2, un piston à gaz éjecte la munition du tube de lancement, après quoi le propulseur s'allume une fois la distance de sécurité confirmée. Cette combinaison améliore la sécurité, prévient les incendies accidentels en cas d'enrayement de l'arme et réduit considérablement les coûts de maintenance.\n\nÀ l'instar de sa variante plus abordable et moins puissante, cette roquette utilise un simple détonateur à percussion doublé d'une minuterie de secours. Cependant, la roquette lourde dispose de deux composants d'ogive distincts placés en tandem directement derrière le détonateur. Lors de l'impact, la charge précurseure détonne immédiatement, projetant un dard superchauffé capable de percer la coque externe de la plupart des vaisseaux. Quelques microsecondes après le précurseur, la charge principale, bien plus volumineuse, déclenche un explosif conventionnel, causant des dégâts potentiellement catastrophiques aux petits vaisseaux et des dommages importants aux plus grands. Si l'arme ne parvient pas à toucher sa cible, elle poursuit sa course en ligne droite jusqu'à l'expiration de sa minuterie embarquée, point auquel elle s'autodétruit en toute sécurité.</t>
     <t id="6024">(Obsolète)(Heavy Dumbfire Missile Mk1){20105,6021} {20111,5211} {20111,101}</t>
     <t id="6031">(Dumbfire Missile){20105,6001}</t>
     <t id="6032">{20105,6022}\n\nGrâce aux améliorations apportées à la composition chimique du propulseur et à l'utilisation d'un carburant plus avancé, la Roquette Lourde Mk2 est un système d'armement légèrement plus réactif que sa version précédente.</t>
@@ -52693,7 +52694,7 @@
     <t id="6262">{20006,102}(No information available)</t>
     <t id="6264">(Roquette à sous-munitions Légère Mk1){20105,6261} Légère {20111,101}</t>
     <t id="6271">(Scatter Missile){20105,6261}</t>
-    <t id="6272">La roquette lourde à sous-munitions est une arme à deux étages. Afin de respecter les dimensions standards des lanceurs, un compromis a dû être trouvé pour offrir une solution de lancement de roquettes à cadence rapide, tout en utilisant les systèmes d'affûts ordinaires. L'arme contient un étage primaire composé d'une coque externe détachable, d'un câblage interne et des points de fixation nécessaires pour loger plusieurs roquettes individuelles. Une fois que l'arme a quitté le lanceur et que le corps principal est à une distance de sécurité suffisante du vaisseau, la coque externe se détache de l'armature interne en quatre morceaux distincts. En quelques microsecondes, les petites roquettes individuelles se séparent de l'armature et leurs propulseurs s'allument, les projetant vers la cible à grande vitesse. L'arme se comporte un peu comme un fusil à pompe très complexe, mais un fusil à pompe qui tirerait des roquettes au lieu de chevrotine.\n\nL'utilisation d'une combinaison d'ogives hautement explosives et incendiaires peut infliger des dégâts répartis sur de multiples points d'un combattant ennemi, et constitue un moyen très efficace de submerger ses capacités de réparation. Elle est cependant extrêmement imprécise et ne doit être utilisée qu'à bout portant contre des cibles de taille L et XL.</t>
+    <t id="6272">La roquette lourde à sous-munitions est une arme à deux étages. Afin de respecter les dimensions standards des lanceurs, un compromis a dû être trouvé pour offrir une solution de lancement de roquettes à cadence rapide, tout en utilisant les systèmes d'affûts ordinaires. L'arme contient un étage primaire composé d'une coque externe détachable, d'un câblage interne et des points de fixation nécessaires pour loger plusieurs roquettes individuelles. Une fois que l'arme a quitté son lanceur et que le corps principal est à une distance de sécurité suffisante du vaisseau, la coque externe se détache de l'armature interne en quatre morceaux distincts. En quelques microsecondes, les petites roquettes individuelles se séparent de l'armature et leurs propulseurs s'allument, les projetant vers la cible à grande vitesse. L'arme se comporte un peu comme un fusil à pompe très complexe, mais un fusil à pompe qui tirerait des roquettes au lieu de chevrotine.\n\nL'utilisation d'une combinaison d'ogives hautement explosives et incendiaires peut infliger des dégâts répartis sur de multiples points d'un combattant ennemi, et constitue un moyen très efficace de submerger ses capacités de réparation. Elle est cependant extrêmement imprécise et ne doit être utilisée qu'à bout portant contre des cibles de taille L et XL.</t>
     <t id="6274">(Heavy Scatter Missile Mk1){20105,6271} Lourde {20111,101}</t>
     <t id="6281">Missile à tête chercheuse</t>
     <t id="6282">{20006,102}(No information available)</t>
@@ -52837,10 +52838,10 @@
     <t id="7123">(Meson Stream){20105,1361}</t>
     <t id="7124">(TER Tourelle Flux de mésons M Mk1){20202,703} {20105,7121} {20111,5021} {20111,101}</t>
     <t id="7125">(Meson Stream Mk1){20105,7123} {20111,101}</t>
-    <t id="7131">Tourelle Barrage à protons</t>
+    <t id="7131">Tourelle de barrage à protons</t>
     <t id="7132">{20105,1382}</t>
     <t id="7133">(Proton Barrage){20105,1381}</t>
-    <t id="7134">(TER Tourelle Barrage à protons M Mk1){20202,703} {20105,7131} {20111,5021} {20111,101}</t>
+    <t id="7134">(TER Tourelle de barrage à protons M Mk1){20202,703} {20105,7131} {20111,5021} {20111,101}</t>
     <t id="7135">(Barrage à protons Mk1){20105,7133} {20111,101}</t>
     <t id="9000">(*Custom Ship Weapons/Turrets*)</t>
     <t id="9001">Tourelle</t>
@@ -57868,7 +57869,7 @@
     <t id="40602">{20006,102}(No information available)</t>
     <t id="40603">Fait le chien de garde pour</t>
     <t id="40604">Garde du corps du commandant</t>
-    <t id="40701">Ravitailler la flotte</t>
+    <t id="40701">Ravitaillement de la flotte</t>
     <t id="40702">Fournit des munitions, des objets déployables et des appareils aux vaisseaux d'une flotte.</t>
     <t id="40703">Ravitailler cette flotte</t>
     <t id="40704">Ravitailler la flotte du commandant</t>
@@ -57896,10 +57897,10 @@
     <t id="41302">Suivre le commandant.</t>
     <t id="41303">Suivre</t>
     <t id="41304">Suivre commandant</t>
-    <t id="41401">Récupération</t>
+    <t id="41401">Récupération des débris</t>
     <t id="41402">Récupérer l'épave pour le commandant.</t>
     <t id="41403">Récupérer pour</t>
-    <t id="41404">Collecter les débris pour le commandant.</t>
+    <t id="41404">Récupérer les débris pour le commandant</t>
     <t id="41501">Défense de position</t>
     <t id="41502">Défendre une position en coordination avec la flotte.</t>
     <t id="41503">Défendre la position</t>
@@ -58113,7 +58114,7 @@
     <t id="1500">Auxiliaire</t>
     <t id="1600">Bien-être</t>
     <t id="1700">Traitement</t>
-    <t id="1800">Récupération</t>
+    <t id="1800">Récupération des débris</t>
     <t id="1900">Démantèlement</t>
     <t id="2000">Course</t>
     <t id="2100">Plate-forme</t>

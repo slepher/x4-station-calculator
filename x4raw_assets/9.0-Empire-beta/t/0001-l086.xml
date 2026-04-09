@@ -2719,6 +2719,7 @@
     <t id="9654">生产模块</t>
     <t id="9655">助推加速倍率</t>
     <t id="9656">打断L及XL级护盾回充</t>
+    <t id="9657">Unknown production method</t>
     <t id="9700">(User question)</t>
     <t id="9701">骇入中</t>
     <t id="9702">你即将开始骇入</t>
@@ -3332,10 +3333,10 @@
     <t id="11688">采矿船分析时间(followed by colon and added percentage)</t>
     <t id="11689">潜在资源</t>
     <t id="11690">已探明资源</t>
-    <t id="11691">Introducing Priority Orders</t>
-    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
-    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
-    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
+    <t id="11691">优先指令介绍</t>
+    <t id="11692">现在你可以使用组合键，直接在地图或交互菜单中下达队列 \(%s($INPUT_MODIFIER_ICON$)\) 和优先 \(%s($INPUT_MODIFIER_ICON$)\) 指令. 默认情况下，不使用组合键下达的指令会覆盖已队列的指令。</t>
+    <t id="11693">如果你更喜欢旧模式，可以在游戏设置菜单中将"默认指令行为"改为"队列"，这样在使用交互菜单时按下%s($INPUT_MODIFIER_ICON$)将会覆盖指令，而不是将其添加到队列中。</t>
+    <t id="11694">按"是"试用新的默认修饰键行为，按"否"保持旧行为使用%s($INPUT_MODIFIER_ICON$)覆盖指令。</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">离线存档</t>
     <t id="11702">覆盖离线存档</t>

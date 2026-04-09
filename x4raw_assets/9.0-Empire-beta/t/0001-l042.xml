@@ -2719,6 +2719,7 @@
     <t id="9654">Výrobní modul</t>
     <t id="9655">Násobitel zrychlení při posílení</t>
     <t id="9656">Narušuje dobíjení štítů velikosti L a XL</t>
+    <t id="9657">Unknown production method</t>
     <t id="9700">(Uživatelská otázka)</t>
     <t id="9701">Hackování</t>
     <t id="9702">Chystáte se hacknout</t>
@@ -3747,8 +3748,8 @@
     <t id="12786">AMD FSR Generátor snímků</t>
     <t id="12787">Experimentální vylepšená podpora ovladače</t>
     <t id="12788">AMD FSR</t>
-    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12789">Pokud hrajete v X4 poprvé, doporučujeme vám, abyste si před začátkem cesty do otevřeného vesmíru X4 vyzkoušeli několik tutoriálů.</t>
+    <t id="12790">Spustit nový otevřený vesmír</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Akce velvyslanectví</t>
     <t id="12803">Diplomat</t>
@@ -8665,7 +8666,7 @@
     <t id="9929">Tuto možnost nemůžete vybrat, protože byste tím zrušili výběr možnosti, která je nutná k odemčení sektoru, do kterého jste umístili majetek.</t>
     <t id="9930">Tuto hru nelze vybrat, protože obsahuje předměty s omezeným přístupem, které jste dosud neodemkli.</t>
     <t id="9931">Tato vlastní hra obsahuje vybavení, které je nekompatibilní. Nekompatibilní vybavení nebude nainstalováno.</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">Tato vlastní hra obsahuje zboží nebo plány, které již nejsou platné. Ovlivněné položky nebudou použity.</t>
     <t id="10000">(Obecná chyba / informace){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">Přijetí této mise přeruší jakoukoli jinou operaci v multivesmíru.</t>

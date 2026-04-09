@@ -10804,13 +10804,13 @@
     <owner faction="ministry"/>
     <owner faction="scaleplate"/>
     <owner faction="teladi"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="104"/>
         <ware ware="hullparts" amount="4"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="shield_tel_m_standard_01_mk2" name="{20106,2064}" description="{20106,2062}" group="shields" transport="equipment" volume="1" tags="equipment shield">
     <price min="62115" average="69017" max="75918"/>
@@ -10828,6 +10828,7 @@
     <owner faction="ministry"/>
     <owner faction="teladi"/>
     <owner faction="yaki"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="3"/>
@@ -10835,7 +10836,6 @@
         <ware ware="hullparts" amount="19"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="shield_tel_m_standard_02_mk1" name="{20106,2024}" description="{20106,2022}" group="shields" transport="equipment" volume="1" tags="equipment shield">
     <price min="12015" average="13350" max="14685"/>
@@ -10853,13 +10853,13 @@
     <owner faction="ministry"/>
     <owner faction="scaleplate"/>
     <owner faction="teladi"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="104"/>
         <ware ware="hullparts" amount="4"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="shield_tel_m_standard_02_mk2" name="{20106,2064}" description="{20106,2062}" group="shields" transport="equipment" volume="1" tags="equipment shield">
     <price min="26058" average="28954" max="31849"/>
@@ -10876,6 +10876,7 @@
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="3"/>
@@ -10883,7 +10884,6 @@
         <ware ware="hullparts" amount="19"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="shield_tel_s_standard_01_mk1" name="{20106,1024}" description="{20106,1022}" group="shields" transport="equipment" volume="1" tags="equipment shield">
     <price min="1218" average="1354" max="1489"/>
@@ -14671,6 +14671,7 @@
     <owner faction="buccaneers"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="7"/>
@@ -14678,7 +14679,6 @@
         <ware ware="hullparts" amount="44"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_l_dumbfire_01_mk1" name="{20105,5124}" description="{20105,5122}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="67905" average="75450" max="82995"/>
@@ -14697,6 +14697,7 @@
     <owner faction="argon"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="3"/>
@@ -14704,7 +14705,6 @@
         <ware ware="hullparts" amount="22"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_l_guided_01_mk1" name="{20105,5164}" description="{20105,5162}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="78261" average="86957" max="95652"/>
@@ -14723,6 +14723,7 @@
     <owner faction="argon"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="4"/>
@@ -14730,7 +14731,6 @@
         <ware ware="hullparts" amount="24"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_l_laser_01_mk1" name="{20105,5004}" description="{20105,5002}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="52289" average="58099" max="63909"/>
@@ -14752,6 +14752,7 @@
     <owner faction="yaki"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2"/>
@@ -14759,7 +14760,6 @@
         <ware ware="hullparts" amount="16"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_l_mining_01_mk1" name="{20105,5204}" description="{20105,5202}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="49166" average="54629" max="60092"/>
@@ -14779,6 +14779,7 @@
     <owner faction="hatikvah"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2"/>
@@ -14786,7 +14787,6 @@
         <ware ware="hullparts" amount="14"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_l_plasma_01_mk1" name="{20105,5044}" description="{20105,5042}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="93055" average="103395" max="113734"/>
@@ -14806,6 +14806,7 @@
     <owner faction="buccaneers"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="4"/>
@@ -14813,7 +14814,6 @@
         <ware ware="hullparts" amount="28"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_beam_01_mk1" name="{20105,4164}" description="{20105,4162}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="45385" average="50428" max="55471"/>
@@ -14833,6 +14833,7 @@
     <owner faction="buccaneers"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2"/>
@@ -14840,7 +14841,6 @@
         <ware ware="hullparts" amount="15"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_beam_02_mk1" name="{20105,4164}" description="{20105,4162}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="45385" average="50428" max="55471"/>
@@ -14860,6 +14860,7 @@
     <owner faction="buccaneers"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2"/>
@@ -14867,7 +14868,6 @@
         <ware ware="hullparts" amount="15"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_dumbfire_01_mk1" name="{20105,4244}" description="{20105,4242}" group="turrets" transport="equipment" volume="1" tags="noplayerblueprint turret">
     <price min="22865" average="25406" max="27946"/>
@@ -14881,6 +14881,7 @@
     <component ref="turret_arg_m_dumbfire_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
     <owner faction="argon"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -14888,7 +14889,6 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_dumbfire_02_mk1" name="{20105,4244}" description="{20105,4242}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="22865" average="25406" max="27946"/>
@@ -14981,6 +14981,7 @@
     <owner faction="buccaneers"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -14988,7 +14989,6 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_gatling_02_mk1" name="{20105,4084}" description="{20105,4082}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="24665" average="27406" max="30147"/>
@@ -15030,6 +15030,7 @@
     <component ref="turret_arg_m_guided_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
     <owner faction="argon"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -15037,7 +15038,6 @@
         <ware ware="hullparts" amount="8"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_guided_02_mk1" name="{20105,4284}" description="{20105,4282}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="26317" average="29242" max="32166"/>
@@ -15086,6 +15086,7 @@
     <owner faction="yaki"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -15093,7 +15094,6 @@
         <ware ware="hullparts" amount="6"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_laser_02_mk1" name="{20105,4004}" description="{20105,4002}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="21378" average="23753" max="26128"/>
@@ -15143,13 +15143,13 @@
     <owner faction="hatikvah"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="123"/>
         <ware ware="hullparts" amount="5"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_mining_02_mk1" name="{20105,4204}" description="{20105,4202}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="16446" average="18274" max="20101"/>
@@ -15196,6 +15196,7 @@
     <owner faction="buccaneers"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -15203,7 +15204,6 @@
         <ware ware="hullparts" amount="9"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_plasma_02_mk1" name="{20105,4124}" description="{20105,4122}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="31249" average="34721" max="38193"/>
@@ -15223,6 +15223,7 @@
     <owner faction="buccaneers"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -15230,7 +15231,6 @@
         <ware ware="hullparts" amount="9"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_shotgun_01_mk1" name="{20105,4044}" description="{20105,4042}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="22857" average="25397" max="27936"/>
@@ -15250,6 +15250,7 @@
     <owner faction="buccaneers"/>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -15257,7 +15258,6 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="turret_arg_m_shotgun_02_mk1" name="{20105,4044}" description="{20105,4042}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="22857" average="25397" max="27936"/>
@@ -16500,6 +16500,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -16507,7 +16508,6 @@
         <ware ware="hullparts" amount="8"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_beam_01_mk2" name="{20105,2094}" description="{20105,2092}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="127132" average="141257" max="155383"/>
@@ -16540,6 +16540,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="7"/>
@@ -16547,7 +16548,6 @@
         <ware ware="hullparts" amount="41"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_dumbfire_01_mk1" name="{20105,2124}" description="{20105,2122}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="22558" average="25064" max="27571"/>
@@ -16586,6 +16586,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -16593,7 +16594,6 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_dumbfire_01_mk2" name="{20105,2134}" description="{20105,2132}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="111753" average="124170" max="136587"/>
@@ -16630,6 +16630,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="6"/>
@@ -16637,7 +16638,6 @@
         <ware ware="hullparts" amount="37"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_gatling_01_mk1" name="{20105,2024}" description="{20105,2022}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="43055" average="47839" max="52623"/>
@@ -16671,6 +16671,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2"/>
@@ -16678,7 +16679,6 @@
         <ware ware="hullparts" amount="15"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_gatling_01_mk2" name="{20105,2034}" description="{20105,2032}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="214756" average="238618" max="262480"/>
@@ -16711,6 +16711,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="13"/>
@@ -16718,7 +16719,6 @@
         <ware ware="hullparts" amount="75"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_guided_01_mk1" name="{20105,2144}" description="{20105,2142}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="44770" average="49745" max="54719"/>
@@ -16755,6 +16755,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2"/>
@@ -16762,7 +16763,6 @@
         <ware ware="hullparts" amount="15"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_guided_01_mk2" name="{20105,2154}" description="{20105,2152}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="222815" average="247572" max="272330"/>
@@ -16799,6 +16799,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="13"/>
@@ -16806,7 +16807,6 @@
         <ware ware="hullparts" amount="75"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_laser_01_mk1" name="{20105,2004}" description="{20105,2002}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="20763" average="23070" max="25377"/>
@@ -16845,6 +16845,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -16852,7 +16853,6 @@
         <ware ware="hullparts" amount="6"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_laser_01_mk2" name="{20105,2014}" description="{20105,2012}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="103297" average="114775" max="126252"/>
@@ -16889,6 +16889,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="5"/>
@@ -16896,7 +16897,6 @@
         <ware ware="hullparts" amount="32"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_mining_01_mk1" name="{20105,2104}" description="{20105,2102}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="16016" average="17796" max="19575"/>
@@ -16935,13 +16935,13 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="128"/>
         <ware ware="hullparts" amount="5"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_mining_01_mk2" name="{20105,2114}" description="{20105,2112}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="79562" average="88402" max="97243"/>
@@ -16979,6 +16979,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="4"/>
@@ -16986,7 +16987,6 @@
         <ware ware="hullparts" amount="25"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_plasma_01_mk1" name="{20105,2064}" description="{20105,2062}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="30277" average="33641" max="37005"/>
@@ -17022,6 +17022,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -17029,7 +17030,6 @@
         <ware ware="hullparts" amount="9"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_plasma_01_mk2" name="{20105,2074}" description="{20105,2072}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="150867" average="167630" max="184393"/>
@@ -17065,6 +17065,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="8"/>
@@ -17072,7 +17073,6 @@
         <ware ware="hullparts" amount="48"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_shotgun_01_mk1" name="{20105,2044}" description="{20105,2042}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="27152" average="30169" max="33186"/>
@@ -17106,6 +17106,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -17113,7 +17114,6 @@
         <ware ware="hullparts" amount="9"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_shotgun_01_mk2" name="{20105,2054}" description="{20105,2052}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="111308" average="123676" max="136043"/>
@@ -17147,6 +17147,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="6"/>
@@ -17154,7 +17155,6 @@
         <ware ware="hullparts" amount="36"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_torpedo_01_mk1" name="{20105,2164}" description="{20105,2162}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="78039" average="86710" max="95381"/>
@@ -17190,6 +17190,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="4"/>
@@ -17197,7 +17198,6 @@
         <ware ware="hullparts" amount="25"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_m_torpedo_01_mk2" name="{20105,2174}" description="{20105,2172}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="389160" average="432400" max="475640"/>
@@ -17233,6 +17233,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="22"/>
@@ -17240,7 +17241,6 @@
         <ware ware="hullparts" amount="128"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_spacesuit_demolition_01_mk1" name="{20113,1031}" description="{20113,1032}" group="weapons" transport="inventory" volume="1" tags="disallowdrop equipment inventory noblueprint noplayerblueprint personalupgrade weapon">
     <price min="175000" average="200000" max="225000"/>
@@ -17305,6 +17305,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -17312,7 +17313,6 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_beam_01_mk2" name="{20105,1094}" description="{20105,1092}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="104979" average="116643" max="128308"/>
@@ -17345,6 +17345,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="6"/>
@@ -17352,7 +17353,6 @@
         <ware ware="hullparts" amount="34"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_burst_01_mk1" name="{20105,1244}" description="{20105,1242}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="18582" average="28990" max="39398"/>
@@ -17418,6 +17418,7 @@
     <owner faction="holyorder"/>
     <owner faction="ministry"/>
     <owner faction="trinity"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="3"/>
@@ -17425,7 +17426,6 @@
         <ware ware="hullparts" amount="17"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_cannon_01_mk2" name="{20105,1274}" description="{20105,1272}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="57963" average="84981" max="111999"/>
@@ -17443,6 +17443,7 @@
     <owner faction="holyorder"/>
     <owner faction="ministry"/>
     <owner faction="trinity"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="4"/>
@@ -17450,7 +17451,6 @@
         <ware ware="hullparts" amount="24"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_dumbfire_01_mk1" name="{20105,1124}" description="{20105,1122}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="6695" average="7439" max="8183"/>
@@ -17488,13 +17488,13 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="65"/>
         <ware ware="hullparts" amount="2"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_dumbfire_01_mk2" name="{20105,1134}" description="{20105,1132}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="13370" average="14855" max="16341"/>
@@ -17531,13 +17531,13 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="120"/>
         <ware ware="hullparts" amount="4"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_gatling_01_mk1" name="{20105,1024}" description="{20105,1022}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="23928" average="26586" max="29245"/>
@@ -17571,6 +17571,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -17578,7 +17579,6 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_gatling_01_mk2" name="{20105,1034}" description="{20105,1032}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="119121" average="132356" max="145592"/>
@@ -17611,6 +17611,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="6"/>
@@ -17618,7 +17619,6 @@
         <ware ware="hullparts" amount="37"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_guided_01_mk1" name="{20105,1144}" description="{20105,1142}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="8277" average="9197" max="10117"/>
@@ -17654,13 +17654,13 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="83"/>
         <ware ware="hullparts" amount="2"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_guided_01_mk2" name="{20105,1154}" description="{20105,1142}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="40349" average="44832" max="49316"/>
@@ -17697,6 +17697,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2"/>
@@ -17704,7 +17705,6 @@
         <ware ware="hullparts" amount="13"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_laser_01_mk1" name="{20105,1004}" description="{20105,1002}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="16056" average="17840" max="19624"/>
@@ -17743,6 +17743,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -17750,7 +17751,6 @@
         <ware ware="hullparts" amount="5"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_laser_01_mk2" name="{20105,1014}" description="{20105,1012}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="79761" average="88623" max="97485"/>
@@ -17787,6 +17787,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="4"/>
@@ -17794,7 +17795,6 @@
         <ware ware="hullparts" amount="28"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_mining_01_mk1" name="{20105,1104}" description="{20105,1102}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="6522" average="7247" max="7971"/>
@@ -17830,13 +17830,13 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="60"/>
         <ware ware="hullparts" amount="2"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_mining_01_mk2" name="{20105,1114}" description="{20105,1112}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="32092" average="35658" max="39223"/>
@@ -17874,6 +17874,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -17881,7 +17882,6 @@
         <ware ware="hullparts" amount="11"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_plasma_01_mk1" name="{20105,1064}" description="{20105,1062}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="12851" average="14279" max="15707"/>
@@ -17917,13 +17917,13 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="105"/>
         <ware ware="hullparts" amount="4"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_plasma_01_mk2" name="{20105,1074}" description="{20105,1072}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="55827" average="62030" max="68233"/>
@@ -17959,6 +17959,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="3"/>
@@ -17966,7 +17967,6 @@
         <ware ware="hullparts" amount="18"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_shotgun_01_mk1" name="{20105,1044}" description="{20105,1042}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="22365" average="24850" max="27335"/>
@@ -18000,6 +18000,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -18007,7 +18008,6 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_shotgun_01_mk2" name="{20105,1054}" description="{20105,1052}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="135242" average="150269" max="165296"/>
@@ -18041,6 +18041,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="8"/>
@@ -18048,7 +18049,6 @@
         <ware ware="hullparts" amount="46"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_torpedo_01_mk1" name="{20105,1164}" description="{20105,1162}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="22558" average="25064" max="27571"/>
@@ -18084,6 +18084,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -18091,7 +18092,6 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_gen_s_torpedo_01_mk2" name="{20105,1174}" description="{20105,1172}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="111753" average="124170" max="136587"/>
@@ -18127,6 +18127,7 @@
     </production>
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
+    <owner faction="kaori"/>
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="6"/>
@@ -18134,7 +18135,6 @@
         <ware ware="hullparts" amount="37"/>
       </primary>
     </production>
-    <owner faction="kaori"/>
   </ware>
   <ware id="weapon_kha_l_beam_01_mk1" name="{20105,3084}" description="{20105,3082}" group="weapons" transport="equipment" volume="1" tags="equipment noblueprint noplayerblueprint weapon">
     <price min="0" average="0" max="0"/>
@@ -25406,10 +25406,6 @@
         <ware ware="engineparts" amount="175"/>
       </primary>
     </production>
-    <component ref="engine_ter_l_allround_02_mk1_macro"/>
-    <restriction licence="capitalequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="20" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="28"/>
@@ -25418,6 +25414,10 @@
         <ware ware="siliconcarbide" amount="45"/>
       </primary>
     </production>
+    <component ref="engine_ter_l_allround_02_mk1_macro"/>
+    <restriction licence="capitalequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="engine_ter_m_virtual_01_mk1" name="{20107,2844}" description="{20107,2842}" group="engines" transport="equipment" volume="1" tags="engine equipment nocustomgamestart nodiplomacyblueprint">
     <price min="76478" average="95598" max="114717"/>
@@ -25428,11 +25428,6 @@
         <ware ware="engineparts" amount="22"/>
       </primary>
     </production>
-    <component ref="engine_ter_m_virtual_01_mk1_macro"/>
-    <icon video="engine_ter_m_virtual_01_mk1_video_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="15" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="3"/>
@@ -25441,6 +25436,11 @@
         <ware ware="siliconcarbide" amount="5"/>
       </primary>
     </production>
+    <component ref="engine_ter_m_virtual_01_mk1_macro"/>
+    <icon video="engine_ter_m_virtual_01_mk1_video_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="engine_ter_s_virtual_01_mk1" name="{20107,1854}" description="{20107,1852}" group="engines" transport="equipment" volume="1" tags="engine equipment nocustomgamestart nodiplomacyblueprint">
     <price min="15563" average="19453" max="23344"/>
@@ -25450,11 +25450,6 @@
         <ware ware="engineparts" amount="15"/>
       </primary>
     </production>
-    <component ref="engine_ter_s_virtual_01_mk1_macro"/>
-    <icon video="engine_ter_s_virtual_01_mk1_video_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="energycells" amount="155"/>
@@ -25462,6 +25457,11 @@
         <ware ware="siliconcarbide" amount="4"/>
       </primary>
     </production>
+    <component ref="engine_ter_s_virtual_01_mk1_macro"/>
+    <icon video="engine_ter_s_virtual_01_mk1_video_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="engine_xen_xl_mothership_01_allround_mk1" name="{20107,9024}" description="{20107,9022}" group="engines" transport="equipment" volume="1" tags="engine equipment noplayerblueprint">
     <price min="498332" average="600400" max="702468"/>
@@ -25486,11 +25486,6 @@
         <ware ware="smartchips" amount="3"/>
       </primary>
     </production>
-    <component ref="missile_flagship_heavy_mk1_macro"/>
-    <container ref="sm_gen_pickup_equipment_01_macro"/>
-    <restriction licence="capitalequipment"/>
-    <use threshold="0"/>
-    <owner faction="ownerless"/>
     <production time="3" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="7"/>
@@ -25504,6 +25499,11 @@
         <ware ware="siliconcarbide" amount="1"/>
       </primary>
     </production>
+    <component ref="missile_flagship_heavy_mk1_macro"/>
+    <container ref="sm_gen_pickup_equipment_01_macro"/>
+    <restriction licence="capitalequipment"/>
+    <use threshold="0"/>
+    <owner faction="ownerless"/>
   </ware>
   <ware id="missile_flagship_light_mk1" name="{20105,6314}" description="{20105,6312}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
     <price min="1400" average="1680" max="1950"/>
@@ -25514,11 +25514,6 @@
         <ware ware="smartchips" amount="3"/>
       </primary>
     </production>
-    <component ref="missile_flagship_light_mk1_macro"/>
-    <container ref="sm_gen_pickup_equipment_01_macro"/>
-    <restriction licence="capitalequipment"/>
-    <use threshold="0"/>
-    <owner faction="ownerless"/>
     <production time="3" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="energycells" amount="4"/>
@@ -25532,6 +25527,11 @@
         <ware ware="siliconcarbide" amount="1"/>
       </primary>
     </production>
+    <component ref="missile_flagship_light_mk1_macro"/>
+    <container ref="sm_gen_pickup_equipment_01_macro"/>
+    <restriction licence="capitalequipment"/>
+    <use threshold="0"/>
+    <owner faction="ownerless"/>
   </ware>
   <ware id="module_conn_arg_antigonearc_01" name="{20104,55101}" description="{20104,55102}" transport="container" volume="1" tags="module rewarded">
     <price min="160148" average="188410" max="216671"/>
@@ -25766,10 +25766,6 @@
         <ware ware="shieldcomponents" amount="15"/>
       </primary>
     </production>
-    <component ref="shield_ter_l_standard_02_mk1_macro"/>
-    <restriction licence="capitalequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="20" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="5"/>
@@ -25777,6 +25773,10 @@
         <ware ware="metallicmicrolattice" amount="15"/>
       </primary>
     </production>
+    <component ref="shield_ter_l_standard_02_mk1_macro"/>
+    <restriction licence="capitalequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_l_standard_02_mk2" name="{20106,3174}" description="{20106,3172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="494028" average="548920" max="603812"/>
@@ -25787,10 +25787,6 @@
         <ware ware="shieldcomponents" amount="117"/>
       </primary>
     </production>
-    <component ref="shield_ter_l_standard_02_mk2_macro"/>
-    <restriction licence="capitalequipment"/>
-    <use threshold="0.25"/>
-    <owner faction="terran"/>
     <production time="20" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="22"/>
@@ -25799,6 +25795,10 @@
         <ware ware="siliconcarbide" amount="14"/>
       </primary>
     </production>
+    <component ref="shield_ter_l_standard_02_mk2_macro"/>
+    <restriction licence="capitalequipment"/>
+    <use threshold="0.25"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_l_standard_02_mk3" name="{20106,3184}" description="{20106,3182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="1294817" average="1523314" max="1751811"/>
@@ -25809,10 +25809,6 @@
         <ware ware="shieldcomponents" amount="309"/>
       </primary>
     </production>
-    <component ref="shield_ter_l_standard_02_mk3_macro"/>
-    <restriction licence="capitalequipment"/>
-    <use threshold="0.55"/>
-    <owner faction="terran"/>
     <production time="20" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="58"/>
@@ -25821,6 +25817,10 @@
         <ware ware="siliconcarbide" amount="42"/>
       </primary>
     </production>
+    <component ref="shield_ter_l_standard_02_mk3_macro"/>
+    <restriction licence="capitalequipment"/>
+    <use threshold="0.55"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_standard_04_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="69473" average="86842" max="104210"/>
@@ -25831,10 +25831,6 @@
         <ware ware="shieldcomponents" amount="35"/>
       </primary>
     </production>
-    <component ref="shield_ter_m_standard_04_mk1_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="3"/>
@@ -25843,6 +25839,10 @@
         <ware ware="siliconcarbide" amount="4"/>
       </primary>
     </production>
+    <component ref="shield_ter_m_standard_04_mk1_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_standard_04_mk2" name="{20106,2184}" description="{20106,2182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="129373" average="161716" max="194059"/>
@@ -25853,10 +25853,6 @@
         <ware ware="shieldcomponents" amount="40"/>
       </primary>
     </production>
-    <component ref="shield_ter_m_standard_04_mk2_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="4"/>
@@ -25865,6 +25861,10 @@
         <ware ware="siliconcarbide" amount="20"/>
       </primary>
     </production>
+    <component ref="shield_ter_m_standard_04_mk2_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0.25"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_standard_04_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="566175" average="707718" max="849262"/>
@@ -25875,10 +25875,6 @@
         <ware ware="shieldcomponents" amount="150"/>
       </primary>
     </production>
-    <component ref="shield_ter_m_standard_04_mk3_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="9"/>
@@ -25887,6 +25883,10 @@
         <ware ware="siliconcarbide" amount="135"/>
       </primary>
     </production>
+    <component ref="shield_ter_m_standard_04_mk3_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0.55"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_virtual_01_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="69473" average="86842" max="104210"/>
@@ -25897,11 +25897,6 @@
         <ware ware="shieldcomponents" amount="35"/>
       </primary>
     </production>
-    <component ref="shield_ter_m_virtual_01_mk1_macro"/>
-    <icon video="shield_ter_m_virtual_01_mk1_video_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="3"/>
@@ -25910,6 +25905,11 @@
         <ware ware="siliconcarbide" amount="2"/>
       </primary>
     </production>
+    <component ref="shield_ter_m_virtual_01_mk1_macro"/>
+    <icon video="shield_ter_m_virtual_01_mk1_video_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_virtual_01_mk2" name="{20106,2184}" description="{20106,2182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="129373" average="161716" max="185975"/>
@@ -25920,11 +25920,6 @@
         <ware ware="shieldcomponents" amount="40"/>
       </primary>
     </production>
-    <component ref="shield_ter_m_virtual_01_mk2_macro"/>
-    <icon video="shield_ter_m_virtual_01_mk1_video_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="4"/>
@@ -25933,6 +25928,11 @@
         <ware ware="siliconcarbide" amount="2"/>
       </primary>
     </production>
+    <component ref="shield_ter_m_virtual_01_mk2_macro"/>
+    <icon video="shield_ter_m_virtual_01_mk1_video_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0.25"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_virtual_01_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="566175" average="707718" max="849262"/>
@@ -25943,11 +25943,6 @@
         <ware ware="shieldcomponents" amount="150"/>
       </primary>
     </production>
-    <component ref="shield_ter_m_virtual_01_mk3_macro"/>
-    <icon video="shield_ter_m_virtual_01_mk1_video_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="26"/>
@@ -25956,6 +25951,11 @@
         <ware ware="siliconcarbide" amount="18"/>
       </primary>
     </production>
+    <component ref="shield_ter_m_virtual_01_mk3_macro"/>
+    <icon video="shield_ter_m_virtual_01_mk1_video_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0.55"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_s_virtual_01_mk1" name="{20106,1224}" description="{20106,1222}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="11811" average="14763" max="17716"/>
@@ -25965,11 +25965,6 @@
         <ware ware="shieldcomponents" amount="10"/>
       </primary>
     </production>
-    <component ref="shield_ter_s_virtual_01_mk1_macro"/>
-    <icon video="shield_ter_s_virtual_01_mk1_video_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="1"/>
@@ -25978,6 +25973,11 @@
         <ware ware="siliconcarbide" amount="2"/>
       </primary>
     </production>
+    <component ref="shield_ter_s_virtual_01_mk1_macro"/>
+    <icon video="shield_ter_s_virtual_01_mk1_video_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_s_xperimental_01_mk5" name="{20106,1264}" description="{20106,1262}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
     <price min="389810" average="458600" max="527390"/>
@@ -25988,11 +25988,6 @@
         <ware ware="shieldcomponents" amount="205"/>
       </primary>
     </production>
-    <component ref="shield_ter_s_xperimental_01_mk5_macro"/>
-    <icon video="shield_ter_s_xperimental_01_mk5_video_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="15"/>
@@ -26001,6 +25996,11 @@
         <ware ware="siliconcarbide" amount="13"/>
       </primary>
     </production>
+    <component ref="shield_ter_s_xperimental_01_mk5_macro"/>
+    <icon video="shield_ter_s_xperimental_01_mk5_video_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="shield_xen_xl_mothership_01_mk1" name="{20106,9024}" description="{20106,9022}" group="shields" transport="equipment" volume="1" tags="equipment noplayerblueprint shield">
     <price min="320048" average="385600" max="451152"/>
@@ -26072,9 +26072,6 @@
         <ware ware="hullparts" amount="4950"/>
       </primary>
     </production>
-    <component ref="ship_ter_l_flagship_01_a_macro"/>
-    <restriction licence="capitalship"/>
-    <owner faction="ownerless"/>
     <production time="187" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="124"/>
@@ -26082,6 +26079,9 @@
         <ware ware="metallicmicrolattice" amount="315"/>
       </primary>
     </production>
+    <component ref="ship_ter_l_flagship_01_a_macro"/>
+    <restriction licence="capitalship"/>
+    <owner faction="ownerless"/>
   </ware>
   <ware id="ship_ter_m_corvette_02_a" name="{20101,64801}" description="{20101,64811}" transport="ship" volume="1" tags="nocustomgamestart ship">
     <price min="1128622" average="1410777" max="1692933"/>
@@ -26091,9 +26091,6 @@
         <ware ware="hullparts" amount="950"/>
       </primary>
     </production>
-    <component ref="ship_ter_m_corvette_02_a_macro"/>
-    <restriction licence="militaryship"/>
-    <owner faction="ownerless"/>
     <production time="15" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="24"/>
@@ -26101,6 +26098,9 @@
         <ware ware="metallicmicrolattice" amount="42"/>
       </primary>
     </production>
+    <component ref="ship_ter_m_corvette_02_a_macro"/>
+    <restriction licence="militaryship"/>
+    <owner faction="ownerless"/>
   </ware>
   <ware id="ship_ter_s_fighter_04_a" name="{20101,60401}" description="{20101,60411}" transport="ship" volume="1" tags="nocustomgamestart ship">
     <price min="275041" average="343801" max="412561"/>
@@ -26110,9 +26110,6 @@
         <ware ware="hullparts" amount="265"/>
       </primary>
     </production>
-    <component ref="ship_ter_s_fighter_04_a_macro"/>
-    <restriction licence="militaryship"/>
-    <owner faction="ownerless"/>
     <production time="15" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="7"/>
@@ -26120,6 +26117,9 @@
         <ware ware="metallicmicrolattice" amount="25"/>
       </primary>
     </production>
+    <component ref="ship_ter_s_fighter_04_a_macro"/>
+    <restriction licence="militaryship"/>
+    <owner faction="ownerless"/>
   </ware>
   <ware id="ship_ter_s_xperimental_01_a" name="{20101,122801}" description="{20101,122811}" transport="ship" volume="1" tags="limited nocustomgamestart ship">
     <price min="1058607" average="1323258" max="1587910"/>
@@ -26129,9 +26129,6 @@
         <ware ware="hullparts" amount="870"/>
       </primary>
     </production>
-    <component ref="ship_ter_s_xperimental_01_a_macro"/>
-    <restriction licence="militaryship"/>
-    <owner faction="ownerless"/>
     <production time="60" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="18"/>
@@ -26140,6 +26137,9 @@
         <ware ware="siliconcarbide" amount="15"/>
       </primary>
     </production>
+    <component ref="ship_ter_s_xperimental_01_a_macro"/>
+    <restriction licence="militaryship"/>
+    <owner faction="ownerless"/>
   </ware>
   <ware id="ship_xen_xl_mothership_01" name="{20101,72101}" description="{20101,72111}" transport="ship" volume="1" tags="noplayerblueprint ship">
     <price min="13039000" average="15340000" max="17641000"/>
@@ -26163,10 +26163,6 @@
         <ware ware="turretcomponents" amount="30"/>
       </primary>
     </production>
-    <component ref="turret_ter_m_laser_03_mk1_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="2"/>
@@ -26175,6 +26171,10 @@
         <ware ware="siliconcarbide" amount="3"/>
       </primary>
     </production>
+    <component ref="turret_ter_m_laser_03_mk1_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="turret_ter_m_laser_04_mk1" name="{20105,7014}" description="{20105,7012}" group="turrets" transport="equipment" volume="1" tags="equipment missiononly turret">
     <price min="43104" average="51933" max="60762"/>
@@ -26185,10 +26185,6 @@
         <ware ware="turretcomponents" amount="30"/>
       </primary>
     </production>
-    <component ref="turret_ter_m_laser_04_mk1_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="2"/>
@@ -26197,6 +26193,10 @@
         <ware ware="siliconcarbide" amount="3"/>
       </primary>
     </production>
+    <component ref="turret_ter_m_laser_04_mk1_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="turret_xen_xl_battleship_01_mk1" name="{20105,9074}" description="{20105,9072}" group="turrets" transport="equipment" volume="1" tags="equipment noplayerblueprint turret">
     <price min="40670" average="49000" max="57330"/>
@@ -26229,11 +26229,6 @@
         <ware ware="weaponcomponents" amount="215"/>
       </primary>
     </production>
-    <component ref="weapon_ter_l_flagship_01_mk1_macro"/>
-    <icon video="weapon_ter_l_flagship_01_mk1_video_macro"/>
-    <restriction licence="capitalequipment"/>
-    <use threshold="0"/>
-    <owner faction="ownerless"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="121"/>
@@ -26242,6 +26237,11 @@
         <ware ware="siliconcarbide" amount="98"/>
       </primary>
     </production>
+    <component ref="weapon_ter_l_flagship_01_mk1_macro"/>
+    <icon video="weapon_ter_l_flagship_01_mk1_video_macro"/>
+    <restriction licence="capitalequipment"/>
+    <use threshold="0"/>
+    <owner faction="ownerless"/>
   </ware>
   <ware id="weapon_ter_m_laser_02_mk1" name="{20105,2564}" description="{20105,2562}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
     <price min="82456" average="109941" max="140725"/>
@@ -26252,10 +26252,6 @@
         <ware ware="weaponcomponents" amount="50"/>
       </primary>
     </production>
-    <component ref="weapon_ter_m_laser_02_mk1_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="4"/>
@@ -26264,6 +26260,10 @@
         <ware ware="siliconcarbide" amount="3"/>
       </primary>
     </production>
+    <component ref="weapon_ter_m_laser_02_mk1_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="weapon_ter_s_laser_02_mk1" name="{20105,1564}" description="{20105,1562}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
     <price min="29605" average="39474" max="50527"/>
@@ -26274,10 +26274,6 @@
         <ware ware="weaponcomponents" amount="20"/>
       </primary>
     </production>
-    <component ref="weapon_ter_s_laser_02_mk1_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="1"/>
@@ -26286,6 +26282,10 @@
         <ware ware="siliconcarbide" amount="4"/>
       </primary>
     </production>
+    <component ref="weapon_ter_s_laser_02_mk1_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="weapon_ter_s_plasma_01_mk1" name="{20105,1554}" description="{20105,1552}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
     <price min="49210" average="65613" max="83985"/>
@@ -26296,10 +26296,6 @@
         <ware ware="weaponcomponents" amount="20"/>
       </primary>
     </production>
-    <component ref="weapon_ter_s_plasma_01_mk1_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="terran"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="3"/>
@@ -26308,6 +26304,10 @@
         <ware ware="siliconcarbide" amount="2"/>
       </primary>
     </production>
+    <component ref="weapon_ter_s_plasma_01_mk1_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="terran"/>
   </ware>
   <ware id="ship_par_l_expeditionary_01_a" name="{20101,33101}" description="{20101,33111}" transport="ship" volume="1" tags="hiddenwithoutlicence ship">
     <price min="2905313" average="3418015" max="3930717"/>
@@ -26348,11 +26348,6 @@
         <ware ware="engineparts" amount="79"/>
       </primary>
     </production>
-    <component ref="engine_arg_m_corvette_01_mk1_macro"/>
-    <icon video="engine_arg_m_corvette_01_mk1_video_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0"/>
-    <owner faction="argon"/>
     <production time="15" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="10"/>
@@ -26360,6 +26355,11 @@
         <ware ware="hullparts" amount="60"/>
       </primary>
     </production>
+    <component ref="engine_arg_m_corvette_01_mk1_macro"/>
+    <icon video="engine_arg_m_corvette_01_mk1_video_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0"/>
+    <owner faction="argon"/>
   </ware>
   <ware id="engine_arg_m_corvette_01_mk2" name="{20107,9054}" description="{20107,9052}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
     <price min="489379" average="575740" max="662101"/>
@@ -26370,11 +26370,6 @@
         <ware ware="engineparts" amount="190"/>
       </primary>
     </production>
-    <component ref="engine_arg_m_corvette_01_mk2_macro"/>
-    <icon video="engine_arg_m_corvette_01_mk2_video_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0.7"/>
-    <owner faction="argon"/>
     <production time="15" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="25"/>
@@ -26382,6 +26377,11 @@
         <ware ware="hullparts" amount="144"/>
       </primary>
     </production>
+    <component ref="engine_arg_m_corvette_01_mk2_macro"/>
+    <icon video="engine_arg_m_corvette_01_mk2_video_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0.7"/>
+    <owner faction="argon"/>
   </ware>
   <ware id="engine_tel_m_corvette_01_mk1" name="{20107,9044}" description="{20107,9042}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
     <price min="171139" average="201340" max="231541"/>
@@ -26392,12 +26392,6 @@
         <ware ware="engineparts" amount="66"/>
       </primary>
     </production>
-    <component ref="engine_tel_m_corvette_01_mk1_macro"/>
-    <icon video="engine_tel_m_corvette_01_mk1_video_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0"/>
-    <owner faction="ministry"/>
-    <owner faction="scaleplate"/>
     <production time="15" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="8"/>
@@ -26405,6 +26399,12 @@
         <ware ware="hullparts" amount="50"/>
       </primary>
     </production>
+    <component ref="engine_tel_m_corvette_01_mk1_macro"/>
+    <icon video="engine_tel_m_corvette_01_mk1_video_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0"/>
+    <owner faction="ministry"/>
+    <owner faction="scaleplate"/>
   </ware>
   <ware id="engine_tel_m_corvette_01_mk2" name="{20107,9064}" description="{20107,9062}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
     <price min="410729" average="483210" max="555692"/>
@@ -26415,11 +26415,6 @@
         <ware ware="engineparts" amount="159"/>
       </primary>
     </production>
-    <component ref="engine_tel_m_corvette_01_mk2_macro"/>
-    <icon video="engine_tel_m_corvette_01_mk2_video_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0.7"/>
-    <owner faction="ministry"/>
     <production time="15" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="21"/>
@@ -26427,6 +26422,11 @@
         <ware ware="hullparts" amount="121"/>
       </primary>
     </production>
+    <component ref="engine_tel_m_corvette_01_mk2_macro"/>
+    <icon video="engine_tel_m_corvette_01_mk2_video_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0.7"/>
+    <owner faction="ministry"/>
   </ware>
   <ware id="research_ship_gen_m_corvette_02" name="{20216,4001}" description="{20216,4002}" transport="research" volume="1" tags="nocustomgamestart research" sortorder="501">
     <price min="1" average="1" max="1"/>
@@ -26448,13 +26448,6 @@
         <ware ware="shieldcomponents" amount="24"/>
       </primary>
     </production>
-    <component ref="shield_gen_m_corvette_01_mk1_macro"/>
-    <icon video="shield_gen_m_corvette_01_mk1_video_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0"/>
-    <owner faction="argon"/>
-    <owner faction="ministry"/>
-    <owner faction="scaleplate"/>
     <production time="20" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="3"/>
@@ -26462,6 +26455,13 @@
         <ware ware="hullparts" amount="18"/>
       </primary>
     </production>
+    <component ref="shield_gen_m_corvette_01_mk1_macro"/>
+    <icon video="shield_gen_m_corvette_01_mk1_video_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0"/>
+    <owner faction="argon"/>
+    <owner faction="ministry"/>
+    <owner faction="scaleplate"/>
   </ware>
   <ware id="ship_gen_m_corvette_01" name="{20101,123601}" description="{20101,123611}" transport="ship" volume="1" tags="hiddenwithoutlicence onlyownerbuild ship">
     <price min="1083822" average="1275085" max="1466348"/>
@@ -26471,10 +26471,6 @@
         <ware ware="hullparts" amount="1209"/>
       </primary>
     </production>
-    <component ref="ship_gen_m_corvette_01_macro"/>
-    <restriction licence="envoy_access"/>
-    <owner faction="argon"/>
-    <owner faction="ministry"/>
     <production time="26" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="75"/>
@@ -26482,6 +26478,10 @@
         <ware ware="hullparts" amount="427"/>
       </primary>
     </production>
+    <component ref="ship_gen_m_corvette_01_macro"/>
+    <restriction licence="envoy_access"/>
+    <owner faction="argon"/>
+    <owner faction="ministry"/>
   </ware>
   <ware id="ship_gen_m_corvette_02" name="{20101,123701}" description="{20101,123711}" transport="ship" volume="1" tags="hiddenwithoutlicence nocustomgamestart nodiplomacyblueprint ship">
     <price min="777444" average="914640" max="1051836"/>
@@ -26491,9 +26491,6 @@
         <ware ware="hullparts" amount="872"/>
       </primary>
     </production>
-    <component ref="ship_gen_m_corvette_02_macro"/>
-    <restriction licence="envoy_access"/>
-    <owner faction="scaleplate"/>
     <production time="19" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="54"/>
@@ -26501,6 +26498,9 @@
         <ware ware="hullparts" amount="308"/>
       </primary>
     </production>
+    <component ref="ship_gen_m_corvette_02_macro"/>
+    <restriction licence="envoy_access"/>
+    <owner faction="scaleplate"/>
   </ware>
   <ware id="turret_gen_m_disabler_01_mk1" name="{20105,7044}" description="{20105,7042}" group="turrets" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild turret">
     <price min="10061" average="60363" max="67070"/>
@@ -26511,10 +26511,6 @@
         <ware ware="turretcomponents" amount="15"/>
       </primary>
     </production>
-    <component ref="turret_gen_m_disabler_01_mk1_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0"/>
-    <owner faction="ministry"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2"/>
@@ -26522,6 +26518,10 @@
         <ware ware="hullparts" amount="17"/>
       </primary>
     </production>
+    <component ref="turret_gen_m_disabler_01_mk1_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0"/>
+    <owner faction="ministry"/>
   </ware>
   <ware id="turret_gen_m_gatling_01_mk1" name="{20105,7054}" description="{20105,7052}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
     <price min="36999" average="41110" max="45221"/>
@@ -26532,10 +26532,6 @@
         <ware ware="turretcomponents" amount="9"/>
       </primary>
     </production>
-    <component ref="turret_gen_m_gatling_01_mk1_macro"/>
-    <restriction licence="generaluseequipment"/>
-    <use threshold="0"/>
-    <owner faction="scaleplate"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1"/>
@@ -26543,6 +26539,10 @@
         <ware ware="hullparts" amount="7"/>
       </primary>
     </production>
+    <component ref="turret_gen_m_gatling_01_mk1_macro"/>
+    <restriction licence="generaluseequipment"/>
+    <use threshold="0"/>
+    <owner faction="scaleplate"/>
   </ware>
   <ware id="turret_gen_m_shieldpierce_01_mk1" name="{20105,7034}" description="{20105,7032}" group="turrets" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild turret">
     <price min="75456" average="83840" max="92224"/>
@@ -26553,10 +26553,6 @@
         <ware ware="turretcomponents" amount="18"/>
       </primary>
     </production>
-    <component ref="turret_gen_m_shieldpierce_01_mk1_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0"/>
-    <owner faction="argon"/>
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="3"/>
@@ -26564,6 +26560,10 @@
         <ware ware="hullparts" amount="20"/>
       </primary>
     </production>
+    <component ref="turret_gen_m_shieldpierce_01_mk1_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0"/>
+    <owner faction="argon"/>
   </ware>
   <ware id="weapon_gen_m_disabler_01_mk1" name="{20105,2594}" description="{20105,2592}" group="weapons" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild weapon">
     <price min="399870" average="444300" max="488730"/>
@@ -26574,11 +26574,6 @@
         <ware ware="weaponcomponents" amount="94"/>
       </primary>
     </production>
-    <component ref="weapon_gen_m_disabler_01_mk1_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0"/>
-    <owner faction="ministry"/>
-    <owner faction="scaleplate"/>
     <production time="20" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="19"/>
@@ -26586,6 +26581,11 @@
         <ware ware="hullparts" amount="111"/>
       </primary>
     </production>
+    <component ref="weapon_gen_m_disabler_01_mk1_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0"/>
+    <owner faction="ministry"/>
+    <owner faction="scaleplate"/>
   </ware>
   <ware id="weapon_gen_m_shieldpierce_01_mk1" name="{20105,2584}" description="{20105,2582}" group="weapons" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild weapon">
     <price min="300659" average="334065" max="334065"/>
@@ -26596,10 +26596,6 @@
         <ware ware="turretcomponents" amount="70"/>
       </primary>
     </production>
-    <component ref="weapon_gen_m_shieldpierce_01_mk1_macro"/>
-    <restriction licence="envoy_access"/>
-    <use threshold="0"/>
-    <owner faction="argon"/>
     <production time="20" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="14"/>
@@ -26607,5 +26603,9 @@
         <ware ware="hullparts" amount="82"/>
       </primary>
     </production>
+    <component ref="weapon_gen_m_shieldpierce_01_mk1_macro"/>
+    <restriction licence="envoy_access"/>
+    <use threshold="0"/>
+    <owner faction="argon"/>
   </ware>
 </wares>

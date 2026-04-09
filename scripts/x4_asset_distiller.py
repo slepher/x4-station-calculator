@@ -253,6 +253,222 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
     def clone_tree(tree):
         return etree.ElementTree(deepcopy(tree.getroot()))
 
+    namespaces = {'xsi': 'http://www.w3.org/2001/XMLSchema-instance'}
+
+    def ns_xpath(node, xpath_expr):
+        return node.xpath(xpath_expr, namespaces=namespaces)
+
+    def patch_has_if(root):
+        if root.tag != 'diff':
+            return False
+        return any(node.get('if') for node in root if isinstance(node.tag, str))
+
+    def should_bypass_if_condition(op_node):
+        if op_node.tag != 'add':
+            return False
+        condition = op_node.get('if')
+        if condition not in {
+            "/wares/production/method[@id='terran']",
+            "/wares/production/method[@id='closedloop']",
+        }:
+            return False
+        sel = op_node.get('sel') or ''
+        if not (sel.startswith("/wares/ware[@id='") and sel.endswith("']")):
+            return False
+        children = [child for child in op_node if isinstance(child.tag, str)]
+        if not children:
+            return False
+        return all(child.tag == 'production' for child in children)
+
+    def evaluate_patch_condition(temp_tree, op_node):
+        condition = op_node.get('if')
+        if not condition:
+            return True
+        if should_bypass_if_condition(op_node):
+            return True
+        attempts = [condition]
+        if condition.startswith('/'):
+            attempts.append('.' + condition)
+        elif condition.startswith('('):
+            attempts.append(condition.replace('(', '(.', 1))
+
+        result = None
+        last_error = None
+        for expr in attempts:
+            try:
+                result = ns_xpath(temp_tree, expr)
+                last_error = None
+                break
+            except Exception as e:
+                last_error = e
+        if last_error is not None:
+            print(f"      ⚠️ 条件解析失败 line={op_node.sourceline}: {condition} ({last_error})")
+            return False
+
+        if isinstance(result, list):
+            return bool(result)
+        return bool(result)
+
+    def resolve_patch_targets(temp_tree, op_node):
+        xpath_expr = op_node.get('sel')
+        if not xpath_expr:
+            raise ValueError('missing sel')
+
+        optype = 'node'
+        base_xpath = xpath_expr
+        for suffix in ['/text()[1]', '/text()']:
+            if base_xpath.endswith(suffix):
+                optype = 'text'
+                base_xpath = base_xpath[: -len(suffix)]
+                break
+
+        try:
+            if base_xpath.startswith('('):
+                rel_xpath = base_xpath.replace('(', '(.', 1)
+            else:
+                rel_xpath = '.' + base_xpath
+            matched = ns_xpath(temp_tree, rel_xpath)
+        except Exception as e:
+            raise ValueError(f'xpath exception: {e}') from e
+
+        if not matched:
+            raise ValueError('no xpath match found')
+        if len(matched) > 1:
+            raise ValueError('multiple xpath matches found')
+
+        target = matched[0]
+        if isinstance(target, (str, etree._ElementUnicodeResult)):
+            target = target.getparent()
+            optype = 'attrib'
+
+        if op_node.get('type'):
+            optype = 'attrib'
+
+        return target, optype
+
+    def extract_attrib_name(op_node):
+        if op_node.tag == 'add':
+            attrib_name = op_node.get('type')
+            if not attrib_name:
+                raise ValueError('attribute add missing type')
+            return attrib_name.replace('@', '')
+
+        xpath_expr = op_node.get('sel') or ''
+        if '/@' not in xpath_expr:
+            raise ValueError('attribute op missing /@ in sel')
+        attrib_name = xpath_expr.rsplit('/@', 1)[1]
+        if '[' in attrib_name:
+            attrib_name = attrib_name.split('[', 1)[0]
+        return attrib_name
+
+    def apply_custom_patch_op(op_node, target_node, optype):
+        def append_near_same_tag(parent_node, child_node):
+            insert_at = None
+            for idx, existing in enumerate(parent_node):
+                if existing.tag == child_node.tag:
+                    insert_at = idx + 1
+            if insert_at is None:
+                parent_node.append(child_node)
+            else:
+                parent_node.insert(insert_at, child_node)
+
+        if optype == 'text':
+            if op_node.tag == 'add':
+                raise ValueError('text add not supported')
+            if op_node.tag == 'remove':
+                target_node.text = None
+                return
+            if op_node.tag == 'replace':
+                target_node.text = op_node.text
+                return
+
+        if optype == 'attrib':
+            attrib_name = extract_attrib_name(op_node)
+            if op_node.tag in ('add', 'replace'):
+                target_node.set(attrib_name, op_node.text or '')
+                return
+            if op_node.tag == 'remove':
+                if attrib_name in target_node.attrib:
+                    target_node.attrib.pop(attrib_name)
+                return
+
+        parent = target_node.getparent()
+        if parent is None:
+            raise ValueError('target node has no parent')
+
+        if op_node.tag == 'add':
+            pos = op_node.get('pos')
+            children = deepcopy(op_node.getchildren())
+            if pos is None:
+                for child in children:
+                    append_near_same_tag(target_node, child)
+                return
+            if pos == 'prepend':
+                for child in reversed(children):
+                    target_node.insert(0, child)
+                return
+            if pos == 'before':
+                for child in children:
+                    target_node.addprevious(child)
+                return
+            if pos == 'after':
+                for child in reversed(children):
+                    target_tail = target_node.tail
+                    child_tail = child.tail
+                    target_node.addnext(child)
+                    target_node.tail = target_tail
+                    child.tail = child_tail
+                return
+            raise ValueError(f'pos {pos} not understood')
+
+        if op_node.tag == 'remove':
+            parent.remove(target_node)
+            return
+
+        if op_node.tag == 'replace':
+            children = deepcopy(op_node.getchildren())
+            for child in children:
+                target_node.addprevious(child)
+            parent.remove(target_node)
+            return
+
+        raise ValueError(f'unsupported op {op_node.tag}')
+
+    def apply_custom_patch(target_tree, patch_root, source_path):
+        target_root = target_tree.getroot()
+        if patch_root.tag != 'diff':
+            if patch_root.tag != target_root.tag:
+                raise ValueError(f'root tags differ: {target_root.tag} vs {patch_root.tag}')
+            target_root.extend(deepcopy(patch_root.getchildren()))
+            return
+
+        temp_root = etree.Element('root')
+        temp_root.append(target_root)
+        temp_tree = etree.ElementTree(temp_root)
+
+        for op_node in patch_root:
+            if not isinstance(op_node.tag, str):
+                continue
+            if op_node.tag not in {'add', 'replace', 'remove'}:
+                print(f"      ⚠️ 跳过不支持的 patch 指令 {op_node.tag} ({source_path}:{op_node.sourceline})")
+                continue
+            if not evaluate_patch_condition(temp_tree, op_node):
+                continue
+            try:
+                target_node, optype = resolve_patch_targets(temp_tree, op_node)
+                apply_custom_patch_op(op_node, target_node, optype)
+            except Exception as e:
+                if op_node.get('silent') in {'1', 'true'}:
+                    continue
+                print(
+                    f"      ⚠️ 自定义补丁失败 {source_path}:{op_node.sourceline} "
+                    f"{op_node.tag} sel={op_node.get('sel')} err={e}"
+                )
+
+        if not len(temp_root):
+            raise ValueError('XML base node was deleted')
+        target_tree._setroot(temp_root[0])
+
     def apply_overlay_to_tree(base_tree, source_path):
         if base_tree is None:
             print(f"      ⚠️ 缺少基础树，无法应用补丁: {source_path}")
@@ -267,6 +483,9 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
         source_root = source_tree.getroot()
         try:
             target_tree = clone_tree(base_tree)
+            if patch_has_if(source_root):
+                apply_custom_patch(target_tree, source_root, source_path)
+                return target_tree, 'patched-custom'
             xml_diff.Apply_Patch(target_tree.getroot(), source_root)
             return target_tree, 'patched'
         except Exception as e:
@@ -324,7 +543,7 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
             dlc_written += 1
 
             final_next_tree, final_result = apply_overlay_to_tree(final_tree, source_path)
-            if final_next_tree is not None and final_result == 'patched':
+            if final_next_tree is not None and final_result in {'patched', 'patched-custom'}:
                 final_tree = final_next_tree
 
         if final_tree is None and base_tree is not None:
