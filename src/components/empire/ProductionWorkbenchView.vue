@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useSaveStore } from '@/store/useSaveStore'
 import {
   buildSaveBindingProductionFlows,
   type ProductionSourceKind
@@ -24,10 +25,18 @@ const empireStore = useEmpireStore()
 const stationStore = useStationStore()
 const gameDataStore = useGameDataStore()
 const saveBindingStore = useSaveBindingStore()
+const saveStore = useSaveStore()
 const activeTransitSectorId = computed(() => empireStore.activeTransitSectorId)
 const isOverview = computed(() => empireStore.activeStation === null && !activeTransitSectorId.value)
 const wareFlowViewMode = ref<SharedWareFlowViewMode>('quantity')
 const productionSource = ref<ProductionSourceKind>('empire')
+
+watch(() => saveBindingStore.activeGameGuid, (guid) => {
+  if (guid) {
+    productionSource.value = 'save-binding'
+  }
+})
+
 const transitHubModel = computed(() => empireStore.getTransitHubViewModel({
   sectorId: activeTransitSectorId.value,
   racePreference: stationStore.settings.racePreference,
@@ -38,13 +47,15 @@ const activeSaveBinding = computed(() => {
   const guid = saveBindingStore.activeGameGuid
   return guid ? saveBindingStore.getBindingByGameGuid(guid) : null
 })
-const saveBindingGroupedFlows = computed(() => buildSaveBindingProductionFlows(activeSaveBinding.value, {
+const saveBindingProductionResult = computed(() => buildSaveBindingProductionFlows(activeSaveBinding.value, {
   modulesMap: gameDataStore.modulesMap,
   waresMap: gameDataStore.waresMap,
   medicalConsumptionMap: gameDataStore.medicalConsumptionMap,
   enforceDlcActivation: gameDataStore.enforceDlcActivation,
-  isModuleDlcActive: (moduleId: string) => gameDataStore.isDlcActive(gameDataStore.modulesMap[moduleId]?.dlc_tag)
+  isModuleDlcActive: (moduleId: string) => gameDataStore.isDlcActive(gameDataStore.modulesMap[moduleId]?.dlc_tag),
+  archive: saveStore.selectedArchive
 }))
+const saveBindingGroupedFlows = computed(() => saveBindingProductionResult.value.groupedFlows)
 const overviewGroupedFlows = computed(() =>
   productionSource.value === 'save-binding' ? saveBindingGroupedFlows.value : null
 )

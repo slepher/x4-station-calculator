@@ -30,7 +30,23 @@
 - [x] T20. 清理旧 `EmpirePlan.saveBindings` 相关引用和旧 binding action
 - [x] T21. 运行 `npm run build`，修复编译错误并重复执行直到通过或明确 blocker
 - [x] T22. 将 Step 3 改为 station blueprint 来源，并在 Step 2 新建星区时复用定位星区菜单创建 group draft
-- [ ] T23. 点击 binding 入口时，如果当前 ordinary empire dirty，复用 dirty empire 新建确认流程；保存或放弃后再进入 binding，取消则中止
-- [ ] T24. 点击 binding 入口成功后，将量化生产 active source 切换到当前 `gameGuid` 对应的 `save-binding`
-- [ ] T25. 将 save-binding production adapter 改为基于 binding 派生视图：covered save stations 和 virtual stations 映射为空间站，未覆盖 save stations 不映射
-- [ ] T26. 在 save-binding production source 中将 `TradeStationBinding` 映射为 transit hub，而不是普通生产空间站
+- [x] T23. 点击 binding 入口时，如果当前 ordinary empire dirty，复用 dirty empire 新建确认流程；保存或放弃后再进入 binding，取消则中止
+- [x] T24. 点击 binding 入口成功后，将量化生产 active source 切换到当前 `gameGuid` 对应的 `save-binding`
+- [x] T25. 将 save-binding production adapter 改为基于 binding 派生视图：covered save stations 和 virtual stations 映射为空间站，未覆盖 save stations 不映射
+- [x] T26. 在 save-binding production source 中将 `TradeStationBinding` 映射为 transit hub，而不是普通生产空间站
+
+## 数据源完整切换 (Phase 2)
+
+- [x] T27. 扩展 `useSaveBindingStore` 添加 `activeStationId`、`selectStation`、`updateStationPlan`、`createStationPlanInGroup`
+- [x] T28. 创建 `useEmpireDataStore` 纯数据持久化层，提取 localStorage 操作
+- [x] T29. 修改 `useEmpireStore` 使用 `useEmpireDataStore` 保持 API 兼容
+- [ ] T30. 在 `useEmpireStore` 添加 `productionSource` ref，支持 `'empire' | 'save-binding'`
+- [ ] T31. 重构 `useEmpireStore.stations` computed 根据 `productionSource` 路由到 empire 或 binding 数据
+- [ ] T32. 重构 `useEmpireStore.sectors` computed 根据 `productionSource` 路由（binding groups 作为 sectors）
+- [ ] T33. 重构 `useEmpireStore.activeStation`/`activeStationId` 根据 `productionSource` 路由
+- [ ] T34. 重构 `useEmpireStore.selectStation()` 方法根据 `productionSource` 路由
+- [ ] T35. 重构 `useEmpireStore.createStation()`/`deleteStation()` 根据 `productionSource` 路由
+- [ ] T36. 添加 `useEmpireStore.switchToBinding(gameGuid)` 方法处理切换逻辑和 dirty 确认
+- [ ] T37. 更新 `MapSavePanel.vue` 使用 `switchToBinding()` 替代直接操作
+- [ ] T38. 移除 `ProductionWorkbenchView.vue` 中的手动 `productionSource` 管理
+- [ ] T39. 运行 `npm run build` 验证所有改动

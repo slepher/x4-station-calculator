@@ -160,6 +160,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   const activeGameGuid = computed(() => savedBindings.value.activeGameGuid)
   const activeBinding = computed(() => draftBinding.value)
   const isDirty = computed(() => serializeBinding(draftBinding.value) !== lastSavedDraftSnapshot.value)
+  const activeStationId = ref<string | null>(null)
 
   function getBindingByGameGuid(gameGuid: string): SaveBindingPlan | null {
     return savedBindings.value.list.find((item) => item.gameGuid === gameGuid) || null
@@ -459,6 +460,37 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (savedBindings.value.activeGameGuid) loadDraft(savedBindings.value.activeGameGuid)
   }
 
+  function selectStation(stationId: string | null) {
+    activeStationId.value = stationId
+  }
+
+  function updateStationPlan(gameGuid: string, stationPlanId: string, patch: Partial<BindingStationPlan>) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return false
+    const plan = draftBinding.value.stationPlans.find((item) => item.id === stationPlanId)
+    if (!plan) return false
+    if (patch.name !== undefined) plan.name = patch.name
+    if (patch.type !== undefined) plan.type = patch.type
+    if (patch.modules !== undefined) plan.modules = deepClone(patch.modules)
+    if (patch.settings !== undefined) plan.settings = deepClone(patch.settings)
+    if (patch.groupId !== undefined) plan.groupId = patch.groupId
+    if (patch.sectorMacro !== undefined) plan.sectorMacro = patch.sectorMacro
+    if (patch.position !== undefined) plan.position = patch.position
+    draftBinding.value.updatedAt = Date.now()
+    return true
+  }
+
+  function createStationPlanInGroup(gameGuid: string, groupId: string | null, name: string, type: StationType = 'industrial'): BindingStationPlan | null {
+    return upsertStationPlan({
+      gameGuid,
+      groupId,
+      name,
+      type,
+      modules: [],
+      settings: deepClone(DEFAULT_STATION_SETTINGS)
+    })
+  }
+
   return {
     savedBindings,
     bindings,
@@ -467,6 +499,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     draftBinding,
     isDirty,
     isInitialized,
+    activeStationId,
     initialize,
     getBindingByGameGuid,
     createOrOpenBinding,
@@ -488,6 +521,9 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     deleteTradeStation,
     setTradeStationPosition,
     importEmpireStationToSaveStation,
+    selectStation,
+    updateStationPlan,
+    createStationPlanInGroup,
     loadData,
     writeState
   }

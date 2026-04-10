@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { ref, computed } from 'vue'
 import type {
   EntityLocation,
@@ -18,13 +18,13 @@ import type {
   TransitHubViewModel
 } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
+import { useEmpireDataStore } from './useEmpireDataStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './logic/sectorLinkFlow'
 import { buildTransitHubViewModel } from './logic/transitHubViewModel'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './logic/stationGapViewModel'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
-import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
 import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, parseSectorLinkKey } from './logic/sectorLinks'
 
 const V1_STORAGE_KEY = 'x4_station_data'
@@ -90,15 +90,12 @@ interface SectorLinkCalcEntry {
 
 export const useEmpireStore = defineStore('empire', () => {
   const gameData = useGameDataStore()
-
-  function getStorageKey(): string {
-    return gameData.getStorageKey('empire')
-  }
+  const empireDataStore = useEmpireDataStore()
+  const { savedEmpires } = storeToRefs(empireDataStore)
 
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
 
-  const savedEmpires = ref<SavedEmpiresState>({ version: CURRENT_EMPIRE_VERSION, activeId: null, activeStationId: null, list: [] })
   const version = computed(() => savedEmpires.value.version)
   const empires = computed(() => savedEmpires.value.list)
   const activeEmpireId = computed(() => savedEmpires.value.activeId)
@@ -460,8 +457,7 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function saveToStorage() {
-    const data = JSON.stringify(savedEmpires.value)
-    localStorage.setItem(getStorageKey(), data)
+    empireDataStore.saveToStorage()
   }
 
   function saveEmpire() {
@@ -976,21 +972,14 @@ export const useEmpireStore = defineStore('empire', () => {
     try {
       await gameData.initialize()
       
-      const stored = localStorage.getItem(getStorageKey())
-      if (stored) {
-        try {
-          const data = JSON.parse(stored) as SavedEmpiresState | V1StorageState
-          if (data && Array.isArray((data as SavedEmpiresState).list)) {
-            loadData(data)
-            saveToStorage()
-            initializeAllStationCaches()
-            isReady.value = true
-            console.log('[EmpireStore] Loaded saved empires')
-            return
-          }
-        } catch (e) {
-          console.error('[EmpireStore] Failed to parse data:', e)
-        }
+      const stored = empireDataStore.loadFromStorage()
+      if (stored && Array.isArray(stored.list)) {
+        loadData(stored)
+        saveToStorage()
+        initializeAllStationCaches()
+        isReady.value = true
+        console.log('[EmpireStore] Loaded saved empires')
+        return
       }
       
       const v1Stored = localStorage.getItem(V1_STORAGE_KEY)
