@@ -229,6 +229,7 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
 const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
 const isFreeStationDropForbidden = computed(() => {
+  if (draggingPlacementItem.value && draggingBindingKey.value) return false
   if (!draggingFreeStation.value && !draggingVirtualTradestation.value && !draggingFreeSector.value) return false
   if (!placementPreview.value) return true
   if (draggingFreeSector.value) return false
@@ -1665,7 +1666,7 @@ const onMouseDown = (event: MouseEvent) => {
 
 const onMouseMove = (event: MouseEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
-  if (draggingPlacementItem.value && isBindingPanelOpen.value) {
+  if (draggingPlacementItem.value && !draggingBindingKey.value && isBindingPanelOpen.value) {
     const location = resolveLocationAtPointer(event.clientX, event.clientY)
     placementPreview.value = location ? {
       kind: draggingPlacementItem.value.kind,
