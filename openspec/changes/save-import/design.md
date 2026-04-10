@@ -708,3 +708,140 @@ rust-parser/                            # Rust WASM解析器源码
 ### Duplicate Save
 
 - 同guid+time视为更新，替换旧数据
+
+---
+
+## Save Parser Shape 扩展
+
+### Decision 13: Player Station 与 BuildStorage 数据结构扩展
+
+**问题**: player station 需要更丰富的数据字段支持 binding 业务，同时 buildstorage 需要独立输出并建立与 station 的关联。
+
+**方案**: 扩展 parser 输出结构，增加 player station 的 component_id/cargo/reservation/buildstorage_code，并将 buildstorage 作为独立实体输出。
+
+**实现细节**:
+
+#### P1: PlayerStationConstruction 增加 id
+- `PlayerStationConstruction` 新增 `id?: string` 字段
+- 来源：construction 元素的 id 属性
+
+#### P2: PlayerStation 扩展字段
+- `PlayerStationEntry` 新增：
+  - `component_id?: string` - station 组件 id
+  - `cargo?: WareAmount[]` - station storage cargo 聚合
+  - `reservation?: WareAmount[]` - station reservation 聚合
+  - `buildstorage_code?: string` - 关联的 buildstorage code 引用
+
+#### P3: Sector 顶层 player_buildstorages
+- `SectorData` 新增 `player_buildstorages?: Record<string, BuildStorageEntry>`
+- `player station` 与 `buildstorage` 只通过 `code` 互相引用，不做对象嵌套
+
+#### P4: BuildStorage 解析范围
+- 仅解析 `buildstorage/buildtasks/inprogress/build`
+- 不解析 `buildstorage/buildtasks/queue/build`
+- 输出字段：`cargo`, `reservation`, `constructions`, `progress`
+
+#### P5: BuildStorage progress 字段
+- `buildstorage.progress` 仅保留：`start`, `end`, `sequenceindex`
+- 来源：`buildstorage/connections/connection/component[@class="buildmodule"]/connections/connection/component[@class="buildprocessor"]/build`
+
+#### P6: Station 与 BuildStorage 关联
+- 使用 `buildstorage/buildtasks/inprogress/build/@component = station/@id` 建立关联
+- 命中时：
+  - `playerStation.buildstorage_code = buildstorage.code`
+  - `buildstorage.station_code = playerStation.code`
+- 未命中时，`buildstorage` 仍保留在 sector 顶层
+
+#### P7: ID 字段格式处理
+- parser 输出的 `id` / `component_id` / `target_station_component_id` 等字段去掉外层 `[]`
+- 例如：`[0x4646c]` → `0x4646c`
+
+#### P8: SectorData 实体集合改为 map
+- `SectorData` 下按 `code` 唯一的实体集合统一改为 `snake_case` 的 map：
+  - `player_stations?: Record<string, PlayerStationEntry>`
+  - `npc_stations?: Record<string, NpcStationEntry>`
+  - `xenon_stations?: Record<string, FactionStationEntry>`
+  - `khaak_stations?: Record<string, FactionStationEntry>`
+  - `player_buildstorages?: Record<string, BuildStorageEntry>`
+  - `datavaults?: Record<string, DatavaultEntry>`
+  - `erlking_vaults?: Record<string, DatavaultEntry>`
+  - `abandoned_ships?: Record<string, AbandonedShipEntry>`
+
+#### P9: BuildStorageRef 重命名
+- 类型名从 `BuildStorageRef` 改为 `BuildStorageEntry`
+
+#### P10: BuildStorage constructions equipments
+- `player_buildstorages[*].constructions[*]` 补齐 `equipments` 字段
+- 与 `player_stations[*].constructions[*]` 使用同构结构
+
+#### P11: modules/equipments 改为 map
+- 所有 station / player_buildstorage 的 `modules` / `equipments` 改为 `Record<ref, entry>`
+- `AggregatedStationModule` 结构保持，但存储方式从数组改为 map
+
+#### P12: post 中 enrich module_id/equipment_id
+- Rust parser 只输出原始聚合：`ref`/`amount`/`type`
+- `postProcessRustSaveArchive()` 负责 enrich：
+  - `modules[*].module_id`
+  - `modules[*].type`
+  - `modules[*].group`
+  - `equipments[*].equipment_id`
+
+### Decision 14: SaveArchive 数据模型更新
+
+```typescript
+interface WareAmount {
+  ware: string
+  amount: number
+}
+
+interface BuildProgress {
+  start?: number
+  end?: number
+  sequenceindex?: number
+}
+
+interface BuildStorageEntry {
+  component_id: string
+  code: string
+  owner: string
+  relative_position: { x: number; y: number; z: number }
+  zone_id?: string
+  cargo?: WareAmount[]
+  reservation?: WareAmount[]
+  station_code?: string
+  target_station_component_id?: string
+  constructions?: PlayerStationConstruction[]
+  modules?: Record<string, AggregatedStationModule>
+  equipments?: Record<string, AggregatedEquipment>
+  progress?: BuildProgress
+}
+
+interface PlayerStationEntry extends StationBaseEntry {
+  component_id?: string
+  cargo?: WareAmount[]
+  reservation?: WareAmount[]
+  buildstorage_code?: string
+  constructions?: PlayerStationConstruction[]
+  modules?: Record<string, AggregatedStationModule>
+  equipments?: Record<string, AggregatedEquipment>
+}
+
+interface PlayerStationConstruction {
+  id?: string
+  index: number
+  ref: string
+  predecessor?: number
+  equipments?: StationEquipment[]
+}
+
+interface SectorData {
+  player_stations?: Record<string, PlayerStationEntry>
+  npc_stations?: Record<string, NpcStationEntry>
+  xenon_stations?: Record<string, FactionStationEntry>
+  khaak_stations?: Record<string, FactionStationEntry>
+  player_buildstorages?: Record<string, BuildStorageEntry>
+  datavaults?: Record<string, DatavaultEntry>
+  erlking_vaults?: Record<string, DatavaultEntry>
+  abandoned_ships?: Record<string, AbandonedShipEntry>
+}
+```
