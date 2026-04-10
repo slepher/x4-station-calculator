@@ -1,4 +1,5 @@
 import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
+import { isSectorMacroInBindingScope, resolveBindingSectorScope } from './saveBindingSectorScope'
 import { stationStateMap, migrateStationSettings } from '@/store/state/StationStateMap'
 import type {
   BindingStationPlan,
@@ -13,6 +14,45 @@ import type {
 import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
 
 export type ProductionSourceKind = 'empire' | 'save-binding'
+
+export type ParsedBindingStationId =
+  | { kind: 'plan'; gameGuid: string; planId: string }
+  | { kind: 'derived'; gameGuid: string; saveStationCode: string }
+
+export function createBindingPlanStationId(gameGuid: string, planId: string): string {
+  return `__save_binding__${gameGuid}__${planId}`
+}
+
+export function createDerivedSaveStationId(gameGuid: string, saveStationCode: string): string {
+  return `__save_binding_derived__${gameGuid}__${saveStationCode}`
+}
+
+export function parseBindingStationId(stationId: string | null | undefined): ParsedBindingStationId | null {
+  if (!stationId) return null
+  const planPrefix = '__save_binding__'
+  if (stationId.startsWith(planPrefix)) {
+    const rest = stationId.slice(planPrefix.length)
+    const separator = rest.indexOf('__')
+    if (separator <= 0) return null
+    const gameGuid = rest.slice(0, separator)
+    const planId = rest.slice(separator + 2)
+    if (!gameGuid || !planId) return null
+    return { kind: 'plan', gameGuid, planId }
+  }
+
+  const derivedPrefix = '__save_binding_derived__'
+  if (stationId.startsWith(derivedPrefix)) {
+    const rest = stationId.slice(derivedPrefix.length)
+    const separator = rest.indexOf('__')
+    if (separator <= 0) return null
+    const gameGuid = rest.slice(0, separator)
+    const saveStationCode = rest.slice(separator + 2)
+    if (!gameGuid || !saveStationCode) return null
+    return { kind: 'derived', gameGuid, saveStationCode }
+  }
+
+  return null
+}
 
 export interface ProductionSourceDeps {
   modulesMap: Record<string, X4Module>
@@ -38,7 +78,7 @@ export function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
 
 function toProductionStation(gameGuid: string, plan: BindingStationPlan): StationPlan {
   return {
-    id: `__save_binding__${gameGuid}__${plan.id}`,
+    id: createBindingPlanStationId(gameGuid, plan.id),
     name: plan.name || plan.saveStationCode || 'Station',
     type: plan.type,
     modules: plan.modules || [],
@@ -55,8 +95,8 @@ function toDerivedSaveStation(
   plan: BindingStationPlan | undefined
 ): StationPlan {
   const id = plan
-    ? `__save_binding__${gameGuid}__${plan.id}`
-    : `__save_binding_derived__${gameGuid}__${saveStation.code}`
+    ? createBindingPlanStationId(gameGuid, plan.id)
+    : createDerivedSaveStationId(gameGuid, saveStation.code)
   return {
     id,
     name: plan?.name || saveStation.code || 'Save Station',
@@ -77,9 +117,7 @@ function getCoveredSaveStationCodes(
 
   const coverageMacros = new Set<string>()
   groups.forEach((group) => {
-    group.coverageSectorMacros.forEach((entry) => {
-      coverageMacros.add(entry.ref)
-    })
+    resolveBindingSectorScope(group).sectorMacros.forEach((sectorMacro) => coverageMacros.add(sectorMacro))
   })
 
   const coveredCodes = new Set<string>()
@@ -109,8 +147,7 @@ function findGroupBySectorMacro(
   sectorMacro: string
 ): BindingSectorGroup | null {
   for (const group of groups) {
-    const coverage = group.coverageSectorMacros || []
-    if (coverage.some((entry) => entry.ref === sectorMacro)) {
+    if (isSectorMacroInBindingScope(group, sectorMacro)) {
       return group
     }
   }
@@ -142,6 +179,7 @@ export function buildSaveBindingProductionFlows(
   const coveredCodes = getCoveredSaveStationCodes(deps.archive, binding.groups)
   const stationPlansByCode = new Map<string, BindingStationPlan>()
   const virtualPlans: BindingStationPlan[] = []
+  const emittedPlanIds = new Set<string>()
 
   binding.stationPlans.forEach((plan) => {
     if (plan.saveStationCode) {
@@ -161,6 +199,15 @@ export function buildSaveBindingProductionFlows(
     const station = toDerivedSaveStation(binding.gameGuid, entry.station, plan)
     station.sectorId = groupId
     derivedStations.push(station)
+    if (plan) emittedPlanIds.add(plan.id)
+  })
+
+  binding.stationPlans.forEach((plan) => {
+    if (!plan.saveStationCode || emittedPlanIds.has(plan.id)) return
+    const station = toProductionStation(binding.gameGuid, plan)
+    station.sectorId = plan.groupId || null
+    derivedStations.push(station)
+    emittedPlanIds.add(plan.id)
   })
 
   virtualPlans.forEach((plan) => {
@@ -229,6 +276,7 @@ export function deriveBindingStations(
   const result: DerivedBindingStation[] = []
   const coveredCodes = getCoveredSaveStationCodes(archive, binding.groups)
   const stationPlansByCode = new Map<string, BindingStationPlan>()
+  const emittedPlanIds = new Set<string>()
 
   binding.stationPlans.forEach((plan) => {
     if (plan.saveStationCode) {
@@ -247,17 +295,17 @@ export function deriveBindingStations(
       station,
       groupId
     })
+    if (plan) emittedPlanIds.add(plan.id)
   })
 
   binding.stationPlans.forEach((plan) => {
-    if (!plan.saveStationCode) {
-      const station = toProductionStation(binding.gameGuid, plan)
-      station.sectorId = plan.groupId || null
-      result.push({
-        station,
-        groupId: plan.groupId || null
-      })
-    }
+    if (emittedPlanIds.has(plan.id)) return
+    const station = toProductionStation(binding.gameGuid, plan)
+    station.sectorId = plan.groupId || null
+    result.push({
+      station,
+      groupId: plan.groupId || null
+    })
   })
 
   return result

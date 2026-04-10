@@ -361,9 +361,7 @@ const isStationEmpty = () => {
 const applyBlueprintOverwrite = (stationId: string, modules: BlueprintModule[]) => {
   const station = empireStore.getStationById(stationId)
   if (!station) return
-  station.modules = modules.map((item) => ({ ...item }))
-  station.lastUpdated = Date.now()
-  empireStore.refreshStationFlowCache(station.id)
+  empireStore.updateStationModules(station.id, modules.map((item) => ({ ...item })))
 }
 
 const applyBlueprintAdd = (stationId: string, modules: BlueprintModule[]) => {
@@ -378,9 +376,10 @@ const applyBlueprintAdd = (stationId: string, modules: BlueprintModule[]) => {
     merged.set(module.id, (merged.get(module.id) || 0) + module.count)
   })
 
-  station.modules = Array.from(merged.entries()).map(([id, count]) => ({ id, count }))
-  station.lastUpdated = Date.now()
-  empireStore.refreshStationFlowCache(station.id)
+  empireStore.updateStationModules(
+    station.id,
+    Array.from(merged.entries()).map(([id, count]) => ({ id, count }))
+  )
 }
 
 const createStationWithDefaultName = () => {

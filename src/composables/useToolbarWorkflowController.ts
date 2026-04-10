@@ -115,7 +115,7 @@ export function useToolbarWorkflowController({ t, translateShip }: UseToolbarWor
     if (storeType === 'logicFlow') {
       return logicFlowStore.saveCurrentPlan()
     }
-    empireStore.saveEmpire()
+    empireStore.saveCurrentSource()
     return true
   }
 

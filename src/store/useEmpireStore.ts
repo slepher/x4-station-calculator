@@ -28,7 +28,11 @@ import { buildStationComponentGapFlows, type StationComponentGapFlows } from './
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
 import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, parseSectorLinkKey } from './logic/sectorLinks'
-import { deriveBindingStations } from './logic/productionSourceAdapter'
+import {
+  createBindingPlanStationId,
+  deriveBindingStations,
+  parseBindingStationId
+} from './logic/productionSourceAdapter'
 
 const V1_STORAGE_KEY = 'x4_station_data'
 const SESSION_ACTIVE_STATION_KEY = 'x4_active_station_id'
@@ -153,10 +157,9 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     return activeEmpire.value.stations.find(s => s.id === activeStationId.value) || null
   })
   const activeTransitSectorId = computed(() => {
-    if (!activeEmpire.value) return null
     const sectorId = fromTransitTabId(activeStationId.value)
     if (!sectorId) return null
-    const exists = (activeEmpire.value.sectors || []).some((sector) => sector.id === sectorId)
+    const exists = sectors.value.some((sector) => sector.id === sectorId)
     return exists ? sectorId : null
   })
   const sectors = computed<SectorPlan[]>(() => {
@@ -202,6 +205,50 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     })
     return withIndex.map((item) => item.station)
   })
+
+  function getDerivedBindingStation(stationId: string): StationPlan | null {
+    const binding = saveBindingStore.activeBinding
+    if (!binding) return null
+    const archive = saveStore.selectedArchive
+    const derived = deriveBindingStations(binding, archive)
+    return derived.find((item) => item.station.id === stationId)?.station || null
+  }
+
+  function updateBindingStationPlan(
+    stationId: string,
+    patch: Partial<Pick<StationPlan, 'name' | 'type' | 'modules' | 'settings' | 'sectorId'>>
+  ): boolean {
+    const binding = saveBindingStore.activeBinding
+    const parsed = parseBindingStationId(stationId)
+    if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
+
+    if (parsed.kind === 'plan') {
+      return saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, {
+        name: patch.name,
+        type: patch.type,
+        modules: patch.modules,
+        settings: patch.settings,
+        groupId: patch.sectorId
+      })
+    }
+
+    const station = getDerivedBindingStation(stationId)
+    const plan = saveBindingStore.upsertStationPlan({
+      gameGuid: binding.gameGuid,
+      saveStationCode: parsed.saveStationCode,
+      groupId: patch.sectorId ?? station?.sectorId ?? null,
+      name: patch.name ?? station?.name ?? parsed.saveStationCode,
+      type: patch.type ?? station?.type ?? 'industrial',
+      modules: patch.modules ?? station?.modules ?? [],
+      settings: patch.settings ?? station?.settings ?? DEFAULT_STATION_SETTINGS
+    })
+    if (!plan) return false
+    const nextId = createBindingPlanStationId(binding.gameGuid, plan.id)
+    if (activeStationId.value === stationId) {
+      activeStationId.value = nextId
+    }
+    return true
+  }
 
   const allStations = computed(() => {
     const stations: { station: StationPlan; empireId: string }[] = []
@@ -537,6 +584,15 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     takeSnapshot()
   }
 
+  function saveCurrentSource() {
+    if (productionSource.value === 'save-binding') {
+      saveBindingStore.saveBinding()
+      return true
+    }
+    saveEmpire()
+    return true
+  }
+
   function saveEmpireAs(name: string) {
     if (!activeEmpire.value) return false
     const newEmpire = JSON.parse(JSON.stringify(activeEmpire.value))
@@ -549,6 +605,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function requiresSaveAsOnSave() {
+    if (productionSource.value === 'save-binding') return false
     return !savedEmpires.value.activeId
   }
 
@@ -624,11 +681,24 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     if (productionSource.value === 'save-binding') {
       const binding = saveBindingStore.activeBinding
       if (!binding) return null
-      const plan = saveBindingStore.createStationPlanInGroup(binding.gameGuid, null, name, type)
+      const groupId = activeStation.value?.sectorId || sectors.value[0]?.id || null
+      const plan = saveBindingStore.createStationPlanInGroup(binding.gameGuid, groupId, name, type)
+      if (!plan) return null
+      const stationId = createBindingPlanStationId(binding.gameGuid, plan.id)
       if (plan && selectAfterCreate) {
-        activeStationId.value = plan.id
+        activeStationId.value = stationId
       }
-      return plan ? { ...plan, id: plan.id } as StationPlan : null
+      return {
+        id: stationId,
+        name: plan.name,
+        type: plan.type,
+        sectorId: plan.groupId || null,
+        modules: plan.modules,
+        settings: plan.settings,
+        lastUpdated: 0,
+        lockedWares: [],
+        warePriority: {}
+      }
     }
 
     if (!activeEmpire.value) return null
@@ -647,7 +717,11 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     if (productionSource.value === 'save-binding') {
       const binding = saveBindingStore.activeBinding
       if (!binding) return
-      saveBindingStore.deleteStationPlan(binding.gameGuid, stationId)
+      const parsed = parseBindingStationId(stationId)
+      if (parsed?.kind === 'plan' && parsed.gameGuid === binding.gameGuid) {
+        saveBindingStore.deleteStationPlan(binding.gameGuid, parsed.planId)
+        stationStateMap.remove(stationId)
+      }
       if (activeStationId.value === stationId) {
         activeStationId.value = null
       }
@@ -741,6 +815,9 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function moveStationToSector(stationId: string, sectorId: string | null) {
+    if (productionSource.value === 'save-binding') {
+      return updateBindingStationPlan(stationId, { sectorId })
+    }
     if (!activeEmpire.value) return false
     const station = activeEmpire.value.stations.find((item) => item.id === stationId)
     if (!station) return false
@@ -941,6 +1018,9 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function renameStation(stationId: string, newName: string) {
+    if (productionSource.value === 'save-binding') {
+      return updateBindingStationPlan(stationId, { name: newName })
+    }
     if (!activeEmpire.value) return false
     
     const station = activeEmpire.value.stations.find(s => s.id === stationId)
@@ -967,8 +1047,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
       return
     }
-    if (!activeEmpire.value) return
-    const exists = (activeEmpire.value.sectors || []).some((sector) => sector.id === sectorId)
+    const exists = sectors.value.some((sector) => sector.id === sectorId)
     if (!exists) return
     const transitTabId = toTransitTabId(sectorId)
     activeStationId.value = transitTabId
@@ -980,6 +1059,9 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function getStationById(stationId: string): StationPlan | null {
+    if (productionSource.value === 'save-binding') {
+      return getDerivedBindingStation(stationId)
+    }
     if (activeEmpire.value) {
       const station = activeEmpire.value.stations.find(s => s.id === stationId)
       if (station) return station
@@ -988,6 +1070,13 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function updateStationSettings(stationId: string, settings: Partial<StationSettings>) {
+    if (productionSource.value === 'save-binding') {
+      const station = getDerivedBindingStation(stationId)
+      const current = migrateStationSettings(station?.settings || DEFAULT_STATION_SETTINGS)
+      updateBindingStationPlan(stationId, { settings: { ...current, ...settings } })
+      refreshStationFlowCache(stationId)
+      return
+    }
     const station = getStationById(stationId)
     if (station) {
       station.settings = { ...station.settings, ...settings }
@@ -997,6 +1086,11 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function updateStationModules(stationId: string, modules: SavedModule[]) {
+    if (productionSource.value === 'save-binding') {
+      updateBindingStationPlan(stationId, { modules })
+      refreshStationFlowCache(stationId)
+      return
+    }
     const station = getStationById(stationId)
     if (station) {
       station.modules = modules
@@ -1006,6 +1100,10 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function updateStationSector(stationId: string, sectorId: string | null) {
+    if (productionSource.value === 'save-binding') {
+      updateBindingStationPlan(stationId, { sectorId })
+      return
+    }
     const station = getStationById(stationId)
     if (station) {
       station.sectorId = sectorId || undefined
@@ -1020,12 +1118,18 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   const isDirty = computed(() => {
+    if (productionSource.value === 'save-binding') {
+      return saveBindingStore.isDirty
+    }
     if (isEmptyForSave()) return false
     const current = serializeEmpireForDirtyCheck()
     return current !== lastSavedSnapshot.value
   })
 
   function isEmptyForSave() {
+    if (productionSource.value === 'save-binding') {
+      return !saveBindingStore.activeBinding
+    }
     if (!activeEmpire.value) return true
     const hasStations = (activeEmpire.value.stations || []).length > 0
     const hasSectors = (activeEmpire.value.sectors || []).length > 0
@@ -1089,18 +1193,26 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     }
   }
 
+  function openBindingForProduction(gameGuid: string) {
+    const currentDraft = saveBindingStore.activeBinding
+    if (currentDraft?.gameGuid === gameGuid && saveBindingStore.activeGameGuid === gameGuid) {
+      return
+    }
+    saveBindingStore.createOrOpenBinding(gameGuid)
+  }
+
   function switchToBinding(gameGuid: string): { needsConfirm: boolean } {
     if (productionSource.value === 'empire' && isDirty.value) {
       return { needsConfirm: true }
     }
     productionSource.value = 'save-binding'
-    saveBindingStore.createOrOpenBinding(gameGuid)
+    openBindingForProduction(gameGuid)
     return { needsConfirm: false }
   }
 
   function confirmSwitchToBinding(gameGuid: string) {
     productionSource.value = 'save-binding'
-    saveBindingStore.createOrOpenBinding(gameGuid)
+    openBindingForProduction(gameGuid)
   }
 
   function switchToEmpire() {
@@ -1137,6 +1249,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     loadData,
     saveToStorage,
     saveEmpire,
+    saveCurrentSource,
     saveEmpireAs,
     requiresSaveAsOnSave,
     loadEmpire,

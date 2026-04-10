@@ -38,6 +38,8 @@ const activeSaveBinding = computed(() => {
   const guid = saveBindingStore.activeGameGuid
   return guid ? saveBindingStore.getBindingByGameGuid(guid) : null
 })
+const activeSaveBindingGameGuid = computed(() => activeSaveBinding.value?.gameGuid || saveBindingStore.activeGameGuid)
+const canSwitchToActiveBinding = computed(() => Boolean(activeSaveBindingGameGuid.value))
 const saveBindingProductionResult = computed(() => buildSaveBindingProductionFlows(activeSaveBinding.value, {
   modulesMap: gameDataStore.modulesMap,
   waresMap: gameDataStore.waresMap,
@@ -50,6 +52,12 @@ const saveBindingGroupedFlows = computed(() => saveBindingProductionResult.value
 const overviewGroupedFlows = computed(() =>
   productionSource.value === 'save-binding' ? saveBindingGroupedFlows.value : null
 )
+
+function switchToActiveBinding() {
+  const gameGuid = activeSaveBindingGameGuid.value
+  if (!gameGuid) return
+  empireStore.switchToBinding(gameGuid)
+}
 </script>
 
 <template>
@@ -96,7 +104,8 @@ const overviewGroupedFlows = computed(() =>
               type="button"
               class="source-tab"
               :class="{ active: productionSource === 'save-binding' }"
-              disabled
+              :disabled="!canSwitchToActiveBinding"
+              @click="switchToActiveBinding"
             >
               {{ $t('production.source_save_binding') }}
             </button>

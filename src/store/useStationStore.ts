@@ -9,7 +9,12 @@ import type {
 } from '../types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireStore } from './useEmpireStore'
+import { useSaveBindingStore } from './useSaveBindingStore'
 import { useShipBuildStore, type StationActiveView } from './useShipBuildStore'
+import {
+  createBindingPlanStationId,
+  parseBindingStationId
+} from './logic/productionSourceAdapter'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
   parseXmlBlueprint,
@@ -34,6 +39,7 @@ function deepClone<T>(value: T): T {
 export const useStationStore = defineStore('station', () => {
   const gameData = useGameDataStore()
   const empireStore = useEmpireStore()
+  const saveBindingStore = useSaveBindingStore()
   const shipBuildStore = useShipBuildStore()
 
   const activeView = computed<StationActiveView>({
@@ -131,6 +137,40 @@ export const useStationStore = defineStore('station', () => {
     }
   }
 
+  function syncBindingStationPlanFromState(stationId: string) {
+    if (empireStore.productionSource !== 'save-binding') return
+    const binding = saveBindingStore.activeBinding
+    const parsed = parseBindingStationId(stationId)
+    if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return
+
+    const persisted = stationStateMap.toPersisted(stationId)
+    const station = empireStore.activeStation
+    if (!persisted || !station) return
+
+    const patch = {
+      modules: deepClone(persisted.modules),
+      settings: migrateStationSettings(persisted.settings)
+    }
+
+    if (parsed.kind === 'plan') {
+      saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, patch)
+      return
+    }
+
+    const plan = saveBindingStore.upsertStationPlan({
+      gameGuid: binding.gameGuid,
+      saveStationCode: parsed.saveStationCode,
+      groupId: station.sectorId || null,
+      name: station.name || parsed.saveStationCode,
+      type: station.type || 'industrial',
+      modules: patch.modules,
+      settings: patch.settings
+    })
+    if (plan) {
+      empireStore.selectStation(createBindingPlanStationId(binding.gameGuid, plan.id))
+    }
+  }
+
   function applyAndRecompute(writer: (stationId: string) => void) {
     const ctx = getActiveContext()
     if (!ctx) return
@@ -139,6 +179,7 @@ export const useStationStore = defineStore('station', () => {
     const deps = getComputeDeps()
     if (deps) stationStateMap.recompute(stationId, deps)
     syncActiveStationFromState(false)
+    syncBindingStationPlanFromState(stationId)
   }
 
   function updateSetting<K extends keyof StationSettings>(key: K, value: StationSettings[K]) {
