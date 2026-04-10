@@ -59,6 +59,10 @@ const activeBindingPlan = computed(() => {
   return saveBindingStore.getBindingByGameGuid(props.gameGuid)
 })
 
+function getSaveStationPlan(saveStationCode: string) {
+  return activeBindingPlan.value?.stationPlans.find((plan) => plan.saveStationCode === saveStationCode) || null
+}
+
 const currentGroupBinding = computed<GroupSaveBinding | null>(() => {
   const group = activeBindingPlan.value?.groups.find((b) => b.id === props.sectorGroupId)
   if (!group) return null
@@ -393,9 +397,7 @@ function getEmpireStationIconById(stationId: string): string {
 }
 
 function isSaveStationBound(saveStationCode: string): boolean {
-  return Boolean(activeBindingPlan.value?.stationPlans.some(
-    (plan) => plan.saveStationCode === saveStationCode
-  ))
+  return Boolean(getSaveStationPlan(saveStationCode))
 }
 
 function getBoundStationBinding(saveStationCode: string): StationSaveBinding | null {
@@ -407,7 +409,7 @@ function getBoundStationBinding(saveStationCode: string): StationSaveBinding | n
 function getBoundEmpireStation(saveStationCode: string): StationPlan | null {
   const binding = getBoundStationBinding(saveStationCode)
   if (!binding) return null
-  const plan = activeBindingPlan.value?.stationPlans.find((item) => item.id === binding.stationId)
+  const plan = getSaveStationPlan(saveStationCode)
   if (plan) {
     return {
       id: plan.id,
@@ -424,7 +426,7 @@ function getBoundEmpireStation(saveStationCode: string): StationPlan | null {
 function hasDanglingBoundStation(saveStationCode: string): boolean {
   const binding = getBoundStationBinding(saveStationCode)
   if (!binding) return false
-  return !activeBindingPlan.value?.stationPlans.some((item) => item.id === binding.stationId)
+  return !getSaveStationPlan(saveStationCode)
 }
 
 function getBindButtonLabel(saveStationCode: string): string {
@@ -537,6 +539,12 @@ function clearCurrentSaveStationBinding() {
   const saveStationCode = bindMenuSaveStation.value?.code
   if (!saveStationCode) return
 
+  if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) {
+    saveBindingStore.deleteTradeStation(props.gameGuid, props.sectorGroupId)
+    closeBindMenu()
+    return
+  }
+
   saveBindingStore.clearStationPlan(props.gameGuid, saveStationCode)
   closeBindMenu()
 }
@@ -614,16 +622,31 @@ const allStationsForMenu = computed(() => {
     sectorMacro?: string
     disabled?: boolean
     placed?: boolean
-  } | {
-    type: 'virtualTradestation'
-    name: string
+	  } | {
+	    type: 'stationPlan'
+	    planId: string
+	    name: string
+	    placed?: boolean
+	  } | {
+	    type: 'virtualTradestation'
+	    name: string
     sectorGroupId: string
     sectorMacro?: string
     disabled?: boolean
     placed?: boolean
-  }> = []
+	  }> = []
 
-  for (const station of activeEmpire.value.stations) {
+	  const boundPlan = bindMenuSaveStation.value ? getSaveStationPlan(bindMenuSaveStation.value.code) : null
+	  if (boundPlan && currentGroupBinding.value?.tradestationBinding?.saveStationCode !== bindMenuSaveStation.value?.code) {
+	    items.push({
+	      type: 'stationPlan',
+	      planId: boundPlan.id,
+	      name: boundPlan.name || bindMenuSaveStation.value?.code || boundPlan.id,
+	      placed: Boolean(boundPlan.position)
+	    })
+	  }
+
+	  for (const station of activeEmpire.value.stations) {
     const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
     
     if (station.id === boundStationId) {
@@ -680,7 +703,7 @@ const allStationsForMenu = computed(() => {
         disabled: true,
         placed: true
       })
-    } else if (tb?.position && tradestationSaveStationCode) {
+    } else if (tb && tradestationSaveStationCode) {
       const isCurrentSaveStation = bindMenuSaveStation.value?.code === tradestationSaveStationCode
       items.push({
         type: 'virtualTradestation',
@@ -688,7 +711,7 @@ const allStationsForMenu = computed(() => {
         sectorGroupId: props.sectorGroupId,
         sectorMacro: tb.sectorMacro,
         disabled: !isCurrentSaveStation,
-        placed: true
+        placed: Boolean(tb.position)
       })
     } else if (!tb) {
       items.push({
@@ -1003,33 +1026,50 @@ onBeforeUnmount(() => {
               >×</button>
             </span>
           </button>
-          <template v-for="item in allStationsForMenu" :key="'station' in item ? item.station.id : 'virtual-ts'">
-            <!-- Empire Station -->
-            <button
-              v-if="'station' in item"
-              type="button"
-              class="bind-menu-item"
-              :class="{
-                active: bindMenuSaveStation && getBoundEmpireStation(bindMenuSaveStation.code)?.id === item.station.id,
-                'bind-menu-item--placed': item.placed,
-                'bind-menu-item--disabled': item.disabled
-              }"
-              :disabled="item.disabled"
+	          <template v-for="item in allStationsForMenu" :key="'station' in item ? item.station.id : item.type === 'stationPlan' ? `plan-${item.planId}` : 'virtual-ts'">
+	            <!-- Empire Station -->
+	            <button
+	              v-if="'station' in item"
+	              type="button"
+	              class="bind-menu-item"
+	              :class="{
+	                active: bindMenuSaveStation && getSaveStationPlan(bindMenuSaveStation.code)?.id === item.station.id,
+	                'bind-menu-item--placed': item.placed,
+	                'bind-menu-item--disabled': item.disabled
+	              }"
+	              :disabled="item.disabled"
               @click="bindToStation(item.station.id)"
             >
               <span class="bind-menu-item-name">{{ item.station.name }}</span>
-              <span class="bind-menu-item-side">
-                <button
-                  v-if="bindMenuSaveStation && getBoundEmpireStation(bindMenuSaveStation.code)?.id === item.station.id"
-                  type="button"
-                  class="bind-menu-item-clear"
-                  @click.stop="clearCurrentSaveStationBinding"
-                >×</button>
-              </span>
-            </button>
-            <!-- Virtual Tradestation -->
-            <button
-              v-else
+	              <span class="bind-menu-item-side">
+	                <button
+	                  v-if="bindMenuSaveStation && getSaveStationPlan(bindMenuSaveStation.code)?.id === item.station.id"
+	                  type="button"
+	                  class="bind-menu-item-clear"
+	                  @click.stop="clearCurrentSaveStationBinding"
+	                >×</button>
+	              </span>
+	            </button>
+	            <!-- Bound copied station plan -->
+	            <button
+	              v-else-if="item.type === 'stationPlan'"
+	              type="button"
+	              class="bind-menu-item active"
+	              :class="{ 'bind-menu-item--placed': item.placed }"
+	              @click.prevent
+	            >
+	              <span class="bind-menu-item-name">{{ item.name }}</span>
+	              <span class="bind-menu-item-side">
+	                <button
+	                  type="button"
+	                  class="bind-menu-item-clear"
+	                  @click.stop="clearCurrentSaveStationBinding"
+	                >×</button>
+	              </span>
+	            </button>
+	            <!-- Virtual Tradestation -->
+	            <button
+	              v-else
               type="button"
               class="bind-menu-item bind-menu-item--tradestation"
               :class="{

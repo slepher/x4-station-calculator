@@ -108,6 +108,7 @@ type DraggingPlacementItem = {
   kind: 'station' | 'sector'
   name: string
   icon: 'factory' | 'shipyard' | 'tradestation'
+  savePoiVisual?: SavePoiOverlayItem
 }
 
 const clusterRefHeightPx = ref(142)
@@ -168,7 +169,6 @@ const resourcePrimaryColor = ref<string | null>(null)
 const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
 const draggingPlacementItem = ref<DraggingPlacementItem | null>(null)
-const draggingOriginalSectorMacro = ref<string | null>(null)
 const draggingOverlayKey = ref<string | null>(null)
 const draggingBindingKey = ref<string | null>(null)
 const draggingSectorGroupId = ref<string | null>(null)
@@ -231,7 +231,7 @@ const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
 const isFreeStationDropForbidden = computed(() => {
   if (!draggingFreeStation.value && !draggingVirtualTradestation.value && !draggingFreeSector.value) return false
-  if (!placementPreview.value) return true
+  if (!placementPreview.value) return false
   if (draggingFreeSector.value) return false
   const location = placementPreview.value.location
   const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
@@ -1666,14 +1666,27 @@ const onMouseDown = (event: MouseEvent) => {
 
 const onMouseMove = (event: MouseEvent) => {
   lastMousePos.value = { x: event.clientX, y: event.clientY }
-  if (draggingPlacementItem.value && !draggingBindingKey.value && isBindingPanelOpen.value) {
-    const location = resolveLocationAtPointer(event.clientX, event.clientY)
-    placementPreview.value = location ? {
-      kind: draggingPlacementItem.value.kind,
-      name: draggingPlacementItem.value.name,
-      icon: draggingPlacementItem.value.icon,
-      location
-    } : null
+  if (draggingPlacementItem.value && isBindingPanelOpen.value) {
+    if (draggingBindingKey.value) {
+      const bindingSampleResult = resolveBindingLocationSampleAtPointer(event.clientX, event.clientY)
+      const sample = bindingSampleResult?.sample || null
+          placementPreview.value = sample
+        ? buildBindingPreview(draggingBindingKey.value, sample.location, sample.localRatio, {
+            kind: draggingPlacementItem.value.kind,
+            name: draggingPlacementItem.value.name,
+            icon: draggingPlacementItem.value.icon,
+            savePoiVisual: draggingPlacementItem.value.savePoiVisual
+          })
+        : null
+    } else {
+      const location = resolveLocationAtPointer(event.clientX, event.clientY)
+      placementPreview.value = location ? {
+        kind: draggingPlacementItem.value.kind,
+        name: draggingPlacementItem.value.name,
+        icon: draggingPlacementItem.value.icon,
+        location
+      } : null
+    }
   } else if (draggingFreeSector.value && isBindingPanelOpen.value) {
     const bindingSampleResult = resolveBindingLocationSampleAtPointer(event.clientX, event.clientY)
     const sample = bindingSampleResult?.sample || null
@@ -1857,28 +1870,16 @@ const onOverlayPointerDown = (payload: {
       id: payload.id,
       kind: payload.kind,
       name: payload.name,
-      icon: payload.icon
+      icon: payload.icon,
+      savePoiVisual: payload.savePoiVisual
     }
     draggingBindingKey.value = payload.binding.gameGuid
     draggingSectorGroupId.value = payload.binding.sectorGroupId
     draggingCoverageSectorMacros.value = new Set(payload.binding.coverageSectorMacros)
     draggingOverlayKey.value = payload.key
     draggingFreeSector.value = null
-    if (payload.binding.isVirtualTradestation) {
-      draggingFreeStation.value = null
-      draggingVirtualTradestation.value = {
-        sectorGroupId: payload.binding.sectorGroupId,
-        name: payload.name
-      }
-    } else {
-      draggingVirtualTradestation.value = null
-      draggingFreeStation.value = {
-        stationId: payload.id,
-        sectorGroupId: payload.binding.sectorGroupId,
-        name: payload.name,
-        icon: payload.icon as 'factory' | 'shipyard'
-      }
-    }
+    draggingFreeStation.value = null
+    draggingVirtualTradestation.value = null
     return
   }
 
