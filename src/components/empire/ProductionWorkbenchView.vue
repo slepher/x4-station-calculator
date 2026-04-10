@@ -1,14 +1,11 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, ref } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useSaveStore } from '@/store/useSaveStore'
-import {
-  buildSaveBindingProductionFlows,
-  type ProductionSourceKind
-} from '@/store/logic/productionSourceAdapter'
+import { buildSaveBindingProductionFlows } from '@/store/logic/productionSourceAdapter'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import StationTabBar from '@/components/empire/StationTabBar.vue'
@@ -29,13 +26,7 @@ const saveStore = useSaveStore()
 const activeTransitSectorId = computed(() => empireStore.activeTransitSectorId)
 const isOverview = computed(() => empireStore.activeStation === null && !activeTransitSectorId.value)
 const wareFlowViewMode = ref<SharedWareFlowViewMode>('quantity')
-const productionSource = ref<ProductionSourceKind>('empire')
-
-watch(() => saveBindingStore.activeGameGuid, (guid) => {
-  if (guid) {
-    productionSource.value = 'save-binding'
-  }
-})
+const productionSource = computed(() => empireStore.productionSource)
 
 const transitHubModel = computed(() => empireStore.getTransitHubViewModel({
   sectorId: activeTransitSectorId.value,
@@ -97,7 +88,7 @@ const overviewGroupedFlows = computed(() =>
               type="button"
               class="source-tab"
               :class="{ active: productionSource === 'empire' }"
-              @click="productionSource = 'empire'"
+              @click="empireStore.switchToEmpire()"
             >
               {{ $t('production.source_empire') }}
             </button>
@@ -105,7 +96,7 @@ const overviewGroupedFlows = computed(() =>
               type="button"
               class="source-tab"
               :class="{ active: productionSource === 'save-binding' }"
-              @click="productionSource = 'save-binding'"
+              disabled
             >
               {{ $t('production.source_save_binding') }}
             </button>

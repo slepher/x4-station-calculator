@@ -95,11 +95,24 @@ function getCoveredSaveStationCodes(
 function getSaveStationByCode(
   archive: SaveArchive | null,
   code: string
-): PlayerStationEntry | null {
+): { station: PlayerStationEntry; sectorMacro: string } | null {
   if (!archive || !archive.sectors) return null
-  for (const sector of Object.values(archive.sectors)) {
+  for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
     const station = sector.player_stations?.[code]
-    if (station) return station
+    if (station) return { station, sectorMacro }
+  }
+  return null
+}
+
+function findGroupBySectorMacro(
+  groups: BindingSectorGroup[],
+  sectorMacro: string
+): BindingSectorGroup | null {
+  for (const group of groups) {
+    const coverage = group.coverageSectorMacros || []
+    if (coverage.some((entry) => entry.ref === sectorMacro)) {
+      return group
+    }
   }
   return null
 }
@@ -141,14 +154,19 @@ export function buildSaveBindingProductionFlows(
   const derivedStations: StationPlan[] = []
 
   coveredCodes.forEach((code) => {
-    const saveStation = getSaveStationByCode(deps.archive, code)
-    if (!saveStation) return
+    const entry = getSaveStationByCode(deps.archive, code)
+    if (!entry) return
     const plan = stationPlansByCode.get(code)
-    derivedStations.push(toDerivedSaveStation(binding.gameGuid, saveStation, plan))
+    const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, entry.sectorMacro)?.id || null
+    const station = toDerivedSaveStation(binding.gameGuid, entry.station, plan)
+    station.sectorId = groupId
+    derivedStations.push(station)
   })
 
   virtualPlans.forEach((plan) => {
-    derivedStations.push(toProductionStation(binding.gameGuid, plan))
+    const station = toProductionStation(binding.gameGuid, plan)
+    station.sectorId = plan.groupId || null
+    derivedStations.push(station)
   })
 
   if (derivedStations.length === 0) {
@@ -195,6 +213,54 @@ export function buildSaveBindingProductionFlows(
         tradeStation: g.tradeStation
       }))
   }
+}
+
+export interface DerivedBindingStation {
+  station: StationPlan
+  groupId: string | null
+}
+
+export function deriveBindingStations(
+  binding: SaveBindingPlan | null | undefined,
+  archive: SaveArchive | null
+): DerivedBindingStation[] {
+  if (!binding) return []
+
+  const result: DerivedBindingStation[] = []
+  const coveredCodes = getCoveredSaveStationCodes(archive, binding.groups)
+  const stationPlansByCode = new Map<string, BindingStationPlan>()
+
+  binding.stationPlans.forEach((plan) => {
+    if (plan.saveStationCode) {
+      stationPlansByCode.set(plan.saveStationCode, plan)
+    }
+  })
+
+  coveredCodes.forEach((code) => {
+    const entry = getSaveStationByCode(archive, code)
+    if (!entry) return
+    const plan = stationPlansByCode.get(code)
+    const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, entry.sectorMacro)?.id || null
+    const station = toDerivedSaveStation(binding.gameGuid, entry.station, plan)
+    station.sectorId = groupId
+    result.push({
+      station,
+      groupId
+    })
+  })
+
+  binding.stationPlans.forEach((plan) => {
+    if (!plan.saveStationCode) {
+      const station = toProductionStation(binding.gameGuid, plan)
+      station.sectorId = plan.groupId || null
+      result.push({
+        station,
+        groupId: plan.groupId || null
+      })
+    }
+  })
+
+  return result
 }
 
 export function buildSaveBindingProductionFlowsLegacy(

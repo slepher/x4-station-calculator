@@ -158,52 +158,54 @@ async function onArchiveNavigate(payload: { guid: string; time: number | null })
 }
 
 async function onArchiveBind(payload: { guid: string; time: number | null }) {
-  if (empireStore.isDirty) {
-    smartSaveDialog.isOpen = true
-    smartSaveDialog.pendingBindPayload = payload
-    return
+    const result = empireStore.switchToBinding(payload.guid)
+    if (result.needsConfirm) {
+      smartSaveDialog.isOpen = true
+      smartSaveDialog.pendingBindPayload = payload
+      return
+    }
+
+    await proceedToBinding(payload)
   }
 
-  await proceedToBinding(payload)
-}
+  async function proceedToBinding(payload: { guid: string; time: number | null }) {
+    saveBindingStore.createOrOpenBinding(payload.guid, payload.time)
 
-async function proceedToBinding(payload: { guid: string; time: number | null }) {
-  saveBindingStore.createOrOpenBinding(payload.guid, payload.time)
-
-  const effectiveTime = payload.time ?? getLatestTime(payload.guid)
-  if (payload.time === null) {
-    await saveStore.selectArchiveGroup(payload.guid)
-    if (effectiveTime !== null) {
+    const effectiveTime = payload.time ?? getLatestTime(payload.guid)
+    if (payload.time === null) {
+      await saveStore.selectArchiveGroup(payload.guid)
+      if (effectiveTime !== null) {
+        emit('select-archive', { guid: payload.guid, time: effectiveTime })
+      }
+    } else if (effectiveTime !== null) {
+      await saveStore.selectArchive(payload.guid, effectiveTime)
       emit('select-archive', { guid: payload.guid, time: effectiveTime })
     }
-  } else if (effectiveTime !== null) {
-    await saveStore.selectArchive(payload.guid, effectiveTime)
-    emit('select-archive', { guid: payload.guid, time: effectiveTime })
+
+    selectedBindingGameGuid.value = payload.guid
+    selectedSectorGroupId.value = null
+    layer.value = 'binding-sector'
   }
 
-  selectedBindingGameGuid.value = payload.guid
-  selectedSectorGroupId.value = null
-  layer.value = 'binding-sector'
-}
-
-function handleSmartSaveDialogClose() {
-  smartSaveDialog.isOpen = false
-  smartSaveDialog.pendingBindPayload = null
-}
-
-function handleSmartSaveDialogSubmitImport(payload: { choice: 'SAVE_AND_IMPORT' | 'DISCARD_AND_IMPORT' }) {
-  if (payload.choice === 'SAVE_AND_IMPORT') {
-    empireStore.saveEmpire()
+  function handleSmartSaveDialogClose() {
+    smartSaveDialog.isOpen = false
+    smartSaveDialog.pendingBindPayload = null
   }
 
-  const pending = smartSaveDialog.pendingBindPayload
-  smartSaveDialog.isOpen = false
-  smartSaveDialog.pendingBindPayload = null
+  function handleSmartSaveDialogSubmitImport(payload: { choice: 'SAVE_AND_IMPORT' | 'DISCARD_AND_IMPORT' }) {
+    if (payload.choice === 'SAVE_AND_IMPORT') {
+      empireStore.saveEmpire()
+    }
 
-  if (pending) {
-    proceedToBinding(pending)
+    const pending = smartSaveDialog.pendingBindPayload
+    smartSaveDialog.isOpen = false
+    smartSaveDialog.pendingBindPayload = null
+
+    if (pending) {
+      empireStore.confirmSwitchToBinding(pending.guid)
+      proceedToBinding(pending)
+    }
   }
-}
 
 function onCategorySelect(category: SavePoiCategory) {
   selectedCategory.value = category
