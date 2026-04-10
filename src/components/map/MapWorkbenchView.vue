@@ -168,6 +168,7 @@ const resourcePrimaryColor = ref<string | null>(null)
 const resourceSectorFills = ref<Record<string, SectorResourceFill>>({})
 const resourceSectorGroupBadges = ref<Record<string, string[]>>({})
 const draggingPlacementItem = ref<DraggingPlacementItem | null>(null)
+const draggingOriginalSectorMacro = ref<string | null>(null)
 const draggingOverlayKey = ref<string | null>(null)
 const draggingBindingKey = ref<string | null>(null)
 const draggingSectorGroupId = ref<string | null>(null)
@@ -229,7 +230,6 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
 const displayScaleText = computed(() => `${Math.round(scale.value * 100)}%`)
 const normalizedSearchQuery = computed(() => searchQuery.value.trim().toLowerCase())
 const isFreeStationDropForbidden = computed(() => {
-  if (draggingPlacementItem.value && draggingBindingKey.value) return false
   if (!draggingFreeStation.value && !draggingVirtualTradestation.value && !draggingFreeSector.value) return false
   if (!placementPreview.value) return true
   if (draggingFreeSector.value) return false
