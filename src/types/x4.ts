@@ -456,7 +456,6 @@ export interface EmpirePlan {
   sectors?: SectorPlan[];
   sectorLinks?: string[];
   stations: StationPlan[];
-  saveBindings?: SaveBindingPlan[];
 }
 
 export interface SavedEmpiresState {
@@ -1107,11 +1106,50 @@ export interface StationSaveBinding {
   position?: { x: number; y: number; z: number }
 }
 
+export interface TradeStationBinding {
+  id: string
+  saveStationCode?: string
+  name: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+export interface BindingSectorGroup {
+  id: string
+  name: string
+  order: number
+  sectorMacro?: string
+  jumpRange: number
+  coverageSectorMacros: CoverageSectorEntry[]
+  connectedGroupIds?: string[]
+  tradeStation?: TradeStationBinding
+}
+
+export interface BindingStationPlan {
+  id: string
+  saveStationCode?: string
+  groupId?: string | null
+  name: string
+  type: StationType
+  modules: SavedModule[]
+  settings: StationSettings
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
 export interface SaveBindingPlan {
   gameGuid: string
-  active: boolean
   selectedArchiveTime: number | null
-  groupBindings: GroupSaveBinding[]
+  blueprintEmpireId?: string
+  groups: BindingSectorGroup[]
+  stationPlans: BindingStationPlan[]
+  updatedAt: number
+}
+
+export interface SavedSaveBindingsState {
+  version: number
+  activeGameGuid: string | null
+  list: SaveBindingPlan[]
 }
 
 export interface ResolvedGroupSaveBinding extends GroupSaveBinding {

@@ -47,11 +47,11 @@ function onItemClick(key: string, clickable: boolean) {
 
 <style scoped>
 .save-breadcrumb {
-  @apply flex items-center gap-1 text-xs text-amber-200/80 mb-3;
+  @apply flex min-w-0 items-center gap-1 text-xs text-amber-200/80;
 }
 
 .breadcrumb-item {
-  @apply transition-colors duration-150;
+  @apply min-w-0 truncate transition-colors duration-150;
 }
 
 .breadcrumb-item.clickable {
@@ -63,6 +63,6 @@ function onItemClick(key: string, clickable: boolean) {
 }
 
 .breadcrumb-separator {
-  @apply text-amber-100/50;
+  @apply shrink-0 text-amber-100/50;
 }
 </style>

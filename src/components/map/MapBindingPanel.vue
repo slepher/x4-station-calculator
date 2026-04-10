@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveStore } from '@/store/useSaveStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapBindingSelectArchive from './MapBindingSelectArchive.vue'
 import MapBindingSectorGroup from './MapBindingSectorGroup.vue'
@@ -24,8 +24,8 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const empireStore = useEmpireStore()
 const saveStore = useSaveStore()
+const saveBindingStore = useSaveBindingStore()
 
 const stage = ref<PanelStage>('select-binding')
 const selectedGameGuid = ref<string | null>(null)
@@ -42,7 +42,7 @@ interface BreadcrumbItem {
 
 const empireSectorName = computed(() => {
   if (!selectedSectorGroupId.value) return null
-  const sector = empireStore.activeEmpire?.sectors?.find(s => s.id === selectedSectorGroupId.value)
+  const sector = saveBindingStore.activeBinding?.groups.find(s => s.id === selectedSectorGroupId.value)
   return sector?.name || null
 })
 
@@ -82,7 +82,7 @@ function getLatestTime(gameGuid: string): number | null {
 }
 
 async function restoreArchiveAfterPreviewExit() {
-  const binding = empireStore.getActiveBinding?.() || null
+  const binding = saveBindingStore.activeBinding || null
   if (binding?.gameGuid) {
     const time = binding.selectedArchiveTime ?? getLatestTime(binding.gameGuid)
     if (time !== null) {
@@ -104,19 +104,11 @@ async function onPreviewArchive(payload: { gameGuid: string; time: number }) {
 }
 
 async function onBindArchive(payload: { gameGuid: string; time: number | null }) {
-  const existingBinding = empireStore.activeEmpire?.saveBindings?.find(
-    (p) => p.gameGuid === payload.gameGuid
-  )
-
-  if (!existingBinding) {
-    empireStore.createBinding(payload.gameGuid)
-  }
+  saveBindingStore.createOrOpenBinding(payload.gameGuid, payload.time)
 
   if (payload.time !== null) {
-    empireStore.setSelectedArchiveTime(payload.gameGuid, payload.time)
     await saveStore.selectArchive(payload.gameGuid, payload.time)
   } else {
-    empireStore.setSelectedArchiveTime(payload.gameGuid, null)
     const latestTime = getLatestTime(payload.gameGuid)
     if (latestTime !== null) {
       await saveStore.selectArchive(payload.gameGuid, latestTime)
@@ -221,7 +213,27 @@ watch([stage, selectedGameGuid, selectedSectorGroupId, () => props.open], () => 
     </div>
 
     <div class="map-binding-panel__footer">
-      <div class="map-binding-panel__hint">{{ t('map.binding_footer_hint') }}</div>
+      <div class="map-binding-panel__hint">
+        {{ saveBindingStore.isDirty ? t('map.binding_unsaved') : t('map.binding_saved') }}
+      </div>
+      <div class="map-binding-panel__footer-actions">
+        <button
+          type="button"
+          class="map-binding-panel__footer-btn"
+          :disabled="!saveBindingStore.activeBinding || !saveBindingStore.isDirty"
+          @click="saveBindingStore.saveBinding()"
+        >
+          {{ t('map.binding_save') }}
+        </button>
+        <button
+          type="button"
+          class="map-binding-panel__footer-btn subtle"
+          :disabled="!saveBindingStore.activeBinding || !saveBindingStore.isDirty"
+          @click="saveBindingStore.discardChanges()"
+        >
+          {{ t('map.binding_discard') }}
+        </button>
+      </div>
     </div>
   </aside>
 </template>
@@ -267,5 +279,17 @@ watch([stage, selectedGameGuid, selectedSectorGroupId, () => props.open], () => 
   @apply px-3 pt-2 text-xs text-amber-100/60;
   border-top: 1px solid rgba(251, 191, 36, 0.15);
   margin-top: auto;
+}
+
+.map-binding-panel__footer-actions {
+  @apply mt-2 flex items-center gap-2;
+}
+
+.map-binding-panel__footer-btn {
+  @apply rounded border border-amber-300/30 bg-amber-500/15 px-2 py-1 text-xs font-bold text-amber-100 transition-colors duration-150 hover:border-amber-200/60 hover:bg-amber-500/25 disabled:cursor-not-allowed disabled:opacity-45;
+}
+
+.map-binding-panel__footer-btn.subtle {
+  @apply bg-transparent;
 }
 </style>

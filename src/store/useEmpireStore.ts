@@ -1,4 +1,4 @@
-import { defineStore } from 'pinia'
+import { defineStore, storeToRefs } from 'pinia'
 import { ref, computed } from 'vue'
 import type {
   EntityLocation,
@@ -18,14 +18,13 @@ import type {
   TransitHubViewModel
 } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
+import { useEmpireDataStore } from './useEmpireDataStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './logic/sectorLinkFlow'
 import { buildTransitHubViewModel } from './logic/transitHubViewModel'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './logic/stationGapViewModel'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
-import { createSaveBindingActions } from './logic/saveBindingActions'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
-import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
 import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, parseSectorLinkKey } from './logic/sectorLinks'
 
 const V1_STORAGE_KEY = 'x4_station_data'
@@ -91,16 +90,12 @@ interface SectorLinkCalcEntry {
 
 export const useEmpireStore = defineStore('empire', () => {
   const gameData = useGameDataStore()
-
-  function getStorageKey(): string {
-    return gameData.getStorageKey('empire')
-  }
+  const empireDataStore = useEmpireDataStore()
+  const { savedEmpires } = storeToRefs(empireDataStore)
 
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
-  const bindingDirtyMarker = ref(0)
 
-  const savedEmpires = ref<SavedEmpiresState>({ version: CURRENT_EMPIRE_VERSION, activeId: null, activeStationId: null, list: [] })
   const version = computed(() => savedEmpires.value.version)
   const empires = computed(() => savedEmpires.value.list)
   const activeEmpireId = computed(() => savedEmpires.value.activeId)
@@ -462,8 +457,7 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function saveToStorage() {
-    const data = JSON.stringify(savedEmpires.value)
-    localStorage.setItem(getStorageKey(), data)
+    empireDataStore.saveToStorage()
   }
 
   function saveEmpire() {
@@ -730,27 +724,11 @@ export const useEmpireStore = defineStore('empire', () => {
     return true
   }
 
-  function deleteSector(sectorId: string, gameGuid?: string) {
+  function deleteSector(sectorId: string) {
     if (!activeEmpire.value) return false
     const sectorList = activeEmpire.value.sectors || []
     const idx = sectorList.findIndex((item) => item.id === sectorId)
     if (idx === -1) return false
-
-    if (Array.isArray(activeEmpire.value.saveBindings)) {
-      activeEmpire.value.saveBindings.forEach((plan) => {
-        if (gameGuid && plan.gameGuid !== gameGuid) return
-        const removedBinding = plan.groupBindings.find((binding) => binding.sectorGroupId === sectorId)
-        plan.groupBindings = plan.groupBindings
-          .filter((binding) => binding.sectorGroupId !== sectorId)
-          .map((binding) => ({
-            ...binding,
-            connectedSectorGroupIds: (binding.connectedSectorGroupIds || []).filter((id) => id !== sectorId)
-          }))
-        if (removedBinding) {
-          bindingDirtyMarker.value++
-        }
-      })
-    }
 
     sectorList.splice(idx, 1)
     sectorList.forEach((sector, order) => {
@@ -963,7 +941,6 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   const isDirty = computed(() => {
-    void bindingDirtyMarker.value
     if (isEmptyForSave()) return false
     const current = serializeEmpireForDirtyCheck()
     return current !== lastSavedSnapshot.value
@@ -988,15 +965,6 @@ export const useEmpireStore = defineStore('empire', () => {
     return createEmpire(defaultName)
   }
 
-  // ========== SavePlans Binding Actions ==========
-  function onBindingDirty() {
-    bindingDirtyMarker.value++
-  }
-
-  const bindingActions = createSaveBindingActions(activeEmpire, onBindingDirty, updateStationSector)
-
-  // ========== End SavePlans Binding Actions ==========
-
   async function initialize() {
     console.log('[EmpireStore] Initializing...')
     isReady.value = false
@@ -1004,21 +972,14 @@ export const useEmpireStore = defineStore('empire', () => {
     try {
       await gameData.initialize()
       
-      const stored = localStorage.getItem(getStorageKey())
-      if (stored) {
-        try {
-          const data = JSON.parse(stored) as SavedEmpiresState | V1StorageState
-          if (data && Array.isArray((data as SavedEmpiresState).list)) {
-            loadData(data)
-            saveToStorage()
-            initializeAllStationCaches()
-            isReady.value = true
-            console.log('[EmpireStore] Loaded saved empires')
-            return
-          }
-        } catch (e) {
-          console.error('[EmpireStore] Failed to parse data:', e)
-        }
+      const stored = empireDataStore.loadFromStorage()
+      if (stored && Array.isArray(stored.list)) {
+        loadData(stored)
+        saveToStorage()
+        initializeAllStationCaches()
+        isReady.value = true
+        console.log('[EmpireStore] Loaded saved empires')
+        return
       }
       
       const v1Stored = localStorage.getItem(V1_STORAGE_KEY)
@@ -1117,30 +1078,6 @@ export const useEmpireStore = defineStore('empire', () => {
     shouldConfirmBeforeEmpireReset,
     resetEmpireWithDefaultName,
     takeSnapshot,
-    initialize,
-    // SaveBindings
-    getActiveBinding: bindingActions.getActiveBinding,
-    getBindingByGameGuid: bindingActions.getBindingByGameGuid,
-    createBinding: bindingActions.createBinding,
-    setActiveBinding: bindingActions.setActiveBinding,
-    setSelectedArchiveTime: bindingActions.setSelectedArchiveTime,
-    bindSectorGroup: bindingActions.bindSectorGroup,
-    updateSectorGroupJumpRange: bindingActions.updateSectorGroupJumpRange,
-    setGroupConnection: bindingActions.setGroupConnection,
-    clearSectorGroupBinding: bindingActions.clearSectorGroupBinding,
-    getGroupBinding: bindingActions.getGroupBinding,
-    setTradestationBinding: bindingActions.setTradestationBinding,
-    clearTradestationBinding: bindingActions.clearTradestationBinding,
-    bindTradestationToSaveStation: bindingActions.bindTradestationToSaveStation,
-    clearTradestationCode: bindingActions.clearTradestationCode,
-    clearStationCode: bindingActions.clearStationCode,
-    bindStationToSaveStation: bindingActions.bindStationToSaveStation,
-    clearStationBinding: bindingActions.clearStationBinding,
-    setStationBindingPosition: bindingActions.setStationBindingPosition,
-    isSaveStationAlreadyBound: bindingActions.isSaveStationAlreadyBound,
-    importSaveStationAsBinding: bindingActions.importSaveStationAsBinding,
-    deleteBinding: bindingActions.deleteBinding,
-    setFreeSectorBinding: bindingActions.setFreeSectorBinding,
-    setFreeStationBinding: bindingActions.setFreeStationBinding
+    initialize
   }
 })

@@ -1,0 +1,530 @@
+import { defineStore } from 'pinia'
+import { computed, ref } from 'vue'
+import { useGameDataStore } from './useGameDataStore'
+import { DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import type {
+  BindingSectorGroup,
+  BindingStationPlan,
+  CoverageSectorEntry,
+  SavedModule,
+  SavedSaveBindingsState,
+  SaveBindingPlan,
+  StationPlan,
+  StationSettings,
+  StationType,
+  TradeStationBinding
+} from '@/types/x4'
+
+const CURRENT_SAVE_BINDING_VERSION = 1
+
+function deepClone<T>(value: T): T {
+  return JSON.parse(JSON.stringify(value))
+}
+
+function createDefaultBinding(gameGuid: string): SaveBindingPlan {
+  return {
+    gameGuid,
+    selectedArchiveTime: null,
+    groups: [],
+    stationPlans: [],
+    updatedAt: Date.now()
+  }
+}
+
+function createDefaultGroup(name: string, order: number): BindingSectorGroup {
+  return {
+    id: crypto.randomUUID(),
+    name: name || `Sector ${order + 1}`,
+    order,
+    jumpRange: 3,
+    coverageSectorMacros: [],
+    connectedGroupIds: []
+  }
+}
+
+function normalizeTradeStation(input: unknown): TradeStationBinding | undefined {
+  const value = input as Partial<TradeStationBinding> | null | undefined
+  if (!value) return undefined
+  return {
+    id: value.id || crypto.randomUUID(),
+    saveStationCode: value.saveStationCode,
+    name: value.name || 'Trade Station',
+    sectorMacro: value.sectorMacro,
+    position: value.position
+  }
+}
+
+function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefined): SavedSaveBindingsState {
+  const list = Array.isArray(input?.list)
+    ? input.list
+        .filter((item): item is SaveBindingPlan => !!item && typeof item.gameGuid === 'string' && item.gameGuid.length > 0)
+        .map((item) => {
+          const groups = Array.isArray(item.groups) ? item.groups.map((group, index) => ({
+            id: group.id || crypto.randomUUID(),
+            name: group.name || `Sector ${index + 1}`,
+            order: Number.isFinite(Number(group.order)) ? Number(group.order) : index,
+            sectorMacro: group.sectorMacro,
+            jumpRange: Number.isFinite(Number(group.jumpRange)) ? Number(group.jumpRange) : 3,
+            coverageSectorMacros: Array.isArray(group.coverageSectorMacros) ? group.coverageSectorMacros : [],
+            connectedGroupIds: Array.isArray(group.connectedGroupIds) ? group.connectedGroupIds : [],
+            tradeStation: normalizeTradeStation(group.tradeStation)
+          })) : []
+
+          const rawStationPlans = Array.isArray((item as any).stationPlans) ? (item as any).stationPlans as unknown[] : []
+          const normalizedStationPlans: BindingStationPlan[] = rawStationPlans
+            .filter((plan): plan is Record<string, unknown> => typeof plan === 'object' && plan !== null)
+            .map((plan) => ({
+              id: (plan.id as string) || crypto.randomUUID(),
+              saveStationCode: plan.saveStationCode as string | undefined,
+              groupId: plan.groupId as string | null | undefined,
+              name: (plan.name as string) || (plan.saveStationCode ? String(plan.saveStationCode) : 'Virtual Station'),
+              type: (plan.type as StationType) || 'industrial',
+              modules: Array.isArray(plan.modules) ? plan.modules : [],
+              settings: deepClone<StationSettings>((plan.settings as StationSettings) || DEFAULT_STATION_SETTINGS),
+              sectorMacro: plan.sectorMacro as string | undefined,
+              position: plan.position as { x: number; y: number; z: number } | undefined
+            }))
+
+          return {
+            gameGuid: item.gameGuid,
+            selectedArchiveTime: item.selectedArchiveTime ?? null,
+            blueprintEmpireId: item.blueprintEmpireId,
+            groups,
+            stationPlans: normalizedStationPlans,
+            updatedAt: Number.isFinite(Number(item.updatedAt)) ? Number(item.updatedAt) : Date.now()
+          }
+        })
+    : []
+
+  const unique = new Map<string, SaveBindingPlan>()
+  list.forEach((item) => unique.set(item.gameGuid, item))
+  const activeGameGuid = input?.activeGameGuid && unique.has(input.activeGameGuid) ? input.activeGameGuid : null
+
+  return {
+    version: CURRENT_SAVE_BINDING_VERSION,
+    activeGameGuid,
+    list: Array.from(unique.values())
+  }
+}
+
+export const useSaveBindingStore = defineStore('saveBinding', () => {
+  const gameData = useGameDataStore()
+  const savedBindings = ref<SavedSaveBindingsState>({
+    version: CURRENT_SAVE_BINDING_VERSION,
+    activeGameGuid: null,
+    list: []
+  })
+  const draftBinding = ref<SaveBindingPlan | null>(null)
+  const lastSavedDraftSnapshot = ref('')
+  const isInitialized = ref(false)
+
+  function getStorageKey(): string {
+    const saveKey = gameData.getStorageKey('save_archives')
+    if (saveKey.includes('save_archives')) return saveKey.replace('save_archives', 'save_bindings')
+    return 'x4_save_bindings'
+  }
+
+  function serializeBinding(binding: SaveBindingPlan | null): string {
+    return binding ? JSON.stringify(binding) : ''
+  }
+
+  function writeState() {
+    localStorage.setItem(getStorageKey(), JSON.stringify(savedBindings.value))
+  }
+
+  function persistViewState() {
+    writeState()
+  }
+
+  function loadDraft(gameGuid: string) {
+    const existing = savedBindings.value.list.find((item) => item.gameGuid === gameGuid) || createDefaultBinding(gameGuid)
+    draftBinding.value = deepClone(existing)
+    lastSavedDraftSnapshot.value = serializeBinding(draftBinding.value)
+  }
+
+  function initialize() {
+    try {
+      const raw = localStorage.getItem(getStorageKey())
+      savedBindings.value = raw ? normalizeState(JSON.parse(raw)) : normalizeState(null)
+    } catch (error) {
+      console.warn('[SaveBindingStore] failed to load bindings:', error)
+      savedBindings.value = normalizeState(null)
+    }
+    if (savedBindings.value.activeGameGuid) {
+      loadDraft(savedBindings.value.activeGameGuid)
+    }
+    isInitialized.value = true
+  }
+
+  const bindings = computed(() => savedBindings.value.list)
+  const activeGameGuid = computed(() => savedBindings.value.activeGameGuid)
+  const activeBinding = computed(() => draftBinding.value)
+  const isDirty = computed(() => serializeBinding(draftBinding.value) !== lastSavedDraftSnapshot.value)
+  const activeStationId = ref<string | null>(null)
+
+  function getBindingByGameGuid(gameGuid: string): SaveBindingPlan | null {
+    return savedBindings.value.list.find((item) => item.gameGuid === gameGuid) || null
+  }
+
+  function createOrOpenBinding(gameGuid: string, archiveTime: number | null = null): SaveBindingPlan {
+    let binding = getBindingByGameGuid(gameGuid)
+    if (!binding) {
+      binding = createDefaultBinding(gameGuid)
+      savedBindings.value.list.push(binding)
+    }
+    savedBindings.value.activeGameGuid = gameGuid
+    loadDraft(gameGuid)
+    if (draftBinding.value) {
+      draftBinding.value.selectedArchiveTime = archiveTime
+      lastSavedDraftSnapshot.value = serializeBinding(draftBinding.value)
+      binding.selectedArchiveTime = archiveTime
+      binding.updatedAt = Date.now()
+    }
+    persistViewState()
+    return draftBinding.value || binding
+  }
+
+  function setActiveBinding(gameGuid: string | null) {
+    savedBindings.value.activeGameGuid = gameGuid
+    if (gameGuid) loadDraft(gameGuid)
+    else {
+      draftBinding.value = null
+      lastSavedDraftSnapshot.value = ''
+    }
+    persistViewState()
+  }
+
+  function setSelectedArchiveTime(gameGuid: string, archiveTime: number | null) {
+    const binding = getBindingByGameGuid(gameGuid) || createDefaultBinding(gameGuid)
+    if (!getBindingByGameGuid(gameGuid)) savedBindings.value.list.push(binding)
+    binding.selectedArchiveTime = archiveTime
+    binding.updatedAt = Date.now()
+    savedBindings.value.activeGameGuid = gameGuid
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraft(gameGuid)
+    if (draftBinding.value) {
+      draftBinding.value.selectedArchiveTime = archiveTime
+      lastSavedDraftSnapshot.value = serializeBinding(draftBinding.value)
+    }
+    persistViewState()
+  }
+
+  function setBlueprintEmpire(gameGuid: string, empireId: string | undefined) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return
+    draftBinding.value.blueprintEmpireId = empireId
+    draftBinding.value.updatedAt = Date.now()
+  }
+
+  function saveBinding() {
+    if (!draftBinding.value) return
+    draftBinding.value.updatedAt = Date.now()
+    const next = deepClone(draftBinding.value)
+    const idx = savedBindings.value.list.findIndex((item) => item.gameGuid === next.gameGuid)
+    if (idx >= 0) savedBindings.value.list[idx] = next
+    else savedBindings.value.list.push(next)
+    savedBindings.value.activeGameGuid = next.gameGuid
+    writeState()
+    lastSavedDraftSnapshot.value = serializeBinding(draftBinding.value)
+  }
+
+  function discardChanges() {
+    const guid = draftBinding.value?.gameGuid || savedBindings.value.activeGameGuid
+    if (!guid) return
+    loadDraft(guid)
+  }
+
+  function createGroup(gameGuid: string, name = ''): BindingSectorGroup | null {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return null
+    const group = createDefaultGroup(name, draftBinding.value.groups.length)
+    draftBinding.value.groups.push(group)
+    draftBinding.value.updatedAt = Date.now()
+    return group
+  }
+
+  function updateGroup(gameGuid: string, groupId: string, patch: Partial<BindingSectorGroup>) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    const group = draftBinding.value?.groups.find((item) => item.id === groupId)
+    if (!group) return false
+    Object.assign(group, patch)
+    draftBinding.value!.updatedAt = Date.now()
+    return true
+  }
+
+  function deleteGroup(gameGuid: string, groupId: string) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return false
+    const before = draftBinding.value.groups.length
+    draftBinding.value.groups = draftBinding.value.groups.filter((item) => item.id !== groupId)
+    draftBinding.value.groups.forEach((group, order) => { group.order = order })
+    draftBinding.value.groups.forEach((group) => {
+      group.connectedGroupIds = (group.connectedGroupIds || []).filter((id) => id !== groupId)
+    })
+    draftBinding.value.stationPlans.forEach((plan) => {
+      if (plan.groupId === groupId) plan.groupId = null
+    })
+    draftBinding.value.updatedAt = Date.now()
+    return draftBinding.value.groups.length !== before
+  }
+
+  function bindSectorGroup(input: {
+    gameGuid: string
+    sectorGroupId: string
+    sectorMacro?: string
+    jumpRange: number
+    coverageSectorMacros: CoverageSectorEntry[]
+  }) {
+    updateGroup(input.gameGuid, input.sectorGroupId, {
+      sectorMacro: input.sectorMacro,
+      jumpRange: input.jumpRange,
+      coverageSectorMacros: deepClone(input.coverageSectorMacros)
+    })
+  }
+
+  function setGroupConnection(gameGuid: string, sourceGroupId: string, targetGroupId: string, connected: boolean) {
+    if (sourceGroupId === targetGroupId) return
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    const source = draftBinding.value?.groups.find((item) => item.id === sourceGroupId)
+    const target = draftBinding.value?.groups.find((item) => item.id === targetGroupId)
+    if (!source || !target) return
+    const sourceSet = new Set(source.connectedGroupIds || [])
+    const targetSet = new Set(target.connectedGroupIds || [])
+    if (connected) {
+      sourceSet.add(targetGroupId)
+      targetSet.add(sourceGroupId)
+    } else {
+      sourceSet.delete(targetGroupId)
+      targetSet.delete(sourceGroupId)
+    }
+    source.connectedGroupIds = Array.from(sourceSet)
+    target.connectedGroupIds = Array.from(targetSet)
+    draftBinding.value!.updatedAt = Date.now()
+  }
+
+  function upsertStationPlan(input: {
+    gameGuid: string
+    saveStationCode?: string
+    groupId?: string | null
+    name: string
+    type?: StationType
+    modules?: SavedModule[]
+    settings?: StationSettings
+    sectorMacro?: string
+    position?: { x: number; y: number; z: number }
+  }): BindingStationPlan | null {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value) return null
+
+    let plan = input.saveStationCode
+      ? draftBinding.value.stationPlans.find((item) => item.saveStationCode === input.saveStationCode)
+      : null
+
+    if (!plan) {
+      plan = {
+        id: crypto.randomUUID(),
+        saveStationCode: input.saveStationCode,
+        groupId: input.groupId ?? null,
+        name: input.name,
+        type: input.type || 'industrial',
+        modules: [],
+        settings: deepClone(DEFAULT_STATION_SETTINGS),
+        sectorMacro: input.sectorMacro,
+        position: input.position
+      }
+      draftBinding.value.stationPlans.push(plan)
+    }
+
+    plan.groupId = input.groupId ?? plan.groupId ?? null
+    plan.name = input.name ?? plan.name
+    if (input.type !== undefined) plan.type = input.type
+    if (input.modules) plan.modules = deepClone(input.modules)
+    if (input.settings) plan.settings = deepClone(input.settings)
+    if (input.sectorMacro !== undefined) plan.sectorMacro = input.sectorMacro
+    if (input.position !== undefined) plan.position = input.position
+    draftBinding.value.updatedAt = Date.now()
+    return plan
+  }
+
+  function clearStationPlan(gameGuid: string, identifier: string) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return false
+    const before = draftBinding.value.stationPlans.length
+    draftBinding.value.stationPlans = draftBinding.value.stationPlans.filter(
+      (item) => !(item.saveStationCode === identifier || item.id === identifier)
+    )
+    draftBinding.value.updatedAt = Date.now()
+    return draftBinding.value.stationPlans.length !== before
+  }
+
+  function deleteStationPlan(gameGuid: string, stationPlanId: string) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return false
+    const before = draftBinding.value.stationPlans.length
+    draftBinding.value.stationPlans = draftBinding.value.stationPlans.filter((item) => item.id !== stationPlanId)
+    draftBinding.value.updatedAt = Date.now()
+    return draftBinding.value.stationPlans.length !== before
+  }
+
+  function setStationPlanPosition(input: {
+    gameGuid: string
+    stationPlanId: string
+    groupId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value) return false
+    const plan = draftBinding.value.stationPlans.find((item) => item.id === input.stationPlanId)
+    if (!plan) return false
+    plan.groupId = input.groupId
+    plan.sectorMacro = input.sectorMacro
+    plan.position = input.position
+    draftBinding.value.updatedAt = Date.now()
+    return true
+  }
+
+  function upsertTradeStation(input: {
+    gameGuid: string
+    groupId: string
+    saveStationCode?: string
+    name: string
+    sectorMacro?: string
+    position?: { x: number; y: number; z: number }
+  }): TradeStationBinding | null {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value) return null
+    const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
+    if (!group) return null
+
+    let ts = group.tradeStation
+    if (!ts) {
+      ts = {
+        id: crypto.randomUUID(),
+        saveStationCode: input.saveStationCode,
+        name: input.name,
+        sectorMacro: input.sectorMacro,
+        position: input.position
+      }
+      group.tradeStation = ts
+    } else {
+      ts.saveStationCode = input.saveStationCode ?? ts.saveStationCode
+      ts.name = input.name ?? ts.name
+      if (input.sectorMacro !== undefined) ts.sectorMacro = input.sectorMacro
+      if (input.position !== undefined) ts.position = input.position
+    }
+    draftBinding.value.updatedAt = Date.now()
+    return ts
+  }
+
+  function deleteTradeStation(gameGuid: string, groupId: string) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return false
+    const group = draftBinding.value.groups.find((item) => item.id === groupId)
+    if (!group?.tradeStation) return false
+    group.tradeStation = undefined
+    draftBinding.value.updatedAt = Date.now()
+    return true
+  }
+
+  function setTradeStationPosition(input: {
+    gameGuid: string
+    groupId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value) return false
+    const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
+    if (!group?.tradeStation) return false
+    group.tradeStation.sectorMacro = input.sectorMacro
+    group.tradeStation.position = input.position
+    draftBinding.value.updatedAt = Date.now()
+    return true
+  }
+
+  function importEmpireStationToSaveStation(gameGuid: string, saveStationCode: string, station: StationPlan, groupId?: string | null) {
+    return upsertStationPlan({
+      gameGuid,
+      saveStationCode,
+      groupId,
+      name: station.name,
+      type: station.type,
+      modules: station.modules,
+      settings: station.settings
+    })
+  }
+
+  function loadData(data: SavedSaveBindingsState) {
+    savedBindings.value = normalizeState(data)
+    writeState()
+    if (savedBindings.value.activeGameGuid) loadDraft(savedBindings.value.activeGameGuid)
+  }
+
+  function selectStation(stationId: string | null) {
+    activeStationId.value = stationId
+  }
+
+  function updateStationPlan(gameGuid: string, stationPlanId: string, patch: Partial<BindingStationPlan>) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return false
+    const plan = draftBinding.value.stationPlans.find((item) => item.id === stationPlanId)
+    if (!plan) return false
+    if (patch.name !== undefined) plan.name = patch.name
+    if (patch.type !== undefined) plan.type = patch.type
+    if (patch.modules !== undefined) plan.modules = deepClone(patch.modules)
+    if (patch.settings !== undefined) plan.settings = deepClone(patch.settings)
+    if (patch.groupId !== undefined) plan.groupId = patch.groupId
+    if (patch.sectorMacro !== undefined) plan.sectorMacro = patch.sectorMacro
+    if (patch.position !== undefined) plan.position = patch.position
+    draftBinding.value.updatedAt = Date.now()
+    return true
+  }
+
+  function createStationPlanInGroup(gameGuid: string, groupId: string | null, name: string, type: StationType = 'industrial'): BindingStationPlan | null {
+    return upsertStationPlan({
+      gameGuid,
+      groupId,
+      name,
+      type,
+      modules: [],
+      settings: deepClone(DEFAULT_STATION_SETTINGS)
+    })
+  }
+
+  return {
+    savedBindings,
+    bindings,
+    activeGameGuid,
+    activeBinding,
+    draftBinding,
+    isDirty,
+    isInitialized,
+    activeStationId,
+    initialize,
+    getBindingByGameGuid,
+    createOrOpenBinding,
+    setActiveBinding,
+    setSelectedArchiveTime,
+    setBlueprintEmpire,
+    saveBinding,
+    discardChanges,
+    createGroup,
+    updateGroup,
+    deleteGroup,
+    bindSectorGroup,
+    setGroupConnection,
+    upsertStationPlan,
+    clearStationPlan,
+    deleteStationPlan,
+    setStationPlanPosition,
+    upsertTradeStation,
+    deleteTradeStation,
+    setTradeStationPosition,
+    importEmpireStationToSaveStation,
+    selectStation,
+    updateStationPlan,
+    createStationPlanInGroup,
+    loadData,
+    writeState
+  }
+})

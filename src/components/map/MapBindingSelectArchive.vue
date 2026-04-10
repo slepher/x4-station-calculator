@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 
 const props = defineProps<{
   previewGameGuid: string | null
@@ -16,9 +16,9 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const saveStore = useSaveStore()
-const empireStore = useEmpireStore()
+const saveBindingStore = useSaveBindingStore()
 
-const bindingPlans = computed(() => empireStore.activeEmpire?.saveBindings || [])
+const bindingPlans = computed(() => saveBindingStore.bindings)
 
 const sortedArchiveGroups = computed(() => {
   return [...saveStore.archiveGroups].sort((a, b) => {
