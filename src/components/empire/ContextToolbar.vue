@@ -2,6 +2,8 @@
 import { computed, reactive, ref } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStationStore } from '@/store/useStationStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
@@ -11,6 +13,8 @@ import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 const { t } = useI18n()
 const empireStore = useEmpireStore()
 const stationStore = useStationStore()
+const saveBindingStore = useSaveBindingStore()
+const activeViewStore = useActiveViewStore()
 
 const importModalState = reactive<{
   isOpen: boolean
@@ -19,6 +23,8 @@ const importModalState = reactive<{
   isOpen: false,
   initialTab: 'game-blueprint'
 })
+
+const isBindingMode = computed(() => activeViewStore.productionSource === 'save-binding')
 
 // --- 状态判断 ---
 const activeStation = computed(() => empireStore.activeStation)
@@ -31,19 +37,28 @@ const activeSupplySector = computed(() => {
 })
 
 // --- 数据绑定 (保持您原有的逻辑) ---
-const sectorTitleConfig = computed(() => ({
-  getName: () => isSupplyOverview.value
-    ? (activeSupplySector.value?.name || '')
-    : (empireStore.activeEmpire?.name || ''),
-  setName: (name: string) => {
-    if (isSupplyOverview.value && activeSupplySector.value) {
-      empireStore.renameSector(activeSupplySector.value.id, name)
-      return
+const sectorTitleConfig = computed(() => {
+  if (isBindingMode.value && isOverview.value) {
+    return {
+      getName: () => saveBindingStore.activeBindingName,
+      setName: (name: string) => { saveBindingStore.activeBindingName = name },
+      getDefaultName: () => t('binding.new_binding_name')
     }
-    empireStore.updateEmpireName(name)
-  },
-  getDefaultName: () => t('sector.new_sector_name')
-}))
+  }
+  return {
+    getName: () => isSupplyOverview.value
+      ? (activeSupplySector.value?.name || '')
+      : (empireStore.activeEmpire?.name || ''),
+    setName: (name: string) => {
+      if (isSupplyOverview.value && activeSupplySector.value) {
+        empireStore.renameSector(activeSupplySector.value.id, name)
+        return
+      }
+      empireStore.updateEmpireName(name)
+    },
+    getDefaultName: () => t('sector.new_sector_name')
+  }
+})
 
 const { displayNameModel: empireName } = useTitleDisplayNameModel(sectorTitleConfig)
 

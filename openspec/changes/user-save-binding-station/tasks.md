@@ -49,14 +49,23 @@
 - [x] T21. 修正 binding 模式星区中转站聚合：`sectorInternalDataMap`、`stationMap`、`sectorLinkCalcMap` 不再固定读取 `activeEmpire`
 - [x] T22. 将 empire station 管理动作下沉到 `useEmpireDataStore`，`useEmpireStore` 仅保留 source-aware facade
 - [x] T23. 将 empire sector 管理动作下沉到 `useEmpireDataStore`，保留删除星区时的 station/link 清理语义
-- [x] T24. 将 empire sector link 管理动作下沉到 `useEmpireDataStore`，binding 模式下 `getLinkedSectors()` 改读 `connectedGroupIds`
+- [x] T24. 将 empire sector link 理动作下沉到 `useEmpireDataStore`，binding 模式下 `getLinkedSectors()` 改读 `connectedGroupIds`
 - [x] T25. 补充回归测试：binding 中转站可聚合本星区 station flow，binding connected groups 参与 link solver
 - [x] T26. 运行相关 unit/e2e/build 验证
 
+## 后续修正 - 载入界面统一与数据源分发
+
+- [x] T28. LoadPlanModal 添加 empire/binding tab 切换，binding 显示 bindingName
+- [x] T29. ContextToolbar binding 模式下名称输入框使用 `activeBindingName` 双向绑定
+- [x] T30. ProductionWorkbenchView 移除 productionSource 切换按钮，数据分发移到 empireStore
+- [x] T31. `empireStore.empireGroupedFlows` 根据 `productionSource` 自动分发数据源
+- [x] T32. `loadEmpire` 调用 `switchToEmpire` 正确切换 productionSource
+- [x] T33. 添加 i18n 文本：bindingName、tab_empire、tab_binding 等
+
 ## 当前状态
 
-**已完成**：D1-D3 文档任务完成；T1-T19 UI、store 适配和测试验证完成
+**已完成**：D1-D3 文档任务完成；T1-T26 UI、store 适配、测试验证和 source-aware 职责分离完成
 
-**已完成**：T20-T26 source-aware 中转聚合与 empire 管理职责下沉完成
+**已完成**：T28-T33 载入界面统一与数据源分发完成
 
 **依赖**：基于 `stand-alone-binding` 已实现的 `productionSource` 路由架构

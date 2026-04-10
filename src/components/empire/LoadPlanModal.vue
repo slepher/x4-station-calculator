@@ -1,8 +1,12 @@
 <script setup lang="ts">
+import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useStationStore, type SavedModule } from '@/store/useStationStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
+import TopViewSwitch from '@/components/common/TopViewSwitch.vue'
 const { translateModule } = useX4I18n()
 
 const props = defineProps<{
@@ -13,11 +17,26 @@ const emit = defineEmits(['close'])
 const { t } = useI18n()
 const stationStore = useStationStore()
 const empireStore = useEmpireStore()
+const saveBindingStore = useSaveBindingStore()
+const activeViewStore = useActiveViewStore()
+
+const activeTab = ref('empire')
+
+const tabItems = computed(() => [
+  { key: 'empire', label: t('planning.tab_empire'), activeClass: 'bg-blue-600 text-white shadow-lg' },
+  { key: 'binding', label: t('planning.tab_binding'), activeClass: 'bg-cyan-600 text-white shadow-lg' }
+])
 
 const formatDate = (ts: number) => new Date(ts).toLocaleString()
 
 const handleLoadEmpire = (empireId: string) => {
   empireStore.loadEmpire(empireId)
+  emit('close')
+}
+
+const handleLoadBinding = (gameGuid: string) => {
+  saveBindingStore.createOrOpenBinding(gameGuid)
+  activeViewStore.switchToBinding(gameGuid)
   emit('close')
 }
 
@@ -35,6 +54,19 @@ const getStationDescription = (modules: SavedModule[]) => {
 const handleDeleteEmpire = (empireId: string) => {
   if (confirm(t('planning.confirm_delete_plan'))) {
     empireStore.deleteEmpire(empireId)
+  }
+}
+
+const handleDeleteBinding = (gameGuid: string) => {
+  if (confirm(t('planning.confirm_delete_binding'))) {
+    const idx = saveBindingStore.savedBindings.list.findIndex(b => b.gameGuid === gameGuid)
+    if (idx >= 0) {
+      saveBindingStore.savedBindings.list.splice(idx, 1)
+      saveBindingStore.writeState()
+      if (saveBindingStore.activeGameGuid === gameGuid) {
+        saveBindingStore.setActiveBinding(null)
+      }
+    }
   }
 }
 
@@ -58,6 +90,9 @@ const getEmpireLastUpdated = (empireId: string) => {
           </svg>
           {{ t('planning.load_plan') }}
         </h3>
+        <div class="flex-1 flex justify-center">
+          <TopViewSwitch v-model="activeTab" :tabs="tabItems" ui-key="load-plan" />
+        </div>
         <button @click="$emit('close')"
           class="text-slate-400 hover:text-white transition p-1 hover:bg-slate-700 rounded">
           <svg class="w-6 h-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -67,62 +102,118 @@ const getEmpireLastUpdated = (empireId: string) => {
       </div>
 
       <div class="flex-1 overflow-y-auto p-6 space-y-4 custom-scrollbar">
-        <div v-if="empireStore.savedEmpires.list.length === 0" class="text-center py-12 text-slate-500 italic">
-          {{ t('planning.no_saved_plans') }}
-        </div>
+        <template v-if="activeTab === 'empire'">
+          <div v-if="empireStore.savedEmpires.list.length === 0" class="text-center py-12 text-slate-500 italic">
+            {{ t('planning.no_saved_plans') }}
+          </div>
 
-        <div v-for="empire in empireStore.savedEmpires.list" :key="empire.id"
-          class="group bg-slate-700/40 border border-slate-600/50 rounded-md p-4 hover:border-cyan-500/50 hover:bg-slate-700/60 transition-all duration-200">
-          <div class="flex justify-between items-start mb-2">
-            <div class="flex items-center gap-2">
-              <span class="text-lg">📊</span>
-              <div>
-                <div class="font-bold text-lg text-cyan-100 mb-1 group-hover:text-cyan-400 transition-colors">{{
-                  empire.name }}</div>
-                <div class="text-xs text-slate-500 font-mono">{{ formatDate(getEmpireLastUpdated(empire.id)) }}</div>
+          <div v-for="empire in empireStore.savedEmpires.list" :key="empire.id"
+            class="group bg-slate-700/40 border border-slate-600/50 rounded-md p-4 hover:border-cyan-500/50 hover:bg-slate-700/60 transition-all duration-200">
+            <div class="flex justify-between items-start mb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">📊</span>
+                <div>
+                  <div class="font-bold text-lg text-cyan-100 mb-1 group-hover:text-cyan-400 transition-colors">{{
+                    empire.name }}</div>
+                  <div class="text-xs text-slate-500 font-mono">{{ formatDate(getEmpireLastUpdated(empire.id)) }}</div>
+                </div>
+              </div>
+              <div class="text-xs text-slate-400 bg-slate-600/50 px-2 py-1 rounded">
+                {{ empire.stations.length }} {{ t('sector.stations_count') }}
               </div>
             </div>
-            <div class="text-xs text-slate-400 bg-slate-600/50 px-2 py-1 rounded">
-              {{ empire.stations.length }} {{ t('sector.stations_count') }}
+
+            <div class="mb-3">
+              <div v-for="station in empire.stations.slice(0, 2)" :key="station.id" 
+                class="text-sm text-slate-300 mb-1 line-clamp-1 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
+                <span class="font-medium">{{ station.name }}:</span>
+                {{ getStationDescription(station.modules) }}
+              </div>
+              <div v-if="empire.stations.length > 2" class="text-xs text-slate-500 italic ml-2">
+                +{{ empire.stations.length - 2 }} more...
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">
+              <button @click="handleLoadEmpire(empire.id)"
+                class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/30 px-3 py-1.5 rounded transition">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 3h6v6" />
+                  <path d="M10 14L21 3" />
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                </svg>
+                {{ t('planning.action_load_plan') }}
+              </button>
+
+              <div class="flex-1"></div>
+
+              <button @click="handleDeleteEmpire(empire.id)"
+                class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded transition">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="10" y1="11" x2="10" y2="17" />
+                  <line x1="14" y1="11" x2="14" y2="17" />
+                </svg>
+                {{ t('planning.action_delete') }}
+              </button>
             </div>
           </div>
+        </template>
 
-          <div class="mb-3">
-            <div v-for="station in empire.stations.slice(0, 2)" :key="station.id" 
-              class="text-sm text-slate-300 mb-1 line-clamp-1 leading-relaxed bg-slate-800/50 p-2 rounded border border-slate-700/50">
-              <span class="font-medium">{{ station.name }}:</span>
-              {{ getStationDescription(station.modules) }}
-            </div>
-            <div v-if="empire.stations.length > 2" class="text-xs text-slate-500 italic ml-2">
-              +{{ empire.stations.length - 2 }} more...
-            </div>
+        <template v-if="activeTab === 'binding'">
+          <div v-if="saveBindingStore.savedBindings.list.length === 0" class="text-center py-12 text-slate-500 italic">
+            {{ t('planning.no_saved_bindings') }}
           </div>
 
-          <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">
-            <button @click="handleLoadEmpire(empire.id)"
-              class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/30 px-3 py-1.5 rounded transition">
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M15 3h6v6" />
-                <path d="M10 14L21 3" />
-                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
-              </svg>
-              {{ t('planning.action_load_plan') }}
-            </button>
+          <div v-for="binding in saveBindingStore.savedBindings.list" :key="binding.gameGuid"
+            class="group bg-slate-700/40 border border-slate-600/50 rounded-md p-4 hover:border-cyan-500/50 hover:bg-slate-700/60 transition-all duration-200">
+            <div class="flex justify-between items-start mb-2">
+              <div class="flex items-center gap-2">
+                <span class="text-lg">🎮</span>
+                <div>
+                  <div class="font-bold text-lg text-cyan-100 mb-1 group-hover:text-cyan-400 transition-colors">
+                    {{ binding.bindingName || binding.gameGuid.slice(0, 8) }}
+                  </div>
+                  <div class="text-xs text-slate-500 font-mono">{{ formatDate(binding.updatedAt) }}</div>
+                </div>
+              </div>
+              <div class="flex gap-2">
+                <div class="text-xs text-slate-400 bg-slate-600/50 px-2 py-1 rounded">
+                  {{ binding.groups.length }} {{ t('planning.groups_count') }}
+                </div>
+                <div class="text-xs text-slate-400 bg-slate-600/50 px-2 py-1 rounded">
+                  {{ binding.stationPlans.length }} {{ t('sector.stations_count') }}
+                </div>
+              </div>
+            </div>
 
-            <div class="flex-1"></div>
+            <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">
+              <button @click="handleLoadBinding(binding.gameGuid)"
+                class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/30 px-3 py-1.5 rounded transition">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M15 3h6v6" />
+                  <path d="M10 14L21 3" />
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" />
+                </svg>
+                {{ t('planning.action_load_binding') }}
+              </button>
 
-            <button @click="handleDeleteEmpire(empire.id)"
-              class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded transition">
-              <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="3 6 5 6 21 6" />
-                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
-                <line x1="10" y1="11" x2="10" y2="17" />
-                <line x1="14" y1="11" x2="14" y2="17" />
-              </svg>
-              {{ t('planning.action_delete') }}
-            </button>
+              <div class="flex-1"></div>
+
+              <button @click="handleDeleteBinding(binding.gameGuid)"
+                class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded transition">
+                <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="3 6 5 6 21 6" />
+                  <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />
+                  <line x1="10" y1="11" x2="10" y2="17" />
+                  <line x1="14" y1="11" x2="14" y2="17" />
+                </svg>
+                {{ t('planning.action_delete') }}
+              </button>
+            </div>
           </div>
-        </div>
+        </template>
       </div>
     </div>
   </div>

@@ -43,3 +43,7 @@
 - [x] V1. 运行 `npm run build`，修复编译错误并重复执行直到通过或明确 blocker
 - [x] V2. 验证 binding 数据写入独立 storage
 - [x] V3. 验证 productionSource 路由正确切换 empire / save-binding
+
+## 后续修正 - Binding 名称字段
+
+- [x] T27. SaveBindingPlan 添加 `bindingName` 字段，创建时从 archive playerName 复制

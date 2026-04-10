@@ -594,7 +594,15 @@
     "confirm_delete_plan": "确定要删除这个方案吗？",
     "confirm_load_with_unsaved": "当前方案有未保存的修改，确定要加载新方案吗？",
     "groups_count": "个产线组",
-    "nodes_count": "个节点"
+    "nodes_count": "个节点",
+    "tab_empire": "帝国",
+    "tab_binding": "存档绑定",
+    "no_saved_bindings": "暂无保存的存档绑定",
+    "action_load_binding": "加载绑定",
+    "confirm_delete_binding": "确定要删除这个存档绑定吗？"
+  },
+  "binding": {
+    "new_binding_name": "新绑定"
   },
   "shipBuild": {
     "load_blueprint": "载入飞船配装",

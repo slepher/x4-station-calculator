@@ -33,7 +33,9 @@ import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, pa
 import {
   createBindingPlanStationId,
   deriveBindingStations,
-  parseBindingStationId
+  parseBindingStationId,
+  buildSaveBindingProductionFlows,
+  type SaveBindingProductionDeps
 } from './logic/productionSourceAdapter'
 
 const V1_STORAGE_KEY = 'x4_station_data'
@@ -287,6 +289,19 @@ export const useEmpireStore = defineStore('empire', () => {
   )
 
   const empireGroupedFlows = computed<EmpireGroupedFlows>(() => {
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      const deps: SaveBindingProductionDeps = {
+        modulesMap: gameData.modulesMap,
+        waresMap: gameData.waresMap,
+        medicalConsumptionMap: gameData.medicalConsumptionMap,
+        enforceDlcActivation: gameData.enforceDlcActivation,
+        isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag),
+        archive: saveStore.selectedArchive
+      }
+      return buildSaveBindingProductionFlows(binding, deps).groupedFlows
+    }
+    
     if (!activeEmpire.value || !gameData.modulesMap) {
       return createEmptyEmpireGroupedFlows()
     }
@@ -649,7 +664,7 @@ export const useEmpireStore = defineStore('empire', () => {
       
       sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
       
-      activeStationId.value = null
+      activeViewStore.switchToEmpire(empireId)
       initializeAllStationCaches()
       takeSnapshot()
     }

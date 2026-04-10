@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
@@ -23,7 +22,6 @@ const props = withDefaults(defineProps<{
   supplyStorageFlows: () => []
 })
 
-const empireStore = useEmpireStore()
 const gameData = useGameDataStore()
 const { t } = useI18n()
 const { translateWare } = useX4I18n()
@@ -34,7 +32,7 @@ const viewMode = ref<ViewMode>('quantity')
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 
-const empireGroupedFlows = computed(() => props.groupedFlows || empireStore.empireGroupedFlows)
+const empireGroupedFlows = computed(() => props.groupedFlows || { flows: [], empireGroups: { operations: [], supply: [] } })
 
 const wrapFlow = (flow: any) => {
   const wareInfo = gameData.waresMap?.[flow.wareId]

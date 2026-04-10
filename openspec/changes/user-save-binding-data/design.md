@@ -23,6 +23,7 @@ interface SavedSaveBindingsState {
 ```ts
 interface SaveBindingPlan {
   gameGuid: string
+  bindingName?: string  // 显示名称，创建时从 archive playerName 复制
   selectedArchiveTime: number | null
   blueprintEmpireId?: string
   groups: BindingSectorGroup[]
@@ -31,7 +32,7 @@ interface SaveBindingPlan {
 }
 ```
 
-`selectedArchiveTime` 是视角字段。`blueprintEmpireId` 只是导入候选来源的 UI 记忆，不是 station plan 的来源关系。
+`bindingName` 是用户可见的显示名称，创建 binding 时自动从 archive 的 `playerName` 复制，后续可在 UI 中编辑修改。`selectedArchiveTime` 是视角字段。`blueprintEmpireId` 只是导入候选来源的 UI 记忆，不是 station plan 的来源关系。
 
 ### Binding groups
 

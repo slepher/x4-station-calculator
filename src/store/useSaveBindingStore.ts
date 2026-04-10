@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
+import { useSaveStore } from './useSaveStore'
 import { DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
 import type {
   BindingSectorGroup,
@@ -88,6 +89,7 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
 
           return {
             gameGuid: item.gameGuid,
+            bindingName: item.bindingName,
             selectedArchiveTime: item.selectedArchiveTime ?? null,
             blueprintEmpireId: item.blueprintEmpireId,
             groups,
@@ -109,6 +111,7 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
 export const useSaveBindingStore = defineStore('saveBinding', () => {
   const gameData = useGameDataStore()
   const activeViewStore = useActiveViewStore()
+  const saveStore = useSaveStore()
   const savedBindings = ref<SavedSaveBindingsState>({
     version: CURRENT_SAVE_BINDING_VERSION,
     list: []
@@ -159,6 +162,15 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   const bindings = computed(() => savedBindings.value.list)
   const activeGameGuid = computed(() => activeViewStore.activeId)
   const activeBinding = computed(() => draftBinding.value)
+  const activeBindingName = computed({
+    get: () => draftBinding.value?.bindingName || '',
+    set: (name: string) => {
+      if (draftBinding.value) {
+        draftBinding.value.bindingName = name
+        draftBinding.value.updatedAt = Date.now()
+      }
+    }
+  })
   const isDirty = computed(() => serializeBinding(draftBinding.value) !== lastSavedDraftSnapshot.value)
   const activeStationId = ref<string | null>(null)
 
@@ -166,18 +178,29 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     return savedBindings.value.list.find((item) => item.gameGuid === gameGuid) || null
   }
 
+  function getBindingDisplayName(gameGuid: string): string {
+    const group = saveStore.archiveGroups.find(g => g.guid === gameGuid)
+    return group?.playerName || gameGuid.slice(0, 8)
+  }
+
   function createOrOpenBinding(gameGuid: string, archiveTime: number | null = null): SaveBindingPlan {
     let binding = getBindingByGameGuid(gameGuid)
+    const isNewBinding = !binding
     if (!binding) {
       binding = createDefaultBinding(gameGuid)
+      binding.bindingName = getBindingDisplayName(gameGuid)
       savedBindings.value.list.push(binding)
     }
     activeViewStore.setActiveId(gameGuid)
     loadDraft(gameGuid)
     if (draftBinding.value) {
+      if (isNewBinding && !draftBinding.value.bindingName) {
+        draftBinding.value.bindingName = getBindingDisplayName(gameGuid)
+      }
       draftBinding.value.selectedArchiveTime = archiveTime
       lastSavedDraftSnapshot.value = serializeBinding(draftBinding.value)
       binding.selectedArchiveTime = archiveTime
+      binding.bindingName = draftBinding.value.bindingName
       binding.updatedAt = Date.now()
     }
     persistViewState()
@@ -499,12 +522,14 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     bindings,
     activeGameGuid,
     activeBinding,
+    activeBindingName,
     draftBinding,
     isDirty,
     isInitialized,
     activeStationId,
     initialize,
     getBindingByGameGuid,
+    getBindingDisplayName,
     createOrOpenBinding,
     setActiveBinding,
     setSelectedArchiveTime,

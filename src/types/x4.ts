@@ -1137,6 +1137,7 @@ export interface BindingStationPlan {
 
 export interface SaveBindingPlan {
   gameGuid: string
+  bindingName?: string
   selectedArchiveTime: number | null
   blueprintEmpireId?: string
   groups: BindingSectorGroup[]

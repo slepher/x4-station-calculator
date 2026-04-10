@@ -2,10 +2,6 @@
 import { computed, ref } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStationStore } from '@/store/useStationStore'
-import { useGameDataStore } from '@/store/useGameDataStore'
-import { useSaveBindingStore } from '@/store/useSaveBindingStore'
-import { useSaveStore } from '@/store/useSaveStore'
-import { buildSaveBindingProductionFlows } from '@/store/logic/productionSourceAdapter'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import StationTabBar from '@/components/empire/StationTabBar.vue'
@@ -20,44 +16,15 @@ type SharedWareFlowViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
 const empireStore = useEmpireStore()
 const stationStore = useStationStore()
-const gameDataStore = useGameDataStore()
-const saveBindingStore = useSaveBindingStore()
-const saveStore = useSaveStore()
 const activeTransitSectorId = computed(() => empireStore.activeTransitSectorId)
 const isOverview = computed(() => empireStore.activeStation === null && !activeTransitSectorId.value)
 const wareFlowViewMode = ref<SharedWareFlowViewMode>('quantity')
-const productionSource = computed(() => empireStore.productionSource)
 
 const transitHubModel = computed(() => empireStore.getTransitHubViewModel({
   sectorId: activeTransitSectorId.value,
   racePreference: stationStore.settings.racePreference,
   transportShipCapacity: stationStore.settings.transportShipCapacity
 }))
-const activeSaveBinding = computed(() => {
-  if (saveBindingStore.activeBinding) return saveBindingStore.activeBinding
-  const guid = saveBindingStore.activeGameGuid
-  return guid ? saveBindingStore.getBindingByGameGuid(guid) : null
-})
-const activeSaveBindingGameGuid = computed(() => activeSaveBinding.value?.gameGuid || saveBindingStore.activeGameGuid)
-const canSwitchToActiveBinding = computed(() => Boolean(activeSaveBindingGameGuid.value))
-const saveBindingProductionResult = computed(() => buildSaveBindingProductionFlows(activeSaveBinding.value, {
-  modulesMap: gameDataStore.modulesMap,
-  waresMap: gameDataStore.waresMap,
-  medicalConsumptionMap: gameDataStore.medicalConsumptionMap,
-  enforceDlcActivation: gameDataStore.enforceDlcActivation,
-  isModuleDlcActive: (moduleId: string) => gameDataStore.isDlcActive(gameDataStore.modulesMap[moduleId]?.dlc_tag),
-  archive: saveStore.selectedArchive
-}))
-const saveBindingGroupedFlows = computed(() => saveBindingProductionResult.value.groupedFlows)
-const overviewGroupedFlows = computed(() =>
-  productionSource.value === 'save-binding' ? saveBindingGroupedFlows.value : null
-)
-
-function switchToActiveBinding() {
-  const gameGuid = activeSaveBindingGameGuid.value
-  if (!gameGuid) return
-  empireStore.switchToBinding(gameGuid)
-}
 </script>
 
 <template>
@@ -90,28 +57,7 @@ function switchToActiveBinding() {
       </div>
 
       <div class="col-span-1 lg:col-span-3">
-        <div class="production-source-toolbar">
-          <div class="production-source-tabs">
-            <button
-              type="button"
-              class="source-tab"
-              :class="{ active: productionSource === 'empire' }"
-              @click="empireStore.switchToEmpire()"
-            >
-              {{ $t('production.source_empire') }}
-            </button>
-            <button
-              type="button"
-              class="source-tab"
-              :class="{ active: productionSource === 'save-binding' }"
-              :disabled="!canSwitchToActiveBinding"
-              @click="switchToActiveBinding"
-            >
-              {{ $t('production.source_save_binding') }}
-            </button>
-          </div>
-        </div>
-        <EmpireWareFlowsDashboard :grouped-flows="overviewGroupedFlows" />
+        <EmpireWareFlowsDashboard :grouped-flows="empireStore.empireGroupedFlows" />
       </div>
     </div>
   </template>
@@ -146,25 +92,4 @@ function switchToActiveBinding() {
 .sector-management-placeholder {
   min-height: 1px;
 }
-
-.production-source-toolbar {
-  @apply mb-3 flex flex-wrap items-center justify-between gap-2;
-}
-
-.production-source-tabs {
-  @apply flex items-center gap-2;
-}
-
-.source-tab {
-  @apply rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-300 transition;
-}
-
-.source-tab:hover {
-  @apply border-slate-500 bg-slate-700 text-white;
-}
-
-.source-tab.active {
-  @apply border-sky-500 bg-sky-600/30 text-sky-100;
-}
-
 </style>

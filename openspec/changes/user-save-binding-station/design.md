@@ -96,10 +96,29 @@ const isDirty = computed(() => {
 
 ### ProductionWorkbenchView
 
-- 总览界面数据源切换按钮
+- 总览界面直接使用 `empireStore.empireGroupedFlows`，数据自动根据 `productionSource` 分发
 - binding 模式禁用 empire 专属功能（如星区链接）
 
-## D6: 空间站创建流程
+## D7: 数据源自动分发
+
+`empireGroupedFlows` computed 根据 `productionSource` 自动选择数据源：
+
+```ts
+const empireGroupedFlows = computed(() => {
+  if (productionSource.value === 'save-binding') {
+    const binding = saveBindingStore.activeBinding
+    return buildSaveBindingProductionFlows(binding, deps).groupedFlows
+  }
+  return analyzeEmpireWareFlow(activeEmpire.stations, ...)
+})
+```
+
+**核心原则**：
+- 组件只访问 `empireStore.empireGroupedFlows`
+- 数据源切换逻辑集中在 store 内
+- 无需组件层手动判断 `productionSource`
+
+## D8: 空间站创建流程
 
 ### 创建虚拟空间站
 
@@ -138,7 +157,7 @@ function importBlueprintModules(
 }
 ```
 
-## D7: 数据层分离
+## D8: 数据层分离
 
 `useEmpireDataStore` 负责纯数据持久化，`useEmpireStore` 调用其方法处理 localStorage。
 
