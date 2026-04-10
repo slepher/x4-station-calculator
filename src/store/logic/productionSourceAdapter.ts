@@ -197,6 +197,50 @@ export function buildSaveBindingProductionFlows(
   }
 }
 
+export interface DerivedBindingStation {
+  station: StationPlan
+  groupId: string | null
+}
+
+export function deriveBindingStations(
+  binding: SaveBindingPlan | null | undefined,
+  archive: SaveArchive | null
+): DerivedBindingStation[] {
+  if (!binding) return []
+
+  const result: DerivedBindingStation[] = []
+  const coveredCodes = getCoveredSaveStationCodes(archive, binding.groups)
+  const stationPlansByCode = new Map<string, BindingStationPlan>()
+
+  binding.stationPlans.forEach((plan) => {
+    if (plan.saveStationCode) {
+      stationPlansByCode.set(plan.saveStationCode, plan)
+    }
+  })
+
+  coveredCodes.forEach((code) => {
+    const saveStation = getSaveStationByCode(archive, code)
+    if (!saveStation) return
+    const plan = stationPlansByCode.get(code)
+    const station = toDerivedSaveStation(binding.gameGuid, saveStation, plan)
+    result.push({
+      station,
+      groupId: plan?.groupId || null
+    })
+  })
+
+  binding.stationPlans.forEach((plan) => {
+    if (!plan.saveStationCode) {
+      result.push({
+        station: toProductionStation(binding.gameGuid, plan),
+        groupId: plan.groupId || null
+      })
+    }
+  })
+
+  return result
+}
+
 export function buildSaveBindingProductionFlowsLegacy(
   binding: SaveBindingPlan | null | undefined,
   deps: ProductionSourceDeps | null | undefined

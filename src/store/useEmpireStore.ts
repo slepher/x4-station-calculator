@@ -20,6 +20,7 @@ import type {
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
+import { useSaveStore } from './useSaveStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './logic/sectorLinkFlow'
 import { buildTransitHubViewModel } from './logic/transitHubViewModel'
@@ -27,6 +28,7 @@ import { buildStationComponentGapFlows, type StationComponentGapFlows } from './
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
 import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, parseSectorLinkKey } from './logic/sectorLinks'
+import { deriveBindingStations } from './logic/productionSourceAdapter'
 
 const V1_STORAGE_KEY = 'x4_station_data'
 const SESSION_ACTIVE_STATION_KEY = 'x4_active_station_id'
@@ -93,6 +95,7 @@ export const useEmpireStore = defineStore('empire', () => {
   const gameData = useGameDataStore()
   const empireDataStore = useEmpireDataStore()
   const saveBindingStore = useSaveBindingStore()
+  const saveStore = useSaveStore()
   const { savedEmpires } = storeToRefs(empireDataStore)
 
   const isReady = ref(false)
@@ -103,11 +106,35 @@ export const useEmpireStore = defineStore('empire', () => {
   const empires = computed(() => savedEmpires.value.list)
   const activeEmpireId = computed(() => savedEmpires.value.activeId)
   
-  const activeEmpire = ref<EmpirePlan | null>(null)
-  const activeStationId = ref<string | null>(null)
-  
+const activeEmpire = ref<EmpirePlan | null>(null)
+  const empireActiveStationId = ref<string | null>(null)
+
+  const activeStationId = computed({
+    get: () => productionSource.value === 'save-binding'
+      ? saveBindingStore.activeStationId
+      : empireActiveStationId.value,
+    set: (id: string | null) => {
+      if (productionSource.value === 'save-binding') {
+        saveBindingStore.selectStation(id)
+      } else {
+        empireActiveStationId.value = id
+      }
+    }
+  })
+
+  const bindingActiveStationId = computed(() => saveBindingStore.activeStationId)
+
   const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     const cache = new Map<string, GroupedFlows>()
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      const archive = saveStore.selectedArchive
+      const derived = deriveBindingStations(binding, archive)
+      derived.forEach((item) => {
+        cache.set(item.station.id, stationStateMap.getFilteredGroupedFlows(item.station.id))
+      })
+      return cache
+    }
     if (!activeEmpire.value) return cache
     activeEmpire.value.stations.forEach(station => {
       cache.set(station.id, stationStateMap.getFilteredGroupedFlows(station.id))
@@ -116,6 +143,12 @@ export const useEmpireStore = defineStore('empire', () => {
   })
 
   const activeStation = computed(() => {
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      const archive = saveStore.selectedArchive
+      const derived = deriveBindingStations(binding, archive)
+      return derived.find(item => item.station.id === bindingActiveStationId.value)?.station || null
+    }
     if (!activeEmpire.value || !activeStationId.value) return null
     return activeEmpire.value.stations.find(s => s.id === activeStationId.value) || null
   })
@@ -127,6 +160,15 @@ export const useEmpireStore = defineStore('empire', () => {
     return exists ? sectorId : null
   })
   const sectors = computed<SectorPlan[]>(() => {
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      if (!binding) return []
+      return binding.groups.map((group, index) => ({
+        id: group.id,
+        name: group.name,
+        order: index
+      }))
+    }
     if (!activeEmpire.value) return []
     const list = activeEmpire.value.sectors || []
     return [...list].sort((a, b) => a.order - b.order)
@@ -134,6 +176,20 @@ export const useEmpireStore = defineStore('empire', () => {
   const sectorLinks = computed<string[]>(() => activeEmpire.value?.sectorLinks || [])
 
   const orderedStationsBySector = computed<StationPlan[]>(() => {
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      const archive = saveStore.selectedArchive
+      const derived = deriveBindingStations(binding, archive)
+      const sectorOrderMap = new Map<string, number>(sectors.value.map((sector, idx) => [sector.id, idx]))
+      const withIndex = derived.map((item, index) => ({ station: item.station, index, groupId: item.groupId }))
+      withIndex.sort((a, b) => {
+        const aOrder = a.groupId ? (sectorOrderMap.get(a.groupId) ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER
+        const bOrder = b.groupId ? (sectorOrderMap.get(b.groupId) ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER
+        if (aOrder !== bOrder) return aOrder - bOrder
+        return a.index - b.index
+      })
+      return withIndex.map((item) => item.station)
+    }
     if (!activeEmpire.value) return []
     const stations = activeEmpire.value.stations || []
     const sectorOrderMap = new Map<string, number>(sectors.value.map((sector, idx) => [sector.id, idx]))
@@ -565,6 +621,16 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function createStation(name: string, type: StationType = 'industrial', selectAfterCreate: boolean = true) {
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      if (!binding) return null
+      const plan = saveBindingStore.createStationPlanInGroup(binding.gameGuid, null, name, type)
+      if (plan && selectAfterCreate) {
+        activeStationId.value = plan.id
+      }
+      return plan ? { ...plan, id: plan.id } as StationPlan : null
+    }
+
     if (!activeEmpire.value) return null
     
     const station = createDefaultStation(name, type)
@@ -578,6 +644,16 @@ export const useEmpireStore = defineStore('empire', () => {
   }
 
   function deleteStation(stationId: string) {
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      if (!binding) return
+      saveBindingStore.deleteStationPlan(binding.gameGuid, stationId)
+      if (activeStationId.value === stationId) {
+        activeStationId.value = null
+      }
+      return
+    }
+
     if (!activeEmpire.value) return
     
     const index = activeEmpire.value.stations.findIndex(s => s.id === stationId)
