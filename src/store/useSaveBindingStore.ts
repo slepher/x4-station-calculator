@@ -425,6 +425,22 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     return true
   }
 
+  function setTradeStationPosition(input: {
+    gameGuid: string
+    groupId: string
+    sectorMacro: string
+    position: { x: number; y: number; z: number }
+  }) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value) return false
+    const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
+    if (!group?.tradeStation) return false
+    group.tradeStation.sectorMacro = input.sectorMacro
+    group.tradeStation.position = input.position
+    draftBinding.value.updatedAt = Date.now()
+    return true
+  }
+
   function importEmpireStationToSaveStation(gameGuid: string, saveStationCode: string, station: StationPlan, groupId?: string | null) {
     return upsertStationPlan({
       gameGuid,
@@ -470,6 +486,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     setStationPlanPosition,
     upsertTradeStation,
     deleteTradeStation,
+    setTradeStationPosition,
     importEmpireStationToSaveStation,
     loadData,
     writeState

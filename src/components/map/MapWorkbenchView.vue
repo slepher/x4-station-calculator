@@ -1089,7 +1089,7 @@ const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocati
     if (draggingBindingKey.value && draggingSectorGroupId.value) {
       const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
       if (!sectorMacro) return
-      saveBindingStore.setStationPlanPosition({
+      const moved = saveBindingStore.setStationPlanPosition({
         gameGuid: draggingBindingKey.value,
         stationPlanId: item.id,
         groupId: draggingSectorGroupId.value,
@@ -1100,6 +1100,18 @@ const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocati
           z: location.pos.z
         }
       })
+      if (!moved) {
+        saveBindingStore.setTradeStationPosition({
+          gameGuid: draggingBindingKey.value,
+          groupId: draggingSectorGroupId.value,
+          sectorMacro,
+          position: {
+            x: location.pos.x,
+            y: 0,
+            z: location.pos.z
+          }
+        })
+      }
     } else {
       empireStore.setStationLocation(item.id, location)
     }
@@ -1779,7 +1791,7 @@ const onViewportDragOver = (event: DragEvent) => {
   if (!isBindingPanelOpen.value) return
   event.preventDefault()
 
-  if (draggingPlacementItem.value) {
+  if (draggingPlacementItem.value && !draggingBindingKey.value) {
     const location = resolveLocationAtPointer(event.clientX, event.clientY)
     placementPreview.value = location ? {
       kind: draggingPlacementItem.value.kind,
@@ -1840,7 +1852,12 @@ const onOverlayPointerDown = (payload: {
   }
 }) => {
   if (payload.binding) {
-    draggingPlacementItem.value = null
+    draggingPlacementItem.value = {
+      id: payload.id,
+      kind: payload.kind,
+      name: payload.name,
+      icon: payload.icon
+    }
     draggingBindingKey.value = payload.binding.gameGuid
     draggingSectorGroupId.value = payload.binding.sectorGroupId
     draggingCoverageSectorMacros.value = new Set(payload.binding.coverageSectorMacros)
