@@ -24,14 +24,14 @@ interface SavedSaveBindingsState {
 interface SaveBindingPlan {
   gameGuid: string
   selectedArchiveTime: number | null
-  sourceEmpireId?: string
+  blueprintEmpireId?: string
   groups: BindingSectorGroup[]
   stationPlans: BindingStationPlan[]
   updatedAt: number
 }
 ```
 
-`selectedArchiveTime` 是视角字段。`sourceEmpireId` 只是导入候选来源的 UI 记忆，不是 station plan 的来源关系。
+`selectedArchiveTime` 是视角字段。`blueprintEmpireId` 只是导入候选来源的 UI 记忆，不是 station plan 的来源关系。
 
 ### Binding groups
 
@@ -237,7 +237,7 @@ binding 面板和量化生产的 binding source 视图都需要显示同一 dirt
 
 - 如果当前 archive 缺失，binding 保留，但派生 save station view 为空，并显示当前 time 不可用状态。
 - 如果 `stationPlans` 中的 `saveStationCode` 当前 archive 不存在，该 plan 保留，但不参与当前 group 派生视图；后续 UI 可放入未覆盖/失效规划区。
-- 如果 `sourceEmpireId` 指向不存在的 empire，只清空候选列表，不删除已有 station plans。
+- 如果 `blueprintEmpireId` 指向不存在的 empire，只清空候选列表，不删除已有 station plans。
 - 如果同一 `gameGuid` 下出现重复 `saveStationCode` plan，store 规范化时保留最后一次有效编辑或阻止写入，确保唯一。
 - 如果尝试将已绑定到 `stationPlans` 的 save station 绑定为 trade station，应先移除原 plan。
 

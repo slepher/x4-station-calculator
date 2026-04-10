@@ -51,8 +51,8 @@
 
 ### 6. Source empire 导入
 
-- binding 可以记住一个 `sourceEmpireId` 作为 UI 上的“自由空间站/规划模板”来源。
-- `sourceEmpireId` 只用于显示可导入候选，不代表 binding station 与 source empire station 有持续关系。
+- binding 可以记住一个 `blueprintEmpireId` 作为 UI 上的“空间站蓝图”来源。
+- `blueprintEmpireId` 只用于显示可导入候选，不代表 binding station 与 blueprint empire station 有持续关系。
 - 从 source empire station 导入时，只复制当时的 `name`、`type`、`modules`、`settings` 作为 binding 的规划目标。
 - 复制完成后，修改 binding station 不影响 source empire；修改 source empire 也不影响已复制的 binding station。
 
@@ -77,7 +77,7 @@
 - binding 使用显式保存。
 - group 编辑、coverage 修改、source empire 导入、规划 modules 修改、virtual station 创建/删除都进入 binding dirty 状态。
 - `保存绑定` 写入 `x4_save_bindings`；`保存帝国` 不保存 binding。
-- `activeGameGuid`、`selectedArchiveTime`、`sourceEmpireId` 可作为 UI 视角/偏好保存，但不得让用户误以为它们会同步或修改 empire。
+- `activeGameGuid`、`selectedArchiveTime`、`blueprintEmpireId` 可作为 UI 视角/偏好保存，但不得让用户误以为它们会同步或修改 empire。
 - 离开 dirty binding、切换 binding 或关闭相关面板时，UI 应提供保存、放弃或继续编辑的选择。
 
 ## 边界

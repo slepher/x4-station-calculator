@@ -173,7 +173,7 @@ const draggingOverlayKey = ref<string | null>(null)
 const draggingBindingKey = ref<string | null>(null)
 const draggingSectorGroupId = ref<string | null>(null)
 const draggingFreeSector = ref<{ sectorGroupId: string; name: string } | null>(null)
-const draggingFreeStation = ref<{ stationId: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' } | null>(null)
+const draggingFreeStation = ref<{ stationId: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard'; blueprintStation?: StationPlan } | null>(null)
 const draggingVirtualTradestation = ref<{ sectorGroupId: string; name: string } | null>(null)
 const draggingCoverageSectorMacros = ref<Set<string>>(new Set())
 const bindingContextGameGuid = ref<string | null>(null)
@@ -260,7 +260,7 @@ const activeBindingDragPreview = computed<{
     }
   }
   if (draggingFreeStation.value) {
-    const station = empireStore.activeEmpire?.stations?.find((item) => item.id === draggingFreeStation.value?.stationId) || null
+    const station = draggingFreeStation.value.blueprintStation || null
     const sectorMacro = Array.from(draggingCoverageSectorMacros.value)[0] || ''
     return {
       kind: 'station',
@@ -1536,7 +1536,7 @@ const onBindingFitSectors = (sectorMacros: string[]) => {
   }
 }
 
-const onBindingDragStationStart = (payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }) => {
+const onBindingDragStationStart = (payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean; blueprintStation?: StationPlan }) => {
   if (payload.isVirtualTradestation) {
     draggingVirtualTradestation.value = {
       sectorGroupId: payload.sectorGroupId,
@@ -1547,7 +1547,8 @@ const onBindingDragStationStart = (payload: { stationId: string; gameGuid: strin
       stationId: payload.stationId,
       sectorGroupId: payload.sectorGroupId,
       name: payload.name,
-      icon: payload.icon as 'factory' | 'shipyard'
+      icon: payload.icon as 'factory' | 'shipyard',
+      blueprintStation: payload.blueprintStation
     }
   }
   draggingBindingKey.value = payload.gameGuid
@@ -1775,7 +1776,7 @@ const stopDrag = () => {
   } else if (draggingFreeStation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
     const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
     if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
-      const source = empireStore.activeEmpire?.stations.find((station) => station.id === draggingFreeStation.value?.stationId)
+      const source = draggingFreeStation.value.blueprintStation
       saveBindingStore.upsertStationPlan({
         gameGuid: draggingBindingKey.value,
         groupId: draggingSectorGroupId.value,

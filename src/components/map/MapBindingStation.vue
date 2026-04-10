@@ -10,7 +10,7 @@ import { getSavePoiIconUrl } from '@/components/map/utils/style'
 import { resolveGroupSaveBinding, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import { compareModulesByPickerOrder } from '@/store/logic/searchModule'
-import type { GroupSaveBinding, SavedModule, StationSaveBinding, StationPlan } from '@/types/x4'
+import type { BindingStationPlan, GroupSaveBinding, SavedModule, StationSaveBinding, StationPlan } from '@/types/x4'
 import type { PlayerStationEntry, SavePoiOverlayItem } from '@/types/saveArchive'
 import factoryIconUrl from '@/components/icons/factory.svg'
 import tradestationIconUrl from '@/components/icons/tradestation.svg'
@@ -23,7 +23,7 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: 'focus-sector', sectorId: string): void
   (e: 'fit-sectors', sectorIds: string[]): void
-  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }): void
+  (e: 'drag-station-start', payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean; blueprintStation?: StationPlan }): void
   (e: 'drag-station-end'): void
 }>()
 
@@ -42,10 +42,14 @@ const bindMenuSaveStation = ref<PlayerStationEntry | null>(null)
 const bindMenuSectorMacro = ref<string | null>(null)
 const bindMenuTriggerEl = ref<HTMLElement | null>(null)
 const bindMenuAnchorEl = ref<HTMLElement | null>(null)
+const blueprintEmpireMenuOpen = ref(false)
+const blueprintEmpireMenuRef = ref<HTMLElement | null>(null)
+const blueprintEmpireMenuTriggerEl = ref<HTMLElement | null>(null)
+const blueprintEmpireMenuStyle = ref<Record<string, string>>({})
 
 const pendingDrag = ref<{
   key: string
-  payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean }
+  payload: { stationId: string; gameGuid: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard' | 'tradestation'; coverageSectorMacros: { ref: string; jump: number }[]; isVirtualTradestation?: boolean; blueprintStation?: StationPlan }
   startX: number
   startY: number
 } | null>(null)
@@ -53,10 +57,23 @@ const activeDragKey = ref<string | null>(null)
 const DRAG_START_THRESHOLD_PX = 4
 const suppressNextSectorFocus = ref(false)
 
-const activeEmpire = computed(() => empireStore.activeEmpire)
 const activeBindingPlan = computed(() => {
   if (saveBindingStore.activeBinding?.gameGuid === props.gameGuid) return saveBindingStore.activeBinding
   return saveBindingStore.getBindingByGameGuid(props.gameGuid)
+})
+const blueprintEmpires = computed(() => empireStore.savedEmpires?.list || [])
+const selectedBlueprintEmpireId = computed(() => (
+  activeBindingPlan.value?.blueprintEmpireId ||
+  empireStore.activeEmpireId ||
+  empireStore.activeEmpire?.id ||
+  blueprintEmpires.value[0]?.id ||
+  null
+))
+const blueprintEmpire = computed(() => {
+  const id = selectedBlueprintEmpireId.value
+  if (!id) return null
+  if (empireStore.activeEmpire?.id === id) return empireStore.activeEmpire
+  return blueprintEmpires.value.find((empire) => empire.id === id) || null
 })
 
 function getSaveStationPlan(saveStationCode: string) {
@@ -122,24 +139,15 @@ function recordValues<T>(record: Record<string, T> | undefined): T[] {
 }
 
 const freeStations = computed(() => {
-  if (!activeEmpire.value) return []
+  if (!blueprintEmpire.value) return []
 
-  const stationBindings = currentGroupBinding.value?.stationBindings || []
-  
-  // 所有没有 stationBinding 的 empire station 都是自由空间站
-  const freeEmpireStations = activeEmpire.value.stations
-    .filter((station) => {
-      const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
-      return !binding
-    })
+  return (blueprintEmpire.value.stations || [])
     .map((station) => ({
       station,
       sectorGroupId: '',
       sectorGroupName: '',
       sectorMacro: undefined
     }))
-
-  return freeEmpireStations
 })
 
 const virtualTradestation = computed(() => {
@@ -220,7 +228,7 @@ const anchorAndCoverageSectors = computed(() => {
 	    const stationBindings = currentGroupBinding.value.stationBindings || []
 	    for (const binding of stationBindings) {
 	      if (binding.sectorMacro === sectorMacro && binding.position) {
-	        const station = activeEmpire.value?.stations.find(s => s.id === binding.stationId)
+	        const station = blueprintEmpire.value?.stations.find(s => s.id === binding.stationId)
 	        const stationPlan = activeBindingPlan.value?.stationPlans.find((plan) => plan.id === binding.stationId)
 	        const resolved = resolveStationSaveBinding(binding, activeArchive.value)
 	        if (!binding.saveStationCode && (station || stationPlan)) {
@@ -392,8 +400,22 @@ function getEmpireStationIcon(station: StationPlan | undefined | null): string {
   return getSavePoiIconUrl(poiLike) || factoryIconUrl
 }
 
+function bindingPlanToStationPlan(plan: BindingStationPlan): StationPlan {
+  return {
+    id: plan.id,
+    name: plan.name,
+    type: plan.type,
+    modules: plan.modules,
+    settings: plan.settings,
+    lastUpdated: Date.now(),
+    sectorId: plan.groupId || null
+  }
+}
+
 function getEmpireStationIconById(stationId: string): string {
-  return getEmpireStationIcon(activeEmpire.value?.stations.find((station) => station.id === stationId))
+  const station = blueprintEmpire.value?.stations.find((item) => item.id === stationId)
+  const stationPlan = activeBindingPlan.value?.stationPlans.find((item) => item.id === stationId)
+  return getEmpireStationIcon(station || (stationPlan ? bindingPlanToStationPlan(stationPlan) : null))
 }
 
 function isSaveStationBound(saveStationCode: string): boolean {
@@ -420,7 +442,7 @@ function getBoundEmpireStation(saveStationCode: string): StationPlan | null {
       lastUpdated: activeBindingPlan.value?.updatedAt || Date.now()
     }
   }
-  return activeEmpire.value?.stations?.find((s) => s.id === binding.stationId) || null
+  return blueprintEmpire.value?.stations?.find((s) => s.id === binding.stationId) || null
 }
 
 function hasDanglingBoundStation(saveStationCode: string): boolean {
@@ -496,25 +518,82 @@ function closeBindMenu() {
   bindMenuAnchorEl.value = null
 }
 
+function updateBlueprintEmpireMenuPosition() {
+  const panel = document.querySelector('.map-save-panel, .map-binding-panel')
+  const trigger = blueprintEmpireMenuTriggerEl.value
+  if (!panel || !trigger) {
+    blueprintEmpireMenuStyle.value = {
+      position: 'fixed',
+      top: '100px',
+      left: '400px',
+      maxHeight: '300px'
+    }
+    return
+  }
+
+  const panelRect = panel.getBoundingClientRect()
+  const triggerRect = trigger.getBoundingClientRect()
+  const menuHeight = blueprintEmpireMenuRef.value?.offsetHeight || 260
+  const viewportHeight = window.innerHeight || document.documentElement.clientHeight || 0
+  const rawTop = Math.min(triggerRect.top, Math.max(8, viewportHeight - menuHeight - 8))
+  const top = Math.max(8, rawTop)
+
+  blueprintEmpireMenuStyle.value = {
+    position: 'fixed',
+    top: `${top}px`,
+    left: `${panelRect.right + 8}px`,
+    maxHeight: '300px'
+  }
+}
+
+function toggleBlueprintEmpireMenu(event: MouseEvent) {
+  blueprintEmpireMenuTriggerEl.value = event.currentTarget as HTMLElement
+  blueprintEmpireMenuOpen.value = !blueprintEmpireMenuOpen.value
+  if (blueprintEmpireMenuOpen.value) {
+    closeBindMenu()
+    nextTick(() => updateBlueprintEmpireMenuPosition())
+  }
+}
+
+function closeBlueprintEmpireMenu() {
+  blueprintEmpireMenuOpen.value = false
+  blueprintEmpireMenuTriggerEl.value = null
+}
+
+function selectBlueprintEmpire(empireId: string) {
+  saveBindingStore.setBlueprintEmpire(props.gameGuid, empireId)
+  closeBlueprintEmpireMenu()
+}
+
 function onBindMenuGlobalPointerDown(event: MouseEvent) {
-  if (!bindMenuOpen.value) return
+  if (!bindMenuOpen.value && !blueprintEmpireMenuOpen.value) return
+  if (!(event.target instanceof Node)) return
+
   const menuRoot = bindMenuRef.value
   const trigger = bindMenuTriggerEl.value
-  if (!menuRoot) return
-  if (!(event.target instanceof Node)) return
-  if (menuRoot.contains(event.target)) return
-  if (trigger && trigger.contains(event.target)) return
-  closeBindMenu()
+  if (bindMenuOpen.value) {
+    if (menuRoot?.contains(event.target)) return
+    if (trigger?.contains(event.target)) return
+    closeBindMenu()
+  }
+
+  const empireMenuRoot = blueprintEmpireMenuRef.value
+  const empireTrigger = blueprintEmpireMenuTriggerEl.value
+  if (blueprintEmpireMenuOpen.value) {
+    if (empireMenuRoot?.contains(event.target)) return
+    if (empireTrigger?.contains(event.target)) return
+    closeBlueprintEmpireMenu()
+  }
 }
 
 function onBindMenuViewportChange() {
-  if (!bindMenuOpen.value) return
-  updateBindMenuPosition()
+  if (bindMenuOpen.value) updateBindMenuPosition()
+  if (blueprintEmpireMenuOpen.value) updateBlueprintEmpireMenuPosition()
 }
 
 function bindToStation(stationId: string) {
   if (!bindMenuSaveStation.value || !bindMenuSectorMacro.value) return
-  const station = activeEmpire.value?.stations.find((item) => item.id === stationId)
+  const station = blueprintEmpire.value?.stations.find((item) => item.id === stationId)
   if (!station) return
 
   saveBindingStore.importEmpireStationToSaveStation(props.gameGuid, bindMenuSaveStation.value.code, station, props.sectorGroupId)
@@ -606,11 +685,9 @@ function formatCoordKm(value: number): string {
 }
 
 const allStationsForMenu = computed(() => {
-  if (!activeEmpire.value || !props.sectorGroupId) return []
+  if (!blueprintEmpire.value || !props.sectorGroupId) return []
 
   const stationBindings = currentGroupBinding.value?.stationBindings || []
-  
-  // 所有 empire station
   const boundStationId = bindMenuSaveStation.value
     ? stationBindings.find((b: StationSaveBinding) => b.saveStationCode === bindMenuSaveStation.value?.code)?.stationId
     : null
@@ -646,43 +723,15 @@ const allStationsForMenu = computed(() => {
 	    })
 	  }
 
-	  for (const station of activeEmpire.value.stations) {
+  for (const station of blueprintEmpire.value.stations || []) {
     const binding = stationBindings.find((b: StationSaveBinding) => b.stationId === station.id)
-    
-    if (station.id === boundStationId) {
-      items.push({
-        station,
-        sectorGroupId: station.sectorId || '',
-        sectorGroupName: '',
-        sectorMacro: binding?.sectorMacro,
-        placed: Boolean(binding?.position)
-      })
-    } else if (binding && !binding.saveStationCode) {
-      items.push({
-        station,
-        sectorGroupId: station.sectorId || '',
-        sectorGroupName: '',
-        sectorMacro: binding?.sectorMacro,
-        disabled: true,
-        placed: Boolean(binding?.position)
-      })
-    } else if (binding?.saveStationCode) {
-      items.push({
-        station,
-        sectorGroupId: station.sectorId || '',
-        sectorGroupName: '',
-        sectorMacro: binding.sectorMacro,
-        disabled: true,
-        placed: Boolean(binding.position)
-      })
-    } else if (!binding) {
-      items.push({
-        station,
-        sectorGroupId: station.sectorId || '',
-        sectorGroupName: '',
-        sectorMacro: undefined
-      })
-    }
+    items.push({
+      station,
+      sectorGroupId: station.sectorId || '',
+      sectorGroupName: '',
+      sectorMacro: binding?.sectorMacro,
+      placed: station.id === boundStationId ? Boolean(binding?.position) : false
+    })
   }
 
   // 3. 已放置未绑定的虚拟补给站（有 position，无 saveStationCode）
@@ -758,7 +807,8 @@ function onFreeStationMouseDown(event: MouseEvent, item: { station: StationPlan;
       sectorGroupId: props.sectorGroupId,
       name: item.station.name,
       icon: item.station.type === 'shipyard' ? 'shipyard' : 'factory',
-      coverageSectorMacros: buildStationDragCoverage()
+      coverageSectorMacros: buildStationDragCoverage(),
+      blueprintStation: item.station
     },
     startX: event.clientX,
     startY: event.clientY
@@ -767,10 +817,12 @@ function onFreeStationMouseDown(event: MouseEvent, item: { station: StationPlan;
 
 function onPlacedFreeStationMouseDown(event: MouseEvent, placed: { stationId: string }) {
   if (event.button !== 0) return
-  const station = activeEmpire.value?.stations.find((item) => item.id === placed.stationId)
-  if (!station) return
+  const station = blueprintEmpire.value?.stations.find((item) => item.id === placed.stationId)
+  const stationPlan = activeBindingPlan.value?.stationPlans.find((item) => item.id === placed.stationId)
+  const dragStation = station || (stationPlan ? bindingPlanToStationPlan(stationPlan) : null)
+  if (!dragStation) return
   onFreeStationMouseDown(event, {
-    station,
+    station: dragStation,
     sectorGroupId: props.sectorGroupId
   })
 }
@@ -836,10 +888,23 @@ onBeforeUnmount(() => {
 
 <template>
   <div class="binding-station">
-    <!-- Free Stations (Top) -->
-    <div class="section-header">{{ t('map.binding_free_stations') }}</div>
+    <!-- Station Blueprints (Top) -->
+    <div class="section-title-row">
+      <div class="section-header">{{ t('map.binding_station_blueprints') }}</div>
+      <button
+        type="button"
+        class="station-action blueprint-empire-button"
+        ref="blueprintEmpireMenuTriggerEl"
+        @click="toggleBlueprintEmpireMenu"
+      >
+        {{ blueprintEmpire?.name || t('map.binding_select_blueprint_empire') }}
+        <svg class="action-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
+        </svg>
+      </button>
+    </div>
     <div v-if="freeStations.length === 0 && !virtualTradestation" class="empty-hint">
-      {{ t('map.binding_no_stations') }}
+      {{ t('map.binding_no_blueprint_stations') }}
     </div>
     <div v-else class="free-stations">
       <!-- Virtual Trade Station -->
@@ -858,7 +923,7 @@ onBeforeUnmount(() => {
         </div>
       </div>
 
-      <!-- Empire Free Stations -->
+      <!-- Station Blueprints -->
       <div
         v-for="item in freeStations"
         :key="item.station.id"
@@ -1010,7 +1075,7 @@ onBeforeUnmount(() => {
         :style="bindMenuStyle"
       >
         <div class="bind-menu-group">
-          <div class="bind-menu-group-title">{{ t('map.binding_free_stations') }}</div>
+          <div class="bind-menu-group-title">{{ t('map.binding_station_blueprints') }}</div>
           <button
             v-if="bindMenuSaveStation && hasDanglingBoundStation(bindMenuSaveStation.code)"
             type="button"
@@ -1092,7 +1157,7 @@ onBeforeUnmount(() => {
             </button>
           </template>
           <div v-if="allStationsForMenu.length === 0" class="bind-menu-empty">
-            {{ t('map.binding_no_idle_stations') }}
+            {{ t('map.binding_no_blueprint_stations') }}
           </div>
         </div>
 
@@ -1107,6 +1172,31 @@ onBeforeUnmount(() => {
           </button>
         </div>
       </div>
+
+      <div
+        v-if="blueprintEmpireMenuOpen"
+        class="bind-menu"
+        ref="blueprintEmpireMenuRef"
+        :style="blueprintEmpireMenuStyle"
+      >
+        <div class="bind-menu-group">
+          <div class="bind-menu-group-title">{{ t('map.binding_blueprint_empire') }}</div>
+          <button
+            v-for="empire in blueprintEmpires"
+            :key="empire.id"
+            type="button"
+            class="bind-menu-item"
+            :class="{ active: empire.id === selectedBlueprintEmpireId }"
+            @click="selectBlueprintEmpire(empire.id)"
+          >
+            <span class="bind-menu-item-name">{{ empire.name }}</span>
+            <span class="bind-menu-item-side">{{ empire.stations?.length || 0 }}</span>
+          </button>
+          <div v-if="blueprintEmpires.length === 0" class="bind-menu-empty">
+            {{ t('map.binding_no_blueprint_empires') }}
+          </div>
+        </div>
+      </div>
     </Teleport>
   </div>
 </template>
@@ -1118,6 +1208,14 @@ onBeforeUnmount(() => {
 
 .section-header {
   @apply text-xs font-semibold uppercase tracking-wider text-amber-100/60;
+}
+
+.section-title-row {
+  @apply flex items-center justify-between gap-2;
+}
+
+.blueprint-empire-button {
+  @apply max-w-[12rem] overflow-hidden text-ellipsis;
 }
 
 .empty-hint {

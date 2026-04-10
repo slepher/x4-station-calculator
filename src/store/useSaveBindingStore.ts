@@ -88,7 +88,7 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
           return {
             gameGuid: item.gameGuid,
             selectedArchiveTime: item.selectedArchiveTime ?? null,
-            sourceEmpireId: item.sourceEmpireId,
+            blueprintEmpireId: item.blueprintEmpireId,
             groups,
             stationPlans: normalizedStationPlans,
             updatedAt: Number.isFinite(Number(item.updatedAt)) ? Number(item.updatedAt) : Date.now()
@@ -207,10 +207,10 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     persistViewState()
   }
 
-  function setSourceEmpire(gameGuid: string, empireId: string | undefined) {
+  function setBlueprintEmpire(gameGuid: string, empireId: string | undefined) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
     if (!draftBinding.value) return
-    draftBinding.value.sourceEmpireId = empireId
+    draftBinding.value.blueprintEmpireId = empireId
     draftBinding.value.updatedAt = Date.now()
   }
 
@@ -472,7 +472,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     createOrOpenBinding,
     setActiveBinding,
     setSelectedArchiveTime,
-    setSourceEmpire,
+    setBlueprintEmpire,
     saveBinding,
     discardChanges,
     createGroup,
