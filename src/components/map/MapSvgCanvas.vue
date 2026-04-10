@@ -137,6 +137,7 @@ const props = withDefaults(defineProps<{
 const emit = defineEmits<{
   (e: 'content-size', payload: { width: number; height: number; clusterRefHeight: number }): void
   (e: 'sector-layout', payload: SearchSectorLayout[]): void
+  (e: 'layout-state', payload: { centers: Record<string, { x: number; y: number }>; clusterRadius: number }): void
   (e: 'sector-hover', payload: SectorHoverPayload): void
   (e: 'sector-leave', sectorId: string): void
   (e: 'overlay-pointerdown', payload: PlacementOverlay): void
@@ -327,6 +328,10 @@ watchEffect(() => {
     clusterRefHeight: layoutState.value.clusterRadius * 2
   })
   emit('sector-layout', sectorLayouts.value)
+  emit('layout-state', {
+    centers: layoutState.value.centers,
+    clusterRadius: layoutState.value.clusterRadius
+  })
 })
 </script>
 

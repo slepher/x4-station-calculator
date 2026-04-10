@@ -112,6 +112,8 @@ type DraggingPlacementItem = {
 }
 
 const clusterRefHeightPx = ref(142)
+const clusterRadiusFromLayout = ref(0)
+const centersFromLayout = ref<Record<string, { x: number; y: number }>>({})
 const MAX_SCALE_MULTIPLIER = 4
 const TOOLTIP_OFFSET = 14
 const TOOLTIP_VIEWPORT_PADDING = 12
@@ -816,6 +818,30 @@ const onCanvasSize = async (payload: { width: number; height: number; clusterRef
 
 const onSectorLayout = (payload: SearchSectorLayout[]) => {
   searchSectors.value = payload
+}
+
+const onLayoutState = (payload: { centers: Record<string, { x: number; y: number }>; clusterRadius: number }) => {
+  centersFromLayout.value = payload.centers
+  clusterRadiusFromLayout.value = payload.clusterRadius
+}
+
+const syncViewportStateToStore = () => {
+  const bounds = mapViewBoxBounds.value
+  if (!bounds) return
+  mapStore.syncViewportState({
+    viewportBounds: {
+      left: bounds.left,
+      top: bounds.top,
+      right: bounds.left + bounds.width,
+      bottom: bounds.top + bounds.height
+    },
+    viewportHeight: viewportSize.value.height,
+    clusterRadius: clusterRadiusFromLayout.value,
+    centers: centersFromLayout.value,
+    scale: scale.value,
+    panX: panX.value,
+    panY: panY.value
+  })
 }
 
 const parseClusterQuery = (query: string) => {
@@ -1931,6 +1957,10 @@ watch(liveSavePoiViewportContentBounds, (bounds) => {
   settledSavePoiViewportContentBounds.value = bounds
 }, { immediate: true })
 
+watch([mapViewBoxBounds, scale, panX, panY, viewportSize, centersFromLayout, clusterRadiusFromLayout], () => {
+  syncViewportStateToStore()
+}, { immediate: true })
+
 onMounted(() => {
   updateViewportSize()
   window.addEventListener('resize', onResize)
@@ -1976,7 +2006,6 @@ onBeforeUnmount(() => {
         :archive="activeMapArchive"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
-        @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
         @focus-poi="onSavePoiFocus"
         @context-change="onBindingContextChange"
@@ -2037,6 +2066,7 @@ onBeforeUnmount(() => {
               :show-resource-badges="mapDiagnosticVisibility.resourceBadges"
               @content-size="onCanvasSize"
               @sector-layout="onSectorLayout"
+              @layout-state="onLayoutState"
               @sector-hover="onSectorHover"
               @sector-leave="onSectorLeave"
               @overlay-pointerdown="onOverlayPointerDown"
