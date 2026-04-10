@@ -256,11 +256,6 @@ const empireSectorItems = computed(() => {
   return items
 })
 
-// TODO: 实现地图可见面积超过50%的星区计算
-const visibleMapSectors = computed<string[]>(() => {
-  return []
-})
-
 // 计算传递给菜单组件的数据
 const bindMenuCurrentBoundSectorMacro = computed<string | null>(() => {
   if (!bindMenuTargetSectorId.value) return null
@@ -278,13 +273,6 @@ const bindMenuFilteredSaveSectors = computed(() => {
   return filteredSaveSectors.value.map(s => ({
     sectorMacro: s.sectorMacro,
     sectorName: s.sectorName
-  }))
-})
-
-const bindMenuVisibleMapSectors = computed(() => {
-  return visibleMapSectors.value.map(macro => ({
-    macro,
-    displayName: getSectorMacroDisplayName(macro)
   }))
 })
 
@@ -1094,7 +1082,6 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
       :target-sector-id="bindMenuTargetSectorId"
       :trigger-el="bindMenuTriggerEl"
       :filtered-save-sectors="bindMenuFilteredSaveSectors"
-      :visible-map-sectors="bindMenuVisibleMapSectors"
       :draft-anchor-sector-macro="draft.anchorSectorMacro"
       :current-bound-sector-macro="bindMenuCurrentBoundSectorMacro"
       :occupied-sector-macros="bindMenuOccupiedSectorMacros"

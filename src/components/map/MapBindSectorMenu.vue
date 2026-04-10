@@ -1,14 +1,17 @@
 <script setup lang="ts">
-import { nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useMapStore } from '@/store/useMapStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 
 interface SaveSectorCandidate {
   sectorMacro: string
   sectorName: string
 }
 
-interface VisibleSectorCandidate {
-  macro: string
+interface MapSectorCandidate {
+  sectorMacro: string
   displayName: string
 }
 
@@ -17,7 +20,6 @@ const props = defineProps<{
   targetSectorId: string | null
   triggerEl: HTMLElement | null
   filteredSaveSectors: SaveSectorCandidate[]
-  visibleMapSectors: VisibleSectorCandidate[]
   draftAnchorSectorMacro: string | null
   currentBoundSectorMacro: string | null
   occupiedSectorMacros: Set<string>
@@ -28,10 +30,15 @@ const emit = defineEmits<{
   (e: 'select-sector', sectorMacro: string): void
 }>()
 
-const { t } = useI18n()
+const { t, te, locale } = useI18n()
+const mapStore = useMapStore()
+const gameDataStore = useGameDataStore()
 
 const bindMenuRef = ref<HTMLElement | null>(null)
 const bindMenuStyle = ref<Record<string, string>>({})
+const searchQuery = ref('')
+
+const normalizedQuery = computed(() => searchQuery.value.trim().toLowerCase())
 
 function isSectorOccupied(sectorMacro: string): boolean {
   return props.occupiedSectorMacros.has(sectorMacro)
@@ -44,6 +51,104 @@ function isCurrentBoundSector(sectorMacro: string): boolean {
 function isDraftBoundSector(sectorMacro: string): boolean {
   return props.draftAnchorSectorMacro === sectorMacro
 }
+
+function filterSaveSectors(sectors: SaveSectorCandidate[]): SaveSectorCandidate[] {
+  if (!normalizedQuery.value) return sectors
+  return sectors.filter((sector) => {
+    const rawName = sector.sectorName
+    const displayName = sector.sectorName
+    return getLocalizedSectorQueryMatch({
+      rawName,
+      displayName,
+      normalizedQuery: normalizedQuery.value,
+      locale: locale.value
+    }).matched
+  })
+}
+
+function getMapSectorDisplayName(sectorMacro: string): string {
+  const resolved = mapStore.resolveSectorByMacro(sectorMacro)
+  if (resolved) {
+    const sector = resolved.sector
+    if (sector.nameId && te(sector.nameId)) {
+      return t(sector.nameId)
+    }
+    return sector.name || sectorMacro
+  }
+  return sectorMacro
+}
+
+function getAllMapSectors(): MapSectorCandidate[] {
+  const maps = gameDataStore.maps
+  const clusters = (maps as any)?.clusters || {}
+  const sectors = (maps as any)?.sectors || {}
+  const result: MapSectorCandidate[] = []
+
+  Object.entries(clusters).forEach(([_clusterId, cluster]: [string, any]) => {
+    if (gameDataStore.enforceDlcActivation && !gameDataStore.isDlcActive(cluster.dlc_tag)) {
+      return
+    }
+    ;(cluster.sectors || []).forEach((sectorId: string) => {
+      const sector = sectors[sectorId]
+      if (!sector) return
+      const sectorMacro = sector.macro || sector.id
+      result.push({
+        sectorMacro,
+        displayName: getMapSectorDisplayName(sectorMacro)
+      })
+    })
+  })
+
+  return result
+}
+
+function getVisibleMapSectors(): MapSectorCandidate[] {
+  if (!mapStore.shouldComputeVisibleSectors) {
+    return []
+  }
+  return mapStore.computeVisibleSectorCenters()
+}
+
+function filterMapSectors(sectors: MapSectorCandidate[]): MapSectorCandidate[] {
+  if (!normalizedQuery.value) return sectors
+  return sectors.filter((sector) => {
+    const rawName = sector.sectorMacro
+    const displayName = sector.displayName
+    return getLocalizedSectorQueryMatch({
+      rawName,
+      displayName,
+      normalizedQuery: normalizedQuery.value,
+      locale: locale.value
+    }).matched
+  })
+}
+
+const filteredSaveSectorsDisplay = computed(() => {
+  return filterSaveSectors(props.filteredSaveSectors)
+})
+
+const allMapSectors = computed(() => getAllMapSectors())
+
+const saveSectorMacros = computed(() => {
+  return new Set(props.filteredSaveSectors.map(s => s.sectorMacro))
+})
+
+const mapSectorsExcludingSave = computed(() => {
+  return allMapSectors.value.filter(s => !saveSectorMacros.value.has(s.sectorMacro))
+})
+
+const visibleMapSectorsRaw = computed(() => getVisibleMapSectors())
+
+const visibleMapSectorsExcludingSave = computed(() => {
+  return visibleMapSectorsRaw.value.filter(s => !saveSectorMacros.value.has(s.sectorMacro))
+})
+
+const filteredMapSectorsDisplay = computed(() => {
+  if (normalizedQuery.value) {
+    return filterMapSectors(mapSectorsExcludingSave.value)
+  }
+  return visibleMapSectorsExcludingSave.value
+})
 
 function updateBindMenuPosition() {
   const panel = document.querySelector('.map-save-panel, .map-binding-panel')
@@ -84,10 +189,6 @@ function onMenuSectorClick(sectorMacro: string) {
   emit('select-sector', sectorMacro)
 }
 
-function onVisibleSectorClick(sectorMacro: string) {
-  emit('select-sector', sectorMacro)
-}
-
 function onGlobalPointerDown(event: MouseEvent) {
   if (!props.open) return
   const menuRoot = bindMenuRef.value
@@ -106,6 +207,7 @@ function onViewportChange() {
 
 watch(() => props.open, (open) => {
   if (open) {
+    searchQuery.value = ''
     nextTick(() => updateBindMenuPosition())
   }
 })
@@ -131,11 +233,28 @@ onBeforeUnmount(() => {
       ref="bindMenuRef"
       :style="bindMenuStyle"
     >
+      <div class="bind-menu-search">
+        <input
+          v-model="searchQuery"
+          class="bind-menu-search-input"
+          type="text"
+          :placeholder="t('map.save_coord_search_placeholder')"
+        />
+        <button
+          v-if="searchQuery"
+          class="bind-menu-search-clear"
+          type="button"
+          @click="searchQuery = ''"
+        >
+          ×
+        </button>
+      </div>
+
       <div class="bind-menu-group">
         <div class="bind-menu-group-title">{{ t('map.binding_save_sector_candidates') }}</div>
-        <template v-if="filteredSaveSectors.length <= 10">
+        <template v-if="filteredSaveSectorsDisplay.length <= 10">
           <button
-            v-for="sector in filteredSaveSectors"
+            v-for="sector in filteredSaveSectorsDisplay"
             :key="sector.sectorMacro"
             type="button"
             class="bind-menu-item"
@@ -153,30 +272,33 @@ onBeforeUnmount(() => {
         <div v-else class="bind-menu-hint">
           {{ t('map.binding_filter_hint_search') }}
         </div>
-        <div v-if="filteredSaveSectors.length === 0" class="bind-menu-empty">
+        <div v-if="filteredSaveSectorsDisplay.length === 0" class="bind-menu-empty">
           {{ t('map.binding_no_unbound_sectors') }}
         </div>
       </div>
 
-      <div class="bind-menu-group">
+      <div v-if="filteredMapSectorsDisplay.length > 0 || !normalizedQuery" class="bind-menu-group">
         <div class="bind-menu-group-title">{{ t('map.binding_visible_sector_candidates') }}</div>
-        <template v-if="visibleMapSectors.length > 0 && visibleMapSectors.length <= 10">
+        <template v-if="filteredMapSectorsDisplay.length > 0 && filteredMapSectorsDisplay.length <= 10">
           <button
-            v-for="sector in visibleMapSectors"
-            :key="sector.macro"
+            v-for="sector in filteredMapSectorsDisplay"
+            :key="sector.sectorMacro"
             type="button"
             class="bind-menu-item"
-            :class="{ orange: isSectorOccupied(sector.macro) }"
-            :disabled="isSectorOccupied(sector.macro)"
-            @click="onVisibleSectorClick(sector.macro)"
+            :class="{ orange: isSectorOccupied(sector.sectorMacro) }"
+            :disabled="isSectorOccupied(sector.sectorMacro)"
+            @click="onMenuSectorClick(sector.sectorMacro)"
           >
             {{ sector.displayName }}
           </button>
         </template>
-        <div v-else-if="visibleMapSectors.length > 10" class="bind-menu-hint">
+        <div v-else-if="filteredMapSectorsDisplay.length > 10" class="bind-menu-hint">
           {{ t('map.binding_filter_hint_zoom') }}
         </div>
-        <div v-else class="bind-menu-empty">
+        <div v-else-if="normalizedQuery && filteredMapSectorsDisplay.length === 0" class="bind-menu-empty">
+          {{ t('map.binding_no_visible_sectors') }}
+        </div>
+        <div v-else-if="!normalizedQuery && filteredMapSectorsDisplay.length === 0" class="bind-menu-empty">
           {{ t('map.binding_no_visible_sectors') }}
         </div>
       </div>
@@ -206,6 +328,18 @@ onBeforeUnmount(() => {
 
 .bind-menu::-webkit-scrollbar-thumb:hover {
   @apply bg-amber-200/60;
+}
+
+.bind-menu-search {
+  @apply relative px-2 pb-2;
+}
+
+.bind-menu-search-input {
+  @apply w-full rounded border border-amber-300/30 bg-black/50 px-3 py-1.5 text-sm text-amber-50 outline-none placeholder:text-amber-100/40;
+}
+
+.bind-menu-search-clear {
+  @apply absolute right-3 top-1/2 -translate-y-1/2 text-amber-100/60 hover:text-amber-50;
 }
 
 .bind-menu-group {
