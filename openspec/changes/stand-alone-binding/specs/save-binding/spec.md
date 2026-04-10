@@ -92,7 +92,7 @@
 
 ### Requirement: Trade Station
 
-系统 MUST 将星区中转站作为独立类型，不参与量化生产。
+系统 MUST 将星区中转站作为独立类型；它不参与普通 station modules 生产计算，但在 save-binding source 下映射为量化生产中的 transit hub。
 
 #### Scenario: 创建星区中转站
 - **前提** 用户位于 binding station 规划上下文
@@ -101,11 +101,12 @@
 - **并且** SHALL NOT 保存 modules、settings、type 字段
 - **并且** SHALL 标记 binding dirty
 
-#### Scenario: 星区中转站不参与生产
+#### Scenario: 星区中转站映射为 transit hub
 - **前提** 某个 group 存在 `tradeStation`
 - **当** 量化生产计算 binding source
-- **那么** 系统 SHALL 忽略 `tradeStation`
-- **并且** 只使用 `stationPlans` 中的 planned modules
+- **那么** 系统 SHALL 将 `tradeStation` 映射为星区中转站 / transit hub
+- **并且** SHALL NOT 将 `tradeStation` 映射为普通 station
+- **并且** 普通 station modules 生产计算 SHALL 只使用 covered save station views 的 planned modules 与 virtual station plans
 
 #### Scenario: 绑定 save station 为中转站
 - **前提** 某个 save station 尚未绑定

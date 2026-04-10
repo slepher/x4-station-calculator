@@ -30,3 +30,7 @@
 - [x] T20. 清理旧 `EmpirePlan.saveBindings` 相关引用和旧 binding action
 - [x] T21. 运行 `npm run build`，修复编译错误并重复执行直到通过或明确 blocker
 - [x] T22. 将 Step 3 改为 station blueprint 来源，并在 Step 2 新建星区时复用定位星区菜单创建 group draft
+- [ ] T23. 点击 binding 入口时，如果当前 ordinary empire dirty，复用 dirty empire 新建确认流程；保存或放弃后再进入 binding，取消则中止
+- [ ] T24. 点击 binding 入口成功后，将量化生产 active source 切换到当前 `gameGuid` 对应的 `save-binding`
+- [ ] T25. 将 save-binding production adapter 改为基于 binding 派生视图：covered save stations 和 virtual stations 映射为空间站，未覆盖 save stations 不映射
+- [ ] T26. 在 save-binding production source 中将 `TradeStationBinding` 映射为 transit hub，而不是普通生产空间站

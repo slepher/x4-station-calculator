@@ -75,7 +75,7 @@ interface BindingStationPlan {
 
 ### Trade station
 
-`TradeStationBinding` 表示星区中转站，不参与量化生产：
+`TradeStationBinding` 表示星区中转站，不作为普通生产空间站参与 station modules 生产计算，但会在量化生产的 save-binding source 下映射为 transit hub：
 
 ```ts
 interface TradeStationBinding {
@@ -88,7 +88,8 @@ interface TradeStationBinding {
 ```
 
 **约束**：
-- `modules` 始终为 `[]`，不参与生产计算
+- `modules` 始终为 `[]`，不参与普通 station modules 生产计算
+- save-binding source 下需要把它映射为星区中转站 / transit hub
 - 同一 `saveStationCode` 不能同时存在于 `stationPlans[]` 和 `tradeStation`
 
 对于 save station，如果没有对应 `BindingStationPlan`，则视为存在一个派生 station view，但规划 modules 为空。进入 binding 时不自动创建 plan。
@@ -116,7 +117,7 @@ interface BindingStationView {
 - 若 `stationPlans` 中存在同 `saveStationCode` 的 `BindingStationPlan`，使用其 `modules/settings/name`。
 - 若不存在 plan，`plannedModules = []`。
 - `stationPlans` 中没有 `saveStationCode` 的 plan 是虚拟占位站 view。
-- `group.tradeStation` 作为独立的 trade station view，不进入生产计算。
+- `group.tradeStation` 作为独立的 trade station view，不进入普通 station modules 生产计算，但可映射为 transit hub。
 - `groupId` 不存在或为空的 station plan 是合法未分组规划；本次只保证数据层与全局量化可处理，详细 UI 后续规划。
 
 ## 关键决策
@@ -139,9 +140,10 @@ virtual station 表示“当前存档还没有建好，但用户想在 binding �
 
 ### D3: Trade station 不参与生产
 
-`TradeStationBinding` 表示星区中转站，其职责是物流中转而非生产。因此：
+`TradeStationBinding` 表示星区中转站，其职责是物流中转而非普通 station modules 生产。因此：
 - 不存储 `modules`、`settings`、`type` 字段
-- 量化生产计算时忽略 trade station
+- 普通 station 生产计算时忽略 trade station
+- save-binding source 需要把 trade station 映射到量化生产中的 transit hub 视角/模型
 - 同一 save station 不能同时作为生产站和中转站
 
 ### D4: Source empire 导入是单次复制
@@ -168,7 +170,17 @@ interface ProductionSource {
 }
 ```
 
-`empire` source 直接来自 empire stations。`save-binding` source 来自 `stationPlans`，并且只读取 `plannedModules`。trade station 和 save archive modules 不进入本次计算。
+`empire` source 直接来自 empire stations。`save-binding` source 来自 binding 派生视图，而不是只读取已物化的 `stationPlans[]`：
+
+- 对当前 archive 中被 `BindingSectorGroup.coverageSectorMacros` 覆盖的 save stations 生成普通 station 输入。
+- 若 covered save station 有同 `saveStationCode` 的 `BindingStationPlan`，使用该 plan 的 planned modules/settings/name。
+- 若 covered save station 没有 plan，仍生成空 modules station，对普通生产计算贡献为 0。
+- `stationPlans[]` 中没有 `saveStationCode` 的 virtual station 生成普通 station 输入。
+- `BindingSectorGroup.tradeStation` 生成 transit hub 输入，不生成普通 station 输入。
+- 不在任何 group coverage 内的 save station 不生成量化生产输入。
+- save archive 自身解析出的 modules 不进入本次计算。
+
+点击存档首页 binding 按钮后，量化生产 active source 需要切到该 `gameGuid` 对应的 `save-binding`。如果当前 active source 是普通 empire 且 active empire dirty，则在进入 binding 前复用 dirty empire 点击新建时的保存/放弃确认：保存或放弃后继续进入 binding，关闭确认则中止进入和 source 切换。
 
 ### D7: 平铺存储，树状展示
 
@@ -185,6 +197,8 @@ interface ProductionSource {
 ### Save homepage
 
 存档首页 binding 图标打开或创建对应 `gameGuid` 的唯一 binding。点击 guid 级入口打开 latest 视角，点击 time 级入口更新 `selectedArchiveTime` 并打开同一个 binding。
+
+进入 binding 前需要处理当前 ordinary empire 的未保存改动：如果量化生产当前 active source 是 `empire` 且 active empire dirty，系统先显示与“新建帝国”同源的 SmartSave 确认。用户选择保存或放弃后才继续进入 binding；用户关闭确认时停留在原状态。成功进入 binding 后，量化生产 active source 切换为当前 `gameGuid` 的 save-binding。
 
 ### Step 2: Binding groups
 
@@ -253,5 +267,5 @@ save panel 的 binding 分支标题栏右侧提供保存控制：
 - 覆盖范围变化会改变派生 save station view，但不会自动写入 stationPlans。
 - 导入 source empire station 后，修改 source empire 不会改变 binding planned modules。
 - virtual station 只由显式操作创建。
-- save-binding 生产 source 只使用 planned modules。
-- trade station 不参与量化生产计算。
+- save-binding 生产 source 的普通 station 计算只使用 planned modules，不读取 save archive 自身 modules。
+- trade station 映射为 transit hub，不参与普通 station modules 生产计算。

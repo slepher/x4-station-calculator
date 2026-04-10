@@ -72,9 +72,17 @@
 - 量化生产界面需要支持两类数据源：
   - `empire`：使用普通 empire stations。
   - `save-binding`：使用某个 `SaveBindingPlan` 派生出的规划 stations。
+- 点击存档首页的 binding 按钮后，系统需要将量化生产的 active source 切换到当前 `gameGuid` 对应的 `save-binding`，并使量化生产显示当前绑定存档对应的 binding。
+- 如果切换前当前 active source 是普通 empire，且 active empire 存在 dirty 改动，则进入 binding 前必须复用“dirty empire 点击新建”同源确认流程：
+  - 用户选择保存后，先保存当前 empire，再进入当前存档的 binding。
+  - 用户选择放弃后，放弃当前 empire 改动，再进入当前存档的 binding。
+  - 用户关闭或取消确认时，不进入 binding，也不切换量化生产 source。
 - 当数据源为 binding 时，量化生产只读取规划 modules；save modules 不参与本次计算。
-- binding 下覆盖范围内但没有规划 plan 的 save station 可显示为空规划，但对生产计算贡献为 0。
-- virtual station 和 save station plan 在本阶段的量化生产界面不需要区别对待显示。
+- binding 下覆盖范围内的 save station 必须映射为空间站；即使没有 `BindingStationPlan` 或 planned modules，也作为空规划空间站进入量化生产，对生产计算贡献为 0。
+- virtual station 必须映射为空间站。
+- 星区中转站必须映射为量化生产中的星区中转站 / transit hub，而不是普通生产空间站。
+- 没有归属任何 binding 星区组的 save station 不映射到量化生产；这里的“归属”由当前 archive 与 `BindingSectorGroup.coverageSectorMacros` 派生。
+- virtual station 和 save station plan 在本阶段的普通 station 展示中不需要区别对待显示。
 
 ### 9. 保存时机 UI
 
@@ -121,7 +129,11 @@
 10. `保存帝国` 不会保存 binding dirty 改动。
 11. 量化生产可以选择 ordinary empire 或 save binding 作为数据源。
 12. save-binding 数据源的生产计算只读取 binding 规划 modules。
-13. 星区总览不再显示星区管理面板，但原左侧占位仍存在，右侧资源视图不会因面板移除而扩张。
+13. 点击 binding 入口后，量化生产 active source 切换到当前 `gameGuid` 的 save-binding；若当前 ordinary empire dirty，则先走与 dirty empire 新建同源的保存/放弃确认。
+14. save-binding 数据源包含 covered save stations 和 virtual stations；covered save station 无 planning layer 时仍作为空 modules station 出现。
+15. save-binding 数据源将星区中转站映射为 transit hub，不把它当作普通生产空间站。
+16. 不在任何 binding group coverage 内的 save station 不映射到量化生产。
+17. 星区总览不再显示星区管理面板，但原左侧占位仍存在，右侧资源视图不会因面板移除而扩张。
 
 ## 未决项
 
