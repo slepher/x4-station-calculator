@@ -182,6 +182,19 @@ interface ProductionSource {
 
 点击存档首页 binding 按钮后，量化生产 active source 需要切到该 `gameGuid` 对应的 `save-binding`。如果当前 active source 是普通 empire 且 active empire dirty，则在进入 binding 前复用 dirty empire 点击新建时的保存/放弃确认：保存或放弃后继续进入 binding，关闭确认则中止进入和 source 切换。
 
+**派生空间站名称与星区归属**：
+
+空间站名称：
+- 若 covered save station 有对应 `BindingStationPlan`，使用 `plan.name`
+- 若无 plan，使用 save station 的 `code`
+
+空间站所属星区 (`sectorId`)：
+- 若 covered save station 有对应 `BindingStationPlan`，使用 `plan.groupId`
+- 若无 plan，通过 save station 的 `sectorMacro` 找到 `coverageSectorMacros` 包含该 `sectorMacro` 的 group，使用该 `group.id`
+- virtual station（无 `saveStationCode`）使用 `plan.groupId`
+
+此逻辑在 `deriveBindingStations` 和 `buildSaveBindingProductionFlows` 中实现，确保 `station.sectorId` 正确指向所属 binding group，供 `StationTabBar` 等组件使用。
+
 ### D7: 平铺存储，树状展示
 
 `groups[]` 与 `stationPlans[]` 平铺保存，但 trade station 是 group 内部单体字段。`stationPlans[]` 保存 save-station 和 virtual-station 的规划数据，方便按 `gameGuid`、`saveStationCode`、`groupId` 做唯一性检查和全局生产汇总。UI 需要树状结构时使用 view model 组装。未分组 station plan 允许存在，后续可在量化生产输出区作为单独 bucket 展示。
@@ -191,6 +204,35 @@ interface ProductionSource {
 `empire` 不再拥有星区，因此星区总览中的 `SectorManagementPanel` 不再有业务对象。`save-binding` 虽然拥有 binding groups，但它们由 save binding Step 2 管理，不应复用星区总览入口。
 
 因此总览态应移除星区管理面板内容，但保留原左侧布局占位。占位的职责只是稳定布局，避免右侧资源视图在面板移除后横向扩张或产生明显跳变。
+
+### D9: Production source 路由架构
+
+`useEmpireStore` 持有 `productionSource` ref，控制数据源切换：
+
+```ts
+productionSource: 'empire' | 'save-binding'
+```
+
+**核心属性路由**：
+
+- `sectors`：empire 模式返回 `activeEmpire.sectors`，binding 模式返回 `binding.groups`（映射为 SectorLike）
+- `orderedStationsBySector`：binding 模式使用 `deriveBindingStations` 派生空间站列表
+- `activeStationId`：computed 双向绑定，binding 模式路由到 `saveBindingStore.activeStationId`
+- `activeStation`：binding 模式从派生列表查找
+
+**切换方法**：
+
+```ts
+switchToBinding(gameGuid): { needsConfirm: boolean }
+confirmSwitchToBinding(gameGuid): void
+switchToEmpire(): void
+```
+
+`switchToBinding` 检查 empire dirty 状态，返回 `needsConfirm` 供 UI 显示确认对话框。用户确认后调用 `confirmSwitchToBinding`。
+
+**数据层分离**：
+
+`useEmpireDataStore` 负责纯数据持久化，`useEmpireStore` 调用其方法处理 localStorage。此分离为后续支持多数据源切换奠定基础。
 
 ## UI 设计
 

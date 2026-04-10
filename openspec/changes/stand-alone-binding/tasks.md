@@ -5,6 +5,8 @@
 - [x] D1. 创建 `request.md` 并记录独立 binding、按需 station plan、显式保存、量化生产数据源等已确认方案
 - [x] D2. 创建 `design.md` 并说明 store、派生视图、UI 和保存策略
 - [x] D3. 创建 delta specs 覆盖 save binding、empire 管理、地图 binding、量化生产和星区总览
+- [x] D4. 更新 `design.md` 添加派生空间站名称与星区归属逻辑说明
+- [x] D5. 更新 `design.md` 添加 D9: Production source 路由架构说明
 
 ## Implementation
 
@@ -50,3 +52,23 @@
 - [x] T37. 更新 `MapSavePanel.vue` 使用 `switchToBinding()` 替代直接操作
 - [x] T38. 移除 `ProductionWorkbenchView.vue` 中的手动 `productionSource` 管理
 - [x] T39. 运行 `npm run build` 验证所有改动
+
+## 空间站名称与星区归属 (Phase 3)
+
+- [x] T40. 修正 `deriveBindingStations` 计算 groupId：有 plan 用 plan.groupId，无 plan 通过 sectorMacro 找 group
+- [x] T41. 设置 `station.sectorId = groupId` 确保 UI 组件兼容
+- [x] T42. 更新 `design.md` 记录名称与星区逻辑
+
+## 当前状态
+
+**已完成**：T1-T42 全部完成，Phase 1-3 完整实现。
+
+**Build 状态**：通过 ✓
+
+**核心实现**：
+- `useEmpireDataStore` 纯数据层
+- `productionSource` ref 控制数据源
+- `sectors`/`orderedStationsBySector`/`activeStationId` 路由
+- `deriveBindingStations` 派生空间站列表
+- `switchToBinding`/`confirmSwitchToBinding` 切换方法
+- 空间站名称与星区归属正确计算
