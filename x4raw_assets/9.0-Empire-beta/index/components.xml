@@ -2950,6 +2950,23 @@
   <entry name="test_etienne_turret_spl_m_laser_02_mk2" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_laser_02_mk2"/>
   <entry name="test_etienne_turret_spl_m_plasma_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_plasma_02_mk1"/>
   <entry name="test_etienne_turret_spl_m_shotgun_02_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_spl_m_shotgun_02_mk1"/>
+  <entry name="test_markus_turret_arg_l_laser_01_mk1" value="assets\test\markus\test_markus_turret_arg_l_laser_01_mk1"/>
+  <entry name="test_etienne_turret_arg_l_laser_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_l_laser_01_mk1"/>
+  <entry name="test_etienne_turret_arg_l_plasma_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_l_plasma_01_mk1"/>
+  <entry name="test_etienne_turret_arg_l_beam_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_l_beam_01_mk1"/>
+  <entry name="test_etienne_turret_arg_l_dumbfire_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_l_dumbfire_01_mk1"/>
+  <entry name="test_etienne_turret_arg_l_guided_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_l_guided_01_mk1"/>
+  <entry name="test_etienne_turret_arg_l_mining_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_arg_l_mining_01_mk1"/>
+  <entry name="test_etienne_turret_par_l_laser_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_par_l_laser_01_mk1"/>
+  <entry name="test_etienne_turret_par_l_plasma_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_par_l_plasma_01_mk1"/>
+  <entry name="test_etienne_turret_par_l_beam_01_mk1" value="assets\test\etienne\props\weaponsystems\test_etienne_turret_par_l_beam_01_mk1"/>
+  <entry name="muzzle_kha_s_beam_01_mk1" value="assets\fx\weaponFx\muzzle_kha_s_beam_01_mk1"/>
+  <entry name="impact_kha_s_beam_01_mk1" value="assets\fx\weaponFx\impact_kha_s_beam_01_mk1"/>
+  <entry name="muzzle_kha_m_beam_01_mk1" value="assets\fx\weaponFx\muzzle_kha_m_beam_01_mk1"/>
+  <entry name="impact_kha_m_beam_01_mk1" value="assets\fx\weaponFx\impact_kha_m_beam_01_mk1"/>
+  <entry name="muzzle_par_m_railgun_01_mk1" value="assets\fx\weaponFx\muzzle_par_m_railgun_01_mk1"/>
+  <entry name="impact_par_m_railgun_01_mk1" value="assets\fx\weaponFx\impact_par_m_railgun_01_mk1"/>
+  <entry name="test_markus_turret_arg_l_laser_01_mk1_b51" value="assets\test\markus\test_markus_turret_arg_l_laser_01_mk1_b51"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>

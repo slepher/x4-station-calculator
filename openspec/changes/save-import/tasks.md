@@ -311,6 +311,32 @@
 4. 修复所有编译错误
 5. 重新运行build直到成功
 
+---
+
+### T15: Save Parser Shape 扩展
+
+**Scope**: Player Station 与 BuildStorage 数据结构扩展
+
+**Files**:
+- `rust-parser/src/model.rs` - 类型定义更新
+- `rust-parser/src/core.rs` - 解析逻辑扩展
+- `src/types/saveArchive.ts` - TS 类型定义更新
+- `src/workers/saveParser.post.ts` - 后处理 enrich 逻辑
+
+**Steps**:
+1. [ ] P1. 为 `PlayerStationConstruction` 增加 `id` 字段
+2. [ ] P2. 为 `PlayerStationEntry` 增加 `component_id` / `cargo` / `reservation` / `buildstorage_code` 字段
+3. [ ] P3. 为 `SectorData` 增加 `player_buildstorages` map
+4. [ ] P4. `buildstorage` 仅解析 `inprogress`，输出 `cargo` / `reservation` / `constructions` / `progress`
+5. [ ] P5. `buildstorage.progress` 仅保留 `start` / `end` / `sequenceindex`
+6. [ ] P6. 使用 `buildstorage/buildtasks/inprogress/build/@component = station/@id` 建立 `station_code/buildstorage_code` 引用
+7. [ ] P7. parser 输出的 `id` / `component_id` 去掉外层 `[]`
+8. [ ] P8. `SectorData` 下实体集合改为 `snake_case` 的 map
+9. [ ] P9. `BuildStorageRef` 重命名为 `BuildStorageEntry`
+10. [ ] P10. `player_buildstorages[*].constructions[*]` 补齐 `equipments`
+11. [ ] P11. 所有 station / player_buildstorage 的 `modules` / `equipments` 改为 `Record<ref, entry>`
+12. [ ] P12. `postProcessRustSaveArchive()` 为 `modules` 补 `module_id`，为 `equipments` 补 `equipment_id`
+
 ## Task Dependencies
 
 ```
@@ -322,6 +348,7 @@ T5 (detail) → T6
 T6 (view) → T7, T8
 T9 (export) → T4
 T10 (i18n) → T7
+T15 (parser shape) → T2
 T14 (build) ← all tasks
 ```
 
@@ -343,3 +370,4 @@ T14 (build) ← all tasks
 | T12 | completed | `saveParser.post.ts` 已承接版本常量、坐标后处理、模块 enrich 与 `isValid` 生成 |
 | T13 | completed | `zones/shcon_anchors` 迁移完成，地图侧无效存档已禁止进入二级菜单 |
 | T14 | completed | 已执行 rust-parser/build.sh；相关单测已覆盖版本恢复与无效存档交互 |
+| T15 | pending | Save Parser Shape 扩展（P1-P12） |

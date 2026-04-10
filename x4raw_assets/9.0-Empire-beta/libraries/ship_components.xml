@@ -4243,7 +4243,7 @@
       <connection name="ConnectionForpart_engines" tags="engineeffect forceoutline part platformcollision "/>
       <connection name="enginealign" tags="enginealign "/>
       <connection name="ConnectionForanim_flame_02" tags="animation detail_l engineeffect fx nocollision part speedscale_forward textureanimation useobjectrotation "/>
-      <connection name="ConnectionFordetail_m_decals1876420117312" group=" " tags="envmap_cockpit iklink part " parent="part_main"/>
+      <connection name="ConnectionFordetail_m_decals2893182319296" group=" " tags="envmap_cockpit iklink part " parent="part_main"/>
     </connections>
   </component>
   <component name="ship_par_m_trans_container_02" class="ship_m">
@@ -9699,69 +9699,69 @@
   <component name="ship_xen_xl_carrier_01" class="ship_xl">
     <connections>
       <connection name="con_engine_01" group="group10 " tags="engine extralarge  standard "/>
-      <connection name="con_engine_02" group="group11 " tags="engine extralarge  standard "/>
+      <connection name="con_engine_02" group="group10 " tags="engine extralarge  standard "/>
       <connection name="connection_cockpit" tags="cockpit cockpit_visible"/>
-      <connection name="connection_turret_large_xe01" group="group01 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe02" group="group02 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_large_xe01" group="group01 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe02" group="group02 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen20" group="group01 " tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen18" group="group03 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_large_xe03" group="group03 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe04" group="group04 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_large_xe03" group="group03 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe04" group="group04 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen17" group="group04 " tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen19" group="group02 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_medium_xe14" group="group05 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe12" group="group06 " tags="turret medium standard hittable  combat"/>
+      <connection name="connection_turret_medium_xe14" group="group05 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe12" group="group06 " tags="turret medium standard hittable  combat "/>
       <connection name="connection_shieldgen16" group="group05 " tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen15" group="group06 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_medium_xe10" group="group07 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe08" group="group07 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe06" group="group07 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe04" group="group07 " tags="turret medium standard hittable  combat"/>
+      <connection name="connection_turret_medium_xe10" group="group07 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe08" group="group07 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe06" group="group07 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe04" group="group07 " tags="turret medium standard hittable  combat "/>
       <connection name="connection_shieldgen14" group="group07 " tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen13" group="group07 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_large_xe05" group="group08 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe06" group="group08 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_large_xe05" group="group08 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe06" group="group08 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen12" group="group08 " tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen10" group="group10 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_medium_xe20" group="group18 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe19" group="group18 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe18" group="group18 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_shieldgen09" group="group11 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_medium_xe17" group="group19 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe16" group="group19 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe15" group="group19 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_large_xe07" group="group09 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe08" group="group09 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_medium_xe20" group="group18 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe19" group="group18 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe18" group="group18 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_shieldgen09" group="group10 " tags="medium shield hittable  standard "/>
+      <connection name="connection_turret_medium_xe17" group="group19 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe16" group="group19 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe15" group="group19 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_large_xe07" group="group09 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe08" group="group09 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen11" group="group09 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_large_xe09" group="group12 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe10" group="group12 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_large_xe09" group="group12 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe10" group="group12 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen08" group="group12 " tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen07" group="group12 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_large_xe11" group="group13 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_large_xe11" group="group13 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen06" group="group13" tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen05" group="group13 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_large_xe12" group="group13 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_large_xe12" group="group13 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen04" group="group14 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_large_xe13" group="group14 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe14" group="group14 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_medium_xe13" group="group15 " tags="turret medium standard hittable  combat"/>
+      <connection name="connection_turret_large_xe13" group="group14 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe14" group="group14 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_medium_xe13" group="group15 " tags="turret medium standard hittable  combat "/>
       <connection name="connection_shieldgen03" group="group15 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_medium_xe11" group="group15 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe09" group="group15 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe07" group="group15 " tags="turret medium standard hittable  combat"/>
+      <connection name="connection_turret_medium_xe11" group="group15 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe09" group="group15 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe07" group="group15 " tags="turret medium standard hittable  combat "/>
       <connection name="connection_shieldgen02" group="group16 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_medium_xe05" group="group16 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe03" group="group16 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe02" group="group16 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_medium_xe01" group="group16 " tags="turret medium standard hittable  combat"/>
-      <connection name="connection_turret_large_xe15" group="group14 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe16" group="group14 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_medium_xe05" group="group16 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe03" group="group16 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe02" group="group16 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_medium_xe01" group="group16 " tags="turret medium standard hittable  combat "/>
+      <connection name="connection_turret_large_xe15" group="group14 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe16" group="group14 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen01" group="group14 " tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen21" group="group17 " tags="medium shield hittable  standard "/>
-      <connection name="connection_turret_large_xe17" group="group17 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe18" group="group17 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe19" group="group17 " tags="turret large standard  combat"/>
-      <connection name="connection_turret_large_xe20" group="group17 " tags="turret large standard  combat"/>
+      <connection name="connection_turret_large_xe17" group="group17 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe18" group="group17 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe19" group="group17 " tags="turret large standard  combat "/>
+      <connection name="connection_turret_large_xe20" group="group17 " tags="turret large standard  combat "/>
       <connection name="connection_shieldgen22" group="group17 " tags="medium shield hittable  standard "/>
       <connection name="connection_shieldgen_external03" tags="extralarge shield standard "/>
       <connection name="connection_shieldgen_external04" tags="extralarge shield standard "/>

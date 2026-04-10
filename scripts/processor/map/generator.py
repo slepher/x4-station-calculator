@@ -11,6 +11,7 @@ import xml.etree.ElementTree as ET
 from processor.path_utils import get_map_xml_path
 from processor.utils.math_utils import (
     as_float,
+    compact_number,
     pos_from,
     pos3d_from,
     quaternion_from,
@@ -526,14 +527,14 @@ def generate_map_data(
                 region_offset = link.get("offset", {"x": 0.0, "y": 0.0, "z": 0.0})
                 cluster_rotation = link.get("rotation")
                 cluster_pos = {
-                    "x": region_offset.get("x", 0.0),
-                    "y": region_offset.get("y", 0.0),
-                    "z": region_offset.get("z", 0.0),
+                    "x": compact_number(region_offset.get("x", 0.0)),
+                    "y": compact_number(region_offset.get("y", 0.0)),
+                    "z": compact_number(region_offset.get("z", 0.0)),
                 }
                 relative_pos = {
-                    "x": region_offset.get("x", 0.0) - sector_local_pos.get("x", 0.0),
-                    "y": region_offset.get("y", 0.0) - sector_local_pos.get("y", 0.0),
-                    "z": region_offset.get("z", 0.0) - sector_local_pos.get("z", 0.0),
+                    "x": compact_number(region_offset.get("x", 0.0) - sector_local_pos.get("x", 0.0)),
+                    "y": compact_number(region_offset.get("y", 0.0) - sector_local_pos.get("y", 0.0)),
+                    "z": compact_number(region_offset.get("z", 0.0) - sector_local_pos.get("z", 0.0)),
                 }
                 region_position_map[(sector_id, region_ref, region_name)] = {
                     "position": relative_pos,
@@ -780,7 +781,10 @@ def generate_map_data(
                 "template_kind": template_kind,
                 "slot": slot_name,
                 "sector_radius_ratio": radius_ratio,
-                "center_offset_ratio": {"x": offset_ratio["x"], "y": offset_ratio["y"]},
+                "center_offset_ratio": {
+                    "x": compact_number(offset_ratio["x"]),
+                    "y": compact_number(offset_ratio["y"]),
+                },
                 "scale_per_radius": scale_per_radius,
                 "scale_basis": {
                     "hex_inner_ratio": inner_ratio,
@@ -788,7 +792,11 @@ def generate_map_data(
                     "max_extent": max_extent,
                 },
             }
-            sectors[sector_id]["raw_center_pos"] = {"x": sector_center["x"], "y": sector_center["y"], "z": sector_center["z"]}
+            sectors[sector_id]["raw_center_pos"] = {
+                "x": compact_number(sector_center["x"]),
+                "y": compact_number(sector_center["y"]),
+                "z": compact_number(sector_center["z"]),
+            }
 
     for gate_id, gate in cluster_links.items():
         sector_id = gate["sector_id"]
@@ -811,7 +819,7 @@ def generate_map_data(
         raw = zone["raw_local_pos"]
         zone["raw_local_pos"] = {
             "x": raw["x"],
-            "y": raw.get("y", 0.0),
+            "y": compact_number(raw.get("y", 0.0)),
             "z": raw["z"],
             "sx": (raw["x"] - sector_center["x"]) * scale_per_radius,
             "sy": -(raw["z"] - sector_center["z"]) * scale_per_radius,
@@ -871,10 +879,16 @@ def generate_map_data(
             if not sector_id or sector_id not in sectors:
                 continue
 
-            base_pos = {"x": as_float(station_node.get("x"), 0.0), "z": as_float(station_node.get("z"), 0.0)}
+            base_pos = {
+                "x": compact_number(as_float(station_node.get("x"), 0.0)),
+                "z": compact_number(as_float(station_node.get("z"), 0.0)),
+            }
             position = station_node.find("./position")
             if position is not None:
-                base_pos = {"x": as_float(position.get("x"), 0.0), "z": as_float(position.get("z"), 0.0)}
+                base_pos = {
+                    "x": compact_number(as_float(position.get("x"), 0.0)),
+                    "z": compact_number(as_float(position.get("z"), 0.0)),
+                }
 
             if location_class == "zone":
                 zone_id = zone_macro_by_lower.get(location_macro.lower())
@@ -888,8 +902,8 @@ def generate_map_data(
             scale_per_radius = sector_norm["scale_per_radius"]
             sector_center = sector_centers.get(sector_id, {"x": 0.0, "z": 0.0})
             station_sector_pos = {
-                "x": raw_sector_pos["x"],
-                "z": raw_sector_pos["z"],
+                "x": compact_number(raw_sector_pos["x"]),
+                "z": compact_number(raw_sector_pos["z"]),
                 "sx": (raw_sector_pos["x"] - sector_center["x"]) * scale_per_radius,
                 "sy": -(raw_sector_pos["z"] - sector_center["z"]) * scale_per_radius,
             }

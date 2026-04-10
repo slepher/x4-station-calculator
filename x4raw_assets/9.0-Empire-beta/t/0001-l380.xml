@@ -2719,6 +2719,7 @@
     <t id="9654">Production Module</t>
     <t id="9655">Boost Acceleration Multiplier</t>
     <t id="9656">Disrupts Recharge of L and XL Shields</t>
+    <t id="9657">Unknown production method</t>
     <t id="9700">(User question)</t>
     <t id="9701">Хакерство</t>
     <t id="9702">Ви збираєтеся зламати</t>
@@ -3926,9 +3927,9 @@
     <t id="13226">Currently edited ship has incompatible missiles.</t>
     <t id="13227">Travel Drive Stability</t>
     <t id="13300">(Input bar)</t>
-    <t id="13301">Pan</t>
+    <t id="13301">Pan View</t>
     <t id="13302">Reset Position</t>
-    <t id="13303">Rotate</t>
+    <t id="13303">Rotate View</t>
     <t id="13304">Reset Rotation</t>
     <t id="13305">Zoom</t>
     <t id="13306">Emulated Mouse Cursor</t>
