@@ -7,6 +7,8 @@ import type { StationType } from '@/types/x4'
 const empireStore = useEmpireStore()
 const { t } = useI18n()
 
+const isBindingMode = computed(() => empireStore.productionSource === 'save-binding')
+
 // 状态管理
 const showMenu = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
@@ -98,6 +100,7 @@ const openOverview = () => {
 
 // 右键菜单逻辑
 const openMenu = (stationId: string, event: MouseEvent) => {
+  if (isBindingMode.value) return
   event.preventDefault()
   menuStationId.value = stationId
   
@@ -293,7 +296,7 @@ const cancelDelete = () => {
         </div>
       </div>
 
-      <button class="add-btn" @click="addNewStation" :title="t('sector.add_station')">
+      <button v-if="!isBindingMode" class="add-btn" @click="addNewStation" :title="t('sector.add_station')">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
