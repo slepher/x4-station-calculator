@@ -202,6 +202,7 @@ function getPoiLabel(poi: SavePoiOverlayItem): string {
       <input
         v-model="searchQuery"
         class="search-input"
+        name="coord-search"
         :placeholder="t('map.save_coord_search_placeholder')"
         type="text"
       />
