@@ -19,6 +19,7 @@ import type {
 } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
+import { useSaveBindingStore } from './useSaveBindingStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './logic/sectorLinkFlow'
 import { buildTransitHubViewModel } from './logic/transitHubViewModel'
@@ -91,10 +92,12 @@ interface SectorLinkCalcEntry {
 export const useEmpireStore = defineStore('empire', () => {
   const gameData = useGameDataStore()
   const empireDataStore = useEmpireDataStore()
+  const saveBindingStore = useSaveBindingStore()
   const { savedEmpires } = storeToRefs(empireDataStore)
 
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
+  const productionSource = ref<'empire' | 'save-binding'>('empire')
 
   const version = computed(() => savedEmpires.value.version)
   const empires = computed(() => savedEmpires.value.list)
@@ -1010,6 +1013,25 @@ export const useEmpireStore = defineStore('empire', () => {
     }
   }
 
+  function switchToBinding(gameGuid: string): { needsConfirm: boolean } {
+    if (productionSource.value === 'empire' && isDirty.value) {
+      return { needsConfirm: true }
+    }
+    productionSource.value = 'save-binding'
+    saveBindingStore.createOrOpenBinding(gameGuid)
+    return { needsConfirm: false }
+  }
+
+  function confirmSwitchToBinding(gameGuid: string) {
+    productionSource.value = 'save-binding'
+    saveBindingStore.createOrOpenBinding(gameGuid)
+  }
+
+  function switchToEmpire() {
+    productionSource.value = 'empire'
+    activeStationId.value = null
+  }
+
   return {
     isReady,
     isDirty,
@@ -1078,6 +1100,10 @@ export const useEmpireStore = defineStore('empire', () => {
     shouldConfirmBeforeEmpireReset,
     resetEmpireWithDefaultName,
     takeSnapshot,
-    initialize
+    initialize,
+    productionSource,
+    switchToBinding,
+    confirmSwitchToBinding,
+    switchToEmpire
   }
 })

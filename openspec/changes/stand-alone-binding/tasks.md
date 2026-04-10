@@ -40,13 +40,13 @@
 - [x] T27. 扩展 `useSaveBindingStore` 添加 `activeStationId`、`selectStation`、`updateStationPlan`、`createStationPlanInGroup`
 - [x] T28. 创建 `useEmpireDataStore` 纯数据持久化层，提取 localStorage 操作
 - [x] T29. 修改 `useEmpireStore` 使用 `useEmpireDataStore` 保持 API 兼容
-- [ ] T30. 在 `useEmpireStore` 添加 `productionSource` ref，支持 `'empire' | 'save-binding'`
+- [x] T30. 在 `useEmpireStore` 添加 `productionSource` ref，支持 `'empire' | 'save-binding'`
 - [ ] T31. 重构 `useEmpireStore.stations` computed 根据 `productionSource` 路由到 empire 或 binding 数据
 - [ ] T32. 重构 `useEmpireStore.sectors` computed 根据 `productionSource` 路由（binding groups 作为 sectors）
 - [ ] T33. 重构 `useEmpireStore.activeStation`/`activeStationId` 根据 `productionSource` 路由
 - [ ] T34. 重构 `useEmpireStore.selectStation()` 方法根据 `productionSource` 路由
 - [ ] T35. 重构 `useEmpireStore.createStation()`/`deleteStation()` 根据 `productionSource` 路由
-- [ ] T36. 添加 `useEmpireStore.switchToBinding(gameGuid)` 方法处理切换逻辑和 dirty 确认
-- [ ] T37. 更新 `MapSavePanel.vue` 使用 `switchToBinding()` 替代直接操作
-- [ ] T38. 移除 `ProductionWorkbenchView.vue` 中的手动 `productionSource` 管理
-- [ ] T39. 运行 `npm run build` 验证所有改动
+- [x] T36. 添加 `useEmpireStore.switchToBinding(gameGuid)` 方法处理切换逻辑和 dirty 确认
+- [x] T37. 更新 `MapSavePanel.vue` 使用 `switchToBinding()` 替代直接操作
+- [x] T38. 移除 `ProductionWorkbenchView.vue` 中的手动 `productionSource` 管理
+- [x] T39. 运行 `npm run build` 验证所有改动
