@@ -45,7 +45,6 @@ export const useEmpireDataStore = defineStore('empireData', () => {
   const savedEmpires = ref<SavedEmpiresState>({
     version: CURRENT_EMPIRE_VERSION,
     activeId: null,
-    activeStationId: null,
     list: []
   })
 
@@ -54,10 +53,6 @@ export const useEmpireDataStore = defineStore('empireData', () => {
   const activeId = computed({
     get: () => savedEmpires.value.activeId,
     set: (id: string | null) => { savedEmpires.value.activeId = id }
-  })
-  const persistedActiveStationId = computed({
-    get: () => savedEmpires.value.activeStationId,
-    set: (id: string | null) => { savedEmpires.value.activeStationId = id }
   })
 
   function saveToStorage(): void {
@@ -130,10 +125,6 @@ export const useEmpireDataStore = defineStore('empireData', () => {
 
   function setActiveEmpire(id: string | null): void {
     savedEmpires.value.activeId = id
-  }
-
-  function setPersistedActiveStationId(id: string | null): void {
-    savedEmpires.value.activeStationId = id
   }
 
   function createStationInEmpire(empire: EmpirePlan | null, name: string, type: StationType = 'industrial'): StationPlan | null {
@@ -371,7 +362,6 @@ export const useEmpireDataStore = defineStore('empireData', () => {
     version,
     empires,
     activeId,
-    persistedActiveStationId,
     getStorageKey,
     saveToStorage,
     loadFromStorage,
@@ -383,7 +373,6 @@ export const useEmpireDataStore = defineStore('empireData', () => {
     getEmpireById,
     updateEmpire,
     setActiveEmpire,
-    setPersistedActiveStationId,
     createStationInEmpire,
     deleteStationFromEmpire,
     duplicateStationInEmpire,

@@ -461,7 +461,6 @@ export interface EmpirePlan {
 export interface SavedEmpiresState {
   version: number;
   activeId: string | null;
-  activeStationId: string | null;
   list: EmpirePlan[];
 }
 
@@ -471,7 +470,6 @@ export interface SavedEmpiresState {
 export interface V2StorageState {
   version: 2;
   activeEmpireId: string | null;
-  activeStationId: string | null;
   empires: EmpirePlan[];
 }
 

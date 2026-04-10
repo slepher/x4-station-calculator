@@ -2,6 +2,7 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
+import { useActiveViewStore } from './useActiveViewStore'
 import type {
   ConnectionValue,
   EquipmentType,
@@ -92,6 +93,7 @@ const BUILT_IN_PRESETS: Array<{ key: BuiltInPresetKey; labelKey: string }> = [
 
 export const useShipBuildStore = defineStore('ship-build', () => {
   const gameData = useGameDataStore()
+  const activeViewStore = useActiveViewStore()
 
   const canUseDlcTag = (dlcTag: string | null | undefined) => {
     if (!gameData.enforceDlcActivation) return true
@@ -135,9 +137,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const dronesMap = computed(() => consumableDatas.value.dronesMap)
   const missilesMap = computed(() => consumableDatas.value.missilesMap)
 
-  const activeView = ref<StationActiveView>(
-    (localStorage.getItem('x4_station_active_view') as StationActiveView) || 'production'
-  )
+  const activeView = computed({
+    get: () => activeViewStore.activeView,
+    set: (val: StationActiveView) => { activeViewStore.setActiveView(val) }
+  })
   const viewMode = ref<ShipBuildViewMode>('selector')
   const statsViewMode = ref<ShipBuildStatsViewMode>('summary')
   const fitMode = ref<FitMode>('connection')
@@ -172,10 +175,6 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       map.set(ware.id, ware)
     })
     return map
-  })
-
-  watch(activeView, (val) => {
-    localStorage.setItem('x4_station_active_view', val)
   })
 
   // Load blueprints from localStorage

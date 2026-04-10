@@ -120,7 +120,6 @@ function migrateLegacyV1ToV2(raw: V1StorageState): SavedEmpiresState {
   return {
     version: 2,
     activeId: list[0]?.id || null,
-    activeStationId: list[0]?.stations[0]?.id || null,
     list
   }
 }
@@ -164,16 +163,9 @@ function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]):
     activeId = list[0]?.id || null
   }
 
-  let activeStationId = raw.activeStationId || null
-  if (activeStationId && !list.some((empire) => (empire.stations || []).some((station) => station.id === activeStationId))) {
-    const activeEmpire = list.find((empire) => empire.id === activeId) || list[0]
-    activeStationId = activeEmpire?.stations?.[0]?.id || null
-  }
-
   return {
     version: raw.version,
     activeId,
-    activeStationId,
     list
   }
 }
@@ -194,7 +186,6 @@ export function migrateEmpireStateToCurrent(
       working = {
         version: 2,
         activeId: (input as SavedEmpiresState).activeId || null,
-        activeStationId: (input as SavedEmpiresState).activeStationId || null,
         list: deepClone((input as SavedEmpiresState).list || [])
       }
     }
@@ -203,7 +194,6 @@ export function migrateEmpireStateToCurrent(
     working = {
       version: typeof inState.version === 'number' ? inState.version : 2,
       activeId: inState.activeId || null,
-      activeStationId: inState.activeStationId || null,
       list: deepClone(inState.list || [])
     }
   }

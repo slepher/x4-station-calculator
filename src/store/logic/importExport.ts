@@ -327,7 +327,6 @@ function coerceEmpireState(value: unknown): CoercedEmpireState | null {
   return {
     version,
     activeId: typeof raw.activeId === 'string' ? raw.activeId : null,
-    activeStationId: typeof raw.activeStationId === 'string' ? raw.activeStationId : null,
     list: list as SavedEmpiresState['list']
   }
 }
@@ -433,13 +432,11 @@ function remapEmpireIds(input: SavedEmpiresState): { state: SavedEmpiresState; a
   })
 
   const mappedActiveEmpireId = input.activeId ? empireIdMap.get(input.activeId) || null : null
-  const mappedActiveStationId = input.activeStationId ? stationIdMap.get(input.activeStationId) || null : null
 
   return {
     state: {
       version: CURRENT_EMPIRE_VERSION,
       activeId: mappedActiveEmpireId,
-      activeStationId: mappedActiveStationId,
       list
     },
     activeChangedTo: mappedActiveEmpireId
@@ -546,7 +543,6 @@ function mergeEmpireState(current: SavedEmpiresState, incoming: SavedEmpiresStat
   return {
     version: CURRENT_EMPIRE_VERSION,
     activeId: current.activeId,
-    activeStationId: current.activeStationId,
     list: [...deepClone(current.list), ...deepClone(incoming.list)]
   }
 }
@@ -1111,29 +1107,23 @@ function applyEmpireImport(options: ImportApplyOptions, warnings: string[]): boo
 
   let next: SavedEmpiresState
   let incomingActiveId: string | null = migrated.activeId || null
-  let incomingActiveStationId: string | null = migrated.activeStationId || null
-
   if (options.mode === 'overwrite') {
     next = migrated
   } else {
     const remapped = remapEmpireIds(migrated)
     incomingActiveId = remapped.state.activeId
-    incomingActiveStationId = remapped.state.activeStationId
     next = mergeEmpireState(current, remapped.state)
 
     const canUpdate = shouldUpdateActiveIncremental(current.activeId, isEmpireActiveEmpty(current), options.empireStore.isDirty)
     if (canUpdate && incomingActiveId) {
       next.activeId = incomingActiveId
-      next.activeStationId = incomingActiveStationId
     } else {
       next.activeId = current.activeId
-      next.activeStationId = current.activeStationId
     }
   }
 
   if (options.mode === 'overwrite' && !next.activeId && next.list.length > 0) {
     next.activeId = next.list[0]?.id || null
-    next.activeStationId = next.list[0]?.stations[0]?.id || null
     warnings.push('Empire activeId was missing; fallback to first empire.')
   }
 

@@ -558,12 +558,8 @@ const activeEmpire = ref<EmpirePlan | null>(null)
         const sessionTabId = sessionStorage.getItem(SESSION_ACTIVE_STATION_KEY)
         if (isValidTabId(sessionTabId)) {
           activeStationId.value = sessionTabId
-        } else if (migrated.state.activeStationId === null) {
-          activeStationId.value = null
-        } else if (isValidTabId(migrated.state.activeStationId)) {
-          activeStationId.value = migrated.state.activeStationId
         } else {
-          activeStationId.value = empire.stations[0]?.id || null
+          activeStationId.value = null
         }
       }
     }
@@ -587,7 +583,6 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     }
     
     savedEmpires.value.activeId = empireData.id
-    savedEmpires.value.activeStationId = activeStationId.value
     saveToStorage()
     takeSnapshot()
   }
@@ -624,7 +619,6 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     // New empire stays in-memory until user explicitly saves.
     // Avoid auto-persisting empty empires into saved list.
     savedEmpires.value.activeId = null
-    savedEmpires.value.activeStationId = null
     takeSnapshot()
     return empire
   }
@@ -646,22 +640,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       
       sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
       
-      const isValidTabId = (tabId: string | null) => {
-        if (!tabId) return false
-        const transitSectorId = fromTransitTabId(tabId)
-        if (transitSectorId) {
-          return (activeEmpire.value?.sectors || []).some((sector) => sector.id === transitSectorId)
-        }
-        return empire.stations.some((station) => station.id === tabId)
-      }
-
-      if (savedEmpires.value.activeStationId === null) {
-        activeStationId.value = null
-      } else if (isValidTabId(savedEmpires.value.activeStationId)) {
-        activeStationId.value = savedEmpires.value.activeStationId
-      } else {
-        activeStationId.value = empire.stations[0]?.id || null
-      }
+      activeStationId.value = null
       initializeAllStationCaches()
       takeSnapshot()
     }
