@@ -43,8 +43,20 @@
 - [x] T18. E2E 测试：创建虚拟空间站 → 分配到 group → 保存
 - [x] T19. 运行 `npm run build` 验证编译通过
 
+## 后续修正 - Source-aware 数据源与职责分离
+
+- [x] T20. 建立 production source 统一读取抽象：`stations` / `sectors` / `sectorLinks` 在 empire 与 save-binding 模式下分别从正确数据源读取
+- [x] T21. 修正 binding 模式星区中转站聚合：`sectorInternalDataMap`、`stationMap`、`sectorLinkCalcMap` 不再固定读取 `activeEmpire`
+- [x] T22. 将 empire station 管理动作下沉到 `useEmpireDataStore`，`useEmpireStore` 仅保留 source-aware facade
+- [x] T23. 将 empire sector 管理动作下沉到 `useEmpireDataStore`，保留删除星区时的 station/link 清理语义
+- [x] T24. 将 empire sector link 管理动作下沉到 `useEmpireDataStore`，binding 模式下 `getLinkedSectors()` 改读 `connectedGroupIds`
+- [x] T25. 补充回归测试：binding 中转站可聚合本星区 station flow，binding connected groups 参与 link solver
+- [x] T26. 运行相关 unit/e2e/build 验证
+
 ## 当前状态
 
 **已完成**：D1-D3 文档任务完成；T1-T19 UI、store 适配和测试验证完成
+
+**已完成**：T20-T26 source-aware 中转聚合与 empire 管理职责下沉完成
 
 **依赖**：基于 `stand-alone-binding` 已实现的 `productionSource` 路由架构

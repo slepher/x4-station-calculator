@@ -17,6 +17,7 @@ import type {
   SupplyStorageFlow,
   TransitHubViewModel
 } from '@/types/x4'
+import type { BindingSectorGroup } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
@@ -48,21 +49,6 @@ function fromTransitTabId(tabId: string | null | undefined): string | null {
   return sectorId || null
 }
 
-function createDefaultStation(name: string, type: StationType = 'industrial'): StationPlan {
-  return {
-    id: crypto.randomUUID(),
-    name,
-    type,
-    count: 1,
-    modules: [],
-    settings: { ...DEFAULT_STATION_SETTINGS },
-    lastUpdated: Date.now(),
-    lockedWares: [],
-    warePriority: {},
-    location: undefined
-  }
-}
-
 function createDefaultEmpire(name: string = ''): EmpirePlan {
   return {
     id: crypto.randomUUID(),
@@ -87,6 +73,19 @@ function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
 
 function createEmptySupplyStorageFlows(): SupplyStorageFlow[] {
   return []
+}
+
+function buildBindingSectorLinks(groups: BindingSectorGroup[]): string[] {
+  const validGroupIds = new Set(groups.map((group) => group.id))
+  const links = new Set<string>()
+  groups.forEach((group) => {
+    ;(group.connectedGroupIds || []).forEach((targetId) => {
+      if (!validGroupIds.has(targetId)) return
+      const key = normalizeSectorLinkKey(group.id, targetId)
+      if (key) links.add(key)
+    })
+  })
+  return Array.from(links)
 }
 
 interface SectorLinkCalcEntry {
@@ -176,7 +175,12 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     const list = activeEmpire.value.sectors || []
     return [...list].sort((a, b) => a.order - b.order)
   })
-  const sectorLinks = computed<string[]>(() => activeEmpire.value?.sectorLinks || [])
+  const sectorLinks = computed<string[]>(() => {
+    if (productionSource.value === 'save-binding') {
+      return buildBindingSectorLinks(saveBindingStore.activeBinding?.groups || [])
+    }
+    return activeEmpire.value?.sectorLinks || []
+  })
 
   const orderedStationsBySector = computed<StationPlan[]>(() => {
     if (productionSource.value === 'save-binding') {
@@ -205,6 +209,10 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     })
     return withIndex.map((item) => item.station)
   })
+
+  const productionStations = computed<StationPlan[]>(() => orderedStationsBySector.value)
+  const productionSectors = computed<SectorPlan[]>(() => sectors.value)
+  const productionSectorLinks = computed<string[]>(() => sectorLinks.value)
 
   function getDerivedBindingStation(stationId: string): StationPlan | null {
     const binding = saveBindingStore.activeBinding
@@ -282,10 +290,10 @@ const activeEmpire = ref<EmpirePlan | null>(null)
 
   const sectorInternalDataMap = computed<Map<string, SectorInternalData>>(() => {
     const map = new Map<string, SectorInternalData>()
-    if (!activeEmpire.value || !gameData.modulesMap) return map
+    if (!gameData.modulesMap) return map
 
-    const stations = activeEmpire.value.stations || []
-    const sectorList = sectors.value
+    const stations = productionStations.value
+    const sectorList = productionSectors.value
 
     const buildSupplyStorageFlows = (groupedFlows: EmpireGroupedFlows): SupplyStorageFlow[] => {
       const stationMap = new Map(stations.map((station) => [station.id, station]))
@@ -382,9 +390,9 @@ const activeEmpire = ref<EmpirePlan | null>(null)
 
   const sectorLinkCalcMap = computed<Map<string, SectorLinkCalcEntry>>(() => {
     const result = new Map<string, SectorLinkCalcEntry>()
-    if (!activeEmpire.value || !gameData.modulesMap) return result
+    if (!gameData.modulesMap) return result
 
-    const links: SectorLinkInput[] = (activeEmpire.value.sectorLinks || [])
+    const links: SectorLinkInput[] = productionSectorLinks.value
       .map((key) => parseSectorLinkKey(key))
       .filter((item): item is { a: string; b: string } => !!item)
       .map((item) => ({
@@ -395,8 +403,8 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       }))
 
     const rawNetByWareBySector = new Map<string, Record<string, number>>()
-    sectors.value.forEach((sector) => {
-      const localStations = orderedStationsBySector.value.filter((station) => station.sectorId === sector.id)
+    productionSectors.value.forEach((sector) => {
+      const localStations = productionStations.value.filter((station) => station.sectorId === sector.id)
       const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => stationStateMap.getGroupedFlows(stationId))
       const netByWare: Record<string, number> = {}
       rawGroupedFlows.flows
@@ -407,7 +415,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       rawNetByWareBySector.set(sector.id, netByWare)
     })
 
-    const sectorsInput = sectors.value.map((sector) => ({
+    const sectorsInput = productionSectors.value.map((sector) => ({
       sectorId: sector.id,
       netByWare: rawNetByWareBySector.get(sector.id) || {}
     }))
@@ -443,7 +451,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       console.groupEnd()
     }
 
-    sectors.value.forEach((viewSector) => {
+    productionSectors.value.forEach((viewSector) => {
       result.set(viewSector.id, {
         sectorId: viewSector.id,
         sectorsInput,
@@ -660,21 +668,17 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function deleteEmpire(empireId: string) {
-    const idx = savedEmpires.value.list.findIndex(e => e.id === empireId)
-    if (idx !== -1) {
-      savedEmpires.value.list.splice(idx, 1)
-      if (savedEmpires.value.activeId === empireId) {
-        savedEmpires.value.activeId = savedEmpires.value.list[0]?.id || null
+    const deletingActiveEmpire = activeEmpire.value?.id === empireId
+    const deleted = empireDataStore.deleteEmpire(empireId)
+    if (!deleted) return
+    if (deletingActiveEmpire) {
+      if (savedEmpires.value.list.length > 0) {
+        loadEmpire(savedEmpires.value.list[0]!.id)
+      } else {
+        createEmpire()
       }
-      if (activeEmpire.value?.id === empireId) {
-        if (savedEmpires.value.list.length > 0) {
-          loadEmpire(savedEmpires.value.list[0]!.id)
-        } else {
-          createEmpire()
-        }
-      }
-      saveToStorage()
     }
+    saveToStorage()
   }
 
   function createStation(name: string, type: StationType = 'industrial', selectAfterCreate: boolean = true) {
@@ -701,11 +705,8 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       }
     }
 
-    if (!activeEmpire.value) return null
-    
-    const station = createDefaultStation(name, type)
-    station.sectorId = null
-    activeEmpire.value.stations.push(station)
+    const station = empireDataStore.createStationInEmpire(activeEmpire.value, name, type)
+    if (!station) return null
     if (selectAfterCreate) {
       activeStationId.value = station.id
     }
@@ -728,14 +729,11 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       return
     }
 
-    if (!activeEmpire.value) return
-    
-    const index = activeEmpire.value.stations.findIndex(s => s.id === stationId)
-    if (index !== -1) {
-      activeEmpire.value.stations.splice(index, 1)
+    const deleted = empireDataStore.deleteStationFromEmpire(activeEmpire.value, stationId)
+    if (deleted) {
       stationStateMap.remove(stationId)
       if (activeStationId.value === stationId) {
-        activeStationId.value = activeEmpire.value.stations[0]?.id || null
+        activeStationId.value = activeEmpire.value?.stations[0]?.id || null
         if (activeStationId.value) {
           sessionStorage.setItem(SESSION_ACTIVE_STATION_KEY, activeStationId.value)
         } else {
@@ -746,96 +744,38 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function duplicateStation(stationId: string) {
-    if (!activeEmpire.value) return null
-    
-    const sourceStation = activeEmpire.value.stations.find(s => s.id === stationId)
-    if (!sourceStation) return null
-    
-    const newStation: StationPlan = {
-      ...JSON.parse(JSON.stringify(sourceStation)),
-      id: crypto.randomUUID(),
-      name: `${sourceStation.name} (Copy)`,
-      sectorId: sourceStation.sectorId || null,
-      lastUpdated: Date.now()
-    }
-    
-    activeEmpire.value.stations.push(newStation)
+    const newStation = empireDataStore.duplicateStationInEmpire(activeEmpire.value, stationId)
+    if (!newStation) return null
     activeStationId.value = newStation.id
     refreshStationFlowCache(newStation.id)
     return newStation
   }
 
   function reorderStations(reorderedStations: StationPlan[]) {
-    if (!activeEmpire.value) return
-
-    const currentStations = activeEmpire.value.stations
-    if (reorderedStations.length !== currentStations.length) return
-
-    const reorderedIdSet = new Set(reorderedStations.map(station => station.id))
-    if (reorderedIdSet.size !== currentStations.length) return
-    if (currentStations.some(station => !reorderedIdSet.has(station.id))) return
-
-    activeEmpire.value.stations = [...reorderedStations]
+    empireDataStore.reorderStationsInEmpire(activeEmpire.value, reorderedStations)
   }
 
   function createSector(name: string = ''): SectorPlan | null {
-    if (!activeEmpire.value) return null
-    const nextOrder = (activeEmpire.value.sectors || []).length
-    const sector: SectorPlan = {
-      id: crypto.randomUUID(),
-      name: name || `Sector ${nextOrder + 1}`,
-      order: nextOrder
-    }
-    if (!activeEmpire.value.sectors) activeEmpire.value.sectors = []
-    activeEmpire.value.sectors.push(sector)
-    if (!Array.isArray(activeEmpire.value.sectorLinks)) activeEmpire.value.sectorLinks = []
-    return sector
+    return empireDataStore.createSectorInEmpire(activeEmpire.value, name)
   }
 
   function renameSector(sectorId: string, name: string) {
-    if (!activeEmpire.value) return false
-    const sector = (activeEmpire.value.sectors || []).find((item) => item.id === sectorId)
-    if (!sector) return false
-    sector.name = name
-    return true
+    return empireDataStore.renameSectorInEmpire(activeEmpire.value, sectorId, name)
   }
 
   function reorderSectors(orderedSectorIds: string[]) {
-    if (!activeEmpire.value) return
-    const current = activeEmpire.value.sectors || []
-    if (orderedSectorIds.length !== current.length) return
-    const set = new Set(orderedSectorIds)
-    if (set.size !== current.length) return
-    if (current.some((sector) => !set.has(sector.id))) return
-    const sectorMap = new Map(current.map((sector) => [sector.id, sector]))
-    activeEmpire.value.sectors = orderedSectorIds.map((id, index) => ({
-      ...(sectorMap.get(id) as SectorPlan),
-      order: index
-    }))
+    empireDataStore.reorderSectorsInEmpire(activeEmpire.value, orderedSectorIds)
   }
 
   function moveStationToSector(stationId: string, sectorId: string | null) {
     if (productionSource.value === 'save-binding') {
       return updateBindingStationPlan(stationId, { sectorId })
     }
-    if (!activeEmpire.value) return false
-    const station = activeEmpire.value.stations.find((item) => item.id === stationId)
-    if (!station) return false
-    if (sectorId) {
-      const exists = (activeEmpire.value.sectors || []).some((sector) => sector.id === sectorId)
-      if (!exists) return false
-    }
-    station.sectorId = sectorId
-    return true
+    return empireDataStore.moveStationToSectorInEmpire(activeEmpire.value, stationId, sectorId)
   }
 
   function setStationLocation(stationId: string, location: EntityLocation | null) {
-    if (!activeEmpire.value) return false
-    const station = activeEmpire.value.stations.find((item) => item.id === stationId)
-    if (!station) return false
-    station.location = location ? JSON.parse(JSON.stringify(location)) : undefined
-    station.lastUpdated = Date.now()
-    return true
+    return empireDataStore.setStationLocationInEmpire(activeEmpire.value, stationId, location)
   }
 
   function clearStationLocation(stationId: string) {
@@ -843,11 +783,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function setSectorLocation(sectorId: string, location: EntityLocation | null) {
-    if (!activeEmpire.value) return false
-    const sector = (activeEmpire.value.sectors || []).find((item) => item.id === sectorId)
-    if (!sector) return false
-    sector.location = location ? JSON.parse(JSON.stringify(location)) : undefined
-    return true
+    return empireDataStore.setSectorLocationInEmpire(activeEmpire.value, sectorId, location)
   }
 
   function clearSectorLocation(sectorId: string) {
@@ -855,48 +791,12 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function setSectorStationOrder(sectorId: string | null, orderedStationIds: string[]) {
-    if (!activeEmpire.value) return false
-    const matchSector = (station: StationPlan) => (station.sectorId || null) === sectorId
-    const bucket = activeEmpire.value.stations.filter(matchSector)
-    if (bucket.length !== orderedStationIds.length) return false
-    const idSet = new Set(orderedStationIds)
-    if (idSet.size !== bucket.length) return false
-    if (bucket.some((station) => !idSet.has(station.id))) return false
-
-    const stationMap = new Map(bucket.map((station) => [station.id, station]))
-    const orderedBucket = orderedStationIds.map((id) => stationMap.get(id)!).filter(Boolean)
-
-    const nextStations: StationPlan[] = []
-    let bucketIndex = 0
-    for (const station of activeEmpire.value.stations) {
-      if (matchSector(station)) {
-        const next = orderedBucket[bucketIndex++]
-        if (next) nextStations.push(next)
-      } else {
-        nextStations.push(station)
-      }
-    }
-    activeEmpire.value.stations = nextStations
-    return true
+    return empireDataStore.setSectorStationOrderInEmpire(activeEmpire.value, sectorId, orderedStationIds)
   }
 
   function deleteSector(sectorId: string) {
-    if (!activeEmpire.value) return false
-    const sectorList = activeEmpire.value.sectors || []
-    const idx = sectorList.findIndex((item) => item.id === sectorId)
-    if (idx === -1) return false
-
-    sectorList.splice(idx, 1)
-    sectorList.forEach((sector, order) => {
-      sector.order = order
-    })
-    activeEmpire.value.stations.forEach((station) => {
-      if (station.sectorId === sectorId) station.sectorId = null
-    })
-    activeEmpire.value.sectorLinks = (activeEmpire.value.sectorLinks || []).filter((key) => {
-      const linkedIds = getLinkedSectorIdsFor(sectorId, [key])
-      return linkedIds.length === 0
-    })
+    const deleted = empireDataStore.deleteSectorFromEmpire(activeEmpire.value, sectorId)
+    if (!deleted) return false
     if (activeTransitSectorId.value === sectorId) {
       activeStationId.value = null
       sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
@@ -905,30 +805,11 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function createSectorLink(sourceSectorId: string, targetSectorId: string) {
-    if (!activeEmpire.value) return { ok: false as const, reason: 'no-active-empire' as const }
-    const sourceExists = (activeEmpire.value.sectors || []).some((sector) => sector.id === sourceSectorId)
-    const targetExists = (activeEmpire.value.sectors || []).some((sector) => sector.id === targetSectorId)
-    if (!sourceExists || !targetExists) return { ok: false as const, reason: 'invalid-target' as const }
-
-    const key = normalizeSectorLinkKey(sourceSectorId, targetSectorId)
-    if (!key) return { ok: false as const, reason: 'self-link' as const }
-
-    if (!Array.isArray(activeEmpire.value.sectorLinks)) activeEmpire.value.sectorLinks = []
-    if (activeEmpire.value.sectorLinks.includes(key)) {
-      return { ok: false as const, reason: 'duplicate-link' as const }
-    }
-
-    activeEmpire.value.sectorLinks.push(key)
-    return { ok: true as const }
+    return empireDataStore.createSectorLinkInEmpire(activeEmpire.value, sourceSectorId, targetSectorId)
   }
 
   function removeSectorLink(a: string, b: string) {
-    if (!activeEmpire.value || !Array.isArray(activeEmpire.value.sectorLinks)) return false
-    const key = normalizeSectorLinkKey(a, b)
-    if (!key) return false
-    const prev = activeEmpire.value.sectorLinks.length
-    activeEmpire.value.sectorLinks = activeEmpire.value.sectorLinks.filter((item) => item !== key)
-    return activeEmpire.value.sectorLinks.length !== prev
+    return empireDataStore.removeSectorLinkInEmpire(activeEmpire.value, a, b)
   }
 
   function getLinkedSectors(sectorId: string): string[] {
@@ -960,11 +841,11 @@ const activeEmpire = ref<EmpirePlan | null>(null)
   }
 
   function getStationComponentGapFlows(stationId: string | null = activeStation.value?.id || null): StationComponentGapFlows {
-    if (!activeEmpire.value || !stationId) {
+    if (!stationId) {
       return { operations: [], supply: [] }
     }
 
-    const station = activeEmpire.value.stations.find((item) => item.id === stationId)
+    const station = productionStations.value.find((item) => item.id === stationId)
     const currentSectorId = station?.sectorId || ''
     if (!currentSectorId) {
       return { operations: [], supply: [] }
@@ -1021,15 +902,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     if (productionSource.value === 'save-binding') {
       return updateBindingStationPlan(stationId, { name: newName })
     }
-    if (!activeEmpire.value) return false
-    
-    const station = activeEmpire.value.stations.find(s => s.id === stationId)
-    if (station) {
-      station.name = newName
-      station.lastUpdated = Date.now()
-      return true
-    }
-    return false
+    return empireDataStore.renameStationInEmpire(activeEmpire.value, stationId, newName)
   }
 
   function selectStation(stationId: string | null) {
@@ -1077,10 +950,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       refreshStationFlowCache(stationId)
       return
     }
-    const station = getStationById(stationId)
-    if (station) {
-      station.settings = { ...station.settings, ...settings }
-      station.lastUpdated = Date.now()
+    if (empireDataStore.updateStationSettingsInEmpire(activeEmpire.value, stationId, settings)) {
       refreshStationFlowCache(stationId)
     }
   }
@@ -1091,10 +961,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       refreshStationFlowCache(stationId)
       return
     }
-    const station = getStationById(stationId)
-    if (station) {
-      station.modules = modules
-      station.lastUpdated = Date.now()
+    if (empireDataStore.updateStationModulesInEmpire(activeEmpire.value, stationId, modules)) {
       refreshStationFlowCache(stationId)
     }
   }
@@ -1104,17 +971,11 @@ const activeEmpire = ref<EmpirePlan | null>(null)
       updateBindingStationPlan(stationId, { sectorId })
       return
     }
-    const station = getStationById(stationId)
-    if (station) {
-      station.sectorId = sectorId || undefined
-      station.lastUpdated = Date.now()
-    }
+    empireDataStore.updateStationSectorInEmpire(activeEmpire.value, stationId, sectorId)
   }
 
   function updateEmpireName(name: string) {
-    if (activeEmpire.value) {
-      activeEmpire.value.name = name
-    }
+    empireDataStore.renameEmpireDraft(activeEmpire.value, name)
   }
 
   const isDirty = computed(() => {

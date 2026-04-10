@@ -60,6 +60,8 @@ import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useStationStore } from '@/store/useStationStore'
+import { stationStateMap } from '@/store/state/StationStateMap'
+import type { GroupedFlows, WareFlow } from '@/types/x4'
 
 function makeArchive(): SaveArchive {
   return {
@@ -129,6 +131,55 @@ function loadBindingFixture() {
     }]
   })
   bindingStore.createOrOpenBinding('game-1', 100)
+}
+
+function makeFlow(wareId: string, netRate: number): WareFlow {
+  const production = Math.max(netRate, 0)
+  const consumption = Math.max(-netRate, 0)
+  return {
+    wareId,
+    orderIndex: 0,
+    tier: 1,
+    transportType: 'container',
+    unitVolume: 1,
+    production,
+    consumption,
+    workforceConsumption: 0,
+    netRate,
+    productionVolume: production,
+    consumptionVolume: consumption,
+    netVolume: netRate,
+    totalOccupiedCount: Math.abs(netRate),
+    totalOccupiedConsumptionCount: consumption,
+    totalOccupiedVolume: Math.abs(netRate),
+    unitPrice: 1,
+    netValue: netRate,
+    contributions: []
+  }
+}
+
+function makeGroupedFlows(...flows: WareFlow[]): GroupedFlows {
+  return {
+    flows,
+    rateGroups: {
+      positive: flows.filter((flow) => flow.netRate > 0),
+      operations: flows.filter((flow) => flow.netRate <= 0),
+      supply: [],
+      resources: []
+    },
+    volumeGroups: {
+      solid: [],
+      liquid: [],
+      container: flows
+    }
+  }
+}
+
+function setStationFlows(stationId: string, flows: GroupedFlows) {
+  stationStateMap.mutate(stationId, (state) => {
+    state.groupedFlows = flows
+    state.groupedFlowsForEmpire = flows
+  })
 }
 
 describe('user-save-binding-station production routing', () => {
@@ -264,5 +315,66 @@ describe('user-save-binding-station production routing', () => {
     expect(empire.activeStationId).toBe('transit:group-a')
     expect(empire.activeTransitSectorId).toBe('group-a')
     expect(empire.activeStation).toBe(null)
+  })
+
+  it('aggregates binding station flows into the binding group transit hub', async () => {
+    loadBindingFixture()
+    const empire = useEmpireStore()
+    await empire.initialize()
+    await vi.waitFor(() => expect(empire.isReady).toBe(true), { timeout: 3000 })
+    empire.switchToBinding('game-1')
+
+    setStationFlows(
+      '__save_binding__game-1__plan-alpha',
+      makeGroupedFlows(makeFlow('energycells', 100))
+    )
+
+    const model = empire.getTransitHubViewModel({
+      sectorId: 'group-a',
+      racePreference: 'argon',
+      transportShipCapacity: 62000
+    })
+
+    expect(model.groupedFlows.flows[0]?.wareId).toBe('energycells')
+    expect(model.storageFlows[0]?.details[0]?.stationName).toBe('Alpha Plan')
+  })
+
+  it('uses binding group connections for transit hub link balancing', async () => {
+    loadBindingFixture()
+    const binding = useSaveBindingStore()
+    binding.activeBinding!.groups.push({
+      id: 'group-b',
+      name: 'Group B',
+      order: 1,
+      sectorMacro: 'sector_macro_b',
+      jumpRange: 0,
+      coverageSectorMacros: [],
+      connectedGroupIds: ['group-a']
+    })
+    binding.activeBinding!.groups[0].connectedGroupIds = ['group-b']
+    binding.activeBinding!.stationPlans.push({
+      id: 'plan-beta',
+      groupId: 'group-b',
+      name: 'Beta Plan',
+      type: 'industrial',
+      modules: [],
+      settings: { ...DEFAULT_STATION_SETTINGS }
+    })
+
+    const empire = useEmpireStore()
+    await empire.initialize()
+    await vi.waitFor(() => expect(empire.isReady).toBe(true), { timeout: 3000 })
+    empire.switchToBinding('game-1')
+
+    setStationFlows('__save_binding__game-1__plan-alpha', makeGroupedFlows(makeFlow('energycells', 100)))
+    setStationFlows('__save_binding__game-1__plan-beta', makeGroupedFlows(makeFlow('energycells', -40)))
+
+    const model = empire.getTransitHubViewModel({
+      sectorId: 'group-a',
+      racePreference: 'argon',
+      transportShipCapacity: 62000
+    })
+
+    expect(model.storageFlows[0]?.details.some((detail) => detail.stationId === 'external:group-b:out')).toBe(true)
   })
 })
