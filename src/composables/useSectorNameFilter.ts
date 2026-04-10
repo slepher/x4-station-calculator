@@ -44,19 +44,6 @@ export function useSectorNameFilter(searchQuery: Ref<string>) {
 
   const normalizedQuery = computed(() => searchQuery.value.trim().toLowerCase())
 
-  function filterSectors<T extends SectorWithName>(sectors: T[]): T[] {
-    if (!normalizedQuery.value) return sectors
-
-    return sectors.filter((sector) =>
-      getLocalizedSectorQueryMatch({
-        rawName: sector.rawSectorName,
-        displayName: sector.sectorName,
-        normalizedQuery: normalizedQuery.value,
-        locale: locale.value
-      }).matched
-    )
-  }
-
   function computeShowRawSectorName(
     sector: SectorWithName,
     match: ReturnType<typeof getLocalizedSectorQueryMatch>
@@ -65,6 +52,22 @@ export function useSectorNameFilter(searchQuery: Ref<string>) {
     if (sector.rawSectorName === sector.sectorName) return false
     if (!normalizedQuery.value) return false
     return match.matchedRawName && !match.matchedDisplayName
+  }
+
+  function filterSectors<T extends SectorWithName>(sectors: T[]): T[] {
+    if (!normalizedQuery.value) return sectors
+
+    return sectors.filter((sector) => {
+      const match = getLocalizedSectorQueryMatch({
+        rawName: sector.rawSectorName,
+        displayName: sector.sectorName,
+        normalizedQuery: normalizedQuery.value,
+        locale: locale.value
+      })
+      if (!match.matched) return false
+      sector.showRawSectorName = computeShowRawSectorName(sector, match)
+      return true
+    })
   }
 
   return {

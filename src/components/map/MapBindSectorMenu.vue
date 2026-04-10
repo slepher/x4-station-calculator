@@ -3,23 +3,17 @@ import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useMapStore } from '@/store/useMapStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import { getLocalizedSectorQueryMatch } from './savePoiSearch'
+import { useSectorNameFilter, type SectorWithName } from '@/composables/useSectorNameFilter'
 
-interface SaveSectorCandidate {
-  sectorMacro: string
-  sectorName: string
-}
+interface SaveSectorCandidate extends SectorWithName {}
 
-interface MapSectorCandidate {
-  sectorMacro: string
-  displayName: string
-}
+interface MapSectorCandidate extends SectorWithName {}
 
 const props = defineProps<{
   open: boolean
   targetSectorId: string | null
   triggerEl: HTMLElement | null
-  filteredSaveSectors: SaveSectorCandidate[]
+  filteredSaveSectors: { sectorMacro: string; sectorName: string }[]
   draftAnchorSectorMacro: string | null
   currentBoundSectorMacro: string | null
   occupiedSectorMacros: Set<string>
@@ -30,7 +24,7 @@ const emit = defineEmits<{
   (e: 'select-sector', sectorMacro: string): void
 }>()
 
-const { t, te, locale } = useI18n()
+const { t } = useI18n()
 const mapStore = useMapStore()
 const gameDataStore = useGameDataStore()
 
@@ -38,7 +32,7 @@ const bindMenuRef = ref<HTMLElement | null>(null)
 const bindMenuStyle = ref<Record<string, string>>({})
 const searchQuery = ref('')
 
-const normalizedQuery = computed(() => searchQuery.value.trim().toLowerCase())
+const { getSectorDisplayName, normalizedQuery, filterSectors } = useSectorNameFilter(searchQuery)
 
 function isSectorOccupied(sectorMacro: string): boolean {
   return props.occupiedSectorMacros.has(sectorMacro)
@@ -52,30 +46,12 @@ function isDraftBoundSector(sectorMacro: string): boolean {
   return props.draftAnchorSectorMacro === sectorMacro
 }
 
-function filterSaveSectors(sectors: SaveSectorCandidate[]): SaveSectorCandidate[] {
-  if (!normalizedQuery.value) return sectors
-  return sectors.filter((sector) => {
-    const rawName = sector.sectorName
-    const displayName = sector.sectorName
-    return getLocalizedSectorQueryMatch({
-      rawName,
-      displayName,
-      normalizedQuery: normalizedQuery.value,
-      locale: locale.value
-    }).matched
-  })
+function buildSaveSectorCandidate(sectorMacro: string, fallbackName: string): SaveSectorCandidate {
+  return getSectorDisplayName(sectorMacro, fallbackName)
 }
 
-function getMapSectorDisplayName(sectorMacro: string): string {
-  const resolved = mapStore.resolveSectorByMacro(sectorMacro)
-  if (resolved) {
-    const sector = resolved.sector
-    if (sector.nameId && te(sector.nameId)) {
-      return t(sector.nameId)
-    }
-    return sector.name || sectorMacro
-  }
-  return sectorMacro
+function buildMapSectorCandidate(sectorMacro: string): MapSectorCandidate {
+  return getSectorDisplayName(sectorMacro, sectorMacro)
 }
 
 function getAllMapSectors(): MapSectorCandidate[] {
@@ -92,10 +68,7 @@ function getAllMapSectors(): MapSectorCandidate[] {
       const sector = sectors[sectorId]
       if (!sector) return
       const sectorMacro = sector.macro || sector.id
-      result.push({
-        sectorMacro,
-        displayName: getMapSectorDisplayName(sectorMacro)
-      })
+      result.push(buildMapSectorCandidate(sectorMacro))
     })
   })
 
@@ -106,25 +79,16 @@ function getVisibleMapSectors(): MapSectorCandidate[] {
   if (!mapStore.shouldComputeVisibleSectors) {
     return []
   }
-  return mapStore.computeVisibleSectorCenters()
+  const visibleCenters = mapStore.computeVisibleSectorCenters()
+  return visibleCenters.map((center) => buildMapSectorCandidate(center.sectorMacro))
 }
 
-function filterMapSectors(sectors: MapSectorCandidate[]): MapSectorCandidate[] {
-  if (!normalizedQuery.value) return sectors
-  return sectors.filter((sector) => {
-    const rawName = sector.sectorMacro
-    const displayName = sector.displayName
-    return getLocalizedSectorQueryMatch({
-      rawName,
-      displayName,
-      normalizedQuery: normalizedQuery.value,
-      locale: locale.value
-    }).matched
-  })
-}
+const saveSectorCandidates = computed<SaveSectorCandidate[]>(() => {
+  return props.filteredSaveSectors.map((s) => buildSaveSectorCandidate(s.sectorMacro, s.sectorName))
+})
 
 const filteredSaveSectorsDisplay = computed(() => {
-  return filterSaveSectors(props.filteredSaveSectors)
+  return filterSectors(saveSectorCandidates.value)
 })
 
 const allMapSectors = computed(() => getAllMapSectors())
@@ -145,7 +109,7 @@ const visibleMapSectorsExcludingSave = computed(() => {
 
 const filteredMapSectorsDisplay = computed(() => {
   if (normalizedQuery.value) {
-    return filterMapSectors(mapSectorsExcludingSave.value)
+    return filterSectors(mapSectorsExcludingSave.value)
   }
   return visibleMapSectorsExcludingSave.value
 })
@@ -266,7 +230,8 @@ onBeforeUnmount(() => {
             :disabled="isSectorOccupied(sector.sectorMacro)"
             @click="onMenuSectorClick(sector.sectorMacro)"
           >
-            <span>{{ sector.sectorName }}</span>
+            <span class="sector-name">{{ sector.sectorName }}</span>
+            <span v-if="sector.showRawSectorName" class="sector-raw-name">{{ sector.rawSectorName }}</span>
           </button>
         </template>
         <div v-else class="bind-menu-hint">
@@ -289,7 +254,8 @@ onBeforeUnmount(() => {
             :disabled="isSectorOccupied(sector.sectorMacro)"
             @click="onMenuSectorClick(sector.sectorMacro)"
           >
-            {{ sector.displayName }}
+            <span class="sector-name">{{ sector.sectorName }}</span>
+            <span v-if="sector.showRawSectorName" class="sector-raw-name">{{ sector.rawSectorName }}</span>
           </button>
         </template>
         <div v-else-if="filteredMapSectorsDisplay.length > 10" class="bind-menu-hint">
@@ -372,6 +338,14 @@ onBeforeUnmount(() => {
 
 .bind-menu-item:disabled {
   @apply cursor-not-allowed opacity-50;
+}
+
+.sector-name {
+  @apply truncate;
+}
+
+.sector-raw-name {
+  @apply ml-2 shrink-0 text-xs text-amber-100/50;
 }
 
 .bind-menu-hint {
