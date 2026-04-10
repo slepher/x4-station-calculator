@@ -31,6 +31,16 @@
 - **那么** 系统 SHALL 读写独立 binding store 中的 groups
 - **并且** SHALL NOT 读写 `activeEmpire.sectors`
 
+#### Scenario: 用户通过定位星区菜单新建 binding group
+- **前提** 用户已进入 Step 2
+- **当** 用户点击新建星区
+- **那么** 系统 SHALL 弹出与编辑 group 定位星区相同的 save sector 候选菜单
+- **并且** SHALL 使用相同的候选禁用逻辑
+- **当** 用户点击一个可用 save sector
+- **那么** 系统 SHALL 展开新的 group draft
+- **并且** SHALL 将该 save sector 设置为新 group 的 `sectorMacro`
+- **并且** SHALL 将新 group 名称默认设置为该 save sector 的显示名称
+
 ### Requirement: Step 3 Derived Station Planning
 
 系统 MUST 在 Step 3 显示 coverage 派生的 save stations 与用户创建的 station plans。
@@ -43,11 +53,11 @@
 - **并且** SHALL 显示星区中转站（如有）
 - **并且** SHALL NOT 要求用户逐个绑定现有 save station
 
-#### Scenario: 用户导入 empire station 规划
-- **前提** 用户在 Step 3 选择了 source empire
-- **当** 用户将某个 source empire station 的规划导入到 save station plan
+#### Scenario: 用户导入 station blueprint 规划
+- **前提** 用户在 Step 3 选择了 blueprint empire
+- **当** 用户将某个 station blueprint 的规划导入到 save station plan
 - **那么** 系统 SHALL 在 binding 中创建或更新 planned modules
-- **并且** SHALL NOT 修改 source empire station
+- **并且** SHALL NOT 修改 blueprint empire station
 
 #### Scenario: 用户创建星区中转站
 - **前提** 用户在 Step 3
@@ -85,7 +95,8 @@
 - **前提** 用户在地图 binding 面板中修改了 group、station plan 或 trade station
 - **当** 改动尚未保存
 - **那么** 系统 SHALL 显示 binding dirty 状态
-- **并且** SHALL 提供 `保存绑定` 操作
+- **并且** SHALL 在 save panel 的 binding 分支标题栏右侧提供取消、保存、关闭操作
+- **并且** SHALL NOT 在量化生产界面提供保存 binding 或放弃 binding 改动的入口
 
 #### Scenario: 用户关闭 dirty binding 面板
 - **前提** binding 存在未保存改动

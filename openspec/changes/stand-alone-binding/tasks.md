@@ -29,3 +29,4 @@
 - [x] T19. 更新 i18n 文案：保存绑定、绑定 dirty、binding 星区、source empire 导入、virtual station
 - [x] T20. 清理旧 `EmpirePlan.saveBindings` 相关引用和旧 binding action
 - [x] T21. 运行 `npm run build`，修复编译错误并重复执行直到通过或明确 blocker
+- [x] T22. 将 Step 3 改为 station blueprint 来源，并在 Step 2 新建星区时复用定位星区菜单创建 group draft

@@ -190,12 +190,19 @@ interface ProductionSource {
 
 Step 2 不再显示"帝国星区"，改为 binding 星区列表。用户在这里创建、排序、重命名 group，设置 anchor、coverage、jump range 和 connected groups。
 
+新建 group 复用编辑 group 的 anchor sector 选择菜单。点击"新建星区"时只打开候选菜单，不立即创建空 group；用户选择一个未被其他 group 占用的 save sector 后，UI 展开一个新 group draft：
+
+- `sectorMacro` 使用被点击的 save sector
+- `name` 默认使用该 save sector 的显示名称
+- coverage 按当前默认 jump range 自动计算
+- 菜单候选、样式和禁用逻辑与编辑 anchor sector 完全一致
+
 ### Step 3: Station planning
 
 Step 3 的主对象是 group coverage 派生出的 save stations 和用户显式创建的 virtual stations。用户不需要逐个绑定已有 save station。额外操作集中在：
 
-- 选择 source empire，用其中 station 作为规划模块导入模板。
-- 将 source empire station 的规划模块导入到某个 save station plan。
+- 选择 blueprint empire，用其中 station 作为空间站蓝图导入模板。
+- 将 blueprint empire station 的规划模块导入到某个 save station plan。
 - 创建 virtual station 占位或星区中转站。
 - 编辑或清空规划 modules。
 
@@ -220,14 +227,13 @@ Step 3 的主对象是 group coverage 派生出的 save stations 和用户显式
 
 ### Binding save status
 
-binding 面板和量化生产的 binding source 视图都需要显示同一 dirty 状态：
+save panel 的 binding 分支标题栏右侧提供保存控制：
 
-- `绑定已保存`
-- `绑定有未保存改动`
-- `正在保存绑定...`
-- `保存失败`
+- `取消`：放弃当前 binding draft 改动
+- `保存`：写入 `x4_save_bindings`
+- `关闭`：关闭 binding 面板
 
-主要操作按钮为 `保存绑定` 与 `放弃改动`。
+面板底部只显示 dirty 状态，例如 `绑定已保存` / `绑定有未保存改动`。量化生产界面只选择 `empire` / `save-binding` 数据源，不再提供保存 binding 或放弃 binding 改动的入口。
 
 ### Sector overview placeholder
 

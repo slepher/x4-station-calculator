@@ -425,33 +425,8 @@ function onBindMenuViewportChange() {
   updateBindMenuPosition()
 }
 
-function selectSaveSectorForBinding(sectorMacro: string) {
-  if (!bindMenuTargetSectorId.value) return
-
-  const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {}, gameDataStore.maps?.sectors || {})
-
-  // Build coverage entries with jump distance
-  const sectorJumpMap = new Map<string, number>()
-  for (let jump = 1; jump <= draft.value.jumpRange; jump++) {
-    const result = getCoverageSectors(sectorMacro, jump, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap)
-    for (const s of result) {
-      if (s.sectorMacro !== sectorMacro && !sectorJumpMap.has(s.sectorMacro)) {
-        sectorJumpMap.set(s.sectorMacro, jump)
-      }
-    }
-  }
-  
-  draft.value.coverage = sanitizeDraftCoverageEntries(
-    Array.from(sectorJumpMap.entries()).map(([ref, jump]) => ({ ref, jump }))
-  , bindMenuTargetSectorId.value)
-  draft.value.sectorGroupId = bindMenuTargetSectorId.value
-  draft.value.anchorSectorMacro = sectorMacro
-
-  closeBindMenu()
-}
-
 function selectVisibleSectorForBinding(sectorMacro: string) {
-  selectSaveSectorForBinding(sectorMacro)
+  onMenuSectorClick(sectorMacro)
 }
 
 function isCurrentBoundSector(sectorMacro: string): boolean {
@@ -505,7 +480,7 @@ function onMenuSectorClick(sectorMacro: string) {
   
   draft.value.sectorGroupId = bindMenuTargetSectorId.value
   draft.value.isNew = !currentSector
-  draft.value.name = currentSector?.name || draft.value.name
+  draft.value.name = currentSector?.name || getSectorMacroDisplayName(sectorMacro)
   draft.value.anchorSectorMacro = sectorMacro
   draft.value.connectedSectorGroupIds = [...(currentBinding?.connectedGroupIds || [])]
   
@@ -690,17 +665,12 @@ function addToCoverage(sectorMacro: string, jump: number) {
   }
 }
 
-function createSectorAndEdit() {
+function createSectorAndEdit(event: MouseEvent) {
   if (isDraftOpen()) return
-  draft.value = {
-    sectorGroupId: `draft:${crypto.randomUUID()}`,
-    isNew: true,
-    name: '',
-    anchorSectorMacro: null,
-    jumpRange: 2,
-    coverage: [],
-    connectedSectorGroupIds: []
-  }
+  bindMenuTargetSectorId.value = `draft:${crypto.randomUUID()}`
+  bindMenuTriggerEl.value = event.currentTarget as HTMLElement
+  bindMenuOpen.value = true
+  nextTick(() => updateBindMenuPosition())
 }
 
 function applySectorOrder(items: Array<{ id: string }>) {
@@ -788,6 +758,11 @@ function getCollapsedConnectedAtJump(sectorId: string, jump: number) {
 
 function getCollapsedConnectedJumps(sectorId: string) {
   return Array.from(new Set(getCollapsedConnectedSectors(sectorId).map((item) => item.jump))).sort((a, b) => a - b)
+}
+
+function getConnectedSectorLabel(name: string, sectorMacro: string): string {
+  const sectorName = getSectorMacroDisplayName(sectorMacro)
+  return name.trim() === sectorName.trim() ? name : `${name}:${sectorName}`
 }
 
 function getSaveSectorStationGroups(stations: PlayerStationEntry[]): AggregatedStationName[] {
@@ -1013,7 +988,7 @@ onBeforeUnmount(() => {
                     :class="candidate.isConnected ? 'pill--connected' : 'pill--disconnected'"
                     @click.stop="focusSectorByMacro(candidate.sectorMacro)"
                   >
-                    {{ candidate.name }}:{{ getSectorMacroDisplayName(candidate.sectorMacro) }}
+                    {{ getConnectedSectorLabel(candidate.name, candidate.sectorMacro) }}
                     <button
                       class="pill-plus"
                       type="button"
@@ -1081,7 +1056,7 @@ onBeforeUnmount(() => {
                       class="pill pill--small pill--connected pill--clickable"
                       @click.stop="focusSectorByMacro(connected.sectorMacro)"
                     >
-                      {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
+                      {{ getConnectedSectorLabel(connected.name, connected.sectorMacro) }}
                     </span>
                   </div>
                 </div>
@@ -1103,7 +1078,7 @@ onBeforeUnmount(() => {
                         class="pill pill--small pill--connected pill--clickable"
                         @click.stop="focusSectorByMacro(connected.sectorMacro)"
                       >
-                        {{ connected.name }}:{{ getSectorMacroDisplayName(connected.sectorMacro) }}
+                        {{ getConnectedSectorLabel(connected.name, connected.sectorMacro) }}
                       </span>
                     </div>
                   </div>
@@ -1216,6 +1191,8 @@ onBeforeUnmount(() => {
               :key="macro"
               type="button"
               class="bind-menu-item"
+              :class="{ orange: isSectorBoundToOtherGroup(macro, bindMenuTargetSectorId || '') }"
+              :disabled="isSectorBoundToOtherGroup(macro, bindMenuTargetSectorId || '')"
               @click="selectVisibleSectorForBinding(macro)"
             >
               {{ getSectorMacroDisplayName(macro) }}

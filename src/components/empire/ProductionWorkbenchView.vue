@@ -99,27 +99,6 @@ const overviewGroupedFlows = computed(() =>
               {{ $t('production.source_save_binding') }}
             </button>
           </div>
-          <div v-if="productionSource === 'save-binding'" class="binding-save-actions">
-            <span class="binding-save-status">
-              {{ saveBindingStore.isDirty ? $t('production.binding_unsaved') : $t('production.binding_saved') }}
-            </span>
-            <button
-              type="button"
-              class="binding-action"
-              :disabled="!saveBindingStore.isDirty"
-              @click="saveBindingStore.saveBinding()"
-            >
-              {{ $t('production.save_binding') }}
-            </button>
-            <button
-              type="button"
-              class="binding-action subtle"
-              :disabled="!saveBindingStore.isDirty"
-              @click="saveBindingStore.discardChanges()"
-            >
-              {{ $t('production.discard_binding') }}
-            </button>
-          </div>
         </div>
         <EmpireWareFlowsDashboard :grouped-flows="overviewGroupedFlows" />
       </div>
@@ -165,34 +144,16 @@ const overviewGroupedFlows = computed(() =>
   @apply flex items-center gap-2;
 }
 
-.source-tab,
-.binding-action {
+.source-tab {
   @apply rounded border border-slate-700 bg-slate-800 px-3 py-1.5 text-xs font-bold text-slate-300 transition;
 }
 
-.source-tab:hover,
-.binding-action:hover:not(:disabled) {
+.source-tab:hover {
   @apply border-slate-500 bg-slate-700 text-white;
 }
 
 .source-tab.active {
   @apply border-sky-500 bg-sky-600/30 text-sky-100;
-}
-
-.binding-save-actions {
-  @apply flex items-center gap-2 text-xs;
-}
-
-.binding-save-status {
-  @apply text-slate-400;
-}
-
-.binding-action:disabled {
-  @apply cursor-not-allowed opacity-45;
-}
-
-.binding-action.subtle {
-  @apply bg-slate-900;
 }
 
 </style>

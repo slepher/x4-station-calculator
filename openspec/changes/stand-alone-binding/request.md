@@ -27,6 +27,8 @@
 
 - 用户在 binding 内决定星区怎么分、每个星区锚定哪个存档星区、覆盖哪些范围，以及星区补给站如何定位或划给哪个范围内的空间站。
 - `BindingSectorGroup` 保存名称、顺序、定位星区、jump range、coverage 和 connected groups。
+- Step 2 的新建星区入口不直接创建空 group；它复用编辑星区时的定位星区选择菜单，用户点击一个可用存档星区后才创建 group。
+- 新建时选中的存档星区就是 group 的定位星区，group 默认名称使用该定位星区显示名称；候选菜单的禁用逻辑与编辑定位星区完全一致。
 - save station 属于哪个 binding group 由当前 archive 与 group coverage 自动派生。
 - 用户不需要逐个把现有 save station 绑定到 binding；覆盖范围内的 save stations 自动出现在 binding 视图中。
 
@@ -49,12 +51,14 @@
 - 删除、解绑或换绑 save station 规划时，相关 save station plan 应直接消失或转为无规划状态，而不是保留为 virtual station。
 - virtual station 自身有名称、类型、规划 modules、settings、定位信息，并参与量化生产。
 
-### 6. Source empire 导入
+### 6. 空间站蓝图导入
 
+- Step 3 的候选空间站显示为“空间站蓝图”，而不是自由空间站。
 - binding 可以记住一个 `blueprintEmpireId` 作为 UI 上的“空间站蓝图”来源。
+- `blueprintEmpireId` 由 Step 3 顶部的 empire 菜单选择并保存到 `x4_save_bindings` 当前 binding 顶层。
 - `blueprintEmpireId` 只用于显示可导入候选，不代表 binding station 与 blueprint empire station 有持续关系。
-- 从 source empire station 导入时，只复制当时的 `name`、`type`、`modules`、`settings` 作为 binding 的规划目标。
-- 复制完成后，修改 binding station 不影响 source empire；修改 source empire 也不影响已复制的 binding station。
+- 从 blueprint empire station 导入时，只复制当时的 `name`、`type`、`modules`、`settings` 作为 binding 的规划目标。
+- 复制完成后，修改 binding station 不影响 blueprint empire；修改 blueprint empire 也不影响已复制的 binding station。
 
 ### 7. 平铺存储与未分组
 
@@ -77,6 +81,8 @@
 - binding 使用显式保存。
 - group 编辑、coverage 修改、source empire 导入、规划 modules 修改、virtual station 创建/删除都进入 binding dirty 状态。
 - `保存绑定` 写入 `x4_save_bindings`；`保存帝国` 不保存 binding。
+- save panel 的 binding 分支标题栏右侧显示 `取消`、`保存`、`关闭` 三个按钮；`取消` 放弃 binding draft，`保存` 写入 binding，`关闭` 只关闭面板。
+- 量化生产界面不提供保存 binding 或放弃 binding 改动入口，避免把生产视图变成 binding 编辑入口。
 - `activeGameGuid`、`selectedArchiveTime`、`blueprintEmpireId` 可作为 UI 视角/偏好保存，但不得让用户误以为它们会同步或修改 empire。
 - 离开 dirty binding、切换 binding 或关闭相关面板时，UI 应提供保存、放弃或继续编辑的选择。
 
