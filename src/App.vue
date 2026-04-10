@@ -11,6 +11,7 @@ import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useStationStore } from '@/store/useStationStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useMapStore } from '@/store/useMapStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
@@ -19,6 +20,7 @@ const shipBuildStore = useShipBuildStore()
 const stationStore = useStationStore()
 const saveStore = useSaveStore()
 const mapStore = useMapStore()
+const saveBindingStore = useSaveBindingStore()
 
 const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
 const isInitializing = ref(true)
@@ -39,7 +41,8 @@ async function initializeApp() {
       logicFlowStore.init(),
       mapStore.initialize(),
       shipBuildStore.initialize(),
-      saveStore.initialize()
+      saveStore.initialize(),
+      saveBindingStore.initialize()
     ])
 
     console.log('[App] All stores initialized. Empire ready:', empireStore.isReady)
@@ -84,6 +87,7 @@ const checkExportStores = () => {
       (window as any).logicFlowStore = logicFlowStore;
       (window as any).empireStore = empireStore;
       (window as any).shipBuildStore = shipBuildStore;
+      (window as any).saveBindingStore = saveBindingStore;
       (window as any).store = stationStore;
     }
     return true;

@@ -2,13 +2,14 @@ import { computed, type ComputedRef } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import type {
   SaveBindingPlan,
   GroupSaveBinding,
   StationSaveBinding,
   ResolvedGroupSaveBinding,
   ResolvedStationSaveBinding,
-  SectorPlan,
+  BindingSectorGroup,
   StationPlan,
   CoverageSectorEntry
 } from '@/types/x4'
@@ -53,7 +54,7 @@ export interface EmpireStationBindingInfo {
 }
 
 export interface GroupBindingInfo {
-  group: SectorPlan
+  group: BindingSectorGroup
   binding: ResolvedGroupSaveBinding | null
   coverageSectorMacros: CoverageSectorEntry[]
 }
@@ -80,13 +81,14 @@ export function useMapBindingViewModel(): MapBindingViewModel {
   const empireStore = useEmpireStore()
   const saveStore = useSaveStore()
   const gameDataStore = useGameDataStore()
+  const saveBindingStore = useSaveBindingStore()
 
   const activeBindingPlan = computed<SaveBindingPlan | null>(() => {
-    return empireStore.getActiveBinding()
+    return saveBindingStore.activeBinding
   })
 
   const bindingPlansForEmpire = computed<SaveBindingPlan[]>(() => {
-    return empireStore.activeEmpire?.saveBindings || []
+    return saveBindingStore.bindings
   })
 
   const selectedArchiveTime = computed<number | null>(() => {
@@ -150,12 +152,8 @@ export function useMapBindingViewModel(): MapBindingViewModel {
 
     const allBoundCodes = new Set<string>()
     if (bindingKey && activeBindingPlan.value) {
-      for (const group of activeBindingPlan.value.groupBindings) {
-        for (const binding of group.stationBindings) {
-          if (binding.saveStationCode) {
-            allBoundCodes.add(binding.saveStationCode)
-          }
-        }
+      for (const plan of activeBindingPlan.value.stationPlans) {
+        if (plan.kind === 'save-station') allBoundCodes.add(plan.saveStationCode)
       }
     }
 
@@ -172,22 +170,18 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     const empire = empireStore.activeEmpire
     if (!empire) return []
 
-    const stations = empire.stations.filter((s) => s.sectorId === sectorGroupId)
+    const stations = empire.stations
     const bindingKey = activeBindingPlan.value?.gameGuid
     const archive = getActiveArchive()
 
-    const groupBinding = bindingKey
-      ? (activeBindingPlan.value?.groupBindings || []).find((b) => b.sectorGroupId === sectorGroupId) || null
-      : null
+    void bindingKey
+    void sectorGroupId
 
     return stations.map((station) => {
-      const rawBinding = groupBinding
-        ? (groupBinding.stationBindings || []).find((b: StationSaveBinding) => b.stationId === station.id) || null
-        : null
-
-      const binding = rawBinding ? resolveStationSaveBinding(rawBinding, archive) : null
-      const isIdle = !rawBinding?.saveStationCode
-      const hasPosition = Boolean(rawBinding?.position)
+      void archive
+      const binding = null
+      const isIdle = true
+      const hasPosition = false
 
       return { station, binding, isIdle, hasPosition }
     })
@@ -207,34 +201,42 @@ export function useMapBindingViewModel(): MapBindingViewModel {
       }))
     }
 
-    const allStationBindings: StationSaveBinding[] = []
-    for (const group of activeBindingPlan.value?.groupBindings || []) {
-      allStationBindings.push(...group.stationBindings)
-    }
-
-    const archive = getActiveArchive()
-
     return empire.stations.map((station) => {
-      const rawBinding = allStationBindings.find((b: StationSaveBinding) => b.stationId === station.id) || null
-      const binding = rawBinding ? resolveStationSaveBinding(rawBinding, archive) : null
-      const isIdle = !rawBinding?.saveStationCode
-      const hasPosition = Boolean(rawBinding?.position)
-
-      return { station, binding, isIdle, hasPosition }
-    }).filter((info) => info.isIdle || info.hasPosition)
+      return { station, binding: null, isIdle: true, hasPosition: false }
+    })
   }
 
   function getGroupBindings(): GroupBindingInfo[] {
     const empire = empireStore.activeEmpire
     if (!empire) return []
 
-    const sectors = empire.sectors || []
+    const sectors = activeBindingPlan.value?.groups || []
     const bindingKey = activeBindingPlan.value?.gameGuid
     const archive = getActiveArchive()
 
     return sectors.map((group) => {
       const rawBinding = bindingKey
-        ? (activeBindingPlan.value?.groupBindings || []).find((b) => b.sectorGroupId === group.id) || null
+        ? {
+            sectorGroupId: group.id,
+            sectorMacro: group.sectorMacro,
+            jumpRange: group.jumpRange,
+            coverageSectorMacros: group.coverageSectorMacros,
+            connectedSectorGroupIds: group.connectedGroupIds,
+            tradestationBinding: group.virtualStation && group.virtualStation.role === 'tradestation'
+              ? {
+                  stationId: group.virtualStation.id,
+                  sectorMacro: group.virtualStation.sectorMacro,
+                  position: group.virtualStation.position
+                }
+              : undefined,
+            stationBindings: group.virtualStation && group.virtualStation.role !== 'tradestation'
+              ? [{
+                  stationId: group.virtualStation.id,
+                  sectorMacro: group.virtualStation.sectorMacro,
+                  position: group.virtualStation.position
+                } as StationSaveBinding]
+              : [] as StationSaveBinding[]
+          }
         : null
 
       const binding = rawBinding ? resolveGroupSaveBinding(rawBinding, archive) : null
@@ -248,7 +250,10 @@ export function useMapBindingViewModel(): MapBindingViewModel {
   function isSaveStationBound(sectorGroupId: string, saveStationCode: string): boolean {
     const bindingKey = activeBindingPlan.value?.gameGuid
     if (!bindingKey) return false
-    return empireStore.isSaveStationAlreadyBound(bindingKey, sectorGroupId, saveStationCode)
+    void sectorGroupId
+    return Boolean(activeBindingPlan.value?.stationPlans.some(
+      (plan) => plan.kind === 'save-station' && plan.saveStationCode === saveStationCode
+    ))
   }
 
   function resolveStationBinding(binding: StationSaveBinding): ResolvedStationSaveBinding {

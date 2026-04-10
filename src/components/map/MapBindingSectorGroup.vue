@@ -2,16 +2,16 @@
 import draggable from 'vuedraggable'
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch, type ComponentPublicInstance } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useSectorNameFilter } from '@/composables/useSectorNameFilter'
 import { getLocalizedSectorQueryMatch } from './savePoiSearch'
 import { getCoverageSectors, buildSectorGraphFromMaps } from '@/store/logic/saveBindingUtils'
 import { resolveMapSectorByMacro } from './mapSectorMacro'
 import { getStationPoiLabel } from './savePoiLabel'
 import JumpInput from '@/components/common/JumpInput.vue'
-import type { SaveBindingPlan, SectorPlan, CoverageSectorEntry } from '@/types/x4'
+import type { BindingSectorGroup, SaveBindingPlan, CoverageSectorEntry } from '@/types/x4'
 import type { PlayerStationEntry, SaveArchive } from '@/types/saveArchive'
 
 const props = defineProps<{
@@ -25,9 +25,9 @@ const emit = defineEmits<{
 }>()
 
 const { t, te, locale } = useI18n()
-const empireStore = useEmpireStore()
 const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
+const saveBindingStore = useSaveBindingStore()
 
 const sectorSearchQuery = ref('')
 const { getSectorDisplayName, normalizedQuery } = useSectorNameFilter(sectorSearchQuery)
@@ -39,10 +39,9 @@ const bindMenuTargetSectorId = ref<string | null>(null)
 const bindMenuTriggerEl = ref<HTMLElement | null>(null)
 const sectorItemEls = ref<Record<string, HTMLElement | null>>({})
 
-const activeEmpire = computed(() => empireStore.activeEmpire)
-
 const activeBindingPlan = computed<SaveBindingPlan | null>(() => {
-  return empireStore.activeEmpire?.saveBindings?.find((b) => b.gameGuid === props.gameGuid) || null
+  if (saveBindingStore.activeBinding?.gameGuid === props.gameGuid) return saveBindingStore.activeBinding
+  return saveBindingStore.getBindingByGameGuid(props.gameGuid)
 })
 
 const activeArchive = computed<SaveArchive | null>(() => {
@@ -210,23 +209,18 @@ const filteredSaveSectors = computed<SectorWithStations[]>(() => {
     })
 })
 
-const empireSectors = computed<SectorPlan[]>(() => {
-  if (!activeEmpire.value) return []
-  return [...(activeEmpire.value.sectors || [])].sort((a, b) => (a.order || 0) - (b.order || 0))
+const empireSectors = computed<BindingSectorGroup[]>(() => {
+  return [...(activeBindingPlan.value?.groups || [])].sort((a, b) => (a.order || 0) - (b.order || 0))
 })
 
 const empireSectorItems = computed(() => {
   const items = empireSectors.value.map(sector => {
-    const groupBinding = activeBindingPlan.value?.groupBindings.find(
-      (b) => b.sectorGroupId === sector.id
-    )
-    
     // 如果当前正在编辑此星区，使用 draft 数据
     if (draft.value.sectorGroupId === sector.id) {
       return {
         id: sector.id,
         name: sector.name,
-        isBound: !!groupBinding,
+        isBound: !!draft.value.anchorSectorMacro,
         sectorMacro: draft.value.anchorSectorMacro,
         coverageMacros: draft.value.coverage,
         connectedSectorGroupIds: draft.value.connectedSectorGroupIds,
@@ -238,11 +232,11 @@ const empireSectorItems = computed(() => {
     return {
       id: sector.id,
       name: sector.name,
-      isBound: !!groupBinding,
-      sectorMacro: groupBinding?.sectorMacro || null,
-      coverageMacros: groupBinding?.coverageSectorMacros || [],
-      connectedSectorGroupIds: groupBinding?.connectedSectorGroupIds || [],
-      jumpRange: groupBinding?.jumpRange || 2,
+      isBound: !!sector.sectorMacro,
+      sectorMacro: sector.sectorMacro || null,
+      coverageMacros: sector.coverageSectorMacros || [],
+      connectedSectorGroupIds: sector.connectedGroupIds || [],
+      jumpRange: sector.jumpRange || 2,
       expanded: false
     }
   })
@@ -272,8 +266,8 @@ const visibleMapSectors = computed<string[]>(() => {
 function isSectorBoundToOtherGroup(sectorMacro: string, currentGroupId: string): boolean {
   if (!activeBindingPlan.value) return false
 
-  return activeBindingPlan.value.groupBindings.some(b => {
-    if (b.sectorGroupId === currentGroupId) return false
+  return activeBindingPlan.value.groups.some(b => {
+    if (b.id === currentGroupId) return false
     if (b.sectorMacro === sectorMacro) return true
     return b.coverageSectorMacros?.some(entry => entry.ref === sectorMacro)
   })
@@ -281,12 +275,12 @@ function isSectorBoundToOtherGroup(sectorMacro: string, currentGroupId: string):
 
 function isSaveSectorBound(sectorMacro: string): boolean {
   if (!activeBindingPlan.value) return false
-  const isAnchor = activeBindingPlan.value.groupBindings.some(
+  const isAnchor = activeBindingPlan.value.groups.some(
     b => b.sectorMacro === sectorMacro
   )
   if (isAnchor) return true
 
-  const isCoverage = activeBindingPlan.value.groupBindings.some(
+  const isCoverage = activeBindingPlan.value.groups.some(
     b => b.coverageSectorMacros?.some(entry => entry.ref === sectorMacro)
   )
   return isCoverage
@@ -294,19 +288,19 @@ function isSaveSectorBound(sectorMacro: string): boolean {
 
 function getBoundSectorGroupName(sectorMacro: string): string | null {
   if (!activeBindingPlan.value) return null
-  const anchorBinding = activeBindingPlan.value.groupBindings.find(
+  const anchorBinding = activeBindingPlan.value.groups.find(
     (b) => b.sectorMacro === sectorMacro
   )
   if (anchorBinding) {
-    const sector = empireSectors.value.find((s) => s.id === anchorBinding.sectorGroupId)
+    const sector = empireSectors.value.find((s) => s.id === anchorBinding.id)
     return sector?.name || null
   }
 
-  const groupBinding = activeBindingPlan.value.groupBindings.find(
+  const groupBinding = activeBindingPlan.value.groups.find(
     (b) => b.coverageSectorMacros?.some(entry => entry.ref === sectorMacro)
   )
   if (groupBinding) {
-    const sector = empireSectors.value.find((s) => s.id === groupBinding.sectorGroupId)
+    const sector = empireSectors.value.find((s) => s.id === groupBinding.id)
     return sector?.name || null
   }
   
@@ -317,8 +311,8 @@ function getOtherGroupOccupiedSectorMacros(currentGroupId: string | null): Set<s
   const occupied = new Set<string>()
   if (!activeBindingPlan.value) return occupied
 
-  activeBindingPlan.value.groupBindings.forEach((binding) => {
-    if (binding.sectorGroupId === currentGroupId) return
+  activeBindingPlan.value.groups.forEach((binding) => {
+    if (binding.id === currentGroupId) return
     if (binding.sectorMacro) occupied.add(binding.sectorMacro)
     ;(binding.coverageSectorMacros || []).forEach((entry) => occupied.add(entry.ref))
   })
@@ -462,8 +456,8 @@ function selectVisibleSectorForBinding(sectorMacro: string) {
 
 function isCurrentBoundSector(sectorMacro: string): boolean {
   if (!bindMenuTargetSectorId.value) return false
-  const groupBinding = activeBindingPlan.value?.groupBindings.find(
-    b => b.sectorGroupId === bindMenuTargetSectorId.value
+  const groupBinding = activeBindingPlan.value?.groups.find(
+    b => b.id === bindMenuTargetSectorId.value
   )
   return groupBinding?.sectorMacro === sectorMacro
 }
@@ -476,8 +470,8 @@ function onMenuSectorClick(sectorMacro: string) {
   if (!bindMenuTargetSectorId.value) return
   if (isDraftBoundSector(sectorMacro)) return
   const currentSector = empireSectors.value.find((item) => item.id === bindMenuTargetSectorId.value)
-  const currentBinding = activeBindingPlan.value?.groupBindings.find(
-    b => b.sectorGroupId === bindMenuTargetSectorId.value
+  const currentBinding = activeBindingPlan.value?.groups.find(
+    b => b.id === bindMenuTargetSectorId.value
   )
   
   if (currentBinding?.sectorMacro === sectorMacro) {
@@ -513,7 +507,7 @@ function onMenuSectorClick(sectorMacro: string) {
   draft.value.isNew = !currentSector
   draft.value.name = currentSector?.name || draft.value.name
   draft.value.anchorSectorMacro = sectorMacro
-  draft.value.connectedSectorGroupIds = [...(currentBinding?.connectedSectorGroupIds || [])]
+  draft.value.connectedSectorGroupIds = [...(currentBinding?.connectedGroupIds || [])]
   
   // 编辑时不写入 store，只在 draft 中操作
   closeBindMenu()
@@ -522,17 +516,14 @@ function onMenuSectorClick(sectorMacro: string) {
 function openDraft(sectorId: string) {
   if (isDraftOpen() && draft.value.sectorGroupId !== sectorId) return
   const sector = empireSectors.value.find((item) => item.id === sectorId)
-  const currentBinding = activeBindingPlan.value?.groupBindings.find(
-    b => b.sectorGroupId === sectorId
-  )
   draft.value = {
     sectorGroupId: sectorId,
     isNew: false,
     name: sector?.name || '',
-    anchorSectorMacro: currentBinding?.sectorMacro || null,
-    jumpRange: currentBinding?.jumpRange || 2,
-    coverage: sanitizeDraftCoverageEntries([...(currentBinding?.coverageSectorMacros || [])], sectorId),
-    connectedSectorGroupIds: [...(currentBinding?.connectedSectorGroupIds || [])]
+    anchorSectorMacro: sector?.sectorMacro || null,
+    jumpRange: sector?.jumpRange || 2,
+    coverage: sanitizeDraftCoverageEntries([...(sector?.coverageSectorMacros || [])], sectorId),
+    connectedSectorGroupIds: [...(sector?.connectedGroupIds || [])]
   }
 }
 
@@ -553,21 +544,21 @@ function confirmBinding(sectorId: string) {
   let resolvedSectorId = sectorId
 
   if (draft.value.isNew) {
-    const created = empireStore.createSector(resolvedName)
+    const created = saveBindingStore.createGroup(props.gameGuid, resolvedName)
     if (!created) {
       closeDraft()
       return
     }
     resolvedSectorId = created.id
   } else {
-    empireStore.renameSector(sectorId, resolvedName || draft.value.name)
+    saveBindingStore.updateGroup(props.gameGuid, sectorId, { name: resolvedName || draft.value.name })
   }
 
-  const previousBinding = activeBindingPlan.value?.groupBindings.find((binding) => binding.sectorGroupId === resolvedSectorId)
-  const previousConnections = new Set(previousBinding?.connectedSectorGroupIds || [])
+  const previousBinding = activeBindingPlan.value?.groups.find((binding) => binding.id === resolvedSectorId)
+  const previousConnections = new Set(previousBinding?.connectedGroupIds || [])
   const nextConnections = new Set(draft.value.connectedSectorGroupIds)
 
-  empireStore.bindSectorGroup({
+  saveBindingStore.bindSectorGroup({
     gameGuid: props.gameGuid,
     sectorGroupId: resolvedSectorId,
     sectorMacro: draft.value.anchorSectorMacro,
@@ -577,7 +568,7 @@ function confirmBinding(sectorId: string) {
 
   const relatedSectorIds = new Set([...previousConnections, ...nextConnections])
   relatedSectorIds.forEach((relatedSectorId) => {
-    empireStore.setGroupConnection(props.gameGuid, resolvedSectorId, relatedSectorId, nextConnections.has(relatedSectorId))
+    saveBindingStore.setGroupConnection(props.gameGuid, resolvedSectorId, relatedSectorId, nextConnections.has(relatedSectorId))
   })
 
   deleteConfirmOpen.value = false
@@ -713,7 +704,9 @@ function createSectorAndEdit() {
 }
 
 function applySectorOrder(items: Array<{ id: string }>) {
-  empireStore.reorderSectors(items.map((item) => item.id))
+  items.forEach((item, order) => {
+    saveBindingStore.updateGroup(props.gameGuid, item.id, { order })
+  })
 }
 
 function getConnectedSectorCandidates() {
@@ -726,8 +719,7 @@ function getConnectedSectorCandidates() {
   return empireSectors.value
     .filter((sector) => sector.id !== draft.value.sectorGroupId)
     .map((sector) => {
-      const binding = activeBindingPlan.value?.groupBindings.find((item) => item.sectorGroupId === sector.id)
-      const anchorMacro = binding?.sectorMacro
+      const anchorMacro = sector.sectorMacro
       if (!anchorMacro) return null
       const jump = distanceMap.get(anchorMacro)
       if (jump === undefined || jump <= 0 || jump > 5) return null
@@ -765,23 +757,22 @@ function toggleDraftConnection(sectorId: string, connected: boolean) {
 }
 
 function getCollapsedConnectedSectors(sectorId: string) {
-  const groupBinding = activeBindingPlan.value?.groupBindings.find((binding) => binding.sectorGroupId === sectorId)
+  const groupBinding = activeBindingPlan.value?.groups.find((binding) => binding.id === sectorId)
   const sectorGraphData = buildSectorGraphFromMaps(gameDataStore.maps?.clusters || {}, gameDataStore.maps?.sectors || {})
   const anchorMacro = groupBinding?.sectorMacro
   const distanceMap = anchorMacro
     ? new Map(getCoverageSectors(anchorMacro, 5, sectorGraphData.sectorGraph, sectorGraphData.sectorClusterMap).map((entry) => [entry.sectorMacro, entry.distance]))
     : new Map<string, number>()
 
-  return (groupBinding?.connectedSectorGroupIds || [])
+  return (groupBinding?.connectedGroupIds || [])
     .map((connectedId) => {
       const sector = empireSectors.value.find((item) => item.id === connectedId)
-      const targetBinding = activeBindingPlan.value?.groupBindings.find((item) => item.sectorGroupId === connectedId)
-      if (!sector || !targetBinding?.sectorMacro) return null
+      if (!sector?.sectorMacro) return null
       return {
         sectorId: connectedId,
         name: sector.name,
-        sectorMacro: targetBinding.sectorMacro,
-        jump: distanceMap.get(targetBinding.sectorMacro) || 0
+        sectorMacro: sector.sectorMacro,
+        jump: distanceMap.get(sector.sectorMacro) || 0
       }
     })
     .filter(Boolean)
@@ -825,7 +816,7 @@ function cancelDeleteCurrentSector() {
 
 function confirmDeleteCurrentSector() {
   if (!draft.value.sectorGroupId || draft.value.isNew) return
-  empireStore.deleteSector(draft.value.sectorGroupId, props.gameGuid)
+  saveBindingStore.deleteGroup(props.gameGuid, draft.value.sectorGroupId)
   deleteConfirmOpen.value = false
   closeDraft()
   closeBindMenu()

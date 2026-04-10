@@ -1,0 +1,31 @@
+# stand-alone-binding Tasks
+
+## Documentation
+
+- [x] D1. 创建 `request.md` 并记录独立 binding、按需 station plan、显式保存、量化生产数据源等已确认方案
+- [x] D2. 创建 `design.md` 并说明 store、派生视图、UI 和保存策略
+- [x] D3. 创建 delta specs 覆盖 save binding、empire 管理、地图 binding、量化生产和星区总览
+
+## Implementation
+
+- [x] T1. 新增 save binding 类型与独立 storage 版本
+- [x] T2. 新增 `useSaveBindingStore`，支持按 `gameGuid` 创建/打开唯一 binding
+- [x] T3. 实现 binding draft、dirty、保存、放弃改动和 selected archive time/source empire 视角状态
+- [x] T4. 从 `EmpirePlan` 与 `useEmpireStore` 中移除 save binding 写入路径
+- [x] T5. 从 empire 业务中移除 binding 星区职责，避免 Step 2 继续读写 `activeEmpire.sectors`
+- [x] T6. 实现 binding group actions：创建、排序、重命名、anchor、coverage、jump range、connected groups
+- [x] T7. 实现 covered save station 派生 view model，进入 binding 时不自动创建 station plan
+- [x] T8. 实现 source empire station 候选选择与单次复制导入
+- [x] T9. 实现 save station plan 的按需创建、更新、清空删除
+- [x] T10. 实现 virtual station 显式创建、编辑、定位和删除
+- [x] T11. 改造 `MapSaveArchiveList` / `MapSavePanel` 使用独立 save binding store
+- [x] T12. 改造 `MapBindingSectorGroup` 读写 binding groups
+- [x] T13. 改造 `MapBindingStation` 显示派生 save station views、source empire 导入和 virtual station 操作
+- [x] T14. 改造地图 binding POI 投影，从独立 binding store 派生
+- [x] T15. 为量化生产新增 production source adapter，支持 `empire` 与 `save-binding`
+- [x] T16. 量化生产在 `save-binding` source 下只使用 planned modules
+- [x] T17. 移除星区总览中的星区管理面板内容，并保留左侧布局占位防止右侧资源视图扩张
+- [x] T18. 更新 storage import/export，把 `x4_save_bindings` 作为独立模块处理
+- [x] T19. 更新 i18n 文案：保存绑定、绑定 dirty、binding 星区、source empire 导入、virtual station
+- [x] T20. 清理旧 `EmpirePlan.saveBindings` 相关引用和旧 binding action
+- [x] T21. 运行 `npm run build`，修复编译错误并重复执行直到通过或明确 blocker

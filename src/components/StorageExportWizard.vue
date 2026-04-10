@@ -6,6 +6,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useSaveStore } from '@/store/useSaveStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import {
   buildExportPayload,
   buildSaveExportData,
@@ -29,6 +30,7 @@ const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
 const saveStore = useSaveStore()
+const saveBindingStore = useSaveBindingStore()
 
 const currentVersionLabel = computed(() =>
   gameDataStore.displayFullVersion()
@@ -60,7 +62,8 @@ watch(
       empireStore.savedEmpires,
       logicFlowStore.savedPlans,
       shipBuildStore.savedBlueprints,
-      gameDataStore
+      gameDataStore,
+      saveBindingStore.savedBindings
     )
     
     const saveExportData = await buildSaveExportData(saveStore.savedArchivesState, gameDataStore)
@@ -86,6 +89,8 @@ const moduleTitle = (key: ImportModuleKey) => {
       return t('moduleNames.ship')
     case 'x4_save_archives':
       return t('moduleNames.save')
+    case 'x4_save_bindings':
+      return t('moduleNames.save_binding')
     default:
       return key
   }
@@ -106,7 +111,8 @@ const handleDownload = async () => {
     empireStore.savedEmpires,
     logicFlowStore.savedPlans,
     shipBuildStore.savedBlueprints,
-    gameDataStore
+    gameDataStore,
+    saveBindingStore.savedBindings
   )
 
   if (includeSaveArchives.value && saveStore.savedArchivesState.list.length > 0) {

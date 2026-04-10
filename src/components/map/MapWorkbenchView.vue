@@ -16,6 +16,7 @@ import { resolveMapSectorByMacro, resolveSectorMacroById } from '@/components/ma
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 import { useSaveStore } from '@/store/useSaveStore'
@@ -195,6 +196,7 @@ const gameDataStore = useGameDataStore()
 const mapStore = useMapStore()
 const saveStore = useSaveStore()
 const empireStore = useEmpireStore()
+const saveBindingStore = useSaveBindingStore()
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
   const maps = gameDataStore.maps
@@ -276,7 +278,9 @@ const activeBindingDragPreview = computed<{
 
 const resolveBindingArchive = (gameGuid: string | null) => {
   if (!gameGuid) return null
-  const binding = empireStore.activeEmpire?.saveBindings?.find((item) => item.gameGuid === gameGuid) || null
+  const binding = saveBindingStore.activeBinding?.gameGuid === gameGuid
+    ? saveBindingStore.activeBinding
+    : saveBindingStore.getBindingByGameGuid(gameGuid)
   const selected = saveStore.selectedArchive
   if (selected && selected.meta.guid === gameGuid) {
     if (binding?.selectedArchiveTime === null || binding?.selectedArchiveTime === undefined || selected.meta.time === binding?.selectedArchiveTime) {
@@ -360,7 +364,7 @@ const resolveSectorDisplayNameByMacro = (sectorMacro: string) => {
 }
 
 const resolveEmpireSectorGroupName = (sectorGroupId: string) =>
-  empireStore.activeEmpire?.sectors?.find((sector) => sector.id === sectorGroupId)?.name || sectorGroupId
+  saveBindingStore.activeBinding?.groups.find((sector) => sector.id === sectorGroupId)?.name || sectorGroupId
 
 const buildBindingSavePoiVisual = (input: {
   key: string
@@ -446,118 +450,74 @@ const buildBindingPreview = (
 }
 
 const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
-  const empire = empireStore.activeEmpire
-  if (!empire) return []
   if (!savePoiVisibility.value.playerStation) return []
-  const activePlan = (empire.saveBindings || []).find((plan) => plan.active) || null
+  const activePlan = saveBindingStore.activeBinding
   if (!activePlan) return []
 
   const overlays: PlacementOverlayItem[] = []
-  for (const plan of [activePlan]) {
-    for (const group of plan.groupBindings) {
-      const coverageSectorMacros = Array.from(new Set([
-        ...(group.sectorMacro ? [group.sectorMacro] : []),
-        ...(group.coverageSectorMacros || []).map((entry) => entry.ref)
-      ]))
+  for (const group of activePlan.groups) {
+    const stationPlan = group.virtualStation
+    if (!stationPlan?.position || !stationPlan.sectorMacro) continue
+    const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationPlan.sectorMacro)
+    if (!resolved) continue
+    const isVirtualTradestation = stationPlan.role === 'tradestation' || stationPlan.name === t('map.binding_tradestation_virtual')
+    const coverageSectorMacros = Array.from(new Set([
+      ...(group.sectorMacro ? [group.sectorMacro] : []),
+      ...(group.coverageSectorMacros || []).map((entry) => entry.ref)
+    ]))
 
-      if (group.tradestationBinding?.position && group.sectorMacro && !group.tradestationBinding.saveStationCode) {
-        const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, group.sectorMacro)
-        if (resolved) {
-          overlays.push({
-            key: `binding:tradestation:${group.sectorGroupId}`,
-            id: group.tradestationBinding.stationId,
-            kind: 'sector',
-            name: empire.sectors?.find(s => s.id === group.sectorGroupId)?.name || group.sectorGroupId,
-            icon: 'tradestation',
-            location: {
-              cluster_id: resolved.clusterId,
-              sector_id: resolved.sectorId,
-              pos: {
-                x: group.tradestationBinding.position.x,
-                z: group.tradestationBinding.position.z
-              },
-              sunlight: 0,
-              resources: []
-            },
-            localRatio: buildSaveSectorLocalRatio(plan.gameGuid, group.sectorMacro, resolved.sectorId, {
-              x: group.tradestationBinding.position.x,
-              z: group.tradestationBinding.position.z
-            }),
-            draggable: isBindingPanelOpen.value &&
-              bindingContextStage.value === 'select-station' &&
-              dragEnabledBindingSectorGroupId.value === group.sectorGroupId &&
-              bindingContextGameGuid.value === plan.gameGuid,
-            savePoiVisual: buildBindingSavePoiVisual({
-              key: `binding:tradestation:${group.sectorGroupId}`,
-              code: empire.sectors?.find(s => s.id === group.sectorGroupId)?.name || group.sectorGroupId,
-              sectorMacro: group.sectorMacro,
-              position: {
-                x: group.tradestationBinding.position.x,
-                z: group.tradestationBinding.position.z
-              },
-              isVirtualTradestation: true,
-              sectorGroupId: group.sectorGroupId
-            }),
-            binding: {
-              gameGuid: plan.gameGuid,
-              sectorGroupId: group.sectorGroupId,
-              coverageSectorMacros,
-              isVirtualTradestation: true
-            }
-          })
-        }
+    overlays.push({
+      key: `binding:station:${stationPlan.id}`,
+      id: stationPlan.id,
+      kind: 'station',
+      name: stationPlan.name,
+      icon: isVirtualTradestation
+        ? 'tradestation'
+        : stationPlan.type === 'shipyard' ? 'shipyard' : 'factory',
+      location: {
+        cluster_id: resolved.clusterId,
+        sector_id: resolved.sectorId,
+        pos: {
+          x: stationPlan.position.x,
+          z: stationPlan.position.z
+        },
+        sunlight: 0,
+        resources: []
+      },
+      localRatio: buildSaveSectorLocalRatio(activePlan.gameGuid, stationPlan.sectorMacro, resolved.sectorId, {
+        x: stationPlan.position.x,
+        z: stationPlan.position.z
+      }),
+      draggable: isBindingPanelOpen.value &&
+        bindingContextStage.value === 'select-station' &&
+        dragEnabledBindingSectorGroupId.value === group.id &&
+        bindingContextGameGuid.value === activePlan.gameGuid,
+      savePoiVisual: buildBindingSavePoiVisual({
+        key: `binding:station:${stationPlan.id}`,
+        code: stationPlan.name,
+        sectorMacro: stationPlan.sectorMacro,
+        position: {
+          x: stationPlan.position.x,
+          z: stationPlan.position.z
+        },
+        station: {
+          id: stationPlan.id,
+          name: stationPlan.name,
+          type: stationPlan.type,
+          modules: stationPlan.modules,
+          settings: stationPlan.settings,
+          lastUpdated: activePlan.updatedAt
+        },
+        isVirtualTradestation,
+        sectorGroupId: group.id
+      }),
+      binding: {
+        gameGuid: activePlan.gameGuid,
+        sectorGroupId: group.id,
+        coverageSectorMacros,
+        isVirtualTradestation
       }
-
-      for (const stationBinding of group.stationBindings) {
-        if (stationBinding.saveStationCode) continue
-        if (stationBinding.position && stationBinding.sectorMacro) {
-          const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationBinding.sectorMacro)
-          if (resolved) {
-            const station = empire.stations?.find(s => s.id === stationBinding.stationId)
-            overlays.push({
-              key: `binding:station:${stationBinding.stationId}`,
-              id: stationBinding.stationId,
-              kind: 'station',
-              name: station?.name || stationBinding.stationId,
-              icon: station?.type === 'shipyard' ? 'shipyard' : 'factory',
-              location: {
-                cluster_id: resolved.clusterId,
-                sector_id: resolved.sectorId,
-                pos: {
-                  x: stationBinding.position.x,
-                  z: stationBinding.position.z
-                },
-                sunlight: 0,
-                resources: []
-              },
-              localRatio: buildSaveSectorLocalRatio(plan.gameGuid, stationBinding.sectorMacro, resolved.sectorId, {
-                x: stationBinding.position.x,
-                z: stationBinding.position.z
-              }),
-              draggable: isBindingPanelOpen.value &&
-                bindingContextStage.value === 'select-station' &&
-                dragEnabledBindingSectorGroupId.value === group.sectorGroupId &&
-                bindingContextGameGuid.value === plan.gameGuid,
-              savePoiVisual: buildBindingSavePoiVisual({
-                key: `binding:station:${stationBinding.stationId}`,
-                code: station?.name || stationBinding.stationId,
-                sectorMacro: stationBinding.sectorMacro,
-                position: {
-                  x: stationBinding.position.x,
-                  z: stationBinding.position.z
-                },
-                station
-              }),
-              binding: {
-                gameGuid: plan.gameGuid,
-                sectorGroupId: group.sectorGroupId,
-                coverageSectorMacros
-              }
-            })
-          }
-        }
-      }
-    }
+    })
   }
 
   return overlays
@@ -1061,10 +1021,18 @@ const clearPlacementState = () => {
 const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocation) => {
   if (item.kind === 'station') {
     if (draggingBindingKey.value && draggingSectorGroupId.value) {
-      empireStore.setStationBindingPosition(draggingBindingKey.value, draggingSectorGroupId.value, item.id, {
-        x: location.pos.x,
-        y: 0,
-        z: location.pos.z
+      const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
+      if (!sectorMacro) return
+      saveBindingStore.setVirtualStationPosition({
+        gameGuid: draggingBindingKey.value,
+        stationPlanId: item.id,
+        groupId: draggingSectorGroupId.value,
+        sectorMacro,
+        position: {
+          x: location.pos.x,
+          y: 0,
+          z: location.pos.z
+        }
       })
     } else {
       empireStore.setStationLocation(item.id, location)
@@ -1692,22 +1660,17 @@ const stopDrag = () => {
       clearPlacementState()
       return
     }
-    empireStore.setFreeSectorBinding({
-      gameGuid: draggingBindingKey.value,
-      sectorGroupId: draggingFreeSector.value.sectorGroupId,
+    saveBindingStore.updateGroup(draggingBindingKey.value, draggingFreeSector.value.sectorGroupId, {
       sectorMacro,
-      position: {
-        x: placementPreview.value.location.pos.x,
-        y: 0,
-        z: placementPreview.value.location.pos.z
-      }
+      coverageSectorMacros: [{ ref: sectorMacro, jump: 0 }]
     })
   } else if (draggingVirtualTradestation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
     const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
     if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
-      empireStore.setTradestationBinding({
+      saveBindingStore.upsertVirtualTradestation({
         gameGuid: draggingBindingKey.value,
-        sectorGroupId: draggingSectorGroupId.value,
+        groupId: draggingSectorGroupId.value,
+        name: draggingVirtualTradestation.value.name,
         sectorMacro,
         position: {
           x: placementPreview.value.location.pos.x,
@@ -1719,10 +1682,14 @@ const stopDrag = () => {
   } else if (draggingFreeStation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
     const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
     if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
-      empireStore.setFreeStationBinding({
+      const source = empireStore.activeEmpire?.stations.find((station) => station.id === draggingFreeStation.value?.stationId)
+      saveBindingStore.createVirtualStation({
         gameGuid: draggingBindingKey.value,
-        sectorGroupId: draggingSectorGroupId.value,
-        stationId: draggingFreeStation.value.stationId,
+        groupId: draggingSectorGroupId.value,
+        name: source?.name || draggingFreeStation.value.name,
+        type: source?.type || 'industrial',
+        modules: source?.modules || [],
+        settings: source?.settings,
         sectorMacro,
         position: {
           x: placementPreview.value.location.pos.x,
@@ -1777,15 +1744,13 @@ const onViewportDrop = (event: DragEvent) => {
   if (draggingPlacementItem.value) {
     applyLocationToItem(draggingPlacementItem.value, location)
   } else if (draggingFreeSector.value && draggingBindingKey.value) {
-    empireStore.setTradestationBinding({
-      gameGuid: draggingBindingKey.value,
-      sectorGroupId: draggingFreeSector.value.sectorGroupId,
-      position: {
-        x: location.pos.x,
-        y: 0,
-        z: location.pos.z
-      }
-    })
+    const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
+    if (sectorMacro) {
+      saveBindingStore.updateGroup(draggingBindingKey.value, draggingFreeSector.value.sectorGroupId, {
+        sectorMacro,
+        coverageSectorMacros: [{ ref: sectorMacro, jump: 0 }]
+      })
+    }
   }
   clearPlacementState()
 }
@@ -1805,37 +1770,29 @@ const onOverlayPointerDown = (payload: {
     isVirtualTradestation?: boolean
   }
 }) => {
-  if (payload.binding) {
-    if (!payload.draggable) {
+	  if (payload.binding) {
+	    if (!payload.draggable) {
       if (payload.savePoiVisual) {
         focusedSavePoiKey.value = payload.savePoiVisual.key
         savePoiTooltipItem.value = payload.savePoiVisual
       }
-      return
-    }
-    draggingPlacementItem.value = null
-    draggingBindingKey.value = payload.binding.gameGuid
-    draggingSectorGroupId.value = payload.binding.sectorGroupId
-    draggingCoverageSectorMacros.value = new Set(payload.binding.coverageSectorMacros)
-    draggingOverlayKey.value = payload.key
-    draggingFreeSector.value = null
-    if (payload.binding.isVirtualTradestation) {
-      draggingFreeStation.value = null
-      draggingVirtualTradestation.value = {
-        sectorGroupId: payload.binding.sectorGroupId,
-        name: payload.name
-      }
-    } else {
-      draggingVirtualTradestation.value = null
-      draggingFreeStation.value = {
-        stationId: payload.id,
-        sectorGroupId: payload.binding.sectorGroupId,
-        name: payload.name,
-        icon: payload.icon as 'factory' | 'shipyard'
-      }
-    }
-    return
-  }
+	      return
+	    }
+	    draggingPlacementItem.value = {
+	      id: payload.id,
+	      kind: payload.kind,
+	      name: payload.name,
+	      icon: payload.icon
+	    }
+	    draggingBindingKey.value = payload.binding.gameGuid
+	    draggingSectorGroupId.value = payload.binding.sectorGroupId
+	    draggingCoverageSectorMacros.value = new Set(payload.binding.coverageSectorMacros)
+	    draggingOverlayKey.value = payload.key
+	    draggingFreeSector.value = null
+	    draggingFreeStation.value = null
+	    draggingVirtualTradestation.value = null
+	    return
+	  }
 
   closeSavePoiTooltip()
   draggingPlacementItem.value = {

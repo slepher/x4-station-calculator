@@ -13,7 +13,8 @@ import type {
   ShipBlueprintBucket,
   X4Ship,
   X4Equipment,
-  X4Map
+  X4Map,
+  SavedSaveBindingsState
 } from '@/types/x4'
 import type {
   SavedSaveArchivesState,
@@ -36,18 +37,20 @@ import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VE
 import { normalizeSectorLinkKey, parseSectorLinkKey } from './sectorLinks'
 
 export type ImportMode = 'overwrite' | 'incremental'
-export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints' | 'x4_save_archives'
+export type ImportModuleKey = 'x4_empire_data' | 'x4_logic_flow_plans' | 'x4_ship_blueprints' | 'x4_save_archives' | 'x4_save_bindings'
 
 const EMPIRE_KEY: ImportModuleKey = 'x4_empire_data'
 const FLOW_KEY: ImportModuleKey = 'x4_logic_flow_plans'
 const SHIP_KEY: ImportModuleKey = 'x4_ship_blueprints'
 const SAVE_KEY: ImportModuleKey = 'x4_save_archives'
+const BINDING_KEY: ImportModuleKey = 'x4_save_bindings'
 
 const STORAGE_KEY_MAP: Record<ImportModuleKey, string> = {
   [EMPIRE_KEY]: 'x4_empire_data',
   [FLOW_KEY]: 'x4_logic_flow_plans',
   [SHIP_KEY]: 'x4_ship_blueprints',
-  [SAVE_KEY]: 'x4_save_archives'
+  [SAVE_KEY]: 'x4_save_archives',
+  [BINDING_KEY]: 'x4_save_bindings'
 }
 
 export interface SaveArchiveExportData {
@@ -114,6 +117,7 @@ export interface ImportApplyOptions {
   logicFlowStore: LogicFlowStoreLike
   shipBuildStore: ShipBuildStoreLike
   saveStore?: SaveStoreLike
+  saveBindingStore?: SaveBindingStoreLike
 }
 
 export interface ImportApplyResult {
@@ -170,6 +174,11 @@ interface SaveStoreLike {
   isInitialized: boolean
   loadDataAndRestore: (data: SavedSaveArchivesState) => Promise<void>
   restoreSelectedArchive: (archiveId: string) => Promise<void>
+}
+
+interface SaveBindingStoreLike {
+  savedBindings: SavedSaveBindingsState
+  loadData: (data: SavedSaveBindingsState) => void
 }
 
 interface ShipSlotRequirement {
@@ -264,6 +273,10 @@ function getStorageKey(moduleKey: ImportModuleKey, gameDataStore?: GameDataStore
   if (moduleKey === EMPIRE_KEY) return gameDataStore.getStorageKey('empire')
   if (moduleKey === FLOW_KEY) return gameDataStore.getStorageKey('logic_flow')
   if (moduleKey === SHIP_KEY) return gameDataStore.getStorageKey('ship_blueprints')
+  if (moduleKey === BINDING_KEY) {
+    const saveKey = gameDataStore.getStorageKey('save_archives')
+    return saveKey.includes('save_archives') ? saveKey.replace('save_archives', 'save_bindings') : STORAGE_KEY_MAP[BINDING_KEY]
+  }
   return gameDataStore.getStorageKey('save_archives')
 }
 
@@ -576,7 +589,8 @@ function getImportModulesFromRaw(raw: unknown): Partial<Record<ImportModuleKey, 
       [EMPIRE_KEY]: raw.data[EMPIRE_KEY],
       [FLOW_KEY]: raw.data[FLOW_KEY],
       [SHIP_KEY]: raw.data[SHIP_KEY],
-      [SAVE_KEY]: raw.data[SAVE_KEY]
+      [SAVE_KEY]: raw.data[SAVE_KEY],
+      [BINDING_KEY]: raw.data[BINDING_KEY]
     }
   }
 
@@ -584,7 +598,18 @@ function getImportModulesFromRaw(raw: unknown): Partial<Record<ImportModuleKey, 
     [EMPIRE_KEY]: raw[EMPIRE_KEY],
     [FLOW_KEY]: raw[FLOW_KEY],
     [SHIP_KEY]: raw[SHIP_KEY],
-    [SAVE_KEY]: raw[SAVE_KEY]
+    [SAVE_KEY]: raw[SAVE_KEY],
+    [BINDING_KEY]: raw[BINDING_KEY]
+  }
+}
+
+function coerceSaveBindingsState(value: unknown): SavedSaveBindingsState | null {
+  if (!isObject(value)) return null
+  if (!Array.isArray(value.list)) return null
+  return {
+    version: Number.isFinite(Number(value.version)) ? Number(value.version) : 1,
+    activeGameGuid: typeof value.activeGameGuid === 'string' ? value.activeGameGuid : null,
+    list: value.list as SavedSaveBindingsState['list']
   }
 }
 
@@ -602,6 +627,7 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
   const flow = coerceFlowState(payload.modules[FLOW_KEY])
   const ship = coerceShipState(payload.modules[SHIP_KEY])
   const save = coerceSaveExportData(payload.modules[SAVE_KEY])
+  const binding = coerceSaveBindingsState(payload.modules[BINDING_KEY])
 
   if (empire) stats.push({ key: EMPIRE_KEY, count: empire.list.length })
   if (flow) stats.push({ key: FLOW_KEY, count: flow.list.length })
@@ -613,6 +639,7 @@ export function getModuleImportStats(payload: NormalizedImportPayload): ModuleIm
   if (save) {
     stats.push({ key: SAVE_KEY, count: save.state.list.length })
   }
+  if (binding) stats.push({ key: BINDING_KEY, count: binding.list.length })
 
   return stats
 }
@@ -968,6 +995,12 @@ export function prepareImportPayload(
     }
   }
 
+  const binding = coerceSaveBindingsState(payload.modules[BINDING_KEY])
+  if (binding) {
+    preparedModules[BINDING_KEY] = binding
+    moduleStats.push({ key: BINDING_KEY, count: binding.list.length })
+  }
+
   return {
     payload,
     moduleStats,
@@ -982,7 +1015,8 @@ export function buildExportPayload(
   empire: SavedEmpiresState,
   flow: SavedFlowPlansState,
   ship: SavedShipBlueprintsState,
-  gameDataStore?: GameDataStoreLike
+  gameDataStore?: GameDataStoreLike,
+  saveBindings?: SavedSaveBindingsState
 ) {
   const lookup = gameDataStore || { modulesMap: {}, modulesByMacroId: {} }
   const empireCoerced = coerceEmpireState(empire)
@@ -1008,7 +1042,8 @@ export function buildExportPayload(
     data: {
       [EMPIRE_KEY]: deepClone(migratedEmpire),
       [FLOW_KEY]: deepClone(migratedFlow),
-      [SHIP_KEY]: deepClone(migratedShip.state)
+      [SHIP_KEY]: deepClone(migratedShip.state),
+      ...(saveBindings ? { [BINDING_KEY]: deepClone(saveBindings) } : {})
     }
   }
 }
@@ -1259,6 +1294,21 @@ async function applySaveImport(options: ImportApplyOptions, warnings: string[]):
   return true
 }
 
+function applySaveBindingImport(options: ImportApplyOptions, warnings: string[]): boolean {
+  const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
+  const bindingData = preparedPayload.preparedModules[BINDING_KEY] as SavedSaveBindingsState | undefined
+  if (!bindingData) return false
+
+  if (options.saveBindingStore) {
+    options.saveBindingStore.loadData(bindingData)
+    return true
+  }
+
+  persistModule(BINDING_KEY, bindingData, options.gameDataStore)
+  warnings.push(`${BINDING_KEY} imported to storage; reload may be required.`)
+  return true
+}
+
 export async function applyImportPayload(options: ImportApplyOptions): Promise<ImportApplyResult> {
   const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
   const warnings: string[] = [...preparedPayload.warnings]
@@ -1268,7 +1318,8 @@ export async function applyImportPayload(options: ImportApplyOptions): Promise<I
   const syncEntries: Array<{ key: ImportModuleKey; run: () => boolean }> = [
     { key: EMPIRE_KEY, run: () => applyEmpireImport(options, warnings) },
     { key: FLOW_KEY, run: () => applyFlowImport(options, warnings) },
-    { key: SHIP_KEY, run: () => applyShipImport(options, warnings) }
+    { key: SHIP_KEY, run: () => applyShipImport(options, warnings) },
+    { key: BINDING_KEY, run: () => applySaveBindingImport(options, warnings) }
   ]
 
   syncEntries.forEach(({ key, run }) => {

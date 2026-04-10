@@ -268,7 +268,11 @@
     "binding_drag_hint": "拖拽到地图",
     "binding_existing_bindings": "现有绑定",
     "binding_status_missing": "当前时间点失效",
-    "binding_footer_hint": "变更将在保存帝国时持久化。",
+    "binding_footer_hint": "绑定需要显式保存。",
+    "binding_saved": "绑定已保存",
+    "binding_unsaved": "绑定有未保存改动",
+    "binding_save": "保存绑定",
+    "binding_discard": "放弃改动",
     "binding_panel_tab": "绑定",
     "binding_archive_time": "存档时间",
     "binding_bound_to": "已绑定到",
@@ -784,7 +788,16 @@
     "sector": "星区",
     "flow": "流程",
     "ship": "舰船",
-    "save": "存档"
+    "save": "存档",
+    "save_binding": "存档绑定"
+  },
+  "production": {
+    "source_empire": "帝国",
+    "source_save_binding": "存档绑定",
+    "binding_saved": "绑定已保存",
+    "binding_unsaved": "绑定有未保存改动",
+    "save_binding": "保存绑定",
+    "discard_binding": "放弃改动"
   },
   "importExport": {
     "title": "导入数据",

@@ -268,7 +268,11 @@
     "binding_drag_hint": "Drag to map",
     "binding_existing_bindings": "Existing Bindings",
     "binding_status_missing": "Missing at this time",
-    "binding_footer_hint": "Changes are saved when you save the empire.",
+    "binding_footer_hint": "Binding changes require an explicit save.",
+    "binding_saved": "Binding saved",
+    "binding_unsaved": "Unsaved binding changes",
+    "binding_save": "Save Binding",
+    "binding_discard": "Discard Changes",
     "binding_panel_tab": "Binding",
     "binding_archive_time": "Archive Time",
     "binding_bound_to": "Bound to",
@@ -782,7 +786,16 @@
     "sector": "Sector",
     "flow": "Flow",
     "ship": "Ship",
-    "save": "Save Archive"
+    "save": "Save Archive",
+    "save_binding": "Save Binding"
+  },
+  "production": {
+    "source_empire": "Empire",
+    "source_save_binding": "Save Binding",
+    "binding_saved": "Binding saved",
+    "binding_unsaved": "Unsaved binding changes",
+    "save_binding": "Save Binding",
+    "discard_binding": "Discard Changes"
   },
   "importExport": {
     "title": "Import Data",

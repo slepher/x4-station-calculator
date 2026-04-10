@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveStore } from '@/store/useSaveStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
@@ -33,7 +33,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const saveStore = useSaveStore()
-const empireStore = useEmpireStore()
+const saveBindingStore = useSaveBindingStore()
 
 const layer = ref<PanelLayer>('list')
 const selectedCategory = ref<SavePoiCategory | null>(null)
@@ -52,7 +52,7 @@ const bindingPlayerName = computed(() => {
 
 const bindingSectorName = computed(() => {
   if (!selectedSectorGroupId.value) return null
-  return empireStore.activeEmpire?.sectors?.find((item) => item.id === selectedSectorGroupId.value)?.name || null
+  return saveBindingStore.activeBinding?.groups.find((item) => item.id === selectedSectorGroupId.value)?.name || null
 })
 
 const breadcrumbItems = computed<BreadcrumbItem[]>(() => {
@@ -149,12 +149,7 @@ async function onArchiveNavigate(payload: { guid: string; time: number | null })
 }
 
 async function onArchiveBind(payload: { guid: string; time: number | null }) {
-  const existingBinding = empireStore.activeEmpire?.saveBindings?.find((item) => item.gameGuid === payload.guid)
-  if (!existingBinding) {
-    empireStore.createBinding(payload.guid)
-  }
-
-  empireStore.setSelectedArchiveTime(payload.guid, payload.time)
+  saveBindingStore.createOrOpenBinding(payload.guid, payload.time)
 
   const effectiveTime = payload.time ?? getLatestTime(payload.guid)
   if (payload.time === null) {

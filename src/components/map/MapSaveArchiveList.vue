@@ -2,7 +2,7 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import type { ArchiveGroup } from '@/types/saveArchive'
 
@@ -15,14 +15,14 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const saveStore = useSaveStore()
-const empireStore = useEmpireStore()
+const saveBindingStore = useSaveBindingStore()
 
 const sortedGroups = computed<ArchiveGroup[]>(() => {
   return [...saveStore.archiveGroups].sort((a, b) => a.playerName.localeCompare(b.playerName))
 })
 
 const activeArchiveId = computed(() => saveStore.savedArchivesState.activeArchiveId)
-const bindingPlans = computed(() => empireStore.activeEmpire?.saveBindings || [])
+const bindingPlans = computed(() => saveBindingStore.bindings)
 
 function createArchiveId(guid: string, time: number): string {
   return `${guid}_${time}`
