@@ -72,3 +72,12 @@
 - `deriveBindingStations` 派生空间站列表
 - `switchToBinding`/`confirmSwitchToBinding` 切换方法
 - 空间站名称与星区归属正确计算
+
+**后续工作**：
+
+量化生产界面的用户交互体验（空间站编辑、保存绑定按钮、dirty 状态显示等）已拆分到新 change：
+
+- **change**: `user-save-binding-station`
+- **范围**: useStationStore 路由、UI 组件适配、保存绑定流程
+- **任务**: T1-T19 (19 个任务)
+- **依赖**: 基于 stand-alone-binding 已实现的 productionSource 路由架构
