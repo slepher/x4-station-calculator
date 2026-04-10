@@ -1009,6 +1009,9 @@ export const useEmpireStore = defineStore('empire', () => {
         loadData(stored)
         saveToStorage()
         initializeAllStationCaches()
+        
+        applyActiveViewFallback()
+        
         isReady.value = true
         console.log('[EmpireStore] Loaded saved empires')
         return
@@ -1024,6 +1027,9 @@ export const useEmpireStore = defineStore('empire', () => {
             saveToStorage()
             localStorage.removeItem(V1_STORAGE_KEY)
             initializeAllStationCaches()
+            
+            applyActiveViewFallback()
+            
             console.log('[EmpireStore] Migration complete')
             isReady.value = true
             return
@@ -1034,12 +1040,59 @@ export const useEmpireStore = defineStore('empire', () => {
       }
       
       createEmpire()
+      activeViewStore.setProductionSource('empire')
       isReady.value = true
       console.log('[EmpireStore] Initialized with new empire')
       
     } catch (e) {
       console.error('[EmpireStore] Initialization failed:', e)
     }
+  }
+
+  function applyActiveViewFallback() {
+    const source = activeViewStore.productionSource
+    const storedId = activeViewStore.activeId
+    
+    if (source === 'save-binding') {
+      if (storedId && saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedId)) {
+        saveBindingStore.createOrOpenBinding(storedId)
+        return
+      }
+      
+      const firstBinding = saveBindingStore.savedBindings.list[0]
+      if (firstBinding) {
+        activeViewStore.setActiveId(firstBinding.gameGuid)
+        saveBindingStore.createOrOpenBinding(firstBinding.gameGuid)
+        return
+      }
+      
+      console.log('[EmpireStore] No bindings found, falling back to empire')
+      activeViewStore.setProductionSource('empire')
+      fallbackToFirstEmpire()
+      return
+    }
+    
+    fallbackToFirstEmpire()
+  }
+
+  function fallbackToFirstEmpire() {
+    const storedId = activeViewStore.activeId
+    
+    if (storedId && savedEmpires.value.list.some((e) => e.id === storedId)) {
+      loadEmpire(storedId)
+      return
+    }
+    
+    const firstEmpire = savedEmpires.value.list[0]
+    if (firstEmpire) {
+      activeViewStore.setActiveId(firstEmpire.id)
+      loadEmpire(firstEmpire.id)
+      return
+    }
+    
+    console.log('[EmpireStore] No empires found, creating new empire')
+    createEmpire()
+    activeViewStore.setProductionSource('empire')
   }
 
   function openBindingForProduction(gameGuid: string) {
