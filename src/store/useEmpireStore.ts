@@ -22,6 +22,7 @@ import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
+import { useActiveViewStore } from './useActiveViewStore'
 import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './logic/sectorLinkFlow'
 import { buildTransitHubViewModel } from './logic/transitHubViewModel'
@@ -99,18 +100,26 @@ export const useEmpireStore = defineStore('empire', () => {
   const empireDataStore = useEmpireDataStore()
   const saveBindingStore = useSaveBindingStore()
   const saveStore = useSaveStore()
+  const activeViewStore = useActiveViewStore()
   const { savedEmpires } = storeToRefs(empireDataStore)
 
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
-  const productionSource = ref<'empire' | 'save-binding'>('empire')
+
+  const productionSource = computed({
+    get: () => activeViewStore.productionSource,
+    set: (val) => activeViewStore.setProductionSource(val)
+  })
 
   const version = computed(() => savedEmpires.value.version)
   const empires = computed(() => savedEmpires.value.list)
   const activeEmpireId = computed(() => savedEmpires.value.activeId)
   
-const activeEmpire = ref<EmpirePlan | null>(null)
-  const empireActiveStationId = ref<string | null>(null)
+ const activeEmpire = ref<EmpirePlan | null>(null)
+  const empireActiveStationId = computed({
+    get: () => activeViewStore.activeStationId,
+    set: (id: string | null) => activeViewStore.setActiveStationId(id)
+  })
 
   const activeStationId = computed({
     get: () => productionSource.value === 'save-binding'
