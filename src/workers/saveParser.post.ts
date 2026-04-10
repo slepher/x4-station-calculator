@@ -13,15 +13,13 @@ import type {
   SectorData
 } from '@/types/saveArchive'
 import type { X4Module } from '@/types/x4'
-import type { X4Equipment, X4Map } from '@/types/x4'
+import type { X4Equipment, X4Map, X4Ship } from '@/types/x4'
 import {
   classifyPlayerStationPoi,
   getFactoryGroup,
   getProductionProfile,
   hasModulePattern
 } from '@/store/logic/stationPoiSemantics'
-import shipsData from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
-import equipmentsData from '@/assets/x4_game_data/8.0-Diplomacy/data/equipments.json'
 
 interface Vector3 {
   x: number
@@ -133,9 +131,10 @@ function equipmentIdFromRef(ref: string): string {
   return ref.endsWith('_macro') ? ref.slice(0, -6) : ref
 }
 
-function buildEquipmentLookup(): Record<string, X4Equipment> {
+function buildEquipmentLookup(equipments: X4Equipment[] | undefined): Record<string, X4Equipment> {
   const lookup: Record<string, X4Equipment> = {}
-  for (const equipment of equipmentsData as X4Equipment[]) {
+  if (!equipments) return lookup
+  for (const equipment of equipments) {
     lookup[`${equipment.id}_macro`] = equipment
   }
   return lookup
@@ -155,9 +154,9 @@ function getMapsSectors(maps: X4Map | undefined): Record<string, MapSector> {
   return sectors
 }
 
-function buildShipLookup(): ShipLookup {
+function buildShipLookup(ships: X4Ship[] | undefined): ShipLookup {
   const lookup: ShipLookup = {}
-  const ships = shipsData as Array<{ id: string; macro?: string; purposePrimary?: string }>
+  if (!ships) return lookup
   for (const ship of ships) {
     if (ship.macro && ship.purposePrimary) {
       lookup[ship.macro] = {
@@ -168,9 +167,6 @@ function buildShipLookup(): ShipLookup {
   }
   return lookup
 }
-
-const SHIP_LOOKUP = buildShipLookup()
-const EQUIPMENT_LOOKUP = buildEquipmentLookup()
 
 function buildZoneLookup(maps: X4Map | undefined): ZoneLookup {
   const lookup: ZoneLookup = {}
@@ -537,12 +533,13 @@ function enrichModulesWithGameData(
 }
 
 function enrichEquipmentsWithGameData(
-  equipments: CodeMap<AggregatedEquipment> | undefined
+  equipments: CodeMap<AggregatedEquipment> | undefined,
+  equipmentLookup: Record<string, X4Equipment>
 ): CodeMap<AggregatedEquipment> | undefined {
   if (!equipments || Object.keys(equipments).length === 0) return equipments
 
   return Object.fromEntries(Object.entries(equipments).map(([ref, equipment]) => {
-    const matchedEquipment = EQUIPMENT_LOOKUP[equipment.ref]
+    const matchedEquipment = equipmentLookup[equipment.ref]
     return [ref, {
       ...equipment,
       equipment_id: matchedEquipment?.id || equipmentIdFromRef(equipment.ref)
@@ -576,7 +573,6 @@ function enrichPlayerStation(
   
   return {
     ...station,
-    equipments: enrichEquipmentsWithGameData(station.equipments),
     position,
     isShipyard: classification.isShipyard,
     isWharf: classification.isWharf,
@@ -633,7 +629,6 @@ function enrichNpcStation(
   
   return {
     ...station,
-    equipments: enrichEquipmentsWithGameData(station.equipments),
     position,
     isShipyard: isShipyard || undefined,
     isWharf: isWharf || undefined,
@@ -690,7 +685,6 @@ function enrichFactionStation(
     
     return {
       ...station,
-      equipments: enrichEquipmentsWithGameData(station.equipments),
       position,
       isShipyard: isShipyard || undefined,
       isWharf: isWharf || undefined,
@@ -718,7 +712,6 @@ function enrichFactionStation(
   
   return {
     ...station,
-    equipments: enrichEquipmentsWithGameData(station.equipments),
     position,
     isNest: isNest || undefined,
     isHive: isHive || undefined,
@@ -798,8 +791,12 @@ function attachSectorBuildstorages(sector: SectorData): SectorData {
 export function postProcessRustSaveArchive(
   archive: SaveArchive, 
   modulesByMacroId?: Record<string, X4Module>,
-  maps?: X4Map
+  maps?: X4Map,
+  ships?: X4Ship[],
+  equipments?: X4Equipment[]
 ): SaveArchive {
+  const SHIP_LOOKUP = buildShipLookup(ships)
+  const EQUIPMENT_LOOKUP = buildEquipmentLookup(equipments)
   const zoneLookup = buildZoneLookup(maps)
   const sectorCenterLookup = buildSectorCenterLookup(maps)
   const sectorScaleLookup = buildArchiveSectorScaleLookup(archive, maps, zoneLookup, sectorCenterLookup)
@@ -820,7 +817,7 @@ export function postProcessRustSaveArchive(
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
             : station.modules
           return enrichPlayerStation(
-            { ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments) },
+            { ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments, EQUIPMENT_LOOKUP) },
             sectorMacro,
             zoneLookup,
             sectorCenterLookup,
@@ -833,7 +830,7 @@ export function postProcessRustSaveArchive(
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
             : station.modules
           return enrichNpcStation(
-            { ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments) },
+            { ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments, EQUIPMENT_LOOKUP) },
             sectorMacro,
             zoneLookup,
             sectorCenterLookup,
@@ -845,13 +842,13 @@ export function postProcessRustSaveArchive(
           const enrichedModules = modulesByMacroId
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
             : station.modules
-          return enrichFactionStation({ ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments) }, 'xenon', sectorMacro, zoneLookup, sectorCenterLookup, sectorScaleLookup)
+          return enrichFactionStation({ ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments, EQUIPMENT_LOOKUP) }, 'xenon', sectorMacro, zoneLookup, sectorCenterLookup, sectorScaleLookup)
         })),
         khaak_stations: mapByCode(recordValues(sector.khaak_stations).map((station) => {
           const enrichedModules = modulesByMacroId
             ? enrichModulesWithGameData(station.modules, modulesByMacroId)
             : station.modules
-          return enrichFactionStation({ ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments) }, 'khaak', sectorMacro, zoneLookup, sectorCenterLookup, sectorScaleLookup)
+          return enrichFactionStation({ ...station, modules: enrichedModules, equipments: enrichEquipmentsWithGameData(station.equipments, EQUIPMENT_LOOKUP) }, 'khaak', sectorMacro, zoneLookup, sectorCenterLookup, sectorScaleLookup)
         })),
         player_buildstorages: mapByCode(recordValues(sector.player_buildstorages).map((buildstorage) => {
           const enrichedModules = modulesByMacroId
@@ -860,7 +857,7 @@ export function postProcessRustSaveArchive(
           return {
             ...buildstorage,
             modules: enrichedModules,
-            equipments: enrichEquipmentsWithGameData(buildstorage.equipments)
+            equipments: enrichEquipmentsWithGameData(buildstorage.equipments, EQUIPMENT_LOOKUP)
           }
         })),
         datavaults: mapByCode(recordValues(sector.datavaults).map((vault) => {

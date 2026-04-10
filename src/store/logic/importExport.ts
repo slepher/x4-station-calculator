@@ -163,6 +163,8 @@ interface GameDataStoreLike {
   modulesMap: Record<string, X4Module>
   modulesByMacroId?: Record<string, X4Module>
   maps?: X4Map
+  ships?: X4Ship[]
+  equipments?: X4Equipment[]
   currentVersion?: string
   isBeta?: boolean
   getStorageKey?: (module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'save_archives') => string
@@ -919,7 +921,7 @@ function reprocessSaveArchives(
       return archive
     }
 
-    const reprocessed = postProcessRustSaveArchive(archive, modulesByMacroId, maps)
+    const reprocessed = postProcessRustSaveArchive(archive, modulesByMacroId, maps, gameDataStore.ships, gameDataStore.equipments)
     reprocessed.meta.post_processor_version = CURRENT_POST_PROCESSOR_VERSION
     reprocessed.isValid = archive.meta.parser_version === CURRENT_PARSER_VERSION
     return reprocessed

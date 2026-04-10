@@ -453,7 +453,9 @@ export const useSaveStore = defineStore('save', () => {
       const reprocessedArchive = postProcessRustSaveArchive(
         fullArchive,
         gameDataStore.modulesByMacroId,
-        gameDataStore.maps
+        gameDataStore.maps,
+        gameDataStore.ships,
+        gameDataStore.equipments
       )
       reprocessedArchive.isCompatible = checkVersionCompatibility(reprocessedArchive.meta.version)
       reprocessedArchive.isValid = isArchiveParserVersionValid(reprocessedArchive)
@@ -737,7 +739,7 @@ export const useSaveStore = defineStore('save', () => {
 
       const finalArchive = archive.meta.post_processor_version === CURRENT_POST_PROCESSOR_VERSION
         ? archive
-        : postProcessRustSaveArchive(archive, gameDataStore.modulesByMacroId, gameDataStore.maps)
+        : postProcessRustSaveArchive(archive, gameDataStore.modulesByMacroId, gameDataStore.maps, gameDataStore.ships, gameDataStore.equipments)
 
       addArchive(finalArchive)
       return { success: true }
