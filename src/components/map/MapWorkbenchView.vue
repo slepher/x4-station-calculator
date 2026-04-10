@@ -23,6 +23,7 @@ import { useSaveStore } from '@/store/useSaveStore'
 import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import type { StationPlan } from '@/types/x4'
+import { DEFAULT_STATION_SETTINGS } from '@/store/state/StationStateMap'
 
 type SearchSectorLayout = {
   sectorId: string
@@ -455,12 +456,79 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
   if (!activePlan) return []
 
   const overlays: PlacementOverlayItem[] = []
+
+  // stationPlans with position (virtual stations placed on map)
+  for (const plan of activePlan.stationPlans) {
+    if (!plan.position || !plan.sectorMacro) continue
+    const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, plan.sectorMacro)
+    if (!resolved) continue
+
+    const group = plan.groupId ? activePlan.groups.find(g => g.id === plan.groupId) : null
+    const coverageSectorMacros = group
+      ? Array.from(new Set([
+          ...(group.sectorMacro ? [group.sectorMacro] : []),
+          ...(group.coverageSectorMacros || []).map((entry) => entry.ref)
+        ]))
+      : []
+
+    overlays.push({
+      key: `binding:station:${plan.id}`,
+      id: plan.id,
+      kind: 'station',
+      name: plan.name,
+      icon: plan.type === 'shipyard' ? 'shipyard' : 'factory',
+      location: {
+        cluster_id: resolved.clusterId,
+        sector_id: resolved.sectorId,
+        pos: {
+          x: plan.position.x,
+          z: plan.position.z
+        },
+        sunlight: 0,
+        resources: []
+      },
+      localRatio: buildSaveSectorLocalRatio(activePlan.gameGuid, plan.sectorMacro, resolved.sectorId, {
+        x: plan.position.x,
+        z: plan.position.z
+      }),
+      draggable: !!(isBindingPanelOpen.value &&
+        bindingContextStage.value === 'select-station' &&
+        group && dragEnabledBindingSectorGroupId.value === group.id &&
+        bindingContextGameGuid.value === activePlan.gameGuid),
+      savePoiVisual: buildBindingSavePoiVisual({
+        key: `binding:station:${plan.id}`,
+        code: plan.name,
+        sectorMacro: plan.sectorMacro,
+        position: {
+          x: plan.position.x,
+          z: plan.position.z
+        },
+        station: {
+          id: plan.id,
+          name: plan.name,
+          type: plan.type,
+          modules: plan.modules,
+          settings: plan.settings,
+          lastUpdated: activePlan.updatedAt
+        },
+        isVirtualTradestation: false,
+        sectorGroupId: group?.id
+      }),
+      binding: group ? {
+        gameGuid: activePlan.gameGuid,
+        sectorGroupId: group.id,
+        coverageSectorMacros,
+        isVirtualTradestation: false
+      } : undefined
+    })
+  }
+
+  // tradeStation per group
   for (const group of activePlan.groups) {
-    const stationPlan = group.virtualStation
+    const stationPlan = group.tradeStation
     if (!stationPlan?.position || !stationPlan.sectorMacro) continue
     const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationPlan.sectorMacro)
     if (!resolved) continue
-    const isVirtualTradestation = stationPlan.role === 'tradestation' || stationPlan.name === t('map.binding_tradestation_virtual')
     const coverageSectorMacros = Array.from(new Set([
       ...(group.sectorMacro ? [group.sectorMacro] : []),
       ...(group.coverageSectorMacros || []).map((entry) => entry.ref)
@@ -471,9 +539,7 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
       id: stationPlan.id,
       kind: 'station',
       name: stationPlan.name,
-      icon: isVirtualTradestation
-        ? 'tradestation'
-        : stationPlan.type === 'shipyard' ? 'shipyard' : 'factory',
+      icon: 'tradestation',
       location: {
         cluster_id: resolved.clusterId,
         sector_id: resolved.sectorId,
@@ -503,19 +569,19 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
         station: {
           id: stationPlan.id,
           name: stationPlan.name,
-          type: stationPlan.type,
-          modules: stationPlan.modules,
-          settings: stationPlan.settings,
+          type: 'transit',
+          modules: [],
+          settings: DEFAULT_STATION_SETTINGS,
           lastUpdated: activePlan.updatedAt
         },
-        isVirtualTradestation,
+        isVirtualTradestation: true,
         sectorGroupId: group.id
       }),
       binding: {
         gameGuid: activePlan.gameGuid,
         sectorGroupId: group.id,
         coverageSectorMacros,
-        isVirtualTradestation
+        isVirtualTradestation: true
       }
     })
   }
@@ -1023,7 +1089,7 @@ const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocati
     if (draggingBindingKey.value && draggingSectorGroupId.value) {
       const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, location.cluster_id, location.sector_id)
       if (!sectorMacro) return
-      saveBindingStore.setVirtualStationPosition({
+      saveBindingStore.setStationPlanPosition({
         gameGuid: draggingBindingKey.value,
         stationPlanId: item.id,
         groupId: draggingSectorGroupId.value,
@@ -1648,6 +1714,7 @@ const onWheel = (event: WheelEvent) => {
 const stopDrag = () => {
   isDragging.value = false
   settledSavePoiViewportContentBounds.value = liveSavePoiViewportContentBounds.value
+
   if (draggingPlacementItem.value && placementPreview.value) {
     applyLocationToItem(draggingPlacementItem.value, placementPreview.value.location)
   } else if (draggingFreeSector.value && placementPreview.value && draggingBindingKey.value) {
@@ -1667,7 +1734,7 @@ const stopDrag = () => {
   } else if (draggingVirtualTradestation.value && placementPreview.value && draggingBindingKey.value && draggingSectorGroupId.value) {
     const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
     if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
-      saveBindingStore.upsertVirtualTradestation({
+      saveBindingStore.upsertTradeStation({
         gameGuid: draggingBindingKey.value,
         groupId: draggingSectorGroupId.value,
         name: draggingVirtualTradestation.value.name,
@@ -1683,7 +1750,7 @@ const stopDrag = () => {
     const sectorMacro = resolveSectorMacroById(gameDataStore.maps || { clusters: {}, sectors: {} }, placementPreview.value.location.cluster_id, placementPreview.value.location.sector_id)
     if (sectorMacro && draggingCoverageSectorMacros.value.has(sectorMacro)) {
       const source = empireStore.activeEmpire?.stations.find((station) => station.id === draggingFreeStation.value?.stationId)
-      saveBindingStore.createVirtualStation({
+      saveBindingStore.upsertStationPlan({
         gameGuid: draggingBindingKey.value,
         groupId: draggingSectorGroupId.value,
         name: source?.name || draggingFreeStation.value.name,
@@ -1711,7 +1778,7 @@ const onResize = () => {
 const onViewportDragOver = (event: DragEvent) => {
   if (!isBindingPanelOpen.value) return
   event.preventDefault()
-  
+
   if (draggingPlacementItem.value) {
     const location = resolveLocationAtPointer(event.clientX, event.clientY)
     placementPreview.value = location ? {
@@ -1728,6 +1795,8 @@ const onViewportDragOver = (event: DragEvent) => {
       icon: 'tradestation',
       location
     } : null
+  } else if (activeBindingDragPreview.value) {
+    placementPreview.value = resolveBindingPreviewAtPointer(event.clientX, event.clientY)
   }
 }
 
@@ -1770,29 +1839,30 @@ const onOverlayPointerDown = (payload: {
     isVirtualTradestation?: boolean
   }
 }) => {
-	  if (payload.binding) {
-	    if (!payload.draggable) {
-      if (payload.savePoiVisual) {
-        focusedSavePoiKey.value = payload.savePoiVisual.key
-        savePoiTooltipItem.value = payload.savePoiVisual
+  if (payload.binding) {
+    draggingPlacementItem.value = null
+    draggingBindingKey.value = payload.binding.gameGuid
+    draggingSectorGroupId.value = payload.binding.sectorGroupId
+    draggingCoverageSectorMacros.value = new Set(payload.binding.coverageSectorMacros)
+    draggingOverlayKey.value = payload.key
+    draggingFreeSector.value = null
+    if (payload.binding.isVirtualTradestation) {
+      draggingFreeStation.value = null
+      draggingVirtualTradestation.value = {
+        sectorGroupId: payload.binding.sectorGroupId,
+        name: payload.name
       }
-	      return
-	    }
-	    draggingPlacementItem.value = {
-	      id: payload.id,
-	      kind: payload.kind,
-	      name: payload.name,
-	      icon: payload.icon
-	    }
-	    draggingBindingKey.value = payload.binding.gameGuid
-	    draggingSectorGroupId.value = payload.binding.sectorGroupId
-	    draggingCoverageSectorMacros.value = new Set(payload.binding.coverageSectorMacros)
-	    draggingOverlayKey.value = payload.key
-	    draggingFreeSector.value = null
-	    draggingFreeStation.value = null
-	    draggingVirtualTradestation.value = null
-	    return
-	  }
+    } else {
+      draggingVirtualTradestation.value = null
+      draggingFreeStation.value = {
+        stationId: payload.id,
+        sectorGroupId: payload.binding.sectorGroupId,
+        name: payload.name,
+        icon: payload.icon as 'factory' | 'shipyard'
+      }
+    }
+    return
+  }
 
   closeSavePoiTooltip()
   draggingPlacementItem.value = {

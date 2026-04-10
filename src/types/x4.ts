@@ -1106,6 +1106,14 @@ export interface StationSaveBinding {
   position?: { x: number; y: number; z: number }
 }
 
+export interface TradeStationBinding {
+  id: string
+  saveStationCode?: string
+  name: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
 export interface BindingSectorGroup {
   id: string
   name: string
@@ -1114,23 +1122,12 @@ export interface BindingSectorGroup {
   jumpRange: number
   coverageSectorMacros: CoverageSectorEntry[]
   connectedGroupIds?: string[]
-  virtualStation?: VirtualStationPlan
+  tradeStation?: TradeStationBinding
 }
 
-export interface SaveStationPlan {
+export interface BindingStationPlan {
   id: string
-  kind: 'save-station'
-  saveStationCode: string
-  groupId?: string | null
-  modules: SavedModule[]
-  settings: StationSettings
-  name?: string
-}
-
-export interface VirtualStationPlan {
-  id: string
-  kind: 'virtual-station'
-  role?: 'tradestation'
+  saveStationCode?: string
   groupId?: string | null
   name: string
   type: StationType
@@ -1145,7 +1142,7 @@ export interface SaveBindingPlan {
   selectedArchiveTime: number | null
   sourceEmpireId?: string
   groups: BindingSectorGroup[]
-  stationPlans: SaveStationPlan[]
+  stationPlans: BindingStationPlan[]
   updatedAt: number
 }
 

@@ -263,7 +263,7 @@
     "binding_no_stations": "覆盖范围内无空间站。",
     "binding_free_stations": "自由空间站",
     "binding_anchor_and_coverage_sectors": "定位星区和范围星区",
-    "binding_tradestation_virtual": "虚拟中转站",
+    "binding_sector_tradestation": "星区中转站",
     "binding_sector_stations": "星区空间站",
     "binding_drag_hint": "拖拽到地图",
     "binding_existing_bindings": "现有绑定",

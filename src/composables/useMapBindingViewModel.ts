@@ -153,7 +153,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     const allBoundCodes = new Set<string>()
     if (bindingKey && activeBindingPlan.value) {
       for (const plan of activeBindingPlan.value.stationPlans) {
-        if (plan.kind === 'save-station') allBoundCodes.add(plan.saveStationCode)
+        if (plan.saveStationCode) allBoundCodes.add(plan.saveStationCode)
       }
     }
 
@@ -222,20 +222,15 @@ export function useMapBindingViewModel(): MapBindingViewModel {
             jumpRange: group.jumpRange,
             coverageSectorMacros: group.coverageSectorMacros,
             connectedSectorGroupIds: group.connectedGroupIds,
-            tradestationBinding: group.virtualStation && group.virtualStation.role === 'tradestation'
+            tradestationBinding: group.tradeStation
               ? {
-                  stationId: group.virtualStation.id,
-                  sectorMacro: group.virtualStation.sectorMacro,
-                  position: group.virtualStation.position
+                  stationId: group.tradeStation.id,
+                  saveStationCode: group.tradeStation.saveStationCode,
+                  sectorMacro: group.tradeStation.sectorMacro,
+                  position: group.tradeStation.position
                 }
               : undefined,
-            stationBindings: group.virtualStation && group.virtualStation.role !== 'tradestation'
-              ? [{
-                  stationId: group.virtualStation.id,
-                  sectorMacro: group.virtualStation.sectorMacro,
-                  position: group.virtualStation.position
-                } as StationSaveBinding]
-              : [] as StationSaveBinding[]
+            stationBindings: [] as StationSaveBinding[]
           }
         : null
 
@@ -252,7 +247,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
     if (!bindingKey) return false
     void sectorGroupId
     return Boolean(activeBindingPlan.value?.stationPlans.some(
-      (plan) => plan.kind === 'save-station' && plan.saveStationCode === saveStationCode
+      (plan) => plan.saveStationCode === saveStationCode
     ))
   }
 

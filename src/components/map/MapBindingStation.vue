@@ -59,42 +59,29 @@ const activeBindingPlan = computed(() => {
   return saveBindingStore.getBindingByGameGuid(props.gameGuid)
 })
 
-const isVirtualTradestationPlan = (plan: { kind: string; role?: string; type?: string; name?: string }) =>
-  plan.kind === 'virtual-station' &&
-  (plan.role === 'tradestation' || plan.name === t('map.binding_tradestation_virtual'))
-
 const currentGroupBinding = computed<GroupSaveBinding | null>(() => {
   const group = activeBindingPlan.value?.groups.find((b) => b.id === props.sectorGroupId)
   if (!group) return null
-  const tradestationPlan = group.virtualStation && isVirtualTradestationPlan(group.virtualStation)
-    ? group.virtualStation
-    : null
   const stationBindings: StationSaveBinding[] = (activeBindingPlan.value?.stationPlans || [])
     .filter((plan) => plan.groupId === props.sectorGroupId)
     .map((plan) => ({
       stationId: plan.id,
       saveStationCode: plan.saveStationCode,
-      sectorMacro: group.sectorMacro,
-      position: undefined
+      sectorMacro: plan.sectorMacro,
+      position: plan.position
     }))
-  if (group.virtualStation && !isVirtualTradestationPlan(group.virtualStation)) {
-    stationBindings.push({
-      stationId: group.virtualStation.id,
-      sectorMacro: group.virtualStation.sectorMacro,
-      position: group.virtualStation.position
-    })
-  }
   return {
     sectorGroupId: group.id,
     sectorMacro: group.sectorMacro,
     jumpRange: group.jumpRange,
     coverageSectorMacros: group.coverageSectorMacros,
     connectedSectorGroupIds: group.connectedGroupIds || [],
-    tradestationBinding: tradestationPlan && tradestationPlan.kind === 'virtual-station'
+    tradestationBinding: group.tradeStation
       ? {
-          stationId: tradestationPlan.id,
-          sectorMacro: tradestationPlan.sectorMacro,
-          position: tradestationPlan.position
+          stationId: group.tradeStation.id,
+          saveStationCode: group.tradeStation.saveStationCode,
+          sectorMacro: group.tradeStation.sectorMacro,
+          position: group.tradeStation.position
         }
       : undefined,
     stationBindings
@@ -158,7 +145,7 @@ const virtualTradestation = computed(() => {
   if (!currentGroupBinding.value.tradestationBinding) {
     return {
       type: 'virtual' as const,
-      name: t('map.binding_tradestation_virtual')
+      name: t('map.binding_sector_tradestation')
     }
   }
   return null
@@ -230,15 +217,13 @@ const anchorAndCoverageSectors = computed(() => {
 	    for (const binding of stationBindings) {
 	      if (binding.sectorMacro === sectorMacro && binding.position) {
 	        const station = activeEmpire.value?.stations.find(s => s.id === binding.stationId)
-	        const stationPlan = activeBindingPlan.value?.groups
-	          .map((group) => group.virtualStation)
-	          .find((plan) => plan?.id === binding.stationId)
+	        const stationPlan = activeBindingPlan.value?.stationPlans.find((plan) => plan.id === binding.stationId)
 	        const resolved = resolveStationSaveBinding(binding, activeArchive.value)
 	        if (!binding.saveStationCode && (station || stationPlan)) {
 	          placedFreeStations.push({
 	            stationId: station?.id || stationPlan!.id,
 	            stationName: station?.name || stationPlan?.name || binding.stationId,
-	            sectorMacro: binding.sectorMacro,
+	            sectorMacro: binding.sectorMacro!,
 	            position: binding.position
 	          })
         } else if (station && binding.saveStationCode && resolved.status === 'missing_at_selected_time') {
@@ -409,7 +394,7 @@ function getEmpireStationIconById(stationId: string): string {
 
 function isSaveStationBound(saveStationCode: string): boolean {
   return Boolean(activeBindingPlan.value?.stationPlans.some(
-    (plan) => plan.kind === 'save-station' && plan.saveStationCode === saveStationCode
+    (plan) => plan.saveStationCode === saveStationCode
   ))
 }
 
@@ -444,7 +429,7 @@ function hasDanglingBoundStation(saveStationCode: string): boolean {
 
 function getBindButtonLabel(saveStationCode: string): string {
   if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) {
-    return t('map.binding_tradestation_virtual')
+    return t('map.binding_sector_tradestation')
   }
   if (hasDanglingBoundStation(saveStationCode)) {
     return t('map.binding_status_error')
@@ -535,16 +520,14 @@ function bindToStation(stationId: string) {
   closeBindMenu()
 }
 
-function bindToVirtualTradestation() {
+function bindToSectorTradestation() {
   if (!bindMenuSaveStation.value) return
 
-  saveBindingStore.upsertSaveStationPlan({
+  saveBindingStore.upsertTradeStation({
     gameGuid: props.gameGuid,
-    saveStationCode: bindMenuSaveStation.value.code,
     groupId: props.sectorGroupId,
-    name: t('map.binding_tradestation_virtual'),
-    modules: [],
-    settings: activeEmpire.value?.stations[0]?.settings
+    saveStationCode: bindMenuSaveStation.value.code,
+    name: t('map.binding_sector_tradestation')
   })
 
   closeBindMenu()
@@ -554,7 +537,7 @@ function clearCurrentSaveStationBinding() {
   const saveStationCode = bindMenuSaveStation.value?.code
   if (!saveStationCode) return
 
-  saveBindingStore.clearSaveStationPlan(props.gameGuid, saveStationCode)
+  saveBindingStore.clearStationPlan(props.gameGuid, saveStationCode)
   closeBindMenu()
 }
 
@@ -585,7 +568,7 @@ function importSaveStation(station: PlayerStationEntry, sectorMacro: string) {
   })
 
   void sectorMacro
-  saveBindingStore.upsertSaveStationPlan({
+  saveBindingStore.upsertStationPlan({
     gameGuid: props.gameGuid,
     saveStationCode: station.code,
     groupId: props.sectorGroupId,
@@ -603,12 +586,11 @@ function importSaveStationFromMenu() {
 }
 
 function clearFreeStationBinding(stationId: string) {
-  if (saveBindingStore.deleteVirtualStation(props.gameGuid, props.sectorGroupId, stationId)) return
   saveBindingStore.deleteStationPlan(props.gameGuid, stationId)
 }
 
-function clearVirtualTradestationBinding() {
-  saveBindingStore.deleteVirtualStation(props.gameGuid, props.sectorGroupId)
+function clearSectorTradestationBinding() {
+  saveBindingStore.deleteTradeStation(props.gameGuid, props.sectorGroupId)
 }
 
 function formatCoordKm(value: number): string {
@@ -692,7 +674,7 @@ const allStationsForMenu = computed(() => {
     if (tb?.position && !tradestationSaveStationCode) {
       items.push({
         type: 'virtualTradestation',
-        name: t('map.binding_tradestation_virtual'),
+        name: t('map.binding_sector_tradestation'),
         sectorGroupId: props.sectorGroupId,
         sectorMacro: tb.sectorMacro,
         disabled: true,
@@ -702,7 +684,7 @@ const allStationsForMenu = computed(() => {
       const isCurrentSaveStation = bindMenuSaveStation.value?.code === tradestationSaveStationCode
       items.push({
         type: 'virtualTradestation',
-        name: t('map.binding_tradestation_virtual'),
+        name: t('map.binding_sector_tradestation'),
         sectorGroupId: props.sectorGroupId,
         sectorMacro: tb.sectorMacro,
         disabled: !isCurrentSaveStation,
@@ -711,7 +693,7 @@ const allStationsForMenu = computed(() => {
     } else if (!tb) {
       items.push({
         type: 'virtualTradestation',
-        name: t('map.binding_tradestation_virtual'),
+        name: t('map.binding_sector_tradestation'),
         sectorGroupId: props.sectorGroupId,
         sectorMacro: undefined
       })
@@ -730,7 +712,7 @@ function onVirtualTradestationMouseDown(event: MouseEvent) {
       stationId: '__virtual_tradestation__',
       gameGuid: props.gameGuid,
       sectorGroupId: props.sectorGroupId,
-      name: t('map.binding_tradestation_virtual'),
+      name: t('map.binding_sector_tradestation'),
       icon: 'tradestation',
       coverageSectorMacros: currentGroupBinding.value?.sectorMacro
         ? [{ ref: currentGroupBinding.value.sectorMacro, jump: 0 }]
@@ -969,13 +951,13 @@ onBeforeUnmount(() => {
           >
             <img class="entry-icon" :src="tradestationIconUrl" alt="" />
             <div class="station-text">
-              <span class="station-label">{{ t('map.binding_tradestation_virtual') }}</span>
+              <span class="station-label">{{ t('map.binding_sector_tradestation') }}</span>
               <span v-if="sector.placedVirtualTradestationPosition" class="station-code">
                 x: {{ formatCoordKm(sector.placedVirtualTradestationPosition.x) }} / z:
                 {{ formatCoordKm(sector.placedVirtualTradestationPosition.z) }}
               </span>
             </div>
-            <button class="placed-clear" type="button" @click.stop="clearVirtualTradestationBinding()">×</button>
+            <button class="placed-clear" type="button" @click.stop="clearSectorTradestationBinding()">×</button>
           </div>
 
           <div
@@ -984,10 +966,10 @@ onBeforeUnmount(() => {
           >
             <img class="entry-icon" :src="tradestationIconUrl" alt="" />
             <div class="station-text">
-              <span class="station-label">{{ t('map.binding_tradestation_virtual') }}</span>
+              <span class="station-label">{{ t('map.binding_sector_tradestation') }}</span>
               <span class="station-code">{{ t('map.binding_status_missing') }}</span>
             </div>
-            <button class="placed-clear" type="button" @click.stop="clearVirtualTradestationBinding">×</button>
+            <button class="placed-clear" type="button" @click.stop="clearSectorTradestationBinding">×</button>
           </div>
         </div>
         <div v-else class="sector-empty">
@@ -1056,7 +1038,7 @@ onBeforeUnmount(() => {
                 'bind-menu-item--disabled': item.disabled
               }"
               :disabled="item.disabled"
-              @click="bindToVirtualTradestation()"
+              @click="bindToSectorTradestation()"
             >
               <span class="bind-menu-item-name">{{ item.name }}</span>
               <span class="bind-menu-item-side">

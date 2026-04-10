@@ -194,7 +194,7 @@ describe('MapBindingStation', () => {
     expect(wrapper.findAll('.station-item').length).toBe(2)
     expect(wrapper.find('.station-item--placed').exists()).toBe(false)
     expect(wrapper.find('.station-item--missing').exists()).toBe(false)
-    expect(wrapper.text()).toContain('map.binding_tradestation_virtual')
+    expect(wrapper.text()).toContain('map.binding_sector_tradestation')
     expect(wrapper.find('.station-item--tradestation').exists()).toBe(false)
   })
 
@@ -304,7 +304,7 @@ describe('MapBindingStation', () => {
 
     const wrapper = mountComponent()
 
-    expect(wrapper.text()).toContain('map.binding_tradestation_virtual')
+    expect(wrapper.text()).toContain('map.binding_sector_tradestation')
     expect(wrapper.text()).toContain('x: 5.0km / z: 6.0km')
     expect(wrapper.find('.station-item--placed.station-item--tradestation').exists()).toBe(true)
   })

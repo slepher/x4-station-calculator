@@ -4,6 +4,7 @@ import { useGameDataStore } from './useGameDataStore'
 import { DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
 import type {
   BindingSectorGroup,
+  BindingStationPlan,
   CoverageSectorEntry,
   SavedModule,
   SavedSaveBindingsState,
@@ -11,7 +12,7 @@ import type {
   StationPlan,
   StationSettings,
   StationType,
-  VirtualStationPlan
+  TradeStationBinding
 } from '@/types/x4'
 
 const CURRENT_SAVE_BINDING_VERSION = 1
@@ -41,18 +42,13 @@ function createDefaultGroup(name: string, order: number): BindingSectorGroup {
   }
 }
 
-function normalizeVirtualStation(input: unknown, groupId: string): VirtualStationPlan | undefined {
-  const value = input as Partial<VirtualStationPlan> | null | undefined
-  if (!value || value.kind !== 'virtual-station') return undefined
+function normalizeTradeStation(input: unknown): TradeStationBinding | undefined {
+  const value = input as Partial<TradeStationBinding> | null | undefined
+  if (!value) return undefined
   return {
     id: value.id || crypto.randomUUID(),
-    kind: 'virtual-station',
-    role: value.role,
-    groupId,
-    name: value.name || 'Virtual Station',
-    type: value.type || 'industrial',
-    modules: Array.isArray(value.modules) ? value.modules : [],
-    settings: deepClone(value.settings || DEFAULT_STATION_SETTINGS),
+    saveStationCode: value.saveStationCode,
+    name: value.name || 'Trade Station',
     sectorMacro: value.sectorMacro,
     position: value.position
   }
@@ -71,29 +67,30 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
             jumpRange: Number.isFinite(Number(group.jumpRange)) ? Number(group.jumpRange) : 3,
             coverageSectorMacros: Array.isArray(group.coverageSectorMacros) ? group.coverageSectorMacros : [],
             connectedGroupIds: Array.isArray(group.connectedGroupIds) ? group.connectedGroupIds : [],
-            virtualStation: normalizeVirtualStation(group.virtualStation, group.id)
+            tradeStation: normalizeTradeStation(group.tradeStation)
           })) : []
 
           const rawStationPlans = Array.isArray((item as any).stationPlans) ? (item as any).stationPlans as unknown[] : []
-
-          rawStationPlans
-            .filter((plan): plan is VirtualStationPlan =>
-              typeof plan === 'object' && plan !== null && (plan as { kind?: string }).kind === 'virtual-station'
-            )
-            .forEach((plan) => {
-              const group = groups.find((item) => item.id === plan.groupId)
-              if (group && !group.virtualStation) group.virtualStation = normalizeVirtualStation(plan, group.id)
-            })
+          const normalizedStationPlans: BindingStationPlan[] = rawStationPlans
+            .filter((plan): plan is Record<string, unknown> => typeof plan === 'object' && plan !== null)
+            .map((plan) => ({
+              id: (plan.id as string) || crypto.randomUUID(),
+              saveStationCode: plan.saveStationCode as string | undefined,
+              groupId: plan.groupId as string | null | undefined,
+              name: (plan.name as string) || (plan.saveStationCode ? String(plan.saveStationCode) : 'Virtual Station'),
+              type: (plan.type as StationType) || 'industrial',
+              modules: Array.isArray(plan.modules) ? plan.modules : [],
+              settings: deepClone<StationSettings>((plan.settings as StationSettings) || DEFAULT_STATION_SETTINGS),
+              sectorMacro: plan.sectorMacro as string | undefined,
+              position: plan.position as { x: number; y: number; z: number } | undefined
+            }))
 
           return {
             gameGuid: item.gameGuid,
             selectedArchiveTime: item.selectedArchiveTime ?? null,
             sourceEmpireId: item.sourceEmpireId,
             groups,
-            stationPlans: rawStationPlans.filter(
-              (plan): plan is SaveBindingPlan['stationPlans'][number] =>
-                typeof plan === 'object' && plan !== null && (plan as { kind?: string }).kind === 'save-station'
-            ),
+            stationPlans: normalizedStationPlans,
             updatedAt: Number.isFinite(Number(item.updatedAt)) ? Number(item.updatedAt) : Date.now()
           }
         })
@@ -303,45 +300,56 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     draftBinding.value!.updatedAt = Date.now()
   }
 
-  function upsertSaveStationPlan(input: {
+  function upsertStationPlan(input: {
     gameGuid: string
-    saveStationCode: string
+    saveStationCode?: string
     groupId?: string | null
+    name: string
+    type?: StationType
     modules?: SavedModule[]
     settings?: StationSettings
-    name?: string
-  }) {
+    sectorMacro?: string
+    position?: { x: number; y: number; z: number }
+  }): BindingStationPlan | null {
     if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
     if (!draftBinding.value) return null
-    let plan = draftBinding.value.stationPlans.find(
-      (item) => item.kind === 'save-station' && item.saveStationCode === input.saveStationCode
-    )
+
+    let plan = input.saveStationCode
+      ? draftBinding.value.stationPlans.find((item) => item.saveStationCode === input.saveStationCode)
+      : null
+
     if (!plan) {
       plan = {
         id: crypto.randomUUID(),
-        kind: 'save-station',
         saveStationCode: input.saveStationCode,
         groupId: input.groupId ?? null,
+        name: input.name,
+        type: input.type || 'industrial',
         modules: [],
         settings: deepClone(DEFAULT_STATION_SETTINGS),
-        name: input.name
+        sectorMacro: input.sectorMacro,
+        position: input.position
       }
       draftBinding.value.stationPlans.push(plan)
     }
+
     plan.groupId = input.groupId ?? plan.groupId ?? null
+    plan.name = input.name ?? plan.name
+    if (input.type !== undefined) plan.type = input.type
     if (input.modules) plan.modules = deepClone(input.modules)
     if (input.settings) plan.settings = deepClone(input.settings)
-    if (input.name !== undefined) plan.name = input.name
+    if (input.sectorMacro !== undefined) plan.sectorMacro = input.sectorMacro
+    if (input.position !== undefined) plan.position = input.position
     draftBinding.value.updatedAt = Date.now()
     return plan
   }
 
-  function clearSaveStationPlan(gameGuid: string, saveStationCode: string) {
+  function clearStationPlan(gameGuid: string, identifier: string) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
     if (!draftBinding.value) return false
     const before = draftBinding.value.stationPlans.length
     draftBinding.value.stationPlans = draftBinding.value.stationPlans.filter(
-      (item) => !(item.kind === 'save-station' && item.saveStationCode === saveStationCode)
+      (item) => !(item.saveStationCode === identifier || item.id === identifier)
     )
     draftBinding.value.updatedAt = Date.now()
     return draftBinding.value.stationPlans.length !== before
@@ -356,7 +364,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     return draftBinding.value.stationPlans.length !== before
   }
 
-  function setVirtualStationPosition(input: {
+  function setStationPlanPosition(input: {
     gameGuid: string
     stationPlanId: string
     groupId: string
@@ -365,8 +373,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
     if (!draftBinding.value) return false
-    const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
-    const plan = group?.virtualStation?.id === input.stationPlanId ? group.virtualStation : null
+    const plan = draftBinding.value.stationPlans.find((item) => item.id === input.stationPlanId)
     if (!plan) return false
     plan.groupId = input.groupId
     plan.sectorMacro = input.sectorMacro
@@ -375,95 +382,56 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     return true
   }
 
-  function createVirtualStation(input: {
-    gameGuid: string
-    groupId?: string | null
-    name: string
-    type?: StationType
-    role?: 'tradestation'
-    modules?: SavedModule[]
-    settings?: StationSettings
-    sectorMacro?: string
-    position?: { x: number; y: number; z: number }
-  }): VirtualStationPlan | null {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
-    if (!draftBinding.value) return null
-    const group = input.groupId
-      ? draftBinding.value.groups.find((item) => item.id === input.groupId)
-      : null
-    if (!group) return null
-    const plan: VirtualStationPlan = {
-      id: crypto.randomUUID(),
-      kind: 'virtual-station',
-      role: input.role,
-      groupId: group.id,
-      name: input.name,
-      type: input.type || 'industrial',
-      modules: deepClone(input.modules || []),
-      settings: deepClone(input.settings || DEFAULT_STATION_SETTINGS),
-      sectorMacro: input.sectorMacro,
-      position: input.position
-    }
-    group.virtualStation = plan
-    draftBinding.value.updatedAt = Date.now()
-    return plan
-  }
-
-  function upsertVirtualTradestation(input: {
+  function upsertTradeStation(input: {
     gameGuid: string
     groupId: string
+    saveStationCode?: string
     name: string
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
-  }): VirtualStationPlan | null {
+  }): TradeStationBinding | null {
     if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
     if (!draftBinding.value) return null
     const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
     if (!group) return null
-    let plan = group.virtualStation
-    if (!plan) {
-      plan = {
+
+    let ts = group.tradeStation
+    if (!ts) {
+      ts = {
         id: crypto.randomUUID(),
-        kind: 'virtual-station',
-        role: 'tradestation',
-        groupId: input.groupId,
+        saveStationCode: input.saveStationCode,
         name: input.name,
-        type: 'transit',
-        modules: [],
-        settings: deepClone(DEFAULT_STATION_SETTINGS),
         sectorMacro: input.sectorMacro,
         position: input.position
       }
-      group.virtualStation = plan
+      group.tradeStation = ts
     } else {
-      plan.role = 'tradestation'
-      plan.name = input.name
-      plan.type = 'transit'
-      plan.groupId = input.groupId
-      if (input.sectorMacro !== undefined) plan.sectorMacro = input.sectorMacro
-      if (input.position !== undefined) plan.position = input.position
+      ts.saveStationCode = input.saveStationCode ?? ts.saveStationCode
+      ts.name = input.name ?? ts.name
+      if (input.sectorMacro !== undefined) ts.sectorMacro = input.sectorMacro
+      if (input.position !== undefined) ts.position = input.position
     }
     draftBinding.value.updatedAt = Date.now()
-    return plan
+    return ts
   }
 
-  function deleteVirtualStation(gameGuid: string, groupId: string, stationPlanId?: string) {
+  function deleteTradeStation(gameGuid: string, groupId: string) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
     if (!draftBinding.value) return false
     const group = draftBinding.value.groups.find((item) => item.id === groupId)
-    if (!group?.virtualStation) return false
-    if (stationPlanId && group.virtualStation.id !== stationPlanId) return false
-    group.virtualStation = undefined
+    if (!group?.tradeStation) return false
+    group.tradeStation = undefined
     draftBinding.value.updatedAt = Date.now()
     return true
   }
 
   function importEmpireStationToSaveStation(gameGuid: string, saveStationCode: string, station: StationPlan, groupId?: string | null) {
-    return upsertSaveStationPlan({
+    return upsertStationPlan({
       gameGuid,
       saveStationCode,
       groupId,
       name: station.name,
+      type: station.type,
       modules: station.modules,
       settings: station.settings
     })
@@ -496,13 +464,12 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     deleteGroup,
     bindSectorGroup,
     setGroupConnection,
-    upsertSaveStationPlan,
-    clearSaveStationPlan,
+    upsertStationPlan,
+    clearStationPlan,
     deleteStationPlan,
-    setVirtualStationPosition,
-    createVirtualStation,
-    upsertVirtualTradestation,
-    deleteVirtualStation,
+    setStationPlanPosition,
+    upsertTradeStation,
+    deleteTradeStation,
     importEmpireStationToSaveStation,
     loadData,
     writeState

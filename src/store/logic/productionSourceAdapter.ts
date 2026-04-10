@@ -1,11 +1,10 @@
 import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
 import { stationStateMap, migrateStationSettings } from '@/store/state/StationStateMap'
 import type {
+  BindingStationPlan,
   EmpireGroupedFlows,
   SaveBindingPlan,
-  SaveStationPlan,
   StationPlan,
-  VirtualStationPlan,
   X4Module,
   X4Ware,
   RaceMedicalConsumption
@@ -31,13 +30,11 @@ export function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
   }
 }
 
-type SaveBindingProductionPlan = SaveStationPlan | VirtualStationPlan
-
-function toProductionStation(gameGuid: string, plan: SaveBindingProductionPlan): StationPlan {
+function toProductionStation(gameGuid: string, plan: BindingStationPlan): StationPlan {
   return {
     id: `__save_binding__${gameGuid}__${plan.id}`,
-    name: plan.kind === 'save-station' ? (plan.name || plan.saveStationCode) : plan.name,
-    type: plan.kind === 'virtual-station' ? plan.type : 'industrial',
+    name: plan.name || plan.saveStationCode || 'Station',
+    type: plan.type,
     modules: plan.modules || [],
     settings: migrateStationSettings(plan.settings),
     lastUpdated: 0,
@@ -54,10 +51,7 @@ export function buildSaveBindingProductionFlows(
     return createEmptyEmpireGroupedFlows()
   }
 
-  const plans: SaveBindingProductionPlan[] = [
-    ...binding.stationPlans,
-    ...binding.groups.map((group) => group.virtualStation).filter((plan): plan is VirtualStationPlan => Boolean(plan))
-  ]
+  const plans: BindingStationPlan[] = binding.stationPlans
   const stations = plans.map((plan) => toProductionStation(binding.gameGuid, plan))
   if (stations.length === 0) return createEmptyEmpireGroupedFlows()
 

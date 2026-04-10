@@ -263,7 +263,7 @@
     "binding_no_stations": "No stations in coverage range.",
     "binding_free_stations": "Free Stations",
     "binding_anchor_and_coverage_sectors": "Anchor & Coverage Sectors",
-    "binding_tradestation_virtual": "Virtual Trade Station",
+    "binding_sector_tradestation": "Sector Trade Station",
     "binding_sector_stations": "Sector Stations",
     "binding_drag_hint": "Drag to map",
     "binding_existing_bindings": "Existing Bindings",
