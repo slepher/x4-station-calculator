@@ -604,7 +604,6 @@ function coerceSaveBindingsState(value: unknown): SavedSaveBindingsState | null 
   if (!Array.isArray(value.list)) return null
   return {
     version: Number.isFinite(Number(value.version)) ? Number(value.version) : 1,
-    activeGameGuid: typeof value.activeGameGuid === 'string' ? value.activeGameGuid : null,
     list: value.list as SavedSaveBindingsState['list']
   }
 }

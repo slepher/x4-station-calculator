@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { computed, ref } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
+import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
 import type {
   BindingSectorGroup,
@@ -98,20 +99,18 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
 
   const unique = new Map<string, SaveBindingPlan>()
   list.forEach((item) => unique.set(item.gameGuid, item))
-  const activeGameGuid = input?.activeGameGuid && unique.has(input.activeGameGuid) ? input.activeGameGuid : null
 
   return {
     version: CURRENT_SAVE_BINDING_VERSION,
-    activeGameGuid,
     list: Array.from(unique.values())
   }
 }
 
 export const useSaveBindingStore = defineStore('saveBinding', () => {
   const gameData = useGameDataStore()
+  const activeViewStore = useActiveViewStore()
   const savedBindings = ref<SavedSaveBindingsState>({
     version: CURRENT_SAVE_BINDING_VERSION,
-    activeGameGuid: null,
     list: []
   })
   const draftBinding = ref<SaveBindingPlan | null>(null)
@@ -150,14 +149,15 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       console.warn('[SaveBindingStore] failed to load bindings:', error)
       savedBindings.value = normalizeState(null)
     }
-    if (savedBindings.value.activeGameGuid) {
-      loadDraft(savedBindings.value.activeGameGuid)
+    const storedGuid = activeViewStore.activeId
+    if (storedGuid && savedBindings.value.list.some((b) => b.gameGuid === storedGuid)) {
+      loadDraft(storedGuid)
     }
     isInitialized.value = true
   }
 
   const bindings = computed(() => savedBindings.value.list)
-  const activeGameGuid = computed(() => savedBindings.value.activeGameGuid)
+  const activeGameGuid = computed(() => activeViewStore.activeId)
   const activeBinding = computed(() => draftBinding.value)
   const isDirty = computed(() => serializeBinding(draftBinding.value) !== lastSavedDraftSnapshot.value)
   const activeStationId = ref<string | null>(null)
@@ -172,7 +172,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       binding = createDefaultBinding(gameGuid)
       savedBindings.value.list.push(binding)
     }
-    savedBindings.value.activeGameGuid = gameGuid
+    activeViewStore.setActiveId(gameGuid)
     loadDraft(gameGuid)
     if (draftBinding.value) {
       draftBinding.value.selectedArchiveTime = archiveTime
@@ -185,7 +185,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function setActiveBinding(gameGuid: string | null) {
-    savedBindings.value.activeGameGuid = gameGuid
+    activeViewStore.setActiveId(gameGuid)
     if (gameGuid) loadDraft(gameGuid)
     else {
       draftBinding.value = null
@@ -199,7 +199,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (!getBindingByGameGuid(gameGuid)) savedBindings.value.list.push(binding)
     binding.selectedArchiveTime = archiveTime
     binding.updatedAt = Date.now()
-    savedBindings.value.activeGameGuid = gameGuid
+    activeViewStore.setActiveId(gameGuid)
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraft(gameGuid)
     if (draftBinding.value) {
       draftBinding.value.selectedArchiveTime = archiveTime
@@ -222,13 +222,13 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     const idx = savedBindings.value.list.findIndex((item) => item.gameGuid === next.gameGuid)
     if (idx >= 0) savedBindings.value.list[idx] = next
     else savedBindings.value.list.push(next)
-    savedBindings.value.activeGameGuid = next.gameGuid
+    activeViewStore.setActiveId(next.gameGuid)
     writeState()
     lastSavedDraftSnapshot.value = serializeBinding(draftBinding.value)
   }
 
   function discardChanges() {
-    const guid = draftBinding.value?.gameGuid || savedBindings.value.activeGameGuid
+    const guid = draftBinding.value?.gameGuid || activeViewStore.activeId
     if (!guid) return
     loadDraft(guid)
   }
@@ -457,7 +457,10 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   function loadData(data: SavedSaveBindingsState) {
     savedBindings.value = normalizeState(data)
     writeState()
-    if (savedBindings.value.activeGameGuid) loadDraft(savedBindings.value.activeGameGuid)
+    const storedGuid = activeViewStore.activeId
+    if (storedGuid && savedBindings.value.list.some((b) => b.gameGuid === storedGuid)) {
+      loadDraft(storedGuid)
+    }
   }
 
   function selectStation(stationId: string | null) {

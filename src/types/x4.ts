@@ -1146,7 +1146,6 @@ export interface SaveBindingPlan {
 
 export interface SavedSaveBindingsState {
   version: number
-  activeGameGuid: string | null
   list: SaveBindingPlan[]
 }
 
