@@ -6,7 +6,7 @@ import sax from 'sax'
 import { createSaveParserRuntime, createSaveXmlFilterRuntime, createComponentXmlFilterRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
 import { postProcessRustSaveArchive } from '../src/workers/saveParser.post'
-import type { X4Module, X4Map } from '../src/types/x4'
+import type { X4Module, X4Map, X4Ship, X4Equipment } from '../src/types/x4'
 
 interface FilteredXmlResult {
   xml: string
@@ -261,6 +261,64 @@ function loadMaps(version: string | null): X4Map | undefined {
   
   console.log(`[extract_save] loaded maps for version ${version}: ${clusterCount} clusters, ${sectorCount} sectors, ${zoneCount} zones`)
   return maps
+}
+
+function loadShips(version: string | null): X4Ship[] | undefined {
+  if (!version) return undefined
+  
+  const versionConfigPath = path.resolve(process.cwd(), 'src/assets/versions.json')
+  if (!fs.existsSync(versionConfigPath)) {
+    console.warn(`[extract_save] versions.json not found at ${versionConfigPath}, skipping ships loading`)
+    return undefined
+  }
+  
+  const versionConfig = JSON.parse(fs.readFileSync(versionConfigPath, 'utf-8'))
+  const versionInfo = versionConfig.versions?.find((v: { version: string }) => String(v.version) === version)
+  if (!versionInfo) {
+    console.warn(`[extract_save] version ${version} not found in versions.json, skipping ships loading`)
+    return undefined
+  }
+  
+  const folderName = versionInfo.folder_name || version
+  const shipsPath = path.resolve(process.cwd(), `src/assets/x4_game_data/${folderName}/data/ships.json`)
+  
+  if (!fs.existsSync(shipsPath)) {
+    console.warn(`[extract_save] ships.json not found at ${shipsPath}, skipping ships loading`)
+    return undefined
+  }
+  
+  const ships: X4Ship[] = JSON.parse(fs.readFileSync(shipsPath, 'utf-8'))
+  console.log(`[extract_save] loaded ${ships.length} ships for version ${version}`)
+  return ships
+}
+
+function loadEquipments(version: string | null): X4Equipment[] | undefined {
+  if (!version) return undefined
+  
+  const versionConfigPath = path.resolve(process.cwd(), 'src/assets/versions.json')
+  if (!fs.existsSync(versionConfigPath)) {
+    console.warn(`[extract_save] versions.json not found at ${versionConfigPath}, skipping equipments loading`)
+    return undefined
+  }
+  
+  const versionConfig = JSON.parse(fs.readFileSync(versionConfigPath, 'utf-8'))
+  const versionInfo = versionConfig.versions?.find((v: { version: string }) => String(v.version) === version)
+  if (!versionInfo) {
+    console.warn(`[extract_save] version ${version} not found in versions.json, skipping equipments loading`)
+    return undefined
+  }
+  
+  const folderName = versionInfo.folder_name || version
+  const equipmentsPath = path.resolve(process.cwd(), `src/assets/x4_game_data/${folderName}/data/equipments.json`)
+  
+  if (!fs.existsSync(equipmentsPath)) {
+    console.warn(`[extract_save] equipments.json not found at ${equipmentsPath}, skipping equipments loading`)
+    return undefined
+  }
+  
+  const equipments: X4Equipment[] = JSON.parse(fs.readFileSync(equipmentsPath, 'utf-8'))
+  console.log(`[extract_save] loaded ${equipments.length} equipments for version ${version}`)
+  return equipments
 }
 
 function pumpWasmParser(options: {
@@ -814,7 +872,9 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
   } else {
     const modulesByMacroId = loadModulesByMacroId(expectedVersion)
     const maps = loadMaps(expectedVersion)
-    archive = postProcessRustSaveArchive(rawArchive, modulesByMacroId, maps)
+    const ships = loadShips(expectedVersion)
+    const equipments = loadEquipments(expectedVersion)
+    archive = postProcessRustSaveArchive(rawArchive, modulesByMacroId, maps, ships, equipments)
   }
 
   console.log(`[extract_save] done: sectors ${Object.keys(archive.sectors).length}, compatible=${archive.isCompatible}`)

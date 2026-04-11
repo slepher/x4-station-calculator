@@ -202,6 +202,7 @@ onBeforeUnmount(() => {
           v-model="searchQuery"
           class="bind-menu-search-input"
           type="text"
+          name="bind-sector-search"
           :placeholder="t('map.save_coord_search_placeholder')"
         />
         <button

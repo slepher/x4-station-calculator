@@ -126,7 +126,9 @@ async function processXmlFile(file: File) {
         const processedArchive = postProcessRustSaveArchive(
           msg.data, 
           gameDataStore.modulesByMacroId,
-          gameDataStore.maps
+          gameDataStore.maps,
+          gameDataStore.ships,
+          gameDataStore.equipments
         )
         saveStore.addArchive(processedArchive)
         saveStore.setParsingState(false, '', null)

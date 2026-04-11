@@ -25,7 +25,9 @@ import type {
   X4Missile,
   X4Res,
   X4Dlc,
-  X4SettingStorage
+  X4SettingStorage,
+  X4Ship,
+  X4Equipment
 } from '@/types/x4'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
@@ -74,6 +76,8 @@ export const useGameDataStore = defineStore('gameData', () => {
   const missiles = ref<X4Missile[]>([])
   const drones = ref<X4Drone[]>([])
   const consumables = ref<X4Consumable[]>([])
+  const ships = ref<X4Ship[]>([])
+  const equipments = ref<X4Equipment[]>([])
   const maps = ref<X4Map>({ clusters: {}, sectors: {} })
   const regionyields = ref<X4RegionYield[]>([])
   const res = ref<X4Res[]>([])
@@ -390,6 +394,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     missiles.value = data.missiles
     drones.value = data.drones
     consumables.value = data.consumables
+    ships.value = data.ships
+    equipments.value = data.equipments
     maps.value = data.maps
     regionyields.value = data.regionyields
     res.value = data.res
@@ -516,6 +522,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     missiles,
     drones,
     consumables,
+    ships,
+    equipments,
     maps,
     regionyields,
     res,

@@ -2134,6 +2134,7 @@ onBeforeUnmount(() => {
               :value="searchQuery"
               class="search-input"
               data-testid="map-sector-search-input"
+              name="map-sector-search"
               :placeholder="t('map.search_sector_placeholder')"
               @input="onSearchInput"
               @focus="onSearchFocus"
@@ -2234,6 +2235,7 @@ onBeforeUnmount(() => {
             <input
               class="zoom-slider"
               type="range"
+              name="map-zoom"
               min="0"
               max="100"
               step="0.5"

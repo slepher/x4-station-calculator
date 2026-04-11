@@ -1025,6 +1025,7 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
       <input
         v-model="sectorSearchQuery"
         class="search-input"
+        name="sector-search"
         :placeholder="t('map.save_coord_search_placeholder')"
         type="text"
       />
