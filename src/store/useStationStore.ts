@@ -151,10 +151,12 @@ export const useStationStore = defineStore('station', () => {
     const station = empireStore.activeStation
     if (!state || !station) return
 
-    const { plannedModules, settings } = state
+    const { plannedModules, settings, lockedWares, warePriority } = state
     const patch = {
       modules: deepClone(plannedModules),
-      settings: migrateStationSettings(settings)
+      settings: migrateStationSettings(settings),
+      lockedWares: deepClone(lockedWares || []),
+      warePriority: deepClone(warePriority || {})
     }
 
     if (parsed.kind === 'plan') {
@@ -169,7 +171,9 @@ export const useStationStore = defineStore('station', () => {
       name: station.name || parsed.saveStationCode,
       type: station.type || 'industrial',
       modules: patch.modules,
-      settings: patch.settings
+      settings: patch.settings,
+      lockedWares: patch.lockedWares,
+      warePriority: patch.warePriority
     })
     if (plan) {
       empireStore.selectStation(createBindingPlanStationId(binding.gameGuid, plan.id))
@@ -191,6 +195,7 @@ export const useStationStore = defineStore('station', () => {
       const binding = saveBindingStore.activeBinding
       const parsed = parseBindingStationId(stationId)
       if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
+      const station = empireStore.getStationById(stationId)
       
       if (parsed.kind === 'plan') {
         return saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, {
@@ -199,6 +204,21 @@ export const useStationStore = defineStore('station', () => {
           lockedWares: patch.lockedWares,
           warePriority: patch.warePriority
         })
+      }
+      
+      if (parsed.kind === 'derived') {
+        const plan = saveBindingStore.upsertStationPlan({
+          gameGuid: binding.gameGuid,
+          saveStationCode: parsed.saveStationCode,
+          groupId: station?.sectorId || null,
+          name: station?.name || parsed.saveStationCode,
+          type: station?.type || 'industrial',
+          modules: patch.modules,
+          settings: patch.settings,
+          lockedWares: patch.lockedWares,
+          warePriority: patch.warePriority
+        })
+        return !!plan
       }
       return false
     },

@@ -92,11 +92,6 @@ const componentGapFlows = computed(() => {
 
 const empireGaps = computed(() => {
   const flows = componentGapFlows.value
-  const stationNetByWare = new Map<string, number>()
-  ;(groupedFlows.value.flows || []).forEach((flow: any) => {
-    if (flow.transportType !== 'container') return
-    stationNetByWare.set(flow.wareId, Number(flow.netRate || 0))
-  })
   store.plannedModules
   locale.value
   const byTierThenName = (a: any, b: any) => {
@@ -110,7 +105,7 @@ const empireGaps = computed(() => {
     return String(a.id || '').localeCompare(String(b.id || ''), 'en')
   }
   const operations = flows.operations
-    .filter((flow: any) => (stationNetByWare.get(flow.wareId) ?? 0) < 0 || store.getResolvedLevel(flow.wareId) > 0)
+    .filter((flow: any) => flow.netRate < 0 || store.getResolvedLevel(flow.wareId) > 0)
     .map((flow: any) => {
       const module = getModuleForWare(flow.wareId)
       const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
@@ -133,7 +128,7 @@ const empireGaps = computed(() => {
           disableRemove: !module || plannedIndex === -1
         }
       })
-      .filter((flow: any) => (stationNetByWare.get(flow.wareId) ?? 0) <= 0 || !flow.disableRemove)
+      .filter((flow: any) => flow.netRate <= 0 || !flow.disableRemove)
       .sort(byTierThenName)
   }
 })

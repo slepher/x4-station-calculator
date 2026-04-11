@@ -9,7 +9,7 @@ import type {
   EntityLocation
 } from '@/types/x4'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from '@/store/state/StationStateMap'
-import { createBindingPlanStationId, parseBindingStationId } from './productionSourceAdapter'
+import { createBindingPlanStationId, parseBindingStationId, toProductionStation } from './productionSourceAdapter'
 
 export interface EmpireMutationHandlers {
   onStationCreated: (stationId: string) => void
@@ -177,17 +177,9 @@ export function createEmpireMutationService(deps: EmpireMutationDeps): EmpireMut
       if (plan && selectAfterCreate) {
         onActiveStationChange(stationId)
       }
-      return {
-        id: stationId,
-        name: plan.name,
-        type: plan.type,
-        sectorId: plan.groupId || null,
-        modules: plan.modules,
-        settings: plan.settings,
-        lastUpdated: 0,
-        lockedWares: [],
-        warePriority: {}
-      }
+      const station = toProductionStation(binding.gameGuid, plan)
+      station.sectorId = plan.groupId || null
+      return station
     }
 
     const station = empireDataStore.createStationInEmpire(activeEmpire.value, name, type)

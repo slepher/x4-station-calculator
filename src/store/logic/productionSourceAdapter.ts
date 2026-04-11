@@ -81,7 +81,7 @@ export function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
   }
 }
 
-function toProductionStation(gameGuid: string, plan: BindingStationPlan): StationPlan {
+export function toProductionStation(gameGuid: string, plan: BindingStationPlan): StationPlan {
   return {
     id: createBindingPlanStationId(gameGuid, plan.id),
     name: plan.name || plan.saveStationCode || 'Station',
@@ -89,12 +89,12 @@ function toProductionStation(gameGuid: string, plan: BindingStationPlan): Statio
     modules: plan.modules || [],
     settings: migrateStationSettings(plan.settings),
     lastUpdated: 0,
-    lockedWares: [],
-    warePriority: {}
+    lockedWares: plan.lockedWares || [],
+    warePriority: plan.warePriority || {}
   }
 }
 
-function toDerivedSaveStation(
+export function toDerivedSaveStation(
   gameGuid: string,
   saveStation: PlayerStationEntry,
   plan: BindingStationPlan | undefined
@@ -109,8 +109,8 @@ function toDerivedSaveStation(
     modules: plan?.modules || [],
     settings: migrateStationSettings(plan?.settings || {}),
     lastUpdated: 0,
-    lockedWares: [],
-    warePriority: {}
+    lockedWares: plan?.lockedWares || [],
+    warePriority: plan?.warePriority || {}
   }
 }
 

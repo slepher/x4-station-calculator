@@ -140,6 +140,10 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
     const stations = productionStations.value
     const sectorList = productionSectors.value
 
+    if (productionSource.value === 'save-binding') {
+      empireGroupedFlows.value
+    }
+
     const buildSupplyStorageFlows = (groupedFlows: EmpireGroupedFlows): SupplyStorageFlow[] => {
       const stationMap = new Map(stations.map((station) => [station.id, station]))
       const byWareId = new Map<string, SupplyStorageFlow>()

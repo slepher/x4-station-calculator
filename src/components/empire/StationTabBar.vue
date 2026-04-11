@@ -9,7 +9,6 @@ const { t } = useI18n()
 
 const isBindingMode = computed(() => empireStore.productionSource === 'save-binding')
 
-// 状态管理
 const showMenu = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
 const menuStationId = ref<string | null>(null)
@@ -18,6 +17,7 @@ const stationToDelete = ref<string | null>(null)
 const tabsScrollAreaRef = ref<HTMLElement | null>(null)
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
+const expandedSectorId = ref<string | null>(null)
 
 // 数据获取
 const stations = computed(() => {
@@ -27,6 +27,15 @@ const sectors = computed(() => empireStore.sectors)
 
 const activeStationId = computed(() => empireStore.activeStationId)
 const activeTransitSectorId = computed(() => empireStore.activeTransitSectorId)
+
+const computeDefaultExpandedSectorId = (): string | null => {
+  if (activeTransitSectorId.value) return activeTransitSectorId.value
+  if (activeStationId.value) {
+    const activeStation = stations.value.find(s => s.id === activeStationId.value)
+    return activeStation?.sectorId || null
+  }
+  return null
+}
 
 const tabGroups = computed(() => {
   const unassigned = stations.value.filter((station) => !station.sectorId)
@@ -91,11 +100,21 @@ const addNewStation = () => {
 }
 
 const openSupply = (sectorId: string) => {
+  expandedSectorId.value = sectorId
   empireStore.selectTransitSector(sectorId)
 }
 
 const openOverview = () => {
+  expandedSectorId.value = null
   empireStore.selectStation(null)
+}
+
+const selectStationWithExpand = (stationId: string) => {
+  const station = stations.value.find(s => s.id === stationId)
+  if (station?.sectorId) {
+    expandedSectorId.value = station.sectorId
+  }
+  empireStore.selectStation(stationId)
 }
 
 // 右键菜单逻辑
@@ -156,6 +175,17 @@ watch(
     updateTabsScrollState()
   },
   { deep: true }
+)
+
+watch(
+  [activeStationId, activeTransitSectorId, visibleSectorGroups],
+  () => {
+    const defaultSector = computeDefaultExpandedSectorId()
+    if (defaultSector && visibleSectorGroups.value.some(g => g.id === defaultSector)) {
+      expandedSectorId.value = defaultSector
+    }
+  },
+  { immediate: true }
 )
 
 onMounted(() => {
@@ -266,25 +296,9 @@ const cancelDelete = () => {
           <div class="tab-separator tab-separator-sector h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
 
           <div
-            v-for="station in group.stations"
-            :key="station.id"
-            class="tab-item station-tab"
-            :data-station-id="station.id"
-            :class="{ 'active': activeStationId === station.id }"
-            @click="selectStation(station.id)"
-            @contextmenu.stop="openMenu(station.id, $event)"
-          >
-            <div class="tab-highlight"></div>
-            <div class="tab-content">
-              <span class="tab-icon">{{ getStationIcon(station.type) }}</span>
-              <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
-            </div>
-          </div>
-
-          <div
             v-if="group.showTransitTab"
             class="tab-item supply-tab"
-            :class="{ 'active': activeStationId === empireStore.getTransitTabId(group.id) }"
+            :class="{ 'active': activeTransitSectorId === group.id }"
             @click="openSupply(group.id)"
           >
             <div class="tab-highlight"></div>
@@ -293,6 +307,24 @@ const cancelDelete = () => {
               <span class="tab-label max-w-[120px] truncate">{{ group.name }}</span>
             </div>
           </div>
+
+          <template v-if="expandedSectorId === group.id">
+            <div
+              v-for="station in group.stations"
+              :key="station.id"
+              class="tab-item station-tab"
+              :data-station-id="station.id"
+              :class="{ 'active': activeStationId === station.id }"
+              @click="selectStationWithExpand(station.id)"
+              @contextmenu.stop="openMenu(station.id, $event)"
+            >
+              <div class="tab-highlight"></div>
+              <div class="tab-content">
+                <span class="tab-icon">{{ getStationIcon(station.type) }}</span>
+                <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
+              </div>
+            </div>
+          </template>
         </div>
       </div>
 

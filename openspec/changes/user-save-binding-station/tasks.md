@@ -137,3 +137,14 @@
 - Flow 聚合逻辑独立封装，便于测试和维护
 - 清晰的职责边界：读取层、聚合层、mutation层
 - 代码行数显著减少，可维护性提升
+
+## Tabbar 折叠展开逻辑
+
+- [x] T70. 在 StationTabBar 添加 `expandedSectorId` ref，跟踪当前展开的星区
+- [x] T71. 计算 `expandedSectorId` 默认值：根据 activeStationId / activeTransitSectorId 所在星区
+- [x] T72. 调整模板渲染逻辑：未展开星区仅显示中转站，展开星区显示中转站+站点（中转站在前）
+- [x] T73. 点击中转站时：展开对应星区 + 调用 openSupply(sectorId)
+- [x] T74. 点击站点时：自动展开其所在星区
+- [x] T75. 监听 activeStationId / activeTransitSectorId 变化，自动更新 expandedSectorId
+- [ ] T76. E2E 测试：验证折叠展开行为符合需求
+- [x] T77. 运行 build 验证编译通过

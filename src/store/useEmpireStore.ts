@@ -31,7 +31,8 @@ import {
 import { getLinkedSectorIdsFor, normalizeSectorLinks } from './logic/sectorLinks'
 import {
   createBindingPlanStationId,
-  parseBindingStationId
+  parseBindingStationId,
+  toProductionStation
 } from './logic/productionSourceAdapter'
 import {
   createEmpireSourceView,
@@ -246,17 +247,9 @@ const gameData = useGameDataStore()
       if (plan && selectAfterCreate) {
         activeStationId.value = stationId
       }
-      return {
-        id: stationId,
-        name: plan.name,
-        type: plan.type,
-        sectorId: plan.groupId || null,
-        modules: plan.modules,
-        settings: plan.settings,
-        lastUpdated: 0,
-        lockedWares: [],
-        warePriority: {}
-      }
+      const station = toProductionStation(binding.gameGuid, plan)
+      station.sectorId = plan.groupId || null
+      return station
     }
 
     const station = empireDataStore.createStationInEmpire(activeEmpire.value, name, type)

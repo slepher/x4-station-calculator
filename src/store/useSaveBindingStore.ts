@@ -83,6 +83,8 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
               type: (plan.type as StationType) || 'industrial',
               modules: Array.isArray(plan.modules) ? plan.modules : [],
               settings: deepClone<StationSettings>((plan.settings as StationSettings) || DEFAULT_STATION_SETTINGS),
+              lockedWares: Array.isArray(plan.lockedWares) ? deepClone(plan.lockedWares as string[]) : [],
+              warePriority: (plan.warePriority && typeof plan.warePriority === 'object') ? deepClone(plan.warePriority as Record<string, number>) : {},
               sectorMacro: plan.sectorMacro as string | undefined,
               position: plan.position as { x: number; y: number; z: number } | undefined
             }))
