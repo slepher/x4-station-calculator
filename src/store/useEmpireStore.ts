@@ -39,7 +39,6 @@ import {
 } from './logic/productionSourceAdapter'
 
 const V1_STORAGE_KEY = 'x4_station_data'
-const SESSION_ACTIVE_STATION_KEY = 'x4_active_station_id'
 const TRANSIT_TAB_PREFIX = 'transit:'
 
 function toTransitTabId(sectorId: string) {
@@ -117,26 +116,12 @@ export const useEmpireStore = defineStore('empire', () => {
   const empires = computed(() => savedEmpires.value.list)
   const activeEmpireId = computed(() => savedEmpires.value.activeId)
   
- const activeEmpire = ref<EmpirePlan | null>(null)
-  const empireActiveStationId = computed({
+const activeEmpire = ref<EmpirePlan | null>(null)
+  
+  const activeStationId = computed({
     get: () => activeViewStore.activeStationId,
     set: (id: string | null) => activeViewStore.setActiveStationId(id)
   })
-
-  const activeStationId = computed({
-    get: () => productionSource.value === 'save-binding'
-      ? saveBindingStore.activeStationId
-      : empireActiveStationId.value,
-    set: (id: string | null) => {
-      if (productionSource.value === 'save-binding') {
-        saveBindingStore.selectStation(id)
-      } else {
-        empireActiveStationId.value = id
-      }
-    }
-  })
-
-  const bindingActiveStationId = computed(() => saveBindingStore.activeStationId)
 
   const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     const cache = new Map<string, GroupedFlows>()
@@ -161,7 +146,7 @@ export const useEmpireStore = defineStore('empire', () => {
       const binding = saveBindingStore.activeBinding
       const archive = saveStore.selectedArchive
       const derived = deriveBindingStations(binding, archive)
-      return derived.find(item => item.station.id === bindingActiveStationId.value)?.station || null
+      return derived.find(item => item.station.id === activeStationId.value)?.station || null
     }
     if (!activeEmpire.value || !activeStationId.value) return null
     return activeEmpire.value.stations.find(s => s.id === activeStationId.value) || null
@@ -554,7 +539,7 @@ export const useEmpireStore = defineStore('empire', () => {
       return
     }
     
-    if (migrated.state.activeId) {
+    if (migrated.state.activeId && activeViewStore.productionSource === 'empire') {
       const empire = migrated.state.list.find(e => e.id === migrated.state.activeId)
       if (empire) {
         if (!Array.isArray(empire.sectorLinks)) {
@@ -570,6 +555,7 @@ export const useEmpireStore = defineStore('empire', () => {
         })
         activeEmpire.value = JSON.parse(JSON.stringify(empire))
         
+        const storedTabId = activeViewStore.activeStationId
         const isValidTabId = (tabId: string | null) => {
           if (!tabId) return false
           const transitSectorId = fromTransitTabId(tabId)
@@ -579,10 +565,8 @@ export const useEmpireStore = defineStore('empire', () => {
           return empire.stations.some((station) => station.id === tabId)
         }
 
-        const sessionTabId = sessionStorage.getItem(SESSION_ACTIVE_STATION_KEY)
-        if (isValidTabId(sessionTabId)) {
-          activeStationId.value = sessionTabId
-        } else {
+        const isValid = isValidTabId(storedTabId)
+        if (!isValid) {
           activeStationId.value = null
         }
       }
@@ -662,9 +646,12 @@ export const useEmpireStore = defineStore('empire', () => {
       }
       savedEmpires.value.activeId = empireId
       
-      sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
-      
+      const storedTabId = activeViewStore.activeStationId
+      const isValid = storedTabId && empire.stations.some(s => s.id === storedTabId)
       activeViewStore.switchToEmpire(empireId)
+      if (isValid) {
+        activeStationId.value = storedTabId
+      }
       initializeAllStationCaches()
       takeSnapshot()
     }
@@ -737,11 +724,6 @@ export const useEmpireStore = defineStore('empire', () => {
       stationStateMap.remove(stationId)
       if (activeStationId.value === stationId) {
         activeStationId.value = activeEmpire.value?.stations[0]?.id || null
-        if (activeStationId.value) {
-          sessionStorage.setItem(SESSION_ACTIVE_STATION_KEY, activeStationId.value)
-        } else {
-          sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
-        }
       }
     }
   }
@@ -802,7 +784,6 @@ export const useEmpireStore = defineStore('empire', () => {
     if (!deleted) return false
     if (activeTransitSectorId.value === sectorId) {
       activeStationId.value = null
-      sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
     }
     return true
   }
@@ -910,24 +891,17 @@ export const useEmpireStore = defineStore('empire', () => {
 
   function selectStation(stationId: string | null) {
     activeStationId.value = stationId
-    if (stationId) {
-      sessionStorage.setItem(SESSION_ACTIVE_STATION_KEY, stationId)
-    } else {
-      sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
-    }
   }
 
   function selectTransitSector(sectorId: string | null) {
     if (!sectorId) {
       activeStationId.value = null
-      sessionStorage.removeItem(SESSION_ACTIVE_STATION_KEY)
       return
     }
     const exists = sectors.value.some((sector) => sector.id === sectorId)
     if (!exists) return
     const transitTabId = toTransitTabId(sectorId)
     activeStationId.value = transitTabId
-    sessionStorage.setItem(SESSION_ACTIVE_STATION_KEY, transitTabId)
   }
 
   function getTransitTabId(sectorId: string) {
@@ -1070,14 +1044,16 @@ export const useEmpireStore = defineStore('empire', () => {
     
     if (source === 'save-binding') {
       if (storedId && saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedId)) {
-        saveBindingStore.createOrOpenBinding(storedId)
+        openBindingForProduction(storedId)
+        validateActiveStationId()
         return
       }
       
       const firstBinding = saveBindingStore.savedBindings.list[0]
       if (firstBinding) {
         activeViewStore.setActiveId(firstBinding.gameGuid)
-        saveBindingStore.createOrOpenBinding(firstBinding.gameGuid)
+        openBindingForProduction(firstBinding.gameGuid)
+        validateActiveStationId()
         return
       }
       
@@ -1116,6 +1092,22 @@ export const useEmpireStore = defineStore('empire', () => {
       return
     }
     saveBindingStore.createOrOpenBinding(gameGuid)
+  }
+
+  function validateActiveStationId() {
+    const currentStationId = activeViewStore.activeStationId
+    if (!currentStationId) return
+    if (productionSource.value !== 'save-binding') return
+    
+    const binding = saveBindingStore.activeBinding
+    const archive = saveStore.selectedArchive
+    const derived = deriveBindingStations(binding, archive)
+    const validIds = new Set(derived.map(item => item.station.id))
+    if (validIds.has(currentStationId)) {
+      activeStationId.value = currentStationId
+    } else {
+      activeStationId.value = null
+    }
   }
 
   function switchToBinding(gameGuid: string): { needsConfirm: boolean } {

@@ -1,19 +1,14 @@
 <script setup lang="ts">
 import { useStationStore } from '@/store/useStationStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
-import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import StationPlanningItem from './StationPlanningItem.vue'
 import StationModulePicker from './StationModulePicker.vue'
-import { computed, ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick } from 'vue'
 
 const { t } = useI18n()
 const store = useStationStore()
-const empireStore = useEmpireStore()
-const saveBindingStore = useSaveBindingStore()
 const flashTime = 300; 0; // 闪烁动画时长（毫秒）
-const isBindingMode = computed(() => empireStore.productionSource === 'save-binding')
 
 // 规划区数量调整功能
 // 应用缩放比例
@@ -99,20 +94,6 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
 
 <template>
   <div class="module-list-container">
-    <div v-if="isBindingMode" class="binding-save-row">
-      <span class="binding-status" :class="{ dirty: saveBindingStore.isDirty }">
-        {{ saveBindingStore.isDirty ? t('production.binding_unsaved') : t('production.binding_saved') }}
-      </span>
-      <button
-        type="button"
-        class="binding-save-button"
-        :disabled="!saveBindingStore.activeBinding || !saveBindingStore.isDirty"
-        @click="saveBindingStore.saveBinding()"
-      >
-        {{ t('production.save_binding') }}
-      </button>
-    </div>
-
     <div class="search-panel">
       <StationModulePicker />
     </div>
@@ -233,23 +214,6 @@ watch(() => store.plannedModules.length, (newLength, oldLength) => {
 
 .module-list-container {
   @apply space-y-2;
-}
-
-.binding-save-row {
-  @apply flex items-center justify-between gap-3 rounded-md border border-slate-700 bg-slate-900/70 px-3 py-2;
-}
-
-.binding-status {
-  @apply text-[11px] font-bold uppercase tracking-wide text-emerald-300;
-}
-
-.binding-status.dirty {
-  @apply text-amber-300;
-}
-
-.binding-save-button {
-  @apply rounded-md border border-sky-500/70 bg-sky-500 px-3 py-1 text-xs font-bold text-slate-950 transition-colors;
-  @apply hover:bg-sky-400 disabled:cursor-not-allowed disabled:border-slate-700 disabled:bg-slate-800 disabled:text-slate-500;
 }
 
 .sunlight-control {

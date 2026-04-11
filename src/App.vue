@@ -12,6 +12,7 @@ import { useStationStore } from '@/store/useStationStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
 
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
@@ -21,6 +22,7 @@ const stationStore = useStationStore()
 const saveStore = useSaveStore()
 const mapStore = useMapStore()
 const saveBindingStore = useSaveBindingStore()
+const activeViewStore = useActiveViewStore()
 
 const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
 const isInitializing = ref(true)
@@ -31,21 +33,21 @@ async function initializeApp() {
   isInitializing.value = true
 
   try {
-    // Step 1: Initialize gameData first (sets version and storage keys)
     await gameDataStore.initialize()
-    console.log('[App] GameData initialized. Version:', gameDataStore.currentVersion, 'Beta:', gameDataStore.isBeta)
+    console.log('[App] GameData initialized')
 
-    // Step 2: Initialize business stores in parallel (they all depend on gameData)
+    await saveStore.initialize()
+    await saveBindingStore.initialize()
+    
+    await empireStore.initialize()
+    
     await Promise.all([
-      empireStore.initialize(),
       logicFlowStore.init(),
       mapStore.initialize(),
-      shipBuildStore.initialize(),
-      saveStore.initialize(),
-      saveBindingStore.initialize()
+      shipBuildStore.initialize()
     ])
 
-    console.log('[App] All stores initialized. Empire ready:', empireStore.isReady)
+    console.log('[App] All stores initialized')
   } catch (e) {
     console.error('[App] Initialization failed:', e)
   } finally {
@@ -88,6 +90,9 @@ const checkExportStores = () => {
       (window as any).empireStore = empireStore;
       (window as any).shipBuildStore = shipBuildStore;
       (window as any).saveBindingStore = saveBindingStore;
+      (window as any).saveStore = saveStore;
+      (window as any).mapStore = mapStore;
+      (window as any).activeViewStore = activeViewStore;
       (window as any).store = stationStore;
     }
     return true;

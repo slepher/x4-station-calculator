@@ -172,7 +172,6 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     }
   })
   const isDirty = computed(() => serializeBinding(draftBinding.value) !== lastSavedDraftSnapshot.value)
-  const activeStationId = ref<string | null>(null)
 
   function getBindingByGameGuid(gameGuid: string): SaveBindingPlan | null {
     return savedBindings.value.list.find((item) => item.gameGuid === gameGuid) || null
@@ -486,9 +485,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     }
   }
 
-  function selectStation(stationId: string | null) {
-    activeStationId.value = stationId
-  }
+  
 
   function updateStationPlan(gameGuid: string, stationPlanId: string, patch: Partial<BindingStationPlan>) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
@@ -526,7 +523,6 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     draftBinding,
     isDirty,
     isInitialized,
-    activeStationId,
     initialize,
     getBindingByGameGuid,
     getBindingDisplayName,
@@ -549,7 +545,6 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     deleteTradeStation,
     setTradeStationPosition,
     importEmpireStationToSaveStation,
-    selectStation,
     updateStationPlan,
     createStationPlanInGroup,
     loadData,
