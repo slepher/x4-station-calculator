@@ -154,7 +154,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       console.warn('[SaveBindingStore] failed to load bindings:', error)
       savedBindings.value = normalizeState(null)
     }
-    const storedGuid = activeViewStore.activeId
+    const storedGuid = activeViewStore.activeBinding
     if (storedGuid && savedBindings.value.list.some((b) => b.gameGuid === storedGuid)) {
       loadDraft(storedGuid)
     }
@@ -162,7 +162,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   const bindings = computed(() => savedBindings.value.list)
-  const activeGameGuid = computed(() => activeViewStore.activeId)
+  const activeGameGuid = computed(() => activeViewStore.activeBinding)
   const activeBinding = computed(() => draftBinding.value)
   const activeBindingName = computed({
     get: () => draftBinding.value?.bindingName || '',
@@ -252,7 +252,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function discardChanges() {
-    const guid = draftBinding.value?.gameGuid || activeViewStore.activeId
+    const guid = draftBinding.value?.gameGuid || activeViewStore.activeBinding
     if (!guid) return
     loadDraft(guid)
   }
@@ -487,7 +487,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   function loadData(data: SavedSaveBindingsState) {
     savedBindings.value = normalizeState(data)
     writeState()
-    const storedGuid = activeViewStore.activeId
+    const storedGuid = activeViewStore.activeBinding
     if (storedGuid && savedBindings.value.list.some((b) => b.gameGuid === storedGuid)) {
       loadDraft(storedGuid)
     }

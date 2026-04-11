@@ -687,18 +687,18 @@ const gameData = useGameDataStore()
 
   function applyActiveViewFallback() {
     const source = activeViewStore.productionSource
-    const storedId = activeViewStore.activeId
+    const storedBindingGuid = activeViewStore.activeBinding
     
     if (source === 'save-binding') {
-      if (storedId && saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedId)) {
-        openBindingForProduction(storedId)
+      if (storedBindingGuid && saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedBindingGuid)) {
+        openBindingForProduction(storedBindingGuid)
         validateActiveStationId()
         return
       }
       
       const firstBinding = saveBindingStore.savedBindings.list[0]
       if (firstBinding) {
-        activeViewStore.setActiveId(firstBinding.gameGuid)
+        activeViewStore.activeBinding = firstBinding.gameGuid
         openBindingForProduction(firstBinding.gameGuid)
         validateActiveStationId()
         return
@@ -714,7 +714,7 @@ const gameData = useGameDataStore()
   }
 
   function fallbackToFirstEmpire() {
-    const storedId = activeViewStore.activeId
+    const storedId = activeViewStore.activeEmpireId
     
     if (storedId && savedEmpires.value.list.some((e) => e.id === storedId)) {
       loadEmpire(storedId)
@@ -723,7 +723,7 @@ const gameData = useGameDataStore()
     
     const firstEmpire = savedEmpires.value.list[0]
     if (firstEmpire) {
-      activeViewStore.setActiveId(firstEmpire.id)
+      activeViewStore.activeEmpireId = firstEmpire.id
       loadEmpire(firstEmpire.id)
       return
     }

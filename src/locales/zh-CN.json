@@ -92,11 +92,11 @@
     }
   },
   "view": {
-    "production": "量化生产",
+    "blueprint_production": "蓝图产能",
+    "live_production": "实况产能",
     "logical_flow": "逻辑组网",
     "ship_build": "船只建造",
-    "maps": "星区地图",
-    "save_import": "存档同步"
+    "maps": "星区地图"
   },
   "map": {
     "search_sector_placeholder": "搜索星区",

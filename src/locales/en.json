@@ -92,11 +92,11 @@
     }
   },
   "view": {
-    "production": "Quantified",
+    "blueprint_production": "Blueprint",
+    "live_production": "Live",
     "logical_flow": "Logical Flow",
     "ship_build": "Ship Build",
-    "maps": "Sector Map",
-    "save_import": "Save Sync"
+    "maps": "Sector Map"
   },
   "map": {
     "search_sector_placeholder": "Search sector",

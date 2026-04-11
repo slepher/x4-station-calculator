@@ -2,21 +2,21 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { StationActiveView } from './useShipBuildStore'
 
-export type ProductionSourceKind = 'empire' | 'save-binding'
-
 export interface ActiveViewState {
-  productionSource: ProductionSourceKind
-  activeId: string | null
-  activeStationId: string | null
+  activeEmpireId: string | null
+  activeEmpireStation: string | null
+  activeBinding: string | null
+  activeBindingStation: string | null
   activeView: StationActiveView
 }
 
 const STORAGE_KEY = 'x4_station_active_view'
 const DEFAULT_STATE: ActiveViewState = {
-  productionSource: 'empire',
-  activeId: null,
-  activeStationId: null,
-  activeView: 'production'
+  activeEmpireId: null,
+  activeEmpireStation: null,
+  activeBinding: null,
+  activeBindingStation: null,
+  activeView: 'blueprint-production'
 }
 
 function loadFromStorage(): ActiveViewState {
@@ -24,11 +24,21 @@ function loadFromStorage(): ActiveViewState {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return { ...DEFAULT_STATE }
     const parsed = JSON.parse(raw)
+    if (parsed.activeEmpireId !== undefined || parsed.activeBinding !== undefined) {
+      return {
+        activeEmpireId: parsed.activeEmpireId || null,
+        activeEmpireStation: parsed.activeEmpireStation || null,
+        activeBinding: parsed.activeBinding || null,
+        activeBindingStation: parsed.activeBindingStation || null,
+        activeView: parsed.activeView || 'blueprint-production'
+      }
+    }
     return {
-      productionSource: parsed.productionSource || 'empire',
-      activeId: parsed.activeId || null,
-      activeStationId: parsed.activeStationId || null,
-      activeView: parsed.activeView || 'production'
+      activeEmpireId: parsed.productionSource === 'empire' ? parsed.activeId : null,
+      activeEmpireStation: parsed.productionSource === 'empire' ? parsed.activeStationId : null,
+      activeBinding: parsed.productionSource === 'save-binding' ? parsed.activeId : null,
+      activeBindingStation: parsed.productionSource === 'save-binding' ? parsed.activeStationId : null,
+      activeView: parsed.activeView || 'blueprint-production'
     }
   } catch {
     return { ...DEFAULT_STATE }
@@ -46,26 +56,34 @@ function saveToStorage(state: ActiveViewState): void {
 export const useActiveViewStore = defineStore('activeView', () => {
   const state = ref<ActiveViewState>(loadFromStorage())
 
-  const productionSource = computed({
-    get: () => state.value.productionSource,
-    set: (val: ProductionSourceKind) => {
-      state.value.productionSource = val
+  const activeEmpireId = computed({
+    get: () => state.value.activeEmpireId,
+    set: (val: string | null) => {
+      state.value.activeEmpireId = val
       saveToStorage(state.value)
     }
   })
 
-  const activeId = computed({
-    get: () => state.value.activeId,
+  const activeEmpireStation = computed({
+    get: () => state.value.activeEmpireStation,
     set: (val: string | null) => {
-      state.value.activeId = val
+      state.value.activeEmpireStation = val
       saveToStorage(state.value)
     }
   })
 
-  const activeStationId = computed({
-    get: () => state.value.activeStationId,
+  const activeBinding = computed({
+    get: () => state.value.activeBinding,
     set: (val: string | null) => {
-      state.value.activeStationId = val
+      state.value.activeBinding = val
+      saveToStorage(state.value)
+    }
+  })
+
+  const activeBindingStation = computed({
+    get: () => state.value.activeBindingStation,
+    set: (val: string | null) => {
+      state.value.activeBindingStation = val
       saveToStorage(state.value)
     }
   })
@@ -78,19 +96,57 @@ export const useActiveViewStore = defineStore('activeView', () => {
     }
   })
 
-  function setProductionSource(source: ProductionSourceKind) {
-    state.value.productionSource = source
-    saveToStorage(state.value)
-  }
+  const productionSource = computed<'empire' | 'save-binding'>({
+    get: () => {
+      if (state.value.activeView === 'live-production') return 'save-binding'
+      return 'empire'
+    },
+    set: (val: 'empire' | 'save-binding') => {
+      if (val === 'save-binding') {
+        state.value.activeView = 'live-production'
+      } else {
+        state.value.activeView = 'blueprint-production'
+      }
+      saveToStorage(state.value)
+    }
+  })
+
+  const activeId = computed<string | null>({
+    get: () => {
+      if (productionSource.value === 'save-binding') return state.value.activeBinding
+      return state.value.activeEmpireId
+    },
+    set: (val: string | null) => {
+      if (productionSource.value === 'save-binding') {
+        state.value.activeBinding = val
+      } else {
+        state.value.activeEmpireId = val
+      }
+      saveToStorage(state.value)
+    }
+  })
+
+  const activeStationId = computed<string | null>({
+    get: () => {
+      if (productionSource.value === 'save-binding') return state.value.activeBindingStation
+      return state.value.activeEmpireStation
+    },
+    set: (val: string | null) => {
+      if (productionSource.value === 'save-binding') {
+        state.value.activeBindingStation = val
+      } else {
+        state.value.activeEmpireStation = val
+      }
+      saveToStorage(state.value)
+    }
+  })
 
   function setActiveId(id: string | null) {
-    state.value.activeId = id
-    saveToStorage(state.value)
+    activeId.value = id
   }
 
   function setActiveStationId(id: string | null) {
-    state.value.activeStationId = id
-    saveToStorage(state.value)
+    activeStationId.value = id
   }
 
   function setActiveView(view: StationActiveView) {
@@ -98,22 +154,30 @@ export const useActiveViewStore = defineStore('activeView', () => {
     saveToStorage(state.value)
   }
 
+  function setProductionSource(source: 'empire' | 'save-binding') {
+    productionSource.value = source
+  }
+
   function resetToOverview() {
-    state.value.activeStationId = null
+    if (productionSource.value === 'save-binding') {
+      state.value.activeBindingStation = null
+    } else {
+      state.value.activeEmpireStation = null
+    }
     saveToStorage(state.value)
   }
 
   function switchToBinding(gameGuid: string) {
-    state.value.productionSource = 'save-binding'
-    state.value.activeId = gameGuid
-    state.value.activeStationId = null
+    state.value.activeBinding = gameGuid
+    state.value.activeBindingStation = null
+    state.value.activeView = 'live-production'
     saveToStorage(state.value)
   }
 
   function switchToEmpire(empireId: string | null) {
-    state.value.productionSource = 'empire'
-    state.value.activeId = empireId
-    state.value.activeStationId = null
+    state.value.activeEmpireId = empireId
+    state.value.activeEmpireStation = null
+    state.value.activeView = 'blueprint-production'
     saveToStorage(state.value)
   }
 
@@ -127,6 +191,10 @@ export const useActiveViewStore = defineStore('activeView', () => {
     productionSource,
     activeId,
     activeStationId,
+    activeEmpireId,
+    activeEmpireStation,
+    activeBinding,
+    activeBindingStation,
     activeView,
     setProductionSource,
     setActiveId,

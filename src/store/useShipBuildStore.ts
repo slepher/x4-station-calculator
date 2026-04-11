@@ -33,7 +33,7 @@ const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
   missiles: []
 }
 
-export type StationActiveView = 'production' | 'flow' | 'ship-build' | 'maps' | 'save-import'
+export type StationActiveView = 'blueprint-production' | 'live-production' | 'flow' | 'ship-build' | 'maps'
 export type ShipBuildStatsViewMode = 'summary' | 'detail'
 export type ShipBuildViewMode = 'selector' | 'workbench'
 export type ShipBuildMockTagPatch = {

@@ -1,26 +1,52 @@
 <script setup lang="ts">
 import { useStationStore } from '@/store/useStationStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { useEmpireStore } from '@/store/useEmpireStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import StationToolbar from './StationToolbar.vue'
 import StatusMonitor from './StatusMonitor.vue'
 import ProductionWorkbenchView from './empire/ProductionWorkbenchView.vue'
 import LogicFlowWorkbenchView from './logic-flow/LogicFlowWorkbenchView.vue'
 import ShipBuildView from './ship-build/ShipBuildView.vue'
 import MapWorkbenchView from './map/MapWorkbenchView.vue'
-import SaveImportView from './save/SaveImportView.vue'
 
 const store = useStationStore()
 const shipBuildStore = useShipBuildStore()
+const activeViewStore = useActiveViewStore()
+const empireStore = useEmpireStore()
+const saveBindingStore = useSaveBindingStore()
 
-import { watchEffect, computed } from 'vue'
+import { watch, watchEffect, computed } from 'vue'
 watchEffect(() => {
   console.log('[MainWorkbench] isReady:', store.isReady, 'activeView:', shipBuildStore.activeView)
 })
 
-const isProductionView = computed(() => shipBuildStore.activeView === 'production')
+const isBlueprintProduction = computed(() => shipBuildStore.activeView === 'blueprint-production')
+const isLiveProduction = computed(() => shipBuildStore.activeView === 'live-production')
+const isProductionView = computed(() => isBlueprintProduction.value || isLiveProduction.value)
 const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
 const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
-const isSaveImportView = computed(() => shipBuildStore.activeView === 'save-import')
+
+watch(isBlueprintProduction, (val) => {
+  if (val) {
+    activeViewStore.setProductionSource('empire')
+    const empireId = activeViewStore.activeEmpireId
+    if (empireId) {
+      empireStore.loadEmpire(empireId)
+    }
+  }
+})
+
+watch(isLiveProduction, (val) => {
+  if (val) {
+    activeViewStore.setProductionSource('save-binding')
+    const gameGuid = activeViewStore.activeBinding
+    if (gameGuid) {
+      saveBindingStore.createOrOpenBinding(gameGuid)
+    }
+  }
+})
 
 </script>
 
@@ -45,10 +71,6 @@ const isSaveImportView = computed(() => shipBuildStore.activeView === 'save-impo
       <MapWorkbenchView />
     </div>
 
-    <div v-else-if="isSaveImportView" class="save-import-slot">
-      <SaveImportView />
-    </div>
-
     <div v-else class="flow-layout flex flex-col gap-6">
       <LogicFlowWorkbenchView />
     </div>
@@ -66,10 +88,6 @@ const isSaveImportView = computed(() => shipBuildStore.activeView === 'save-impo
 
 .maps-slot {
   @apply flex-1 min-h-0;
-}
-
-.save-import-slot {
-  @apply flex-1 min-h-0 flex flex-col;
 }
 
 .coming-soon-panel {
