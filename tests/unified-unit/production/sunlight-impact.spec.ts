@@ -8,7 +8,7 @@ import { StationSettings, X4Module, X4Ware, SavedModule } from '@/types/x4';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
-const DATA_PATH = path.join(__dirname, '../../src/assets/x4_game_data/8.0-Diplomacy/data');
+const DATA_PATH = path.join(__dirname, '../../../src/assets/x4_game_data/8.0-Diplomacy/data');
 
 describe('Sunlight Impact Logic', () => {
   let modules: Record<string, X4Module> = {};
@@ -86,7 +86,7 @@ describe('Sunlight Impact Logic', () => {
     // Energy Cell Producer (Argon)
     const claytronicsId = Object.keys(modules).find(k => k.includes('claytronics') && k.includes('prod'))!;
     const siliconWafersId = Object.keys(modules).find(k => k.includes('siliconwafers') && k.includes('prod'))!;
-    const energyCellsId = Object.keys(modules).find(k => k.includes('energycells') && k.includes('prod_gen'))!;
+    const energyCellsId = Object.keys(modules).find(k => k.includes('energycells') && k.includes('prod') && k.includes('gen'))!;
 
     expect(claytronicsId).toBeDefined();
     expect(siliconWafersId).toBeDefined();

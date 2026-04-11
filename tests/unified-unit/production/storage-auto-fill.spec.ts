@@ -11,7 +11,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
 // 数据路径调整：从 tests/unit 往上找 src
-const DATA_PATH = path.join(__dirname, '../../src/assets/x4_game_data/8.0-Diplomacy/data');
+const DATA_PATH = path.join(__dirname, '../../../src/assets/x4_game_data/8.0-Diplomacy/data');
 
 describe('Storage Auto-Fill Logic', () => {
   let modules: Record<string, X4Module> = {};

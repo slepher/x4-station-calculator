@@ -20,11 +20,13 @@ npm run test:unit
 npm run test:unit -- tests/unit/<path>/<file>.spec.ts
 
 # E2E tests (Playwright)
-npm run test:e2e
-# Run single test file
-npm run test:e2e -- tests/e2e/<path>/<file>.spec.ts
+npm exec playwright test
+# Run single test file (use -- to pass args to playwright)
+npm exec playwright test -- tests/e2e/<path>/<file>.spec.ts
 # Interactive UI mode
-npm run test:e2e:ui
+npm exec playwright test -- tests/e2e/<path>/<file>.spec.ts --ui
+# Or shorthand for running all tests
+npm run test:e2e
 
 # Install Playwright browsers
 npm run playwright:install

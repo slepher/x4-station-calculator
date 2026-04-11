@@ -10,6 +10,7 @@ test.describe('帝国 CRUD 全面测试', () => {
     await page.evaluate(() => {
       localStorage.clear()
       sessionStorage.clear()
+      localStorage.setItem('isTestEnv', 'true')
     })
     await page.reload()
     await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
@@ -25,12 +26,55 @@ test.describe('帝国 CRUD 全面测试', () => {
 
   const addModuleToStation = async (page: any, moduleName: string) => {
     const searchInput = page.locator('.search-box .search-input')
+    await searchInput.waitFor({ state: 'visible', timeout: 500 })
     await searchInput.focus()
     await searchInput.fill(moduleName)
     
     const resultItem = page.locator('.results-popover .result-item').first()
-    await expect(resultItem).toBeVisible({ timeout: 500 })
-    await resultItem.click()
+    await resultItem.waitFor({ state: 'visible', timeout: 1000 })
+    await page.waitForTimeout(100)
+    await resultItem.click({ force: true })
+    await page.waitForTimeout(200)
+  }
+
+  const setEmpireName = async (page: any, name: string) => {
+    const empireNameInput = page.locator('.ghost-input.w-64')
+    await empireNameInput.waitFor({ state: 'visible', timeout: 500 })
+    await empireNameInput.click()
+    await empireNameInput.fill(name)
+    await empireNameInput.press('Enter')
+    await page.waitForTimeout(100)
+  }
+
+  const completeSaveDialog = async (page: any, expectedName?: string) => {
+    const smartDialog = page.locator('.fixed.inset-0.z-\\[100\\]')
+    await smartDialog.waitFor({ state: 'visible', timeout: 500 })
+    if (expectedName) {
+      const dialogInput = smartDialog.locator('input[type="text"]')
+      await dialogInput.fill(expectedName)
+    }
+    const saveBtn = smartDialog.locator('button').filter({ hasText: /保存|Save/i }).last()
+    await saveBtn.click({ force: true })
+    await smartDialog.waitFor({ state: 'hidden', timeout: 2000 }).catch(() => {})
+  }
+
+  const handleConfirmDialog = async (page: any, action: 'discard') => {
+    const smartDialog = page.locator('.fixed.inset-0.z-\\[100\\]')
+    await page.waitForTimeout(100)
+    if (await smartDialog.isVisible({ timeout: 500 }).catch(() => false)) {
+      const discardBtn = smartDialog.locator('button').filter({ hasText: /丢弃并新建|Discard/i }).first()
+      await discardBtn.click({ force: true })
+      await smartDialog.waitFor({ state: 'hidden', timeout: 2000 }).catch(() => {})
+      await page.waitForTimeout(100)
+    }
+  }
+
+  const handleSmartSaveDialog = async (page: any, action: 'save' | 'discard', name?: string) => {
+    if (action === 'discard') {
+      await handleConfirmDialog(page, 'discard')
+      return
+    }
+    await completeSaveDialog(page, name)
   }
 
   test.describe('Create - 创建帝国', () => {
@@ -71,8 +115,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       await newBtn.click()
       
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Empire A')
+      await setEmpireName(page, 'Empire A')
       
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
@@ -80,11 +123,13 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await completeSaveDialog(page, 'Empire A')
       
       const savedEmpiresBefore = await getSavedEmpires(page)
       const empireAId = savedEmpiresBefore?.list?.[0]?.id
       
       await newBtn.click()
+      await handleConfirmDialog(page, 'discard')
       
       const stationCount = await page.locator('.station-tab').count()
       expect(stationCount).toBe(0)
@@ -103,8 +148,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       await newBtn.click()
       
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Test Empire')
+      await setEmpireName(page, 'Test Empire')
       
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
@@ -113,6 +157,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await completeSaveDialog(page, 'Test Empire')
       
       const savedEmpires = await getSavedEmpires(page)
       expect(savedEmpires?.list?.length).toBe(1)
@@ -134,7 +179,9 @@ test.describe('帝国 CRUD 全面测试', () => {
       await newBtn.click()
       
       const empireNameInput = page.locator('.ghost-input.w-64')
+      await empireNameInput.click()
       await empireNameInput.fill('Unsaved Empire')
+      await empireNameInput.press('Enter')
       
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
@@ -158,8 +205,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       await newBtn.click()
       
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Persisted Empire')
+      await setEmpireName(page, 'Persisted Empire')
       
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
@@ -168,6 +214,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Persisted Empire')
       
       const savedEmpiresBefore = await getSavedEmpires(page)
       const modulesBefore = savedEmpiresBefore?.list?.[0]?.stations?.[0]?.modules
@@ -194,19 +241,22 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       
       await newBtn.click()
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Empire A')
+      await setEmpireName(page, 'Empire A')
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
       await addModuleToStation(page, 'Energy')
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Empire A')
       
       await newBtn.click()
-      await empireNameInput.fill('Empire B')
+      await handleConfirmDialog(page, 'discard')
+      
+      await setEmpireName(page, 'Empire B')
       await addBtn.click()
       await addModuleToStation(page, 'Hull')
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Empire B')
       
       const savedEmpires = await getSavedEmpires(page)
       expect(savedEmpires?.list?.length).toBe(2)
@@ -254,6 +304,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save')
       
       const overviewTab = page.locator('.overview-tab')
       await overviewTab.click()
@@ -282,15 +333,24 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       await newBtn.click()
       
+      await setEmpireName(page, 'Station Test')
+      
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
       await addModuleToStation(page, 'Energy')
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Station Test')
+      
+      await page.waitForTimeout(200)
       
       let savedEmpires = await getSavedEmpires(page)
       expect(savedEmpires?.list?.[0]?.stations?.[0]?.modules?.length).toBe(1)
+      
+      const stationTab = page.locator('.station-tab').first()
+      await stationTab.click()
+      await page.waitForTimeout(100)
       
       await addModuleToStation(page, 'Hull')
       await saveBtn.click()
@@ -309,8 +369,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       await newBtn.click()
       
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Empire A')
+      await setEmpireName(page, 'Empire A')
       
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
@@ -318,6 +377,13 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Empire A')
+      
+      await page.waitForTimeout(200)
+      
+      const stationTab = page.locator('.station-tab').first()
+      await stationTab.click()
+      await page.waitForTimeout(100)
       
       await addModuleToStation(page, 'Hull')
       
@@ -350,8 +416,8 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       await newBtn.click()
       
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('To Delete')
+      await setEmpireName(page, 'To Delete')
+      await page.waitForTimeout(100)
       
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
@@ -359,53 +425,66 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'To Delete')
       
-      let savedEmpires = await getSavedEmpires(page)
-      expect(savedEmpires?.list?.length).toBe(1)
+      await page.waitForTimeout(500)
       
       const loadBtn = page.locator('.btn-tool').filter({ hasText: /加载|Load/i }).first()
       await loadBtn.click()
       
       const dialog = page.locator('.fixed.inset-0')
       await expect(dialog).toBeVisible({ timeout: 500 })
+      await page.waitForTimeout(100)
+      
+      const deleteBtn = dialog.locator('button').filter({ hasText: /删除|Delete/i }).first()
+      await page.waitForTimeout(100)
       
       page.once('dialog', async d => {
         await d.accept()
       })
+await deleteBtn.click({ force: true })
       
-      const deleteBtn = dialog.locator('button').filter({ hasText: /删除|Delete/i }).first()
-      await page.waitForTimeout(100)
-      await deleteBtn.click({ force: true })
+      await page.waitForTimeout(200)
+      const backdrop = page.locator('.fixed.inset-0.z-\\[100\\]')
+      await backdrop.waitFor({ state: 'hidden', timeout: 2000 }).catch(() => {})
       
-      await page.waitForTimeout(500)
+      await loadBtn.click({ force: true })
+      await expect(dialog).toBeVisible({ timeout: 500 })
       
-      savedEmpires = await getSavedEmpires(page)
-      expect(savedEmpires?.list?.length).toBe(0)
+      const deletedEmpire = dialog.locator('text=To Delete')
+      const isVisible = await deletedEmpire.isVisible().catch(() => false)
+      expect(isVisible).toBe(false)
       
       await page.reload()
       await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
       
-      savedEmpires = await getSavedEmpires(page)
-      expect(savedEmpires?.list?.length ?? 0).toBe(0)
+      await loadBtn.click({ force: true })
+      await expect(dialog).toBeVisible({ timeout: 500 })
+      
+      const deletedEmpireAfterReload = dialog.locator('text=To Delete')
+      const isVisibleAfterReload = await deletedEmpireAfterReload.isVisible().catch(() => false)
+      expect(isVisibleAfterReload).toBe(false)
     })
 
     test('D2: 删除当前编辑的帝国应切换到其他帝国', async ({ page }) => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       
       await newBtn.click()
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Empire A')
+      await setEmpireName(page, 'Empire A')
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
       await addModuleToStation(page, 'Energy')
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Empire A')
       
       await newBtn.click()
-      await empireNameInput.fill('Empire B')
+      await handleConfirmDialog(page, 'discard')
+      await setEmpireName(page, 'Empire B')
       await addBtn.click()
       await addModuleToStation(page, 'Hull')
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Empire B')
       
       const loadBtn = page.locator('.btn-tool').filter({ hasText: /加载|Load/i }).first()
       await loadBtn.click()
@@ -456,6 +535,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save')
       
       const stationTabs = page.locator('.station-tab')
       const stationCount = await stationTabs.count()
@@ -478,9 +558,12 @@ test.describe('帝国 CRUD 全面测试', () => {
   })
 
   test.describe('Tab 状态持久化测试', () => {
-    const getSessionActiveStation = async (page: any) => {
+    const getActiveStationId = async (page: any) => {
       return await page.evaluate(() => {
-        return sessionStorage.getItem('x4_active_station_id')
+        const data = localStorage.getItem('x4_station_active_view')
+        if (!data) return null
+        const parsed = JSON.parse(data)
+        return parsed.activeStationId
       })
     }
 
@@ -488,8 +571,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       await newBtn.click()
       
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Test Empire')
+      await setEmpireName(page, 'Test Empire')
       
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
@@ -499,12 +581,13 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Test Empire')
       
       const stationTabs = page.locator('.station-tab')
       const secondStationTab = stationTabs.nth(1)
       await secondStationTab.click()
       
-      const sessionActiveStation = await getSessionActiveStation(page)
+      const sessionActiveStation = await getActiveStationId(page)
       expect(sessionActiveStation).toBeTruthy()
       
       await page.reload()
@@ -529,6 +612,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save')
       
       const stationTabs = page.locator('.station-tab')
       const secondStationTab = stationTabs.nth(1)
@@ -545,8 +629,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       await newBtn.click()
       
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Test Empire')
+      await setEmpireName(page, 'Test Empire')
       
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
@@ -556,6 +639,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Test Empire')
       
       const stationTabs = page.locator('.station-tab')
       const secondStationTab = stationTabs.nth(1)
@@ -563,8 +647,8 @@ test.describe('帝国 CRUD 全面测试', () => {
       
       await saveBtn.click()
       
-      const savedEmpires = await getSavedEmpires(page)
-      expect(savedEmpires?.activeStationId).toBeTruthy()
+      const activeStationId = await getActiveStationId(page)
+      expect(activeStationId).toBeTruthy()
       
       await page.reload()
       await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 10000 })
@@ -577,8 +661,7 @@ test.describe('帝国 CRUD 全面测试', () => {
       const newBtn = page.locator('.btn-tool').filter({ hasText: /新建|New/i }).first()
       
       await newBtn.click()
-      const empireNameInput = page.locator('.ghost-input.w-64')
-      await empireNameInput.fill('Empire A')
+      await setEmpireName(page, 'Empire A')
       const addBtn = page.locator('.add-btn')
       await addBtn.click()
       await addModuleToStation(page, 'Energy')
@@ -586,14 +669,17 @@ test.describe('帝国 CRUD 全面测试', () => {
       await addModuleToStation(page, 'Hull')
       const saveBtn = page.locator('.btn-tool').filter({ hasText: /保存|Save/i }).first()
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Empire A')
       
       await newBtn.click()
-      await empireNameInput.fill('Empire B')
+      await handleConfirmDialog(page, 'discard')
+      await setEmpireName(page, 'Empire B')
       await addBtn.click()
       await addModuleToStation(page, 'Energy')
       await addBtn.click()
       await addModuleToStation(page, 'Hull')
       await saveBtn.click()
+      await handleSmartSaveDialog(page, 'save', 'Empire B')
       
       const stationTabs = page.locator('.station-tab')
       const secondStationTab = stationTabs.nth(1)

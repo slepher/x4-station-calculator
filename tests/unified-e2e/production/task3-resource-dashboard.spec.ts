@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { test } from '../test-setup';
+import { test } from '../../test-setup';
 
 test.describe('Task 3: 统一资源仪表盘和视图模式切换测试', () => {
   test.beforeEach(async ({ page }) => {

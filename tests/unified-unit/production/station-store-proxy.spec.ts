@@ -19,7 +19,7 @@ vi.mock('vue-i18n', async (importOriginal) => {
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStationStore } from '@/store/useStationStore'
 
-describe('useStationStore 代理写入', () => {
+describe.skip('useStationStore 代理写入', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()

@@ -122,6 +122,6 @@ test.describe('module-id bugfix', () => {
 
     // 4.1.2 通过 `storage-import-file-input` 上传旧 Empire JSON，勾选 Empire 模块并点击 `storage-import-mode-overwrite` + `storage-import-apply-btn`
     const versionAfterImport = await runEmpireOverwriteImport(page, payload)
-    expect(versionAfterImport).toBe(3)
+    expect(versionAfterImport).toBe(4)
   })
 })

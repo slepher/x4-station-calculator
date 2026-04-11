@@ -45,7 +45,11 @@ watch(() => props.isOpen, (val) => {
       const baseName = props.storeType === 'logicFlow' 
         ? (logicFlowStore.savedPlans.activeId ? logicFlowStore.savedPlans.list.find((l: LogicFlowPlan) => l.id === logicFlowStore.savedPlans.activeId)?.name : '')
         : empireStore.activeEmpire?.name
-      inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t(defaultNameKey.value)
+      if (isNewPlan.value) {
+        inputName.value = baseName || t(defaultNameKey.value)
+      } else {
+        inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t(defaultNameKey.value)
+      }
     } else {
       inputName.value = t(defaultNameKey.value)
     }
@@ -63,7 +67,7 @@ const isNewPlan = computed(() => {
   if (props.storeType === 'logicFlow') {
     return !logicFlowStore.savedPlans.activeId
   }
-  return !empireStore.activeEmpire
+  return !empireStore.activeEmpireId
 })
 
 const currentPlanName = computed(() => {

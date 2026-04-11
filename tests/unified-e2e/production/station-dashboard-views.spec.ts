@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { test } from '../test-setup';
+import { test } from '../../test-setup';
 
 test.describe('StationDashboard Views and Logic', () => {
   test.beforeEach(async ({ page }) => {

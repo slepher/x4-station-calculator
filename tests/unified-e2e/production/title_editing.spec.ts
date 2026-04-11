@@ -1,4 +1,4 @@
-import { test } from '../test-setup';
+import { test } from '../../test-setup';
 import { expect } from '@playwright/test';
 
 test.describe('Station Title Editing', () => {
