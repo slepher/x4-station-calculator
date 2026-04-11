@@ -1,6 +1,11 @@
 import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
 import { isSectorMacroInBindingScope, resolveBindingSectorScope } from './saveBindingSectorScope'
-import { stationStateMap, migrateStationSettings } from '@/store/state/StationStateMap'
+import { migrateStationSettings } from '@/store/state/StationStateMap'
+import {
+  patchStationState,
+  recomputeStation,
+  getFilteredGroupedFlows
+} from '@/store/logic/stationComputeService'
 import type {
   BindingStationPlan,
   EmpireGroupedFlows,
@@ -230,13 +235,13 @@ export function buildSaveBindingProductionFlows(
   }
 
   derivedStations.forEach((station) => {
-    stationStateMap.patch(station.id, {
+    patchStationState(station.id, {
       plannedModules: station.modules,
       lockedWares: station.lockedWares || [],
       warePriority: station.warePriority || {},
       settings: station.settings
     })
-    stationStateMap.recompute(station.id, {
+    recomputeStation(station.id, {
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
       medicalConsumptionMap: deps.medicalConsumptionMap,
@@ -247,7 +252,7 @@ export function buildSaveBindingProductionFlows(
 
   const groupedFlows = analyzeEmpireWareFlow(
     derivedStations,
-    (stationId) => stationStateMap.getFilteredGroupedFlows(stationId)
+    (stationId) => getFilteredGroupedFlows(stationId)
   )
 
   return {
@@ -324,13 +329,13 @@ export function buildSaveBindingProductionFlowsLegacy(
   if (stations.length === 0) return createEmptyEmpireGroupedFlows()
 
   stations.forEach((station) => {
-    stationStateMap.patch(station.id, {
+    patchStationState(station.id, {
       plannedModules: station.modules,
       lockedWares: station.lockedWares || [],
       warePriority: station.warePriority || {},
       settings: station.settings
     })
-    stationStateMap.recompute(station.id, {
+    recomputeStation(station.id, {
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
       medicalConsumptionMap: deps.medicalConsumptionMap,
@@ -341,6 +346,6 @@ export function buildSaveBindingProductionFlowsLegacy(
 
   return analyzeEmpireWareFlow(
     stations,
-    (stationId) => stationStateMap.getFilteredGroupedFlows(stationId)
+    (stationId) => getFilteredGroupedFlows(stationId)
   )
 }

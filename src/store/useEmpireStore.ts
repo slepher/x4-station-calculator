@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import type {
   EntityLocation,
   EmpirePlan,
-  SectorPlan,
   SavedEmpiresState,
   StationPlan,
   StationType,
@@ -11,45 +10,43 @@ import type {
   StationSettings,
   SavedModule,
   GroupedFlows,
-  EmpireGroupedFlows,
   SupplyPlanningInput,
   SectorInternalData,
-  SupplyStorageFlow,
   TransitHubViewModel
 } from '@/types/x4'
-import type { BindingSectorGroup } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
-import { analyzeEmpireWareFlow } from './logic/analyzeEmpireWareFlow'
-import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './logic/sectorLinkFlow'
-import { buildTransitHubViewModel } from './logic/transitHubViewModel'
-import { buildStationComponentGapFlows, type StationComponentGapFlows } from './logic/stationGapViewModel'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
-import { getLinkedSectorIdsFor, normalizeSectorLinkKey, normalizeSectorLinks, parseSectorLinkKey } from './logic/sectorLinks'
+import {
+  buildStationComputeDeps,
+  syncPersistedToStateMap,
+  recomputeStation,
+  getFilteredGroupedFlows,
+  clearStationState
+} from './logic/stationComputeService'
+import { getLinkedSectorIdsFor, normalizeSectorLinks } from './logic/sectorLinks'
 import {
   createBindingPlanStationId,
-  deriveBindingStations,
-  parseBindingStationId,
-  buildSaveBindingProductionFlows,
-  type SaveBindingProductionDeps
+  parseBindingStationId
 } from './logic/productionSourceAdapter'
+import {
+  createEmpireSourceView,
+  computeActiveStation,
+  computeActiveTransitSectorId,
+  toTransitTabId,
+  fromTransitTabId
+} from './logic/empireSourceView'
+import {
+  createEmpireFlowFacade,
+  type SectorLinkCalcEntry
+} from './logic/empireFlowFacade'
+import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 
 const V1_STORAGE_KEY = 'x4_station_data'
-const TRANSIT_TAB_PREFIX = 'transit:'
-
-function toTransitTabId(sectorId: string) {
-  return `${TRANSIT_TAB_PREFIX}${sectorId}`
-}
-
-function fromTransitTabId(tabId: string | null | undefined): string | null {
-  if (!tabId || !tabId.startsWith(TRANSIT_TAB_PREFIX)) return null
-  const sectorId = tabId.slice(TRANSIT_TAB_PREFIX.length)
-  return sectorId || null
-}
 
 function createDefaultEmpire(name: string = ''): EmpirePlan {
   return {
@@ -63,46 +60,15 @@ function createDefaultEmpire(name: string = ''): EmpirePlan {
 
 export type { SavedEmpiresState } from '@/types/x4'
 
-function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
-  return {
-    flows: [],
-    empireGroups: {
-      operations: [],
-      supply: []
-    }
-  }
-}
-
-function createEmptySupplyStorageFlows(): SupplyStorageFlow[] {
-  return []
-}
-
-function buildBindingSectorLinks(groups: BindingSectorGroup[]): string[] {
-  const validGroupIds = new Set(groups.map((group) => group.id))
-  const links = new Set<string>()
-  groups.forEach((group) => {
-    ;(group.connectedGroupIds || []).forEach((targetId) => {
-      if (!validGroupIds.has(targetId)) return
-      const key = normalizeSectorLinkKey(group.id, targetId)
-      if (key) links.add(key)
-    })
-  })
-  return Array.from(links)
-}
-
-interface SectorLinkCalcEntry {
-  sectorId: string
-  sectorsInput: Array<{ sectorId: string; netByWare: Record<string, number> }>
-  solverOutput: SolveMultiWareByLinkOutput
-}
-
 export const useEmpireStore = defineStore('empire', () => {
-  const gameData = useGameDataStore()
+const gameData = useGameDataStore()
   const empireDataStore = useEmpireDataStore()
   const saveBindingStore = useSaveBindingStore()
   const saveStore = useSaveStore()
   const activeViewStore = useActiveViewStore()
   const { savedEmpires } = storeToRefs(empireDataStore)
+  const { activeBinding } = storeToRefs(saveBindingStore)
+  const { selectedArchive } = storeToRefs(saveStore)
 
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
@@ -116,111 +82,126 @@ export const useEmpireStore = defineStore('empire', () => {
   const empires = computed(() => savedEmpires.value.list)
   const activeEmpireId = computed(() => savedEmpires.value.activeId)
   
-const activeEmpire = ref<EmpirePlan | null>(null)
+  const activeEmpire = ref<EmpirePlan | null>(null)
   
   const activeStationId = computed({
     get: () => activeViewStore.activeStationId,
     set: (id: string | null) => activeViewStore.setActiveStationId(id)
   })
 
-  const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
-    const cache = new Map<string, GroupedFlows>()
-    if (productionSource.value === 'save-binding') {
-      const binding = saveBindingStore.activeBinding
-      const archive = saveStore.selectedArchive
-      const derived = deriveBindingStations(binding, archive)
-      derived.forEach((item) => {
-        cache.set(item.station.id, stationStateMap.getFilteredGroupedFlows(item.station.id))
-      })
-      return cache
-    }
-    if (!activeEmpire.value) return cache
-    activeEmpire.value.stations.forEach(station => {
-      cache.set(station.id, stationStateMap.getFilteredGroupedFlows(station.id))
-    })
-    return cache
+  const sourceView = createEmpireSourceView({
+    productionSource,
+    activeEmpire,
+    activeBinding,
+    selectedArchive
   })
 
-  const activeStation = computed(() => {
-    if (productionSource.value === 'save-binding') {
-      const binding = saveBindingStore.activeBinding
-      const archive = saveStore.selectedArchive
-      const derived = deriveBindingStations(binding, archive)
-      return derived.find(item => item.station.id === activeStationId.value)?.station || null
-    }
-    if (!activeEmpire.value || !activeStationId.value) return null
-    return activeEmpire.value.stations.find(s => s.id === activeStationId.value) || null
-  })
-  const activeTransitSectorId = computed(() => {
-    const sectorId = fromTransitTabId(activeStationId.value)
-    if (!sectorId) return null
-    const exists = sectors.value.some((sector) => sector.id === sectorId)
-    return exists ? sectorId : null
-  })
-  const sectors = computed<SectorPlan[]>(() => {
-    if (productionSource.value === 'save-binding') {
-      const binding = saveBindingStore.activeBinding
-      if (!binding) return []
-      return binding.groups.map((group, index) => ({
-        id: group.id,
-        name: group.name,
-        order: index
-      }))
-    }
-    if (!activeEmpire.value) return []
-    const list = activeEmpire.value.sectors || []
-    return [...list].sort((a, b) => a.order - b.order)
-  })
-  const sectorLinks = computed<string[]>(() => {
-    if (productionSource.value === 'save-binding') {
-      return buildBindingSectorLinks(saveBindingStore.activeBinding?.groups || [])
-    }
-    return activeEmpire.value?.sectorLinks || []
+  const sectors = sourceView.sectors
+  const sectorLinks = sourceView.sectorLinks
+  const orderedStationsBySector = sourceView.orderedStationsBySector
+  const derivedBindingStations = sourceView.derivedBindingStations
+
+  const flowFacade = createEmpireFlowFacade({
+    productionSource,
+    activeEmpire,
+    activeBinding,
+    selectedArchive,
+    sourceView,
+    modulesMap: computed(() => gameData.modulesMap),
+    waresMap: computed(() => gameData.waresMap),
+    medicalConsumptionMap: computed(() => gameData.medicalConsumptionMap),
+    enforceDlcActivation: computed(() => gameData.enforceDlcActivation),
+    isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
   })
 
-  const orderedStationsBySector = computed<StationPlan[]>(() => {
-    if (productionSource.value === 'save-binding') {
-      const binding = saveBindingStore.activeBinding
-      const archive = saveStore.selectedArchive
-      const derived = deriveBindingStations(binding, archive)
-      const sectorOrderMap = new Map<string, number>(sectors.value.map((sector, idx) => [sector.id, idx]))
-      const withIndex = derived.map((item, index) => ({ station: item.station, index, groupId: item.groupId }))
-      withIndex.sort((a, b) => {
-        const aOrder = a.groupId ? (sectorOrderMap.get(a.groupId) ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER
-        const bOrder = b.groupId ? (sectorOrderMap.get(b.groupId) ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER
-        if (aOrder !== bOrder) return aOrder - bOrder
-        return a.index - b.index
-      })
-      return withIndex.map((item) => item.station)
-    }
-    if (!activeEmpire.value) return []
-    const stations = activeEmpire.value.stations || []
-    const sectorOrderMap = new Map<string, number>(sectors.value.map((sector, idx) => [sector.id, idx]))
-    const withIndex = stations.map((station, index) => ({ station, index }))
-    withIndex.sort((a, b) => {
-      const aOrder = a.station.sectorId ? (sectorOrderMap.get(a.station.sectorId) ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER
-      const bOrder = b.station.sectorId ? (sectorOrderMap.get(b.station.sectorId) ?? Number.MAX_SAFE_INTEGER) : Number.MAX_SAFE_INTEGER
-      if (aOrder !== bOrder) return aOrder - bOrder
-      return a.index - b.index
-    })
-    return withIndex.map((item) => item.station)
-  })
+  const stationFlowCache = flowFacade.stationFlowCache
+  const empireGroupedFlows = flowFacade.empireGroupedFlows
+  const sectorInternalDataMap = flowFacade.sectorInternalDataMap
+  const sectorLinkCalcMap = flowFacade.sectorLinkCalcMap
 
-  const productionStations = computed<StationPlan[]>(() => orderedStationsBySector.value)
-  const productionSectors = computed<SectorPlan[]>(() => sectors.value)
-  const productionSectorLinks = computed<string[]>(() => sectorLinks.value)
+  const activeStation = computed(() => computeActiveStation(
+    productionSource.value,
+    derivedBindingStations.value,
+    activeEmpire.value,
+    activeStationId.value
+  ))
+
+  const activeTransitSectorId = computed(() => computeActiveTransitSectorId(
+    activeStationId.value,
+    sectors.value
+  ))
 
   function getDerivedBindingStation(stationId: string): StationPlan | null {
-    const binding = saveBindingStore.activeBinding
-    if (!binding) return null
-    const archive = saveStore.selectedArchive
-    const derived = deriveBindingStations(binding, archive)
-    return derived.find((item) => item.station.id === stationId)?.station || null
+    return sourceView.getDerivedBindingStation(stationId)
+  }
+
+  function getStationById(stationId: string): StationPlan | null {
+    return sourceView.getStationById(stationId)
+  }
+
+  const allStations = computed(() => {
+    const stations: { station: StationPlan; empireId: string }[] = []
+    if (activeEmpire.value) {
+      activeEmpire.value.stations.forEach(station => {
+        stations.push({ station, empireId: activeEmpire.value!.id })
+      })
+    }
+    savedEmpires.value.list.forEach(empire => {
+      empire.stations.forEach(station => {
+        stations.push({ station, empireId: empire.id })
+      })
+    })
+    return stations
+  })
+
+  const industrialStations = computed(() => 
+    allStations.value.filter(item => item.station.type === 'industrial')
+  )
+
+  function getComputeDeps() {
+    const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
+    if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
+    return buildStationComputeDeps({
+      modulesMap,
+      waresMap,
+      medicalConsumptionMap,
+      buildPriceMultiplier: 0.5,
+      enforceDlcActivation,
+      isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
+    })
+  }
+
+  function refreshStationFlowCache(stationId: string) {
+    const station = getStationById(stationId)
+    if (!station) return
+    const deps = getComputeDeps()
+    if (!deps) return
+    syncPersistedToStateMap(stationId, station)
+    recomputeStation(stationId, deps)
+  }
+
+  function getStationFlowCache(stationId: string): GroupedFlows | null {
+    const state = stationStateMap.get(stationId)
+    if (!state) return null
+    return getFilteredGroupedFlows(stationId)
+  }
+
+  function initializeAllStationCaches() {
+    if (!activeEmpire.value) return
+    activeEmpire.value.stations.forEach(station => {
+      refreshStationFlowCache(station.id)
+    })
+  }
+
+  function clearStationCaches() {
+    stationStateMap.list().forEach(state => {
+      clearStationState(state.stationId)
+    })
   }
 
   function updateBindingStationPlan(
     stationId: string,
-    patch: Partial<Pick<StationPlan, 'name' | 'type' | 'modules' | 'settings' | 'sectorId'>>
+    patch: Partial<Pick<StationPlan, 'name' | 'type' | 'modules' | 'settings' | 'sectorId' | 'lockedWares' | 'warePriority'>>
   ): boolean {
     const binding = saveBindingStore.activeBinding
     const parsed = parseBindingStationId(stationId)
@@ -254,256 +235,213 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     return true
   }
 
-  const allStations = computed(() => {
-    const stations: { station: StationPlan; empireId: string }[] = []
-    if (activeEmpire.value) {
-      activeEmpire.value.stations.forEach(station => {
-        stations.push({ station, empireId: activeEmpire.value!.id })
-      })
-    }
-    savedEmpires.value.list.forEach(empire => {
-      empire.stations.forEach(station => {
-        stations.push({ station, empireId: empire.id })
-      })
-    })
-    return stations
-  })
-
-  const industrialStations = computed(() => 
-    allStations.value.filter(item => item.station.type === 'industrial')
-  )
-
-  const empireGroupedFlows = computed<EmpireGroupedFlows>(() => {
+  function createStation(name: string, type: StationType = 'industrial', selectAfterCreate: boolean = true) {
     if (productionSource.value === 'save-binding') {
       const binding = saveBindingStore.activeBinding
-      const deps: SaveBindingProductionDeps = {
-        modulesMap: gameData.modulesMap,
-        waresMap: gameData.waresMap,
-        medicalConsumptionMap: gameData.medicalConsumptionMap,
-        enforceDlcActivation: gameData.enforceDlcActivation,
-        isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag),
-        archive: saveStore.selectedArchive
+      if (!binding) return null
+      const groupId = activeStation.value?.sectorId || sectors.value[0]?.id || null
+      const plan = saveBindingStore.createStationPlanInGroup(binding.gameGuid, groupId, name, type)
+      if (!plan) return null
+      const stationId = createBindingPlanStationId(binding.gameGuid, plan.id)
+      if (plan && selectAfterCreate) {
+        activeStationId.value = stationId
       }
-      return buildSaveBindingProductionFlows(binding, deps).groupedFlows
-    }
-    
-    if (!activeEmpire.value || !gameData.modulesMap) {
-      return createEmptyEmpireGroupedFlows()
-    }
-    
-    return analyzeEmpireWareFlow(
-      activeEmpire.value.stations,
-      (stationId) => stationStateMap.getFilteredGroupedFlows(stationId)
-    )
-  })
-
-  const sectorInternalDataMap = computed<Map<string, SectorInternalData>>(() => {
-    const map = new Map<string, SectorInternalData>()
-    if (!gameData.modulesMap) return map
-
-    const stations = productionStations.value
-    const sectorList = productionSectors.value
-
-    const buildSupplyStorageFlows = (groupedFlows: EmpireGroupedFlows): SupplyStorageFlow[] => {
-      const stationMap = new Map(stations.map((station) => [station.id, station]))
-      const byWareId = new Map<string, SupplyStorageFlow>()
-
-      groupedFlows.flows.forEach((flow) => {
-        const details: SupplyStorageFlow['details'] = []
-        let totalProductionStorageVolume = 0
-        let totalConsumptionStorageVolume = 0
-
-        flow.contributions.forEach((contribution) => {
-          const station = stationMap.get(contribution.stationId)
-          if (!station) return
-
-          const staticProduction = Math.max(contribution.netRate, 0)
-          const staticConsumption = Math.max(-contribution.netRate, 0)
-          const productionStorageVolume = staticProduction * flow.unitVolume * station.settings.primaryProductBufferHours
-          const consumptionStorageVolume = staticConsumption * flow.unitVolume * station.settings.resourceBufferHours
-
-          if (productionStorageVolume > 0) {
-            details.push({
-              stationId: contribution.stationId,
-              stationName: contribution.stationName,
-              stationCount: contribution.stationCount,
-              kind: 'production',
-              staticRate: staticProduction,
-              storageVolume: productionStorageVolume
-            })
-            totalProductionStorageVolume += productionStorageVolume
-          }
-
-          if (consumptionStorageVolume > 0) {
-            details.push({
-              stationId: contribution.stationId,
-              stationName: contribution.stationName,
-              stationCount: contribution.stationCount,
-              kind: 'consumption',
-              staticRate: staticConsumption,
-              storageVolume: consumptionStorageVolume
-            })
-            totalConsumptionStorageVolume += consumptionStorageVolume
-          }
-        })
-
-        byWareId.set(flow.wareId, {
-          wareId: flow.wareId,
-          orderIndex: flow.orderIndex,
-          tier: flow.tier,
-          transportType: flow.transportType,
-          unitVolume: flow.unitVolume,
-          totalProductionStorageVolume,
-          totalConsumptionStorageVolume,
-          totalRequiredStorageVolume: Math.max(totalProductionStorageVolume, totalConsumptionStorageVolume),
-          details
-        })
-      })
-
-      const products = groupedFlows.empireGroups.operations
-        .filter((flow) => flow.netRate > 0)
-        .map((flow) => flow.wareId)
-      const operations = groupedFlows.empireGroups.operations
-        .filter((flow) => flow.netRate <= 0)
-        .map((flow) => flow.wareId)
-      const supply = groupedFlows.empireGroups.supply.map((flow) => flow.wareId)
-      const orderedWareIds = [...products, ...operations, ...supply]
-
-      return orderedWareIds
-        .map((wareId) => byWareId.get(wareId))
-        .filter((item): item is SupplyStorageFlow => !!item && item.transportType === 'container')
+      return {
+        id: stationId,
+        name: plan.name,
+        type: plan.type,
+        sectorId: plan.groupId || null,
+        modules: plan.modules,
+        settings: plan.settings,
+        lastUpdated: 0,
+        lockedWares: [],
+        warePriority: {}
+      }
     }
 
-    sectorList.forEach((sector) => {
-      const localStationIds = stations
-        .filter((station) => station.sectorId === sector.id)
-        .map((station) => station.id)
-
-      const localStationSet = new Set(localStationIds)
-      const localStations = stations.filter((station) => localStationSet.has(station.id))
-      const localGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => stationStateMap.getFilteredGroupedFlows(stationId))
-
-      map.set(sector.id, {
-        sectorId: sector.id,
-        planning: {
-          sectorId: sector.id,
-          localStationIds
-        },
-        localGroupedFlows,
-        supplyStorageFlows: buildSupplyStorageFlows(localGroupedFlows)
-      })
-    })
-
-    return map
-  })
-
-  const sectorLinkCalcMap = computed<Map<string, SectorLinkCalcEntry>>(() => {
-    const result = new Map<string, SectorLinkCalcEntry>()
-    if (!gameData.modulesMap) return result
-
-    const links: SectorLinkInput[] = productionSectorLinks.value
-      .map((key) => parseSectorLinkKey(key))
-      .filter((item): item is { a: string; b: string } => !!item)
-      .map((item) => ({
-        linkId: `${item.a}|${item.b}`,
-        a: item.a,
-        b: item.b,
-        distance: 1
-      }))
-
-    const rawNetByWareBySector = new Map<string, Record<string, number>>()
-    productionSectors.value.forEach((sector) => {
-      const localStations = productionStations.value.filter((station) => station.sectorId === sector.id)
-      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => stationStateMap.getGroupedFlows(stationId))
-      const netByWare: Record<string, number> = {}
-      rawGroupedFlows.flows
-        .filter((flow) => flow.transportType === 'container')
-        .forEach((flow) => {
-          netByWare[flow.wareId] = Number(flow.netRate || 0)
-        })
-      rawNetByWareBySector.set(sector.id, netByWare)
-    })
-
-    const sectorsInput = productionSectors.value.map((sector) => ({
-      sectorId: sector.id,
-      netByWare: rawNetByWareBySector.get(sector.id) || {}
-    }))
-
-    const solverOutput = solveMultiWareByLink({
-      sectors: sectorsInput,
-      links,
-      epsilon: 1e-9
-    })
-
-    if (import.meta.env.DEV) {
-      const wareIds = Array.from(new Set(
-        sectorsInput.flatMap((sectorInput) => Object.keys(sectorInput.netByWare || {}))
-      )).sort()
-      console.groupCollapsed(`[SectorLinkCalc][TransitHub] mode=global-all-container wares=${wareIds.join(',')}`)
-      console.log('[SectorLinkCalc][TransitHub] links', links)
-      sectorsInput.forEach((sectorInput) => {
-        const relatedFlows = solverOutput.linkWareFlows.filter(
-          (flow) => flow.from === sectorInput.sectorId || flow.to === sectorInput.sectorId
-        )
-        const allocated = solverOutput.allocatedDemandBySector.find((item) => item.sectorId === sectorInput.sectorId)
-        const deficit = solverOutput.deficitSummary.deficitByNode.find((item) => item.sectorId === sectorInput.sectorId)
-        const producers = solverOutput.deficitSummary.producerNodes.find((item) => item.sectorId === sectorInput.sectorId)
-        console.groupCollapsed(`[SectorLinkCalc][TransitHub][Sector] ${sectorInput.sectorId}`)
-        console.log('input.netByWare', sectorInput.netByWare)
-        console.log('output.linkWareFlows', relatedFlows)
-        console.log('output.allocatedDemand', allocated || null)
-        console.log('output.deficit', deficit || null)
-        console.log('output.producers', producers || null)
-        console.groupEnd()
-      })
-      console.log('[SectorLinkCalc][TransitHub] totalDeficit', solverOutput.deficitSummary.totalDeficit)
-      console.groupEnd()
+    const station = empireDataStore.createStationInEmpire(activeEmpire.value, name, type)
+    if (!station) return null
+    if (selectAfterCreate) {
+      activeStationId.value = station.id
     }
-
-    productionSectors.value.forEach((viewSector) => {
-      result.set(viewSector.id, {
-        sectorId: viewSector.id,
-        sectorsInput,
-        solverOutput
-      })
-    })
-
-    return result
-  })
-
-  function getComputeDeps() {
-    const { modulesMap, waresMap, medicalConsumptionMap } = gameData
-    if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
-    return { modulesMap, waresMap, medicalConsumptionMap }
+    refreshStationFlowCache(station.id)
+    return station
   }
 
-  function refreshStationFlowCache(stationId: string) {
+  function deleteStation(stationId: string) {
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      if (!binding) return
+      const parsed = parseBindingStationId(stationId)
+      if (parsed?.kind === 'plan' && parsed.gameGuid === binding.gameGuid) {
+        saveBindingStore.deleteStationPlan(binding.gameGuid, parsed.planId)
+        stationStateMap.remove(stationId)
+      }
+      if (activeStationId.value === stationId) {
+        activeStationId.value = null
+      }
+      return
+    }
+
+    const deleted = empireDataStore.deleteStationFromEmpire(activeEmpire.value, stationId)
+    if (deleted) {
+      stationStateMap.remove(stationId)
+      if (activeStationId.value === stationId) {
+        activeStationId.value = activeEmpire.value?.stations[0]?.id || null
+      }
+    }
+  }
+
+  function duplicateStation(stationId: string) {
+    const newStation = empireDataStore.duplicateStationInEmpire(activeEmpire.value, stationId)
+    if (!newStation) return null
+    activeStationId.value = newStation.id
+    refreshStationFlowCache(newStation.id)
+    return newStation
+  }
+
+  function reorderStations(reorderedStations: StationPlan[]) {
+    empireDataStore.reorderStationsInEmpire(activeEmpire.value, reorderedStations)
+  }
+
+  function setStationLocation(stationId: string, location: EntityLocation | null) {
+    return empireDataStore.setStationLocationInEmpire(activeEmpire.value, stationId, location)
+  }
+
+  function clearStationLocation(stationId: string) {
+    return setStationLocation(stationId, null)
+  }
+
+  function getLinkedSectors(sectorId: string): string[] {
+    return getLinkedSectorIdsFor(sectorId, sectorLinks.value)
+  }
+
+  function renameBindingSector(sectorId: string, name: string): boolean {
+    if (productionSource.value !== 'save-binding') return false
+    const binding = saveBindingStore.activeBinding
+    if (!binding) return false
+    return saveBindingStore.updateGroup(binding.gameGuid, sectorId, { name })
+  }
+
+  function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
+    return flowFacade.getSupplyPlanningInput(sectorId)
+  }
+
+  function getSectorInternalData(sectorId: string): SectorInternalData {
+    return flowFacade.getSectorInternalData(sectorId)
+  }
+
+  function getSectorLinkCalc(sectorId: string): SectorLinkCalcEntry | null {
+    return flowFacade.getSectorLinkCalc(sectorId)
+  }
+
+  function getStationComponentGapFlows(stationId: string | null = activeStation.value?.id || null): StationComponentGapFlows {
+    return flowFacade.getStationComponentGapFlows(stationId, activeStationId.value)
+  }
+
+  function getTransitHubViewModel(input: {
+    sectorId: string | null
+    racePreference: string
+    transportShipCapacity: number
+    storageBufferHours?: number
+  }): TransitHubViewModel {
+    return flowFacade.getTransitHubViewModel(input)
+  }
+
+  function renameStation(stationId: string, newName: string) {
+    if (productionSource.value === 'save-binding') {
+      return updateBindingStationPlan(stationId, { name: newName })
+    }
+    return empireDataStore.renameStationInEmpire(activeEmpire.value, stationId, newName)
+  }
+
+  function selectStation(stationId: string | null) {
+    activeStationId.value = stationId
+  }
+
+  function selectTransitSector(sectorId: string | null) {
+    if (!sectorId) {
+      activeStationId.value = null
+      return
+    }
+    const exists = sectors.value.some((sector) => sector.id === sectorId)
+    if (!exists) return
+    const transitTabId = toTransitTabId(sectorId)
+    activeStationId.value = transitTabId
+  }
+
+  function getTransitTabId(sectorId: string) {
+    return toTransitTabId(sectorId)
+  }
+
+  function updateStationSettings(stationId: string, settings: Partial<StationSettings>) {
+    if (productionSource.value === 'save-binding') {
+      const station = getDerivedBindingStation(stationId)
+      const current = migrateStationSettings(station?.settings || DEFAULT_STATION_SETTINGS)
+      updateBindingStationPlan(stationId, { settings: { ...current, ...settings } })
+      refreshStationFlowCache(stationId)
+      return
+    }
+    if (empireDataStore.updateStationSettingsInEmpire(activeEmpire.value, stationId, settings)) {
+      refreshStationFlowCache(stationId)
+    }
+  }
+
+  function updateStationModules(stationId: string, modules: SavedModule[]) {
+    if (productionSource.value === 'save-binding') {
+      updateBindingStationPlan(stationId, { modules })
+      refreshStationFlowCache(stationId)
+      return
+    }
+    if (empireDataStore.updateStationModulesInEmpire(activeEmpire.value, stationId, modules)) {
+      refreshStationFlowCache(stationId)
+    }
+  }
+
+  function applyImportedStationPayload(
+    stationId: string,
+    payload: { modules: SavedModule[]; lockedWares: string[]; warePriority: Record<string, number> }
+  ): boolean {
+    if (productionSource.value === 'save-binding') {
+      const binding = saveBindingStore.activeBinding
+      const parsed = parseBindingStationId(stationId)
+      if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
+      
+      if (parsed.kind === 'plan') {
+        saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, {
+          modules: payload.modules,
+          lockedWares: payload.lockedWares,
+          warePriority: payload.warePriority
+        })
+      } else {
+        const station = getDerivedBindingStation(stationId)
+        saveBindingStore.upsertStationPlan({
+          gameGuid: binding.gameGuid,
+          saveStationCode: parsed.saveStationCode,
+          groupId: station?.sectorId || null,
+          name: station?.name || parsed.saveStationCode,
+          type: station?.type || 'industrial',
+          modules: payload.modules,
+          settings: station?.settings || DEFAULT_STATION_SETTINGS,
+          lockedWares: payload.lockedWares,
+          warePriority: payload.warePriority
+        })
+      }
+      refreshStationFlowCache(stationId)
+      return true
+    }
     const station = getStationById(stationId)
-    if (!station) return
-    const deps = getComputeDeps()
-    if (!deps) return
-    station.settings = migrateStationSettings(station.settings)
-    stationStateMap.fromPersisted(stationId, station)
-    stationStateMap.recompute(stationId, deps)
+    if (!station) return false
+    station.modules = payload.modules.map(m => ({ ...m }))
+    station.lockedWares = [...payload.lockedWares]
+    station.warePriority = { ...payload.warePriority }
+    station.lastUpdated = Date.now()
+    refreshStationFlowCache(stationId)
+    return true
   }
 
-  function getStationFlowCache(stationId: string): GroupedFlows | null {
-    const state = stationStateMap.get(stationId)
-    if (!state) return null
-    return stationStateMap.getFilteredGroupedFlows(stationId)
-  }
-
-  function initializeAllStationCaches() {
-    if (!activeEmpire.value) return
-    activeEmpire.value.stations.forEach(station => {
-      refreshStationFlowCache(station.id)
-    })
-  }
-
-  function clearStationCaches() {
-    stationStateMap.list().forEach(state => {
-      stationStateMap.remove(state.stationId)
-    })
+  function updateEmpireName(name: string) {
+    empireDataStore.renameEmpireDraft(activeEmpire.value, name)
   }
 
   function serializeEmpireForDirtyCheck() {
@@ -671,290 +609,6 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     saveToStorage()
   }
 
-  function createStation(name: string, type: StationType = 'industrial', selectAfterCreate: boolean = true) {
-    if (productionSource.value === 'save-binding') {
-      const binding = saveBindingStore.activeBinding
-      if (!binding) return null
-      const groupId = activeStation.value?.sectorId || sectors.value[0]?.id || null
-      const plan = saveBindingStore.createStationPlanInGroup(binding.gameGuid, groupId, name, type)
-      if (!plan) return null
-      const stationId = createBindingPlanStationId(binding.gameGuid, plan.id)
-      if (plan && selectAfterCreate) {
-        activeStationId.value = stationId
-      }
-      return {
-        id: stationId,
-        name: plan.name,
-        type: plan.type,
-        sectorId: plan.groupId || null,
-        modules: plan.modules,
-        settings: plan.settings,
-        lastUpdated: 0,
-        lockedWares: [],
-        warePriority: {}
-      }
-    }
-
-    const station = empireDataStore.createStationInEmpire(activeEmpire.value, name, type)
-    if (!station) return null
-    if (selectAfterCreate) {
-      activeStationId.value = station.id
-    }
-    refreshStationFlowCache(station.id)
-    return station
-  }
-
-  function deleteStation(stationId: string) {
-    if (productionSource.value === 'save-binding') {
-      const binding = saveBindingStore.activeBinding
-      if (!binding) return
-      const parsed = parseBindingStationId(stationId)
-      if (parsed?.kind === 'plan' && parsed.gameGuid === binding.gameGuid) {
-        saveBindingStore.deleteStationPlan(binding.gameGuid, parsed.planId)
-        stationStateMap.remove(stationId)
-      }
-      if (activeStationId.value === stationId) {
-        activeStationId.value = null
-      }
-      return
-    }
-
-    const deleted = empireDataStore.deleteStationFromEmpire(activeEmpire.value, stationId)
-    if (deleted) {
-      stationStateMap.remove(stationId)
-      if (activeStationId.value === stationId) {
-        activeStationId.value = activeEmpire.value?.stations[0]?.id || null
-      }
-    }
-  }
-
-  function duplicateStation(stationId: string) {
-    const newStation = empireDataStore.duplicateStationInEmpire(activeEmpire.value, stationId)
-    if (!newStation) return null
-    activeStationId.value = newStation.id
-    refreshStationFlowCache(newStation.id)
-    return newStation
-  }
-
-  function reorderStations(reorderedStations: StationPlan[]) {
-    empireDataStore.reorderStationsInEmpire(activeEmpire.value, reorderedStations)
-  }
-
-  function createSector(name: string = ''): SectorPlan | null {
-    return empireDataStore.createSectorInEmpire(activeEmpire.value, name)
-  }
-
-  function renameSector(sectorId: string, name: string) {
-    return empireDataStore.renameSectorInEmpire(activeEmpire.value, sectorId, name)
-  }
-
-  function reorderSectors(orderedSectorIds: string[]) {
-    empireDataStore.reorderSectorsInEmpire(activeEmpire.value, orderedSectorIds)
-  }
-
-  function moveStationToSector(stationId: string, sectorId: string | null) {
-    if (productionSource.value === 'save-binding') {
-      return updateBindingStationPlan(stationId, { sectorId })
-    }
-    return empireDataStore.moveStationToSectorInEmpire(activeEmpire.value, stationId, sectorId)
-  }
-
-  function setStationLocation(stationId: string, location: EntityLocation | null) {
-    return empireDataStore.setStationLocationInEmpire(activeEmpire.value, stationId, location)
-  }
-
-  function clearStationLocation(stationId: string) {
-    return setStationLocation(stationId, null)
-  }
-
-  function setSectorLocation(sectorId: string, location: EntityLocation | null) {
-    return empireDataStore.setSectorLocationInEmpire(activeEmpire.value, sectorId, location)
-  }
-
-  function clearSectorLocation(sectorId: string) {
-    return setSectorLocation(sectorId, null)
-  }
-
-  function setSectorStationOrder(sectorId: string | null, orderedStationIds: string[]) {
-    return empireDataStore.setSectorStationOrderInEmpire(activeEmpire.value, sectorId, orderedStationIds)
-  }
-
-  function deleteSector(sectorId: string) {
-    const deleted = empireDataStore.deleteSectorFromEmpire(activeEmpire.value, sectorId)
-    if (!deleted) return false
-    if (activeTransitSectorId.value === sectorId) {
-      activeStationId.value = null
-    }
-    return true
-  }
-
-  function createSectorLink(sourceSectorId: string, targetSectorId: string) {
-    return empireDataStore.createSectorLinkInEmpire(activeEmpire.value, sourceSectorId, targetSectorId)
-  }
-
-  function removeSectorLink(a: string, b: string) {
-    return empireDataStore.removeSectorLinkInEmpire(activeEmpire.value, a, b)
-  }
-
-  function getLinkedSectors(sectorId: string): string[] {
-    return getLinkedSectorIdsFor(sectorId, sectorLinks.value)
-  }
-
-  function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
-    const internal = sectorInternalDataMap.value.get(sectorId)
-    if (internal) return internal.planning
-    return {
-      sectorId,
-      localStationIds: []
-    }
-  }
-
-  function getSectorInternalData(sectorId: string): SectorInternalData {
-    const internal = sectorInternalDataMap.value.get(sectorId)
-    if (internal) return internal
-    return {
-      sectorId,
-      planning: getSupplyPlanningInput(sectorId),
-      localGroupedFlows: createEmptyEmpireGroupedFlows(),
-      supplyStorageFlows: createEmptySupplyStorageFlows()
-    }
-  }
-
-  function getSectorLinkCalc(sectorId: string): SectorLinkCalcEntry | null {
-    return sectorLinkCalcMap.value.get(sectorId) || null
-  }
-
-  function getStationComponentGapFlows(stationId: string | null = activeStation.value?.id || null): StationComponentGapFlows {
-    if (!stationId) {
-      return { operations: [], supply: [] }
-    }
-
-    const station = productionStations.value.find((item) => item.id === stationId)
-    const currentSectorId = station?.sectorId || ''
-    if (!currentSectorId) {
-      return { operations: [], supply: [] }
-    }
-
-    return buildStationComponentGapFlows({
-      currentSectorId,
-      sectors: sectors.value,
-      sectorLinks: sectorLinks.value,
-      orderedStations: orderedStationsBySector.value,
-      sectorInternalDataMap: sectorInternalDataMap.value
-    })
-  }
-
-  function getTransitHubViewModel(input: {
-    sectorId: string | null
-    racePreference: string
-    transportShipCapacity: number
-    storageBufferHours?: number
-  }): TransitHubViewModel {
-    if (!input.sectorId) {
-      return buildTransitHubViewModel({
-        sectorId: null,
-        sectors: sectors.value,
-        stations: orderedStationsBySector.value,
-        localGroupedFlows: createEmptyEmpireGroupedFlows(),
-        solverOutput: null,
-        waresMap: gameData.waresMap || undefined,
-        modulesMap: gameData.modulesMap || undefined,
-        racePreference: input.racePreference,
-        transportShipCapacity: input.transportShipCapacity,
-        storageBufferHours: input.storageBufferHours
-      })
-    }
-
-    const sectorData = getSectorInternalData(input.sectorId)
-    const sectorLinkCalc = getSectorLinkCalc(input.sectorId)
-
-    return buildTransitHubViewModel({
-      sectorId: input.sectorId,
-      sectors: sectors.value,
-      stations: orderedStationsBySector.value,
-      localGroupedFlows: sectorData.localGroupedFlows,
-      solverOutput: sectorLinkCalc?.solverOutput || null,
-      waresMap: gameData.waresMap || undefined,
-      modulesMap: gameData.modulesMap || undefined,
-      racePreference: input.racePreference,
-      transportShipCapacity: input.transportShipCapacity,
-      storageBufferHours: input.storageBufferHours
-    })
-  }
-
-  function renameStation(stationId: string, newName: string) {
-    if (productionSource.value === 'save-binding') {
-      return updateBindingStationPlan(stationId, { name: newName })
-    }
-    return empireDataStore.renameStationInEmpire(activeEmpire.value, stationId, newName)
-  }
-
-  function selectStation(stationId: string | null) {
-    activeStationId.value = stationId
-  }
-
-  function selectTransitSector(sectorId: string | null) {
-    if (!sectorId) {
-      activeStationId.value = null
-      return
-    }
-    const exists = sectors.value.some((sector) => sector.id === sectorId)
-    if (!exists) return
-    const transitTabId = toTransitTabId(sectorId)
-    activeStationId.value = transitTabId
-  }
-
-  function getTransitTabId(sectorId: string) {
-    return toTransitTabId(sectorId)
-  }
-
-  function getStationById(stationId: string): StationPlan | null {
-    if (productionSource.value === 'save-binding') {
-      return getDerivedBindingStation(stationId)
-    }
-    if (activeEmpire.value) {
-      const station = activeEmpire.value.stations.find(s => s.id === stationId)
-      if (station) return station
-    }
-    return null
-  }
-
-  function updateStationSettings(stationId: string, settings: Partial<StationSettings>) {
-    if (productionSource.value === 'save-binding') {
-      const station = getDerivedBindingStation(stationId)
-      const current = migrateStationSettings(station?.settings || DEFAULT_STATION_SETTINGS)
-      updateBindingStationPlan(stationId, { settings: { ...current, ...settings } })
-      refreshStationFlowCache(stationId)
-      return
-    }
-    if (empireDataStore.updateStationSettingsInEmpire(activeEmpire.value, stationId, settings)) {
-      refreshStationFlowCache(stationId)
-    }
-  }
-
-  function updateStationModules(stationId: string, modules: SavedModule[]) {
-    if (productionSource.value === 'save-binding') {
-      updateBindingStationPlan(stationId, { modules })
-      refreshStationFlowCache(stationId)
-      return
-    }
-    if (empireDataStore.updateStationModulesInEmpire(activeEmpire.value, stationId, modules)) {
-      refreshStationFlowCache(stationId)
-    }
-  }
-
-  function updateStationSector(stationId: string, sectorId: string | null) {
-    if (productionSource.value === 'save-binding') {
-      updateBindingStationPlan(stationId, { sectorId })
-      return
-    }
-    empireDataStore.updateStationSectorInEmpire(activeEmpire.value, stationId, sectorId)
-  }
-
-  function updateEmpireName(name: string) {
-    empireDataStore.renameEmpireDraft(activeEmpire.value, name)
-  }
-
   const isDirty = computed(() => {
     if (productionSource.value === 'save-binding') {
       return saveBindingStore.isDirty
@@ -1099,10 +753,7 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     if (!currentStationId) return
     if (productionSource.value !== 'save-binding') return
     
-    const binding = saveBindingStore.activeBinding
-    const archive = saveStore.selectedArchive
-    const derived = deriveBindingStations(binding, archive)
-    const validIds = new Set(derived.map(item => item.station.id))
+    const validIds = new Set(derivedBindingStations.value.map(item => item.station.id))
     if (validIds.has(currentStationId)) {
       activeStationId.value = currentStationId
     } else {
@@ -1168,32 +819,23 @@ const activeEmpire = ref<EmpirePlan | null>(null)
     deleteStation,
     duplicateStation,
     reorderStations,
-    createSector,
-    renameSector,
-    reorderSectors,
-    deleteSector,
-    createSectorLink,
-    removeSectorLink,
-    getLinkedSectors,
-    moveStationToSector,
     setStationLocation,
     clearStationLocation,
-    setSectorLocation,
-    clearSectorLocation,
-    setSectorStationOrder,
     getSupplyPlanningInput,
     getSectorInternalData,
     getSectorLinkCalc,
     getStationComponentGapFlows,
     getTransitHubViewModel,
     renameStation,
+    renameBindingSector,
+    getLinkedSectors,
     selectStation,
     selectTransitSector,
     getTransitTabId,
     getStationById,
     updateStationSettings,
     updateStationModules,
-    updateStationSector,
+    applyImportedStationPayload,
     updateEmpireName,
     shouldConfirmBeforeEmpireReset,
     resetEmpireWithDefaultName,

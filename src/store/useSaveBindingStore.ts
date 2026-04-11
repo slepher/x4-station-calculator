@@ -331,6 +331,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     type?: StationType
     modules?: SavedModule[]
     settings?: StationSettings
+    lockedWares?: string[]
+    warePriority?: Record<string, number>
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }): BindingStationPlan | null {
@@ -350,6 +352,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
         type: input.type || 'industrial',
         modules: [],
         settings: deepClone(DEFAULT_STATION_SETTINGS),
+        lockedWares: [],
+        warePriority: {},
         sectorMacro: input.sectorMacro,
         position: input.position
       }
@@ -361,6 +365,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (input.type !== undefined) plan.type = input.type
     if (input.modules) plan.modules = deepClone(input.modules)
     if (input.settings) plan.settings = deepClone(input.settings)
+    if (input.lockedWares) plan.lockedWares = deepClone(input.lockedWares)
+    if (input.warePriority) plan.warePriority = deepClone(input.warePriority)
     if (input.sectorMacro !== undefined) plan.sectorMacro = input.sectorMacro
     if (input.position !== undefined) plan.position = input.position
     draftBinding.value.updatedAt = Date.now()
@@ -496,6 +502,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     if (patch.type !== undefined) plan.type = patch.type
     if (patch.modules !== undefined) plan.modules = deepClone(patch.modules)
     if (patch.settings !== undefined) plan.settings = deepClone(patch.settings)
+    if (patch.lockedWares !== undefined) plan.lockedWares = deepClone(patch.lockedWares)
+    if (patch.warePriority !== undefined) plan.warePriority = deepClone(patch.warePriority)
     if (patch.groupId !== undefined) plan.groupId = patch.groupId
     if (patch.sectorMacro !== undefined) plan.sectorMacro = patch.sectorMacro
     if (patch.position !== undefined) plan.position = patch.position

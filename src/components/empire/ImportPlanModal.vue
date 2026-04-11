@@ -161,14 +161,13 @@ const getSelectedPlan = () => {
 }
 
 const applyImportPayloadToStation = (stationId: string, payload: StationImportPayload) => {
-  const station = empireStore.getStationById(stationId)
-  if (!station) return
-  station.modules = payload.plannedModules.map((module) => ({ ...module }))
-  station.lockedWares = [...payload.lockedWares]
-  station.warePriority = {}
-  station.lastUpdated = Date.now()
-  empireStore.refreshStationFlowCache(station.id)
-}
+    const modules = payload.plannedModules.map((module) => ({ ...module }))
+    empireStore.applyImportedStationPayload(stationId, {
+      modules,
+      lockedWares: [...payload.lockedWares],
+      warePriority: {}
+    })
+  }
 
 const executeStationImport = (mode: 'new' | 'overwrite', payload?: StationImportPayload) => {
   const selection = pendingImportSelection.value

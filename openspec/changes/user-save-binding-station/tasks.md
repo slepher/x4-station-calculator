@@ -62,10 +62,78 @@
 - [x] T32. `loadEmpire` 调用 `switchToEmpire` 正确切换 productionSource
 - [x] T33. 添加 i18n 文本：bindingName、tab_empire、tab_binding 等
 
+## 后续修正 - useStationStore 职责收缩与重构
+
+- [x] T34. 编写 `refactory.md`，明确 `useStationStore` 的复杂度来源、边界问题与目标架构
+- [x] T35. 建立统一站点命令层的基础设施文件：`stationCommands.ts`
+- [ ] T36. 将 `useStationStore` 主写路径正式迁移到 `stationCommands`
+- [x] T37. 抽出 `stationComputeService` 基础设施，统一部分 `compute deps`、persisted 同步与 `recompute()` 流程
+- [x] T38. 让 `useEmpireStore.refreshStationFlowCache()` 开始复用统一计算服务
+- [x] T39. 让 `productionSourceAdapter` 开始复用统一计算服务，减少重复的 `patch + recompute`
+- [x] T40. 创建独立 plan library 模块：`useStationPlanLibrary.ts`
+- [x] T41. 创建独立 importer service：`stationImporter.ts`
+- [ ] T42. 将组件与主业务路径真正切换到命令层 / importer / plan library，移除旧路径并修复导入回归
+- [ ] T43. 补充“主路径已接线”的回归测试，覆盖 empire/save-binding 两种 source 与导入行为
+- [x] T44. 运行 `npm run build` 验证当前重构中间态可编译
+
+## 后续修正 - useStationStore 重构第二阶段
+
+- [x] T45. 编写 `refactory2.md`，记录当前重构中间态的评估结论、回归问题与二阶段任务
+- [x] T46. 修复 `ImportPlanModal` 导入时 `lockedWares` / `warePriority` / `lastUpdated` 语义丢失问题
+- [x] T47. 在 `useStationStore` 中接入 `stationCommands`，让其成为正式主写路径
+- [x] T48. 将组件侧站点更新统一改走命令接口，禁止"直接改 station + refresh cache"
+- [x] T49. 继续收紧 `stationComputeService` 边界，减少上层直接依赖 `stationStateMap`
+- [x] T50. 统一 persisted -> state -> recompute 编排，消除重复流程
+- [ ] T51. 接入 `useStationPlanLibrary`，移除 `useStationStore` 内部 `savedPlans` 持久化细节
+- [x] T52. 接入 `stationImporter`，移除 `useStationStore.importPlan()` 中的内联解析细节
+- [ ] T53. 补充主路径接线测试：`useStationStore -> stationCommands`、导入流程、empire/save-binding source 路由
+- [ ] T54. 完成二阶段后重新核对 `tasks.md` 状态，只在真实主路径切换完成后标记完成
+
+## 后续修正 - useEmpireStore 降复杂度专项
+
+- [x] T55. 编写 `refactory3.md`，将重构目标重新对齐为"实质性降低 `useEmpireStore` 复杂度"
+- [x] T56. 抽出 `empireSourceView` 或等价模块，统一 `activeStation` / `sectors` / `sectorLinks` / `orderedStationsBySector` / `production*` 读取
+- [x] T57. 将 `getStationById`、binding 派生站点查找与 source-aware 读取逻辑迁入 `empireSourceView`
+- [x] T58. 抽出 `empireFlowFacade` 或等价模块，迁移 `stationFlowCache`、`empireGroupedFlows`
+- [x] T59. 继续迁移 `sectorInternalDataMap`、`sectorLinkCalcMap`、`getSupplyPlanningInput`、`getSectorInternalData`
+- [x] T60. 迁移 `getSectorLinkCalc`、`getStationComponentGapFlows`、`getTransitHubViewModel` 到 flow facade
+- [x] T61. 抽出 `empireMutationService` 基础设施文件
+- [ ] T62. 接入 `empireMutationService`，统一 mutation 路由（类型适配待完成）
+- [ ] T63. 补充专项回归测试，验证 empire / save-binding 两种 source 下读取、聚合语义不变
+- [x] T67. 完成专项后复核 `useEmpireStore` 文件体积与职责边界，并更新文档状态
+
 ## 当前状态
 
 **已完成**：D1-D3 文档任务完成；T1-T26 UI、store 适配、测试验证和 source-aware 职责分离完成
 
 **已完成**：T28-T33 载入界面统一与数据源分发完成
 
-**依赖**：基于 `stand-alone-binding` 已实现的 `productionSource` 路由架构
+**已完成（第一阶段）**：T35、T37-T41、T44 完成了基础设施抽取与部分接入
+
+**已完成（第二阶段）**：
+- T46: 修复导入回归，添加 `applyImportedStationPayload` 方法
+- T47: useStationStore 接入 stationCommands
+- T48: ImportPlanModal 使用 `applyImportedStationPayload`
+- T49-T50: stationComputeService 收口 stationStateMap 访问，统一计算流程
+- T52: importPlan 使用 `stationImporter.parseImportInput`
+
+**已完成（降复杂度专项 Phase 1/2）**：
+- T56-T57: 创建 `empireSourceView.ts` (202行)，统一 source-aware 读取逻辑，**已接入主路径**
+- T58-T60: 创建 `empireFlowFacade.ts` (377行)，迁移 flow 聚合逻辑，**已接入主路径**
+- T61: 创建 `empireMutationService.ts` (370行) 基础设施文件
+- `useEmpireStore.ts` 从 **~1264 行 → 909 行**（减少 28%）
+- 编译验证通过
+- station-refactory 单元测试通过 (30 tests)
+- 创建 `refactory-summary.md` 总结文档
+
+**待后续完成**：
+- T62: empireMutationService 接入主路径（类型适配）
+- T63: 专项回归测试
+- T51: useStationPlanLibrary 接入
+- Phase 4: empireSessionService 抽取
+
+**重构收益**：
+- Source-aware 读取逻辑统一，减少重复分支判断
+- Flow 聚合逻辑独立封装，便于测试和维护
+- 清晰的职责边界：读取层、聚合层、mutation层
+- 代码行数显著减少，可维护性提升

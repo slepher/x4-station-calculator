@@ -51,7 +51,7 @@ const sectorTitleConfig = computed(() => {
       : (empireStore.activeEmpire?.name || ''),
     setName: (name: string) => {
       if (isSupplyOverview.value && activeSupplySector.value) {
-        empireStore.renameSector(activeSupplySector.value.id, name)
+        empireStore.renameBindingSector(activeSupplySector.value.id, name)
         return
       }
       empireStore.updateEmpireName(name)

@@ -16,13 +16,20 @@ import {
   parseBindingStationId
 } from './logic/productionSourceAdapter'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
+import { migrateStationSettings, DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { createStationCommands, type StationCommandContext } from './logic/stationCommands'
 import {
-  parseXmlBlueprint,
-  isXmlFormat,
-  parseGameComLink,
-  resolveModuleId
-} from './logic/blueprintParser'
-import { stationStateMap, migrateStationSettings, DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+  buildStationComputeDeps,
+  syncPersistedToStateMap,
+  recomputeStation,
+  getStationState,
+  ensureStationState,
+  patchStationState,
+  getGroupedFlows,
+  getSettings,
+  deepClone
+} from './logic/stationComputeService'
+import { parseImportInput, type ImportDeps } from './logic/stationImporter'
 
 export type { SavedModule, StationPlan } from '../types/x4'
 
@@ -30,10 +37,6 @@ export interface SavedPlansState {
   version: number;
   activeId: string | null;
   list: StationPlan[];
-}
-
-function deepClone<T>(value: T): T {
-  return JSON.parse(JSON.stringify(value))
 }
 
 export const useStationStore = defineStore('station', () => {
@@ -77,34 +80,34 @@ export const useStationStore = defineStore('station', () => {
   function getComputeDeps() {
     if (!gameData.isReady) return null
     if (!modulesMap.value || !waresMap.value || !medicalConsumptionMap.value) return null
-    return {
+    return buildStationComputeDeps({
       modulesMap: modulesMap.value,
       waresMap: waresMap.value,
       medicalConsumptionMap: medicalConsumptionMap.value,
       buildPriceMultiplier: buildPriceMultiplier.value,
       enforceDlcActivation: enforceDlcActivation.value,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap.value[moduleId]?.dlc_tag)
-    }
+    })
   }
 
   function getActiveContext() {
     const station = empireStore.activeStation
     if (!station) {
-      let state = stationStateMap.get('__local__')
+      let state = getStationState('__local__')
       if (!state) {
-        state = stationStateMap.ensure('__local__', {
+        state = ensureStationState('__local__', {
           settings: { ...DEFAULT_STATION_SETTINGS }
         })
       }
       return { station: null as StationPlan | null, state }
     }
 
-    let state = stationStateMap.get(station.id)
+    let state = getStationState(station.id)
     if (!state) {
       station.settings = migrateStationSettings(station.settings)
-      state = stationStateMap.fromPersisted(station.id, station)
+      syncPersistedToStateMap(station.id, station)
       const deps = getComputeDeps()
-      if (deps) stationStateMap.recompute(station.id, deps)
+      if (deps) recomputeStation(station.id, deps)
     }
 
     return { station: station as StationPlan | null, state }
@@ -115,9 +118,9 @@ export const useStationStore = defineStore('station', () => {
     if (!station) return
 
     station.settings = migrateStationSettings(station.settings)
-    stationStateMap.fromPersisted(station.id, station)
+    syncPersistedToStateMap(station.id, station)
     const deps = getComputeDeps()
-    if (deps) stationStateMap.recompute(station.id, deps)
+    if (deps) recomputeStation(station.id, deps)
   }
 
   function syncActiveStationFromState(updateTimestamp: boolean) {
@@ -125,13 +128,14 @@ export const useStationStore = defineStore('station', () => {
     if (!ctx) return
     if (!ctx.station) return
     const stationId = ctx.station.id
-    const persisted = stationStateMap.toPersisted(stationId)
-    if (!persisted) return
+    const state = getStationState(stationId)
+    if (!state) return
 
-    ctx.station.modules = deepClone(persisted.modules)
-    ctx.station.lockedWares = deepClone(persisted.lockedWares || [])
-    ctx.station.warePriority = deepClone(persisted.warePriority || {})
-    ctx.station.settings = migrateStationSettings(persisted.settings)
+    const { plannedModules, lockedWares, warePriority, settings } = state
+    ctx.station.modules = deepClone(plannedModules)
+    ctx.station.lockedWares = deepClone(lockedWares || [])
+    ctx.station.warePriority = deepClone(warePriority || {})
+    ctx.station.settings = migrateStationSettings(settings)
     if (updateTimestamp) {
       ctx.station.lastUpdated = Date.now()
     }
@@ -143,13 +147,14 @@ export const useStationStore = defineStore('station', () => {
     const parsed = parseBindingStationId(stationId)
     if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return
 
-    const persisted = stationStateMap.toPersisted(stationId)
+    const state = getStationState(stationId)
     const station = empireStore.activeStation
-    if (!persisted || !station) return
+    if (!state || !station) return
 
+    const { plannedModules, settings } = state
     const patch = {
-      modules: deepClone(persisted.modules),
-      settings: migrateStationSettings(persisted.settings)
+      modules: deepClone(plannedModules),
+      settings: migrateStationSettings(settings)
     }
 
     if (parsed.kind === 'plan') {
@@ -171,21 +176,58 @@ export const useStationStore = defineStore('station', () => {
     }
   }
 
+  const commandContext: StationCommandContext = {
+    productionSource: empireStore.productionSource,
+    getStationById: (stationId: string) => empireStore.getStationById(stationId),
+    updateEmpireStationModules: (stationId: string, modules: SavedModule[]) => {
+      empireStore.updateStationModules(stationId, modules)
+      return true
+    },
+    updateEmpireStationSettings: (stationId: string, settings: Partial<StationSettings>) => {
+      empireStore.updateStationSettings(stationId, settings)
+      return true
+    },
+    updateBindingStationPlan: (stationId: string, patch: Partial<Pick<StationPlan, 'modules' | 'settings' | 'lockedWares' | 'warePriority'>>) => {
+      const binding = saveBindingStore.activeBinding
+      const parsed = parseBindingStationId(stationId)
+      if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
+      
+      if (parsed.kind === 'plan') {
+        return saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, {
+          modules: patch.modules,
+          settings: patch.settings,
+          lockedWares: patch.lockedWares,
+          warePriority: patch.warePriority
+        })
+      }
+      return false
+    },
+    getComputeDeps: () => getComputeDeps(),
+    getWaresMap: () => waresMap.value
+  }
+
+  const commands = createStationCommands(commandContext)
+
+  function getActiveStationId(): string {
+    const ctx = getActiveContext()
+    return ctx?.station?.id || '__local__'
+  }
+
   function applyAndRecompute(writer: (stationId: string) => void) {
     const ctx = getActiveContext()
     if (!ctx) return
     const stationId = ctx.station?.id || '__local__'
     writer(stationId)
     const deps = getComputeDeps()
-    if (deps) stationStateMap.recompute(stationId, deps)
+    if (deps) recomputeStation(stationId, deps)
     syncActiveStationFromState(false)
     syncBindingStationPlanFromState(stationId)
   }
 
   function updateSetting<K extends keyof StationSettings>(key: K, value: StationSettings[K]) {
     applyAndRecompute((stationId) => {
-      const current = stationStateMap.get(stationId)?.settings || { ...DEFAULT_STATION_SETTINGS }
-      stationStateMap.patch(stationId, {
+      const current = getSettings(stationId)
+      patchStationState(stationId, {
         settings: {
           ...current,
           [key]: value
@@ -231,64 +273,88 @@ export const useStationStore = defineStore('station', () => {
   )
 
   const plannedModules = computed<SavedModule[]>({
-    get: () => getActiveContext()?.state.plannedModules || [],
+    get: () => {
+      const ctx = getActiveContext()
+      return ctx?.state?.plannedModules || []
+    },
     set: (value) => {
       applyAndRecompute((stationId) => {
-        stationStateMap.patch(stationId, { plannedModules: deepClone(value) })
+        patchStationState(stationId, { plannedModules: deepClone(value) })
       })
     }
   })
 
   const lockedWares = computed<string[]>({
-    get: () => getActiveContext()?.state.lockedWares || [],
+    get: () => {
+      const ctx = getActiveContext()
+      return ctx?.state?.lockedWares || []
+    },
     set: (value) => {
       applyAndRecompute((stationId) => {
-        stationStateMap.patch(stationId, { lockedWares: deepClone(value) })
+        patchStationState(stationId, { lockedWares: deepClone(value) })
       })
     }
   })
 
   const warePriority = computed<Record<string, number>>({
-    get: () => getActiveContext()?.state.warePriority || {},
+    get: () => {
+      const ctx = getActiveContext()
+      return ctx?.state?.warePriority || {}
+    },
     set: (value) => {
       applyAndRecompute((stationId) => {
-        stationStateMap.patch(stationId, { warePriority: deepClone(value) })
+        patchStationState(stationId, { warePriority: deepClone(value) })
       })
     }
   })
 
   const settings = computed<StationSettings>({
-    get: () => getActiveContext()?.state.settings || { ...DEFAULT_STATION_SETTINGS },
+    get: () => {
+      const ctx = getActiveContext()
+      return ctx?.state?.settings || { ...DEFAULT_STATION_SETTINGS }
+    },
     set: (value) => {
       applyAndRecompute((stationId) => {
-        stationStateMap.patch(stationId, { settings: migrateStationSettings(value) })
+        patchStationState(stationId, { settings: migrateStationSettings(value) })
       })
     }
   })
 
-  const autoIndustryModules = computed(() => getActiveContext()?.state.autoIndustryModules || [])
-  const actualWorkforce = computed(() => getActiveContext()?.state.actualWorkforce || 0)
-  const currentEfficiency = computed(() => getActiveContext()?.state.currentEfficiency || 0)
+  const autoIndustryModules = computed(() => {
+    const ctx = getActiveContext()
+    return ctx?.state?.autoIndustryModules || []
+  })
+  const actualWorkforce = computed(() => {
+    const ctx = getActiveContext()
+    return ctx?.state?.actualWorkforce || 0
+  })
+  const currentEfficiency = computed(() => {
+    const ctx = getActiveContext()
+    return ctx?.state?.currentEfficiency || 0
+  })
   const groupedFlows = computed(() => {
     const ctx = getActiveContext()
-    if (!ctx) return stationStateMap.getGroupedFlows('__local__')
-    return stationStateMap.getGroupedFlows(ctx.station?.id || '__local__')
+    if (!ctx) return getGroupedFlows('__local__')
+    return getGroupedFlows(ctx.station?.id || '__local__')
   })
-  const stationAnalysis = computed(() => getActiveContext()?.state.stationAnalysis || {
-    totalCost: 0,
-    totalVolume: 0,
-    totalTime: 0,
-    totalCapacity: 0,
-    totalNeeded: 0,
-    playerHQNeeded: 0,
-    totalWorkerDiff: 0,
-    summaryItems: [],
-    moduleGroups: []
+  const stationAnalysis = computed(() => {
+    const ctx = getActiveContext()
+    return ctx?.state?.stationAnalysis || {
+      totalCost: 0,
+      totalVolume: 0,
+      totalTime: 0,
+      totalCapacity: 0,
+      totalNeeded: 0,
+      playerHQNeeded: 0,
+      totalWorkerDiff: 0,
+      summaryItems: [],
+      moduleGroups: []
+    }
   })
 
   function applyPlan(plan: StationPlan) {
     applyAndRecompute((stationId) => {
-      stationStateMap.patch(stationId, {
+      patchStationState(stationId, {
         plannedModules: deepClone(plan.modules),
         lockedWares: deepClone(plan.lockedWares || []),
         warePriority: deepClone(plan.warePriority || {}),
@@ -311,17 +377,18 @@ export const useStationStore = defineStore('station', () => {
     if (!ctx) return
 
     const stationId = ctx.station?.id || '__local__'
-    const persisted = stationStateMap.toPersisted(stationId)
-    if (!persisted) return
+    const state = getStationState(stationId)
+    if (!state) return
 
+    const { plannedModules, lockedWares, settings, warePriority } = state
     const finalName = name || currentPlanName.value
     const planData: StationPlan = {
       id: savedPlans.value.activeId || crypto.randomUUID(),
       name: finalName,
-      modules: deepClone(persisted.modules),
-      lockedWares: deepClone(persisted.lockedWares || []),
-      settings: deepClone(persisted.settings),
-      warePriority: deepClone(persisted.warePriority || {}),
+      modules: deepClone(plannedModules),
+      lockedWares: deepClone(lockedWares || []),
+      settings: deepClone(settings),
+      warePriority: deepClone(warePriority || {}),
       lastUpdated: Date.now()
     }
 
@@ -362,46 +429,34 @@ export const useStationStore = defineStore('station', () => {
 
   function addModule(id: string = '', count = 1) {
     if (id !== '' && !modulesMap.value[id]) return
-    applyAndRecompute((stationId) => {
-      stationStateMap.mutate(stationId, (state) => {
-        const existing = state.plannedModules.find(m => m.id === id && id !== '')
-        if (existing) existing.count += count
-        else state.plannedModules.push({ id, count })
-      })
-    })
+    const stationId = getActiveStationId()
+    commands.addModule(stationId, id, count)
+    syncActiveStationFromState(false)
+    syncBindingStationPlanFromState(stationId)
   }
 
   function updateModuleId(index: number, newId: string) {
     if (!modulesMap.value[newId]) return
-    applyAndRecompute((stationId) => {
-      stationStateMap.mutate(stationId, (state) => {
-        if (index >= 0 && index < state.plannedModules.length) {
-          const plannedModule = state.plannedModules[index]
-          if (plannedModule) plannedModule.id = newId
-        }
-      })
-    })
+    const stationId = getActiveStationId()
+    commands.updateModuleId(stationId, index, newId)
+    syncActiveStationFromState(false)
+    syncBindingStationPlanFromState(stationId)
   }
 
   function updateModuleCount(index: number, count: number) {
-    applyAndRecompute((stationId) => {
-      stationStateMap.mutate(stationId, (state) => {
-        if (index >= 0 && index < state.plannedModules.length) {
-          const module = state.plannedModules[index]
-          if (module && isModuleCountEditable(module.id)) module.count = count
-        }
-      })
-    })
+    const stationId = getActiveStationId()
+    const module = plannedModules.value[index]
+    if (!module || !isModuleCountEditable(module.id)) return
+    commands.updateModuleCount(stationId, index, count)
+    syncActiveStationFromState(false)
+    syncBindingStationPlanFromState(stationId)
   }
 
   function removeModule(index: number) {
-    applyAndRecompute((stationId) => {
-      stationStateMap.mutate(stationId, (state) => {
-        if (index >= 0 && index < state.plannedModules.length) {
-          state.plannedModules.splice(index, 1)
-        }
-      })
-    })
+    const stationId = getActiveStationId()
+    commands.removeModule(stationId, index)
+    syncActiveStationFromState(false)
+    syncBindingStationPlanFromState(stationId)
   }
 
   function removeModuleById(id: string) {
@@ -416,28 +471,19 @@ export const useStationStore = defineStore('station', () => {
   }
 
   function clearAll() {
-    applyAndRecompute((stationId) => {
-      stationStateMap.patch(stationId, {
-        plannedModules: [],
-        lockedWares: [],
-        warePriority: {}
-      })
-    })
+    const stationId = getActiveStationId()
+    commands.clearAll(stationId)
+    syncActiveStationFromState(false)
+    syncBindingStationPlanFromState(stationId)
     savedPlans.value.activeId = null
     currentPlanName.value = ''
   }
 
   function toggleWareLock(wareId: string) {
-    const ware = waresMap.value[wareId]
-    if (ware?.transport !== 'container') return
-
-    applyAndRecompute((stationId) => {
-      stationStateMap.mutate(stationId, (state) => {
-        const idx = state.lockedWares.indexOf(wareId)
-        if (idx > -1) state.lockedWares.splice(idx, 1)
-        else state.lockedWares.push(wareId)
-      })
-    })
+    const stationId = getActiveStationId()
+    commands.toggleWareLock(stationId, wareId)
+    syncActiveStationFromState(false)
+    syncBindingStationPlanFromState(stationId)
   }
 
   function isWareOperable(wareId: string) {
@@ -503,28 +549,19 @@ export const useStationStore = defineStore('station', () => {
     const raw = input.trim()
     if (!raw) return
 
-    if (isXmlFormat(raw)) {
-      const counts = parseXmlBlueprint(raw)
-      const totalFound = Object.values(counts).reduce((sum, count) => sum + count, 0)
-      if (totalFound > 0) {
-        clearAll()
-        Object.entries(counts).forEach(([id, count]) => {
-          const resolvedId = resolveModuleId(id, modulesMap.value, gameData.modulesByMacroId)
-          if (resolvedId) addModule(resolvedId, count)
-          else console.warn(`[StationStore][Import] unresolved module id in XML: ${id}`)
-        })
-        return
-      }
+    const deps: ImportDeps = {
+      modulesMap: modulesMap.value,
+      modulesByMacroId: gameData.modulesByMacroId
     }
 
-    const counts = parseGameComLink(raw)
-    if (Object.keys(counts).length > 0) {
+    const result = parseImportInput(raw, deps)
+    if (result.warnings.length > 0) {
+      result.warnings.forEach(w => console.warn(`[StationStore][Import] ${w}`))
+    }
+
+    if (result.modules.length > 0) {
       clearAll()
-      Object.entries(counts).forEach(([id, count]) => {
-        const resolvedId = resolveModuleId(id, modulesMap.value, gameData.modulesByMacroId)
-        if (resolvedId) addModule(resolvedId, count)
-        else console.warn(`[StationStore][Import] unresolved module id in x4-game link: ${id}`)
-      })
+      result.modules.forEach(m => addModule(m.id, m.count))
     }
   }
 
@@ -536,9 +573,6 @@ export const useStationStore = defineStore('station', () => {
       workforce: { capacity: 0, needed: 0, maxBonus: 0 }
     } as X4Module
   }
-
-  // StationStore is now a pure presentation layer
-  // Initialization is coordinated by App.vue
 
   return {
     isReady, isDirty, activeView,

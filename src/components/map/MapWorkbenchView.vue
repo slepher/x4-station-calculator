@@ -1144,7 +1144,6 @@ const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocati
     }
     return
   }
-  empireStore.setSectorLocation(item.id, location)
 }
 
 const closeTooltip = () => {

@@ -1131,6 +1131,8 @@ export interface BindingStationPlan {
   type: StationType
   modules: SavedModule[]
   settings: StationSettings
+  lockedWares?: string[]
+  warePriority?: Record<string, number>
   sectorMacro?: string
   position?: { x: number; y: number; z: number }
 }
