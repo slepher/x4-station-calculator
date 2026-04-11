@@ -11,7 +11,7 @@ export default defineConfig({
     }
   },
   test: {
-    include: ['tests/unit/**/*.spec.ts', 'tests/skills/unit/**/*.spec.ts'],
+    include: ['tests/unified-unit/**/*.spec.ts', 'tests/unit/**/*.spec.ts', 'tests/skills/unit/**/*.spec.ts'],
     globals: true,
     environment: 'node',
   }
