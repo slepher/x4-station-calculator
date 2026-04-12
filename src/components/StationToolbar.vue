@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { ref, reactive, computed } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import LanguageSelector from './LanguageSelector.vue'
 import MissingTranslate from './MissingTranslate.vue'
-import LoadPlanModal from './empire/LoadPlanModal.vue'
+import LoadBlueprintPlanModal from './empire/LoadBlueprintPlanModal.vue'
+import LoadLivePlanModal from './empire/LoadLivePlanModal.vue'
 import LoadFlowPlanModal from './logic-flow/LoadFlowPlanModal.vue'
 import SmartSaveDialog from './common/SmartSaveDialog.vue'
 import LoadShipBlueprintModal from './ship-build/LoadShipBlueprintModal.vue'
@@ -20,18 +20,19 @@ import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
 import type { SmartSaveStep } from '@/utils/smartSavePolicy'
+import type { ToolbarStoreType } from '@/composables/useToolbarWorkflowController'
 
 void useLogicFlowStore()
-void useEmpireStore()
 const shipBuildStore = useShipBuildStore()
 const gameData = useGameDataStore()
 const { t } = useI18n()
 const { translateShip } = useX4I18n()
 const toolbarWorkflow = useToolbarWorkflowController({ t, translateShip })
 
-const showLoadModal = ref(false)
-const showLoadFlowModal = ref(false)
 const showLoadBlueprintModal = ref(false)
+const showLoadLiveModal = ref(false)
+const showLoadFlowModal = ref(false)
+const showLoadShipBlueprintModal = ref(false)
 const showImportWizard = ref(false)
 const showVersionSettingsModal = ref(false)
 const showDlcSettingsModal = ref(false)
@@ -41,15 +42,26 @@ const smartDialog = reactive({
   intent: 'NEW' as 'NEW' | 'SAVE_AS'
 })
 
-const isFlowView = computed(() => shipBuildStore.activeView === 'flow')
-const isShipBuildView = computed(() => shipBuildStore.activeView === 'ship-build')
+const activeView = computed(() => shipBuildStore.activeView)
+const isFlowView = computed(() => activeView.value === 'flow')
+const isShipBuildView = computed(() => activeView.value === 'ship-build')
+const isLiveView = computed(() => activeView.value === 'live-production')
 const isShipActionDisabled = computed(() => isShipBuildView.value && !shipBuildStore.selectedShipId)
-const activeToolbarStoreType = computed(() => (
-  isShipBuildView.value ? 'ship-build' : (isFlowView.value ? 'logicFlow' : 'station')
-))
-const isToolbarActionDisabled = computed(() => (
-  isShipActionDisabled.value || toolbarWorkflow.isEditableFor(activeToolbarStoreType.value)
-))
+
+const activeToolbarStoreType = computed<ToolbarStoreType>(() => {
+  if (isShipBuildView.value) return 'ship-build'
+  if (isFlowView.value) return 'logicFlow'
+  if (isLiveView.value) return 'live-production'
+  return 'blueprint-production'
+})
+
+const isLiveNewDisabled = computed(() => !toolbarWorkflow.isActionSupportedFor('live-production', 'NEW'))
+const isLiveSaveAsDisabled = computed(() => !toolbarWorkflow.isActionSupportedFor('live-production', 'SAVE_AS'))
+
+const isToolbarActionDisabled = computed(() => {
+  if (isShipActionDisabled.value) return true
+  return false
+})
 const showVersionIndicator = computed(() => gameData.needsVersionSetup)
 
 const themeColors = computed(() => {
@@ -63,6 +75,12 @@ const themeColors = computed(() => {
     return {
       primary: 'btn-green',
       secondary: 'btn-emerald'
+    }
+  }
+  if (isLiveView.value) {
+    return {
+      primary: 'btn-cyan',
+      secondary: 'btn-teal'
     }
   }
   return {
@@ -110,14 +128,18 @@ const handleSaveAs = () => {
 const handleLoad = () => {
   if (isShipBuildView.value) {
     if (!shipBuildStore.selectedShipId) return
-    showLoadBlueprintModal.value = true
+    showLoadShipBlueprintModal.value = true
     return
   }
   if (isFlowView.value) {
     showLoadFlowModal.value = true
-  } else {
-    showLoadModal.value = true
+    return
   }
+  if (isLiveView.value) {
+    showLoadLiveModal.value = true
+    return
+  }
+  showLoadBlueprintModal.value = true
 }
 
 // Handle SmartSaveDialog events for ship-build
@@ -148,7 +170,7 @@ const handleExport = () => {
 <template>
   <div class="toolbar-panel">
     <div class="flex items-center gap-1.5 ml-4">
-      <button :class="['btn-tool', themeColors.secondary]" data-testid="toolbar-new-btn" :disabled="isToolbarActionDisabled" @click="handleNew">
+      <button :class="['btn-tool', themeColors.secondary]" data-testid="toolbar-new-btn" :disabled="isToolbarActionDisabled || (isLiveView && isLiveNewDisabled)" @click="handleNew">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z" />
@@ -165,7 +187,7 @@ const handleExport = () => {
         </svg>
         <span>{{ t('menu.save') }}</span>
       </button>
-      <button :class="['btn-tool', themeColors.primary]" data-testid="toolbar-save-as-btn" :disabled="isToolbarActionDisabled" @click="handleSaveAs">
+      <button :class="['btn-tool', themeColors.primary]" data-testid="toolbar-save-as-btn" :disabled="isToolbarActionDisabled || (isLiveView && isLiveSaveAsDisabled)" @click="handleSaveAs">
         <svg class="w-3.5 h-3.5" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none"
           stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M7 21h10" />
@@ -249,9 +271,10 @@ const handleExport = () => {
       />
     </div>
 
-    <LoadPlanModal :isOpen="showLoadModal" @close="showLoadModal = false" />
+    <LoadBlueprintPlanModal :isOpen="showLoadBlueprintModal" @close="showLoadBlueprintModal = false" />
+    <LoadLivePlanModal :isOpen="showLoadLiveModal" @close="showLoadLiveModal = false" />
     <LoadFlowPlanModal :isOpen="showLoadFlowModal" @close="showLoadFlowModal = false" />
-    <LoadShipBlueprintModal :isOpen="showLoadBlueprintModal" @close="showLoadBlueprintModal = false" />
+    <LoadShipBlueprintModal :isOpen="showLoadShipBlueprintModal" @close="showLoadShipBlueprintModal = false" />
     <StorageImportWizard :isOpen="showImportWizard" @close="showImportWizard = false" />
     <StorageExportWizard :isOpen="showExportWizard" @close="showExportWizard = false" />
     <VersionSettingsModal :visible="showVersionSettingsModal" @close="showVersionSettingsModal = false" />
@@ -261,7 +284,7 @@ const handleExport = () => {
       :isOpen="smartDialog.isOpen"
       :intent="smartDialog.intent"
       :initialName="toolbarWorkflow.getDefaultName(activeToolbarStoreType, { selectedShip: shipBuildStore.selectedShip })"
-      :storeType="isShipBuildView ? 'ship-build' : (isFlowView ? 'logicFlow' : 'station')"
+      :storeType="activeToolbarStoreType"
       @close="handleSmartDialogClose"
       @submit-default="handleSmartDialogSubmitDefault"
       @invalid="handleSmartDialogInvalid"
@@ -277,6 +300,10 @@ const handleExport = () => {
 
 .btn-cyan {
   @apply bg-cyan-500 hover:bg-cyan-400 text-slate-900;
+}
+
+.btn-teal {
+  @apply bg-teal-500 hover:bg-teal-400 text-slate-900;
 }
 
 .btn-fuchsia {

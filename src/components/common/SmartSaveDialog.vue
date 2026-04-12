@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { buildSmartSavePlan, type SmartSaveStep } from '@/utils/smartSavePolicy'
 import { useI18n } from 'vue-i18n'
@@ -11,7 +11,7 @@ const props = defineProps<{
   isOpen: boolean
   intent: 'NEW' | 'SAVE_AS'
   initialName?: string
-  storeType?: 'station' | 'logicFlow' | 'ship-build'
+  storeType?: 'blueprint-production' | 'live-production' | 'logicFlow' | 'ship-build'
   mode?: 'default' | 'import'
 }>()
 
@@ -22,7 +22,7 @@ const emit = defineEmits<{
   (e: 'invalid', payload: { reason: 'EMPTY_NAME' }): void
 }>()
 const logicFlowStore = useLogicFlowStore()
-const empireStore = useEmpireStore()
+const blueprintStore = useBlueprintProductionStore()
 const shipBuildStore = useShipBuildStore()
 const { t } = useI18n()
 
@@ -44,7 +44,7 @@ watch(() => props.isOpen, (val) => {
     } else if (props.intent === 'SAVE_AS') {
       const baseName = props.storeType === 'logicFlow' 
         ? (logicFlowStore.savedPlans.activeId ? logicFlowStore.savedPlans.list.find((l: LogicFlowPlan) => l.id === logicFlowStore.savedPlans.activeId)?.name : '')
-        : empireStore.activeEmpire?.name
+        : blueprintStore.activeEmpire?.name
       if (isNewPlan.value) {
         inputName.value = baseName || t(defaultNameKey.value)
       } else {
@@ -67,7 +67,10 @@ const isNewPlan = computed(() => {
   if (props.storeType === 'logicFlow') {
     return !logicFlowStore.savedPlans.activeId
   }
-  return !empireStore.activeEmpireId
+  if (props.storeType === 'live-production') {
+    return false
+  }
+  return !blueprintStore.savedEmpires.activeId
 })
 
 const currentPlanName = computed(() => {
@@ -80,7 +83,7 @@ const currentPlanName = computed(() => {
     }
     return ''
   }
-  return empireStore.activeEmpire?.name || t(defaultNameKey.value)
+  return blueprintStore.activeEmpire?.name || t(defaultNameKey.value)
 })
 
 const dialogTitle = computed(() => {

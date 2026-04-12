@@ -1,5 +1,5 @@
 import { defineStore, storeToRefs } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import type {
   StationPlan,
   StationType,
@@ -8,7 +8,8 @@ import type {
   StationSettings,
   TransitHubViewModel,
   SupplyPlanningInput,
-  SectorInternalData
+  SectorInternalData,
+  X4Module
 } from '@/types/x4'
 import type { ProductionSessionContext } from '@/types/production-context'
 import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
@@ -17,13 +18,24 @@ import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
-import { stationStateMap, DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { stationStateMap, DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
 import {
   buildStationComputeDeps,
   syncPersistedToStateMap,
   recomputeStation,
   getFilteredGroupedFlows,
-  clearStationState
+  clearStationState,
+  getStationState,
+  ensureStationState,
+  patchStationState,
+  getSettings,
+  getPlannedModules,
+  getLockedWares,
+  getWarePriority,
+  getAutoIndustryModules,
+  getActualWorkforce,
+  getCurrentEfficiency,
+  deepClone
 } from './logic/stationComputeService'
 import {
   createEmpireSourceView,
@@ -47,6 +59,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const { selectedArchive } = storeToRefs(saveStore)
 
   const isReady = ref(false)
+  const buildPriceMultiplier = ref(0.5)
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
 
@@ -122,11 +135,328 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       modulesMap,
       waresMap,
       medicalConsumptionMap,
-      buildPriceMultiplier: 0.5,
+      buildPriceMultiplier: buildPriceMultiplier.value,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
     })
   }
+
+  function ensureActiveStationState(): ReturnType<typeof stationStateMap.get> {
+    const station = activeStation.value
+    if (!station) {
+      return ensureStationState('__local__', {
+        settings: { ...DEFAULT_STATION_SETTINGS }
+      })
+    }
+    return ensureStationState(station.id)
+  }
+
+  function syncPersistedActiveStationToStateMap(): void {
+    const station = activeStation.value
+    if (!station) return
+    station.settings = migrateStationSettings(station.settings)
+    syncPersistedToStateMap(station.id, station)
+  }
+
+  function syncStateMapBackToPersistedActiveStation(updateTimestamp: boolean = false): void {
+    const station = activeStation.value
+    if (!station) return
+    const state = getStationState(station.id)
+    if (!state) return
+    station.modules = deepClone(state.plannedModules)
+    station.lockedWares = deepClone(state.lockedWares || [])
+    station.warePriority = deepClone(state.warePriority || {})
+    station.settings = migrateStationSettings(state.settings)
+    if (updateTimestamp) {
+      station.lastUpdated = Date.now()
+    }
+  }
+
+  function recomputeActiveStation(): void {
+    const station = activeStation.value
+    const stationId = station?.id || '__local__'
+    const deps = getComputeDeps()
+    if (!deps) return
+    recomputeStation(stationId, deps)
+  }
+
+  function writeAndRecomputeActive(writer: (stationId: string) => void): void {
+    const station = activeStation.value
+    const stationId = station?.id || '__local__'
+    if (!station) {
+      ensureActiveStationState()
+    } else {
+      syncPersistedActiveStationToStateMap()
+    }
+    writer(stationId)
+    recomputeActiveStation()
+    syncStateMapBackToPersistedActiveStation(false)
+    if (station) {
+      updateBindingStationPlan(station.id, {
+        modules: station.modules,
+        lockedWares: station.lockedWares,
+        warePriority: station.warePriority,
+        settings: station.settings
+      })
+    }
+  }
+
+  const plannedModules = computed<SavedModule[]>({
+    get: () => {
+      const stationId = activeStation.value?.id || '__local__'
+      return getPlannedModules(stationId)
+    },
+    set: (value) => {
+      writeAndRecomputeActive((stationId) => {
+        patchStationState(stationId, { plannedModules: deepClone(value) })
+      })
+    }
+  })
+
+  const lockedWares = computed<string[]>({
+    get: () => {
+      const stationId = activeStation.value?.id || '__local__'
+      return getLockedWares(stationId)
+    },
+    set: (value) => {
+      writeAndRecomputeActive((stationId) => {
+        patchStationState(stationId, { lockedWares: deepClone(value) })
+      })
+    }
+  })
+
+  const warePriority = computed<Record<string, number>>({
+    get: () => {
+      const stationId = activeStation.value?.id || '__local__'
+      return getWarePriority(stationId)
+    },
+    set: (value) => {
+      writeAndRecomputeActive((stationId) => {
+        patchStationState(stationId, { warePriority: deepClone(value) })
+      })
+    }
+  })
+
+  const settings = computed<StationSettings>({
+    get: () => {
+      const stationId = activeStation.value?.id || '__local__'
+      return getSettings(stationId)
+    },
+    set: (value) => {
+      writeAndRecomputeActive((stationId) => {
+        patchStationState(stationId, { settings: migrateStationSettings(value) })
+      })
+    }
+  })
+
+  const autoIndustryModules = computed(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getAutoIndustryModules(stationId)
+  })
+
+  const actualWorkforce = computed(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getActualWorkforce(stationId)
+  })
+
+  const currentEfficiency = computed(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getCurrentEfficiency(stationId)
+  })
+
+  const groupedFlows = computed(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getFilteredGroupedFlows(stationId)
+  })
+
+  const stationAnalysis = computed(() => {
+    const state = getStationState(activeStation.value?.id || '__local__')
+    return state?.stationAnalysis || {
+      totalCost: 0,
+      totalVolume: 0,
+      totalTime: 0,
+      totalCapacity: 0,
+      totalNeeded: 0,
+      playerHQNeeded: 0,
+      totalWorkerDiff: 0,
+      summaryItems: [],
+      moduleGroups: []
+    }
+  })
+
+  const wares = computed(() => gameData.waresMap)
+
+  const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
+
+  function updatePlannedModules(modules: SavedModule[]): void {
+    if (activeStation.value) {
+      updateStationModules(activeStation.value.id, modules)
+    }
+  }
+
+  function updateStationSettingsDirect(key: keyof StationSettings, value: StationSettings[keyof StationSettings]): void {
+    writeAndRecomputeActive((stationId) => {
+      const current = getSettings(stationId)
+      patchStationState(stationId, {
+        settings: { ...current, [key]: value }
+      })
+    })
+  }
+
+  function isWareOperable(wareId: string): boolean {
+    const ware = gameData.waresMap[wareId]
+    return ware?.transport === 'container'
+  }
+
+  function isWareLocked(wareId: string): boolean {
+    if (!isWareOperable(wareId)) return true
+    return lockedWares.value.includes(wareId)
+  }
+
+  function toggleWareLock(wareId: string): void {
+    if (!isWareOperable(wareId)) return
+    writeAndRecomputeActive((stationId) => {
+      const current = getLockedWares(stationId)
+      const next = current.includes(wareId)
+        ? current.filter(id => id !== wareId)
+        : [...current, wareId]
+      patchStationState(stationId, { lockedWares: next })
+    })
+  }
+
+  function isPlannedWare(wareId: string): boolean {
+    return plannedModules.value.some(module => {
+      const moduleInfo = gameData.modulesMap[module.id]
+      if (!moduleInfo) return false
+      return Object.keys(moduleInfo.outputs || {}).includes(wareId)
+    })
+  }
+
+  function isAutoWare(wareId: string): boolean {
+    if (isPlannedWare(wareId)) return false
+    return autoIndustryModules.value.some(module => {
+      const moduleInfo = gameData.modulesMap[module.id]
+      if (!moduleInfo) return false
+      return Object.keys(moduleInfo.outputs || {}).includes(wareId)
+    })
+  }
+
+  function getResolvedLevel(wareId: string): number {
+    const planned = isPlannedWare(wareId)
+    const auto = isAutoWare(wareId)
+    const override = warePriority.value[wareId]
+
+    if (planned && override === 0) return 1
+    if (auto && override === 2) return 1
+    if (override !== undefined) return override
+    if (planned) return 2
+    if (auto) return 0
+    return 0
+  }
+
+  function toggleWarePriority(wareId: string): void {
+    const currentLevel = getResolvedLevel(wareId)
+    const planned = isPlannedWare(wareId)
+    const auto = isAutoWare(wareId)
+
+    writeAndRecomputeActive((stationId) => {
+      const nextPriority = deepClone(getWarePriority(stationId))
+
+      if (planned) {
+        if (currentLevel === 2) nextPriority[wareId] = 1
+        else delete nextPriority[wareId]
+      } else if (auto) {
+        if (currentLevel === 0) nextPriority[wareId] = 1
+        else delete nextPriority[wareId]
+      }
+
+      patchStationState(stationId, { warePriority: nextPriority })
+    })
+  }
+
+  function isModuleDlcActive(moduleId: string): boolean {
+    return gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
+  }
+
+  function isModuleCountEditable(moduleId: string): boolean {
+    return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
+  }
+
+  function getModuleInfo(id: string): X4Module {
+    return gameData.modulesMap[id] || {
+      id, macroId: '', wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
+      buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
+      dockingCount: 0,
+      workforce: { capacity: 0, needed: 0, maxBonus: 0 }
+    } as X4Module
+  }
+
+  function addModule(id: string = '', count = 1): void {
+    if (id !== '' && !gameData.modulesMap[id]) return
+    writeAndRecomputeActive((stationId) => {
+      const current = getPlannedModules(stationId)
+      const existingIndex = current.findIndex(m => m.id === id)
+      if (existingIndex !== -1) {
+        const next = deepClone(current)
+        const existing = next[existingIndex]
+        if (existing) existing.count += count
+        patchStationState(stationId, { plannedModules: next })
+      } else {
+        patchStationState(stationId, { plannedModules: [...current, { id, count }] })
+      }
+    })
+  }
+
+  function removeModule(index: number): void {
+    writeAndRecomputeActive((stationId) => {
+      const current = getPlannedModules(stationId)
+      const next = current.filter((_, i) => i !== index)
+      patchStationState(stationId, { plannedModules: next })
+    })
+  }
+
+  function updateModuleCount(index: number, count: number): void {
+    const module = plannedModules.value[index]
+    if (!module || !isModuleCountEditable(module.id)) return
+    writeAndRecomputeActive((stationId) => {
+      const current = getPlannedModules(stationId)
+      const next = deepClone(current)
+      const target = next[index]
+      if (target) target.count = count
+      patchStationState(stationId, { plannedModules: next })
+    })
+  }
+
+  function removeModuleById(id: string): void {
+    const index = plannedModules.value.findIndex(m => m.id === id)
+    if (index !== -1) removeModule(index)
+  }
+
+  function transferModuleFromAutoIndustry(module: SavedModule): void {
+    const inIndustry = autoIndustryModules.value.some(m => m.id === module.id)
+    if (!inIndustry) return
+    addModule(module.id, module.count)
+  }
+
+  function clearAllModules(): void {
+    writeAndRecomputeActive((stationId) => {
+      patchStationState(stationId, { plannedModules: [] })
+    })
+  }
+
+  watch(
+    () => ({
+      stationId: activeStation.value?.id,
+      gameReady: gameData.isReady,
+      buildPrice: buildPriceMultiplier.value,
+      enforceDlcActivation: gameData.enforceDlcActivation
+    }),
+    () => {
+      syncPersistedActiveStationToStateMap()
+      recomputeActiveStation()
+    },
+    { immediate: true }
+  )
 
   function refreshStationFlowCache(stationId: string) {
     const station = getStationById(stationId)
@@ -459,6 +789,36 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getSectorInternalData,
     getSectorLinkCalc,
     getStationComponentGapFlows,
-    getTransitHubViewModel
+    getTransitHubViewModel,
+    buildPriceMultiplier,
+    plannedModules,
+    settings,
+    lockedWares,
+    warePriority,
+    autoIndustryModules,
+    actualWorkforce,
+    currentEfficiency,
+    groupedFlows,
+    stationAnalysis,
+    wares,
+    enforceDlcActivation,
+    updatePlannedModules,
+    updateSetting: updateStationSettingsDirect,
+    toggleWareLock,
+    toggleWarePriority,
+    getResolvedLevel,
+    isWareLocked,
+    isWareOperable,
+    isPlannedWare,
+    isAutoWare,
+    isModuleDlcActive,
+    isModuleCountEditable,
+    getModuleInfo,
+    addModule,
+    removeModule,
+    updateModuleCount,
+    removeModuleById,
+    transferModuleFromAutoIndustry,
+    clearAll: clearAllModules
   }
 })

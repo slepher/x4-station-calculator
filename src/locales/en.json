@@ -583,6 +583,8 @@
     "transfer_to_planning": "Click to transfer to planning area",
     "remove": "Remove",
     "load_plan": "Load Plan",
+    "load_blueprint": "Load Blueprint",
+    "load_live": "Load Live Binding",
     "load_flow_plan": "Load Flow Plan",
     "no_saved_plans": "No saved plans found.",
     "no_saved_flow_plans": "No saved flow plans found.",

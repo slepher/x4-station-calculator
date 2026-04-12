@@ -126,11 +126,33 @@
 - station-refactory 单元测试通过 (30 tests)
 - 创建 `refactory-summary.md` 总结文档
 
-**待后续完成**：
-- T62: empireMutationService 接入主路径（类型适配）
-- T63: 专项回归测试
-- T51: useStationPlanLibrary 接入
-- Phase 4: empireSessionService 抽取
+**已完成（Station Store Refactory Phase S1-S6）**：
+- T137-T149: `useStationStore` 职责迁移完成
+- `useBlueprintProductionStore` 添加 station compute 门面（~280 行）
+- `useLiveProductionStore` 添加 station compute 门面（~280 行）
+- `BlueprintProductionWorkbenchView` 和 `LiveProductionWorkbenchView` 切到新入口 store
+- `StationWareFlow.vue` 和 `StationWareFlowGroup.vue` 改为 props + emits
+- `LoadPlanModal.vue` 改用 `useGameDataStore`
+- `MainWorkbench.vue` 使用 `blueprintStore.isReady`
+- `App.vue` window 暴露改用 `blueprintStore`/`liveStore`
+
+**已完成（Toolbar 按 active-view 分流）**：
+- T162-T169, T171: Toolbar 职责拆分完成
+- `ToolbarStoreType` 从 `'station'` 改为 `'blueprint-production' | 'live-production' | 'logicFlow' | 'ship-build'`
+- `LoadPlanModal` 拆分为 `LoadBlueprintPlanModal` 和 `LoadLivePlanModal`
+- `live-production` 模式下 `新建`/`另存为` 按钮 disabled
+- `ImportPlanModal` 通过 `productionSource` prop 路由到正确入口
+- 编译验证通过
+
+**待后续完成（Toolbar 回归测试）**：
+- T170: E2E 测试覆盖 toolbar 动作路由
+
+**重构收益**：
+- Source-aware 读取逻辑统一，减少重复分支判断
+- Flow 聚合逻辑独立封装，便于测试和维护
+- 清晰的职责边界：读取层、聚合层、mutation层
+- 代码行数显著减少，可维护性提升
+- `useStationStore` 完全删除，production 主路径直接使用专用入口 store
 
 **已完成（Refactory 4 Phase 1）**：
 - T107: 创建 `production-context.ts` 定义共享 props/actions contract
@@ -222,6 +244,19 @@
 - [ ] T116. 将共享可复用逻辑下沉到纯 service / query / command / importer / mapper 层，禁止在两个新 store 中复制计算逻辑
 - [ ] T117. 将 station 编辑命令整理为入口无关的 command builder，由 blueprint/live 两个入口分别注入持久化依赖
 - [ ] T118. 停止在新主路径中扩散 `productionSource` / `activeId` / `activeStationId` 兼容 computed，仅保留过渡适配层
+
+## 后续修正 - Toolbar 按 active-view 分流
+
+- [x] T162. 新增 `toolbar.md`，明确 `StationToolbar` 按 `activeView` 路由到 `blueprint-production` / `live-production` / `logicFlow` / `ship-build`
+- [x] T163. 重构 `useToolbarWorkflowController.ToolbarStoreType`，移除泛化 `station`，改为显式支持 `blueprint-production` 与 `live-production`
+- [x] T164. 修改 `StationToolbar` 的 `activeToolbarStoreType` 映射，使 blueprint/live 与当前 workbench 入口 store 对齐
+- [x] T165. 在 `StationToolbar` 与 controller 双层接入 `live-production` 禁用规则：`新建`、`另存为` disabled
+- [x] T166. 拆分 `LoadPlanModal` 为 `LoadBlueprintPlanModal` 与 `LoadLivePlanModal`，移除 empire/binding tab
+- [x] T167. 修改 `StationToolbar.handleLoad()`：blueprint 只打开 blueprint load modal，live 只打开 live load modal
+- [x] T168. 调整 `SmartSaveDialog` 的 production storeType 语义，移除旧 `station` 对 blueprint/live 的混用
+- [x] T169. 调整 `ImportPlanModal` 导入确认流程，按 blueprint/live 入口分别调用对应 toolbar workflow 分支
+- [ ] T170. 补充 unit/e2e 回归：覆盖 blueprint/live toolbar 动作路由、live 禁用态、load modal 分流
+- [x] T171. 运行 `npm run build` 与相关测试验证 toolbar 改造不回归
 - [ ] T119. 在 `BlueprintProductionWorkbenchView` / `LiveProductionWorkbenchView` 主路径稳定后，移除 `useEmpireStore` 中对 binding 的主路径编排职责
 - [ ] T120. 在两个新入口主路径稳定后，移除 `useStationStore` 中基于 `productionSource` 的写路由，改为显式接入对应入口 command
 - [ ] T121. 补充入口级回归测试：分别验证 `BlueprintProductionWorkbenchView` 与 `LiveProductionWorkbenchView` 下的 station 选择、overview、transit、dirty/save 语义
@@ -243,3 +278,34 @@
 - [x] T134. 清理新入口主路径对 `useStationStore` 细粒度规划编辑入口的依赖，停止为 `StationPlanningPanel` 保留这些适配接口
 - [ ] T135. 补充回归测试：验证模块添加、删除、改数量、拖拽、批量缩放、自动模块转入在整包提交模式下行为不回归
 - [x] T136. 运行 `npm run build` 与相关 unit/e2e 验证，确认 Refactory 5 不引入 planning 面板回归
+
+## 后续修正 - useStationStore 能力迁移（Station Store Refactory）
+
+- [x] T137. 编写 `station-store-refactory.md`，明确 `useStationStore` 废弃前的职责迁移落点、共享模块边界与强制施工顺序
+- [x] T138. 在 `useBlueprintProductionStore` 中建立 station compute 门面：`getComputeDeps`、active station state-map 初始化、persisted/state-map 双向同步、recompute 编排
+- [x] T139. 在 `useLiveProductionStore` 中建立 station compute 门面：`getComputeDeps`、active station state-map 初始化、persisted/state-map 双向同步、recompute 编排
+- [x] T140. 将 `BlueprintProductionWorkbenchView` 的 planning 主路径切到 `useBlueprintProductionStore`：删除对 `useStationStore.plannedModules`、`autoIndustryModules`、`enforceDlcActivation` 的依赖
+- [x] T141. 将 `LiveProductionWorkbenchView` 的 planning 主路径切到 `useLiveProductionStore`：删除对 `useStationStore.plannedModules`、`autoIndustryModules`、`enforceDlcActivation` 的依赖
+- [x] T142. 将 `BlueprintProductionWorkbenchView` 的 settings / flows / dashboard 主路径切到 `useBlueprintProductionStore`：删除对 `useStationStore.settings`、`groupedFlows`、`stationAnalysis`、`currentEfficiency`、`actualWorkforce`、`buildPriceMultiplier` 的依赖
+- [x] T143. 将 `LiveProductionWorkbenchView` 的 settings / flows / dashboard 主路径切到 `useLiveProductionStore`：删除对 `useStationStore.settings`、`groupedFlows`、`stationAnalysis`、`currentEfficiency`、`actualWorkforce`、`buildPriceMultiplier` 的依赖
+- [x] T144. 将 ware lock / ware priority / resolved level 逻辑迁入两个 production store 或共享 helper，删除新入口主路径对 `useStationStore.toggleWareLock`、`toggleWarePriority`、`getResolvedLevel` 的依赖
+- [x] T145. 重构 `StationWareFlow.vue`：删除 `useStationStore`，改为 props + emits + 上层注入的只读模块信息
+- [x] T146. 重构 `StationWareFlowGroup.vue`：删除 `useStationStore`，改为 props + emits，禁止内部直接读取 store
+- [x] T147. 将 `LoadPlanModal.vue` 从 `useStationStore.modules` 切换到 `useGameDataStore` 或专用只读模块 helper
+- [x] T148. 将 `savedPlans/loadData/saveCurrentPlan/loadPlan/mergePlan/deletePlan` 迁移到独立 station plan library，禁止继续保留在 `useStationStore`
+- [x] T149. 清理 production 主路径对 `useStationStore` 的剩余依赖后，补充回归测试，验证 blueprint/live 两个入口的 planning、settings、flow、dashboard、ware 交互语义不回归
+
+## 后续修正 - useStationStore 删除（Station Store Remove）
+
+- [x] T150. 编写 `station-store-remove.md`，明确 `useStationStore` 的删除边界、前置条件、强制删除顺序与完成标准
+- [x] T151. 删除 `BlueprintProductionWorkbenchView.vue` 对 `useStationStore` 的全部引用
+- [x] T152. 删除 `LiveProductionWorkbenchView.vue` 对 `useStationStore` 的全部引用
+- [x] T153. 删除 `ProductionWorkbenchView.vue` 的剩余 `useStationStore` 依赖，并确认该过渡组件不再承接主路径（已删除文件）
+- [x] T154. 删除 `StationWareFlow.vue` 对 `useStationStore` 的导入与调用
+- [x] T155. 删除 `StationWareFlowGroup.vue` 对 `useStationStore` 的导入与调用
+- [x] T156. 删除 `LoadPlanModal.vue` 对 `useStationStore` 的导入与调用
+- [x] T157. 删除 `MainWorkbench.vue` 对 `useStationStore.isReady` 的依赖
+- [x] T158. 清理 `App.vue` 中 window 暴露的 `stationStore` 测试桥，改为暴露新入口 store
+- [x] T159. 在所有主路径引用删除后，删除 `useStationStore` 中的旧桥接职责（已删除文件）
+- [x] T160. 在旧 plan library 与细粒度模块编辑接口已迁移后，删除 `useStationStore.ts` 文件
+- [x] T161. 运行最终回归验证：确认 production 主路径中不存在 `useStationStore()` 调用，且 blueprint/live 两个入口行为保持正确

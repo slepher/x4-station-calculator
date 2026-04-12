@@ -8,7 +8,8 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import { useStationStore } from '@/store/useStationStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
+import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
@@ -18,7 +19,8 @@ const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const empireStore = useEmpireStore()
 const shipBuildStore = useShipBuildStore()
-const stationStore = useStationStore()
+const blueprintStore = useBlueprintProductionStore()
+const liveStore = useLiveProductionStore()
 const saveStore = useSaveStore()
 const mapStore = useMapStore()
 const saveBindingStore = useSaveBindingStore()
@@ -27,7 +29,6 @@ const activeViewStore = useActiveViewStore()
 const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
 const isInitializing = ref(true)
 
-// Unified initialization coordinator
 async function initializeApp() {
   console.log('[App] Starting unified initialization...')
   isInitializing.value = true
@@ -55,7 +56,6 @@ async function initializeApp() {
   }
 }
 
-// Start initialization immediately
 initializeApp()
 
 onMounted(() => {
@@ -73,7 +73,6 @@ onMounted(() => {
   }
 })
 
-// Expose stores for testing
 const isReady = computed(() => empireStore.isReady && gameDataStore.isReady)
 
 const checkExportStores = () => {
@@ -82,9 +81,10 @@ const checkExportStores = () => {
                  window.localStorage.getItem('isTestEnv') === 'true';
 
   if (import.meta.env.DEV || isTest) {
-    if (!(window as any).stationStore) {
+    if (!(window as any).blueprintStore) {
       console.log('[App] Exporting stores to window for test env');
-      (window as any).stationStore = stationStore;
+      (window as any).blueprintStore = blueprintStore;
+      (window as any).liveStore = liveStore;
       (window as any).gameDataStore = gameDataStore;
       (window as any).logicFlowStore = logicFlowStore;
       (window as any).empireStore = empireStore;
@@ -93,17 +93,15 @@ const checkExportStores = () => {
       (window as any).saveStore = saveStore;
       (window as any).mapStore = mapStore;
       (window as any).activeViewStore = activeViewStore;
-      (window as any).store = stationStore;
+      (window as any).store = blueprintStore;
     }
     return true;
   }
   return false;
 };
 
-// Expose stores immediately for test access
 checkExportStores();
 
-// Retry for edge cases
 setTimeout(checkExportStores, 100);
 setTimeout(checkExportStores, 500);
 </script>

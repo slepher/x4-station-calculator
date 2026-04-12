@@ -1,13 +1,15 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useStationStore, type SavedModule } from '@/store/useStationStore'
+import type { SavedModule } from '@/types/x4'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import TopViewSwitch from '@/components/common/TopViewSwitch.vue'
 const { translateModule } = useX4I18n()
+const gameData = useGameDataStore()
 
 const props = defineProps<{
   isOpen: boolean
@@ -15,7 +17,6 @@ const props = defineProps<{
 
 const emit = defineEmits(['close'])
 const { t } = useI18n()
-const stationStore = useStationStore()
 const empireStore = useEmpireStore()
 const saveBindingStore = useSaveBindingStore()
 const activeViewStore = useActiveViewStore()
@@ -45,7 +46,7 @@ const getStationDescription = (modules: SavedModule[]) => {
     .sort((a, b) => b.count - a.count)
     .slice(0, 3)
     .map(m => {
-      const info = stationStore.modules[m.id];
+      const info = gameData.localizedModulesMap[m.id];
       return `${m.count} x ${info ? translateModule(info) : m.id}`;
     })
     .join(', ') + (modules.length > 3 ? '...' : '');

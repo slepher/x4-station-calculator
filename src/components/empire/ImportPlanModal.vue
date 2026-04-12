@@ -5,6 +5,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useStatusStore } from '@/store/useStatusStore'
 import { useToolbarWorkflowController } from '@/composables/useToolbarWorkflowController'
+import type { ToolbarStoreType } from '@/composables/useToolbarWorkflowController'
 import { buildEmpireImportTargets, buildStationImportPayload, type LogicFlowImportWarning, type StationImportPayload } from '@/store/logic/logicFlowImport'
 import { getLogicFlowGroupDisplayName } from '@/store/logic/logicFlowGroupName'
 import { parseGameComLink, parseXmlBlueprintMeta, resolveModuleId } from '@/store/logic/blueprintParser'
@@ -31,6 +32,10 @@ const toolbarWorkflow = useToolbarWorkflowController({
   t,
   translateShip: (ship) => ship.name || ship.id
 })
+
+const importStoreType = computed<ToolbarStoreType>(() => 
+  props.productionSource === 'save-binding' ? 'live-production' : 'blueprint-production'
+)
 
 const activeTab = ref<ImportTabKey>('game-blueprint')
 const selfClosed = ref(false)
@@ -260,13 +265,13 @@ const handleImportSelected = (selection: { planId: string; groupId?: string }) =
     return
   }
 
-  if (toolbarWorkflow.shouldConfirmBeforeImport('station')) {
+  if (toolbarWorkflow.shouldConfirmBeforeImport(importStoreType.value)) {
     showEmpireImportConfirm.value = true
     return
   }
 
   toolbarWorkflow.runImportAction({
-    storeType: 'station',
+    storeType: importStoreType.value,
     choice: 'DISCARD_AND_IMPORT',
     defaultEmpireName: t('menu.default_sector_name'),
     importData: () => executeEmpireImport()
@@ -277,7 +282,7 @@ const handleEmpireImportSubmit = (payload: { choice: 'SAVE_AND_IMPORT' | 'DISCAR
   empireImportSubmitted.value = true
   showEmpireImportConfirm.value = false
   const result = toolbarWorkflow.runImportAction({
-    storeType: 'station',
+    storeType: importStoreType.value,
     choice: payload.choice,
     defaultEmpireName: t('menu.default_sector_name'),
     importData: () => executeEmpireImport()
@@ -634,7 +639,7 @@ const handleBlueprintActionNew = () => {
     <SmartSaveDialog
       :isOpen="showEmpireImportConfirm"
       intent="NEW"
-      storeType="station"
+      storeType="blueprint-production"
       mode="import"
       @submit-import="handleEmpireImportSubmit"
       @close="handleEmpireImportDialogClose"

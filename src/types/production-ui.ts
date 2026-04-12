@@ -197,6 +197,7 @@ export interface ImportPlanModalProps {
   isOpen: boolean
   initialTab?: 'logic-flow' | 'game-blueprint' | 'x4-station'
   isOverview: boolean
+  productionSource: 'empire' | 'save-binding'
   activeStationId: string | null
   activeStation: { id: string; modules: SavedModule[] } | null
   createStation: (name: string, type?: StationType) => { id: string; modules: SavedModule[] } | null

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useStationStore } from '@/store/useStationStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import LockButton from '../common/LockButton.vue'
 import FavoriteButton from '../common/FavoriteButton.vue'
@@ -11,45 +11,45 @@ const props = defineProps<{
   netRate: number
   name: string
   details?: any[]
-  locked?: boolean // 新增 locked 属性
-  priorityLevel?: number // 新增：产物优先级级别 (0, 1, 2)
-  // 新增体积和经济数据
+  locked?: boolean
+  priorityLevel?: number
   netVolume: number
   transportDemand?: number
   netValue: number
   transportType: string
   unitVolume: number
-  // 新增仓储规划数据
   totalOccupiedVolume: number
   totalOccupiedCount: number
   totalOccupiedConsumptionCount: number
-  // 新增视图模式属性
   viewMode: 'quantity' | 'volume' | 'economy' | 'transport'
   transportMinutes?: number
+  nonOperable?: boolean
+  isPlanned?: boolean
+  resourceBufferHours?: number
+  primaryProductBufferHours?: number
+  secondaryProductBufferHours?: number
+  modulesMap?: Record<string, any>
 }>()
 
 const emit = defineEmits<{
   (e: 'update:locked', value: boolean): void
-  (e: 'update:priorityLevel', value: number): void // 新增：优先级变更事件
+  (e: 'update:priorityLevel', value: number): void
 }>()
 
-const store = useStationStore()
+const gameData = useGameDataStore()
 
 const translateModule = (moduleId: string) => {
-    const store = useStationStore()
-    const module = store.modules[moduleId]
-    return module ? module.localeName : moduleId;
+  const module = props.modulesMap?.[moduleId] || gameData.localizedModulesMap[moduleId]
+  return module ? module.localeName : moduleId
 }
 
-// 计算是否可操作
-const nonOperable = computed(() => !store.isWareOperable(props.resourceId))
+const nonOperableComputed = computed(() => props.nonOperable ?? false)
 
 const formatNum = (n: number, digits: number = 1) => new Intl.NumberFormat('en-US', {
   maximumFractionDigits: digits,
   minimumFractionDigits: digits
 }).format(n)
 
-// 根据视图模式显示不同的主值
 const displayValue = computed(() => {
   if (props.viewMode === 'economy' && props.netValue !== undefined) {
     return props.netValue
@@ -65,10 +65,7 @@ const displayValue = computed(() => {
   return props.netRate
 })
 
-// 根据视图模式显示不同的符号
-const displaySign = computed(() => {
-    return displayValue.value >= 0 ? '+' : ''
-})
+const displaySign = computed(() => displayValue.value >= 0 ? '+' : '')
 
 const formattedDisplayValue = computed(() => {
   if (props.viewMode === 'economy') {
@@ -83,7 +80,6 @@ const formattedDisplayValue = computed(() => {
   return displaySign.value + formatNum(displayValue.value)
 })
 
-// 明细排序与处理
 const processedDetails = computed(() => {
   if (!props.details) return []
   return [...props.details].sort((a, b) => {
@@ -94,33 +90,20 @@ const processedDetails = computed(() => {
   })
 })
 
-// 根据视图模式格式化明细数据
 const formattedDetails = computed(() => {
   if (!props.details) return []
   
-  // 如果是经济视图，需要将明细数据转换为经济数据
   if (props.viewMode === 'economy') {
     return processedDetails.value.map(detail => {
-      // 使用analyzeWareFlow函数计算的实际valueFlow数据
       const economicValue = detail.valueFlow !== undefined ? detail.valueFlow : detail.amount * 100
-      return {
-        ...detail,
-        economicAmount: economicValue,
-        displayAmount: economicValue
-      }
+      return { ...detail, economicAmount: economicValue, displayAmount: economicValue }
     })
   }
   
-  // 如果是体积视图，需要将明细数据转换为体积数据
   if (props.viewMode === 'volume') {
     return processedDetails.value.map(detail => {
-      // 使用analyzeWareFlow函数计算的实际volumeFlow数据
       const volumeValue = detail.volumeFlow !== undefined ? detail.volumeFlow : detail.amount * (props.unitVolume || 0)
-      return {
-        ...detail,
-        volumeAmount: volumeValue,
-        displayAmount: volumeValue
-      }
+      return { ...detail, volumeAmount: volumeValue, displayAmount: volumeValue }
     })
   }
 
@@ -130,46 +113,28 @@ const formattedDetails = computed(() => {
       const transportValue = detail.transportFlow !== undefined
         ? detail.transportFlow
         : Math.abs(detail.amount || 0) * (props.unitVolume || 0) * (minutes / 60)
-      return {
-        ...detail,
-        displayAmount: transportValue
-      }
+      return { ...detail, displayAmount: transportValue }
     })
   }
   
-  // 默认视图模式，显示原始产量数据
-  return processedDetails.value.map(detail => ({
-    ...detail,
-    displayAmount: detail.amount
-  }))
+  return processedDetails.value.map(detail => ({ ...detail, displayAmount: detail.amount }))
 })
 
 const hasProduction = computed(() => props.details?.some(d => d.amount > 0) ?? false)
 const hasConsumption = computed(() => props.details?.some(d => d.amount < 0) ?? false)
 
-// 计算是否为用户规划的产物 (Planned Ware)
-const isPlanned = computed(() => {
-  return store.plannedModules.some(m => {
-    const info = store.modules[m.id]
-    return info && info.outputs && Object.keys(info.outputs).includes(props.resourceId)
-  })
-})
+const isPlannedComputed = computed(() => props.isPlanned ?? false)
 
-// 计算可用优先级 (Available Levels)
 const availableLevels = computed(() => {
-  if (isPlanned.value) {
-    // 用户规划产物: 必须保留，不能设为无需求 (0)
+  if (isPlannedComputed.value) {
     return [1, 2]
   } else if (hasProduction.value) {
-    // 自动/副产物: 不能设为主产物 (2)，防止死循环
     return [0, 1]
   } else {
-    // 纯消耗: 只能是无需求 (0)
     return [0]
   }
 })
 
-// FavoriteButton 的禁用状态仅取决于是否有多个选项
 const favoriteDisabled = computed(() => availableLevels.value.length <= 1)
 
 const classWithSymbol = (displayValue: number, className:string) => [className, className + '-' + (displayValue >= 0 ? 'pos' : 'neg')]
@@ -243,15 +208,15 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
         :disabled="favoriteDisabled"
         :has-consumption="hasConsumption"
         :has-production="hasProduction"
-        :resource-buffer-hours="store.settings.resourceBufferHours"
-        :primary-product-buffer-hours="store.settings.primaryProductBufferHours"
-        :secondary-product-buffer-hours="store.settings.secondaryProductBufferHours"
+        :resource-buffer-hours="resourceBufferHours ?? 1"
+        :primary-product-buffer-hours="primaryProductBufferHours ?? 12"
+        :secondary-product-buffer-hours="secondaryProductBufferHours ?? 2"
         :available-levels="availableLevels"
         @update:level="emit('update:priorityLevel', $event)"
       />
       <LockButton
         :locked="locked"
-        :disabled="nonOperable"
+        :disabled="nonOperableComputed"
         @update:locked="emit('update:locked', $event)"
       />
     </div>

@@ -23,6 +23,7 @@ const props = defineProps<{
     sellMultiplier: number
     racePreference: string
     showEmpireGaps: boolean
+    transportMinutes?: number
   }
   empireGaps: {
     operations: EmpireGapItem[]
@@ -30,6 +31,13 @@ const props = defineProps<{
   }
   plannedModules: SavedModule[]
   wares: Record<string, any>
+  modulesMap?: Record<string, any>
+  isWareLocked?: (wareId: string) => boolean
+  getResolvedLevel?: (wareId: string) => number
+  isWareOperable?: (wareId: string) => boolean
+  isPlannedWare?: (wareId: string) => boolean
+  onToggleWareLock?: (wareId: string) => void
+  onToggleWarePriority?: (wareId: string) => void
 }>()
 
 const emit = defineEmits<{
@@ -202,6 +210,17 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
             :title="group.title"
             :items="group.items"
             :viewMode="viewMode"
+            :isWareLocked="props.isWareLocked"
+            :getResolvedLevel="props.getResolvedLevel"
+            :isWareOperable="props.isWareOperable"
+            :isPlannedWare="props.isPlannedWare"
+            :transportMinutes="props.settings.transportMinutes"
+            :resourceBufferHours="props.settings.resourceBufferHours"
+            :primaryProductBufferHours="props.settings.primaryProductBufferHours"
+            :secondaryProductBufferHours="props.settings.secondaryProductBufferHours"
+            :modulesMap="props.modulesMap"
+            :onToggleWareLock="props.onToggleWareLock"
+            :onToggleWarePriority="props.onToggleWarePriority"
         >
           <span class="volume-group-planning">
             {{ getGroupVolume(group.items) }}m³
@@ -219,6 +238,17 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
           :title="group.title"
           :items="group.items"
           :viewMode="viewMode"
+          :isWareLocked="props.isWareLocked"
+          :getResolvedLevel="props.getResolvedLevel"
+          :isWareOperable="props.isWareOperable"
+          :isPlannedWare="props.isPlannedWare"
+          :transportMinutes="props.settings.transportMinutes"
+          :resourceBufferHours="props.settings.resourceBufferHours"
+          :primaryProductBufferHours="props.settings.primaryProductBufferHours"
+          :secondaryProductBufferHours="props.settings.secondaryProductBufferHours"
+          :modulesMap="props.modulesMap"
+          :onToggleWareLock="props.onToggleWareLock"
+          :onToggleWarePriority="props.onToggleWarePriority"
         >
           <div class="transport-group-value">
             <span class="transport-group-sum">
@@ -270,7 +300,18 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
           <StationWareFlowGroup v-for="group in rateGroups" :key="group.key"
             :title="group.title" 
             :items="group.items" 
-            :viewMode="viewMode" 
+            :viewMode="viewMode"
+            :isWareLocked="props.isWareLocked"
+            :getResolvedLevel="props.getResolvedLevel"
+            :isWareOperable="props.isWareOperable"
+            :isPlannedWare="props.isPlannedWare"
+            :transportMinutes="props.settings.transportMinutes"
+            :resourceBufferHours="props.settings.resourceBufferHours"
+            :primaryProductBufferHours="props.settings.primaryProductBufferHours"
+            :secondaryProductBufferHours="props.settings.secondaryProductBufferHours"
+            :modulesMap="props.modulesMap"
+            :onToggleWareLock="props.onToggleWareLock"
+            :onToggleWarePriority="props.onToggleWarePriority"
           > 
             <span v-if="viewMode === 'economy'" :class="['economy-group-sum', group.symbolClass]"> 
               {{ getGroupSymboledValue(group.items) }} Cr 

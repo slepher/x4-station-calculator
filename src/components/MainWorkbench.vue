@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { useStationStore } from '@/store/useStationStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import StationToolbar from './StationToolbar.vue'
 import StatusMonitor from './StatusMonitor.vue'
@@ -11,7 +11,7 @@ import MapWorkbenchView from './map/MapWorkbenchView.vue'
 
 import { computed } from 'vue'
 
-const store = useStationStore()
+const blueprintStore = useBlueprintProductionStore()
 const shipBuildStore = useShipBuildStore()
 
 const isBlueprintProduction = computed(() => shipBuildStore.activeView === 'blueprint-production')
@@ -25,7 +25,7 @@ const isMapsView = computed(() => shipBuildStore.activeView === 'maps')
     class="main-workbench w-full max-w-[1600px] mx-auto p-4 text-sm relative flex flex-col"
     :class="{ 'maps-mode': isMapsView }"
   >
-    <div id="debug-ready-marker" v-if="store.isReady" class="hidden">READY</div>
+    <div id="debug-ready-marker" v-if="blueprintStore.isReady" class="hidden">READY</div>
 
     <StationToolbar />
 

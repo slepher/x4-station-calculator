@@ -18,10 +18,18 @@ export interface UseStationWareFlowsModelDeps {
     sellMultiplier: number
     racePreference: string
     showEmpireGaps: boolean
+    transportMinutes?: number
   }>
   empireGaps: ComputedRef<EmpireGapFlows>
   plannedModules: ComputedRef<SavedModule[]>
   wares: ComputedRef<Record<string, any>>
+  modulesMap?: ComputedRef<Record<string, any>>
+  isWareLocked?: (wareId: string) => boolean
+  getResolvedLevel?: (wareId: string) => number
+  isWareOperable?: (wareId: string) => boolean
+  isPlannedWare?: (wareId: string) => boolean
+  onToggleWareLock?: (wareId: string) => void
+  onToggleWarePriority?: (wareId: string) => void
 }
 
 export interface UseStationWareFlowsModelReturn {
@@ -36,7 +44,14 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
     settings,
     empireGaps,
     plannedModules,
-    wares
+    wares,
+    modulesMap,
+    isWareLocked,
+    getResolvedLevel,
+    isWareOperable,
+    isPlannedWare,
+    onToggleWareLock,
+    onToggleWarePriority
   } = deps
 
   const props = computed<StationWareFlowsDashboardProps>(() => ({
@@ -49,7 +64,8 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
       buyMultiplier: settings.value.buyMultiplier,
       sellMultiplier: settings.value.sellMultiplier,
       racePreference: settings.value.racePreference,
-      showEmpireGaps: settings.value.showEmpireGaps
+      showEmpireGaps: settings.value.showEmpireGaps,
+      transportMinutes: settings.value.transportMinutes
     },
     empireGaps: {
       operations: empireGaps.value.operations.map((flow: any) => ({
@@ -76,7 +92,14 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
       }))
     },
     plannedModules: plannedModules.value,
-    wares: wares.value
+    wares: wares.value,
+    modulesMap: modulesMap?.value,
+    isWareLocked,
+    getResolvedLevel,
+    isWareOperable,
+    isPlannedWare,
+    onToggleWareLock,
+    onToggleWarePriority
   }))
 
   const emits: StationWareFlowsDashboardEmits = {
@@ -84,25 +107,18 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
       viewMode.value = value
     },
     updateResourceBufferHours: (_value: number) => {
-      // Handled by parent via settings update
     },
     updatePrimaryProductBufferHours: (_value: number) => {
-      // Handled by parent via settings update
     },
     updateSecondaryProductBufferHours: (_value: number) => {
-      // Handled by parent via settings update
     },
     updateBuyMultiplier: (_value: number) => {
-      // Handled by parent via settings update
     },
     updateSellMultiplier: (_value: number) => {
-      // Handled by parent via settings update
     },
     addGapModule: (_wareId: string) => {
-      // Handled by parent
     },
     removeGapModule: (_wareId: string) => {
-      // Handled by parent
     }
   }
 
