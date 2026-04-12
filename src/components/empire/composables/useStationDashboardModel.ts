@@ -49,23 +49,8 @@ export function useStationDashboardModel(deps: UseStationDashboardModelDeps): Us
 
   const props = computed<StationDashboardProps>(() => ({
     plannedModules: plannedModules.value,
-    stationAnalysis: {
-      totalCost: stationAnalysis.value.totalCost,
-      totalVolume: stationAnalysis.value.totalVolume,
-      totalNeeded: stationAnalysis.value.totalNeeded,
-      totalCapacity: stationAnalysis.value.totalCapacity,
-      totalTime: stationAnalysis.value.totalTime,
-      playerHQNeeded: stationAnalysis.value.playerHQNeeded,
-      totalWorkerDiff: stationAnalysis.value.totalWorkerDiff,
-      moduleGroups: stationAnalysis.value.moduleGroups,
-      summaryItems: stationAnalysis.value.summaryItems
-    },
-    settings: {
-      transportShipCapacity: settings.value.transportShipCapacity,
-      workforceAuto: settings.value.workforceAuto,
-      manualWorkforce: settings.value.manualWorkforce,
-      useHQ: settings.value.useHQ
-    },
+    stationAnalysis: stationAnalysis.value,
+    settings: settings.value,
     currentEfficiency: currentEfficiency.value,
     actualWorkforce: actualWorkforce.value,
     plannedModulesOverride: plannedModulesOverride?.value ?? null,

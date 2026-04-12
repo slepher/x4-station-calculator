@@ -2,7 +2,7 @@
 import { computed, ref, watch, watchEffect, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { stationStateMap } from '@/store/state/StationStateMap'
 import type { SavedFlowGroup } from '@/types/x4'
@@ -74,7 +74,7 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
-const empireStore = useEmpireStore()
+const blueprintStore = useBlueprintProductionStore()
 const logicFlowStore = useLogicFlowStore()
 
 const formatYieldLabel = (yieldName: string, wareId?: string) => {
@@ -143,13 +143,13 @@ const loaderMenuRef = ref<HTMLElement | null>(null)
 const loaderTriggerRef = ref<HTMLElement | null>(null)
 const loaderMenuStyle = ref<Record<string, string>>({})
 const loadedSourceId = ref<string | null>(null)
-const loadedSourceType = ref<'sector' | 'logicflow' | null>(null)
+const loadedSourceType = ref<'empire' | 'logicflow' | null>(null)
 
 const loaderCurrentLabel = computed(() => {
   if (!loadedSourceId.value) return t('map.resource_filter_loader_custom')
-  if (loadedSourceType.value === 'sector') {
-    const sector = empireStore.sectors.find(s => s.id === loadedSourceId.value)
-    return sector?.name || t('map.resource_filter_loader_custom')
+  if (loadedSourceType.value === 'empire') {
+    const empire = blueprintStore.savedEmpires.list.find(e => e.id === loadedSourceId.value)
+    return empire?.name || t('map.resource_filter_loader_custom')
   }
   if (loadedSourceType.value === 'logicflow') {
     const plan = logicFlowStore.savedPlans.list.find(p => p.id === loadedSourceId.value)
@@ -158,18 +158,17 @@ const loaderCurrentLabel = computed(() => {
   return t('map.resource_filter_loader_custom')
 })
 
-const loadableSectors = computed(() => {
-  const sectors = empireStore.sectors
-  const stations = empireStore.activeEmpire?.stations || []
-  return sectors.filter(sector => {
-    const sectorStations = stations.filter(s => s.sectorId === sector.id)
-    return sectorStations.some(station => {
+const loadableEmpires = computed(() => {
+  const empires = blueprintStore.savedEmpires.list
+  return empires.filter(empire => {
+    const stations = empire.stations || []
+    return stations.some(station => {
       const flows = stationStateMap.getGroupedFlows(station.id)
       return flows.rateGroups.resources.length > 0
     })
-  }).map(sector => ({
-    id: sector.id,
-    name: sector.name
+  }).map(empire => ({
+    id: empire.id,
+    name: empire.name || empire.id
   }))
 })
 
@@ -198,12 +197,14 @@ const closeLoaderMenu = () => {
   loaderMenuOpen.value = false
 }
 
-const loadSectorStations = (sectorId: string) => {
-  const stations = empireStore.activeEmpire?.stations || []
-  const sectorStations = stations.filter(s => s.sectorId === sectorId)
+const loadEmpireStations = (empireId: string) => {
+  const empire = blueprintStore.savedEmpires.list.find(e => e.id === empireId)
+  if (!empire) return
+  
+  const stations = empire.stations || []
   
   const newGroups: AdvancedResourceTagGroup[] = []
-  for (const station of sectorStations) {
+  for (const station of stations) {
     const flows = stationStateMap.getGroupedFlows(station.id)
     const resourceWares = flows.rateGroups.resources.map(f => f.wareId)
     if (resourceWares.length === 0) continue
@@ -218,8 +219,8 @@ const loadSectorStations = (sectorId: string) => {
   
   if (newGroups.length > 0) {
     draftTagGroups.value = newGroups
-    loadedSourceId.value = sectorId
-    loadedSourceType.value = 'sector'
+    loadedSourceId.value = empireId
+    loadedSourceType.value = 'empire'
     expandedGroupId.value = null
     refreshCandidates()
   }
@@ -903,17 +904,15 @@ const getGroupSharedMinYieldName = (group: AdvancedResourceTagGroup) =>
         <div class="loader-menu-group">
           <div class="loader-menu-group-title">{{ t('map.resource_filter_loader_group_sectors') }}</div>
           <button
-            v-for="sector in loadableSectors"
-            :key="sector.id"
+            v-for="empire in loadableEmpires"
+            :key="empire.id"
             type="button"
             class="loader-menu-item"
-            :class="{ active: loadedSourceType === 'sector' && loadedSourceId === sector.id }"
-            :data-testid="`map-resource-advanced-loader-sector-${sector.id}`"
-            @click="loadSectorStations(sector.id)"
+            @click="loadEmpireStations(empire.id)"
           >
-            {{ sector.name }}
+            <span>{{ empire.name }}</span>
           </button>
-          <div v-if="loadableSectors.length === 0" class="loader-menu-empty">
+          <div v-if="loadableEmpires.length === 0" class="loader-menu-empty">
             {{ t('map.resource_filter_loader_no_sectors') }}
           </div>
         </div>

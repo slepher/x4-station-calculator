@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
@@ -28,7 +28,7 @@ const emit = defineEmits<{
 }>()
 
 const { t, te } = useI18n()
-const empireStore = useEmpireStore()
+const blueprintStore = useBlueprintProductionStore()
 const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
 const saveBindingStore = useSaveBindingStore()
@@ -61,18 +61,17 @@ const activeBindingPlan = computed(() => {
   if (saveBindingStore.activeBinding?.gameGuid === props.gameGuid) return saveBindingStore.activeBinding
   return saveBindingStore.getBindingByGameGuid(props.gameGuid)
 })
-const blueprintEmpires = computed(() => empireStore.savedEmpires?.list || [])
+const blueprintEmpires = computed(() => blueprintStore.savedEmpires?.list || [])
 const selectedBlueprintEmpireId = computed(() => (
   activeBindingPlan.value?.blueprintEmpireId ||
-  empireStore.activeEmpireId ||
-  empireStore.activeEmpire?.id ||
+  blueprintStore.activeEmpire?.id ||
   blueprintEmpires.value[0]?.id ||
   null
 ))
 const blueprintEmpire = computed(() => {
   const id = selectedBlueprintEmpireId.value
   if (!id) return null
-  if (empireStore.activeEmpire?.id === id) return empireStore.activeEmpire
+  if (blueprintStore.activeEmpire?.id === id) return blueprintStore.activeEmpire
   return blueprintEmpires.value.find((empire) => empire.id === id) || null
 })
 

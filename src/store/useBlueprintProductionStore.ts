@@ -7,7 +7,8 @@ import type {
   SavedModule,
   GroupedFlows,
   StationSettings,
-  X4Module
+  X4Module,
+  EntityLocation
 } from '@/types/x4'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import type { ProductionSessionContext } from '@/types/production-context'
@@ -21,6 +22,7 @@ import {
   buildStationComputeDeps,
   syncPersistedToStateMap,
   recomputeStation,
+  getGroupedFlows,
   getFilteredGroupedFlows,
   clearStationState,
   getStationState,
@@ -219,7 +221,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   const groupedFlows = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
-    return getFilteredGroupedFlows(stationId)
+    return getGroupedFlows(stationId)
   })
 
   const stationAnalysis = computed(() => {
@@ -509,6 +511,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     refreshStationFlowCache(stationId)
   }
 
+  function setStationLocation(stationId: string, location: EntityLocation | null): boolean {
+    return empireDataStore.setStationLocationInEmpire(activeEmpire.value, stationId, location)
+  }
+
   function applyImportedStationPayload(
     stationId: string,
     payload: { modules: SavedModule[]; lockedWares: string[]; warePriority: Record<string, number> }
@@ -776,6 +782,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateStationType,
     updateStationCount,
     updateStationMinerals,
+    setStationLocation,
     applyImportedStationPayload,
     updateEmpireName,
     takeSnapshot,

@@ -113,7 +113,8 @@ export interface ImportApplyOptions {
   payload: NormalizedImportPayload
   preparedPayload?: PreparedImportPayload
   gameDataStore: GameDataStoreLike
-  empireStore: EmpireStoreLike
+  blueprintStore: BlueprintProductionStoreLike
+  liveStore?: LiveProductionStoreLike
   logicFlowStore: LogicFlowStoreLike
   shipBuildStore: ShipBuildStoreLike
   saveStore?: SaveStoreLike
@@ -127,14 +128,18 @@ export interface ImportApplyResult {
   sanitizeSummaries: ImportSanitizeSummary[]
 }
 
-interface EmpireStoreLike {
+interface BlueprintProductionStoreLike {
   savedEmpires: SavedEmpiresState
-  activeEmpireId: string | null
   isDirty: boolean
   loadEmpire?: (empireId: string) => void
   loadData: (data: SavedEmpiresState) => void
   initializeAllStationCaches: () => void
   saveToStorage: () => void
+}
+
+interface LiveProductionStoreLike {
+  savedBindings?: SavedSaveBindingsState
+  isDirty?: boolean
 }
 
 interface LogicFlowStoreLike {
@@ -1104,7 +1109,7 @@ function applyEmpireImport(options: ImportApplyOptions, warnings: string[]): boo
   const preparedPayload = options.preparedPayload || prepareImportPayload(options.payload, options.gameDataStore, options.shipBuildStore)
   const migrated = preparedPayload.preparedModules[EMPIRE_KEY] as SavedEmpiresState | undefined
   if (!migrated) return false
-  const current = deepClone(options.empireStore.savedEmpires)
+  const current = deepClone(options.blueprintStore.savedEmpires)
 
   let next: SavedEmpiresState
   let incomingActiveId: string | null = migrated.activeId || null
@@ -1115,7 +1120,7 @@ function applyEmpireImport(options: ImportApplyOptions, warnings: string[]): boo
     incomingActiveId = remapped.state.activeId
     next = mergeEmpireState(current, remapped.state)
 
-    const canUpdate = shouldUpdateActiveIncremental(current.activeId, isEmpireActiveEmpty(current), options.empireStore.isDirty)
+    const canUpdate = shouldUpdateActiveIncremental(current.activeId, isEmpireActiveEmpty(current), options.blueprintStore.isDirty)
     if (canUpdate && incomingActiveId) {
       next.activeId = incomingActiveId
     } else {
@@ -1129,11 +1134,11 @@ function applyEmpireImport(options: ImportApplyOptions, warnings: string[]): boo
   }
 
   persistModule(EMPIRE_KEY, next, options.gameDataStore)
-  options.empireStore.loadData(next)
-  options.empireStore.initializeAllStationCaches()
-  options.empireStore.saveToStorage()
+  options.blueprintStore.loadData(next)
+  options.blueprintStore.initializeAllStationCaches()
+  options.blueprintStore.saveToStorage()
   if (next.activeId) {
-    options.empireStore.loadEmpire?.(next.activeId)
+    options.blueprintStore.loadEmpire?.(next.activeId)
   }
   return true
 }

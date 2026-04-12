@@ -257,6 +257,29 @@
 - [x] T169. 调整 `ImportPlanModal` 导入确认流程，按 blueprint/live 入口分别调用对应 toolbar workflow 分支
 - [ ] T170. 补充 unit/e2e 回归：覆盖 blueprint/live toolbar 动作路由、live 禁用态、load modal 分流
 - [x] T171. 运行 `npm run build` 与相关测试验证 toolbar 改造不回归
+
+## 后续修正 - useEmpireStore 全应用移除
+
+- [x] T172. 新增 `empire-store-remove.md`，明确全应用移除 `useEmpireStore` 的目标边界、分阶段路线与完成定义
+- [x] T173. Phase 1: 删除 `src/components/VersionSettingsModal.vue` 对 `useEmpireStore` 的依赖，改读 `useBlueprintProductionStore`
+- [x] T174. Phase 1: 删除 `src/components/empire/LoadPlanModal.vue` 的主路径依赖或完成下线，确保 production 主路径不再通过该文件读取 `useEmpireStore`
+- [x] T175. Phase 1: 运行源码引用检查，确认 toolbar/load/version 阶段完成后，`rg -n "useEmpireStore" src/components src/composables src/App.vue` 不再命中上述文件
+- [x] T176. Phase 2: 删除 `src/components/StorageImportWizard.vue` 对 `useEmpireStore` 的依赖
+- [x] T177. Phase 2: 删除 `src/components/StorageExportWizard.vue` 对 `useEmpireStore` 的依赖
+- [x] T178. Phase 2: 重构 `src/store/logic/importExport.ts`，将 empire/binding 输入改为显式真实 domain stores，禁止继续传 `empireStore`
+- [x] T179. Phase 2: 运行源码引用检查，确认 import/export 阶段完成后不再命中 `StorageImportWizard.vue` / `StorageExportWizard.vue`
+- [x] T180. Phase 3: 删除 `src/components/map/MapSavePanel.vue` 对 `useEmpireStore` 的依赖；save-before-bind 与 dirty confirm 改读 `useBlueprintProductionStore` / `useLiveProductionStore`
+- [x] T181. Phase 3: 删除 `src/components/map/MapBindingStation.vue` 对 `useEmpireStore` 的依赖
+- [x] T182. Phase 3: 删除 `src/composables/useMapBindingViewModel.ts` 对 `useEmpireStore` 的依赖
+- [x] T183. Phase 3: 删除 `src/components/map/MapWorkbenchView.vue` 对 `useEmpireStore` 的依赖
+- [x] T184. Phase 3: 删除 `src/components/map/MapResourceFilterAdvancedPanel.vue` 对 `useEmpireStore` 的依赖；将 loader 从 sector 列表改为 empire 列表，选择 empire 后加载该 empire 的全部 stations
+- [x] T185. Phase 3: 运行源码引用检查，确认 map 阶段完成后不再命中 map 相关文件
+- [x] T186. Phase 4: 删除 `src/App.vue` 对 `useEmpireStore` 的 import、初始化、ready gate 依赖与 `window.empireStore` 测试桥
+- [x] T187. Phase 4: 运行源码引用检查，确认 `rg -n "useEmpireStore" src` 只剩 `src/store/useEmpireStore.ts`
+- [ ] T188. Phase 5: 删除 `src/store/useEmpireStore.ts`
+- [ ] T189. Phase 5: 迁移 `tests/` 中全部 `useEmpireStore` import / mock / window bridge，改用真实 owning stores
+- [ ] T190. Phase 5: 运行最终引用检查，确认 `rg -n "useEmpireStore" src tests` 无结果
+- [ ] T191. 运行最终验证：至少执行 `npm run build`，并补充覆盖 toolbar、map、import/export、version switch 的相关 unit/e2e 测试
 - [ ] T119. 在 `BlueprintProductionWorkbenchView` / `LiveProductionWorkbenchView` 主路径稳定后，移除 `useEmpireStore` 中对 binding 的主路径编排职责
 - [ ] T120. 在两个新入口主路径稳定后，移除 `useStationStore` 中基于 `productionSource` 的写路由，改为显式接入对应入口 command
 - [ ] T121. 补充入口级回归测试：分别验证 `BlueprintProductionWorkbenchView` 与 `LiveProductionWorkbenchView` 下的 station 选择、overview、transit、dirty/save 语义

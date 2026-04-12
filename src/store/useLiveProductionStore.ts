@@ -23,6 +23,7 @@ import {
   buildStationComputeDeps,
   syncPersistedToStateMap,
   recomputeStation,
+  getGroupedFlows,
   getFilteredGroupedFlows,
   clearStationState,
   getStationState,
@@ -266,7 +267,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const groupedFlows = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
-    return getFilteredGroupedFlows(stationId)
+    return getGroupedFlows(stationId)
   })
 
   const stationAnalysis = computed(() => {

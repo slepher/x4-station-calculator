@@ -1,16 +1,14 @@
 <script setup lang="ts">
-import { computed, ref, watch, reactive } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
 import MapSaveCoordList from './MapSaveCoordList.vue'
 import MapBindingSectorGroup from './MapBindingSectorGroup.vue'
 import MapBindingStation from './MapBindingStation.vue'
-import SmartSaveDialog from '@/components/common/SmartSaveDialog.vue'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 import type { StationPlan } from '@/types/x4'
 
@@ -37,16 +35,12 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
-const empireStore = useEmpireStore()
 
 const layer = ref<PanelLayer>('list')
 const selectedCategory = ref<SavePoiCategory | null>(null)
 const selectedBindingGameGuid = ref<string | null>(null)
 const selectedSectorGroupId = ref<string | null>(null)
-const smartSaveDialog = reactive({
-  isOpen: false,
-  pendingBindPayload: null as { guid: string; time: number | null } | null
-})
+
 interface BreadcrumbItem {
   key: string
   label: string
@@ -158,54 +152,27 @@ async function onArchiveNavigate(payload: { guid: string; time: number | null })
 }
 
 async function onArchiveBind(payload: { guid: string; time: number | null }) {
-    const result = empireStore.switchToBinding(payload.guid)
-    if (result.needsConfirm) {
-      smartSaveDialog.isOpen = true
-      smartSaveDialog.pendingBindPayload = payload
-      return
-    }
+  await proceedToBinding(payload)
+}
 
-    await proceedToBinding(payload)
-  }
+async function proceedToBinding(payload: { guid: string; time: number | null }) {
+  saveBindingStore.createOrOpenBinding(payload.guid, payload.time)
 
-  async function proceedToBinding(payload: { guid: string; time: number | null }) {
-    saveBindingStore.createOrOpenBinding(payload.guid, payload.time)
-
-    const effectiveTime = payload.time ?? getLatestTime(payload.guid)
-    if (payload.time === null) {
-      await saveStore.selectArchiveGroup(payload.guid)
-      if (effectiveTime !== null) {
-        emit('select-archive', { guid: payload.guid, time: effectiveTime })
-      }
-    } else if (effectiveTime !== null) {
-      await saveStore.selectArchive(payload.guid, effectiveTime)
+  const effectiveTime = payload.time ?? getLatestTime(payload.guid)
+  if (payload.time === null) {
+    await saveStore.selectArchiveGroup(payload.guid)
+    if (effectiveTime !== null) {
       emit('select-archive', { guid: payload.guid, time: effectiveTime })
     }
-
-    selectedBindingGameGuid.value = payload.guid
-    selectedSectorGroupId.value = null
-    layer.value = 'binding-sector'
+  } else if (effectiveTime !== null) {
+    await saveStore.selectArchive(payload.guid, effectiveTime)
+    emit('select-archive', { guid: payload.guid, time: effectiveTime })
   }
 
-  function handleSmartSaveDialogClose() {
-    smartSaveDialog.isOpen = false
-    smartSaveDialog.pendingBindPayload = null
-  }
-
-  function handleSmartSaveDialogSubmitImport(payload: { choice: 'SAVE_AND_IMPORT' | 'DISCARD_AND_IMPORT' }) {
-    if (payload.choice === 'SAVE_AND_IMPORT') {
-      empireStore.saveEmpire()
-    }
-
-    const pending = smartSaveDialog.pendingBindPayload
-    smartSaveDialog.isOpen = false
-    smartSaveDialog.pendingBindPayload = null
-
-    if (pending) {
-      empireStore.confirmSwitchToBinding(pending.guid)
-      proceedToBinding(pending)
-    }
-  }
+  selectedBindingGameGuid.value = payload.guid
+  selectedSectorGroupId.value = null
+  layer.value = 'binding-sector'
+}
 
 function onCategorySelect(category: SavePoiCategory) {
   selectedCategory.value = category
@@ -357,16 +324,7 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
         @drag-station-end="emit('drag-station-end')"
       />
     </div>
-
   </aside>
-
-  <SmartSaveDialog
-    :is-open="smartSaveDialog.isOpen"
-    intent="NEW"
-    mode="import"
-    @close="handleSmartSaveDialogClose"
-    @submit-import="handleSmartSaveDialogSubmitImport"
-  />
 </template>
 
 <style scoped>

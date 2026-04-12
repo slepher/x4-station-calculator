@@ -1,5 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
@@ -78,7 +78,7 @@ export interface MapBindingViewModel {
 }
 
 export function useMapBindingViewModel(): MapBindingViewModel {
-  const empireStore = useEmpireStore()
+  const blueprintStore = useBlueprintProductionStore()
   const saveStore = useSaveStore()
   const gameDataStore = useGameDataStore()
   const saveBindingStore = useSaveBindingStore()
@@ -167,7 +167,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
   }
 
   function getEmpireStationsForSector(sectorGroupId: string): EmpireStationBindingInfo[] {
-    const empire = empireStore.activeEmpire
+    const empire = blueprintStore.activeEmpire
     if (!empire) return []
 
     const stations = empire.stations
@@ -188,7 +188,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
   }
 
   function getIdleEmpireStations(): EmpireStationBindingInfo[] {
-    const empire = empireStore.activeEmpire
+    const empire = blueprintStore.activeEmpire
     if (!empire) return []
 
     const bindingKey = activeBindingPlan.value?.gameGuid
@@ -207,7 +207,7 @@ export function useMapBindingViewModel(): MapBindingViewModel {
   }
 
   function getGroupBindings(): GroupBindingInfo[] {
-    const empire = empireStore.activeEmpire
+    const empire = blueprintStore.activeEmpire
     if (!empire) return []
 
     const sectors = activeBindingPlan.value?.groups || []

@@ -15,7 +15,7 @@ import { hexVertices } from '@/components/map/utils/geometry'
 import { resolveMapSectorByMacro, resolveSectorMacroById } from '@/components/map/utils/mapSectorMacro'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useMapStore } from '@/store/useMapStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
@@ -199,7 +199,7 @@ const { t, te, locale } = useI18n()
 const gameDataStore = useGameDataStore()
 const mapStore = useMapStore()
 const saveStore = useSaveStore()
-const empireStore = useEmpireStore()
+const blueprintStore = useBlueprintProductionStore()
 const saveBindingStore = useSaveBindingStore()
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
@@ -1140,7 +1140,7 @@ const applyLocationToItem = (item: DraggingPlacementItem, location: EntityLocati
         })
       }
     } else {
-      empireStore.setStationLocation(item.id, location)
+      blueprintStore.setStationLocation(item.id, location)
     }
     return
   }

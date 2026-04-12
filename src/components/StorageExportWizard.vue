@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
@@ -25,7 +25,7 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const empireStore = useEmpireStore()
+const blueprintStore = useBlueprintProductionStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
@@ -59,7 +59,7 @@ watch(
     includeSaveArchives.value = false
     
     const basePayload = buildExportPayload(
-      empireStore.savedEmpires,
+      blueprintStore.savedEmpires,
       logicFlowStore.savedPlans,
       shipBuildStore.savedBlueprints,
       gameDataStore,
@@ -108,7 +108,7 @@ const handleDownload = async () => {
   const withExt = raw ? (raw.endsWith('.json') ? raw : `${raw}.json`) : buildDefaultFileName()
   
   const basePayload = buildExportPayload(
-    empireStore.savedEmpires,
+    blueprintStore.savedEmpires,
     logicFlowStore.savedPlans,
     shipBuildStore.savedBlueprints,
     gameDataStore,

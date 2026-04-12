@@ -6,7 +6,6 @@ import TestTemplateFlow from './components/test/GLM-Parent.vue'
 import MetricPanelPlayground from './components/test/MetricPanelPlayground.vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
@@ -17,7 +16,6 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
-const empireStore = useEmpireStore()
 const shipBuildStore = useShipBuildStore()
 const blueprintStore = useBlueprintProductionStore()
 const liveStore = useLiveProductionStore()
@@ -40,7 +38,8 @@ async function initializeApp() {
     await saveStore.initialize()
     await saveBindingStore.initialize()
     
-    await empireStore.initialize()
+    await blueprintStore.initialize()
+    await liveStore.initialize()
     
     await Promise.all([
       logicFlowStore.init(),
@@ -73,7 +72,7 @@ onMounted(() => {
   }
 })
 
-const isReady = computed(() => empireStore.isReady && gameDataStore.isReady)
+const isReady = computed(() => blueprintStore.isReady && gameDataStore.isReady)
 
 const checkExportStores = () => {
   const isTest = (window as any).isTestEnv ||
@@ -87,7 +86,6 @@ const checkExportStores = () => {
       (window as any).liveStore = liveStore;
       (window as any).gameDataStore = gameDataStore;
       (window as any).logicFlowStore = logicFlowStore;
-      (window as any).empireStore = empireStore;
       (window as any).shipBuildStore = shipBuildStore;
       (window as any).saveBindingStore = saveBindingStore;
       (window as any).saveStore = saveStore;
@@ -112,7 +110,7 @@ setTimeout(checkExportStores, 500);
     <TestTemplateFlow v-else-if="currentView === 'template-flow'" />
     <MetricPanelPlayground v-else-if="currentView === 'metric-panel-test'" />
     <MainWorkbench v-else-if="isReady"/>
-    <div v-else class="loading-gate">Initializing... (GameData: {{ gameDataStore.isReady }}, Empire: {{ empireStore.isReady }})</div>
+    <div v-else class="loading-gate">Initializing... (GameData: {{ gameDataStore.isReady }}, Blueprint: {{ blueprintStore.isReady }})</div>
   </div>
 </template>
 

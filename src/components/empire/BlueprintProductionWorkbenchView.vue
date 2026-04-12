@@ -261,17 +261,7 @@ const stationWareFlowsModel = useStationWareFlowsModel({
 
 const stationDashboardModel = useStationDashboardModel({
   plannedModules: computed(() => blueprintStore.plannedModules as SavedModule[]),
-  stationAnalysis: computed(() => ({
-    totalCost: blueprintStore.stationAnalysis.totalCost,
-    totalVolume: blueprintStore.stationAnalysis.totalVolume,
-    totalNeeded: blueprintStore.stationAnalysis.totalNeeded,
-    totalCapacity: blueprintStore.stationAnalysis.totalCapacity,
-    totalTime: blueprintStore.stationAnalysis.totalTime,
-    playerHQNeeded: blueprintStore.stationAnalysis.playerHQNeeded,
-    totalWorkerDiff: blueprintStore.stationAnalysis.totalWorkerDiff || 0,
-    moduleGroups: blueprintStore.stationAnalysis.moduleGroups,
-    summaryItems: blueprintStore.stationAnalysis.summaryItems
-  })),
+  stationAnalysis: computed(() => blueprintStore.stationAnalysis) as any,
   settings: computed(() => ({
     transportShipCapacity: blueprintStore.settings.transportShipCapacity,
     workforceAuto: blueprintStore.settings.workforceAuto,
