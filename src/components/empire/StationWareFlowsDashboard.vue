@@ -1,10 +1,9 @@
 <script setup lang="tsx">
 import { computed } from 'vue'
-import { useStationStore } from '@/store/useStationStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
-import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
-import { useI18n } from 'vue-i18n';
+import { useI18n } from 'vue-i18n'
+import type { GroupedFlows, SavedModule } from '@/types/x4'
+import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -13,58 +12,70 @@ import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 
-const store = useStationStore()
-const empireStore = useEmpireStore()
-const gameData = useGameDataStore()
-const { t, locale } = useI18n();
-const { translateWare } = useX4I18n()
-
-type ViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
-
-const props = withDefaults(defineProps<{
-  viewMode?: ViewMode
-}>(), {
-  viewMode: 'quantity'
-})
-
-const emit = defineEmits<{
-  (e: 'update:viewMode', value: ViewMode): void
+const props = defineProps<{
+  viewMode: WareFlowViewMode
+  groupedFlows: GroupedFlows
+  settings: {
+    resourceBufferHours: number
+    primaryProductBufferHours: number
+    secondaryProductBufferHours: number
+    buyMultiplier: number
+    sellMultiplier: number
+    racePreference: string
+    showEmpireGaps: boolean
+  }
+  empireGaps: {
+    operations: EmpireGapItem[]
+    supply: EmpireGapItem[]
+  }
+  plannedModules: SavedModule[]
+  wares: Record<string, any>
 }>()
 
-const viewMode = computed<ViewMode>({
+const emit = defineEmits<{
+  updateViewMode: [value: WareFlowViewMode]
+  updateResourceBufferHours: [value: number]
+  updatePrimaryProductBufferHours: [value: number]
+  updateSecondaryProductBufferHours: [value: number]
+  updateBuyMultiplier: [value: number]
+  updateSellMultiplier: [value: number]
+  addGapModule: [wareId: string]
+  removeGapModule: [wareId: string]
+}>()
+
+const { t, locale } = useI18n()
+const { translateWare } = useX4I18n()
+
+const viewMode = computed<WareFlowViewMode>({
   get: () => props.viewMode,
-  set: (value) => emit('update:viewMode', value)
+  set: (value) => emit('updateViewMode', value)
 })
 
-// 格式化函数
-const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
-
-// 从store获取已排序和分组好的数据
-const groupedFlows = computed(() => store.groupedFlows)
 const resourceBufferHours = computed({
-  get: () => store.settings.resourceBufferHours,
-  set: (val: number) => store.updateSetting('resourceBufferHours', val)
+  get: () => props.settings.resourceBufferHours,
+  set: (val: number) => emit('updateResourceBufferHours', val)
 })
 const primaryProductBufferHours = computed({
-  get: () => store.settings.primaryProductBufferHours,
-  set: (val: number) => store.updateSetting('primaryProductBufferHours', val)
+  get: () => props.settings.primaryProductBufferHours,
+  set: (val: number) => emit('updatePrimaryProductBufferHours', val)
 })
 const secondaryProductBufferHours = computed({
-  get: () => store.settings.secondaryProductBufferHours,
-  set: (val: number) => store.updateSetting('secondaryProductBufferHours', val)
+  get: () => props.settings.secondaryProductBufferHours,
+  set: (val: number) => emit('updateSecondaryProductBufferHours', val)
 })
 const buyMultiplier = computed({
-  get: () => store.settings.buyMultiplier,
-  set: (val: number) => store.updateSetting('buyMultiplier', val)
+  get: () => props.settings.buyMultiplier,
+  set: (val: number) => emit('updateBuyMultiplier', val)
 })
 const sellMultiplier = computed({
-  get: () => store.settings.sellMultiplier,
-  set: (val: number) => store.updateSetting('sellMultiplier', val)
+  get: () => props.settings.sellMultiplier,
+  set: (val: number) => emit('updateSellMultiplier', val)
 })
 
-// 辅助函数：为UI提供名称翻译后的包装对象
+const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
+
 const wrapFlow = (flow: any) => {
-  const wareInfo = store.wares[flow.wareId]
+  const wareInfo = props.wares[flow.wareId]
   return {
     id: flow.wareId,
     name: wareInfo ? translateWare(wareInfo) : flow.wareId,
@@ -72,73 +83,12 @@ const wrapFlow = (flow: any) => {
   }
 }
 
-const getModuleForWare = (wareId: string) =>
-  gameData.findModuleForWare(wareId, store.settings.racePreference)
-
-const getPlannedModuleIndex = (moduleId: string) =>
-  store.plannedModules.findIndex(module => module.id === moduleId)
-
-const empireFlowByWareId = computed(() => {
-  const map = new Map<string, any>()
-  const groups = empireStore.empireGroupedFlows.empireGroups
-  groups.operations.forEach(flow => map.set(flow.wareId, flow))
-  groups.supply.forEach(flow => map.set(flow.wareId, flow))
-  return map
-})
-
-const componentGapFlows = computed(() => {
-  return empireStore.getStationComponentGapFlows(empireStore.activeStation?.id || null)
-})
-
-const empireGaps = computed(() => {
-  const flows = componentGapFlows.value
-  store.plannedModules
-  locale.value
-  const byTierThenName = (a: any, b: any) => {
-    const tierA = Number(a.tier ?? 0)
-    const tierB = Number(b.tier ?? 0)
-    if (tierA !== tierB) return tierB - tierA
-    const nameA = String(a.name || '')
-    const nameB = String(b.name || '')
-    const nameCmp = nameA.localeCompare(nameB, 'en')
-    if (nameCmp !== 0) return nameCmp
-    return String(a.id || '').localeCompare(String(b.id || ''), 'en')
-  }
-  const operations = flows.operations
-    .filter((flow: any) => flow.netRate < 0 || store.getResolvedLevel(flow.wareId) > 0)
-    .map((flow: any) => {
-      const module = getModuleForWare(flow.wareId)
-      const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
-      return {
-        ...wrapFlow(flow),
-        disableAdd: !module || flow.netRate > 0,
-        disableRemove: !module || plannedIndex === -1
-      }
-    })
-    .sort(byTierThenName)
-  return {
-    operations,
-    supply: flows.supply
-      .map((flow: any) => {
-        const module = getModuleForWare(flow.wareId)
-        const plannedIndex = module ? getPlannedModuleIndex(module.id) : -1
-        return {
-          ...wrapFlow(flow),
-          disableAdd: !module || flow.netRate > 0,
-          disableRemove: !module || plannedIndex === -1
-        }
-      })
-      .filter((flow: any) => flow.netRate <= 0 || !flow.disableRemove)
-      .sort(byTierThenName)
-  }
-})
 const hasEmpireGapItems = computed(() =>
-  empireGaps.value.operations.length > 0 || empireGaps.value.supply.length > 0
+  props.empireGaps.operations.length > 0 || props.empireGaps.supply.length > 0
 )
 
-// 总利润计算
 const totalProfit = computed(() => {
-  return groupedFlows.value.flows.reduce((sum, flow) => sum + flow.netValue, 0)
+  return props.groupedFlows.flows.reduce((sum, flow) => sum + flow.netValue, 0)
 })
 
 const getGroupVolume = (group: any[]) => 
@@ -154,7 +104,7 @@ const getGroupSymboledValue = (group: any[]) => {
   const value = group.reduce((sum, item) => sum + Math.abs(item.netValue || 0), 0)
   const symbol = value >= 0 ? '+' : '-'
   return symbol + formatNum(Math.abs(value))
-  }
+}
 
 const title = () => {
   if (viewMode.value === 'quantity') {
@@ -168,31 +118,32 @@ const title = () => {
   }
 }
 
-const views = computed<{key: ViewMode; label: string}[]>(() => {
+const views = computed<{key: WareFlowViewMode; label: string}[]>(() => {
   locale.value
   return [
-  {key: 'quantity', label: t('wareflow.quantity_view')},
-  {key: 'economy', label: t('wareflow.economy_view')},
-  {key: 'volume', label: t('wareflow.volume_view')},
-  {key: 'transport', label: t('wareflow.transport_view')}
-]})
+    {key: 'quantity', label: t('wareflow.quantity_view')},
+    {key: 'economy', label: t('wareflow.economy_view')},
+    {key: 'volume', label: t('wareflow.volume_view')},
+    {key: 'transport', label: t('wareflow.transport_view')}
+  ]
+})
 
 const volumeGroups = computed(() => [
   {key: 'container', title: t('wareflow.container_group'),
-   items: groupedFlows.value.volumeGroups.container.map(wrapFlow)},
+   items: props.groupedFlows.volumeGroups.container.map(wrapFlow)},
   {key: 'solid', title: t('wareflow.solid_group'),
-   items: groupedFlows.value.volumeGroups.solid.map(wrapFlow)},
+   items: props.groupedFlows.volumeGroups.solid.map(wrapFlow)},
   {key: 'liquid', title: t('wareflow.liquid_group'),
-   items: groupedFlows.value.volumeGroups.liquid.map(wrapFlow)}
+   items: props.groupedFlows.volumeGroups.liquid.map(wrapFlow)}
 ])
 
 const transportGroups = computed(() => [
   {key: 'container', title: t('wareflow.container_group'),
-   items: groupedFlows.value.volumeGroups.container.map(wrapFlow)},
+   items: props.groupedFlows.volumeGroups.container.map(wrapFlow)},
   {key: 'solid', title: t('wareflow.solid_group'),
-   items: groupedFlows.value.volumeGroups.solid.map(wrapFlow)},
+   items: props.groupedFlows.volumeGroups.solid.map(wrapFlow)},
   {key: 'liquid', title: t('wareflow.liquid_group'),
-   items: groupedFlows.value.volumeGroups.liquid.map(wrapFlow)}
+   items: props.groupedFlows.volumeGroups.liquid.map(wrapFlow)}
 ])
 
 const rateGroups = computed(() => ([
@@ -201,49 +152,36 @@ const rateGroups = computed(() => ([
    title: viewMode.value === 'economy'
      ? t('wareflow.income_group')
      : t('wareflow.products_group'),
-   items: groupedFlows.value.rateGroups.positive.map(wrapFlow)},
+   items: props.groupedFlows.rateGroups.positive.map(wrapFlow)},
   {key: 'operations',
    symbolClass: "negative",
    title: viewMode.value === 'economy'
      ? t('wareflow.expenses_operations_group')
      : t('wareflow.operations_group'),
-   items: groupedFlows.value.rateGroups.operations.map(wrapFlow)},
+   items: props.groupedFlows.rateGroups.operations.map(wrapFlow)},
   {key: 'supply',
    symbolClass: "negative",
    title: viewMode.value === 'economy'
      ? t('wareflow.expenses_supply_group')
      : t('wareflow.supply_group'),
-   items: groupedFlows.value.rateGroups.supply.map(wrapFlow)},
+   items: props.groupedFlows.rateGroups.supply.map(wrapFlow)},
   {key: 'resources', 
    symbolClass: "negative",
    title: viewMode.value === 'economy'
      ? t('wareflow.expenses_resources_group')
      : t('wareflow.resources_group'),
-   items: groupedFlows.value.rateGroups.resources.map(wrapFlow)}
+   items: props.groupedFlows.rateGroups.resources.map(wrapFlow)}
 ]))
 
 const handleAddModule = (wareId: string) => {
-  const module = getModuleForWare(wareId)
-  if (!module) return
-  const flow = empireFlowByWareId.value.get(wareId)
-  if (flow && flow.netRate > 0) return
-  store.addModule(module.id, 1)
+  emit('addGapModule', wareId)
 }
 
 const handleRemoveModule = (wareId: string) => {
-  const module = getModuleForWare(wareId)
-  if (!module) return
-  const plannedIndex = getPlannedModuleIndex(module.id)
-  if (plannedIndex === -1) return
-  const current = store.plannedModules[plannedIndex]?.count ?? 0
-  if (current <= 1) {
-    store.removeModule(plannedIndex)
-  } else {
-    store.updateModuleCount(plannedIndex, current - 1)
-  }
+  emit('removeGapModule', wareId)
 }
 
-const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
+const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
 </script>
 
 <template>
@@ -259,7 +197,6 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
     </div>
 
     <div class="list-body custom-scrollbar">
-      <!-- 体积视图：显示分组数据 -->
       <div v-if="viewMode === 'volume'" class="volume-groups-container">
         <StationWareFlowGroup v-for="(group, index) in volumeGroups" :key="index"
             :title="group.title"
@@ -305,13 +242,12 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
         </StationWareFlowGroup>
       </div>
 
-      <!-- 通用分组视图：根据当前视图模式显示对应的数据 -->
       <div v-if="viewMode === 'economy' || viewMode === 'quantity'" class="volume-groups-container">
-          <div v-if="store.settings.showEmpireGaps && viewMode === 'quantity' && hasEmpireGapItems" class="empire-gap-groups">
-            <div v-if="empireGaps.operations.length > 0" class="empire-gap-group">
+          <div v-if="props.settings.showEmpireGaps && viewMode === 'quantity' && hasEmpireGapItems" class="empire-gap-groups">
+            <div v-if="props.empireGaps.operations.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
                 :title="t('wareflow.sector_operations')"
-                :items="empireGaps.operations"
+                :items="props.empireGaps.operations"
                 :viewMode="viewMode"
                 :showAddButton="true"
                 :showRemoveButton="true"
@@ -319,10 +255,10 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
                 @remove="handleRemoveModule"
               />
             </div>
-            <div v-if="empireGaps.supply.length > 0" class="empire-gap-group">
+            <div v-if="props.empireGaps.supply.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
                 :title="t('wareflow.sector_supply')"
-                :items="empireGaps.supply"
+                :items="props.empireGaps.supply"
                 :viewMode="viewMode"
                 :showAddButton="true"
                 :showRemoveButton="true"
@@ -331,7 +267,6 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
               />
             </div>
           </div>
-          <!-- 产品/收入组 -->
           <StationWareFlowGroup v-for="group in rateGroups" :key="group.key"
             :title="group.title" 
             :items="group.items" 
@@ -341,14 +276,12 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
               {{ getGroupSymboledValue(group.items) }} Cr 
             </span> 
           </StationWareFlowGroup>
-        <!-- 经济视图空状态 -->
-        <EmptyState v-if="viewMode === 'economy' && groupedFlows.flows.length === 0" />
+        <EmptyState v-if="viewMode === 'economy' && props.groupedFlows.flows.length === 0" />
       </div>
 
-      <EmptyState v-if="groupedFlows.flows.length === 0 && viewMode !== 'economy'" />
+      <EmptyState v-if="props.groupedFlows.flows.length === 0 && viewMode !== 'economy'" />
     </div>
 
-    <!-- 体积控件部分 -->
     <div class="volume-controls-section" v-if="hasFlowData && viewMode === 'volume'">
       <div class="simulation-controls flex flex-row gap-4">
         <VolumeControlSlider
@@ -372,14 +305,12 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
       </div>
     </div>
 
-    <!-- 利润分析部分 -->
     <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'">
       <div class="simulation-controls flex flex-row gap-4">
         <PriceSlider v-model="buyMultiplier" :label="t('wareflow.res_price')" type="buy" />
         <PriceSlider v-model="sellMultiplier" :label="t('wareflow.prod_price')" type="sell" />
       </div>
 
-      <!-- 总利润 -->
       <div class="profit-footer">
         <span class="profit-label">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -412,15 +343,10 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
   @apply flex items-center gap-3;
 }
 
-.header-badge {
-  @apply px-2 py-0.5 rounded bg-slate-700 text-[10px] text-slate-400 font-bold uppercase tracking-tighter;
-}
-
 .list-body {
   @apply p-2 overflow-y-auto;
 }
 
-/* Custom Scrollbar Style */
 .custom-scrollbar::-webkit-scrollbar {
   width: 4px;
 }
@@ -438,37 +364,12 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
   background: rgba(148, 163, 184, 0.7);
 }
 
-/* 体积控件和利润分析样式 */
 .volume-controls-section, .profit-section {
   @apply border-t border-slate-700/50;
 }
 
 .simulation-controls {
   @apply p-4 bg-slate-900/50 border-b border-slate-700/50;
-}
-
-.profit-details {
-  @apply p-4;
-}
-
-.profit-item, .profit-total {
-  @apply flex justify-between items-center py-2 border-b border-slate-700/30 last:border-0;
-}
-
-.profit-economy-label {
-  @apply text-sm font-medium text-slate-400;
-}
-
-.profit-economy-value {
-  @apply font-mono font-bold;
-}
-
-.profit-economy-value.positive {
-  @apply text-emerald-400;
-}
-
-.profit-economy-value.negative {
-  @apply text-red-400;
 }
 
 .profit-footer {
@@ -491,21 +392,8 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
   @apply text-red-400;
 }
 
-/* 体积视图样式 */
 .volume-groups-container {
   @apply space-y-1;
-}
-
-.volume-group {
-  @apply bg-transparent rounded-lg;
-}
-
-.volume-group-header {
-  @apply flex justify-between items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded mb-1;
-}
-
-.volume-group-title {
-  @apply text-sm font-bold text-slate-300;
 }
 
 .volume-group-planning {
@@ -520,31 +408,6 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
   @apply flex items-center gap-2;
 }
 
-.volume-item {
-  @apply flex justify-between items-center py-2 border-b border-slate-700/20 last:border-0;
-}
-
-.volume-item-name {
-  @apply text-sm text-slate-400;
-}
-
-.volume-item-value {
-  @apply font-mono font-bold text-slate-300;
-}
-
-/* 经济视图样式 */
-.economy-group {
-  @apply mb-1;
-}
-
-.economy-group-header {
-  @apply flex justify-between items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded mb-1;
-}
-
-.economy-group-title {
-  @apply text-sm font-bold text-slate-300;
-}
-
 .economy-group-sum {
   @apply text-sm font-mono font-bold;
 }
@@ -557,44 +420,11 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
   @apply text-red-400;
 }
 
-.economy-items {
-  @apply pl-3 pr-1 py-1 bg-slate-800/20 rounded mb-1;
+.empire-gap-groups {
+  @apply space-y-1 mb-2;
 }
 
-.economy-item {
-  @apply flex justify-between items-center py-1 border-b border-slate-700/20 last:border-0;
-}
-
-.economy-item-name {
-  @apply text-sm text-slate-400;
-}
-
-.economy-item-value {
-  @apply text-sm font-mono font-bold;
-}
-
-.economy-item-value.positive {
-  @apply text-green-400;
-}
-
-.economy-item-value.negative {
-  @apply text-red-400;
-}
-
-/* 资源视图样式 */
-.resource-groups-container {
-  @apply space-y-1;
-}
-
-.resource-group {
-  @apply mb-1;
-}
-
-.resource-group-header {
-  @apply flex justify-between items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded mb-1;
-}
-
-.resource-group-title {
-  @apply text-sm font-bold text-slate-300;
+.empire-gap-group {
+  @apply contents;
 }
 </style>

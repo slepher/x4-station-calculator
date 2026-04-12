@@ -1,43 +1,45 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useStationStore } from '@/store/useStationStore'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import type { ModuleGroupResult } from '@/types/x4'
 
-const store = useStationStore()
-const { t } = useI18n()
+const props = defineProps<{
+  searchQuery: string
+  filteredModulesGrouped: ModuleGroupResult[]
+}>()
+
+const emit = defineEmits<{
+  updateSearchQuery: [value: string]
+  selectModule: [moduleId: string]
+}>()
+
 const gameData = useGameDataStore()
+const { t } = useI18n()
 
-// --- Search Logic & State ---
 const searchInput = ref<HTMLInputElement | null>(null)
 const isFocused = ref(false)
-const focusSnapshot = ref('') // 聚焦快照
-
-
+const focusSnapshot = ref('')
 
 const onInput = (e: Event) => {
-  store.searchQuery = (e.target as HTMLInputElement).value
+  emit('updateSearchQuery', (e.target as HTMLInputElement).value)
 }
 
 const onFocus = () => {
-  focusSnapshot.value = store.searchQuery || ''
+  focusSnapshot.value = props.searchQuery || ''
   isFocused.value = true
 }
 
 const onBlur = () => {
-  // 延迟处理，避免与点击事件冲突
   setTimeout(() => {
     if (isFocused.value) {
-      // 检查是否点击了弹出菜单内部
       const popover = document.querySelector('.results-popover')
       const isClickInsidePopover = popover && popover.contains(document.activeElement)
 
-      // 只有当点击在弹出菜单外部时才关闭
       if (!isClickInsidePopover) {
-        // 无效搜索回滚逻辑
-        const hasResults = store.filteredModulesGrouped.length > 0
+        const hasResults = props.filteredModulesGrouped.length > 0
         if (!hasResults) {
-          store.searchQuery = focusSnapshot.value
+          emit('updateSearchQuery', focusSnapshot.value)
         }
         isFocused.value = false
       }
@@ -46,25 +48,18 @@ const onBlur = () => {
 }
 
 const onClearClick = () => {
-  store.searchQuery = ''
-  focusSnapshot.value = '' // 毁灭快照
+  emit('updateSearchQuery', '')
+  focusSnapshot.value = ''
   searchInput.value?.focus()
 }
 
 const handleSelect = (m: any) => {
-  // 直接添加模块到规划区，取消预览
-  store.addModule(m.id)
-  // 保持弹出菜单打开，允许连续添加
-  // isFocused.value = false // 不再关闭列表
-  // searchInput.value?.blur() // 不再失去焦点
+  emit('selectModule', m.id)
 }
 
 const onEsc = () => {
   searchInput.value?.blur()
 }
-// ----------------------------
-
-
 </script>
 
 <template>
@@ -72,9 +67,9 @@ const onEsc = () => {
     <div class="flex flex-col gap-1">
       <div class="search-box group" :class="{ 'focused': isFocused }">
         <span class="search-icon">🔍</span>
-        <input ref="searchInput" :value="store.searchQuery" class="search-input" data-testid="station-module-search-input" :placeholder="t('planning.search_placeholder')"
+        <input ref="searchInput" :value="props.searchQuery" class="search-input" data-testid="station-module-search-input" :placeholder="t('planning.search_placeholder')"
           @input="onInput" @focus="onFocus" @blur="onBlur" @keydown.esc="onEsc" />
-        <button v-show="store.searchQuery"
+        <button v-show="props.searchQuery"
           class="clear-btn opacity-0 group-hover:opacity-100 transition-opacity duration-200"
           @mousedown.prevent="onClearClick">
           ×
@@ -84,7 +79,7 @@ const onEsc = () => {
 
     <Transition name="fade-slide">
       <div v-if="isFocused" class="results-popover pop-right scrollbar-thin" data-testid="station-module-candidate-popover" @mousedown.prevent>
-        <div v-for="group in store.filteredModulesGrouped" :key="group.group" class="type-group" :data-testid="`station-module-candidate-group-${group.group}`">
+        <div v-for="group in props.filteredModulesGrouped" :key="group.group" class="type-group" :data-testid="`station-module-candidate-group-${group.group}`">
           <div class="group-header">{{ group.displayLabel }}</div>
           <div v-for="m in group.modules" :key="m.id" class="result-item" :data-testid="`station-module-candidate-${m.id}`" @click="handleSelect(m)">
             <div class="color-indicator" :style="{ backgroundColor: m.color_rgb || (m.moduleGroup?.type === 'habitation' || m.moduleGroup?.type?.includes('habitat') ? '#f97316' : '#0ea5e9') }">
@@ -105,12 +100,8 @@ const onEsc = () => {
 <style scoped>
 .selector-container {
   @apply relative;
-  /* Base container is now relative to anchor the popover */
 }
 
-
-
-/* Search Styles (Merged) */
 .search-box {
   @apply flex items-center h-10 w-full bg-slate-900/40 border border-slate-700 rounded px-2 transition-all;
 }
@@ -133,7 +124,6 @@ const onEsc = () => {
 
 .pop-right {
   @apply top-0 left-full ml-2;
-  /* 从搜索框右上方向右下弹出 */
 }
 
 .group-header {
@@ -168,23 +158,8 @@ const onEsc = () => {
   @apply border-rose-500/70 text-rose-300;
 }
 
-.no-results {
-  @apply p-6 text-center text-slate-600 text-[10px] italic;
-}
-
 .clear-btn {
   @apply text-slate-500 hover:text-slate-300 px-1 cursor-pointer;
-}
-
-/* Animations */
-.fade-enter-active,
-.fade-leave-active {
-  @apply transition-opacity duration-75;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-  @apply opacity-0;
 }
 
 .fade-slide-enter-active,
@@ -195,5 +170,13 @@ const onEsc = () => {
 .fade-slide-enter-from,
 .fade-slide-leave-to {
   @apply opacity-0 transform translate-x-2;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  @apply w-1;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  @apply bg-slate-700 rounded-full;
 }
 </style>

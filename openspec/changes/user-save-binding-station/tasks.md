@@ -162,3 +162,53 @@
 - [x] T88. 更新 locales：添加 `view.blueprint_production`、`view.live_production`
 - [x] T89. 运行 build 验证编译通过
 - [ ] T90. E2E 测试：验证切换 tab 加载正确数据源
+
+## 后续修正 - UI 去耦优先专项（Refactory UI）
+
+- [x] T91. 编写 `refactory-ui.md`，明确 production workbench 子树的 UI 去耦范围、组件层级、允许保留的 `useGameDataStore` 依赖与 Definition of Done
+- [x] T94. 按组件边界拆分局部 UI model / composable，禁止创建单一 `productionUiViewModel.ts`；已创建 `useStationTabBarModel`、`useContextToolbarModel`、`useStationPlanningPanelModel`、`useStationWareFlowsModel`、`useStationDashboardModel`、`useTransitHubWorkbenchModel` 六类局部模型
+- [x] T95. 重构 `StationTabBar`：移除对 `useEmpireStore` 的直接依赖，将 tab 分组、展开状态、active tab、相关动作改为 props + emits
+- [x] T96. 重构 `ProductionWorkbenchView`：作为顶层切入口读取 store 并向下传递 props，处理子组件 emits
+- [x] T98. 重构 `ContextToolbar`：移除 `useEmpireStore` / `useSaveBindingStore` / `useActiveViewStore` / `useStationStore` 依赖，改为 props + emits
+- [x] T99. 重构 `StationModulePicker` + `StationPlanningPanel`：保留 `useGameDataStore` 读取静态模块/DLC 元数据，移除 `useStationStore`，改为 props + emits
+- [x] T100. 重构 `StationWareFlowsDashboard`：移除 `useEmpireStore` / `useStationStore` 依赖，仅保留 `useX4I18n`，将 `groupedFlows/settings/empireGaps` 通过 props 注入
+- [x] T101. 重构 `StationDashboard`：移除 `useStationStore` 依赖，仅保留 `useGameDataStore` + `useX4I18n`，将 `stationAnalysis/settings/currentEfficiency/actualWorkforce` 通过 props 注入
+- [x] T105. 运行 `npm run build` 验证编译通过
+- [ ] T102. 重构 `ImportPlanModal` 的 production workbench 接入方式：移除对 `useEmpireStore` 的直接依赖，将当前站点导入、新建站点导入等动作改为上层注入
+- [ ] T103. 在 production workbench 子树中建立约束：除顶层容器外，不再新增 `useEmpireStore`；`useGameDataStore` 仅用于静态游戏数据与翻译
+- [ ] T104. 补充 UI 去耦回归测试：验证 props 化后 overview / station / transit 三种布局渲染和主要交互不回归
+- [ ] T93. 定义 production UI props / actions 类型文件（如 `production-ui.types.ts`），覆盖 `ProductionWorkbenchView`、`ContextToolbar`、`StationPlanningPanel`、`StationWareFlowsDashboard`、`StationDashboard`
+- [ ] T94. 按组件边界拆分局部 UI model / composable，禁止创建单一 `productionUiViewModel.ts`；至少拆为 layout、tabbar、toolbar、planning、ware-flows、dashboard、transit-hub、import-modal 八类局部模型
+- [ ] T95. 重构 `ProductionWorkbenchView`：移除对 `useEmpireStore` / `useStationStore` 的直接依赖，仅通过 props 渲染 overview / station / transit 三种布局
+- [ ] T96. 重构 `ContextToolbar`：移除 `useEmpireStore` / `useSaveBindingStore` / `useActiveViewStore` / `useStationStore` 依赖，改为 props + emits
+- [ ] T95. 重构 `StationTabBar`：移除对 `useEmpireStore` 的直接依赖，将 tab 分组、展开状态、active tab、相关动作改为 props + emits
+- [ ] T96. 重构 `ProductionWorkbenchView`：移除对 `useEmpireStore` / `useStationStore` 的直接依赖，仅通过 props 渲染 overview / station / transit 三种布局
+- [ ] T97. 重构 `ContextToolbar`：移除 `useEmpireStore` / `useSaveBindingStore` / `useActiveViewStore` / `useStationStore` 依赖，改为 props + emits
+- [ ] T98. 重构 `StationPlanningPanel`：移除 `useStationStore` 依赖，改为通过 props 接收 `plannedModules/autoIndustryModules/searchQuery` 和相关 actions
+- [ ] T99. 重构 `StationModulePicker`：保留 `useGameDataStore` 读取静态模块/DLC 元数据，移除 `useStationStore`，改为 props + emits
+- [ ] T100. 重构 `StationWareFlowsDashboard`：移除 `useEmpireStore` / `useStationStore` 依赖，仅保留 `useGameDataStore`，将 `groupedFlows/settings/empireGaps` 通过 props 注入
+- [ ] T101. 重构 `StationDashboard`：移除 `useStationStore` 依赖，仅保留 `useGameDataStore`，将 `stationAnalysis/settings/currentEfficiency/actualWorkforce` 通过 props 注入
+- [ ] T102. 重构 `ImportPlanModal` 的 production workbench 接入方式：移除对 `useEmpireStore` 的直接依赖，将当前站点导入、新建站点导入等动作改为上层注入
+- [ ] T103. 在 production workbench 子树中建立约束：除顶层容器外，不再新增 `useEmpireStore`；`useGameDataStore` 仅用于静态游戏数据与翻译
+- [ ] T104. 补充 UI 去耦回归测试：验证 props 化后 overview / station / transit 三种布局渲染和主要交互不回归
+- [ ] T105. 运行 `npm run build` 与相关 unit/e2e 验证，确认 UI 去耦改造不影响现有行为
+
+## 后续修正 - 两个入口彻底拆分（Refactory 4）
+
+- [x] T106. 编写 `refactory4.md`，明确“同内容从同一入口拆成两个入口”后的目标架构与重构原则
+- [ ] T107. 定义共享工作台 contract：`ProductionWorkbenchContext` / planning context / dashboard context，明确共享 UI 的最小输入接口
+- [ ] T108. 创建 `BlueprintProductionEntry.vue`，承接蓝图产能入口装配，不再由 `MainWorkbench` watcher 编排 empire source 切换
+- [ ] T109. 创建 `LiveProductionEntry.vue`，承接实况产能入口装配，不再由 `MainWorkbench` watcher 编排 binding source 切换
+- [ ] T110. 简化 `MainWorkbench`：按 active view 直接选择入口组件，移除“view -> productionSource -> load”双重翻译逻辑
+- [ ] T111. 创建 `useBlueprintProductionStore`，接管 empire 入口的 selection / mutation / flow / save / dirty 生命周期
+- [ ] T112. 创建 `useLiveProductionStore`，接管 binding 入口的 selection / mutation / draft / save / discard 生命周期
+- [ ] T113. 将共享可复用逻辑下沉到纯 service / query / command 层，避免在新 store 之间复制计算逻辑
+- [ ] T114. 将 station 编辑命令整理为入口无关的 command builder，由蓝图/实况入口分别注入持久化依赖
+- [ ] T115. 将 empire session/saveAs/delete/snapshot 生命周期从旧总 store 中拆出，收口到蓝图入口 session service
+- [ ] T116. 将 binding draft/save/discard/confirm lifecycle 从旧总 store 中拆出，收口到实况入口 session service
+- [ ] T117. 停止在新主路径中扩散 `productionSource` / `activeId` / `activeStationId` 兼容 computed，仅保留过渡适配层
+- [ ] T118. 在新入口稳定后，逐步移除 `useEmpireStore` 中对 binding 的主路径编排职责
+- [ ] T119. 在新入口稳定后，逐步移除 `useStationStore` 中基于 `productionSource` 的写路由，改为显式接入对应入口 command
+- [ ] T120. 补充入口级回归测试：蓝图入口与实况入口分别验证 station 选择、overview、transit、dirty/save 语义
+- [ ] T121. 补充共享 UI 回归测试：同一套工作台组件在 blueprint/live 两个入口下行为一致，仅入口语义差异不同
+- [ ] T122. 完成迁移后删除旧 watcher/compat 主路径，并更新 `tasks.md` 状态与剩余兼容清单
