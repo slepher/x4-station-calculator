@@ -1,5 +1,5 @@
 import { computed, type Ref, type ComputedRef } from 'vue'
-import type { GroupedFlows } from '@/types/x4'
+import type { GroupedFlows, SavedModule } from '@/types/x4'
 import type { StationWareFlowsDashboardProps, StationWareFlowsDashboardEmits, WareFlowViewMode } from '@/types/production-ui'
 
 export interface EmpireGapFlows {
@@ -20,6 +20,8 @@ export interface UseStationWareFlowsModelDeps {
     showEmpireGaps: boolean
   }>
   empireGaps: ComputedRef<EmpireGapFlows>
+  plannedModules: ComputedRef<SavedModule[]>
+  wares: ComputedRef<Record<string, any>>
 }
 
 export interface UseStationWareFlowsModelReturn {
@@ -32,7 +34,9 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
     viewMode,
     groupedFlows,
     settings,
-    empireGaps
+    empireGaps,
+    plannedModules,
+    wares
   } = deps
 
   const props = computed<StationWareFlowsDashboardProps>(() => ({
@@ -53,7 +57,9 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
         name: flow.name || flow.wareId,
         wareId: flow.wareId,
         netRate: flow.netRate,
+        netValue: flow.netValue || 0,
         tier: flow.tier ?? 0,
+        contributions: flow.contributions,
         disableAdd: flow.disableAdd ?? false,
         disableRemove: flow.disableRemove ?? false
       })),
@@ -62,11 +68,15 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
         name: flow.name || flow.wareId,
         wareId: flow.wareId,
         netRate: flow.netRate,
+        netValue: flow.netValue || 0,
         tier: flow.tier ?? 0,
+        contributions: flow.contributions,
         disableAdd: flow.disableAdd ?? false,
         disableRemove: flow.disableRemove ?? false
       }))
-    }
+    },
+    plannedModules: plannedModules.value,
+    wares: wares.value
   }))
 
   const emits: StationWareFlowsDashboardEmits = {

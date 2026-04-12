@@ -398,25 +398,31 @@ const gameData = useGameDataStore()
   function updateStationType(stationId: string, type: StationType) {
     if (productionSource.value === 'save-binding') {
       updateBindingStationPlan(stationId, { type })
+      refreshStationFlowCache(stationId)
       return
     }
     empireDataStore.updateStationTypeInEmpire(activeEmpire.value, stationId, type)
+    refreshStationFlowCache(stationId)
   }
 
   function updateStationCount(stationId: string, count: number) {
     if (productionSource.value === 'save-binding') {
       updateBindingStationPlan(stationId, { count })
+      refreshStationFlowCache(stationId)
       return
     }
     empireDataStore.updateStationCountInEmpire(activeEmpire.value, stationId, count)
+    refreshStationFlowCache(stationId)
   }
 
   function updateStationMinerals(stationId: string, minerals: string[]) {
     if (productionSource.value === 'save-binding') {
       updateBindingStationPlan(stationId, { minerals })
+      refreshStationFlowCache(stationId)
       return
     }
     empireDataStore.updateStationMineralsInEmpire(activeEmpire.value, stationId, minerals)
+    refreshStationFlowCache(stationId)
   }
 
   function applyImportedStationPayload(

@@ -9,11 +9,13 @@ export interface StationAnalysis {
   totalCapacity: number
   totalTime: number
   playerHQNeeded: number
+  totalWorkerDiff: number
   moduleGroups: any[]
   summaryItems: any[]
 }
 
 export interface UseStationDashboardModelDeps {
+  plannedModules: ComputedRef<SavedModule[]>
   stationAnalysis: ComputedRef<StationAnalysis>
   settings: ComputedRef<{
     transportShipCapacity: number
@@ -35,6 +37,7 @@ export interface UseStationDashboardModelReturn {
 
 export function useStationDashboardModel(deps: UseStationDashboardModelDeps): UseStationDashboardModelReturn {
   const {
+    plannedModules,
     stationAnalysis,
     settings,
     currentEfficiency,
@@ -45,7 +48,18 @@ export function useStationDashboardModel(deps: UseStationDashboardModelDeps): Us
   } = deps
 
   const props = computed<StationDashboardProps>(() => ({
-    stationAnalysis: stationAnalysis.value,
+    plannedModules: plannedModules.value,
+    stationAnalysis: {
+      totalCost: stationAnalysis.value.totalCost,
+      totalVolume: stationAnalysis.value.totalVolume,
+      totalNeeded: stationAnalysis.value.totalNeeded,
+      totalCapacity: stationAnalysis.value.totalCapacity,
+      totalTime: stationAnalysis.value.totalTime,
+      playerHQNeeded: stationAnalysis.value.playerHQNeeded,
+      totalWorkerDiff: stationAnalysis.value.totalWorkerDiff,
+      moduleGroups: stationAnalysis.value.moduleGroups,
+      summaryItems: stationAnalysis.value.summaryItems
+    },
     settings: {
       transportShipCapacity: settings.value.transportShipCapacity,
       workforceAuto: settings.value.workforceAuto,

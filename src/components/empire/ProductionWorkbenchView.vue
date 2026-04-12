@@ -8,8 +8,13 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import { useTitleDisplayNameModel } from '@/composables/useTitleDisplayNameModel'
 import { useStationTabBarModel } from '@/components/empire/composables/useStationTabBarModel'
+import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
+import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
+import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
+import { useStationDashboardModel } from '@/components/empire/composables/useStationDashboardModel'
+import { useTransitHubWorkbenchModel } from '@/components/empire/composables/useTransitHubWorkbenchModel'
+import type { StationType, SavedModule, GroupedFlows, EmpireGroupedFlows } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import StationTabBar from '@/components/empire/StationTabBar.vue'
@@ -54,6 +59,22 @@ const handleCloseImport = () => {
   importModalState.isOpen = false
 }
 
+const importModalCreateStation = (name: string, type?: StationType) => {
+  return empireStore.createStation(name, type)
+}
+
+const importModalApplyPayload = (stationId: string, payload: any) => {
+  empireStore.applyImportedStationPayload(stationId, payload)
+}
+
+const importModalUpdateModules = (stationId: string, modules: any[]) => {
+  empireStore.updateStationModules(stationId, modules)
+}
+
+const importModalGetStationById = (stationId: string) => {
+  return empireStore.getStationById(stationId)
+}
+
 const tabBarModel = useStationTabBarModel({
   sectors: computed(() => empireStore.sectors),
   orderedStationsBySector: computed(() => empireStore.orderedStationsBySector),
@@ -65,98 +86,53 @@ const tabBarModel = useStationTabBarModel({
   getLinkedSectors: (sectorId: string) => empireStore.getLinkedSectors(sectorId)
 })
 
-const activeSupplySector = computed(() => {
-  if (!activeTransitSectorId.value) return null
-  return empireStore.sectors.find((sector) => sector.id === activeTransitSectorId.value) || null
+const activeBindingNameRef = computed({
+  get: () => saveBindingStore.activeBindingName,
+  set: (val: string) => { saveBindingStore.activeBindingName = val }
 })
 
-const sectorTitleConfig = computed(() => {
-  if (isBindingMode.value && isOverview.value) {
-    return {
-      getName: () => saveBindingStore.activeBindingName,
-      setName: (name: string) => { saveBindingStore.activeBindingName = name },
-      getDefaultName: () => t('binding.new_binding_name')
-    }
-  }
-  return {
-    getName: () => activeTransitSectorId.value
-      ? (activeSupplySector.value?.name || '')
-      : (empireStore.activeEmpire?.name || ''),
-    setName: (name: string) => {
-      if (activeTransitSectorId.value && activeSupplySector.value) {
-        empireStore.renameBindingSector(activeSupplySector.value.id, name)
-        return
-      }
-      empireStore.updateEmpireName(name)
-    },
-    getDefaultName: () => t('sector.new_sector_name')
-  }
+const activeEmpireNameRef = computed({
+  get: () => empireStore.activeEmpire?.name || '',
+  set: (val: string) => { empireStore.updateEmpireName(val) }
 })
-
-const { displayNameModel: titleModelValue } = useTitleDisplayNameModel(sectorTitleConfig)
-
-const toolbarMode = computed<'overview' | 'station' | 'transit'>(() => {
-  if (activeTransitSectorId.value) return 'transit'
-  if (activeStation.value) return 'station'
-  return 'overview'
-})
-
-const toolbarTitleModel = computed(() => ({
-  value: titleModelValue.value,
-  placeholder: sectorTitleConfig.value.getDefaultName()
-}))
-
-const toolbarStation = computed(() => {
-  if (!activeStation.value) return null
-  return {
-    id: activeStation.value.id,
-    name: activeStation.value.name,
-    type: activeStation.value.type || 'industrial',
-    count: activeStation.value.count ?? 1,
-    minerals: activeStation.value.minerals || []
-  }
-})
-
-const toolbarSettings = computed(() => {
-  if (toolbarMode.value === 'station') {
-    return stationStore.settings
-  }
-  if (toolbarMode.value === 'transit') {
-    return {
-      racePreference: stationStore.settings.racePreference,
-      considerWorkforceForAutoFill: stationStore.settings.considerWorkforceForAutoFill,
-      showEmpireGaps: stationStore.settings.showEmpireGaps,
-      sunlight: stationStore.settings.sunlight,
-      transportMinutes: stationStore.settings.transportMinutes
-    }
-  }
-  return null
-})
-
-const toolbarRaces = computed(() => [
-  { value: 'argon', label: t('toolbar.races.argon') },
-  { value: 'terran', label: t('toolbar.races.terran') },
-  { value: 'teladi', label: t('toolbar.races.teladi') },
-  { value: 'paranid', label: t('toolbar.races.paranid') },
-  { value: 'split', label: t('toolbar.races.split') }
-])
-
-const toolbarStationTypes = computed(() => [
-    { value: 'industrial' as const, label: t('toolbar.station_types.industrial') },
-    { value: 'supply' as const, label: t('toolbar.station_types.supply') },
-    { value: 'transit' as const, label: t('toolbar.station_types.transit') },
-    { value: 'shipyard' as const, label: t('toolbar.station_types.shipyard') }
-  ])
-
-const availableMinerals = ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane']
 
 const singleBerthThroughput = computed(() => {
   const shipCapacity = Math.max(1, stationStore.settings.transportShipCapacity || 1)
   return shipCapacity * 15
 })
 
+const contextToolbarModel = useContextToolbarModel({
+  isBindingMode,
+  activeStation,
+  activeTransitSectorId,
+  sectors: computed(() => empireStore.sectors),
+  settings: computed(() => stationStore.settings),
+  activeBindingName: activeBindingNameRef as any,
+  activeEmpireName: activeEmpireNameRef as any,
+  singleBerthThroughput
+})
+
+const importModalActiveStation = computed(() => {
+  if (!activeStation.value) return null
+  return {
+    id: activeStation.value.id,
+    modules: activeStation.value.modules
+  }
+})
+
+const activeSupplySector = computed(() => {
+  if (!activeTransitSectorId.value) return null
+  return empireStore.sectors.find((sector) => sector.id === activeTransitSectorId.value) || null
+})
+
 const handleUpdateTitle = (value: string) => {
-  sectorTitleConfig.value.setName(value)
+  if (isBindingMode.value && isOverview.value) {
+    saveBindingStore.activeBindingName = value
+  } else if (activeTransitSectorId.value && activeSupplySector.value) {
+    empireStore.renameBindingSector(activeSupplySector.value.id, value)
+  } else {
+    empireStore.updateEmpireName(value)
+  }
 }
 
 const handleUpdateStationName = (value: string) => {
@@ -206,11 +182,134 @@ const handleUpdateShowEmpireGaps = (value: boolean) => {
   stationStore.updateSetting('showEmpireGaps', value)
 }
 
-const transitHubModel = computed(() => empireStore.getTransitHubViewModel({
+const stationPlanningPanelModel = useStationPlanningPanelModel({
+  plannedModules: computed(() => stationStore.plannedModules as SavedModule[]),
+  autoIndustryModules: computed(() => stationStore.autoIndustryModules as SavedModule[]),
+  filteredModulesGrouped: computed(() => stationStore.filteredModulesGrouped),
+  searchQuery: computed({
+    get: () => stationStore.searchQuery,
+    set: (val: string) => { stationStore.searchQuery = val }
+  }) as any,
+  enforceDlcActivation: computed(() => stationStore.enforceDlcActivation)
+})
+
+const empireGapsForModel = computed(() => {
+  const flows = empireStore.getStationComponentGapFlows(activeStation.value?.id || null)
+
+  const byTierThenName = (a: any, b: any) => {
+    const tierA = Number(a.tier ?? 0)
+    const tierB = Number(b.tier ?? 0)
+    if (tierA !== tierB) return tierB - tierA
+    const nameA = String(a.name || '')
+    const nameB = String(b.name || '')
+    const nameCmp = nameA.localeCompare(nameB, 'en')
+    if (nameCmp !== 0) return nameCmp
+    return String(a.id || '').localeCompare(String(b.id || ''), 'en')
+  }
+  
+  const operations = flows.operations
+    .filter((flow: any) => flow.netRate < 0 || stationStore.getResolvedLevel(flow.wareId) > 0)
+    .map((flow: any) => {
+      const module = gameData.findModuleForWare(flow.wareId, stationStore.settings.racePreference)
+      const plannedIndex = module ? stationStore.plannedModules.findIndex(m => m.id === module.id) : -1
+      const wareInfo = stationStore.wares[flow.wareId]
+      return {
+        id: flow.wareId,
+        name: wareInfo ? translateWare(wareInfo) : (flow.name || flow.wareId),
+        wareId: flow.wareId,
+        netRate: flow.netRate,
+        netValue: flow.netValue,
+        tier: flow.tier ?? 0,
+        contributions: flow.contributions,
+        disableAdd: !module || flow.netRate > 0,
+        disableRemove: !module || plannedIndex === -1
+      }
+    })
+    .sort(byTierThenName)
+    
+  const supply = flows.supply
+    .map((flow: any) => {
+      const module = gameData.findModuleForWare(flow.wareId, stationStore.settings.racePreference)
+      const plannedIndex = module ? stationStore.plannedModules.findIndex(m => m.id === module.id) : -1
+      const wareInfo = stationStore.wares[flow.wareId]
+      return {
+        id: flow.wareId,
+        name: wareInfo ? translateWare(wareInfo) : (flow.name || flow.wareId),
+        wareId: flow.wareId,
+        netRate: flow.netRate,
+        netValue: flow.netValue,
+        tier: flow.tier ?? 0,
+        contributions: flow.contributions,
+        disableAdd: !module || flow.netRate > 0,
+        disableRemove: !module || plannedIndex === -1
+      }
+    })
+    .filter((flow: any) => flow.netRate <= 0 || !flow.disableRemove)
+    .sort(byTierThenName)
+    
+  return { operations, supply }
+})
+
+const stationWareFlowsModel = useStationWareFlowsModel({
+  viewMode: wareFlowViewMode as any,
+  groupedFlows: computed(() => stationStore.groupedFlows as GroupedFlows),
+  settings: computed(() => ({
+    resourceBufferHours: stationStore.settings.resourceBufferHours,
+    primaryProductBufferHours: stationStore.settings.primaryProductBufferHours,
+    secondaryProductBufferHours: stationStore.settings.secondaryProductBufferHours,
+    buyMultiplier: stationStore.settings.buyMultiplier,
+    sellMultiplier: stationStore.settings.sellMultiplier,
+    racePreference: stationStore.settings.racePreference,
+    showEmpireGaps: stationStore.settings.showEmpireGaps ?? false
+  })),
+  empireGaps: empireGapsForModel,
+  plannedModules: computed(() => stationStore.plannedModules as SavedModule[]),
+  wares: computed(() => stationStore.wares)
+})
+
+const stationDashboardModel = useStationDashboardModel({
+  plannedModules: computed(() => stationStore.plannedModules as SavedModule[]),
+  stationAnalysis: computed(() => ({
+    totalCost: stationStore.stationAnalysis.totalCost,
+    totalVolume: stationStore.stationAnalysis.totalVolume,
+    totalNeeded: stationStore.stationAnalysis.totalNeeded,
+    totalCapacity: stationStore.stationAnalysis.totalCapacity,
+    totalTime: stationStore.stationAnalysis.totalTime,
+    playerHQNeeded: stationStore.stationAnalysis.playerHQNeeded,
+    totalWorkerDiff: stationStore.stationAnalysis.totalWorkerDiff || 0,
+    moduleGroups: stationStore.stationAnalysis.moduleGroups,
+    summaryItems: stationStore.stationAnalysis.summaryItems
+  })),
+  settings: computed(() => ({
+    transportShipCapacity: stationStore.settings.transportShipCapacity,
+    workforceAuto: stationStore.settings.workforceAuto,
+    manualWorkforce: stationStore.settings.manualWorkforce,
+    useHQ: stationStore.settings.useHQ
+  })),
+  currentEfficiency: computed(() => stationStore.currentEfficiency),
+  actualWorkforce: computed(() => stationStore.actualWorkforce),
+  buildPriceMultiplier: computed({
+    get: () => stationStore.buildPriceMultiplier,
+    set: (val: number) => { stationStore.buildPriceMultiplier = val }
+  }) as any
+})
+
+const transitHubModelRaw = computed(() => empireStore.getTransitHubViewModel({
   sectorId: activeTransitSectorId.value,
   racePreference: stationStore.settings.racePreference,
   transportShipCapacity: stationStore.settings.transportShipCapacity
 }))
+
+const transitHubWorkbenchModel = useTransitHubWorkbenchModel({
+  sectorId: computed(() => activeTransitSectorId.value) as any,
+  groupedFlows: computed(() => transitHubModelRaw.value.groupedFlows as EmpireGroupedFlows),
+  storageFlows: computed(() => transitHubModelRaw.value.storageFlows),
+  storageModulePlans: computed(() => transitHubModelRaw.value.storageModulePlans),
+  supplyBuildModules: computed(() => transitHubModelRaw.value.supplyBuildModules as SavedModule[]),
+  viewMode: wareFlowViewMode as any
+})
+
+const transitHubModel = computed(() => transitHubWorkbenchModel.props.value || transitHubModelRaw.value)
 
 const handleSelectOverview = () => {
   empireStore.selectStation(null)
@@ -277,73 +376,6 @@ const handleTransferAutoModule = (module: any) => {
   stationStore.transferModuleFromAutoIndustry(module)
 }
 
-const wareFlowSettings = computed(() => ({
-  resourceBufferHours: stationStore.settings.resourceBufferHours,
-  primaryProductBufferHours: stationStore.settings.primaryProductBufferHours,
-  secondaryProductBufferHours: stationStore.settings.secondaryProductBufferHours,
-  buyMultiplier: stationStore.settings.buyMultiplier,
-  sellMultiplier: stationStore.settings.sellMultiplier,
-  racePreference: stationStore.settings.racePreference,
-  showEmpireGaps: stationStore.settings.showEmpireGaps ?? false
-}))
-
-const empireGaps = computed(() => {
-  const flows = empireStore.getStationComponentGapFlows(activeStation.value?.id || null)
-
-  const byTierThenName = (a: any, b: any) => {
-    const tierA = Number(a.tier ?? 0)
-    const tierB = Number(b.tier ?? 0)
-    if (tierA !== tierB) return tierB - tierA
-    const nameA = String(a.name || '')
-    const nameB = String(b.name || '')
-    const nameCmp = nameA.localeCompare(nameB, 'en')
-    if (nameCmp !== 0) return nameCmp
-    return String(a.id || '').localeCompare(String(b.id || ''), 'en')
-  }
-  
-  const operations = flows.operations
-    .filter((flow: any) => flow.netRate < 0 || stationStore.getResolvedLevel(flow.wareId) > 0)
-    .map((flow: any) => {
-      const module = gameData.findModuleForWare(flow.wareId, stationStore.settings.racePreference)
-      const plannedIndex = module ? stationStore.plannedModules.findIndex(m => m.id === module.id) : -1
-      const wareInfo = stationStore.wares[flow.wareId]
-      return {
-        id: flow.wareId,
-        name: wareInfo ? translateWare(wareInfo) : (flow.name || flow.wareId),
-        wareId: flow.wareId,
-        netRate: flow.netRate,
-        netValue: flow.netValue,
-        tier: flow.tier ?? 0,
-        contributions: flow.contributions,
-        disableAdd: !module || flow.netRate > 0,
-        disableRemove: !module || plannedIndex === -1
-      }
-    })
-    .sort(byTierThenName)
-    
-  const supply = flows.supply
-    .map((flow: any) => {
-      const module = gameData.findModuleForWare(flow.wareId, stationStore.settings.racePreference)
-      const plannedIndex = module ? stationStore.plannedModules.findIndex(m => m.id === module.id) : -1
-      const wareInfo = stationStore.wares[flow.wareId]
-      return {
-        id: flow.wareId,
-        name: wareInfo ? translateWare(wareInfo) : (flow.name || flow.wareId),
-        wareId: flow.wareId,
-        netRate: flow.netRate,
-        netValue: flow.netValue,
-        tier: flow.tier ?? 0,
-        contributions: flow.contributions,
-        disableAdd: !module || flow.netRate > 0,
-        disableRemove: !module || plannedIndex === -1
-      }
-    })
-    .filter((flow: any) => flow.netRate <= 0 || !flow.disableRemove)
-    .sort(byTierThenName)
-    
-  return { operations, supply }
-})
-
 const handleUpdateWareFlowResourceBufferHours = (value: number) => {
   stationStore.updateSetting('resourceBufferHours', value)
 }
@@ -383,25 +415,6 @@ const handleWareFlowRemoveGapModule = (wareId: string) => {
   }
 }
 
-const dashboardStationAnalysis = computed(() => ({
-  totalCost: stationStore.stationAnalysis.totalCost,
-  totalVolume: stationStore.stationAnalysis.totalVolume,
-  totalNeeded: stationStore.stationAnalysis.totalNeeded,
-  totalCapacity: stationStore.stationAnalysis.totalCapacity,
-  totalTime: stationStore.stationAnalysis.totalTime,
-  playerHQNeeded: stationStore.stationAnalysis.playerHQNeeded,
-  totalWorkerDiff: stationStore.stationAnalysis.totalWorkerDiff || 0,
-  moduleGroups: stationStore.stationAnalysis.moduleGroups,
-  summaryItems: stationStore.stationAnalysis.summaryItems
-}))
-
-const dashboardSettings = computed(() => ({
-  transportShipCapacity: stationStore.settings.transportShipCapacity,
-  workforceAuto: stationStore.settings.workforceAuto,
-  manualWorkforce: stationStore.settings.manualWorkforce,
-  useHQ: stationStore.settings.useHQ
-}))
-
 const handleDashboardUpdateTransportShipCapacity = (value: number) => {
   stationStore.updateSetting('transportShipCapacity', value)
 }
@@ -440,15 +453,15 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
     @expand-sector="handleExpandSector"
   />
   <ContextToolbar
-    :mode="toolbarMode"
-    :is-binding-mode="isBindingMode"
-    :title-model="toolbarTitleModel"
-    :station="toolbarStation"
-    :settings="toolbarSettings"
-    :races="toolbarRaces"
-    :station-types="toolbarStationTypes"
-    :available-minerals="availableMinerals"
-    :single-berth-throughput="singleBerthThroughput"
+    :mode="contextToolbarModel.props.value.mode"
+    :is-binding-mode="contextToolbarModel.props.value.isBindingMode"
+    :title-model="contextToolbarModel.props.value.titleModel"
+    :station="contextToolbarModel.props.value.station"
+    :settings="contextToolbarModel.props.value.settings"
+    :races="contextToolbarModel.props.value.races"
+    :station-types="contextToolbarModel.props.value.stationTypes"
+    :available-minerals="contextToolbarModel.props.value.availableMinerals"
+    :single-berth-throughput="contextToolbarModel.props.value.singleBerthThroughput"
     @update-title="handleUpdateTitle"
     @update-station-name="handleUpdateStationName"
     @update-station-type="handleUpdateStationType"
@@ -465,6 +478,13 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
   <ImportPlanModal
     :isOpen="importModalState.isOpen"
     :initialTab="importModalState.initialTab"
+    :isOverview="isOverview"
+    :activeStationId="empireStore.activeStationId"
+    :activeStation="importModalActiveStation"
+    :createStation="importModalCreateStation"
+    :applyImportedStationPayload="importModalApplyPayload"
+    :updateStationModules="importModalUpdateModules"
+    :getStationById="importModalGetStationById"
     @close="handleCloseImport"
   />
 
@@ -508,11 +528,13 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
   <div v-else class="main-layout mt-6">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
-        :planned-modules="stationStore.plannedModules"
-        :auto-industry-modules="stationStore.autoIndustryModules"
-        :filtered-modules-grouped="stationStore.filteredModulesGrouped"
-        :search-query="stationStore.searchQuery"
-        :enforce-dlc-activation="stationStore.enforceDlcActivation"
+        :planned-modules="stationPlanningPanelModel.props.value.plannedModules"
+        :auto-industry-modules="stationPlanningPanelModel.props.value.autoIndustryModules"
+        :filtered-modules-grouped="stationPlanningPanelModel.props.value.filteredModulesGrouped"
+        :search-query="stationPlanningPanelModel.props.value.searchQuery"
+        :enforce-dlc-activation="stationPlanningPanelModel.props.value.enforceDlcActivation"
+        :flashing-module-ids="stationPlanningPanelModel.props.value.flashingModuleIds"
+        :highlighted-module-ids="stationPlanningPanelModel.props.value.highlightedModuleIds"
         @update-search-query="handleUpdateSearchQuery"
         @add-module="handleAddModule"
         @remove-module="handleRemoveModule"
@@ -525,12 +547,12 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
 
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
-        :view-mode="wareFlowViewMode"
-        :grouped-flows="stationStore.groupedFlows"
-        :settings="wareFlowSettings"
-        :empire-gaps="empireGaps"
-        :planned-modules="stationStore.plannedModules"
-        :wares="stationStore.wares"
+        :view-mode="stationWareFlowsModel.props.value.viewMode"
+        :grouped-flows="stationWareFlowsModel.props.value.groupedFlows"
+        :settings="stationWareFlowsModel.props.value.settings"
+        :empire-gaps="stationWareFlowsModel.props.value.empireGaps"
+        :planned-modules="stationWareFlowsModel.props.value.plannedModules"
+        :wares="stationWareFlowsModel.props.value.wares"
         @update-view-mode="wareFlowViewMode = $event"
         @update-resource-buffer-hours="handleUpdateWareFlowResourceBufferHours"
         @update-primary-product-buffer-hours="handleUpdateWareFlowPrimaryBufferHours"
@@ -544,12 +566,13 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
 
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
-        :planned-modules="stationStore.plannedModules"
-        :station-analysis="dashboardStationAnalysis"
-        :settings="dashboardSettings"
-        :current-efficiency="stationStore.currentEfficiency"
-        :actual-workforce="stationStore.actualWorkforce"
-        :build-price-multiplier="stationStore.buildPriceMultiplier"
+        :planned-modules="stationDashboardModel.props.value.plannedModules"
+        :station-analysis="stationDashboardModel.props.value.stationAnalysis"
+        :settings="stationDashboardModel.props.value.settings"
+        :current-efficiency="stationDashboardModel.props.value.currentEfficiency"
+        :actual-workforce="stationDashboardModel.props.value.actualWorkforce"
+        :build-price-multiplier="stationDashboardModel.props.value.buildPriceMultiplier"
+        :hide-workers-view="stationDashboardModel.props.value.hideWorkersView"
         @update-transport-ship-capacity="handleDashboardUpdateTransportShipCapacity"
         @update-build-price-multiplier="handleDashboardUpdateBuildPriceMultiplier"
         @update-manual-workforce="handleDashboardUpdateManualWorkforce"

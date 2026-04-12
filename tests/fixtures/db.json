@@ -1047,5 +1047,12 @@
         ]
       }
     ]
+  },
+  "x4_station_active_view": {
+    "activeEmpireId": "empire-1",
+    "activeEmpireStation": "empire-1-station-1",
+    "activeBinding": null,
+    "activeBindingStation": null,
+    "activeView": "blueprint-production"
   }
 }

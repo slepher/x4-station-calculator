@@ -99,7 +99,9 @@ export interface EmpireGapItem {
   name: string
   wareId: string
   netRate: number
+  netValue: number
   tier: number
+  contributions?: any[]
   disableAdd: boolean
   disableRemove: boolean
 }
@@ -120,6 +122,8 @@ export interface StationWareFlowsDashboardProps {
     operations: EmpireGapItem[]
     supply: EmpireGapItem[]
   }
+  plannedModules: SavedModule[]
+  wares: Record<string, any>
 }
 
 export interface StationWareFlowsDashboardEmits {
@@ -134,6 +138,7 @@ export interface StationWareFlowsDashboardEmits {
 }
 
 export interface StationDashboardProps {
+  plannedModules: SavedModule[]
   stationAnalysis: {
     totalCost: number
     totalVolume: number
@@ -141,9 +146,10 @@ export interface StationDashboardProps {
     totalCapacity: number
     totalTime: number
     playerHQNeeded: number
+    totalWorkerDiff: number
     moduleGroups: any[]
     summaryItems: any[]
-  } | null
+  }
   settings: {
     transportShipCapacity: number
     workforceAuto: boolean
@@ -189,6 +195,28 @@ export interface ProductionWorkbenchViewProps {
   stationWareFlows: StationWareFlowsDashboardProps | null
   stationDashboard: StationDashboardProps | null
   transitHub: TransitHubWorkbenchProps | null
+}
+
+export interface ImportPayload {
+  modules: SavedModule[]
+  lockedWares: string[]
+  warePriority: Record<string, number>
+}
+
+export interface ImportPlanModalProps {
+  isOpen: boolean
+  initialTab?: 'logic-flow' | 'game-blueprint' | 'x4-station'
+  isOverview: boolean
+  activeStationId: string | null
+  activeStation: { id: string; modules: SavedModule[] } | null
+  createStation: (name: string, type?: StationType) => { id: string; modules: SavedModule[] } | null
+  applyImportedStationPayload: (stationId: string, payload: ImportPayload) => void
+  updateStationModules: (stationId: string, modules: SavedModule[]) => void
+  getStationById: (stationId: string) => { id: string; modules: SavedModule[] } | null
+}
+
+export interface ImportPlanModalEmits {
+  close: () => void
 }
 
 export interface ProductionWorkbenchViewEmits {
