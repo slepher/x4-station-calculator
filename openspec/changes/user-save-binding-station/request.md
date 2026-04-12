@@ -85,3 +85,46 @@ binding 使用显式保存模式：
 3. 点击已展开星区的中转站，保持展开，打开中转站视图
 4. 点击站点 tab，自动展开其所在星区（收起其他）
 5. 无星区站点始终平铺显示，不受折叠逻辑影响
+
+---
+
+## 新增需求：Production Tab 拆分
+
+### 背景
+
+当前"量化生产" tab 同时承载 empire 蓝图和 save binding 实况两种数据源，用户需要通过按钮切换数据源，不够直观。
+
+### 需求描述
+
+将 production tab 拆分为两个独立 tab：
+
+1. **蓝图产能** (`blueprint-production`)：展示 empire 蓝图规划
+2. **实况产能** (`live-production`)：展示 save binding 实况数据
+3. 两个 tab 共用同一份 UI 代码 (`ProductionWorkbenchView.vue`)
+4. 切换 tab 自动加载对应数据源
+
+### ActiveViewState 结构变更
+
+从单一 `activeId` + `productionSource` 模式改为分离存储：
+
+```typescript
+interface ActiveViewState {
+  activeEmpireId: string | null         // empire 的 id
+  activeEmpireStation: string | null    // empire 模式下的 stationId
+  activeBinding: string | null          // binding 的 gameGuid
+  activeBindingStation: string | null   // binding 模式下的 stationId
+  activeView: StationActiveView         // 当前 tab
+}
+```
+
+### 兼容性
+
+- 旧格式 `{ productionSource, activeId, activeStationId, activeView }` 自动迁移
+- `productionSource`, `activeId`, `activeStationId` 作为 computed 保留兼容层
+
+### 验收标准
+
+1. 切换到"蓝图产能" tab，自动加载 `activeEmpireId` 对应的 empire
+2. 切换到"实况产能" tab，自动加载 `activeBinding` 对应的 binding
+3. 刷新页面后，正确恢复上次选中的 empire/binding 及 station
+4. localStorage 数据格式正确：分离存储 activeEmpireId 和 activeBinding

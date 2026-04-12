@@ -148,3 +148,17 @@
 - [x] T75. 监听 activeStationId / activeTransitSectorId 变化，自动更新 expandedSectorId
 - [ ] T76. E2E 测试：验证折叠展开行为符合需求
 - [x] T77. 运行 build 验证编译通过
+
+## Production Tab 拆分
+
+- [x] T80. 修改 `StationActiveView` type：移除 `save-import`，添加 `blueprint-production`、`live-production`
+- [x] T81. 修改 `ActiveViewState` 结构：分离为 `activeEmpireId`、`activeEmpireStation`、`activeBinding`、`activeBindingStation`
+- [x] T82. 实现旧格式迁移：`{ productionSource, activeId }` → 分离字段
+- [x] T83. 添加兼容层 computed：`productionSource`、`activeId`、`activeStationId` 根据 `activeView` 推断
+- [x] T84. 修改 `TopViewSwitch.vue`：替换 tabs 为"蓝图产能"/"实况产能"
+- [x] T85. 修改 `MainWorkbench.vue`：切换 tab 时自动加载对应 empire/binding
+- [x] T86. 更新 `useEmpireStore.fallbackToFirstEmpire()`：使用 `activeEmpireId`
+- [x] T87. 更新 `useSaveBindingStore.initialize()`：使用 `activeBinding`
+- [x] T88. 更新 locales：添加 `view.blueprint_production`、`view.live_production`
+- [x] T89. 运行 build 验证编译通过
+- [ ] T90. E2E 测试：验证切换 tab 加载正确数据源
