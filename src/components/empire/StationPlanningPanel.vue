@@ -3,6 +3,7 @@ import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import { ref, watch, nextTick, computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { generateFilteredModulesGrouped } from '@/store/logic/searchModule'
 import StationPlanningItem from './StationPlanningItem.vue'
 import StationModulePicker from './StationModulePicker.vue'
 import type { SavedModule, ModuleGroupResult } from '@/types/x4'
@@ -10,37 +11,35 @@ import type { SavedModule, ModuleGroupResult } from '@/types/x4'
 const props = defineProps<{
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
-  filteredModulesGrouped: ModuleGroupResult[]
-  searchQuery: string
   enforceDlcActivation: boolean
 }>()
 
 const emit = defineEmits<{
-  updateSearchQuery: [value: string]
-  addModule: [moduleId: string]
-  removeModule: [index: number]
-  updateModuleCount: [index: number, count: number]
-  reorderModules: [modules: SavedModule[]]
-  applyScale: [scale: number]
-  transferAutoModule: [module: SavedModule]
+  updatePlannedModules: [modules: SavedModule[]]
 }>()
 
 const { t } = useI18n()
 const gameDataStore = useGameDataStore()
 const flashTime = 300
 
+const searchQuery = ref('')
 const highlightedModuleIds = ref<Set<string>>(new Set())
 const flashingNumberModuleIds = ref<Set<string>>(new Set())
 const lastModuleCounts = ref<Record<string, number>>({})
 
-const internalSearchQuery = computed({
-  get: () => props.searchQuery,
-  set: (val) => emit('updateSearchQuery', val)
+const filteredModulesGrouped = computed<ModuleGroupResult[]>(() => {
+  return generateFilteredModulesGrouped(
+    searchQuery.value,
+    gameDataStore.currentLocale,
+    gameDataStore.localizedModulesMap,
+    gameDataStore.localizedModuleGroupsMap,
+    (module) => !props.enforceDlcActivation || gameDataStore.isDlcActive(module.dlc_tag)
+  )
 })
 
 const internalPlannedModules = computed({
   get: () => props.plannedModules,
-  set: (val) => emit('reorderModules', val)
+  set: (val) => emit('updatePlannedModules', val)
 })
 
 const triggerHighlight = (id: string) => {
@@ -89,7 +88,11 @@ watch(() => props.plannedModules.length, (newLength, oldLength) => {
 })
 
 const applyScale = (scale: number) => {
-  emit('applyScale', scale)
+  const nextModules = props.plannedModules.map(module => ({
+    ...module,
+    count: Math.ceil(module.count * scale)
+  }))
+  emit('updatePlannedModules', nextModules)
 }
 
 const getModuleInfo = (moduleId: string) => {
@@ -109,19 +112,49 @@ const isModuleCountEditable = (moduleId: string) => {
 }
 
 const handleAddModule = (moduleId: string) => {
-  emit('addModule', moduleId)
+  const existingIndex = props.plannedModules.findIndex(m => m.id === moduleId)
+  let nextModules: SavedModule[]
+  if (existingIndex >= 0) {
+    nextModules = props.plannedModules.map((m, i) =>
+      i === existingIndex ? { ...m, count: m.count + 1 } : m
+    )
+  } else {
+    nextModules = [...props.plannedModules, { id: moduleId, count: 1 }]
+  }
+  emit('updatePlannedModules', nextModules)
 }
 
 const handleUpdateModuleCount = (index: number, count: number) => {
-  emit('updateModuleCount', index, count)
+  const nextModules = props.plannedModules.map((m, i) =>
+    i === index ? { ...m, count } : m
+  )
+  emit('updatePlannedModules', nextModules)
 }
 
 const handleRemoveModule = (index: number) => {
-  emit('removeModule', index)
+  const nextModules = props.plannedModules.filter((_, i) => i !== index)
+  emit('updatePlannedModules', nextModules)
+}
+
+const handleReorderModules = (modules: SavedModule[]) => {
+  emit('updatePlannedModules', modules)
 }
 
 const handleTransferAutoModule = (module: SavedModule) => {
-  emit('transferAutoModule', module)
+  const existingIndex = props.plannedModules.findIndex(m => m.id === module.id)
+  let nextModules: SavedModule[]
+  if (existingIndex >= 0) {
+    nextModules = props.plannedModules.map((m, i) =>
+      i === existingIndex ? { ...m, count: m.count + module.count } : m
+    )
+  } else {
+    nextModules = [...props.plannedModules, { id: module.id, count: module.count }]
+  }
+  emit('updatePlannedModules', nextModules)
+}
+
+const handleUpdateSearchQuery = (value: string) => {
+  searchQuery.value = value
 }
 </script>
 
@@ -129,9 +162,9 @@ const handleTransferAutoModule = (module: SavedModule) => {
   <div class="module-list-container">
     <div class="search-panel">
       <StationModulePicker
-        :search-query="internalSearchQuery"
-        :filtered-modules-grouped="props.filteredModulesGrouped"
-        @update-search-query="emit('updateSearchQuery', $event)"
+        :search-query="searchQuery"
+        :filtered-modules-grouped="filteredModulesGrouped"
+        @update-search-query="handleUpdateSearchQuery"
         @select-module="handleAddModule"
       />
     </div>
@@ -152,7 +185,7 @@ const handleTransferAutoModule = (module: SavedModule) => {
       </div>
       <div class="module-list-scroll">
         <draggable v-model="internalPlannedModules" item-key="id" ghost-class="drag-ghost" filter=".ignore-drag"
-          :prevent-on-filter="false" class="draggable-container">
+          :prevent-on-filter="false" class="draggable-container" @update:model-value="handleReorderModules">
           <template #item="{ element, index }">
             <StationPlanningItem :item="element" :info="getModuleInfo(element.id)!"
               :inactive-by-dlc="props.enforceDlcActivation && !isModuleDlcActive(element.id)"

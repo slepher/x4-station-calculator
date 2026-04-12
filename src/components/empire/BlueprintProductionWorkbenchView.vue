@@ -186,15 +186,17 @@ const handleUpdateShowEmpireGaps = (value: boolean) => {
   stationStore.updateSetting('showEmpireGaps', value)
 }
 
+const handleUpdatePlannedModules = (modules: SavedModule[]) => {
+  if (activeStation.value) {
+    blueprintStore.updateStationModules(activeStation.value.id, modules)
+  }
+}
+
 const stationPlanningPanelModel = useStationPlanningPanelModel({
   plannedModules: computed(() => stationStore.plannedModules as SavedModule[]),
   autoIndustryModules: computed(() => stationStore.autoIndustryModules as SavedModule[]),
-  filteredModulesGrouped: computed(() => stationStore.filteredModulesGrouped),
-  searchQuery: computed({
-    get: () => stationStore.searchQuery,
-    set: (val: string) => { stationStore.searchQuery = val }
-  }) as any,
-  enforceDlcActivation: computed(() => stationStore.enforceDlcActivation)
+  enforceDlcActivation: computed(() => stationStore.enforceDlcActivation),
+  onUpdatePlannedModules: handleUpdatePlannedModules
 })
 
 const empireGapsForModel = computed(() => {
@@ -345,39 +347,6 @@ const handleDeleteStation = (stationId: string) => {
 
 const handleExpandSector = (sectorId: string | null) => {
   tabBarModel.expandedSectorId.value = sectorId
-}
-
-const handleUpdateSearchQuery = (value: string) => {
-  stationStore.searchQuery = value
-}
-
-const handleAddModule = (moduleId: string) => {
-  stationStore.addModule(moduleId)
-}
-
-const handleRemoveModule = (index: number) => {
-  stationStore.removeModule(index)
-}
-
-const handleUpdateModuleCount = (index: number, count: number) => {
-  stationStore.updateModuleCount(index, count)
-}
-
-const handleReorderModules = (modules: any[]) => {
-  if (activeStation.value) {
-    blueprintStore.updateStationModules(activeStation.value.id, modules)
-  }
-}
-
-const handleApplyScale = (scale: number) => {
-  stationStore.plannedModules.forEach((module: any, index: number) => {
-    const newCount = Math.ceil(module.count * scale)
-    stationStore.updateModuleCount(index, newCount)
-  })
-}
-
-const handleTransferAutoModule = (module: any) => {
-  stationStore.transferModuleFromAutoIndustry(module)
 }
 
 const handleUpdateWareFlowResourceBufferHours = (value: number) => {
@@ -534,18 +503,8 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
       <StationPlanningPanel
         :planned-modules="stationPlanningPanelModel.props.value.plannedModules"
         :auto-industry-modules="stationPlanningPanelModel.props.value.autoIndustryModules"
-        :filtered-modules-grouped="stationPlanningPanelModel.props.value.filteredModulesGrouped"
-        :search-query="stationPlanningPanelModel.props.value.searchQuery"
         :enforce-dlc-activation="stationPlanningPanelModel.props.value.enforceDlcActivation"
-        :flashing-module-ids="stationPlanningPanelModel.props.value.flashingModuleIds"
-        :highlighted-module-ids="stationPlanningPanelModel.props.value.highlightedModuleIds"
-        @update-search-query="handleUpdateSearchQuery"
-        @add-module="handleAddModule"
-        @remove-module="handleRemoveModule"
-        @update-module-count="handleUpdateModuleCount"
-        @reorder-modules="handleReorderModules"
-        @apply-scale="handleApplyScale"
-        @transfer-auto-module="handleTransferAutoModule"
+        @update-planned-modules="stationPlanningPanelModel.emits.updatePlannedModules"
       />
     </div>
 

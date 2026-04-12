@@ -421,7 +421,7 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
 }
 
 .empire-gap-groups {
-  @apply space-y-1 mb-2;
+  @apply space-y-1;
 }
 
 .empire-gap-group {

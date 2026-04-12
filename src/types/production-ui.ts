@@ -67,21 +67,11 @@ export interface ContextToolbarEmits {
 export interface StationPlanningPanelProps {
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
-  filteredModulesGrouped: ModuleGroupResult[]
-  searchQuery: string
   enforceDlcActivation: boolean
-  flashingModuleIds: string[]
-  highlightedModuleIds: string[]
 }
 
 export interface StationPlanningPanelEmits {
-  updateSearchQuery: (value: string) => void
-  addModule: (moduleId: string) => void
-  removeModule: (index: number) => void
-  updateModuleCount: (index: number, count: number) => void
-  reorderModules: (modules: SavedModule[]) => void
-  applyScale: (scale: number) => void
-  transferAutoModule: (module: SavedModule) => void
+  updatePlannedModules: (modules: SavedModule[]) => void
 }
 
 export interface StationModulePickerProps {

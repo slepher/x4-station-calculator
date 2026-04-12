@@ -227,3 +227,19 @@
 - [ ] T121. 补充入口级回归测试：分别验证 `BlueprintProductionWorkbenchView` 与 `LiveProductionWorkbenchView` 下的 station 选择、overview、transit、dirty/save 语义
 - [ ] T122. 补充共享 UI 回归测试：同一套已去耦 workbench 子树在 blueprint/live 两个入口下行为一致，仅入口语义差异不同
 - [ ] T123. 移除 `ProductionWorkbenchView`，完成迁移后删除旧 watcher/compat 主路径，并更新 `tasks.md` 状态与剩余兼容清单
+
+## 后续修正 - StationPlanningPanel 整包提交流程（Refactory 5）
+
+- [x] T124. 编写 `refactory5.md`，明确 `StationPlanningPanel` 改为方案 B：整包提交 `plannedModules`
+- [x] T125. 修改 `StationPlanningPanel` 对外 contract：props 仅保留 `plannedModules`、`autoIndustryModules`、`enforceDlcActivation`
+- [x] T126. 修改 `StationPlanningPanel` 对外 contract：emits 仅保留 `updatePlannedModules`
+- [x] T127. 在 `StationPlanningPanel` 内部实现统一数组变换提交流程：新增模块、删除模块、修改数量、拖拽排序后统一生成 `nextModules`
+- [x] T128. 在 `StationPlanningPanel` 内部实现批量缩放与自动模块转入：移除 `applyScale` / `transferAutoModule` 对外事件，统一改为提交 `nextModules`
+- [x] T129. 将搜索输入、模块筛选、高亮、闪烁状态全部内聚到 `StationPlanningPanel` / `StationModulePicker` 内部，不再由入口层提供 `searchQuery` / `filteredModulesGrouped`
+- [x] T130. 更新 `useStationPlanningPanelModel` 与相关类型文件，只暴露整包 `plannedModules` 输入/输出 contract
+- [x] T131. 更新 `BlueprintProductionWorkbenchView`：删除面向 panel 的细粒度 handler，只保留 `updatePlannedModules`
+- [x] T132. 更新 `LiveProductionWorkbenchView`：删除面向 panel 的细粒度 handler，只保留 `updatePlannedModules`
+- [x] T133. 调整 `useBlueprintProductionStore` / `useLiveProductionStore` 的 planning 写接口，改为接收整包 `plannedModules`
+- [x] T134. 清理新入口主路径对 `useStationStore` 细粒度规划编辑入口的依赖，停止为 `StationPlanningPanel` 保留这些适配接口
+- [ ] T135. 补充回归测试：验证模块添加、删除、改数量、拖拽、批量缩放、自动模块转入在整包提交模式下行为不回归
+- [x] T136. 运行 `npm run build` 与相关 unit/e2e 验证，确认 Refactory 5 不引入 planning 面板回归
