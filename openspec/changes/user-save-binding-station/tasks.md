@@ -132,6 +132,20 @@
 - T51: useStationPlanLibrary 接入
 - Phase 4: empireSessionService 抽取
 
+**已完成（Refactory 4 Phase 1）**：
+- T107: 创建 `production-context.ts` 定义共享 props/actions contract
+- T108: 创建 `useBlueprintProductionStore.ts` 接管 blueprint 入口
+- T109: 创建 `useLiveProductionStore.ts` 接管 live 入口
+- T112: 创建 `BlueprintProductionWorkbenchView.vue` 直接接入 blueprint store
+- T113: 创建 `LiveProductionWorkbenchView.vue` 直接接入 live store
+- T115: 简化 `MainWorkbench.vue` 按 activeView 直接选择入口组件
+- 编译验证通过
+
+**待后续完成（Refactory 4 Phase 2）**：
+- T110-T111: session 生命周期完全拆分
+- T114: ProductionWorkbenchView 职责迁移（已大部分完成）
+- T116-T123: 收缩旧兼容层、测试验证
+
 **重构收益**：
 - Source-aware 读取逻辑统一，减少重复分支判断
 - Flow 聚合逻辑独立封装，便于测试和维护
@@ -196,19 +210,20 @@
 ## 后续修正 - 两个入口彻底拆分（Refactory 4）
 
 - [x] T106. 编写 `refactory4.md`，明确“同内容从同一入口拆成两个入口”后的目标架构与重构原则
-- [ ] T107. 定义共享工作台 contract：`ProductionWorkbenchContext` / planning context / dashboard context，明确共享 UI 的最小输入接口
-- [ ] T108. 创建 `BlueprintProductionEntry.vue`，承接蓝图产能入口装配，不再由 `MainWorkbench` watcher 编排 empire source 切换
-- [ ] T109. 创建 `LiveProductionEntry.vue`，承接实况产能入口装配，不再由 `MainWorkbench` watcher 编排 binding source 切换
-- [ ] T110. 简化 `MainWorkbench`：按 active view 直接选择入口组件，移除“view -> productionSource -> load”双重翻译逻辑
-- [ ] T111. 创建 `useBlueprintProductionStore`，接管 empire 入口的 selection / mutation / flow / save / dirty 生命周期
-- [ ] T112. 创建 `useLiveProductionStore`，接管 binding 入口的 selection / mutation / draft / save / discard 生命周期
-- [ ] T113. 将共享可复用逻辑下沉到纯 service / query / command 层，避免在新 store 之间复制计算逻辑
-- [ ] T114. 将 station 编辑命令整理为入口无关的 command builder，由蓝图/实况入口分别注入持久化依赖
-- [ ] T115. 将 empire session/saveAs/delete/snapshot 生命周期从旧总 store 中拆出，收口到蓝图入口 session service
-- [ ] T116. 将 binding draft/save/discard/confirm lifecycle 从旧总 store 中拆出，收口到实况入口 session service
-- [ ] T117. 停止在新主路径中扩散 `productionSource` / `activeId` / `activeStationId` 兼容 computed，仅保留过渡适配层
-- [ ] T118. 在新入口稳定后，逐步移除 `useEmpireStore` 中对 binding 的主路径编排职责
-- [ ] T119. 在新入口稳定后，逐步移除 `useStationStore` 中基于 `productionSource` 的写路由，改为显式接入对应入口 command
-- [ ] T120. 补充入口级回归测试：蓝图入口与实况入口分别验证 station 选择、overview、transit、dirty/save 语义
-- [ ] T121. 补充共享 UI 回归测试：同一套工作台组件在 blueprint/live 两个入口下行为一致，仅入口语义差异不同
-- [ ] T122. 完成迁移后删除旧 watcher/compat 主路径，并更新 `tasks.md` 状态与剩余兼容清单
+- [x] T107. 定义共享子组件 props / actions contract，覆盖 `StationTabBar`、`ContextToolbar`、`StationPlanningPanel`、`StationWareFlowsDashboard`、`StationDashboard`、`ImportPlanModal`、`TransitHub*` 的最小输入接口；禁止定义单一 `ProductionWorkbenchContext`
+- [x] T108. 创建 `useBlueprintProductionStore`，接管 blueprint 入口的 selection / mutation / flow / save / dirty 生命周期
+- [x] T109. 创建 `useLiveProductionStore`，接管 live 入口的 selection / mutation / draft / save / discard 生命周期
+- [ ] T110. 将 empire session/saveAs/delete/snapshot 生命周期从旧总 store 中拆出，收口到 `useBlueprintProductionStore`
+- [ ] T111. 将 binding draft/save/discard/confirm lifecycle 从旧总 store 中拆出，收口到 `useLiveProductionStore`
+- [x] T112. 创建 `BlueprintProductionWorkbenchView.vue`，直接接入 `useBlueprintProductionStore`，并向共享 workbench 子树注入 blueprint 主路径 props / actions
+- [x] T113. 创建 `LiveProductionWorkbenchView.vue`，直接接入 `useLiveProductionStore`，并向共享 workbench 子树注入 live 主路径 props / actions
+- [ ] T114. 将 `ProductionWorkbenchView` 当前承担的 overview / station / transit 布局编排、子组件 props 接线与 import modal 接线迁移到 `BlueprintProductionWorkbenchView` / `LiveProductionWorkbenchView`
+- [x] T115. 简化 `MainWorkbench`：按 active view 直接选择 `BlueprintProductionWorkbenchView` / `LiveProductionWorkbenchView`，移除“view -> productionSource -> load”双重翻译逻辑
+- [ ] T116. 将共享可复用逻辑下沉到纯 service / query / command / importer / mapper 层，禁止在两个新 store 中复制计算逻辑
+- [ ] T117. 将 station 编辑命令整理为入口无关的 command builder，由 blueprint/live 两个入口分别注入持久化依赖
+- [ ] T118. 停止在新主路径中扩散 `productionSource` / `activeId` / `activeStationId` 兼容 computed，仅保留过渡适配层
+- [ ] T119. 在 `BlueprintProductionWorkbenchView` / `LiveProductionWorkbenchView` 主路径稳定后，移除 `useEmpireStore` 中对 binding 的主路径编排职责
+- [ ] T120. 在两个新入口主路径稳定后，移除 `useStationStore` 中基于 `productionSource` 的写路由，改为显式接入对应入口 command
+- [ ] T121. 补充入口级回归测试：分别验证 `BlueprintProductionWorkbenchView` 与 `LiveProductionWorkbenchView` 下的 station 选择、overview、transit、dirty/save 语义
+- [ ] T122. 补充共享 UI 回归测试：同一套已去耦 workbench 子树在 blueprint/live 两个入口下行为一致，仅入口语义差异不同
+- [ ] T123. 移除 `ProductionWorkbenchView`，完成迁移后删除旧 watcher/compat 主路径，并更新 `tasks.md` 状态与剩余兼容清单

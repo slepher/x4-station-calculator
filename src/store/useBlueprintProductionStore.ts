@@ -1,0 +1,562 @@
+import { defineStore, storeToRefs } from 'pinia'
+import { ref, computed } from 'vue'
+import type {
+  EmpirePlan,
+  StationPlan,
+  StationType,
+  SavedModule,
+  GroupedFlows,
+  StationSettings,
+  TransitHubViewModel,
+  SupplyPlanningInput,
+  SectorInternalData
+} from '@/types/x4'
+import type { StationComponentGapFlows } from './logic/stationGapViewModel'
+import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
+import type { ProductionSessionContext } from '@/types/production-context'
+import { useGameDataStore } from './useGameDataStore'
+import { useEmpireDataStore } from './useEmpireDataStore'
+import { useActiveViewStore } from './useActiveViewStore'
+import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
+import { stationStateMap, migrateStationSettings } from './state/StationStateMap'
+import {
+  buildStationComputeDeps,
+  syncPersistedToStateMap,
+  recomputeStation,
+  getFilteredGroupedFlows,
+  clearStationState
+} from './logic/stationComputeService'
+import { getLinkedSectorIdsFor, normalizeSectorLinks } from './logic/sectorLinks'
+import {
+  createEmpireSourceView,
+  computeActiveStation,
+  computeActiveTransitSectorId,
+  toTransitTabId,
+  fromTransitTabId
+} from './logic/empireSourceView'
+import { createEmpireFlowFacade } from './logic/empireFlowFacade'
+
+function createDefaultEmpire(name: string = ''): EmpirePlan {
+  return {
+    id: crypto.randomUUID(),
+    name,
+    sectors: [],
+    sectorLinks: [],
+    stations: []
+  }
+}
+
+export const useBlueprintProductionStore = defineStore('blueprintProduction', () => {
+  const gameData = useGameDataStore()
+  const empireDataStore = useEmpireDataStore()
+  const activeViewStore = useActiveViewStore()
+  const { savedEmpires } = storeToRefs(empireDataStore)
+
+  const isReady = ref(false)
+  const lastSavedSnapshot = ref<string>('')
+
+  const activeEmpire = ref<EmpirePlan | null>(null)
+
+  const activeStationId = computed({
+    get: () => activeViewStore.activeEmpireStation,
+    set: (id: string | null) => activeViewStore.activeEmpireStation = id
+  })
+
+  const productionSource = computed<'empire'>(() => 'empire')
+
+  const sourceView = createEmpireSourceView({
+    productionSource,
+    activeEmpire,
+    activeBinding: ref(null),
+    selectedArchive: ref(null)
+  })
+
+  const sectors = sourceView.sectors
+  const sectorLinks = sourceView.sectorLinks
+  const orderedStationsBySector = sourceView.orderedStationsBySector
+
+  const flowFacade = createEmpireFlowFacade({
+    productionSource,
+    activeEmpire,
+    activeBinding: ref(null),
+    selectedArchive: ref(null),
+    sourceView,
+    modulesMap: computed(() => gameData.modulesMap),
+    waresMap: computed(() => gameData.waresMap),
+    medicalConsumptionMap: computed(() => gameData.medicalConsumptionMap),
+    enforceDlcActivation: computed(() => gameData.enforceDlcActivation),
+    isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
+  })
+
+  const stationFlowCache = flowFacade.stationFlowCache
+  const empireGroupedFlows = flowFacade.empireGroupedFlows
+  const sectorInternalDataMap = flowFacade.sectorInternalDataMap
+  const sectorLinkCalcMap = flowFacade.sectorLinkCalcMap
+
+  const activeStation = computed(() => computeActiveStation(
+    productionSource.value,
+    [],
+    activeEmpire.value,
+    activeStationId.value
+  ))
+
+  const activeTransitSectorId = computed(() => computeActiveTransitSectorId(
+    activeStationId.value,
+    sectors.value
+  ))
+
+  function getStationById(stationId: string): StationPlan | null {
+    return sourceView.getStationById(stationId)
+  }
+
+  function getComputeDeps() {
+    const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
+    if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
+    return buildStationComputeDeps({
+      modulesMap,
+      waresMap,
+      medicalConsumptionMap,
+      buildPriceMultiplier: 0.5,
+      enforceDlcActivation,
+      isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
+    })
+  }
+
+  function refreshStationFlowCache(stationId: string) {
+    const station = getStationById(stationId)
+    if (!station) return
+    const deps = getComputeDeps()
+    if (!deps) return
+    syncPersistedToStateMap(stationId, station)
+    recomputeStation(stationId, deps)
+  }
+
+  function getStationFlowCache(stationId: string): GroupedFlows | null {
+    const state = stationStateMap.get(stationId)
+    if (!state) return null
+    return getFilteredGroupedFlows(stationId)
+  }
+
+  function initializeAllStationCaches() {
+    if (!activeEmpire.value) return
+    activeEmpire.value.stations.forEach(station => {
+      refreshStationFlowCache(station.id)
+    })
+  }
+
+  function clearStationCaches() {
+    stationStateMap.list().forEach(state => {
+      clearStationState(state.stationId)
+    })
+  }
+
+  function getLinkedSectors(sectorId: string): string[] {
+    return getLinkedSectorIdsFor(sectorId, sectorLinks.value)
+  }
+
+  function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
+    return flowFacade.getSupplyPlanningInput(sectorId)
+  }
+
+  function getSectorInternalData(sectorId: string): SectorInternalData {
+    return flowFacade.getSectorInternalData(sectorId)
+  }
+
+  function getSectorLinkCalc(sectorId: string): SectorLinkCalcEntry | null {
+    return flowFacade.getSectorLinkCalc(sectorId)
+  }
+
+  function getStationComponentGapFlows(stationId: string | null): StationComponentGapFlows {
+    return flowFacade.getStationComponentGapFlows(stationId, activeStationId.value)
+  }
+
+  function getTransitHubViewModel(input: {
+    sectorId: string | null
+    racePreference: string
+    transportShipCapacity: number
+    storageBufferHours?: number
+  }): TransitHubViewModel {
+    return flowFacade.getTransitHubViewModel(input)
+  }
+
+  function createStation(name: string, type: StationType = 'industrial', selectAfterCreate: boolean = true) {
+    const station = empireDataStore.createStationInEmpire(activeEmpire.value, name, type)
+    if (!station) return null
+    if (selectAfterCreate) {
+      activeStationId.value = station.id
+    }
+    refreshStationFlowCache(station.id)
+    return station
+  }
+
+  function deleteStation(stationId: string) {
+    const deleted = empireDataStore.deleteStationFromEmpire(activeEmpire.value, stationId)
+    if (deleted) {
+      stationStateMap.remove(stationId)
+      if (activeStationId.value === stationId) {
+        activeStationId.value = activeEmpire.value?.stations[0]?.id || null
+      }
+    }
+  }
+
+  function duplicateStation(stationId: string) {
+    const newStation = empireDataStore.duplicateStationInEmpire(activeEmpire.value, stationId)
+    if (!newStation) return null
+    activeStationId.value = newStation.id
+    refreshStationFlowCache(newStation.id)
+    return newStation
+  }
+
+  function renameStation(stationId: string, newName: string) {
+    return empireDataStore.renameStationInEmpire(activeEmpire.value, stationId, newName)
+  }
+
+  function selectStation(stationId: string | null) {
+    activeStationId.value = stationId
+  }
+
+  function selectTransitSector(sectorId: string | null) {
+    if (!sectorId) {
+      activeStationId.value = null
+      return
+    }
+    const exists = sectors.value.some((sector) => sector.id === sectorId)
+    if (!exists) return
+    const transitTabId = toTransitTabId(sectorId)
+    activeStationId.value = transitTabId
+  }
+
+  function selectOverview() {
+    activeStationId.value = null
+  }
+
+  function updateStationSettings(stationId: string, settings: Partial<StationSettings>) {
+    if (empireDataStore.updateStationSettingsInEmpire(activeEmpire.value, stationId, settings)) {
+      refreshStationFlowCache(stationId)
+    }
+  }
+
+  function updateStationModules(stationId: string, modules: SavedModule[]) {
+    if (empireDataStore.updateStationModulesInEmpire(activeEmpire.value, stationId, modules)) {
+      refreshStationFlowCache(stationId)
+    }
+  }
+
+  function updateStationType(stationId: string, type: StationType) {
+    empireDataStore.updateStationTypeInEmpire(activeEmpire.value, stationId, type)
+    refreshStationFlowCache(stationId)
+  }
+
+  function updateStationCount(stationId: string, count: number) {
+    empireDataStore.updateStationCountInEmpire(activeEmpire.value, stationId, count)
+    refreshStationFlowCache(stationId)
+  }
+
+  function updateStationMinerals(stationId: string, minerals: string[]) {
+    empireDataStore.updateStationMineralsInEmpire(activeEmpire.value, stationId, minerals)
+    refreshStationFlowCache(stationId)
+  }
+
+  function applyImportedStationPayload(
+    stationId: string,
+    payload: { modules: SavedModule[]; lockedWares: string[]; warePriority: Record<string, number> }
+  ): boolean {
+    const station = getStationById(stationId)
+    if (!station) return false
+    station.modules = payload.modules.map(m => ({ ...m }))
+    station.lockedWares = [...payload.lockedWares]
+    station.warePriority = { ...payload.warePriority }
+    station.lastUpdated = Date.now()
+    refreshStationFlowCache(stationId)
+    return true
+  }
+
+  function updateEmpireName(name: string) {
+    empireDataStore.renameEmpireDraft(activeEmpire.value, name)
+  }
+
+  function serializeEmpireForDirtyCheck() {
+    return JSON.stringify({
+      activeEmpire: activeEmpire.value ? JSON.parse(JSON.stringify(activeEmpire.value)) : null
+    })
+  }
+
+  function takeSnapshot() {
+    lastSavedSnapshot.value = serializeEmpireForDirtyCheck()
+  }
+
+  function getModuleLookup() {
+    return {
+      modulesMap: gameData.modulesMap,
+      modulesByMacroId: gameData.modulesByMacroId
+    }
+  }
+
+  function loadData(data: any) {
+    const migrated = migrateEmpireStateToCurrent(data, getModuleLookup())
+    migrated.warnings.forEach((warning) => console.warn('[BlueprintProductionStore][Migration]', warning))
+
+    savedEmpires.value = migrated.state
+
+    if (migrated.state.list.length === 0) {
+      const defaultEmpire = createDefaultEmpire('')
+      savedEmpires.value.list.push(defaultEmpire)
+      savedEmpires.value.activeId = defaultEmpire.id
+      activeEmpire.value = JSON.parse(JSON.stringify(defaultEmpire))
+      activeStationId.value = null
+      takeSnapshot()
+      return
+    }
+
+    if (migrated.state.activeId) {
+      const empire = migrated.state.list.find(e => e.id === migrated.state.activeId)
+      if (empire) {
+        if (!Array.isArray(empire.sectorLinks)) {
+          empire.sectorLinks = []
+        }
+        const validSectorIds = new Set((empire.sectors || []).map((sector) => sector.id))
+        empire.sectorLinks = normalizeSectorLinks(empire.sectorLinks, validSectorIds)
+        empire.stations.forEach(station => {
+          if (station.count === null || station.count === undefined) {
+            station.count = 1
+          }
+          station.settings = migrateStationSettings(station.settings)
+        })
+        activeEmpire.value = JSON.parse(JSON.stringify(empire))
+
+        const storedTabId = activeViewStore.activeEmpireStation
+        const isValidTabId = (tabId: string | null) => {
+          if (!tabId) return false
+          const transitSectorId = fromTransitTabId(tabId)
+          if (transitSectorId) {
+            return (empire.sectors || []).some((sector) => sector.id === transitSectorId)
+          }
+          return empire.stations.some((station) => station.id === tabId)
+        }
+
+        const isValid = isValidTabId(storedTabId)
+        if (!isValid) {
+          activeStationId.value = null
+        }
+      }
+    }
+    takeSnapshot()
+  }
+
+  function saveToStorage() {
+    empireDataStore.saveToStorage()
+  }
+
+  function saveEmpire() {
+    if (!activeEmpire.value) return
+
+    const empireData = JSON.parse(JSON.stringify(activeEmpire.value))
+    const idx = savedEmpires.value.list.findIndex(e => e.id === empireData.id)
+
+    if (idx !== -1) {
+      savedEmpires.value.list[idx] = empireData
+    } else {
+      savedEmpires.value.list.push(empireData)
+    }
+
+    savedEmpires.value.activeId = empireData.id
+    saveToStorage()
+    takeSnapshot()
+  }
+
+  function saveEmpireAs(name: string) {
+    if (!activeEmpire.value) return false
+    const newEmpire = JSON.parse(JSON.stringify(activeEmpire.value))
+    newEmpire.id = crypto.randomUUID()
+    newEmpire.name = name
+    newEmpire.stations.forEach((s: { id: string }) => { s.id = crypto.randomUUID() })
+    activeEmpire.value = newEmpire
+    saveEmpire()
+    return true
+  }
+
+  function requiresSaveAsOnSave() {
+    return !savedEmpires.value.activeId
+  }
+
+  function createEmpire(name: string = ''): EmpirePlan {
+    const empire = createDefaultEmpire(name)
+    activeEmpire.value = empire
+    activeStationId.value = null
+    savedEmpires.value.activeId = null
+    takeSnapshot()
+    return empire
+  }
+
+  function loadEmpire(empireId: string) {
+    const empire = savedEmpires.value.list.find(e => e.id === empireId)
+    if (empire) {
+      clearStationCaches()
+      activeEmpire.value = JSON.parse(JSON.stringify(empire))
+      const active = activeEmpire.value
+      if (active && !Array.isArray(active.sectorLinks)) {
+        active.sectorLinks = []
+      }
+      if (active) {
+        const validSectorIds = new Set((active.sectors || []).map((sector) => sector.id))
+        active.sectorLinks = normalizeSectorLinks(active.sectorLinks, validSectorIds)
+      }
+      savedEmpires.value.activeId = empireId
+
+      const storedTabId = activeViewStore.activeEmpireStation
+      const isValid = storedTabId && empire.stations.some(s => s.id === storedTabId)
+      activeViewStore.switchToEmpire(empireId)
+      if (isValid) {
+        activeStationId.value = storedTabId
+      }
+      initializeAllStationCaches()
+      takeSnapshot()
+    }
+  }
+
+  function deleteEmpire(empireId: string) {
+    const deletingActiveEmpire = activeEmpire.value?.id === empireId
+    const deleted = empireDataStore.deleteEmpire(empireId)
+    if (!deleted) return
+    if (deletingActiveEmpire) {
+      if (savedEmpires.value.list.length > 0) {
+        loadEmpire(savedEmpires.value.list[0]!.id)
+      } else {
+        createEmpire()
+      }
+    }
+    saveToStorage()
+  }
+
+  const isDirty = computed(() => {
+    if (isEmptyForSave()) return false
+    const current = serializeEmpireForDirtyCheck()
+    return current !== lastSavedSnapshot.value
+  })
+
+  function isEmptyForSave() {
+    if (!activeEmpire.value) return true
+    const hasStations = (activeEmpire.value.stations || []).length > 0
+    const hasSectors = (activeEmpire.value.sectors || []).length > 0
+    return !hasStations && !hasSectors
+  }
+
+  const session: ProductionSessionContext = {
+    isDirty: computed(() => isDirty.value).value,
+    save: saveEmpire,
+    discard: () => {
+      const empireId = savedEmpires.value.activeId
+      if (empireId) {
+        loadEmpire(empireId)
+      } else {
+        createEmpire()
+      }
+    },
+    canSave: computed(() => !isEmptyForSave()).value,
+    canDiscard: computed(() => isDirty.value).value
+  }
+
+  async function initialize() {
+    console.log('[BlueprintProductionStore] Initializing...')
+    isReady.value = false
+
+    try {
+      await gameData.initialize()
+
+      const stored = empireDataStore.loadFromStorage()
+      if (stored && Array.isArray(stored.list)) {
+        loadData(stored)
+        saveToStorage()
+        initializeAllStationCaches()
+
+        fallbackToFirstEmpire()
+
+        isReady.value = true
+        console.log('[BlueprintProductionStore] Loaded saved empires')
+        return
+      }
+
+      createEmpire()
+      activeViewStore.setProductionSource('empire')
+      isReady.value = true
+      console.log('[BlueprintProductionStore] Initialized with new empire')
+
+    } catch (e) {
+      console.error('[BlueprintProductionStore] Initialization failed:', e)
+    }
+  }
+
+  function fallbackToFirstEmpire() {
+    const storedId = activeViewStore.activeEmpireId
+
+    if (storedId && savedEmpires.value.list.some((e) => e.id === storedId)) {
+      loadEmpire(storedId)
+      return
+    }
+
+    const firstEmpire = savedEmpires.value.list[0]
+    if (firstEmpire) {
+      activeViewStore.activeEmpireId = firstEmpire.id
+      loadEmpire(firstEmpire.id)
+      return
+    }
+
+    console.log('[BlueprintProductionStore] No empires found, creating new empire')
+    createEmpire()
+    activeViewStore.setProductionSource('empire')
+  }
+
+  return {
+    isReady,
+    isDirty,
+    isEmptyForSave,
+    session,
+    activeEmpire,
+    activeStation,
+    activeStationId,
+    activeTransitSectorId,
+    sectors,
+    sectorLinks,
+    orderedStationsBySector,
+    savedEmpires,
+    stationFlowCache,
+    getStationFlowCache,
+    refreshStationFlowCache,
+    initializeAllStationCaches,
+    clearStationCaches,
+    empireGroupedFlows,
+    sectorInternalDataMap,
+    sectorLinkCalcMap,
+    loadData,
+    saveToStorage,
+    saveEmpire,
+    saveEmpireAs,
+    requiresSaveAsOnSave,
+    loadEmpire,
+    deleteEmpire,
+    createEmpire,
+    createStation,
+    deleteStation,
+    duplicateStation,
+    renameStation,
+    getLinkedSectors,
+    selectStation,
+    selectTransitSector,
+    selectOverview,
+    getStationById,
+    updateStationSettings,
+    updateStationModules,
+    updateStationType,
+    updateStationCount,
+    updateStationMinerals,
+    applyImportedStationPayload,
+    updateEmpireName,
+    takeSnapshot,
+    initialize,
+    getSupplyPlanningInput,
+    getSectorInternalData,
+    getSectorLinkCalc,
+    getStationComponentGapFlows,
+    getTransitHubViewModel
+  }
+})
