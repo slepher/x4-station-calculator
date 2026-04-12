@@ -1,27 +1,26 @@
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
-
-interface StationTabItem {
-  id: string
-  name: string
-  stationType?: StationType
-}
+import type { ProductionTabItem } from '@/types/production-ui'
 
 const props = defineProps<{
-  tabs: StationTabItem[]
+  tabs: ProductionTabItem[]
   activeTabId: string | null
+  expandedSectorId: string | null
   canCreateStation: boolean
   canOpenContextMenu: boolean
 }>()
 
 const emit = defineEmits<{
+  selectOverview: []
+  selectTransit: [sectorId: string]
   selectStation: [stationId: string]
   createStation: []
   renameStation: [stationId: string]
   duplicateStation: [stationId: string]
   deleteStation: [stationId: string]
+  expandSector: [sectorId: string | null]
 }>()
 
 const { t } = useI18n()
@@ -56,7 +55,21 @@ const addNewStation = () => {
   }, 100)
 }
 
-const selectStation = (stationId: string) => {
+const openSupply = (sectorId: string) => {
+  emit('expandSector', sectorId)
+  emit('selectTransit', sectorId)
+}
+
+const openOverview = () => {
+  emit('expandSector', null)
+  emit('selectOverview')
+}
+
+const selectStationWithExpand = (stationId: string) => {
+  const station = props.tabs.find(tab => tab.id === stationId)
+  if (station?.sectorId) {
+    emit('expandSector', station.sectorId)
+  }
   emit('selectStation', stationId)
 }
 
@@ -153,6 +166,41 @@ const cancelDelete = () => {
   showDeleteConfirm.value = false
   stationToDelete.value = null
 }
+
+const tabsToShow = computed(() => {
+  const result: ProductionTabItem[] = []
+  
+  props.tabs.forEach(tab => {
+    if (tab.type === 'overview') {
+      result.push(tab)
+    } else if (tab.type === 'station' && !tab.sectorId) {
+      result.push(tab)
+    }
+  })
+  
+  const sectorGroups = new Map<string, ProductionTabItem[]>()
+  props.tabs.forEach(tab => {
+    if (tab.sectorId && tab.type !== 'overview') {
+      if (!sectorGroups.has(tab.sectorId)) {
+        sectorGroups.set(tab.sectorId, [])
+      }
+      sectorGroups.get(tab.sectorId)!.push(tab)
+    }
+  })
+  
+  sectorGroups.forEach((items, sectorId) => {
+    const transitTab = items.find(i => i.type === 'transit')
+    if (transitTab) result.push(transitTab)
+    
+    if (props.expandedSectorId === sectorId) {
+      items.filter(i => i.type === 'station').forEach(stationTab => {
+        result.push(stationTab)
+      })
+    }
+  })
+  
+  return result
+})
 </script>
 
 <template>
@@ -171,17 +219,20 @@ const cancelDelete = () => {
     <div ref="tabsScrollAreaRef" class="tabs-scroll-area custom-scrollbar" @scroll="handleTabsScroll">
       
       <div 
-        v-for="tab in tabs"
+        v-for="tab in tabsToShow"
         :key="tab.id"
-        class="tab-item station-tab"
-        :class="{ 'active': activeTabId === tab.id }"
-        @click="selectStation(tab.id)"
-        @contextmenu.stop="openMenu(tab.id, $event)"
+        class="tab-item"
+        :class="[
+          tab.type === 'overview' ? 'overview-tab' : tab.type === 'transit' ? 'supply-tab' : 'station-tab',
+          { 'active': activeTabId === tab.id }
+        ]"
+        @click="tab.type === 'overview' ? openOverview() : tab.type === 'transit' ? openSupply(tab.sectorId!) : selectStationWithExpand(tab.id)"
+        @contextmenu.stop="tab.type === 'station' ? openMenu(tab.id, $event) : undefined"
       >
         <div class="tab-highlight"></div>
         <div class="tab-content">
-          <span class="tab-icon text-base">{{ getStationIcon(tab.stationType) }}</span>
-          <span class="tab-label max-w-[120px] truncate">{{ tab.name }}</span>
+          <span class="tab-icon text-base">{{ tab.type === 'overview' ? '📊' : tab.type === 'transit' ? '🚚' : getStationIcon(tab.stationType) }}</span>
+          <span class="tab-label max-w-[120px] truncate">{{ tab.type === 'overview' ? t('sector.overview') : tab.name }}</span>
         </div>
       </div>
 
@@ -288,6 +339,9 @@ const cancelDelete = () => {
 .station-tab {
   @apply cursor-pointer;
 }
+.supply-tab {
+  @apply cursor-pointer;
+}
 
 .tab-item.active {
   @apply bg-slate-800 text-sky-400 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)];
@@ -308,6 +362,10 @@ const cancelDelete = () => {
 
 .tab-label {
   @apply text-xs font-bold tracking-wide;
+}
+
+.overview-tab {
+  @apply min-w-[fit-content] px-3;
 }
 
 .add-btn {

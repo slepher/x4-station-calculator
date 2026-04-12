@@ -6,13 +6,9 @@ import type {
   StationType,
   SavedModule,
   GroupedFlows,
-  StationSettings,
-  TransitHubViewModel,
-  SupplyPlanningInput,
-  SectorInternalData
+  StationSettings
 } from '@/types/x4'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
-import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
 import type { ProductionSessionContext } from '@/types/production-context'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
@@ -26,15 +22,10 @@ import {
   getFilteredGroupedFlows,
   clearStationState
 } from './logic/stationComputeService'
-import { getLinkedSectorIdsFor, normalizeSectorLinks } from './logic/sectorLinks'
 import {
   createEmpireSourceView,
-  computeActiveStation,
-  computeActiveTransitSectorId,
-  toTransitTabId,
-  fromTransitTabId
+  computeActiveStation
 } from './logic/empireSourceView'
-import { createEmpireFlowFacade } from './logic/empireFlowFacade'
 
 function createDefaultEmpire(name: string = ''): EmpirePlan {
   return {
@@ -71,38 +62,13 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     selectedArchive: ref(null)
   })
 
-  const sectors = sourceView.sectors
-  const sectorLinks = sourceView.sectorLinks
-  const orderedStationsBySector = sourceView.orderedStationsBySector
-
-  const flowFacade = createEmpireFlowFacade({
-    productionSource,
-    activeEmpire,
-    activeBinding: ref(null),
-    selectedArchive: ref(null),
-    sourceView,
-    modulesMap: computed(() => gameData.modulesMap),
-    waresMap: computed(() => gameData.waresMap),
-    medicalConsumptionMap: computed(() => gameData.medicalConsumptionMap),
-    enforceDlcActivation: computed(() => gameData.enforceDlcActivation),
-    isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
-  })
-
-  const stationFlowCache = flowFacade.stationFlowCache
-  const empireGroupedFlows = flowFacade.empireGroupedFlows
-  const sectorInternalDataMap = flowFacade.sectorInternalDataMap
-  const sectorLinkCalcMap = flowFacade.sectorLinkCalcMap
+  const orderedStations = sourceView.orderedStationsBySector
 
   const activeStation = computed(() => computeActiveStation(
     productionSource.value,
     [],
     activeEmpire.value,
     activeStationId.value
-  ))
-
-  const activeTransitSectorId = computed(() => computeActiveTransitSectorId(
-    activeStationId.value,
-    sectors.value
   ))
 
   function getStationById(stationId: string): StationPlan | null {
@@ -150,33 +116,11 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     })
   }
 
-  function getLinkedSectors(sectorId: string): string[] {
-    return getLinkedSectorIdsFor(sectorId, sectorLinks.value)
-  }
-
-  function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
-    return flowFacade.getSupplyPlanningInput(sectorId)
-  }
-
-  function getSectorInternalData(sectorId: string): SectorInternalData {
-    return flowFacade.getSectorInternalData(sectorId)
-  }
-
-  function getSectorLinkCalc(sectorId: string): SectorLinkCalcEntry | null {
-    return flowFacade.getSectorLinkCalc(sectorId)
-  }
-
-  function getStationComponentGapFlows(stationId: string | null): StationComponentGapFlows {
-    return flowFacade.getStationComponentGapFlows(stationId, activeStationId.value)
-  }
-
-  function getTransitHubViewModel(input: {
-    sectorId: string | null
-    racePreference: string
-    transportShipCapacity: number
-    storageBufferHours?: number
-  }): TransitHubViewModel {
-    return flowFacade.getTransitHubViewModel(input)
+  function getStationComponentGapFlows(_stationId: string | null): StationComponentGapFlows {
+    return {
+      operations: [],
+      supply: []
+    }
   }
 
   function createStation(name: string, type: StationType = 'industrial', selectAfterCreate: boolean = true) {
@@ -213,21 +157,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   function selectStation(stationId: string | null) {
     activeStationId.value = stationId
-  }
-
-  function selectTransitSector(sectorId: string | null) {
-    if (!sectorId) {
-      activeStationId.value = null
-      return
-    }
-    const exists = sectors.value.some((sector) => sector.id === sectorId)
-    if (!exists) return
-    const transitTabId = toTransitTabId(sectorId)
-    activeStationId.value = transitTabId
-  }
-
-  function selectOverview() {
-    activeStationId.value = null
   }
 
   function updateStationSettings(stationId: string, settings: Partial<StationSettings>) {
@@ -311,11 +240,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (migrated.state.activeId) {
       const empire = migrated.state.list.find(e => e.id === migrated.state.activeId)
       if (empire) {
-        if (!Array.isArray(empire.sectorLinks)) {
-          empire.sectorLinks = []
-        }
-        const validSectorIds = new Set((empire.sectors || []).map((sector) => sector.id))
-        empire.sectorLinks = normalizeSectorLinks(empire.sectorLinks, validSectorIds)
         empire.stations.forEach(station => {
           if (station.count === null || station.count === undefined) {
             station.count = 1
@@ -325,16 +249,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         activeEmpire.value = JSON.parse(JSON.stringify(empire))
 
         const storedTabId = activeViewStore.activeEmpireStation
-        const isValidTabId = (tabId: string | null) => {
-          if (!tabId) return false
-          const transitSectorId = fromTransitTabId(tabId)
-          if (transitSectorId) {
-            return (empire.sectors || []).some((sector) => sector.id === transitSectorId)
-          }
-          return empire.stations.some((station) => station.id === tabId)
-        }
-
-        const isValid = isValidTabId(storedTabId)
+        const isValid = storedTabId && empire.stations.some((station) => station.id === storedTabId)
         if (!isValid) {
           activeStationId.value = null
         }
@@ -393,14 +308,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (empire) {
       clearStationCaches()
       activeEmpire.value = JSON.parse(JSON.stringify(empire))
-      const active = activeEmpire.value
-      if (active && !Array.isArray(active.sectorLinks)) {
-        active.sectorLinks = []
-      }
-      if (active) {
-        const validSectorIds = new Set((active.sectors || []).map((sector) => sector.id))
-        active.sectorLinks = normalizeSectorLinks(active.sectorLinks, validSectorIds)
-      }
       savedEmpires.value.activeId = empireId
 
       const storedTabId = activeViewStore.activeEmpireStation
@@ -437,8 +344,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   function isEmptyForSave() {
     if (!activeEmpire.value) return true
     const hasStations = (activeEmpire.value.stations || []).length > 0
-    const hasSectors = (activeEmpire.value.sectors || []).length > 0
-    return !hasStations && !hasSectors
+    return !hasStations
   }
 
   const session: ProductionSessionContext = {
@@ -514,19 +420,12 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeEmpire,
     activeStation,
     activeStationId,
-    activeTransitSectorId,
-    sectors,
-    sectorLinks,
-    orderedStationsBySector,
+    orderedStations,
     savedEmpires,
-    stationFlowCache,
     getStationFlowCache,
     refreshStationFlowCache,
     initializeAllStationCaches,
     clearStationCaches,
-    empireGroupedFlows,
-    sectorInternalDataMap,
-    sectorLinkCalcMap,
     loadData,
     saveToStorage,
     saveEmpire,
@@ -539,10 +438,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     deleteStation,
     duplicateStation,
     renameStation,
-    getLinkedSectors,
     selectStation,
-    selectTransitSector,
-    selectOverview,
     getStationById,
     updateStationSettings,
     updateStationModules,
@@ -553,10 +449,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateEmpireName,
     takeSnapshot,
     initialize,
-    getSupplyPlanningInput,
-    getSectorInternalData,
-    getSectorLinkCalc,
-    getStationComponentGapFlows,
-    getTransitHubViewModel
+    getStationComponentGapFlows
   }
 })

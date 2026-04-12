@@ -6,7 +6,7 @@ import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useStationStore } from '@/store/useStationStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
-import { useStationTabBarModel } from '@/components/empire/composables/useStationTabBarModel'
+import { useSectorStationTabBarModel } from '@/components/empire/composables/useSectorStationTabBarModel'
 import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
 import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
@@ -15,7 +15,7 @@ import { useTransitHubWorkbenchModel } from '@/components/empire/composables/use
 import type { StationType, SavedModule, GroupedFlows, EmpireGroupedFlows } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
-import StationTabBar from '@/components/empire/StationTabBar.vue'
+import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
 import ContextToolbar from '@/components/empire/ContextToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
@@ -83,7 +83,7 @@ const importModalGetStationById = (stationId: string) => {
   return liveStore.getStationById(stationId)
 }
 
-const tabBarModel = useStationTabBarModel({
+const tabBarModel = useSectorStationTabBarModel({
   sectors: computed(() => liveStore.sectors),
   orderedStationsBySector: computed(() => liveStore.orderedStationsBySector),
   activeStationId: computed({
@@ -406,7 +406,7 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
 </script>
 
 <template>
-  <StationTabBar
+  <SectorStationTabBar
     :tabs="tabBarModel.props.value.tabs"
     :active-tab-id="tabBarModel.props.value.activeTabId"
     :expanded-sector-id="tabBarModel.props.value.expandedSectorId"

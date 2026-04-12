@@ -11,17 +11,12 @@ import { useContextToolbarModel } from '@/components/empire/composables/useConte
 import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
 import { useStationDashboardModel } from '@/components/empire/composables/useStationDashboardModel'
-import { useTransitHubWorkbenchModel } from '@/components/empire/composables/useTransitHubWorkbenchModel'
-import type { StationType, SavedModule, GroupedFlows, EmpireGroupedFlows } from '@/types/x4'
+import type { StationType, SavedModule, GroupedFlows } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import StationTabBar from '@/components/empire/StationTabBar.vue'
 import ContextToolbar from '@/components/empire/ContextToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
-import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
-import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
-import TransitHubCenterDashboard from '@/components/empire/transit-hub/TransitHubCenterDashboard.vue'
-import TransitHubMaterialsPanel from '@/components/empire/transit-hub/TransitHubMaterialsPanel.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 
 type SharedWareFlowViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
@@ -84,18 +79,12 @@ const importModalGetStationById = (stationId: string) => {
 }
 
 const tabBarModel = useStationTabBarModel({
-  sectors: computed(() => blueprintStore.sectors),
-  orderedStationsBySector: computed(() => blueprintStore.orderedStationsBySector),
-  activeStationId: computed({
-    get: () => blueprintStore.activeStationId,
-    set: (val) => blueprintStore.selectStation(val)
-  }),
-  isBindingMode,
-  getLinkedSectors: (sectorId: string) => blueprintStore.getLinkedSectors(sectorId)
-})
-
-const activeTransitSectorId = computed(() => blueprintStore.activeTransitSectorId)
-const isOverview = computed(() => blueprintStore.activeStation === null && !activeTransitSectorId.value)
+    orderedStations: computed(() => blueprintStore.orderedStations),
+    activeStationId: computed({
+      get: () => blueprintStore.activeStationId,
+      set: (val) => blueprintStore.selectStation(val)
+    })
+  })
 
 const activeEmpireNameRef = computed({
   get: () => blueprintStore.activeEmpire?.name || '',
@@ -108,36 +97,27 @@ const singleBerthThroughput = computed(() => {
 })
 
 const contextToolbarModel = useContextToolbarModel({
-  isBindingMode,
-  activeStation,
-  activeTransitSectorId,
-  sectors: computed(() => blueprintStore.sectors),
-  settings: computed(() => stationStore.settings),
-  activeBindingName: computed({ get: () => '', set: () => {} }),
-  activeEmpireName: activeEmpireNameRef as any,
-  singleBerthThroughput
-})
+    isBindingMode,
+    activeStation,
+    activeTransitSectorId: computed(() => null),
+    sectors: computed(() => []),
+    settings: computed(() => stationStore.settings),
+    activeBindingName: computed({ get: () => '', set: () => {} }),
+    activeEmpireName: activeEmpireNameRef as any,
+    singleBerthThroughput
+  })
 
 const importModalActiveStation = computed(() => {
-  if (!activeStation.value) return null
-  return {
-    id: activeStation.value.id,
-    modules: activeStation.value.modules
-  }
-})
+    if (!activeStation.value) return null
+    return {
+      id: activeStation.value.id,
+      modules: activeStation.value.modules
+    }
+  })
 
-const activeSupplySector = computed(() => {
-  if (!activeTransitSectorId.value) return null
-  return blueprintStore.sectors.find((sector) => sector.id === activeTransitSectorId.value) || null
-})
-
-const handleUpdateTitle = (value: string) => {
-  if (activeTransitSectorId.value && activeSupplySector.value) {
-    // renameBindingSector not applicable for blueprint
-  } else {
+  const handleUpdateTitle = (value: string) => {
     blueprintStore.updateEmpireName(value)
   }
-}
 
 const handleUpdateStationName = (value: string) => {
   if (activeStation.value) {
@@ -294,38 +274,13 @@ const stationDashboardModel = useStationDashboardModel({
   })),
   currentEfficiency: computed(() => stationStore.currentEfficiency),
   actualWorkforce: computed(() => stationStore.actualWorkforce),
-  buildPriceMultiplier: computed({
-    get: () => stationStore.buildPriceMultiplier,
-    set: (val: number) => { stationStore.buildPriceMultiplier = val }
-  }) as any
-})
+buildPriceMultiplier: computed({
+      get: () => stationStore.buildPriceMultiplier,
+      set: (val: number) => { stationStore.buildPriceMultiplier = val }
+    }) as any
+  })
 
-const transitHubModelRaw = computed(() => blueprintStore.getTransitHubViewModel({
-  sectorId: activeTransitSectorId.value,
-  racePreference: stationStore.settings.racePreference,
-  transportShipCapacity: stationStore.settings.transportShipCapacity
-}))
-
-const transitHubWorkbenchModel = useTransitHubWorkbenchModel({
-  sectorId: computed(() => activeTransitSectorId.value) as any,
-  groupedFlows: computed(() => transitHubModelRaw.value.groupedFlows as EmpireGroupedFlows),
-  storageFlows: computed(() => transitHubModelRaw.value.storageFlows),
-  storageModulePlans: computed(() => transitHubModelRaw.value.storageModulePlans),
-  supplyBuildModules: computed(() => transitHubModelRaw.value.supplyBuildModules as SavedModule[]),
-  viewMode: wareFlowViewMode as any
-})
-
-const transitHubModel = computed(() => transitHubWorkbenchModel.props.value || transitHubModelRaw.value)
-
-const handleSelectOverview = () => {
-  blueprintStore.selectStation(null)
-}
-
-const handleSelectTransit = (sectorId: string) => {
-  blueprintStore.selectTransitSector(sectorId)
-}
-
-const handleSelectStation = (stationId: string) => {
+  const handleSelectStation = (stationId: string) => {
   blueprintStore.selectStation(stationId)
 }
 
@@ -342,14 +297,10 @@ const handleDuplicateStation = (stationId: string) => {
 }
 
 const handleDeleteStation = (stationId: string) => {
-  blueprintStore.deleteStation(stationId)
-}
+    blueprintStore.deleteStation(stationId)
+  }
 
-const handleExpandSector = (sectorId: string | null) => {
-  tabBarModel.expandedSectorId.value = sectorId
-}
-
-const handleUpdateWareFlowResourceBufferHours = (value: number) => {
+  const handleUpdateWareFlowResourceBufferHours = (value: number) => {
   stationStore.updateSetting('resourceBufferHours', value)
 }
 
@@ -413,17 +364,13 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
   <StationTabBar
     :tabs="tabBarModel.props.value.tabs"
     :active-tab-id="tabBarModel.props.value.activeTabId"
-    :expanded-sector-id="tabBarModel.props.value.expandedSectorId"
     :can-create-station="tabBarModel.props.value.canCreateStation"
     :can-open-context-menu="tabBarModel.props.value.canOpenContextMenu"
-    @select-overview="handleSelectOverview"
-    @select-transit="handleSelectTransit"
     @select-station="handleSelectStation"
     @create-station="handleCreateStation"
     @rename-station="handleRenameStation"
     @duplicate-station="handleDuplicateStation"
     @delete-station="handleDeleteStation"
-    @expand-sector="handleExpandSector"
   />
   <ContextToolbar
     :mode="contextToolbarModel.props.value.mode"
@@ -451,7 +398,7 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
   <ImportPlanModal
     :isOpen="importModalState.isOpen"
     :initialTab="importModalState.initialTab"
-    :isOverview="isOverview"
+    :isOverview="!activeStation"
     :activeStationId="blueprintStore.activeStationId"
     :activeStation="importModalActiveStation"
     :createStation="importModalCreateStation"
@@ -461,44 +408,7 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
     @close="handleCloseImport"
   />
 
-  <template v-if="isOverview || !!activeTransitSectorId">
-    <div v-if="activeTransitSectorId" class="main-layout mt-6">
-      <div class="col-span-12 lg:col-span-3">
-        <TransitHubBuildPanel :storage-module-plans="transitHubModel.storageModulePlans" />
-      </div>
-
-      <div class="col-span-12 lg:col-span-5">
-        <TransitHubCenterDashboard
-          :grouped-flows="transitHubModel.groupedFlows"
-          :storage-flows="transitHubModel.storageFlows"
-          :view-mode="wareFlowViewMode"
-          @update:view-mode="wareFlowViewMode = $event"
-        />
-      </div>
-
-      <div class="col-span-12 lg:col-span-4">
-        <TransitHubMaterialsPanel
-          :plannedModulesOverride="transitHubModel.supplyBuildModules"
-          :buildPriceMultiplier="stationStore.buildPriceMultiplier"
-          :useHQ="stationStore.settings.useHQ"
-          @updateBuildPriceMultiplier="handleDashboardUpdateBuildPriceMultiplier"
-          @updateUseHQ="handleDashboardUpdateUseHQ"
-        />
-      </div>
-    </div>
-
-    <div v-else-if="isOverview" class="overview-layout mt-6">
-      <div class="col-span-1 lg:col-span-2">
-        <div class="sector-management-placeholder" aria-hidden="true"></div>
-      </div>
-
-      <div class="col-span-1 lg:col-span-3">
-        <EmpireWareFlowsDashboard :grouped-flows="blueprintStore.empireGroupedFlows" />
-      </div>
-    </div>
-  </template>
-
-  <div v-else class="main-layout mt-6">
+  <div v-if="activeStation" class="main-layout mt-6">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
         :planned-modules="stationPlanningPanelModel.props.value.plannedModules"
@@ -549,13 +459,5 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
 <style scoped>
 .main-layout {
   @apply grid grid-cols-12 gap-8 items-start;
-}
-
-.overview-layout {
-  @apply grid grid-cols-1 lg:grid-cols-5 gap-8 items-start;
-}
-
-.sector-management-placeholder {
-  min-height: 1px;
 }
 </style>

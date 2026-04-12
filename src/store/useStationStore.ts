@@ -8,16 +8,12 @@ import type {
   ModuleGroupResult,
 } from '../types/x4'
 import { useGameDataStore } from './useGameDataStore'
-import { useEmpireStore } from './useEmpireStore'
-import { useSaveBindingStore } from './useSaveBindingStore'
+import { useBlueprintProductionStore } from './useBlueprintProductionStore'
+import { useLiveProductionStore } from './useLiveProductionStore'
 import { useShipBuildStore, type StationActiveView } from './useShipBuildStore'
-import {
-  createBindingPlanStationId,
-  parseBindingStationId
-} from './logic/productionSourceAdapter'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import { migrateStationSettings, DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
-import { createStationCommands, type StationCommandContext } from './logic/stationCommands'
+import { createStationCommands, type StationCommandContext, type ProductionSourceKind } from './logic/stationCommands'
 import {
   buildStationComputeDeps,
   syncPersistedToStateMap,
@@ -41,8 +37,8 @@ export interface SavedPlansState {
 
 export const useStationStore = defineStore('station', () => {
   const gameData = useGameDataStore()
-  const empireStore = useEmpireStore()
-  const saveBindingStore = useSaveBindingStore()
+  const blueprintStore = useBlueprintProductionStore()
+  const liveStore = useLiveProductionStore()
   const shipBuildStore = useShipBuildStore()
 
   const activeView = computed<StationActiveView>({
@@ -51,15 +47,31 @@ export const useStationStore = defineStore('station', () => {
       shipBuildStore.activeView = value
     }
   })
-  const isReady = computed(() => empireStore.isReady && gameData.isReady)
+  const isReady = computed(() => gameData.isReady)
   const savedPlans = ref<SavedPlansState>({ version: 1, activeId: null, list: [] })
   const buildPriceMultiplier = ref(0.5)
 
+  const productionSource = computed(() => {
+    if (activeView.value === 'live-production') return 'save-binding'
+    return 'empire'
+  })
+
+  const activeStation = computed(() => {
+    if (productionSource.value === 'save-binding') {
+      return liveStore.activeStation
+    }
+    return blueprintStore.activeStation
+  })
+
   const currentPlanName = computed({
-    get: () => empireStore.activeStation?.name || '',
+    get: () => activeStation.value?.name || '',
     set: (name: string) => {
-      if (empireStore.activeStation) {
-        empireStore.activeStation.name = name
+      if (activeStation.value) {
+        if (productionSource.value === 'save-binding') {
+          liveStore.renameStation(activeStation.value.id, name)
+        } else {
+          blueprintStore.renameStation(activeStation.value.id, name)
+        }
       }
     }
   })
@@ -91,7 +103,7 @@ export const useStationStore = defineStore('station', () => {
   }
 
   function getActiveContext() {
-    const station = empireStore.activeStation
+    const station = activeStation.value
     if (!station) {
       let state = getStationState('__local__')
       if (!state) {
@@ -114,7 +126,7 @@ export const useStationStore = defineStore('station', () => {
   }
 
   function syncStateFromActiveStation() {
-    const station = empireStore.activeStation
+    const station = activeStation.value
     if (!station) return
 
     station.settings = migrateStationSettings(station.settings)
@@ -142,85 +154,41 @@ export const useStationStore = defineStore('station', () => {
   }
 
   function syncBindingStationPlanFromState(stationId: string) {
-    if (empireStore.productionSource !== 'save-binding') return
-    const binding = saveBindingStore.activeBinding
-    const parsed = parseBindingStationId(stationId)
-    if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return
-
+    if (productionSource.value !== 'save-binding') return
     const state = getStationState(stationId)
-    const station = empireStore.activeStation
-    if (!state || !station) return
+    if (!state) return
 
-    const { plannedModules, settings, lockedWares, warePriority } = state
-    const patch = {
-      modules: deepClone(plannedModules),
-      settings: migrateStationSettings(settings),
-      lockedWares: deepClone(lockedWares || []),
-      warePriority: deepClone(warePriority || {})
-    }
-
-    if (parsed.kind === 'plan') {
-      saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, patch)
-      return
-    }
-
-    const plan = saveBindingStore.upsertStationPlan({
-      gameGuid: binding.gameGuid,
-      saveStationCode: parsed.saveStationCode,
-      groupId: station.sectorId || null,
-      name: station.name || parsed.saveStationCode,
-      type: station.type || 'industrial',
-      modules: patch.modules,
-      settings: patch.settings,
-      lockedWares: patch.lockedWares,
-      warePriority: patch.warePriority
-    })
-    if (plan) {
-      empireStore.selectStation(createBindingPlanStationId(binding.gameGuid, plan.id))
-    }
+    liveStore.updateStationModules(stationId, deepClone(state.plannedModules))
   }
 
   const commandContext: StationCommandContext = {
-    productionSource: empireStore.productionSource,
-    getStationById: (stationId: string) => empireStore.getStationById(stationId),
+    productionSource: productionSource.value as ProductionSourceKind,
+    getStationById: (stationId: string) => {
+      if (productionSource.value === 'save-binding') {
+        return liveStore.getStationById(stationId)
+      }
+      return blueprintStore.getStationById(stationId)
+    },
     updateEmpireStationModules: (stationId: string, modules: SavedModule[]) => {
-      empireStore.updateStationModules(stationId, modules)
+      if (productionSource.value === 'save-binding') {
+        liveStore.updateStationModules(stationId, modules)
+      } else {
+        blueprintStore.updateStationModules(stationId, modules)
+      }
       return true
     },
     updateEmpireStationSettings: (stationId: string, settings: Partial<StationSettings>) => {
-      empireStore.updateStationSettings(stationId, settings)
+      if (productionSource.value === 'save-binding') {
+        liveStore.updateStationSettings(stationId, settings)
+      } else {
+        blueprintStore.updateStationSettings(stationId, settings)
+      }
       return true
     },
     updateBindingStationPlan: (stationId: string, patch: Partial<Pick<StationPlan, 'modules' | 'settings' | 'lockedWares' | 'warePriority'>>) => {
-      const binding = saveBindingStore.activeBinding
-      const parsed = parseBindingStationId(stationId)
-      if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
-      const station = empireStore.getStationById(stationId)
-      
-      if (parsed.kind === 'plan') {
-        return saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, {
-          modules: patch.modules,
-          settings: patch.settings,
-          lockedWares: patch.lockedWares,
-          warePriority: patch.warePriority
-        })
-      }
-      
-      if (parsed.kind === 'derived') {
-        const plan = saveBindingStore.upsertStationPlan({
-          gameGuid: binding.gameGuid,
-          saveStationCode: parsed.saveStationCode,
-          groupId: station?.sectorId || null,
-          name: station?.name || parsed.saveStationCode,
-          type: station?.type || 'industrial',
-          modules: patch.modules,
-          settings: patch.settings,
-          lockedWares: patch.lockedWares,
-          warePriority: patch.warePriority
-        })
-        return !!plan
-      }
-      return false
+      if (productionSource.value !== 'save-binding') return false
+      liveStore.updateStationModules(stationId, patch.modules || [])
+      return true
     },
     getComputeDeps: () => getComputeDeps(),
     getWaresMap: () => waresMap.value
@@ -280,7 +248,7 @@ export const useStationStore = defineStore('station', () => {
 
   watch(
     () => ({
-      stationId: empireStore.activeStation?.id,
+      stationId: activeStation.value?.id,
       gameReady: gameData.isReady,
       buildPrice: buildPriceMultiplier.value,
       enforceDlcActivation: enforceDlcActivation.value,
@@ -427,7 +395,12 @@ export const useStationStore = defineStore('station', () => {
     savedPlans.value.activeId = planData.id
   }
 
-  const isDirty = computed(() => empireStore.isDirty)
+  const isDirty = computed(() => {
+    if (productionSource.value === 'save-binding') {
+      return liveStore.isDirty
+    }
+    return blueprintStore.isDirty
+  })
 
   function loadPlan(index: number) {
     const plan = savedPlans.value.list[index]
