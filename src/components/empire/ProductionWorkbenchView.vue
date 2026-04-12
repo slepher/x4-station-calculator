@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { reactive } from 'vue'
 import { useEmpireStore } from '@/store/useEmpireStore'
 import { useStationStore } from '@/store/useStationStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
@@ -18,6 +19,7 @@ import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboa
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
 import TransitHubCenterDashboard from '@/components/empire/transit-hub/TransitHubCenterDashboard.vue'
 import TransitHubMaterialsPanel from '@/components/empire/transit-hub/TransitHubMaterialsPanel.vue'
+import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 
 type SharedWareFlowViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
@@ -34,6 +36,23 @@ const isOverview = computed(() => empireStore.activeStation === null && !activeT
 const wareFlowViewMode = ref<SharedWareFlowViewMode>('quantity')
 const isBindingMode = computed(() => activeViewStore.productionSource === 'save-binding')
 const activeStation = computed(() => empireStore.activeStation)
+
+const importModalState = reactive<{
+  isOpen: boolean
+  initialTab: 'logic-flow' | 'game-blueprint' | 'x4-station'
+}>({
+  isOpen: false,
+  initialTab: 'game-blueprint'
+})
+
+const handleOpenImport = () => {
+  importModalState.initialTab = 'logic-flow'
+  importModalState.isOpen = true
+}
+
+const handleCloseImport = () => {
+  importModalState.isOpen = false
+}
 
 const tabBarModel = useStationTabBarModel({
   sectors: computed(() => empireStore.sectors),
@@ -440,6 +459,13 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
     @update-race-preference="handleUpdateRacePreference"
     @update-workforce="handleUpdateWorkforce"
     @update-show-empire-gaps="handleUpdateShowEmpireGaps"
+    @open-import="handleOpenImport"
+  />
+
+  <ImportPlanModal
+    :isOpen="importModalState.isOpen"
+    :initialTab="importModalState.initialTab"
+    @close="handleCloseImport"
   />
 
   <template v-if="isOverview || !!activeTransitSectorId">

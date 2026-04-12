@@ -1,9 +1,8 @@
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { StationType, StationSettings } from '@/types/x4'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
-import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 
 const props = defineProps<{
   mode: 'overview' | 'station' | 'transit'
@@ -41,14 +40,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-
-const importModalState = reactive<{
-  isOpen: boolean
-  initialTab: 'logic-flow' | 'game-blueprint' | 'x4-station'
-}>({
-  isOpen: false,
-  initialTab: 'game-blueprint'
-})
 
 const isOverview = computed(() => props.mode === 'overview')
 const isSupplyOverview = computed(() => props.mode === 'transit')
@@ -111,8 +102,7 @@ const toggleMineral = (mineral: string) => {
 }
 
 const handleOpenImport = () => {
-  importModalState.initialTab = 'logic-flow'
-  importModalState.isOpen = true
+  emit('openImport')
 }
 </script>
 
@@ -287,12 +277,6 @@ const handleOpenImport = () => {
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
       </button>
     </div>
-
-    <ImportPlanModal
-      :isOpen="importModalState.isOpen"
-      :initialTab="importModalState.initialTab"
-      @close="importModalState.isOpen = false"
-    />
   </div>
 </template>
 
