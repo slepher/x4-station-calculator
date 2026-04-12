@@ -1,10 +1,9 @@
 import { reactive } from 'vue'
-import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module, X4Ware } from '@/types/x4'
+import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module, X4Ware, WareFlow } from '@/types/x4'
 import type { RaceMedicalConsumption } from '@/types/x4'
-import { calculateAutoFill } from '@/store/logic/moduleDiffCalculator'
-import { calculateWorkforceBreakdown, calculateActualWorkforce, calculateEfficiencySaturation } from '@/store/logic/workforceCalculator'
+import type { WareProductionFlow } from '@/types/production-flow'
+import { calculateProductionFlows } from '@/store/logic/calculateProductionFlows'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
-import { analyzeWareFlow } from '@/store/logic/analyzeWareFlow'
 import { analyzeStation } from '@/store/logic/analyzeStation'
 
 export const DEFAULT_STATION_SETTINGS: StationSettings = {
@@ -44,10 +43,11 @@ export interface StationState {
   warePriority: Record<string, number>
   settings: StationSettings
   autoIndustryModules: SavedModule[]
+  autoInfrastructureModules: SavedModule[]
   actualWorkforce: number
   currentEfficiency: number
-  groupedFlows: GroupedFlows | null
-  groupedFlowsForEmpire: GroupedFlows | null
+  productionFlows: WareProductionFlow[] | null
+  warePriorityLevels: Record<string, number> | null
   stationAnalysis: ReturnType<typeof analyzeStation> | null
 }
 
@@ -72,6 +72,63 @@ function createEmptyGroupedFlows(): GroupedFlows {
   }
 }
 
+function filterProductionFlowsByPriority(
+  flows: WareProductionFlow[],
+  priorityLevels: Record<string, number>
+): WareProductionFlow[] {
+  return flows.filter(f => {
+    if (f.netRate <= 0) return true
+    return (priorityLevels[f.wareId] ?? 0) > 0
+  })
+}
+
+function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
+  return {
+    wareId: prod.wareId,
+    orderIndex: prod.orderIndex,
+    tier: prod.tier,
+    transportType: prod.transportType,
+    unitVolume: prod.unitVolume,
+    production: prod.production,
+    consumption: prod.consumption,
+    workforceConsumption: prod.workforceConsumption,
+    netRate: prod.netRate,
+    productionVolume: 0,
+    consumptionVolume: 0,
+    netVolume: 0,
+    transportDemand: 0,
+    totalOccupiedCount: 0,
+    totalOccupiedConsumptionCount: 0,
+    totalOccupiedVolume: 0,
+    unitPrice: 0,
+    netValue: 0,
+    contributions: prod.contributions
+  }
+}
+
+function groupProductionFlows(flows: WareProductionFlow[]): GroupedFlows {
+  const wareFlows = flows.map(convertProductionFlowToWareFlow)
+
+  const result: GroupedFlows = {
+    flows: wareFlows,
+    rateGroups: { positive: [], operations: [], supply: [], resources: [] },
+    volumeGroups: { solid: [], liquid: [], container: [] }
+  }
+
+  wareFlows.forEach(flow => {
+    if (flow.netRate > 0) result.rateGroups.positive.push(flow)
+    else if (flow.workforceConsumption > 0) result.rateGroups.supply.push(flow)
+    else if (flow.transportType === 'container') result.rateGroups.operations.push(flow)
+    else result.rateGroups.resources.push(flow)
+
+    if (flow.transportType === 'solid') result.volumeGroups.solid.push(flow)
+    else if (flow.transportType === 'liquid') result.volumeGroups.liquid.push(flow)
+    else result.volumeGroups.container.push(flow)
+  })
+
+  return result
+}
+
 export function migrateStationSettings(raw: Partial<StationSettings> | null | undefined): StationSettings {
   const source = deepClone(raw || {}) as any
   source.racePreference = source.racePreference || 'argon'
@@ -89,27 +146,6 @@ export function migrateStationSettings(raw: Partial<StationSettings> | null | un
   return { ...DEFAULT_STATION_SETTINGS, ...source }
 }
 
-function filterGroupedFlowsByPriority(
-  flows: GroupedFlows,
-  priorityLevels: Record<string, number>
-): GroupedFlows {
-  return {
-    flows: flows.flows.filter(f => {
-      if (f.netRate <= 0) return true
-      return (priorityLevels[f.wareId] ?? 0) > 0
-    }),
-    rateGroups: {
-      positive: flows.rateGroups.positive.filter(f =>
-        (priorityLevels[f.wareId] ?? 0) > 0
-      ),
-      operations: flows.rateGroups.operations,
-      supply: flows.rateGroups.supply,
-      resources: flows.rateGroups.resources
-    },
-    volumeGroups: flows.volumeGroups
-  }
-}
-
 function createDefaultState(stationId: string): StationState {
   return reactive({
     stationId,
@@ -118,10 +154,11 @@ function createDefaultState(stationId: string): StationState {
     warePriority: {},
     settings: { ...DEFAULT_STATION_SETTINGS },
     autoIndustryModules: [],
+    autoInfrastructureModules: [],
     actualWorkforce: 0,
     currentEfficiency: 0,
-    groupedFlows: null,
-    groupedFlowsForEmpire: null,
+    productionFlows: null,
+    warePriorityLevels: null,
     stationAnalysis: null
   })
 }
@@ -214,26 +251,20 @@ export class StationStateMap {
       ? state.plannedModules.filter(module => deps.isModuleDlcActive?.(module.id) !== false)
       : state.plannedModules
 
-    const autoFillResult = calculateAutoFill(
-      plannedModulesForCompute,
-      state.settings,
-      computeModulesMap,
-      deps.waresMap,
-      state.lockedWares,
-      deps.medicalConsumptionMap,
-      state.warePriority
-    )
+    const result = calculateProductionFlows({
+      plannedModules: plannedModulesForCompute,
+      settings: state.settings,
+      modulesMap: computeModulesMap,
+      waresMap: deps.waresMap,
+      lockedWares: state.lockedWares,
+      medicalConsumptionMap: deps.medicalConsumptionMap,
+      warePriority: state.warePriority
+    })
 
-    state.autoIndustryModules = autoFillResult.autoIndustry
+    state.autoIndustryModules = result.autoIndustryModules
+    state.productionFlows = result.productionFlows
+
     const allIndustryModules = [...plannedModulesForCompute, ...state.autoIndustryModules]
-
-    const workforceBreakdown = calculateWorkforceBreakdown(
-      allIndustryModules,
-      computeModulesMap,
-      state.settings
-    )
-    const actualWorkforce = calculateActualWorkforce(workforceBreakdown, state.settings)
-    const currentEfficiency = calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
 
     const warePriorityLevels = buildResolvedWarePriority(
       {
@@ -244,25 +275,7 @@ export class StationStateMap {
       },
       Object.keys(deps.waresMap)
     )
-
-    const groupedFlows = analyzeWareFlow(
-      allIndustryModules,
-      computeModulesMap,
-      deps.waresMap,
-      deps.medicalConsumptionMap,
-      state.settings,
-      actualWorkforce,
-      currentEfficiency,
-      state.settings.resourceBufferHours,
-      state.settings.primaryProductBufferHours,
-      state.settings.secondaryProductBufferHours,
-      warePriorityLevels
-    )
-
-    state.actualWorkforce = actualWorkforce
-    state.currentEfficiency = currentEfficiency
-    state.groupedFlows = groupedFlows
-    state.groupedFlowsForEmpire = filterGroupedFlowsByPriority(groupedFlows, warePriorityLevels)
+    state.warePriorityLevels = warePriorityLevels
 
     state.stationAnalysis = analyzeStation(
       allIndustryModules,
@@ -275,12 +288,28 @@ export class StationStateMap {
     return state
   }
 
-  getGroupedFlows(stationId: string): GroupedFlows {
-    return this.get(stationId)?.groupedFlows || createEmptyGroupedFlows()
+  getProductionFlows(stationId: string): WareProductionFlow[] {
+    return this.get(stationId)?.productionFlows || []
+  }
+
+  getFilteredProductionFlows(stationId: string): WareProductionFlow[] {
+    const state = this.get(stationId)
+    if (!state || !state.productionFlows || !state.warePriorityLevels) return []
+    return filterProductionFlowsByPriority(state.productionFlows, state.warePriorityLevels)
+  }
+
+  getGroupedFlows(_stationId: string): GroupedFlows {
+    return createEmptyGroupedFlows()
   }
 
   getFilteredGroupedFlows(stationId: string): GroupedFlows {
-    return this.get(stationId)?.groupedFlowsForEmpire || createEmptyGroupedFlows()
+    const filteredFlows = this.getFilteredProductionFlows(stationId)
+    if (filteredFlows.length === 0) return createEmptyGroupedFlows()
+    return groupProductionFlows(filteredFlows)
+  }
+
+  getWarePriorityLevels(stationId: string): Record<string, number> {
+    return this.get(stationId)?.warePriorityLevels || {}
   }
 }
 

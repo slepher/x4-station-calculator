@@ -36,6 +36,16 @@ const emit = defineEmits<{
   (e: 'update:priorityLevel', value: number): void
 }>()
 
+function handleToggleLock(value: boolean) {
+  console.log('[StationWareFlow] emit update:locked', { resourceId: props.resourceId, value, locked: props.locked })
+  emit('update:locked', value)
+}
+
+function handleTogglePriority(value: number) {
+  console.log('[StationWareFlow] emit update:priorityLevel', { resourceId: props.resourceId, value, priorityLevel: props.priorityLevel })
+  emit('update:priorityLevel', value)
+}
+
 const gameData = useGameDataStore()
 
 const translateModule = (moduleId: string) => {
@@ -212,12 +222,12 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
         :primary-product-buffer-hours="primaryProductBufferHours ?? 12"
         :secondary-product-buffer-hours="secondaryProductBufferHours ?? 2"
         :available-levels="availableLevels"
-        @update:level="emit('update:priorityLevel', $event)"
+        @update:level="handleTogglePriority($event)"
       />
       <LockButton
         :locked="locked"
         :disabled="nonOperableComputed"
-        @update:locked="emit('update:locked', $event)"
+        @update:locked="handleToggleLock($event)"
       />
     </div>
   </div>

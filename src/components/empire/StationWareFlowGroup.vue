@@ -2,7 +2,7 @@
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import StationWareFlow from './StationWareFlow.vue'
 
-defineProps<{
+const props = defineProps<{
   title: string
   items: any[]
   viewMode: 'quantity' | 'volume' | 'economy' | 'transport'
@@ -18,6 +18,24 @@ defineProps<{
   onToggleWareLock?: (wareId: string) => void
   onToggleWarePriority?: (wareId: string) => void
 }>()
+
+function handleToggleLock(wareId: string) {
+  console.log('[StationWareFlowGroup] handleToggleLock', { wareId, hasCallback: !!props.onToggleWareLock })
+  if (props.onToggleWareLock) {
+    props.onToggleWareLock(wareId)
+  } else {
+    console.warn('[StationWareFlowGroup] onToggleWareLock callback missing!')
+  }
+}
+
+function handleTogglePriority(wareId: string) {
+  console.log('[StationWareFlowGroup] handleTogglePriority', { wareId, hasCallback: !!props.onToggleWarePriority })
+  if (props.onToggleWarePriority) {
+    props.onToggleWarePriority(wareId)
+  } else {
+    console.warn('[StationWareFlowGroup] onToggleWarePriority callback missing!')
+  }
+}
 </script>
 
 <template>
@@ -57,8 +75,8 @@ defineProps<{
       :primaryProductBufferHours="primaryProductBufferHours ?? 12"
       :secondaryProductBufferHours="secondaryProductBufferHours ?? 2"
       :modulesMap="modulesMap"
-      @update:locked="onToggleWareLock?.(item.id)"
-      @update:priorityLevel="onToggleWarePriority?.(item.id)"
+      @update:locked="handleToggleLock(item.id)"
+      @update:priorityLevel="handleTogglePriority(item.id)"
     />
   </div>
 </template>

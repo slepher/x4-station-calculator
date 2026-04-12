@@ -9,8 +9,9 @@ import { useStationTabBarModel } from '@/components/empire/composables/useStatio
 import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
 import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
+import { useWareFlowDerived } from '@/components/empire/composables/useWareFlowDerived'
 import { useStationDashboardModel } from '@/components/empire/composables/useStationDashboardModel'
-import type { StationType, SavedModule, GroupedFlows } from '@/types/x4'
+import type { StationType, SavedModule } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import StationTabBar from '@/components/empire/StationTabBar.vue'
@@ -173,6 +174,7 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
 const stationPlanningPanelModel = useStationPlanningPanelModel({
   plannedModules: computed(() => blueprintStore.plannedModules as SavedModule[]),
   autoIndustryModules: computed(() => blueprintStore.autoIndustryModules as SavedModule[]),
+  autoInfrastructureModules: computed(() => blueprintStore.autoInfrastructureModules as SavedModule[]),
   enforceDlcActivation: computed(() => blueprintStore.enforceDlcActivation),
   onUpdatePlannedModules: handleUpdatePlannedModules
 })
@@ -234,9 +236,33 @@ const empireGapsForModel = computed(() => {
   return { operations, supply }
 })
 
+const stationWareFlowDerived = useWareFlowDerived(
+  {
+    productionFlows: computed(() => blueprintStore.productionFlows),
+    autoIndustryModules: computed(() => blueprintStore.autoIndustryModules as SavedModule[]),
+    plannedModules: computed(() => blueprintStore.plannedModules as SavedModule[]),
+    warePriorityLevels: computed(() => blueprintStore.warePriorityLevels),
+    modulesMap: computed(() => gameData.modulesMap || {}),
+    settings: computed(() => ({
+      racePreference: blueprintStore.settings.racePreference,
+      resourceBufferHours: blueprintStore.settings.resourceBufferHours,
+      primaryProductBufferHours: blueprintStore.settings.primaryProductBufferHours,
+      secondaryProductBufferHours: blueprintStore.settings.secondaryProductBufferHours,
+      buyMultiplier: blueprintStore.settings.buyMultiplier,
+      sellMultiplier: blueprintStore.settings.sellMultiplier,
+      transportMinutes: blueprintStore.settings.transportMinutes,
+      transportShipCapacity: blueprintStore.settings.transportShipCapacity,
+      sunlight: blueprintStore.settings.sunlight
+    }))
+  },
+  (modules) => {
+    blueprintStore.setAutoInfrastructureModules(modules)
+  }
+)
+
 const stationWareFlowsModel = useStationWareFlowsModel({
   viewMode: wareFlowViewMode as any,
-  groupedFlows: computed(() => blueprintStore.groupedFlows as GroupedFlows),
+  groupedFlows: stationWareFlowDerived.groupedFlows,
   settings: computed(() => ({
     resourceBufferHours: blueprintStore.settings.resourceBufferHours,
     primaryProductBufferHours: blueprintStore.settings.primaryProductBufferHours,
@@ -410,6 +436,7 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
       <StationPlanningPanel
         :planned-modules="stationPlanningPanelModel.props.value.plannedModules"
         :auto-industry-modules="stationPlanningPanelModel.props.value.autoIndustryModules"
+        :auto-infrastructure-modules="stationPlanningPanelModel.props.value.autoInfrastructureModules"
         :enforce-dlc-activation="stationPlanningPanelModel.props.value.enforceDlcActivation"
         @update-planned-modules="stationPlanningPanelModel.emits.updatePlannedModules"
       />
@@ -423,6 +450,13 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
         :empire-gaps="stationWareFlowsModel.props.value.empireGaps"
         :planned-modules="stationWareFlowsModel.props.value.plannedModules"
         :wares="stationWareFlowsModel.props.value.wares"
+        :modules-map="stationWareFlowsModel.props.value.modulesMap"
+        :is-ware-locked="stationWareFlowsModel.props.value.isWareLocked"
+        :get-resolved-level="stationWareFlowsModel.props.value.getResolvedLevel"
+        :is-ware-operable="stationWareFlowsModel.props.value.isWareOperable"
+        :is-planned-ware="stationWareFlowsModel.props.value.isPlannedWare"
+        :on-toggle-ware-lock="stationWareFlowsModel.props.value.onToggleWareLock"
+        :on-toggle-ware-priority="stationWareFlowsModel.props.value.onToggleWarePriority"
         @update-view-mode="wareFlowViewMode = $event"
         @update-resource-buffer-hours="handleUpdateWareFlowResourceBufferHours"
         @update-primary-product-buffer-hours="handleUpdateWareFlowPrimaryBufferHours"

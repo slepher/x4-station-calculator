@@ -9,18 +9,25 @@ import TransitHubStorageFlowItem from './transit-hub/TransitHubStorageFlow.vue'
 import TransitHubTransportFlowItem from './transit-hub/TransitHubTransportFlow.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
+import PriceSlider from '@/components/common/PriceSlider.vue'
 
 const props = withDefaults(defineProps<{
   groupedFlows?: EmpireGroupedFlows | null
   enableStorageView?: boolean
   enableTransportView?: boolean
   supplyStorageFlows?: SupplyStorageFlow[]
+  priceMultiplier?: number
 }>(), {
   groupedFlows: null,
   enableStorageView: false,
   enableTransportView: false,
-  supplyStorageFlows: () => []
+  supplyStorageFlows: () => [],
+  priceMultiplier: 0.5
 })
+
+const emit = defineEmits<{
+  (e: 'update:priceMultiplier', value: number): void
+}>()
 
 const gameData = useGameDataStore()
 const { t } = useI18n()
@@ -33,6 +40,11 @@ const viewMode = ref<ViewMode>('quantity')
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 
 const empireGroupedFlows = computed(() => props.groupedFlows || { flows: [], empireGroups: { operations: [], supply: [] } })
+
+const localPriceMultiplier = computed({
+  get: () => props.priceMultiplier,
+  set: (val) => emit('update:priceMultiplier', val)
+})
 
 const wrapFlow = (flow: any) => {
   const wareInfo = gameData.waresMap?.[flow.wareId]
@@ -246,6 +258,10 @@ const transportTotalVolume = computed(() =>
     </div>
 
     <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'">
+      <div class="simulation-controls flex flex-row gap-4">
+        <PriceSlider v-model="localPriceMultiplier" :label="t('wareflow.price_multiplier')" type="buy" />
+      </div>
+
       <div class="profit-footer">
         <span class="profit-label">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -305,6 +321,10 @@ const transportTotalVolume = computed(() =>
 
 .profit-section {
   @apply border-t border-slate-700/50;
+}
+
+.simulation-controls {
+  @apply px-4 py-3 bg-slate-800/30 border-b border-slate-700/50;
 }
 
 .profit-footer {

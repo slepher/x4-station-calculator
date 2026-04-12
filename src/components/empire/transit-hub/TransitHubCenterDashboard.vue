@@ -5,6 +5,8 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import type { EmpireGroupedFlows, SupplyStorageFlow } from '@/types/x4'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
+import PriceSlider from '@/components/common/PriceSlider.vue'
+import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import TransitHubQuantityView from './TransitHubQuantityView.vue'
 import TransitHubEconomyView from './TransitHubEconomyView.vue'
 import TransitHubStorageView from './TransitHubStorageView.vue'
@@ -20,17 +22,49 @@ const props = withDefaults(defineProps<{
   groupedFlows: EmpireGroupedFlows
   storageFlows: SupplyStorageFlow[]
   viewMode?: SharedViewMode
+  priceMultiplier?: number
+  resourceBufferHours?: number
+  primaryProductBufferHours?: number
+  secondaryProductBufferHours?: number
 }>(), {
-  viewMode: 'quantity'
+  viewMode: 'quantity',
+  priceMultiplier: 0.5,
+  resourceBufferHours: 2,
+  primaryProductBufferHours: 12,
+  secondaryProductBufferHours: 2
 })
 
 const emit = defineEmits<{
   (e: 'update:viewMode', value: SharedViewMode): void
+  (e: 'update:priceMultiplier', value: number): void
+  (e: 'update:resourceBufferHours', value: number): void
+  (e: 'update:primaryProductBufferHours', value: number): void
+  (e: 'update:secondaryProductBufferHours', value: number): void
 }>()
 
 const viewMode = computed<SharedViewMode>({
   get: () => props.viewMode,
   set: (value) => emit('update:viewMode', value)
+})
+
+const localPriceMultiplier = computed({
+  get: () => props.priceMultiplier,
+  set: (value) => emit('update:priceMultiplier', value)
+})
+
+const localResourceBufferHours = computed({
+  get: () => props.resourceBufferHours,
+  set: (value) => emit('update:resourceBufferHours', value)
+})
+
+const localPrimaryProductBufferHours = computed({
+  get: () => props.primaryProductBufferHours,
+  set: (value) => emit('update:primaryProductBufferHours', value)
+})
+
+const localSecondaryProductBufferHours = computed({
+  get: () => props.secondaryProductBufferHours,
+  set: (value) => emit('update:secondaryProductBufferHours', value)
 })
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
@@ -173,6 +207,32 @@ const hasTransportData = computed(() =>
         :has-data="hasTransportData"
       />
     </div>
+
+    <div class="controls-section" v-if="hasFlowData">
+      <div v-if="viewMode === 'economy'" class="simulation-controls flex flex-row gap-4">
+        <PriceSlider v-model="localPriceMultiplier" :label="t('wareflow.price_multiplier')" type="buy" />
+      </div>
+      <div v-if="viewMode === 'volume'" class="simulation-controls flex flex-row gap-4">
+        <VolumeControlSlider
+          v-model="localResourceBufferHours"
+          :label="t('wareflow.resource_buffer_hours')"
+          type="resource"
+          :max="24"
+          :step="1" />
+        <VolumeControlSlider
+          v-model="localPrimaryProductBufferHours"
+          :label="t('wareflow.primary_product_buffer_hours')"
+          type="product"
+          :max="24"
+          :step="1" />
+        <VolumeControlSlider
+          v-model="localSecondaryProductBufferHours"
+          :label="t('wareflow.secondary_product_buffer_hours')"
+          type="product"
+          :max="24"
+          :step="1" />
+      </div>
+    </div>
   </div>
 </template>
 
@@ -204,5 +264,11 @@ const hasTransportData = computed(() =>
 }
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
   background: rgba(148, 163, 184, 0.7);
+}
+.controls-section {
+  @apply border-t border-slate-700/50;
+}
+.simulation-controls {
+  @apply px-4 py-3 bg-slate-800/30 border-b border-slate-700/50;
 }
 </style>

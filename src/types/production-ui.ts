@@ -67,6 +67,7 @@ export interface ContextToolbarEmits {
 export interface StationPlanningPanelProps {
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
+  autoInfrastructureModules?: SavedModule[]
   enforceDlcActivation: boolean
 }
 
@@ -107,6 +108,7 @@ export interface StationWareFlowsDashboardProps {
     sellMultiplier: number
     racePreference: string
     showEmpireGaps: boolean
+    transportMinutes?: number
   }
   empireGaps: {
     operations: EmpireGapItem[]
@@ -114,6 +116,13 @@ export interface StationWareFlowsDashboardProps {
   }
   plannedModules: SavedModule[]
   wares: Record<string, any>
+  modulesMap?: Record<string, any>
+  isWareLocked?: (wareId: string) => boolean
+  getResolvedLevel?: (wareId: string) => number
+  isWareOperable?: (wareId: string) => boolean
+  isPlannedWare?: (wareId: string) => boolean
+  onToggleWareLock?: (wareId: string) => void
+  onToggleWarePriority?: (wareId: string) => void
 }
 
 export interface StationWareFlowsDashboardEmits {

@@ -5,6 +5,7 @@ import type { StationPlanningPanelProps, StationPlanningPanelEmits } from '@/typ
 export interface UseStationPlanningPanelModelDeps {
   plannedModules: ComputedRef<SavedModule[]>
   autoIndustryModules: ComputedRef<SavedModule[]>
+  autoInfrastructureModules: ComputedRef<SavedModule[]>
   enforceDlcActivation: ComputedRef<boolean>
   onUpdatePlannedModules: (modules: SavedModule[]) => void
 }
@@ -18,6 +19,7 @@ export function useStationPlanningPanelModel(deps: UseStationPlanningPanelModelD
   const {
     plannedModules,
     autoIndustryModules,
+    autoInfrastructureModules,
     enforceDlcActivation,
     onUpdatePlannedModules
   } = deps
@@ -25,6 +27,7 @@ export function useStationPlanningPanelModel(deps: UseStationPlanningPanelModelD
   const props = computed<StationPlanningPanelProps>(() => ({
     plannedModules: plannedModules.value,
     autoIndustryModules: autoIndustryModules.value,
+    autoInfrastructureModules: autoInfrastructureModules.value,
     enforceDlcActivation: enforceDlcActivation.value
   }))
 

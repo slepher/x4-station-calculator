@@ -11,6 +11,7 @@ import type { SavedModule, ModuleGroupResult } from '@/types/x4'
 const props = defineProps<{
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
+  autoInfrastructureModules?: SavedModule[]
   enforceDlcActivation: boolean
 }>()
 
@@ -156,6 +157,22 @@ const handleTransferAutoModule = (module: SavedModule) => {
 const handleUpdateSearchQuery = (value: string) => {
   searchQuery.value = value
 }
+
+const mergedAutoModules = computed<SavedModule[]>(() => {
+  const infrastructure = props.autoInfrastructureModules || []
+  const merged: SavedModule[] = [...props.autoIndustryModules]
+
+  infrastructure.forEach((infra) => {
+    const existing = merged.find((m) => m.id === infra.id)
+    if (existing) {
+      existing.count += infra.count
+    } else {
+      merged.push(infra)
+    }
+  })
+
+  return merged
+})
 </script>
 
 <template>
@@ -198,13 +215,13 @@ const handleUpdateSearchQuery = (value: string) => {
       </div>
     </div>
 
-    <div v-if="props.autoIndustryModules.length > 0" class="tier-section tier-auto">
+    <div v-if="mergedAutoModules.length > 0" class="tier-section tier-auto">
         <div class="tier-header">
           <span class="tier-label">{{ t('planning.tier_industry') }}</span>
         </div>
       <div class="module-list-scroll">
         <div class="auto-modules-container">
-          <StationPlanningItem v-for="(element, index) in props.autoIndustryModules" :key="element.id + '-' + index"
+          <StationPlanningItem v-for="(element, index) in mergedAutoModules" :key="element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
             @transfer="handleTransferAutoModule(element)" />
         </div>

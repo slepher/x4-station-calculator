@@ -11,6 +11,7 @@ import type {
   SectorInternalData,
   X4Module
 } from '@/types/x4'
+import type { WareProductionFlow } from '@/types/production-flow'
 import type { ProductionSessionContext } from '@/types/production-context'
 import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
@@ -33,7 +34,11 @@ import {
   getPlannedModules,
   getLockedWares,
   getWarePriority,
+  getProductionFlows,
+  getWarePriorityLevels,
   getAutoIndustryModules,
+  getAutoInfrastructureModules,
+  updateAutoInfrastructureModules,
   getActualWorkforce,
   getCurrentEfficiency,
   deepClone
@@ -184,6 +189,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   function writeAndRecomputeActive(writer: (stationId: string) => void): void {
     const station = activeStation.value
     const stationId = station?.id || '__local__'
+    console.log('[LiveStore] writeAndRecomputeActive', { stationId, hasStation: !!station, stationName: station?.name })
     if (!station) {
       ensureActiveStationState()
     } else {
@@ -255,6 +261,26 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return getAutoIndustryModules(stationId)
   })
 
+  const autoInfrastructureModules = computed(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getAutoInfrastructureModules(stationId)
+  })
+
+  const productionFlows = computed<WareProductionFlow[]>(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getProductionFlows(stationId)
+  })
+
+  const warePriorityLevels = computed<Record<string, number>>(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getWarePriorityLevels(stationId)
+  })
+
+  function setAutoInfrastructureModules(modules: SavedModule[]): void {
+    const stationId = activeStation.value?.id || '__local__'
+    updateAutoInfrastructureModules(stationId, modules)
+  }
+
   const actualWorkforce = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
     return getActualWorkforce(stationId)
@@ -315,9 +341,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function toggleWareLock(wareId: string): void {
-    if (!isWareOperable(wareId)) return
+    console.log('[LiveStore] toggleWareLock called', { wareId, operable: isWareOperable(wareId) })
+    if (!isWareOperable(wareId)) {
+      console.log('[LiveStore] toggleWareLock skipped - not operable')
+      return
+    }
     writeAndRecomputeActive((stationId) => {
       const current = getLockedWares(stationId)
+      console.log('[LiveStore] toggleWareLock writing', { stationId, wareId, current, willLock: !current.includes(wareId) })
       const next = current.includes(wareId)
         ? current.filter(id => id !== wareId)
         : [...current, wareId]
@@ -359,9 +390,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const currentLevel = getResolvedLevel(wareId)
     const planned = isPlannedWare(wareId)
     const auto = isAutoWare(wareId)
+    console.log('[LiveStore] toggleWarePriority called', { wareId, currentLevel, planned, auto })
 
     writeAndRecomputeActive((stationId) => {
       const nextPriority = deepClone(getWarePriority(stationId))
+      console.log('[LiveStore] toggleWarePriority writing', { stationId, wareId, currentPriority: nextPriority[wareId] })
 
       if (planned) {
         if (currentLevel === 2) nextPriority[wareId] = 1
@@ -370,6 +403,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         if (currentLevel === 0) nextPriority[wareId] = 1
         else delete nextPriority[wareId]
       }
+
+      console.log('[LiveStore] toggleWarePriority result', { nextPriority })
 
       patchStationState(stationId, { warePriority: nextPriority })
     })
@@ -511,6 +546,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   ): boolean {
     const binding = activeBinding.value
     const parsed = parseBindingStationId(stationId)
+    console.log('[LiveStore] updateBindingStationPlan', { stationId, parsedKind: parsed?.kind, hasPatch: !!patch, lockedWares: patch.lockedWares })
     if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
 
     if (parsed.kind === 'plan') {
@@ -521,7 +557,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         settings: patch.settings,
         groupId: patch.sectorId,
         count: patch.count,
-        minerals: patch.minerals
+        minerals: patch.minerals,
+        lockedWares: patch.lockedWares,
+        warePriority: patch.warePriority
       })
     }
 
@@ -535,7 +573,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       modules: patch.modules ?? station?.modules ?? [],
       settings: patch.settings ?? station?.settings ?? DEFAULT_STATION_SETTINGS,
       count: patch.count ?? station?.count ?? 1,
-      minerals: patch.minerals ?? station?.minerals ?? []
+      minerals: patch.minerals ?? station?.minerals ?? [],
+      lockedWares: patch.lockedWares ?? [],
+      warePriority: patch.warePriority ?? {}
     })
     if (!plan) return false
     const nextId = createBindingPlanStationId(binding.gameGuid, plan.id)
@@ -797,6 +837,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     lockedWares,
     warePriority,
     autoIndustryModules,
+    autoInfrastructureModules,
+    productionFlows,
+    warePriorityLevels,
+    setAutoInfrastructureModules,
     actualWorkforce,
     currentEfficiency,
     groupedFlows,

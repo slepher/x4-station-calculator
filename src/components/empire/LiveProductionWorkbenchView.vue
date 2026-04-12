@@ -9,9 +9,11 @@ import { useSectorStationTabBarModel } from '@/components/empire/composables/use
 import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
 import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
+import { useWareFlowDerived } from '@/components/empire/composables/useWareFlowDerived'
+import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmpireWareFlowDerived'
 import { useStationDashboardModel } from '@/components/empire/composables/useStationDashboardModel'
 import { useTransitHubWorkbenchModel } from '@/components/empire/composables/useTransitHubWorkbenchModel'
-import type { StationType, SavedModule, GroupedFlows, EmpireGroupedFlows } from '@/types/x4'
+import type { StationType, SavedModule, EmpireGroupedFlows } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
@@ -94,6 +96,11 @@ const tabBarModel = useSectorStationTabBarModel({
 
 const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
 const isOverview = computed(() => liveStore.activeStation === null && !activeTransitSectorId.value)
+
+const empireWareFlowDerived = useEmpireWareFlowDerived({
+  stations: computed(() => liveStore.orderedStationsBySector),
+  modulesMap: computed(() => gameData.modulesMap || {})
+})
 
 const activeBindingNameRef = computed({
   get: () => liveStore.activeBindingName,
@@ -193,6 +200,7 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
 const stationPlanningPanelModel = useStationPlanningPanelModel({
   plannedModules: computed(() => liveStore.plannedModules as SavedModule[]),
   autoIndustryModules: computed(() => liveStore.autoIndustryModules as SavedModule[]),
+  autoInfrastructureModules: computed(() => liveStore.autoInfrastructureModules as SavedModule[]),
   enforceDlcActivation: computed(() => liveStore.enforceDlcActivation),
   onUpdatePlannedModules: handleUpdatePlannedModules
 })
@@ -254,9 +262,33 @@ const empireGapsForModel = computed(() => {
   return { operations, supply }
 })
 
+const stationWareFlowDerived = useWareFlowDerived(
+  {
+    productionFlows: computed(() => liveStore.productionFlows),
+    autoIndustryModules: computed(() => liveStore.autoIndustryModules as SavedModule[]),
+    plannedModules: computed(() => liveStore.plannedModules as SavedModule[]),
+    warePriorityLevels: computed(() => liveStore.warePriorityLevels),
+    modulesMap: computed(() => gameData.modulesMap || {}),
+    settings: computed(() => ({
+      racePreference: liveStore.settings.racePreference,
+      resourceBufferHours: liveStore.settings.resourceBufferHours,
+      primaryProductBufferHours: liveStore.settings.primaryProductBufferHours,
+      secondaryProductBufferHours: liveStore.settings.secondaryProductBufferHours,
+      buyMultiplier: liveStore.settings.buyMultiplier,
+      sellMultiplier: liveStore.settings.sellMultiplier,
+      transportMinutes: liveStore.settings.transportMinutes,
+      transportShipCapacity: liveStore.settings.transportShipCapacity,
+      sunlight: liveStore.settings.sunlight
+    }))
+  },
+  (modules) => {
+    liveStore.setAutoInfrastructureModules(modules)
+  }
+)
+
 const stationWareFlowsModel = useStationWareFlowsModel({
   viewMode: wareFlowViewMode as any,
-  groupedFlows: computed(() => liveStore.groupedFlows as GroupedFlows),
+  groupedFlows: stationWareFlowDerived.groupedFlows,
   settings: computed(() => ({
     resourceBufferHours: liveStore.settings.resourceBufferHours,
     primaryProductBufferHours: liveStore.settings.primaryProductBufferHours,
@@ -464,7 +496,15 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
           :grouped-flows="transitHubModel.groupedFlows"
           :storage-flows="transitHubModel.storageFlows"
           :view-mode="wareFlowViewMode"
+          :price-multiplier="liveStore.settings.buyMultiplier"
+          :resource-buffer-hours="liveStore.settings.resourceBufferHours"
+          :primary-product-buffer-hours="liveStore.settings.primaryProductBufferHours"
+          :secondary-product-buffer-hours="liveStore.settings.secondaryProductBufferHours"
           @update:view-mode="wareFlowViewMode = $event"
+          @update:price-multiplier="handleUpdateWareFlowBuyMultiplier"
+          @update:resource-buffer-hours="handleUpdateWareFlowResourceBufferHours"
+          @update:primary-product-buffer-hours="handleUpdateWareFlowPrimaryBufferHours"
+          @update:secondary-product-buffer-hours="handleUpdateWareFlowSecondaryBufferHours"
         />
       </div>
 
@@ -485,7 +525,11 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
       </div>
 
       <div class="col-span-1 lg:col-span-3">
-        <EmpireWareFlowsDashboard :grouped-flows="liveStore.empireGroupedFlows" />
+        <EmpireWareFlowsDashboard
+          :grouped-flows="empireWareFlowDerived.empireGroupedFlows.value"
+          :price-multiplier="empireWareFlowDerived.priceMultiplier.value"
+          @update:price-multiplier="empireWareFlowDerived.priceMultiplier.value = $event"
+        />
       </div>
     </div>
   </template>
@@ -495,6 +539,7 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
       <StationPlanningPanel
         :planned-modules="stationPlanningPanelModel.props.value.plannedModules"
         :auto-industry-modules="stationPlanningPanelModel.props.value.autoIndustryModules"
+        :auto-infrastructure-modules="stationPlanningPanelModel.props.value.autoInfrastructureModules"
         :enforce-dlc-activation="stationPlanningPanelModel.props.value.enforceDlcActivation"
         @update-planned-modules="stationPlanningPanelModel.emits.updatePlannedModules"
       />
@@ -508,6 +553,13 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
         :empire-gaps="stationWareFlowsModel.props.value.empireGaps"
         :planned-modules="stationWareFlowsModel.props.value.plannedModules"
         :wares="stationWareFlowsModel.props.value.wares"
+        :modules-map="stationWareFlowsModel.props.value.modulesMap"
+        :is-ware-locked="stationWareFlowsModel.props.value.isWareLocked"
+        :get-resolved-level="stationWareFlowsModel.props.value.getResolvedLevel"
+        :is-ware-operable="stationWareFlowsModel.props.value.isWareOperable"
+        :is-planned-ware="stationWareFlowsModel.props.value.isPlannedWare"
+        :on-toggle-ware-lock="stationWareFlowsModel.props.value.onToggleWareLock"
+        :on-toggle-ware-priority="stationWareFlowsModel.props.value.onToggleWarePriority"
         @update-view-mode="wareFlowViewMode = $event"
         @update-resource-buffer-hours="handleUpdateWareFlowResourceBufferHours"
         @update-primary-product-buffer-hours="handleUpdateWareFlowPrimaryBufferHours"

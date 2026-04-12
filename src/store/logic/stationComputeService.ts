@@ -1,11 +1,13 @@
 import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, GroupedFlows } from '@/types/x4'
 import type { RaceMedicalConsumption } from '@/types/x4'
+import type { WareProductionFlow } from '@/types/production-flow'
 import {
   stationStateMap,
   DEFAULT_STATION_SETTINGS,
   migrateStationSettings,
   type StationComputeDeps
 } from '@/store/state/StationStateMap'
+import { calculateWareFlowDerived } from '@/store/logic/calculateWareFlowDerived'
 
 export function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value))
@@ -57,6 +59,55 @@ export function getGroupedFlows(stationId: string): GroupedFlows {
 
 export function getFilteredGroupedFlows(stationId: string): GroupedFlows {
   return stationStateMap.getFilteredGroupedFlows(stationId)
+}
+
+function createEmptyGroupedFlows(): GroupedFlows {
+  return {
+    flows: [],
+    rateGroups: { positive: [], operations: [], supply: [], resources: [] },
+    volumeGroups: { solid: [], liquid: [], container: [] }
+  }
+}
+
+export interface DerivedSettings {
+  racePreference: string
+  resourceBufferHours: number
+  primaryProductBufferHours: number
+  secondaryProductBufferHours: number
+  buyMultiplier: number
+  sellMultiplier: number
+  transportMinutes: number
+  transportShipCapacity: number
+  sunlight: number
+}
+
+export function getDerivedGroupedFlows(
+  stationId: string,
+  modulesMap: Record<string, X4Module>,
+  derivedSettings: DerivedSettings
+): GroupedFlows {
+  const state = stationStateMap.get(stationId)
+  if (!state || !state.productionFlows || !state.warePriorityLevels) {
+    return createEmptyGroupedFlows()
+  }
+
+  const filteredFlows = state.productionFlows.filter(f => {
+    if (f.netRate <= 0) return true
+    return (state.warePriorityLevels?.[f.wareId] ?? 0) > 0
+  })
+
+  if (filteredFlows.length === 0) return createEmptyGroupedFlows()
+
+  const result = calculateWareFlowDerived({
+    productionFlows: filteredFlows,
+    autoIndustryModules: state.autoIndustryModules,
+    plannedModules: state.plannedModules,
+    modulesMap,
+    settings: derivedSettings,
+    warePriorityLevels: state.warePriorityLevels
+  })
+
+  return result.groupedFlows
 }
 
 export function getStationAnalysis(stationId: string): ReturnType<typeof stationStateMap.get> extends infer T ? T extends { stationAnalysis: infer A } ? A : null : null {
@@ -155,4 +206,26 @@ export function getCurrentEfficiency(stationId: string): number {
 
 export function cloneStationState(fromId: string, toId: string): void {
   stationStateMap.clone(fromId, toId)
+}
+
+export function getProductionFlows(stationId: string): WareProductionFlow[] {
+  return stationStateMap.getProductionFlows(stationId)
+}
+
+export function getFilteredProductionFlows(stationId: string): WareProductionFlow[] {
+  return stationStateMap.getFilteredProductionFlows(stationId)
+}
+
+export function getAutoInfrastructureModules(stationId: string): SavedModule[] {
+  return stationStateMap.get(stationId)?.autoInfrastructureModules || []
+}
+
+export function getWarePriorityLevels(stationId: string): Record<string, number> {
+  return stationStateMap.getWarePriorityLevels(stationId)
+}
+
+export function updateAutoInfrastructureModules(stationId: string, modules: SavedModule[]): void {
+  stationStateMap.mutate(stationId, (state) => {
+    state.autoInfrastructureModules = modules
+  })
 }

@@ -54,6 +54,15 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
     onToggleWarePriority
   } = deps
 
+  console.log('[useStationWareFlowsModel] deps received', {
+    hasIsWareLocked: !!isWareLocked,
+    hasGetResolvedLevel: !!getResolvedLevel,
+    hasIsWareOperable: !!isWareOperable,
+    hasIsPlannedWare: !!isPlannedWare,
+    hasOnToggleWareLock: !!onToggleWareLock,
+    hasOnToggleWarePriority: !!onToggleWarePriority
+  })
+
   const props = computed<StationWareFlowsDashboardProps>(() => ({
     viewMode: viewMode.value,
     groupedFlows: groupedFlows.value,

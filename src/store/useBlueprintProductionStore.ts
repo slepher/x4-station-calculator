@@ -10,6 +10,7 @@ import type {
   X4Module,
   EntityLocation
 } from '@/types/x4'
+import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import type { ProductionSessionContext } from '@/types/production-context'
 import i18n from '@/i18n'
@@ -35,7 +36,11 @@ import {
   getAutoIndustryModules,
   getActualWorkforce,
   getCurrentEfficiency,
-  deepClone
+  deepClone,
+  getProductionFlows,
+  getAutoInfrastructureModules,
+  getWarePriorityLevels,
+  updateAutoInfrastructureModules
 } from './logic/stationComputeService'
 import {
   createEmpireSourceView,
@@ -146,6 +151,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   function writeAndRecomputeActive(writer: (stationId: string) => void): void {
     const station = activeStation.value
     const stationId = station?.id || '__local__'
+    console.log('[BlueprintStore] writeAndRecomputeActive', { stationId, hasStation: !!station, stationName: station?.name })
     if (!station) {
       ensureActiveStationState()
     } else {
@@ -209,6 +215,11 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return getAutoIndustryModules(stationId)
   })
 
+  const autoInfrastructureModules = computed(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getAutoInfrastructureModules(stationId)
+  })
+
   const actualWorkforce = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
     return getActualWorkforce(stationId)
@@ -217,6 +228,16 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const currentEfficiency = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
     return getCurrentEfficiency(stationId)
+  })
+
+  const productionFlows = computed<WareProductionFlow[]>(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getProductionFlows(stationId)
+  })
+
+  const warePriorityLevels = computed<Record<string, number>>(() => {
+    const stationId = activeStation.value?.id || '__local__'
+    return getWarePriorityLevels(stationId)
   })
 
   const groupedFlows = computed(() => {
@@ -269,9 +290,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function toggleWareLock(wareId: string): void {
-    if (!isWareOperable(wareId)) return
+    console.log('[BlueprintStore] toggleWareLock called', { wareId, operable: isWareOperable(wareId) })
+    if (!isWareOperable(wareId)) {
+      console.log('[BlueprintStore] toggleWareLock skipped - not operable')
+      return
+    }
     writeAndRecomputeActive((stationId) => {
       const current = getLockedWares(stationId)
+      console.log('[BlueprintStore] toggleWareLock writing', { stationId, wareId, current, willLock: !current.includes(wareId) })
       const next = current.includes(wareId)
         ? current.filter(id => id !== wareId)
         : [...current, wareId]
@@ -313,9 +339,11 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     const currentLevel = getResolvedLevel(wareId)
     const planned = isPlannedWare(wareId)
     const auto = isAutoWare(wareId)
+    console.log('[BlueprintStore] toggleWarePriority called', { wareId, currentLevel, planned, auto })
 
     writeAndRecomputeActive((stationId) => {
       const nextPriority = deepClone(getWarePriority(stationId))
+      console.log('[BlueprintStore] toggleWarePriority writing', { stationId, wareId, currentPriority: nextPriority[wareId] })
 
       if (planned) {
         if (currentLevel === 2) nextPriority[wareId] = 1
@@ -325,6 +353,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         else delete nextPriority[wareId]
       }
 
+      console.log('[BlueprintStore] toggleWarePriority result', { nextPriority })
       patchStationState(stationId, { warePriority: nextPriority })
     })
   }
@@ -335,6 +364,11 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   function isModuleCountEditable(moduleId: string): boolean {
     return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
+  }
+
+  function setAutoInfrastructureModules(modules: SavedModule[]): void {
+    const stationId = activeStation.value?.id || '__local__'
+    updateAutoInfrastructureModules(stationId, modules)
   }
 
   function getModuleInfo(id: string): X4Module {
@@ -645,7 +679,13 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
       const storedTabId = activeViewStore.activeEmpireStation
       const isValid = storedTabId && empire.stations.some(s => s.id === storedTabId)
-      activeViewStore.switchToEmpire(empireId)
+      
+      if (activeViewStore.activeView === 'blueprint-production') {
+        activeViewStore.switchToEmpire(empireId)
+      } else {
+        activeViewStore.activeEmpireId = empireId
+      }
+      
       if (isValid) {
         activeStationId.value = storedTabId
       } else if (empire.stations.length > 0) {
@@ -720,7 +760,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       }
 
       createEmpire()
-      activeViewStore.setProductionSource('empire')
+      if (activeViewStore.activeView === 'blueprint-production') {
+        activeViewStore.switchToEmpire(savedEmpires.value.activeId || null)
+      }
       isReady.value = true
       console.log('[BlueprintProductionStore] Initialized with new empire')
 
@@ -746,7 +788,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
     console.log('[BlueprintProductionStore] No empires found, creating new empire')
     createEmpire()
-    activeViewStore.setProductionSource('empire')
+    if (activeViewStore.activeView === 'blueprint-production') {
+      activeViewStore.setProductionSource('empire')
+    }
   }
 
   return {
@@ -794,8 +838,11 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     lockedWares,
     warePriority,
     autoIndustryModules,
+    autoInfrastructureModules,
     actualWorkforce,
     currentEfficiency,
+    productionFlows,
+    warePriorityLevels,
     groupedFlows,
     stationAnalysis,
     wares,
@@ -817,6 +864,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateModuleCount,
     removeModuleById,
     transferModuleFromAutoIndustry,
+    setAutoInfrastructureModules,
     clearAll: clearAllModules
   }
 })

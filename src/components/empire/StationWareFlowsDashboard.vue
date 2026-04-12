@@ -40,6 +40,15 @@ const props = defineProps<{
   onToggleWarePriority?: (wareId: string) => void
 }>()
 
+console.log('[StationWareFlowsDashboard] props received', {
+  hasIsWareLocked: !!props.isWareLocked,
+  hasGetResolvedLevel: !!props.getResolvedLevel,
+  hasIsWareOperable: !!props.isWareOperable,
+  hasIsPlannedWare: !!props.isPlannedWare,
+  hasOnToggleWareLock: !!props.onToggleWareLock,
+  hasOnToggleWarePriority: !!props.onToggleWarePriority
+})
+
 const emit = defineEmits<{
   updateViewMode: [value: WareFlowViewMode]
   updateResourceBufferHours: [value: number]
