@@ -41,7 +41,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const isOverview = computed(() => props.mode === 'overview')
+const isOverview = computed(() => props.mode !== 'station')
 const isSupplyOverview = computed(() => props.mode === 'transit')
 
 const titleValue = computed({
