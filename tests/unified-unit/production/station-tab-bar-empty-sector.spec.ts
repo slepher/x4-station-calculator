@@ -13,14 +13,19 @@ vi.mock('vue-i18n', () => ({
 vi.mock('@/store/useEmpireStore', () => ({
   useEmpireStore: () => ({
     orderedStationsBySector: [
-      { id: 'st-1', name: 'Station-1', type: 'industrial', sectorId: 'sec-b' }
+      { id: 'st-1', name: 'Station-1', type: 'industrial', sectorId: 'sec-b', showTransitTab: false }
     ],
     sectors: [
       { id: 'sec-a', name: 'Empty Sector', order: 0 },
       { id: 'sec-b', name: 'Busy Sector', order: 1 }
     ],
     activeStationId: null,
+    activeTransitSectorId: null,
+    productionSource: 'empire',
+    getLinkedSectors: () => [],
+    getTransitTabId: () => null,
     selectStation: vi.fn(),
+    selectTransitSector: vi.fn(),
     createStation: vi.fn(),
     duplicateStation: vi.fn(),
     deleteStation: vi.fn()

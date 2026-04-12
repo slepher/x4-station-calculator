@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { test } from '../test-setup';
+import { test } from '../../test-setup';
 // import { STATION_MOCK_DATA } from '../mock/station_mock_data';
 
 test.describe('WareFlow UI Refactor', () => {

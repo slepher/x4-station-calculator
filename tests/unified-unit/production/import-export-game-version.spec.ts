@@ -367,7 +367,7 @@ describe('import-export game version pipeline', () => {
     })
   })
 
-  it('applies imports into the active version storage keys', () => {
+  it('applies imports into the active version storage keys', async () => {
     const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = buildStores()
     const payload = normalizeImportPayload({
       game_vsn: '9.0',
@@ -379,7 +379,7 @@ describe('import-export game version pipeline', () => {
       }
     })
 
-    const result = applyImportPayload({
+    const result = await applyImportPayload({
       mode: 'overwrite',
       selectedModules: {
         x4_empire_data: true,
@@ -400,7 +400,7 @@ describe('import-export game version pipeline', () => {
     expect(localStorage.getItem('x4_ship_blueprints@9.0-beta')).toBeTruthy()
   })
 
-  it('overwrite import switches runtime active selections to imported targets', () => {
+  it('overwrite import switches runtime active selections to imported targets', async () => {
     const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = buildStores()
     const empire = createEmpireState()
     empire.activeId = 'empire-imported'
@@ -416,7 +416,7 @@ describe('import-export game version pipeline', () => {
     ship.activeBlueprintId = 'bp-imported'
     ship.ships[0]!.blueprints[0]!.id = 'bp-imported'
 
-    applyImportPayload({
+    await applyImportPayload({
       mode: 'overwrite',
       selectedModules: {
         x4_empire_data: true,

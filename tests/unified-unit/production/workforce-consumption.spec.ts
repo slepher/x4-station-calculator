@@ -68,7 +68,7 @@ describe('Split Supply Operations - workforceConsumption', () => {
   });
 
   it('测试工人消耗正确记录到 workforceConsumption 字段', () => {
-    const habModuleId = 'hab_arg_m_01_macro';
+    const habModuleId = 'module_arg_hab_m_01';
     const habModule = modules[habModuleId];
     
     expect(habModule).toBeDefined();
@@ -118,7 +118,7 @@ describe('Split Supply Operations - workforceConsumption', () => {
   });
 
   it('测试分组逻辑 - 补给分组', () => {
-    const habModuleId = 'hab_arg_m_01_macro';
+    const habModuleId = 'module_arg_hab_m_01';
     const habModule = modules[habModuleId];
     
     expect(habModule).toBeDefined();
@@ -187,9 +187,9 @@ describe('Split Supply Operations - workforceConsumption', () => {
   });
 
   it('测试分组逻辑 - 混合消耗物资归入补给分组', () => {
-    const habModuleId = 'hab_arg_m_01_macro';
+    const habModuleId = 'module_arg_hab_m_01';
     const weaponComponentsModuleId = Object.keys(modules).find(k => 
-      k.includes('weaponcomponents') && k.includes('prod')
+      k.includes('weaponcomponents')
     );
     
     expect(modules[habModuleId]).toBeDefined();

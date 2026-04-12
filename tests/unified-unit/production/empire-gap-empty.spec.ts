@@ -36,6 +36,7 @@ vi.mock('@/store/useStationStore', () => ({
 
 vi.mock('@/store/useEmpireStore', () => ({
   useEmpireStore: () => ({
+    activeStation: { id: 'station-1' },
     empireGroupedFlows: {
       flows: [],
       empireGroups: {
@@ -45,7 +46,11 @@ vi.mock('@/store/useEmpireStore', () => ({
         ],
         supply: []
       }
-    }
+    },
+    getStationComponentGapFlows: vi.fn(() => ({
+      operations: [],
+      supply: []
+    }))
   })
 }))
 
@@ -55,7 +60,7 @@ vi.mock('@/store/useGameDataStore', () => ({
   })
 }))
 
-import StationWareFlowsDashboard from '@/components/StationWareFlowsDashboard.vue'
+import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 
 describe('帝国运营/补给过滤逻辑', () => {
   it('运营与补给都为空时不显示分组', () => {

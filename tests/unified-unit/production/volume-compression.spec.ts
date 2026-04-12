@@ -42,7 +42,8 @@ vi.mock('@/utils/UseX4I18n', () => ({
 }))
 
 vi.mock('@/i18n', () => ({
-  loadLanguageAsync: vi.fn().mockResolvedValue(true)
+  loadLanguageAsync: vi.fn().mockResolvedValue(true),
+  setGameFolderName: vi.fn()
 }))
 
 describe('Volume Compression Rate Calculation', () => {

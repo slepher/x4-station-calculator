@@ -99,14 +99,20 @@ function createFlowState(): SavedFlowPlansState {
 function createShipState(): SavedShipBlueprintsState {
   return {
     version: 1,
-    activeId: 'bp-a',
-    list: [
+    activeShipId: 'ship_a',
+    activeBlueprintId: 'bp-a',
+    ships: [
       {
-        id: 'bp-a',
-        name: 'BP A',
         shipId: 'ship_a',
-        connections: [],
-        lastUpdated: Date.now()
+        blueprints: [
+          {
+            id: 'bp-a',
+            name: 'BP A',
+            shipId: 'ship_a',
+            connections: [],
+            lastUpdated: Date.now()
+          }
+        ]
       }
     ]
   }
@@ -118,13 +124,15 @@ function createStores(overrides?: {
   shipDirty?: boolean
   flowActiveId?: string | null
   shipActiveId?: string | null
+  shipActiveBlueprintId?: string | null
 }) {
   const empireState = createEmpireState()
   const flowState = createFlowState()
   const shipState = createShipState()
 
   if (overrides?.flowActiveId !== undefined) flowState.activeId = overrides.flowActiveId
-  if (overrides?.shipActiveId !== undefined) shipState.activeId = overrides.shipActiveId
+  if (overrides?.shipActiveId !== undefined) shipState.activeShipId = overrides.shipActiveId
+  if (overrides?.shipActiveBlueprintId !== undefined) shipState.activeBlueprintId = overrides.shipActiveBlueprintId
 
   const empireStore = {
     savedEmpires: empireState,
@@ -151,6 +159,11 @@ function createStores(overrides?: {
     savedBlueprints: shipState,
     isDirty: overrides?.shipDirty ?? false,
     activeView: 'production' as const,
+    shipMap: new Map([['ship_a', {}]]),
+    equipmentMap: new Map(),
+    consumablesMap: new Map(),
+    dronesMap: new Map(),
+    missilesMap: new Map(),
     loadBlueprintsFromStorage: vi.fn(() => {
       const raw = localStorage.getItem('x4_ship_blueprints')
       if (raw) shipBuildStore.savedBlueprints = JSON.parse(raw)
@@ -203,7 +216,7 @@ describe('import-export logic', () => {
     ])
   })
 
-  it('1.2 overwrite import applies all selected modules', () => {
+  it('1.2 overwrite import applies all selected modules', async () => {
     // 1.2.1 overwrite 模式写入 empire/flow/ship 并刷新对应 store #期望: ["applied"]
     const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = createStores()
 
@@ -218,10 +231,10 @@ describe('import-export logic', () => {
     incomingFlow.list[0]!.id = 'imp-flow'
 
     const incomingShip = createShipState()
-    incomingShip.activeId = 'imp-bp'
-    incomingShip.list[0]!.id = 'imp-bp'
+    incomingShip.activeBlueprintId = 'imp-bp'
+    incomingShip.ships[0]!.blueprints[0]!.id = 'imp-bp'
 
-    const result = applyImportPayload({
+    const result = await applyImportPayload({
       mode: 'overwrite',
       selectedModules: allSelected(),
       currentView: 'production',
@@ -245,14 +258,14 @@ describe('import-export logic', () => {
     expect(savedEmpire.activeId).toBe('imp-empire')
   })
 
-  it('1.3 incremental import keeps flow activeId when current is dirty', () => {
+  it('1.3 incremental import keeps flow activeId when current is dirty', async () => {
     // 1.3.1 incremental 且 flow isDirty=true 时保持现有 activeId #期望: ["unchanged"]
     const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = createStores({ flowDirty: true })
 
     const incomingFlow = createFlowState()
     incomingFlow.activeId = 'flow-incoming'
 
-    applyImportPayload({
+    await applyImportPayload({
       mode: 'incremental',
       selectedModules: {
         x4_empire_data: false,
@@ -272,15 +285,15 @@ describe('import-export logic', () => {
     expect(savedFlow.list.length).toBe(2)
   })
 
-  it('1.4 incremental ship import regenerates ids to avoid collisions', () => {
+  it('1.4 incremental ship import regenerates ids to avoid collisions', async () => {
     // 1.4.1 incremental 导入 ship 时冲突 id 重生且无冲突 #期望: ["no-id-collision"]
     const { empireStore, logicFlowStore, shipBuildStore, gameDataStore } = createStores()
 
     const incomingShip = createShipState()
-    incomingShip.activeId = 'bp-a'
-    incomingShip.list[0]!.id = 'bp-a'
+    incomingShip.activeBlueprintId = 'bp-a'
+    incomingShip.ships[0]!.blueprints[0]!.id = 'bp-a'
 
-    applyImportPayload({
+    await applyImportPayload({
       mode: 'incremental',
       selectedModules: {
         x4_empire_data: false,
@@ -296,8 +309,8 @@ describe('import-export logic', () => {
     })
 
     const savedShip = JSON.parse(localStorage.getItem('x4_ship_blueprints') || '{}') as SavedShipBlueprintsState
-    expect(savedShip.list.length).toBe(2)
-    const ids = savedShip.list.map((item) => item.id)
+    expect(savedShip.ships[0]!.blueprints.length).toBe(2)
+    const ids = savedShip.ships[0]!.blueprints.map((item) => item.id)
     expect(new Set(ids).size).toBe(2)
     expect(ids).toContain('bp-a')
   })
@@ -311,6 +324,6 @@ describe('import-export logic', () => {
     expect(payload.data.x4_logic_flow_plans.version).toBe(CURRENT_FLOW_VERSION)
     expect(payload.data.x4_empire_data.list.length).toBe(1)
     expect(payload.data.x4_logic_flow_plans.list.length).toBe(1)
-    expect(payload.data.x4_ship_blueprints.list.length).toBe(1)
+    expect(payload.data.x4_ship_blueprints.ships.length).toBe(1)
   })
 })

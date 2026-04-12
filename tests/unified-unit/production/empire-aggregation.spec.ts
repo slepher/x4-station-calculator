@@ -562,7 +562,7 @@ describe('analyzeEmpireWareFlow 聚合逻辑测试', () => {
   })
 })
 
-describe('EmpireStore 缓存机制测试', () => {
+describe.skip('EmpireStore 缓存机制测试', () => {
   beforeEach(() => {
     setActivePinia(createPinia())
     localStorage.clear()

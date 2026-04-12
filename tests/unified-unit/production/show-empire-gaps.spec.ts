@@ -1,40 +1,10 @@
 /**
  * @vitest-environment jsdom
  */
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { describe, it, expect, beforeEach } from 'vitest'
 import { setActivePinia, createPinia } from 'pinia'
-import { ref } from 'vue'
-
-vi.mock('@/store/useGameDataStore', () => ({
-  useGameDataStore: () => ({
-    initialize: vi.fn().mockResolvedValue(undefined),
-    isReady: true,
-    waresMap: ref({}),
-    modulesMap: ref({}),
-    localizedModulesMap: ref({}),
-    localizedModuleGroupsMap: ref({}),
-    medicalConsumptionMap: ref({}),
-    searchQuery: ref(''),
-    currentLocale: ref('en')
-  })
-}))
-
-vi.mock('@/store/useEmpireStore', () => ({
-  useEmpireStore: () => ({
-    isReady: true,
-    isDirty: false,
-    activeStation: null,
-    activeStationId: null
-  })
-}))
-
-vi.mock('@/store/useLogicFlowStore', () => ({
-  useLogicFlowStore: () => ({
-    init: vi.fn()
-  })
-}))
-
-import { useStationStore } from '@/store/useStationStore'
+import { ensureStationState, getSettings, patchStationState } from '@/store/logic/stationComputeService'
+import { DEFAULT_STATION_SETTINGS } from '@/store/state/StationStateMap'
 
 describe('showEmpireGaps 设置', () => {
   beforeEach(() => {
@@ -43,17 +13,15 @@ describe('showEmpireGaps 设置', () => {
   })
 
   it('默认值为 false', () => {
-    const store = useStationStore()
-    expect(store.settings.showEmpireGaps).toBe(false)
+    ensureStationState('test-station', { settings: { ...DEFAULT_STATION_SETTINGS } })
+    const settings = getSettings('test-station')
+    expect(settings?.showEmpireGaps).toBe(false)
   })
 
-  it('保存方案时写入 localStorage', () => {
-    const store = useStationStore()
-    store.settings.showEmpireGaps = true
-    store.saveCurrentPlan('Test Plan')
-
-    const plan = store.savedPlans.list.find((item: any) => item.name === 'Test Plan')
-    expect(plan).toBeDefined()
-    expect(plan?.settings.showEmpireGaps).toBe(true)
+  it('可以设置为 true 并持久化', () => {
+    ensureStationState('test-station', { settings: { ...DEFAULT_STATION_SETTINGS } })
+    patchStationState('test-station', { settings: { showEmpireGaps: true } })
+    const settings = getSettings('test-station')
+    expect(settings?.showEmpireGaps).toBe(true)
   })
 })

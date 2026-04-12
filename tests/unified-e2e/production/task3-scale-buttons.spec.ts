@@ -1,5 +1,5 @@
 import { expect } from '@playwright/test';
-import { test } from '../test-setup';
+import { test } from '../../test-setup';
 
 test.describe('Task 3: 规划区数量调整功能测试', () => {
   test.beforeEach(async ({ page }) => {
