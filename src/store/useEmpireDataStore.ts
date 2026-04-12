@@ -205,6 +205,33 @@ export const useEmpireDataStore = defineStore('empireData', () => {
     return true
   }
 
+  function updateStationTypeInEmpire(empire: EmpirePlan | null, stationId: string, type: StationType): boolean {
+    if (!empire) return false
+    const station = empire.stations.find((item) => item.id === stationId)
+    if (!station) return false
+    station.type = type
+    station.lastUpdated = Date.now()
+    return true
+  }
+
+  function updateStationCountInEmpire(empire: EmpirePlan | null, stationId: string, count: number): boolean {
+    if (!empire) return false
+    const station = empire.stations.find((item) => item.id === stationId)
+    if (!station) return false
+    station.count = count
+    station.lastUpdated = Date.now()
+    return true
+  }
+
+  function updateStationMineralsInEmpire(empire: EmpirePlan | null, stationId: string, minerals: string[]): boolean {
+    if (!empire) return false
+    const station = empire.stations.find((item) => item.id === stationId)
+    if (!station) return false
+    station.minerals = minerals
+    station.lastUpdated = Date.now()
+    return true
+  }
+
   function renameEmpireDraft(empire: EmpirePlan | null, name: string): boolean {
     if (!empire) return false
     empire.name = name
@@ -381,6 +408,9 @@ export const useEmpireDataStore = defineStore('empireData', () => {
     updateStationSettingsInEmpire,
     updateStationModulesInEmpire,
     updateStationSectorInEmpire,
+    updateStationTypeInEmpire,
+    updateStationCountInEmpire,
+    updateStationMineralsInEmpire,
     renameEmpireDraft,
     moveStationToSectorInEmpire,
     setStationLocationInEmpire,

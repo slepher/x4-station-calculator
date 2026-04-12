@@ -148,26 +148,23 @@ const handleUpdateStationName = (value: string) => {
 
 const handleUpdateStationType = (value: string) => {
   if (activeStation.value) {
-    activeStation.value.type = value as any
-    activeStation.value.lastUpdated = Date.now()
+    empireStore.updateStationType(activeStation.value.id, value as any)
   }
 }
 
 const handleUpdateStationCount = (value: number) => {
   if (activeStation.value) {
-    activeStation.value.count = value
-    activeStation.value.lastUpdated = Date.now()
+    empireStore.updateStationCount(activeStation.value.id, value)
   }
 }
 
 const handleToggleMineral = (mineral: string) => {
   if (!activeStation.value) return
   const current = activeStation.value.minerals || []
-  if (current.includes(mineral)) {
-    activeStation.value.minerals = current.filter((m: string) => m !== mineral)
-  } else {
-    activeStation.value.minerals = [...current, mineral]
-  }
+  const newMinerals = current.includes(mineral)
+    ? current.filter((m: string) => m !== mineral)
+    : [...current, mineral]
+  empireStore.updateStationMinerals(activeStation.value.id, newMinerals)
 }
 
 const handleUpdateSunlight = (value: number) => {
@@ -246,8 +243,7 @@ const handleUpdateModuleCount = (index: number, count: number) => {
 
 const handleReorderModules = (modules: any[]) => {
   if (activeStation.value) {
-    activeStation.value.modules = modules
-    activeStation.value.lastUpdated = Date.now()
+    empireStore.updateStationModules(activeStation.value.id, modules)
   }
 }
 

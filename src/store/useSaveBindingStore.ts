@@ -331,10 +331,12 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     groupId?: string | null
     name: string
     type?: StationType
+    count?: number
     modules?: SavedModule[]
     settings?: StationSettings
     lockedWares?: string[]
     warePriority?: Record<string, number>
+    minerals?: string[]
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }): BindingStationPlan | null {
@@ -352,10 +354,12 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
         groupId: input.groupId ?? null,
         name: input.name,
         type: input.type || 'industrial',
+        count: input.count ?? 1,
         modules: [],
         settings: deepClone(DEFAULT_STATION_SETTINGS),
         lockedWares: [],
         warePriority: {},
+        minerals: [],
         sectorMacro: input.sectorMacro,
         position: input.position
       }
@@ -365,10 +369,12 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     plan.groupId = input.groupId ?? plan.groupId ?? null
     plan.name = input.name ?? plan.name
     if (input.type !== undefined) plan.type = input.type
+    if (input.count !== undefined) plan.count = input.count
     if (input.modules) plan.modules = deepClone(input.modules)
     if (input.settings) plan.settings = deepClone(input.settings)
     if (input.lockedWares) plan.lockedWares = deepClone(input.lockedWares)
     if (input.warePriority) plan.warePriority = deepClone(input.warePriority)
+    if (input.minerals !== undefined) plan.minerals = deepClone(input.minerals)
     if (input.sectorMacro !== undefined) plan.sectorMacro = input.sectorMacro
     if (input.position !== undefined) plan.position = input.position
     draftBinding.value.updatedAt = Date.now()

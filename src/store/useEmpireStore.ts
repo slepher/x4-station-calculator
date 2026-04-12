@@ -202,7 +202,7 @@ const gameData = useGameDataStore()
 
   function updateBindingStationPlan(
     stationId: string,
-    patch: Partial<Pick<StationPlan, 'name' | 'type' | 'modules' | 'settings' | 'sectorId' | 'lockedWares' | 'warePriority'>>
+    patch: Partial<Pick<StationPlan, 'name' | 'type' | 'modules' | 'settings' | 'sectorId' | 'lockedWares' | 'warePriority' | 'count' | 'minerals'>>
   ): boolean {
     const binding = saveBindingStore.activeBinding
     const parsed = parseBindingStationId(stationId)
@@ -214,7 +214,9 @@ const gameData = useGameDataStore()
         type: patch.type,
         modules: patch.modules,
         settings: patch.settings,
-        groupId: patch.sectorId
+        groupId: patch.sectorId,
+        count: patch.count,
+        minerals: patch.minerals
       })
     }
 
@@ -226,7 +228,9 @@ const gameData = useGameDataStore()
       name: patch.name ?? station?.name ?? parsed.saveStationCode,
       type: patch.type ?? station?.type ?? 'industrial',
       modules: patch.modules ?? station?.modules ?? [],
-      settings: patch.settings ?? station?.settings ?? DEFAULT_STATION_SETTINGS
+      settings: patch.settings ?? station?.settings ?? DEFAULT_STATION_SETTINGS,
+      count: patch.count ?? station?.count ?? 1,
+      minerals: patch.minerals ?? station?.minerals ?? []
     })
     if (!plan) return false
     const nextId = createBindingPlanStationId(binding.gameGuid, plan.id)
@@ -389,6 +393,30 @@ const gameData = useGameDataStore()
     if (empireDataStore.updateStationModulesInEmpire(activeEmpire.value, stationId, modules)) {
       refreshStationFlowCache(stationId)
     }
+  }
+
+  function updateStationType(stationId: string, type: StationType) {
+    if (productionSource.value === 'save-binding') {
+      updateBindingStationPlan(stationId, { type })
+      return
+    }
+    empireDataStore.updateStationTypeInEmpire(activeEmpire.value, stationId, type)
+  }
+
+  function updateStationCount(stationId: string, count: number) {
+    if (productionSource.value === 'save-binding') {
+      updateBindingStationPlan(stationId, { count })
+      return
+    }
+    empireDataStore.updateStationCountInEmpire(activeEmpire.value, stationId, count)
+  }
+
+  function updateStationMinerals(stationId: string, minerals: string[]) {
+    if (productionSource.value === 'save-binding') {
+      updateBindingStationPlan(stationId, { minerals })
+      return
+    }
+    empireDataStore.updateStationMineralsInEmpire(activeEmpire.value, stationId, minerals)
   }
 
   function applyImportedStationPayload(
@@ -828,6 +856,9 @@ const gameData = useGameDataStore()
     getStationById,
     updateStationSettings,
     updateStationModules,
+    updateStationType,
+    updateStationCount,
+    updateStationMinerals,
     applyImportedStationPayload,
     updateEmpireName,
     shouldConfirmBeforeEmpireReset,
