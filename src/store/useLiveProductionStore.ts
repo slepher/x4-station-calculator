@@ -788,9 +788,27 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const currentStationId = activeViewStore.activeBindingStation
     if (!currentStationId) return
 
+    const transitMatch = currentStationId.match(/^transit-(.+)$/)
+    if (transitMatch) {
+      const sectorId = transitMatch[1]!
+      const validSectorIds = new Set(sectors.value.map(s => s.id))
+      if (validSectorIds.has(sectorId)) {
+        activeStationId.value = currentStationId
+        expandedSectorId.value = sectorId
+      } else {
+        activeStationId.value = null
+        expandedSectorId.value = null
+      }
+      return
+    }
+
     const validIds = new Set(derivedBindingStations.value.map(item => item.station.id))
     if (validIds.has(currentStationId)) {
       activeStationId.value = currentStationId
+      const station = orderedStationsBySector.value.find(s => s.id === currentStationId)
+      if (station?.sectorId) {
+        expandedSectorId.value = station.sectorId
+      }
     } else {
       activeStationId.value = null
     }
