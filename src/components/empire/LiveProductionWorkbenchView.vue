@@ -61,7 +61,7 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
   sectorId: activeTransitSectorId.value,
   racePreference: liveStore.settings.racePreference,
   transportShipCapacity: liveStore.settings.transportShipCapacity,
-  storageBufferHours: liveStore.settings.primaryProductBufferHours
+  storageBufferHours: liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours
 }))
 </script>
 
@@ -129,10 +129,10 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
           :storage-flows="transitHubModel.storageFlows"
           :view-mode="wareflowPresenter.props.viewMode.value"
           :price-multiplier="liveStore.settings.buyMultiplier"
-          :product-buffer-hours="liveStore.settings.primaryProductBufferHours"
+          :product-buffer-hours="liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours"
           @update:view-mode="wareflowPresenter.emits.updateViewMode"
           @update:price-multiplier="wareflowPresenter.emits.updateBuyMultiplier"
-          @update:product-buffer-hours="wareflowPresenter.emits.updatePrimaryProductBufferHours"
+          @update:product-buffer-hours="(v) => liveStore.updateTransitHubSettings({ primaryProductBufferHours: v })"
         />
       </div>
 

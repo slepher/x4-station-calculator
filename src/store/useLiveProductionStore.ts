@@ -131,6 +131,24 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     sectors.value
   ))
 
+  const transitHubSettings = computed<Partial<StationSettings>>(() => {
+    const sectorId = activeTransitSectorId.value
+    if (!sectorId) return {}
+    const group = activeBinding.value?.groups.find(g => g.id === sectorId)
+    return group?.settings || {}
+  })
+
+  function updateTransitHubSettings(patch: Partial<StationSettings>) {
+    const sectorId = activeTransitSectorId.value
+    if (!sectorId) return
+    const gameGuid = activeBinding.value?.gameGuid
+    if (!gameGuid) return
+    const current = transitHubSettings.value
+    saveBindingStore.updateGroup(gameGuid, sectorId, {
+      settings: { ...current, ...patch }
+    })
+  }
+
   function getDerivedBindingStation(stationId: string): StationPlan | null {
     return sourceView.getDerivedBindingStation(stationId)
   }
@@ -1147,6 +1165,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeStation,
     activeStationId,
     activeTransitSectorId,
+    transitHubSettings,
+    updateTransitHubSettings,
     sectors,
     orderedStationsBySector,
     derivedBindingStations,
