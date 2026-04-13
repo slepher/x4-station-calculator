@@ -24,6 +24,8 @@ interface BuildTransitHubViewModelInput {
   racePreference: string
   transportShipCapacity: number
   storageBufferHours?: number
+  buyMultiplier?: number
+  sellMultiplier?: number
 }
 
 interface BuildTransitHubStorageFlowsInput {
@@ -61,10 +63,14 @@ function mergeLinkFlowsIntoGroupedFlows(
   solverOutput: SolveMultiWareByLinkOutput,
   sectorId: string,
   sectors: SectorPlan[],
-  waresMap?: Record<string, X4Ware>
+  waresMap?: Record<string, X4Ware>,
+  buyMultiplier?: number,
+  sellMultiplier?: number
 ): EmpireGroupedFlows {
   const safeSolverOutput = solverOutput || createEmptySolverOutput()
   const sectorNameMap = new Map(sectors.map((sector) => [sector.id, sector.name]))
+  const effectiveBuyMultiplier = buyMultiplier ?? 0.5
+  const effectiveSellMultiplier = sellMultiplier ?? 0.5
 
   const flowsByWareId = new Map<string, EmpireWareFlow>()
   groupedFlows.flows.forEach((flow) => {
@@ -94,7 +100,9 @@ function mergeLinkFlowsIntoGroupedFlows(
       consumption: isFromHere ? amount : 0,
       workforceConsumption: 0,
       netRate: isToHere ? amount : -amount,
-      netValue: (isToHere ? amount : -amount) * unitPrice
+      netValue: isToHere
+        ? amount * unitPrice * effectiveBuyMultiplier
+        : -amount * unitPrice * effectiveSellMultiplier
     }
 
     if (existingFlow) {
@@ -352,7 +360,9 @@ export function buildTransitHubViewModel(input: BuildTransitHubViewModelInput): 
     input.solverOutput || createEmptySolverOutput(),
     input.sectorId,
     input.sectors,
-    input.waresMap
+    input.waresMap,
+    input.buyMultiplier,
+    input.sellMultiplier
   )
 
   const storageFlows = buildTransitHubStorageFlows({

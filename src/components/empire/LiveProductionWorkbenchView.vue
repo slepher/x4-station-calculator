@@ -61,7 +61,9 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
   sectorId: activeTransitSectorId.value,
   racePreference: liveStore.settings.racePreference,
   transportShipCapacity: liveStore.settings.transportShipCapacity,
-  storageBufferHours: liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours
+  storageBufferHours: liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours,
+  buyMultiplier: liveStore.transitHubSettings.buyMultiplier ?? liveStore.settings.buyMultiplier,
+  sellMultiplier: liveStore.transitHubSettings.sellMultiplier ?? liveStore.settings.sellMultiplier
 }))
 </script>
 
@@ -128,10 +130,12 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
           :grouped-flows="transitHubModel.groupedFlows"
           :storage-flows="transitHubModel.storageFlows"
           :view-mode="wareflowPresenter.props.viewMode.value"
-          :price-multiplier="liveStore.settings.buyMultiplier"
+          :buy-multiplier="liveStore.transitHubSettings.buyMultiplier ?? liveStore.settings.buyMultiplier"
+          :sell-multiplier="liveStore.transitHubSettings.sellMultiplier ?? liveStore.settings.sellMultiplier"
           :product-buffer-hours="liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours"
           @update:view-mode="wareflowPresenter.emits.updateViewMode"
-          @update:price-multiplier="wareflowPresenter.emits.updateBuyMultiplier"
+          @update:buy-multiplier="(v) => liveStore.updateTransitHubSettings({ buyMultiplier: v })"
+          @update:sell-multiplier="(v) => liveStore.updateTransitHubSettings({ sellMultiplier: v })"
           @update:product-buffer-hours="(v) => liveStore.updateTransitHubSettings({ primaryProductBufferHours: v })"
         />
       </div>

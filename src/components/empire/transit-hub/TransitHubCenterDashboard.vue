@@ -22,17 +22,20 @@ const props = withDefaults(defineProps<{
   groupedFlows: EmpireGroupedFlows
   storageFlows: SupplyStorageFlow[]
   viewMode?: SharedViewMode
-  priceMultiplier?: number
+  buyMultiplier?: number
+  sellMultiplier?: number
   productBufferHours?: number
 }>(), {
   viewMode: 'quantity',
-  priceMultiplier: 0.5,
+  buyMultiplier: 0.5,
+  sellMultiplier: 0.5,
   productBufferHours: 12
 })
 
 const emit = defineEmits<{
   (e: 'update:viewMode', value: SharedViewMode): void
-  (e: 'update:priceMultiplier', value: number): void
+  (e: 'update:buyMultiplier', value: number): void
+  (e: 'update:sellMultiplier', value: number): void
   (e: 'update:productBufferHours', value: number): void
 }>()
 
@@ -41,9 +44,14 @@ const viewMode = computed<SharedViewMode>({
   set: (value) => emit('update:viewMode', value)
 })
 
-const localPriceMultiplier = computed({
-  get: () => props.priceMultiplier,
-  set: (value) => emit('update:priceMultiplier', value)
+const localBuyMultiplier = computed({
+  get: () => props.buyMultiplier,
+  set: (value) => emit('update:buyMultiplier', value)
+})
+
+const localSellMultiplier = computed({
+  get: () => props.sellMultiplier,
+  set: (value) => emit('update:sellMultiplier', value)
 })
 
 const localProductBufferHours = computed({
@@ -194,7 +202,8 @@ const hasTransportData = computed(() =>
 
     <div class="controls-section" v-if="hasFlowData">
       <div v-if="viewMode === 'economy'" class="simulation-controls flex flex-row gap-4">
-        <PriceSlider v-model="localPriceMultiplier" :label="t('wareflow.price_multiplier')" type="buy" />
+        <PriceSlider v-model="localBuyMultiplier" :label="t('wareflow.buy_multiplier')" type="buy" />
+        <PriceSlider v-model="localSellMultiplier" :label="t('wareflow.sell_multiplier')" type="sell" />
       </div>
       <div v-if="viewMode === 'volume'" class="simulation-controls flex flex-row gap-4">
         <VolumeControlSlider

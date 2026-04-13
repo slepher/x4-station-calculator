@@ -660,8 +660,10 @@
     "profit_title": "经济分析",
     "res_price": "原材料价格",
     "prod_price": "产品价格",
-    "price_multiplier": "价格倍率",
-    "profit_footer": "预计每小时利润",
+"price_multiplier": "价格倍率",
+  "buy_multiplier": "买入价格倍率",
+  "sell_multiplier": "卖出价格倍率",
+  "profit_footer": "预计每小时利润",
     "header_volume": "材料体积",
     "net_volume": "吞吐容量",
     "storage_volume": "占用容量"

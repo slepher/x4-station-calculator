@@ -658,8 +658,10 @@
     "profit_title": "ECONOMIC ANALYSIS",
     "res_price": "RESOURCES PRICE",
     "prod_price": "PRODUCTS PRICE",
-    "price_multiplier": "Price Multiplier",
-    "profit_footer": "ESTIMATED HOURLY PROFIT",
+"price_multiplier": "Price Multiplier",
+  "buy_multiplier": "Buy Price Multiplier",
+  "sell_multiplier": "Sell Price Multiplier",
+  "profit_footer": "ESTIMATED HOURLY PROFIT",
     "header_volume": "Material Volume",
     "net_volume": "Net Volume",
     "storage_volume": "Storage Volume"

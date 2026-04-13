@@ -623,6 +623,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     racePreference: string
     transportShipCapacity: number
     storageBufferHours?: number
+    buyMultiplier?: number
+    sellMultiplier?: number
   }): TransitHubViewModel {
     return flowFacade.getTransitHubViewModel(input)
   }

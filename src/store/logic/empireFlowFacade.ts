@@ -55,6 +55,8 @@ export interface EmpireFlowFacade {
     racePreference: string
     transportShipCapacity: number
     storageBufferHours?: number
+    buyMultiplier?: number
+    sellMultiplier?: number
   }) => TransitHubViewModel
 }
 
@@ -367,6 +369,8 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
     racePreference: string
     transportShipCapacity: number
     storageBufferHours?: number
+    buyMultiplier?: number
+    sellMultiplier?: number
   }): TransitHubViewModel {
     if (!input.sectorId) {
       return buildTransitHubViewModel({
@@ -379,7 +383,9 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
         modulesMap: modulesMap.value || undefined,
         racePreference: input.racePreference,
         transportShipCapacity: input.transportShipCapacity,
-        storageBufferHours: input.storageBufferHours
+        storageBufferHours: input.storageBufferHours,
+        buyMultiplier: input.buyMultiplier,
+        sellMultiplier: input.sellMultiplier
       })
     }
 
@@ -396,7 +402,9 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
       modulesMap: modulesMap.value || undefined,
       racePreference: input.racePreference,
       transportShipCapacity: input.transportShipCapacity,
-      storageBufferHours: input.storageBufferHours
+      storageBufferHours: input.storageBufferHours,
+      buyMultiplier: input.buyMultiplier,
+      sellMultiplier: input.sellMultiplier
     })
   }
 
