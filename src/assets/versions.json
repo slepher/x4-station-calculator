@@ -13,6 +13,10 @@
         "ship_blueprints": "x4_ship_blueprints",
         "setting": "x4-setting",
         "save_archives": "x4_save_archives"
+      },
+      "indexeddb_tables": {
+        "archive_data": "archive_data",
+        "player_station": "player_station"
       }
     },
     {
@@ -26,6 +30,10 @@
         "ship_blueprints": "x4_ship_blueprints_v9_beta",
         "setting": "x4-setting_v9_beta",
         "save_archives": "x4_save_archives_v9_beta"
+      },
+      "indexeddb_tables": {
+        "archive_data": "archive_data_v9_beta",
+        "player_station": "player_station_v9_beta"
       }
     }
   ]

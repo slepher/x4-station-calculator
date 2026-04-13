@@ -230,6 +230,23 @@ export interface AbandonedShipEntry {
 
 export type CodeMap<T> = Record<string, T>
 
+export type PlayerStationType = 'station' | 'buildstorage'
+
+export interface PlayerStationRecord {
+  id: string
+  archiveId: string
+  sectorMacro: string
+  code: string
+  type: PlayerStationType
+  data: PlayerStationEntry | BuildStorageEntry
+}
+
+export interface ArchiveDataRecord {
+  id: string
+  archiveId: string
+  data: SaveArchive
+}
+
 export interface SectorData {
   name: string
   is_known: boolean

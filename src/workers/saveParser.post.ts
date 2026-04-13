@@ -66,7 +66,7 @@ interface SectorStaticHighwayLookup {
 }
 
 export const CURRENT_PARSER_VERSION = 'v3' as const
-export const CURRENT_POST_PROCESSOR_VERSION = 'v9' as const
+export const CURRENT_POST_PROCESSOR_VERSION = 'v10' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
 const DEFAULT_EXTENT_RATIO = 0.8

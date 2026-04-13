@@ -868,6 +868,10 @@ export interface VersionConfig {
     setting: string
     save_archives: string
   }
+  indexeddb_tables?: {
+    archive_data: string
+    player_station: string
+  }
 }
 
 export interface VersionsFile {
