@@ -168,6 +168,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return ensureStationState(station.id)
   }
 
+  function syncAllBindingStationsToStateMap(): void {
+    const stations = derivedBindingStations.value
+    const deps = getComputeDeps()
+    if (!deps) return
+
+    stations.forEach((item) => {
+      const station = item.station
+      station.settings = migrateStationSettings(station.settings)
+      syncPersistedToStateMap(station.id, station)
+      recomputeStation(station.id, deps)
+    })
+  }
+
   function syncPersistedActiveStationToStateMap(): void {
     const station = activeStation.value
     if (!station) return
@@ -826,6 +839,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       const storedGuid = activeViewStore.activeBinding
       if (storedGuid && saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedGuid)) {
         openBinding(storedGuid)
+        syncAllBindingStationsToStateMap()
         validateActiveStationId()
         isReady.value = true
         console.log('[LiveProductionStore] Loaded saved binding')
@@ -836,6 +850,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (firstBinding) {
         activeViewStore.activeBinding = firstBinding.gameGuid
         openBinding(firstBinding.gameGuid)
+        syncAllBindingStationsToStateMap()
         validateActiveStationId()
         isReady.value = true
         console.log('[LiveProductionStore] Loaded first binding')

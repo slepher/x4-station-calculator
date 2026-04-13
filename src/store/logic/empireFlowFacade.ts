@@ -18,7 +18,7 @@ import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOu
 import { buildTransitHubViewModel } from './transitHubViewModel'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { buildSaveBindingProductionFlows, type SaveBindingProductionDeps } from './productionSourceAdapter'
-import { getFilteredGroupedFlows, getGroupedFlows } from './stationComputeService'
+import { getFilteredGroupedFlows } from './stationComputeService'
 import { parseSectorLinkKey } from './sectorLinks'
 import type { EmpireSourceView } from './empireSourceView'
 
@@ -142,7 +142,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
 
     sectorList.forEach((sector) => {
       const localStations = stations.filter((station) => station.sectorId === sector.id)
-      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getGroupedFlows(stationId))
+      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getFilteredGroupedFlows(stationId))
       map.set(sector.id, rawGroupedFlows)
     })
 
