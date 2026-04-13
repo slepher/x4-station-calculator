@@ -263,6 +263,8 @@ export class StationStateMap {
 
     state.autoIndustryModules = result.autoIndustryModules
     state.productionFlows = result.productionFlows
+    state.actualWorkforce = result.actualWorkforce
+    state.currentEfficiency = result.currentEfficiency
 
     const allIndustryModules = [...plannedModulesForCompute, ...state.autoIndustryModules]
 

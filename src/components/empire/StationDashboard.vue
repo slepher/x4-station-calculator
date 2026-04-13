@@ -72,12 +72,29 @@ const buildPriceMultiplier = computed({
   set: (val) => emit('updateBuildPriceMultiplier', val)
 })
 
+const clampedManualWorkforce = computed(() => {
+  const currentAnalysis = analysis.value
+  const capacity = currentAnalysis.totalCapacity || 0
+  return Math.max(0, Math.min(props.settings.manualWorkforce, capacity))
+})
+
+const displayedActualWorkforce = computed(() => {
+  if (props.settings.workforceAuto) return maxAllowedWorkforce.value
+  return clampedManualWorkforce.value
+})
+
+const displayedEfficiency = computed(() => {
+  const needed = analysis.value.totalNeeded || 0
+  if (needed === 0) return 1
+  return Math.min(1, displayedActualWorkforce.value / needed)
+})
+
 const workforceEfficiencyText = computed(() => {
-  return `${Math.round(props.currentEfficiency * 100)}%`
+  return `${Math.round(displayedEfficiency.value * 100)}%`
 })
 
 const workforceEfficiencyColor = computed(() => {
-  const eff = props.currentEfficiency
+  const eff = displayedEfficiency.value
   if (eff >= 1) return 'text-emerald-400'
   if (eff >= 0.5) return 'text-amber-400'
   return 'text-red-400'
@@ -106,7 +123,7 @@ const saturationPercent = computed({
     const currentAnalysis = analysis.value
     const capacity = currentAnalysis.totalCapacity || 0;
     if (capacity === 0) return 0;
-    const currentVal = props.settings.workforceAuto ? props.actualWorkforce : props.settings.manualWorkforce;
+    const currentVal = displayedActualWorkforce.value
     return Math.round((currentVal / capacity) * 100);
   },
   set: (val: number) => {
@@ -433,10 +450,10 @@ const hasDashboardData = computed(() => {
             <X4NumberInput v-if="!props.settings.workforceAuto" v-model="manualWorkforce"
               :max="analysis.totalCapacity" width-class="w-24" />
             <span v-else class="val-text-display">
-              {{ props.actualWorkforce }}
+              {{ displayedActualWorkforce }}
             </span>
           </div>
-          <span class="percent-display">{{ Math.round((props.actualWorkforce / (analysis.totalCapacity || 1)) * 100)
+          <span class="percent-display">{{ Math.round((displayedActualWorkforce / (analysis.totalCapacity || 1)) * 100)
             }}%</span>
         </div>
 

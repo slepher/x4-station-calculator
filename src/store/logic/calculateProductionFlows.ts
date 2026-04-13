@@ -7,8 +7,17 @@ import type {
   ModuleFlowAtom
 } from '../../types/x4'
 import type { WareProductionFlow } from '../../types/production-flow'
-import { findBestProducer, findBestHabitat, getProductionEfficiency } from './bestModuleSelector'
+import {
+  findBestProducer,
+  findBestHabitat,
+  getProductionEfficiency
+} from './bestModuleSelector'
 import { calculateWorkforceCensus } from './calculatorUtils'
+import {
+  calculateWorkforceBreakdown,
+  calculateActualWorkforce,
+  calculateEfficiencySaturation
+} from './workforceCalculator'
 
 export interface CalculateProductionFlowsInput {
   plannedModules: SavedModule[]
@@ -23,6 +32,8 @@ export interface CalculateProductionFlowsInput {
 export interface CalculateProductionFlowsOutput {
   autoIndustryModules: SavedModule[]
   productionFlows: WareProductionFlow[]
+  actualWorkforce: number
+  currentEfficiency: number
 }
 
 export function calculateProductionFlows(
@@ -142,7 +153,7 @@ export function calculateProductionFlows(
   // ==========================================
 
   const allModules = [...plannedModules, ...autoIndustry]
-  const productionFlows = calculateProductionFlowsInternal(
+  const internalResult = calculateProductionFlowsInternal(
     allModules,
     modulesMap,
     waresMap,
@@ -153,7 +164,9 @@ export function calculateProductionFlows(
 
   return {
     autoIndustryModules: autoIndustry,
-    productionFlows
+    productionFlows: internalResult.productionFlows,
+    actualWorkforce: internalResult.actualWorkforce,
+    currentEfficiency: internalResult.saturation
   }
 }
 
@@ -203,6 +216,12 @@ function calculateTotalWorkforceInternal(
   return totalWorkers
 }
 
+interface ProductionFlowsInternalResult {
+  productionFlows: WareProductionFlow[]
+  actualWorkforce: number
+  saturation: number
+}
+
 function calculateProductionFlowsInternal(
   plannedModules: SavedModule[],
   modulesMap: Record<string, X4Module>,
@@ -210,7 +229,7 @@ function calculateProductionFlowsInternal(
   medicalConsumptionMap: RaceMedicalConsumption,
   settings: StationSettings,
   _warePriority: Record<string, number>
-): WareProductionFlow[] {
+): ProductionFlowsInternalResult {
   const flowMap: Record<string, WareProductionFlow> = {}
 
   const wareOrderMap = new Map<string, number>()
@@ -244,9 +263,9 @@ function calculateProductionFlowsInternal(
     return flowMap[wareId]
   }
 
-  const workforceBreakdown = calculateWorkforceBreakdownInternal(plannedModules, modulesMap, settings)
-  const actualWorkforce = calculateActualWorkforceInternal(workforceBreakdown, settings)
-  const saturation = calculateEfficiencySaturationInternal(workforceBreakdown.needed.total, actualWorkforce)
+  const workforceBreakdown = calculateWorkforceBreakdown(plannedModules, modulesMap, settings)
+  const actualWorkforce = calculateActualWorkforce(workforceBreakdown, settings)
+  const saturation = calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
 
   plannedModules.forEach(item => {
     const info = modulesMap[item.id]
@@ -340,50 +359,5 @@ function calculateProductionFlowsInternal(
     return Math.abs(b.netRate) - Math.abs(a.netRate)
   })
 
-  return allFlows
-}
-
-interface WorkforceBreakdown {
-  needed: { total: number }
-}
-
-function calculateWorkforceBreakdownInternal(
-  modules: SavedModule[],
-  modulesMap: Record<string, X4Module>,
-  settings: StationSettings
-): WorkforceBreakdown {
-  let totalNeeded = 0
-
-  modules.forEach(item => {
-    const module = modulesMap[item.id]
-    if (module?.workforce?.needed) {
-      if (settings.workforceAuto || module.type !== 'habitation') {
-        totalNeeded += item.count * module.workforce.needed
-      }
-    }
-  })
-
-  return { needed: { total: totalNeeded } }
-}
-
-function calculateActualWorkforceInternal(
-  breakdown: WorkforceBreakdown,
-  settings: StationSettings
-): number {
-  if (!settings.workforceAuto && settings.manualWorkforce > 0) {
-    return settings.manualWorkforce
-  }
-
-  const needed = breakdown.needed.total
-  const percent = settings.workforcePercent || 100
-
-  return Math.round(needed * (percent / 100))
-}
-
-function calculateEfficiencySaturationInternal(
-  needed: number,
-  actual: number
-): number {
-  if (needed <= 0) return 1.0
-  return actual / needed
+  return { productionFlows: allFlows, actualWorkforce, saturation }
 }
