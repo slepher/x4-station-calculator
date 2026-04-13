@@ -100,8 +100,8 @@ function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
     totalOccupiedCount: 0,
     totalOccupiedConsumptionCount: 0,
     totalOccupiedVolume: 0,
-    unitPrice: 0,
-    netValue: 0,
+    unitPrice: prod.price,
+    netValue: prod.netRate * prod.price,
     contributions: prod.contributions
   }
 }
