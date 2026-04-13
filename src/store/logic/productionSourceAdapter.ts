@@ -28,7 +28,7 @@ export function createBindingPlanStationId(gameGuid: string, planId: string): st
   return `__save_binding__${gameGuid}__${planId}`
 }
 
-export function createDerivedSaveStationId(gameGuid: string, saveStationCode: string): string {
+function createDerivedSaveStationId(gameGuid: string, saveStationCode: string): string {
   return `__save_binding_derived__${gameGuid}__${saveStationCode}`
 }
 
@@ -71,7 +71,7 @@ export interface SaveBindingProductionDeps extends ProductionSourceDeps {
   archive: SaveArchive | null
 }
 
-export function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
+function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
   return {
     flows: [],
     empireGroups: {
@@ -94,7 +94,7 @@ export function toProductionStation(gameGuid: string, plan: BindingStationPlan):
   }
 }
 
-export function toDerivedSaveStation(
+function toDerivedSaveStation(
   gameGuid: string,
   saveStation: PlayerStationEntry,
   plan: BindingStationPlan | undefined
@@ -316,36 +316,4 @@ export function deriveBindingStations(
   return result
 }
 
-export function buildSaveBindingProductionFlowsLegacy(
-  binding: SaveBindingPlan | null | undefined,
-  deps: ProductionSourceDeps | null | undefined
-): EmpireGroupedFlows {
-  if (!binding || !deps || !deps.modulesMap || !deps.waresMap || !deps.medicalConsumptionMap) {
-    return createEmptyEmpireGroupedFlows()
-  }
 
-  const plans: BindingStationPlan[] = binding.stationPlans
-  const stations = plans.map((plan) => toProductionStation(binding.gameGuid, plan))
-  if (stations.length === 0) return createEmptyEmpireGroupedFlows()
-
-  stations.forEach((station) => {
-    patchStationState(station.id, {
-      plannedModules: station.modules,
-      lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {},
-      settings: station.settings
-    })
-    recomputeStation(station.id, {
-      modulesMap: deps.modulesMap,
-      waresMap: deps.waresMap,
-      medicalConsumptionMap: deps.medicalConsumptionMap,
-      enforceDlcActivation: deps.enforceDlcActivation,
-      isModuleDlcActive: deps.isModuleDlcActive
-    })
-  })
-
-  return analyzeEmpireWareFlow(
-    stations,
-    (stationId) => getFilteredProductionFlows(stationId)
-  )
-}
