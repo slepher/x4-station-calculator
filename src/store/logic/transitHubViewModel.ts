@@ -1,6 +1,5 @@
 import type {
   EmpireGroupedFlows,
-  EmpireWareFlow,
   SectorPlan,
   StationPlan,
   SupplyStorageFlow,
@@ -61,15 +60,6 @@ function createEmptySolverOutput(): SolveMultiWareByLinkOutput {
   }
 }
 
-function calculateFlowPrice(flow: EmpireWareFlow, buyMultiplier: number, sellMultiplier: number): { unitPrice: number; netValue: number } {
-  const isSurplus = flow.netRate >= 0
-  const multiplier = isSurplus ? sellMultiplier : buyMultiplier
-  const ware = { minPrice: flow.minPrice, price: flow.avgPrice, maxPrice: flow.maxPrice }
-  const unitPrice = getPriceByMultiplier(ware as X4Ware, multiplier)
-  const netValue = flow.netRate * unitPrice
-  return { unitPrice, netValue }
-}
-
 function mergeLinkFlowsIntoGroupedFlows(
   groupedFlows: EmpireGroupedFlows,
   solverOutput: SolveMultiWareByLinkOutput,
@@ -84,21 +74,57 @@ function mergeLinkFlowsIntoGroupedFlows(
   const effectiveBuyMultiplier = buyMultiplier ?? 0.5
   const effectiveSellMultiplier = sellMultiplier ?? 0.5
 
-  const flowsByWareId = new Map<string, TransitHubWareFlow>()
+  interface PendingFlow {
+    wareId: string
+    orderIndex: number
+    tier: number
+    transportType: 'container' | 'solid' | 'liquid'
+    unitVolume: number
+    minPrice: number
+    avgPrice: number
+    maxPrice: number
+    production: number
+    consumption: number
+    workforceConsumption: number
+    netRate: number
+    contributions: Array<{
+      stationId: string
+      stationName: string
+      stationCount: number
+      production: number
+      consumption: number
+      workforceConsumption: number
+      netRate: number
+    }>
+  }
+
+  const pendingFlowsByWareId = new Map<string, PendingFlow>()
   
   groupedFlows.flows.forEach((flow) => {
-    const { unitPrice, netValue } = calculateFlowPrice(flow, effectiveBuyMultiplier, effectiveSellMultiplier)
-    
-    const contributionsWithPrice = (flow.contributions || []).map((contrib) => ({
-      ...contrib,
-      netValue: contrib.netRate * unitPrice
+    const contributions = (flow.contributions || []).map((contrib) => ({
+      stationId: contrib.stationId,
+      stationName: contrib.stationName,
+      stationCount: contrib.stationCount,
+      production: contrib.production,
+      consumption: contrib.consumption,
+      workforceConsumption: contrib.workforceConsumption,
+      netRate: contrib.netRate
     }))
     
-    flowsByWareId.set(flow.wareId, {
-      ...flow,
-      unitPrice,
-      netValue,
-      contributions: contributionsWithPrice
+    pendingFlowsByWareId.set(flow.wareId, {
+      wareId: flow.wareId,
+      orderIndex: flow.orderIndex,
+      tier: flow.tier,
+      transportType: flow.transportType,
+      unitVolume: flow.unitVolume,
+      minPrice: flow.minPrice,
+      avgPrice: flow.avgPrice,
+      maxPrice: flow.maxPrice,
+      production: flow.production,
+      consumption: flow.consumption,
+      workforceConsumption: flow.workforceConsumption,
+      netRate: flow.netRate,
+      contributions
     })
   })
 
@@ -110,21 +136,7 @@ function mergeLinkFlowsIntoGroupedFlows(
     const peerSectorId = isFromHere ? linkFlow.to : linkFlow.from
     const peerSectorName = sectorNameMap.get(peerSectorId) || peerSectorId
     const amount = Math.abs(linkFlow.amount || 0)
-
-    const existingFlow = flowsByWareId.get(linkFlow.wareId)
-    const ware = waresMap?.[linkFlow.wareId]
-    const minPrice = existingFlow?.minPrice || ware?.minPrice || 0
-    const avgPrice = existingFlow?.avgPrice || ware?.price || 0
-    const maxPrice = existingFlow?.maxPrice || ware?.maxPrice || 0
-    const unitVolume = existingFlow?.unitVolume || ware?.volume || 1
-    const tier = existingFlow?.tier || ware?.tier || 0
-    const orderIndex = existingFlow?.orderIndex || Number.MAX_SAFE_INTEGER
-
     const netRate = isToHere ? amount : -amount
-    const isSurplus = netRate >= 0
-    const multiplier = isSurplus ? effectiveSellMultiplier : effectiveBuyMultiplier
-    const unitPrice = getPriceByMultiplier({ minPrice, price: avgPrice, maxPrice } as X4Ware, multiplier)
-    const netValue = netRate * unitPrice
 
     const contribution = {
       stationId: `external:${peerSectorId}`,
@@ -133,44 +145,73 @@ function mergeLinkFlowsIntoGroupedFlows(
       production: isToHere ? amount : 0,
       consumption: isFromHere ? amount : 0,
       workforceConsumption: 0,
-      netRate,
-      netValue
+      netRate
     }
 
+    const existingFlow = pendingFlowsByWareId.get(linkFlow.wareId)
     if (existingFlow) {
       existingFlow.contributions.push(contribution)
       existingFlow.production += contribution.production
       existingFlow.consumption += contribution.consumption
       existingFlow.netRate += contribution.netRate
-      existingFlow.unitPrice = unitPrice
-      existingFlow.netValue += netValue
     } else {
-      flowsByWareId.set(linkFlow.wareId, {
+      const ware = waresMap?.[linkFlow.wareId]
+      pendingFlowsByWareId.set(linkFlow.wareId, {
         wareId: linkFlow.wareId,
-        orderIndex,
-        tier,
+        orderIndex: Number.MAX_SAFE_INTEGER,
+        tier: ware?.tier || 0,
         transportType: 'container',
-        unitVolume,
+        unitVolume: ware?.volume || 1,
+        minPrice: ware?.minPrice || 0,
+        avgPrice: ware?.price || 0,
+        maxPrice: ware?.maxPrice || 0,
         production: contribution.production,
         consumption: contribution.consumption,
         workforceConsumption: 0,
         netRate: contribution.netRate,
-        minPrice,
-        avgPrice,
-        maxPrice,
-        unitPrice,
-        netValue,
         contributions: [contribution]
       })
     }
   })
 
-  const mergedFlows = Array.from(flowsByWareId.values())
-  const operations = mergedFlows.filter((flow) => flow.transportType === 'container' && flow.workforceConsumption <= 0)
-  const supply = mergedFlows.filter((flow) => flow.workforceConsumption > 0 || flow.transportType !== 'container')
+  const resultFlows: TransitHubWareFlow[] = []
+  
+  pendingFlowsByWareId.forEach((pending) => {
+    const isSurplus = pending.netRate >= 0
+    const multiplier = isSurplus ? effectiveSellMultiplier : effectiveBuyMultiplier
+    const ware = { minPrice: pending.minPrice, price: pending.avgPrice, maxPrice: pending.maxPrice }
+    const unitPrice = getPriceByMultiplier(ware as X4Ware, multiplier)
+    const netValue = pending.netRate * unitPrice
+    
+    const contributionsWithPrice = pending.contributions.map((contrib) => ({
+      ...contrib,
+      netValue: contrib.netRate * unitPrice
+    }))
+    
+    resultFlows.push({
+      wareId: pending.wareId,
+      orderIndex: pending.orderIndex,
+      tier: pending.tier,
+      transportType: pending.transportType,
+      unitVolume: pending.unitVolume,
+      production: pending.production,
+      consumption: pending.consumption,
+      workforceConsumption: pending.workforceConsumption,
+      netRate: pending.netRate,
+      minPrice: pending.minPrice,
+      avgPrice: pending.avgPrice,
+      maxPrice: pending.maxPrice,
+      unitPrice,
+      netValue,
+      contributions: contributionsWithPrice
+    })
+  })
+
+  const operations = resultFlows.filter((flow) => flow.transportType === 'container' && flow.workforceConsumption <= 0)
+  const supply = resultFlows.filter((flow) => flow.workforceConsumption > 0 || flow.transportType !== 'container')
 
   return {
-    flows: mergedFlows,
+    flows: resultFlows,
     empireGroups: {
       operations,
       supply
