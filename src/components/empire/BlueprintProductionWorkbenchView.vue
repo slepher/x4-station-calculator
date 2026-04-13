@@ -5,9 +5,7 @@ import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
-import { useStationTabBarModel } from '@/components/empire/composables/useStationTabBarModel'
 import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
-import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
 import type { StationType, SavedModule } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
@@ -75,13 +73,11 @@ const importModalGetStationById = (stationId: string) => {
   return blueprintStore.getStationById(stationId)
 }
 
-const tabBarModel = useStationTabBarModel({
-    orderedStations: computed(() => blueprintStore.orderedStations),
-    activeStationId: computed({
-      get: () => blueprintStore.activeStationId,
-      set: (val) => blueprintStore.selectStation(val)
-    })
-  })
+const stationTabs = computed(() => blueprintStore.orderedStations.map(s => ({
+  id: s.id,
+  name: s.name,
+  stationType: s.type
+})))
 
 const activeEmpireNameRef = computed({
   get: () => blueprintStore.activeEmpire?.name || '',
@@ -168,14 +164,6 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
     blueprintStore.updateStationModules(activeStation.value.id, modules)
   }
 }
-
-const stationPlanningPanelModel = useStationPlanningPanelModel({
-  plannedModules: computed(() => blueprintStore.plannedModules as SavedModule[]),
-  autoIndustryModules: computed(() => blueprintStore.autoIndustryModules as SavedModule[]),
-  autoInfrastructureModules: computed(() => blueprintStore.autoInfrastructureModules as SavedModule[]),
-  enforceDlcActivation: computed(() => blueprintStore.enforceDlcActivation),
-  onUpdatePlannedModules: handleUpdatePlannedModules
-})
 
 const empireGapsForModel = computed(() => {
   const flows = blueprintStore.getStationComponentGapFlows(activeStation.value?.id || null)
@@ -342,10 +330,10 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
 
 <template>
   <StationTabBar
-    :tabs="tabBarModel.props.value.tabs"
-    :active-tab-id="tabBarModel.props.value.activeTabId"
-    :can-create-station="tabBarModel.props.value.canCreateStation"
-    :can-open-context-menu="tabBarModel.props.value.canOpenContextMenu"
+    :tabs="stationTabs"
+    :active-tab-id="blueprintStore.activeStationId"
+    :can-create-station="true"
+    :can-open-context-menu="true"
     @select-station="handleSelectStation"
     @create-station="handleCreateStation"
     @rename-station="handleRenameStation"
@@ -392,11 +380,11 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
   <div v-if="activeStation" class="main-layout mt-6">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
-        :planned-modules="stationPlanningPanelModel.props.value.plannedModules"
-        :auto-industry-modules="stationPlanningPanelModel.props.value.autoIndustryModules"
-        :auto-infrastructure-modules="stationPlanningPanelModel.props.value.autoInfrastructureModules"
-        :enforce-dlc-activation="stationPlanningPanelModel.props.value.enforceDlcActivation"
-        @update-planned-modules="stationPlanningPanelModel.emits.updatePlannedModules"
+        :planned-modules="blueprintStore.plannedModules"
+        :auto-industry-modules="blueprintStore.autoIndustryModules"
+        :auto-infrastructure-modules="blueprintStore.autoInfrastructureModules"
+        :enforce-dlc-activation="blueprintStore.enforceDlcActivation"
+        @update-planned-modules="handleUpdatePlannedModules"
       />
     </div>
 

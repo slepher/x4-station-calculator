@@ -7,7 +7,6 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useSectorStationTabBarModel } from '@/components/empire/composables/useSectorStationTabBarModel'
 import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
-import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
 import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmpireWareFlowDerived'
 import { useTransitHubWorkbenchModel } from '@/components/empire/composables/useTransitHubWorkbenchModel'
@@ -194,14 +193,6 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
     liveStore.updateStationModules(activeStation.value.id, modules)
   }
 }
-
-const stationPlanningPanelModel = useStationPlanningPanelModel({
-  plannedModules: computed(() => liveStore.plannedModules as SavedModule[]),
-  autoIndustryModules: computed(() => liveStore.autoIndustryModules as SavedModule[]),
-  autoInfrastructureModules: computed(() => liveStore.autoInfrastructureModules as SavedModule[]),
-  enforceDlcActivation: computed(() => liveStore.enforceDlcActivation),
-  onUpdatePlannedModules: handleUpdatePlannedModules
-})
 
 const empireGapsForModel = computed(() => {
   const flows = liveStore.getStationComponentGapFlows(activeStation.value?.id || null)
@@ -495,11 +486,11 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
   <div v-else class="main-layout mt-6">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
-        :planned-modules="stationPlanningPanelModel.props.value.plannedModules"
-        :auto-industry-modules="stationPlanningPanelModel.props.value.autoIndustryModules"
-        :auto-infrastructure-modules="stationPlanningPanelModel.props.value.autoInfrastructureModules"
-        :enforce-dlc-activation="stationPlanningPanelModel.props.value.enforceDlcActivation"
-        @update-planned-modules="stationPlanningPanelModel.emits.updatePlannedModules"
+        :planned-modules="liveStore.plannedModules"
+        :auto-industry-modules="liveStore.autoIndustryModules"
+        :auto-infrastructure-modules="liveStore.autoInfrastructureModules"
+        :enforce-dlc-activation="liveStore.enforceDlcActivation"
+        @update-planned-modules="handleUpdatePlannedModules"
       />
     </div>
 
