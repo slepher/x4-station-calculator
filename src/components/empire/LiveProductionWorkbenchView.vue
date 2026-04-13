@@ -10,7 +10,6 @@ import { useContextToolbarModel } from '@/components/empire/composables/useConte
 import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
 import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmpireWareFlowDerived'
-import { useStationDashboardModel } from '@/components/empire/composables/useStationDashboardModel'
 import { useTransitHubWorkbenchModel } from '@/components/empire/composables/useTransitHubWorkbenchModel'
 import type { StationType, SavedModule, EmpireGroupedFlows } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
@@ -287,23 +286,6 @@ const stationWareFlowsModel = useStationWareFlowsModel({
   onToggleWarePriority: (wareId: string) => liveStore.toggleWarePriority(wareId)
 })
 
-const stationDashboardModel = useStationDashboardModel({
-  plannedModules: computed(() => liveStore.plannedModules as SavedModule[]),
-  stationAnalysis: computed(() => liveStore.stationAnalysis) as any,
-  settings: computed(() => ({
-    transportShipCapacity: liveStore.settings.transportShipCapacity,
-    workforceAuto: liveStore.settings.workforceAuto,
-    manualWorkforce: liveStore.settings.manualWorkforce,
-    useHQ: liveStore.settings.useHQ
-  })),
-  currentEfficiency: computed(() => liveStore.currentEfficiency),
-  actualWorkforce: computed(() => liveStore.actualWorkforce),
-  buildPriceMultiplier: computed({
-    get: () => liveStore.buildPriceMultiplier,
-    set: (val: number) => { liveStore.buildPriceMultiplier = val }
-  }) as any
-})
-
 const transitHubModelRaw = computed(() => liveStore.getTransitHubViewModel({
   sectorId: activeTransitSectorId.value,
   racePreference: liveStore.settings.racePreference,
@@ -550,13 +532,17 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
 
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
-        :planned-modules="stationDashboardModel.props.value.plannedModules"
-        :station-analysis="stationDashboardModel.props.value.stationAnalysis"
-        :settings="stationDashboardModel.props.value.settings"
-        :current-efficiency="stationDashboardModel.props.value.currentEfficiency"
-        :actual-workforce="stationDashboardModel.props.value.actualWorkforce"
-        :build-price-multiplier="stationDashboardModel.props.value.buildPriceMultiplier"
-        :hide-workers-view="stationDashboardModel.props.value.hideWorkersView"
+        :planned-modules="liveStore.plannedModules"
+        :station-analysis="liveStore.stationAnalysis"
+        :settings="{
+          transportShipCapacity: liveStore.settings.transportShipCapacity,
+          workforceAuto: liveStore.settings.workforceAuto,
+          manualWorkforce: liveStore.settings.manualWorkforce,
+          useHQ: liveStore.settings.useHQ
+        }"
+        :current-efficiency="liveStore.currentEfficiency"
+        :actual-workforce="liveStore.actualWorkforce"
+        :build-price-multiplier="liveStore.buildPriceMultiplier"
         @update-transport-ship-capacity="handleDashboardUpdateTransportShipCapacity"
         @update-build-price-multiplier="handleDashboardUpdateBuildPriceMultiplier"
         @update-manual-workforce="handleDashboardUpdateManualWorkforce"

@@ -192,11 +192,12 @@ export function analyzeWareFlow(
     // A. 流量净值
     entry.netRate = entry.production - entry.consumption;
     entry.netVolume = entry.productionVolume - entry.consumptionVolume;
-    const priorityLevel = warePriorityLevels?.[entry.wareId] ?? 0
+const priorityLevel = warePriorityLevels?.[entry.wareId] ?? 0
     const isMainOrSecondary = priorityLevel > 0
     const isSupplyGap = entry.workforceConsumption > 0
     const isResourceFlow = entry.transportType !== 'container'
-    const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow
+    const isDeficit = entry.netRate < 0
+    const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow || isDeficit
 
     entry.transportDemand = shouldCountTransport
       ? Math.abs(entry.netRate) * entry.unitVolume

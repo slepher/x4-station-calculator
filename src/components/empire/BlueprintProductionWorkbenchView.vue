@@ -9,7 +9,6 @@ import { useStationTabBarModel } from '@/components/empire/composables/useStatio
 import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
 import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
-import { useStationDashboardModel } from '@/components/empire/composables/useStationDashboardModel'
 import type { StationType, SavedModule } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
@@ -261,24 +260,7 @@ const stationWareFlowsModel = useStationWareFlowsModel({
   onToggleWarePriority: (wareId: string) => blueprintStore.toggleWarePriority(wareId)
 })
 
-const stationDashboardModel = useStationDashboardModel({
-  plannedModules: computed(() => blueprintStore.plannedModules as SavedModule[]),
-  stationAnalysis: computed(() => blueprintStore.stationAnalysis) as any,
-  settings: computed(() => ({
-    transportShipCapacity: blueprintStore.settings.transportShipCapacity,
-    workforceAuto: blueprintStore.settings.workforceAuto,
-    manualWorkforce: blueprintStore.settings.manualWorkforce,
-    useHQ: blueprintStore.settings.useHQ
-  })),
-  currentEfficiency: computed(() => blueprintStore.currentEfficiency),
-  actualWorkforce: computed(() => blueprintStore.actualWorkforce),
-buildPriceMultiplier: computed({
-      get: () => blueprintStore.buildPriceMultiplier,
-      set: (val: number) => { blueprintStore.buildPriceMultiplier = val }
-    }) as any
-  })
-
-  const handleSelectStation = (stationId: string) => {
+const handleSelectStation = (stationId: string) => {
   blueprintStore.selectStation(stationId)
 }
 
@@ -447,13 +429,17 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
 
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
-        :planned-modules="stationDashboardModel.props.value.plannedModules"
-        :station-analysis="stationDashboardModel.props.value.stationAnalysis"
-        :settings="stationDashboardModel.props.value.settings"
-        :current-efficiency="stationDashboardModel.props.value.currentEfficiency"
-        :actual-workforce="stationDashboardModel.props.value.actualWorkforce"
-        :build-price-multiplier="stationDashboardModel.props.value.buildPriceMultiplier"
-        :hide-workers-view="stationDashboardModel.props.value.hideWorkersView"
+        :planned-modules="blueprintStore.plannedModules"
+        :station-analysis="blueprintStore.stationAnalysis"
+        :settings="{
+          transportShipCapacity: blueprintStore.settings.transportShipCapacity,
+          workforceAuto: blueprintStore.settings.workforceAuto,
+          manualWorkforce: blueprintStore.settings.manualWorkforce,
+          useHQ: blueprintStore.settings.useHQ
+        }"
+        :current-efficiency="blueprintStore.currentEfficiency"
+        :actual-workforce="blueprintStore.actualWorkforce"
+        :build-price-multiplier="blueprintStore.buildPriceMultiplier"
         @update-transport-ship-capacity="handleDashboardUpdateTransportShipCapacity"
         @update-build-price-multiplier="handleDashboardUpdateBuildPriceMultiplier"
         @update-manual-workforce="handleDashboardUpdateManualWorkforce"

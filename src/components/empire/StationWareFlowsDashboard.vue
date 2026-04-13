@@ -165,11 +165,11 @@ const volumeGroups = computed(() => [
 
 const transportGroups = computed(() => [
   {key: 'container', title: t('wareflow.container_group'),
-   items: props.groupedFlows.volumeGroups.container.map(wrapFlow)},
+   items: props.groupedFlows.volumeGroups.container.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)},
   {key: 'solid', title: t('wareflow.solid_group'),
-   items: props.groupedFlows.volumeGroups.solid.map(wrapFlow)},
+   items: props.groupedFlows.volumeGroups.solid.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)},
   {key: 'liquid', title: t('wareflow.liquid_group'),
-   items: props.groupedFlows.volumeGroups.liquid.map(wrapFlow)}
+   items: props.groupedFlows.volumeGroups.liquid.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)}
 ])
 
 const rateGroups = computed(() => ([

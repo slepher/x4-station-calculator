@@ -58,7 +58,8 @@ export function calculateWareFlowDerived(
     const isMainOrSecondary = priorityLevel > 0
     const isSupplyGap = prodFlow.workforceConsumption > 0
     const isResourceFlow = prodFlow.transportType !== 'container'
-    const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow
+    const isDeficit = prodFlow.netRate < 0
+    const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow || isDeficit
     const transportDemand = shouldCountTransport ? Math.abs(prodFlow.netRate) * unitVolume : 0
 
     const consumptionBufferCount = prodFlow.consumption * settings.resourceBufferHours
@@ -205,13 +206,15 @@ function calculateInfrastructureModules(
   }
 
   const singleBerthThroughput = Math.max(1, settings.transportShipCapacity || 1) * 15
-  const throughputByType = groupedFlows.flows.reduce((acc, flow) => {
-    const value = Math.abs(flow.transportDemand || 0)
-    if (flow.transportType === 'solid') acc.solid += value
-    else if (flow.transportType === 'liquid') acc.liquid += value
-    else acc.container += value
-    return acc
-  }, { container: 0, solid: 0, liquid: 0 })
+  const throughputByType = groupedFlows.flows
+    .filter(flow => (flow.transportDemand || 0) > 0)
+    .reduce((acc, flow) => {
+      const value = flow.transportDemand || 0
+      if (flow.transportType === 'solid') acc.solid += value
+      else if (flow.transportType === 'liquid') acc.liquid += value
+      else acc.container += value
+      return acc
+    }, { container: 0, solid: 0, liquid: 0 })
 
   const requiredTotalBerths =
     Math.ceil(throughputByType.container / singleBerthThroughput) +
