@@ -44,14 +44,14 @@ const formattedDetails = computed(() => {
     .map((detail) => {
       const isExternal = String(detail.stationId || '').startsWith('external:')
       const kindLabel = isExternal
-        ? (detail.kind === 'consumption'
+        ? (detail.kind === 'production'
             ? t('sectorManagement.supply_storage_input')
             : t('sectorManagement.supply_storage_output'))
         : (detail.kind === 'production'
             ? t('sectorManagement.supply_storage_production')
             : t('sectorManagement.supply_storage_consumption'))
       const kindClass = isExternal
-        ? (detail.kind === 'consumption' ? 'kind-pos' : 'kind-neg')
+        ? (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
         : (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
       return {
         ...detail,

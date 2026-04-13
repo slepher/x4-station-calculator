@@ -788,7 +788,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const currentStationId = activeViewStore.activeBindingStation
     if (!currentStationId) return
 
-    const transitMatch = currentStationId.match(/^transit-(.+)$/)
+    const transitMatch = currentStationId.match(/^transit:(.+)$/)
     if (transitMatch) {
       const sectorId = transitMatch[1]!
       const validSectorIds = new Set(sectors.value.map(s => s.id))
@@ -945,7 +945,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       const result: any[] = []
       result.push({ id: 'overview', type: 'overview', name: '' })
       sectors.value.forEach(sector => {
-        result.push({ id: `transit-${sector.id}`, type: 'transit', name: sector.name, sectorId: sector.id })
+        result.push({ id: `transit:${sector.id}`, type: 'transit', name: sector.name, sectorId: sector.id })
         if (expandedSectorId.value === sector.id) {
           orderedStationsBySector.value
             .filter(s => s.sectorId === sector.id)
@@ -957,7 +957,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: undefined, stationType: s.type }))
       return result
     },
-    getActiveTabId: () => activeTransitSectorId.value ? `transit-${activeTransitSectorId.value}` : activeStationId.value || 'overview',
+    getActiveTabId: () => activeTransitSectorId.value ? `transit:${activeTransitSectorId.value}` : activeStationId.value || 'overview',
     getExpandedSectorId: () => expandedSectorId.value,
     getWorkbenchMode: () => activeTransitSectorId.value ? 'transit' : (activeStation.value ? 'station' : 'overview'),
     getActiveStationId: () => activeStationId.value,

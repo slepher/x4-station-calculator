@@ -300,8 +300,10 @@ export class StationStateMap {
     return filterProductionFlowsByPriority(state.productionFlows, state.warePriorityLevels)
   }
 
-  getGroupedFlows(_stationId: string): GroupedFlows {
-    return createEmptyGroupedFlows()
+  getGroupedFlows(stationId: string): GroupedFlows {
+    const flows = this.getProductionFlows(stationId)
+    if (flows.length === 0) return createEmptyGroupedFlows()
+    return groupProductionFlows(flows)
   }
 
   getFilteredGroupedFlows(stationId: string): GroupedFlows {

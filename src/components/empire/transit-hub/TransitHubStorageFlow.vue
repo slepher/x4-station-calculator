@@ -41,14 +41,14 @@ const formattedDetails = computed(() => {
         ? 0
         : Math.ceil(detail.storageVolume / props.unitVolume),
       kindLabel: String(detail.stationId || '').startsWith('external:')
-        ? (detail.kind === 'consumption'
+        ? (detail.kind === 'production'
             ? t('sectorManagement.supply_storage_input')
             : t('sectorManagement.supply_storage_output'))
         : (detail.kind === 'production'
             ? t('sectorManagement.supply_storage_production')
             : t('sectorManagement.supply_storage_consumption')),
       kindClass: String(detail.stationId || '').startsWith('external:')
-        ? (detail.kind === 'consumption' ? 'kind-pos' : 'kind-neg')
+        ? (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
         : (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
     }))
 })

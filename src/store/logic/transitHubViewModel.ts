@@ -1,5 +1,6 @@
 import type {
   EmpireGroupedFlows,
+  EmpireWareFlow,
   SectorPlan,
   StationPlan,
   SupplyStorageFlow,
@@ -30,8 +31,6 @@ interface BuildTransitHubStorageFlowsInput {
   sectors: SectorPlan[]
   stations: StationPlan[]
   groupedFlows: EmpireGroupedFlows
-  solverOutput: SolveMultiWareByLinkOutput | null
-  waresMap?: Record<string, X4Ware>
   storageBufferHours: number
 }
 
@@ -53,6 +52,84 @@ function createEmptySolverOutput(): SolveMultiWareByLinkOutput {
       totalDeficit: 0,
       deficitByNode: [],
       producerNodes: []
+    }
+  }
+}
+
+function mergeLinkFlowsIntoGroupedFlows(
+  groupedFlows: EmpireGroupedFlows,
+  solverOutput: SolveMultiWareByLinkOutput,
+  sectorId: string,
+  sectors: SectorPlan[],
+  waresMap?: Record<string, X4Ware>
+): EmpireGroupedFlows {
+  const safeSolverOutput = solverOutput || createEmptySolverOutput()
+  const sectorNameMap = new Map(sectors.map((sector) => [sector.id, sector.name]))
+
+  const flowsByWareId = new Map<string, EmpireWareFlow>()
+  groupedFlows.flows.forEach((flow) => {
+    flowsByWareId.set(flow.wareId, { ...flow, contributions: [...(flow.contributions || [])] })
+  })
+
+  safeSolverOutput.linkWareFlows.forEach((linkFlow) => {
+    const isFromHere = linkFlow.from === sectorId
+    const isToHere = linkFlow.to === sectorId
+    if (!isFromHere && !isToHere) return
+
+    const peerSectorId = isFromHere ? linkFlow.to : linkFlow.from
+    const peerSectorName = sectorNameMap.get(peerSectorId) || peerSectorId
+    const amount = Math.abs(linkFlow.amount || 0)
+
+    const existingFlow = flowsByWareId.get(linkFlow.wareId)
+    const unitPrice = existingFlow?.unitPrice || waresMap?.[linkFlow.wareId]?.price || 0
+    const unitVolume = existingFlow?.unitVolume || waresMap?.[linkFlow.wareId]?.volume || 1
+    const tier = existingFlow?.tier || waresMap?.[linkFlow.wareId]?.tier || 0
+    const orderIndex = existingFlow?.orderIndex || Number.MAX_SAFE_INTEGER
+
+    const contribution = {
+      stationId: `external:${peerSectorId}`,
+      stationName: peerSectorName,
+      stationCount: 1,
+      production: isToHere ? amount : 0,
+      consumption: isFromHere ? amount : 0,
+      workforceConsumption: 0,
+      netRate: isToHere ? amount : -amount,
+      netValue: (isToHere ? amount : -amount) * unitPrice
+    }
+
+    if (existingFlow) {
+      existingFlow.contributions.push(contribution)
+      existingFlow.production += contribution.production
+      existingFlow.consumption += contribution.consumption
+      existingFlow.netRate += contribution.netRate
+      existingFlow.netValue += contribution.netValue
+    } else {
+      flowsByWareId.set(linkFlow.wareId, {
+        wareId: linkFlow.wareId,
+        orderIndex,
+        tier,
+        transportType: 'container',
+        unitVolume,
+        production: contribution.production,
+        consumption: contribution.consumption,
+        workforceConsumption: 0,
+        netRate: contribution.netRate,
+        unitPrice,
+        netValue: contribution.netValue,
+        contributions: [contribution]
+      })
+    }
+  })
+
+  const mergedFlows = Array.from(flowsByWareId.values())
+  const operations = mergedFlows.filter((flow) => flow.transportType === 'container' && flow.workforceConsumption <= 0)
+  const supply = mergedFlows.filter((flow) => flow.workforceConsumption > 0 || flow.transportType !== 'container')
+
+  return {
+    flows: mergedFlows,
+    empireGroups: {
+      operations,
+      supply
     }
   }
 }
@@ -82,12 +159,9 @@ export function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsIn
     sectors,
     stations,
     groupedFlows,
-    solverOutput,
-    waresMap,
     storageBufferHours
   } = input
 
-  const sectorNameMap = new Map(sectors.map((sector) => [sector.id, sector.name]))
   const sectorOrderMap = new Map(sectors.map((sector, index) => [sector.id, index]))
   const localStationOrderMap = new Map(
     stations
@@ -125,8 +199,12 @@ export function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsIn
 
       ;(flow.contributions || []).forEach((detail) => {
         const netRate = Number(detail.netRate || 0)
-        if (netRate === 0) return
         const amount = Math.abs(netRate)
+        if (amount === 0) return
+
+        const isExternal = detail.stationId.startsWith('external:')
+        const peerSectorId = isExternal ? detail.stationId.slice(9) : null
+
         row.details.push({
           stationId: detail.stationId,
           stationName: detail.stationName,
@@ -134,38 +212,12 @@ export function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsIn
           kind: netRate > 0 ? 'production' : 'consumption',
           staticRate: amount,
           storageVolume: amount * (row.unitVolume || 1) * storageBufferHours,
-          sortOrder: localStationOrderMap.get(detail.stationId) ?? Number.MAX_SAFE_INTEGER / 2
+          sortOrder: isExternal
+            ? 100000 + (sectorOrderMap.get(peerSectorId!) ?? Number.MAX_SAFE_INTEGER / 2)
+            : (localStationOrderMap.get(detail.stationId) ?? Number.MAX_SAFE_INTEGER / 2)
         })
       })
     })
-
-  const safeSolverOutput = solverOutput || createEmptySolverOutput()
-  safeSolverOutput.linkWareFlows.forEach((flow) => {
-    const isOutbound = flow.from === sectorId
-    const isInbound = flow.to === sectorId
-    if (!isOutbound && !isInbound) return
-
-    const peerSectorId = isOutbound ? flow.to : flow.from
-    const peerSectorName = sectorNameMap.get(peerSectorId) || peerSectorId
-    const wareInfo = waresMap?.[flow.wareId]
-    const row = ensureWare(flow.wareId, {
-      tier: Number(wareInfo?.tier || 0),
-      unitVolume: Number(wareInfo?.volume || 1)
-    })
-
-    const amount = Math.abs(flow.amount || 0)
-    if (amount <= 0) return
-
-    row.details.push({
-      stationId: `external:${peerSectorId}:${isOutbound ? 'out' : 'in'}`,
-      stationName: peerSectorName,
-      stationCount: 1,
-      kind: isOutbound ? 'production' : 'consumption',
-      staticRate: amount,
-      storageVolume: amount * (row.unitVolume || 1) * storageBufferHours,
-      sortOrder: 100000 + (sectorOrderMap.get(peerSectorId) ?? Number.MAX_SAFE_INTEGER / 2)
-    })
-  })
 
   return Array.from(byWare.values())
     .map((row) => {
@@ -295,13 +347,19 @@ export function buildTransitHubViewModel(input: BuildTransitHubViewModelInput): 
     ? Number(input.storageBufferHours)
     : DEFAULT_TRANSIT_STORAGE_BUFFER_HOURS
 
+  const mergedGroupedFlows = mergeLinkFlowsIntoGroupedFlows(
+    input.localGroupedFlows,
+    input.solverOutput || createEmptySolverOutput(),
+    input.sectorId,
+    input.sectors,
+    input.waresMap
+  )
+
   const storageFlows = buildTransitHubStorageFlows({
     sectorId: input.sectorId,
     sectors: input.sectors,
     stations: input.stations,
-    groupedFlows: input.localGroupedFlows,
-    solverOutput: input.solverOutput,
-    waresMap: input.waresMap,
+    groupedFlows: mergedGroupedFlows,
     storageBufferHours: storageBufferHours > 0 ? storageBufferHours : DEFAULT_TRANSIT_STORAGE_BUFFER_HOURS
   })
 
@@ -313,7 +371,7 @@ export function buildTransitHubViewModel(input: BuildTransitHubViewModelInput): 
   })
 
   return {
-    groupedFlows: input.localGroupedFlows,
+    groupedFlows: mergedGroupedFlows,
     storageFlows,
     storageModulePlans,
     supplyBuildModules: storageModulePlans.map((item) => ({ ...item.item }))
