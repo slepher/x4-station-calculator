@@ -9,7 +9,6 @@ import { useSectorStationTabBarModel } from '@/components/empire/composables/use
 import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
 import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
-import { useWareFlowDerived } from '@/components/empire/composables/useWareFlowDerived'
 import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmpireWareFlowDerived'
 import { useStationDashboardModel } from '@/components/empire/composables/useStationDashboardModel'
 import { useTransitHubWorkbenchModel } from '@/components/empire/composables/useTransitHubWorkbenchModel'
@@ -262,33 +261,10 @@ const empireGapsForModel = computed(() => {
   return { operations, supply }
 })
 
-const stationWareFlowDerived = useWareFlowDerived(
-  {
-    productionFlows: computed(() => liveStore.productionFlows),
-    autoIndustryModules: computed(() => liveStore.autoIndustryModules as SavedModule[]),
-    plannedModules: computed(() => liveStore.plannedModules as SavedModule[]),
-    warePriorityLevels: computed(() => liveStore.warePriorityLevels),
-    modulesMap: computed(() => gameData.modulesMap || {}),
-    settings: computed(() => ({
-      racePreference: liveStore.settings.racePreference,
-      resourceBufferHours: liveStore.settings.resourceBufferHours,
-      primaryProductBufferHours: liveStore.settings.primaryProductBufferHours,
-      secondaryProductBufferHours: liveStore.settings.secondaryProductBufferHours,
-      buyMultiplier: liveStore.settings.buyMultiplier,
-      sellMultiplier: liveStore.settings.sellMultiplier,
-      transportMinutes: liveStore.settings.transportMinutes,
-      transportShipCapacity: liveStore.settings.transportShipCapacity,
-      sunlight: liveStore.settings.sunlight
-    }))
-  },
-  (modules) => {
-    liveStore.setAutoInfrastructureModules(modules)
-  }
-)
-
 const stationWareFlowsModel = useStationWareFlowsModel({
   viewMode: wareFlowViewMode as any,
-  groupedFlows: stationWareFlowDerived.groupedFlows,
+  groupedFlows: computed(() => liveStore.groupedFlows),
+  autoModules: computed(() => liveStore.autoIndustryModules as SavedModule[]),
   settings: computed(() => ({
     resourceBufferHours: liveStore.settings.resourceBufferHours,
     primaryProductBufferHours: liveStore.settings.primaryProductBufferHours,
@@ -549,6 +525,7 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
       <StationWareFlowsDashboard
         :view-mode="stationWareFlowsModel.props.value.viewMode"
         :grouped-flows="stationWareFlowsModel.props.value.groupedFlows"
+        :auto-modules="stationWareFlowsModel.props.value.autoModules"
         :settings="stationWareFlowsModel.props.value.settings"
         :empire-gaps="stationWareFlowsModel.props.value.empireGaps"
         :planned-modules="stationWareFlowsModel.props.value.plannedModules"

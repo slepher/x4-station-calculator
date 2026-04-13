@@ -10,6 +10,7 @@ export interface EmpireGapFlows {
 export interface UseStationWareFlowsModelDeps {
   viewMode: Ref<WareFlowViewMode>
   groupedFlows: ComputedRef<GroupedFlows>
+  autoModules: ComputedRef<SavedModule[]>
   settings: ComputedRef<{
     resourceBufferHours: number
     primaryProductBufferHours: number
@@ -41,6 +42,7 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
   const {
     viewMode,
     groupedFlows,
+    autoModules,
     settings,
     empireGaps,
     plannedModules,
@@ -66,6 +68,7 @@ export function useStationWareFlowsModel(deps: UseStationWareFlowsModelDeps): Us
   const props = computed<StationWareFlowsDashboardProps>(() => ({
     viewMode: viewMode.value,
     groupedFlows: groupedFlows.value,
+    autoModules: autoModules.value,
     settings: {
       resourceBufferHours: settings.value.resourceBufferHours,
       primaryProductBufferHours: settings.value.primaryProductBufferHours,

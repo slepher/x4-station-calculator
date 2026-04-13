@@ -146,6 +146,21 @@ const useHQ = computed({
   set: (val: boolean) => emit('updateUseHQ', val)
 })
 
+const workforceSliderDraft = ref(0)
+
+watch(saturationPercent, (value) => {
+  workforceSliderDraft.value = value
+}, { immediate: true })
+
+const handleWorkforceSliderInput = (event: Event) => {
+  workforceSliderDraft.value = Number((event.target as HTMLInputElement).value)
+}
+
+const handleWorkforceSliderCommit = () => {
+  if (props.settings.workforceAuto) return
+  saturationPercent.value = workforceSliderDraft.value
+}
+
 const formatLargeNum = (n: number) => {
   if (n >= 1_000_000) {
     const val = n / 1_000_000
@@ -458,10 +473,11 @@ const hasDashboardData = computed(() => {
         </div>
 
         <div class="slider-container">
-          <input type="range" v-model.number="saturationPercent" min="0" max="100"
+          <input type="range" :value="workforceSliderDraft" min="0" max="100"
+            @input="handleWorkforceSliderInput" @change="handleWorkforceSliderCommit"
             :disabled="props.settings.workforceAuto" class="range-slider">
           <div class="slider-track-bg">
-            <div class="slider-fill" :style="{ width: `${saturationPercent}%` }"></div>
+            <div class="slider-fill" :style="{ width: `${workforceSliderDraft}%` }"></div>
           </div>
         </div>
 

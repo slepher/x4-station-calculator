@@ -15,6 +15,7 @@ import ViewTabUi from '@/components/common/ViewTabUI.vue'
 const props = defineProps<{
   viewMode: WareFlowViewMode
   groupedFlows: GroupedFlows
+  autoModules: SavedModule[]
   settings: {
     resourceBufferHours: number
     primaryProductBufferHours: number
@@ -123,6 +124,14 @@ const getGroupSymboledValue = (group: any[]) => {
   return symbol + formatNum(Math.abs(value))
 }
 
+const handleAddModule = (wareId: string) => {
+  emit('addGapModule', wareId)
+}
+
+const handleRemoveModule = (wareId: string) => {
+  emit('removeGapModule', wareId)
+}
+
 const title = () => {
   if (viewMode.value === 'quantity') {
     return t('wareflow.resource_view')
@@ -189,14 +198,6 @@ const rateGroups = computed(() => ([
      : t('wareflow.resources_group'),
    items: props.groupedFlows.rateGroups.resources.map(wrapFlow)}
 ]))
-
-const handleAddModule = (wareId: string) => {
-  emit('addGapModule', wareId)
-}
-
-const handleRemoveModule = (wareId: string) => {
-  emit('removeGapModule', wareId)
-}
 
 const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
 </script>

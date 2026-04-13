@@ -86,28 +86,37 @@ export function getDerivedGroupedFlows(
   modulesMap: Record<string, X4Module>,
   derivedSettings: DerivedSettings
 ): GroupedFlows {
+  return getDerivedStationData(stationId, modulesMap, derivedSettings).groupedFlows
+}
+
+export function getDerivedStationData(
+  stationId: string,
+  modulesMap: Record<string, X4Module>,
+  derivedSettings: DerivedSettings
+): { groupedFlows: GroupedFlows; autoInfrastructureModules: SavedModule[] } {
   const state = stationStateMap.get(stationId)
   if (!state || !state.productionFlows || !state.warePriorityLevels) {
-    return createEmptyGroupedFlows()
+    return {
+      groupedFlows: createEmptyGroupedFlows(),
+      autoInfrastructureModules: []
+    }
   }
 
-  const filteredFlows = state.productionFlows.filter(f => {
-    if (f.netRate <= 0) return true
-    return (state.warePriorityLevels?.[f.wareId] ?? 0) > 0
-  })
+  if (state.productionFlows.length === 0) {
+    return {
+      groupedFlows: createEmptyGroupedFlows(),
+      autoInfrastructureModules: []
+    }
+  }
 
-  if (filteredFlows.length === 0) return createEmptyGroupedFlows()
-
-  const result = calculateWareFlowDerived({
-    productionFlows: filteredFlows,
+  return calculateWareFlowDerived({
+    productionFlows: state.productionFlows,
     autoIndustryModules: state.autoIndustryModules,
     plannedModules: state.plannedModules,
     modulesMap,
     settings: derivedSettings,
     warePriorityLevels: state.warePriorityLevels
   })
-
-  return result.groupedFlows
 }
 
 export function getStationAnalysis(stationId: string): ReturnType<typeof stationStateMap.get> extends infer T ? T extends { stationAnalysis: infer A } ? A : null : null {

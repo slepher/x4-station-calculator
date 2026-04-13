@@ -158,21 +158,7 @@ const handleUpdateSearchQuery = (value: string) => {
   searchQuery.value = value
 }
 
-const mergedAutoModules = computed<SavedModule[]>(() => {
-  const infrastructure = props.autoInfrastructureModules || []
-  const merged: SavedModule[] = [...props.autoIndustryModules]
-
-  infrastructure.forEach((infra) => {
-    const existing = merged.find((m) => m.id === infra.id)
-    if (existing) {
-      existing.count += infra.count
-    } else {
-      merged.push(infra)
-    }
-  })
-
-  return merged
-})
+const mergedAutoModules = computed<SavedModule[]>(() => props.autoIndustryModules)
 </script>
 
 <template>

@@ -40,7 +40,8 @@ import {
   getProductionFlows,
   getAutoInfrastructureModules,
   getWarePriorityLevels,
-  updateAutoInfrastructureModules
+  updateAutoInfrastructureModules,
+  getDerivedStationData
 } from './logic/stationComputeService'
 import {
   createEmpireSourceView,
@@ -210,14 +211,36 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
   })
 
-  const autoIndustryModules = computed(() => {
+  const step1AutoIndustryModules = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
     return getAutoIndustryModules(stationId)
   })
 
   const autoInfrastructureModules = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
-    return getAutoInfrastructureModules(stationId)
+    const deps = getComputeDeps()
+    if (!deps) return getAutoInfrastructureModules(stationId)
+    return getDerivedStationData(stationId, deps.modulesMap, {
+      racePreference: settings.value.racePreference,
+      resourceBufferHours: settings.value.resourceBufferHours,
+      primaryProductBufferHours: settings.value.primaryProductBufferHours,
+      secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
+      buyMultiplier: settings.value.buyMultiplier,
+      sellMultiplier: settings.value.sellMultiplier,
+      transportMinutes: settings.value.transportMinutes,
+      transportShipCapacity: settings.value.transportShipCapacity,
+      sunlight: settings.value.sunlight
+    }).autoInfrastructureModules
+  })
+
+  const autoIndustryModules = computed(() => {
+    const merged = step1AutoIndustryModules.value.map((module) => ({ ...module }))
+    autoInfrastructureModules.value.forEach((infra) => {
+      const existing = merged.find((m) => m.id === infra.id)
+      if (existing) existing.count += infra.count
+      else merged.push({ ...infra })
+    })
+    return merged
   })
 
   const actualWorkforce = computed(() => {
@@ -242,7 +265,19 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   const groupedFlows = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
-    return getGroupedFlows(stationId)
+    const deps = getComputeDeps()
+    if (!deps) return getGroupedFlows(stationId)
+    return getDerivedStationData(stationId, deps.modulesMap, {
+      racePreference: settings.value.racePreference,
+      resourceBufferHours: settings.value.resourceBufferHours,
+      primaryProductBufferHours: settings.value.primaryProductBufferHours,
+      secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
+      buyMultiplier: settings.value.buyMultiplier,
+      sellMultiplier: settings.value.sellMultiplier,
+      transportMinutes: settings.value.transportMinutes,
+      transportShipCapacity: settings.value.transportShipCapacity,
+      sunlight: settings.value.sunlight
+    }).groupedFlows
   })
 
   const stationAnalysis = computed(() => {

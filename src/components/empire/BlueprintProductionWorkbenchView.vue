@@ -9,7 +9,6 @@ import { useStationTabBarModel } from '@/components/empire/composables/useStatio
 import { useContextToolbarModel } from '@/components/empire/composables/useContextToolbarModel'
 import { useStationPlanningPanelModel } from '@/components/empire/composables/useStationPlanningPanelModel'
 import { useStationWareFlowsModel } from '@/components/empire/composables/useStationWareFlowsModel'
-import { useWareFlowDerived } from '@/components/empire/composables/useWareFlowDerived'
 import { useStationDashboardModel } from '@/components/empire/composables/useStationDashboardModel'
 import type { StationType, SavedModule } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
@@ -236,33 +235,10 @@ const empireGapsForModel = computed(() => {
   return { operations, supply }
 })
 
-const stationWareFlowDerived = useWareFlowDerived(
-  {
-    productionFlows: computed(() => blueprintStore.productionFlows),
-    autoIndustryModules: computed(() => blueprintStore.autoIndustryModules as SavedModule[]),
-    plannedModules: computed(() => blueprintStore.plannedModules as SavedModule[]),
-    warePriorityLevels: computed(() => blueprintStore.warePriorityLevels),
-    modulesMap: computed(() => gameData.modulesMap || {}),
-    settings: computed(() => ({
-      racePreference: blueprintStore.settings.racePreference,
-      resourceBufferHours: blueprintStore.settings.resourceBufferHours,
-      primaryProductBufferHours: blueprintStore.settings.primaryProductBufferHours,
-      secondaryProductBufferHours: blueprintStore.settings.secondaryProductBufferHours,
-      buyMultiplier: blueprintStore.settings.buyMultiplier,
-      sellMultiplier: blueprintStore.settings.sellMultiplier,
-      transportMinutes: blueprintStore.settings.transportMinutes,
-      transportShipCapacity: blueprintStore.settings.transportShipCapacity,
-      sunlight: blueprintStore.settings.sunlight
-    }))
-  },
-  (modules) => {
-    blueprintStore.setAutoInfrastructureModules(modules)
-  }
-)
-
 const stationWareFlowsModel = useStationWareFlowsModel({
   viewMode: wareFlowViewMode as any,
-  groupedFlows: stationWareFlowDerived.groupedFlows,
+  groupedFlows: computed(() => blueprintStore.groupedFlows),
+  autoModules: computed(() => blueprintStore.autoIndustryModules as SavedModule[]),
   settings: computed(() => ({
     resourceBufferHours: blueprintStore.settings.resourceBufferHours,
     primaryProductBufferHours: blueprintStore.settings.primaryProductBufferHours,
@@ -446,6 +422,7 @@ const handleDashboardUpdateUseHQ = (value: boolean) => {
       <StationWareFlowsDashboard
         :view-mode="stationWareFlowsModel.props.value.viewMode"
         :grouped-flows="stationWareFlowsModel.props.value.groupedFlows"
+        :auto-modules="stationWareFlowsModel.props.value.autoModules"
         :settings="stationWareFlowsModel.props.value.settings"
         :empire-gaps="stationWareFlowsModel.props.value.empireGaps"
         :planned-modules="stationWareFlowsModel.props.value.plannedModules"

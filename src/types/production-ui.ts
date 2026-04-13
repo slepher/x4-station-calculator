@@ -100,6 +100,7 @@ export interface EmpireGapItem {
 export interface StationWareFlowsDashboardProps {
   viewMode: WareFlowViewMode
   groupedFlows: GroupedFlows
+  autoModules: SavedModule[]
   settings: {
     resourceBufferHours: number
     primaryProductBufferHours: number
