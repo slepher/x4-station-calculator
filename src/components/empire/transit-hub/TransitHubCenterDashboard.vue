@@ -23,23 +23,17 @@ const props = withDefaults(defineProps<{
   storageFlows: SupplyStorageFlow[]
   viewMode?: SharedViewMode
   priceMultiplier?: number
-  resourceBufferHours?: number
-  primaryProductBufferHours?: number
-  secondaryProductBufferHours?: number
+  productBufferHours?: number
 }>(), {
   viewMode: 'quantity',
   priceMultiplier: 0.5,
-  resourceBufferHours: 2,
-  primaryProductBufferHours: 12,
-  secondaryProductBufferHours: 2
+  productBufferHours: 12
 })
 
 const emit = defineEmits<{
   (e: 'update:viewMode', value: SharedViewMode): void
   (e: 'update:priceMultiplier', value: number): void
-  (e: 'update:resourceBufferHours', value: number): void
-  (e: 'update:primaryProductBufferHours', value: number): void
-  (e: 'update:secondaryProductBufferHours', value: number): void
+  (e: 'update:productBufferHours', value: number): void
 }>()
 
 const viewMode = computed<SharedViewMode>({
@@ -52,19 +46,9 @@ const localPriceMultiplier = computed({
   set: (value) => emit('update:priceMultiplier', value)
 })
 
-const localResourceBufferHours = computed({
-  get: () => props.resourceBufferHours,
-  set: (value) => emit('update:resourceBufferHours', value)
-})
-
-const localPrimaryProductBufferHours = computed({
-  get: () => props.primaryProductBufferHours,
-  set: (value) => emit('update:primaryProductBufferHours', value)
-})
-
-const localSecondaryProductBufferHours = computed({
-  get: () => props.secondaryProductBufferHours,
-  set: (value) => emit('update:secondaryProductBufferHours', value)
+const localProductBufferHours = computed({
+  get: () => props.productBufferHours,
+  set: (value) => emit('update:productBufferHours', value)
 })
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
@@ -214,20 +198,8 @@ const hasTransportData = computed(() =>
       </div>
       <div v-if="viewMode === 'volume'" class="simulation-controls flex flex-row gap-4">
         <VolumeControlSlider
-          v-model="localResourceBufferHours"
-          :label="t('wareflow.resource_buffer_hours')"
-          type="resource"
-          :max="24"
-          :step="1" />
-        <VolumeControlSlider
-          v-model="localPrimaryProductBufferHours"
-          :label="t('wareflow.primary_product_buffer_hours')"
-          type="product"
-          :max="24"
-          :step="1" />
-        <VolumeControlSlider
-          v-model="localSecondaryProductBufferHours"
-          :label="t('wareflow.secondary_product_buffer_hours')"
+          v-model="localProductBufferHours"
+          :label="t('wareflow.product_buffer_hours')"
           type="product"
           :max="24"
           :step="1" />

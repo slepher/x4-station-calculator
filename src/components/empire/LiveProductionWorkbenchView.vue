@@ -129,14 +129,10 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
           :storage-flows="transitHubModel.storageFlows"
           :view-mode="wareflowPresenter.props.viewMode.value"
           :price-multiplier="liveStore.settings.buyMultiplier"
-          :resource-buffer-hours="liveStore.settings.resourceBufferHours"
-          :primary-product-buffer-hours="liveStore.settings.primaryProductBufferHours"
-          :secondary-product-buffer-hours="liveStore.settings.secondaryProductBufferHours"
+          :product-buffer-hours="liveStore.settings.primaryProductBufferHours"
           @update:view-mode="wareflowPresenter.emits.updateViewMode"
           @update:price-multiplier="wareflowPresenter.emits.updateBuyMultiplier"
-          @update:resource-buffer-hours="wareflowPresenter.emits.updateResourceBufferHours"
-          @update:primary-product-buffer-hours="wareflowPresenter.emits.updatePrimaryProductBufferHours"
-          @update:secondary-product-buffer-hours="wareflowPresenter.emits.updateSecondaryProductBufferHours"
+          @update:product-buffer-hours="wareflowPresenter.emits.updatePrimaryProductBufferHours"
         />
       </div>
 
