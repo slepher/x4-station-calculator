@@ -18,7 +18,7 @@ import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOu
 import { buildTransitHubViewModel } from './transitHubViewModel'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { buildSaveBindingProductionFlows, type SaveBindingProductionDeps } from './productionSourceAdapter'
-import { getFilteredGroupedFlows } from './stationComputeService'
+import { getFilteredProductionFlows, getFilteredGroupedFlows } from './stationComputeService'
 import { parseSectorLinkKey } from './sectorLinks'
 import type { EmpireSourceView } from './empireSourceView'
 
@@ -96,7 +96,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
   const sectorLinks = sourceView.sectorLinks
   const orderedStationsBySector = sourceView.orderedStationsBySector
 
-  const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
+const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     const cache = new Map<string, GroupedFlows>()
     if (productionSource.value === 'save-binding') {
       derivedBindingStations.value.forEach((item) => {
@@ -131,7 +131,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
     
     return analyzeEmpireWareFlow(
       activeEmpire.value.stations,
-      (stationId) => getFilteredGroupedFlows(stationId)
+      (stationId) => getFilteredProductionFlows(stationId)
     )
   })
 
@@ -144,7 +144,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
 
     sectorList.forEach((sector) => {
       const localStations = stations.filter((station) => station.sectorId === sector.id)
-      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getFilteredGroupedFlows(stationId))
+      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getFilteredProductionFlows(stationId))
       map.set(sector.id, rawGroupedFlows)
     })
 

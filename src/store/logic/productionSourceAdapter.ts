@@ -4,7 +4,7 @@ import { migrateStationSettings } from '@/store/state/StationStateMap'
 import {
   patchStationState,
   recomputeStation,
-  getFilteredGroupedFlows
+  getFilteredProductionFlows
 } from '@/store/logic/stationComputeService'
 import type {
   BindingStationPlan,
@@ -252,7 +252,7 @@ export function buildSaveBindingProductionFlows(
 
   const groupedFlows = analyzeEmpireWareFlow(
     derivedStations,
-    (stationId) => getFilteredGroupedFlows(stationId)
+    (stationId) => getFilteredProductionFlows(stationId)
   )
 
   return {
@@ -346,6 +346,6 @@ export function buildSaveBindingProductionFlowsLegacy(
 
   return analyzeEmpireWareFlow(
     stations,
-    (stationId) => getFilteredGroupedFlows(stationId)
+    (stationId) => getFilteredProductionFlows(stationId)
   )
 }

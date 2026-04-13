@@ -61,6 +61,10 @@ export function getFilteredGroupedFlows(stationId: string): GroupedFlows {
   return stationStateMap.getFilteredGroupedFlows(stationId)
 }
 
+export function getFilteredProductionFlows(stationId: string): WareProductionFlow[] {
+  return stationStateMap.getFilteredProductionFlows(stationId)
+}
+
 function createEmptyGroupedFlows(): GroupedFlows {
   return {
     flows: [],
@@ -219,10 +223,6 @@ export function cloneStationState(fromId: string, toId: string): void {
 
 export function getProductionFlows(stationId: string): WareProductionFlow[] {
   return stationStateMap.getProductionFlows(stationId)
-}
-
-export function getFilteredProductionFlows(stationId: string): WareProductionFlow[] {
-  return stationStateMap.getFilteredProductionFlows(stationId)
 }
 
 export function getAutoInfrastructureModules(stationId: string): SavedModule[] {

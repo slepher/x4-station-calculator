@@ -618,7 +618,6 @@ export interface StationFlowAtom {
   consumption: number;
   workforceConsumption: number;
   netRate: number;
-  netValue: number;
 }
 
 export interface EmpireWareFlow {
@@ -632,6 +631,10 @@ export interface EmpireWareFlow {
   consumption: number;
   workforceConsumption: number;
   netRate: number;
+  
+  minPrice: number;
+  avgPrice: number;
+  maxPrice: number;
   
   unitPrice: number;
   netValue: number;
@@ -691,8 +694,21 @@ export interface TransitHubStorageModulePlan {
   type: 'container' | 'solid' | 'liquid';
 }
 
+export interface TransitHubWareFlow extends EmpireWareFlow {
+  unitPrice: number;
+  netValue: number;
+}
+
+export interface TransitHubGroupedFlows {
+  flows: TransitHubWareFlow[];
+  empireGroups: {
+    operations: TransitHubWareFlow[];
+    supply: TransitHubWareFlow[];
+  };
+}
+
 export interface TransitHubViewModel {
-  groupedFlows: EmpireGroupedFlows;
+  groupedFlows: TransitHubGroupedFlows;
   storageFlows: SupplyStorageFlow[];
   storageModulePlans: TransitHubStorageModulePlan[];
   supplyBuildModules: SavedModule[];
