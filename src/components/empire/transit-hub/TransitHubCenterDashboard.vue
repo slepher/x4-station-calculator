@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { EmpireGroupedFlows, SupplyStorageFlow } from '@/types/x4'
+import type { TransitHubGroupedFlows, SupplyStorageFlow } from '@/types/x4'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -19,7 +19,7 @@ const { translateWare } = useX4I18n()
 type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
 const props = withDefaults(defineProps<{
-  groupedFlows: EmpireGroupedFlows
+  groupedFlows: TransitHubGroupedFlows
   storageFlows: SupplyStorageFlow[]
   viewMode?: SharedViewMode
   buyMultiplier?: number

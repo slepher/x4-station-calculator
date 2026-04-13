@@ -84,7 +84,6 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
     current.consumption += flow.consumption || 0
     current.workforceConsumption += flow.workforceConsumption || 0
     current.netRate += flow.netRate || 0
-    current.netValue += flow.netValue || 0
     current.contributions.push(...contributions.map(cloneContribution))
   }
 
@@ -113,7 +112,6 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
               consumption: Math.max(-(flow.netRate || 0), 0),
               workforceConsumption: flow.workforceConsumption || 0,
               netRate: flow.netRate || 0,
-              netValue: flow.netValue || 0,
               sortOrder: externalSortOrder
             }]
         appendFlow(operationsByWare, flow, contributions)
@@ -135,7 +133,6 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
               consumption: Math.max(-(flow.netRate || 0), 0),
               workforceConsumption: flow.workforceConsumption || 0,
               netRate: flow.netRate || 0,
-              netValue: flow.netValue || 0,
               sortOrder: externalSortOrder
             }]
         appendFlow(supplyByWare, flow, contributions)
@@ -155,7 +152,6 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
     supplyFlow.consumption += opFlow.consumption || 0
     supplyFlow.workforceConsumption += opFlow.workforceConsumption || 0
     supplyFlow.netRate += opFlow.netRate || 0
-    supplyFlow.netValue += opFlow.netValue || 0
     supplyFlow.contributions.push(...(opFlow.contributions || []))
   })
 

@@ -159,8 +159,10 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
       <div class="col-span-1 lg:col-span-3">
         <EmpireWareFlowsDashboard
           :grouped-flows="empireWareFlowDerived.empireGroupedFlows.value"
-          :price-multiplier="empireWareFlowDerived.priceMultiplier.value"
-          @update:price-multiplier="empireWareFlowDerived.priceMultiplier.value = $event"
+          :buy-multiplier="empireWareFlowDerived.buyMultiplier.value"
+          :sell-multiplier="empireWareFlowDerived.sellMultiplier.value"
+          @update:buy-multiplier="empireWareFlowDerived.buyMultiplier.value = $event"
+          @update:sell-multiplier="empireWareFlowDerived.sellMultiplier.value = $event"
         />
       </div>
     </div>

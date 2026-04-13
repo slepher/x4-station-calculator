@@ -636,9 +636,6 @@ export interface EmpireWareFlow {
   avgPrice: number;
   maxPrice: number;
   
-  unitPrice: number;
-  netValue: number;
-  
   contributions: StationFlowAtom[];
 }
 

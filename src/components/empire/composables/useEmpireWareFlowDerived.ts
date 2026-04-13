@@ -9,14 +9,16 @@ export interface UseEmpireWareFlowDerivedDeps {
 }
 
 export interface UseEmpireWareFlowDerivedReturn {
-  priceMultiplier: Ref<number>
+  buyMultiplier: Ref<number>
+  sellMultiplier: Ref<number>
   empireGroupedFlows: ComputedRef<EmpireGroupedFlows>
 }
 
 export function useEmpireWareFlowDerived(deps: UseEmpireWareFlowDerivedDeps): UseEmpireWareFlowDerivedReturn {
   const { stations } = deps
 
-  const priceMultiplier = ref(0.5)
+  const buyMultiplier = ref(0.5)
+  const sellMultiplier = ref(0.5)
 
   const empireGroupedFlows = computed<EmpireGroupedFlows>(() => {
     if (stations.value.length === 0) {
@@ -33,7 +35,8 @@ export function useEmpireWareFlowDerived(deps: UseEmpireWareFlowDerivedDeps): Us
   })
 
   return {
-    priceMultiplier,
+    buyMultiplier,
+    sellMultiplier,
     empireGroupedFlows
   }
 }

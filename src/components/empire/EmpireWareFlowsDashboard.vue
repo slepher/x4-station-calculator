@@ -3,7 +3,8 @@ import { computed, ref } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { EmpireGroupedFlows, SupplyStorageFlow } from '@/types/x4'
+import type { EmpireGroupedFlows, SupplyStorageFlow, EmpireWareFlow } from '@/types/x4'
+import { getPriceByMultiplier } from '@/store/logic/calculatorUtils'
 import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
 import TransitHubStorageFlowItem from './transit-hub/TransitHubStorageFlow.vue'
 import TransitHubTransportFlowItem from './transit-hub/TransitHubTransportFlow.vue'
@@ -16,17 +17,20 @@ const props = withDefaults(defineProps<{
   enableStorageView?: boolean
   enableTransportView?: boolean
   supplyStorageFlows?: SupplyStorageFlow[]
-  priceMultiplier?: number
+  buyMultiplier?: number
+  sellMultiplier?: number
 }>(), {
   groupedFlows: null,
   enableStorageView: false,
   enableTransportView: false,
   supplyStorageFlows: () => [],
-  priceMultiplier: 0.5
+  buyMultiplier: 0.5,
+  sellMultiplier: 0.5
 })
 
 const emit = defineEmits<{
-  (e: 'update:priceMultiplier', value: number): void
+  (e: 'update:buyMultiplier', value: number): void
+  (e: 'update:sellMultiplier', value: number): void
 }>()
 
 const gameData = useGameDataStore()
@@ -41,27 +45,49 @@ const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.roun
 
 const empireGroupedFlows = computed(() => props.groupedFlows || { flows: [], empireGroups: { operations: [], supply: [] } })
 
-const localPriceMultiplier = computed({
-  get: () => props.priceMultiplier,
-  set: (val) => emit('update:priceMultiplier', val)
+const localBuyMultiplier = computed({
+  get: () => props.buyMultiplier,
+  set: (val) => emit('update:buyMultiplier', val)
 })
 
-const wrapFlow = (flow: any) => {
+const localSellMultiplier = computed({
+  get: () => props.sellMultiplier,
+  set: (val) => emit('update:sellMultiplier', val)
+})
+
+function calculateFlowPrice(flow: EmpireWareFlow): { unitPrice: number; netValue: number } {
+  const isSurplus = flow.netRate >= 0
+  const multiplier = isSurplus ? props.sellMultiplier : props.buyMultiplier
+  const ware = { minPrice: flow.minPrice, price: flow.avgPrice, maxPrice: flow.maxPrice }
+  const unitPrice = getPriceByMultiplier(ware as any, multiplier)
+  const netValue = flow.netRate * unitPrice
+  return { unitPrice, netValue }
+}
+
+function wrapFlowWithPrice(flow: EmpireWareFlow) {
+  const { unitPrice, netValue } = calculateFlowPrice(flow)
   const wareInfo = gameData.waresMap?.[flow.wareId]
+  const contributionsWithPrice = flow.contributions.map(contrib => ({
+    ...contrib,
+    netValue: contrib.netRate * unitPrice
+  }))
   return {
     ...flow,
     id: flow.wareId,
-    name: wareInfo ? translateWare(wareInfo) : flow.wareId
+    name: wareInfo ? translateWare(wareInfo) : flow.wareId,
+    unitPrice,
+    netValue,
+    contributions: contributionsWithPrice
   }
 }
 
 const totalProfit = computed(() => {
-  return empireGroupedFlows.value.flows.reduce((sum, flow) => sum + flow.netValue, 0)
+  return empireGroupedFlows.value.flows.reduce((sum, flow) => sum + calculateFlowPrice(flow).netValue, 0)
 })
 const hasFlowData = computed(() => empireGroupedFlows.value.flows.length > 0)
 
-const getGroupSymboledValue = (group: any[]) => {
-  const value = group.reduce((sum, item) => sum + Math.abs(item.netValue || 0), 0)
+const getGroupSymboledValue = (group: EmpireWareFlow[]) => {
+  const value = group.reduce((sum, item) => sum + Math.abs(calculateFlowPrice(item).netValue), 0)
   const symbol = value >= 0 ? '+' : '-'
   return symbol + formatNum(Math.abs(value))
 }
@@ -98,7 +124,7 @@ const empireGroups = computed(() => {
   const operations = groups.operations.filter(item => item.netRate <= 0)
   
   const getSupplyTitle = () => {
-    const supplyValue = groups.supply.reduce((sum, item) => sum + item.netValue, 0)
+    const supplyValue = groups.supply.reduce((sum, item) => sum + calculateFlowPrice(item).netValue, 0)
     return viewMode.value === 'economy' 
       ? (supplyValue >= 0 ? t('wareflow.supply_income_group') : t('wareflow.supply_expense_group'))
       : t('wareflow.supply_group')
@@ -109,19 +135,19 @@ const empireGroups = computed(() => {
       key: 'products',
       symbolClass: 'positive',
       title: viewMode.value === 'economy' ? t('wareflow.products_income_group') : t('wareflow.products_group'),
-      items: products.map(wrapFlow)
+      items: products.map(wrapFlowWithPrice)
     },
     {
       key: 'operations',
       symbolClass: 'negative',
       title: viewMode.value === 'economy' ? t('wareflow.operations_expense_group') : t('wareflow.operations_group'),
-      items: operations.map(wrapFlow)
+      items: operations.map(wrapFlowWithPrice)
     },
     {
       key: 'supply',
-      symbolClass: groups.supply.reduce((sum, item) => sum + item.netValue, 0) >= 0 ? 'positive' : 'negative',
+      symbolClass: groups.supply.reduce((sum, item) => sum + calculateFlowPrice(item).netValue, 0) >= 0 ? 'positive' : 'negative',
       title: getSupplyTitle(),
-      items: groups.supply.map(wrapFlow)
+      items: groups.supply.map(wrapFlowWithPrice)
     }
   ]
 })
@@ -259,7 +285,8 @@ const transportTotalVolume = computed(() =>
 
     <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'">
       <div class="simulation-controls flex flex-row gap-4">
-        <PriceSlider v-model="localPriceMultiplier" :label="t('wareflow.price_multiplier')" type="buy" />
+        <PriceSlider v-model="localBuyMultiplier" :label="t('wareflow.buy_multiplier')" type="buy" />
+        <PriceSlider v-model="localSellMultiplier" :label="t('wareflow.sell_multiplier')" type="sell" />
       </div>
 
       <div class="profit-footer">

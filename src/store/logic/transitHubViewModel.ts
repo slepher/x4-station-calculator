@@ -88,11 +88,17 @@ function mergeLinkFlowsIntoGroupedFlows(
   
   groupedFlows.flows.forEach((flow) => {
     const { unitPrice, netValue } = calculateFlowPrice(flow, effectiveBuyMultiplier, effectiveSellMultiplier)
+    
+    const contributionsWithPrice = (flow.contributions || []).map((contrib) => ({
+      ...contrib,
+      netValue: contrib.netRate * unitPrice
+    }))
+    
     flowsByWareId.set(flow.wareId, {
       ...flow,
       unitPrice,
       netValue,
-      contributions: [...(flow.contributions || [])]
+      contributions: contributionsWithPrice
     })
   })
 
@@ -127,7 +133,8 @@ function mergeLinkFlowsIntoGroupedFlows(
       production: isToHere ? amount : 0,
       consumption: isFromHere ? amount : 0,
       workforceConsumption: 0,
-      netRate
+      netRate,
+      netValue
     }
 
     if (existingFlow) {

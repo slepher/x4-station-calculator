@@ -83,8 +83,6 @@ function aggregateProductionFlows(
       minPrice: firstFlow.minPrice,
       avgPrice: firstFlow.price,
       maxPrice: firstFlow.maxPrice,
-      unitPrice: firstFlow.price,
-      netValue: totalNetRate * firstFlow.price,
       contributions
     })
   })
@@ -103,7 +101,6 @@ function mergeEmpireFlow(target: EmpireWareFlow, source: EmpireWareFlow): Empire
     consumption: target.consumption + source.consumption,
     workforceConsumption: target.workforceConsumption + source.workforceConsumption,
     netRate: target.netRate + source.netRate,
-    netValue: target.netValue + source.netValue,
     contributions: [...target.contributions, ...source.contributions]
   }
 }
