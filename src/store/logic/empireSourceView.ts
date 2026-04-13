@@ -1,9 +1,9 @@
 import { computed, type Ref, type ComputedRef } from 'vue'
 import type { EmpirePlan, SectorPlan, StationPlan, SaveBindingPlan } from '@/types/x4'
 import type { BindingSectorGroup } from '@/types/x4'
-import type { SaveArchive } from '@/types/saveArchive'
+import type { PlayerStationRecord } from '@/types/saveArchive'
 import {
-  deriveBindingStations,
+  deriveBindingStationsFromRecords,
   parseBindingStationId,
   createBindingPlanStationId,
   type DerivedBindingStation,
@@ -17,7 +17,7 @@ export interface EmpireSourceViewDeps {
   productionSource: Ref<ProductionSourceKind>
   activeEmpire: Ref<EmpirePlan | null>
   activeBinding: Ref<SaveBindingPlan | null>
-  selectedArchive: Ref<SaveArchive | null>
+  playerStationRecords: Ref<PlayerStationRecord[]>
 }
 
 export interface EmpireSourceView {
@@ -53,12 +53,12 @@ export function createEmpireSourceView(deps: EmpireSourceViewDeps): EmpireSource
     productionSource,
     activeEmpire,
     activeBinding,
-    selectedArchive
+    playerStationRecords
   } = deps
 
   const derivedBindingStations = computed<DerivedBindingStation[]>(() => {
     if (productionSource.value !== 'save-binding') return []
-    return deriveBindingStations(activeBinding.value, selectedArchive.value)
+    return deriveBindingStationsFromRecords(activeBinding.value, playerStationRecords.value)
   })
 
   const sectors = computed<SectorPlan[]>(() => {

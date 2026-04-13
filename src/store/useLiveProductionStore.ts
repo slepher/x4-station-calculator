@@ -13,6 +13,7 @@ import type {
 } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { ProductionSessionContext } from '@/types/production-context'
+import type { PlayerStationRecord } from '@/types/saveArchive'
 import type {
   ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
@@ -66,6 +67,7 @@ import {
   parseBindingStationId,
   toProductionStation
 } from './logic/productionSourceAdapter'
+import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -77,8 +79,30 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const isReady = ref(false)
   const buildPriceMultiplier = ref(0.5)
+  const playerStationRecords = ref<PlayerStationRecord[]>([])
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
+
+  async function loadPlayerStationRecords() {
+    const archive = selectedArchive.value
+    if (!archive) {
+      playerStationRecords.value = []
+      return
+    }
+    const scopeKey = gameData.getStorageKey('save_archives')
+    const archiveId = createArchiveId(archive.meta.guid, archive.meta.time)
+    try {
+      const records = await loadPlayerStationsByArchiveId(scopeKey, archiveId)
+      playerStationRecords.value = records
+    } catch (e) {
+      console.error('[LiveProductionStore] Failed to load player stations:', e)
+      playerStationRecords.value = []
+    }
+  }
+
+  watch(selectedArchive, async () => {
+    await loadPlayerStationRecords()
+  })
 
   const activeStationId = computed({
     get: () => activeViewStore.activeBindingStation,
@@ -94,7 +118,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     productionSource,
     activeEmpire: ref(null),
     activeBinding,
-    selectedArchive
+    playerStationRecords
   })
 
   const sectors = sourceView.sectors
@@ -105,7 +129,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     productionSource,
     activeEmpire: ref(null),
     activeBinding,
-    selectedArchive,
+    playerStationRecords,
     sourceView,
     modulesMap: computed(() => gameData.modulesMap),
     waresMap: computed(() => gameData.waresMap),
@@ -853,6 +877,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     try {
       await gameData.initialize()
+      await loadPlayerStationRecords()
 
       saveBindingStore.initialize()
 

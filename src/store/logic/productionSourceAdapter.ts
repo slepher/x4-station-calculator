@@ -16,7 +16,7 @@ import type {
   RaceMedicalConsumption,
   BindingSectorGroup
 } from '@/types/x4'
-import type { SaveArchive, PlayerStationEntry } from '@/types/saveArchive'
+import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchive'
 
 export type ProductionSourceKind = 'empire' | 'save-binding'
 
@@ -68,7 +68,7 @@ export interface ProductionSourceDeps {
 }
 
 export interface SaveBindingProductionDeps extends ProductionSourceDeps {
-  archive: SaveArchive | null
+  playerStationRecords: PlayerStationRecord[]
 }
 
 function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
@@ -114,39 +114,6 @@ function toDerivedSaveStation(
   }
 }
 
-function getCoveredSaveStationCodes(
-  archive: SaveArchive | null,
-  groups: BindingSectorGroup[]
-): Set<string> {
-  if (!archive || !archive.sectors) return new Set()
-
-  const coverageMacros = new Set<string>()
-  groups.forEach((group) => {
-    resolveBindingSectorScope(group).sectorMacros.forEach((sectorMacro) => coverageMacros.add(sectorMacro))
-  })
-
-  const coveredCodes = new Set<string>()
-  Object.entries(archive.sectors).forEach(([sectorMacro, sector]) => {
-    if (!coverageMacros.has(sectorMacro)) return
-    const stations = sector.player_stations || {}
-    Object.keys(stations).forEach((code) => coveredCodes.add(code))
-  })
-
-  return coveredCodes
-}
-
-function getSaveStationByCode(
-  archive: SaveArchive | null,
-  code: string
-): { station: PlayerStationEntry; sectorMacro: string } | null {
-  if (!archive || !archive.sectors) return null
-  for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
-    const station = sector.player_stations?.[code]
-    if (station) return { station, sectorMacro }
-  }
-  return null
-}
-
 function findGroupBySectorMacro(
   groups: BindingSectorGroup[],
   sectorMacro: string
@@ -181,7 +148,7 @@ export function buildSaveBindingProductionFlows(
     return emptyResult
   }
 
-  const coveredCodes = getCoveredSaveStationCodes(deps.archive, binding.groups)
+  const coveredCodes = getCoveredCodesFromRecords(deps.playerStationRecords, binding.groups)
   const stationPlansByCode = new Map<string, BindingStationPlan>()
   const virtualPlans: BindingStationPlan[] = []
   const emittedPlanIds = new Set<string>()
@@ -197,11 +164,11 @@ export function buildSaveBindingProductionFlows(
   const derivedStations: StationPlan[] = []
 
   coveredCodes.forEach((code) => {
-    const entry = getSaveStationByCode(deps.archive, code)
-    if (!entry) return
+    const record = getStationRecordByCode(deps.playerStationRecords, code)
+    if (!record) return
     const plan = stationPlansByCode.get(code)
-    const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, entry.sectorMacro)?.id || null
-    const station = toDerivedSaveStation(binding.gameGuid, entry.station, plan)
+    const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, record.sectorMacro)?.id || null
+    const station = toDerivedSaveStation(binding.gameGuid, record.data as PlayerStationEntry, plan)
     station.sectorId = groupId
     derivedStations.push(station)
     if (plan) emittedPlanIds.add(plan.id)
@@ -272,14 +239,43 @@ export interface DerivedBindingStation {
   groupId: string | null
 }
 
-export function deriveBindingStations(
+function getCoveredCodesFromRecords(
+  records: PlayerStationRecord[],
+  groups: BindingSectorGroup[]
+): Set<string> {
+  if (!records || records.length === 0) return new Set()
+
+  const coverageMacros = new Set<string>()
+  groups.forEach((group) => {
+    resolveBindingSectorScope(group).sectorMacros.forEach((sectorMacro) => coverageMacros.add(sectorMacro))
+  })
+
+  const coveredCodes = new Set<string>()
+  records.forEach((record) => {
+    if (coverageMacros.has(record.sectorMacro) && record.type === 'station') {
+      coveredCodes.add(record.code)
+    }
+  })
+
+  return coveredCodes
+}
+
+function getStationRecordByCode(
+  records: PlayerStationRecord[],
+  code: string
+): PlayerStationRecord | null {
+  return records.find((r) => r.code === code && r.type === 'station') || null
+}
+
+export function deriveBindingStationsFromRecords(
   binding: SaveBindingPlan | null | undefined,
-  archive: SaveArchive | null
+  stationRecords: PlayerStationRecord[]
 ): DerivedBindingStation[] {
   if (!binding) return []
+  if (!stationRecords || stationRecords.length === 0) return []
 
   const result: DerivedBindingStation[] = []
-  const coveredCodes = getCoveredSaveStationCodes(archive, binding.groups)
+  const coveredCodes = getCoveredCodesFromRecords(stationRecords, binding.groups)
   const stationPlansByCode = new Map<string, BindingStationPlan>()
   const emittedPlanIds = new Set<string>()
 
@@ -290,11 +286,11 @@ export function deriveBindingStations(
   })
 
   coveredCodes.forEach((code) => {
-    const entry = getSaveStationByCode(archive, code)
-    if (!entry) return
+    const record = getStationRecordByCode(stationRecords, code)
+    if (!record) return
     const plan = stationPlansByCode.get(code)
-    const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, entry.sectorMacro)?.id || null
-    const station = toDerivedSaveStation(binding.gameGuid, entry.station, plan)
+    const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, record.sectorMacro)?.id || null
+    const station = toDerivedSaveStation(binding.gameGuid, record.data as PlayerStationEntry, plan)
     station.sectorId = groupId
     result.push({
       station,

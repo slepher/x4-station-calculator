@@ -12,7 +12,7 @@ import type {
   X4Ware,
   RaceMedicalConsumption
 } from '@/types/x4'
-import type { SaveArchive } from '@/types/saveArchive'
+import type { PlayerStationRecord } from '@/types/saveArchive'
 import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './sectorLinkFlow'
 import { buildTransitHubViewModel } from './transitHubViewModel'
@@ -32,7 +32,7 @@ export interface EmpireFlowFacadeDeps {
   productionSource: Ref<'empire' | 'save-binding'>
   activeEmpire: Ref<EmpirePlan | null>
   activeBinding: Ref<SaveBindingPlan | null>
-  selectedArchive: Ref<SaveArchive | null>
+  playerStationRecords: Ref<PlayerStationRecord[]>
   sourceView: EmpireSourceView
   modulesMap: Ref<Record<string, X4Module> | null>
   waresMap: Ref<Record<string, X4Ware> | null>
@@ -79,7 +79,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
     productionSource,
     activeEmpire,
     activeBinding,
-    selectedArchive,
+    playerStationRecords,
     sourceView,
     modulesMap,
     waresMap,
@@ -120,7 +120,7 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
         medicalConsumptionMap: medicalConsumptionMap.value!,
         enforceDlcActivation: enforceDlcActivation.value,
         isModuleDlcActive,
-        archive: selectedArchive.value
+        playerStationRecords: playerStationRecords.value
       }
       return buildSaveBindingProductionFlows(binding, saveBindingDeps).groupedFlows
     }
