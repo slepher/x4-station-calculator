@@ -133,16 +133,28 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
     )
   })
 
+  const rawSectorGroupedFlowsMap = computed<Map<string, EmpireGroupedFlows>>(() => {
+    const map = new Map<string, EmpireGroupedFlows>()
+    if (!modulesMap.value) return map
+
+    const sectorList = productionSectors.value
+    const stations = productionStations.value
+
+    sectorList.forEach((sector) => {
+      const localStations = stations.filter((station) => station.sectorId === sector.id)
+      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getGroupedFlows(stationId))
+      map.set(sector.id, rawGroupedFlows)
+    })
+
+    return map
+  })
+
   const sectorInternalDataMap = computed<Map<string, SectorInternalData>>(() => {
     const map = new Map<string, SectorInternalData>()
     if (!modulesMap.value) return map
 
     const stations = productionStations.value
     const sectorList = productionSectors.value
-
-    if (productionSource.value === 'save-binding') {
-      empireGroupedFlows.value
-    }
 
     const buildSupplyStorageFlows = (groupedFlows: EmpireGroupedFlows): SupplyStorageFlow[] => {
       const stationMap = new Map(stations.map((station) => [station.id, station]))
@@ -219,9 +231,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
         .filter((station) => station.sectorId === sector.id)
         .map((station) => station.id)
 
-      const localStationSet = new Set(localStationIds)
-      const localStations = stations.filter((station) => localStationSet.has(station.id))
-      const localGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getFilteredGroupedFlows(stationId))
+      const rawGroupedFlows = rawSectorGroupedFlowsMap.value.get(sector.id) || createEmptyEmpireGroupedFlows()
 
       map.set(sector.id, {
         sectorId: sector.id,
@@ -229,8 +239,8 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
           sectorId: sector.id,
           localStationIds
         },
-        localGroupedFlows,
-        supplyStorageFlows: buildSupplyStorageFlows(localGroupedFlows)
+        localGroupedFlows: rawGroupedFlows,
+        supplyStorageFlows: buildSupplyStorageFlows(rawGroupedFlows)
       })
     })
 
@@ -251,23 +261,19 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
         distance: 1
       }))
 
-    const rawNetByWareBySector = new Map<string, Record<string, number>>()
-    productionSectors.value.forEach((sector) => {
-      const localStations = productionStations.value.filter((station) => station.sectorId === sector.id)
-      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getGroupedFlows(stationId))
+    const sectorsInput = productionSectors.value.map((sector) => {
+      const rawGroupedFlows = rawSectorGroupedFlowsMap.value.get(sector.id) || createEmptyEmpireGroupedFlows()
       const netByWare: Record<string, number> = {}
       rawGroupedFlows.flows
         .filter((flow) => flow.transportType === 'container')
         .forEach((flow) => {
           netByWare[flow.wareId] = Number(flow.netRate || 0)
         })
-      rawNetByWareBySector.set(sector.id, netByWare)
+      return {
+        sectorId: sector.id,
+        netByWare
+      }
     })
-
-    const sectorsInput = productionSectors.value.map((sector) => ({
-      sectorId: sector.id,
-      netByWare: rawNetByWareBySector.get(sector.id) || {}
-    }))
 
     const solverOutput = solveMultiWareByLink({
       sectors: sectorsInput,
