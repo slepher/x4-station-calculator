@@ -92,6 +92,10 @@ function mergeLinkFlowsIntoGroupedFlows(
     const tier = existingFlow?.tier || waresMap?.[linkFlow.wareId]?.tier || 0
     const orderIndex = existingFlow?.orderIndex || Number.MAX_SAFE_INTEGER
 
+    const netRate = isToHere ? amount : -amount
+    const isSurplus = netRate >= 0
+    const multiplier = isSurplus ? effectiveSellMultiplier : effectiveBuyMultiplier
+
     const contribution = {
       stationId: `external:${peerSectorId}`,
       stationName: peerSectorName,
@@ -99,10 +103,8 @@ function mergeLinkFlowsIntoGroupedFlows(
       production: isToHere ? amount : 0,
       consumption: isFromHere ? amount : 0,
       workforceConsumption: 0,
-      netRate: isToHere ? amount : -amount,
-      netValue: isToHere
-        ? amount * unitPrice * effectiveBuyMultiplier
-        : -amount * unitPrice * effectiveSellMultiplier
+      netRate,
+      netValue: netRate * unitPrice * multiplier
     }
 
     if (existingFlow) {
