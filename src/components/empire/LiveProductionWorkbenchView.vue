@@ -9,7 +9,6 @@ import { useProductionPlanningPresenter } from '@/components/empire/presenters/u
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
 import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmpireWareFlowDerived'
-import type { SavedModule } from '@/types/x4'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
@@ -44,58 +43,6 @@ const planningPresenter = useProductionPlanningPresenter(liveStore.workbench)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore.workbench)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore.workbench)
 
-const tabbarProps = computed(() => ({
-  tabs: tabbarPresenter.props.tabs.value,
-  activeTabId: tabbarPresenter.props.activeTabId.value,
-  expandedSectorId: tabbarPresenter.props.expandedSectorId.value,
-  canCreateStation: tabbarPresenter.props.canCreateStation,
-  canOpenContextMenu: tabbarPresenter.props.canOpenContextMenu
-}))
-
-const toolbarProps = computed(() => ({
-  mode: toolbarPresenter.props.mode.value,
-  isBindingMode: toolbarPresenter.props.isBindingMode,
-  titleModel: toolbarPresenter.props.titleModel.value,
-  station: toolbarPresenter.props.station.value,
-  settings: toolbarPresenter.props.settings.value,
-  races: toolbarPresenter.props.races,
-  stationTypes: toolbarPresenter.props.stationTypes,
-  availableMinerals: toolbarPresenter.props.availableMinerals,
-  singleBerthThroughput: toolbarPresenter.props.singleBerthThroughput.value
-}))
-
-const planningProps = computed(() => ({
-  plannedModules: planningPresenter.props.plannedModules.value,
-  autoIndustryModules: planningPresenter.props.autoIndustryModules.value,
-  enforceDlcActivation: planningPresenter.props.enforceDlcActivation.value
-}))
-
-const wareflowProps = computed(() => ({
-  viewMode: wareflowPresenter.props.viewMode.value,
-  groupedFlows: wareflowPresenter.props.groupedFlows.value,
-  autoModules: wareflowPresenter.props.autoModules.value,
-  settings: wareflowPresenter.props.settings.value,
-  empireGaps: wareflowPresenter.props.empireGaps.value,
-  plannedModules: wareflowPresenter.props.plannedModules,
-  wares: wareflowPresenter.props.wares.value,
-  modulesMap: wareflowPresenter.props.modulesMap.value,
-  isWareLocked: wareflowPresenter.props.isWareLocked,
-  getResolvedLevel: wareflowPresenter.props.getResolvedLevel,
-  isWareOperable: wareflowPresenter.props.isWareOperable,
-  isPlannedWare: wareflowPresenter.props.isPlannedWare,
-  onToggleWareLock: wareflowPresenter.props.onToggleWareLock,
-  onToggleWarePriority: wareflowPresenter.props.onToggleWarePriority
-}))
-
-const dashboardProps = computed(() => ({
-  plannedModules: dashboardPresenter.props.plannedModules,
-  stationAnalysis: dashboardPresenter.props.stationAnalysis.value,
-  settings: dashboardPresenter.props.settings.value,
-  currentEfficiency: dashboardPresenter.props.currentEfficiency.value,
-  actualWorkforce: dashboardPresenter.props.actualWorkforce.value,
-  buildPriceMultiplier: dashboardPresenter.props.buildPriceMultiplier.value
-}))
-
 const activeStation = computed(() => liveStore.activeStation)
 const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
 const isOverview = computed(() => !activeStation.value && !activeTransitSectorId.value)
@@ -119,11 +66,11 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
 
 <template>
   <SectorStationTabBar
-    :tabs="tabbarProps.tabs"
-    :active-tab-id="tabbarProps.activeTabId"
-    :expanded-sector-id="tabbarProps.expandedSectorId"
-    :can-create-station="tabbarProps.canCreateStation"
-    :can-open-context-menu="tabbarProps.canOpenContextMenu"
+    :tabs="tabbarPresenter.props.tabs.value"
+    :active-tab-id="tabbarPresenter.props.activeTabId.value"
+    :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
+    :can-create-station="tabbarPresenter.props.canCreateStation"
+    :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
     @select-overview="tabbarPresenter.emits.selectOverview"
     @select-transit="tabbarPresenter.emits.selectTransit"
     @select-station="tabbarPresenter.emits.selectStation"
@@ -133,15 +80,15 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     @expand-sector="tabbarPresenter.emits.expandSector"
   />
   <ContextToolbar
-    :mode="toolbarProps.mode"
-    :is-binding-mode="toolbarProps.isBindingMode"
-    :title-model="toolbarProps.titleModel"
-    :station="toolbarProps.station"
-    :settings="toolbarProps.settings"
-    :races="toolbarProps.races"
-    :station-types="toolbarProps.stationTypes"
-    :available-minerals="toolbarProps.availableMinerals"
-    :single-berth-throughput="toolbarProps.singleBerthThroughput"
+    :mode="toolbarPresenter.props.mode.value"
+    :is-binding-mode="toolbarPresenter.props.isBindingMode"
+    :title-model="toolbarPresenter.props.titleModel.value"
+    :station="toolbarPresenter.props.station.value"
+    :settings="toolbarPresenter.props.settings.value"
+    :races="toolbarPresenter.props.races"
+    :station-types="toolbarPresenter.props.stationTypes"
+    :available-minerals="toolbarPresenter.props.availableMinerals"
+    :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     @update-title="toolbarPresenter.emits.updateTitle"
     @update-station-name="toolbarPresenter.emits.updateStationName"
     @update-station-type="toolbarPresenter.emits.updateStationType"
@@ -179,7 +126,7 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
         <TransitHubCenterDashboard
           :grouped-flows="transitHubModel.groupedFlows"
           :storage-flows="transitHubModel.storageFlows"
-          :view-mode="wareflowProps.viewMode"
+          :view-mode="wareflowPresenter.props.viewMode.value"
           :price-multiplier="liveStore.settings.buyMultiplier"
           :resource-buffer-hours="liveStore.settings.resourceBufferHours"
           :primary-product-buffer-hours="liveStore.settings.primaryProductBufferHours"
@@ -221,29 +168,29 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
   <div v-else class="main-layout mt-6">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
-        :planned-modules="planningProps.plannedModules"
-        :auto-industry-modules="planningProps.autoIndustryModules"
-        :enforce-dlc-activation="planningProps.enforceDlcActivation"
+        :planned-modules="planningPresenter.props.plannedModules.value"
+        :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
+        :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
       />
     </div>
 
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
-        :view-mode="wareflowProps.viewMode"
-        :grouped-flows="wareflowProps.groupedFlows"
-        :auto-modules="wareflowProps.autoModules"
-        :settings="wareflowProps.settings"
-        :empire-gaps="wareflowProps.empireGaps"
-        :planned-modules="wareflowProps.plannedModules"
-        :wares="wareflowProps.wares"
-        :modules-map="wareflowProps.modulesMap"
-        :is-ware-locked="wareflowProps.isWareLocked"
-        :get-resolved-level="wareflowProps.getResolvedLevel"
-        :is-ware-operable="wareflowProps.isWareOperable"
-        :is-planned-ware="wareflowProps.isPlannedWare"
-        :on-toggle-ware-lock="wareflowProps.onToggleWareLock"
-        :on-toggle-ware-priority="wareflowProps.onToggleWarePriority"
+        :view-mode="wareflowPresenter.props.viewMode.value"
+        :grouped-flows="wareflowPresenter.props.groupedFlows.value"
+        :auto-modules="wareflowPresenter.props.autoModules.value"
+        :settings="wareflowPresenter.props.settings.value"
+        :empire-gaps="wareflowPresenter.props.empireGaps.value"
+        :planned-modules="wareflowPresenter.props.plannedModules.value"
+        :wares="wareflowPresenter.props.wares.value"
+        :modules-map="wareflowPresenter.props.modulesMap.value"
+        :is-ware-locked="wareflowPresenter.props.isWareLocked"
+        :get-resolved-level="wareflowPresenter.props.getResolvedLevel"
+        :is-ware-operable="wareflowPresenter.props.isWareOperable"
+        :is-planned-ware="wareflowPresenter.props.isPlannedWare"
+        :on-toggle-ware-lock="wareflowPresenter.props.onToggleWareLock"
+        :on-toggle-ware-priority="wareflowPresenter.props.onToggleWarePriority"
         @update-view-mode="wareflowPresenter.emits.updateViewMode"
         @update-resource-buffer-hours="wareflowPresenter.emits.updateResourceBufferHours"
         @update-primary-product-buffer-hours="wareflowPresenter.emits.updatePrimaryProductBufferHours"
@@ -257,12 +204,12 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
 
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
-        :planned-modules="dashboardProps.plannedModules"
-        :station-analysis="dashboardProps.stationAnalysis"
-        :settings="dashboardProps.settings"
-        :current-efficiency="dashboardProps.currentEfficiency"
-        :actual-workforce="dashboardProps.actualWorkforce"
-        :build-price-multiplier="dashboardProps.buildPriceMultiplier"
+        :planned-modules="dashboardPresenter.props.plannedModules.value"
+        :station-analysis="dashboardPresenter.props.stationAnalysis.value"
+        :settings="dashboardPresenter.props.settings.value"
+        :current-efficiency="dashboardPresenter.props.currentEfficiency.value"
+        :actual-workforce="dashboardPresenter.props.actualWorkforce.value"
+        :build-price-multiplier="dashboardPresenter.props.buildPriceMultiplier.value"
         @update-transport-ship-capacity="dashboardPresenter.emits.updateTransportShipCapacity"
         @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
         @update-manual-workforce="dashboardPresenter.emits.updateManualWorkforce"

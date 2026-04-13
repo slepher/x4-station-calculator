@@ -4,7 +4,7 @@ import type { StationDashboardEmits } from '@/types/production-ui'
 import type { SavedModule } from '@/types/x4'
 
 export interface DashboardPresenterProps {
-  plannedModules: SavedModule[]
+  plannedModules: ComputedRef<SavedModule[]>
   stationAnalysis: ComputedRef<{
     totalCost: number
     totalVolume: number
@@ -34,7 +34,7 @@ export interface UseProductionDashboardPresenterReturn {
 
 export function useProductionDashboardPresenter(store: ProductionWorkbenchStoreContract): UseProductionDashboardPresenterReturn {
   const props: DashboardPresenterProps = {
-    plannedModules: [],
+    plannedModules: computed(() => store.getPlannedModules()),
     stationAnalysis: computed(() => store.getStationAnalysis()),
     settings: computed(() => store.getDashboardSettings()),
     currentEfficiency: computed(() => store.getCurrentEfficiency()),

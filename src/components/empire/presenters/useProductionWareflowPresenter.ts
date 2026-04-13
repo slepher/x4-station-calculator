@@ -18,7 +18,7 @@ export interface WareflowPresenterProps {
     transportMinutes?: number
   }>
   empireGaps: ComputedRef<{ operations: EmpireGapItem[]; supply: EmpireGapItem[] }>
-  plannedModules: SavedModule[]
+  plannedModules: ComputedRef<SavedModule[]>
   wares: ComputedRef<Record<string, any>>
   modulesMap: ComputedRef<Record<string, any> | undefined>
   isWareLocked: (wareId: string) => boolean
@@ -41,7 +41,7 @@ export function useProductionWareflowPresenter(store: ProductionWorkbenchStoreCo
     autoModules: computed(() => store.getAutoModules()),
     settings: computed(() => store.getWareflowSettings()),
     empireGaps: computed(() => store.getEmpireGaps()),
-    plannedModules: [],
+    plannedModules: computed(() => store.getPlannedModules()),
     wares: computed(() => store.getWares()),
     modulesMap: computed(() => store.getModulesMap()),
     isWareLocked: (wareId: string) => store.isWareLocked(wareId),
