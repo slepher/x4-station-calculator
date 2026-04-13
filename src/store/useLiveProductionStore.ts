@@ -13,7 +13,16 @@ import type {
 } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { ProductionSessionContext } from '@/types/production-context'
+import type {
+  ProductionWorkbenchStoreContract,
+  ProductionWorkbenchCapabilities,
+  ProductionAddModuleOptions,
+  ProductionRemoveModuleTarget,
+  ImportPayload
+} from '@/types/production-workbench-contract'
+import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
+import i18n from '@/i18n'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
@@ -44,6 +53,7 @@ import {
   deepClone,
   getDerivedStationData
 } from './logic/stationComputeService'
+import { analyzeStation } from './logic/analyzeStation'
 import {
   createEmpireSourceView,
   computeActiveStation,
@@ -332,18 +342,29 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const stationAnalysis = computed(() => {
-    const state = getStationState(activeStation.value?.id || '__local__')
-    return state?.stationAnalysis || {
-      totalCost: 0,
-      totalVolume: 0,
-      totalTime: 0,
-      totalCapacity: 0,
-      totalNeeded: 0,
-      playerHQNeeded: 0,
-      totalWorkerDiff: 0,
-      summaryItems: [],
-      moduleGroups: []
+    const planned = plannedModules.value
+    const auto = autoIndustryModules.value
+    const allModules = [...planned, ...auto]
+    if (allModules.length === 0) {
+      return {
+        totalCost: 0,
+        totalVolume: 0,
+        totalTime: 0,
+        totalCapacity: 0,
+        totalNeeded: 0,
+        playerHQNeeded: 0,
+        totalWorkerDiff: 0,
+        summaryItems: [],
+        moduleGroups: []
+      }
     }
+    return analyzeStation(
+      allModules,
+      gameData.modulesMap,
+      gameData.waresMap,
+      buildPriceMultiplier.value,
+      settings.value.useHQ
+    )
   })
 
   const wares = computed(() => gameData.waresMap)
@@ -820,6 +841,269 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeViewStore.activeBinding = gameGuid
   }
 
+  const importModalOpen = ref(false)
+  const wareflowViewMode = ref<WareFlowViewMode>('quantity')
+  const expandedSectorId = ref<string | null>(null)
+
+  const capabilities: ProductionWorkbenchCapabilities = {
+    uniqueWorkbench: true,
+    uniqueStation: true,
+    hasSectors: true
+  }
+
+  const empireGapsComputed = computed<{ operations: EmpireGapItem[]; supply: EmpireGapItem[] }>(() => {
+    const flows = getStationComponentGapFlows(activeStation.value?.id || null)
+    const { waresMap } = gameData
+    const racePref = settings.value.racePreference
+
+    interface ItemWithName {
+      id: string
+      name: string
+      wareId: string
+      netRate: number
+      netValue: number
+      tier: number
+      contributions?: any[]
+      disableAdd: boolean
+      disableRemove: boolean
+    }
+
+    const byTierThenName = (a: ItemWithName, b: ItemWithName) => {
+      const tierA = Number(a.tier ?? 0)
+      const tierB = Number(b.tier ?? 0)
+      if (tierA !== tierB) return tierB - tierA
+      const nameA = String(a.name || '')
+      const nameB = String(b.name || '')
+      return nameA.localeCompare(nameB, 'en')
+    }
+
+    const toItem = (flow: any): ItemWithName => {
+      const module = gameData.findModuleForWare(flow.wareId, racePref)
+      const plannedIndex = module ? plannedModules.value.findIndex(m => m.id === module.id) : -1
+      const wareInfo = waresMap[flow.wareId]
+      return {
+        id: flow.wareId,
+        name: wareInfo?.name || flow.wareId,
+        wareId: flow.wareId,
+        netRate: flow.netRate,
+        netValue: flow.netValue || 0,
+        tier: flow.tier ?? 0,
+        contributions: flow.contributions,
+        disableAdd: !module || flow.netRate > 0,
+        disableRemove: !module || plannedIndex === -1
+      }
+    }
+
+    const stripName = (item: ItemWithName): EmpireGapItem => ({
+      id: item.id,
+      wareId: item.wareId,
+      netRate: item.netRate,
+      netValue: item.netValue,
+      tier: item.tier,
+      contributions: item.contributions,
+      disableAdd: item.disableAdd,
+      disableRemove: item.disableRemove
+    })
+
+    return {
+      operations: flows.operations
+        .filter((flow: any) => flow.netRate < 0 || getResolvedLevel(flow.wareId) > 0)
+        .map(toItem)
+        .sort(byTierThenName)
+        .map(stripName),
+      supply: flows.supply
+        .map(toItem)
+        .filter((item: ItemWithName) => item.netRate <= 0 || !item.disableRemove)
+        .sort(byTierThenName)
+        .map(stripName)
+    }
+  })
+
+  const workbench: ProductionWorkbenchStoreContract = {
+    mode: 'live',
+    capabilities,
+
+    getTabs: () => {
+      const result: any[] = []
+      result.push({ id: 'overview', type: 'overview', name: '' })
+      sectors.value.forEach(sector => {
+        result.push({ id: `transit-${sector.id}`, type: 'transit', name: sector.name, sectorId: sector.id })
+        if (expandedSectorId.value === sector.id) {
+          orderedStationsBySector.value
+            .filter(s => s.sectorId === sector.id)
+            .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: s.sectorId ?? undefined, stationType: s.type }))
+        }
+      })
+      orderedStationsBySector.value
+        .filter(s => !s.sectorId)
+        .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: undefined, stationType: s.type }))
+      return result
+    },
+    getActiveTabId: () => activeTransitSectorId.value ? `transit-${activeTransitSectorId.value}` : activeStationId.value || 'overview',
+    getExpandedSectorId: () => expandedSectorId.value,
+    getWorkbenchMode: () => activeTransitSectorId.value ? 'transit' : (activeStation.value ? 'station' : 'overview'),
+    getActiveStationId: () => activeStationId.value,
+    getActiveTransitSectorId: () => activeTransitSectorId.value,
+
+    getTitleModel: () => ({
+      value: activeBinding.value?.bindingName || activeBindingName.value || '',
+      placeholder: i18n.global.t('binding.new_binding_name')
+    }),
+    getToolbarStation: () => activeStation.value ? {
+      id: activeStation.value.id,
+      name: activeStation.value.name,
+      type: activeStation.value.type || 'industrial',
+      count: activeStation.value.count ?? 1,
+      minerals: activeStation.value.minerals || []
+    } : null,
+    getToolbarSettings: () => activeStation.value ? settings.value : null,
+    getToolbarRaces: () => [
+      { value: 'argon', label: i18n.global.t('toolbar.races.argon') },
+      { value: 'terran', label: i18n.global.t('toolbar.races.terran') },
+      { value: 'teladi', label: i18n.global.t('toolbar.races.teladi') },
+      { value: 'paranid', label: i18n.global.t('toolbar.races.paranid') },
+      { value: 'split', label: i18n.global.t('toolbar.races.split') }
+    ],
+    getToolbarStationTypes: () => [
+      { value: 'industrial' as StationType, label: i18n.global.t('toolbar.station_types.industrial') },
+      { value: 'supply' as StationType, label: i18n.global.t('toolbar.station_types.supply') },
+      { value: 'transit' as StationType, label: i18n.global.t('toolbar.station_types.transit') },
+      { value: 'shipyard' as StationType, label: i18n.global.t('toolbar.station_types.shipyard') }
+    ],
+    getAvailableMinerals: () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane'],
+    getSingleBerthThroughput: () => Math.max(1, settings.value.transportShipCapacity || 1) * 15,
+
+    getPlannedModules: () => plannedModules.value,
+    getAutoModules: () => autoIndustryModules.value,
+    getEnforceDlcActivation: () => enforceDlcActivation.value,
+
+    getWareflowViewMode: () => wareflowViewMode.value,
+    getGroupedFlows: () => groupedFlows.value,
+    getWareflowSettings: () => ({
+      resourceBufferHours: settings.value.resourceBufferHours,
+      primaryProductBufferHours: settings.value.primaryProductBufferHours,
+      secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
+      buyMultiplier: settings.value.buyMultiplier,
+      sellMultiplier: settings.value.sellMultiplier,
+      racePreference: settings.value.racePreference,
+      showEmpireGaps: settings.value.showEmpireGaps ?? false,
+      transportMinutes: settings.value.transportMinutes
+    }),
+    getEmpireGaps: () => empireGapsComputed.value,
+
+    getStationAnalysis: () => stationAnalysis.value,
+    getDashboardSettings: () => ({
+      transportShipCapacity: settings.value.transportShipCapacity,
+      workforceAuto: settings.value.workforceAuto,
+      manualWorkforce: settings.value.manualWorkforce,
+      useHQ: settings.value.useHQ
+    }),
+    getCurrentEfficiency: () => currentEfficiency.value,
+    getActualWorkforce: () => actualWorkforce.value,
+    getBuildPriceMultiplier: () => buildPriceMultiplier.value,
+
+    isOverview: () => !activeStation.value && !activeTransitSectorId.value,
+    getProductionSource: () => 'save-binding',
+    getImportActiveStationId: () => activeStationId.value,
+    getImportActiveStation: () => activeStation.value ? { id: activeStation.value.id, modules: activeStation.value.modules } : null,
+
+    selectOverview: () => selectStation(null),
+    selectTransit: (sectorId: string) => selectTransitSector(sectorId),
+    selectStation: (stationId: string) => selectStation(stationId),
+    expandSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
+
+    createStation: (name?: string, type?: StationType) => {
+      const station = createStation(name || i18n.global.t('sector.new_station_name'), type || 'industrial')
+      return station?.id || null
+    },
+    renameStation: (stationId: string, name: string) => renameStation(stationId, name),
+    duplicateStation: () => null,
+    deleteStation: (stationId: string) => deleteStation(stationId),
+
+    updateTitle: (value: string) => { activeBindingName.value = value },
+    updateStationName: (value: string) => {
+      if (activeStation.value) renameStation(activeStation.value.id, value)
+    },
+    updateStationType: (value: StationType) => {
+      if (activeStation.value) updateStationType(activeStation.value.id, value)
+    },
+    updateStationCount: (value: number) => {
+      if (activeStation.value) updateStationCount(activeStation.value.id, value)
+    },
+    toggleMineral: (mineral: string) => {
+      if (!activeStation.value) return
+      const current = activeStation.value.minerals || []
+      const newMinerals = current.includes(mineral)
+        ? current.filter((m: string) => m !== mineral)
+        : [...current, mineral]
+      updateStationMinerals(activeStation.value.id, newMinerals)
+    },
+    updateSunlight: (value: number) => updateStationSettingsDirect('sunlight', value),
+    updateTransportMinutes: (value: number) => updateStationSettingsDirect('transportMinutes', value),
+    updateRacePreference: (value: string) => updateStationSettingsDirect('racePreference', value),
+    updateWorkforce: (value: boolean) => updateStationSettingsDirect('considerWorkforceForAutoFill', value),
+    updateShowEmpireGaps: (value: boolean) => updateStationSettingsDirect('showEmpireGaps', value),
+
+    updatePlannedModules: (modules: SavedModule[]) => {
+      if (activeStation.value) updateStationModules(activeStation.value.id, modules)
+    },
+    addModule: (moduleId: string, options?: ProductionAddModuleOptions) => {
+      if (options?.source === 'gap' && options.wareId) {
+        const module = gameData.findModuleForWare(options.wareId, settings.value.racePreference)
+        if (module) addModule(module.id, 1)
+      } else {
+        addModule(moduleId, 1)
+      }
+    },
+    removeModule: (target: ProductionRemoveModuleTarget) => {
+      if ('moduleId' in target && target.source === 'gap') {
+        const module = gameData.findModuleForWare(target.wareId || '', settings.value.racePreference)
+        if (!module) return
+        const plannedIndex = plannedModules.value.findIndex(m => m.id === module.id)
+        if (plannedIndex === -1) return
+        const current = plannedModules.value[plannedIndex]?.count ?? 0
+        if (current <= 1) removeModule(plannedIndex)
+        else updateModuleCount(plannedIndex, current - 1)
+      } else {
+        removeModule(target.index)
+      }
+    },
+    updateModuleCount: (index: number, count: number) => updateModuleCount(index, count),
+
+    updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
+    updateResourceBufferHours: (value: number) => updateStationSettingsDirect('resourceBufferHours', value),
+    updatePrimaryProductBufferHours: (value: number) => updateStationSettingsDirect('primaryProductBufferHours', value),
+    updateSecondaryProductBufferHours: (value: number) => updateStationSettingsDirect('secondaryProductBufferHours', value),
+    updateBuyMultiplier: (value: number) => updateStationSettingsDirect('buyMultiplier', value),
+    updateSellMultiplier: (value: number) => updateStationSettingsDirect('sellMultiplier', value),
+    toggleWareLock: (wareId: string) => toggleWareLock(wareId),
+    toggleWarePriority: (wareId: string) => toggleWarePriority(wareId),
+
+    updateTransportShipCapacity: (value: number) => updateStationSettingsDirect('transportShipCapacity', value),
+    updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
+    updateManualWorkforce: (value: number) => updateStationSettingsDirect('manualWorkforce', value),
+    updateWorkforceAuto: (value: boolean) => updateStationSettingsDirect('workforceAuto', value),
+    updateUseHQ: (value: boolean) => updateStationSettingsDirect('useHQ', value),
+
+    openImport: () => { importModalOpen.value = true },
+    applyImportedStationPayload: (stationId: string, payload: ImportPayload) => {
+      applyImportedStationPayload(stationId, payload)
+    },
+    updateStationModules: (stationId: string, modules: SavedModule[]) => updateStationModules(stationId, modules),
+    getStationById: (stationId: string) => {
+      const station = getStationById(stationId)
+      return station ? { id: station.id, modules: station.modules } : null
+    },
+
+    isWareLocked: (wareId: string) => isWareLocked(wareId),
+    getResolvedLevel: (wareId: string) => getResolvedLevel(wareId),
+    isWareOperable: (wareId: string) => isWareOperable(wareId),
+    isPlannedWare: (wareId: string) => isPlannedWare(wareId),
+
+    getWares: () => wares.value,
+    getModulesMap: () => gameData.localizedModulesMap
+  }
+
   return {
     isReady,
     isDirty,
@@ -899,6 +1183,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     updateModuleCount,
     removeModuleById,
     transferModuleFromAutoIndustry,
-    clearAll: clearAllModules
+    clearAll: clearAllModules,
+    workbench,
+    importModalOpen
   }
 })

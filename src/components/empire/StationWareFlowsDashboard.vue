@@ -95,14 +95,22 @@ const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.roun
 const wrapFlow = (flow: any) => {
   const wareInfo = props.wares[flow.wareId]
   return {
+    ...flow,
     id: flow.wareId,
-    name: wareInfo ? translateWare(wareInfo) : flow.wareId,
-    ...flow
+    name: wareInfo ? translateWare(wareInfo) : flow.wareId
   }
 }
 
 const hasEmpireGapItems = computed(() =>
   props.empireGaps.operations.length > 0 || props.empireGaps.supply.length > 0
+)
+
+const empireGapOperations = computed(() =>
+  props.empireGaps.operations.map(wrapFlow)
+)
+
+const empireGapSupply = computed(() =>
+  props.empireGaps.supply.map(wrapFlow)
 )
 
 const totalProfit = computed(() => {
@@ -284,10 +292,10 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
 
       <div v-if="viewMode === 'economy' || viewMode === 'quantity'" class="volume-groups-container">
           <div v-if="props.settings.showEmpireGaps && viewMode === 'quantity' && hasEmpireGapItems" class="empire-gap-groups">
-            <div v-if="props.empireGaps.operations.length > 0" class="empire-gap-group">
+            <div v-if="empireGapOperations.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
                 :title="t('wareflow.sector_operations')"
-                :items="props.empireGaps.operations"
+                :items="empireGapOperations"
                 :viewMode="viewMode"
                 :showAddButton="true"
                 :showRemoveButton="true"
@@ -295,10 +303,10 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
                 @remove="handleRemoveModule"
               />
             </div>
-            <div v-if="props.empireGaps.supply.length > 0" class="empire-gap-group">
+            <div v-if="empireGapSupply.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
                 :title="t('wareflow.sector_supply')"
-                :items="props.empireGaps.supply"
+                :items="empireGapSupply"
                 :viewMode="viewMode"
                 :showAddButton="true"
                 :showRemoveButton="true"

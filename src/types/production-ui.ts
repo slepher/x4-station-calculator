@@ -87,7 +87,6 @@ export interface StationModulePickerEmits {
 
 export interface EmpireGapItem {
   id: string
-  name: string
   wareId: string
   netRate: number
   netValue: number

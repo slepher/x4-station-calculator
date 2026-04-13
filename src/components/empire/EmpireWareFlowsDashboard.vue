@@ -49,9 +49,9 @@ const localPriceMultiplier = computed({
 const wrapFlow = (flow: any) => {
   const wareInfo = gameData.waresMap?.[flow.wareId]
   return {
+    ...flow,
     id: flow.wareId,
-    name: wareInfo ? translateWare(wareInfo) : flow.wareId,
-    ...flow
+    name: wareInfo ? translateWare(wareInfo) : flow.wareId
   }
 }
 
