@@ -60,7 +60,8 @@ const empireWareFlowDerived = useEmpireWareFlowDerived({
 const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
   sectorId: activeTransitSectorId.value,
   racePreference: liveStore.settings.racePreference,
-  transportShipCapacity: liveStore.settings.transportShipCapacity
+  transportShipCapacity: liveStore.settings.transportShipCapacity,
+  storageBufferHours: liveStore.settings.primaryProductBufferHours
 }))
 </script>
 
