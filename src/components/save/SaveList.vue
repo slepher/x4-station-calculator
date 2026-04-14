@@ -99,7 +99,7 @@ function isSelected(guid: string, time: number): boolean {
 
 <style scoped>
 .save-list {
-  @apply flex flex-col gap-2 bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden p-4;
+  @apply flex flex-col gap-2;
 }
 
 .empty-hint {

@@ -220,7 +220,7 @@ async function processXmlFile(file: File) {
 
 <style scoped>
 .save-upload-panel {
-  @apply flex flex-col gap-3 bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden p-4;
+  @apply flex flex-col gap-3;
 }
 
 .upload-zone {
