@@ -69,7 +69,7 @@ export function compareModulesByPickerOrder(
   return getModulePickerLabel(a).localeCompare(getModulePickerLabel(b))
 }
 
-function sortModulesBySearchPriority(
+export function sortModulesBySearchPriority(
   modules: { id: string; group?: string; tier?: number; localeName?: string; name?: string }[],
   localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
 ): void {

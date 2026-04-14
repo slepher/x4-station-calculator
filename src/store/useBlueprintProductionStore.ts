@@ -90,7 +90,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     productionSource,
     activeEmpire,
     activeBinding: ref(null),
-    selectedArchive: ref(null)
+    playerStationRecords: ref([])
   })
 
   const orderedStations = sourceView.orderedStationsBySector

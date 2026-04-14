@@ -123,7 +123,7 @@ export function computeExpandUpstream(
   return result
 }
 
-function traceWareDependencies(
+export function traceWareDependencies(
   seeds: Array<{ wareId: string; race: string }>,
   ctx: ExpandContext
 ): { modules: Set<string>; wares: Set<string> } {
