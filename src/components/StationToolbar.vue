@@ -45,7 +45,7 @@ const smartDialog = reactive({
 const activeView = computed(() => shipBuildStore.activeView)
 const isFlowView = computed(() => activeView.value === 'flow')
 const isShipBuildView = computed(() => activeView.value === 'ship-build')
-const isLiveView = computed(() => activeView.value === 'live-production')
+const isLiveView = computed(() => activeView.value === 'live-production' || activeView.value === 'maps')
 const isShipActionDisabled = computed(() => isShipBuildView.value && !shipBuildStore.selectedShipId)
 
 const activeToolbarStoreType = computed<ToolbarStoreType>(() => {

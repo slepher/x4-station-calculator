@@ -189,22 +189,6 @@ function onSelectBindingGroup(sectorGroupId: string) {
   layer.value = 'binding-station'
 }
 
-function onCancelBindingChanges() {
-  saveBindingStore.discardChanges()
-
-  if (layer.value !== 'binding-station' || !selectedSectorGroupId.value) return
-
-  const sectorExists = Boolean(saveBindingStore.activeBinding?.groups.some((item) => item.id === selectedSectorGroupId.value))
-  if (!sectorExists) {
-    selectedSectorGroupId.value = null
-    layer.value = 'binding-sector'
-  }
-}
-
-function onSaveBindingChanges() {
-  saveBindingStore.saveBinding()
-}
-
 function onClose() {
   emit('active-category-change', null)
   emit('close')
@@ -264,24 +248,6 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
       >
         {{ t('map.binding_close') }}
       </button>
-      <div v-if="isBindingLayer" class="map-save-panel__header-actions">
-        <button
-          class="map-save-panel__header-btn subtle"
-          type="button"
-          :disabled="!saveBindingStore.activeBinding || !saveBindingStore.isDirty"
-          @click="onCancelBindingChanges"
-        >
-          {{ t('map.binding_cancel') }}
-        </button>
-        <button
-          class="map-save-panel__header-btn"
-          type="button"
-          :disabled="!saveBindingStore.activeBinding || !saveBindingStore.isDirty"
-          @click="onSaveBindingChanges"
-        >
-          {{ t('map.binding_save') }}
-        </button>
-      </div>
     </div>
 
     <div class="map-save-panel__body scrollbar-thin">
@@ -347,22 +313,6 @@ watch([layer, selectedBindingGameGuid, selectedSectorGroupId, () => props.open],
 
 .map-save-panel__close {
   @apply rounded border border-amber-300/30 bg-transparent px-2 py-1 text-xs text-amber-100 transition-colors duration-150 hover:border-amber-200/60 hover:text-amber-50;
-}
-
-.map-save-panel__header-actions {
-  @apply flex shrink-0 items-center gap-2;
-}
-
-.map-save-panel__header--binding .map-save-panel__header-actions {
-  @apply justify-end;
-}
-
-.map-save-panel__header-btn {
-  @apply rounded border border-amber-300/30 bg-amber-500/15 px-2 py-1 text-xs font-bold text-amber-100 transition-colors duration-150 hover:border-amber-200/60 hover:bg-amber-500/25 hover:text-amber-50 disabled:cursor-not-allowed disabled:opacity-45;
-}
-
-.map-save-panel__header-btn.subtle {
-  @apply bg-transparent;
 }
 
 .map-save-panel__body {

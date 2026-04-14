@@ -816,7 +816,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
       createEmpire()
       if (activeViewStore.activeView === 'blueprint-production') {
-        activeViewStore.switchToEmpire(savedEmpires.value.activeId || null)
+        activeViewStore.activeEmpireId = activeEmpire.value?.id || null
       }
       isReady.value = true
       console.log('[BlueprintProductionStore] Initialized with new empire')
@@ -842,9 +842,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
 
     console.log('[BlueprintProductionStore] No empires found, creating new empire')
-    createEmpire()
+    const empire = createEmpire()
     if (activeViewStore.activeView === 'blueprint-production') {
-      activeViewStore.setProductionSource('empire')
+      activeViewStore.activeEmpireId = empire.id
     }
   }
 

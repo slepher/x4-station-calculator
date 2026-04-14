@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, onMounted, watch } from 'vue'
+import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -19,10 +20,13 @@ import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuil
 import TransitHubCenterDashboard from '@/components/empire/transit-hub/TransitHubCenterDashboard.vue'
 import TransitHubMaterialsPanel from '@/components/empire/transit-hub/TransitHubMaterialsPanel.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
+import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
+import SaveList from '@/components/save/SaveList.vue'
 
 const liveStore = useLiveProductionStore()
 const activeViewStore = useActiveViewStore()
 const gameData = useGameDataStore()
+const { t } = useI18n()
 
 onMounted(() => {
   const gameGuid = activeViewStore.activeBinding
@@ -152,8 +156,12 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     </div>
 
     <div v-else-if="isOverview" class="overview-layout mt-6">
-      <div class="col-span-1 lg:col-span-2">
-        <div class="sector-management-placeholder" aria-hidden="true"></div>
+      <div class="overview-left-panel panel-card">
+        <div class="panel-header">{{ t('save_import.title') }}</div>
+        <div class="panel-content">
+          <SaveUploadPanel @upload-complete="() => {}" />
+          <SaveList />
+        </div>
       </div>
 
       <div class="col-span-1 lg:col-span-3">
@@ -232,7 +240,19 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
   @apply grid grid-cols-1 lg:grid-cols-5 gap-8 items-start;
 }
 
-.sector-management-placeholder {
-  min-height: 1px;
+.overview-left-panel {
+  @apply lg:col-span-2 flex flex-col;
+}
+
+.overview-left-panel.panel-card {
+  @apply bg-slate-900/40 rounded-lg border border-slate-800 shadow-xl overflow-hidden;
+}
+
+.overview-left-panel .panel-header {
+  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30;
+}
+
+.overview-left-panel .panel-content {
+  @apply p-4 flex flex-col gap-4;
 }
 </style>
