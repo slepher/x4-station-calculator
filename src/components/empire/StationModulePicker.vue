@@ -37,7 +37,7 @@ const updatePopoverPosition = async () => {
   let baseLeft = searchRect.right
   if (panelWrapper) {
     const panelRect = panelWrapper.getBoundingClientRect()
-    baseLeft = panelRect.right + 16
+    baseLeft = panelRect.right + 8
   } else {
     baseLeft = searchRect.right + 8
   }
