@@ -249,7 +249,7 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
 }
 
 .overview-left-panel .panel-header {
-  @apply h-12 flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-800/70 bg-slate-900/50;
+  @apply flex items-center px-4 text-slate-200 text-sm font-semibold border-b border-slate-700/50 bg-slate-800/30;
 }
 
 .overview-left-panel .panel-content {
