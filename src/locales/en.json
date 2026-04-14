@@ -572,6 +572,10 @@
     "x4_station_failed": "Import failed. Please check x4-station URL format."
   },
   "planning": {
+    "modules_title": "Modules",
+    "tab_plan": "Plan",
+    "tab_archive": "Archive",
+    "archive_empty": "No modules in save archive",
     "module_list": "Station Modules",
     "tier_planned": "Planned Modules",
     "tier_industry": "Auto Industry",
