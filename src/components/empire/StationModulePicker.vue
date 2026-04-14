@@ -50,8 +50,8 @@ const updatePopoverPosition = async () => {
 
 const onFocus = async () => {
   focusSnapshot.value = props.searchQuery || ''
-  isFocused.value = true
   await updatePopoverPosition()
+  isFocused.value = true
 }
 
 const onBlur = () => {
