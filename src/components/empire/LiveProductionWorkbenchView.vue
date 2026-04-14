@@ -220,6 +220,8 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
         @update-use-hq="dashboardPresenter.emits.updateUseHQ"
       />
     </div>
+  </div>
+</template>
 
 <style scoped>
 .main-layout {
