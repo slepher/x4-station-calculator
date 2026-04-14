@@ -5,14 +5,14 @@ import type {
   ModuleGroupResult
 } from '@/types/x4'
 
-export const TYPE_PRIORITY: Record<string, number> = {
+const TYPE_PRIORITY: Record<string, number> = {
   production: 1,
   processingmodule: 2,
   habitation: 3,
   storage: 4
 }
 
-export const GROUP_PRIORITY: Record<string, number> = {
+const GROUP_PRIORITY: Record<string, number> = {
   shiptech: 1,
   hightech: 2,
   refined: 3,
@@ -69,7 +69,7 @@ export function compareModulesByPickerOrder(
   return getModulePickerLabel(a).localeCompare(getModulePickerLabel(b))
 }
 
-export function sortModulesBySearchPriority(
+function sortModulesBySearchPriority(
   modules: { id: string; group?: string; tier?: number; localeName?: string; name?: string }[],
   localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
 ): void {

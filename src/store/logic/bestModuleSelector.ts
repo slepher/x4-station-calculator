@@ -70,13 +70,13 @@ export function findBestProducer(
   return selectBestModule(existingCandidates, dbCandidates, race, sortByOutput);
 }
 
-export function findStandardPowerPlant(
+function findStandardPowerPlant(
   race: string,
   existingModules: SavedModule[],
   modules: Record<string, X4Module>,
   wares: Record<string, X4Ware>
 ): X4Module | undefined {
-  return findBestProducer('energycells', race, existingModules, modules, wares);
+  return findBestProducer('energycells', race, existingModules, modules, wares)
 }
 
 /**

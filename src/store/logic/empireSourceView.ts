@@ -6,12 +6,11 @@ import {
   deriveBindingStationsFromRecords,
   parseBindingStationId,
   createBindingPlanStationId,
+  type ProductionSourceKind,
   type DerivedBindingStation,
   type ParsedBindingStationId
 } from './productionSourceAdapter'
 import { normalizeSectorLinkKey } from './sectorLinks'
-
-export type ProductionSourceKind = 'empire' | 'save-binding'
 
 export interface EmpireSourceViewDeps {
   productionSource: Ref<ProductionSourceKind>

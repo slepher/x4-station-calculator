@@ -13,7 +13,7 @@ import type {
 import type { SolveMultiWareByLinkOutput } from './sectorLinkFlow'
 import { getPriceByMultiplier } from './calculatorUtils'
 
-export const DEFAULT_TRANSIT_STORAGE_BUFFER_HOURS = 12
+const DEFAULT_TRANSIT_STORAGE_BUFFER_HOURS = 12
 
 interface BuildTransitHubViewModelInput {
   sectorId: string | null
@@ -238,7 +238,7 @@ function sortStorageFlows(a: SupplyStorageFlow, b: SupplyStorageFlow) {
   return a.wareId.localeCompare(b.wareId)
 }
 
-export function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsInput): SupplyStorageFlow[] {
+function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsInput): SupplyStorageFlow[] {
   const {
     sectorId,
     sectors,
@@ -324,7 +324,7 @@ export function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsIn
     .sort(sortStorageFlows)
 }
 
-export function buildTransitHubStorageModulePlans(input: {
+function buildTransitHubStorageModulePlans(input: {
   storageFlows: SupplyStorageFlow[]
   modulesMap?: Record<string, X4Module>
   racePreference: string

@@ -19,42 +19,31 @@ import {
   calculateEfficiencySaturation
 } from './workforceCalculator'
 
-export interface CalculateProductionFlowsInput {
+export interface CalculateAutoFillInput {
   plannedModules: SavedModule[]
   settings: StationSettings
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
   lockedWares: string[]
-  medicalConsumptionMap: RaceMedicalConsumption
-  warePriority: Record<string, number>
 }
 
-export interface CalculateProductionFlowsOutput {
+export interface CalculateAutoFillOutput {
   autoIndustryModules: SavedModule[]
-  productionFlows: WareProductionFlow[]
-  actualWorkforce: number
-  currentEfficiency: number
 }
 
-export function calculateProductionFlows(
-  input: CalculateProductionFlowsInput
-): CalculateProductionFlowsOutput {
+export function calculateAutoFillModules(
+  input: CalculateAutoFillInput
+): CalculateAutoFillOutput {
   const {
     plannedModules,
     settings,
     modulesMap,
     waresMap,
-    lockedWares,
-    medicalConsumptionMap,
-    warePriority
+    lockedWares
   } = input
 
   const race = settings.racePreference
   const globalWorkforceBonus = settings.considerWorkforceForAutoFill
-
-  // ==========================================
-  // Phase 1: 工业硬补完 (Tier 2 Calculation)
-  // ==========================================
 
   const industryModules: Record<string, number> = {}
   plannedModules.forEach(m => {
@@ -114,10 +103,6 @@ export function calculateProductionFlows(
     .filter(m => m.count > 0)
     .sort((a, b) => (modulesMap[b.id]?.tier || 0) - (modulesMap[a.id]?.tier || 0))
 
-  // ==========================================
-  // Phase 2: 居住舱补完
-  // ==========================================
-
   const allProducers: SavedModule[] = [...plannedModules, ...autoIndustry]
   const clientPopulation = calculateTotalWorkforceInternal(allProducers, modulesMap)
 
@@ -148,25 +133,114 @@ export function calculateProductionFlows(
     }
   }
 
-  // ==========================================
-  // Phase 3: 产量计算
-  // ==========================================
+  return { autoIndustryModules: autoIndustry }
+}
 
-  const allModules = [...plannedModules, ...autoIndustry]
+export interface CalculateProductionFlowsCoreInput {
+  plannedModules: SavedModule[]
+  autoIndustryModules: SavedModule[]
+  modulesMap: Record<string, X4Module>
+  waresMap: Record<string, X4Ware>
+  medicalConsumptionMap: RaceMedicalConsumption
+  settings: StationSettings
+  warePriority: Record<string, number>
+  actualWorkforceOverride?: number
+  saturationOverride?: number
+}
+
+export interface CalculateProductionFlowsCoreOutput {
+  productionFlows: WareProductionFlow[]
+  actualWorkforce: number
+  currentEfficiency: number
+}
+
+export function calculateProductionFlowsCore(
+  input: CalculateProductionFlowsCoreInput
+): CalculateProductionFlowsCoreOutput {
+  const {
+    plannedModules,
+    autoIndustryModules,
+    modulesMap,
+    waresMap,
+    medicalConsumptionMap,
+    settings,
+    warePriority,
+    actualWorkforceOverride,
+    saturationOverride
+  } = input
+
+  const allModules = [...plannedModules, ...autoIndustryModules]
   const internalResult = calculateProductionFlowsInternal(
     allModules,
     modulesMap,
     waresMap,
     medicalConsumptionMap,
     settings,
-    warePriority
+    warePriority,
+    actualWorkforceOverride,
+    saturationOverride
   )
 
   return {
-    autoIndustryModules: autoIndustry,
     productionFlows: internalResult.productionFlows,
     actualWorkforce: internalResult.actualWorkforce,
     currentEfficiency: internalResult.saturation
+  }
+}
+
+export interface CalculateProductionFlowsInput {
+  plannedModules: SavedModule[]
+  settings: StationSettings
+  modulesMap: Record<string, X4Module>
+  waresMap: Record<string, X4Ware>
+  lockedWares: string[]
+  medicalConsumptionMap: RaceMedicalConsumption
+  warePriority: Record<string, number>
+}
+
+export interface CalculateProductionFlowsOutput {
+  autoIndustryModules: SavedModule[]
+  productionFlows: WareProductionFlow[]
+  actualWorkforce: number
+  currentEfficiency: number
+}
+
+export function calculateProductionFlows(
+  input: CalculateProductionFlowsInput
+): CalculateProductionFlowsOutput {
+  const {
+    plannedModules,
+    settings,
+    modulesMap,
+    waresMap,
+    lockedWares,
+    medicalConsumptionMap,
+    warePriority
+  } = input
+
+  const autoFillResult = calculateAutoFillModules({
+    plannedModules,
+    settings,
+    modulesMap,
+    waresMap,
+    lockedWares
+  })
+
+  const coreResult = calculateProductionFlowsCore({
+    plannedModules,
+    autoIndustryModules: autoFillResult.autoIndustryModules,
+    modulesMap,
+    waresMap,
+    medicalConsumptionMap,
+    settings,
+    warePriority
+  })
+
+  return {
+    autoIndustryModules: autoFillResult.autoIndustryModules,
+    productionFlows: coreResult.productionFlows,
+    actualWorkforce: coreResult.actualWorkforce,
+    currentEfficiency: coreResult.currentEfficiency
   }
 }
 
@@ -228,7 +302,9 @@ function calculateProductionFlowsInternal(
   waresMap: Record<string, X4Ware>,
   medicalConsumptionMap: RaceMedicalConsumption,
   settings: StationSettings,
-  _warePriority: Record<string, number>
+  _warePriority: Record<string, number>,
+  actualWorkforceOverride?: number,
+  saturationOverride?: number
 ): ProductionFlowsInternalResult {
   const flowMap: Record<string, WareProductionFlow> = {}
 
@@ -264,8 +340,8 @@ function calculateProductionFlowsInternal(
   }
 
   const workforceBreakdown = calculateWorkforceBreakdown(plannedModules, modulesMap, settings)
-  const actualWorkforce = calculateActualWorkforce(workforceBreakdown, settings)
-  const saturation = calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
+  const actualWorkforce = actualWorkforceOverride ?? calculateActualWorkforce(workforceBreakdown, settings)
+  const saturation = saturationOverride ?? calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
 
   plannedModules.forEach(item => {
     const info = modulesMap[item.id]

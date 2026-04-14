@@ -161,7 +161,7 @@ export const filterTypesByClass = (
   return shipTypes.filter((type) => type.class.includes(shipClass))
 }
 
-export const filterEquipmentCandidates = (
+const filterEquipmentCandidates = (
   candidates: FitEquipmentOption[],
   filters: EquipmentPickerFilters
 ): FitEquipmentOption[] => {
@@ -173,7 +173,7 @@ export const filterEquipmentCandidates = (
     .filter((item) => matchesTags(normalizeTags(item), tags))
 }
 
-export const extractEquipmentSlotCandidates = (payload: {
+const extractEquipmentSlotCandidates = (payload: {
   shipMap: ShipLookup
   equipmentMap: EquipmentLookup
   shipId: string
