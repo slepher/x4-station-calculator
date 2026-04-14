@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+
 import { useI18n } from 'vue-i18n'
 import type { SavedModule } from '@/types/x4'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
