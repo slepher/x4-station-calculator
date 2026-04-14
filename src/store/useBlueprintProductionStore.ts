@@ -326,8 +326,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function updateStationSettingsDirect(key: keyof StationSettings, value: StationSettings[keyof StationSettings]): void {
+    console.log('[BlueprintStore] updateStationSettingsDirect called', { key, value, stationId: activeStation.value?.id })
     writeAndRecomputeActive((stationId) => {
       const current = getSettings(stationId)
+      console.log('[BlueprintStore] updateStationSettingsDirect inside writer', { stationId, key, value, currentUseHQ: current.useHQ })
       patchStationState(stationId, {
         settings: { ...current, [key]: value }
       })

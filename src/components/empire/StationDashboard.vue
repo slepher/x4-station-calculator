@@ -143,7 +143,10 @@ const workforceAuto = computed({
 })
 const useHQ = computed({
   get: () => props.settings.useHQ,
-  set: (val: boolean) => emit('updateUseHQ', val)
+  set: (val: boolean) => {
+    console.log('[StationDashboard] useHQ setter called', { val, current: props.settings.useHQ })
+    emit('updateUseHQ', val)
+  }
 })
 
 const workforceSliderDraft = ref(0)

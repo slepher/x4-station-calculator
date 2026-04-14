@@ -433,8 +433,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function updateStationSettingsDirect(key: keyof StationSettings, value: StationSettings[keyof StationSettings]): void {
+    console.log('[LiveStore] updateStationSettingsDirect called', { key, value, stationId: activeStation.value?.id })
     writeAndRecomputeActive((stationId) => {
       const current = getSettings(stationId)
+      console.log('[LiveStore] updateStationSettingsDirect inside writer', { stationId, key, value, currentUseHQ: current.useHQ })
       patchStationState(stationId, {
         settings: { ...current, [key]: value }
       })

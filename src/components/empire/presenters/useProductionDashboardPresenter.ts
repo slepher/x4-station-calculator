@@ -47,7 +47,10 @@ export function useProductionDashboardPresenter(store: ProductionWorkbenchStoreC
     updateBuildPriceMultiplier: (value: number) => store.updateBuildPriceMultiplier(value),
     updateManualWorkforce: (value: number) => store.updateManualWorkforce(value),
     updateWorkforceAuto: (value: boolean) => store.updateWorkforceAuto(value),
-    updateUseHQ: (value: boolean) => store.updateUseHQ(value)
+    updateUseHQ: (value: boolean) => {
+      console.log('[DashboardPresenter] updateUseHQ called', { value })
+      store.updateUseHQ(value)
+    }
   }
 
   return { props, emits }
