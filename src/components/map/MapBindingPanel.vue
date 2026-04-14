@@ -212,7 +212,7 @@ watch([stage, selectedGameGuid, selectedSectorGroupId, () => props.open], () => 
       />
     </div>
 
-    <div class="map-binding-panel__footer">
+    <div v-if="stage === 'select-binding'" class="map-binding-panel__footer">
       <div class="map-binding-panel__hint">
         {{ saveBindingStore.isDirty ? t('map.binding_unsaved') : t('map.binding_saved') }}
       </div>
