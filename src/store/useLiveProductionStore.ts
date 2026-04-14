@@ -1225,6 +1225,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getStationComponentGapFlows,
     getTransitHubViewModel,
     buildPriceMultiplier,
+    playerStationRecords,
     plannedModules,
     settings,
     lockedWares,

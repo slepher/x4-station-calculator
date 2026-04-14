@@ -574,6 +574,10 @@
     "x4_station_failed": "导入失败，请检查 x4-station URL 格式。"
   },
   "planning": {
+    "modules_title": "模组",
+    "tab_plan": "规划",
+    "tab_archive": "存档",
+    "archive_empty": "存档中无模块数据",
     "module_list": "模块列表",
     "tier_planned": "用户规划区",
     "tier_industry": "自动工业区",

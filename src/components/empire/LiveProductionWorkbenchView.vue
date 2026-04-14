@@ -9,7 +9,7 @@ import { useProductionPlanningPresenter } from '@/components/empire/presenters/u
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
 import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmpireWareFlowDerived'
-import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
+import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
 import ContextToolbar from '@/components/empire/ContextToolbar.vue'
@@ -170,7 +170,7 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
 
   <div v-else class="main-layout mt-6">
     <div class="col-span-12 lg:col-span-3">
-      <StationPlanningPanel
+      <StationPlanningPanelWrapper
         :planned-modules="planningPresenter.props.plannedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
