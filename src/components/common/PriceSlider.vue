@@ -50,16 +50,13 @@ const commitValue = (e: Event) => {
 </template>
 
 <style scoped>
-/* 占满 flex 容器分配的 1/2 空间 */
 .slider-container {
   @apply flex-1;
 }
 
-/* 核心：确保文字和滑块在一行内，并限制最大宽度防止过长 */
 .slider-wrapper {
   @apply space-y-1.5;
   max-width: 240px;
-  /* 固定一个合适的宽度值，确保在不同页面视觉一致 */
 }
 
 .slider-header {
@@ -74,11 +71,35 @@ const commitValue = (e: Event) => {
   @apply w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer focus:outline-none;
 }
 
+.custom-range::-webkit-slider-thumb {
+  @apply appearance-none w-4 h-4 rounded-full cursor-pointer;
+}
+
+.custom-range::-moz-range-thumb {
+  @apply w-4 h-4 rounded-full border-0 cursor-pointer;
+}
+
 .range-buy {
   @apply accent-sky-500;
 }
 
+.range-buy::-webkit-slider-thumb {
+  @apply bg-sky-500;
+}
+
+.range-buy::-moz-range-thumb {
+  @apply bg-sky-500;
+}
+
 .range-sell {
   @apply accent-emerald-500;
+}
+
+.range-sell::-webkit-slider-thumb {
+  @apply bg-emerald-500;
+}
+
+.range-sell::-moz-range-thumb {
+  @apply bg-emerald-500;
 }
 </style>
