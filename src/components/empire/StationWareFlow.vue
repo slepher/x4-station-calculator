@@ -37,12 +37,10 @@ const emit = defineEmits<{
 }>()
 
 function handleToggleLock(value: boolean) {
-  console.log('[StationWareFlow] emit update:locked', { resourceId: props.resourceId, value, locked: props.locked })
   emit('update:locked', value)
 }
 
 function handleTogglePriority(value: number) {
-  console.log('[StationWareFlow] emit update:priorityLevel', { resourceId: props.resourceId, value, priorityLevel: props.priorityLevel })
   emit('update:priorityLevel', value)
 }
 

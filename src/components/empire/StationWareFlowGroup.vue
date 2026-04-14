@@ -29,11 +29,8 @@ function handleToggleLock(wareId: string) {
 }
 
 function handleTogglePriority(wareId: string) {
-  console.log('[StationWareFlowGroup] handleTogglePriority', { wareId, hasCallback: !!props.onToggleWarePriority })
   if (props.onToggleWarePriority) {
     props.onToggleWarePriority(wareId)
-  } else {
-    console.warn('[StationWareFlowGroup] onToggleWarePriority callback missing!')
   }
 }
 </script>

@@ -255,7 +255,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   function writeAndRecomputeActive(writer: (stationId: string) => void): void {
     const station = activeStation.value
     const stationId = station?.id || '__local__'
-    console.log('[LiveStore] writeAndRecomputeActive', { stationId, hasStation: !!station, stationName: station?.name })
     if (!station) {
       ensureActiveStationState()
     } else {
@@ -501,11 +500,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const currentLevel = getResolvedLevel(wareId)
     const planned = isPlannedWare(wareId)
     const auto = isAutoWare(wareId)
-    console.log('[LiveStore] toggleWarePriority called', { wareId, currentLevel, planned, auto })
 
     writeAndRecomputeActive((stationId) => {
       const nextPriority = deepClone(getWarePriority(stationId))
-      console.log('[LiveStore] toggleWarePriority writing', { stationId, wareId, currentPriority: nextPriority[wareId] })
 
       if (planned) {
         if (currentLevel === 2) nextPriority[wareId] = 1
@@ -514,8 +511,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         if (currentLevel === 0) nextPriority[wareId] = 1
         else delete nextPriority[wareId]
       }
-
-      console.log('[LiveStore] toggleWarePriority result', { nextPriority })
 
       patchStationState(stationId, { warePriority: nextPriority })
     })
@@ -659,7 +654,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   ): boolean {
     const binding = activeBinding.value
     const parsed = parseBindingStationId(stationId)
-    console.log('[LiveStore] updateBindingStationPlan', { stationId, parsedKind: parsed?.kind, hasPatch: !!patch, lockedWares: patch.lockedWares })
     if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
 
     if (parsed.kind === 'plan') {
