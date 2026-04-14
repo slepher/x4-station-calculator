@@ -29,3 +29,14 @@ export function normalizeSectorLinks(rawLinks: unknown, validSectorIds: Set<stri
   })
   return Array.from(set)
 }
+
+export function getLinkedSectorIdsFor(sectorId: string, links: string[]): string[] {
+  const linked = new Set<string>()
+  links.forEach((key) => {
+    const parsed = parseSectorLinkKey(key)
+    if (!parsed) return
+    if (parsed.a === sectorId) linked.add(parsed.b)
+    if (parsed.b === sectorId) linked.add(parsed.a)
+  })
+  return Array.from(linked)
+}
