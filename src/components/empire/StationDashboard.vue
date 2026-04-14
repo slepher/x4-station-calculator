@@ -43,7 +43,7 @@ const emit = defineEmits<{
   updateBuildPriceMultiplier: [value: number]
   updateManualWorkforce: [value: number]
   updateWorkforceAuto: [value: boolean]
-  updateUseHQ: [value: boolean]
+  updateUseHq: [value: boolean]
 }>()
 
 const gameDataStore = useGameDataStore()
@@ -145,7 +145,7 @@ const useHQ = computed({
   get: () => props.settings.useHQ,
   set: (val: boolean) => {
     console.log('[StationDashboard] useHQ setter called', { val, current: props.settings.useHQ })
-    emit('updateUseHQ', val)
+    emit('updateUseHq', val)
   }
 })
 

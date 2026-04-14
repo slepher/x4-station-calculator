@@ -32,7 +32,7 @@ const dashboardSettings = computed(() => ({
 
 const emit = defineEmits<{
   updateBuildPriceMultiplier: [value: number]
-  updateUseHQ: [value: boolean]
+  updateUseHq: [value: boolean]
 }>()
 
 const handleUpdateBuildPriceMultiplier = (value: number) => {
@@ -40,7 +40,7 @@ const handleUpdateBuildPriceMultiplier = (value: number) => {
 }
 
 const handleUpdateUseHQ = (value: boolean) => {
-  emit('updateUseHQ', value)
+  emit('updateUseHq', value)
 }
 </script>
 

@@ -146,7 +146,7 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
           :buildPriceMultiplier="liveStore.buildPriceMultiplier"
           :useHQ="liveStore.settings.useHQ"
           @updateBuildPriceMultiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
-          @updateUseHQ="dashboardPresenter.emits.updateUseHQ"
+          @updateUseHq="dashboardPresenter.emits.updateUseHQ"
         />
       </div>
     </div>
@@ -220,8 +220,6 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
         @update-use-hq="dashboardPresenter.emits.updateUseHQ"
       />
     </div>
-  </div>
-</template>
 
 <style scoped>
 .main-layout {
