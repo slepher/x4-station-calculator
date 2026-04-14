@@ -30,10 +30,21 @@ const onInput = (e: Event) => {
 const updatePopoverPosition = async () => {
   await nextTick()
   if (!searchBoxEl.value) return
-  const rect = searchBoxEl.value.getBoundingClientRect()
+  
+  const searchRect = searchBoxEl.value.getBoundingClientRect()
+  const panelWrapper = searchBoxEl.value.closest('.list-wrapper')
+  
+  let baseLeft = searchRect.right
+  if (panelWrapper) {
+    const panelRect = panelWrapper.getBoundingClientRect()
+    baseLeft = panelRect.right + 16
+  } else {
+    baseLeft = searchRect.right + 8
+  }
+  
   popoverPosition.value = {
-    top: rect.top,
-    left: rect.right + 8
+    top: searchRect.top,
+    left: baseLeft
   }
 }
 
