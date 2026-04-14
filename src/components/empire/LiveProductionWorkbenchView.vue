@@ -19,6 +19,8 @@ import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuil
 import TransitHubCenterDashboard from '@/components/empire/transit-hub/TransitHubCenterDashboard.vue'
 import TransitHubMaterialsPanel from '@/components/empire/transit-hub/TransitHubMaterialsPanel.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
+import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
+import SaveList from '@/components/save/SaveList.vue'
 
 const liveStore = useLiveProductionStore()
 const activeViewStore = useActiveViewStore()
@@ -152,8 +154,9 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     </div>
 
     <div v-else-if="isOverview" class="overview-layout mt-6">
-      <div class="col-span-1 lg:col-span-2">
-        <div class="sector-management-placeholder" aria-hidden="true"></div>
+      <div class="overview-left-panel">
+        <SaveUploadPanel @upload-complete="() => {}" />
+        <SaveList />
       </div>
 
       <div class="col-span-1 lg:col-span-3">
@@ -232,7 +235,7 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
   @apply grid grid-cols-1 lg:grid-cols-5 gap-8 items-start;
 }
 
-.sector-management-placeholder {
-  min-height: 1px;
+.overview-left-panel {
+  @apply lg:col-span-2 flex flex-col gap-4;
 }
 </style>
