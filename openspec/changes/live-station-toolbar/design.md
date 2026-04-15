@@ -25,8 +25,11 @@ LiveStationToolbar.vue
 | Prop | 类型 | 说明 |
 |-----|------|------|
 | `stationCode` | `string` | 存档 station 的 code |
+| `sectorName` | `string` | 存档 sector 的 name |
+| `sectorNameId` | `string \| undefined` | 存档 sector 的 nameId（用于 i18n） |
+| `stationPosition` | `ArchiveStationPosition \| undefined` | 存档 station 的坐标 `{x, y, z}` |
 | `sectorResources` | `string[]` | 存档 sector 的 resources 列表 |
-| `sectorSunlight` | `number` | 存档 sector 的 sunlight 值 |
+| `sectorSunlight` | `number` | 存档 sector 的 sunlight 值 × 100 |
 | `hasBindingStation` | `boolean` | 是否存在 bindingStation 规划 |
 | `hasSaveStation` | `boolean` | 是否存在 saveStation 数据 |
 
@@ -75,11 +78,19 @@ interface ArchiveStationData {
   name?: string
   sectorMacro: string
   
+  // 空间站坐标
+  position?: {
+    x: number
+    y: number
+    z: number
+  }
+  
   // 聚合星区数据（从 map sector 查询）
   sector: {
     name: string
-    resources: string[]    // sector.resources
-    sunlight: number       // sector.sunlight
+    nameId?: string      // sector.nameId（用于 i18n）
+    resources: string[]  // sector.resources
+    sunlight: number     // sector.sunlight
   }
   
   // 已建成模块（存档 station.modules）
@@ -221,8 +232,11 @@ props 数据传递给 LiveStationToolbar
 | `hasBindingStation` | `getBindingStation() !== null` |
 | `hasSaveStation` | `getArchiveStation() !== null` |
 | `stationCode` | `getArchiveStation()?.code` |
-| `sectorResources` | `getSectorResources(getArchiveStation()?.sectorMacro)` |
-| `sectorSunlight` | `getSectorSunlight(getArchiveStation()?.sectorMacro)` |
+| `sectorName` | `getArchiveStation()?.sector.name` |
+| `sectorNameId` | `getArchiveStation()?.sector.nameId` |
+| `stationPosition` | `getArchiveStation()?.position` |
+| `sectorResources` | `getArchiveStation()?.sector.resources` |
+| `sectorSunlight` | `Math.round(getArchiveStation()?.sector.sunlight * 100)` |
 
 ### Sector 数据查询
 
@@ -283,14 +297,24 @@ const canToggle = computed(() => {
 
 ### 4. 光伏效率展示
 
-**决策**: 使用静态数值展示，无输入控件。
+**决策**: 使用静态数值展示，无输入控件。显示百分比格式（原始值 × 100）。
 
 **原因**:
-- 光伏效率来源于存档 sector.sunlight
+- 光伏效率来源于存档 sector.sunlight（0-1 范围）
 - 存档中的光照是固定值，不可修改
+- 百分比格式更直观（如 13% 而非 0.13）
 - 样式使用 count-pill 样式（静态文本容器）
 
-### 5. 规划控件条件渲染
+### 5. 星区名称与坐标展示
+
+**决策**: 新增星区字段，点击弹出坐标 popover。
+
+**原因**:
+- 星区名称支持 i18n（通过 sector.nameId）
+- 坐标来源于 station.relative_position
+- popover 展示 `(x, y, z)` 格式坐标
+
+### 6. 规划控件条件渲染
 
 **决策**: 使用 `v-if="mode === 'planning'"` 控制显示。
 

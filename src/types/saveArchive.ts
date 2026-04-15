@@ -389,6 +389,7 @@ export interface SaveParserConfig {
 
 export interface ArchiveStationSectorData {
   name: string
+  nameId?: string
   resources: string[]
   sunlight: number
 }
@@ -399,11 +400,18 @@ export interface ArchiveStationBuildingData {
   reservation: WareAmount[]
 }
 
+export interface ArchiveStationPosition {
+  x: number
+  y: number
+  z: number
+}
+
 export interface ArchiveStationData {
   code: string
   name?: string
   sectorMacro: string
   sector: ArchiveStationSectorData
+  position?: ArchiveStationPosition
   modules: SavedModule[]
   building: ArchiveStationBuildingData
   cargo?: WareAmount[]

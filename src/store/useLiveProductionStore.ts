@@ -214,9 +214,24 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (!stationId) return null
     
     const parsed = parseBindingStationId(stationId)
-    if (!parsed || parsed.kind !== 'derived') return null
+    if (!parsed) return null
     
-    const code = parsed.saveStationCode
+    const binding = activeBinding.value
+    if (!binding) return null
+    
+    let code: string | null = null
+    
+    if (parsed.kind === 'derived') {
+      code = parsed.saveStationCode
+    } else if (parsed.kind === 'plan') {
+      const plan = binding.stationPlans.find(plan => plan.id === parsed.planId)
+      if (plan && plan.saveStationCode) {
+        code = plan.saveStationCode
+      }
+    }
+    
+    if (!code) return null
+    
     const record = playerStationRecords.value.find(r => r.code === code && r.type === 'station')
     if (!record) return null
     
@@ -226,9 +241,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const sector = gameData.maps?.sectors?.[sectorMacro]
     const sectorData = {
       name: sector?.name || sectorMacro,
+      nameId: sector?.nameId,
       resources: (sector?.resources || []).map(r => r.ware),
       sunlight: sector?.area?.sunlight ?? 100
     }
+    
+    const position = stationEntry.relative_position ? {
+      x: stationEntry.relative_position.x,
+      y: stationEntry.relative_position.y,
+      z: stationEntry.relative_position.z
+    } : undefined
     
     const modules: SavedModule[] = []
     if (stationEntry.modules) {
@@ -274,6 +296,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           name: stationEntry.macro,
           sectorMacro,
           sector: sectorData,
+          position,
           modules,
           building: {
             modules: buildingModules,
@@ -291,6 +314,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       name: stationEntry.macro,
       sectorMacro,
       sector: sectorData,
+      position,
       modules,
       building: {
         modules: buildingModules,
@@ -1310,6 +1334,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getStationFlowCache,
     refreshStationFlowCache,
     clearStationCaches,
+    syncAllBindingStationsToStateMap,
     empireGroupedFlows,
     sectorInternalDataMap,
     sectorLinkCalcMap,

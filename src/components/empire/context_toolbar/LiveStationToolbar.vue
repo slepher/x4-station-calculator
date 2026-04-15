@@ -2,10 +2,14 @@
 import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { StationSettings } from '@/types/x4'
+import type { ArchiveStationPosition } from '@/types/saveArchive'
 
 const props = defineProps<{
   stationName: string
   stationCode: string
+  sectorName: string
+  sectorNameId?: string
+  stationPosition?: ArchiveStationPosition
   sectorResources: string[]
   sectorSunlight: number
   hasBindingStation: boolean
@@ -24,9 +28,10 @@ const emit = defineEmits<{
   openImport: []
 }>()
 
-const { t } = useI18n()
+const { t, te } = useI18n()
 
 const mode = ref<'live' | 'planning'>('planning')
+const showSectorPopover = ref(false)
 
 const initialMode = computed(() => {
   if (props.hasBindingStation && props.hasSaveStation) return 'planning'
@@ -71,6 +76,19 @@ const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
 
 const showResourcesPopover = ref(false)
 
+const displaySectorName = computed(() => {
+  if (props.sectorNameId && te(props.sectorNameId)) {
+    return t(props.sectorNameId)
+  }
+  return props.sectorName || '-'
+})
+
+const positionText = computed(() => {
+  if (!props.stationPosition) return null
+  const { x, y, z } = props.stationPosition
+  return `(${Math.round(x)}, ${Math.round(y)}, ${Math.round(z)})`
+})
+
 const toggleMode = () => {
   if (!canToggle.value) return
   mode.value = mode.value === 'live' ? 'planning' : 'live'
@@ -100,14 +118,16 @@ const handleOpenImport = () => {
         <div class="input-group ml-4">
           <label class="group-label">{{ t('toolbar.mode') }}</label>
           <button 
-            class="mode-toggle-btn"
-            :class="{ disabled: !canToggle }"
+            class="toggle-chip mode-toggle-chip"
+            :class="[
+              mode === 'planning' ? 'active-planning' : 'active-live',
+              { 'no-toggle': !canToggle }
+            ]"
             :disabled="!canToggle"
             @click="toggleMode"
           >
-            <span class="mode-label" :class="{ active: mode === 'live' }">{{ t('toolbar.mode_live') }}</span>
-            <span class="mode-separator">|</span>
-            <span class="mode-label" :class="{ active: mode === 'planning' }">{{ t('toolbar.mode_planning') }}</span>
+            <span class="mode-icon">{{ mode === 'live' ? '📡' : '📝' }}</span>
+            <span class="chip-status">{{ mode === 'live' ? t('toolbar.mode_live') : t('toolbar.mode_planning') }}</span>
           </button>
         </div>
       </div>
@@ -116,6 +136,32 @@ const handleOpenImport = () => {
 
       <div class="toolbar-section">
         <div class="relative">
+          <div 
+            class="input-group cursor-pointer hover:text-sky-400 transition-colors"
+            @click="showSectorPopover = !showSectorPopover"
+          >
+            <label class="group-label cursor-pointer">{{ t('toolbar.sector') }}</label>
+            <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded px-2 min-w-[80px] justify-center h-6">
+              <span class="text-xs font-bold text-sky-400 truncate">{{ displaySectorName }}</span>
+            </div>
+          </div>
+
+          <div v-if="showSectorPopover" class="sector-popover">
+            <div class="popover-header">{{ displaySectorName }}</div>
+            <div class="popover-content">
+              <div class="position-item" v-if="positionText">
+                <span class="text-xs text-slate-400">{{ t('toolbar.position') }}</span>
+                <span class="text-xs font-mono text-sky-400 ml-2">{{ positionText }}</span>
+              </div>
+              <div v-else class="text-xs text-slate-500 text-center py-2">
+                {{ t('toolbar.no_position') }}
+              </div>
+            </div>
+            <div class="fixed inset-0 z-[-1]" @click="showSectorPopover = false"></div>
+          </div>
+        </div>
+
+        <div class="relative ml-6">
           <div 
             class="input-group cursor-pointer hover:text-sky-400 transition-colors"
             @click="showResourcesPopover = !showResourcesPopover"
@@ -274,6 +320,23 @@ const handleOpenImport = () => {
   @apply text-slate-600 mx-1;
 }
 
+.mode-toggle-chip {
+  @apply min-w-[80px] justify-center;
+}
+.mode-toggle-chip.active-live {
+  @apply border-sky-600 text-sky-400 bg-sky-900/30;
+}
+.mode-toggle-chip.active-planning {
+  @apply border-amber-600 text-amber-400 bg-amber-900/30;
+}
+.mode-toggle-chip.no-toggle {
+  @apply cursor-default;
+}
+
+.mode-icon {
+  @apply text-sm;
+}
+
 .count-pill {
   @apply flex items-center bg-slate-900 border border-slate-800 rounded px-2 h-7;
 }
@@ -308,6 +371,7 @@ const handleOpenImport = () => {
 }
 .toggle-chip.active-green .chip-status { @apply text-emerald-300; }
 
+.sector-popover,
 .resources-popover {
   @apply absolute top-full left-0 mt-1 z-50 bg-slate-800 border border-slate-600 rounded-lg shadow-xl min-w-[140px];
 }
@@ -316,6 +380,9 @@ const handleOpenImport = () => {
 }
 .popover-content {
   @apply p-1 max-h-48 overflow-y-auto;
+}
+.position-item {
+  @apply flex items-center justify-between px-2 py-1.5;
 }
 .resource-item {
   @apply px-2 py-1.5 text-xs text-slate-300;

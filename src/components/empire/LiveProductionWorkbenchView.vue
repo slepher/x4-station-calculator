@@ -60,7 +60,10 @@ const hasBindingStation = computed(() => bindingStation.value !== null)
 const hasSaveStation = computed(() => archiveStation.value !== null)
 const stationCode = computed(() => archiveStation.value?.code || '')
 const sectorResources = computed(() => archiveStation.value?.sector.resources || [])
-const sectorSunlight = computed(() => archiveStation.value?.sector.sunlight ?? 100)
+  const sectorSunlight = computed(() => Math.round((archiveStation.value?.sector.sunlight ?? 100) * 100))
+  const sectorName = computed(() => archiveStation.value?.sector.name || '')
+  const sectorNameId = computed(() => archiveStation.value?.sector.nameId)
+  const stationPosition = computed(() => archiveStation.value?.position)
 
 const importModalActiveStation = computed(() => {
   if (!activeStation.value) return null
@@ -123,6 +126,9 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     v-if="activeStation"
     :station-name="toolbarPresenter.props.station.value?.name || ''"
     :station-code="stationCode"
+    :sector-name="sectorName"
+    :sector-name-id="sectorNameId"
+    :station-position="stationPosition"
     :sector-resources="sectorResources"
     :sector-sunlight="sectorSunlight"
     :has-binding-station="hasBindingStation"
