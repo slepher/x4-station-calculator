@@ -195,4 +195,33 @@ test.describe('Sector Flow Filter', () => {
     
     console.log('验证：单个 station 显示所有 flows（含 auto-industry surplus）')
   })
+  
+  test('小行星聚合 flows 详细快照（基准数据）', async ({ page }) => {
+    await commonSetup(page)
+    await page.waitForTimeout(1000)
+    
+    const asteroidSupplyTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    await expect(asteroidSupplyTab).toBeVisible({ timeout: 5000 })
+    await asteroidSupplyTab.click()
+    await page.waitForTimeout(500)
+    
+    const wareflowPanel = page.locator('.list-wrapper').filter({ hasText: /资源视图|Resource View/i })
+    await expect(wareflowPanel).toBeVisible({ timeout: 2000 })
+    
+    const panelContent = await wareflowPanel.textContent()
+    console.log('=== 小行星聚合 flows 完整快照 ===')
+    console.log('Full content:', panelContent)
+    
+    expect(panelContent).toContain('反物质转换器+3,192.0')
+    expect(panelContent).toContain('励磁线圈+2,100.0')
+    expect(panelContent).toContain('电子基质+5,880.0')
+    expect(panelContent).toContain('碳化硅+5,760.0')
+    expect(panelContent).toContain('金属微晶+37,760.0')
+    
+    expect(panelContent).not.toContain('等离子导体')
+    expect(panelContent).not.toContain('量子管')
+    expect(panelContent).not.toContain('石墨烯')
+    
+    console.log('=== 基准快照验证完成（Products surplus） ===')
+  })
 })

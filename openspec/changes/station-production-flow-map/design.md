@@ -18,6 +18,7 @@
 │  cacheMap: Map<stationId, StationFlowCache>                  │
 │  empireFlowsCache: WareProductionFlow[]                      │
 │  sectorFlowsCache: Map<sectorId, WareProductionFlow[]>       │
+│  sectorSolverOutputCache: Map<sectorId, SolverOutput>        │
 │                                                              │
 │  compute(stationId, input, deps)                             │
 │  ├─ 计算 autoIndustryModules（补缺生产模块）                   │
@@ -31,8 +32,20 @@
 │  getProductionFlows(stationId) → WareProductionFlow[]        │
 │  getSectorFlows(sectorId) → WareProductionFlow[]             │
 │  getEmpireFlows() → WareProductionFlow[]                     │
+│  getSectorSolverOutput(sectorId) → SolverOutput | null       │
 └─────────────────────────────────────────────────────────────┘
 ```
+
+### 1.1 SolverOutput 缓存
+
+**SolverOutput** 包含跨 sector link flows 的运输计算结果：
+- 由 `sectorLinkCalcMap` 计算生成
+- 缓存到 `sectorSolverOutputCache`
+- Transit Hub 用于合并本 sector flows + link flows
+
+**更新时机**：
+- `computeAll()` 后计算 sector links
+- sector links 变化时更新
 
 ### 2. WareProductionFlow 结构变更
 
@@ -229,6 +242,54 @@ UI 获取数据
 **理由**：
 - 聚合查询频繁（UI 实时显示）
 - 实时遍历计算性能差
+
+### 冄策 7：Transit Hub 数据流重构
+
+**问题**：Transit Hub 界面目前接收已分组的 `groupedFlows`，与 Station 界面架构不一致。
+
+**决策**：Transit Hub 接收原始数据，在 Vue composable 中分组计算。
+
+**数据流对比**：
+
+| 层级 | Station 界面 | Transit Hub 界面（重构后） |
+|------|-------------|--------------------------|
+| Props | `productionFlows[]` | `productionFlows[]` + `solverOutput` |
+| 分组位置 | Vue composable | Vue composable |
+| 价格计算 | Vue composable | Vue composable |
+| Link flows 合并 | - | Vue composable |
+
+**Transit Hub 特殊处理**：
+- `solverOutput` 包含跨 sector link flows
+- composable 内部合并：本 sector flows + link flows
+- 缓存到 `StationProductionFlowMap.sectorSolverOutputCache`
+
+**架构**：
+
+```
+StationProductionFlowMap:
+  sectorFlowsCache: Map<sectorId, WareProductionFlow[]>
+  sectorSolverOutputCache: Map<sectorId, SolverOutput>
+
+TransitHubCenterDashboard.vue:
+  props: {
+    productionFlows: WareProductionFlow[]  // 从 sectorFlowsCache
+    solverOutput: SolverOutput             // 从 sectorSolverOutputCache
+    settings: { buyMultiplier, sellMultiplier, productBufferHours }
+  }
+  
+  useTransitHubFlowGrouping({
+    productionFlows,    // 本 sector flows（已过滤）
+    solverOutput,       // link flows（跨 sector 运输）
+    waresMap,           // 从 gameDataStore
+    settings
+  })
+  → TransitHubGroupedFlows（分组 + 价格 + link flows 合并）
+```
+
+**移除 Store 层逻辑**：
+- `analyzeEmpireWareFlow` 不再在 Store 层分组
+- `buildTransitHubViewModel` 只提供原始数据
+- `mergeLinkFlowsIntoGroupedFlows` 移到 Vue composable
 
 ## 文件变更清单
 
