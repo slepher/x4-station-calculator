@@ -2,21 +2,32 @@
 
 ## Phase 0: Store Getter 新增
 
-### Task 0.1: 实现 getBindingStation getter
+### Task 0.1: 定义 ArchiveStationData 类型
+
+- [ ] 在 `src/types/x4.ts` 或 `src/types/saveArchive.ts` 中定义 `ArchiveStationData` interface
+- [ ] 包含 `code`, `name`, `sectorMacro`, `sector`（聚合星区数据）
+- [ ] 包含 `modules`（已建模块）
+- [ ] 包含 `building: { modules, cargo, reservation }`（在建信息）
+- [ ] 包含 `cargo`, `reservation`（站点库存）
+
+### Task 0.2: 实现 getBindingStation getter
 
 - [ ] 在 `useLiveProductionStore.ts` 中添加 `getBindingStation()` 函数
 - [ ] 解析 `activeStationId` 获取 planId 或 saveStationCode
 - [ ] 从 `activeBinding.stationPlans` 中查找对应的 `BindingStationPlan`
 - [ ] 返回找到的 plan 或 null
 
-### Task 0.2: 实现 getArchiveStation getter
+### Task 0.3: 实现 getArchiveStation getter
 
 - [ ] 在 `useLiveProductionStore.ts` 中添加 `getArchiveStation()` 函数
 - [ ] 解析 `activeStationId` 获取 saveStationCode（仅 derived 类型）
 - [ ] 从 `playerStationRecords` 中查找 code 匹配的记录
-- [ ] 返回 `PlayerStationEntry` 或 null
+- [ ] 获取对应的 `PlayerStationEntry` 和 `BuildStorageEntry`
+- [ ] 计算差集 `building.modules = buildstorage.modules - station.modules`（按 module_id）
+- [ ] 查询 map sector 获取 `sector.resources` 和 `sector.sunlight`
+- [ ] 返回转化后的 `ArchiveStationData`
 
-### Task 0.3: 导出 getter 到 return 语句
+### Task 0.4: 导出 getter 到 return 语句
 
 - [ ] 在 store return 语句中添加 `getBindingStation`
 - [ ] 在 store return 语句中添加 `getArchiveStation`
@@ -137,12 +148,38 @@
 - [ ] 正常状态：可点击，sky 色系
 - [ ] 禁用状态：灰色，不可点击
 
-## Phase 6: 验证
+## Phase 7: ArchiveModuleList 在建模块集成
 
-### Task 6.1: TypeScript 编译
+### Task 7.1: 扩展 ArchiveModuleList props
+
+- [ ] 新增 `buildingModules?: SavedModule[]` prop
+- [ ] 保留原有 `modules: AggregatedStationModule[]` prop
+
+### Task 7.2: 在建模块分组逻辑
+
+- [ ] 将 `buildingModules` 按 module_id 映射到对应分组
+- [ ] 使用 `gameData.modulesMap[moduleId].group` 获取分组信息
+- [ ] 合并到已有分组数据中
+
+### Task 7.3: 在建模块 UI 显示
+
+- [ ] 在每个分组末尾添加在建模块区域
+- [ ] 使用虚线 left-border 样式（参考 StationPlanningPanel 的 tier-auto）
+- [ ] 样式：`border-l-2 border-dashed border-amber-600/40 pl-2`（使用 amber 区分在建状态）
+- [ ] 使用 StationPlanningItem 组件渲染，设置 `readonly` 和 `noClick`
+
+### Task 7.4: StationPlanningPanelWrapper 传递 buildingModules
+
+- [ ] 调用 `liveStore.getArchiveStation()` 获取 `ArchiveStationData`
+- [ ] 传递 `archiveStation.building.modules` 到 ArchiveModuleList
+- [ ] 条件传递：仅在存档模式（activeTab === 'archive'）且有在建模块时传递
+
+## Phase 8: 验证
+
+### Task 8.1: TypeScript 编译
 
 - [ ] 运行 `npx vue-tsc --noEmit` 无错误
 
-### Task 6.2: 构建验证
+### Task 8.2: 构建验证
 
 - [ ] 运行 `npm run build` 成功

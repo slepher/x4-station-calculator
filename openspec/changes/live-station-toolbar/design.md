@@ -64,6 +64,105 @@ LiveStationToolbar.vue
 | `updateSunlight` | 光伏效率 |
 | `updateTransportMinutes` | 运输时间 |
 
+## ArchiveStationData 结构
+
+**不直接暴露 PlayerStationEntry，转化为目标接口：**
+
+```typescript
+interface ArchiveStationData {
+  // 站点标识
+  code: string
+  name?: string
+  sectorMacro: string
+  
+  // 聚合星区数据（从 map sector 查询）
+  sector: {
+    name: string
+    resources: string[]    // sector.resources
+    sunlight: number       // sector.sunlight
+  }
+  
+  // 已建成模块（存档 station.modules）
+  modules: SavedModule[]
+  
+  // 在建信息（来自 buildstorage）
+  building: {
+    modules: SavedModule[]   // buildstorage.modules - station.modules（按 module_id 计算差集）
+    cargo: WareAmount[]      // buildstorage.cargo（建造材料库存）
+    reservation: WareAmount[] // buildstorage.reservation（在途建造材料）
+  }
+  
+  // 站点库存
+  cargo?: WareAmount[]        // station.cargo
+  reservation?: WareAmount[]  // station.reservation（在途资源）
+}
+```
+
+**building.modules 差集计算逻辑：**
+
+```
+buildstorage.modules: [module_id_A×2, module_id_B×1, module_id_C×3]
+station.modules:      [module_id_A×2, module_id_B×1]
+
+building.modules = 差集 = [module_id_C×3]  ← 在建中，尚未完成
+```
+
+**含义**: 建造缓存中有但站点中没有的模块 = 正在建造中的模块
+
+## ArchiveModuleList 在建模块集成
+
+### 当前 ArchiveModuleList 结构
+
+```
+ArchiveModuleList
+  ├── 按模块分组显示已建模块
+  │   └── Production 组
+  │       ├── 模块A × 2
+  │       └── 模块B × 1
+  │   └── Storage 组
+  │       └── 模块D × 1
+```
+
+### 需求：在建模块与已建模块同组显示
+
+```
+ArchiveModuleList（存档模式）
+  ├── Production 组
+  │   ├── 模块A × 2  ← 已建
+  │   ├── 模块B × 1  ← 已建
+  │   └── ╎ 模块C × 3  ← 在建（虚线 left-border）
+  │   └── Storage 组
+  │       └── 模块D × 1  ← 已建
+```
+
+### 实现方案
+
+**方案 A: ArchiveModuleList 接收 buildingModules prop**
+
+```typescript
+// ArchiveModuleList.vue props
+const props = defineProps<{
+  modules: AggregatedStationModule[]       // 已建模块
+  buildingModules?: SavedModule[]          // 在建模块（可选）
+}>()
+```
+
+**分组逻辑**：
+1. 已建模块按原有逻辑分组
+2. 在建模块按 module_id 映射到对应分组
+3. 在每个分组末尾，用虚线 left-border 区域显示该组的在建模块
+
+**UI 样式**：
+- 参考 StationPlanningPanel 的 `tier-auto` 样式：`border-l-2 border-dashed border-slate-600 pl-2`
+- 在建模块区域使用相同虚线样式，但放在分组内部末尾
+
+### StationPlanningItem 适配
+
+在建模块使用 StationPlanningItem 组件：
+- `readonly: true` - 不可编辑
+- `noClick: true` - 无点击交互
+- 可选：添加 `building: true` prop 用于特殊样式（如不同背景色）
+
 ## Store 新增 Getter
 
 ### useLiveProductionStore 新增两个 getter
