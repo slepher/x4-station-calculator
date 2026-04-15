@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue'
+import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { StationSettings } from '@/types/x4'
 import type { ArchiveStationPosition } from '@/types/saveArchive'
@@ -14,6 +14,8 @@ const props = defineProps<{
   sectorSunlight: number
   hasBindingStation: boolean
   hasSaveStation: boolean
+  mode: 'live' | 'planning'
+  canToggle: boolean
   settings: Partial<StationSettings> | StationSettings | null
   races: Array<{ value: string; label: string }>
   singleBerthThroughput: number
@@ -21,7 +23,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   updateStationName: [value: string]
-  toggleMode: [mode: 'live' | 'planning']
+  toggleMode: []
   updateRacePreference: [value: string]
   updateWorkforce: [value: boolean]
   updateShowEmpireGaps: [value: boolean]
@@ -30,24 +32,7 @@ const emit = defineEmits<{
 
 const { t, te } = useI18n()
 
-const mode = ref<'live' | 'planning'>('planning')
 const showSectorPopover = ref(false)
-
-const initialMode = computed(() => {
-  if (props.hasBindingStation && props.hasSaveStation) return 'planning'
-  if (props.hasBindingStation && !props.hasSaveStation) return 'planning'
-  if (!props.hasBindingStation && props.hasSaveStation) return 'live'
-  return 'planning'
-})
-
-const canToggle = computed(() => {
-  return props.hasBindingStation && props.hasSaveStation
-    || !props.hasBindingStation && props.hasSaveStation
-})
-
-onMounted(() => {
-  mode.value = initialMode.value
-})
 
 const nameValue = computed({
   get: () => props.stationName || '',
@@ -90,9 +75,8 @@ const positionText = computed(() => {
 })
 
 const toggleMode = () => {
-  if (!canToggle.value) return
-  mode.value = mode.value === 'live' ? 'planning' : 'live'
-  emit('toggleMode', mode.value)
+  if (!props.canToggle) return
+  emit('toggleMode')
 }
 
 const handleOpenImport = () => {
@@ -120,14 +104,14 @@ const handleOpenImport = () => {
           <button 
             class="toggle-chip mode-toggle-chip"
             :class="[
-              mode === 'planning' ? 'active-planning' : 'active-live',
+              props.mode === 'planning' ? 'active-planning' : 'active-live',
               { 'no-toggle': !canToggle }
             ]"
             :disabled="!canToggle"
             @click="toggleMode"
           >
-            <span class="mode-icon">{{ mode === 'live' ? '📡' : '📝' }}</span>
-            <span class="chip-status">{{ mode === 'live' ? t('toolbar.mode_live') : t('toolbar.mode_planning') }}</span>
+            <span class="mode-icon">{{ props.mode === 'live' ? '📡' : '📝' }}</span>
+            <span class="chip-status">{{ props.mode === 'live' ? t('toolbar.mode_live') : t('toolbar.mode_planning') }}</span>
           </button>
         </div>
       </div>
@@ -207,7 +191,7 @@ const handleOpenImport = () => {
         </div>
       </div>
 
-      <template v-if="mode === 'planning'">
+      <template v-if="props.mode === 'planning'">
         <div class="separator mx-6"></div>
 
         <div class="toolbar-section">

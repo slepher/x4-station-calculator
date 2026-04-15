@@ -1,5 +1,5 @@
-import { computed, type Ref, type ComputedRef } from 'vue'
-import type { SavedModule, StationSettings, X4Module, X4Ware, GroupedFlows } from '@/types/x4'
+import { computed, type ComputedRef } from 'vue'
+import type { SavedModule, X4Module, X4Ware, GroupedFlows } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import { calculateWareFlowDerived } from '@/store/logic/calculateWareFlowDerived'
 
@@ -27,7 +27,6 @@ export interface DerivedSettings {
 
 export interface StationFlowDerivedResult {
   groupedFlows: GroupedFlows
-  autoInfrastructureModules: SavedModule[]
 }
 
 function createEmptyGroupedFlows(): GroupedFlows {
@@ -44,8 +43,7 @@ export function useStationFlowDerived(
   return computed(() => {
     if (props.value.productionFlows.length === 0) {
       return {
-        groupedFlows: createEmptyGroupedFlows(),
-        autoInfrastructureModules: []
+        groupedFlows: createEmptyGroupedFlows()
       }
     }
     
@@ -66,8 +64,7 @@ export function computeStationDerived(
 ): StationFlowDerivedResult {
   if (props.productionFlows.length === 0) {
     return {
-      groupedFlows: createEmptyGroupedFlows(),
-      autoInfrastructureModules: []
+      groupedFlows: createEmptyGroupedFlows()
     }
   }
   

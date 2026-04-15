@@ -18,6 +18,14 @@
 - [x] Task 14: StationFlowCache 增加 resolvedModules
 - [x] Task 15: settings 不缓存，从 activeStation.settings 获取
 - [x] Task 16: 构建验证（Phase 2）
+- [x] Task 17: autoInfrastructureModules 移至 Stage 1
+- [x] Task 18: 移除 calculateWareFlowDerived 中的 autoInfrastructure 计算
+- [ ] Task 19: 创建 useWareFlowGrouping composable
+- [ ] Task 20: StationWareFlowsDashboard 重构
+- [ ] Task 21: Presenter 层改动
+- [ ] Task 22: Contract + Store 层改动
+- [ ] Task 23: 删除 StationStateMap.ts
+- [ ] Task 24: 构建验证
 
 ---
 
@@ -27,103 +35,107 @@ Task 1-10 已完成，建立了 StationProductionFlowMap 作为 ProductionFlow �
 
 ## Phase 2: 两阶段计算架构（已完成）
 
-### Task 11: WareProductionFlow 移除价格字段
+Task 11-16 已完成，实现了 WareProductionFlow volume 计算和 Stage 1 缓存。
 
-**文件**：`src/types/production-flow.ts`
+## Phase 3: autoInfrastructureModules 移至 Stage 1（已完成）
 
-**变更**：
-- 移除 `minPrice`, `price`, `maxPrice`
-- 新增 `productionVolume`, `consumptionVolume`, `netVolume`
+Task 17-18 已完成，autoInfrastructureModules 现在在 Stage 1 计算，存入 resolvedModules。
 
-### Task 12: calculateProductionFlows 计算 volume
+---
 
-**文件**：`src/store/logic/calculateProductionFlows.ts`
+## Phase 4: Vue 组件重构（待实现）
 
-**变更**：
-- 在 productionFlows 生成时计算 volume 数据
-- `productionVolume = production × unitVolume`
-- `consumptionVolume = consumption × unitVolume`
-- `netVolume = netRate × unitVolume`
+### Task 19: 创建 useWareFlowGrouping composable
 
-### Task 13: 价格从 waresMap 获取
+**目标**：提供分组+价格计算函数，不依赖模块列表
 
-**文件**：
-- `src/store/logic/calculateWareFlowDerived.ts`
-- `src/store/logic/analyzeEmpireWareFlow.ts`
+**改动**：
+- 创建 `src/components/empire/composables/useWareFlowGrouping.ts`
+- `computeGroupedFlows(props)` - 接收 productionFlows + waresMap + settings + warePriorityLevels
+- 返回 `groupedFlows`（含价格、分组、transportDemand、volume 计算）
 
-**变更**：
-- 函数签名增加 `waresMap` 参数
-- 价格从 `waresMap[wareId]` 获取而非 productionFlows
+**状态**：⏳ 待实现
 
-### Task 14: StationFlowCache 增加 resolvedModules
+---
 
-**文件**：`src/store/state/StationProductionFlowMap.ts`
+### Task 20: StationWareFlowsDashboard 重构
 
-**变更**：
-- `StationFlowCache` 结构：
-  ```typescript
-  interface StationFlowCache {
-    resolvedModules: SavedModule[]  // planned + autoIndustry
-    productionFlows: WareProductionFlow[]
-  }
-  ```
-- `compute()` 输出 resolvedModules 和含 volume 的 productionFlows
-- 新增 `getCache()` / `getResolvedModules()` 方法
+**目标**：组件接收原始数据 props，内部用 composable 计算 groupedFlows
 
-### Task 15: settings 不缓存
+**改动**：
+- 删除 `groupedFlows`、`wares`、`modulesMap` props
+- 新增 `productionFlows`、`warePriorityLevels` props
+- 内部用 `useWareFlowGrouping` 计算 `groupedFlows`
+- `waresMap` 直接访问 `gameDataStore`
 
-**决策**：
-- settings 从 `activeStation.settings` 获取，不缓存到 StationFlowCache
-- Stage 2 实时派生使用 station.settings
+**状态**：⏳ 待实现
 
-### Task 16: 构建验证
+---
 
-**状态**：✅ 通过
+### Task 21: Presenter 层改动
 
-## Phase 4: Vue 组件迁移（待实现）
+**目标**：Presenter 只提供原始数据，不计算 groupedFlows
 
-### Task 19: 创建 useStationFlowDerived composable
+**改动**：
+- 删除 `groupedFlows` 计算
+- 新增 `productionFlows`、`warePriorityLevels` 原始数据获取
+- 从 `stationProductionFlowMap.getProductionFlows(stationId)` 获取
 
-**文件**：`src/components/empire/composables/useStationFlowDerived.ts`
+**状态**：⏳ 待实现
 
-**内容**：
-- 接收 `StationFlowDerivedProps`（productionFlows, modules, settings 等）
-- 返回 `StationFlowDerivedResult`（groupedFlows, autoInfrastructureModules）
-- 提供 `computeStationDerived()` 函数用于单次计算
+---
 
-**状态**：✅ 完成
+### Task 22: Contract + Store 层改动
 
-### Task 20: StationWareFlowsDashboard 迁移
+**目标**：移除派生计算方法，只提供原始数据
 
-**当前状态**：
-- 接收 `groupedFlows` 和 `autoModules` 作为 props（父组件计算）
-- 内部仅处理展示逻辑
+**改动**：
+- 删除 `getGroupedFlows()`、`getStationAnalysis()`、`getCurrentEfficiency()`、`getActualWorkforce()`
+- 新增 `getProductionFlows()`、`getResolvedModules()`、`getWarePriorityLevels()`
 
-**迁移后**：
-- 接收 `productionFlows, plannedModules, autoIndustryModules, settings, modulesMap, waresMap, warePriorityLevels`
-- 使用 `useStationFlowDerived` 计算 `groupedFlows` 和 `autoInfrastructureModules`
+**状态**：⏳ 待实现
 
-**状态**：⏳ 待迁移
+---
 
-### Task 21: StationDashboard 迁移
+### Task 23: 删除 StationStateMap.ts
 
-**当前状态**：
-- 接收 `stationAnalysis, currentEfficiency, actualWorkforce` 作为 props
-- 这些数据来自 Stage 1，不需要 Stage 2 计算
+**目标**：所有依赖已迁移，删除旧状态管理
 
-**决策**：无需迁移，StationDashboard 不依赖 Stage 2 计算
+**改动**：
+- 检查无引用
+- 删除 `src/store/state/StationStateMap.ts`
 
-**状态**：❌ 不需要
+**状态**：⏳ 待实现
+
+---
+
+### Task 24: 构建验证
+
+**目标**：确保重构完成，构建通过
+
+**改动**：
+- 运行 `npm run build`
+- 运行 `npm run test:unit`
+- 运行 `npm exec playwright test`
+
+**状态**：⏳ 待实现
 
 ---
 
 ## 执行顺序
 
 ```
-Phase 1 → Phase 2 → Phase 3 (部分) → Phase 4
+Phase 3（autoInfrastructure 移至 Stage 1）：
+  Task 17 → StationProductionFlowMap.compute 增加 autoInfrastructure
+  Task 18 → 清理 calculateWareFlowDerived，移除 autoInfrastructure 计算
   ↓
-Phase 4:
-  Task 19 (composable) ✓
-  Task 20 (StationWareFlowsDashboard) ⏳
-  Task 21 (StationDashboard) ❌ 不需要
+Phase 4（Vue 组件重构）：
+  Task 19 → 创建 useWareFlowGrouping composable（只计算 groupedFlows）
+  Task 20 → StationWareFlowsDashboard 改用原始数据 props + 内部 composable
+  Task 21 → Presenter 改动（提供 productionFlows + warePriorityLevels）
+  Task 22 → Contract + Store 改动（移除派生计算方法）
+  ↓
+Phase 5（清理）：
+  Task 23 → 删除 StationStateMap.ts
+  Task 24 → 构建验证
 ```

@@ -1,20 +1,17 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
-import { useSaveBindingStore } from '@/store/useSaveBindingStore'
-import { parseBindingStationId } from '@/store/logic/productionSourceAdapter'
-import ViewTabUI from '@/components/common/ViewTabUI.vue'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import ArchiveModuleList from '@/components/empire/ArchiveModuleList.vue'
 import type { SavedModule } from '@/types/x4'
-import type { AggregatedStationModule } from '@/types/saveArchive'
 
 const props = defineProps<{
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoInfrastructureModules?: SavedModule[]
   enforceDlcActivation: boolean
+  mode: 'live' | 'planning'
 }>()
 
 const emit = defineEmits<{
@@ -23,57 +20,20 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const liveStore = useLiveProductionStore()
-const saveBindingStore = useSaveBindingStore()
 
-const activeTab = ref<'plan' | 'archive'>('plan')
+const archiveStation = computed(() => liveStore.archiveStation)
 
-const activeStationId = computed(() => liveStore.activeStationId)
-const parsedId = computed(() => parseBindingStationId(activeStationId.value))
-
-const saveStationCode = computed(() => {
-  const parsed = parsedId.value
-  if (!parsed) return null
-
-  if (parsed.kind === 'derived') {
-    return parsed.saveStationCode
-  }
-
-  if (parsed.kind === 'plan') {
-    const plan = saveBindingStore.activeBinding?.stationPlans.find(
-      (p) => p.id === parsed.planId
-    )
-    return plan?.saveStationCode || null
-  }
-
-  return null
+const saveStationModules = computed<SavedModule[]>(() => {
+  return archiveStation.value?.modules || []
 })
-
-const isSaveStation = computed(() => {
-  return !!saveStationCode.value
-})
-
-const saveStationModules = computed<AggregatedStationModule[]>(() => {
-  if (!saveStationCode.value) return []
-  const records = liveStore.playerStationRecords
-  const record = records.find((r) => r.code === saveStationCode.value)
-  if (!record?.data?.modules) return []
-  return Object.values(record.data.modules)
-})
-
-const archiveStation = computed(() => liveStore.getArchiveStation())
 
 const buildingModules = computed<SavedModule[]>(() => {
   return archiveStation.value?.building.modules || []
 })
 
-const hasArchiveModules = computed(() => saveStationModules.value.length > 0)
-
-const showTabs = computed(() => isSaveStation.value && hasArchiveModules.value)
-
-const tabViews = computed(() => [
-  { key: 'plan', label: t('planning.tab_plan') },
-  { key: 'archive', label: t('planning.tab_archive') }
-])
+const showArchivePanel = computed(() => {
+  return props.mode === 'live' && archiveStation.value !== null
+})
 
 const handleUpdatePlannedModules = (modules: SavedModule[]) => {
   emit('updatePlannedModules', modules)
@@ -86,21 +46,11 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
       <h3 class="header-title">
         {{ t('planning.modules_title') }}
       </h3>
-
-      <div v-if="showTabs" class="header-right-group">
-        <ViewTabUI
-          :views="tabViews"
-          :model-value="activeTab"
-          color-style="sky"
-          ui-key="planning-panel"
-          @update:model-value="activeTab = $event as 'plan' | 'archive'"
-        />
-      </div>
     </div>
 
     <div class="list-body custom-scrollbar">
       <StationPlanningPanel
-        v-if="!showTabs || activeTab === 'plan'"
+        v-if="!showArchivePanel"
         :planned-modules="props.plannedModules"
         :auto-industry-modules="props.autoIndustryModules"
         :auto-infrastructure-modules="props.autoInfrastructureModules"

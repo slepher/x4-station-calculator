@@ -11,8 +11,8 @@
 │  职责：缓存 resolvedModules + ProductionFlow + Empire/Sector 聚合 │
 │                                                              │
 │  StationFlowCache {                                          │
-│    resolvedModules: SavedModule[]    // planned + autoIndustry │
-│    productionFlows: WareProductionFlow[]                       │
+│    resolvedModules: SavedModule[]    // planned + autoIndustry + autoInfrastructure │
+│    productionFlows: WareProductionFlow[]  // 基于 planned + autoIndustry │
 │  }                                                             │
 │                                                              │
 │  cacheMap: Map<stationId, StationFlowCache>                  │
@@ -20,9 +20,10 @@
 │  sectorFlowsCache: Map<sectorId, WareProductionFlow[]>       │
 │                                                              │
 │  compute(stationId, input, deps)                             │
-│  ├─ 计算 autoIndustryModules                                 │
-│  ├─ resolvedModules = planned + autoIndustry                 │
-│  ├─ 计算 productionFlows (含 volume，不含价格)                │
+│  ├─ 计算 autoIndustryModules（补缺生产模块）                   │
+│  ├─ 计算 productionFlows（含 volume）                         │
+│  ├─ 计算 autoInfrastructureModules（仓储/泊位）               │
+│  ├─ resolvedModules = planned + autoIndustry + autoInfrastructure │
 │  └─ 缓存到 cacheMap                                           │
 │                                                              │
 │  getCache(stationId) → StationFlowCache                      │
@@ -70,11 +71,11 @@ interface WareProductionFlow {
 ```
 输入: plannedModules + settings + lockedWares + warePriority
 输出:
-  resolvedModules: planned + autoIndustry
+  resolvedModules: planned + autoIndustry + autoInfrastructure（仓储/泊位）
   productionFlows: {
     wareId, tier, transportType, unitVolume,
     production, consumption, workforceConsumption, netRate,
-    productionVolume, consumptionVolume, netVolume,  ← 含 volume
+    productionVolume, consumptionVolume, netVolume,  ← 用于计算仓储/泊位
     contributions
   }
   
@@ -83,14 +84,19 @@ settings 不缓存，从 activeStation.settings 获取
 
 **Stage 2（UI Composable 实时计算）**：
 ```
-输入: productionFlows + waresMap + settings
+输入: productionFlows + waresMap + settings（multiplier）
 输出:
-  - 价格: minPrice, avgPrice, maxPrice (from waresMap)
+  - 价格: minPrice, avgPrice, maxPrice (from waresMap + multiplier)
   - groupedFlows: 分组展示
-  - transportDemand: 运输需求计算
-  - autoInfrastructureModules: 仓储/泊位计算
-  - stationAnalysis: 成本/模块分析
 ```
+
+**关键变更**：autoInfrastructureModules（仓储/泊位）从 Stage 2 移到 Stage 1
+
+**理由**：
+- 仓储/泊位计算依赖 volume 数据（productionFlows 已含 volume）
+- volume 在 Stage 1 计算，autoInfrastructure 也可同步计算
+- resolvedModules = planned + autoIndustry + autoInfrastructure（完整的生产模块列表）
+- Stage 2 只做价格计算和分组展示，无需模块列表
 
 ### 4. ActiveStationContext 整合设计
 
@@ -104,16 +110,12 @@ activeStation.value (StationPlan)
 activeStationContext computed:
   ├── station: activeStation.value     ← 原始数据引用
   ├── cache: cacheMap[stationId]       ← 缓存数据
-  │     ├── resolvedModules: planned + autoIndustry
+  │     ├── resolvedModules: planned + autoIndustry + autoInfrastructure
   │     └── productionFlows: WareProductionFlow[] (含 volume)
   │
   └── derived (实时计算 - UI Composable):
-        ├── prices: from waresMap
-        ├── autoInfrastructureModules: computeStorageBerths(...)
-        ├── stationAnalysis: analyze(resolved + autoInfra, settings)
-        ├── actualWorkforce: computeWorkforce(resolvedModules)
-        ├── groupedFlows: group(productionFlows)
-        └── warePriorityLevels: resolvePriority(resolvedModules, warePriority)
+        ├── prices: from waresMap + multiplier
+        └── groupedFlows: group(productionFlows) + prices
 ```
 
 ### 5. 数据来源清晰化
@@ -124,13 +126,15 @@ activeStationContext computed:
 | **settings** | **station.settings** | **用户编辑，不缓存** |
 | lockedWares | station.lockedWares | 用户编辑 |
 | warePriority | station.warePriority | 用户编辑 |
-| **resolvedModules** | planned + autoIndustry | **缓存**（Stage 1） |
-| **productionFlows** | from resolvedModules | **缓存**（Stage 1，含 volume） |
-| **volume数据** | flows × unitVolume | **缓存**（Stage 1） |
-| prices | from waresMap | 实时派生（Stage 2） |
-| autoInfrastructureModules | from flows + settings | 实时派生（Stage 2） |
-| stationAnalysis | from modules + settings | 实时派生（Stage 2） |
+| **autoIndustryModules** | from production gaps | **缓存（Stage 1）** |
+| **autoInfrastructureModules** | from volume + settings | **缓存（Stage 1）** |
+| **resolvedModules** | planned + autoIndustry + autoInfrastructure | **缓存（Stage 1）** |
+| **productionFlows** | from resolvedModules（不含 infra） | **缓存（Stage 1，含 volume）** |
+| **volume数据** | flows × unitVolume | **缓存（Stage 1）** |
+| prices | from waresMap + multiplier | 实时派生（Stage 2） |
 | groupedFlows | from productionFlows | 实时派生（Stage 2） |
+
+**注意**：productionFlows 基于 planned + autoIndustry（不含 autoInfrastructure），因为仓储/泊位不产生 flow
 
 ### 6. 调用关系
 
@@ -265,6 +269,70 @@ UI 获取数据
 ### 移除文件
 
 - `src/store/state/StationStateMap.ts`
+
+## Phase 4: Vue 组件重构设计
+
+### 核心原则
+
+**Vue 组件接收原始数据 props，内部用 composable 计算派生数据**
+
+- Presenter 只提供原始数据，不做派生计算
+- `modulesMap` / `waresMap` 直接从 `gameDataStore` 获取，不通过 props 传递
+- 派生数据（groupedFlows、价格）由 Vue composable 实时计算
+- `autoInfrastructureModules` 已在 Stage 1 缓存到 `resolvedModules`，无需传递
+
+### StationWareFlowsDashboard 改动
+
+**原 Props（删除）**：
+- `groupedFlows` - 改为内部计算
+- `wares` - 直接访问 gameDataStore
+- `modulesMap` - 直接访问 gameDataStore
+
+**新 Props（原始数据）**：
+- `productionFlows: WareProductionFlow[]` - Stage 1 缓存数据
+- `warePriorityLevels: Record<string, number>` - 优先级数据
+- `settings: {...}` - buffer/multiplier 设置
+- `empireGaps: {...}` - 保持
+- 回调函数保持
+
+**内部计算**：
+```typescript
+const gameDataStore = useGameDataStore()
+
+const groupedFlows = computed(() => computeGroupedFlows({
+  productionFlows: props.productionFlows,
+  waresMap: gameDataStore.waresMap,
+  settings: props.settings,  // 包含 buyMultiplier/sellMultiplier
+  warePriorityLevels: props.warePriorityLevels
+}))
+
+// 翻译 ware 名称
+const translateWare = (wareId: string) => {
+  const ware = gameDataStore.waresMap[wareId]
+  return ware ? useX4I18n().translateWare(ware) : wareId
+}
+```
+
+### useWareFlowGrouping composable
+
+```typescript
+export function useWareFlowGrouping() {
+  function computeGroupedFlows(props: {
+    productionFlows: WareProductionFlow[]
+    waresMap: Record<string, X4Ware>
+    settings: { buyMultiplier, sellMultiplier, ... }
+    warePriorityLevels: Record<string, number>
+  }): GroupedFlows {
+    // 1. 价格计算（from waresMap + multiplier）
+    // 2. 分组（rateGroups + volumeGroups）
+    // 3. transportDemand 计算
+    // 4. totalOccupiedVolume 计算（需要 bufferHours）
+    return groupedFlows
+  }
+  
+  return { computeGroupedFlows }
+}
+```
 
 ## 潜在风险
 

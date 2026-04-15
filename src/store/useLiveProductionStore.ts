@@ -15,6 +15,7 @@ import type {
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { ProductionSessionContext } from '@/types/production-context'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
+import { stationProductionFlowMap } from './state/StationProductionFlowMap'
 import type {
   ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
@@ -47,9 +48,7 @@ import {
   getWarePriority,
   getProductionFlows,
   getWarePriorityLevels,
-  getAutoIndustryModules,
   getAutoInfrastructureModules,
-  updateAutoInfrastructureModules,
   getActualWorkforce,
   getCurrentEfficiency,
   deepClone,
@@ -513,36 +512,18 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const step1AutoIndustryModules = computed(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    return getAutoIndustryModules(stationId)
-  })
-
-  const autoInfrastructureModules = computed(() => {
+const autoInfrastructureModules = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
     const deps = getComputeDeps()
-    if (!deps) return getAutoInfrastructureModules(stationId)
-    return getDerivedStationData(stationId, deps.modulesMap, deps.waresMap, {
-      racePreference: settings.value.racePreference,
-      resourceBufferHours: settings.value.resourceBufferHours,
-      primaryProductBufferHours: settings.value.primaryProductBufferHours,
-      secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
-      buyMultiplier: settings.value.buyMultiplier,
-      sellMultiplier: settings.value.sellMultiplier,
-      transportMinutes: settings.value.transportMinutes,
-      transportShipCapacity: settings.value.transportShipCapacity,
-      sunlight: settings.value.sunlight
-    }).autoInfrastructureModules
+    if (!deps) return []
+    return getAutoInfrastructureModules(stationId, deps.modulesMap)
   })
 
   const autoIndustryModules = computed(() => {
-    const merged = step1AutoIndustryModules.value.map((module) => ({ ...module }))
-    autoInfrastructureModules.value.forEach((infra) => {
-      const existing = merged.find((m) => m.id === infra.id)
-      if (existing) existing.count += infra.count
-      else merged.push({ ...infra })
-    })
-    return merged
+    const stationId = activeStation.value?.id || '__local__'
+    const resolved = stationProductionFlowMap.getResolvedModules(stationId)
+    const plannedIds = plannedModules.value.map((m) => m.id)
+    return resolved.filter((m) => !plannedIds.includes(m.id))
   })
 
   const productionFlows = computed<WareProductionFlow[]>(() => {
@@ -554,11 +535,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const stationId = activeStation.value?.id || '__local__'
     return getWarePriorityLevels(stationId)
   })
-
-  function setAutoInfrastructureModules(modules: SavedModule[]): void {
-    const stationId = activeStation.value?.id || '__local__'
-    updateAutoInfrastructureModules(stationId, modules)
-  }
 
   const actualWorkforce = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
@@ -574,7 +550,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const stationId = activeStation.value?.id || '__local__'
     const deps = getComputeDeps()
     if (!deps) return getGroupedFlows(stationId)
-    return getDerivedStationData(stationId, deps.modulesMap, deps.waresMap, {
+    return getDerivedStationData(stationId, deps.waresMap, {
       racePreference: settings.value.racePreference,
       resourceBufferHours: settings.value.resourceBufferHours,
       primaryProductBufferHours: settings.value.primaryProductBufferHours,
@@ -1434,7 +1410,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     autoInfrastructureModules,
     productionFlows,
     warePriorityLevels,
-    setAutoInfrastructureModules,
     actualWorkforce,
     currentEfficiency,
     groupedFlows,

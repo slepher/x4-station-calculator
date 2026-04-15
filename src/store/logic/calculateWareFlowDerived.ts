@@ -30,7 +30,6 @@ export interface CalculateWareFlowDerivedInput {
 
 export interface CalculateWareFlowDerivedOutput {
   groupedFlows: GroupedFlows
-  autoInfrastructureModules: SavedModule[]
 }
 
 export function calculateWareFlowDerived(
@@ -38,9 +37,6 @@ export function calculateWareFlowDerived(
 ): CalculateWareFlowDerivedOutput {
   const {
     productionFlows,
-    autoIndustryModules,
-    plannedModules,
-    modulesMap,
     waresMap,
     settings,
     warePriorityLevels
@@ -141,17 +137,8 @@ export function calculateWareFlowDerived(
     else groupedFlows.volumeGroups.container.push(flow)
   })
 
-  const autoInfrastructureModules = calculateInfrastructureModules(
-    groupedFlows,
-    plannedModules,
-    autoIndustryModules,
-    modulesMap,
-    settings
-  )
-
   return {
-    groupedFlows,
-    autoInfrastructureModules
+    groupedFlows
   }
 }
 
@@ -168,162 +155,4 @@ function getPriceByMultiplier(ware: X4Ware | undefined, multiplier: number): num
     const t = (multiplier - 0.5) * 2
     return avgPrice + (maxPrice - avgPrice) * t
   }
-}
-
-function calculateInfrastructureModules(
-  groupedFlows: GroupedFlows,
-  plannedModules: SavedModule[],
-  autoIndustryModules: SavedModule[],
-  modulesMap: Record<string, X4Module>,
-  settings: CalculateWareFlowDerivedInput['settings']
-): SavedModule[] {
-  const race = settings.racePreference
-  const allModules = [...plannedModules, ...autoIndustryModules]
-  const result: SavedModule[] = []
-
-  const needs = { container: 0, solid: 0, liquid: 0 }
-
-  groupedFlows.flows.forEach(flow => {
-    if (flow.totalOccupiedVolume > 0) {
-      if (flow.transportType === 'solid') needs.solid += flow.totalOccupiedVolume
-      else if (flow.transportType === 'liquid') needs.liquid += flow.totalOccupiedVolume
-      else needs.container += flow.totalOccupiedVolume
-    }
-  })
-
-  const storageTypes: ('container' | 'solid' | 'liquid')[] = ['container', 'solid', 'liquid']
-  for (const type of storageTypes) {
-    const needed = needs[type]
-
-    let existingCapacity = 0
-    allModules.forEach(m => {
-      const info = modulesMap[m.id]
-      if (info?.cargo?.type === type && info.cargo?.capacity) {
-        existingCapacity += info.cargo.capacity * m.count
-      }
-    })
-
-    const deficit = needed - existingCapacity
-
-    if (deficit > 0) {
-      const storageModule = findBestStorage(type, race, modulesMap, allModules)
-      if (storageModule && storageModule.cargo) {
-        const count = Math.ceil(deficit / storageModule.cargo.capacity)
-        result.push({ id: storageModule.id, count })
-      }
-    }
-  }
-
-  const singleBerthThroughput = Math.max(1, settings.transportShipCapacity || 1) * 15
-  const throughputByType = groupedFlows.flows
-    .filter(flow => (flow.transportDemand || 0) > 0)
-    .reduce((acc, flow) => {
-      const value = flow.transportDemand || 0
-      if (flow.transportType === 'solid') acc.solid += value
-      else if (flow.transportType === 'liquid') acc.liquid += value
-      else acc.container += value
-      return acc
-    }, { container: 0, solid: 0, liquid: 0 })
-
-  const requiredTotalBerths =
-    Math.ceil(throughputByType.container / singleBerthThroughput) +
-    Math.ceil(throughputByType.solid / singleBerthThroughput) +
-    Math.ceil(throughputByType.liquid / singleBerthThroughput)
-
-  const modulesAfterStorage = [...allModules, ...result]
-  const existingTotalBerths = modulesAfterStorage.reduce((sum, m) => {
-    const info = modulesMap[m.id]
-    if (info?.type !== 'pier') return sum
-    return sum + getPierDockCount(info) * m.count
-  }, 0)
-
-  const berthDeficit = Math.max(0, requiredTotalBerths - existingTotalBerths)
-
-  if (berthDeficit > 0) {
-    const preferredPier = findPreferredPierModule(race, modulesMap, plannedModules)
-    const berthPerModule = getPierDockCount(preferredPier)
-    if (preferredPier && berthPerModule > 0) {
-      const requiredPierCount = Math.ceil(berthDeficit / berthPerModule)
-      result.push({ id: preferredPier.id, count: requiredPierCount })
-    }
-  }
-
-  return result
-}
-
-function findBestStorage(
-  type: 'container' | 'solid' | 'liquid',
-  race: string,
-  modules: Record<string, X4Module>,
-  existingModules: SavedModule[]
-): X4Module | null {
-  const existingCandidates = existingModules
-    .map(m => modules[m.id])
-    .filter((m): m is X4Module => !!m && m.type === 'storage' && m.cargo?.type === type)
-    .sort((a, b) => (b.cargo?.capacity || 0) - (a.cargo?.capacity || 0))
-
-  if (existingCandidates.length > 0) {
-    return existingCandidates[0]!
-  }
-
-  let candidate = Object.values(modules).find(m =>
-    m.type === 'storage' &&
-    m.race === race &&
-    m.cargo?.type === type &&
-    m.cargo?.capacity > 500000
-  )
-
-  if (!candidate) {
-    candidate = Object.values(modules).find(m =>
-      m.type === 'storage' &&
-      m.cargo?.type === type &&
-      m.cargo?.capacity > 500000
-    )
-  }
-
-  if (!candidate) {
-    const allStorages = Object.values(modules).filter(m =>
-      m.type === 'storage' &&
-      m.cargo?.type === type
-    )
-    if (allStorages.length > 0) {
-      candidate = allStorages.sort((a, b) => (b.cargo?.capacity || 0) - (a.cargo?.capacity || 0))[0]
-    }
-  }
-
-  return candidate || null
-}
-
-function isELargePier(module: X4Module | undefined): module is X4Module {
-  return !!module && module.type === 'pier' && !!module.macroId?.includes('harbor_03')
-}
-
-function getPierDockCount(module: X4Module | null | undefined): number {
-  if (!module) return 0
-  if (typeof module.dockingCount === 'number' && module.dockingCount > 0) {
-    return module.dockingCount
-  }
-  const byName = Number((module.name || '').match(/(\d+)-Dock/i)?.[1] || 0)
-  if (byName > 0) return byName
-  return 0
-}
-
-function findPreferredPierModule(
-  race: string,
-  modules: Record<string, X4Module>,
-  plannedModules: SavedModule[]
-): X4Module | null {
-  const plannedPiers = plannedModules
-    .map(m => modules[m.id])
-    .filter((m): m is X4Module => !!m && m.type === 'pier')
-
-  const sameRacePlanned = plannedPiers.find((m) => m.race === race)
-  if (sameRacePlanned) return sameRacePlanned
-
-  if (plannedPiers.length > 0) return plannedPiers[0]!
-
-  const sameRace = Object.values(modules).find(m => isELargePier(m) && m.race === race)
-  if (sameRace) return sameRace
-
-  return Object.values(modules).find(m => isELargePier(m)) || null
 }

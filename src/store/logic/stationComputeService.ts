@@ -177,33 +177,31 @@ export interface DerivedSettings {
 
 export function getDerivedGroupedFlows(
   stationId: string,
-  modulesMap: Record<string, X4Module>,
+  _modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   derivedSettings: DerivedSettings
 ): GroupedFlows {
-  return getDerivedStationData(stationId, modulesMap, waresMap, derivedSettings).groupedFlows
+  return getDerivedStationData(stationId, waresMap, derivedSettings).groupedFlows
 }
 
 export function getDerivedStationData(
   stationId: string,
-  modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   derivedSettings: DerivedSettings
-): { groupedFlows: GroupedFlows; autoInfrastructureModules: SavedModule[] } {
+): { groupedFlows: GroupedFlows } {
   const state = stationStateMap.get(stationId)
   const cache = stationProductionFlowMap.getCache(stationId)
   if (!state || !cache || cache.productionFlows.length === 0 || !state.warePriorityLevels) {
     return {
-      groupedFlows: createEmptyGroupedFlows(),
-      autoInfrastructureModules: []
+      groupedFlows: createEmptyGroupedFlows()
     }
   }
 
   return calculateWareFlowDerived({
     productionFlows: cache.productionFlows,
-    autoIndustryModules: cache.resolvedModules.filter(m => !state.plannedModules.some(p => p.id === m.id)),
-    plannedModules: state.plannedModules,
-    modulesMap,
+    autoIndustryModules: [],
+    plannedModules: [],
+    modulesMap: {},
     waresMap,
     settings: derivedSettings,
     warePriorityLevels: state.warePriorityLevels
@@ -313,8 +311,14 @@ export function getProductionFlows(stationId: string): WareProductionFlow[] {
   return stationProductionFlowMap.getProductionFlows(stationId)
 }
 
-export function getAutoInfrastructureModules(stationId: string): SavedModule[] {
-  return stationStateMap.get(stationId)?.autoInfrastructureModules || []
+export function getAutoInfrastructureModules(stationId: string, modulesMap: Record<string, X4Module>): SavedModule[] {
+  const resolved = stationProductionFlowMap.getResolvedModules(stationId)
+  const plannedIds = stationStateMap.get(stationId)?.plannedModules?.map(m => m.id) || []
+  return resolved.filter(m => {
+    if (plannedIds.includes(m.id)) return false
+    const info = modulesMap[m.id]
+    return info?.type === 'storage' || info?.type === 'pier'
+  })
 }
 
 export function getWarePriorityLevels(stationId: string): Record<string, number> {

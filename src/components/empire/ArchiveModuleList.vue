@@ -4,11 +4,10 @@ import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { compareModuleGroupsByPickerOrder, compareModulesByPickerOrder } from '@/store/logic/searchModule'
 import StationPlanningItem from '@/components/empire/StationPlanningItem.vue'
-import type { AggregatedStationModule } from '@/types/saveArchive'
 import type { SavedModule, X4Module } from '@/types/x4'
 
 const props = defineProps<{
-  modules: AggregatedStationModule[]
+  modules: SavedModule[]
   buildingModules?: SavedModule[]
 }>()
 
@@ -27,33 +26,22 @@ const groupedModules = computed(() => {
   const groups: Record<string, GroupedArchiveModule[]> = {}
   const modulesMap = gameData.modulesMap
   const moduleGroupsMap = gameData.localizedModuleGroupsMap
-  const modulesByMacroId = gameData.modulesByMacroId
 
   props.modules.forEach((module) => {
-    let moduleId = module.module_id
-    let group = module.group || ''
-
-    if (!moduleId || !group) {
-      const matchedModule = modulesByMacroId[module.ref]
-      if (matchedModule) {
-        moduleId = moduleId || matchedModule.id
-        group = group || matchedModule.group || ''
-      }
-    }
-
-    if (!moduleId || !group) return
-
+    const moduleId = module.id
     const x4Module = modulesMap[moduleId]
     if (!x4Module) return
 
-    const savedModule: SavedModule = { id: moduleId, count: module.amount }
+    const group = x4Module.group || ''
+    if (!group) return
+
     const groupKey = group
 
     if (!groups[groupKey]) groups[groupKey] = []
     groups[groupKey]!.push({
       moduleId,
       group: groupKey,
-      savedModule,
+      savedModule: module,
       x4Module,
       isBuilding: false
     })
@@ -61,7 +49,8 @@ const groupedModules = computed(() => {
 
   if (props.buildingModules && props.buildingModules.length > 0) {
     props.buildingModules.forEach((buildingMod) => {
-      const x4Module = modulesMap[buildingMod.id]
+      const moduleId = buildingMod.id
+      const x4Module = modulesMap[moduleId]
       if (!x4Module) return
 
       const group = x4Module.group || ''
@@ -69,7 +58,7 @@ const groupedModules = computed(() => {
 
       if (!groups[group]) groups[group] = []
       groups[group]!.push({
-        moduleId: buildingMod.id,
+        moduleId,
         group,
         savedModule: buildingMod,
         x4Module,

@@ -13,6 +13,7 @@ import type {
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import type { ProductionSessionContext } from '@/types/production-context'
+import { stationProductionFlowMap } from './state/StationProductionFlowMap'
 import type {
   ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
@@ -41,14 +42,12 @@ import {
   getPlannedModules,
   getLockedWares,
   getWarePriority,
-  getAutoIndustryModules,
   getActualWorkforce,
   getCurrentEfficiency,
   deepClone,
   getProductionFlows,
   getAutoInfrastructureModules,
   getWarePriorityLevels,
-  updateAutoInfrastructureModules,
   getDerivedStationData,
   updateProductionFlowAggregationAfterRecompute,
   getActiveStationState,
@@ -227,36 +226,18 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
   })
 
-  const step1AutoIndustryModules = computed(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    return getAutoIndustryModules(stationId)
-  })
-
   const autoInfrastructureModules = computed(() => {
     const stationId = activeStation.value?.id || '__local__'
     const deps = getComputeDeps()
-    if (!deps) return getAutoInfrastructureModules(stationId)
-    return getDerivedStationData(stationId, deps.modulesMap, deps.waresMap, {
-      racePreference: settings.value.racePreference,
-      resourceBufferHours: settings.value.resourceBufferHours,
-      primaryProductBufferHours: settings.value.primaryProductBufferHours,
-      secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
-      buyMultiplier: settings.value.buyMultiplier,
-      sellMultiplier: settings.value.sellMultiplier,
-      transportMinutes: settings.value.transportMinutes,
-      transportShipCapacity: settings.value.transportShipCapacity,
-      sunlight: settings.value.sunlight
-    }).autoInfrastructureModules
+    if (!deps) return []
+    return getAutoInfrastructureModules(stationId, deps.modulesMap)
   })
 
   const autoIndustryModules = computed(() => {
-    const merged = step1AutoIndustryModules.value.map((module) => ({ ...module }))
-    autoInfrastructureModules.value.forEach((infra) => {
-      const existing = merged.find((m) => m.id === infra.id)
-      if (existing) existing.count += infra.count
-      else merged.push({ ...infra })
-    })
-    return merged
+    const stationId = activeStation.value?.id || '__local__'
+    const resolved = stationProductionFlowMap.getResolvedModules(stationId)
+    const plannedIds = plannedModules.value.map(m => m.id)
+    return resolved.filter(m => !plannedIds.includes(m.id))
   })
 
   const actualWorkforce = computed(() => {
@@ -283,7 +264,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     const stationId = activeStation.value?.id || '__local__'
     const deps = getComputeDeps()
     if (!deps) return getGroupedFlows(stationId)
-    return getDerivedStationData(stationId, deps.modulesMap, deps.waresMap, {
+    return getDerivedStationData(stationId, deps.waresMap, {
       racePreference: settings.value.racePreference,
       resourceBufferHours: settings.value.resourceBufferHours,
       primaryProductBufferHours: settings.value.primaryProductBufferHours,
@@ -426,11 +407,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   function isModuleCountEditable(moduleId: string): boolean {
     return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
-  }
-
-  function setAutoInfrastructureModules(modules: SavedModule[]): void {
-    const stationId = activeStation.value?.id || '__local__'
-    updateAutoInfrastructureModules(stationId, modules)
   }
 
   function getModuleInfo(id: string): X4Module {
@@ -1184,7 +1160,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateModuleCount,
     removeModuleById,
     transferModuleFromAutoIndustry,
-    setAutoInfrastructureModules,
     clearAll: clearAllModules
   }
 })

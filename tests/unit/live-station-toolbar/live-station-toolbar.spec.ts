@@ -29,6 +29,8 @@ describe('1 单元测试', () => {
     sectorSunlight: 100,
     hasBindingStation: false,
     hasSaveStation: false,
+    mode: 'planning' as 'live' | 'planning',
+    canToggle: false,
     settings: {
       racePreference: 'argon',
       considerWorkforceForAutoFill: true,
@@ -41,55 +43,47 @@ describe('1 单元测试', () => {
     singleBerthThroughput: 10000
   }
 
-  it('1.1 Unit: initialMode computed 正确计算初始模式', async () => {
-    // 1.1.1 输入 hasBindingStation=true, hasSaveStation=true -> 输出 'planning' #期望: ['planning']
+  it('1.1 Unit: mode prop 正确渲染模式状态', async () => {
+    // 1.1.1 输入 mode='planning', canToggle=true -> 显示规划模式，可点击
     const wrapper1 = mount(LiveStationToolbar, {
-      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: true }
+      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: true, mode: 'planning', canToggle: true }
     })
-    expect(wrapper1.vm.initialMode).toBe('planning')
+    const modeBtn = wrapper1.find('.mode-toggle-chip')
+    expect(modeBtn.classes()).toContain('active-planning')
+    expect(modeBtn.attributes('disabled')).toBeUndefined()
 
-    // 1.1.2 输入 hasBindingStation=true, hasSaveStation=false -> 输出 'planning' #期望: ['planning']
+    // 1.1.2 输入 mode='live', canToggle=true -> 显示实时模式，可点击
     const wrapper2 = mount(LiveStationToolbar, {
-      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: false }
+      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: true, mode: 'live', canToggle: true }
     })
-    expect(wrapper2.vm.initialMode).toBe('planning')
+    const modeBtn2 = wrapper2.find('.mode-toggle-chip')
+    expect(modeBtn2.classes()).toContain('active-live')
+    expect(modeBtn2.attributes('disabled')).toBeUndefined()
 
-    // 1.1.3 输入 hasBindingStation=false, hasSaveStation=true -> 输出 'live' #期望: ['live']
+    // 1.1.3 输入 mode='planning', canToggle=false -> 显示规划模式，不可点击
     const wrapper3 = mount(LiveStationToolbar, {
-      props: { ...defaultProps, hasBindingStation: false, hasSaveStation: true }
+      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: false, mode: 'planning', canToggle: false }
     })
-    expect(wrapper3.vm.initialMode).toBe('live')
-
-    // 1.1.4 输入 hasBindingStation=false, hasSaveStation=false -> 输出 'planning' (fallback) #期望: ['planning']
-    const wrapper4 = mount(LiveStationToolbar, {
-      props: { ...defaultProps, hasBindingStation: false, hasSaveStation: false }
-    })
-    expect(wrapper4.vm.initialMode).toBe('planning')
+    const modeBtn3 = wrapper3.find('.mode-toggle-chip')
+    expect(modeBtn3.classes()).toContain('active-planning')
+    expect(modeBtn3.classes()).toContain('no-toggle')
+    expect(modeBtn3.attributes('disabled')).toBeDefined()
   })
 
-  it('1.2 Unit: canToggle computed 正确计算切换能力', async () => {
-    // 1.2.1 输入 hasBindingStation=true, hasSaveStation=true -> 输出 true #期望: [true]
+  it('1.2 Unit: canToggle prop 正确控制切换能力', async () => {
+    // 1.2.1 输入 canToggle=true -> 点击按钮触发 toggleMode 事件
     const wrapper1 = mount(LiveStationToolbar, {
-      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: true }
+      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: true, mode: 'planning', canToggle: true }
     })
-    expect(wrapper1.vm.canToggle).toBe(true)
+    await wrapper1.find('.mode-toggle-chip').trigger('click')
+    expect(wrapper1.emitted('toggleMode')).toBeTruthy()
+    expect(wrapper1.emitted('toggleMode')?.length).toBe(1)
 
-    // 1.2.2 输入 hasBindingStation=true, hasSaveStation=false -> 输出 false #期望: [false]
+    // 1.2.2 输入 canToggle=false -> 点击按钮不触发 toggleMode 事件
     const wrapper2 = mount(LiveStationToolbar, {
-      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: false }
+      props: { ...defaultProps, hasBindingStation: true, hasSaveStation: false, mode: 'planning', canToggle: false }
     })
-    expect(wrapper2.vm.canToggle).toBe(false)
-
-    // 1.2.3 输入 hasBindingStation=false, hasSaveStation=true -> 输出 true #期望: [true]
-    const wrapper3 = mount(LiveStationToolbar, {
-      props: { ...defaultProps, hasBindingStation: false, hasSaveStation: true }
-    })
-    expect(wrapper3.vm.canToggle).toBe(true)
-
-    // 1.2.4 输入 hasBindingStation=false, hasSaveStation=false -> 输出 false #期望: [false]
-    const wrapper4 = mount(LiveStationToolbar, {
-      props: { ...defaultProps, hasBindingStation: false, hasSaveStation: false }
-    })
-    expect(wrapper4.vm.canToggle).toBe(false)
+    await wrapper2.find('.mode-toggle-chip').trigger('click')
+    expect(wrapper2.emitted('toggleMode')).toBeFalsy()
   })
 })

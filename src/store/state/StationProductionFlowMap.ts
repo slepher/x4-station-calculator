@@ -3,6 +3,7 @@ import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module,
 import type { RaceMedicalConsumption } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import { calculateProductionFlows } from '@/store/logic/calculateProductionFlows'
+import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
 
 export interface ProductionFlowComputeDeps {
   modulesMap: Record<string, X4Module>
@@ -177,14 +178,34 @@ export class StationProductionFlowMap {
       warePriority: input.warePriority
     })
 
-    const resolvedModules = [...input.plannedModules, ...result.autoIndustryModules]
-    
     const productionFlows = result.productionFlows.map(flow => ({
       ...flow,
       productionVolume: flow.production * flow.unitVolume,
       consumptionVolume: flow.consumption * flow.unitVolume,
       netVolume: flow.netRate * flow.unitVolume
     }))
+
+    const warePriorityLevels = input.warePriority || {}
+    const autoInfrastructureModules = calculateInfrastructureModules({
+      productionFlows,
+      plannedModules: input.plannedModules,
+      autoIndustryModules: result.autoIndustryModules,
+      modulesMap: deps.modulesMap,
+      settings: {
+        racePreference: input.settings.racePreference,
+        resourceBufferHours: input.settings.resourceBufferHours,
+        primaryProductBufferHours: input.settings.primaryProductBufferHours,
+        secondaryProductBufferHours: input.settings.secondaryProductBufferHours,
+        transportShipCapacity: input.settings.transportShipCapacity
+      },
+      warePriorityLevels
+    })
+
+    const resolvedModules = [
+      ...input.plannedModules,
+      ...result.autoIndustryModules,
+      ...autoInfrastructureModules
+    ]
 
     this.cacheMap.set(stationId, {
       resolvedModules,
