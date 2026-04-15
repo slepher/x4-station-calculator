@@ -53,12 +53,12 @@ import {
   getActualWorkforce,
   getCurrentEfficiency,
   deepClone,
-  getDerivedStationData
+  getDerivedStationData,
+  updateProductionFlowAggregationAfterRecompute
 } from './logic/stationComputeService'
 import { analyzeStation } from './logic/analyzeStation'
 import {
   createEmpireSourceView,
-  computeActiveStation,
   computeActiveTransitSectorId,
   toTransitTabId
 } from './logic/empireSourceView'
@@ -66,7 +66,8 @@ import { createEmpireFlowFacade } from './logic/empireFlowFacade'
 import {
   createBindingPlanStationId,
   parseBindingStationId,
-  toProductionStation
+  toProductionStation,
+  createDerivedSaveStationId
 } from './logic/productionSourceAdapter'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 
@@ -144,13 +145,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const sectorInternalDataMap = flowFacade.sectorInternalDataMap
   const sectorLinkCalcMap = flowFacade.sectorLinkCalcMap
 
-  const activeStation = computed(() => computeActiveStation(
-    productionSource.value,
-    derivedBindingStations.value,
-    null,
-    activeStationId.value
-  ))
-
   const activeTransitSectorId = computed(() => computeActiveTransitSectorId(
     activeStationId.value,
     sectors.value
@@ -188,7 +182,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return group.connectedGroupIds || []
   }
 
-  function getBindingStation(): BindingStationPlan | null {
+  const bindingStation = computed<BindingStationPlan | null>(() => {
     const stationId = activeStationId.value
     if (!stationId) return null
     
@@ -207,9 +201,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
     
     return null
-  }
+  })
 
-  function getArchiveStation(): ArchiveStationData | null {
+  const archiveStation = computed<ArchiveStationData | null>(() => {
     const stationId = activeStationId.value
     if (!stationId) return null
     
@@ -324,7 +318,57 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       cargo: stationEntry.cargo,
       reservation: stationEntry.reservation
     }
+  })
+
+  const mode = ref<'live' | 'planning'>('planning')
+
+  const initialMode = computed<'live' | 'planning'>(() => {
+    const hasBinding = bindingStation.value !== null
+    const hasSave = archiveStation.value !== null
+    if (hasBinding && hasSave) return 'planning'
+    if (hasBinding && !hasSave) return 'planning'
+    if (!hasBinding && hasSave) return 'live'
+    return 'planning'
+  })
+
+  const canToggle = computed(() => {
+    const hasBinding = bindingStation.value !== null
+    const hasSave = archiveStation.value !== null
+    return (hasBinding && hasSave) || (!hasBinding && hasSave)
+  })
+
+  function toggleMode() {
+    if (!canToggle.value) return
+    mode.value = mode.value === 'live' ? 'planning' : 'live'
   }
+
+  watch(activeStationId, () => {
+    if (activeStationId.value) {
+      mode.value = initialMode.value
+    }
+  })
+
+  const activeStation = computed<StationPlan | null>(() => {
+    const gameGuid = activeBinding.value?.gameGuid || ''
+    if (bindingStation.value) {
+      return toProductionStation(gameGuid, bindingStation.value)
+    }
+    if (archiveStation.value) {
+      const archive = archiveStation.value
+      const id = createDerivedSaveStationId(gameGuid, archive.code)
+      return {
+        id,
+        name: archive.name || archive.code,
+        type: 'industrial',
+        modules: archive.modules || [],
+        settings: { ...DEFAULT_STATION_SETTINGS },
+        lastUpdated: 0,
+        lockedWares: [],
+        warePriority: {}
+      }
+    }
+    return null
+  })
 
   function getComputeDeps() {
     const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
@@ -360,6 +404,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       syncPersistedToStateMap(station.id, station)
       recomputeStation(station.id, deps)
     })
+
+    const stationPlans = stations.map(item => item.station)
+    updateProductionFlowAggregationAfterRecompute(stationPlans)
   }
 
   function syncPersistedActiveStationToStateMap(): void {
@@ -1349,8 +1396,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     selectOverview,
     getStationById,
     getDerivedBindingStation,
-    getBindingStation,
-    getArchiveStation,
+    bindingStation,
+    archiveStation,
+    mode,
+    initialMode,
+    canToggle,
+    toggleMode,
     updateStationSettings,
     updateStationModules,
     updateStationType,

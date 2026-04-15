@@ -49,7 +49,8 @@ import {
   getAutoInfrastructureModules,
   getWarePriorityLevels,
   updateAutoInfrastructureModules,
-  getDerivedStationData
+  getDerivedStationData,
+  updateProductionFlowAggregationAfterRecompute
 } from './logic/stationComputeService'
 import { analyzeStation } from './logic/analyzeStation'
 import {
@@ -522,6 +523,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeEmpire.value.stations.forEach(station => {
       refreshStationFlowCache(station.id)
     })
+    updateProductionFlowAggregationAfterRecompute(activeEmpire.value)
   }
 
   function clearStationCaches() {

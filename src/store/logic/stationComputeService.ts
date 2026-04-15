@@ -1,4 +1,4 @@
-import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, GroupedFlows } from '@/types/x4'
+import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, GroupedFlows, EmpirePlan } from '@/types/x4'
 import type { RaceMedicalConsumption } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import {
@@ -7,6 +7,11 @@ import {
   migrateStationSettings,
   type StationComputeDeps
 } from '@/store/state/StationStateMap'
+import {
+  stationProductionFlowMap,
+  type ProductionFlowComputeDeps,
+  updateProductionFlowAggregation
+} from '@/store/state/StationProductionFlowMap'
 import { calculateWareFlowDerived } from '@/store/logic/calculateWareFlowDerived'
 
 export function deepClone<T>(value: T): T {
@@ -40,6 +45,17 @@ export function buildStationComputeDeps(gameData: {
   }
 }
 
+function toProductionFlowDeps(deps: StationComputeDeps): ProductionFlowComputeDeps {
+  return {
+    modulesMap: deps.modulesMap,
+    waresMap: deps.waresMap,
+    medicalConsumptionMap: deps.medicalConsumptionMap,
+    buildPriceMultiplier: deps.buildPriceMultiplier,
+    enforceDlcActivation: deps.enforceDlcActivation,
+    isModuleDlcActive: deps.isModuleDlcActive
+  }
+}
+
 export function syncPersistedToStateMap(stationId: string, station: StationPlan): void {
   station.settings = migrateStationSettings(station.settings)
   stationStateMap.fromPersisted(stationId, station)
@@ -47,6 +63,27 @@ export function syncPersistedToStateMap(stationId: string, station: StationPlan)
 
 export function recomputeStation(stationId: string, deps: StationComputeDeps): void {
   stationStateMap.recompute(stationId, deps)
+  const state = stationStateMap.get(stationId)
+  if (state) {
+    stationProductionFlowMap.compute(stationId, {
+      plannedModules: state.plannedModules,
+      settings: state.settings,
+      lockedWares: state.lockedWares,
+      warePriority: state.warePriority
+    }, toProductionFlowDeps(deps))
+  }
+}
+
+export function computeAllProductionFlows(empire: EmpirePlan, deps: StationComputeDeps): void {
+  stationProductionFlowMap.computeAll(empire, toProductionFlowDeps(deps))
+}
+
+export function getEmpireFlows(): WareProductionFlow[] {
+  return stationProductionFlowMap.getEmpireFlows()
+}
+
+export function getSectorFlows(sectorId: string): WareProductionFlow[] {
+  return stationProductionFlowMap.getSectorFlows(sectorId)
 }
 
 export function syncStateMapToPersisted(stationId: string): Pick<StationPlan, 'modules' | 'lockedWares' | 'warePriority' | 'settings'> | null {
@@ -54,15 +91,16 @@ export function syncStateMapToPersisted(stationId: string): Pick<StationPlan, 'm
 }
 
 export function getGroupedFlows(stationId: string): GroupedFlows {
-  return stationStateMap.getGroupedFlows(stationId)
+  return stationProductionFlowMap.getGrouped(stationId)
 }
 
 export function getFilteredGroupedFlows(stationId: string): GroupedFlows {
-  return stationStateMap.getFilteredGroupedFlows(stationId)
+  const priorityLevels = stationStateMap.getWarePriorityLevels(stationId)
+  return stationProductionFlowMap.getFilteredGrouped(stationId, priorityLevels)
 }
 
 export function getFilteredProductionFlows(stationId: string): WareProductionFlow[] {
-  return stationStateMap.getFilteredProductionFlows(stationId)
+  return stationProductionFlowMap.getStationFlows(stationId)
 }
 
 function createEmptyGroupedFlows(): GroupedFlows {
@@ -99,14 +137,8 @@ export function getDerivedStationData(
   derivedSettings: DerivedSettings
 ): { groupedFlows: GroupedFlows; autoInfrastructureModules: SavedModule[] } {
   const state = stationStateMap.get(stationId)
-  if (!state || !state.productionFlows || !state.warePriorityLevels) {
-    return {
-      groupedFlows: createEmptyGroupedFlows(),
-      autoInfrastructureModules: []
-    }
-  }
-
-  if (state.productionFlows.length === 0) {
+  const productionFlows = stationProductionFlowMap.getStationFlows(stationId)
+  if (!state || !productionFlows || productionFlows.length === 0 || !state.warePriorityLevels) {
     return {
       groupedFlows: createEmptyGroupedFlows(),
       autoInfrastructureModules: []
@@ -114,7 +146,7 @@ export function getDerivedStationData(
   }
 
   return calculateWareFlowDerived({
-    productionFlows: state.productionFlows,
+    productionFlows,
     autoIndustryModules: state.autoIndustryModules,
     plannedModules: state.plannedModules,
     modulesMap,
@@ -187,6 +219,7 @@ export function writePersistedAndRecompute(
 
 export function clearStationState(stationId: string): void {
   stationStateMap.remove(stationId)
+  stationProductionFlowMap.remove(stationId)
 }
 
 export function getPlannedModules(stationId: string): SavedModule[] {
@@ -222,7 +255,7 @@ export function cloneStationState(fromId: string, toId: string): void {
 }
 
 export function getProductionFlows(stationId: string): WareProductionFlow[] {
-  return stationStateMap.getProductionFlows(stationId)
+  return stationProductionFlowMap.getStationFlows(stationId)
 }
 
 export function getAutoInfrastructureModules(stationId: string): SavedModule[] {
@@ -237,4 +270,9 @@ export function updateAutoInfrastructureModules(stationId: string, modules: Save
   stationStateMap.mutate(stationId, (state) => {
     state.autoInfrastructureModules = modules
   })
+}
+
+export function updateProductionFlowAggregationAfterRecompute(empireOrStations: EmpirePlan | StationPlan[]): void {
+  const stations = Array.isArray(empireOrStations) ? empireOrStations : empireOrStations.stations
+  updateProductionFlowAggregation(stations)
 }

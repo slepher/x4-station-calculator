@@ -1,5 +1,20 @@
 # Station Production Flow Map - 实现任务
 
+## Tasks
+
+- [x] Task 1: 创建 StationProductionFlowMap 类
+- [x] Task 2: 实现 compute 方法
+- [x] Task 3: 实现 computeAll 方法
+- [x] Task 4: 实现 getter 方法
+- [x] Task 5: 迁移 helper 函数
+- [x] Task 6: 移除 StationStateMap flow 相关字段
+- [x] Task 7: 更新 stationComputeService
+- [x] Task 8: 更新 useBlueprintProductionStore 和 useLiveProductionStore
+- [x] Task 9: 更新 UI 组件
+- [x] Task 10: 构建验证
+
+---
+
 ## Task 1: 创建 StationProductionFlowMap 类
 
 **文件**：`src/store/state/StationProductionFlowMap.ts`
@@ -21,8 +36,6 @@
 
 **依赖**：无
 
-**状态**：待实现
-
 ## Task 2: 实现 compute 方法
 
 **文件**：`src/store/state/StationProductionFlowMap.ts`
@@ -37,8 +50,6 @@
 
 **依赖**：Task 1
 
-**状态**：待实现
-
 ## Task 3: 实现 computeAll 方法
 
 **文件**：`src/store/state/StationProductionFlowMap.ts`
@@ -51,8 +62,6 @@
   - 调用 `groupBySector()` 计算 sectorFlowsCache
 
 **依赖**：Task 2
-
-**状态**：待实现
 
 ## Task 4: 实现 getter 方法
 
@@ -67,8 +76,6 @@
   - 调用 `groupProductionFlows(flows)` 返回 GroupedFlows
 
 **依赖**：Task 3
-
-**状态**：待实现
 
 ## Task 5: 迁移 helper 函数
 
@@ -86,8 +93,6 @@
 
 **依赖**：Task 1
 
-**状态**：待实现
-
 ## Task 6: 移除 StationStateMap flow 相关字段
 
 **文件**：`src/store/state/StationStateMap.ts`
@@ -104,8 +109,6 @@
 - recompute() 返回值仅用于 autoIndustryModules / warePriorityLevels / stationAnalysis
 
 **依赖**：Task 5
-
-**状态**：待实现
 
 ## Task 7: 更新 stationComputeService
 
@@ -126,8 +129,6 @@
 
 **依赖**：Task 1-4
 
-**状态**：待实现
-
 ## Task 8: 更新 useBlueprintProductionStore 和 useLiveProductionStore
 
 **文件**：
@@ -143,8 +144,6 @@
 
 **依赖**：Task 6, Task 7
 
-**状态**：待实现
-
 ## Task 9: 更新 UI 组件
 
 **文件**：
@@ -159,8 +158,6 @@
 
 **依赖**：Task 8
 
-**状态**：待实现
-
 ## Task 10: 构建验证
 
 **命令**：`npm run build`
@@ -170,8 +167,6 @@
 - 无运行时错误（开发环境）
 
 **依赖**：Task 1-9
-
-**状态**：待实现
 
 ## 执行顺序
 
@@ -186,7 +181,3 @@ Task 7 → Task 8 (串行)
   ↓
 Task 9 → Task 10
 ```
-
-## 当前进度
-
-**全部任务**：待实现

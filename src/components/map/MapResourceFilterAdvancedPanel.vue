@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
-import { stationStateMap } from '@/store/state/StationStateMap'
+import { stationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
 import type { SavedFlowGroup } from '@/types/x4'
 import {
   ADVANCED_SUNLIGHT_TAG_ID,
@@ -163,7 +163,7 @@ const loadableEmpires = computed(() => {
   return empires.filter(empire => {
     const stations = empire.stations || []
     return stations.some(station => {
-      const flows = stationStateMap.getGroupedFlows(station.id)
+      const flows = stationProductionFlowMap.getGrouped(station.id)
       return flows.rateGroups.resources.length > 0
     })
   }).map(empire => ({
@@ -205,14 +205,14 @@ const loadEmpireStations = (empireId: string) => {
   
   const newGroups: AdvancedResourceTagGroup[] = []
   for (const station of stations) {
-    const flows = stationStateMap.getGroupedFlows(station.id)
-    const resourceWares = flows.rateGroups.resources.map(f => f.wareId)
+    const flows = stationProductionFlowMap.getGrouped(station.id)
+    const resourceWares = flows.rateGroups.resources.map((f: { wareId: string }) => f.wareId)
     if (resourceWares.length === 0) continue
     
     const group = buildDefaultGroup()
     group.tagIds = resourceWares
     group.minYieldByWare = Object.fromEntries(
-      resourceWares.map(wareId => [wareId, 'low'])
+      resourceWares.map((wareId: string) => [wareId, 'low'])
     )
     newGroups.push(group)
   }
