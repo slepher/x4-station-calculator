@@ -20,10 +20,10 @@
 - [x] Task 16: 构建验证（Phase 2）
 - [x] Task 17: autoInfrastructureModules 移至 Stage 1
 - [x] Task 18: 移除 calculateWareFlowDerived 中的 autoInfrastructure 计算
-- [ ] Task 19: 创建 useWareFlowGrouping composable
-- [ ] Task 20: StationWareFlowsDashboard 重构
-- [ ] Task 21: Presenter 层改动
-- [ ] Task 22: Contract + Store 层改动
+- [x] Task 19: 创建 useWareFlowGrouping composable
+- [x] Task 20: StationWareFlowsDashboard 重构
+- [x] Task 21: Presenter 层改动
+- [x] Task 22: Contract + Store 层改动
 - [ ] Task 23: 删除 StationStateMap.ts
 - [ ] Task 24: 构建验证
 

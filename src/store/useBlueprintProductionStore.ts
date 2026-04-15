@@ -959,7 +959,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
-    getGroupedFlows: () => groupedFlows.value,
+    getProductionFlows: () => productionFlows.value,
+    getWarePriorityLevels: () => warePriorityLevels.value,
     getWareflowSettings: () => ({
       resourceBufferHours: settings.value.resourceBufferHours,
       primaryProductBufferHours: settings.value.primaryProductBufferHours,
@@ -1080,10 +1081,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     isWareLocked: (wareId: string) => isWareLocked(wareId),
     getResolvedLevel: (wareId: string) => getResolvedLevel(wareId),
     isWareOperable: (wareId: string) => isWareOperable(wareId),
-    isPlannedWare: (wareId: string) => isPlannedWare(wareId),
-
-    getWares: () => wares.value,
-    getModulesMap: () => gameData.localizedModulesMap
+    isPlannedWare: (wareId: string) => isPlannedWare(wareId)
   }
 
   return {

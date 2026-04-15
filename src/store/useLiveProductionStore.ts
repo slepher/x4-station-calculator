@@ -1218,7 +1218,8 @@ const autoInfrastructureModules = computed(() => {
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
-    getGroupedFlows: () => groupedFlows.value,
+    getProductionFlows: () => productionFlows.value,
+    getWarePriorityLevels: () => warePriorityLevels.value,
     getWareflowSettings: () => ({
       resourceBufferHours: settings.value.resourceBufferHours,
       primaryProductBufferHours: settings.value.primaryProductBufferHours,
@@ -1338,10 +1339,7 @@ const autoInfrastructureModules = computed(() => {
     isWareLocked: (wareId: string) => isWareLocked(wareId),
     getResolvedLevel: (wareId: string) => getResolvedLevel(wareId),
     isWareOperable: (wareId: string) => isWareOperable(wareId),
-    isPlannedWare: (wareId: string) => isPlannedWare(wareId),
-
-    getWares: () => wares.value,
-    getModulesMap: () => gameData.localizedModulesMap
+    isPlannedWare: (wareId: string) => isPlannedWare(wareId)
   }
 
   return {

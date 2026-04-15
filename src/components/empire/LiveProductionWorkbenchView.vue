@@ -230,13 +230,10 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
         :view-mode="wareflowPresenter.props.viewMode.value"
-        :grouped-flows="wareflowPresenter.props.groupedFlows.value"
-        :auto-modules="wareflowPresenter.props.autoModules.value"
+        :production-flows="wareflowPresenter.props.productionFlows.value"
+        :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"
-        :planned-modules="wareflowPresenter.props.plannedModules.value"
-        :wares="wareflowPresenter.props.wares.value"
-        :modules-map="wareflowPresenter.props.modulesMap.value"
         :is-ware-locked="wareflowPresenter.props.isWareLocked"
         :get-resolved-level="wareflowPresenter.props.getResolvedLevel"
         :is-ware-operable="wareflowPresenter.props.isWareOperable"
