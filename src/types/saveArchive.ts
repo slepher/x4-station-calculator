@@ -1,3 +1,5 @@
+import type { SavedModule } from './x4'
+
 export type SaveSource = 'original' | 'imported'
 
 export interface VersionMismatchError {
@@ -383,4 +385,27 @@ export interface SaveParserConfig {
   strings: Record<string, Record<string, string>>
   currentVersion: string
   filename?: string
+}
+
+export interface ArchiveStationSectorData {
+  name: string
+  resources: string[]
+  sunlight: number
+}
+
+export interface ArchiveStationBuildingData {
+  modules: SavedModule[]
+  cargo: WareAmount[]
+  reservation: WareAmount[]
+}
+
+export interface ArchiveStationData {
+  code: string
+  name?: string
+  sectorMacro: string
+  sector: ArchiveStationSectorData
+  modules: SavedModule[]
+  building: ArchiveStationBuildingData
+  cargo?: WareAmount[]
+  reservation?: WareAmount[]
 }

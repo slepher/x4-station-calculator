@@ -53,6 +53,15 @@ const activeStation = computed(() => liveStore.activeStation)
 const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
 const isOverview = computed(() => !activeStation.value && !activeTransitSectorId.value)
 
+const bindingStation = computed(() => liveStore.getBindingStation())
+const archiveStation = computed(() => liveStore.getArchiveStation())
+
+const hasBindingStation = computed(() => bindingStation.value !== null)
+const hasSaveStation = computed(() => archiveStation.value !== null)
+const stationCode = computed(() => archiveStation.value?.code || '')
+const sectorResources = computed(() => archiveStation.value?.sector.resources || [])
+const sectorSunlight = computed(() => archiveStation.value?.sector.sunlight ?? 100)
+
 const importModalActiveStation = computed(() => {
   if (!activeStation.value) return null
   return { id: activeStation.value.id, modules: activeStation.value.modules }
@@ -112,18 +121,17 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
   
   <LiveStationToolbar
     v-if="activeStation"
-    :station="toolbarPresenter.props.station.value!"
+    :station-name="toolbarPresenter.props.station.value?.name || ''"
+    :station-code="stationCode"
+    :sector-resources="sectorResources"
+    :sector-sunlight="sectorSunlight"
+    :has-binding-station="hasBindingStation"
+    :has-save-station="hasSaveStation"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
-    :station-types="toolbarPresenter.props.stationTypes"
-    :available-minerals="toolbarPresenter.props.availableMinerals"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     @update-station-name="toolbarPresenter.emits.updateStationName"
-    @update-station-type="toolbarPresenter.emits.updateStationType"
-    @update-station-count="toolbarPresenter.emits.updateStationCount"
-    @toggle-mineral="toolbarPresenter.emits.toggleMineral"
-    @update-sunlight="toolbarPresenter.emits.updateSunlight"
-    @update-transport-minutes="toolbarPresenter.emits.updateTransportMinutes"
+    @toggle-mode="() => {}"
     @update-race-preference="toolbarPresenter.emits.updateRacePreference"
     @update-workforce="toolbarPresenter.emits.updateWorkforce"
     @update-show-empire-gaps="toolbarPresenter.emits.updateShowEmpireGaps"

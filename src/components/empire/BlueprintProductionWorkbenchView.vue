@@ -63,15 +63,12 @@ const importModalActiveStation = computed(() => {
     @delete-station="tabbarPresenter.emits.deleteStation"
   />
   <BlueprintContextToolbar
-    :mode="toolbarPresenter.props.mode.value"
-    :title-model="toolbarPresenter.props.titleModel.value"
-    :station="toolbarPresenter.props.station.value"
+    :station="toolbarPresenter.props.station.value!"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
     :station-types="toolbarPresenter.props.stationTypes"
     :available-minerals="toolbarPresenter.props.availableMinerals"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
-    @update-title="toolbarPresenter.emits.updateTitle"
     @update-station-name="toolbarPresenter.emits.updateStationName"
     @update-station-type="toolbarPresenter.emits.updateStationType"
     @update-station-count="toolbarPresenter.emits.updateStationCount"

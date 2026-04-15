@@ -9,11 +9,12 @@ import type {
   TransitHubViewModel,
   SupplyPlanningInput,
   SectorInternalData,
-  X4Module
+  X4Module,
+  BindingStationPlan
 } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { ProductionSessionContext } from '@/types/production-context'
-import type { PlayerStationRecord } from '@/types/saveArchive'
+import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
 import type {
   ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
@@ -185,6 +186,120 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const group = activeBinding.value?.groups.find(g => g.id === sectorId)
     if (!group) return []
     return group.connectedGroupIds || []
+  }
+
+  function getBindingStation(): BindingStationPlan | null {
+    const stationId = activeStationId.value
+    if (!stationId) return null
+    
+    const parsed = parseBindingStationId(stationId)
+    if (!parsed) return null
+    
+    const binding = activeBinding.value
+    if (!binding) return null
+    
+    if (parsed.kind === 'plan') {
+      return binding.stationPlans.find(plan => plan.id === parsed.planId) || null
+    }
+    
+    if (parsed.kind === 'derived') {
+      return binding.stationPlans.find(plan => plan.saveStationCode === parsed.saveStationCode) || null
+    }
+    
+    return null
+  }
+
+  function getArchiveStation(): ArchiveStationData | null {
+    const stationId = activeStationId.value
+    if (!stationId) return null
+    
+    const parsed = parseBindingStationId(stationId)
+    if (!parsed || parsed.kind !== 'derived') return null
+    
+    const code = parsed.saveStationCode
+    const record = playerStationRecords.value.find(r => r.code === code && r.type === 'station')
+    if (!record) return null
+    
+    const stationEntry = record.data as PlayerStationEntry
+    const sectorMacro = record.sectorMacro
+    
+    const sector = gameData.maps?.sectors?.[sectorMacro]
+    const sectorData = {
+      name: sector?.name || sectorMacro,
+      resources: (sector?.resources || []).map(r => r.ware),
+      sunlight: sector?.area?.sunlight ?? 100
+    }
+    
+    const modules: SavedModule[] = []
+    if (stationEntry.modules) {
+      const modulesByMacroId = gameData.modulesByMacroId
+      for (const mod of Object.values(stationEntry.modules)) {
+        const matchedModule = mod.module_id || modulesByMacroId[mod.ref]?.id
+        if (matchedModule) {
+          const existing = modules.find(m => m.id === matchedModule)
+          if (existing) {
+            existing.count += mod.amount
+          } else {
+            modules.push({ id: matchedModule, count: mod.amount })
+          }
+        }
+      }
+    }
+    
+    const buildingModules: SavedModule[] = []
+    if (stationEntry.buildstorage_code) {
+      const buildstorageRecord = playerStationRecords.value.find(
+        r => r.code === stationEntry.buildstorage_code && r.type === 'buildstorage'
+      )
+      if (buildstorageRecord) {
+        const buildstorageEntry = buildstorageRecord.data as BuildStorageEntry
+        if (buildstorageEntry.modules) {
+          const modulesByMacroId = gameData.modulesByMacroId
+          const stationModuleIds = new Set(modules.map(m => m.id))
+          for (const mod of Object.values(buildstorageEntry.modules)) {
+            const matchedModule = mod.module_id || modulesByMacroId[mod.ref]?.id
+            if (matchedModule && !stationModuleIds.has(matchedModule)) {
+              const existing = buildingModules.find(m => m.id === matchedModule)
+              if (existing) {
+                existing.count += mod.amount
+              } else {
+                buildingModules.push({ id: matchedModule, count: mod.amount })
+              }
+            }
+          }
+        }
+        
+        return {
+          code: record.code,
+          name: stationEntry.macro,
+          sectorMacro,
+          sector: sectorData,
+          modules,
+          building: {
+            modules: buildingModules,
+            cargo: buildstorageEntry.cargo || [],
+            reservation: buildstorageEntry.reservation || []
+          },
+          cargo: stationEntry.cargo,
+          reservation: stationEntry.reservation
+        }
+      }
+    }
+    
+    return {
+      code: record.code,
+      name: stationEntry.macro,
+      sectorMacro,
+      sector: sectorData,
+      modules,
+      building: {
+        modules: buildingModules,
+        cargo: [],
+        reservation: []
+      },
+      cargo: stationEntry.cargo,
+      reservation: stationEntry.reservation
+    }
   }
 
   function getComputeDeps() {
@@ -1209,6 +1324,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     selectOverview,
     getStationById,
     getDerivedBindingStation,
+    getBindingStation,
+    getArchiveStation,
     updateStationSettings,
     updateStationModules,
     updateStationType,

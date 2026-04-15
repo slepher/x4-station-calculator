@@ -60,6 +60,12 @@ const saveStationModules = computed<AggregatedStationModule[]>(() => {
   return Object.values(record.data.modules)
 })
 
+const archiveStation = computed(() => liveStore.getArchiveStation())
+
+const buildingModules = computed<SavedModule[]>(() => {
+  return archiveStation.value?.building.modules || []
+})
+
 const hasArchiveModules = computed(() => saveStationModules.value.length > 0)
 
 const showTabs = computed(() => isSaveStation.value && hasArchiveModules.value)
@@ -104,6 +110,7 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
       <ArchiveModuleList
         v-else
         :modules="saveStationModules"
+        :building-modules="buildingModules"
       />
     </div>
   </div>

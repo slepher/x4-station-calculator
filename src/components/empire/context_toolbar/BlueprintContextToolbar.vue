@@ -5,18 +5,13 @@ import type { StationType, StationSettings } from '@/types/x4'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
 
 const props = defineProps<{
-  mode: 'overview' | 'station'
-  titleModel: {
-    value: string
-    placeholder: string
-  }
   station: {
     id: string
     name: string
     type: StationType
     count: number
     minerals: string[]
-  } | null
+  }
   settings: Partial<StationSettings> | StationSettings | null
   races: Array<{ value: string; label: string }>
   stationTypes: Array<{ value: StationType; label: string }>
@@ -25,7 +20,6 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  updateTitle: [value: string]
   updateStationName: [value: string]
   updateStationType: [value: StationType]
   updateStationCount: [value: number]
@@ -40,25 +34,18 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const isOverview = computed(() => props.mode !== 'station')
-
-const titleValue = computed({
-  get: () => props.titleModel.value,
-  set: (val: string) => emit('updateTitle', val)
-})
-
 const stationName = computed({
-  get: () => props.station?.name || '',
+  get: () => props.station.name,
   set: (name: string) => emit('updateStationName', name)
 })
 
 const stationType = computed({
-  get: () => props.station?.type || 'industrial',
+  get: () => props.station.type,
   set: (type: StationType) => emit('updateStationType', type)
 })
 
 const stationCount = computed({
-  get: () => props.station?.count ?? 1,
+  get: () => props.station.count ?? 1,
   set: (val: number) => emit('updateStationCount', val)
 })
 
@@ -93,7 +80,7 @@ const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
 }).format(n)
 
 const showMineralPopover = ref(false)
-const selectedMinerals = computed(() => props.station?.minerals || [])
+const selectedMinerals = computed(() => props.station.minerals || [])
 
 const toggleMineral = (mineral: string) => {
   emit('toggleMineral', mineral)
@@ -106,21 +93,7 @@ const handleOpenImport = () => {
 
 <template>
   <div class="context-toolbar">
-    
-    <div v-if="isOverview" class="toolbar-content w-full flex items-center">
-      <div class="toolbar-section">
-        <div class="input-group">
-          <label class="group-label">{{ t('empire.empire_name') }}</label>
-          <input 
-            v-model="titleValue"
-            class="ghost-input w-64 text-lg"
-            :placeholder="props.titleModel.placeholder"
-          />
-        </div>
-      </div>
-    </div>
-
-    <div v-else class="toolbar-content w-full flex items-center">
+    <div class="toolbar-content w-full flex items-center">
       
       <div class="toolbar-section">
         <div class="input-group">
@@ -248,7 +221,7 @@ const handleOpenImport = () => {
       <button
         class="icon-btn"
         :title="t('logicFlowImport.entry_title')"
-        :data-testid="isOverview ? 'logicflow-import-entry-empire' : 'logicflow-import-entry-station'"
+        :data-testid="'logicflow-import-entry-station'"
         @click="handleOpenImport"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>

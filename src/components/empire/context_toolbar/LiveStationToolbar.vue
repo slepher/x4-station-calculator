@@ -1,38 +1,23 @@
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { StationType, StationSettings } from '@/types/x4'
-import X4NumberInput from '@/components/common/X4NumberInput.vue'
+import type { StationSettings } from '@/types/x4'
 
 const props = defineProps<{
-  station: {
-    id: string
-    name: string
-    type: StationType
-    count: number
-    minerals: string[]
-  }
+  stationName: string
+  stationCode: string
+  sectorResources: string[]
+  sectorSunlight: number
+  hasBindingStation: boolean
+  hasSaveStation: boolean
   settings: Partial<StationSettings> | StationSettings | null
   races: Array<{ value: string; label: string }>
-  stationTypes: Array<{ value: StationType; label: string }>
-  availableMinerals: string[]
   singleBerthThroughput: number
-  liveData?: {
-    stationCargo?: Array<{ ware: string; amount: number }>
-    stationReservation?: Array<{ ware: string; amount: number }>
-    buildStorageCargo?: Array<{ ware: string; amount: number }>
-    buildStorageReservation?: Array<{ ware: string; amount: number }>
-    constructingModules?: Array<{ name: string; progress: number }>
-  } | null
 }>()
 
 const emit = defineEmits<{
   updateStationName: [value: string]
-  updateStationType: [value: StationType]
-  updateStationCount: [value: number]
-  toggleMineral: [mineral: string]
-  updateSunlight: [value: number]
-  updateTransportMinutes: [value: number]
+  toggleMode: [mode: 'live' | 'planning']
   updateRacePreference: [value: string]
   updateWorkforce: [value: boolean]
   updateShowEmpireGaps: [value: boolean]
@@ -41,29 +26,27 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const stationName = computed({
-  get: () => props.station?.name || '',
-  set: (name: string) => emit('updateStationName', name)
+const mode = ref<'live' | 'planning'>('planning')
+
+const initialMode = computed(() => {
+  if (props.hasBindingStation && props.hasSaveStation) return 'planning'
+  if (props.hasBindingStation && !props.hasSaveStation) return 'planning'
+  if (!props.hasBindingStation && props.hasSaveStation) return 'live'
+  return 'planning'
 })
 
-const stationType = computed({
-  get: () => props.station?.type || 'industrial',
-  set: (type: StationType) => emit('updateStationType', type)
+const canToggle = computed(() => {
+  return props.hasBindingStation && props.hasSaveStation
+    || !props.hasBindingStation && props.hasSaveStation
 })
 
-const stationCount = computed({
-  get: () => props.station?.count ?? 1,
-  set: (val: number) => emit('updateStationCount', val)
+onMounted(() => {
+  mode.value = initialMode.value
 })
 
-const sunlight = computed({
-  get: () => props.settings?.sunlight ?? 100,
-  set: (val: number) => emit('updateSunlight', val)
-})
-
-const transportMinutes = computed({
-  get: () => props.settings?.transportMinutes ?? 10,
-  set: (val: number) => emit('updateTransportMinutes', val)
+const nameValue = computed({
+  get: () => props.stationName || '',
+  set: (val: string) => emit('updateStationName', val)
 })
 
 const workforce = computed({
@@ -86,34 +69,12 @@ const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 1
 }).format(n)
 
-const showMineralPopover = ref(false)
-const showLiveDataPopover = ref(false)
-const selectedMinerals = computed(() => props.station?.minerals || [])
+const showResourcesPopover = ref(false)
 
-const hasLiveData = computed(() => {
-  const ld = props.liveData
-  if (!ld) return false
-  return (ld.stationCargo?.length ?? 0) > 0
-    || (ld.stationReservation?.length ?? 0) > 0
-    || (ld.constructingModules?.length ?? 0) > 0
-})
-
-const liveDataSummary = computed(() => {
-  const ld = props.liveData
-  if (!ld) return null
-  const cargoCount = ld.stationCargo?.length ?? 0
-  const reservationCount = ld.stationReservation?.length ?? 0
-  const constructingCount = ld.constructingModules?.length ?? 0
-  return {
-    cargoCount,
-    reservationCount,
-    constructingCount,
-    total: cargoCount + reservationCount + constructingCount
-  }
-})
-
-const toggleMineral = (mineral: string) => {
-  emit('toggleMineral', mineral)
+const toggleMode = () => {
+  if (!canToggle.value) return
+  mode.value = mode.value === 'live' ? 'planning' : 'live'
+  emit('toggleMode', mode.value)
 }
 
 const handleOpenImport = () => {
@@ -128,19 +89,26 @@ const handleOpenImport = () => {
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.station_name') }}</label>
-          <input v-model="stationName" class="ghost-input w-32" :placeholder="t('toolbar.station_name_placeholder')" />
+          <input v-model="nameValue" class="ghost-input w-32" :placeholder="t('toolbar.station_name_placeholder')" />
         </div>
 
-        <div class="input-group ml-6">
-          <label class="group-label">{{ t('toolbar.station_type') }}</label>
-          <select v-model="stationType" class="ghost-select w-20">
-            <option v-for="st in props.stationTypes" :key="st.value" :value="st.value">{{ st.label }}</option>
-          </select>
+        <div class="input-group ml-4">
+          <label class="group-label">{{ t('toolbar.station_code') }}</label>
+          <div class="readonly-pill">{{ props.stationCode || '-' }}</div>
         </div>
 
-        <div class="input-group ml-6">
-          <label class="group-label">{{ t('toolbar.station_count') }}</label>
-          <X4NumberInput v-model="stationCount" :min="0" width-class="w-12" />
+        <div class="input-group ml-4">
+          <label class="group-label">{{ t('toolbar.mode') }}</label>
+          <button 
+            class="mode-toggle-btn"
+            :class="{ disabled: !canToggle }"
+            :disabled="!canToggle"
+            @click="toggleMode"
+          >
+            <span class="mode-label" :class="{ active: mode === 'live' }">{{ t('toolbar.mode_live') }}</span>
+            <span class="mode-separator">|</span>
+            <span class="mode-label" :class="{ active: mode === 'planning' }">{{ t('toolbar.mode_planning') }}</span>
+          </button>
         </div>
       </div>
 
@@ -150,51 +118,37 @@ const handleOpenImport = () => {
         <div class="relative">
           <div 
             class="input-group cursor-pointer hover:text-sky-400 transition-colors"
-            @click="showMineralPopover = !showMineralPopover"
+            @click="showResourcesPopover = !showResourcesPopover"
           >
             <label class="group-label cursor-pointer">{{ t('toolbar.sector_resources') }}</label>
             <div class="flex items-center gap-1.5 bg-slate-900 border border-slate-800 rounded px-2 min-w-[60px] justify-center h-6">
-              <span class="text-xs text-slate-500" v-if="selectedMinerals.length === 0">{{ t('toolbar.no_resources') }}</span>
+              <span class="text-xs text-slate-500" v-if="props.sectorResources.length === 0">{{ t('toolbar.no_resources') }}</span>
               <template v-else>
                 <span class="text-xs">💎</span>
-                <span class="text-xs font-bold font-mono text-sky-400">{{ selectedMinerals.length }}</span>
+                <span class="text-xs font-bold font-mono text-sky-400">{{ props.sectorResources.length }}</span>
               </template>
             </div>
           </div>
 
-          <div v-if="showMineralPopover" class="mineral-popover">
-            <div class="popover-header">{{ t('toolbar.select_resources') }}</div>
+          <div v-if="showResourcesPopover" class="resources-popover">
+            <div class="popover-header">{{ t('toolbar.sector_resources') }}</div>
             <div class="popover-content">
-              <label 
-                v-for="m in props.availableMinerals" 
-                :key="m" 
-                class="mineral-option"
-              >
-                <input 
-                  type="checkbox" 
-                  :checked="selectedMinerals.includes(m)"
-                  @change="toggleMineral(m)"
-                />
-                <span class="text-xs text-slate-300">{{ m }}</span>
-              </label>
+              <div class="resource-item" v-for="r in props.sectorResources" :key="r">
+                <span class="text-xs text-slate-300">{{ r }}</span>
+              </div>
+              <div v-if="props.sectorResources.length === 0" class="text-xs text-slate-500 text-center py-2">
+                {{ t('toolbar.no_resources') }}
+              </div>
             </div>
-            <div class="fixed inset-0 z-[-1]" @click="showMineralPopover = false"></div>
+            <div class="fixed inset-0 z-[-1]" @click="showResourcesPopover = false"></div>
           </div>
         </div>
 
         <div class="input-group ml-6">
           <label class="group-label">{{ t('toolbar.sunlight_efficiency') }}</label>
-          <div class="x4-composite-input-wrapper">
-            <X4NumberInput v-model="sunlight" :min="0" :max="200" width-class="w-14" class="x4-nested-input" />
-            <div class="x4-unit-suffix-box">%</div>
-          </div>
-        </div>
-
-        <div class="input-group ml-6">
-          <label class="group-label">{{ t('toolbar.transport_time') }}</label>
-          <div class="x4-composite-input-wrapper">
-            <X4NumberInput v-model="transportMinutes" :min="0" width-class="w-14" class="x4-nested-input" />
-            <div class="x4-unit-suffix-box">{{ t('ui.minute') }}</div>
+          <div class="count-pill min-w-[60px] justify-end">
+            <span class="text-xs font-mono font-bold text-sky-400">{{ props.sectorSunlight }}</span>
+            <span class="text-[10px] text-slate-500 ml-1">%</span>
           </div>
         </div>
 
@@ -207,93 +161,42 @@ const handleOpenImport = () => {
         </div>
       </div>
 
-      <div class="separator mx-6"></div>
-
-      <div class="toolbar-section">
-        <div class="input-group">
-          <label class="group-label">{{ t('toolbar.race_preference') }}</label>
-          <select v-model="racePreference" class="race-select">
-            <option v-for="r in props.races" :key="r.value" :value="r.value">{{ r.label }}</option>
-          </select>
-        </div>
-
-        <div class="input-group ml-6">
-          <label class="group-label">{{ t('toolbar.workforce_calc') }}</label>
-          <button 
-            class="toggle-chip"
-            :class="workforce ? 'active-green' : 'inactive'"
-            @click="workforce = !workforce"
-            :title="t('toolbar.workforce_calc_title')"
-          >
-            <span class="text-sm">👥</span>
-            <span class="chip-status">{{ workforce ? 'ON' : 'OFF' }}</span>
-          </button>
-        </div>
-
-        <div class="input-group ml-6">
-          <label class="group-label">{{ t('ui.show_sector_gaps') }}</label>
-          <button 
-            class="toggle-chip"
-            :class="showEmpireGaps ? 'active-green' : 'inactive'"
-            @click="showEmpireGaps = !showEmpireGaps"
-            data-testid="toggle-show-empire-gaps"
-          >
-            <span class="sr-only">{{ t('ui.show_sector_gaps') }}</span>
-            <span class="text-sm">📊</span>
-            <span class="chip-status">{{ showEmpireGaps ? 'ON' : 'OFF' }}</span>
-          </button>
-        </div>
-      </div>
-
-      <template v-if="hasLiveData">
+      <template v-if="mode === 'planning'">
         <div class="separator mx-6"></div>
-        <div class="toolbar-section">
-          <div class="relative">
-            <div 
-              class="input-group cursor-pointer hover:text-amber-400 transition-colors"
-              @click="showLiveDataPopover = !showLiveDataPopover"
-            >
-              <label class="group-label cursor-pointer text-amber-400/80">{{ t('toolbar.live_data') }}</label>
-              <div class="flex items-center gap-1.5 bg-amber-950/30 border border-amber-500/20 rounded px-2 min-w-[80px] justify-center h-6">
-                <span class="text-xs">⚡</span>
-                <span class="text-xs font-bold font-mono text-amber-300">{{ liveDataSummary?.total ?? 0 }}</span>
-              </div>
-            </div>
 
-            <div v-if="showLiveDataPopover" class="live-data-popover">
-              <div class="popover-header text-amber-400/80">{{ t('toolbar.live_status') }}</div>
-              <div class="popover-content">
-                <div v-if="props.liveData?.stationCargo?.length" class="live-data-group">
-                  <div class="group-title">{{ t('toolbar.station_storage') }}</div>
-                  <div class="data-item" v-for="item in props.liveData.stationCargo" :key="item.ware">
-                    <span class="ware-name">{{ item.ware }}</span>
-                    <span class="ware-amount">{{ item.amount.toLocaleString() }}</span>
-                  </div>
-                </div>
-                <div v-if="props.liveData?.stationReservation?.length" class="live-data-group">
-                  <div class="group-title">{{ t('toolbar.in_transit') }}</div>
-                  <div class="data-item" v-for="item in props.liveData.stationReservation" :key="item.ware">
-                    <span class="ware-name">{{ item.ware }}</span>
-                    <span class="ware-amount text-amber-300">{{ item.amount.toLocaleString() }}</span>
-                  </div>
-                </div>
-                <div v-if="props.liveData?.constructingModules?.length" class="live-data-group">
-                  <div class="group-title">{{ t('toolbar.constructing') }}</div>
-                  <div class="construct-item" v-for="mod in props.liveData.constructingModules" :key="mod.name">
-                    <span class="mod-name">{{ mod.name }}</span>
-                    <span class="mod-progress">{{ Math.round(mod.progress * 100) }}%</span>
-                  </div>
-                </div>
-                <div v-if="props.liveData?.buildStorageCargo?.length" class="live-data-group">
-                  <div class="group-title">{{ t('toolbar.buildstorage') }}</div>
-                  <div class="data-item" v-for="item in props.liveData.buildStorageCargo" :key="item.ware">
-                    <span class="ware-name">{{ item.ware }}</span>
-                    <span class="ware-amount text-sky-300">{{ item.amount.toLocaleString() }}</span>
-                  </div>
-                </div>
-              </div>
-              <div class="fixed inset-0 z-[-1]" @click="showLiveDataPopover = false"></div>
-            </div>
+        <div class="toolbar-section">
+          <div class="input-group">
+            <label class="group-label">{{ t('toolbar.race_preference') }}</label>
+            <select v-model="racePreference" class="race-select">
+              <option v-for="r in props.races" :key="r.value" :value="r.value">{{ r.label }}</option>
+            </select>
+          </div>
+
+          <div class="input-group ml-6">
+            <label class="group-label">{{ t('toolbar.workforce_calc') }}</label>
+            <button 
+              class="toggle-chip"
+              :class="workforce ? 'active-green' : 'inactive'"
+              @click="workforce = !workforce"
+              :title="t('toolbar.workforce_calc_title')"
+            >
+              <span class="text-sm">👥</span>
+              <span class="chip-status">{{ workforce ? 'ON' : 'OFF' }}</span>
+            </button>
+          </div>
+
+          <div class="input-group ml-6">
+            <label class="group-label">{{ t('ui.show_sector_gaps') }}</label>
+            <button 
+              class="toggle-chip"
+              :class="showEmpireGaps ? 'active-green' : 'inactive'"
+              @click="showEmpireGaps = !showEmpireGaps"
+              data-testid="toggle-show-empire-gaps"
+            >
+              <span class="sr-only">{{ t('ui.show_sector_gaps') }}</span>
+              <span class="text-sm">📊</span>
+              <span class="chip-status">{{ showEmpireGaps ? 'ON' : 'OFF' }}</span>
+            </button>
           </div>
         </div>
       </template>
@@ -347,23 +250,32 @@ const handleOpenImport = () => {
   @apply bg-transparent border-b border-slate-800 hover:border-slate-600 focus:border-sky-500 text-sm font-bold text-slate-200 px-1 h-6 outline-none transition-colors;
 }
 
-.ghost-select {
-  @apply bg-transparent border-b border-slate-800 hover:border-slate-600 focus:border-sky-500 text-xs text-slate-300 h-6 outline-none cursor-pointer transition-colors appearance-none;
-}
-.ghost-select option {
-  @apply bg-slate-900 text-slate-300;
+.readonly-pill {
+  @apply flex items-center bg-slate-800/50 border border-slate-700 rounded px-2 h-6 text-xs text-slate-400 font-mono min-w-[80px] justify-center;
 }
 
-.x4-composite-input-wrapper {
-  @apply flex items-center gap-0 h-6;
+.mode-toggle-btn {
+  @apply flex items-center gap-1 bg-slate-900 border border-slate-700 rounded px-2 h-6 text-xs cursor-pointer transition-colors;
+}
+.mode-toggle-btn:hover:not(.disabled) {
+  @apply border-sky-500;
+}
+.mode-toggle-btn.disabled {
+  @apply opacity-50 cursor-not-allowed border-slate-600;
 }
 
-.x4-nested-input {
-  @apply flex-shrink-0;
+.mode-label {
+  @apply text-slate-400 transition-colors;
+}
+.mode-label.active {
+  @apply text-sky-400 font-bold;
+}
+.mode-separator {
+  @apply text-slate-600 mx-1;
 }
 
-.x4-unit-suffix-box {
-  @apply text-[10px] text-slate-500 font-bold ml-1 whitespace-nowrap;
+.count-pill {
+  @apply flex items-center bg-slate-900 border border-slate-800 rounded px-2 h-7;
 }
 
 .race-select {
@@ -377,10 +289,6 @@ const handleOpenImport = () => {
 }
 .race-select option {
   @apply bg-slate-900 text-slate-300;
-}
-
-.count-pill {
-  @apply flex items-center bg-slate-900 border border-slate-800 rounded px-2 h-7;
 }
 
 .toggle-chip {
@@ -400,7 +308,7 @@ const handleOpenImport = () => {
 }
 .toggle-chip.active-green .chip-status { @apply text-emerald-300; }
 
-.mineral-popover {
+.resources-popover {
   @apply absolute top-full left-0 mt-1 z-50 bg-slate-800 border border-slate-600 rounded-lg shadow-xl min-w-[140px];
 }
 .popover-header {
@@ -409,38 +317,7 @@ const handleOpenImport = () => {
 .popover-content {
   @apply p-1 max-h-48 overflow-y-auto;
 }
-.mineral-option {
-  @apply flex items-center gap-2 px-2 py-1.5 cursor-pointer hover:bg-slate-700/50 rounded;
-}
-.mineral-option input {
-  @apply w-3 h-3 accent-sky-500 bg-slate-900 border-slate-600 rounded-sm;
-}
-
-.live-data-popover {
-  @apply absolute top-full left-0 mt-1 z-50 bg-slate-800 border border-amber-500/30 rounded-lg shadow-xl min-w-[200px];
-}
-.live-data-group {
-  @apply px-2 py-1;
-}
-.group-title {
-  @apply text-[10px] font-bold text-slate-400 mb-1 uppercase;
-}
-.data-item {
-  @apply flex justify-between items-center px-2 py-0.5 hover:bg-slate-700/30 rounded text-xs;
-}
-.ware-name {
-  @apply text-slate-300;
-}
-.ware-amount {
-  @apply font-mono text-emerald-300;
-}
-.construct-item {
-  @apply flex justify-between items-center px-2 py-0.5 hover:bg-slate-700/30 rounded text-xs;
-}
-.mod-name {
-  @apply text-slate-300;
-}
-.mod-progress {
-  @apply font-mono text-amber-300;
+.resource-item {
+  @apply px-2 py-1.5 text-xs text-slate-300;
 }
 </style>

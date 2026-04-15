@@ -9,6 +9,7 @@ import type { SavedModule, X4Module } from '@/types/x4'
 
 const props = defineProps<{
   modules: AggregatedStationModule[]
+  buildingModules?: SavedModule[]
 }>()
 
 const { t } = useI18n()
@@ -19,6 +20,7 @@ interface GroupedArchiveModule {
   group: string
   savedModule: SavedModule
   x4Module: X4Module
+  isBuilding?: boolean
 }
 
 const groupedModules = computed(() => {
@@ -52,20 +54,54 @@ const groupedModules = computed(() => {
       moduleId,
       group: groupKey,
       savedModule,
-      x4Module
+      x4Module,
+      isBuilding: false
     })
   })
+
+  if (props.buildingModules && props.buildingModules.length > 0) {
+    props.buildingModules.forEach((buildingMod) => {
+      const x4Module = modulesMap[buildingMod.id]
+      if (!x4Module) return
+
+      const group = x4Module.group || ''
+      if (!group) return
+
+      if (!groups[group]) groups[group] = []
+      groups[group]!.push({
+        moduleId: buildingMod.id,
+        group,
+        savedModule: buildingMod,
+        x4Module,
+        isBuilding: true
+      })
+    })
+  }
 
   Object.keys(groups).forEach((groupKey) => {
     const groupModules = groups[groupKey]
     if (!groupModules) return
-    groupModules.sort((a, b) =>
+
+    const builtModules = groupModules.filter(m => !m.isBuilding)
+    const buildingMods = groupModules.filter(m => m.isBuilding)
+
+    builtModules.sort((a, b) =>
       compareModulesByPickerOrder(
         { id: a.moduleId, group: groupKey },
         { id: b.moduleId, group: groupKey },
         moduleGroupsMap
       )
     )
+
+    buildingMods.sort((a, b) =>
+      compareModulesByPickerOrder(
+        { id: a.moduleId, group: groupKey },
+        { id: b.moduleId, group: groupKey },
+        moduleGroupsMap
+      )
+    )
+
+    groups[groupKey] = [...builtModules, ...buildingMods]
   })
 
   return Object.keys(groups)
@@ -73,7 +109,8 @@ const groupedModules = computed(() => {
     .map((groupKey) => ({
       group: groupKey,
       displayLabel: moduleGroupsMap[groupKey]?.localeName || groupKey,
-      modules: groups[groupKey] || []
+      modules: groups[groupKey] || [],
+      hasBuilding: groups[groupKey]?.some(m => m.isBuilding) || false
     }))
 })
 
@@ -96,15 +133,27 @@ function getModuleInfo(item: GroupedArchiveModule): X4Module {
           <span class="tier-label">{{ group.displayLabel }}</span>
         </div>
         <div class="module-list-scroll scrollbar-thin">
-          <div class="auto-modules-container">
+          <div class="modules-container">
             <StationPlanningItem
-              v-for="module in group.modules"
+              v-for="module in group.modules.filter(m => !m.isBuilding)"
               :key="module.moduleId"
               :item="module.savedModule"
               :info="getModuleInfo(module)"
               :readonly="true"
               :no-click="true"
             />
+            <template v-if="group.hasBuilding">
+              <div class="building-section">
+                <StationPlanningItem
+                  v-for="module in group.modules.filter(m => m.isBuilding)"
+                  :key="module.moduleId + '-building'"
+                  :item="module.savedModule"
+                  :info="getModuleInfo(module)"
+                  :readonly="true"
+                  :no-click="true"
+                />
+              </div>
+            </template>
           </div>
         </div>
       </div>
@@ -141,8 +190,12 @@ function getModuleInfo(item: GroupedArchiveModule): X4Module {
   @apply overflow-y-auto pr-1;
 }
 
-.auto-modules-container {
+.modules-container {
   @apply space-y-2;
+}
+
+.building-section {
+  @apply border-l-2 border-dashed border-amber-600/40 pl-2 ml-1 space-y-2;
 }
 
 .scrollbar-thin::-webkit-scrollbar {
