@@ -13,7 +13,6 @@ import type {
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import type { ProductionSessionContext } from '@/types/production-context'
-import { stationProductionFlowMap } from './state/StationProductionFlowMap'
 import type {
   ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
@@ -27,29 +26,12 @@ import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
-import { stationStateMap, migrateStationSettings, DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { migrateStationSettings, DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { stationProductionFlowMap } from './state/StationProductionFlowMap'
 import {
   buildStationComputeDeps,
-  syncPersistedToStateMap,
-  recomputeStation,
-  getGroupedFlows,
   getFilteredGroupedFlows,
-  clearStationState,
-  getStationState,
-  ensureStationState,
-  patchStationState,
-  getSettings,
-  getPlannedModules,
-  getLockedWares,
-  getWarePriority,
-  getActualWorkforce,
-  getCurrentEfficiency,
   deepClone,
-  getProductionFlows,
-  getAutoInfrastructureModules,
-  getWarePriorityLevels,
-  getDerivedStationData,
-  updateProductionFlowAggregationAfterRecompute,
   getActiveStationState,
   type ActiveStationState
 } from './logic/stationComputeService'
@@ -131,157 +113,125 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
     })
   }
-
-  function ensureActiveStationState(): ReturnType<typeof stationStateMap.get> {
-    const station = activeStation.value
-    if (!station) {
-      return ensureStationState('__local__', {
-        settings: { ...DEFAULT_STATION_SETTINGS }
-      })
-    }
-    return ensureStationState(station.id)
-  }
-
-  function syncPersistedActiveStationToStateMap(): void {
-    const station = activeStation.value
-    if (!station) return
-    station.settings = migrateStationSettings(station.settings)
-    syncPersistedToStateMap(station.id, station)
-  }
-
-  function syncStateMapBackToPersistedActiveStation(updateTimestamp: boolean = false): void {
-    const station = activeStation.value
-    if (!station) return
-    const state = getStationState(station.id)
-    if (!state) return
-    station.modules = deepClone(state.plannedModules)
-    station.lockedWares = deepClone(state.lockedWares || [])
-    station.warePriority = deepClone(state.warePriority || {})
-    station.settings = migrateStationSettings(state.settings)
-    if (updateTimestamp) {
-      station.lastUpdated = Date.now()
-    }
-  }
-
-  function recomputeActiveStation(): void {
-    const station = activeStation.value
-    const stationId = station?.id || '__local__'
-    const deps = getComputeDeps()
-    if (!deps) return
-    recomputeStation(stationId, deps)
-  }
-
-  function writeAndRecomputeActive(writer: (stationId: string) => void): void {
-    const station = activeStation.value
-    const stationId = station?.id || '__local__'
-    console.log('[BlueprintStore] writeAndRecomputeActive', { stationId, hasStation: !!station, stationName: station?.name })
-    if (!station) {
-      ensureActiveStationState()
-    } else {
-      syncPersistedActiveStationToStateMap()
-    }
-    writer(stationId)
-    recomputeActiveStation()
-    syncStateMapBackToPersistedActiveStation(false)
-  }
-
+  
   const plannedModules = computed<SavedModule[]>({
-    get: () => {
-      const stationId = activeStation.value?.id || '__local__'
-      return getPlannedModules(stationId)
-    },
+    get: () => activeStation.value?.modules || [],
     set: (value) => {
-      writeAndRecomputeActive((stationId) => {
-        patchStationState(stationId, { plannedModules: deepClone(value) })
-      })
+      const station = activeStation.value
+      if (!station) return
+      station.modules = deepClone(value)
+      station.lastUpdated = Date.now()
+      const deps = getComputeDeps()
+      if (deps) stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules,
+        settings: migrateStationSettings(station.settings),
+        lockedWares: station.lockedWares || [],
+        warePriority: station.warePriority || {}
+      }, deps)
     }
   })
 
   const lockedWares = computed<string[]>({
-    get: () => {
-      const stationId = activeStation.value?.id || '__local__'
-      return getLockedWares(stationId)
-    },
+    get: () => activeStation.value?.lockedWares || [],
     set: (value) => {
-      writeAndRecomputeActive((stationId) => {
-        patchStationState(stationId, { lockedWares: deepClone(value) })
-      })
+      const station = activeStation.value
+      if (!station) return
+      station.lockedWares = deepClone(value)
+      station.lastUpdated = Date.now()
+      const deps = getComputeDeps()
+      if (deps) stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules || [],
+        settings: migrateStationSettings(station.settings),
+        lockedWares: station.lockedWares,
+        warePriority: station.warePriority || {}
+      }, deps)
     }
   })
 
   const warePriority = computed<Record<string, number>>({
-    get: () => {
-      const stationId = activeStation.value?.id || '__local__'
-      return getWarePriority(stationId)
-    },
+    get: () => activeStation.value?.warePriority || {},
     set: (value) => {
-      writeAndRecomputeActive((stationId) => {
-        patchStationState(stationId, { warePriority: deepClone(value) })
-      })
+      const station = activeStation.value
+      if (!station) return
+      station.warePriority = deepClone(value)
+      station.lastUpdated = Date.now()
+      const deps = getComputeDeps()
+      if (deps) stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules || [],
+        settings: migrateStationSettings(station.settings),
+        lockedWares: station.lockedWares || [],
+        warePriority: station.warePriority
+      }, deps)
     }
   })
 
   const settings = computed<StationSettings>({
-    get: () => {
-      const stationId = activeStation.value?.id || '__local__'
-      return getSettings(stationId)
-    },
+    get: () => activeStation.value?.settings || { ...DEFAULT_STATION_SETTINGS },
     set: (value) => {
-      writeAndRecomputeActive((stationId) => {
-        patchStationState(stationId, { settings: migrateStationSettings(value) })
-      })
+      const station = activeStation.value
+      if (!station) return
+      station.settings = migrateStationSettings(value)
+      station.lastUpdated = Date.now()
+      const deps = getComputeDeps()
+      if (deps) stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules || [],
+        settings: station.settings,
+        lockedWares: station.lockedWares || [],
+        warePriority: station.warePriority || {}
+      }, deps)
     }
   })
 
-  const autoInfrastructureModules = computed(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    const deps = getComputeDeps()
-    if (!deps) return []
-    return getAutoInfrastructureModules(stationId, deps.modulesMap)
-  })
-
-  const autoIndustryModules = computed(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    const resolved = stationProductionFlowMap.getResolvedModules(stationId)
-    const plannedIds = plannedModules.value.map(m => m.id)
-    return resolved.filter(m => !plannedIds.includes(m.id))
-  })
-
   const actualWorkforce = computed(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    return getActualWorkforce(stationId)
+    const stationId = activeStation.value?.id
+    if (!stationId) return 0
+    return stationProductionFlowMap.getCache(stationId)?.actualWorkforce || 0
   })
 
   const currentEfficiency = computed(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    return getCurrentEfficiency(stationId)
+    const stationId = activeStation.value?.id
+    if (!stationId) return 0
+    return stationProductionFlowMap.getCache(stationId)?.currentEfficiency || 0
   })
 
   const productionFlows = computed<WareProductionFlow[]>(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    return getProductionFlows(stationId)
+    const stationId = activeStation.value?.id
+    if (!stationId) return []
+    return stationProductionFlowMap.getProductionFlows(stationId)
   })
 
   const warePriorityLevels = computed<Record<string, number>>(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    return getWarePriorityLevels(stationId)
+    const stationId = activeStation.value?.id
+    if (!stationId) return {}
+    return stationProductionFlowMap.getCache(stationId)?.warePriorityLevels || {}
+  })
+
+  const resolvedModules = computed(() => {
+    const stationId = activeStation.value?.id
+    if (!stationId) return []
+    return stationProductionFlowMap.getResolvedModules(stationId)
+  })
+
+  const autoIndustryModules = computed(() => {
+    const plannedIds = plannedModules.value.map(m => m.id)
+    return resolvedModules.value.filter(m => !plannedIds.includes(m.id))
+  })
+
+  const autoInfrastructureModules = computed(() => {
+    const deps = getComputeDeps()
+    if (!deps) return []
+    const plannedIds = plannedModules.value.map(m => m.id)
+    return resolvedModules.value.filter(m => {
+      if (plannedIds.includes(m.id)) return false
+      const info = deps.modulesMap[m.id]
+      return info?.type === 'storage' || info?.type === 'pier'
+    })
   })
 
   const groupedFlows = computed(() => {
-    const stationId = activeStation.value?.id || '__local__'
-    const deps = getComputeDeps()
-    if (!deps) return getGroupedFlows(stationId)
-    return getDerivedStationData(stationId, deps.waresMap, {
-      racePreference: settings.value.racePreference,
-      resourceBufferHours: settings.value.resourceBufferHours,
-      primaryProductBufferHours: settings.value.primaryProductBufferHours,
-      secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
-      buyMultiplier: settings.value.buyMultiplier,
-      sellMultiplier: settings.value.sellMultiplier,
-      transportMinutes: settings.value.transportMinutes,
-      transportShipCapacity: settings.value.transportShipCapacity,
-      sunlight: settings.value.sunlight
-    }).groupedFlows
+    const stationId = activeStation.value?.id
+    if (!stationId) return { flows: [], rateGroups: { positive: [], operations: [], supply: [], resources: [] }, volumeGroups: { solid: [], liquid: [], container: [] } }
+    return stationProductionFlowMap.getGrouped(stationId)
   })
 
   const stationAnalysis = computed(() => {
@@ -321,12 +271,17 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function updateStationSettingsDirect(key: keyof StationSettings, value: StationSettings[keyof StationSettings]): void {
-    writeAndRecomputeActive((stationId) => {
-      const current = getSettings(stationId)
-      patchStationState(stationId, {
-        settings: { ...current, [key]: value }
-      })
-    })
+    const station = activeStation.value
+    if (!station) return
+    station.settings = migrateStationSettings({ ...station.settings, [key]: value })
+    station.lastUpdated = Date.now()
+    const deps = getComputeDeps()
+    if (deps) stationProductionFlowMap.compute(station.id, {
+      plannedModules: station.modules || [],
+      settings: station.settings,
+      lockedWares: station.lockedWares || [],
+      warePriority: station.warePriority || {}
+    }, deps)
   }
 
   function isWareOperable(wareId: string): boolean {
@@ -345,14 +300,21 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       console.log('[BlueprintStore] toggleWareLock skipped - not operable')
       return
     }
-    writeAndRecomputeActive((stationId) => {
-      const current = getLockedWares(stationId)
-      console.log('[BlueprintStore] toggleWareLock writing', { stationId, wareId, current, willLock: !current.includes(wareId) })
-      const next = current.includes(wareId)
-        ? current.filter(id => id !== wareId)
-        : [...current, wareId]
-      patchStationState(stationId, { lockedWares: next })
-    })
+    const station = activeStation.value
+    if (!station) return
+    const current = station.lockedWares || []
+    console.log('[BlueprintStore] toggleWareLock writing', { wareId, current, willLock: !current.includes(wareId) })
+    station.lockedWares = current.includes(wareId)
+      ? current.filter((id: string) => id !== wareId)
+      : [...current, wareId]
+    station.lastUpdated = Date.now()
+    const deps = getComputeDeps()
+    if (deps) stationProductionFlowMap.compute(station.id, {
+      plannedModules: station.modules || [],
+      settings: migrateStationSettings(station.settings),
+      lockedWares: station.lockedWares,
+      warePriority: station.warePriority || {}
+    }, deps)
   }
 
   function isPlannedWare(wareId: string): boolean {
@@ -391,21 +353,29 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     const auto = isAutoWare(wareId)
     console.log('[BlueprintStore] toggleWarePriority called', { wareId, currentLevel, planned, auto })
 
-    writeAndRecomputeActive((stationId) => {
-      const nextPriority = deepClone(getWarePriority(stationId))
-      console.log('[BlueprintStore] toggleWarePriority writing', { stationId, wareId, currentPriority: nextPriority[wareId] })
+    const station = activeStation.value
+    if (!station) return
+    const nextPriority = deepClone(station.warePriority || {})
+    console.log('[BlueprintStore] toggleWarePriority writing', { wareId, currentPriority: nextPriority[wareId] })
 
-      if (planned) {
-        if (currentLevel === 2) nextPriority[wareId] = 1
-        else delete nextPriority[wareId]
-      } else if (auto) {
-        if (currentLevel === 0) nextPriority[wareId] = 1
-        else delete nextPriority[wareId]
-      }
+    if (planned) {
+      if (currentLevel === 2) nextPriority[wareId] = 1
+      else delete nextPriority[wareId]
+    } else if (auto) {
+      if (currentLevel === 0) nextPriority[wareId] = 1
+      else delete nextPriority[wareId]
+    }
 
-      console.log('[BlueprintStore] toggleWarePriority result', { nextPriority })
-      patchStationState(stationId, { warePriority: nextPriority })
-    })
+    console.log('[BlueprintStore] toggleWarePriority result', { nextPriority })
+    station.warePriority = nextPriority
+    station.lastUpdated = Date.now()
+    const deps = getComputeDeps()
+    if (deps) stationProductionFlowMap.compute(station.id, {
+      plannedModules: station.modules || [],
+      settings: migrateStationSettings(station.settings),
+      lockedWares: station.lockedWares || [],
+      warePriority: station.warePriority
+    }, deps)
   }
 
   function isModuleDlcActive(moduleId: string): boolean {
@@ -427,38 +397,60 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   function addModule(id: string = '', count = 1): void {
     if (id !== '' && !gameData.modulesMap[id]) return
-    writeAndRecomputeActive((stationId) => {
-      const current = getPlannedModules(stationId)
-      const existingIndex = current.findIndex(m => m.id === id)
-      if (existingIndex !== -1) {
-        const next = deepClone(current)
-        const existing = next[existingIndex]
-        if (existing) existing.count += count
-        patchStationState(stationId, { plannedModules: next })
-      } else {
-        patchStationState(stationId, { plannedModules: [...current, { id, count }] })
-      }
-    })
+    const station = activeStation.value
+    if (!station) return
+    const current = station.modules || []
+    const existingIndex = current.findIndex(m => m.id === id)
+    if (existingIndex !== -1) {
+      const next = deepClone(current)
+      const existing = next[existingIndex]
+      if (existing) existing.count += count
+      station.modules = next
+    } else {
+      station.modules = [...current, { id, count }]
+    }
+    station.lastUpdated = Date.now()
+    const deps = getComputeDeps()
+    if (deps) stationProductionFlowMap.compute(station.id, {
+      plannedModules: station.modules,
+      settings: migrateStationSettings(station.settings),
+      lockedWares: station.lockedWares || [],
+      warePriority: station.warePriority || {}
+    }, deps)
   }
 
   function removeModule(index: number): void {
-    writeAndRecomputeActive((stationId) => {
-      const current = getPlannedModules(stationId)
-      const next = current.filter((_, i) => i !== index)
-      patchStationState(stationId, { plannedModules: next })
-    })
+    const station = activeStation.value
+    if (!station) return
+    const current = station.modules || []
+    station.modules = current.filter((_, i) => i !== index)
+    station.lastUpdated = Date.now()
+    const deps = getComputeDeps()
+    if (deps) stationProductionFlowMap.compute(station.id, {
+      plannedModules: station.modules,
+      settings: migrateStationSettings(station.settings),
+      lockedWares: station.lockedWares || [],
+      warePriority: station.warePriority || {}
+    }, deps)
   }
 
   function updateModuleCount(index: number, count: number): void {
     const module = plannedModules.value[index]
     if (!module || !isModuleCountEditable(module.id)) return
-    writeAndRecomputeActive((stationId) => {
-      const current = getPlannedModules(stationId)
-      const next = deepClone(current)
-      const target = next[index]
-      if (target) target.count = count
-      patchStationState(stationId, { plannedModules: next })
-    })
+    const station = activeStation.value
+    if (!station) return
+    const next = deepClone(station.modules || [])
+    const target = next[index]
+    if (target) target.count = count
+    station.modules = next
+    station.lastUpdated = Date.now()
+    const deps = getComputeDeps()
+    if (deps) stationProductionFlowMap.compute(station.id, {
+      plannedModules: station.modules,
+      settings: migrateStationSettings(station.settings),
+      lockedWares: station.lockedWares || [],
+      warePriority: station.warePriority || {}
+    }, deps)
   }
 
   function removeModuleById(id: string): void {
@@ -473,9 +465,17 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function clearAllModules(): void {
-    writeAndRecomputeActive((stationId) => {
-      patchStationState(stationId, { plannedModules: [] })
-    })
+    const station = activeStation.value
+    if (!station) return
+    station.modules = []
+    station.lastUpdated = Date.now()
+    const deps = getComputeDeps()
+    if (deps) stationProductionFlowMap.compute(station.id, {
+      plannedModules: [],
+      settings: migrateStationSettings(station.settings),
+      lockedWares: station.lockedWares || [],
+      warePriority: station.warePriority || {}
+    }, deps)
   }
 
   watch(
@@ -486,8 +486,16 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       enforceDlcActivation: gameData.enforceDlcActivation
     }),
     () => {
-      syncPersistedActiveStationToStateMap()
-      recomputeActiveStation()
+      const station = activeStation.value
+      const deps = getComputeDeps()
+      if (station && deps) {
+        stationProductionFlowMap.compute(station.id, {
+          plannedModules: station.modules || [],
+          settings: migrateStationSettings(station.settings),
+          lockedWares: station.lockedWares || [],
+          warePriority: station.warePriority || {}
+        }, deps)
+      }
     },
     { immediate: true }
   )
@@ -497,28 +505,35 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (!station) return
     const deps = getComputeDeps()
     if (!deps) return
-    syncPersistedToStateMap(stationId, station)
-    recomputeStation(stationId, deps)
+    stationProductionFlowMap.compute(stationId, {
+      plannedModules: station.modules || [],
+      settings: migrateStationSettings(station.settings),
+      lockedWares: station.lockedWares || [],
+      warePriority: station.warePriority || {}
+    }, deps)
   }
 
   function getStationFlowCache(stationId: string): GroupedFlows | null {
-    const state = stationStateMap.get(stationId)
-    if (!state) return null
     return getFilteredGroupedFlows(stationId)
   }
 
   function initializeAllStationCaches() {
     if (!activeEmpire.value) return
+    const deps = getComputeDeps()
+    if (!deps) return
     activeEmpire.value.stations.forEach(station => {
-      refreshStationFlowCache(station.id)
+      stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules || [],
+        settings: migrateStationSettings(station.settings),
+        lockedWares: station.lockedWares || [],
+        warePriority: station.warePriority || {}
+      }, deps)
     })
-    updateProductionFlowAggregationAfterRecompute(activeEmpire.value)
+    stationProductionFlowMap.updateAggregation(activeEmpire.value.stations)
   }
 
   function clearStationCaches() {
-    stationStateMap.list().forEach(state => {
-      clearStationState(state.stationId)
-    })
+    stationProductionFlowMap.clear()
   }
 
   function getStationComponentGapFlows(_stationId: string | null): StationComponentGapFlows {
@@ -541,7 +556,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   function deleteStation(stationId: string) {
     const deleted = empireDataStore.deleteStationFromEmpire(activeEmpire.value, stationId)
     if (deleted) {
-      stationStateMap.remove(stationId)
+      stationProductionFlowMap.remove(stationId)
       if (activeStationId.value === stationId) {
         activeStationId.value = activeEmpire.value?.stations[0]?.id || null
       }

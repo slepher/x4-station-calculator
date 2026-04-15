@@ -190,19 +190,18 @@ Task 23-24 待实现，删除 StationStateMap.ts（41处调用需迁移）。
 
 ---
 
-### Task 23: 删除 StationStateMap.ts（分阶段迁移）- 已开始
+### Task 23: 删除 StationStateMap.ts - BlueprintStore 和 LiveStore 已重构
 
-**进展**：
-- `getActiveStationState` 已改为接受 `getStation` 参数，从 StationPlan 和 StationProductionFlowMap 获取数据
-- BlueprintStore 和 LiveProductionStore 已更新调用方式
-- 其他 getter 函数（getPlannedModules, getLockedWares 等）仍从 StationStateMap 获取
+**已完成**：
+- BlueprintProductionStore: 所有 computed 直接从 activeStation 和 StationProductionFlowMap 获取数据
+- LiveProductionStore: 同上，并保持 updateBindingStationPlan 同步
+- 移除了 Store 层对 stationComputeService getter 函数的依赖
 
 **下一步**：
-1. 修改剩余 getter 函数，接受 getStation 参数
-2. Store 改为直接从 activeStation 获取原始数据
-3. 移除 StationStateMap.ts
+- 清理 stationComputeService.ts 中不再使用的函数
+- 删除 StationStateMap.ts（仅测试和 empireFlowFacade 可能仍需要）
 
-**状态**：⏳ 进行中
+**状态**：✅ Store 层重构完成
 
 ---
 
