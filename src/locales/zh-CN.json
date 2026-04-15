@@ -1,4 +1,9 @@
 {
+  "empire": {
+    "empire_name": "帝国名称",
+    "overview": "帝国总览",
+    "unnamed_empire": "未命名帝国"
+  },
   "sector": {
     "overview": "星区总览",
     "new_sector_name": "新建星区",
@@ -62,6 +67,12 @@
   },
   "toolbar": {
     "import_config": "导入配置",
+    "live_data": "实况数据",
+    "live_status": "实况状态",
+    "station_storage": "站点仓储",
+    "in_transit": "在途资源",
+    "constructing": "在建模块",
+    "buildstorage": "建造缓存",
     "station_name": "名称",
     "station_name_placeholder": "分站名称",
     "station_type": "类型",
@@ -608,6 +619,7 @@
     "confirm_delete_binding": "确定要删除这个存档绑定吗？"
   },
   "binding": {
+    "binding_name": "绑定名称",
     "new_binding_name": "新绑定"
   },
   "shipBuild": {

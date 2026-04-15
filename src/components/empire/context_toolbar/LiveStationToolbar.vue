@@ -5,28 +5,28 @@ import type { StationType, StationSettings } from '@/types/x4'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
 
 const props = defineProps<{
-  mode: 'overview' | 'station' | 'transit'
-  isBindingMode: boolean
-  titleModel: {
-    value: string
-    placeholder: string
-  }
   station: {
     id: string
     name: string
     type: StationType
     count: number
     minerals: string[]
-  } | null
+  }
   settings: Partial<StationSettings> | StationSettings | null
   races: Array<{ value: string; label: string }>
   stationTypes: Array<{ value: StationType; label: string }>
   availableMinerals: string[]
   singleBerthThroughput: number
+  liveData?: {
+    stationCargo?: Array<{ ware: string; amount: number }>
+    stationReservation?: Array<{ ware: string; amount: number }>
+    buildStorageCargo?: Array<{ ware: string; amount: number }>
+    buildStorageReservation?: Array<{ ware: string; amount: number }>
+    constructingModules?: Array<{ name: string; progress: number }>
+  } | null
 }>()
 
 const emit = defineEmits<{
-  updateTitle: [value: string]
   updateStationName: [value: string]
   updateStationType: [value: StationType]
   updateStationCount: [value: number]
@@ -40,14 +40,6 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-
-const isOverview = computed(() => props.mode !== 'station')
-const isSupplyOverview = computed(() => props.mode === 'transit')
-
-const titleValue = computed({
-  get: () => props.titleModel.value,
-  set: (val: string) => emit('updateTitle', val)
-})
 
 const stationName = computed({
   get: () => props.station?.name || '',
@@ -95,7 +87,30 @@ const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
 }).format(n)
 
 const showMineralPopover = ref(false)
+const showLiveDataPopover = ref(false)
 const selectedMinerals = computed(() => props.station?.minerals || [])
+
+const hasLiveData = computed(() => {
+  const ld = props.liveData
+  if (!ld) return false
+  return (ld.stationCargo?.length ?? 0) > 0
+    || (ld.stationReservation?.length ?? 0) > 0
+    || (ld.constructingModules?.length ?? 0) > 0
+})
+
+const liveDataSummary = computed(() => {
+  const ld = props.liveData
+  if (!ld) return null
+  const cargoCount = ld.stationCargo?.length ?? 0
+  const reservationCount = ld.stationReservation?.length ?? 0
+  const constructingCount = ld.constructingModules?.length ?? 0
+  return {
+    cargoCount,
+    reservationCount,
+    constructingCount,
+    total: cargoCount + reservationCount + constructingCount
+  }
+})
 
 const toggleMineral = (mineral: string) => {
   emit('toggleMineral', mineral)
@@ -107,43 +122,8 @@ const handleOpenImport = () => {
 </script>
 
 <template>
-  <div class="context-toolbar">
-    
-    <div v-if="isOverview" class="toolbar-content w-full flex items-center">
-      <div class="toolbar-section">
-        <div class="input-group">
-          <label class="group-label">{{ t('sector.sector_name') }}</label>
-          <input 
-            v-model="titleValue"
-            class="ghost-input w-64 text-lg"
-            :placeholder="props.titleModel.placeholder"
-          />
-        </div>
-      </div>
-
-      <template v-if="isSupplyOverview">
-        <div class="separator mx-6"></div>
-        <div class="toolbar-section">
-          <div class="input-group">
-            <label class="group-label">{{ t('toolbar.race_preference') }}</label>
-            <select v-model="racePreference" class="race-select">
-              <option v-for="r in props.races" :key="r.value" :value="r.value">{{ r.label }}</option>
-            </select>
-          </div>
-
-          <div class="input-group ml-6">
-            <label class="group-label">{{ t('toolbar.single_berth_throughput') }}</label>
-            <div class="count-pill min-w-[120px] justify-end">
-              <span class="text-xs font-mono font-bold text-sky-400">{{ formatThroughput(props.singleBerthThroughput) }}</span>
-              <span class="text-[10px] text-slate-500 ml-1">m³/h</span>
-            </div>
-          </div>
-        </div>
-      </template>
-
-    </div>
-
-    <div v-else class="toolbar-content w-full flex items-center">
+  <div class="live-toolbar">
+    <div class="toolbar-content w-full flex items-center">
       
       <div class="toolbar-section">
         <div class="input-group">
@@ -265,13 +245,66 @@ const handleOpenImport = () => {
         </div>
       </div>
 
+      <template v-if="hasLiveData">
+        <div class="separator mx-6"></div>
+        <div class="toolbar-section">
+          <div class="relative">
+            <div 
+              class="input-group cursor-pointer hover:text-amber-400 transition-colors"
+              @click="showLiveDataPopover = !showLiveDataPopover"
+            >
+              <label class="group-label cursor-pointer text-amber-400/80">{{ t('toolbar.live_data') }}</label>
+              <div class="flex items-center gap-1.5 bg-amber-950/30 border border-amber-500/20 rounded px-2 min-w-[80px] justify-center h-6">
+                <span class="text-xs">⚡</span>
+                <span class="text-xs font-bold font-mono text-amber-300">{{ liveDataSummary?.total ?? 0 }}</span>
+              </div>
+            </div>
+
+            <div v-if="showLiveDataPopover" class="live-data-popover">
+              <div class="popover-header text-amber-400/80">{{ t('toolbar.live_status') }}</div>
+              <div class="popover-content">
+                <div v-if="props.liveData?.stationCargo?.length" class="live-data-group">
+                  <div class="group-title">{{ t('toolbar.station_storage') }}</div>
+                  <div class="data-item" v-for="item in props.liveData.stationCargo" :key="item.ware">
+                    <span class="ware-name">{{ item.ware }}</span>
+                    <span class="ware-amount">{{ item.amount.toLocaleString() }}</span>
+                  </div>
+                </div>
+                <div v-if="props.liveData?.stationReservation?.length" class="live-data-group">
+                  <div class="group-title">{{ t('toolbar.in_transit') }}</div>
+                  <div class="data-item" v-for="item in props.liveData.stationReservation" :key="item.ware">
+                    <span class="ware-name">{{ item.ware }}</span>
+                    <span class="ware-amount text-amber-300">{{ item.amount.toLocaleString() }}</span>
+                  </div>
+                </div>
+                <div v-if="props.liveData?.constructingModules?.length" class="live-data-group">
+                  <div class="group-title">{{ t('toolbar.constructing') }}</div>
+                  <div class="construct-item" v-for="mod in props.liveData.constructingModules" :key="mod.name">
+                    <span class="mod-name">{{ mod.name }}</span>
+                    <span class="mod-progress">{{ Math.round(mod.progress * 100) }}%</span>
+                  </div>
+                </div>
+                <div v-if="props.liveData?.buildStorageCargo?.length" class="live-data-group">
+                  <div class="group-title">{{ t('toolbar.buildstorage') }}</div>
+                  <div class="data-item" v-for="item in props.liveData.buildStorageCargo" :key="item.ware">
+                    <span class="ware-name">{{ item.ware }}</span>
+                    <span class="ware-amount text-sky-300">{{ item.amount.toLocaleString() }}</span>
+                  </div>
+                </div>
+              </div>
+              <div class="fixed inset-0 z-[-1]" @click="showLiveDataPopover = false"></div>
+            </div>
+          </div>
+        </div>
+      </template>
+
     </div>
 
     <div class="toolbar-import-slot">
       <button
         class="icon-btn"
         :title="t('logicFlowImport.entry_title')"
-        :data-testid="isOverview ? 'logicflow-import-entry-empire' : 'logicflow-import-entry-station'"
+        data-testid="logicflow-import-entry-station"
         @click="handleOpenImport"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
@@ -281,7 +314,7 @@ const handleOpenImport = () => {
 </template>
 
 <style scoped>
-.context-toolbar {
+.live-toolbar {
   @apply w-full h-16 bg-slate-950 border-b border-slate-800 flex items-center px-6 select-none relative z-10;
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
 }
@@ -381,5 +414,33 @@ const handleOpenImport = () => {
 }
 .mineral-option input {
   @apply w-3 h-3 accent-sky-500 bg-slate-900 border-slate-600 rounded-sm;
+}
+
+.live-data-popover {
+  @apply absolute top-full left-0 mt-1 z-50 bg-slate-800 border border-amber-500/30 rounded-lg shadow-xl min-w-[200px];
+}
+.live-data-group {
+  @apply px-2 py-1;
+}
+.group-title {
+  @apply text-[10px] font-bold text-slate-400 mb-1 uppercase;
+}
+.data-item {
+  @apply flex justify-between items-center px-2 py-0.5 hover:bg-slate-700/30 rounded text-xs;
+}
+.ware-name {
+  @apply text-slate-300;
+}
+.ware-amount {
+  @apply font-mono text-emerald-300;
+}
+.construct-item {
+  @apply flex justify-between items-center px-2 py-0.5 hover:bg-slate-700/30 rounded text-xs;
+}
+.mod-name {
+  @apply text-slate-300;
+}
+.mod-progress {
+  @apply font-mono text-amber-300;
 }
 </style>

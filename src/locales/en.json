@@ -1,4 +1,9 @@
 {
+  "empire": {
+    "empire_name": "Empire Name",
+    "overview": "Empire Overview",
+    "unnamed_empire": "Unnamed Empire"
+  },
   "sector": {
     "overview": "Sector Overview",
     "new_sector_name": "New Sector",
@@ -62,6 +67,12 @@
   },
   "toolbar": {
     "import_config": "Import Config",
+    "live_data": "Live Data",
+    "live_status": "Live Status",
+    "station_storage": "Station Storage",
+    "in_transit": "In Transit",
+    "constructing": "Constructing",
+    "buildstorage": "BuildStorage",
     "station_name": "Name",
     "station_name_placeholder": "Station Name",
     "station_type": "Type",
@@ -606,6 +617,7 @@
     "confirm_delete_binding": "Are you sure you want to delete this binding?"
   },
   "binding": {
+    "binding_name": "Binding Name",
     "new_binding_name": "New Binding"
   },
   "shipBuild": {

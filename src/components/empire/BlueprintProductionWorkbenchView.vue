@@ -10,7 +10,7 @@ import { useProductionDashboardPresenter } from '@/components/empire/presenters/
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import StationTabBar from '@/components/empire/StationTabBar.vue'
-import ContextToolbar from '@/components/empire/ContextToolbar.vue'
+import BlueprintContextToolbar from '@/components/empire/context_toolbar/BlueprintContextToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 
@@ -62,9 +62,8 @@ const importModalActiveStation = computed(() => {
     @duplicate-station="tabbarPresenter.emits.duplicateStation"
     @delete-station="tabbarPresenter.emits.deleteStation"
   />
-  <ContextToolbar
+  <BlueprintContextToolbar
     :mode="toolbarPresenter.props.mode.value"
-    :is-binding-mode="toolbarPresenter.props.isBindingMode"
     :title-model="toolbarPresenter.props.titleModel.value"
     :station="toolbarPresenter.props.station.value"
     :settings="toolbarPresenter.props.settings.value"

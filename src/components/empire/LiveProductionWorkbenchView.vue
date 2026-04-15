@@ -13,7 +13,9 @@ import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmp
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
-import ContextToolbar from '@/components/empire/ContextToolbar.vue'
+import LiveOverviewToolbar from '@/components/empire/context_toolbar/LiveOverviewToolbar.vue'
+import LiveTransitToolbar from '@/components/empire/context_toolbar/LiveTransitToolbar.vue'
+import LiveStationToolbar from '@/components/empire/context_toolbar/LiveStationToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
@@ -86,17 +88,36 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     @delete-station="tabbarPresenter.emits.deleteStation"
     @expand-sector="tabbarPresenter.emits.expandSector"
   />
-  <ContextToolbar
-    :mode="toolbarPresenter.props.mode.value"
-    :is-binding-mode="toolbarPresenter.props.isBindingMode"
+  
+  <LiveOverviewToolbar
+    v-if="isOverview"
     :title-model="toolbarPresenter.props.titleModel.value"
-    :station="toolbarPresenter.props.station.value"
+    :settings="toolbarPresenter.props.settings.value"
+    :races="toolbarPresenter.props.races"
+    @update-title="toolbarPresenter.emits.updateTitle"
+    @update-race-preference="toolbarPresenter.emits.updateRacePreference"
+    @open-import="liveStore.importModalOpen = true"
+  />
+  
+  <LiveTransitToolbar
+    v-if="activeTransitSectorId"
+    :title-model="toolbarPresenter.props.titleModel.value"
+    :settings="transitHubSettings"
+    :races="toolbarPresenter.props.races"
+    :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
+    @update-title="toolbarPresenter.emits.updateTitle"
+    @update-race-preference="(v) => liveStore.updateTransitHubSettings({ racePreference: v })"
+    @open-import="liveStore.importModalOpen = true"
+  />
+  
+  <LiveStationToolbar
+    v-if="activeStation"
+    :station="toolbarPresenter.props.station.value!"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
     :station-types="toolbarPresenter.props.stationTypes"
     :available-minerals="toolbarPresenter.props.availableMinerals"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
-    @update-title="toolbarPresenter.emits.updateTitle"
     @update-station-name="toolbarPresenter.emits.updateStationName"
     @update-station-type="toolbarPresenter.emits.updateStationType"
     @update-station-count="toolbarPresenter.emits.updateStationCount"
