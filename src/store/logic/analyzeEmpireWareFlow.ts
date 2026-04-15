@@ -2,7 +2,8 @@ import type {
   StationPlan,
   EmpireWareFlow,
   EmpireGroupedFlows,
-  StationFlowAtom
+  StationFlowAtom,
+  X4Ware
 } from '../../types/x4'
 import type { WareProductionFlow } from '../../types/production-flow'
 
@@ -36,7 +37,8 @@ function classifyProductionFlow(flow: WareProductionFlow): 'positive' | 'supply'
 }
 
 function aggregateProductionFlows(
-  flowsByWareId: Map<string, { flow: WareProductionFlow; station: StationPlan }[]>
+  flowsByWareId: Map<string, { flow: WareProductionFlow; station: StationPlan }[]>,
+  waresMap: Record<string, X4Ware>
 ): EmpireWareFlow[] {
   const result: EmpireWareFlow[] = []
   
@@ -47,6 +49,7 @@ function aggregateProductionFlows(
     if (!firstItem) return
     
     const firstFlow = firstItem.flow
+    const ware = waresMap[wareId]
     let totalProduction = 0
     let totalConsumption = 0
     let totalWorkforceConsumption = 0
@@ -80,9 +83,9 @@ function aggregateProductionFlows(
       consumption: totalConsumption,
       workforceConsumption: totalWorkforceConsumption,
       netRate: totalNetRate,
-      minPrice: firstFlow.minPrice,
-      avgPrice: firstFlow.price,
-      maxPrice: firstFlow.maxPrice,
+      minPrice: ware?.minPrice || 0,
+      avgPrice: ware?.price || 0,
+      maxPrice: ware?.maxPrice || 0,
       contributions
     })
   })
@@ -107,7 +110,8 @@ function mergeEmpireFlow(target: EmpireWareFlow, source: EmpireWareFlow): Empire
 
 export function analyzeEmpireWareFlow(
   stations: StationPlan[],
-  getStationProductionFlows: (stationId: string) => WareProductionFlow[] | null
+  getStationProductionFlows: (stationId: string) => WareProductionFlow[] | null,
+  waresMap: Record<string, X4Ware>
 ): EmpireGroupedFlows {
   const stationFlowData: StationFlowData[] = []
   
@@ -145,7 +149,7 @@ export function analyzeEmpireWareFlow(
     })
   })
   
-  const supplyFlows = aggregateProductionFlows(supplyByWareId)
+  const supplyFlows = aggregateProductionFlows(supplyByWareId, waresMap)
   const supplyByWareIdMap = new Map<string, EmpireWareFlow>()
   supplyFlows.forEach(flow => {
     supplyByWareIdMap.set(flow.wareId, flow)
@@ -154,7 +158,7 @@ export function analyzeEmpireWareFlow(
   
   const operations: EmpireWareFlow[] = []
   
-  const candidateFlows = aggregateProductionFlows(candidatesByWareId)
+  const candidateFlows = aggregateProductionFlows(candidatesByWareId, waresMap)
   candidateFlows.forEach(flow => {
     if (supplyWareIdSet.has(flow.wareId)) {
       const existingSupply = supplyByWareIdMap.get(flow.wareId)

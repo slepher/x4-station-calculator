@@ -50,7 +50,9 @@ import {
   getWarePriorityLevels,
   updateAutoInfrastructureModules,
   getDerivedStationData,
-  updateProductionFlowAggregationAfterRecompute
+  updateProductionFlowAggregationAfterRecompute,
+  getActiveStationState,
+  type ActiveStationState
 } from './logic/stationComputeService'
 import { analyzeStation } from './logic/analyzeStation'
 import {
@@ -102,6 +104,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeEmpire.value,
     activeStationId.value
   ))
+
+  const activeStationState = computed<ActiveStationState>(() => 
+    getActiveStationState(activeStationId.value)
+  )
 
   function getStationById(stationId: string): StationPlan | null {
     return sourceView.getStationById(stationId)
@@ -230,7 +236,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     const stationId = activeStation.value?.id || '__local__'
     const deps = getComputeDeps()
     if (!deps) return getAutoInfrastructureModules(stationId)
-    return getDerivedStationData(stationId, deps.modulesMap, {
+    return getDerivedStationData(stationId, deps.modulesMap, deps.waresMap, {
       racePreference: settings.value.racePreference,
       resourceBufferHours: settings.value.resourceBufferHours,
       primaryProductBufferHours: settings.value.primaryProductBufferHours,
@@ -277,7 +283,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     const stationId = activeStation.value?.id || '__local__'
     const deps = getComputeDeps()
     if (!deps) return getGroupedFlows(stationId)
-    return getDerivedStationData(stationId, deps.modulesMap, {
+    return getDerivedStationData(stationId, deps.modulesMap, deps.waresMap, {
       racePreference: settings.value.racePreference,
       resourceBufferHours: settings.value.resourceBufferHours,
       primaryProductBufferHours: settings.value.primaryProductBufferHours,
@@ -1111,6 +1117,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     session,
     activeEmpire,
     activeStation,
+    activeStationState,
     activeStationId,
     orderedStations,
     savedEmpires,

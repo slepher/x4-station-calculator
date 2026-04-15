@@ -1,11 +1,12 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue'
-import type { StationPlan, EmpireGroupedFlows } from '@/types/x4'
+import type { StationPlan, EmpireGroupedFlows, X4Ware } from '@/types/x4'
 import { analyzeEmpireWareFlow } from '@/store/logic/analyzeEmpireWareFlow'
 import { getFilteredProductionFlows } from '@/store/logic/stationComputeService'
 
 export interface UseEmpireWareFlowDerivedDeps {
   stations: ComputedRef<StationPlan[]>
   modulesMap: ComputedRef<Record<string, any>>
+  waresMap: ComputedRef<Record<string, X4Ware>>
 }
 
 export interface UseEmpireWareFlowDerivedReturn {
@@ -15,7 +16,7 @@ export interface UseEmpireWareFlowDerivedReturn {
 }
 
 export function useEmpireWareFlowDerived(deps: UseEmpireWareFlowDerivedDeps): UseEmpireWareFlowDerivedReturn {
-  const { stations } = deps
+  const { stations, waresMap } = deps
 
   const buyMultiplier = ref(0.5)
   const sellMultiplier = ref(0.5)
@@ -30,7 +31,8 @@ export function useEmpireWareFlowDerived(deps: UseEmpireWareFlowDerivedDeps): Us
 
     return analyzeEmpireWareFlow(
       stations.value,
-      (stationId) => getFilteredProductionFlows(stationId)
+      (stationId) => getFilteredProductionFlows(stationId),
+      waresMap.value
     )
   })
 

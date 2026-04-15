@@ -53,11 +53,13 @@ const activeStation = computed(() => liveStore.activeStation)
 const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
 const isOverview = computed(() => !activeStation.value && !activeTransitSectorId.value)
 
-const bindingStation = computed(() => liveStore.getBindingStation())
-const archiveStation = computed(() => liveStore.getArchiveStation())
+const bindingStation = computed(() => liveStore.bindingStation)
+const archiveStation = computed(() => liveStore.archiveStation)
 
 const hasBindingStation = computed(() => bindingStation.value !== null)
 const hasSaveStation = computed(() => archiveStation.value !== null)
+const mode = computed(() => liveStore.mode)
+const canToggle = computed(() => liveStore.canToggle)
 const stationCode = computed(() => archiveStation.value?.code || '')
 const sectorResources = computed(() => archiveStation.value?.sector.resources || [])
   const sectorSunlight = computed(() => Math.round((archiveStation.value?.sector.sunlight ?? 100) * 100))
@@ -72,7 +74,8 @@ const importModalActiveStation = computed(() => {
 
 const empireWareFlowDerived = useEmpireWareFlowDerived({
   stations: computed(() => liveStore.orderedStationsBySector),
-  modulesMap: computed(() => gameData.modulesMap || {})
+  modulesMap: computed(() => gameData.modulesMap || {}),
+  waresMap: computed(() => gameData.waresMap || {})
 })
 
 const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
@@ -133,11 +136,13 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     :sector-sunlight="sectorSunlight"
     :has-binding-station="hasBindingStation"
     :has-save-station="hasSaveStation"
+    :mode="mode"
+    :can-toggle="canToggle"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     @update-station-name="toolbarPresenter.emits.updateStationName"
-    @toggle-mode="() => {}"
+    @toggle-mode="liveStore.toggleMode"
     @update-race-preference="toolbarPresenter.emits.updateRacePreference"
     @update-workforce="toolbarPresenter.emits.updateWorkforce"
     @update-show-empire-gaps="toolbarPresenter.emits.updateShowEmpireGaps"
@@ -217,6 +222,7 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
         :planned-modules="planningPresenter.props.plannedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
+        :mode="mode"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
       />
     </div>

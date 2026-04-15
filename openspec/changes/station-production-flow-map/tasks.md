@@ -12,172 +12,106 @@
 - [x] Task 8: 更新 useBlueprintProductionStore 和 useLiveProductionStore
 - [x] Task 9: 更新 UI 组件
 - [x] Task 10: 构建验证
+- [x] Task 11: WareProductionFlow 移除价格字段，新增 volume 字段
+- [x] Task 12: calculateProductionFlows 计算 volume 数据
+- [x] Task 13: 价格从 waresMap 获取（Stage 2）
+- [x] Task 14: StationFlowCache 增加 resolvedModules
+- [x] Task 15: settings 不缓存，从 activeStation.settings 获取
+- [x] Task 16: 构建验证（Phase 2）
 
 ---
 
-## Task 1: 创建 StationProductionFlowMap 类
+## Phase 1: StationProductionFlowMap 基础架构（已完成）
 
-**文件**：`src/store/state/StationProductionFlowMap.ts`
+Task 1-10 已完成，建立了 StationProductionFlowMap 作为 ProductionFlow 计算的独立层。
 
-**内容**：
-- 创建 `StationProductionFlowMap` 类
-- 内部状态：
-  - `flowsMap = reactive(new Map<string, WareProductionFlow[]>())`
-  - `empireFlowsCache: WareProductionFlow[] = []`
-  - `sectorFlowsCache: Map<string, WareProductionFlow[]> = new Map()`
-- 方法签名：
-  - `compute(stationId: string, deps: ComputeDeps): void`
-  - `computeAll(empire: EmpirePlan, deps: ComputeDeps): void`
-  - `getStationFlows(stationId: string): WareProductionFlow[]`
-  - `getSectorFlows(sectorId: string): WareProductionFlow[]`
-  - `getEmpireFlows(): WareProductionFlow[]`
-  - `getGrouped(stationId: string): GroupedFlows`
-  - `remove(stationId: string): void`
+## Phase 2: 两阶段计算架构（已完成）
 
-**依赖**：无
+### Task 11: WareProductionFlow 移除价格字段
 
-## Task 2: 实现 compute 方法
+**文件**：`src/types/production-flow.ts`
 
-**文件**：`src/store/state/StationProductionFlowMap.ts`
+**变更**：
+- 移除 `minPrice`, `price`, `maxPrice`
+- 新增 `productionVolume`, `consumptionVolume`, `netVolume`
 
-**内容**：
-- 定义 `ComputeDeps` 接口（复用 StationComputeDeps 或简化）
-- compute() 实现：
-  - 从 empireStore 或传入参数获取 StationPlan
-  - 调用 `calculateProductionFlows` 计算 productionFlows
-  - 存入 `flowsMap.set(stationId, productionFlows)`
-  - 更新 empireFlowsCache 和 sectorFlowsCache
+### Task 12: calculateProductionFlows 计算 volume
 
-**依赖**：Task 1
+**文件**：`src/store/logic/calculateProductionFlows.ts`
 
-## Task 3: 实现 computeAll 方法
+**变更**：
+- 在 productionFlows 生成时计算 volume 数据
+- `productionVolume = production × unitVolume`
+- `consumptionVolume = consumption × unitVolume`
+- `netVolume = netRate × unitVolume`
 
-**文件**：`src/store/state/StationProductionFlowMap.ts`
-
-**内容**：
-- computeAll() 实现：
-  - 遍历 empire.stations
-  - 每个 station 执行 compute(stationId, deps)
-  - 调用 `mergeFlows()` 计算 empireFlowsCache
-  - 调用 `groupBySector()` 计算 sectorFlowsCache
-
-**依赖**：Task 2
-
-## Task 4: 实现 getter 方法
-
-**文件**：`src/store/state/StationProductionFlowMap.ts`
-
-**内容**：
-- getStationFlows(stationId): 返回 `flowsMap.get(stationId) || []`
-- getSectorFlows(sectorId): 返回 `sectorFlowsCache.get(sectorId) || []`
-- getEmpireFlows(): 返回 `empireFlowsCache`
-- getGrouped(stationId): 
-  - 获取 flows = getStationFlows(stationId)
-  - 调用 `groupProductionFlows(flows)` 返回 GroupedFlows
-
-**依赖**：Task 3
-
-## Task 5: 迁移 helper 函数
-
-**文件**：`src/store/state/StationProductionFlowMap.ts`
-
-**内容**：
-- 从 StationStateMap.ts 迁移以下函数：
-  - `createEmptyGroupedFlows()`
-  - `filterProductionFlowsByPriority()`
-  - `convertProductionFlowToWareFlow()`
-  - `groupProductionFlows()`
-- 实现聚合 helper：
-  - `mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[]`
-  - `groupBySector(flowsMap, empire): Map<string, WareProductionFlow[]>`
-
-**依赖**：Task 1
-
-## Task 6: 移除 StationStateMap flow 相关字段
-
-**文件**：`src/store/state/StationStateMap.ts`
-
-**内容**：
-- StationState 移除 `productionFlows` 字段
-- 移除方法：
-  - `getProductionFlows()`
-  - `getFilteredProductionFlows()`
-  - `getGroupedFlows()`
-  - `getFilteredGroupedFlows()`
-- 移除 helper 函数（已迁移到 Task 5）
-- recompute() 保持调用 calculateProductionFlows，但不存储 productionFlows
-- recompute() 返回值仅用于 autoIndustryModules / warePriorityLevels / stationAnalysis
-
-**依赖**：Task 5
-
-## Task 7: 更新 stationComputeService
-
-**文件**：`src/store/logic/stationComputeService.ts`
-
-**内容**：
-- 导入 `stationProductionFlowMap`
-- 新增函数：
-  - `computeAllProductionFlows(empire: EmpirePlan, deps: StationComputeDeps)` → 调用 `stationProductionFlowMap.computeAll`
-  - `getEmpireFlows()` → `stationProductionFlowMap.getEmpireFlows()`
-  - `getSectorFlows(sectorId)` → `stationProductionFlowMap.getSectorFlows(sectorId)`
-- 修改现有函数：
-  - `getProductionFlows(stationId)` → `stationProductionFlowMap.getStationFlows(stationId)`
-  - `getGroupedFlows(stationId)` → `stationProductionFlowMap.getGrouped(stationId)`
-  - `getFilteredGroupedFlows(stationId)` → 基于 stationProductionFlowMap 计算
-  - `recomputeStation(stationId)` → 调用 `stationProductionFlowMap.compute(stationId, deps)`
-- 移除对 StationStateMap.productionFlows 的直接访问
-
-**依赖**：Task 1-4
-
-## Task 8: 更新 useBlueprintProductionStore 和 useLiveProductionStore
+### Task 13: 价格从 waresMap 获取
 
 **文件**：
-- `src/store/useBlueprintProductionStore.ts`
-- `src/store/useLiveProductionStore.ts`
+- `src/store/logic/calculateWareFlowDerived.ts`
+- `src/store/logic/analyzeEmpireWareFlow.ts`
+
+**变更**：
+- 函数签名增加 `waresMap` 参数
+- 价格从 `waresMap[wareId]` 获取而非 productionFlows
+
+### Task 14: StationFlowCache 增加 resolvedModules
+
+**文件**：`src/store/state/StationProductionFlowMap.ts`
+
+**变更**：
+- `StationFlowCache` 结构：
+  ```typescript
+  interface StationFlowCache {
+    resolvedModules: SavedModule[]  // planned + autoIndustry
+    productionFlows: WareProductionFlow[]
+  }
+  ```
+- `compute()` 输出 resolvedModules 和含 volume 的 productionFlows
+- 新增 `getCache()` / `getResolvedModules()` 方法
+
+### Task 15: settings 不缓存
+
+**决策**：
+- settings 从 `activeStation.settings` 获取，不缓存到 StationFlowCache
+- Stage 2 实时派生使用 station.settings
+
+### Task 16: 构建验证
+
+**状态**：✅ 通过
+
+## Phase 3: 移除 StationStateMap（部分完成）
+
+### Task 17: 创建 stationContextService
+
+**文件**：`src/store/logic/stationContextService.ts`
 
 **内容**：
-- 通过 stationComputeService 获取 flow 数据（已封装在 Task 7）
-- 新增 getter（如需要）：
-  - `empireFlows` → `stationComputeService.getEmpireFlows()`
-  - `sectorFlows(sectorId)` → `stationComputeService.getSectorFlows(sectorId)`
-- loadEmpire / activateStation 时调用 `stationComputeService.computeAllProductionFlows`
+- 创建 `ActiveStationContext` 接口
+- 实现 `getActiveStationContext(station, modulesMap, waresMap)`
+- 整合 station + cache + 实时派生数据
 
-**依赖**：Task 6, Task 7
+**状态**：✅ 完成
 
-## Task 9: 更新 UI 组件
+### Task 18: 移除 StationStateMap（待继续）
 
-**文件**：
-- `src/components/empire/StationWareFlowsDashboard.vue`
-- `src/components/empire/StationPlanningPanel.vue`
-- 其他使用 productionFlows/groupedFlows 的组件
+**需要修改的调用点（35处）**：
 
-**内容**：
-- 检查所有使用 StationStateMap.getProductionFlows 的组件
-- 改为通过 store getter 获取（store 内部调用 stationProductionFlowMap）
-- 确保 UI 显示正常
+| 文件 | 调用点数 | 改动类型 |
+|------|----------|----------|
+| stationComputeService.ts | 20+ | 大改动 |
+| useBlueprintProductionStore.ts | 5 | 中改动 |
+| useLiveProductionStore.ts | 4 | 中改动 |
+| tests | 1 | 小改动 |
 
-**依赖**：Task 8
+**改动方向**：
+- `stationId` 参数 → 接收 `station` 对象
+- `StationStateMap.get()` → 直接从 station 获取
+- `StationStateMap.patch()` → 直接修改 station 属性
+- `recomputeStation()` → `computeStationFlowCache()`
 
-## Task 10: 构建验证
+**风险**：
+- 函数签名变更影响较大
+- 需要更新测试
 
-**命令**：`npm run build`
-
-**验证**：
-- 无 TypeScript 编译错误
-- 无运行时错误（开发环境）
-
-**依赖**：Task 1-9
-
-## 执行顺序
-
-```
-Task 1 → Task 5 (可并行)
-  ↓
-Task 2 → Task 3 → Task 4
-  ↓
-Task 6
-  ↓
-Task 7 → Task 8 (串行)
-  ↓
-Task 9 → Task 10
-```
+**状态**：⏳ 待继续

@@ -28,7 +28,7 @@ export function createBindingPlanStationId(gameGuid: string, planId: string): st
   return `__save_binding__${gameGuid}__${planId}`
 }
 
-function createDerivedSaveStationId(gameGuid: string, saveStationCode: string): string {
+export function createDerivedSaveStationId(gameGuid: string, saveStationCode: string): string {
   return `__save_binding_derived__${gameGuid}__${saveStationCode}`
 }
 
@@ -219,7 +219,8 @@ export function buildSaveBindingProductionFlows(
 
   const groupedFlows = analyzeEmpireWareFlow(
     derivedStations,
-    (stationId) => getFilteredProductionFlows(stationId)
+    (stationId) => getFilteredProductionFlows(stationId),
+    deps.waresMap
   )
 
   return {

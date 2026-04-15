@@ -20,6 +20,11 @@ export interface ProductionFlowInput {
   warePriority: Record<string, number>
 }
 
+export interface StationFlowCache {
+  resolvedModules: SavedModule[]
+  productionFlows: WareProductionFlow[]
+}
+
 function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value))
 }
@@ -53,15 +58,15 @@ function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
     consumption: prod.consumption,
     workforceConsumption: prod.workforceConsumption,
     netRate: prod.netRate,
-    productionVolume: 0,
-    consumptionVolume: 0,
-    netVolume: 0,
+    productionVolume: prod.productionVolume,
+    consumptionVolume: prod.consumptionVolume,
+    netVolume: prod.netVolume,
     transportDemand: 0,
     totalOccupiedCount: 0,
     totalOccupiedConsumptionCount: 0,
     totalOccupiedVolume: 0,
-    unitPrice: prod.price,
-    netValue: prod.netRate * prod.price,
+    unitPrice: 0,
+    netValue: 0,
     contributions: prod.contributions
   }
 }
@@ -102,13 +107,13 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
           tier: flow.tier,
           transportType: flow.transportType,
           unitVolume: flow.unitVolume,
-          minPrice: flow.minPrice,
-          price: flow.price,
-          maxPrice: flow.maxPrice,
           production: 0,
           consumption: 0,
           workforceConsumption: 0,
           netRate: 0,
+          productionVolume: 0,
+          consumptionVolume: 0,
+          netVolume: 0,
           contributions: []
         }
         mergedMap[flow.wareId] = entry
@@ -117,6 +122,9 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
       entry.consumption += flow.consumption
       entry.workforceConsumption += flow.workforceConsumption
       entry.netRate += flow.netRate
+      entry.productionVolume += flow.productionVolume
+      entry.consumptionVolume += flow.consumptionVolume
+      entry.netVolume += flow.netVolume
       entry.contributions.push(...deepClone(flow.contributions))
     }
   }
@@ -132,14 +140,15 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
 }
 
 function groupBySector(
-  flowsMap: Map<string, WareProductionFlow[]>,
+  cacheMap: Map<string, StationFlowCache>,
   stations: StationPlan[]
 ): Map<string, WareProductionFlow[]> {
   const sectorMap = new Map<string, WareProductionFlow[]>()
 
   for (const station of stations) {
     const sectorId = station.sectorId || '__no_sector__'
-    const flows = flowsMap.get(station.id) || []
+    const cache = cacheMap.get(station.id)
+    const flows = cache?.productionFlows || []
     
     if (!sectorMap.has(sectorId)) {
       sectorMap.set(sectorId, [])
@@ -153,7 +162,7 @@ function groupBySector(
 }
 
 export class StationProductionFlowMap {
-  private flowsMap = reactive(new Map<string, WareProductionFlow[]>())
+  private cacheMap = reactive(new Map<string, StationFlowCache>())
   private empireFlowsCache: WareProductionFlow[] = []
   private sectorFlowsCache: Map<string, WareProductionFlow[]> = new Map()
 
@@ -168,11 +177,23 @@ export class StationProductionFlowMap {
       warePriority: input.warePriority
     })
 
-    this.flowsMap.set(stationId, result.productionFlows)
+    const resolvedModules = [...input.plannedModules, ...result.autoIndustryModules]
+    
+    const productionFlows = result.productionFlows.map(flow => ({
+      ...flow,
+      productionVolume: flow.production * flow.unitVolume,
+      consumptionVolume: flow.consumption * flow.unitVolume,
+      netVolume: flow.netRate * flow.unitVolume
+    }))
+
+    this.cacheMap.set(stationId, {
+      resolvedModules,
+      productionFlows
+    })
   }
 
   computeAll(empire: EmpirePlan, deps: ProductionFlowComputeDeps): void {
-    this.flowsMap.clear()
+    this.cacheMap.clear()
     this.sectorFlowsCache.clear()
     this.empireFlowsCache = []
 
@@ -189,13 +210,21 @@ export class StationProductionFlowMap {
   }
 
   updateAggregation(stations: StationPlan[]): void {
-    const allFlows = Array.from(this.flowsMap.values())
+    const allFlows = Array.from(this.cacheMap.values()).map(c => c.productionFlows)
     this.empireFlowsCache = mergeFlows(allFlows)
-    this.sectorFlowsCache = groupBySector(this.flowsMap, stations)
+    this.sectorFlowsCache = groupBySector(this.cacheMap, stations)
   }
 
-  getStationFlows(stationId: string): WareProductionFlow[] {
-    return this.flowsMap.get(stationId) || []
+  getCache(stationId: string): StationFlowCache | null {
+    return this.cacheMap.get(stationId) || null
+  }
+
+  getResolvedModules(stationId: string): SavedModule[] {
+    return this.cacheMap.get(stationId)?.resolvedModules || []
+  }
+
+  getProductionFlows(stationId: string): WareProductionFlow[] {
+    return this.cacheMap.get(stationId)?.productionFlows || []
   }
 
   getSectorFlows(sectorId: string): WareProductionFlow[] {
@@ -207,24 +236,24 @@ export class StationProductionFlowMap {
   }
 
   getGrouped(stationId: string): GroupedFlows {
-    const flows = this.getStationFlows(stationId)
+    const flows = this.getProductionFlows(stationId)
     if (flows.length === 0) return createEmptyGroupedFlows()
     return groupProductionFlows(flows)
   }
 
   getFilteredGrouped(stationId: string, priorityLevels: Record<string, number>): GroupedFlows {
-    const flows = this.getStationFlows(stationId)
+    const flows = this.getProductionFlows(stationId)
     const filtered = filterProductionFlowsByPriority(flows, priorityLevels)
     if (filtered.length === 0) return createEmptyGroupedFlows()
     return groupProductionFlows(filtered)
   }
 
   remove(stationId: string): void {
-    this.flowsMap.delete(stationId)
+    this.cacheMap.delete(stationId)
   }
 
   clear(): void {
-    this.flowsMap.clear()
+    this.cacheMap.clear()
     this.sectorFlowsCache.clear()
     this.empireFlowsCache = []
   }

@@ -326,13 +326,13 @@ function calculateProductionFlowsInternal(
         tier: ware?.tier || 0,
         transportType: ware?.transport || 'container',
         unitVolume: ware?.volume || 0,
-        minPrice: ware?.minPrice || 0,
-        price: ware?.price || 0,
-        maxPrice: ware?.maxPrice || 0,
         production: 0,
         consumption: 0,
         workforceConsumption: 0,
         netRate: 0,
+        productionVolume: 0,
+        consumptionVolume: 0,
+        netVolume: 0,
         contributions: []
       }
     }
@@ -426,6 +426,9 @@ function calculateProductionFlowsInternal(
 
   const allFlows = Object.values(flowMap).map(entry => {
     entry.netRate = entry.production - entry.consumption
+    entry.productionVolume = entry.production * entry.unitVolume
+    entry.consumptionVolume = entry.consumption * entry.unitVolume
+    entry.netVolume = entry.netRate * entry.unitVolume
     return entry
   })
 

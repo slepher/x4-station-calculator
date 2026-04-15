@@ -131,20 +131,21 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     
     return analyzeEmpireWareFlow(
       activeEmpire.value.stations,
-      (stationId) => getFilteredProductionFlows(stationId)
+      (stationId) => getFilteredProductionFlows(stationId),
+      waresMap.value || {}
     )
   })
 
   const rawSectorGroupedFlowsMap = computed<Map<string, EmpireGroupedFlows>>(() => {
     const map = new Map<string, EmpireGroupedFlows>()
-    if (!modulesMap.value) return map
+    if (!modulesMap.value || !waresMap.value) return map
 
     const sectorList = productionSectors.value
     const stations = productionStations.value
 
     sectorList.forEach((sector) => {
       const localStations = stations.filter((station) => station.sectorId === sector.id)
-      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getFilteredProductionFlows(stationId))
+      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getFilteredProductionFlows(stationId), waresMap.value!)
       map.set(sector.id, rawGroupedFlows)
     })
 

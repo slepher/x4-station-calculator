@@ -1,6 +1,7 @@
 import type {
   SavedModule,
   X4Module,
+  X4Ware,
   WareFlow,
   GroupedFlows,
   ModuleFlowAtom
@@ -12,6 +13,7 @@ export interface CalculateWareFlowDerivedInput {
   autoIndustryModules: SavedModule[]
   plannedModules: SavedModule[]
   modulesMap: Record<string, X4Module>
+  waresMap: Record<string, X4Ware>
   settings: {
     racePreference: string
     resourceBufferHours: number
@@ -39,19 +41,21 @@ export function calculateWareFlowDerived(
     autoIndustryModules,
     plannedModules,
     modulesMap,
+    waresMap,
     settings,
     warePriorityLevels
   } = input
 
   const wareFlows: WareFlow[] = productionFlows.map(prodFlow => {
+    const ware = waresMap[prodFlow.wareId]
     const unitVolume = prodFlow.unitVolume
-    const productionVolume = prodFlow.production * unitVolume
-    const consumptionVolume = prodFlow.consumption * unitVolume
-    const netVolume = productionVolume - consumptionVolume
+    const productionVolume = prodFlow.productionVolume || prodFlow.production * unitVolume
+    const consumptionVolume = prodFlow.consumptionVolume || prodFlow.consumption * unitVolume
+    const netVolume = prodFlow.netVolume || productionVolume - consumptionVolume
 
     const isSurplus = prodFlow.netRate >= 0
     const multiplier = isSurplus ? settings.sellMultiplier : settings.buyMultiplier
-    const unitPrice = getPriceByMultiplier(prodFlow, multiplier)
+    const unitPrice = getPriceByMultiplier(ware, multiplier)
     const netValue = prodFlow.netRate * unitPrice
 
     const priorityLevel = warePriorityLevels?.[prodFlow.wareId] ?? 0
@@ -151,13 +155,18 @@ export function calculateWareFlowDerived(
   }
 }
 
-function getPriceByMultiplier(flow: WareProductionFlow, multiplier: number): number {
+function getPriceByMultiplier(ware: X4Ware | undefined, multiplier: number): number {
+  if (!ware) return 0
+  const minPrice = ware.minPrice || 0
+  const avgPrice = ware.price || 0
+  const maxPrice = ware.maxPrice || 0
+  
   if (multiplier <= 0.5) {
     const t = multiplier * 2
-    return flow.minPrice + (flow.price - flow.minPrice) * t
+    return minPrice + (avgPrice - minPrice) * t
   } else {
     const t = (multiplier - 0.5) * 2
-    return flow.price + (flow.maxPrice - flow.price) * t
+    return avgPrice + (maxPrice - avgPrice) * t
   }
 }
 

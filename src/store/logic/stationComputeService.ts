@@ -1,6 +1,7 @@
 import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, GroupedFlows, EmpirePlan } from '@/types/x4'
 import type { RaceMedicalConsumption } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
+import type { StationAnalysis } from '@/store/logic/analyzeStation'
 import {
   stationStateMap,
   DEFAULT_STATION_SETTINGS,
@@ -13,6 +14,57 @@ import {
   updateProductionFlowAggregation
 } from '@/store/state/StationProductionFlowMap'
 import { calculateWareFlowDerived } from '@/store/logic/calculateWareFlowDerived'
+
+export interface ActiveStationState {
+  stationAnalysis: StationAnalysis | null
+  actualWorkforce: number
+  currentEfficiency: number
+  autoIndustryModules: SavedModule[]
+  autoInfrastructureModules: SavedModule[]
+  warePriorityLevels: Record<string, number>
+  productionFlows: WareProductionFlow[]
+  groupedFlows: GroupedFlows
+}
+
+function createEmptyActiveStationState(): ActiveStationState {
+  return {
+    stationAnalysis: null,
+    actualWorkforce: 0,
+    currentEfficiency: 0,
+    autoIndustryModules: [],
+    autoInfrastructureModules: [],
+    warePriorityLevels: {},
+    productionFlows: [],
+    groupedFlows: {
+      flows: [],
+      rateGroups: { positive: [], operations: [], supply: [], resources: [] },
+      volumeGroups: { solid: [], liquid: [], container: [] }
+    }
+  }
+}
+
+export function getActiveStationState(stationId: string | null): ActiveStationState {
+  if (!stationId) return createEmptyActiveStationState()
+  
+  const state = stationStateMap.get(stationId)
+  const cache = stationProductionFlowMap.getCache(stationId)
+  
+  if (!state || !cache) return createEmptyActiveStationState()
+  
+  return {
+    stationAnalysis: state.stationAnalysis || null,
+    actualWorkforce: state.actualWorkforce || 0,
+    currentEfficiency: state.currentEfficiency || 0,
+    autoIndustryModules: cache.resolvedModules.filter(m => {
+      const isPlanned = state.plannedModules.some(p => p.id === m.id)
+      return !isPlanned
+    }),
+    autoInfrastructureModules: state.autoInfrastructureModules || [],
+    warePriorityLevels: state.warePriorityLevels || {},
+    productionFlows: cache.productionFlows,
+    groupedFlows: stationProductionFlowMap.getGrouped(stationId)
+  }
+}
 
 export function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value))
@@ -100,7 +152,7 @@ export function getFilteredGroupedFlows(stationId: string): GroupedFlows {
 }
 
 export function getFilteredProductionFlows(stationId: string): WareProductionFlow[] {
-  return stationProductionFlowMap.getStationFlows(stationId)
+  return stationProductionFlowMap.getProductionFlows(stationId)
 }
 
 function createEmptyGroupedFlows(): GroupedFlows {
@@ -126,19 +178,21 @@ export interface DerivedSettings {
 export function getDerivedGroupedFlows(
   stationId: string,
   modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
   derivedSettings: DerivedSettings
 ): GroupedFlows {
-  return getDerivedStationData(stationId, modulesMap, derivedSettings).groupedFlows
+  return getDerivedStationData(stationId, modulesMap, waresMap, derivedSettings).groupedFlows
 }
 
 export function getDerivedStationData(
   stationId: string,
   modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
   derivedSettings: DerivedSettings
 ): { groupedFlows: GroupedFlows; autoInfrastructureModules: SavedModule[] } {
   const state = stationStateMap.get(stationId)
-  const productionFlows = stationProductionFlowMap.getStationFlows(stationId)
-  if (!state || !productionFlows || productionFlows.length === 0 || !state.warePriorityLevels) {
+  const cache = stationProductionFlowMap.getCache(stationId)
+  if (!state || !cache || cache.productionFlows.length === 0 || !state.warePriorityLevels) {
     return {
       groupedFlows: createEmptyGroupedFlows(),
       autoInfrastructureModules: []
@@ -146,10 +200,11 @@ export function getDerivedStationData(
   }
 
   return calculateWareFlowDerived({
-    productionFlows,
-    autoIndustryModules: state.autoIndustryModules,
+    productionFlows: cache.productionFlows,
+    autoIndustryModules: cache.resolvedModules.filter(m => !state.plannedModules.some(p => p.id === m.id)),
     plannedModules: state.plannedModules,
     modulesMap,
+    waresMap,
     settings: derivedSettings,
     warePriorityLevels: state.warePriorityLevels
   })
@@ -255,7 +310,7 @@ export function cloneStationState(fromId: string, toId: string): void {
 }
 
 export function getProductionFlows(stationId: string): WareProductionFlow[] {
-  return stationProductionFlowMap.getStationFlows(stationId)
+  return stationProductionFlowMap.getProductionFlows(stationId)
 }
 
 export function getAutoInfrastructureModules(stationId: string): SavedModule[] {

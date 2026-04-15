@@ -2,231 +2,286 @@
 
 ## 架构变更
 
-### 1. 双层状态架构
+### 1. 单层缓存架构（移除 StationStateMap）
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                     StationStateMap                          │
-│                                                              │
-│  职责：站点状态管理 + 派生模块 + 分析计算                       │
-│                                                              │
-│  StationState {                                              │
-│    stationId                                                 │
-│    plannedModules      ← 用户输入                            │
-│    lockedWares         ← 用户输入                            │
-│    warePriority        ← 用户输入                            │
-│    settings            ← 用户输入                            │
-│    autoIndustryModules ← 派生结果                            │
-│    actualWorkforce     ← 派生结果                            │
-│    currentEfficiency   ← 派生结果                            │
-│    warePriorityLevels  ← 派生结果                            │
-│    stationAnalysis     ← 派生结果                            │
-│  }                                                           │
-│                                                              │
-│  recompute(stationId, deps) → 调用 calculateProductionFlows │
-│                              → 返回 autoIndustryModules 等   │
-│                              → 不存储 productionFlows        │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              │ stationId + deps
-                              ▼
 ┌─────────────────────────────────────────────────────────────┐
 │                   StationProductionFlowMap                   │
 │                                                              │
-│  职责：ProductionFlow 计算 + Empire/Sector 聚合               │
+│  职责：缓存 resolvedModules + ProductionFlow + Empire/Sector 聚合 │
 │                                                              │
-│  flowsMap: Map<stationId, WareProductionFlow[]>              │
+│  StationFlowCache {                                          │
+│    resolvedModules: SavedModule[]    // planned + autoIndustry │
+│    productionFlows: WareProductionFlow[]                       │
+│  }                                                             │
+│                                                              │
+│  cacheMap: Map<stationId, StationFlowCache>                  │
 │  empireFlowsCache: WareProductionFlow[]                      │
 │  sectorFlowsCache: Map<sectorId, WareProductionFlow[]>       │
 │                                                              │
-│  compute(stationId, deps)                                    │
-│  ├─ 读取 StationPlan (plannedModules/settings)              │
-│  ├─ 调用 calculateProductionFlows                           │
-│  └─ 存入 flowsMap                                            │
+│  compute(stationId, input, deps)                             │
+│  ├─ 计算 autoIndustryModules                                 │
+│  ├─ resolvedModules = planned + autoIndustry                 │
+│  ├─ 计算 productionFlows (含 volume，不含价格)                │
+│  └─ 缓存到 cacheMap                                           │
 │                                                              │
-│  computeAll(empire, deps)                                    │
-│  ├─ 遍历 empire.stations                                     │
-│  ├─ 每个 station 执行 compute                                │
-│  ├─ 计算 empireFlowsCache                                    │
-│  └─ 计算 sectorFlowsCache                                    │
-│                                                              │
-│  getStationFlows(stationId) → WareProductionFlow[]          │
-│  getSectorFlows(sectorId)   → WareProductionFlow[]          │
-│  getEmpireFlows()           → WareProductionFlow[]          │
-│  getGrouped(stationId)      → GroupedFlows                  │
+│  getCache(stationId) → StationFlowCache                      │
+│  getResolvedModules(stationId) → SavedModule[]               │
+│  getProductionFlows(stationId) → WareProductionFlow[]        │
+│  getSectorFlows(sectorId) → WareProductionFlow[]             │
+│  getEmpireFlows() → WareProductionFlow[]                     │
 └─────────────────────────────────────────────────────────────┘
 ```
 
-### 2. 数据流分离
+### 2. WareProductionFlow 结构变更
 
-**StationStateMap 数据流**：
-```
-plannedModules + settings → autoIndustryModules + stationAnalysis
+**移除字段**：
+- `minPrice`, `price`, `maxPrice` - 价格在 Stage 2 计算
+
+**新增字段**：
+- `productionVolume: number` - production × unitVolume
+- `consumptionVolume: number` - consumption × unitVolume  
+- `netVolume: number` - netRate × unitVolume
+
+```typescript
+interface WareProductionFlow {
+  wareId: string
+  orderIndex: number
+  tier: number
+  transportType: TransportType
+  unitVolume: number
+  
+  production: number
+  consumption: number
+  workforceConsumption: number
+  netRate: number
+  
+  productionVolume: number      // 新增
+  consumptionVolume: number     // 新增
+  netVolume: number             // 新增
+  
+  contributions: ModuleFlowAtom[]
+}
 ```
 
-**StationProductionFlowMap 数据流**：
+### 3. 两阶段计算架构
+
+**Stage 1（缓存 - StationProductionFlowMap）**：
 ```
-StationPlan → calculateProductionFlows → WareProductionFlow[]
-                                        → flowsMap[stationId]
+输入: plannedModules + settings + lockedWares + warePriority
+输出:
+  resolvedModules: planned + autoIndustry
+  productionFlows: {
+    wareId, tier, transportType, unitVolume,
+    production, consumption, workforceConsumption, netRate,
+    productionVolume, consumptionVolume, netVolume,  ← 含 volume
+    contributions
+  }
+  
+settings 不缓存，从 activeStation.settings 获取
 ```
 
-**聚合数据流**：
+**Stage 2（UI Composable 实时计算）**：
 ```
-flowsMap.values() → merge flows → empireFlowsCache
-                   → group by sector → sectorFlowsCache
+输入: productionFlows + waresMap + settings
+输出:
+  - 价格: minPrice, avgPrice, maxPrice (from waresMap)
+  - groupedFlows: 分组展示
+  - transportDemand: 运输需求计算
+  - autoInfrastructureModules: 仓储/泊位计算
+  - stationAnalysis: 成本/模块分析
 ```
 
-### 3. 调用关系
+### 4. ActiveStationContext 整合设计
 
 ```
-useEmpireDataStore.loadEmpire()
+activeStation.value (StationPlan)
+  ├── modules: SavedModule[]           ← 用户直接编辑
+  ├── settings: StationSettings        ← 用户直接编辑（不缓存）
+  ├── lockedWares: string[]            ← 用户直接编辑
+  └── warePriority: Record<string, number> ← 用户直接编辑
+
+activeStationContext computed:
+  ├── station: activeStation.value     ← 原始数据引用
+  ├── cache: cacheMap[stationId]       ← 缓存数据
+  │     ├── resolvedModules: planned + autoIndustry
+  │     └── productionFlows: WareProductionFlow[] (含 volume)
+  │
+  └── derived (实时计算 - UI Composable):
+        ├── prices: from waresMap
+        ├── autoInfrastructureModules: computeStorageBerths(...)
+        ├── stationAnalysis: analyze(resolved + autoInfra, settings)
+        ├── actualWorkforce: computeWorkforce(resolvedModules)
+        ├── groupedFlows: group(productionFlows)
+        └── warePriorityLevels: resolvePriority(resolvedModules, warePriority)
+```
+
+### 5. 数据来源清晰化
+
+| 数据 | 来源 | 计算时机 |
+|------|------|----------|
+| plannedModules | station.modules | 用户编辑 |
+| **settings** | **station.settings** | **用户编辑，不缓存** |
+| lockedWares | station.lockedWares | 用户编辑 |
+| warePriority | station.warePriority | 用户编辑 |
+| **resolvedModules** | planned + autoIndustry | **缓存**（Stage 1） |
+| **productionFlows** | from resolvedModules | **缓存**（Stage 1，含 volume） |
+| **volume数据** | flows × unitVolume | **缓存**（Stage 1） |
+| prices | from waresMap | 实时派生（Stage 2） |
+| autoInfrastructureModules | from flows + settings | 实时派生（Stage 2） |
+| stationAnalysis | from modules + settings | 实时派生（Stage 2） |
+| groupedFlows | from productionFlows | 实时派生（Stage 2） |
+
+### 6. 调用关系
+
+```
+loadEmpire() / activateStation()
     │
-    ├─→ StationStateMap.fromPersisted(stationId, plan)  [循环所有 station]
-    │       └─→ StationStateMap.recompute(stationId, deps)
-    │
-    └─→ stationComputeService.computeAllProductionFlows(empire, deps)
-            └─→ StationProductionFlowMap.computeAll(empire, deps)
-                    └─→ StationProductionFlowMap.compute(stationId, deps)  [循环]
+    └─→ StationProductionFlowMap.computeAll(empire.stations, deps)
+            └─→ for each station: compute(station.id, input, deps)
 
-stationComputeService.recomputeStation(stationId)
+用户编辑 modules/settings/lockedWares/warePriority
     │
-    ├─→ StationStateMap.recompute(stationId, deps)
-    └─→ StationProductionFlowMap.compute(stationId, deps)
-            └─→ 重新计算 empireFlowsCache / sectorFlowsCache
+    └─→ StationProductionFlowMap.compute(stationId, input, deps)
+            └─→ 更新缓存 + 更新聚合
 
-useBlueprintProductionStore / useLiveProductionStore
+UI 获取数据
     │
-    └─→ stationComputeService.getProductionFlows(stationId)
-            └─→ StationProductionFlowMap.getStationFlows(stationId)
-    │
-    └─→ stationComputeService.getGroupedFlows(stationId)
-            └─→ StationProductionFlowMap.getGrouped(stationId)
+    └─→ store.activeStationContext (Stage 2 实时派生)
+            ├─→ station (原始数据，含 settings)
+            ├─→ cache.resolvedModules (缓存)
+            ├─→ cache.productionFlows (缓存，含 volume)
+            └─→ derived.* (实时派生，含 prices)
 ```
 
 ## 关键决策
 
-### 决策 1：完全独立设计
+### 决策 1：移除 StationStateMap
 
-**问题**：StationProductionFlowMap 是否依赖 StationStateMap？
+**问题**：StationStateMap 是否还有必要？
 
-**决策**：完全独立，StationProductionFlowMap 直接读取 StationPlan 数据。
+**决策**：完全移除 StationStateMap。
 
 **理由**：
-- 避免循环依赖
-- 聚合计算需要遍历 empire.stations，StationStateMap 无法提供此数据
-- 保持职责清晰：StationStateMap = 状态管理，StationProductionFlowMap = flow 计算
+- 用户编辑直接反映到 `activeStation`，无需临时编辑态
+- 无取消回滚需求
+- 派生数据实时计算或缓存到 StationProductionFlowMap
+- 减少数据同步复杂度
 
-### 冰策 2：预计算聚合缓存
+### 决策 2：settings 不缓存
 
-**问题**：聚合查询是实时计算还是预计算？
+**问题**：settings 是否缓存？
 
-**决策**：载入时预计算 empire/sector 聚合，存入缓存。
+**决策**：settings 不缓存，直接从 `activeStation.settings` 获取。
+
+**理由**：
+- settings 频繁变更（bufferHours、priceMultiplier 等）
+- 避免缓存同步问题
+- Stage 2 实时计算直接使用 station.settings
+
+### 冄策 3：WareProductionFlow 移除价格字段
+
+**问题**：价格数据是否缓存？
+
+**决策**：移除 `minPrice, price, maxPrice`，新增 `productionVolume, consumptionVolume, netVolume`。
+
+**理由**：
+- 价格依赖 waresMap，可能在 Stage 2 使用不同价格倍率
+- volume 数据可在 Stage 1 计算（production × unitVolume）
+- 分离关注点：Stage 1 计算流量，Stage 2 计算价值
+
+### 冄策 4：resolvedModules 命名
+
+**问题**：合并后的模块列表如何命名？
+
+**决策**：命名为 `resolvedModules` = plannedModules + autoIndustryModules。
+
+**理由**：
+- "resolved" 表示"解析完成"的语义
+- 与 planned（规划态）区分
+- 包含所有实际会运行的模块（不含仓储/泊位）
+
+### 冄策 5：缓存边界
+
+**问题**：哪些数据缓存？哪些实时计算？
+
+**决策**：
+- **缓存**：resolvedModules、productionFlows（含 volume）
+- **实时派生（Stage 2）**：prices、autoInfrastructureModules、stationAnalysis、groupedFlows
+
+**理由**：
+- resolvedModules 和 productionFlows 计算成本高，缓存
+- volume 可在 Stage 1 计算（unitVolume 来自 waresMap）
+- prices 依赖 Stage 2 的价格倍率，实时计算
+- autoInfrastructureModules 依赖 settings.bufferHours，实时计算
+- stationAnalysis/workforce/groupedFlows 可实时计算
+
+### 冄策 6：聚合缓存
+
+**问题**：empire/sector 聚合如何处理？
+
+**决策**：预计算缓存，单站变更时增量更新。
 
 **理由**：
 - 聚合查询频繁（UI 实时显示）
 - 实时遍历计算性能差
-- 单站变更时只需更新相关缓存，无需全量重算
-
-### 冰策 3：移除 StationStateMap.flow 相关字段
-
-**问题**：是否渐进迁移或直接移除？
-
-**决策**：直接移除 productionFlows 字段和相关 getter。
-
-**理由**：
-- 减少冗余存储
-- 避免数据同步复杂性
-- 单一真源原则：flow 数据只在 StationProductionFlowMap 中
-
-### 冰策 4：聚合 contributions 溯源
-
-**问题**：聚合 flow 的 contributions 如何标记来源？
-
-**决策**：contributions 增加 `stationId` 字段标记来源。
-
-**理由**：
-- Empire/Sector 聚合需要追溯每个 contribution 的来源 station
-- 便于 drill-down 查询具体 station 的 contribution
-
-### 冄策 5：helper 函数迁移
-
-**问题**：groupProductionFlows 等 helper 函数放哪里？
-
-**决策**：迁移到 `StationProductionFlowMap.ts` 作为内部函数。
-
-**理由**：
-- 这些函数仅用于 flow 处理
-- StationStateMap 不再需要这些函数
-- 保持逻辑内聚
 
 ## 文件变更清单
 
-### 新增文件
-
-1. `src/store/state/StationProductionFlowMap.ts`
-   - StationProductionFlowMap 类
-   - compute / computeAll / getStationFlows / getSectorFlows / getEmpireFlows / getGrouped
-   - helper: groupProductionFlows / filterProductionFlowsByPriority / convertProductionFlowToWareFlow
-
-2. `src/types/production-flow.ts`（已存在，可能需要扩展）
-   - Contribution 增加 `stationId` 字段（可选）
-
 ### 修改文件
 
-1. `src/store/state/StationStateMap.ts`
-   - 移除 `productionFlows` 字段
-   - 移除 `getProductionFlows` / `getFilteredProductionFlows` / `getGroupedFlows` / `getFilteredGroupedFlows`
-   - 移除 helper 函数
-   - recompute() 返回计算结果但不存储 flows
+1. `src/types/production-flow.ts`
+   - 移除 `minPrice, price, maxPrice` 字段
+   - 新增 `productionVolume, consumptionVolume, netVolume` 字段
 
-2. `src/store/logic/stationComputeService.ts`
-   - 导入 StationProductionFlowMap
-   - 新增 computeAllProductionFlows / getEmpireFlows / getSectorFlows
-   - getProductionFlows / getGroupedFlows 改为调用 stationProductionFlowMap
+2. `src/store/state/StationProductionFlowMap.ts`
+   - 新增 `StationFlowCache` 接口（resolvedModules + productionFlows）
+   - compute() 输出 resolvedModules 和含 volume 的 productionFlows
+   - 新增 `getCache(stationId)` / `getResolvedModules(stationId)` 方法
+   - settings 不缓存
 
-3. `src/store/useBlueprintProductionStore.ts`
-   - 通过 stationComputeService 获取 flow 数据
-   - loadEmpire 时调用 computeAllProductionFlows
+3. `src/store/logic/calculateProductionFlows.ts`
+   - 移除价格字段填充
+   - 新增 volume 字段计算（productionVolume, consumptionVolume, netVolume）
 
-4. `src/store/useLiveProductionStore.ts`
-   - 通过 stationComputeService 获取 flow 数据
-   - 激活 station 时调用 computeAllProductionFlows
+4. `src/store/logic/analyzeEmpireWareFlow.ts`
+   - 价格从 waresMap 获取而非 productionFlows
 
-5. `src/store/useEmpireDataStore.ts`（可选）
-   - 如需 empire 聚合 getter，可通过 stationComputeService 访问
+5. `src/store/logic/calculateWareFlowDerived.ts`
+   - 价格从 waresMap 获取而非 productionFlows
 
-4. `src/components/empire/StationWareFlowsDashboard.vue`
-   - 获取 flow 数据路径变更
+6. `src/store/logic/stationComputeService.ts`
+   - 移除 StationStateMap 相关函数
+   - 更新 getActiveStationContext 使用新 cache 结构
+   - 移除 `getStationFlows` 改为 `getProductionFlows`
 
-5. `src/components/empire/StationPlanningPanel.vue`
-   - 获取 grouped flows 路径变更
+7. `src/store/useBlueprintProductionStore.ts`
+   - 移除 StationStateMap 相关调用
+   - settings 从 activeStation.settings 获取
 
-### 移除内容
+8. `src/store/useLiveProductionStore.ts`
+   - 同上
 
-- StationStateMap.ts 中的 helper 函数（迁移到 StationProductionFlowMap.ts）
+### 移除文件
+
+- `src/store/state/StationStateMap.ts`
 
 ## 潜在风险
 
-### 风险 1：现有测试依赖 StationStateMap.productionFlows
+### 风险 1：测试依赖 StationStateMap
 
-**影响**：测试用例可能断言 productionFlows 字段。
+**影响**：现有测试可能依赖 StationStateMap。
 
-**缓解**：
-- 测试改为调用 StationProductionFlowMap.getStationFlows
-- 或通过 store getter 间接访问
+**缓解**：更新测试使用新的数据获取方式。
 
-### 风险 2：computeAll 性能
+### 风险 2：价格计算位置变更
 
-**影响**：大量 station 时 computeAll 可能慢。
+**影响**：现有代码可能从 productionFlows 获取价格。
 
-**缓解**：
-- 首次载入异步计算（可选）
-- 单站变更时增量更新缓存而非全量重算
+**缓解**：Stage 2 从 waresMap 获取价格。
 
-### 风险 3：缓存一致性
+### 风险 3：迁移过程复杂
 
-**影响**：单站变更后聚合缓存可能不一致。
+**影响**：多个文件引用 StationStateMap。
 
-**缓解**：
-- compute(stationId) 完成后立即更新 empire/sector 缓存
-- 或标记脏数据，下次查询时重新计算
+**缓解**：逐步迁移，保持 build 通过。
