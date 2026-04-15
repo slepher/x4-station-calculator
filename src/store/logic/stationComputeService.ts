@@ -152,7 +152,12 @@ export function getFilteredGroupedFlows(stationId: string): GroupedFlows {
 }
 
 export function getFilteredProductionFlows(stationId: string): WareProductionFlow[] {
-  return stationProductionFlowMap.getProductionFlows(stationId)
+  const cache = stationProductionFlowMap.getCache(stationId)
+  if (!cache) return []
+  return cache.productionFlows.filter(f => {
+    if (f.netRate <= 0) return true
+    return (cache.warePriorityLevels[f.wareId] ?? 0) > 0
+  })
 }
 
 function createEmptyGroupedFlows(): GroupedFlows {

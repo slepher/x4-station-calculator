@@ -197,8 +197,6 @@ export class StationProductionFlowMap {
       userPriorityOverride: input.warePriority || {}
     }, allWareIds)
     
-    console.log('[StationProductionFlowMap.compute] warePriorityLevels:', warePriorityLevels)
-    
     const autoInfrastructureModules = calculateInfrastructureModules({
       productionFlows,
       plannedModules: input.plannedModules,
