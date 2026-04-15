@@ -43,7 +43,9 @@ Task 17-18 已完成，autoInfrastructureModules 现在在 Stage 1 计算，存�
 
 ---
 
-## Phase 4: Vue 组件重构（待实现）
+## Phase 4: Vue 组件重构（已完成）
+
+Task 19-22 已完成，实现了 Vue 组件接收原始数据 props + 内部 composable 计算派生数据。
 
 ### Task 19: 创建 useWareFlowGrouping composable
 
@@ -97,45 +99,44 @@ Task 17-18 已完成，autoInfrastructureModules 现在在 Stage 1 计算，存�
 
 ---
 
-### Task 23: 删除 StationStateMap.ts
+### Task 23: 删除 StationStateMap.ts（需要更多迁移工作）
 
 **目标**：所有依赖已迁移，删除旧状态管理
 
-**改动**：
-- 检查无引用
-- 删除 `src/store/state/StationStateMap.ts`
+**当前状态**：StationStateMap 仍有 41 处调用，需要逐步迁移功能：
+- `plannedModules` → `activeStation.modules`
+- `lockedWares` → `activeStation.lockedWares`
+- `warePriority` → `activeStation.warePriority`
+- `settings` → `activeStation.settings`
+- `autoIndustryModules` → 从 `resolvedModules` 过滤
+- `warePriorityLevels` → 从 `warePriority` 计算
+- `actualWorkforce/currentEfficiency` → 实时计算
+- `stationAnalysis` → 实时计算
 
-**状态**：⏳ 待实现
+**状态**：⏳ 需要额外 Phase 处理
 
 ---
 
-### Task 24: 构建验证
+### Task 24: 构建验证（当前阶段）
 
-**目标**：确保重构完成，构建通过
-
-**改动**：
-- 运行 `npm run build`
-- 运行 `npm run test:unit`
-- 运行 `npm exec playwright test`
-
-**状态**：⏳ 待实现
+**状态**：✅ 构建已通过
 
 ---
 
 ## 执行顺序
 
 ```
-Phase 3（autoInfrastructure 移至 Stage 1）：
+Phase 3（autoInfrastructure 移至 Stage 1）✅：
   Task 17 → StationProductionFlowMap.compute 增加 autoInfrastructure
   Task 18 → 清理 calculateWareFlowDerived，移除 autoInfrastructure 计算
-  ↓
-Phase 4（Vue 组件重构）：
-  Task 19 → 创建 useWareFlowGrouping composable（只计算 groupedFlows）
+  
+Phase 4（Vue 组件重构）✅：
+  Task 19 → 创建 useWareFlowGrouping composable
   Task 20 → StationWareFlowsDashboard 改用原始数据 props + 内部 composable
   Task 21 → Presenter 改动（提供 productionFlows + warePriorityLevels）
   Task 22 → Contract + Store 改动（移除派生计算方法）
-  ↓
-Phase 5（清理）：
-  Task 23 → 删除 StationStateMap.ts
-  Task 24 → 构建验证
+
+Phase 5（清理 StationStateMap）⏳：
+  Task 23 → 需要更多迁移工作（41 处调用点）
+  Task 24 → 构建验证 ✅ 已通过
 ```
