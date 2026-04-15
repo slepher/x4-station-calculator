@@ -145,7 +145,7 @@ test.describe('Sector Flow Filter', () => {
     } else {
       console.log('Products header not found - checking panel content directly')
       
-      const productsKeywordMatch = panelContent?.match(/产品([^资]*)/)
+      const productsKeywordMatch = panelContent?.match(/产品([^运]*)/)
       if (productsKeywordMatch) {
         const productsPart = productsKeywordMatch[1]
         console.log('Products part extracted:', productsPart?.substring(0, 400))
@@ -219,9 +219,10 @@ test.describe('Sector Flow Filter', () => {
     expect(panelContent).toContain('金属微晶+37,760.0')
     
     expect(panelContent).not.toContain('等离子导体')
-    expect(panelContent).not.toContain('量子管')
     expect(panelContent).not.toContain('石墨烯')
     
-    console.log('=== 基准快照验证完成（Products surplus） ===')
+    expect(panelContent).toContain('运营量子管-28.8')
+    
+    console.log('=== 基准快照验证完成（Products surplus + Operations） ===')
   })
 })
