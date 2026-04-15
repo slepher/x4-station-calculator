@@ -4,6 +4,7 @@ import type { RaceMedicalConsumption } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import { calculateProductionFlows } from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
+import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 
 export interface ProductionFlowComputeDeps {
   modulesMap: Record<string, X4Module>
@@ -188,7 +189,16 @@ export class StationProductionFlowMap {
       netVolume: flow.netRate * flow.unitVolume
     }))
 
-    const warePriorityLevels = input.warePriority || {}
+    const allWareIds = productionFlows.map(f => f.wareId)
+    const warePriorityLevels = buildResolvedWarePriority({
+      plannedModules: input.plannedModules,
+      autoIndustryModules: result.autoIndustryModules,
+      modulesMap: deps.modulesMap,
+      userPriorityOverride: input.warePriority || {}
+    }, allWareIds)
+    
+    console.log('[StationProductionFlowMap.compute] warePriorityLevels:', warePriorityLevels)
+    
     const autoInfrastructureModules = calculateInfrastructureModules({
       productionFlows,
       plannedModules: input.plannedModules,
@@ -213,7 +223,7 @@ export class StationProductionFlowMap {
     this.cacheMap.set(stationId, {
       resolvedModules,
       productionFlows,
-      warePriorityLevels: input.warePriority || {}
+      warePriorityLevels
     })
   }
 

@@ -115,48 +115,84 @@ test.describe('Sector Flow Filter', () => {
     await expect(wareflowPanel).toBeVisible({ timeout: 2000 })
     
     const panelContent = await wareflowPanel.textContent()
-    console.log('小行星星区聚合 flows:', panelContent?.substring(0, 800))
+    console.log('小行星聚合 flows:', panelContent?.substring(0, 800))
     
-    const expectedPlannedWares = [
-      'computronicsubstrate',
-      'siliconcarbide',
-      'metallicmicrolattice',
-      'fieldcoils',
-      'antimatterconverters'
-    ]
+    const plannedWares = ['反物质转换器', '励磁线圈', '电子基质', '碳化硅', '金属微晶']
+    const autoIndustryWares = ['等离子导体', '量子管', '石墨烯', '超流体冷却剂', '精炼金属', '硅晶片']
     
-    const productsSection = wareflowPanel.locator('.flow-group').filter({ hasText: /产品|Products/i })
-    if (await productsSection.count() > 0) {
-      const productsContent = await productsSection.textContent()
-      console.log('Products section:', productsContent)
+    const productsGroupCount = await wareflowPanel.locator('.flow-group').count()
+    console.log('Flow group count:', productsGroupCount)
+    
+    const productsHeader = wareflowPanel.locator('.group-header').filter({ hasText: /产品|Products/i })
+    const headerCount = await productsHeader.count()
+    console.log('Products header count:', headerCount)
+    
+    if (headerCount > 0) {
+      const productsHeaderText = await productsHeader.first().textContent()
+      console.log('Products header text:', productsHeaderText)
       
-      const surplusWareIds: string[] = []
-      const wareflowItems = productsSection.locator('.wareflow-item')
-      const itemCount = await wareflowItems.count()
-      console.log('Surplus wareflow items count:', itemCount)
+      const productsGroup = productsHeader.first().locator('..')
+      const productsContent = await productsGroup.textContent()
+      console.log('Products group content:', productsContent?.substring(0, 500))
       
-      for (let i = 0; i < itemCount; i++) {
-        const item = wareflowItems.nth(i)
-        const wareNameEl = item.locator('.ware-name')
-        if (await wareNameEl.count() > 0) {
-          const wareName = await wareNameEl.textContent()
-          surplusWareIds.push(wareName?.toLowerCase().replace(/\s+/g, '') || '')
+      for (const planned of plannedWares) {
+        expect(productsContent).toContain(planned.substring(0, 4))
+      }
+      
+      for (const auto of autoIndustryWares) {
+        expect(productsContent).not.toContain(auto.substring(0, 4))
+      }
+    } else {
+      console.log('Products header not found - checking panel content directly')
+      
+      const productsKeywordMatch = panelContent?.match(/产品([^资]*)/)
+      if (productsKeywordMatch) {
+        const productsPart = productsKeywordMatch[1]
+        console.log('Products part extracted:', productsPart?.substring(0, 400))
+        
+        for (const planned of plannedWares) {
+          expect(productsPart).toContain(planned.substring(0, 4))
+        }
+        
+        for (const auto of autoIndustryWares) {
+          expect(productsPart).not.toContain(auto.substring(0, 4))
         }
       }
-      console.log('Surplus ware IDs from UI:', surplusWareIds)
-      
-      for (const surplusWare of surplusWareIds) {
-        const isPlanned = expectedPlannedWares.some(planned => 
-          surplusWare.includes(planned.substring(0, 4)) || planned.includes(surplusWare.substring(0, 4))
-        )
-        console.log(`Surplus ware: ${surplusWare}, isPlanned: ${isPlanned}`)
-      }
+    }
+  })
+  
+  test('单个 station flows 显示原始数据（含 auto-industry surplus）', async ({ page }) => {
+    await commonSetup(page)
+    await page.waitForTimeout(1000)
+    
+    const asteroidSupplyTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
+    await expect(asteroidSupplyTab).toBeVisible({ timeout: 5000 })
+    await asteroidSupplyTab.click()
+    await page.waitForTimeout(500)
+    
+    const stationTabs = page.locator('.station-tab').filter({ hasText: /地球人|MGO-010|新建空间站/ })
+    const stationCount = await stationTabs.count()
+    expect(stationCount).toBe(3)
+    
+    const mgoTab = stationTabs.filter({ hasText: 'MGO-010' })
+    await mgoTab.click()
+    await page.waitForTimeout(500)
+    
+    const wareflowPanel = page.locator('.list-wrapper').filter({ hasText: /资源视图|Resource View/i })
+    await expect(wareflowPanel).toBeVisible({ timeout: 2000 })
+    
+    const panelContent = await wareflowPanel.textContent()
+    console.log('MGO-010 单站 flows（原始数据）:', panelContent?.substring(0, 600))
+    
+    const plannedWare = '励磁线圈'
+    const autoIndustryWares = ['等离子导体', '量子管', '石墨烯', '超流体冷却剂']
+    
+    expect(panelContent).toContain(plannedWare.substring(0, 4))
+    
+    for (const autoWare of autoIndustryWares) {
+      expect(panelContent).toContain(autoWare.substring(0, 4))
     }
     
-    const resourcesSection = wareflowPanel.locator('.flow-group').filter({ hasText: /资源|Resources/i })
-    if (await resourcesSection.count() > 0) {
-      const resourcesContent = await resourcesSection.textContent()
-      console.log('Resources section (deficit):', resourcesContent?.substring(0, 300))
-    }
+    console.log('验证：单个 station 显示所有 flows（含 auto-industry surplus）')
   })
 })
