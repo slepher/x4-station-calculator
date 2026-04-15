@@ -102,7 +102,7 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
   <LiveTransitToolbar
     v-if="activeTransitSectorId"
     :title-model="toolbarPresenter.props.titleModel.value"
-    :settings="transitHubSettings"
+    :settings="liveStore.transitHubSettings"
     :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     @update-title="toolbarPresenter.emits.updateTitle"
