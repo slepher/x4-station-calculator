@@ -80,38 +80,50 @@ Task 1-10 已完成，建立了 StationProductionFlowMap 作为 ProductionFlow �
 
 **状态**：✅ 通过
 
-## Phase 3: 移除 StationStateMap（部分完成）
+## Phase 4: Vue 组件迁移（待实现）
 
-### Task 17: 创建 stationContextService
+### Task 19: 创建 useStationFlowDerived composable
 
-**文件**：`src/store/logic/stationContextService.ts`
+**文件**：`src/components/empire/composables/useStationFlowDerived.ts`
 
 **内容**：
-- 创建 `ActiveStationContext` 接口
-- 实现 `getActiveStationContext(station, modulesMap, waresMap)`
-- 整合 station + cache + 实时派生数据
+- 接收 `StationFlowDerivedProps`（productionFlows, modules, settings 等）
+- 返回 `StationFlowDerivedResult`（groupedFlows, autoInfrastructureModules）
+- 提供 `computeStationDerived()` 函数用于单次计算
 
 **状态**：✅ 完成
 
-### Task 18: 移除 StationStateMap（待继续）
+### Task 20: StationWareFlowsDashboard 迁移
 
-**需要修改的调用点（35处）**：
+**当前状态**：
+- 接收 `groupedFlows` 和 `autoModules` 作为 props（父组件计算）
+- 内部仅处理展示逻辑
 
-| 文件 | 调用点数 | 改动类型 |
-|------|----------|----------|
-| stationComputeService.ts | 20+ | 大改动 |
-| useBlueprintProductionStore.ts | 5 | 中改动 |
-| useLiveProductionStore.ts | 4 | 中改动 |
-| tests | 1 | 小改动 |
+**迁移后**：
+- 接收 `productionFlows, plannedModules, autoIndustryModules, settings, modulesMap, waresMap, warePriorityLevels`
+- 使用 `useStationFlowDerived` 计算 `groupedFlows` 和 `autoInfrastructureModules`
 
-**改动方向**：
-- `stationId` 参数 → 接收 `station` 对象
-- `StationStateMap.get()` → 直接从 station 获取
-- `StationStateMap.patch()` → 直接修改 station 属性
-- `recomputeStation()` → `computeStationFlowCache()`
+**状态**：⏳ 待迁移
 
-**风险**：
-- 函数签名变更影响较大
-- 需要更新测试
+### Task 21: StationDashboard 迁移
 
-**状态**：⏳ 待继续
+**当前状态**：
+- 接收 `stationAnalysis, currentEfficiency, actualWorkforce` 作为 props
+- 这些数据来自 Stage 1，不需要 Stage 2 计算
+
+**决策**：无需迁移，StationDashboard 不依赖 Stage 2 计算
+
+**状态**：❌ 不需要
+
+---
+
+## 执行顺序
+
+```
+Phase 1 → Phase 2 → Phase 3 (部分) → Phase 4
+  ↓
+Phase 4:
+  Task 19 (composable) ✓
+  Task 20 (StationWareFlowsDashboard) ⏳
+  Task 21 (StationDashboard) ❌ 不需要
+```
