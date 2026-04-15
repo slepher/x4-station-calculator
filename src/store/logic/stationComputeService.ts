@@ -1,5 +1,4 @@
-import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, GroupedFlows, EmpirePlan } from '@/types/x4'
-import type { RaceMedicalConsumption } from '@/types/x4'
+import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, GroupedFlows, EmpirePlan, RaceMedicalConsumption } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationAnalysis } from '@/store/logic/analyzeStation'
 import {
@@ -14,6 +13,7 @@ import {
   updateProductionFlowAggregation
 } from '@/store/state/StationProductionFlowMap'
 import { calculateWareFlowDerived } from '@/store/logic/calculateWareFlowDerived'
+import { analyzeStation } from '@/store/logic/analyzeStation'
 
 export interface ActiveStationState {
   stationAnalysis: StationAnalysis | null
@@ -43,24 +43,41 @@ function createEmptyActiveStationState(): ActiveStationState {
   }
 }
 
-export function getActiveStationState(stationId: string | null): ActiveStationState {
+export function getActiveStationState(
+  stationId: string | null,
+  modulesMap?: Record<string, X4Module>,
+  waresMap?: Record<string, X4Ware>,
+  getStation?: (id: string) => StationPlan | null,
+  buildPriceMultiplier?: number
+): ActiveStationState {
   if (!stationId) return createEmptyActiveStationState()
   
-  const state = stationStateMap.get(stationId)
   const cache = stationProductionFlowMap.getCache(stationId)
+  if (!cache) return createEmptyActiveStationState()
   
-  if (!state || !cache) return createEmptyActiveStationState()
+  const station = getStation?.(stationId)
+  const plannedModules = station?.modules || []
+  
+  const stationAnalysis = station && modulesMap && waresMap
+    ? analyzeStation(cache.resolvedModules, modulesMap, waresMap, buildPriceMultiplier ?? 0.5, station.settings?.useHQ ?? false)
+    : null
   
   return {
-    stationAnalysis: state.stationAnalysis || null,
-    actualWorkforce: state.actualWorkforce || 0,
-    currentEfficiency: state.currentEfficiency || 0,
+    stationAnalysis,
+    actualWorkforce: cache.actualWorkforce || 0,
+    currentEfficiency: cache.currentEfficiency || 0,
     autoIndustryModules: cache.resolvedModules.filter(m => {
-      const isPlanned = state.plannedModules.some(p => p.id === m.id)
+      const isPlanned = plannedModules.some(p => p.id === m.id)
       return !isPlanned
     }),
-    autoInfrastructureModules: state.autoInfrastructureModules || [],
-    warePriorityLevels: state.warePriorityLevels || {},
+    autoInfrastructureModules: modulesMap
+      ? cache.resolvedModules.filter(m => {
+          const isPlanned = plannedModules.some(p => p.id === m.id)
+          const info = modulesMap[m.id]
+          return !isPlanned && (info?.type === 'storage' || info?.type === 'pier')
+        })
+      : [],
+    warePriorityLevels: cache.warePriorityLevels || {},
     productionFlows: cache.productionFlows,
     groupedFlows: stationProductionFlowMap.getGrouped(stationId)
   }

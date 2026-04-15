@@ -26,6 +26,8 @@ export interface StationFlowCache {
   resolvedModules: SavedModule[]
   productionFlows: WareProductionFlow[]
   warePriorityLevels: Record<string, number>
+  actualWorkforce: number
+  currentEfficiency: number
 }
 
 function deepClone<T>(value: T): T {
@@ -221,7 +223,9 @@ export class StationProductionFlowMap {
     this.cacheMap.set(stationId, {
       resolvedModules,
       productionFlows,
-      warePriorityLevels
+      warePriorityLevels,
+      actualWorkforce: result.actualWorkforce,
+      currentEfficiency: result.currentEfficiency
     })
   }
 

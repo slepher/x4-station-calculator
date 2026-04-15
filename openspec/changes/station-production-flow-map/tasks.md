@@ -24,6 +24,12 @@
 - [x] Task 20: StationWareFlowsDashboard 重构
 - [x] Task 21: Presenter 层改动
 - [x] Task 22: Contract + Store 层改动
+- [x] Task 25: 创建 useTransitHubFlowGrouping composable
+- [x] Task 26: TransitHubCenterDashboard 改用原始数据 props
+- [x] Task 27: empireFlowFacade 只提供原始数据
+- [x] Task 28: transitHubViewModel 移除分组逻辑（保留供测试使用）
+- [x] Task 29: Presenter 层改动
+- [x] Task 30: 构建验证
 - [ ] Task 23: 删除 StationStateMap.ts
 - [ ] Task 24: 构建验证
 
@@ -46,6 +52,91 @@ Task 17-18 已完成，autoInfrastructureModules 现在在 Stage 1 计算，存�
 ## Phase 4: Vue 组件重构（已完成）
 
 Task 19-22 已完成，实现了 Vue 组件接收原始数据 props + 内部 composable 计算派生数据。
+
+---
+
+## Phase 5: Transit Hub 重构（已完成）
+
+Task 25-30 已完成，Transit Hub 界面现在接收原始数据 props + 内部 composable 计算派生数据。
+
+### Task 25: 创建 useTransitHubFlowGrouping composable
+
+**目标**：提供 Transit Hub 专用分组+价格计算函数
+
+**改动**：
+- 创建 `src/components/empire/composables/useTransitHubFlowGrouping.ts`
+- 合并本 sector flows + link flows（跨 sector 运输）
+- 返回 `TransitHubGroupedFlows`（含价格、分组、storage/transport 计算）
+
+**状态**：⏳ 待实现
+
+---
+
+### Task 26: TransitHubCenterDashboard 改用原始数据 props
+
+**目标**：组件接收原始数据 props，内部用 composable 计算 groupedFlows
+
+**改动**：
+- 删除 `groupedFlows`、`storageFlows` props
+- 新增 `productionFlows`、`solverOutput` props
+- 内部用 `useTransitHubFlowGrouping` 计算 `groupedFlows` 和 `storageFlows`
+- `waresMap` 直接访问 `gameDataStore`
+
+**状态**：⏳ 待实现
+
+---
+
+### Task 27: empireFlowFacade 只提供原始数据
+
+**目标**：Facade 只提供原始数据，不调用 buildTransitHubViewModel
+
+**改动**：
+- 新增 `getSectorFlows(sectorId)` 返回 `WareProductionFlow[]`
+- 新增 `getSectorSolverOutput(sectorId)` 返回 `SolverOutput`
+- 删除或简化 `getTransitHubViewModel`
+
+**状态**：⏳ 待实现
+
+---
+
+### Task 28: transitHubViewModel 移除分组逻辑
+
+**目标**：移除 Store 层分组逻辑，只保留 link flows 合并
+
+**改动**：
+- `mergeLinkFlowsIntoGroupedFlows` 移到 Vue composable
+- `buildTransitHubStorageFlows` 移到 Vue composable
+- `buildTransitHubStorageModulePlans` 移到 Vue composable
+- 可选择完全删除此文件，逻辑迁移到 composable
+
+**状态**：⏳ 待实现
+
+---
+
+### Task 29: Presenter 层改动
+
+**目标**：Presenter 只提供原始数据，不调用 buildTransitHubViewModel
+
+**改动**：
+- 删除 `transitHubModel` 计算
+- 新增 `sectorFlows`、`solverOutput` 原始数据获取
+- 从 `empireFlowFacade.getSectorFlows()` 和 `getSectorSolverOutput()` 获取
+
+**状态**：⏳ 待实现
+
+---
+
+### Task 30: 构建验证
+
+**目标**：确保所有改动后构建通过
+
+**状态**：✅ 构建已通过，E2E 测试已通过
+
+---
+
+## Phase 6: 清理 StationStateMap（待实现）
+
+Task 23-24 待实现，删除 StationStateMap.ts（41处调用需迁移）。
 
 ### Task 19: 创建 useWareFlowGrouping composable
 
@@ -99,25 +190,23 @@ Task 19-22 已完成，实现了 Vue 组件接收原始数据 props + 内部 com
 
 ---
 
-### Task 23: 删除 StationStateMap.ts（需要更多迁移工作）
+### Task 23: 删除 StationStateMap.ts（分阶段迁移）- 已开始
 
-**目标**：所有依赖已迁移，删除旧状态管理
+**进展**：
+- `getActiveStationState` 已改为接受 `getStation` 参数，从 StationPlan 和 StationProductionFlowMap 获取数据
+- BlueprintStore 和 LiveProductionStore 已更新调用方式
+- 其他 getter 函数（getPlannedModules, getLockedWares 等）仍从 StationStateMap 获取
 
-**当前状态**：StationStateMap 仍有 41 处调用，需要逐步迁移功能：
-- `plannedModules` → `activeStation.modules`
-- `lockedWares` → `activeStation.lockedWares`
-- `warePriority` → `activeStation.warePriority`
-- `settings` → `activeStation.settings`
-- `autoIndustryModules` → 从 `resolvedModules` 过滤
-- `warePriorityLevels` → 从 `warePriority` 计算
-- `actualWorkforce/currentEfficiency` → 实时计算
-- `stationAnalysis` → 实时计算
+**下一步**：
+1. 修改剩余 getter 函数，接受 getStation 参数
+2. Store 改为直接从 activeStation 获取原始数据
+3. 移除 StationStateMap.ts
 
-**状态**：⏳ 需要额外 Phase 处理
+**状态**：⏳ 进行中
 
 ---
 
-### Task 24: 构建验证（当前阶段）
+### Task 24: 构建验证
 
 **状态**：✅ 构建已通过
 

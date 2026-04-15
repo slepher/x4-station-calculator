@@ -104,9 +104,16 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeStationId.value
   ))
 
-  const activeStationState = computed<ActiveStationState>(() => 
-    getActiveStationState(activeStationId.value)
-  )
+  const activeStationState = computed<ActiveStationState>(() => {
+    const deps = getComputeDeps()
+    return getActiveStationState(
+      activeStationId.value,
+      deps?.modulesMap,
+      deps?.waresMap,
+      (id: string) => sourceView.getStationById(id),
+      deps?.buildPriceMultiplier
+    )
+  })
 
   function getStationById(stationId: string): StationPlan | null {
     return sourceView.getStationById(stationId)

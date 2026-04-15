@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
@@ -24,11 +24,14 @@ import TransitHubMaterialsPanel from '@/components/empire/transit-hub/TransitHub
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
+import type { TransitHubStorageModulePlan, SupplyStorageFlow } from '@/types/x4'
 
 const liveStore = useLiveProductionStore()
 const activeViewStore = useActiveViewStore()
 const gameData = useGameDataStore()
 const { t } = useI18n()
+
+const transitHubDashboardRef = ref<{ storageModulePlans: TransitHubStorageModulePlan[], storageFlows: SupplyStorageFlow[] } | null>(null)
 
 onMounted(() => {
   const gameGuid = activeViewStore.activeBinding
@@ -78,14 +81,29 @@ const empireWareFlowDerived = useEmpireWareFlowDerived({
   waresMap: computed(() => gameData.waresMap || {})
 })
 
-const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
-  sectorId: activeTransitSectorId.value,
-  racePreference: liveStore.settings.racePreference,
-  transportShipCapacity: liveStore.settings.transportShipCapacity,
-  storageBufferHours: liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours,
-  buyMultiplier: liveStore.transitHubSettings.buyMultiplier ?? liveStore.settings.buyMultiplier,
-  sellMultiplier: liveStore.transitHubSettings.sellMultiplier ?? liveStore.settings.sellMultiplier
-}))
+const transitHubInput = computed(() => {
+  const sectorId = activeTransitSectorId.value
+  if (!sectorId) {
+    return {
+      sectorId: null,
+      sectors: [],
+      stations: [],
+      localGroupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
+      solverOutput: null
+    }
+  }
+
+  const sectorInternalData = liveStore.getSectorInternalData(sectorId)
+  const sectorLinkCalc = liveStore.getSectorLinkCalc(sectorId)
+
+  return {
+    sectorId,
+    sectors: liveStore.sectors,
+    stations: liveStore.orderedStationsBySector,
+    localGroupedFlows: sectorInternalData.localGroupedFlows,
+    solverOutput: sectorLinkCalc?.solverOutput || null
+  }
+})
 </script>
 
 <template>
@@ -163,17 +181,23 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     @close="liveStore.importModalOpen = false"
   />
 
-  <template v-if="isOverview || activeTransitSectorId">
+<template v-if="isOverview || activeTransitSectorId">
     <div v-if="activeTransitSectorId" class="main-layout mt-6">
       <div class="col-span-12 lg:col-span-3">
-        <TransitHubBuildPanel :storage-module-plans="transitHubModel.storageModulePlans" />
+        <TransitHubBuildPanel :storage-module-plans="transitHubDashboardRef?.storageModulePlans || []" />
       </div>
 
       <div class="col-span-12 lg:col-span-5">
         <TransitHubCenterDashboard
-          :grouped-flows="transitHubModel.groupedFlows"
-          :storage-flows="transitHubModel.storageFlows"
+          ref="transitHubDashboardRef"
+          :sector-id="transitHubInput.sectorId"
+          :sectors="transitHubInput.sectors"
+          :stations="transitHubInput.stations"
+          :local-grouped-flows="transitHubInput.localGroupedFlows"
+          :solver-output="transitHubInput.solverOutput"
           :view-mode="wareflowPresenter.props.viewMode.value"
+          :race-preference="liveStore.transitHubSettings.racePreference ?? liveStore.settings.racePreference"
+          :transport-ship-capacity="liveStore.settings.transportShipCapacity"
           :buy-multiplier="liveStore.transitHubSettings.buyMultiplier ?? liveStore.settings.buyMultiplier"
           :sell-multiplier="liveStore.transitHubSettings.sellMultiplier ?? liveStore.settings.sellMultiplier"
           :product-buffer-hours="liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours"
@@ -186,11 +210,11 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
 
       <div class="col-span-12 lg:col-span-4">
         <TransitHubMaterialsPanel
-          :plannedModulesOverride="transitHubModel.storageModulePlans"
-          :buildPriceMultiplier="liveStore.buildPriceMultiplier"
+          :planned-modules-override="(transitHubDashboardRef?.storageModulePlans || []).map(p => p.item)"
+          :build-price-multiplier="liveStore.buildPriceMultiplier"
           :useHQ="liveStore.settings.useHQ"
-          @updateBuildPriceMultiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
-          @updateUseHq="dashboardPresenter.emits.updateUseHQ"
+          @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
+          @update-use-hq="dashboardPresenter.emits.updateUseHQ"
         />
       </div>
     </div>

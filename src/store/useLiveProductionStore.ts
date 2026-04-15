@@ -371,9 +371,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return null
   })
 
-  const activeStationState = computed<ActiveStationState>(() => 
-    getActiveStationState(activeStation.value?.id || null)
-  )
+  const activeStationState = computed<ActiveStationState>(() => {
+    const deps = getComputeDeps()
+    return getActiveStationState(
+      activeStation.value?.id || null,
+      deps?.modulesMap,
+      deps?.waresMap,
+      (id: string) => sourceView.getStationById(id),
+      deps?.buildPriceMultiplier
+    )
+  })
 
   function getComputeDeps() {
     const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
