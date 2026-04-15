@@ -236,6 +236,7 @@ type SeedStationPlan = {
   position?: { x: number; y: number; z: number }
   modules?: SavedModule[]
   group?: string
+  lockedWares?: string[]
 }
 
 type SeedBinding = {
@@ -468,7 +469,7 @@ const buildBindingState = (seed: SeedBinding, now: number, saveData: any): Saved
       modules: s.modules || [],
       settings: DEFAULT_STATION_SETTINGS,
       lastUpdated: now,
-      lockedWares: [],
+      lockedWares: s.lockedWares || [],
       warePriority: {}
     }
     

@@ -201,7 +201,9 @@
               "transportShipCapacity": 62000
             },
             "lastUpdated": 1772453451902,
-            "lockedWares": [],
+            "lockedWares": [
+              "quantumtubes"
+            ],
             "warePriority": {}
           },
           {
@@ -299,7 +301,9 @@
               "transportShipCapacity": 62000
             },
             "lastUpdated": 1772453451902,
-            "lockedWares": [],
+            "lockedWares": [
+              "quantumtubes"
+            ],
             "warePriority": {}
           },
           {

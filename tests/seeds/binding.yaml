@@ -72,6 +72,8 @@ stationPlans:
     modules:
       - id: module_gen_prod_claytronics_01
         count: 2
+    lockedWares:
+      - quantumtubes
   - name: XAJ-926
     saveStationCode: XAJ-926
   - name: AVE-937
@@ -81,6 +83,8 @@ stationPlans:
     modules:
       - id: module_gen_prod_fieldcoils_01
         count: 1
+    lockedWares:
+      - quantumtubes
   - name: EOF-448
     saveStationCode: EOF-448
     modules:
