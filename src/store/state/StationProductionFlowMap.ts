@@ -24,6 +24,7 @@ export interface ProductionFlowInput {
 export interface StationFlowCache {
   resolvedModules: SavedModule[]
   productionFlows: WareProductionFlow[]
+  warePriorityLevels: Record<string, number>
 }
 
 function deepClone<T>(value: T): T {
@@ -140,7 +141,7 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
   return merged
 }
 
-function groupBySector(
+function groupBySectorFiltered(
   cacheMap: Map<string, StationFlowCache>,
   stations: StationPlan[]
 ): Map<string, WareProductionFlow[]> {
@@ -149,14 +150,16 @@ function groupBySector(
   for (const station of stations) {
     const sectorId = station.sectorId || '__no_sector__'
     const cache = cacheMap.get(station.id)
-    const flows = cache?.productionFlows || []
+    if (!cache) continue
+    
+    const filteredFlows = filterProductionFlowsByPriority(cache.productionFlows, cache.warePriorityLevels)
     
     if (!sectorMap.has(sectorId)) {
       sectorMap.set(sectorId, [])
     }
     
     const existing = sectorMap.get(sectorId)!
-    sectorMap.set(sectorId, mergeFlows([existing, flows]))
+    sectorMap.set(sectorId, mergeFlows([existing, filteredFlows]))
   }
 
   return sectorMap
@@ -209,7 +212,8 @@ export class StationProductionFlowMap {
 
     this.cacheMap.set(stationId, {
       resolvedModules,
-      productionFlows
+      productionFlows,
+      warePriorityLevels: input.warePriority || {}
     })
   }
 
@@ -231,9 +235,13 @@ export class StationProductionFlowMap {
   }
 
   updateAggregation(stations: StationPlan[]): void {
-    const allFlows = Array.from(this.cacheMap.values()).map(c => c.productionFlows)
-    this.empireFlowsCache = mergeFlows(allFlows)
-    this.sectorFlowsCache = groupBySector(this.cacheMap, stations)
+    const allFilteredFlows = stations.map(station => {
+      const cache = this.cacheMap.get(station.id)
+      if (!cache) return []
+      return filterProductionFlowsByPriority(cache.productionFlows, cache.warePriorityLevels)
+    })
+    this.empireFlowsCache = mergeFlows(allFilteredFlows)
+    this.sectorFlowsCache = groupBySectorFiltered(this.cacheMap, stations)
   }
 
   getCache(stationId: string): StationFlowCache | null {
