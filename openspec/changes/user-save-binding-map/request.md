@@ -48,8 +48,9 @@
 - 额外操作集中在：
   - 选择 blueprint empire，用其中 station 作为空间站蓝图导入模板
   - 将 blueprint empire station 的规划模块导入到 save station plan
-  - 创建 virtual station 占位或星区中转站
+  - 创建 virtual station 占位
   - 编辑或清空规划 modules
+  - 绑定/解绑 save station 到 group 的默认中转站
 - binding 可以记住一个 `blueprintEmpireId` 作为 UI 上的"空间站蓝图"来源。
 - 从 blueprint empire station 导入时，只复制当时的规划，后续不与 source empire 同步。
 - 绑定菜单 UI 细节：
@@ -57,6 +58,19 @@
   - Y 轴对齐 station-item，空间不足时向上弹出
   - 滚动条样式与 Step 2 统一
 - 模块搜索面板与 Step 3 导入共享同一套默认排序规则，通过共享 comparator 实现。
+
+### 3.1 星区中转站自动创建
+
+- 星区组创建时自动创建默认 tradestation：
+  - `position` = 星区中心坐标
+  - `sectorMacro` = 该 group 的定位星区
+- Step 3 不再显示"自由空间站"区域的中转站占位（因为每个 group 已有默认 tradestation）。
+- save station 可绑定到该 group 的默认 tradestation（一对一关系）。
+- 已被绑定的 tradestation 不可再被其他 save station 绑定。
+- 解绑行为：当 save station 解绑 tradestation 时：
+  - 位置重置到星区中心点
+  - 转换为 virtual station（保留规划但无 `saveStationCode`）
+  - tradestation 保留在原位置，可被其他 save station 绑定
 
 ### 4. Binding POI 与地图行为
 
@@ -69,7 +83,7 @@
 #### 从 save panel 拖拽
 
 - 拖拽自由空间站到地图 → 创建 `BindingStationPlan`（无 `saveStationCode`）
-- 拖拽星区中转站到地图 → 创建 `TradeStationBinding`（无 `saveStationCode`）
+- 注：星区中转站已自动创建，不再需要手动拖拽
 
 #### 拖拽已放置的 station
 
@@ -123,6 +137,11 @@
 10. Step 3 可选择 blueprint empire 并导入规划模块。
 11. binding POI 常驻显示，但拖拽权限受当前 Step 3 上下文限制。
 12. binding save status UI 正确显示取消/保存/关闭，dirty 状态正确。
+13. Group 创建时自动创建 tradestation（position=星区中心，sectorMacro=定位星区）。
+14. Step 3 不显示"自由空间站"区域的中转站占位。
+15. Save station 可绑定到 group 默认 tradestation（一对一）。
+16. 已绑定 tradestation 不可再被其他 save station 绑定。
+17. 解绑时 save station 变为 virtual station，位置重置到星区中心。
 
 ## 未决项
 

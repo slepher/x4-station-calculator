@@ -7,6 +7,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSavePoiIconUrl } from '@/components/map/utils/style'
+import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { resolveGroupSaveBinding, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import { compareModulesByPickerOrder } from '@/store/logic/searchModule'
@@ -32,6 +33,14 @@ const blueprintStore = useBlueprintProductionStore()
 const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
 const saveBindingStore = useSaveBindingStore()
+
+function getSectorCenterPositionForBinding(sectorMacro: string | null | undefined): { x: number; y: number; z: number } | undefined {
+  if (!sectorMacro) return undefined
+  const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, sectorMacro)
+  if (!resolved) return undefined
+  const center = getSectorZoneBoundingCenter(resolved.sector)
+  return { x: center.x, y: 0, z: center.z }
+}
 
 const importStationName = ref('')
 
@@ -147,19 +156,6 @@ const freeStations = computed(() => {
       sectorGroupName: '',
       sectorMacro: undefined
     }))
-})
-
-const virtualTradestation = computed(() => {
-  if (!currentGroupBinding.value) return null
-  
-  // 未放置 = 无 tradestationBinding
-  if (!currentGroupBinding.value.tradestationBinding) {
-    return {
-      type: 'virtual' as const,
-      name: t('map.binding_sector_tradestation')
-    }
-  }
-  return null
 })
 
 const anchorAndCoverageSectors = computed(() => {
@@ -618,7 +614,7 @@ function clearCurrentSaveStationBinding() {
   if (!saveStationCode) return
 
   if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) {
-    saveBindingStore.deleteTradeStation(props.gameGuid, props.sectorGroupId)
+    saveBindingStore.unbindTradeStation(props.gameGuid, props.sectorGroupId)
     closeBindMenu()
     return
   }
@@ -676,7 +672,24 @@ function clearFreeStationBinding(stationId: string) {
 }
 
 function clearSectorTradestationBinding() {
-  saveBindingStore.deleteTradeStation(props.gameGuid, props.sectorGroupId)
+  const ts = currentGroupBinding.value?.tradestationBinding
+  if (ts?.saveStationCode) {
+    // If bound to a save station, unbind it
+    saveBindingStore.unbindTradeStation(props.gameGuid, props.sectorGroupId)
+  } else {
+    // If virtual tradestation (no saveStationCode), keep it (auto-created)
+    // Just reset position to sector center
+    const sectorMacro = currentGroupBinding.value?.sectorMacro || ts?.sectorMacro || ''
+    const position = getSectorCenterPositionForBinding(sectorMacro)
+    if (position) {
+      saveBindingStore.setTradeStationPosition({
+        gameGuid: props.gameGuid,
+        groupId: props.sectorGroupId,
+        sectorMacro,
+        position
+      })
+    }
+  }
 }
 
 function formatCoordKm(value: number): string {
@@ -902,26 +915,10 @@ onBeforeUnmount(() => {
         </svg>
       </button>
     </div>
-    <div v-if="freeStations.length === 0 && !virtualTradestation" class="empty-hint">
+    <div v-if="freeStations.length === 0" class="empty-hint">
       {{ t('map.binding_no_blueprint_stations') }}
     </div>
     <div v-else class="free-stations">
-      <!-- Virtual Trade Station -->
-      <div
-        v-if="virtualTradestation"
-        class="free-station-item free-station-item--virtual"
-        :class="{ 'free-station-item--dragging': activeDragKey === '__virtual_tradestation__' }"
-        @mousedown="onVirtualTradestationMouseDown($event)"
-      >
-        <img class="entry-icon" :src="tradestationIconUrl" alt="" />
-        <div class="station-info">
-          <div class="station-name">{{ virtualTradestation.name }}</div>
-        </div>
-        <div class="station-handle">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-
       <!-- Station Blueprints -->
       <div
         v-for="item in freeStations"

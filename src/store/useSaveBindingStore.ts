@@ -4,6 +4,8 @@ import { useGameDataStore } from './useGameDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { useSaveStore } from './useSaveStore'
 import { DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
+import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import type {
   BindingSectorGroup,
   BindingStationPlan,
@@ -14,13 +16,27 @@ import type {
   StationPlan,
   StationSettings,
   StationType,
-  TradeStationBinding
+  TradeStationBinding,
+  X4MapSector
 } from '@/types/x4'
 
 const CURRENT_SAVE_BINDING_VERSION = 1
 
 function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value))
+}
+
+function getSectorCenterPosition(
+  maps: { clusters: Record<string, { sectors?: string[] }>; sectors: Record<string, X4MapSector> } | null | undefined,
+  sectorMacro: string | null | undefined
+): { x: number; y: number; z: number } | undefined {
+  if (!maps || !sectorMacro) return undefined
+  
+  const resolved = resolveMapSectorByMacro(maps, sectorMacro)
+  if (!resolved) return undefined
+  
+  const center = getSectorZoneBoundingCenter(resolved.sector)
+  return { x: center.x, y: 0, z: center.z }
 }
 
 function createDefaultBinding(gameGuid: string): SaveBindingPlan {
@@ -299,11 +315,42 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     jumpRange: number
     coverageSectorMacros: CoverageSectorEntry[]
   }) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value) return
+    
+    const group = draftBinding.value.groups.find((item) => item.id === input.sectorGroupId)
+    if (!group) return
+    
+    const wasSectorMacroSet = Boolean(group.sectorMacro)
+    const newSectorMacro = input.sectorMacro
+    
     updateGroup(input.gameGuid, input.sectorGroupId, {
       sectorMacro: input.sectorMacro,
       jumpRange: input.jumpRange,
       coverageSectorMacros: deepClone(input.coverageSectorMacros)
     })
+    
+    // Auto-create tradestation when first binding to a sector
+    if (!wasSectorMacroSet && newSectorMacro && !group.tradeStation) {
+      const position = getSectorCenterPosition(gameData.maps, newSectorMacro)
+      group.tradeStation = {
+        id: crypto.randomUUID(),
+        name: 'Trade Station',
+        sectorMacro: newSectorMacro,
+        position
+      }
+      draftBinding.value.updatedAt = Date.now()
+    }
+    
+    // Update tradestation sectorMacro when anchor sector changes
+    if (newSectorMacro && group.tradeStation && group.tradeStation.sectorMacro !== newSectorMacro) {
+      group.tradeStation.sectorMacro = newSectorMacro
+      const position = getSectorCenterPosition(gameData.maps, newSectorMacro)
+      if (position && !group.tradeStation.saveStationCode) {
+        group.tradeStation.position = position
+      }
+      draftBinding.value.updatedAt = Date.now()
+    }
   }
 
   function setGroupConnection(gameGuid: string, sourceGroupId: string, targetGroupId: string, connected: boolean) {
@@ -479,6 +526,24 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     return true
   }
 
+  function unbindTradeStation(gameGuid: string, groupId: string) {
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value) return false
+    const group = draftBinding.value.groups.find((item) => item.id === groupId)
+    if (!group?.tradeStation) return false
+    
+    // Clear saveStationCode and reset position to sector center
+    group.tradeStation.saveStationCode = undefined
+    const sectorMacro = group.sectorMacro || group.tradeStation.sectorMacro
+    if (sectorMacro) {
+      const position = getSectorCenterPosition(gameData.maps, sectorMacro)
+      group.tradeStation.position = position
+      group.tradeStation.sectorMacro = sectorMacro
+    }
+    draftBinding.value.updatedAt = Date.now()
+    return true
+  }
+
   function importEmpireStationToSaveStation(gameGuid: string, saveStationCode: string, station: StationPlan, groupId?: string | null) {
     return upsertStationPlan({
       gameGuid,
@@ -561,6 +626,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     upsertTradeStation,
     deleteTradeStation,
     setTradeStationPosition,
+    unbindTradeStation,
     importEmpireStationToSaveStation,
     updateStationPlan,
     createStationPlanInGroup,
