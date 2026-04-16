@@ -350,7 +350,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
 
     if (!plan) {
       plan = {
-        id: crypto.randomUUID(),
+        id: input.saveStationCode || crypto.randomUUID(),
         saveStationCode: input.saveStationCode,
         groupId: input.groupId ?? null,
         name: input.name,

@@ -40,10 +40,7 @@ import {
 } from './logic/empireSourceView'
 import { createEmpireFlowFacade } from './logic/empireFlowFacade'
 import {
-  createBindingPlanStationId,
-  parseBindingStationId,
-  toProductionStation,
-  createDerivedSaveStationId
+  toProductionStation
 } from './logic/productionSourceAdapter'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 
@@ -163,45 +160,21 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const stationId = activeStationId.value
     if (!stationId) return null
     
-    const parsed = parseBindingStationId(stationId)
-    if (!parsed) return null
-    
     const binding = activeBinding.value
     if (!binding) return null
     
-    if (parsed.kind === 'plan') {
-      return binding.stationPlans.find(plan => plan.id === parsed.planId) || null
-    }
-    
-    if (parsed.kind === 'derived') {
-      return binding.stationPlans.find(plan => plan.saveStationCode === parsed.saveStationCode) || null
-    }
-    
-    return null
+    return binding.stationPlans.find(plan => plan.id === stationId) || null
   })
 
   const archiveStation = computed<ArchiveStationData | null>(() => {
     const stationId = activeStationId.value
     if (!stationId) return null
     
-    const parsed = parseBindingStationId(stationId)
-    if (!parsed) return null
-    
     const binding = activeBinding.value
     if (!binding) return null
     
-    let code: string | null = null
-    
-    if (parsed.kind === 'derived') {
-      code = parsed.saveStationCode
-    } else if (parsed.kind === 'plan') {
-      const plan = binding.stationPlans.find(plan => plan.id === parsed.planId)
-      if (plan && plan.saveStationCode) {
-        code = plan.saveStationCode
-      }
-    }
-    
-    if (!code) return null
+    const plan = binding.stationPlans.find(plan => plan.id === stationId)
+    const code = plan?.saveStationCode || stationId
     
     const record = playerStationRecords.value.find(r => r.code === code && r.type === 'station')
     if (!record) return null
@@ -326,15 +299,13 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const activeStation = computed<StationPlan | null>(() => {
-    const gameGuid = activeBinding.value?.gameGuid || ''
     if (bindingStation.value) {
-      return toProductionStation(gameGuid, bindingStation.value, gameData.maps.sectors)
+      return toProductionStation(bindingStation.value, gameData.maps.sectors)
     }
     if (archiveStation.value) {
       const archive = archiveStation.value
-      const id = createDerivedSaveStationId(gameGuid, archive.code)
       return {
-        id,
+        id: archive.code,
         name: archive.name || archive.code,
         type: 'industrial',
         modules: archive.modules || [],
@@ -868,11 +839,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     patch: Partial<Pick<StationPlan, 'name' | 'type' | 'modules' | 'settings' | 'sectorId' | 'lockedWares' | 'warePriority' | 'count' | 'minerals'>>
   ): boolean {
     const binding = activeBinding.value
-    const parsed = parseBindingStationId(stationId)
-    if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
+    if (!binding) return false
 
-    if (parsed.kind === 'plan') {
-      return saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, {
+    const existingPlan = binding.stationPlans.find(plan => plan.id === stationId)
+    
+    if (existingPlan) {
+      return saveBindingStore.updateStationPlan(binding.gameGuid, stationId, {
         name: patch.name,
         type: patch.type,
         modules: patch.modules,
@@ -888,9 +860,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const station = getDerivedBindingStation(stationId)
     const plan = saveBindingStore.upsertStationPlan({
       gameGuid: binding.gameGuid,
-      saveStationCode: parsed.saveStationCode,
+      saveStationCode: stationId,
       groupId: patch.sectorId ?? station?.sectorId ?? null,
-      name: patch.name ?? station?.name ?? parsed.saveStationCode,
+      name: patch.name ?? station?.name ?? stationId,
       type: patch.type ?? station?.type ?? 'industrial',
       modules: patch.modules ?? station?.modules ?? [],
       settings: patch.settings ?? station?.settings ?? DEFAULT_STATION_SETTINGS,
@@ -900,7 +872,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       warePriority: patch.warePriority ?? {}
     })
     if (!plan) return false
-    const nextId = createBindingPlanStationId(binding.gameGuid, plan.id)
+    const nextId = plan.id
     if (activeStationId.value === stationId) {
       activeStationId.value = nextId
     }
@@ -913,11 +885,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const groupId = activeStation.value?.sectorId || sectors.value[0]?.id || null
     const plan = saveBindingStore.createStationPlanInGroup(binding.gameGuid, groupId, name, type)
     if (!plan) return null
-    const stationId = createBindingPlanStationId(binding.gameGuid, plan.id)
+    const stationId = plan.id
     if (plan && selectAfterCreate) {
       activeStationId.value = stationId
     }
-    const station = toProductionStation(binding.gameGuid, plan)
+    const station = toProductionStation(plan)
     station.sectorId = plan.groupId || null
     refreshStationFlowCache(stationId)
     return station
@@ -926,9 +898,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   function deleteStation(stationId: string) {
     const binding = activeBinding.value
     if (!binding) return
-    const parsed = parseBindingStationId(stationId)
-    if (parsed?.kind === 'plan' && parsed.gameGuid === binding.gameGuid) {
-      saveBindingStore.deleteStationPlan(binding.gameGuid, parsed.planId)
+    const existingPlan = binding.stationPlans.find(plan => plan.id === stationId)
+    if (existingPlan) {
+      saveBindingStore.deleteStationPlan(binding.gameGuid, stationId)
       stationProductionFlowMap.remove(stationId)
     }
     if (activeStationId.value === stationId) {
@@ -991,11 +963,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     payload: { modules: SavedModule[]; lockedWares: string[]; warePriority: Record<string, number> }
   ): boolean {
     const binding = activeBinding.value
-    const parsed = parseBindingStationId(stationId)
-    if (!binding || !parsed || parsed.gameGuid !== binding.gameGuid) return false
+    if (!binding) return false
 
-    if (parsed.kind === 'plan') {
-      saveBindingStore.updateStationPlan(binding.gameGuid, parsed.planId, {
+    const existingPlan = binding.stationPlans.find(plan => plan.id === stationId)
+
+    if (existingPlan) {
+      saveBindingStore.updateStationPlan(binding.gameGuid, stationId, {
         modules: payload.modules,
         lockedWares: payload.lockedWares,
         warePriority: payload.warePriority
@@ -1004,9 +977,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       const station = getDerivedBindingStation(stationId)
       saveBindingStore.upsertStationPlan({
         gameGuid: binding.gameGuid,
-        saveStationCode: parsed.saveStationCode,
+        saveStationCode: stationId,
         groupId: station?.sectorId || null,
-        name: station?.name || parsed.saveStationCode,
+        name: station?.name || stationId,
         type: station?.type || 'industrial',
         modules: payload.modules,
         settings: station?.settings || DEFAULT_STATION_SETTINGS,

@@ -16,45 +16,6 @@ import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchiv
 
 export type ProductionSourceKind = 'empire' | 'save-binding'
 
-export type ParsedBindingStationId =
-  | { kind: 'plan'; gameGuid: string; planId: string }
-  | { kind: 'derived'; gameGuid: string; saveStationCode: string }
-
-export function createBindingPlanStationId(gameGuid: string, planId: string): string {
-  return `__save_binding__${gameGuid}__${planId}`
-}
-
-export function createDerivedSaveStationId(gameGuid: string, saveStationCode: string): string {
-  return `__save_binding_derived__${gameGuid}__${saveStationCode}`
-}
-
-export function parseBindingStationId(stationId: string | null | undefined): ParsedBindingStationId | null {
-  if (!stationId) return null
-  const planPrefix = '__save_binding__'
-  if (stationId.startsWith(planPrefix)) {
-    const rest = stationId.slice(planPrefix.length)
-    const separator = rest.indexOf('__')
-    if (separator <= 0) return null
-    const gameGuid = rest.slice(0, separator)
-    const planId = rest.slice(separator + 2)
-    if (!gameGuid || !planId) return null
-    return { kind: 'plan', gameGuid, planId }
-  }
-
-  const derivedPrefix = '__save_binding_derived__'
-  if (stationId.startsWith(derivedPrefix)) {
-    const rest = stationId.slice(derivedPrefix.length)
-    const separator = rest.indexOf('__')
-    if (separator <= 0) return null
-    const gameGuid = rest.slice(0, separator)
-    const saveStationCode = rest.slice(separator + 2)
-    if (!gameGuid || !saveStationCode) return null
-    return { kind: 'derived', gameGuid, saveStationCode }
-  }
-
-  return null
-}
-
 export interface ProductionSourceDeps {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
@@ -83,7 +44,6 @@ export interface SectorSunlightMap {
 }
 
 export function toProductionStation(
-  gameGuid: string,
   plan: BindingStationPlan,
   sectorsMap?: SectorSunlightMap
 ): StationPlan {
@@ -97,7 +57,7 @@ export function toProductionStation(
   }
   
   return {
-    id: createBindingPlanStationId(gameGuid, plan.id),
+    id: plan.id,
     name: plan.name || plan.saveStationCode || 'Station',
     type: plan.type,
     modules: plan.modules || [],
@@ -109,13 +69,10 @@ export function toProductionStation(
 }
 
 function toDerivedSaveStation(
-  gameGuid: string,
   saveStation: PlayerStationEntry,
   plan: BindingStationPlan | undefined
 ): StationPlan {
-  const id = plan
-    ? createBindingPlanStationId(gameGuid, plan.id)
-    : createDerivedSaveStationId(gameGuid, saveStation.code)
+  const id = plan ? plan.id : saveStation.code
   return {
     id,
     name: plan?.name || saveStation.code || 'Save Station',
@@ -182,7 +139,7 @@ export function buildSaveBindingProductionFlows(
     if (!record) return
     const plan = stationPlansByCode.get(code)
     const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, record.sectorMacro)?.id || null
-    const station = toDerivedSaveStation(binding.gameGuid, record.data as PlayerStationEntry, plan)
+    const station = toDerivedSaveStation(record.data as PlayerStationEntry, plan)
     station.sectorId = groupId
     derivedStations.push(station)
     if (plan) emittedPlanIds.add(plan.id)
@@ -190,14 +147,14 @@ export function buildSaveBindingProductionFlows(
 
   binding.stationPlans.forEach((plan) => {
     if (!plan.saveStationCode || emittedPlanIds.has(plan.id)) return
-    const station = toProductionStation(binding.gameGuid, plan, deps.sectorsMap)
+    const station = toProductionStation(plan, deps.sectorsMap)
     station.sectorId = plan.groupId || null
     derivedStations.push(station)
     emittedPlanIds.add(plan.id)
   })
 
   virtualPlans.forEach((plan) => {
-    const station = toProductionStation(binding.gameGuid, plan, deps.sectorsMap)
+    const station = toProductionStation(plan, deps.sectorsMap)
     station.sectorId = plan.groupId || null
     derivedStations.push(station)
   })
@@ -313,7 +270,7 @@ export function deriveBindingStationsFromRecords(
     if (!record) return
     const plan = stationPlansByCode.get(code)
     const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, record.sectorMacro)?.id || null
-    const station = toDerivedSaveStation(binding.gameGuid, record.data as PlayerStationEntry, plan)
+    const station = toDerivedSaveStation(record.data as PlayerStationEntry, plan)
     station.sectorId = groupId
     result.push({
       station,
@@ -324,7 +281,7 @@ export function deriveBindingStationsFromRecords(
 
   binding.stationPlans.forEach((plan) => {
     if (emittedPlanIds.has(plan.id)) return
-    const station = toProductionStation(binding.gameGuid, plan, sectorsMap)
+    const station = toProductionStation(plan, sectorsMap)
     station.sectorId = plan.groupId || null
     result.push({
       station,

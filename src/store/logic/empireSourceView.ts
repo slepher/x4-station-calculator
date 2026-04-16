@@ -4,11 +4,8 @@ import type { BindingSectorGroup } from '@/types/x4'
 import type { PlayerStationRecord } from '@/types/saveArchive'
 import {
   deriveBindingStationsFromRecords,
-  parseBindingStationId,
-  createBindingPlanStationId,
   type ProductionSourceKind,
-  type DerivedBindingStation,
-  type ParsedBindingStationId
+  type DerivedBindingStation
 } from './productionSourceAdapter'
 import { normalizeSectorLinkKey } from './sectorLinks'
 
@@ -181,11 +178,4 @@ export function fromTransitTabId(tabId: string | null | undefined): string | nul
   if (!tabId || !tabId.startsWith(TRANSIT_TAB_PREFIX)) return null
   const sectorId = tabId.slice(TRANSIT_TAB_PREFIX.length)
   return sectorId || null
-}
-
-export {
-  parseBindingStationId,
-  createBindingPlanStationId,
-  type ParsedBindingStationId,
-  type DerivedBindingStation
 }

@@ -460,7 +460,7 @@ const buildBindingState = (seed: SeedBinding, now: number, saveData: any): Saved
     }
     
     const plan: BindingStationPlan = {
-      id: stableId('binding-station', seed.gameGuid, s.name, String(i)),
+      id: s.saveStationCode || stableId('binding-station', seed.gameGuid, s.name, String(i)),
       saveStationCode: s.saveStationCode,
       groupId,
       name: s.name,

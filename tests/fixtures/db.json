@@ -125,7 +125,7 @@
         ],
         "stationPlans": [
           {
-            "id": "d8e8a897-eaac-8694-50f0-202b52acfdb2",
+            "id": "KXN-018",
             "saveStationCode": "KXN-018",
             "groupId": "186727eb-7c4a-c0e0-b20d-f17405fd3aa3",
             "name": "地球人",
@@ -169,7 +169,7 @@
             "warePriority": {}
           },
           {
-            "id": "ff817dbd-7992-339b-d78c-aac755a41a9e",
+            "id": "RWC-785",
             "saveStationCode": "RWC-785",
             "groupId": "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
             "name": "RWC-785",
@@ -207,7 +207,7 @@
             "warePriority": {}
           },
           {
-            "id": "f4eb7c07-e32f-87ff-f26a-e1e2ff7d34d7",
+            "id": "XAJ-926",
             "saveStationCode": "XAJ-926",
             "groupId": "16f32571-659b-3035-a6c7-ce40f9a354b1",
             "name": "XAJ-926",
@@ -238,7 +238,7 @@
             "warePriority": {}
           },
           {
-            "id": "09aeae80-ede5-8f6e-8550-2ba3e54f1f00",
+            "id": "AVE-937",
             "saveStationCode": "AVE-937",
             "groupId": "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
             "name": "AVE-937",
@@ -269,7 +269,7 @@
             "warePriority": {}
           },
           {
-            "id": "251d170a-0b01-c0a1-f3f7-cb8530613bfb",
+            "id": "MGO-010",
             "saveStationCode": "MGO-010",
             "groupId": "186727eb-7c4a-c0e0-b20d-f17405fd3aa3",
             "name": "MGO-010",
@@ -307,7 +307,7 @@
             "warePriority": {}
           },
           {
-            "id": "ba6edcb1-c3db-1264-1905-417df5a8d555",
+            "id": "EOF-448",
             "saveStationCode": "EOF-448",
             "groupId": "af2f3083-3207-c8bc-d981-4dc848844f32",
             "name": "EOF-448",
