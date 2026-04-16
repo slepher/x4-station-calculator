@@ -29,9 +29,9 @@ import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
-import { DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
+import { DEFAULT_STATION_SETTINGS, migrateStationSettings, type StationComputeDeps } from './state/StationStateMap'
 import { stationProductionFlowMap } from './state/StationProductionFlowMap'
-import { buildStationComputeDeps, getFilteredGroupedFlows, deepClone } from './logic/stationComputeService'
+import { deepClone } from '@/utils/deepClone'
 import { analyzeStation } from './logic/analyzeStation'
 import {
   createEmpireSourceView,
@@ -346,17 +346,17 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return null
   })
 
-  function getComputeDeps() {
+  function getComputeDeps(): StationComputeDeps | null {
     const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
     if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
-    return buildStationComputeDeps({
+    return {
       modulesMap,
       waresMap,
       medicalConsumptionMap,
       buildPriceMultiplier: buildPriceMultiplier.value,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
-    })
+    }
   }
 
   function syncAllBindingStationsToStateMap(): void {
@@ -826,8 +826,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function getStationFlowCache(stationId: string): GroupedFlows | null {
-    if (!stationProductionFlowMap.getCache(stationId)) return null
-    return getFilteredGroupedFlows(stationId)
+    const cache = stationProductionFlowMap.getCache(stationId)
+    if (!cache) return null
+    return stationProductionFlowMap.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
   function clearStationCaches() {

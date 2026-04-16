@@ -25,10 +25,10 @@ import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
-import { migrateStationSettings, DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { migrateStationSettings, DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/StationStateMap'
 import { stationProductionFlowMap } from './state/StationProductionFlowMap'
+import { deepClone } from '@/utils/deepClone'
 import { analyzeStation } from './logic/analyzeStation'
-import { buildStationComputeDeps, deepClone, getFilteredGroupedFlows } from './logic/stationComputeService'
 import {
   createEmpireSourceView,
   computeActiveStation
@@ -83,17 +83,17 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return sourceView.getStationById(stationId)
   }
 
-  function getComputeDeps() {
+  function getComputeDeps(): StationComputeDeps | null {
     const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
     if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
-    return buildStationComputeDeps({
+    return {
       modulesMap,
       waresMap,
       medicalConsumptionMap,
       buildPriceMultiplier: buildPriceMultiplier.value,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
-    })
+    }
   }
   
   const plannedModules = computed<SavedModule[]>({
@@ -458,7 +458,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function getStationFlowCache(stationId: string): GroupedFlows | null {
-    return getFilteredGroupedFlows(stationId)
+    const cache = stationProductionFlowMap.getCache(stationId)
+    if (!cache) return null
+    return stationProductionFlowMap.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
   function initializeAllStationCaches() {

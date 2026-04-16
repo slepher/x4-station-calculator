@@ -18,7 +18,7 @@ import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOu
 import { buildTransitHubViewModel } from './transitHubViewModel'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { buildSaveBindingProductionFlows, type SaveBindingProductionDeps } from './productionSourceAdapter'
-import { getFilteredProductionFlows, getFilteredGroupedFlows } from './stationComputeService'
+import { stationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
 import { parseSectorLinkKey } from './sectorLinks'
 import type { EmpireSourceView } from './empireSourceView'
 
@@ -100,13 +100,19 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     const cache = new Map<string, GroupedFlows>()
     if (productionSource.value === 'save-binding') {
       derivedBindingStations.value.forEach((item) => {
-        cache.set(item.station.id, getFilteredGroupedFlows(item.station.id))
+        const flowCache = stationProductionFlowMap.getCache(item.station.id)
+        if (flowCache) {
+          cache.set(item.station.id, stationProductionFlowMap.getFilteredGrouped(item.station.id, flowCache.warePriorityLevels))
+        }
       })
       return cache
     }
     if (!activeEmpire.value) return cache
     activeEmpire.value.stations.forEach(station => {
-      cache.set(station.id, getFilteredGroupedFlows(station.id))
+      const flowCache = stationProductionFlowMap.getCache(station.id)
+      if (flowCache) {
+        cache.set(station.id, stationProductionFlowMap.getFilteredGrouped(station.id, flowCache.warePriorityLevels))
+      }
     })
     return cache
   })
@@ -131,7 +137,14 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     
     return analyzeEmpireWareFlow(
       activeEmpire.value.stations,
-      (stationId) => getFilteredProductionFlows(stationId),
+      (stationId) => {
+        const cache = stationProductionFlowMap.getCache(stationId)
+        if (!cache) return []
+        return cache.productionFlows.filter(f => {
+          if (f.netRate <= 0) return true
+          return (cache.warePriorityLevels[f.wareId] ?? 0) > 0
+        })
+      },
       waresMap.value || {}
     )
   })
@@ -145,7 +158,14 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
     sectorList.forEach((sector) => {
       const localStations = stations.filter((station) => station.sectorId === sector.id)
-      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => getFilteredProductionFlows(stationId), waresMap.value!)
+      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => {
+        const cache = stationProductionFlowMap.getCache(stationId)
+        if (!cache) return []
+        return cache.productionFlows.filter(f => {
+          if (f.netRate <= 0) return true
+          return (cache.warePriorityLevels[f.wareId] ?? 0) > 0
+        })
+      }, waresMap.value!)
       map.set(sector.id, rawGroupedFlows)
     })
 

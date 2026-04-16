@@ -1,11 +1,7 @@
 import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
 import { isSectorMacroInBindingScope, resolveBindingSectorScope } from './saveBindingSectorScope'
 import { migrateStationSettings } from '@/store/state/StationStateMap'
-import {
-  patchStationState,
-  recomputeStation,
-  getFilteredProductionFlows
-} from '@/store/logic/stationComputeService'
+import { stationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
 import type {
   BindingStationPlan,
   EmpireGroupedFlows,
@@ -202,16 +198,16 @@ export function buildSaveBindingProductionFlows(
   }
 
   derivedStations.forEach((station) => {
-    patchStationState(station.id, {
-      plannedModules: station.modules,
+    stationProductionFlowMap.compute(station.id, {
+      plannedModules: station.modules || [],
+      settings: migrateStationSettings(station.settings),
       lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {},
-      settings: station.settings
-    })
-    recomputeStation(station.id, {
+      warePriority: station.warePriority || {}
+    }, {
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
       medicalConsumptionMap: deps.medicalConsumptionMap,
+      buildPriceMultiplier: 0.5,
       enforceDlcActivation: deps.enforceDlcActivation,
       isModuleDlcActive: deps.isModuleDlcActive
     })
@@ -219,7 +215,14 @@ export function buildSaveBindingProductionFlows(
 
   const groupedFlows = analyzeEmpireWareFlow(
     derivedStations,
-    (stationId) => getFilteredProductionFlows(stationId),
+    (stationId) => {
+      const cache = stationProductionFlowMap.getCache(stationId)
+      if (!cache) return []
+      return cache.productionFlows.filter(f => {
+        if (f.netRate <= 0) return true
+        return (cache.warePriorityLevels[f.wareId] ?? 0) > 0
+      })
+    },
     deps.waresMap
   )
 
