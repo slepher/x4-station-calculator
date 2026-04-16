@@ -279,7 +279,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     
     const hasBinding = binding !== null
     const hasArchive = archive !== null
-    const stationCode = archive?.code || station.id
+    const stationCode = archive?.code || ''
     
     const sectorName = archive?.sector?.name || ''
     const sectorNameId = archive?.sector?.nameId
@@ -338,9 +338,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       const archive = archiveStation.value
       return {
         id: archive.code,
-        name: archive.name || archive.code,
+        name: archive.code,
         type: 'industrial',
-        modules: archive.modules || [],
+        modules: [],
         settings: { ...DEFAULT_STATION_SETTINGS, sunlight: Math.round((archive.sector?.sunlight ?? 1) * 100) },
         lastUpdated: 0,
         lockedWares: [],
