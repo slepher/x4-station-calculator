@@ -321,43 +321,24 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     const group = draftBinding.value.groups.find((item) => item.id === input.sectorGroupId)
     if (!group) return
     
-    const wasSectorMacroSet = Boolean(group.sectorMacro)
-    const newSectorMacro = input.sectorMacro
-    const anchorChanged = group.sectorMacro !== newSectorMacro
-    
     updateGroup(input.gameGuid, input.sectorGroupId, {
       sectorMacro: input.sectorMacro,
       jumpRange: input.jumpRange,
       coverageSectorMacros: deepClone(input.coverageSectorMacros)
     })
     
-    // Auto-create tradestation when first binding to a sector
-    if (!wasSectorMacroSet && newSectorMacro && !group.tradeStation) {
-      const position = getSectorCenterPosition(gameData.maps, newSectorMacro)
-      group.tradeStation = {
-        id: crypto.randomUUID(),
-        name: 'Trade Station',
-        sectorMacro: newSectorMacro,
-        position
-      }
-      draftBinding.value.updatedAt = Date.now()
-    }
-    
-    // When anchor sector changes: reset or create tradestation
-    if (anchorChanged && newSectorMacro) {
+    // Ensure tradestation exists at anchor sector center
+    if (input.sectorMacro) {
+      const position = getSectorCenterPosition(gameData.maps, input.sectorMacro)
       if (group.tradeStation) {
-        // Reset tradestation to new sector center, unbind
-        group.tradeStation.sectorMacro = newSectorMacro
+        group.tradeStation.sectorMacro = input.sectorMacro
         group.tradeStation.saveStationCode = undefined
-        const position = getSectorCenterPosition(gameData.maps, newSectorMacro)
         group.tradeStation.position = position
       } else {
-        // Create new tradestation at new sector center
-        const position = getSectorCenterPosition(gameData.maps, newSectorMacro)
         group.tradeStation = {
           id: crypto.randomUUID(),
           name: 'Trade Station',
-          sectorMacro: newSectorMacro,
+          sectorMacro: input.sectorMacro,
           position
         }
       }

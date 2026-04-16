@@ -7,7 +7,6 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSavePoiIconUrl } from '@/components/map/utils/style'
-import { getSectorZoneBoundingCenter } from '@/components/map/utils/coordinates'
 import { resolveGroupSaveBinding, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import { compareModulesByPickerOrder } from '@/store/logic/searchModule'
@@ -33,14 +32,6 @@ const blueprintStore = useBlueprintProductionStore()
 const saveStore = useSaveStore()
 const gameDataStore = useGameDataStore()
 const saveBindingStore = useSaveBindingStore()
-
-function getSectorCenterPositionForBinding(sectorMacro: string | null | undefined): { x: number; y: number; z: number } | undefined {
-  if (!sectorMacro) return undefined
-  const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, sectorMacro)
-  if (!resolved) return undefined
-  const center = getSectorZoneBoundingCenter(resolved.sector)
-  return { x: center.x, y: 0, z: center.z }
-}
 
 const importStationName = ref('')
 
@@ -248,13 +239,11 @@ const anchorAndCoverageSectors = computed(() => {
       ? resolveGroupSaveBinding(currentGroupBinding.value, activeArchive.value)
       : null
     const hasPlacedVirtualTradestation = !!(
-      tb?.position &&
-      tb.sectorMacro === sectorMacro &&
+      tb?.sectorMacro === sectorMacro &&
       !tb.saveStationCode
     )
     const hasMissingVirtualTradestation = !!(
-      tb?.position &&
-      tb.sectorMacro === sectorMacro &&
+      tb?.sectorMacro === sectorMacro &&
       tb.saveStationCode &&
       resolvedTradestation?.status === 'missing_at_selected_time'
     )
@@ -671,27 +660,6 @@ function clearFreeStationBinding(stationId: string) {
   saveBindingStore.deleteStationPlan(props.gameGuid, stationId)
 }
 
-function clearSectorTradestationBinding() {
-  const ts = currentGroupBinding.value?.tradestationBinding
-  if (ts?.saveStationCode) {
-    // If bound to a save station, unbind it
-    saveBindingStore.unbindTradeStation(props.gameGuid, props.sectorGroupId)
-  } else {
-    // If virtual tradestation (no saveStationCode), keep it (auto-created)
-    // Just reset position to sector center
-    const sectorMacro = currentGroupBinding.value?.sectorMacro || ts?.sectorMacro || ''
-    const position = getSectorCenterPositionForBinding(sectorMacro)
-    if (position) {
-      saveBindingStore.setTradeStationPosition({
-        gameGuid: props.gameGuid,
-        groupId: props.sectorGroupId,
-        sectorMacro,
-        position
-      })
-    }
-  }
-}
-
 function formatCoordKm(value: number): string {
   return `${(value / 1000).toFixed(1)}km`
 }
@@ -1041,7 +1009,6 @@ onBeforeUnmount(() => {
                 {{ formatCoordKm(sector.placedVirtualTradestationPosition.z) }}
               </span>
             </div>
-            <button class="placed-clear" type="button" @click.stop="clearSectorTradestationBinding()">×</button>
           </div>
 
           <div
@@ -1053,7 +1020,6 @@ onBeforeUnmount(() => {
               <span class="station-label">{{ t('map.binding_sector_tradestation') }}</span>
               <span class="station-code">{{ t('map.binding_status_missing') }}</span>
             </div>
-            <button class="placed-clear" type="button" @click.stop="clearSectorTradestationBinding">×</button>
           </div>
         </div>
         <div v-else class="sector-empty">
