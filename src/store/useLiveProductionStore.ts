@@ -281,11 +281,31 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const hasArchive = archive !== null
     const stationCode = archive?.code || ''
     
-    const sectorName = archive?.sector?.name || ''
-    const sectorNameId = archive?.sector?.nameId
-    const sectorResources = archive?.sector?.resources || []
-    const sectorSunlight = archive?.sector?.sunlight ?? 100
-    const position = archive?.position
+    let sectorName = ''
+    let sectorNameId: string | undefined
+    let sectorResources: string[] = []
+    let sectorSunlight = 100
+    let position: { x: number; y: number; z: number } | undefined
+    
+    if (archive) {
+      sectorName = archive.sector?.name || ''
+      sectorNameId = archive.sector?.nameId
+      sectorResources = archive.sector?.resources || []
+      sectorSunlight = archive.sector?.sunlight ?? 100
+      position = archive.position
+    } else if (binding) {
+      const sectorMacro = binding.sectorMacro
+      if (sectorMacro) {
+        const sectorData = gameData.maps.sectors[sectorMacro]
+        if (sectorData) {
+          sectorName = sectorData.name || ''
+          sectorNameId = sectorData.nameId
+          sectorResources = (sectorData.resources || []).map(r => r.ware)
+          sectorSunlight = Math.round((sectorData.area?.sunlight ?? 1) * 100)
+        }
+      }
+      position = binding.position
+    }
     
     const archiveModules: SavedModule[] = archive?.modules || []
     const buildingModules: SavedModule[] = archive?.building?.modules || []
