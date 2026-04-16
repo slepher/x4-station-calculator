@@ -3337,6 +3337,10 @@
     <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
     <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
     <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
+    <t id="11695">Towable Wreck</t>
+    <t id="11696">Dismantleable Wreck</t>
+    <t id="11697">Resource Probe coverage</t>
+    <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">オフラインで保存する</t>
     <t id="11702">オフラインセーブデータを上書きする</t>
@@ -3676,7 +3680,7 @@
     <t id="12714">本当にカラープロファイルを削除しますか？</t>
     <t id="12715">プロファイルを削除</t>
     <t id="12716">『X4: Foundations』と『X4: Timelines』にようこそ！</t>
-    <t id="12717">はじめて『X4』をプレイする場合、まずチュートリアルを試してから『Timelines』のストーリーをプレイし、その後に『X4』のオープンユニバースに出発することをお勧めします。</t>
+    <t id="12717">はじめて『X4』をプレイする場合、まず一部のチュートリアルを試してから『Timelines』のストーリーをプレイし、その後『X4』のオープンユニバースに飛び立つことをお勧めします。</t>
     <t id="12718">『Timelines』では、オープンユニバースで使える機能やアクティビティの一部を紹介します。</t>
     <t id="12719">オープンユニバースに飛び込む準備ができたら、複数あるゲームスタートからプレイスタイルに合ったものを選んでゲームを始めましょう。</t>
     <t id="12720">『X4: Foundations』にようこそ！</t>
@@ -3748,8 +3752,8 @@
     <t id="12786">AMD FSRフレーム生成</t>
     <t id="12787">改良型コントローラー対応（実験的）</t>
     <t id="12788">AMD FSR</t>
-    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12789">はじめて『X4』をプレイする場合、オープンユニバースに飛び立つ前に、一部のチュートリアルを試すことをお勧めします。</t>
+    <t id="12790">オープンユニバースを新規に始める</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">大使の行動</t>
     <t id="12803">大使</t>
@@ -8666,7 +8670,7 @@
     <t id="9929">いずれかの資産オブジェクトがある特定の宙域がロックされてしまうため、この選択肢を選べません。</t>
     <t id="9930">まだアンロックしていない内容が含まれているため、このカスタムゲームは選択できません。</t>
     <t id="9931">このカスタムゲームには、互換性のない設備を含む兵装が含まれています。互換性のない設備は搭載されません。</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">このカスタムゲームには、利用できなくなったウェアや設計図が含まれています。関連するアイテムは使用されません。</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">このミッションを受けると、ほかの多元宇宙作戦ミッションは中断されます。</t>
