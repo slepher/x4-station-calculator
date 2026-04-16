@@ -10,10 +10,12 @@ import type {
   SupplyPlanningInput,
   SectorInternalData,
   X4Module,
-  BindingStationPlan
+  BindingStationPlan,
+  TradeStationBinding
 } from '@/types/x4'
 import type { ProductionSessionContext } from '@/types/production-context'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
+import type { ProductionPanelSource } from '@/types/production-panel-source'
 import type {
   ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
@@ -30,7 +32,7 @@ import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS, migrateStationSettings, type StationComputeDeps } from './state/stationSettings'
-import { stationProductionFlowMap } from './state/StationProductionFlowMap'
+import { stationProductionFlowMap, StationProductionFlowMap } from './state/StationProductionFlowMap'
 import { deepClone } from '@/utils/deepClone'
 import { analyzeStation } from './logic/analyzeStation'
 import {
@@ -56,6 +58,117 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
 
+  const liveFlowMap = new StationProductionFlowMap()
+
+  function syncLiveFlowMap() {
+    const deps = getComputeDeps()
+    if (!deps) return
+
+    derivedBindingStations.value.forEach((item) => {
+      const station = item.station
+      syncLiveFlowMapForStation(station.id, deps)
+    })
+
+    const stationPlans = derivedBindingStations.value
+      .filter((item) => playerStationRecords.value.some((r) => r.code === item.station.id && r.type === 'station'))
+      .map((item) => item.station)
+    liveFlowMap.updateAggregation(stationPlans)
+  }
+
+  function syncLiveFlowMapForStation(stationId: string, deps?: StationComputeDeps): void {
+    const computeDeps = deps || getComputeDeps()
+    if (!computeDeps) return
+
+    const archiveStationRecord = playerStationRecords.value.find(
+      (r) => r.code === stationId && r.type === 'station'
+    )
+    if (!archiveStationRecord) return
+
+    const stationEntry = archiveStationRecord.data as PlayerStationEntry
+    if (!stationEntry.modules) return
+
+    const modules: SavedModule[] = []
+    const modulesByMacroId = gameData.modulesByMacroId
+    for (const mod of Object.values(stationEntry.modules)) {
+      const matchedModule = mod.module_id || modulesByMacroId[mod.ref]?.id
+      if (matchedModule) {
+        const existing = modules.find((m) => m.id === matchedModule)
+        if (existing) {
+          existing.count += mod.amount
+        } else {
+          modules.push({ id: matchedModule, count: mod.amount })
+        }
+      }
+    }
+
+    const station = derivedBindingStations.value.find(item => item.station.id === stationId)?.station
+    const liveSettings: StationSettings = station?.settings || DEFAULT_STATION_SETTINGS
+
+    liveFlowMap.compute(stationId, {
+      plannedModules: modules,
+      settings: liveSettings,
+      lockedWares: [],
+      warePriority: {},
+      skipAutoFill: true
+    }, computeDeps)
+  }
+
+  function syncAfterStationFlowChange(stationId: string, deps: StationComputeDeps): void {
+    syncPlanningSectorAggregations()
+    syncLiveFlowMapForStation(stationId, deps)
+    syncLiveSectorAggregations()
+  }
+
+  function syncPlanningSectorAggregations(): void {
+    const deps = getComputeDeps()
+    if (!deps) return
+
+    const sectorList = sectors.value
+    for (const sector of sectorList) {
+      const finalFlows = planningFlowFacade.getSectorFinalProductionFlows(sector.id)
+      const group = activeBinding.value?.groups.find(g => g.id === sector.id)
+      const sectorSettings = group?.settings || settings.value
+      const effectiveSettings = {
+        racePreference: sectorSettings.racePreference ?? settings.value.racePreference,
+        resourceBufferHours: sectorSettings.resourceBufferHours ?? settings.value.resourceBufferHours,
+        primaryProductBufferHours: sectorSettings.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
+        secondaryProductBufferHours: sectorSettings.secondaryProductBufferHours ?? settings.value.secondaryProductBufferHours,
+        transportShipCapacity: sectorSettings.transportShipCapacity ?? settings.value.transportShipCapacity
+      }
+      stationProductionFlowMap.computeSectorAggregation(
+        sector.id,
+        finalFlows,
+        effectiveSettings,
+        deps
+      )
+    }
+  }
+
+  function syncLiveSectorAggregations(): void {
+    const deps = getComputeDeps()
+    if (!deps) return
+
+    const sectorList = sectors.value
+    for (const sector of sectorList) {
+      const finalFlows = liveFlowFacade.getSectorFinalProductionFlows(sector.id)
+      const group = activeBinding.value?.groups.find(g => g.id === sector.id)
+      const sectorSettings = group?.settings || settings.value
+      const effectiveSettings = {
+        racePreference: sectorSettings.racePreference ?? settings.value.racePreference,
+        resourceBufferHours: sectorSettings.resourceBufferHours ?? settings.value.resourceBufferHours,
+        primaryProductBufferHours: sectorSettings.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
+        secondaryProductBufferHours: sectorSettings.secondaryProductBufferHours ?? settings.value.secondaryProductBufferHours,
+        transportShipCapacity: sectorSettings.transportShipCapacity ?? settings.value.transportShipCapacity
+      }
+      liveFlowMap.computeSectorAggregation(
+        sector.id,
+        finalFlows,
+        effectiveSettings,
+        deps
+      )
+    }
+  }
+
   async function loadPlayerStationRecords() {
     const archive = selectedArchive.value
     if (!archive) {
@@ -75,6 +188,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   watch(selectedArchive, async () => {
     await loadPlayerStationRecords()
+    syncLiveFlowMap()
+    syncLiveSectorAggregations()
   })
 
   const activeStationId = computed({
@@ -87,30 +202,81 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     set: (name: string) => { saveBindingStore.activeBindingName = name }
   })
 
-  const sourceView = createEmpireSourceView({
-    productionSource,
-    activeEmpire: ref(null),
-    activeBinding,
-    playerStationRecords,
-    sectorsMap: computed(() => gameData.maps.sectors)
+  const archiveCoveredStationIds = computed<Set<string>>(() => {
+    const coveredIds = new Set<string>()
+    const stationCodes = new Set(
+      playerStationRecords.value
+        .filter((record) => record.type === 'station')
+        .map((record) => record.code)
+    )
+
+    const binding = activeBinding.value
+    if (!binding) {
+      stationCodes.forEach((code) => coveredIds.add(code))
+      return coveredIds
+    }
+
+    const matchedCodes = new Set<string>()
+
+    binding.stationPlans.forEach((plan) => {
+      const archiveCode = plan.saveStationCode || plan.id
+      if (stationCodes.has(archiveCode)) {
+        coveredIds.add(plan.id)
+        matchedCodes.add(archiveCode)
+      }
+    })
+
+    stationCodes.forEach((code) => {
+      if (!matchedCodes.has(code)) {
+        coveredIds.add(code)
+      }
+    })
+
+    return coveredIds
   })
 
-  const sectors = sourceView.sectors
-  const orderedStationsBySector = sourceView.orderedStationsBySector
-  const derivedBindingStations = sourceView.derivedBindingStations
-
-  const flowFacade = createEmpireFlowFacade({
+  const planningSourceView = createEmpireSourceView({
     productionSource,
     activeEmpire: ref(null),
     activeBinding,
     playerStationRecords,
-    sourceView,
+    sectorsMap: computed(() => gameData.maps.sectors),
+    visibleStationIds: ref(null)
+  })
+
+  const liveSourceView = createEmpireSourceView({
+    productionSource,
+    activeEmpire: ref(null),
+    activeBinding,
+    playerStationRecords,
+    sectorsMap: computed(() => gameData.maps.sectors),
+    visibleStationIds: archiveCoveredStationIds
+  })
+
+  const sectors = planningSourceView.sectors
+  const orderedStationsBySector = planningSourceView.orderedStationsBySector
+  const derivedBindingStations = planningSourceView.derivedBindingStations
+
+  const planningFlowFacade = createEmpireFlowFacade({
+    productionSource,
+    activeEmpire: ref(null),
+    activeBinding,
+    sourceView: planningSourceView,
+    modulesMap: computed(() => gameData.modulesMap),
+    waresMap: computed(() => gameData.waresMap)
+  })
+
+  const liveFlowFacade = createEmpireFlowFacade({
+    productionSource,
+    activeEmpire: ref(null),
+    activeBinding,
+    sourceView: liveSourceView,
     modulesMap: computed(() => gameData.modulesMap),
     waresMap: computed(() => gameData.waresMap),
-    medicalConsumptionMap: computed(() => gameData.medicalConsumptionMap),
-    enforceDlcActivation: computed(() => gameData.enforceDlcActivation),
-    isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
+    flowMap: liveFlowMap
   })
+
+  const flowFacade = planningFlowFacade
 
   const stationFlowCache = flowFacade.stationFlowCache
   const empireGroupedFlows = flowFacade.empireGroupedFlows
@@ -138,14 +304,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     saveBindingStore.updateGroup(gameGuid, sectorId, {
       settings: { ...current, ...patch }
     })
+    syncPlanningSectorAggregations()
+    syncLiveSectorAggregations()
   }
 
   function getDerivedBindingStation(stationId: string): StationPlan | null {
-    return sourceView.getDerivedBindingStation(stationId)
+    return planningSourceView.getDerivedBindingStation(stationId)
   }
 
   function getStationById(stationId: string): StationPlan | null {
-    return sourceView.getStationById(stationId)
+    return planningSourceView.getStationById(stationId)
   }
 
   function getLinkedSectors(sectorId: string): string[] {
@@ -154,25 +322,61 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return group.connectedGroupIds || []
   }
 
-  const bindingStation = computed<BindingStationPlan | null>(() => {
-    const stationId = activeStationId.value
-    if (!stationId) return null
+  const workbenchMode = computed<'station' | 'transit' | 'overview'>(() => {
+    return activeTransitSectorId.value ? 'transit' : (activeStationId.value ? 'station' : 'overview')
+  })
+
+  const bindingStation = computed<BindingStationPlan | TradeStationBinding | null>(() => {
+    const mode = workbenchMode.value
     
-    const binding = activeBinding.value
-    if (!binding) return null
+    if (mode === 'station') {
+      const stationId = activeStationId.value
+      if (!stationId) return null
+      
+      const binding = activeBinding.value
+      if (!binding) return null
+      
+      return binding.stationPlans.find(plan => plan.id === stationId) || null
+    }
     
-    return binding.stationPlans.find(plan => plan.id === stationId) || null
+    if (mode === 'transit') {
+      const sectorId = activeTransitSectorId.value
+      if (!sectorId) return null
+      
+      const binding = activeBinding.value
+      if (!binding) return null
+      
+      const group = binding.groups.find(g => g.id === sectorId)
+      return group?.tradeStation || null
+    }
+    
+    return null
   })
 
   const archiveStation = computed<ArchiveStationData | null>(() => {
-    const stationId = activeStationId.value
-    if (!stationId) return null
-    
+    const mode = workbenchMode.value
     const binding = activeBinding.value
     if (!binding) return null
     
-    const plan = binding.stationPlans.find(plan => plan.id === stationId)
-    const code = plan?.saveStationCode || stationId
+    let code: string | undefined
+    
+    if (mode === 'station') {
+      const stationId = activeStationId.value
+      if (!stationId) return null
+      
+      const plan = binding.stationPlans.find(plan => plan.id === stationId)
+      code = plan?.saveStationCode || stationId
+    }
+    
+    if (mode === 'transit') {
+      const sectorId = activeTransitSectorId.value
+      if (!sectorId) return null
+      
+      const group = binding.groups.find(g => g.id === sectorId)
+      code = group?.tradeStation?.saveStationCode
+    }
+    
+    if (!code) return null
     
     const record = playerStationRecords.value.find(r => r.code === code && r.type === 'station')
     if (!record) return null
@@ -185,7 +389,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       name: sector?.name || sectorMacro,
       nameId: sector?.nameId,
       resources: (sector?.resources || []).map(r => r.ware),
-      sunlight: sector?.area?.sunlight ?? 100
+      sunlight: Math.round((sector?.area?.sunlight ?? 1) * 100)
     }
     
     const position = stationEntry.relative_position ? {
@@ -268,14 +472,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const mode = ref<'live' | 'planning'>('planning')
-
   const stationContext = computed(() => {
     const binding = bindingStation.value
     const archive = archiveStation.value
-    const station = activeStation.value
-    
-    if (!station) return null
     
     const hasBinding = binding !== null
     const hasArchive = archive !== null
@@ -324,6 +523,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
+  const mode = ref<'live' | 'planning'>('planning')
+
   const initialMode = computed<'live' | 'planning'>(() => {
     const hasBinding = bindingStation.value !== null
     const hasSave = archiveStation.value !== null
@@ -339,8 +540,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return (hasBinding && hasSave) || (!hasBinding && hasSave)
   })
 
+  const canToggleTransit = computed(() => true)
+
   function toggleMode() {
-    if (!canToggle.value) return
     mode.value = mode.value === 'live' ? 'planning' : 'live'
   }
 
@@ -351,22 +553,32 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const activeStation = computed<StationPlan | null>(() => {
-    if (bindingStation.value) {
-      return toProductionStation(bindingStation.value, gameData.maps.sectors)
+    const mode = workbenchMode.value
+    
+    if (mode === 'transit') {
+      return null
     }
-    if (archiveStation.value) {
+    
+    if (mode === 'station') {
+      const binding = bindingStation.value
+      if (binding && 'modules' in binding) {
+        return toProductionStation(binding as BindingStationPlan, gameData.maps.sectors)
+      }
       const archive = archiveStation.value
-      return {
-        id: archive.code,
-        name: archive.code,
-        type: 'industrial',
-        modules: [],
-        settings: { ...DEFAULT_STATION_SETTINGS, sunlight: Math.round((archive.sector?.sunlight ?? 1) * 100) },
-        lastUpdated: 0,
-        lockedWares: [],
-        warePriority: {}
+      if (archive) {
+        return {
+          id: archive.code,
+          name: archive.code,
+          type: 'industrial',
+          modules: [],
+          settings: { ...DEFAULT_STATION_SETTINGS, sunlight: archive.sector?.sunlight ?? 100 },
+          lastUpdated: 0,
+          lockedWares: [],
+          warePriority: {}
+        }
       }
     }
+    
     return null
   })
 
@@ -401,6 +613,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     const stationPlans = stations.map(item => item.station)
     stationProductionFlowMap.updateAggregation(stationPlans)
+    syncPlanningSectorAggregations()
   }
 
   const plannedModules = computed<SavedModule[]>({
@@ -424,6 +637,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           warePriority: station.warePriority,
           settings: station.settings
         })
+        syncAfterStationFlowChange(station.id, deps)
       }
     }
   })
@@ -449,6 +663,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           warePriority: station.warePriority,
           settings: station.settings
         })
+        syncAfterStationFlowChange(station.id, deps)
       }
 }
   })
@@ -499,6 +714,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           warePriority: station.warePriority,
           settings: station.settings
         })
+        syncAfterStationFlowChange(station.id, deps)
       }
     }
   })
@@ -518,7 +734,26 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         resolvedModules: []
       }
     }
-    const cache = stationProductionFlowMap.getCache(stationId)
+
+    const currentMode = mode.value
+    const flowMapToUse = currentMode === 'live' ? liveFlowMap : stationProductionFlowMap
+    const cache = flowMapToUse.getCache(stationId)
+
+    if (currentMode === 'live') {
+      const archiveModules: SavedModule[] = archiveStation.value?.modules || []
+      return {
+        actualWorkforce: cache?.actualWorkforce || 0,
+        currentEfficiency: cache?.currentEfficiency || 0,
+        warePriorityLevels: {},
+        productionFlows: flowMapToUse.getProductionFlows(stationId),
+        plannedModules: archiveModules,
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [],
+        resolvedModules: archiveModules
+      }
+    }
+
     const planned = plannedModules.value
     const autoIndustry = cache?.autoIndustryModules || []
     const autoHabitation = cache?.autoHabitationModules || []
@@ -529,7 +764,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       actualWorkforce: cache?.actualWorkforce || 0,
       currentEfficiency: cache?.currentEfficiency || 0,
       warePriorityLevels: cache?.warePriorityLevels || {},
-      productionFlows: stationProductionFlowMap.getProductionFlows(stationId),
+      productionFlows: flowMapToUse.getProductionFlows(stationId),
       plannedModules: planned,
       autoIndustryModules: autoIndustry,
       autoHabitationModules: autoHabitation,
@@ -572,6 +807,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         warePriority: station.warePriority,
         settings: station.settings
       })
+      syncLiveFlowMapForStation(station.id, deps)
     }
   }
 
@@ -613,6 +849,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         warePriority: station.warePriority,
         settings: station.settings
       })
+      syncAfterStationFlowChange(station.id, deps)
     }
   }
 
@@ -679,6 +916,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         warePriority: station.warePriority,
         settings: station.settings
       })
+      syncPlanningSectorAggregations()
+      syncLiveFlowMapForStation(station.id, deps)
+      syncLiveSectorAggregations()
     }
   }
 
@@ -847,16 +1087,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       lockedWares: station.lockedWares || [],
       warePriority: station.warePriority || {}
     }, deps)
+    syncAfterStationFlowChange(stationId, deps)
   }
 
   function getStationFlowCache(stationId: string): GroupedFlows | null {
-    const cache = stationProductionFlowMap.getCache(stationId)
+    const flowMapToUse = mode.value === 'live' ? liveFlowMap : stationProductionFlowMap
+    const cache = flowMapToUse.getCache(stationId)
     if (!cache) return null
-    return stationProductionFlowMap.getFilteredGrouped(stationId, cache.warePriorityLevels)
+    return flowMapToUse.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
   function clearStationCaches() {
     stationProductionFlowMap.clear()
+    liveFlowMap.clear()
   }
 
   function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
@@ -884,6 +1127,62 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     sellMultiplier?: number
   }): TransitHubViewModel {
     return flowFacade.getTransitHubViewModel(input)
+  }
+
+  function getPlanningStationPanelSource(stationId: string | null): ProductionPanelSource {
+    const ctx = stationContext.value
+    return planningFlowFacade.getStationPanelSource({
+      stationId,
+      archiveModules: ctx?.archiveModules || [],
+      buildingModules: ctx?.buildingModules || []
+    })
+  }
+
+  function getLiveStationPanelSource(stationId: string | null): ProductionPanelSource {
+    const ctx = stationContext.value
+    return liveFlowFacade.getStationPanelSource({
+      stationId,
+      archiveModules: ctx?.archiveModules || [],
+      buildingModules: ctx?.buildingModules || []
+    })
+  }
+
+  function getActiveStationPanelSource(stationId: string | null): ProductionPanelSource {
+    return mode.value === 'live'
+      ? getLiveStationPanelSource(stationId)
+      : getPlanningStationPanelSource(stationId)
+  }
+
+  function getPlanningTransitPanelSource(sectorId: string | null): ProductionPanelSource {
+    const ctx = stationContext.value
+    return planningFlowFacade.getTransitPanelSource({
+      sectorId,
+      archiveModules: ctx?.archiveModules || [],
+      buildingModules: ctx?.buildingModules || [],
+      hasArchiveTradeStation: ctx?.hasArchive ?? false,
+      transitSettings: transitHubSettings.value,
+      globalSettings: settings.value,
+      mode: 'planning'
+    })
+  }
+
+  function getLiveTransitPanelSource(sectorId: string | null): ProductionPanelSource {
+    const ctx = stationContext.value
+    return liveFlowFacade.getTransitPanelSource({
+      sectorId,
+      archiveModules: ctx?.archiveModules || [],
+      buildingModules: ctx?.buildingModules || [],
+      hasArchiveTradeStation: ctx?.hasArchive ?? false,
+      transitSettings: transitHubSettings.value,
+      globalSettings: settings.value,
+      mode: 'live'
+    })
+  }
+
+  function getActiveTransitPanelSource(sectorId: string | null): ProductionPanelSource {
+    return mode.value === 'live'
+      ? getLiveTransitPanelSource(sectorId)
+      : getPlanningTransitPanelSource(sectorId)
   }
 
   function updateBindingStationPlan(
@@ -1119,6 +1418,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (storedGuid && saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedGuid)) {
         openBinding(storedGuid)
         syncAllBindingStationsToStateMap()
+        syncLiveFlowMap()
+        syncLiveSectorAggregations()
         validateActiveStationId()
         isReady.value = true
         console.log('[LiveProductionStore] Loaded saved binding')
@@ -1130,6 +1431,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         activeViewStore.activeBinding = firstBinding.gameGuid
         openBinding(firstBinding.gameGuid)
         syncAllBindingStationsToStateMap()
+        syncLiveFlowMap()
+        syncLiveSectorAggregations()
         validateActiveStationId()
         isReady.value = true
         console.log('[LiveProductionStore] Loaded first binding')
@@ -1285,10 +1588,30 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getAvailableMinerals: () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane'],
     getSingleBerthThroughput: () => Math.max(1, settings.value.transportShipCapacity || 1) * 15,
 
+    getToolbarStationCode: () => {
+      return stationContext.value?.stationCode || ''
+    },
+    getToolbarSectorName: () => {
+      return stationContext.value?.sectorName || ''
+    },
+    getToolbarSectorNameId: () => {
+      return stationContext.value?.sectorNameId
+    },
+    getToolbarStationPosition: () => {
+      return stationContext.value?.position
+    },
+    getToolbarSectorResources: () => {
+      return stationContext.value?.sectorResources || []
+    },
+    getToolbarSectorSunlight: () => {
+      return stationContext.value?.sectorSunlight ?? 100
+    },
+
     getPlannedModules: () => plannedModules.value,
     getAutoModules: () => activeStationState.value.autoIndustryModules,
     getAutoHabitationModules: () => activeStationState.value.autoHabitationModules,
     getAutoInfrastructureModules: () => activeStationState.value.autoInfrastructureModules,
+    getResolvedModules: () => activeStationState.value.resolvedModules,
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
@@ -1301,15 +1624,13 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       buyMultiplier: settings.value.buyMultiplier,
       sellMultiplier: settings.value.sellMultiplier,
       racePreference: settings.value.racePreference,
-      showEmpireGaps: settings.value.showEmpireGaps ?? false,
+      showEmpireGaps: mode.value === 'live' ? false : settings.value.showEmpireGaps ?? false,
       transportMinutes: settings.value.transportMinutes
     }),
     getEmpireGaps: () => empireGapsComputed.value,
 
     getStationAnalysis: () => {
-      const planned = plannedModules.value
-      const auto = activeStationState.value.autoIndustryModules
-      const allModules = [...planned, ...auto]
+      const allModules = activeStationState.value.resolvedModules
       if (allModules.length === 0) {
         return {
           totalCost: 0,
@@ -1478,6 +1799,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     mode,
     initialMode,
     canToggle,
+    canToggleTransit,
     toggleMode,
     updateStationSettings,
     updateStationModules,
@@ -1526,6 +1848,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     transferModuleFromAutoIndustry,
     clearAll: clearAllModules,
     workbench,
-    importModalOpen
+    importModalOpen,
+    getPlanningStationPanelSource,
+    getLiveStationPanelSource,
+    getActiveStationPanelSource,
+    getPlanningTransitPanelSource,
+    getLiveTransitPanelSource,
+    getActiveTransitPanelSource,
+    planningFlowFacade,
+    liveFlowFacade,
+    planningSourceView,
+    liveSourceView
   }
 })

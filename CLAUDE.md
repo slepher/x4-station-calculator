@@ -23,8 +23,6 @@ npm run test:unit -- tests/unit/<path>/<file>.spec.ts
 npm exec playwright test
 # Run single test file (use -- to pass args to playwright)
 npm exec playwright test -- tests/e2e/<path>/<file>.spec.ts
-# Interactive UI mode
-npm exec playwright test -- tests/e2e/<path>/<file>.spec.ts --ui
 # Or shorthand for running all tests
 npm run test:e2e
 
@@ -143,7 +141,7 @@ tests/
 Key testing patterns:
 - Playwright config uses `webServer` with `npm run preview`
 - Stores exposed on `window` for E2E access in dev/test mode (see `App.vue`)
-- `data-testid` attributes preferred for stable selectors
+- `data-testid` attributes preferred for stable selectors (avoid text/i18n matching for non-text elements)
 - i18n-aware locators using regex: `/文本|Text/i`
 
 ### E2E Test beforeEach Requirements

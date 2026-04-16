@@ -363,7 +363,7 @@ const hasDashboardData = computed(() => {
 </script>
 
 <template>
-  <div class="dashboard-container">
+  <div class="dashboard-container" data-testid="station-dashboard">
     <div class="dashboard-header">
       <h3 class="header-title">{{ headerTitle }}</h3>
       
@@ -373,7 +373,7 @@ const hasDashboardData = computed(() => {
     </div>
 
     <div class="stats-bar" v-if="analysis.moduleGroups.length > 0">
-      <div class="stat-item">
+      <div class="stat-item" data-testid="cost-stat">
         <span class="stat-label">{{ t('station.summary_cost') }}</span>
         <span class="stat-value text-red-400">{{ formatLargeNum(analysis.totalCost) }} <small>Cr</small></span>
       </div>

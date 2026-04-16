@@ -6,16 +6,34 @@ import { analyzeStation } from '@/store/logic/analyzeStation'
 import type { SavedModule } from '@/types/x4'
 
 const props = defineProps<{
-  plannedModulesOverride: SavedModule[]
+  modules: SavedModule[]
+  buildingModules?: SavedModule[]
   buildPriceMultiplier: number
   useHQ: boolean
 }>()
 
 const gameDataStore = useGameDataStore()
 
+const combinedModules = computed(() => {
+  const result: SavedModule[] = []
+  const counts = new Map<string, number>()
+  
+  for (const m of props.modules) {
+    counts.set(m.id, (counts.get(m.id) || 0) + m.count)
+  }
+  for (const m of props.buildingModules || []) {
+    counts.set(m.id, (counts.get(m.id) || 0) + m.count)
+  }
+  
+  for (const [id, count] of counts.entries()) {
+    result.push({ id, count })
+  }
+  return result
+})
+
 const stationAnalysis = computed(() => {
   return analyzeStation(
-    props.plannedModulesOverride,
+    combinedModules.value,
     gameDataStore.modulesMap,
     gameDataStore.waresMap,
     props.buildPriceMultiplier,
@@ -45,10 +63,10 @@ const handleUpdateUseHQ = (value: boolean) => {
 </script>
 
 <template>
-  <section>
+  <section data-testid="transit-hub-materials-panel">
     <StationDashboard
       :planned-modules="[]"
-      :planned-modules-override="plannedModulesOverride"
+      :planned-modules-override="combinedModules"
       :hide-workers-view="true"
       :station-analysis="stationAnalysis"
       :settings="dashboardSettings"

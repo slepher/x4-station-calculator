@@ -211,7 +211,7 @@ defineExpose({
 </script>
 
 <template>
-  <div class="list-wrapper">
+  <div class="list-wrapper" data-testid="transit-hub-center-dashboard">
     <div class="list-header">
       <h3 class="header-title">{{ title }}</h3>
       <div class="header-right-group">
