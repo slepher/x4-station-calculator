@@ -3337,6 +3337,10 @@
     <t id="11692">现在你可以使用组合键，直接在地图或交互菜单中下达队列 \(%s($INPUT_MODIFIER_ICON$)\) 和优先 \(%s($INPUT_MODIFIER_ICON$)\) 指令. 默认情况下，不使用组合键下达的指令会覆盖已队列的指令。</t>
     <t id="11693">如果你更喜欢旧模式，可以在游戏设置菜单中将"默认指令行为"改为"队列"，这样在使用交互菜单时按下%s($INPUT_MODIFIER_ICON$)将会覆盖指令，而不是将其添加到队列中。</t>
     <t id="11694">按"是"试用新的默认修饰键行为，按"否"保持旧行为使用%s($INPUT_MODIFIER_ICON$)覆盖指令。</t>
+    <t id="11695">Towable Wreck</t>
+    <t id="11696">Dismantleable Wreck</t>
+    <t id="11697">Resource Probe coverage</t>
+    <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">离线存档</t>
     <t id="11702">覆盖离线存档</t>
@@ -3748,8 +3752,8 @@
     <t id="12786">AMD FSR 超分辨率与帧生成</t>
     <t id="12787">实验型改善控制器支持</t>
     <t id="12788">AMD FSR</t>
-    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12789"> 如果你是第一次游玩《X4：基石》，我们建议你应该在完成教程之后再开启X4的开放宇宙之旅。</t>
+    <t id="12790">开始新的开放宇宙</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">大使馆行动</t>
     <t id="12803">外交官</t>
@@ -7395,8 +7399,8 @@
     <t id="5901">《X4：基石》的展示场景</t>
     <t id="5902">展会环境</t>
     <t id="5904">欢迎来到《X4》！\n\n本次重点演示将带你直接进入紧张刺激的战斗之中。在强大的主力舰和自动防御系统支援下，你将加入一支盟军舰队，击退敌军，并保卫一座位于前线遭到围攻的空间站，亲身体验《X4》中大规模太空战斗，\n\n在星门附近参与激烈的缠斗。无需设置或停机时间，你可以立即上手，掌控飞船，亲身感受《X4：基石》中太空战斗的宏大规模、紧张氛围与震撼美感。</t>
-    <t id="5905">Tradeshow Playground</t>
-    <t id="5906">Welcome to X4!\n\nThis scenario drops you into a busy sector within a downscaled universe, giving you a taste of the immense scale and possibilities of X4: Foundations.</t>
+    <t id="5905">展会演示场景</t>
+    <t id="5906">欢迎来到《X4：基石》！\n\n本场景会将你投放到一个缩小版宇宙中的繁忙星区，让你初步领略《X4：基石》中的宏大规模与无限可能。</t>
     <t id="6000">教程：进阶游戏玩法</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">雷玛·塞迪姆</t>
@@ -8666,7 +8670,7 @@
     <t id="9929">你无法选择该选项，该选项和另一个选项冲突。而那个选项是必须的，因为你已在它对应解锁的星区里放置了资产。</t>
     <t id="9930">无法选择此自定义游戏，因为它包含尚未解锁的受限物品。</t>
     <t id="9931">此自定义游戏中存在含有不兼容设备的飞船配置。不兼容的设备将不会被安装。</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">此自定义游戏中存在过时的货物或蓝图。受到影响的物品将不会被使用。</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">接受此任务意味着将放弃其他多元宇宙行动任务。</t>
@@ -11485,18 +11489,18 @@
     <t id="116">你可以使用键盘的 X 和 Y 键、鼠标滚轮或油门杆来调整前进速度。</t>
     <t id="117">一旦你选定目标，瞄准系统就会尝试锁定。 锁定成功后，你可以按下 R键或辅助射击按钮发射导弹。</t>
     <t id="200">(Tradeshow Playground Scenario)</t>
-    <t id="201">Welcome to X4: Foundations, a living universe with hundreds of sectors connected by gates. These sectors can be explored, and contain thousands of ships and stations operating within a fully simulated economy. You can own and command everything, ranging from a single tiny fighter to a grand empire with merchant fleets and powerful capital ships, to shape your story.</t>
-    <t id="202">This scenario places you near one of the many hundreds of bustling space stations you'll find in our living universe, with traders delivering wares and miners gathering resources. \nRecently there have been skirmishes with the machine intelligence known as the Xenon pouring in from the nearby gate, disrupting the trade.</t>
-    <t id="211">(explore explanation)Leaving the station behind, you are free to explore the other sectors and factions. The full X-Universe contains hundreds of unique sectors inhabited by various factions and species, all with rich history.</t>
-    <t id="212">(fight explanation)The Gate network is not always safe. Between the machine intelligence known as the Xenon, pirates, warring factions and the occasional war profiteering opportunist, you will see clashes ranging from small skirmishes to giant fleet brawls.</t>
-    <t id="213">(mining explanation)Ships like these mine the raw resources that the majority of the economy is based on. Once delivered they are refined, moved to factories and eventually turned into the wares that can be used to build the ships and stations you see.</t>
-    <t id="214">(trading explanation)Traders, haulers and merchants transport wares between stations. They buy where goods are plentiful and sell them where they are scarce, keeping the gears of the economy turning.</t>
-    <t id="215">(shipyard construction)This ship is currently under construction using the wares created by other stations. It will soon defend this sector from any further incursions.</t>
-    <t id="216">(launch tube explanation)The station is launching fighters from its launch tubes to defend itself from incoming attackers.</t>
-    <t id="217">(station attack explanation)A hostile Xenon force is approaching. If they damage the station, the production of new ships could be severely limited.</t>
-    <t id="218">(criminal explanation)Criminals try to capitalise on transporting illicit wares for great profits by hiding in traffic around stations. These criminals can even run organised operations with their own stations and masked freighters.</t>
-    <t id="219">(explore suggestion)There are more sights to see and things to do. Try flying around and targeting different objects.</t>
-    <t id="220">X4: Foundations has so much more to offer. You can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe.</t>
+    <t id="201">欢迎来到《X4：基石》--一个由星门连接、数百个星区组成的鲜活宇宙。你可以自由探索这些星区，整个宇宙中包含数千艘飞船和空间站，它们都在一个完全模拟的经济体系中运行。从一架小小的战斗机，到拥有数十只商船舰队与强大主力舰的庞大帝国，一切皆可由你拥有，书写属于你自己的故事。</t>
+    <t id="202">本场景会将你传送到这个鲜活宇宙中数百个繁忙空间站其中之一的附近，那里有运送货物的商船，采集资源的矿船。\n最近，一种被称为"Xenon"的机械智能体从附近的星门大量涌入，与当地居民爆发了小规模冲突，扰乱了贸易秩序。</t>
+    <t id="211">(explore explanation)离开空间站之后，你就可以自由前往其它星区和势力了。整个X宇宙中有几百个各不相同的星区，里面居住着各种各样的势力和种族，每一个星区背后都有一大堆故事。</t>
+    <t id="212">(fight explanation)星门网络可不是一直太平的。什么智械危机"Xenon"、海盗、势力战争，还有趁机发战争财的机会主义者，到处都有冲突。小到小规模交火，大到舰队大混战，你都能碰上。</t>
+    <t id="213">(mining explanation)像这样的船就是去挖原材料的，整个宇宙的经济体系基本就靠这些原材料支撑。它们把矿物挖回来，先送去精炼，再运到工厂，最后变成你能见到的各种物资，去造那些飞船和空间站。</t>
+    <t id="214">(trading explanation)商船、货运船和贸易员往返于各个空间站之间运货。哪里货源足就去哪买，哪里缺货就往哪卖，就这么让经济这架机器一直运转下去。</t>
+    <t id="215">(shipyard construction)这艘船正用其他空间站造出来的物资组装。再过一会儿，它就能坚守这个星区，抵御外敌了。</t>
+    <t id="216">(launch tube explanation)空间站正从发射管里放出战斗机，从敌人的攻击中保卫自身。</t>
+    <t id="217">(station attack explanation)一伙敌对的 Xenon 正朝这边过来。要是他们打坏空间站，新船的产量可就要大受影响了。</t>
+    <t id="218">(criminal explanation)那些罪犯喜欢混在空间站周围的船流里，偷偷走私违禁品来赚大钱。这帮人甚至能搞起有组织的买卖，自己建空间站，还用伪装过的货船来运货。</t>
+    <t id="219">(explore suggestion)还有好多地方可逛，好多事可以做。试着到处飞一飞，随便锁定点什么东西看看。</t>
+    <t id="220">《X4：基石》能玩的东西还有很多。你很快就能攒够买下一整支船队的钱。还能雇别的飞行员给你干活，听你指挥。让他们去跑商或者挖矿，帮你赚钱；你自己也可以去推推剧情线，或者接接散落在广阔宇宙里的各种零散任务。</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>

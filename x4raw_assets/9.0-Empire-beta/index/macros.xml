@@ -1053,7 +1053,7 @@
   <entry name="prod_tel_scanningarrays_macro" value="assets\structures\production\macros\prod_tel_scanningarrays_macro"/>
   <entry name="prod_tel_medicalsupplies_macro" value="assets\structures\production\macros\prod_tel_medicalsupplies_macro"/>
   <entry name="prod_par_medicalsupplies_macro" value="assets\structures\production\macros\prod_par_medicalsupplies_macro"/>
-  <entry name="sm_gen_lockbox_explosive_01_macro" value="assets\props\StorageModules\macros\sm_gen_lockbox_explosive_01_macro"/>
+  <entry name="sm_gen_lockbox_explosive_01_macro" value="assets\props\storagemodules\macros\sm_gen_lockbox_explosive_01_macro"/>
   <entry name="sm_gen_lockbox_fragile_01_macro" value="assets\props\StorageModules\macros\sm_gen_lockbox_fragile_01_macro"/>
   <entry name="adsign_gen_signholder_01_macro" value="assets\props\highwayelements\macros\adsign_gen_signholder_01_macro"/>
   <entry name="env_debris_debris_xl_04_macro" value="assets\environments\debris\macros\env_debris_debris_xl_04_macro"/>
@@ -2881,6 +2881,8 @@
   <entry name="muzzle_kha_m_beam_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_kha_m_beam_01_mk1_macro"/>
   <entry name="muzzle_par_m_railgun_01_mk1_macro" value="assets\fx\weaponfx\macros\muzzle_par_m_railgun_01_mk1_macro"/>
   <entry name="impact_par_m_railgun_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_par_m_railgun_01_mk1_macro"/>
+  <entry name="test_yasmine_room_gen_trophyroom_01_macro" value="assets\test\yasmine\macros\test_yasmine_room_gen_trophyroom_01_macro"/>
+  <entry name="test_ship_xen_m_dsk_01_macro" value="assets\test\dmytro\macros\test_ship_xen_m_dsk_01_macro"/>
   <entry name="cluster_sm_split_macro" value="extensions\ego_dlc_split\assets\environments\cluster\macros\cluster_sm_split_macro"/>
   <entry name="cluster_400_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>
   <entry name="cluster_401_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>

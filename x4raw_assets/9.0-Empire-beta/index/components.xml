@@ -2858,7 +2858,6 @@
   <entry name="test_steven_ship_arg_l_destroyer_02" value="assets\test\steven\test_steven_ship_arg_l_destroyer_02"/>
   <entry name="test_lino_ship_arg_m_frigate_01_b5_0" value="assets\test\lino\test_lino_ship_arg_m_frigate_01_b5_0"/>
   <entry name="test_olivier_effect_gen_s_boost _01" value="assets\test\effects\test_olivier_effect_gen_s_boost _01"/>
-  <entry name="test_ship_xen_m_dsk_01" value="assets\test\dmytro\test_ship_xen_m_dsk_01"/>
   <entry name="test_markus_xen_s_heavyfighter_01" value="assets\test\markus\test_markus_xen_s_heavyfighter_01"/>
   <entry name="test_gen_m_shieldpierce_01_mk1" value="assets\test\markus\test_gen_m_shieldpierce_01_mk1"/>
   <entry name="effect_gen_s_boost_01" value="assets\fx\misc\effect_gen_s_boost_01"/>
@@ -2967,6 +2966,8 @@
   <entry name="muzzle_par_m_railgun_01_mk1" value="assets\fx\weaponFx\muzzle_par_m_railgun_01_mk1"/>
   <entry name="impact_par_m_railgun_01_mk1" value="assets\fx\weaponFx\impact_par_m_railgun_01_mk1"/>
   <entry name="test_markus_turret_arg_l_laser_01_mk1_b51" value="assets\test\markus\test_markus_turret_arg_l_laser_01_mk1_b51"/>
+  <entry name="test_gen_s_fighter_01_b44" value="assets\test\markus\test_gen_s_fighter_01_b44"/>
+  <entry name="test_gen_s_fighter_01_b51" value="assets\test\markus\test_gen_s_fighter_01_b51"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>

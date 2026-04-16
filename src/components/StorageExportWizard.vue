@@ -33,7 +33,7 @@ const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
 
 const currentVersionLabel = computed(() =>
-  gameDataStore.displayFullVersion()
+  gameDataStore.displayFullVersion(undefined, undefined, false)
 )
 
 const buildDefaultFileName = () => {

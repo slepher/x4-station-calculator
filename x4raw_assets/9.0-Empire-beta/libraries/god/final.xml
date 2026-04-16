@@ -4926,6 +4926,12 @@
       </station>
     </station>
     <!-- Boron God gamestart player HQ -->
+    <!-- Mitsuno's Revelation -->
+    <!-- Mitsuno's Defiance -->
+    <!-- Mitsuno's Sacrifice -->
+    <!-- President's End -->
+    <!-- Nopileos' Memorial -->
+    <!-- Matrix #101 -->
     <station id="gs_boron2_hq" race="boron" owner="civilian" type="headquarters">
       <quotas>
         <quota galaxy="1" zone="1" gamestart="x4ep1_gamestart_boron2"/>
@@ -4938,7 +4944,6 @@
         </loadout>
       </station>
     </station>
-    <!-- Mitsuno's Revelation -->
     <station id="kao_tradestation_cluster_701" race="argon" owner="kaori" type="tradingstation" startactive="false">
       <quotas>
         <quota galaxy="1" zone="1"/>
@@ -4959,7 +4964,6 @@
       <position x="-70000" y="0" z="-50000" pitch="0" yaw="305" roll="0"/>
       <station constructionplan="kao_energy_array"/>
     </station>
-    <!-- Mitsuno's Defiance -->
     <station id="kao_wharf_cluster_702" race="argon" owner="kaori" type="factory" startactive="false">
       <quotas>
         <quota galaxy="1" zone="1"/>
@@ -4988,7 +4992,6 @@
       <position x="-60000" y="0" z="42000" pitch="0" yaw="165" roll="0"/>
       <station constructionplan="kao_compound_refinery"/>
     </station>
-    <!-- Mitsuno's Sacrifice -->
     <station id="kao_tradestation_cluster_703" race="argon" owner="kaori" type="tradingstation" startactive="false">
       <quotas>
         <quota galaxy="1" zone="1"/>
@@ -5029,7 +5032,6 @@
       <position x="-60000" y="0" z="55000" pitch="0" yaw="0" roll="0"/>
       <station constructionplan="kao_produce_facility"/>
     </station>
-    <!-- President's End -->
     <station id="arg_tradestation_cluster_704" race="argon" owner="argon" type="tradingstation" startactive="false">
       <quotas>
         <quota galaxy="1" zone="1"/>
@@ -5053,7 +5055,6 @@
         <select faction="argon" tags="[defence]"/>
       </station>
     </station>
-    <!-- Nopileos' Memorial -->
     <station id="sca_piratestation_cluster_705" race="teladi" owner="scaleplate" type="piratebase" startactive="false">
       <quotas>
         <quota galaxy="1" sector="1"/>
@@ -5066,7 +5067,6 @@
         </loadout>
       </station>
     </station>
-    <!-- Matrix #101 -->
     <station id="xen_defence_cluster_708_sector001_01" race="xenon" owner="xenon" type="defence" startactive="false">
       <quotas>
         <quota galaxy="1" zone="1"/>
@@ -9902,20 +9902,6 @@
         <select ware="plankton" race="boron"/>
       </module>
     </product>
-    <station id="bor_plankton_prefab_06_01" ware="plankton" owner="boron" type="factory" priority="55">
-      <quotas>
-        <quota galaxy="2" sector="1"/>
-      </quotas>
-      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
-        <economy min="0.5" max="0.75" maxbound="false"/>
-      </location>
-      <station constructionplan="bor_plankton_prefab_06">
-        <stage min="2" max="4"/>
-        <loadout>
-          <level exact="0.7"/>
-        </loadout>
-      </station>
-    </station>
     <product id="arg_advancedelectronics_new" ware="advancedelectronics" owner="argon" type="factory" startactive="false">
       <quotas>
         <quota galaxy="1"/>
@@ -9960,6 +9946,20 @@
         <select ware="water" race="argon"/>
       </module>
     </product>
+    <station id="bor_plankton_prefab_06_01" ware="plankton" owner="boron" type="factory" priority="55">
+      <quotas>
+        <quota galaxy="2" sector="1"/>
+      </quotas>
+      <location class="galaxy" macro="xu_ep2_universe_macro" faction="boron" relation="self" comparison="ge">
+        <economy min="0.5" max="0.75" maxbound="false"/>
+      </location>
+      <station constructionplan="bor_plankton_prefab_06">
+        <stage min="2" max="4"/>
+        <loadout>
+          <level exact="0.7"/>
+        </loadout>
+      </station>
+    </station>
   </products>
   <gamestart ref="x4ep1_gamestart_tutorial1">
     <objects>
@@ -10037,6 +10037,10 @@
     </ships>
     <stations>
       <!-- Used to patch DLC stations -->
+      <!-- Production -->
+      <!-- Docks -->
+      <!-- Refineries -->
+      <!-- Funanori -->
       <station id="scenario_mining_1to4_spl_equipment" race="split" owner="split" type="factory">
         <quotas>
           <quota galaxy="1"/>
@@ -10063,7 +10067,6 @@
           </loadout>
         </station>
       </station>
-      <!-- Production -->
       <station id="scenario_mining_1to4_energy_001" race="argon" owner="argon" type="factory">
         <quotas>
           <quota galaxy="1"/>
@@ -10104,7 +10107,6 @@
         <position x="173000" y="0" z="-98000" pitch="0" roll="0" yaw="70"/>
         <station constructionplan="'scenario_mining_flower_farm'"/>
       </station>
-      <!-- Docks -->
       <station id="scenario_mining_1to4_arg_equipment" race="argon" owner="argon" type="factory">
         <quotas>
           <quota galaxy="1"/>
@@ -10144,7 +10146,6 @@
           </loadout>
         </station>
       </station>
-      <!-- Refineries -->
       <station id="scenario_mining_1to4_ore_refinery_001" race="argon" owner="argon" type="factory">
         <quotas>
           <quota galaxy="1" zone="1"/>
@@ -10169,7 +10170,6 @@
         <position x="76000" y="0" z="-103000" pitch="0" roll="0" yaw="110"/>
         <station constructionplan="'scenario_mining_silicon_refinery'"/>
       </station>
-      <!-- Funanori -->
       <station id="scenario_mining_4_funanori_station" race="argon" owner="argon" type="factory">
         <quotas>
           <quota galaxy="1" zone="1" gamestart="scenario_mining_4"/>
@@ -10659,7 +10659,6 @@
       </station>
     </stations>
   </gamestart>
-  <!-- Attack on Antigone -->
   <gamestart ref="scenario_waveattack_antigone">
     <stations>
       <station id="scenario_waveattack_antigone_station" race="argon" owner="argon" type="tradingstation">
@@ -10672,7 +10671,6 @@
       </station>
     </stations>
   </gamestart>
-  <!-- Protect Object -->
   <gamestart ref="scenario_protect_object">
     <stations>
       <station id="usc_defence_scenario_protect_object_station_001" race="argon" owner="argon" type="factory">
@@ -10687,7 +10685,6 @@
       </station>
     </stations>
   </gamestart>
-  <!-- M0 Boss Battle -->
   <gamestart ref="scenario_m0_boss_battle">
     <stations>
       <station id="xen_shipyard_scenario_m0_boss_battle_cluster_001_001" race="xenon" owner="xenon" type="shipyard">
@@ -10744,7 +10741,6 @@
       </station>
     </stations>
   </gamestart>
-  <!-- scenario_transport_refugees_engineer -->
   <gamestart ref="scenario_transport_refugees_engineer">
     <ships>
       <ship id="scenario_transport_refugees_engineer_rescue_ship" owner="civilian">
@@ -10762,7 +10758,6 @@
       </ship>
     </ships>
   </gamestart>
-  <!-- scenario_transport_refugees_escort -->
   <gamestart ref="scenario_transport_refugees_escort">
     <ships>
       <ship id="scenario_transport_refugees_escort_rescue_ship" owner="player">
@@ -10780,7 +10775,6 @@
       </ship>
     </ships>
   </gamestart>
-  <!-- Dragonfyre -->
   <gamestart ref="scenario_dragonfyre">
     <stations>
       <station id="scenario_dragonfyre_orbital_support" race="argon" owner="argon" type="tradingstation">
@@ -10833,7 +10827,6 @@
       </station>
     </stations>
   </gamestart>
-  <!-- Khaak Boss Battle -->
   <gamestart ref="scenario_khaak_boss_battle">
     <stations>
       <station id="scenario_khaak_battle_shipyard" race="argon" owner="argon" type="factory">
@@ -10901,4 +10894,11 @@
       </station>
     </stations>
   </gamestart>
+  <!-- Attack on Antigone -->
+  <!-- Protect Object -->
+  <!-- M0 Boss Battle -->
+  <!-- scenario_transport_refugees_engineer -->
+  <!-- scenario_transport_refugees_escort -->
+  <!-- Dragonfyre -->
+  <!-- Khaak Boss Battle -->
 </god>

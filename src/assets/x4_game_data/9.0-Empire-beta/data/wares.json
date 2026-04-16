@@ -306,7 +306,7 @@
     "dlc_tag": "base",
     "transport": "container",
     "price": 9,
-    "volume": 2,
+    "volume": 1,
     "minPrice": 6,
     "maxPrice": 13,
     "tier": 3

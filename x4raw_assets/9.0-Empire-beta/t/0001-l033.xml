@@ -3337,6 +3337,10 @@
     <t id="11692">Vous pouvez désormais utiliser des touches de modification pour donner des ordres mis en attente \(%s($INPUT_MODIFIER_ICON$)\) ou prioritaires \(%s($INPUT_MODIFIER_ICON$)\) directement depuis la carte ou le menu d'interaction. Par défaut, les ordres donnés aux vaisseaux sans utiliser ces touches écraseront désormais tout ordre précédemment mis en attente.</t>
     <t id="11693">Si vous préférez l'ancien comportement, vous pouvez changer le paramètre "Comportement d'ordre par défaut" dans le menu des Paramètres du jeu sur "Mettre en attente". Ainsi, appuyer sur %s($INPUT_MODIFIER_ICON$) tout en utilisant le menu d'interaction écrasera les ordres au lieu de l'ajouter à la file d'attente.</t>
     <t id="11694">Appuyez sur Oui si vous souhaitez essayer le nouveau comportement par défaut, ou sur Non si vous souhaitez conserver l'ancien comportement et utiliser %s($INPUT_MODIFIER_ICON$) pour écraser les ordres.</t>
+    <t id="11695">Towable Wreck</t>
+    <t id="11696">Dismantleable Wreck</t>
+    <t id="11697">Resource Probe coverage</t>
+    <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Sauvegarde locale</t>
     <t id="11702">Ecraser la sauvegarde locale</t>
@@ -3748,8 +3752,8 @@
     <t id="12786">Génération d'images AMD FSR</t>
     <t id="12787">Amélioration expérimentale du support manette</t>
     <t id="12788">AMD FSR</t>
-    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12789">Si c'est votre première plongée dans X4, nous vous suggérons d'essayer quelques tutoriels avant de commencer votre voyage dans l'univers de X4.</t>
+    <t id="12790">Commencer un nouvel univers ouvert</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Actions de l'ambassade</t>
     <t id="12803">Diplomate</t>
@@ -3902,7 +3906,7 @@
     <t id="13201">Délai de recharge du bouclier</t>
     <t id="13202">Taux de recharge du bouclier</t>
     <t id="13203">(valeur de modificateur par défaut)Normal</t>
-    <t id="13204">Spécifications du vaisseau(on peut affiner en fonction du contexte, je le prends ici comme la catégorie où sont listés les différents paramètres du vaisseau qui viennent après, au sens capacités techniques et pas capacité en soute)</t>
+    <t id="13204">Spécifications du vaisseau</t>
     <t id="13205">Boucliers</t>
     <t id="13206">Boucliers des éléments de surface</t>
     <t id="13207">Armes</t>
@@ -3934,7 +3938,7 @@
     <t id="13305">Zoom</t>
     <t id="13306">Émulation de la souris</t>
     <t id="13307">Sélectionner</t>
-    <t id="13308">Sélection multiple(ou Sélectionner plusieurs)</t>
+    <t id="13308">Sélection multiple</t>
     <t id="13309">Interagir</t>
     <t id="13310">Menu radial</t>
     <t id="13311">Menu radial 2</t>
@@ -8666,7 +8670,7 @@
     <t id="9929">Vous ne pouvez pas sélectionner cette option, car elle désactiverait une option nécessaire au déverrouillage d'un secteur dans lequel vous avez placé une propriété.</t>
     <t id="9930">Cette partie personnalisée ne peut pas être sélectionnée, car elle contient des objets restreints que vous n'avez pas encore débloqués.</t>
     <t id="9931">Cette partie personnalisée contient des plans incluant des équipements incompatibles. Ces équipements ne seront pas installés.</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">Cette partie personnalisée contient des marchandises ou des plans qui ne sont plus valides. Les éléments concernés ne seront pas utilisés.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">Accepter cette mission annulera toute autre mission opérationnelle dans le multivers.</t>
@@ -11468,9 +11472,9 @@
   <page id="10097" title="Demo Speaker" descr="Lines for the Demo Speaker" voice="yes">
     <t id="100">Bienvenue dans cette démonstration de X4: Foundations - une simulation spatiale de grande envergure dans laquelle vous pouvez piloter personnellement des centaines de vaisseaux différents, des plus petits appareils aux gigantesques vaisseaux de ligne.</t>
     <t id="101">Vous vous trouvez actuellement sur le pont d'un vaisseau de ligne qui ne vous appartient pas encore. À la place, vous allez être [mp:invité|fp:invitée] à piloter un vaisseau plus petit, en cours de chargement sur un quai d'amarrage de taille S.</t>
-    <t id="102">Please follow the orange line and walk to the elevator.</t>
+    <t id="102">Veuillez suivre la ligne orange et marcher jusqu'à l'ascenseur.</t>
     <t id="103">Veuillez vous diriger vers la sortie et cliquer sur le panneau à votre droite pour sélectionner le quai.</t>
-    <t id="104">Follow the orange lines on the floor and climb into your ship.</t>
+    <t id="104">Suivez les lignes orange au sol et montez dans votre vaisseau.</t>
     <t id="105">Dirigez-vous vers le siège de pilotage et sélectionnez-le pour prendre le contrôle de ce vaisseau.</t>
     <t id="106">Sélectionnez DÉSAMARRER pour commencer à piloter le vaisseau.</t>
     <t id="107">Vos commandes seront un peu différentes de celles utilisées pour la marche. Jetez un œil aux options de commandes. Accélérez pour faire avancer votre vaisseau. Toutes les commandes peuvent être reconfigurées, que vous jouiez au clavier et à la souris, à la manette ou au joystick.</t>
@@ -52052,7 +52056,7 @@
     <t id="4074">(XEN M Shard Turret Mk1){20202,603} {20105,4071} {20111,5021} {20111,101}</t>
     <t id="4075">(Éclats Mk1){20105,4073} {20111, 101}</t>
     <t id="4081">Tourelle à projectiles</t>
-    <t id="4082">La tourelle à projectiles est un système d'armement défensif économique, couramment utilisé pour dissuader les chasseurs hostiles. Certains opérateurs emploient ce système exclusivement pour la défense antimissile, où son tir soutenu offre une protection de zone fiable.</t>
+    <t id="4082">La tourelle à projectiles est un système d'armement défensif économique, couramment utilisé pour dissuader les chasseurs hostiles. Certains opérateurs emploient ce système exclusivement pour la défense antimissile, pour laquelle son tir soutenu offre une protection de zone fiable.</t>
     <t id="4083">Projectile</t>
     <t id="4084">(ARG M Bolt Turret Mk1){20202,103} {20105,4081} {20111,5021} {20111,101}</t>
     <t id="4085">(Bolt Mk1){20105,4083} {20111,101}</t>
@@ -52092,7 +52096,7 @@
     <t id="4154">(XEN M Plasma Turret Mk1){20202,603} {20105,4151} {20111,5021} {20111,101}</t>
     <t id="4155">(Plasma Mk1){20105,4153} {20111,101}</t>
     <t id="4161">Tourelle à rayon</t>
-    <t id="4162">La tourelle à rayons est un système d'armement défensif d'entrée de gamme, souvent choisie par les opérateurs pour son faible coût d'acquisition. Sa portée effective étendue et sa grande précision de ciblage la rendent particulièrement adaptée aux missions de défense antimissile. Bien que l'arme soit efficace contre les cibles protégées, sa puissance de frappe diminue à mesure que les boucliers s'épuisent, limitant son efficacité contre les structures de coque exposées.</t>
+    <t id="4162">La tourelle à rayons est un système d'armement défensif d'entrée de gamme, souvent choisie par les opérateurs pour son faible coût d'acquisition. Sa portée effective étendue et sa grande précision de ciblage la rendent particulièrement adaptée aux missions de défense antimissile. Bien que l'arme soit efficace contre les boucliers, sa puissance de frappe diminue à mesure que ceux-ci s'épuisent, limitant son efficacité contre les structures de coque exposées.</t>
     <t id="4163">Rayon</t>
     <t id="4164">(ARG M Beam Turret Mk1){20202,103} {20105,4161} {20111,5021} {20111,101}</t>
     <t id="4165">(Beam Mk1){20105,4163} {20111,101}</t>
@@ -52221,7 +52225,7 @@
     <t id="4423">(Flak){20105,4403}</t>
     <t id="4424">(SPL Tourelle anti-aérienne M Mk1){20202,303} {20105,4421} {20111,5021} {20111,101}</t>
     <t id="4425">(Flak Mk1){20105,4423} {20111,101}</t>
-    <t id="4426">La tourelle anti-aérienne est un système d'armement de proximité optimisé pour engager des cibles de classe chasseur. Son large rayon de déflagration réduit les exigences de précision à courte distance. Issue d'une rétro-ingénierie de la technologie de la flotte argonne, ce système n'égale pas la précision de visée de la conception originale, mais compense cette lacune par une capacité de munitions accrue. Malgré ces différences, la tourelle conserve le même rôle opérationnel et la même enveloppe de performance.</t>
+    <t id="4426">La tourelle anti-aérienne est un système d'armement de proximité optimisé pour engager des cibles de classe chasseur. Son large rayon de déflagration réduit les exigences de précision à courte distance. Issue d'une rétro-ingénierie de la technologie de la flotte argonne, ce système n'égale pas la précision de visée de la conception originale, mais compense cette lacune par un nombre de munitions accrue. Malgré ces différences, la tourelle conserve le même rôle opérationnel et la même enveloppe de performance.</t>
     <t id="4481">Tourelle Boson</t>
     <t id="4482">{20006,102}(No information available)</t>
     <t id="4483">Boson</t>
@@ -52515,7 +52519,7 @@
     <t id="5334">(TER L Pulse Turret Mk1){20202,703} {20105,5331} {20111,5031} {20111,101}</t>
     <t id="5335">(Pulse Mk1){20105,4323} {20111,101}</t>
     <t id="5341">(Bolt Turret){20105,4081}</t>
-    <t id="5342">La tourelle de barrage à protons est généralement employée comme arme de soutien lors d'affrontements entre vaisseaux de ligne, fournissant un appui-feu complémentaire contre des cibles désignées. En raison de sa vitesse de rotation relativement limitée, les opérateurs engagent souvent ce système d'arme contre des vaisseaux de taille moyenne, là où les exigences de suivi de cible sont moins exigeantes. Lors d'opérations de combat coordonnées, cette tourelle est généralement utilisée pour inhiber la régénération des boucliers et empêcher l'activation des moteurs de voyage.</t>
+    <t id="5342">La tourelle de barrage à protons est généralement employée comme arme de soutien lors d'affrontements entre vaisseaux de ligne, fournissant un appui-feu complémentaire contre des cibles spécifiques. En raison de sa vitesse de rotation relativement limitée, les opérateurs engagent souvent ce système d'arme contre des vaisseaux de taille moyenne, là où les exigences de suivi de cible sont moins exigeantes. Lors d'opérations de combat coordonnées, cette tourelle est généralement utilisée pour inhiber la régénération des boucliers et empêcher l'activation des moteurs de voyage.</t>
     <t id="5343">(Bolt){20105,4083}</t>
     <t id="5344">(TER L Bolt Turret Mk1){20202,703} {20105,5341} {20111,5031} {20111,101}</t>
     <t id="5345">(Bolt Mk1){20105,4343} {20111,101}</t>
@@ -52559,8 +52563,8 @@
     <t id="5423">(Kinetic){20105,4793}</t>
     <t id="5424">(TER L Kinetic Turret Mk1){20202,703} {20105,5421} {20111,5031} {20111,101}</t>
     <t id="5425">(Kinetic Mk1){20105,4793} {20111,101}</t>
-    <t id="5431">Canon électro-magnétique à ions cinétique</t>
-    <t id="5432">Le canon électro-magnétique à ions cinétiques est une arme utilitaire développée par la Défense militaire royale boronne, une organisation de recherche gouvernementale spécialisée dans l'ingénierie expérimentale. Il tire des projectiles rapides, qui explosent de façon à endommager simultanément plusieurs éléments de surface. De plus, la décharge ionique associée neutralise les capteurs et la mobilité de la cible, y compris sur les vaisseaux de classe Capital.</t>
+    <t id="5431">Canon électro-magnétique à ions cinétiques</t>
+    <t id="5432">Le canon électro-magnétique à ions cinétiques est une arme utilitaire développée par la Défense militaire royale boronne, une organisation de recherche gouvernementale spécialisée dans l'ingénierie expérimentale. Il tire des projectiles rapides, qui explosent de façon à endommager simultanément plusieurs éléments de surface. De plus, la décharge ionique associée neutralise les capteurs et la mobilité de la cible, y compris sur les vaisseaux de classe Capitale.</t>
     <t id="5433">Champ ionique</t>
     <t id="5434">(BOR Canon électro-magnétique à ions cinétique L Mk1){20202,203} {20105,5431} {20111,5031} {20111,101}</t>
     <t id="5435">(Ion Net Launcher){20105,5431}</t>

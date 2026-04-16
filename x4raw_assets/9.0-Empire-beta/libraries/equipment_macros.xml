@@ -268,7 +268,7 @@
     <component ref="engine_gen_m_corvette_01"/>
     <properties>
       <identification name="{20107,9034}" basename="{20107,9031}" shortname="{20107,9035}" makerrace="argon" description="{20107,9032}" mk="1"/>
-      <boost duration="15" recharge="92" thrust="7.38" acceleration="7" release="3" coast="1.2"/>
+      <boost duration="16" recharge="92" thrust="7.2" acceleration="6" release="4" coast="1.2"/>
       <travel charge="7" thrust="12.5" attack="38" release="10"/>
       <thrust forward="1484.1" reverse="1336"/>
       <hull integrated="1"/>
@@ -300,7 +300,7 @@
     <component ref="engine_gen_m_corvette_01"/>
     <properties>
       <identification name="{20107,9054}" basename="{20107,9051}" shortname="{20107,9055}" makerrace="argon" description="{20107,9052}" mk="2"/>
-      <boost duration="15" recharge="92" thrust="7.38" acceleration="7" release="3" coast="1.2"/>
+      <boost duration="16" recharge="92" thrust="7.2" acceleration="6" release="4" coast="1.2"/>
       <travel charge="7" thrust="12" attack="38" release="10"/>
       <thrust forward="1706" reverse="1535"/>
       <hull integrated="1"/>
@@ -3098,8 +3098,8 @@
     <component ref="engine_gen_m_corvette_01"/>
     <properties>
       <identification name="{20107,9044}" basename="{20107,9041}" shortname="{20107,9045}" makerrace="teladi" description="{20107,9042}" mk="1"/>
-      <boost duration="22" recharge="114" thrust="5.9" acceleration="4.2" release="3" coast="1.1"/>
-      <travel charge="3" thrust="14.3" attack="24" release="10"/>
+      <boost duration="26.4" recharge="120" thrust="5.4" acceleration="4" release="3" coast="1.1"/>
+      <travel charge="3" thrust="14.3" attack="23" release="10"/>
       <thrust forward="1342" reverse="1208"/>
       <hull integrated="1"/>
       <effects>
@@ -3130,8 +3130,8 @@
     <component ref="engine_gen_m_corvette_01"/>
     <properties>
       <identification name="{20107,9064}" basename="{20107,9061}" shortname="{20107,9065}" makerrace="teladi" description="{20107,9062}" mk="2"/>
-      <boost duration="22" recharge="114" thrust="5.9" acceleration="4.2" release="3" coast="1.1"/>
-      <travel charge="3" thrust="13.8" attack="24" release="10"/>
+      <boost duration="26.4" recharge="120" thrust="5.4" acceleration="4" release="3" coast="1.1"/>
+      <travel charge="3" thrust="13.8" attack="23" release="10"/>
       <thrust forward="1543" reverse="1389"/>
       <hull integrated="1"/>
       <effects>
@@ -5881,7 +5881,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2004}" basename="{20106,2001}" shortname="{20106,2005}" makerrace="argon" description="{20106,2002}" mk="1"/>
-      <recharge max="5750" rate="83" delay="13"/>
+      <recharge max="5750" rate="90" delay="13"/>
       <hull max="700" integrated="1"/>
     </properties>
   </macro>
@@ -5889,7 +5889,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2044}" basename="{20106,2041}" shortname="{20106,2045}" makerrace="argon" description="{20106,2042}" mk="2"/>
-      <recharge max="7475" rate="116" delay="13"/>
+      <recharge max="7475" rate="126" delay="13"/>
       <hull max="700" integrated="1"/>
     </properties>
   </macro>
@@ -5897,7 +5897,7 @@
     <component ref="shield_arg_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2004}" basename="{20106,2001}" shortname="{20106,2005}" makerrace="argon" description="{20106,2002}" mk="1"/>
-      <recharge max="5750" rate="83" delay="13"/>
+      <recharge max="5750" rate="90" delay="13"/>
       <hull max="700" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -5905,7 +5905,7 @@
     <component ref="shield_arg_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2044}" basename="{20106,2041}" shortname="{20106,2045}" makerrace="argon" description="{20106,2042}" mk="2"/>
-      <recharge max="7475" rate="116" delay="13"/>
+      <recharge max="7475" rate="126" delay="13"/>
       <hull max="700" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -5992,7 +5992,7 @@
     <component ref="shield_bor_m_standard_01"/>
     <properties>
       <identification name="{20106,2144}" basename="{20106,2141}" shortname="{20106,2145}" makerrace="boron" description="{20106,2142}" mk="1"/>
-      <recharge max="5250" rate="79" delay="9.1"/>
+      <recharge max="5250" rate="86" delay="9.1"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6000,7 +6000,7 @@
     <component ref="shield_bor_m_standard_01"/>
     <properties>
       <identification name="{20106,2154}" basename="{20106,2151}" shortname="{20106,2155}" makerrace="boron" description="{20106,2152}" mk="2"/>
-      <recharge max="6825" rate="109" delay="9.1"/>
+      <recharge max="6825" rate="118" delay="9.1"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6008,7 +6008,7 @@
     <component ref="shield_bor_m_standard_01"/>
     <properties>
       <identification name="{20106,2164}" basename="{20106,2161}" shortname="{20106,2165}" makerrace="boron" description="{20106,2162}" mk="3"/>
-      <recharge max="8400" rate="166" delay="9.1"/>
+      <recharge max="8400" rate="160" delay="9.1"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6016,7 +6016,7 @@
     <component ref="shield_bor_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2144}" basename="{20106,2141}" shortname="{20106,2145}" makerrace="boron" description="{20106,2142}" mk="1"/>
-      <recharge max="5250" rate="79" delay="9.1"/>
+      <recharge max="5250" rate="86" delay="9.1"/>
       <hull max="600" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6024,7 +6024,7 @@
     <component ref="shield_bor_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2154}" basename="{20106,2151}" shortname="{20106,2155}" makerrace="boron" description="{20106,2152}" mk="2"/>
-      <recharge max="6825" rate="109" delay="9.1"/>
+      <recharge max="6825" rate="118" delay="9.1"/>
       <hull max="600" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6032,7 +6032,7 @@
     <component ref="shield_bor_m_standard_02_mk3"/>
     <properties>
       <identification name="{20106,2164}" basename="{20106,2161}" shortname="{20106,2165}" makerrace="boron" description="{20106,2162}" mk="3"/>
-      <recharge max="8400" rate="166" delay="9.1"/>
+      <recharge max="8400" rate="160" delay="9.1"/>
       <hull max="600" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6080,7 +6080,7 @@
     <component ref="shield_gen_m_corvette_01"/>
     <properties>
       <identification name="{20106,9034}" basename="{20106,9031}" shortname="{20106,9035}" makerrace="argon teladi" description="{20106,9032}" mk="1"/>
-      <recharge max="8600" rate="102" delay="11"/>
+      <recharge max="8600" rate="102" delay="10"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6117,7 +6117,7 @@
     <component ref="shield_kha_m_standard_01_mk1"/>
     <properties>
       <identification name="{20106,2104}" basename="{20106,2101}" shortname="{20106,2105}" makerrace="khaak" description="{20106,2102}" mk="1"/>
-      <recharge max="4800" rate="52" delay="2"/>
+      <recharge max="4800" rate="52" delay="3"/>
       <hull integrated="1" scrapware="rawkhaakscrap"/>
     </properties>
   </macro>
@@ -6125,7 +6125,7 @@
     <component ref="shield_kha_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2104}" basename="{20106,2101}" shortname="{20106,2105}" makerrace="khaak" description="{20106,2102}" mk="1"/>
-      <recharge max="4800" rate="52" delay="2"/>
+      <recharge max="4800" rate="52" delay="3"/>
       <hull scrapware="rawkhaakscrap"/>
     </properties>
   </macro>
@@ -6133,7 +6133,7 @@
     <component ref="shield_kha_m_standard_03_mk1"/>
     <properties>
       <identification name="{20106,2104}" basename="{20106,2101}" shortname="{20106,2105}" makerrace="khaak" description="{20106,2102}" mk="1"/>
-      <recharge max="4800" rate="52" delay="2"/>
+      <recharge max="4800" rate="52" delay="3"/>
       <hull max="2000" scrapware="rawkhaakscrap"/>
     </properties>
   </macro>
@@ -6183,7 +6183,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2014}" basename="{20106,2011}" shortname="{20106,2015}" makerrace="paranid" description="{20106,2012}" mk="1"/>
-      <recharge max="4000" rate="108" delay="9.5"/>
+      <recharge max="4000" rate="117" delay="8.5"/>
       <hull max="500" integrated="1"/>
     </properties>
   </macro>
@@ -6191,7 +6191,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2054}" basename="{20106,2051}" shortname="{20106,2055}" makerrace="paranid" description="{20106,2052}" mk="2"/>
-      <recharge max="5200" rate="162" delay="9.5"/>
+      <recharge max="5200" rate="183" delay="8.5"/>
       <hull max="500" integrated="1"/>
     </properties>
   </macro>
@@ -6199,7 +6199,7 @@
     <component ref="shield_arg_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2014}" basename="{20106,2011}" shortname="{20106,2015}" makerrace="paranid" description="{20106,2012}" mk="1"/>
-      <recharge max="4000" rate="108" delay="9.5"/>
+      <recharge max="4000" rate="117" delay="8.5"/>
       <hull max="500" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6207,7 +6207,7 @@
     <component ref="shield_arg_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2054}" basename="{20106,2051}" shortname="{20106,2055}" makerrace="paranid" description="{20106,2052}" mk="2"/>
-      <recharge max="5200" rate="162" delay="9.5"/>
+      <recharge max="5200" rate="183" delay="8.5"/>
       <hull max="500" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6289,7 +6289,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2084}" basename="{20106,2081}" shortname="{20106,2085}" makerrace="split" description="{20106,2082}" mk="1"/>
-      <recharge max="3700" rate="55" delay="2.5"/>
+      <recharge max="3848" rate="60" delay="2.5"/>
       <hull max="700" integrated="1"/>
     </properties>
   </macro>
@@ -6297,7 +6297,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2094}" basename="{20106,2091}" shortname="{20106,2095}" makerrace="split" description="{20106,2092}" mk="2"/>
-      <recharge max="4810" rate="78" delay="2.5"/>
+      <recharge max="4932" rate="85" delay="2.5"/>
       <hull max="700" integrated="1"/>
     </properties>
   </macro>
@@ -6305,7 +6305,7 @@
     <component ref="shield_spl_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2084}" basename="{20106,2081}" shortname="{20106,2085}" makerrace="split" description="{20106,2082}" mk="1"/>
-      <recharge max="3700" rate="55" delay="2.5"/>
+      <recharge max="3848" rate="60" delay="2.5"/>
       <hull max="700" threshold="0.2"/>
     </properties>
   </macro>
@@ -6313,7 +6313,7 @@
     <component ref="shield_spl_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2094}" basename="{20106,2091}" shortname="{20106,2095}" makerrace="split" description="{20106,2092}" mk="2"/>
-      <recharge max="4810" rate="78" delay="2.5"/>
+      <recharge max="4932" rate="85" delay="2.5"/>
       <hull max="700" threshold="0.2"/>
     </properties>
   </macro>
@@ -6379,7 +6379,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2024}" basename="{20106,2021}" shortname="{20106,2025}" makerrace="teladi" description="{20106,2022}" mk="1"/>
-      <recharge max="6500" rate="66" delay="14.3"/>
+      <recharge max="6500" rate="72" delay="14.3"/>
       <hull max="800" integrated="1"/>
     </properties>
   </macro>
@@ -6387,7 +6387,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2064}" basename="{20106,2061}" shortname="{20106,2065}" makerrace="teladi" description="{20106,2062}" mk="2"/>
-      <recharge max="8775" rate="83" delay="14.3"/>
+      <recharge max="8840" rate="90" delay="14.3"/>
       <hull max="800" integrated="1"/>
     </properties>
   </macro>
@@ -6395,7 +6395,7 @@
     <component ref="shield_arg_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2024}" basename="{20106,2021}" shortname="{20106,2025}" makerrace="teladi" description="{20106,2022}" mk="1"/>
-      <recharge max="6500" rate="66" delay="14.3"/>
+      <recharge max="6500" rate="72" delay="14.3"/>
       <hull max="800" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6403,7 +6403,7 @@
     <component ref="shield_arg_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2064}" basename="{20106,2061}" shortname="{20106,2065}" makerrace="teladi" description="{20106,2062}" mk="2"/>
-      <recharge max="8775" rate="83" delay="13.3"/>
+      <recharge max="8840" rate="90" delay="13.3"/>
       <hull max="800" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6529,7 +6529,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2114}" basename="{20106,2111}" shortname="{20106,2115}" makerrace="terran" description="{20106,2112}" mk="1"/>
-      <recharge max="6000" rate="96" delay="16.6"/>
+      <recharge max="6000" rate="104" delay="16.6"/>
       <hull max="600" integrated="1"/>
     </properties>
   </macro>
@@ -6537,7 +6537,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2124}" basename="{20106,2121}" shortname="{20106,2125}" makerrace="terran" description="{20106,2122}" mk="2"/>
-      <recharge max="7800" rate="131" delay="16.6"/>
+      <recharge max="7800" rate="143" delay="16.6"/>
       <hull max="600" integrated="1"/>
     </properties>
   </macro>
@@ -6545,7 +6545,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2134}" basename="{20106,2131}" shortname="{20106,2135}" makerrace="terran" description="{20106,2132}" mk="3"/>
-      <recharge max="9600" rate="159" delay="16.6"/>
+      <recharge max="9720" rate="174" delay="16.6"/>
       <hull max="600" integrated="1"/>
     </properties>
   </macro>
@@ -6553,7 +6553,7 @@
     <component ref="shield_ter_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2114}" basename="{20106,2111}" shortname="{20106,2115}" makerrace="terran" description="{20106,2112}" mk="1"/>
-      <recharge max="6000" rate="96" delay="16.6"/>
+      <recharge max="6000" rate="104" delay="16.6"/>
       <hull max="600" integrated="0"/>
     </properties>
   </macro>
@@ -6561,7 +6561,7 @@
     <component ref="shield_ter_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2124}" basename="{20106,2121}" shortname="{20106,2125}" makerrace="terran" description="{20106,2122}" mk="2"/>
-      <recharge max="7800" rate="131" delay="16.6"/>
+      <recharge max="7800" rate="143" delay="16.6"/>
       <hull max="600" integrated="0"/>
     </properties>
   </macro>
@@ -6569,7 +6569,7 @@
     <component ref="shield_ter_m_standard_02_mk3"/>
     <properties>
       <identification name="{20106,2134}" basename="{20106,2131}" shortname="{20106,2135}" makerrace="terran" description="{20106,2132}" mk="3"/>
-      <recharge max="9600" rate="159" delay="16.6"/>
+      <recharge max="9720" rate="174" delay="16.6"/>
       <hull max="600" integrated="0"/>
     </properties>
   </macro>
@@ -6577,7 +6577,7 @@
     <component ref="shield_ter_m_standard_04_mk1"/>
     <properties>
       <identification name="{20106,2174}" basename="{20106,2171}" shortname="{20106,2175}" makerrace="terran" description="{20106,2172}" mk="1"/>
-      <recharge max="6000" rate="50" delay="5"/>
+      <recharge max="6000" rate="56" delay="5"/>
       <hull max="600" integrated="0"/>
     </properties>
   </macro>
@@ -6585,7 +6585,7 @@
     <component ref="shield_ter_m_standard_04_mk2"/>
     <properties>
       <identification name="{20106,2184}" basename="{20106,2181}" shortname="{20106,2185}" makerrace="terran" description="{20106,2182}" mk="2"/>
-      <recharge max="7800" rate="69" delay="5"/>
+      <recharge max="7800" rate="76" delay="5"/>
       <hull max="600" integrated="0"/>
     </properties>
   </macro>
@@ -6593,7 +6593,7 @@
     <component ref="shield_ter_m_standard_04_mk3"/>
     <properties>
       <identification name="{20106,2194}" basename="{20106,2191}" shortname="{20106,2195}" makerrace="terran" description="{20106,2192}" mk="3"/>
-      <recharge max="9600" rate="82" delay="5"/>
+      <recharge max="9720" rate="94" delay="5"/>
       <hull max="600" integrated="0"/>
     </properties>
   </macro>
@@ -6601,7 +6601,7 @@
     <component ref="shield_ter_m_virtual_01"/>
     <properties>
       <identification name="{20106,2174}" basename="{20106,2171}" shortname="{20106,2175}" makerrace="terran" description="{20106,2172}" mk="1"/>
-      <recharge max="6000" rate="50" delay="5"/>
+      <recharge max="6000" rate="56" delay="5"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6609,7 +6609,7 @@
     <component ref="shield_ter_m_virtual_01"/>
     <properties>
       <identification name="{20106,2184}" basename="{20106,2181}" shortname="{20106,2185}" makerrace="terran" description="{20106,2182}" mk="2"/>
-      <recharge max="7800" rate="69" delay="5"/>
+      <recharge max="7800" rate="76" delay="5"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6617,7 +6617,7 @@
     <component ref="shield_ter_m_virtual_01"/>
     <properties>
       <identification name="{20106,2194}" basename="{20106,2191}" shortname="{20106,2195}" makerrace="terran" description="{20106,2192}" mk="3"/>
-      <recharge max="9600" rate="82" delay="5"/>
+      <recharge max="9720" rate="94" delay="5"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6733,7 +6733,7 @@
     <component ref="shield_xen_m_standard_01_mk1"/>
     <properties>
       <identification name="{20106,2034}" basename="{20106,2031}" shortname="{20106,2035}" makerrace="xenon" description="{20106,2032}" mk="1"/>
-      <recharge max="4750" rate="110" delay="16"/>
+      <recharge max="4750" rate="119" delay="16"/>
       <hull max="700" integrated="1"/>
     </properties>
   </macro>
@@ -6741,7 +6741,7 @@
     <component ref="shield_xen_m_standard_01_mk2"/>
     <properties>
       <identification name="{20106,2074}" basename="{20106,2071}" shortname="{20106,2075}" makerrace="xenon" description="{20106,2072}" mk="2"/>
-      <recharge max="5662" rate="171" delay="16"/>
+      <recharge max="5662" rate="178" delay="16"/>
       <hull max="700" threshold="0.2"/>
     </properties>
   </macro>
@@ -6752,7 +6752,7 @@
     <component ref="shield_xen_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2074}" basename="{20106,2071}" shortname="{20106,2075}" makerrace="xenon" description="{20106,2072}" mk="2"/>
-      <recharge max="5662" rate="171" delay="16"/>
+      <recharge max="5662" rate="178" delay="16"/>
       <hull max="700" threshold="0.2"/>
     </properties>
   </macro>
@@ -6760,7 +6760,7 @@
     <component ref="shield_xen_m_standard_04_mk1"/>
     <properties>
       <identification name="{20106,2034}" basename="{20106,2031}" shortname="{20106,2035}" makerrace="xenon" description="{20106,2032}" mk="1"/>
-      <recharge max="4750" rate="110" delay="16"/>
+      <recharge max="4750" rate="119" delay="16"/>
       <hull max="700" threshold="0.2"/>
     </properties>
   </macro>
@@ -6768,7 +6768,7 @@
     <component ref="shield_xen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2034}" basename="{20106,2031}" shortname="{20106,2035}" makerrace="xenon" description="{20106,2032}" mk="1"/>
-      <recharge max="5225" rate="149" delay="16"/>
+      <recharge max="5662" rate="178" delay="16"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -9346,7 +9346,7 @@
     <properties>
       <identification name="{20105,3004}" basename="{20105,3001}" makerrace="argon" description="{20105,3002}" mk="1"/>
       <bullet class="bullet_arg_l_laser_01_mk1_macro"/>
-      <heat overheat="10000" cooldelay="2.5" overheatcooldelay="2" coolrate="1250" reenable="8000"/>
+      <heat overheat="10000" cooldelay="2.7" overheatcooldelay="2" coolrate="1160" reenable="8000"/>
       <rotationspeed max="20"/>
       <rotationacceleration max="30"/>
       <hull max="10000"/>
@@ -9852,9 +9852,9 @@
     <properties>
       <identification name="{20105,2584}" basename="{20105,2581}" shortname="{20105,2585}" makerrace="argon" description="{20105,2582}" mk="1"/>
       <bullet class="bullet_gen_m_shieldpierce_01_mk1_macro"/>
-      <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="900" reenable="5000"/>
-      <rotationspeed max="74.6"/>
-      <rotationacceleration max="149.1"/>
+      <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="850" reenable="5000"/>
+      <rotationspeed max="70"/>
+      <rotationacceleration max="105"/>
       <hull max="1001" hittable="0"/>
       <effects>
         <firing start="startshooting_gen_m_shieldpierce_01"/>
@@ -10808,7 +10808,7 @@
     <properties>
       <identification name="{20105,3051}" makerrace="terran" description="{20105,3052}" mk="1"/>
       <bullet class="bullet_ter_l_gatling_01_mk1_macro"/>
-      <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="1700" reenable="8000"/>
+      <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="1760" reenable="8000"/>
       <rotationspeed max="30"/>
       <rotationacceleration max="45"/>
       <hull max="8000"/>
