@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch, ref } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
@@ -9,7 +9,11 @@ import { useProductionToolbarPresenter } from '@/components/empire/presenters/us
 import { useProductionPlanningPresenter } from '@/components/empire/presenters/useProductionPlanningPresenter'
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
+import { useTransitPlanningPresenter } from '@/components/empire/presenters/useTransitPlanningPresenter'
+import { useTransitWareflowPresenter } from '@/components/empire/presenters/useTransitWareflowPresenter'
+import { useTransitDashboardPresenter } from '@/components/empire/presenters/useTransitDashboardPresenter'
 import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmpireWareFlowDerived'
+import type { TransitPresenterContract } from '@/types/transit-presenter-contract'
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
@@ -21,17 +25,30 @@ import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboa
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
 import TransitHubCenterDashboard from '@/components/empire/transit-hub/TransitHubCenterDashboard.vue'
 import TransitHubMaterialsPanel from '@/components/empire/transit-hub/TransitHubMaterialsPanel.vue'
+import ArchiveModuleList from '@/components/empire/ArchiveModuleList.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
-import type { TransitHubStorageModulePlan, SupplyStorageFlow } from '@/types/x4'
 
 const liveStore = useLiveProductionStore()
 const activeViewStore = useActiveViewStore()
 const gameData = useGameDataStore()
 const { t } = useI18n()
 
-const transitHubDashboardRef = ref<{ storageModulePlans: TransitHubStorageModulePlan[], storageFlows: SupplyStorageFlow[] } | null>(null)
+const transitPresenterContract: TransitPresenterContract = {
+  getActiveTransitSectorId: () => liveStore.activeTransitSectorId,
+  getTransitMode: () => liveStore.mode,
+  getPlanningTransitPanelSource: (sectorId) => liveStore.getPlanningTransitPanelSource(sectorId),
+  getLiveTransitPanelSource: (sectorId) => liveStore.getLiveTransitPanelSource(sectorId),
+  getActiveTransitPanelSource: (sectorId) => liveStore.getActiveTransitPanelSource(sectorId),
+  getTransitHasArchiveTradeStation: () => liveStore.stationContext?.hasArchive ?? false,
+  getTransitArchiveModules: () => liveStore.stationContext?.archiveModules ?? [],
+  getTransitBuildingModules: () => liveStore.stationContext?.buildingModules ?? [],
+  getTransitSettings: () => liveStore.transitHubSettings,
+  getGlobalSettings: () => liveStore.settings,
+  updateTransitHubSettings: (patch) => liveStore.updateTransitHubSettings(patch),
+  toggleMode: () => liveStore.toggleMode()
+}
 
 onMounted(() => {
   const gameGuid = activeViewStore.activeBinding
@@ -52,6 +69,10 @@ const planningPresenter = useProductionPlanningPresenter(liveStore.workbench)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore.workbench)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore.workbench)
 
+const transitPlanningPresenter = useTransitPlanningPresenter(transitPresenterContract)
+const transitWareflowPresenter = useTransitWareflowPresenter(transitPresenterContract)
+const transitDashboardPresenter = useTransitDashboardPresenter(transitPresenterContract)
+
 const activeStation = computed(() => liveStore.activeStation)
 const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
 const isOverview = computed(() => !activeStation.value && !activeTransitSectorId.value)
@@ -62,12 +83,6 @@ const hasBindingStation = computed(() => stationContext.value?.hasBinding ?? fal
 const hasSaveStation = computed(() => stationContext.value?.hasArchive ?? false)
 const mode = computed(() => liveStore.mode)
 const canToggle = computed(() => liveStore.canToggle)
-const stationCode = computed(() => stationContext.value?.stationCode || '')
-const sectorResources = computed(() => stationContext.value?.sectorResources || [])
-const sectorSunlight = computed(() => stationContext.value?.sectorSunlight ?? 100)
-const sectorName = computed(() => stationContext.value?.sectorName || '')
-const sectorNameId = computed(() => stationContext.value?.sectorNameId)
-const stationPosition = computed(() => stationContext.value?.position)
 const archiveModules = computed(() => stationContext.value?.archiveModules || [])
 const buildingModules = computed(() => stationContext.value?.buildingModules || [])
 
@@ -82,28 +97,8 @@ const empireWareFlowDerived = useEmpireWareFlowDerived({
   waresMap: computed(() => gameData.waresMap || {})
 })
 
-const transitHubInput = computed(() => {
-  const sectorId = activeTransitSectorId.value
-  if (!sectorId) {
-    return {
-      sectorId: null,
-      sectors: [],
-      stations: [],
-      localGroupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
-      solverOutput: null
-    }
-  }
-
-  const sectorInternalData = liveStore.getSectorInternalData(sectorId)
-  const sectorLinkCalc = liveStore.getSectorLinkCalc(sectorId)
-
-  return {
-    sectorId,
-    sectors: liveStore.sectors,
-    stations: liveStore.orderedStationsBySector,
-    localGroupedFlows: sectorInternalData.localGroupedFlows,
-    solverOutput: sectorLinkCalc?.solverOutput || null
-  }
+const showArchiveModuleList = computed(() => {
+  return mode.value === 'live' && stationContext.value?.hasArchive
 })
 </script>
 
@@ -136,23 +131,33 @@ const transitHubInput = computed(() => {
   <LiveTransitToolbar
     v-if="activeTransitSectorId"
     :title-model="toolbarPresenter.props.titleModel.value"
+    :station-code="toolbarPresenter.props.stationCode.value"
+    :sector-name="toolbarPresenter.props.sectorName.value"
+    :sector-name-id="toolbarPresenter.props.sectorNameId.value"
+    :station-position="toolbarPresenter.props.stationPosition.value"
+    :sector-resources="toolbarPresenter.props.sectorResources.value"
+    :sector-sunlight="toolbarPresenter.props.sectorSunlight.value"
     :settings="liveStore.transitHubSettings"
     :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
+    :mode="transitPlanningPresenter.props.mode.value"
+    :visual-mode="transitPlanningPresenter.props.visualMode.value"
+    :can-toggle="true"
+    :has-archive-trade-station="transitPlanningPresenter.props.hasArchiveTradeStation.value"
     @update-title="toolbarPresenter.emits.updateTitle"
     @update-race-preference="(v) => liveStore.updateTransitHubSettings({ racePreference: v })"
-    @open-import="liveStore.importModalOpen = true"
+    @toggle-mode="liveStore.toggleMode"
   />
   
   <LiveStationToolbar
     v-if="activeStation"
     :station-name="toolbarPresenter.props.station.value?.name || ''"
-    :station-code="stationCode"
-    :sector-name="sectorName"
-    :sector-name-id="sectorNameId"
-    :station-position="stationPosition"
-    :sector-resources="sectorResources"
-    :sector-sunlight="sectorSunlight"
+    :station-code="toolbarPresenter.props.stationCode.value"
+    :sector-name="toolbarPresenter.props.sectorName.value"
+    :sector-name-id="toolbarPresenter.props.sectorNameId.value"
+    :station-position="toolbarPresenter.props.stationPosition.value"
+    :sector-resources="toolbarPresenter.props.sectorResources.value"
+    :sector-sunlight="toolbarPresenter.props.sectorSunlight.value"
     :has-binding-station="hasBindingStation"
     :has-save-station="hasSaveStation"
     :mode="mode"
@@ -185,33 +190,42 @@ const transitHubInput = computed(() => {
 <template v-if="isOverview || activeTransitSectorId">
     <div v-if="activeTransitSectorId" class="main-layout mt-6">
       <div class="col-span-12 lg:col-span-3">
-        <TransitHubBuildPanel :storage-module-plans="transitHubDashboardRef?.storageModulePlans || []" />
+        <ArchiveModuleList
+          v-if="showArchiveModuleList"
+          :modules="transitPlanningPresenter.props.liveModules.value"
+          :building-modules="transitPlanningPresenter.props.liveBuildingModules.value"
+        />
+        <TransitHubBuildPanel
+          v-else
+          :modules="transitPlanningPresenter.props.plannedModules.value"
+          :module-plans="transitPlanningPresenter.props.modulePlans.value"
+        />
       </div>
 
       <div class="col-span-12 lg:col-span-5">
         <TransitHubCenterDashboard
-          ref="transitHubDashboardRef"
-          :sector-id="transitHubInput.sectorId"
-          :sectors="transitHubInput.sectors"
-          :stations="transitHubInput.stations"
-          :local-grouped-flows="transitHubInput.localGroupedFlows"
-          :solver-output="transitHubInput.solverOutput"
-          :view-mode="wareflowPresenter.props.viewMode.value"
+          :sector-id="transitWareflowPresenter.props.sectorId.value"
+          :sectors="liveStore.sectors"
+          :stations="liveStore.orderedStationsBySector"
+          :local-grouped-flows="transitWareflowPresenter.props.localGroupedFlows.value || { flows: [], empireGroups: { operations: [], supply: [] } }"
+          :solver-output="transitWareflowPresenter.props.solverOutput.value"
+          :view-mode="transitWareflowPresenter.props.viewMode.value"
           :race-preference="liveStore.transitHubSettings.racePreference ?? liveStore.settings.racePreference"
           :transport-ship-capacity="liveStore.settings.transportShipCapacity"
-          :buy-multiplier="liveStore.transitHubSettings.buyMultiplier ?? liveStore.settings.buyMultiplier"
-          :sell-multiplier="liveStore.transitHubSettings.sellMultiplier ?? liveStore.settings.sellMultiplier"
-          :product-buffer-hours="liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours"
-          @update:view-mode="wareflowPresenter.emits.updateViewMode"
-          @update:buy-multiplier="(v) => liveStore.updateTransitHubSettings({ buyMultiplier: v })"
-          @update:sell-multiplier="(v) => liveStore.updateTransitHubSettings({ sellMultiplier: v })"
-          @update:product-buffer-hours="(v) => liveStore.updateTransitHubSettings({ primaryProductBufferHours: v })"
+          :buy-multiplier="transitWareflowPresenter.props.buyMultiplier.value"
+          :sell-multiplier="transitWareflowPresenter.props.sellMultiplier.value"
+          :product-buffer-hours="transitWareflowPresenter.props.productBufferHours.value"
+          @update:view-mode="transitWareflowPresenter.emits.updateViewMode"
+          @update:buy-multiplier="transitWareflowPresenter.emits.updateBuyMultiplier"
+          @update:sell-multiplier="transitWareflowPresenter.emits.updateSellMultiplier"
+          @update:product-buffer-hours="transitWareflowPresenter.emits.updateProductBufferHours"
         />
       </div>
 
       <div class="col-span-12 lg:col-span-4">
         <TransitHubMaterialsPanel
-          :planned-modules-override="(transitHubDashboardRef?.storageModulePlans || []).map(p => p.item)"
+          :modules="transitDashboardPresenter.props.activeModules.value"
+          :building-modules="transitDashboardPresenter.props.activeBuildingModules.value"
           :build-price-multiplier="liveStore.buildPriceMultiplier"
           :useHQ="liveStore.settings.useHQ"
           @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"

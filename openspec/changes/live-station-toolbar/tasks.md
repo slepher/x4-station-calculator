@@ -301,3 +301,87 @@
 
 - [x] Test 3.10 新增：验证 bindingStation 的星区名称（小行星带）、sunlight（13%）、资源（7种）、坐标格式
 - [x] Test 3.6 更新：验证新坐标格式（X: -39.5, Y: 0, Z: 8.8 km）
+
+## Phase 11: Toolbar Presenter 统一化（Station + Transit）
+
+### Task 11.1: Contract 扩展 - 新增通用 context 方法
+
+- [x] `ProductionWorkbenchContract.ts` 新增 6 个方法：
+  - `getToolbarStationCode(): string`
+  - `getToolbarSectorName(): string`
+  - `getToolbarSectorNameId(): string | undefined`
+  - `getToolbarStationPosition(): { x, y, z } | undefined`
+  - `getToolbarSectorResources(): string[]`
+  - `getToolbarSectorSunlight(): number`
+- [x] 方法内部根据 `getWorkbenchMode()` 自动返回 station 或 transit 对应数据
+
+### Task 11.2: Presenter 扩展 - 新增 props
+
+- [x] `useProductionToolbarPresenter.ts` 新增 6 个 props：
+  - `stationCode: ComputedRef<string>`
+  - `sectorName: ComputedRef<string>`
+  - `sectorNameId: ComputedRef<string | undefined>`
+  - `stationPosition: ComputedRef<{ x, y, z } | undefined>`
+  - `sectorResources: ComputedRef<string[]>`
+  - `sectorSunlight: ComputedRef<number>`
+
+### Task 11.3: LiveStore 实现 - context 方法实现
+
+- [x] `useLiveProductionStore.ts` 实现 6 个 toolbar 方法
+- [x] 根据 `workbench.getWorkbenchMode()` 判断：
+  - `mode === 'station'` → 返回 `stationContext` 数据
+  - `mode === 'transit'` → 返回 `transitHubContext` 数据
+
+### Task 11.4: BlueprintStore 实现 - 同步扩展
+
+- [x] `useBlueprintProductionStore.ts` 同步实现 6 个 toolbar 方法
+- [x] Station 模式返回空/sector 数据（无 transit）
+
+### Task 11.5: View 适配 - 统一使用 toolbarPresenter
+
+- [x] `LiveProductionWorkbenchView.vue` TransitToolbar 使用 toolbarPresenter props
+- [x] `LiveProductionWorkbenchView.vue` StationToolbar 使用 toolbarPresenter props
+- [x] 移除 View 层重复 computed（stationCode, sectorName 等）
+- [x] 保留 hasBindingStation/hasSaveStation/mode/canToggle（store 特有）
+
+### Task 11.6: TransitToolbar 对齐 StationToolbar
+
+- [x] `LiveTransitToolbar.vue` 结构对齐：
+  - Section 1: transit 名称 + trade station 代码 + 模式切换按钮
+  - Sep 1
+  - Section 2: 星区名称 + popover + 星区资源 + popover + 光伏效率 + 单泊位吞吐量
+  - Sep 2（仅 planning mode）
+  - 种族偏好（仅 planning mode）
+- [x] 移除导入按钮
+- [x] 样式对齐：toggle-chip + emoji（📝/📡）+ 颜色
+- [x] 颜色规则：visualMode 决定颜色（planning=amber, live=sky）
+
+### Task 11.7: transitHubContext 扩展 - 新增扇区字段
+
+- [x] `useLiveProductionStore.ts` transitHubContext 新增字段：
+  - `sectorName: string`
+  - `sectorNameId: string | undefined`
+  - `sectorResources: string[]`
+  - `sectorSunlight: number`
+  - `position: { x, y, z } | undefined`
+- [x] 从 archive station 的 `stationEntry.position` 获取坐标
+
+### Task 11.8: 修复 sectorMacro 获取
+
+- [x] transitHubContext 使用 `group.sectorMacro` 获取扇区数据（而非 sectorId）
+- [x] 从 `gameData.maps.sectors[sectorMacro]` 查询扇区信息
+- [x] 正确计算 sunlight: `Math.round((sectorData.area?.sunlight ?? 1) * 100)`
+- [x] 正确获取 resources: `(sectorData.resources || []).map(r => r.ware)`
+
+### Task 11.9: E2E 测试 - 扇区信息验证
+
+- [x] `live-flow-map.spec.ts` 新增测试：transit hub 扇区信息显示正确
+- [x] 验证日照效率：阿尔忒弥斯的朦胧显示 141%（而非默认 100%）
+- [x] 验证资源数量：大于 0
+- [x] 验证星区 popover：显示正确名称
+- [x] 修复 locator 使用正确 i18n 文本：`光伏效率` / `星区资源` / `星区`
+
+### Task 11.10: 构建验证
+
+- [x] `npm run build` 成功
+- [x] TypeScript 无错误

@@ -50,10 +50,18 @@ export interface ProductionWorkbenchStoreContract {
   getAvailableMinerals(): string[]
   getSingleBerthThroughput(): number
 
+  getToolbarStationCode(): string
+  getToolbarSectorName(): string
+  getToolbarSectorNameId(): string | undefined
+  getToolbarStationPosition(): { x: number; y: number; z: number } | undefined
+  getToolbarSectorResources(): string[]
+  getToolbarSectorSunlight(): number
+
   getPlannedModules(): SavedModule[]
   getAutoModules(): SavedModule[]
   getAutoHabitationModules(): SavedModule[]
   getAutoInfrastructureModules(): SavedModule[]
+  getResolvedModules(): SavedModule[]
   getEnforceDlcActivation(): boolean
 
   getWareflowViewMode(): WareFlowViewMode

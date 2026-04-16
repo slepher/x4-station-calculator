@@ -19,6 +19,12 @@ export interface ToolbarPresenterProps {
   stationTypes: Array<{ value: StationType; label: string }>
   availableMinerals: string[]
   singleBerthThroughput: ComputedRef<number>
+  stationCode: ComputedRef<string>
+  sectorName: ComputedRef<string>
+  sectorNameId: ComputedRef<string | undefined>
+  stationPosition: ComputedRef<{ x: number; y: number; z: number } | undefined>
+  sectorResources: ComputedRef<string[]>
+  sectorSunlight: ComputedRef<number>
 }
 
 export interface UseProductionToolbarPresenterReturn {
@@ -36,7 +42,13 @@ export function useProductionToolbarPresenter(store: ProductionWorkbenchStoreCon
     races: store.getToolbarRaces(),
     stationTypes: store.getToolbarStationTypes(),
     availableMinerals: store.getAvailableMinerals(),
-    singleBerthThroughput: computed(() => store.getSingleBerthThroughput())
+    singleBerthThroughput: computed(() => store.getSingleBerthThroughput()),
+    stationCode: computed(() => store.getToolbarStationCode()),
+    sectorName: computed(() => store.getToolbarSectorName()),
+    sectorNameId: computed(() => store.getToolbarSectorNameId()),
+    stationPosition: computed(() => store.getToolbarStationPosition()),
+    sectorResources: computed(() => store.getToolbarSectorResources()),
+    sectorSunlight: computed(() => store.getToolbarSectorSunlight())
   }
 
   const emits: ContextToolbarEmits = {

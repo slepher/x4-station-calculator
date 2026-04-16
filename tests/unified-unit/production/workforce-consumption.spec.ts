@@ -23,6 +23,7 @@ function callComputeFlows(
   const coreResult = calculateProductionFlowsCore({
     plannedModules,
     autoIndustryModules: [],
+    autoHabitationModules: [],
     modulesMap: modules,
     waresMap: wares,
     medicalConsumptionMap: consumption,

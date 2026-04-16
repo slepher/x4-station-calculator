@@ -15,6 +15,7 @@ export interface EmpireSourceViewDeps {
   activeBinding: Ref<SaveBindingPlan | null>
   playerStationRecords: Ref<PlayerStationRecord[]>
   sectorsMap?: Ref<Record<string, X4MapSector>>
+  visibleStationIds?: Ref<Set<string> | null>
 }
 
 export interface EmpireSourceView {
@@ -51,7 +52,8 @@ export function createEmpireSourceView(deps: EmpireSourceViewDeps): EmpireSource
     activeEmpire,
     activeBinding,
     playerStationRecords,
-    sectorsMap
+    sectorsMap,
+    visibleStationIds
   } = deps
 
   const derivedBindingStations = computed<DerivedBindingStation[]>(() => {
@@ -99,7 +101,12 @@ export function createEmpireSourceView(deps: EmpireSourceViewDeps): EmpireSource
         if (aOrder !== bOrder) return aOrder - bOrder
         return a.index - b.index
       })
-      return withIndex.map((item) => item.station)
+      const sorted = withIndex.map((item) => item.station)
+      const filterSet = visibleStationIds?.value
+      if (filterSet) {
+        return sorted.filter((station) => filterSet.has(station.id))
+      }
+      return sorted
     }
     if (!activeEmpire.value) return []
     const stations = activeEmpire.value.stations || []
@@ -111,7 +118,12 @@ export function createEmpireSourceView(deps: EmpireSourceViewDeps): EmpireSource
       if (aOrder !== bOrder) return aOrder - bOrder
       return a.index - b.index
     })
-    return withIndex.map((item) => item.station)
+    const sorted = withIndex.map((item) => item.station)
+    const filterSet = visibleStationIds?.value
+    if (filterSet) {
+      return sorted.filter((station) => filterSet.has(station.id))
+    }
+    return sorted
   })
 
   const productionStations = computed<StationPlan[]>(() => orderedStationsBySector.value)

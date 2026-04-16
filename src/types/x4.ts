@@ -435,10 +435,14 @@ export interface StationPlan {
   minerals?: string[];
 }
 
-/**
- * 分站类型定义
- */
 export type StationType = 'industrial' | 'supply' | 'transit' | 'shipyard';
+
+export interface FlowSourceStation {
+  id: string;
+  sourceKey: string;
+  sectorId: string | null;
+  station: StationPlan;
+}
 
 export interface SectorPlan {
   id: string;
@@ -679,6 +683,10 @@ export interface SectorInternalData {
   planning: SupplyPlanningInput;
   localGroupedFlows: EmpireGroupedFlows;
   supplyStorageFlows: SupplyStorageFlow[];
+  storageModulePlans: TransitHubStorageModulePlan[];
+  autoIndustryModules: SavedModule[];
+  autoHabitationModules: SavedModule[];
+  autoInfrastructureModules: SavedModule[];
 }
 
 export interface TransitHubStorageModulePlan {

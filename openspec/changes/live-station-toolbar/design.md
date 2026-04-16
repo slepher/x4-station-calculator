@@ -387,3 +387,135 @@ gameData.maps.sectors[plan.sectorMacro]
 - 移除星区资源 checkbox popover
 - 移除光伏效率输入控件
 - 移除 liveData popover 相关代码（后续功能）
+
+## Phase 11: Toolbar Presenter 统一化（Station + Transit）
+
+### 背景
+
+TransitToolbar 需要显示扇区信息（星区名称、资源、光伏效率），但之前没有统一的数据获取路径。StationToolbar 通过 `stationContext` computed 获取，TransitToolbar 缺少对应机制。
+
+### 决策：Contract 扩展而非独立 Context
+
+**问题**: TransitToolbar 是否应该有独立的 `transitHubContext` computed？
+
+**决策**: 扩展 `ProductionWorkbenchContract` 和 `useProductionToolbarPresenter`，提供统一的 context 方法，内部根据 `getWorkbenchMode()` 自动返回 station/transit 对应数据。
+
+**原因**:
+- 避免为每个 context 类型（station/transit/overview）创建独立 computed
+- Presenter 层统一接口，View 层简化调用
+- 符合 DRY 原则
+
+### Contract 新增方法
+
+| 方法 | 返回类型 | Station 数据源 | Transit 数据源 |
+|------|---------|---------------|---------------|
+| `getToolbarStationCode()` | `string` | `stationContext.stationCode` | `transitHubContext.tradeStationCode` |
+| `getToolbarSectorName()` | `string` | `stationContext.sectorName` | `transitHubContext.sectorName` |
+| `getToolbarSectorNameId()` | `string \| undefined` | `stationContext.sectorNameId` | `transitHubContext.sectorNameId` |
+| `getToolbarStationPosition()` | `{x,y,z} \| undefined` | `stationContext.position` | `transitHubContext.position` |
+| `getToolbarSectorResources()` | `string[]` | `stationContext.sectorResources` | `transitHubContext.sectorResources` |
+| `getToolbarSectorSunlight()` | `number` | `stationContext.sectorSunlight` | `transitHubContext.sectorSunlight` |
+
+### Presenter Props 映射
+
+```typescript
+// useProductionToolbarPresenter.ts
+const props = {
+  stationCode: computed(() => store.getToolbarStationCode()),
+  sectorName: computed(() => store.getToolbarSectorName()),
+  sectorNameId: computed(() => store.getToolbarSectorNameId()),
+  stationPosition: computed(() => store.getToolbarStationPosition()),
+  sectorResources: computed(() => store.getToolbarSectorResources()),
+  sectorSunlight: computed(() => store.getToolbarSectorSunlight()),
+}
+```
+
+### TransitToolbar 对齐 StationToolbar
+
+**结构对齐**:
+
+| Section | Station | Transit |
+|---------|---------|---------|
+| Section 1 | 名称 + 代码 + 模式 | 名称 + trade station 代码 + 模式 |
+| Sep 1 | ✓ | ✓ |
+| Section 2 | 星区 + popover + 资源 + popover + 光伏 + 吞吐 | 星区 + popover + 资源 + popover + 光伏 + 吞吐 |
+| Sep 2 | ✓ (仅 planning) | ✓ (仅 planning) |
+| 种族偏好 | ✓ (仅 planning) | ✓ (仅 planning) |
+
+**移除元素**: TransitToolbar 移除导入按钮（transit hub 不需要导入功能）
+
+**样式对齐**:
+- toggle-chip + emoji（📝 规划 / 📡 实时）
+- 颜色：visualMode 决定（planning=amber, live=sky）
+
+### transitHubContext 扩展
+
+**新增字段**:
+
+```typescript
+interface TransitHubContext {
+  // 已有字段
+  sectorId: string
+  hasArchiveTradeStation: boolean
+  tradeStationCode: string
+  archiveModules: SavedModule[]
+  buildingModules: SavedModule[]
+  modeBehavior: 'full-switch' | 'wareflow-only'
+  
+  // 新增扇区字段
+  sectorName: string
+  sectorNameId?: string
+  sectorResources: string[]
+  sectorSunlight: number
+  position?: { x, y, z }
+}
+```
+
+**数据获取**:
+
+```
+transitHubContext
+    ↓
+group.sectorMacro  ←── 从 BindingSectorGroup 获取
+    ↓
+gameData.maps.sectors[sectorMacro]
+    ↓
+sectorData.area.sunlight → sectorSunlight (×100)
+sectorData.resources → sectorResources
+sectorData.name → sectorName
+sectorData.nameId → sectorNameId
+```
+
+**关键修复**: 使用 `group.sectorMacro` 而非 `sectorId`（binding group ID ≠ sector macro）
+
+### Station 数据获取对比
+
+| 项目 | 之前 | 现在 |
+|------|------|------|
+| Station 数据 | `stationContext` computed → View props | `toolbarPresenter.props.stationCode` |
+| Transit 数据 | 无 | `toolbarPresenter.props.stationCode` (同一接口) |
+| View 层 computed | 多个独立 computed | 移除，使用 presenter |
+
+**本质**: Station 只是换了路径，Transit 是新增功能。
+
+### E2E 测试验证
+
+新增测试验证 transit hub 扇区信息：
+
+| 测试 | 验证内容 | 期望值 |
+|------|----------|--------|
+| 日照效率 | 阿尔忒弥斯的朦胧 sunlight | 141%（`sunlight=1.41`） |
+| 资源数量 | 该星区资源 | > 0（hydrogen 等） |
+| 星区 popover | 点击显示名称 | 正确名称，非 "-" |
+
+### File Changes (Phase 11)
+
+| 文件 | 变更 |
+|-----|------|
+| `src/types/production-workbench-contract.ts` | 新增 6 个 toolbar 方法定义 |
+| `src/components/empire/presenters/useProductionToolbarPresenter.ts` | 新增 6 个 props |
+| `src/store/useLiveProductionStore.ts` | 实现 6 个 toolbar 方法 + transitHubContext 扩展 |
+| `src/store/useBlueprintProductionStore.ts` | 同步实现 6 个 toolbar 方法 |
+| `src/components/empire/LiveProductionWorkbenchView.vue` | 移除重复 computed，统一使用 toolbarPresenter |
+| `src/components/empire/context_toolbar/LiveTransitToolbar.vue` | 结构对齐 StationToolbar |
+| `tests/e2e/live-flow-map/live-flow-map.spec.ts` | 新增扇区信息验证测试 |

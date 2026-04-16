@@ -34,7 +34,7 @@ export interface UseProductionDashboardPresenterReturn {
 
 export function useProductionDashboardPresenter(store: ProductionWorkbenchStoreContract): UseProductionDashboardPresenterReturn {
   const props: DashboardPresenterProps = {
-    plannedModules: computed(() => store.getPlannedModules()),
+    plannedModules: computed(() => store.getResolvedModules()),
     stationAnalysis: computed(() => store.getStationAnalysis()),
     settings: computed(() => store.getDashboardSettings()),
     currentEfficiency: computed(() => store.getCurrentEfficiency()),

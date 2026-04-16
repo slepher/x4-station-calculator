@@ -60,7 +60,7 @@ function createEmptySolverOutput(): SolveMultiWareByLinkOutput {
   }
 }
 
-function mergeLinkFlowsIntoGroupedFlows(
+export function mergeLinkFlowsIntoGroupedFlows(
   groupedFlows: EmpireGroupedFlows,
   solverOutput: SolveMultiWareByLinkOutput,
   sectorId: string,
@@ -238,7 +238,7 @@ function sortStorageFlows(a: SupplyStorageFlow, b: SupplyStorageFlow) {
   return a.wareId.localeCompare(b.wareId)
 }
 
-function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsInput): SupplyStorageFlow[] {
+export function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsInput): SupplyStorageFlow[] {
   const {
     sectorId,
     sectors,
@@ -324,7 +324,7 @@ function buildTransitHubStorageFlows(input: BuildTransitHubStorageFlowsInput): S
     .sort(sortStorageFlows)
 }
 
-function buildTransitHubStorageModulePlans(input: {
+export function buildTransitHubStorageModulePlans(input: {
   storageFlows: SupplyStorageFlow[]
   modulesMap?: Record<string, X4Module>
   racePreference: string

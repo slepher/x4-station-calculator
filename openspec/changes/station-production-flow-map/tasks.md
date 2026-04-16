@@ -219,49 +219,15 @@ Phase 7（Auto Modules 分拆 - 数据层）✅：
 - [x] Task R4: 拆散 `productionSourceAdapter.ts`
 - [x] Task R5: 移除对外的 `bindingStation/archiveStation`
 
-### Task R1: 新增 stationContext
+---
 
-**改动**：
-- `useLiveProductionStore.ts` 新增 `stationContext` computed
-- `useBlueprintProductionStore.ts` 新增 `stationContext: null` 兼容字段
-- `stationContext` 聚合 hasBinding, hasArchive, stationCode, sectorName, sectorNameId, sectorResources, sectorSunlight, position, archiveModules, buildingModules
+## Phase 9: Transit Hub Live Mode 切换（已完成）
 
-**状态**：✅ 已完成
-
-### Task R2: view 改用 stationContext
-
-**改动**：
-- `LiveProductionWorkbenchView.vue` 移除直接读取 `bindingStation`/`archiveStation`
-- toolbar 所需数据全部从 `stationContext` 获取
-- `StationPlanningPanelWrapper.vue` 改为 props 驱动，接收 archiveModules/buildingModules/hasArchive
-
-**状态**：✅ 已完成
-
-### Task R3: 创建共享 helper 文件
-
-**改动**：
-- 创建 `src/store/logic/productionStationShared.ts`
-- 包含：buildComputeDeps, buildActiveStationState, computeStationFlow, isWareOperable, isWareLocked, isPlannedWare, isAutoWare, getResolvedLevel, toggleWareLockForActiveStation, toggleWarePriorityForActiveStation, getFallbackModuleInfo, addModuleToStation, removeModuleFromStation, updateModuleCountInStation, updateStationSettingsDirect, getDefaultStationPlan
-
-**状态**：✅ 已完成
-
-### Task R4: 拆散 productionSourceAdapter.ts
-
-**改动**：
-- 创建 `src/store/logic/liveStationResolver.ts` - station 解析函数
-- 创建 `src/store/logic/liveProductionFlows.ts` - flow source 组织函数
-- 删除 `src/store/logic/productionSourceAdapter.ts`
-- 更新引用方使用新文件
-
-**状态**：✅ 已完成
-
-### Task R5: 移除对外 bindingStation/archiveStation
-
-**改动**：
-- 从 `useLiveProductionStore` return 语句移除 `bindingStation` 和 `archiveStation`
-- 保留为内部 computed，供 `stationContext` 使用
-
-**状态**：✅ 已完成
+- [x] Task A-5: transit context 判定
+- [x] Task A-6: transit hub 双 source 输入
+- [x] Task A-7: LiveTransitToolbar 增加 toggle
+- [x] Task A-8: transit special rule 接线
+- [x] Task A-9: 构建验证
 
 ---
 
@@ -273,13 +239,16 @@ Phase 7（Auto Modules 分拆 - 数据层）✅：
 - StationStateMap.ts 已删除
 - stationComputeService.ts / stationContextService.ts 已删除
 - Auto Modules 计算逻辑分三组输出
+- 双 FlowMap（planningFlowMap + liveFlowMap）已实现
 
-**Store 重构（Phase 1-8）**：
-- `useLiveProductionStore` 对外只暴露 `activeStation + stationContext`
+**Store 重构（Phase 1-9）**：
+- `useLiveProductionStore` 对外只暴露 `activeStation + stationContext + transitHubContext`
 - `useBlueprintProductionStore` 提供 `stationContext: null` 兼容
 - `productionSourceAdapter.ts` 已删除，拆分为三个职责明确的文件
 - 共享 helper 函数已提取到 `productionStationShared.ts`
+- Transit hub mode 切换已实现（特殊规则：无 archive 时颜色保持 planning）
 
 **UI 层改动（归属 user-save-binding-station）**：
 - StationPlanningPanel 分三组显示（见 user-save-binding-station T167-T171）
 - Vue 组件接收原始数据 props + 内部 composable（见 user-save-binding-station T140-T146）
+- LiveTransitToolbar 已支持 mode toggle

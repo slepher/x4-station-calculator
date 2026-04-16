@@ -8,17 +8,20 @@ import type {
   SupplyStorageFlow,
   SupplyPlanningInput,
   TransitHubViewModel,
+  SavedModule,
+  StationSettings,
   X4Module,
-  X4Ware,
-  RaceMedicalConsumption
+  X4Ware
 } from '@/types/x4'
-import type { PlayerStationRecord } from '@/types/saveArchive'
+import type { ProductionPanelSource, ProductionPanelModeSource } from '@/types/production-panel-source'
+import type { WareProductionFlow } from '@/types/production-flow'
+import { createEmptyProductionPanelModeSource } from '@/types/production-panel-source'
 import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './sectorLinkFlow'
-import { buildTransitHubViewModel } from './transitHubViewModel'
+import { buildTransitHubViewModel, buildTransitHubStorageFlows, buildTransitHubStorageModulePlans, mergeLinkFlowsIntoGroupedFlows } from './transitHubViewModel'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
-import { buildSaveBindingProductionFlows, type SaveBindingProductionDeps } from './liveProductionFlows'
-import { stationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
+import { readSaveBindingAggregatedFlows, buildTransitHubsFromBinding } from './liveProductionFlows'
+import { stationProductionFlowMap, StationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
 import { parseSectorLinkKey } from './sectorLinks'
 import type { EmpireSourceView } from './empireSourceView'
 
@@ -32,13 +35,10 @@ export interface EmpireFlowFacadeDeps {
   productionSource: Ref<'empire' | 'save-binding'>
   activeEmpire: Ref<EmpirePlan | null>
   activeBinding: Ref<SaveBindingPlan | null>
-  playerStationRecords: Ref<PlayerStationRecord[]>
   sourceView: EmpireSourceView
   modulesMap: Ref<Record<string, X4Module> | null>
   waresMap: Ref<Record<string, X4Ware> | null>
-  medicalConsumptionMap: Ref<RaceMedicalConsumption | null>
-  enforceDlcActivation: Ref<boolean>
-  isModuleDlcActive: (moduleId: string) => boolean
+  flowMap?: StationProductionFlowMap
 }
 
 export interface EmpireFlowFacade {
@@ -49,6 +49,7 @@ export interface EmpireFlowFacade {
   getSupplyPlanningInput: (sectorId: string) => SupplyPlanningInput
   getSectorInternalData: (sectorId: string) => SectorInternalData
   getSectorLinkCalc: (sectorId: string) => SectorLinkCalcEntry | null
+  getSectorFinalProductionFlows: (sectorId: string) => WareProductionFlow[]
   getStationComponentGapFlows: (stationId: string | null, activeStationId: string | null) => StationComponentGapFlows
   getTransitHubViewModel: (input: {
     sectorId: string | null
@@ -58,6 +59,20 @@ export interface EmpireFlowFacade {
     buyMultiplier?: number
     sellMultiplier?: number
   }) => TransitHubViewModel
+  getStationPanelSource: (input: {
+    stationId: string | null
+    archiveModules: SavedModule[]
+    buildingModules: SavedModule[]
+  }) => ProductionPanelSource
+  getTransitPanelSource: (input: {
+    sectorId: string | null
+    archiveModules: SavedModule[]
+    buildingModules: SavedModule[]
+    hasArchiveTradeStation: boolean
+    transitSettings: Partial<StationSettings>
+    globalSettings: StationSettings
+    mode: 'planning' | 'live'
+  }) => ProductionPanelSource
 }
 
 function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
@@ -79,14 +94,13 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
     productionSource,
     activeEmpire,
     activeBinding,
-    playerStationRecords,
     sourceView,
     modulesMap,
     waresMap,
-    medicalConsumptionMap,
-    enforceDlcActivation,
-    isModuleDlcActive
+    flowMap: inputFlowMap
   } = deps
+
+  const flowMap = inputFlowMap || stationProductionFlowMap
 
   const derivedBindingStations = sourceView.derivedBindingStations
   const productionStations = sourceView.productionStations
@@ -100,18 +114,18 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     const cache = new Map<string, GroupedFlows>()
     if (productionSource.value === 'save-binding') {
       derivedBindingStations.value.forEach((item) => {
-        const flowCache = stationProductionFlowMap.getCache(item.station.id)
+        const flowCache = flowMap.getCache(item.station.id)
         if (flowCache) {
-          cache.set(item.station.id, stationProductionFlowMap.getFilteredGrouped(item.station.id, flowCache.warePriorityLevels))
+          cache.set(item.station.id, flowMap.getFilteredGrouped(item.station.id, flowCache.warePriorityLevels))
         }
       })
       return cache
     }
     if (!activeEmpire.value) return cache
     activeEmpire.value.stations.forEach(station => {
-      const flowCache = stationProductionFlowMap.getCache(station.id)
+      const flowCache = flowMap.getCache(station.id)
       if (flowCache) {
-        cache.set(station.id, stationProductionFlowMap.getFilteredGrouped(station.id, flowCache.warePriorityLevels))
+        cache.set(station.id, flowMap.getFilteredGrouped(station.id, flowCache.warePriorityLevels))
       }
     })
     return cache
@@ -120,15 +134,17 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
   const empireGroupedFlows = computed<EmpireGroupedFlows>(() => {
     if (productionSource.value === 'save-binding') {
       const binding = activeBinding.value
-      const saveBindingDeps: SaveBindingProductionDeps = {
-        modulesMap: modulesMap.value!,
-        waresMap: waresMap.value!,
-        medicalConsumptionMap: medicalConsumptionMap.value!,
-        enforceDlcActivation: enforceDlcActivation.value,
-        isModuleDlcActive,
-        playerStationRecords: playerStationRecords.value
+      if (!binding || !waresMap.value) {
+        return createEmptyEmpireGroupedFlows()
       }
-      return buildSaveBindingProductionFlows(binding, saveBindingDeps).groupedFlows
+      const stations = derivedBindingStations.value.map((item) => item.station)
+      const transitHubs = buildTransitHubsFromBinding(binding.groups)
+      const result = readSaveBindingAggregatedFlows({
+        stations,
+        waresMap: waresMap.value,
+        getCache: (stationId) => flowMap.getCache(stationId)
+      }, { transitHubs })
+      return result.groupedFlows
     }
     
     if (!activeEmpire.value || !modulesMap.value) {
@@ -138,7 +154,7 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     return analyzeEmpireWareFlow(
       activeEmpire.value.stations,
       (stationId) => {
-        const cache = stationProductionFlowMap.getCache(stationId)
+        const cache = flowMap.getCache(stationId)
         if (!cache) return []
         return cache.productionFlows.filter(f => {
           if (f.netRate <= 0) return true
@@ -159,7 +175,7 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     sectorList.forEach((sector) => {
       const localStations = stations.filter((station) => station.sectorId === sector.id)
       const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => {
-        const cache = stationProductionFlowMap.getCache(stationId)
+        const cache = flowMap.getCache(stationId)
         if (!cache) return []
         return cache.productionFlows.filter(f => {
           if (f.netRate <= 0) return true
@@ -263,7 +279,11 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
           localStationIds
         },
         localGroupedFlows: rawGroupedFlows,
-        supplyStorageFlows: buildSupplyStorageFlows(rawGroupedFlows)
+        supplyStorageFlows: buildSupplyStorageFlows(rawGroupedFlows),
+        storageModulePlans: [],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: []
       })
     })
 
@@ -356,12 +376,43 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
       sectorId,
       planning: getSupplyPlanningInput(sectorId),
       localGroupedFlows: createEmptyEmpireGroupedFlows(),
-      supplyStorageFlows: createEmptySupplyStorageFlows()
+      supplyStorageFlows: createEmptySupplyStorageFlows(),
+      storageModulePlans: [],
+      autoIndustryModules: [],
+      autoHabitationModules: [],
+      autoInfrastructureModules: []
     }
   }
 
   function getSectorLinkCalc(sectorId: string): SectorLinkCalcEntry | null {
     return sectorLinkCalcMap.value.get(sectorId) || null
+  }
+
+  function getSectorFinalProductionFlows(sectorId: string): WareProductionFlow[] {
+    const rawGroupedFlows = rawSectorGroupedFlowsMap.value.get(sectorId) || createEmptyEmpireGroupedFlows()
+    const sectorLinkCalc = getSectorLinkCalc(sectorId)
+    const merged = mergeLinkFlowsIntoGroupedFlows(
+      rawGroupedFlows,
+      sectorLinkCalc?.solverOutput || { linkWareFlows: [], allocatedDemandBySector: [], deficitSummary: { totalDeficit: 0, deficitByNode: [], producerNodes: [] } },
+      sectorId,
+      sectors.value,
+      waresMap.value || {}
+    )
+    return merged.flows.map((flow) => ({
+      wareId: flow.wareId,
+      orderIndex: flow.orderIndex,
+      tier: flow.tier,
+      transportType: flow.transportType,
+      unitVolume: flow.unitVolume,
+      production: flow.production,
+      consumption: flow.consumption,
+      workforceConsumption: flow.workforceConsumption,
+      netRate: flow.netRate,
+      productionVolume: flow.production * flow.unitVolume,
+      consumptionVolume: flow.consumption * flow.unitVolume,
+      netVolume: flow.netRate * flow.unitVolume,
+      contributions: []
+    }))
   }
 
   function getStationComponentGapFlows(stationId: string | null, activeStationId: string | null): StationComponentGapFlows {
@@ -429,6 +480,175 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     })
   }
 
+  function getStationPanelSource(input: {
+    stationId: string | null
+    archiveModules: SavedModule[]
+    buildingModules: SavedModule[]
+  }): ProductionPanelSource {
+    const stationId = input.stationId
+    if (!stationId) {
+      return {
+        id: '',
+        entityType: 'station',
+        planning: createEmptyProductionPanelModeSource(),
+        live: createEmptyProductionPanelModeSource(),
+        liveVisualState: 'planning',
+        canUseLiveModules: false
+      }
+    }
+
+    const cache = flowMap.getCache(stationId)
+    const station = productionStations.value.find(s => s.id === stationId)
+
+    const planningMode: ProductionPanelModeSource = cache ? {
+      modules: station?.modules || [],
+      buildingModules: [],
+      autoIndustryModules: cache.autoIndustryModules,
+      autoHabitationModules: cache.autoHabitationModules,
+      autoInfrastructureModules: cache.autoInfrastructureModules,
+      productionFlows: cache.productionFlows,
+      localGroupedFlows: null,
+      solverOutput: null,
+      supplyStorageFlows: [],
+      storageModulePlans: []
+    } : createEmptyProductionPanelModeSource()
+
+    const liveMode: ProductionPanelModeSource = {
+      modules: input.archiveModules,
+      buildingModules: input.buildingModules,
+      autoIndustryModules: [],
+      autoHabitationModules: [],
+      autoInfrastructureModules: [],
+      productionFlows: flowMap.getProductionFlows(stationId),
+      localGroupedFlows: null,
+      solverOutput: null,
+      supplyStorageFlows: [],
+      storageModulePlans: []
+    }
+
+    return {
+      id: stationId,
+      entityType: 'station',
+      planning: planningMode,
+      live: liveMode,
+      liveVisualState: 'planning',
+      canUseLiveModules: input.archiveModules.length > 0
+    }
+  }
+
+  function getTransitPanelSource(input: {
+    sectorId: string | null
+    archiveModules: SavedModule[]
+    buildingModules: SavedModule[]
+    hasArchiveTradeStation: boolean
+    transitSettings: Partial<StationSettings>
+    globalSettings: StationSettings
+    mode: 'planning' | 'live'
+  }): ProductionPanelSource {
+    const sectorId = input.sectorId
+    if (!sectorId) {
+      return {
+        id: '',
+        entityType: 'transit',
+        planning: createEmptyProductionPanelModeSource(),
+        live: createEmptyProductionPanelModeSource(),
+        liveVisualState: 'planning',
+        canUseLiveModules: false
+      }
+    }
+
+    const sectorData = getSectorInternalData(sectorId)
+    const sectorLinkCalc = getSectorLinkCalc(sectorId)
+    const sectorAggregation = flowMap.getSectorAggregation(sectorId)
+
+    const effectiveSettings = {
+      racePreference: input.transitSettings.racePreference ?? input.globalSettings.racePreference,
+      resourceBufferHours: input.transitSettings.resourceBufferHours ?? input.globalSettings.resourceBufferHours,
+      primaryProductBufferHours: input.transitSettings.primaryProductBufferHours ?? input.globalSettings.primaryProductBufferHours,
+      secondaryProductBufferHours: input.transitSettings.secondaryProductBufferHours ?? input.globalSettings.secondaryProductBufferHours,
+      transportShipCapacity: input.transitSettings.transportShipCapacity ?? input.globalSettings.transportShipCapacity,
+      buyMultiplier: input.transitSettings.buyMultiplier ?? input.globalSettings.buyMultiplier,
+      sellMultiplier: input.transitSettings.sellMultiplier ?? input.globalSettings.sellMultiplier
+    }
+
+    const mergedGroupedFlows = mergeLinkFlowsIntoGroupedFlows(
+      sectorData.localGroupedFlows,
+      sectorLinkCalc?.solverOutput || { linkWareFlows: [], allocatedDemandBySector: [], deficitSummary: { totalDeficit: 0, deficitByNode: [], producerNodes: [] } },
+      sectorId,
+      sectors.value,
+      waresMap.value || {}
+    )
+
+    const storageFlows = buildTransitHubStorageFlows({
+      sectorId,
+      sectors: sectors.value,
+      stations: orderedStationsBySector.value,
+      groupedFlows: mergedGroupedFlows,
+      storageBufferHours: effectiveSettings.primaryProductBufferHours
+    })
+
+    const storageModulePlans = buildTransitHubStorageModulePlans({
+      storageFlows,
+      modulesMap: modulesMap.value || {},
+      racePreference: effectiveSettings.racePreference,
+      transportShipCapacity: effectiveSettings.transportShipCapacity
+    })
+
+    const autoInfrastructureModules = sectorAggregation?.autoInfrastructureModules || flowMap.getSectorAutoInfrastructureModules(sectorId)
+
+    const planningMode: ProductionPanelModeSource = {
+      modules: autoInfrastructureModules,
+      buildingModules: [],
+      autoIndustryModules: [],
+      autoHabitationModules: [],
+      autoInfrastructureModules: autoInfrastructureModules,
+      productionFlows: [],
+      localGroupedFlows: sectorData.localGroupedFlows,
+      solverOutput: sectorLinkCalc?.solverOutput || null,
+      supplyStorageFlows: storageFlows,
+      storageModulePlans: storageModulePlans
+    }
+
+    const liveMode: ProductionPanelModeSource = input.hasArchiveTradeStation ? {
+      modules: input.archiveModules,
+      buildingModules: input.buildingModules,
+      autoIndustryModules: [],
+      autoHabitationModules: [],
+      autoInfrastructureModules: [],
+      productionFlows: [],
+      localGroupedFlows: sectorData.localGroupedFlows,
+      solverOutput: sectorLinkCalc?.solverOutput || null,
+      supplyStorageFlows: [],
+      storageModulePlans: []
+    } : {
+      modules: planningMode.modules,
+      buildingModules: [],
+      autoIndustryModules: [],
+      autoHabitationModules: [],
+      autoInfrastructureModules: planningMode.autoInfrastructureModules,
+      productionFlows: [],
+      localGroupedFlows: sectorData.localGroupedFlows,
+      solverOutput: sectorLinkCalc?.solverOutput || null,
+      supplyStorageFlows: planningMode.supplyStorageFlows,
+      storageModulePlans: []
+    }
+
+    const liveVisualState: 'planning' | 'live' = input.mode === 'planning'
+      ? 'planning'
+      : input.hasArchiveTradeStation
+        ? 'live'
+        : 'planning'
+
+    return {
+      id: sectorId,
+      entityType: 'transit',
+      planning: planningMode,
+      live: liveMode,
+      liveVisualState,
+      canUseLiveModules: input.hasArchiveTradeStation
+    }
+  }
+
   return {
     stationFlowCache,
     empireGroupedFlows,
@@ -437,7 +657,10 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     getSupplyPlanningInput,
     getSectorInternalData,
     getSectorLinkCalc,
+    getSectorFinalProductionFlows,
     getStationComponentGapFlows,
-    getTransitHubViewModel
+    getTransitHubViewModel,
+    getStationPanelSource,
+    getTransitPanelSource
   }
 }

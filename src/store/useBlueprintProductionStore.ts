@@ -924,10 +924,38 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     getAvailableMinerals: () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane'],
     getSingleBerthThroughput: () => Math.max(1, settings.value.transportShipCapacity || 1) * 15,
 
+    getToolbarStationCode: () => '',
+    getToolbarSectorName: () => {
+      const sectorId = activeStation.value?.sectorId
+      if (!sectorId) return ''
+      const sectorData = gameData.maps.sectors[sectorId]
+      return sectorData?.name || ''
+    },
+    getToolbarSectorNameId: () => {
+      const sectorId = activeStation.value?.sectorId
+      if (!sectorId) return undefined
+      const sectorData = gameData.maps.sectors[sectorId]
+      return sectorData?.nameId
+    },
+    getToolbarStationPosition: () => undefined,
+    getToolbarSectorResources: () => {
+      const sectorId = activeStation.value?.sectorId
+      if (!sectorId) return []
+      const sectorData = gameData.maps.sectors[sectorId]
+      return (sectorData?.resources || []).map(r => r.ware)
+    },
+    getToolbarSectorSunlight: () => {
+      const sectorId = activeStation.value?.sectorId
+      if (!sectorId) return 100
+      const sectorData = gameData.maps.sectors[sectorId]
+      return Math.round((sectorData?.area?.sunlight ?? 1) * 100)
+    },
+
     getPlannedModules: () => plannedModules.value,
     getAutoModules: () => activeStationState.value.autoIndustryModules,
     getAutoHabitationModules: () => activeStationState.value.autoHabitationModules,
     getAutoInfrastructureModules: () => activeStationState.value.autoInfrastructureModules,
+    getResolvedModules: () => activeStationState.value.resolvedModules,
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
