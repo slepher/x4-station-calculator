@@ -15,7 +15,6 @@ import type {
 } from '@/types/x4'
 import type { ProductionSessionContext } from '@/types/production-context'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
-import type { ProductionPanelSource } from '@/types/production-panel-source'
 import type {
   ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
@@ -43,6 +42,7 @@ import {
 import { createEmpireFlowFacade } from './logic/empireFlowFacade'
 import { toProductionStation } from './logic/liveStationResolver'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
+import { buildTransitHubViewModel } from './logic/transitHubViewModel'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -540,7 +540,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return (hasBinding && hasSave) || (!hasBinding && hasSave)
   })
 
-  const canToggleTransit = computed(() => true)
+  const visualMode = computed<'planning' | 'live'>(() => {
+    if (mode.value === 'planning') return 'planning'
+    return stationContext.value?.hasArchive ? 'live' : 'planning'
+  })
+
+  const sessionState = computed(() => ({
+    workbenchMode: workbenchMode.value,
+    mode: mode.value,
+    visualMode: visualMode.value,
+    activeStationId: activeStationId.value,
+    activeTransitSectorId: activeTransitSectorId.value,
+    canToggle: workbenchMode.value === 'transit' ? true : canToggle.value
+  }))
 
   function toggleMode() {
     mode.value = mode.value === 'live' ? 'planning' : 'live'
@@ -777,6 +789,92 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
+
+  const transitPlanningViewModel = computed(() => {
+    const sectorId = activeTransitSectorId.value
+    if (!sectorId) {
+      return buildTransitHubViewModel({
+        sectorId: null,
+        sectors: sectors.value,
+        stations: orderedStationsBySector.value,
+        localGroupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
+        solverOutput: null,
+        waresMap: gameData.waresMap,
+        modulesMap: gameData.modulesMap,
+        racePreference: transitHubSettings.value.racePreference ?? settings.value.racePreference,
+        transportShipCapacity: transitHubSettings.value.transportShipCapacity ?? settings.value.transportShipCapacity,
+        storageBufferHours: transitHubSettings.value.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
+        buyMultiplier: transitHubSettings.value.buyMultiplier ?? settings.value.buyMultiplier,
+        sellMultiplier: transitHubSettings.value.sellMultiplier ?? settings.value.sellMultiplier
+      })
+    }
+
+    const sectorData = planningFlowFacade.getSectorInternalData(sectorId)
+    const sectorLinkCalc = planningFlowFacade.getSectorLinkCalc(sectorId)
+    return buildTransitHubViewModel({
+      sectorId,
+      sectors: sectors.value,
+      stations: orderedStationsBySector.value,
+      localGroupedFlows: sectorData.localGroupedFlows,
+      solverOutput: sectorLinkCalc?.solverOutput || null,
+      waresMap: gameData.waresMap,
+      modulesMap: gameData.modulesMap,
+      racePreference: transitHubSettings.value.racePreference ?? settings.value.racePreference,
+      transportShipCapacity: transitHubSettings.value.transportShipCapacity ?? settings.value.transportShipCapacity,
+      storageBufferHours: transitHubSettings.value.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
+      buyMultiplier: transitHubSettings.value.buyMultiplier ?? settings.value.buyMultiplier,
+      sellMultiplier: transitHubSettings.value.sellMultiplier ?? settings.value.sellMultiplier
+    })
+  })
+
+  const transitLiveViewModel = computed(() => {
+    const sectorId = activeTransitSectorId.value
+    if (!sectorId) {
+      return buildTransitHubViewModel({
+        sectorId: null,
+        sectors: sectors.value,
+        stations: orderedStationsBySector.value,
+        localGroupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
+        solverOutput: null,
+        waresMap: gameData.waresMap,
+        modulesMap: gameData.modulesMap,
+        racePreference: transitHubSettings.value.racePreference ?? settings.value.racePreference,
+        transportShipCapacity: transitHubSettings.value.transportShipCapacity ?? settings.value.transportShipCapacity,
+        storageBufferHours: transitHubSettings.value.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
+        buyMultiplier: transitHubSettings.value.buyMultiplier ?? settings.value.buyMultiplier,
+        sellMultiplier: transitHubSettings.value.sellMultiplier ?? settings.value.sellMultiplier
+      })
+    }
+
+    const sectorData = liveFlowFacade.getSectorInternalData(sectorId)
+    const sectorLinkCalc = liveFlowFacade.getSectorLinkCalc(sectorId)
+    return buildTransitHubViewModel({
+      sectorId,
+      sectors: sectors.value,
+      stations: orderedStationsBySector.value,
+      localGroupedFlows: sectorData.localGroupedFlows,
+      solverOutput: sectorLinkCalc?.solverOutput || null,
+      waresMap: gameData.waresMap,
+      modulesMap: gameData.modulesMap,
+      racePreference: transitHubSettings.value.racePreference ?? settings.value.racePreference,
+      transportShipCapacity: transitHubSettings.value.transportShipCapacity ?? settings.value.transportShipCapacity,
+      storageBufferHours: transitHubSettings.value.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
+      buyMultiplier: transitHubSettings.value.buyMultiplier ?? settings.value.buyMultiplier,
+      sellMultiplier: transitHubSettings.value.sellMultiplier ?? settings.value.sellMultiplier
+    })
+  })
+
+  const transitState = computed(() => {
+    const currentAggregation = mode.value === 'live'
+      ? transitLiveViewModel.value
+      : transitPlanningViewModel.value
+    return {
+      sectorId: activeTransitSectorId.value,
+      groupedFlows: currentAggregation.groupedFlows,
+      storageFlows: currentAggregation.storageFlows,
+      storageModulePlans: transitPlanningViewModel.value.storageModulePlans
+    }
+  })
 
   const wares = computed(() => gameData.waresMap)
 
@@ -1127,62 +1225,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     sellMultiplier?: number
   }): TransitHubViewModel {
     return flowFacade.getTransitHubViewModel(input)
-  }
-
-  function getPlanningStationPanelSource(stationId: string | null): ProductionPanelSource {
-    const ctx = stationContext.value
-    return planningFlowFacade.getStationPanelSource({
-      stationId,
-      archiveModules: ctx?.archiveModules || [],
-      buildingModules: ctx?.buildingModules || []
-    })
-  }
-
-  function getLiveStationPanelSource(stationId: string | null): ProductionPanelSource {
-    const ctx = stationContext.value
-    return liveFlowFacade.getStationPanelSource({
-      stationId,
-      archiveModules: ctx?.archiveModules || [],
-      buildingModules: ctx?.buildingModules || []
-    })
-  }
-
-  function getActiveStationPanelSource(stationId: string | null): ProductionPanelSource {
-    return mode.value === 'live'
-      ? getLiveStationPanelSource(stationId)
-      : getPlanningStationPanelSource(stationId)
-  }
-
-  function getPlanningTransitPanelSource(sectorId: string | null): ProductionPanelSource {
-    const ctx = stationContext.value
-    return planningFlowFacade.getTransitPanelSource({
-      sectorId,
-      archiveModules: ctx?.archiveModules || [],
-      buildingModules: ctx?.buildingModules || [],
-      hasArchiveTradeStation: ctx?.hasArchive ?? false,
-      transitSettings: transitHubSettings.value,
-      globalSettings: settings.value,
-      mode: 'planning'
-    })
-  }
-
-  function getLiveTransitPanelSource(sectorId: string | null): ProductionPanelSource {
-    const ctx = stationContext.value
-    return liveFlowFacade.getTransitPanelSource({
-      sectorId,
-      archiveModules: ctx?.archiveModules || [],
-      buildingModules: ctx?.buildingModules || [],
-      hasArchiveTradeStation: ctx?.hasArchive ?? false,
-      transitSettings: transitHubSettings.value,
-      globalSettings: settings.value,
-      mode: 'live'
-    })
-  }
-
-  function getActiveTransitPanelSource(sectorId: string | null): ProductionPanelSource {
-    return mode.value === 'live'
-      ? getLiveTransitPanelSource(sectorId)
-      : getPlanningTransitPanelSource(sectorId)
   }
 
   function updateBindingStationPlan(
@@ -1559,6 +1601,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getWorkbenchMode: () => activeTransitSectorId.value ? 'transit' : (activeStation.value ? 'station' : 'overview'),
     getActiveStationId: () => activeStationId.value,
     getActiveTransitSectorId: () => activeTransitSectorId.value,
+    getSessionState: () => sessionState.value,
+    getContextState: () => ({
+      hasBinding: stationContext.value?.hasBinding ?? false,
+      hasArchive: stationContext.value?.hasArchive ?? false,
+      stationCode: stationContext.value?.stationCode || '',
+      sectorName: stationContext.value?.sectorName || '',
+      sectorNameId: stationContext.value?.sectorNameId,
+      stationPosition: stationContext.value?.position,
+      sectorResources: stationContext.value?.sectorResources || [],
+      sectorSunlight: stationContext.value?.sectorSunlight ?? 100,
+      archiveModules: stationContext.value?.archiveModules || [],
+      buildingModules: stationContext.value?.buildingModules || []
+    }),
+    getTransitState: () => transitState.value,
 
     getTitleModel: () => ({
       value: activeBinding.value?.bindingName || activeBindingName.value || '',
@@ -1607,16 +1663,26 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       return stationContext.value?.sectorSunlight ?? 100
     },
 
-    getPlannedModules: () => plannedModules.value,
-    getAutoModules: () => activeStationState.value.autoIndustryModules,
-    getAutoHabitationModules: () => activeStationState.value.autoHabitationModules,
-    getAutoInfrastructureModules: () => activeStationState.value.autoInfrastructureModules,
-    getResolvedModules: () => activeStationState.value.resolvedModules,
+    getPlannedModules: () => workbenchMode.value === 'transit'
+      ? activeStationState.value.autoInfrastructureModules
+      : plannedModules.value,
+    getAutoModules: () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoIndustryModules,
+    getAutoHabitationModules: () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoHabitationModules,
+    getAutoInfrastructureModules: () => workbenchMode.value === 'transit'
+      ? transitPlanningViewModel.value.supplyBuildModules
+      : activeStationState.value.autoInfrastructureModules,
+    getResolvedModules: () => workbenchMode.value === 'transit'
+      ? transitPlanningViewModel.value.supplyBuildModules
+      : activeStationState.value.resolvedModules,
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
-    getProductionFlows: () => productionFlows.value,
-    getWarePriorityLevels: () => warePriorityLevels.value,
+    getProductionFlows: () => workbenchMode.value === 'transit'
+      ? (visualMode.value === 'live' && stationContext.value?.hasArchive
+          ? liveFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || '')
+          : planningFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || ''))
+      : productionFlows.value,
+    getWarePriorityLevels: () => workbenchMode.value === 'transit' ? {} : warePriorityLevels.value,
     getWareflowSettings: () => ({
       resourceBufferHours: settings.value.resourceBufferHours,
       primaryProductBufferHours: settings.value.primaryProductBufferHours,
@@ -1630,6 +1696,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getEmpireGaps: () => empireGapsComputed.value,
 
     getStationAnalysis: () => {
+      if (workbenchMode.value === 'transit') {
+        return {
+          totalCost: 0,
+          totalVolume: 0,
+          totalTime: 0,
+          totalCapacity: 0,
+          totalNeeded: 0,
+          playerHQNeeded: 0,
+          totalWorkerDiff: 0,
+          summaryItems: [],
+          moduleGroups: []
+        }
+      }
       const allModules = activeStationState.value.resolvedModules
       if (allModules.length === 0) {
         return {
@@ -1658,8 +1737,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       manualWorkforce: settings.value.manualWorkforce,
       useHQ: settings.value.useHQ
     }),
-    getCurrentEfficiency: () => currentEfficiency.value,
-    getActualWorkforce: () => actualWorkforce.value,
+    getCurrentEfficiency: () => workbenchMode.value === 'transit' ? 0 : currentEfficiency.value,
+    getActualWorkforce: () => workbenchMode.value === 'transit' ? 0 : actualWorkforce.value,
     getBuildPriceMultiplier: () => buildPriceMultiplier.value,
 
     isOverview: () => !activeStation.value && !activeTransitSectorId.value,
@@ -1744,6 +1823,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     updateManualWorkforce: (value: number) => updateStationSettingsDirect('manualWorkforce', value),
     updateWorkforceAuto: (value: boolean) => updateStationSettingsDirect('workforceAuto', value),
     updateUseHQ: (value: boolean) => updateStationSettingsDirect('useHQ', value),
+    updateTransitHubSettings: (patch: Partial<StationSettings>) => updateTransitHubSettings(patch),
 
     openImport: () => { importModalOpen.value = true },
     applyImportedStationPayload: (stationId: string, payload: ImportPayload) => {
@@ -1799,7 +1879,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     mode,
     initialMode,
     canToggle,
-    canToggleTransit,
     toggleMode,
     updateStationSettings,
     updateStationModules,
@@ -1849,12 +1928,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     clearAll: clearAllModules,
     workbench,
     importModalOpen,
-    getPlanningStationPanelSource,
-    getLiveStationPanelSource,
-    getActiveStationPanelSource,
-    getPlanningTransitPanelSource,
-    getLiveTransitPanelSource,
-    getActiveTransitPanelSource,
     planningFlowFacade,
     liveFlowFacade,
     planningSourceView,

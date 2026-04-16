@@ -3,9 +3,7 @@ import { computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { EmpireGroupedFlows, SectorPlan, StationPlan } from '@/types/x4'
-import type { SolveMultiWareByLinkOutput } from '@/store/logic/sectorLinkFlow'
-import { useTransitHubFlowGrouping } from '@/components/empire/composables/useTransitHubFlowGrouping'
+import type { SupplyStorageFlow, TransitHubGroupedFlows } from '@/types/x4'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -17,26 +15,18 @@ import TransitHubTransportView from './TransitHubTransportView.vue'
 const gameData = useGameDataStore()
 const { t } = useI18n()
 const { translateWare } = useX4I18n()
-const { computeTransitHubGrouping } = useTransitHubFlowGrouping()
 
 type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
 const props = withDefaults(defineProps<{
-  sectorId: string | null
-  sectors: SectorPlan[]
-  stations: StationPlan[]
-  localGroupedFlows: EmpireGroupedFlows
-  solverOutput: SolveMultiWareByLinkOutput | null
+  groupedFlows: TransitHubGroupedFlows
+  storageFlows: SupplyStorageFlow[]
   viewMode?: SharedViewMode
-  racePreference?: string
-  transportShipCapacity?: number
   buyMultiplier?: number
   sellMultiplier?: number
   productBufferHours?: number
 }>(), {
   viewMode: 'quantity',
-  racePreference: 'argon',
-  transportShipCapacity: 10000,
   buyMultiplier: 0.5,
   sellMultiplier: 0.5,
   productBufferHours: 12
@@ -69,34 +59,8 @@ const localProductBufferHours = computed({
   set: (value) => emit('update:productBufferHours', value)
 })
 
-const transitHubDerived = computed(() => {
-  if (!gameData.waresMap || !gameData.modulesMap) {
-    return {
-      groupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
-      storageFlows: [],
-      storageModulePlans: []
-    }
-  }
-
-  return computeTransitHubGrouping({
-    sectorId: props.sectorId,
-    sectors: props.sectors,
-    stations: props.stations,
-    localGroupedFlows: props.localGroupedFlows,
-    solverOutput: props.solverOutput,
-    waresMap: gameData.waresMap,
-    modulesMap: gameData.modulesMap,
-    racePreference: props.racePreference,
-    transportShipCapacity: props.transportShipCapacity,
-    storageBufferHours: props.productBufferHours,
-    buyMultiplier: props.buyMultiplier,
-    sellMultiplier: props.sellMultiplier
-  })
-})
-
-const groupedFlows = computed(() => transitHubDerived.value.groupedFlows)
-const storageFlows = computed(() => transitHubDerived.value.storageFlows)
-const storageModulePlans = computed(() => transitHubDerived.value.storageModulePlans)
+const groupedFlows = computed(() => props.groupedFlows)
+const storageFlows = computed(() => props.storageFlows)
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`
@@ -204,10 +168,6 @@ const hasTransportData = computed(() =>
   transportItems.value.some((item) => item.totalTransportVolume > 0)
 )
 
-defineExpose({
-  storageModulePlans,
-  storageFlows
-})
 </script>
 
 <template>

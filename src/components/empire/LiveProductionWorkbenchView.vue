@@ -9,11 +9,7 @@ import { useProductionToolbarPresenter } from '@/components/empire/presenters/us
 import { useProductionPlanningPresenter } from '@/components/empire/presenters/useProductionPlanningPresenter'
 import { useProductionWareflowPresenter } from '@/components/empire/presenters/useProductionWareflowPresenter'
 import { useProductionDashboardPresenter } from '@/components/empire/presenters/useProductionDashboardPresenter'
-import { useTransitPlanningPresenter } from '@/components/empire/presenters/useTransitPlanningPresenter'
-import { useTransitWareflowPresenter } from '@/components/empire/presenters/useTransitWareflowPresenter'
-import { useTransitDashboardPresenter } from '@/components/empire/presenters/useTransitDashboardPresenter'
 import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmpireWareFlowDerived'
-import type { TransitPresenterContract } from '@/types/transit-presenter-contract'
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
@@ -78,29 +74,8 @@ const empireWareFlowDerived = useEmpireWareFlowDerived({
   waresMap: computed(() => gameData.waresMap || {})
 })
 
-const transitPresenterContract: TransitPresenterContract = {
-  getActiveTransitSectorId: () => liveStore.activeTransitSectorId,
-  getTransitMode: () => liveStore.mode,
-  getPlanningTransitPanelSource: (sectorId) => liveStore.getPlanningTransitPanelSource(sectorId),
-  getLiveTransitPanelSource: (sectorId) => liveStore.getLiveTransitPanelSource(sectorId),
-  getActiveTransitPanelSource: (sectorId) => liveStore.getActiveTransitPanelSource(sectorId),
-  getTransitHasArchiveTradeStation: () => liveStore.stationContext?.hasArchive ?? false,
-  getTransitSettings: () => liveStore.transitHubSettings,
-  getGlobalSettings: () => liveStore.settings,
-  getBuildPriceMultiplier: () => liveStore.buildPriceMultiplier,
-  getUseHQ: () => liveStore.settings.useHQ,
-  updateTransitHubSettings: (patch) => liveStore.updateTransitHubSettings(patch),
-  updateBuildPriceMultiplier: (value) => dashboardPresenter.emits.updateBuildPriceMultiplier(value),
-  updateUseHQ: (value) => dashboardPresenter.emits.updateUseHQ(value),
-  toggleMode: () => liveStore.toggleMode()
-}
-
-const transitPlanningPresenter = useTransitPlanningPresenter(transitPresenterContract)
-const transitWareflowPresenter = useTransitWareflowPresenter(transitPresenterContract)
-const transitDashboardPresenter = useTransitDashboardPresenter(transitPresenterContract)
-
 const showArchiveModuleList = computed(() => {
-  return mode.value === 'live' && stationContext.value?.hasArchive
+  return planningPresenter.props.visualMode.value === 'live' && planningPresenter.props.hasArchive.value
 })
 </script>
 
@@ -142,10 +117,10 @@ const showArchiveModuleList = computed(() => {
     :settings="liveStore.transitHubSettings"
     :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
-    :mode="transitPlanningPresenter.props.mode.value"
-    :visual-mode="transitPlanningPresenter.props.visualMode.value"
+    :mode="mode"
+    :visual-mode="planningPresenter.props.visualMode.value"
     :can-toggle="true"
-    :has-archive-trade-station="transitPlanningPresenter.props.hasArchiveTradeStation.value"
+    :has-archive-trade-station="planningPresenter.props.hasArchive.value"
     @update-title="toolbarPresenter.emits.updateTitle"
     @update-race-preference="(v) => liveStore.updateTransitHubSettings({ racePreference: v })"
     @toggle-mode="liveStore.toggleMode"
@@ -194,44 +169,39 @@ const showArchiveModuleList = computed(() => {
       <div class="col-span-12 lg:col-span-3">
         <ArchiveModuleList
           v-if="showArchiveModuleList"
-          :modules="transitPlanningPresenter.props.liveModules.value"
-          :building-modules="transitPlanningPresenter.props.liveBuildingModules.value"
+          :modules="planningPresenter.props.liveModules.value"
+          :building-modules="planningPresenter.props.liveBuildingModules.value"
         />
         <TransitHubBuildPanel
           v-else
-          :modules="transitPlanningPresenter.props.plannedModules.value"
-          :module-plans="transitPlanningPresenter.props.modulePlans.value"
+          :modules="planningPresenter.props.autoInfrastructureModules.value"
+          :module-plans="planningPresenter.props.modulePlans.value"
         />
       </div>
 
       <div class="col-span-12 lg:col-span-5">
         <TransitHubCenterDashboard
-          :sector-id="transitWareflowPresenter.props.sectorId.value"
-          :sectors="liveStore.sectors"
-          :stations="liveStore.orderedStationsBySector"
-          :local-grouped-flows="transitWareflowPresenter.props.localGroupedFlows.value || { flows: [], empireGroups: { operations: [], supply: [] } }"
-          :solver-output="transitWareflowPresenter.props.solverOutput.value"
-          :view-mode="transitWareflowPresenter.props.viewMode.value"
-          :race-preference="liveStore.transitHubSettings.racePreference ?? liveStore.settings.racePreference"
-          :transport-ship-capacity="liveStore.settings.transportShipCapacity"
-          :buy-multiplier="transitWareflowPresenter.props.buyMultiplier.value"
-          :sell-multiplier="transitWareflowPresenter.props.sellMultiplier.value"
-          :product-buffer-hours="transitWareflowPresenter.props.productBufferHours.value"
-          @update:view-mode="transitWareflowPresenter.emits.updateViewMode"
-          @update:buy-multiplier="transitWareflowPresenter.emits.updateBuyMultiplier"
-          @update:sell-multiplier="transitWareflowPresenter.emits.updateSellMultiplier"
-          @update:product-buffer-hours="transitWareflowPresenter.emits.updateProductBufferHours"
+          :grouped-flows="wareflowPresenter.props.groupedFlows.value"
+          :storage-flows="wareflowPresenter.props.storageFlows.value"
+          :view-mode="wareflowPresenter.props.viewMode.value"
+          :buy-multiplier="wareflowPresenter.props.settings.value.buyMultiplier"
+          :sell-multiplier="wareflowPresenter.props.settings.value.sellMultiplier"
+          :product-buffer-hours="wareflowPresenter.props.settings.value.primaryProductBufferHours"
+          @update:view-mode="wareflowPresenter.emits.updateViewMode"
+          @update:buy-multiplier="wareflowPresenter.emits.updateBuyMultiplier"
+          @update:sell-multiplier="wareflowPresenter.emits.updateSellMultiplier"
+          @update:product-buffer-hours="wareflowPresenter.emits.updatePrimaryProductBufferHours"
         />
       </div>
 
       <div class="col-span-12 lg:col-span-4">
         <TransitHubMaterialsPanel
-          :modules="transitDashboardPresenter.props.activeModules.value"
-          :building-modules="transitDashboardPresenter.props.activeBuildingModules.value"
-          :build-price-multiplier="transitDashboardPresenter.props.buildPriceMultiplier.value"
-          :useHQ="transitDashboardPresenter.props.useHQ.value"
-          @update-build-price-multiplier="transitDashboardPresenter.emits.updateBuildPriceMultiplier"
-          @update-use-hq="transitDashboardPresenter.emits.updateUseHQ"
+          :modules="dashboardPresenter.props.activeModules.value"
+          :building-modules="dashboardPresenter.props.activeBuildingModules.value"
+          :build-price-multiplier="dashboardPresenter.props.buildPriceMultiplier.value"
+          :useHQ="dashboardPresenter.props.settings.value.useHQ"
+          @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
+          @update-use-hq="dashboardPresenter.emits.updateUseHQ"
         />
       </div>
     </div>

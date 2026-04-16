@@ -895,6 +895,36 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     getWorkbenchMode: () => activeStation.value ? 'station' : 'overview',
     getActiveStationId: () => activeStationId.value,
     getActiveTransitSectorId: () => null,
+    getSessionState: () => ({
+      workbenchMode: activeStation.value ? 'station' : 'overview',
+      mode: 'planning',
+      visualMode: 'planning',
+      activeStationId: activeStationId.value,
+      activeTransitSectorId: null,
+      canToggle: false
+    }),
+    getContextState: () => {
+      const sectorId = activeStation.value?.sectorId
+      const sectorData = sectorId ? gameData.maps.sectors[sectorId] : null
+      return {
+        hasBinding: !!activeStation.value,
+        hasArchive: false,
+        stationCode: '',
+        sectorName: sectorData?.name || '',
+        sectorNameId: sectorData?.nameId,
+        stationPosition: undefined,
+        sectorResources: (sectorData?.resources || []).map(r => r.ware),
+        sectorSunlight: Math.round((sectorData?.area?.sunlight ?? 1) * 100),
+        archiveModules: [],
+        buildingModules: []
+      }
+    },
+    getTransitState: () => ({
+      sectorId: null,
+      groupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
+      storageFlows: [],
+      storageModulePlans: []
+    }),
 
     getTitleModel: () => ({
       value: activeEmpire.value?.name || '',
@@ -1091,6 +1121,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateManualWorkforce: (value: number) => updateStationSettingsDirect('manualWorkforce', value),
     updateWorkforceAuto: (value: boolean) => updateStationSettingsDirect('workforceAuto', value),
     updateUseHQ: (value: boolean) => updateStationSettingsDirect('useHQ', value),
+    updateTransitHubSettings: () => {},
 
     openImport: () => { importModalOpen.value = true },
     applyImportedStationPayload: (stationId: string, payload: ImportPayload) => {

@@ -1,4 +1,11 @@
-import type { StationType, SavedModule, StationSettings } from './x4'
+import type {
+  StationType,
+  SavedModule,
+  StationSettings,
+  SupplyStorageFlow,
+  TransitHubGroupedFlows,
+  TransitHubStorageModulePlan
+} from './x4'
 import type { WareFlowViewMode, EmpireGapItem } from './production-ui'
 import type { WareProductionFlow } from './production-flow'
 
@@ -27,6 +34,35 @@ export interface ProductionAddModuleOptions {
   wareId?: string
 }
 
+export interface ProductionWorkbenchSessionState {
+  workbenchMode: 'overview' | 'station' | 'transit'
+  mode: 'planning' | 'live'
+  visualMode: 'planning' | 'live'
+  activeStationId: string | null
+  activeTransitSectorId: string | null
+  canToggle: boolean
+}
+
+export interface ProductionWorkbenchContextState {
+  hasBinding: boolean
+  hasArchive: boolean
+  stationCode: string
+  sectorName: string
+  sectorNameId?: string
+  stationPosition?: { x: number; y: number; z: number }
+  sectorResources: string[]
+  sectorSunlight: number
+  archiveModules: SavedModule[]
+  buildingModules: SavedModule[]
+}
+
+export interface ProductionWorkbenchTransitState {
+  sectorId: string | null
+  groupedFlows: TransitHubGroupedFlows
+  storageFlows: SupplyStorageFlow[]
+  storageModulePlans: TransitHubStorageModulePlan[]
+}
+
 export type ProductionRemoveModuleTarget =
   | { index: number; source?: 'planning' }
   | { moduleId: string; source: 'gap'; wareId?: string }
@@ -41,6 +77,9 @@ export interface ProductionWorkbenchStoreContract {
   getWorkbenchMode(): 'overview' | 'station' | 'transit'
   getActiveStationId(): string | null
   getActiveTransitSectorId(): string | null
+  getSessionState(): ProductionWorkbenchSessionState
+  getContextState(): ProductionWorkbenchContextState
+  getTransitState(): ProductionWorkbenchTransitState
 
   getTitleModel(): { value: string; placeholder: string }
   getToolbarStation(): { id: string; name: string; type: StationType; count: number; minerals: string[] } | null
@@ -145,6 +184,7 @@ export interface ProductionWorkbenchStoreContract {
   updateManualWorkforce(value: number): void
   updateWorkforceAuto(value: boolean): void
   updateUseHQ(value: boolean): void
+  updateTransitHubSettings(patch: Partial<StationSettings>): void
 
   openImport(): void
   applyImportedStationPayload(stationId: string, payload: ImportPayload): void
