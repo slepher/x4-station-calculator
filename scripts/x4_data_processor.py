@@ -12,13 +12,13 @@ try:
     from processor.i18n import get_i18n_registry
     from processor.path_utils import get_library_xml
     from processor.versioning import get_target_versions, load_version_config, merge_version_config
-    from processor.map.service import process_map_for_version
+    from processor.step1_map.service import process_map_for_version
     from processor.dlc_tag import build_ware_dlc_tag_map
 except ModuleNotFoundError:
     from scripts.processor.i18n import get_i18n_registry  # type: ignore
     from scripts.processor.path_utils import get_library_xml  # type: ignore
     from scripts.processor.versioning import get_target_versions, load_version_config, merge_version_config  # type: ignore
-    from scripts.processor.map.service import process_map_for_version  # type: ignore
+    from scripts.processor.step1_map.service import process_map_for_version  # type: ignore
     from scripts.processor.dlc_tag import build_ware_dlc_tag_map  # type: ignore
 
 # =============================================================================

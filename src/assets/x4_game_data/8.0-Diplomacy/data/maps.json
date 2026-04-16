@@ -3947,7 +3947,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000014073989167353207,
+        "scale_per_radius": 1.4073989167353207e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -4378,7 +4378,7 @@
           "x": -0.5,
           "y": 0
         },
-        "scale_per_radius": 0.0000024320053647929932,
+        "scale_per_radius": 2.4320053647929932e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -4837,7 +4837,7 @@
         {
           "ware": "rawscrap",
           "reserve": 14896,
-          "respawn": 213,
+          "respawn": 213.0,
           "replay_reserve": 14898,
           "replay_respawn": 213,
           "rating": 1,
@@ -4896,7 +4896,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000003904096081507416,
+        "scale_per_radius": 3.904096081507416e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -5237,12 +5237,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004513201377875215,
+        "scale_per_radius": 4.513201377875215e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -5514,12 +5514,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.00000372131341941525,
+        "scale_per_radius": 3.72131341941525e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -5731,7 +5731,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 9.870439439033152e-7,
+        "scale_per_radius": 9.870439439033152e-07,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -6159,7 +6159,7 @@
         {
           "ware": "nividium",
           "reserve": 12755,
-          "respawn": 106,
+          "respawn": 106.0,
           "replay_reserve": 27491,
           "replay_respawn": 229,
           "rating": 2,
@@ -6228,7 +6228,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000035683562304591383,
+        "scale_per_radius": 3.5683562304591383e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -6346,12 +6346,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000035259409914712588,
+        "scale_per_radius": 3.5259409914712588e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -6516,7 +6516,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000003925444604547657,
+        "scale_per_radius": 3.925444604547657e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -6532,7 +6532,7 @@
             "y": 0,
             "z": 15.5868530273,
             "sx": 0.5338604662184814,
-            "sy": -0.0000611853281178921
+            "sy": -6.11853281178921e-05
           }
         },
         "tzonecluster_06_sector001shcon12_gatezone_macro": {
@@ -6817,7 +6817,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.000003524000941174311,
+        "scale_per_radius": 3.524000941174311e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -7099,12 +7099,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004688706546142699,
+        "scale_per_radius": 4.688706546142699e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -7243,12 +7243,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003633181860794153,
+        "scale_per_radius": 3.633181860794153e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -7610,12 +7610,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003449341254818066,
+        "scale_per_radius": 3.449341254818066e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -7920,12 +7920,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004999214489785773,
+        "scale_per_radius": 4.999214489785773e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -8158,12 +8158,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004040103014682397,
+        "scale_per_radius": 4.040103014682397e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -8571,12 +8571,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004373522442047991,
+        "scale_per_radius": 4.373522442047991e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -8836,12 +8836,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000005144502994979286,
+        "scale_per_radius": 5.144502994979286e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -9172,7 +9172,7 @@
       "owner": "argon",
       "owner_color": "#0069B3",
       "area": {
-        "sunlight": 1,
+        "sunlight": 1.0,
         "economy": 0.75,
         "security": 0.75,
         "tags": [
@@ -9195,12 +9195,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000051473485019373905,
+        "scale_per_radius": 5.1473485019373905e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -9476,7 +9476,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.0000033606722016672232,
+        "scale_per_radius": 3.3606722016672232e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -9885,7 +9885,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000033944050134062615,
+        "scale_per_radius": 3.3944050134062615e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -10155,12 +10155,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004036631878806086,
+        "scale_per_radius": 4.036631878806086e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -10420,7 +10420,7 @@
       "owner": "xenon",
       "owner_color": "#B30000",
       "area": {
-        "sunlight": 1,
+        "sunlight": 1.0,
         "economy": 0.25,
         "security": 0.75,
         "tags": [
@@ -10443,12 +10443,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000030909810157416735,
+        "scale_per_radius": 3.0909810157416735e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -10620,7 +10620,7 @@
         {
           "ware": "nividium",
           "reserve": 166140,
-          "respawn": 989,
+          "respawn": 989.0,
           "replay_reserve": 58688,
           "replay_respawn": 349,
           "rating": 3,
@@ -10683,12 +10683,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003875191797792179,
+        "scale_per_radius": 3.875191797792179e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -11256,7 +11256,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000003596953385625374,
+        "scale_per_radius": 3.596953385625374e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -11631,7 +11631,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000033268309627676257,
+        "scale_per_radius": 3.3268309627676257e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -11953,12 +11953,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004167433796561358,
+        "scale_per_radius": 4.167433796561358e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -12218,7 +12218,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.000003085731164377132,
+        "scale_per_radius": 3.085731164377132e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -12500,7 +12500,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000002643874407092999,
+        "scale_per_radius": 2.643874407092999e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -12686,12 +12686,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004123371921357956,
+        "scale_per_radius": 4.123371921357956e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -13024,12 +13024,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004254800110470755,
+        "scale_per_radius": 4.254800110470755e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -13188,12 +13188,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003206309048386968,
+        "scale_per_radius": 3.206309048386968e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -13538,7 +13538,7 @@
           "raw_sector_pos": {
             "x": 0,
             "z": -72000,
-            "sx": 0,
+            "sx": 0.0,
             "sy": 0.2308542514838617
           },
           "zone_id": null
@@ -13833,7 +13833,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000004557250452294531,
+        "scale_per_radius": 4.557250452294531e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -14160,7 +14160,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000028112909529650825,
+        "scale_per_radius": 2.8112909529650825e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -14358,7 +14358,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000003881757904721397,
+        "scale_per_radius": 3.881757904721397e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -14585,7 +14585,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000032403601694978967,
+        "scale_per_radius": 3.2403601694978967e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -14798,12 +14798,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000026756511993631588,
+        "scale_per_radius": 2.6756511993631588e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -14829,7 +14829,7 @@
             "x": -15.9301757812,
             "y": 0,
             "z": 118220.21875,
-            "sx": -0.000042623593935033725,
+            "sx": -4.2623593935033725e-05,
             "sy": -0.14507439332817032
           }
         },
@@ -15020,9 +15020,9 @@
             "z": 10628
           },
           "rotation": {
-            "qx": 0,
+            "qx": 0.0,
             "qy": 0.573576,
-            "qz": 0,
+            "qz": 0.0,
             "qw": 0.819152
           },
           "boundary": {
@@ -15159,12 +15159,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003917492327077155,
+        "scale_per_radius": 3.917492327077155e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -15567,7 +15567,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.000002699364572224784,
+        "scale_per_radius": 2.699364572224784e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -15938,7 +15938,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000003586598500783663,
+        "scale_per_radius": 3.586598500783663e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -16276,12 +16276,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000045274675846587295,
+        "scale_per_radius": 4.5274675846587295e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -16414,12 +16414,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003509817865071813,
+        "scale_per_radius": 3.509817865071813e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -16530,8 +16530,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -16598,7 +16598,7 @@
         {
           "ware": "rawscrap",
           "reserve": 12831,
-          "respawn": 183,
+          "respawn": 183.0,
           "replay_reserve": 47306,
           "replay_respawn": 676,
           "rating": 1,
@@ -16644,7 +16644,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000035429477302031436,
+        "scale_per_radius": 3.5429477302031436e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -17016,7 +17016,7 @@
         {
           "ware": "nividium",
           "reserve": 23245,
-          "respawn": 138,
+          "respawn": 138.0,
           "replay_reserve": 26294,
           "replay_respawn": 157,
           "rating": 2,
@@ -17036,7 +17036,7 @@
         {
           "ware": "rawscrap",
           "reserve": 14817,
-          "respawn": 212,
+          "respawn": 212.0,
           "replay_reserve": 30825,
           "replay_respawn": 440,
           "rating": 1,
@@ -17094,7 +17094,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000003028516256996194,
+        "scale_per_radius": 3.028516256996194e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -17325,12 +17325,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003843654754429175,
+        "scale_per_radius": 3.843654754429175e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -17589,7 +17589,8 @@
           "theoretical_reserve": 71458,
           "theoretical_respawn": 1787
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_34_sector001_macro": {
       "id": "cluster_34_sector001_macro",
@@ -17622,12 +17623,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000038891004469523715,
+        "scale_per_radius": 3.8891004469523715e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -17889,7 +17890,7 @@
       "owner": "holyorder",
       "owner_color": "#FF99FF",
       "area": {
-        "sunlight": 1,
+        "sunlight": 1.0,
         "economy": 0.25,
         "security": 0.75,
         "tags": [
@@ -17912,12 +17913,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004432332910390102,
+        "scale_per_radius": 4.432332910390102e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -18006,7 +18007,7 @@
           "raw_sector_pos": {
             "x": 0,
             "z": -100000,
-            "sx": 0,
+            "sx": 0.0,
             "sy": 0.4432332910390102
           },
           "zone_id": null
@@ -18121,12 +18122,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004254800110470755,
+        "scale_per_radius": 4.254800110470755e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -18330,12 +18331,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000005247950653492765,
+        "scale_per_radius": 5.247950653492765e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -18648,12 +18649,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004846455302008407,
+        "scale_per_radius": 4.846455302008407e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -18892,7 +18893,7 @@
         {
           "ware": "nividium",
           "reserve": 150995,
-          "respawn": 473,
+          "respawn": 473.0,
           "replay_reserve": 124360,
           "replay_respawn": 388,
           "rating": 3,
@@ -18955,12 +18956,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000037567799202603934,
+        "scale_per_radius": 3.7567799202603934e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -19068,7 +19069,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_40_sector001_macro": {
       "id": "cluster_40_sector001_macro",
@@ -19101,12 +19103,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003961721545277722,
+        "scale_per_radius": 3.961721545277722e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -19221,8 +19223,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         }
@@ -19314,12 +19316,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004249244880739759,
+        "scale_per_radius": 4.249244880739759e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -19408,7 +19410,7 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 70200,
-            "sx": 0,
+            "sx": 0.0,
             "sy": -0.2982969906279311
           },
           "zone_id": null
@@ -19510,7 +19512,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.0000035606514729629636,
+        "scale_per_radius": 3.5606514729629636e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -19668,7 +19670,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000033606722016672232,
+        "scale_per_radius": 3.3606722016672232e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -19767,8 +19769,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         }
@@ -19811,12 +19813,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004550534413989296,
+        "scale_per_radius": 4.550534413989296e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -19986,12 +19988,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004680110155955738,
+        "scale_per_radius": 4.680110155955738e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -20091,8 +20093,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         }
@@ -20130,7 +20132,7 @@
         {
           "ware": "nividium",
           "reserve": 49675,
-          "respawn": 296,
+          "respawn": 296.0,
           "replay_reserve": 109764,
           "replay_respawn": 653,
           "rating": 2,
@@ -20193,12 +20195,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003826397422250426,
+        "scale_per_radius": 3.826397422250426e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -20287,8 +20289,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -20455,12 +20457,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003917916799173506,
+        "scale_per_radius": 3.917916799173506e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -20624,7 +20626,7 @@
         {
           "ware": "nividium",
           "reserve": 39410,
-          "respawn": 235,
+          "respawn": 235.0,
           "replay_reserve": 180649,
           "replay_respawn": 1076,
           "rating": 2,
@@ -20687,12 +20689,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004446475046953378,
+        "scale_per_radius": 4.446475046953378e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -20897,7 +20899,7 @@
         {
           "ware": "nividium",
           "reserve": 39320,
-          "respawn": 234,
+          "respawn": 234.0,
           "replay_reserve": 180703,
           "replay_respawn": 1075,
           "rating": 2,
@@ -20960,12 +20962,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000002155407353463432,
+        "scale_per_radius": 2.155407353463432e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -21185,12 +21187,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000051473485019373905,
+        "scale_per_radius": 5.1473485019373905e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -21424,7 +21426,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000003881757904721397,
+        "scale_per_radius": 3.881757904721397e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -21603,7 +21605,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000028731060573730116,
+        "scale_per_radius": 2.8731060573730116e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -21737,7 +21739,7 @@
         {
           "ware": "nividium",
           "reserve": 52875,
-          "respawn": 315,
+          "respawn": 315.0,
           "replay_reserve": 60160,
           "replay_respawn": 358,
           "rating": 3,
@@ -21801,12 +21803,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003325825260317619,
+        "scale_per_radius": 3.325825260317619e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -22086,12 +22088,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000031422517580328137,
+        "scale_per_radius": 3.1422517580328137e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -22256,7 +22258,8 @@
           "theoretical_reserve": 12597013,
           "theoretical_respawn": 318682
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_711_sector001_macro": {
       "id": "cluster_711_sector001_macro",
@@ -22290,12 +22293,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003551171141710057,
+        "scale_per_radius": 3.551171141710057e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -22461,7 +22464,8 @@
           "theoretical_reserve": 240942,
           "theoretical_respawn": 8470
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_712_sector001_macro": {
       "id": "cluster_712_sector001_macro",
@@ -22495,12 +22499,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000034354516428917848,
+        "scale_per_radius": 3.4354516428917848e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -22639,7 +22643,7 @@
         {
           "ware": "nividium",
           "reserve": 23935,
-          "respawn": 115,
+          "respawn": 115.0,
           "replay_reserve": 26950,
           "replay_respawn": 130,
           "rating": 2,
@@ -22666,7 +22670,8 @@
           "theoretical_reserve": 491549295,
           "theoretical_respawn": 8192488
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_713_sector001_macro": {
       "id": "cluster_713_sector001_macro",
@@ -22700,12 +22705,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003551171141710057,
+        "scale_per_radius": 3.551171141710057e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -22938,7 +22943,8 @@
           "theoretical_reserve": 52901328,
           "theoretical_respawn": 1322533
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_714_sector001_macro": {
       "id": "cluster_714_sector001_macro",
@@ -22971,12 +22977,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003551171141710057,
+        "scale_per_radius": 3.551171141710057e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -23107,12 +23113,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003551171141710057,
+        "scale_per_radius": 3.551171141710057e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -23381,7 +23387,7 @@
         {
           "ware": "nividium",
           "reserve": 120820,
-          "respawn": 360,
+          "respawn": 360.0,
           "replay_reserve": 135201,
           "replay_respawn": 402,
           "rating": 3,
@@ -23408,7 +23414,8 @@
           "theoretical_reserve": 1720422531,
           "theoretical_respawn": 28673709
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_720_sector001_macro": {
       "id": "cluster_720_sector001_macro",
@@ -23441,12 +23448,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000002772157865618852,
+        "scale_per_radius": 2.772157865618852e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -23710,12 +23717,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003002638271246856,
+        "scale_per_radius": 3.002638271246856e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -23872,7 +23879,7 @@
         {
           "ware": "nividium",
           "reserve": 25435,
-          "respawn": 151,
+          "respawn": 151.0,
           "replay_reserve": 27224,
           "replay_respawn": 162,
           "rating": 2,
@@ -23899,7 +23906,8 @@
           "theoretical_reserve": 82938046,
           "theoretical_respawn": 2488141
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_722_sector001_macro": {
       "id": "cluster_722_sector001_macro",
@@ -23932,12 +23940,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003551171141710057,
+        "scale_per_radius": 3.551171141710057e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -24363,7 +24371,8 @@
           "theoretical_reserve": 25007078,
           "theoretical_respawn": 670189
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_723_sector001_macro": {
       "id": "cluster_723_sector001_macro",
@@ -24396,12 +24405,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000002772157865618852,
+        "scale_per_radius": 2.772157865618852e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -24535,7 +24544,8 @@
           "theoretical_reserve": 9153202,
           "theoretical_respawn": 152553
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_724_sector001_macro": {
       "id": "cluster_724_sector001_macro",
@@ -24568,12 +24578,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003551171141710057,
+        "scale_per_radius": 3.551171141710057e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -24588,8 +24598,8 @@
             "x": 0,
             "y": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           }
         },
         "zone001_cluster_724_sector001_macro": {
@@ -24729,7 +24739,8 @@
           "theoretical_reserve": 492816,
           "theoretical_respawn": 12320
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_725_sector001_macro": {
       "id": "cluster_725_sector001_macro",
@@ -24760,12 +24771,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000034610773275436903,
+        "scale_per_radius": 3.4610773275436903e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -25063,12 +25074,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000045835491198929695,
+        "scale_per_radius": 4.5835491198929695e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -25212,12 +25223,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004018882735780633,
+        "scale_per_radius": 4.018882735780633e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -25339,8 +25350,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -25428,7 +25439,7 @@
         {
           "ware": "nividium",
           "reserve": 67850,
-          "respawn": 202,
+          "respawn": 202.0,
           "replay_reserve": 67993,
           "replay_respawn": 202,
           "rating": 2,
@@ -25491,12 +25502,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000040724150825586085,
+        "scale_per_radius": 4.0724150825586085e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -25667,7 +25678,8 @@
           "theoretical_reserve": 135716803,
           "theoretical_respawn": 3392920
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_403_sector001_macro": {
       "id": "cluster_403_sector001_macro",
@@ -25700,12 +25712,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000036542990171316374,
+        "scale_per_radius": 3.6542990171316374e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -25875,12 +25887,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000036216876399499527,
+        "scale_per_radius": 3.6216876399499527e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -26029,7 +26041,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_405_sector001_macro": {
       "id": "cluster_405_sector001_macro",
@@ -26062,12 +26075,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004075750468978437,
+        "scale_per_radius": 4.075750468978437e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -26227,15 +26240,16 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         }
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_406_sector001_macro": {
       "id": "cluster_406_sector001_macro",
@@ -26268,12 +26282,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000035342952642457047,
+        "scale_per_radius": 3.5342952642457047e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -26384,8 +26398,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -26422,7 +26436,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_407_sector001_macro": {
       "id": "cluster_407_sector001_macro",
@@ -26455,12 +26470,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003771298051696247,
+        "scale_per_radius": 3.771298051696247e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -26582,8 +26597,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -26646,7 +26661,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.000003497469496853585,
+        "scale_per_radius": 3.497469496853585e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -26817,7 +26832,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.0000033606722016672232,
+        "scale_per_radius": 3.3606722016672232e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -26960,12 +26975,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000033869546780142,
+        "scale_per_radius": 3.3869546780142e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -27131,12 +27146,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003477655599605575,
+        "scale_per_radius": 3.477655599605575e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -27258,8 +27273,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -27365,12 +27380,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003966065305637695,
+        "scale_per_radius": 3.966065305637695e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -27582,7 +27597,8 @@
           "theoretical_reserve": 258840,
           "theoretical_respawn": 8628
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_412_sector001_macro": {
       "id": "cluster_412_sector001_macro",
@@ -27615,12 +27631,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000035257684111994776,
+        "scale_per_radius": 3.5257684111994776e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -27720,8 +27736,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -27801,7 +27817,8 @@
           "theoretical_reserve": 25944975,
           "theoretical_respawn": 864833
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_413_sector001_macro": {
       "id": "cluster_413_sector001_macro",
@@ -27834,12 +27851,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003287333656653681,
+        "scale_per_radius": 3.287333656653681e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -27994,7 +28011,8 @@
           "theoretical_reserve": 617737500,
           "theoretical_respawn": 6863750
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_414_sector001_macro": {
       "id": "cluster_414_sector001_macro",
@@ -28027,12 +28045,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000032827298847435504,
+        "scale_per_radius": 3.2827298847435504e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -28168,7 +28186,8 @@
           "theoretical_reserve": 60436389,
           "theoretical_respawn": 1510910
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_415_sector001_macro": {
       "id": "cluster_415_sector001_macro",
@@ -28201,12 +28220,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003932159586943947,
+        "scale_per_radius": 3.932159586943947e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -28321,8 +28340,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -28336,8 +28355,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         }
@@ -28385,7 +28404,7 @@
         {
           "ware": "nividium",
           "reserve": 10105,
-          "respawn": 120,
+          "respawn": 120.0,
           "replay_reserve": 10648,
           "replay_respawn": 127,
           "rating": 2,
@@ -28412,7 +28431,8 @@
           "theoretical_reserve": 95001762,
           "theoretical_respawn": 3166725
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_416_sector001_macro": {
       "id": "cluster_416_sector001_macro",
@@ -28450,7 +28470,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000033879030710172774,
+        "scale_per_radius": 3.3879030710172774e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -28580,7 +28600,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_416_sector002_macro": {
       "id": "cluster_416_sector002_macro",
@@ -28618,7 +28639,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000003433172942023946,
+        "scale_per_radius": 3.433172942023946e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -28755,7 +28776,7 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
+            "sx": 0.0,
             "sy": -0.21972306828953253
           },
           "zone_id": null
@@ -28791,7 +28812,8 @@
           "theoretical_reserve": 201454629,
           "theoretical_respawn": 40290926
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_417_sector001_macro": {
       "id": "cluster_417_sector001_macro",
@@ -28824,12 +28846,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003948074280434173,
+        "scale_per_radius": 3.948074280434173e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -28937,7 +28959,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_418_sector001_macro": {
       "id": "cluster_418_sector001_macro",
@@ -28970,12 +28993,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003944778065023644,
+        "scale_per_radius": 3.944778065023644e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -29249,7 +29272,8 @@
           "theoretical_reserve": 950018,
           "theoretical_respawn": 23750
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_419_sector001_macro": {
       "id": "cluster_419_sector001_macro",
@@ -29282,12 +29306,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000033086011866163404,
+        "scale_per_radius": 3.3086011866163404e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -29419,7 +29443,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_420_sector001_macro": {
       "id": "cluster_420_sector001_macro",
@@ -29452,12 +29477,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000035476166732054385,
+        "scale_per_radius": 3.5476166732054385e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -29661,12 +29686,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000031523662828565286,
+        "scale_per_radius": 3.1523662828565286e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -29871,12 +29896,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000035472888234205494,
+        "scale_per_radius": 3.5472888234205494e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -29991,8 +30016,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         }
@@ -30088,7 +30113,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000027794508220777868,
+        "scale_per_radius": 2.7794508220777868e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -30259,7 +30284,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.0000033015580556325497,
+        "scale_per_radius": 3.3015580556325497e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -30407,7 +30432,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.000003259571465345261,
+        "scale_per_radius": 3.259571465345261e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -30541,7 +30566,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_424_sector002_macro": {
       "id": "cluster_424_sector002_macro",
@@ -30579,7 +30605,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.0000030427648026537908,
+        "scale_per_radius": 3.0427648026537908e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -30694,7 +30720,7 @@
             "x": 0,
             "z": 0,
             "sx": 0.19473694736984262,
-            "sy": 0
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -30709,7 +30735,7 @@
             "x": 0,
             "z": 0,
             "sx": 0.19473694736984262,
-            "sy": 0
+            "sy": -0.0
           },
           "zone_id": null
         }
@@ -30754,7 +30780,8 @@
           "theoretical_reserve": 95001762,
           "theoretical_respawn": 3166725
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_425_sector001_macro": {
       "id": "cluster_425_sector001_macro",
@@ -30765,8 +30792,8 @@
       "owner_color": "#C0C0C0",
       "area": {
         "sunlight": 0.64,
-        "economy": 0,
-        "security": 0,
+        "economy": 0.0,
+        "security": 0.0,
         "tags": []
       },
       "raw_local_pos": {
@@ -30785,12 +30812,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003953691194369238,
+        "scale_per_radius": 3.953691194369238e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -30909,7 +30936,8 @@
           "theoretical_reserve": 95001762,
           "theoretical_respawn": 3166725
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_100_sector001_macro": {
       "id": "cluster_100_sector001_macro",
@@ -30942,12 +30970,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004254800110470755,
+        "scale_per_radius": 4.254800110470755e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -31125,7 +31153,7 @@
         {
           "ware": "nividium",
           "reserve": 16540,
-          "respawn": 155,
+          "respawn": 155.0,
           "replay_reserve": 20300,
           "replay_respawn": 190,
           "rating": 2,
@@ -31188,12 +31216,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003706399042312383,
+        "scale_per_radius": 3.706399042312383e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -31327,7 +31355,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_102_sector001_macro": {
       "id": "cluster_102_sector001_macro",
@@ -31358,12 +31387,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000041515150846183815,
+        "scale_per_radius": 4.1515150846183815e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -31482,7 +31511,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_104_sector001_macro": {
       "id": "cluster_104_sector001_macro",
@@ -31492,7 +31522,7 @@
       "owner": "terran",
       "owner_color": "#99D5FF",
       "area": {
-        "sunlight": 1,
+        "sunlight": 1.0,
         "economy": 0.75,
         "security": 0.75,
         "tags": []
@@ -31518,7 +31548,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.0000032474279390695527,
+        "scale_per_radius": 3.2474279390695527e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -31649,7 +31679,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_104_sector002_macro": {
       "id": "cluster_104_sector002_macro",
@@ -31685,7 +31716,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000030365573886120155,
+        "scale_per_radius": 3.0365573886120155e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -31830,7 +31861,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_106_sector001_macro": {
       "id": "cluster_106_sector001_macro",
@@ -31861,12 +31893,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000041991062342568065,
+        "scale_per_radius": 4.1991062342568065e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -31967,7 +31999,8 @@
           "theoretical_reserve": 125779500,
           "theoretical_respawn": 1397550
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_107_sector001_macro": {
       "id": "cluster_107_sector001_macro",
@@ -32000,12 +32033,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000037826479799807728,
+        "scale_per_radius": 3.7826479799807728e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -32126,7 +32159,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_108_sector001_macro": {
       "id": "cluster_108_sector001_macro",
@@ -32164,7 +32198,7 @@
           "x": 0.5,
           "y": 0
         },
-        "scale_per_radius": 0.0000033606722016672232,
+        "scale_per_radius": 3.3606722016672232e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -32327,7 +32361,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_108_sector002_macro": {
       "id": "cluster_108_sector002_macro",
@@ -32365,7 +32400,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.000003070534386390262,
+        "scale_per_radius": 3.070534386390262e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -32508,7 +32543,8 @@
           "theoretical_reserve": 89842500,
           "theoretical_respawn": 1123031
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_108_sector003_macro": {
       "id": "cluster_108_sector003_macro",
@@ -32546,7 +32582,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000004029976987504973,
+        "scale_per_radius": 4.029976987504973e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -32660,8 +32696,8 @@
           },
           "rotation": {
             "qx": -0.233445,
-            "qy": 0,
-            "qz": 0,
+            "qy": 0.0,
+            "qz": 0.0,
             "qw": -0.97237
           },
           "boundary": {
@@ -32725,7 +32761,8 @@
           "theoretical_reserve": 10530894,
           "theoretical_respawn": 351030
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_109_sector001_macro": {
       "id": "cluster_109_sector001_macro",
@@ -32758,12 +32795,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000033822485184808966,
+        "scale_per_radius": 3.3822485184808966e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -32849,7 +32886,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_110_sector001_macro": {
       "id": "cluster_110_sector001_macro",
@@ -32882,12 +32920,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000035565233083155355,
+        "scale_per_radius": 3.5565233083155355e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -33055,7 +33093,8 @@
           "theoretical_reserve": 17788815,
           "theoretical_respawn": 1778882
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_111_sector001_macro": {
       "id": "cluster_111_sector001_macro",
@@ -33088,12 +33127,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003347994610412542,
+        "scale_per_radius": 3.347994610412542e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -33201,7 +33240,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_112_sector001_macro": {
       "id": "cluster_112_sector001_macro",
@@ -33239,7 +33279,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000002617361972142262,
+        "scale_per_radius": 2.617361972142262e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -33443,7 +33483,7 @@
         {
           "ware": "nividium",
           "reserve": 24255,
-          "respawn": 144,
+          "respawn": 144.0,
           "replay_reserve": 24403,
           "replay_respawn": 145,
           "rating": 2,
@@ -33511,7 +33551,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000034449778852631716,
+        "scale_per_radius": 3.4449778852631716e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -33611,7 +33651,7 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
+            "sx": 0.0,
             "sy": 0.22047858465684297
           },
           "zone_id": null
@@ -33670,7 +33710,7 @@
         {
           "ware": "nividium",
           "reserve": 58500,
-          "respawn": 348,
+          "respawn": 348.0,
           "replay_reserve": 262,
           "replay_respawn": 2,
           "rating": 3,
@@ -33733,12 +33773,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000036543347223601083,
+        "scale_per_radius": 3.6543347223601083e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -33996,12 +34036,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000036722074241974205,
+        "scale_per_radius": 3.6722074241974205e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -34197,7 +34237,7 @@
         {
           "ware": "nividium",
           "reserve": 12595,
-          "respawn": 75,
+          "respawn": 75.0,
           "replay_reserve": 13332,
           "replay_respawn": 79,
           "rating": 1,
@@ -34260,12 +34300,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000028143798430852377,
+        "scale_per_radius": 2.8143798430852377e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -34280,7 +34320,7 @@
             "x": -29.6058654785,
             "y": 0,
             "z": -100147.09375,
-            "sx": -0.00008332215103978349,
+            "sx": -8.332215103978349e-05,
             "sy": 0.10173165203611238
           }
         },
@@ -34335,7 +34375,7 @@
             "x": -29.6,
             "y": 0,
             "z": -274972.6328125,
-            "sx": -0.00008330564335532304,
+            "sx": -8.330564335532304e-05,
             "sy": 0.5937571252301233
           }
         }
@@ -34470,12 +34510,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000004254800110470755,
+        "scale_per_radius": 4.254800110470755e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -34631,7 +34671,7 @@
         {
           "ware": "nividium",
           "reserve": 29240,
-          "respawn": 174,
+          "respawn": 174.0,
           "replay_reserve": 33548,
           "replay_respawn": 200,
           "rating": 2,
@@ -34658,7 +34698,8 @@
           "theoretical_reserve": 347867378,
           "theoretical_respawn": 10436021
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_500_sector001_macro": {
       "id": "cluster_500_sector001_macro",
@@ -34694,7 +34735,7 @@
           "x": 0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000002947835246935813,
+        "scale_per_radius": 2.947835246935813e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -34946,7 +34987,7 @@
         {
           "ware": "nividium",
           "reserve": 2355,
-          "respawn": 28,
+          "respawn": 28.0,
           "replay_reserve": 3404,
           "replay_respawn": 47,
           "rating": 1,
@@ -35012,7 +35053,7 @@
           "x": 0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.000002766324787320908,
+        "scale_per_radius": 2.766324787320908e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -35249,7 +35290,7 @@
           "x": -0.5,
           "y": 0
         },
-        "scale_per_radius": 0.0000033606722016672232,
+        "scale_per_radius": 3.3606722016672232e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -35417,12 +35458,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000037559322144549703,
+        "scale_per_radius": 3.7559322144549703e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -35624,7 +35665,7 @@
         {
           "ware": "nividium",
           "reserve": 174420,
-          "respawn": 841,
+          "respawn": 841.0,
           "replay_reserve": 60308,
           "replay_respawn": 291,
           "rating": 3,
@@ -35686,12 +35727,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000037263004406997544,
+        "scale_per_radius": 3.7263004406997544e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -35913,12 +35954,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000026463280114235233,
+        "scale_per_radius": 2.6463280114235233e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -36197,12 +36238,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000002851230349232337,
+        "scale_per_radius": 2.851230349232337e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -36278,7 +36319,7 @@
             "x": 0,
             "z": 0,
             "sx": 0.18247874235086958,
-            "sy": 0
+            "sy": -0.0
           },
           "zone_id": null
         }
@@ -36375,7 +36416,8 @@
           "theoretical_reserve": 6286375,
           "theoretical_respawn": 628638
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_601_sector001_macro": {
       "id": "cluster_601_sector001_macro",
@@ -36409,12 +36451,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000031422522619365367,
+        "scale_per_radius": 3.1422522619365367e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -36627,12 +36669,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003448462001402743,
+        "scale_per_radius": 3.448462001402743e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -36830,12 +36872,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000033491346682863376,
+        "scale_per_radius": 3.3491346682863376e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -37054,12 +37096,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003373953402379184,
+        "scale_per_radius": 3.373953402379184e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -37229,12 +37271,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000047352234440099475,
+        "scale_per_radius": 4.7352234440099475e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -37697,7 +37739,8 @@
           "theoretical_reserve": 7175,
           "theoretical_respawn": 719
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_606_sector001_macro": {
       "id": "cluster_606_sector001_macro",
@@ -37735,7 +37778,7 @@
           "x": -0.25,
           "y": -0.4330127018922193
         },
-        "scale_per_radius": 0.000002876322631438702,
+        "scale_per_radius": 2.876322631438702e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -37973,7 +38016,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_606_sector002_macro": {
       "id": "cluster_606_sector002_macro",
@@ -38011,7 +38055,7 @@
           "x": -0.25,
           "y": 0.4330127018922193
         },
-        "scale_per_radius": 0.0000024696900446373547,
+        "scale_per_radius": 2.4696900446373547e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -38392,7 +38436,8 @@
           "theoretical_reserve": 12521080,
           "theoretical_respawn": 208685
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_606_sector003_macro": {
       "id": "cluster_606_sector003_macro",
@@ -38430,7 +38475,7 @@
           "x": 0.5,
           "y": 0
         },
-        "scale_per_radius": 0.0000030808215111583257,
+        "scale_per_radius": 3.0808215111583257e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -38663,7 +38708,8 @@
       ],
       "has_khaak_hive": false,
       "regions": [],
-      "resources": []
+      "resources": [],
+      "khaak_hive_sources": []
     },
     "cluster_607_sector001_macro": {
       "id": "cluster_607_sector001_macro",
@@ -38697,12 +38743,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.0000039956437134318114,
+        "scale_per_radius": 3.9956437134318114e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -38910,7 +38956,8 @@
           "theoretical_reserve": 262369498,
           "theoretical_respawn": 4372825
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_608_sector001_macro": {
       "id": "cluster_608_sector001_macro",
@@ -38944,12 +38991,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003513301876205184,
+        "scale_per_radius": 3.513301876205184e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -39230,7 +39277,8 @@
           "theoretical_reserve": 12153440,
           "theoretical_respawn": 405115
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_609_sector001_macro": {
       "id": "cluster_609_sector001_macro",
@@ -39264,12 +39312,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003051768629696159,
+        "scale_per_radius": 3.051768629696159e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -39554,7 +39602,8 @@
           "theoretical_reserve": 10803057,
           "theoretical_respawn": 360102
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_701_sector001_macro": {
       "id": "cluster_701_sector001_macro",
@@ -39587,12 +39636,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003537792820803507,
+        "scale_per_radius": 3.537792820803507e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -39747,12 +39796,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003820132362562774,
+        "scale_per_radius": 3.820132362562774e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -39850,8 +39899,8 @@
           "raw_sector_pos": {
             "x": 0,
             "z": 0,
-            "sx": 0,
-            "sy": 0
+            "sx": 0.0,
+            "sy": -0.0
           },
           "zone_id": null
         },
@@ -40071,12 +40120,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003820132362562774,
+        "scale_per_radius": 3.820132362562774e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -40314,7 +40363,8 @@
           "theoretical_reserve": 600170,
           "theoretical_respawn": 20006
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_704_sector001_macro": {
       "id": "cluster_704_sector001_macro",
@@ -40347,12 +40397,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003820132362562774,
+        "scale_per_radius": 3.820132362562774e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -40544,7 +40594,7 @@
         {
           "ware": "nividium",
           "reserve": 1435,
-          "respawn": 12,
+          "respawn": 12.0,
           "replay_reserve": 3426,
           "replay_respawn": 29,
           "rating": 1,
@@ -40597,12 +40647,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003820132362562774,
+        "scale_per_radius": 3.820132362562774e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -40809,7 +40859,8 @@
           "theoretical_reserve": 16445655,
           "theoretical_respawn": 414817
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_706_sector001_macro": {
       "id": "cluster_706_sector001_macro",
@@ -40842,12 +40893,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003820132362562774,
+        "scale_per_radius": 3.820132362562774e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -41034,12 +41085,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003820132362562774,
+        "scale_per_radius": 3.820132362562774e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -41200,7 +41251,8 @@
           "theoretical_reserve": 243069,
           "theoretical_respawn": 8102
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_730_sector001_macro": {
       "id": "cluster_730_sector001_macro",
@@ -41210,7 +41262,7 @@
       "owner": "ownerless",
       "owner_color": "#C0C0C0",
       "area": {
-        "sunlight": 1,
+        "sunlight": 1.0,
         "economy": 0.25,
         "security": 0.25,
         "tags": [
@@ -41233,12 +41285,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000003551171141710057,
+        "scale_per_radius": 3.551171141710057e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -41390,7 +41442,7 @@
         {
           "ware": "nividium",
           "reserve": 600,
-          "respawn": 5,
+          "respawn": 5.0,
           "replay_reserve": 657,
           "replay_respawn": 5,
           "rating": 1,
@@ -41407,7 +41459,8 @@
           "theoretical_reserve": 90025,
           "theoretical_respawn": 3001
         }
-      ]
+      ],
+      "khaak_hive_sources": []
     },
     "cluster_740_sector001_macro": {
       "id": "cluster_740_sector001_macro",
@@ -41440,12 +41493,12 @@
       "normalized": {
         "template_kind": "single",
         "slot": "single",
-        "sector_radius_ratio": 1,
+        "sector_radius_ratio": 1.0,
         "center_offset_ratio": {
           "x": 0,
           "y": 0
         },
-        "scale_per_radius": 0.000002993545167442799,
+        "scale_per_radius": 2.993545167442799e-06,
         "scale_basis": {
           "hex_inner_ratio": 0.8660254037844386,
           "extent_ratio": 0.8,
@@ -41483,7 +41536,7 @@
             "y": 0,
             "z": 0,
             "sx": 0.40712214277222064,
-            "sy": 0
+            "sy": -0.0
           }
         },
         "zone003_cluster_740_sector001_macro": {

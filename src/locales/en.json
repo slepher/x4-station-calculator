@@ -227,7 +227,8 @@
     "save_npc_tag_defencemodule": "Defense Station",
     "save_npc_tag_weaponplatform": "Weapon Platform",
     "save_npc_tag_nest": "Nest",
-    "save_npc_tag_hive": "Hive"
+    "save_npc_tag_hive": "Hive",
+    "poi_visibility_toggle": "POI Display"
   },
   "ship_build": {
     "title": "Ship Build",

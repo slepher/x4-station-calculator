@@ -2,15 +2,13 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
-import type { SaveArchive, SavePoiCategory, SavePoiVisibility } from '@/types/saveArchive'
+import type { SaveArchive, SavePoiCategory } from '@/types/saveArchive'
 
 const props = defineProps<{
   archive: SaveArchive | null
-  visibility: SavePoiVisibility
 }>()
 
 const emit = defineEmits<{
-  (e: 'visibility-change', visibility: SavePoiVisibility): void
   (e: 'select-category', category: SavePoiCategory): void
 }>()
 
@@ -24,8 +22,7 @@ interface CategoryInfo {
 }
 
 const categories = computed<CategoryInfo[]>(() => {
-  const data = saveStore.getArchivePoiCategories(props.archive, {
-  })
+  const data = saveStore.getArchivePoiCategories(props.archive, {})
 
   return [
     { key: 'playerStation', label: t('map.save_category_player_station'), count: data.playerStation.count },
@@ -37,11 +34,6 @@ const categories = computed<CategoryInfo[]>(() => {
     { key: 'erlkingVault', label: t('map.save_category_erlking_vault'), count: data.erlkingVault.count }
   ]
 })
-
-function onCheckboxChange(category: SavePoiCategory, checked: boolean) {
-  const newVisibility = { ...props.visibility, [category]: checked }
-  emit('visibility-change', newVisibility)
-}
 
 function onCategorySelect(category: SavePoiCategory) {
   emit('select-category', category)
@@ -55,29 +47,18 @@ function onCategorySelect(category: SavePoiCategory) {
     </div>
 
     <div class="category-list">
-      <div
+      <button
         v-for="cat in categories"
         :key="cat.key"
+        type="button"
         class="category-item"
+        :aria-label="`${cat.label} details`"
+        @click="onCategorySelect(cat.key)"
       >
-        <label class="category-checkbox">
-          <input
-            type="checkbox"
-            :checked="visibility[cat.key]"
-            @change="onCheckboxChange(cat.key, ($event.target as HTMLInputElement).checked)"
-          />
-          <span class="category-label">{{ cat.label }}</span>
-          <span class="category-count">({{ cat.count }})</span>
-        </label>
-        <button
-          class="category-arrow"
-          type="button"
-          :aria-label="`${cat.label} details`"
-          @click="onCategorySelect(cat.key)"
-        >
-          →
-        </button>
-      </div>
+        <span class="category-label">{{ cat.label }}</span>
+        <span class="category-count">({{ cat.count }})</span>
+        <span class="category-arrow">→</span>
+      </button>
     </div>
   </div>
 </template>
@@ -96,19 +77,11 @@ function onCategorySelect(category: SavePoiCategory) {
 }
 
 .category-item {
-  @apply flex items-center justify-between p-3 rounded bg-black/45 border border-amber-300/15 hover:bg-amber-200/5 hover:border-amber-200/45 transition-colors;
-}
-
-.category-checkbox {
-  @apply flex items-center gap-2 cursor-pointer;
-}
-
-.category-checkbox input[type="checkbox"] {
-  @apply w-4 h-4 accent-amber-400 rounded border-amber-300/30;
+  @apply flex items-center gap-2 p-3 rounded bg-black/45 border border-amber-300/15 text-left hover:bg-amber-200/5 hover:border-amber-200/45 transition-colors;
 }
 
 .category-label {
-  @apply text-sm text-amber-50;
+  @apply flex-1 text-sm text-amber-50;
 }
 
 .category-count {
@@ -116,6 +89,6 @@ function onCategorySelect(category: SavePoiCategory) {
 }
 
 .category-arrow {
-  @apply rounded border border-amber-300/20 px-2 py-1 text-sm text-amber-200/70 transition-colors hover:border-amber-200/50 hover:text-amber-50;
+  @apply text-sm text-amber-200/70;
 }
 </style>

@@ -5,14 +5,15 @@
 ### 组件结构
 
 ```
-src/components/empire/
-├── MapWorkbenchView.vue          # 修改：添加存档按钮、集成侧边栏状态
+src/components/map/
+├── MapWorkbenchView.vue          # 修改：添加存档按钮、集成侧边栏状态、右上角控件
 ├── MapSavePanel.vue              # 新增：存档侧边栏主组件
 ├── MapSaveArchiveList.vue        # 新增：L1层 - 存档列表
-├── MapSaveCategoryMenu.vue       # 新增：L2层 - 分类子菜单
+├── MapSaveCategoryMenu.vue       # 新增：L2层 - 分类子菜单（仅导航）
 ├── MapSaveCoordList.vue          # 新增：L3层 - 坐标列表
 ├── MapSaveBreadcrumb.vue         # 新增：面包屑导航组件
 ├── MapSavePoiTooltip.vue         # 新增：兴趣点tooltip
+├── MapSavePoiVisibilityControl.vue # 新增：右上角POI显示控制
 └── MapSvgCanvas.vue              # 修改：支持兴趣点叠加层渲染
 ```
 
@@ -207,22 +208,46 @@ watch([isSavePanelOpen, selectedSaveArchive], () => {
 
 ---
 
-### D6: 分类层点击职责拆分
+### D6: POI 显示控制控件位置与样式
 
-**决策**：分类层将“显示开关”和“进入详情”拆成两个独立交互。
+**决策**：将 POI 显示控制 checkbox 从侧边栏分类层移至地图右上角折叠菜单。
 
-**规则**：
-- 左侧 checkbox 仅负责类别显隐
-- 分类整行文本区域和空白区域不再承担进入详情行为
-- 只有右侧箭头按钮负责进入 L3 坐标列表
+**位置**：
+- `right-6 top-5`，与左上角搜索框对称
+- 与左下角按钮组、右下角缩放控件形成四角对称布局
+
+**样式**：
+- 折叠态：触发按钮，样式与左下角按钮一致（bg-black/75 + border-amber-300/40 + backdrop-blur）
+- 展开态：checkbox 列表容器，样式与左上角搜索框一致
+
+**显示条件**：
+- 仅当 `activeMapArchive` 存在时显示
+- 切换存档或取消选择时保持显示（如果有存档）
 
 **理由**：
-- 避免用户想勾选时误进详情
-- 保持 checkbox 语义单一，降低状态歧义
+- 将显示控制从侧边栏分离，避免侧边栏层级导航与显示控制混杂
+- 右上角位置与现有四角控件对称，视觉平衡
+- 折叠设计避免遮挡地图内容
 
 ---
 
-### D7: 详情层临时可见类别
+### D7: 分类层导航职责简化
+
+**决策**：分类层仅保留导航功能，移除 checkbox。
+
+**规则**：
+- 分类项显示：分类名称 + 数量统计 + 右侧箭头按钮
+- 分类整行和空白区域不触发任何交互
+- 只有右侧箭头按钮负责进入 L3 坐标列表
+- checkbox 功能转移到右上角折叠控件
+
+**理由**：
+- 职责分离：导航在侧边栏，显示控制在地图控件
+- 避免 checkbox 与导航入口混在一起导致用户困惑
+
+---
+
+### D8: 详情层临时可见类别
 
 **决策**：地图上的存档兴趣点可见类别，不再只由 checkbox 状态决定，而是取“checkbox 勾选类别 + 当前详情层激活类别”的并集。
 
@@ -239,7 +264,7 @@ watch([isSavePanelOpen, selectedSaveArchive], () => {
 
 ---
 
-### D8: 星区 macro 映射
+### D9: 星区 macro 映射
 
 **问题**：存档 `SectorData` 的 key 是星区 macro（如 `sector_macro_01`），需要映射到地图的 `sectorId`。
 
@@ -262,7 +287,7 @@ function getSectorIdFromMacro(macro: string): string | null {
 
 ---
 
-### D9: Focus 定位行为
+### D10: Focus 定位行为
 
 **决策**：点击坐标项时，调用类似 `focusPlacementOverlay` 的逻辑，但使用固定缩放比例（如 scale=1）。
 
@@ -308,12 +333,13 @@ MapWorkbenchView.vue
 
 | 文件 | 操作 | 说明 |
 |------|------|------|
-| `MapWorkbenchView.vue` | 修改 | 添加存档按钮、状态管理、事件处理 |
+| `MapWorkbenchView.vue` | 修改 | 添加存档按钮、状态管理、事件处理、右上角控件 |
 | `MapSavePanel.vue` | 新增 | 存档侧边栏主组件 |
 | `MapSaveArchiveList.vue` | 新增 | L1层存档列表 |
-| `MapSaveCategoryMenu.vue` | 新增 | L2层分类子菜单，checkbox 与箭头职责分离 |
+| `MapSaveCategoryMenu.vue` | 新增 | L2层分类子菜单（仅导航，无checkbox） |
 | `MapSaveCoordList.vue` | 新增 | L3层坐标列表 |
 | `MapSaveBreadcrumb.vue` | 新增 | 面包屑导航 |
+| `MapSavePoiVisibilityControl.vue` | 新增 | 右上角POI显示控制折叠菜单 |
 | `MapSvgCanvas.vue` | 修改 | 支持兴趣点叠加层 |
 | `MapSavePoiTooltip.vue` | 新增 | 兴趣点tooltip |
 | `useSaveStore.ts` | 可能修改 | 添加分类数据计算方法 |
@@ -322,7 +348,7 @@ MapWorkbenchView.vue
 
 ---
 
-### D10: 阵营颜色染色
+### D11: 阵营颜色染色
 
 **决策**：使用 SVG `feColorMatrix` filter 对图标进行阵营颜色染色。
 
@@ -344,7 +370,7 @@ function colorToFeColorMatrix(hex: string): string {
 
 ---
 
-### D11: 星区/Cluster Owner Override
+### D12: 星区/Cluster Owner Override
 
 **决策**：从存档提取 owner 映射，覆盖地图默认颜色。
 
@@ -369,7 +395,7 @@ const clusterOwnerOverride = computed(() => {
 
 ---
 
-### D12: 高亮状态保持阵营颜色
+### D13: 高亮状态保持阵营颜色
 
 **问题**：CSS `.focused` 的 `filter` 会覆盖 SVG 内联 filter。
 
@@ -386,7 +412,7 @@ const clusterOwnerOverride = computed(() => {
 
 ---
 
-### D13: Tooltip Owner i18n
+### D14: Tooltip Owner i18n
 
 **决策**：使用 faction 的 `nameId` 进行本地化翻译。
 
@@ -406,7 +432,7 @@ const ownerName = computed(() => {
 
 ---
 
-### D14: Abandoned Ship Icon Mapping
+### D15: Abandoned Ship Icon Mapping
 
 **决策**：弃船使用飞船类型图标替代圆点，根据 `class` + `purpose` 选择对应 SVG。
 
@@ -451,7 +477,7 @@ SHIP_CLASS_PURPOSE_ICON_MAP = {
 
 ---
 
-### D15: Abandoned Ship Data Enhancement
+### D16: Abandoned Ship Data Enhancement
 
 **决策**：在 saveParser.post.ts 中为弃船添加 `shipId` 和 `purpose` 字段。
 
@@ -475,7 +501,7 @@ interface AbandonedShipEntry {
 
 ---
 
-### D16: Abandoned Ship Tooltip Enhancement
+### D17: Abandoned Ship Tooltip Enhancement
 
 **决策**：弃船 tooltip 显示 i18n 化的飞船名称。
 
@@ -494,7 +520,7 @@ const shipName = computed(() => {
 
 ---
 
-### D17: Unified Overlay Item Creation
+### D18: Unified Overlay Item Creation
 
 **决策**：使用统一的 `createOverlayItem` 函数构建 `SavePoiOverlayItem`。
 
@@ -514,7 +540,7 @@ export function createOverlayItem(
 
 ---
 
-### D18: POI Rendering Order
+### D19: POI Rendering Order
 
 **决策**：高亮的 POI 必须在 z-index 上位于最上方，不被其他 POI 遮挡。
 
@@ -527,7 +553,7 @@ export function createOverlayItem(
 
 ---
 
-### D19: POI Text Display
+### D20: POI Text Display
 
 **决策**：移除所有 POI 上方的文字显示。
 
@@ -537,7 +563,7 @@ export function createOverlayItem(
 
 ---
 
-### D20: POI Category i18n
+### D21: POI Category i18n
 
 **决策**：统一 POI 分类名称的 i18n。
 

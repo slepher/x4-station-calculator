@@ -1,0 +1,40 @@
+wing: x4_station_calculator
+exclude_paths:
+- src/assets/x4_game_data
+- src/wasm
+rooms:
+- name: openspec
+  description: Files from openspec/
+  paths:
+  - openspec
+- name: scripts
+  description: Files from scripts/
+  paths:
+  - scripts
+- name: src
+  description: Files from src/
+  paths:
+  - src
+- name: testing
+  description: Files from tests/
+  paths:
+  - tests
+- name: skill_scripts
+  description: Files from local skill directories.
+  paths:
+  - .trae/skills
+  - .agents/skills
+- name: rust_parser
+  description: Files from rust-parser/
+  paths:
+  - rust-parser
+- name: planning
+  description: Files from planning docs and specs.
+  paths:
+  - docs/plans
+  - openspec/specs
+- name: frontend
+  description: Files from frontend-specific UI directories.
+  paths:
+  - src/components
+  - guide

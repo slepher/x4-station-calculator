@@ -28,6 +28,13 @@ def as_number(value, default: float = 0.0) -> float:
     return default
 
 
+def compact_number(value: float):
+    """整值转 int，非整值保留 float。"""
+    if isinstance(value, float) and value.is_integer():
+        return int(value)
+    return value
+
+
 def round_significant(value: float, sig_digits: int = 5) -> float:
     """
     四舍五入到指定有效数字。
@@ -60,8 +67,11 @@ def pos_from(parent) -> Dict[str, float]:
     if parent is not None:
         position = parent.find("./offset/position")
     if position is None:
-        return {"x": 0.0, "z": 0.0}
-    return {"x": as_float(position.get("x")), "z": as_float(position.get("z"))}
+        return {"x": 0, "z": 0}
+    return {
+        "x": compact_number(as_float(position.get("x"))),
+        "z": compact_number(as_float(position.get("z"))),
+    }
 
 
 def pos3d_from(parent) -> Dict[str, float]:
@@ -70,11 +80,11 @@ def pos3d_from(parent) -> Dict[str, float]:
     if parent is not None:
         position = parent.find("./offset/position")
     if position is None:
-        return {"x": 0.0, "y": 0.0, "z": 0.0}
+        return {"x": 0, "y": 0, "z": 0}
     return {
-        "x": as_float(position.get("x"), 0.0),
-        "y": as_float(position.get("y"), 0.0),
-        "z": as_float(position.get("z"), 0.0),
+        "x": compact_number(as_float(position.get("x"), 0.0)),
+        "y": compact_number(as_float(position.get("y"), 0.0)),
+        "z": compact_number(as_float(position.get("z"), 0.0)),
     }
 
 
@@ -95,15 +105,18 @@ def quaternion_from(parent) -> Optional[Dict[str, float]]:
 
 def vec_add(left: Dict[str, float], right: Dict[str, float]) -> Dict[str, float]:
     """2D 向量加法 (x, z)。"""
-    return {"x": left["x"] + right["x"], "z": left["z"] + right["z"]}
+    return {
+        "x": compact_number(left["x"] + right["x"]),
+        "z": compact_number(left["z"] + right["z"]),
+    }
 
 
 def vec_add_3d(left: Dict[str, float], right: Dict[str, float]) -> Dict[str, float]:
     """3D 向量加法。"""
     return {
-        "x": left.get("x", 0.0) + right.get("x", 0.0),
-        "y": left.get("y", 0.0) + right.get("y", 0.0),
-        "z": left.get("z", 0.0) + right.get("z", 0.0),
+        "x": compact_number(left.get("x", 0.0) + right.get("x", 0.0)),
+        "y": compact_number(left.get("y", 0.0) + right.get("y", 0.0)),
+        "z": compact_number(left.get("z", 0.0) + right.get("z", 0.0)),
     }
 
 
@@ -117,8 +130,8 @@ def cluster_world_to_axial(pos: Dict[str, float]) -> Dict[str, int]:
 def axial_to_pixel_flat(q: int, r: int, size: float = 1.0) -> Dict[str, float]:
     """轴向坐标转像素坐标。"""
     return {
-        "x": size * 1.5 * q,
-        "y": size * math.sqrt(3.0) * (r + q / 2.0),
+        "x": compact_number(size * 1.5 * q),
+        "y": compact_number(size * math.sqrt(3.0) * (r + q / 2.0)),
     }
 
 

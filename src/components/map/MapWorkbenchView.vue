@@ -6,6 +6,7 @@ import MapSectorTooltip from './MapSectorTooltip.vue'
 import MapResourceFilterPanel from './MapResourceFilterPanel.vue'
 import MapStationPanel, { type MapStationPanelItem } from './MapStationPanel.vue'
 import MapSavePanel from './MapSavePanel.vue'
+import MapSavePoiVisibilityControl from './MapSavePoiVisibilityControl.vue'
 import { getEffectiveVisibleSavePoiCategories } from './savePoiVisibility'
 import MapSavePoiTooltip from './MapSavePoiTooltip.vue'
 import { focusOverlayInViewport } from './focusOverlayInViewport'
@@ -1352,11 +1353,9 @@ onBeforeUnmount(() => {
       <MapSavePanel
         :open="isSavePanelOpen"
         :archive="activeMapArchive"
-        :visibility="savePoiVisibility"
         @close="onSavePanelClose"
         @select-archive="onSaveSelectArchive"
         @select-archive-and-navigate="onSaveSelectArchiveAndNavigate"
-        @visibility-change="onSaveVisibilityChange"
         @active-category-change="onSaveActiveCategoryChange"
         @focus-poi="onSavePoiFocus"
       />
@@ -1436,6 +1435,12 @@ onBeforeUnmount(() => {
           </div>
 
         </div>
+
+        <MapSavePoiVisibilityControl
+          :visibility="savePoiVisibility"
+          :archive="activeMapArchive"
+          @visibility-change="onSaveVisibilityChange"
+        />
 
         <div class="map-search-panel left-6 top-5" @mousedown.stop>
           <div class="search-box group" :class="{ focused: isSearchFocused }">
