@@ -332,3 +332,11 @@
 - [x] T159. 在所有主路径引用删除后，删除 `useStationStore` 中的旧桥接职责（已删除文件）
 - [x] T160. 在旧 plan library 与细粒度模块编辑接口已迁移后，删除 `useStationStore.ts` 文件
 - [x] T161. 运行最终回归验证：确认 production 主路径中不存在 `useStationStore()` 调用，且 blueprint/live 两个入口行为保持正确
+
+## 后续修正 - Auto Modules 分三组显示（UI层）
+
+- [x] T169. `StationPlanningPanel` 显示三组：自动工业区、自动居住区、自动基础设施
+- [x] T170. 各组独立展开/折叠，使用 tier-auto-industry / tier-auto-habitation / tier-auto-infrastructure 样式
+- [x] T171. 运行构建验证：确认 UI 分组显示正常
+
+> **数据层改动**（StationProductionFlowMap.compute 输出分拆、StationStateMap 删除等）归属 `station-production-flow-map` change

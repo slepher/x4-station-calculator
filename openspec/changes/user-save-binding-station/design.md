@@ -165,3 +165,56 @@ function importBlueprintModules(
 - empire 数据使用 `x4_empire_data`
 - binding 数据使用 `x4_save_bindings`
 - 两套数据独立管理，互不干扰
+
+## D9: Auto Modules 分三组显示（UI层）
+
+### 背景
+
+原 `StationPlanningPanel` 将所有 auto 模块显示在一个"自动模块"区域，用户无法区分模块类型。
+
+### UI 改动
+
+分三组显示：
+
+```
+StationPlanningPanel
+  ├── 用户规划区（用户手动添加的模块）
+  │
+  ├── 自动工业区（tier-auto-industry 样式）
+  │     └── production 类型自动模块
+  │
+  ├── 自动居住区（tier-auto-habitation 样式）
+  │     └── habitation 类型自动模块
+  │
+  └── 自动基础设施（tier-auto-infrastructure 样式）
+        └── storage/dock 类型自动模块
+```
+
+### 分组逻辑
+
+**数据来源**：`StationProductionFlowMap.getCache(stationId)` 返回：
+- `autoIndustryModules` - production 类型（生产模块）
+- `autoHabitationModules` - habitation 类型（居住模块）
+- `autoInfrastructureModules` - storage/dock 类型（仓储/泊位）
+
+**UI 组件**：
+- `StationPlanningPanel.vue` 接收三个 props
+- 各组独立展开/折叠
+- 使用不同边框颜色区分：
+  - industry: amber（生产）
+  - habitation: emerald（居住）
+  - infrastructure: slate（基础设施）
+
+### 样式类
+
+```css
+.tier-auto-industry {
+  @apply border-l-2 border-amber-500/40 pl-2;
+}
+.tier-auto-habitation {
+  @apply border-l-2 border-emerald-500/40 pl-2;
+}
+.tier-auto-infrastructure {
+  @apply border-l-2 border-slate-500/40 pl-2;
+}
+```

@@ -7,14 +7,14 @@ export interface WareProductionFlow {
   transportType: TransportType
   unitVolume: number
 
-  minPrice: number
-  price: number
-  maxPrice: number
-
   production: number
   consumption: number
   workforceConsumption: number
   netRate: number
+
+  productionVolume: number
+  consumptionVolume: number
+  netVolume: number
 
   contributions: ModuleFlowAtom[]
 }

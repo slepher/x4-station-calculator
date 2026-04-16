@@ -10,7 +10,7 @@ import { useProductionDashboardPresenter } from '@/components/empire/presenters/
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import StationTabBar from '@/components/empire/StationTabBar.vue'
-import ContextToolbar from '@/components/empire/ContextToolbar.vue'
+import BlueprintContextToolbar from '@/components/empire/context_toolbar/BlueprintContextToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 
@@ -62,17 +62,13 @@ const importModalActiveStation = computed(() => {
     @duplicate-station="tabbarPresenter.emits.duplicateStation"
     @delete-station="tabbarPresenter.emits.deleteStation"
   />
-  <ContextToolbar
-    :mode="toolbarPresenter.props.mode.value"
-    :is-binding-mode="toolbarPresenter.props.isBindingMode"
-    :title-model="toolbarPresenter.props.titleModel.value"
-    :station="toolbarPresenter.props.station.value"
+  <BlueprintContextToolbar
+    :station="toolbarPresenter.props.station.value!"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
     :station-types="toolbarPresenter.props.stationTypes"
     :available-minerals="toolbarPresenter.props.availableMinerals"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
-    @update-title="toolbarPresenter.emits.updateTitle"
     @update-station-name="toolbarPresenter.emits.updateStationName"
     @update-station-type="toolbarPresenter.emits.updateStationType"
     @update-station-count="toolbarPresenter.emits.updateStationCount"
@@ -104,6 +100,8 @@ const importModalActiveStation = computed(() => {
       <StationPlanningPanel
         :planned-modules="planningPresenter.props.plannedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
+        :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
+        :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
       />
@@ -112,13 +110,10 @@ const importModalActiveStation = computed(() => {
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
         :view-mode="wareflowPresenter.props.viewMode.value"
-        :grouped-flows="wareflowPresenter.props.groupedFlows.value"
-        :auto-modules="wareflowPresenter.props.autoModules.value"
+        :production-flows="wareflowPresenter.props.productionFlows.value"
+        :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"
-        :planned-modules="wareflowPresenter.props.plannedModules.value"
-        :wares="wareflowPresenter.props.wares.value"
-        :modules-map="wareflowPresenter.props.modulesMap.value"
         :is-ware-locked="wareflowPresenter.props.isWareLocked"
         :get-resolved-level="wareflowPresenter.props.getResolvedLevel"
         :is-ware-operable="wareflowPresenter.props.isWareOperable"

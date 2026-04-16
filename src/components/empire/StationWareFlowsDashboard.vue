@@ -2,8 +2,10 @@
 import { computed } from 'vue'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { GroupedFlows, SavedModule } from '@/types/x4'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { useWareFlowGrouping } from './composables/useWareFlowGrouping'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
+import type { WareProductionFlow } from '@/types/production-flow'
 
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -14,8 +16,8 @@ import ViewTabUi from '@/components/common/ViewTabUI.vue'
 
 const props = defineProps<{
   viewMode: WareFlowViewMode
-  groupedFlows: GroupedFlows
-  autoModules: SavedModule[]
+  productionFlows: WareProductionFlow[]
+  warePriorityLevels: Record<string, number>
   settings: {
     resourceBufferHours: number
     primaryProductBufferHours: number
@@ -30,9 +32,6 @@ const props = defineProps<{
     operations: EmpireGapItem[]
     supply: EmpireGapItem[]
   }
-  plannedModules: SavedModule[]
-  wares: Record<string, any>
-  modulesMap?: Record<string, any>
   isWareLocked?: (wareId: string) => boolean
   getResolvedLevel?: (wareId: string) => number
   isWareOperable?: (wareId: string) => boolean
@@ -40,15 +39,6 @@ const props = defineProps<{
   onToggleWareLock?: (wareId: string) => void
   onToggleWarePriority?: (wareId: string) => void
 }>()
-
-console.log('[StationWareFlowsDashboard] props received', {
-  hasIsWareLocked: !!props.isWareLocked,
-  hasGetResolvedLevel: !!props.getResolvedLevel,
-  hasIsWareOperable: !!props.isWareOperable,
-  hasIsPlannedWare: !!props.isPlannedWare,
-  hasOnToggleWareLock: !!props.onToggleWareLock,
-  hasOnToggleWarePriority: !!props.onToggleWarePriority
-})
 
 const emit = defineEmits<{
   updateViewMode: [value: WareFlowViewMode]
@@ -61,8 +51,23 @@ const emit = defineEmits<{
   removeGapModule: [wareId: string]
 }>()
 
+const gameDataStore = useGameDataStore()
 const { t, locale } = useI18n()
 const { translateWare } = useX4I18n()
+const { computeGroupedFlows } = useWareFlowGrouping()
+
+const groupedFlows = computed(() => computeGroupedFlows({
+  productionFlows: props.productionFlows,
+  waresMap: gameDataStore.waresMap,
+  settings: {
+    buyMultiplier: props.settings.buyMultiplier,
+    sellMultiplier: props.settings.sellMultiplier,
+    resourceBufferHours: props.settings.resourceBufferHours,
+    primaryProductBufferHours: props.settings.primaryProductBufferHours,
+    secondaryProductBufferHours: props.settings.secondaryProductBufferHours
+  },
+  warePriorityLevels: props.warePriorityLevels
+}))
 
 const viewMode = computed<WareFlowViewMode>({
   get: () => props.viewMode,
@@ -93,7 +98,7 @@ const sellMultiplier = computed({
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 
 const wrapFlow = (flow: any) => {
-  const wareInfo = props.wares[flow.wareId]
+  const wareInfo = gameDataStore.waresMap[flow.wareId]
   return {
     ...flow,
     id: flow.wareId,
@@ -114,7 +119,7 @@ const empireGapSupply = computed(() =>
 )
 
 const totalProfit = computed(() => {
-  return props.groupedFlows.flows.reduce((sum, flow) => sum + flow.netValue, 0)
+  return groupedFlows.value.flows.reduce((sum, flow) => sum + flow.netValue, 0)
 })
 
 const getGroupVolume = (group: any[]) => 
@@ -164,20 +169,20 @@ const views = computed<{key: WareFlowViewMode; label: string}[]>(() => {
 
 const volumeGroups = computed(() => [
   {key: 'container', title: t('wareflow.container_group'),
-   items: props.groupedFlows.volumeGroups.container.map(wrapFlow)},
+   items: groupedFlows.value.volumeGroups.container.map(wrapFlow)},
   {key: 'solid', title: t('wareflow.solid_group'),
-   items: props.groupedFlows.volumeGroups.solid.map(wrapFlow)},
+   items: groupedFlows.value.volumeGroups.solid.map(wrapFlow)},
   {key: 'liquid', title: t('wareflow.liquid_group'),
-   items: props.groupedFlows.volumeGroups.liquid.map(wrapFlow)}
+   items: groupedFlows.value.volumeGroups.liquid.map(wrapFlow)}
 ])
 
 const transportGroups = computed(() => [
   {key: 'container', title: t('wareflow.container_group'),
-   items: props.groupedFlows.volumeGroups.container.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)},
+   items: groupedFlows.value.volumeGroups.container.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)},
   {key: 'solid', title: t('wareflow.solid_group'),
-   items: props.groupedFlows.volumeGroups.solid.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)},
+   items: groupedFlows.value.volumeGroups.solid.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)},
   {key: 'liquid', title: t('wareflow.liquid_group'),
-   items: props.groupedFlows.volumeGroups.liquid.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)}
+   items: groupedFlows.value.volumeGroups.liquid.filter(f => (f.transportDemand || 0) > 0).map(wrapFlow)}
 ])
 
 const rateGroups = computed(() => ([
@@ -186,28 +191,28 @@ const rateGroups = computed(() => ([
    title: viewMode.value === 'economy'
      ? t('wareflow.income_group')
      : t('wareflow.products_group'),
-   items: props.groupedFlows.rateGroups.positive.map(wrapFlow)},
+   items: groupedFlows.value.rateGroups.positive.map(wrapFlow)},
   {key: 'operations',
    symbolClass: "negative",
    title: viewMode.value === 'economy'
      ? t('wareflow.expenses_operations_group')
      : t('wareflow.operations_group'),
-   items: props.groupedFlows.rateGroups.operations.map(wrapFlow)},
+   items: groupedFlows.value.rateGroups.operations.map(wrapFlow)},
   {key: 'supply',
    symbolClass: "negative",
    title: viewMode.value === 'economy'
      ? t('wareflow.expenses_supply_group')
      : t('wareflow.supply_group'),
-   items: props.groupedFlows.rateGroups.supply.map(wrapFlow)},
+   items: groupedFlows.value.rateGroups.supply.map(wrapFlow)},
   {key: 'resources', 
    symbolClass: "negative",
    title: viewMode.value === 'economy'
      ? t('wareflow.expenses_resources_group')
      : t('wareflow.resources_group'),
-   items: props.groupedFlows.rateGroups.resources.map(wrapFlow)}
+   items: groupedFlows.value.rateGroups.resources.map(wrapFlow)}
 ]))
 
-const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
+const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
 </script>
 
 <template>
@@ -236,7 +241,6 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
             :resourceBufferHours="props.settings.resourceBufferHours"
             :primaryProductBufferHours="props.settings.primaryProductBufferHours"
             :secondaryProductBufferHours="props.settings.secondaryProductBufferHours"
-            :modulesMap="props.modulesMap"
             :onToggleWareLock="props.onToggleWareLock"
             :onToggleWarePriority="props.onToggleWarePriority"
         >
@@ -264,7 +268,6 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
           :resourceBufferHours="props.settings.resourceBufferHours"
           :primaryProductBufferHours="props.settings.primaryProductBufferHours"
           :secondaryProductBufferHours="props.settings.secondaryProductBufferHours"
-          :modulesMap="props.modulesMap"
           :onToggleWareLock="props.onToggleWareLock"
           :onToggleWarePriority="props.onToggleWarePriority"
         >
@@ -327,7 +330,6 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
             :resourceBufferHours="props.settings.resourceBufferHours"
             :primaryProductBufferHours="props.settings.primaryProductBufferHours"
             :secondaryProductBufferHours="props.settings.secondaryProductBufferHours"
-            :modulesMap="props.modulesMap"
             :onToggleWareLock="props.onToggleWareLock"
             :onToggleWarePriority="props.onToggleWarePriority"
           > 
@@ -335,10 +337,10 @@ const hasFlowData = computed(() => props.groupedFlows.flows.length > 0)
               {{ getGroupSymboledValue(group.items) }} Cr 
             </span> 
           </StationWareFlowGroup>
-        <EmptyState v-if="viewMode === 'economy' && props.groupedFlows.flows.length === 0" />
+        <EmptyState v-if="viewMode === 'economy' && groupedFlows.flows.length === 0" />
       </div>
 
-      <EmptyState v-if="props.groupedFlows.flows.length === 0 && viewMode !== 'economy'" />
+      <EmptyState v-if="groupedFlows.flows.length === 0 && viewMode !== 'economy'" />
     </div>
 
     <div class="volume-controls-section" v-if="hasFlowData && viewMode === 'volume'">

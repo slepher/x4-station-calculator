@@ -1,12 +1,12 @@
 import { computed, type ComputedRef } from 'vue'
 import type { ProductionWorkbenchStoreContract } from '@/types/production-workbench-contract'
 import type { StationWareFlowsDashboardEmits, WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import type { SavedModule, GroupedFlows } from '@/types/x4'
+import type { WareProductionFlow } from '@/types/production-flow'
 
 export interface WareflowPresenterProps {
   viewMode: ComputedRef<WareFlowViewMode>
-  groupedFlows: ComputedRef<GroupedFlows>
-  autoModules: ComputedRef<SavedModule[]>
+  productionFlows: ComputedRef<WareProductionFlow[]>
+  warePriorityLevels: ComputedRef<Record<string, number>>
   settings: ComputedRef<{
     resourceBufferHours: number
     primaryProductBufferHours: number
@@ -18,9 +18,6 @@ export interface WareflowPresenterProps {
     transportMinutes?: number
   }>
   empireGaps: ComputedRef<{ operations: EmpireGapItem[]; supply: EmpireGapItem[] }>
-  plannedModules: ComputedRef<SavedModule[]>
-  wares: ComputedRef<Record<string, any>>
-  modulesMap: ComputedRef<Record<string, any> | undefined>
   isWareLocked: (wareId: string) => boolean
   getResolvedLevel: (wareId: string) => number
   isWareOperable: (wareId: string) => boolean
@@ -37,13 +34,10 @@ export interface UseProductionWareflowPresenterReturn {
 export function useProductionWareflowPresenter(store: ProductionWorkbenchStoreContract): UseProductionWareflowPresenterReturn {
   const props: WareflowPresenterProps = {
     viewMode: computed(() => store.getWareflowViewMode()),
-    groupedFlows: computed(() => store.getGroupedFlows()),
-    autoModules: computed(() => store.getAutoModules()),
+    productionFlows: computed(() => store.getProductionFlows()),
+    warePriorityLevels: computed(() => store.getWarePriorityLevels()),
     settings: computed(() => store.getWareflowSettings()),
     empireGaps: computed(() => store.getEmpireGaps()),
-    plannedModules: computed(() => store.getPlannedModules()),
-    wares: computed(() => store.getWares()),
-    modulesMap: computed(() => store.getModulesMap()),
     isWareLocked: (wareId: string) => store.isWareLocked(wareId),
     getResolvedLevel: (wareId: string) => store.getResolvedLevel(wareId),
     isWareOperable: (wareId: string) => store.isWareOperable(wareId),

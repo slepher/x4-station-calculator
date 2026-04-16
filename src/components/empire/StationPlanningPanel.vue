@@ -11,7 +11,8 @@ import type { SavedModule, ModuleGroupResult } from '@/types/x4'
 const props = defineProps<{
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
-  autoInfrastructureModules?: SavedModule[]
+  autoHabitationModules: SavedModule[]
+  autoInfrastructureModules: SavedModule[]
   enforceDlcActivation: boolean
 }>()
 
@@ -157,8 +158,6 @@ const handleTransferAutoModule = (module: SavedModule) => {
 const handleUpdateSearchQuery = (value: string) => {
   searchQuery.value = value
 }
-
-const mergedAutoModules = computed<SavedModule[]>(() => props.autoIndustryModules)
 </script>
 
 <template>
@@ -201,13 +200,39 @@ const mergedAutoModules = computed<SavedModule[]>(() => props.autoIndustryModule
       </div>
     </div>
 
-    <div v-if="mergedAutoModules.length > 0" class="tier-section tier-auto">
-        <div class="tier-header">
-          <span class="tier-label">{{ t('planning.tier_industry') }}</span>
-        </div>
+    <div v-if="props.autoIndustryModules.length > 0" class="tier-section tier-auto">
+      <div class="tier-header">
+        <span class="tier-label">{{ t('planning.tier_industry') }}</span>
+      </div>
       <div class="module-list-scroll">
         <div class="auto-modules-container">
-          <StationPlanningItem v-for="(element, index) in mergedAutoModules" :key="element.id + '-' + index"
+          <StationPlanningItem v-for="(element, index) in props.autoIndustryModules" :key="'industry-' + element.id + '-' + index"
+            :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            @transfer="handleTransferAutoModule(element)" />
+        </div>
+      </div>
+    </div>
+
+    <div v-if="props.autoHabitationModules.length > 0" class="tier-section tier-auto">
+      <div class="tier-header">
+        <span class="tier-label">{{ t('planning.tier_habitation') }}</span>
+      </div>
+      <div class="module-list-scroll">
+        <div class="auto-modules-container">
+          <StationPlanningItem v-for="(element, index) in props.autoHabitationModules" :key="'habitation-' + element.id + '-' + index"
+            :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            @transfer="handleTransferAutoModule(element)" />
+        </div>
+      </div>
+    </div>
+
+    <div v-if="props.autoInfrastructureModules.length > 0" class="tier-section tier-auto">
+      <div class="tier-header">
+        <span class="tier-label">{{ t('planning.tier_infrastructure') }}</span>
+      </div>
+      <div class="module-list-scroll">
+        <div class="auto-modules-container">
+          <StationPlanningItem v-for="(element, index) in props.autoInfrastructureModules" :key="'infrastructure-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
             @transfer="handleTransferAutoModule(element)" />
         </div>

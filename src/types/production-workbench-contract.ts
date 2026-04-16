@@ -1,5 +1,6 @@
-import type { StationType, SavedModule, GroupedFlows, StationSettings } from './x4'
+import type { StationType, SavedModule, StationSettings } from './x4'
 import type { WareFlowViewMode, EmpireGapItem } from './production-ui'
+import type { WareProductionFlow } from './production-flow'
 
 export interface ProductionWorkbenchCapabilities {
   uniqueWorkbench: boolean
@@ -51,10 +52,13 @@ export interface ProductionWorkbenchStoreContract {
 
   getPlannedModules(): SavedModule[]
   getAutoModules(): SavedModule[]
+  getAutoHabitationModules(): SavedModule[]
+  getAutoInfrastructureModules(): SavedModule[]
   getEnforceDlcActivation(): boolean
 
   getWareflowViewMode(): WareFlowViewMode
-  getGroupedFlows(): GroupedFlows
+  getProductionFlows(): WareProductionFlow[]
+  getWarePriorityLevels(): Record<string, number>
   getWareflowSettings(): {
     resourceBufferHours: number
     primaryProductBufferHours: number
@@ -143,7 +147,4 @@ export interface ProductionWorkbenchStoreContract {
   getResolvedLevel(wareId: string): number
   isWareOperable(wareId: string): boolean
   isPlannedWare(wareId: string): boolean
-
-  getWares(): Record<string, any>
-  getModulesMap(): Record<string, any>
 }
