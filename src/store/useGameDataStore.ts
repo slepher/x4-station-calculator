@@ -87,8 +87,6 @@ export const useGameDataStore = defineStore('gameData', () => {
   const languages = ref<X4Language[]>([])
   const dlcs = ref<X4Dlc[]>([])
   const dlcSetting = ref<X4SettingStorage>({})
-  const ships = ref<X4Ship[]>([])
-  const equipments = ref<X4Equipment[]>([])
 
   const factionColorMap = computed<Record<string, string>>(() => {
     const map: Record<string, string> = {}
@@ -414,8 +412,6 @@ export const useGameDataStore = defineStore('gameData', () => {
     shipSlots.value = data.shipSlots
     languages.value = data.languages
     dlcs.value = data.dlcs
-    ships.value = data.ships
-    equipments.value = data.equipments
   }
 
   function setVersion(version: string, beta: boolean) {
@@ -550,8 +546,6 @@ export const useGameDataStore = defineStore('gameData', () => {
     needsDlcSetup,
     enforceDlcActivation,
     factionColorMap,
-    ships,
-    equipments,
     // Methods
     getStorageKey,
     setVersion,
