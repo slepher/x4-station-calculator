@@ -56,64 +56,20 @@ const activeStation = computed(() => liveStore.activeStation)
 const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
 const isOverview = computed(() => !activeStation.value && !activeTransitSectorId.value)
 
-const bindingStation = computed(() => liveStore.bindingStation)
-const archiveStation = computed(() => liveStore.archiveStation)
+const stationContext = computed(() => liveStore.stationContext)
 
-const hasBindingStation = computed(() => bindingStation.value !== null)
-const hasSaveStation = computed(() => archiveStation.value !== null)
+const hasBindingStation = computed(() => stationContext.value?.hasBinding ?? false)
+const hasSaveStation = computed(() => stationContext.value?.hasArchive ?? false)
 const mode = computed(() => liveStore.mode)
 const canToggle = computed(() => liveStore.canToggle)
-const stationCode = computed(() => archiveStation.value?.code || '')
-const sectorResources = computed(() => {
-  if (archiveStation.value?.sector?.resources?.length) {
-    return archiveStation.value.sector.resources
-  }
-  return bindingSectorData.value?.resources || []
-})
-
-const bindingSectorData = computed(() => {
-  const sectorMacro = bindingStation.value?.sectorMacro
-  if (!sectorMacro) return null
-  const sector = gameData.maps.sectors[sectorMacro]
-  if (!sector) return null
-  return {
-    name: sector.name,
-    nameId: sector.nameId,
-    sunlight: sector.area?.sunlight ?? 1,
-    resources: (sector.resources || []).map(r => r.ware)
-  }
-})
-
-const sectorSunlight = computed(() => {
-  if (archiveStation.value?.sector?.sunlight !== undefined) {
-    return Math.round(archiveStation.value.sector.sunlight * 100)
-  }
-  if (bindingSectorData.value?.sunlight !== undefined) {
-    return Math.round(bindingSectorData.value.sunlight * 100)
-  }
-  return 100
-})
-
-const sectorName = computed(() => {
-  if (archiveStation.value?.sector?.name) {
-    return archiveStation.value.sector.name
-  }
-  return bindingSectorData.value?.name || ''
-})
-
-const sectorNameId = computed(() => {
-  if (archiveStation.value?.sector?.nameId) {
-    return archiveStation.value.sector.nameId
-  }
-  return bindingSectorData.value?.nameId
-})
-
-const stationPosition = computed(() => {
-  if (archiveStation.value?.position) {
-    return archiveStation.value.position
-  }
-  return bindingStation.value?.position
-})
+const stationCode = computed(() => stationContext.value?.stationCode || '')
+const sectorResources = computed(() => stationContext.value?.sectorResources || [])
+const sectorSunlight = computed(() => stationContext.value?.sectorSunlight ?? 100)
+const sectorName = computed(() => stationContext.value?.sectorName || '')
+const sectorNameId = computed(() => stationContext.value?.sectorNameId)
+const stationPosition = computed(() => stationContext.value?.position)
+const archiveModules = computed(() => stationContext.value?.archiveModules || [])
+const buildingModules = computed(() => stationContext.value?.buildingModules || [])
 
 const importModalActiveStation = computed(() => {
   if (!activeStation.value) return null
@@ -294,6 +250,9 @@ const transitHubInput = computed(() => {
         :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         :mode="mode"
+        :archive-modules="archiveModules"
+        :building-modules="buildingModules"
+        :has-archive="hasSaveStation"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
       />
     </div>

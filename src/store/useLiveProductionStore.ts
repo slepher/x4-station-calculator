@@ -272,6 +272,40 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const mode = ref<'live' | 'planning'>('planning')
 
+  const stationContext = computed(() => {
+    const binding = bindingStation.value
+    const archive = archiveStation.value
+    const station = activeStation.value
+    
+    if (!station) return null
+    
+    const hasBinding = binding !== null
+    const hasArchive = archive !== null
+    const stationCode = archive?.code || station.id
+    
+    const sectorName = archive?.sector?.name || ''
+    const sectorNameId = archive?.sector?.nameId
+    const sectorResources = archive?.sector?.resources || []
+    const sectorSunlight = archive?.sector?.sunlight ?? 100
+    const position = archive?.position
+    
+    const archiveModules: SavedModule[] = archive?.modules || []
+    const buildingModules: SavedModule[] = archive?.building?.modules || []
+    
+    return {
+      hasBinding,
+      hasArchive,
+      stationCode,
+      sectorName,
+      sectorNameId,
+      sectorResources,
+      sectorSunlight,
+      position,
+      archiveModules,
+      buildingModules
+    }
+  })
+
   const initialMode = computed<'live' | 'planning'>(() => {
     const hasBinding = bindingStation.value !== null
     const hasSave = archiveStation.value !== null
@@ -1424,6 +1458,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getDerivedBindingStation,
     bindingStation,
     archiveStation,
+    stationContext,
     mode,
     initialMode,
     canToggle,

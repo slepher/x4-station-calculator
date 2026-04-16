@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import StationPlanningPanel from '@/components/empire/StationPlanningPanel.vue'
 import ArchiveModuleList from '@/components/empire/ArchiveModuleList.vue'
 import type { SavedModule } from '@/types/x4'
@@ -13,6 +12,9 @@ const props = defineProps<{
   autoInfrastructureModules: SavedModule[]
   enforceDlcActivation: boolean
   mode: 'live' | 'planning'
+  archiveModules?: SavedModule[]
+  buildingModules?: SavedModule[]
+  hasArchive?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -20,20 +22,9 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const liveStore = useLiveProductionStore()
-
-const archiveStation = computed(() => liveStore.archiveStation)
-
-const saveStationModules = computed<SavedModule[]>(() => {
-  return archiveStation.value?.modules || []
-})
-
-const buildingModules = computed<SavedModule[]>(() => {
-  return archiveStation.value?.building.modules || []
-})
 
 const showArchivePanel = computed(() => {
-  return props.mode === 'live' && archiveStation.value !== null
+  return props.mode === 'live' && props.hasArchive
 })
 
 const handleUpdatePlannedModules = (modules: SavedModule[]) => {
@@ -61,8 +52,8 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
       />
       <ArchiveModuleList
         v-else
-        :modules="saveStationModules"
-        :building-modules="buildingModules"
+        :modules="props.archiveModules || []"
+        :building-modules="props.buildingModules || []"
       />
     </div>
   </div>

@@ -204,6 +204,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
   const productionFlows = computed(() => activeStationState.value.productionFlows)
 
+  const stationContext = computed<null>(() => null)
+
   const wares = computed(() => gameData.waresMap)
 
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
@@ -1087,6 +1089,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeStation,
     activeStationState,
     activeStationId,
+    stationContext,
     orderedStations,
     savedEmpires,
     workbench,
