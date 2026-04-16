@@ -714,42 +714,23 @@ const allStationsForMenu = computed(() => {
     })
   }
 
-  // 3. 已放置未绑定的虚拟补给站（有 position，无 saveStationCode）
-  // 4. 未放置的虚拟补给站（无 tradestationBinding）
+  // 3. 虚拟中转站（未绑定的可以被绑定，已绑定的只允许解绑）
   // 只有定位星区的 save station 可以绑定虚拟补给站
   const anchorMacro = currentGroupBinding.value?.sectorMacro
   const tb = currentGroupBinding.value?.tradestationBinding
   const tradestationSaveStationCode = currentGroupBinding.value?.tradestationBinding?.saveStationCode
   const isAnchorSector = bindMenuSectorMacro.value === anchorMacro
   
-  if (isAnchorSector) {
-    if (tb?.position && !tradestationSaveStationCode) {
-      items.push({
-        type: 'virtualTradestation',
-        name: t('map.binding_sector_tradestation'),
-        sectorGroupId: props.sectorGroupId,
-        sectorMacro: tb.sectorMacro,
-        disabled: true,
-        placed: true
-      })
-    } else if (tb && tradestationSaveStationCode) {
-      const isCurrentSaveStation = bindMenuSaveStation.value?.code === tradestationSaveStationCode
-      items.push({
-        type: 'virtualTradestation',
-        name: t('map.binding_sector_tradestation'),
-        sectorGroupId: props.sectorGroupId,
-        sectorMacro: tb.sectorMacro,
-        disabled: !isCurrentSaveStation,
-        placed: Boolean(tb.position)
-      })
-    } else if (!tb) {
-      items.push({
-        type: 'virtualTradestation',
-        name: t('map.binding_sector_tradestation'),
-        sectorGroupId: props.sectorGroupId,
-        sectorMacro: undefined
-      })
-    }
+  if (isAnchorSector && tb) {
+    const isCurrentSaveStation = bindMenuSaveStation.value?.code === tradestationSaveStationCode
+    items.push({
+      type: 'virtualTradestation',
+      name: t('map.binding_sector_tradestation'),
+      sectorGroupId: props.sectorGroupId,
+      sectorMacro: tb.sectorMacro,
+      disabled: tradestationSaveStationCode ? !isCurrentSaveStation : false,
+      placed: true
+    })
   }
 
   return items
