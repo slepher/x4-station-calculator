@@ -1,6 +1,6 @@
 import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
 import { isSectorMacroInBindingScope, resolveBindingSectorScope } from './saveBindingSectorScope'
-import { migrateStationSettings } from '@/store/state/StationStateMap'
+import { migrateStationSettings } from '@/store/state/stationSettings'
 import { stationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
 import type {
   BindingStationPlan,

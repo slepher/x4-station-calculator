@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { useSaveStore } from './useSaveStore'
-import { DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { DEFAULT_STATION_SETTINGS } from './state/stationSettings'
 import type {
   BindingSectorGroup,
   BindingStationPlan,
