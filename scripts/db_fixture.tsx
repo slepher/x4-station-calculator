@@ -333,6 +333,17 @@ type X4Ship = {
   slots: X4ShipSlot[]
 }
 
+type X4MapSector = {
+  raw_center_pos?: { x: number; y: number; z: number }
+  zones?: Record<string, {
+    raw_sector_pos?: { x: number; y: number; z: number }
+  }>
+}
+
+type X4Map = {
+  sectors: Record<string, X4MapSector>
+}
+
 type StationSettings = {
   sunlight: number
   useHQ: boolean
@@ -373,6 +384,48 @@ const DEFAULT_STATION_SETTINGS: StationSettings = {
   transportShipCapacity: 62000
 }
 
+const SECTOR_CENTER_GRID = 64000
+const snapToSectorCenterGrid = (value: number) => Math.round(value / SECTOR_CENTER_GRID) * SECTOR_CENTER_GRID
+
+const getSectorZoneBoundingCenter = (sector: X4MapSector): { x: number; z: number } => {
+  if (sector.raw_center_pos?.x !== undefined && sector.raw_center_pos?.z !== undefined) {
+    return { x: sector.raw_center_pos.x, z: sector.raw_center_pos.z }
+  }
+
+  const points: Array<{ x: number; z: number }> = []
+  for (const zone of Object.values(sector.zones || {})) {
+    if (zone.raw_sector_pos?.x !== undefined && zone.raw_sector_pos?.z !== undefined) {
+      points.push({ x: zone.raw_sector_pos.x, z: zone.raw_sector_pos.z })
+    }
+  }
+
+  if (points.length === 0) return { x: 0, z: 0 }
+
+  const minX = Math.min(...points.map((p) => p.x))
+  const maxX = Math.max(...points.map((p) => p.x))
+  const minZ = Math.min(...points.map((p) => p.z))
+  const maxZ = Math.max(...points.map((p) => p.z))
+  return {
+    x: snapToSectorCenterGrid((minX + maxX) / 2),
+    z: snapToSectorCenterGrid((minZ + maxZ) / 2)
+  }
+}
+
+const resolveMapSectorByMacro = (maps: X4Map, macro: string): X4MapSector | null => {
+  const normalizedMacro = macro.trim().toLowerCase()
+  for (const [sectorId, sector] of Object.entries(maps.sectors)) {
+    if (sectorId.toLowerCase() === normalizedMacro) return sector
+  }
+  return null
+}
+
+const getSectorCenterPosition = (maps: X4Map, sectorMacro: string): { x: number; y: number; z: number } => {
+  const sector = resolveMapSectorByMacro(maps, sectorMacro)
+  if (!sector) return { x: 0, y: 0, z: 0 }
+  const center = getSectorZoneBoundingCenter(sector)
+  return { x: center.x, y: 0, z: center.z }
+}
+
 const loadJson = async <T,>(file: string): Promise<T> => {
   const raw = await readFile(file, 'utf8')
   return JSON.parse(raw) as T
@@ -388,7 +441,7 @@ const isLogicFlowSeed = (seed: any): seed is SeedLogicFlow => Boolean(seed?.plan
 const isShipBlueprintSeed = (seed: any): seed is SeedShipBuild => Boolean(seed?.ships)
 const isBindingSeed = (seed: any): seed is SeedBinding => Boolean(seed?.gameGuid)
 
-const buildBindingState = (seed: SeedBinding, now: number, saveData: any): SavedSaveBindingsState => {
+const buildBindingState = (seed: SeedBinding, now: number, saveData: any, maps: X4Map): SavedSaveBindingsState => {
   const groupNameToId = new Map<string, string>()
   const groupSectorToGroupId = new Map<string, string>()
   
@@ -412,20 +465,32 @@ const buildBindingState = (seed: SeedBinding, now: number, saveData: any): Saved
       connectedGroupIds: g.connectedGroupIds.map(name => groupNameToId.get(name) || name)
     }
     
+    // Auto-create tradestation if not specified in seed
     if (g.tradeStation) {
       if (g.tradeStation.saveStationCode) {
         group.tradeStation = {
           id: stableId('tradestation', seed.gameGuid, g.name),
           name: `${g.name} 中转站`,
-          saveStationCode: g.tradeStation.saveStationCode
+          saveStationCode: g.tradeStation.saveStationCode,
+          sectorMacro: g.tradeStation.sectorMacro || g.sectorMacro,
+          position: g.tradeStation.position
         }
       } else {
         group.tradeStation = {
           id: stableId('tradestation', seed.gameGuid, g.name),
           name: `${g.name} 中转站`,
-          sectorMacro: g.tradeStation.sectorMacro,
+          sectorMacro: g.tradeStation.sectorMacro || g.sectorMacro,
           position: g.tradeStation.position
         }
+      }
+    } else {
+      // Auto-create tradestation at sector center
+      const position = getSectorCenterPosition(maps, g.sectorMacro)
+      group.tradeStation = {
+        id: stableId('tradestation', seed.gameGuid, g.name),
+        name: `${g.name} 中转站`,
+        sectorMacro: g.sectorMacro,
+        position
       }
     }
     
@@ -783,6 +848,7 @@ const main = async () => {
   const wares = await loadJson<X4Ware[]>(path.join(DATA_DIR, 'wares.json'))
   const modules = await loadJson<X4Module[]>(path.join(DATA_DIR, 'modules.json'))
   const ships = await loadJson<X4Ship[]>(path.join(DATA_DIR, 'ships.json'))
+  const maps = await loadJson<X4Map>(path.join(DATA_DIR, 'maps.json'))
   const wareMap = new Map(wares.map((ware) => [ware.id, ware]))
   const moduleMap = new Map(modules.map((module) => [module.id, module]))
 
@@ -811,7 +877,7 @@ const main = async () => {
       dbPayload.x4_ship_blueprints = buildShipBlueprintState(seed, ships, now)
     }
     if (isBindingSeed(seed)) {
-      dbPayload.x4_save_bindings = buildBindingState(seed, now, saveData)
+      dbPayload.x4_save_bindings = buildBindingState(seed, now, saveData, maps)
     }
   }
   
