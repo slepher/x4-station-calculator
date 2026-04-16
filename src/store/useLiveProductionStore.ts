@@ -39,9 +39,7 @@ import {
   toTransitTabId
 } from './logic/empireSourceView'
 import { createEmpireFlowFacade } from './logic/empireFlowFacade'
-import {
-  toProductionStation
-} from './logic/productionSourceAdapter'
+import { toProductionStation } from './logic/liveStationResolver'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
@@ -1456,8 +1454,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     selectOverview,
     getStationById,
     getDerivedBindingStation,
-    bindingStation,
-    archiveStation,
     stationContext,
     mode,
     initialMode,

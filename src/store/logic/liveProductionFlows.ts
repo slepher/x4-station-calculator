@@ -14,8 +14,6 @@ import type {
 } from '@/types/x4'
 import type { PlayerStationEntry, PlayerStationRecord } from '@/types/saveArchive'
 
-export type ProductionSourceKind = 'empire' | 'save-binding'
-
 export interface ProductionSourceDeps {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
@@ -29,6 +27,10 @@ export interface SaveBindingProductionDeps extends ProductionSourceDeps {
   sectorsMap?: SectorSunlightMap
 }
 
+export interface SectorSunlightMap {
+  [sectorMacro: string]: { area?: { sunlight?: number } }
+}
+
 function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
   return {
     flows: [],
@@ -39,11 +41,7 @@ function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
   }
 }
 
-export interface SectorSunlightMap {
-  [sectorMacro: string]: { area?: { sunlight?: number } }
-}
-
-export function toProductionStation(
+function toProductionStation(
   plan: BindingStationPlan,
   sectorsMap?: SectorSunlightMap
 ): StationPlan {
@@ -104,6 +102,34 @@ export interface SaveBindingProductionResult {
     groupName: string
     tradeStation: BindingSectorGroup['tradeStation']
   }>
+}
+
+function getCoveredCodesFromRecords(
+  records: PlayerStationRecord[],
+  groups: BindingSectorGroup[]
+): Set<string> {
+  if (!records || records.length === 0) return new Set()
+
+  const coverageMacros = new Set<string>()
+  groups.forEach((group) => {
+    resolveBindingSectorScope(group).sectorMacros.forEach((sectorMacro) => coverageMacros.add(sectorMacro))
+  })
+
+  const coveredCodes = new Set<string>()
+  records.forEach((record) => {
+    if (coverageMacros.has(record.sectorMacro) && record.type === 'station') {
+      coveredCodes.add(record.code)
+    }
+  })
+
+  return coveredCodes
+}
+
+function getStationRecordByCode(
+  records: PlayerStationRecord[],
+  code: string
+): PlayerStationRecord | null {
+  return records.find((r) => r.code === code && r.type === 'station') || null
 }
 
 export function buildSaveBindingProductionFlows(
@@ -212,84 +238,3 @@ export function buildSaveBindingProductionFlows(
       }))
   }
 }
-
-export interface DerivedBindingStation {
-  station: StationPlan
-  groupId: string | null
-}
-
-function getCoveredCodesFromRecords(
-  records: PlayerStationRecord[],
-  groups: BindingSectorGroup[]
-): Set<string> {
-  if (!records || records.length === 0) return new Set()
-
-  const coverageMacros = new Set<string>()
-  groups.forEach((group) => {
-    resolveBindingSectorScope(group).sectorMacros.forEach((sectorMacro) => coverageMacros.add(sectorMacro))
-  })
-
-  const coveredCodes = new Set<string>()
-  records.forEach((record) => {
-    if (coverageMacros.has(record.sectorMacro) && record.type === 'station') {
-      coveredCodes.add(record.code)
-    }
-  })
-
-  return coveredCodes
-}
-
-function getStationRecordByCode(
-  records: PlayerStationRecord[],
-  code: string
-): PlayerStationRecord | null {
-  return records.find((r) => r.code === code && r.type === 'station') || null
-}
-
-export function deriveBindingStationsFromRecords(
-  binding: SaveBindingPlan | null | undefined,
-  stationRecords: PlayerStationRecord[],
-  sectorsMap?: SectorSunlightMap
-): DerivedBindingStation[] {
-  if (!binding) return []
-  if (!stationRecords || stationRecords.length === 0) return []
-
-  const result: DerivedBindingStation[] = []
-  const coveredCodes = getCoveredCodesFromRecords(stationRecords, binding.groups)
-  const stationPlansByCode = new Map<string, BindingStationPlan>()
-  const emittedPlanIds = new Set<string>()
-
-  binding.stationPlans.forEach((plan) => {
-    if (plan.saveStationCode) {
-      stationPlansByCode.set(plan.saveStationCode, plan)
-    }
-  })
-
-  coveredCodes.forEach((code) => {
-    const record = getStationRecordByCode(stationRecords, code)
-    if (!record) return
-    const plan = stationPlansByCode.get(code)
-    const groupId = plan?.groupId || findGroupBySectorMacro(binding.groups, record.sectorMacro)?.id || null
-    const station = toDerivedSaveStation(record.data as PlayerStationEntry, plan)
-    station.sectorId = groupId
-    result.push({
-      station,
-      groupId
-    })
-    if (plan) emittedPlanIds.add(plan.id)
-  })
-
-  binding.stationPlans.forEach((plan) => {
-    if (emittedPlanIds.has(plan.id)) return
-    const station = toProductionStation(plan, sectorsMap)
-    station.sectorId = plan.groupId || null
-    result.push({
-      station,
-      groupId: plan.groupId || null
-    })
-  })
-
-  return result
-}
-
-
