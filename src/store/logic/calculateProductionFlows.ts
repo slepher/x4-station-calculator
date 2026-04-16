@@ -29,6 +29,7 @@ export interface CalculateAutoFillInput {
 
 export interface CalculateAutoFillOutput {
   autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
 }
 
 export function calculateAutoFillModules(
@@ -103,6 +104,8 @@ export function calculateAutoFillModules(
     .filter(m => m.count > 0)
     .sort((a, b) => (modulesMap[b.id]?.tier || 0) - (modulesMap[a.id]?.tier || 0))
 
+  const autoHabitation: SavedModule[] = []
+
   const allProducers: SavedModule[] = [...plannedModules, ...autoIndustry]
   const clientPopulation = calculateTotalWorkforceInternal(allProducers, modulesMap)
 
@@ -115,30 +118,29 @@ export function calculateAutoFillModules(
       if (habitat) {
         const habitatCount = Math.ceil(industrialWorkers / habitat.workforce.capacity)
 
-        const existingHabitatCount = allProducers
+        const existingHabitatCount = plannedModules
           .filter(m => modulesMap[m.id]?.type === 'habitation')
           .reduce((sum, m) => sum + m.count, 0)
 
         const neededHabitats = Math.max(0, habitatCount - existingHabitatCount)
 
         if (neededHabitats > 0) {
-          const existingIndustryHabitat = autoIndustry.find(m => m.id === habitat.id)
-          if (existingIndustryHabitat) {
-            existingIndustryHabitat.count += neededHabitats
-          } else {
-            autoIndustry.push({ id: habitat.id, count: neededHabitats })
-          }
+          autoHabitation.push({ id: habitat.id, count: neededHabitats })
         }
       }
     }
   }
 
-  return { autoIndustryModules: autoIndustry }
+  return { 
+    autoIndustryModules: autoIndustry,
+    autoHabitationModules: autoHabitation
+  }
 }
 
 export interface CalculateProductionFlowsCoreInput {
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
   medicalConsumptionMap: RaceMedicalConsumption
@@ -160,6 +162,7 @@ export function calculateProductionFlowsCore(
   const {
     plannedModules,
     autoIndustryModules,
+    autoHabitationModules,
     modulesMap,
     waresMap,
     medicalConsumptionMap,
@@ -169,7 +172,7 @@ export function calculateProductionFlowsCore(
     saturationOverride
   } = input
 
-  const allModules = [...plannedModules, ...autoIndustryModules]
+  const allModules = [...plannedModules, ...autoIndustryModules, ...autoHabitationModules]
   const internalResult = calculateProductionFlowsInternal(
     allModules,
     modulesMap,
@@ -200,6 +203,7 @@ export interface CalculateProductionFlowsInput {
 
 export interface CalculateProductionFlowsOutput {
   autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
   productionFlows: WareProductionFlow[]
   actualWorkforce: number
   currentEfficiency: number
@@ -229,6 +233,7 @@ export function calculateProductionFlows(
   const coreResult = calculateProductionFlowsCore({
     plannedModules,
     autoIndustryModules: autoFillResult.autoIndustryModules,
+    autoHabitationModules: autoFillResult.autoHabitationModules,
     modulesMap,
     waresMap,
     medicalConsumptionMap,
@@ -238,6 +243,7 @@ export function calculateProductionFlows(
 
   return {
     autoIndustryModules: autoFillResult.autoIndustryModules,
+    autoHabitationModules: autoFillResult.autoHabitationModules,
     productionFlows: coreResult.productionFlows,
     actualWorkforce: coreResult.actualWorkforce,
     currentEfficiency: coreResult.currentEfficiency

@@ -171,15 +171,31 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         actualWorkforce: 0,
         currentEfficiency: 0,
         warePriorityLevels: {},
-        productionFlows: []
+        productionFlows: [],
+        plannedModules: [],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [],
+        resolvedModules: []
       }
     }
     const cache = stationProductionFlowMap.getCache(stationId)
+    const planned = plannedModules.value
+    const autoIndustry = cache?.autoIndustryModules || []
+    const autoHabitation = cache?.autoHabitationModules || []
+    const autoInfrastructure = cache?.autoInfrastructureModules || []
+    const resolved = [...planned, ...autoIndustry, ...autoHabitation, ...autoInfrastructure]
+    
     return {
       actualWorkforce: cache?.actualWorkforce || 0,
       currentEfficiency: cache?.currentEfficiency || 0,
       warePriorityLevels: cache?.warePriorityLevels || {},
-      productionFlows: stationProductionFlowMap.getProductionFlows(stationId)
+      productionFlows: stationProductionFlowMap.getProductionFlows(stationId),
+      plannedModules: planned,
+      autoIndustryModules: autoIndustry,
+      autoHabitationModules: autoHabitation,
+      autoInfrastructureModules: autoInfrastructure,
+      resolvedModules: resolved
     }
   })
 
@@ -187,28 +203,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
   const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
   const productionFlows = computed(() => activeStationState.value.productionFlows)
-
-  const resolvedModules = computed(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return []
-    return stationProductionFlowMap.getResolvedModules(stationId)
-  })
-
-  const autoIndustryModules = computed(() => {
-    const plannedIds = plannedModules.value.map(m => m.id)
-    return resolvedModules.value.filter(m => !plannedIds.includes(m.id))
-  })
-
-  const autoInfrastructureModules = computed(() => {
-    const deps = getComputeDeps()
-    if (!deps) return []
-    const plannedIds = plannedModules.value.map(m => m.id)
-    return resolvedModules.value.filter(m => {
-      if (plannedIds.includes(m.id)) return false
-      const info = deps.modulesMap[m.id]
-      return info?.type === 'storage' || info?.type === 'pier'
-    })
-  })
 
   const wares = computed(() => gameData.waresMap)
 
@@ -277,7 +271,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   function isAutoWare(wareId: string): boolean {
     if (isPlannedWare(wareId)) return false
-    return autoIndustryModules.value.some(module => {
+    return activeStationState.value.autoIndustryModules.some(module => {
       const moduleInfo = gameData.modulesMap[module.id]
       if (!moduleInfo) return false
       return Object.keys(moduleInfo.outputs || {}).includes(wareId)
@@ -409,7 +403,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function transferModuleFromAutoIndustry(module: SavedModule): void {
-    const inIndustry = autoIndustryModules.value.some(m => m.id === module.id)
+    const inIndustry = activeStationState.value.autoIndustryModules.some(m => m.id === module.id)
     if (!inIndustry) return
     addModule(module.id, module.count)
   }
@@ -927,7 +921,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     getSingleBerthThroughput: () => Math.max(1, settings.value.transportShipCapacity || 1) * 15,
 
     getPlannedModules: () => plannedModules.value,
-    getAutoModules: () => autoIndustryModules.value,
+    getAutoModules: () => activeStationState.value.autoIndustryModules,
+    getAutoHabitationModules: () => activeStationState.value.autoHabitationModules,
+    getAutoInfrastructureModules: () => activeStationState.value.autoInfrastructureModules,
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
@@ -947,7 +943,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
     getStationAnalysis: () => {
       const planned = plannedModules.value
-      const auto = autoIndustryModules.value
+      const auto = activeStationState.value.autoIndustryModules
       const allModules = [...planned, ...auto]
       if (allModules.length === 0) {
         return {
@@ -1127,8 +1123,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     settings,
     lockedWares,
     warePriority,
-    autoIndustryModules,
-    autoInfrastructureModules,
     actualWorkforce,
     currentEfficiency,
     productionFlows,

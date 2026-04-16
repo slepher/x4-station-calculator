@@ -56,27 +56,23 @@ export function getActiveStationState(
   if (!cache) return createEmptyActiveStationState()
   
   const station = getStation?.(stationId)
-  const plannedModules = station?.modules || []
+  
+  const resolvedModules = [
+    ...cache.autoIndustryModules,
+    ...cache.autoHabitationModules,
+    ...cache.autoInfrastructureModules
+  ]
   
   const stationAnalysis = station && modulesMap && waresMap
-    ? analyzeStation(cache.resolvedModules, modulesMap, waresMap, buildPriceMultiplier ?? 0.5, station.settings?.useHQ ?? false)
+    ? analyzeStation(resolvedModules, modulesMap, waresMap, buildPriceMultiplier ?? 0.5, station.settings?.useHQ ?? false)
     : null
   
   return {
     stationAnalysis,
     actualWorkforce: cache.actualWorkforce || 0,
     currentEfficiency: cache.currentEfficiency || 0,
-    autoIndustryModules: cache.resolvedModules.filter(m => {
-      const isPlanned = plannedModules.some(p => p.id === m.id)
-      return !isPlanned
-    }),
-    autoInfrastructureModules: modulesMap
-      ? cache.resolvedModules.filter(m => {
-          const isPlanned = plannedModules.some(p => p.id === m.id)
-          const info = modulesMap[m.id]
-          return !isPlanned && (info?.type === 'storage' || info?.type === 'pier')
-        })
-      : [],
+    autoIndustryModules: cache.autoIndustryModules,
+    autoInfrastructureModules: cache.autoInfrastructureModules,
     warePriorityLevels: cache.warePriorityLevels || {},
     productionFlows: cache.productionFlows,
     groupedFlows: stationProductionFlowMap.getGrouped(stationId)

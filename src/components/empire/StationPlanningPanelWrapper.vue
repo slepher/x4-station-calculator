@@ -9,7 +9,8 @@ import type { SavedModule } from '@/types/x4'
 const props = defineProps<{
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
-  autoInfrastructureModules?: SavedModule[]
+  autoHabitationModules: SavedModule[]
+  autoInfrastructureModules: SavedModule[]
   enforceDlcActivation: boolean
   mode: 'live' | 'planning'
 }>()
@@ -53,6 +54,7 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
         v-if="!showArchivePanel"
         :planned-modules="props.plannedModules"
         :auto-industry-modules="props.autoIndustryModules"
+        :auto-habitation-modules="props.autoHabitationModules"
         :auto-infrastructure-modules="props.autoInfrastructureModules"
         :enforce-dlc-activation="props.enforceDlcActivation"
         @update-planned-modules="handleUpdatePlannedModules"

@@ -6,6 +6,8 @@ import type { SavedModule } from '@/types/x4'
 export interface PlanningPresenterProps {
   plannedModules: ComputedRef<SavedModule[]>
   autoIndustryModules: ComputedRef<SavedModule[]>
+  autoHabitationModules: ComputedRef<SavedModule[]>
+  autoInfrastructureModules: ComputedRef<SavedModule[]>
   enforceDlcActivation: ComputedRef<boolean>
 }
 
@@ -18,6 +20,8 @@ export function useProductionPlanningPresenter(store: ProductionWorkbenchStoreCo
   const props: PlanningPresenterProps = {
     plannedModules: computed(() => store.getPlannedModules()),
     autoIndustryModules: computed(() => store.getAutoModules()),
+    autoHabitationModules: computed(() => store.getAutoHabitationModules()),
+    autoInfrastructureModules: computed(() => store.getAutoInfrastructureModules()),
     enforceDlcActivation: computed(() => store.getEnforceDlcActivation())
   }
 

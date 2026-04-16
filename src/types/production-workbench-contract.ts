@@ -52,6 +52,8 @@ export interface ProductionWorkbenchStoreContract {
 
   getPlannedModules(): SavedModule[]
   getAutoModules(): SavedModule[]
+  getAutoHabitationModules(): SavedModule[]
+  getAutoInfrastructureModules(): SavedModule[]
   getEnforceDlcActivation(): boolean
 
   getWareflowViewMode(): WareFlowViewMode

@@ -100,6 +100,8 @@ const importModalActiveStation = computed(() => {
       <StationPlanningPanel
         :planned-modules="planningPresenter.props.plannedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
+        :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
+        :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
       />

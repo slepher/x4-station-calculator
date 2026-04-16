@@ -597,6 +597,8 @@
     "module_list": "Station Modules",
     "tier_planned": "Planned Modules",
     "tier_industry": "Auto Industry",
+    "tier_habitation": "Auto Habitation",
+    "tier_infrastructure": "Auto Infrastructure",
     "tier_supply": "Auto Supply",
     "consider_workforce_bonus": "Consider Worker Efficiency Bonus",
     "race_preference": "Race",

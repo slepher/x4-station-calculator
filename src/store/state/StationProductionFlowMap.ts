@@ -23,7 +23,9 @@ export interface ProductionFlowInput {
 }
 
 export interface StationFlowCache {
-  resolvedModules: SavedModule[]
+  autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
+  autoInfrastructureModules: SavedModule[]
   productionFlows: WareProductionFlow[]
   warePriorityLevels: Record<string, number>
   actualWorkforce: number
@@ -184,7 +186,7 @@ export class StationProductionFlowMap {
       warePriority: input.warePriority
     })
 
-    const productionFlows = result.productionFlows.map(flow => ({
+const productionFlows = result.productionFlows.map(flow => ({
       ...flow,
       productionVolume: flow.production * flow.unitVolume,
       consumptionVolume: flow.consumption * flow.unitVolume,
@@ -214,14 +216,10 @@ export class StationProductionFlowMap {
       warePriorityLevels
     })
 
-    const resolvedModules = [
-      ...input.plannedModules,
-      ...result.autoIndustryModules,
-      ...autoInfrastructureModules
-    ]
-
     this.cacheMap.set(stationId, {
-      resolvedModules,
+      autoIndustryModules: result.autoIndustryModules,
+      autoHabitationModules: result.autoHabitationModules,
+      autoInfrastructureModules,
       productionFlows,
       warePriorityLevels,
       actualWorkforce: result.actualWorkforce,
@@ -261,7 +259,25 @@ export class StationProductionFlowMap {
   }
 
   getResolvedModules(stationId: string): SavedModule[] {
-    return this.cacheMap.get(stationId)?.resolvedModules || []
+    const cache = this.cacheMap.get(stationId)
+    if (!cache) return []
+    return [
+      ...cache.autoIndustryModules,
+      ...cache.autoHabitationModules,
+      ...cache.autoInfrastructureModules
+    ]
+  }
+
+  getAutoIndustryModules(stationId: string): SavedModule[] {
+    return this.cacheMap.get(stationId)?.autoIndustryModules || []
+  }
+
+  getAutoHabitationModules(stationId: string): SavedModule[] {
+    return this.cacheMap.get(stationId)?.autoHabitationModules || []
+  }
+
+  getAutoInfrastructureModules(stationId: string): SavedModule[] {
+    return this.cacheMap.get(stationId)?.autoInfrastructureModules || []
   }
 
   getProductionFlows(stationId: string): WareProductionFlow[] {

@@ -23,6 +23,7 @@ export interface ActiveStationContext {
   productionFlows: WareProductionFlow[]
   
   autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
   
   stationAnalysis: StationAnalysis | null
@@ -63,6 +64,7 @@ function createEmptyContext(): ActiveStationContext {
     resolvedModules: [],
     productionFlows: [],
     autoIndustryModules: [],
+    autoHabitationModules: [],
     autoInfrastructureModules: [],
     stationAnalysis: null,
     actualWorkforce: 0,
@@ -98,11 +100,15 @@ export function getActiveStationContext(
   
   const plannedModules = station.modules || []
   const settings = station.settings
-  const autoIndustryModules = cache.resolvedModules.filter(m => 
-    !plannedModules.some(p => p.id === m.id)
-  )
+  const autoIndustryModules = cache.autoIndustryModules
   
-  const workforceBreakdown = calculateWorkforceBreakdown(cache.resolvedModules, modulesMap, settings)
+  const resolvedModules = [
+    ...cache.autoIndustryModules,
+    ...cache.autoHabitationModules,
+    ...cache.autoInfrastructureModules
+  ]
+  
+  const workforceBreakdown = calculateWorkforceBreakdown(resolvedModules, modulesMap, settings)
   const actualWorkforce = calculateActualWorkforce(workforceBreakdown, settings)
   const currentEfficiency = calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
   
@@ -116,7 +122,7 @@ export function getActiveStationContext(
     Object.keys(waresMap)
   )
   
-  const allModules = [...cache.resolvedModules]
+  const allModules = [...resolvedModules]
   const stationAnalysis = analyzeStation(
     allModules,
     modulesMap,
@@ -132,10 +138,11 @@ export function getActiveStationContext(
     settings,
     lockedWares: station.lockedWares || [],
     warePriority: station.warePriority || {},
-    resolvedModules: cache.resolvedModules,
+    resolvedModules,
     productionFlows: cache.productionFlows,
-    autoIndustryModules,
-    autoInfrastructureModules: [],
+    autoIndustryModules: cache.autoIndustryModules,
+    autoHabitationModules: cache.autoHabitationModules,
+    autoInfrastructureModules: cache.autoInfrastructureModules,
     stationAnalysis,
     actualWorkforce,
     currentEfficiency,
