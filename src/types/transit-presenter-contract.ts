@@ -1,4 +1,4 @@
-import type { StationSettings, SavedModule } from '@/types/x4'
+import type { StationSettings } from '@/types/x4'
 import type { ProductionPanelSource } from '@/types/production-panel-source'
 
 export interface TransitPresenterContract {
@@ -8,10 +8,12 @@ export interface TransitPresenterContract {
   getLiveTransitPanelSource(sectorId: string | null): ProductionPanelSource
   getActiveTransitPanelSource(sectorId: string | null): ProductionPanelSource
   getTransitHasArchiveTradeStation(): boolean
-  getTransitArchiveModules(): SavedModule[]
-  getTransitBuildingModules(): SavedModule[]
   getTransitSettings(): Partial<StationSettings>
   getGlobalSettings(): StationSettings
+  getBuildPriceMultiplier(): number
+  getUseHQ(): boolean
   updateTransitHubSettings(patch: Partial<StationSettings>): void
+  updateBuildPriceMultiplier(value: number): void
+  updateUseHQ(value: boolean): void
   toggleMode(): void
 }

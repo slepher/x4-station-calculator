@@ -35,21 +35,6 @@ const activeViewStore = useActiveViewStore()
 const gameData = useGameDataStore()
 const { t } = useI18n()
 
-const transitPresenterContract: TransitPresenterContract = {
-  getActiveTransitSectorId: () => liveStore.activeTransitSectorId,
-  getTransitMode: () => liveStore.mode,
-  getPlanningTransitPanelSource: (sectorId) => liveStore.getPlanningTransitPanelSource(sectorId),
-  getLiveTransitPanelSource: (sectorId) => liveStore.getLiveTransitPanelSource(sectorId),
-  getActiveTransitPanelSource: (sectorId) => liveStore.getActiveTransitPanelSource(sectorId),
-  getTransitHasArchiveTradeStation: () => liveStore.stationContext?.hasArchive ?? false,
-  getTransitArchiveModules: () => liveStore.stationContext?.archiveModules ?? [],
-  getTransitBuildingModules: () => liveStore.stationContext?.buildingModules ?? [],
-  getTransitSettings: () => liveStore.transitHubSettings,
-  getGlobalSettings: () => liveStore.settings,
-  updateTransitHubSettings: (patch) => liveStore.updateTransitHubSettings(patch),
-  toggleMode: () => liveStore.toggleMode()
-}
-
 onMounted(() => {
   const gameGuid = activeViewStore.activeBinding
   if (gameGuid && !liveStore.activeBinding) {
@@ -68,10 +53,6 @@ const toolbarPresenter = useProductionToolbarPresenter(liveStore.workbench)
 const planningPresenter = useProductionPlanningPresenter(liveStore.workbench)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore.workbench)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore.workbench)
-
-const transitPlanningPresenter = useTransitPlanningPresenter(transitPresenterContract)
-const transitWareflowPresenter = useTransitWareflowPresenter(transitPresenterContract)
-const transitDashboardPresenter = useTransitDashboardPresenter(transitPresenterContract)
 
 const activeStation = computed(() => liveStore.activeStation)
 const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
@@ -96,6 +77,27 @@ const empireWareFlowDerived = useEmpireWareFlowDerived({
   modulesMap: computed(() => gameData.modulesMap || {}),
   waresMap: computed(() => gameData.waresMap || {})
 })
+
+const transitPresenterContract: TransitPresenterContract = {
+  getActiveTransitSectorId: () => liveStore.activeTransitSectorId,
+  getTransitMode: () => liveStore.mode,
+  getPlanningTransitPanelSource: (sectorId) => liveStore.getPlanningTransitPanelSource(sectorId),
+  getLiveTransitPanelSource: (sectorId) => liveStore.getLiveTransitPanelSource(sectorId),
+  getActiveTransitPanelSource: (sectorId) => liveStore.getActiveTransitPanelSource(sectorId),
+  getTransitHasArchiveTradeStation: () => liveStore.stationContext?.hasArchive ?? false,
+  getTransitSettings: () => liveStore.transitHubSettings,
+  getGlobalSettings: () => liveStore.settings,
+  getBuildPriceMultiplier: () => liveStore.buildPriceMultiplier,
+  getUseHQ: () => liveStore.settings.useHQ,
+  updateTransitHubSettings: (patch) => liveStore.updateTransitHubSettings(patch),
+  updateBuildPriceMultiplier: (value) => dashboardPresenter.emits.updateBuildPriceMultiplier(value),
+  updateUseHQ: (value) => dashboardPresenter.emits.updateUseHQ(value),
+  toggleMode: () => liveStore.toggleMode()
+}
+
+const transitPlanningPresenter = useTransitPlanningPresenter(transitPresenterContract)
+const transitWareflowPresenter = useTransitWareflowPresenter(transitPresenterContract)
+const transitDashboardPresenter = useTransitDashboardPresenter(transitPresenterContract)
 
 const showArchiveModuleList = computed(() => {
   return mode.value === 'live' && stationContext.value?.hasArchive
@@ -226,10 +228,10 @@ const showArchiveModuleList = computed(() => {
         <TransitHubMaterialsPanel
           :modules="transitDashboardPresenter.props.activeModules.value"
           :building-modules="transitDashboardPresenter.props.activeBuildingModules.value"
-          :build-price-multiplier="liveStore.buildPriceMultiplier"
-          :useHQ="liveStore.settings.useHQ"
-          @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
-          @update-use-hq="dashboardPresenter.emits.updateUseHQ"
+          :build-price-multiplier="transitDashboardPresenter.props.buildPriceMultiplier.value"
+          :useHQ="transitDashboardPresenter.props.useHQ.value"
+          @update-build-price-multiplier="transitDashboardPresenter.emits.updateBuildPriceMultiplier"
+          @update-use-hq="transitDashboardPresenter.emits.updateUseHQ"
         />
       </div>
     </div>

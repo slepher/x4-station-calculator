@@ -1,6 +1,6 @@
 import { computed, type ComputedRef } from 'vue'
 import type { TransitPresenterContract } from '@/types/transit-presenter-contract'
-import type { SavedModule, SupplyStorageFlow } from '@/types/x4'
+import type { SavedModule } from '@/types/x4'
 
 export interface TransitDashboardPresenterProps {
   mode: ComputedRef<'planning' | 'live'>
@@ -11,12 +11,18 @@ export interface TransitDashboardPresenterProps {
   liveBuildingModules: ComputedRef<SavedModule[]>
   activeModules: ComputedRef<SavedModule[]>
   activeBuildingModules: ComputedRef<SavedModule[]>
-  storageFlows: ComputedRef<SupplyStorageFlow[]>
+  buildPriceMultiplier: ComputedRef<number>
+  useHQ: ComputedRef<boolean>
+}
+
+export interface TransitDashboardPresenterEmits {
+  updateBuildPriceMultiplier: (value: number) => void
+  updateUseHQ: (value: boolean) => void
 }
 
 export interface UseTransitDashboardPresenterReturn {
   props: TransitDashboardPresenterProps
-  emits: {}
+  emits: TransitDashboardPresenterEmits
 }
 
 export function useTransitDashboardPresenter(store: TransitPresenterContract): UseTransitDashboardPresenterReturn {
@@ -33,7 +39,6 @@ export function useTransitDashboardPresenter(store: TransitPresenterContract): U
   const plannedModules = computed(() => planningSource.value.planning.modules)
   const liveModules = computed(() => liveSource.value.live.modules)
   const liveBuildingModules = computed(() => liveSource.value.live.buildingModules)
-  const storageFlows = computed(() => activeSource.value.planning.supplyStorageFlows)
 
   const activeModules = computed<SavedModule[]>(() => {
     if (visualMode.value === 'planning') {
@@ -55,6 +60,9 @@ export function useTransitDashboardPresenter(store: TransitPresenterContract): U
     return []
   })
 
+  const buildPriceMultiplier = computed(() => store.getBuildPriceMultiplier())
+  const useHQ = computed(() => store.getUseHQ())
+
   const props: TransitDashboardPresenterProps = {
     mode,
     visualMode,
@@ -64,8 +72,14 @@ export function useTransitDashboardPresenter(store: TransitPresenterContract): U
     liveBuildingModules,
     activeModules,
     activeBuildingModules,
-    storageFlows
+    buildPriceMultiplier,
+    useHQ
   }
 
-  return { props, emits: {} }
+  const emits: TransitDashboardPresenterEmits = {
+    updateBuildPriceMultiplier: (value: number) => store.updateBuildPriceMultiplier(value),
+    updateUseHQ: (value: boolean) => store.updateUseHQ(value)
+  }
+
+  return { props, emits }
 }
