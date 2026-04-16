@@ -526,10 +526,11 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
     })
   }
 
-  // tradeStation per group
+  // tradeStation per group (only virtual/unbound ones)
   for (const group of activePlan.groups) {
     const stationPlan = group.tradeStation
-    if (!stationPlan?.position || !stationPlan.sectorMacro) continue
+    // Skip bound tradestations - they show as save station POIs instead
+    if (!stationPlan?.position || !stationPlan.sectorMacro || stationPlan.saveStationCode) continue
     const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationPlan.sectorMacro)
     if (!resolved) continue
     const coverageSectorMacros = Array.from(new Set([

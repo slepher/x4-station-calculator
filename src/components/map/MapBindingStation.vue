@@ -592,7 +592,9 @@ function bindToSectorTradestation() {
     gameGuid: props.gameGuid,
     groupId: props.sectorGroupId,
     saveStationCode: bindMenuSaveStation.value.code,
-    name: t('map.binding_sector_tradestation')
+    name: t('map.binding_sector_tradestation'),
+    sectorMacro: bindMenuSectorMacro.value || undefined,
+    position: bindMenuSaveStation.value.position
   })
 
   closeBindMenu()
