@@ -1,12 +1,11 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import type { SavedModule, TransitHubStorageModulePlan, X4Module } from '@/types/x4'
+import type { SavedModule, X4Module } from '@/types/x4'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import StationPlanningItem from '../StationPlanningItem.vue'
 
 const props = defineProps<{
   modules: SavedModule[]
-  modulePlans?: TransitHubStorageModulePlan[]
 }>()
 
 const gameData = useGameDataStore()

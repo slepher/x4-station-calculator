@@ -6,7 +6,6 @@ import type {
   SavedModule,
   GroupedFlows,
   StationSettings,
-  TransitHubViewModel,
   SupplyPlanningInput,
   SectorInternalData,
   X4Module,
@@ -42,7 +41,6 @@ import {
 import { createEmpireFlowFacade } from './logic/empireFlowFacade'
 import { toProductionStation } from './logic/liveStationResolver'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
-import { buildTransitHubViewModel } from './logic/transitHubViewModel'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -790,92 +788,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
 
-  const transitPlanningViewModel = computed(() => {
-    const sectorId = activeTransitSectorId.value
-    if (!sectorId) {
-      return buildTransitHubViewModel({
-        sectorId: null,
-        sectors: sectors.value,
-        stations: orderedStationsBySector.value,
-        localGroupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
-        solverOutput: null,
-        waresMap: gameData.waresMap,
-        modulesMap: gameData.modulesMap,
-        racePreference: transitHubSettings.value.racePreference ?? settings.value.racePreference,
-        transportShipCapacity: transitHubSettings.value.transportShipCapacity ?? settings.value.transportShipCapacity,
-        storageBufferHours: transitHubSettings.value.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
-        buyMultiplier: transitHubSettings.value.buyMultiplier ?? settings.value.buyMultiplier,
-        sellMultiplier: transitHubSettings.value.sellMultiplier ?? settings.value.sellMultiplier
-      })
-    }
-
-    const sectorData = planningFlowFacade.getSectorInternalData(sectorId)
-    const sectorLinkCalc = planningFlowFacade.getSectorLinkCalc(sectorId)
-    return buildTransitHubViewModel({
-      sectorId,
-      sectors: sectors.value,
-      stations: orderedStationsBySector.value,
-      localGroupedFlows: sectorData.localGroupedFlows,
-      solverOutput: sectorLinkCalc?.solverOutput || null,
-      waresMap: gameData.waresMap,
-      modulesMap: gameData.modulesMap,
-      racePreference: transitHubSettings.value.racePreference ?? settings.value.racePreference,
-      transportShipCapacity: transitHubSettings.value.transportShipCapacity ?? settings.value.transportShipCapacity,
-      storageBufferHours: transitHubSettings.value.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
-      buyMultiplier: transitHubSettings.value.buyMultiplier ?? settings.value.buyMultiplier,
-      sellMultiplier: transitHubSettings.value.sellMultiplier ?? settings.value.sellMultiplier
-    })
-  })
-
-  const transitLiveViewModel = computed(() => {
-    const sectorId = activeTransitSectorId.value
-    if (!sectorId) {
-      return buildTransitHubViewModel({
-        sectorId: null,
-        sectors: sectors.value,
-        stations: orderedStationsBySector.value,
-        localGroupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
-        solverOutput: null,
-        waresMap: gameData.waresMap,
-        modulesMap: gameData.modulesMap,
-        racePreference: transitHubSettings.value.racePreference ?? settings.value.racePreference,
-        transportShipCapacity: transitHubSettings.value.transportShipCapacity ?? settings.value.transportShipCapacity,
-        storageBufferHours: transitHubSettings.value.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
-        buyMultiplier: transitHubSettings.value.buyMultiplier ?? settings.value.buyMultiplier,
-        sellMultiplier: transitHubSettings.value.sellMultiplier ?? settings.value.sellMultiplier
-      })
-    }
-
-    const sectorData = liveFlowFacade.getSectorInternalData(sectorId)
-    const sectorLinkCalc = liveFlowFacade.getSectorLinkCalc(sectorId)
-    return buildTransitHubViewModel({
-      sectorId,
-      sectors: sectors.value,
-      stations: orderedStationsBySector.value,
-      localGroupedFlows: sectorData.localGroupedFlows,
-      solverOutput: sectorLinkCalc?.solverOutput || null,
-      waresMap: gameData.waresMap,
-      modulesMap: gameData.modulesMap,
-      racePreference: transitHubSettings.value.racePreference ?? settings.value.racePreference,
-      transportShipCapacity: transitHubSettings.value.transportShipCapacity ?? settings.value.transportShipCapacity,
-      storageBufferHours: transitHubSettings.value.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
-      buyMultiplier: transitHubSettings.value.buyMultiplier ?? settings.value.buyMultiplier,
-      sellMultiplier: transitHubSettings.value.sellMultiplier ?? settings.value.sellMultiplier
-    })
-  })
-
-  const transitState = computed(() => {
-    const currentAggregation = mode.value === 'live'
-      ? transitLiveViewModel.value
-      : transitPlanningViewModel.value
-    return {
-      sectorId: activeTransitSectorId.value,
-      groupedFlows: currentAggregation.groupedFlows,
-      storageFlows: currentAggregation.storageFlows,
-      storageModulePlans: transitPlanningViewModel.value.storageModulePlans
-    }
-  })
-
   const wares = computed(() => gameData.waresMap)
 
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
@@ -1214,17 +1126,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function getStationComponentGapFlows(stationId: string | null): StationComponentGapFlows {
     return flowFacade.getStationComponentGapFlows(stationId, activeStationId.value)
-  }
-
-  function getTransitHubViewModel(input: {
-    sectorId: string | null
-    racePreference: string
-    transportShipCapacity: number
-    storageBufferHours?: number
-    buyMultiplier?: number
-    sellMultiplier?: number
-  }): TransitHubViewModel {
-    return flowFacade.getTransitHubViewModel(input)
   }
 
   function updateBindingStationPlan(
@@ -1614,7 +1515,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       archiveModules: stationContext.value?.archiveModules || [],
       buildingModules: stationContext.value?.buildingModules || []
     }),
-    getTransitState: () => transitState.value,
 
     getTitleModel: () => ({
       value: activeBinding.value?.bindingName || activeBindingName.value || '',
@@ -1669,16 +1569,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getAutoModules: () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoIndustryModules,
     getAutoHabitationModules: () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoHabitationModules,
     getAutoInfrastructureModules: () => workbenchMode.value === 'transit'
-      ? transitPlanningViewModel.value.supplyBuildModules
+      ? stationProductionFlowMap.getSectorAutoInfrastructureModules(activeTransitSectorId.value || '')
       : activeStationState.value.autoInfrastructureModules,
     getResolvedModules: () => workbenchMode.value === 'transit'
-      ? transitPlanningViewModel.value.supplyBuildModules
+      ? stationProductionFlowMap.getSectorAutoInfrastructureModules(activeTransitSectorId.value || '')
       : activeStationState.value.resolvedModules,
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
     getProductionFlows: () => workbenchMode.value === 'transit'
-      ? (visualMode.value === 'live' && stationContext.value?.hasArchive
+      ? (mode.value === 'live'
           ? liveFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || '')
           : planningFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || ''))
       : productionFlows.value,
@@ -1894,7 +1794,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getSectorInternalData,
     getSectorLinkCalc,
     getStationComponentGapFlows,
-    getTransitHubViewModel,
     buildPriceMultiplier,
     playerStationRecords,
     plannedModules,

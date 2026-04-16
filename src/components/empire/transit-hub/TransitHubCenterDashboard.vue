@@ -3,7 +3,8 @@ import { computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { SupplyStorageFlow, TransitHubGroupedFlows } from '@/types/x4'
+import type { SupplyStorageFlow } from '@/types/x4'
+import type { WareProductionFlow } from '@/types/production-flow'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -18,9 +19,86 @@ const { translateWare } = useX4I18n()
 
 type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
+function getPriceByMultiplier(minPrice: number, avgPrice: number, maxPrice: number, multiplier: number): number {
+  if (multiplier <= 0.5) {
+    const t = multiplier * 2
+    return minPrice + (avgPrice - minPrice) * t
+  }
+  const t = (multiplier - 0.5) * 2
+  return avgPrice + (maxPrice - avgPrice) * t
+}
+
+function buildStorageFlowsFromProductionFlows(
+  productionFlows: WareProductionFlow[],
+  bufferHours: number
+): SupplyStorageFlow[] {
+  const safeBufferHours = Number.isFinite(bufferHours) && bufferHours > 0 ? bufferHours : 12
+  const byWare = new Map<string, SupplyStorageFlow>()
+
+  productionFlows
+    .filter((flow) => flow.transportType === 'container')
+    .forEach((flow) => {
+      const row = byWare.get(flow.wareId) || {
+        wareId: flow.wareId,
+        orderIndex: flow.orderIndex,
+        tier: flow.tier,
+        transportType: flow.transportType,
+        unitVolume: flow.unitVolume || 1,
+        totalProductionStorageVolume: 0,
+        totalConsumptionStorageVolume: 0,
+        totalRequiredStorageVolume: 0,
+        details: []
+      }
+
+      const details = flow.stationContributions || []
+      details.forEach((detail, index) => {
+        const amount = Math.abs(detail.netRate || 0)
+        if (amount === 0) return
+        row.details.push({
+          stationId: detail.stationId,
+          stationName: detail.stationName,
+          stationCount: detail.stationCount || 1,
+          kind: detail.netRate >= 0 ? 'production' : 'consumption',
+          staticRate: amount,
+          storageVolume: amount * (flow.unitVolume || 1) * safeBufferHours,
+          sortOrder: index
+        })
+      })
+
+      byWare.set(flow.wareId, row)
+    })
+
+  return Array.from(byWare.values())
+    .map((row) => {
+      const totalProductionStorageVolume = row.details
+        .filter((detail) => detail.kind === 'production')
+        .reduce((sum, detail) => sum + detail.storageVolume, 0)
+      const totalConsumptionStorageVolume = row.details
+        .filter((detail) => detail.kind === 'consumption')
+        .reduce((sum, detail) => sum + detail.storageVolume, 0)
+      return {
+        ...row,
+        totalProductionStorageVolume,
+        totalConsumptionStorageVolume,
+        totalRequiredStorageVolume: Math.max(totalProductionStorageVolume, totalConsumptionStorageVolume),
+        details: [...row.details].sort((a, b) => {
+          const orderA = Number(a.sortOrder)
+          const orderB = Number(b.sortOrder)
+          if (Number.isFinite(orderA) && Number.isFinite(orderB) && orderA !== orderB) return orderA - orderB
+          return b.storageVolume - a.storageVolume
+        })
+      }
+    })
+    .filter((item) => item.totalRequiredStorageVolume > 0)
+    .sort((a, b) => {
+      if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
+      if (a.tier !== b.tier) return b.tier - a.tier
+      return a.wareId.localeCompare(b.wareId)
+    })
+}
+
 const props = withDefaults(defineProps<{
-  groupedFlows: TransitHubGroupedFlows
-  storageFlows: SupplyStorageFlow[]
+  productionFlows: WareProductionFlow[]
   viewMode?: SharedViewMode
   buyMultiplier?: number
   sellMultiplier?: number
@@ -59,8 +137,37 @@ const localProductBufferHours = computed({
   set: (value) => emit('update:productBufferHours', value)
 })
 
-const groupedFlows = computed(() => props.groupedFlows)
-const storageFlows = computed(() => props.storageFlows)
+const groupedFlows = computed(() => {
+  const buyMultiplier = localBuyMultiplier.value
+  const sellMultiplier = localSellMultiplier.value
+  const flows = props.productionFlows.map((flow) => {
+    const ware = gameData.waresMap?.[flow.wareId]
+    const isSurplus = flow.netRate >= 0
+    const unitPrice = getPriceByMultiplier(
+      ware?.minPrice || 0,
+      ware?.price || 0,
+      ware?.maxPrice || 0,
+      isSurplus ? sellMultiplier : buyMultiplier
+    )
+    return {
+      ...flow,
+      unitPrice,
+      netValue: flow.netRate * unitPrice,
+      contributions: (flow.stationContributions || []).map((detail, index) => ({
+        ...detail,
+        sortOrder: index,
+        netValue: detail.netRate * unitPrice
+      }))
+    }
+  })
+
+  const products = flows.filter((flow) => flow.netRate > 0)
+  const operations = flows.filter((flow) => flow.netRate <= 0 && flow.workforceConsumption <= 0 && flow.transportType === 'container')
+  const supply = flows.filter((flow) => flow.workforceConsumption > 0 || flow.transportType !== 'container')
+
+  return { flows, products, operations, supply }
+})
+const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(props.productionFlows, localProductBufferHours.value))
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`
@@ -89,16 +196,16 @@ const title = computed(() => {
 })
 
 const grouped = computed(() => {
-  const groups = groupedFlows.value.empireGroups
-  const products = groups.operations.filter(item => item.netRate > 0)
-  const operations = groups.operations.filter(item => item.netRate <= 0)
-  const supplyValue = groups.supply.reduce((sum, item) => sum + item.netValue, 0)
+  const products = groupedFlows.value.products
+  const operations = groupedFlows.value.operations
+  const supply = groupedFlows.value.supply
+  const supplyValue = supply.reduce((sum, item) => sum + item.netValue, 0)
 
   return {
     quantity: [
       { key: 'products', title: t('wareflow.products_group'), items: products.map(wrapFlow) },
       { key: 'operations', title: t('wareflow.operations_group'), items: operations.map(wrapFlow) },
-      { key: 'supply', title: t('wareflow.supply_group'), items: groups.supply.map(wrapFlow) }
+      { key: 'supply', title: t('wareflow.supply_group'), items: supply.map(wrapFlow) }
     ],
     economy: [
       {
@@ -118,7 +225,7 @@ const grouped = computed(() => {
       {
         key: 'supply',
         title: supplyValue >= 0 ? t('wareflow.supply_income_group') : t('wareflow.supply_expense_group'),
-        items: groups.supply.map(wrapFlow),
+        items: supply.map(wrapFlow),
         sumText: formatSignedAbs(supplyValue),
         sumClass: supplyValue >= 0 ? 'positive' : 'negative'
       }

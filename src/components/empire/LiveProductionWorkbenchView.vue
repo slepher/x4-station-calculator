@@ -175,14 +175,12 @@ const showArchiveModuleList = computed(() => {
         <TransitHubBuildPanel
           v-else
           :modules="planningPresenter.props.autoInfrastructureModules.value"
-          :module-plans="planningPresenter.props.modulePlans.value"
         />
       </div>
 
       <div class="col-span-12 lg:col-span-5">
         <TransitHubCenterDashboard
-          :grouped-flows="wareflowPresenter.props.groupedFlows.value"
-          :storage-flows="wareflowPresenter.props.storageFlows.value"
+          :production-flows="wareflowPresenter.props.productionFlows.value"
           :view-mode="wareflowPresenter.props.viewMode.value"
           :buy-multiplier="wareflowPresenter.props.settings.value.buyMultiplier"
           :sell-multiplier="wareflowPresenter.props.settings.value.sellMultiplier"

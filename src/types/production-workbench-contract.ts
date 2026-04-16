@@ -1,10 +1,7 @@
 import type {
   StationType,
   SavedModule,
-  StationSettings,
-  SupplyStorageFlow,
-  TransitHubGroupedFlows,
-  TransitHubStorageModulePlan
+  StationSettings
 } from './x4'
 import type { WareFlowViewMode, EmpireGapItem } from './production-ui'
 import type { WareProductionFlow } from './production-flow'
@@ -56,13 +53,6 @@ export interface ProductionWorkbenchContextState {
   buildingModules: SavedModule[]
 }
 
-export interface ProductionWorkbenchTransitState {
-  sectorId: string | null
-  groupedFlows: TransitHubGroupedFlows
-  storageFlows: SupplyStorageFlow[]
-  storageModulePlans: TransitHubStorageModulePlan[]
-}
-
 export type ProductionRemoveModuleTarget =
   | { index: number; source?: 'planning' }
   | { moduleId: string; source: 'gap'; wareId?: string }
@@ -79,7 +69,6 @@ export interface ProductionWorkbenchStoreContract {
   getActiveTransitSectorId(): string | null
   getSessionState(): ProductionWorkbenchSessionState
   getContextState(): ProductionWorkbenchContextState
-  getTransitState(): ProductionWorkbenchTransitState
 
   getTitleModel(): { value: string; placeholder: string }
   getToolbarStation(): { id: string; name: string; type: StationType; count: number; minerals: string[] } | null

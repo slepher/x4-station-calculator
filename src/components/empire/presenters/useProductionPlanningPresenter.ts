@@ -1,7 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
 import type { ProductionWorkbenchStoreContract } from '@/types/production-workbench-contract'
 import type { StationPlanningPanelEmits } from '@/types/production-ui'
-import type { SavedModule, TransitHubStorageModulePlan } from '@/types/x4'
+import type { SavedModule } from '@/types/x4'
 
 export interface PlanningPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
@@ -11,7 +11,6 @@ export interface PlanningPresenterProps {
   autoIndustryModules: ComputedRef<SavedModule[]>
   autoHabitationModules: ComputedRef<SavedModule[]>
   autoInfrastructureModules: ComputedRef<SavedModule[]>
-  modulePlans: ComputedRef<TransitHubStorageModulePlan[]>
   liveModules: ComputedRef<SavedModule[]>
   liveBuildingModules: ComputedRef<SavedModule[]>
   enforceDlcActivation: ComputedRef<boolean>
@@ -25,7 +24,6 @@ export interface UseProductionPlanningPresenterReturn {
 export function useProductionPlanningPresenter(store: ProductionWorkbenchStoreContract): UseProductionPlanningPresenterReturn {
   const session = computed(() => store.getSessionState())
   const context = computed(() => store.getContextState())
-  const transitState = computed(() => store.getTransitState())
   const props: PlanningPresenterProps = {
     workbenchMode: computed(() => session.value.workbenchMode),
     visualMode: computed(() => session.value.visualMode),
@@ -34,7 +32,6 @@ export function useProductionPlanningPresenter(store: ProductionWorkbenchStoreCo
     autoIndustryModules: computed(() => store.getAutoModules()),
     autoHabitationModules: computed(() => store.getAutoHabitationModules()),
     autoInfrastructureModules: computed(() => store.getAutoInfrastructureModules()),
-    modulePlans: computed(() => transitState.value.storageModulePlans),
     liveModules: computed(() => context.value.archiveModules),
     liveBuildingModules: computed(() => context.value.buildingModules),
     enforceDlcActivation: computed(() => store.getEnforceDlcActivation())

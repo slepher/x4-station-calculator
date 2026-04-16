@@ -919,12 +919,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         buildingModules: []
       }
     },
-    getTransitState: () => ({
-      sectorId: null,
-      groupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
-      storageFlows: [],
-      storageModulePlans: []
-    }),
 
     getTitleModel: () => ({
       value: activeEmpire.value?.name || '',

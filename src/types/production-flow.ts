@@ -1,4 +1,4 @@
-import type { TransportType, ModuleFlowAtom } from './x4'
+import type { TransportType, ModuleFlowAtom, StationFlowAtom } from './x4'
 
 export interface WareProductionFlow {
   wareId: string
@@ -17,4 +17,5 @@ export interface WareProductionFlow {
   netVolume: number
 
   contributions: ModuleFlowAtom[]
+  stationContributions?: StationFlowAtom[]
 }

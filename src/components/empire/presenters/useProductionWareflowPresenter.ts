@@ -2,15 +2,12 @@ import { computed, type ComputedRef } from 'vue'
 import type { ProductionWorkbenchStoreContract } from '@/types/production-workbench-contract'
 import type { StationWareFlowsDashboardEmits, WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { WareProductionFlow } from '@/types/production-flow'
-import type { SupplyStorageFlow, TransitHubGroupedFlows } from '@/types/x4'
 
 export interface WareflowPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
   visualMode: ComputedRef<'planning' | 'live'>
   viewMode: ComputedRef<WareFlowViewMode>
   productionFlows: ComputedRef<WareProductionFlow[]>
-  groupedFlows: ComputedRef<TransitHubGroupedFlows>
-  storageFlows: ComputedRef<SupplyStorageFlow[]>
   warePriorityLevels: ComputedRef<Record<string, number>>
   settings: ComputedRef<{
     resourceBufferHours: number
@@ -38,14 +35,11 @@ export interface UseProductionWareflowPresenterReturn {
 
 export function useProductionWareflowPresenter(store: ProductionWorkbenchStoreContract): UseProductionWareflowPresenterReturn {
   const session = computed(() => store.getSessionState())
-  const transitState = computed(() => store.getTransitState())
   const props: WareflowPresenterProps = {
     workbenchMode: computed(() => session.value.workbenchMode),
     visualMode: computed(() => session.value.visualMode),
     viewMode: computed(() => store.getWareflowViewMode()),
     productionFlows: computed(() => store.getProductionFlows()),
-    groupedFlows: computed(() => transitState.value.groupedFlows),
-    storageFlows: computed(() => transitState.value.storageFlows),
     warePriorityLevels: computed(() => store.getWarePriorityLevels()),
     settings: computed(() => store.getWareflowSettings()),
     empireGaps: computed(() => store.getEmpireGaps()),
