@@ -61,16 +61,22 @@
 
 ### 3.1 星区中转站自动创建
 
-- 星区组创建时自动创建默认 tradestation：
+- 星区组绑定定位星区时自动创建/更新默认 tradestation：
   - `position` = 星区中心坐标
   - `sectorMacro` = 该 group 的定位星区
+  - 若 tradestation 已存在，则更新位置并解除绑定
 - Step 3 不再显示"自由空间站"区域的中转站占位（因为每个 group 已有默认 tradestation）。
-- save station 可绑定到该 group 的默认 tradestation（一对一关系）。
-- 已被绑定的 tradestation 不可再被其他 save station 绑定。
+- save station 可绑定到该 group 的默认 tradestation（一对一关系）：
+  - 绑定时设置 `saveStationCode`，position 使用 save station 的实际位置
+  - 已绑定的 tradestation 不可再被其他 save station 绑定
 - 解绑行为：当 save station 解绑 tradestation 时：
   - 位置重置到星区中心点
   - 转换为 virtual station（保留规划但无 `saveStationCode`）
   - tradestation 保留在原位置，可被其他 save station 绑定
+- 定位星区变化时：
+  - tradestation 的 sectorMacro 和 position 更新为新星区中心
+  - 若已绑定 save station，则解除绑定（saveStationCode 清除）
+- 已绑定的 save station 在地图上显示为 tradestation 图标（而非 factory 图标）
 
 ### 4. Binding POI 与地图行为
 
@@ -142,6 +148,8 @@
 15. Save station 可绑定到 group 默认 tradestation（一对一）。
 16. 已绑定 tradestation 不可再被其他 save station 绑定。
 17. 解绑时 save station 变为 virtual station，位置重置到星区中心。
+18. 定位星区变化时，tradestation 更新到新星区中心并解除绑定。
+19. 已绑定的 save station 显示 tradestation 图标。
 
 ## 未决项
 
