@@ -852,6 +852,7 @@ export interface VersionConfig {
   version: string
   beta: boolean
   codename: string
+  mini_version?: number
   folder_name: string
   storage_keys: {
     empire: string

@@ -428,10 +428,10 @@
       "reverse": 1336.0
     },
     "boost": {
-      "duration": 15.0,
+      "duration": 16.0,
       "recharge": 92.0,
-      "thrust": 7.38,
-      "acceleration": 7.0
+      "thrust": 7.2,
+      "acceleration": 6.0
     },
     "travel": {
       "charge": 7.0,
@@ -479,10 +479,10 @@
       "reverse": 1535.0
     },
     "boost": {
-      "duration": 15.0,
+      "duration": 16.0,
       "recharge": 92.0,
-      "thrust": 7.38,
-      "acceleration": 7.0
+      "thrust": 7.2,
+      "acceleration": 6.0
     },
     "travel": {
       "charge": 7.0,
@@ -4378,15 +4378,15 @@
       "reverse": 1208.0
     },
     "boost": {
-      "duration": 22.0,
-      "recharge": 114.0,
-      "thrust": 5.9,
-      "acceleration": 4.2
+      "duration": 26.4,
+      "recharge": 120.0,
+      "thrust": 5.4,
+      "acceleration": 4.0
     },
     "travel": {
       "charge": 3.0,
       "thrust": 14.3,
-      "attack": 24.0,
+      "attack": 23.0,
       "release": 10.0
     }
   },
@@ -4429,15 +4429,15 @@
       "reverse": 1389.0
     },
     "boost": {
-      "duration": 22.0,
-      "recharge": 114.0,
-      "thrust": 5.9,
-      "acceleration": 4.2
+      "duration": 26.4,
+      "recharge": 120.0,
+      "thrust": 5.4,
+      "acceleration": 4.0
     },
     "travel": {
       "charge": 3.0,
       "thrust": 13.8,
-      "attack": 24.0,
+      "attack": 23.0,
       "release": 10.0
     }
   },
@@ -6753,7 +6753,7 @@
     },
     "recharge": {
       "max": 5750.0,
-      "rate": 83.0,
+      "rate": 90.0,
       "delay": 13.0
     }
   },
@@ -6792,7 +6792,7 @@
     },
     "recharge": {
       "max": 7475.0,
-      "rate": 116.0,
+      "rate": 126.0,
       "delay": 13.0
     }
   },
@@ -6830,7 +6830,7 @@
     },
     "recharge": {
       "max": 5750.0,
-      "rate": 83.0,
+      "rate": 90.0,
       "delay": 13.0
     }
   },
@@ -6869,7 +6869,7 @@
     },
     "recharge": {
       "max": 7475.0,
-      "rate": 116.0,
+      "rate": 126.0,
       "delay": 13.0
     }
   },
@@ -7051,7 +7051,7 @@
     "recharge": {
       "max": 148900.0,
       "rate": 550.0,
-      "delay": 17.0
+      "delay": 15.0
     }
   },
   {
@@ -7183,7 +7183,7 @@
     },
     "recharge": {
       "max": 5250.0,
-      "rate": 79.0,
+      "rate": 86.0,
       "delay": 9.1
     }
   },
@@ -7217,7 +7217,7 @@
     },
     "recharge": {
       "max": 6825.0,
-      "rate": 109.0,
+      "rate": 118.0,
       "delay": 9.1
     }
   },
@@ -7251,7 +7251,7 @@
     },
     "recharge": {
       "max": 8400.0,
-      "rate": 166.0,
+      "rate": 160.0,
       "delay": 9.1
     }
   },
@@ -7285,7 +7285,7 @@
     },
     "recharge": {
       "max": 5250.0,
-      "rate": 79.0,
+      "rate": 86.0,
       "delay": 9.1
     }
   },
@@ -7319,7 +7319,7 @@
     },
     "recharge": {
       "max": 6825.0,
-      "rate": 109.0,
+      "rate": 118.0,
       "delay": 9.1
     }
   },
@@ -7353,7 +7353,7 @@
     },
     "recharge": {
       "max": 8400.0,
-      "rate": 166.0,
+      "rate": 160.0,
       "delay": 9.1
     }
   },
@@ -7485,7 +7485,7 @@
     "recharge": {
       "max": 135955.0,
       "rate": 534.0,
-      "delay": 12.0
+      "delay": 10.5
     }
   },
   {
@@ -7518,7 +7518,7 @@
     "recharge": {
       "max": 160427.0,
       "rate": 715.0,
-      "delay": 12.0
+      "delay": 10.5
     }
   },
   {
@@ -7559,7 +7559,7 @@
     "recharge": {
       "max": 8600.0,
       "rate": 102.0,
-      "delay": 11.0
+      "delay": 10.0
     }
   },
   {
@@ -7689,7 +7689,7 @@
     "recharge": {
       "max": 4800.0,
       "rate": 52.0,
-      "delay": 2.0
+      "delay": 3.0
     }
   },
   {
@@ -7718,7 +7718,7 @@
     "recharge": {
       "max": 4800.0,
       "rate": 52.0,
-      "delay": 2.0
+      "delay": 3.0
     }
   },
   {
@@ -7746,7 +7746,7 @@
     "recharge": {
       "max": 4800.0,
       "rate": 52.0,
-      "delay": 2.0
+      "delay": 3.0
     }
   },
   {
@@ -7901,8 +7901,8 @@
     },
     "recharge": {
       "max": 4000.0,
-      "rate": 108.0,
-      "delay": 9.5
+      "rate": 117.0,
+      "delay": 8.5
     }
   },
   {
@@ -7935,8 +7935,8 @@
     },
     "recharge": {
       "max": 5200.0,
-      "rate": 162.0,
-      "delay": 9.5
+      "rate": 183.0,
+      "delay": 8.5
     }
   },
   {
@@ -7969,8 +7969,8 @@
     },
     "recharge": {
       "max": 4000.0,
-      "rate": 108.0,
-      "delay": 9.5
+      "rate": 117.0,
+      "delay": 8.5
     }
   },
   {
@@ -8003,8 +8003,8 @@
     },
     "recharge": {
       "max": 5200.0,
-      "rate": 162.0,
-      "delay": 9.5
+      "rate": 183.0,
+      "delay": 8.5
     }
   },
   {
@@ -8168,7 +8168,7 @@
     "recharge": {
       "max": 103585.0,
       "rate": 715.0,
-      "delay": 9.8
+      "delay": 8.5
     }
   },
   {
@@ -8299,8 +8299,8 @@
       }
     },
     "recharge": {
-      "max": 3700.0,
-      "rate": 55.0,
+      "max": 3848.0,
+      "rate": 60.0,
       "delay": 2.5
     }
   },
@@ -8333,8 +8333,8 @@
       }
     },
     "recharge": {
-      "max": 4810.0,
-      "rate": 78.0,
+      "max": 4932.0,
+      "rate": 85.0,
       "delay": 2.5
     }
   },
@@ -8367,8 +8367,8 @@
       }
     },
     "recharge": {
-      "max": 3700.0,
-      "rate": 55.0,
+      "max": 3848.0,
+      "rate": 60.0,
       "delay": 2.5
     }
   },
@@ -8401,8 +8401,8 @@
       }
     },
     "recharge": {
-      "max": 4810.0,
-      "rate": 78.0,
+      "max": 4932.0,
+      "rate": 85.0,
       "delay": 2.5
     }
   },
@@ -8534,7 +8534,7 @@
     "recharge": {
       "max": 100800.0,
       "rate": 390.0,
-      "delay": 3.8
+      "delay": 3.0
     }
   },
   {
@@ -8637,7 +8637,7 @@
     },
     "recharge": {
       "max": 6500.0,
-      "rate": 66.0,
+      "rate": 72.0,
       "delay": 14.3
     }
   },
@@ -8675,8 +8675,8 @@
       }
     },
     "recharge": {
-      "max": 8775.0,
-      "rate": 83.0,
+      "max": 8840.0,
+      "rate": 90.0,
       "delay": 14.3
     }
   },
@@ -8714,7 +8714,7 @@
     },
     "recharge": {
       "max": 6500.0,
-      "rate": 66.0,
+      "rate": 72.0,
       "delay": 14.3
     }
   },
@@ -8752,8 +8752,8 @@
       }
     },
     "recharge": {
-      "max": 8775.0,
-      "rate": 83.0,
+      "max": 8840.0,
+      "rate": 90.0,
       "delay": 13.3
     }
   },
@@ -8916,9 +8916,9 @@
       }
     },
     "recharge": {
-      "max": 176742.0,
+      "max": 181791.0,
       "rate": 426.0,
-      "delay": 19.5
+      "delay": 18.0
     }
   },
   {
@@ -8952,7 +8952,7 @@
     "recharge": {
       "max": 57600.0,
       "rate": 292.0,
-      "delay": 20.0
+      "delay": 19.0
     }
   },
   {
@@ -8984,9 +8984,9 @@
       }
     },
     "recharge": {
-      "max": 69120.0,
-      "rate": 431.0,
-      "delay": 20.0
+      "max": 71424.0,
+      "rate": 444.0,
+      "delay": 19.0
     }
   },
   {
@@ -9020,7 +9020,7 @@
     "recharge": {
       "max": 86400.0,
       "rate": 616.0,
-      "delay": 20.0
+      "delay": 19.0
     }
   },
   {
@@ -9060,7 +9060,7 @@
     "recharge": {
       "max": 57600.0,
       "rate": 162.0,
-      "delay": 7.0
+      "delay": 6.5
     }
   },
   {
@@ -9098,9 +9098,9 @@
       }
     },
     "recharge": {
-      "max": 69120.0,
-      "rate": 431.0,
-      "delay": 20.0
+      "max": 71424.0,
+      "rate": 227.0,
+      "delay": 6.5
     }
   },
   {
@@ -9140,7 +9140,7 @@
     "recharge": {
       "max": 86400.0,
       "rate": 324.0,
-      "delay": 7.0
+      "delay": 6.5
     }
   },
   {
@@ -9174,8 +9174,8 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 96.0,
-      "delay": 17.0
+      "rate": 104.0,
+      "delay": 16.6
     }
   },
   {
@@ -9209,8 +9209,8 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 131.0,
-      "delay": 17.0
+      "rate": 143.0,
+      "delay": 16.6
     }
   },
   {
@@ -9243,9 +9243,9 @@
       }
     },
     "recharge": {
-      "max": 9600.0,
-      "rate": 159.0,
-      "delay": 17.0
+      "max": 9720.0,
+      "rate": 174.0,
+      "delay": 16.6
     }
   },
   {
@@ -9279,8 +9279,8 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 96.0,
-      "delay": 17.0
+      "rate": 104.0,
+      "delay": 16.6
     }
   },
   {
@@ -9314,8 +9314,8 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 131.0,
-      "delay": 17.0
+      "rate": 143.0,
+      "delay": 16.6
     }
   },
   {
@@ -9348,9 +9348,9 @@
       }
     },
     "recharge": {
-      "max": 9600.0,
-      "rate": 159.0,
-      "delay": 17.0
+      "max": 9720.0,
+      "rate": 174.0,
+      "delay": 16.6
     }
   },
   {
@@ -9390,7 +9390,7 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 50.0,
+      "rate": 56.0,
       "delay": 5.0
     }
   },
@@ -9431,7 +9431,7 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 69.0,
+      "rate": 76.0,
       "delay": 5.0
     }
   },
@@ -9471,8 +9471,8 @@
       }
     },
     "recharge": {
-      "max": 9600.0,
-      "rate": 82.0,
+      "max": 9720.0,
+      "rate": 94.0,
       "delay": 5.0
     }
   },
@@ -9513,7 +9513,7 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 50.0,
+      "rate": 56.0,
       "delay": 5.0
     }
   },
@@ -9554,7 +9554,7 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 69.0,
+      "rate": 76.0,
       "delay": 5.0
     }
   },
@@ -9594,8 +9594,8 @@
       }
     },
     "recharge": {
-      "max": 9600.0,
-      "rate": 82.0,
+      "max": 9720.0,
+      "rate": 94.0,
       "delay": 5.0
     }
   },
@@ -9808,7 +9808,7 @@
     "recharge": {
       "max": 155377.0,
       "rate": 634.0,
-      "delay": 21.5
+      "delay": 19.0
     }
   },
   {
@@ -9840,9 +9840,9 @@
       }
     },
     "recharge": {
-      "max": 185054.0,
+      "max": 195775.0,
       "rate": 944.0,
-      "delay": 21.5
+      "delay": 19.0
     }
   },
   {
@@ -10027,7 +10027,7 @@
     },
     "recharge": {
       "max": 4750.0,
-      "rate": 110.0,
+      "rate": 119.0,
       "delay": 16.0
     }
   },
@@ -10061,7 +10061,7 @@
     },
     "recharge": {
       "max": 5662.0,
-      "rate": 171.0,
+      "rate": 178.0,
       "delay": 16.0
     }
   },
@@ -10124,7 +10124,7 @@
     },
     "recharge": {
       "max": 5662.0,
-      "rate": 171.0,
+      "rate": 178.0,
       "delay": 16.0
     }
   },
@@ -10163,7 +10163,7 @@
     },
     "recharge": {
       "max": 4750.0,
-      "rate": 110.0,
+      "rate": 119.0,
       "delay": 16.0
     }
   },
@@ -10201,8 +10201,8 @@
       }
     },
     "recharge": {
-      "max": 5225.0,
-      "rate": 149.0,
+      "max": 5662.0,
+      "rate": 178.0,
       "delay": 16.0
     }
   },
@@ -10372,8 +10372,8 @@
     },
     "recharge": {
       "max": 123007.0,
-      "rate": 700.0,
-      "delay": 17.55
+      "rate": 755.0,
+      "delay": 15.25
     }
   },
   {
@@ -15948,8 +15948,8 @@
     "bullet": "bullet_arg_l_laser_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 2.5,
-      "coolrate": 1250.0
+      "cooldelay": 2.7,
+      "coolrate": 1160.0
     }
   },
   {
@@ -17422,7 +17422,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 1.0,
-      "coolrate": 900.0
+      "coolrate": 850.0
     }
   },
   {
@@ -18800,7 +18800,7 @@
     "bullet": "bullet_kha_l_beam_02_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 0.0,
+      "cooldelay": 2.0,
       "coolrate": 1000.0
     }
   },
@@ -19938,7 +19938,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 1.0,
-      "coolrate": 1700.0
+      "coolrate": 1760.0
     }
   },
   {

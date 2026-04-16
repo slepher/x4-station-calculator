@@ -31,7 +31,7 @@ const shipBuildStore = useShipBuildStore()
 const saveStore = useSaveStore()
 
 const currentVersionLabel = computed(() =>
-  gameDataStore.displayFullVersion()
+  gameDataStore.displayFullVersion(undefined, undefined, false)
 )
 
 const buildDefaultFileName = () => {
