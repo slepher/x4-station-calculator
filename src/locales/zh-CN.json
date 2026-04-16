@@ -1,4 +1,9 @@
 {
+  "empire": {
+    "empire_name": "帝国名称",
+    "overview": "帝国总览",
+    "unnamed_empire": "未命名帝国"
+  },
   "sector": {
     "overview": "星区总览",
     "new_sector_name": "新建星区",
@@ -62,10 +67,23 @@
   },
   "toolbar": {
     "import_config": "导入配置",
+    "live_data": "实况数据",
+    "live_status": "实况状态",
+    "station_storage": "站点仓储",
+    "in_transit": "在途资源",
+    "constructing": "在建模块",
+    "buildstorage": "建造缓存",
     "station_name": "名称",
     "station_name_placeholder": "分站名称",
+    "station_code": "编码",
+    "mode": "模式",
+    "mode_live": "实时",
+    "mode_planning": "规划",
     "station_type": "类型",
     "station_count": "数量",
+    "sector": "星区",
+    "position": "坐标",
+    "no_position": "无坐标数据",
     "sector_resources": "星区资源",
     "no_resources": "无资源",
     "select_resources": "选择可用资源",
@@ -581,6 +599,8 @@
     "module_list": "模块列表",
     "tier_planned": "用户规划区",
     "tier_industry": "自动工业区",
+    "tier_habitation": "自动生活区",
+    "tier_infrastructure": "自动基础设施",
     "tier_supply": "自动补给区",
     "consider_workforce_bonus": "考虑工人效率加成",
     "race_preference": "种族偏好",
@@ -608,6 +628,7 @@
     "confirm_delete_binding": "确定要删除这个存档绑定吗？"
   },
   "binding": {
+    "binding_name": "绑定名称",
     "new_binding_name": "新绑定"
   },
   "shipBuild": {

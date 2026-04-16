@@ -1,22 +1,20 @@
 import { computed, type Ref, type ComputedRef } from 'vue'
-import type { EmpirePlan, SectorPlan, StationPlan, SaveBindingPlan } from '@/types/x4'
-import type { BindingSectorGroup } from '@/types/x4'
+import type { EmpirePlan, SectorPlan, StationPlan, SaveBindingPlan, X4MapSector, BindingSectorGroup } from '@/types/x4'
 import type { PlayerStationRecord } from '@/types/saveArchive'
 import {
   deriveBindingStationsFromRecords,
-  parseBindingStationId,
-  createBindingPlanStationId,
-  type ProductionSourceKind,
-  type DerivedBindingStation,
-  type ParsedBindingStationId
-} from './productionSourceAdapter'
+  type DerivedBindingStation
+} from './liveStationResolver'
 import { normalizeSectorLinkKey } from './sectorLinks'
+
+export type ProductionSourceKind = 'empire' | 'save-binding'
 
 export interface EmpireSourceViewDeps {
   productionSource: Ref<ProductionSourceKind>
   activeEmpire: Ref<EmpirePlan | null>
   activeBinding: Ref<SaveBindingPlan | null>
   playerStationRecords: Ref<PlayerStationRecord[]>
+  sectorsMap?: Ref<Record<string, X4MapSector>>
 }
 
 export interface EmpireSourceView {
@@ -52,12 +50,20 @@ export function createEmpireSourceView(deps: EmpireSourceViewDeps): EmpireSource
     productionSource,
     activeEmpire,
     activeBinding,
-    playerStationRecords
+    playerStationRecords,
+    sectorsMap
   } = deps
 
   const derivedBindingStations = computed<DerivedBindingStation[]>(() => {
     if (productionSource.value !== 'save-binding') return []
-    return deriveBindingStationsFromRecords(activeBinding.value, playerStationRecords.value)
+    const binding = activeBinding.value
+    if (!binding) return []
+    return deriveBindingStationsFromRecords(
+      binding.groups,
+      binding.stationPlans,
+      playerStationRecords.value,
+      sectorsMap?.value
+    )
   })
 
   const sectors = computed<SectorPlan[]>(() => {
@@ -179,11 +185,4 @@ export function fromTransitTabId(tabId: string | null | undefined): string | nul
   if (!tabId || !tabId.startsWith(TRANSIT_TAB_PREFIX)) return null
   const sectorId = tabId.slice(TRANSIT_TAB_PREFIX.length)
   return sectorId || null
-}
-
-export {
-  parseBindingStationId,
-  createBindingPlanStationId,
-  type ParsedBindingStationId,
-  type DerivedBindingStation
 }

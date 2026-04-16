@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { computed, onMounted, watch, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
@@ -13,7 +13,9 @@ import { useEmpireWareFlowDerived } from '@/components/empire/composables/useEmp
 import StationPlanningPanelWrapper from '@/components/empire/StationPlanningPanelWrapper.vue'
 import StationDashboard from '@/components/empire/StationDashboard.vue'
 import SectorStationTabBar from '@/components/empire/SectorStationTabBar.vue'
-import ContextToolbar from '@/components/empire/ContextToolbar.vue'
+import LiveOverviewToolbar from '@/components/empire/context_toolbar/LiveOverviewToolbar.vue'
+import LiveTransitToolbar from '@/components/empire/context_toolbar/LiveTransitToolbar.vue'
+import LiveStationToolbar from '@/components/empire/context_toolbar/LiveStationToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
@@ -22,11 +24,14 @@ import TransitHubMaterialsPanel from '@/components/empire/transit-hub/TransitHub
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
 import SaveList from '@/components/save/SaveList.vue'
+import type { TransitHubStorageModulePlan, SupplyStorageFlow } from '@/types/x4'
 
 const liveStore = useLiveProductionStore()
 const activeViewStore = useActiveViewStore()
 const gameData = useGameDataStore()
 const { t } = useI18n()
+
+const transitHubDashboardRef = ref<{ storageModulePlans: TransitHubStorageModulePlan[], storageFlows: SupplyStorageFlow[] } | null>(null)
 
 onMounted(() => {
   const gameGuid = activeViewStore.activeBinding
@@ -51,6 +56,21 @@ const activeStation = computed(() => liveStore.activeStation)
 const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
 const isOverview = computed(() => !activeStation.value && !activeTransitSectorId.value)
 
+const stationContext = computed(() => liveStore.stationContext)
+
+const hasBindingStation = computed(() => stationContext.value?.hasBinding ?? false)
+const hasSaveStation = computed(() => stationContext.value?.hasArchive ?? false)
+const mode = computed(() => liveStore.mode)
+const canToggle = computed(() => liveStore.canToggle)
+const stationCode = computed(() => stationContext.value?.stationCode || '')
+const sectorResources = computed(() => stationContext.value?.sectorResources || [])
+const sectorSunlight = computed(() => stationContext.value?.sectorSunlight ?? 100)
+const sectorName = computed(() => stationContext.value?.sectorName || '')
+const sectorNameId = computed(() => stationContext.value?.sectorNameId)
+const stationPosition = computed(() => stationContext.value?.position)
+const archiveModules = computed(() => stationContext.value?.archiveModules || [])
+const buildingModules = computed(() => stationContext.value?.buildingModules || [])
+
 const importModalActiveStation = computed(() => {
   if (!activeStation.value) return null
   return { id: activeStation.value.id, modules: activeStation.value.modules }
@@ -58,17 +78,33 @@ const importModalActiveStation = computed(() => {
 
 const empireWareFlowDerived = useEmpireWareFlowDerived({
   stations: computed(() => liveStore.orderedStationsBySector),
-  modulesMap: computed(() => gameData.modulesMap || {})
+  modulesMap: computed(() => gameData.modulesMap || {}),
+  waresMap: computed(() => gameData.waresMap || {})
 })
 
-const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
-  sectorId: activeTransitSectorId.value,
-  racePreference: liveStore.settings.racePreference,
-  transportShipCapacity: liveStore.settings.transportShipCapacity,
-  storageBufferHours: liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours,
-  buyMultiplier: liveStore.transitHubSettings.buyMultiplier ?? liveStore.settings.buyMultiplier,
-  sellMultiplier: liveStore.transitHubSettings.sellMultiplier ?? liveStore.settings.sellMultiplier
-}))
+const transitHubInput = computed(() => {
+  const sectorId = activeTransitSectorId.value
+  if (!sectorId) {
+    return {
+      sectorId: null,
+      sectors: [],
+      stations: [],
+      localGroupedFlows: { flows: [], empireGroups: { operations: [], supply: [] } },
+      solverOutput: null
+    }
+  }
+
+  const sectorInternalData = liveStore.getSectorInternalData(sectorId)
+  const sectorLinkCalc = liveStore.getSectorLinkCalc(sectorId)
+
+  return {
+    sectorId,
+    sectors: liveStore.sectors,
+    stations: liveStore.orderedStationsBySector,
+    localGroupedFlows: sectorInternalData.localGroupedFlows,
+    solverOutput: sectorLinkCalc?.solverOutput || null
+  }
+})
 </script>
 
 <template>
@@ -86,23 +122,46 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     @delete-station="tabbarPresenter.emits.deleteStation"
     @expand-sector="tabbarPresenter.emits.expandSector"
   />
-  <ContextToolbar
-    :mode="toolbarPresenter.props.mode.value"
-    :is-binding-mode="toolbarPresenter.props.isBindingMode"
+  
+  <LiveOverviewToolbar
+    v-if="isOverview"
     :title-model="toolbarPresenter.props.titleModel.value"
-    :station="toolbarPresenter.props.station.value"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
-    :station-types="toolbarPresenter.props.stationTypes"
-    :available-minerals="toolbarPresenter.props.availableMinerals"
+    @update-title="toolbarPresenter.emits.updateTitle"
+    @update-race-preference="toolbarPresenter.emits.updateRacePreference"
+    @open-import="liveStore.importModalOpen = true"
+  />
+  
+  <LiveTransitToolbar
+    v-if="activeTransitSectorId"
+    :title-model="toolbarPresenter.props.titleModel.value"
+    :settings="liveStore.transitHubSettings"
+    :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     @update-title="toolbarPresenter.emits.updateTitle"
+    @update-race-preference="(v) => liveStore.updateTransitHubSettings({ racePreference: v })"
+    @open-import="liveStore.importModalOpen = true"
+  />
+  
+  <LiveStationToolbar
+    v-if="activeStation"
+    :station-name="toolbarPresenter.props.station.value?.name || ''"
+    :station-code="stationCode"
+    :sector-name="sectorName"
+    :sector-name-id="sectorNameId"
+    :station-position="stationPosition"
+    :sector-resources="sectorResources"
+    :sector-sunlight="sectorSunlight"
+    :has-binding-station="hasBindingStation"
+    :has-save-station="hasSaveStation"
+    :mode="mode"
+    :can-toggle="canToggle"
+    :settings="toolbarPresenter.props.settings.value"
+    :races="toolbarPresenter.props.races"
+    :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     @update-station-name="toolbarPresenter.emits.updateStationName"
-    @update-station-type="toolbarPresenter.emits.updateStationType"
-    @update-station-count="toolbarPresenter.emits.updateStationCount"
-    @toggle-mineral="toolbarPresenter.emits.toggleMineral"
-    @update-sunlight="toolbarPresenter.emits.updateSunlight"
-    @update-transport-minutes="toolbarPresenter.emits.updateTransportMinutes"
+    @toggle-mode="liveStore.toggleMode"
     @update-race-preference="toolbarPresenter.emits.updateRacePreference"
     @update-workforce="toolbarPresenter.emits.updateWorkforce"
     @update-show-empire-gaps="toolbarPresenter.emits.updateShowEmpireGaps"
@@ -123,17 +182,23 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     @close="liveStore.importModalOpen = false"
   />
 
-  <template v-if="isOverview || activeTransitSectorId">
+<template v-if="isOverview || activeTransitSectorId">
     <div v-if="activeTransitSectorId" class="main-layout mt-6">
       <div class="col-span-12 lg:col-span-3">
-        <TransitHubBuildPanel :storage-module-plans="transitHubModel.storageModulePlans" />
+        <TransitHubBuildPanel :storage-module-plans="transitHubDashboardRef?.storageModulePlans || []" />
       </div>
 
       <div class="col-span-12 lg:col-span-5">
         <TransitHubCenterDashboard
-          :grouped-flows="transitHubModel.groupedFlows"
-          :storage-flows="transitHubModel.storageFlows"
+          ref="transitHubDashboardRef"
+          :sector-id="transitHubInput.sectorId"
+          :sectors="transitHubInput.sectors"
+          :stations="transitHubInput.stations"
+          :local-grouped-flows="transitHubInput.localGroupedFlows"
+          :solver-output="transitHubInput.solverOutput"
           :view-mode="wareflowPresenter.props.viewMode.value"
+          :race-preference="liveStore.transitHubSettings.racePreference ?? liveStore.settings.racePreference"
+          :transport-ship-capacity="liveStore.settings.transportShipCapacity"
           :buy-multiplier="liveStore.transitHubSettings.buyMultiplier ?? liveStore.settings.buyMultiplier"
           :sell-multiplier="liveStore.transitHubSettings.sellMultiplier ?? liveStore.settings.sellMultiplier"
           :product-buffer-hours="liveStore.transitHubSettings.primaryProductBufferHours ?? liveStore.settings.primaryProductBufferHours"
@@ -146,11 +211,11 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
 
       <div class="col-span-12 lg:col-span-4">
         <TransitHubMaterialsPanel
-          :plannedModulesOverride="transitHubModel.storageModulePlans"
-          :buildPriceMultiplier="liveStore.buildPriceMultiplier"
+          :planned-modules-override="(transitHubDashboardRef?.storageModulePlans || []).map(p => p.item)"
+          :build-price-multiplier="liveStore.buildPriceMultiplier"
           :useHQ="liveStore.settings.useHQ"
-          @updateBuildPriceMultiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
-          @updateUseHq="dashboardPresenter.emits.updateUseHQ"
+          @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
+          @update-use-hq="dashboardPresenter.emits.updateUseHQ"
         />
       </div>
     </div>
@@ -181,7 +246,13 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
       <StationPlanningPanelWrapper
         :planned-modules="planningPresenter.props.plannedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
+        :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
+        :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
+        :mode="mode"
+        :archive-modules="archiveModules"
+        :building-modules="buildingModules"
+        :has-archive="hasSaveStation"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
       />
     </div>
@@ -189,13 +260,10 @@ const transitHubModel = computed(() => liveStore.getTransitHubViewModel({
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
         :view-mode="wareflowPresenter.props.viewMode.value"
-        :grouped-flows="wareflowPresenter.props.groupedFlows.value"
-        :auto-modules="wareflowPresenter.props.autoModules.value"
+        :production-flows="wareflowPresenter.props.productionFlows.value"
+        :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"
-        :planned-modules="wareflowPresenter.props.plannedModules.value"
-        :wares="wareflowPresenter.props.wares.value"
-        :modules-map="wareflowPresenter.props.modulesMap.value"
         :is-ware-locked="wareflowPresenter.props.isWareLocked"
         :get-resolved-level="wareflowPresenter.props.getResolvedLevel"
         :is-ware-operable="wareflowPresenter.props.isWareOperable"

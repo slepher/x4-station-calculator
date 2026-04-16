@@ -23,7 +23,7 @@ import { useSaveStore } from '@/store/useSaveStore'
 import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import type { StationPlan } from '@/types/x4'
-import { DEFAULT_STATION_SETTINGS } from '@/store/state/StationStateMap'
+import { DEFAULT_STATION_SETTINGS } from '@/store/state/stationSettings'
 
 type SearchSectorLayout = {
   sectorId: string

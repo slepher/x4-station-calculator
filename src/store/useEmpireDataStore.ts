@@ -3,7 +3,7 @@ import { ref, computed } from 'vue'
 import type { EntityLocation, SavedEmpiresState, EmpirePlan, SavedModule, SectorPlan, StationPlan, StationSettings, StationType } from '@/types/x4'
 import { useGameDataStore } from './useGameDataStore'
 import { CURRENT_EMPIRE_VERSION } from './logic/storageVersions'
-import { DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { DEFAULT_STATION_SETTINGS } from './state/stationSettings'
 import { getLinkedSectorIdsFor, normalizeSectorLinkKey } from './logic/sectorLinks'
 
 function deepClone<T>(value: T): T {

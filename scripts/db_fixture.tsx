@@ -1,7 +1,7 @@
 import { readFile, writeFile, mkdir, rename, readdir } from 'node:fs/promises'
 import path from 'node:path'
 import { createHash } from 'node:crypto'
-import { parse } from 'yaml'
+import { parse, stringify } from 'yaml'
 import { CURRENT_EMPIRE_VERSION, CURRENT_FLOW_VERSION, CURRENT_SHIP_BLUEPRINT_VERSION } from '../src/store/logic/storageVersions'
 
 const ROOT = process.cwd()
@@ -9,6 +9,7 @@ const SEED_DIR = path.join(ROOT, 'tests/seeds')
 const FIXTURE_DIR = path.join(ROOT, 'tests/fixtures')
 const DB_DIR = path.join(FIXTURE_DIR, 'db')
 const DB_PATH = path.join(FIXTURE_DIR, 'db.json')
+const SAVE_PATH = path.join(FIXTURE_DIR, 'save.json')
 
 const DATA_DIR = path.join(ROOT, 'src/assets/x4_game_data/8.0-Diplomacy/data')
 const FIXTURE_TIMESTAMP = Number(process.env.DB_FIXTURE_TIMESTAMP ?? 1772453451902)
@@ -208,6 +209,106 @@ type SavedShipBlueprintsState = {
   list: ShipBlueprint[]
 }
 
+// ============ Binding Seed Types ============
+type SeedCoverageSectorEntry = {
+  ref: string
+  jump: number
+}
+
+type SeedTradeStation = {
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+type SeedBindingGroup = {
+  name: string
+  sectorMacro: string
+  coverageSectorMacros: SeedCoverageSectorEntry[]
+  connectedGroupIds: string[]
+  tradeStation?: SeedTradeStation
+}
+
+type SeedStationPlan = {
+  name: string
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+  modules?: SavedModule[]
+  group?: string
+  lockedWares?: string[]
+}
+
+type SeedBinding = {
+  gameGuid: string
+  bindingName: string
+  groups: SeedBindingGroup[]
+  stationPlans: SeedStationPlan[]
+}
+
+type CoverageSectorEntry = {
+  ref: string
+  jump: number
+}
+
+type TradeStationBinding = {
+  id: string
+  name: string
+  saveStationCode?: string
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+type BindingSectorGroup = {
+  id: string
+  name: string
+  order: number
+  sectorMacro: string
+  jumpRange: number
+  coverageSectorMacros: CoverageSectorEntry[]
+  connectedGroupIds: string[]
+  tradeStation?: TradeStationBinding
+}
+
+type BindingStationPlan = {
+  id: string
+  saveStationCode?: string
+  groupId: string | null
+  name: string
+  type: 'industrial'
+  count: number
+  modules: SavedModule[]
+  settings: StationSettings
+  lastUpdated: number
+  lockedWares: string[]
+  warePriority: Record<string, number>
+  sectorMacro?: string
+  position?: { x: number; y: number; z: number }
+}
+
+type SaveBindingPlan = {
+  gameGuid: string
+  bindingName?: string
+  selectedArchiveTime: number | null
+  groups: BindingSectorGroup[]
+  stationPlans: BindingStationPlan[]
+  updatedAt: number
+}
+
+type SavedSaveBindingsState = {
+  version: number
+  list: SaveBindingPlan[]
+}
+
+type PlayerStationRecord = {
+  id: string
+  archiveId: string
+  sectorMacro: string
+  code: string
+  type: 'station' | 'buildstorage'
+  data: any
+}
+
 type X4ShipConnection = {
   size?: string
   count: number
@@ -285,6 +386,115 @@ const loadYaml = async <T,>(file: string): Promise<T> => {
 const isEmpireSeed = (seed: any): seed is SeedEmpire => Boolean(seed?.empires)
 const isLogicFlowSeed = (seed: any): seed is SeedLogicFlow => Boolean(seed?.plans)
 const isShipBlueprintSeed = (seed: any): seed is SeedShipBuild => Boolean(seed?.ships)
+const isBindingSeed = (seed: any): seed is SeedBinding => Boolean(seed?.gameGuid)
+
+const buildBindingState = (seed: SeedBinding, now: number, saveData: any): SavedSaveBindingsState => {
+  const groupNameToId = new Map<string, string>()
+  const groupSectorToGroupId = new Map<string, string>()
+  
+  seed.groups.forEach((g, i) => {
+    const groupId = stableId('binding-group', seed.gameGuid, g.name, String(i))
+    groupNameToId.set(g.name, groupId)
+    groupSectorToGroupId.set(g.sectorMacro, groupId)
+    g.coverageSectorMacros.forEach(c => {
+      groupSectorToGroupId.set(c.ref, groupId)
+    })
+  })
+  
+  const groups: BindingSectorGroup[] = seed.groups.map((g, i) => {
+    const group: BindingSectorGroup = {
+      id: groupNameToId.get(g.name)!,
+      name: g.name,
+      order: i + 1,
+      sectorMacro: g.sectorMacro,
+      jumpRange: 3,
+      coverageSectorMacros: g.coverageSectorMacros,
+      connectedGroupIds: g.connectedGroupIds.map(name => groupNameToId.get(name) || name)
+    }
+    
+    if (g.tradeStation) {
+      if (g.tradeStation.saveStationCode) {
+        group.tradeStation = {
+          id: stableId('tradestation', seed.gameGuid, g.name),
+          name: `${g.name} 中转站`,
+          saveStationCode: g.tradeStation.saveStationCode
+        }
+      } else {
+        group.tradeStation = {
+          id: stableId('tradestation', seed.gameGuid, g.name),
+          name: `${g.name} 中转站`,
+          sectorMacro: g.tradeStation.sectorMacro,
+          position: g.tradeStation.position
+        }
+      }
+    }
+    
+    return group
+  })
+  
+  const stationSectorMap = new Map<string, string>()
+  if (saveData?.archives) {
+    for (const archive of saveData.archives) {
+      if (archive.sectors) {
+        for (const [sectorMacro, sectorData] of Object.entries(archive.sectors)) {
+          if ((sectorData as any).player_stations) {
+            for (const [stationCode, stationData] of Object.entries((sectorData as any).player_stations)) {
+              stationSectorMap.set(stationCode, sectorMacro)
+            }
+          }
+        }
+      }
+    }
+  }
+  
+  const stationPlans: BindingStationPlan[] = seed.stationPlans.map((s, i) => {
+    let groupId: string | null = null
+    
+    if (s.saveStationCode) {
+      const sectorMacro = stationSectorMap.get(s.saveStationCode)
+      if (sectorMacro) {
+        groupId = groupSectorToGroupId.get(sectorMacro) || null
+      }
+    } else if (s.sectorMacro) {
+      groupId = groupSectorToGroupId.get(s.sectorMacro) || null
+    }
+    
+    const plan: BindingStationPlan = {
+      id: s.saveStationCode || stableId('binding-station', seed.gameGuid, s.name, String(i)),
+      saveStationCode: s.saveStationCode,
+      groupId,
+      name: s.name,
+      type: 'industrial',
+      count: 1,
+      modules: s.modules || [],
+      settings: DEFAULT_STATION_SETTINGS,
+      lastUpdated: now,
+      lockedWares: s.lockedWares || [],
+      warePriority: {}
+    }
+    
+    if (!s.saveStationCode) {
+      plan.sectorMacro = s.sectorMacro
+      plan.position = s.position
+    }
+    
+    return plan
+  })
+  
+  const binding: SaveBindingPlan = {
+    gameGuid: seed.gameGuid,
+    bindingName: seed.bindingName,
+    selectedArchiveTime: null,
+    groups,
+    stationPlans,
+    updatedAt: now
+  }
+  
+  return {
+    version: 1,
+    list: [binding]
+  }
+}
 
 const pickPrimaryOutput = (module: X4Module): string => {
   const keys = Object.keys(module.outputs ?? {})
@@ -576,6 +786,13 @@ const main = async () => {
   const wareMap = new Map(wares.map((ware) => [ware.id, ware]))
   const moduleMap = new Map(modules.map((module) => [module.id, module]))
 
+  let saveData: any = null
+  try {
+    saveData = await loadJson<any>(SAVE_PATH)
+  } catch {
+    console.log('No save.json found')
+  }
+
   const dbPayload: Record<string, any> = {}
   const now = FIXTURE_TIMESTAMP
 
@@ -593,6 +810,46 @@ const main = async () => {
     if (isShipBlueprintSeed(seed)) {
       dbPayload.x4_ship_blueprints = buildShipBlueprintState(seed, ships, now)
     }
+    if (isBindingSeed(seed)) {
+      dbPayload.x4_save_bindings = buildBindingState(seed, now, saveData)
+    }
+  }
+  
+  if (saveData) {
+    dbPayload.x4_save_archives = saveData
+    
+    const playerStationRecords: PlayerStationRecord[] = []
+    for (const archive of saveData.archives || []) {
+      const archiveId = `${archive.meta.guid}_${archive.meta.time}`
+      for (const [sectorMacro, sectorData] of Object.entries(archive.sectors || {})) {
+        const sector = sectorData as any
+        if (sector.player_stations) {
+          for (const [code, entry] of Object.entries(sector.player_stations)) {
+            playerStationRecords.push({
+              id: `${archiveId}:${code}`,
+              archiveId,
+              sectorMacro,
+              code,
+              type: 'station',
+              data: entry
+            })
+          }
+        }
+        if (sector.player_buildstorages) {
+          for (const [code, entry] of Object.entries(sector.player_buildstorages)) {
+            playerStationRecords.push({
+              id: `${archiveId}:${code}`,
+              archiveId,
+              sectorMacro,
+              code,
+              type: 'buildstorage',
+              data: entry
+            })
+          }
+        }
+      }
+    }
+    dbPayload.playerStationRecords = playerStationRecords
   }
 
   const currentVsn = await readCurrentVsn()

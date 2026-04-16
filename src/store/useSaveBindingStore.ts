@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { useSaveStore } from './useSaveStore'
-import { DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
+import { DEFAULT_STATION_SETTINGS } from './state/stationSettings'
 import type {
   BindingSectorGroup,
   BindingStationPlan,
@@ -350,7 +350,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
 
     if (!plan) {
       plan = {
-        id: crypto.randomUUID(),
+        id: input.saveStationCode || crypto.randomUUID(),
         saveStationCode: input.saveStationCode,
         groupId: input.groupId ?? null,
         name: input.name,
