@@ -10,7 +10,6 @@ import type {
   X4Module,
   EntityLocation
 } from '@/types/x4'
-import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import type { ProductionSessionContext } from '@/types/production-context'
 import type {
@@ -28,14 +27,8 @@ import { useActiveViewStore } from './useActiveViewStore'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { migrateStationSettings, DEFAULT_STATION_SETTINGS } from './state/StationStateMap'
 import { stationProductionFlowMap } from './state/StationProductionFlowMap'
-import {
-  buildStationComputeDeps,
-  getFilteredGroupedFlows,
-  deepClone,
-  getActiveStationState,
-  type ActiveStationState
-} from './logic/stationComputeService'
 import { analyzeStation } from './logic/analyzeStation'
+import { buildStationComputeDeps, deepClone, getFilteredGroupedFlows } from './logic/stationComputeService'
 import {
   createEmpireSourceView,
   computeActiveStation
@@ -85,17 +78,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeEmpire.value,
     activeStationId.value
   ))
-
-  const activeStationState = computed<ActiveStationState>(() => {
-    const deps = getComputeDeps()
-    return getActiveStationState(
-      activeStationId.value,
-      deps?.modulesMap,
-      deps?.waresMap,
-      (id: string) => sourceView.getStationById(id),
-      deps?.buildPriceMultiplier
-    )
-  })
 
   function getStationById(stationId: string): StationPlan | null {
     return sourceView.getStationById(stationId)
@@ -182,29 +164,29 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
   })
 
-  const actualWorkforce = computed(() => {
+  const activeStationState = computed(() => {
     const stationId = activeStation.value?.id
-    if (!stationId) return 0
-    return stationProductionFlowMap.getCache(stationId)?.actualWorkforce || 0
+    if (!stationId) {
+      return {
+        actualWorkforce: 0,
+        currentEfficiency: 0,
+        warePriorityLevels: {},
+        productionFlows: []
+      }
+    }
+    const cache = stationProductionFlowMap.getCache(stationId)
+    return {
+      actualWorkforce: cache?.actualWorkforce || 0,
+      currentEfficiency: cache?.currentEfficiency || 0,
+      warePriorityLevels: cache?.warePriorityLevels || {},
+      productionFlows: stationProductionFlowMap.getProductionFlows(stationId)
+    }
   })
 
-  const currentEfficiency = computed(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return 0
-    return stationProductionFlowMap.getCache(stationId)?.currentEfficiency || 0
-  })
-
-  const productionFlows = computed<WareProductionFlow[]>(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return []
-    return stationProductionFlowMap.getProductionFlows(stationId)
-  })
-
-  const warePriorityLevels = computed<Record<string, number>>(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return {}
-    return stationProductionFlowMap.getCache(stationId)?.warePriorityLevels || {}
-  })
+  const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
+  const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
+  const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
+  const productionFlows = computed(() => activeStationState.value.productionFlows)
 
   const resolvedModules = computed(() => {
     const stationId = activeStation.value?.id
@@ -226,38 +208,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       const info = deps.modulesMap[m.id]
       return info?.type === 'storage' || info?.type === 'pier'
     })
-  })
-
-  const groupedFlows = computed(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return { flows: [], rateGroups: { positive: [], operations: [], supply: [], resources: [] }, volumeGroups: { solid: [], liquid: [], container: [] } }
-    return stationProductionFlowMap.getGrouped(stationId)
-  })
-
-  const stationAnalysis = computed(() => {
-    const planned = plannedModules.value
-    const auto = autoIndustryModules.value
-    const allModules = [...planned, ...auto]
-    if (allModules.length === 0) {
-      return {
-        totalCost: 0,
-        totalVolume: 0,
-        totalTime: 0,
-        totalCapacity: 0,
-        totalNeeded: 0,
-        playerHQNeeded: 0,
-        totalWorkerDiff: 0,
-        summaryItems: [],
-        moduleGroups: []
-      }
-    }
-    return analyzeStation(
-      allModules,
-      gameData.modulesMap,
-      gameData.waresMap,
-      buildPriceMultiplier.value,
-      settings.value.useHQ
-    )
   })
 
   const wares = computed(() => gameData.waresMap)
@@ -995,7 +945,31 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }),
     getEmpireGaps: () => empireGapsComputed.value,
 
-    getStationAnalysis: () => stationAnalysis.value,
+    getStationAnalysis: () => {
+      const planned = plannedModules.value
+      const auto = autoIndustryModules.value
+      const allModules = [...planned, ...auto]
+      if (allModules.length === 0) {
+        return {
+          totalCost: 0,
+          totalVolume: 0,
+          totalTime: 0,
+          totalCapacity: 0,
+          totalNeeded: 0,
+          playerHQNeeded: 0,
+          totalWorkerDiff: 0,
+          summaryItems: [],
+          moduleGroups: []
+        }
+      }
+      return analyzeStation(
+        allModules,
+        gameData.modulesMap,
+        gameData.waresMap,
+        buildPriceMultiplier.value,
+        settings.value.useHQ
+      )
+    },
     getDashboardSettings: () => ({
       transportShipCapacity: settings.value.transportShipCapacity,
       workforceAuto: settings.value.workforceAuto,
@@ -1159,8 +1133,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     currentEfficiency,
     productionFlows,
     warePriorityLevels,
-    groupedFlows,
-    stationAnalysis,
     wares,
     enforceDlcActivation,
     updatePlannedModules,

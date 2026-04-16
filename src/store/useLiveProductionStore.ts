@@ -12,7 +12,6 @@ import type {
   X4Module,
   BindingStationPlan
 } from '@/types/x4'
-import type { WareProductionFlow } from '@/types/production-flow'
 import type { ProductionSessionContext } from '@/types/production-context'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
 import type {
@@ -32,13 +31,7 @@ import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS, migrateStationSettings } from './state/StationStateMap'
 import { stationProductionFlowMap } from './state/StationProductionFlowMap'
-import {
-  buildStationComputeDeps,
-  getFilteredGroupedFlows,
-  deepClone,
-  getActiveStationState,
-  type ActiveStationState
-} from './logic/stationComputeService'
+import { buildStationComputeDeps, getFilteredGroupedFlows, deepClone } from './logic/stationComputeService'
 import { analyzeStation } from './logic/analyzeStation'
 import {
   createEmpireSourceView,
@@ -353,17 +346,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return null
   })
 
-  const activeStationState = computed<ActiveStationState>(() => {
-    const deps = getComputeDeps()
-    return getActiveStationState(
-      activeStation.value?.id || null,
-      deps?.modulesMap,
-      deps?.waresMap,
-      (id: string) => sourceView.getStationById(id),
-      deps?.buildPriceMultiplier
-    )
-  })
-
   function getComputeDeps() {
     const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
     if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
@@ -519,61 +501,29 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return resolved.filter(m => !plannedIds.includes(m.id))
   })
 
-  const productionFlows = computed<WareProductionFlow[]>(() => {
+  const activeStationState = computed(() => {
     const stationId = activeStation.value?.id
-    if (!stationId) return []
-    return stationProductionFlowMap.getProductionFlows(stationId)
-  })
-
-  const warePriorityLevels = computed<Record<string, number>>(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return {}
-    return stationProductionFlowMap.getCache(stationId)?.warePriorityLevels || {}
-  })
-
-  const actualWorkforce = computed(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return 0
-    return stationProductionFlowMap.getCache(stationId)?.actualWorkforce || 0
-  })
-
-  const currentEfficiency = computed(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return 0
-    return stationProductionFlowMap.getCache(stationId)?.currentEfficiency || 0
-  })
-
-  const groupedFlows = computed(() => {
-    const stationId = activeStation.value?.id
-    if (!stationId) return { flows: [], rateGroups: { positive: [], operations: [], supply: [], resources: [] }, volumeGroups: { solid: [], liquid: [], container: [] } }
-    return stationProductionFlowMap.getGrouped(stationId)
-  })
-
-  const stationAnalysis = computed(() => {
-    const planned = plannedModules.value
-    const auto = autoIndustryModules.value
-    const allModules = [...planned, ...auto]
-    if (allModules.length === 0) {
+    if (!stationId) {
       return {
-        totalCost: 0,
-        totalVolume: 0,
-        totalTime: 0,
-        totalCapacity: 0,
-        totalNeeded: 0,
-        playerHQNeeded: 0,
-        totalWorkerDiff: 0,
-        summaryItems: [],
-        moduleGroups: []
+        actualWorkforce: 0,
+        currentEfficiency: 0,
+        warePriorityLevels: {},
+        productionFlows: []
       }
     }
-    return analyzeStation(
-      allModules,
-      gameData.modulesMap,
-      gameData.waresMap,
-      buildPriceMultiplier.value,
-      settings.value.useHQ
-    )
+    const cache = stationProductionFlowMap.getCache(stationId)
+    return {
+      actualWorkforce: cache?.actualWorkforce || 0,
+      currentEfficiency: cache?.currentEfficiency || 0,
+      warePriorityLevels: cache?.warePriorityLevels || {},
+      productionFlows: stationProductionFlowMap.getProductionFlows(stationId)
+    }
   })
+
+  const productionFlows = computed(() => activeStationState.value.productionFlows)
+  const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
+  const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
+  const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
 
   const wares = computed(() => gameData.waresMap)
 
@@ -1333,7 +1283,31 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }),
     getEmpireGaps: () => empireGapsComputed.value,
 
-    getStationAnalysis: () => stationAnalysis.value,
+    getStationAnalysis: () => {
+      const planned = plannedModules.value
+      const auto = autoIndustryModules.value
+      const allModules = [...planned, ...auto]
+      if (allModules.length === 0) {
+        return {
+          totalCost: 0,
+          totalVolume: 0,
+          totalTime: 0,
+          totalCapacity: 0,
+          totalNeeded: 0,
+          playerHQNeeded: 0,
+          totalWorkerDiff: 0,
+          summaryItems: [],
+          moduleGroups: []
+        }
+      }
+      return analyzeStation(
+        allModules,
+        gameData.modulesMap,
+        gameData.waresMap,
+        buildPriceMultiplier.value,
+        settings.value.useHQ
+      )
+    },
     getDashboardSettings: () => ({
       transportShipCapacity: settings.value.transportShipCapacity,
       workforceAuto: settings.value.workforceAuto,
@@ -1451,7 +1425,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeBinding,
     activeBindingName,
     activeStation,
-    activeStationState,
     activeStationId,
     activeTransitSectorId,
     transitHubSettings,
@@ -1511,8 +1484,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     warePriorityLevels,
     actualWorkforce,
     currentEfficiency,
-    groupedFlows,
-    stationAnalysis,
     wares,
     enforceDlcActivation,
     updatePlannedModules,
