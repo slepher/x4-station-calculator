@@ -10,9 +10,8 @@ import type {
   SaveArchive,
   SectorData
 } from '@/types/saveArchive'
-import type { X4Module } from '@/types/x4'
+import type { X4Module, X4Ship } from '@/types/x4'
 import type { X4Map } from '@/types/x4'
-import shipsData from '@/assets/x4_game_data/8.0-Diplomacy/data/ships.json'
 
 interface Vector3 {
   x: number
@@ -94,9 +93,9 @@ interface ShipLookup {
   [macro: string]: ShipLookupEntry
 }
 
-function buildShipLookup(): ShipLookup {
+function buildShipLookup(ships: X4Ship[] | undefined): ShipLookup {
   const lookup: ShipLookup = {}
-  const ships = shipsData as Array<{ id: string; macro?: string; purposePrimary?: string }>
+  if (!ships) return lookup
   for (const ship of ships) {
     if (ship.macro && ship.purposePrimary) {
       lookup[ship.macro] = {
@@ -107,8 +106,6 @@ function buildShipLookup(): ShipLookup {
   }
   return lookup
 }
-
-const SHIP_LOOKUP = buildShipLookup()
 
 function buildZoneLookup(maps: X4Map | undefined): ZoneLookup {
   const lookup: ZoneLookup = {}
@@ -779,8 +776,10 @@ function stripEmptySectorArrays(sector: SectorData): SectorData {
 export function postProcessRustSaveArchive(
   archive: SaveArchive, 
   modulesByMacroId?: Record<string, X4Module>,
-  maps?: X4Map
+  maps?: X4Map,
+  ships?: X4Ship[]
 ): SaveArchive {
+  const SHIP_LOOKUP = buildShipLookup(ships)
   const zoneLookup = buildZoneLookup(maps)
   const sectorCenterLookup = buildSectorCenterLookup(maps)
   const sectorScaleLookup = buildArchiveSectorScaleLookup(archive, maps, zoneLookup, sectorCenterLookup)
