@@ -64,11 +64,56 @@ const hasSaveStation = computed(() => archiveStation.value !== null)
 const mode = computed(() => liveStore.mode)
 const canToggle = computed(() => liveStore.canToggle)
 const stationCode = computed(() => archiveStation.value?.code || '')
-const sectorResources = computed(() => archiveStation.value?.sector.resources || [])
-  const sectorSunlight = computed(() => Math.round((archiveStation.value?.sector.sunlight ?? 100) * 100))
-  const sectorName = computed(() => archiveStation.value?.sector.name || '')
-  const sectorNameId = computed(() => archiveStation.value?.sector.nameId)
-  const stationPosition = computed(() => archiveStation.value?.position)
+const sectorResources = computed(() => {
+  if (archiveStation.value?.sector?.resources?.length) {
+    return archiveStation.value.sector.resources
+  }
+  return bindingSectorData.value?.resources || []
+})
+
+const bindingSectorData = computed(() => {
+  const sectorMacro = bindingStation.value?.sectorMacro
+  if (!sectorMacro) return null
+  const sector = gameData.maps.sectors[sectorMacro]
+  if (!sector) return null
+  return {
+    name: sector.name,
+    nameId: sector.nameId,
+    sunlight: sector.area?.sunlight ?? 1,
+    resources: (sector.resources || []).map(r => r.ware)
+  }
+})
+
+const sectorSunlight = computed(() => {
+  if (archiveStation.value?.sector?.sunlight !== undefined) {
+    return Math.round(archiveStation.value.sector.sunlight * 100)
+  }
+  if (bindingSectorData.value?.sunlight !== undefined) {
+    return Math.round(bindingSectorData.value.sunlight * 100)
+  }
+  return 100
+})
+
+const sectorName = computed(() => {
+  if (archiveStation.value?.sector?.name) {
+    return archiveStation.value.sector.name
+  }
+  return bindingSectorData.value?.name || ''
+})
+
+const sectorNameId = computed(() => {
+  if (archiveStation.value?.sector?.nameId) {
+    return archiveStation.value.sector.nameId
+  }
+  return bindingSectorData.value?.nameId
+})
+
+const stationPosition = computed(() => {
+  if (archiveStation.value?.position) {
+    return archiveStation.value.position
+  }
+  return bindingStation.value?.position
+})
 
 const importModalActiveStation = computed(() => {
   if (!activeStation.value) return null

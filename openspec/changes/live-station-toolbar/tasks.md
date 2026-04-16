@@ -246,3 +246,58 @@
 - [x] 测试存档站点 "PPW-916": 无 bindingStation + saveStation -> 实时模式，可切换
 - [x] 测试模式切换: 点击切换按钮可切换模式
 - [x] 所有测试通过
+
+## Phase 9: bindingStation 数据显示修复
+
+### Task 9.1: 修复 `toProductionStation` sunlight 获取
+
+- [x] 在 `productionSourceAdapter.ts` 添加 `SectorSunlightMap` 类型
+- [x] `toProductionStation` 函数添加 `sectorsMap` 参数
+- [x] 从 `sectorsMap[plan.sectorMacro]?.area?.sunlight` 获取 sunlight（0-1 范围）
+- [x] 设置 `settings.sunlight = Math.round(sunlight * 100)`（转为百分比）
+
+### Task 9.2: 修复 `deriveBindingStationsFromRecords`
+
+- [x] 函数添加 `sectorsMap` 参数
+- [x] 传递 `sectorsMap` 给 `toProductionStation` 调用
+
+### Task 9.3: 修复 `empireSourceView.ts`
+
+- [x] `EmpireSourceViewDeps` 添加 `sectorsMap?: Ref<Record<string, X4MapSector>>`
+- [x] `derivedBindingStations` computed 传递 `sectorsMap?.value` 给派生函数
+
+### Task 9.4: 修复 `useLiveProductionStore.ts`
+
+- [x] `createEmpireSourceView` 传递 `sectorsMap: computed(() => gameData.maps.sectors)`
+- [x] `activeStation` computed 传递 `gameData.maps.sectors` 给 `toProductionStation`
+
+### Task 9.5: 修复 `LiveProductionWorkbenchView.vue` bindingStation 数据源
+
+- [x] 添加 `bindingSectorData` computed：从 `bindingStation.sectorMacro` 查询 `gameData.maps.sectors`
+- [x] 返回 `{ name, nameId, sunlight, resources }` 聚合数据
+- [x] `sectorSunlight` computed：优先 `archiveStation`，其次 `bindingSectorData`
+- [x] `sectorName` computed：优先 `archiveStation`，其次 `bindingSectorData`
+- [x] `sectorNameId` computed：优先 `archiveStation`，其次 `bindingSectorData`
+- [x] `stationPosition` computed：优先 `archiveStation`，其次 `bindingStation.position`
+- [x] `sectorResources` computed：优先 `archiveStation`（检查 `.length`），其次 `bindingSectorData`
+
+## Phase 10: 坐标与资源 UI 改进
+
+### Task 10.1: 坐标显示格式改进
+
+- [x] `LiveStationToolbar.vue` 添加 `formatKm` 函数：整数取整，浮点取1位小数
+- [x] `positionKm` computed：转换为 `{ x, y, z }` km 格式
+- [x] popover 模板改为 X/Y/Z 分行显示
+- [x] 添加 `.position-row` 样式：`flex items-center justify-between px-2 py-1.5 gap-2`
+- [x] 显示单位 `km`
+
+### Task 10.2: 资源 popover 改进
+
+- [x] 移除 `.popover-content` 的 `max-h-48` 高度限制
+- [x] 添加 `.popover-content.resources-list` 样式：`max-h-none overflow-visible`
+- [x] 资源名称 i18n：添加 `getResourceName` 函数，从 `waresMap[wareId]` 获取 ware 对象再调用 `translateWare`
+
+### Task 10.3: E2E 测试更新
+
+- [x] Test 3.10 新增：验证 bindingStation 的星区名称（小行星带）、sunlight（13%）、资源（7种）、坐标格式
+- [x] Test 3.6 更新：验证新坐标格式（X: -39.5, Y: 0, Z: 8.8 km）

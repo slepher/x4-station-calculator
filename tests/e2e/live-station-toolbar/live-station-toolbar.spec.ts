@@ -151,6 +151,91 @@ test.describe('3 E2E 测试场景', () => {
     await expect(modeBtn).toBeDisabled()
   })
 
+  test('3.10 Case: 站点"新建空间站"bindingStation-星区坐标sunlight正确显示', async ({ page }) => {
+    // 3.10.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
+    await commonSetup(page)
+    // 3.10.2 点击星区 `小行星` supply-tab，点击站点 `新建空间站` station-tab，等待 toolbar 加载
+    await selectStationInSector(page, '小行星', '新建空间站')
+    
+    // 3.10.3 断言星区名称显示正确（bindingStation.sectorMacro -> gameData.maps.sectors -> nameId 翻译）
+    // fixture: sectorMacro = "cluster_100_sector001_macro" = Asteroid Belt = 中文"小行星带"
+    const sectorField = page.locator('.input-group').filter({ hasText: /星区|Sector/ }).first()
+    const sectorDisplay = sectorField.locator('.text-sky-400')
+    await expect(sectorDisplay).toBeVisible({ timeout: 500 })
+    const sectorNameText = await sectorDisplay.textContent()
+    expect(sectorNameText).toContain('小行星带')
+    
+    // 3.10.4 断言光伏效率显示正确（bindingStation.sectorMacro -> gameData.area.sunlight = 0.13 -> 13%）
+    const sunlightField = page.locator('.input-group').filter({ hasText: /光伏效率|Sunlight/ }).first()
+    const sunlightValue = sunlightField.locator('.text-sky-400')
+    await expect(sunlightValue).toBeVisible({ timeout: 500 })
+    const sunlightText = await sunlightValue.textContent()
+    expect(sunlightText).toBe('13')
+    
+    // 3.10.5 断言星区资源显示正确（bindingStation.sectorMacro -> gameData.resources -> 7种资源）
+    const resourcesField = page.locator('.input-group').filter({ hasText: /星区资源|Sector Resources/ })
+    await expect(resourcesField).toBeVisible({ timeout: 500 })
+    const resourcesDisplay = resourcesField.locator('.font-mono.text-sky-400')
+    await expect(resourcesDisplay).toBeVisible({ timeout: 500 })
+    const resourcesText = await resourcesDisplay.textContent()
+    expect(resourcesText).toBe('7')
+    
+    // 3.10.6 点击星区字段，触发 popover 显示坐标
+    await sectorField.click()
+    await page.waitForTimeout(100)
+    
+    // 3.10.7 断言 popover 可见
+    await expect(page.locator('.sector-popover')).toBeVisible({ timeout: 500 })
+    
+    // 3.10.8 断言 popover 内容包含坐标文本（bindingStation.position）
+    // fixture: position = { x: 67524, y: 0, z: 81288 }
+    // 单位从 m 转为 km: x=67.5km, y=0km, z=81.3km
+    const popoverContent = page.locator('.sector-popover .popover-content')
+    await expect(popoverContent).toBeVisible({ timeout: 500 })
+    
+    // 断言坐标分开显示，格式正确
+    const positionItems = popoverContent.locator('.position-row')
+    await expect(positionItems).toHaveCount(3, { timeout: 500 })
+    
+    // X坐标
+    const xRow = positionItems.filter({ hasText: 'X' })
+    const xValue = await xRow.locator('.position-value').textContent()
+    expect(xValue).toBe('67.5')
+    
+    // Y坐标
+    const yRow = positionItems.filter({ hasText: 'Y' })
+    const yValue = await yRow.locator('.position-value').textContent()
+    expect(yValue).toBe('0')
+    
+    // Z坐标
+    const zRow = positionItems.filter({ hasText: 'Z' })
+    const zValue = await zRow.locator('.position-value').textContent()
+    expect(zValue).toBe('81.3')
+    
+    // 关闭 popover
+    await page.locator('.sector-popover .fixed').click()
+    await page.waitForTimeout(100)
+    
+    // 3.10.9 点击星区资源字段，触发 popover 显示资源列表
+    await resourcesField.click()
+    await page.waitForTimeout(100)
+    
+    // 3.10.10 断言资源 popover 可见，且无高度限制（可显示完整列表）
+    const resourcesPopover = page.locator('.resources-popover')
+    await expect(resourcesPopover).toBeVisible({ timeout: 500 })
+    
+    // 3.10.11 断言资源列表包含 i18n 翻译后的名称（中文）
+    // fixture: resources = [helium, hydrogen, ice, methane, nividium, ore, silicon]
+    const resourceItems = resourcesPopover.locator('.resource-item')
+    await expect(resourceItems).toHaveCount(7, { timeout: 500 })
+    
+    // 检查部分资源的中文翻译
+    const resourceTexts = await resourceItems.allTextContents()
+    expect(resourceTexts.some(t => t.includes('氦') || t.includes('Helium'))).toBe(true)
+    expect(resourceTexts.some(t => t.includes('氢') || t.includes('Hydrogen'))).toBe(true)
+    expect(resourceTexts.some(t => t.includes('冰') || t.includes('Ice'))).toBe(true)
+  })
+
   test('3.3 Case: 存档站点"PPW-916"仅有saveStation-实时模式可切换', async ({ page }) => {
     // 3.3.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
     await commonSetup(page)
@@ -227,10 +312,26 @@ test.describe('3 E2E 测试场景', () => {
     await page.waitForTimeout(100)
     // 3.6.4 断言 `.sector-popover` 可见
     await expect(page.locator('.sector-popover')).toBeVisible({ timeout: 500 })
-    // 3.6.5 断言 popover 内容包含坐标文本格式 #期望: ['坐标']
+    // 3.6.5 断言 popover 内容包含坐标显示（X/Y/Z 分开，单位 km）
+    // fixture: PPW-916 position = { x: -39466.402, y: 0, z: 8790 } -> X: -39.5km, Y: 0km, Z: 8.8km
     const popoverContent = page.locator('.sector-popover .popover-content')
-    const popoverText = await popoverContent.textContent()
-    expect(popoverText).toContain('坐标')
+    const positionRows = popoverContent.locator('.position-row')
+    await expect(positionRows).toHaveCount(3, { timeout: 500 })
+    
+    // X坐标（负值）
+    const xRow = positionRows.filter({ hasText: 'X' })
+    const xValue = await xRow.locator('.position-value').textContent()
+    expect(xValue).toBe('-39.5')
+    
+    // Y坐标
+    const yRow = positionRows.filter({ hasText: 'Y' })
+    const yValue = await yRow.locator('.position-value').textContent()
+    expect(yValue).toBe('0')
+    
+    // Z坐标
+    const zRow = positionRows.filter({ hasText: 'Z' })
+    const zValue = await zRow.locator('.position-value').textContent()
+    expect(zValue).toBe('8.8')
   })
 
   test('3.7 Case: 星区资源popover展示resources列表', async ({ page }) => {

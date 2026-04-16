@@ -134,76 +134,22 @@ Task 25-30 已完成，Transit Hub 界面现在接收原始数据 props + 内部
 
 ---
 
-## Phase 6: 清理 StationStateMap（待实现）
+## Phase 6: 清理 StationStateMap（已完成）
 
-Task 23-24 待实现，删除 StationStateMap.ts（41处调用需迁移）。
+- [x] Task 23: 删除 StationStateMap.ts
+- [x] Task 24: 构建验证
 
-### Task 19: 创建 useWareFlowGrouping composable
-
-**目标**：提供分组+价格计算函数，不依赖模块列表
-
-**改动**：
-- 创建 `src/components/empire/composables/useWareFlowGrouping.ts`
-- `computeGroupedFlows(props)` - 接收 productionFlows + waresMap + settings + warePriorityLevels
-- 返回 `groupedFlows`（含价格、分组、transportDemand、volume 计算）
-
-**状态**：⏳ 待实现
-
----
-
-### Task 20: StationWareFlowsDashboard 重构
-
-**目标**：组件接收原始数据 props，内部用 composable 计算 groupedFlows
-
-**改动**：
-- 删除 `groupedFlows`、`wares`、`modulesMap` props
-- 新增 `productionFlows`、`warePriorityLevels` props
-- 内部用 `useWareFlowGrouping` 计算 `groupedFlows`
-- `waresMap` 直接访问 `gameDataStore`
-
-**状态**：⏳ 待实现
-
----
-
-### Task 21: Presenter 层改动
-
-**目标**：Presenter 只提供原始数据，不计算 groupedFlows
-
-**改动**：
-- 删除 `groupedFlows` 计算
-- 新增 `productionFlows`、`warePriorityLevels` 原始数据获取
-- 从 `stationProductionFlowMap.getProductionFlows(stationId)` 获取
-
-**状态**：⏳ 待实现
-
----
-
-### Task 22: Contract + Store 层改动
-
-**目标**：移除派生计算方法，只提供原始数据
-
-**改动**：
-- 删除 `getGroupedFlows()`、`getStationAnalysis()`、`getCurrentEfficiency()`、`getActualWorkforce()`
-- 新增 `getProductionFlows()`、`getResolvedModules()`、`getWarePriorityLevels()`
-
-**状态**：⏳ 待实现
-
----
-
-### Task 23: 删除 StationStateMap.ts - BlueprintStore 和 LiveStore 已重构
+### Task 23: 删除 StationStateMap.ts
 
 **已完成**：
 - BlueprintProductionStore: 所有 computed 直接从 activeStation 和 StationProductionFlowMap 获取数据
 - LiveProductionStore: 同上，并保持 updateBindingStationPlan 同步
 - 移除了 Store 层对 stationComputeService getter 函数的依赖
+- StationStateMap.ts 文件已删除
+- stationComputeService.ts 已删除（改为 stationSettings.ts）
+- stationContextService.ts 已删除
 
-**下一步**：
-- 清理 stationComputeService.ts 中不再使用的函数
-- 删除 StationStateMap.ts（仅测试和 empireFlowFacade 可能仍需要）
-
-**状态**：✅ Store 层重构完成
-
----
+**状态**：✅ 已完成
 
 ### Task 24: 构建验证
 
@@ -211,20 +157,69 @@ Task 23-24 待实现，删除 StationStateMap.ts（41处调用需迁移）。
 
 ---
 
+## Phase 7: Auto Modules 分拆显示（已完成）
+
+- [x] Task 31: autoModules 分拆为 industry/habitation/infrastructure 三组
+- [x] Task 32: StationPlanningPanel 分三组显示 auto 模块
+- [x] Task 33: 构建验证
+
+### Task 31: autoModules 分拆
+
+**改动**：
+- `StationProductionFlowMap.compute` 输出 `autoIndustryModules`, `autoHabitationModules`, `autoInfrastructureModules`
+- 分组逻辑基于 module.group
+
+**状态**：✅ 已完成
+
+### Task 32: UI 分三组显示
+
+**改动**：
+- StationPlanningPanel 显示三组：自动工业区、自动居住区、自动基础设施
+- 各组独立展开/折叠
+
+**状态**：✅ 已完成
+
+---
+
 ## 执行顺序
 
 ```
-Phase 3（autoInfrastructure 移至 Stage 1）✅：
-  Task 17 → StationProductionFlowMap.compute 增加 autoInfrastructure
-  Task 18 → 清理 calculateWareFlowDerived，移除 autoInfrastructure 计算
-  
-Phase 4（Vue 组件重构）✅：
-  Task 19 → 创建 useWareFlowGrouping composable
-  Task 20 → StationWareFlowsDashboard 改用原始数据 props + 内部 composable
-  Task 21 → Presenter 改动（提供 productionFlows + warePriorityLevels）
-  Task 22 → Contract + Store 改动（移除派生计算方法）
+Phase 1（StationProductionFlowMap 基础架构）✅：
+  Task 1-10 已完成
 
-Phase 5（清理 StationStateMap）⏳：
-  Task 23 → 需要更多迁移工作（41 处调用点）
-  Task 24 → 构建验证 ✅ 已通过
+Phase 2（两阶段计算架构）✅：
+  Task 11-16 已完成
+
+Phase 3（autoInfrastructure 移至 Stage 1）✅：
+  Task 17-18 已完成
+
+Phase 4（Vue 组件重构）✅：
+  Task 19-22 已完成
+
+Phase 5（Transit Hub 重构）✅：
+  Task 25-30 已完成
+
+Phase 6（清理 StationStateMap - 数据层）✅：
+  Task 23-24 已完成
+  StationStateMap.ts 已删除
+  stationComputeService.ts / stationContextService.ts 已删除
+
+Phase 7（Auto Modules 分拆 - 数据层）✅：
+  Task 31-32 已完成
+  StationProductionFlowMap.compute 输出分拆为 autoIndustry/autoHabitation/autoInfrastructure
 ```
+
+---
+
+## 完成状态总结
+
+**数据层改动（本 change）**：
+- StationProductionFlowMap 基础架构已建立
+- 两阶段计算架构已实现
+- StationStateMap.ts 已删除
+- stationComputeService.ts / stationContextService.ts 已删除
+- Auto Modules 计算逻辑分三组输出
+
+**UI 层改动（归属 user-save-binding-station）**：
+- StationPlanningPanel 分三组显示（见 user-save-binding-station T167-T171）
+- Vue 组件接收原始数据 props + 内部 composable（见 user-save-binding-station T140-T146）

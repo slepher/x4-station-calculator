@@ -330,6 +330,84 @@ TransitHubCenterDashboard.vue:
 ### 移除文件
 
 - `src/store/state/StationStateMap.ts`
+- `src/store/logic/stationComputeService.ts` → 改为 `src/store/logic/stationSettings.ts`
+- `src/store/logic/stationContextService.ts`
+
+### 新增文件
+
+- `src/store/utils/deepClone.ts` - 统一深拷贝实现
+
+## Phase 6: 删除 StationStateMap（已完成）
+
+### 架构变更
+
+移除 StationStateMap 后的数据流：
+
+```
+activeStation.value (StationPlan)
+    ├── modules, settings, lockedWares, warePriority（用户直接编辑）
+    │
+StationProductionFlowMap
+    ├── cacheMap: Map<stationId, StationFlowCache>
+    │     ├── resolvedModules: planned + autoIndustry + autoInfrastructure
+    │     └── productionFlows: WareProductionFlow[] (含 volume)
+    │
+BlueprintProductionStore / LiveProductionStore
+    ├── computed 直接从 activeStation + StationProductionFlowMap 获取
+    ├── 不再经过中间 context 服务
+```
+
+### 关键决策
+
+**决策 8**：完全删除 StationStateMap
+
+**理由**：
+- 用户编辑直接反映到 `activeStation`，无需临时编辑态
+- 无取消回滚需求
+- 派生数据实时计算或缓存到 StationProductionFlowMap
+- 减少数据同步复杂度
+
+**决策 9**：删除 stationComputeService / stationContextService
+
+**理由**：
+- 两个 production store 已直接访问 StationProductionFlowMap
+- 中间服务层不再需要
+- `stationSettings.ts` 仅保留设置迁移辅助函数
+
+## Phase 7: Auto Modules 分拆（数据层）
+
+### StationFlowCache 结构变更
+
+```typescript
+interface StationFlowCache {
+  resolvedModules: SavedModule[]  // planned + autoIndustry + autoInfrastructure
+  productionFlows: WareProductionFlow[]
+  
+  // 新增：分拆输出
+  autoIndustryModules: SavedModule[]      // production 类型自动模块
+  autoHabitationModules: SavedModule[]    // habitation 类型自动模块  
+  autoInfrastructureModules: SavedModule[] // storage/dock 类型自动模块
+}
+```
+
+### 分组逻辑
+
+```typescript
+// StationProductionFlowMap.compute
+const autoIndustryModules = autoModules.filter(m => 
+  modulesMap[m.id]?.group === 'production'
+)
+const autoHabitationModules = autoModules.filter(m =>
+  modulesMap[m.id]?.group === 'habitation'
+)
+const autoInfrastructureModules = autoModules.filter(m =>
+  modulesMap[m.id]?.group === 'storage' || modulesMap[m.id]?.group === 'dock'
+)
+```
+
+### UI 层改动
+
+见 `user-save-binding-station/design.md` - StationPlanningPanel 分三组显示
 
 ## Phase 4: Vue 组件重构设计
 

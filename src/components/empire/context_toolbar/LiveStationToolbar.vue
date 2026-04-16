@@ -1,8 +1,14 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { useX4I18n } from '@/utils/UseX4I18n'
 import type { StationSettings } from '@/types/x4'
 import type { ArchiveStationPosition } from '@/types/saveArchive'
+
+const gameDataStore = useGameDataStore()
+const { t, te } = useI18n()
+const { translateWare } = useX4I18n()
 
 const props = defineProps<{
   stationName: string
@@ -29,8 +35,6 @@ const emit = defineEmits<{
   updateShowEmpireGaps: [value: boolean]
   openImport: []
 }>()
-
-const { t, te } = useI18n()
 
 const showSectorPopover = ref(false)
 
@@ -68,11 +72,31 @@ const displaySectorName = computed(() => {
   return props.sectorName || '-'
 })
 
-const positionText = computed(() => {
+const formatKm = (value: number): string => {
+  const km = value / 1000
+  if (Number.isInteger(km)) {
+    return String(km)
+  }
+  return km.toFixed(1)
+}
+
+const positionKm = computed(() => {
   if (!props.stationPosition) return null
   const { x, y, z } = props.stationPosition
-  return `(${Math.round(x)}, ${Math.round(y)}, ${Math.round(z)})`
+  return {
+    x: formatKm(x),
+    y: formatKm(y),
+    z: formatKm(z)
+  }
 })
+
+const getResourceName = (wareId: string): string => {
+  const ware = gameDataStore.waresMap[wareId]
+  if (ware) {
+    return translateWare(ware)
+  }
+  return wareId
+}
 
 const toggleMode = () => {
   if (!props.canToggle) return
@@ -133,10 +157,23 @@ const handleOpenImport = () => {
           <div v-if="showSectorPopover" class="sector-popover">
             <div class="popover-header">{{ displaySectorName }}</div>
             <div class="popover-content">
-              <div class="position-item" v-if="positionText">
-                <span class="text-xs text-slate-400">{{ t('toolbar.position') }}</span>
-                <span class="text-xs font-mono text-sky-400 ml-2">{{ positionText }}</span>
-              </div>
+              <template v-if="positionKm">
+                <div class="position-row">
+                  <span class="text-xs text-slate-400">X</span>
+                  <span class="text-xs font-mono text-sky-400 position-value">{{ positionKm.x }}</span>
+                  <span class="text-xs text-slate-500">km</span>
+                </div>
+                <div class="position-row">
+                  <span class="text-xs text-slate-400">Y</span>
+                  <span class="text-xs font-mono text-sky-400 position-value">{{ positionKm.y }}</span>
+                  <span class="text-xs text-slate-500">km</span>
+                </div>
+                <div class="position-row">
+                  <span class="text-xs text-slate-400">Z</span>
+                  <span class="text-xs font-mono text-sky-400 position-value">{{ positionKm.z }}</span>
+                  <span class="text-xs text-slate-500">km</span>
+                </div>
+              </template>
               <div v-else class="text-xs text-slate-500 text-center py-2">
                 {{ t('toolbar.no_position') }}
               </div>
@@ -162,9 +199,9 @@ const handleOpenImport = () => {
 
           <div v-if="showResourcesPopover" class="resources-popover">
             <div class="popover-header">{{ t('toolbar.sector_resources') }}</div>
-            <div class="popover-content">
+            <div class="popover-content resources-list">
               <div class="resource-item" v-for="r in props.sectorResources" :key="r">
-                <span class="text-xs text-slate-300">{{ r }}</span>
+                <span class="text-xs text-slate-300">{{ getResourceName(r) }}</span>
               </div>
               <div v-if="props.sectorResources.length === 0" class="text-xs text-slate-500 text-center py-2">
                 {{ t('toolbar.no_resources') }}
@@ -365,8 +402,14 @@ const handleOpenImport = () => {
 .popover-content {
   @apply p-1 max-h-48 overflow-y-auto;
 }
-.position-item {
-  @apply flex items-center justify-between px-2 py-1.5;
+.popover-content.resources-list {
+  @apply max-h-none overflow-visible;
+}
+.position-row {
+  @apply flex items-center justify-between px-2 py-1.5 gap-2;
+}
+.position-value {
+  @apply ml-2;
 }
 .resource-item {
   @apply px-2 py-1.5 text-xs text-slate-300;

@@ -65,6 +65,7 @@ export interface ProductionSourceDeps {
 
 export interface SaveBindingProductionDeps extends ProductionSourceDeps {
   playerStationRecords: PlayerStationRecord[]
+  sectorsMap?: SectorSunlightMap
 }
 
 function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
@@ -77,13 +78,30 @@ function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
   }
 }
 
-export function toProductionStation(gameGuid: string, plan: BindingStationPlan): StationPlan {
+export interface SectorSunlightMap {
+  [sectorMacro: string]: { area?: { sunlight?: number } }
+}
+
+export function toProductionStation(
+  gameGuid: string,
+  plan: BindingStationPlan,
+  sectorsMap?: SectorSunlightMap
+): StationPlan {
+  const settings = migrateStationSettings(plan.settings)
+  
+  if (plan.sectorMacro && sectorsMap) {
+    const sector = sectorsMap[plan.sectorMacro]
+    if (sector?.area?.sunlight !== undefined) {
+      settings.sunlight = Math.round(sector.area.sunlight * 100)
+    }
+  }
+  
   return {
     id: createBindingPlanStationId(gameGuid, plan.id),
     name: plan.name || plan.saveStationCode || 'Station',
     type: plan.type,
     modules: plan.modules || [],
-    settings: migrateStationSettings(plan.settings),
+    settings,
     lastUpdated: 0,
     lockedWares: plan.lockedWares || [],
     warePriority: plan.warePriority || {}
@@ -172,14 +190,14 @@ export function buildSaveBindingProductionFlows(
 
   binding.stationPlans.forEach((plan) => {
     if (!plan.saveStationCode || emittedPlanIds.has(plan.id)) return
-    const station = toProductionStation(binding.gameGuid, plan)
+    const station = toProductionStation(binding.gameGuid, plan, deps.sectorsMap)
     station.sectorId = plan.groupId || null
     derivedStations.push(station)
     emittedPlanIds.add(plan.id)
   })
 
   virtualPlans.forEach((plan) => {
-    const station = toProductionStation(binding.gameGuid, plan)
+    const station = toProductionStation(binding.gameGuid, plan, deps.sectorsMap)
     station.sectorId = plan.groupId || null
     derivedStations.push(station)
   })
@@ -273,7 +291,8 @@ function getStationRecordByCode(
 
 export function deriveBindingStationsFromRecords(
   binding: SaveBindingPlan | null | undefined,
-  stationRecords: PlayerStationRecord[]
+  stationRecords: PlayerStationRecord[],
+  sectorsMap?: SectorSunlightMap
 ): DerivedBindingStation[] {
   if (!binding) return []
   if (!stationRecords || stationRecords.length === 0) return []
@@ -305,7 +324,7 @@ export function deriveBindingStationsFromRecords(
 
   binding.stationPlans.forEach((plan) => {
     if (emittedPlanIds.has(plan.id)) return
-    const station = toProductionStation(binding.gameGuid, plan)
+    const station = toProductionStation(binding.gameGuid, plan, sectorsMap)
     station.sectorId = plan.groupId || null
     result.push({
       station,

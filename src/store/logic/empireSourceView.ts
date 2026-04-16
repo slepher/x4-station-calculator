@@ -1,5 +1,5 @@
 import { computed, type Ref, type ComputedRef } from 'vue'
-import type { EmpirePlan, SectorPlan, StationPlan, SaveBindingPlan } from '@/types/x4'
+import type { EmpirePlan, SectorPlan, StationPlan, SaveBindingPlan, X4MapSector } from '@/types/x4'
 import type { BindingSectorGroup } from '@/types/x4'
 import type { PlayerStationRecord } from '@/types/saveArchive'
 import {
@@ -17,6 +17,7 @@ export interface EmpireSourceViewDeps {
   activeEmpire: Ref<EmpirePlan | null>
   activeBinding: Ref<SaveBindingPlan | null>
   playerStationRecords: Ref<PlayerStationRecord[]>
+  sectorsMap?: Ref<Record<string, X4MapSector>>
 }
 
 export interface EmpireSourceView {
@@ -52,12 +53,13 @@ export function createEmpireSourceView(deps: EmpireSourceViewDeps): EmpireSource
     productionSource,
     activeEmpire,
     activeBinding,
-    playerStationRecords
+    playerStationRecords,
+    sectorsMap
   } = deps
 
   const derivedBindingStations = computed<DerivedBindingStation[]>(() => {
     if (productionSource.value !== 'save-binding') return []
-    return deriveBindingStationsFromRecords(activeBinding.value, playerStationRecords.value)
+    return deriveBindingStationsFromRecords(activeBinding.value, playerStationRecords.value, sectorsMap?.value)
   })
 
   const sectors = computed<SectorPlan[]>(() => {

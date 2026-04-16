@@ -96,7 +96,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     productionSource,
     activeEmpire: ref(null),
     activeBinding,
-    playerStationRecords
+    playerStationRecords,
+    sectorsMap: computed(() => gameData.maps.sectors)
   })
 
   const sectors = sourceView.sectors
@@ -327,7 +328,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const activeStation = computed<StationPlan | null>(() => {
     const gameGuid = activeBinding.value?.gameGuid || ''
     if (bindingStation.value) {
-      return toProductionStation(gameGuid, bindingStation.value)
+      return toProductionStation(gameGuid, bindingStation.value, gameData.maps.sectors)
     }
     if (archiveStation.value) {
       const archive = archiveStation.value
@@ -337,7 +338,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         name: archive.name || archive.code,
         type: 'industrial',
         modules: archive.modules || [],
-        settings: { ...DEFAULT_STATION_SETTINGS },
+        settings: { ...DEFAULT_STATION_SETTINGS, sunlight: Math.round((archive.sector?.sunlight ?? 1) * 100) },
         lastUpdated: 0,
         lockedWares: [],
         warePriority: {}

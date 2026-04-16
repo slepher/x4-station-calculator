@@ -314,6 +314,51 @@ const canToggle = computed(() => {
 - 坐标来源于 station.relative_position
 - popover 展示 `(x, y, z)` 格式坐标
 
+**改进（2026-04-16）**: 坐标改为 X/Y/Z 分行显示，单位从 m 转为 km。
+
+**坐标格式规则**:
+- 整数 km 取整（如 `0` km）
+- 浮点 km 取1位小数（如 `67.5` km, `81.3` km）
+- 示例：`{ x: 67524, y: 0, z: 81288 }` m → `X: 67.5 km, Y: 0 km, Z: 81.3 km`
+
+### 5b. bindingStation 数据源补充（2026-04-16）
+
+**问题**: `LiveStationToolbar` 只从 `archiveStation` 获取数据，bindingStation（无对应 save archive）的 sector/sunlight/resources/position 显示为空。
+
+**决策**: 添加 `bindingSectorData` computed 作为备选数据源。
+
+**数据流**:
+```
+archiveStation?.sector     ←── 优先（有 save archive）
+        ↓ (fallback)
+bindingSectorData          ←── 备选（仅 bindingStation）
+    ↑
+gameData.maps.sectors[plan.sectorMacro]
+```
+
+**computed 双源逻辑**:
+| Prop | archiveStation 优先 | bindingSectorData 备选 |
+|-----|---------------------|----------------------|
+| `sectorSunlight` | `Math.round(sector.sunlight * 100)` | `Math.round(bindingSectorData.sunlight * 100)` |
+| `sectorName` | `sector.name` | `bindingSectorData.name` |
+| `sectorNameId` | `sector.nameId` | `bindingSectorData.nameId` |
+| `stationPosition` | `archiveStation.position` | `bindingStation.position` |
+| `sectorResources` | `sector.resources` (检查 `.length`) | `bindingSectorData.resources` |
+
+**关键点**: `sectorResources` 需检查 `.length`，因为空数组 `[]` 也是 truthy。
+
+### 5c. 资源 popover 改进（2026-04-16）
+
+**决策**: 资源 popover 移除高度限制，资源名称支持 i18n 翻译。
+
+**原因**:
+- 原有 `max-h-48` 高度限制会截断长列表
+- 资源 ID 如 `helium` 需翻译为中文 `氦`
+
+**实现**:
+- CSS: `.popover-content.resources-list { max-h-none; overflow-visible; }`
+- JS: 添加 `getResourceName(wareId)` 函数，从 `waresMap[wareId]` 获取 ware 对象，调用 `translateWare(ware)`
+
 ### 6. 规划控件条件渲染
 
 **决策**: 使用 `v-if="mode === 'planning'"` 控制显示。
