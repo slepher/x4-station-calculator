@@ -323,6 +323,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     
     const wasSectorMacroSet = Boolean(group.sectorMacro)
     const newSectorMacro = input.sectorMacro
+    const anchorChanged = group.sectorMacro !== newSectorMacro
     
     updateGroup(input.gameGuid, input.sectorGroupId, {
       sectorMacro: input.sectorMacro,
@@ -342,12 +343,23 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       draftBinding.value.updatedAt = Date.now()
     }
     
-    // Update tradestation sectorMacro when anchor sector changes
-    if (newSectorMacro && group.tradeStation && group.tradeStation.sectorMacro !== newSectorMacro) {
-      group.tradeStation.sectorMacro = newSectorMacro
-      const position = getSectorCenterPosition(gameData.maps, newSectorMacro)
-      if (position && !group.tradeStation.saveStationCode) {
+    // When anchor sector changes: reset or create tradestation
+    if (anchorChanged && newSectorMacro) {
+      if (group.tradeStation) {
+        // Reset tradestation to new sector center, unbind
+        group.tradeStation.sectorMacro = newSectorMacro
+        group.tradeStation.saveStationCode = undefined
+        const position = getSectorCenterPosition(gameData.maps, newSectorMacro)
         group.tradeStation.position = position
+      } else {
+        // Create new tradestation at new sector center
+        const position = getSectorCenterPosition(gameData.maps, newSectorMacro)
+        group.tradeStation = {
+          id: crypto.randomUUID(),
+          name: 'Trade Station',
+          sectorMacro: newSectorMacro,
+          position
+        }
       }
       draftBinding.value.updatedAt = Date.now()
     }
