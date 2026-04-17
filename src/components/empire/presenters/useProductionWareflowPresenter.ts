@@ -66,7 +66,6 @@ export interface WareflowPresenterStore {
   toggleWareLock(wareId: string): void
   toggleWarePriority(wareId: string): void
   updateWareflowViewMode(value: WareFlowViewMode): void
-  updateTransitHubSettings(patch: any): void
   updateResourceBufferHours(value: number): void
   updatePrimaryProductBufferHours(value: number): void
   updateSecondaryProductBufferHours(value: number): void
@@ -95,26 +94,11 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
 
   const emits: WareflowPresenterEmits = {
     updateViewMode: (value: WareFlowViewMode) => store.updateWareflowViewMode(value),
-    updateResourceBufferHours: (value: number) => {
-      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ resourceBufferHours: value })
-      else store.updateResourceBufferHours(value)
-    },
-    updatePrimaryProductBufferHours: (value: number) => {
-      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ primaryProductBufferHours: value })
-      else store.updatePrimaryProductBufferHours(value)
-    },
-    updateSecondaryProductBufferHours: (value: number) => {
-      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ secondaryProductBufferHours: value })
-      else store.updateSecondaryProductBufferHours(value)
-    },
-    updateBuyMultiplier: (value: number) => {
-      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ buyMultiplier: value })
-      else store.updateBuyMultiplier(value)
-    },
-    updateSellMultiplier: (value: number) => {
-      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ sellMultiplier: value })
-      else store.updateSellMultiplier(value)
-    },
+    updateResourceBufferHours: (value: number) => store.updateResourceBufferHours(value),
+    updatePrimaryProductBufferHours: (value: number) => store.updatePrimaryProductBufferHours(value),
+    updateSecondaryProductBufferHours: (value: number) => store.updateSecondaryProductBufferHours(value),
+    updateBuyMultiplier: (value: number) => store.updateBuyMultiplier(value),
+    updateSellMultiplier: (value: number) => store.updateSellMultiplier(value),
     addGapModule: (wareId: string) => store.addWareModule(wareId),
     removeGapModule: (wareId: string) => store.removeWareModule(wareId)
   }

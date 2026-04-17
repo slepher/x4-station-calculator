@@ -19,7 +19,8 @@ const forbiddenPatterns = [
   { pattern: /\bgetContextState\(/g, message: 'Do not use getContextState(); read store.context directly.' },
   { pattern: /\bgetWorkbenchMode\(/g, message: 'Do not use getWorkbenchMode(); read store.session.workbenchMode directly.' },
   { pattern: /\bgetActiveStationId\(/g, message: 'Do not use getActiveStationId(); read store.session.activeStationId directly.' },
-  { pattern: /\bgetActiveTransitSectorId\(/g, message: 'Do not use getActiveTransitSectorId(); read store.session.activeTransitSectorId directly.' }
+  { pattern: /\bgetActiveTransitSectorId\(/g, message: 'Do not use getActiveTransitSectorId(); read store.session.activeTransitSectorId directly.' },
+  { pattern: /\bupdateTransitHubSettings\(/g, message: 'Do not use updateTransitHubSettings(); transit settings must flow through unified updateSetting/updateX actions.' }
 ]
 
 const errors = []

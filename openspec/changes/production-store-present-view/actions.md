@@ -859,18 +859,28 @@ export function createProductionSettingActions<TStation extends ProductionSettin
 
 要在 helper 中写死映射，不要让 presenter 再知道内部字段名。
 
-### 3. transit hub settings
+### 3. transit setting 也必须统一到 `updateSetting`
 
-`updateTransitHubSettings` 不适合直接塞进这个 helper。
+不再保留 `updateTransitSetting` / `updateTransitHubSettings` 这类 transit 专属 settings action。
+
+硬性规定：
+
+- 只允许保留 `updateSetting(key, value)` 与 `updateSettings(patch)`
+- transit 相关设置如果仍存在，也必须作为 `StationSettings` 的一部分进入同一写入口
+- presenter / view 不得调用 transit 专属 settings action
+- live store 不得继续暴露独立的 `updateTransitSetting` / `updateTransitHubSettings`
 
 原因：
 
-- live transit patch 写入的是 group settings，不是当前 station settings
+- `stationState` 已经是 station / transit 共用的唯一主状态对象
+- settings 写入口如果继续分成 station / transit 两套，会重新制造第二套状态语义
+- 统一到 `updateSetting` 后，presenter 只需要知道“改哪个 key”，不需要知道当前实体是 station 还是 transit
 
-因此：
+实现要求：
 
-- `productionSettingActions.ts` 只处理当前 station settings
-- transit hub group settings 仍由 live store 自己管理
+- 若现有 transit setting 落点与普通 station setting 不同，差异只能留在 `commitStationMutation` / `afterCommit` 注入层
+- 共享 helper 侧不得出现 `updateTransitSetting`
+- 新增 setting 字段时，禁止新增 transit 专属 action 名；必须先扩展 `StationSettings`，再接入 `updateSetting`
 
 ---
 

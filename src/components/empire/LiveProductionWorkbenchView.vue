@@ -102,7 +102,7 @@ const showArchiveModuleList = computed(() => {
     :station-position="toolbarPresenter.props.position.value"
     :sector-resources="toolbarPresenter.props.sectorResources.value"
     :sector-sunlight="toolbarPresenter.props.sectorSunlight.value"
-    :settings="liveStore.transitHubSettings"
+    :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
     :mode="liveStore.session.mode"
@@ -110,7 +110,7 @@ const showArchiveModuleList = computed(() => {
     :can-toggle="true"
     :has-archive-trade-station="planningPresenter.props.hasArchive.value"
     @update-title="toolbarPresenter.emits.updateTitle"
-    @update-race-preference="(v) => liveStore.updateTransitHubSettings({ racePreference: v })"
+    @update-race-preference="toolbarPresenter.emits.updateRacePreference"
     @toggle-mode="liveStore.toggleMode"
   />
   

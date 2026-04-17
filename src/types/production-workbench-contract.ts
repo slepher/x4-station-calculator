@@ -189,7 +189,6 @@ export interface ProductionWorkbenchStoreContract {
   updateManualWorkforce(value: number): void
   updateWorkforceAuto(value: boolean): void
   updateUseHQ(value: boolean): void
-  updateTransitHubSettings(patch: Partial<StationSettings>): void
 
   openImport(): void
   applyImportedStationPayload(stationId: string, payload: ImportPayload): void

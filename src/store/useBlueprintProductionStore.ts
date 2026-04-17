@@ -1045,7 +1045,6 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     updateManualWorkforce: (value: number) => settingActions.updateManualWorkforce(value),
     updateWorkforceAuto: (value: boolean) => settingActions.updateWorkforceAuto(value),
     updateUseHQ: (value: boolean) => settingActions.updateUseHQ(value),
-    updateTransitHubSettings: () => {},
 
     openImport: () => { importModalOpen.value = true },
     applyImportedStationPayload: (stationId: string, payload: ImportPayload) => {
@@ -1157,7 +1156,6 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     updateSecondaryProductBufferHours: workbenchMethods.updateSecondaryProductBufferHours,
     updateBuyMultiplier: workbenchMethods.updateBuyMultiplier,
     updateSellMultiplier: workbenchMethods.updateSellMultiplier,
-    updateTransitHubSettings: workbenchMethods.updateTransitHubSettings,
     updateTransportShipCapacity: workbenchMethods.updateTransportShipCapacity,
     updateBuildPriceMultiplier: workbenchMethods.updateBuildPriceMultiplier,
     updateManualWorkforce: workbenchMethods.updateManualWorkforce,
