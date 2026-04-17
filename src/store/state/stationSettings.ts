@@ -1,6 +1,5 @@
 import type { StationSettings, X4Module, X4Ware } from '@/types/x4'
 import type { RaceMedicalConsumption } from '@/types/x4'
-import { deepClone } from '@/utils/deepClone'
 
 export const DEFAULT_STATION_SETTINGS: StationSettings = {
   sunlight: 100,
@@ -32,19 +31,3 @@ export interface StationComputeDeps {
   isModuleDlcActive?: (moduleId: string) => boolean
 }
 
-export function migrateStationSettings(raw: Partial<StationSettings> | null | undefined): StationSettings {
-  const source = deepClone(raw || {}) as any
-  source.racePreference = source.racePreference || 'argon'
-  if ('productBufferHours' in source) {
-    const oldValue = source.productBufferHours
-    source.primaryProductBufferHours = oldValue
-    delete source.productBufferHours
-  }
-  source.primaryProductBufferHours = source.primaryProductBufferHours ?? 12.0
-  source.secondaryProductBufferHours = source.secondaryProductBufferHours ?? 2.0
-  source.resourceBufferHours = source.resourceBufferHours !== undefined ? source.resourceBufferHours : 2
-  source.transportMinutes = source.transportMinutes ?? 30
-  source.transportShipCapacity = source.transportShipCapacity ?? 62000
-  source.showEmpireGaps = source.showEmpireGaps ?? false
-  return { ...DEFAULT_STATION_SETTINGS, ...source }
-}

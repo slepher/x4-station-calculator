@@ -465,9 +465,6 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
       consumption: flow.consumption,
       workforceConsumption: flow.workforceConsumption,
       netRate: flow.netRate,
-      productionVolume: flow.production * flow.unitVolume,
-      consumptionVolume: flow.consumption * flow.unitVolume,
-      netVolume: flow.netRate * flow.unitVolume,
       contributions: [],
       stationContributions: flow.contributions.map((contrib) => ({ ...contrib }))
     }))

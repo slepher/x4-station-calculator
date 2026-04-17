@@ -1,5 +1,5 @@
 import { isSectorMacroInBindingScope, resolveBindingSectorScope } from './saveBindingSectorScope'
-import { migrateStationSettings } from '@/store/state/stationSettings'
+import { DEFAULT_STATION_SETTINGS } from '@/store/state/stationSettings'
 import type {
   BindingStationPlan,
   StationPlan,
@@ -15,7 +15,7 @@ export function toProductionStation(
   plan: BindingStationPlan,
   sectorsMap?: SectorSunlightMap
 ): StationPlan {
-  const settings = migrateStationSettings(plan.settings)
+  const settings = ({ ...DEFAULT_STATION_SETTINGS, ...plan.settings })
   
   if (plan.sectorMacro && sectorsMap) {
     const sector = sectorsMap[plan.sectorMacro]
@@ -46,7 +46,7 @@ function toDerivedSaveStation(
     name: plan?.name || saveStation.code || 'Save Station',
     type: plan?.type || 'industrial',
     modules: plan?.modules || [],
-    settings: migrateStationSettings(plan?.settings || {}),
+    settings: ({ ...DEFAULT_STATION_SETTINGS, ...plan?.settings || {} }),
     lastUpdated: 0,
     lockedWares: plan?.lockedWares || [],
     warePriority: plan?.warePriority || {}

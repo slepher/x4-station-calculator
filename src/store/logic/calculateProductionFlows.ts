@@ -3,10 +3,9 @@ import type {
   X4Module,
   X4Ware,
   StationSettings,
-  RaceMedicalConsumption,
-  ModuleFlowAtom
+  RaceMedicalConsumption
 } from '../../types/x4'
-import type { WareProductionFlow } from '../../types/production-flow'
+import type { BaseModuleFlowAtom, WareProductionFlow } from '../../types/production-flow'
 import {
   findBestProducer,
   findBestHabitat,
@@ -336,9 +335,6 @@ function calculateProductionFlowsInternal(
         consumption: 0,
         workforceConsumption: 0,
         netRate: 0,
-        productionVolume: 0,
-        consumptionVolume: 0,
-        netVolume: 0,
         contributions: []
       }
     }
@@ -366,15 +362,12 @@ function calculateProductionFlowsInternal(
 
       entry.production += actualAmount
 
-      const contribution: ModuleFlowAtom = {
+      const contribution: BaseModuleFlowAtom = {
         moduleId: item.id,
         count: item.count,
         type: 'production',
         amount: actualAmount,
-        bonusPercent: Math.round(currentBonusRatio * 100),
-        volumeFlow: 0,
-        valueFlow: 0,
-        transportFlow: 0
+        bonusPercent: Math.round(currentBonusRatio * 100)
       }
       entry.contributions.push(contribution)
     }
@@ -386,15 +379,12 @@ function calculateProductionFlowsInternal(
 
       entry.consumption += actualAmount
 
-      const contribution: ModuleFlowAtom = {
+      const contribution: BaseModuleFlowAtom = {
         moduleId: item.id,
         count: item.count,
         type: 'consumption',
         amount: -actualAmount,
-        bonusPercent: 0,
-        volumeFlow: 0,
-        valueFlow: 0,
-        transportFlow: 0
+        bonusPercent: 0
       }
       entry.contributions.push(contribution)
     }
@@ -416,15 +406,12 @@ function calculateProductionFlowsInternal(
       entry.consumption += hourlyAmount
       entry.workforceConsumption += hourlyAmount
 
-      const contribution: ModuleFlowAtom = {
+      const contribution: BaseModuleFlowAtom = {
         moduleId: item.moduleId,
         count: item.count,
         type: 'consumption',
         amount: -hourlyAmount,
-        bonusPercent: 0,
-        volumeFlow: 0,
-        valueFlow: 0,
-        transportFlow: 0
+        bonusPercent: 0
       }
       entry.contributions.push(contribution)
     }
@@ -432,9 +419,6 @@ function calculateProductionFlowsInternal(
 
   const allFlows = Object.values(flowMap).map(entry => {
     entry.netRate = entry.production - entry.consumption
-    entry.productionVolume = entry.production * entry.unitVolume
-    entry.consumptionVolume = entry.consumption * entry.unitVolume
-    entry.netVolume = entry.netRate * entry.unitVolume
     return entry
   })
 

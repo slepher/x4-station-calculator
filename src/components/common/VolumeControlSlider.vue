@@ -35,7 +35,8 @@ const displayValue = computed(() => {
 })
 
 const updateValue = (e: Event) => {
-  draftValue.value = parseFloat((e.target as HTMLInputElement).value)
+  const nextValue = parseFloat((e.target as HTMLInputElement).value)
+  draftValue.value = nextValue
 }
 
 const commitValue = (e: Event) => {

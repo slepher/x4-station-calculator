@@ -17,7 +17,7 @@ import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
-import { DEFAULT_STATION_SETTINGS, migrateStationSettings, type StationComputeDeps } from './state/stationSettings'
+import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { stationProductionFlowMap, StationProductionFlowMap } from './state/StationProductionFlowMap'
 import { deepClone } from '@/utils/deepClone'
 import {
@@ -26,11 +26,12 @@ import {
   toTransitTabId
 } from './logic/empireSourceView'
 import { createEmpireFlowFacade } from './logic/empireFlowFacade'
+import { buildDerivedActiveStationState, buildDerivedTransitState } from './logic/productionStationShared'
 import { toProductionStation } from './logic/liveStationResolver'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 import { createProductionModuleActions } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
-import { createProductionSettingActions } from './actions/productionSettingActions'
+import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -47,6 +48,25 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const productionSource = computed<'save-binding'>(() => 'save-binding')
 
   const liveFlowMap = new StationProductionFlowMap()
+
+  function diffStationSettings(
+    previous: StationSettings,
+    next: StationSettings
+  ): Partial<StationSettings> {
+    const patch: Partial<StationSettings> = {}
+    const keys = new Set<keyof StationSettings>([
+      ...Object.keys(previous) as Array<keyof StationSettings>,
+      ...Object.keys(next) as Array<keyof StationSettings>
+    ])
+
+    keys.forEach((key) => {
+      if (previous[key] !== next[key]) {
+        Object.assign(patch, { [key]: next[key] })
+      }
+    })
+
+    return patch
+  }
 
   function syncLiveFlowMap() {
     const deps = getComputeDeps()
@@ -102,59 +122,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function syncAfterStationFlowChange(stationId: string, deps: StationComputeDeps): void {
-    syncPlanningSectorAggregations()
     syncLiveFlowMapForStation(stationId, deps)
-    syncLiveSectorAggregations()
-  }
-
-  function syncPlanningSectorAggregations(): void {
-    const deps = getComputeDeps()
-    if (!deps) return
-
-    const sectorList = sectors.value
-    for (const sector of sectorList) {
-      const finalFlows = planningFlowFacade.getSectorFinalProductionFlows(sector.id)
-      const group = activeBinding.value?.groups.find(g => g.id === sector.id)
-      const sectorSettings = group?.tradeStation?.settings || settings.value
-      const effectiveSettings = {
-        racePreference: sectorSettings.racePreference ?? settings.value.racePreference,
-        resourceBufferHours: sectorSettings.resourceBufferHours ?? settings.value.resourceBufferHours,
-        primaryProductBufferHours: sectorSettings.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
-        secondaryProductBufferHours: sectorSettings.secondaryProductBufferHours ?? settings.value.secondaryProductBufferHours,
-        transportShipCapacity: sectorSettings.transportShipCapacity ?? settings.value.transportShipCapacity
-      }
-      stationProductionFlowMap.computeSectorAggregation(
-        sector.id,
-        finalFlows,
-        effectiveSettings,
-        deps
-      )
-    }
-  }
-
-  function syncLiveSectorAggregations(): void {
-    const deps = getComputeDeps()
-    if (!deps) return
-
-    const sectorList = sectors.value
-    for (const sector of sectorList) {
-      const finalFlows = liveFlowFacade.getSectorFinalProductionFlows(sector.id)
-      const group = activeBinding.value?.groups.find(g => g.id === sector.id)
-      const sectorSettings = group?.tradeStation?.settings || settings.value
-      const effectiveSettings = {
-        racePreference: sectorSettings.racePreference ?? settings.value.racePreference,
-        resourceBufferHours: sectorSettings.resourceBufferHours ?? settings.value.resourceBufferHours,
-        primaryProductBufferHours: sectorSettings.primaryProductBufferHours ?? settings.value.primaryProductBufferHours,
-        secondaryProductBufferHours: sectorSettings.secondaryProductBufferHours ?? settings.value.secondaryProductBufferHours,
-        transportShipCapacity: sectorSettings.transportShipCapacity ?? settings.value.transportShipCapacity
-      }
-      liveFlowMap.computeSectorAggregation(
-        sector.id,
-        finalFlows,
-        effectiveSettings,
-        deps
-      )
-    }
   }
 
   async function loadPlayerStationRecords() {
@@ -177,7 +145,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   watch(selectedArchive, async () => {
     await loadPlayerStationRecords()
     syncLiveFlowMap()
-    syncLiveSectorAggregations()
   })
 
   const activeStationId = computed({
@@ -537,7 +504,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         name: tradeStation.name || tradeStation.saveStationCode || 'Transit Hub',
         type: 'transit',
         modules: [],
-        settings: migrateStationSettings(tradeStation.settings || {}),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...tradeStation.settings || {} }),
         lastUpdated: 0,
         lockedWares: [],
         warePriority: {}
@@ -587,7 +554,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     stations.forEach((item) => {
       const station = item.station
-      station.settings = migrateStationSettings(station.settings)
+      station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...station.settings })
       stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
         settings: station.settings,
@@ -598,7 +565,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     const stationPlans = stations.map(item => item.station)
     stationProductionFlowMap.updateAggregation(stationPlans)
-    syncPlanningSectorAggregations()
   }
 
   const plannedModules = computed<SavedModule[]>({
@@ -612,7 +578,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (deps) {
         stationProductionFlowMap.compute(station.id, {
           plannedModules: station.modules,
-          settings: migrateStationSettings(station.settings),
+          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares || [],
           warePriority: station.warePriority || {}
         }, deps)
@@ -638,7 +604,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (deps) {
         stationProductionFlowMap.compute(station.id, {
           plannedModules: station.modules || [],
-          settings: migrateStationSettings(station.settings),
+          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares,
           warePriority: station.warePriority || {}
         }, deps)
@@ -664,7 +630,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (deps) {
         stationProductionFlowMap.compute(station.id, {
           plannedModules: station.modules || [],
-          settings: migrateStationSettings(station.settings),
+          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares || [],
           warePriority: station.warePriority
         }, deps)
@@ -681,25 +647,38 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const settings = computed<StationSettings>({
     get: () => activeStation.value?.settings || { ...DEFAULT_STATION_SETTINGS },
     set: (value) => {
+      if (workbenchMode.value === 'transit') {
+        const sectorId = activeTransitSectorId.value
+        if (!sectorId) return
+        const group = activeBinding.value?.groups.find(g => g.id === sectorId)
+        if (!group?.tradeStation) return
+        group.tradeStation.settings = { ...DEFAULT_STATION_SETTINGS, ...value }
+        saveBindingStore.updateGroup(activeBinding.value?.gameGuid || '', sectorId, { tradeStation: group.tradeStation })
+        return
+      }
       const station = activeStation.value
       if (!station) return
-      station.settings = migrateStationSettings(value)
+      const previousSettings = { ...DEFAULT_STATION_SETTINGS, ...station.settings }
+      station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...value })
       station.lastUpdated = Date.now()
       const deps = getComputeDeps()
       if (deps) {
-        stationProductionFlowMap.compute(station.id, {
-          plannedModules: station.modules || [],
-          settings: station.settings,
-          lockedWares: station.lockedWares || [],
-          warePriority: station.warePriority || {}
-        }, deps)
+        const changedSettings = diffStationSettings(previousSettings, station.settings)
         updateBindingStationPlan(station.id, {
           modules: station.modules,
           lockedWares: station.lockedWares,
           warePriority: station.warePriority,
           settings: station.settings
         })
-        syncAfterStationFlowChange(station.id, deps)
+        if (doesStationSettingsAffectFlowMap(changedSettings)) {
+          stationProductionFlowMap.compute(station.id, {
+            plannedModules: station.modules || [],
+            settings: station.settings,
+            lockedWares: station.lockedWares || [],
+            warePriority: station.warePriority || {}
+          }, deps)
+          syncAfterStationFlowChange(station.id, deps)
+        }
       }
     }
   })
@@ -740,22 +719,13 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
 
     const planned = plannedModules.value
-    const autoIndustry = cache?.autoIndustryModules || []
-    const autoHabitation = cache?.autoHabitationModules || []
-    const autoInfrastructure = cache?.autoInfrastructureModules || []
-    const resolved = [...planned, ...autoIndustry, ...autoHabitation, ...autoInfrastructure]
-    
-    return {
-      actualWorkforce: cache?.actualWorkforce || 0,
-      currentEfficiency: cache?.currentEfficiency || 0,
-      warePriorityLevels: cache?.warePriorityLevels || {},
-      productionFlows: flowMapToUse.getProductionFlows(stationId),
+    return buildDerivedActiveStationState({
+      stationId,
       plannedModules: planned,
-      autoIndustryModules: autoIndustry,
-      autoHabitationModules: autoHabitation,
-      autoInfrastructureModules: autoInfrastructure,
-      resolvedModules: resolved
-    }
+      settings: settings.value,
+      cache,
+      deps: getComputeDeps()
+    })
   })
 
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
@@ -793,7 +763,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     recompute: (station, deps) => {
       stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
       }, deps)
@@ -826,7 +796,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     recompute: (station, deps) => {
       stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
       }, deps)
@@ -849,7 +819,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (station && deps) {
         stationProductionFlowMap.compute(station.id, {
           plannedModules: station.modules || [],
-          settings: migrateStationSettings(station.settings),
+          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares || [],
           warePriority: station.warePriority || {}
         }, deps)
@@ -865,7 +835,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (!deps) return
     stationProductionFlowMap.compute(stationId, {
       plannedModules: station.modules || [],
-      settings: migrateStationSettings(station.settings),
+      settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
       lockedWares: station.lockedWares || [],
       warePriority: station.warePriority || {}
     }, deps)
@@ -902,7 +872,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function updateBindingStationPlan(
     stationId: string,
-    patch: Partial<Pick<StationPlan, 'name' | 'type' | 'modules' | 'settings' | 'sectorId' | 'lockedWares' | 'warePriority' | 'count' | 'minerals'>>
+    patch: Partial<Pick<StationPlan, 'name' | 'type' | 'modules' | 'settings' | 'sectorId' | 'lockedWares' | 'warePriority'>>
   ): boolean {
     const binding = activeBinding.value
     if (!binding) return false
@@ -916,8 +886,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         modules: patch.modules,
         settings: patch.settings,
         groupId: patch.sectorId,
-        count: patch.count,
-        minerals: patch.minerals,
         lockedWares: patch.lockedWares,
         warePriority: patch.warePriority
       })
@@ -932,8 +900,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       type: patch.type ?? station?.type ?? 'industrial',
       modules: patch.modules ?? station?.modules ?? [],
       settings: patch.settings ?? station?.settings ?? DEFAULT_STATION_SETTINGS,
-      count: patch.count ?? station?.count ?? 1,
-      minerals: patch.minerals ?? station?.minerals ?? [],
       lockedWares: patch.lockedWares ?? [],
       warePriority: patch.warePriority ?? {}
     })
@@ -1000,16 +966,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function updateStationType(stationId: string, type: StationType) {
     updateBindingStationPlan(stationId, { type })
-    refreshStationFlowCache(stationId)
-  }
-
-  function updateStationCount(stationId: string, count: number) {
-    updateBindingStationPlan(stationId, { count })
-    refreshStationFlowCache(stationId)
-  }
-
-  function updateStationMinerals(stationId: string, minerals: string[]) {
-    updateBindingStationPlan(stationId, { minerals })
     refreshStationFlowCache(stationId)
   }
 
@@ -1115,7 +1071,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         openBinding(storedGuid)
         syncAllBindingStationsToStateMap()
         syncLiveFlowMap()
-        syncLiveSectorAggregations()
         validateActiveStationId()
         isReady.value = true
         console.log('[LiveProductionStore] Loaded saved binding')
@@ -1128,7 +1083,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         openBinding(firstBinding.gameGuid)
         syncAllBindingStationsToStateMap()
         syncLiveFlowMap()
-        syncLiveSectorAggregations()
         validateActiveStationId()
         isReady.value = true
         console.log('[LiveProductionStore] Loaded first binding')
@@ -1265,19 +1219,24 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (wm === 'transit') {
       const sectorId = activeTransitSectorId.value
       if (!sectorId) return null
+      const planningFlows = planningFlowFacade.getSectorFinalProductionFlows(sectorId)
       const flows = mode.value === 'live' 
         ? liveFlowFacade.getSectorFinalProductionFlows(sectorId)
-        : planningFlowFacade.getSectorFinalProductionFlows(sectorId)
-      const autoInfra = stationProductionFlowMap.getSectorAutoInfrastructureModules(sectorId)
+        : planningFlows
+      const derivedTransitState = buildDerivedTransitState({
+        productionFlows: planningFlows,
+        settings: settings.value,
+        deps: getComputeDeps()
+      })
       return {
         entityType: 'transit',
         id: sectorId,
         name: sectors.value.find(s => s.id === sectorId)?.name || sectorId,
         plannedModules: [],
-        resolvedModules: autoInfra,
+        resolvedModules: derivedTransitState.resolvedModules,
         autoIndustryModules: [],
         autoHabitationModules: [],
-        autoInfrastructureModules: autoInfra,
+        autoInfrastructureModules: derivedTransitState.autoInfrastructureModules,
         productionFlows: flows,
 warePriorityLevels: {},
       settings: settings.value
@@ -1363,24 +1322,24 @@ warePriorityLevels: {},
   const updateStationTypeFromActive = (value: StationType) => {
     if (activeStation.value) updateStationType(activeStation.value.id, value)
   }
-  const updateStationCountFromActive = (value: number) => {
-    if (activeStation.value) updateStationCount(activeStation.value.id, value)
-  }
-  const toggleMineralFromActive = (mineral: string) => {
-    if (!activeStation.value) return
-    const current = activeStation.value.minerals || []
-    const newMinerals = current.includes(mineral)
-      ? current.filter((m: string) => m !== mineral)
-      : [...current, mineral]
-    updateStationMinerals(activeStation.value.id, newMinerals)
-  }
-
   const settingActions = createProductionSettingActions<StationPlan>({
     getActiveStation: () => activeStation.value,
     getComputeDeps,
-    mergeSettings: (base, patch) => migrateStationSettings({ ...base, ...patch }),
+    mergeSettings: (base, patch) => ({ ...DEFAULT_STATION_SETTINGS, ...{ ...base, ...patch } }),
     now: () => Date.now(),
     commitStationMutation: (station) => {
+      const sectorId = activeTransitSectorId.value
+      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      
+      if (station.id === tradeStationId) {
+        const sectorId = activeTransitSectorId.value
+        if (!sectorId) return
+        const group = activeBinding.value?.groups.find(g => g.id === sectorId)
+        if (!group?.tradeStation) return
+        group.tradeStation.settings = { ...DEFAULT_STATION_SETTINGS, ...station.settings }
+        saveBindingStore.updateGroup(activeBinding.value?.gameGuid || '', sectorId, { tradeStation: group.tradeStation })
+        return
+      }
       updateBindingStationPlan(station.id, {
         modules: station.modules,
         lockedWares: station.lockedWares,
@@ -1389,6 +1348,12 @@ warePriorityLevels: {},
       })
     },
     recompute: (station, deps) => {
+      const sectorId = activeTransitSectorId.value
+      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      
+      if (station.id === tradeStationId) {
+        return
+      }
       stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
         settings: station.settings,
@@ -1396,8 +1361,27 @@ warePriorityLevels: {},
         warePriority: station.warePriority || {}
       }, deps)
     },
-    afterCommit: (station, deps) => {
+    shouldRecompute: (station, patch) => {
+      const sectorId = activeTransitSectorId.value
+      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      if (station.id === tradeStationId) return true
+      return doesStationSettingsAffectFlowMap(patch)
+    },
+    afterRecompute: (station, deps) => {
+      const sectorId = activeTransitSectorId.value
+      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+      
+      if (station.id === tradeStationId) return
       syncAfterStationFlowChange(station.id, deps)
+    },
+    afterCommit: (station, _deps, patch) => {
+      const sectorId = activeTransitSectorId.value
+      const tradeStationId = activeBinding.value?.groups.find(g => g.id === sectorId)?.tradeStation?.id
+
+      if (station.id === tradeStationId) return
+      if (!doesStationSettingsAffectFlowMap(patch)) {
+        return
+      }
     }
   })
 
@@ -1434,7 +1418,6 @@ warePriorityLevels: {},
     canToggle,
     toggleMode,
     updateStationModules,
-    updateStationMinerals,
     applyImportedStationPayload,
     renameBindingSector,
     initialize,
@@ -1476,8 +1459,6 @@ warePriorityLevels: {},
     updateTitle,
     updateStationName: updateStationNameFromActive,
     updateStationType: updateStationTypeFromActive,
-    updateStationCount: updateStationCountFromActive,
-    toggleMineral: toggleMineralFromActive,
     openImport: () => { importModalOpen.value = true },
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },

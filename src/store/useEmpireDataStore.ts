@@ -63,9 +63,14 @@ export const useEmpireDataStore = defineStore('empireData', () => {
     const raw = localStorage.getItem(getStorageKey())
     if (!raw) return null
     try {
-      const data = JSON.parse(raw)
+      const data = JSON.parse(raw) as SavedEmpiresState
       if (data && Array.isArray(data.list)) {
-        return data as SavedEmpiresState
+        for (const empire of data.list) {
+          for (const station of empire.stations) {
+            station.settings = { ...DEFAULT_STATION_SETTINGS, ...station.settings }
+          }
+        }
+        return data
       }
       return null
     } catch {

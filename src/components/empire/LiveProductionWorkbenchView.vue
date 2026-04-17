@@ -20,7 +20,6 @@ import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashb
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 import TransitHubBuildPanel from '@/components/empire/transit-hub/TransitHubBuildPanel.vue'
 import TransitHubCenterDashboard from '@/components/empire/transit-hub/TransitHubCenterDashboard.vue'
-import TransitHubMaterialsPanel from '@/components/empire/transit-hub/TransitHubMaterialsPanel.vue'
 import ArchiveModuleList from '@/components/empire/ArchiveModuleList.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 import SaveUploadPanel from '@/components/save/SaveUploadPanel.vue'
@@ -181,11 +180,14 @@ const showArchiveModuleList = computed(() => {
       </div>
 
       <div class="col-span-12 lg:col-span-4">
-        <TransitHubMaterialsPanel
-          :modules="dashboardPresenter.props.activeModules.value"
-          :building-modules="dashboardPresenter.props.activeBuildingModules.value"
+        <StationDashboard
+          :modules="[...dashboardPresenter.props.activeModules.value, ...dashboardPresenter.props.activeBuildingModules.value]"
+          :hide-workers-view="true"
+          :settings="dashboardPresenter.props.settings.value"
+          :current-efficiency="1"
+          :actual-workforce="0"
           :build-price-multiplier="dashboardPresenter.props.buildPriceMultiplier.value"
-          :useHQ="dashboardPresenter.props.settings.value.useHQ"
+          @update-transport-ship-capacity="dashboardPresenter.emits.updateTransportShipCapacity"
           @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
           @update-use-hq="dashboardPresenter.emits.updateUseHQ"
         />

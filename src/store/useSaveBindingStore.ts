@@ -99,7 +99,7 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
               name: (plan.name as string) || (plan.saveStationCode ? String(plan.saveStationCode) : 'Virtual Station'),
               type: (plan.type as StationType) || 'industrial',
               modules: Array.isArray(plan.modules) ? plan.modules : [],
-              settings: deepClone<StationSettings>((plan.settings as StationSettings) || DEFAULT_STATION_SETTINGS),
+              settings: { ...DEFAULT_STATION_SETTINGS, ...(plan.settings as Partial<StationSettings> || {}) },
               lockedWares: Array.isArray(plan.lockedWares) ? deepClone(plan.lockedWares as string[]) : [],
               warePriority: (plan.warePriority && typeof plan.warePriority === 'object') ? deepClone(plan.warePriority as Record<string, number>) : {},
               sectorMacro: plan.sectorMacro as string | undefined,
@@ -285,10 +285,11 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
 
   function updateGroup(gameGuid: string, groupId: string, patch: Partial<BindingSectorGroup>) {
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
-    const group = draftBinding.value?.groups.find((item) => item.id === groupId)
+    if (!draftBinding.value) return false
+    const group = draftBinding.value.groups.find((item) => item.id === groupId)
     if (!group) return false
     Object.assign(group, patch)
-    draftBinding.value!.updatedAt = Date.now()
+    draftBinding.value.updatedAt = Date.now()
     return true
   }
 
@@ -372,12 +373,10 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     groupId?: string | null
     name: string
     type?: StationType
-    count?: number
     modules?: SavedModule[]
     settings?: StationSettings
     lockedWares?: string[]
     warePriority?: Record<string, number>
-    minerals?: string[]
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }): BindingStationPlan | null {
@@ -395,12 +394,10 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
         groupId: input.groupId ?? null,
         name: input.name,
         type: input.type || 'industrial',
-        count: input.count ?? 1,
         modules: [],
         settings: deepClone(DEFAULT_STATION_SETTINGS),
         lockedWares: [],
         warePriority: {},
-        minerals: [],
         sectorMacro: input.sectorMacro,
         position: input.position
       }
@@ -410,12 +407,10 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     plan.groupId = input.groupId ?? plan.groupId ?? null
     plan.name = input.name ?? plan.name
     if (input.type !== undefined) plan.type = input.type
-    if (input.count !== undefined) plan.count = input.count
     if (input.modules) plan.modules = deepClone(input.modules)
     if (input.settings) plan.settings = deepClone(input.settings)
     if (input.lockedWares) plan.lockedWares = deepClone(input.lockedWares)
     if (input.warePriority) plan.warePriority = deepClone(input.warePriority)
-    if (input.minerals !== undefined) plan.minerals = deepClone(input.minerals)
     if (input.sectorMacro !== undefined) plan.sectorMacro = input.sectorMacro
     if (input.position !== undefined) plan.position = input.position
     draftBinding.value.updatedAt = Date.now()

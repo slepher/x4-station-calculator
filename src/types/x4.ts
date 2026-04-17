@@ -1156,12 +1156,10 @@ export interface BindingStationPlan {
   groupId?: string | null
   name: string
   type: StationType
-  count?: number
   modules: SavedModule[]
   settings: StationSettings
   lockedWares?: string[]
   warePriority?: Record<string, number>
-  minerals?: string[]
   sectorMacro?: string
   position?: { x: number; y: number; z: number }
 }

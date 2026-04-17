@@ -6,7 +6,7 @@ import type {
   GroupedFlows,
   ModuleFlowAtom
 } from '../../types/x4'
-import type { WareProductionFlow } from '../../types/production-flow'
+import type { DerivedProductionFlow, DerivedStationFlowAtom, WareProductionFlow } from '../../types/production-flow'
 
 export interface CalculateWareFlowDerivedInput {
   productionFlows: WareProductionFlow[]
@@ -29,12 +29,13 @@ export interface CalculateWareFlowDerivedInput {
 }
 
 export interface CalculateWareFlowDerivedOutput {
+  productionFlows: DerivedProductionFlow[]
   groupedFlows: GroupedFlows
 }
 
-export function calculateWareFlowDerived(
+export function deriveProductionFlows(
   input: CalculateWareFlowDerivedInput
-): CalculateWareFlowDerivedOutput {
+): DerivedProductionFlow[] {
   const {
     productionFlows,
     waresMap,
@@ -42,12 +43,12 @@ export function calculateWareFlowDerived(
     warePriorityLevels
   } = input
 
-  const wareFlows: WareFlow[] = productionFlows.map(prodFlow => {
+  const wareFlows: DerivedProductionFlow[] = productionFlows.map(prodFlow => {
     const ware = waresMap[prodFlow.wareId]
     const unitVolume = prodFlow.unitVolume
-    const productionVolume = prodFlow.productionVolume || prodFlow.production * unitVolume
-    const consumptionVolume = prodFlow.consumptionVolume || prodFlow.consumption * unitVolume
-    const netVolume = prodFlow.netVolume || productionVolume - consumptionVolume
+    const productionVolume = prodFlow.production * unitVolume
+    const consumptionVolume = prodFlow.consumption * unitVolume
+    const netVolume = productionVolume - consumptionVolume
 
     const isSurplus = prodFlow.netRate >= 0
     const multiplier = isSurplus ? settings.sellMultiplier : settings.buyMultiplier
@@ -91,6 +92,14 @@ export function calculateWareFlowDerived(
       transportFlow: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
     }))
 
+    const stationContributions: DerivedStationFlowAtom[] | undefined = prodFlow.stationContributions?.map((detail, index) => ({
+      ...detail,
+      sortOrder: index,
+      netValue: detail.netRate * unitPrice,
+      storageVolume: Math.abs(detail.netRate || 0) * unitVolume * settings.primaryProductBufferHours,
+      transportVolume: Math.abs(detail.netRate || 0) * unitVolume
+    }))
+
     return {
       wareId: prodFlow.wareId,
       orderIndex: prodFlow.orderIndex,
@@ -110,7 +119,8 @@ export function calculateWareFlowDerived(
       totalOccupiedVolume,
       unitPrice,
       netValue,
-      contributions
+      contributions,
+      stationContributions
     }
   })
 
@@ -119,6 +129,14 @@ export function calculateWareFlowDerived(
     if (a.tier !== b.tier) return b.tier - a.tier
     return Math.abs(b.netRate) - Math.abs(a.netRate)
   })
+
+  return wareFlows
+}
+
+export function groupDerivedProductionFlows(
+  productionFlows: DerivedProductionFlow[]
+): GroupedFlows {
+  const wareFlows: WareFlow[] = [...productionFlows]
 
   const groupedFlows: GroupedFlows = {
     flows: wareFlows,
@@ -137,7 +155,17 @@ export function calculateWareFlowDerived(
     else groupedFlows.volumeGroups.container.push(flow)
   })
 
+  return groupedFlows
+}
+
+export function calculateWareFlowDerived(
+  input: CalculateWareFlowDerivedInput
+): CalculateWareFlowDerivedOutput {
+  const productionFlows = deriveProductionFlows(input)
+  const groupedFlows = groupDerivedProductionFlows(productionFlows)
+
   return {
+    productionFlows,
     groupedFlows
   }
 }

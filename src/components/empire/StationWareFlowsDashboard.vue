@@ -4,6 +4,7 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useWareFlowGrouping } from './composables/useWareFlowGrouping'
+import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { WareProductionFlow } from '@/types/production-flow'
 
@@ -56,17 +57,28 @@ const { t, locale } = useI18n()
 const { translateWare } = useX4I18n()
 const { computeGroupedFlows } = useWareFlowGrouping()
 
-const groupedFlows = computed(() => computeGroupedFlows({
+const derivedProductionFlows = computed(() => deriveProductionFlows({
   productionFlows: props.productionFlows,
+  autoIndustryModules: [],
+  plannedModules: [],
+  modulesMap: gameDataStore.modulesMap,
   waresMap: gameDataStore.waresMap,
   settings: {
-    buyMultiplier: props.settings.buyMultiplier,
-    sellMultiplier: props.settings.sellMultiplier,
+    racePreference: props.settings.racePreference,
     resourceBufferHours: props.settings.resourceBufferHours,
     primaryProductBufferHours: props.settings.primaryProductBufferHours,
-    secondaryProductBufferHours: props.settings.secondaryProductBufferHours
+    secondaryProductBufferHours: props.settings.secondaryProductBufferHours,
+    buyMultiplier: props.settings.buyMultiplier,
+    sellMultiplier: props.settings.sellMultiplier,
+    transportMinutes: props.settings.transportMinutes || 30,
+    transportShipCapacity: 0,
+    sunlight: 100
   },
   warePriorityLevels: props.warePriorityLevels
+}))
+
+const groupedFlows = computed(() => computeGroupedFlows({
+  productionFlows: derivedProductionFlows.value
 }))
 
 const viewMode = computed<WareFlowViewMode>({

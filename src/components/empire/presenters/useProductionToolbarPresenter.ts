@@ -70,8 +70,8 @@ export interface ToolbarPresenterStore {
   updateTitle(value: string): void
   updateStationName(value: string): void
   updateStationType(value: StationType): void
-  updateStationCount(value: number): void
-  toggleMineral(mineral: string): void
+  updateStationCount?(value: number): void
+  toggleMineral?(mineral: string): void
   openImport(): void
 }
 
@@ -93,12 +93,16 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     singleBerthThroughput: computed(() => store.getSingleBerthThroughput())
   }
 
+  const dummyThrow = (method: string) => () => {
+    throw new Error(`Method ${method} not implemented in this mode`)
+  }
+
   const emits: ToolbarPresenterEmits = {
     updateTitle: (value: string) => store.updateTitle(value),
     updateStationName: (value: string) => store.updateStationName(value),
     updateStationType: (value) => store.updateStationType(value),
-    updateStationCount: (value: number) => store.updateStationCount(value),
-    toggleMineral: (mineral: string) => store.toggleMineral(mineral),
+    updateStationCount: (value: number) => (store.updateStationCount || dummyThrow('updateStationCount'))(value),
+    toggleMineral: (mineral: string) => (store.toggleMineral || dummyThrow('toggleMineral'))(mineral),
     updateSunlight: (value: number) => store.settingActions.updateSunlight(value),
     updateTransportMinutes: (value: number) => store.settingActions.updateTransportMinutes(value),
     updateRacePreference: (value: string) => store.settingActions.updateRacePreference(value),

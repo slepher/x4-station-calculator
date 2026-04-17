@@ -1,8 +1,9 @@
 import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, RaceMedicalConsumption } from '@/types/x4'
+import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationComputeDeps } from '../state/stationSettings'
 import type { StationFlowCache } from '../state/StationProductionFlowMap'
-import { stationProductionFlowMap } from '../state/StationProductionFlowMap'
-import { DEFAULT_STATION_SETTINGS, migrateStationSettings } from '../state/stationSettings'
+import { deriveInfrastructureModules, stationProductionFlowMap } from '../state/StationProductionFlowMap'
+import { DEFAULT_STATION_SETTINGS } from '../state/stationSettings'
 import { deepClone } from '@/utils/deepClone'
 
 export interface ActiveStationState {
@@ -42,6 +43,8 @@ export function buildActiveStationState(
   plannedModules: SavedModule[],
   cache: StationFlowCache | null
 ): ActiveStationState {
+  const productionFlows = cache?.productionFlows || []
+
   if (!stationId) {
     return {
       actualWorkforce: 0,
@@ -58,19 +61,107 @@ export function buildActiveStationState(
   
   const autoIndustry = cache?.autoIndustryModules || []
   const autoHabitation = cache?.autoHabitationModules || []
-  const autoInfrastructure = cache?.autoInfrastructureModules || []
-  const resolved = [...plannedModules, ...autoIndustry, ...autoHabitation, ...autoInfrastructure]
+  const resolved = [...plannedModules, ...autoIndustry, ...autoHabitation]
   
   return {
     actualWorkforce: cache?.actualWorkforce || 0,
     currentEfficiency: cache?.currentEfficiency || 0,
     warePriorityLevels: cache?.warePriorityLevels || {},
-    productionFlows: stationProductionFlowMap.getProductionFlows(stationId),
+    productionFlows,
+    plannedModules,
+    autoIndustryModules: autoIndustry,
+    autoHabitationModules: autoHabitation,
+    autoInfrastructureModules: [],
+    resolvedModules: resolved
+  }
+}
+
+export interface BuildDerivedActiveStationStateInput {
+  stationId: string | undefined
+  plannedModules: SavedModule[]
+  settings: StationSettings
+  cache: StationFlowCache | null
+  deps: StationComputeDeps | null
+}
+
+export function buildDerivedActiveStationState(
+  input: BuildDerivedActiveStationStateInput
+): ActiveStationState {
+  const {
+    stationId,
+    plannedModules,
+    settings,
+    cache,
+    deps
+  } = input
+
+  if (!stationId) {
+    return buildActiveStationState(stationId, plannedModules, cache)
+  }
+
+  const autoIndustry = cache?.autoIndustryModules || []
+  const autoHabitation = cache?.autoHabitationModules || []
+  const productionFlows = cache?.productionFlows || []
+  const autoInfrastructure = (!deps || !cache)
+    ? []
+    : deriveInfrastructureModules({
+        productionFlows,
+        plannedModules,
+        autoIndustryModules: autoIndustry,
+        settings: {
+          racePreference: settings.racePreference,
+          resourceBufferHours: settings.resourceBufferHours,
+          primaryProductBufferHours: settings.primaryProductBufferHours,
+          secondaryProductBufferHours: settings.secondaryProductBufferHours,
+          transportShipCapacity: settings.transportShipCapacity
+        },
+        warePriorityLevels: cache.warePriorityLevels,
+        deps
+      })
+  const resolved = [...plannedModules, ...autoIndustry, ...autoHabitation, ...autoInfrastructure]
+
+  return {
+    actualWorkforce: cache?.actualWorkforce || 0,
+    currentEfficiency: cache?.currentEfficiency || 0,
+    warePriorityLevels: cache?.warePriorityLevels || {},
+    productionFlows,
     plannedModules,
     autoIndustryModules: autoIndustry,
     autoHabitationModules: autoHabitation,
     autoInfrastructureModules: autoInfrastructure,
     resolvedModules: resolved
+  }
+}
+
+export interface BuildDerivedTransitStateInput {
+  productionFlows: WareProductionFlow[]
+  settings: StationSettings
+  deps: StationComputeDeps | null
+}
+
+export function buildDerivedTransitState(
+  input: BuildDerivedTransitStateInput
+): Pick<ActiveStationState, 'autoInfrastructureModules' | 'resolvedModules'> {
+  const autoInfrastructure = !input.deps
+    ? []
+    : deriveInfrastructureModules({
+        productionFlows: input.productionFlows,
+        plannedModules: [],
+        autoIndustryModules: [],
+        settings: {
+          racePreference: input.settings.racePreference,
+          resourceBufferHours: input.settings.resourceBufferHours,
+          primaryProductBufferHours: input.settings.primaryProductBufferHours,
+          secondaryProductBufferHours: input.settings.secondaryProductBufferHours,
+          transportShipCapacity: input.settings.transportShipCapacity
+        },
+        warePriorityLevels: {},
+        deps: input.deps
+      })
+
+  return {
+    autoInfrastructureModules: autoInfrastructure,
+    resolvedModules: autoInfrastructure
   }
 }
 
@@ -81,7 +172,7 @@ export function computeStationFlow(
 ): void {
   stationProductionFlowMap.compute(stationId, {
     plannedModules: station.modules || [],
-    settings: migrateStationSettings(station.settings),
+    settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
     lockedWares: station.lockedWares || [],
     warePriority: station.warePriority || {}
   }, deps)
@@ -294,7 +385,7 @@ export function updateStationSettingsDirect(
   deps: StationComputeDeps,
   persistCallback: (stationId: string, patch: Partial<StationPlan>) => boolean
 ): void {
-  station.settings = migrateStationSettings({ ...station.settings, [key]: value })
+  station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...{ ...station.settings, [key]: value } })
   station.lastUpdated = Date.now()
   computeStationFlow(station.id, station, deps)
   persistCallback(station.id, {

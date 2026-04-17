@@ -22,16 +22,17 @@ import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
-import { migrateStationSettings, DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
+import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { stationProductionFlowMap } from './state/StationProductionFlowMap'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
   computeActiveStation
 } from './logic/empireSourceView'
+import { buildDerivedActiveStationState } from './logic/productionStationShared'
 import { createProductionModuleActions, type ProductionModuleStation } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
-import { createProductionSettingActions } from './actions/productionSettingActions'
+import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
 
 function createDefaultEmpire(name: string = ''): EmpirePlan {
   return {
@@ -54,6 +55,25 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const buildPriceMultiplier = ref(0.5)
 
   const activeEmpire = ref<EmpirePlan | null>(null)
+
+  function diffStationSettings(
+    previous: StationSettings,
+    next: StationSettings
+  ): Partial<StationSettings> {
+    const patch: Partial<StationSettings> = {}
+    const keys = new Set<keyof StationSettings>([
+      ...Object.keys(previous) as Array<keyof StationSettings>,
+      ...Object.keys(next) as Array<keyof StationSettings>
+    ])
+
+    keys.forEach((key) => {
+      if (previous[key] !== next[key]) {
+        Object.assign(patch, { [key]: next[key] })
+      }
+    })
+
+    return patch
+  }
 
   const activeStationId = computed({
     get: () => activeViewStore.activeEmpireStation,
@@ -94,7 +114,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
     }
   }
-  
+
   const plannedModules = computed<SavedModule[]>({
     get: () => activeStation.value?.modules || [],
     set: (value) => {
@@ -105,7 +125,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       const deps = getComputeDeps()
       if (deps) stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules,
-        settings: migrateStationSettings(station.settings),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
       }, deps)
@@ -122,7 +142,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       const deps = getComputeDeps()
       if (deps) stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares,
         warePriority: station.warePriority || {}
       }, deps)
@@ -139,7 +159,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       const deps = getComputeDeps()
       if (deps) stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority
       }, deps)
@@ -151,15 +171,21 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     set: (value) => {
       const station = activeStation.value
       if (!station) return
-      station.settings = migrateStationSettings(value)
+      const previousSettings = { ...DEFAULT_STATION_SETTINGS, ...station.settings }
+      station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...value })
       station.lastUpdated = Date.now()
       const deps = getComputeDeps()
-      if (deps) stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: station.settings,
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
+      if (deps) {
+        const changedSettings = diffStationSettings(previousSettings, station.settings)
+        if (doesStationSettingsAffectFlowMap(changedSettings)) {
+          stationProductionFlowMap.compute(station.id, {
+            plannedModules: station.modules || [],
+            settings: station.settings,
+            lockedWares: station.lockedWares || [],
+            warePriority: station.warePriority || {}
+          }, deps)
+        }
+      }
     }
   })
 
@@ -179,23 +205,13 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       }
     }
     const cache = stationProductionFlowMap.getCache(stationId)
-    const planned = plannedModules.value
-    const autoIndustry = cache?.autoIndustryModules || []
-    const autoHabitation = cache?.autoHabitationModules || []
-    const autoInfrastructure = cache?.autoInfrastructureModules || []
-    const resolved = [...planned, ...autoIndustry, ...autoHabitation, ...autoInfrastructure]
-    
-    return {
-      actualWorkforce: cache?.actualWorkforce || 0,
-      currentEfficiency: cache?.currentEfficiency || 0,
-      warePriorityLevels: cache?.warePriorityLevels || {},
-      productionFlows: stationProductionFlowMap.getProductionFlows(stationId),
-      plannedModules: planned,
-      autoIndustryModules: autoIndustry,
-      autoHabitationModules: autoHabitation,
-      autoInfrastructureModules: autoInfrastructure,
-      resolvedModules: resolved
-    }
+    return buildDerivedActiveStationState({
+      stationId,
+      plannedModules: plannedModules.value,
+      settings: settings.value,
+      cache,
+      deps: getComputeDeps()
+    })
   })
 
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
@@ -225,7 +241,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     recompute: (station, deps) => {
       stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
       }, deps)
@@ -248,7 +264,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     recompute: (station, deps) => {
       stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
       }, deps)
@@ -268,7 +284,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (station && deps) {
         stationProductionFlowMap.compute(station.id, {
           plannedModules: station.modules || [],
-          settings: migrateStationSettings(station.settings),
+          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares || [],
           warePriority: station.warePriority || {}
         }, deps)
@@ -284,7 +300,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (!deps) return
     stationProductionFlowMap.compute(stationId, {
       plannedModules: station.modules || [],
-      settings: migrateStationSettings(station.settings),
+      settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
       lockedWares: station.lockedWares || [],
       warePriority: station.warePriority || {}
     }, deps)
@@ -303,7 +319,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeEmpire.value.stations.forEach(station => {
       stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
+        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
       }, deps)
@@ -441,7 +457,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
           if (station.count === null || station.count === undefined) {
             station.count = 1
           }
-          station.settings = migrateStationSettings(station.settings)
+          station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...station.settings })
         })
         activeEmpire.value = JSON.parse(JSON.stringify(empire))
 
@@ -740,9 +756,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const settingActions = createProductionSettingActions<StationPlan>({
     getActiveStation: () => activeStation.value,
     getComputeDeps,
-    mergeSettings: (base, patch) => migrateStationSettings({ ...base, ...patch }),
+    mergeSettings: (base, patch) => ({ ...DEFAULT_STATION_SETTINGS, ...{ ...base, ...patch } }),
     now: () => Date.now(),
     commitStationMutation: () => {},
+    shouldRecompute: (_station, patch) => doesStationSettingsAffectFlowMap(patch),
     recompute: (station, deps) => {
       stationProductionFlowMap.compute(station.id, {
         plannedModules: station.modules || [],

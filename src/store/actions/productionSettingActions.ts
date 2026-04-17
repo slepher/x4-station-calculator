@@ -21,7 +21,9 @@ export interface ProductionSettingActionDeps<TStation extends ProductionSettingS
   now(): number
   commitStationMutation(station: TStation): void
   recompute(station: TStation, deps: StationComputeDeps): void
-  afterCommit?(station: TStation, deps: StationComputeDeps): void
+  shouldRecompute?(station: TStation, patch: Partial<StationSettings>): boolean
+  afterRecompute?(station: TStation, deps: StationComputeDeps): void
+  afterCommit?(station: TStation, deps: StationComputeDeps, patch: Partial<StationSettings>): void
 }
 
 export interface ProductionSettingActions {
@@ -43,6 +45,19 @@ export interface ProductionSettingActions {
   updateUseHQ(value: boolean): ActionResult
 }
 
+const FLOW_MAP_SETTING_KEYS: Array<keyof StationSettings> = [
+  'sunlight',
+  'racePreference',
+  'considerWorkforceForAutoFill',
+  'manualWorkforce',
+  'workforceAuto',
+  'useHQ'
+]
+
+export function doesStationSettingsAffectFlowMap(patch: Partial<StationSettings>): boolean {
+  return FLOW_MAP_SETTING_KEYS.some(key => key in patch)
+}
+
 export function createProductionSettingActions<TStation extends ProductionSettingStation>(
   deps: ProductionSettingActionDeps<TStation>
 ): ProductionSettingActions {
@@ -57,8 +72,12 @@ export function createProductionSettingActions<TStation extends ProductionSettin
     station.lastUpdated = deps.now()
 
     deps.commitStationMutation(station)
-    deps.recompute(station, computeDeps)
-    deps.afterCommit?.(station, computeDeps)
+    const shouldRecompute = deps.shouldRecompute?.(station, patch) ?? true
+    if (shouldRecompute) {
+      deps.recompute(station, computeDeps)
+      deps.afterRecompute?.(station, computeDeps)
+    }
+    deps.afterCommit?.(station, computeDeps, patch)
 
     return { ok: true }
   }

@@ -4,7 +4,8 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import type { SupplyStorageFlow } from '@/types/x4'
-import type { WareProductionFlow } from '@/types/production-flow'
+import type { DerivedProductionFlow, WareProductionFlow } from '@/types/production-flow'
+import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -19,17 +20,8 @@ const { translateWare } = useX4I18n()
 
 type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
-function getPriceByMultiplier(minPrice: number, avgPrice: number, maxPrice: number, multiplier: number): number {
-  if (multiplier <= 0.5) {
-    const t = multiplier * 2
-    return minPrice + (avgPrice - minPrice) * t
-  }
-  const t = (multiplier - 0.5) * 2
-  return avgPrice + (maxPrice - avgPrice) * t
-}
-
 function buildStorageFlowsFromProductionFlows(
-  productionFlows: WareProductionFlow[],
+  productionFlows: DerivedProductionFlow[],
   bufferHours: number
 ): SupplyStorageFlow[] {
   const safeBufferHours = Number.isFinite(bufferHours) && bufferHours > 0 ? bufferHours : 12
@@ -137,29 +129,28 @@ const localProductBufferHours = computed({
   set: (value) => emit('update:productBufferHours', value)
 })
 
+const derivedFlows = computed(() => deriveProductionFlows({
+  productionFlows: props.productionFlows,
+  autoIndustryModules: [],
+  plannedModules: [],
+  modulesMap: {},
+  waresMap: gameData.waresMap,
+  settings: {
+    racePreference: 'argon',
+    resourceBufferHours: 0,
+    primaryProductBufferHours: localProductBufferHours.value,
+    secondaryProductBufferHours: 0,
+    buyMultiplier: localBuyMultiplier.value,
+    sellMultiplier: localSellMultiplier.value,
+    transportMinutes: 30,
+    transportShipCapacity: 0,
+    sunlight: 100
+  },
+  warePriorityLevels: {}
+}))
+
 const groupedFlows = computed(() => {
-  const buyMultiplier = localBuyMultiplier.value
-  const sellMultiplier = localSellMultiplier.value
-  const flows = props.productionFlows.map((flow) => {
-    const ware = gameData.waresMap?.[flow.wareId]
-    const isSurplus = flow.netRate >= 0
-    const unitPrice = getPriceByMultiplier(
-      ware?.minPrice || 0,
-      ware?.price || 0,
-      ware?.maxPrice || 0,
-      isSurplus ? sellMultiplier : buyMultiplier
-    )
-    return {
-      ...flow,
-      unitPrice,
-      netValue: flow.netRate * unitPrice,
-      contributions: (flow.stationContributions || []).map((detail, index) => ({
-        ...detail,
-        sortOrder: index,
-        netValue: detail.netRate * unitPrice
-      }))
-    }
-  })
+  const flows = derivedFlows.value
 
   const products = flows.filter((flow) => flow.netRate > 0)
   const operations = flows.filter((flow) => flow.netRate <= 0 && flow.workforceConsumption <= 0 && flow.transportType === 'container')
@@ -167,7 +158,7 @@ const groupedFlows = computed(() => {
 
   return { flows, products, operations, supply }
 })
-const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(props.productionFlows, localProductBufferHours.value))
+const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(derivedFlows.value, localProductBufferHours.value))
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`

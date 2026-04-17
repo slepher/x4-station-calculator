@@ -26,17 +26,10 @@ export interface ProductionFlowInput {
 export interface StationFlowCache {
   autoIndustryModules: SavedModule[]
   autoHabitationModules: SavedModule[]
-  autoInfrastructureModules: SavedModule[]
   productionFlows: WareProductionFlow[]
   warePriorityLevels: Record<string, number>
   actualWorkforce: number
   currentEfficiency: number
-}
-
-export interface SectorFlowAggregationCache {
-  sectorId: string
-  productionFlows: WareProductionFlow[]
-  autoInfrastructureModules: SavedModule[]
 }
 
 export interface ComputeInfrastructureModulesInput {
@@ -55,22 +48,7 @@ export interface ComputeInfrastructureModulesInput {
   deps: ProductionFlowComputeDeps
 }
 
-function enrichProductionFlowVolumes(flows: WareProductionFlow[]): WareProductionFlow[] {
-  return flows.map((flow) => ({
-    ...flow,
-    productionVolume: flow.production * flow.unitVolume,
-    consumptionVolume: flow.consumption * flow.unitVolume,
-    netVolume: flow.netRate * flow.unitVolume
-  }))
-}
-
-function buildSectorWarePriorityLevels(flows: WareProductionFlow[]): Record<string, number> {
-  const levels: Record<string, number> = {}
-  flows.forEach((flow) => {
-    levels[flow.wareId] = 2
-  })
-  return levels
-}
+export interface DeriveInfrastructureModulesInput extends ComputeInfrastructureModulesInput {}
 
 export function computeInfrastructureModulesFromFlows(input: ComputeInfrastructureModulesInput): SavedModule[] {
   return calculateInfrastructureModules({
@@ -81,6 +59,10 @@ export function computeInfrastructureModulesFromFlows(input: ComputeInfrastructu
     settings: input.settings,
     warePriorityLevels: input.warePriorityLevels
   })
+}
+
+export function deriveInfrastructureModules(input: DeriveInfrastructureModulesInput): SavedModule[] {
+  return computeInfrastructureModulesFromFlows(input)
 }
 
 function deepClone<T>(value: T): T {
@@ -106,6 +88,10 @@ function filterProductionFlowsByPriority(
 }
 
 function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
+  const productionVolume = prod.production * prod.unitVolume
+  const consumptionVolume = prod.consumption * prod.unitVolume
+  const netVolume = prod.netRate * prod.unitVolume
+
   return {
     wareId: prod.wareId,
     orderIndex: prod.orderIndex,
@@ -116,16 +102,25 @@ function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
     consumption: prod.consumption,
     workforceConsumption: prod.workforceConsumption,
     netRate: prod.netRate,
-    productionVolume: prod.productionVolume,
-    consumptionVolume: prod.consumptionVolume,
-    netVolume: prod.netVolume,
+    productionVolume,
+    consumptionVolume,
+    netVolume,
     transportDemand: 0,
     totalOccupiedCount: 0,
     totalOccupiedConsumptionCount: 0,
     totalOccupiedVolume: 0,
     unitPrice: 0,
     netValue: 0,
-    contributions: prod.contributions
+    contributions: prod.contributions.map((atom) => ({
+      moduleId: atom.moduleId,
+      count: atom.count,
+      type: atom.type,
+      amount: atom.amount,
+      bonusPercent: atom.bonusPercent,
+      volumeFlow: atom.amount * prod.unitVolume,
+      valueFlow: 0,
+      transportFlow: 0
+    }))
   }
 }
 
@@ -169,21 +164,16 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
           consumption: 0,
           workforceConsumption: 0,
           netRate: 0,
-          productionVolume: 0,
-          consumptionVolume: 0,
-          netVolume: 0,
           contributions: []
         }
         mergedMap[flow.wareId] = entry
       }
-      entry.production += flow.production
-      entry.consumption += flow.consumption
-      entry.workforceConsumption += flow.workforceConsumption
-      entry.netRate += flow.netRate
-      entry.productionVolume += flow.productionVolume
-      entry.consumptionVolume += flow.consumptionVolume
-      entry.netVolume += flow.netVolume
-      entry.contributions.push(...deepClone(flow.contributions))
+      const currentEntry = entry
+      currentEntry.production += flow.production
+      currentEntry.consumption += flow.consumption
+      currentEntry.workforceConsumption += flow.workforceConsumption
+      currentEntry.netRate += flow.netRate
+      currentEntry.contributions.push(...deepClone(flow.contributions))
     }
   }
 
@@ -225,7 +215,6 @@ export class StationProductionFlowMap {
   private cacheMap = reactive(new Map<string, StationFlowCache>())
   private empireFlowsCache: WareProductionFlow[] = []
   private sectorFlowsCache: Map<string, WareProductionFlow[]> = new Map()
-  private sectorAggregationCache: Map<string, SectorFlowAggregationCache> = new Map()
 
   compute(stationId: string, input: ProductionFlowInput, deps: ProductionFlowComputeDeps): void {
     let autoIndustryModules: SavedModule[] = []
@@ -265,8 +254,6 @@ export class StationProductionFlowMap {
       currentEfficiency = result.currentEfficiency
     }
 
-    productionFlows = enrichProductionFlowVolumes(productionFlows)
-
     const allWareIds = productionFlows.map(f => f.wareId)
     const warePriorityLevels = buildResolvedWarePriority({
       plannedModules: input.plannedModules,
@@ -275,28 +262,9 @@ export class StationProductionFlowMap {
       userPriorityOverride: input.warePriority || {}
     }, allWareIds)
     
-    let autoInfrastructureModules: SavedModule[] = []
-    if (!input.skipAutoFill) {
-      autoInfrastructureModules = computeInfrastructureModulesFromFlows({
-        productionFlows,
-        plannedModules: input.plannedModules,
-        autoIndustryModules,
-        settings: {
-          racePreference: input.settings.racePreference,
-          resourceBufferHours: input.settings.resourceBufferHours,
-          primaryProductBufferHours: input.settings.primaryProductBufferHours,
-          secondaryProductBufferHours: input.settings.secondaryProductBufferHours,
-          transportShipCapacity: input.settings.transportShipCapacity
-        },
-        warePriorityLevels,
-        deps
-      })
-    }
-
     this.cacheMap.set(stationId, {
       autoIndustryModules,
       autoHabitationModules,
-      autoInfrastructureModules,
       productionFlows,
       warePriorityLevels,
       actualWorkforce,
@@ -307,7 +275,6 @@ export class StationProductionFlowMap {
   computeAll(empire: EmpirePlan, deps: ProductionFlowComputeDeps): void {
     this.cacheMap.clear()
     this.sectorFlowsCache.clear()
-    this.sectorAggregationCache.clear()
     this.empireFlowsCache = []
 
     for (const station of empire.stations) {
@@ -336,16 +303,6 @@ export class StationProductionFlowMap {
     return this.cacheMap.get(stationId) || null
   }
 
-  getResolvedModules(stationId: string): SavedModule[] {
-    const cache = this.cacheMap.get(stationId)
-    if (!cache) return []
-    return [
-      ...cache.autoIndustryModules,
-      ...cache.autoHabitationModules,
-      ...cache.autoInfrastructureModules
-    ]
-  }
-
   getAutoIndustryModules(stationId: string): SavedModule[] {
     return this.cacheMap.get(stationId)?.autoIndustryModules || []
   }
@@ -354,54 +311,12 @@ export class StationProductionFlowMap {
     return this.cacheMap.get(stationId)?.autoHabitationModules || []
   }
 
-  getAutoInfrastructureModules(stationId: string): SavedModule[] {
-    return this.cacheMap.get(stationId)?.autoInfrastructureModules || []
-  }
-
   getProductionFlows(stationId: string): WareProductionFlow[] {
     return this.cacheMap.get(stationId)?.productionFlows || []
   }
 
   getSectorFlows(sectorId: string): WareProductionFlow[] {
     return this.sectorFlowsCache.get(sectorId) || []
-  }
-
-  getSectorAggregation(sectorId: string): SectorFlowAggregationCache | null {
-    return this.sectorAggregationCache.get(sectorId) || null
-  }
-
-  getSectorAutoInfrastructureModules(sectorId: string): SavedModule[] {
-    return this.sectorAggregationCache.get(sectorId)?.autoInfrastructureModules || []
-  }
-
-  computeSectorAggregation(
-    sectorId: string,
-    productionFlows: WareProductionFlow[],
-    settings: Pick<
-      StationSettings,
-      | 'racePreference'
-      | 'resourceBufferHours'
-      | 'primaryProductBufferHours'
-      | 'secondaryProductBufferHours'
-      | 'transportShipCapacity'
-    >,
-    deps: ProductionFlowComputeDeps
-  ): void {
-    const normalizedFlows = enrichProductionFlowVolumes(productionFlows)
-    const warePriorityLevels = buildSectorWarePriorityLevels(normalizedFlows)
-    const autoInfrastructureModules = computeInfrastructureModulesFromFlows({
-      productionFlows: normalizedFlows,
-      plannedModules: [],
-      autoIndustryModules: [],
-      settings,
-      warePriorityLevels,
-      deps
-    })
-    this.sectorAggregationCache.set(sectorId, {
-      sectorId,
-      productionFlows: normalizedFlows,
-      autoInfrastructureModules
-    })
   }
 
   getEmpireFlows(): WareProductionFlow[] {
@@ -428,7 +343,6 @@ export class StationProductionFlowMap {
   clear(): void {
     this.cacheMap.clear()
     this.sectorFlowsCache.clear()
-    this.sectorAggregationCache.clear()
     this.empireFlowsCache = []
   }
 }

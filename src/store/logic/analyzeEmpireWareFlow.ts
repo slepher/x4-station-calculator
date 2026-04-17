@@ -21,10 +21,7 @@ function multiplyProductionFlow(flow: WareProductionFlow, multiplier: number): W
     netRate: flow.netRate * multiplier,
     contributions: flow.contributions.map(c => ({
       ...c,
-      amount: c.amount * multiplier,
-      volumeFlow: c.volumeFlow * multiplier,
-      valueFlow: c.valueFlow * multiplier,
-      transportFlow: c.transportFlow ? c.transportFlow * multiplier : undefined
+      amount: c.amount * multiplier
     }))
   }
 }
