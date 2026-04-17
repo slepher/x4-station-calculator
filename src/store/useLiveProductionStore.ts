@@ -994,13 +994,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeStationId.value = transitTabId
   }
 
-  function updateStationSettings(stationId: string, settings: Partial<StationSettings>) {
-    const station = getDerivedBindingStation(stationId)
-    const current = station?.settings || DEFAULT_STATION_SETTINGS
-    updateBindingStationPlan(stationId, { settings: { ...current, ...settings } })
-    refreshStationFlowCache(stationId)
-  }
-
   function updateStationModules(stationId: string, modules: SavedModule[]) {
     updateBindingStationPlan(stationId, { modules })
     refreshStationFlowCache(stationId)
@@ -1464,7 +1457,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     initialMode,
     canToggle,
     toggleMode,
-    updateStationSettings,
     updateStationModules,
     updateStationMinerals,
     applyImportedStationPayload,

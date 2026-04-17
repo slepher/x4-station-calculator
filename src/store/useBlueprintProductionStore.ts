@@ -12,12 +12,11 @@ import type {
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import type {
   ProductionWorkbenchCapabilities,
-  ImportPayload,
   ProductionSessionState,
   ProductionContextState,
   ProductionStationState
 } from '@/types/production-workbench-contract'
-import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
+import type { WareFlowViewMode, EmpireGapItem, ImportPayload } from '@/types/production-ui'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
@@ -358,12 +357,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   function selectStation(stationId: string | null) {
     activeStationId.value = stationId
-  }
-
-  function updateStationSettings(stationId: string, settings: Partial<StationSettings>) {
-    if (empireDataStore.updateStationSettingsInEmpire(activeEmpire.value, stationId, settings)) {
-      refreshStationFlowCache(stationId)
-    }
   }
 
   function updateStationModules(stationId: string, modules: SavedModule[]) {
@@ -933,7 +926,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     renameStation,
     selectStation,
     getStationById,
-    updateStationSettings,
     updateStationModules,
     updateStationType: workbenchMethods.updateStationType,
     updateStationCount: workbenchMethods.updateStationCount,
