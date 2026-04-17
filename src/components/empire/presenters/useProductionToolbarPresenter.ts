@@ -1,11 +1,11 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionContextState, ProductionSessionState } from '@/types/production-workbench-contract'
-import type { StationType } from '@/types/x4'
+import type { ProductionContextState, ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
+import type { StationSettings, StationType } from '@/types/x4'
 
 export interface ToolbarPresenterProps {
   mode: ComputedRef<'overview' | 'station' | 'transit'>
   titleModel: ComputedRef<{ value: string; placeholder: string }>
-  settings: ComputedRef<any>
+  settings: ComputedRef<StationSettings | null>
   station: ComputedRef<{
     id: string
     name: string
@@ -47,8 +47,15 @@ export interface UseProductionToolbarPresenterReturn {
 export interface ToolbarPresenterStore {
   session: ProductionSessionState
   context: ProductionContextState
+  stationState: ProductionStationState | null
+  settingActions: {
+    updateSunlight(value: number): void
+    updateTransportMinutes(value: number): void
+    updateRacePreference(value: string): void
+    updateWorkforce(value: boolean): void
+    updateShowEmpireGaps(value: boolean): void
+  }
   getTitleModel(): { value: string; placeholder: string }
-  getToolbarSettings(): any
   getToolbarStation(): {
     id: string
     name: string
@@ -65,11 +72,6 @@ export interface ToolbarPresenterStore {
   updateStationType(value: StationType): void
   updateStationCount(value: number): void
   toggleMineral(mineral: string): void
-  updateSunlight(value: number): void
-  updateTransportMinutes(value: number): void
-  updateRacePreference(value: string): void
-  updateWorkforce(value: boolean): void
-  updateShowEmpireGaps(value: boolean): void
   openImport(): void
 }
 
@@ -77,7 +79,7 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
   const props: ToolbarPresenterProps = {
     mode: computed(() => store.session.workbenchMode),
     titleModel: computed(() => store.getTitleModel()),
-    settings: computed(() => store.getToolbarSettings()),
+    settings: computed(() => store.stationState?.settings || null),
     station: computed(() => store.getToolbarStation()),
     stationCode: computed(() => store.context.stationCode),
     sectorName: computed(() => store.context.sectorName),
@@ -97,11 +99,11 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     updateStationType: (value) => store.updateStationType(value),
     updateStationCount: (value: number) => store.updateStationCount(value),
     toggleMineral: (mineral: string) => store.toggleMineral(mineral),
-    updateSunlight: (value: number) => store.updateSunlight(value),
-    updateTransportMinutes: (value: number) => store.updateTransportMinutes(value),
-    updateRacePreference: (value: string) => store.updateRacePreference(value),
-    updateWorkforce: (value: boolean) => store.updateWorkforce(value),
-    updateShowEmpireGaps: (value: boolean) => store.updateShowEmpireGaps(value),
+    updateSunlight: (value: number) => store.settingActions.updateSunlight(value),
+    updateTransportMinutes: (value: number) => store.settingActions.updateTransportMinutes(value),
+    updateRacePreference: (value: string) => store.settingActions.updateRacePreference(value),
+    updateWorkforce: (value: boolean) => store.settingActions.updateWorkforce(value),
+    updateShowEmpireGaps: (value: boolean) => store.settingActions.updateShowEmpireGaps(value),
     openImport: () => store.openImport()
   }
 

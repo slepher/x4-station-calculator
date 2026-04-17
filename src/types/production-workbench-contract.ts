@@ -96,7 +96,6 @@ export interface ProductionWorkbenchStoreContract {
 
   getTitleModel(): { value: string; placeholder: string }
   getToolbarStation(): { id: string; name: string; type: StationType; count: number; minerals: string[] } | null
-  getToolbarSettings(): StationSettings | null
   getToolbarRaces(): Array<{ value: string; label: string }>
   getToolbarStationTypes(): Array<{ value: StationType; label: string }>
   getAvailableMinerals(): string[]
@@ -119,25 +118,9 @@ export interface ProductionWorkbenchStoreContract {
   getWareflowViewMode(): WareFlowViewMode
   getProductionFlows(): WareProductionFlow[]
   getWarePriorityLevels(): Record<string, number>
-  getWareflowSettings(): {
-    resourceBufferHours: number
-    primaryProductBufferHours: number
-    secondaryProductBufferHours: number
-    buyMultiplier: number
-    sellMultiplier: number
-    racePreference: string
-    showEmpireGaps: boolean
-    transportMinutes?: number
-  }
   getEmpireGaps(): { operations: EmpireGapItem[]; supply: EmpireGapItem[] }
 
   getStationAnalysis(): StationAnalysis
-  getDashboardSettings(): {
-    transportShipCapacity: number
-    workforceAuto: boolean
-    manualWorkforce: number
-    useHQ: boolean
-  }
   getCurrentEfficiency(): number
   getActualWorkforce(): number
   getBuildPriceMultiplier(): number

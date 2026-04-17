@@ -1124,6 +1124,8 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     context,
     stationState,
     capabilities,
+    settingActions,
+    wareRuleActions,
     getTabs: workbenchMethods.getTabs,
     getActiveTabId: workbenchMethods.getActiveTabId,
     getExpandedSectorId: workbenchMethods.getExpandedSectorId,

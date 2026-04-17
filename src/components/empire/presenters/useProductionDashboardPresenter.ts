@@ -3,6 +3,13 @@ import type { ProductionSessionState, ProductionContextState, ProductionStationS
 import type { SavedModule } from '@/types/x4'
 import type { StationAnalysis } from '@/store/logic/analyzeStation'
 
+const DEFAULT_DASHBOARD_SETTINGS = {
+  transportShipCapacity: 62000,
+  workforceAuto: true,
+  manualWorkforce: 0,
+  useHQ: false
+}
+
 export interface DashboardPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
   visualMode: ComputedRef<'planning' | 'live'>
@@ -38,20 +45,16 @@ export interface DashboardPresenterStore {
   session: ProductionSessionState
   context: ProductionContextState
   stationState: ProductionStationState | null
-  getDashboardSettings(): {
-    transportShipCapacity: number
-    workforceAuto: boolean
-    manualWorkforce: number
-    useHQ: boolean
+  settingActions: {
+    updateTransportShipCapacity(value: number): void
+    updateManualWorkforce(value: number): void
+    updateWorkforceAuto(value: boolean): void
+    updateUseHQ(value: boolean): void
   }
   getCurrentEfficiency(): number
   getActualWorkforce(): number
   getBuildPriceMultiplier(): number
-  updateTransportShipCapacity(value: number): void
   updateBuildPriceMultiplier(value: number): void
-  updateManualWorkforce(value: number): void
-  updateWorkforceAuto(value: boolean): void
-  updateUseHQ(value: boolean): void
 }
 
 const emptyStationAnalysis: StationAnalysis = {
@@ -84,18 +87,27 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
       return []
     }),
     stationAnalysis: computed(() => store.stationState?.stationAnalysis || emptyStationAnalysis),
-    settings: computed(() => store.getDashboardSettings()),
+    settings: computed(() => {
+      const s = store.stationState?.settings
+      if (!s) return DEFAULT_DASHBOARD_SETTINGS
+      return {
+        transportShipCapacity: s.transportShipCapacity,
+        workforceAuto: s.workforceAuto,
+        manualWorkforce: s.manualWorkforce,
+        useHQ: s.useHQ
+      }
+    }),
     currentEfficiency: computed(() => store.getCurrentEfficiency()),
     actualWorkforce: computed(() => store.getActualWorkforce()),
     buildPriceMultiplier: computed(() => store.getBuildPriceMultiplier())
   }
 
   const emits: DashboardPresenterEmits = {
-    updateTransportShipCapacity: (value: number) => store.updateTransportShipCapacity(value),
+    updateTransportShipCapacity: (value: number) => store.settingActions.updateTransportShipCapacity(value),
     updateBuildPriceMultiplier: (value: number) => store.updateBuildPriceMultiplier(value),
-    updateManualWorkforce: (value: number) => store.updateManualWorkforce(value),
-    updateWorkforceAuto: (value: boolean) => store.updateWorkforceAuto(value),
-    updateUseHQ: (value: boolean) => store.updateUseHQ(value)
+    updateManualWorkforce: (value: number) => store.settingActions.updateManualWorkforce(value),
+    updateWorkforceAuto: (value: boolean) => store.settingActions.updateWorkforceAuto(value),
+    updateUseHQ: (value: boolean) => store.settingActions.updateUseHQ(value)
   }
 
   return { props, emits }
