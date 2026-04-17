@@ -32,6 +32,7 @@ import { createEmpireFlowFacade } from './logic/empireFlowFacade'
 import { toProductionStation } from './logic/liveStationResolver'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 import { createProductionModuleActions } from './actions/productionModuleActions'
+import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -821,6 +822,39 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
+  const wareRuleActions = createProductionWareRuleActions<StationPlan>({
+    getActiveStation: () => activeStation.value,
+    getComputeDeps,
+    getPlannedModules: () => plannedModules.value,
+    getAutoIndustryModules: () => activeStationState.value.autoIndustryModules,
+    getModulesMap: () => gameData.modulesMap,
+    getWaresMap: () => gameData.waresMap,
+    getLockedWares: () => lockedWares.value,
+    getWarePriority: () => warePriority.value,
+    cloneStringList: (values) => deepClone(values),
+    clonePriorityMap: (values) => deepClone(values),
+    now: () => Date.now(),
+    commitStationMutation: (station) => {
+      updateBindingStationPlan(station.id, {
+        modules: station.modules,
+        lockedWares: station.lockedWares,
+        warePriority: station.warePriority,
+        settings: station.settings
+      })
+    },
+    recompute: (station, deps) => {
+      stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules || [],
+        settings: migrateStationSettings(station.settings),
+        lockedWares: station.lockedWares || [],
+        warePriority: station.warePriority || {}
+      }, deps)
+    },
+    afterCommit: (station, deps) => {
+      syncAfterStationFlowChange(station.id, deps)
+    }
+  })
+
   function updatePlannedModules(modules: SavedModule[]): void {
     moduleActions.updatePlannedModules(modules)
   }
@@ -849,114 +883,31 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function isWareOperable(wareId: string): boolean {
-    const ware = gameData.waresMap[wareId]
-    return ware?.transport === 'container'
+    return wareRuleActions.isWareOperable(wareId)
   }
 
   function isWareLocked(wareId: string): boolean {
-    if (!isWareOperable(wareId)) return true
-    return lockedWares.value.includes(wareId)
+    return wareRuleActions.isWareLocked(wareId)
   }
 
   function toggleWareLock(wareId: string): void {
-    console.log('[LiveStore] toggleWareLock called', { wareId, operable: isWareOperable(wareId) })
-    if (!isWareOperable(wareId)) {
-      console.log('[LiveStore] toggleWareLock skipped - not operable')
-      return
-    }
-    const station = activeStation.value
-    if (!station) return
-    const current = station.lockedWares || []
-    console.log('[LiveStore] toggleWareLock writing', { wareId, current, willLock: !current.includes(wareId) })
-    station.lockedWares = current.includes(wareId)
-      ? current.filter((id: string) => id !== wareId)
-      : [...current, wareId]
-    station.lastUpdated = Date.now()
-    const deps = getComputeDeps()
-    if (deps) {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority || {}
-      }, deps)
-      updateBindingStationPlan(station.id, {
-        modules: station.modules,
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority,
-        settings: station.settings
-      })
-      syncAfterStationFlowChange(station.id, deps)
-    }
+    wareRuleActions.toggleWareLock(wareId)
   }
 
   function isPlannedWare(wareId: string): boolean {
-    return plannedModules.value.some(module => {
-      const moduleInfo = gameData.modulesMap[module.id]
-      if (!moduleInfo) return false
-      return Object.keys(moduleInfo.outputs || {}).includes(wareId)
-    })
+    return wareRuleActions.isPlannedWare(wareId)
   }
 
   function isAutoWare(wareId: string): boolean {
-    if (isPlannedWare(wareId)) return false
-    return activeStationState.value.autoIndustryModules.some(module => {
-      const moduleInfo = gameData.modulesMap[module.id]
-      if (!moduleInfo) return false
-      return Object.keys(moduleInfo.outputs || {}).includes(wareId)
-    })
+    return wareRuleActions.isAutoWare(wareId)
   }
 
   function getResolvedLevel(wareId: string): number {
-    const planned = isPlannedWare(wareId)
-    const auto = isAutoWare(wareId)
-    const override = warePriority.value[wareId]
-
-    if (planned && override === 0) return 1
-    if (auto && override === 2) return 1
-    if (override !== undefined) return override
-    if (planned) return 2
-    if (auto) return 0
-    return 0
+    return wareRuleActions.getResolvedLevel(wareId)
   }
 
   function toggleWarePriority(wareId: string): void {
-    const currentLevel = getResolvedLevel(wareId)
-    const planned = isPlannedWare(wareId)
-    const auto = isAutoWare(wareId)
-
-    const station = activeStation.value
-    if (!station) return
-    const nextPriority = deepClone(station.warePriority || {})
-
-    if (planned) {
-      if (currentLevel === 2) nextPriority[wareId] = 1
-      else delete nextPriority[wareId]
-    } else if (auto) {
-      if (currentLevel === 0) nextPriority[wareId] = 1
-      else delete nextPriority[wareId]
-    }
-
-    station.warePriority = nextPriority
-    station.lastUpdated = Date.now()
-    const deps = getComputeDeps()
-    if (deps) {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: migrateStationSettings(station.settings),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority
-      }, deps)
-      updateBindingStationPlan(station.id, {
-        modules: station.modules,
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority,
-        settings: station.settings
-      })
-      syncPlanningSectorAggregations()
-      syncLiveFlowMapForStation(station.id, deps)
-      syncLiveSectorAggregations()
-    }
+    wareRuleActions.toggleWarePriority(wareId)
   }
 
   function addModule(id: string = '', count = 1): void {
