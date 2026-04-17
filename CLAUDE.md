@@ -240,6 +240,11 @@ These define the development workflow patterns used in this codebase.
 ### Git Worktree Merge
 When merging a worktree branch into develop:
 - Run `git merge <branch-name>` directly in the develop working directory
+
+### Git Operations Safety
+- **当用户说"提交"时，必须先检查本地变动**（`git status`、`git diff`），不得从对话记录里假设没有变动
+- **我不是仓库的唯一编辑人**，用户可能在其他终端、编辑器或工具中修改了文件
+- 任何 git 操作前，必须先确认当前状态，不得假设状态与对话记录一致
 - Do NOT push to remote unless explicitly requested
 - Example workflow: commit on branch → switch to develop → merge branch
 
