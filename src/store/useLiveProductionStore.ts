@@ -31,6 +31,7 @@ import {
 import { createEmpireFlowFacade } from './logic/empireFlowFacade'
 import { toProductionStation } from './logic/liveStationResolver'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
+import { createProductionModuleActions } from './actions/productionModuleActions'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -771,10 +772,57 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
 
-  function updatePlannedModules(modules: SavedModule[]): void {
-    if (activeStation.value) {
-      updateStationModules(activeStation.value.id, modules)
+  function isModuleDlcActive(moduleId: string): boolean {
+    return gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
+  }
+
+  function isModuleCountEditable(moduleId: string): boolean {
+    return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
+  }
+
+  function getModuleInfo(id: string): X4Module {
+    return gameData.modulesMap[id] || {
+      id, macroId: '', wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
+      buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
+      dockingCount: 0,
+      workforce: { capacity: 0, needed: 0, maxBonus: 0 }
+    } as X4Module
+  }
+
+  const moduleActions = createProductionModuleActions<StationPlan>({
+    getActiveStation: () => activeStation.value,
+    getComputeDeps,
+    findModuleForWare: (wareId, racePreference) => gameData.findModuleForWare(wareId, racePreference),
+    getRacePreference: () => settings.value.racePreference,
+    getModulesMap: () => gameData.modulesMap,
+    isModuleCountEditable,
+    getPlannedModules: () => plannedModules.value,
+    getAutoIndustryModules: () => activeStationState.value.autoIndustryModules,
+    cloneModules: (modules) => deepClone(modules),
+    now: () => Date.now(),
+    commitStationMutation: (station) => {
+      updateBindingStationPlan(station.id, {
+        modules: station.modules,
+        lockedWares: station.lockedWares,
+        warePriority: station.warePriority,
+        settings: station.settings
+      })
+    },
+    recompute: (station, deps) => {
+      stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules || [],
+        settings: migrateStationSettings(station.settings),
+        lockedWares: station.lockedWares || [],
+        warePriority: station.warePriority || {}
+      }, deps)
+    },
+    afterCommit: (station, deps) => {
+      syncAfterStationFlowChange(station.id, deps)
     }
+  })
+
+  function updatePlannedModules(modules: SavedModule[]): void {
+    moduleActions.updatePlannedModules(modules)
   }
 
   function updateStationSettingsDirect(key: keyof StationSettings, value: StationSettings[keyof StationSettings]): void {
@@ -911,136 +959,28 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   }
 
-  function isModuleDlcActive(moduleId: string): boolean {
-    return gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
-  }
-
-  function isModuleCountEditable(moduleId: string): boolean {
-    return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
-  }
-
-  function getModuleInfo(id: string): X4Module {
-    return gameData.modulesMap[id] || {
-      id, macroId: '', wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
-      buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
-      dockingCount: 0,
-      workforce: { capacity: 0, needed: 0, maxBonus: 0 }
-    } as X4Module
-  }
-
   function addModule(id: string = '', count = 1): void {
-    if (id !== '' && !gameData.modulesMap[id]) return
-    const station = activeStation.value
-    if (!station) return
-    const current = station.modules || []
-    const existingIndex = current.findIndex(m => m.id === id)
-    if (existingIndex !== -1) {
-      const next = deepClone(current)
-      const existing = next[existingIndex]
-      if (existing) existing.count += count
-      station.modules = next
-    } else {
-      station.modules = [...current, { id, count }]
-    }
-    station.lastUpdated = Date.now()
-    const deps = getComputeDeps()
-    if (deps) {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules,
-        settings: migrateStationSettings(station.settings),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
-      updateBindingStationPlan(station.id, {
-        modules: station.modules,
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority,
-        settings: station.settings
-      })
-    }
+    moduleActions.addModule(id, count)
   }
 
   function removeModule(index: number): void {
-    const station = activeStation.value
-    if (!station) return
-    const current = station.modules || []
-    station.modules = current.filter((_, i) => i !== index)
-    station.lastUpdated = Date.now()
-    const deps = getComputeDeps()
-    if (deps) {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules,
-        settings: migrateStationSettings(station.settings),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
-      updateBindingStationPlan(station.id, {
-        modules: station.modules,
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority,
-        settings: station.settings
-      })
-    }
+    moduleActions.removeModule(index)
   }
 
   function updateModuleCount(index: number, count: number): void {
-    const module = plannedModules.value[index]
-    if (!module || !isModuleCountEditable(module.id)) return
-    const station = activeStation.value
-    if (!station) return
-    const next = deepClone(station.modules || [])
-    const target = next[index]
-    if (target) target.count = count
-    station.modules = next
-    station.lastUpdated = Date.now()
-    const deps = getComputeDeps()
-    if (deps) {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules,
-        settings: migrateStationSettings(station.settings),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
-      updateBindingStationPlan(station.id, {
-        modules: station.modules,
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority,
-        settings: station.settings
-      })
-    }
+    moduleActions.updateModuleCount(index, count)
   }
 
   function removeModuleById(id: string): void {
-    const index = plannedModules.value.findIndex(m => m.id === id)
-    if (index !== -1) removeModule(index)
+    moduleActions.removeModuleById(id)
   }
 
   function transferModuleFromAutoIndustry(module: SavedModule): void {
-    const inIndustry = activeStationState.value.autoIndustryModules.some(m => m.id === module.id)
-    if (!inIndustry) return
-    addModule(module.id, module.count)
+    moduleActions.transferModuleFromAutoIndustry(module)
   }
 
   function clearAllModules(): void {
-    const station = activeStation.value
-    if (!station) return
-    station.modules = []
-    station.lastUpdated = Date.now()
-    const deps = getComputeDeps()
-    if (deps) {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: [],
-        settings: migrateStationSettings(station.settings),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
-      updateBindingStationPlan(station.id, {
-        modules: [],
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority,
-        settings: station.settings
-      })
-    }
+    moduleActions.clearAllModules()
   }
 
   watch(
