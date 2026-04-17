@@ -44,6 +44,16 @@
 - [x] T28. 模块排序规则共享：抽取 comparator 供搜索面板和 Step 3 导入共用
 - [x] T29. i18n 文案：保存绑定、绑定 dirty、binding 星区、source empire 导入、virtual station
 
+## Implementation: Auto TradeStation & Binding
+
+- [x] T50. Group 创建时自动创建默认 tradestation（position=星区中心，sectorMacro=定位星区）
+- [x] T51. 移除 Step 3 "自由空间站"区域的中转站占位 UI
+- [x] T52. Save station 绑定到 tradestation：设置 `BindingStationPlan.saveStationCode` 为 tradestation 的 code
+- [x] T53. 已绑定 tradestation 不可再被绑定：绑定菜单禁用已绑定的 tradestation
+- [x] T54. 解绑逻辑：位置重置到星区中心，清除 `saveStationCode`，变为 virtual station
+- [x] T55. 更新拖拽交互：移除"拖拽星区中转站到地图"创建逻辑（因为自动创建）
+- [x] T56. i18n 文案：绑定中转站、解绑中转站、已绑定状态提示
+
 ## Implementation: Binding POI on Map
 
 - [x] T30. 改造地图 binding POI 投影，从独立 binding store 派生
@@ -55,7 +65,7 @@
 ## Implementation: Drag Interaction
 
 - [x] T35. 拖拽自由空间站到地图 → 创建 `BindingStationPlan`（无 `saveStationCode`）
-- [x] T36. 拖拽星区中转站到地图 → 创建 `TradeStationBinding`（无 `saveStationCode`）
+- [x] T36. 移除"拖拽星区中转站到地图"创建逻辑（改为自动创建）
 - [x] T37. 拖拽已放置的 binding station → 移动位置（`setStationPlanPosition`）
 - [x] T38. 拖拽已放置的 trade station → 移动位置（`setTradeStationPosition`）
 - [x] T39. 拖拽预览：正确的图标风格 + 虚线外圈 + `activeBindingDragPreview`
@@ -83,3 +93,11 @@
 - [x] V8. 验证模块排序规则共享
 - [x] V9. 验证 binding POI 拖拽权限限制
 - [x] V10. 验证 binding save status UI 正确
+
+## Verification: Auto TradeStation & Binding
+
+- [x] V11. 验证 group 创建时自动创建 tradestation（位置=星区中心）
+- [x] V12. 验证 Step 3 不显示中转站占位
+- [x] V13. 验证 save station 绑定 tradestation 正确设置 saveStationCode
+- [x] V14. 验证已绑定 tradestation 不可再被绑定
+- [x] V15. 验证解绑时 save station 变为 virtual station，位置重置到星区中心

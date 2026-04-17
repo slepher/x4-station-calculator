@@ -27,19 +27,47 @@ Step 2 不再显示"帝国星区"，改为 binding 星区列表。用户在这�
 
 ### Step 3: Station planning
 
-Step 3 的主对象是 group coverage 派生出的 save stations 和用户显式创建的 virtual stations。用户不需要逐个绑定已有 save station。额外操作集中在：
+Step 3 的主对象是 group coverage 派生出的 save stations、用户显式创建的 virtual stations 以及 group 默认的 tradestation。用户不需要逐个绑定已有 save station。额外操作集中在：
 
 - 选择 blueprint empire，用其中 station 作为空间站蓝图导入模板。
 - 将 blueprint empire station 的规划模块导入到某个 save station plan。
-- 创建 virtual station 占位或星区中转站。
+- 创建 virtual station 占位。
 - 编辑或清空规划 modules。
+- 绑定/解绑 save station 到 group 的默认中转站。
+
+### 星区中转站自动创建
+
+每个 group 绑定定位星区时自动创建/更新一个默认 tradestation，无需用户手动拖拽：
+- `position` = 星区中心坐标（从定位星区数据获取）
+- `sectorMacro` = 该 group 的定位星区
+- 若 tradestation 已存在，则更新位置并解除绑定
+
+Step 3 不再显示"自由空间站"区域的中转站占位，因为每个 group 已有默认 tradestation。
+
+绑定规则：
+- save station 可绑定到该 group 的默认 tradestation（一对一）
+- 绑定时 position 使用 save station 的实际位置
+- 已被绑定的 tradestation 显示已绑定状态，不可再被其他 save station 绑定
+
+解绑规则：
+- 解绑时 save station 位置重置到星区中心点
+- 转换为 virtual station（保留规划但无 `saveStationCode`）
+- tradestation 保留原位置，可被其他 save station 绑定
+
+定位星区变化：
+- tradestation 的 sectorMacro 和 position 更新为新星区中心
+- 若已绑定 save station，则解除绑定
+
+显示规则：
+- 已绑定的 save station 在地图上显示为 tradestation 图标（设置 `tag: 'tradestation'`）
+- 已绑定的 tradestation overlay 不显示（由 save station POI 代替）
 
 ### 拖拽交互
 
 #### 从 save panel 拖拽
 
 - 拖拽自由空间站到地图 → 创建 `BindingStationPlan`（无 `saveStationCode`）
-- 拖拽星区中转站到地图 → 创建 `TradeStationBinding`（无 `saveStationCode`）
+- 注：星区中转站已自动创建，不再需要手动拖拽
 
 #### 拖拽已放置的 station
 
@@ -110,6 +138,18 @@ save panel 的 binding 分支标题栏右侧提供保存控制：
 - 已有 `BindingStationPlan` 显示其规划 modules/settings/name。
 - 没有 plan 的 save station 显示空规划状态。
 
+### D11: 星区中转站自动创建与绑定规则
+
+- 每个 group 绑定定位星区时自动创建/更新默认 tradestation，无需用户手动拖拽。
+- 默认 tradestation 的 position = 星区中心，sectorMacro = 定位星区。
+- Step 3 不显示"自由空间站"区域的中转站占位。
+- save station 与 tradestation 是一对一绑定关系。
+- 绑定时使用 save station 的实际位置。
+- 已被绑定的 tradestation 不可再被其他 save station 绑定。
+- 解绑时 save station 变为 virtual station，位置重置到星区中心。
+- 定位星区变化时，tradestation 更新到新星区中心并解除绑定。
+- 已绑定的 save station 显示 tradestation 图标。
+
 ### D8: Blueprint empire 作为导入模板来源
 
 - `blueprintEmpireId` 只用于显示可导入候选，不代表持续同步关系。
@@ -144,3 +184,8 @@ save panel 的 binding 分支标题栏右侧提供保存控制：
 - Blueprint 导入只复制当时规划，后续不同步。
 - binding POI 拖拽权限受 Step 3 context 限制。
 - binding save status UI 正确显示 dirty 状态。
+- Group 绑定定位星区时自动创建/更新 tradestation（位置=星区中心）。
+- Save station 绑定/解绑 tradestation 正确执行。
+- 已绑定 tradestation 不可再被绑定。
+- 定位星区变化时 tradestation 正确更新并解除绑定。
+- 已绑定的 save station 显示 tradestation 图标。

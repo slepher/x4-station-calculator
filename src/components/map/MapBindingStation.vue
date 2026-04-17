@@ -149,19 +149,6 @@ const freeStations = computed(() => {
     }))
 })
 
-const virtualTradestation = computed(() => {
-  if (!currentGroupBinding.value) return null
-  
-  // 未放置 = 无 tradestationBinding
-  if (!currentGroupBinding.value.tradestationBinding) {
-    return {
-      type: 'virtual' as const,
-      name: t('map.binding_sector_tradestation')
-    }
-  }
-  return null
-})
-
 const anchorAndCoverageSectors = computed(() => {
   if (!currentGroupBinding.value) return []
 
@@ -252,13 +239,11 @@ const anchorAndCoverageSectors = computed(() => {
       ? resolveGroupSaveBinding(currentGroupBinding.value, activeArchive.value)
       : null
     const hasPlacedVirtualTradestation = !!(
-      tb?.position &&
-      tb.sectorMacro === sectorMacro &&
+      tb?.sectorMacro === sectorMacro &&
       !tb.saveStationCode
     )
     const hasMissingVirtualTradestation = !!(
-      tb?.position &&
-      tb.sectorMacro === sectorMacro &&
+      tb?.sectorMacro === sectorMacro &&
       tb.saveStationCode &&
       resolvedTradestation?.status === 'missing_at_selected_time'
     )
@@ -607,7 +592,9 @@ function bindToSectorTradestation() {
     gameGuid: props.gameGuid,
     groupId: props.sectorGroupId,
     saveStationCode: bindMenuSaveStation.value.code,
-    name: t('map.binding_sector_tradestation')
+    name: t('map.binding_sector_tradestation'),
+    sectorMacro: bindMenuSectorMacro.value || undefined,
+    position: bindMenuSaveStation.value.position
   })
 
   closeBindMenu()
@@ -618,7 +605,7 @@ function clearCurrentSaveStationBinding() {
   if (!saveStationCode) return
 
   if (currentGroupBinding.value?.tradestationBinding?.saveStationCode === saveStationCode) {
-    saveBindingStore.deleteTradeStation(props.gameGuid, props.sectorGroupId)
+    saveBindingStore.unbindTradeStation(props.gameGuid, props.sectorGroupId)
     closeBindMenu()
     return
   }
@@ -675,10 +662,6 @@ function clearFreeStationBinding(stationId: string) {
   saveBindingStore.deleteStationPlan(props.gameGuid, stationId)
 }
 
-function clearSectorTradestationBinding() {
-  saveBindingStore.deleteTradeStation(props.gameGuid, props.sectorGroupId)
-}
-
 function formatCoordKm(value: number): string {
   return `${(value / 1000).toFixed(1)}km`
 }
@@ -733,42 +716,23 @@ const allStationsForMenu = computed(() => {
     })
   }
 
-  // 3. 已放置未绑定的虚拟补给站（有 position，无 saveStationCode）
-  // 4. 未放置的虚拟补给站（无 tradestationBinding）
+  // 3. 虚拟中转站（未绑定的可以被绑定，已绑定的只允许解绑）
   // 只有定位星区的 save station 可以绑定虚拟补给站
   const anchorMacro = currentGroupBinding.value?.sectorMacro
   const tb = currentGroupBinding.value?.tradestationBinding
   const tradestationSaveStationCode = currentGroupBinding.value?.tradestationBinding?.saveStationCode
   const isAnchorSector = bindMenuSectorMacro.value === anchorMacro
   
-  if (isAnchorSector) {
-    if (tb?.position && !tradestationSaveStationCode) {
-      items.push({
-        type: 'virtualTradestation',
-        name: t('map.binding_sector_tradestation'),
-        sectorGroupId: props.sectorGroupId,
-        sectorMacro: tb.sectorMacro,
-        disabled: true,
-        placed: true
-      })
-    } else if (tb && tradestationSaveStationCode) {
-      const isCurrentSaveStation = bindMenuSaveStation.value?.code === tradestationSaveStationCode
-      items.push({
-        type: 'virtualTradestation',
-        name: t('map.binding_sector_tradestation'),
-        sectorGroupId: props.sectorGroupId,
-        sectorMacro: tb.sectorMacro,
-        disabled: !isCurrentSaveStation,
-        placed: Boolean(tb.position)
-      })
-    } else if (!tb) {
-      items.push({
-        type: 'virtualTradestation',
-        name: t('map.binding_sector_tradestation'),
-        sectorGroupId: props.sectorGroupId,
-        sectorMacro: undefined
-      })
-    }
+  if (isAnchorSector && tb) {
+    const isCurrentSaveStation = bindMenuSaveStation.value?.code === tradestationSaveStationCode
+    items.push({
+      type: 'virtualTradestation',
+      name: t('map.binding_sector_tradestation'),
+      sectorGroupId: props.sectorGroupId,
+      sectorMacro: tb.sectorMacro,
+      disabled: tradestationSaveStationCode ? !isCurrentSaveStation : false,
+      placed: true
+    })
   }
 
   return items
@@ -902,26 +866,10 @@ onBeforeUnmount(() => {
         </svg>
       </button>
     </div>
-    <div v-if="freeStations.length === 0 && !virtualTradestation" class="empty-hint">
+    <div v-if="freeStations.length === 0" class="empty-hint">
       {{ t('map.binding_no_blueprint_stations') }}
     </div>
     <div v-else class="free-stations">
-      <!-- Virtual Trade Station -->
-      <div
-        v-if="virtualTradestation"
-        class="free-station-item free-station-item--virtual"
-        :class="{ 'free-station-item--dragging': activeDragKey === '__virtual_tradestation__' }"
-        @mousedown="onVirtualTradestationMouseDown($event)"
-      >
-        <img class="entry-icon" :src="tradestationIconUrl" alt="" />
-        <div class="station-info">
-          <div class="station-name">{{ virtualTradestation.name }}</div>
-        </div>
-        <div class="station-handle">
-          <span></span><span></span><span></span>
-        </div>
-      </div>
-
       <!-- Station Blueprints -->
       <div
         v-for="item in freeStations"
@@ -1044,7 +992,6 @@ onBeforeUnmount(() => {
                 {{ formatCoordKm(sector.placedVirtualTradestationPosition.z) }}
               </span>
             </div>
-            <button class="placed-clear" type="button" @click.stop="clearSectorTradestationBinding()">×</button>
           </div>
 
           <div
@@ -1056,7 +1003,6 @@ onBeforeUnmount(() => {
               <span class="station-label">{{ t('map.binding_sector_tradestation') }}</span>
               <span class="station-code">{{ t('map.binding_status_missing') }}</span>
             </div>
-            <button class="placed-clear" type="button" @click.stop="clearSectorTradestationBinding">×</button>
           </div>
         </div>
         <div v-else class="sector-empty">

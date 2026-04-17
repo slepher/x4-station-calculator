@@ -122,6 +122,54 @@
 - **那么** 系统 SHALL 在 `BindingSectorGroup.tradeStation` 创建 `TradeStationBinding`
 - **并且** 该 station SHALL NOT 参与量化生产计算
 
+### Requirement: Auto TradeStation Creation
+
+系统 MUST 在 group 创建时自动创建默认 tradestation。
+
+#### Scenario: group 创建时自动创建 tradestation
+- **前提** 用户在 Step 2 创建新 group
+- **当** 用户选择定位星区并确认创建
+- **那么** 系统 SHALL 自动创建 `TradeStationBinding`
+- **并且** position SHALL 设置为星区中心坐标
+- **并且** sectorMacro SHALL 设置为该 group 的定位星区
+- **并且** 该 tradestation SHALL 显示在地图上
+- **并且** 用户 SHALL NOT 需要手动拖拽创建
+
+#### Scenario: Step 3 不显示中转站占位
+- **前提** 用户进入 Step 3
+- **当** 系统显示空间站列表
+- **那么** 系统 SHALL NOT 显示"自由空间站"区域的中转站占位
+- **并且** SHALL 显示 group 的默认 tradestation
+
+### Requirement: Save Station TradeStation Binding
+
+系统 MUST 支持 save station 与 tradestation 的单向一对一绑定。
+
+#### Scenario: save station 绑定到 tradestation
+- **前提** 用户在 Step 3
+- **并且** group 已有默认 tradestation
+- **并且** tradestation 未被绑定
+- **当** 用户将某个 save station 绑定到该 tradestation
+- **那么** 系统 SHALL 设置 `BindingStationPlan.saveStationCode` 为 tradestation 的 code
+- **并且** 该 save station SHALL 使用 tradestation 的位置
+
+#### Scenario: 已绑定 tradestation 不可再绑定
+- **前提** 用户在 Step 3
+- **并且** 某个 tradestation 已被 save station A 绑定
+- **当** 用户尝试将 save station B 绑定到同一 tradestation
+- **那么** 系统 SHALL 显示该 tradestation 已被绑定状态
+- **并且** SHALL 禁用绑定操作
+
+#### Scenario: save station 解绑 tradestation
+- **前提** 用户在 Step 3
+- **并且** save station 已绑定到 tradestation
+- **当** 用户解绑该 save station
+- **那么** 系统 SHALL 清除 `BindingStationPlan.saveStationCode`
+- **并且** SHALL 将位置重置到星区中心点
+- **并且** 该 save station SHALL 变为 virtual station
+- **并且** tradestation SHALL 保留在原位置
+- **并且** tradestation SHALL 可被其他 save station 绑定
+
 ### Requirement: Step 3 Binding Menu UI
 
 系统 MUST 提供一致的绑定菜单 UI。
@@ -171,11 +219,7 @@
 - **那么** 系统 SHALL 创建无 `saveStationCode` 的 `BindingStationPlan`
 - **并且** SHALL 设置 position 和 sectorMacro
 
-#### Scenario: 拖拽星区中转站到地图
-- **前提** 用户在 Step 3
-- **当** 用户拖拽星区中转站到地图覆盖范围内
-- **那么** 系统 SHALL 创建 `TradeStationBinding`
-- **并且** SHALL 设置 position 和 sectorMacro
+注：星区中转站已在 group 创建时自动创建，不再需要手动拖拽创建 `TradeStationBinding`。
 
 #### Scenario: 拖拽已放置的 station
 - **前提** 地图上已存在 binding station 或 trade station

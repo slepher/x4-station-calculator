@@ -526,10 +526,11 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
     })
   }
 
-  // tradeStation per group
+  // tradeStation per group (only virtual/unbound ones)
   for (const group of activePlan.groups) {
     const stationPlan = group.tradeStation
-    if (!stationPlan?.position || !stationPlan.sectorMacro) continue
+    // Skip bound tradestations - they show as save station POIs instead
+    if (!stationPlan?.position || !stationPlan.sectorMacro || stationPlan.saveStationCode) continue
     const resolved = resolveMapSectorByMacro(gameDataStore.maps || { clusters: {}, sectors: {} }, stationPlan.sectorMacro)
     if (!resolved) continue
     const coverageSectorMacros = Array.from(new Set([
@@ -608,6 +609,17 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
     activeSavePoiCategory.value
   )
 
+  // Build a set of save station codes bound to tradestations
+  const boundToTradestationCodes = new Set<string>()
+  const activeBinding = saveBindingStore.activeBinding
+  if (activeBinding) {
+    for (const group of activeBinding.groups) {
+      if (group.tradeStation?.saveStationCode) {
+        boundToTradestationCodes.add(group.tradeStation.saveStationCode)
+      }
+    }
+  }
+
   return saveStore
     .getArchivePoiOverlays(activeMapArchive.value, activeCategories)
     .map((overlay) => {
@@ -617,9 +629,14 @@ const savePoiOverlays = computed<SavePoiOverlayItem[]>(() => {
           sectors: gameDataStore.maps?.sectors || {}
         }, overlay.sectorMacro)
       const sectorData = resolved ? sectorsById.value[resolved.sectorId] : null
+      
+      // Set tag to 'tradestation' if bound to tradestation
+      const isBoundTradestation = overlay.category === 'playerStation' && boundToTradestationCodes.has(overlay.code)
+      
       return {
         ...overlay,
-        sectorName: sectorData?.displayName || overlay.sectorName
+        sectorName: sectorData?.displayName || overlay.sectorName,
+        tag: isBoundTradestation ? 'tradestation' : overlay.tag
       }
     })
 })

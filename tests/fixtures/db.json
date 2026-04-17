@@ -53,7 +53,17 @@
             "connectedGroupIds": [
               "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
               "16f32571-659b-3035-a6c7-ce40f9a354b1"
-            ]
+            ],
+            "tradeStation": {
+              "id": "886fbc50-a01f-21e0-b4a0-e24aacb04c55",
+              "name": "神圣眼光 中转站",
+              "sectorMacro": "cluster_24_sector001_macro",
+              "position": {
+                "x": 0,
+                "y": 0,
+                "z": 0
+              }
+            }
           },
           {
             "id": "1e6fdef6-b279-6da6-76c4-ce8f671dfcd9",
@@ -69,7 +79,8 @@
             "tradeStation": {
               "id": "b93b3a8f-cdc0-c61c-3d1e-63ec19f5dc90",
               "name": "阿尔忒弥斯的朦胧 中转站",
-              "saveStationCode": "BHW-834"
+              "saveStationCode": "BHW-834",
+              "sectorMacro": "cluster_715_sector001_macro"
             }
           },
           {
@@ -119,7 +130,8 @@
             "tradeStation": {
               "id": "c9a28d5f-e1c7-f607-537c-655a76fffbea",
               "name": "警惕凝视 中转站",
-              "saveStationCode": "UKW-234"
+              "saveStationCode": "UKW-234",
+              "sectorMacro": "cluster_601_sector001_macro"
             }
           }
         ],
