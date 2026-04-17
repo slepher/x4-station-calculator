@@ -112,12 +112,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const station = derivedBindingStations.value.find(item => item.station.id === stationId)?.station
     const liveSettings: StationSettings = station?.settings || DEFAULT_STATION_SETTINGS
 
+    const workforces = stationEntry.workforces
+    const hasWorkforce = workforces && workforces.length > 0
+    const actualWorkforceOverride = hasWorkforce
+      ? workforces.reduce((sum, w) => sum + w.amount, 0)
+      : 0
+
     liveFlowMap.compute(stationId, {
       plannedModules: modules,
       settings: liveSettings,
       lockedWares: [],
       warePriority: {},
-      skipAutoFill: true
+      skipAutoFill: true,
+      workforceOverride: hasWorkforce ? workforces : undefined,
+      actualWorkforceOverride
     }, computeDeps)
   }
 

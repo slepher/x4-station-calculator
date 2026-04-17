@@ -490,6 +490,8 @@
     "surplus": "Surplus",
     "shortage": "Shortage",
     "limit": "Limit",
+    "actual": "Actual",
+    "workforce_label": "Workers",
     "auto_calc": "Auto-Calculate",
     "inc_phq": "Inc. PHQ",
     "view_cost": "Cost",

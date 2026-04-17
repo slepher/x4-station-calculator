@@ -24,6 +24,7 @@ const props = defineProps<{
   currentEfficiency: number
   actualWorkforce: number
   buildPriceMultiplier: number
+  forceWorkforceAuto?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -66,28 +67,6 @@ const clampedManualWorkforce = computed(() => {
   return Math.max(0, Math.min(props.settings.manualWorkforce, capacity))
 })
 
-const displayedActualWorkforce = computed(() => {
-  if (props.settings.workforceAuto) return maxAllowedWorkforce.value
-  return clampedManualWorkforce.value
-})
-
-const displayedEfficiency = computed(() => {
-  const needed = analysis.value.totalNeeded || 0
-  if (needed === 0) return 1
-  return Math.min(1, displayedActualWorkforce.value / needed)
-})
-
-const workforceEfficiencyText = computed(() => {
-  return `${Math.round(displayedEfficiency.value * 100)}%`
-})
-
-const workforceEfficiencyColor = computed(() => {
-  const eff = displayedEfficiency.value
-  if (eff >= 1) return 'text-emerald-400'
-  if (eff >= 0.5) return 'text-amber-400'
-  return 'text-red-400'
-})
-
 const analysis = computed(() => {
   return analyzeStation(
     props.modules,
@@ -105,8 +84,54 @@ const maxAllowedWorkforce = computed(() => {
   return Math.min(needed, capacity);
 });
 
+const displayedActualWorkforce = computed(() => {
+  if (props.forceWorkforceAuto) {
+    return props.actualWorkforce
+  }
+  if (props.settings.workforceAuto) return maxAllowedWorkforce.value
+  return clampedManualWorkforce.value
+})
+
+const displayedEfficiency = computed(() => {
+  if (props.forceWorkforceAuto) {
+    return props.currentEfficiency
+  }
+  const needed = analysis.value.totalNeeded || 0
+  if (needed === 0) return 1
+  return Math.min(1, displayedActualWorkforce.value / needed)
+})
+
+const workforceEfficiencyText = computed(() => {
+  return `${Math.round(displayedEfficiency.value * 100)}%`
+})
+
+const workforceEfficiencyColor = computed(() => {
+  const eff = displayedEfficiency.value
+  if (eff >= 1) return 'text-emerald-400'
+  if (eff >= 0.5) return 'text-amber-400'
+  return 'text-red-400'
+})
+const manualWorkforce = computed({
+  get: () => props.settings.manualWorkforce,
+  set: (val: number) => emit('updateManualWorkforce', val)
+})
+const workforceAuto = computed({
+  get: () => props.forceWorkforceAuto || props.settings.workforceAuto,
+  set: (val: boolean) => {
+    if (props.forceWorkforceAuto) return
+    emit('updateWorkforceAuto', val)
+  }
+})
+const useHQ = computed({
+  get: () => props.settings.useHQ,
+  set: (val: boolean) => emit('updateUseHq', val)
+})
+
 const saturationPercent = computed({
   get: () => {
+    if (props.forceWorkforceAuto) {
+      return Math.round(props.currentEfficiency * 100)
+    }
     const currentAnalysis = analysis.value
     const capacity = currentAnalysis.totalCapacity || 0;
     if (capacity === 0) return 0;
@@ -114,23 +139,11 @@ const saturationPercent = computed({
     return Math.round((currentVal / capacity) * 100);
   },
   set: (val: number) => {
-    if (props.settings.workforceAuto) return;
+    if (props.forceWorkforceAuto || props.settings.workforceAuto) return;
     const currentAnalysis = analysis.value
     const capacity = currentAnalysis.totalCapacity || 0;
     emit('updateManualWorkforce', Math.min(Math.round((val / 100) * capacity), capacity));
   }
-})
-const manualWorkforce = computed({
-  get: () => props.settings.manualWorkforce,
-  set: (val: number) => emit('updateManualWorkforce', val)
-})
-const workforceAuto = computed({
-  get: () => props.settings.workforceAuto,
-  set: (val: boolean) => emit('updateWorkforceAuto', val)
-})
-const useHQ = computed({
-  get: () => props.settings.useHQ,
-  set: (val: boolean) => emit('updateUseHq', val)
 })
 
 const workforceSliderDraft = ref(0)
@@ -144,7 +157,7 @@ const handleWorkforceSliderInput = (event: Event) => {
 }
 
 const handleWorkforceSliderCommit = () => {
-  if (props.settings.workforceAuto) return
+  if (props.forceWorkforceAuto || props.settings.workforceAuto) return
   saturationPercent.value = workforceSliderDraft.value
 }
 
@@ -449,20 +462,19 @@ const hasDashboardData = computed(() => {
           <div class="flex items-center gap-2">
             <span class="text-[10px] text-slate-500 font-bold uppercase">{{ t('station.control_actual_workforce') }}</span>
 
-            <X4NumberInput v-if="!props.settings.workforceAuto" v-model="manualWorkforce"
+            <X4NumberInput v-if="!workforceAuto" v-model="manualWorkforce"
               :max="analysis.totalCapacity" width-class="w-24" />
             <span v-else class="val-text-display">
               {{ displayedActualWorkforce }}
             </span>
           </div>
-          <span class="percent-display">{{ Math.round((displayedActualWorkforce / (analysis.totalCapacity || 1)) * 100)
-            }}%</span>
+          <span class="percent-display">{{ saturationPercent }}%</span>
         </div>
 
         <div class="slider-container">
           <input type="range" :value="workforceSliderDraft" min="0" max="100"
             @input="handleWorkforceSliderInput" @change="handleWorkforceSliderCommit"
-            :disabled="props.settings.workforceAuto" class="range-slider">
+            :disabled="workforceAuto" class="range-slider">
           <div class="slider-track-bg">
             <div class="slider-fill" :style="{ width: `${workforceSliderDraft}%` }"></div>
           </div>
@@ -470,12 +482,12 @@ const hasDashboardData = computed(() => {
 
         <div class="flex items-center justify-between mt-2">
           <label class="auto-toggle group">
-            <input type="checkbox" v-model="workforceAuto" class="hidden">
-            <div class="cb" :class="{ 'cb-active': props.settings.workforceAuto }">
-              <div v-if="props.settings.workforceAuto" class="cb-inner"></div>
+            <input type="checkbox" v-model="workforceAuto" class="hidden" :disabled="props.forceWorkforceAuto">
+            <div class="cb" :class="{ 'cb-active': workforceAuto }">
+              <div v-if="workforceAuto" class="cb-inner"></div>
             </div>
             <span class="text-[11px] font-bold italic uppercase"
-              :class="props.settings.workforceAuto ? 'text-sky-400' : 'text-slate-500'">
+              :class="workforceAuto ? 'text-sky-400' : 'text-slate-500'">
               {{ t('station.auto_calc') }} ({{ t('station.limit') }}: {{ formatNum(maxAllowedWorkforce) }})
             </span>
           </label>

@@ -2,6 +2,7 @@ import { reactive } from 'vue'
 import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module, X4Ware, WareFlow, EmpirePlan } from '@/types/x4'
 import type { RaceMedicalConsumption } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
+import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
@@ -21,6 +22,9 @@ export interface ProductionFlowInput {
   lockedWares: string[]
   warePriority: Record<string, number>
   skipAutoFill?: boolean
+  workforceOverride?: WorkforceEntry[]
+  actualWorkforceOverride?: number
+  saturationOverride?: number
 }
 
 export interface StationFlowCache {
@@ -232,7 +236,10 @@ export class StationProductionFlowMap {
         waresMap: deps.waresMap,
         medicalConsumptionMap: deps.medicalConsumptionMap,
         settings: input.settings,
-        warePriority: input.warePriority
+        warePriority: input.warePriority,
+        workforceOverride: input.workforceOverride,
+        actualWorkforceOverride: input.actualWorkforceOverride,
+        saturationOverride: input.saturationOverride
       })
       productionFlows = coreResult.productionFlows
       actualWorkforce = coreResult.actualWorkforce

@@ -75,9 +75,10 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
     settings: computed(() => {
       const s = store.stationState?.settings
       if (!s) return DEFAULT_DASHBOARD_SETTINGS
+      const forceAuto = store.session.visualMode === 'live'
       return {
         transportShipCapacity: s.transportShipCapacity,
-        workforceAuto: s.workforceAuto,
+        workforceAuto: forceAuto ? true : s.workforceAuto,
         manualWorkforce: s.manualWorkforce,
         useHQ: s.useHQ
       }

@@ -262,6 +262,7 @@ const showArchiveModuleList = computed(() => {
         :current-efficiency="dashboardPresenter.props.currentEfficiency.value"
         :actual-workforce="dashboardPresenter.props.actualWorkforce.value"
         :build-price-multiplier="dashboardPresenter.props.buildPriceMultiplier.value"
+        :force-workforce-auto="liveStore.session.visualMode === 'live'"
         @update-transport-ship-capacity="dashboardPresenter.emits.updateTransportShipCapacity"
         @update-build-price-multiplier="dashboardPresenter.emits.updateBuildPriceMultiplier"
         @update-manual-workforce="dashboardPresenter.emits.updateManualWorkforce"

@@ -1,10 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import LockButton from '../common/LockButton.vue'
 import FavoriteButton from '../common/FavoriteButton.vue'
 import VolumeTooltip from '../common/VolumeTooltip.vue'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   resourceId: string
@@ -50,6 +53,9 @@ const translateModule = (moduleId: string) => {
   const module = props.modulesMap?.[moduleId] || gameData.localizedModulesMap[moduleId]
   return module ? module.localeName : moduleId
 }
+
+const isWorkforceEntry = (moduleId: string) => moduleId.startsWith('workforce:')
+const getWorkforceRace = (moduleId: string) => moduleId.split(':')[1]
 
 const nonOperableComputed = computed(() => props.nonOperable ?? false)
 
@@ -199,7 +205,14 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           <span class="item-name">
             <span class="qty">{{ item.count }}</span>
             <span class="symbol">x</span>
-            <span class="name">{{ translateModule(item.moduleId) }}</span>
+            <span class="name">
+              <template v-if="isWorkforceEntry(item.moduleId)">
+                {{ t(`race.${getWorkforceRace(item.moduleId)}`) }} {{ t('station.workforce_label') }}
+              </template>
+              <template v-else>
+                {{ translateModule(item.moduleId) }}
+              </template>
+            </span>
           </span>
           <div class="item-val-group">
             <span v-if="item.bonusPercent > 0" class="item-bonus">(+{{ item.bonusPercent }}%)</span>
