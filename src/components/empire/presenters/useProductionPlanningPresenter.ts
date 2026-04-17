@@ -28,8 +28,10 @@ export interface PlanningPresenterStore {
   session: ProductionSessionState
   context: ProductionContextState
   stationState: ProductionStationState | null
+  moduleActions: {
+    updatePlannedModules(modules: SavedModule[]): void
+  }
   getEnforceDlcActivation(): boolean
-  updatePlannedModules(modules: SavedModule[]): void
 }
 
 export function useProductionPlanningPresenter(store: PlanningPresenterStore): UseProductionPlanningPresenterReturn {
@@ -47,7 +49,7 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   }
 
   const emits: PlanningPresenterEmits = {
-    updatePlannedModules: (modules) => store.updatePlannedModules(modules)
+    updatePlannedModules: (modules) => store.moduleActions.updatePlannedModules(modules)
   }
 
   return { props, emits }

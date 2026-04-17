@@ -267,38 +267,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
   })
 
-  function updatePlannedModules(modules: SavedModule[]): void {
-    moduleActions.updatePlannedModules(modules)
-  }
-
-  function isWareOperable(wareId: string): boolean {
-    return wareRuleActions.isWareOperable(wareId)
-  }
-
-  function isWareLocked(wareId: string): boolean {
-    return wareRuleActions.isWareLocked(wareId)
-  }
-
-  function toggleWareLock(wareId: string): void {
-    wareRuleActions.toggleWareLock(wareId)
-  }
-
-  function isPlannedWare(wareId: string): boolean {
-    return wareRuleActions.isPlannedWare(wareId)
-  }
-
-  function isAutoWare(wareId: string): boolean {
-    return wareRuleActions.isAutoWare(wareId)
-  }
-
-  function getResolvedLevel(wareId: string): number {
-    return wareRuleActions.getResolvedLevel(wareId)
-  }
-
-  function toggleWarePriority(wareId: string): void {
-    wareRuleActions.toggleWarePriority(wareId)
-  }
-
   function addModule(id: string = '', count = 1): void {
     moduleActions.addModule(id, count)
   }
@@ -751,7 +719,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
     return {
       operations: flows.operations
-        .filter((flow: any) => flow.netRate < 0 || getResolvedLevel(flow.wareId) > 0)
+        .filter((flow: any) => flow.netRate < 0 || wareRuleActions.getResolvedLevel(flow.wareId) > 0)
         .map(toItem)
         .sort(byTierThenName)
         .map(stripName),
@@ -957,7 +925,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       updateStationMinerals(activeStation.value.id, newMinerals)
     },
 
-    updatePlannedModules: (modules: SavedModule[]) => updatePlannedModules(modules),
     addModule: (moduleId: string, count?: number) => addModule(moduleId, count ?? 1),
     removeModule: (index: number) => removeModule(index),
     updateModuleCount: (index: number, count: number) => updateModuleCount(index, count),
@@ -1015,15 +982,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     takeSnapshot,
     initialize,
     getStationComponentGapFlows,
-    updatePlannedModules,
-    updateSetting: (key: keyof StationSettings, value: StationSettings[keyof StationSettings]) => settingActions.updateSetting(key, value),
-    toggleWareLock,
-    toggleWarePriority,
-    getResolvedLevel,
-    isWareLocked,
-    isWareOperable,
-    isPlannedWare,
-    isAutoWare,
     isModuleDlcActive,
     isModuleCountEditable,
     getModuleInfo,
