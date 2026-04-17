@@ -20,7 +20,6 @@ import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS, migrateStationSettings, type StationComputeDeps } from './state/stationSettings'
 import { stationProductionFlowMap, StationProductionFlowMap } from './state/StationProductionFlowMap'
 import { deepClone } from '@/utils/deepClone'
-import { analyzeStation } from './logic/analyzeStation'
 import {
   createEmpireSourceView,
   computeActiveTransitSectorId,
@@ -1281,17 +1280,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         autoInfrastructureModules: autoInfra,
         productionFlows: flows,
         warePriorityLevels: {},
-        stationAnalysis: {
-          totalCost: 0,
-          totalVolume: 0,
-          totalTime: 0,
-          totalCapacity: 0,
-          totalNeeded: 0,
-          playerHQNeeded: 0,
-          totalWorkerDiff: 0,
-          summaryItems: [],
-          moduleGroups: []
-        },
         settings: currentWorkbenchSettings.value
       }
     }
@@ -1299,7 +1287,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const station = activeStation.value
     if (!station) return null
     const state = activeStationState.value
-    const allModules = state.resolvedModules
     return {
       entityType: 'station',
       id: station.id,
@@ -1311,17 +1298,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
       warePriorityLevels: state.warePriorityLevels,
-      stationAnalysis: allModules.length === 0 ? {
-        totalCost: 0,
-        totalVolume: 0,
-        totalTime: 0,
-        totalCapacity: 0,
-        totalNeeded: 0,
-        playerHQNeeded: 0,
-        totalWorkerDiff: 0,
-        summaryItems: [],
-        moduleGroups: []
-      } : analyzeStation(allModules, gameData.modulesMap, gameData.waresMap, buildPriceMultiplier.value, settings.value.useHQ),
       settings: settings.value
     }
   })

@@ -138,8 +138,7 @@ function createImportStation(name: string, type?: 'industrial' | 'supply' | 'tra
 
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
-        :planned-modules="dashboardPresenter.props.plannedModules.value"
-        :station-analysis="dashboardPresenter.props.stationAnalysis.value"
+        :modules="dashboardPresenter.props.modules.value"
         :settings="dashboardPresenter.props.settings.value"
         :current-efficiency="dashboardPresenter.props.currentEfficiency.value"
         :actual-workforce="dashboardPresenter.props.actualWorkforce.value"

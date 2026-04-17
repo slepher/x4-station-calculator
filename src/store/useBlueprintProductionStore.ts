@@ -25,7 +25,6 @@ import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { migrateStationSettings, DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { stationProductionFlowMap } from './state/StationProductionFlowMap'
 import { deepClone } from '@/utils/deepClone'
-import { analyzeStation } from './logic/analyzeStation'
 import {
   createEmpireSourceView,
   computeActiveStation
@@ -734,17 +733,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
       warePriorityLevels: state.warePriorityLevels,
-      stationAnalysis: state.resolvedModules.length === 0 ? {
-        totalCost: 0,
-        totalVolume: 0,
-        totalTime: 0,
-        totalCapacity: 0,
-        totalNeeded: 0,
-        playerHQNeeded: 0,
-        totalWorkerDiff: 0,
-        summaryItems: [],
-        moduleGroups: []
-      } : analyzeStation(state.resolvedModules, gameData.modulesMap, gameData.waresMap, buildPriceMultiplier.value, settings.value.useHQ),
       settings: settings.value
     }
   })

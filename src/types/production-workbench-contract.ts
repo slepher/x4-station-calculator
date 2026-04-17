@@ -4,7 +4,6 @@ import type {
   StationSettings
 } from './x4'
 import type { WareProductionFlow } from './production-flow'
-import type { StationAnalysis } from '../store/logic/analyzeStation'
 
 export interface ProductionWorkbenchCapabilities {
   uniqueWorkbench: boolean
@@ -56,7 +55,6 @@ export interface ProductionStationState {
   autoInfrastructureModules: SavedModule[]
   productionFlows: WareProductionFlow[]
   warePriorityLevels: Record<string, number>
-  stationAnalysis: StationAnalysis
   settings: StationSettings
 }
 

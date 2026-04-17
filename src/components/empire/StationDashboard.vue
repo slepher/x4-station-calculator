@@ -13,20 +13,8 @@ import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import { analyzeStation } from '@/store/logic/analyzeStation'
 
 const props = defineProps<{
-  plannedModules: SavedModule[]
-  plannedModulesOverride?: SavedModule[] | null
+  modules: SavedModule[]
   hideWorkersView?: boolean
-  stationAnalysis: {
-    totalCost: number
-    totalVolume: number
-    totalNeeded: number
-    totalCapacity: number
-    totalTime: number
-    playerHQNeeded: number
-    totalWorkerDiff: number
-    moduleGroups: any[]
-    summaryItems: any[]
-  }
   settings: {
     transportShipCapacity: number
     workforceAuto: boolean
@@ -101,9 +89,8 @@ const workforceEfficiencyColor = computed(() => {
 })
 
 const analysis = computed(() => {
-  if (!props.plannedModulesOverride) return props.stationAnalysis
   return analyzeStation(
-    props.plannedModulesOverride,
+    props.modules,
     gameDataStore.modulesMap,
     gameDataStore.waresMap,
     buildPriceMultiplier.value,
