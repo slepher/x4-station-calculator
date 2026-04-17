@@ -775,11 +775,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     })),
     getActiveTabId: () => activeStationId.value,
     getExpandedSectorId: () => null,
-    getWorkbenchMode: () => activeStation.value ? 'station' : 'overview',
-    getActiveStationId: () => activeStationId.value,
-    getActiveTransitSectorId: () => null,
-    getSessionState: () => session.value,
-    getContextState: () => context.value,
 
     getTitleModel: () => ({
       value: activeEmpire.value?.name || '',
@@ -808,33 +803,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     getAvailableMinerals: () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane'],
     getSingleBerthThroughput: () => Math.max(1, settings.value.transportShipCapacity || 1) * 15,
 
-    getToolbarStationCode: () => '',
-    getToolbarSectorName: () => {
-      const sectorId = activeStation.value?.sectorId
-      if (!sectorId) return ''
-      const sectorData = gameData.maps.sectors[sectorId]
-      return sectorData?.name || ''
-    },
-    getToolbarSectorNameId: () => {
-      const sectorId = activeStation.value?.sectorId
-      if (!sectorId) return undefined
-      const sectorData = gameData.maps.sectors[sectorId]
-      return sectorData?.nameId
-    },
-    getToolbarStationPosition: () => undefined,
-    getToolbarSectorResources: () => {
-      const sectorId = activeStation.value?.sectorId
-      if (!sectorId) return []
-      const sectorData = gameData.maps.sectors[sectorId]
-      return (sectorData?.resources || []).map(r => r.ware)
-    },
-    getToolbarSectorSunlight: () => {
-      const sectorId = activeStation.value?.sectorId
-      if (!sectorId) return 100
-      const sectorData = gameData.maps.sectors[sectorId]
-      return Math.round((sectorData?.area?.sunlight ?? 1) * 100)
-    },
-
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
@@ -844,26 +812,17 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     getActualWorkforce: () => actualWorkforce.value,
     getBuildPriceMultiplier: () => buildPriceMultiplier.value,
 
-    isOverview: () => !activeStation.value,
-    getProductionSource: () => 'empire',
-    getImportActiveStationId: () => activeStationId.value,
-    getImportActiveStation: () => activeStation.value ? { id: activeStation.value.id, modules: activeStation.value.modules } : null,
-
     selectOverview: () => selectStation(null),
-    selectTransit: () => {},
-    selectStation: (stationId: string) => selectStation(stationId),
     expandSector: () => {},
 
     createStation: (name?: string, type?: StationType) => {
       const station = createStation(name || i18n.global.t('sector.new_station_name'), type || 'industrial')
       return station?.id || null
     },
-    renameStation: (stationId: string, name: string) => renameStation(stationId, name),
     duplicateStation: (stationId: string) => {
       const station = duplicateStation(stationId)
       return station?.id || null
     },
-    deleteStation: (stationId: string) => deleteStation(stationId),
 
     updateTitle: (value: string) => updateEmpireName(value),
     updateStationName: (value: string) => {
