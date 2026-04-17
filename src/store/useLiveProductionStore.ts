@@ -115,7 +115,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     for (const sector of sectorList) {
       const finalFlows = planningFlowFacade.getSectorFinalProductionFlows(sector.id)
       const group = activeBinding.value?.groups.find(g => g.id === sector.id)
-      const sectorSettings = group?.settings || settings.value
+      const sectorSettings = group?.tradeStation?.settings || settings.value
       const effectiveSettings = {
         racePreference: sectorSettings.racePreference ?? settings.value.racePreference,
         resourceBufferHours: sectorSettings.resourceBufferHours ?? settings.value.resourceBufferHours,
@@ -140,7 +140,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     for (const sector of sectorList) {
       const finalFlows = liveFlowFacade.getSectorFinalProductionFlows(sector.id)
       const group = activeBinding.value?.groups.find(g => g.id === sector.id)
-      const sectorSettings = group?.settings || settings.value
+      const sectorSettings = group?.tradeStation?.settings || settings.value
       const effectiveSettings = {
         racePreference: sectorSettings.racePreference ?? settings.value.racePreference,
         resourceBufferHours: sectorSettings.resourceBufferHours ?? settings.value.resourceBufferHours,
@@ -275,13 +275,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeStationId.value,
     sectors.value
   ))
-
-  const transitHubSettings = computed<Partial<StationSettings>>(() => {
-    const sectorId = activeTransitSectorId.value
-    if (!sectorId) return {}
-    const group = activeBinding.value?.groups.find(g => g.id === sectorId)
-    return group?.settings || {}
-  })
 
   function getDerivedBindingStation(stationId: string): StationPlan | null {
     return planningSourceView.getDerivedBindingStation(stationId)
@@ -534,7 +527,21 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const mode = workbenchMode.value
     
     if (mode === 'transit') {
-      return null
+      const sectorId = activeTransitSectorId.value
+      if (!sectorId) return null
+      const group = activeBinding.value?.groups.find(g => g.id === sectorId)
+      const tradeStation = group?.tradeStation
+      if (!tradeStation) return null
+      return {
+        id: tradeStation.id,
+        name: tradeStation.name || tradeStation.saveStationCode || 'Transit Hub',
+        type: 'transit',
+        modules: [],
+        settings: migrateStationSettings(tradeStation.settings || {}),
+        lastUpdated: 0,
+        lockedWares: [],
+        warePriority: {}
+      }
     }
     
     if (mode === 'station') {
@@ -695,13 +702,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         syncAfterStationFlowChange(station.id, deps)
       }
     }
-  })
-
-  const currentWorkbenchSettings = computed<StationSettings>(() => {
-    if (workbenchMode.value === 'transit') {
-      return migrateStationSettings(transitHubSettings.value)
-    }
-    return settings.value
   })
 
   const activeStationState = computed(() => {
@@ -1279,10 +1279,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         autoHabitationModules: [],
         autoInfrastructureModules: autoInfra,
         productionFlows: flows,
-        warePriorityLevels: {},
-        settings: currentWorkbenchSettings.value
-      }
+warePriorityLevels: {},
+      settings: settings.value
     }
+  }
     
     const station = activeStation.value
     if (!station) return null
@@ -1346,7 +1346,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     { value: 'shipyard' as StationType, label: i18n.global.t('toolbar.station_types.shipyard') }
   ]
   const getAvailableMinerals = () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane']
-  const getSingleBerthThroughput = () => Math.max(1, currentWorkbenchSettings.value.transportShipCapacity || 1) * 15
+  const getSingleBerthThroughput = () => Math.max(1, settings.value.transportShipCapacity || 1) * 15
   const getEnforceDlcActivation = () => enforceDlcActivation.value
   const getWareflowViewMode = () => wareflowViewMode.value
   const getEmpireGaps = () => empireGapsComputed.value

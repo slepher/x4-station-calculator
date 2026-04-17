@@ -1136,6 +1136,7 @@ export interface TradeStationBinding {
   name: string
   sectorMacro?: string
   position?: { x: number; y: number; z: number }
+  settings?: Partial<StationSettings>
 }
 
 export interface BindingSectorGroup {
@@ -1147,7 +1148,6 @@ export interface BindingSectorGroup {
   coverageSectorMacros: CoverageSectorEntry[]
   connectedGroupIds?: string[]
   tradeStation?: TradeStationBinding
-  settings?: Partial<StationSettings>
 }
 
 export interface BindingStationPlan {

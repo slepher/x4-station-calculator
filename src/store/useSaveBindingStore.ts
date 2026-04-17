@@ -68,7 +68,8 @@ function normalizeTradeStation(input: unknown): TradeStationBinding | undefined 
     saveStationCode: value.saveStationCode,
     name: value.name || 'Trade Station',
     sectorMacro: value.sectorMacro,
-    position: value.position
+    position: value.position,
+    settings: value.settings
   }
 }
 
@@ -85,8 +86,7 @@ function normalizeState(input: Partial<SavedSaveBindingsState> | null | undefine
             jumpRange: Number.isFinite(Number(group.jumpRange)) ? Number(group.jumpRange) : 3,
             coverageSectorMacros: Array.isArray(group.coverageSectorMacros) ? group.coverageSectorMacros : [],
             connectedGroupIds: Array.isArray(group.connectedGroupIds) ? group.connectedGroupIds : [],
-            tradeStation: normalizeTradeStation(group.tradeStation),
-            settings: group.settings ? deepClone(group.settings as Partial<StationSettings>) : undefined
+            tradeStation: normalizeTradeStation(group.tradeStation)
           })) : []
 
           const rawStationPlans = Array.isArray((item as any).stationPlans) ? (item as any).stationPlans as unknown[] : []
