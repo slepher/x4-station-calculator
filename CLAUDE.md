@@ -204,6 +204,19 @@ These define the development workflow patterns used in this codebase.
 
 ## Working Guidelines
 
+### UI Layering Principle
+- **新方案必须严格采用 `store -> presenter -> vue` 三层结构**
+- **不得再添加中间层**。`store` 和 `presenter` 之间、`presenter` 和 `vue` 之间都不允许再引入新的适配层、view model 层、facade UI 层或其他等价中间层
+- `store` **不面向 UI 直接输出数据**。`store` 只负责领域状态、持久化状态、计算过程、基础派生和可复用业务能力，不负责为了某个 Vue 组件定制返回结构
+- `presenter` **负责面向 UI 组装数据**。所有供界面直接消费的展示结构、组件输入、显示模式切换、分组和 UI 专用字段，都应在 `presenter` 层完成
+- `vue` **不得直接调用 `store`**，除读取静态 JSON 数据这类例外情况外，Vue 组件必须通过 `presenter` 取数和触发行为
+- `vue` **不得直接调用 `presenter` 以外的业务组装逻辑**。凡是组件内直接拼装 store 数据、直接做 UI 导向的数据变形，均视为违反新方案
+- 当前代码中凡是 **没有通过 `presenter` 而直接访问 `store` 的写法，都属于历史遗留问题**。可以识别、记录、渐进清理，但**新方案不得继续采用**
+- 设计评审和实现时，默认检查标准是：
+  - 这段逻辑是否应留在 `store`
+  - 这段面向界面的组装是否应移动到 `presenter`
+  - 该 Vue 组件是否仍然直接依赖 `store`
+
 ### When User Asks for Understanding/Analysis
 - Provide explanation first, do not modify code without confirmation
 - Wait for user to confirm understanding is correct before proceeding
