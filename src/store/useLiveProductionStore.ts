@@ -772,8 +772,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const productionFlows = computed(() => activeStationState.value.productionFlows)
-  const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
 
@@ -1440,62 +1438,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const getToolbarStationPosition = () => stationContext.value?.position
   const getToolbarSectorResources = () => stationContext.value?.sectorResources || []
   const getToolbarSectorSunlight = () => stationContext.value?.sectorSunlight ?? 100
-  const getPlannedModules = () => workbenchMode.value === 'transit'
-    ? activeStationState.value.autoInfrastructureModules
-    : plannedModules.value
-  const getAutoModules = () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoIndustryModules
-  const getAutoHabitationModules = () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoHabitationModules
-  const getAutoInfrastructureModules = () => workbenchMode.value === 'transit'
-    ? stationProductionFlowMap.getSectorAutoInfrastructureModules(activeTransitSectorId.value || '')
-    : activeStationState.value.autoInfrastructureModules
-  const getResolvedModules = () => workbenchMode.value === 'transit'
-    ? stationProductionFlowMap.getSectorAutoInfrastructureModules(activeTransitSectorId.value || '')
-    : activeStationState.value.resolvedModules
   const getEnforceDlcActivation = () => enforceDlcActivation.value
   const getWareflowViewMode = () => wareflowViewMode.value
-  const getProductionFlows = () => workbenchMode.value === 'transit'
-    ? (mode.value === 'live'
-        ? liveFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || '')
-        : planningFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || ''))
-    : productionFlows.value
-  const getWarePriorityLevels = () => workbenchMode.value === 'transit' ? {} : warePriorityLevels.value
   const getEmpireGaps = () => empireGapsComputed.value
-  const getStationAnalysis = () => {
-    if (workbenchMode.value === 'transit') {
-      return {
-        totalCost: 0,
-        totalVolume: 0,
-        totalTime: 0,
-        totalCapacity: 0,
-        totalNeeded: 0,
-        playerHQNeeded: 0,
-        totalWorkerDiff: 0,
-        summaryItems: [],
-        moduleGroups: []
-      }
-    }
-    const allModules = activeStationState.value.resolvedModules
-    if (allModules.length === 0) {
-      return {
-        totalCost: 0,
-        totalVolume: 0,
-        totalTime: 0,
-        totalCapacity: 0,
-        totalNeeded: 0,
-        playerHQNeeded: 0,
-        totalWorkerDiff: 0,
-        summaryItems: [],
-        moduleGroups: []
-      }
-    }
-    return analyzeStation(
-      allModules,
-      gameData.modulesMap,
-      gameData.waresMap,
-      buildPriceMultiplier.value,
-      settings.value.useHQ
-    )
-  }
   const getCurrentEfficiency = () => workbenchMode.value === 'transit' ? 0 : currentEfficiency.value
   const getActualWorkforce = () => workbenchMode.value === 'transit' ? 0 : actualWorkforce.value
   const getBuildPriceMultiplier = () => buildPriceMultiplier.value
@@ -1519,19 +1464,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       ? current.filter((m: string) => m !== mineral)
       : [...current, mineral]
     updateStationMinerals(activeStation.value.id, newMinerals)
-  }
-  const addWareModule = (wareId: string) => {
-    const module = gameData.findModuleForWare(wareId, currentWorkbenchSettings.value.racePreference)
-    if (module) addModule(module.id, 1)
-  }
-  const removeWareModule = (wareId: string) => {
-    const module = gameData.findModuleForWare(wareId, currentWorkbenchSettings.value.racePreference)
-    if (!module) return
-    const plannedIndex = plannedModules.value.findIndex(m => m.id === module.id)
-    if (plannedIndex === -1) return
-    const current = plannedModules.value[plannedIndex]?.count ?? 0
-    if (current <= 1) removeModule(plannedIndex)
-    else updateModuleCount(plannedIndex, current - 1)
   }
 
   const settingActions = createProductionSettingActions<StationPlan>({
@@ -1653,17 +1585,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getToolbarStationPosition,
     getToolbarSectorResources,
     getToolbarSectorSunlight,
-    getPlannedModules,
-    getAutoModules,
-    getAutoHabitationModules,
-    getAutoInfrastructureModules,
-    getResolvedModules,
     getEnforceDlcActivation,
     getWareflowViewMode,
-    getProductionFlows,
-    getWarePriorityLevels,
     getEmpireGaps,
-    getStationAnalysis,
     getCurrentEfficiency,
     getActualWorkforce,
     getBuildPriceMultiplier,
@@ -1679,8 +1603,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     duplicateStation: () => null,
     selectOverview: selectOverviewAction,
     selectTransit,
-    selectStation,
-    addWareModule,
-    removeWareModule
+    selectStation
   }
 })

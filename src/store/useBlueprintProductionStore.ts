@@ -203,8 +203,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
-const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
-  const productionFlows = computed(() => activeStationState.value.productionFlows)
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
 
   function isModuleDlcActive(moduleId: string): boolean {
@@ -910,43 +908,11 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
       return Math.round((sectorData?.area?.sunlight ?? 1) * 100)
     },
 
-    getPlannedModules: () => plannedModules.value,
-    getAutoModules: () => activeStationState.value.autoIndustryModules,
-    getAutoHabitationModules: () => activeStationState.value.autoHabitationModules,
-    getAutoInfrastructureModules: () => activeStationState.value.autoInfrastructureModules,
-    getResolvedModules: () => activeStationState.value.resolvedModules,
     getEnforceDlcActivation: () => enforceDlcActivation.value,
 
     getWareflowViewMode: () => wareflowViewMode.value,
-    getProductionFlows: () => productionFlows.value,
-    getWarePriorityLevels: () => warePriorityLevels.value,
     getEmpireGaps: () => empireGapsComputed.value,
 
-    getStationAnalysis: () => {
-      const planned = plannedModules.value
-      const auto = activeStationState.value.autoIndustryModules
-      const allModules = [...planned, ...auto]
-      if (allModules.length === 0) {
-        return {
-          totalCost: 0,
-          totalVolume: 0,
-          totalTime: 0,
-          totalCapacity: 0,
-          totalNeeded: 0,
-          playerHQNeeded: 0,
-          totalWorkerDiff: 0,
-          summaryItems: [],
-          moduleGroups: []
-        }
-      }
-      return analyzeStation(
-        allModules,
-        gameData.modulesMap,
-        gameData.waresMap,
-        buildPriceMultiplier.value,
-        settings.value.useHQ
-      )
-    },
     getCurrentEfficiency: () => currentEfficiency.value,
     getActualWorkforce: () => actualWorkforce.value,
     getBuildPriceMultiplier: () => buildPriceMultiplier.value,
