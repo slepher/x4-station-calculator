@@ -1,6 +1,6 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionWorkbenchStoreContract } from '@/types/production-workbench-contract'
-import type { ProductionTabItem, StationTabBarEmits } from '@/types/production-ui'
+import type { ProductionWorkbenchCapabilities } from '@/types/production-workbench-contract'
+import type { ProductionTabItem } from '@/types/production-ui'
 
 export interface TabbarPresenterProps {
   tabs: ComputedRef<ProductionTabItem[]>
@@ -10,12 +10,38 @@ export interface TabbarPresenterProps {
   canOpenContextMenu: boolean
 }
 
-export interface UseProductionTabbarPresenterReturn {
-  props: TabbarPresenterProps
-  emits: StationTabBarEmits
+export interface TabbarPresenterEmits {
+  selectOverview: () => void
+  selectTransit: (sectorId: string) => void
+  selectStation: (stationId: string) => void
+  createStation: () => unknown
+  renameStation: (stationId: string) => void
+  duplicateStation: (stationId: string) => unknown
+  deleteStation: (stationId: string) => void
+  expandSector: (sectorId: string | null) => void
 }
 
-export function useProductionTabbarPresenter(store: ProductionWorkbenchStoreContract): UseProductionTabbarPresenterReturn {
+export interface UseProductionTabbarPresenterReturn {
+  props: TabbarPresenterProps
+  emits: TabbarPresenterEmits
+}
+
+export interface TabbarPresenterStore {
+  capabilities: ProductionWorkbenchCapabilities
+  getTabs(): ProductionTabItem[]
+  getActiveTabId(): string | null
+  getExpandedSectorId(): string | null
+  selectOverview(): void
+  selectTransit(sectorId: string): void
+  selectStation(stationId: string): void
+  createStation(name?: string): unknown
+  renameStation(stationId: string, name: string): void
+  duplicateStation(stationId: string): unknown
+  deleteStation(stationId: string): void
+  expandSector(sectorId: string | null): void
+}
+
+export function useProductionTabbarPresenter(store: TabbarPresenterStore): UseProductionTabbarPresenterReturn {
   const props: TabbarPresenterProps = {
     tabs: computed(() => store.getTabs()),
     activeTabId: computed(() => store.getActiveTabId()),
@@ -24,7 +50,7 @@ export function useProductionTabbarPresenter(store: ProductionWorkbenchStoreCont
     canOpenContextMenu: !store.capabilities.uniqueStation
   }
 
-  const emits: StationTabBarEmits = {
+  const emits: TabbarPresenterEmits = {
     selectOverview: () => store.selectOverview(),
     selectTransit: (sectorId: string) => store.selectTransit(sectorId),
     selectStation: (stationId: string) => store.selectStation(stationId),

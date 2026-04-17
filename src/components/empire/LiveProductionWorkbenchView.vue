@@ -44,28 +44,16 @@ watch(() => activeViewStore.activeBinding, (newGuid) => {
   }
 })
 
-const tabbarPresenter = useProductionTabbarPresenter(liveStore.workbench)
-const toolbarPresenter = useProductionToolbarPresenter(liveStore.workbench)
-const planningPresenter = useProductionPlanningPresenter(liveStore.workbench)
-const wareflowPresenter = useProductionWareflowPresenter(liveStore.workbench)
-const dashboardPresenter = useProductionDashboardPresenter(liveStore.workbench)
-
-const activeStation = computed(() => liveStore.activeStation)
-const activeTransitSectorId = computed(() => liveStore.activeTransitSectorId)
-const isOverview = computed(() => !activeStation.value && !activeTransitSectorId.value)
-
-const stationContext = computed(() => liveStore.stationContext)
-
-const hasBindingStation = computed(() => stationContext.value?.hasBinding ?? false)
-const hasSaveStation = computed(() => stationContext.value?.hasArchive ?? false)
-const mode = computed(() => liveStore.mode)
-const canToggle = computed(() => liveStore.canToggle)
-const archiveModules = computed(() => stationContext.value?.archiveModules || [])
-const buildingModules = computed(() => stationContext.value?.buildingModules || [])
+const tabbarPresenter = useProductionTabbarPresenter(liveStore)
+const toolbarPresenter = useProductionToolbarPresenter(liveStore)
+const planningPresenter = useProductionPlanningPresenter(liveStore)
+const wareflowPresenter = useProductionWareflowPresenter(liveStore)
+const dashboardPresenter = useProductionDashboardPresenter(liveStore)
 
 const importModalActiveStation = computed(() => {
-  if (!activeStation.value) return null
-  return { id: activeStation.value.id, modules: activeStation.value.modules }
+  const station = liveStore.stationState
+  if (!station || station.entityType !== 'station') return null
+  return { id: station.id, modules: station.plannedModules }
 })
 
 const empireWareFlowDerived = useEmpireWareFlowDerived({
@@ -96,7 +84,7 @@ const showArchiveModuleList = computed(() => {
   />
   
   <LiveOverviewToolbar
-    v-if="isOverview"
+    v-if="liveStore.session.workbenchMode === 'overview'"
     :title-model="toolbarPresenter.props.titleModel.value"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
@@ -106,18 +94,18 @@ const showArchiveModuleList = computed(() => {
   />
   
   <LiveTransitToolbar
-    v-if="activeTransitSectorId"
+    v-if="liveStore.session.workbenchMode === 'transit'"
     :title-model="toolbarPresenter.props.titleModel.value"
     :station-code="toolbarPresenter.props.stationCode.value"
     :sector-name="toolbarPresenter.props.sectorName.value"
     :sector-name-id="toolbarPresenter.props.sectorNameId.value"
-    :station-position="toolbarPresenter.props.stationPosition.value"
+    :station-position="toolbarPresenter.props.position.value"
     :sector-resources="toolbarPresenter.props.sectorResources.value"
     :sector-sunlight="toolbarPresenter.props.sectorSunlight.value"
     :settings="liveStore.transitHubSettings"
     :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
-    :mode="mode"
+    :mode="liveStore.session.mode"
     :visual-mode="planningPresenter.props.visualMode.value"
     :can-toggle="true"
     :has-archive-trade-station="planningPresenter.props.hasArchive.value"
@@ -127,18 +115,18 @@ const showArchiveModuleList = computed(() => {
   />
   
   <LiveStationToolbar
-    v-if="activeStation"
+    v-if="liveStore.session.workbenchMode === 'station'"
     :station-name="toolbarPresenter.props.station.value?.name || ''"
     :station-code="toolbarPresenter.props.stationCode.value"
     :sector-name="toolbarPresenter.props.sectorName.value"
     :sector-name-id="toolbarPresenter.props.sectorNameId.value"
-    :station-position="toolbarPresenter.props.stationPosition.value"
+    :station-position="toolbarPresenter.props.position.value"
     :sector-resources="toolbarPresenter.props.sectorResources.value"
     :sector-sunlight="toolbarPresenter.props.sectorSunlight.value"
-    :has-binding-station="hasBindingStation"
-    :has-save-station="hasSaveStation"
-    :mode="mode"
-    :can-toggle="canToggle"
+    :has-binding-station="liveStore.context.hasBinding"
+    :has-save-station="liveStore.context.hasArchive"
+    :mode="liveStore.session.mode"
+    :can-toggle="liveStore.session.canToggle"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
@@ -153,7 +141,7 @@ const showArchiveModuleList = computed(() => {
   <ImportPlanModal
     :isOpen="liveStore.importModalOpen"
     :initialTab="'logic-flow'"
-    :isOverview="isOverview"
+    :isOverview="liveStore.session.workbenchMode === 'overview'"
     productionSource="save-binding"
     :activeStationId="liveStore.activeStationId"
     :activeStation="importModalActiveStation"
@@ -164,8 +152,8 @@ const showArchiveModuleList = computed(() => {
     @close="liveStore.importModalOpen = false"
   />
 
-<template v-if="isOverview || activeTransitSectorId">
-    <div v-if="activeTransitSectorId" class="main-layout mt-6">
+<template v-if="liveStore.session.workbenchMode === 'overview' || liveStore.session.workbenchMode === 'transit'">
+    <div v-if="liveStore.session.workbenchMode === 'transit'" class="main-layout mt-6">
       <div class="col-span-12 lg:col-span-3">
         <ArchiveModuleList
           v-if="showArchiveModuleList"
@@ -204,7 +192,7 @@ const showArchiveModuleList = computed(() => {
       </div>
     </div>
 
-    <div v-else-if="isOverview" class="overview-layout mt-6">
+    <div v-else-if="liveStore.session.workbenchMode === 'overview'" class="overview-layout mt-6">
       <div class="overview-left-panel panel-card">
         <div class="panel-header">{{ t('save_import.title') }}</div>
         <div class="panel-content">
@@ -233,10 +221,10 @@ const showArchiveModuleList = computed(() => {
         :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
         :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
-        :mode="mode"
-        :archive-modules="archiveModules"
-        :building-modules="buildingModules"
-        :has-archive="hasSaveStation"
+        :mode="liveStore.session.mode"
+        :archive-modules="liveStore.context.archiveModules"
+        :building-modules="liveStore.context.buildingModules"
+        :has-archive="liveStore.context.hasArchive"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
       />
     </div>

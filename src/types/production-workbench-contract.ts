@@ -5,6 +5,7 @@ import type {
 } from './x4'
 import type { WareFlowViewMode, EmpireGapItem } from './production-ui'
 import type { WareProductionFlow } from './production-flow'
+import type { StationAnalysis } from '../store/logic/analyzeStation'
 
 export interface ProductionWorkbenchCapabilities {
   uniqueWorkbench: boolean
@@ -27,39 +28,62 @@ export interface ImportPayload {
 }
 
 export interface ProductionAddModuleOptions {
-  source?: 'planning' | 'gap'
   wareId?: string
 }
 
-export interface ProductionWorkbenchSessionState {
+export interface ProductionSessionState {
   workbenchMode: 'overview' | 'station' | 'transit'
+  entityType: 'overview' | 'station' | 'transit'
   mode: 'planning' | 'live'
   visualMode: 'planning' | 'live'
   activeStationId: string | null
   activeTransitSectorId: string | null
+  activeBinding: string | null
   canToggle: boolean
 }
 
-export interface ProductionWorkbenchContextState {
-  hasBinding: boolean
-  hasArchive: boolean
+export interface ProductionContextState {
   stationCode: string
+  sectorId: string | null
   sectorName: string
   sectorNameId?: string
-  stationPosition?: { x: number; y: number; z: number }
+  position?: { x: number; y: number; z: number }
   sectorResources: string[]
   sectorSunlight: number
+  hasBinding: boolean
+  hasArchive: boolean
   archiveModules: SavedModule[]
   buildingModules: SavedModule[]
 }
 
+export interface ProductionStationState {
+  entityType: 'station' | 'transit'
+  id: string
+  name: string
+  plannedModules: SavedModule[]
+  resolvedModules: SavedModule[]
+  autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
+  autoInfrastructureModules: SavedModule[]
+  productionFlows: WareProductionFlow[]
+  warePriorityLevels: Record<string, number>
+  stationAnalysis: StationAnalysis
+  settings: StationSettings
+}
+
+export type ProductionWorkbenchSessionState = ProductionSessionState
+export type ProductionWorkbenchContextState = ProductionContextState
+
 export type ProductionRemoveModuleTarget =
-  | { index: number; source?: 'planning' }
-  | { moduleId: string; source: 'gap'; wareId?: string }
+  | { index: number }
 
 export interface ProductionWorkbenchStoreContract {
   mode: 'blueprint' | 'live'
   capabilities: ProductionWorkbenchCapabilities
+
+  session: ProductionSessionState
+  context: ProductionContextState
+  stationState: ProductionStationState | null
 
   getTabs(): ProductionTabItem[]
   getActiveTabId(): string | null
@@ -107,17 +131,7 @@ export interface ProductionWorkbenchStoreContract {
   }
   getEmpireGaps(): { operations: EmpireGapItem[]; supply: EmpireGapItem[] }
 
-  getStationAnalysis(): {
-    totalCost: number
-    totalVolume: number
-    totalTime: number
-    totalCapacity: number
-    totalNeeded: number
-    playerHQNeeded: number
-    totalWorkerDiff: number
-    moduleGroups: any[]
-    summaryItems: any[]
-  }
+  getStationAnalysis(): StationAnalysis
   getDashboardSettings(): {
     transportShipCapacity: number
     workforceAuto: boolean
@@ -155,8 +169,10 @@ export interface ProductionWorkbenchStoreContract {
   updateShowEmpireGaps(value: boolean): void
 
   updatePlannedModules(modules: SavedModule[]): void
-  addModule(moduleId: string, options?: ProductionAddModuleOptions): void
-  removeModule(target: ProductionRemoveModuleTarget): void
+  addModule(moduleId: string, count?: number): void
+  addWareModule(wareId: string): void
+  removeWareModule(wareId: string): void
+  removeModule(index: number): void
   updateModuleCount(index: number, count: number): void
 
   updateWareflowViewMode(value: WareFlowViewMode): void

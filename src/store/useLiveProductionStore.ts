@@ -1,30 +1,20 @@
 import { defineStore, storeToRefs } from 'pinia'
 import { ref, computed, watch } from 'vue'
 import type {
-  StationPlan,
-  StationType,
-  SavedModule,
-  GroupedFlows,
-  StationSettings,
-  SupplyPlanningInput,
-  SectorInternalData,
-  X4Module,
-  BindingStationPlan,
-  TradeStationBinding
-} from '@/types/x4'
-import type { ProductionSessionContext } from '@/types/production-context'
-import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
-import type {
-  ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
-  ProductionAddModuleOptions,
-  ProductionRemoveModuleTarget,
-  ImportPayload
+  ImportPayload,
+  ProductionSessionState,
+  ProductionContextState,
+  ProductionStationState,
+  ProductionWorkbenchStoreContract
 } from '@/types/production-workbench-contract'
+import type { SectorInternalData } from '@/types/x4'
+import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
-import i18n from '@/i18n'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
+import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, X4Module, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
+import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
@@ -543,15 +533,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return stationContext.value?.hasArchive ? 'live' : 'planning'
   })
 
-  const sessionState = computed(() => ({
-    workbenchMode: workbenchMode.value,
-    mode: mode.value,
-    visualMode: visualMode.value,
-    activeStationId: activeStationId.value,
-    activeTransitSectorId: activeTransitSectorId.value,
-    canToggle: workbenchMode.value === 'transit' ? true : canToggle.value
-  }))
-
   function toggleMode() {
     mode.value = mode.value === 'live' ? 'planning' : 'live'
   }
@@ -787,8 +768,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
-
-  const wares = computed(() => gameData.waresMap)
 
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
 
@@ -1221,10 +1200,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeStationId.value = transitTabId
   }
 
-  function selectOverview() {
-    activeStationId.value = null
-  }
-
   function updateStationSettings(stationId: string, settings: Partial<StationSettings>) {
     const station = getDerivedBindingStation(stationId)
     const current = station?.settings || DEFAULT_STATION_SETTINGS
@@ -1307,14 +1282,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function isEmptyForSave() {
     return !activeBinding.value
-  }
-
-  const session: ProductionSessionContext = {
-    isDirty: computed(() => isDirty.value).value,
-    save: saveBinding,
-    discard: discardChanges,
-    canSave: computed(() => !isEmptyForSave()).value,
-    canDiscard: computed(() => isDirty.value).value
   }
 
   function validateActiveStationId() {
@@ -1477,206 +1444,331 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const workbench: ProductionWorkbenchStoreContract = {
+  const session = computed<ProductionSessionState>(() => ({
+    workbenchMode: workbenchMode.value,
+    entityType: workbenchMode.value,
+    mode: mode.value,
+    visualMode: visualMode.value,
+    activeStationId: activeStationId.value,
+    activeTransitSectorId: activeTransitSectorId.value,
+    activeBinding: activeBinding.value?.gameGuid || null,
+    canToggle: workbenchMode.value === 'transit' ? true : canToggle.value
+  }))
+
+  const context = computed<ProductionContextState>(() => {
+    const ctx = stationContext.value
+    return {
+      stationCode: ctx?.stationCode || '',
+      sectorId: activeTransitSectorId.value || activeStation.value?.sectorId || null,
+      sectorName: ctx?.sectorName || '',
+      sectorNameId: ctx?.sectorNameId,
+      position: ctx?.position,
+      sectorResources: ctx?.sectorResources || [],
+      sectorSunlight: ctx?.sectorSunlight ?? 100,
+      hasBinding: ctx?.hasBinding ?? false,
+      hasArchive: ctx?.hasArchive ?? false,
+      archiveModules: ctx?.archiveModules || [],
+      buildingModules: ctx?.buildingModules || []
+    }
+  })
+
+  const stationState = computed<ProductionStationState | null>(() => {
+    const wm = workbenchMode.value
+    if (wm === 'overview') return null
+    
+    if (wm === 'transit') {
+      const sectorId = activeTransitSectorId.value
+      if (!sectorId) return null
+      const flows = mode.value === 'live' 
+        ? liveFlowFacade.getSectorFinalProductionFlows(sectorId)
+        : planningFlowFacade.getSectorFinalProductionFlows(sectorId)
+      const autoInfra = stationProductionFlowMap.getSectorAutoInfrastructureModules(sectorId)
+      return {
+        entityType: 'transit',
+        id: sectorId,
+        name: sectors.value.find(s => s.id === sectorId)?.name || sectorId,
+        plannedModules: [],
+        resolvedModules: autoInfra,
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: autoInfra,
+        productionFlows: flows,
+        warePriorityLevels: {},
+        stationAnalysis: {
+          totalCost: 0,
+          totalVolume: 0,
+          totalTime: 0,
+          totalCapacity: 0,
+          totalNeeded: 0,
+          playerHQNeeded: 0,
+          totalWorkerDiff: 0,
+          summaryItems: [],
+          moduleGroups: []
+        },
+        settings: transitHubSettings.value as StationSettings
+      }
+    }
+    
+    const station = activeStation.value
+    if (!station) return null
+    const state = activeStationState.value
+    const allModules = state.resolvedModules
+    return {
+      entityType: 'station',
+      id: station.id,
+      name: station.name,
+      plannedModules: state.plannedModules,
+      resolvedModules: state.resolvedModules,
+      autoIndustryModules: state.autoIndustryModules,
+      autoHabitationModules: state.autoHabitationModules,
+      autoInfrastructureModules: state.autoInfrastructureModules,
+      productionFlows: state.productionFlows,
+      warePriorityLevels: state.warePriorityLevels,
+      stationAnalysis: allModules.length === 0 ? {
+        totalCost: 0,
+        totalVolume: 0,
+        totalTime: 0,
+        totalCapacity: 0,
+        totalNeeded: 0,
+        playerHQNeeded: 0,
+        totalWorkerDiff: 0,
+        summaryItems: [],
+        moduleGroups: []
+      } : analyzeStation(allModules, gameData.modulesMap, gameData.waresMap, buildPriceMultiplier.value, settings.value.useHQ),
+      settings: settings.value
+    }
+  })
+
+  const getTabs = () => {
+    const result: any[] = []
+    result.push({ id: 'overview', type: 'overview', name: '' })
+    sectors.value.forEach(sector => {
+      result.push({ id: `transit:${sector.id}`, type: 'transit', name: sector.name, sectorId: sector.id })
+      if (expandedSectorId.value === sector.id) {
+        orderedStationsBySector.value
+          .filter(s => s.sectorId === sector.id)
+          .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: s.sectorId ?? undefined, stationType: s.type }))
+      }
+    })
+    orderedStationsBySector.value
+      .filter(s => !s.sectorId)
+      .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: undefined, stationType: s.type }))
+    return result
+  }
+
+  const getActiveTabId = () => activeTransitSectorId.value ? `transit:${activeTransitSectorId.value}` : activeStationId.value || 'overview'
+  const getExpandedSectorId = () => expandedSectorId.value
+  const getTitleModel = () => ({
+    value: activeBinding.value?.bindingName || activeBindingName.value || '',
+    placeholder: i18n.global.t('binding.new_binding_name')
+  })
+  const getToolbarStation = () => activeStation.value ? {
+    id: activeStation.value.id,
+    name: activeStation.value.name,
+    type: activeStation.value.type || 'industrial',
+    count: activeStation.value.count ?? 1,
+    minerals: activeStation.value.minerals || []
+  } : null
+  const getToolbarSettings = () => activeStation.value ? settings.value : null
+  const getToolbarRaces = () => [
+    { value: 'argon', label: i18n.global.t('toolbar.races.argon') },
+    { value: 'terran', label: i18n.global.t('toolbar.races.terran') },
+    { value: 'teladi', label: i18n.global.t('toolbar.races.teladi') },
+    { value: 'paranid', label: i18n.global.t('toolbar.races.paranid') },
+    { value: 'split', label: i18n.global.t('toolbar.races.split') }
+  ]
+  const getToolbarStationTypes = () => [
+    { value: 'industrial' as StationType, label: i18n.global.t('toolbar.station_types.industrial') },
+    { value: 'supply' as StationType, label: i18n.global.t('toolbar.station_types.supply') },
+    { value: 'transit' as StationType, label: i18n.global.t('toolbar.station_types.transit') },
+    { value: 'shipyard' as StationType, label: i18n.global.t('toolbar.station_types.shipyard') }
+  ]
+  const getAvailableMinerals = () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane']
+  const getSingleBerthThroughput = () => Math.max(1, settings.value.transportShipCapacity || 1) * 15
+  const getToolbarStationCode = () => stationContext.value?.stationCode || ''
+  const getToolbarSectorName = () => stationContext.value?.sectorName || ''
+  const getToolbarSectorNameId = () => stationContext.value?.sectorNameId
+  const getToolbarStationPosition = () => stationContext.value?.position
+  const getToolbarSectorResources = () => stationContext.value?.sectorResources || []
+  const getToolbarSectorSunlight = () => stationContext.value?.sectorSunlight ?? 100
+  const getPlannedModules = () => workbenchMode.value === 'transit'
+    ? activeStationState.value.autoInfrastructureModules
+    : plannedModules.value
+  const getAutoModules = () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoIndustryModules
+  const getAutoHabitationModules = () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoHabitationModules
+  const getAutoInfrastructureModules = () => workbenchMode.value === 'transit'
+    ? stationProductionFlowMap.getSectorAutoInfrastructureModules(activeTransitSectorId.value || '')
+    : activeStationState.value.autoInfrastructureModules
+  const getResolvedModules = () => workbenchMode.value === 'transit'
+    ? stationProductionFlowMap.getSectorAutoInfrastructureModules(activeTransitSectorId.value || '')
+    : activeStationState.value.resolvedModules
+  const getEnforceDlcActivation = () => enforceDlcActivation.value
+  const getWareflowViewMode = () => wareflowViewMode.value
+  const getProductionFlows = () => workbenchMode.value === 'transit'
+    ? (mode.value === 'live'
+        ? liveFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || '')
+        : planningFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || ''))
+    : productionFlows.value
+  const getWarePriorityLevels = () => workbenchMode.value === 'transit' ? {} : warePriorityLevels.value
+  const getWareflowSettings = () => ({
+    resourceBufferHours: settings.value.resourceBufferHours,
+    primaryProductBufferHours: settings.value.primaryProductBufferHours,
+    secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
+    buyMultiplier: settings.value.buyMultiplier,
+    sellMultiplier: settings.value.sellMultiplier,
+    racePreference: settings.value.racePreference,
+    showEmpireGaps: mode.value === 'live' ? false : settings.value.showEmpireGaps ?? false,
+    transportMinutes: settings.value.transportMinutes
+  })
+  const getEmpireGaps = () => empireGapsComputed.value
+  const getStationAnalysis = () => {
+    if (workbenchMode.value === 'transit') {
+      return {
+        totalCost: 0,
+        totalVolume: 0,
+        totalTime: 0,
+        totalCapacity: 0,
+        totalNeeded: 0,
+        playerHQNeeded: 0,
+        totalWorkerDiff: 0,
+        summaryItems: [],
+        moduleGroups: []
+      }
+    }
+    const allModules = activeStationState.value.resolvedModules
+    if (allModules.length === 0) {
+      return {
+        totalCost: 0,
+        totalVolume: 0,
+        totalTime: 0,
+        totalCapacity: 0,
+        totalNeeded: 0,
+        playerHQNeeded: 0,
+        totalWorkerDiff: 0,
+        summaryItems: [],
+        moduleGroups: []
+      }
+    }
+    return analyzeStation(
+      allModules,
+      gameData.modulesMap,
+      gameData.waresMap,
+      buildPriceMultiplier.value,
+      settings.value.useHQ
+    )
+  }
+  const getDashboardSettings = () => ({
+    transportShipCapacity: settings.value.transportShipCapacity,
+    workforceAuto: settings.value.workforceAuto,
+    manualWorkforce: settings.value.manualWorkforce,
+    useHQ: settings.value.useHQ
+  })
+  const getCurrentEfficiency = () => workbenchMode.value === 'transit' ? 0 : currentEfficiency.value
+  const getActualWorkforce = () => workbenchMode.value === 'transit' ? 0 : actualWorkforce.value
+  const getBuildPriceMultiplier = () => buildPriceMultiplier.value
+  const getImportActiveStation = () => activeStation.value ? { id: activeStation.value.id, modules: activeStation.value.modules } : null
+  const selectOverviewAction = () => selectStation(null)
+  const selectTransit = (sectorId: string) => selectTransitSector(sectorId)
+  const expandSector = (sectorId: string | null) => { expandedSectorId.value = sectorId }
+  const createWorkbenchStation = (name?: string, type?: StationType) => {
+    const station = createStation(name || i18n.global.t('sector.new_station_name'), type || 'industrial')
+    return station?.id || null
+  }
+  const updateTitle = (value: string) => { activeBindingName.value = value }
+  const updateStationNameFromActive = (value: string) => {
+    if (activeStation.value) renameStation(activeStation.value.id, value)
+  }
+  const updateStationTypeFromActive = (value: StationType) => {
+    if (activeStation.value) updateStationType(activeStation.value.id, value)
+  }
+  const updateStationCountFromActive = (value: number) => {
+    if (activeStation.value) updateStationCount(activeStation.value.id, value)
+  }
+  const toggleMineralFromActive = (mineral: string) => {
+    if (!activeStation.value) return
+    const current = activeStation.value.minerals || []
+    const newMinerals = current.includes(mineral)
+      ? current.filter((m: string) => m !== mineral)
+      : [...current, mineral]
+    updateStationMinerals(activeStation.value.id, newMinerals)
+  }
+  const addWareModule = (wareId: string) => {
+    const module = gameData.findModuleForWare(wareId, settings.value.racePreference)
+    if (module) addModule(module.id, 1)
+  }
+  const removeWareModule = (wareId: string) => {
+    const module = gameData.findModuleForWare(wareId, settings.value.racePreference)
+    if (!module) return
+    const plannedIndex = plannedModules.value.findIndex(m => m.id === module.id)
+    if (plannedIndex === -1) return
+    const current = plannedModules.value[plannedIndex]?.count ?? 0
+    if (current <= 1) removeModule(plannedIndex)
+    else updateModuleCount(plannedIndex, current - 1)
+  }
+
+  const deprecatedWorkbench: ProductionWorkbenchStoreContract = {
     mode: 'live',
     capabilities,
-
+    get session() { return session.value },
+    get context() { return context.value },
+    get stationState() { return stationState.value },
     getTabs: () => {
-      const result: any[] = []
-      result.push({ id: 'overview', type: 'overview', name: '' })
-      sectors.value.forEach(sector => {
-        result.push({ id: `transit:${sector.id}`, type: 'transit', name: sector.name, sectorId: sector.id })
-        if (expandedSectorId.value === sector.id) {
-          orderedStationsBySector.value
-            .filter(s => s.sectorId === sector.id)
-            .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: s.sectorId ?? undefined, stationType: s.type }))
-        }
-      })
-      orderedStationsBySector.value
-        .filter(s => !s.sectorId)
-        .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: undefined, stationType: s.type }))
-      return result
+      return getTabs()
     },
-    getActiveTabId: () => activeTransitSectorId.value ? `transit:${activeTransitSectorId.value}` : activeStationId.value || 'overview',
-    getExpandedSectorId: () => expandedSectorId.value,
-    getWorkbenchMode: () => activeTransitSectorId.value ? 'transit' : (activeStation.value ? 'station' : 'overview'),
+    getActiveTabId: () => getActiveTabId(),
+    getExpandedSectorId: () => getExpandedSectorId(),
+    getWorkbenchMode: () => workbenchMode.value,
     getActiveStationId: () => activeStationId.value,
     getActiveTransitSectorId: () => activeTransitSectorId.value,
-    getSessionState: () => sessionState.value,
-    getContextState: () => ({
-      hasBinding: stationContext.value?.hasBinding ?? false,
-      hasArchive: stationContext.value?.hasArchive ?? false,
-      stationCode: stationContext.value?.stationCode || '',
-      sectorName: stationContext.value?.sectorName || '',
-      sectorNameId: stationContext.value?.sectorNameId,
-      stationPosition: stationContext.value?.position,
-      sectorResources: stationContext.value?.sectorResources || [],
-      sectorSunlight: stationContext.value?.sectorSunlight ?? 100,
-      archiveModules: stationContext.value?.archiveModules || [],
-      buildingModules: stationContext.value?.buildingModules || []
-    }),
-
-    getTitleModel: () => ({
-      value: activeBinding.value?.bindingName || activeBindingName.value || '',
-      placeholder: i18n.global.t('binding.new_binding_name')
-    }),
-    getToolbarStation: () => activeStation.value ? {
-      id: activeStation.value.id,
-      name: activeStation.value.name,
-      type: activeStation.value.type || 'industrial',
-      count: activeStation.value.count ?? 1,
-      minerals: activeStation.value.minerals || []
-    } : null,
-    getToolbarSettings: () => activeStation.value ? settings.value : null,
-    getToolbarRaces: () => [
-      { value: 'argon', label: i18n.global.t('toolbar.races.argon') },
-      { value: 'terran', label: i18n.global.t('toolbar.races.terran') },
-      { value: 'teladi', label: i18n.global.t('toolbar.races.teladi') },
-      { value: 'paranid', label: i18n.global.t('toolbar.races.paranid') },
-      { value: 'split', label: i18n.global.t('toolbar.races.split') }
-    ],
-    getToolbarStationTypes: () => [
-      { value: 'industrial' as StationType, label: i18n.global.t('toolbar.station_types.industrial') },
-      { value: 'supply' as StationType, label: i18n.global.t('toolbar.station_types.supply') },
-      { value: 'transit' as StationType, label: i18n.global.t('toolbar.station_types.transit') },
-      { value: 'shipyard' as StationType, label: i18n.global.t('toolbar.station_types.shipyard') }
-    ],
-    getAvailableMinerals: () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane'],
-    getSingleBerthThroughput: () => Math.max(1, settings.value.transportShipCapacity || 1) * 15,
-
-    getToolbarStationCode: () => {
-      return stationContext.value?.stationCode || ''
-    },
-    getToolbarSectorName: () => {
-      return stationContext.value?.sectorName || ''
-    },
-    getToolbarSectorNameId: () => {
-      return stationContext.value?.sectorNameId
-    },
-    getToolbarStationPosition: () => {
-      return stationContext.value?.position
-    },
-    getToolbarSectorResources: () => {
-      return stationContext.value?.sectorResources || []
-    },
-    getToolbarSectorSunlight: () => {
-      return stationContext.value?.sectorSunlight ?? 100
-    },
-
-    getPlannedModules: () => workbenchMode.value === 'transit'
-      ? activeStationState.value.autoInfrastructureModules
-      : plannedModules.value,
-    getAutoModules: () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoIndustryModules,
-    getAutoHabitationModules: () => workbenchMode.value === 'transit' ? [] : activeStationState.value.autoHabitationModules,
-    getAutoInfrastructureModules: () => workbenchMode.value === 'transit'
-      ? stationProductionFlowMap.getSectorAutoInfrastructureModules(activeTransitSectorId.value || '')
-      : activeStationState.value.autoInfrastructureModules,
-    getResolvedModules: () => workbenchMode.value === 'transit'
-      ? stationProductionFlowMap.getSectorAutoInfrastructureModules(activeTransitSectorId.value || '')
-      : activeStationState.value.resolvedModules,
-    getEnforceDlcActivation: () => enforceDlcActivation.value,
-
-    getWareflowViewMode: () => wareflowViewMode.value,
-    getProductionFlows: () => workbenchMode.value === 'transit'
-      ? (mode.value === 'live'
-          ? liveFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || '')
-          : planningFlowFacade.getSectorFinalProductionFlows(activeTransitSectorId.value || ''))
-      : productionFlows.value,
-    getWarePriorityLevels: () => workbenchMode.value === 'transit' ? {} : warePriorityLevels.value,
-    getWareflowSettings: () => ({
-      resourceBufferHours: settings.value.resourceBufferHours,
-      primaryProductBufferHours: settings.value.primaryProductBufferHours,
-      secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
-      buyMultiplier: settings.value.buyMultiplier,
-      sellMultiplier: settings.value.sellMultiplier,
-      racePreference: settings.value.racePreference,
-      showEmpireGaps: mode.value === 'live' ? false : settings.value.showEmpireGaps ?? false,
-      transportMinutes: settings.value.transportMinutes
-    }),
-    getEmpireGaps: () => empireGapsComputed.value,
-
-    getStationAnalysis: () => {
-      if (workbenchMode.value === 'transit') {
-        return {
-          totalCost: 0,
-          totalVolume: 0,
-          totalTime: 0,
-          totalCapacity: 0,
-          totalNeeded: 0,
-          playerHQNeeded: 0,
-          totalWorkerDiff: 0,
-          summaryItems: [],
-          moduleGroups: []
-        }
-      }
-      const allModules = activeStationState.value.resolvedModules
-      if (allModules.length === 0) {
-        return {
-          totalCost: 0,
-          totalVolume: 0,
-          totalTime: 0,
-          totalCapacity: 0,
-          totalNeeded: 0,
-          playerHQNeeded: 0,
-          totalWorkerDiff: 0,
-          summaryItems: [],
-          moduleGroups: []
-        }
-      }
-      return analyzeStation(
-        allModules,
-        gameData.modulesMap,
-        gameData.waresMap,
-        buildPriceMultiplier.value,
-        settings.value.useHQ
-      )
-    },
-    getDashboardSettings: () => ({
-      transportShipCapacity: settings.value.transportShipCapacity,
-      workforceAuto: settings.value.workforceAuto,
-      manualWorkforce: settings.value.manualWorkforce,
-      useHQ: settings.value.useHQ
-    }),
-    getCurrentEfficiency: () => workbenchMode.value === 'transit' ? 0 : currentEfficiency.value,
-    getActualWorkforce: () => workbenchMode.value === 'transit' ? 0 : actualWorkforce.value,
-    getBuildPriceMultiplier: () => buildPriceMultiplier.value,
+    getSessionState: () => session.value,
+    getContextState: () => context.value,
+    getTitleModel,
+    getToolbarStation,
+    getToolbarSettings,
+    getToolbarRaces,
+    getToolbarStationTypes,
+    getAvailableMinerals,
+    getSingleBerthThroughput,
+    getToolbarStationCode,
+    getToolbarSectorName,
+    getToolbarSectorNameId,
+    getToolbarStationPosition,
+    getToolbarSectorResources,
+    getToolbarSectorSunlight,
+    getPlannedModules,
+    getAutoModules,
+    getAutoHabitationModules,
+    getAutoInfrastructureModules,
+    getResolvedModules,
+    getEnforceDlcActivation,
+    getWareflowViewMode,
+    getProductionFlows,
+    getWarePriorityLevels,
+    getWareflowSettings,
+    getEmpireGaps,
+    getStationAnalysis,
+    getDashboardSettings,
+    getCurrentEfficiency,
+    getActualWorkforce,
+    getBuildPriceMultiplier,
 
     isOverview: () => !activeStation.value && !activeTransitSectorId.value,
     getProductionSource: () => 'save-binding',
     getImportActiveStationId: () => activeStationId.value,
-    getImportActiveStation: () => activeStation.value ? { id: activeStation.value.id, modules: activeStation.value.modules } : null,
-
-    selectOverview: () => selectStation(null),
-    selectTransit: (sectorId: string) => selectTransitSector(sectorId),
+    getImportActiveStation,
+    selectOverview: selectOverviewAction,
+    selectTransit,
     selectStation: (stationId: string) => selectStation(stationId),
-    expandSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
-
-    createStation: (name?: string, type?: StationType) => {
-      const station = createStation(name || i18n.global.t('sector.new_station_name'), type || 'industrial')
-      return station?.id || null
-    },
+    expandSector,
+    createStation: createWorkbenchStation,
     renameStation: (stationId: string, name: string) => renameStation(stationId, name),
     duplicateStation: () => null,
     deleteStation: (stationId: string) => deleteStation(stationId),
-
-    updateTitle: (value: string) => { activeBindingName.value = value },
-    updateStationName: (value: string) => {
-      if (activeStation.value) renameStation(activeStation.value.id, value)
-    },
-    updateStationType: (value: StationType) => {
-      if (activeStation.value) updateStationType(activeStation.value.id, value)
-    },
-    updateStationCount: (value: number) => {
-      if (activeStation.value) updateStationCount(activeStation.value.id, value)
-    },
-    toggleMineral: (mineral: string) => {
-      if (!activeStation.value) return
-      const current = activeStation.value.minerals || []
-      const newMinerals = current.includes(mineral)
-        ? current.filter((m: string) => m !== mineral)
-        : [...current, mineral]
-      updateStationMinerals(activeStation.value.id, newMinerals)
-    },
+    updateTitle,
+    updateStationName: updateStationNameFromActive,
+    updateStationType: updateStationTypeFromActive,
+    updateStationCount: updateStationCountFromActive,
+    toggleMineral: toggleMineralFromActive,
     updateSunlight: (value: number) => updateStationSettingsDirect('sunlight', value),
     updateTransportMinutes: (value: number) => updateStationSettingsDirect('transportMinutes', value),
     updateRacePreference: (value: string) => updateStationSettingsDirect('racePreference', value),
@@ -1686,27 +1778,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     updatePlannedModules: (modules: SavedModule[]) => {
       if (activeStation.value) updateStationModules(activeStation.value.id, modules)
     },
-    addModule: (moduleId: string, options?: ProductionAddModuleOptions) => {
-      if (options?.source === 'gap' && options.wareId) {
-        const module = gameData.findModuleForWare(options.wareId, settings.value.racePreference)
-        if (module) addModule(module.id, 1)
-      } else {
-        addModule(moduleId, 1)
-      }
-    },
-    removeModule: (target: ProductionRemoveModuleTarget) => {
-      if ('moduleId' in target && target.source === 'gap') {
-        const module = gameData.findModuleForWare(target.wareId || '', settings.value.racePreference)
-        if (!module) return
-        const plannedIndex = plannedModules.value.findIndex(m => m.id === module.id)
-        if (plannedIndex === -1) return
-        const current = plannedModules.value[plannedIndex]?.count ?? 0
-        if (current <= 1) removeModule(plannedIndex)
-        else updateModuleCount(plannedIndex, current - 1)
-      } else {
-        removeModule(target.index)
-      }
-    },
+    addModule: (moduleId: string, count?: number) => addModule(moduleId, count ?? 1),
+    addWareModule,
+    removeWareModule,
+    removeModule: (index: number) => removeModule(index),
     updateModuleCount: (index: number, count: number) => updateModuleCount(index, count),
 
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
@@ -1745,7 +1820,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     isReady,
     isDirty,
     isEmptyForSave,
-    session,
     activeBinding,
     activeBindingName,
     activeStation,
@@ -1770,20 +1844,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     deleteStation,
     renameStation,
     getLinkedSectors,
-    selectStation,
-    selectTransitSector,
-    selectOverview,
     getStationById,
     getDerivedBindingStation,
-    stationContext,
     mode,
     initialMode,
     canToggle,
     toggleMode,
     updateStationSettings,
     updateStationModules,
-    updateStationType,
-    updateStationCount,
     updateStationMinerals,
     applyImportedStationPayload,
     renameBindingSector,
@@ -1794,27 +1862,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getSectorInternalData,
     getSectorLinkCalc,
     getStationComponentGapFlows,
-    buildPriceMultiplier,
     playerStationRecords,
-    plannedModules,
-    settings,
-    lockedWares,
-    warePriority,
-    activeStationState,
-    productionFlows,
-    warePriorityLevels,
-    actualWorkforce,
-    currentEfficiency,
-    wares,
-    enforceDlcActivation,
     updatePlannedModules,
     updateSetting: updateStationSettingsDirect,
-    toggleWareLock,
-    toggleWarePriority,
-    getResolvedLevel,
-    isWareLocked,
-    isWareOperable,
-    isPlannedWare,
     isAutoWare,
     isModuleDlcActive,
     isModuleCountEditable,
@@ -1825,11 +1875,82 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     removeModuleById,
     transferModuleFromAutoIndustry,
     clearAll: clearAllModules,
-    workbench,
     importModalOpen,
     planningFlowFacade,
     liveFlowFacade,
     planningSourceView,
-    liveSourceView
+    liveSourceView,
+
+    session,
+    context,
+    stationState,
+    capabilities,
+    getTabs,
+    getActiveTabId,
+    getExpandedSectorId,
+    getTitleModel,
+    getToolbarStation,
+    getToolbarSettings,
+    getToolbarRaces,
+    getToolbarStationTypes,
+    getAvailableMinerals,
+    getSingleBerthThroughput,
+    getToolbarStationCode,
+    getToolbarSectorName,
+    getToolbarSectorNameId,
+    getToolbarStationPosition,
+    getToolbarSectorResources,
+    getToolbarSectorSunlight,
+    getPlannedModules,
+    getAutoModules,
+    getAutoHabitationModules,
+    getAutoInfrastructureModules,
+    getResolvedModules,
+    getEnforceDlcActivation,
+    getWareflowViewMode,
+    getProductionFlows,
+    getWarePriorityLevels,
+    getWareflowSettings,
+    getEmpireGaps,
+    getStationAnalysis,
+    getDashboardSettings,
+    getCurrentEfficiency,
+    getActualWorkforce,
+    getBuildPriceMultiplier,
+    updateTitle,
+    updateStationName: updateStationNameFromActive,
+    updateStationType: updateStationTypeFromActive,
+    updateStationCount: updateStationCountFromActive,
+    toggleMineral: toggleMineralFromActive,
+    updateSunlight: deprecatedWorkbench.updateSunlight,
+    updateTransportMinutes: deprecatedWorkbench.updateTransportMinutes,
+    updateRacePreference: deprecatedWorkbench.updateRacePreference,
+    updateWorkforce: deprecatedWorkbench.updateWorkforce,
+    updateShowEmpireGaps: deprecatedWorkbench.updateShowEmpireGaps,
+    openImport: deprecatedWorkbench.openImport,
+    updateWareflowViewMode: deprecatedWorkbench.updateWareflowViewMode,
+    updateResourceBufferHours: deprecatedWorkbench.updateResourceBufferHours,
+    updatePrimaryProductBufferHours: deprecatedWorkbench.updatePrimaryProductBufferHours,
+    updateSecondaryProductBufferHours: deprecatedWorkbench.updateSecondaryProductBufferHours,
+    updateBuyMultiplier: deprecatedWorkbench.updateBuyMultiplier,
+    updateSellMultiplier: deprecatedWorkbench.updateSellMultiplier,
+    updateTransportShipCapacity: deprecatedWorkbench.updateTransportShipCapacity,
+    updateBuildPriceMultiplier: deprecatedWorkbench.updateBuildPriceMultiplier,
+    updateManualWorkforce: deprecatedWorkbench.updateManualWorkforce,
+    updateWorkforceAuto: deprecatedWorkbench.updateWorkforceAuto,
+    updateUseHQ: deprecatedWorkbench.updateUseHQ,
+    expandSector,
+    duplicateStation: deprecatedWorkbench.duplicateStation,
+    selectOverview: selectOverviewAction,
+    selectTransit,
+    selectStation,
+    addWareModule,
+    removeWareModule,
+    isWareLocked: deprecatedWorkbench.isWareLocked,
+    getResolvedLevel: deprecatedWorkbench.getResolvedLevel,
+    isWareOperable: deprecatedWorkbench.isWareOperable,
+    isPlannedWare: deprecatedWorkbench.isPlannedWare,
+    toggleWareLock: deprecatedWorkbench.toggleWareLock,
+    toggleWarePriority: deprecatedWorkbench.toggleWarePriority
   }
 })

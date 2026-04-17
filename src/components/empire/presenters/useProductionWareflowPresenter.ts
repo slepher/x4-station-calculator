@@ -1,6 +1,6 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionWorkbenchStoreContract } from '@/types/production-workbench-contract'
-import type { StationWareFlowsDashboardEmits, WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
+import type { ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
+import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { WareProductionFlow } from '@/types/production-flow'
 
 export interface WareflowPresenterProps {
@@ -28,19 +28,61 @@ export interface WareflowPresenterProps {
   onToggleWarePriority: (wareId: string) => void
 }
 
-export interface UseProductionWareflowPresenterReturn {
-  props: WareflowPresenterProps
-  emits: StationWareFlowsDashboardEmits
+export interface WareflowPresenterEmits {
+  updateViewMode: (value: WareFlowViewMode) => void
+  updateResourceBufferHours: (value: number) => void
+  updatePrimaryProductBufferHours: (value: number) => void
+  updateSecondaryProductBufferHours: (value: number) => void
+  updateBuyMultiplier: (value: number) => void
+  updateSellMultiplier: (value: number) => void
+  addGapModule: (wareId: string) => void
+  removeGapModule: (wareId: string) => void
 }
 
-export function useProductionWareflowPresenter(store: ProductionWorkbenchStoreContract): UseProductionWareflowPresenterReturn {
-  const session = computed(() => store.getSessionState())
+export interface UseProductionWareflowPresenterReturn {
+  props: WareflowPresenterProps
+  emits: WareflowPresenterEmits
+}
+
+export interface WareflowPresenterStore {
+  session: ProductionSessionState
+  stationState: ProductionStationState | null
+  getWareflowViewMode(): WareFlowViewMode
+  getWareflowSettings(): {
+    resourceBufferHours: number
+    primaryProductBufferHours: number
+    secondaryProductBufferHours: number
+    buyMultiplier: number
+    sellMultiplier: number
+    racePreference: string
+    showEmpireGaps: boolean
+    transportMinutes?: number
+  }
+  getEmpireGaps(): { operations: EmpireGapItem[]; supply: EmpireGapItem[] }
+  isWareLocked(wareId: string): boolean
+  getResolvedLevel(wareId: string): number
+  isWareOperable(wareId: string): boolean
+  isPlannedWare(wareId: string): boolean
+  toggleWareLock(wareId: string): void
+  toggleWarePriority(wareId: string): void
+  updateWareflowViewMode(value: WareFlowViewMode): void
+  updateTransitHubSettings(patch: any): void
+  updateResourceBufferHours(value: number): void
+  updatePrimaryProductBufferHours(value: number): void
+  updateSecondaryProductBufferHours(value: number): void
+  updateBuyMultiplier(value: number): void
+  updateSellMultiplier(value: number): void
+  addWareModule(wareId: string): void
+  removeWareModule(wareId: string): void
+}
+
+export function useProductionWareflowPresenter(store: WareflowPresenterStore): UseProductionWareflowPresenterReturn {
   const props: WareflowPresenterProps = {
-    workbenchMode: computed(() => session.value.workbenchMode),
-    visualMode: computed(() => session.value.visualMode),
+    workbenchMode: computed(() => store.session.workbenchMode),
+    visualMode: computed(() => store.session.visualMode),
     viewMode: computed(() => store.getWareflowViewMode()),
-    productionFlows: computed(() => store.getProductionFlows()),
-    warePriorityLevels: computed(() => store.getWarePriorityLevels()),
+    productionFlows: computed(() => store.stationState?.productionFlows || []),
+    warePriorityLevels: computed(() => store.stationState?.warePriorityLevels || {}),
     settings: computed(() => store.getWareflowSettings()),
     empireGaps: computed(() => store.getEmpireGaps()),
     isWareLocked: (wareId: string) => store.isWareLocked(wareId),
@@ -51,30 +93,30 @@ export function useProductionWareflowPresenter(store: ProductionWorkbenchStoreCo
     onToggleWarePriority: (wareId: string) => store.toggleWarePriority(wareId)
   }
 
-  const emits: StationWareFlowsDashboardEmits = {
+  const emits: WareflowPresenterEmits = {
     updateViewMode: (value: WareFlowViewMode) => store.updateWareflowViewMode(value),
     updateResourceBufferHours: (value: number) => {
-      if (session.value.workbenchMode === 'transit') store.updateTransitHubSettings({ resourceBufferHours: value })
+      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ resourceBufferHours: value })
       else store.updateResourceBufferHours(value)
     },
     updatePrimaryProductBufferHours: (value: number) => {
-      if (session.value.workbenchMode === 'transit') store.updateTransitHubSettings({ primaryProductBufferHours: value })
+      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ primaryProductBufferHours: value })
       else store.updatePrimaryProductBufferHours(value)
     },
     updateSecondaryProductBufferHours: (value: number) => {
-      if (session.value.workbenchMode === 'transit') store.updateTransitHubSettings({ secondaryProductBufferHours: value })
+      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ secondaryProductBufferHours: value })
       else store.updateSecondaryProductBufferHours(value)
     },
     updateBuyMultiplier: (value: number) => {
-      if (session.value.workbenchMode === 'transit') store.updateTransitHubSettings({ buyMultiplier: value })
+      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ buyMultiplier: value })
       else store.updateBuyMultiplier(value)
     },
     updateSellMultiplier: (value: number) => {
-      if (session.value.workbenchMode === 'transit') store.updateTransitHubSettings({ sellMultiplier: value })
+      if (store.session.workbenchMode === 'transit') store.updateTransitHubSettings({ sellMultiplier: value })
       else store.updateSellMultiplier(value)
     },
-    addGapModule: (wareId: string) => store.addModule('', { source: 'gap', wareId }),
-    removeGapModule: (wareId: string) => store.removeModule({ moduleId: '', source: 'gap', wareId })
+    addGapModule: (wareId: string) => store.addWareModule(wareId),
+    removeGapModule: (wareId: string) => store.removeWareModule(wareId)
   }
 
   return { props, emits }

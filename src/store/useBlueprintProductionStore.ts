@@ -11,13 +11,12 @@ import type {
   EntityLocation
 } from '@/types/x4'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
-import type { ProductionSessionContext } from '@/types/production-context'
 import type {
-  ProductionWorkbenchStoreContract,
   ProductionWorkbenchCapabilities,
-  ProductionAddModuleOptions,
-  ProductionRemoveModuleTarget,
-  ImportPayload
+  ImportPayload,
+  ProductionSessionState,
+  ProductionContextState,
+  ProductionStationState
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import i18n from '@/i18n'
@@ -201,13 +200,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
-  const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
+const warePriorityLevels = computed(() => activeStationState.value.warePriorityLevels)
   const productionFlows = computed(() => activeStationState.value.productionFlows)
-
-  const stationContext = computed<null>(() => null)
-
-  const wares = computed(() => gameData.waresMap)
-
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
 
   function updatePlannedModules(modules: SavedModule[]): void {
@@ -733,21 +727,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return !hasStations
   }
 
-  const session: ProductionSessionContext = {
-    isDirty: computed(() => isDirty.value).value,
-    save: saveEmpire,
-    discard: () => {
-      const empireId = savedEmpires.value.activeId
-      if (empireId) {
-        loadEmpire(empireId)
-      } else {
-        createEmpire()
-      }
-    },
-    canSave: computed(() => !isEmptyForSave()).value,
-    canDiscard: computed(() => isDirty.value).value
-  }
-
   async function initialize() {
     console.log('[BlueprintProductionStore] Initializing...')
     isReady.value = false
@@ -879,10 +858,66 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
   })
 
-  const workbench: ProductionWorkbenchStoreContract = {
-    mode: 'blueprint',
-    capabilities,
+  const session = computed<ProductionSessionState>(() => ({
+    workbenchMode: activeStation.value ? 'station' : 'overview',
+    entityType: activeStation.value ? 'station' : 'overview',
+    mode: 'planning',
+    visualMode: 'planning',
+    activeStationId: activeStationId.value,
+    activeTransitSectorId: null,
+    activeBinding: activeEmpire.value?.id || null,
+    canToggle: false
+  }))
 
+  const context = computed<ProductionContextState>(() => {
+    const sectorId = activeStation.value?.sectorId
+    const sectorData = sectorId ? gameData.maps.sectors[sectorId] : null
+    return {
+      stationCode: '',
+      sectorId: sectorId || null,
+      sectorName: sectorData?.name || '',
+      sectorNameId: sectorData?.nameId,
+      position: undefined,
+      sectorResources: (sectorData?.resources || []).map(r => r.ware),
+      sectorSunlight: Math.round((sectorData?.area?.sunlight ?? 1) * 100),
+      hasBinding: !!activeStation.value,
+      hasArchive: false,
+      archiveModules: [],
+      buildingModules: []
+    }
+  })
+
+  const stationState = computed<ProductionStationState | null>(() => {
+    const station = activeStation.value
+    if (!station) return null
+    const state = activeStationState.value
+    return {
+      entityType: 'station',
+      id: station.id,
+      name: station.name,
+      plannedModules: state.plannedModules,
+      resolvedModules: state.resolvedModules,
+      autoIndustryModules: state.autoIndustryModules,
+      autoHabitationModules: state.autoHabitationModules,
+      autoInfrastructureModules: state.autoInfrastructureModules,
+      productionFlows: state.productionFlows,
+      warePriorityLevels: state.warePriorityLevels,
+      stationAnalysis: state.resolvedModules.length === 0 ? {
+        totalCost: 0,
+        totalVolume: 0,
+        totalTime: 0,
+        totalCapacity: 0,
+        totalNeeded: 0,
+        playerHQNeeded: 0,
+        totalWorkerDiff: 0,
+        summaryItems: [],
+        moduleGroups: []
+      } : analyzeStation(state.resolvedModules, gameData.modulesMap, gameData.waresMap, buildPriceMultiplier.value, settings.value.useHQ),
+      settings: settings.value
+    }
+  })
+
+  const workbenchMethods = {
     getTabs: () => orderedStations.value.map(s => ({
       id: s.id,
       type: 'station' as const,
@@ -895,30 +930,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     getWorkbenchMode: () => activeStation.value ? 'station' : 'overview',
     getActiveStationId: () => activeStationId.value,
     getActiveTransitSectorId: () => null,
-    getSessionState: () => ({
-      workbenchMode: activeStation.value ? 'station' : 'overview',
-      mode: 'planning',
-      visualMode: 'planning',
-      activeStationId: activeStationId.value,
-      activeTransitSectorId: null,
-      canToggle: false
-    }),
-    getContextState: () => {
-      const sectorId = activeStation.value?.sectorId
-      const sectorData = sectorId ? gameData.maps.sectors[sectorId] : null
-      return {
-        hasBinding: !!activeStation.value,
-        hasArchive: false,
-        stationCode: '',
-        sectorName: sectorData?.name || '',
-        sectorNameId: sectorData?.nameId,
-        stationPosition: undefined,
-        sectorResources: (sectorData?.resources || []).map(r => r.ware),
-        sectorSunlight: Math.round((sectorData?.area?.sunlight ?? 1) * 100),
-        archiveModules: [],
-        buildingModules: []
-      }
-    },
+    getSessionState: () => session.value,
+    getContextState: () => context.value,
 
     getTitleModel: () => ({
       value: activeEmpire.value?.name || '',
@@ -1078,27 +1091,21 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateShowEmpireGaps: (value: boolean) => updateStationSettingsDirect('showEmpireGaps', value),
 
     updatePlannedModules: (modules: SavedModule[]) => updatePlannedModules(modules),
-    addModule: (moduleId: string, options?: ProductionAddModuleOptions) => {
-      if (options?.source === 'gap' && options.wareId) {
-        const module = gameData.findModuleForWare(options.wareId, settings.value.racePreference)
-        if (module) addModule(module.id, 1)
-      } else {
-        addModule(moduleId, 1)
-      }
+    addModule: (moduleId: string, count?: number) => addModule(moduleId, count ?? 1),
+    addWareModule: (wareId: string) => {
+      const module = gameData.findModuleForWare(wareId, settings.value.racePreference)
+      if (module) addModule(module.id, 1)
     },
-    removeModule: (target: ProductionRemoveModuleTarget) => {
-      if ('moduleId' in target && target.source === 'gap') {
-        const module = gameData.findModuleForWare(target.wareId || '', settings.value.racePreference)
-        if (!module) return
-        const plannedIndex = plannedModules.value.findIndex(m => m.id === module.id)
-        if (plannedIndex === -1) return
-        const current = plannedModules.value[plannedIndex]?.count ?? 0
-        if (current <= 1) removeModule(plannedIndex)
-        else updateModuleCount(plannedIndex, current - 1)
-      } else {
-        removeModule(target.index)
-      }
+    removeWareModule: (wareId: string) => {
+      const module = gameData.findModuleForWare(wareId, settings.value.racePreference)
+      if (!module) return
+      const plannedIndex = plannedModules.value.findIndex(m => m.id === module.id)
+      if (plannedIndex === -1) return
+      const current = plannedModules.value[plannedIndex]?.count ?? 0
+      if (current <= 1) removeModule(plannedIndex)
+      else updateModuleCount(plannedIndex, current - 1)
     },
+    removeModule: (index: number) => removeModule(index),
     updateModuleCount: (index: number, count: number) => updateModuleCount(index, count),
 
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
@@ -1137,15 +1144,11 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     isReady,
     isDirty,
     isEmptyForSave,
-    session,
     activeEmpire,
     activeStation,
-    activeStationState,
     activeStationId,
-    stationContext,
     orderedStations,
     savedEmpires,
-    workbench,
     importModalOpen,
     getStationFlowCache,
     refreshStationFlowCache,
@@ -1159,16 +1162,16 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     loadEmpire,
     deleteEmpire,
     createEmpire,
-    createStation,
+    createStation: workbenchMethods.createStation,
     deleteStation,
-    duplicateStation,
+    duplicateStation: workbenchMethods.duplicateStation,
     renameStation,
     selectStation,
     getStationById,
     updateStationSettings,
     updateStationModules,
-    updateStationType,
-    updateStationCount,
+    updateStationType: workbenchMethods.updateStationType,
+    updateStationCount: workbenchMethods.updateStationCount,
     updateStationMinerals,
     setStationLocation,
     applyImportedStationPayload,
@@ -1176,17 +1179,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     takeSnapshot,
     initialize,
     getStationComponentGapFlows,
-    buildPriceMultiplier,
-    plannedModules,
-    settings,
-    lockedWares,
-    warePriority,
-    actualWorkforce,
-    currentEfficiency,
-    productionFlows,
-    warePriorityLevels,
-    wares,
-    enforceDlcActivation,
     updatePlannedModules,
     updateSetting: updateStationSettingsDirect,
     toggleWareLock,
@@ -1204,6 +1196,55 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateModuleCount,
     removeModuleById,
     transferModuleFromAutoIndustry,
-    clearAll: clearAllModules
+    clearAll: clearAllModules,
+
+    session,
+    context,
+    stationState,
+    capabilities,
+    getTabs: workbenchMethods.getTabs,
+    getActiveTabId: workbenchMethods.getActiveTabId,
+    getExpandedSectorId: workbenchMethods.getExpandedSectorId,
+    getTitleModel: workbenchMethods.getTitleModel,
+    getToolbarStation: workbenchMethods.getToolbarStation,
+    getToolbarSettings: workbenchMethods.getToolbarSettings,
+    getToolbarRaces: workbenchMethods.getToolbarRaces,
+    getToolbarStationTypes: workbenchMethods.getToolbarStationTypes,
+    getAvailableMinerals: workbenchMethods.getAvailableMinerals,
+    getSingleBerthThroughput: workbenchMethods.getSingleBerthThroughput,
+    getEnforceDlcActivation: workbenchMethods.getEnforceDlcActivation,
+    getWareflowViewMode: workbenchMethods.getWareflowViewMode,
+    getWareflowSettings: workbenchMethods.getWareflowSettings,
+    getEmpireGaps: workbenchMethods.getEmpireGaps,
+    getDashboardSettings: workbenchMethods.getDashboardSettings,
+    getCurrentEfficiency: workbenchMethods.getCurrentEfficiency,
+    getActualWorkforce: workbenchMethods.getActualWorkforce,
+    getBuildPriceMultiplier: workbenchMethods.getBuildPriceMultiplier,
+    updateTitle: workbenchMethods.updateTitle,
+    updateStationName: workbenchMethods.updateStationName,
+    updateSunlight: workbenchMethods.updateSunlight,
+    updateTransportMinutes: workbenchMethods.updateTransportMinutes,
+    updateRacePreference: workbenchMethods.updateRacePreference,
+    updateWorkforce: workbenchMethods.updateWorkforce,
+    updateShowEmpireGaps: workbenchMethods.updateShowEmpireGaps,
+    openImport: workbenchMethods.openImport,
+    updateWareflowViewMode: workbenchMethods.updateWareflowViewMode,
+    updateResourceBufferHours: workbenchMethods.updateResourceBufferHours,
+    updatePrimaryProductBufferHours: workbenchMethods.updatePrimaryProductBufferHours,
+    updateSecondaryProductBufferHours: workbenchMethods.updateSecondaryProductBufferHours,
+    updateBuyMultiplier: workbenchMethods.updateBuyMultiplier,
+    updateSellMultiplier: workbenchMethods.updateSellMultiplier,
+    updateTransitHubSettings: workbenchMethods.updateTransitHubSettings,
+    updateTransportShipCapacity: workbenchMethods.updateTransportShipCapacity,
+    updateBuildPriceMultiplier: workbenchMethods.updateBuildPriceMultiplier,
+    updateManualWorkforce: workbenchMethods.updateManualWorkforce,
+    updateWorkforceAuto: workbenchMethods.updateWorkforceAuto,
+    updateUseHQ: workbenchMethods.updateUseHQ,
+    selectOverview: workbenchMethods.selectOverview,
+    selectTransit: () => {},
+    expandSector: workbenchMethods.expandSector,
+    toggleMineral: workbenchMethods.toggleMineral,
+    addWareModule: workbenchMethods.addWareModule,
+    removeWareModule: workbenchMethods.removeWareModule
   }
 })

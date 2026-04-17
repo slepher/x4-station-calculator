@@ -1,7 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionWorkbenchStoreContract } from '@/types/production-workbench-contract'
-import type { StationDashboardEmits } from '@/types/production-ui'
+import type { ProductionSessionState, ProductionContextState, ProductionStationState } from '@/types/production-workbench-contract'
 import type { SavedModule } from '@/types/x4'
+import type { StationAnalysis } from '@/store/logic/analyzeStation'
 
 export interface DashboardPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
@@ -9,17 +9,7 @@ export interface DashboardPresenterProps {
   plannedModules: ComputedRef<SavedModule[]>
   activeModules: ComputedRef<SavedModule[]>
   activeBuildingModules: ComputedRef<SavedModule[]>
-  stationAnalysis: ComputedRef<{
-    totalCost: number
-    totalVolume: number
-    totalNeeded: number
-    totalCapacity: number
-    totalTime: number
-    playerHQNeeded: number
-    totalWorkerDiff: number
-    moduleGroups: any[]
-    summaryItems: any[]
-  }>
+  stationAnalysis: ComputedRef<StationAnalysis>
   settings: ComputedRef<{
     transportShipCapacity: number
     workforceAuto: boolean
@@ -31,38 +21,76 @@ export interface DashboardPresenterProps {
   buildPriceMultiplier: ComputedRef<number>
 }
 
-export interface UseProductionDashboardPresenterReturn {
-  props: DashboardPresenterProps
-  emits: StationDashboardEmits
+export interface DashboardPresenterEmits {
+  updateTransportShipCapacity: (value: number) => void
+  updateBuildPriceMultiplier: (value: number) => void
+  updateManualWorkforce: (value: number) => void
+  updateWorkforceAuto: (value: boolean) => void
+  updateUseHQ: (value: boolean) => void
 }
 
-export function useProductionDashboardPresenter(store: ProductionWorkbenchStoreContract): UseProductionDashboardPresenterReturn {
-  const session = computed(() => store.getSessionState())
-  const context = computed(() => store.getContextState())
+export interface UseProductionDashboardPresenterReturn {
+  props: DashboardPresenterProps
+  emits: DashboardPresenterEmits
+}
+
+export interface DashboardPresenterStore {
+  session: ProductionSessionState
+  context: ProductionContextState
+  stationState: ProductionStationState | null
+  getDashboardSettings(): {
+    transportShipCapacity: number
+    workforceAuto: boolean
+    manualWorkforce: number
+    useHQ: boolean
+  }
+  getCurrentEfficiency(): number
+  getActualWorkforce(): number
+  getBuildPriceMultiplier(): number
+  updateTransportShipCapacity(value: number): void
+  updateBuildPriceMultiplier(value: number): void
+  updateManualWorkforce(value: number): void
+  updateWorkforceAuto(value: boolean): void
+  updateUseHQ(value: boolean): void
+}
+
+const emptyStationAnalysis: StationAnalysis = {
+  totalCost: 0,
+  totalVolume: 0,
+  totalTime: 0,
+  totalCapacity: 0,
+  totalNeeded: 0,
+  playerHQNeeded: 0,
+  totalWorkerDiff: 0,
+  summaryItems: [],
+  moduleGroups: []
+}
+
+export function useProductionDashboardPresenter(store: DashboardPresenterStore): UseProductionDashboardPresenterReturn {
   const props: DashboardPresenterProps = {
-    workbenchMode: computed(() => session.value.workbenchMode),
-    visualMode: computed(() => session.value.visualMode),
-    plannedModules: computed(() => store.getResolvedModules()),
+    workbenchMode: computed(() => store.session.workbenchMode),
+    visualMode: computed(() => store.session.visualMode),
+    plannedModules: computed(() => store.stationState?.resolvedModules || []),
     activeModules: computed(() => {
-      if (session.value.visualMode === 'live' && context.value.hasArchive) {
-        return context.value.archiveModules
+      if (store.session.visualMode === 'live' && store.context.hasArchive) {
+        return store.context.archiveModules
       }
-      return store.getResolvedModules()
+      return store.stationState?.resolvedModules || []
     }),
     activeBuildingModules: computed(() => {
-      if (session.value.visualMode === 'live' && context.value.hasArchive) {
-        return context.value.buildingModules
+      if (store.session.visualMode === 'live' && store.context.hasArchive) {
+        return store.context.buildingModules
       }
       return []
     }),
-    stationAnalysis: computed(() => store.getStationAnalysis()),
+    stationAnalysis: computed(() => store.stationState?.stationAnalysis || emptyStationAnalysis),
     settings: computed(() => store.getDashboardSettings()),
     currentEfficiency: computed(() => store.getCurrentEfficiency()),
     actualWorkforce: computed(() => store.getActualWorkforce()),
     buildPriceMultiplier: computed(() => store.getBuildPriceMultiplier())
   }
 
-  const emits: StationDashboardEmits = {
+  const emits: DashboardPresenterEmits = {
     updateTransportShipCapacity: (value: number) => store.updateTransportShipCapacity(value),
     updateBuildPriceMultiplier: (value: number) => store.updateBuildPriceMultiplier(value),
     updateManualWorkforce: (value: number) => store.updateManualWorkforce(value),

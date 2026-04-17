@@ -1,6 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionWorkbenchStoreContract } from '@/types/production-workbench-contract'
-import type { StationPlanningPanelEmits } from '@/types/production-ui'
+import type { ProductionContextState, ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
 import type { SavedModule } from '@/types/x4'
 
 export interface PlanningPresenterProps {
@@ -16,28 +15,38 @@ export interface PlanningPresenterProps {
   enforceDlcActivation: ComputedRef<boolean>
 }
 
-export interface UseProductionPlanningPresenterReturn {
-  props: PlanningPresenterProps
-  emits: StationPlanningPanelEmits
+export interface PlanningPresenterEmits {
+  updatePlannedModules: (modules: SavedModule[]) => void
 }
 
-export function useProductionPlanningPresenter(store: ProductionWorkbenchStoreContract): UseProductionPlanningPresenterReturn {
-  const session = computed(() => store.getSessionState())
-  const context = computed(() => store.getContextState())
+export interface UseProductionPlanningPresenterReturn {
+  props: PlanningPresenterProps
+  emits: PlanningPresenterEmits
+}
+
+export interface PlanningPresenterStore {
+  session: ProductionSessionState
+  context: ProductionContextState
+  stationState: ProductionStationState | null
+  getEnforceDlcActivation(): boolean
+  updatePlannedModules(modules: SavedModule[]): void
+}
+
+export function useProductionPlanningPresenter(store: PlanningPresenterStore): UseProductionPlanningPresenterReturn {
   const props: PlanningPresenterProps = {
-    workbenchMode: computed(() => session.value.workbenchMode),
-    visualMode: computed(() => session.value.visualMode),
-    hasArchive: computed(() => context.value.hasArchive),
-    plannedModules: computed(() => store.getPlannedModules()),
-    autoIndustryModules: computed(() => store.getAutoModules()),
-    autoHabitationModules: computed(() => store.getAutoHabitationModules()),
-    autoInfrastructureModules: computed(() => store.getAutoInfrastructureModules()),
-    liveModules: computed(() => context.value.archiveModules),
-    liveBuildingModules: computed(() => context.value.buildingModules),
+    workbenchMode: computed(() => store.session.workbenchMode),
+    visualMode: computed(() => store.session.visualMode),
+    hasArchive: computed(() => store.context.hasArchive),
+    plannedModules: computed(() => store.stationState?.plannedModules || []),
+    autoIndustryModules: computed(() => store.stationState?.autoIndustryModules || []),
+    autoHabitationModules: computed(() => store.stationState?.autoHabitationModules || []),
+    autoInfrastructureModules: computed(() => store.stationState?.autoInfrastructureModules || []),
+    liveModules: computed(() => store.context.archiveModules),
+    liveBuildingModules: computed(() => store.context.buildingModules),
     enforceDlcActivation: computed(() => store.getEnforceDlcActivation())
   }
 
-  const emits: StationPlanningPanelEmits = {
+  const emits: PlanningPresenterEmits = {
     updatePlannedModules: (modules) => store.updatePlannedModules(modules)
   }
 

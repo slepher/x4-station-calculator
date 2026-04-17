@@ -16,7 +16,6 @@ import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
 
 const blueprintStore = useBlueprintProductionStore()
 const activeViewStore = useActiveViewStore()
-const workbench = blueprintStore.workbench
 
 onMounted(() => {
   const empireId = activeViewStore.activeEmpireId
@@ -36,17 +35,23 @@ const importModalOpen = computed({
   set: (value) => { blueprintStore.importModalOpen = value }
 })
 
-const tabbarPresenter = useProductionTabbarPresenter(workbench)
-const toolbarPresenter = useProductionToolbarPresenter(workbench)
-const planningPresenter = useProductionPlanningPresenter(workbench)
-const wareflowPresenter = useProductionWareflowPresenter(workbench)
-const dashboardPresenter = useProductionDashboardPresenter(workbench)
+const tabbarPresenter = useProductionTabbarPresenter(blueprintStore)
+const toolbarPresenter = useProductionToolbarPresenter(blueprintStore)
+const planningPresenter = useProductionPlanningPresenter(blueprintStore)
+const wareflowPresenter = useProductionWareflowPresenter(blueprintStore)
+const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
 
 const activeStation = computed(() => blueprintStore.activeStation)
 const importModalActiveStation = computed(() => {
   if (!activeStation.value) return null
   return { id: activeStation.value.id, modules: activeStation.value.modules }
 })
+
+function createImportStation(name: string, type?: 'industrial' | 'supply' | 'transit' | 'shipyard') {
+  const createdId = blueprintStore.createStation(name, type)
+  if (!createdId) return null
+  return blueprintStore.getStationById(createdId)
+}
 </script>
 
 <template>
@@ -88,7 +93,7 @@ const importModalActiveStation = computed(() => {
     productionSource="empire"
     :activeStationId="blueprintStore.activeStationId"
     :activeStation="importModalActiveStation"
-    :createStation="(name, type) => blueprintStore.createStation(name, type)"
+    :createStation="createImportStation"
     :applyImportedStationPayload="(id, payload) => blueprintStore.applyImportedStationPayload(id, payload)"
     :updateStationModules="(id, modules) => blueprintStore.updateStationModules(id, modules)"
     :getStationById="(id) => blueprintStore.getStationById(id)"

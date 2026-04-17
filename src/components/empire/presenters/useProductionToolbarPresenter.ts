@@ -1,12 +1,11 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionWorkbenchStoreContract } from '@/types/production-workbench-contract'
-import type { ContextToolbarEmits } from '@/types/production-ui'
+import type { ProductionContextState, ProductionSessionState } from '@/types/production-workbench-contract'
 import type { StationType } from '@/types/x4'
 
 export interface ToolbarPresenterProps {
   mode: ComputedRef<'overview' | 'station' | 'transit'>
-  isBindingMode: boolean
   titleModel: ComputedRef<{ value: string; placeholder: string }>
+  settings: ComputedRef<any>
   station: ComputedRef<{
     id: string
     name: string
@@ -14,44 +13,85 @@ export interface ToolbarPresenterProps {
     count: number
     minerals: string[]
   } | null>
-  settings: ComputedRef<any>
+  stationCode: ComputedRef<string>
+  sectorName: ComputedRef<string>
+  sectorNameId: ComputedRef<string | undefined>
+  position: ComputedRef<{ x: number; y: number; z: number } | undefined>
+  sectorResources: ComputedRef<string[]>
+  sectorSunlight: ComputedRef<number>
   races: Array<{ value: string; label: string }>
   stationTypes: Array<{ value: StationType; label: string }>
   availableMinerals: string[]
   singleBerthThroughput: ComputedRef<number>
-  stationCode: ComputedRef<string>
-  sectorName: ComputedRef<string>
-  sectorNameId: ComputedRef<string | undefined>
-  stationPosition: ComputedRef<{ x: number; y: number; z: number } | undefined>
-  sectorResources: ComputedRef<string[]>
-  sectorSunlight: ComputedRef<number>
+}
+
+export interface ToolbarPresenterEmits {
+  updateTitle: (value: string) => void
+  updateStationName: (value: string) => void
+  updateStationType: (value: StationType) => void
+  updateStationCount: (value: number) => void
+  toggleMineral: (mineral: string) => void
+  updateSunlight: (value: number) => void
+  updateTransportMinutes: (value: number) => void
+  updateRacePreference: (value: string) => void
+  updateWorkforce: (value: boolean) => void
+  updateShowEmpireGaps: (value: boolean) => void
+  openImport: () => void
 }
 
 export interface UseProductionToolbarPresenterReturn {
   props: ToolbarPresenterProps
-  emits: ContextToolbarEmits
+  emits: ToolbarPresenterEmits
 }
 
-export function useProductionToolbarPresenter(store: ProductionWorkbenchStoreContract): UseProductionToolbarPresenterReturn {
+export interface ToolbarPresenterStore {
+  session: ProductionSessionState
+  context: ProductionContextState
+  getTitleModel(): { value: string; placeholder: string }
+  getToolbarSettings(): any
+  getToolbarStation(): {
+    id: string
+    name: string
+    type: StationType
+    count: number
+    minerals: string[]
+  } | null
+  getToolbarRaces(): Array<{ value: string; label: string }>
+  getToolbarStationTypes(): Array<{ value: StationType; label: string }>
+  getAvailableMinerals(): string[]
+  getSingleBerthThroughput(): number
+  updateTitle(value: string): void
+  updateStationName(value: string): void
+  updateStationType(value: StationType): void
+  updateStationCount(value: number): void
+  toggleMineral(mineral: string): void
+  updateSunlight(value: number): void
+  updateTransportMinutes(value: number): void
+  updateRacePreference(value: string): void
+  updateWorkforce(value: boolean): void
+  updateShowEmpireGaps(value: boolean): void
+  openImport(): void
+}
+
+export function useProductionToolbarPresenter(store: ToolbarPresenterStore): UseProductionToolbarPresenterReturn {
   const props: ToolbarPresenterProps = {
-    mode: computed(() => store.getWorkbenchMode()),
-    isBindingMode: store.mode === 'live',
+    mode: computed(() => store.session.workbenchMode),
     titleModel: computed(() => store.getTitleModel()),
-    station: computed(() => store.getToolbarStation()),
     settings: computed(() => store.getToolbarSettings()),
+    station: computed(() => store.getToolbarStation()),
+    stationCode: computed(() => store.context.stationCode),
+    sectorName: computed(() => store.context.sectorName),
+    sectorNameId: computed(() => store.context.sectorNameId),
+    position: computed(() => store.context.position),
+    sectorResources: computed(() => store.context.sectorResources),
+    sectorSunlight: computed(() => store.context.sectorSunlight),
     races: store.getToolbarRaces(),
     stationTypes: store.getToolbarStationTypes(),
     availableMinerals: store.getAvailableMinerals(),
-    singleBerthThroughput: computed(() => store.getSingleBerthThroughput()),
-    stationCode: computed(() => store.getToolbarStationCode()),
-    sectorName: computed(() => store.getToolbarSectorName()),
-    sectorNameId: computed(() => store.getToolbarSectorNameId()),
-    stationPosition: computed(() => store.getToolbarStationPosition()),
-    sectorResources: computed(() => store.getToolbarSectorResources()),
-    sectorSunlight: computed(() => store.getToolbarSectorSunlight())
+    singleBerthThroughput: computed(() => store.getSingleBerthThroughput())
   }
 
-  const emits: ContextToolbarEmits = {
+  const emits: ToolbarPresenterEmits = {
     updateTitle: (value: string) => store.updateTitle(value),
     updateStationName: (value: string) => store.updateStationName(value),
     updateStationType: (value) => store.updateStationType(value),
