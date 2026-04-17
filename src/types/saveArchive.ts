@@ -41,7 +41,7 @@ export interface SaveMeta {
   playerName: string
   version: string
   filename: string
-  parser_version: 'v1' | 'v2' | 'v3'
+  parser_version: 'v1' | 'v2' | 'v3' | 'v4'
   post_processor_version?: string
   source: SaveSource
 }
@@ -93,6 +93,11 @@ export interface PlayerStationConstruction {
 
 export interface WareAmount {
   ware: string
+  amount: number
+}
+
+export interface WorkforceEntry {
+  race: string
   amount: number
 }
 
@@ -155,6 +160,7 @@ export interface PlayerStationEntry extends StationBaseEntry {
   cargo?: WareAmount[]
   reservation?: WareAmount[]
   buildstorage_code?: string
+  workforces?: WorkforceEntry[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean

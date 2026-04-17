@@ -104,6 +104,12 @@ pub(crate) struct WareAmount {
     pub(crate) amount: i64,
 }
 
+#[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct WorkforceEntry {
+    pub(crate) race: String,
+    pub(crate) amount: i64,
+}
+
 #[derive(Clone, Serialize, Deserialize, Default)]
 pub(crate) struct Meta {
     pub(crate) guid: String,
@@ -215,6 +221,8 @@ pub(crate) struct PlayerStationEntry {
     pub(crate) reservation: Vec<WareAmount>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) buildstorage_code: Option<String>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) workforces: Vec<WorkforceEntry>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -326,7 +334,10 @@ pub(crate) struct ArchiveMeta {
     pub(crate) filename: String,
     #[serde(rename = "parser_version")]
     pub(crate) parser_version: String,
-    #[serde(rename = "post_processor_version", skip_serializing_if = "Option::is_none")]
+    #[serde(
+        rename = "post_processor_version",
+        skip_serializing_if = "Option::is_none"
+    )]
     pub(crate) post_processor_version: Option<String>,
     pub(crate) source: String,
 }
