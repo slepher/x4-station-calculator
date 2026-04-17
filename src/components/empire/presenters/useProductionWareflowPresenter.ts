@@ -73,10 +73,12 @@ export interface WareflowPresenterStore {
     toggleWareLock(wareId: string): void
     toggleWarePriority(wareId: string): void
   }
+  moduleActions: {
+    addModuleByWare(wareId: string): void
+    removeModuleByWare(wareId: string): void
+  }
   getWareflowViewMode(): WareFlowViewMode
   updateWareflowViewMode(value: WareFlowViewMode): void
-  addWareModule(wareId: string): void
-  removeWareModule(wareId: string): void
   getEmpireGaps(): { operations: EmpireGapItem[]; supply: EmpireGapItem[] }
 }
 
@@ -117,8 +119,8 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
     updateSecondaryProductBufferHours: (value: number) => store.settingActions.updateSecondaryProductBufferHours(value),
     updateBuyMultiplier: (value: number) => store.settingActions.updateBuyMultiplier(value),
     updateSellMultiplier: (value: number) => store.settingActions.updateSellMultiplier(value),
-    addGapModule: (wareId: string) => store.addWareModule(wareId),
-    removeGapModule: (wareId: string) => store.removeWareModule(wareId)
+    addGapModule: (wareId: string) => store.moduleActions.addModuleByWare(wareId),
+    removeGapModule: (wareId: string) => store.moduleActions.removeModuleByWare(wareId)
   }
 
   return { props, emits }

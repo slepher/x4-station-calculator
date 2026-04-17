@@ -867,7 +867,6 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
       count: activeStation.value.count ?? 1,
       minerals: activeStation.value.minerals || []
     } : null,
-    getToolbarSettings: () => activeStation.value ? settings.value : null,
     getToolbarRaces: () => [
       { value: 'argon', label: i18n.global.t('toolbar.races.argon') },
       { value: 'terran', label: i18n.global.t('toolbar.races.terran') },
@@ -921,16 +920,6 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     getWareflowViewMode: () => wareflowViewMode.value,
     getProductionFlows: () => productionFlows.value,
     getWarePriorityLevels: () => warePriorityLevels.value,
-    getWareflowSettings: () => ({
-      resourceBufferHours: settings.value.resourceBufferHours,
-      primaryProductBufferHours: settings.value.primaryProductBufferHours,
-      secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
-      buyMultiplier: settings.value.buyMultiplier,
-      sellMultiplier: settings.value.sellMultiplier,
-      racePreference: settings.value.racePreference,
-      showEmpireGaps: settings.value.showEmpireGaps ?? false,
-      transportMinutes: settings.value.transportMinutes
-    }),
     getEmpireGaps: () => empireGapsComputed.value,
 
     getStationAnalysis: () => {
@@ -958,12 +947,6 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
         settings.value.useHQ
       )
     },
-    getDashboardSettings: () => ({
-      transportShipCapacity: settings.value.transportShipCapacity,
-      workforceAuto: settings.value.workforceAuto,
-      manualWorkforce: settings.value.manualWorkforce,
-      useHQ: settings.value.useHQ
-    }),
     getCurrentEfficiency: () => currentEfficiency.value,
     getActualWorkforce: () => actualWorkforce.value,
     getBuildPriceMultiplier: () => buildPriceMultiplier.value,
@@ -1007,44 +990,14 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
         : [...current, mineral]
       updateStationMinerals(activeStation.value.id, newMinerals)
     },
-    updateSunlight: (value: number) => settingActions.updateSunlight(value),
-    updateTransportMinutes: (value: number) => settingActions.updateTransportMinutes(value),
-    updateRacePreference: (value: string) => settingActions.updateRacePreference(value),
-    updateWorkforce: (value: boolean) => settingActions.updateWorkforce(value),
-    updateShowEmpireGaps: (value: boolean) => settingActions.updateShowEmpireGaps(value),
 
     updatePlannedModules: (modules: SavedModule[]) => updatePlannedModules(modules),
     addModule: (moduleId: string, count?: number) => addModule(moduleId, count ?? 1),
-    addWareModule: (wareId: string) => {
-      const module = gameData.findModuleForWare(wareId, settings.value.racePreference)
-      if (module) addModule(module.id, 1)
-    },
-    removeWareModule: (wareId: string) => {
-      const module = gameData.findModuleForWare(wareId, settings.value.racePreference)
-      if (!module) return
-      const plannedIndex = plannedModules.value.findIndex(m => m.id === module.id)
-      if (plannedIndex === -1) return
-      const current = plannedModules.value[plannedIndex]?.count ?? 0
-      if (current <= 1) removeModule(plannedIndex)
-      else updateModuleCount(plannedIndex, current - 1)
-    },
     removeModule: (index: number) => removeModule(index),
     updateModuleCount: (index: number, count: number) => updateModuleCount(index, count),
 
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
-    updateResourceBufferHours: (value: number) => settingActions.updateResourceBufferHours(value),
-    updatePrimaryProductBufferHours: (value: number) => settingActions.updatePrimaryProductBufferHours(value),
-    updateSecondaryProductBufferHours: (value: number) => settingActions.updateSecondaryProductBufferHours(value),
-    updateBuyMultiplier: (value: number) => settingActions.updateBuyMultiplier(value),
-    updateSellMultiplier: (value: number) => settingActions.updateSellMultiplier(value),
-    toggleWareLock: (wareId: string) => toggleWareLock(wareId),
-    toggleWarePriority: (wareId: string) => toggleWarePriority(wareId),
-
-    updateTransportShipCapacity: (value: number) => settingActions.updateTransportShipCapacity(value),
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
-    updateManualWorkforce: (value: number) => settingActions.updateManualWorkforce(value),
-    updateWorkforceAuto: (value: boolean) => settingActions.updateWorkforceAuto(value),
-    updateUseHQ: (value: boolean) => settingActions.updateUseHQ(value),
 
     openImport: () => { importModalOpen.value = true },
     applyImportedStationPayload: (stationId: string, payload: ImportPayload) => {
@@ -1054,12 +1007,7 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     getStationById: (stationId: string) => {
       const station = getStationById(stationId)
       return station ? { id: station.id, modules: station.modules } : null
-    },
-
-    isWareLocked: (wareId: string) => isWareLocked(wareId),
-    getResolvedLevel: (wareId: string) => getResolvedLevel(wareId),
-    isWareOperable: (wareId: string) => isWareOperable(wareId),
-    isPlannedWare: (wareId: string) => isPlannedWare(wareId)
+    }
   }
 
   return {
@@ -1126,48 +1074,30 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     capabilities,
     settingActions,
     wareRuleActions,
+    moduleActions,
     getTabs: workbenchMethods.getTabs,
     getActiveTabId: workbenchMethods.getActiveTabId,
     getExpandedSectorId: workbenchMethods.getExpandedSectorId,
     getTitleModel: workbenchMethods.getTitleModel,
     getToolbarStation: workbenchMethods.getToolbarStation,
-    getToolbarSettings: workbenchMethods.getToolbarSettings,
     getToolbarRaces: workbenchMethods.getToolbarRaces,
     getToolbarStationTypes: workbenchMethods.getToolbarStationTypes,
     getAvailableMinerals: workbenchMethods.getAvailableMinerals,
     getSingleBerthThroughput: workbenchMethods.getSingleBerthThroughput,
     getEnforceDlcActivation: workbenchMethods.getEnforceDlcActivation,
     getWareflowViewMode: workbenchMethods.getWareflowViewMode,
-    getWareflowSettings: workbenchMethods.getWareflowSettings,
     getEmpireGaps: workbenchMethods.getEmpireGaps,
-    getDashboardSettings: workbenchMethods.getDashboardSettings,
     getCurrentEfficiency: workbenchMethods.getCurrentEfficiency,
     getActualWorkforce: workbenchMethods.getActualWorkforce,
     getBuildPriceMultiplier: workbenchMethods.getBuildPriceMultiplier,
     updateTitle: workbenchMethods.updateTitle,
     updateStationName: workbenchMethods.updateStationName,
-    updateSunlight: workbenchMethods.updateSunlight,
-    updateTransportMinutes: workbenchMethods.updateTransportMinutes,
-    updateRacePreference: workbenchMethods.updateRacePreference,
-    updateWorkforce: workbenchMethods.updateWorkforce,
-    updateShowEmpireGaps: workbenchMethods.updateShowEmpireGaps,
     openImport: workbenchMethods.openImport,
     updateWareflowViewMode: workbenchMethods.updateWareflowViewMode,
-    updateResourceBufferHours: workbenchMethods.updateResourceBufferHours,
-    updatePrimaryProductBufferHours: workbenchMethods.updatePrimaryProductBufferHours,
-    updateSecondaryProductBufferHours: workbenchMethods.updateSecondaryProductBufferHours,
-    updateBuyMultiplier: workbenchMethods.updateBuyMultiplier,
-    updateSellMultiplier: workbenchMethods.updateSellMultiplier,
-    updateTransportShipCapacity: workbenchMethods.updateTransportShipCapacity,
     updateBuildPriceMultiplier: workbenchMethods.updateBuildPriceMultiplier,
-    updateManualWorkforce: workbenchMethods.updateManualWorkforce,
-    updateWorkforceAuto: workbenchMethods.updateWorkforceAuto,
-    updateUseHQ: workbenchMethods.updateUseHQ,
     selectOverview: workbenchMethods.selectOverview,
     selectTransit: () => {},
     expandSector: workbenchMethods.expandSector,
-    toggleMineral: workbenchMethods.toggleMineral,
-    addWareModule: workbenchMethods.addWareModule,
-    removeWareModule: workbenchMethods.removeWareModule
+    toggleMineral: workbenchMethods.toggleMineral
   }
 })
