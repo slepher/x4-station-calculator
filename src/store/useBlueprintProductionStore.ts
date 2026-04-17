@@ -7,7 +7,6 @@ import type {
   SavedModule,
   GroupedFlows,
   StationSettings,
-  X4Module,
   EntityLocation
 } from '@/types/x4'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
@@ -213,15 +212,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
   }
 
-  function getModuleInfo(id: string): X4Module {
-    return gameData.modulesMap[id] || {
-      id, macroId: '', wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
-      buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
-      dockingCount: 0,
-      workforce: { capacity: 0, needed: 0, maxBonus: 0 }
-    } as X4Module
-  }
-
   const moduleActions = createProductionModuleActions<ProductionModuleStation & StationPlan>({
     getActiveStation: () => activeStation.value,
     getComputeDeps,
@@ -266,30 +256,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       }, deps)
     }
   })
-
-  function addModule(id: string = '', count = 1): void {
-    moduleActions.addModule(id, count)
-  }
-
-  function removeModule(index: number): void {
-    moduleActions.removeModule(index)
-  }
-
-  function updateModuleCount(index: number, count: number): void {
-    moduleActions.updateModuleCount(index, count)
-  }
-
-  function removeModuleById(id: string): void {
-    moduleActions.removeModuleById(id)
-  }
-
-  function transferModuleFromAutoIndustry(module: SavedModule): void {
-    moduleActions.transferModuleFromAutoIndustry(module)
-  }
-
-  function clearAllModules(): void {
-    moduleActions.clearAllModules()
-  }
 
   watch(
     () => ({
@@ -925,10 +891,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       updateStationMinerals(activeStation.value.id, newMinerals)
     },
 
-    addModule: (moduleId: string, count?: number) => addModule(moduleId, count ?? 1),
-    removeModule: (index: number) => removeModule(index),
-    updateModuleCount: (index: number, count: number) => updateModuleCount(index, count),
-
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
 
@@ -982,15 +944,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     takeSnapshot,
     initialize,
     getStationComponentGapFlows,
-    isModuleDlcActive,
-    isModuleCountEditable,
-    getModuleInfo,
-    addModule,
-    removeModule,
-    updateModuleCount,
-    removeModuleById,
-    transferModuleFromAutoIndustry,
-    clearAll: clearAllModules,
 
     session,
     context,

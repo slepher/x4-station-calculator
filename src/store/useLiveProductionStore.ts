@@ -11,7 +11,7 @@ import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, Player
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
-import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, X4Module, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
+import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
@@ -283,19 +283,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const group = activeBinding.value?.groups.find(g => g.id === sectorId)
     return group?.settings || {}
   })
-
-  function commitTransitSettingsPatch(patch: Partial<StationSettings>) {
-    const sectorId = activeTransitSectorId.value
-    if (!sectorId) return
-    const gameGuid = activeBinding.value?.gameGuid
-    if (!gameGuid) return
-    const current = migrateStationSettings(transitHubSettings.value)
-    saveBindingStore.updateGroup(gameGuid, sectorId, {
-      settings: migrateStationSettings({ ...current, ...patch })
-    })
-    syncPlanningSectorAggregations()
-    syncLiveSectorAggregations()
-  }
 
   function getDerivedBindingStation(stationId: string): StationPlan | null {
     return planningSourceView.getDerivedBindingStation(stationId)
@@ -785,15 +772,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
   }
 
-  function getModuleInfo(id: string): X4Module {
-    return gameData.modulesMap[id] || {
-      id, macroId: '', wareId: '', nameId: id, type: 'unknown', group: 'others', race: 'unknown', buildTime: 0,
-      buildCost: {}, cycleTime: 0, outputs: {}, inputs: {},
-      dockingCount: 0,
-      workforce: { capacity: 0, needed: 0, maxBonus: 0 }
-    } as X4Module
-  }
-
   const moduleActions = createProductionModuleActions<StationPlan>({
     getActiveStation: () => activeStation.value,
     getComputeDeps,
@@ -858,38 +836,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       syncAfterStationFlowChange(station.id, deps)
     }
   })
-
-  function updatePlannedModules(modules: SavedModule[]): void {
-    moduleActions.updatePlannedModules(modules)
-  }
-
-  function isAutoWare(wareId: string): boolean {
-    return wareRuleActions.isAutoWare(wareId)
-  }
-
-  function addModule(id: string = '', count = 1): void {
-    moduleActions.addModule(id, count)
-  }
-
-  function removeModule(index: number): void {
-    moduleActions.removeModule(index)
-  }
-
-  function updateModuleCount(index: number, count: number): void {
-    moduleActions.updateModuleCount(index, count)
-  }
-
-  function removeModuleById(id: string): void {
-    moduleActions.removeModuleById(id)
-  }
-
-  function transferModuleFromAutoIndustry(module: SavedModule): void {
-    moduleActions.transferModuleFromAutoIndustry(module)
-  }
-
-  function clearAllModules(): void {
-    moduleActions.clearAllModules()
-  }
 
   watch(
     () => ({
@@ -1432,12 +1378,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   ]
   const getAvailableMinerals = () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane']
   const getSingleBerthThroughput = () => Math.max(1, currentWorkbenchSettings.value.transportShipCapacity || 1) * 15
-  const getToolbarStationCode = () => stationContext.value?.stationCode || ''
-  const getToolbarSectorName = () => stationContext.value?.sectorName || ''
-  const getToolbarSectorNameId = () => stationContext.value?.sectorNameId
-  const getToolbarStationPosition = () => stationContext.value?.position
-  const getToolbarSectorResources = () => stationContext.value?.sectorResources || []
-  const getToolbarSectorSunlight = () => stationContext.value?.sectorSunlight ?? 100
   const getEnforceDlcActivation = () => enforceDlcActivation.value
   const getWareflowViewMode = () => wareflowViewMode.value
   const getEmpireGaps = () => empireGapsComputed.value
@@ -1492,14 +1432,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  function updateCurrentSettings(patch: Partial<StationSettings>) {
-    if (workbenchMode.value === 'transit') {
-      commitTransitSettingsPatch(patch)
-      return
-    }
-    settingActions.updateSettings(patch)
-  }
-
   return {
     isReady,
     isDirty,
@@ -1545,18 +1477,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getSectorLinkCalc,
     getStationComponentGapFlows,
     playerStationRecords,
-    updatePlannedModules,
-    updateSetting: (key: keyof StationSettings, value: StationSettings[keyof StationSettings]) => updateCurrentSettings({ [key]: value } as Partial<StationSettings>),
-    isAutoWare,
-    isModuleDlcActive,
-    isModuleCountEditable,
-    getModuleInfo,
-    addModule,
-    removeModule,
-    updateModuleCount,
-    removeModuleById,
-    transferModuleFromAutoIndustry,
-    clearAll: clearAllModules,
     importModalOpen,
     planningFlowFacade,
     liveFlowFacade,
@@ -1579,12 +1499,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getToolbarStationTypes,
     getAvailableMinerals,
     getSingleBerthThroughput,
-    getToolbarStationCode,
-    getToolbarSectorName,
-    getToolbarSectorNameId,
-    getToolbarStationPosition,
-    getToolbarSectorResources,
-    getToolbarSectorSunlight,
     getEnforceDlcActivation,
     getWareflowViewMode,
     getEmpireGaps,
