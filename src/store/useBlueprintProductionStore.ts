@@ -34,6 +34,7 @@ import {
 } from './logic/empireSourceView'
 import { createProductionModuleActions, type ProductionModuleStation } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
+import { createProductionSettingActions } from './actions/productionSettingActions'
 
 function createDefaultEmpire(name: string = ''): EmpirePlan {
   return {
@@ -270,20 +271,6 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
 
   function updatePlannedModules(modules: SavedModule[]): void {
     moduleActions.updatePlannedModules(modules)
-  }
-
-  function updateStationSettingsDirect(key: keyof StationSettings, value: StationSettings[keyof StationSettings]): void {
-    const station = activeStation.value
-    if (!station) return
-    station.settings = migrateStationSettings({ ...station.settings, [key]: value })
-    station.lastUpdated = Date.now()
-    const deps = getComputeDeps()
-    if (deps) stationProductionFlowMap.compute(station.id, {
-      plannedModules: station.modules || [],
-      settings: station.settings,
-      lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {}
-    }, deps)
   }
 
   function isWareOperable(wareId: string): boolean {
@@ -837,6 +824,22 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     }
   })
 
+  const settingActions = createProductionSettingActions<StationPlan>({
+    getActiveStation: () => activeStation.value,
+    getComputeDeps,
+    mergeSettings: (base, patch) => migrateStationSettings({ ...base, ...patch }),
+    now: () => Date.now(),
+    commitStationMutation: () => {},
+    recompute: (station, deps) => {
+      stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules || [],
+        settings: station.settings,
+        lockedWares: station.lockedWares || [],
+        warePriority: station.warePriority || {}
+      }, deps)
+    }
+  })
+
   const workbenchMethods = {
     getTabs: () => orderedStations.value.map(s => ({
       id: s.id,
@@ -1004,11 +1007,11 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
         : [...current, mineral]
       updateStationMinerals(activeStation.value.id, newMinerals)
     },
-    updateSunlight: (value: number) => updateStationSettingsDirect('sunlight', value),
-    updateTransportMinutes: (value: number) => updateStationSettingsDirect('transportMinutes', value),
-    updateRacePreference: (value: string) => updateStationSettingsDirect('racePreference', value),
-    updateWorkforce: (value: boolean) => updateStationSettingsDirect('considerWorkforceForAutoFill', value),
-    updateShowEmpireGaps: (value: boolean) => updateStationSettingsDirect('showEmpireGaps', value),
+    updateSunlight: (value: number) => settingActions.updateSunlight(value),
+    updateTransportMinutes: (value: number) => settingActions.updateTransportMinutes(value),
+    updateRacePreference: (value: string) => settingActions.updateRacePreference(value),
+    updateWorkforce: (value: boolean) => settingActions.updateWorkforce(value),
+    updateShowEmpireGaps: (value: boolean) => settingActions.updateShowEmpireGaps(value),
 
     updatePlannedModules: (modules: SavedModule[]) => updatePlannedModules(modules),
     addModule: (moduleId: string, count?: number) => addModule(moduleId, count ?? 1),
@@ -1029,19 +1032,19 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     updateModuleCount: (index: number, count: number) => updateModuleCount(index, count),
 
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
-    updateResourceBufferHours: (value: number) => updateStationSettingsDirect('resourceBufferHours', value),
-    updatePrimaryProductBufferHours: (value: number) => updateStationSettingsDirect('primaryProductBufferHours', value),
-    updateSecondaryProductBufferHours: (value: number) => updateStationSettingsDirect('secondaryProductBufferHours', value),
-    updateBuyMultiplier: (value: number) => updateStationSettingsDirect('buyMultiplier', value),
-    updateSellMultiplier: (value: number) => updateStationSettingsDirect('sellMultiplier', value),
+    updateResourceBufferHours: (value: number) => settingActions.updateResourceBufferHours(value),
+    updatePrimaryProductBufferHours: (value: number) => settingActions.updatePrimaryProductBufferHours(value),
+    updateSecondaryProductBufferHours: (value: number) => settingActions.updateSecondaryProductBufferHours(value),
+    updateBuyMultiplier: (value: number) => settingActions.updateBuyMultiplier(value),
+    updateSellMultiplier: (value: number) => settingActions.updateSellMultiplier(value),
     toggleWareLock: (wareId: string) => toggleWareLock(wareId),
     toggleWarePriority: (wareId: string) => toggleWarePriority(wareId),
 
-    updateTransportShipCapacity: (value: number) => updateStationSettingsDirect('transportShipCapacity', value),
+    updateTransportShipCapacity: (value: number) => settingActions.updateTransportShipCapacity(value),
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
-    updateManualWorkforce: (value: number) => updateStationSettingsDirect('manualWorkforce', value),
-    updateWorkforceAuto: (value: boolean) => updateStationSettingsDirect('workforceAuto', value),
-    updateUseHQ: (value: boolean) => updateStationSettingsDirect('useHQ', value),
+    updateManualWorkforce: (value: number) => settingActions.updateManualWorkforce(value),
+    updateWorkforceAuto: (value: boolean) => settingActions.updateWorkforceAuto(value),
+    updateUseHQ: (value: boolean) => settingActions.updateUseHQ(value),
     updateTransitHubSettings: () => {},
 
     openImport: () => { importModalOpen.value = true },
@@ -1100,7 +1103,7 @@ const warePriorityLevels = computed(() => activeStationState.value.warePriorityL
     initialize,
     getStationComponentGapFlows,
     updatePlannedModules,
-    updateSetting: updateStationSettingsDirect,
+    updateSetting: (key: keyof StationSettings, value: StationSettings[keyof StationSettings]) => settingActions.updateSetting(key, value),
     toggleWareLock,
     toggleWarePriority,
     getResolvedLevel,

@@ -33,6 +33,7 @@ import { toProductionStation } from './logic/liveStationResolver'
 import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 import { createProductionModuleActions } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
+import { createProductionSettingActions } from './actions/productionSettingActions'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -859,29 +860,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     moduleActions.updatePlannedModules(modules)
   }
 
-  function updateStationSettingsDirect(key: keyof StationSettings, value: StationSettings[keyof StationSettings]): void {
-    const station = activeStation.value
-    if (!station) return
-    station.settings = migrateStationSettings({ ...station.settings, [key]: value })
-    station.lastUpdated = Date.now()
-    const deps = getComputeDeps()
-    if (deps) {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: station.settings,
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
-      updateBindingStationPlan(station.id, {
-        modules: station.modules,
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority,
-        settings: station.settings
-      })
-      syncLiveFlowMapForStation(station.id, deps)
-    }
-  }
-
   function isWareOperable(wareId: string): boolean {
     return wareRuleActions.isWareOperable(wareId)
   }
@@ -1597,6 +1575,32 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     else updateModuleCount(plannedIndex, current - 1)
   }
 
+  const settingActions = createProductionSettingActions<StationPlan>({
+    getActiveStation: () => activeStation.value,
+    getComputeDeps,
+    mergeSettings: (base, patch) => migrateStationSettings({ ...base, ...patch }),
+    now: () => Date.now(),
+    commitStationMutation: (station) => {
+      updateBindingStationPlan(station.id, {
+        modules: station.modules,
+        lockedWares: station.lockedWares,
+        warePriority: station.warePriority,
+        settings: station.settings
+      })
+    },
+    recompute: (station, deps) => {
+      stationProductionFlowMap.compute(station.id, {
+        plannedModules: station.modules || [],
+        settings: station.settings,
+        lockedWares: station.lockedWares || [],
+        warePriority: station.warePriority || {}
+      }, deps)
+    },
+    afterCommit: (station, deps) => {
+      syncAfterStationFlowChange(station.id, deps)
+    }
+  })
+
   const deprecatedWorkbench: ProductionWorkbenchStoreContract = {
     mode: 'live',
     capabilities,
@@ -1660,11 +1664,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     updateStationType: updateStationTypeFromActive,
     updateStationCount: updateStationCountFromActive,
     toggleMineral: toggleMineralFromActive,
-    updateSunlight: (value: number) => updateStationSettingsDirect('sunlight', value),
-    updateTransportMinutes: (value: number) => updateStationSettingsDirect('transportMinutes', value),
-    updateRacePreference: (value: string) => updateStationSettingsDirect('racePreference', value),
-    updateWorkforce: (value: boolean) => updateStationSettingsDirect('considerWorkforceForAutoFill', value),
-    updateShowEmpireGaps: (value: boolean) => updateStationSettingsDirect('showEmpireGaps', value),
+    updateSunlight: (value: number) => settingActions.updateSunlight(value),
+    updateTransportMinutes: (value: number) => settingActions.updateTransportMinutes(value),
+    updateRacePreference: (value: string) => settingActions.updateRacePreference(value),
+    updateWorkforce: (value: boolean) => settingActions.updateWorkforce(value),
+    updateShowEmpireGaps: (value: boolean) => settingActions.updateShowEmpireGaps(value),
 
     updatePlannedModules: (modules: SavedModule[]) => {
       if (activeStation.value) updateStationModules(activeStation.value.id, modules)
@@ -1676,19 +1680,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     updateModuleCount: (index: number, count: number) => updateModuleCount(index, count),
 
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
-    updateResourceBufferHours: (value: number) => updateStationSettingsDirect('resourceBufferHours', value),
-    updatePrimaryProductBufferHours: (value: number) => updateStationSettingsDirect('primaryProductBufferHours', value),
-    updateSecondaryProductBufferHours: (value: number) => updateStationSettingsDirect('secondaryProductBufferHours', value),
-    updateBuyMultiplier: (value: number) => updateStationSettingsDirect('buyMultiplier', value),
-    updateSellMultiplier: (value: number) => updateStationSettingsDirect('sellMultiplier', value),
+    updateResourceBufferHours: (value: number) => settingActions.updateResourceBufferHours(value),
+    updatePrimaryProductBufferHours: (value: number) => settingActions.updatePrimaryProductBufferHours(value),
+    updateSecondaryProductBufferHours: (value: number) => settingActions.updateSecondaryProductBufferHours(value),
+    updateBuyMultiplier: (value: number) => settingActions.updateBuyMultiplier(value),
+    updateSellMultiplier: (value: number) => settingActions.updateSellMultiplier(value),
     toggleWareLock: (wareId: string) => toggleWareLock(wareId),
     toggleWarePriority: (wareId: string) => toggleWarePriority(wareId),
 
-    updateTransportShipCapacity: (value: number) => updateStationSettingsDirect('transportShipCapacity', value),
+    updateTransportShipCapacity: (value: number) => settingActions.updateTransportShipCapacity(value),
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
-    updateManualWorkforce: (value: number) => updateStationSettingsDirect('manualWorkforce', value),
-    updateWorkforceAuto: (value: boolean) => updateStationSettingsDirect('workforceAuto', value),
-    updateUseHQ: (value: boolean) => updateStationSettingsDirect('useHQ', value),
+    updateManualWorkforce: (value: number) => settingActions.updateManualWorkforce(value),
+    updateWorkforceAuto: (value: boolean) => settingActions.updateWorkforceAuto(value),
+    updateUseHQ: (value: boolean) => settingActions.updateUseHQ(value),
     updateTransitHubSettings: (patch: Partial<StationSettings>) => updateTransitHubSettings(patch),
 
     openImport: () => { importModalOpen.value = true },
@@ -1755,7 +1759,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getStationComponentGapFlows,
     playerStationRecords,
     updatePlannedModules,
-    updateSetting: updateStationSettingsDirect,
+    updateSetting: (key: keyof StationSettings, value: StationSettings[keyof StationSettings]) => settingActions.updateSetting(key, value),
     isAutoWare,
     isModuleDlcActive,
     isModuleCountEditable,
