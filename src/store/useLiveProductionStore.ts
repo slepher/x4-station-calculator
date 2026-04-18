@@ -1291,10 +1291,12 @@ warePriorityLevels: {},
     result.push({ id: 'overview', type: 'overview', name: i18n.global.t('sector.overview') })
     
     const stationPlansByCode = new Map<string, BindingStationPlan>()
+    const stationPlansById = new Map<string, BindingStationPlan>()
     activeBinding.value?.stationPlans.forEach(plan => {
       if (plan.saveStationCode) {
         stationPlansByCode.set(plan.saveStationCode, plan)
       }
+      stationPlansById.set(plan.id, plan)
     })
     
     sectors.value.forEach(sector => {
@@ -1303,7 +1305,7 @@ warePriorityLevels: {},
         orderedStationsBySector.value
           .filter(s => s.sectorId === sector.id)
           .forEach(s => {
-            const matchingPlan = stationPlansByCode.get(s.id)
+            const matchingPlan = stationPlansByCode.get(s.id) || stationPlansById.get(s.id)
             const hasPlan = Boolean(matchingPlan)
             
             if (hasPlan && matchingPlan) {
@@ -1353,7 +1355,7 @@ warePriorityLevels: {},
     orderedStationsBySector.value
       .filter(s => !s.sectorId)
       .forEach(s => {
-        const matchingPlan = stationPlansByCode.get(s.id)
+        const matchingPlan = stationPlansByCode.get(s.id) || stationPlansById.get(s.id)
         const hasPlan = Boolean(matchingPlan)
         
         if (hasPlan && matchingPlan) {
