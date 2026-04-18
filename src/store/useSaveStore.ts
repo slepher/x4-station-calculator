@@ -293,7 +293,12 @@ function isArchiveParserVersionValid(archive: Pick<SaveArchive, 'meta'>): boolea
   return archive.meta.parser_version === CURRENT_PARSER_VERSION
 }
 
+function isArchiveParserVersionValidByString(parserVersion: string): boolean {
+  return parserVersion === CURRENT_PARSER_VERSION
+}
+
 function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
+  const isValid = isArchiveParserVersionValidByString(meta.parser_version)
   return {
     meta: {
       guid: meta.guid,
@@ -302,17 +307,13 @@ function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
       playerName: meta.playerName,
       version: meta.version,
       filename: meta.filename,
-      parser_version: meta.parser_version === 'v1'
-        ? 'v1'
-        : meta.parser_version === 'v2'
-          ? 'v2'
-          : 'v3',
+      parser_version: meta.parser_version,
       post_processor_version: meta.post_processor_version as SaveMeta['post_processor_version'],
       source: meta.source
     },
     sectors: {},
     isCompatible: meta.isCompatible,
-    isValid: meta.parser_version === CURRENT_PARSER_VERSION
+    isValid
   }
 }
 
@@ -517,6 +518,14 @@ export const useSaveStore = defineStore('save', () => {
 
       if (savedArchivesState.value.activeArchiveId) {
         await restoreSelectedArchive(savedArchivesState.value.activeArchiveId)
+      }
+      
+      // Check if restored archive is valid
+      const restoredArchive = selectedArchive.value
+      if (restoredArchive && !isArchiveParserVersionValid(restoredArchive)) {
+        selectedArchive.value = null
+        savedArchivesState.value.activeArchiveId = null
+        writeSavedState()
       }
     } catch (error) {
       console.error('[saveStore] initialization failed:', error)

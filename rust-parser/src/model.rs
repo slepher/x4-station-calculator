@@ -195,10 +195,6 @@ pub(crate) struct BuildStorageEntry {
     pub(crate) target_station_component_id: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) constructions: Vec<PlayerStationConstruction>,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(crate) modules: HashMap<String, AggregatedStationModule>,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(crate) equipments: HashMap<String, AggregatedEquipment>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) progress: Option<BuildProgress>,
 }
@@ -211,10 +207,6 @@ pub(crate) struct PlayerStationEntry {
     pub(crate) component_id: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) constructions: Vec<PlayerStationConstruction>,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(crate) modules: HashMap<String, AggregatedStationModule>,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(crate) equipments: HashMap<String, AggregatedEquipment>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) cargo: Vec<WareAmount>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
@@ -229,10 +221,10 @@ pub(crate) struct PlayerStationEntry {
 pub(crate) struct FactionStationEntry {
     #[serde(flatten)]
     pub(crate) base: StationBaseEntry,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(crate) modules: HashMap<String, AggregatedStationModule>,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(crate) equipments: HashMap<String, AggregatedEquipment>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) modules: Vec<AggregatedStationModule>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) equipments: Vec<AggregatedEquipment>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]
@@ -246,10 +238,10 @@ pub(crate) struct AggregatedStationModule {
 pub(crate) struct NpcStationEntry {
     #[serde(flatten)]
     pub(crate) base: StationBaseEntry,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(crate) modules: HashMap<String, AggregatedStationModule>,
-    #[serde(skip_serializing_if = "HashMap::is_empty")]
-    pub(crate) equipments: HashMap<String, AggregatedEquipment>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) modules: Vec<AggregatedStationModule>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) equipments: Vec<AggregatedEquipment>,
 }
 
 #[derive(Clone, Serialize, Deserialize)]

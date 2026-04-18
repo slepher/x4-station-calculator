@@ -135,7 +135,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   async function loadPlayerStationRecords() {
     const archive = selectedArchive.value
-    if (!archive) {
+    if (!archive || !archive.isValid) {
       playerStationRecords.value = []
       return
     }
@@ -365,10 +365,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         const buildstorageEntry = buildstorageRecord.data as BuildStorageEntry
         if (buildstorageEntry.modules) {
           const modulesByMacroId = gameData.modulesByMacroId
-          const stationModuleIds = new Set(modules.map(m => m.id))
           for (const mod of Object.values(buildstorageEntry.modules)) {
             const matchedModule = mod.module_id || modulesByMacroId[mod.ref]?.id
-            if (matchedModule && !stationModuleIds.has(matchedModule)) {
+            if (matchedModule) {
               const existing = buildingModules.find(m => m.id === matchedModule)
               if (existing) {
                 existing.count += mod.amount
@@ -1069,34 +1068,51 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     try {
       await gameData.initialize()
+      await saveStore.initialize()
       await loadPlayerStationRecords()
 
       saveBindingStore.initialize()
 
       const storedGuid = activeViewStore.activeBinding
-      if (storedGuid && saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedGuid)) {
-        openBinding(storedGuid)
+      if (storedGuid) {
+        const bindingExists = saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedGuid)
+        const archiveGroup = saveStore.archives.get(storedGuid)
+        const hasValidArchive = archiveGroup?.saves.some(s => s.isValid) ?? false
+        
+        if (bindingExists && hasValidArchive) {
+          openBinding(storedGuid)
+          syncAllBindingStationsToStateMap()
+          syncLiveFlowMap()
+          validateActiveStationId()
+          isReady.value = true
+          console.log('[LiveProductionStore] Loaded saved binding')
+          return
+        }
+        
+        console.log('[LiveProductionStore] Saved binding invalid, trying fallback')
+      }
+
+      // Fallback to first valid binding
+      const validBinding = saveBindingStore.savedBindings.list.find((b) => {
+        const archiveGroup = saveStore.archives.get(b.gameGuid)
+        return archiveGroup?.saves.some(s => s.isValid) ?? false
+      })
+      
+      if (validBinding) {
+        activeViewStore.activeBinding = validBinding.gameGuid
+        openBinding(validBinding.gameGuid)
         syncAllBindingStationsToStateMap()
         syncLiveFlowMap()
         validateActiveStationId()
         isReady.value = true
-        console.log('[LiveProductionStore] Loaded saved binding')
+        console.log('[LiveProductionStore] Fallback to first valid binding:', validBinding.gameGuid)
         return
       }
 
-      const firstBinding = saveBindingStore.savedBindings.list[0]
-      if (firstBinding) {
-        activeViewStore.activeBinding = firstBinding.gameGuid
-        openBinding(firstBinding.gameGuid)
-        syncAllBindingStationsToStateMap()
-        syncLiveFlowMap()
-        validateActiveStationId()
-        isReady.value = true
-        console.log('[LiveProductionStore] Loaded first binding')
-        return
-      }
-
-      console.log('[LiveProductionStore] No bindings found')
+      // No valid binding found
+      activeViewStore.activeBinding = null
+      activeViewStore.activeBindingStation = null
+      console.log('[LiveProductionStore] No valid bindings found, cleared')
       isReady.value = true
 
     } catch (e) {

@@ -83,7 +83,7 @@ const showArchiveModuleList = computed(() => {
   />
   
   <LiveOverviewToolbar
-    v-if="liveStore.session.workbenchMode === 'overview'"
+    v-if="liveStore.session.workbenchMode === 'overview' && liveStore.activeBinding"
     :title-model="toolbarPresenter.props.titleModel.value"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
@@ -93,7 +93,7 @@ const showArchiveModuleList = computed(() => {
   />
   
   <LiveTransitToolbar
-    v-if="liveStore.session.workbenchMode === 'transit'"
+    v-if="liveStore.session.workbenchMode === 'transit' && liveStore.activeBinding"
     :title-model="toolbarPresenter.props.titleModel.value"
     :station-code="toolbarPresenter.props.stationCode.value"
     :sector-name="toolbarPresenter.props.sectorName.value"
@@ -114,7 +114,7 @@ const showArchiveModuleList = computed(() => {
   />
   
   <LiveStationToolbar
-    v-if="liveStore.session.workbenchMode === 'station'"
+    v-if="liveStore.session.workbenchMode === 'station' && liveStore.activeBinding"
     :station-name="toolbarPresenter.props.station.value?.name || ''"
     :station-code="toolbarPresenter.props.stationCode.value"
     :sector-name="toolbarPresenter.props.sectorName.value"

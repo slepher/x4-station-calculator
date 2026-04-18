@@ -41,7 +41,7 @@ export interface SaveMeta {
   playerName: string
   version: string
   filename: string
-  parser_version: 'v1' | 'v2' | 'v3' | 'v4'
+  parser_version: string
   post_processor_version?: string
   source: SaveSource
 }
@@ -118,8 +118,8 @@ export interface BuildStorageEntry {
   station_code?: string
   target_station_component_id?: string
   constructions?: PlayerStationConstruction[]
-  modules?: CodeMap<AggregatedStationModule>
-  equipments?: CodeMap<AggregatedEquipment>
+  modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   progress?: BuildProgress
 }
 
@@ -155,8 +155,8 @@ export interface StationBaseEntry {
 export interface PlayerStationEntry extends StationBaseEntry {
   component_id?: string
   constructions?: PlayerStationConstruction[]
-  modules?: CodeMap<AggregatedStationModule>
-  equipments?: CodeMap<AggregatedEquipment>
+  modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   cargo?: WareAmount[]
   reservation?: WareAmount[]
   buildstorage_code?: string
@@ -173,8 +173,8 @@ export interface PlayerStationEntry extends StationBaseEntry {
 }
 
 export interface NpcStationEntry extends StationBaseEntry {
-  modules?: CodeMap<AggregatedStationModule>
-  equipments?: CodeMap<AggregatedEquipment>
+  modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean
@@ -190,8 +190,8 @@ export interface NpcStationEntry extends StationBaseEntry {
 }
 
 export interface FactionStationEntry extends StationBaseEntry {
-  modules?: CodeMap<AggregatedStationModule>
-  equipments?: CodeMap<AggregatedEquipment>
+  modules?: AggregatedStationModule[]
+  equipments?: AggregatedEquipment[]
   isShipyard?: boolean
   isWharf?: boolean
   isEquipmentdock?: boolean

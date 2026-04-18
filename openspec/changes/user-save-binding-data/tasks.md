@@ -47,3 +47,20 @@
 ## 后续修正 - Binding 名称字段
 
 - [x] T27. SaveBindingPlan 添加 `bindingName` 字段，创建时从 archive playerName 复制
+
+## Implementation: Modules/Equipments 聚合迁移
+
+- [x] T28. rust-parser: 移除 `aggregated_modules_from_constructions()` 和 `aggregated_equipments_from_constructions()` 函数调用（仅针对 player 站点）
+- [x] T29. rust-parser: `PlayerStationEntry` 和 `BuildStorageEntry` 移除 `modules` 和 `equipments` 字段（NPC/Xenon/Khaak 站点保留）
+- [x] T30. rust-parser: 更新测试用例，验证 player 站点只输出 `constructions` 数组
+- [x] T31. saveParser.post.ts: 新增 `aggregateModules()` 和 `aggregateEquipments()` 函数
+- [x] T32. saveParser.post.ts: 实现 progress.sequenceindex 排除逻辑
+  - 通过 sequenceindex 找到 buildstorage.constructions[index]
+  - 用该 construction 的 id 在 station.constructions 中查找
+  - 从聚合中排除该项（不修改原 construction 数据）
+- [x] T33. saveParser.post.ts: 实现 buildstorage 差值计算
+  - buildstorage.modules = aggregate(buildstorage.constructions) - station.modules
+  - buildstorage.equipments = aggregate(buildstorage.constructions) - station.equipments
+- [x] T34. 构建验证：`npm run build` 通过
+- [x] T35. saveParser.post.ts: 更新 `CURRENT_POST_PROCESSOR_VERSION` 从 `v10` 到 `v11`
+- [x] T36. useLiveProductionStore: 移除重复的 buildstorage.modules 差值计算（已在 post.ts 中处理）

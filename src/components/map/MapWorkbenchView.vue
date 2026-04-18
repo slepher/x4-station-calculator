@@ -455,6 +455,7 @@ const buildBindingPreview = (
 
 const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
   if (!savePoiVisibility.value.playerStation) return []
+  if (!activeMapArchive.value) return []
   const activePlan = saveBindingStore.activeBinding
   if (!activePlan) return []
 
@@ -593,9 +594,11 @@ const bindingOverlays = computed<PlacementOverlayItem[]>(() => {
   return overlays
 })
 
-const activeMapArchive = computed<SaveArchive | null>(() =>
-  saveStore.selectedArchive
-)
+const activeMapArchive = computed<SaveArchive | null>(() => {
+  const archive = saveStore.selectedArchive
+  if (archive && !archive.isValid) return null
+  return archive
+})
 
 const savePoiVisibility = computed<SavePoiVisibility>({
   get: () => saveStore.savedArchivesState.settings.visibility,

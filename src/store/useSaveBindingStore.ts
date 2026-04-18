@@ -164,6 +164,9 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function initialize() {
+    if (isInitialized.value) return
+    isInitialized.value = true
+    
     try {
       const raw = localStorage.getItem(getStorageKey())
       savedBindings.value = raw ? normalizeState(JSON.parse(raw)) : normalizeState(null)
@@ -171,11 +174,20 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       console.warn('[SaveBindingStore] failed to load bindings:', error)
       savedBindings.value = normalizeState(null)
     }
+    
     const storedGuid = activeViewStore.activeBinding
     if (storedGuid && savedBindings.value.list.some((b) => b.gameGuid === storedGuid)) {
-      loadDraft(storedGuid)
+      const archiveGroup = saveStore.archives.get(storedGuid)
+      const hasValidArchive = archiveGroup?.saves.some(s => s.isValid) ?? false
+      
+      if (hasValidArchive) {
+        loadDraft(storedGuid)
+      } else {
+        activeViewStore.activeBinding = null
+        activeViewStore.activeBindingStation = null
+        draftBinding.value = null
+      }
     }
-    isInitialized.value = true
   }
 
   const bindings = computed(() => savedBindings.value.list)

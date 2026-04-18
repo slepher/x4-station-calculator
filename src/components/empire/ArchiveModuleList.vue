@@ -103,7 +103,7 @@ const groupedModules = computed(() => {
     }))
 })
 
-const hasModules = computed(() => props.modules.length > 0)
+const hasModules = computed(() => props.modules.length > 0 || (props.buildingModules?.length ?? 0) > 0)
 
 function getModuleInfo(item: GroupedArchiveModule): X4Module {
   return item.x4Module

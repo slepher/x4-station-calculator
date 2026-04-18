@@ -145,3 +145,35 @@
 - **当** 用户点击 `保存绑定`
 - **那么** 系统 SHALL 持久化 binding 改动
 - **并且** SHALL 清除 binding dirty 状态
+
+### Requirement: Modules/Equipments Aggregation Migration
+
+系统 MUST 将 modules 和 equipments 的聚合逻辑从 rust-parser 迁移到 saveParser.post.ts。
+
+#### Scenario: rust-parser 只输出原始 constructions
+- **前提** rust-parser 解析存档
+- **当** 输出 `PlayerStationEntry` 或 `BuildStorageEntry`
+- **那么** 系统 SHALL 只保留 `constructions` 数组
+- **并且** SHALL NOT 输出 `modules` 和 `equipments` 聚合结果
+
+#### Scenario: post.ts 聚合 modules 和 equipments
+- **前提** saveParser.post.ts 处理 station 数据
+- **当** 遍历 `constructions` 数组
+- **那么** 系统 SHALL 按 `ref` 聚合 modules
+- **并且** SHALL 按 `(type, ref)` 聚合 equipments
+- **并且** 聚合结果 SHALL 写入 `modules` 和 `equipments` 字段
+
+#### Scenario: progress.sequenceindex 排除 construction
+- **前提** `buildstorage.progress.sequenceindex` 存在
+- **并且** `sequenceindex` 指向 `buildstorage.constructions` 中的某项
+- **当** 聚合 station 的 modules/equipments
+- **那么** 系统 SHALL 用该 construction 的 `id` 在 `station.constructions` 中查找对应项
+- **并且** SHALL 从聚合中排除该项（不修改原 construction 数据）
+- **并且** 原始 `constructions` 数组 SHALL 保持完整不变
+
+#### Scenario: buildstorage 聚合结果差值
+- **前提** station 和 buildstorage 都有 `constructions`
+- **当** 计算 buildstorage 的 modules/equipments
+- **那么** 系统 SHALL 先聚合 `buildstorage.constructions`
+- **并且** SHALL 减去 station 已有的 modules/equipments
+- **并且** buildstorage 结果 SHALL 只显示"新增/正在建造"的模块

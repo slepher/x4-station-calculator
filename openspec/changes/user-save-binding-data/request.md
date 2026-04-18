@@ -67,6 +67,56 @@
 - 重构 `useEmpireStore.stations` / `sectors` / `activeStation` 根据 `productionSource` 路由到 empire 或 binding 数据。
 - 添加 `switchToBinding(gameGuid)` 方法处理切换逻辑和 dirty 确认。
 
+### 9. Modules/Equipments 聚合逻辑迁移
+
+将 modules 和 equipments 的聚合逻辑从 rust-parser 迁移到 saveParser.post.ts：
+
+#### 9.1 rust-parser 变更
+
+- **仅针对 Player 站点移除聚合**：
+  - `PlayerStationEntry` 和 `BuildStorageEntry` 不再包含 `modules` 和 `equipments` 聚合结果
+  - 只保留 `constructions` 数组，供 post.ts 做聚合
+- **NPC/Xenon/Khaak 站点保留聚合**：
+  - `NpcStationEntry` 和 `FactionStationEntry` 继续在 rust-parser 中聚合
+  - 因为这些站点不保留原始 `constructions` 数据
+  - `modules` 和 `equipments` 字段保留
+
+#### 9.2 saveParser.post.ts 聚合逻辑
+
+遍历 `constructions` 数组，统计 modules 和 equipments：
+- **modules**：按 `ref` 聚合计数 → `{ref: amount}`
+- **equipments**：按 `(type, ref)` 聚合计数 → `{ref: {type, ref, amount}}`
+
+#### 9.3 BuildStorage progress 处理
+
+如果 `buildstorage.progress.sequenceindex` 存在：
+- `sequenceindex` 表示正在建造的 module 在 `buildstorage.constructions` 数组中的**位置索引**（从 0 开始）
+- 通过 `sequenceindex` 找到 `buildstorage.constructions[sequenceindex]`
+- 用该 construction 的 `id` 在 `station.constructions` 中找到对应项
+- **从聚合中排除该 construction**（不计入聚合结果，原始 construction 数据保持不变）
+
+**注意**：不修改原 construction 对象，只在聚合计算时排除。
+
+#### 9.4 BuildStorage 聚合结果差值
+
+`buildstorage.modules/equipments` 表示"新增/正在建造"的模块，需要减去 station 已有的：
+
+```
+buildstorage.modules = aggregate(buildstorage.constructions) - station.modules
+buildstorage.equipments = aggregate(buildstorage.constructions) - station.equipments
+```
+
+**示例**：
+```
+station.modules = {A: 3, B: 4}
+buildstorage.constructions 聚合 = {A: 5, B: 6, C: 2}
+buildstorage.modules = {A: 2, B: 2, C: 2}  // 减去 station 已有
+```
+
+#### 9.5 Station tag 处理
+
+如果 station 聚合后的 `modules` 为空（`[]` 或 `{}`），设置 `tag = 'constructionsite'`。
+
 ## 边界
 
 ### In Scope

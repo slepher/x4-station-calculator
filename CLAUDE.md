@@ -8,6 +8,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 # Development server (hot reload)
 npm run dev
 
+# Build Rust WASM parser (output to src/wasm/)
+npm run build-rust
+# Or manually:
+# cd rust-parser && ./build.sh
+
 # Production build
 npm run build
 

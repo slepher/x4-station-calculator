@@ -53,6 +53,7 @@ const activeArchive = computed<SaveArchive | null>(() => {
   if (selected && selected.meta.guid === guid) {
     const time = binding.selectedArchiveTime
     if (time === null || selected.meta.time === time) {
+      if (!selected.isValid) return null
       return selected
     }
   }
@@ -62,10 +63,13 @@ const activeArchive = computed<SaveArchive | null>(() => {
 
   const time = binding.selectedArchiveTime
   if (time === null) {
-    return group.saves[0] || null
+    const first = group.saves[0]
+    if (first && !first.isValid) return null
+    return first || null
   }
 
   const archive = group.saves.find((s) => s.meta.time === time)
+  if (archive && !archive.isValid) return null
   return archive ?? group.saves[0] ?? null
 })
 

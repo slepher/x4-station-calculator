@@ -608,17 +608,11 @@ impl SaveParserCore {
                                 Some("player") => {
                                     let constructions =
                                         std::mem::take(&mut self.player_station_constructions);
-                                    let modules =
-                                        aggregated_modules_from_constructions(&constructions);
-                                    let equipments =
-                                        aggregated_equipments_from_constructions(&constructions);
                                     let workforces = ctx.workforces.clone();
                                     let entry = PlayerStationEntry {
                                         base,
                                         component_id: ctx.id.clone(),
                                         constructions,
-                                        modules,
-                                        equipments,
                                         cargo: ware_amounts(&ctx.cargo_totals),
                                         reservation: ware_amounts(&ctx.reservation_totals),
                                         buildstorage_code: None,
@@ -718,12 +712,6 @@ impl SaveParserCore {
                                         .build_target_station_component_id
                                         .clone(),
                                     constructions: ctx.build_constructions.clone(),
-                                    modules: aggregated_modules_from_constructions(
-                                        &ctx.build_constructions,
-                                    ),
-                                    equipments: aggregated_equipments_from_constructions(
-                                        &ctx.build_constructions,
-                                    ),
                                     progress: ctx.build_progress.clone(),
                                 };
                                 sd.player_buildstorages.insert(entry.code.clone(), entry);
@@ -811,7 +799,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v4".into(),
+                parser_version: "v5".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },
@@ -880,60 +868,22 @@ fn ware_entries(input: &HashMap<String, i64>) -> Vec<DatavaultWareEntry> {
     wares
 }
 
-fn aggregated_modules(
-    input: &mut HashMap<String, i64>,
-) -> HashMap<String, AggregatedStationModule> {
+fn aggregated_modules(input: &mut HashMap<String, i64>) -> Vec<AggregatedStationModule> {
     input
         .drain()
-        .map(|(ref_field, amount)| {
-            (
-                ref_field.clone(),
-                AggregatedStationModule { ref_field, amount },
-            )
-        })
+        .map(|(ref_field, amount)| AggregatedStationModule { ref_field, amount })
         .collect()
 }
 
-fn aggregated_equipments(
-    input: &mut HashMap<(String, String), i64>,
-) -> HashMap<String, AggregatedEquipment> {
+fn aggregated_equipments(input: &mut HashMap<(String, String), i64>) -> Vec<AggregatedEquipment> {
     input
         .drain()
-        .map(|((equip_type, ref_field), amount)| {
-            (
-                ref_field.clone(),
-                AggregatedEquipment {
-                    equip_type,
-                    ref_field,
-                    amount,
-                },
-            )
+        .map(|((equip_type, ref_field), amount)| AggregatedEquipment {
+            equip_type,
+            ref_field,
+            amount,
         })
         .collect()
-}
-
-fn aggregated_modules_from_constructions(
-    constructions: &[PlayerStationConstruction],
-) -> HashMap<String, AggregatedStationModule> {
-    let mut counts: HashMap<String, i64> = HashMap::new();
-    for c in constructions {
-        *counts.entry(c.ref_field.clone()).or_insert(0) += 1;
-    }
-    aggregated_modules(&mut counts)
-}
-
-fn aggregated_equipments_from_constructions(
-    constructions: &[PlayerStationConstruction],
-) -> HashMap<String, AggregatedEquipment> {
-    let mut totals: HashMap<(String, String), i64> = HashMap::new();
-    for c in constructions {
-        for e in &c.equipments {
-            *totals
-                .entry((e.equip_type.clone(), e.ref_field.clone()))
-                .or_insert(0) += e.exact;
-        }
-    }
-    aggregated_equipments(&mut totals)
 }
 
 fn ware_amounts(input: &HashMap<String, i64>) -> Vec<WareAmount> {

@@ -214,6 +214,52 @@ interface ProductionSource {
 
 `groups[]` 与 `stationPlans[]` 平铺保存，但 trade station 是 group 内部单体字段。`stationPlans[]` 保存 save-station 和 virtual-station 的规划数据，方便按 `gameGuid`、`saveStationCode`、`groupId` 做唯一性检查和全局生产汇总。UI 需要树状结构时使用 view model 组装。未分组 station plan 允许存在，后续可在量化生产输出区作为单独 bucket 展示。
 
+### D10: Modules/Equipments 聚合迁移到 post.ts
+
+将聚合逻辑从 rust-parser 移到 saveParser.post.ts，原因：
+- post.ts 可以访问 buildstorage 与 station 的关联关系
+- post.ts 可以处理 progress.sequenceindex 的排除逻辑
+- rust-parser 只负责原始数据提取，保持职责单一
+
+#### 数据流
+
+```
+rust-parser 输出:
+  PlayerStationEntry { constructions: [...], modules: {}, equipments: {} }
+  BuildStorageEntry { constructions: [...], modules: {}, equipments: {}, progress?: {...} }
+
+saveParser.post.ts 处理:
+  1. 对 station: aggregate(constructions) - 排除正在建造的
+  2. 对 buildstorage: aggregate(constructions) - station.modules/equipments
+```
+
+#### progress.sequenceindex 处理流程
+
+```
+buildstorage.progress.sequenceindex = N (从 0 开始)
+  ↓
+buildstorage.constructions[N].id = constructionId
+  ↓
+在 station.constructions 中找到 id === constructionId 的项
+  ↓
+从聚合中排除该项（原始 construction 数据保持不变）
+```
+
+**重要**：不修改原 construction 对象，只在聚合计算时将其排除。construction 数组作为原始数据完整保留。
+
+#### 差值计算
+
+```typescript
+// Station 聚合
+const stationModules = aggregateModules(station.constructions, excludeInProgress(buildstorage))
+
+// BuildStorage 聚合
+const buildstorageRawModules = aggregateModules(buildstorage.constructions)
+const buildstorageModules = subtract(buildstorageRawModules, stationModules)
+```
+
+**差值语义**：buildstorage 显示的是"新增/正在建造但未完成"的模块。
+
 ## 错误与边界处理
 
 - 如果当前 archive 缺失，binding 保留，但派生 save station view 为空，并显示当前 time 不可用状态。
