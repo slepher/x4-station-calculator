@@ -930,7 +930,6 @@ const main = async () => {
   const output = { vsn: finalVsn, ...dbPayload }
   await mkdir(FIXTURE_DIR, { recursive: true })
   await writeFile(DB_PATH, JSON.stringify(output, null, 2), 'utf8')
-  console.log(JSON.stringify(output, null, 2))
 }
 
 main().catch((err) => {
