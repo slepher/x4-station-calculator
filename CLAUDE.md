@@ -193,6 +193,41 @@ test.beforeEach(async ({ page }) => {
 - 语言存储使用 Cookie (`user_locale`)，但翻译更新必须通过 UI 触发
 - fixture 路径应使用相对于测试文件的路径
 
+### Live Binding E2E Fixture Rule
+
+涉及 Live Production / save-binding / archive 联动的 E2E，不要再手写：
+- 从 `db.json` 删除 `x4_save_archives`
+- 手动 `saveStore.importFromJson(...)`
+- 手动向 `liveStore.playerStationRecords` 回填 records
+
+统一使用：
+- `tests/e2e/helpers/loadLiveBindingFixture.ts`
+- 入口函数：`loadLiveBindingFixture(page)`
+
+原因：
+- `tests/fixtures/db.json` 现在只保留基础 localStorage 状态
+- `tests/fixtures/save.json` 承载 save 明细
+- `loadLiveBindingFixture(page)` 会负责：
+  1. 注入 `db.json` 到 localStorage
+  2. 基于 `save.json` 构造 `x4_save_archives` state
+  3. 把 `save.json` 写入 IndexedDB
+  4. reload 后切到 `live-production`
+  5. 通过 UI 设置语言
+
+示例：
+
+```typescript
+import { test } from '../../test-setup'
+import { loadLiveBindingFixture } from '../helpers/loadLiveBindingFixture'
+
+test.beforeEach(async ({ page }) => {
+  await page.addStyleTag({
+    content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
+  })
+  await loadLiveBindingFixture(page)
+})
+```
+
 ### Skills & Workflow
 
 The `.trae/skills/` directory contains markdown skill definitions for the Trae IDE:

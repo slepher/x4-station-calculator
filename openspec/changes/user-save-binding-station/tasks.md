@@ -340,3 +340,20 @@
 - [x] T171. 运行构建验证：确认 UI 分组显示正常
 
 > **数据层改动**（StationProductionFlowMap.compute 输出分拆、StationStateMap 删除等）归属 `station-production-flow-map` change
+
+## Station Tab 图标与文本显示逻辑
+
+- [x] T175. 修改 `ProductionTabItem` 类型定义：移除 `icon` 字段，新增 `tag` 字段用于传递 POI 类型标识
+- [x] T176. 修改 `useLiveProductionStore.getTabs`：移除 icon URL 和 name 的复杂计算逻辑，仅返回 `tag` 字段
+- [x] T177. 修改 `SectorStationTabBar.vue`：添加 CSS class 定义（icon-green、icon-orange）用于图标染色
+- [x] T178. 修改 `SectorStationTabBar.vue.getTabIcon`：根据 `tag` 从 `SAVE_POI_ICON_MAP` 获取图标 URL
+- [x] T179. 修改 `SectorStationTabBar.vue`：添加 CSS filter 实现 SVG 图标染色（绿色 hue-rotate 84deg，橙色 hue-rotate 7deg）
+- [x] T180. 导出 `SAVE_POI_ICON_MAP` 供 tab 组件使用（在 `style.ts` 中）
+- [x] T181. 运行 `npm run build` 验证编译通过
+
+> **显示逻辑说明**：
+> - overview tab: tag='playerhq'，图标染绿色，文本="星区总览"
+> - transit tab: tag='tradestation'，图标染橙色，文本=星区名
+> - station tab（有 BindingStationPlan）：tag=根据 modules 计算的 POI 类型，文本=plan.label
+> - station tab（无 BindingStationPlan）：tag=archive.tag（如 constructionsite），文本=archive.tooltip i18n
+> - modules=[] 时 tag='constructionsite'

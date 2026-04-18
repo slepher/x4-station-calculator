@@ -128,3 +128,47 @@ interface ActiveViewState {
 2. 切换到"实况产能" tab，自动加载 `activeBinding` 对应的 binding
 3. 刷新页面后，正确恢复上次选中的 empire/binding 及 station
 4. localStorage 数据格式正确：分离存储 activeEmpireId 和 activeBinding
+
+---
+
+## 新增需求：Station Tab 图标与文本显示逻辑
+
+### 背景
+
+实况产能模式下，station tab 需根据站点类型显示不同的图标和文本。原有实现将 icon URL 计算放在 store 层，导致职责边界模糊。
+
+### 需求描述
+
+调整 station tab 图标和文本的显示逻辑：
+
+1. **Store 层职责**：仅传递 `tag`（POI 类型标识）到 tab，不计算 icon URL 和 name
+2. **Tab 组件职责**：根据 `tag` 决定如何显示图标和文本
+3. **图标染色**：
+   - overview tab：playerhq 图标染绿色（表示总览）
+   - transit tab：tradestation 图标染橙色（表示中转）
+4. **station tab 显示规则**：
+   - 有 BindingStationPlan：tag=根据 modules 计算的 POI 类型，文本=plan.label
+   - 无 BindingStationPlan：tag=archive.tag（如 constructionsite），文本=archive.tooltip i18n
+
+### Tab 类型与显示对应表
+
+| Tab 类型 | tag | 图标染色 | 文本来源 |
+|---------|-----|---------|---------|
+| overview | playerhq | 绿色（hue-rotate 84deg） | 固定："星区总览" |
+| transit | tradestation | 橙色（hue-rotate 7deg） | 星区名 |
+| station（有 plan） | classifyPlayerStationPoi(modules) | 无染色 | plan.name || station.name || station.id |
+| station（无 plan） | archive.tag（如 constructionsite） | 无染色 | archive.tooltip i18n |
+
+### tag 计算规则
+
+`classifyPlayerStationPoi(modules)` 函数：
+- modules=[] → 'constructionsite'（施工现场）
+- 其他情况根据 modules 的产品类型判定（factory/wharehouse/dock 等）
+
+### 验收标准
+
+1. overview tab 显示 playerhq 图标（绿色），文本为"星区总览"
+2. transit tab 显示 tradestation 图标（橙色），文本为星区名
+3. station tab（有 plan）显示正确的 POI 图标（无染色），文本为 plan.label
+4. station tab（无 plan）显示 constructionsite 或其他 archive.tag 图标，文本为 i18n 翻译
+5. modules=[] 的 station 显示 constructionsite 图标

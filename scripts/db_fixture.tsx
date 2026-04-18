@@ -10,6 +10,8 @@ const FIXTURE_DIR = path.join(ROOT, 'tests/fixtures')
 const DB_DIR = path.join(FIXTURE_DIR, 'db')
 const DB_PATH = path.join(FIXTURE_DIR, 'db.json')
 const SAVE_PATH = path.join(FIXTURE_DIR, 'save.json')
+const ANALYSIS_TMP_DIR = path.join(ROOT, 'analysis/tmp')
+const ANALYSIS_DB_PATH = path.join(ANALYSIS_TMP_DIR, 'db.json')
 
 const DATA_DIR = path.join(ROOT, 'src/assets/x4_game_data/8.0-Diplomacy/data')
 const FIXTURE_TIMESTAMP = Number(process.env.DB_FIXTURE_TIMESTAMP ?? 1772453451902)
@@ -887,6 +889,87 @@ const readCurrentVsn = async (): Promise<number | null> => {
   }
 }
 
+const buildSaveFixturePayload = (
+  saveData: any,
+  now: number
+): {
+  saveExportData: SaveArchiveExportData
+  playerStationRecords: PlayerStationRecord[]
+} => {
+  const archiveId = `${saveData.meta.guid}_${saveData.meta.time}`
+  const sectorCount = Object.keys(saveData.sectors || {}).length
+
+  const archiveMeta: ArchiveMeta = {
+    id: archiveId,
+    guid: saveData.meta.guid,
+    time: saveData.meta.time,
+    playerName: saveData.meta.playerName,
+    version: saveData.meta.version,
+    filename: saveData.meta.filename,
+    parser_version: saveData.meta.parser_version,
+    post_processor_version: saveData.meta.post_processor_version,
+    source: saveData.meta.source,
+    isCompatible: true,
+    isValid: true,
+    createdAt: new Date(now).toISOString(),
+    sectorCount
+  }
+
+  const saveArchivesState: SavedSaveArchivesState = {
+    version: 1,
+    activeArchiveId: archiveId,
+    list: [archiveMeta],
+    settings: {
+      visibility: {
+        playerStation: true,
+        npcStation: true,
+        xenonStation: true,
+        khaakStation: true,
+        abandonedShip: true,
+        datavault: true,
+        erlkingVault: true
+      }
+    }
+  }
+
+  const playerStationRecords: PlayerStationRecord[] = []
+  for (const [sectorMacro, sectorData] of Object.entries(saveData.sectors || {})) {
+    const sector = sectorData as any
+    if (sector.player_stations) {
+      for (const [code, entry] of Object.entries(sector.player_stations)) {
+        playerStationRecords.push({
+          id: `${archiveId}:${code}`,
+          archiveId,
+          sectorMacro,
+          code,
+          type: 'station',
+          data: entry
+        })
+      }
+    }
+    if (sector.player_buildstorages) {
+      for (const [code, entry] of Object.entries(sector.player_buildstorages)) {
+        playerStationRecords.push({
+          id: `${archiveId}:${code}`,
+          archiveId,
+          sectorMacro,
+          code,
+          type: 'buildstorage',
+          data: entry
+        })
+      }
+    }
+  }
+
+  return {
+    saveExportData: {
+      state: saveArchivesState,
+      archives: [saveData]
+    },
+    playerStationRecords
+  }
+}
+
 const main = async () => {
   const args = process.argv.slice(2)
   const bump = args.includes('--bump')
@@ -929,81 +1012,6 @@ const main = async () => {
     }
   }
   
-  if (saveData) {
-    const archiveId = `${saveData.meta.guid}_${saveData.meta.time}`
-    const sectorCount = Object.keys(saveData.sectors || {}).length
-    
-    const archiveMeta: ArchiveMeta = {
-      id: archiveId,
-      guid: saveData.meta.guid,
-      time: saveData.meta.time,
-      playerName: saveData.meta.playerName,
-      version: saveData.meta.version,
-      filename: saveData.meta.filename,
-      parser_version: saveData.meta.parser_version,
-      post_processor_version: saveData.meta.post_processor_version,
-      source: saveData.meta.source,
-      isCompatible: true,
-      isValid: true,
-      createdAt: new Date(now).toISOString(),
-      sectorCount
-    }
-    
-    const saveArchivesState: SavedSaveArchivesState = {
-      version: 1,
-      activeArchiveId: archiveId,
-      list: [archiveMeta],
-      settings: {
-        visibility: {
-          playerStation: true,
-          npcStation: true,
-          xenonStation: true,
-          khaakStation: true,
-          abandonedShip: true,
-          datavault: true,
-          erlkingVault: true
-        }
-      }
-    }
-    
-    const saveExportData: SaveArchiveExportData = {
-      state: saveArchivesState,
-      archives: [saveData]
-    }
-    
-    dbPayload.x4_save_archives = saveExportData
-    
-    const playerStationRecords: PlayerStationRecord[] = []
-    for (const [sectorMacro, sectorData] of Object.entries(saveData.sectors || {})) {
-      const sector = sectorData as any
-      if (sector.player_stations) {
-        for (const [code, entry] of Object.entries(sector.player_stations)) {
-          playerStationRecords.push({
-            id: `${archiveId}:${code}`,
-            archiveId,
-            sectorMacro,
-            code,
-            type: 'station',
-            data: entry
-          })
-        }
-      }
-      if (sector.player_buildstorages) {
-        for (const [code, entry] of Object.entries(sector.player_buildstorages)) {
-          playerStationRecords.push({
-            id: `${archiveId}:${code}`,
-            archiveId,
-            sectorMacro,
-            code,
-            type: 'buildstorage',
-            data: entry
-          })
-        }
-      }
-    }
-    dbPayload.playerStationRecords = playerStationRecords
-  }
-
   const currentVsn = await readCurrentVsn()
   const nextVsn = currentVsn !== null ? currentVsn + 1 : 1
   const finalVsn = bump ? nextVsn : currentVsn ?? 1
@@ -1016,6 +1024,17 @@ const main = async () => {
   const output = { vsn: finalVsn, ...dbPayload }
   await mkdir(FIXTURE_DIR, { recursive: true })
   await writeFile(DB_PATH, JSON.stringify(output, null, 2), 'utf8')
+
+  if (saveData) {
+    const { saveExportData, playerStationRecords } = buildSaveFixturePayload(saveData, now)
+    const analysisOutput = {
+      ...output,
+      x4_save_archives: saveExportData,
+      playerStationRecords
+    }
+    await mkdir(ANALYSIS_TMP_DIR, { recursive: true })
+    await writeFile(ANALYSIS_DB_PATH, JSON.stringify(analysisOutput, null, 2), 'utf8')
+  }
 }
 
 main().catch((err) => {

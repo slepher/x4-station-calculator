@@ -11,7 +11,8 @@ import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, Player
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
-import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
+import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput, X4Module } from '@/types/x4'
+import type { ProductionTabItem } from '@/types/production-ui'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
@@ -32,6 +33,7 @@ import { loadPlayerStationsFlatByArchiveId, createArchiveId } from '@/db/saveArc
 import { createProductionModuleActions } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
+import { classifyPlayerStationPoi, buildAggregatedModulesFromStationPlan } from './logic/stationPoiSemantics'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -1285,19 +1287,109 @@ warePriorityLevels: {},
   })
 
   const getTabs = () => {
-    const result: any[] = []
-    result.push({ id: 'overview', type: 'overview', name: '' })
+    const result: ProductionTabItem[] = []
+    result.push({ id: 'overview', type: 'overview', name: i18n.global.t('sector.overview') })
+    
+    const stationPlansByCode = new Map<string, BindingStationPlan>()
+    activeBinding.value?.stationPlans.forEach(plan => {
+      if (plan.saveStationCode) {
+        stationPlansByCode.set(plan.saveStationCode, plan)
+      }
+    })
+    
     sectors.value.forEach(sector => {
       result.push({ id: `transit:${sector.id}`, type: 'transit', name: sector.name, sectorId: sector.id })
       if (expandedSectorId.value === sector.id) {
         orderedStationsBySector.value
           .filter(s => s.sectorId === sector.id)
-          .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: s.sectorId ?? undefined, stationType: s.type }))
+          .forEach(s => {
+            const matchingPlan = stationPlansByCode.get(s.id)
+            const hasPlan = Boolean(matchingPlan)
+            
+            if (hasPlan && matchingPlan) {
+              const aggregatedModules = buildAggregatedModulesFromStationPlan(matchingPlan, gameData.modulesMap || {})
+              const modulesByMacroId = Object.fromEntries(
+                Object.values(aggregatedModules)
+                  .map(m => {
+                    const matched = gameData.modulesByMacroId?.[m.ref]
+                    return matched ? [m.ref, matched] : null
+                  })
+                  .filter((entry): entry is [string, X4Module] => Boolean(entry))
+              )
+              const classification = classifyPlayerStationPoi({
+                modules: aggregatedModules,
+                modulesByMacroId,
+                isHeadquarter: false
+              })
+              const name = matchingPlan.name || s.name || s.id
+              result.push({
+                id: s.id,
+                type: 'station',
+                name,
+                sectorId: s.sectorId ?? undefined,
+                stationType: s.type,
+                tag: classification.tag,
+                factoryGroup: classification.factoryGroup
+              })
+            } else {
+              const stationRecord = playerStationRecords.value.find(r => r.code === s.id)
+              const archiveStation = stationRecord?.data as PlayerStationEntry | undefined
+              const tag = archiveStation?.tag || 'constructionsite'
+              const factoryGroup = archiveStation?.factoryGroup
+              const name = s.name || s.id
+              result.push({
+                id: s.id,
+                type: 'station',
+                name,
+                sectorId: s.sectorId ?? undefined,
+                stationType: s.type,
+                tag,
+                factoryGroup
+              })
+            }
+          })
       }
     })
     orderedStationsBySector.value
       .filter(s => !s.sectorId)
-      .forEach(s => result.push({ id: s.id, type: 'station', name: s.name, sectorId: undefined, stationType: s.type }))
+      .forEach(s => {
+        const matchingPlan = stationPlansByCode.get(s.id)
+        const hasPlan = Boolean(matchingPlan)
+        
+        if (hasPlan && matchingPlan) {
+          const aggregatedModules = buildAggregatedModulesFromStationPlan(matchingPlan, gameData.modulesMap || {})
+          const modulesByMacroId = Object.fromEntries(
+            Object.values(aggregatedModules)
+              .map(m => {
+                const matched = gameData.modulesByMacroId?.[m.ref]
+                return matched ? [m.ref, matched] : null
+              })
+              .filter((entry): entry is [string, X4Module] => Boolean(entry))
+          )
+          const classification = classifyPlayerStationPoi({
+            modules: aggregatedModules,
+            modulesByMacroId,
+            isHeadquarter: false
+          })
+          const name = matchingPlan.name || s.name || s.id
+          result.push({
+            id: s.id,
+            type: 'station',
+            name,
+            sectorId: undefined,
+            stationType: s.type,
+            tag: classification.tag,
+            factoryGroup: classification.factoryGroup
+          })
+        } else {
+          const stationRecord = playerStationRecords.value.find(r => r.code === s.id)
+          const archiveStation = stationRecord?.data as PlayerStationEntry | undefined
+          const tag = archiveStation?.tag || 'constructionsite'
+          const factoryGroup = archiveStation?.factoryGroup
+          const name = s.name || s.id
+          result.push({ id: s.id, type: 'station', name, sectorId: undefined, stationType: s.type, tag, factoryGroup })
+        }
+      })
     return result
   }
 

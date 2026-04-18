@@ -8,6 +8,8 @@ export interface ProductionTabItem {
   name: string
   sectorId?: string
   stationType?: StationType
+  tag?: string
+  factoryGroup?: string
 }
 
 export interface StationTabBarProps {

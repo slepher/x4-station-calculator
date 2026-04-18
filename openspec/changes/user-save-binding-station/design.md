@@ -218,3 +218,121 @@ StationPlanningPanel
   @apply border-l-2 border-slate-500/40 pl-2;
 }
 ```
+
+## D10: Station Tab 图标与文本显示逻辑
+
+### 类型定义变更
+
+`ProductionTabItem` 移除 `icon` 字段，新增 `tag` 字段：
+
+```typescript
+interface ProductionTabItem {
+  id: string
+  type: 'overview' | 'station' | 'transit'
+  name: string
+  sectorId?: string
+  tag?: string  // POI 类型标识，供 tab 组件决定图标显示
+}
+```
+
+### Store 层：getTabs 函数简化
+
+`useLiveProductionStore.getTabs()` 只计算 `tag`，不计算 icon URL：
+
+```typescript
+function getTabs(): ProductionTabItem[] {
+  return [
+    { id: 'overview', type: 'overview', name: '星区总览', tag: 'playerhq' },
+    { id: `transit-${sectorId}`, type: 'transit', name: sectorName, sectorId, tag: 'tradestation' },
+    ...stations.map(s => {
+      const matchingPlan = findMatchingPlan(s)
+      return {
+        id: s.id,
+        type: 'station',
+        name: matchingPlan?.name || s.name || s.id,
+        sectorId: s.sectorId,
+        tag: matchingPlan
+          ? classifyPlayerStationPoi(matchingPlan.modules)
+          : s.poiLike?.tag || 'constructionsite'
+      }
+    })
+  ]
+}
+```
+
+### Tab 组件：图标显示与染色
+
+`SectorStationTabBar.vue` 根据 `tag` 获取图标 URL 并应用染色：
+
+```typescript
+import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
+
+function getTabIcon(tab: ProductionTabItem): string | null {
+  if (tab.type === 'overview') {
+    return SAVE_POI_ICON_MAP['playerhq']
+  }
+  if (tab.type === 'transit') {
+    return SAVE_POI_ICON_MAP['tradestation']
+  }
+  if (tab.type === 'station' && tab.tag) {
+    return SAVE_POI_ICON_MAP[tab.tag] || null
+  }
+  return null
+}
+
+function getTabIconClass(tab: ProductionTabItem): string {
+  if (tab.type === 'overview') return 'icon-green'
+  if (tab.type === 'transit') return 'icon-orange'
+  return ''
+}
+```
+
+### CSS 滤镜染色
+
+使用 CSS filter 实现 SVG 图标染色：
+
+```css
+.icon-green {
+  filter: hue-rotate(84deg) saturate(1.5);
+}
+.icon-orange {
+  filter: hue-rotate(7deg) saturate(1.2);
+}
+```
+
+### SAVE_POI_ICON_MAP 导出
+
+`src/components/map/utils/style.ts` 导出图标映射：
+
+```typescript
+export const SAVE_POI_ICON_MAP: Record<string, string> = {
+  playerhq: '/images/poi/playerhq.svg',
+  tradestation: '/images/poi/tradestation.svg',
+  constructionsite: '/images/poi/constructionsite.svg',
+  factory: '/images/poi/factory.svg',
+  wharehouse: '/images/poi/wharehouse.svg',
+  dock: '/images/poi/dock.svg',
+  // ... 其他 POI 类型
+}
+```
+
+### tag 计算函数
+
+`classifyPlayerStationPoi(modules)` 统一处理 tag 分类：
+
+```typescript
+function classifyPlayerStationPoi(modules: SavedModule[]): string {
+  if (!modules || modules.length === 0) {
+    return 'constructionsite'
+  }
+  // 根据 modules 的产品类型判定
+  // factory / wharehouse / dock 等
+  return computePoiTagFromModules(modules)
+}
+```
+
+**关键点**：
+- modules=[] 优先返回 'constructionsite'
+- Store 层不关心 icon URL，只传递语义化的 tag
+- Tab 组件负责视觉呈现（图标选择、染色）
+```

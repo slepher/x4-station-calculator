@@ -1,5 +1,5 @@
 import type { AggregatedStationModule, CodeMap } from '@/types/saveArchive'
-import type { SavedModule, StationPlan, X4Module } from '@/types/x4'
+import type { SavedModule, X4Module } from '@/types/x4'
 
 const ENERGY_GROUP = 'energy'
 const MIXED_PRODUCTION_PROFILE = 'mixed'
@@ -19,6 +19,13 @@ const FACTORY_GROUP_PRIORITY = [
   'energy'
 ]
 
+export function getPoiIconTag(item: { tag?: string; factoryGroup?: string }): string | null {
+  if (item.tag === 'factory' && item.factoryGroup) {
+    return item.factoryGroup
+  }
+  return item.tag || null
+}
+
 export type StationPoiClassification = {
   tag: string
   isPiratebase?: boolean
@@ -34,7 +41,7 @@ export type StationPoiClassification = {
 }
 
 export function buildAggregatedModulesFromStationPlan(
-  station: StationPlan,
+  station: { modules: SavedModule[] },
   modulesMap: Record<string, X4Module>
 ): CodeMap<AggregatedStationModule> {
   return Object.fromEntries((station.modules || []).flatMap((module: SavedModule) => {
@@ -164,7 +171,13 @@ export function classifyPlayerStationPoi(args: {
   const modules = moduleValues(args.modules)
   const macro = (args.macro || '').toLowerCase()
 
+  if (modules.length === 0) {
+    return { tag: 'constructionsite' }
+  }
+
   const isPiratebase = macro.includes('_piratebase')
+  const hasHqModule = hasModulePattern(modules, ['player_hq_'])
+  const isHeadquarter = hasHqModule || args.isHeadquarter
   const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_l_'])
   const isWharf = hasModulePattern(modules, ['_ships_m_'])
   const isEquipmentdock = hasModulePattern(modules, ['_equip_'])
@@ -172,10 +185,10 @@ export function classifyPlayerStationPoi(args: {
   const factoryGroup = getFactoryGroup(modules)
   const isTradestation = macro.includes('tradestation')
   const isDefencemodule = modules.some((m) => m.type === 'defencemodule')
-  const isHeadquarter = hasModulePattern(modules, ['player_hq_']) || args.isHeadquarter
 
   let tag = 'factory'
-  if (isPiratebase) tag = 'piratestation'
+  if (hasHqModule) tag = 'playerhq'
+  else if (isPiratebase) tag = 'piratestation'
   else if (isShipyard) tag = 'shipyard'
   else if (isWharf) tag = 'wharf'
   else if (isEquipmentdock) tag = 'equipmentdock'

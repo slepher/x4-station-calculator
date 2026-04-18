@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { StationType } from '@/types/x4'
 import type { ProductionTabItem } from '@/types/production-ui'
+import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
+import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
+import playerhqIconUrl from '@/components/icons/playerhq.svg'
+import tradestationIconUrl from '@/components/icons/tradestation.svg'
+import factoryIconUrl from '@/components/icons/factory.svg'
 
 const props = defineProps<{
   tabs: ProductionTabItem[]
@@ -34,14 +38,18 @@ const tabsScrollAreaRef = ref<HTMLElement | null>(null)
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
 
-const getStationIcon = (type?: StationType): string => {
-  switch (type) {
-    case 'industrial': return '🏭'
-    case 'supply': return '📦'
-    case 'transit': return '🚚'
-    case 'shipyard': return '⚓'
-    default: return '🏭'
-  }
+const getTabIcon = (tab: ProductionTabItem): string => {
+  if (tab.type === 'overview') return playerhqIconUrl
+  if (tab.type === 'transit') return tradestationIconUrl
+  const iconTag = getPoiIconTag(tab)
+  if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
+  return factoryIconUrl
+}
+
+const getTabIconClass = (tab: ProductionTabItem): string => {
+  if (tab.type === 'overview') return 'icon-green'
+  if (tab.type === 'transit') return 'icon-orange'
+  return ''
 }
 
 const addNewStation = () => {
@@ -226,12 +234,14 @@ const tabsToShow = computed(() => {
           tab.type === 'overview' ? 'overview-tab' : tab.type === 'transit' ? 'supply-tab' : 'station-tab',
           { 'active': activeTabId === tab.id }
         ]"
+        :data-tag="tab.tag"
+        :data-factory-group="tab.factoryGroup"
         @click="tab.type === 'overview' ? openOverview() : tab.type === 'transit' ? openSupply(tab.sectorId!) : selectStationWithExpand(tab.id)"
         @contextmenu.stop="tab.type === 'station' ? openMenu(tab.id, $event) : undefined"
       >
         <div class="tab-highlight"></div>
         <div class="tab-content">
-          <span class="tab-icon text-base">{{ tab.type === 'overview' ? '📊' : tab.type === 'transit' ? '🚚' : getStationIcon(tab.stationType) }}</span>
+          <img class="tab-icon w-6 h-6" :class="getTabIconClass(tab)" :src="getTabIcon(tab)" alt="" />
           <span class="tab-label max-w-[120px] truncate">{{ tab.type === 'overview' ? t('sector.overview') : tab.name }}</span>
         </div>
       </div>
@@ -425,5 +435,13 @@ const tabsToShow = computed(() => {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+.icon-green {
+  filter: brightness(0) saturate(100%) invert(64%) sepia(60%) saturate(450%) hue-rotate(84deg) brightness(92%) contrast(91%);
+}
+
+.icon-orange {
+  filter: brightness(0) saturate(100%) invert(76%) sepia(45%) saturate(650%) hue-rotate(7deg) brightness(99%) contrast(91%);
 }
 </style>

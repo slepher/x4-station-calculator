@@ -1,5 +1,6 @@
 import { test } from '../../test-setup'
 import { expect, Page } from '@playwright/test'
+import { loadLiveBindingFixture } from '../helpers/loadLiveBindingFixture'
 
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 
@@ -7,82 +8,8 @@ test.beforeEach(async ({ page }) => {
   await page.addStyleTag({
     content: '*, *::before, *::after { transition: none !important; animation: none !important; }'
   })
-  await page.goto('/')
-  await page.evaluate(() => {
-    localStorage.clear()
-    sessionStorage.clear()
-  })
-  await page.reload()
-  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 500 })
+  await loadLiveBindingFixture(page)
 })
-
-async function loadDbFixture(page: Page) {
-  const dbFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
-  const dbData = JSON.parse(JSON.stringify(dbFixture.default))
-  delete dbData.vsn
-  delete dbData.playerStationRecords
-  delete dbData.x4_save_archives
-  
-  await page.evaluate((data) => {
-    Object.entries(data).forEach(([key, value]) => {
-      localStorage.setItem(key, JSON.stringify(value))
-    })
-    localStorage.setItem('isTestEnv', 'true')
-  }, dbData)
-  await page.reload()
-  await page.waitForSelector('#debug-ready-marker', { state: 'attached', timeout: 500 })
-}
-
-async function importSaveArchives(page: Page) {
-  const saveFixture = await import('../../fixtures/db.json', { with: { type: 'json' } })
-  const saveData = saveFixture.default.x4_save_archives
-  
-  await page.evaluate(async (archivesData: any) => {
-    const saveStore = (window as any).saveStore
-    const liveStore = (window as any).liveStore
-    const saveBindingStore = (window as any).saveBindingStore
-    const saveArchiveDB = (window as any).saveArchiveDB
-    if (!saveStore || !liveStore || !saveArchiveDB) return { success: false, error: 'Stores not available' }
-    
-    const { saveArchiveToDB, createArchiveId, loadPlayerStationsByArchiveId } = saveArchiveDB
-    const archives = archivesData.archives || []
-    const scopeKey = 'x4_save_archives'
-    
-    for (const archive of archives) {
-      await saveArchiveToDB(scopeKey, archive)
-      saveStore.importFromJson(archive)
-    }
-    
-    const archive = saveStore.selectedArchive
-    if (archive) {
-      const archiveId = createArchiveId(archive.meta.guid, archive.meta.time)
-      const records = await loadPlayerStationsByArchiveId(scopeKey, archiveId)
-      liveStore.playerStationRecords.value = records
-    }
-    
-    const bindingsList = saveBindingStore?.savedBindings?.list || []
-    if (bindingsList.length > 0) {
-      const firstBinding = bindingsList[0]
-      saveBindingStore.createOrOpenBinding(firstBinding.gameGuid)
-      liveStore.openBinding(firstBinding.gameGuid)
-    }
-    
-    await new Promise(r => setTimeout(r, 100))
-    liveStore.syncAllBindingStationsToStateMap?.()
-    
-    return { success: true }
-  }, saveData)
-  await page.waitForTimeout(500)
-}
-
-async function setupActiveBinding(page: Page) {
-  await page.evaluate((gameGuid: string) => {
-    localStorage.setItem('x4_station_active_view', JSON.stringify({
-      activeBinding: gameGuid,
-      activeView: 'live-production'
-    }))
-  }, GAME_GUID)
-}
 
 async function setLanguage(page: Page, lang: string) {
   const langSelect = page.locator('select').filter({ hasText: /简体中文|English/ })
@@ -106,19 +33,8 @@ async function selectStationInSector(page: Page, sectorName: string, stationName
   await page.waitForTimeout(300)
 }
 
-async function commonSetup(page: Page) {
-  await loadDbFixture(page)
-  await importSaveArchives(page)
-  await setupActiveBinding(page)
-  await setLanguage(page, 'zh-CN')
-  await switchToLiveProduction(page)
-}
-
 test.describe('3 E2E 测试场景', () => {
   test('3.1 Case: 站点"地球人"双数据源-规划模式可切换', async ({ page }) => {
-    // 3.1.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
-    // 3.1.2 点击星区 `小行星` supply-tab，点击站点 `地球人` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '小行星', '地球人')
     // 3.1.3 断言 `.mode-toggle-chip` 可见，CSS 类包含 `active-planning`
     const modeBtn = page.locator('.mode-toggle-chip')
@@ -134,9 +50,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.2 Case: 站点"新建空间站"仅有bindingStation-规划模式不可切换', async ({ page }) => {
-    // 3.2.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
-    // 3.2.2 点击星区 `小行星` supply-tab，点击站点 `新建空间站` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '小行星', '新建空间站')
     // 3.2.3 断言 `.mode-toggle-chip` 可见，CSS 类包含 `active-planning`
     const modeBtn = page.locator('.mode-toggle-chip')
@@ -152,9 +65,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.10 Case: 站点"新建空间站"bindingStation-星区坐标sunlight正确显示', async ({ page }) => {
-    // 3.10.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
-    // 3.10.2 点击星区 `小行星` supply-tab，点击站点 `新建空间站` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '小行星', '新建空间站')
     
     // 3.10.3 断言星区名称显示正确（bindingStation.sectorMacro -> gameData.maps.sectors -> nameId 翻译）
@@ -237,8 +147,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.3 Case: 存档站点"PPW-916"仅有saveStation-实时模式可切换', async ({ page }) => {
-    // 3.3.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
     // 3.3.2 点击星区 `神圣眼光` supply-tab，点击存档站点 `PPW-916` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '神圣眼光', 'PPW-916')
     // 3.3.3 断言 `.mode-toggle-chip` 可见，CSS 类包含 `active-live`
@@ -255,9 +163,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.4 Case: 模式切换交互-点击按钮可切换状态', async ({ page }) => {
-    // 3.4.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
-    // 3.4.2 点击星区 `小行星` supply-tab，点击站点 `地球人` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '小行星', '地球人')
     // 3.4.3 断言初始状态为规划模式，`.mode-toggle-chip` CSS 类包含 `active-planning`
     const modeBtn = page.locator('.mode-toggle-chip')
@@ -284,9 +189,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.5 Case: Toolbar布局结构正确展示各字段', async ({ page }) => {
-    // 3.5.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
-    // 3.5.2 点击星区 `小行星` supply-tab，点击站点 `地球人` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '小行星', '地球人')
     // 3.5.3 断言 `.mode-toggle-chip` 可见（模式切换按钮）
     await expect(page.locator('.mode-toggle-chip')).toBeVisible({ timeout: 1000 })
@@ -302,8 +204,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.6 Case: 星区字段点击弹出坐标popover', async ({ page }) => {
-    // 3.6.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
     // 3.6.2 点击星区 `神圣眼光` supply-tab，点击存档站点 `PPW-916` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '神圣眼光', 'PPW-916')
     // 3.6.3 点击星区字段区域，触发 popover 显示
@@ -335,8 +235,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.7 Case: 星区资源popover展示resources列表', async ({ page }) => {
-    // 3.7.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
     // 3.7.2 选择有资源的站点，等待 toolbar 加载
     await selectStationInSector(page, '神圣眼光', 'PPW-916')
     // 3.7.3 点击星区资源字段区域，触发 popover 显示
@@ -350,9 +248,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.8 Case: 规划模式下控件可编辑', async ({ page }) => {
-    // 3.8.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
-    // 3.8.2 点击星区 `小行星` supply-tab，点击站点 `地球人` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '小行星', '地球人')
     // 3.8.3 断言 `.race-select` 可见且可交互（偏好种族下拉）
     const raceSelect = page.locator('.race-select')
@@ -373,8 +268,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.9 Case: 实时模式下规划控件隐藏', async ({ page }) => {
-    // 3.9.1 加载 fixture 数据，导入存档，设置 binding，切换到 Live Production 视图，设置语言为中文
-    await commonSetup(page)
     // 3.9.2 点击星区 `神圣眼光` supply-tab，点击存档站点 `PPW-916` station-tab，等待 toolbar 加载
     await selectStationInSector(page, '神圣眼光', 'PPW-916')
     // 3.9.3 断言 `.race-select` 隐藏（偏好种族下拉隐藏） #期望: [hidden]
@@ -387,7 +280,6 @@ test.describe('3 E2E 测试场景', () => {
   })
 
   test('3.10 Case: 星区中转站已绑定的空间站不在tab列表显示', async ({ page }) => {
-    await commonSetup(page)
     
     const sectorTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
@@ -400,5 +292,22 @@ test.describe('3 E2E 测试场景', () => {
     const allStationTabs = await page.locator('.station-tab').allInnerTexts()
     const bhwStationTabs = allStationTabs.filter(text => text.includes('BHW-834'))
     expect(bhwStationTabs.length).toBe(0)
+  })
+
+  test('3.11 Case: 空间站tab显示正确的tag和factoryGroup属性', async ({ page }) => {
+    
+    const sectorTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    await expect(sectorTab).toBeVisible({ timeout: 5000 })
+    await sectorTab.click()
+    await page.waitForTimeout(500)
+    
+    const stationRWC = page.locator('.station-tab').filter({ hasText: 'RWC-785' })
+    await expect(stationRWC).toBeVisible({ timeout: 3000 })
+    
+    const tagAttr = await stationRWC.getAttribute('data-tag')
+    expect(tagAttr).toBe('factory')
+    
+    const factoryGroupAttr = await stationRWC.getAttribute('data-factory-group')
+    expect(factoryGroupAttr).toBe('shiptech')
   })
 })
