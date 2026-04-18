@@ -101,3 +101,19 @@
 - [x] V13. 验证 save station 绑定 tradestation 正确设置 saveStationCode
 - [x] V14. 验证已绑定 tradestation 不可再被绑定
 - [x] V15. 验证解绑时 save station 变为 virtual station，位置重置到星区中心
+
+## Implementation: ConstructionSite Tag & Icon
+
+- [x] T57. saveParser.post.ts: modules=[] 时设置 tag='constructionsite'
+- [x] T58. style.ts: 添加 constructionsite 图标导入和映射
+- [x] T59. savePoiLabel.ts: 添加 constructionsite 到 NPC_TAG_LABEL_KEYS
+- [x] T60. locales: 添加 save_npc_tag_constructionsite 翻译（zh-CN: 建筑仓库, en: Construction Site）
+- [x] T61. MapBindingStation.vue: 复用 getNpcStationPoiLabel 替代独立标签逻辑
+- [x] T62. 修复 module pattern 判断：shipyard 用 _ships_xl_/_ships_l_，wharf 用 _ships_m_，equipmentdock 用 _equip_
+
+## Verification: ConstructionSite Tag & Icon
+
+- [x] V16. 验证 modules=[] 的 station tag='constructionsite'
+- [x] V17. 验证 constructionsite 图标正确显示
+- [x] V18. 验证 tooltip 和绑定界面显示"建筑仓库"
+- [x] V19. 验证 station label 逻辑统一（tooltip 和 binding step 3）

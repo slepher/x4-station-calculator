@@ -169,6 +169,25 @@ save panel 的 binding 分支标题栏右侧提供保存控制：
 - 只有在对应 `sectorGroup` 的 Step 3 上下文中允许拖拽。
 - 其他 context 下只显示并支持 tooltip。
 
+### D12: ConstructionSite Tag 判断
+
+- 当 modules=[] 时，tag='constructionsite'（表示正在建造的站点）
+- 判断逻辑在 `enrichPlayerStation`、`enrichNpcStation`、`enrichFactionStation` 中统一处理
+- 所有站点类型（player/npc/xenon/khaak）均适用此规则
+
+### D13: Station Label 逻辑统一
+
+- Tooltip 和 Step 3 绑定界面使用同一套 label 逻辑
+- `savePoiLabel.ts` 的 `getNpcStationPoiLabel` 是唯一 label 来源
+- `MapBindingStation.vue` 复用此函数，避免独立维护 tagLabelKeys
+
+### D14: Module Pattern 判断精确化
+
+- shipyard: `_ships_xl_` 或 `_ships_l_`（XL 和 L 级造船模块）
+- wharf: `_ships_m_`（M 级造船模块）
+- equipmentdock: `_equip_`（设备模块）
+- pattern 必须带下划线，避免误匹配
+
 ## 错误与边界处理
 
 - 如果当前 archive 缺失，Step 2/3 显示当前 time 不可用状态，派生 save station view 为空。
@@ -189,3 +208,5 @@ save panel 的 binding 分支标题栏右侧提供保存控制：
 - 已绑定 tradestation 不可再被绑定。
 - 定位星区变化时 tradestation 正确更新并解除绑定。
 - 已绑定的 save station 显示 tradestation 图标。
+- ConstructionSite 站点（modules=[]）正确显示建筑仓库图标和标签。
+- Tooltip 和 Step 3 绑定界面显示一致的 station label。
