@@ -647,6 +647,19 @@ export const useSaveStore = defineStore('save', () => {
 
     if (!archive) return
 
+    const needsReprocess = archive.meta.post_processor_version !== CURRENT_POST_PROCESSOR_VERSION
+      || !hasValidPosition(archive)
+
+    if (needsReprocess) {
+      archive = postProcessRustSaveArchive(
+        archive,
+        gameDataStore.modulesByMacroId,
+        gameDataStore.maps,
+        gameDataStore.ships,
+        gameDataStore.equipments
+      )
+    }
+
     const exportData = {
       meta: archive.meta,
       sectors: archive.sectors
@@ -666,6 +679,17 @@ export const useSaveStore = defineStore('save', () => {
     document.body.removeChild(link)
 
     URL.revokeObjectURL(url)
+  }
+
+  function hasValidPosition(archive: SaveArchive): boolean {
+    for (const sector of Object.values(archive.sectors)) {
+      for (const station of Object.values(sector.player_stations || {})) {
+        if (station.relative_position && !station.position) {
+          return false
+        }
+      }
+    }
+    return true
   }
 
   function importFromJson(jsonData: unknown): { success: boolean; error?: string; errorDetail?: SaveParserErrorDetail } {
