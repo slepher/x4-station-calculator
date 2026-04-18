@@ -13,7 +13,8 @@ const NPC_TAG_LABEL_KEYS: Record<string, string> = {
   weaponplatform: 'map.save_npc_tag_weaponplatform',
   nest: 'map.save_npc_tag_nest',
   hive: 'map.save_npc_tag_hive',
-  factory: 'map.save_npc_tag_factory'
+  factory: 'map.save_npc_tag_factory',
+  constructionsite: 'map.save_npc_tag_constructionsite'
 }
 
 type Translator = (key: string) => string

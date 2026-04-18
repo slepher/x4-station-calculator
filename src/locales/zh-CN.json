@@ -250,7 +250,7 @@
     "save_npc_tag_weaponplatform": "武器平台",
     "save_npc_tag_nest": "巢穴",
     "save_npc_tag_hive": "蜂巢",
-    "binding_button": "绑定",
+    "save_npc_tag_constructionsite": "建筑仓库",
     "binding_title": "存档绑定",
     "binding_close": "关闭",
     "binding_select_plan_hint": "选择一个绑定计划或创建新的，将你的帝国与存档文件关联。",

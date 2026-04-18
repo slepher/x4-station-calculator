@@ -7,6 +7,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { resolveMapSectorByMacro } from '@/components/map/utils/mapSectorMacro'
 import { getSavePoiIconUrl } from '@/components/map/utils/style'
+import { getNpcStationPoiLabel } from '@/components/map/savePoiLabel'
 import { resolveGroupSaveBinding, resolveStationSaveBinding } from '@/store/logic/saveBindingUtils'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import { compareModulesByPickerOrder } from '@/store/logic/searchModule'
@@ -295,38 +296,29 @@ function buildStationDragCoverage(): { ref: string; jump: number }[] {
 }
 
 function getStationLabel(station: PlayerStationEntry): string {
-  if (station.is_headquarter) {
-    return t('map.save_station_headquarter')
+  const poiLike: SavePoiOverlayItem = {
+    key: `binding-save-station:${station.code}`,
+    code: station.code,
+    category: 'playerStation',
+    owner: 'player',
+    sectorMacro: '',
+    sectorName: '',
+    position: {
+      x: station.position.x,
+      y: station.position.y,
+      z: station.position.z
+    },
+    tag: station.tag,
+    factoryGroup: station.factoryGroup,
+    productionProfile: station.productionProfile,
+    profileName: station.profileName,
+    is_headquarter: station.is_headquarter
   }
-
-  if (station.tag === 'factory') {
-    const profile = station.productionProfile
-    if (!profile) return t('map.save_npc_tag_factory')
-
-    if (profile === 'mixed') return t('map.save_npc_profile_mixed')
-
-    const localizedModule = gameDataStore.localizedModulesMap?.[profile]
-    if (localizedModule?.localeName) return localizedModule.localeName
-
-    const localizedGroup = gameDataStore.localizedModuleGroupsMap?.[profile]
-    if (localizedGroup?.localeName) return localizedGroup.localeName
-
-    return station.profileName || profile
-  }
-
-  const tagLabelKeys: Record<string, string> = {
-    shipyard: 'map.save_npc_tag_shipyard',
-    wharf: 'map.save_npc_tag_wharf',
-    equipmentdock: 'map.save_npc_tag_equipmentdock',
-    tradestation: 'map.save_npc_tag_tradestation',
-    piratebase: 'map.save_npc_tag_piratebase',
-    defencemodule: 'map.save_npc_tag_defencemodule'
-  }
-
-  const labelKey = station.tag ? tagLabelKeys[station.tag] : undefined
-  if (labelKey) return t(labelKey)
-
-  return t('map.save_category_player_station')
+  return getNpcStationPoiLabel(poiLike, {
+    t,
+    localizedModulesMap: gameDataStore.localizedModulesMap,
+    localizedModuleGroupsMap: gameDataStore.localizedModuleGroupsMap
+  })
 }
 
 function getSaveStationIcon(station: PlayerStationEntry): string {

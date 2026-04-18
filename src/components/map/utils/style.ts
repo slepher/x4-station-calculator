@@ -8,6 +8,7 @@ import defensestationIconUrl from '@/components/icons/defensestation.svg'
 import piratestationIconUrl from '@/components/icons/piratestation.svg'
 import hiveIconUrl from '@/components/icons/hive.svg'
 import weaponplatformIconUrl from '@/components/icons/weaponplatform.svg'
+import constructionsiteIconUrl from '@/components/icons/constructionsite.svg'
 import shiptechIconUrl from '@/components/icons/shiptech.svg'
 import hightechIconUrl from '@/components/icons/hightech.svg'
 import refinedIconUrl from '@/components/icons/refined.svg'
@@ -75,6 +76,7 @@ const SAVE_POI_ICON_MAP: Record<string, string> = {
   piratestation: piratestationIconUrl,
   hive: hiveIconUrl,
   weaponplatform: weaponplatformIconUrl,
+  constructionsite: constructionsiteIconUrl,
   playerhq: playerhqIconUrl,
   shiptech: shiptechIconUrl,
   hightech: hightechIconUrl,
