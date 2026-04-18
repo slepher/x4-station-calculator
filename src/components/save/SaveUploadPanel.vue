@@ -15,15 +15,6 @@ const isDragging = ref(false)
 const fileInput = ref<HTMLInputElement | null>(null)
 const parsePercent = ref(0)
 
-function isSaveUploadTimingDebugEnabled() {
-  if (typeof window === 'undefined') return false
-  try {
-    return window.localStorage.getItem('save_upload_timing_debug') === 'true'
-  } catch {
-    return false
-  }
-}
-
 const emit = defineEmits<{
   (e: 'upload-complete', archive: SaveArchive): void
 }>()
@@ -111,16 +102,6 @@ async function processJsonFile(file: File) {
 async function processXmlFile(file: File) {
   parsePercent.value = 0
   saveStore.setParsingState(true, t('save_import.reading_file'), null)
-  const debugTimings = isSaveUploadTimingDebugEnabled()
-  const uploadStartedAt = Date.now()
-  let lastProgressAt = uploadStartedAt
-
-  if (debugTimings) {
-    console.log('[save-upload-timing][ui] upload:start', {
-      fileName: file.name,
-      fileSize: file.size
-    })
-  }
 
   try {
     const worker = new Worker(
@@ -140,17 +121,6 @@ async function processXmlFile(file: File) {
             ? t('save_import.finalizing')
             : `${percent.toFixed(0)}% - ${sectorCount} sectors`
         saveStore.setParsingState(true, statusText, null)
-        if (debugTimings) {
-          const now = Date.now()
-          console.log('[save-upload-timing][ui] worker:progress', {
-            phase,
-            percent,
-            sectorCount,
-            elapsedMs: now - uploadStartedAt,
-            sinceLastProgressMs: now - lastProgressAt
-          })
-          lastProgressAt = now
-        }
       } else if (msg.type === 'complete') {
         parsePercent.value = 100
         const processedArchive = postProcessRustSaveArchive(
@@ -163,12 +133,6 @@ async function processXmlFile(file: File) {
         saveStore.addArchive(processedArchive)
         saveStore.setParsingState(false, '', null)
         emit('upload-complete', processedArchive)
-        if (debugTimings) {
-          console.log('[save-upload-timing][ui] upload:complete', {
-            elapsedMs: Date.now() - uploadStartedAt,
-            sectorCount: Object.keys(processedArchive.sectors || {}).length
-          })
-        }
         worker.terminate()
       } else if (msg.type === 'error') {
         parsePercent.value = 0
@@ -186,13 +150,6 @@ async function processXmlFile(file: File) {
         }
         
         saveStore.setParsingState(false, '', errorMessage)
-        if (debugTimings) {
-          console.log('[save-upload-timing][ui] upload:error', {
-            elapsedMs: Date.now() - uploadStartedAt,
-            message: msg.message,
-            detail: msg.detail
-          })
-        }
         worker.terminate()
       }
     }
@@ -200,30 +157,17 @@ async function processXmlFile(file: File) {
     worker.onerror = (error) => {
       parsePercent.value = 0
       saveStore.setParsingState(false, '', error.message || t('save_import.parse_failed'))
-      if (debugTimings) {
-        console.log('[save-upload-timing][ui] worker:error', {
-          elapsedMs: Date.now() - uploadStartedAt,
-          message: error.message
-        })
-      }
       worker.terminate()
     }
 
     await streamFileToSaveParserWorker({
       worker,
       file,
-      currentVersion: gameDataStore.currentVersion,
-      debugTimings
+      currentVersion: gameDataStore.currentVersion
     })
   } catch (e) {
     const message = e instanceof Error ? e.message : t('save_import.parse_failed')
     saveStore.setParsingState(false, '', message)
-    if (debugTimings) {
-      console.log('[save-upload-timing][ui] upload:exception', {
-        elapsedMs: Date.now() - uploadStartedAt,
-        message
-      })
-    }
   }
 }
 </script>
