@@ -165,9 +165,9 @@ export function classifyPlayerStationPoi(args: {
   const macro = (args.macro || '').toLowerCase()
 
   const isPiratebase = macro.includes('_piratebase')
-  const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_xl', '_ships_x_', '_ships_x'])
-  const isWharf = hasModulePattern(modules, ['_ships_m_', '_ships_m'])
-  const isEquipmentdock = hasModulePattern(modules, ['_equip'])
+  const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_l_'])
+  const isWharf = hasModulePattern(modules, ['_ships_m_'])
+  const isEquipmentdock = hasModulePattern(modules, ['_equip_'])
   const isFactory = modules.some((m) => m.type === 'production')
   const factoryGroup = getFactoryGroup(modules)
   const isTradestation = macro.includes('tradestation')

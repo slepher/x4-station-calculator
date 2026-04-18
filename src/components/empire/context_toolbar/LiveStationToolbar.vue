@@ -341,23 +341,6 @@ const handleOpenImport = () => {
   @apply text-slate-600 mx-1;
 }
 
-.mode-toggle-chip {
-  @apply min-w-[80px] justify-center;
-}
-.mode-toggle-chip.active-live {
-  @apply border-sky-600 text-sky-400 bg-sky-900/30;
-}
-.mode-toggle-chip.active-planning {
-  @apply border-amber-600 text-amber-400 bg-amber-900/30;
-}
-.mode-toggle-chip.no-toggle {
-  @apply cursor-default;
-}
-
-.mode-icon {
-  @apply text-sm;
-}
-
 .count-pill {
   @apply flex items-center bg-slate-900 border border-slate-800 rounded px-2 h-7;
 }
@@ -391,6 +374,23 @@ const handleOpenImport = () => {
   @apply bg-emerald-950/40 border-emerald-500/30 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.2)];
 }
 .toggle-chip.active-green .chip-status { @apply text-emerald-300; }
+
+.mode-toggle-chip {
+  @apply min-w-[80px] justify-center;
+}
+.mode-toggle-chip.active-live {
+  @apply border-sky-600 text-sky-400 bg-sky-900/30;
+}
+.mode-toggle-chip.active-planning {
+  @apply border-amber-600 text-amber-400 bg-amber-900/30;
+}
+.mode-toggle-chip.no-toggle {
+  @apply cursor-default;
+}
+
+.mode-icon {
+  @apply text-sm;
+}
 
 .sector-popover,
 .resources-popover {

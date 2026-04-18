@@ -287,10 +287,14 @@ const getResourceName = (wareId: string): string => {
 
 .toggle-chip {
   @apply flex items-center gap-1.5 px-2 rounded border transition-all duration-200 cursor-pointer select-none;
+  @apply h-6 min-w-[50px] bg-slate-900 border-slate-700 text-slate-500;
+}
+.toggle-chip:hover {
+  @apply bg-slate-800 text-slate-400;
 }
 
 .mode-toggle-chip {
-  @apply min-w-[80px] justify-center h-7;
+  @apply min-w-[80px] justify-center;
 }
 
 .mode-toggle-chip.active-planning {
@@ -302,7 +306,7 @@ const getResourceName = (wareId: string): string => {
 }
 
 .mode-toggle-chip.no-toggle {
-  @apply cursor-default bg-slate-800 text-slate-500 border-slate-700;
+  @apply cursor-default;
 }
 
 .mode-icon {
@@ -310,35 +314,35 @@ const getResourceName = (wareId: string): string => {
 }
 
 .chip-status {
-  @apply text-xs font-bold whitespace-nowrap;
+  @apply text-[10px] font-bold;
 }
 
 .sector-popover,
 .resources-popover {
-  @apply absolute top-full left-0 mt-1 bg-slate-900 border border-slate-700 rounded shadow-lg z-50 min-w-[150px];
+  @apply absolute top-full left-0 mt-1 z-50 bg-slate-800 border border-slate-600 rounded-lg shadow-xl min-w-[140px];
 }
 
 .popover-header {
-  @apply px-3 py-2 text-xs font-bold text-sky-400 border-b border-slate-700;
+  @apply px-3 py-2 text-[10px] font-bold text-slate-400 border-b border-slate-700 uppercase;
 }
 
 .popover-content {
-  @apply px-3 py-2;
+  @apply p-1 max-h-48 overflow-y-auto;
 }
 
 .position-row {
-  @apply flex items-center gap-2 py-1;
+  @apply flex items-center justify-between px-2 py-1.5 gap-2;
 }
 
 .position-value {
-  @apply min-w-[60px];
+  @apply ml-2;
 }
 
 .resources-list {
-  @apply max-h-[200px] overflow-y-auto;
+  @apply max-h-none overflow-visible;
 }
 
 .resource-item {
-  @apply py-1;
+  @apply px-2 py-1.5 text-xs text-slate-300;
 }
 </style>

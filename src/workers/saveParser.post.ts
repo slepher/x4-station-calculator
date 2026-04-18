@@ -67,7 +67,7 @@ interface SectorStaticHighwayLookup {
 }
 
 export const CURRENT_PARSER_VERSION = 'v5' as const
-export const CURRENT_POST_PROCESSOR_VERSION = 'v11' as const
+export const CURRENT_POST_PROCESSOR_VERSION = 'v12' as const
 const SECTOR_CENTER_GRID = 64000
 const DEFAULT_HEX_INNER_RATIO = Math.sqrt(3) / 2
 const DEFAULT_EXTENT_RATIO = 0.8
@@ -598,13 +598,10 @@ function aggregateSectorPlayerStations(sector: SectorData): SectorData {
     const modules = aggregateModules(constructions, excludeIds)
     const equipments = aggregateEquipments(constructions, excludeIds)
     
-    const tag = modules.length === 0 ? 'constructionsite' : station.tag
-    
     return {
       ...station,
       modules,
-      equipments,
-      tag
+      equipments
     }
   })
   
@@ -713,6 +710,8 @@ function enrichPlayerStation(
   ), sectorId, sectorScaleLookup, sectorCenterLookup)
   const { productionProfile, profileName } = getProductionProfile(modules, modulesByMacroId)
   
+  const tag = modules.length === 0 ? 'constructionsite' : classification.tag
+  
   return {
     ...station,
     position,
@@ -726,7 +725,7 @@ function enrichPlayerStation(
     isPiratebase: classification.isPiratebase,
     isDefencemodule: classification.isDefencemodule,
     is_headquarter: classification.is_headquarter,
-    tag: classification.tag
+    tag
   }
 }
 
@@ -742,16 +741,17 @@ function enrichNpcStation(
   const macro = station.macro.toLowerCase()
   
   const isPiratebase = macro.includes('_piratebase')
-  const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_xl', '_ships_x_', '_ships_x'])
-  const isWharf = hasModulePattern(modules, ['_ships_m_', '_ships_m'])
-  const isEquipmentdock = hasModulePattern(modules, ['_equip'])
+  const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_l_'])
+  const isWharf = hasModulePattern(modules, ['_ships_m_'])
+  const isEquipmentdock = hasModulePattern(modules, ['_equip_'])
   const isFactory = modules.some((m) => m.type === 'production')
   const factoryGroup = getFactoryGroup(modules)
   const isTradestation = macro.includes('tradestation')
   const isDefencemodule = modules.some((m) => m.type === 'defencemodule')
   
   let tag: string | undefined
-  if (isPiratebase) tag = 'piratebase'
+  if (modules.length === 0) tag = 'constructionsite'
+  else if (isPiratebase) tag = 'piratebase'
   else if (isShipyard) tag = 'shipyard'
   else if (isWharf) tag = 'wharf'
   else if (isEquipmentdock) tag = 'equipmentdock'
@@ -798,16 +798,17 @@ function enrichFactionStation(
   
   if (owner === 'xenon') {
     const isPiratebase = macro.includes('_piratebase')
-    const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_xl', '_ships_x_', '_ships_x'])
-    const isWharf = hasModulePattern(modules, ['_ships_m_', '_ships_m'])
-    const isEquipmentdock = hasModulePattern(modules, ['_equip'])
+    const isShipyard = hasModulePattern(modules, ['_ships_xl_', '_ships_l_'])
+    const isWharf = hasModulePattern(modules, ['_ships_m_'])
+    const isEquipmentdock = hasModulePattern(modules, ['_equip_'])
     const isFactory = modules.some((m) => m.type === 'production')
     const factoryGroup = getFactoryGroup(modules)
     const isTradestation = macro.includes('tradestation')
     const isDefencemodule = modules.some((m) => m.type === 'defencemodule')
     
     let tag: string | undefined
-    if (isPiratebase) tag = 'piratebase'
+    if (modules.length === 0) tag = 'constructionsite'
+    else if (isPiratebase) tag = 'piratebase'
     else if (isShipyard) tag = 'shipyard'
     else if (isWharf) tag = 'wharf'
     else if (isEquipmentdock) tag = 'equipmentdock'
@@ -841,7 +842,7 @@ function enrichFactionStation(
   const isHive = macro.includes('landmarks_kha_hive_')
   const isNest = macro.includes('landmarks_kha_nest_')
   
-  const tag = isHive ? 'hive' : isNest ? 'nest' : 'weaponplatform'
+  const tag = modules.length === 0 ? 'constructionsite' : isHive ? 'hive' : isNest ? 'nest' : 'weaponplatform'
   
   const position = withTransformPosition(calculateFinalPosition(
     station.relative_position,
