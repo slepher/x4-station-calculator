@@ -49,6 +49,7 @@ const getTabIcon = (tab: ProductionTabItem): string => {
 const getTabIconClass = (tab: ProductionTabItem): string => {
   if (tab.type === 'overview') return 'icon-green'
   if (tab.type === 'transit') return 'icon-orange'
+  if (tab.type === 'station') return 'icon-green'
   return ''
 }
 

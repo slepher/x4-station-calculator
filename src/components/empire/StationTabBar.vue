@@ -2,11 +2,16 @@
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { StationType } from '@/types/x4'
+import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
+import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
+import factoryIconUrl from '@/components/icons/factory.svg'
 
 interface StationTabItem {
   id: string
   name: string
   stationType?: StationType
+  tag?: string
+  factoryGroup?: string
 }
 
 const props = defineProps<{
@@ -35,14 +40,10 @@ const tabsScrollAreaRef = ref<HTMLElement | null>(null)
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
 
-const getStationIcon = (type?: StationType): string => {
-  switch (type) {
-    case 'industrial': return '🏭'
-    case 'supply': return '📦'
-    case 'transit': return '🚚'
-    case 'shipyard': return '⚓'
-    default: return '🏭'
-  }
+const getStationIcon = (tab: StationTabItem): string => {
+  const iconTag = getPoiIconTag(tab)
+  if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
+  return factoryIconUrl
 }
 
 const addNewStation = () => {
@@ -180,7 +181,7 @@ const cancelDelete = () => {
       >
         <div class="tab-highlight"></div>
         <div class="tab-content">
-          <span class="tab-icon text-base">{{ getStationIcon(tab.stationType) }}</span>
+          <img class="tab-icon w-6 h-6 icon-green" :src="getStationIcon(tab)" alt="" />
           <span class="tab-label max-w-[120px] truncate">{{ tab.name }}</span>
         </div>
       </div>
@@ -367,5 +368,9 @@ const cancelDelete = () => {
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+.icon-green {
+  filter: brightness(0) saturate(100%) invert(64%) sepia(60%) saturate(450%) hue-rotate(84deg) brightness(92%) contrast(91%);
 }
 </style>

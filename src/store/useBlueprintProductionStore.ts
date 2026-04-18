@@ -25,6 +25,7 @@ import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { stationProductionFlowMap } from './state/StationProductionFlowMap'
 import { deepClone } from '@/utils/deepClone'
+import { classifyPlayerStationPoi, buildAggregatedModulesFromStationPlan } from './logic/stationPoiSemantics'
 import {
   createEmpireSourceView,
   computeActiveStation
@@ -771,13 +772,31 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   })
 
   const workbenchMethods = {
-    getTabs: () => orderedStations.value.map(s => ({
-      id: s.id,
-      type: 'station' as const,
-      name: s.name,
-      sectorId: s.sectorId ?? undefined,
-      stationType: s.type
-    })),
+    getTabs: () => orderedStations.value.map(s => {
+      const aggregatedModules = buildAggregatedModulesFromStationPlan(s, gameData.modulesMap || {})
+      const modulesByMacroId = Object.fromEntries(
+        Object.values(aggregatedModules)
+          .map(m => {
+            const matched = gameData.modulesByMacroId?.[m.ref]
+            return matched ? [m.ref, matched] : null
+          })
+          .filter((entry): entry is [string, any] => Boolean(entry))
+      )
+      const classification = classifyPlayerStationPoi({
+        modules: aggregatedModules,
+        modulesByMacroId,
+        isHeadquarter: false
+      })
+      return {
+        id: s.id,
+        type: 'station' as const,
+        name: s.name,
+        sectorId: s.sectorId ?? undefined,
+        stationType: s.type,
+        tag: classification.tag,
+        factoryGroup: classification.factoryGroup
+      }
+    }),
     getActiveTabId: () => activeStationId.value,
     getExpandedSectorId: () => null,
 
