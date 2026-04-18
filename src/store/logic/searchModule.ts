@@ -19,12 +19,17 @@ const GROUP_PRIORITY: Record<string, number> = {
   energy: 4
 }
 
+export const MODULE_TYPE_PRIORITY = TYPE_PRIORITY
+export const MODULE_GROUP_PRIORITY = GROUP_PRIORITY
+
 function getModuleTypePriority(
-  groupId: string | undefined,
-  localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
+  type?: string,
+  groupId?: string,
+  localizedModuleGroupsMap?: Record<string, LocalizedX4ModuleGroup>
 ): number {
-  const type = localizedModuleGroupsMap[groupId || '']?.type || groupId || 'others'
-  return TYPE_PRIORITY[type] || 99
+  if (type) return TYPE_PRIORITY[type] || 99
+  const resolvedType = localizedModuleGroupsMap?.[groupId || '']?.type || groupId || 'others'
+  return TYPE_PRIORITY[resolvedType] || 99
 }
 
 function getModuleGroupPriority(groupId: string | undefined): number {
@@ -44,8 +49,8 @@ export function compareModuleGroupsByPickerOrder(
   groupB: string,
   localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
 ): number {
-  const pTypeA = getModuleTypePriority(groupA, localizedModuleGroupsMap)
-  const pTypeB = getModuleTypePriority(groupB, localizedModuleGroupsMap)
+  const pTypeA = getModuleTypePriority(undefined, groupA, localizedModuleGroupsMap)
+  const pTypeB = getModuleTypePriority(undefined, groupB, localizedModuleGroupsMap)
   if (pTypeA !== pTypeB) return pTypeA - pTypeB
 
   const pGroupA = getModuleGroupPriority(groupA)
@@ -56,12 +61,17 @@ export function compareModuleGroupsByPickerOrder(
 }
 
 export function compareModulesByPickerOrder(
-  a: { id: string; group?: string; tier?: number; localeName?: string; name?: string },
-  b: { id: string; group?: string; tier?: number; localeName?: string; name?: string },
-  localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
+  a: { id: string; group?: string; tier?: number; localeName?: string; name?: string; type?: string },
+  b: { id: string; group?: string; tier?: number; localeName?: string; name?: string; type?: string },
+  localizedModuleGroupsMap?: Record<string, LocalizedX4ModuleGroup>
 ): number {
-  const groupCompare = compareModuleGroupsByPickerOrder(a.group || 'others', b.group || 'others', localizedModuleGroupsMap)
-  if (groupCompare !== 0) return groupCompare
+  const typePriorityA = getModuleTypePriority(a.type, a.group, localizedModuleGroupsMap)
+  const typePriorityB = getModuleTypePriority(b.type, b.group, localizedModuleGroupsMap)
+  if (typePriorityA !== typePriorityB) return typePriorityA - typePriorityB
+
+  const groupPriorityA = getModuleGroupPriority(a.group)
+  const groupPriorityB = getModuleGroupPriority(b.group)
+  if (groupPriorityA !== groupPriorityB) return groupPriorityA - groupPriorityB
 
   const tierDiff = (b.tier || 0) - (a.tier || 0)
   if (tierDiff !== 0) return tierDiff
@@ -70,8 +80,8 @@ export function compareModulesByPickerOrder(
 }
 
 export function sortModulesBySearchPriority(
-  modules: { id: string; group?: string; tier?: number; localeName?: string; name?: string }[],
-  localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
+  modules: { id: string; group?: string; tier?: number; localeName?: string; name?: string; type?: string }[],
+  localizedModuleGroupsMap?: Record<string, LocalizedX4ModuleGroup>
 ): void {
   modules.sort((a, b) => compareModulesByPickerOrder(a, b, localizedModuleGroupsMap))
 }

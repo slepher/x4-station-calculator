@@ -225,13 +225,17 @@ interface ProductionSource {
 
 ```
 rust-parser 输出:
-  PlayerStationEntry { constructions: [...], modules: {}, equipments: {} }
-  BuildStorageEntry { constructions: [...], modules: {}, equipments: {}, progress?: {...} }
+  PlayerStationEntry { constructions: [...], modules?: [], equipments?: [] }
+  BuildStorageEntry { constructions: [...], modules?: [], equipments?: [], progress?: {...} }
+  NpcStationEntry { modules?: [], equipments?: [] }  // 在 rust-parser 中聚合
+  FactionStationEntry { modules?: [], equipments?: [] }  // 在 rust-parser 中聚合
 
 saveParser.post.ts 处理:
   1. 对 station: aggregate(constructions) - 排除正在建造的
   2. 对 buildstorage: aggregate(constructions) - station.modules/equipments
 ```
+
+**注意**：`modules` 和 `equipments` 使用 **Array 格式** `[{ref, amount}]`，而非 HashMap。
 
 #### progress.sequenceindex 处理流程
 
@@ -250,12 +254,14 @@ buildstorage.constructions[N].id = constructionId
 #### 差值计算
 
 ```typescript
-// Station 聚合
+// Station 聚合（返回 Array）
 const stationModules = aggregateModules(station.constructions, excludeInProgress(buildstorage))
+// stationModules = [{ref, amount}, ...]
 
 // BuildStorage 聚合
 const buildstorageRawModules = aggregateModules(buildstorage.constructions)
-const buildstorageModules = subtract(buildstorageRawModules, stationModules)
+const buildstorageModules = subtractArrays(buildstorageRawModules, stationModules)
+// buildstorageModules = buildstorageRaw 减去 station 已有（差值）
 ```
 
 **差值语义**：buildstorage 显示的是"新增/正在建造但未完成"的模块。

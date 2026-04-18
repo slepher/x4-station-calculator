@@ -83,9 +83,11 @@
 
 #### 9.2 saveParser.post.ts 聚合逻辑
 
-遍历 `constructions` 数组，统计 modules 和 equipments：
-- **modules**：按 `ref` 聚合计数 → `{ref: amount}`
-- **equipments**：按 `(type, ref)` 聚合计数 → `{ref: {type, ref, amount}}`
+遍历 `constructions` 数组，统计 modules 和 equipments（返回 **Array 格式**）：
+- **modules**：按 `ref` 聚合计数 → `[{ref, amount}]`
+- **equipments**：按 `(type, ref)` 聚合计数 → `[{type, ref, amount}]`
+
+**注意**：rust-parser 对所有站点（包括 NPC/Xenon/Khaak）也使用 Array 格式输出 `modules` 和 `equipments`。
 
 #### 9.3 BuildStorage progress 处理
 
@@ -108,9 +110,9 @@ buildstorage.equipments = aggregate(buildstorage.constructions) - station.equipm
 
 **示例**：
 ```
-station.modules = {A: 3, B: 4}
-buildstorage.constructions 聚合 = {A: 5, B: 6, C: 2}
-buildstorage.modules = {A: 2, B: 2, C: 2}  // 减去 station 已有
+station.modules = [{ref: A, amount: 3}, {ref: B, amount: 4}]
+buildstorage.constructions 聚合 = [{ref: A, amount: 5}, {ref: B, amount: 6}, {ref: C, amount: 2}]
+buildstorage.modules = [{ref: A, amount: 2}, {ref: B, amount: 2}, {ref: C, amount: 2}]  // 减去 station 已有
 ```
 
 #### 9.5 Station tag 处理

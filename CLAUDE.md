@@ -9,6 +9,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 npm run dev
 
 # Build Rust WASM parser (output to src/wasm/)
+# FORBIDDEN to run this unless rust-parser/src/*.rs files are modified
 npm run build-rust
 # Or manually:
 # cd rust-parser && ./build.sh

@@ -20,6 +20,7 @@ import {
   getProductionProfile,
   hasModulePattern
 } from '@/store/logic/stationPoiSemantics'
+import { compareModulesByPickerOrder } from '@/store/logic/searchModule'
 
 interface Vector3 {
   x: number
@@ -650,13 +651,9 @@ function enrichModulesWithGameData(
 ): AggregatedStationModule[] | undefined {
   if (!modules || modules.length === 0) return modules
 
-  return modules.map(module => {
+  const enriched = modules.map(module => {
     const matchedModule = modulesByMacroId[module.ref]
-
-    if (!matchedModule) {
-      return module
-    }
-
+    if (!matchedModule) return module
     return {
       ...module,
       module_id: matchedModule.id,
@@ -664,6 +661,17 @@ function enrichModulesWithGameData(
       group: matchedModule.group
     }
   })
+
+  enriched.sort((a, b) => {
+    const mA = modulesByMacroId[a.ref]
+    const mB = modulesByMacroId[b.ref]
+    return compareModulesByPickerOrder(
+      { id: a.ref, group: a.group, tier: mA?.tier, localeName: mA?.name, name: mA?.name, type: a.type },
+      { id: b.ref, group: b.group, tier: mB?.tier, localeName: mB?.name, name: mB?.name, type: b.type }
+    )
+  })
+
+  return enriched
 }
 
 function enrichEquipmentsWithGameData(
