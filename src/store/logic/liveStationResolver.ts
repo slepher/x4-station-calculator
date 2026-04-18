@@ -111,6 +111,13 @@ export function deriveBindingStationsFromRecords(
   const stationPlansByCode = new Map<string, BindingStationPlan>()
   const emittedPlanIds = new Set<string>()
 
+  const tradestationCodes = new Set<string>()
+  groups.forEach((group) => {
+    if (group.tradeStation?.saveStationCode) {
+      tradestationCodes.add(group.tradeStation.saveStationCode)
+    }
+  })
+
   stationPlans.forEach((plan) => {
     if (plan.saveStationCode) {
       stationPlansByCode.set(plan.saveStationCode, plan)
@@ -118,6 +125,7 @@ export function deriveBindingStationsFromRecords(
   })
 
   coveredCodes.forEach((code) => {
+    if (tradestationCodes.has(code)) return
     const record = getStationRecordByCode(stationRecords, code)
     if (!record) return
     const plan = stationPlansByCode.get(code)

@@ -385,4 +385,20 @@ test.describe('3 E2E 测试场景', () => {
     const workforceBtn = page.locator('.toolbar-section .toggle-chip').filter({ hasText: /ON|OFF/ }).first()
     await expect(workforceBtn).toBeHidden({ timeout: 500 })
   })
+
+  test('3.10 Case: 星区中转站已绑定的空间站不在tab列表显示', async ({ page }) => {
+    await commonSetup(page)
+    
+    const sectorTab = page.locator('.supply-tab').filter({ hasText: '阿尔忒弥斯的朦胧' })
+    await expect(sectorTab).toBeVisible({ timeout: 5000 })
+    await sectorTab.click()
+    await page.waitForTimeout(500)
+    
+    const stationRWC = page.locator('.station-tab').filter({ hasText: 'RWC-785' })
+    await expect(stationRWC).toBeVisible({ timeout: 3000 })
+    
+    const allStationTabs = await page.locator('.station-tab').allInnerTexts()
+    const bhwStationTabs = allStationTabs.filter(text => text.includes('BHW-834'))
+    expect(bhwStationTabs.length).toBe(0)
+  })
 })
