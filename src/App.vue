@@ -13,7 +13,7 @@ import { useSaveStore } from '@/store/useSaveStore'
 import { useMapStore } from '@/store/useMapStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
-import { saveArchiveToDB, createArchiveId, loadPlayerStationsByArchiveId } from '@/db/saveArchiveDB'
+import { saveArchiveToDB, createArchiveId, loadPlayerStationsFlatByArchiveId } from '@/db/saveArchiveDB'
 
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
@@ -93,7 +93,7 @@ const checkExportStores = () => {
       (window as any).mapStore = mapStore;
       (window as any).activeViewStore = activeViewStore;
       (window as any).store = blueprintStore;
-      (window as any).saveArchiveDB = { saveArchiveToDB, createArchiveId, loadPlayerStationsByArchiveId };
+      (window as any).saveArchiveDB = { saveArchiveToDB, createArchiveId, loadPlayerStationsFlatByArchiveId };
     }
     return true;
   }

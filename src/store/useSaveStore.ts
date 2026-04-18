@@ -435,7 +435,7 @@ export const useSaveStore = defineStore('save', () => {
       return
     }
 
-    const fullArchive = await loadArchiveDetailFromDB(getStorageKey(), resolvedArchiveId)
+    const fullArchive = await loadArchiveDetailFromDB(gameDataStore, resolvedArchiveId)
     if (requestId !== archiveRestoreRequestId) return
     if (!fullArchive) {
       selectedArchive.value = null
@@ -459,7 +459,7 @@ export const useSaveStore = defineStore('save', () => {
       )
       reprocessedArchive.isCompatible = checkVersionCompatibility(reprocessedArchive.meta.version)
       reprocessedArchive.isValid = isArchiveParserVersionValid(reprocessedArchive)
-      await saveArchiveToDB(getStorageKey(), reprocessedArchive)
+      await saveArchiveToDB(gameDataStore, reprocessedArchive)
       const existingMeta = savedArchivesState.value.list.find((item) => item.id === resolvedArchiveId)
       const nextMeta = buildArchiveMeta(reprocessedArchive, existingMeta?.createdAt)
       savedArchivesState.value.list = upsertArchiveMeta(savedArchivesState.value.list, nextMeta)
@@ -549,7 +549,7 @@ export const useSaveStore = defineStore('save', () => {
     rebuildArchivesFromState()
     selectedArchive.value = archive
 
-    saveArchiveToDB(getStorageKey(), archive).catch(error => {
+    saveArchiveToDB(gameDataStore, archive).catch(error => {
       console.error('[saveStore] failed to persist archive:', error)
     })
   }
@@ -614,7 +614,7 @@ export const useSaveStore = defineStore('save', () => {
     writeSavedState()
     rebuildArchivesFromState()
 
-    removeArchiveFromDB(getStorageKey(), archiveId).catch(error => {
+    removeArchiveFromDB(gameDataStore, archiveId).catch(error => {
       console.error('[saveStore] failed to remove archive from DB:', error)
     })
   }
@@ -630,14 +630,14 @@ export const useSaveStore = defineStore('save', () => {
     isParsing.value = false
     writeSavedState()
 
-    clearArchivesFromDB(getStorageKey()).catch(error => {
+    clearArchivesFromDB(gameDataStore).catch(error => {
       console.error('[saveStore] failed to clear DB:', error)
     })
   }
 
   async function exportToJson(guid: string, time: number): Promise<void> {
     const archiveId = createArchiveId(guid, time)
-    let archive = await loadArchiveDetailFromDB(getStorageKey(), archiveId)
+    let archive = await loadArchiveDetailFromDB(gameDataStore, archiveId)
 
     if (!archive) {
       const group = archives.value.get(guid)

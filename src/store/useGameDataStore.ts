@@ -161,6 +161,11 @@ export const useGameDataStore = defineStore('gameData', () => {
     return config.storage_keys[module]
   }
 
+  function getIndexedDBName(): string {
+    const config = currentVersionConfig.value
+    return config?.indexeddb_name ?? 'x4_save_archive_db'
+  }
+
   function parseVersionNumber(value: string): number {
     const parsed = Number.parseFloat(value)
     return Number.isFinite(parsed) ? parsed : 0
@@ -548,6 +553,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     factionColorMap,
     // Methods
     getStorageKey,
+    getIndexedDBName,
     setVersion,
     getRawData,
     initialize,

@@ -7,14 +7,22 @@
 **现状**：
 ```
 localStorage: SavedSaveArchivesState (元数据)
-IndexedDB.archiveData: SaveArchive (完整存档，含 player_stations/buildstorages)
+IndexedDB.X4SaveArchiveDB:
+  ├─ archive_data: SaveArchive (存档基础数据)
+  ├─ archive_data_v9_beta: SaveArchive (Beta 版存档)
+  ├─ player_station: PlayerStationRecord[] (每条空间站一条记录)
+  └─ player_station_v9_beta: PlayerStationRecord[] (Beta 版空间站)
 ```
 
 **变更后**：
 ```
 localStorage: SavedSaveArchivesState (元数据)
-IndexedDB.archive_data: SaveArchive (存档基础数据，不含 stations)
-IndexedDB.player_station: PlayerStationRecord[] (独立空间站记录)
+IndexedDB.x4_save_archive_db (8.0):
+  ├─ archive_data: ArchiveDataRecord
+  └─ player_stations: PlayerStationsRecord
+IndexedDB.x4_save_archive_db_v9_beta (9.0 Beta):
+  ├─ archive_data: ArchiveDataRecord
+  └─ player_stations: PlayerStationsRecord
 ```
 
 ### 数据流
@@ -24,76 +32,96 @@ IndexedDB.player_station: PlayerStationRecord[] (独立空间站记录)
   └─ SaveParserWorker 解析原始文件
   └─ postProcessRustSaveArchive 后处理
   └─ addArchive()
-      ├─ 写入 archive_data 表 (基础存档)
-      ├─ 遍历 player_stations → player_station 表 (type='station')
-      └─ 遍历 player_buildstorages → player_station 表 (type='buildstorage')
+      ├─ 写入 archive_data 表 (基础存档，不含 stations/buildstorages)
+      └─ 写入 player_stations 表 (一条记录，data 按 sectorMacro 归组)
 
 加载存档
   └─ restoreSelectedArchive(archiveId)
-      ├─ 读取 archive_data 表
-      ├─ 查询 player_station 表 (where archiveId)
-      ├─ 按 sectorMacro 归组
-      ├─ 合并到 SaveArchive.sectors
-      └─ 返回完整对象
+      ├─ 读取 archive_data 表 (基础存档)
+      ├─ 读取 player_stations 表 (同一 archiveId)
+      ├─ 合并 player_stations/buildstorages 到 sectors
+      └─ 返回完整 SaveArchive 对象
 ```
 
 ## Decisions
 
-### 1. 表名动态生成
+### 1. 数据库分版本而非表分版本
 
-**决策**：根据 `versions.json` 中的 `indexeddb_tables` 配置动态生成表名
+**决策**：每个游戏版本使用独立数据库，表名固定不变
 
 **原因**：
-- 不同游戏版本数据需隔离存储
-- 表名后缀规则可配置，避免硬编码
-- snake_case 格式与 localStorage key 保持一致
+- 数据库级别隔离更彻底，避免跨版本数据污染
+- 表名统一简化代码逻辑，无需动态拼接表名
+- Dexie 对多数据库支持良好，通过不同 dbName 初始化
 
 **实现**：
 ```typescript
 // versions.json
 {
-  "indexeddb_tables": {
-    "archive_data": "archive_data",
-    "player_station": "player_station"
-  }
+  "indexeddb_name": "x4_save_archive_db"      // 8.0
 }
-// Beta 版本
 {
-  "indexeddb_tables": {
-    "archive_data": "archive_data_v9_beta",
-    "player_station": "player_station_v9_beta"
+  "indexeddb_name": "x4_save_archive_db_v9_beta"  // 9.0 Beta
+}
+```
+
+### 2. player_stations 表与 archive_data 共享主键
+
+**决策**：两张表使用相同主键 `archiveId`，每存档一条记录
+
+**原因**：
+- 空间站数据与存档元数据一一对应
+- 主键相同简化查询逻辑（一次 `get()` 而非 `where().toArray()`)
+- 按 sectorMacro 归组存储符合数据原有结构
+
+**数据结构**：
+```typescript
+interface PlayerStationsRecord {
+  id: string        // archiveId
+  archiveId: string
+  data: {
+    player_stations: Record<string, Record<string, PlayerStationEntry>>
+    player_buildstorages: Record<string, Record<string, BuildStorageEntry>>
   }
 }
 ```
 
-### 2. Station/Buildstorage 合并存储
-
-**决策**：将 station 和 buildstorage 合并到同一 `player_station` 表，通过 `type` 字段区分
-
-**原因**：
-- 两者的数据结构相似（都有 modules, equipments, cargo）
-- 合并存储简化表结构管理
-- `type` 索引支持按类型查询
-
 ### 3. 索引设计
 
-**决策**：索引 `id, archiveId, sectorMacro, type`
+**决策**：两张表索引相同：主键 + guid
 
 | 索引 | 用途 |
 |------|------|
-| id | 主键查询 |
-| archiveId | 批量加载存档所有空间站 |
-| sectorMacro | 按星区查询 |
-| type | 按类型区分 station/buildstorage |
-
-### 4. ID 格式简化
-
-**决策**：`id` 格式为 `${archiveId}:${code}`，移除 `scopeKey`
+| id (主键) | 按 archiveId 查询存档 |
+| guid | 查询某 GUID 的所有存档版本 |
 
 **原因**：
-- 表名已按版本隔离，无需在 ID 中重复 scopeKey
-- archiveId 已包含 guid+time，可唯一标识存档
-- 简化 ID 格式便于调试和日志追踪
+- archiveId 已等于主键 id，无需单独索引
+- guid 索引支持查找同一游戏的多个存档时间点
+
+### 4. 动态数据库创建
+
+**决策**：根据 scopeKey 动态创建数据库实例，缓存到 Map
+
+**原因**：
+- 不同版本需不同数据库实例
+- 避免每次调用都创建新实例
+- 缓存确保同一版本使用同一连接
+
+**实现**：
+```typescript
+const dbCache = new Map<string, X4SaveArchiveDB>()
+
+function getDB(scopeKey: string): X4SaveArchiveDB {
+  const dbName = getDBName(scopeKey)
+  let db = dbCache.get(dbName)
+  if (!db) {
+    db = new X4SaveArchiveDB(dbName)
+    dbCache.set(dbName, db)
+  }
+  return db
+}
+```
 
 ### 5. 加载策略保持现状
 
@@ -101,19 +129,25 @@ IndexedDB.player_station: PlayerStationRecord[] (独立空间站记录)
 
 **原因**：
 - 上层代码依赖 `SaveArchive` 完整对象
-- 暂不引入按需加载，避免 UI 层变更
-- 通过 `archiveId` 索引批量查询性能可接受
+- 两表主键相同，两次 `get()` 即可完成合并
+- 无需引入按需加载，避免 UI 层变更
 
-### 6. DB 迁移策略
+### 6. 版本迁移策略
 
-**决策**：升级时清理旧数据而非迁移
+**决策**：直接清空旧数据库，不进行数据迁移
 
 **原因**：
-- 旧版 parser 数据可能已失效（版本不兼容）
-- 迁移逻辑复杂度高，收益有限
+- 数据库名变更（`X4SaveArchiveDB` → `x4_save_archive_db`）
+- 旧版数据结构不兼容
 - 用户可重新导入存档文件
 
-**实现**：检测旧版表存在时，直接清理并重建
+**实现**：
+```typescript
+export async function clearLegacySaveDB(): Promise<void> {
+  dbCache.clear()
+  await Dexie.delete('X4SaveArchiveDB')
+}
+```
 
 ## Implementation Notes
 
@@ -124,34 +158,30 @@ IndexedDB.player_station: PlayerStationRecord[] (独立空间站记录)
   "versions": [
     {
       "version": "8.0",
-      "indexeddb_tables": {
-        "archive_data": "archive_data",
-        "player_station": "player_station"
-      }
+      "indexeddb_name": "x4_save_archive_db"
     },
     {
       "version": "9.0",
       "beta": true,
-      "indexeddb_tables": {
-        "archive_data": "archive_data_v9_beta",
-        "player_station": "player_station_v9_beta"
-      }
+      "indexeddb_name": "x4_save_archive_db_v9_beta"
     }
   ]
 }
 ```
 
+移除原有 `indexeddb_tables` 配置。
+
 ### saveArchiveDB.ts 重构
 
 ```typescript
 // 新增类型
-interface PlayerStationRecord {
+interface PlayerStationsRecord {
   id: string
   archiveId: string
-  sectorMacro: string
-  code: string
-  type: 'station' | 'buildstorage'
-  data: PlayerStationEntry | BuildStorageEntry
+  data: {
+    player_stations: Record<string, Record<string, PlayerStationEntry>>
+    player_buildstorages: Record<string, Record<string, BuildStorageEntry>>
+  }
 }
 
 interface ArchiveDataRecord {
@@ -161,88 +191,64 @@ interface ArchiveDataRecord {
 }
 
 // DB schema
-this.version(DB_VERSION).stores({
-  archive_data: 'id, archiveId',
-  player_station: 'id, archiveId, sectorMacro, type'
-})
+class X4SaveArchiveDB extends Dexie {
+  archive_data!: Table<ArchiveDataRecord>
+  player_stations!: Table<PlayerStationsRecord>
 
-// 新增函数
-async function savePlayerStationToDB(
-  scopeKey: string,  // 用于确定表名
-  archiveId: string,
-  sectorMacro: string,
-  code: string,
-  type: 'station' | 'buildstorage',
-  data: PlayerStationEntry | BuildStorageEntry
-): Promise<void>
-
-async function loadPlayerStationsByArchiveId(
-  scopeKey: string,
-  archiveId: string
-): Promise<PlayerStationRecord[]>
-
-// 修改函数
-async function saveArchiveToDB(scopeKey: string, archive: SaveArchive): Promise<void> {
-  // 分离写入 archive_data 和 player_station
+  constructor(dbName: string) {
+    super(dbName)
+    this.version(1).stores({
+      archive_data: 'id, archiveId, guid',
+      player_stations: 'id, archiveId, guid'
+    })
+  }
 }
 
-async function loadArchiveDetailFromDB(scopeKey: string, archiveId: string): Promise<SaveArchive | null> {
-  // 合并读取 archive_data + player_station
+// 简化的 CRUD
+async function saveArchiveToDB(scopeKey: string, archive: SaveArchive) {
+  // 两条 put() 完成存储
+}
+
+async function loadArchiveDetailFromDB(scopeKey: string, archiveId: string) {
+  // 两次 get() + 合并
+}
+
+async function removeArchiveFromDB(scopeKey: string, archiveId: string) {
+  // 两次 delete()
 }
 ```
 
-### useSaveStore.ts 适配
+### SectorData 类型保持不变
 
-```typescript
-// addArchive() 无需变更，saveArchiveToDB 内部处理分离
+**决策**：`SectorData` 类型保留 `player_stations` 和 `player_buildstorages` 字段
 
-// restoreSelectedArchive() 无需变更，loadArchiveDetailFromDB 内部处理合并
-```
+**原因**：
+- 运行时 `SaveArchive` 需要完整数据供上层消费
+- 存储时分离，加载时合并
+- 类型定义反映运行时完整状态
 
-### SectorData 类型变更
+### useSaveStore.ts 无需变更
 
-```typescript
-// 移除字段
-interface SectorData {
-  // player_stations?: CodeMap<PlayerStationEntry>  // 已移除
-  // player_buildstorages?: CodeMap<BuildStorageEntry>  // 已移除
-  xenon_stations?: CodeMap<FactionStationEntry>
-  khaak_stations?: CodeMap<FactionStationEntry>
-  npc_stations?: CodeMap<NpcStationEntry>
-  datavaults?: CodeMap<DatavaultEntry>
-  erlking_vaults?: CodeMap<DatavaultEntry>
-  abandoned_ships?: CodeMap<AbandonedShipEntry>
-}
-```
-
-### DB_VERSION 升级
-
-```typescript
-const DB_VERSION = 4  // 从 3 升级
-
-// 清理旧版数据
-async function clearLegacySaveDB(): Promise<void> {
-  // 删除旧表 archiveData（v3）
-  // 重建新表 archive_data, player_station
-}
-```
+- `addArchive()` 调用 `saveArchiveToDB()` 已处理分离
+- `restoreSelectedArchive()` 调用 `loadArchiveDetailFromDB()` 已处理合并
+- 函数签名和行为不变，无需适配
 
 ## Risks
 
-### 1. 数据迁移失败
+### 1. 多数据库实例管理
 
-**风险**：旧版数据迁移时解析失败导致数据丢失
+**风险**：用户切版本时数据库实例缓存未清理
 
-**缓解**：不迁移，直接清理；用户可重新导入存档文件
+**缓解**：`clearArchivesFromDB()` 时清理缓存中对应版本的数据库实例
 
 ### 2. 类型兼容性
 
-**风险**：上层代码依赖 `SectorData.player_stations` 字段导致编译错误
+**风险**：上层代码依赖旧版 `PlayerStationRecord` 类型
 
-**缓解**：确保所有依赖点通过 `SaveArchive` 对象访问，加载时已合并完整数据
+**缓解**：检查所有导入点，确保仅使用新版类型
 
-### 3. DB 锁冲突
+### 3. 旧数据库遗留
 
-**风险**：并发写入 `archive_data` 和 `player_station` 表时锁冲突
+**风险**：旧 `X4SaveArchiveDB` 未清理占用存储空间
 
-**缓解**：使用 Dexie 事务确保原子写入
+**缓解**：首次使用新版本时调用 `clearLegacySaveDB()` 清理

@@ -173,6 +173,7 @@ interface GameDataStoreLike {
   currentVersion?: string
   isBeta?: boolean
   getStorageKey?: (module: 'empire' | 'logic_flow' | 'ship_blueprints' | 'save_archives') => string
+  getIndexedDBName?: () => string
 }
 
 interface SaveStoreLike {
@@ -1054,11 +1055,10 @@ export async function buildSaveExportData(
   state: SavedSaveArchivesState,
   gameDataStore: GameDataStoreLike
 ): Promise<SaveArchiveExportData> {
-  const scopeKey = getStorageKey(SAVE_KEY, gameDataStore)
   const archives: SaveArchive[] = []
 
   for (const meta of state.list) {
-    const archive = await loadArchiveDetailFromDB(scopeKey, meta.id)
+    const archive = await loadArchiveDetailFromDB(gameDataStore, meta.id)
     if (archive) {
       archives.push(archive)
     }
@@ -1229,7 +1229,6 @@ async function applySaveImport(options: ImportApplyOptions, warnings: string[]):
   const saveData = preparedPayload.preparedModules[SAVE_KEY] as { state: SavedSaveArchivesState; archives: SaveArchive[] } | undefined
   if (!saveData) return false
 
-  const scopeKey = getStorageKey(SAVE_KEY, options.gameDataStore)
   const defaultSettings = {
     visibility: {
       playerStation: false,
@@ -1247,7 +1246,7 @@ async function applySaveImport(options: ImportApplyOptions, warnings: string[]):
   let nextArchives: SaveArchive[]
 
   if (options.mode === 'overwrite') {
-    await clearArchivesFromDB(scopeKey)
+    await clearArchivesFromDB(options.gameDataStore)
     nextState = saveData.state
     nextArchives = saveData.archives
   } else {
@@ -1280,7 +1279,7 @@ async function applySaveImport(options: ImportApplyOptions, warnings: string[]):
 
   for (const archive of nextArchives) {
     const serializedArchive = JSON.parse(JSON.stringify(archive))
-    await saveArchiveToDB(scopeKey, serializedArchive)
+    await saveArchiveToDB(options.gameDataStore, serializedArchive)
   }
 
   if (options.saveStore) {

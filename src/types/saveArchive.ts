@@ -249,9 +249,20 @@ export interface PlayerStationRecord {
   data: PlayerStationEntry | BuildStorageEntry
 }
 
+export interface PlayerStationsRecord {
+  id: string
+  archiveId: string
+  guid: string
+  data: {
+    player_stations: Record<string, Record<string, PlayerStationEntry>>
+    player_buildstorages: Record<string, Record<string, BuildStorageEntry>>
+  }
+}
+
 export interface ArchiveDataRecord {
   id: string
   archiveId: string
+  guid: string
   data: SaveArchive
 }
 

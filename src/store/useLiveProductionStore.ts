@@ -28,7 +28,7 @@ import {
 import { createEmpireFlowFacade } from './logic/empireFlowFacade'
 import { buildDerivedActiveStationState, buildDerivedTransitState } from './logic/productionStationShared'
 import { toProductionStation } from './logic/liveStationResolver'
-import { loadPlayerStationsByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
+import { loadPlayerStationsFlatByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 import { createProductionModuleActions } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
@@ -139,10 +139,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       playerStationRecords.value = []
       return
     }
-    const scopeKey = gameData.getStorageKey('save_archives')
     const archiveId = createArchiveId(archive.meta.guid, archive.meta.time)
     try {
-      const records = await loadPlayerStationsByArchiveId(scopeKey, archiveId)
+      const records = await loadPlayerStationsFlatByArchiveId(gameData, archiveId)
       playerStationRecords.value = records
     } catch (e) {
       console.error('[LiveProductionStore] Failed to load player stations:', e)

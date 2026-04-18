@@ -14,10 +14,7 @@
         "setting": "x4-setting",
         "save_archives": "x4_save_archives"
       },
-      "indexeddb_tables": {
-        "archive_data": "archive_data",
-        "player_station": "player_station"
-      }
+      "indexeddb_name": "x4_save_archive_db"
     },
     {
       "version": "9.0",
@@ -32,10 +29,7 @@
         "setting": "x4-setting_v9_beta",
         "save_archives": "x4_save_archives_v9_beta"
       },
-      "indexeddb_tables": {
-        "archive_data": "archive_data_v9_beta",
-        "player_station": "player_station_v9_beta"
-      }
+      "indexeddb_name": "x4_save_archive_db_v9_beta"
     }
   ]
 }

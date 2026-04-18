@@ -4,151 +4,51 @@ import type {
   PlayerStationEntry,
   BuildStorageEntry,
   SectorData,
-  PlayerStationRecord,
+  PlayerStationsRecord,
   ArchiveDataRecord,
+  PlayerStationRecord,
   PlayerStationType
 } from '@/types/saveArchive'
 
-export type { PlayerStationRecord, ArchiveDataRecord, PlayerStationType }
+export type { PlayerStationsRecord, ArchiveDataRecord, PlayerStationRecord, PlayerStationType }
 
-const DB_NAME = 'X4SaveArchiveDB'
-const DB_VERSION = 4
-
-const DEFAULT_TABLE_NAMES = {
-  archive_data: 'archive_data',
-  player_station: 'player_station'
+interface GameDataStoreLike {
+  getIndexedDBName?: () => string
 }
 
-const VERSION_TABLE_MAP: Record<string, { archive_data: string; player_station: string }> = {
-  'x4_save_archives': { archive_data: 'archive_data', player_station: 'player_station' },
-  'x4_save_archives_v9_beta': { archive_data: 'archive_data_v9_beta', player_station: 'player_station_v9_beta' }
+const DEFAULT_DB_NAME = 'x4_save_archive_db'
+
+const dbCache = new Map<string, X4SaveArchiveDB>()
+
+function getDBName(gameDataStore: GameDataStoreLike): string {
+  return gameDataStore.getIndexedDBName?.() ?? DEFAULT_DB_NAME
 }
 
-function getTableNames(scopeKey: string): { archive_data: string; player_station: string } {
-  return VERSION_TABLE_MAP[scopeKey] ?? DEFAULT_TABLE_NAMES
-}
-
-class X4SaveDB extends Dexie {
+class X4SaveArchiveDB extends Dexie {
   archive_data!: Table<ArchiveDataRecord>
-  archive_data_v9_beta!: Table<ArchiveDataRecord>
-  player_station!: Table<PlayerStationRecord>
-  player_station_v9_beta!: Table<PlayerStationRecord>
+  player_stations!: Table<PlayerStationsRecord>
 
-  constructor() {
-    super(DB_NAME)
+  constructor(dbName: string) {
+    super(dbName)
     this.version(1).stores({
-      archives: 'id, guid, playerName, time, createdAt, parser_version',
-      archiveData: 'id'
-    })
-    this.version(2).stores({
-      archives: 'id, guid, playerName, time, createdAt, parser_version, post_processor_version, isValid',
-      archiveData: 'id'
-    })
-    this.version(3).stores({
-      archiveData: 'id, scopeKey, archiveId'
-    })
-    this.version(DB_VERSION).stores({
-      archive_data: 'id, archiveId',
-      archive_data_v9_beta: 'id, archiveId',
-      player_station: 'id, archiveId, sectorMacro, type',
-      player_station_v9_beta: 'id, archiveId, sectorMacro, type'
-    }).upgrade(async (tx) => {
-      interface OldArchiveRecord {
-        id: string
-        scopeKey: string
-        archiveId: string
-        data: SaveArchive
-      }
-      
-      const oldRecords = await tx.table('archiveData').toArray() as OldArchiveRecord[]
-      
-      for (const record of oldRecords) {
-        const archive = record.data
-        const archiveId = record.archiveId
-        const tableNames = getTableNames(record.scopeKey)
-        const archiveDataTable = tx.table(tableNames.archive_data)
-        const playerStationTable = tx.table(tableNames.player_station)
-        
-        const strippedSectors: Record<string, SectorData> = {}
-        for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
-          strippedSectors[sectorMacro] = {
-            ...sector,
-            player_stations: undefined,
-            player_buildstorages: undefined
-          }
-        }
-        const strippedArchive: SaveArchive = {
-          ...archive,
-          sectors: strippedSectors
-        }
-        
-        await archiveDataTable.put({
-          id: archiveId,
-          archiveId,
-          data: strippedArchive
-        })
-        
-        for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
-          if (sector.player_stations) {
-            for (const [code, entry] of Object.entries(sector.player_stations)) {
-              await playerStationTable.put({
-                id: `${archiveId}:${code}`,
-                archiveId,
-                sectorMacro,
-                code,
-                type: 'station',
-                data: entry
-              })
-            }
-          }
-          if (sector.player_buildstorages) {
-            for (const [code, entry] of Object.entries(sector.player_buildstorages)) {
-              await playerStationTable.put({
-                id: `${archiveId}:${code}`,
-                archiveId,
-                sectorMacro,
-                code,
-                type: 'buildstorage',
-                data: entry
-              })
-            }
-          }
-        }
-      }
-      
-      await tx.table('archiveData').clear()
-      await tx.table('archives').clear()
+      archive_data: 'id, archiveId, guid',
+      player_stations: 'id, archiveId, guid'
     })
   }
 }
 
-let db: X4SaveDB | null = null
-
-function getDB(): X4SaveDB {
+function getDB(gameDataStore: GameDataStoreLike): X4SaveArchiveDB {
+  const dbName = getDBName(gameDataStore)
+  let db = dbCache.get(dbName)
   if (!db) {
-    db = new X4SaveDB()
+    db = new X4SaveArchiveDB(dbName)
+    dbCache.set(dbName, db)
   }
   return db
 }
 
 export function createArchiveId(guid: string, time: number): string {
   return `${guid}_${time}`
-}
-
-function createStationRecordId(archiveId: string, code: string): string {
-  return `${archiveId}:${code}`
-}
-
-function getArchiveDataTable(scopeKey: string): Table<ArchiveDataRecord> {
-  const db = getDB()
-  const names = getTableNames(scopeKey)
-  return db.table(names.archive_data) as Table<ArchiveDataRecord>
-}
-
-function getPlayerStationTable(scopeKey: string): Table<PlayerStationRecord> {
-  const db = getDB()
-  const names = getTableNames(scopeKey)
-  return db.table(names.player_station) as Table<PlayerStationRecord>
 }
 
 function stripPlayerStationsFromArchive(archive: SaveArchive): SaveArchive {
@@ -166,133 +66,141 @@ function stripPlayerStationsFromArchive(archive: SaveArchive): SaveArchive {
   }
 }
 
+function extractPlayerStationsData(archive: SaveArchive): PlayerStationsRecord['data'] {
+  const playerStationsData: Record<string, Record<string, PlayerStationEntry>> = {}
+  const playerBuildstoragesData: Record<string, Record<string, BuildStorageEntry>> = {}
+
+  for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
+    if (sector.player_stations && Object.keys(sector.player_stations).length > 0) {
+      playerStationsData[sectorMacro] = sector.player_stations
+    }
+    if (sector.player_buildstorages && Object.keys(sector.player_buildstorages).length > 0) {
+      playerBuildstoragesData[sectorMacro] = sector.player_buildstorages
+    }
+  }
+
+  return {
+    player_stations: playerStationsData,
+    player_buildstorages: playerBuildstoragesData
+  }
+}
+
 function mergePlayerStationsIntoArchive(
   archive: SaveArchive,
-  records: PlayerStationRecord[]
+  stationsData?: PlayerStationsRecord['data']
 ): SaveArchive {
+  if (!stationsData) return archive
+
   const mergedSectors: Record<string, SectorData> = { ...archive.sectors }
-  
-  for (const [_sectorMacro, sector] of Object.entries(mergedSectors)) {
+
+  for (const [sectorMacro, sector] of Object.entries(mergedSectors)) {
     if (sector) {
-      sector.player_stations = sector.player_stations ?? {}
-      sector.player_buildstorages = sector.player_buildstorages ?? {}
+      sector.player_stations = stationsData.player_stations[sectorMacro] ?? {}
+      sector.player_buildstorages = stationsData.player_buildstorages[sectorMacro] ?? {}
     }
   }
-  
-  for (const record of records) {
-    const sector = mergedSectors[record.sectorMacro]
-    if (!sector) continue
-    
-    if (record.type === 'station') {
-      const stations = sector.player_stations ?? {}
-      stations[record.code] = record.data as PlayerStationEntry
-      sector.player_stations = stations
-    } else {
-      const buildstorages = sector.player_buildstorages ?? {}
-      buildstorages[record.code] = record.data as BuildStorageEntry
-      sector.player_buildstorages = buildstorages
-    }
-  }
-  
-  return {
-    ...archive,
-    sectors: mergedSectors
-  }
+
+  return { ...archive, sectors: mergedSectors }
 }
 
-export async function saveArchiveToDB(scopeKey: string, archive: SaveArchive): Promise<void> {
-  const database = getDB()
+export async function saveArchiveToDB(gameDataStore: GameDataStoreLike, archive: SaveArchive): Promise<void> {
+  const db = getDB(gameDataStore)
   const archiveId = createArchiveId(archive.meta.guid, archive.meta.time)
-  const archiveTable = getArchiveDataTable(scopeKey)
-  const stationTable = getPlayerStationTable(scopeKey)
-  
+
   const strippedArchive = stripPlayerStationsFromArchive(archive)
-  
-  await database.transaction('rw', [archiveTable, stationTable], async () => {
-    await archiveTable.put({
+  const stationsData = extractPlayerStationsData(archive)
+
+  await db.transaction('rw', [db.archive_data, db.player_stations], async () => {
+    await db.archive_data.put({
       id: archiveId,
       archiveId,
+      guid: archive.meta.guid,
       data: strippedArchive
     })
-    
-    const stationRecords: PlayerStationRecord[] = []
-    
-    for (const [sectorMacro, sector] of Object.entries(archive.sectors)) {
-      if (sector.player_stations) {
-        for (const [code, entry] of Object.entries(sector.player_stations)) {
-          stationRecords.push({
-            id: createStationRecordId(archiveId, code),
-            archiveId,
-            sectorMacro,
-            code,
-            type: 'station',
-            data: entry
-          })
-        }
-      }
-      if (sector.player_buildstorages) {
-        for (const [code, entry] of Object.entries(sector.player_buildstorages)) {
-          stationRecords.push({
-            id: createStationRecordId(archiveId, code),
-            archiveId,
-            sectorMacro,
-            code,
-            type: 'buildstorage',
-            data: entry
-          })
-        }
-      }
-    }
-    
-    if (stationRecords.length > 0) {
-      await stationTable.bulkPut(stationRecords)
-    }
+
+    await db.player_stations.put({
+      id: archiveId,
+      archiveId,
+      guid: archive.meta.guid,
+      data: stationsData
+    })
   })
 }
 
-export async function loadArchiveDetailFromDB(scopeKey: string, archiveId: string): Promise<SaveArchive | null> {
-  const archiveTable = getArchiveDataTable(scopeKey)
-  const stationTable = getPlayerStationTable(scopeKey)
-  
-  const record = await archiveTable.get(archiveId)
-  if (!record) return null
-  
-  const stationRecords = await stationTable.where('archiveId').equals(archiveId).toArray()
-  
-  return mergePlayerStationsIntoArchive(record.data, stationRecords)
+export async function loadArchiveDetailFromDB(gameDataStore: GameDataStoreLike, archiveId: string): Promise<SaveArchive | null> {
+  const db = getDB(gameDataStore)
+
+  const archiveRecord = await db.archive_data.get(archiveId)
+  if (!archiveRecord) return null
+
+  const stationsRecord = await db.player_stations.get(archiveId)
+
+  return mergePlayerStationsIntoArchive(archiveRecord.data, stationsRecord?.data)
 }
 
-export async function removeArchiveFromDB(scopeKey: string, archiveId: string): Promise<void> {
-  const database = getDB()
-  const archiveTable = getArchiveDataTable(scopeKey)
-  const stationTable = getPlayerStationTable(scopeKey)
-  
-  await database.transaction('rw', [archiveTable, stationTable], async () => {
-    await archiveTable.delete(archiveId)
-    const stationIds = await stationTable.where('archiveId').equals(archiveId).primaryKeys()
-    if (stationIds.length > 0) {
-      await stationTable.bulkDelete(stationIds)
-    }
+export async function removeArchiveFromDB(gameDataStore: GameDataStoreLike, archiveId: string): Promise<void> {
+  const db = getDB(gameDataStore)
+
+  await db.transaction('rw', [db.archive_data, db.player_stations], async () => {
+    await db.archive_data.delete(archiveId)
+    await db.player_stations.delete(archiveId)
   })
 }
 
-export async function clearArchivesFromDB(scopeKey: string): Promise<void> {
-  const archiveTable = getArchiveDataTable(scopeKey)
-  const stationTable = getPlayerStationTable(scopeKey)
-  
-  await archiveTable.clear()
-  await stationTable.clear()
+export async function clearArchivesFromDB(gameDataStore: GameDataStoreLike): Promise<void> {
+  const db = getDB(gameDataStore)
+  await db.archive_data.clear()
+  await db.player_stations.clear()
 }
 
 export async function clearLegacySaveDB(): Promise<void> {
-  db = null
-  await Dexie.delete(DB_NAME)
+  dbCache.clear()
+  await Dexie.delete('X4SaveArchiveDB')
 }
 
-export async function loadPlayerStationsByArchiveId(
-  scopeKey: string,
+export function flattenPlayerStationsRecord(
+  archiveId: string,
+  data: PlayerStationsRecord['data']
+): PlayerStationRecord[] {
+  const records: PlayerStationRecord[] = []
+
+  for (const [sectorMacro, stations] of Object.entries(data.player_stations)) {
+    for (const [code, entry] of Object.entries(stations)) {
+      records.push({
+        id: `${archiveId}:${code}`,
+        archiveId,
+        sectorMacro,
+        code,
+        type: 'station',
+        data: entry
+      })
+    }
+  }
+
+  for (const [sectorMacro, buildstorages] of Object.entries(data.player_buildstorages)) {
+    for (const [code, entry] of Object.entries(buildstorages)) {
+      records.push({
+        id: `${archiveId}:${code}`,
+        archiveId,
+        sectorMacro,
+        code,
+        type: 'buildstorage',
+        data: entry
+      })
+    }
+  }
+
+  return records
+}
+
+export async function loadPlayerStationsFlatByArchiveId(
+  gameDataStore: GameDataStoreLike,
   archiveId: string
 ): Promise<PlayerStationRecord[]> {
-  const stationTable = getPlayerStationTable(scopeKey)
-  return await stationTable.where('archiveId').equals(archiveId).toArray()
+  const db = getDB(gameDataStore)
+
+  const record = await db.player_stations.get(archiveId)
+  if (!record) return []
+
+  return flattenPlayerStationsRecord(archiveId, record.data)
 }

@@ -7,90 +7,82 @@
 **文件**：`src/assets/versions.json`
 
 **内容**：
-- 为每个版本新增 `indexeddb_tables` 配置项
-- 8.0：`archive_data`, `player_station`
-- 9.0 Beta：`archive_data_v9_beta`, `player_station_v9_beta`
+- 移除 `indexeddb_tables` 配置项
+- 为每个版本新增 `indexeddb_name` 配置项
+- 8.0：`x4_save_archive_db`
+- 9.0 Beta：`x4_save_archive_db_v9_beta`
 
 - [x] 完成
 
-### 2. 新增 IndexedDB 类型定义
+### 2. 更新类型定义
 
 **文件**：`src/types/saveArchive.ts`
 
 **内容**：
-- 新增 `PlayerStationRecord` 类型
-- 新增 `ArchiveDataRecord` 类型（简化版，移除 scopeKey）
-- 新增 `PlayerStationType = 'station' | 'buildstorage'` 类型
+- 删除 `PlayerStationType` 类型
+- 删除 `PlayerStationRecord` 类型（旧版）
+- 新增 `PlayerStationsRecord` 类型（新版）
+- 保留 `ArchiveDataRecord` 类型不变
+- 保留 `SectorData` 中 `player_stations` 和 `player_buildstorages` 字段（运行时需要）
 
-- [x] 完成（类型定义移至 saveArchiveDB.ts）
+- [x] 完成
 
-### 3. 移除 SectorData 内嵌字段
-
-**文件**：`src/types/saveArchive.ts`
-
-**内容**：
-- 移除 `SectorData.player_stations` 字段
-- 移除 `SectorData.player_buildstorages` 字段
-- 保留其他 POI 字段不变
-
-- [x] 完成（保留字段用于运行时合并，存储时分离）
-
-### 4. 重构 saveArchiveDB.ts
+### 3. 重构 saveArchiveDB.ts
 
 **文件**：`src/db/saveArchiveDB.ts`
 
 **内容**：
-- 升级 `DB_VERSION` 到 4
-- 新增 `getPlayerStationTableName(scopeKey)` 函数
-- 新增 `getArchiveDataTableName(scopeKey)` 函数
-- 新增 `PlayerStationRecord` 和 `ArchiveDataRecord` 表定义
-- 新增索引：`id, archiveId, sectorMacro, type`
-- 新增 `savePlayerStationToDB()` 函数
-- 新增 `loadPlayerStationsByArchiveId()` 函数
-- 修改 `saveArchiveToDB()`：分离写入 archive_data 和 player_station
-- 修改 `loadArchiveDetailFromDB()`：合并读取 archive_data + player_station
-- 修改 `removeArchiveFromDB()`：同时删除 archive_data 和关联 player_station 记录
-- 修改 `clearArchivesFromDB()`：清理对应版本的所有表数据
-- 修改 `clearLegacySaveDB()`：处理 v3 到 v4 的迁移
+- 修改 `X4SaveArchiveDB` 类：
+  - 构造函数接收 `dbName` 参数
+  - 表定义改为 `archive_data` 和 `player_stations`
+  - 索引改为 `id, archiveId, guid`
+- 新增 `dbCache: Map<string, X4SaveArchiveDB>` 缓存
+- 新增 `getDBName(scopeKey)` 函数，从 versions.json 读取 `indexeddb_name`
+- 新增 `getDB(scopeKey)` 函数，动态创建/获取数据库实例
+- 重写 `saveArchiveToDB()`：
+  - 提取 player_stations/buildstorages 按 sectorMacro 归组
+  - 两表各写入一条记录（同一 archiveId）
+- 重写 `loadArchiveDetailFromDB()`：
+  - 两次 `get()` 查询两表
+  - 合并 data 到 sectors
+- 重写 `removeArchiveFromDB()`：
+  - 两次 `delete()` 删除两表记录
+- 重写 `clearArchivesFromDB()`：
+  - 清理两表数据
+- 重写 `clearLegacySaveDB()`：
+  - 清理缓存
+  - 删除旧 `X4SaveArchiveDB` 数据库
+- 删除 `loadPlayerStationsByArchiveId()` 函数（不再需要）
+- 删除 `createStationRecordId()` 函数（不再需要）
+- 删除 `getArchiveDataTable()` 函数（不再需要）
+- 删除 `getPlayerStationTable()` 函数（不再需要）
+- 删除 `VERSION_TABLE_MAP` 常量（不再需要）
 
 - [x] 完成
 
-### 5. 适配 useSaveStore.ts
+### 4. 适配 useSaveStore.ts
 
 **文件**：`src/store/useSaveStore.ts`
 
 **内容**：
-- 确认 `addArchive()` 调用 `saveArchiveToDB()` 无需变更（内部已处理分离）
-- 确认 `restoreSelectedArchive()` 调用 `loadArchiveDetailFromDB()` 无需变更（内部已处理合并）
-- 确认 `removeArchive()` 调用 `removeArchiveFromDB()` 无需变更
-- 确认 `clearAll()` 调用 `clearArchivesFromDB()` 无需变更
-- 检查 `normalizeSectorData()` 函数：移除 `player_stations` 和 `player_buildstorages` 的默认值设置
+- 检查 `addArchive()` 调用点，确认无需变更
+- 检查 `restoreSelectedArchive()` 调用点，确认无需变更
+- 检查 `removeArchive()` 调用点，确认无需变更
+- 检查 `clearAll()` 调用点，确认无需变更
 
-- [x] 完成（无需变更，函数已兼容）
+- [x] 完成（预期无需变更）
 
-### 6. 适配 saveParser.post.ts
+### 5. 适配其他依赖点
 
-**文件**：`src/workers/saveParser.post.ts`
+**文件**：搜索所有导入 `PlayerStationRecord` 或 `PlayerStationType` 的文件
 
 **内容**：
-- 检查 `postProcessRustSaveArchive()` 返回的 `SaveArchive` 结构
-- 确认返回数据中 `sectors` 不再包含 `player_stations` 和 `player_buildstorages`（由原始解析器决定）
-- 如需调整，修改后处理逻辑以适配新存储结构
-- 升级 `CURRENT_POST_PROCESSOR_VERSION` 到 v10
+- 检查是否有外部代码依赖旧版类型
+- 如有，更新导入和用法
 
 - [x] 完成
 
-### 7. 更新 useGameDataStore.ts
-
-**文件**：`src/store/useGameDataStore.ts`
-
-**内容**：
-- 新增 `getTableConfig(version)` 函数，返回该版本的 IndexedDB 表名配置
-- 确认 `getStorageKey()` 可获取 `indexeddb_tables` 配置
-
-- [x] 完成（saveArchiveDB.ts 内部通过 VERSION_TABLE_MAP 处理）
-
-### 8. 构建验证
+### 6. 构建验证
 
 **命令**：`npm run build`
 
@@ -103,17 +95,13 @@
 ## 任务依赖关系
 
 ```
-1 (versions.json) ─┬─> 4 (saveArchiveDB.ts)
-                   │
-2 (types) ─────────┴─> 4 (saveArchiveDB.ts)
-                          │
-3 (SectorData) ───────────┴─> 5 (useSaveStore.ts)
-                                │
-4 (saveArchiveDB) ──────────────┴─> 6 (saveParser.post)
-                                    │
-7 (useGameDataStore) ──────────────┴─> 4 (saveArchiveDB.ts)
-                                        │
-                                      8 (build)
+1 (versions.json) ──> 3 (saveArchiveDB.ts)
+                         │
+2 (types) ───────────────┘
+                         │
+4 (useSaveStore) ────────┴─> 5 (其他依赖点)
+                                 │
+                               6 (build)
 ```
 
 ## 验收检查点
