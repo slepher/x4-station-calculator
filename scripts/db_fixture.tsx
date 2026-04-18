@@ -309,6 +309,58 @@ type PlayerStationRecord = {
   data: any
 }
 
+type SaveArchive = {
+  meta: {
+    guid: string
+    time: number
+    playerName: string
+    version: string
+    filename: string
+    parser_version: string
+    post_processor_version?: string
+    source: string
+  }
+  sectors: Record<string, any>
+}
+
+type ArchiveMeta = {
+  id: string
+  guid: string
+  time: number
+  playerName: string
+  version: string
+  filename: string
+  parser_version: string
+  post_processor_version?: string
+  source: string
+  isCompatible: boolean
+  isValid: boolean
+  createdAt: string
+  sectorCount: number
+}
+
+type SavedSaveArchivesState = {
+  version: number
+  activeArchiveId: string | null
+  list: ArchiveMeta[]
+  settings: {
+    visibility: {
+      playerStation: boolean
+      npcStation: boolean
+      xenonStation: boolean
+      khaakStation: boolean
+      abandonedShip: boolean
+      datavault: boolean
+      erlkingVault: boolean
+    }
+  }
+}
+
+type SaveArchiveExportData = {
+  state: SavedSaveArchivesState
+  archives: SaveArchive[]
+}
+
 type X4ShipConnection = {
   size?: string
   count: number
@@ -498,15 +550,11 @@ const buildBindingState = (seed: SeedBinding, now: number, saveData: any, maps: 
   })
   
   const stationSectorMap = new Map<string, string>()
-  if (saveData?.archives) {
-    for (const archive of saveData.archives) {
-      if (archive.sectors) {
-        for (const [sectorMacro, sectorData] of Object.entries(archive.sectors)) {
-          if ((sectorData as any).player_stations) {
-            for (const [stationCode, stationData] of Object.entries((sectorData as any).player_stations)) {
-              stationSectorMap.set(stationCode, sectorMacro)
-            }
-          }
+  if (saveData?.sectors) {
+    for (const [sectorMacro, sectorData] of Object.entries(saveData.sectors)) {
+      if ((sectorData as any).player_stations) {
+        for (const [stationCode, stationData] of Object.entries((sectorData as any).player_stations)) {
+          stationSectorMap.set(stationCode, sectorMacro)
         }
       }
     }
@@ -882,36 +930,74 @@ const main = async () => {
   }
   
   if (saveData) {
-    dbPayload.x4_save_archives = saveData
+    const archiveId = `${saveData.meta.guid}_${saveData.meta.time}`
+    const sectorCount = Object.keys(saveData.sectors || {}).length
+    
+    const archiveMeta: ArchiveMeta = {
+      id: archiveId,
+      guid: saveData.meta.guid,
+      time: saveData.meta.time,
+      playerName: saveData.meta.playerName,
+      version: saveData.meta.version,
+      filename: saveData.meta.filename,
+      parser_version: saveData.meta.parser_version,
+      post_processor_version: saveData.meta.post_processor_version,
+      source: saveData.meta.source,
+      isCompatible: true,
+      isValid: true,
+      createdAt: new Date(now).toISOString(),
+      sectorCount
+    }
+    
+    const saveArchivesState: SavedSaveArchivesState = {
+      version: 1,
+      activeArchiveId: archiveId,
+      list: [archiveMeta],
+      settings: {
+        visibility: {
+          playerStation: true,
+          npcStation: true,
+          xenonStation: true,
+          khaakStation: true,
+          abandonedShip: true,
+          datavault: true,
+          erlkingVault: true
+        }
+      }
+    }
+    
+    const saveExportData: SaveArchiveExportData = {
+      state: saveArchivesState,
+      archives: [saveData]
+    }
+    
+    dbPayload.x4_save_archives = saveExportData
     
     const playerStationRecords: PlayerStationRecord[] = []
-    for (const archive of saveData.archives || []) {
-      const archiveId = `${archive.meta.guid}_${archive.meta.time}`
-      for (const [sectorMacro, sectorData] of Object.entries(archive.sectors || {})) {
-        const sector = sectorData as any
-        if (sector.player_stations) {
-          for (const [code, entry] of Object.entries(sector.player_stations)) {
-            playerStationRecords.push({
-              id: `${archiveId}:${code}`,
-              archiveId,
-              sectorMacro,
-              code,
-              type: 'station',
-              data: entry
-            })
-          }
+    for (const [sectorMacro, sectorData] of Object.entries(saveData.sectors || {})) {
+      const sector = sectorData as any
+      if (sector.player_stations) {
+        for (const [code, entry] of Object.entries(sector.player_stations)) {
+          playerStationRecords.push({
+            id: `${archiveId}:${code}`,
+            archiveId,
+            sectorMacro,
+            code,
+            type: 'station',
+            data: entry
+          })
         }
-        if (sector.player_buildstorages) {
-          for (const [code, entry] of Object.entries(sector.player_buildstorages)) {
-            playerStationRecords.push({
-              id: `${archiveId}:${code}`,
-              archiveId,
-              sectorMacro,
-              code,
-              type: 'buildstorage',
-              data: entry
-            })
-          }
+      }
+      if (sector.player_buildstorages) {
+        for (const [code, entry] of Object.entries(sector.player_buildstorages)) {
+          playerStationRecords.push({
+            id: `${archiveId}:${code}`,
+            archiveId,
+            sectorMacro,
+            code,
+            type: 'buildstorage',
+            data: entry
+          })
         }
       }
     }
