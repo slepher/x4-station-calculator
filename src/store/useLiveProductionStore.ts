@@ -19,8 +19,7 @@ import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
-import { planningDerivedMap, StationDerivedMap } from './state/StationDerivedMap'
-import { buildStationSemantics, buildArchiveSemantics } from './logic/stationDerivedSemantics'
+import { planningDerivedMap, StationDerivedMap, type StationDerivedSeed } from './state/StationDerivedMap'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -116,24 +115,23 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     const workforces = stationEntry.workforces
     const hasWorkforce = workforces && workforces.length > 0
-    const actualWorkforceOverride = hasWorkforce
-      ? workforces.reduce((sum, w) => sum + w.amount, 0)
-      : 0
 
-    liveFlowMap.compute(stationId, {
-      plannedModules: modules,
+    liveFlowMap.setComputeDeps(computeDeps)
+    const seed: StationDerivedSeed = {
+      modulesMode: 'full',
+      modules,
       settings: liveSettings,
       lockedWares: [],
       warePriority: {},
-      skipAutoFill: true,
-      workforceOverride: hasWorkforce ? workforces : undefined,
-      actualWorkforceOverride
-    }, computeDeps)
-    const semantics = buildArchiveSemantics(stationEntry, {
-      modulesMap: computeDeps.modulesMap,
-      modulesByMacroId: gameData.modulesByMacroId
-    })
-    liveFlowMap.setSemantics(stationId, semantics)
+      workforces: hasWorkforce ? workforces : undefined,
+      archiveSemanticsSource: {
+        tag: stationEntry.tag,
+        factoryGroup: stationEntry.factoryGroup,
+        productionProfile: stationEntry.productionProfile,
+        profileName: stationEntry.profileName
+      }
+    }
+    liveFlowMap.upsertStation(stationId, seed)
   }
 
   function syncAfterStationFlowChange(stationId: string, deps: StationComputeDeps): void {
@@ -548,12 +546,13 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   function getComputeDeps(): StationComputeDeps | null {
-    const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
+    const { modulesMap, waresMap, medicalConsumptionMap, modulesByMacroId, enforceDlcActivation } = gameData
     if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
     return {
       modulesMap,
       waresMap,
       medicalConsumptionMap,
+      modulesByMacroId,
       buildPriceMultiplier: buildPriceMultiplier.value,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
@@ -565,20 +564,18 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const deps = getComputeDeps()
     if (!deps) return
 
+    planningDerivedMap.setComputeDeps(deps)
     stations.forEach((item) => {
       const station = item.station
       station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...station.settings })
-      planningDerivedMap.compute(station.id, {
-        plannedModules: station.modules || [],
+      const seed: StationDerivedSeed = {
+        modulesMode: 'plan',
+        modules: station.modules || [],
         settings: station.settings,
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
-      }, deps)
-      const semantics = buildStationSemantics(station, {
-        modulesMap: deps.modulesMap,
-        modulesByMacroId: gameData.modulesByMacroId
-      })
-      planningDerivedMap.setSemantics(station.id, semantics)
+      }
+      planningDerivedMap.upsertStation(station.id, seed)
     })
 
     const stationPlans = stations.map(item => item.station)
@@ -594,12 +591,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       station.lastUpdated = Date.now()
       const deps = getComputeDeps()
       if (deps) {
-        planningDerivedMap.compute(station.id, {
-          plannedModules: station.modules,
-          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-          lockedWares: station.lockedWares || [],
-          warePriority: station.warePriority || {}
-        }, deps)
+        planningDerivedMap.setComputeDeps(deps)
+        planningDerivedMap.updateModules(station.id, station.modules)
         updateBindingStationPlan(station.id, {
           modules: station.modules,
           lockedWares: station.lockedWares,
@@ -620,12 +613,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       station.lastUpdated = Date.now()
       const deps = getComputeDeps()
       if (deps) {
-        planningDerivedMap.compute(station.id, {
-          plannedModules: station.modules || [],
-          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-          lockedWares: station.lockedWares,
-          warePriority: station.warePriority || {}
-        }, deps)
+        planningDerivedMap.setComputeDeps(deps)
+        planningDerivedMap.updateLockedWares(station.id, station.lockedWares)
         updateBindingStationPlan(station.id, {
           modules: station.modules,
           lockedWares: station.lockedWares,
@@ -646,12 +635,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       station.lastUpdated = Date.now()
       const deps = getComputeDeps()
       if (deps) {
-        planningDerivedMap.compute(station.id, {
-          plannedModules: station.modules || [],
-          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-          lockedWares: station.lockedWares || [],
-          warePriority: station.warePriority
-        }, deps)
+        planningDerivedMap.setComputeDeps(deps)
+        planningDerivedMap.updateWarePriority(station.id, station.warePriority)
         updateBindingStationPlan(station.id, {
           modules: station.modules,
           lockedWares: station.lockedWares,
@@ -689,12 +674,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           settings: station.settings
         })
         if (doesStationSettingsAffectFlowMap(changedSettings)) {
-          planningDerivedMap.compute(station.id, {
-            plannedModules: station.modules || [],
-            settings: station.settings,
-            lockedWares: station.lockedWares || [],
-            warePriority: station.warePriority || {}
-          }, deps)
+          planningDerivedMap.setComputeDeps(deps)
+          planningDerivedMap.updateSettings(station.id, station.settings)
           syncAfterStationFlowChange(station.id, deps)
         }
       }
@@ -778,12 +759,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         settings: station.settings
       })
     },
-    recomputeDerived: (station, _deps) => {
-      const semantics = buildStationSemantics(station, {
-        modulesMap: gameData.modulesMap,
-        modulesByMacroId: gameData.modulesByMacroId
-      })
-      planningDerivedMap.setSemantics(station.id, semantics)
+    recomputeDerived: (station, deps) => {
+      planningDerivedMap.setComputeDeps(deps)
+      planningDerivedMap.updateModules(station.id, station.modules || [])
     },
     afterCommit: (station, deps) => {
       syncAfterStationFlowChange(station.id, deps)
@@ -811,12 +789,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       })
     },
     recompute: (station, deps) => {
-      planningDerivedMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
+      planningDerivedMap.setComputeDeps(deps)
+      planningDerivedMap.updateLockedWares(station.id, station.lockedWares || [])
+      planningDerivedMap.updateWarePriority(station.id, station.warePriority || {})
     },
     afterCommit: (station, deps) => {
       syncAfterStationFlowChange(station.id, deps)
@@ -838,19 +813,17 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (!activeBinding.value) return
       const deps = getComputeDeps()
       if (!deps) return
+      planningDerivedMap.setComputeDeps(deps)
       derivedBindingStations.value.forEach(item => {
         const station = item.station
-        planningDerivedMap.compute(station.id, {
-          plannedModules: station.modules || [],
-          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
+        const seed: StationDerivedSeed = {
+          modulesMode: 'plan',
+          modules: station.modules || [],
+          settings: station.settings || {},
           lockedWares: station.lockedWares || [],
           warePriority: station.warePriority || {}
-        }, deps)
-        const semantics = buildStationSemantics(station, {
-          modulesMap: deps.modulesMap,
-          modulesByMacroId: gameData.modulesByMacroId
-        })
-        planningDerivedMap.setSemantics(station.id, semantics)
+        }
+        planningDerivedMap.upsertStation(station.id, seed)
       })
       const stationPlans = derivedBindingStations.value.map(item => item.station)
       planningDerivedMap.updateAggregation(stationPlans)
@@ -862,12 +835,15 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (!station) return
     const deps = getComputeDeps()
     if (!deps) return
-    planningDerivedMap.compute(stationId, {
-      plannedModules: station.modules || [],
-      settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
+    planningDerivedMap.setComputeDeps(deps)
+    const seed: StationDerivedSeed = {
+      modulesMode: 'plan',
+      modules: station.modules || [],
+      settings: station.settings || {},
       lockedWares: station.lockedWares || [],
       warePriority: station.warePriority || {}
-    }, deps)
+    }
+    planningDerivedMap.upsertStation(stationId, seed)
     syncAfterStationFlowChange(stationId, deps)
   }
 
@@ -1464,12 +1440,15 @@ warePriorityLevels: {},
       if (station.id === tradeStationId) {
         return
       }
-      planningDerivedMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: station.settings,
+      planningDerivedMap.setComputeDeps(deps)
+      const seed: StationDerivedSeed = {
+        modulesMode: 'plan',
+        modules: station.modules || [],
+        settings: station.settings || {},
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
-      }, deps)
+      }
+      planningDerivedMap.upsertStation(station.id, seed)
     },
     shouldRecompute: (station, patch) => {
       const sectorId = activeTransitSectorId.value

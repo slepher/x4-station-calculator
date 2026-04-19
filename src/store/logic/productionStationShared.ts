@@ -1,7 +1,7 @@
 import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, RaceMedicalConsumption } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationComputeDeps } from '../state/stationSettings'
-import type { StationDerivedCache } from '../state/StationDerivedMap'
+import type { StationDerivedCache, StationDerivedSeed } from '../state/StationDerivedMap'
 import { deriveInfrastructureModules, planningDerivedMap } from '../state/StationDerivedMap'
 import { DEFAULT_STATION_SETTINGS } from '../state/stationSettings'
 import { deepClone } from '@/utils/deepClone'
@@ -170,12 +170,15 @@ export function computeStationFlow(
   station: StationPlan,
   deps: StationComputeDeps
 ): void {
-  planningDerivedMap.compute(stationId, {
-    plannedModules: station.modules || [],
-    settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
+  planningDerivedMap.setComputeDeps(deps)
+  const seed: StationDerivedSeed = {
+    modulesMode: 'plan',
+    modules: station.modules || [],
+    settings: station.settings || {},
     lockedWares: station.lockedWares || [],
     warePriority: station.warePriority || {}
-  }, deps)
+  }
+  planningDerivedMap.upsertStation(stationId, seed)
 }
 
 export function isWareOperable(wareId: string, waresMap: Record<string, X4Ware>): boolean {

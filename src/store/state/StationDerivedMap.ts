@@ -1,46 +1,20 @@
 import { reactive } from 'vue'
-import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module, WareFlow, EmpirePlan } from '@/types/x4'
+import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module, WareFlow } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
+import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 
 export interface ProductionFlowComputeDeps {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, any>
   medicalConsumptionMap: Record<string, any>
+  modulesByMacroId?: Record<string, X4Module>
   buildPriceMultiplier?: number
   enforceDlcActivation?: boolean
   isModuleDlcActive?: (moduleId: string) => boolean
-}
-
-export interface StationSemanticDerived {
-  tag?: string
-  factoryGroup?: string
-  productionProfile?: string
-  profileName?: string
-}
-
-export interface StationDerivedCache {
-  autoIndustryModules: SavedModule[]
-  autoHabitationModules: SavedModule[]
-  productionFlows: WareProductionFlow[]
-  warePriorityLevels: Record<string, number>
-  actualWorkforce: number
-  currentEfficiency: number
-  semantics?: StationSemanticDerived
-}
-
-export interface ProductionFlowInput {
-  plannedModules: SavedModule[]
-  settings: StationSettings
-  lockedWares: string[]
-  warePriority: Record<string, number>
-  skipAutoFill?: boolean
-  workforceOverride?: WorkforceEntry[]
-  actualWorkforceOverride?: number
-  saturationOverride?: number
 }
 
 export interface ComputeInfrastructureModulesInput {
@@ -76,8 +50,143 @@ export function deriveInfrastructureModules(input: DeriveInfrastructureModulesIn
   return computeInfrastructureModulesFromFlows(input)
 }
 
+export interface StationSemanticDerived {
+  tag?: string
+  factoryGroup?: string
+  productionProfile?: string
+  profileName?: string
+}
+
+export interface StationSemanticDerivedSource {
+  tag?: string
+  factoryGroup?: string
+  productionProfile?: string
+  profileName?: string
+}
+
+export interface StationDerivedSettings {
+  racePreference: string
+  considerWorkforceForAutoFill: boolean
+  sunlight: number
+  useHQ: boolean
+  workforceAuto: boolean
+  manualWorkforce: number
+}
+
+export interface StationDerivedCache {
+  autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
+  productionFlows: WareProductionFlow[]
+  warePriorityLevels: Record<string, number>
+  actualWorkforce: number
+  currentEfficiency: number
+  semantics?: StationSemanticDerived
+}
+
+export interface StationDerivedSnapshot {
+  modulesMode: 'plan' | 'full'
+  inputModules: SavedModule[]
+  fullModules: SavedModule[]
+  settings: StationDerivedSettings
+  lockedWares: string[]
+  warePriority: Record<string, number>
+  workforcesOverride?: WorkforceEntry[]
+  archiveSemanticsSource?: StationSemanticDerivedSource
+}
+
+export interface StationDerivedSettingsInput {
+  racePreference?: string
+  considerWorkforceForAutoFill?: boolean
+  sunlight?: number
+  useHQ?: boolean
+  workforceAuto?: boolean
+  manualWorkforce?: number
+}
+
+export interface StationDerivedSeed {
+  modulesMode: 'plan' | 'full'
+  modules: SavedModule[]
+  settings: StationDerivedSettingsInput
+  lockedWares?: string[]
+  warePriority?: Record<string, number>
+  workforces?: WorkforceEntry[]
+  archiveSemanticsSource?: StationSemanticDerivedSource
+}
+
+const DEFAULT_DERIVED_SETTINGS: StationDerivedSettings = {
+  racePreference: 'argon',
+  considerWorkforceForAutoFill: true,
+  sunlight: 100,
+  useHQ: false,
+  workforceAuto: true,
+  manualWorkforce: 0
+}
+
+function truncateSettings(input: StationDerivedSettingsInput | Record<string, any>): StationDerivedSettings {
+  return {
+    racePreference: input.racePreference ?? DEFAULT_DERIVED_SETTINGS.racePreference,
+    considerWorkforceForAutoFill: input.considerWorkforceForAutoFill ?? DEFAULT_DERIVED_SETTINGS.considerWorkforceForAutoFill,
+    sunlight: input.sunlight ?? DEFAULT_DERIVED_SETTINGS.sunlight,
+    useHQ: input.useHQ ?? DEFAULT_DERIVED_SETTINGS.useHQ,
+    workforceAuto: input.workforceAuto ?? DEFAULT_DERIVED_SETTINGS.workforceAuto,
+    manualWorkforce: input.manualWorkforce ?? DEFAULT_DERIVED_SETTINGS.manualWorkforce
+  }
+}
+
 function deepClone<T>(value: T): T {
   return JSON.parse(JSON.stringify(value))
+}
+
+function normalizeModules(modules: SavedModule[]): SavedModule[] {
+  return modules.map(m => ({ id: m.id, count: m.count }))
+}
+
+function normalizeLockedWares(lockedWares: string[] | undefined): string[] {
+  return lockedWares ? [...lockedWares] : []
+}
+
+function normalizeWarePriority(warePriority: Record<string, number> | undefined): Record<string, number> {
+  return warePriority ? { ...warePriority } : {}
+}
+
+function modulesEqual(a: SavedModule[], b: SavedModule[]): boolean {
+  if (a.length !== b.length) return false
+  const aMap = new Map(a.map(m => [m.id, m.count]))
+  for (const m of b) {
+    const countA = aMap.get(m.id)
+    if (countA === undefined || countA !== m.count) return false
+  }
+  return true
+}
+
+function settingsEqual(a: StationDerivedSettings, b: StationDerivedSettings): boolean {
+  return (
+    a.racePreference === b.racePreference &&
+    a.considerWorkforceForAutoFill === b.considerWorkforceForAutoFill &&
+    a.sunlight === b.sunlight &&
+    a.useHQ === b.useHQ &&
+    a.workforceAuto === b.workforceAuto &&
+    a.manualWorkforce === b.manualWorkforce
+  )
+}
+
+function lockedWaresEqual(a: string[], b: string[]): boolean {
+  if (a.length !== b.length) return false
+  const setA = new Set(a)
+  for (const w of b) {
+    if (!setA.has(w)) return false
+  }
+  return true
+}
+
+function warePriorityEqual(a: Record<string, number>, b: Record<string, number>): boolean {
+  const keysA = Object.keys(a)
+  const keysB = Object.keys(b)
+  if (keysA.length !== keysB.length) return false
+  for (const key of keysA) {
+    if (a[key] !== b[key]) return false
+  }
+  return true
 }
 
 function createEmptyGroupedFlows(): GroupedFlows {
@@ -222,44 +331,297 @@ function groupBySectorFiltered(
   return sectorMap
 }
 
+function toFullSettingsForCompute(settings: StationDerivedSettings): StationSettings {
+  return {
+    racePreference: settings.racePreference,
+    considerWorkforceForAutoFill: settings.considerWorkforceForAutoFill,
+    sunlight: settings.sunlight,
+    useHQ: settings.useHQ,
+    workforceAuto: settings.workforceAuto,
+    manualWorkforce: settings.manualWorkforce,
+    workforcePercent: 100,
+    resourceBufferHours: 2,
+    primaryProductBufferHours: 2,
+    secondaryProductBufferHours: 2,
+    transportShipCapacity: 20000,
+    buyMultiplier: 1,
+    sellMultiplier: 1,
+    minersEnabled: false,
+    internalSupply: true,
+    transportMinutes: 30
+  }
+}
+
+function buildSemanticsFromModules(
+  modules: SavedModule[],
+  deps: ProductionFlowComputeDeps
+): StationSemanticDerived {
+  const aggregatedModules = buildAggregatedModulesFromStationPlan({ modules }, deps.modulesMap)
+  const classification = classifyPlayerStationPoi({
+    modules: aggregatedModules,
+    modulesByMacroId: deps.modulesByMacroId,
+    isHeadquarter: false
+  })
+
+  return {
+    tag: classification.tag,
+    factoryGroup: classification.factoryGroup,
+    productionProfile: classification.productionProfile,
+    profileName: classification.profileName
+  }
+}
+
 export class StationDerivedMap {
   private cacheMap = reactive(new Map<string, StationDerivedCache>())
+  private snapshotMap = new Map<string, StationDerivedSnapshot>()
   private empireFlowsCache: WareProductionFlow[] = []
   private sectorFlowsCache: Map<string, WareProductionFlow[]> = new Map()
+  private deps: ProductionFlowComputeDeps | null = null
 
-  compute(stationId: string, input: ProductionFlowInput, deps: ProductionFlowComputeDeps): void {
+  setComputeDeps(deps: ProductionFlowComputeDeps): void {
+    this.deps = deps
+  }
+
+  upsertStation(stationId: string, seed: StationDerivedSeed): void {
+    const deps = this.deps
+    if (!deps) return
+
+    const settings = truncateSettings(seed.settings)
+    const inputModules = normalizeModules(seed.modules)
+    const lockedWares = normalizeLockedWares(seed.lockedWares)
+    const warePriority = normalizeWarePriority(seed.warePriority)
+
+    let fullModules: SavedModule[]
+    let workforcesOverride: WorkforceEntry[] | undefined
+    let archiveSemanticsSource: StationSemanticDerivedSource | undefined
+
+    if (seed.modulesMode === 'plan') {
+      fullModules = this.deriveFullModules(inputModules, settings, lockedWares, warePriority, deps)
+      workforcesOverride = undefined
+      archiveSemanticsSource = undefined
+    } else {
+      fullModules = inputModules
+      workforcesOverride = seed.workforces ? normalizeWorkforces(seed.workforces) : undefined
+      archiveSemanticsSource = seed.archiveSemanticsSource
+    }
+
+    const snapshot: StationDerivedSnapshot = {
+      modulesMode: seed.modulesMode,
+      inputModules,
+      fullModules,
+      settings,
+      lockedWares,
+      warePriority,
+      workforcesOverride,
+      archiveSemanticsSource
+    }
+
+    this.snapshotMap.set(stationId, snapshot)
+    this.computeInternal(stationId, snapshot, deps, true)
+  }
+
+  updateModules(stationId: string, modules: SavedModule[]): void {
+    const snapshot = this.snapshotMap.get(stationId)
+    if (!snapshot) return
+    const deps = this.deps
+    if (!deps) return
+
+    const newInputModules = normalizeModules(modules)
+    if (modulesEqual(newInputModules, snapshot.inputModules)) return
+
+    let newFullModules: SavedModule[]
+    if (snapshot.modulesMode === 'plan') {
+      newFullModules = this.deriveFullModules(newInputModules, snapshot.settings, snapshot.lockedWares, snapshot.warePriority, deps)
+    } else {
+      newFullModules = newInputModules
+    }
+
+    const newSnapshot: StationDerivedSnapshot = {
+      ...snapshot,
+      inputModules: newInputModules,
+      fullModules: newFullModules
+    }
+
+    this.snapshotMap.set(stationId, newSnapshot)
+    this.computeInternal(stationId, newSnapshot, deps, true)
+  }
+
+  updateSettings(stationId: string, settings: StationDerivedSettingsInput): void {
+    const snapshot = this.snapshotMap.get(stationId)
+    if (!snapshot) return
+    const deps = this.deps
+    if (!deps) return
+
+    const newSettings = truncateSettings(settings)
+    if (settingsEqual(newSettings, snapshot.settings)) return
+
+    const newSnapshot: StationDerivedSnapshot = {
+      ...snapshot,
+      settings: newSettings,
+      fullModules: snapshot.modulesMode === 'plan'
+        ? this.deriveFullModules(snapshot.inputModules, newSettings, snapshot.lockedWares, snapshot.warePriority, deps)
+        : snapshot.fullModules
+    }
+
+    this.snapshotMap.set(stationId, newSnapshot)
+    this.computeInternal(stationId, newSnapshot, deps, false)
+  }
+
+  updateLockedWares(stationId: string, lockedWares: string[]): void {
+    const snapshot = this.snapshotMap.get(stationId)
+    if (!snapshot) return
+    const deps = this.deps
+    if (!deps) return
+
+    const newLockedWares = normalizeLockedWares(lockedWares)
+    if (lockedWaresEqual(newLockedWares, snapshot.lockedWares)) return
+
+    const newSnapshot: StationDerivedSnapshot = {
+      ...snapshot,
+      lockedWares: newLockedWares,
+      fullModules: snapshot.modulesMode === 'plan'
+        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, newLockedWares, snapshot.warePriority, deps)
+        : snapshot.fullModules
+    }
+
+    this.snapshotMap.set(stationId, newSnapshot)
+    this.computeInternal(stationId, newSnapshot, deps, false)
+  }
+
+  updateWarePriority(stationId: string, warePriority: Record<string, number>): void {
+    const snapshot = this.snapshotMap.get(stationId)
+    if (!snapshot) return
+    const deps = this.deps
+    if (!deps) return
+
+    const newWarePriority = normalizeWarePriority(warePriority)
+    if (warePriorityEqual(newWarePriority, snapshot.warePriority)) return
+
+    const newSnapshot: StationDerivedSnapshot = {
+      ...snapshot,
+      warePriority: newWarePriority,
+      fullModules: snapshot.modulesMode === 'plan'
+        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, snapshot.lockedWares, newWarePriority, deps)
+        : snapshot.fullModules
+    }
+
+    this.snapshotMap.set(stationId, newSnapshot)
+    this.computeInternal(stationId, newSnapshot, deps, false)
+  }
+
+  refreshStation(stationId: string): void {
+    const snapshot = this.snapshotMap.get(stationId)
+    if (!snapshot) return
+    const deps = this.deps
+    if (!deps) return
+
+    this.computeInternal(stationId, snapshot, deps, true)
+  }
+
+  refreshAll(): void {
+    const deps = this.deps
+    if (!deps) return
+
+    this.snapshotMap.forEach((snapshot, stationId) => {
+      this.computeInternal(stationId, snapshot, deps, true)
+    })
+  }
+
+  removeStation(stationId: string): void {
+    this.cacheMap.delete(stationId)
+    this.snapshotMap.delete(stationId)
+  }
+
+  remove(stationId: string): void {
+    this.removeStation(stationId)
+  }
+
+  clear(): void {
+    this.cacheMap.clear()
+    this.snapshotMap.clear()
+    this.sectorFlowsCache.clear()
+    this.empireFlowsCache = []
+  }
+
+  private deriveFullModules(
+    inputModules: SavedModule[],
+    settings: StationDerivedSettings,
+    lockedWares: string[],
+    warePriority: Record<string, number>,
+    deps: ProductionFlowComputeDeps
+  ): SavedModule[] {
+    const fullSettings = toFullSettingsForCompute(settings)
+    const result = calculateProductionFlows({
+      plannedModules: inputModules,
+      settings: fullSettings,
+      modulesMap: deps.modulesMap,
+      waresMap: deps.waresMap,
+      lockedWares,
+      medicalConsumptionMap: deps.medicalConsumptionMap,
+      warePriority
+    })
+    
+    const fullModules = [...inputModules]
+    for (const autoMod of result.autoIndustryModules) {
+      const existing = fullModules.find(m => m.id === autoMod.id)
+      if (existing) {
+        existing.count += autoMod.count
+      } else {
+        fullModules.push({ id: autoMod.id, count: autoMod.count })
+      }
+    }
+    for (const autoMod of result.autoHabitationModules) {
+      const existing = fullModules.find(m => m.id === autoMod.id)
+      if (existing) {
+        existing.count += autoMod.count
+      } else {
+        fullModules.push({ id: autoMod.id, count: autoMod.count })
+      }
+    }
+    return fullModules
+  }
+
+  private computeInternal(
+    stationId: string,
+    snapshot: StationDerivedSnapshot,
+    deps: ProductionFlowComputeDeps,
+    recomputeSemantics: boolean
+  ): void {
+    const fullSettings = toFullSettingsForCompute(snapshot.settings)
+    
     let autoIndustryModules: SavedModule[] = []
     let autoHabitationModules: SavedModule[] = []
     let productionFlows: WareProductionFlow[]
     let actualWorkforce: number
     let currentEfficiency: number
 
-    if (input.skipAutoFill) {
+    if (snapshot.modulesMode === 'full') {
       const coreResult = calculateProductionFlowsCore({
-        plannedModules: input.plannedModules,
+        plannedModules: snapshot.fullModules,
         autoIndustryModules: [],
         autoHabitationModules: [],
         modulesMap: deps.modulesMap,
         waresMap: deps.waresMap,
         medicalConsumptionMap: deps.medicalConsumptionMap,
-        settings: input.settings,
-        warePriority: input.warePriority,
-        workforceOverride: input.workforceOverride,
-        actualWorkforceOverride: input.actualWorkforceOverride,
-        saturationOverride: input.saturationOverride
+        settings: fullSettings,
+        warePriority: snapshot.warePriority,
+        workforceOverride: snapshot.workforcesOverride,
+        actualWorkforceOverride: snapshot.workforcesOverride
+          ? snapshot.workforcesOverride.reduce((sum, w) => sum + w.amount, 0)
+          : undefined
       })
       productionFlows = coreResult.productionFlows
       actualWorkforce = coreResult.actualWorkforce
       currentEfficiency = coreResult.currentEfficiency
     } else {
       const result = calculateProductionFlows({
-        plannedModules: input.plannedModules,
-        settings: input.settings,
+        plannedModules: snapshot.inputModules,
+        settings: fullSettings,
         modulesMap: deps.modulesMap,
         waresMap: deps.waresMap,
-        lockedWares: input.lockedWares,
+        lockedWares: snapshot.lockedWares,
         medicalConsumptionMap: deps.medicalConsumptionMap,
-        warePriority: input.warePriority
+        warePriority: snapshot.warePriority
       })
       autoIndustryModules = result.autoIndustryModules
       autoHabitationModules = result.autoHabitationModules
@@ -270,37 +632,44 @@ export class StationDerivedMap {
 
     const allWareIds = productionFlows.map(f => f.wareId)
     const warePriorityLevels = buildResolvedWarePriority({
-      plannedModules: input.plannedModules,
+      plannedModules: snapshot.inputModules,
       autoIndustryModules,
       modulesMap: deps.modulesMap,
-      userPriorityOverride: input.warePriority || {}
+      userPriorityOverride: snapshot.warePriority || {}
     }, allWareIds)
-    
+
+    const existingCache = this.cacheMap.get(stationId)
+    const semantics = recomputeSemantics
+      ? this.buildSemantics(snapshot, deps)
+      : existingCache?.semantics
+
     this.cacheMap.set(stationId, {
       autoIndustryModules,
       autoHabitationModules,
       productionFlows,
       warePriorityLevels,
       actualWorkforce,
-      currentEfficiency
+      currentEfficiency,
+      semantics
     })
   }
 
-  computeAll(empire: EmpirePlan, deps: ProductionFlowComputeDeps): void {
-    this.cacheMap.clear()
-    this.sectorFlowsCache.clear()
-    this.empireFlowsCache = []
-
-    for (const station of empire.stations) {
-      this.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: station.settings,
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
+  private buildSemantics(snapshot: StationDerivedSnapshot, deps: ProductionFlowComputeDeps): StationSemanticDerived {
+    if (snapshot.modulesMode === 'plan') {
+      return buildSemanticsFromModules(snapshot.inputModules, deps)
     }
 
-    this.updateAggregation(empire.stations)
+    const fallback = buildSemanticsFromModules(snapshot.fullModules, deps)
+    const source = snapshot.archiveSemanticsSource
+
+    if (!source) return fallback
+
+    return {
+      tag: source.tag ?? fallback.tag,
+      factoryGroup: source.factoryGroup ?? fallback.factoryGroup,
+      productionProfile: source.productionProfile ?? fallback.productionProfile,
+      profileName: source.profileName ?? fallback.profileName
+    }
   }
 
   updateAggregation(stations: StationPlan[]): void {
@@ -315,6 +684,10 @@ export class StationDerivedMap {
 
   getCache(stationId: string): StationDerivedCache | null {
     return this.cacheMap.get(stationId) || null
+  }
+
+  getSnapshot(stationId: string): StationDerivedSnapshot | null {
+    return this.snapshotMap.get(stationId) || null
   }
 
   getAutoIndustryModules(stationId: string): SavedModule[] {
@@ -350,21 +723,13 @@ export class StationDerivedMap {
     return groupProductionFlows(filtered)
   }
 
-  remove(stationId: string): void {
-    this.cacheMap.delete(stationId)
+  getModulesMode(stationId: string): 'plan' | 'full' | null {
+    return this.snapshotMap.get(stationId)?.modulesMode || null
   }
+}
 
-  setSemantics(stationId: string, semantics: StationSemanticDerived): void {
-    const cache = this.cacheMap.get(stationId)
-    if (!cache) return
-    this.cacheMap.set(stationId, { ...cache, semantics })
-  }
-
-  clear(): void {
-    this.cacheMap.clear()
-    this.sectorFlowsCache.clear()
-    this.empireFlowsCache = []
-  }
+function normalizeWorkforces(workforces: WorkforceEntry[]): WorkforceEntry[] {
+  return workforces.map(w => ({ race: w.race, amount: w.amount }))
 }
 
 export const planningDerivedMap = new StationDerivedMap()

@@ -23,8 +23,7 @@ import { useEmpireDataStore } from './useEmpireDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
-import { planningDerivedMap } from './state/StationDerivedMap'
-import { buildStationSemantics } from './logic/stationDerivedSemantics'
+import { planningDerivedMap, type StationDerivedSeed } from './state/StationDerivedMap'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -104,12 +103,13 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function getComputeDeps(): StationComputeDeps | null {
-    const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
+    const { modulesMap, waresMap, medicalConsumptionMap, modulesByMacroId, enforceDlcActivation } = gameData
     if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
     return {
       modulesMap,
       waresMap,
       medicalConsumptionMap,
+      modulesByMacroId,
       buildPriceMultiplier: buildPriceMultiplier.value,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
@@ -134,7 +134,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (!station) return
       station.lockedWares = deepClone(value)
       station.lastUpdated = Date.now()
-      recomputePlanStationDerived(station.id)
+      const deps = getComputeDeps()
+      if (!deps) return
+      planningDerivedMap.setComputeDeps(deps)
+      planningDerivedMap.updateLockedWares(station.id, station.lockedWares)
       if (activeEmpire.value) {
         planningDerivedMap.updateAggregation(activeEmpire.value.stations)
       }
@@ -148,6 +151,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (!station) return
       station.warePriority = deepClone(value)
       station.lastUpdated = Date.now()
+      const deps = getComputeDeps()
+      if (!deps) return
+      planningDerivedMap.setComputeDeps(deps)
+      planningDerivedMap.updateWarePriority(station.id, station.warePriority)
       if (activeEmpire.value) {
         planningDerivedMap.updateAggregation(activeEmpire.value.stations)
       }
@@ -237,7 +244,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     now: () => Date.now(),
     commitStationMutation: () => {},
     recompute: (station, _deps) => {
-      recomputePlanStationFlowOnly(station.id)
+      const deps = getComputeDeps()
+      if (!deps) return
+      planningDerivedMap.setComputeDeps(deps)
+      planningDerivedMap.updateLockedWares(station.id, station.lockedWares || [])
+      planningDerivedMap.updateWarePriority(station.id, station.warePriority || {})
+      if (activeEmpire.value) {
+        planningDerivedMap.updateAggregation(activeEmpire.value.stations)
+      }
     }
   })
 
@@ -268,17 +282,15 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (!station) return
     const deps = getComputeDeps()
     if (!deps) return
-    planningDerivedMap.compute(stationId, {
-      plannedModules: station.modules || [],
-      settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
+    planningDerivedMap.setComputeDeps(deps)
+    const seed: StationDerivedSeed = {
+      modulesMode: 'plan',
+      modules: station.modules || [],
+      settings: station.settings || {},
       lockedWares: station.lockedWares || [],
       warePriority: station.warePriority || {}
-    }, deps)
-    const semantics = buildStationSemantics(station, {
-      modulesMap: deps.modulesMap,
-      modulesByMacroId: gameData.modulesByMacroId
-    })
-    planningDerivedMap.setSemantics(stationId, semantics)
+    }
+    planningDerivedMap.upsertStation(stationId, seed)
   }
 
   function recomputePlanStationFlowOnly(stationId: string) {
@@ -286,12 +298,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (!station) return
     const deps = getComputeDeps()
     if (!deps) return
-    planningDerivedMap.compute(stationId, {
-      plannedModules: station.modules || [],
-      settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-      lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {}
-    }, deps)
+    planningDerivedMap.setComputeDeps(deps)
+    planningDerivedMap.updateSettings(stationId, station.settings || {})
   }
 
   function getStationFlowCache(stationId: string): GroupedFlows | null {
@@ -304,18 +312,16 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (!activeEmpire.value) return
     const deps = getComputeDeps()
     if (!deps) return
+    planningDerivedMap.setComputeDeps(deps)
     activeEmpire.value.stations.forEach(station => {
-      planningDerivedMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
+      const seed: StationDerivedSeed = {
+        modulesMode: 'plan',
+        modules: station.modules || [],
+        settings: station.settings || {},
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
-      }, deps)
-      const semantics = buildStationSemantics(station, {
-        modulesMap: deps.modulesMap,
-        modulesByMacroId: gameData.modulesByMacroId
-      })
-      planningDerivedMap.setSemantics(station.id, semantics)
+      }
+      planningDerivedMap.upsertStation(station.id, seed)
     })
     planningDerivedMap.updateAggregation(activeEmpire.value.stations)
   }
