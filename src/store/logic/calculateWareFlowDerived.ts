@@ -100,6 +100,10 @@ export function deriveProductionFlows(
       transportVolume: Math.abs(detail.netRate || 0) * unitVolume
     }))
 
+    const detailContributions = stationContributions
+      ? stationContributions
+      : contributions
+
     return {
       wareId: prodFlow.wareId,
       orderIndex: prodFlow.orderIndex,
@@ -119,7 +123,7 @@ export function deriveProductionFlows(
       totalOccupiedVolume,
       unitPrice,
       netValue,
-      contributions,
+      contributions: detailContributions as any,
       stationContributions
     }
   })
