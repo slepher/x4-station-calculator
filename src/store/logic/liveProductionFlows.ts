@@ -5,7 +5,7 @@ import type {
   X4Ware,
   BindingSectorGroup
 } from '@/types/x4'
-import type { StationFlowCache } from '@/store/state/StationProductionFlowMap'
+import type { StationDerivedCache } from '@/store/state/StationDerivedMap'
 
 export interface SectorSunlightMap {
   [sectorMacro: string]: { area?: { sunlight?: number } }
@@ -35,7 +35,7 @@ export interface SaveBindingAggregateResult {
 export interface ReadAggregatedFlowsInput {
   stations: StationPlan[]
   waresMap: Record<string, X4Ware>
-  getCache: (stationId: string) => StationFlowCache | null
+  getCache: (stationId: string) => StationDerivedCache | null
 }
 
 export interface ReadAggregatedFlowsOptions {

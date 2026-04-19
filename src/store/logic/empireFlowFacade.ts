@@ -15,7 +15,7 @@ import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './sectorLinkFlow'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { readSaveBindingAggregatedFlows, buildTransitHubsFromBinding } from './liveProductionFlows'
-import { stationProductionFlowMap, StationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
+import { planningDerivedMap, StationDerivedMap } from '@/store/state/StationDerivedMap'
 import { parseSectorLinkKey } from './sectorLinks'
 import type { EmpireSourceView } from './empireSourceView'
 
@@ -32,7 +32,7 @@ export interface EmpireFlowFacadeDeps {
   sourceView: EmpireSourceView
   modulesMap: Ref<Record<string, X4Module> | null>
   waresMap: Ref<Record<string, X4Ware> | null>
-  flowMap?: StationProductionFlowMap
+  flowMap?: StationDerivedMap
 }
 
 export interface EmpireFlowFacade {
@@ -157,7 +157,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
     flowMap: inputFlowMap
   } = deps
 
-  const flowMap = inputFlowMap || stationProductionFlowMap
+  const flowMap = inputFlowMap || planningDerivedMap
 
   const derivedBindingStations = sourceView.derivedBindingStations
   const productionStations = sourceView.productionStations

@@ -26,7 +26,7 @@ export interface ProductionModuleActionDeps<TStation extends ProductionModuleSta
   cloneModules(modules: SavedModule[]): SavedModule[]
   now(): number
   commitStationMutation(station: TStation): void
-  recompute(station: TStation, deps: StationComputeDeps): void
+  recomputeDerived(station: TStation, deps: StationComputeDeps): void
   afterCommit?(station: TStation, deps: StationComputeDeps): void
 }
 
@@ -56,7 +56,7 @@ export function createProductionModuleActions<TStation extends ProductionModuleS
     station.lastUpdated = deps.now()
     
     deps.commitStationMutation(station)
-    deps.recompute(station, computeDeps)
+    deps.recomputeDerived(station, computeDeps)
     deps.afterCommit?.(station, computeDeps)
     
     return { ok: true }
@@ -87,7 +87,7 @@ export function createProductionModuleActions<TStation extends ProductionModuleS
     station.lastUpdated = deps.now()
     
     deps.commitStationMutation(station)
-    deps.recompute(station, computeDeps)
+    deps.recomputeDerived(station, computeDeps)
     deps.afterCommit?.(station, computeDeps)
     
     return { ok: true }
@@ -116,7 +116,7 @@ export function createProductionModuleActions<TStation extends ProductionModuleS
     station.lastUpdated = deps.now()
     
     deps.commitStationMutation(station)
-    deps.recompute(station, computeDeps)
+    deps.recomputeDerived(station, computeDeps)
     deps.afterCommit?.(station, computeDeps)
     
     return { ok: true }
@@ -181,7 +181,7 @@ export function createProductionModuleActions<TStation extends ProductionModuleS
     station.lastUpdated = deps.now()
     
     deps.commitStationMutation(station)
-    deps.recompute(station, computeDeps)
+    deps.recomputeDerived(station, computeDeps)
     deps.afterCommit?.(station, computeDeps)
     
     return { ok: true }
@@ -198,7 +198,7 @@ export function createProductionModuleActions<TStation extends ProductionModuleS
     station.lastUpdated = deps.now()
     
     deps.commitStationMutation(station)
-    deps.recompute(station, computeDeps)
+    deps.recomputeDerived(station, computeDeps)
     deps.afterCommit?.(station, computeDeps)
     
     return { ok: true }

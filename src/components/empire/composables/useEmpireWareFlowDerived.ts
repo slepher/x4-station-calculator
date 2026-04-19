@@ -1,7 +1,7 @@
 import { ref, computed, type Ref, type ComputedRef } from 'vue'
 import type { StationPlan, EmpireGroupedFlows, X4Ware } from '@/types/x4'
 import { analyzeEmpireWareFlow } from '@/store/logic/analyzeEmpireWareFlow'
-import { stationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
+import { planningDerivedMap } from '@/store/state/StationDerivedMap'
 
 export interface UseEmpireWareFlowDerivedDeps {
   stations: ComputedRef<StationPlan[]>
@@ -32,7 +32,7 @@ export function useEmpireWareFlowDerived(deps: UseEmpireWareFlowDerivedDeps): Us
     return analyzeEmpireWareFlow(
       stations.value,
       (stationId) => {
-        const cache = stationProductionFlowMap.getCache(stationId)
+        const cache = planningDerivedMap.getCache(stationId)
         if (!cache) return []
         return cache.productionFlows.filter(f => {
           if (f.netRate <= 0) return true

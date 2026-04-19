@@ -133,7 +133,7 @@ interface BlueprintProductionStoreLike {
   isDirty: boolean
   loadEmpire?: (empireId: string) => void
   loadData: (data: SavedEmpiresState) => void
-  initializeAllStationCaches: () => void
+  initializeAllStationDerived: () => void
   saveToStorage: () => void
 }
 
@@ -1135,7 +1135,7 @@ function applyEmpireImport(options: ImportApplyOptions, warnings: string[]): boo
 
   persistModule(EMPIRE_KEY, next, options.gameDataStore)
   options.blueprintStore.loadData(next)
-  options.blueprintStore.initializeAllStationCaches()
+  options.blueprintStore.initializeAllStationDerived()
   options.blueprintStore.saveToStorage()
   if (next.activeId) {
     options.blueprintStore.loadEmpire?.(next.activeId)

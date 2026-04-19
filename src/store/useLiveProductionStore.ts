@@ -11,7 +11,7 @@ import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, Player
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
-import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput, X4Module } from '@/types/x4'
+import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
 import type { ProductionTabItem } from '@/types/production-ui'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -19,7 +19,8 @@ import { useSaveBindingStore } from './useSaveBindingStore'
 import { useSaveStore } from './useSaveStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
-import { stationProductionFlowMap, StationProductionFlowMap } from './state/StationProductionFlowMap'
+import { planningDerivedMap, StationDerivedMap } from './state/StationDerivedMap'
+import { buildStationSemantics, buildArchiveSemantics } from './logic/stationDerivedSemantics'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -33,7 +34,6 @@ import { loadPlayerStationsFlatByArchiveId, createArchiveId } from '@/db/saveArc
 import { createProductionModuleActions } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
-import { classifyPlayerStationPoi, buildAggregatedModulesFromStationPlan } from './logic/stationPoiSemantics'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   const gameData = useGameDataStore()
@@ -49,7 +49,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
 
-  const liveFlowMap = new StationProductionFlowMap()
+  const liveFlowMap = new StationDerivedMap()
 
   function diffStationSettings(
     previous: StationSettings,
@@ -129,6 +129,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       workforceOverride: hasWorkforce ? workforces : undefined,
       actualWorkforceOverride
     }, computeDeps)
+    const semantics = buildArchiveSemantics(stationEntry, {
+      modulesMap: computeDeps.modulesMap,
+      modulesByMacroId: gameData.modulesByMacroId
+    })
+    liveFlowMap.setSemantics(stationId, semantics)
   }
 
   function syncAfterStationFlowChange(stationId: string, deps: StationComputeDeps): void {
@@ -563,16 +568,21 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     stations.forEach((item) => {
       const station = item.station
       station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...station.settings })
-      stationProductionFlowMap.compute(station.id, {
+      planningDerivedMap.compute(station.id, {
         plannedModules: station.modules || [],
         settings: station.settings,
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
       }, deps)
+      const semantics = buildStationSemantics(station, {
+        modulesMap: deps.modulesMap,
+        modulesByMacroId: gameData.modulesByMacroId
+      })
+      planningDerivedMap.setSemantics(station.id, semantics)
     })
 
     const stationPlans = stations.map(item => item.station)
-    stationProductionFlowMap.updateAggregation(stationPlans)
+    planningDerivedMap.updateAggregation(stationPlans)
   }
 
   const plannedModules = computed<SavedModule[]>({
@@ -584,7 +594,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       station.lastUpdated = Date.now()
       const deps = getComputeDeps()
       if (deps) {
-        stationProductionFlowMap.compute(station.id, {
+        planningDerivedMap.compute(station.id, {
           plannedModules: station.modules,
           settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares || [],
@@ -610,7 +620,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       station.lastUpdated = Date.now()
       const deps = getComputeDeps()
       if (deps) {
-        stationProductionFlowMap.compute(station.id, {
+        planningDerivedMap.compute(station.id, {
           plannedModules: station.modules || [],
           settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares,
@@ -636,7 +646,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       station.lastUpdated = Date.now()
       const deps = getComputeDeps()
       if (deps) {
-        stationProductionFlowMap.compute(station.id, {
+        planningDerivedMap.compute(station.id, {
           plannedModules: station.modules || [],
           settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares || [],
@@ -679,7 +689,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           settings: station.settings
         })
         if (doesStationSettingsAffectFlowMap(changedSettings)) {
-          stationProductionFlowMap.compute(station.id, {
+          planningDerivedMap.compute(station.id, {
             plannedModules: station.modules || [],
             settings: station.settings,
             lockedWares: station.lockedWares || [],
@@ -708,7 +718,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
 
     const currentMode = mode.value
-    const flowMapToUse = currentMode === 'live' ? liveFlowMap : stationProductionFlowMap
+    const flowMapToUse = currentMode === 'live' ? liveFlowMap : planningDerivedMap
     const cache = flowMapToUse.getCache(stationId)
 
     if (currentMode === 'live') {
@@ -768,13 +778,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         settings: station.settings
       })
     },
-    recompute: (station, deps) => {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
+    recomputeDerived: (station, _deps) => {
+      const semantics = buildStationSemantics(station, {
+        modulesMap: gameData.modulesMap,
+        modulesByMacroId: gameData.modulesByMacroId
+      })
+      planningDerivedMap.setSemantics(station.id, semantics)
     },
     afterCommit: (station, deps) => {
       syncAfterStationFlowChange(station.id, deps)
@@ -802,7 +811,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       })
     },
     recompute: (station, deps) => {
-      stationProductionFlowMap.compute(station.id, {
+      planningDerivedMap.compute(station.id, {
         plannedModules: station.modules || [],
         settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
@@ -815,25 +824,37 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   watch(
-    () => ({
-      stationId: activeStation.value?.id,
-      gameReady: gameData.isReady,
-      buildPrice: buildPriceMultiplier.value,
-      enforceDlcActivation: gameData.enforceDlcActivation
-    }),
+    () => gameData.isReady,
+    (newReady, oldReady) => {
+      if (newReady && !oldReady && activeBinding.value) {
+        syncAllBindingStationsToStateMap()
+      }
+    }
+  )
+
+  watch(
+    () => gameData.enforceDlcActivation,
     () => {
-      const station = activeStation.value
+      if (!activeBinding.value) return
       const deps = getComputeDeps()
-      if (station && deps) {
-        stationProductionFlowMap.compute(station.id, {
+      if (!deps) return
+      derivedBindingStations.value.forEach(item => {
+        const station = item.station
+        planningDerivedMap.compute(station.id, {
           plannedModules: station.modules || [],
           settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
           lockedWares: station.lockedWares || [],
           warePriority: station.warePriority || {}
         }, deps)
-      }
-    },
-    { immediate: true }
+        const semantics = buildStationSemantics(station, {
+          modulesMap: deps.modulesMap,
+          modulesByMacroId: gameData.modulesByMacroId
+        })
+        planningDerivedMap.setSemantics(station.id, semantics)
+      })
+      const stationPlans = derivedBindingStations.value.map(item => item.station)
+      planningDerivedMap.updateAggregation(stationPlans)
+    }
   )
 
   function refreshStationFlowCache(stationId: string) {
@@ -841,7 +862,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (!station) return
     const deps = getComputeDeps()
     if (!deps) return
-    stationProductionFlowMap.compute(stationId, {
+    planningDerivedMap.compute(stationId, {
       plannedModules: station.modules || [],
       settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
       lockedWares: station.lockedWares || [],
@@ -851,14 +872,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function getStationFlowCache(stationId: string): GroupedFlows | null {
-    const flowMapToUse = mode.value === 'live' ? liveFlowMap : stationProductionFlowMap
+    const flowMapToUse = mode.value === 'live' ? liveFlowMap : planningDerivedMap
     const cache = flowMapToUse.getCache(stationId)
     if (!cache) return null
     return flowMapToUse.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
   function clearStationCaches() {
-    stationProductionFlowMap.clear()
+    planningDerivedMap.clear()
     liveFlowMap.clear()
   }
 
@@ -941,7 +962,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const existingPlan = binding.stationPlans.find(plan => plan.id === stationId)
     if (existingPlan) {
       saveBindingStore.deleteStationPlan(binding.gameGuid, stationId)
-      stationProductionFlowMap.remove(stationId)
+      planningDerivedMap.remove(stationId)
     }
     if (activeStationId.value === stationId) {
       activeStationId.value = null
@@ -1308,36 +1329,22 @@ warePriorityLevels: {},
             const matchingPlan = stationPlansByCode.get(s.id) || stationPlansById.get(s.id)
             const hasPlan = Boolean(matchingPlan)
             
-            if (hasPlan && matchingPlan) {
-              const aggregatedModules = buildAggregatedModulesFromStationPlan(matchingPlan, gameData.modulesMap || {})
-              const modulesByMacroId = Object.fromEntries(
-                Object.values(aggregatedModules)
-                  .map(m => {
-                    const matched = gameData.modulesByMacroId?.[m.ref]
-                    return matched ? [m.ref, matched] : null
-                  })
-                  .filter((entry): entry is [string, X4Module] => Boolean(entry))
-              )
-              const classification = classifyPlayerStationPoi({
-                modules: aggregatedModules,
-                modulesByMacroId,
-                isHeadquarter: false
-              })
-              const name = matchingPlan.name || s.name || s.id
+            if (hasPlan) {
+              const cache = planningDerivedMap.getCache(s.id)
+              const semantics = cache?.semantics
+              const name = matchingPlan?.name || s.name || s.id
               result.push({
                 id: s.id,
                 type: 'station',
                 name,
                 sectorId: s.sectorId ?? undefined,
                 stationType: s.type,
-                tag: classification.tag,
-                factoryGroup: classification.factoryGroup
+                tag: semantics?.tag,
+                factoryGroup: semantics?.factoryGroup
               })
             } else {
-              const stationRecord = playerStationRecords.value.find(r => r.code === s.id)
-              const archiveStation = stationRecord?.data as PlayerStationEntry | undefined
-              const tag = archiveStation?.tag || 'constructionsite'
-              const factoryGroup = archiveStation?.factoryGroup
+              const cache = liveFlowMap.getCache(s.id)
+              const semantics = cache?.semantics
               const name = s.name || s.id
               result.push({
                 id: s.id,
@@ -1345,8 +1352,8 @@ warePriorityLevels: {},
                 name,
                 sectorId: s.sectorId ?? undefined,
                 stationType: s.type,
-                tag,
-                factoryGroup
+                tag: semantics?.tag || 'constructionsite',
+                factoryGroup: semantics?.factoryGroup
               })
             }
           })
@@ -1358,38 +1365,24 @@ warePriorityLevels: {},
         const matchingPlan = stationPlansByCode.get(s.id) || stationPlansById.get(s.id)
         const hasPlan = Boolean(matchingPlan)
         
-        if (hasPlan && matchingPlan) {
-          const aggregatedModules = buildAggregatedModulesFromStationPlan(matchingPlan, gameData.modulesMap || {})
-          const modulesByMacroId = Object.fromEntries(
-            Object.values(aggregatedModules)
-              .map(m => {
-                const matched = gameData.modulesByMacroId?.[m.ref]
-                return matched ? [m.ref, matched] : null
-              })
-              .filter((entry): entry is [string, X4Module] => Boolean(entry))
-          )
-          const classification = classifyPlayerStationPoi({
-            modules: aggregatedModules,
-            modulesByMacroId,
-            isHeadquarter: false
-          })
-          const name = matchingPlan.name || s.name || s.id
+        if (hasPlan) {
+          const cache = planningDerivedMap.getCache(s.id)
+          const semantics = cache?.semantics
+          const name = matchingPlan?.name || s.name || s.id
           result.push({
             id: s.id,
             type: 'station',
             name,
             sectorId: undefined,
             stationType: s.type,
-            tag: classification.tag,
-            factoryGroup: classification.factoryGroup
+            tag: semantics?.tag,
+            factoryGroup: semantics?.factoryGroup
           })
         } else {
-          const stationRecord = playerStationRecords.value.find(r => r.code === s.id)
-          const archiveStation = stationRecord?.data as PlayerStationEntry | undefined
-          const tag = archiveStation?.tag || 'constructionsite'
-          const factoryGroup = archiveStation?.factoryGroup
+          const cache = liveFlowMap.getCache(s.id)
+          const semantics = cache?.semantics
           const name = s.name || s.id
-          result.push({ id: s.id, type: 'station', name, sectorId: undefined, stationType: s.type, tag, factoryGroup })
+          result.push({ id: s.id, type: 'station', name, sectorId: undefined, stationType: s.type, tag: semantics?.tag || 'constructionsite', factoryGroup: semantics?.factoryGroup })
         }
       })
     return result
@@ -1471,7 +1464,7 @@ warePriorityLevels: {},
       if (station.id === tradeStationId) {
         return
       }
-      stationProductionFlowMap.compute(station.id, {
+      planningDerivedMap.compute(station.id, {
         plannedModules: station.modules || [],
         settings: station.settings,
         lockedWares: station.lockedWares || [],

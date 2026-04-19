@@ -1,6 +1,5 @@
 import { reactive } from 'vue'
-import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module, X4Ware, WareFlow, EmpirePlan } from '@/types/x4'
-import type { RaceMedicalConsumption } from '@/types/x4'
+import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module, WareFlow, EmpirePlan } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
@@ -9,11 +8,28 @@ import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 
 export interface ProductionFlowComputeDeps {
   modulesMap: Record<string, X4Module>
-  waresMap: Record<string, X4Ware>
-  medicalConsumptionMap: RaceMedicalConsumption
+  waresMap: Record<string, any>
+  medicalConsumptionMap: Record<string, any>
   buildPriceMultiplier?: number
   enforceDlcActivation?: boolean
   isModuleDlcActive?: (moduleId: string) => boolean
+}
+
+export interface StationSemanticDerived {
+  tag?: string
+  factoryGroup?: string
+  productionProfile?: string
+  profileName?: string
+}
+
+export interface StationDerivedCache {
+  autoIndustryModules: SavedModule[]
+  autoHabitationModules: SavedModule[]
+  productionFlows: WareProductionFlow[]
+  warePriorityLevels: Record<string, number>
+  actualWorkforce: number
+  currentEfficiency: number
+  semantics?: StationSemanticDerived
 }
 
 export interface ProductionFlowInput {
@@ -25,15 +41,6 @@ export interface ProductionFlowInput {
   workforceOverride?: WorkforceEntry[]
   actualWorkforceOverride?: number
   saturationOverride?: number
-}
-
-export interface StationFlowCache {
-  autoIndustryModules: SavedModule[]
-  autoHabitationModules: SavedModule[]
-  productionFlows: WareProductionFlow[]
-  warePriorityLevels: Record<string, number>
-  actualWorkforce: number
-  currentEfficiency: number
 }
 
 export interface ComputeInfrastructureModulesInput {
@@ -192,7 +199,7 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
 }
 
 function groupBySectorFiltered(
-  cacheMap: Map<string, StationFlowCache>,
+  cacheMap: Map<string, StationDerivedCache>,
   stations: StationPlan[]
 ): Map<string, WareProductionFlow[]> {
   const sectorMap = new Map<string, WareProductionFlow[]>()
@@ -215,8 +222,8 @@ function groupBySectorFiltered(
   return sectorMap
 }
 
-export class StationProductionFlowMap {
-  private cacheMap = reactive(new Map<string, StationFlowCache>())
+export class StationDerivedMap {
+  private cacheMap = reactive(new Map<string, StationDerivedCache>())
   private empireFlowsCache: WareProductionFlow[] = []
   private sectorFlowsCache: Map<string, WareProductionFlow[]> = new Map()
 
@@ -306,7 +313,7 @@ export class StationProductionFlowMap {
     this.sectorFlowsCache = groupBySectorFiltered(this.cacheMap, stations)
   }
 
-  getCache(stationId: string): StationFlowCache | null {
+  getCache(stationId: string): StationDerivedCache | null {
     return this.cacheMap.get(stationId) || null
   }
 
@@ -347,6 +354,12 @@ export class StationProductionFlowMap {
     this.cacheMap.delete(stationId)
   }
 
+  setSemantics(stationId: string, semantics: StationSemanticDerived): void {
+    const cache = this.cacheMap.get(stationId)
+    if (!cache) return
+    this.cacheMap.set(stationId, { ...cache, semantics })
+  }
+
   clear(): void {
     this.cacheMap.clear()
     this.sectorFlowsCache.clear()
@@ -354,9 +367,8 @@ export class StationProductionFlowMap {
   }
 }
 
-export const stationProductionFlowMap = new StationProductionFlowMap()
-export const planningFlowMap = stationProductionFlowMap
+export const planningDerivedMap = new StationDerivedMap()
 
-export function updateProductionFlowAggregation(stations: StationPlan[]): void {
-  stationProductionFlowMap.updateAggregation(stations)
+export function updateDerivedAggregation(stations: StationPlan[]): void {
+  planningDerivedMap.updateAggregation(stations)
 }

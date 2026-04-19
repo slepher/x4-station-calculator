@@ -1,8 +1,8 @@
 import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, RaceMedicalConsumption } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationComputeDeps } from '../state/stationSettings'
-import type { StationFlowCache } from '../state/StationProductionFlowMap'
-import { deriveInfrastructureModules, stationProductionFlowMap } from '../state/StationProductionFlowMap'
+import type { StationDerivedCache } from '../state/StationDerivedMap'
+import { deriveInfrastructureModules, planningDerivedMap } from '../state/StationDerivedMap'
 import { DEFAULT_STATION_SETTINGS } from '../state/stationSettings'
 import { deepClone } from '@/utils/deepClone'
 
@@ -41,7 +41,7 @@ export function buildComputeDeps(input: ComputeDepsInput): StationComputeDeps {
 export function buildActiveStationState(
   stationId: string | undefined,
   plannedModules: SavedModule[],
-  cache: StationFlowCache | null
+  cache: StationDerivedCache | null
 ): ActiveStationState {
   const productionFlows = cache?.productionFlows || []
 
@@ -80,7 +80,7 @@ export interface BuildDerivedActiveStationStateInput {
   stationId: string | undefined
   plannedModules: SavedModule[]
   settings: StationSettings
-  cache: StationFlowCache | null
+  cache: StationDerivedCache | null
   deps: StationComputeDeps | null
 }
 
@@ -170,7 +170,7 @@ export function computeStationFlow(
   station: StationPlan,
   deps: StationComputeDeps
 ): void {
-  stationProductionFlowMap.compute(stationId, {
+  planningDerivedMap.compute(stationId, {
     plannedModules: station.modules || [],
     settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
     lockedWares: station.lockedWares || [],

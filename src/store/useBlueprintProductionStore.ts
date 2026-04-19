@@ -23,9 +23,9 @@ import { useEmpireDataStore } from './useEmpireDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
-import { stationProductionFlowMap } from './state/StationProductionFlowMap'
+import { planningDerivedMap } from './state/StationDerivedMap'
+import { buildStationSemantics } from './logic/stationDerivedSemantics'
 import { deepClone } from '@/utils/deepClone'
-import { classifyPlayerStationPoi, buildAggregatedModulesFromStationPlan } from './logic/stationPoiSemantics'
 import {
   createEmpireSourceView,
   computeActiveStation
@@ -123,13 +123,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (!station) return
       station.modules = deepClone(value)
       station.lastUpdated = Date.now()
-      const deps = getComputeDeps()
-      if (deps) stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules,
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
+      recomputePlanStationDerived(station.id)
     }
   })
 
@@ -140,13 +134,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (!station) return
       station.lockedWares = deepClone(value)
       station.lastUpdated = Date.now()
-      const deps = getComputeDeps()
-      if (deps) stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-        lockedWares: station.lockedWares,
-        warePriority: station.warePriority || {}
-      }, deps)
+      recomputePlanStationDerived(station.id)
+      if (activeEmpire.value) {
+        planningDerivedMap.updateAggregation(activeEmpire.value.stations)
+      }
     }
   })
 
@@ -157,13 +148,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (!station) return
       station.warePriority = deepClone(value)
       station.lastUpdated = Date.now()
-      const deps = getComputeDeps()
-      if (deps) stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority
-      }, deps)
+      if (activeEmpire.value) {
+        planningDerivedMap.updateAggregation(activeEmpire.value.stations)
+      }
     }
   })
 
@@ -175,17 +162,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       const previousSettings = { ...DEFAULT_STATION_SETTINGS, ...station.settings }
       station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...value })
       station.lastUpdated = Date.now()
-      const deps = getComputeDeps()
-      if (deps) {
-        const changedSettings = diffStationSettings(previousSettings, station.settings)
-        if (doesStationSettingsAffectFlowMap(changedSettings)) {
-          stationProductionFlowMap.compute(station.id, {
-            plannedModules: station.modules || [],
-            settings: station.settings,
-            lockedWares: station.lockedWares || [],
-            warePriority: station.warePriority || {}
-          }, deps)
-        }
+      const changedSettings = diffStationSettings(previousSettings, station.settings)
+      if (doesStationSettingsAffectFlowMap(changedSettings)) {
+        recomputePlanStationFlowOnly(station.id)
       }
     }
   })
@@ -205,7 +184,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         resolvedModules: []
       }
     }
-    const cache = stationProductionFlowMap.getCache(stationId)
+    const cache = planningDerivedMap.getCache(stationId)
     return buildDerivedActiveStationState({
       stationId,
       plannedModules: plannedModules.value,
@@ -239,13 +218,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     cloneModules: (modules) => deepClone(modules),
     now: () => Date.now(),
     commitStationMutation: () => {},
-    recompute: (station, deps) => {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
+    recomputeDerived: (station, _deps) => {
+      recomputePlanStationDerived(station.id)
     }
   })
 
@@ -262,44 +236,57 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     clonePriorityMap: (values) => deepClone(values),
     now: () => Date.now(),
     commitStationMutation: () => {},
-    recompute: (station, deps) => {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
+    recompute: (station, _deps) => {
+      recomputePlanStationFlowOnly(station.id)
     }
   })
 
   watch(
-    () => ({
-      stationId: activeStation.value?.id,
-      gameReady: gameData.isReady,
-      buildPrice: buildPriceMultiplier.value,
-      enforceDlcActivation: gameData.enforceDlcActivation
-    }),
-    () => {
-      const station = activeStation.value
-      const deps = getComputeDeps()
-      if (station && deps) {
-        stationProductionFlowMap.compute(station.id, {
-          plannedModules: station.modules || [],
-          settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
-          lockedWares: station.lockedWares || [],
-          warePriority: station.warePriority || {}
-        }, deps)
+    () => gameData.isReady,
+    (newReady, oldReady) => {
+      if (newReady && !oldReady && activeEmpire.value) {
+        initializeAllStationDerived()
       }
-    },
-    { immediate: true }
+    }
   )
 
-  function refreshStationFlowCache(stationId: string) {
+  watch(
+    () => gameData.enforceDlcActivation,
+    () => {
+      if (!activeEmpire.value) return
+      const deps = getComputeDeps()
+      if (!deps) return
+      activeEmpire.value.stations.forEach(station => {
+        recomputePlanStationDerived(station.id)
+      })
+      planningDerivedMap.updateAggregation(activeEmpire.value.stations)
+    }
+  )
+
+  function recomputePlanStationDerived(stationId: string) {
     const station = getStationById(stationId)
     if (!station) return
     const deps = getComputeDeps()
     if (!deps) return
-    stationProductionFlowMap.compute(stationId, {
+    planningDerivedMap.compute(stationId, {
+      plannedModules: station.modules || [],
+      settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
+      lockedWares: station.lockedWares || [],
+      warePriority: station.warePriority || {}
+    }, deps)
+    const semantics = buildStationSemantics(station, {
+      modulesMap: deps.modulesMap,
+      modulesByMacroId: gameData.modulesByMacroId
+    })
+    planningDerivedMap.setSemantics(stationId, semantics)
+  }
+
+  function recomputePlanStationFlowOnly(stationId: string) {
+    const station = getStationById(stationId)
+    if (!station) return
+    const deps = getComputeDeps()
+    if (!deps) return
+    planningDerivedMap.compute(stationId, {
       plannedModules: station.modules || [],
       settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
       lockedWares: station.lockedWares || [],
@@ -308,28 +295,33 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function getStationFlowCache(stationId: string): GroupedFlows | null {
-    const cache = stationProductionFlowMap.getCache(stationId)
+    const cache = planningDerivedMap.getCache(stationId)
     if (!cache) return null
-    return stationProductionFlowMap.getFilteredGrouped(stationId, cache.warePriorityLevels)
+    return planningDerivedMap.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
-  function initializeAllStationCaches() {
+  function initializeAllStationDerived() {
     if (!activeEmpire.value) return
     const deps = getComputeDeps()
     if (!deps) return
     activeEmpire.value.stations.forEach(station => {
-      stationProductionFlowMap.compute(station.id, {
+      planningDerivedMap.compute(station.id, {
         plannedModules: station.modules || [],
         settings: ({ ...DEFAULT_STATION_SETTINGS, ...station.settings }),
         lockedWares: station.lockedWares || [],
         warePriority: station.warePriority || {}
       }, deps)
+      const semantics = buildStationSemantics(station, {
+        modulesMap: deps.modulesMap,
+        modulesByMacroId: gameData.modulesByMacroId
+      })
+      planningDerivedMap.setSemantics(station.id, semantics)
     })
-    stationProductionFlowMap.updateAggregation(activeEmpire.value.stations)
+    planningDerivedMap.updateAggregation(activeEmpire.value.stations)
   }
 
   function clearStationCaches() {
-    stationProductionFlowMap.clear()
+    planningDerivedMap.clear()
   }
 
   function getStationComponentGapFlows(_stationId: string | null): StationComponentGapFlows {
@@ -345,14 +337,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (selectAfterCreate) {
       activeStationId.value = station.id
     }
-    refreshStationFlowCache(station.id)
+    recomputePlanStationDerived(station.id)
     return station
   }
 
   function deleteStation(stationId: string) {
     const deleted = empireDataStore.deleteStationFromEmpire(activeEmpire.value, stationId)
     if (deleted) {
-      stationProductionFlowMap.remove(stationId)
+      planningDerivedMap.remove(stationId)
       if (activeStationId.value === stationId) {
         activeStationId.value = activeEmpire.value?.stations[0]?.id || null
       }
@@ -363,7 +355,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     const newStation = empireDataStore.duplicateStationInEmpire(activeEmpire.value, stationId)
     if (!newStation) return null
     activeStationId.value = newStation.id
-    refreshStationFlowCache(newStation.id)
+    recomputePlanStationDerived(newStation.id)
     return newStation
   }
 
@@ -377,23 +369,23 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   function updateStationModules(stationId: string, modules: SavedModule[]) {
     if (empireDataStore.updateStationModulesInEmpire(activeEmpire.value, stationId, modules)) {
-      refreshStationFlowCache(stationId)
+      recomputePlanStationDerived(stationId)
     }
   }
 
   function updateStationType(stationId: string, type: StationType) {
     empireDataStore.updateStationTypeInEmpire(activeEmpire.value, stationId, type)
-    refreshStationFlowCache(stationId)
+    recomputePlanStationDerived(stationId)
   }
 
   function updateStationCount(stationId: string, count: number) {
     empireDataStore.updateStationCountInEmpire(activeEmpire.value, stationId, count)
-    refreshStationFlowCache(stationId)
+    recomputePlanStationDerived(stationId)
   }
 
   function updateStationMinerals(stationId: string, minerals: string[]) {
     empireDataStore.updateStationMineralsInEmpire(activeEmpire.value, stationId, minerals)
-    refreshStationFlowCache(stationId)
+    recomputePlanStationDerived(stationId)
   }
 
   function setStationLocation(stationId: string, location: EntityLocation | null): boolean {
@@ -410,7 +402,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     station.lockedWares = [...payload.lockedWares]
     station.warePriority = { ...payload.warePriority }
     station.lastUpdated = Date.now()
-    refreshStationFlowCache(stationId)
+    recomputePlanStationDerived(stationId)
     return true
   }
 
@@ -515,7 +507,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     const defaultStationName = stationName ?? i18n.global.t('sector.new_station_name')
     const station = createStation(defaultStationName, 'industrial', true)
     if (station) {
-      initializeAllStationCaches()
+      initializeAllStationDerived()
     }
     takeSnapshot()
     return empire
@@ -544,7 +536,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       } else {
         activeStationId.value = null
       }
-      initializeAllStationCaches()
+      initializeAllStationDerived()
       takeSnapshot()
     }
   }
@@ -586,7 +578,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (stored && Array.isArray(stored.list)) {
         loadData(stored)
         saveToStorage()
-        initializeAllStationCaches()
+        initializeAllStationDerived()
 
         fallbackToFirstEmpire()
 
@@ -761,40 +753,23 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     now: () => Date.now(),
     commitStationMutation: () => {},
     shouldRecompute: (_station, patch) => doesStationSettingsAffectFlowMap(patch),
-    recompute: (station, deps) => {
-      stationProductionFlowMap.compute(station.id, {
-        plannedModules: station.modules || [],
-        settings: station.settings,
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      }, deps)
+    recompute: (station, _deps) => {
+      recomputePlanStationFlowOnly(station.id)
     }
   })
 
   const workbenchMethods = {
     getTabs: () => orderedStations.value.map(s => {
-      const aggregatedModules = buildAggregatedModulesFromStationPlan(s, gameData.modulesMap || {})
-      const modulesByMacroId = Object.fromEntries(
-        Object.values(aggregatedModules)
-          .map(m => {
-            const matched = gameData.modulesByMacroId?.[m.ref]
-            return matched ? [m.ref, matched] : null
-          })
-          .filter((entry): entry is [string, any] => Boolean(entry))
-      )
-      const classification = classifyPlayerStationPoi({
-        modules: aggregatedModules,
-        modulesByMacroId,
-        isHeadquarter: false
-      })
+      const cache = planningDerivedMap.getCache(s.id)
+      const semantics = cache?.semantics
       return {
         id: s.id,
         type: 'station' as const,
         name: s.name,
         sectorId: s.sectorId ?? undefined,
         stationType: s.type,
-        tag: classification.tag,
-        factoryGroup: classification.factoryGroup
+        tag: semantics?.tag,
+        factoryGroup: semantics?.factoryGroup
       }
     }),
     getActiveTabId: () => activeStationId.value,
@@ -892,8 +867,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     savedEmpires,
     importModalOpen,
     getStationFlowCache,
-    refreshStationFlowCache,
-    initializeAllStationCaches,
+    recomputePlanStationDerived,
+    recomputePlanStationFlowOnly,
+    initializeAllStationDerived,
     clearStationCaches,
     loadData,
     saveToStorage,

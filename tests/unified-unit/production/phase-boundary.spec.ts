@@ -1,18 +1,18 @@
 import { describe, expect, it } from 'vitest'
 import { buildDerivedActiveStationState } from '@/store/logic/productionStationShared'
-import { stationProductionFlowMap, type StationFlowCache } from '@/store/state/StationProductionFlowMap'
+import { planningDerivedMap, type StationDerivedCache } from '@/store/state/StationDerivedMap'
 import { DEFAULT_STATION_SETTINGS } from '@/store/state/stationSettings'
 
 describe('production phase boundary', () => {
   it('does not expose sector phase-two aggregation APIs on flow map', () => {
-    const flowMapApi = stationProductionFlowMap as unknown as Record<string, unknown>
+    const flowMapApi = planningDerivedMap as unknown as Record<string, unknown>
 
     expect('computeSectorAggregation' in flowMapApi).toBe(false)
     expect('getSectorAggregation' in flowMapApi).toBe(false)
   })
 
   it('keeps phase-two derived modules in station state, not cache', () => {
-    const cache: StationFlowCache = {
+    const cache: StationDerivedCache = {
       autoIndustryModules: [{ id: 'auto-industry', count: 1 }],
       autoHabitationModules: [{ id: 'auto-hab', count: 2 }],
       productionFlows: [{

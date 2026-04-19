@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
-import { stationProductionFlowMap } from '@/store/state/StationProductionFlowMap'
+import { planningDerivedMap } from '@/store/state/StationDerivedMap'
 import type { SavedFlowGroup } from '@/types/x4'
 import {
   ADVANCED_SUNLIGHT_TAG_ID,
@@ -163,7 +163,7 @@ const loadableEmpires = computed(() => {
   return empires.filter(empire => {
     const stations = empire.stations || []
     return stations.some(station => {
-      const flows = stationProductionFlowMap.getGrouped(station.id)
+      const flows = planningDerivedMap.getGrouped(station.id)
       return flows.rateGroups.resources.length > 0
     })
   }).map(empire => ({
@@ -205,7 +205,7 @@ const loadEmpireStations = (empireId: string) => {
   
   const newGroups: AdvancedResourceTagGroup[] = []
   for (const station of stations) {
-    const flows = stationProductionFlowMap.getGrouped(station.id)
+    const flows = planningDerivedMap.getGrouped(station.id)
     const resourceWares = flows.rateGroups.resources.map((f: { wareId: string }) => f.wareId)
     if (resourceWares.length === 0) continue
     
