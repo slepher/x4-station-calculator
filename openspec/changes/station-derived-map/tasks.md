@@ -8,7 +8,7 @@
 - [x] T2. 将类名 `StationProductionFlowMap` 改为 `StationDerivedMap`
 - [x] T3. 将 blueprint/planning 单例主名改为新 derived 命名，不保留兼容别名，不允许新旧名称并存
 - [x] T4. 更新 `useBlueprintProductionStore`、`useLiveProductionStore`、`productionStationShared`、`empireFlowFacade`、`liveProductionFlows` 等所有 import/type 引用
-- [x] T5. 将 `useLiveProductionStore` 内部 archive/live 实例改为 `new StationDerivedMap()`
+- [x] T5. 将 `useLiveProductionStore` 内部 archive/live 实例改为 store 自持 `new StationDerivedMap(staticDeps)`
 - [x] T6. 同步更新 OpenSpec 文档中对 `StationProductionFlowMap` 的主名词引用，明确其后续由 `StationDerivedMap` 取代
 - [x] T7. 第一阶段自检：确认未新增字段、未改变 compute/updateAggregation/getCache/getGrouped 行为
 - [x] T8. 第一阶段构建验证：`npm run build`

@@ -58,7 +58,8 @@ const importModalActiveStation = computed(() => {
 const empireWareFlowDerived = useEmpireWareFlowDerived({
   stations: computed(() => liveStore.orderedStationsBySector),
   modulesMap: computed(() => gameData.modulesMap || {}),
-  waresMap: computed(() => gameData.waresMap || {})
+  waresMap: computed(() => gameData.waresMap || {}),
+  getStationCache: (stationId) => liveStore.getPlanningStationCache(stationId)
 })
 
 const showArchiveModuleList = computed(() => {

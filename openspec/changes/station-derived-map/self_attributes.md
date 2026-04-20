@@ -9,6 +9,42 @@
 
 ## 对外接口
 
+## Static Deps 规则
+
+`StationDerivedMap` 的静态计算依赖必须只通过构造函数注入。
+
+构造输入必须是：
+
+```ts
+new StationDerivedMap({
+  modulesMap,
+  waresMap,
+  medicalConsumptionMap,
+  modulesByMacroId
+})
+```
+
+并且：
+
+- `StationDerivedMap` 不得提供 `setComputeDeps`
+- `StationDerivedMap` 不得提供 `updateStaticDeps`
+- store 不得在实例创建后修改静态依赖
+- 当静态依赖不可用时，store 不得创建实例
+- 当静态依赖发生切换时，store 必须重建实例，不得复用旧实例并热更新依赖
+
+## Store Instance Ownership
+
+`StationDerivedMap` 实例所有权必须归 store 自己管理。
+
+必须满足：
+
+- `useBlueprintProductionStore` 必须维护自己的 planning `StationDerivedMap` 实例
+- `useLiveProductionStore` 必须维护自己的 planning `StationDerivedMap` 实例
+- `useLiveProductionStore` 必须另外维护自己的 archive/live `StationDerivedMap` 实例
+- blueprint planning instance 与 live planning instance 不得共享同一个对象
+- 不得继续从 `StationDerivedMap.ts` 导出模块级共享 planning instance
+- facade / presenter / vue 不得直接 import 模块级共享 `StationDerivedMap` 实例
+
 `StationDerivedMap` 对外必须只暴露以下写接口：
 
 ```ts

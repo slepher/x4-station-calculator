@@ -15,7 +15,7 @@ import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
 import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './sectorLinkFlow'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { readSaveBindingAggregatedFlows, buildTransitHubsFromBinding } from './liveProductionFlows'
-import { planningDerivedMap, StationDerivedMap } from '@/store/state/StationDerivedMap'
+import { StationDerivedMap } from '@/store/state/StationDerivedMap'
 import { parseSectorLinkKey } from './sectorLinks'
 import type { EmpireSourceView } from './empireSourceView'
 
@@ -32,7 +32,7 @@ export interface EmpireFlowFacadeDeps {
   sourceView: EmpireSourceView
   modulesMap: Ref<Record<string, X4Module> | null>
   waresMap: Ref<Record<string, X4Ware> | null>
-  flowMap?: StationDerivedMap
+  flowMap: Ref<StationDerivedMap | null> | ComputedRef<StationDerivedMap | null>
 }
 
 export interface EmpireFlowFacade {
@@ -157,8 +157,6 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
     flowMap: inputFlowMap
   } = deps
 
-  const flowMap = inputFlowMap || planningDerivedMap
-
   const derivedBindingStations = sourceView.derivedBindingStations
   const productionStations = sourceView.productionStations
   const productionSectors = sourceView.productionSectors
@@ -169,6 +167,8 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
 
 const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     const cache = new Map<string, GroupedFlows>()
+    const flowMap = inputFlowMap.value
+    if (!flowMap) return cache
     if (productionSource.value === 'save-binding') {
       derivedBindingStations.value.forEach((item) => {
         const flowCache = flowMap.getCache(item.station.id)
@@ -189,6 +189,8 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
   })
 
   const empireGroupedFlows = computed<EmpireGroupedFlows>(() => {
+    const flowMap = inputFlowMap.value
+    if (!flowMap) return createEmptyEmpireGroupedFlows()
     if (productionSource.value === 'save-binding') {
       const binding = activeBinding.value
       if (!binding || !waresMap.value) {
@@ -224,6 +226,8 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
   const rawSectorGroupedFlowsMap = computed<Map<string, EmpireGroupedFlows>>(() => {
     const map = new Map<string, EmpireGroupedFlows>()
+    const flowMap = inputFlowMap.value
+    if (!flowMap) return map
     if (!modulesMap.value || !waresMap.value) return map
 
     const sectorList = productionSectors.value
@@ -247,6 +251,8 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
   const sectorInternalDataMap = computed<Map<string, SectorInternalData>>(() => {
     const map = new Map<string, SectorInternalData>()
+    const flowMap = inputFlowMap.value
+    if (!flowMap) return map
     if (!modulesMap.value) return map
 
     const stations = productionStations.value
@@ -349,6 +355,8 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
   const sectorLinkCalcMap = computed<Map<string, SectorLinkCalcEntry>>(() => {
     const result = new Map<string, SectorLinkCalcEntry>()
+    const flowMap = inputFlowMap.value
+    if (!flowMap) return result
     if (!modulesMap.value) return result
 
     const links: SectorLinkInput[] = productionSectorLinks.value
@@ -418,6 +426,12 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
   })
 
   function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
+    if (!inputFlowMap.value) {
+      return {
+        sectorId,
+        localStationIds: []
+      }
+    }
     const internal = sectorInternalDataMap.value.get(sectorId)
     if (internal) return internal.planning
     return {
@@ -427,6 +441,18 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
   }
 
   function getSectorInternalData(sectorId: string): SectorInternalData {
+    if (!inputFlowMap.value) {
+      return {
+        sectorId,
+        planning: getSupplyPlanningInput(sectorId),
+        localGroupedFlows: createEmptyEmpireGroupedFlows(),
+        supplyStorageFlows: createEmptySupplyStorageFlows(),
+        storageModulePlans: [],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: []
+      }
+    }
     const internal = sectorInternalDataMap.value.get(sectorId)
     if (internal) return internal
     return {
@@ -446,6 +472,7 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
   }
 
   function getSectorFinalProductionFlows(sectorId: string): WareProductionFlow[] {
+    if (!inputFlowMap.value) return []
     const rawGroupedFlows = rawSectorGroupedFlowsMap.value.get(sectorId) || createEmptyEmpireGroupedFlows()
     const sectorLinkCalc = getSectorLinkCalc(sectorId)
     const merged = mergeSectorLinkIntoEmpireGroupedFlows(
@@ -471,6 +498,9 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
   }
 
   function getStationComponentGapFlows(stationId: string | null, activeStationId: string | null): StationComponentGapFlows {
+    if (!inputFlowMap.value) {
+      return { operations: [], supply: [] }
+    }
     const effectiveStationId = stationId || activeStationId || null
     if (!effectiveStationId) {
       return { operations: [], supply: [] }

@@ -114,7 +114,7 @@ stationProductionFlowMap
   └─ rename → planningDerivedMap / blueprintDerivedMap（待定）
 
 liveFlowMap = new StationProductionFlowMap()
-  └─ rename type only → new StationDerivedMap()
+  └─ rename type only → `new StationDerivedMap(staticDeps)`
 ```
 
 行为必须保持不变：

@@ -5,6 +5,8 @@
 ### Phase S1: 收口对外接口
 
 - [x] S1. 删除 `StationDerivedMap` 对外导出的计算接口
+- [x] S1a. 删除 `setComputeDeps`
+- [x] S1b. 删除 `updateStaticDeps`
 - [x] S2. 保留并实现以下对外写接口：
   - `upsertStation(stationId, seed)`
   - `updateModules(stationId, modules)`
@@ -95,6 +97,12 @@
 - [x] S38. `useLiveProductionStore` 改为只调用属性更新接口
 - [x] S39. 删除 store 层对 map 计算接口的直接依赖
 - [x] S40. 删除 store 层手工组合 `compute + setSemantics + updateAggregation` 的路径
+- [x] S40a. `StationDerivedMap` 静态依赖改为仅构造函数注入
+- [x] S40b. blueprint store 自持 planning `StationDerivedMap` 实例
+- [x] S40c. live store 自持 planning `StationDerivedMap` 实例
+- [x] S40d. live store 自持 archive/live `StationDerivedMap` 实例
+- [x] S40e. 删除 blueprint 与 live 共享 planning map 的路径
+- [x] S40f. facade / presenter / 组件不再依赖模块级共享 planning map
 
 ### Phase S8: 验证
 

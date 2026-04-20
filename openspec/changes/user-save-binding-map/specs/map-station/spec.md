@@ -174,6 +174,17 @@
 
 系统 MUST 提供一致的绑定菜单 UI。
 
+#### Scenario: 绑定按钮文字显示绑定状态
+- **前提** 用户在 Step 3 查看 save station 列表
+- **当** save station 未绑定任何 station plan
+- **那么** 按钮 SHALL 显示"绑定"
+- **当** save station 已绑定到普通 empire station
+- **那么** 按钮 SHALL 显示已绑定 station 的名称（无名称时 fallback 到"绑定"）
+- **当** save station 已绑定到 tradestation
+- **那么** 按钮 SHALL 显示"星区中转站"
+- **当** save station 存在异常绑定（stationBinding 存在但 stationId 无法解析）
+- **那么** 按钮 SHALL 显示红色"绑定异常"
+
 #### Scenario: 绑定菜单仅用视觉表达状态
 - **前提** 用户打开 Step 3 绑定菜单
 - **当** 系统显示候选列表

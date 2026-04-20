@@ -1,11 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import { buildDerivedActiveStationState } from '@/store/logic/productionStationShared'
-import { planningDerivedMap, type StationDerivedCache } from '@/store/state/StationDerivedMap'
+import { StationDerivedMap, type StationDerivedCache } from '@/store/state/StationDerivedMap'
 import { DEFAULT_STATION_SETTINGS } from '@/store/state/stationSettings'
 
 describe('production phase boundary', () => {
   it('does not expose sector phase-two aggregation APIs on flow map', () => {
-    const flowMapApi = planningDerivedMap as unknown as Record<string, unknown>
+    const flowMapApi = new StationDerivedMap({
+      modulesMap: {},
+      waresMap: {},
+      medicalConsumptionMap: {}
+    }) as unknown as Record<string, unknown>
 
     expect('computeSectorAggregation' in flowMapApi).toBe(false)
     expect('getSectorAggregation' in flowMapApi).toBe(false)

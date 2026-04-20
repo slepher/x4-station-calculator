@@ -52,7 +52,7 @@
 - [x] T53. 已绑定 tradestation 不可再被绑定：绑定菜单禁用已绑定的 tradestation
 - [x] T54. 解绑逻辑：位置重置到星区中心，清除 `saveStationCode`，变为 virtual station
 - [x] T55. 更新拖拽交互：移除"拖拽星区中转站到地图"创建逻辑（因为自动创建）
-- [x] T56. i18n 文案：绑定中转站、解绑中转站、已绑定状态提示
+- [x] T56. i18n 文案：绑定按钮文字逻辑（未绑定显示"绑定"，已绑定显示 station 名称，绑定到 tradestation 显示"星区中转站"，异常显示"绑定异常"）
 
 ## Implementation: Binding POI on Map
 

@@ -150,6 +150,23 @@ save panel 的 binding 分支标题栏右侧提供保存控制：
 - 定位星区变化时，tradestation 更新到新星区中心并解除绑定。
 - 已绑定的 save station 显示 tradestation 图标。
 
+### D15: save station 绑定按钮文字逻辑
+
+`getBindButtonLabel(saveStationCode)` 函数决定按钮显示文字：
+
+| 状态 | 按钮文字 | 样式 |
+|------|----------|------|
+| save station 绑定到 tradestation | `星区中转站` (i18n: `map.binding_sector_tradestation`) | 默认 amber |
+| 异常绑定（stationBinding 存在但 stationId 无法解析） | 红色 `绑定异常` (i18n: `map.binding_status_error`) | 红色 rose |
+| 已绑定到其他 station | 已绑定 station 的 `name`（无 name 则 fallback 到 `绑定`） | amber 高亮 |
+| 未绑定 | `绑定` (i18n: `map.binding_bind`) | 默认 amber |
+
+按钮点击打开绑定菜单，菜单内提供：
+- 绑定到 blueprint empire station
+- 绑定到虚拟中转站（仅定位星区的 save station 可用）
+- 导入 save station 为新 plan
+- 解绑（显示 `×` 按钮）
+
 ### D8: Blueprint empire 作为导入模板来源
 
 - `blueprintEmpireId` 只用于显示可导入候选，不代表持续同步关系。
