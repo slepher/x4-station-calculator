@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import type { GroupedFlows, SavedModule, StationPlan, StationSettings, X4Module, WareFlow } from '@/types/x4'
+import type { GroupedFlows, SavedModule, StationSettings, X4Module, WareFlow } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
@@ -7,14 +7,11 @@ import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastru
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 
-export interface ProductionFlowComputeDeps {
+export interface StationDerivedStaticDeps {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, any>
   medicalConsumptionMap: Record<string, any>
   modulesByMacroId?: Record<string, X4Module>
-  buildPriceMultiplier?: number
-  enforceDlcActivation?: boolean
-  isModuleDlcActive?: (moduleId: string) => boolean
 }
 
 export interface ComputeInfrastructureModulesInput {
@@ -30,7 +27,7 @@ export interface ComputeInfrastructureModulesInput {
     | 'transportShipCapacity'
   >
   warePriorityLevels: Record<string, number>
-  deps: ProductionFlowComputeDeps
+  deps: StationDerivedStaticDeps
 }
 
 export interface DeriveInfrastructureModulesInput extends ComputeInfrastructureModulesInput {}
@@ -85,6 +82,7 @@ export interface StationDerivedCache {
 
 export interface StationDerivedSnapshot {
   modulesMode: 'plan' | 'full'
+  sectorId: string | null
   inputModules: SavedModule[]
   fullModules: SavedModule[]
   settings: StationDerivedSettings
@@ -105,6 +103,7 @@ export interface StationDerivedSettingsInput {
 
 export interface StationDerivedSeed {
   modulesMode: 'plan' | 'full'
+  sectorId?: string | null
   modules: SavedModule[]
   settings: StationDerivedSettingsInput
   lockedWares?: string[]
@@ -307,30 +306,6 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
   return merged
 }
 
-function groupBySectorFiltered(
-  cacheMap: Map<string, StationDerivedCache>,
-  stations: StationPlan[]
-): Map<string, WareProductionFlow[]> {
-  const sectorMap = new Map<string, WareProductionFlow[]>()
-
-  for (const station of stations) {
-    const sectorId = station.sectorId || '__no_sector__'
-    const cache = cacheMap.get(station.id)
-    if (!cache) continue
-    
-    const filteredFlows = filterProductionFlowsByPriority(cache.productionFlows, cache.warePriorityLevels)
-    
-    if (!sectorMap.has(sectorId)) {
-      sectorMap.set(sectorId, [])
-    }
-    
-    const existing = sectorMap.get(sectorId)!
-    sectorMap.set(sectorId, mergeFlows([existing, filteredFlows]))
-  }
-
-  return sectorMap
-}
-
 function toFullSettingsForCompute(settings: StationDerivedSettings): StationSettings {
   return {
     racePreference: settings.racePreference,
@@ -354,7 +329,7 @@ function toFullSettingsForCompute(settings: StationDerivedSettings): StationSett
 
 function buildSemanticsFromModules(
   modules: SavedModule[],
-  deps: ProductionFlowComputeDeps
+  deps: StationDerivedStaticDeps
 ): StationSemanticDerived {
   const aggregatedModules = buildAggregatedModulesFromStationPlan({ modules }, deps.modulesMap)
   const classification = classifyPlayerStationPoi({
@@ -376,15 +351,14 @@ export class StationDerivedMap {
   private snapshotMap = new Map<string, StationDerivedSnapshot>()
   private empireFlowsCache: WareProductionFlow[] = []
   private sectorFlowsCache: Map<string, WareProductionFlow[]> = new Map()
-  private deps: ProductionFlowComputeDeps | null = null
+  private staticDeps: StationDerivedStaticDeps
 
-  setComputeDeps(deps: ProductionFlowComputeDeps): void {
-    this.deps = deps
+  constructor(staticDeps: StationDerivedStaticDeps) {
+    this.staticDeps = staticDeps
   }
 
   upsertStation(stationId: string, seed: StationDerivedSeed): void {
-    const deps = this.deps
-    if (!deps) return
+    const deps = this.staticDeps
 
     const settings = truncateSettings(seed.settings)
     const inputModules = normalizeModules(seed.modules)
@@ -407,6 +381,7 @@ export class StationDerivedMap {
 
     const snapshot: StationDerivedSnapshot = {
       modulesMode: seed.modulesMode,
+      sectorId: seed.sectorId ?? null,
       inputModules,
       fullModules,
       settings,
@@ -423,8 +398,7 @@ export class StationDerivedMap {
   updateModules(stationId: string, modules: SavedModule[]): void {
     const snapshot = this.snapshotMap.get(stationId)
     if (!snapshot) return
-    const deps = this.deps
-    if (!deps) return
+    const deps = this.staticDeps
 
     const newInputModules = normalizeModules(modules)
     if (modulesEqual(newInputModules, snapshot.inputModules)) return
@@ -449,8 +423,7 @@ export class StationDerivedMap {
   updateSettings(stationId: string, settings: StationDerivedSettingsInput): void {
     const snapshot = this.snapshotMap.get(stationId)
     if (!snapshot) return
-    const deps = this.deps
-    if (!deps) return
+    const deps = this.staticDeps
 
     const newSettings = truncateSettings(settings)
     if (settingsEqual(newSettings, snapshot.settings)) return
@@ -470,8 +443,7 @@ export class StationDerivedMap {
   updateLockedWares(stationId: string, lockedWares: string[]): void {
     const snapshot = this.snapshotMap.get(stationId)
     if (!snapshot) return
-    const deps = this.deps
-    if (!deps) return
+    const deps = this.staticDeps
 
     const newLockedWares = normalizeLockedWares(lockedWares)
     if (lockedWaresEqual(newLockedWares, snapshot.lockedWares)) return
@@ -491,8 +463,7 @@ export class StationDerivedMap {
   updateWarePriority(stationId: string, warePriority: Record<string, number>): void {
     const snapshot = this.snapshotMap.get(stationId)
     if (!snapshot) return
-    const deps = this.deps
-    if (!deps) return
+    const deps = this.staticDeps
 
     const newWarePriority = normalizeWarePriority(warePriority)
     if (warePriorityEqual(newWarePriority, snapshot.warePriority)) return
@@ -512,19 +483,19 @@ export class StationDerivedMap {
   refreshStation(stationId: string): void {
     const snapshot = this.snapshotMap.get(stationId)
     if (!snapshot) return
-    const deps = this.deps
-    if (!deps) return
+    const deps = this.staticDeps
 
     this.computeInternal(stationId, snapshot, deps, true)
   }
 
   refreshAll(): void {
-    const deps = this.deps
-    if (!deps) return
+    const deps = this.staticDeps
 
     this.snapshotMap.forEach((snapshot, stationId) => {
-      this.computeInternal(stationId, snapshot, deps, true)
+      this.computeInternal(stationId, snapshot, deps, true, true)
     })
+    
+    this.updateAggregation()
   }
 
   removeStation(stationId: string): void {
@@ -548,7 +519,7 @@ export class StationDerivedMap {
     settings: StationDerivedSettings,
     lockedWares: string[],
     warePriority: Record<string, number>,
-    deps: ProductionFlowComputeDeps
+    deps: StationDerivedStaticDeps
   ): SavedModule[] {
     const fullSettings = toFullSettingsForCompute(settings)
     const result = calculateProductionFlows({
@@ -584,8 +555,9 @@ export class StationDerivedMap {
   private computeInternal(
     stationId: string,
     snapshot: StationDerivedSnapshot,
-    deps: ProductionFlowComputeDeps,
-    recomputeSemantics: boolean
+    deps: StationDerivedStaticDeps,
+    recomputeSemantics: boolean,
+    skipAggregation: boolean = false
   ): void {
     const fullSettings = toFullSettingsForCompute(snapshot.settings)
     
@@ -652,9 +624,13 @@ export class StationDerivedMap {
       currentEfficiency,
       semantics
     })
+    
+    if (!skipAggregation) {
+      this.updateAggregation()
+    }
   }
 
-  private buildSemantics(snapshot: StationDerivedSnapshot, deps: ProductionFlowComputeDeps): StationSemanticDerived {
+  private buildSemantics(snapshot: StationDerivedSnapshot, deps: StationDerivedStaticDeps): StationSemanticDerived {
     if (snapshot.modulesMode === 'plan') {
       return buildSemanticsFromModules(snapshot.inputModules, deps)
     }
@@ -672,14 +648,27 @@ export class StationDerivedMap {
     }
   }
 
-  updateAggregation(stations: StationPlan[]): void {
-    const allFilteredFlows = stations.map(station => {
-      const cache = this.cacheMap.get(station.id)
-      if (!cache) return []
-      return filterProductionFlowsByPriority(cache.productionFlows, cache.warePriorityLevels)
+  updateAggregation(): void {
+    const allFilteredFlows: WareProductionFlow[][] = []
+    const sectorMap = new Map<string, WareProductionFlow[]>()
+    
+    this.snapshotMap.forEach((snapshot, stationId) => {
+      const cache = this.cacheMap.get(stationId)
+      if (!cache) return
+      
+      const filteredFlows = filterProductionFlowsByPriority(cache.productionFlows, cache.warePriorityLevels)
+      allFilteredFlows.push(filteredFlows)
+      
+      const sectorId = snapshot.sectorId || '__no_sector__'
+      if (!sectorMap.has(sectorId)) {
+        sectorMap.set(sectorId, [])
+      }
+      const existing = sectorMap.get(sectorId)!
+      sectorMap.set(sectorId, mergeFlows([existing, filteredFlows]))
     })
+    
     this.empireFlowsCache = mergeFlows(allFilteredFlows)
-    this.sectorFlowsCache = groupBySectorFiltered(this.cacheMap, stations)
+    this.sectorFlowsCache = sectorMap
   }
 
   getCache(stationId: string): StationDerivedCache | null {
@@ -730,10 +719,4 @@ export class StationDerivedMap {
 
 function normalizeWorkforces(workforces: WorkforceEntry[]): WorkforceEntry[] {
   return workforces.map(w => ({ race: w.race, amount: w.amount }))
-}
-
-export const planningDerivedMap = new StationDerivedMap()
-
-export function updateDerivedAggregation(stations: StationPlan[]): void {
-  planningDerivedMap.updateAggregation(stations)
 }
