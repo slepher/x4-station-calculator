@@ -1126,6 +1126,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           syncAllBindingStationsToStateMap()
           syncLiveFlowMap()
           validateActiveStationId()
+          if (activeStationId.value) {
+            mode.value = initialMode.value
+          }
           isReady.value = true
           console.log('[LiveProductionStore] Loaded saved binding')
           return
@@ -1146,6 +1149,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         syncAllBindingStationsToStateMap()
         syncLiveFlowMap()
         validateActiveStationId()
+        if (activeStationId.value) {
+          mode.value = initialMode.value
+        }
         isReady.value = true
         console.log('[LiveProductionStore] Fallback to first valid binding:', validBinding.gameGuid)
         return
