@@ -75,6 +75,33 @@ const isDirty = computed(() => {
 - `saveEmpire()` 只保存 empire 数据
 - binding 模式下需调用 `saveBindingStore.saveBinding()`
 
+## D4.1: 保存时清理空模块 BindingStationPlan
+
+`saveBinding()` 保存前执行清理：
+
+```ts
+function saveBinding() {
+  draftBinding.value.stationPlans = draftBinding.value.stationPlans.filter((plan) => {
+    // 已绑定的 save station + modules=[] → 删除
+    if (plan.saveStationCode && (!plan.modules || plan.modules.length === 0)) return false
+    // 其他情况保留（virtual station 或有 modules 的 plan）
+    return true
+  })
+  // ... 持久化逻辑
+}
+```
+
+清理规则：
+- **删除**：已绑定的 save station（有 `saveStationCode`）且 `modules=[]`
+- **保留**：virtual station（无 `saveStationCode`）
+- **保留**：有 modules 的 plan
+
+缓存与视图切换：
+- `useLiveProductionStore.saveBinding()` 清理 `planningDerivedMap` 缓存（删除的 planId）
+- **保留 `liveFlowMap` 缓存**（archive station 仍存在）
+- `activeStationId` 从 `plan.id` 切换为 `plan.saveStationCode`（映射从 bindingStation 变为 archiveStation）
+- 图标显示：`toDerivedSaveStation` fallback 使用 archive 的实际 modules 计算 semantics
+
 ## D5: UI 组件适配
 
 ### StationPlanningPanel

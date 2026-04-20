@@ -1059,7 +1059,23 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const isDirty = computed(() => saveBindingStore.isDirty)
 
   function saveBinding() {
+    const binding = activeBinding.value
+    if (!binding) {
+      saveBindingStore.saveBinding()
+      return
+    }
+    const beforePlans = binding.stationPlans
+    const beforeById = new Map(beforePlans.map(p => [p.id, p]))
     saveBindingStore.saveBinding()
+    const afterIds = new Set(binding.stationPlans.map(p => p.id))
+    for (const [id, plan] of beforeById) {
+      if (!afterIds.has(id)) {
+        planningDerivedMap.value?.remove(id)
+        if (activeStationId.value === id && plan.saveStationCode) {
+          activeStationId.value = plan.saveStationCode
+        }
+      }
+    }
   }
 
   function discardChanges() {

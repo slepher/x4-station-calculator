@@ -41,11 +41,15 @@ function toDerivedSaveStation(
   plan: BindingStationPlan | undefined
 ): StationPlan {
   const id = plan ? plan.id : saveStation.code
+  const archiveModules = (saveStation.modules || []).map((mod) => ({
+    id: mod.module_id || mod.ref,
+    count: mod.amount || 1
+  }))
   return {
     id,
     name: plan?.name || saveStation.code || 'Save Station',
     type: plan?.type || 'industrial',
-    modules: plan?.modules || [],
+    modules: plan?.modules || archiveModules,
     settings: ({ ...DEFAULT_STATION_SETTINGS, ...plan?.settings || {} }),
     lastUpdated: 0,
     lockedWares: plan?.lockedWares || [],

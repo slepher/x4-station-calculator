@@ -205,6 +205,12 @@ save panel 的 binding 分支标题栏右侧提供保存控制：
 - equipmentdock: `_equip_`（设备模块）
 - pattern 必须带下划线，避免误匹配
 
+### D15: 自由空间站列表过滤空模块
+
+- Step 3 的自由空间站列表（Blueprint 空间站）不显示 `modules=[]` 的 blueprint station
+- 过滤逻辑在 `freeStations` computed 中实现
+- 原因：空模块的 blueprint station 无实际规划价值，拖拽到地图后也无法产生有效的 binding plan
+
 ## 错误与边界处理
 
 - 如果当前 archive 缺失，Step 2/3 显示当前 time 不可用状态，派生 save station view 为空。

@@ -147,6 +147,7 @@ const freeStations = computed(() => {
   if (!blueprintEmpire.value) return []
 
   return (blueprintEmpire.value.stations || [])
+    .filter((station) => station.modules && station.modules.length > 0)
     .map((station) => ({
       station,
       sectorGroupId: '',
