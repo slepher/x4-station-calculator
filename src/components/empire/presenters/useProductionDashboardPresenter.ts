@@ -49,9 +49,6 @@ export interface DashboardPresenterStore {
     updateWorkforceAuto(value: boolean): void
     updateUseHQ(value: boolean): void
   }
-  getCurrentEfficiency(): number
-  getActualWorkforce(): number
-  getBuildPriceMultiplier(): number
   updateBuildPriceMultiplier(value: number): void
 }
 
@@ -83,9 +80,9 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
         useHQ: s.useHQ
       }
     }),
-    currentEfficiency: computed(() => store.getCurrentEfficiency()),
-    actualWorkforce: computed(() => store.getActualWorkforce()),
-    buildPriceMultiplier: computed(() => store.getBuildPriceMultiplier())
+    currentEfficiency: computed(() => store.stationState?.currentEfficiency || 0),
+    actualWorkforce: computed(() => store.stationState?.actualWorkforce || 0),
+    buildPriceMultiplier: computed(() => store.stationState?.buildPriceMultiplier || 0)
   }
 
   const emits: DashboardPresenterEmits = {

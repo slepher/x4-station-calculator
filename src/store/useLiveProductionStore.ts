@@ -12,7 +12,6 @@ import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
-import type { ProductionTabItem } from '@/types/production-ui'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
@@ -328,10 +327,38 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return bindingStationPlan.value || bindingTransitGroup.value?.tradeStation || null
   })
 
-  const editableStationPlan = computed<StationPlan | null>(() => {
+  const planningStationDraft = computed<StationPlan | null>(() => {
+    const stationId = activeBindingStationId.value
+    if (!stationId) return null
     const plan = bindingStationPlan.value
-    if (!plan) return null
-    return toProductionStation(plan, gameData.maps.sectors)
+    if (plan) {
+      return toProductionStation(plan, gameData.maps.sectors)
+    }
+    const derived = planningSourceView.getDerivedBindingStation(stationId)
+    const archive = archiveStation.value
+    if (!derived && !archive) return null
+    return {
+      id: stationId,
+      name: derived?.name || archive?.name || stationId,
+      sectorId: derived?.sectorId,
+      type: derived?.type || 'industrial',
+      count: derived?.count,
+      location: derived?.location,
+      modules: [],
+      settings: {
+        ...DEFAULT_STATION_SETTINGS,
+        ...derived?.settings
+      },
+      lastUpdated: derived?.lastUpdated || 0,
+      lockedWares: [],
+      warePriority: {},
+      minerals: derived?.minerals || []
+    }
+  })
+
+  const editableStationPlan = computed<StationPlan | null>(() => {
+    if (workbenchMode.value !== 'station') return null
+    return planningStationDraft.value
   })
 
   const archiveStationCode = computed<string | null>(() => {
@@ -522,6 +549,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const activeStation = computed<StationPlan | null>(() => {
+    if (workbenchMode.value === 'station' && planningStationDraft.value) {
+      return planningStationDraft.value
+    }
+
     const binding = bindingStation.value
     if (binding) {
       if ('modules' in binding) {
@@ -579,21 +610,45 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   }
 
+  function hasBindingPlan(stationId: string): boolean {
+    const binding = activeBinding.value
+    if (!binding) return false
+    return binding.stationPlans.some((plan) => plan.id === stationId)
+  }
+
+  function getArchiveSectorSunlight(stationId: string): number | null {
+    const record = playerStationRecords.value.find((item) => item.code === stationId && item.type === 'station')
+    if (!record) return null
+    const sector = gameData.maps?.sectors?.[record.sectorMacro]
+    if (!sector?.area?.sunlight && sector?.area?.sunlight !== 0) return null
+    return Math.round(sector.area.sunlight * 100)
+  }
+
+  function buildPlanningSeed(station: StationPlan) {
+    const usesBindingPlan = hasBindingPlan(station.id)
+    const archiveSunlight = usesBindingPlan ? null : getArchiveSectorSunlight(station.id)
+    const settings = {
+      ...DEFAULT_STATION_SETTINGS,
+      ...station.settings,
+      sunlight: archiveSunlight ?? station.settings?.sunlight ?? DEFAULT_STATION_SETTINGS.sunlight
+    }
+    return {
+      modulesMode: 'plan' as const,
+      sectorId: station.sectorId,
+      modules: usesBindingPlan ? (station.modules || []) : [],
+      settings,
+      lockedWares: usesBindingPlan ? (station.lockedWares || []) : [],
+      warePriority: usesBindingPlan ? (station.warePriority || {}) : {}
+    }
+  }
+
   function syncAllBindingStationsToStateMap(): void {
     const stations = derivedBindingStations.value
     const map = resetPlanningDerivedMap()
     if (!map) return
     stations.forEach((item) => {
       const station = item.station
-      station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...station.settings })
-      map.upsertStation(station.id, {
-        modulesMode: 'plan',
-        sectorId: station.sectorId,
-        modules: station.modules || [],
-        settings: station.settings,
-        lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
-      })
+      map.upsertStation(station.id, buildPlanningSeed(station))
     })
   }
 
@@ -832,14 +887,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (!map) return
       derivedBindingStations.value.forEach(item => {
         const station = item.station
-        map.upsertStation(station.id, {
-          modulesMode: 'plan',
-          sectorId: station.sectorId,
-          modules: station.modules || [],
-          settings: station.settings || {},
-          lockedWares: station.lockedWares || [],
-          warePriority: station.warePriority || {}
-        })
+        map.upsertStation(station.id, buildPlanningSeed(station))
       })
     }
   )
@@ -850,14 +898,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const deps = getDerivedStaticDeps()
     const map = ensurePlanningDerivedMap()
     if (!deps || !map) return
-    map.upsertStation(stationId, {
-      modulesMode: 'plan',
-      sectorId: station.sectorId,
-      modules: station.modules || [],
-      settings: station.settings || {},
-      lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {}
-    })
+    map.upsertStation(stationId, buildPlanningSeed(station))
     syncAfterStationFlowChange(stationId, deps)
   }
 
@@ -1172,6 +1213,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const importModalOpen = ref(false)
   const wareflowViewMode = ref<WareFlowViewMode>('quantity')
   const expandedSectorId = ref<string | null>(null)
+  const titleValue = computed(() => activeBinding.value?.bindingName || activeBindingName.value || '')
+  const titlePlaceholder = computed(() => i18n.global.t('binding.new_binding_name'))
 
   const capabilities: ProductionWorkbenchCapabilities = {
     uniqueWorkbench: true,
@@ -1255,7 +1298,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeStationId: activeStationId.value,
     activeTransitSectorId: activeTransitSectorId.value,
     activeBinding: activeBinding.value?.gameGuid || null,
-    canToggle: workbenchMode.value === 'transit' ? true : canToggle.value
+    canToggle: workbenchMode.value === 'transit' ? true : canToggle.value,
+    wareflowViewMode: wareflowViewMode.value
   }))
 
   const context = computed<ProductionContextState>(() => {
@@ -1295,16 +1339,27 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         entityType: 'transit',
         id: sectorId,
         name: sectors.value.find(s => s.id === sectorId)?.name || sectorId,
+        stationType: 'transit',
+        count: 1,
+        minerals: [],
         plannedModules: [],
         resolvedModules: derivedTransitState.resolvedModules,
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: derivedTransitState.autoInfrastructureModules,
         productionFlows: flows,
-warePriorityLevels: {},
-      settings: settings.value
+        warePriorityLevels: {},
+        settings: {
+          ...settings.value,
+          enforceDlcActivation: enforceDlcActivation.value
+        },
+        enforceDlcActivation: enforceDlcActivation.value,
+        empireGaps: empireGapsComputed.value,
+        currentEfficiency: 0,
+        actualWorkforce: 0,
+        buildPriceMultiplier: buildPriceMultiplier.value
+      }
     }
-  }
     
     const station = activeStation.value
     if (!station) return null
@@ -1313,6 +1368,9 @@ warePriorityLevels: {},
       entityType: 'station',
       id: station.id,
       name: station.name,
+      stationType: station.type || 'industrial',
+      count: station.count ?? 1,
+      minerals: station.minerals || [],
       plannedModules: state.plannedModules,
       resolvedModules: state.resolvedModules,
       autoIndustryModules: state.autoIndustryModules,
@@ -1320,128 +1378,44 @@ warePriorityLevels: {},
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
       warePriorityLevels: state.warePriorityLevels,
-      settings: settings.value
+      settings: {
+        ...settings.value,
+        enforceDlcActivation: enforceDlcActivation.value
+      },
+      enforceDlcActivation: enforceDlcActivation.value,
+      empireGaps: empireGapsComputed.value,
+      currentEfficiency: currentEfficiency.value,
+      actualWorkforce: actualWorkforce.value,
+      buildPriceMultiplier: buildPriceMultiplier.value
     }
   })
 
-  const getTabs = () => {
-    const result: ProductionTabItem[] = []
-    result.push({ id: 'overview', type: 'overview', name: i18n.global.t('sector.overview') })
-    
+  const tabSemanticsById = computed<Record<string, { tag?: string; factoryGroup?: string }>>(() => {
     const stationPlansByCode = new Map<string, BindingStationPlan>()
     const stationPlansById = new Map<string, BindingStationPlan>()
-    activeBinding.value?.stationPlans.forEach(plan => {
+    activeBinding.value?.stationPlans.forEach((plan) => {
       if (plan.saveStationCode) {
         stationPlansByCode.set(plan.saveStationCode, plan)
       }
       stationPlansById.set(plan.id, plan)
     })
-    
-    sectors.value.forEach(sector => {
-      result.push({ id: `transit:${sector.id}`, type: 'transit', name: sector.name, sectorId: sector.id })
-      if (expandedSectorId.value === sector.id) {
-        orderedStationsBySector.value
-          .filter(s => s.sectorId === sector.id)
-          .forEach(s => {
-            const matchingPlan = stationPlansByCode.get(s.id) || stationPlansById.get(s.id)
-            const hasPlan = Boolean(matchingPlan)
-            
-            if (hasPlan) {
-              const cache = planningDerivedMap.value?.getCache(s.id)
-              const semantics = cache?.semantics
-              const name = matchingPlan?.name || s.name || s.id
-              result.push({
-                id: s.id,
-                type: 'station',
-                name,
-                sectorId: s.sectorId ?? undefined,
-                stationType: s.type,
-                tag: semantics?.tag,
-                factoryGroup: semantics?.factoryGroup
-              })
-            } else {
-              const cache = liveFlowMap.value?.getCache(s.id)
-              const semantics = cache?.semantics
-              const name = s.name || s.id
-              result.push({
-                id: s.id,
-                type: 'station',
-                name,
-                sectorId: s.sectorId ?? undefined,
-                stationType: s.type,
-                tag: semantics?.tag || 'constructionsite',
-                factoryGroup: semantics?.factoryGroup
-              })
-            }
-          })
-      }
-    })
-    orderedStationsBySector.value
-      .filter(s => !s.sectorId)
-      .forEach(s => {
-        const matchingPlan = stationPlansByCode.get(s.id) || stationPlansById.get(s.id)
-        const hasPlan = Boolean(matchingPlan)
-        
-        if (hasPlan) {
-          const cache = planningDerivedMap.value?.getCache(s.id)
-          const semantics = cache?.semantics
-          const name = matchingPlan?.name || s.name || s.id
-          result.push({
-            id: s.id,
-            type: 'station',
-            name,
-            sectorId: undefined,
-            stationType: s.type,
-            tag: semantics?.tag,
-            factoryGroup: semantics?.factoryGroup
-          })
-        } else {
-          const cache = liveFlowMap.value?.getCache(s.id)
-          const semantics = cache?.semantics
-          const name = s.name || s.id
-          result.push({ id: s.id, type: 'station', name, sectorId: undefined, stationType: s.type, tag: semantics?.tag || 'constructionsite', factoryGroup: semantics?.factoryGroup })
-        }
-      })
-    return result
-  }
 
-  const getActiveTabId = () => activeTransitSectorId.value ? `transit:${activeTransitSectorId.value}` : activeStationId.value || 'overview'
-  const getExpandedSectorId = () => expandedSectorId.value
-  const getTitleModel = () => ({
-    value: activeBinding.value?.bindingName || activeBindingName.value || '',
-    placeholder: i18n.global.t('binding.new_binding_name')
+    const entries = orderedStationsBySector.value.map((station) => {
+      const matchingPlan = stationPlansByCode.get(station.id) || stationPlansById.get(station.id)
+      const semantics = matchingPlan
+        ? planningDerivedMap.value?.getCache(station.id)?.semantics
+        : liveFlowMap.value?.getCache(station.id)?.semantics
+      return [
+        station.id,
+        {
+          tag: semantics?.tag ?? (matchingPlan ? undefined : 'constructionsite'),
+          factoryGroup: semantics?.factoryGroup
+        }
+      ] as const
+    })
+
+    return Object.fromEntries(entries)
   })
-  const getToolbarStation = () => activeStation.value ? {
-    id: activeStation.value.id,
-    name: activeStation.value.name,
-    type: activeStation.value.type || 'industrial',
-    count: activeStation.value.count ?? 1,
-    minerals: activeStation.value.minerals || []
-  } : null
-  const getToolbarRaces = () => [
-    { value: 'argon', label: i18n.global.t('toolbar.races.argon') },
-    { value: 'terran', label: i18n.global.t('toolbar.races.terran') },
-    { value: 'teladi', label: i18n.global.t('toolbar.races.teladi') },
-    { value: 'paranid', label: i18n.global.t('toolbar.races.paranid') },
-    { value: 'split', label: i18n.global.t('toolbar.races.split') }
-  ]
-  const getToolbarStationTypes = () => [
-    { value: 'industrial' as StationType, label: i18n.global.t('toolbar.station_types.industrial') },
-    { value: 'supply' as StationType, label: i18n.global.t('toolbar.station_types.supply') },
-    { value: 'transit' as StationType, label: i18n.global.t('toolbar.station_types.transit') },
-    { value: 'shipyard' as StationType, label: i18n.global.t('toolbar.station_types.shipyard') }
-  ]
-  const getAvailableMinerals = () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane']
-  const getSingleBerthThroughput = () => Math.max(1, settings.value.transportShipCapacity || 1) * 15
-  const getEnforceDlcActivation = () => enforceDlcActivation.value
-  const getWareflowViewMode = () => wareflowViewMode.value
-  const getEmpireGaps = () => empireGapsComputed.value
-  const getCurrentEfficiency = () => workbenchMode.value === 'transit' ? 0 : currentEfficiency.value
-  const getActualWorkforce = () => workbenchMode.value === 'transit' ? 0 : actualWorkforce.value
-  const getBuildPriceMultiplier = () => buildPriceMultiplier.value
-  const selectOverviewAction = () => selectStation(null)
-  const selectTransit = (sectorId: string) => selectTransitSector(sectorId)
-  const expandSector = (sectorId: string | null) => { expandedSectorId.value = sectorId }
   const updateTitle = (value: string) => { activeBindingName.value = value }
   const updateStationNameFromActive = (value: string) => {
     if (editableStationPlan.value) renameStation(editableStationPlan.value.id, value)
@@ -1528,6 +1502,10 @@ warePriorityLevels: {},
     activeTransitSectorId,
     sectors,
     orderedStationsBySector,
+    tabSemanticsById,
+    expandedSectorId,
+    titleValue,
+    titlePlaceholder,
     derivedBindingStations,
     stationFlowCache,
     getStationFlowCache,
@@ -1543,6 +1521,8 @@ warePriorityLevels: {},
     createStation,
     deleteStation,
     renameStation,
+    selectTransitSector,
+    setExpandedSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
     getLinkedSectors,
     getStationById,
     getDerivedBindingStation,
@@ -1574,31 +1554,12 @@ warePriorityLevels: {},
     settingActions,
     wareRuleActions,
     moduleActions,
-    getTabs,
-    getActiveTabId,
-    getExpandedSectorId,
-    getTitleModel,
-    getToolbarStation,
-    getToolbarRaces,
-    getToolbarStationTypes,
-    getAvailableMinerals,
-    getSingleBerthThroughput,
-    getEnforceDlcActivation,
-    getWareflowViewMode,
-    getEmpireGaps,
-    getCurrentEfficiency,
-    getActualWorkforce,
-    getBuildPriceMultiplier,
     updateTitle,
     updateStationName: updateStationNameFromActive,
     updateStationType: updateStationTypeFromActive,
-    openImport: () => { importModalOpen.value = true },
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
-    expandSector,
     duplicateStation: () => null,
-    selectOverview: selectOverviewAction,
-    selectTransit,
     selectStation
   }
 })

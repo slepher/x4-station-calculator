@@ -404,6 +404,7 @@ export interface StationSettings {
   secondaryProductBufferHours: number; // 副产物缓冲时间（小时）
   transportMinutes: number; // 运输时间（分钟）
   transportShipCapacity: number; // 运输船运量
+  enforceDlcActivation?: boolean;
 }
 
 export interface EntityLocation {

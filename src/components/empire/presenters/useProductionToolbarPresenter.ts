@@ -1,6 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
 import type { ProductionContextState, ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
 import type { StationSettings, StationType } from '@/types/x4'
+import i18n from '@/i18n'
 
 export interface ToolbarPresenterProps {
   mode: ComputedRef<'overview' | 'station' | 'transit'>
@@ -48,6 +49,8 @@ export interface ToolbarPresenterStore {
   session: ProductionSessionState
   context: ProductionContextState
   stationState: ProductionStationState | null
+  titleValue: string
+  titlePlaceholder: string
   settingActions: {
     updateSunlight(value: number): void
     updateTransportMinutes(value: number): void
@@ -55,42 +58,59 @@ export interface ToolbarPresenterStore {
     updateWorkforce(value: boolean): void
     updateShowEmpireGaps(value: boolean): void
   }
-  getTitleModel(): { value: string; placeholder: string }
-  getToolbarStation(): {
-    id: string
-    name: string
-    type: StationType
-    count: number
-    minerals: string[]
-  } | null
-  getToolbarRaces(): Array<{ value: string; label: string }>
-  getToolbarStationTypes(): Array<{ value: StationType; label: string }>
-  getAvailableMinerals(): string[]
-  getSingleBerthThroughput(): number
   updateTitle(value: string): void
   updateStationName(value: string): void
   updateStationType(value: StationType): void
   updateStationCount?(value: number): void
   toggleMineral?(mineral: string): void
-  openImport(): void
 }
 
 export function useProductionToolbarPresenter(store: ToolbarPresenterStore): UseProductionToolbarPresenterReturn {
+  const races = [
+    { value: 'argon', label: i18n.global.t('toolbar.races.argon') },
+    { value: 'terran', label: i18n.global.t('toolbar.races.terran') },
+    { value: 'teladi', label: i18n.global.t('toolbar.races.teladi') },
+    { value: 'paranid', label: i18n.global.t('toolbar.races.paranid') },
+    { value: 'split', label: i18n.global.t('toolbar.races.split') }
+  ]
+
+  const stationTypes = [
+    { value: 'industrial' as StationType, label: i18n.global.t('toolbar.station_types.industrial') },
+    { value: 'supply' as StationType, label: i18n.global.t('toolbar.station_types.supply') },
+    { value: 'transit' as StationType, label: i18n.global.t('toolbar.station_types.transit') },
+    { value: 'shipyard' as StationType, label: i18n.global.t('toolbar.station_types.shipyard') }
+  ]
+
+  const availableMinerals = ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane']
+
   const props: ToolbarPresenterProps = {
     mode: computed(() => store.session.workbenchMode),
-    titleModel: computed(() => store.getTitleModel()),
+    titleModel: computed(() => ({
+      value: store.titleValue,
+      placeholder: store.titlePlaceholder
+    })),
     settings: computed(() => store.stationState?.settings || null),
-    station: computed(() => store.getToolbarStation()),
+    station: computed(() => {
+      const station = store.stationState
+      if (!station) return null
+      return {
+        id: station.id,
+        name: station.name,
+        type: station.stationType || 'industrial',
+        count: station.count ?? 1,
+        minerals: station.minerals || []
+      }
+    }),
     stationCode: computed(() => store.context.stationCode),
     sectorName: computed(() => store.context.sectorName),
     sectorNameId: computed(() => store.context.sectorNameId),
     position: computed(() => store.context.position),
     sectorResources: computed(() => store.context.sectorResources),
     sectorSunlight: computed(() => store.context.sectorSunlight),
-    races: store.getToolbarRaces(),
-    stationTypes: store.getToolbarStationTypes(),
-    availableMinerals: store.getAvailableMinerals(),
-    singleBerthThroughput: computed(() => store.getSingleBerthThroughput())
+    races,
+    stationTypes,
+    availableMinerals,
+    singleBerthThroughput: computed(() => Math.max(1, store.stationState?.settings.transportShipCapacity || 1) * 15)
   }
 
   const dummyThrow = (method: string) => () => {
@@ -108,7 +128,7 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     updateRacePreference: (value: string) => store.settingActions.updateRacePreference(value),
     updateWorkforce: (value: boolean) => store.settingActions.updateWorkforce(value),
     updateShowEmpireGaps: (value: boolean) => store.settingActions.updateShowEmpireGaps(value),
-    openImport: () => store.openImport()
+    openImport: () => {}
   }
 
   return { props, emits }

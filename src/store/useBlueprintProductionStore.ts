@@ -16,7 +16,7 @@ import type {
   ProductionContextState,
   ProductionStationState
 } from '@/types/production-workbench-contract'
-import type { WareFlowViewMode, EmpireGapItem, ImportPayload } from '@/types/production-ui'
+import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
@@ -221,6 +221,20 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       cache,
       deps: getComputeDeps()
     })
+  })
+
+  const tabSemanticsById = computed<Record<string, { tag?: string; factoryGroup?: string }>>(() => {
+    const entries = orderedStations.value.map((station) => {
+      const semantics = planningDerivedMap.value?.getCache(station.id)?.semantics
+      return [
+        station.id,
+        {
+          tag: semantics?.tag,
+          factoryGroup: semantics?.factoryGroup
+        }
+      ] as const
+    })
+    return Object.fromEntries(entries)
   })
 
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
@@ -672,6 +686,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   const importModalOpen = ref(false)
   const wareflowViewMode = ref<WareFlowViewMode>('quantity')
+  const expandedSectorId = computed<string | null>(() => null)
+  const titleValue = computed(() => activeEmpire.value?.name || '')
+  const titlePlaceholder = computed(() => i18n.global.t('sector.new_sector_name'))
 
   const capabilities: ProductionWorkbenchCapabilities = {
     uniqueWorkbench: false,
@@ -755,7 +772,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeStationId: activeStationId.value,
     activeTransitSectorId: null,
     activeBinding: activeEmpire.value?.id || null,
-    canToggle: false
+    canToggle: false,
+    wareflowViewMode: wareflowViewMode.value
   }))
 
   const context = computed<ProductionContextState>(() => {
@@ -784,6 +802,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       entityType: 'station',
       id: station.id,
       name: station.name,
+      stationType: station.type || 'industrial',
+      count: station.count ?? 1,
+      minerals: station.minerals || [],
       plannedModules: state.plannedModules,
       resolvedModules: state.resolvedModules,
       autoIndustryModules: state.autoIndustryModules,
@@ -791,7 +812,15 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
       warePriorityLevels: state.warePriorityLevels,
-      settings: settings.value
+      settings: {
+        ...settings.value,
+        enforceDlcActivation: enforceDlcActivation.value
+      },
+      enforceDlcActivation: enforceDlcActivation.value,
+      empireGaps: empireGapsComputed.value,
+      currentEfficiency: currentEfficiency.value,
+      actualWorkforce: actualWorkforce.value,
+      buildPriceMultiplier: buildPriceMultiplier.value
     }
   })
 
@@ -807,102 +836,39 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
   })
 
-  const workbenchMethods = {
-    getTabs: () => orderedStations.value.map(s => {
-      const cache = planningDerivedMap.value?.getCache(s.id)
-      const semantics = cache?.semantics
-      return {
-        id: s.id,
-        type: 'station' as const,
-        name: s.name,
-        sectorId: s.sectorId ?? undefined,
-        stationType: s.type,
-        tag: semantics?.tag,
-        factoryGroup: semantics?.factoryGroup
-      }
-    }),
-    getActiveTabId: () => activeStationId.value,
-    getExpandedSectorId: () => null,
+  function createStationFromUi(name?: string, type?: StationType) {
+    const station = createStation(name || i18n.global.t('sector.new_station_name'), type || 'industrial')
+    return station?.id || null
+  }
 
-    getTitleModel: () => ({
-      value: activeEmpire.value?.name || '',
-      placeholder: i18n.global.t('sector.new_sector_name')
-    }),
-    getToolbarStation: () => activeStation.value ? {
-      id: activeStation.value.id,
-      name: activeStation.value.name,
-      type: activeStation.value.type || 'industrial',
-      count: activeStation.value.count ?? 1,
-      minerals: activeStation.value.minerals || []
-    } : null,
-    getToolbarRaces: () => [
-      { value: 'argon', label: i18n.global.t('toolbar.races.argon') },
-      { value: 'terran', label: i18n.global.t('toolbar.races.terran') },
-      { value: 'teladi', label: i18n.global.t('toolbar.races.teladi') },
-      { value: 'paranid', label: i18n.global.t('toolbar.races.paranid') },
-      { value: 'split', label: i18n.global.t('toolbar.races.split') }
-    ],
-    getToolbarStationTypes: () => [
-      { value: 'industrial' as StationType, label: i18n.global.t('toolbar.station_types.industrial') },
-      { value: 'supply' as StationType, label: i18n.global.t('toolbar.station_types.supply') },
-      { value: 'transit' as StationType, label: i18n.global.t('toolbar.station_types.transit') },
-      { value: 'shipyard' as StationType, label: i18n.global.t('toolbar.station_types.shipyard') }
-    ],
-    getAvailableMinerals: () => ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane'],
-    getSingleBerthThroughput: () => Math.max(1, settings.value.transportShipCapacity || 1) * 15,
+  function duplicateStationFromUi(stationId: string) {
+    const station = duplicateStation(stationId)
+    return station?.id || null
+  }
 
-    getEnforceDlcActivation: () => enforceDlcActivation.value,
+  function updateTitle(value: string) {
+    updateEmpireName(value)
+  }
 
-    getWareflowViewMode: () => wareflowViewMode.value,
-    getEmpireGaps: () => empireGapsComputed.value,
+  function updateStationNameFromActive(value: string) {
+    if (editableStationPlan.value) renameStation(editableStationPlan.value.id, value)
+  }
 
-    getCurrentEfficiency: () => currentEfficiency.value,
-    getActualWorkforce: () => actualWorkforce.value,
-    getBuildPriceMultiplier: () => buildPriceMultiplier.value,
+  function updateStationTypeFromActive(value: StationType) {
+    if (editableStationPlan.value) updateStationType(editableStationPlan.value.id, value)
+  }
 
-    selectOverview: () => selectStation(null),
-    expandSector: () => {},
+  function updateStationCountFromActive(value: number) {
+    if (editableStationPlan.value) updateStationCount(editableStationPlan.value.id, value)
+  }
 
-    createStation: (name?: string, type?: StationType) => {
-      const station = createStation(name || i18n.global.t('sector.new_station_name'), type || 'industrial')
-      return station?.id || null
-    },
-    duplicateStation: (stationId: string) => {
-      const station = duplicateStation(stationId)
-      return station?.id || null
-    },
-
-    updateTitle: (value: string) => updateEmpireName(value),
-    updateStationName: (value: string) => {
-      if (editableStationPlan.value) renameStation(editableStationPlan.value.id, value)
-    },
-    updateStationType: (value: StationType) => {
-      if (editableStationPlan.value) updateStationType(editableStationPlan.value.id, value)
-    },
-    updateStationCount: (value: number) => {
-      if (editableStationPlan.value) updateStationCount(editableStationPlan.value.id, value)
-    },
-    toggleMineral: (mineral: string) => {
-      if (!editableStationPlan.value) return
-      const current = editableStationPlan.value.minerals || []
-      const newMinerals = current.includes(mineral)
-        ? current.filter((m: string) => m !== mineral)
-        : [...current, mineral]
-      updateStationMinerals(editableStationPlan.value.id, newMinerals)
-    },
-
-    updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
-    updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
-
-    openImport: () => { importModalOpen.value = true },
-    applyImportedStationPayload: (stationId: string, payload: ImportPayload) => {
-      applyImportedStationPayload(stationId, payload)
-    },
-    updateStationModules: (stationId: string, modules: SavedModule[]) => updateStationModules(stationId, modules),
-    getStationById: (stationId: string) => {
-      const station = getStationById(stationId)
-      return station ? { id: station.id, modules: station.modules } : null
-    }
+  function toggleMineralFromActive(mineral: string) {
+    if (!editableStationPlan.value) return
+    const current = editableStationPlan.value.minerals || []
+    const newMinerals = current.includes(mineral)
+      ? current.filter((m: string) => m !== mineral)
+      : [...current, mineral]
+    updateStationMinerals(editableStationPlan.value.id, newMinerals)
   }
 
   return {
@@ -914,6 +880,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     editableStationPlan,
     activeStationId,
     orderedStations,
+    tabSemanticsById,
+    expandedSectorId,
+    titleValue,
+    titlePlaceholder,
     savedEmpires,
     importModalOpen,
     getStationFlowCache,
@@ -930,15 +900,17 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     loadEmpire,
     deleteEmpire,
     createEmpire,
-    createStation: workbenchMethods.createStation,
+    createStation: createStationFromUi,
     deleteStation,
-    duplicateStation: workbenchMethods.duplicateStation,
+    duplicateStation: duplicateStationFromUi,
     renameStation,
     selectStation,
+    selectTransitSector: (_sectorId: string | null) => {},
+    setExpandedSector: (_sectorId: string | null) => {},
     getStationById,
     updateStationModules,
-    updateStationType: workbenchMethods.updateStationType,
-    updateStationCount: workbenchMethods.updateStationCount,
+    updateStationType: updateStationTypeFromActive,
+    updateStationCount: updateStationCountFromActive,
     updateStationMinerals,
     setStationLocation,
     applyImportedStationPayload,
@@ -954,29 +926,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     settingActions,
     wareRuleActions,
     moduleActions,
-    getTabs: workbenchMethods.getTabs,
-    getActiveTabId: workbenchMethods.getActiveTabId,
-    getExpandedSectorId: workbenchMethods.getExpandedSectorId,
-    getTitleModel: workbenchMethods.getTitleModel,
-    getToolbarStation: workbenchMethods.getToolbarStation,
-    getToolbarRaces: workbenchMethods.getToolbarRaces,
-    getToolbarStationTypes: workbenchMethods.getToolbarStationTypes,
-    getAvailableMinerals: workbenchMethods.getAvailableMinerals,
-    getSingleBerthThroughput: workbenchMethods.getSingleBerthThroughput,
-    getEnforceDlcActivation: workbenchMethods.getEnforceDlcActivation,
-    getWareflowViewMode: workbenchMethods.getWareflowViewMode,
-    getEmpireGaps: workbenchMethods.getEmpireGaps,
-    getCurrentEfficiency: workbenchMethods.getCurrentEfficiency,
-    getActualWorkforce: workbenchMethods.getActualWorkforce,
-    getBuildPriceMultiplier: workbenchMethods.getBuildPriceMultiplier,
-    updateTitle: workbenchMethods.updateTitle,
-    updateStationName: workbenchMethods.updateStationName,
-    openImport: workbenchMethods.openImport,
-    updateWareflowViewMode: workbenchMethods.updateWareflowViewMode,
-    updateBuildPriceMultiplier: workbenchMethods.updateBuildPriceMultiplier,
-    selectOverview: workbenchMethods.selectOverview,
-    selectTransit: () => {},
-    expandSector: workbenchMethods.expandSector,
-    toggleMineral: workbenchMethods.toggleMineral
+    updateTitle,
+    updateStationName: updateStationNameFromActive,
+    updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
+    updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
+    toggleMineral: toggleMineralFromActive
   }
 })

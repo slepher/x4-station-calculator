@@ -4,6 +4,7 @@ import type {
   StationSettings
 } from './x4'
 import type { WareProductionFlow } from './production-flow'
+import type { EmpireGapItem, WareFlowViewMode, ProductionTabItem as UiProductionTabItem } from './production-ui'
 
 export interface ProductionWorkbenchCapabilities {
   uniqueWorkbench: boolean
@@ -11,13 +12,7 @@ export interface ProductionWorkbenchCapabilities {
   hasSectors: boolean
 }
 
-export interface ProductionTabItem {
-  id: string
-  type: 'station' | 'transit' | 'overview'
-  name: string
-  sectorId?: string
-  stationType?: StationType
-}
+export type ProductionTabItem = UiProductionTabItem
 
 export interface ProductionSessionState {
   workbenchMode: 'overview' | 'station' | 'transit'
@@ -28,6 +23,7 @@ export interface ProductionSessionState {
   activeTransitSectorId: string | null
   activeBinding: string | null
   canToggle: boolean
+  wareflowViewMode: WareFlowViewMode
 }
 
 export interface ProductionContextState {
@@ -48,6 +44,9 @@ export interface ProductionStationState {
   entityType: 'station' | 'transit'
   id: string
   name: string
+  stationType?: StationType
+  count?: number
+  minerals?: string[]
   plannedModules: SavedModule[]
   resolvedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
@@ -56,6 +55,11 @@ export interface ProductionStationState {
   productionFlows: WareProductionFlow[]
   warePriorityLevels: Record<string, number>
   settings: StationSettings
+  enforceDlcActivation: boolean
+  empireGaps: { operations: EmpireGapItem[]; supply: EmpireGapItem[] }
+  currentEfficiency: number
+  actualWorkforce: number
+  buildPriceMultiplier: number
 }
 
 export type ProductionWorkbenchSessionState = ProductionSessionState

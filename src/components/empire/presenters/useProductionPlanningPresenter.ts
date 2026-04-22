@@ -31,7 +31,6 @@ export interface PlanningPresenterStore {
   moduleActions: {
     updatePlannedModules(modules: SavedModule[]): void
   }
-  getEnforceDlcActivation(): boolean
 }
 
 export function useProductionPlanningPresenter(store: PlanningPresenterStore): UseProductionPlanningPresenterReturn {
@@ -45,7 +44,7 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
     autoInfrastructureModules: computed(() => store.stationState?.autoInfrastructureModules || []),
     liveModules: computed(() => store.context.archiveModules),
     liveBuildingModules: computed(() => store.context.buildingModules),
-    enforceDlcActivation: computed(() => store.getEnforceDlcActivation())
+    enforceDlcActivation: computed(() => store.stationState?.enforceDlcActivation ?? false)
   }
 
   const emits: PlanningPresenterEmits = {

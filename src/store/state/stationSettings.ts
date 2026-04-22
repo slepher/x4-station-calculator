@@ -19,7 +19,8 @@ export const DEFAULT_STATION_SETTINGS: StationSettings = {
   primaryProductBufferHours: 12.0,
   secondaryProductBufferHours: 2.0,
   transportMinutes: 30,
-  transportShipCapacity: 62000
+  transportShipCapacity: 62000,
+  enforceDlcActivation: false
 }
 
 export interface StationComputeDeps {

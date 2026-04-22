@@ -77,16 +77,14 @@ export interface WareflowPresenterStore {
     addModuleByWare(wareId: string): void
     removeModuleByWare(wareId: string): void
   }
-  getWareflowViewMode(): WareFlowViewMode
   updateWareflowViewMode(value: WareFlowViewMode): void
-  getEmpireGaps(): { operations: EmpireGapItem[]; supply: EmpireGapItem[] }
 }
 
 export function useProductionWareflowPresenter(store: WareflowPresenterStore): UseProductionWareflowPresenterReturn {
   const props: WareflowPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
-    viewMode: computed(() => store.getWareflowViewMode()),
+    viewMode: computed(() => store.session.wareflowViewMode),
     productionFlows: computed(() => store.stationState?.productionFlows || []),
     warePriorityLevels: computed(() => store.stationState?.warePriorityLevels || {}),
     settings: computed(() => {
@@ -103,7 +101,7 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
         transportMinutes: s.transportMinutes
       }
     }),
-    empireGaps: computed(() => store.getEmpireGaps()),
+    empireGaps: computed(() => store.stationState?.empireGaps || { operations: [], supply: [] }),
     isWareLocked: (wareId: string) => store.wareRuleActions.isWareLocked(wareId),
     getResolvedLevel: (wareId: string) => store.wareRuleActions.getResolvedLevel(wareId),
     isWareOperable: (wareId: string) => store.wareRuleActions.isWareOperable(wareId),
