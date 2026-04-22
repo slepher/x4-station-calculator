@@ -593,7 +593,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       waresMap,
       medicalConsumptionMap,
       modulesByMacroId,
-      buildPriceMultiplier: buildPriceMultiplier.value,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
     }

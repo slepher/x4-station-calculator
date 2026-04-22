@@ -22,7 +22,6 @@ export interface ComputeDepsInput {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
   medicalConsumptionMap: RaceMedicalConsumption
-  buildPriceMultiplier: number
   enforceDlcActivation: boolean
   isModuleDlcActive: (moduleId: string) => boolean
 }
@@ -32,7 +31,6 @@ export function buildComputeDeps(input: ComputeDepsInput): StationComputeDeps {
     modulesMap: input.modulesMap,
     waresMap: input.waresMap,
     medicalConsumptionMap: input.medicalConsumptionMap,
-    buildPriceMultiplier: input.buildPriceMultiplier,
     enforceDlcActivation: input.enforceDlcActivation,
     isModuleDlcActive: input.isModuleDlcActive
   }

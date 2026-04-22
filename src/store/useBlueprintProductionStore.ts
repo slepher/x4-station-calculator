@@ -113,7 +113,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       waresMap,
       medicalConsumptionMap,
       modulesByMacroId,
-      buildPriceMultiplier: buildPriceMultiplier.value,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
     }
