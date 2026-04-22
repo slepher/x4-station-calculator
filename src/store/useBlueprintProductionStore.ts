@@ -99,6 +99,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeStationId.value
   ))
 
+  const editableStationPlan = computed<StationPlan | null>(() => activeStation.value)
+
   function getStationById(stationId: string): StationPlan | null {
     return sourceView.getStationById(stationId)
   }
@@ -149,9 +151,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   const plannedModules = computed<SavedModule[]>({
-    get: () => activeStation.value?.modules || [],
+    get: () => editableStationPlan.value?.modules || [],
     set: (value) => {
-      const station = activeStation.value
+      const station = editableStationPlan.value
       if (!station) return
       station.modules = deepClone(value)
       station.lastUpdated = Date.now()
@@ -160,9 +162,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   })
 
   const lockedWares = computed<string[]>({
-    get: () => activeStation.value?.lockedWares || [],
+    get: () => editableStationPlan.value?.lockedWares || [],
     set: (value) => {
-      const station = activeStation.value
+      const station = editableStationPlan.value
       if (!station) return
       station.lockedWares = deepClone(value)
       station.lastUpdated = Date.now()
@@ -171,9 +173,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   })
 
   const warePriority = computed<Record<string, number>>({
-    get: () => activeStation.value?.warePriority || {},
+    get: () => editableStationPlan.value?.warePriority || {},
     set: (value) => {
-      const station = activeStation.value
+      const station = editableStationPlan.value
       if (!station) return
       station.warePriority = deepClone(value)
       station.lastUpdated = Date.now()
@@ -182,9 +184,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   })
 
   const settings = computed<StationSettings>({
-    get: () => activeStation.value?.settings || { ...DEFAULT_STATION_SETTINGS },
+    get: () => editableStationPlan.value?.settings || { ...DEFAULT_STATION_SETTINGS },
     set: (value) => {
-      const station = activeStation.value
+      const station = editableStationPlan.value
       if (!station) return
       const previousSettings = { ...DEFAULT_STATION_SETTINGS, ...station.settings }
       station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...value })
@@ -234,7 +236,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   const moduleActions = createProductionModuleActions<ProductionModuleStation & StationPlan>({
-    getActiveStation: () => activeStation.value,
+    getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
     findModuleForWare: (wareId, racePreference) => gameData.findModuleForWare(wareId, racePreference),
     getRacePreference: () => settings.value.racePreference,
@@ -251,7 +253,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   })
 
   const wareRuleActions = createProductionWareRuleActions<StationPlan>({
-    getActiveStation: () => activeStation.value,
+    getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
     getPlannedModules: () => plannedModules.value,
     getAutoIndustryModules: () => activeStationState.value.autoIndustryModules,
@@ -794,7 +796,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   })
 
   const settingActions = createProductionSettingActions<StationPlan>({
-    getActiveStation: () => activeStation.value,
+    getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
     mergeSettings: (base, patch) => ({ ...DEFAULT_STATION_SETTINGS, ...{ ...base, ...patch } }),
     now: () => Date.now(),
@@ -872,21 +874,21 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
     updateTitle: (value: string) => updateEmpireName(value),
     updateStationName: (value: string) => {
-      if (activeStation.value) renameStation(activeStation.value.id, value)
+      if (editableStationPlan.value) renameStation(editableStationPlan.value.id, value)
     },
     updateStationType: (value: StationType) => {
-      if (activeStation.value) updateStationType(activeStation.value.id, value)
+      if (editableStationPlan.value) updateStationType(editableStationPlan.value.id, value)
     },
     updateStationCount: (value: number) => {
-      if (activeStation.value) updateStationCount(activeStation.value.id, value)
+      if (editableStationPlan.value) updateStationCount(editableStationPlan.value.id, value)
     },
     toggleMineral: (mineral: string) => {
-      if (!activeStation.value) return
-      const current = activeStation.value.minerals || []
+      if (!editableStationPlan.value) return
+      const current = editableStationPlan.value.minerals || []
       const newMinerals = current.includes(mineral)
         ? current.filter((m: string) => m !== mineral)
         : [...current, mineral]
-      updateStationMinerals(activeStation.value.id, newMinerals)
+      updateStationMinerals(editableStationPlan.value.id, newMinerals)
     },
 
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
@@ -909,6 +911,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     isEmptyForSave,
     activeEmpire,
     activeStation,
+    editableStationPlan,
     activeStationId,
     orderedStations,
     savedEmpires,

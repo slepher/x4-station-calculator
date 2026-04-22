@@ -306,57 +306,44 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return activeTransitSectorId.value ? 'transit' : (activeStationId.value ? 'station' : 'overview')
   })
 
+  const activeBindingStationId = computed(() => activeTransitSectorId.value ? null : activeStationId.value)
+
+  const bindingStationPlan = computed<BindingStationPlan | null>(() => {
+    const stationId = activeBindingStationId.value
+    if (!stationId) return null
+    const binding = activeBinding.value
+    if (!binding) return null
+    return binding.stationPlans.find(plan => plan.id === stationId) || null
+  })
+
+  const bindingTransitGroup = computed(() => {
+    const sectorId = activeTransitSectorId.value
+    if (!sectorId) return null
+    const binding = activeBinding.value
+    if (!binding) return null
+    return binding.groups.find(g => g.id === sectorId) || null
+  })
+
   const bindingStation = computed<BindingStationPlan | TradeStationBinding | null>(() => {
-    const mode = workbenchMode.value
-    
-    if (mode === 'station') {
-      const stationId = activeStationId.value
-      if (!stationId) return null
-      
-      const binding = activeBinding.value
-      if (!binding) return null
-      
-      return binding.stationPlans.find(plan => plan.id === stationId) || null
-    }
-    
-    if (mode === 'transit') {
-      const sectorId = activeTransitSectorId.value
-      if (!sectorId) return null
-      
-      const binding = activeBinding.value
-      if (!binding) return null
-      
-      const group = binding.groups.find(g => g.id === sectorId)
-      return group?.tradeStation || null
-    }
-    
-    return null
+    return bindingStationPlan.value || bindingTransitGroup.value?.tradeStation || null
+  })
+
+  const editableStationPlan = computed<StationPlan | null>(() => {
+    const plan = bindingStationPlan.value
+    if (!plan) return null
+    return toProductionStation(plan, gameData.maps.sectors)
+  })
+
+  const archiveStationCode = computed<string | null>(() => {
+    const binding = bindingStation.value
+    if (binding?.saveStationCode) return binding.saveStationCode
+    const stationId = activeBindingStationId.value
+    return stationId || null
   })
 
   const archiveStation = computed<ArchiveStationData | null>(() => {
-    const mode = workbenchMode.value
-    const binding = activeBinding.value
-    if (!binding) return null
-    
-    let code: string | undefined
-    
-    if (mode === 'station') {
-      const stationId = activeStationId.value
-      if (!stationId) return null
-      
-      const plan = binding.stationPlans.find(plan => plan.id === stationId)
-      code = plan?.saveStationCode || stationId
-    }
-    
-    if (mode === 'transit') {
-      const sectorId = activeTransitSectorId.value
-      if (!sectorId) return null
-      
-      const group = binding.groups.find(g => g.id === sectorId)
-      code = group?.tradeStation?.saveStationCode
-    }
-    
-    if (!code) return null
+    const code = archiveStationCode.value
+    if (!code || !activeBinding.value) return null
     
     const record = playerStationRecords.value.find(r => r.code === code && r.type === 'station')
     if (!record) return null
@@ -535,47 +522,36 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const activeStation = computed<StationPlan | null>(() => {
-    const mode = workbenchMode.value
-    
-    if (mode === 'transit') {
-      const sectorId = activeTransitSectorId.value
-      if (!sectorId) return null
-      const group = activeBinding.value?.groups.find(g => g.id === sectorId)
-      const tradeStation = group?.tradeStation
-      if (!tradeStation) return null
+    const binding = bindingStation.value
+    if (binding) {
+      if ('modules' in binding) {
+        return toProductionStation(binding, gameData.maps.sectors)
+      }
       return {
-        id: tradeStation.id,
-        name: tradeStation.name || tradeStation.saveStationCode || 'Transit Hub',
+        id: binding.id,
+        name: binding.name || binding.saveStationCode || 'Transit Hub',
         type: 'transit',
         modules: [],
-        settings: ({ ...DEFAULT_STATION_SETTINGS, ...tradeStation.settings || {} }),
+        settings: { ...DEFAULT_STATION_SETTINGS, ...binding.settings || {} },
         lastUpdated: 0,
         lockedWares: [],
         warePriority: {}
       }
     }
-    
-    if (mode === 'station') {
-      const binding = bindingStation.value
-      if (binding && 'modules' in binding) {
-        return toProductionStation(binding as BindingStationPlan, gameData.maps.sectors)
-      }
-      const archive = archiveStation.value
-      if (archive) {
-        return {
-          id: archive.code,
-          name: archive.code,
-          type: 'industrial',
-          modules: [],
-          settings: { ...DEFAULT_STATION_SETTINGS, sunlight: archive.sector?.sunlight ?? 100 },
-          lastUpdated: 0,
-          lockedWares: [],
-          warePriority: {}
-        }
-      }
+
+    const archive = archiveStation.value
+    if (!archive) return null
+
+    return {
+      id: archive.code,
+      name: archive.name || archive.code,
+      type: workbenchMode.value === 'transit' ? 'transit' : 'industrial',
+      modules: [],
+      settings: { ...DEFAULT_STATION_SETTINGS, sunlight: archive.sector?.sunlight ?? 100 },
+      lastUpdated: 0,
+      lockedWares: [],
+      warePriority: {}
     }
-    
-    return null
   })
 
   function getComputeDeps(): StationComputeDeps | null {
@@ -622,9 +598,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   const plannedModules = computed<SavedModule[]>({
-    get: () => activeStation.value?.modules || [],
+    get: () => editableStationPlan.value?.modules || [],
     set: (value) => {
-      const station = activeStation.value
+      const station = editableStationPlan.value
       if (!station) return
       station.modules = deepClone(value)
       station.lastUpdated = Date.now()
@@ -644,9 +620,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const lockedWares = computed<string[]>({
-    get: () => activeStation.value?.lockedWares || [],
+    get: () => editableStationPlan.value?.lockedWares || [],
     set: (value) => {
-      const station = activeStation.value
+      const station = editableStationPlan.value
       if (!station) return
       station.lockedWares = deepClone(value)
       station.lastUpdated = Date.now()
@@ -666,9 +642,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const warePriority = computed<Record<string, number>>({
-    get: () => activeStation.value?.warePriority || {},
+    get: () => editableStationPlan.value?.warePriority || {},
     set: (value) => {
-      const station = activeStation.value
+      const station = editableStationPlan.value
       if (!station) return
       station.warePriority = deepClone(value)
       station.lastUpdated = Date.now()
@@ -687,7 +663,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const settings = computed<StationSettings>({
-    get: () => activeStation.value?.settings || { ...DEFAULT_STATION_SETTINGS },
+    get: () => editableStationPlan.value?.settings || activeStation.value?.settings || { ...DEFAULT_STATION_SETTINGS },
     set: (value) => {
       if (workbenchMode.value === 'transit') {
         const sectorId = activeTransitSectorId.value
@@ -698,7 +674,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         saveBindingStore.updateGroup(activeBinding.value?.gameGuid || '', sectorId, { tradeStation: group.tradeStation })
         return
       }
-      const station = activeStation.value
+      const station = editableStationPlan.value
       if (!station) return
       const previousSettings = { ...DEFAULT_STATION_SETTINGS, ...station.settings }
       station.settings = ({ ...DEFAULT_STATION_SETTINGS, ...value })
@@ -780,7 +756,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   const moduleActions = createProductionModuleActions<StationPlan>({
-    getActiveStation: () => activeStation.value,
+    getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
     findModuleForWare: (wareId, racePreference) => gameData.findModuleForWare(wareId, racePreference),
     getRacePreference: () => settings.value.racePreference,
@@ -809,7 +785,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const wareRuleActions = createProductionWareRuleActions<StationPlan>({
-    getActiveStation: () => activeStation.value,
+    getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
     getPlannedModules: () => plannedModules.value,
     getAutoIndustryModules: () => activeStationState.value.autoIndustryModules,
@@ -1468,13 +1444,13 @@ warePriorityLevels: {},
   const expandSector = (sectorId: string | null) => { expandedSectorId.value = sectorId }
   const updateTitle = (value: string) => { activeBindingName.value = value }
   const updateStationNameFromActive = (value: string) => {
-    if (activeStation.value) renameStation(activeStation.value.id, value)
+    if (editableStationPlan.value) renameStation(editableStationPlan.value.id, value)
   }
   const updateStationTypeFromActive = (value: StationType) => {
-    if (activeStation.value) updateStationType(activeStation.value.id, value)
+    if (editableStationPlan.value) updateStationType(editableStationPlan.value.id, value)
   }
   const settingActions = createProductionSettingActions<StationPlan>({
-    getActiveStation: () => activeStation.value,
+    getActiveStation: () => editableStationPlan.value || activeStation.value,
     getComputeDeps,
     mergeSettings: (base, patch) => ({ ...DEFAULT_STATION_SETTINGS, ...{ ...base, ...patch } }),
     now: () => Date.now(),
@@ -1547,6 +1523,7 @@ warePriorityLevels: {},
     activeBinding,
     activeBindingName,
     activeStation,
+    editableStationPlan,
     activeStationId,
     activeTransitSectorId,
     sectors,
