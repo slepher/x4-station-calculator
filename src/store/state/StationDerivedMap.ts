@@ -11,7 +11,6 @@ export interface StationDerivedStaticDeps {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, any>
   medicalConsumptionMap: Record<string, any>
-  modulesByMacroId?: Record<string, X4Module>
 }
 
 export interface ComputeInfrastructureModulesInput {
@@ -334,7 +333,7 @@ function buildSemanticsFromModules(
   const aggregatedModules = buildAggregatedModulesFromStationPlan({ modules }, deps.modulesMap)
   const classification = classifyPlayerStationPoi({
     modules: aggregatedModules,
-    modulesByMacroId: deps.modulesByMacroId,
+    modulesMap: deps.modulesMap,
     isHeadquarter: false
   })
 

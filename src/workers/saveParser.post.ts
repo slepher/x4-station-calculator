@@ -699,7 +699,7 @@ function enrichPlayerStation(
     macro: station.macro,
     modules,
     isHeadquarter: station.is_headquarter,
-    modulesByMacroId
+    modulesMap: modulesByMacroId
   })
   
   const position = withTransformPosition(calculateFinalPosition(

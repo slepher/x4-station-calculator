@@ -101,7 +101,7 @@ function getPrimaryProductionModule(
 
 export function getProductionProfile(
   modules: CodeMap<AggregatedStationModule> | AggregatedStationModule[] | undefined,
-  modulesByMacroId?: Record<string, X4Module>
+  modulesMap?: Record<string, X4Module>
 ): { productionProfile?: string; profileName?: string } {
   const entries = moduleValues(modules)
   if (!entries.length) return {}
@@ -115,7 +115,10 @@ export function getProductionProfile(
   if (nonEnergyModules.length === 1 || nonEnergyModules.length === 0) {
     const primaryModule = getPrimaryProductionModule(entries)
     if (!primaryModule?.module_id) return {}
-    const moduleName = modulesByMacroId?.[primaryModule.ref]?.name
+    const moduleName = (
+      (primaryModule.module_id ? modulesMap?.[primaryModule.module_id]?.name : undefined)
+      || modulesMap?.[primaryModule.ref]?.name
+    )
     return {
       productionProfile: primaryModule.module_id,
       profileName: moduleName || primaryModule.module_id
@@ -166,7 +169,7 @@ export function classifyPlayerStationPoi(args: {
   macro?: string | null
   modules?: CodeMap<AggregatedStationModule> | AggregatedStationModule[]
   isHeadquarter?: boolean
-  modulesByMacroId?: Record<string, X4Module>
+  modulesMap?: Record<string, X4Module>
 }): StationPoiClassification {
   const modules = moduleValues(args.modules)
   const macro = (args.macro || '').toLowerCase()
@@ -196,7 +199,7 @@ export function classifyPlayerStationPoi(args: {
   else if (isTradestation) tag = 'tradestation'
   else if (isDefencemodule) tag = 'defencemodule'
 
-  const { productionProfile, profileName } = getProductionProfile(modules, args.modulesByMacroId)
+  const { productionProfile, profileName } = getProductionProfile(modules, args.modulesMap)
 
   return {
     tag,

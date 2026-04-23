@@ -5,7 +5,6 @@ import { classifyPlayerStationPoi, buildAggregatedModulesFromStationPlan, getFac
 
 export interface BuildSemanticsDeps {
   modulesMap: Record<string, X4Module>
-  modulesByMacroId?: Record<string, X4Module>
 }
 
 export function buildStationSemantics(
@@ -15,7 +14,7 @@ export function buildStationSemantics(
   const aggregatedModules = buildAggregatedModulesFromStationPlan(station, deps.modulesMap)
   const classification = classifyPlayerStationPoi({
     modules: aggregatedModules,
-    modulesByMacroId: deps.modulesByMacroId,
+    modulesMap: deps.modulesMap,
     isHeadquarter: false
   })
 
@@ -50,7 +49,7 @@ export function buildArchiveSemantics(
   }
 
   const fallbackFactoryGroup = existingFactoryGroup || getFactoryGroup(modulesArray)
-  const fallbackProfile = getProductionProfile(modulesArray, deps.modulesByMacroId)
+  const fallbackProfile = getProductionProfile(modulesArray, deps.modulesMap)
 
   return {
     tag: existingTag || 'factory',

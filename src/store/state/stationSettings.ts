@@ -27,7 +27,6 @@ export interface StationComputeDeps {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
   medicalConsumptionMap: RaceMedicalConsumption
-  modulesByMacroId?: Record<string, X4Module>
   enforceDlcActivation?: boolean
   isModuleDlcActive?: (moduleId: string) => boolean
 }

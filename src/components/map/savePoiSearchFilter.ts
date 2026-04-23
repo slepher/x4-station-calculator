@@ -17,13 +17,13 @@ export interface SearchState {
 export function matchStationByProduct(
   station: StationEntry,
   wareId: string,
-  modulesByMacroId: Record<string, X4Module>
+  modulesMap: Record<string, X4Module>
 ): boolean {
   const modules = station.modules ? Object.values(station.modules) : []
   if (modules.length === 0) return false
 
   for (const module of modules) {
-    const x4Module = modulesByMacroId[module.ref] || modulesByMacroId[module.module_id || '']
+    const x4Module = module.module_id ? modulesMap[module.module_id] : null
     if (x4Module && x4Module.outputs && wareId in x4Module.outputs) {
       return true
     }
@@ -100,7 +100,7 @@ function findSectorIdByMacro(maps: X4Map, sectorMacro: string): string | null {
 export function filterStationBySearchState(
   station: StationEntry,
   searchState: SearchState,
-  modulesByMacroId: Record<string, X4Module>
+  modulesMap: Record<string, X4Module>
 ): boolean {
   const { productModuleTags, factionTags } = searchState
 
@@ -108,7 +108,7 @@ export function filterStationBySearchState(
     productModuleTags.length === 0 ||
     productModuleTags.some((tag) => {
       if (tag.category === 'product') {
-        return matchStationByProduct(station, tag.id, modulesByMacroId)
+        return matchStationByProduct(station, tag.id, modulesMap)
       }
       if (tag.category === 'module') {
         return matchStationByModule(station, tag.id)

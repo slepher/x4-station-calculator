@@ -171,8 +171,7 @@ export function computeStationFlow(
   const staticDeps: StationDerivedStaticDeps = {
     modulesMap: deps.modulesMap,
     waresMap: deps.waresMap,
-    medicalConsumptionMap: deps.medicalConsumptionMap,
-    modulesByMacroId: deps.modulesByMacroId
+    medicalConsumptionMap: deps.medicalConsumptionMap
   }
   const flowMap = new StationDerivedMap(staticDeps)
   const seed: StationDerivedSeed = {

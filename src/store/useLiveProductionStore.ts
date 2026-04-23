@@ -127,9 +127,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (!stationEntry.modules) return
 
     const modules: SavedModule[] = []
-    const modulesByMacroId = gameData.modulesByMacroId
     for (const mod of Object.values(stationEntry.modules)) {
-      const matchedModule = mod.module_id || modulesByMacroId[mod.ref]?.id
+      const matchedModule = mod.module_id
       if (matchedModule) {
         const existing = modules.find((m) => m.id === matchedModule)
         if (existing) {
@@ -394,9 +393,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     
     const modules: SavedModule[] = []
     if (stationEntry.modules) {
-      const modulesByMacroId = gameData.modulesByMacroId
       for (const mod of Object.values(stationEntry.modules)) {
-        const matchedModule = mod.module_id || modulesByMacroId[mod.ref]?.id
+        const matchedModule = mod.module_id
         if (matchedModule) {
           const existing = modules.find(m => m.id === matchedModule)
           if (existing) {
@@ -416,9 +414,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       if (buildstorageRecord) {
         const buildstorageEntry = buildstorageRecord.data as BuildStorageEntry
         if (buildstorageEntry.modules) {
-          const modulesByMacroId = gameData.modulesByMacroId
           for (const mod of Object.values(buildstorageEntry.modules)) {
-            const matchedModule = mod.module_id || modulesByMacroId[mod.ref]?.id
+            const matchedModule = mod.module_id
             if (matchedModule) {
               const existing = buildingModules.find(m => m.id === matchedModule)
               if (existing) {
@@ -586,13 +583,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   function getComputeDeps(): StationComputeDeps | null {
-    const { modulesMap, waresMap, medicalConsumptionMap, modulesByMacroId, enforceDlcActivation } = gameData
+    const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
     if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
     return {
       modulesMap,
       waresMap,
       medicalConsumptionMap,
-      modulesByMacroId,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
     }
@@ -604,8 +600,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return {
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
-      medicalConsumptionMap: deps.medicalConsumptionMap,
-      modulesByMacroId: deps.modulesByMacroId
+      medicalConsumptionMap: deps.medicalConsumptionMap
     }
   }
 

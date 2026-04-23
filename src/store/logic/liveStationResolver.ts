@@ -42,9 +42,9 @@ function toDerivedSaveStation(
 ): StationPlan {
   const id = plan ? plan.id : saveStation.code
   const archiveModules = (saveStation.modules || []).map((mod) => ({
-    id: mod.module_id || mod.ref,
+    id: mod.module_id || '',
     count: mod.amount || 1
-  }))
+  })).filter((mod) => Boolean(mod.id))
   return {
     id,
     name: plan?.name || saveStation.code || 'Save Station',

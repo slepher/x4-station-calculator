@@ -400,17 +400,9 @@ const buildBindingSavePoiVisual = (input: {
 
   const station = input.station
   const aggregatedModules = station ? buildAggregatedModulesFromStationPlan(station, gameDataStore.modulesMap) : {}
-  const modulesByMacroId = Object.fromEntries(
-    Object.values(aggregatedModules)
-      .map((module) => {
-        const matched = gameDataStore.modulesByMacroId[module.ref]
-        return matched ? [module.ref, matched] : null
-      })
-      .filter((entry): entry is [string, typeof gameDataStore.modulesByMacroId[string]] => Boolean(entry))
-  )
   const classification = classifyPlayerStationPoi({
     modules: aggregatedModules,
-    modulesByMacroId
+    modulesMap: gameDataStore.modulesMap
   })
 
   return {
