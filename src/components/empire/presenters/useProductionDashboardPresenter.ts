@@ -1,5 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionSessionState, ProductionContextState, ProductionStationState } from '@/types/production-workbench-contract'
+import type { ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
 import type { SavedModule } from '@/types/x4'
 
 const DEFAULT_DASHBOARD_SETTINGS = {
@@ -24,6 +24,7 @@ export interface DashboardPresenterProps {
   currentEfficiency: ComputedRef<number>
   actualWorkforce: ComputedRef<number>
   buildPriceMultiplier: ComputedRef<number>
+  forceWorkforceAuto: ComputedRef<boolean>
 }
 
 export interface DashboardPresenterEmits {
@@ -41,7 +42,6 @@ export interface UseProductionDashboardPresenterReturn {
 
 export interface DashboardPresenterStore {
   session: ProductionSessionState
-  context: ProductionContextState
   stationState: ProductionStationState | null
   settingActions: {
     updateTransportShipCapacity(value: number): void
@@ -56,19 +56,9 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
   const props: DashboardPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
-    modules: computed(() => store.stationState?.resolvedModules || []),
-    activeModules: computed(() => {
-      if (store.session.visualMode === 'live' && store.context.hasArchive) {
-        return store.context.archiveModules
-      }
-      return store.stationState?.resolvedModules || []
-    }),
-    activeBuildingModules: computed(() => {
-      if (store.session.visualMode === 'live' && store.context.hasArchive) {
-        return store.context.buildingModules
-      }
-      return []
-    }),
+    modules: computed(() => store.stationState?.modules || []),
+    activeModules: computed(() => store.stationState?.modules || []),
+    activeBuildingModules: computed(() => store.stationState?.buildingModules || []),
     settings: computed(() => {
       const s = store.stationState?.settings
       if (!s) return DEFAULT_DASHBOARD_SETTINGS
@@ -82,7 +72,8 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
     }),
     currentEfficiency: computed(() => store.stationState?.currentEfficiency || 0),
     actualWorkforce: computed(() => store.stationState?.actualWorkforce || 0),
-    buildPriceMultiplier: computed(() => store.stationState?.buildPriceMultiplier || 0)
+    buildPriceMultiplier: computed(() => store.stationState?.buildPriceMultiplier || 0),
+    forceWorkforceAuto: computed(() => store.session.visualMode === 'live')
   }
 
   const emits: DashboardPresenterEmits = {

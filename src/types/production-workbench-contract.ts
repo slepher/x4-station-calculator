@@ -36,8 +36,6 @@ export interface ProductionContextState {
   sectorSunlight: number
   hasBinding: boolean
   hasArchive: boolean
-  archiveModules: SavedModule[]
-  buildingModules: SavedModule[]
 }
 
 export interface ProductionStationState {
@@ -49,6 +47,8 @@ export interface ProductionStationState {
   minerals?: string[]
   plannedModules: SavedModule[]
   resolvedModules: SavedModule[]
+  modules: SavedModule[]
+  buildingModules: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]

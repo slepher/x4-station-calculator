@@ -433,4 +433,9 @@ export interface ArchiveStationData {
   building: ArchiveStationBuildingData
   cargo?: WareAmount[]
   reservation?: WareAmount[]
+  workforces?: WorkforceEntry[]
+  tag?: string
+  factoryGroup?: string
+  productionProfile?: string
+  profileName?: string
 }

@@ -434,6 +434,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           sector: sectorData,
           position,
           modules,
+          workforces: stationEntry.workforces,
+          tag: stationEntry.tag,
+          factoryGroup: stationEntry.factoryGroup,
+          productionProfile: stationEntry.productionProfile,
+          profileName: stationEntry.profileName,
           building: {
             modules: buildingModules,
             cargo: buildstorageEntry.cargo || [],
@@ -452,6 +457,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       sector: sectorData,
       position,
       modules,
+      workforces: stationEntry.workforces,
+      tag: stationEntry.tag,
+      factoryGroup: stationEntry.factoryGroup,
+      productionProfile: stationEntry.productionProfile,
+      profileName: stationEntry.profileName,
       building: {
         modules: buildingModules,
         cargo: [],
@@ -462,7 +472,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
-  const stationContext = computed(() => {
+  const context = computed<ProductionContextState>(() => {
     const binding = bindingStation.value
     const archive = archiveStation.value
     
@@ -496,20 +506,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       position = binding.position
     }
     
-    const archiveModules: SavedModule[] = archive?.modules || []
-    const buildingModules: SavedModule[] = archive?.building?.modules || []
-    
     return {
-      hasBinding,
-      hasArchive,
       stationCode,
+      sectorId: activeTransitSectorId.value || activeStation.value?.sectorId || null,
       sectorName,
       sectorNameId,
+      position,
       sectorResources,
       sectorSunlight,
-      position,
-      archiveModules,
-      buildingModules
+      hasBinding,
+      hasArchive
     }
   })
 
@@ -532,7 +538,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const visualMode = computed<'planning' | 'live'>(() => {
     if (mode.value === 'planning') return 'planning'
-    return stationContext.value?.hasArchive ? 'live' : 'planning'
+    return archiveStation.value !== null ? 'live' : 'planning'
   })
 
   function toggleMode() {
@@ -758,7 +764,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
-        resolvedModules: []
+        resolvedModules: [],
+        modules: [],
+        buildingModules: []
       }
     }
 
@@ -777,22 +785,67 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
-        resolvedModules: archiveModules
+        resolvedModules: archiveModules,
+        modules: archiveModules,
+        buildingModules: archiveStation.value?.building?.modules || []
       }
     }
 
     const planned = plannedModules.value
-    return buildDerivedActiveStationState({
+    const planState = buildDerivedActiveStationState({
       stationId,
       plannedModules: planned,
       settings: settings.value,
       cache,
       deps: getComputeDeps()
     })
+    return {
+      ...planState,
+      modules: planState.resolvedModules,
+      buildingModules: []
+    }
   })
 
-  const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
-  const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
+  const activeTransitState = computed(() => {
+    const sectorId = activeTransitSectorId.value
+    if (!sectorId) {
+      return {
+        plannedModules: [] as SavedModule[],
+        resolvedModules: [] as SavedModule[],
+        modules: [] as SavedModule[],
+        buildingModules: [] as SavedModule[],
+        autoIndustryModules: [] as SavedModule[],
+        autoHabitationModules: [] as SavedModule[],
+        autoInfrastructureModules: [] as SavedModule[],
+        productionFlows: [] as any[],
+        warePriorityLevels: {} as Record<string, number>,
+        actualWorkforce: 0,
+        currentEfficiency: 0
+      }
+    }
+    const planningFlows = planningFlowFacade.getSectorFinalProductionFlows(sectorId)
+    const flows = mode.value === 'live'
+      ? liveFlowFacade.getSectorFinalProductionFlows(sectorId)
+      : planningFlows
+    const derived = buildDerivedTransitState({
+      productionFlows: planningFlows,
+      settings: settings.value,
+      deps: getComputeDeps()
+    })
+    return {
+      plannedModules: [] as SavedModule[],
+      resolvedModules: derived.resolvedModules,
+      modules: derived.resolvedModules,
+      buildingModules: [] as SavedModule[],
+      autoIndustryModules: [] as SavedModule[],
+      autoHabitationModules: [] as SavedModule[],
+      autoInfrastructureModules: derived.autoInfrastructureModules,
+      productionFlows: flows,
+      warePriorityLevels: {} as Record<string, number>,
+      actualWorkforce: 0,
+      currentEfficiency: 0
+    }
+  })
 
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
 
@@ -902,10 +955,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const cache = flowMapToUse?.getCache(stationId) || null
     if (!cache) return null
     return flowMapToUse.getFilteredGrouped(stationId, cache.warePriorityLevels)
-  }
-
-  function getPlanningStationCache(stationId: string) {
-    return planningDerivedMap.value?.getCache(stationId) || null
   }
 
   function clearStationCaches() {
@@ -1204,7 +1253,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     activeViewStore.activeBinding = gameGuid
   }
 
-  const importModalOpen = ref(false)
   const wareflowViewMode = ref<WareFlowViewMode>('quantity')
   const expandedSectorId = ref<string | null>(null)
   const titleValue = computed(() => activeBinding.value?.bindingName || activeBindingName.value || '')
@@ -1296,77 +1344,36 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     wareflowViewMode: wareflowViewMode.value
   }))
 
-  const context = computed<ProductionContextState>(() => {
-    const ctx = stationContext.value
-    return {
-      stationCode: ctx?.stationCode || '',
-      sectorId: activeTransitSectorId.value || activeStation.value?.sectorId || null,
-      sectorName: ctx?.sectorName || '',
-      sectorNameId: ctx?.sectorNameId,
-      position: ctx?.position,
-      sectorResources: ctx?.sectorResources || [],
-      sectorSunlight: ctx?.sectorSunlight ?? 100,
-      hasBinding: ctx?.hasBinding ?? false,
-      hasArchive: ctx?.hasArchive ?? false,
-      archiveModules: ctx?.archiveModules || [],
-      buildingModules: ctx?.buildingModules || []
-    }
-  })
-
   const stationState = computed<ProductionStationState | null>(() => {
     const wm = workbenchMode.value
     if (wm === 'overview') return null
-    
-    if (wm === 'transit') {
-      const sectorId = activeTransitSectorId.value
-      if (!sectorId) return null
-      const planningFlows = planningFlowFacade.getSectorFinalProductionFlows(sectorId)
-      const flows = mode.value === 'live' 
-        ? liveFlowFacade.getSectorFinalProductionFlows(sectorId)
-        : planningFlows
-      const derivedTransitState = buildDerivedTransitState({
-        productionFlows: planningFlows,
-        settings: settings.value,
-        deps: getComputeDeps()
-      })
-      return {
-        entityType: 'transit',
-        id: sectorId,
-        name: sectors.value.find(s => s.id === sectorId)?.name || sectorId,
-        stationType: 'transit',
-        count: 1,
-        minerals: [],
-        plannedModules: [],
-        resolvedModules: derivedTransitState.resolvedModules,
-        autoIndustryModules: [],
-        autoHabitationModules: [],
-        autoInfrastructureModules: derivedTransitState.autoInfrastructureModules,
-        productionFlows: flows,
-        warePriorityLevels: {},
-        settings: {
-          ...settings.value,
-          enforceDlcActivation: enforceDlcActivation.value
-        },
-        enforceDlcActivation: enforceDlcActivation.value,
-        empireGaps: empireGapsComputed.value,
-        currentEfficiency: 0,
-        actualWorkforce: 0,
-        buildPriceMultiplier: buildPriceMultiplier.value
-      }
-    }
-    
-    const station = activeStation.value
-    if (!station) return null
-    const state = activeStationState.value
+
+    const isTransit = wm === 'transit'
+    const state = isTransit ? activeTransitState.value : activeStationState.value
+
+    if (isTransit && !activeTransitSectorId.value) return null
+    if (!isTransit && !activeStation.value) return null
+
+    const entityType = isTransit ? 'transit' as const : 'station' as const
+    const entityId = isTransit ? activeTransitSectorId.value! : activeStation.value!.id
+    const entityName = isTransit
+      ? (sectors.value.find(s => s.id === activeTransitSectorId.value)?.name || activeTransitSectorId.value!)
+      : activeStation.value!.name
+    const stationType = 'industrial' as const
+    const stationCount = 1
+    const stationMinerals: string[] = []
+
     return {
-      entityType: 'station',
-      id: station.id,
-      name: station.name,
-      stationType: station.type || 'industrial',
-      count: station.count ?? 1,
-      minerals: station.minerals || [],
+      entityType,
+      id: entityId,
+      name: entityName,
+      stationType,
+      count: stationCount,
+      minerals: stationMinerals,
       plannedModules: state.plannedModules,
       resolvedModules: state.resolvedModules,
+      modules: state.modules,
+      buildingModules: state.buildingModules,
       autoIndustryModules: state.autoIndustryModules,
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
@@ -1378,8 +1385,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       },
       enforceDlcActivation: enforceDlcActivation.value,
       empireGaps: empireGapsComputed.value,
-      currentEfficiency: currentEfficiency.value,
-      actualWorkforce: actualWorkforce.value,
+      currentEfficiency: state.currentEfficiency,
+      actualWorkforce: state.actualWorkforce,
       buildPriceMultiplier: buildPriceMultiplier.value
     }
   })
@@ -1503,7 +1510,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     derivedBindingStations,
     stationFlowCache,
     getStationFlowCache,
-    getPlanningStationCache,
     syncBindingStationDerivedSnapshot,
     clearStationCaches,
     syncAllBindingStationsToStateMap,
@@ -1534,8 +1540,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getSectorInternalData,
     getSectorLinkCalc,
     getStationComponentGapFlows,
+    archiveStation,
+    bindingStation,
     playerStationRecords,
-    importModalOpen,
     planningFlowFacade,
     liveFlowFacade,
     planningSourceView,

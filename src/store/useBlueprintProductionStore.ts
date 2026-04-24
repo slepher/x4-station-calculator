@@ -330,18 +330,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return map.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
-  function getPlanningStationCache(stationId: string) {
-    return planningDerivedMap.value?.getCache(stationId) || null
-  }
-
-  function getPlanningGroupedFlows(stationId: string): GroupedFlows {
-    return planningDerivedMap.value?.getGrouped(stationId) || {
-      flows: [],
-      rateGroups: { positive: [], operations: [], supply: [], resources: [] },
-      volumeGroups: { solid: [], liquid: [], container: [] }
-    }
-  }
-
   function getSavedStationGroupedFlows(station: StationPlan): GroupedFlows {
     const deps = getDerivedStaticDeps()
     if (!deps) {
@@ -681,7 +669,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
   }
 
-  const importModalOpen = ref(false)
   const wareflowViewMode = ref<WareFlowViewMode>('quantity')
   const expandedSectorId = computed<string | null>(() => null)
   const titleValue = computed(() => activeEmpire.value?.name || '')
@@ -785,9 +772,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       sectorResources: (sectorData?.resources || []).map(r => r.ware),
       sectorSunlight: Math.round((sectorData?.area?.sunlight ?? 1) * 100),
       hasBinding: !!activeStation.value,
-      hasArchive: false,
-      archiveModules: [],
-      buildingModules: []
+      hasArchive: false
     }
   })
 
@@ -804,6 +789,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       minerals: station.minerals || [],
       plannedModules: state.plannedModules,
       resolvedModules: state.resolvedModules,
+      modules: state.resolvedModules,
+      buildingModules: [],
       autoIndustryModules: state.autoIndustryModules,
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
@@ -882,10 +869,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     titleValue,
     titlePlaceholder,
     savedEmpires,
-    importModalOpen,
     getStationFlowCache,
-    getPlanningStationCache,
-    getPlanningGroupedFlows,
     getSavedStationGroupedFlows,
     initializeAllStationDerived,
     clearStationCaches,

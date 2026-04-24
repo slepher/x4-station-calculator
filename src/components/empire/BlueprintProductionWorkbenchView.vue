@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, watch } from 'vue'
+import { onMounted, watch } from 'vue'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useProductionTabbarPresenter } from '@/components/empire/presenters/useProductionTabbarPresenter'
@@ -30,28 +30,11 @@ watch(() => activeViewStore.activeEmpireId, (newId) => {
   }
 })
 
-const importModalOpen = computed({
-  get: () => blueprintStore.importModalOpen,
-  set: (value) => { blueprintStore.importModalOpen = value }
-})
-
 const tabbarPresenter = useProductionTabbarPresenter(blueprintStore)
 const toolbarPresenter = useProductionToolbarPresenter(blueprintStore)
 const planningPresenter = useProductionPlanningPresenter(blueprintStore)
 const wareflowPresenter = useProductionWareflowPresenter(blueprintStore)
 const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
-
-const activeStation = computed(() => blueprintStore.activeStation)
-const importModalActiveStation = computed(() => {
-  if (!activeStation.value) return null
-  return { id: activeStation.value.id, modules: activeStation.value.modules }
-})
-
-function createImportStation(name: string, type?: 'industrial' | 'supply' | 'transit' | 'shipyard') {
-  const createdId = blueprintStore.createStation(name, type)
-  if (!createdId) return null
-  return blueprintStore.getStationById(createdId)
-}
 </script>
 
 <template>
@@ -83,24 +66,24 @@ function createImportStation(name: string, type?: 'industrial' | 'supply' | 'tra
     @update-race-preference="toolbarPresenter.emits.updateRacePreference"
     @update-workforce="toolbarPresenter.emits.updateWorkforce"
     @update-show-empire-gaps="toolbarPresenter.emits.updateShowEmpireGaps"
-    @open-import="importModalOpen = true"
+    @open-import="toolbarPresenter.emits.openImport"
   />
 
   <ImportPlanModal
-    :isOpen="importModalOpen"
+    :isOpen="toolbarPresenter.props.showImportModal.value"
     :initialTab="'logic-flow'"
-    :isOverview="!activeStation"
+    :isOverview="toolbarPresenter.props.isImportOverview.value"
     productionSource="empire"
-    :activeStationId="blueprintStore.activeStationId"
-    :activeStation="importModalActiveStation"
-    :createStation="createImportStation"
-    :applyImportedStationPayload="(id, payload) => blueprintStore.applyImportedStationPayload(id, payload)"
-    :updateStationModules="(id, modules) => blueprintStore.updateStationModules(id, modules)"
-    :getStationById="(id) => blueprintStore.getStationById(id)"
-    @close="importModalOpen = false"
+    :activeStationId="toolbarPresenter.props.importStationId.value"
+    :activeStation="toolbarPresenter.props.importStation.value"
+    :createStation="toolbarPresenter.props.createImportStation"
+    :applyImportedStationPayload="toolbarPresenter.props.applyImportedStationPayload"
+    :updateStationModules="toolbarPresenter.props.updateImportStationModules"
+    :getStationById="toolbarPresenter.props.getImportStationById"
+    @close="toolbarPresenter.emits.closeImport"
   />
 
-  <div v-if="activeStation" class="main-layout mt-6">
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'station'" class="main-layout mt-6">
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
         :planned-modules="planningPresenter.props.plannedModules.value"

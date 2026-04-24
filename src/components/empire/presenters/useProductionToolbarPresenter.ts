@@ -1,10 +1,13 @@
-import { computed, type ComputedRef } from 'vue'
+import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import type { ProductionContextState, ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
-import type { StationSettings, StationType } from '@/types/x4'
+import type { SavedModule, StationSettings, StationType } from '@/types/x4'
+import type { ArchiveStationData } from '@/types/saveArchive'
+import type { BindingStationPlan, TradeStationBinding } from '@/types/x4'
 import i18n from '@/i18n'
 
 export interface ToolbarPresenterProps {
-  mode: ComputedRef<'overview' | 'station' | 'transit'>
+  workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
+  mode: ComputedRef<'planning' | 'live'>
   titleModel: ComputedRef<{ value: string; placeholder: string }>
   settings: ComputedRef<StationSettings | null>
   station: ComputedRef<{
@@ -24,6 +27,22 @@ export interface ToolbarPresenterProps {
   stationTypes: Array<{ value: StationType; label: string }>
   availableMinerals: string[]
   singleBerthThroughput: ComputedRef<number>
+  hasBinding: ComputedRef<boolean>
+  hasArchive: ComputedRef<boolean>
+  hasActiveBinding: ComputedRef<boolean>
+  canToggle: ComputedRef<boolean>
+  showImportModal: Ref<boolean>
+  importStationId: ComputedRef<string | null>
+  importStation: ComputedRef<{ id: string; modules: SavedModule[] } | null>
+  isImportOverview: ComputedRef<boolean>
+  createImportStation: (name: string, type?: StationType) => { id: string; modules: SavedModule[] } | null
+  applyImportedStationPayload: (stationId: string, payload: {
+    modules: SavedModule[]
+    lockedWares: string[]
+    warePriority: Record<string, number>
+  }) => void
+  updateImportStationModules: (stationId: string, modules: SavedModule[]) => void
+  getImportStationById: (stationId: string) => { id: string; modules: SavedModule[] } | null
 }
 
 export interface ToolbarPresenterEmits {
@@ -38,6 +57,8 @@ export interface ToolbarPresenterEmits {
   updateWorkforce: (value: boolean) => void
   updateShowEmpireGaps: (value: boolean) => void
   openImport: () => void
+  toggleMode: () => void
+  closeImport: () => void
 }
 
 export interface UseProductionToolbarPresenterReturn {
@@ -63,6 +84,19 @@ export interface ToolbarPresenterStore {
   updateStationType(value: StationType): void
   updateStationCount?(value: number): void
   toggleMineral?(mineral: string): void
+  archiveStation?: ArchiveStationData | null
+  bindingStation?: BindingStationPlan | TradeStationBinding | null
+  activeBinding?: { gameGuid: string } | null
+  toggleMode?: () => void
+  createStation?: (name: string, type?: StationType) => unknown
+  activeStationId?: string | null
+  getStationById?: (stationId: string) => { id: string; modules: SavedModule[] } | null
+  applyImportedStationPayload?: (stationId: string, payload: {
+    modules: SavedModule[]
+    lockedWares: string[]
+    warePriority: Record<string, number>
+  }) => void
+  updateStationModules?: (stationId: string, modules: SavedModule[]) => void
 }
 
 export function useProductionToolbarPresenter(store: ToolbarPresenterStore): UseProductionToolbarPresenterReturn {
@@ -83,8 +117,32 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
 
   const availableMinerals = ['Ore', 'Silicon', 'Ice', 'Hydrogen', 'Helium', 'Methane']
 
+  const showImportModal = ref(false)
+
+  const importStation = computed<{ id: string; modules: SavedModule[] } | null>(() => {
+    const station = store.stationState
+    if (!station || station.entityType !== 'station') return null
+    return {
+      id: station.id,
+      modules: station.plannedModules
+    }
+  })
+
+  const createImportStation = (name: string, type?: StationType) => {
+    const created = store.createStation?.(name, type)
+    if (!created) return null
+    if (typeof created === 'string') {
+      return store.getStationById?.(created) || null
+    }
+    if (typeof created === 'object' && 'id' in created && typeof created.id === 'string') {
+      return store.getStationById?.(created.id) || null
+    }
+    return null
+  }
+
   const props: ToolbarPresenterProps = {
-    mode: computed(() => store.session.workbenchMode),
+    workbenchMode: computed(() => store.session.workbenchMode),
+    mode: computed(() => store.session.mode),
     titleModel: computed(() => ({
       value: store.titleValue,
       placeholder: store.titlePlaceholder
@@ -110,7 +168,19 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     races,
     stationTypes,
     availableMinerals,
-    singleBerthThroughput: computed(() => Math.max(1, store.stationState?.settings.transportShipCapacity || 1) * 15)
+    singleBerthThroughput: computed(() => Math.max(1, store.stationState?.settings.transportShipCapacity || 1) * 15),
+    hasBinding: computed(() => store.bindingStation != null),
+    hasArchive: computed(() => store.archiveStation != null),
+    hasActiveBinding: computed(() => store.activeBinding != null),
+    canToggle: computed(() => store.session.canToggle),
+    showImportModal,
+    importStationId: computed(() => store.session.activeStationId),
+    importStation,
+    isImportOverview: computed(() => store.session.workbenchMode === 'overview'),
+    createImportStation,
+    applyImportedStationPayload: (stationId, payload) => store.applyImportedStationPayload?.(stationId, payload),
+    updateImportStationModules: (stationId, modules) => store.updateStationModules?.(stationId, modules),
+    getImportStationById: (stationId) => store.getStationById?.(stationId) || null
   }
 
   const dummyThrow = (method: string) => () => {
@@ -128,7 +198,9 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     updateRacePreference: (value: string) => store.settingActions.updateRacePreference(value),
     updateWorkforce: (value: boolean) => store.settingActions.updateWorkforce(value),
     updateShowEmpireGaps: (value: boolean) => store.settingActions.updateShowEmpireGaps(value),
-    openImport: () => {}
+    openImport: () => { showImportModal.value = true },
+    toggleMode: () => store.toggleMode?.(),
+    closeImport: () => { showImportModal.value = false }
   }
 
   return { props, emits }

@@ -2,43 +2,162 @@
 
 ## 设计目标
 
-本次重构的核心不是调整业务算法，而是稳定 production workbench 的分层边界：
+本次重构必须同时满足两个目标：
 
-- `store` 负责领域状态与业务动作
-- `presenter` 负责 UI 组装
-- `view` 负责展示与切换
+1. production workbench 必须稳定为 `store -> presenter -> view`
+2. 系统必须减少抽象层次，而不是通过新增中间层掩盖现有混乱
 
-当前代码已经部分 presenter 化，但 store 仍然直接暴露大量按面板命名的 getter，view 也仍持有少量直接拼装逻辑。继续沿着旧接口扩展，会让 `station` / `transit` / `planning` / `live` 的分支继续散落在多层。
+本次设计不得引入新的页面级 presenter、workbench facade、view model、adapter 或兼容胶水层。所有收口必须直接发生在现有 store、现有 5 个 presenter、现有 view 之间。
 
-本方案通过统一主状态对象，先把“数据长什么样”固定，再让 presenter 作为唯一 UI 适配层。
+## 核心设计结论
 
-## 最终架构
+### 1. `archiveStation` 是 store 领域模型
 
-### 1. Store
+`archiveStation` 必须被定义为 live production 的核心领域对象，而不是 presenter 的输入碎片。
 
-两个 store 继续保留：
+`archiveStation` 必须承担下列职责：
 
-- `useBlueprintProductionStore`
-- `useLiveProductionStore`
+- 表达当前选中存档站点的真实领域快照
+- 聚合 player station record、build storage record、sector 信息与模块聚合结果
+- 承载后续新增的 live 专属字段
 
-但它们对外统一导出：
+`archiveStation` 不得被压平成 `context` 的字段集合后再作为主来源使用。
 
-- `session`
-- `context`
-- `stationState`
-- `actions`
+### 2. `stationContext` 不是稳定领域对象
 
-其中前三者是 store 直接导出的主领域对象；`actions` 是业务行为。
+当前 `stationContext` 本质上是“为 toolbar/view 凑 props 的扁平结构”，不是领域模型。
 
-这里的边界必须明确：
+因此本次设计必须执行以下收敛：
 
-- 正式主对象出口是 `store.session / store.context / store.stationState`
-- 不保留 `workbench` 兼容适配层作为正式迁移方案
-- presenter 直接消费 store 主对象与 actions
+- 保留 `archiveStation`
+- 禁止继续扩张 `stationContext`
+- 禁止继续把 archive 领域字段先写进 `stationContext` 再转写到 presenter
 
-### 2. Presenter
+若某字段表达 live 领域事实，字段必须进入 `archiveStation` 或同级 store 领域对象；若某字段只服务 UI 展示，字段必须由 presenter 从 store 领域对象映射得出。
 
-保留现有五个 presenter：
+### 3. `context` 只保留附加上下文，不再承担 archive 事实
+
+`context` 允许保留“当前实体附加上下文”这一职责，但必须收窄语义。
+
+`context` 只允许表达：
+
+- 当前实体所处 sector 与位置上下文
+- 当前实体是否有 binding / archive 的判定结果
+- presenter 在多个 UI 片段中重复读取的轻量附加信息
+
+`context` 不得继续承担：
+
+- archive 站点详情主模型
+- build storage 明细主模型
+- 未来 live 专属领域字段的主归属
+
+### 4. `stationState` 继续作为唯一主展示状态
+
+`stationState` 必须继续承担当前实体的统一主展示状态职责，但自身不做任何计算——它是纯组装层。
+
+设计要求如下：
+
+- station 与 transit 必须共用 `stationState`
+- transit 不得恢复独立主状态对象
+- **所有主计算结果（包括 transit 的）必须进入各自的状态 computed（`activeStationState` / `activeTransitState`）**
+- `stationState` 只做：择取正确的内部状态、附加实体元信息、拼合 settings/empireGaps 等公共字段
+- presenter 必须只从 `stationState` 读取主结果
+
+#### 4.1. plan | live 双态切换的收敛结构
+
+live store 内部的切换结构如下：
+
+```
+activeStationState ─── station 模式的 plan/live 切换
+  ├─ plan: planningDerivedMap
+  └─ live: liveFlowMap
+
+activeTransitState ─── transit 模式的 plan/live 切换（新增）
+  ├─ plan: planningFlowFacade
+  └─ live: liveFlowFacade
+
+stationState ─── 纯组装层（不做切换、不做计算）
+  ├─ wm === 'transit'  → 从 activeTransitState 取值 + 拼合元信息
+  ├─ wm === 'station'  → 从 activeStationState 取值 + 拼合元信息
+  └─ wm === 'overview' → null
+```
+
+`stationState` 的 transit 分支当前（未重构前）内嵌了完整的 `mode.value === 'live'`、`buildDerivedTransitState()` 等计算逻辑。重构后这些逻辑移至 `activeTransitState`，`stationState` 退化为：
+
+```typescript
+if (wm === 'transit') {
+  const state = activeTransitState.value  // 已包含正确切换后的结果
+  return { entityType: 'transit', ...state, ...元信息, ...公共字段 }
+}
+```
+
+`activeStationState` 的字段：
+
+#### 4.2. plan/live 切换的两种模式
+
+plan/live 双态切换在实际 UI 中呈现为两种本质不同的情况，必须分开处理：
+
+##### 模式 A: 同组件、不同数据 → `stationState` 归一化
+
+当前实体的某个属性在 plan 和 live 下由相同的子组件渲染，只是数据来源不同。例如：
+
+- `productionFlows`：`WareflowDashboard` 在 plan/live 下渲染方式相同
+- `modules` / `buildingModules`：Dashboard 在 plan/live 下都用同一个模块列表组件展示
+
+**处理方式**：在 `activeStationState` 中完成切换，`stationState` 输出统一形状的字段。presenter 和 Vue 只消费 `stationState`，不需要知道底层是 plan 还是 live。
+
+##### 模式 B: 不同组件、二元切换 → presenter 提供选择，wrapper 做组件分支
+
+plan 和 live 下使用**完全不同的子组件**，且组件接口、交互模式完全不同。当前唯一切例：
+
+| | plan 模式 | live 模式 |
+|---|---|---|
+| 组件 | `StationPlanningPanel` | `ArchiveModuleList` |
+| 行为 | 可编辑拖拽排序、搜索添加、缩放按钮、auto-tier 展示与转入 | 只读、按模块组分类展示、build storage 虚线区域 |
+| 所需数据 | `plannedModules`, `autoIndustryModules`, `autoHabitationModules`, `autoInfrastructureModules`, `enforceDlcActivation` | `archiveModules`, `buildingModules` |
+
+**处理方式**：
+
+1. **presenter** 提供两套数据 + 一个 `showArchive` 布尔（派生自 `visualMode === 'live'`）：
+   - plan 侧数据：`plannedModules`, `autoIndustryModules`, `autoHabitationModules`, `autoInfrastructureModules`, `enforceDlcActivation`
+   - live 侧数据：`liveModules`, `liveBuildingModules`
+   - 选择信号：`showArchive`（或等价布尔）
+
+2. **wrapper** 用 `v-if / v-else` 选择渲染哪个子组件，传递对应的 props
+
+3. **wrapper 不得直接访问 store**。`mode`、`archiveModules`、`buildingModules`、`hasArchive` 必须全部从 presenter 获取。当前 `LiveProductionWorkbenchView.vue` 中下列行破坏了此规则：
+   ```vue
+   :mode="liveStore.session.mode"                       ← 违规：直接读 store
+   :archive-modules="liveStore.context.archiveModules"   ← 违规：直接读 store + context
+   :building-modules="liveStore.context.buildingModules" ← 违规：直接读 store + context
+   :has-archive="liveStore.context.hasArchive"           ← 违规：直接读 store + context
+   ```
+   修正后应为：
+   ```vue
+   :show-archive="planningPresenter.props.visualMode.value === 'live'"
+   :archive-modules="planningPresenter.props.liveModules.value"
+   :building-modules="planningPresenter.props.liveBuildingModules.value"
+   ```
+
+4. **presenter 中 `liveModules` / `liveBuildingModules` 的来源**也必须修正：当前从 `store.context.archiveModules` / `store.context.buildingModules` 读取。`context` 清掉这些字段后，改为从 `store.archiveStation` 读取：
+   ```typescript
+   liveModules: computed(() => store.archiveStation?.modules ?? []),
+   liveBuildingModules: computed(() => store.archiveStation?.building?.modules ?? [])
+   ```
+
+##### 判定原则
+
+| 条件 | 处理方式 |
+|---|---|
+| 同一子组件渲染，数据来源不同 | 模式 A：收敛到 `stationState`，presenter 不分支 |
+| 完全不同子组件，接口和行为不同 | 模式 B：presenter 提供 `showArchive` + 两套数据，wrapper 做 `v-if/v-else` 组件选择 |
+| archive 独有字段，plan 侧无对应物 | 留在 `archiveStation`，presenter 直接读取 |
+
+
+
+### 5. presenter 是唯一 UI 组装层
+
+五个 production presenter 必须承担全部 UI 组装职责：
 
 - `useProductionTabbarPresenter`
 - `useProductionToolbarPresenter`
@@ -46,309 +165,185 @@
 - `useProductionWareflowPresenter`
 - `useProductionDashboardPresenter`
 
-它们统一只读：
+它们必须直接从以下来源读取：
 
 - `session`
 - `context`
 - `stationState`
-- `actions`
+- `archiveStation` 或其他 store 领域对象
+- 统一业务动作
 
-presenter 的职责是：
+presenter 必须完成：
 
-- 把领域对象映射为子组件 props
-- 绑定 UI emits 到 store actions
-- 处理 station / transit / overview 的展示分支
+- 子组件 props 组装
+- station / transit / overview 展示分支
+- planning / live 可视化切换映射
+- archive 字段到 UI 字段的映射
 
-presenter 不负责：
+presenter 不得完成：
 
-- 重算 `productionFlows`
-- 重算 `stationAnalysis`
-- 新增一层 source/facade 胶水
+- 领域对象定义
+- 业务算法重算
+- 新建页面级中间抽象
 
-### 3. View
+## 最终架构
 
-两个 workbench view 收敛为：
+### 1. Store 层
 
-1. 获取 store
+两个 store 必须继续保留：
+
+- `useBlueprintProductionStore`
+- `useLiveProductionStore`
+
+它们对 presenter 的正式主接口必须固定为：
+
+- `session`
+- `context`
+- `stationState`
+- actions
+
+同时，store 内部与必要的正式接口中必须继续保留真实领域对象来源，例如：
+
+- `archiveStation`
+- `bindingStation`
+- `planningStationDraft`
+
+这些对象必须作为计算与映射的真实来源存在，不得为了接口表面统一而被删除。
+
+### 2. Presenter 层
+
+presenter 必须直接消费 store 领域对象并映射子组件所需结构。
+
+本次设计禁止新增：
+
+- `useProductionWorkbenchPresenter`
+- `useLiveWorkbenchPresenter`
+- `useBlueprintWorkbenchPresenter`
+- `viewModel`
+- `facade`
+
+收口必须在现有 5 个 presenter 中完成。
+
+### 3. View 层
+
+两个 workbench view 只允许承担：
+
+1. 选择 store
 2. 创建 presenter
-3. 将 presenter 输出传给子组件
-4. 基于 `session.workbenchMode` 切换 overview / station / transit 布局
-
-view 不再直接解释业务状态，不再从 store 拉取大段碎字段做二次组装。
-
-## 主状态对象设计
-
-### 1. `session`
-
-`session` 表达当前工作台正在看什么。
-
-```ts
-interface ProductionSessionState {
-  workbenchMode: 'overview' | 'station' | 'transit'
-  entityType: 'overview' | 'station' | 'transit'
-  mode: 'planning' | 'live'
-  visualMode: 'planning' | 'live'
-  activeStationId: string | null
-  activeTransitSectorId: string | null
-  activeBinding: string | null
-  canToggle: boolean
-}
-```
-
-设计约束：
-
-- 不带任何面板数据
-- 不带实体详情
-- 只提供“当前工作上下文”
+3. 传递 presenter 输出给子组件
+4. 基于 `session.workbenchMode` 执行布局切换
 
-### 2. `context`
+view 不得继续定义“解释 archive/binding 组合规则”的 computed，也不得直接拉取多个 store 字段拼接成子组件 props。
 
-`context` 表达当前实体的附加上下文。
+## 字段归属规则
 
-```ts
-interface ProductionContextState {
-  stationCode: string
-  sectorId: string | null
-  sectorName: string
-  sectorNameId?: string
-  position?: { x: number; y: number; z: number }
-  sectorResources: string[]
-  sectorSunlight: number
-  hasBinding: boolean
-  hasArchive: boolean
-  archiveModules: SavedModule[]
-  buildingModules: SavedModule[]
-}
-```
+### 1. 必须进入 store 领域对象的字段
 
-设计约束：
+满足任一条件的字段必须进入 `archiveStation` 或其他 store 领域对象：
 
-- 只表达环境与附属信息
-- 不承载主计算结果
-- station / transit 共用同一结构
+- 字段表达存档真实事实
+- 字段在 presenter 之间可复用
+- 字段会随着 live 功能扩展持续增长
+- 字段与 blueprint 明显不同，且不是单纯展示态
 
-### 3. `stationState`
+典型示例：
 
-`stationState` 是当前实体唯一的主状态对象。
+- sector 原始信息
+- station/build storage cargo
+- reservation
+- workforces
+- tag / factoryGroup / productionProfile / profileName
+- 未来新增的 archive station 细节
 
-```ts
-interface ProductionStationState {
-  entityType: 'station' | 'transit'
-  id: string
-  name: string
-  plannedModules: SavedModule[]
-  resolvedModules: SavedModule[]
-  autoIndustryModules: SavedModule[]
-  autoHabitationModules: SavedModule[]
-  autoInfrastructureModules: SavedModule[]
-  productionFlows: WareProductionFlow[]
-  warePriorityLevels: Record<string, number>
-  stationAnalysis: StationAnalysis
-  settings: StationSettings
-}
-```
+### 2. 必须进入 presenter 的字段
 
-设计约束：
+满足任一条件的字段必须在 presenter 中组装：
 
-- 这是 presenter 读取主展示状态的唯一入口
-- station / transit 共用一套 shape
-- 任何 UI 面板需要的主结果都应优先从这里读取
+- 字段是某个 Vue 组件专用 props
+- 字段只是对领域对象的重命名或扁平展开
+- 字段服务于 UI 开关、显示文案或展示组合
+- 字段是 station / transit / overview 的显示分支结果
 
-## Transit 语义映射
+典型示例：
 
-### 1. 不再保留 `transitState`
+- toolbar 需要的标题模型
+- dashboard 需要的 `modules + buildingModules` 拼接结果
+- 资源 pill / sector pill 展示值
+- planning/live 模式下的面板显示差异
 
-上一轮重构已经移除了 transit hub 的独立主对象链路，当前 transit 没有必须独立存在的主状态字段。
+### 3. 必须移出 store 的字段
 
-因此：
+下列类型字段不得保留在 store 中作为正式职责：
 
-- `transitState` 不再是主领域对象
-- 若仍有 transit 展示特有派生值，只允许由 presenter 临时拼装
+- `importModalOpen` 这类纯 UI 打开状态
+- `titlePlaceholder` 这类纯展示文案
+- 任何“专为某个子组件准备的扁平 props 对象”
 
-### 2. transit 进入 `stationState`
+## 实施设计
 
-transit 下 `stationState` 固定按以下语义映射：
+### Phase 1: 固定领域边界
 
-```ts
-{
-  entityType: 'transit',
-  plannedModules: [],
-  resolvedModules: autoInfrastructureModules,
-  autoIndustryModules: [],
-  autoHabitationModules: [],
-  autoInfrastructureModules: sectorAutoInfrastructureModules,
-  productionFlows: sectorFinalProductionFlows,
-  warePriorityLevels: {},
-  stationAnalysis: emptyStationAnalysis,
-}
-```
+必须先完成以下动作：
 
-这样的好处：
+1. 公开导出 `archiveStation`，加入 `useLiveProductionStore` 的 public return
+2. 明确 `archiveStation` 的类型边界（当前 `ArchiveStationData` 中 `modules`、`building.modules`、`cargo`、`reservation`、`workforces`、`tag`、`factoryGroup` 等字段的职责）
+3. 从 `context` 的 `ProductionContextState` 中移除 `archiveModules` / `buildingModules`
+4. 消除内部 `stationContext` computed，将其剩余的附属字段合并到 `context` computed 中
+5. 在 `ProductionStationState` 中新增 `modules` / `buildingModules` 字段
+6. 在 `activeStationState` 中按 plan/live 切换填充这两个新字段
+7. 冻结 `context` 的职责，禁止继续塞入 archive 主事实
 
-- presenter 不必维护另一套主状态入口
-- transit/station 可以共享 planning / wareflow / dashboard presenter
-- view 不需要识别更多中间对象
+### Phase 2: presenter 回收 UI 组装
 
-## Contract 重构策略
+必须依次改造五个 presenter：
 
-### 1. 目标
+1. `Tabbar`
+2. `Toolbar`
+3. `Planning`
+4. `Wareflow`
+5. `Dashboard`
 
-不再保留 `ProductionWorkbenchStoreContract` 作为兼容适配层主入口。
+每个 presenter 都必须停止依赖 panel-specific getter 主路径，并直接从领域对象映射 UI。
 
-若类型层仍需要一个统一接口，它也必须直接表达 `session/context/stationState/actions`，且不得作为旧 getter 的包装外壳继续存在。
+其中 `useProductionDashboardPresenter` 的改动力度最大：
+- 移除以 `context.archiveModules` / `context.buildingModules` 为来源的编排逻辑
+- 统一从 `stationState.modules` / `stationState.buildingModules` 读取
+- 不再自行判断 `visualMode === 'live'` 来切换数据源
+- archive 独有的 live 专属展示字段（如 cargo、reservation、tag 等）直接从 `archiveStation` 映射
 
-### 2. 迁移方式
+### Phase 3: view 收缩
 
-本次采用一次性收口路线，不保留兼容适配层：
+在 presenter 改造完成后，必须收缩两个 workbench view。
 
-- presenter 直接改读 `session/context/stationState/actions`
-- 旧的 `getToolbarXxx/getDashboardXxx/getWareflowXxx` 直接删除或停止导出
-- 不允许新增 `workbench` 过渡层来承接旧调用
+view 必须移除：
 
-若因同一提交内编辑顺序必须短暂保留旧符号，必须同时：
+- 直接引用 store 零散字段的 computed
+- 直接处理 archive / binding / transit 组合规则的逻辑
+- 直接拼装 Import、Toolbar、Planning、Dashboard props 的逻辑
 
-- 用 `@deprecated` 标记旧符号
-- 为旧符号调用建立静态告警
-- 在本次 change 完成前删除这些旧符号
+### Phase 4: 旧入口清理
 
-### 3. 行为入口
+最后必须清理：
 
-`actions` 统一收敛以下行为：
+- 旧 panel-specific getter
+- 旧兼容层
+- 旧 contract 中延续旧模式的字段
 
-- 选择工作对象
-- 更新名称 / 模块 / 设置
-- 切换 live/planning
-- 导入、创建、删除、复制
-- ware lock / priority 变更
+若同一提交内短暂保留旧入口，必须加 `@deprecated` 与静态告警门禁，并在本 change 完成前彻底移除。
 
-动作命名继续按功能，不按面板分组。
-
-## Presenter 迁移设计
-
-### 1. Tabbar Presenter
-
-只负责：
-
-- tabs 结构
-- 当前激活 tab
-- sector 展开状态
-- 站点创建/删除/切换行为
-
-不负责解释 station details。
-
-### 2. Toolbar Presenter
-
-只从：
-
-- `session`
-- `context`
-- `stationState`
-
-映射 toolbar 所需 props。
-
-toolbar 的 station/transit 差异由 presenter 分支处理，而不是由 store 暴露不同 getter。
-
-### 3. Planning Presenter
-
-只从 `stationState` 取：
-
-- `plannedModules`
-- `autoIndustryModules`
-- `autoHabitationModules`
-- `autoInfrastructureModules`
-
-只从 `context` 取：
-
-- `archiveModules`
-- `buildingModules`
-
-### 4. Wareflow Presenter
-
-只从 `stationState` 取：
-
-- `productionFlows`
-- `warePriorityLevels`
-- `settings`
-
-只从 `session` 判断当前是否为 transit/station。
-
-gap 操作继续走统一 action，不单独新增 transit 专用接口。
-
-### 5. Dashboard Presenter
-
-只从 `stationState` 取：
-
-- `resolvedModules`
-- `stationAnalysis`
-- `settings`
-
-只从 `context` 取 live archive/building 模块作为展示分支。
-
-## View 收敛设计
-
-### 1. BlueprintProductionWorkbenchView
-
-最终只保留：
-
-- 加载 active empire
-- 创建五个 presenter
-- 将 presenter props/emits 传给子组件
-
-### 2. LiveProductionWorkbenchView
-
-最终只保留：
-
-- 加载 active binding
-- 创建五个 presenter
-- 根据 `session.workbenchMode` 选择 overview / transit / station 区块
-- 将 presenter props/emits 传给子组件
-
-### 3. 明确删除的职责
-
-view 中必须清掉：
-
-- 直接从 store 取大量碎字段再 computed
-- 对 toolbar / dashboard / planning 数据做局部组装
-- transit 特有的第二套主状态对象解释
-
-## 风险与控制
-
-### 1. 迁移中残留旧入口
-
-一次性收口时，最容易发生的是局部文件还在调用旧 getter 或旧 contract。
-
-控制方式：
-
-- 旧入口全部标记 `@deprecated`
-- 对旧入口调用建立静态告警门禁
-- 本次 change 合并前必须删净旧入口
-
-### 2. transit 映射空值约定
-
-transit 被并入 `stationState` 后，部分字段需要空值约定。
-
-控制方式：
-
-- `plannedModules = []`
-- `warePriorityLevels = {}`
-- `stationAnalysis = 空结构`
-
-这样 presenter 与 view 不必处理 `null` 主状态。
-
-### 3. 双 store 语义对齐
-
-blueprint 与 live store 需要共享同一 contract，但两者数据来源不同。
-
-控制方式：
-
-- 只统一对外对象 shape
-- 不强迫内部实现路径一致
-
-## 实施顺序
-
-1. 定义 `session/context/stationState/actions` 类型边界
-2. 在两个 production store 中补齐三类主对象与动作出口
-3. 修改五个 presenter 直接改读主对象
-4. 清理两个 workbench view 中的碎状态读取
-5. 删除多余 getter / 类型残留
-6. 为残留旧入口建立并验证静态告警
+## 失败判定
+
+出现下列任一情况，本次设计视为失败：
+
+1. 新增了页面级 facade / presenter / view model。
+2. `archiveStation` 被错误下沉到 presenter。
+3. `archiveStation` 未公开导出，presenter 仍通过 `context` 间接读取 archive 数据。
+4. `context` 继续扩张为 archive 事实容器。
+5. `context` 中仍保留 `archiveModules` / `buildingModules` 字段。
+6. `stationContext` 内部中间层未被消除。
+7. `stationState` 缺少 `modules` / `buildingModules` 字段。
+8. `stationState` transit 分支内嵌计算逻辑（应移至 `activeTransitState`）。
+9. `useProductionDashboardPresenter` 仍自行判断 `visualMode` 来切换数据源。
+10. view 仍直接拼装大量 UI 数据。
+11. store 继续新增 panel-specific getter 主路径。
+12. transit 恢复为独立主状态对象。

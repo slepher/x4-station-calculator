@@ -11,10 +11,9 @@ const props = defineProps<{
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
   enforceDlcActivation: boolean
-  mode: 'live' | 'planning'
+  showArchive: boolean
   archiveModules?: SavedModule[]
   buildingModules?: SavedModule[]
-  hasArchive?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -23,9 +22,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 
-const showArchivePanel = computed(() => {
-  return props.mode === 'live' && props.hasArchive
-})
+const showArchivePanel = computed(() => props.showArchive)
 
 const handleUpdatePlannedModules = (modules: SavedModule[]) => {
   emit('updatePlannedModules', modules)
