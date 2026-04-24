@@ -2337,7 +2337,6 @@
   <entry name="example_startmenu" value="assets\test\markus\example_startmenu"/>
   <entry name="test_bridge_par_l_expeditionary_01_ycharles" value="assets\test\ycharles\test_bridge_par_l_expeditionary_01_ycharles"/>
   <entry name="test_scs_gen_destructible_hatch_16_01" value="assets\test\unai\test_scs_gen_destructible_hatch_16_01"/>
-  <entry name="Test_scs_gen_destructible_hatch_32_01" value="assets\test\unai\test_scs_gen_destructible_hatch_32_01"/>
   <entry name="test_scs_gen_destructible_hatch_viewer" value="assets\test\markus\test_scs_gen_destructible_hatch_viewer"/>
   <entry name="ship_par_l_expeditionary_01_sounds" value="assets\test\markus\ship_par_l_expeditionary_01_sounds"/>
   <entry name="shield_par_l_standard_01_mk1" value="assets\props\SurfaceElements\shield_par_l_standard_01_mk1"/>
@@ -2869,7 +2868,6 @@
   <entry name="thruster_ship_xs_01" value="assets\units\xref_parts\thruster_ship_xs_01"/>
   <entry name="muzzle_gen_m_plasma_01_mk1" value="assets\fx\weaponFx\muzzle_gen_m_plasma_01_mk1"/>
   <entry name="impact_gen_m_plasma_01_mk1" value="assets\fx\weaponFx\impact_gen_m_plasma_01_mk1"/>
-  <entry name="test_etienne_ship_arg_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_arg_xs_spacebike_01"/>
   <entry name="muzzle_arg_l_laser_01_mk1" value="assets\fx\weaponFx\muzzle_arg_l_laser_01_mk1"/>
   <entry name="muzzle_par_l_laser_01_mk1" value="assets\fx\weaponFx\muzzle_par_l_laser_01_mk1"/>
   <entry name="muzzle_tel_l_laser_01_mk1" value="assets\fx\weaponFx\muzzle_tel_l_laser_01_mk1"/>
@@ -2878,10 +2876,6 @@
   <entry name="impact_tel_l_laser_01_mk1" value="assets\fx\weaponFx\impact_tel_l_laser_01_mk1"/>
   <entry name="test_olivier_anc_gate_01" value="assets\test\olivier\test_olivier_anc_gate_01"/>
   <entry name="test_markus_room_01" value="assets\test\markus\test_markus_room_01"/>
-  <entry name="test_etienne_ship_spl_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_spl_xs_spacebike_01"/>
-  <entry name="test_etienne_ship_tel_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_tel_xs_spacebike_01"/>
-  <entry name="test_etienne_ship_par_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_par_xs_spacebike_01"/>
-  <entry name="test_etienne_ship_bor_xs_spacebike_01" value="assets\test\etienne\xs\test_etienne_ship_bor_xs_spacebike_01"/>
   <entry name="impact_tel_m_charge_01_mk1" value="assets\fx\weaponFx\impact_tel_m_charge_01_mk1"/>
   <entry name="test_steven_ship_arg_s_heavyfighter_01" value="assets\test\steven\test_steven_ship_arg_s_heavyfighter_01"/>
   <entry name="test_steven_ship_par_m_frigate_01" value="assets\test\steven\test_steven_ship_par_m_frigate_01"/>
@@ -2968,6 +2962,9 @@
   <entry name="test_markus_turret_arg_l_laser_01_mk1_b51" value="assets\test\markus\test_markus_turret_arg_l_laser_01_mk1_b51"/>
   <entry name="test_gen_s_fighter_01_b44" value="assets\test\markus\test_gen_s_fighter_01_b44"/>
   <entry name="test_gen_s_fighter_01_b51" value="assets\test\markus\test_gen_s_fighter_01_b51"/>
+  <entry name="landmarks_gen_asteroidmine_01_asteroid_01" value="assets\structures\landmarks\landmarks_gen_asteroidmine_01_asteroid_01"/>
+  <entry name="landmarks_gen_asteroidmine_01_entrance_01" value="assets\structures\landmarks\landmarks_gen_asteroidmine_01_entrance_01"/>
+  <entry name="landmarks_gen_asteroidmine_01" value="assets\structures\landmarks\landmarks_gen_asteroidmine_01"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>

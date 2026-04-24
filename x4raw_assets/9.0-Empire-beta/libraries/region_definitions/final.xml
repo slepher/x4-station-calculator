@@ -2666,7 +2666,7 @@
       </radial>
     </falloff>
     <fields>
-      <volumetricfog multiplier="0.20" medium="fog_lightgreen" texture="assets/textures/environments/volumefog/vf_structured_01_diff" lodrule="nebula" size="22000" sizevariation="0.75" densityfactor="0.5" rotation="0" rotationvariation="0.5" noisescale="25000" seed="26021984" minnoisevalue="0.8" maxnoisevalue="0.9" distancefactor="0.250"/>
+      <volumetricfog multiplier="1.0" medium="fog_lightgreen" texture="assets/textures/environments/volumefog/vf_structured_01_diff" lodrule="nebula" size="64000" sizevariation="0.75" densityfactor="0.025" rotation="0" rotationvariation="0.5" noisescale="25000" seed="26021984" minnoisevalue="0.8" maxnoisevalue="0.9" distancefactor="0.250"/>
       <asteroid groupref="asteroid_ore_l" densityfactor="1.5" rotation="360" rotationvariation="4" noisescale="25000" seed="26021984" minnoisevalue="0.8" maxnoisevalue="1"/>
       <asteroid groupref="asteroid_ore_m" densityfactor="6" rotation="360" rotationvariation="8" noisescale="25000" seed="26021984" minnoisevalue="0.75" maxnoisevalue="1"/>
       <asteroid groupref="asteroid_ore_s" densityfactor="6" rotation="360" rotationvariation="16" noisescale="25000" seed="26021984" minnoisevalue="0.7" maxnoisevalue="1"/>

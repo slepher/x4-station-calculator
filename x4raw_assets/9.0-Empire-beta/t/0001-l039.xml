@@ -3333,10 +3333,10 @@
     <t id="11688">Tempo di valutazione mineraria(followed by colon and added percentage)</t>
     <t id="11689">Risorsa Potenziale</t>
     <t id="11690">Risorsa Rilevata</t>
-    <t id="11691">Introducing Priority Orders</t>
-    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
-    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
-    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
+    <t id="11691">Presentazione degli Ordini Prioritari</t>
+    <t id="11692">Ora è possibile usare tasti modificatori per assegnare ordini in coda \(%s($INPUT_MODIFIER_ICON$)\) e prioritari \(%s($INPUT_MODIFIER_ICON$)\) direttamente dalla mappa o dal menu Interazione. Di default, gli ordini assegnati alle navi senza l'utilizzo di questi tasti modificatori sovrascriveranno qualsiasi ordine messo precedentemente in coda.</t>
+    <t id="11693">Se preferisci il comportamento precedente, puoi impostare in "Coda" la Modalità Ordini di Default nelle Impostazioni di Gioco. In questo modo, premere %s($INPUT_MODIFIER_ICON$) dal menu Interazione sovrascriverà l'ordine invece di aggiungerlo in coda.</t>
+    <t id="11694">Seleziona Sì se vuoi provare il nuovo comportamento di default del modificatore, oppure No se preferisci mantenere il vecchio comportamento e usare %s($INPUT_MODIFIER_ICON$) per sovrascrivere gli ordini.</t>
     <t id="11695">Towable Wreck</t>
     <t id="11696">Dismantleable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
@@ -3752,8 +3752,8 @@
     <t id="12786">Generazione Fotogrammi AMD FSR</t>
     <t id="12787">Supporto ai Controller Migliorato \(Sperimentale\)</t>
     <t id="12788">AMD FSR</t>
-    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12789">Se è la prima volta che giochi a X4, ti suggeriamo di provare qualcuno dei Tutorial prima di avventurarti nell'Universo Aperto di X4.</t>
+    <t id="12790">Avvia un Nuovo Universo Aperto</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Attività di Ambasciata</t>
     <t id="12803">Diplomatico</t>
@@ -3958,7 +3958,7 @@
     <t id="13325">Cancella Selezione Modulo</t>
     <t id="13326">Focalizza Modulo della Stazione</t>
     <t id="13327">Ordine Prioritario in Coda</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">Tasso di Raccolta(of resources; header item for table column)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Arrivederci</t>
@@ -7399,8 +7399,8 @@
     <t id="5901">.</t>
     <t id="5902">.</t>
     <t id="5904">.</t>
-    <t id="5905">Tradeshow Playground</t>
-    <t id="5906">Welcome to X4!\n\nThis scenario drops you into a busy sector within a downscaled universe, giving you a taste of the immense scale and possibilities of X4: Foundations.</t>
+    <t id="5905">Scenario Expo</t>
+    <t id="5906">Benvenuti in X4!\n\nQuesto scenario vi introduce in un trafficato settore di un universo in scala ridotta, dandovi un assaggio dell'immensa scala e delle possibilità di X4: Foundations.</t>
     <t id="6000">Tutorial: Gioco Avanzato</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">Rayma Sedim</t>
@@ -8670,7 +8670,7 @@
     <t id="9929">Non puoi selezionare questa opzione perché farlo comporterebbe deselezionare un'opzione necessaria per sbloccare un settore in cui hai posizionato delle proprietà.</t>
     <t id="9930">Questa partita personalizzata non può essere selezionata perché contiene oggetti che non hai ancora sbloccato.</t>
     <t id="9931">Questa partita personalizzata contiene configurazioni che includono equipaggiamento incompatibile. L'equipaggiamento incompatibile non verrà installato.</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">Questa partita personalizzata contiene merci o progetti non più validi. Gli oggetti interessati non verranno utilizzati.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">Accettare questa missione annullerà qualsiasi altra missione nel multiverso.</t>

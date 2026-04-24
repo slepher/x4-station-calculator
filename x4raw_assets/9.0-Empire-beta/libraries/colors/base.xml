@@ -1017,7 +1017,10 @@
     <mapping id="resource_icon_silicon" ref="azure_glow"/>
     <mapping id="resource_icon_nividium" ref="magenta_glow"/>
     <mapping id="resource_icon_ice" ref="azure_very_bright_glow"/>
-    <mapping id="resource_map_default" ref="azure_very_dark"/>
+    <mapping id="resource_map_default" ref="azure"/>
+    <mapping id="resource_map_anymineral" ref="orange_dark"/>
+    <mapping id="resource_map_anygas" ref="cyan_dark"/>
+    <mapping id="resource_map_anyscrap" ref="grey_192"/>
     <mapping id="resource_map_ore" ref="orange_dark"/>
     <mapping id="resource_map_silicon" ref="cyan_dark"/>
     <mapping id="resource_map_nividium" ref="magenta_dark"/>
