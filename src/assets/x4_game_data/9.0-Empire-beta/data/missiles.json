@@ -420,8 +420,8 @@
       }
     },
     "amount": 4,
-    "lifetime": 10.0,
-    "range": 6000.0,
+    "lifetime": 12.0,
+    "range": 6500.0,
     "explosive": 1000.0,
     "reload": 1.2,
     "hull": 50.0,
@@ -463,12 +463,12 @@
       }
     },
     "amount": 1,
-    "lifetime": 85.0,
+    "lifetime": 88.0,
     "range": 12000.0,
-    "explosive": 9000.0,
-    "reload": 0.8,
-    "hull": 50.0,
-    "resilience": 0.996,
+    "explosive": 8400.0,
+    "reload": 1.0,
+    "hull": 90.0,
+    "resilience": 0.984,
     "ammunition": 2
   },
   {
@@ -503,14 +503,14 @@
         "energycells": 23.0
       }
     },
-    "amount": 1,
+    "amount": 2,
     "lifetime": 10.0,
-    "range": 5000.0,
-    "explosive": 900.0,
-    "reload": 0.3,
-    "hull": 50.0,
+    "range": 5500.0,
+    "explosive": 780.0,
+    "reload": 0.5,
+    "hull": 1.0,
     "resilience": 1.0,
-    "ammunition": 8
+    "ammunition": 4
   },
   {
     "id": "missile_gen_m_dumbfire_01_mk2",
@@ -544,14 +544,14 @@
         "energycells": 25.0
       }
     },
-    "amount": 1,
+    "amount": 2,
     "lifetime": 10.0,
-    "range": 5000.0,
-    "explosive": 567.0,
-    "reload": 0.3,
-    "hull": 50.0,
+    "range": 5500.0,
+    "explosive": 500.0,
+    "reload": 0.5,
+    "hull": 1.0,
     "resilience": 1.0,
-    "ammunition": 8
+    "ammunition": 4
   },
   {
     "id": "missile_gen_m_guided_01_mk1",
@@ -588,12 +588,12 @@
       }
     },
     "amount": 1,
-    "lifetime": 18.0,
-    "range": 14000.0,
+    "lifetime": 17.5,
+    "range": 12000.0,
     "explosive": 1100.0,
-    "reload": 14.0,
-    "hull": 20.0,
-    "resilience": 0.92,
+    "reload": 17.0,
+    "hull": 1.0,
+    "resilience": 0.925,
     "ammunition": 1
   },
   {
@@ -631,13 +631,13 @@
       }
     },
     "amount": 1,
-    "lifetime": 40.0,
-    "range": 8000.0,
+    "lifetime": 20.0,
+    "range": 9000.0,
     "explosive": 920.0,
-    "reload": 1.5,
-    "hull": 26.0,
-    "resilience": 0.996,
-    "ammunition": 2
+    "reload": 18.0,
+    "hull": 1.0,
+    "resilience": 0.988,
+    "ammunition": 1
   },
   {
     "id": "missile_gen_s_disruptor_01_mk1",
@@ -830,12 +830,12 @@
       }
     },
     "amount": 1,
-    "lifetime": 9.5,
+    "lifetime": 12.5,
     "range": 12000.0,
-    "explosive": 1100.0,
-    "reload": 8.0,
+    "explosive": 1200.0,
+    "reload": 10.0,
     "hull": 1.0,
-    "resilience": 0.977,
+    "resilience": 0.964,
     "ammunition": 1
   },
   {
@@ -872,12 +872,12 @@
       }
     },
     "amount": 1,
-    "lifetime": 10.0,
-    "range": 6000.0,
+    "lifetime": 8.0,
+    "range": 7000.0,
     "explosive": 940.0,
     "reload": 1.0,
     "hull": 1.0,
-    "resilience": 0.95,
+    "resilience": 0.94,
     "ammunition": 2
   },
   {
@@ -948,10 +948,10 @@
       }
     },
     "amount": 1,
-    "lifetime": 15.0,
+    "lifetime": 16.0,
     "range": 8000.0,
-    "explosive": 820.0,
-    "reload": 6.0,
+    "explosive": 980.0,
+    "reload": 8.0,
     "hull": 1.0,
     "resilience": 1.0,
     "ammunition": 1
@@ -990,12 +990,12 @@
       }
     },
     "amount": 8,
-    "lifetime": 14.0,
-    "range": 5000.0,
-    "explosive": 134.0,
-    "reload": 6.0,
+    "lifetime": 15.0,
+    "range": 7000.0,
+    "explosive": 210.0,
+    "reload": 8.0,
     "hull": 1.0,
-    "resilience": 0.975,
+    "resilience": 0.98,
     "ammunition": 1
   },
   {
@@ -1035,10 +1035,10 @@
     "amount": 1,
     "lifetime": 40.0,
     "range": 5000.0,
-    "explosive": 3400.0,
+    "explosive": 3660.0,
     "reload": 14.0,
-    "hull": 15.0,
-    "resilience": 0.996,
+    "hull": 60.0,
+    "resilience": 0.984,
     "ammunition": 1
   },
   {

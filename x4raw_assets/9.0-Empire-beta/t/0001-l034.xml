@@ -3333,7 +3333,7 @@
     <t id="11688">Tiempo de evaluación de naves mineras</t>
     <t id="11689">Posibles recursos</t>
     <t id="11690">Recursos detectados</t>
-    <t id="11691">Introducing Priority Orders</t>
+    <t id="11691">Introduciendo ordenes de prioridad</t>
     <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
     <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
     <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
@@ -3753,7 +3753,7 @@
     <t id="12787">Mejorada asistencia de control experimental</t>
     <t id="12788">FSR de AMD</t>
     <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12790">Iniciar un nuevo universo abierto</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Acciones de embajada</t>
     <t id="12803">[ms:Diplomático|fs:Diplomática]</t>
@@ -3958,7 +3958,7 @@
     <t id="13325">Cancelar selección de módulo</t>
     <t id="13326">Enfocar el modelo de la estación</t>
     <t id="13327">Orden de prioridad en cola</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">Tasa de recolección</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Adiós</t>
@@ -7399,8 +7399,8 @@
     <t id="5901">Un escenario muestra de X4: Foundations</t>
     <t id="5902">Ambiente de feria de venta</t>
     <t id="5904">¡[mp:Bienvenido|fp:Bienvenida] a X4!\n\nEste demo te lleva directamente a la acción. Prueba las batallas espaciales a gran escala de X4 mientras te unes a una flota aliada, luchas contra las fuerzas enemigas y defiendes una estación fronteriza asediada en la.\n\nParticipa en intensos combates cerca de una Puerta de Salto, respaldado por poderosas naves capitales y defensas automatizadas. Sin tiempo de preparación ni de inactividad, puedes ponerte a los mandos y experimentar la escala, la tensión y la belleza del combate espacial en X4: Foundations.</t>
-    <t id="5905">Tradeshow Playground</t>
-    <t id="5906">Welcome to X4!\n\nThis scenario drops you into a busy sector within a downscaled universe, giving you a taste of the immense scale and possibilities of X4: Foundations.</t>
+    <t id="5905">Feria de comercio</t>
+    <t id="5906">¡[mp:Bienvenido|fp:Bienvenida]a X4!\n\nEste escenario te sitúa en un sector muy activo dentro de un universo reducido, dándote una idea de la inmensa escala y posibilidades de X4: Foundations.</t>
     <t id="6000">Tutorial: Mecánicas Avanzadas</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">Rayma Sedim</t>
@@ -8670,7 +8670,7 @@
     <t id="9929">No puedes elegir esta opción porque el hacerlo deshabilitaría una opción necesaria para habilitar un sector en el cual has instalado propiedades.</t>
     <t id="9930">Esta partida a medida no puede ser elegida puesto que contiene objetos restringidos, los cuales aún no has desbloqueado.</t>
     <t id="9931">Este juego personalizado contiene perfiles los cuales tienen equipo incompatible. El equipo incompatible no será instalado.</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">Este juego personalizado contiene objetos o planos que ya no son válidos. Los objetos afectados no se utilizarán.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">El aceptar esta misión cancelará cualquier otra misión de operación del multiverso.</t>

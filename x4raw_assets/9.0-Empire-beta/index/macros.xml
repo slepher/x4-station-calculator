@@ -2883,6 +2883,9 @@
   <entry name="impact_par_m_railgun_01_mk1_macro" value="assets\fx\weaponfx\macros\impact_par_m_railgun_01_mk1_macro"/>
   <entry name="test_yasmine_room_gen_trophyroom_01_macro" value="assets\test\yasmine\macros\test_yasmine_room_gen_trophyroom_01_macro"/>
   <entry name="test_ship_xen_m_dsk_01_macro" value="assets\test\dmytro\macros\test_ship_xen_m_dsk_01_macro"/>
+  <entry name="landmarks_gen_asteroidmine_01_macro" value="assets\structures\landmarks\macros\landmarks_gen_asteroidmine_01_macro"/>
+  <entry name="landmarks_gen_asteroidmine_01_entrance_01_macro" value="assets\structures\landmarks\macros\landmarks_gen_asteroidmine_01_entrance_01_macro"/>
+  <entry name="landmarks_gen_asteroidmine_01_asteroid_01_macro" value="assets\structures\landmarks\macros\landmarks_gen_asteroidmine_01_asteroid_01_macro"/>
   <entry name="cluster_sm_split_macro" value="extensions\ego_dlc_split\assets\environments\cluster\macros\cluster_sm_split_macro"/>
   <entry name="cluster_400_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>
   <entry name="cluster_401_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>

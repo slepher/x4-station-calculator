@@ -3636,9 +3636,9 @@
     <component ref="engine_ter_l_allround_01_mk1"/>
     <properties>
       <identification name="{20107,3104}" basename="{20107,3101}" shortname="{20107,3105}" makerrace="terran" description="{20107,3102}" mk="1"/>
-      <boost duration="40" recharge="100" thrust="4.8" acceleration="1.52" attack="10" release="3" coast="1.3"/>
+      <boost duration="44" recharge="100" thrust="4.8" acceleration="1.62" attack="10" release="3" coast="1.3"/>
       <travel charge="5" thrust="28" attack="42" release="1.5"/>
-      <thrust forward="3520" reverse="3872"/>
+      <thrust forward="3680" reverse="4048"/>
       <hull max="4800" threshold="0.3"/>
       <effects>
         <boosting ref="gen_l_boosteffect_01"/>
@@ -3668,9 +3668,9 @@
     <component ref="engine_ter_l_allround_02_mk1"/>
     <properties>
       <identification name="{20107,3154}" basename="{20107,3151}" shortname="{20107,3155}" makerrace="terran" description="{20107,3152}" mk="1"/>
-      <boost duration="32" recharge="90" thrust="4.8" acceleration="2.2" attack="7" release="4" coast="1.4"/>
+      <boost duration="36" recharge="90" thrust="4.8" acceleration="2.2" attack="7" release="4" coast="1.4"/>
       <travel charge="8" thrust="32" attack="66" release="22.5"/>
-      <thrust forward="3696" reverse="4250.4"/>
+      <thrust forward="3864" reverse="4444"/>
       <hull max="4800" threshold="0.3"/>
       <effects>
         <boosting ref="gen_l_boosteffect_02"/>
@@ -3704,9 +3704,9 @@
     <component ref="engine_ter_l_travel_01_mk1"/>
     <properties>
       <identification name="{20107,3114}" basename="{20107,3111}" shortname="{20107,3115}" makerrace="terran" description="{20107,3112}" mk="1"/>
-      <boost duration="33" recharge="100" thrust="3.9" acceleration="1.44" attack="10" release="3" coast="1.3"/>
+      <boost duration="36" recharge="100" thrust="3.9" acceleration="1.54" attack="10" release="3" coast="1.3"/>
       <travel charge="3" thrust="38" attack="37.6" release="2.5"/>
-      <thrust forward="2851.2" reverse="3136"/>
+      <thrust forward="3047" reverse="3351"/>
       <hull max="4800" threshold="0.3"/>
       <effects>
         <boosting ref="gen_l_boosteffect_01"/>
@@ -4401,7 +4401,7 @@
     <component ref="engine_ter_xl_allround_01_mk1"/>
     <properties>
       <identification name="{20107,4104}" basename="{20107,4101}" shortname="{20107,4105}" makerrace="terran" description="{20107,4102}" mk="1"/>
-      <boost duration="40" recharge="100" thrust="4.8" acceleration="1.51" attack="10" release="3" coast="1.3"/>
+      <boost duration="44" recharge="100" thrust="4.8" acceleration="1.62" attack="10" release="3" coast="1.3"/>
       <travel charge="5" thrust="26.6" attack="42" release="1.5"/>
       <thrust forward="9284" reverse="10212"/>
       <hull max="15000" threshold="0.3"/>
@@ -4433,9 +4433,9 @@
     <component ref="engine_ter_xl_travel_01_mk1"/>
     <properties>
       <identification name="{20107,4114}" basename="{20107,4111}" shortname="{20107,4115}" makerrace="terran" description="{20107,4112}" mk="1"/>
-      <boost duration="33" recharge="100" thrust="3.9" acceleration="1.44" attack="10" release="3" coast="1.3"/>
+      <boost duration="36" recharge="100" thrust="3.9" acceleration="1.54" attack="10" release="3" coast="1.3"/>
       <travel charge="3" thrust="36" attack="37.6" release="2.5"/>
-      <thrust forward="7520.04" reverse="8272"/>
+      <thrust forward="7691" reverse="8460"/>
       <hull max="15000" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
@@ -5039,7 +5039,7 @@
     <properties>
       <identification name="{20105,6374}" basename="{20105,6371}" description="{20105,6372}"/>
       <ammunition value="5" reload="12"/>
-      <missile amount="4" angle="1" barrelamount="1" timediff="0.15" lifetime="10" range="6000" guided="0" icon="hud_ms_cluster_heavy_mk1" tags="largedumbfire"/>
+      <missile amount="4" angle="1" barrelamount="1" timediff="0.5" lifetime="12" range="6500" guided="0" icon="hud_ms_cluster_heavy_mk1" tags="largedumbfire"/>
       <explosiondamage value="1000" shielddisruption="10"/>
       <reload time="1.2"/>
       <hull max="50"/>
@@ -5051,7 +5051,7 @@
       <countermeasure resilience="1"/>
       <physics mass="2.5">
         <inertia pitch="0.5" yaw="0.5" roll="0.5"/>
-        <drag forward="0.08" reverse="0.5" horizontal="0.5" vertical="0.5" pitch="0.5" yaw="0.5" roll="0.5"/>
+        <drag forward="0.085" reverse="0.5" horizontal="0.5" vertical="0.5" pitch="0.5" yaw="0.5" roll="0.5"/>
       </physics>
     </properties>
     <connections>
@@ -5064,20 +5064,21 @@
     <component ref="missile_guided_heavy_mk1"/>
     <properties>
       <identification name="{20105,6404}" basename="{20105,6401}" description="{20105,6402}"/>
-      <ammunition value="2" reload="20"/>
-      <missile amount="1" barrelamount="1" lifetime="85" range="12000" guided="1" icon="hud_ms_guided_heavy_mk1" retarget="0" tags="largeguided" targetable="1"/>
-      <explosiondamage value="9000" shielddisruption="10"/>
-      <reload time="0.8"/>
-      <hull max="50"/>
+      <ammunition value="2" reload="21"/>
+      <missile amount="1" barrelamount="1" timediff="1.3" lifetime="88" range="12000" guided="1" icon="hud_ms_guided_heavy_mk1" retarget="0" tags="largeguided" targetable="1"/>
+      <explosiondamage value="8400" shielddisruption="10"/>
+      <reload time="1"/>
+      <hull max="90"/>
       <effects>
         <explosion ref="missile_explosion_heavy_01"/>
         <launch ref="missile_guided_muzzle"/>
       </effects>
       <weapon system="missile_guided"/>
-      <countermeasure resilience="0.996"/>
-      <physics mass="6">
-        <inertia pitch="30" yaw="30" roll="30"/>
-        <drag forward="0.36" reverse="3" horizontal="20" vertical="20" pitch="11" yaw="11" roll="11"/>
+      <countermeasure resilience="0.984"/>
+      <physics mass="5">
+        <inertia pitch="13" yaw="13" roll="13"/>
+        <drag forward="0.32" reverse="3" horizontal="20" vertical="20" pitch="4.8" yaw="4.8" roll="4.8"/>
+        <accfactors reverse="3.8"/>
       </physics>
     </properties>
     <connections>
@@ -5090,11 +5091,11 @@
     <component ref="missile_dumbfire_heavy_mk1"/>
     <properties>
       <identification name="{20105,6344}" basename="{20105,6341}" description="{20105,6342}"/>
-      <ammunition value="8" reload="8"/>
-      <missile amount="1" angle="0.85" barrelamount="1" timediff="0.1" lifetime="10" range="5000" guided="0" icon="hud_ms_dumbfire_heavy_mk1" tags="mediumdumbfire"/>
-      <explosiondamage value="900"/>
-      <reload time="0.3"/>
-      <hull max="50"/>
+      <ammunition value="4" reload="12"/>
+      <missile amount="2" angle="0.85" barrelamount="1" timediff="0.5" lifetime="10" range="5500" guided="0" icon="hud_ms_dumbfire_heavy_mk1" tags="mediumdumbfire"/>
+      <explosiondamage value="780"/>
+      <reload time="0.5"/>
+      <hull max="1"/>
       <effects>
         <launch ref="missile_dumbfire_muzzle"/>
         <explosion ref="missile_explosion_medium_01"/>
@@ -5103,7 +5104,7 @@
       <countermeasure resilience="1"/>
       <physics mass="2.2">
         <inertia pitch="1.519" yaw="1.519" roll="1.519"/>
-        <drag forward="0.08" reverse="0.993" horizontal="1.782" vertical="1.782" pitch="0.721" yaw="0.721" roll="0.721"/>
+        <drag forward="0.085" reverse="0.993" horizontal="1.782" vertical="1.782" pitch="0.721" yaw="0.721" roll="0.721"/>
       </physics>
     </properties>
     <connections>
@@ -5116,11 +5117,11 @@
     <component ref="missile_dumbfire_heavy_mk2"/>
     <properties>
       <identification name="{20105,6364}" basename="{20105,6361}" description="{20105,6362}"/>
-      <ammunition value="8" reload="8"/>
-      <missile amount="1" angle="0.85" barrelamount="1" timediff="0.1" lifetime="10" range="5000" guided="0" icon="hud_ms_dumbfire_heavy_mk2" tags="mediumdumbfire"/>
-      <explosiondamage value="567" hull="243"/>
-      <reload time="0.3"/>
-      <hull max="50"/>
+      <ammunition value="4" reload="12"/>
+      <missile amount="2" angle="0.85" barrelamount="1" timediff="0.5" lifetime="10" range="5500" guided="0" icon="hud_ms_dumbfire_heavy_mk2" tags="mediumdumbfire"/>
+      <explosiondamage value="500" hull="220"/>
+      <reload time="0.5"/>
+      <hull max="1"/>
       <effects>
         <launch ref="missile_dumbfire_muzzle"/>
         <explosion ref="missile_explosion_medium_01"/>
@@ -5129,7 +5130,7 @@
       <countermeasure resilience="1"/>
       <physics mass="2.2">
         <inertia pitch="1" yaw="1" roll="1"/>
-        <drag forward="0.08" reverse="1" horizontal="1" vertical="1" pitch="1" yaw="1" roll="1"/>
+        <drag forward="0.085" reverse="1" horizontal="1" vertical="1" pitch="1" yaw="1" roll="1"/>
       </physics>
     </properties>
     <connections>
@@ -5143,20 +5144,20 @@
     <properties>
       <identification name="{20105,6394}" basename="{20105,6391}" description="{20105,6392}"/>
       <ammunition value="1"/>
-      <missile amount="1" barrelamount="1" lifetime="18" range="14000" guided="1" icon="hud_ms_guided_heavy_mk1" retarget="0" tags="mediumguided"/>
+      <missile amount="1" barrelamount="1" timediff="1" lifetime="17.5" range="12000" guided="1" icon="hud_ms_guided_heavy_mk1" retarget="0" tags="mediumguided" targetable="1"/>
       <explosiondamage value="1100"/>
-      <reload time="14"/>
-      <hull max="20"/>
+      <reload time="17"/>
+      <hull max="1"/>
       <effects>
         <explosion ref="missile_explosion_medium_01"/>
         <launch ref="missile_guided_muzzle"/>
       </effects>
-      <lock time="2" range="14000"/>
+      <lock time="2" range="12000"/>
       <weapon system="missile_guided"/>
-      <countermeasure resilience="0.92"/>
-      <physics mass="1.5">
-        <inertia pitch="2" yaw="2" roll="2"/>
-        <drag forward="0.069" reverse="1.211" horizontal="2.173" vertical="2.173" pitch="0.36" yaw="0.36" roll="0.36"/>
+      <countermeasure resilience="0.925"/>
+      <physics mass="1.3">
+        <inertia pitch="0.8" yaw="0.8" roll="0.8"/>
+        <drag forward="0.069" reverse="1.211" horizontal="2" vertical="2" pitch="0.5" yaw="0.5" roll="0.5"/>
       </physics>
     </properties>
     <connections>
@@ -5169,20 +5170,20 @@
     <component ref="missile_smart_heavy_mk1"/>
     <properties>
       <identification name="{20105,6454}" basename="{20105,6451}" description="{20105,6452}"/>
-      <ammunition value="2" reload="13"/>
-      <missile amount="1" barrelamount="1" lifetime="40" range="8000" guided="1" icon="hud_ms_smart_heavy_mk1" retarget="1" tags="mediumguided"/>
+      <ammunition value="1"/>
+      <missile amount="1" barrelamount="1" timediff="1" lifetime="20" range="9000" guided="1" icon="hud_ms_smart_heavy_mk1" retarget="1" tags="mediumguided" targetable="1"/>
       <explosiondamage value="920"/>
-      <reload time="1.5"/>
-      <hull max="26"/>
+      <reload time="18"/>
+      <hull max="1"/>
       <effects>
         <explosion ref="missile_explosion_medium_01"/>
         <launch ref="missile_guided_muzzle"/>
       </effects>
       <weapon system="missile_guided"/>
-      <countermeasure resilience="0.996"/>
-      <physics mass="1.5">
-        <inertia pitch="4" yaw="4" roll="4"/>
-        <drag forward="0.1" reverse="1.36" horizontal="2.44" vertical="2.44" pitch="0.48" yaw="0.48" roll="0.48"/>
+      <countermeasure resilience="0.988"/>
+      <physics mass="1.3">
+        <inertia pitch="0.9" yaw="0.9" roll="0.9"/>
+        <drag forward="0.0766" reverse="1.36" horizontal="2" vertical="2" pitch="0.6" yaw="0.6" roll="0.6"/>
       </physics>
     </properties>
     <connections>
@@ -5304,9 +5305,9 @@
     <properties>
       <identification name="{20105,6384}" basename="{20105,6381}" description="{20105,6382}"/>
       <ammunition value="1"/>
-      <missile amount="1" barrelamount="1" lifetime="9.5" range="12000" guided="1" icon="hud_ms_guided_light_mk1" retarget="0" tags="smallguided"/>
-      <explosiondamage value="1100"/>
-      <reload time="8"/>
+      <missile amount="1" barrelamount="1" timediff="0.5" lifetime="12.5" range="12000" guided="1" icon="hud_ms_guided_light_mk1" retarget="0" tags="smallguided"/>
+      <explosiondamage value="1200"/>
+      <reload time="10"/>
       <hull max="1"/>
       <effects>
         <explosion ref="missile_explosion_light_01"/>
@@ -5315,10 +5316,10 @@
       <lock time="2" range="12000"/>
       <longrangescan minlevel="15"/>
       <weapon system="missile_guided"/>
-      <countermeasure resilience="0.977"/>
-      <physics mass="0.5">
-        <inertia pitch="0.3" yaw="0.3" roll="0.3"/>
-        <drag forward="0.0383" reverse="0.263" horizontal="0.472" vertical="0.472" pitch="0.125" yaw="0.125" roll="0.125"/>
+      <countermeasure resilience="0.964"/>
+      <physics mass="0.6">
+        <inertia pitch="0.5" yaw="0.5" roll="0.5"/>
+        <drag forward="0.048" reverse="0.263" horizontal="2" vertical="2" pitch="0.47" yaw="0.47" roll="0.47"/>
       </physics>
     </properties>
     <connections>
@@ -5331,8 +5332,8 @@
     <component ref="missile_heatseeker_light_mk1"/>
     <properties>
       <identification name="{20105,6424}" basename="{20105,6421}" description="{20105,6422}"/>
-      <ammunition value="2" reload="4"/>
-      <missile amount="1" barrelamount="1" lifetime="10" range="6000" guided="1" icon="hud_ms_heatseeker_light_mk1" retarget="0" tags="smallguided"/>
+      <ammunition value="2" reload="4.4"/>
+      <missile amount="1" barrelamount="1" timediff="0.5" lifetime="8" range="7000" guided="1" icon="hud_ms_heatseeker_light_mk1" retarget="0" tags="smallguided"/>
       <explosiondamage value="940"/>
       <reload time="1"/>
       <hull max="1"/>
@@ -5341,10 +5342,10 @@
         <launch ref="missile_guided_muzzle"/>
       </effects>
       <weapon system="missile_guided"/>
-      <countermeasure resilience="0.95"/>
-      <physics mass="0.5">
-        <inertia pitch="0.258" yaw="0.258" roll="0.258"/>
-        <drag forward="0.048" reverse="0.231" horizontal="0.414" vertical="0.414" pitch="0.122" yaw="0.122" roll="0.122"/>
+      <countermeasure resilience="0.94"/>
+      <physics mass="0.6">
+        <inertia pitch="0.5" yaw="0.5" roll="0.5"/>
+        <drag forward="0.04" reverse="0.231" horizontal="2" vertical="2" pitch="0.4" yaw="0.4" roll="0.4"/>
       </physics>
     </properties>
     <connections>
@@ -5385,9 +5386,9 @@
     <properties>
       <identification name="{20105,6444}" basename="{20105,6441}" description="{20105,6442}"/>
       <ammunition value="1"/>
-      <missile amount="1" barrelamount="1" lifetime="15" range="8000" guided="1" icon="hud_ms_smart_heavy_mk1" retarget="1" tags="smallguided"/>
-      <explosiondamage value="820"/>
-      <reload time="6"/>
+      <missile amount="1" barrelamount="1" timediff="0.5" lifetime="16" range="8000" guided="1" icon="hud_ms_smart_heavy_mk1" retarget="1" tags="smallguided"/>
+      <explosiondamage value="980"/>
+      <reload time="8"/>
       <hull max="1"/>
       <effects>
         <explosion ref="missile_explosion_light_01"/>
@@ -5395,9 +5396,9 @@
       </effects>
       <weapon system="missile_guided"/>
       <countermeasure resilience="1"/>
-      <physics mass="0.5">
-        <inertia pitch="0.271" yaw="0.271" roll="0.271"/>
-        <drag forward="0.06" reverse="0.296" horizontal="0.53" vertical="0.53" pitch="0.135" yaw="0.135" roll="0.135"/>
+      <physics mass="0.6">
+        <inertia pitch="0.4" yaw="0.4" roll="0.4"/>
+        <drag forward="0.064" reverse="0.296" horizontal="2" vertical="2" pitch="0.4" yaw="0.4" roll="0.4"/>
       </physics>
     </properties>
     <connections>
@@ -5411,20 +5412,20 @@
     <properties>
       <identification name="{20105,6524}" basename="{20105,6521}" description="{20105,6522}"/>
       <ammunition value="1"/>
-      <missile amount="8" barrelamount="1" lifetime="14" range="5000" swarm="1" guided="1" icon="hud_ms_swarm_light_mk1" retarget="1" tags="smallguided"/>
-      <explosiondamage value="134"/>
-      <reload time="6"/>
+      <missile amount="8" barrelamount="1" timediff="0.5" lifetime="15" range="7000" swarm="1" guided="1" icon="hud_ms_swarm_light_mk1" retarget="1" tags="smallguided"/>
+      <explosiondamage value="210"/>
+      <reload time="8"/>
       <hull max="1"/>
       <effects>
         <explosion ref="missile_explosion_light_01"/>
         <launch ref="missile_guided_muzzle"/>
       </effects>
-      <lock time="1" range="5000"/>
+      <lock time="1" range="7000"/>
       <weapon system="missile_guided"/>
-      <countermeasure resilience="0.975"/>
-      <physics mass="0.25">
-        <inertia pitch="0.2" yaw="0.2" roll="0.2"/>
-        <drag forward="0.062" reverse="0.28" horizontal="0.591" vertical="0.591" pitch="0.1" yaw="0.1" roll="0.1"/>
+      <countermeasure resilience="0.98"/>
+      <physics mass="0.6">
+        <inertia pitch="2" yaw="2" roll="2"/>
+        <drag forward="0.082" reverse="0.28" horizontal="2" vertical="2" pitch="0.8" yaw="0.8" roll="0.8"/>
       </physics>
     </properties>
     <connections>
@@ -5438,19 +5439,20 @@
     <properties>
       <identification name="{20105,6464}" basename="{20105,6461}" description="{20105,6462}"/>
       <ammunition value="1"/>
-      <missile amount="1" barrelamount="1" lifetime="40" range="5000" guided="1" icon="hud_ms_torpedo_light_mk1" retarget="0" tags="smalltorpedo" targetable="1"/>
-      <explosiondamage value="3400" shielddisruption="10"/>
+      <missile amount="1" barrelamount="1" timediff="0.9" lifetime="40" range="5000" guided="1" icon="hud_ms_torpedo_light_mk1" retarget="0" tags="smalltorpedo" targetable="1"/>
+      <explosiondamage value="3660" shielddisruption="10"/>
       <reload time="14"/>
-      <hull max="15"/>
+      <hull max="60"/>
       <effects>
         <explosion ref="missile_explosion_medium_01"/>
         <launch ref="missile_torpedo_muzzle"/>
       </effects>
       <weapon system="torpedo"/>
-      <countermeasure resilience="0.996"/>
-      <physics mass="3">
-        <inertia pitch="6" yaw="6" roll="6"/>
-        <drag forward="0.35" reverse="2.299" horizontal="7.472" vertical="7.472" pitch="4.4" yaw="4.4" roll="4.4"/>
+      <countermeasure resilience="0.984"/>
+      <physics mass="2.8">
+        <inertia pitch="5" yaw="5" roll="5"/>
+        <drag forward="0.32" reverse="2.299" horizontal="7.472" vertical="7.472" pitch="4.4" yaw="4.4" roll="4.4"/>
+        <accfactors reverse="1.3"/>
       </physics>
     </properties>
     <connections>
@@ -5945,7 +5947,7 @@
     <component ref="shield_arg_xl_standard_01_mk1"/>
     <properties>
       <identification name="{20106,4004}" basename="{20106,4001}" shortname="{20106,4005}" makerrace="argon" description="{20106,4002}" mk="1"/>
-      <recharge max="148900" rate="550" delay="15" disruptionstability="10"/>
+      <recharge max="148900" rate="590" delay="15" disruptionstability="10"/>
       <hull max="8100" threshold="0.2"/>
     </properties>
   </macro>
@@ -6064,7 +6066,7 @@
     <component ref="shield_bor_xl_standard_01_mk1"/>
     <properties>
       <identification name="{20106,4074}" basename="{20106,4071}" shortname="{20106,4075}" makerrace="boron" description="{20106,4072}" mk="1"/>
-      <recharge max="135955" rate="534" delay="10.5" disruptionstability="10"/>
+      <recharge max="135955" rate="572" delay="10.5" disruptionstability="10"/>
       <hull max="7200" threshold="0.2"/>
     </properties>
   </macro>
@@ -6072,7 +6074,7 @@
     <component ref="shield_bor_xl_standard_01_mk2"/>
     <properties>
       <identification name="{20106,4084}" basename="{20106,4081}" shortname="{20106,4085}" makerrace="boron" description="{20106,4082}" mk="2"/>
-      <recharge max="160427" rate="715" delay="10.5" disruptionstability="10"/>
+      <recharge max="160427" rate="767" delay="10.5" disruptionstability="10"/>
       <hull max="7200" threshold="0.2"/>
     </properties>
   </macro>
@@ -6149,7 +6151,7 @@
     <component ref="shield_kha_xl_standard_01_mk1"/>
     <properties>
       <identification name="{20106,4154}" basename="{20106,4151}" shortname="{20106,4155}" makerrace="khaak" description="{20106,4152}" mk="1"/>
-      <recharge max="150000" rate="310" delay="8" disruptionstability="10"/>
+      <recharge max="150000" rate="400" delay="8" disruptionstability="10"/>
       <hull max="7000" scrapware="rawkhaakscrap"/>
     </properties>
   </macro>
@@ -6183,7 +6185,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2014}" basename="{20106,2011}" shortname="{20106,2015}" makerrace="paranid" description="{20106,2012}" mk="1"/>
-      <recharge max="4000" rate="117" delay="8.5"/>
+      <recharge max="4000" rate="117" delay="8"/>
       <hull max="500" integrated="1"/>
     </properties>
   </macro>
@@ -6191,7 +6193,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2054}" basename="{20106,2051}" shortname="{20106,2055}" makerrace="paranid" description="{20106,2052}" mk="2"/>
-      <recharge max="5200" rate="183" delay="8.5"/>
+      <recharge max="5200" rate="183" delay="8"/>
       <hull max="500" integrated="1"/>
     </properties>
   </macro>
@@ -6199,7 +6201,7 @@
     <component ref="shield_arg_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2014}" basename="{20106,2011}" shortname="{20106,2015}" makerrace="paranid" description="{20106,2012}" mk="1"/>
-      <recharge max="4000" rate="117" delay="8.5"/>
+      <recharge max="4000" rate="117" delay="8"/>
       <hull max="500" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6207,7 +6209,7 @@
     <component ref="shield_arg_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2054}" basename="{20106,2051}" shortname="{20106,2055}" makerrace="paranid" description="{20106,2052}" mk="2"/>
-      <recharge max="5200" rate="183" delay="8.5"/>
+      <recharge max="5200" rate="183" delay="8"/>
       <hull max="500" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6223,7 +6225,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1014}" basename="{20106,1011}" shortname="{20106,1015}" makerrace="paranid" description="{20106,1012}" mk="1"/>
-      <recharge max="760" rate="65" delay="11"/>
+      <recharge max="760" rate="65" delay="10"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6231,7 +6233,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1054}" basename="{20106,1051}" shortname="{20106,1055}" makerrace="paranid" description="{20106,1052}" mk="2"/>
-      <recharge max="960" rate="104" delay="11"/>
+      <recharge max="960" rate="104" delay="10"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6239,7 +6241,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1094}" basename="{20106,1091}" shortname="{20106,1095}" makerrace="paranid" description="{20106,1092}" mk="3"/>
-      <recharge max="1360" rate="176" delay="11"/>
+      <recharge max="1360" rate="170" delay="10"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6247,7 +6249,7 @@
     <component ref="shield_arg_xl_standard_01_mk1"/>
     <properties>
       <identification name="{20106,4014}" basename="{20106,4011}" shortname="{20106,4015}" makerrace="paranid" description="{20106,4012}" mk="1"/>
-      <recharge max="103585" rate="715" delay="8.5" disruptionstability="10"/>
+      <recharge max="103585" rate="775" delay="8.5" disruptionstability="10"/>
       <hull max="6500" threshold="0.2"/>
     </properties>
   </macro>
@@ -6321,7 +6323,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1124}" basename="{20106,1121}" shortname="{20106,1125}" makerrace="split" description="{20106,1122}" mk="1"/>
-      <recharge max="740" rate="33" delay="4.5"/>
+      <recharge max="740" rate="33" delay="4"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6329,7 +6331,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1134}" basename="{20106,1131}" shortname="{20106,1135}" makerrace="split" description="{20106,1132}" mk="2"/>
-      <recharge max="888" rate="50" delay="4.5"/>
+      <recharge max="888" rate="50" delay="4"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6337,7 +6339,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1144}" basename="{20106,1141}" shortname="{20106,1145}" makerrace="split" description="{20106,1142}" mk="3"/>
-      <recharge max="1258" rate="78" delay="4.5"/>
+      <recharge max="1258" rate="78" delay="4"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6345,7 +6347,7 @@
     <component ref="shield_spl_xl_standard_01_mk1"/>
     <properties>
       <identification name="{20106,4044}" basename="{20106,4041}" shortname="{20106,4045}" makerrace="split" description="{20106,4042}" mk="1"/>
-      <recharge max="100800" rate="390" delay="3" disruptionstability="10"/>
+      <recharge max="100800" rate="422" delay="3" disruptionstability="10"/>
       <hull max="9000" threshold="0.2"/>
     </properties>
   </macro>
@@ -6443,7 +6445,7 @@
     <component ref="shield_arg_xl_standard_01_mk1"/>
     <properties>
       <identification name="{20106,4024}" basename="{20106,4021}" shortname="{20106,4025}" makerrace="teladi" description="{20106,4022}" mk="1"/>
-      <recharge max="181791" rate="426" delay="18" disruptionstability="10"/>
+      <recharge max="181791" rate="472" delay="18" disruptionstability="10"/>
       <hull max="9000" threshold="0.2"/>
     </properties>
   </macro>
@@ -6625,7 +6627,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1164}" basename="{20106,1161}" shortname="{20106,1165}" makerrace="terran" description="{20106,1162}" mk="1"/>
-      <recharge max="1200" rate="63" delay="19"/>
+      <recharge max="1200" rate="63" delay="18.5"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6633,7 +6635,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1174}" basename="{20106,1171}" shortname="{20106,1175}" makerrace="terran" description="{20106,1172}" mk="2"/>
-      <recharge max="1440" rate="93" delay="19"/>
+      <recharge max="1440" rate="93" delay="18.5"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6641,7 +6643,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1184}" basename="{20106,1181}" shortname="{20106,1185}" makerrace="terran" description="{20106,1182}" mk="3"/>
-      <recharge max="2100" rate="144" delay="19"/>
+      <recharge max="2100" rate="144" delay="18.5"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6665,7 +6667,7 @@
     <component ref="shield_ter_xl_standard_01_mk1"/>
     <properties>
       <identification name="{20106,4054}" basename="{20106,4051}" shortname="{20106,4055}" makerrace="terran" description="{20106,4052}" mk="1"/>
-      <recharge max="155377" rate="634" delay="19" disruptionstability="10"/>
+      <recharge max="155377" rate="680" delay="19" disruptionstability="10"/>
       <hull max="6500" threshold="0.2"/>
     </properties>
   </macro>
@@ -6673,7 +6675,7 @@
     <component ref="shield_ter_xl_standard_01_mk2"/>
     <properties>
       <identification name="{20106,4064}" basename="{20106,4061}" shortname="{20106,4065}" makerrace="terran" description="{20106,4062}" mk="2"/>
-      <recharge max="195775" rate="944" delay="19" disruptionstability="10"/>
+      <recharge max="195775" rate="998" delay="19" disruptionstability="10"/>
       <hull max="6500" threshold="0.2"/>
     </properties>
   </macro>
@@ -6808,7 +6810,7 @@
     <component ref="shield_xen_xl_standard_01_mk1"/>
     <properties>
       <identification name="{20106,4034}" basename="{20106,4031}" shortname="{20106,4035}" makerrace="xenon" description="{20106,4032}" mk="1"/>
-      <recharge max="123007" rate="755" delay="15.25" disruptionstability="10"/>
+      <recharge max="123007" rate="810" delay="15.25" disruptionstability="10"/>
       <hull max="7000"/>
     </properties>
   </macro>
@@ -8615,7 +8617,7 @@
       <bullet class="bullet_spl_turret_m_gatling_01_mk1_macro"/>
       <rotationspeed max="140"/>
       <rotationacceleration max="210"/>
-      <hull max="1000" threshold="0.2" integrated="0"/>
+      <hull max="1200" threshold="0.2" integrated="0"/>
       <sounds>
         <firing ref="spl_mg_firing"/>
       </sounds>

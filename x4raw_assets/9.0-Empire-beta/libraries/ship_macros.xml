@@ -8002,7 +8002,7 @@
       <people capacity="60"/>
       <physics mass="325">
         <inertia pitch="350" yaw="350" roll="300"/>
-        <drag forward="69" reverse="345" horizontal="48" vertical="48" pitch="118" yaw="138" roll="80"/>
+        <drag forward="65.7" reverse="296" horizontal="48" vertical="48" pitch="118" yaw="138" roll="80"/>
         <accfactors reverse="0.85" horizontal="1.1" vertical="1.1"/>
       </physics>
       <thruster tags="large"/>
@@ -14298,6 +14298,11 @@
         <point position="1.4" value="0.8"/>
         <point position="1.7" value="0.4"/>
       </steeringcurve>
+      <sounds>
+        <breathing ref="spacesuit_breath"/>
+        <heavybreathing ref="spacesuit_breath_heavy"/>
+        <shipdetail ref="enginedetail_spacesuit_01"/>
+      </sounds>
       <physics mass="0.25">
         <inertia pitch="0.005" yaw="0.005" roll="0.005"/>
         <drag forward="0.07" reverse="0.07" horizontal="0.07" vertical="0.07" pitch="0.005" yaw="0.005" roll="0.005"/>
@@ -21159,7 +21164,7 @@
         <angular value="0.3"/>
       </jerk>
       <explosiondamage value="1500" shield="7500" shielddisruption="10"/>
-      <hull max="400000"/>
+      <hull max="440000"/>
       <threatscore value="35"/>
       <secrecy level="2"/>
       <steeringcurve>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 24.03.2026 17:37:03-->
+<!--Last exported: 21.04.2026 16:40:33-->
 <diff>
   <add sel="/wares/production">
     <method id="terran" name="{20206,901}">
@@ -1239,13 +1239,13 @@
       <research time="10" />
     </ware>
     <ware id="shield_ter_l_standard_01_mk1" name="{20106,3104}" description="{20106,3102}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="101270" average="112523" max="123775" />
+      <price min="101271" average="112523" max="123775" />
       <production time="20" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="3" />
-          <ware ware="energycells" amount="500" />
-          <ware ware="metallicmicrolattice" amount="55" />
-          <ware ware="siliconcarbide" amount="8" />
+          <ware ware="computronicsubstrate" amount="2" />
+          <ware ware="energycells" amount="263" />
+          <ware ware="metallicmicrolattice" amount="36" />
+          <ware ware="siliconcarbide" amount="4" />
         </primary>
       </production>
       <component ref="shield_ter_l_standard_01_mk1_macro" />
@@ -1255,13 +1255,13 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_l_standard_01_mk2" name="{20106,3114}" description="{20106,3112}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="493645" average="548494" max="603344" />
+      <price min="493645" average="548494" max="603343" />
       <production time="20" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="21" />
-          <ware ware="energycells" amount="1000" />
-          <ware ware="metallicmicrolattice" amount="152" />
-          <ware ware="siliconcarbide" amount="22" />
+          <ware ware="computronicsubstrate" amount="13" />
+          <ware ware="energycells" amount="1696" />
+          <ware ware="metallicmicrolattice" amount="181" />
+          <ware ware="siliconcarbide" amount="25" />
         </primary>
       </production>
       <component ref="shield_ter_l_standard_01_mk2_macro" />
@@ -1271,13 +1271,13 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_l_standard_01_mk3" name="{20106,3124}" description="{20106,3122}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="1295367" average="1523962" max="1752556" />
+      <price min="1371566" average="1523962" max="1676358" />
       <production time="20" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="61" />
-          <ware ware="energycells" amount="1500" />
-          <ware ware="metallicmicrolattice" amount="393" />
-          <ware ware="siliconcarbide" amount="61" />
+          <ware ware="computronicsubstrate" amount="55" />
+          <ware ware="energycells" amount="7143" />
+          <ware ware="metallicmicrolattice" amount="761" />
+          <ware ware="siliconcarbide" amount="107" />
         </primary>
       </production>
       <component ref="shield_ter_l_standard_01_mk3_macro" />
@@ -1287,12 +1287,12 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_standard_01_mk1" name="{20106,2114}" description="{20106,2112}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="30852" average="34281" max="37709" />
+      <price min="37023" average="41137" max="45251" />
       <production time="10" amount="1" method="default" name="{20206,901}">
         <primary>
           <ware ware="computronicsubstrate" amount="1" />
-          <ware ware="energycells" amount="200" />
-          <ware ware="metallicmicrolattice" amount="28" />
+          <ware ware="energycells" amount="36" />
+          <ware ware="metallicmicrolattice" amount="5" />
           <ware ware="siliconcarbide" amount="1" />
         </primary>
       </production>
@@ -1304,13 +1304,13 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_standard_01_mk2" name="{20106,2124}" description="{20106,2122}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="149164" average="165737" max="182311" />
+      <price min="178996" average="198884" max="218773" />
       <production time="10" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="6" />
-          <ware ware="energycells" amount="400" />
-          <ware ware="metallicmicrolattice" amount="62" />
-          <ware ware="siliconcarbide" amount="7" />
+          <ware ware="computronicsubstrate" amount="4" />
+          <ware ware="energycells" amount="615" />
+          <ware ware="metallicmicrolattice" amount="48" />
+          <ware ware="siliconcarbide" amount="14" />
         </primary>
       </production>
       <component ref="shield_ter_m_standard_01_mk2_macro" />
@@ -1321,13 +1321,13 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_standard_01_mk3" name="{20106,2134}" description="{20106,2132}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="673420" average="792259" max="911098" />
+      <price min="855640" average="950711" max="1045782" />
       <production time="10" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="32" />
-          <ware ware="energycells" amount="600" />
-          <ware ware="metallicmicrolattice" amount="206" />
-          <ware ware="siliconcarbide" amount="32" />
+          <ware ware="computronicsubstrate" amount="34" />
+          <ware ware="energycells" amount="4456" />
+          <ware ware="metallicmicrolattice" amount="475" />
+          <ware ware="siliconcarbide" amount="67" />
         </primary>
       </production>
       <component ref="shield_ter_m_standard_01_mk3_macro" />
@@ -1338,12 +1338,12 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_standard_02_mk1" name="{20106,2114}" description="{20106,2112}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="30852" average="34281" max="37709" />
+      <price min="37023" average="41137" max="45251" />
       <production time="20" amount="1" method="default" name="{20206,901}">
         <primary>
           <ware ware="computronicsubstrate" amount="1" />
-          <ware ware="energycells" amount="200" />
-          <ware ware="metallicmicrolattice" amount="28" />
+          <ware ware="energycells" amount="36" />
+          <ware ware="metallicmicrolattice" amount="5" />
           <ware ware="siliconcarbide" amount="1" />
         </primary>
       </production>
@@ -1354,13 +1354,13 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_standard_02_mk2" name="{20106,2124}" description="{20106,2122}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="147892" average="164325" max="180757" />
+      <price min="177471" average="197190" max="216909" />
       <production time="20" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="6" />
-          <ware ware="energycells" amount="250" />
-          <ware ware="metallicmicrolattice" amount="70" />
-          <ware ware="siliconcarbide" amount="8" />
+          <ware ware="computronicsubstrate" amount="4" />
+          <ware ware="energycells" amount="610" />
+          <ware ware="metallicmicrolattice" amount="48" />
+          <ware ware="siliconcarbide" amount="14" />
         </primary>
       </production>
       <component ref="shield_ter_m_standard_02_mk2_macro" />
@@ -1370,13 +1370,13 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_standard_02_mk3" name="{20106,2134}" description="{20106,2132}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="673420" average="792259" max="911098" />
+      <price min="855640" average="950711" max="1045782" />
       <production time="10" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="32" />
-          <ware ware="energycells" amount="600" />
-          <ware ware="metallicmicrolattice" amount="206" />
-          <ware ware="siliconcarbide" amount="32" />
+          <ware ware="computronicsubstrate" amount="34" />
+          <ware ware="energycells" amount="4456" />
+          <ware ware="metallicmicrolattice" amount="475" />
+          <ware ware="siliconcarbide" amount="67" />
         </primary>
       </production>
       <component ref="shield_ter_m_standard_02_mk3_macro" />
@@ -1389,7 +1389,7 @@
       <price min="3014" average="3349" max="3684" />
       <production time="10" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="energycells" amount="50" />
+          <ware ware="energycells" amount="21" />
           <ware ware="metallicmicrolattice" amount="12" />
         </primary>
       </production>
@@ -1401,11 +1401,11 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_s_standard_01_mk2" name="{20106,1174}" description="{20106,1172}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="24519" average="27243" max="29968" />
+      <price min="24519" average="27243" max="29967" />
       <production time="10" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="energycells" amount="100" />
-          <ware ware="metallicmicrolattice" amount="54" />
+          <ware ware="energycells" amount="62" />
+          <ware ware="metallicmicrolattice" amount="18" />
           <ware ware="siliconcarbide" amount="5" />
         </primary>
       </production>
@@ -1417,13 +1417,13 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_s_standard_01_mk3" name="{20106,1184}" description="{20106,1182}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="119811" average="133124" max="146436" />
+      <price min="119812" average="133124" max="146436" />
       <production time="10" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="5" />
-          <ware ware="energycells" amount="200" />
+          <ware ware="computronicsubstrate" amount="4" />
+          <ware ware="energycells" amount="624" />
           <ware ware="metallicmicrolattice" amount="48" />
-          <ware ware="siliconcarbide" amount="6" />
+          <ware ware="siliconcarbide" amount="15" />
         </primary>
       </production>
       <component ref="shield_ter_s_standard_01_mk3_macro" />
@@ -1434,12 +1434,12 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_xl_standard_01_mk1" name="{20106,4054}" description="{20106,4052}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="541710" average="601900" max="662091" />
+      <price min="541710" average="601900" max="662090" />
       <production time="20" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="23" />
-          <ware ware="energycells" amount="1500" />
-          <ware ware="metallicmicrolattice" amount="134" />
+          <ware ware="computronicsubstrate" amount="11" />
+          <ware ware="energycells" amount="1410" />
+          <ware ware="metallicmicrolattice" amount="150" />
           <ware ware="siliconcarbide" amount="21" />
         </primary>
       </production>
@@ -1450,13 +1450,13 @@
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_xl_standard_01_mk2" name="{20106,4064}" description="{20106,4062}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="3060534" average="3600629" max="4140723" />
+      <price min="3240566" average="3600629" max="3960692" />
       <production time="20" amount="1" method="default" name="{20206,901}">
         <primary>
-          <ware ware="computronicsubstrate" amount="150" />
-          <ware ware="energycells" amount="2000" />
-          <ware ware="metallicmicrolattice" amount="764" />
-          <ware ware="siliconcarbide" amount="133" />
+          <ware ware="computronicsubstrate" amount="86" />
+          <ware ware="energycells" amount="11139" />
+          <ware ware="metallicmicrolattice" amount="1188" />
+          <ware ware="siliconcarbide" amount="168" />
         </primary>
       </production>
       <component ref="shield_ter_xl_standard_01_mk2_macro" />
@@ -3200,178 +3200,176 @@
   <add sel="/wares/ware[@id='thruster_gen_l_allround_01_mk1']">
     <production time="20" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="28" />
-        <ware ware="energycells" amount="100" />
-        <ware ware="metallicmicrolattice" amount="173" />
-        <ware ware="siliconcarbide" amount="28" />
+        <ware ware="computronicsubstrate" amount="5" />
+        <ware ware="energycells" amount="175" />
+        <ware ware="metallicmicrolattice" amount="56" />
+        <ware ware="siliconcarbide" amount="6" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_l_allround_01_mk2']">
     <production time="20" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="144" />
-        <ware ware="energycells" amount="200" />
-        <ware ware="metallicmicrolattice" amount="724" />
-        <ware ware="siliconcarbide" amount="124" />
+        <ware ware="computronicsubstrate" amount="38" />
+        <ware ware="energycells" amount="1318" />
+        <ware ware="metallicmicrolattice" amount="422" />
+        <ware ware="siliconcarbide" amount="45" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_l_allround_01_mk3']">
     <production time="20" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="721" />
-        <ware ware="energycells" amount="400" />
-        <ware ware="metallicmicrolattice" amount="3571" />
-        <ware ware="siliconcarbide" amount="621" />
+        <ware ware="computronicsubstrate" amount="318" />
+        <ware ware="energycells" amount="10987" />
+        <ware ware="metallicmicrolattice" amount="3515" />
+        <ware ware="siliconcarbide" amount="373" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_m_allround_01_mk1']">
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="1" />
-        <ware ware="energycells" amount="50" />
-        <ware ware="metallicmicrolattice" amount="23" />
-        <ware ware="siliconcarbide" amount="2" />
+        <ware ware="energycells" amount="42" />
+        <ware ware="metallicmicrolattice" amount="11" />
+        <ware ware="siliconcarbide" amount="1" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_m_allround_01_mk2']">
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="6" />
-        <ware ware="energycells" amount="100" />
-        <ware ware="metallicmicrolattice" amount="68" />
-        <ware ware="siliconcarbide" amount="7" />
+        <ware ware="computronicsubstrate" amount="2" />
+        <ware ware="energycells" amount="60" />
+        <ware ware="metallicmicrolattice" amount="19" />
+        <ware ware="siliconcarbide" amount="2" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_m_allround_01_mk3']">
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="32" />
-        <ware ware="energycells" amount="200" />
-        <ware ware="metallicmicrolattice" amount="191" />
-        <ware ware="siliconcarbide" amount="31" />
+        <ware ware="computronicsubstrate" amount="15" />
+        <ware ware="energycells" amount="502" />
+        <ware ware="metallicmicrolattice" amount="160" />
+        <ware ware="siliconcarbide" amount="17" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_m_combat_01_mk1']">
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="1" />
-        <ware ware="energycells" amount="50" />
-        <ware ware="metallicmicrolattice" amount="37" />
-        <ware ware="siliconcarbide" amount="4" />
+        <ware ware="energycells" amount="16" />
+        <ware ware="metallicmicrolattice" amount="5" />
+        <ware ware="siliconcarbide" amount="2" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_m_combat_01_mk2']">
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="8" />
-        <ware ware="energycells" amount="100" />
-        <ware ware="metallicmicrolattice" amount="62" />
-        <ware ware="siliconcarbide" amount="8" />
+        <ware ware="computronicsubstrate" amount="2" />
+        <ware ware="energycells" amount="77" />
+        <ware ware="metallicmicrolattice" amount="24" />
+        <ware ware="siliconcarbide" amount="3" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_m_combat_01_mk3']">
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="41" />
-        <ware ware="energycells" amount="200" />
-        <ware ware="metallicmicrolattice" amount="242" />
-        <ware ware="siliconcarbide" amount="39" />
+        <ware ware="computronicsubstrate" amount="19" />
+        <ware ware="energycells" amount="640" />
+        <ware ware="metallicmicrolattice" amount="204" />
+        <ware ware="siliconcarbide" amount="22" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_s_allround_01_mk1']">
     <production time="5" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="energycells" amount="50" />
-        <ware ware="metallicmicrolattice" amount="19" />
-        <ware ware="siliconcarbide" amount="3" />
+        <ware ware="energycells" amount="6" />
+        <ware ware="metallicmicrolattice" amount="1" />
+        <ware ware="siliconcarbide" amount="1" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_s_allround_01_mk2']">
     <production time="5" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="9" />
-        <ware ware="energycells" amount="100" />
-        <ware ware="metallicmicrolattice" amount="62" />
-        <ware ware="siliconcarbide" amount="10" />
+        <ware ware="computronicsubstrate" amount="1" />
+        <ware ware="energycells" amount="72" />
+        <ware ware="metallicmicrolattice" amount="19" />
+        <ware ware="siliconcarbide" amount="2" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_s_allround_01_mk3']">
     <production time="5" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="22" />
-        <ware ware="energycells" amount="200" />
-        <ware ware="metallicmicrolattice" amount="139" />
-        <ware ware="siliconcarbide" amount="21" />
+        <ware ware="computronicsubstrate" amount="8" />
+        <ware ware="energycells" amount="274" />
+        <ware ware="metallicmicrolattice" amount="87" />
+        <ware ware="siliconcarbide" amount="9" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_s_combat_01_mk1']">
     <production time="5" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="energycells" amount="50" />
-        <ware ware="metallicmicrolattice" amount="39" />
-        <ware ware="siliconcarbide" amount="3" />
+        <ware ware="energycells" amount="4" />
+        <ware ware="metallicmicrolattice" amount="1" />
+        <ware ware="siliconcarbide" amount="1" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_s_combat_01_mk2']">
     <production time="5" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="4" />
-        <ware ware="energycells" amount="100" />
-        <ware ware="metallicmicrolattice" amount="48" />
-        <ware ware="siliconcarbide" amount="5" />
+        <ware ware="computronicsubstrate" amount="3" />
+        <ware ware="energycells" amount="87" />
+        <ware ware="metallicmicrolattice" amount="27" />
+        <ware ware="siliconcarbide" amount="3" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_s_combat_01_mk3']">
     <production time="5" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="17" />
-        <ware ware="energycells" amount="200" />
-        <ware ware="metallicmicrolattice" amount="123" />
-        <ware ware="siliconcarbide" amount="18" />
+        <ware ware="computronicsubstrate" amount="10" />
+        <ware ware="energycells" amount="346" />
+        <ware ware="metallicmicrolattice" amount="110" />
+        <ware ware="siliconcarbide" amount="12" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_xl_allround_01_mk1']">
     <production time="30" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="61" />
-        <ware ware="energycells" amount="100" />
-        <ware ware="metallicmicrolattice" amount="333" />
-        <ware ware="siliconcarbide" amount="53" />
+        <ware ware="computronicsubstrate" amount="11" />
+        <ware ware="energycells" amount="373" />
+        <ware ware="metallicmicrolattice" amount="119" />
+        <ware ware="siliconcarbide" amount="13" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_xl_allround_01_mk2']">
     <production time="30" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="306" />
-        <ware ware="energycells" amount="200" />
-        <ware ware="metallicmicrolattice" amount="1543" />
-        <ware ware="siliconcarbide" amount="266" />
+        <ware ware="computronicsubstrate" amount="81" />
+        <ware ware="energycells" amount="2802" />
+        <ware ware="metallicmicrolattice" amount="896" />
+        <ware ware="siliconcarbide" amount="95" />
       </primary>
     </production>
   </add>
   <add sel="/wares/ware[@id='thruster_gen_xl_allround_01_mk3']">
     <production time="30" amount="1" method="terran" name="{20206,901}">
       <primary>
-        <ware ware="computronicsubstrate" amount="1533" />
-        <ware ware="energycells" amount="400" />
-        <ware ware="metallicmicrolattice" amount="7559" />
-        <ware ware="siliconcarbide" amount="1323" />
+        <ware ware="computronicsubstrate" amount="677" />
+        <ware ware="energycells" amount="23353" />
+        <ware ware="metallicmicrolattice" amount="7472" />
+        <ware ware="siliconcarbide" amount="793" />
       </primary>
     </production>
   </add>

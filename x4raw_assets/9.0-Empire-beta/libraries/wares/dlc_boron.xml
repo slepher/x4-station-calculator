@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 19.03.2026 19:38:46-->
+<!--Last exported: 21.04.2026 16:40:37-->
 <diff>
   <add sel="/wares/production">
     <method id="boron" name="{20206,801}">
@@ -882,9 +882,9 @@
       <price min="41484" average="46612" max="51739" />
       <production time="20" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="50" />
-          <ware ware="fieldcoils" amount="13" />
-          <ware ware="shieldcomponents" amount="10" />
+          <ware ware="energycells" amount="58" />
+          <ware ware="fieldcoils" amount="14" />
+          <ware ware="shieldcomponents" amount="12" />
         </primary>
       </production>
       <component ref="shield_bor_l_standard_01_mk1_macro" />
@@ -893,12 +893,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_l_standard_01_mk2" name="{20106,3144}" description="{20106,3142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="206792" average="232351" max="257910" />
+      <price min="209116" average="232351" max="255586" />
       <production time="20" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="100" />
-          <ware ware="fieldcoils" amount="65" />
-          <ware ware="shieldcomponents" amount="55" />
+          <ware ware="energycells" amount="363" />
+          <ware ware="fieldcoils" amount="91" />
+          <ware ware="shieldcomponents" amount="77" />
         </primary>
       </production>
       <component ref="shield_bor_l_standard_01_mk2_macro" />
@@ -907,12 +907,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_l_standard_01_mk3" name="{20106,3154}" description="{20106,3152}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="1280548" average="1438818" max="1597088" />
+      <price min="1294936" average="1438818" max="1438818" />
       <production time="20" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="180" />
-          <ware ware="fieldcoils" amount="320" />
-          <ware ware="shieldcomponents" amount="240" />
+          <ware ware="energycells" amount="2967" />
+          <ware ware="fieldcoils" amount="749" />
+          <ware ware="shieldcomponents" amount="631" />
         </primary>
       </production>
       <component ref="shield_bor_l_standard_01_mk3_macro" />
@@ -921,10 +921,10 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_01_mk1" name="{20106,2144}" description="{20106,2142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="14990" average="16843" max="18696" />
+      <price min="18190" average="20212" max="22233" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="23" />
+          <ware ware="energycells" amount="25" />
           <ware ware="fieldcoils" amount="5" />
           <ware ware="shieldcomponents" amount="5" />
         </primary>
@@ -935,12 +935,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_01_mk2" name="{20106,2154}" description="{20106,2152}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="66812" average="75070" max="83327" />
+      <price min="81076" average="90084" max="99092" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="44" />
-          <ware ware="fieldcoils" amount="20" />
-          <ware ware="shieldcomponents" amount="25" />
+          <ware ware="energycells" amount="140" />
+          <ware ware="fieldcoils" amount="35" />
+          <ware ware="shieldcomponents" amount="29" />
         </primary>
       </production>
       <component ref="shield_bor_m_standard_01_mk2_macro" />
@@ -949,12 +949,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_01_mk3" name="{20106,2164}" description="{20106,2162}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="294801" average="331238" max="367674" />
+      <price min="357737" average="397486" max="437234" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="76" />
-          <ware ware="fieldcoils" amount="85" />
-          <ware ware="shieldcomponents" amount="96" />
+          <ware ware="energycells" amount="819" />
+          <ware ware="fieldcoils" amount="206" />
+          <ware ware="shieldcomponents" amount="174" />
         </primary>
       </production>
       <component ref="shield_bor_m_standard_01_mk3_macro" />
@@ -963,10 +963,10 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_02_mk1" name="{20106,2144}" description="{20106,2142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="14990" average="16843" max="18696" />
+      <price min="18190" average="20212" max="22233" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="23" />
+          <ware ware="energycells" amount="25" />
           <ware ware="fieldcoils" amount="5" />
           <ware ware="shieldcomponents" amount="5" />
         </primary>
@@ -977,12 +977,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_02_mk2" name="{20106,2154}" description="{20106,2152}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="66812" average="75070" max="83327" />
+      <price min="81076" average="90084" max="99092" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="44" />
-          <ware ware="fieldcoils" amount="20" />
-          <ware ware="shieldcomponents" amount="25" />
+          <ware ware="energycells" amount="140" />
+          <ware ware="fieldcoils" amount="35" />
+          <ware ware="shieldcomponents" amount="29" />
         </primary>
       </production>
       <component ref="shield_bor_m_standard_02_mk2_macro" />
@@ -991,12 +991,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_02_mk3" name="{20106,2164}" description="{20106,2162}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="294801" average="331238" max="367674" />
+      <price min="357737" average="397486" max="437234" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="76" />
-          <ware ware="fieldcoils" amount="85" />
-          <ware ware="shieldcomponents" amount="96" />
+          <ware ware="energycells" amount="819" />
+          <ware ware="fieldcoils" amount="206" />
+          <ware ware="shieldcomponents" amount="174" />
         </primary>
       </production>
       <component ref="shield_bor_m_standard_02_mk3_macro" />
@@ -1005,10 +1005,10 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_s_standard_01_mk1" name="{20106,1194}" description="{20106,1192}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="2236" average="2512" max="2789" />
+      <price min="2261" average="2512" max="2763" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="5" />
+          <ware ware="energycells" amount="8" />
           <ware ware="shieldcomponents" amount="2" />
         </primary>
       </production>
@@ -1019,11 +1019,11 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_s_standard_01_mk2" name="{20106,1204}" description="{20106,1202}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="15706" average="17648" max="19589" />
+      <price min="15883" average="17648" max="19413" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="13" />
-          <ware ware="fieldcoils" amount="5" />
+          <ware ware="energycells" amount="27" />
+          <ware ware="fieldcoils" amount="6" />
           <ware ware="shieldcomponents" amount="5" />
         </primary>
       </production>
@@ -1034,12 +1034,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_s_standard_01_mk3" name="{20106,1214}" description="{20106,1212}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="74409" average="83606" max="92803" />
+      <price min="75245" average="83606" max="91967" />
       <production time="10" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="24" />
-          <ware ware="fieldcoils" amount="20" />
-          <ware ware="shieldcomponents" amount="27" />
+          <ware ware="energycells" amount="172" />
+          <ware ware="fieldcoils" amount="43" />
+          <ware ware="shieldcomponents" amount="36" />
         </primary>
       </production>
       <component ref="shield_bor_s_standard_01_mk3_macro" />
@@ -1049,12 +1049,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_xl_standard_01_mk1" name="{20106,4074}" description="{20106,4072}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="260362" average="292542" max="324722" />
+      <price min="263288" average="292542" max="321796" />
       <production time="20" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="150" />
+          <ware ware="energycells" amount="365" />
           <ware ware="fieldcoils" amount="92" />
-          <ware ware="shieldcomponents" amount="45" />
+          <ware ware="shieldcomponents" amount="77" />
         </primary>
       </production>
       <component ref="shield_bor_xl_standard_01_mk1_macro" />
@@ -1063,12 +1063,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_xl_standard_01_mk2" name="{20106,4084}" description="{20106,4082}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="1805236" average="2028355" max="2251474" />
+      <price min="1825520" average="2028355" max="2231191" />
       <production time="20" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="250" />
-          <ware ware="fieldcoils" amount="510" />
-          <ware ware="shieldcomponents" amount="210" />
+          <ware ware="energycells" amount="3169" />
+          <ware ware="fieldcoils" amount="800" />
+          <ware ware="shieldcomponents" amount="674" />
         </primary>
       </production>
       <component ref="shield_bor_xl_standard_01_mk2_macro" />
@@ -1142,12 +1142,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="ship_bor_m_corvette_01_a" name="{20101,51001}" description="{20101,51011}" transport="ship" volume="1" tags="ship">
-      <price min="529993" average="638546" max="747099" />
+      <price min="660895" average="734328" max="807761" />
       <production time="35" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="110" />
-          <ware ware="hullparts" amount="540" />
-          <ware ware="water" amount="245" />
+          <ware ware="energycells" amount="573" />
+          <ware ware="hullparts" amount="746" />
+          <ware ware="water" amount="346" />
         </primary>
       </production>
       <component ref="ship_bor_m_corvette_01_a_macro" />
@@ -1155,12 +1155,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="ship_bor_m_corvette_02_a" name="{20101,51002}" description="{20101,51012}" transport="ship" volume="1" tags="limited nocustomgamestart nodiplomacyblueprint ship">
-      <price min="561714" average="676764" max="791814" />
+      <price min="730905" average="812117" max="893329" />
       <production time="35" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="110" />
-          <ware ware="hullparts" amount="574" />
-          <ware ware="water" amount="255" />
+          <ware ware="energycells" amount="634" />
+          <ware ware="hullparts" amount="825" />
+          <ware ware="water" amount="383" />
         </primary>
       </production>
       <component ref="ship_bor_m_corvette_02_a_macro" />
@@ -1233,12 +1233,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="ship_bor_s_heavyfighter_01_a" name="{20101,50601}" description="{20101,50611}" transport="ship" volume="1" tags="ship">
-      <price min="203922" average="245690" max="287457" />
+      <price min="320625" average="356250" max="391875" />
       <production time="15" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="79" />
-          <ware ware="hullparts" amount="201" />
-          <ware ware="water" amount="110" />
+          <ware ware="energycells" amount="278" />
+          <ware ware="hullparts" amount="362" />
+          <ware ware="water" amount="168" />
         </primary>
       </production>
       <component ref="ship_bor_s_heavyfighter_01_a_macro" />

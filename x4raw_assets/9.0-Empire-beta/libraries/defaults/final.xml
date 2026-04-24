@@ -235,7 +235,6 @@
       </sounds>
       <effects>
         <highspeed ref="highspeed_effect"/>
-        <soundcontext entered="soundcontext_entered" left="soundcontext_left"/>
         <longrangescan>
           <claimable ref="scfx_result_good_01"/>
         </longrangescan>
@@ -354,6 +353,7 @@
         <sefx_damage_medium ref="ref_ship_persistentdamage_xl_medium"/>
         <sefx_damage_high ref="ref_ship_persistentdamage_xl_high"/>
         <traveling ref="gen_xl_travelbubble_01_exterior" inside="gen_xl_travelbubble_01_cockpit"/>
+        <soundcontext entered="soundcontext_entered" left="soundcontext_left"/>
       </effects>
       <capture allow="true"/>
       <docksize tag="dock_xl"/>
@@ -476,6 +476,7 @@
         <sefx_damage_medium ref="ref_ship_persistentdamage_l_medium"/>
         <sefx_damage_high ref="ref_ship_persistentdamage_l_high"/>
         <traveling ref="gen_l_travelbubble_01_exterior" inside="gen_l_travelbubble_01_cockpit"/>
+        <soundcontext entered="soundcontext_entered" left="soundcontext_left"/>
       </effects>
       <capture allow="true"/>
       <docksize tag="dock_l"/>
@@ -590,6 +591,7 @@
         <!--<surface ref="impact_units_m" />-->
         <collision light="light_collision_m" medium="medium_collision_m" strong="strong_collision_m"/>
         <!--commented out: sustain="ongoing_collision_m" -->
+        <soundcontext entered="soundcontext_entered" left="soundcontext_left"/>
       </effects>
       <capture allow="true"/>
       <docksize tag="dock_m"/>
@@ -693,6 +695,7 @@
         <sefx_damage_high ref="ref_ship_persistentdamage_s_high"/>
         <traveling ref="gen_s_travelbubble_01_exterior" inside="gen_s_travelbubble_01_cockpit"/>
         <!--<surface ref="impact_units_s" />-->
+        <soundcontext entered="soundcontext_entered" left="soundcontext_left"/>
       </effects>
       <capture allow="true"/>
       <docksize tag="dock_s"/>
@@ -864,6 +867,7 @@
           <effect chance="0.20" threshold="25" location="engine" ref="firetrail_s"/>
           <effect chance="0.50" threshold="15" location="hull" ref="surfaceexplosions_s"/>
         </damage>
+        <soundcontext entered="soundcontext_entered" left="soundcontext_left"/>
       </effects>
       <internalsound engine="0.75"/>
     </properties>
