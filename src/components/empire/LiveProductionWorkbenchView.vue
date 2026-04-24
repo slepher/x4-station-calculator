@@ -29,14 +29,14 @@ const { t } = useI18n()
 
 onMounted(() => {
   const gameGuid = activeViewStore.activeBinding
-  if (gameGuid && !liveStore.activeBinding) {
-    liveStore.openBinding(gameGuid)
+  if (gameGuid) {
+    liveStore.activateBinding(gameGuid)
   }
 })
 
 watch(() => activeViewStore.activeBinding, (newGuid) => {
-  if (newGuid && newGuid !== liveStore.activeBinding?.gameGuid) {
-    liveStore.openBinding(newGuid)
+  if (newGuid) {
+    liveStore.activateBinding(newGuid)
   }
 })
 

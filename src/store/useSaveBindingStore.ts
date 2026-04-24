@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { computed, ref } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { useActiveViewStore } from './useActiveViewStore'
 import { useSaveStore } from './useSaveStore'
@@ -175,20 +175,46 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       savedBindings.value = normalizeState(null)
     }
     
-    const storedGuid = activeViewStore.activeBinding
-    if (storedGuid && savedBindings.value.list.some((b) => b.gameGuid === storedGuid)) {
-      const archiveGroup = saveStore.archives.get(storedGuid)
-      const hasValidArchive = archiveGroup?.saves.some(s => s.isValid) ?? false
-      
-      if (hasValidArchive) {
-        loadDraft(storedGuid)
-      } else {
-        activeViewStore.activeBinding = null
-        activeViewStore.activeBindingStation = null
-        draftBinding.value = null
-      }
+    syncFromActiveView()
+  }
+
+  function syncFromActiveView() {
+    const guid = activeViewStore.activeBinding
+    if (!guid) {
+      draftBinding.value = null
+      lastSavedDraftSnapshot.value = ''
+      return
+    }
+    if (draftBinding.value?.gameGuid === guid) return
+    const binding = getBindingByGameGuid(guid)
+    if (binding) {
+      loadDraft(guid)
+    } else {
+      draftBinding.value = null
+      lastSavedDraftSnapshot.value = ''
     }
   }
+
+  function clearDraft() {
+    draftBinding.value = null
+    lastSavedDraftSnapshot.value = ''
+  }
+
+  watch(
+    () => activeViewStore.activeBinding,
+    (newGuid) => {
+      if (newGuid) {
+        const binding = getBindingByGameGuid(newGuid)
+        if (binding) {
+          loadDraft(newGuid)
+        } else {
+          clearDraft()
+        }
+      } else {
+        clearDraft()
+      }
+    }
+  )
 
   const bindings = computed(() => savedBindings.value.list)
   const activeGameGuid = computed(() => activeViewStore.activeBinding)
@@ -247,12 +273,21 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     persistViewState()
   }
 
+  function loadDraftForGameGuid(gameGuid: string) {
+    let binding = getBindingByGameGuid(gameGuid)
+    if (!binding) {
+      binding = createDefaultBinding(gameGuid)
+      binding.bindingName = getBindingDisplayName(gameGuid)
+      savedBindings.value.list.push(binding)
+    }
+    loadDraft(gameGuid)
+  }
+
   function setSelectedArchiveTime(gameGuid: string, archiveTime: number | null) {
     const binding = getBindingByGameGuid(gameGuid) || createDefaultBinding(gameGuid)
     if (!getBindingByGameGuid(gameGuid)) savedBindings.value.list.push(binding)
     binding.selectedArchiveTime = archiveTime
     binding.updatedAt = Date.now()
-    activeViewStore.setActiveId(gameGuid)
     if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraft(gameGuid)
     if (draftBinding.value) {
       draftBinding.value.selectedArchiveTime = archiveTime
@@ -262,7 +297,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function setBlueprintEmpire(gameGuid: string, empireId: string | undefined) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return
     draftBinding.value.blueprintEmpireId = empireId
     draftBinding.value.updatedAt = Date.now()
@@ -279,7 +314,6 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     const idx = savedBindings.value.list.findIndex((item) => item.gameGuid === next.gameGuid)
     if (idx >= 0) savedBindings.value.list[idx] = next
     else savedBindings.value.list.push(next)
-    activeViewStore.setActiveId(next.gameGuid)
     writeState()
     lastSavedDraftSnapshot.value = serializeBinding(draftBinding.value)
   }
@@ -291,7 +325,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function createGroup(gameGuid: string, name = ''): BindingSectorGroup | null {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return null
     const group = createDefaultGroup(name, draftBinding.value.groups.length)
     draftBinding.value.groups.push(group)
@@ -300,7 +334,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function updateGroup(gameGuid: string, groupId: string, patch: Partial<BindingSectorGroup>) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
     const group = draftBinding.value.groups.find((item) => item.id === groupId)
     if (!group) return false
@@ -310,7 +344,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function deleteGroup(gameGuid: string, groupId: string) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
     const before = draftBinding.value.groups.length
     draftBinding.value.groups = draftBinding.value.groups.filter((item) => item.id !== groupId)
@@ -332,7 +366,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     jumpRange: number
     coverageSectorMacros: CoverageSectorEntry[]
   }) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) loadDraftForGameGuid(input.gameGuid)
     if (!draftBinding.value) return
     
     const group = draftBinding.value.groups.find((item) => item.id === input.sectorGroupId)
@@ -365,7 +399,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
 
   function setGroupConnection(gameGuid: string, sourceGroupId: string, targetGroupId: string, connected: boolean) {
     if (sourceGroupId === targetGroupId) return
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     const source = draftBinding.value?.groups.find((item) => item.id === sourceGroupId)
     const target = draftBinding.value?.groups.find((item) => item.id === targetGroupId)
     if (!source || !target) return
@@ -396,7 +430,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }): BindingStationPlan | null {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) loadDraftForGameGuid(input.gameGuid)
     if (!draftBinding.value) return null
 
     let plan = input.saveStationCode
@@ -434,7 +468,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function clearStationPlan(gameGuid: string, identifier: string) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
     const before = draftBinding.value.stationPlans.length
     draftBinding.value.stationPlans = draftBinding.value.stationPlans.filter(
@@ -445,7 +479,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function deleteStationPlan(gameGuid: string, stationPlanId: string) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
     const before = draftBinding.value.stationPlans.length
     draftBinding.value.stationPlans = draftBinding.value.stationPlans.filter((item) => item.id !== stationPlanId)
@@ -460,7 +494,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     sectorMacro: string
     position: { x: number; y: number; z: number }
   }) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) loadDraftForGameGuid(input.gameGuid)
     if (!draftBinding.value) return false
     const plan = draftBinding.value.stationPlans.find((item) => item.id === input.stationPlanId)
     if (!plan) return false
@@ -479,7 +513,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     sectorMacro?: string
     position?: { x: number; y: number; z: number }
   }): TradeStationBinding | null {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) loadDraftForGameGuid(input.gameGuid)
     if (!draftBinding.value) return null
     const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
     if (!group) return null
@@ -505,7 +539,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function deleteTradeStation(gameGuid: string, groupId: string) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
     const group = draftBinding.value.groups.find((item) => item.id === groupId)
     if (!group?.tradeStation) return false
@@ -520,7 +554,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     sectorMacro: string
     position: { x: number; y: number; z: number }
   }) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) createOrOpenBinding(input.gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== input.gameGuid) loadDraftForGameGuid(input.gameGuid)
     if (!draftBinding.value) return false
     const group = draftBinding.value.groups.find((item) => item.id === input.groupId)
     if (!group?.tradeStation) return false
@@ -531,7 +565,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function unbindTradeStation(gameGuid: string, groupId: string) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
     const group = draftBinding.value.groups.find((item) => item.id === groupId)
     if (!group?.tradeStation) return false
@@ -563,16 +597,13 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   function loadData(data: SavedSaveBindingsState) {
     savedBindings.value = normalizeState(data)
     writeState()
-    const storedGuid = activeViewStore.activeBinding
-    if (storedGuid && savedBindings.value.list.some((b) => b.gameGuid === storedGuid)) {
-      loadDraft(storedGuid)
-    }
+    syncFromActiveView()
   }
 
   
 
   function updateStationPlan(gameGuid: string, stationPlanId: string, patch: Partial<BindingStationPlan>) {
-    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) createOrOpenBinding(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraftForGameGuid(gameGuid)
     if (!draftBinding.value) return false
     const plan = draftBinding.value.stationPlans.find((item) => item.id === stationPlanId)
     if (!plan) return false
@@ -610,6 +641,8 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     isDirty,
     isInitialized,
     initialize,
+    syncFromActiveView,
+    clearDraft,
     getBindingByGameGuid,
     getBindingDisplayName,
     createOrOpenBinding,

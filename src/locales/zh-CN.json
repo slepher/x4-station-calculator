@@ -627,7 +627,8 @@
     "tab_binding": "存档绑定",
     "no_saved_bindings": "暂无保存的存档绑定",
     "action_load_binding": "加载绑定",
-    "confirm_delete_binding": "确定要删除这个存档绑定吗？"
+    "confirm_delete_binding": "确定要删除这个存档绑定吗？",
+    "archive_invalid": "存档失效"
   },
   "binding": {
     "binding_name": "绑定名称",

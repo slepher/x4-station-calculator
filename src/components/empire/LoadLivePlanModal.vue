@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { useI18n } from 'vue-i18n'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
-import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { useSaveStore } from '@/store/useSaveStore'
+import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 
 const props = defineProps<{
   isOpen: boolean
@@ -10,13 +11,19 @@ const props = defineProps<{
 const emit = defineEmits(['close'])
 const { t } = useI18n()
 const saveBindingStore = useSaveBindingStore()
-const activeViewStore = useActiveViewStore()
+const saveStore = useSaveStore()
+const liveStore = useLiveProductionStore()
 
 const formatDate = (ts: number) => new Date(ts).toLocaleString()
 
-const handleLoadBinding = (gameGuid: string) => {
-  saveBindingStore.createOrOpenBinding(gameGuid)
-  activeViewStore.switchToBinding(gameGuid)
+function bindingHasValidArchive(gameGuid: string): boolean {
+  const group = saveStore.archives.get(gameGuid)
+  return group?.saves.some(s => s.isValid) ?? false
+}
+
+const handleLoadBinding = async (gameGuid: string) => {
+  if (!bindingHasValidArchive(gameGuid)) return
+  await liveStore.activateBinding(gameGuid)
   emit('close')
 }
 
@@ -68,6 +75,8 @@ const handleDeleteBinding = (gameGuid: string) => {
               <div>
                 <div class="font-bold text-lg text-cyan-100 mb-1 group-hover:text-cyan-400 transition-colors">
                   {{ binding.bindingName || binding.gameGuid.slice(0, 8) }}
+                  <span v-if="!bindingHasValidArchive(binding.gameGuid)"
+                    class="text-red-400 text-sm font-normal ml-1">[{{ t('planning.archive_invalid') }}]</span>
                 </div>
                 <div class="text-xs text-slate-500 font-mono">{{ formatDate(binding.updatedAt) }}</div>
               </div>
@@ -84,7 +93,13 @@ const handleDeleteBinding = (gameGuid: string) => {
 
           <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">
             <button @click="handleLoadBinding(binding.gameGuid)"
-              class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/30 px-3 py-1.5 rounded transition">
+              :disabled="!bindingHasValidArchive(binding.gameGuid)"
+              :class="[
+                'flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider rounded transition px-3 py-1.5',
+                bindingHasValidArchive(binding.gameGuid)
+                  ? 'text-cyan-400 hover:text-cyan-300 hover:bg-cyan-900/30'
+                  : 'text-slate-600 cursor-not-allowed'
+              ]">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M15 3h6v6" />
                 <path d="M10 14L21 3" />

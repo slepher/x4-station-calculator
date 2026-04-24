@@ -34,6 +34,8 @@ import { createProductionWareRuleActions } from './actions/productionWareRuleAct
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
+  type DirtyBindingState = 'all' | Set<string> | null
+
   const gameData = useGameDataStore()
   const saveBindingStore = useSaveBindingStore()
   const saveStore = useSaveStore()
@@ -49,6 +51,50 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
   const liveFlowMap = shallowRef<StationDerivedMap | null>(null)
+  const dirtyBindingStationIds = ref<DirtyBindingState>(null)
+
+  function computeDirtyStation(stationId: string) {
+    const dirty = dirtyBindingStationIds.value
+    if (dirty === null) return
+    if (dirty === 'all' || dirty.has(stationId)) {
+      const deps = getDerivedStaticDeps()
+      if (deps) syncLiveFlowMapForStation(stationId, deps)
+      if (dirty !== 'all') {
+        dirty.delete(stationId)
+        if (dirty.size === 0) {
+          dirtyBindingStationIds.value = null
+        }
+      }
+    }
+  }
+
+  function flushAllDirtyStations() {
+    const dirty = dirtyBindingStationIds.value
+    if (dirty === null) return
+    if (dirty === 'all') {
+      syncLiveFlowMap()
+    } else {
+      const deps = getDerivedStaticDeps()
+      dirty.forEach((stationId) => {
+        if (deps) syncLiveFlowMapForStation(stationId, deps)
+      })
+    }
+    dirtyBindingStationIds.value = null
+  }
+
+  function markAllDirty() {
+    dirtyBindingStationIds.value = 'all'
+  }
+
+  function markStationDirty(stationId: string) {
+    const dirty = dirtyBindingStationIds.value
+    if (dirty === 'all') return
+    if (dirty === null) {
+      dirtyBindingStationIds.value = new Set([stationId])
+    } else {
+      dirty.add(stationId)
+    }
+  }
 
   function diffStationSettings(
     previous: StationSettings,
@@ -164,13 +210,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     })
   }
 
-  function syncAfterStationFlowChange(stationId: string, deps: StationComputeDeps): void {
-    syncLiveFlowMapForStation(stationId, deps)
+  function syncAfterStationFlowChange(stationId: string, _deps: StationComputeDeps): void {
+    markStationDirty(stationId)
   }
 
   async function loadPlayerStationRecords() {
     const archive = selectedArchive.value
-    if (!archive || !archive.isValid) {
+    const binding = activeBinding.value
+    if (!archive || !archive.isValid || !binding || archive.meta.guid !== binding.gameGuid) {
       playerStationRecords.value = []
       return
     }
@@ -185,9 +232,49 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   watch(selectedArchive, async () => {
+    const archive = selectedArchive.value
+    const binding = activeBinding.value
+    if (!archive || !binding || archive.meta.guid !== binding.gameGuid) return
+    if (binding.selectedArchiveTime) return
     await loadPlayerStationRecords()
     syncLiveFlowMap()
   })
+
+  watch(
+    () => saveStore.savedArchivesState.list.length,
+    async (newLen, oldLen) => {
+      if (newLen >= oldLen) return
+      const binding = activeBinding.value
+      if (!binding) return
+
+      const archiveGroup = saveStore.archives.get(binding.gameGuid)
+      const hasValidArchive = archiveGroup?.saves.some(s => s.isValid) ?? false
+
+      if (!hasValidArchive) {
+        activeViewStore.activeBinding = null
+        activeViewStore.activeBindingStation = null
+        saveBindingStore.clearDraft()
+        playerStationRecords.value = []
+        planningDerivedMap.value?.clear()
+        liveFlowMap.value?.clear()
+      } else {
+        const bindingRecord = saveBindingStore.getBindingByGameGuid(binding.gameGuid)
+        if (bindingRecord) {
+          const currentTime = bindingRecord.selectedArchiveTime
+          const archiveStillValid = currentTime != null
+            ? archiveGroup!.saves.some(s => s.meta.time === currentTime && s.isValid)
+            : false
+          if (!archiveStillValid && currentTime != null) {
+            const latest = [...archiveGroup!.saves].sort((a, b) => b.meta.time - a.meta.time).find(s => s.isValid)
+            if (latest) {
+              bindingRecord.selectedArchiveTime = latest.meta.time
+              await saveStore.selectArchive(binding.gameGuid, latest.meta.time)
+            }
+          }
+        }
+      }
+    }
+  )
 
   const activeStationId = computed({
     get: () => activeViewStore.activeBindingStation,
@@ -276,10 +363,22 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const flowFacade = planningFlowFacade
 
-  const stationFlowCache = flowFacade.stationFlowCache
-  const empireGroupedFlows = flowFacade.empireGroupedFlows
-  const sectorInternalDataMap = flowFacade.sectorInternalDataMap
-  const sectorLinkCalcMap = flowFacade.sectorLinkCalcMap
+  const stationFlowCache = computed(() => {
+    if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
+    return flowFacade.stationFlowCache.value
+  })
+  const empireGroupedFlows = computed(() => {
+    if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
+    return flowFacade.empireGroupedFlows.value
+  })
+  const sectorInternalDataMap = computed(() => {
+    if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
+    return flowFacade.sectorInternalDataMap.value
+  })
+  const sectorLinkCalcMap = computed(() => {
+    if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
+    return flowFacade.sectorLinkCalcMap.value
+  })
 
   const activeTransitSectorId = computed(() => computeActiveTransitSectorId(
     activeStationId.value,
@@ -370,7 +469,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const archiveStation = computed<ArchiveStationData | null>(() => {
     const code = archiveStationCode.value
     if (!code || !activeBinding.value) return null
-    
+
+    const archive = selectedArchive.value
+    if (!archive || archive.meta.guid !== activeBinding.value.gameGuid) return null
+
     const record = playerStationRecords.value.find(r => r.code === code && r.type === 'station')
     if (!record) return null
     
@@ -940,16 +1042,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   )
 
   function syncBindingStationDerivedSnapshot(stationId: string) {
-    const station = getStationById(stationId)
-    if (!station) return
-    const deps = getDerivedStaticDeps()
-    const map = ensurePlanningDerivedMap()
-    if (!deps || !map) return
-    map.upsertStation(stationId, buildPlanningSeed(station))
-    syncAfterStationFlowChange(stationId, deps)
+    markStationDirty(stationId)
   }
 
   function getStationFlowCache(stationId: string): GroupedFlows | null {
+    computeDirtyStation(stationId)
     const flowMapToUse = mode.value === 'live' ? liveFlowMap.value : planningDerivedMap.value
     if (!flowMapToUse) return null
     const cache = flowMapToUse?.getCache(stationId) || null
@@ -1152,7 +1249,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function validateActiveStationId() {
     const currentStationId = activeViewStore.activeBindingStation
-    if (!currentStationId) return
+    if (!currentStationId) {
+      activeStationId.value = null
+      expandedSectorId.value = null
+      return
+    }
 
     const transitMatch = currentStationId.match(/^transit:(.+)$/)
     if (transitMatch) {
@@ -1177,6 +1278,43 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       }
     } else {
       activeStationId.value = null
+      expandedSectorId.value = null
+    }
+  }
+
+  let _activating = false
+  async function activateBinding(gameGuid: string): Promise<boolean> {
+    if (_activating) return false
+    _activating = true
+    try {
+      const binding = saveBindingStore.getBindingByGameGuid(gameGuid)
+      if (!binding) return false
+
+      const archiveGroup = saveStore.archives.get(gameGuid)
+      const hasValidArchive = archiveGroup?.saves.some(s => s.isValid) ?? false
+      if (!hasValidArchive) return false
+
+      activeViewStore.activeBinding = gameGuid
+      saveBindingStore.syncFromActiveView()
+
+    const draft = activeBinding.value
+    if (draft?.selectedArchiveTime) {
+      await saveStore.selectArchive(gameGuid, draft.selectedArchiveTime)
+    } else {
+      await saveStore.selectArchiveGroup(gameGuid)
+    }
+
+    await loadPlayerStationRecords()
+    syncAllBindingStationsToStateMap()
+    markAllDirty()
+    validateActiveStationId()
+    if (activeStationId.value) {
+      mode.value = initialMode.value
+    }
+
+    return true
+    } finally {
+      _activating = false
     }
   }
 
@@ -1193,47 +1331,27 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
       const storedGuid = activeViewStore.activeBinding
       if (storedGuid) {
-        const bindingExists = saveBindingStore.savedBindings.list.some((b) => b.gameGuid === storedGuid)
-        const archiveGroup = saveStore.archives.get(storedGuid)
-        const hasValidArchive = archiveGroup?.saves.some(s => s.isValid) ?? false
-        
-        if (bindingExists && hasValidArchive) {
-          openBinding(storedGuid)
-          syncAllBindingStationsToStateMap()
-          syncLiveFlowMap()
-          validateActiveStationId()
-          if (activeStationId.value) {
-            mode.value = initialMode.value
-          }
+        const activated = await activateBinding(storedGuid)
+        if (activated) {
           isReady.value = true
           console.log('[LiveProductionStore] Loaded saved binding')
           return
         }
-        
         console.log('[LiveProductionStore] Saved binding invalid, trying fallback')
       }
 
-      // Fallback to first valid binding
       const validBinding = saveBindingStore.savedBindings.list.find((b) => {
         const archiveGroup = saveStore.archives.get(b.gameGuid)
         return archiveGroup?.saves.some(s => s.isValid) ?? false
       })
-      
+
       if (validBinding) {
-        activeViewStore.activeBinding = validBinding.gameGuid
-        openBinding(validBinding.gameGuid)
-        syncAllBindingStationsToStateMap()
-        syncLiveFlowMap()
-        validateActiveStationId()
-        if (activeStationId.value) {
-          mode.value = initialMode.value
-        }
+        await activateBinding(validBinding.gameGuid)
         isReady.value = true
         console.log('[LiveProductionStore] Fallback to first valid binding:', validBinding.gameGuid)
         return
       }
 
-      // No valid binding found
       activeViewStore.activeBinding = null
       activeViewStore.activeBindingStation = null
       console.log('[LiveProductionStore] No valid bindings found, cleared')
@@ -1244,13 +1362,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   }
 
-  function openBinding(gameGuid: string) {
+  async function openBinding(gameGuid: string) {
     const currentDraft = activeBinding.value
     if (currentDraft?.gameGuid === gameGuid && saveBindingStore.activeGameGuid === gameGuid) {
       return
     }
-    saveBindingStore.createOrOpenBinding(gameGuid)
-    activeViewStore.activeBinding = gameGuid
+    await activateBinding(gameGuid)
   }
 
   const wareflowViewMode = ref<WareFlowViewMode>('quantity')
@@ -1534,6 +1651,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     applyImportedStationPayload,
     renameBindingSector,
     initialize,
+    activateBinding,
     openBinding,
     validateActiveStationId,
     getSupplyPlanningInput,

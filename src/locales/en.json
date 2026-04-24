@@ -626,7 +626,8 @@
     "tab_binding": "Save Binding",
     "no_saved_bindings": "No saved bindings found.",
     "action_load_binding": "Load Binding",
-    "confirm_delete_binding": "Are you sure you want to delete this binding?"
+    "confirm_delete_binding": "Are you sure you want to delete this binding?",
+    "archive_invalid": "Archive Invalid"
   },
   "binding": {
     "binding_name": "Binding Name",

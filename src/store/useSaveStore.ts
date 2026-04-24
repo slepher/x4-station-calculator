@@ -542,7 +542,7 @@ export const useSaveStore = defineStore('save', () => {
     return normalizedVersion === currentVersion
   }
 
-  function addArchive(archive: SaveArchive): void {
+  async function addArchive(archive: SaveArchive): Promise<void> {
     archive.sectors = Object.fromEntries(
       Object.entries(archive.sectors).map(([sectorId, sector]) => [sectorId, normalizeSectorData(sectorId, sector as SectorData & { stations?: StationEntry[] })])
     )
@@ -556,11 +556,14 @@ export const useSaveStore = defineStore('save', () => {
     savedArchivesState.value.activeArchiveId = archiveId
     writeSavedState()
     rebuildArchivesFromState()
-    selectedArchive.value = archive
 
-    saveArchiveToDB(gameDataStore, archive).catch(error => {
+    try {
+      await saveArchiveToDB(gameDataStore, archive)
+    } catch (error) {
       console.error('[saveStore] failed to persist archive:', error)
-    })
+    }
+
+    selectedArchive.value = archive
   }
 
   async function selectArchive(guid: string, time: number): Promise<void> {
