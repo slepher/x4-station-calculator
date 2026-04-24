@@ -281,7 +281,7 @@
     ####################
            MANAGER
     ####################-->
-    <library name="Manager" namespace="this" version="17">
+    <library name="Manager" namespace="this" version="18">
       <params>
         <param name="Faction" comment="The faction to be managed"/>
         <param name="ConsumedFactions" default="[]" comment="Inactive factions considered to be a part of $Faction. Used to take their old goals or economic actions into account with the new faction."/>
@@ -331,6 +331,8 @@
           <find_sector name="$EconomicallyExcludedSectors" macro="$EconomicallyExcludedSectorMacros" multiple="true"/>
         </do_if>
         <set_value name="$NextJobRedeployTime" exact="player.age + 1h"/>
+        <create_group groupname="$PrefabExpandCandidates" comment="Prefab stations which are potentially suitable for expansion. Can be added from Factionlogic_Economy if the station has no major issues."/>
+        <set_value name="$NextPrefabExpansionTime" min="player.age + 6h" max="player.age + 7h"/>
         <!--Add faction manager cue to the global variable-->
         <do_if value="not global.$FactionManagers?">
           <set_value name="global.$FactionManagers" exact="table[]"/>
@@ -449,6 +451,10 @@
           </do_if>
           <remove_value name="$locPhase2Factions"/>
         </do_if>
+      </patch>
+      <patch sinceversion="18">
+        <create_group groupname="$PrefabExpandCandidates"/>
+        <set_value name="$NextPrefabExpansionTime" min="player.age + 3h" max="player.age + 4h"/>
       </patch>
       <cues>
         <cue name="PATCH_ReregisterForPatrolCoordination" onfail="cancel">
@@ -801,6 +807,43 @@
                   </actions>
                 </cue>
               </cues>
+            </cue>
+            <cue name="ExpandPrefabs" checkinterval="1min" instantiate="true">
+              <conditions>
+                <check_value value="player.age ge $NextPrefabExpansionTime"/>
+              </conditions>
+              <actions>
+                <shuffle_group group="$PrefabExpandCandidates"/>
+                <set_value name="this.$SelectedPrefab" exact="null"/>
+                <do_for_each name="$Prefab" in="$PrefabExpandCandidates">
+                  <do_if value="$Prefab.hasstagedconstruction and $Prefab.buildingprocessor and not $Prefab.buildingprocessor.isbuilding and $Prefab.hasfutureconstructionstage and $Prefab.lastattacktime lt player.age - 30min">
+                    <set_value name="this.$HasContestingEnemy" exact="false"/>
+                    <do_for_each name="$ContestingFaction" in="$Prefab.sector.contestingfactions">
+                      <do_if value="$Faction.hasrelation.enemy.{$ContestingFaction}">
+                        <set_value name="this.$HasContestingEnemy" exact="true"/>
+                        <break/>
+                      </do_if>
+                    </do_for_each>
+                    <do_if value="not this.$HasContestingEnemy">
+                      <set_value name="this.$SelectedPrefab" exact="$Prefab"/>
+                      <break/>
+                    </do_if>
+                  </do_if>
+                </do_for_each>
+                <do_if value="this.$SelectedPrefab">
+                  <set_value name="this.$ConstructionPlan" exact="this.$SelectedPrefab.plannedconstruction.sequence"/>
+                  <debug_text text="'Faction ' + $Faction + ' is expanding prefab ' + this.$SelectedPrefab.debugname + ' in ' + this.$SelectedPrefab.sector.knownname + ' to stage ' + (this.$ConstructionPlan.stage.current + 1)" chance="$DebugChance"/>
+                  <add_build_to_expand_station object="this.$SelectedPrefab.buildstorage" buildobject="this.$SelectedPrefab" constructionplan="this.$ConstructionPlan.finalsequence">
+                    <stage exact="this.$ConstructionPlan.stage.current + 1"/>
+                  </add_build_to_expand_station>
+                  <set_value name="$NextPrefabExpansionTime" min="player.age + 6h" max="player.age + 7h"/>
+                </do_if>
+                <do_else>
+                  <!--No prefab expanded. Check again in a shorter amount of time.-->
+                  <debug_text text="'Faction ' + $Faction + ' will not expand a prefab this iteration. There were ' + $PrefabExpandCandidates.count + ' candidates.'" chance="$PrefabExpandCandidates.count * $DebugChance"/>
+                  <set_value name="$NextPrefabExpansionTime" min="player.age + 2h" max="player.age + 3h"/>
+                </do_else>
+              </actions>
             </cue>
             <cue name="SectorLost" instantiate="true">
               <conditions>

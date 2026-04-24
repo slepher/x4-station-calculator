@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 19.03.2026 19:38:48-->
+<!--Last exported: 21.04.2026 16:40:38-->
 <diff>
   <add sel="/wares/production">
     <method id="split" name="{20206,701}">
@@ -989,12 +989,12 @@
       <icon active="ware_scruffinfruit" video="ware_scruffinfruit_macro" />
     </ware>
     <ware id="shield_spl_l_standard_01_mk1" name="{20106,3084}" description="{20106,3082}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="27782" average="45874" max="64068" />
+      <price min="41287" average="45874" max="50461" />
       <production time="20" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="104" />
-          <ware ware="fieldcoils" amount="5" />
-          <ware ware="shieldcomponents" amount="23" />
+          <ware ware="energycells" amount="57" />
+          <ware ware="fieldcoils" amount="14" />
+          <ware ware="shieldcomponents" amount="12" />
         </primary>
       </production>
       <component ref="shield_spl_l_standard_01_mk1_macro" />
@@ -1005,12 +1005,12 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_l_standard_01_mk2" name="{20106,3094}" description="{20106,3092}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="136139" average="226085" max="316589" />
+      <price min="203477" average="226085" max="248694" />
       <production time="20" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="165" />
-          <ware ware="fieldcoils" amount="31" />
-          <ware ware="shieldcomponents" amount="129" />
+          <ware ware="energycells" amount="353" />
+          <ware ware="fieldcoils" amount="89" />
+          <ware ware="shieldcomponents" amount="75" />
         </primary>
       </production>
       <component ref="shield_spl_l_standard_01_mk2_macro" />
@@ -1020,12 +1020,12 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_m_standard_01_mk1" name="{20106,2084}" description="{20106,2082}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="8653" average="14227" max="19836" />
+      <price min="15365" average="17072" max="18780" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="48" />
-          <ware ware="fieldcoils" amount="1" />
-          <ware ware="shieldcomponents" amount="7" />
+          <ware ware="energycells" amount="21" />
+          <ware ware="fieldcoils" amount="5" />
+          <ware ware="shieldcomponents" amount="4" />
         </primary>
       </production>
       <component ref="shield_spl_m_standard_01_mk1_macro" />
@@ -1037,12 +1037,12 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_m_standard_01_mk2" name="{20106,2094}" description="{20106,2092}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="39644" average="65687" max="91930" />
+      <price min="70942" average="78824" max="86707" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="84" />
-          <ware ware="fieldcoils" amount="6" />
-          <ware ware="shieldcomponents" amount="41" />
+          <ware ware="energycells" amount="123" />
+          <ware ware="fieldcoils" amount="31" />
+          <ware ware="shieldcomponents" amount="26" />
         </primary>
       </production>
       <component ref="shield_spl_m_standard_01_mk2_macro" />
@@ -1053,12 +1053,12 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_m_standard_02_mk1" name="{20106,2084}" description="{20106,2082}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="8653" average="14227" max="19836" />
+      <price min="1536515365" average="17072" max="18780" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="48" />
-          <ware ware="fieldcoils" amount="1" />
-          <ware ware="shieldcomponents" amount="7" />
+          <ware ware="energycells" amount="21" />
+          <ware ware="fieldcoils" amount="5" />
+          <ware ware="shieldcomponents" amount="4" />
         </primary>
       </production>
       <component ref="shield_spl_m_standard_02_mk1_macro" />
@@ -1069,12 +1069,12 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_m_standard_02_mk2" name="{20106,2094}" description="{20106,2092}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="39644" average="65687" max="91930" />
+      <price min="70942" average="78824" max="86707" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="84" />
-          <ware ware="fieldcoils" amount="6" />
-          <ware ware="shieldcomponents" amount="41" />
+          <ware ware="energycells" amount="123" />
+          <ware ware="fieldcoils" amount="31" />
+          <ware ware="shieldcomponents" amount="26" />
         </primary>
       </production>
       <component ref="shield_spl_m_standard_02_mk2_macro" />
@@ -1084,10 +1084,10 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_s_standard_01_mk1" name="{20106,1124}" description="{20106,1122}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="929" average="1528" max="2132" />
+      <price min="1375" average="1528" max="1681" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="5" />
+          <ware ware="energycells" amount="8" />
           <ware ware="shieldcomponents" amount="1" />
         </primary>
       </production>
@@ -1100,12 +1100,12 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_s_standard_01_mk2" name="{20106,1134}" description="{20106,1132}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="6658" average="11035" max="15447" />
+      <price min="9932" average="11035" max="12139" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="13" />
-          <ware ware="fieldcoils" amount="1" />
-          <ware ware="shieldcomponents" amount="7" />
+          <ware ware="energycells" amount="17" />
+          <ware ware="fieldcoils" amount="4" />
+          <ware ware="shieldcomponents" amount="3" />
         </primary>
       </production>
       <component ref="shield_spl_s_standard_01_mk2_macro" />
@@ -1117,12 +1117,12 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_s_standard_01_mk3" name="{20106,1144}" description="{20106,1142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="31475" average="52166" max="73051" />
+      <price min="46949" average="52166" max="57383" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="60" />
-          <ware ware="fieldcoils" amount="3" />
-          <ware ware="shieldcomponents" amount="37" />
+          <ware ware="energycells" amount="107" />
+          <ware ware="fieldcoils" amount="27" />
+          <ware ware="shieldcomponents" amount="2" />
         </primary>
       </production>
       <component ref="shield_spl_s_standard_01_mk3_macro" />
@@ -1133,12 +1133,12 @@
       <owner faction="split" />
     </ware>
     <ware id="shield_spl_xl_standard_01_mk1" name="{20106,4044}" description="{20106,4042}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="143572" average="238442" max="333746" />
+      <price min="214598" average="238442" max="262286" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="184" />
-          <ware ware="fieldcoils" amount="41" />
-          <ware ware="shieldcomponents" amount="117" />
+          <ware ware="energycells" amount="298" />
+          <ware ware="fieldcoils" amount="75" />
+          <ware ware="shieldcomponents" amount="63" />
         </primary>
       </production>
       <component ref="shield_spl_xl_standard_01_mk1_macro" />
@@ -1325,11 +1325,11 @@
       <owner faction="freesplit" />
     </ware>
     <ware id="ship_spl_s_heavyfighter_01_a" name="{20101,41001}" description="{20101,41011}" transport="ship" volume="1" tags="ship">
-      <price min="287831" average="338625" max="389419" />
+      <price min="315429" average="350477" max="385525" />
       <production time="17" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="92" />
-          <ware ware="hullparts" amount="317" />
+          <ware ware="energycells" amount="273" />
+          <ware ware="hullparts" amount="398" />
         </primary>
       </production>
       <component ref="ship_spl_s_heavyfighter_01_a_macro" />
@@ -1338,11 +1338,11 @@
       <owner faction="split" />
     </ware>
     <ware id="ship_spl_s_heavyfighter_02_a" name="{20101,42701}" description="{20101,42711}" transport="ship" volume="1" tags="ship">
-      <price min="230648" average="271350" max="312053" />
+      <price min="317480" average="352755" max="388031" />
       <production time="13" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="energycells" amount="74" />
-          <ware ware="hullparts" amount="254" />
+          <ware ware="energycells" amount="275" />
+          <ware ware="hullparts" amount="400" />
         </primary>
       </production>
       <component ref="ship_spl_s_heavyfighter_02_a_macro" />

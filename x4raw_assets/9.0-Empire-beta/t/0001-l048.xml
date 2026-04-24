@@ -3844,7 +3844,7 @@
     <t id="12889">Fabryki</t>
     <t id="12890">Wpływ Relacji</t>
     <t id="12891">Zakończ</t>
-    <t id="12892">Działanie zakończone</t>
+    <t id="12892">Akcja zakończona</t>
     <t id="12893">Wydarzenie Dyplomatyczne Rozpoczęte</t>
     <t id="12894">Akcja Agenta powiodła się!</t>
     <t id="12895">Twój agent pomyślnie wywołał Wydarzenie Dyplomatyczne. Przejrzyj je, aby wyznaczyć cel agenta i wpłynąć na wynik wydarzenia na swoją korzyść.</t>
@@ -9629,7 +9629,7 @@
     <t id="159">Ten typ statku nie może zaopatrywać innych statków.</t>
     <t id="160">Ten typ statku nie może zbierać ani przetwarzać złomu.</t>
     <t id="161">Atak niemożliwy z powodu nadpisania autoryzacji otwarcia ognia.(refers to {1001,7753})</t>
-    <t id="162">No mining subordinates.</t>
+    <t id="162">Brak podwładnych górników.</t>
   </page>
   <page id="1046" title="Diplomacy Texts" descr="Text for diplomacy library" voice="no">
     <t id="1000">(Agent Experience Type)</t>
@@ -51195,22 +51195,22 @@
     <t id="74901">(Argon 1-Dock Short Pier){20202,101} {20104,71109} {20104,71101}</t>
     <t id="74902">{20006,102}(No information available)</t>
     <t id="74903">(1-Dock Short){20104,71109}</t>
-    <t id="75001">Small Ship Showroom 01</t>
-    <t id="75002">Let's face it, owning a spaceship is a necessity in almost all civilised regions of space, no matter how densely populated the official census data makes them appear. Owning two spaceships differentiates the entrepreneur from the middle class, private owner. However, owning three, six, twelve - or however many - spaceships elevates the distinguished gentle-being to the upper class, the one-percenters that can. And if we're honest, what multi-millio-, billio-, quadrillionaire would place their shiny valuable spacecrafts into a parking orbit around some inconsequential moon in a godforsaken star system, never to be appreciated by anyone? That is right, none!\n\nThe rule of wealth goes like this: if you own it, show it. Place it into a lustrous hall, have its hull polished by an army of exquisite robot hands, bathed in blinding lights by a laser beam from above. And then, if you have your romantic interest over for dinner, or your prospective business partner - or your grand elder-being, for that matter - parade them past your luxury vehicles.\n\nYou earned it!</t>
-    <t id="75003">S Showroom 01</t>
-    <t id="75101">Small Ship Showroom 02</t>
+    <t id="75001">Wystawa małych statków 01</t>
+    <t id="75002">Spójrzmy prawdzie w oczy, posiadanie statku kosmicznego jest koniecznością w niemal wszystkich cywilizowanych regionach kosmosu, bez względu na to, jak gęsto zaludnione wydają się one według oficjalnych danych spisowych. Posiadanie dwóch statków kosmicznych odróżnia przedsiębiorcę od prywatnego właściciela z klasy średniej. Jednak posiadanie trzech, sześciu, dwunastu - lub dowolnej ich liczby - statków kosmicznych wynosi wybitnego dżentelmena do klasy wyższej, tego jednego procenta, który może. A jeśli mamy być szczerzy, to który multimilioner, miliarder czy kwadrylioner umieściłby swoje błyszczące, cenne statki kosmiczne na orbicie parkingowej wokół jakiegoś nieistotnego księżyca w zapomnianym przez Boga układzie gwiezdnym, by nikt nigdy ich nie docenił? Zgadza się, nikt! Zasada bogactwa jest następująca: jeśli je posiadasz, pokaż je. Umieść go w lśniącej sali, niech jego kadłub zostanie wypolerowany przez armię wykwalifikowanych rąk robotów, skąpany w oślepiającym świetle wiązki laserowej z góry. A potem, jeśli masz romantyczną kolację lub potencjalnego partnera biznesowego, przejdź się z nimi wokół swoich luksusowych statków.\n\n[mp:Zasłużyłeś|fp:Zasłużyłaś] na to!</t>
+    <t id="75003">S Wystawa 01</t>
+    <t id="75101">Wystawa małych statków 02</t>
     <t id="75102">{20104,75002}</t>
-    <t id="75103">S Showroom 02</t>
-    <t id="75201">Small &amp; Medium Ship Showroom</t>
+    <t id="75103">S Wystawa 02</t>
+    <t id="75201">Wystawa małych i średnich statków</t>
     <t id="75202">{20104,75002}</t>
-    <t id="75203">S/M Showroom</t>
+    <t id="75203">Wystawa S/M</t>
     <t id="75301">(S Showroom Docking Bay){20111,5011} {20104,79601} {20104,72401}</t>
     <t id="75302">{20104,75002}</t>
     <t id="75303">(S Showroom){20111,5011} {20104,79601}</t>
     <t id="75401">(M Showroom Docking Bay){20111,5021} {20104,79601} {20104,72401}</t>
     <t id="75402">{20104,75002}</t>
     <t id="75403">(M Showroom){20111,5021} {20104,79601}</t>
-    <t id="79601">Showroom</t>
+    <t id="79601">Wystawa</t>
     <t id="79602">{20104,75002}</t>
     <t id="79701">Zatoka dokująca</t>
     <t id="79702">{20006,102}(No information available)</t>
@@ -51455,14 +51455,14 @@
     <t id="120102">Wyłączenie bram skokowych spowodowało, że Avarice miało bardzo ograniczony dostęp do zasobów, więc pozostawieni sami sobie argońscy inżynierowie rozpoczęli prace nad różnymi urządzeniami do recyklingu. Jednym z nich była Przetwórnia złomu - moduł, który przyjmuje wraki statków o rozmiarach S i M, aby przetworzyć zawarty w nich surowy złom na metal złomowy, który z kolei może być przetworzony na inne użyteczne surowce. W tym czasie powstały też pierwsze holowniki, które transportowały wraki do Złomowiska. Kostki złomu zostały wprowadzone później, aby umożliwić upakowanie większych wraków w bloki nadające się do holowania i przetworzenia.\n\nPo przybyciu dronów posłańców z Sacred Relic, mieszkańcy Avarice wysłali własne drony do innych odłączonych systemów. Drony te zawierały plany ich technologii recyklingu, w nadziei, że będą one pomocne dla innych, którzy mieli nieszczęście utknąć bez dostępu do zasobów naturalnych. W ten sposób stworzyli lokalną filię Sojuszu Słowa, działającą w Falochronie. Wraz z pierwszym ponownym połączeniem bramy skokowej w roku 825 \(NC\), Sojusz Słowa przeniósł się do własnej stacji w Windfall.(Raw Scrap same as {20201,6801}, Scrap Metal same as {20201,6601}, Tug same as {20221,5051}, Scrap Cube same as {20109,10801})</t>
     <t id="120103">{20201,6601}</t>
     <t id="120201">{20201,7601} {20104,120101}(Allographyne Scrap Processor)</t>
-    <t id="120202">The Jump Gate shutdown left many sectors with very limited access to resources, prompting stranded engineers to design advanced recycling facilities. One of these was the Allographyne Scrap Processor; a module designed to process Kha'ak ship wrecks into Allographyne Fragments, which in turn can be recycled into other useable resources.\n\nThe arrival of the first interstellar messenger drones after the Fall of the Gates encouraged the administrations of many sectors to share survival-critical information with now inaccessible neighbouring systems, including blueprints for the new recycling technology. The aim was to support resource-disadvantaged populations, in the hope of receiving important information in return.\n\nThis system of mutual information exchange worked so well that many sectors maintained it locally even after Jump Gate connections were restored.(Allographyne Fragments same as {20201,7401})</t>
+    <t id="120202">Zamknięcie Bram Skokowych sprawiło, że wiele sektorów miało bardzo ograniczony dostęp do zasobów, co skłoniło inżynierów do zaprojektowania zaawansowanych urządzeń do recyklingu. Jednym z nich był Procesor Złomu Allographyne; moduł zaprojektowany do przetwarzania wraków statków Kha'ak na Fragmenty Allographyne, które z kolei mogą być przetwarzane na inne użyteczne zasoby. Pojawienie się pierwszych międzygwiezdnych dronów komunikacyjnych po Zamknięciu Bram zachęciło administracje wielu sektorów do dzielenia się krytycznymi dla przetrwania informacjami z niedostępnymi obecnie sąsiednimi systemami, w tym planami nowej technologii recyklingu. Celem było wspieranie populacji o ograniczonych zasobach, w nadziei na otrzymanie w zamian ważnych informacji. Ten system wzajemnej wymiany informacji działał tak dobrze, że wiele sektorów utrzymało go lokalnie nawet po przywróceniu połączeń z Wrotami Skoku.(Fragmenty Allographyne takie same jak {20201,7401}).</t>
     <t id="120203">{20201,7401}(Allographyne Fragments)</t>
     <t id="130000">(*Production Modules continued*)</t>
     <t id="130101">Recykler Złomu</t>
     <t id="130102">Wyłączenie bram skokowych spowodowało, że Avarice miało bardzo ograniczony dostęp do zasobów. Pozostawieni sami sobie, argońscy inżynierowie rozpoczęli prace nad różnymi urządzeniami do recyklingu. Recykler Złomu został zaprojektowany do przetwarzania metalu złomowego na surowce użyteczne, zamieniając go w części kadłuba i Claytronikę w zmiennych cyklach produkcyjnych.\n\nPo przybyciu dronów z Sacred Relic, mieszkańcy Avarice wysłali własne drony do innych odłączonych systemów. Drony te zawierały plany ich technologii recyklingu, w nadziei, że będą one pomocne dla innych, mających nieszczęście utknąć bez dostępu do zasobów naturalnych. W ten sposób stworzyli lokalną filię Sojuszu Słowa, działającą w Falochronie. Wraz z pierwszym ponownym połączeniem bramy skokowej w roku 825 \(NC\) Sojusz Słowa przeniósł się do własnej stacji w Windfall.(Scrap Metal same as {20201,6601}, Hull Parts same as {20201,1201}, Claytronics same as {20201,501})</t>
     <t id="130103">Towary z recyklingu</t>
     <t id="130201">{20201,7601} {20104,130101}(Allographyne Scrap Recycler)</t>
-    <t id="130202">The Jump Gate shutdown left many sectors with very limited access to resources, prompting stranded engineers to design advanced recycling facilities. One of these was the Allographyne Scrap Recycler; a module designed to recycle Allographyne Fragments into usable resources by converting them into Allographyne.\n\nThe arrival of the first interstellar messenger drones after the Fall of the Gates encouraged the administrations of many sectors to share survival-critical information with now inaccessible neighbouring systems, including blueprints for the new recycling technology. The aim was to support resource-disadvantaged populations, in the hope of receiving important information in return.\n\nThis system of mutual information exchange worked so well that many sectors maintained it locally even after Jump Gate connections were restored.(Allographyne Fragments same as {20201,7401}, Allographyne same as {20201, 7601})</t>
+    <t id="130202">Zamknięcie Bram Skokowych sprawiło, że wiele sektorów miało bardzo ograniczony dostęp do zasobów, co skłoniło inżynierów do zaprojektowania zaawansowanych urządzeń do recyklingu. Jednym z nich był Procesor Złomu Allographyne; moduł zaprojektowany do recyklingu fragmentów Allographyne w użyteczne zasoby poprzez przekształcenie ich w Allographyne.\nPojawienie się pierwszych międzygwiezdnych dronów komunikacyjnych po Zamknięciu Bram zachęciło administracje wielu sektorów do dzielenia się krytycznymi dla przetrwania informacjami z teraz niedostępnymi sąsiednimi systemami, w tym planami nowej technologii recyklingu. Celem było wsparcie populacji o ograniczonych zasobach, w nadziei na otrzymanie w zamian ważnych informacji. Ten system wzajemnej wymiany informacji działał tak dobrze, że wiele sektorów utrzymało go lokalnie nawet po przywróceniu połączeń z Bramami Skokowymi.(Allographyne Fragments tak samo jak {20201,7401}, Allographyne tak samo jak {20201, 7601}).</t>
     <t id="130203">{20201,7601}(Allographyne)</t>
     <t id="140101">(Terran Scrap Recycler){20202,701} {20104,130101}</t>
     <t id="140102">{20104,130102}\n\nPo otrzymaniu planów Recyklera Złomu, Pionierzy Segaris zmodyfikowali go tak, by był zgodny z ich ziemską gospodarką. Zamiast części kadłuba i claytroniki, wytwarza on węglan krzemu i substancję syntetyczną, w ten sam zmienny sposób, wykorzystując ten sam metal złomowy.(Silicon Carbide same as {20201,6301}, Computronic Substrate same as {20201,6001})</t>

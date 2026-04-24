@@ -3958,7 +3958,7 @@
     <t id="13325">Отмена выбора модуля</t>
     <t id="13326">Фокус на модель станции</t>
     <t id="13327">Приоритетный приказ в очереди</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">Скорость сбора(ресурсов; заголовок для столбца таблицы)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">До свидания</t>

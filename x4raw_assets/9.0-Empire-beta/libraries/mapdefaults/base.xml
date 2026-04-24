@@ -2002,6 +2002,11 @@ Resource Area Yield level
   <dataset macro="Cluster_43_macro">
     <properties>
       <identification name="{20003,430001}" description="{20003,430002}" system="19"/>
+    </properties>
+  </dataset>
+  <dataset macro="Cluster_43_Sector001_macro">
+    <properties>
+      <identification name="{20004,430011}" description="{20004,430012}"/>
       <resourceareas>
         <resourcearea amount="3" ref="sphere_large_ore_medium"/>
         <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
@@ -2013,11 +2018,6 @@ Resource Area Yield level
         <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
         <resourcearea amount="4" ref="sphere_small_silicon_high"/>
       </resourceareas>
-    </properties>
-  </dataset>
-  <dataset macro="Cluster_43_Sector001_macro">
-    <properties>
-      <identification name="{20004,430011}" description="{20004,430012}"/>
       <area sunlight="0.82" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
         <world part="planet1" factor="0.5"/>

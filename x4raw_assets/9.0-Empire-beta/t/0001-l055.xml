@@ -3752,8 +3752,8 @@
     <t id="12786">Geração de Quadros AMD FSR</t>
     <t id="12787">Suporte Experimental Aprimorado para Controles</t>
     <t id="12788">AMD FSR</t>
-    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12789">Se esta for sua primeira vez jogando X4, sugerimos que você experimente alguns tutoriais antes de começar sua jornada no universo aberto de X4.</t>
+    <t id="12790">Comece um Novo Universo Aberto</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Ações da Embaixada</t>
     <t id="12803">Diplomata</t>
@@ -3958,7 +3958,7 @@
     <t id="13325">Cancelar Seleção de Módulo</t>
     <t id="13326">Modelo de Estação de Foco</t>
     <t id="13327">Ordem de Prioridade na Fila</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">Taxa de coleta (de recursos; item de cabeçalho para coluna da tabela)</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Tchau</t>

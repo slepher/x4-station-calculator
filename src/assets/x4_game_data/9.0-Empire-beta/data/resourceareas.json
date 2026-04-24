@@ -9029,6 +9029,138 @@
   },
   {
     "cluster_id": "",
+    "sector_id": "cluster_43_sector001_macro",
+    "areas": [
+      {
+        "ref": "sphere_large_ore_medium",
+        "amount": 3,
+        "resources": [
+          {
+            "ware": "ore",
+            "reserve": 750000,
+            "respawn": 409091,
+            "delay": 110.0,
+            "rating": 13.0,
+            "objectyieldfactor": 1.0
+          }
+        ]
+      },
+      {
+        "ref": "sphere_medium_ore_medium",
+        "amount": 2,
+        "resources": [
+          {
+            "ware": "ore",
+            "reserve": 250000,
+            "respawn": 214286,
+            "delay": 70.0,
+            "rating": 10.0,
+            "objectyieldfactor": 1.0
+          }
+        ]
+      },
+      {
+        "ref": "sphere_small_ore_high",
+        "amount": 3,
+        "resources": [
+          {
+            "ware": "ore",
+            "reserve": 250000,
+            "respawn": 272727,
+            "delay": 55.0,
+            "rating": 9.0,
+            "objectyieldfactor": 1.2
+          }
+        ]
+      },
+      {
+        "ref": "sphere_large_rawscrap_low",
+        "amount": 8,
+        "resources": [
+          {
+            "ware": "rawscrap",
+            "reserve": 500000,
+            "respawn": 333333,
+            "delay": 90.0,
+            "rating": 11.0,
+            "objectyieldfactor": 0.7
+          }
+        ]
+      },
+      {
+        "ref": "sphere_medium_rawscrap_medium",
+        "amount": 3,
+        "resources": [
+          {
+            "ware": "rawscrap",
+            "reserve": 250000,
+            "respawn": 214286,
+            "delay": 70.0,
+            "rating": 10.0,
+            "objectyieldfactor": 1.0
+          }
+        ]
+      },
+      {
+        "ref": "sphere_tiny_rawscrap_veryhigh",
+        "amount": 2,
+        "resources": [
+          {
+            "ware": "rawscrap",
+            "reserve": 100000,
+            "respawn": 100000,
+            "delay": 60.0,
+            "rating": 6.0,
+            "objectyieldfactor": 1.5
+          }
+        ]
+      },
+      {
+        "ref": "sphere_large_silicon_low",
+        "amount": 5,
+        "resources": [
+          {
+            "ware": "silicon",
+            "reserve": 500000,
+            "respawn": 333333,
+            "delay": 90.0,
+            "rating": 11.0,
+            "objectyieldfactor": 0.7
+          }
+        ]
+      },
+      {
+        "ref": "sphere_medium_silicon_medium",
+        "amount": 2,
+        "resources": [
+          {
+            "ware": "silicon",
+            "reserve": 250000,
+            "respawn": 214286,
+            "delay": 70.0,
+            "rating": 10.0,
+            "objectyieldfactor": 1.0
+          }
+        ]
+      },
+      {
+        "ref": "sphere_small_silicon_high",
+        "amount": 4,
+        "resources": [
+          {
+            "ware": "silicon",
+            "reserve": 250000,
+            "respawn": 272727,
+            "delay": 55.0,
+            "rating": 9.0,
+            "objectyieldfactor": 1.2
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "cluster_id": "",
     "sector_id": "cluster_44_sector001_macro",
     "areas": [
       {

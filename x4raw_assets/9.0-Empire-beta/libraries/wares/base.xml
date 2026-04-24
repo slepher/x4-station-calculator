@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Last exported: 14.04.2026 21:18:26-->
+<!--Last exported: 21.04.2026 16:40:31-->
 <wares>
   <production>
     <method id="argon" name="{20206,201}">
@@ -9930,9 +9930,9 @@
     <price min="42166" average="46851" max="51536"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="50"/>
-        <ware ware="fieldcoils" amount="13"/>
-        <ware ware="shieldcomponents" amount="10"/>
+        <ware ware="energycells" amount="58"/>
+        <ware ware="fieldcoils" amount="14"/>
+        <ware ware="shieldcomponents" amount="12"/>
       </primary>
     </production>
     <component ref="shield_arg_l_standard_01_mk1_macro"/>
@@ -9948,9 +9948,9 @@
     <price min="205644" average="228494" max="251343"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="100"/>
-        <ware ware="fieldcoils" amount="65"/>
-        <ware ware="shieldcomponents" amount="50"/>
+        <ware ware="energycells" amount="357"/>
+        <ware ware="fieldcoils" amount="90"/>
+        <ware ware="shieldcomponents" amount="75"/>
       </primary>
     </production>
     <component ref="shield_arg_l_standard_01_mk2_macro"/>
@@ -9962,12 +9962,12 @@
     <owner faction="buccaneers"/>
   </ware>
   <ware id="shield_arg_m_standard_01_mk1" name="{20106,2004}" description="{20106,2002}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="12838" average="14264" max="15691"/>
+    <price min="15405" average="17117" max="18828"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="3"/>
-        <ware ware="shieldcomponents" amount="5"/>
+        <ware ware="energycells" amount="21"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="shieldcomponents" amount="4"/>
       </primary>
     </production>
     <component ref="shield_arg_m_standard_01_mk1_macro"/>
@@ -9981,12 +9981,12 @@
     <owner faction="hatikvah"/>
   </ware>
   <ware id="shield_arg_m_standard_01_mk2" name="{20106,2044}" description="{20106,2042}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="62115" average="69017" max="75918"/>
+    <price min="74538" average="82820" max="91102"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="fieldcoils" amount="15"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="129"/>
+        <ware ware="fieldcoils" amount="32"/>
+        <ware ware="shieldcomponents" amount="27"/>
       </primary>
     </production>
     <component ref="shield_arg_m_standard_01_mk2_macro"/>
@@ -9999,12 +9999,12 @@
     <owner faction="buccaneers"/>
   </ware>
   <ware id="shield_arg_m_standard_02_mk1" name="{20106,2004}" description="{20106,2002}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="12838" average="14264" max="15691"/>
+    <price min="15405" average="17117" max="18828"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="3"/>
-        <ware ware="shieldcomponents" amount="5"/>
+        <ware ware="energycells" amount="21"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="shieldcomponents" amount="4"/>
       </primary>
     </production>
     <component ref="shield_arg_m_standard_02_mk1_macro"/>
@@ -10017,12 +10017,12 @@
     <owner faction="hatikvah"/>
   </ware>
   <ware id="shield_arg_m_standard_02_mk2" name="{20106,2044}" description="{20106,2042}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="61597" average="68441" max="75285"/>
+    <price min="73916" average="82129" max="90342"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="fieldcoils" amount="15"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="128"/>
+        <ware ware="fieldcoils" amount="32"/>
+        <ware ware="shieldcomponents" amount="27"/>
       </primary>
     </production>
     <component ref="shield_arg_m_standard_02_mk2_macro"/>
@@ -10034,7 +10034,7 @@
     <owner faction="buccaneers"/>
   </ware>
   <ware id="shield_arg_s_standard_01_mk1" name="{20106,1004}" description="{20106,1002}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="1218" average="1354" max="1489"/>
+    <price min="1219" average="1354" max="1489"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
         <ware ware="energycells" amount="5"/>
@@ -10055,9 +10055,9 @@
     <price min="10186" average="11318" max="12449"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="fieldcoils" amount="2"/>
-        <ware ware="shieldcomponents" amount="5"/>
+        <ware ware="energycells" amount="17"/>
+        <ware ware="fieldcoils" amount="4"/>
+        <ware ware="shieldcomponents" amount="3"/>
       </primary>
     </production>
     <component ref="shield_arg_s_standard_01_mk2_macro"/>
@@ -10073,9 +10073,9 @@
     <price min="49892" average="55436" max="60979"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="10"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="114"/>
+        <ware ware="fieldcoils" amount="28"/>
+        <ware ware="shieldcomponents" amount="24"/>
       </primary>
     </production>
     <component ref="shield_arg_s_standard_01_mk3_macro"/>
@@ -10091,9 +10091,9 @@
     <price min="225671" average="250745" max="275820"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="150"/>
-        <ware ware="fieldcoils" amount="82"/>
-        <ware ware="shieldcomponents" amount="30"/>
+        <ware ware="energycells" amount="313"/>
+        <ware ware="fieldcoils" amount="79"/>
+        <ware ware="shieldcomponents" amount="66"/>
       </primary>
     </production>
     <component ref="shield_arg_xl_standard_01_mk1_macro"/>
@@ -10147,12 +10147,12 @@
     <owner faction="khaak"/>
   </ware>
   <ware id="shield_par_l_standard_01_mk1" name="{20106,3014}" description="{20106,3012}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="42166" average="46851" max="51536"/>
+    <price min="47226" average="52473" max="57720"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="50"/>
-        <ware ware="fieldcoils" amount="13"/>
-        <ware ware="shieldcomponents" amount="10"/>
+        <ware ware="energycells" amount="65"/>
+        <ware ware="fieldcoils" amount="16"/>
+        <ware ware="shieldcomponents" amount="13"/>
       </primary>
     </production>
     <component ref="shield_par_l_standard_01_mk1_macro"/>
@@ -10165,12 +10165,12 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_l_standard_01_mk2" name="{20106,3054}" description="{20106,3052}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="205644" average="228494" max="251343"/>
+    <price min="230322" average="255913" max="281505"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="100"/>
-        <ware ware="fieldcoils" amount="65"/>
-        <ware ware="shieldcomponents" amount="50"/>
+        <ware ware="energycells" amount="399"/>
+        <ware ware="fieldcoils" amount="100"/>
+        <ware ware="shieldcomponents" amount="85"/>
       </primary>
     </production>
     <component ref="shield_par_l_standard_01_mk2_macro"/>
@@ -10183,11 +10183,11 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_m_standard_01_mk1" name="{20106,2014}" description="{20106,2012}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="12838" average="14264" max="15691"/>
+    <price min="16946" average="18828" max="20711"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="3"/>
+        <ware ware="energycells" amount="23"/>
+        <ware ware="fieldcoils" amount="5"/>
         <ware ware="shieldcomponents" amount="5"/>
       </primary>
     </production>
@@ -10202,12 +10202,12 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_m_standard_01_mk2" name="{20106,2054}" description="{20106,2052}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="62115" average="69017" max="75918"/>
+    <price min="81992" average="91102" max="100213"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="fieldcoils" amount="15"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="142"/>
+        <ware ware="fieldcoils" amount="35"/>
+        <ware ware="shieldcomponents" amount="30"/>
       </primary>
     </production>
     <component ref="shield_par_m_standard_01_mk2_macro"/>
@@ -10221,12 +10221,12 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_m_standard_02_mk1" name="{20106,2014}" description="{20106,2012}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="12015" average="13350" max="14685"/>
+    <price min="15860" average="17622" max="19384"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="3"/>
-        <ware ware="shieldcomponents" amount="5"/>
+        <ware ware="energycells" amount="22"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="shieldcomponents" amount="4"/>
       </primary>
     </production>
     <component ref="shield_par_m_standard_02_mk1_macro"/>
@@ -10239,12 +10239,12 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_m_standard_02_mk2" name="{20106,2054}" description="{20106,2052}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="26058" average="28954" max="31849"/>
+    <price min="34397" average="38219" max="42041"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="40"/>
+        <ware ware="energycells" amount="59"/>
         <ware ware="fieldcoils" amount="15"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="shieldcomponents" amount="12"/>
       </primary>
     </production>
     <component ref="shield_par_m_standard_02_mk2_macro"/>
@@ -10257,10 +10257,10 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_s_standard_01_mk1" name="{20106,1014}" description="{20106,1012}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="1218" average="1354" max="1489"/>
+    <price min="1365" average="1516" max="1668"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="5"/>
+        <ware ware="energycells" amount="8"/>
         <ware ware="shieldcomponents" amount="1"/>
       </primary>
     </production>
@@ -10275,12 +10275,12 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_s_standard_01_mk2" name="{20106,1054}" description="{20106,1052}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="10186" average="11318" max="12449"/>
+    <price min="11409" average="12676" max="13944"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="fieldcoils" amount="2"/>
-        <ware ware="shieldcomponents" amount="5"/>
+        <ware ware="energycells" amount="19"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="shieldcomponents" amount="4"/>
       </primary>
     </production>
     <component ref="shield_par_s_standard_01_mk2_macro"/>
@@ -10294,12 +10294,12 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_s_standard_01_mk3" name="{20106,1094}" description="{20106,1092}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="49892" average="55436" max="60979"/>
+    <price min="55879" average="62088" max="68297"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="10"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="128"/>
+        <ware ware="fieldcoils" amount="32"/>
+        <ware ware="shieldcomponents" amount="27"/>
       </primary>
     </production>
     <component ref="shield_par_s_standard_01_mk3_macro"/>
@@ -10313,12 +10313,12 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="shield_par_xl_standard_01_mk1" name="{20106,4014}" description="{20106,4012}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="225671" average="250745" max="275820"/>
+    <price min="252751" average="280834" max="308918"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="150"/>
-        <ware ware="fieldcoils" amount="82"/>
-        <ware ware="shieldcomponents" amount="30"/>
+        <ware ware="energycells" amount="351"/>
+        <ware ware="fieldcoils" amount="88"/>
+        <ware ware="shieldcomponents" amount="74"/>
       </primary>
     </production>
     <component ref="shield_par_xl_standard_01_mk1_macro"/>
@@ -10334,9 +10334,9 @@
     <price min="42166" average="46851" max="51536"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="50"/>
-        <ware ware="fieldcoils" amount="13"/>
-        <ware ware="shieldcomponents" amount="10"/>
+        <ware ware="energycells" amount="58"/>
+        <ware ware="fieldcoils" amount="14"/>
+        <ware ware="shieldcomponents" amount="12"/>
       </primary>
     </production>
     <component ref="shield_tel_l_standard_01_mk1_macro"/>
@@ -10351,9 +10351,9 @@
     <price min="205644" average="228494" max="251343"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="100"/>
-        <ware ware="fieldcoils" amount="65"/>
-        <ware ware="shieldcomponents" amount="50"/>
+        <ware ware="energycells" amount="357"/>
+        <ware ware="fieldcoils" amount="90"/>
+        <ware ware="shieldcomponents" amount="75"/>
       </primary>
     </production>
     <component ref="shield_tel_l_standard_01_mk2_macro"/>
@@ -10364,12 +10364,12 @@
     <owner faction="teladi"/>
   </ware>
   <ware id="shield_tel_m_standard_01_mk1" name="{20106,2024}" description="{20106,2022}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="12838" average="14264" max="15691"/>
+    <price min="15405" average="17117" max="18828"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="3"/>
-        <ware ware="shieldcomponents" amount="5"/>
+        <ware ware="energycells" amount="21"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="shieldcomponents" amount="4"/>
       </primary>
     </production>
     <component ref="shield_tel_m_standard_01_mk1_macro"/>
@@ -10382,12 +10382,12 @@
     <owner faction="teladi"/>
   </ware>
   <ware id="shield_tel_m_standard_01_mk2" name="{20106,2064}" description="{20106,2062}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="62115" average="69017" max="75918"/>
+    <price min="74538" average="82820" max="91102"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="fieldcoils" amount="15"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="129"/>
+        <ware ware="fieldcoils" amount="32"/>
+        <ware ware="shieldcomponents" amount="27"/>
       </primary>
     </production>
     <component ref="shield_tel_m_standard_01_mk2_macro"/>
@@ -10399,11 +10399,11 @@
     <owner faction="teladi"/>
   </ware>
   <ware id="shield_tel_m_standard_02_mk1" name="{20106,2024}" description="{20106,2022}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="12015" average="13350" max="14685"/>
+    <price min="14418" average="16020" max="17622"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
         <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="3"/>
+        <ware ware="fieldcoils" amount="4"/>
         <ware ware="shieldcomponents" amount="5"/>
       </primary>
     </production>
@@ -10416,12 +10416,12 @@
     <owner faction="teladi"/>
   </ware>
   <ware id="shield_tel_m_standard_02_mk2" name="{20106,2064}" description="{20106,2062}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="26058" average="28954" max="31849"/>
+    <price min="31270" average="34745" max="38219"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="fieldcoils" amount="15"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="54"/>
+        <ware ware="fieldcoils" amount="13"/>
+        <ware ware="shieldcomponents" amount="11"/>
       </primary>
     </production>
     <component ref="shield_tel_m_standard_02_mk2_macro"/>
@@ -10432,10 +10432,10 @@
     <owner faction="teladi"/>
   </ware>
   <ware id="shield_tel_s_standard_01_mk1" name="{20106,1024}" description="{20106,1022}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="1218" average="1354" max="1489"/>
+    <price min="1219" average="1354" max="1489"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="5"/>
+        <ware ware="energycells" amount="6"/>
         <ware ware="shieldcomponents" amount="1"/>
       </primary>
     </production>
@@ -10449,12 +10449,12 @@
     <owner faction="teladi"/>
   </ware>
   <ware id="shield_tel_s_standard_01_mk2" name="{20106,1064}" description="{20106,1062}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="10186" average="11318" max="12449"/>
+    <price min="10186" average="11318" max="12450"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="fieldcoils" amount="2"/>
-        <ware ware="shieldcomponents" amount="5"/>
+        <ware ware="energycells" amount="17"/>
+        <ware ware="fieldcoils" amount="4"/>
+        <ware ware="shieldcomponents" amount="3"/>
       </primary>
     </production>
     <component ref="shield_tel_s_standard_01_mk2_macro"/>
@@ -10466,12 +10466,12 @@
     <owner faction="teladi"/>
   </ware>
   <ware id="shield_tel_s_standard_01_mk3" name="{20106,1104}" description="{20106,1102}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="49892" average="55436" max="60979"/>
+    <price min="49892" average="55436" max="60980"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="fieldcoils" amount="10"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="114"/>
+        <ware ware="fieldcoils" amount="28"/>
+        <ware ware="shieldcomponents" amount="24"/>
       </primary>
     </production>
     <component ref="shield_tel_s_standard_01_mk3_macro"/>
@@ -10486,9 +10486,9 @@
     <price min="225671" average="250745" max="275820"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="150"/>
-        <ware ware="fieldcoils" amount="82"/>
-        <ware ware="shieldcomponents" amount="30"/>
+        <ware ware="energycells" amount="313"/>
+        <ware ware="fieldcoils" amount="79"/>
+        <ware ware="shieldcomponents" amount="66"/>
       </primary>
     </production>
     <component ref="shield_tel_xl_standard_01_mk1_macro"/>
@@ -10502,16 +10502,16 @@
     <price min="41386" average="45984" max="50582"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="25"/>
-        <ware ware="fieldcoils" amount="90"/>
-        <ware ware="shieldcomponents" amount="55"/>
+        <ware ware="energycells" amount="57"/>
+        <ware ware="fieldcoils" amount="14"/>
+        <ware ware="shieldcomponents" amount="12"/>
       </primary>
     </production>
     <production time="20" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="25"/>
-        <ware ware="ore" amount="51"/>
-        <ware ware="silicon" amount="51"/>
+        <ware ware="energycells" amount="94"/>
+        <ware ware="ore" amount="91"/>
+        <ware ware="silicon" amount="70"/>
       </primary>
     </production>
     <component ref="shield_xen_l_standard_01_mk1_macro"/>
@@ -10523,16 +10523,16 @@
     <price min="110765" average="123072" max="135379"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="50"/>
-        <ware ware="fieldcoils" amount="210"/>
-        <ware ware="shieldcomponents" amount="200"/>
+        <ware ware="energycells" amount="192"/>
+        <ware ware="fieldcoils" amount="48"/>
+        <ware ware="shieldcomponents" amount="40"/>
       </primary>
     </production>
     <production time="20" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild" dismantlefactor="1.47">
       <primary>
-        <ware ware="energycells" amount="50"/>
-        <ware ware="ore" amount="138"/>
-        <ware ware="silicon" amount="138"/>
+        <ware ware="energycells" amount="253"/>
+        <ware ware="ore" amount="243"/>
+        <ware ware="silicon" amount="187"/>
       </primary>
     </production>
     <component ref="shield_xen_l_standard_01_mk2_macro"/>
@@ -10544,16 +10544,16 @@
     <price min="41386" average="45984" max="50582"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="25"/>
-        <ware ware="fieldcoils" amount="90"/>
-        <ware ware="shieldcomponents" amount="55"/>
+        <ware ware="energycells" amount="57"/>
+        <ware ware="fieldcoils" amount="14"/>
+        <ware ware="shieldcomponents" amount="12"/>
       </primary>
     </production>
     <production time="20" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="25"/>
-        <ware ware="ore" amount="51"/>
-        <ware ware="silicon" amount="51"/>
+        <ware ware="energycells" amount="94"/>
+        <ware ware="ore" amount="91"/>
+        <ware ware="silicon" amount="70"/>
       </primary>
     </production>
     <component ref="shield_xen_l_standard_02_mk1_macro"/>
@@ -10566,16 +10566,16 @@
     <price min="110765" average="123072" max="135379"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="50"/>
-        <ware ware="fieldcoils" amount="210"/>
-        <ware ware="shieldcomponents" amount="200"/>
+        <ware ware="energycells" amount="192"/>
+        <ware ware="fieldcoils" amount="48"/>
+        <ware ware="shieldcomponents" amount="40"/>
       </primary>
     </production>
     <production time="20" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild" dismantlefactor="1.47">
       <primary>
-        <ware ware="energycells" amount="50"/>
-        <ware ware="ore" amount="138"/>
-        <ware ware="silicon" amount="138"/>
+        <ware ware="energycells" amount="253"/>
+        <ware ware="ore" amount="243"/>
+        <ware ware="silicon" amount="187"/>
       </primary>
     </production>
     <component ref="shield_xen_l_standard_02_mk2_macro"/>
@@ -10585,12 +10585,12 @@
     <owner faction="xenon"/>
   </ware>
   <ware id="shield_xen_m_standard_01_mk1" name="{20106,2034}" description="{20106,2032}" group="shields" transport="equipment" volume="1" tags="equipment noplayerblueprint shield">
-    <price min="13478" average="14976" max="16474"/>
+    <price min="16174" average="17971" max="19768"/>
     <production time="10" amount="1" method="default" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="15"/>
-        <ware ware="ore" amount="16"/>
-        <ware ware="silicon" amount="16"/>
+        <ware ware="energycells" amount="11"/>
+        <ware ware="ore" amount="10"/>
+        <ware ware="silicon" amount="8"/>
       </primary>
     </production>
     <component ref="shield_xen_m_standard_01_mk1_macro"/>
@@ -10599,12 +10599,12 @@
     <owner faction="xenon"/>
   </ware>
   <ware id="shield_xen_m_standard_01_mk2" name="{20106,2074}" description="{20106,2072}" group="shields" transport="equipment" volume="1" tags="equipment noplayerblueprint shield">
-    <price min="27821" average="30912" max="34003"/>
+    <price min="33385" average="37094" max="40804"/>
     <production time="10" amount="1" method="default" name="{20206,601}" tags="noplayerbuild" dismantlefactor="1.79">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="ore" amount="34"/>
-        <ware ware="silicon" amount="34"/>
+        <ware ware="energycells" amount="23"/>
+        <ware ware="ore" amount="22"/>
+        <ware ware="silicon" amount="17"/>
       </primary>
     </production>
     <component ref="shield_xen_m_standard_01_mk2_macro"/>
@@ -10613,12 +10613,12 @@
     <owner faction="xenon"/>
   </ware>
   <ware id="shield_xen_m_standard_02_mk1" name="{20106,2034}" description="{20106,2032}" group="shields" transport="equipment" volume="1" tags="equipment noplayerblueprint shield">
-    <price min="13478" average="14976" max="16474"/>
+    <price min="16174" average="17971" max="19768"/>
     <production time="10" amount="1" method="default" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="15"/>
-        <ware ware="ore" amount="16"/>
-        <ware ware="silicon" amount="16"/>
+        <ware ware="energycells" amount="11"/>
+        <ware ware="ore" amount="10"/>
+        <ware ware="silicon" amount="8"/>
       </primary>
     </production>
     <component ref="shield_xen_m_standard_02_mk1_macro"/>
@@ -10627,12 +10627,12 @@
     <owner faction="xenon"/>
   </ware>
   <ware id="shield_xen_m_standard_02_mk2" name="{20106,2074}" description="{20106,2072}" group="shields" transport="equipment" volume="1" tags="equipment noplayerblueprint shield">
-    <price min="27821" average="30912" max="34003"/>
+    <price min="33385" average="37094" max="40804"/>
     <production time="10" amount="1" method="default" name="{20206,601}" tags="noplayerbuild" dismantlefactor="1.79">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="ore" amount="34"/>
-        <ware ware="silicon" amount="34"/>
+        <ware ware="energycells" amount="23"/>
+        <ware ware="ore" amount="22"/>
+        <ware ware="silicon" amount="17"/>
       </primary>
     </production>
     <component ref="shield_xen_m_standard_02_mk2_macro"/>
@@ -10641,19 +10641,19 @@
     <owner faction="xenon"/>
   </ware>
   <ware id="shield_xen_m_standard_04_mk1" name="{20106,2034}" description="{20106,2032}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="13478" average="14976" max="16474"/>
+    <price min="16174" average="17971" max="19768"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="15"/>
-        <ware ware="fieldcoils" amount="25"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="22"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="shieldcomponents" amount="4"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="15"/>
-        <ware ware="ore" amount="16"/>
-        <ware ware="silicon" amount="16"/>
+        <ware ware="energycells" amount="37"/>
+        <ware ware="ore" amount="35"/>
+        <ware ware="silicon" amount="27"/>
       </primary>
     </production>
     <component ref="shield_xen_m_standard_04_mk1_macro"/>
@@ -10663,19 +10663,19 @@
     <owner faction="xenon"/>
   </ware>
   <ware id="shield_xen_m_virtual_01_mk1" name="{20106,2034}" description="{20106,2032}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-    <price min="13478" average="14976" max="16474"/>
+    <price min="16174" average="17971" max="19768"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="15"/>
-        <ware ware="fieldcoils" amount="25"/>
-        <ware ware="shieldcomponents" amount="25"/>
+        <ware ware="energycells" amount="22"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="shieldcomponents" amount="4"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="15"/>
-        <ware ware="ore" amount="16"/>
-        <ware ware="silicon" amount="16"/>
+        <ware ware="energycells" amount="37"/>
+        <ware ware="ore" amount="35"/>
+        <ware ware="silicon" amount="27"/>
       </primary>
     </production>
     <component ref="shield_xen_m_virtual_01_mk1_macro"/>
@@ -10689,9 +10689,9 @@
     <price min="1901" average="2112" max="2323"/>
     <production time="10" amount="1" method="default" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="5"/>
-        <ware ware="ore" amount="2"/>
-        <ware ware="silicon" amount="2"/>
+        <ware ware="energycells" amount="3"/>
+        <ware ware="ore" amount="1"/>
+        <ware ware="silicon" amount="1"/>
       </primary>
     </production>
     <component ref="shield_xen_s_standard_01_mk1_macro"/>
@@ -10703,9 +10703,9 @@
     <price min="4579" average="5088" max="5597"/>
     <production time="10" amount="1" method="default" name="{20206,601}" tags="noplayerbuild" dismantlefactor="1.82">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="ore" amount="5"/>
-        <ware ware="silicon" amount="5"/>
+        <ware ware="energycells" amount="3"/>
+        <ware ware="ore" amount="3"/>
+        <ware ware="silicon" amount="2"/>
       </primary>
     </production>
     <component ref="shield_xen_s_standard_01_mk2_macro"/>
@@ -10718,15 +10718,14 @@
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
         <ware ware="energycells" amount="5"/>
-        <ware ware="fieldcoils" amount="4"/>
         <ware ware="shieldcomponents" amount="2"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="5"/>
-        <ware ware="ore" amount="2"/>
-        <ware ware="silicon" amount="2"/>
+        <ware ware="energycells" amount="3"/>
+        <ware ware="ore" amount="1"/>
+        <ware ware="silicon" amount="1"/>
       </primary>
     </production>
     <component ref="shield_xen_s_virtual_01_mk1_macro"/>
@@ -10740,9 +10739,9 @@
     <price min="221493" average="246104" max="270714"/>
     <production time="20" amount="1" method="default" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="77"/>
-        <ware ware="ore" amount="278"/>
-        <ware ware="silicon" amount="278"/>
+        <ware ware="energycells" amount="153"/>
+        <ware ware="ore" amount="147"/>
+        <ware ware="silicon" amount="113"/>
       </primary>
     </production>
     <component ref="shield_xen_xl_standard_01_mk1_macro"/>
@@ -11130,11 +11129,11 @@
     <owner faction="buccaneers"/>
   </ware>
   <ware id="ship_arg_m_trans_container_02_a" name="{20101,11702}" description="{20101,11712}" transport="ship" volume="1" tags="ship">
-    <price min="147352" average="173355" max="199358"/>
+    <price min="179422" average="199358" max="219294"/>
     <production time="16" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="90"/>
-        <ware ware="hullparts" amount="159"/>
+        <ware ware="energycells" amount="155"/>
+        <ware ware="hullparts" amount="226"/>
       </primary>
     </production>
     <component ref="ship_arg_m_trans_container_02_a_macro"/>
@@ -11144,11 +11143,11 @@
     <owner faction="buccaneers"/>
   </ware>
   <ware id="ship_arg_m_trans_container_02_b" name="{20101,11703}" description="{20101,11713}" transport="ship" volume="1" tags="ship">
-    <price min="177000" average="208235" max="239470"/>
+    <price min="215523" average="239470" max="263417"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="108"/>
-        <ware ware="hullparts" amount="191"/>
+        <ware ware="energycells" amount="187"/>
+        <ware ware="hullparts" amount="272"/>
       </primary>
     </production>
     <component ref="ship_arg_m_trans_container_02_b_macro"/>
@@ -13433,16 +13432,16 @@
     <price min="253435" average="281595" max="309754"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="120"/>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="engineparts" amount="48"/>
+        <ware ware="antimatterconverters" amount="100"/>
+        <ware ware="energycells" amount="158"/>
+        <ware ware="engineparts" amount="69"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="ore" amount="324"/>
-        <ware ware="silicon" amount="324"/>
+        <ware ware="energycells" amount="88"/>
+        <ware ware="ore" amount="197"/>
+        <ware ware="silicon" amount="129"/>
       </primary>
     </production>
     <component ref="thruster_gen_l_allround_01_mk1_macro"/>
@@ -13452,16 +13451,16 @@
     <price min="1266139" average="1406821" max="1547503"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="600"/>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="engineparts" amount="240"/>
+        <ware ware="antimatterconverters" amount="695"/>
+        <ware ware="energycells" amount="1099"/>
+        <ware ware="engineparts" amount="483"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="ore" amount="648"/>
-        <ware ware="silicon" amount="648"/>
+        <ware ware="energycells" amount="439"/>
+        <ware ware="ore" amount="984"/>
+        <ware ware="silicon" amount="649"/>
       </primary>
     </production>
     <component ref="thruster_gen_l_allround_01_mk2_macro"/>
@@ -13471,16 +13470,16 @@
     <price min="6328619" average="7031799" max="7734979"/>
     <production time="20" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="3000"/>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="engineparts" amount="1200"/>
+        <ware ware="antimatterconverters" amount="4588"/>
+        <ware ware="energycells" amount="7251"/>
+        <ware ware="engineparts" amount="3187"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="ore" amount="1296"/>
-        <ware ware="silicon" amount="1296"/>
+        <ware ware="energycells" amount="1098"/>
+        <ware ware="ore" amount="2461"/>
+        <ware ware="silicon" amount="1622"/>
       </primary>
     </production>
     <component ref="thruster_gen_l_allround_01_mk3_macro"/>
@@ -13491,15 +13490,15 @@
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
         <ware ware="antimatterconverters" amount="4"/>
-        <ware ware="energycells" amount="5"/>
-        <ware ware="engineparts" amount="4"/>
+        <ware ware="energycells" amount="7"/>
+        <ware ware="engineparts" amount="3"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="5"/>
-        <ware ware="ore" amount="15"/>
-        <ware ware="silicon" amount="15"/>
+        <ware ware="energycells" amount="4"/>
+        <ware ware="ore" amount="9"/>
+        <ware ware="silicon" amount="6"/>
       </primary>
     </production>
     <component ref="thruster_gen_m_allround_01_mk1_macro"/>
@@ -13509,16 +13508,16 @@
     <price min="58067" average="64519" max="70971"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="20"/>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="engineparts" amount="20"/>
+        <ware ware="antimatterconverters" amount="31"/>
+        <ware ware="energycells" amount="50"/>
+        <ware ware="engineparts" amount="22"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="ore" amount="30"/>
-        <ware ware="silicon" amount="30"/>
+        <ware ware="energycells" amount="20"/>
+        <ware ware="ore" amount="45"/>
+        <ware ware="silicon" amount="29"/>
       </primary>
     </production>
     <component ref="thruster_gen_m_allround_01_mk2_macro"/>
@@ -13528,16 +13527,16 @@
     <price min="289300" average="321445" max="353589"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="100"/>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="engineparts" amount="100"/>
+        <ware ware="antimatterconverters" amount="209"/>
+        <ware ware="energycells" amount="331"/>
+        <ware ware="engineparts" amount="145"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="ore" amount="60"/>
-        <ware ware="silicon" amount="60"/>
+        <ware ware="energycells" amount="50"/>
+        <ware ware="ore" amount="112"/>
+        <ware ware="silicon" amount="74"/>
       </primary>
     </production>
     <component ref="thruster_gen_m_allround_01_mk3_macro"/>
@@ -13547,16 +13546,16 @@
     <price min="14899" average="16555" max="18210"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="6"/>
-        <ware ware="energycells" amount="5"/>
+        <ware ware="antimatterconverters" amount="5"/>
+        <ware ware="energycells" amount="9"/>
         <ware ware="engineparts" amount="4"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
         <ware ware="energycells" amount="5"/>
-        <ware ware="ore" amount="19"/>
-        <ware ware="silicon" amount="19"/>
+        <ware ware="ore" amount="11"/>
+        <ware ware="silicon" amount="7"/>
       </primary>
     </production>
     <component ref="thruster_gen_m_combat_01_mk1_macro"/>
@@ -13566,16 +13565,16 @@
     <price min="73978" average="82198" max="90418"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="30"/>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="engineparts" amount="20"/>
+        <ware ware="antimatterconverters" amount="40"/>
+        <ware ware="energycells" amount="64"/>
+        <ware ware="engineparts" amount="28"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="ore" amount="38"/>
-        <ware ware="silicon" amount="38"/>
+        <ware ware="energycells" amount="25"/>
+        <ware ware="ore" amount="57"/>
+        <ware ware="silicon" amount="37"/>
       </primary>
     </production>
     <component ref="thruster_gen_m_combat_01_mk2_macro"/>
@@ -13585,16 +13584,16 @@
     <price min="368854" average="409838" max="450821"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="150"/>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="engineparts" amount="100"/>
+        <ware ware="antimatterconverters" amount="267"/>
+        <ware ware="energycells" amount="422"/>
+        <ware ware="engineparts" amount="185"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="ore" amount="76"/>
-        <ware ware="silicon" amount="76"/>
+        <ware ware="energycells" amount="64"/>
+        <ware ware="ore" amount="143"/>
+        <ware ware="silicon" amount="94"/>
       </primary>
     </production>
     <component ref="thruster_gen_m_combat_01_mk3_macro"/>
@@ -13604,53 +13603,54 @@
     <price min="5353" average="5948" max="6542"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="5"/>
-        <ware ware="engineparts" amount="4"/>
+        <ware ware="antimatterconverters" amount="2"/>
+        <ware ware="energycells" amount="3"/>
+        <ware ware="engineparts" amount="1"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="5"/>
-        <ware ware="ore" amount="7"/>
-        <ware ware="silicon" amount="7"/>
+        <ware ware="energycells" amount="1"/>
+        <ware ware="ore" amount="4"/>
+        <ware ware="silicon" amount="2"/>
       </primary>
     </production>
     <component ref="thruster_gen_s_allround_01_mk1_macro"/>
     <use threshold="0"/>
   </ware>
   <ware id="thruster_gen_s_allround_01_mk2" name="{20107,10014}" description="{20107,10012}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
-    <price min="83968" average="93298" max="102627"/>
+    <price min="39752" average="44169" max="48586"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="20"/>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="engineparts" amount="40"/>
+        <ware ware="antimatterconverters" amount="21"/>
+        <ware ware="energycells" amount="34"/>
+        <ware ware="engineparts" amount="15"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="ore" amount="14"/>
-        <ware ware="silicon" amount="14"/>
+        <ware ware="energycells" amount="13"/>
+        <ware ware="ore" amount="30"/>
+        <ware ware="silicon" amount="20"/>
       </primary>
     </production>
     <component ref="thruster_gen_s_allround_01_mk2_macro"/>
     <use threshold="0.4"/>
   </ware>
   <ware id="thruster_gen_s_allround_01_mk3" name="{20107, 10024}" description="{20107, 10022}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
-    <price min="199757" average="221952" max="244147"/>
+    <price min="157946" average="175495" max="193045"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="60"/>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="engineparts" amount="80"/>
+        <ware ware="antimatterconverters" amount="114"/>
+        <ware ware="energycells" amount="180"/>
+        <ware ware="engineparts" amount="79"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="ore" amount="28"/>
-        <ware ware="silicon" amount="28"/>
+        <ware ware="energycells" amount="27"/>
+        <ware ware="ore" amount="61"/>
+        <ware ware="silicon" amount="40"/>
       </primary>
     </production>
     <component ref="thruster_gen_s_allround_01_mk3_macro"/>
@@ -13660,54 +13660,54 @@
     <price min="6241" average="6934" max="7628"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="3"/>
-        <ware ware="energycells" amount="5"/>
+        <ware ware="antimatterconverters" amount="2"/>
+        <ware ware="energycells" amount="3"/>
         <ware ware="engineparts" amount="1"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="5"/>
-        <ware ware="ore" amount="8"/>
-        <ware ware="silicon" amount="8"/>
+        <ware ware="energycells" amount="2"/>
+        <ware ware="ore" amount="4"/>
+        <ware ware="silicon" amount="3"/>
       </primary>
     </production>
     <component ref="thruster_gen_s_combat_01_mk1_macro"/>
     <use threshold="0"/>
   </ware>
   <ware id="thruster_gen_s_combat_01_mk2" name="{20107,10064}" description="{20107,10062}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
-    <price min="39752" average="44169" max="48586"/>
+    <price min="83968" average="93298" max="102628"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="15"/>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="engineparts" amount="12"/>
+        <ware ware="antimatterconverters" amount="46"/>
+        <ware ware="energycells" amount="72"/>
+        <ware ware="engineparts" amount="32"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="ore" amount="16"/>
-        <ware ware="silicon" amount="16"/>
+        <ware ware="energycells" amount="13"/>
+        <ware ware="ore" amount="30"/>
+        <ware ware="silicon" amount="20"/>
       </primary>
     </production>
     <component ref="thruster_gen_s_combat_01_mk2_macro"/>
     <use threshold="0.4"/>
   </ware>
   <ware id="thruster_gen_s_combat_01_mk3" name="{20107,10074}" description="{20107,10072}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
-    <price min="157946" average="175495" max="193045"/>
+    <price min="199757" average="221952" max="244147"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="50"/>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="engineparts" amount="60"/>
+        <ware ware="antimatterconverters" amount="100"/>
+        <ware ware="energycells" amount="228"/>
+        <ware ware="engineparts" amount="144"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="ore" amount="32"/>
-        <ware ware="silicon" amount="32"/>
+        <ware ware="energycells" amount="34"/>
+        <ware ware="ore" amount="77"/>
+        <ware ware="silicon" amount="51"/>
       </primary>
     </production>
     <component ref="thruster_gen_s_combat_01_mk3_macro"/>
@@ -13717,16 +13717,16 @@
     <price min="538346" average="598162" max="657978"/>
     <production time="30" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="260"/>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="engineparts" amount="96"/>
+        <ware ware="antimatterconverters" amount="212"/>
+        <ware ware="energycells" amount="336"/>
+        <ware ware="engineparts" amount="147"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="ore" amount="687"/>
-        <ware ware="silicon" amount="687"/>
+        <ware ware="energycells" amount="186"/>
+        <ware ware="ore" amount="418"/>
+        <ware ware="silicon" amount="276"/>
       </primary>
     </production>
     <component ref="thruster_gen_xl_allround_01_mk1_macro"/>
@@ -13736,16 +13736,16 @@
     <price min="2690693" average="2989659" max="3288625"/>
     <production time="30" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="1300"/>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="engineparts" amount="480"/>
+        <ware ware="antimatterconverters" amount="1477"/>
+        <ware ware="energycells" amount="2335"/>
+        <ware ware="engineparts" amount="1026"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="20"/>
-        <ware ware="ore" amount="1374"/>
-        <ware ware="silicon" amount="1374"/>
+        <ware ware="energycells" amount="934"/>
+        <ware ware="ore" amount="2092"/>
+        <ware ware="silicon" amount="1379"/>
       </primary>
     </production>
     <component ref="thruster_gen_xl_allround_01_mk2_macro"/>
@@ -13755,16 +13755,16 @@
     <price min="13451392" average="14945991" max="16440590"/>
     <production time="30" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="antimatterconverters" amount="6500"/>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="engineparts" amount="2400"/>
+        <ware ware="antimatterconverters" amount="9752"/>
+        <ware ware="energycells" amount="15413"/>
+        <ware ware="engineparts" amount="6774"/>
       </primary>
     </production>
     <production time="10" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="40"/>
-        <ware ware="ore" amount="2748"/>
-        <ware ware="silicon" amount="2748"/>
+        <ware ware="energycells" amount="2335"/>
+        <ware ware="ore" amount="5231"/>
+        <ware ware="silicon" amount="3449"/>
       </primary>
     </production>
     <component ref="thruster_gen_xl_allround_01_mk3_macro"/>

@@ -7543,8 +7543,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 90.0,
-          "hullparts": 159.0
+          "energycells": 155.0,
+          "hullparts": 226.0
         }
       }
     ],
@@ -7715,8 +7715,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 108.0,
-          "hullparts": 191.0
+          "energycells": 187.0,
+          "hullparts": 272.0
         }
       }
     ],
@@ -15826,9 +15826,9 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 110.0,
-          "hullparts": 540.0,
-          "water": 245.0
+          "energycells": 573.0,
+          "hullparts": 746.0,
+          "water": 346.0
         }
       }
     ],
@@ -16123,9 +16123,9 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 110.0,
-          "hullparts": 574.0,
-          "water": 255.0
+          "energycells": 634.0,
+          "hullparts": 825.0,
+          "water": 383.0
         }
       }
     ],
@@ -17577,9 +17577,9 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 79.0,
-          "hullparts": 201.0,
-          "water": 110.0
+          "energycells": 278.0,
+          "hullparts": 362.0,
+          "water": 168.0
         }
       }
     ],
@@ -22245,8 +22245,8 @@
     "physics": {
       "mass": 325.0,
       "drag": {
-        "forward": 69.0,
-        "reverse": 345.0,
+        "forward": 65.7,
+        "reverse": 296.0,
         "horizontal": 48.0,
         "vertical": 48.0,
         "pitch": 118.0,
@@ -38572,8 +38572,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 92.0,
-          "hullparts": 317.0
+          "energycells": 273.0,
+          "hullparts": 398.0
         }
       }
     ],
@@ -38816,8 +38816,8 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 74.0,
-          "hullparts": 254.0
+          "energycells": 275.0,
+          "hullparts": 400.0
         }
       }
     ],
@@ -54496,17 +54496,17 @@
         "method": "default",
         "noplayerbuild": false,
         "cost": {
-          "energycells": 170.0,
-          "hullparts": 950.0
+          "energycells": 2182.0,
+          "hullparts": 3174.0
         }
       },
       {
         "method": "terran",
         "noplayerbuild": false,
         "cost": {
-          "computronicsubstrate": 24.0,
-          "energycells": 285.0,
-          "metallicmicrolattice": 42.0
+          "computronicsubstrate": 76.0,
+          "energycells": 2182.0,
+          "metallicmicrolattice": 698.0
         }
       }
     ],

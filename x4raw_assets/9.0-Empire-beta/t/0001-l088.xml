@@ -3333,10 +3333,10 @@
     <t id="11688">採礦船分析時間(followed by colon and added percentage)</t>
     <t id="11689">潛在資源</t>
     <t id="11690">已探明資源</t>
-    <t id="11691">Introducing Priority Orders</t>
-    <t id="11692">You can now use modifier keys to give queued \(%s($INPUT_MODIFIER_ICON$)\) and priority \(%s($INPUT_MODIFIER_ICON$)\) orders directly from the map or from within the Interact menu. By default, orders given to ships without using these modifier keys will now overwrite any previously queued order.</t>
-    <t id="11693">If you prefer the old behaviour then you can change the Default Order Behaviour setting in the Game Settings menu to Queue, so that pressing %s($INPUT_MODIFIER_ICON$) while using the Interact menu will overwrite the order instead of adding it to the queue.</t>
-    <t id="11694">Press Yes if you would like to try the new default modifier behaviour, or No if you would like to keep the old behaviour and use %s($INPUT_MODIFIER_ICON$) to overwrite orders.</t>
+    <t id="11691">優先指令說明</t>
+    <t id="11692">現在你可以使用快速鍵，直接在地圖或互動選單中下達佇列指令（%s($INPUT_MODIFIER_ICON$)）與優先指令（%s($INPUT_MODIFIER_ICON$)）。預設情況下，未使用快速鍵下達的指令會覆蓋佇列中的指令。</t>
+    <t id="11693">如果你更喜歡舊模式，可以在遊戲設定選單中將「預設指令行為」改為「佇列」，這樣在使用互動選單時按下%s($INPUT_MODIFIER_ICON$)就會覆蓋指令，而不是把它加入佇列中。</t>
+    <t id="11694">按「是」以試用新的預設修飾鍵行為，按「否」保持舊行為，使用%s($INPUT_MODIFIER_ICON$)覆蓋指令。</t>
     <t id="11695">Towable Wreck</t>
     <t id="11696">Dismantleable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
@@ -3752,8 +3752,8 @@
     <t id="12786">AMD FSR 超分辨率與幀生成</t>
     <t id="12787">實驗型改善控制器支援</t>
     <t id="12788">AMD FSR</t>
-    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12789">如果你是第一次遊玩《X4：基石》，我們建議你在完成教學後再開啟 X4 的開放宇宙之旅。</t>
+    <t id="12790">開始新的開放宇宙</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">大使館行動</t>
     <t id="12803">外交官</t>
@@ -3958,7 +3958,7 @@
     <t id="13325">取消選中模組</t>
     <t id="13326">聚焦空間站模型</t>
     <t id="13327">隊列中的優先指令</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">資源採集速率</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">再見</t>
@@ -7399,8 +7399,8 @@
     <t id="5901">《X4：基石》的展示場景</t>
     <t id="5902">展會環境</t>
     <t id="5904">歡迎來到《X4》！\n\n本次重點示範將帶你直接進入緊張刺激的戰鬥之中。在強大的主力艦與自動防禦系統支援下，你將加入一支盟軍艦隊，擊退敵軍，並保衛一座位於前線遭到圍攻的太空站，親身體驗《X4》中大規模太空戰鬥，\n\n在星門附近參與激烈的纏鬥。無需設定或停機時間，你可以立即上手，掌控飛船，親身感受《X4：基石》中的太空戰鬥宏大規模、緊張氛圍與震撼美感。</t>
-    <t id="5905">Tradeshow Playground</t>
-    <t id="5906">Welcome to X4!\n\nThis scenario drops you into a busy sector within a downscaled universe, giving you a taste of the immense scale and possibilities of X4: Foundations.</t>
+    <t id="5905">展覽示範場景</t>
+    <t id="5906">歡迎來到《X4：基石》！\\n\\n本場景會把你置於縮小版宇宙中的繁忙星域，讓你初步領略《X4：基石》中的宏大規模與無限可能。</t>
     <t id="6000">教程：進階遊戲玩法</t>
     <t id="6001">{1021,6101}</t>
     <t id="6002">雷瑪·塞迪姆</t>
@@ -8670,7 +8670,7 @@
     <t id="9929">您無法選擇此選項，因為這樣做會取消選擇一個解鎖您已放置資產的星區所必需的選項。</t>
     <t id="9930">無法選擇此自訂遊戲，因為它包含您尚未解鎖的受限物件。</t>
     <t id="9931">此自訂遊戲中存在包含不相容設備的飛船配置。不相容的設備將不會被安裝。</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">此自訂遊戲中存在過時的貨物或藍圖。受到影響的物品將不會被使用。</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">接受此任務意味著將放棄其他多元宇宙行動任務。</t>
@@ -11489,18 +11489,18 @@
     <t id="116">你可以使用鍵盤的 X 和 Y 鍵、滑鼠滾輪或油門杆來調整前進速度。</t>
     <t id="117">一旦你選定目標，瞄準系統就會嘗試鎖定。鎖定成功後，你可以按下 R 鍵或輔助射擊按鈕發射導彈。</t>
     <t id="200">(Tradeshow Playground Scenario)</t>
-    <t id="201">Welcome to X4: Foundations, a living universe with hundreds of sectors connected by gates. These sectors can be explored, and contain thousands of ships and stations operating within a fully simulated economy. You can own and command everything, ranging from a single tiny fighter to a grand empire with merchant fleets and powerful capital ships, to shape your story.</t>
-    <t id="202">This scenario places you near one of the many hundreds of bustling space stations you'll find in our living universe, with traders delivering wares and miners gathering resources. \nRecently there have been skirmishes with the machine intelligence known as the Xenon pouring in from the nearby gate, disrupting the trade.</t>
-    <t id="211">(explore explanation)Leaving the station behind, you are free to explore the other sectors and factions. The full X-Universe contains hundreds of unique sectors inhabited by various factions and species, all with rich history.</t>
-    <t id="212">(fight explanation)The Gate network is not always safe. Between the machine intelligence known as the Xenon, pirates, warring factions and the occasional war profiteering opportunist, you will see clashes ranging from small skirmishes to giant fleet brawls.</t>
-    <t id="213">(mining explanation)Ships like these mine the raw resources that the majority of the economy is based on. Once delivered they are refined, moved to factories and eventually turned into the wares that can be used to build the ships and stations you see.</t>
-    <t id="214">(trading explanation)Traders, haulers and merchants transport wares between stations. They buy where goods are plentiful and sell them where they are scarce, keeping the gears of the economy turning.</t>
-    <t id="215">(shipyard construction)This ship is currently under construction using the wares created by other stations. It will soon defend this sector from any further incursions.</t>
-    <t id="216">(launch tube explanation)The station is launching fighters from its launch tubes to defend itself from incoming attackers.</t>
-    <t id="217">(station attack explanation)A hostile Xenon force is approaching. If they damage the station, the production of new ships could be severely limited.</t>
-    <t id="218">(criminal explanation)Criminals try to capitalise on transporting illicit wares for great profits by hiding in traffic around stations. These criminals can even run organised operations with their own stations and masked freighters.</t>
-    <t id="219">(explore suggestion)There are more sights to see and things to do. Try flying around and targeting different objects.</t>
-    <t id="220">X4: Foundations has so much more to offer. You can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe.</t>
+    <t id="201">歡迎來到《X4：基石》--一個由星門連接、數百個星區組成的生動宇宙。你可以自由探索這些星區，整個宇宙中包含數千艘飛船和空間站，它們都在一個完全模擬的經濟體系中運行。從一架小小的戰鬥機，到擁有數十艘商船艦隊與強大主力艦的龐大帝國，一切皆可由你擁有，書寫屬於你自己的故事。</t>
+    <t id="202">本場景會將你傳送到這個生動宇宙中數百個繁忙空間站其中之一的附近，那裡有運送貨物的商船、採集資源的礦船。\n最近，一種被稱為「Xenon」的機械智能體從附近的星門大量湧入，與當地居民爆發了小規模衝突，擾亂了貿易秩序。</t>
+    <t id="211">(explore explanation)離開空間站之後，你就可以自由前往其他星區和勢力了。整個X宇宙中有幾百個各不相同的星區，裡面居住著各種各樣的勢力和種族，每一個星區背後都有一大堆故事。</t>
+    <t id="212">(fight explanation)星門網絡可不是一直太平的。所謂的智械危機「Xenon」、海盜、勢力戰爭，以及趁機牟取戰爭財富的機會主義者，遍地都是衝突。從小到小規模交火，到大到艦隊大混戰，你都可能遇到。</t>
+    <t id="213">(mining explanation)像這樣的船就是去挖原材料的，整個宇宙的經濟體系基本就靠這些原材料支撐。它們把礦物挖回來，先送去精煉，再運到工廠，最後變成你能見到的各種物資，去造那些飛船和空間站。</t>
+    <t id="214">(trading explanation)商船、貨運船和貿易員往返於各個空間站之間運貨。哪裡貨源充足就去哪裡買，哪裡缺貨就往哪裡賣，就這麼讓經濟這架機器一直運轉下去。</t>
+    <t id="215">(shipyard construction)這艘船正用其他空間站造出來的物資組裝。再過一會兒，它就能堅守這個星區，抵禦外敵了。</t>
+    <t id="216">(launch tube explanation)空間站正從發射管裡放出戰鬥機，從敵人的攻擊中保衛自身。</t>
+    <t id="217">(station attack explanation)一群敵對的「Xenon」正朝這邊過來。要是他們打壞空間站，新船的產量就要大幅受到影響了。</t>
+    <t id="218">(criminal explanation)那些罪犯喜歡混在空間站周圍的船流裡，偷偷走私違禁品來賺大錢。這群人甚至能搞起有組織的買賣，自己建空間站，還用偽裝過的貨船來運貨。</t>
+    <t id="219">(explore suggestion)還有好多地方可以逛，好多事可以做。試著到處飛一飛，隨便鎖定些什麼看看。</t>
+    <t id="220">《X4：基石》能玩的東西還有很多。你很快就能攢夠買下一整支船隊的錢。還能雇別的飛行員給你幹活，聽你指揮。讓他們去跑商或者挖礦，幫你賺錢；你自己也可以去推推劇情線，或者接接散落在廣袤宇宙裡的各種零散任務。</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
