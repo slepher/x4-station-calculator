@@ -1289,7 +1289,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 42000
+        "capacity": 52000
       }
     ],
     "dockarea": [
@@ -1578,7 +1578,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 50400
+        "capacity": 57200
       }
     ],
     "dockarea": [
@@ -1889,7 +1889,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 40000
+        "capacity": 50800
       }
     ],
     "dockarea": [
@@ -2200,7 +2200,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 50400
+        "capacity": 57200
       }
     ],
     "dockarea": [
@@ -15156,7 +15156,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 42000
+        "capacity": 49600
       }
     ],
     "dockarea": [
@@ -15432,7 +15432,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 40000
+        "capacity": 48500
       }
     ],
     "dockarea": [
@@ -22773,7 +22773,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 32000
+        "capacity": 43500
       }
     ],
     "dockarea": [
@@ -23004,7 +23004,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 38400
+        "capacity": 47500
       }
     ],
     "dockarea": [
@@ -23235,7 +23235,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 35200
+        "capacity": 45100
       }
     ],
     "dockarea": [
@@ -23492,7 +23492,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 32000
+        "capacity": 43500
       }
     ],
     "dockarea": [
@@ -23749,7 +23749,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 38400
+        "capacity": 47500
       }
     ],
     "dockarea": [
@@ -24006,7 +24006,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 34960
+        "capacity": 44960
       }
     ],
     "dockarea": [
@@ -25928,7 +25928,7 @@
     "crew": {
       "capacity": 6
     },
-    "hull": 12000,
+    "hull": 13200,
     "physics": {
       "mass": 26.5,
       "drag": {
@@ -33029,7 +33029,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 34000
+        "capacity": 45000
       }
     ],
     "dockarea": [
@@ -35853,7 +35853,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 22000
+        "capacity": 37000
       }
     ],
     "dockarea": [
@@ -36150,7 +36150,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 20000
+        "capacity": 35800
       }
     ],
     "dockarea": [
@@ -36754,7 +36754,7 @@
     "crew": {
       "capacity": 6
     },
-    "hull": 17000,
+    "hull": 18500,
     "physics": {
       "mass": 23.476,
       "drag": {
@@ -37025,7 +37025,7 @@
     "crew": {
       "capacity": 5
     },
-    "hull": 10000,
+    "hull": 11500,
     "physics": {
       "mass": 17.607,
       "drag": {
@@ -38792,8 +38792,8 @@
         "roll": 4.096
       },
       "accfactors": {
-        "horizontal": 0.95,
-        "vertical": 0.95
+        "horizontal": 1.0,
+        "vertical": 1.0
       }
     },
     "radarRange": 40000
@@ -40724,11 +40724,11 @@
     "crew": {
       "capacity": 128
     },
-    "hull": 202000,
+    "hull": 212800,
     "physics": {
       "mass": 1120.0,
       "drag": {
-        "forward": 189.0,
+        "forward": 185.0,
         "reverse": 800.0,
         "horizontal": 170.0,
         "vertical": 170.0,
@@ -42215,7 +42215,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 44000
+        "capacity": 52600
       }
     ],
     "dockarea": [
@@ -42542,7 +42542,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 52800
+        "capacity": 58000
       }
     ],
     "dockarea": [
@@ -42866,7 +42866,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 54000
+        "capacity": 58500
       }
     ],
     "dockarea": [
@@ -43193,7 +43193,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 48000
+        "capacity": 54800
       }
     ],
     "dockarea": [
@@ -43520,7 +43520,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 57600
+        "capacity": 60800
       }
     ],
     "dockarea": [
@@ -43844,7 +43844,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 50000
+        "capacity": 56300
       }
     ],
     "dockarea": [
@@ -53039,16 +53039,16 @@
     "crew": {
       "capacity": 75
     },
-    "hull": 104500,
+    "hull": 110000,
     "physics": {
-      "mass": 180.0,
+      "mass": 174.0,
       "drag": {
-        "forward": 56.0,
-        "reverse": 252.0,
+        "forward": 52.64,
+        "reverse": 237.0,
         "horizontal": 37.0,
         "vertical": 37.0,
-        "pitch": 84.0,
-        "yaw": 100.5,
+        "pitch": 82.0,
+        "yaw": 100.1,
         "roll": 69.0
       },
       "accfactors": {
@@ -53574,7 +53574,7 @@
     "cargo": [
       {
         "type": "liquid",
-        "capacity": 38000
+        "capacity": 51300
       }
     ],
     "dockarea": [
@@ -53612,15 +53612,15 @@
     },
     "hull": 48000,
     "physics": {
-      "mass": 120.0,
+      "mass": 140.0,
       "drag": {
-        "forward": 30.5,
-        "reverse": 137.3,
-        "horizontal": 69.0,
-        "vertical": 69.0,
-        "pitch": 100.0,
-        "yaw": 108.0,
-        "roll": 80.0
+        "forward": 28.0,
+        "reverse": 130.0,
+        "horizontal": 60.0,
+        "vertical": 60.0,
+        "pitch": 106.0,
+        "yaw": 106.0,
+        "roll": 117.0
       },
       "accfactors": {
         "horizontal": 1,
@@ -53874,7 +53874,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 38000
+        "capacity": 51300
       }
     ],
     "dockarea": [
@@ -53912,15 +53912,15 @@
     },
     "hull": 48000,
     "physics": {
-      "mass": 120.0,
+      "mass": 140.0,
       "drag": {
-        "forward": 30.5,
-        "reverse": 137.3,
-        "horizontal": 69.0,
-        "vertical": 69.0,
-        "pitch": 100.0,
-        "yaw": 108.0,
-        "roll": 80.0
+        "forward": 28.0,
+        "reverse": 130.0,
+        "horizontal": 60.0,
+        "vertical": 60.0,
+        "pitch": 106.0,
+        "yaw": 106.0,
+        "roll": 117.0
       },
       "accfactors": {
         "horizontal": 1,
@@ -55031,7 +55031,7 @@
     "crew": {
       "capacity": 23
     },
-    "hull": 20000,
+    "hull": 22000,
     "physics": {
       "mass": 45.1,
       "drag": {
@@ -59969,8 +59969,8 @@
     "physics": {
       "mass": 46.638,
       "drag": {
-        "forward": 7.788,
-        "reverse": 31.151,
+        "forward": 6.77,
+        "reverse": 30.47,
         "horizontal": 26.364,
         "vertical": 26.364,
         "pitch": 14.159,

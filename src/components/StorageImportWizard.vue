@@ -216,13 +216,13 @@ const handleApplyImport = async () => {
             <div class="flex items-center justify-between gap-4 text-sm">
               <span class="text-slate-400">{{ t('importExport.file_game_version') }}</span>
               <span class="text-slate-100" data-testid="storage-import-file-version">
-                {{ versionState ? gameDataStore.displayFullVersion(versionState.file.game_vsn, versionState.file.beta) : '' }}
+                {{ versionState ? gameDataStore.displayFullVersion(versionState.file.game_vsn, versionState.file.beta, false) : '' }}
               </span>
             </div>
             <div class="flex items-center justify-between gap-4 text-sm">
               <span class="text-slate-400">{{ t('importExport.current_game_version') }}</span>
               <span class="text-slate-100" data-testid="storage-import-current-version">
-                {{ versionState ? gameDataStore.displayFullVersion(versionState.current.game_vsn, versionState.current.beta) : '' }}
+                {{ versionState ? gameDataStore.displayFullVersion(versionState.current.game_vsn, versionState.current.beta, false) : '' }}
               </span>
             </div>
             <p

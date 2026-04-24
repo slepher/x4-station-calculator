@@ -76,8 +76,8 @@ const gameDataState = {
   currentVersion: '8.0',
   isBeta: false,
   hasStoredVersion: true,
-  displayVersion: (version: string, beta: boolean, codename?: string) => `${version}${codename ? `-${codename}` : ''}${beta ? '-beta' : ''}`,
-  displayFullVersion: (version: string, beta: boolean) => `${version}${beta ? '-beta' : ''}`,
+  displayVersion: (version: string, beta: boolean, codename?: string, miniVersion?: number) => `${version}${codename ? `-${codename}` : ''}${beta ? '-beta' : ''}${miniVersion !== undefined ? `-${miniVersion}` : ''}`,
+  displayFullVersion: (version: string, beta: boolean, showMiniVersion?: boolean) => `${version}${beta ? '-beta' : ''}`,
   getStorageKey: (module: string) => {
     const version = gameDataState.currentVersion
     const beta = gameDataState.isBeta
@@ -123,7 +123,7 @@ vi.mock('@/store/useGameDataStore', () => ({
     getStorageKey: gameDataState.getStorageKey,
     versionOptions: [
       { version: '8.0', codename: 'Diplomacy', beta: false, label: '8.0-Diplomacy' },
-      { version: '9.0', codename: 'Empire', beta: true, label: '9.0-Empire-beta' }
+      { version: '9.0', codename: 'Empire', beta: true, label: '9.0-Empire-beta-6' }
     ],
     setVersion: setVersionMock,
     persistVersionSelection: persistVersionSelectionMock,
@@ -214,12 +214,12 @@ describe('1 单元测试', () => {
 
   it('1.2 版本显示格式测试', async () => {
     const store = useGameDataStore()
-    expect(store.displayVersion('9.0', true, 'Empire')).toBe('9.0-Empire-beta')
+    expect(store.displayVersion('9.0', true, 'Empire', 6)).toBe('9.0-Empire-beta-6')
     expect(store.displayFullVersion('9.0', true)).toBe('9.0-beta')
     expect(store.displayFullVersion('8.0', false)).toBe('8.0')
     expect(store.versionOptions.map(option => option.label)).toEqual([
       '8.0-Diplomacy',
-      '9.0-Empire-beta'
+      '9.0-Empire-beta-6'
     ])
   })
 

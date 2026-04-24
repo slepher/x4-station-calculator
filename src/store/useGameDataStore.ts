@@ -25,7 +25,9 @@ import type {
   X4Missile,
   X4Res,
   X4Dlc,
-  X4SettingStorage
+  X4SettingStorage,
+  X4Ship,
+  X4Equipment
 } from '@/types/x4'
 import { generateFilteredModulesGrouped } from './logic/searchModule'
 import {
@@ -83,6 +85,8 @@ export const useGameDataStore = defineStore('gameData', () => {
   const languages = ref<X4Language[]>([])
   const dlcs = ref<X4Dlc[]>([])
   const dlcSetting = ref<X4SettingStorage>({})
+  const ships = ref<X4Ship[]>([])
+  const equipments = ref<X4Equipment[]>([])
 
   const factionColorMap = computed<Record<string, string>>(() => {
     const map: Record<string, string> = {}
@@ -102,20 +106,28 @@ export const useGameDataStore = defineStore('gameData', () => {
   function displayVersion(
     version: string = currentVersion.value,
     beta: boolean = isBeta.value,
-    codename?: string
+    codename?: string,
+    miniVersion?: number
   ): string {
     const resolvedCodename = codename
       || versionsConfig.value.find(v => v.version === version && v.beta === beta)?.codename
       || currentVersionConfig.value?.codename
       || ''
-    return `${version}${resolvedCodename ? `-${resolvedCodename}` : ''}${beta ? '-beta' : ''}`
+    const miniSuffix = miniVersion !== undefined ? `-${miniVersion}` : ''
+    return `${version}${resolvedCodename ? `-${resolvedCodename}` : ''}${beta ? '-beta' : ''}${miniSuffix}`
   }
 
   function displayFullVersion(
     version: string = currentVersion.value,
-    beta: boolean = isBeta.value
+    beta: boolean = isBeta.value,
+    showMiniVersion: boolean = true
   ): string {
-    return `${version}${beta ? '-beta' : ''}`
+    const isCurrentVersion = version === currentVersion.value && beta === isBeta.value
+    const config = isCurrentVersion
+      ? currentVersionConfig.value
+      : versionsConfig.value.find(v => v.version === version && v.beta === beta)
+    const miniSuffix = showMiniVersion && config?.mini_version !== undefined ? `-${config.mini_version}` : ''
+    return `${version}${beta ? '-beta' : ''}${miniSuffix}`
   }
 
   const versionOptions = computed(() => {
@@ -123,7 +135,7 @@ export const useGameDataStore = defineStore('gameData', () => {
       version: v.version,
       codename: v.codename,
       beta: v.beta,
-      label: displayVersion(v.version, v.beta, v.codename)
+      label: displayVersion(v.version, v.beta, v.codename, v.mini_version)
     }))
   })
 
@@ -398,6 +410,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     shipSlots.value = data.shipSlots
     languages.value = data.languages
     dlcs.value = data.dlcs
+    ships.value = data.ships
+    equipments.value = data.equipments
   }
 
   function setVersion(version: string, beta: boolean) {
@@ -530,6 +544,8 @@ export const useGameDataStore = defineStore('gameData', () => {
     needsDlcSetup,
     enforceDlcActivation,
     factionColorMap,
+    ships,
+    equipments,
     // Methods
     getStorageKey,
     setVersion,
