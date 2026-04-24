@@ -18294,8 +18294,64 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
+      "regions": [
+        {
+          "ref": "sphere_large_ore_medium",
+          "amount": 3
+        },
+        {
+          "ref": "sphere_medium_ore_medium",
+          "amount": 2
+        },
+        {
+          "ref": "sphere_small_ore_high",
+          "amount": 3
+        },
+        {
+          "ref": "sphere_large_rawscrap_low",
+          "amount": 8
+        },
+        {
+          "ref": "sphere_medium_rawscrap_medium",
+          "amount": 3
+        },
+        {
+          "ref": "sphere_tiny_rawscrap_veryhigh",
+          "amount": 2
+        },
+        {
+          "ref": "sphere_large_silicon_low",
+          "amount": 5
+        },
+        {
+          "ref": "sphere_medium_silicon_medium",
+          "amount": 2
+        },
+        {
+          "ref": "sphere_small_silicon_high",
+          "amount": 4
+        }
+      ],
+      "resources": [
+        {
+          "ware": "ore",
+          "reserve": 3500000,
+          "respawn": 2474026,
+          "rating": 5
+        },
+        {
+          "ware": "rawscrap",
+          "reserve": 4950000,
+          "respawn": 3509524,
+          "rating": 5
+        },
+        {
+          "ware": "silicon",
+          "reserve": 4000000,
+          "respawn": 3186147,
+          "rating": 5
+        }
+      ],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
