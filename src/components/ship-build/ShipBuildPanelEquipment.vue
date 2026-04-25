@@ -333,7 +333,6 @@ const comparisonData = computed<ComparisonItem[]>(() => {
       { key: 'travelAcceleration', labelKey: 'ship_build.equipment_travel_acceleration', unit: 'm/s²' },
       { key: 'travelCharge', labelKey: 'ship_build.equipment_travel_charge', unit: 's' },
       { key: 'travelAttack', labelKey: 'ship_build.equipment_travel_attack', unit: 's' },
-      { key: 'travelRelease', labelKey: 'ship_build.equipment_travel_release', unit: 's' },
     ]
 
     const maxValues: Record<string, number> = {}
