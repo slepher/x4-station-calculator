@@ -24,7 +24,7 @@ const modulesWithInfo = computed<Array<{ module: SavedModule; info: X4Module }>>
 
 <template>
   <section>
-    <div class="tier-section tier-auto">
+    <div class="tier-section tier-auto" data-testid="transit-hub-build-panel">
       <div class="tier-header">
         <span class="tier-label">{{ $t('sectorManagement.supply_build_zone') }}</span>
       </div>

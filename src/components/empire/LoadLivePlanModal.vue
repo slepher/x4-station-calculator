@@ -2,6 +2,7 @@
 import { useI18n } from 'vue-i18n'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useSaveStore } from '@/store/useSaveStore'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 
 const props = defineProps<{
@@ -12,6 +13,7 @@ const emit = defineEmits(['close'])
 const { t } = useI18n()
 const saveBindingStore = useSaveBindingStore()
 const saveStore = useSaveStore()
+const activeViewStore = useActiveViewStore()
 const liveStore = useLiveProductionStore()
 
 const formatDate = (ts: number) => new Date(ts).toLocaleString()
@@ -34,7 +36,9 @@ const handleDeleteBinding = (gameGuid: string) => {
       saveBindingStore.savedBindings.list.splice(idx, 1)
       saveBindingStore.writeState()
       if (saveBindingStore.activeGameGuid === gameGuid) {
-        saveBindingStore.setActiveBinding(null)
+        activeViewStore.activeBinding = null
+        activeViewStore.activeBindingStation = null
+        saveBindingStore.clearDraft()
       }
     }
   }
@@ -42,7 +46,7 @@ const handleDeleteBinding = (gameGuid: string) => {
 </script>
 
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+  <div v-if="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" data-testid="dialog-backdrop">
     <div
       class="w-full max-w-3xl bg-slate-800 border border-slate-600 rounded-lg shadow-2xl flex flex-col max-h-[85vh] animate-fade-in">
 

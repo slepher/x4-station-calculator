@@ -36,10 +36,10 @@ function handleTogglePriority(wareId: string) {
 </script>
 
 <template>
-  <div v-if="items.length > 0" class="group-container">
+  <div v-if="items.length > 0" class="group-container" data-testid="wareflow-group">
     <CollapsibleDetailList>
       <template #title>
-        <h4 class="group-title">{{ title }}</h4>
+        <h4 class="group-title" data-testid="wareflow-group-title">{{ title }}</h4>
       </template>
       <template #header>
         <slot></slot>

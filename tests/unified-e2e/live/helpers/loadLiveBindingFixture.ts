@@ -1,6 +1,6 @@
 import type { Page } from '@playwright/test'
-import dbFixture from '../../fixtures/db.json' with { type: 'json' }
-import saveFixture from '../../fixtures/save.json' with { type: 'json' }
+import dbFixture from '../../../fixtures/db.json' with { type: 'json' }
+import saveFixture from '../../../fixtures/save.json' with { type: 'json' }
 
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
 

@@ -82,7 +82,7 @@ const getStationCount = (detail: any) => detail.stationCount || 1
 </script>
 
 <template>
-  <div class="flow-wrapper" :data-resource-id="resourceId">
+  <div class="flow-wrapper" data-testid="flow-wrapper" :data-resource-id="resourceId">
     <div class="flow-content">
       <CollapsibleDetailList
         :data="formattedDetails"
@@ -125,6 +125,7 @@ const getStationCount = (detail: any) => detail.stationCount || 1
         v-if="showAddButton"
         class="action-btn add-btn"
         type="button"
+        data-testid="add-btn"
         :disabled="disableAdd"
         @click.stop="emit('add', resourceId)"
       >

@@ -235,6 +235,7 @@ const tabsToShow = computed(() => {
           tab.type === 'overview' ? 'overview-tab' : tab.type === 'transit' ? 'supply-tab' : 'station-tab',
           { 'active': activeTabId === tab.id }
         ]"
+        :data-testid="tab.type === 'overview' ? 'overview-tab' : tab.type === 'transit' ? 'supply-tab' : 'station-tab'"
         :data-tag="tab.tag"
         :data-factory-group="tab.factoryGroup"
         @click="tab.type === 'overview' ? openOverview() : tab.type === 'transit' ? openSupply(tab.sectorId!) : selectStationWithExpand(tab.id)"
@@ -247,7 +248,7 @@ const tabsToShow = computed(() => {
         </div>
       </div>
 
-      <button v-if="canCreateStation" class="add-btn" @click="addNewStation" :title="t('sector.add_station')">
+      <button v-if="canCreateStation" class="add-btn" data-testid="add-station-btn" @click="addNewStation" :title="t('sector.add_station')">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>

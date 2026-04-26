@@ -247,7 +247,6 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       binding.bindingName = getBindingDisplayName(gameGuid)
       savedBindings.value.list.push(binding)
     }
-    activeViewStore.setActiveId(gameGuid)
     loadDraft(gameGuid)
     if (draftBinding.value) {
       if (isNewBinding && !draftBinding.value.bindingName) {
@@ -264,13 +263,11 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
   }
 
   function setActiveBinding(gameGuid: string | null) {
-    activeViewStore.setActiveId(gameGuid)
-    if (gameGuid) loadDraft(gameGuid)
-    else {
-      draftBinding.value = null
-      lastSavedDraftSnapshot.value = ''
+    if (gameGuid) {
+      loadDraft(gameGuid)
+      return
     }
-    persistViewState()
+    clearDraft()
   }
 
   function loadDraftForGameGuid(gameGuid: string) {

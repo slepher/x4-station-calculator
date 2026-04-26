@@ -162,7 +162,7 @@ const handleUpdateSearchQuery = (value: string) => {
 
 <template>
   <div class="module-list-container">
-    <div class="search-panel">
+    <div class="search-panel" data-testid="search-panel-input">
       <StationModulePicker
         :search-query="searchQuery"
         :filtered-modules-grouped="filteredModulesGrouped"

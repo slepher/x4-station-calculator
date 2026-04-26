@@ -257,21 +257,22 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         playerStationRecords.value = []
         planningDerivedMap.value?.clear()
         liveFlowMap.value?.clear()
+        dirtyBindingStationIds.value = null
       } else {
         const bindingRecord = saveBindingStore.getBindingByGameGuid(binding.gameGuid)
         if (bindingRecord) {
           const currentTime = bindingRecord.selectedArchiveTime
-          const archiveStillValid = currentTime != null
+          const archiveStillValid = currentTime !== null
             ? archiveGroup!.saves.some(s => s.meta.time === currentTime && s.isValid)
             : false
-          if (!archiveStillValid && currentTime != null) {
+          if (!archiveStillValid && currentTime !== null) {
             const latest = [...archiveGroup!.saves].sort((a, b) => b.meta.time - a.meta.time).find(s => s.isValid)
             if (latest) {
-              bindingRecord.selectedArchiveTime = latest.meta.time
-              await saveStore.selectArchive(binding.gameGuid, latest.meta.time)
+              saveBindingStore.setSelectedArchiveTime(binding.gameGuid, latest.meta.time)
             }
           }
         }
+        await activateBinding(binding.gameGuid)
       }
     }
   )

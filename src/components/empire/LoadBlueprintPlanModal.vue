@@ -48,7 +48,7 @@ const getEmpireLastUpdated = (empireId: string) => {
 </script>
 
 <template>
-  <div v-if="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+  <div v-if="isOpen" class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4" data-testid="dialog-backdrop">
     <div
       class="w-full max-w-3xl bg-slate-800 border border-slate-600 rounded-lg shadow-2xl flex flex-col max-h-[85vh] animate-fade-in">
 
@@ -102,7 +102,8 @@ const getEmpireLastUpdated = (empireId: string) => {
 
           <div class="flex items-center gap-3 pt-2 border-t border-slate-700/50">
             <button @click="handleLoadEmpire(empire.id)"
-              class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 px-3 py-1.5 rounded transition">
+              class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-blue-400 hover:text-blue-300 hover:bg-blue-900/30 px-3 py-1.5 rounded transition"
+              data-testid="load-empire-btn">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path d="M15 3h6v6" />
                 <path d="M10 14L21 3" />
@@ -114,7 +115,8 @@ const getEmpireLastUpdated = (empireId: string) => {
             <div class="flex-1"></div>
 
             <button @click="handleDeleteEmpire(empire.id)"
-              class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded transition">
+              class="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-red-400 hover:text-red-300 hover:bg-red-900/30 px-3 py-1.5 rounded transition"
+              data-testid="delete-empire-btn">
               <svg class="w-3.5 h-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <polyline points="3 6 5 6 21 6" />
                 <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2" />

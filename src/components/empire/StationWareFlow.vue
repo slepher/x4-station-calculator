@@ -155,20 +155,20 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
 </script>
 
 <template>
-  <div class="flow-wrapper" :data-resource-id="resourceId">
+  <div class="flow-wrapper" data-testid="flow-wrapper" :data-resource-id="resourceId">
     <div class="flow-content">
       <CollapsibleDetailList
         :data="formattedDetails"
         :isPositive="displayValue >= 0"
       >
         <template #title>
-          <span class="header-name">{{ name }}</span>
+          <span class="header-name" data-testid="flow-name">{{ name }}</span>
         </template>
         <template #header>
-          <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
+          <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'" data-testid="flow-value">
             {{ formattedDisplayValue }}
           </div>
-          <div v-if="viewMode === 'transport'" class="value value-transport">
+          <div v-if="viewMode === 'transport'" class="value value-transport" data-testid="flow-value">
             {{ formattedDisplayValue }}
             <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="1" y="3" width="15" height="13"></rect>
@@ -179,7 +179,7 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           </div>
           <tippy v-if="viewMode === 'volume'" theme="x4" :allowHTML="true" interactive>
             <div class="volume-trigger-container">
-              <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none">
+              <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none" data-testid="volume-count">
                 {{ Math.ceil(totalOccupiedCount) }}
               </span>
               <div class="icon-anchor">

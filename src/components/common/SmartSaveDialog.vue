@@ -155,7 +155,7 @@ const handleDiscard = () => {
 </script>
 
 <template>
-  <div v-if="isOpen"
+  <div v-if="isOpen" data-testid="dialog-backdrop"
     class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
     <div
       class="w-full max-w-md bg-slate-800 border border-slate-600 rounded-lg shadow-2xl flex flex-col overflow-hidden transition-all duration-300">

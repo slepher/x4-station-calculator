@@ -240,7 +240,7 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
     </div>
 
     <div class="list-body custom-scrollbar">
-      <div v-if="viewMode === 'volume'" class="volume-groups-container">
+      <div v-if="viewMode === 'volume'" class="volume-groups-container" data-testid="volume-groups">
         <StationWareFlowGroup v-for="(group, index) in volumeGroups" :key="index"
             :title="group.title"
             :items="group.items"
@@ -256,7 +256,7 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
             :onToggleWareLock="props.onToggleWareLock"
             :onToggleWarePriority="props.onToggleWarePriority"
         >
-          <span class="volume-group-planning">
+          <span class="volume-group-planning" data-testid="volume-group-planning">
             {{ getGroupVolume(group.items) }}m³
           </span>
           <svg class="w-3.5 h-3.5 text-blue-300/60" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -283,8 +283,8 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
           :onToggleWareLock="props.onToggleWareLock"
           :onToggleWarePriority="props.onToggleWarePriority"
         >
-          <div class="transport-group-value">
-            <span class="transport-group-sum">
+            <div class="transport-group-value" data-testid="transport-group-value">
+            <span class="transport-group-sum" data-testid="transport-group-sum">
               {{ getGroupTransport(group.items) }}m³
             </span>
             <svg
@@ -345,7 +345,7 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
             :onToggleWareLock="props.onToggleWareLock"
             :onToggleWarePriority="props.onToggleWarePriority"
           > 
-            <span v-if="viewMode === 'economy'" :class="['economy-group-sum', group.symbolClass]"> 
+            <span v-if="viewMode === 'economy'" :class="['economy-group-sum', group.symbolClass]" data-testid="economy-group-sum"> 
               {{ getGroupSymboledValue(group.items) }} Cr 
             </span> 
           </StationWareFlowGroup>
@@ -378,7 +378,7 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
       </div>
     </div>
 
-    <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'">
+    <div class="profit-section" v-if="hasFlowData && viewMode === 'economy'" data-testid="profit-section">
       <div class="simulation-controls flex flex-row gap-4">
         <PriceSlider v-model="buyMultiplier" :label="t('wareflow.res_price')" type="buy" />
         <PriceSlider v-model="sellMultiplier" :label="t('wareflow.prod_price')" type="sell" />
@@ -391,7 +391,7 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
           </svg>
           {{ t('wareflow.profit_footer') }}
         </span>
-        <span class="profit-val" :class="totalProfit >= 0 ? 'positive' : 'negative'">
+        <span class="profit-val" :class="totalProfit >= 0 ? 'positive' : 'negative'" data-testid="profit-val">
           {{ formatNum(totalProfit) }} Cr
         </span>
       </div>

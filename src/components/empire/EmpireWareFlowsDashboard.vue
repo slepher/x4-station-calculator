@@ -194,7 +194,7 @@ const transportTotalVolume = computed(() =>
 </script>
 
 <template>
-  <div class="list-wrapper">
+  <div class="list-wrapper" data-testid="empire-wareflow-dashboard">
     <div class="list-header">
       <h3 class="header-title">
         {{ title() }}
