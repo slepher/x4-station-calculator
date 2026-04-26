@@ -181,16 +181,18 @@ const showArchiveModuleList = computed(() => {
       </div>
     </div>
 
-    <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="overview-layout mt-6">
-      <div class="overview-left-panel panel-card">
-        <div class="panel-header">{{ t('save_import.title') }}</div>
-        <div class="panel-content">
-          <SaveUploadPanel @upload-complete="() => {}" />
-          <SaveList />
+    <div v-else-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout mt-6">
+      <div class="col-span-12 lg:col-span-3">
+        <div class="overview-left-panel panel-card">
+          <div class="panel-header">{{ t('save_import.title') }}</div>
+          <div class="panel-content">
+            <SaveUploadPanel @upload-complete="() => {}" />
+            <SaveList />
+          </div>
         </div>
       </div>
 
-      <div class="col-span-1 lg:col-span-3">
+      <div class="col-span-12 lg:col-span-5">
         <EmpireWareFlowsDashboard
           :grouped-flows="liveStore.empireGroupedFlows"
           :buy-multiplier="overviewBuyMultiplier"
@@ -199,6 +201,8 @@ const showArchiveModuleList = computed(() => {
           @update:sell-multiplier="overviewSellMultiplier = $event"
         />
       </div>
+
+      <div class="col-span-12 lg:col-span-4"></div>
     </div>
   </template>
 
@@ -264,12 +268,8 @@ const showArchiveModuleList = computed(() => {
   @apply grid grid-cols-12 gap-8 items-start;
 }
 
-.overview-layout {
-  @apply grid grid-cols-1 lg:grid-cols-5 gap-8 items-start;
-}
-
 .overview-left-panel {
-  @apply lg:col-span-2 flex flex-col;
+  @apply flex flex-col;
 }
 
 .overview-left-panel.panel-card {
