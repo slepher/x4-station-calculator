@@ -1,11 +1,8 @@
-# Production UI Specification
+# production-ui Specification
 
 ## Purpose
-
-量化生产界面（ProductionWorkbenchView）在 `save-binding` production source 下需要适配用户交互体验。
-
-## ADDED Requirements
-
+TBD - created by archiving change user-save-binding-station. Update Purpose after archive.
+## Requirements
 ### Requirement: Binding Production Source
 
 系统 MUST 在 `useEmpireStore` 中提供 `productionSource` 状态管理。
@@ -107,3 +104,4 @@
 - **那么** 系统 SHALL 从 `stationId` 提取 planId
 - **并且** 调用 `saveBindingStore.updateStationPlan(gameGuid, planId, { settings })`
 - **并且** 同步更新 `StationStateMap` 以触发 recompute
+

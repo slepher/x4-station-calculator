@@ -1,11 +1,8 @@
-# Station Tab Bar Specification
+# station-tab-bar Specification
 
 ## Purpose
-
-定义 StationTabBar 组件的行为规范，区分星区版与简化版。
-
-## ADDED Requirements
-
+TBD - created by archiving change production-workbench-refactory. Update Purpose after archive.
+## Requirements
 ### Requirement: Simplified StationTabBar
 
 简化版 StationTabBar 用于无星区场景（BlueprintProduction）。 SHALL pass validation
@@ -76,15 +73,3 @@ BlueprintProductionStore 的站点列表不再按星区分组。 SHALL pass vali
 **当** 用户尝试访问 Transit 功能
 **那么** 系统无响应（功能已移除）
 
-## REMOVED Requirements
-
-- BlueprintProductionStore 的 `sectors` 属性
-- BlueprintProductionStore 的 `sectorLinks` 属性
-- BlueprintProductionStore 的 `activeTransitSectorId` computed
-- BlueprintProductionStore 的 `selectTransitSector` 方法
-- BlueprintProductionStore 的 `selectOverview` 方法
-- BlueprintProductionStore 的 `getTransitHubViewModel` 方法
-- BlueprintProductionWorkbenchView 的 Transit Hub 视图模板
-- BlueprintProductionWorkbenchView 的 Overview 视图模板
-
-移除原因：BlueprintProduction 用于纯蓝图规划，不涉及存档数据的星区概念。星区功能仅在 LiveProduction（Binding 模式）中使用。

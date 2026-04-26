@@ -25,40 +25,6 @@
 - **那么** 系统 SHALL 只接收"显示哪份 archive"的事件
 - **并且** SHALL NOT 通过事件回写 `saveStore.activeArchiveId`
 
-### Requirement: Binding Entry in Save Homepage
-
-系统 MUST 从存档首页打开或创建独立 save binding。
-
-#### Scenario: 用户点击 guid binding 图标
-- **前提** 用户位于存档首页
-- **当** 用户点击某个 `gameGuid` 的 binding 图标
-- **那么** 系统 SHALL 打开或创建该 `gameGuid` 的唯一 binding
-- **并且** SHALL 进入 binding group 编辑视图
-- **并且** SHALL 将量化生产 active source 切换为该 `gameGuid` 对应的 `save-binding`
-
-#### Scenario: 用户点击 time binding 图标
-- **前提** 用户位于存档首页某个 time 条目
-- **当** 用户点击该 time 的 binding 图标
-- **那么** 系统 SHALL 打开同一 `gameGuid` 的 binding
-- **并且** SHALL 将 `selectedArchiveTime` 设置为该 time
-- **并且** SHALL 将量化生产 active source 切换为该 `gameGuid` 对应的 `save-binding`
-
-#### Scenario: dirty empire 点击 binding 图标
-- **前提** 用户位于存档首页
-- **并且** 量化生产当前 active source 是 `empire`
-- **并且** 当前 active empire 存在 dirty 改动
-- **当** 用户点击某个 `gameGuid` 的 binding 图标
-- **那么** 系统 SHALL 显示与 dirty empire 点击新建按钮相同语义的保存确认界面
-- **当** 用户选择保存
-- **那么** 系统 SHALL 先保存当前 empire，再打开或创建该 `gameGuid` 的 binding
-- **并且** SHALL 将量化生产 active source 切换为该 `gameGuid` 对应的 `save-binding`
-- **当** 用户选择放弃
-- **那么** 系统 SHALL 放弃当前 empire 改动，再打开或创建该 `gameGuid` 的 binding
-- **并且** SHALL 将量化生产 active source 切换为该 `gameGuid` 对应的 `save-binding`
-- **当** 用户关闭或取消确认
-- **那么** 系统 SHALL NOT 打开 binding
-- **并且** SHALL NOT 切换量化生产 active source
-
 ### Requirement: Step 2 Binding Group Editing
 
 系统 MUST 在 Step 2 编辑 binding groups，而不是 empire sectors。
@@ -204,8 +170,6 @@
 - **当** 菜单内容需要滚动
 - **那么** 滚动条样式 SHALL 与 Step 2 绑定菜单统一
 
-## MODIFIED Requirements
-
 ### Requirement: Drag Interaction on Map
 
 系统 MUST 在模块搜索面板与 Step 3 导入之间共享排序规则。
@@ -253,3 +217,41 @@
 - **前提** binding 存在未保存改动
 - **当** 用户关闭面板或切换到另一个 binding
 - **那么** 系统 SHALL 提供保存、放弃或继续编辑的选择
+
+## MODIFIED Requirements
+
+### Requirement: Binding Entry in Save Homepage
+
+系统 MUST 从存档首页打开或创建独立 save binding。
+
+**变更说明**：扩展了原来的 Scenario，增加 time binding 图标和 dirty empire 保存确认流程。
+
+#### Scenario: 用户点击 guid binding 图标
+- **前提** 用户位于存档首页
+- **当** 用户点击某个 `gameGuid` 的 binding 图标
+- **那么** 系统 SHALL 打开或创建该 `gameGuid` 的唯一 binding
+- **并且** SHALL 进入 binding group 编辑视图
+- **并且** SHALL 将量化生产 active source 切换为该 `gameGuid` 对应的 `save-binding`
+
+#### Scenario: 用户点击 time binding 图标
+- **前提** 用户位于存档首页某个 time 条目
+- **当** 用户点击该 time 的 binding 图标
+- **那么** 系统 SHALL 打开同一 `gameGuid` 的 binding
+- **并且** SHALL 将 `selectedArchiveTime` 设置为该 time
+- **并且** SHALL 将量化生产 active source 切换为该 `gameGuid` 对应的 `save-binding`
+
+#### Scenario: dirty empire 点击 binding 图标
+- **前提** 用户位于存档首页
+- **并且** 量化生产当前 active source 是 `empire`
+- **并且** 当前 active empire 存在 dirty 改动
+- **当** 用户点击某个 `gameGuid` 的 binding 图标
+- **那么** 系统 SHALL 显示与 dirty empire 点击新建按钮相同语义的保存确认界面
+- **当** 用户选择保存
+- **那么** 系统 SHALL 先保存当前 empire，再打开或创建该 `gameGuid` 的 binding
+- **并且** SHALL 将量化生产 active source 切换为该 `gameGuid` 对应的 `save-binding`
+- **当** 用户选择放弃
+- **那么** 系统 SHALL 放弃当前 empire 改动，再打开或创建该 `gameGuid` 的 binding
+- **并且** SHALL 将量化生产 active source 切换为该 `gameGuid` 对应的 `save-binding`
+- **当** 用户关闭或取消确认
+- **那么** 系统 SHALL NOT 打开 binding
+- **并且** SHALL NOT 切换量化生产 active source

@@ -3,7 +3,7 @@
 ## Purpose
 补充导入/导出协议中的游戏版本元数据、导入阶段的跨版本失效数据清洗与提示机制，并统一导入/导出模块名称的 i18n 语义，使其与版本切换场景一致且面向用户统一使用 `Sector / 星区` 命名。
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Import-Export UI Workflow
 系统 MUST 通过 TabBar 上现有导入导出按钮承载导入导出流程，并在导入/导出界面补充版本与模块语义信息。

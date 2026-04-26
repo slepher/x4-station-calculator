@@ -3,7 +3,7 @@
 ## Purpose
 调整 empire 管理边界，使 empire 不再承担 save binding 与 binding 星区职责，仅保存普通 station 规划；并添加 productionSource 路由以支持 empire / save-binding 数据源切换。
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Empire Persistence Boundary
 
@@ -49,10 +49,5 @@
 
 ## REMOVED Requirements
 
-### Requirement: Empire Owns Binding Sectors
-
-移除理由：binding 星区已经改为 `SaveBindingPlan.groups`，empire 不再保存星区划分或作为 binding Step 2 的数据来源。
-
-### Requirement: Empire Stores Save Bindings
-
-移除理由：save binding 使用独立 `x4_save_bindings` storage，并以 `gameGuid` 为唯一身份。
+- Empire Owns Binding Sectors: binding 星区已经改为 `SaveBindingPlan.groups`，empire 不再保存星区划分或作为 binding Step 2 的数据来源。
+- Empire Stores Save Bindings: save binding 使用独立 `x4_save_bindings` storage，并以 `gameGuid` 为唯一身份。

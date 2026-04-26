@@ -1,10 +1,8 @@
-# Save Local Storage Specification
+# save-local-storage Specification
 
 ## Purpose
-定义 Save Import 持久化从“IndexedDB 同时承载 meta 与正文”调整为“版本化 `localStorage` 承载目录状态，IndexedDB 只承载正文”的要求，并确保 Save 模块复用现有游戏版本作用域设计。
-
-## ADDED Requirements
-
+TBD - created by archiving change save-archive-infra. Update Purpose after archive.
+## Requirements
 ### Requirement: Save Store SHALL Use Versioned LocalStorage State
 Save Store MUST 使用当前游戏版本配置中的 save storage key，将存档目录状态持久化到 `localStorage`。
 
@@ -138,3 +136,4 @@ Save Import 恢复链路 MUST 从 IndexedDB 列表恢复改为从版本化 `loca
 - **当** Save Store 初始化左侧存档列表
 - **那么** 它 SHALL 从当前版本作用域的 `localStorage` 读取 `ArchiveMeta` 列表
 - **并且** SHALL 不再依赖 IndexedDB 列表表作为一级列表来源
+

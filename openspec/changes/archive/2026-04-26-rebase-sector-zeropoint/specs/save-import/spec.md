@@ -4,7 +4,7 @@
 
 使存档兴趣点与存档站点坐标在导入后直接对齐当前 sector 局部坐标语义，避免地图渲染阶段重复推导和错位。
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Save Archive Position Normalization
 

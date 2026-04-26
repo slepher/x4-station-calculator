@@ -1,11 +1,8 @@
-# Production Store Presenter View Specification
+# production-store-present-view Specification
 
 ## Purpose
-
-定义 production workbench 的强制分层边界，使系统必须稳定为 `store -> presenter -> view` 三层结构，并确保 live 侧 `archiveStation` 保持为 store 领域模型而不是 presenter 拼装结果。
-
-## ADDED Requirements
-
+TBD - created by archiving change production-workbench-refactory. Update Purpose after archive.
+## Requirements
 ### Requirement: Store SHALL Preserve Live Domain Models
 
 production live store MUST 保留 live 领域模型，不得为了接口表面统一而错误下沉领域对象。
@@ -168,3 +165,4 @@ production workbench 的主边界必须直接暴露"领域对象 + 动作接口"
 **当** 需要新增读取字段  
 **那么** 字段 SHALL 优先进入 store 领域对象或 presenter 映射结果中的正确层级  
 **并且** 系统 MUST NOT 继续新增 panel-specific getter 作为主路径
+

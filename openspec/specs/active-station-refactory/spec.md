@@ -1,11 +1,8 @@
-# Active Station Refactory Specification
+# active-station-refactory Specification
 
 ## Purpose
-
-定义 production workbench 中当前实体、当前实体来源与当前可编辑 planning 实体之间的职责边界，避免 `station` / `transit` 语义在 store 中重复表达或相互污染，并要求 blueprint / live 两个 store 在 station 编辑主路径上保持兼容。
-
-## ADDED Requirements
-
+TBD - created by archiving change production-workbench-refactory. Update Purpose after archive.
+## Requirements
 ### Requirement: Active Station Entity Resolution
 
 live production store MUST 将 `activeStation` 定义为当前页面实体的统一抽象，而不是直接混入编辑语义。
@@ -133,3 +130,4 @@ workbench 页面 MUST 以当前页面真实消费点为准划分实体与编辑�
 **并且** 页面主状态输出 MUST 使用 `context` 与 `stationState(entityType = 'transit')`
 
 **并且** 页面 MUST NOT 依赖 `editableStationPlan`
+

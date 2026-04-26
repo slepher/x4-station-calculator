@@ -1,11 +1,8 @@
-# Map Json Shape Specification
+# map-json-shape Specification
 
 ## Purpose
-
-将 `maps.json` 的正式数据结构重构为顶层 `clusters` 与顶层 `sectors` 双索引，并统一 cluster / sector 相关 id 为小写，消除旧嵌套结构与兼容桥接。
-
-## ADDED Requirements
-
+TBD - created by archiving change map-json-refactory. Update Purpose after archive.
+## Requirements
 ### Requirement: Top-Level Cluster And Sector Indexes
 
 `maps.json` SHALL 使用顶层 `clusters` 与顶层 `sectors` 作为正式结构。
@@ -69,3 +66,4 @@ cluster 与 sector 相关 id SHALL 统一为小写。
 **当** save parser 配置、地图搜索或资源提取逻辑需要读取 sector 名称、坐标或资源
 **那么** 默认从顶层 `maps.sectors` 读取
 **并且** 不再通过双层遍历 cluster 内嵌 sector 结构获取
+

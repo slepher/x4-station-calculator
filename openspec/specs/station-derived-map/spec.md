@@ -1,11 +1,8 @@
-# Station Derived Map Specification
+# station-derived-map Specification
 
 ## Purpose
-
-定义 `StationDerivedMap` 作为 station 级派生快照缓存抽象，覆盖现有 production derived cache，并在保持 blueprint/planning 与 archive/live 双实例结构的前提下纳入 station semantic derived 数据。
-
-## ADDED Requirements
-
+TBD - created by archiving change station-derived-map. Update Purpose after archive.
+## Requirements
 ### Requirement: 分站运行态单一真源 (Station Runtime Single Source of Truth)
 
 系统 SHALL 为每个 `stationId` 维护独立分站运行态，并通过统一映射容器读取 station 级派生快照。
@@ -100,3 +97,4 @@
 - **当** `useBlueprintProductionStore.getTabs()` 或 `useLiveProductionStore.getTabs()` 组装 `ProductionTabItem`
 - **那么** 系统 SHALL 优先从对应 `StationDerivedMap` 读取 `tag` / `factoryGroup`
 - **并且** store SHALL NOT 再把 `classifyPlayerStationPoi(...)` 作为长期主路径直接写在 `getTabs()` 中
+

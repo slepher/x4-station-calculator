@@ -4,7 +4,7 @@
 
 修正 sector 内部坐标原点与局部缩放语义，使星区内部点位、连线、tooltip 与存档投影使用一致的中心点定义。
 
-## MODIFIED Requirements
+## ADDED Requirements
 
 ### Requirement: Sector Local Coordinate Normalization
 
