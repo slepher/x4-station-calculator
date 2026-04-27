@@ -17,6 +17,27 @@ test.describe('binding selects latest valid archive', () => {
     })
   })
 
+  test('map save panel shows invalid badge on newest archive, valid one is clickable', async ({ page }) => {
+    await page.getByTestId('top-view-btn-maps').click()
+    await page.waitForTimeout(500)
+    const saveTab = page.getByTestId('map-save-panel-tab')
+    await expect(saveTab).toBeVisible({ timeout: 3000 })
+    await saveTab.click()
+    await page.waitForTimeout(500)
+
+    const panel = page.getByTestId('map-save-panel')
+    await expect(panel).toBeVisible({ timeout: 3000 })
+
+    const invalidWarning = panel.locator('.invalid-warning')
+    await expect(invalidWarning).toBeVisible()
+    await expect(invalidWarning).toContainText(/无效|Invalid/)
+
+    const groupTitle = panel.locator('[data-testid="save-group-title"]')
+    await expect(groupTitle).toBeVisible()
+    await expect(groupTitle).toContainText(/slepher/)
+    await expect(groupTitle).toContainText(/2/)
+  })
+
   test('stations load from older valid archive when newer one is invalid', async ({ page }) => {
     const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
