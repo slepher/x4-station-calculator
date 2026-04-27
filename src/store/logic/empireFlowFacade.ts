@@ -206,21 +206,18 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
       return result.groupedFlows
     }
     
-    if (!activeEmpire.value || !modulesMap.value) {
+    if (!activeEmpire.value || !waresMap.value) {
       return createEmptyEmpireGroupedFlows()
     }
-    
-    return analyzeEmpireWareFlow(
+
+    return flowMap.getEmpireGroupedFlows(
       activeEmpire.value.stations,
-      (stationId) => {
+      waresMap.value,
+      (flow, stationId) => {
+        if (flow.netRate <= 0) return true
         const cache = flowMap.getCache(stationId)
-        if (!cache) return []
-        return cache.productionFlows.filter(f => {
-          if (f.netRate <= 0) return true
-          return (cache.warePriorityLevels[f.wareId] ?? 0) > 0
-        })
-      },
-      waresMap.value || {}
+        return (cache?.warePriorityLevels[flow.wareId] ?? 0) > 0
+      }
     )
   })
 
