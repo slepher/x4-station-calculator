@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//library[@name='SetupGeneralProjects_Water']/actions">
+    <add_terraforming_project cluster="$Cluster" id="'wat_surfacing'"/>
+  </add>
+
+  <add sel="//library[@name='SetupGeneralProjects_Industrial']/actions">
+    <add_terraforming_project cluster="$Cluster" id="'ind_von_neumann'"/>
+  </add>
+
+  <add sel="//library[@name='SetupStatDependentProjects']/actions">
+    <do_if value="$Cluster.terraforming.stat.airpressure.value lt 5">
+      <add_terraforming_project cluster="$Cluster" id="'atm_outgassing'"/>
+    </do_if>
+    <do_if value="$Cluster.terraforming.stat.seismicactivity.value gt 0">
+      <add_terraforming_project cluster="$Cluster" id="'ter_tectonic_scaffolding'"/>
+    </do_if>
+  </add>
+
+  <add sel="//add_terraforming_project[@id=&quot;'tmp_cloudparticles'&quot;]/predecessors">
+    <predecessor id="'wat_surfacing'"/>
+  </add>
+
+  <add sel="//cue[@name='Terraforming_Atiya_Milestone_1']/conditions/check_any">
+    <event_terraforming_project_succeeded cluster="$Cluster_AtiyasMisfortune" project="'ter_tectonic_scaffolding'"/>
+  </add>
+
+  <add sel="//cue[@name='Start']/cues">
+    <cue name="Add_Drone_Blueprints_Terran">
+      <conditions>
+        <check_any>
+          <event_cue_completed cue="Signal_Terraforming_Cues"/>
+          <event_cue_signalled/>
+        </check_any>
+      </conditions>
+      <actions>
+        <add_blueprints macros="[macro.ship_gen_m_transdrone_container_02_a_macro, macro.ship_gen_s_transdrone_container_02_a_macro]"/>
+        <debug_text text="'Adding Terran DLC terraforming drone blueprints'" filter="savegame" chance="if event.name == 'event_cue_signalled' then 100 else 0"/>
+      </actions>
+    </cue>
+
+    <cue name="Patch_Add_Drone_Blueprints_Base_Terran">
+      <actions>
+        <do_if value="Signal_Terraforming_Cues.state == cuestate.complete">
+          <signal_cue cue="Add_Drone_Blueprints_Terran"/>
+        </do_if>
+      </actions>
+    </cue>
+
+    <cue name="Add_Terran_Terraforming_Projects">
+      <actions>
+        <do_if value="Signal_Terraforming_Cues.state == cuestate.complete">
+          <do_for_each in="$TerraformingClusters" name="$Cluster">
+            <add_terraforming_project cluster="$Cluster" id="'ind_von_neumann'"/>
+            <do_if value="$Cluster.terraforming.stat.humidity.value lt 6">
+              <add_terraforming_project cluster="$Cluster" id="'wat_surfacing'"/>
+            </do_if>
+            <do_if value="$Cluster.terraforming.stat.airpressure.value lt 5">
+              <add_terraforming_project cluster="$Cluster" id="'atm_outgassing'"/>
+            </do_if>
+            <do_if value="$Cluster.terraforming.stat.seismicactivity.value gt 0">
+              <add_terraforming_project cluster="$Cluster" id="'ter_tectonic_scaffolding'"/>
+            </do_if>
+          </do_for_each>
+        </do_if>
+      </actions>
+    </cue>
+  </add>
+
+  <add sel="//cue[@name='Debug_Skipper_Conversation_Main']/actions">
+    <do_if value="Debug_Skipper_Unlock_Advanced_Projects.state != cuestate.complete">
+      <add_player_choice_sub section="skipper_unlock_advanced_projects" text="'Cheat Advanced TF Projects'"/>
+    </do_if>
+  </add>
+
+  <add sel="//cue[@name='Debug_Skipper_Conversation']/cues">
+    <cue name="Debug_Skipper_Unlock_Advanced_Projects">
+      <conditions>
+        <event_conversation_next_section actor="$SkipperActor" section="skipper_unlock_advanced_projects"/>
+      </conditions>
+      <actions>
+        <add_research ware="ware.research_tf_tech"/>
+        <show_notification text="{1015,90} + '\n' + ware.research_tf_tech.name" sound="notification_generic" comment="Document received"/>
+      </actions>
+    </cue>
+  </add>
+
+  <add sel="//cue[@name='Terraforming_Boarding_Competition_Finished']/actions/do_all/do_any">
+    <get_character_definition macro="$Macro" faction="faction.terran" tags="tag.marine"/>
+    <get_character_definition macro="$Macro" faction="faction.pioneers" tags="tag.marine"/>
+  </add>
+
+  <add sel="//cue[@name='Terraforming_Piloting_Competition_Finished']/actions/do_all/do_any">
+    <get_character_definition macro="$Macro" faction="faction.terran" tags="tag.pilot"/>
+    <get_character_definition macro="$Macro" faction="faction.pioneers" tags="tag.pilot"/>
+  </add>
+</diff>
