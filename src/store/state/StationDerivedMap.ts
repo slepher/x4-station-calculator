@@ -4,6 +4,7 @@ import type { WareProductionFlow } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
+import { analyzeEmpireWareFlow } from '@/store/logic/analyzeEmpireWareFlow'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 
