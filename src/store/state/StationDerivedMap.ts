@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import type { GroupedFlows, SavedModule, StationSettings, X4Module, WareFlow } from '@/types/x4'
+import type { GroupedFlows, EmpireGroupedFlows, EmpireWareFlow, StationFlowAtom, SavedModule, StationSettings, X4Module, WareFlow, StationPlan, X4Ware } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
@@ -82,6 +82,7 @@ export interface StationDerivedCache {
 export interface StationDerivedSnapshot {
   modulesMode: 'plan' | 'full'
   sectorId: string | null
+  count: number
   inputModules: SavedModule[]
   fullModules: SavedModule[]
   settings: StationDerivedSettings
@@ -713,6 +714,22 @@ export class StationDerivedMap {
 
   getModulesMode(stationId: string): 'plan' | 'full' | null {
     return this.snapshotMap.get(stationId)?.modulesMode || null
+  }
+
+  getEmpireGroupedFlows(
+    stations: StationPlan[],
+    waresMap: Record<string, X4Ware>,
+    filterFn?: (flow: import('@/types/production-flow').WareProductionFlow, stationId: string) => boolean
+  ): EmpireGroupedFlows {
+    return analyzeEmpireWareFlow(
+      stations,
+      (stationId) => {
+        const flows = this.getProductionFlows(stationId)
+        if (!filterFn) return flows
+        return flows.filter(f => filterFn(f, stationId))
+      },
+      waresMap
+    )
   }
 }
 
