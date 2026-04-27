@@ -2,8 +2,10 @@ import { readFile, writeFile } from 'node:fs/promises'
 import path from 'node:path'
 
 const ROOT = process.cwd()
-const SAVE_PATH = path.join(ROOT, 'save.json')
-const OUTPUT_SAVE_PATH = path.join(ROOT, 'tests/fixtures/save.json')
+
+const args = process.argv.slice(2)
+const SAVE_PATH = args[0] || path.join(ROOT, 'save.json')
+const OUTPUT_SAVE_PATH = args[1] || path.join(ROOT, 'tests/fixtures/save.json')
 
 const SECTOR_MACROS = new Set([
   // binding.yaml groups

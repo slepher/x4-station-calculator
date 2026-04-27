@@ -35,7 +35,7 @@ function formatTime(time: number): string {
 }
 
 function getLatestTime(group: ArchiveGroup): number | null {
-  return group.saves[0]?.meta.time ?? null
+  return group.saves.find((s) => s.isValid)?.meta.time ?? null
 }
 
 function getBindingPlan(guid: string) {
