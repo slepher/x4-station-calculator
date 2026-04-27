@@ -93,7 +93,6 @@ type SavedModule = { id: string; count: number }
 type StationPlan = {
   id: string
   name: string
-  sectorId?: string | null
   type: 'industrial' | 'supply' | 'transit' | 'shipyard'
   count: number
   modules: SavedModule[]
@@ -112,15 +111,12 @@ type SectorPlan = {
 type EmpirePlan = {
   id: string
   name: string
-  sectors?: SectorPlan[]
-  sectorLinks?: string[]
   stations: StationPlan[]
 }
 
 type SavedEmpiresState = {
   version: number
   activeId: string | null
-  activeStationId: string | null
   list: EmpirePlan[]
 }
 
@@ -671,7 +667,6 @@ const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
       return {
         id: `empire-${empireIndex + 1}-station-${stationIndex + 1}`,
         name: station.name,
-        sectorId: station.sectorId || null,
         type: 'industrial',
         count: 1,
         modules: station.modules.map((mod) => ({ id: mod.id, count: mod.count })),
@@ -682,26 +677,16 @@ const buildEmpireState = (seed: SeedEmpire, now: number): SavedEmpiresState => {
       }
     })
 
-    const result: EmpirePlan = {
+    return {
       id: `empire-${empireIndex + 1}`,
       name: empire.name,
       stations
     }
-
-    if (empire.sectors && empire.sectors.length > 0) {
-      result.sectors = empire.sectors
-    }
-    if (empire.sectorLinks && empire.sectorLinks.length > 0) {
-      result.sectorLinks = empire.sectorLinks
-    }
-
-    return result
   })
 
   return {
     version: CURRENT_EMPIRE_VERSION,
     activeId: empires[0]?.id ?? null,
-    activeStationId: empires[0]?.stations[0]?.id ?? null,
     list: empires
   }
 }

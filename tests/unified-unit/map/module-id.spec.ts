@@ -126,7 +126,7 @@ describe('module-id unit mapping', () => {
     vi.restoreAllMocks()
   })
 
-  it('1.1 Empire v2 到 v3 迁移归一 module id', () => {
+  it('1.1 Empire v2 到 v5 迁移归一 module id', () => {
     // 1.1.1 构造 `version=2` 且 `modules[].id` 为 macro id 的 empire 输入
     const empireV2Macro = createEmpireV2MacroState()
 
@@ -134,9 +134,9 @@ describe('module-id unit mapping', () => {
     const migrated = migrateEmpireStateToCurrent(empireV2Macro, lookup).state
     const modules = migrated.list.flatMap((empire) => empire.stations.flatMap((station) => station.modules))
 
-    // 1.1.3 断言迁移后版本为 3 且模块 ID 全部可在 modulesMap 命中 #期望: [3, true]
+    // 1.1.3 断言迁移后版本为 5 且模块 ID 全部可在 modulesMap 命中 #期望: [5, true]
     const allHit = modules.every((module) => Boolean(lookup.modulesMap[module.id]))
-    expect(migrated.version).toBe(3)
+    expect(migrated.version).toBe(5)
     expect(allHit).toBe(true)
   })
 
@@ -203,9 +203,9 @@ describe('module-id unit mapping', () => {
       shipBuildStore: shipBuildStore as any
     })
 
-    // 1.3.3 调用 migrate 后检查升级到最新版本 #期望: [2, 3]
+    // 1.3.3 调用 migrate 后检查升级到最新版本 #期望: [2, 5]
     const migrated = JSON.parse(localStorage.getItem('x4_empire_data') || '{}') as SavedEmpiresState
     expect(rawVersion).toBe(2)
-    expect(migrated.version).toBe(3)
+    expect(migrated.version).toBe(5)
   })
 })

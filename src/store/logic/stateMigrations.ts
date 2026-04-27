@@ -204,6 +204,17 @@ export function migrateEmpireStateToCurrent(
 
   working = normalizeEmpireStateShape(working, warnings)
 
+  if (working.version === 4) {
+    working.list.forEach(empire => {
+      delete (empire as any).sectors
+      delete (empire as any).sectorLinks
+      empire.stations.forEach(station => {
+        delete (station as any).sectorId
+        delete (station as any).location
+      })
+    })
+  }
+
   const needModuleNormalization = working.version <= 2 || working.version > CURRENT_EMPIRE_VERSION
   if (needModuleNormalization) {
     working.list = working.list.map((empire, empireIndex) => ({

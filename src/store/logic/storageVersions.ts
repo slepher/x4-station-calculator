@@ -1,3 +1,3 @@
-export const CURRENT_EMPIRE_VERSION = 4
+export const CURRENT_EMPIRE_VERSION = 5
 export const CURRENT_FLOW_VERSION = 3
 export const CURRENT_SHIP_BLUEPRINT_VERSION = 2

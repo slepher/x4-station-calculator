@@ -1,5 +1,5 @@
 {
-  "vsn": 6,
+  "vsn": 5,
   "x4_save_bindings": {
     "version": 1,
     "list": [
@@ -405,8 +405,9 @@
     ]
   },
   "x4_empire_data": {
-    "version": 5,
+    "version": 4,
     "activeId": "empire-1",
+    "activeStationId": "empire-1-station-1",
     "list": [
       {
         "id": "empire-1",
@@ -415,6 +416,7 @@
           {
             "id": "empire-1-station-1",
             "name": "E1-S1",
+            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -455,6 +457,7 @@
           {
             "id": "empire-1-station-2",
             "name": "E1-S2",
+            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -489,6 +492,7 @@
           {
             "id": "empire-1-station-3",
             "name": "E1-S3",
+            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -524,6 +528,13 @@
             "lockedWares": [],
             "warePriority": {}
           }
+        ],
+        "sectors": [
+          {
+            "id": "sector-1",
+            "name": "星区 1",
+            "order": 0
+          }
         ]
       },
       {
@@ -533,6 +544,7 @@
           {
             "id": "empire-2-station-1",
             "name": "E2-S1",
+            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -603,6 +615,7 @@
           {
             "id": "empire-2-station-2",
             "name": "E2-S2",
+            "sectorId": "sector-1",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -638,6 +651,13 @@
             "lockedWares": [],
             "warePriority": {}
           }
+        ],
+        "sectors": [
+          {
+            "id": "sector-1",
+            "name": "星区 1",
+            "order": 0
+          }
         ]
       },
       {
@@ -647,6 +667,7 @@
           {
             "id": "empire-3-station-1",
             "name": "生产站",
+            "sectorId": "production-sector",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -685,6 +706,7 @@
           {
             "id": "empire-3-station-2",
             "name": "补给站",
+            "sectorId": "supply-sector",
             "type": "industrial",
             "count": 1,
             "modules": [
@@ -720,6 +742,21 @@
             "lockedWares": [],
             "warePriority": {}
           }
+        ],
+        "sectors": [
+          {
+            "id": "production-sector",
+            "name": "生产星区",
+            "order": 0
+          },
+          {
+            "id": "supply-sector",
+            "name": "补给星区",
+            "order": 1
+          }
+        ],
+        "sectorLinks": [
+          "production-sector|supply-sector"
         ]
       }
     ]
