@@ -17,6 +17,8 @@ import type {
   ProductionStationState
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
+import type { BuildGoal, BuildPlan, BuildConstraints } from '@/types/build-plan'
+import { calculateBuildPlan } from '@/store/logic/calculateBuildPlan'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
@@ -54,6 +56,91 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const lastSavedSnapshot = ref<string>('')
   const buildPriceMultiplier = ref(0.5)
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
+
+  const buildConstraints = ref<BuildConstraints>({
+    timeBudget: 3600 * 168,
+    creditBudget: 200000000,
+    goals: [{ type: 'self-sufficient' }]
+  })
+
+  const buildPlan = ref<BuildPlan | null>(null)
+
+  const computeBuildPlanLoading = ref(false)
+
+  const empireModules = computed<SavedModule[]>(() => {
+    if (!activeEmpire.value) return []
+    const moduleMap = new Map<string, number>()
+    for (const station of activeEmpire.value.stations) {
+      for (const mod of station.modules || []) {
+        moduleMap.set(mod.id, (moduleMap.get(mod.id) || 0) + (mod.count || 1))
+      }
+    }
+    return Array.from(moduleMap.entries()).map(([id, count]) => ({ id, count }))
+  })
+
+  function setBuildGoal(goal: BuildGoal) {
+    buildConstraints.value = {
+      ...buildConstraints.value,
+      goals: [...buildConstraints.value.goals, goal]
+    }
+  }
+
+  function removeBuildGoal(index: number) {
+    const newGoals = buildConstraints.value.goals.filter((_, i) => i !== index)
+    buildConstraints.value = { ...buildConstraints.value, goals: newGoals }
+  }
+
+  function setTimeBudget(seconds: number) {
+    buildConstraints.value = { ...buildConstraints.value, timeBudget: seconds }
+  }
+
+  function setCreditBudget(credits: number) {
+    buildConstraints.value = { ...buildConstraints.value, creditBudget: credits }
+  }
+
+  function computePlan() {
+    const deps = getComputeDeps()
+    if (!deps) return
+    if (!activeEmpire.value) return
+
+    computeBuildPlanLoading.value = true
+
+    try {
+      const result = calculateBuildPlan({
+        goals: buildConstraints.value.goals,
+        timeBudget: buildConstraints.value.timeBudget,
+        creditBudget: buildConstraints.value.creditBudget,
+        currentModules: empireModules.value,
+        settings: {
+          sunlight: 100,
+          useHQ: false,
+          manualWorkforce: 0,
+          workforcePercent: 100,
+          workforceAuto: true,
+          considerWorkforceForAutoFill: false,
+          supplyWorkforceBonus: false,
+          buyMultiplier: 0.5,
+          sellMultiplier: 0.5,
+          minersEnabled: true,
+          internalSupply: true,
+          showEmpireGaps: false,
+          racePreference: 'argon',
+          resourceBufferHours: 1,
+          primaryProductBufferHours: 12,
+          secondaryProductBufferHours: 2,
+          transportMinutes: 30,
+          transportShipCapacity: 62000,
+          enforceDlcActivation: false
+        },
+        modulesMap: deps.modulesMap,
+        waresMap: deps.waresMap,
+        modulesByOutputMap: gameData.modulesByOutputMap || {}
+      })
+      buildPlan.value = result
+    } finally {
+      computeBuildPlanLoading.value = false
+    }
+  }
 
   const activeEmpire = ref<EmpirePlan | null>(null)
 
@@ -577,7 +664,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         activeViewStore.activeEmpireId = empireId
       }
       
-      if (isValid) {
+      if (storedTabId === null) {
+        activeStationId.value = null
+      } else if (isValid) {
         activeStationId.value = storedTabId
       } else if (empire.stations.length > 0) {
         activeStationId.value = empire.stations[0]?.id || null
@@ -911,6 +1000,16 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateStationName: updateStationNameFromActive,
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
-    toggleMineral: toggleMineralFromActive
+    toggleMineral: toggleMineralFromActive,
+
+    buildConstraints,
+    buildPlan,
+    empireModules,
+    computeBuildPlanLoading,
+    setBuildGoal,
+    removeBuildGoal,
+    setTimeBudget,
+    setCreditBudget,
+    computePlan
   }
 })

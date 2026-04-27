@@ -13,6 +13,10 @@ import StationTabBar from '@/components/empire/StationTabBar.vue'
 import BlueprintContextToolbar from '@/components/empire/context_toolbar/BlueprintContextToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
+import { useBuildPlanPresenter } from '@/components/empire/presenters/useBuildPlanPresenter'
+import BuildPlanConstraintsPanel from '@/components/empire/BuildPlanConstraintsPanel.vue'
+import BuildPlanPanel from '@/components/empire/BuildPlanPanel.vue'
+import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 
 const blueprintStore = useBlueprintProductionStore()
 const activeViewStore = useActiveViewStore()
@@ -35,6 +39,7 @@ const toolbarPresenter = useProductionToolbarPresenter(blueprintStore)
 const planningPresenter = useProductionPlanningPresenter(blueprintStore)
 const wareflowPresenter = useProductionWareflowPresenter(blueprintStore)
 const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
+const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
 </script>
 
 <template>
@@ -44,6 +49,7 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
     :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
     :can-create-station="tabbarPresenter.props.canCreateStation"
     :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
+    @select-overview="tabbarPresenter.emits.selectOverview"
     @select-station="tabbarPresenter.emits.selectStation"
     @create-station="tabbarPresenter.emits.createStation"
     @rename-station="tabbarPresenter.emits.renameStation"
@@ -51,6 +57,7 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
     @delete-station="tabbarPresenter.emits.deleteStation"
   />
   <BlueprintContextToolbar
+    v-if="toolbarPresenter.props.workbenchMode.value === 'station'"
     :station="toolbarPresenter.props.station.value!"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
@@ -134,6 +141,37 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
       />
     </div>
   </div>
+
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout mt-6">
+    <div class="col-span-12 lg:col-span-3">
+      <BuildPlanConstraintsPanel
+        :goals="buildPlanPresenter.props.goals.value"
+        :time-budget="buildPlanPresenter.props.constraints.value.timeBudget"
+        :credit-budget="buildPlanPresenter.props.constraints.value.creditBudget"
+        :build-plan="buildPlanPresenter.props.buildPlan.value"
+        :loading="buildPlanPresenter.props.loading.value"
+        :progress="buildPlanPresenter.props.progress.value"
+        :warnings="buildPlanPresenter.props.warnings.value"
+        @add-goal="buildPlanPresenter.emits.addGoal"
+        @remove-goal="buildPlanPresenter.emits.removeGoal"
+        @set-time-budget="buildPlanPresenter.emits.setTimeBudget"
+        @set-credit-budget="buildPlanPresenter.emits.setCreditBudget"
+        @compute-plan="buildPlanPresenter.emits.computePlan"
+      />
+    </div>
+    <div class="col-span-12 lg:col-span-4">
+      <BuildPlanPanel
+        :build-plan="buildPlanPresenter.props.buildPlan.value"
+        :loading="buildPlanPresenter.props.loading.value"
+      />
+    </div>
+    <div class="col-span-12 lg:col-span-5">
+      <EmpireWareFlowsDashboard
+        :grouped-flows="buildPlanPresenter.props.currentFlows.value"
+      />
+    </div>
+  </div>
+
 </template>
 
 <style scoped>

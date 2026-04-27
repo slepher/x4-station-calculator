@@ -1,27 +1,21 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { StationType } from '@/types/x4'
+import type { ProductionTabItem } from '@/types/production-ui'
 import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
 import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
+import playerhqIconUrl from '@/components/icons/playerhq.svg'
 import factoryIconUrl from '@/components/icons/factory.svg'
 
-interface StationTabItem {
-  id: string
-  name: string
-  stationType?: StationType
-  tag?: string
-  factoryGroup?: string
-}
-
 const props = defineProps<{
-  tabs: StationTabItem[]
+  tabs: ProductionTabItem[]
   activeTabId: string | null
   canCreateStation: boolean
   canOpenContextMenu: boolean
 }>()
 
 const emit = defineEmits<{
+  selectOverview: []
   selectStation: [stationId: string]
   createStation: []
   renameStation: [stationId: string]
@@ -40,7 +34,8 @@ const tabsScrollAreaRef = ref<HTMLElement | null>(null)
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
 
-const getStationIcon = (tab: StationTabItem): string => {
+const getStationIcon = (tab: ProductionTabItem): string => {
+  if (tab.type === 'overview') return playerhqIconUrl
   const iconTag = getPoiIconTag(tab)
   if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
   return factoryIconUrl
@@ -57,8 +52,12 @@ const addNewStation = () => {
   }, 100)
 }
 
-const selectStation = (stationId: string) => {
-  emit('selectStation', stationId)
+const selectStation = (tab: ProductionTabItem) => {
+  if (tab.type === 'overview') {
+    emit('selectOverview')
+  } else {
+    emit('selectStation', tab.id)
+  }
 }
 
 const openMenu = (stationId: string, event: MouseEvent) => {
@@ -178,7 +177,7 @@ const cancelDelete = () => {
         :data-station-id="tab.id !== 'overview' ? tab.id : undefined"
         data-testid="station-tab"
         :class="{ 'active': activeTabId === tab.id, 'overview-tab': tab.id === 'overview' }"
-        @click="selectStation(tab.id)"
+        @click="selectStation(tab)"
         @contextmenu.stop="openMenu(tab.id, $event)"
       >
         <div class="tab-highlight"></div>

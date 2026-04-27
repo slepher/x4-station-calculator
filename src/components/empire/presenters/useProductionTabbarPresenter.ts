@@ -90,14 +90,17 @@ function resolveTabSemantics(
 export function useProductionTabbarPresenter(store: TabbarPresenterStore): UseProductionTabbarPresenterReturn {
   const tabs = computed<ProductionTabItem[]>(() => {
     if (!store.capabilities.hasSectors) {
-      return (store.orderedStations || []).map((station) => ({
-        id: station.id,
-        type: 'station',
-        name: station.name,
-        sectorId: station.sectorId ?? undefined,
-        stationType: station.type,
-        ...resolveTabSemantics(store, station, station.id)
-      }))
+      return [
+        { id: 'overview', type: 'overview' as const, name: i18n.global.t('sector.overview') },
+        ...(store.orderedStations || []).map((station) => ({
+          id: station.id,
+          type: 'station' as const,
+          name: station.name,
+          sectorId: station.sectorId ?? undefined,
+          stationType: station.type,
+          ...resolveTabSemantics(store, station, station.id)
+        }))
+      ]
     }
 
     const result: ProductionTabItem[] = [
