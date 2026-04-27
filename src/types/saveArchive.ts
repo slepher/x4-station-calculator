@@ -301,8 +301,6 @@ export interface ArchiveMeta {
   parser_version: string
   post_processor_version?: string
   source: SaveSource
-  isCompatible: boolean
-  isValid: boolean
   createdAt: Date
   sectorCount: number
 }

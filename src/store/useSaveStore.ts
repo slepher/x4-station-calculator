@@ -297,8 +297,11 @@ function isArchiveParserVersionValidByString(parserVersion: string): boolean {
   return parserVersion === CURRENT_PARSER_VERSION
 }
 
-function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
+function createStubArchiveFromMeta(meta: ArchiveMeta, currentVersion?: string): SaveArchive {
   const isValid = isArchiveParserVersionValidByString(meta.parser_version)
+  const isCompatible = currentVersion
+    ? normalizeVersion(meta.version) === normalizeVersion(currentVersion)
+    : true
   return {
     meta: {
       guid: meta.guid,
@@ -312,29 +315,16 @@ function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
       source: meta.source
     },
     sectors: {},
-    isCompatible: meta.isCompatible,
+    isCompatible,
     isValid
   }
 }
 
-function upsertArchiveMeta(list: ArchiveMeta[], meta: ArchiveMeta): ArchiveMeta[] {
-  const next = [...list]
-  const index = next.findIndex((item) => item.id === meta.id)
-  if (index >= 0) next[index] = meta
-  else next.push(meta)
-  next.sort((a, b) => b.time - a.time)
-  return next
-}
-
-function removeArchiveMeta(list: ArchiveMeta[], archiveId: string): ArchiveMeta[] {
-  return list.filter((item) => item.id !== archiveId)
-}
-
-function buildArchiveGroups(metaList: ArchiveMeta[]): Map<string, ArchiveGroup> {
+function buildArchiveGroups(metaList: ArchiveMeta[], currentVersion?: string): Map<string, ArchiveGroup> {
   const groups = new Map<string, ArchiveGroup>()
 
   for (const meta of metaList) {
-    const archive = createStubArchiveFromMeta(meta)
+    const archive = createStubArchiveFromMeta(meta, currentVersion)
     const existing = groups.get(meta.guid)
     if (existing) {
       existing.saves.push(archive)
@@ -372,7 +362,7 @@ export const useSaveStore = defineStore('save', () => {
   }
 
   function rebuildArchivesFromState() {
-    archives.value = buildArchiveGroups(savedArchivesState.value.list)
+    archives.value = buildArchiveGroups(savedArchivesState.value.list, gameDataStore.currentVersion)
   }
 
   function loadData(data: SavedSaveArchivesState) {
@@ -414,7 +404,6 @@ export const useSaveStore = defineStore('save', () => {
       post_processor_version: archive.meta.post_processor_version,
       source: archive.meta.source,
       isCompatible: archive.isCompatible,
-      isValid: archive.isValid,
       createdAt: existingCreatedAt || new Date(),
       sectorCount: Object.keys(archive.sectors).length
     }
