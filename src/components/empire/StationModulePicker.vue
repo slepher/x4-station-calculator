@@ -80,6 +80,7 @@ const onClearClick = () => {
 const handleSelect = (m: any) => {
   emit('selectModule', m.id)
   isFocused.value = false
+  searchInput.value?.blur()
 }
 
 const onEsc = () => {

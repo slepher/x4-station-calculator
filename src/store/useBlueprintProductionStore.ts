@@ -417,6 +417,22 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return map.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
+  function getEmpireGroupedFlows(): import('@/types/x4').EmpireGroupedFlows {
+    if (!activeEmpire.value || !planningDerivedMap.value) {
+      return { flows: [], empireGroups: { operations: [], supply: [] } }
+    }
+    const map = planningDerivedMap.value
+    return map.getEmpireGroupedFlows(
+      activeEmpire.value.stations,
+      gameData.waresMap,
+      (flow, stationId) => {
+        if (flow.netRate <= 0) return true
+        const cache = map.getCache(stationId)
+        return (cache?.warePriorityLevels[flow.wareId] ?? 0) > 0
+      }
+    )
+  }
+
   function getSavedStationGroupedFlows(station: StationPlan): GroupedFlows {
     const deps = getDerivedStaticDeps()
     if (!deps) {
@@ -657,14 +673,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
       const storedTabId = activeViewStore.activeEmpireStation
       const isValid = storedTabId && empire.stations.some(s => s.id === storedTabId)
-      
+
       if (activeViewStore.activeView === 'blueprint-production') {
         activeViewStore.switchToEmpire(empireId)
       } else {
         activeViewStore.activeEmpireId = empireId
       }
-      
-      if (storedTabId === null) {
+
+      if (!storedTabId) {
         activeStationId.value = null
       } else if (isValid) {
         activeStationId.value = storedTabId
@@ -959,6 +975,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     titlePlaceholder,
     savedEmpires,
     getStationFlowCache,
+    getEmpireGroupedFlows,
     getSavedStationGroupedFlows,
     initializeAllStationDerived,
     clearStationCaches,

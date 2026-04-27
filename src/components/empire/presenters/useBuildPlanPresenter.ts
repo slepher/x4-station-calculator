@@ -26,9 +26,11 @@ export interface UseBuildPlanPresenterReturn {
 }
 
 export interface BuildPlanPresenterStore {
+  activeEmpire: { stations: import('@/types/x4').StationPlan[] } | null
   buildConstraints: BuildConstraints
   buildPlan: BuildPlan | null
   computeBuildPlanLoading: boolean
+  getEmpireGroupedFlows(): EmpireGroupedFlows
   setBuildGoal(goal: BuildGoal): void
   removeBuildGoal(index: number): void
   setTimeBudget(seconds: number): void
@@ -66,9 +68,7 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
       }
       return w
     }),
-    currentFlows: computed(() => {
-      return { flows: [], empireGroups: { operations: [], supply: [] } }
-    })
+    currentFlows: computed(() => store.getEmpireGroupedFlows())
   }
 
   const emits: BuildPlanPresenterEmits = {
