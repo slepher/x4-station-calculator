@@ -108,10 +108,9 @@ function createDefaultSaveArchiveSettings(): SaveArchiveSettings {
 }
 
 function getLatestArchiveMetaForGuid(list: ArchiveMeta[], guid: string): ArchiveMeta | null {
-  const matches = list.filter((item) => item.guid === guid)
+  const matches = list.filter((item) => item.guid === guid && item.isValid)
   if (matches.length === 0) return null
-  const sorted = [...matches].sort((a, b) => b.time - a.time)
-  return sorted.find((item) => item.isValid) || sorted[0]
+  return [...matches].sort((a, b) => b.time - a.time)[0] || null
 }
 
 function migrateSaveArchiveSettingsToCurrent(raw: unknown): SaveArchiveSettings {

@@ -217,7 +217,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   async function loadPlayerStationRecords() {
     const archive = selectedArchive.value
     const binding = activeBinding.value
-    if (!archive || !binding || archive.meta.guid !== binding.gameGuid) {
+    if (!archive || !archive.isValid || !binding || archive.meta.guid !== binding.gameGuid) {
       playerStationRecords.value = []
       return
     }
@@ -1290,6 +1290,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     try {
       const binding = saveBindingStore.getBindingByGameGuid(gameGuid)
       if (!binding) return false
+
+      const archiveGroup = saveStore.archives.get(gameGuid)
+      const hasValidArchive = archiveGroup?.saves.some(s => s.isValid) ?? false
+      if (!hasValidArchive) return false
 
       activeViewStore.activeBinding = gameGuid
       saveBindingStore.syncFromActiveView()
