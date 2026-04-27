@@ -108,7 +108,7 @@ function createDefaultSaveArchiveSettings(): SaveArchiveSettings {
 }
 
 function getLatestArchiveMetaForGuid(list: ArchiveMeta[], guid: string): ArchiveMeta | null {
-  const matches = list.filter((item) => item.guid === guid && item.isValid)
+  const matches = list.filter((item) => item.guid === guid && isArchiveParserVersionValidByString(item.parser_version))
   if (matches.length === 0) return null
   return [...matches].sort((a, b) => b.time - a.time)[0] || null
 }
