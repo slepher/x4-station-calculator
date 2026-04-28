@@ -25,6 +25,8 @@ export interface CalculateWareFlowDerivedInput {
     sunlight: number
   }
   warePriorityLevels: Record<string, number>
+  stationNameMap?: Record<string, string>
+  sectorNameMap?: Record<string, string>
 }
 
 export interface CalculateWareFlowDerivedOutput {
@@ -81,13 +83,19 @@ export function deriveProductionFlows(
     const totalOccupiedVolume = totalOccupiedCount * unitVolume
 
     const modulesMap = input.modulesMap
+    const stationNameMap = input.stationNameMap
+    const sectorNameMap = input.sectorNameMap
     const contributions: DerivedFlowContribution[] = prodFlow.contributions.map(atom => ({
       ...atom,
       name: atom.class === 'module'
         ? modulesMap[atom.id]?.name || atom.id
         : atom.class === 'workforce'
           ? atom.id
-          : ((atom as unknown as Record<string, unknown>).name as string) || atom.id,
+          : atom.class === 'station'
+            ? stationNameMap?.[atom.id] || atom.id
+            : atom.class === 'sector'
+              ? sectorNameMap?.[atom.id] || atom.id
+              : atom.id,
       netValue: atom.amount * unitPrice,
       transportVolume: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
     }))
