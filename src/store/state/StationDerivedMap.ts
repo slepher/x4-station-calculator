@@ -668,13 +668,23 @@ export class StationDerivedMap {
       const filteredFlows = filterProductionFlowsByPriority(cache.productionFlows, cache.warePriorityLevels)
       const scaledFlows = filteredFlows
         .filter(f => !(f.netRate < 0 && !f.contributions.some(c => c.class === 'workforce') && f.transportType !== 'container'))
-        .map(flow => ({
-          ...flow,
-          production: flow.production * count,
-          consumption: flow.consumption * count,
-          netRate: flow.netRate * count,
-          contributions: flow.contributions.map(c => ({ ...c, amount: c.amount * count }))
-        }))
+        .map(flow => {
+          const netRate = flow.netRate * count
+          return {
+            ...flow,
+            production: flow.production * count,
+            consumption: flow.consumption * count,
+            netRate,
+            contributions: [{
+              id: stationId,
+              class: 'station',
+              type: netRate > 0 ? ('production' as const) : ('consumption' as const),
+              count,
+              amount: netRate,
+              bonusPercent: 0
+            }]
+          }
+        })
       
       allFilteredFlows.push(scaledFlows)
       
