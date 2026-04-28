@@ -204,6 +204,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
     () => activeViewStore.activeBinding,
     (newGuid) => {
       if (newGuid) {
+        if (draftBinding.value?.gameGuid === newGuid) return
         const binding = getBindingByGameGuid(newGuid)
         if (binding) {
           loadDraft(newGuid)
@@ -247,7 +248,7 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
       binding.bindingName = getBindingDisplayName(gameGuid)
       savedBindings.value.list.push(binding)
     }
-    loadDraft(gameGuid)
+    if (!draftBinding.value || draftBinding.value.gameGuid !== gameGuid) loadDraft(gameGuid)
     if (draftBinding.value) {
       if (isNewBinding && !draftBinding.value.bindingName) {
         draftBinding.value.bindingName = getBindingDisplayName(gameGuid)
@@ -264,13 +265,14 @@ export const useSaveBindingStore = defineStore('saveBinding', () => {
 
   function setActiveBinding(gameGuid: string | null) {
     if (gameGuid) {
-      loadDraft(gameGuid)
+      if (draftBinding.value?.gameGuid !== gameGuid) loadDraft(gameGuid)
       return
     }
     clearDraft()
   }
 
   function loadDraftForGameGuid(gameGuid: string) {
+    if (draftBinding.value?.gameGuid === gameGuid) return
     let binding = getBindingByGameGuid(gameGuid)
     if (!binding) {
       binding = createDefaultBinding(gameGuid)
