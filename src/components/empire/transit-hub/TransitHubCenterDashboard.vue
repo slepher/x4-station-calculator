@@ -23,7 +23,9 @@ type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
 function buildStorageFlowsFromProductionFlows(
   productionFlows: DerivedProductionFlow[],
-  bufferHours: number
+  bufferHours: number,
+  _stationNameMap?: Record<string, string>,
+  _sectorNameMap?: Record<string, string>
 ): any[] {
   const safeBufferHours = Number.isFinite(bufferHours) && bufferHours > 0 ? bufferHours : 12
   const byWare = new Map<string, any>()
@@ -49,7 +51,6 @@ function buildStorageFlowsFromProductionFlows(
         if (amount === 0) return
         row.details.push({
           ...detail,
-          name: '',
           netValue: 0,
           storageVolume: amount * (flow.unitVolume || 1) * safeBufferHours,
           sortOrder: index
@@ -161,7 +162,7 @@ const groupedFlows = computed(() => {
     supply: [...grouped.rateGroups.supply, ...grouped.rateGroups.resources]
   }
 })
-const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(derivedFlows.value, localProductBufferHours.value))
+const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(derivedFlows.value, localProductBufferHours.value, props.stationNameMap, props.sectorNameMap))
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`
@@ -244,12 +245,8 @@ const transportItems = computed(() =>
   storageFlows.value.map((storageFlow) => {
     const details = (storageFlow.details || [])
       .map((detail: any) => ({
-        stationId: detail.stationId,
-        stationName: detail.stationName,
-        stationCount: detail.stationCount,
-        kind: detail.kind,
-        transportVolume: Math.abs(detail.staticRate || 0) * (storageFlow.unitVolume || 0),
-        sortOrder: detail.sortOrder
+        ...detail,
+        transportVolume: Math.abs(detail.amount || 0) * (storageFlow.unitVolume || 0)
       }))
       .filter((detail: any) => detail.transportVolume > 0)
     const totalTransportVolume = details.reduce((sum: number, detail: any) => sum + detail.transportVolume, 0)

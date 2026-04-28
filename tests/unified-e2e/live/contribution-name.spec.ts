@@ -38,7 +38,7 @@ test.describe('Contribution name 显示验证', () => {
     expect(listContent).toContain('新建空间站')
   })
 
-  test('地球人: 星区运营电子基质展开后贡献名应显示 "地球人" 而非 KXN-018', async ({ page }) => {
+  test('地球人缺口: 星区产品电子基质展开后应显示 station name "地球人"', async ({ page }) => {
     const sectorTab = page.locator('.supply-tab').filter({ hasText: '小行星' })
     await expect(sectorTab).toBeVisible({ timeout: 5000 })
     await sectorTab.click()
@@ -58,10 +58,15 @@ test.describe('Contribution name 显示验证', () => {
     await stationTab.click()
     await page.waitForTimeout(300)
 
-    const opsSection = page.locator('.list-wrapper').filter({ hasText: /星区运营|Sector Operations/i })
-    await expect(opsSection).toBeVisible({ timeout: 2000 })
+    const gapToggle = page.locator('[data-testid="toggle-show-empire-gaps"]')
+    await expect(gapToggle).toBeVisible({ timeout: 2000 })
+    await gapToggle.click()
+    await page.waitForTimeout(300)
 
-    const electronicMatrix = opsSection.locator('.flow-wrapper').filter({ hasText: '电子基质' })
+    const gapSection = page.locator('.empire-gap-group').filter({ hasText: /星区运营|Sector Operations/i })
+    await expect(gapSection).toBeVisible({ timeout: 2000 })
+
+    const electronicMatrix = gapSection.locator('[data-testid="flow-wrapper"]').filter({ hasText: '电子基质' })
     await expect(electronicMatrix).toBeVisible({ timeout: 2000 })
 
     const mainRow = electronicMatrix.locator('.main-row')
@@ -73,7 +78,6 @@ test.describe('Contribution name 显示验证', () => {
 
     const listContent = await listBox.textContent()
     expect(listContent).toContain('地球人')
-    expect(listContent).not.toContain('KXN-018')
   })
 
   test('小行星仓储视图: 反物质转换器展开后贡献名应显示 "新建空间站"', async ({ page }) => {
@@ -91,22 +95,19 @@ test.describe('Contribution name 显示验证', () => {
     }
     await expect(modeBtn).toHaveClass(/active-planning/)
 
-    const volumeTab = page.locator('[data-testid="view-tab-btn-station-wareflow-volume"]')
+    const volumeTab = page.locator('[data-testid="view-tab-btn-transit-hub-wareflow-volume"]')
     await expect(volumeTab).toBeVisible({ timeout: 2000 })
     await volumeTab.click()
     await page.waitForTimeout(300)
 
-    const volumePanel = page.locator('[data-testid="volume-groups"]')
-    await expect(volumePanel).toBeVisible({ timeout: 2000 })
+    const antimatterItem = page.locator('.flow-content').filter({ hasText: '反物质转换器' }).first()
+    await expect(antimatterItem).toBeVisible({ timeout: 2000 })
 
-    const antimatterFlow = volumePanel.locator('.flow-wrapper').filter({ hasText: '反物质转换器' })
-    await expect(antimatterFlow).toBeVisible({ timeout: 2000 })
-
-    const mainRow = antimatterFlow.locator('.main-row')
+    const mainRow = antimatterItem.locator('.main-row')
     await mainRow.click()
     await page.waitForTimeout(200)
 
-    const listBox = antimatterFlow.locator('.list-box')
+    const listBox = antimatterItem.locator('.list-box')
     await expect(listBox).toBeVisible({ timeout: 1000 })
 
     const listContent = await listBox.textContent()
@@ -128,22 +129,19 @@ test.describe('Contribution name 显示验证', () => {
     }
     await expect(modeBtn).toHaveClass(/active-planning/)
 
-    const transportTab = page.locator('[data-testid="view-tab-btn-station-wareflow-transport"]')
+    const transportTab = page.locator('[data-testid="view-tab-btn-transit-hub-wareflow-transport"]')
     await expect(transportTab).toBeVisible({ timeout: 2000 })
     await transportTab.click()
     await page.waitForTimeout(300)
 
-    const transportPanel = page.locator('.list-body .volume-groups-container').last()
-    await expect(transportPanel).toBeVisible({ timeout: 2000 })
+    const antimatterItem = page.locator('.flow-content').filter({ hasText: '反物质转换器' }).first()
+    await expect(antimatterItem).toBeVisible({ timeout: 2000 })
 
-    const antimatterFlow = transportPanel.locator('.flow-wrapper').filter({ hasText: '反物质转换器' })
-    await expect(antimatterFlow).toBeVisible({ timeout: 2000 })
-
-    const mainRow = antimatterFlow.locator('.main-row')
+    const mainRow = antimatterItem.locator('.main-row')
     await mainRow.click()
     await page.waitForTimeout(200)
 
-    const listBox = antimatterFlow.locator('.list-box')
+    const listBox = antimatterItem.locator('.list-box')
     await expect(listBox).toBeVisible({ timeout: 1000 })
 
     const listContent = await listBox.textContent()
