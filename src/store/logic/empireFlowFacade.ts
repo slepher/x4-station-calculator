@@ -327,7 +327,18 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
   function getSectorFinalProductionFlows(sectorId: string): WareProductionFlow[] {
     if (!inputFlowMap.value) return []
-    return inputFlowMap.value.getSectorCombinedFlows(sectorId)
+    const combined = inputFlowMap.value.getSectorCombinedFlows(sectorId)
+    const stationNameMap = new Map(productionStations.value.map(s => [s.id, s.name]))
+    const sectorNameMap = new Map(sectors.value.map(s => [s.id, s.name]))
+    return combined.map(flow => ({
+      ...flow,
+      contributions: flow.contributions.map(c => ({
+        ...c,
+        name: c.class === 'sector'
+          ? sectorNameMap.get(c.id) || c.id
+          : stationNameMap.get(c.id) || c.id
+      }))
+    }))
   }
 
   function getStationComponentGapFlows(stationId: string | null, activeStationId: string | null): StationComponentGapFlows {

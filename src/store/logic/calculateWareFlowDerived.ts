@@ -87,7 +87,7 @@ export function deriveProductionFlows(
         ? modulesMap[atom.id]?.name || atom.id
         : atom.class === 'workforce'
           ? atom.id
-          : atom.id,
+          : ((atom as unknown as Record<string, unknown>).name as string) || atom.id,
       netValue: atom.amount * unitPrice,
       transportVolume: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
     }))
