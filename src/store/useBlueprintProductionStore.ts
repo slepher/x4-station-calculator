@@ -24,6 +24,7 @@ import { useActiveViewStore } from './useActiveViewStore'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { StationDerivedMap, type StationDerivedStaticDeps } from './state/StationDerivedMap'
+import { deriveProductionFlows } from './logic/calculateWareFlowDerived'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -798,6 +799,25 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
+      derivedProductionFlows: deriveProductionFlows({
+        productionFlows: state.productionFlows,
+        autoIndustryModules: [],
+        plannedModules: [],
+        modulesMap: gameData.modulesMap,
+        waresMap: gameData.waresMap,
+        settings: {
+          racePreference: settings.value.racePreference,
+          resourceBufferHours: settings.value.resourceBufferHours,
+          primaryProductBufferHours: settings.value.primaryProductBufferHours,
+          secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
+          buyMultiplier: settings.value.buyMultiplier,
+          sellMultiplier: settings.value.sellMultiplier,
+          transportMinutes: settings.value.transportMinutes || 30,
+          transportShipCapacity: 0,
+          sunlight: settings.value.sunlight ?? 100
+        },
+        warePriorityLevels: state.warePriorityLevels
+      }),
       warePriorityLevels: state.warePriorityLevels,
       settings: {
         ...settings.value,

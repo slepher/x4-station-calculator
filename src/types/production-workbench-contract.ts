@@ -3,7 +3,7 @@ import type {
   SavedModule,
   StationSettings
 } from './x4'
-import type { WareProductionFlow } from './production-flow'
+import type { WareProductionFlow, DerivedProductionFlow } from './production-flow'
 import type { EmpireGapItem, WareFlowViewMode, ProductionTabItem as UiProductionTabItem } from './production-ui'
 
 export interface ProductionWorkbenchCapabilities {
@@ -53,6 +53,7 @@ export interface ProductionStationState {
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
   productionFlows: WareProductionFlow[]
+  derivedProductionFlows: DerivedProductionFlow[]
   warePriorityLevels: Record<string, number>
   settings: StationSettings
   enforceDlcActivation: boolean

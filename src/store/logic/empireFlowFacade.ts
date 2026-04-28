@@ -10,7 +10,8 @@ import type {
   X4Module,
   X4Ware
 } from '@/types/x4'
-import type { WareProductionFlow } from '@/types/production-flow'
+import type { WareProductionFlow, DerivedProductionFlow } from '@/types/production-flow'
+import { deriveProductionFlows, type CalculateWareFlowDerivedInput } from './calculateWareFlowDerived'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { readSaveBindingAggregatedFlows, buildTransitHubsFromBinding } from './liveProductionFlows'
 import { StationDerivedMap } from '@/store/state/StationDerivedMap'
@@ -34,6 +35,11 @@ export interface EmpireFlowFacade {
   getSectorInternalData: (sectorId: string) => SectorInternalData
   getSectorFinalProductionFlows: (sectorId: string) => WareProductionFlow[]
   getStationComponentGapFlows: (stationId: string | null, activeStationId: string | null) => StationComponentGapFlows
+  deriveFlows: (
+    productionFlows: WareProductionFlow[],
+    settings: CalculateWareFlowDerivedInput['settings'],
+    warePriorityLevels?: Record<string, number>
+  ) => DerivedProductionFlow[]
 }
 
 function classifyAndEnrichFlows(
@@ -247,6 +253,33 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     }
   }
 
+  function deriveFlows(
+    flows: WareProductionFlow[],
+    settings: CalculateWareFlowDerivedInput['settings'],
+    warePriorityLevels?: Record<string, number>
+  ): DerivedProductionFlow[] {
+    const stationNameMap = Object.fromEntries(productionStations.value.map(s => [s.id, s.name]))
+    const sectorNameMap = Object.fromEntries(sectors.value.map(s => [s.id, s.name]))
+    const derived = deriveProductionFlows({
+      productionFlows: flows,
+      autoIndustryModules: [],
+      plannedModules: [],
+      modulesMap: modulesMap.value || {},
+      waresMap: waresMap.value || {},
+      settings,
+      warePriorityLevels: warePriorityLevels || {}
+    })
+    const getStationName = (id: string) => stationNameMap[id] || id
+    const getSectorName = (id: string) => sectorNameMap[id] || id
+    return derived.map(flow => ({
+      ...flow,
+      contributions: flow.contributions.map(c => {
+        const d = c as { name?: string }
+        return { ...c, name: c.class === 'sector' ? getSectorName(c.id) : c.class === 'station' ? getStationName(c.id) : d.name || c.id }
+      })
+    }))
+  }
+
   function getSectorFinalProductionFlows(sectorId: string): WareProductionFlow[] {
     if (!inputFlowMap.value) return []
     return inputFlowMap.value.getSectorCombinedFlows(sectorId)
@@ -283,6 +316,7 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     getSupplyPlanningInput,
     getSectorInternalData,
     getSectorFinalProductionFlows,
-    getStationComponentGapFlows
+    getStationComponentGapFlows,
+    deriveFlows
   }
 }

@@ -89,6 +89,7 @@ function buildStorageFlowsFromProductionFlows(
 
 const props = withDefaults(defineProps<{
   productionFlows: WareProductionFlow[]
+  derivedProductionFlows?: DerivedProductionFlow[]
   viewMode?: SharedViewMode
   buyMultiplier?: number
   sellMultiplier?: number
@@ -127,25 +128,28 @@ const localProductBufferHours = computed({
   set: (value) => emit('update:productBufferHours', value)
 })
 
-const derivedFlows = computed(() => deriveProductionFlows({
-  productionFlows: props.productionFlows,
-  autoIndustryModules: [],
-  plannedModules: [],
-  modulesMap: {},
-  waresMap: gameData.waresMap,
-  settings: {
-    racePreference: 'argon',
-    resourceBufferHours: 0,
-    primaryProductBufferHours: localProductBufferHours.value,
-    secondaryProductBufferHours: 0,
-    buyMultiplier: localBuyMultiplier.value,
-    sellMultiplier: localSellMultiplier.value,
-    transportMinutes: 30,
-    transportShipCapacity: 0,
-    sunlight: 100
-  },
-  warePriorityLevels: {}
-}))
+const derivedFlows = computed(() => {
+  if (props.derivedProductionFlows) return props.derivedProductionFlows
+  return deriveProductionFlows({
+    productionFlows: props.productionFlows,
+    autoIndustryModules: [],
+    plannedModules: [],
+    modulesMap: {},
+    waresMap: gameData.waresMap,
+    settings: {
+      racePreference: 'argon',
+      resourceBufferHours: 0,
+      primaryProductBufferHours: localProductBufferHours.value,
+      secondaryProductBufferHours: 0,
+      buyMultiplier: localBuyMultiplier.value,
+      sellMultiplier: localSellMultiplier.value,
+      transportMinutes: 30,
+      transportShipCapacity: 0,
+      sunlight: 100
+    },
+    warePriorityLevels: {}
+  })
+})
 
 const groupedFlows = computed(() => {
   const grouped = computeGroupedFlows({ productionFlows: derivedFlows.value })

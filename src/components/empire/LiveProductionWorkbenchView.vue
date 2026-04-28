@@ -48,17 +48,6 @@ const dashboardPresenter = useProductionDashboardPresenter(liveStore)
 const overviewBuyMultiplier = ref(0.5)
 const overviewSellMultiplier = ref(0.5)
 
-const stationNameMap = computed(() => {
-  const sv = liveStore.planningSourceView
-  if (!sv) return {}
-  return Object.fromEntries(sv.productionStations.map(s => [s.id, s.name]))
-})
-const sectorNameMap = computed(() => {
-  const sv = liveStore.planningSourceView
-  if (!sv) return {}
-  return Object.fromEntries(sv.sectors.map(s => [s.id, s.name]))
-})
-
 const showArchiveModuleList = computed(() => {
   return planningPresenter.props.visualMode.value === 'live' && planningPresenter.props.hasArchive.value
 })
@@ -166,6 +155,7 @@ const showArchiveModuleList = computed(() => {
       <div class="col-span-12 lg:col-span-5">
         <TransitHubCenterDashboard
           :production-flows="wareflowPresenter.props.productionFlows.value"
+          :derived-production-flows="wareflowPresenter.props.derivedProductionFlows.value"
           :view-mode="wareflowPresenter.props.viewMode.value"
           :buy-multiplier="wareflowPresenter.props.settings.value.buyMultiplier"
           :sell-multiplier="wareflowPresenter.props.settings.value.sellMultiplier"
@@ -236,8 +226,7 @@ const showArchiveModuleList = computed(() => {
       <StationWareFlowsDashboard
         :view-mode="wareflowPresenter.props.viewMode.value"
         :production-flows="wareflowPresenter.props.productionFlows.value"
-        :station-name-map="stationNameMap"
-        :sector-name-map="sectorNameMap"
+        :derived-production-flows="wareflowPresenter.props.derivedProductionFlows.value"
         :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"

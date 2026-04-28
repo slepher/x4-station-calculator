@@ -1491,6 +1491,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
+      derivedProductionFlows: planningFlowFacade.deriveFlows(state.productionFlows, settings.value, state.warePriorityLevels),
       warePriorityLevels: state.warePriorityLevels,
       settings: {
         ...settings.value,
