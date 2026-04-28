@@ -4,6 +4,7 @@ import type {
   SaveBindingPlan,
   GroupedFlows,
   EmpireGroupedFlows,
+  EmpireWareFlow,
   SectorInternalData,
   SupplyStorageFlow,
   SupplyPlanningInput,
@@ -11,19 +12,10 @@ import type {
   X4Ware
 } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
-import { analyzeEmpireWareFlow } from './analyzeEmpireWareFlow'
-import { solveMultiWareByLink, type SectorLinkInput, type SolveMultiWareByLinkOutput } from './sectorLinkFlow'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { readSaveBindingAggregatedFlows, buildTransitHubsFromBinding } from './liveProductionFlows'
 import { StationDerivedMap } from '@/store/state/StationDerivedMap'
-import { parseSectorLinkKey } from './sectorLinks'
 import type { EmpireSourceView } from './empireSourceView'
-
-export interface SectorLinkCalcEntry {
-  sectorId: string
-  sectorsInput: Array<{ sectorId: string; netByWare: Record<string, number> }>
-  solverOutput: SolveMultiWareByLinkOutput
-}
 
 export interface EmpireFlowFacadeDeps {
   productionSource: Ref<'empire' | 'save-binding'>
@@ -39,12 +31,51 @@ export interface EmpireFlowFacade {
   stationFlowCache: ComputedRef<Map<string, GroupedFlows>>
   empireGroupedFlows: ComputedRef<EmpireGroupedFlows>
   sectorInternalDataMap: ComputedRef<Map<string, SectorInternalData>>
-  sectorLinkCalcMap: ComputedRef<Map<string, SectorLinkCalcEntry>>
   getSupplyPlanningInput: (sectorId: string) => SupplyPlanningInput
   getSectorInternalData: (sectorId: string) => SectorInternalData
-  getSectorLinkCalc: (sectorId: string) => SectorLinkCalcEntry | null
   getSectorFinalProductionFlows: (sectorId: string) => WareProductionFlow[]
   getStationComponentGapFlows: (stationId: string | null, activeStationId: string | null) => StationComponentGapFlows
+}
+
+function classifyAndEnrichFlows(
+  flows: WareProductionFlow[],
+  waresMap: Record<string, X4Ware>
+): EmpireGroupedFlows {
+  const supply: EmpireWareFlow[] = []
+  const operations: EmpireWareFlow[] = []
+
+  for (const flow of flows) {
+    const isWorkforce = flow.contributions.some(c => c.class === 'workforce')
+    const isNonContainer = flow.transportType !== 'container'
+    const category = (isWorkforce || isNonContainer) ? 'supply' : 'operations'
+
+    const ware = waresMap[flow.wareId]
+    const empireFlow: EmpireWareFlow = {
+      wareId: flow.wareId,
+      orderIndex: flow.orderIndex,
+      tier: flow.tier,
+      transportType: flow.transportType,
+      unitVolume: flow.unitVolume,
+      production: flow.production,
+      consumption: flow.consumption,
+      netRate: flow.netRate,
+      minPrice: ware?.minPrice || 0,
+      avgPrice: ware?.price || 0,
+      maxPrice: ware?.maxPrice || 0,
+      contributions: flow.contributions
+    }
+
+    if (category === 'supply') supply.push(empireFlow)
+    else operations.push(empireFlow)
+  }
+
+  const allFlows = [...operations, ...supply].sort((a, b) => {
+    if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
+    if (a.tier !== b.tier) return b.tier - a.tier
+    return Math.abs(b.netRate) - Math.abs(a.netRate)
+  })
+
+  return { flows: allFlows, empireGroups: { operations, supply } }
 }
 
 function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
@@ -61,89 +92,7 @@ function createEmptySupplyStorageFlows(): SupplyStorageFlow[] {
   return []
 }
 
-function createEmptySolverOutput(): SolveMultiWareByLinkOutput {
-  return {
-    linkWareFlows: [],
-    allocatedDemandBySector: [],
-    deficitSummary: {
-      totalDeficit: 0,
-      deficitByNode: [],
-      producerNodes: []
-    }
-  }
-}
 
-function mergeSectorLinkIntoEmpireGroupedFlows(
-  groupedFlows: EmpireGroupedFlows,
-  solverOutput: SolveMultiWareByLinkOutput | null,
-  sectorId: string,
-  sectors: { id: string; name: string }[],
-  waresMap: Record<string, X4Ware>
-): EmpireGroupedFlows {
-  const safeSolverOutput = solverOutput || createEmptySolverOutput()
-  const sectorNameMap = new Map(sectors.map((sector) => [sector.id, sector.name]))
-  const pendingFlowsByWareId = new Map<string, EmpireGroupedFlows['flows'][number]>()
-
-  groupedFlows.flows.forEach((flow) => {
-    pendingFlowsByWareId.set(flow.wareId, {
-      ...flow,
-      contributions: (flow.contributions || []).map((contrib) => ({ ...contrib }))
-    })
-  })
-
-  safeSolverOutput.linkWareFlows.forEach((linkFlow) => {
-    const isFromHere = linkFlow.from === sectorId
-    const isToHere = linkFlow.to === sectorId
-    if (!isFromHere && !isToHere) return
-
-    const peerSectorId = isFromHere ? linkFlow.to : linkFlow.from
-    const peerSectorName = sectorNameMap.get(peerSectorId) || peerSectorId
-    const flowAmount = linkFlow.amount || 0
-    const contribution = {
-      id: `external:${peerSectorId}`,
-      class: 'station' as const,
-      type: isToHere ? 'production' as const : 'consumption' as const,
-      count: 1,
-      amount: isToHere ? flowAmount : -flowAmount,
-      bonusPercent: 0,
-      stationName: peerSectorName
-    }
-
-    const existingFlow = pendingFlowsByWareId.get(linkFlow.wareId)
-    if (existingFlow) {
-      existingFlow.contributions.push(contribution)
-      existingFlow.production += Math.max(contribution.amount, 0)
-      existingFlow.consumption += Math.max(-contribution.amount, 0)
-      existingFlow.netRate += contribution.amount
-      return
-    }
-
-    const ware = waresMap[linkFlow.wareId]
-    pendingFlowsByWareId.set(linkFlow.wareId, {
-      wareId: linkFlow.wareId,
-      orderIndex: Number.MAX_SAFE_INTEGER,
-      tier: ware?.tier || 0,
-      transportType: ware?.transport || 'container',
-      unitVolume: ware?.volume || 1,
-      production: Math.max(contribution.amount, 0),
-      consumption: Math.max(-contribution.amount, 0),
-      netRate: contribution.amount,
-      minPrice: ware?.minPrice || 0,
-      avgPrice: ware?.price || 0,
-      maxPrice: ware?.maxPrice || 0,
-      contributions: [contribution]
-    })
-  })
-
-  const flows = Array.from(pendingFlowsByWareId.values()).sort((a, b) => {
-    if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
-    if (a.tier !== b.tier) return b.tier - a.tier
-    return Math.abs(b.netRate) - Math.abs(a.netRate)
-  })
-  const operations = flows.filter((flow) => flow.transportType === 'container' && !flow.contributions.some(c => c.class === 'workforce'))
-  const supply = flows.filter((flow) => flow.contributions.some(c => c.class === 'workforce') || flow.transportType !== 'container')
-  return { flows, empireGroups: { operations, supply } }
-}
 
 export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFacade {
   const {
@@ -159,7 +108,6 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
   const derivedBindingStations = sourceView.derivedBindingStations
   const productionStations = sourceView.productionStations
   const productionSectors = sourceView.productionSectors
-  const productionSectorLinks = sourceView.productionSectorLinks
   const sectors = sourceView.sectors
   const sectorLinks = sourceView.sectorLinks
   const orderedStationsBySector = sourceView.orderedStationsBySector
@@ -209,37 +157,21 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
       return createEmptyEmpireGroupedFlows()
     }
 
-    return flowMap.getEmpireGroupedFlows(
-      activeEmpire.value.stations,
-      waresMap.value,
-      (flow, stationId) => {
-        if (flow.netRate <= 0) return true
-        const cache = flowMap.getCache(stationId)
-        return (cache?.warePriorityLevels[flow.wareId] ?? 0) > 0
-      }
-    )
+    const rawFlows = flowMap.getEmpireFlows()
+    return classifyAndEnrichFlows(rawFlows, waresMap.value)
   })
 
   const rawSectorGroupedFlowsMap = computed<Map<string, EmpireGroupedFlows>>(() => {
     const map = new Map<string, EmpireGroupedFlows>()
     const flowMap = inputFlowMap.value
     if (!flowMap) return map
-    if (!modulesMap.value || !waresMap.value) return map
+    if (!waresMap.value) return map
 
     const sectorList = productionSectors.value
-    const stations = productionStations.value
 
     sectorList.forEach((sector) => {
-      const localStations = stations.filter((station) => station.sectorId === sector.id)
-      const rawGroupedFlows = analyzeEmpireWareFlow(localStations, (stationId) => {
-        const cache = flowMap.getCache(stationId)
-        if (!cache) return []
-        return cache.productionFlows.filter(f => {
-          if (f.netRate <= 0) return true
-          return (cache.warePriorityLevels[f.wareId] ?? 0) > 0
-        })
-      }, waresMap.value!)
-      map.set(sector.id, rawGroupedFlows)
+      const rawFlows = flowMap.getSectorFlows(sector.id)
+      map.set(sector.id, classifyAndEnrichFlows(rawFlows, waresMap.value!))
     })
 
     return map
@@ -349,78 +281,6 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     return map
   })
 
-  const sectorLinkCalcMap = computed<Map<string, SectorLinkCalcEntry>>(() => {
-    const result = new Map<string, SectorLinkCalcEntry>()
-    const flowMap = inputFlowMap.value
-    if (!flowMap) return result
-    if (!modulesMap.value) return result
-
-    const links: SectorLinkInput[] = productionSectorLinks.value
-      .map((key) => parseSectorLinkKey(key))
-      .filter((item): item is { a: string; b: string } => !!item)
-      .map((item) => ({
-        linkId: `${item.a}|${item.b}`,
-        a: item.a,
-        b: item.b,
-        distance: 1
-      }))
-
-    const sectorsInput = productionSectors.value.map((sector) => {
-      const rawGroupedFlows = rawSectorGroupedFlowsMap.value.get(sector.id) || createEmptyEmpireGroupedFlows()
-      const netByWare: Record<string, number> = {}
-      rawGroupedFlows.flows
-        .filter((flow) => flow.transportType === 'container')
-        .forEach((flow) => {
-          netByWare[flow.wareId] = Number(flow.netRate || 0)
-        })
-      return {
-        sectorId: sector.id,
-        netByWare
-      }
-    })
-
-    const solverOutput = solveMultiWareByLink({
-      sectors: sectorsInput,
-      links,
-      epsilon: 1e-9
-    })
-
-    if (import.meta.env.DEV) {
-      const wareIds = Array.from(new Set(
-        sectorsInput.flatMap((sectorInput) => Object.keys(sectorInput.netByWare || {}))
-      )).sort()
-      console.groupCollapsed(`[SectorLinkCalc][TransitHub] mode=global-all-container wares=${wareIds.join(',')}`)
-      console.log('[SectorLinkCalc][TransitHub] links', links)
-      sectorsInput.forEach((sectorInput) => {
-        const relatedFlows = solverOutput.linkWareFlows.filter(
-          (flow) => flow.from === sectorInput.sectorId || flow.to === sectorInput.sectorId
-        )
-        const allocated = solverOutput.allocatedDemandBySector.find((item) => item.sectorId === sectorInput.sectorId)
-        const deficit = solverOutput.deficitSummary.deficitByNode.find((item) => item.sectorId === sectorInput.sectorId)
-        const producers = solverOutput.deficitSummary.producerNodes.find((item) => item.sectorId === sectorInput.sectorId)
-        console.groupCollapsed(`[SectorLinkCalc][TransitHub][Sector] ${sectorInput.sectorId}`)
-        console.log('input.netByWare', sectorInput.netByWare)
-        console.log('output.linkWareFlows', relatedFlows)
-        console.log('output.allocatedDemand', allocated || null)
-        console.log('output.deficit', deficit || null)
-        console.log('output.producers', producers || null)
-        console.groupEnd()
-      })
-      console.log('[SectorLinkCalc][TransitHub] totalDeficit', solverOutput.deficitSummary.totalDeficit)
-      console.groupEnd()
-    }
-
-    productionSectors.value.forEach((viewSector) => {
-      result.set(viewSector.id, {
-        sectorId: viewSector.id,
-        sectorsInput,
-        solverOutput
-      })
-    })
-
-    return result
-  })
-
   function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
     if (!inputFlowMap.value) {
       return {
@@ -463,32 +323,9 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     }
   }
 
-  function getSectorLinkCalc(sectorId: string): SectorLinkCalcEntry | null {
-    return sectorLinkCalcMap.value.get(sectorId) || null
-  }
-
   function getSectorFinalProductionFlows(sectorId: string): WareProductionFlow[] {
     if (!inputFlowMap.value) return []
-    const rawGroupedFlows = rawSectorGroupedFlowsMap.value.get(sectorId) || createEmptyEmpireGroupedFlows()
-    const sectorLinkCalc = getSectorLinkCalc(sectorId)
-    const merged = mergeSectorLinkIntoEmpireGroupedFlows(
-      rawGroupedFlows,
-      sectorLinkCalc?.solverOutput || createEmptySolverOutput(),
-      sectorId,
-      sectors.value,
-      waresMap.value || {}
-    )
-    return merged.flows.map((flow) => ({
-      wareId: flow.wareId,
-      orderIndex: flow.orderIndex,
-      tier: flow.tier,
-      transportType: flow.transportType,
-      unitVolume: flow.unitVolume,
-      production: flow.production,
-      consumption: flow.consumption,
-      netRate: flow.netRate,
-      contributions: flow.contributions.map((contrib) => ({ ...contrib, class: 'station' as const }))
-    }))
+    return inputFlowMap.value.getSectorCombinedFlows(sectorId)
   }
 
   function getStationComponentGapFlows(stationId: string | null, activeStationId: string | null): StationComponentGapFlows {
@@ -519,10 +356,8 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     stationFlowCache,
     empireGroupedFlows,
     sectorInternalDataMap,
-    sectorLinkCalcMap,
     getSupplyPlanningInput,
     getSectorInternalData,
-    getSectorLinkCalc,
     getSectorFinalProductionFlows,
     getStationComponentGapFlows
   }

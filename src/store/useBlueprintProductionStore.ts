@@ -310,7 +310,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       modules: station.modules || [],
       settings: station.settings || {},
       lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {}
+      warePriority: station.warePriority || {},
+      count: station.count
     })
   }
 
@@ -347,7 +348,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       modules: station.modules || [],
       settings: station.settings || {},
       lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {}
+      warePriority: station.warePriority || {},
+      count: station.count
     })
     return tempMap.getGrouped(station.id)
   }
@@ -363,7 +365,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         modules: station.modules || [],
         settings: station.settings || {},
         lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
+        warePriority: station.warePriority || {},
+        count: station.count
       })
     })
   }
