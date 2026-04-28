@@ -105,7 +105,7 @@ const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
         :view-mode="wareflowPresenter.props.viewMode.value"
-        :production-flows="wareflowPresenter.props.productionFlows.value"
+        :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
         :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"

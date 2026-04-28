@@ -12,7 +12,9 @@ import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import { buildStationComponentGapFlows } from './logic/stationGapViewModel'
 import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
+import { deriveProductionFlows } from './logic/calculateWareFlowDerived'
 import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
+
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useSaveBindingStore } from './useSaveBindingStore'
@@ -46,6 +48,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   const isReady = ref(false)
   const buildPriceMultiplier = ref(0.5)
+  const overviewBuyMultiplier = ref(0.5)
+  const overviewSellMultiplier = ref(0.5)
   const playerStationRecords = ref<PlayerStationRecord[]>([])
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
@@ -380,6 +384,38 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const empireGroupedFlows = computed(() => {
     if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
     return flowFacade.empireGroupedFlows.value
+  })
+  const empireProductionFlows = computed(() => planningDerivedMap.value?.getEmpireFlows() || [])
+  const empireDerivedProductionFlows = computed(() => {
+    const raw = empireProductionFlows.value
+    if (raw.length === 0) return []
+    const deps = getDerivedStaticDeps()
+    if (!deps) return []
+    const stationNameMap: Record<string, string> = {}
+    planningSourceView.productionStations.value.forEach(s => { stationNameMap[s.id] = s.name })
+    const sectorNameMap: Record<string, string> = {}
+    planningSourceView.sectors.value.forEach(s => { sectorNameMap[s.id] = s.name })
+    return deriveProductionFlows({
+      productionFlows: raw,
+      autoIndustryModules: [],
+      plannedModules: [],
+      modulesMap: deps.modulesMap,
+      waresMap: deps.waresMap,
+      stationNameMap,
+      sectorNameMap,
+      settings: {
+        racePreference: 'argon',
+        resourceBufferHours: 2,
+        primaryProductBufferHours: 2,
+        secondaryProductBufferHours: 2,
+        buyMultiplier: overviewBuyMultiplier.value,
+        sellMultiplier: overviewSellMultiplier.value,
+        transportMinutes: 30,
+        transportShipCapacity: 0,
+        sunlight: 100
+      },
+      warePriorityLevels: {}
+    })
   })
   const sectorInternalDataMap = computed(() => {
     if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
@@ -1658,6 +1694,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     clearStationCaches,
     syncAllBindingStationsToStateMap,
     empireGroupedFlows,
+    empireProductionFlows,
+    empireDerivedProductionFlows,
+    overviewBuyMultiplier,
+    overviewSellMultiplier,
     sectorInternalDataMap,
     saveBinding,
     discardChanges,
