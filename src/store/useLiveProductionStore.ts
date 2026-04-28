@@ -1655,6 +1655,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     archiveStation,
     bindingStation,
     playerStationRecords,
+    planningDerivedMap,
+    liveFlowMap,
     planningFlowFacade,
     liveFlowFacade,
     planningSourceView,

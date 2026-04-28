@@ -6,6 +6,7 @@ import type {
   StationType,
   SavedModule,
   GroupedFlows,
+  EmpireGroupedFlows,
   StationSettings,
   EntityLocation
 } from '@/types/x4'
@@ -32,6 +33,7 @@ import {
   computeActiveStation
 } from './logic/empireSourceView'
 import { buildDerivedActiveStationState } from './logic/productionStationShared'
+import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
 import { createProductionModuleActions, type ProductionModuleStation } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
@@ -418,20 +420,22 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return map.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
-  function getEmpireGroupedFlows(): import('@/types/x4').EmpireGroupedFlows {
+  function getEmpireGroupedFlows(): EmpireGroupedFlows {
     if (!activeEmpire.value || !planningDerivedMap.value) {
       return { flows: [], empireGroups: { operations: [], supply: [] } }
     }
     const map = planningDerivedMap.value
-    return map.getEmpireGroupedFlows(
-      activeEmpire.value.stations,
-      gameData.waresMap,
-      (flow, stationId) => {
-        if (flow.netRate <= 0) return true
-        const cache = map.getCache(stationId)
+    const rawFlows = map.getEmpireFlows()
+
+    const filtered = rawFlows.filter(flow => {
+      if (flow.netRate <= 0) return true
+      return flow.contributions.some(c => {
+        const cache = map.getCache(c.id)
         return (cache?.warePriorityLevels[flow.wareId] ?? 0) > 0
-      }
-    )
+      })
+    })
+
+    return classifyAndEnrichFlows(filtered, gameData.waresMap)
   }
 
   function getSavedStationGroupedFlows(station: StationPlan): GroupedFlows {
@@ -1022,6 +1026,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
     toggleMineral: toggleMineralFromActive,
 
+    planningDerivedMap,
     buildConstraints,
     buildPlan,
     empireModules,

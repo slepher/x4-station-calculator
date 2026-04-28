@@ -37,7 +37,7 @@ export interface EmpireFlowFacade {
   getStationComponentGapFlows: (stationId: string | null, activeStationId: string | null) => StationComponentGapFlows
 }
 
-function classifyAndEnrichFlows(
+export function classifyAndEnrichFlows(
   flows: WareProductionFlow[],
   waresMap: Record<string, X4Ware>
 ): EmpireGroupedFlows {
