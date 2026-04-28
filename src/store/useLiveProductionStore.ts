@@ -13,7 +13,7 @@ import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import { buildStationComponentGapFlows } from './logic/stationGapViewModel'
 import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
 import { deriveProductionFlows } from './logic/calculateWareFlowDerived'
-import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
+import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding } from '@/types/x4'
 
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -57,36 +57,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
   const liveFlowMap = shallowRef<StationDerivedMap | null>(null)
   const dirtyBindingStationIds = ref<DirtyBindingState>(null)
-
-
-  function computeDirtyStation(stationId: string) {
-    const dirty = dirtyBindingStationIds.value
-    if (dirty === null) return
-    if (dirty === 'all' || dirty.has(stationId)) {
-      const deps = getDerivedStaticDeps()
-      if (deps) syncLiveFlowMapForStation(stationId, deps)
-      if (dirty !== 'all') {
-        dirty.delete(stationId)
-        if (dirty.size === 0) {
-          dirtyBindingStationIds.value = null
-        }
-      }
-    }
-  }
-
-  function flushAllDirtyStations() {
-    const dirty = dirtyBindingStationIds.value
-    if (dirty === null) return
-    if (dirty === 'all') {
-      syncLiveFlowMap()
-    } else {
-      const deps = getDerivedStaticDeps()
-      dirty.forEach((stationId) => {
-        if (deps) syncLiveFlowMapForStation(stationId, deps)
-      })
-    }
-    dirtyBindingStationIds.value = null
-  }
 
   function markAllDirty() {
     dirtyBindingStationIds.value = 'all'
@@ -375,16 +345,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     flowMap: computed(() => liveFlowMap.value)
   })
 
-  const flowFacade = planningFlowFacade
-
-  const stationFlowCache = computed(() => {
-    if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
-    return flowFacade.stationFlowCache.value
-  })
-  const empireGroupedFlows = computed(() => {
-    if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
-    return flowFacade.empireGroupedFlows.value
-  })
   const empireProductionFlows = computed(() => planningDerivedMap.value?.getEmpireFlows() || [])
   const empireDerivedProductionFlows = computed(() => {
     const raw = empireProductionFlows.value
@@ -417,10 +377,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       warePriorityLevels: {}
     })
   })
-  const sectorInternalDataMap = computed(() => {
-    if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
-    return flowFacade.sectorInternalDataMap.value
-  })
   const activeTransitSectorId = computed(() => computeActiveTransitSectorId(
     activeStationId.value,
     sectors.value
@@ -432,12 +388,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function getStationById(stationId: string): StationPlan | null {
     return planningSourceView.getStationById(stationId)
-  }
-
-  function getLinkedSectors(sectorId: string): string[] {
-    const group = activeBinding.value?.groups.find(g => g.id === sectorId)
-    if (!group) return []
-    return group.connectedGroupIds || []
   }
 
   const workbenchMode = computed<'station' | 'transit' | 'overview'>(() => {
@@ -1086,28 +1036,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     markStationDirty(stationId)
   }
 
-  function getStationFlowCache(stationId: string): GroupedFlows | null {
-    computeDirtyStation(stationId)
-    const flowMapToUse = mode.value === 'live' ? liveFlowMap.value : planningDerivedMap.value
-    if (!flowMapToUse) return null
-    const cache = flowMapToUse?.getCache(stationId) || null
-    if (!cache) return null
-    return flowMapToUse.getFilteredGrouped(stationId, cache.warePriorityLevels)
-  }
-
-  function clearStationCaches() {
-    planningDerivedMap.value?.clear()
-    liveFlowMap.value?.clear()
-  }
-
-  function getSupplyPlanningInput(sectorId: string): SupplyPlanningInput {
-    return flowFacade.getSupplyPlanningInput(sectorId)
-  }
-
-  function getSectorInternalData(sectorId: string): SectorInternalData {
-    return flowFacade.getSectorInternalData(sectorId)
-  }
-
   function getStationComponentGapFlows(stationId: string | null): StationComponentGapFlows {
     const map = planningDerivedMap.value
     if (!map || !stationId) return { operations: [], supply: [] }
@@ -1269,12 +1197,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return true
   }
 
-  function renameBindingSector(sectorId: string, name: string): boolean {
-    const binding = activeBinding.value
-    if (!binding) return false
-    return saveBindingStore.updateGroup(binding.gameGuid, sectorId, { name })
-  }
-
   const isDirty = computed(() => saveBindingStore.isDirty)
 
   function saveBinding() {
@@ -1294,14 +1216,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           activeStationId.value = plan.saveStationCode
         }
       }
-    }
-  }
-
-  function discardChanges() {
-    saveBindingStore.discardChanges()
-    const guid = activeBinding.value?.gameGuid || activeViewStore.activeBinding
-    if (guid) {
-      validateActiveStationId()
     }
   }
 
@@ -1688,48 +1602,28 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     titleValue,
     titlePlaceholder,
     derivedBindingStations,
-    stationFlowCache,
-    getStationFlowCache,
-    syncBindingStationDerivedSnapshot,
-    clearStationCaches,
     syncAllBindingStationsToStateMap,
-    empireGroupedFlows,
-    empireProductionFlows,
     empireDerivedProductionFlows,
     overviewBuyMultiplier,
     overviewSellMultiplier,
-    sectorInternalDataMap,
     saveBinding,
-    discardChanges,
     createStation,
     deleteStation,
     renameStation,
     selectTransitSector,
     setExpandedSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
-    getLinkedSectors,
     getStationById,
-    getDerivedBindingStation,
     mode,
-    initialMode,
     canToggle,
     toggleMode,
     updateStationModules,
     applyImportedStationPayload,
-    renameBindingSector,
     initialize,
     activateBinding,
     openBinding,
-    validateActiveStationId,
-    getSupplyPlanningInput,
-    getSectorInternalData,
-    getStationComponentGapFlows,
     archiveStation,
     bindingStation,
     playerStationRecords,
-    planningFlowFacade,
-    liveFlowFacade,
-    planningSourceView,
-    liveSourceView,
 
     session,
     context,
