@@ -619,33 +619,10 @@ export interface SupplyPlanningInput {
   localStationIds: string[];
 }
 
-export interface SupplyStorageFlowDetail {
-  stationId: string;
-  stationName: string;
-  stationCount: number;
-  kind: 'production' | 'consumption';
-  staticRate: number;
-  storageVolume: number;
-  sortOrder?: number;
-}
-
-export interface SupplyStorageFlow {
-  wareId: string;
-  orderIndex: number;
-  tier: number;
-  transportType: TransportType;
-  unitVolume: number;
-  totalProductionStorageVolume: number;
-  totalConsumptionStorageVolume: number;
-  totalRequiredStorageVolume: number;
-  details: SupplyStorageFlowDetail[];
-}
-
 export interface SectorInternalData {
   sectorId: string;
   planning: SupplyPlanningInput;
   localGroupedFlows: EmpireGroupedFlows;
-  supplyStorageFlows: SupplyStorageFlow[];
   storageModulePlans: TransitHubStorageModulePlan[];
   autoIndustryModules: SavedModule[];
   autoHabitationModules: SavedModule[];
@@ -660,26 +637,6 @@ export interface TransitHubStorageModulePlan {
   capacity: number;
   required: number;
   type: 'container' | 'solid' | 'liquid';
-}
-
-export interface TransitHubWareFlow extends EmpireWareFlow {
-  unitPrice: number;
-  netValue: number;
-}
-
-export interface TransitHubGroupedFlows {
-  flows: TransitHubWareFlow[];
-  empireGroups: {
-    operations: TransitHubWareFlow[];
-    supply: TransitHubWareFlow[];
-  };
-}
-
-export interface TransitHubViewModel {
-  groupedFlows: TransitHubGroupedFlows;
-  storageFlows: SupplyStorageFlow[];
-  storageModulePlans: TransitHubStorageModulePlan[];
-  supplyBuildModules: SavedModule[];
 }
 
 // [新增] 人口普查结果接口

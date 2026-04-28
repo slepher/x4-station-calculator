@@ -3,9 +3,10 @@ import { computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { SupplyStorageFlow } from '@/types/x4'
+
 import type { DerivedProductionFlow, WareProductionFlow } from '@/types/production-flow'
 import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
+import { computeGroupedFlows } from '@/components/empire/composables/useWareFlowGrouping'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -23,9 +24,9 @@ type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 function buildStorageFlowsFromProductionFlows(
   productionFlows: DerivedProductionFlow[],
   bufferHours: number
-): SupplyStorageFlow[] {
+): any[] {
   const safeBufferHours = Number.isFinite(bufferHours) && bufferHours > 0 ? bufferHours : 12
-  const byWare = new Map<string, SupplyStorageFlow>()
+  const byWare = new Map<string, any>()
 
   productionFlows
     .filter((flow) => flow.transportType === 'container')
@@ -47,11 +48,8 @@ function buildStorageFlowsFromProductionFlows(
         const amount = Math.abs(detail.amount || 0)
         if (amount === 0) return
         row.details.push({
-          stationId: detail.id,
-          stationName: (detail as unknown as Record<string, string>).stationName || '',
-          stationCount: detail.count || 1,
-          kind: detail.amount >= 0 ? 'production' : 'consumption',
-          staticRate: amount,
+          ...detail,
+          netValue: 0,
           storageVolume: amount * (flow.unitVolume || 1) * safeBufferHours,
           sortOrder: index
         })
@@ -61,23 +59,23 @@ function buildStorageFlowsFromProductionFlows(
     })
 
   return Array.from(byWare.values())
-    .map((row) => {
+    .map((row: any) => {
       const totalProductionStorageVolume = row.details
-        .filter((detail) => detail.kind === 'production')
-        .reduce((sum, detail) => sum + detail.storageVolume, 0)
+        .filter((detail: any) => detail.type === 'production')
+        .reduce((sum: number, detail: any) => sum + (detail.storageVolume || 0), 0)
       const totalConsumptionStorageVolume = row.details
-        .filter((detail) => detail.kind === 'consumption')
-        .reduce((sum, detail) => sum + detail.storageVolume, 0)
+        .filter((detail: any) => detail.type === 'consumption')
+        .reduce((sum: number, detail: any) => sum + (detail.storageVolume || 0), 0)
       return {
         ...row,
         totalProductionStorageVolume,
         totalConsumptionStorageVolume,
         totalRequiredStorageVolume: Math.max(totalProductionStorageVolume, totalConsumptionStorageVolume),
-        details: [...row.details].sort((a, b) => {
+        details: [...row.details].sort((a: any, b: any) => {
           const orderA = Number(a.sortOrder)
           const orderB = Number(b.sortOrder)
           if (Number.isFinite(orderA) && Number.isFinite(orderB) && orderA !== orderB) return orderA - orderB
-          return b.storageVolume - a.storageVolume
+          return (b.storageVolume || 0) - (a.storageVolume || 0)
         })
       }
     })
@@ -91,6 +89,7 @@ function buildStorageFlowsFromProductionFlows(
 
 const props = withDefaults(defineProps<{
   productionFlows: WareProductionFlow[]
+  derivedProductionFlows?: DerivedProductionFlow[]
   viewMode?: SharedViewMode
   buyMultiplier?: number
   sellMultiplier?: number
@@ -129,34 +128,37 @@ const localProductBufferHours = computed({
   set: (value) => emit('update:productBufferHours', value)
 })
 
-const derivedFlows = computed(() => deriveProductionFlows({
-  productionFlows: props.productionFlows,
-  autoIndustryModules: [],
-  plannedModules: [],
-  modulesMap: {},
-  waresMap: gameData.waresMap,
-  settings: {
-    racePreference: 'argon',
-    resourceBufferHours: 0,
-    primaryProductBufferHours: localProductBufferHours.value,
-    secondaryProductBufferHours: 0,
-    buyMultiplier: localBuyMultiplier.value,
-    sellMultiplier: localSellMultiplier.value,
-    transportMinutes: 30,
-    transportShipCapacity: 0,
-    sunlight: 100
-  },
-  warePriorityLevels: {}
-}))
+const derivedFlows = computed(() => {
+  if (props.derivedProductionFlows) return props.derivedProductionFlows
+  return deriveProductionFlows({
+    productionFlows: props.productionFlows,
+    autoIndustryModules: [],
+    plannedModules: [],
+    modulesMap: {},
+    waresMap: gameData.waresMap,
+    settings: {
+      racePreference: 'argon',
+      resourceBufferHours: 0,
+      primaryProductBufferHours: localProductBufferHours.value,
+      secondaryProductBufferHours: 0,
+      buyMultiplier: localBuyMultiplier.value,
+      sellMultiplier: localSellMultiplier.value,
+      transportMinutes: 30,
+      transportShipCapacity: 0,
+      sunlight: 100
+    },
+    warePriorityLevels: {}
+  })
+})
 
 const groupedFlows = computed(() => {
-  const flows = derivedFlows.value
-
-  const products = flows.filter((flow) => flow.netRate > 0)
-  const operations = flows.filter((flow) => flow.netRate <= 0 && !flow.contributions.some(c => c.class === 'workforce') && flow.transportType === 'container')
-  const supply = flows.filter((flow) => flow.contributions.some(c => c.class === 'workforce') || flow.transportType !== 'container')
-
-  return { flows, products, operations, supply }
+  const grouped = computeGroupedFlows({ productionFlows: derivedFlows.value })
+  return {
+    flows: grouped.flows,
+    products: grouped.rateGroups.positive,
+    operations: grouped.rateGroups.operations,
+    supply: [...grouped.rateGroups.supply, ...grouped.rateGroups.resources]
+  }
 })
 const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(derivedFlows.value, localProductBufferHours.value))
 
@@ -241,12 +243,8 @@ const transportItems = computed(() =>
   storageFlows.value.map((storageFlow) => {
     const details = (storageFlow.details || [])
       .map((detail: any) => ({
-        stationId: detail.stationId,
-        stationName: detail.stationName,
-        stationCount: detail.stationCount,
-        kind: detail.kind,
-        transportVolume: Math.abs(detail.staticRate || 0) * (storageFlow.unitVolume || 0),
-        sortOrder: detail.sortOrder
+        ...detail,
+        transportVolume: Math.abs(detail.amount || 0) * (storageFlow.unitVolume || 0)
       }))
       .filter((detail: any) => detail.transportVolume > 0)
     const totalTransportVolume = details.reduce((sum: number, detail: any) => sum + detail.transportVolume, 0)

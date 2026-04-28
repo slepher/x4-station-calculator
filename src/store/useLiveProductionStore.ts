@@ -10,6 +10,8 @@ import type { SectorInternalData } from '@/types/x4'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
+import { buildStationComponentGapFlows } from './logic/stationGapViewModel'
+import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
 import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -51,6 +53,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
   const liveFlowMap = shallowRef<StationDerivedMap | null>(null)
   const dirtyBindingStationIds = ref<DirtyBindingState>(null)
+
 
   function computeDirtyStation(stationId: string) {
     const dirty = dirtyBindingStationIds.value
@@ -343,6 +346,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const sectors = planningSourceView.sectors
+  const sectorLinks = planningSourceView.sectorLinks
+  const productionStations = planningSourceView.productionStations
   const orderedStationsBySector = planningSourceView.orderedStationsBySector
   const derivedBindingStations = planningSourceView.derivedBindingStations
 
@@ -1068,7 +1073,32 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   function getStationComponentGapFlows(stationId: string | null): StationComponentGapFlows {
-    return flowFacade.getStationComponentGapFlows(stationId, activeStationId.value)
+    const map = planningDerivedMap.value
+    if (!map || !stationId) return { operations: [], supply: [] }
+    const station = productionStations.value.find(s => s.id === stationId)
+    if (!station) return { operations: [], supply: [] }
+    const wm = gameData.waresMap || {}
+    const sectorInternalData = new Map<string, SectorInternalData>()
+    for (const sector of sectors.value) {
+      const rawFlows = map.getSectorFlows(sector.id)
+      const localGroupedFlows = classifyAndEnrichFlows(rawFlows, wm)
+      sectorInternalData.set(sector.id, {
+        sectorId: sector.id,
+        planning: { sectorId: sector.id, localStationIds: [] },
+        localGroupedFlows,
+        storageModulePlans: [],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: []
+      })
+    }
+    return buildStationComponentGapFlows({
+      currentSectorId: station.sectorId || '',
+      sectors: sectors.value,
+      sectorLinks: sectorLinks.value,
+      orderedStations: orderedStationsBySector.value,
+      sectorInternalDataMap: sectorInternalData
+    })
   }
 
   function updateBindingStationPlan(
@@ -1491,6 +1521,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
+      derivedProductionFlows: planningFlowFacade.deriveFlows(state.productionFlows, settings.value, state.warePriorityLevels),
       warePriorityLevels: state.warePriorityLevels,
       settings: {
         ...settings.value,

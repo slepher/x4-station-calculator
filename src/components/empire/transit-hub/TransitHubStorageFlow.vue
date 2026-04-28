@@ -2,14 +2,14 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
-import type { SupplyStorageFlowDetail } from '@/types/x4'
+import type { DerivedFlowContribution } from '@/types/production-flow'
 
 const props = defineProps<{
   resourceId: string
   name: string
   unitVolume: number
   totalRequiredStorageVolume: number
-  details: SupplyStorageFlowDetail[]
+  details: DerivedFlowContribution[]
 }>()
 
 const { t } = useI18n()
@@ -31,25 +31,25 @@ const formattedDetails = computed(() => {
         if (hasOrderA && !hasOrderB) return -1
         if (!hasOrderA && hasOrderB) return 1
       }
-      if (a.kind !== b.kind) return a.kind === 'production' ? -1 : 1
-      return b.storageVolume - a.storageVolume
+      if (a.type !== b.type) return a.type === 'production' ? -1 : 1
+      return (b.storageVolume || 0) - (a.storageVolume || 0)
     })
     .map((detail) => ({
       ...detail,
-      isExternal: String(detail.stationId || '').startsWith('external:'),
+      isExternal: detail.class === 'sector',
       storageCount: (!props.unitVolume || props.unitVolume <= 0)
         ? 0
-        : Math.ceil(detail.storageVolume / props.unitVolume),
-      kindLabel: String(detail.stationId || '').startsWith('external:')
-        ? (detail.kind === 'production'
+        : Math.ceil((detail.storageVolume || 0) / props.unitVolume),
+      kindLabel: detail.class === 'sector'
+        ? (detail.type === 'production'
             ? t('sectorManagement.supply_storage_input')
             : t('sectorManagement.supply_storage_output'))
-        : (detail.kind === 'production'
+        : (detail.type === 'production'
             ? t('sectorManagement.supply_storage_production')
             : t('sectorManagement.supply_storage_consumption')),
-      kindClass: String(detail.stationId || '').startsWith('external:')
-        ? (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
-        : (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
+      kindClass: detail.class === 'sector'
+        ? (detail.type === 'production' ? 'kind-pos' : 'kind-neg')
+        : (detail.type === 'production' ? 'kind-pos' : 'kind-neg')
     }))
 })
 </script>
@@ -76,9 +76,9 @@ const formattedDetails = computed(() => {
 
       <template #row="{ item }">
         <span class="item-name">
-          <span class="qty">{{ item.stationCount }}</span>
+          <span class="qty">{{ item.count }}</span>
           <span class="symbol">x</span>
-          <span class="name">{{ item.stationName }}</span>
+          <span class="name">{{ item.name }}</span>
           <span :class="item.kindClass">
             {{ item.kindLabel }}
           </span>

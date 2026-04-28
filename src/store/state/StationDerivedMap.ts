@@ -232,12 +232,7 @@ function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
     totalOccupiedVolume: 0,
     unitPrice: 0,
     netValue: 0,
-    contributions: prod.contributions.map((atom) => ({
-      ...atom,
-      volumeFlow: atom.amount * prod.unitVolume,
-      valueFlow: 0,
-      transportFlow: 0
-    }))
+    contributions: prod.contributions.map((atom) => ({ ...atom }))
   }
 }
 
@@ -677,13 +672,13 @@ export class StationDerivedMap {
             netRate,
             contributions: [{
               id: stationId,
-              class: 'station',
+              class: 'station' as const,
               type: netRate > 0 ? ('production' as const) : ('consumption' as const),
               count,
               amount: netRate,
               bonusPercent: 0
             }]
-          }
+          } as WareProductionFlow
         })
       
       allFilteredFlows.push(scaledFlows)
@@ -754,8 +749,8 @@ export class StationDerivedMap {
         const peerSectorId = isFrom ? linkFlow.to : linkFlow.from
         const flowAmount = linkFlow.amount || 0
         const contribution = {
-          id: `external:${peerSectorId}`,
-          class: 'station' as const,
+          id: peerSectorId,
+          class: 'sector' as const,
           type: isTo ? 'production' as const : 'consumption' as const,
           count: 1,
           amount: isTo ? flowAmount : -flowAmount,

@@ -2,14 +2,19 @@ import type { TransportType, WareFlow } from './x4'
 
 export interface FlowContribution {
   id: string
-  class: string
+  class: 'module' | 'workforce' | 'station' | 'sector'
   type: 'production' | 'consumption'
   count: number
   amount: number
   bonusPercent: number
-  volumeFlow?: number
-  valueFlow?: number
-  transportFlow?: number
+}
+
+export interface DerivedFlowContribution extends FlowContribution {
+  name: string
+  netValue: number
+  sortOrder?: number
+  storageVolume?: number
+  transportVolume?: number
 }
 
 export interface WareProductionFlow {
@@ -24,14 +29,6 @@ export interface WareProductionFlow {
   netRate: number
 
   contributions: FlowContribution[]
-}
-
-export interface DerivedStationFlowAtom extends FlowContribution {
-  stationName: string
-  netValue: number
-  sortOrder?: number
-  storageVolume?: number
-  transportVolume?: number
 }
 
 export interface DerivedProductionFlow extends WareFlow {

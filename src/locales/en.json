@@ -705,6 +705,7 @@
     "operations_group": "Operations",
     "supply_group": "Supply",
     "resources_group": "Resources",
+    "sector_products": "Sector Products",
     "sector_operations": "Sector Operations",
     "sector_supply": "Sector Supply",
 "resource_buffer_hours": "Resource Buffer Hours",

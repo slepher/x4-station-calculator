@@ -27,6 +27,7 @@ import { useActiveViewStore } from './useActiveViewStore'
 import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { StationDerivedMap, type StationDerivedStaticDeps } from './state/StationDerivedMap'
+import { deriveProductionFlows } from './logic/calculateWareFlowDerived'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -907,6 +908,13 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
+      derivedProductionFlows: deriveProductionFlows({
+        productionFlows: state.productionFlows,
+        modulesMap: gameData.modulesMap,
+        waresMap: gameData.waresMap,
+        settings: settings.value,
+        warePriorityLevels: state.warePriorityLevels
+      }),
       warePriorityLevels: state.warePriorityLevels,
       settings: {
         ...settings.value,

@@ -6,7 +6,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useWareFlowGrouping } from './composables/useWareFlowGrouping'
 import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import type { WareProductionFlow } from '@/types/production-flow'
+import type { WareProductionFlow, DerivedProductionFlow } from '@/types/production-flow'
 
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -18,6 +18,7 @@ import ViewTabUi from '@/components/common/ViewTabUI.vue'
 const props = defineProps<{
   viewMode: WareFlowViewMode
   productionFlows: WareProductionFlow[]
+  derivedProductionFlows?: DerivedProductionFlow[]
   warePriorityLevels: Record<string, number>
   settings: {
     resourceBufferHours: number
@@ -57,25 +58,28 @@ const { t, locale } = useI18n()
 const { translateWare } = useX4I18n()
 const { computeGroupedFlows } = useWareFlowGrouping()
 
-const derivedProductionFlows = computed(() => deriveProductionFlows({
-  productionFlows: props.productionFlows,
-  autoIndustryModules: [],
-  plannedModules: [],
-  modulesMap: gameDataStore.modulesMap,
-  waresMap: gameDataStore.waresMap,
-  settings: {
-    racePreference: props.settings.racePreference,
-    resourceBufferHours: props.settings.resourceBufferHours,
-    primaryProductBufferHours: props.settings.primaryProductBufferHours,
-    secondaryProductBufferHours: props.settings.secondaryProductBufferHours,
-    buyMultiplier: props.settings.buyMultiplier,
-    sellMultiplier: props.settings.sellMultiplier,
-    transportMinutes: props.settings.transportMinutes || 30,
-    transportShipCapacity: 0,
-    sunlight: 100
-  },
-  warePriorityLevels: props.warePriorityLevels
-}))
+const derivedProductionFlows = computed(() => {
+  if (props.derivedProductionFlows) return props.derivedProductionFlows
+  return deriveProductionFlows({
+    productionFlows: props.productionFlows,
+    autoIndustryModules: [],
+    plannedModules: [],
+    modulesMap: gameDataStore.modulesMap,
+    waresMap: gameDataStore.waresMap,
+    settings: {
+      racePreference: props.settings.racePreference,
+      resourceBufferHours: props.settings.resourceBufferHours,
+      primaryProductBufferHours: props.settings.primaryProductBufferHours,
+      secondaryProductBufferHours: props.settings.secondaryProductBufferHours,
+      buyMultiplier: props.settings.buyMultiplier,
+      sellMultiplier: props.settings.sellMultiplier,
+      transportMinutes: props.settings.transportMinutes || 30,
+      transportShipCapacity: 0,
+      sunlight: 100
+    },
+    warePriorityLevels: props.warePriorityLevels
+  })
+})
 
 const groupedFlows = computed(() => computeGroupedFlows({
   productionFlows: derivedProductionFlows.value
@@ -122,10 +126,12 @@ const hasEmpireGapItems = computed(() =>
   props.empireGaps.operations.length > 0 || props.empireGaps.supply.length > 0
 )
 
-const empireGapOperations = computed(() =>
-  props.empireGaps.operations.map(wrapFlow)
+const empireGapProducts = computed(() =>
+  props.empireGaps.operations.filter(f => f.netRate > 0).map(wrapFlow)
 )
-
+const empireGapOperations = computed(() =>
+  props.empireGaps.operations.filter(f => f.netRate <= 0).map(wrapFlow)
+)
 const empireGapSupply = computed(() =>
   props.empireGaps.supply.map(wrapFlow)
 )
@@ -307,6 +313,17 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
 
       <div v-if="viewMode === 'economy' || viewMode === 'quantity'" class="volume-groups-container">
           <div v-if="props.settings.showEmpireGaps && viewMode === 'quantity' && hasEmpireGapItems" class="empire-gap-groups">
+            <div v-if="empireGapProducts.length > 0" class="empire-gap-group">
+              <EmpireWareFlowGroup
+                :title="t('wareflow.sector_products')"
+                :items="empireGapProducts"
+                :viewMode="viewMode"
+                :showAddButton="true"
+                :showRemoveButton="true"
+                @add="handleAddModule"
+                @remove="handleRemoveModule"
+              />
+            </div>
             <div v-if="empireGapOperations.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
                 :title="t('wareflow.sector_operations')"

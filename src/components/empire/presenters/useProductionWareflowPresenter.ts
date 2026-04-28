@@ -1,7 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
 import type { ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import type { WareProductionFlow } from '@/types/production-flow'
+import type { WareProductionFlow, DerivedProductionFlow } from '@/types/production-flow'
 
 const DEFAULT_WAREFLOW_SETTINGS = {
   resourceBufferHours: 1.0,
@@ -19,6 +19,7 @@ export interface WareflowPresenterProps {
   visualMode: ComputedRef<'planning' | 'live'>
   viewMode: ComputedRef<WareFlowViewMode>
   productionFlows: ComputedRef<WareProductionFlow[]>
+  derivedProductionFlows: ComputedRef<DerivedProductionFlow[]>
   warePriorityLevels: ComputedRef<Record<string, number>>
   settings: ComputedRef<{
     resourceBufferHours: number
@@ -86,6 +87,7 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
     visualMode: computed(() => store.session.visualMode),
     viewMode: computed(() => store.session.wareflowViewMode),
     productionFlows: computed(() => store.stationState?.productionFlows || []),
+    derivedProductionFlows: computed(() => store.stationState?.derivedProductionFlows || []),
     warePriorityLevels: computed(() => store.stationState?.warePriorityLevels || {}),
     settings: computed(() => {
       const s = store.stationState?.settings

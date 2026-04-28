@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import EmpireWareFlow from './EmpireWareFlow.vue'
-import type { FlowContribution } from '@/types/production-flow'
+import type { DerivedFlowContribution } from '@/types/production-flow'
 
 interface EmpireWareFlowGroupItem {
   id: string
   name: string
   netRate: number
   netValue: number
-  contributions: FlowContribution[]
+  contributions: DerivedFlowContribution[]
   disableAdd?: boolean
   disableRemove?: boolean
 }
