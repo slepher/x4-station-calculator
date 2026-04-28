@@ -58,6 +58,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
   const buildPriceMultiplier = ref(0.5)
+  const overviewBuyMultiplier = ref(0.5)
+  const overviewSellMultiplier = ref(0.5)
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
 
   const buildConstraints = ref<BuildConstraints>({
@@ -457,6 +459,38 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
     return result
   }
+
+  const empireDerivedProductionFlows = computed(() => {
+    const raw = planningDerivedMap.value?.getEmpireFlows() || []
+    if (raw.length === 0) return []
+    const deps = getDerivedStaticDeps()
+    if (!deps) return []
+    const stationNameMap: Record<string, string> = {}
+    activeEmpire.value?.stations.forEach(s => { stationNameMap[s.id] = s.name })
+    const sectorNameMap: Record<string, string> = {}
+    sourceView.sectors.value.forEach(s => { sectorNameMap[s.id] = s.name })
+    return deriveProductionFlows({
+      productionFlows: raw,
+      autoIndustryModules: [],
+      plannedModules: [],
+      modulesMap: deps.modulesMap,
+      waresMap: deps.waresMap,
+      stationNameMap,
+      sectorNameMap,
+      settings: {
+        racePreference: 'argon',
+        resourceBufferHours: 2,
+        primaryProductBufferHours: 2,
+        secondaryProductBufferHours: 2,
+        buyMultiplier: overviewBuyMultiplier.value,
+        sellMultiplier: overviewSellMultiplier.value,
+        transportMinutes: 30,
+        transportShipCapacity: 0,
+        sunlight: 100
+      },
+      warePriorityLevels: {}
+    })
+  })
 
   function getSavedStationGroupedFlows(station: StationPlan): GroupedFlows {
     const deps = getDerivedStaticDeps()
@@ -1054,6 +1088,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     toggleMineral: toggleMineralFromActive,
 
     planningDerivedMap,
+    empireDerivedProductionFlows,
+    overviewBuyMultiplier,
+    overviewSellMultiplier,
     buildConstraints,
     buildPlan,
     empireModules,

@@ -167,7 +167,11 @@ const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
     </div>
     <div class="col-span-12 lg:col-span-5">
       <EmpireWareFlowsDashboard
-        :grouped-flows="buildPlanPresenter.props.currentFlows.value"
+        :production-flows="blueprintStore.empireDerivedProductionFlows"
+        :buy-multiplier="blueprintStore.overviewBuyMultiplier"
+        :sell-multiplier="blueprintStore.overviewSellMultiplier"
+        @update:buy-multiplier="blueprintStore.overviewBuyMultiplier = $event"
+        @update:sell-multiplier="blueprintStore.overviewSellMultiplier = $event"
       />
     </div>
   </div>
