@@ -13,6 +13,8 @@ export interface CalculateWareFlowDerivedInput {
   plannedModules?: SavedModule[]
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
+  stationNameMap?: Record<string, string>
+  sectorNameMap?: Record<string, string>
   settings: {
     racePreference: string
     resourceBufferHours: number
@@ -39,7 +41,9 @@ export function deriveProductionFlows(
     productionFlows,
     waresMap,
     settings,
-    warePriorityLevels
+    warePriorityLevels,
+    stationNameMap,
+    sectorNameMap
   } = input
 
   const wareFlows: DerivedProductionFlow[] = productionFlows.map(prodFlow => {
@@ -87,7 +91,11 @@ export function deriveProductionFlows(
         ? modulesMap[atom.id]?.name || atom.id
         : atom.class === 'workforce'
           ? atom.id
-          : (atom as any).name || atom.id,
+          : atom.class === 'station'
+            ? stationNameMap?.[atom.id] || (atom as any).name || atom.id
+            : atom.class === 'sector'
+              ? sectorNameMap?.[atom.id] || (atom as any).name || atom.id
+              : (atom as any).name || atom.id,
       netValue: atom.amount * unitPrice,
       transportVolume: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
     }))

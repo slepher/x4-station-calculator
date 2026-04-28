@@ -258,26 +258,17 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     settings: CalculateWareFlowDerivedInput['settings'],
     warePriorityLevels?: Record<string, number>
   ): DerivedProductionFlow[] {
-    const stationNameMap = Object.fromEntries(productionStations.value.map(s => [s.id, s.name]))
-    const sectorNameMap = Object.fromEntries(sectors.value.map(s => [s.id, s.name]))
-    const derived = deriveProductionFlows({
+    return deriveProductionFlows({
       productionFlows: flows,
       autoIndustryModules: [],
       plannedModules: [],
       modulesMap: modulesMap.value || {},
       waresMap: waresMap.value || {},
+      stationNameMap: Object.fromEntries(productionStations.value.map(s => [s.id, s.name])),
+      sectorNameMap: Object.fromEntries(sectors.value.map(s => [s.id, s.name])),
       settings,
       warePriorityLevels: warePriorityLevels || {}
     })
-    const getStationName = (id: string) => stationNameMap[id] || id
-    const getSectorName = (id: string) => sectorNameMap[id] || id
-    return derived.map(flow => ({
-      ...flow,
-      contributions: flow.contributions.map(c => {
-        const d = c as { name?: string }
-        return { ...c, name: c.class === 'sector' ? getSectorName(c.id) : c.class === 'station' ? getStationName(c.id) : d.name || c.id }
-      })
-    }))
   }
 
   function getSectorFinalProductionFlows(sectorId: string): WareProductionFlow[] {

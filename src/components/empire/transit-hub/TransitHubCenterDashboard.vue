@@ -4,8 +4,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 
-import type { DerivedProductionFlow, WareProductionFlow } from '@/types/production-flow'
-import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
+import type { DerivedProductionFlow } from '@/types/production-flow'
 import { computeGroupedFlows } from '@/components/empire/composables/useWareFlowGrouping'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
@@ -88,8 +87,7 @@ function buildStorageFlowsFromProductionFlows(
 }
 
 const props = withDefaults(defineProps<{
-  productionFlows: WareProductionFlow[]
-  derivedProductionFlows?: DerivedProductionFlow[]
+  productionFlows: DerivedProductionFlow[]
   viewMode?: SharedViewMode
   buyMultiplier?: number
   sellMultiplier?: number
@@ -128,31 +126,8 @@ const localProductBufferHours = computed({
   set: (value) => emit('update:productBufferHours', value)
 })
 
-const derivedFlows = computed(() => {
-  if (props.derivedProductionFlows) return props.derivedProductionFlows
-  return deriveProductionFlows({
-    productionFlows: props.productionFlows,
-    autoIndustryModules: [],
-    plannedModules: [],
-    modulesMap: {},
-    waresMap: gameData.waresMap,
-    settings: {
-      racePreference: 'argon',
-      resourceBufferHours: 0,
-      primaryProductBufferHours: localProductBufferHours.value,
-      secondaryProductBufferHours: 0,
-      buyMultiplier: localBuyMultiplier.value,
-      sellMultiplier: localSellMultiplier.value,
-      transportMinutes: 30,
-      transportShipCapacity: 0,
-      sunlight: 100
-    },
-    warePriorityLevels: {}
-  })
-})
-
 const groupedFlows = computed(() => {
-  const grouped = computeGroupedFlows({ productionFlows: derivedFlows.value })
+  const grouped = computeGroupedFlows({ productionFlows: props.productionFlows })
   return {
     flows: grouped.flows,
     products: grouped.rateGroups.positive,
@@ -160,7 +135,7 @@ const groupedFlows = computed(() => {
     supply: [...grouped.rateGroups.supply, ...grouped.rateGroups.resources]
   }
 })
-const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(derivedFlows.value, localProductBufferHours.value))
+const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(props.productionFlows, localProductBufferHours.value))
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`

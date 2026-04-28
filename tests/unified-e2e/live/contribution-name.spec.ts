@@ -190,4 +190,27 @@ test.describe('Contribution name 显示验证', () => {
     expect(listContent).toContain('阿尔忒弥斯的朦胧')
     expect(listContent).toContain('警惕凝视')
   })
+
+  test('概览总览: 反物质转换器展开后贡献名应显示 "新建空间站"', async ({ page }) => {
+    const overviewTab = page.locator('[data-testid="overview-tab"]')
+    await expect(overviewTab).toBeVisible({ timeout: 5000 })
+    await overviewTab.click()
+    await page.waitForTimeout(300)
+
+    const dashboard = page.locator('[data-testid="empire-wareflow-dashboard"]')
+    await expect(dashboard).toBeVisible({ timeout: 5000 })
+
+    const antimatterFlow = dashboard.locator('.flow-wrapper').filter({ hasText: '反物质转换器' })
+    await expect(antimatterFlow).toBeVisible({ timeout: 2000 })
+
+    const mainRow = antimatterFlow.locator('.main-row')
+    await mainRow.click()
+    await page.waitForTimeout(200)
+
+    const listBox = antimatterFlow.locator('.list-box')
+    await expect(listBox).toBeVisible({ timeout: 1000 })
+
+    const listContent = await listBox.textContent()
+    expect(listContent).toContain('新建空间站')
+  })
 })

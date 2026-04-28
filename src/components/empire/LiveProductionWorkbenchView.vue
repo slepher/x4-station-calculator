@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
@@ -45,8 +45,6 @@ const toolbarPresenter = useProductionToolbarPresenter(liveStore)
 const planningPresenter = useProductionPlanningPresenter(liveStore)
 const wareflowPresenter = useProductionWareflowPresenter(liveStore)
 const dashboardPresenter = useProductionDashboardPresenter(liveStore)
-const overviewBuyMultiplier = ref(0.5)
-const overviewSellMultiplier = ref(0.5)
 
 const showArchiveModuleList = computed(() => {
   return planningPresenter.props.visualMode.value === 'live' && planningPresenter.props.hasArchive.value
@@ -154,8 +152,7 @@ const showArchiveModuleList = computed(() => {
 
       <div class="col-span-12 lg:col-span-5">
         <TransitHubCenterDashboard
-          :production-flows="wareflowPresenter.props.productionFlows.value"
-          :derived-production-flows="wareflowPresenter.props.derivedProductionFlows.value"
+          :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
           :view-mode="wareflowPresenter.props.viewMode.value"
           :buy-multiplier="wareflowPresenter.props.settings.value.buyMultiplier"
           :sell-multiplier="wareflowPresenter.props.settings.value.sellMultiplier"
@@ -195,11 +192,11 @@ const showArchiveModuleList = computed(() => {
 
       <div class="col-span-12 lg:col-span-5">
         <EmpireWareFlowsDashboard
-          :grouped-flows="liveStore.empireGroupedFlows"
-          :buy-multiplier="overviewBuyMultiplier"
-          :sell-multiplier="overviewSellMultiplier"
-          @update:buy-multiplier="overviewBuyMultiplier = $event"
-          @update:sell-multiplier="overviewSellMultiplier = $event"
+          :production-flows="liveStore.empireDerivedProductionFlows"
+          :buy-multiplier="liveStore.overviewBuyMultiplier"
+          :sell-multiplier="liveStore.overviewSellMultiplier"
+          @update:buy-multiplier="liveStore.overviewBuyMultiplier = $event"
+          @update:sell-multiplier="liveStore.overviewSellMultiplier = $event"
         />
       </div>
 
@@ -225,8 +222,7 @@ const showArchiveModuleList = computed(() => {
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
         :view-mode="wareflowPresenter.props.viewMode.value"
-        :production-flows="wareflowPresenter.props.productionFlows.value"
-        :derived-production-flows="wareflowPresenter.props.derivedProductionFlows.value"
+        :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
         :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"
