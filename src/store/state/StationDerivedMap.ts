@@ -754,8 +754,8 @@ export class StationDerivedMap {
         const peerSectorId = isFrom ? linkFlow.to : linkFlow.from
         const flowAmount = linkFlow.amount || 0
         const contribution = {
-          id: `external:${peerSectorId}`,
-          class: 'station' as const,
+          id: peerSectorId,
+          class: 'external-station' as const,
           type: isTo ? 'production' as const : 'consumption' as const,
           count: 1,
           amount: isTo ? flowAmount : -flowAmount,
