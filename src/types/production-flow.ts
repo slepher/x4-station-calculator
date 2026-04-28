@@ -1,11 +1,15 @@
-import type { TransportType, ModuleFlowAtom, StationFlowAtom, WareFlow } from './x4'
+import type { TransportType, WareFlow } from './x4'
 
-export interface BaseModuleFlowAtom {
-  moduleId: string
-  count: number
+export interface FlowContribution {
+  id: string
+  class: string
   type: 'production' | 'consumption'
+  count: number
   amount: number
   bonusPercent: number
+  volumeFlow?: number
+  valueFlow?: number
+  transportFlow?: number
 }
 
 export interface WareProductionFlow {
@@ -17,14 +21,13 @@ export interface WareProductionFlow {
 
   production: number
   consumption: number
-  workforceConsumption: number
   netRate: number
 
-  contributions: BaseModuleFlowAtom[]
-  stationContributions?: StationFlowAtom[]
+  contributions: FlowContribution[]
 }
 
-export interface DerivedStationFlowAtom extends StationFlowAtom {
+export interface DerivedStationFlowAtom extends FlowContribution {
+  stationName: string
   netValue: number
   sortOrder?: number
   storageVolume?: number
@@ -32,6 +35,4 @@ export interface DerivedStationFlowAtom extends StationFlowAtom {
 }
 
 export interface DerivedProductionFlow extends WareFlow {
-  stationContributions?: DerivedStationFlowAtom[]
-  contributions: ModuleFlowAtom[]
 }

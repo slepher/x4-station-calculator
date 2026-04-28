@@ -179,7 +179,8 @@ export function computeStationFlow(
     modules: station.modules || [],
     settings: station.settings || {},
     lockedWares: station.lockedWares || [],
-    warePriority: station.warePriority || {}
+    warePriority: station.warePriority || {},
+    count: station.count ?? 1
   }
   flowMap.upsertStation(stationId, seed)
 }

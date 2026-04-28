@@ -9,7 +9,6 @@ import type {
 import type { SectorInternalData } from '@/types/x4'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import type { SectorLinkCalcEntry } from './logic/empireFlowFacade'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, GroupedFlows, SupplyPlanningInput } from '@/types/x4'
 import i18n from '@/i18n'
@@ -118,7 +117,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   function createDerivedMap(): StationDerivedMap | null {
     const deps = getDerivedStaticDeps()
     if (!deps) return null
-    return new StationDerivedMap(deps)
+    const sourceView = planningSourceView
+    const sectorLinks = sourceView?.productionSectorLinks?.value ?? []
+    return new StationDerivedMap(deps, {
+      hasSector: true,
+      sectorLinks
+    })
   }
 
   function ensurePlanningDerivedMap(): StationDerivedMap | null {
@@ -376,11 +380,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
     return flowFacade.sectorInternalDataMap.value
   })
-  const sectorLinkCalcMap = computed(() => {
-    if (dirtyBindingStationIds.value !== null) flushAllDirtyStations()
-    return flowFacade.sectorLinkCalcMap.value
-  })
-
   const activeTransitSectorId = computed(() => computeActiveTransitSectorId(
     activeStationId.value,
     sectors.value
@@ -1068,10 +1067,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return flowFacade.getSectorInternalData(sectorId)
   }
 
-  function getSectorLinkCalc(sectorId: string): SectorLinkCalcEntry | null {
-    return flowFacade.getSectorLinkCalc(sectorId)
-  }
-
   function getStationComponentGapFlows(stationId: string | null): StationComponentGapFlows {
     return flowFacade.getStationComponentGapFlows(stationId, activeStationId.value)
   }
@@ -1633,7 +1628,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     syncAllBindingStationsToStateMap,
     empireGroupedFlows,
     sectorInternalDataMap,
-    sectorLinkCalcMap,
     saveBinding,
     discardChanges,
     createStation,
@@ -1657,7 +1651,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     validateActiveStationId,
     getSupplyPlanningInput,
     getSectorInternalData,
-    getSectorLinkCalc,
     getStationComponentGapFlows,
     archiveStation,
     bindingStation,

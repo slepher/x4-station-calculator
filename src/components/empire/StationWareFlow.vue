@@ -6,6 +6,7 @@ import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import LockButton from '../common/LockButton.vue'
 import FavoriteButton from '../common/FavoriteButton.vue'
 import VolumeTooltip from '../common/VolumeTooltip.vue'
+import type { FlowContribution } from '@/types/production-flow'
 
 const { t } = useI18n()
 
@@ -13,7 +14,7 @@ const props = defineProps<{
   resourceId: string
   netRate: number
   name: string
-  details?: any[]
+  details?: FlowContribution[]
   locked?: boolean
   priorityLevel?: number
   netVolume: number
@@ -53,9 +54,6 @@ const translateModule = (moduleId: string) => {
   const module = props.modulesMap?.[moduleId] || gameData.localizedModulesMap[moduleId]
   return module ? module.localeName : moduleId
 }
-
-const isWorkforceEntry = (moduleId: string) => moduleId.startsWith('workforce:')
-const getWorkforceRace = (moduleId: string) => moduleId.split(':')[1]
 
 const nonOperableComputed = computed(() => props.nonOperable ?? false)
 
@@ -135,7 +133,7 @@ const formattedDetails = computed(() => {
 })
 
 const hasProduction = computed(() => props.details?.some(d => d.amount > 0) ?? false)
-const hasConsumption = computed(() => props.details?.some(d => d.amount < 0) ?? false)
+const hasConsumption = computed(() => props.details?.some(d => d.type === 'consumption') ?? false)
 
 const isPlannedComputed = computed(() => props.isPlanned ?? false)
 
@@ -206,11 +204,11 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
             <span class="qty">{{ item.count }}</span>
             <span class="symbol">x</span>
             <span class="name">
-              <template v-if="isWorkforceEntry(item.moduleId)">
-                {{ t(`race.${getWorkforceRace(item.moduleId)}`) }} {{ t('station.workforce_label') }}
+              <template v-if="item.class === 'workforce'">
+                {{ t(`race.${item.id}`) }} {{ t('station.workforce_label') }}
               </template>
               <template v-else>
-                {{ translateModule(item.moduleId) }}
+                {{ translateModule(item.id) }}
               </template>
             </span>
           </span>

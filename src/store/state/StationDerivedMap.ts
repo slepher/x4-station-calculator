@@ -1,12 +1,13 @@
 import { reactive } from 'vue'
-import type { GroupedFlows, EmpireGroupedFlows, EmpireWareFlow, StationFlowAtom, SavedModule, StationSettings, X4Module, WareFlow, StationPlan, X4Ware } from '@/types/x4'
+import type { GroupedFlows, SavedModule, StationSettings, X4Module, WareFlow } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
-import { analyzeEmpireWareFlow } from '@/store/logic/analyzeEmpireWareFlow'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
+import { solveMultiWareByLink } from '@/store/logic/sectorLinkFlow'
+import { parseSectorLinkKey } from '@/store/logic/sectorLinks'
 
 export interface StationDerivedStaticDeps {
   modulesMap: Record<string, X4Module>
@@ -111,6 +112,7 @@ export interface StationDerivedSeed {
   warePriority?: Record<string, number>
   workforces?: WorkforceEntry[]
   archiveSemanticsSource?: StationSemanticDerivedSource
+  count?: number
 }
 
 const DEFAULT_DERIVED_SETTINGS: StationDerivedSettings = {
@@ -220,7 +222,6 @@ function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
     unitVolume: prod.unitVolume,
     production: prod.production,
     consumption: prod.consumption,
-    workforceConsumption: prod.workforceConsumption,
     netRate: prod.netRate,
     productionVolume,
     consumptionVolume,
@@ -232,11 +233,7 @@ function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
     unitPrice: 0,
     netValue: 0,
     contributions: prod.contributions.map((atom) => ({
-      moduleId: atom.moduleId,
-      count: atom.count,
-      type: atom.type,
-      amount: atom.amount,
-      bonusPercent: atom.bonusPercent,
+      ...atom,
       volumeFlow: atom.amount * prod.unitVolume,
       valueFlow: 0,
       transportFlow: 0
@@ -255,7 +252,7 @@ function groupProductionFlows(flows: WareProductionFlow[]): GroupedFlows {
 
   wareFlows.forEach(flow => {
     if (flow.netRate > 0) result.rateGroups.positive.push(flow)
-    else if (flow.workforceConsumption > 0) result.rateGroups.supply.push(flow)
+    else if (flow.contributions.some(c => c.class === 'workforce')) result.rateGroups.supply.push(flow)
     else if (flow.transportType === 'container') result.rateGroups.operations.push(flow)
     else result.rateGroups.resources.push(flow)
 
@@ -282,7 +279,6 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
           unitVolume: flow.unitVolume,
           production: 0,
           consumption: 0,
-          workforceConsumption: 0,
           netRate: 0,
           contributions: []
         }
@@ -291,7 +287,6 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
       const currentEntry = entry
       currentEntry.production += flow.production
       currentEntry.consumption += flow.consumption
-      currentEntry.workforceConsumption += flow.workforceConsumption
       currentEntry.netRate += flow.netRate
       currentEntry.contributions.push(...deepClone(flow.contributions))
     }
@@ -347,15 +342,25 @@ function buildSemanticsFromModules(
   }
 }
 
+export interface StationDerivedMapOptions {
+  hasSector?: boolean
+  sectorLinks?: string[]
+}
+
 export class StationDerivedMap {
   private cacheMap = reactive(new Map<string, StationDerivedCache>())
   private snapshotMap = new Map<string, StationDerivedSnapshot>()
   private empireFlowsCache: WareProductionFlow[] = []
   private sectorFlowsCache: Map<string, WareProductionFlow[]> = new Map()
+  private sectorExternalCache: Map<string, WareProductionFlow[]> = new Map()
   private staticDeps: StationDerivedStaticDeps
+  private hasSector: boolean
+  private sectorLinks: string[]
 
-  constructor(staticDeps: StationDerivedStaticDeps) {
+  constructor(staticDeps: StationDerivedStaticDeps, options?: StationDerivedMapOptions) {
     this.staticDeps = staticDeps
+    this.hasSector = options?.hasSector ?? false
+    this.sectorLinks = options?.sectorLinks ?? []
   }
 
   upsertStation(stationId: string, seed: StationDerivedSeed): void {
@@ -383,6 +388,7 @@ export class StationDerivedMap {
     const snapshot: StationDerivedSnapshot = {
       modulesMode: seed.modulesMode,
       sectorId: seed.sectorId ?? null,
+      count: seed.count ?? 1,
       inputModules,
       fullModules,
       settings,
@@ -511,8 +517,9 @@ export class StationDerivedMap {
   clear(): void {
     this.cacheMap.clear()
     this.snapshotMap.clear()
-    this.sectorFlowsCache.clear()
     this.empireFlowsCache = []
+    this.sectorFlowsCache.clear()
+    this.sectorExternalCache.clear()
   }
 
   private deriveFullModules(
@@ -657,19 +664,128 @@ export class StationDerivedMap {
       const cache = this.cacheMap.get(stationId)
       if (!cache) return
       
+      const count = snapshot.count ?? 1
       const filteredFlows = filterProductionFlowsByPriority(cache.productionFlows, cache.warePriorityLevels)
-      allFilteredFlows.push(filteredFlows)
+      const scaledFlows = filteredFlows
+        .filter(f => !(f.netRate < 0 && !f.contributions.some(c => c.class === 'workforce') && f.transportType !== 'container'))
+        .map(flow => ({
+          ...flow,
+          production: flow.production * count,
+          consumption: flow.consumption * count,
+          netRate: flow.netRate * count,
+          contributions: flow.contributions.map(c => ({ ...c, amount: c.amount * count }))
+        }))
       
-      const sectorId = snapshot.sectorId || '__no_sector__'
-      if (!sectorMap.has(sectorId)) {
-        sectorMap.set(sectorId, [])
+      allFilteredFlows.push(scaledFlows)
+      
+      if (this.hasSector) {
+        const sectorId = snapshot.sectorId || '__no_sector__'
+        if (!sectorMap.has(sectorId)) {
+          sectorMap.set(sectorId, [])
+        }
+        const existing = sectorMap.get(sectorId)!
+        sectorMap.set(sectorId, mergeFlows([existing, scaledFlows]))
       }
-      const existing = sectorMap.get(sectorId)!
-      sectorMap.set(sectorId, mergeFlows([existing, filteredFlows]))
     })
     
     this.empireFlowsCache = mergeFlows(allFilteredFlows)
-    this.sectorFlowsCache = sectorMap
+    
+    if (this.hasSector) {
+      this.sectorFlowsCache = sectorMap
+      this.buildExternalCache()
+    }
+  }
+
+  private buildExternalCache(): void {
+    const sectorExternalCache = new Map<string, WareProductionFlow[]>()
+    const links = this.sectorLinks
+      .map(key => parseSectorLinkKey(key))
+      .filter((item): item is { a: string; b: string } => !!item)
+      .map(item => ({
+        linkId: `${item.a}|${item.b}`,
+        a: item.a,
+        b: item.b,
+        distance: 1
+      }))
+
+    if (links.length === 0) {
+      this.sectorExternalCache = sectorExternalCache
+      return
+    }
+
+    const sectorsInput: Array<{ sectorId: string; netByWare: Record<string, number> }> = []
+    this.sectorFlowsCache.forEach((flows, sectorId) => {
+      const netByWare: Record<string, number> = {}
+      for (const flow of flows) {
+        if (flow.transportType === 'container') {
+          netByWare[flow.wareId] = Number(flow.netRate || 0)
+        }
+      }
+      sectorsInput.push({ sectorId, netByWare })
+    })
+
+    if (sectorsInput.length === 0) {
+      this.sectorExternalCache = sectorExternalCache
+      return
+    }
+
+    const solverOutput = solveMultiWareByLink({ sectors: sectorsInput, links, epsilon: 1e-9 })
+    const waresMap = this.staticDeps.waresMap || {}
+
+    for (const sector of sectorsInput) {
+      const perSectorExternal: WareProductionFlow[] = []
+      const externalByWare = new Map<string, WareProductionFlow>()
+
+      for (const linkFlow of solverOutput.linkWareFlows) {
+        const isFrom = linkFlow.from === sector.sectorId
+        const isTo = linkFlow.to === sector.sectorId
+        if (!isFrom && !isTo) continue
+
+        const peerSectorId = isFrom ? linkFlow.to : linkFlow.from
+        const flowAmount = linkFlow.amount || 0
+        const contribution = {
+          id: `external:${peerSectorId}`,
+          class: 'station' as const,
+          type: isTo ? 'production' as const : 'consumption' as const,
+          count: 1,
+          amount: isTo ? flowAmount : -flowAmount,
+          bonusPercent: 0
+        }
+
+        const existingFlow = externalByWare.get(linkFlow.wareId)
+        if (existingFlow) {
+          existingFlow.contributions.push(contribution)
+          existingFlow.production += Math.max(contribution.amount, 0)
+          existingFlow.consumption += Math.max(-contribution.amount, 0)
+          existingFlow.netRate += contribution.amount
+        } else {
+          const ware = waresMap[linkFlow.wareId]
+          externalByWare.set(linkFlow.wareId, {
+            wareId: linkFlow.wareId,
+            orderIndex: Number.MAX_SAFE_INTEGER,
+            tier: ware?.tier || 0,
+            transportType: ware?.transport || 'container',
+            unitVolume: ware?.volume || 1,
+            production: Math.max(contribution.amount, 0),
+            consumption: Math.max(-contribution.amount, 0),
+            netRate: contribution.amount,
+            contributions: [contribution]
+          })
+        }
+      }
+
+      for (const flow of externalByWare.values()) {
+        perSectorExternal.push(flow)
+      }
+      perSectorExternal.sort((a, b) => {
+        if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
+        if (a.tier !== b.tier) return b.tier - a.tier
+        return Math.abs(b.netRate) - Math.abs(a.netRate)
+      })
+      sectorExternalCache.set(sector.sectorId, perSectorExternal)
+    }
+
+    this.sectorExternalCache = sectorExternalCache
   }
 
   getCache(stationId: string): StationDerivedCache | null {
@@ -696,6 +812,14 @@ export class StationDerivedMap {
     return this.sectorFlowsCache.get(sectorId) || []
   }
 
+  getSectorExternalFlows(sectorId: string): WareProductionFlow[] {
+    return this.sectorExternalCache.get(sectorId) || []
+  }
+
+  getSectorCombinedFlows(sectorId: string): WareProductionFlow[] {
+    return mergeFlows([this.getSectorFlows(sectorId), this.getSectorExternalFlows(sectorId)])
+  }
+
   getEmpireFlows(): WareProductionFlow[] {
     return this.empireFlowsCache
   }
@@ -715,22 +839,6 @@ export class StationDerivedMap {
 
   getModulesMode(stationId: string): 'plan' | 'full' | null {
     return this.snapshotMap.get(stationId)?.modulesMode || null
-  }
-
-  getEmpireGroupedFlows(
-    stations: StationPlan[],
-    waresMap: Record<string, X4Ware>,
-    filterFn?: (flow: import('@/types/production-flow').WareProductionFlow, stationId: string) => boolean
-  ): EmpireGroupedFlows {
-    return analyzeEmpireWareFlow(
-      stations,
-      (stationId) => {
-        const flows = this.getProductionFlows(stationId)
-        if (!filterFn) return flows
-        return flows.filter(f => filterFn(f, stationId))
-      },
-      waresMap
-    )
   }
 }
 

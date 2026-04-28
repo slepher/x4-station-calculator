@@ -1,12 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
+import type { FlowContribution } from '@/types/production-flow'
 
 const props = defineProps<{
   resourceId: string
   netRate: number
   name: string
-  details?: any[]
+  details?: FlowContribution[]
   netValue: number
   viewMode: 'quantity' | 'economy'
   showAddButton?: boolean
@@ -46,8 +47,10 @@ const formattedDisplayValue = computed(() => {
 const processedDetails = computed(() => {
   if (!props.details) return []
   return [...props.details].sort((a, b) => {
-    const orderA = Number(a.sortOrder)
-    const orderB = Number(b.sortOrder)
+    const aExtra = a as unknown as Record<string, number>
+    const bExtra = b as unknown as Record<string, number>
+    const orderA = Number(aExtra.sortOrder)
+    const orderB = Number(bExtra.sortOrder)
     const hasOrderA = Number.isFinite(orderA)
     const hasOrderB = Number.isFinite(orderB)
     if (hasOrderA || hasOrderB) {
@@ -55,7 +58,7 @@ const processedDetails = computed(() => {
       if (hasOrderA && !hasOrderB) return -1
       if (!hasOrderA && hasOrderB) return 1
     }
-    return Math.abs(b.netRate) - Math.abs(a.netRate)
+    return Math.abs(b.amount) - Math.abs(a.amount)
   })
 })
 
@@ -63,22 +66,25 @@ const formattedDetails = computed(() => {
   if (!props.details) return []
   
   if (props.viewMode === 'economy') {
-    return processedDetails.value.map(detail => ({
-      ...detail,
-      displayAmount: detail.netValue
-    }))
+    return processedDetails.value.map(detail => {
+      const extra = detail as unknown as Record<string, number>
+      return {
+        ...detail,
+        displayAmount: extra.netValue ?? detail.amount * 100
+      }
+    })
   }
   
   return processedDetails.value.map(detail => ({
     ...detail,
-    displayAmount: detail.netRate
+    displayAmount: detail.amount
   }))
 })
 
 const classWithSymbol = (displayValue: number, className: string) => [className, className + '-' + (displayValue >= 0 ? 'pos' : 'neg')]
 
-const getStationName = (detail: any) => detail.stationName || 'Unknown'
-const getStationCount = (detail: any) => detail.stationCount || 1
+const getStationName = (detail: FlowContribution) => (detail as unknown as Record<string, string>).stationName || detail.id
+const getStationCount = (detail: FlowContribution) => detail.count || 1
 </script>
 
 <template>

@@ -2,82 +2,97 @@
 
 ## Tasks
 
+### Phase 0: 构造函数扩展
+
+- [x] T0a. `StationDerivedMap` 构造函数增加 `options?: { hasSector?: boolean }`
+- [x] T0b. `StationDerivedMapOptions` 接口新增 `sectorLinks?: string[]`
+- [x] T0c. 所有构造调用侧传参：
+  - `useBlueprintProductionStore` → 不传 options（`hasSector: false`）
+  - `useLiveProductionStore` → `createDerivedMap()` 传 `{ hasSector: true, sectorLinks }`
+  - `productionStationShared` → 不传 options
+
 ### Phase 1: count 字段传递
 
-- [ ] T1. `StationDerivedSeed` 增加可选 `count?: number`
-- [ ] T2. `StationDerivedSnapshot` 增加 `count: number`
-- [ ] T3. `upsertStation()` 从 seed 读取 `count`（默认 1）存入 snapshot
-- [ ] T4. 更新 `useBlueprintProductionStore` 中所有 `upsertStation` 调用，传入 `station.count`
-- [ ] T5. 更新 `useLiveProductionStore` 中所有 `upsertStation` 调用，传入 station 的 `count`
-- [ ] T6. 更新 `productionStationShared.computeStationFlow` 调用，传入 `station.count ?? 1`
+- [x] T1. `StationDerivedSeed` 增加可选 `count?: number`
+- [x] T2. `StationDerivedSnapshot.count` 从 seed 读取（而非硬编码 1），默认 1
+- [x] T3. `upsertStation()` 从 seed 读取 `count` 存入 snapshot
+- [x] T4a. `useBlueprintProductionStore.syncPlanStationDerivedSnapshot`（L307）：seed 追加 `count: station.count`
+- [x] T4b. `useBlueprintProductionStore.getSavedStationGroupedFlows`（L344）：seed 追加 `count: station.count`
+- [x] T4c. `useBlueprintProductionStore.initializeAllStationDerived`（L360）：seed 追加 `count: station.count`
+- [x] T5. `productionStationShared.computeStationFlow`（L184）：seed 追加 `count: station.count ?? 1`
+- [x] T6. 确认 live 侧 4 处 `upsertStation` 不传 count（默认 1）
 
 ### Phase 2: updateAggregation 重构
 
-- [ ] T7. 重写 `updateAggregation()`，产出 `empireGroupedFlowsCache: EmpireGroupedFlows` 和 `sectorGroupedFlowsCache: Map<string, EmpireGroupedFlows>`
-- [ ] T8. 在循环中逐 station 读取 `count`，对 flow 的 `production/consumption/workforceConsumption/netRate` 乘以 `count`
-- [ ] T9. 构建 `class='station'` 的贡献条目，按 `analyzeEmpireWareFlow` 的分类逻辑（supply / operations / positive）聚合
-- [ ] T10. 删除 `empireFlowsCache` 字段和 `mergeFlows` 调用
-- [ ] T11. 删除 `sectorFlowsCache` 字段
+- [x] T7. 按 `hasSector` 分支实现：
+  - `false`：只构建 `empireFlowsCache`（count 加权 merge）
+  - `true`：构建全部 3 份缓存
+- [x] T8. local 合并逻辑：循环内读取 `snapshot.count`，对 `production/consumption/netRate` 乘以 `count`
+- [x] T9. `contributions[].amount` 也乘以 `count`
+- [x] T10. 合并到 `empireFlowsCache`（始终）和 `sectorFlowsCache`（`hasSector=true` 时）
+- [x] T11. solver 衔接：`buildExternalCache()` 从 `sectorFlowsCache` 提取 container netByWare → 调 `solveMultiWareByLink()` → 输出转 `WareProductionFlow[]` → `sectorExternalCache`
+- [x] T12. 新增私有字段 `sectorExternalCache: Map<string, WareProductionFlow[]>`
 
-### Phase 3: 新 getter 与旧 getter 清理
+### Phase 3: getter 变更
 
-- [ ] T12. 新增 `getSectorGroupedFlows(sectorId: string): EmpireGroupedFlows`，读取 `sectorGroupedFlowsCache`
-- [ ] T13. 修改 `getEmpireGroupedFlows()` 为无参，读取 `empireGroupedFlowsCache`
-- [ ] T14. 删除 `getEmpireFlows()` 方法
-- [ ] T15. 删除 `getSectorFlows()` 方法
-- [ ] T16. 删除 `clear()` 方法中 `empireFlowsCache` 和 `sectorFlowsCache` 的清理代码，新增 `empireGroupedFlowsCache` 和 `sectorGroupedFlowsCache` 的清理
-- [ ] T17. 更新 `refreshAll()` 确保新缓存正确构建
+- [x] T13. 删除 `getEmpireGroupedFlows()` 方法
+- [x] T14. 从 import 中移除 `analyzeEmpireWareFlow`
+- [x] T15. 保留 `getEmpireFlows()` / `getSectorFlows(sectorId)`（内容已含 count）
+- [x] T16. 新增 `getSectorExternalFlows(sectorId): WareProductionFlow[]`（不存在返回 `[]`）
+- [x] T17. 新增 `getSectorCombinedFlows(sectorId): WareProductionFlow[]`（`mergeFlows` 合并 local + external）
 
-### Phase 4: Facade 侧改读缓存
+### Phase 4: Facade 层改读缓存
 
-- [ ] T18. `empireFlowFacade.empireGroupedFlows`（empire 分支）改为调 `flowMap.getEmpireGroupedFlows()` 无参
-- [ ] T19. guard 从 `!modulesMap.value` 改为 `!activeEmpire.value`（无需 waresMap 保护）
-- [ ] T20. `empireFlowFacade.rawSectorGroupedFlowsMap` 改为遍历 sectors + 调 `flowMap.getSectorGroupedFlows(sectorId)`
-- [ ] T21. 删除 `rawSectorGroupedFlowsMap` 中内联的 `analyzeEmpireWareFlow` 调用
-- [ ] T22. guard 从 `!modulesMap.value || !waresMap.value` 简化为空 map 直接返回
+- [x] T18. 实现 `classifyAndEnrichFlows(flows: WareProductionFlow[], waresMap): EmpireGroupedFlows`
+- [x] T19. `empireGroupedFlows` computed → 读 `flowMap.getEmpireFlows()` + `classifyAndEnrichFlows()`
+- [x] T20. `rawSectorGroupedFlowsMap` computed → 读 `flowMap.getSectorFlows(sector.id)` + `classifyAndEnrichFlows()`
+- [x] T21. guard 简化：`modulesMap` guard 移除，`waresMap` guard 保留
+- [x] T22. `getSectorFinalProductionFlows` → `inputFlowMap.value.getSectorCombinedFlows(sectorId)`
+- [x] T23. 删除 `sectorLinkCalcMap` computed（solver 移至 StationDerivedMap）
+- [x] T24. 删除 `mergeSectorLinkIntoEmpireGroupedFlows` 函数
+- [x] T25. 从 import 中移除 `analyzeEmpireWareFlow`、`solveMultiWareByLink`、`SectorLinkInput`、`SolveMultiWareByLinkOutput`、`parseSectorLinkKey`（facade 不再需要）
+- [x] T26. 确认 `sectorInternalDataMap` 读 `rawSectorGroupedFlowsMap` 接口不变
 
-### Phase 5: Blueprint Store 侧改读缓存
+### Phase 5: 构建验证
 
-- [ ] T23. `useBlueprintProductionStore.getEmpireGroupedFlows()` 改为调 `planningDerivedMap.getEmpireGroupedFlows()` 无参
-- [ ] T24. 删除 `filterFn` 参数传递
-
-### Phase 6: 构建验证
-
-- [ ] T25. 运行时确认 `removeStation` 后缓存正确（通过下次 `computeInternal` 重建）
-- [ ] T26. `npm run build`，修复编译错误直到通过
+- [ ] T27. 运行时确认 `removeStation` 后 3 份缓存 stale 但不会崩溃
+- [x] T28. `npm run build` 通过
 
 ## 执行顺序
 
 ```
-Phase 1 (count 字段传递):
-  T1-T6   seed/snapshot/callers
+Phase 0 (constructor):
+  T0a-T0c  hasSector 选项 + 调用侧传参
+
+Phase 1 (count):
+  T1-T6    seed 加 count → blueprint 4 处传入
 
 Phase 2 (updateAggregation):
-  T7-T11  重写算法，新旧缓存替换
+  T7-T12   hasSector 分支 + 3 份缓存构建
 
 Phase 3 (getter):
-  T12-T17 新 getter + 旧 getter 清理
+  T13-T17  删除 getEmpireGroupedFlows + 新增 getter
 
 Phase 4 (facade):
-  T18-T22 两个 computed 改读缓存
+  T18-T26  3 个入口改读缓存 + 删除 sectorLinkCalcMap
 
-Phase 5 (blueprint):
-  T23-T24 无参调用
-
-Phase 6 (build):
-  T25-T26 验证
+Phase 5 (build):
+  T27-T28  验证
 ```
 
 ## 依赖
 
-- 前置依赖：`one-flow-contribution`（`FlowContribution` 类型变更先完成，本 change 使用 `class='station'` 贡献格式）
+- 前置依赖：`one-flow-contribution`（`FlowContribution` 类型变更先完成）
 
 ## 完成定义
 
-- [ ] `count` 字段正确传递到 snapshot 并影响 flow 聚合
-- [ ] `updateAggregation()` 产出 `EmpireGroupedFlows` 级缓存
-- [ ] 旧 flat caches 及相关 getter 已清理
-- [ ] `getEmpireGroupedFlows()` 为无参缓存读取
-- [ ] facade 的 empire 和 sector 聚合改读缓存
-- [ ] blueprint store 使用无参调用
-- [ ] `npm run build` 通过
+- [x] `StationDerivedMap` 构造函数支持 `hasSector` 选项
+- [x] `count` 正确传递（blueprint 侧 4 处）
+- [x] `updateAggregation()` 按 `hasSector` 分支产出最多 3 份 `WareProductionFlow[]` 缓存
+- [x] `sectorFlowsCache` 含 count 加权 local 贡献
+- [x] `sectorExternalCache` 含 solver 物流贡献
+- [x] `getEmpireGroupedFlows()` 删除，`getSectorExternalFlows()` 新增
+- [x] facade 3 个入口改读缓存（empire / sector local / sector 含物流）
+- [x] facade `sectorLinkCalcMap` + `mergeSectorLinkIntoEmpireGroupedFlows` 删除
+- [x] `npm run build` 通过
+- [ ] T27. 运行时确认 `removeStation` 后 3 份缓存 stale 但不会崩溃
