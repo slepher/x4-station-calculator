@@ -436,7 +436,26 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       })
     })
 
-    return classifyAndEnrichFlows(filtered, gameData.waresMap)
+    const result = classifyAndEnrichFlows(filtered, gameData.waresMap)
+
+    const stationNameMap = new Map(activeEmpire.value.stations.map(s => [s.id, s.name]))
+    const sectorNameMap = new Map(Object.entries(gameData.maps.sectors).map(([id, s]) => [id, s.name]))
+
+    for (const flow of result.flows) {
+      flow.contributions = flow.contributions.map(c => {
+        const dc = c as { name?: string; stationName?: string }
+        if (dc.name || dc.stationName) return c
+        if (c.class === 'station') {
+          return { ...c, name: stationNameMap.get(c.id) || c.id }
+        }
+        if (c.class === 'sector') {
+          return { ...c, name: sectorNameMap.get(c.id) || c.id }
+        }
+        return { ...c, name: c.id }
+      })
+    }
+
+    return result
   }
 
   function getSavedStationGroupedFlows(station: StationPlan): GroupedFlows {
