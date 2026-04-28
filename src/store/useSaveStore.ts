@@ -297,6 +297,20 @@ function isArchiveParserVersionValidByString(parserVersion: string): boolean {
   return parserVersion === CURRENT_PARSER_VERSION
 }
 
+function upsertArchiveMeta(list: ArchiveMeta[], meta: ArchiveMeta): ArchiveMeta[] {
+  const index = list.findIndex((item) => item.id === meta.id)
+  if (index >= 0) {
+    const next = [...list]
+    next[index] = meta
+    return next
+  }
+  return [...list, meta]
+}
+
+function removeArchiveMeta(list: ArchiveMeta[], archiveId: string): ArchiveMeta[] {
+  return list.filter((item) => item.id !== archiveId)
+}
+
 function createStubArchiveFromMeta(meta: ArchiveMeta, currentVersion?: string): SaveArchive {
   const isValid = isArchiveParserVersionValidByString(meta.parser_version)
   const isCompatible = currentVersion
@@ -403,7 +417,6 @@ export const useSaveStore = defineStore('save', () => {
       parser_version: archive.meta.parser_version,
       post_processor_version: archive.meta.post_processor_version,
       source: archive.meta.source,
-      isCompatible: archive.isCompatible,
       createdAt: existingCreatedAt || new Date(),
       sectorCount: Object.keys(archive.sectors).length
     }
