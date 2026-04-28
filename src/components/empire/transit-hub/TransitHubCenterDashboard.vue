@@ -4,7 +4,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import type { SupplyStorageFlow } from '@/types/x4'
-import type { DerivedProductionFlow, DerivedFlowContribution, WareProductionFlow } from '@/types/production-flow'
+import type { DerivedProductionFlow, WareProductionFlow } from '@/types/production-flow'
 import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
@@ -46,10 +46,10 @@ function buildStorageFlowsFromProductionFlows(
       details.forEach((detail, index) => {
         const amount = Math.abs(detail.amount || 0)
         if (amount === 0) return
-        const derived = detail as DerivedFlowContribution
         row.details.push({
-          ...derived,
-          netValue: derived.netValue || 0,
+          ...detail,
+          name: '',
+          netValue: 0,
           storageVolume: amount * (flow.unitVolume || 1) * safeBufferHours,
           sortOrder: index
         })
