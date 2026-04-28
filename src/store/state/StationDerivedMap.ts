@@ -343,6 +343,7 @@ export interface StationDerivedMapOptions {
 }
 
 export class StationDerivedMap {
+  aggregationVersion = 0
   private cacheMap = reactive(new Map<string, StationDerivedCache>())
   private snapshotMap = new Map<string, StationDerivedSnapshot>()
   private empireFlowsCache: WareProductionFlow[] = []
@@ -699,6 +700,7 @@ export class StationDerivedMap {
       this.sectorFlowsCache = sectorMap
       this.buildExternalCache()
     }
+    this.aggregationVersion++
   }
 
   private buildExternalCache(): void {
