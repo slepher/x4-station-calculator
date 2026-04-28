@@ -38,7 +38,7 @@ export function deriveEmpireWareFlows(input: {
       netValue: flow.netRate * unitPrice,
       contributions: flow.contributions.map((contrib) => ({
         ...contrib,
-        name: (contrib as unknown as Record<string, string>).name || (contrib as unknown as Record<string, string>).stationName || '',
+        name: (contrib as unknown as Record<string, string>).name || '',
         netValue: contrib.amount * unitPrice
       }))
     }
