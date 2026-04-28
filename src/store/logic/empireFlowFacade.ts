@@ -98,23 +98,23 @@ function mergeSectorLinkIntoEmpireGroupedFlows(
 
     const peerSectorId = isFromHere ? linkFlow.to : linkFlow.from
     const peerSectorName = sectorNameMap.get(peerSectorId) || peerSectorId
-    const amount = Math.abs(linkFlow.amount || 0)
+    const flowAmount = linkFlow.amount || 0
     const contribution = {
-      stationId: `external:${peerSectorId}`,
-      stationName: peerSectorName,
-      stationCount: 1,
-      production: isToHere ? amount : 0,
-      consumption: isFromHere ? amount : 0,
-      workforceConsumption: 0,
-      netRate: isToHere ? amount : -amount
+      id: `external:${peerSectorId}`,
+      class: 'station' as const,
+      type: isToHere ? 'production' as const : 'consumption' as const,
+      count: 1,
+      amount: isToHere ? flowAmount : -flowAmount,
+      bonusPercent: 0,
+      stationName: peerSectorName
     }
 
     const existingFlow = pendingFlowsByWareId.get(linkFlow.wareId)
     if (existingFlow) {
       existingFlow.contributions.push(contribution)
-      existingFlow.production += contribution.production
-      existingFlow.consumption += contribution.consumption
-      existingFlow.netRate += contribution.netRate
+      existingFlow.production += Math.max(contribution.amount, 0)
+      existingFlow.consumption += Math.max(-contribution.amount, 0)
+      existingFlow.netRate += contribution.amount
       return
     }
 
@@ -125,10 +125,9 @@ function mergeSectorLinkIntoEmpireGroupedFlows(
       tier: ware?.tier || 0,
       transportType: ware?.transport || 'container',
       unitVolume: ware?.volume || 1,
-      production: contribution.production,
-      consumption: contribution.consumption,
-      workforceConsumption: 0,
-      netRate: contribution.netRate,
+      production: Math.max(contribution.amount, 0),
+      consumption: Math.max(-contribution.amount, 0),
+      netRate: contribution.amount,
       minPrice: ware?.minPrice || 0,
       avgPrice: ware?.price || 0,
       maxPrice: ware?.maxPrice || 0,
@@ -141,8 +140,8 @@ function mergeSectorLinkIntoEmpireGroupedFlows(
     if (a.tier !== b.tier) return b.tier - a.tier
     return Math.abs(b.netRate) - Math.abs(a.netRate)
   })
-  const operations = flows.filter((flow) => flow.transportType === 'container' && flow.workforceConsumption <= 0)
-  const supply = flows.filter((flow) => flow.workforceConsumption > 0 || flow.transportType !== 'container')
+  const operations = flows.filter((flow) => flow.transportType === 'container' && !flow.contributions.some(c => c.class === 'workforce'))
+  const supply = flows.filter((flow) => flow.contributions.some(c => c.class === 'workforce') || flow.transportType !== 'container')
   return { flows, empireGroups: { operations, supply } }
 }
 
@@ -265,19 +264,19 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
         let totalConsumptionStorageVolume = 0
 
         flow.contributions.forEach((contribution) => {
-          const station = stationMap.get(contribution.stationId)
+          const station = stationMap.get(contribution.id)
           if (!station) return
 
-          const staticProduction = Math.max(contribution.netRate, 0)
-          const staticConsumption = Math.max(-contribution.netRate, 0)
+          const staticProduction = Math.max(contribution.amount, 0)
+          const staticConsumption = Math.max(-contribution.amount, 0)
           const productionStorageVolume = staticProduction * flow.unitVolume * station.settings.primaryProductBufferHours
           const consumptionStorageVolume = staticConsumption * flow.unitVolume * station.settings.resourceBufferHours
 
           if (productionStorageVolume > 0) {
             details.push({
-              stationId: contribution.stationId,
-              stationName: contribution.stationName,
-              stationCount: contribution.stationCount,
+              stationId: contribution.id,
+              stationName: (contribution as unknown as Record<string, string>).stationName || '',
+              stationCount: contribution.count,
               kind: 'production',
               staticRate: staticProduction,
               storageVolume: productionStorageVolume
@@ -287,9 +286,9 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
           if (consumptionStorageVolume > 0) {
             details.push({
-              stationId: contribution.stationId,
-              stationName: contribution.stationName,
-              stationCount: contribution.stationCount,
+              stationId: contribution.id,
+              stationName: (contribution as unknown as Record<string, string>).stationName || '',
+              stationCount: contribution.count,
               kind: 'consumption',
               staticRate: staticConsumption,
               storageVolume: consumptionStorageVolume
@@ -487,10 +486,8 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
       unitVolume: flow.unitVolume,
       production: flow.production,
       consumption: flow.consumption,
-      workforceConsumption: flow.workforceConsumption,
       netRate: flow.netRate,
-      contributions: [],
-      stationContributions: flow.contributions.map((contrib) => ({ ...contrib }))
+      contributions: flow.contributions.map((contrib) => ({ ...contrib, class: 'station' as const }))
     }))
   }
 

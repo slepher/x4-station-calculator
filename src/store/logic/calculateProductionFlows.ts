@@ -5,7 +5,7 @@ import type {
   StationSettings,
   RaceMedicalConsumption
 } from '../../types/x4'
-import type { BaseModuleFlowAtom, WareProductionFlow } from '../../types/production-flow'
+import type { FlowContribution, WareProductionFlow } from '../../types/production-flow'
 import type { WorkforceEntry } from '../../types/saveArchive'
 import {
   findBestProducer,
@@ -338,7 +338,6 @@ function calculateProductionFlowsInternal(
         unitVolume: ware?.volume || 0,
         production: 0,
         consumption: 0,
-        workforceConsumption: 0,
         netRate: 0,
         contributions: []
       }
@@ -365,12 +364,12 @@ function calculateProductionFlowsInternal(
 
         const flowEntry = getOrInitFlow(wareId)
         flowEntry.consumption += hourlyAmount
-        flowEntry.workforceConsumption += hourlyAmount
 
-        const contribution: BaseModuleFlowAtom = {
-          moduleId: `workforce:${entry.race}`,
-          count: entry.amount,
+        const contribution: FlowContribution = {
+          id: entry.race,
+          class: 'workforce',
           type: 'consumption',
+          count: entry.amount,
           amount: -hourlyAmount,
           bonusPercent: 0
         }
@@ -395,12 +394,12 @@ function calculateProductionFlowsInternal(
         const hourlyAmount = item.residents * (perPersonPerSecond as number) * 3600
 
         entry.consumption += hourlyAmount
-        entry.workforceConsumption += hourlyAmount
 
-        const contribution: BaseModuleFlowAtom = {
-          moduleId: item.moduleId,
-          count: item.count,
+        const contribution: FlowContribution = {
+          id: item.race,
+          class: 'workforce',
           type: 'consumption',
+          count: item.residents,
           amount: -hourlyAmount,
           bonusPercent: 0
         }
@@ -426,10 +425,11 @@ function calculateProductionFlowsInternal(
 
       entry.production += actualAmount
 
-      const contribution: BaseModuleFlowAtom = {
-        moduleId: item.id,
-        count: item.count,
+      const contribution: FlowContribution = {
+        id: item.id,
+        class: 'module',
         type: 'production',
+        count: item.count,
         amount: actualAmount,
         bonusPercent: Math.round(currentBonusRatio * 100)
       }
@@ -443,10 +443,11 @@ function calculateProductionFlowsInternal(
 
       entry.consumption += actualAmount
 
-      const contribution: BaseModuleFlowAtom = {
-        moduleId: item.id,
-        count: item.count,
+      const contribution: FlowContribution = {
+        id: item.id,
+        class: 'module',
         type: 'consumption',
+        count: item.count,
         amount: -actualAmount,
         bonusPercent: 0
       }

@@ -1,3 +1,4 @@
+import type { FlowContribution } from './production-flow'
 
 export type TransportType = 'container' | 'solid' | 'liquid';
 /**
@@ -521,29 +522,6 @@ export interface WareDetail {
   list: ProductionLogItem[];
 }
 
-export interface ModuleFlowAtom {
-  moduleId: string;
-  count: number;
-  
-  // 类型：决定了它是作为“输入缓冲”还是“输出缓冲”的来源
-  type: 'production' | 'consumption';
-
-  // --- 1. 数量流 (基础) ---
-  amount: number;       // 贡献的数量 (个)
-  bonusPercent: number;
-
-  // --- 2. 体积流 (重点) ---
-  // 这是你查看"消耗明细"时最关键的字段
-  // 例如：-33,600 m³ (巨大的消耗带宽)
-  volumeFlow: number;   // amount * Module
-  
-  // --- 3. 资金流 (参考) ---
-  valueFlow: number;    // amount * unitPrice
-
-  // --- 4. 运输需求流 (按运输时间折算) ---
-  transportFlow?: number; // abs(amount) * unitVolume * (transportMinutes / 60)
-}
-
 export interface WareFlow {
   // --- 核心标识 ---
   wareId: string;
@@ -555,7 +533,6 @@ export interface WareFlow {
   // 数量流 (Quantity)
   production: number;      // 总产出/h
   consumption: number;     // 总消耗/h
-  workforceConsumption: number; // 工人消耗/h
   netRate: number;         // 净产出
 
   // 体积流 (Volume) - 新增核心
@@ -587,11 +564,7 @@ export interface WareFlow {
   // ====================================================
   // 维度 D: 构成明细 (Drill-down)
   // ====================================================
-  /**
-   * 包含所有的 ModuleFlowAtom。
-   * UI 上可以分为 "来源(Sources)" 和 "去向(Sinks)" 两组展示
-   */
-  contributions: ModuleFlowAtom[];
+  contributions: FlowContribution[];
 }
 
 // [新增] 分组流向接口 - 用于统一管理和展示
@@ -602,9 +575,9 @@ export interface GroupedFlows {
   // 按数量/经济视图分组
   rateGroups: {
     positive: WareFlow[];  // 产品/收入 (netRate > 0)
-    operations: WareFlow[]; // 运营 (netRate <= 0 && transportType === 'container' && workforceConsumption === 0)
-    supply: WareFlow[];    // 补给 (netRate <= 0 && workforceConsumption > 0)
-    resources: WareFlow[];  // 资源 (netRate <= 0 && transportType !== 'container' && workforceConsumption === 0)
+    operations: WareFlow[];  // 运营 (netRate <= 0 && transportType === 'container' && !hasWorkforce)
+    supply: WareFlow[];    // 补给 (netRate <= 0 && hasWorkforce)
+    resources: WareFlow[];  // 资源 (netRate <= 0 && transportType !== 'container' && !hasWorkforce)
   };
   
   // 按体积视图分组
@@ -613,16 +586,6 @@ export interface GroupedFlows {
     liquid: WareFlow[];    // 液体
     container: WareFlow[]; // 容器
   };
-}
-
-export interface StationFlowAtom {
-  stationId: string;
-  stationName: string;
-  stationCount: number;
-  production: number;
-  consumption: number;
-  workforceConsumption: number;
-  netRate: number;
 }
 
 export interface EmpireWareFlow {
@@ -634,14 +597,13 @@ export interface EmpireWareFlow {
   
   production: number;
   consumption: number;
-  workforceConsumption: number;
   netRate: number;
   
   minPrice: number;
   avgPrice: number;
   maxPrice: number;
   
-  contributions: StationFlowAtom[];
+  contributions: FlowContribution[];
 }
 
 export interface EmpireGroupedFlows {

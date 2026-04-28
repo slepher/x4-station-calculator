@@ -1,5 +1,5 @@
 import { reactive } from 'vue'
-import type { GroupedFlows, EmpireGroupedFlows, EmpireWareFlow, StationFlowAtom, SavedModule, StationSettings, X4Module, WareFlow, StationPlan, X4Ware } from '@/types/x4'
+import type { GroupedFlows, EmpireGroupedFlows, SavedModule, StationSettings, X4Module, WareFlow, StationPlan, X4Ware } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
@@ -220,7 +220,6 @@ function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
     unitVolume: prod.unitVolume,
     production: prod.production,
     consumption: prod.consumption,
-    workforceConsumption: prod.workforceConsumption,
     netRate: prod.netRate,
     productionVolume,
     consumptionVolume,
@@ -232,11 +231,7 @@ function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
     unitPrice: 0,
     netValue: 0,
     contributions: prod.contributions.map((atom) => ({
-      moduleId: atom.moduleId,
-      count: atom.count,
-      type: atom.type,
-      amount: atom.amount,
-      bonusPercent: atom.bonusPercent,
+      ...atom,
       volumeFlow: atom.amount * prod.unitVolume,
       valueFlow: 0,
       transportFlow: 0
@@ -255,7 +250,7 @@ function groupProductionFlows(flows: WareProductionFlow[]): GroupedFlows {
 
   wareFlows.forEach(flow => {
     if (flow.netRate > 0) result.rateGroups.positive.push(flow)
-    else if (flow.workforceConsumption > 0) result.rateGroups.supply.push(flow)
+    else if (flow.contributions.some(c => c.class === 'workforce')) result.rateGroups.supply.push(flow)
     else if (flow.transportType === 'container') result.rateGroups.operations.push(flow)
     else result.rateGroups.resources.push(flow)
 
@@ -282,7 +277,6 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
           unitVolume: flow.unitVolume,
           production: 0,
           consumption: 0,
-          workforceConsumption: 0,
           netRate: 0,
           contributions: []
         }
@@ -291,7 +285,6 @@ function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
       const currentEntry = entry
       currentEntry.production += flow.production
       currentEntry.consumption += flow.consumption
-      currentEntry.workforceConsumption += flow.workforceConsumption
       currentEntry.netRate += flow.netRate
       currentEntry.contributions.push(...deepClone(flow.contributions))
     }
@@ -383,6 +376,7 @@ export class StationDerivedMap {
     const snapshot: StationDerivedSnapshot = {
       modulesMode: seed.modulesMode,
       sectorId: seed.sectorId ?? null,
+      count: 1,
       inputModules,
       fullModules,
       settings,

@@ -1,4 +1,5 @@
-import type { EmpireWareFlow, SectorInternalData, SectorPlan, StationFlowAtom, StationPlan } from '@/types/x4'
+import type { EmpireWareFlow, SectorInternalData, SectorPlan, StationPlan } from '@/types/x4'
+import type { FlowContribution } from '@/types/production-flow'
 import { getSectorNetworkComponent, type SectorLinkInput } from './sectorLinkFlow'
 import { parseSectorLinkKey } from './sectorLinks'
 
@@ -42,7 +43,7 @@ function sortFlows(list: EmpireWareFlow[]): EmpireWareFlow[] {
   })
 }
 
-function cloneContribution(detail: StationFlowAtom & { sortOrder?: number }): StationFlowAtom & { sortOrder?: number } {
+function cloneContribution(detail: FlowContribution & { sortOrder?: number; stationName?: string }): FlowContribution & { sortOrder?: number; stationName?: string } {
   return { ...detail }
 }
 
@@ -70,7 +71,7 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
   const appendFlow = (
     bucket: Map<string, EmpireWareFlow>,
     flow: EmpireWareFlow,
-    contributions: Array<StationFlowAtom & { sortOrder?: number }>
+    contributions: Array<FlowContribution & { sortOrder?: number; stationName?: string }>
   ) => {
     const current = bucket.get(flow.wareId)
     if (!current) {
@@ -82,7 +83,6 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
     }
     current.production += flow.production || 0
     current.consumption += flow.consumption || 0
-    current.workforceConsumption += flow.workforceConsumption || 0
     current.netRate += flow.netRate || 0
     current.contributions.push(...contributions.map(cloneContribution))
   }
@@ -102,16 +102,16 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
         const contributions = isCurrentSector
           ? (flow.contributions || []).map((detail) => ({
               ...detail,
-              sortOrder: currentSectorStationOrderMap.get(detail.stationId) ?? Number.MAX_SAFE_INTEGER / 2
+              sortOrder: currentSectorStationOrderMap.get((detail as unknown as Record<string, string>).stationId ?? detail.id) ?? Number.MAX_SAFE_INTEGER / 2
             }))
           : [{
-              stationId: `sector:${sectorId}`,
+              id: `sector:${sectorId}`,
+              class: 'station',
+              type: flow.netRate > 0 ? 'production' as const : 'consumption' as const,
+              count: 1,
+              amount: flow.netRate || 0,
+              bonusPercent: 0,
               stationName: sectorName,
-              stationCount: 1,
-              production: Math.max(flow.netRate || 0, 0),
-              consumption: Math.max(-(flow.netRate || 0), 0),
-              workforceConsumption: flow.workforceConsumption || 0,
-              netRate: flow.netRate || 0,
               sortOrder: externalSortOrder
             }]
         appendFlow(operationsByWare, flow, contributions)
@@ -123,16 +123,16 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
         const contributions = isCurrentSector
           ? (flow.contributions || []).map((detail) => ({
               ...detail,
-              sortOrder: currentSectorStationOrderMap.get(detail.stationId) ?? Number.MAX_SAFE_INTEGER / 2
+              sortOrder: currentSectorStationOrderMap.get((detail as unknown as Record<string, string>).stationId ?? detail.id) ?? Number.MAX_SAFE_INTEGER / 2
             }))
           : [{
-              stationId: `sector:${sectorId}`,
+              id: `sector:${sectorId}`,
+              class: 'station',
+              type: flow.netRate > 0 ? 'production' as const : 'consumption' as const,
+              count: 1,
+              amount: flow.netRate || 0,
+              bonusPercent: 0,
               stationName: sectorName,
-              stationCount: 1,
-              production: Math.max(flow.netRate || 0, 0),
-              consumption: Math.max(-(flow.netRate || 0), 0),
-              workforceConsumption: flow.workforceConsumption || 0,
-              netRate: flow.netRate || 0,
               sortOrder: externalSortOrder
             }]
         appendFlow(supplyByWare, flow, contributions)
@@ -150,7 +150,6 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
     }
     supplyFlow.production += opFlow.production || 0
     supplyFlow.consumption += opFlow.consumption || 0
-    supplyFlow.workforceConsumption += opFlow.workforceConsumption || 0
     supplyFlow.netRate += opFlow.netRate || 0
     supplyFlow.contributions.push(...(opFlow.contributions || []))
   })

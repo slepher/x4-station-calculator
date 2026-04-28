@@ -42,15 +42,15 @@ function buildStorageFlowsFromProductionFlows(
         details: []
       }
 
-      const details = flow.stationContributions || []
+      const details = flow.contributions || []
       details.forEach((detail, index) => {
-        const amount = Math.abs(detail.netRate || 0)
+        const amount = Math.abs(detail.amount || 0)
         if (amount === 0) return
         row.details.push({
-          stationId: detail.stationId,
-          stationName: detail.stationName,
-          stationCount: detail.stationCount || 1,
-          kind: detail.netRate >= 0 ? 'production' : 'consumption',
+          stationId: detail.id,
+          stationName: (detail as unknown as Record<string, string>).stationName || '',
+          stationCount: detail.count || 1,
+          kind: detail.amount >= 0 ? 'production' : 'consumption',
           staticRate: amount,
           storageVolume: amount * (flow.unitVolume || 1) * safeBufferHours,
           sortOrder: index
@@ -153,8 +153,8 @@ const groupedFlows = computed(() => {
   const flows = derivedFlows.value
 
   const products = flows.filter((flow) => flow.netRate > 0)
-  const operations = flows.filter((flow) => flow.netRate <= 0 && flow.workforceConsumption <= 0 && flow.transportType === 'container')
-  const supply = flows.filter((flow) => flow.workforceConsumption > 0 || flow.transportType !== 'container')
+  const operations = flows.filter((flow) => flow.netRate <= 0 && !flow.contributions.some(c => c.class === 'workforce') && flow.transportType === 'container')
+  const supply = flows.filter((flow) => flow.contributions.some(c => c.class === 'workforce') || flow.transportType !== 'container')
 
   return { flows, products, operations, supply }
 })

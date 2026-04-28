@@ -1,7 +1,9 @@
-import type { EmpireGroupedFlows, EmpireWareFlow, StationFlowAtom, X4Ware } from '@/types/x4'
+import type { EmpireGroupedFlows, EmpireWareFlow, X4Ware } from '@/types/x4'
+import type { FlowContribution } from '@/types/production-flow'
 import { getPriceByMultiplier } from '@/store/logic/calculatorUtils'
 
-export interface DerivedEmpireContribution extends StationFlowAtom {
+export interface DerivedEmpireContribution extends FlowContribution {
+  stationName: string
   netValue: number
 }
 
@@ -41,7 +43,8 @@ export function deriveEmpireWareFlows(input: {
       netValue: flow.netRate * unitPrice,
       contributions: flow.contributions.map((contrib) => ({
         ...contrib,
-        netValue: contrib.netRate * unitPrice
+        stationName: (contrib as unknown as Record<string, string>).stationName || '',
+        netValue: contrib.amount * unitPrice
       }))
     }
   }

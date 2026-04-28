@@ -1,10 +1,21 @@
 <script setup lang="ts">
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import EmpireWareFlow from './EmpireWareFlow.vue'
+import type { FlowContribution } from '@/types/production-flow'
+
+interface EmpireWareFlowGroupItem {
+  id: string
+  name: string
+  netRate: number
+  netValue: number
+  contributions: FlowContribution[]
+  disableAdd?: boolean
+  disableRemove?: boolean
+}
 
 defineProps<{
   title: string
-  items: any[]
+  items: EmpireWareFlowGroupItem[]
   viewMode: 'quantity' | 'economy'
   showAddButton?: boolean
   showRemoveButton?: boolean

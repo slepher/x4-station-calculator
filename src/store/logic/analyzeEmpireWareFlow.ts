@@ -2,10 +2,9 @@ import type {
   StationPlan,
   EmpireWareFlow,
   EmpireGroupedFlows,
-  StationFlowAtom,
   X4Ware
 } from '../../types/x4'
-import type { WareProductionFlow } from '../../types/production-flow'
+import type { FlowContribution, WareProductionFlow } from '../../types/production-flow'
 
 interface StationFlowData {
   station: StationPlan;
@@ -17,7 +16,6 @@ function multiplyProductionFlow(flow: WareProductionFlow, multiplier: number): W
     ...flow,
     production: flow.production * multiplier,
     consumption: flow.consumption * multiplier,
-    workforceConsumption: flow.workforceConsumption * multiplier,
     netRate: flow.netRate * multiplier,
     contributions: flow.contributions.map(c => ({
       ...c,
@@ -28,7 +26,7 @@ function multiplyProductionFlow(flow: WareProductionFlow, multiplier: number): W
 
 function classifyProductionFlow(flow: WareProductionFlow): 'positive' | 'supply' | 'operations' | 'resources' {
   if (flow.netRate >= 0) return 'positive'
-  if (flow.workforceConsumption > 0) return 'supply'
+  if (flow.contributions.some(c => c.class === 'workforce')) return 'supply'
   if (flow.transportType === 'container') return 'operations'
   return 'resources'
 }
@@ -49,25 +47,23 @@ function aggregateProductionFlows(
     const ware = waresMap[wareId]
     let totalProduction = 0
     let totalConsumption = 0
-    let totalWorkforceConsumption = 0
     let totalNetRate = 0
-    const contributions: StationFlowAtom[] = []
+    const contributions: FlowContribution[] = []
     
     items.forEach(({ flow, station }) => {
       totalProduction += flow.production
       totalConsumption += flow.consumption
-      totalWorkforceConsumption += flow.workforceConsumption
       totalNetRate += flow.netRate
       
       contributions.push({
-        stationId: station.id,
-        stationName: station.name,
-        stationCount: station.count ?? 1,
-        production: flow.production,
-        consumption: flow.consumption,
-        workforceConsumption: flow.workforceConsumption,
-        netRate: flow.netRate
-      })
+        id: station.id,
+        class: 'station',
+        type: flow.netRate > 0 ? 'production' : 'consumption',
+        count: station.count ?? 1,
+        amount: flow.netRate,
+        bonusPercent: 0,
+        stationName: station.name
+      } as FlowContribution & { stationName: string })
     })
     
     result.push({
@@ -78,7 +74,6 @@ function aggregateProductionFlows(
       unitVolume: firstFlow.unitVolume,
       production: totalProduction,
       consumption: totalConsumption,
-      workforceConsumption: totalWorkforceConsumption,
       netRate: totalNetRate,
       minPrice: ware?.minPrice || 0,
       avgPrice: ware?.price || 0,
@@ -99,7 +94,6 @@ function mergeEmpireFlow(target: EmpireWareFlow, source: EmpireWareFlow): Empire
     ...target,
     production: target.production + source.production,
     consumption: target.consumption + source.consumption,
-    workforceConsumption: target.workforceConsumption + source.workforceConsumption,
     netRate: target.netRate + source.netRate,
     contributions: [...target.contributions, ...source.contributions]
   }

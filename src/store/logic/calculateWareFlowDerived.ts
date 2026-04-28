@@ -3,10 +3,9 @@ import type {
   X4Module,
   X4Ware,
   WareFlow,
-  GroupedFlows,
-  ModuleFlowAtom
+  GroupedFlows
 } from '../../types/x4'
-import type { DerivedProductionFlow, DerivedStationFlowAtom, WareProductionFlow } from '../../types/production-flow'
+import type { DerivedProductionFlow, FlowContribution, WareProductionFlow } from '../../types/production-flow'
 
 export interface CalculateWareFlowDerivedInput {
   productionFlows: WareProductionFlow[]
@@ -57,7 +56,7 @@ export function deriveProductionFlows(
 
     const priorityLevel = warePriorityLevels?.[prodFlow.wareId] ?? 0
     const isMainOrSecondary = priorityLevel > 0
-    const isSupplyGap = prodFlow.workforceConsumption > 0
+    const isSupplyGap = prodFlow.contributions.some(c => c.class === 'workforce')
     const isResourceFlow = prodFlow.transportType !== 'container'
     const isDeficit = prodFlow.netRate < 0
     const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow || isDeficit
@@ -81,28 +80,12 @@ export function deriveProductionFlows(
     const totalOccupiedCount = consumptionBufferCount + productionBufferCount
     const totalOccupiedVolume = totalOccupiedCount * unitVolume
 
-    const contributions: ModuleFlowAtom[] = prodFlow.contributions.map(atom => ({
-      moduleId: atom.moduleId,
-      count: atom.count,
-      type: atom.type,
-      amount: atom.amount,
-      bonusPercent: atom.bonusPercent,
+    const contributions: FlowContribution[] = prodFlow.contributions.map(atom => ({
+      ...atom,
       volumeFlow: atom.amount * unitVolume,
       valueFlow: atom.amount * unitPrice,
       transportFlow: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
     }))
-
-    const stationContributions: DerivedStationFlowAtom[] | undefined = prodFlow.stationContributions?.map((detail, index) => ({
-      ...detail,
-      sortOrder: index,
-      netValue: detail.netRate * unitPrice,
-      storageVolume: Math.abs(detail.netRate || 0) * unitVolume * settings.primaryProductBufferHours,
-      transportVolume: Math.abs(detail.netRate || 0) * unitVolume
-    }))
-
-    const detailContributions = stationContributions
-      ? stationContributions
-      : contributions
 
     return {
       wareId: prodFlow.wareId,
@@ -112,7 +95,6 @@ export function deriveProductionFlows(
       unitVolume,
       production: prodFlow.production,
       consumption: prodFlow.consumption,
-      workforceConsumption: prodFlow.workforceConsumption,
       netRate: prodFlow.netRate,
       productionVolume,
       consumptionVolume,
@@ -123,8 +105,7 @@ export function deriveProductionFlows(
       totalOccupiedVolume,
       unitPrice,
       netValue,
-      contributions: detailContributions as any,
-      stationContributions
+      contributions
     }
   })
 
@@ -150,7 +131,7 @@ export function groupDerivedProductionFlows(
 
   wareFlows.forEach(flow => {
     if (flow.netRate > 0) groupedFlows.rateGroups.positive.push(flow)
-    else if (flow.workforceConsumption > 0) groupedFlows.rateGroups.supply.push(flow)
+    else if (flow.contributions.some(c => c.class === 'workforce')) groupedFlows.rateGroups.supply.push(flow)
     else if (flow.transportType === 'container') groupedFlows.rateGroups.operations.push(flow)
     else groupedFlows.rateGroups.resources.push(flow)
 
