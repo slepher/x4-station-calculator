@@ -166,7 +166,6 @@ const transportFlows = computed(() => {
     const details = source.contributions
       .map((detail) => ({
         ...detail,
-        name: (detail as any).stationName || (detail as any).name || '',
         transportVolume: Math.abs(detail.amount) * source.unitVolume
       }))
       .filter((detail) => detail.transportVolume > 0)
