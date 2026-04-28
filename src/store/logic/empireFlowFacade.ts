@@ -6,12 +6,11 @@ import type {
   EmpireGroupedFlows,
   EmpireWareFlow,
   SectorInternalData,
-  SupplyStorageFlow,
   SupplyPlanningInput,
   X4Module,
   X4Ware
 } from '@/types/x4'
-import type { WareProductionFlow, DerivedFlowContribution } from '@/types/production-flow'
+import type { WareProductionFlow } from '@/types/production-flow'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { readSaveBindingAggregatedFlows, buildTransitHubsFromBinding } from './liveProductionFlows'
 import { StationDerivedMap } from '@/store/state/StationDerivedMap'
@@ -88,9 +87,7 @@ function createEmptyEmpireGroupedFlows(): EmpireGroupedFlows {
   }
 }
 
-function createEmptySupplyStorageFlows(): SupplyStorageFlow[] {
-  return []
-}
+
 
 
 
@@ -186,78 +183,6 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     const stations = productionStations.value
     const sectorList = productionSectors.value
 
-    const buildSupplyStorageFlows = (groupedFlows: EmpireGroupedFlows): SupplyStorageFlow[] => {
-      const stationObjMap = new Map(stations.map((station) => [station.id, station]))
-      const stationNameMap = new Map(stations.map((station) => [station.id, station.name]))
-      const sectorNameMap = new Map(sectors.value.map(s => [s.id, s.name]))
-      const byWareId = new Map<string, SupplyStorageFlow>()
-
-      groupedFlows.flows.forEach((flow) => {
-        const details: DerivedFlowContribution[] = []
-        let totalProductionStorageVolume = 0
-        let totalConsumptionStorageVolume = 0
-
-        flow.contributions.forEach((contribution) => {
-          const station = stationObjMap.get(contribution.id)
-          if (!station) return
-
-          const name = contribution.class === 'sector'
-            ? sectorNameMap.get(contribution.id) || contribution.id
-            : stationNameMap.get(contribution.id) || contribution.id
-
-          const staticProduction = Math.max(contribution.amount, 0)
-          const staticConsumption = Math.max(-contribution.amount, 0)
-          const productionStorageVolume = staticProduction * flow.unitVolume * station.settings.primaryProductBufferHours
-          const consumptionStorageVolume = staticConsumption * flow.unitVolume * station.settings.resourceBufferHours
-
-          if (productionStorageVolume > 0) {
-            details.push({
-              ...contribution,
-              name,
-              netValue: 0,
-              storageVolume: productionStorageVolume
-            })
-            totalProductionStorageVolume += productionStorageVolume
-          }
-
-          if (consumptionStorageVolume > 0) {
-            details.push({
-              ...contribution,
-              name,
-              netValue: 0,
-              storageVolume: consumptionStorageVolume
-            })
-            totalConsumptionStorageVolume += consumptionStorageVolume
-          }
-        })
-
-        byWareId.set(flow.wareId, {
-          wareId: flow.wareId,
-          orderIndex: flow.orderIndex,
-          tier: flow.tier,
-          transportType: flow.transportType,
-          unitVolume: flow.unitVolume,
-          totalProductionStorageVolume,
-          totalConsumptionStorageVolume,
-          totalRequiredStorageVolume: Math.max(totalProductionStorageVolume, totalConsumptionStorageVolume),
-          details
-        })
-      })
-
-      const products = groupedFlows.empireGroups.operations
-        .filter((flow) => flow.netRate > 0)
-        .map((flow) => flow.wareId)
-      const operations = groupedFlows.empireGroups.operations
-        .filter((flow) => flow.netRate <= 0)
-        .map((flow) => flow.wareId)
-      const supply = groupedFlows.empireGroups.supply.map((flow) => flow.wareId)
-      const orderedWareIds = [...products, ...operations, ...supply]
-
-      return orderedWareIds
-        .map((wareId) => byWareId.get(wareId))
-        .filter((item): item is SupplyStorageFlow => !!item && item.transportType === 'container')
-    }
-
     sectorList.forEach((sector) => {
       const localStationIds = stations
         .filter((station) => station.sectorId === sector.id)
@@ -272,7 +197,6 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
           localStationIds
         },
         localGroupedFlows: rawGroupedFlows,
-        supplyStorageFlows: buildSupplyStorageFlows(rawGroupedFlows),
         storageModulePlans: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
@@ -304,7 +228,6 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
         sectorId,
         planning: getSupplyPlanningInput(sectorId),
         localGroupedFlows: createEmptyEmpireGroupedFlows(),
-        supplyStorageFlows: createEmptySupplyStorageFlows(),
         storageModulePlans: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
@@ -317,7 +240,6 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
       sectorId,
       planning: getSupplyPlanningInput(sectorId),
       localGroupedFlows: createEmptyEmpireGroupedFlows(),
-      supplyStorageFlows: createEmptySupplyStorageFlows(),
       storageModulePlans: [],
       autoIndustryModules: [],
       autoHabitationModules: [],

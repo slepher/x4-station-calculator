@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { SupplyStorageFlow } from '@/types/x4'
+
 import type { DerivedProductionFlow, WareProductionFlow } from '@/types/production-flow'
 import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
@@ -23,9 +23,9 @@ type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 function buildStorageFlowsFromProductionFlows(
   productionFlows: DerivedProductionFlow[],
   bufferHours: number
-): SupplyStorageFlow[] {
+): any[] {
   const safeBufferHours = Number.isFinite(bufferHours) && bufferHours > 0 ? bufferHours : 12
-  const byWare = new Map<string, SupplyStorageFlow>()
+  const byWare = new Map<string, any>()
 
   productionFlows
     .filter((flow) => flow.transportType === 'container')
@@ -59,19 +59,19 @@ function buildStorageFlowsFromProductionFlows(
     })
 
   return Array.from(byWare.values())
-    .map((row) => {
+    .map((row: any) => {
       const totalProductionStorageVolume = row.details
-        .filter((detail) => detail.type === 'production')
-        .reduce((sum, detail) => sum + (detail.storageVolume || 0), 0)
+        .filter((detail: any) => detail.type === 'production')
+        .reduce((sum: number, detail: any) => sum + (detail.storageVolume || 0), 0)
       const totalConsumptionStorageVolume = row.details
-        .filter((detail) => detail.type === 'consumption')
-        .reduce((sum, detail) => sum + (detail.storageVolume || 0), 0)
+        .filter((detail: any) => detail.type === 'consumption')
+        .reduce((sum: number, detail: any) => sum + (detail.storageVolume || 0), 0)
       return {
         ...row,
         totalProductionStorageVolume,
         totalConsumptionStorageVolume,
         totalRequiredStorageVolume: Math.max(totalProductionStorageVolume, totalConsumptionStorageVolume),
-        details: [...row.details].sort((a, b) => {
+        details: [...row.details].sort((a: any, b: any) => {
           const orderA = Number(a.sortOrder)
           const orderB = Number(b.sortOrder)
           if (Number.isFinite(orderA) && Number.isFinite(orderB) && orderA !== orderB) return orderA - orderB

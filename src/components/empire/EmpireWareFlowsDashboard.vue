@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
-import type { EmpireGroupedFlows, SupplyStorageFlow } from '@/types/x4'
+import type { EmpireGroupedFlows } from '@/types/x4'
 import { deriveEmpireWareFlows } from '@/store/logic/deriveEmpireWareFlowView'
 import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
 import TransitHubStorageFlowItem from './transit-hub/TransitHubStorageFlow.vue'
@@ -16,14 +16,12 @@ const props = withDefaults(defineProps<{
   groupedFlows?: EmpireGroupedFlows | null
   enableStorageView?: boolean
   enableTransportView?: boolean
-  supplyStorageFlows?: SupplyStorageFlow[]
   buyMultiplier?: number
   sellMultiplier?: number
 }>(), {
   groupedFlows: null,
   enableStorageView: false,
   enableTransportView: false,
-  supplyStorageFlows: () => [],
   buyMultiplier: 0.5,
   sellMultiplier: 0.5
 })
@@ -141,11 +139,9 @@ const empireGroups = computed(() => {
   ]
 })
 
-const storageFlows = computed(() => props.supplyStorageFlows || [])
-const hasStorageData = computed(() => storageFlows.value.length > 0)
-const storageTotalVolume = computed(() =>
-  storageFlows.value.reduce((sum, item) => sum + item.totalRequiredStorageVolume, 0)
-)
+const storageFlows = computed<{ wareId: string; unitVolume: number; totalRequiredStorageVolume: number; details: any[] }[]>(() => [])
+const hasStorageData = computed(() => false)
+const storageTotalVolume = computed(() => 0)
 const formatVolume = (n: number) => new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1,
   minimumFractionDigits: 1
