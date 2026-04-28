@@ -805,17 +805,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         plannedModules: [],
         modulesMap: gameData.modulesMap,
         waresMap: gameData.waresMap,
-        settings: {
-          racePreference: settings.value.racePreference,
-          resourceBufferHours: settings.value.resourceBufferHours,
-          primaryProductBufferHours: settings.value.primaryProductBufferHours,
-          secondaryProductBufferHours: settings.value.secondaryProductBufferHours,
-          buyMultiplier: settings.value.buyMultiplier,
-          sellMultiplier: settings.value.sellMultiplier,
-          transportMinutes: settings.value.transportMinutes || 30,
-          transportShipCapacity: 0,
-          sunlight: settings.value.sunlight ?? 100
-        },
+        settings: settings.value,
         warePriorityLevels: state.warePriorityLevels
       }),
       warePriorityLevels: state.warePriorityLevels,
