@@ -676,6 +676,7 @@
     "operations_group": "运营",
     "supply_group": "补给",
     "resources_group": "资源",
+    "sector_products": "星区产品",
     "sector_operations": "星区运营",
     "sector_supply": "星区补给",
 "resource_buffer_hours": "资源缓冲时间",

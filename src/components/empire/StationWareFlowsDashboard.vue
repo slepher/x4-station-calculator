@@ -126,10 +126,12 @@ const hasEmpireGapItems = computed(() =>
   props.empireGaps.operations.length > 0 || props.empireGaps.supply.length > 0
 )
 
-const empireGapOperations = computed(() =>
-  props.empireGaps.operations.map(wrapFlow)
+const empireGapProducts = computed(() =>
+  props.empireGaps.operations.filter(f => f.netRate > 0).map(wrapFlow)
 )
-
+const empireGapOperations = computed(() =>
+  props.empireGaps.operations.filter(f => f.netRate <= 0).map(wrapFlow)
+)
 const empireGapSupply = computed(() =>
   props.empireGaps.supply.map(wrapFlow)
 )
@@ -311,6 +313,17 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
 
       <div v-if="viewMode === 'economy' || viewMode === 'quantity'" class="volume-groups-container">
           <div v-if="props.settings.showEmpireGaps && viewMode === 'quantity' && hasEmpireGapItems" class="empire-gap-groups">
+            <div v-if="empireGapProducts.length > 0" class="empire-gap-group">
+              <EmpireWareFlowGroup
+                :title="t('wareflow.sector_products')"
+                :items="empireGapProducts"
+                :viewMode="viewMode"
+                :showAddButton="true"
+                :showRemoveButton="true"
+                @add="handleAddModule"
+                @remove="handleRemoveModule"
+              />
+            </div>
             <div v-if="empireGapOperations.length > 0" class="empire-gap-group">
               <EmpireWareFlowGroup
                 :title="t('wareflow.sector_operations')"

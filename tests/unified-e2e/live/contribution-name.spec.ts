@@ -63,7 +63,7 @@ test.describe('Contribution name 显示验证', () => {
     await gapToggle.click()
     await page.waitForTimeout(300)
 
-    const gapSection = page.locator('.empire-gap-group').filter({ hasText: /星区运营|Sector Operations/i })
+    const gapSection = page.locator('.empire-gap-group').filter({ hasText: /星区产品|Sector Products/i })
     await expect(gapSection).toBeVisible({ timeout: 2000 })
 
     const electronicMatrix = gapSection.locator('[data-testid="flow-wrapper"]').filter({ hasText: '电子基质' })

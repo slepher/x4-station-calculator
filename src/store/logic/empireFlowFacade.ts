@@ -42,7 +42,7 @@ export interface EmpireFlowFacade {
   ) => DerivedProductionFlow[]
 }
 
-function classifyAndEnrichFlows(
+export function classifyAndEnrichFlows(
   flows: WareProductionFlow[],
   waresMap: Record<string, X4Ware>
 ): EmpireGroupedFlows {
