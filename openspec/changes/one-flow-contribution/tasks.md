@@ -2,57 +2,48 @@
 
 ## Tasks
 
-### Phase 1: 类型定义
+### Phase 1: 类型清理
 
-- [x] T1. 新 `FlowContribution`（class: `'module' | 'workforce' | 'station' | 'sector'`，去 `volumeFlow?`/`valueFlow?`/`transportFlow?`）
-- [x] T2. 新 `DerivedFlowContribution extends FlowContribution`（含 `name`/`netValue`/`sortOrder?`/`storageVolume?`/`transportVolume?`）
-- [x] T3. 删 `DerivedStationFlowAtom`
-- [x] T4. 删 `SupplyStorageFlowDetail`，`SupplyStorageFlow.details` 改 `DerivedFlowContribution[]`
-- [x] T5. `WareFlow`、`EmpireWareFlow`、`WareProductionFlow` 的 `contributions` 更新
+- [ ] T1. 删 `SupplyStorageFlow` / `SupplyStorageFlowDetail`（x4.ts）
+- [ ] T2. `SectorInternalData` 删 `supplyStorageFlows`
+- [ ] T3. `StationComponentGapFlows.operations/supply` 改为 `DerivedProductionFlow[]`
+- [ ] T4. `DerivedProductionFlow.contributions` 改为 `DerivedFlowContribution[]`
+- [ ] T5. `EmpireGapItem` 类型改为 `DerivedProductionFlow`
 
-### Phase 2: 原始层适配
+### Phase 2: deriveProductionFlows 统一
 
-- [x] T6. `calculateWareFlowDerived.ts`：`deriveProductionFlows` 产 `DerivedFlowContribution[]`，填 `name`/`netValue`/`transportVolume`
-- [x] T7. `StationDerivedMap.ts`：`convertProductionFlowToWareFlow` 删 `volumeFlow/valueFlow/transportFlow`
-- [x] T8. `StationWareFlow.vue`：`detail.volumeFlow` → 实时计算
+- [ ] T6. `deriveProductionFlows` 入参扩展 `stationNameMap`/`sectorNameMap`
+- [ ] T7. 统一 name 解析：所有 class 都在 `deriveProductionFlows` 内处理
+- [ ] T8. `getSectorFinalProductionFlows` 不自填 name
+- [ ] T9. `deriveEmpireWareFlows` 统一到 `deriveProductionFlows`
 
-### Phase 3: 派生层 name 填充
+### Phase 3: 删除冗余函数
 
-- [x] T9. `buildExternalCache`：`class: 'sector'`，`name` 留空由 facade 回填
-- [x] T10. `stationGapViewModel.ts`：贡献使用 `DerivedFlowContribution`，`id: sectorId, class: 'sector'`，填 `name`
-- [x] T11. `empireFlowFacade.ts`：`buildSupplyStorageFlows` 产 `DerivedFlowContribution[]`，填 `name`
-- [x] T12. `getSectorFinalProductionFlows`：回填 `name`（station / sector）
+- [ ] T10. 删 `buildSupplyStorageFlows`（empireFlowFacade.ts）
+- [ ] T11. 删 `buildStorageFlowsFromProductionFlows`（TransitHubCenterDashboard.vue）
+- [ ] T12. 删 `groupDerivedProductionFlows` 独立函数，改 `useWareFlowGrouping` composable
 
-### Phase 4: UI 层迁移
+### Phase 4: 组件统一
 
-- [x] T13. `TransitHubStorageFlow.vue`：`stationId` → `id`，`kind` → `type`，`stationName` → `name`，`startsWith('external:')` → `class === 'sector'`
-- [x] T14. `TransitHubTransportFlow.vue`：同上
-- [x] T15. `EmpireWareFlowsDashboard.vue`：同上
-- [x] T16. `deriveEmpireWareFlowView.ts`：`DerivedEmpireContribution` → `DerivedFlowContribution`
+- [ ] T13. `StationWareFlowsDashboard` 调 `useWareFlowGrouping` composable
+- [ ] T14. `TransitHubCenterDashboard` 调 `useWareFlowGrouping` composable
+- [ ] T15. `EmpireWareFlowsDashboard` 调 `useWareFlowGrouping` composable
 
-### Phase 5: 构建验证
+### Phase 5: Gap 分析统一
 
-- [x] T17. `npm run build` 通过
+- [ ] T16. `buildStationComponentGapFlows` 产出 `DerivedProductionFlow[]`
+- [ ] T17. `getStationComponentGapFlows` 返回 `DerivedProductionFlow[]`
+- [ ] T18. `StationWareFlowsDashboard` gap 部分适配新类型
 
-## 执行顺序
+### Phase 6: 构建验证
 
-```
-Phase 1 (type defs):     T1-T5
-Phase 2 (raw layer):     T6-T8
-Phase 3 (name fill):     T9-T12
-Phase 4 (UI):            T13-T16
-Phase 5 (build):         T17
-```
-
-## 依赖
-
-- 前置依赖：`empire-sector-flows-cache`
+- [ ] T19. `npm run build` 通过
 
 ## 完成定义
 
-- [x] `FlowContribution` 只含原始字段，class 含 `'sector'`
-- [x] `DerivedFlowContribution` 含 `name`，派生阶段填充
-- [x] `DerivedStationFlowAtom` / `SupplyStorageFlowDetail` 删除
-- [x] gap 分析用 `DerivedFlowContribution` + `class: 'sector'`
-- [x] UI 使用 `detail.name` / `detail.class === 'sector'`
-- [x] `npm run build` 通过
+- [ ] `SupplyStorageFlow` / `SupplyStorageFlowDetail` 删除
+- [ ] `groupDerivedProductionFlows` 改为 composable
+- [ ] `deriveProductionFlows` 统一 name 解析
+- [ ] 三个 dashboard 调同一 grouping composable
+- [ ] Gap 分析统一为 `DerivedProductionFlow[]`
+- [ ] `npm run build` 通过

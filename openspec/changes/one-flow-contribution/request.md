@@ -2,7 +2,12 @@
 
 ## 目标
 
-将现有所有 contribution 相关类型（`FlowContribution`、`DerivedStationFlowAtom`、`SupplyStorageFlowDetail`）统一为单一类型族，用 `class` 字段区分归属，消除类型重复和字段冗余。同时将 `workforceConsumption` 并入 `consumption`。
+统一所有 contribution 相关类型，建立 `store → presenter → vue` 的规范分层：
+- Store/facade 只产出原始 `DerivedProductionFlow[]`，不做分组
+- Vue 层通过统一 composable 完成分组和展示
+- 消除 `SupplyStorageFlow`、`buildStorageFlowsFromProductionFlows`、`groupDerivedProductionFlows`（改为 composable）
+- gap 分析产出 `DerivedProductionFlow[]`，不再使用 `EmpireWareFlow[]`
+- 所有 `FlowContribution` → `DerivedFlowContribution` 的转换统一在 `deriveProductionFlows` 中完成
 
 ## 类型设计
 
@@ -19,17 +24,6 @@ interface FlowContribution {
 }
 ```
 
-各 `class` 填充规则：
-
-| class | id | count | amount |
-|---|---|---|---|
-| `module` | moduleId | module.count | 模块贡献量 |
-| `workforce` | race（实际种族名） | workforce.amount | 负向消耗值 |
-| `station` | stationId | station.count | 站级聚合 netRate |
-| `sector` | sectorId | 1 | 跨星区物流 / gap 其他星区供给 |
-
-不含可派生字段（`volumeFlow`/`valueFlow`/`transportFlow`），避免冗余。
-
 ### 派生层 `DerivedFlowContribution`
 
 ```typescript
@@ -42,37 +36,44 @@ interface DerivedFlowContribution extends FlowContribution {
 }
 ```
 
-| 字段 | 来源 |
+### 统一的流类型 `DerivedProductionFlow`
+
+```typescript
+interface DerivedProductionFlow extends WareFlow {
+  // WareFlow 已有: productionVolume / consumptionVolume / netVolume
+  // WareFlow 已有: transportDemand
+  // WareFlow 已有: unitPrice / netValue
+  // contributions: DerivedFlowContribution[]（统一为派生类型）
+}
+```
+
+所有视图从同一数据源派生：
+
+```
+Store / Facade
+  └── DerivedProductionFlow[]（含 DerivedFlowContribution[]）
+
+Vue composable（useWareFlowGrouping）
+  ├── rateGroups: { positive, operations, supply, resources }
+  ├── volumeGroups: { container, solid, liquid }
+  └── 直接消费 flow.transportDemand
+
+各组件调用同一 composable
+  ├── StationWareFlowsDashboard
+  ├── TransitHubCenterDashboard
+  └── EmpireWareFlowsDashboard
+```
+
+## 消除项
+
+| 消除项 | 替代 |
 |---|---|
-| `name` | 派生阶段按 class 填充：StationPlan.name / binding group name / module name / race |
-| `netValue` | `amount * unitPrice` |
-| `sortOrder` | 排序用 |
-| `storageVolume` | `\|amount\| * unitVolume * bufferHours` |
-| `transportVolume` | `\|amount\| * unitVolume` |
-
-`name` 在派生阶段填充，来源：
-
-| class | name 来源 |
-|---|---|
-| `'station'` | `StationPlan.name` |
-| `'sector'` | `SaveBindingPlan.group.name`（非 map sector name） |
-| `'module'` | `modulesMap[id].name` |
-| `'workforce'` | id 本身即是 race 名 |
-
-### gap 分析使用 `DerivedFlowContribution`
-
-`buildStationComponentGapFlows` 使用 `DerivedFlowContribution`，但只填充必要字段（`id`/`class`/`type`/`count`/`amount`/`bonusPercent`/`name`），不涉及价格/体积派生字段。
-
-### 替换关系
-
-| 旧类型 / 格式 | 新类型 / 格式 |
-|---|---|
-| `FlowContribution`（含 volumeFlow/valueFlow/transportFlow） | `FlowContribution`（不含派生字段） |
-| `DerivedStationFlowAtom extends FlowContribution + stationName` | `DerivedFlowContribution extends FlowContribution`（无 name） |
-| `SupplyStorageFlowDetail` | `DerivedFlowContribution` |
-| gap 分析中 `id: 'sector:<id>', class: 'station'` | `id: sectorId, class: 'sector'` |
-| solver 物流 `class: 'external-station'` | `class: 'sector'` |
-| `stationId.startsWith('external:')` | `class === 'sector'` |
+| `SupplyStorageFlow` 类型 | 直接使用 `DerivedProductionFlow` |
+| `SupplyStorageFlowDetail` 类型 | 使用 `DerivedFlowContribution` |
+| `buildStorageFlowsFromProductionFlows` | 直接读 `DerivedProductionFlow` 字段 |
+| `groupDerivedProductionFlows` 独立函数 | 改为 `useWareFlowGrouping` composable |
+| `StationComponentGapFlows` 中的 `EmpireWareFlow[]` | 改为 `DerivedProductionFlow[]` |
+| `getSectorFinalProductionFlows` 中回填 name | name 在 `deriveProductionFlows` 中统一处理 |
 
 ## 数据流
 
@@ -85,46 +86,31 @@ interface DerivedFlowContribution extends FlowContribution {
   updateAggregation() / buildExternalCache()
     → FlowContribution[]（class: 'station' | 'sector'）
 
-派生侧:
-  deriveProductionFlows() / buildSupplyStorageFlows()
-    → FlowContribution[] → DerivedFlowContribution[]（加 name / netValue 等）
+统一派生入口:
+  deriveProductionFlows()
+    → FlowContribution[] → DerivedFlowContribution[]（name / netValue / transportVolume）
+    → DerivedProductionFlow[]（统一下发）
 
-gap 分析:
-  buildStationComponentGapFlows()
-    → DerivedFlowContribution[]（只填 id/class/type/count/amount/name）
+消费侧（Vue composable）:
+  useWareFlowGrouping(derivedFlows)
+    → rateGroups / volumeGroups（无 SupplyStorageFlow）
 
-消费侧:
-  TransitHub → DerivedFlowContribution（name 已填充）
-  StationToolbar（gap） → DerivedFlowContribution（name 已填充）
+Vue 组件:
+  StationWareFlowsDashboard    ← 调同一 composable
+  TransitHubCenterDashboard    ← 调同一 composable
+  EmpireWareFlowsDashboard     ← 调同一 composable
+  gap 分析                      ← 统一为 DerivedProductionFlow[]
 ```
-
-## 边界
-
-### In Scope
-
-- `FlowContribution` 类型定义（不含派生字段，class 含 `'sector'`）
-- `DerivedFlowContribution` 类型定义（不含 name）
-- 替换所有旧 contribution 类型的引用
-- Gap 分析贡献格式规范化
-- `workforceConsumption` 字段消除与迁移
-- `SupplyStorageFlowDetail` → `DerivedFlowContribution` 的替换
-- filter/group 中 workforce 判定改为 `class='workforce'`
-- UI 组件中 `stationId.startsWith('external:')` 改为 `class === 'sector'`
-
-### Out of Scope
-
-- 测试代码编写与执行
-- `station-name` helper 的实现（由后续 UI change 负责）
 
 ## 验收标准（DoD）
 
-1. `FlowContribution` 只含原始字段，不含 `volumeFlow/valueFlow/transportFlow`
-2. `DerivedFlowContribution` 含 `name`/`netValue`/`sortOrder`/`storageVolume`/`transportVolume`
-3. `DerivedStationFlowAtom` / `SupplyStorageFlowDetail` 已删除
-4. `class` 值正确区分 `module` / `workforce` / `station` / `sector`
-5. gap 分析贡献使用 `DerivedFlowContribution` + `class: 'sector'`，不再用 `id: 'sector:<id>'` 格式
-6. solver 物流使用 `class: 'sector'`，不再用 `class: 'external-station'`
-7. `workforceConsumption` 字段移除，消耗量并入 `consumption`
-8. UI 检测外部贡献不再使用 `stationId.startsWith('external:')`
-9. `name` 在派生阶段填充，Vue 层直接读 `detail.name`
+1. `FlowContribution` 只含原始字段
+2. `DerivedFlowContribution` 含 name / netValue / sortOrder / storageVolume / transportVolume
+3. `DerivedStationFlowAtom` / `SupplyStorageFlow` / `SupplyStorageFlowDetail` 删除
+4. `groupDerivedProductionFlows` 改为 composable
+5. `buildStorageFlowsFromProductionFlows` 删除
+6. `StationComponentGapFlows` 使用 `DerivedProductionFlow[]`
+7. `getSectorFinalProductionFlows` 不自填 name
+8. `deriveProductionFlows` 是唯一 name 解析入口
+9. 全部（StationWareFlowsDashboard、TransitHubCenterDashboard、EmpireWareFlowsDashboard）调同一 grouping composable
 10. `npm run build` 通过

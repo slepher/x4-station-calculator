@@ -1,69 +1,53 @@
 # One Flow Contribution - Design
 
-## 类型结构
+## 消除项
 
-### 原始层 `FlowContribution`
-
-```typescript
-// src/types/production-flow.ts
-export interface FlowContribution {
-  id: string
-  class: 'module' | 'workforce' | 'station' | 'sector'
-  type: 'production' | 'consumption'
-  count: number
-  amount: number
-  bonusPercent: number
-}
-```
-
-### 派生层 `DerivedFlowContribution`
-
-```typescript
-// src/types/production-flow.ts
-export interface DerivedFlowContribution extends FlowContribution {
-  name: string
-  netValue: number
-  sortOrder?: number
-  storageVolume?: number
-  transportVolume?: number
-}
-```
-
-`name` 在派生阶段填充，按 class 从对应数据源查询。Vue 层直接读 `detail.name`。
-
-### 引用类型变更
-
-| 类型 | 字段 | 改动 |
-|---|---|---|
-| `WareProductionFlow` | `contributions: FlowContribution[]` | class: 'module'/'workforce' |
-| `EmpireWareFlow` | `contributions: FlowContribution[]` | class: 'station'/'sector' |
-| `WareFlow` | `contributions: FlowContribution[]` | 沿用 |
-| `SupplyStorageFlow` | `details: SupplyStorageFlowDetail[]` | 改为 `details: DerivedFlowContribution[]` |
-| `DerivedStationFlowAtom` | extends FlowContribution | 删除，由 `DerivedFlowContribution` 替代 |
-
-## 替换关系
-
-| 旧 | 新 |
+| 消除 | 原因 |
 |---|---|
-| `DerivedStationFlowAtom` | `DerivedFlowContribution`（name 回填） |
-| `SupplyStorageFlowDetail` | `DerivedFlowContribution` |
-| `FlowContribution.volumeFlow?` | 运行时 `amount * unitVolume` |
-| `FlowContribution.valueFlow?` | `DerivedFlowContribution.netValue` |
-| `FlowContribution.transportFlow?` | `DerivedFlowContribution.transportVolume` |
-| gap 中 `id: 'sector:<id>', class: 'station'` | `id: sectorId, class: 'sector'` |
-| solver 中 `class: 'external-station'` | `class: 'sector'` |
+| `SupplyStorageFlow` 类型 | TransitHub 不应有独立存储类型，直接读 DerivedProductionFlow |
+| `buildStorageFlowsFromProductionFlows` | 存储体积从 DerivedProductionFlow.storageVolume 取 |
+| `SupplyStorageFlowDetail` | 被 DerivedFlowContribution 替代 |
+| `DerivedStationFlowAtom` | 被 DerivedFlowContribution 替代 |
+| `buildSupplyStorageFlows`（sectorInternalDataMap） | `SectorInternalData.supplyStorageFlows` 无消费者 |
+| `groupDerivedProductionFlows` 独立函数 | 改为 useWareFlowGrouping composable |
+| `StationComponentGapFlows` 中的 `EmpireWareFlow[]` | 改为 `DerivedProductionFlow[]` |
+| `getSectorFinalProductionFlows` 中自填 name | 统一到 deriveProductionFlows |
+
+## 数据流
+
+```
+raw FlowContribution[]
+  ↓
+deriveProductionFlows() ← 唯一派生入口
+  ├── modulesMap → 解析 module name
+  ├── stationNameMap → 解析 station name
+  ├── sectorNameMap → 解析 sector name
+  ├── waresMap → 计算 netValue
+  └── settings → 计算 transportVolume / storageVolume
+  ↓
+DerivedProductionFlow[]（含 DerivedFlowContribution[]）
+  ↓
+useWareFlowGrouping() ← 唯一分组 composable
+  ├── rateGroups: { positive, operations, supply, resources }
+  ├── volumeGroups: { container, solid, liquid }
+  └── 直接读 flow.transportDemand（transport 视图）
+  ↓
+Vue 组件（StationWareFlowsDashboard / TransitHubCenterDashboard / EmpireWareFlowsDashboard）
+```
 
 ## 涉及文件
 
 | 文件 | 变更 |
 |---|---|
-| `src/types/production-flow.ts` | 新 `FlowContribution`，新 `DerivedFlowContribution`（含 name），删 `DerivedStationFlowAtom` |
-| `src/types/x4.ts` | `SupplyStorageFlow.details` 改 `DerivedFlowContribution[]`，删 `SupplyStorageFlowDetail` |
-| `src/store/logic/calculateWareFlowDerived.ts` | 贡献产出改为 `DerivedFlowContribution[]`，填 name/netValue/transportVolume |
-| `src/store/state/StationDerivedMap.ts` | `convertProductionFlowToWareFlow` 删 volumeFlow/valueFlow/transportFlow；`buildExternalCache` 用 `class: 'sector'`，name 留空由 facade 回填 |
-| `src/store/logic/stationGapViewModel.ts` | 贡献使用 `DerivedFlowContribution`，`id: sectorId, class: 'sector'`，填 name |
-| `src/store/logic/empireFlowFacade.ts` | `buildSupplyStorageFlows` 产 `DerivedFlowContribution[]`，填 name；`getSectorFinalProductionFlows` 填 name |
-| `src/components/empire/StationWareFlow.vue` | `detail.volumeFlow` → 实时计算 |
-| `src/components/empire/transit-hub/TransitHubStorageFlow.vue` | `stationId` → `id`，`kind` → `type`，`stationName` → `name`，`startsWith('external:')` → `class === 'sector'` |
-| `src/components/empire/transit-hub/TransitHubTransportFlow.vue` | 同上 |
-| `src/components/empire/EmpireWareFlowsDashboard.vue` | 同上 |
+| `src/types/production-flow.ts` | `DerivedProductionFlow.contributions` 改为 `DerivedFlowContribution[]` |
+| `src/types/x4.ts` | 删 `SupplyStorageFlow` / `SupplyStorageFlowDetail`；`SectorInternalData` 删 `supplyStorageFlows`；`StationComponentGapFlows` 改 `DerivedProductionFlow[]` |
+| `src/store/logic/calculateWareFlowDerived.ts` | `deriveProductionFlows` 收 station/sector name maps，统一 name 解析；产 `DerivedFlowContribution[]` |
+| `src/store/logic/empireFlowFacade.ts` | 删 `buildSupplyStorageFlows`；`sectorInternalDataMap` 删 `supplyStorageFlows`；`getSectorFinalProductionFlows` 不自填 name；`getStationComponentGapFlows` 返回 `DerivedProductionFlow[]` |
+| `src/store/logic/stationGapViewModel.ts` | 产出 `DerivedProductionFlow[]`（替代 `EmpireWareFlow[]`） |
+| `src/store/logic/deriveEmpireWareFlowView.ts` | `deriveEmpireWareFlows` 统一到 `deriveProductionFlows` |
+| `src/components/empire/composables/useWareFlowGrouping.ts` | 从独立 `groupDerivedProductionFlows` 改为 composable，供三个 dashboard 共用 |
+| `src/components/empire/StationWareFlowsDashboard.vue` | 移除本地 `volumeGroups`/`transportGroups`/`wrapFlow`，调 composable |
+| `src/components/empire/transit-hub/TransitHubCenterDashboard.vue` | 移除 `buildStorageFlowsFromProductionFlows` / `transportItems` / 自定义 `groupedFlows`，调 composable |
+| `src/components/empire/transit-hub/TransitHubStorageFlow.vue` | prop 从 `SupplyStorageFlowDetail[]` 改为 `DerivedFlowContribution[]`（已完成） |
+| `src/components/empire/transit-hub/TransitHubTransportFlow.vue` | prop 从 `TransportDetail` 改为 `DerivedFlowContribution[]`（已完成） |
+| `src/components/empire/EmpireWareFlowsDashboard.vue` | 移除本地 `transportFlows`/`storageFlows`，调 composable |
