@@ -2,138 +2,119 @@
 
 ## Purpose
 
-Unify three contribution types (`BaseModuleFlowAtom`, `ModuleFlowAtom`, `StationFlowAtom`) into a single `FlowContribution` type identified by `class`, and eliminate the separate `workforceConsumption` field.
+Unify all contribution-related types (`FlowContribution`, `DerivedStationFlowAtom`, `SupplyStorageFlowDetail`) into a single typed family with `class` field for source differentiation.
 
-## MODIFIED Requirements
+## Type Design
 
-### Requirement: FlowContribution 类型定义
+### Base: `FlowContribution`
 
-`FlowContribution` SHALL 替代现有的 `BaseModuleFlowAtom`、`ModuleFlowAtom` 和 `StationFlowAtom`。
+```typescript
+interface FlowContribution {
+  id: string
+  class: 'module' | 'workforce' | 'station' | 'sector'
+  type: 'production' | 'consumption'
+  count: number
+  amount: number
+  bonusPercent: number
+}
+```
 
-#### Scenario: 统一类型结构
+No derived fields (`volumeFlow`/`valueFlow`/`transportFlow`).
 
-**前提** (Given) `FlowContribution` 类型定义
-**当** (When) 检查其字段
-**那么** (Then) 包含：
-- `id: string`：实体标识（stationId / moduleId / race）
-- `class: string`：归属类别（`'station'` / `'module'` / `'workforce'`）
-- `type: 'production' | 'consumption'`：产消方向
-- `count: number`：数量
-- `amount: number`：贡献量（正=产出，负=消耗）
-- `bonusPercent: number`：效率加成
+### Derived: `DerivedFlowContribution extends FlowContribution`
 
-**并且** (And) 可选包含二阶段衍生字段：
-- `volumeFlow?: number`
-- `valueFlow?: number`
-- `transportFlow?: number`
+```typescript
+interface DerivedFlowContribution extends FlowContribution {
+  name: string
+  netValue: number
+  sortOrder?: number
+  storageVolume?: number
+  transportVolume?: number
+}
+```
 
-### Requirement: WareProductionFlow 类型变更
+`name` filled at derive stage from StationPlan / binding group / modulesMap / race.
 
-#### Scenario: contributions 类型替换
+## ADDED Requirements
 
-**前提** (Given) `WareProductionFlow` 定义
-**当** (When) 获取 `contributions`
-**那么** (Then) 类型为 `FlowContribution[]`
-**并且** (And) 只包含 `class='module'` 和 `class='workforce'` 的条目
+### Requirement: FlowContribution 不含派生字段
 
-#### Scenario: workforceConsumption 字段消除
+#### Scenario: volumeFlow/valueFlow/transportFlow 不在 FlowContribution
 
-**前提** (Given) `WareProductionFlow` 定义
-**当** (When) 检查字段列表
-**那么** (Then) `workforceConsumption` 字段已移除
-**并且** (And) workforce 产生的消耗量已并入 `consumption` 字段
+**Given** `FlowContribution` 类型定义
+**When** 不包含 `volumeFlow`、`valueFlow`、`transportFlow`
+**Then** 这些字段不是 `FlowContribution` 的一部分
+**And** `DerivedFlowContribution.netValue` 替代 `valueFlow`
+**And** `DerivedFlowContribution.transportVolume` 替代 `transportFlow`
 
-### Requirement: EmpireWareFlow 类型变更
+#### Scenario: volumeFlow 实时计算
 
-#### Scenario: contributions 类型替换
+**Given** `StationWareFlow.vue` 需要 volume
+**When** `detail.volumeFlow` 不再可用
+**Then** 使用 `detail.amount * (props.unitVolume || 0)` 实时计算
 
-**前提** (Given) `EmpireWareFlow` 定义
-**当** (When) 获取 `contributions`
-**那么** (Then) 类型为 `FlowContribution[]`
-**并且** (And) 只包含 `class='station'` 的条目
+### Requirement: class 值 'sector'
 
-#### Scenario: workforceConsumption 字段消除
+#### Scenario: gap 分析
 
-**前提** (Given) `EmpireWareFlow` 定义
-**当** (When) 检查字段列表
-**那么** (Then) `workforceConsumption` 字段已移除
-**并且** (And) workforce 产生的消耗量已并入 `consumption` 字段
+**Given** `buildStationComponentGapFlows` 中其他星区供给
+**When** 构建贡献
+**Then** `class: 'sector'`，`id: sectorId`
+**And** 不再使用 `id: 'sector:<id>'` 前缀格式
 
-### Requirement: WareFlow 类型变更
+#### Scenario: solver 物流
 
-#### Scenario: contributions 类型替换
+**Given** `buildExternalCache` 中跨星区物流
+**When** 构建贡献
+**Then** `class: 'sector'` 替代 `'external-station'`
 
-**前提** (Given) `WareFlow` 定义
-**当** (When) 获取 `contributions`
-**那么** (Then) 类型为 `FlowContribution[]`
-**并且** (And) 只包含 `class='module'` 的条目
+### Requirement: DerivedFlowContribution 替代 SupplyStorageFlowDetail
 
-### Requirement: 自动 workforce contribution 生成规则
+#### Scenario: details 类型变更
 
-#### Scenario: 直接用工人数量
+**Given** `SupplyStorageFlow.details`
+**When** 类型从 `SupplyStorageFlowDetail[]` 改为 `DerivedFlowContribution[]`
+**Then** UI 通过 `detail.name` 获取可读名称
+**And** 通过 `detail.class === 'sector'` 检测外部贡献
 
-**前提** (Given) 自动 workforce 计算完成
-**当** (When) 生成 contribution
-**那么** (Then) 不生成居住舱模块的 contribution
-**并且** (And) 生成一条 `{ id: '<race>', class: 'workforce', type: 'consumption', count: <workerCount>, amount: -<hourlyAmount>, bonusPercent: 0 }`
-**并且** (And) race 使用实际种族名（如 `'argon'`、`'teladi'`）
+#### Scenario: class 替代 stationId 前缀
 
-#### Scenario: 消耗量在 contribution
+**Given** TransitHub 组件
+**When** `detail.stationId.startsWith('external:')` 不再可用
+**Then** 使用 `detail.class === 'sector'` 检测外部贡献
 
-**前提** (Given) workforce contribution 生成
-**当** (When) 检查 contribution
-**那么** (Then) `amount` 为负的实际消耗值（如 `-24.0`）
-**并且** (And) `type` 为 `'consumption'`
-**并且** (And) `class` 为 `'workforce'`
-**并且** (And) workforce 消耗也累计到 flow 顶层的 `consumption` 字段
+### Requirement: name 在派生阶段填充
 
-### Requirement: filter/group 逻辑迁移
+#### Scenario: name 来源
 
-#### Scenario: workforce 判定改为检查 class
+**Given** `DerivedFlowContribution` 构建时
+**When** `class === 'station'`
+**Then** `name` 从 `StationPlan.name` 获取
+**When** `class === 'sector'`
+**Then** `name` 从 `SaveBindingPlan.group.name` 获取
+**When** `class === 'module'`
+**Then** `name` 从 `modulesMap[id].name` 获取
+**When** `class === 'workforce'`
+**Then** `name` 从 id（race 名）获取
 
-**前提** (Given) 需要判定 workforce 来源的 filter 或 group 逻辑
-**当** (When) 判定
-**那么** (Then) 不再检查 `workforceConsumption` 字段
-**并且** (And) 改为遍历 `contributions` 检查是否存在 `class='workforce'` 的条目
+### Requirement: gap 分析使用 DerivedFlowContribution
 
-### Requirement: 类型导出清理
+#### Scenario: gap 只填必要字段
 
-#### Scenario: 旧类型不在主要位置导出
-
-**前提** (Given) 类型迁移完成
-**当** (When) 检查导出
-**那么** (Then) `BaseModuleFlowAtom`、`ModuleFlowAtom`、`StationFlowAtom` 不再通过主入口导出
-**并且** (And) 保留兼容别名（可选）或完全清理（根据团队决策）
+**Given** `buildStationComponentGapFlows`
+**When** 构建贡献
+**Then** 使用 `DerivedFlowContribution`
+**And** 只填充 `id`/`class`/`type`/`count`/`amount`/`bonusPercent`/`name`
+**And** `netValue`/`storageVolume`/`transportVolume` 为 0
 
 ## REMOVED Requirements
 
-### Requirement: stationContributions 双路径消除
-
-`WareProductionFlow.stationContributions` 和 `DerivedProductionFlow.stationContributions` 字段被移除，所有 `class='station'` 的贡献条目统一写入 `contributions`。
-
-#### Scenario: stationContributions 字段移除
-
-**前提** (Given) `WareProductionFlow` 定义
-**当** (When) 检查字段列表
-**那么** (Then) `stationContributions` 字段不存在
-**并且** (And) 站级贡献（`class='station'`）写入 `contributions` 字段
-
-#### Scenario: DerivedProductionFlow.stationContributions 移除
-
-**前提** (Given) `DerivedProductionFlow` 定义
-**当** (When) 检查字段列表
-**那么** (Then) `stationContributions` 字段不存在
-**并且** (And) `contributions` 包含所有类型的贡献条目（`class='module'` / `class='workforce'` / `class='station'`）
-
-### Requirement: FlowContribution 冗余字段消除
-
-`FlowContribution` 中移除 `production`、`consumption`、`workforceConsumption`、`netRate` 字段。产消方向由 `type` 承担，数值由 `amount` 承担。这三个字段在 contribution 层仅是 `WareProductionFlow`/`EmpireWareFlow` 流层级字段的冗余拷贝，无独立消费方。
-
-#### Scenario: 冗余字段移除
-
-**前提** (Given) `FlowContribution` 定义
-**当** (When) 检查字段列表
-**那么** (Then) `production` 字段不存在
-**并且** (And) `consumption` 字段不存在
-**并且** (And) `workforceConsumption` 字段不存在
-**并且** (And) `netRate` 字段不存在
+| 删除项 | 替代 |
+|---|---|
+| `DerivedStationFlowAtom` | `DerivedFlowContribution` |
+| `SupplyStorageFlowDetail` | `DerivedFlowContribution` |
+| `FlowContribution.volumeFlow?` | 运行时计算 `amount * unitVolume` |
+| `FlowContribution.valueFlow?` | `DerivedFlowContribution.netValue` |
+| `FlowContribution.transportFlow?` | `DerivedFlowContribution.transportVolume` |
+| gap 中 `id: 'sector:<id>'` | `id: sectorId, class: 'sector'` |
+| `class: 'external-station'` | `class: 'sector'` |

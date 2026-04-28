@@ -106,15 +106,16 @@ const formattedDetails = computed(() => {
   if (!props.details) return []
   
   if (props.viewMode === 'economy') {
-    return processedDetails.value.map(detail => {
-      const economicValue = detail.valueFlow !== undefined ? detail.valueFlow : detail.amount * 100
-      return { ...detail, economicAmount: economicValue, displayAmount: economicValue }
-    })
+    return processedDetails.value.map(detail => ({
+      ...detail,
+      economicAmount: detail.amount * 100,
+      displayAmount: detail.amount * 100
+    }))
   }
   
   if (props.viewMode === 'volume') {
     return processedDetails.value.map(detail => {
-      const volumeValue = detail.volumeFlow !== undefined ? detail.volumeFlow : detail.amount * (props.unitVolume || 0)
+      const volumeValue = detail.amount * (props.unitVolume || 0)
       return { ...detail, volumeAmount: volumeValue, displayAmount: volumeValue }
     })
   }
@@ -122,9 +123,7 @@ const formattedDetails = computed(() => {
   if (props.viewMode === 'transport') {
     const minutes = props.transportMinutes ?? 30
     return processedDetails.value.map(detail => {
-      const transportValue = detail.transportFlow !== undefined
-        ? detail.transportFlow
-        : Math.abs(detail.amount || 0) * (props.unitVolume || 0) * (minutes / 60)
+      const transportValue = Math.abs(detail.amount || 0) * (props.unitVolume || 0) * (minutes / 60)
       return { ...detail, displayAmount: transportValue }
     })
   }

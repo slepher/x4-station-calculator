@@ -11,7 +11,7 @@ import type {
   X4Module,
   X4Ware
 } from '@/types/x4'
-import type { WareProductionFlow } from '@/types/production-flow'
+import type { WareProductionFlow, DerivedFlowContribution } from '@/types/production-flow'
 import { buildStationComponentGapFlows, type StationComponentGapFlows } from './stationGapViewModel'
 import { readSaveBindingAggregatedFlows, buildTransitHubsFromBinding } from './liveProductionFlows'
 import { StationDerivedMap } from '@/store/state/StationDerivedMap'
@@ -187,17 +187,23 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
     const sectorList = productionSectors.value
 
     const buildSupplyStorageFlows = (groupedFlows: EmpireGroupedFlows): SupplyStorageFlow[] => {
-      const stationMap = new Map(stations.map((station) => [station.id, station]))
+      const stationObjMap = new Map(stations.map((station) => [station.id, station]))
+      const stationNameMap = new Map(stations.map((station) => [station.id, station.name]))
+      const sectorNameMap = new Map(sectors.value.map(s => [s.id, s.name]))
       const byWareId = new Map<string, SupplyStorageFlow>()
 
       groupedFlows.flows.forEach((flow) => {
-        const details: SupplyStorageFlow['details'] = []
+        const details: DerivedFlowContribution[] = []
         let totalProductionStorageVolume = 0
         let totalConsumptionStorageVolume = 0
 
         flow.contributions.forEach((contribution) => {
-          const station = stationMap.get(contribution.id)
+          const station = stationObjMap.get(contribution.id)
           if (!station) return
+
+          const name = contribution.class === 'sector'
+            ? sectorNameMap.get(contribution.id) || contribution.id
+            : stationNameMap.get(contribution.id) || contribution.id
 
           const staticProduction = Math.max(contribution.amount, 0)
           const staticConsumption = Math.max(-contribution.amount, 0)
@@ -206,11 +212,9 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
           if (productionStorageVolume > 0) {
             details.push({
-              stationId: contribution.id,
-              stationName: (contribution as unknown as Record<string, string>).stationName || '',
-              stationCount: contribution.count,
-              kind: 'production',
-              staticRate: staticProduction,
+              ...contribution,
+              name,
+              netValue: 0,
               storageVolume: productionStorageVolume
             })
             totalProductionStorageVolume += productionStorageVolume
@@ -218,11 +222,9 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
           if (consumptionStorageVolume > 0) {
             details.push({
-              stationId: contribution.id,
-              stationName: (contribution as unknown as Record<string, string>).stationName || '',
-              stationCount: contribution.count,
-              kind: 'consumption',
-              staticRate: staticConsumption,
+              ...contribution,
+              name,
+              netValue: 0,
               storageVolume: consumptionStorageVolume
             })
             totalConsumptionStorageVolume += consumptionStorageVolume
@@ -325,18 +327,7 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
 
   function getSectorFinalProductionFlows(sectorId: string): WareProductionFlow[] {
     if (!inputFlowMap.value) return []
-    const combined = inputFlowMap.value.getSectorCombinedFlows(sectorId)
-    const stationMap = new Map(productionStations.value.map(s => [s.id, s.name]))
-    const sectorNameMap = new Map(sectors.value.map(s => [s.id, s.name]))
-    return combined.map(flow => ({
-      ...flow,
-      contributions: flow.contributions.map(c => ({
-        ...c,
-        stationName: c.class === 'external-station'
-          ? sectorNameMap.get(c.id) ?? c.id
-          : stationMap.get(c.id) ?? ''
-      }))
-    }))
+    return inputFlowMap.value.getSectorCombinedFlows(sectorId)
   }
 
   function getStationComponentGapFlows(stationId: string | null, activeStationId: string | null): StationComponentGapFlows {

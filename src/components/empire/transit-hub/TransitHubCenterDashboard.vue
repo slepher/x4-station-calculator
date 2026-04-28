@@ -4,7 +4,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import type { SupplyStorageFlow } from '@/types/x4'
-import type { DerivedProductionFlow, WareProductionFlow } from '@/types/production-flow'
+import type { DerivedProductionFlow, DerivedFlowContribution, WareProductionFlow } from '@/types/production-flow'
 import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
@@ -46,12 +46,10 @@ function buildStorageFlowsFromProductionFlows(
       details.forEach((detail, index) => {
         const amount = Math.abs(detail.amount || 0)
         if (amount === 0) return
+        const derived = detail as DerivedFlowContribution
         row.details.push({
-          stationId: detail.id,
-          stationName: (detail as unknown as Record<string, string>).stationName || '',
-          stationCount: detail.count || 1,
-          kind: detail.amount >= 0 ? 'production' : 'consumption',
-          staticRate: amount,
+          ...derived,
+          netValue: derived.netValue || 0,
           storageVolume: amount * (flow.unitVolume || 1) * safeBufferHours,
           sortOrder: index
         })
@@ -63,11 +61,11 @@ function buildStorageFlowsFromProductionFlows(
   return Array.from(byWare.values())
     .map((row) => {
       const totalProductionStorageVolume = row.details
-        .filter((detail) => detail.kind === 'production')
-        .reduce((sum, detail) => sum + detail.storageVolume, 0)
+        .filter((detail) => detail.type === 'production')
+        .reduce((sum, detail) => sum + (detail.storageVolume || 0), 0)
       const totalConsumptionStorageVolume = row.details
-        .filter((detail) => detail.kind === 'consumption')
-        .reduce((sum, detail) => sum + detail.storageVolume, 0)
+        .filter((detail) => detail.type === 'consumption')
+        .reduce((sum, detail) => sum + (detail.storageVolume || 0), 0)
       return {
         ...row,
         totalProductionStorageVolume,
@@ -77,7 +75,7 @@ function buildStorageFlowsFromProductionFlows(
           const orderA = Number(a.sortOrder)
           const orderB = Number(b.sortOrder)
           if (Number.isFinite(orderA) && Number.isFinite(orderB) && orderA !== orderB) return orderA - orderB
-          return b.storageVolume - a.storageVolume
+          return (b.storageVolume || 0) - (a.storageVolume || 0)
         })
       }
     })

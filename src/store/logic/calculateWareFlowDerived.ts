@@ -5,7 +5,7 @@ import type {
   WareFlow,
   GroupedFlows
 } from '../../types/x4'
-import type { DerivedProductionFlow, FlowContribution, WareProductionFlow } from '../../types/production-flow'
+import type { DerivedProductionFlow, DerivedFlowContribution, WareProductionFlow } from '../../types/production-flow'
 
 export interface CalculateWareFlowDerivedInput {
   productionFlows: WareProductionFlow[]
@@ -80,11 +80,16 @@ export function deriveProductionFlows(
     const totalOccupiedCount = consumptionBufferCount + productionBufferCount
     const totalOccupiedVolume = totalOccupiedCount * unitVolume
 
-    const contributions: FlowContribution[] = prodFlow.contributions.map(atom => ({
+    const modulesMap = input.modulesMap
+    const contributions: DerivedFlowContribution[] = prodFlow.contributions.map(atom => ({
       ...atom,
-      volumeFlow: atom.amount * unitVolume,
-      valueFlow: atom.amount * unitPrice,
-      transportFlow: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
+      name: atom.class === 'module'
+        ? modulesMap[atom.id]?.name || atom.id
+        : atom.class === 'workforce'
+          ? atom.id
+          : atom.id,
+      netValue: atom.amount * unitPrice,
+      transportVolume: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
     }))
 
     return {

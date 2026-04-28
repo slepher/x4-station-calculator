@@ -2,94 +2,129 @@
 
 ## 目标
 
-将现有的三种 contribution 类型（`BaseModuleFlowAtom`、`ModuleFlowAtom`、`StationFlowAtom`）统一为单一 `FlowContribution` 类型，用 `class` 字段区分归属，消除类型重复。同时将 `workforceConsumption` 并入 `consumption`，因为 `class` 已能区分 workforce 消耗的来源。
+将现有所有 contribution 相关类型（`FlowContribution`、`DerivedStationFlowAtom`、`SupplyStorageFlowDetail`）统一为单一类型族，用 `class` 字段区分归属，消除类型重复和字段冗余。同时将 `workforceConsumption` 并入 `consumption`。
 
-## 已确认方案（审核重点）
+## 类型设计
 
-### 1. 统一 Contribution 类型
-
-现有三套贡献类型合并为一套：
+### 原始层 `FlowContribution`（cache / gap 层使用）
 
 ```typescript
 interface FlowContribution {
-  id: string           // stationId | moduleId | race
-  class: string        // 'station' | 'module' | 'workforce'
-  count: number        // stationCount | moduleCount | workforceAmount
+  id: string
+  class: 'module' | 'workforce' | 'station' | 'sector'
+  type: 'production' | 'consumption'
+  count: number
   amount: number
   bonusPercent: number
-  production: number
-  consumption: number
-  workforceConsumption: number
-  netRate: number
 }
 ```
 
 各 `class` 填充规则：
 
-| class | id | count | amount | bonusPercent | production/consumption/netRate |
-|---|---|---|---|---|---|
-| `'station'` | stationId | station.count | 0 | 0 | 站级聚合值 |
-| `'module'` | moduleId | module.count | 模块贡献量 | 效率加成 | 0 |
-| `'workforce'` | race（实际种族名） | workforce.amount | 0 | 0 | 0 |
+| class | id | count | amount |
+|---|---|---|---|
+| `module` | moduleId | module.count | 模块贡献量 |
+| `workforce` | race（实际种族名） | workforce.amount | 负向消耗值 |
+| `station` | stationId | station.count | 站级聚合 netRate |
+| `sector` | sectorId | 1 | 跨星区物流 / gap 其他星区供给 |
 
-### 2. `type` 改为 `class`
+不含可派生字段（`volumeFlow`/`valueFlow`/`transportFlow`），避免冗余。
 
-原 `BaseModuleFlowAtom.type`（`'production' | 'consumption'`）与贡献归属语义混淆。改为 `class` 表示归属类别。
+### 派生层 `DerivedFlowContribution`
 
-### 3. workforce contribution 规则
+```typescript
+interface DerivedFlowContribution extends FlowContribution {
+  name: string
+  netValue: number
+  sortOrder?: number
+  storageVolume?: number
+  transportVolume?: number
+}
+```
 
-- race 使用实际种族名：`'argon'`、`'teladi'`、`'paranid'` 等，不使用 `<race>` 占位符。
-- 自动计算的 workforce 不再使用居住舱模块作为 contribution。改为直接使用 workforce 数量作为一条 `class='workforce'` 的贡献条目。
-- `amount` 为 0（workforce 的消耗量已体现在 flow 顶层的 `consumption` 字段）。
+| 字段 | 来源 |
+|---|---|
+| `name` | 派生阶段按 class 填充：StationPlan.name / binding group name / module name / race |
+| `netValue` | `amount * unitPrice` |
+| `sortOrder` | 排序用 |
+| `storageVolume` | `\|amount\| * unitVolume * bufferHours` |
+| `transportVolume` | `\|amount\| * unitVolume` |
 
-### 4. `workforceConsumption` 字段消除
+`name` 在派生阶段填充，来源：
 
-- `WareProductionFlow.workforceConsumption` 和 `EmpireWareFlow.workforceConsumption` 不再独立存在。
-- workforce 产生的消耗量并入 `consumption` 字段。
-- 由于 `FlowContribution.class` 已经可以区分 `'workforce'` 来源，不需要独立字段。
+| class | name 来源 |
+|---|---|
+| `'station'` | `StationPlan.name` |
+| `'sector'` | `SaveBindingPlan.group.name`（非 map sector name） |
+| `'module'` | `modulesMap[id].name` |
+| `'workforce'` | id 本身即是 race 名 |
 
-### 5. 消费方适配
+### gap 分析使用 `DerivedFlowContribution`
 
-- `WareProductionFlow.contributions`：只包含 `class='module'` + `class='workforce'`
-- `EmpireWareFlow.contributions`：只包含 `class='station'`
-- `WareFlow.contributions`：仍包含 `class='module'`（二阶段衍生数据附加到 `FlowContribution`）
-- 所有 filter/group 逻辑中依赖 `workforceConsumption` 的地方改为检查 contributions 中 `class='workforce'` 的存在性
+`buildStationComponentGapFlows` 使用 `DerivedFlowContribution`，但只填充必要字段（`id`/`class`/`type`/`count`/`amount`/`bonusPercent`/`name`），不涉及价格/体积派生字段。
 
-### 6. `StationFlowAtom` 消除
+### 替换关系
 
-`StationFlowAtom` 不再独立存在。站级聚合贡献直接使用 `FlowContribution` + `class='station'` 表示。
+| 旧类型 / 格式 | 新类型 / 格式 |
+|---|---|
+| `FlowContribution`（含 volumeFlow/valueFlow/transportFlow） | `FlowContribution`（不含派生字段） |
+| `DerivedStationFlowAtom extends FlowContribution + stationName` | `DerivedFlowContribution extends FlowContribution`（无 name） |
+| `SupplyStorageFlowDetail` | `DerivedFlowContribution` |
+| gap 分析中 `id: 'sector:<id>', class: 'station'` | `id: sectorId, class: 'sector'` |
+| solver 物流 `class: 'external-station'` | `class: 'sector'` |
+| `stationId.startsWith('external:')` | `class === 'sector'` |
 
-### 7. `ModuleFlowAtom` 消除
+## 数据流
 
-`ModuleFlowAtom` 不再独立存在。模块级贡献直接使用 `FlowContribution` + `class='module'` 表示。二阶段衍生字段（`volumeFlow`/`valueFlow`/`transportFlow`）附加到 `FlowContribution` 上。
+```
+生成侧:
+  calculateProductionFlows()
+    → FlowContribution[]（class: 'module' | 'workforce'）
+
+聚合侧:
+  updateAggregation() / buildExternalCache()
+    → FlowContribution[]（class: 'station' | 'sector'）
+
+派生侧:
+  deriveProductionFlows() / buildSupplyStorageFlows()
+    → FlowContribution[] → DerivedFlowContribution[]（加 name / netValue 等）
+
+gap 分析:
+  buildStationComponentGapFlows()
+    → DerivedFlowContribution[]（只填 id/class/type/count/amount/name）
+
+消费侧:
+  TransitHub → DerivedFlowContribution（name 已填充）
+  StationToolbar（gap） → DerivedFlowContribution（name 已填充）
+```
 
 ## 边界
 
 ### In Scope
 
-- `FlowContribution` 类型定义
-- 替换 `BaseModuleFlowAtom`、`ModuleFlowAtom`、`StationFlowAtom` 的所有引用
+- `FlowContribution` 类型定义（不含派生字段，class 含 `'sector'`）
+- `DerivedFlowContribution` 类型定义（不含 name）
+- 替换所有旧 contribution 类型的引用
+- Gap 分析贡献格式规范化
 - `workforceConsumption` 字段消除与迁移
-- filter/group 逻辑中 workforce 判定方式的更新
-- `calculateProductionFlows` 中 workforce contribution 的生成方式改为直接用工数量
+- `SupplyStorageFlowDetail` → `DerivedFlowContribution` 的替换
+- filter/group 中 workforce 判定改为 `class='workforce'`
+- UI 组件中 `stationId.startsWith('external:')` 改为 `class === 'sector'`
 
 ### Out of Scope
 
-- `StationDerivedMap` 的缓存结构变更
-- `getEmpireGroupedFlows()` 签名变更
-- `updateAggregation()` 的 empire 级聚合重构
 - 测试代码编写与执行
+- `station-name` helper 的实现（由后续 UI change 负责）
 
 ## 验收标准（DoD）
 
-1. `FlowContribution` 类型定义完成，替代现有的三种 contribution 类型
-2. 所有引用旧 contribution 类型的地方已改为使用 `FlowContribution`
-3. `class` 值正确区分三个归属类别
-4. 自动 workforce 以 `class='workforce'` + 实际种族名作为贡献条目，不使用居住舱模块
-5. `workforceConsumption` 字段从 `WareProductionFlow` 和 `EmpireWareFlow` 中移除，消耗量并入 `consumption`
-6. 依赖 `workforceConsumption` 的 filter/group 判定改为检查 `class='workforce'`
-7. `npm run build` 通过
-
-## 未决项
-
-无
+1. `FlowContribution` 只含原始字段，不含 `volumeFlow/valueFlow/transportFlow`
+2. `DerivedFlowContribution` 含 `name`/`netValue`/`sortOrder`/`storageVolume`/`transportVolume`
+3. `DerivedStationFlowAtom` / `SupplyStorageFlowDetail` 已删除
+4. `class` 值正确区分 `module` / `workforce` / `station` / `sector`
+5. gap 分析贡献使用 `DerivedFlowContribution` + `class: 'sector'`，不再用 `id: 'sector:<id>'` 格式
+6. solver 物流使用 `class: 'sector'`，不再用 `class: 'external-station'`
+7. `workforceConsumption` 字段移除，消耗量并入 `consumption`
+8. UI 检测外部贡献不再使用 `stationId.startsWith('external:')`
+9. `name` 在派生阶段填充，Vue 层直接读 `detail.name`
+10. `npm run build` 通过

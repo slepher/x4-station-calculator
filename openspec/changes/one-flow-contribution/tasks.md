@@ -4,59 +4,55 @@
 
 ### Phase 1: 类型定义
 
-- [x] T1. 在 `src/types/production-flow.ts` 中新增 `FlowContribution` 接口，替代 `BaseModuleFlowAtom`
-- [x] T2. 删除 `src/types/production-flow.ts` 中的 `BaseModuleFlowAtom` 接口
-- [x] T3. 更新 `src/types/production-flow.ts` 中 `WareProductionFlow.contributions` 类型为 `FlowContribution[]`
-- [x] T4. 删除 `src/types/x4.ts` 中的 `ModuleFlowAtom` 和 `StationFlowAtom` 接口
-- [x] T5. 更新 `src/types/x4.ts` 中 `WareFlow.contributions` 类型为 `FlowContribution[]`
-- [x] T6. 更新 `src/types/x4.ts` 中 `EmpireWareFlow.contributions` 类型为 `FlowContribution[]`
-- [x] T7. 删除 `src/types/x4.ts` 中 `EmpireWareFlow.workforceConsumption` 字段
-- [x] T8. 删除 `src/types/production-flow.ts` 中 `WareProductionFlow.workforceConsumption` 字段
-- [x] T9. 删除 `src/types/x4.ts` 中 `WareFlow.workforceConsumption` 字段
-- [x] T10. 删除 `DerivedStationFlowAtom` 和 `DerivedProductionFlow`（或更新其类型引用）
+- [x] T1. 新 `FlowContribution`（class: `'module' | 'workforce' | 'station' | 'sector'`，去 `volumeFlow?`/`valueFlow?`/`transportFlow?`）
+- [x] T2. 新 `DerivedFlowContribution extends FlowContribution`（含 `name`/`netValue`/`sortOrder?`/`storageVolume?`/`transportVolume?`）
+- [x] T3. 删 `DerivedStationFlowAtom`
+- [x] T4. 删 `SupplyStorageFlowDetail`，`SupplyStorageFlow.details` 改 `DerivedFlowContribution[]`
+- [x] T5. `WareFlow`、`EmpireWareFlow`、`WareProductionFlow` 的 `contributions` 更新
 
-### Phase 2: 生成侧适配
+### Phase 2: 原始层适配
 
-- [x] T11. 更新 `src/store/logic/calculateProductionFlows.ts`，workforce contribution 改为 `class='workforce'` + 实际种族名 + 直接用工人数量，不再生成居住舱模块贡献
-- [x] T12. 确保 amount 为 0，消耗量写入 flow 顶层的 `consumption`
+- [x] T6. `calculateWareFlowDerived.ts`：`deriveProductionFlows` 产 `DerivedFlowContribution[]`，填 `name`/`netValue`/`transportVolume`
+- [x] T7. `StationDerivedMap.ts`：`convertProductionFlowToWareFlow` 删 `volumeFlow/valueFlow/transportFlow`
+- [x] T8. `StationWareFlow.vue`：`detail.volumeFlow` → 实时计算
 
-### Phase 3: 消费侧适配
+### Phase 3: 派生层 name 填充
 
-- [x] T13. 替换所有 `flow.workforceConsumption > 0` 判定为 `flow.contributions.some(c => c.class === 'workforce')`
-- [x] T14. 更新 `src/store/logic/calculateWareFlowDerived.ts` 中的 contribution 类型引用，将 volumeFlow/valueFlow/transportFlow 附加到 `FlowContribution`
-- [x] T15. 更新 `src/store/logic/analyzeWareFlow.ts` 中的 workforce 判定
-- [x] T16. 更新 `src/store/logic/analyzeEmpireWareFlow.ts` 中的 workforce 判定和 contribution 构建
-- [x] T17. 更新 `src/store/state/StationDerivedMap.ts` 中 filter/group 函数的 `workforceConsumption` 引用
-- [x] T18. 更新 `src/store/logic/empireFlowFacade.ts` 中 `workforceConsumption` 引用
-- [x] T19. 搜索整个 `src/` 目录，替换所有残留的 `workforceConsumption` 字段引用和旧 contribution 类型引用
+- [x] T9. `buildExternalCache`：`class: 'sector'`，`name` 留空由 facade 回填
+- [x] T10. `stationGapViewModel.ts`：贡献使用 `DerivedFlowContribution`，`id: sectorId, class: 'sector'`，填 `name`
+- [x] T11. `empireFlowFacade.ts`：`buildSupplyStorageFlows` 产 `DerivedFlowContribution[]`，填 `name`
+- [x] T12. `getSectorFinalProductionFlows`：回填 `name`（station / sector）
 
-### Phase 4: 构建验证
+### Phase 4: UI 层迁移
 
-- [x] T20. `npm run build`，确认无编译错误（仅 pre-existing 错误残留，非本 change 引入）
-- [x] T21. 若有编译错误，修复后重跑直到通过或显式阻塞
+- [x] T13. `TransitHubStorageFlow.vue`：`stationId` → `id`，`kind` → `type`，`stationName` → `name`，`startsWith('external:')` → `class === 'sector'`
+- [x] T14. `TransitHubTransportFlow.vue`：同上
+- [x] T15. `EmpireWareFlowsDashboard.vue`：同上
+- [x] T16. `deriveEmpireWareFlowView.ts`：`DerivedEmpireContribution` → `DerivedFlowContribution`
 
-### Phase 5: stationContributions 双路径消除
+### Phase 5: 构建验证
 
-- [x] T22. 删除 `src/types/production-flow.ts` 中 `WareProductionFlow.stationContributions` 字段
-- [x] T23. 删除 `src/types/production-flow.ts` 中 `DerivedProductionFlow.stationContributions` 字段
-- [x] T24. 更新 `src/store/logic/calculateWareFlowDerived.ts` 移除 `stationContributions` 分支逻辑和 `DerivedStationFlowAtom` 转换
-- [x] T25. 更新 `src/store/logic/empireFlowFacade.ts` 中 `getSectorFinalProductionFlows` 写入 `contributions` 而非 `stationContributions`
-- [x] T26. 更新 `src/components/empire/transit-hub/TransitHubCenterDashboard.vue` 读取 `contributions` 而非 `stationContributions`
-- [x] T27. `npm run build` 确认无编译错误（仅 pre-existing 错误残留）
+- [x] T17. `npm run build` 通过
 
-### Phase 6: FlowContribution 字段精简
+## 执行顺序
 
-- [x] T28. 从 `FlowContribution` 中移除 `production`、`consumption`、`workforceConsumption`、`netRate` 四个冗余字段，保留 `type`/`amount` 表示产消方向和数值
-- [x] T29. 更新所有 creation site（`calculateProductionFlows`、`analyzeEmpireWareFlow`、`empireFlowFacade`、`stationGapViewModel`）不再设置这四个字段
-- [x] T30. 更新所有消费方：`deriveEmpireWareFlowView`、`EmpireWareFlowsDashboard`、`TransitHubCenterDashboard`、`EmpireWareFlow` 改用 `amount` 替代 `netRate`/`production`/`consumption`
-- [x] T31. 为 Vue 组件增加类型限制（`EmpireWareFlow.details` → `FlowContribution[]`，`EmpireWareFlowGroup.items` 声明接口）
-- [x] T32. `npm run build` 确认通过
+```
+Phase 1 (type defs):     T1-T5
+Phase 2 (raw layer):     T6-T8
+Phase 3 (name fill):     T9-T12
+Phase 4 (UI):            T13-T16
+Phase 5 (build):         T17
+```
+
+## 依赖
+
+- 前置依赖：`empire-sector-flows-cache`
 
 ## 完成定义
 
-- [x] `FlowContribution` 只保留 `id`/`class`/`type`/`count`/`amount`/`bonusPercent` + 可选衍生字段
-- [x] 旧类型从主路径清理
-- [x] `workforceConsumption` 字段从三个 flow 类型中移除
-- [x] 自动 workforce 使用 `class='workforce'` + 实际种族名 + 工数量，`amount` 为负的实际消耗值
-- [x] workforce 判定逻辑全部迁移到 `class='workforce'` 检查
-- [x] `npm run build` 通过（仅 pre-existing 错误残留，非本 change 引入）
+- [x] `FlowContribution` 只含原始字段，class 含 `'sector'`
+- [x] `DerivedFlowContribution` 含 `name`，派生阶段填充
+- [x] `DerivedStationFlowAtom` / `SupplyStorageFlowDetail` 删除
+- [x] gap 分析用 `DerivedFlowContribution` + `class: 'sector'`
+- [x] UI 使用 `detail.name` / `detail.class === 'sector'`
+- [x] `npm run build` 通过

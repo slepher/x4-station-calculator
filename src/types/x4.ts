@@ -1,4 +1,4 @@
-import type { FlowContribution } from './production-flow'
+import type { FlowContribution, DerivedFlowContribution } from './production-flow'
 
 export type TransportType = 'container' | 'solid' | 'liquid';
 /**
@@ -619,16 +619,6 @@ export interface SupplyPlanningInput {
   localStationIds: string[];
 }
 
-export interface SupplyStorageFlowDetail {
-  stationId: string;
-  stationName: string;
-  stationCount: number;
-  kind: 'production' | 'consumption';
-  staticRate: number;
-  storageVolume: number;
-  sortOrder?: number;
-}
-
 export interface SupplyStorageFlow {
   wareId: string;
   orderIndex: number;
@@ -638,7 +628,7 @@ export interface SupplyStorageFlow {
   totalProductionStorageVolume: number;
   totalConsumptionStorageVolume: number;
   totalRequiredStorageVolume: number;
-  details: SupplyStorageFlowDetail[];
+  details: DerivedFlowContribution[];
 }
 
 export interface SectorInternalData {
