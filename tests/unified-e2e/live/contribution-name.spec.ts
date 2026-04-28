@@ -133,7 +133,7 @@ test.describe('Contribution name 显示验证', () => {
     await transportTab.click()
     await page.waitForTimeout(300)
 
-    const transportPanel = page.locator('[data-testid="transport-groups"]')
+    const transportPanel = page.locator('.list-body .volume-groups-container').last()
     await expect(transportPanel).toBeVisible({ timeout: 2000 })
 
     const antimatterFlow = transportPanel.locator('.flow-wrapper').filter({ hasText: '反物质转换器' })
