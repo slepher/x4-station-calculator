@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
-import type { FlowContribution } from '@/types/production-flow'
+import type { DerivedFlowContribution } from '@/types/production-flow'
 
 const props = defineProps<{
   resourceId: string
   netRate: number
   name: string
-  details?: FlowContribution[]
+  details?: DerivedFlowContribution[]
   netValue: number
   viewMode: 'quantity' | 'economy'
   showAddButton?: boolean
@@ -83,8 +83,8 @@ const formattedDetails = computed(() => {
 
 const classWithSymbol = (displayValue: number, className: string) => [className, className + '-' + (displayValue >= 0 ? 'pos' : 'neg')]
 
-const getStationName = (detail: FlowContribution) => (detail as unknown as Record<string, string>).stationName || detail.id
-const getStationCount = (detail: FlowContribution) => detail.count || 1
+const getStationName = (detail: DerivedFlowContribution) => detail.name || detail.id
+const getStationCount = (detail: DerivedFlowContribution) => detail.count || 1
 </script>
 
 <template>
