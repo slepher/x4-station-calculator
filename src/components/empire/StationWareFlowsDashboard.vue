@@ -33,6 +33,8 @@ const props = defineProps<{
     operations: EmpireGapItem[]
     supply: EmpireGapItem[]
   }
+  stationNameMap?: Record<string, string>
+  sectorNameMap?: Record<string, string>
   isWareLocked?: (wareId: string) => boolean
   getResolvedLevel?: (wareId: string) => number
   isWareOperable?: (wareId: string) => boolean
@@ -74,7 +76,9 @@ const derivedProductionFlows = computed(() => deriveProductionFlows({
     transportShipCapacity: 0,
     sunlight: 100
   },
-  warePriorityLevels: props.warePriorityLevels
+  warePriorityLevels: props.warePriorityLevels,
+  stationNameMap: props.stationNameMap,
+  sectorNameMap: props.sectorNameMap
 }))
 
 const groupedFlows = computed(() => computeGroupedFlows({

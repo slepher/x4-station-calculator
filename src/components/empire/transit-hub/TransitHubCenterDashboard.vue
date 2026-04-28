@@ -94,6 +94,8 @@ const props = withDefaults(defineProps<{
   buyMultiplier?: number
   sellMultiplier?: number
   productBufferHours?: number
+  stationNameMap?: Record<string, string>
+  sectorNameMap?: Record<string, string>
 }>(), {
   viewMode: 'quantity',
   buyMultiplier: 0.5,
@@ -145,7 +147,9 @@ const derivedFlows = computed(() => deriveProductionFlows({
     transportShipCapacity: 0,
     sunlight: 100
   },
-  warePriorityLevels: {}
+  warePriorityLevels: {},
+  stationNameMap: props.stationNameMap,
+  sectorNameMap: props.sectorNameMap
 }))
 
 const groupedFlows = computed(() => {
