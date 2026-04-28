@@ -167,8 +167,6 @@ const showArchiveModuleList = computed(() => {
         <TransitHubCenterDashboard
           :production-flows="wareflowPresenter.props.productionFlows.value"
           :view-mode="wareflowPresenter.props.viewMode.value"
-          :station-name-map="stationNameMap"
-          :sector-name-map="sectorNameMap"
           :buy-multiplier="wareflowPresenter.props.settings.value.buyMultiplier"
           :sell-multiplier="wareflowPresenter.props.settings.value.sellMultiplier"
           :product-buffer-hours="wareflowPresenter.props.settings.value.primaryProductBufferHours"

@@ -23,9 +23,7 @@ type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
 
 function buildStorageFlowsFromProductionFlows(
   productionFlows: DerivedProductionFlow[],
-  bufferHours: number,
-  _stationNameMap?: Record<string, string>,
-  _sectorNameMap?: Record<string, string>
+  bufferHours: number
 ): any[] {
   const safeBufferHours = Number.isFinite(bufferHours) && bufferHours > 0 ? bufferHours : 12
   const byWare = new Map<string, any>()
@@ -95,8 +93,6 @@ const props = withDefaults(defineProps<{
   buyMultiplier?: number
   sellMultiplier?: number
   productBufferHours?: number
-  stationNameMap?: Record<string, string>
-  sectorNameMap?: Record<string, string>
 }>(), {
   viewMode: 'quantity',
   buyMultiplier: 0.5,
@@ -148,9 +144,7 @@ const derivedFlows = computed(() => deriveProductionFlows({
     transportShipCapacity: 0,
     sunlight: 100
   },
-  warePriorityLevels: {},
-  stationNameMap: props.stationNameMap,
-  sectorNameMap: props.sectorNameMap
+  warePriorityLevels: {}
 }))
 
 const groupedFlows = computed(() => {
@@ -162,7 +156,7 @@ const groupedFlows = computed(() => {
     supply: [...grouped.rateGroups.supply, ...grouped.rateGroups.resources]
   }
 })
-const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(derivedFlows.value, localProductBufferHours.value, props.stationNameMap, props.sectorNameMap))
+const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(derivedFlows.value, localProductBufferHours.value))
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`
