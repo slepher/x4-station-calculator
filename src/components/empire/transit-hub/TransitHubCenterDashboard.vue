@@ -6,6 +6,7 @@ import { useI18n } from 'vue-i18n'
 
 import type { DerivedProductionFlow, WareProductionFlow } from '@/types/production-flow'
 import { deriveProductionFlows } from '@/store/logic/calculateWareFlowDerived'
+import { computeGroupedFlows } from '@/components/empire/composables/useWareFlowGrouping'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -148,13 +149,13 @@ const derivedFlows = computed(() => deriveProductionFlows({
 }))
 
 const groupedFlows = computed(() => {
-  const flows = derivedFlows.value
-
-  const products = flows.filter((flow) => flow.netRate > 0)
-  const operations = flows.filter((flow) => flow.netRate <= 0 && !flow.contributions.some(c => c.class === 'workforce') && flow.transportType === 'container')
-  const supply = flows.filter((flow) => flow.contributions.some(c => c.class === 'workforce') || flow.transportType !== 'container')
-
-  return { flows, products, operations, supply }
+  const grouped = computeGroupedFlows({ productionFlows: derivedFlows.value })
+  return {
+    flows: grouped.flows,
+    products: grouped.rateGroups.positive,
+    operations: grouped.rateGroups.operations,
+    supply: [...grouped.rateGroups.supply, ...grouped.rateGroups.resources]
+  }
 })
 const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(derivedFlows.value, localProductBufferHours.value))
 
