@@ -801,8 +801,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       productionFlows: state.productionFlows,
       derivedProductionFlows: deriveProductionFlows({
         productionFlows: state.productionFlows,
-        autoIndustryModules: [],
-        plannedModules: [],
         modulesMap: gameData.modulesMap,
         waresMap: gameData.waresMap,
         settings: settings.value,

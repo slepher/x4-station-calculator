@@ -9,8 +9,8 @@ import type { DerivedProductionFlow, DerivedFlowContribution, WareProductionFlow
 
 export interface CalculateWareFlowDerivedInput {
   productionFlows: WareProductionFlow[]
-  autoIndustryModules: SavedModule[]
-  plannedModules: SavedModule[]
+  autoIndustryModules?: SavedModule[]
+  plannedModules?: SavedModule[]
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
   settings: {
@@ -123,7 +123,7 @@ export function deriveProductionFlows(
   return wareFlows
 }
 
-export function groupDerivedProductionFlows(
+function groupDerivedProductionFlows(
   productionFlows: DerivedProductionFlow[]
 ): GroupedFlows {
   const wareFlows: WareFlow[] = [...productionFlows]
