@@ -58,6 +58,7 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
   if (componentSectorIds.length === 0) return createEmptyStationComponentGapFlows()
 
   const sectorNameMap = new Map(sectors.map((sector) => [sector.id, sector.name]))
+  const stationNameMap = new Map(orderedStations.map((s) => [s.id, s.name]))
   const sectorOrderMap = new Map(sectors.map((sector, index) => [sector.id, index]))
   const currentSectorStationOrderMap = new Map(
     orderedStations
@@ -102,6 +103,7 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
         const contributions: DerivedFlowContribution[] = isCurrentSector
           ? (flow.contributions || []).map((detail) => ({
               ...(detail as DerivedFlowContribution),
+              name: stationNameMap.get(detail.id) || '',
               sortOrder: currentSectorStationOrderMap.get(detail.id) ?? Number.MAX_SAFE_INTEGER / 2
             }))
           : [{
@@ -124,6 +126,7 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
         const contributions: DerivedFlowContribution[] = isCurrentSector
           ? (flow.contributions || []).map((detail) => ({
               ...(detail as DerivedFlowContribution),
+              name: stationNameMap.get(detail.id) || '',
               sortOrder: currentSectorStationOrderMap.get(detail.id) ?? Number.MAX_SAFE_INTEGER / 2
             }))
           : [{
