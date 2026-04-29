@@ -462,7 +462,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   const empireDerivedProductionFlows = computed(() => {
-    void refreshKey.value
     const raw = planningDerivedMap.value?.getEmpireFlows() || []
     if (raw.length === 0) return []
     const deps = getDerivedStaticDeps()
