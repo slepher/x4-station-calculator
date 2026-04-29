@@ -61,6 +61,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const overviewBuyMultiplier = ref(0.5)
   const overviewSellMultiplier = ref(0.5)
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
+  const refreshKey = ref(0)
 
   const buildConstraints = ref<BuildConstraints>({
     timeBudget: 3600 * 168,
@@ -222,7 +223,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   function createPlanningDerivedMap(): StationDerivedMap | null {
     const deps = getDerivedStaticDeps()
     if (!deps) return null
-    return new StationDerivedMap(deps)
+    return new StationDerivedMap(deps, { refreshKey })
   }
 
   function ensurePlanningDerivedMap(): StationDerivedMap | null {

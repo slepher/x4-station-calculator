@@ -1,4 +1,4 @@
-import { reactive } from 'vue'
+import { reactive, type Ref } from 'vue'
 import type { GroupedFlows, SavedModule, StationSettings, X4Module, WareFlow } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
@@ -340,6 +340,7 @@ function buildSemanticsFromModules(
 export interface StationDerivedMapOptions {
   hasSector?: boolean
   sectorLinks?: string[]
+  refreshKey?: Ref<number>
 }
 
 export class StationDerivedMap {
@@ -351,11 +352,13 @@ export class StationDerivedMap {
   private staticDeps: StationDerivedStaticDeps
   private hasSector: boolean
   private sectorLinks: string[]
+  private refreshKey?: Ref<number>
 
   constructor(staticDeps: StationDerivedStaticDeps, options?: StationDerivedMapOptions) {
     this.staticDeps = staticDeps
     this.hasSector = options?.hasSector ?? false
     this.sectorLinks = options?.sectorLinks ?? []
+    this.refreshKey = options?.refreshKey
   }
 
   upsertStation(stationId: string, seed: StationDerivedSeed): void {
@@ -699,6 +702,8 @@ export class StationDerivedMap {
       this.sectorFlowsCache = sectorMap
       this.buildExternalCache()
     }
+
+    if (this.refreshKey) this.refreshKey.value++
   }
 
   private buildExternalCache(): void {
