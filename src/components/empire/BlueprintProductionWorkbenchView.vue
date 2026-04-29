@@ -53,10 +53,14 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
     @delete-station="tabbarPresenter.emits.deleteStation"
   />
   <BlueprintContextToolbar
-    v-if="toolbarPresenter.props.workbenchMode.value === 'station'"
-    :station="toolbarPresenter.props.station.value!"
+    :station="toolbarPresenter.props.station.value"
+    :workbench-mode="toolbarPresenter.props.workbenchMode.value"
+    :title-model="toolbarPresenter.props.titleModel.value"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
+    @update-title="toolbarPresenter.emits.updateTitle"
+    @update-race-preference="toolbarPresenter.emits.updateRacePreference"
+    @open-import="toolbarPresenter.emits.openImport"
     :station-types="toolbarPresenter.props.stationTypes"
     :available-minerals="toolbarPresenter.props.availableMinerals"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
@@ -66,10 +70,8 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
     @toggle-mineral="toolbarPresenter.emits.toggleMineral"
     @update-sunlight="toolbarPresenter.emits.updateSunlight"
     @update-transport-minutes="toolbarPresenter.emits.updateTransportMinutes"
-    @update-race-preference="toolbarPresenter.emits.updateRacePreference"
     @update-workforce="toolbarPresenter.emits.updateWorkforce"
     @update-show-empire-gaps="toolbarPresenter.emits.updateShowEmpireGaps"
-    @open-import="toolbarPresenter.emits.openImport"
   />
 
   <ImportPlanModal
