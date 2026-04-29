@@ -4,27 +4,17 @@ import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
 import type { DerivedFlowContribution } from '@/types/production-flow'
 
-interface StorageFlowDetail extends DerivedFlowContribution {
-  storageVolume: number
-}
-
 const props = defineProps<{
   resourceId: string
   name: string
-  unitVolume: number
-  totalRequiredStorageVolume: number
-  details: StorageFlowDetail[]
+  totalOccupiedCount: number
+  contributions: DerivedFlowContribution[]
 }>()
 
 const { t } = useI18n()
 
-const totalRequiredCount = computed(() => {
-  if (!props.unitVolume || props.unitVolume <= 0) return 0
-  return Math.ceil(props.totalRequiredStorageVolume / props.unitVolume)
-})
-
 const formattedDetails = computed(() => {
-  return [...props.details]
+  return [...props.contributions]
     .sort((a, b) => {
       const orderA = Number((a as any).sortOrder)
       const orderB = Number((b as any).sortOrder)
@@ -36,14 +26,11 @@ const formattedDetails = computed(() => {
         if (!hasOrderA && hasOrderB) return 1
       }
       if (a.type !== b.type) return a.type === 'production' ? -1 : 1
-      return (b.storageVolume || 0) - (a.storageVolume || 0)
+      return (b.volumeContribution || 0) - (a.volumeContribution || 0)
     })
     .map((detail) => ({
       ...detail,
       isExternal: detail.class === 'sector',
-      storageCount: (!props.unitVolume || props.unitVolume <= 0)
-        ? 0
-        : Math.ceil((detail.storageVolume || 0) / props.unitVolume),
       kindLabel: detail.class === 'sector'
         ? (detail.type === 'production'
             ? t('sectorManagement.supply_storage_input')
@@ -69,7 +56,7 @@ const formattedDetails = computed(() => {
       </template>
       <template #header>
         <div class="value value-pos">
-          {{ totalRequiredCount }}
+          {{ Math.ceil(totalOccupiedCount) }}
           <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
             <path d="m3.3 7 8.7 5 8.7-5"/>
@@ -88,7 +75,7 @@ const formattedDetails = computed(() => {
           </span>
         </span>
         <div class="item-val-group">
-          <span class="item-count">{{ item.storageCount }}</span>
+          <span class="item-count">{{ Math.ceil(item.volumeContribution) }}</span>
         </div>
       </template>
     </CollapsibleDetailList>

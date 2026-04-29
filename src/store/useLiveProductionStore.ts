@@ -1471,7 +1471,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
-      derivedProductionFlows: planningFlowFacade.deriveFlows(state.productionFlows, settings.value, state.warePriorityLevels),
+      derivedProductionFlows: planningFlowFacade.deriveFlows(state.productionFlows, isTransit ? { ...settings.value, resourceBufferHours: settings.value.primaryProductBufferHours } : settings.value, state.warePriorityLevels, isTransit ? 'max' : 'sum'),
       warePriorityLevels: state.warePriorityLevels,
       settings: {
         ...settings.value,
