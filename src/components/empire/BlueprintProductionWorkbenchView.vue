@@ -13,6 +13,7 @@ import StationTabBar from '@/components/empire/StationTabBar.vue'
 import BlueprintContextToolbar from '@/components/empire/context_toolbar/BlueprintContextToolbar.vue'
 import StationWareFlowsDashboard from '@/components/empire/StationWareFlowsDashboard.vue'
 import ImportPlanModal from '@/components/empire/ImportPlanModal.vue'
+import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 
 const blueprintStore = useBlueprintProductionStore()
 const activeViewStore = useActiveViewStore()
@@ -44,6 +45,7 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
     :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
     :can-create-station="tabbarPresenter.props.canCreateStation"
     :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
+    @select-overview="tabbarPresenter.emits.selectOverview"
     @select-station="tabbarPresenter.emits.selectStation"
     @create-station="tabbarPresenter.emits.createStation"
     @rename-station="tabbarPresenter.emits.renameStation"
@@ -51,6 +53,7 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
     @delete-station="tabbarPresenter.emits.deleteStation"
   />
   <BlueprintContextToolbar
+    v-if="toolbarPresenter.props.workbenchMode.value === 'station'"
     :station="toolbarPresenter.props.station.value!"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
@@ -131,6 +134,18 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
         @update-manual-workforce="dashboardPresenter.emits.updateManualWorkforce"
         @update-workforce-auto="dashboardPresenter.emits.updateWorkforceAuto"
         @update-use-hq="dashboardPresenter.emits.updateUseHQ"
+      />
+    </div>
+  </div>
+
+  <div v-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout mt-6">
+    <div class="col-span-12 lg:col-span-7">
+      <EmpireWareFlowsDashboard
+        :production-flows="blueprintStore.empireDerivedProductionFlows"
+        :buy-multiplier="blueprintStore.overviewBuyMultiplier"
+        :sell-multiplier="blueprintStore.overviewSellMultiplier"
+        @update:buy-multiplier="blueprintStore.overviewBuyMultiplier = $event"
+        @update:sell-multiplier="blueprintStore.overviewSellMultiplier = $event"
       />
     </div>
   </div>

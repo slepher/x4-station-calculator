@@ -6,6 +6,7 @@ import type {
   StationType,
   SavedModule,
   GroupedFlows,
+  EmpireGroupedFlows,
   StationSettings,
   EntityLocation
 } from '@/types/x4'
@@ -25,6 +26,7 @@ import { migrateEmpireStateToCurrent } from './logic/stateMigrations'
 import { DEFAULT_STATION_SETTINGS, type StationComputeDeps } from './state/stationSettings'
 import { StationDerivedMap, type StationDerivedStaticDeps } from './state/StationDerivedMap'
 import { deriveProductionFlows } from './logic/calculateWareFlowDerived'
+import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
 import { deepClone } from '@/utils/deepClone'
 import {
   createEmpireSourceView,
@@ -54,6 +56,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const isReady = ref(false)
   const lastSavedSnapshot = ref<string>('')
   const buildPriceMultiplier = ref(0.5)
+  const overviewBuyMultiplier = ref(0.5)
+  const overviewSellMultiplier = ref(0.5)
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
   const refreshKey = ref(0)
 
@@ -332,6 +336,75 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     if (!cache) return null
     return map.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
+
+  function getEmpireGroupedFlows(): EmpireGroupedFlows {
+    if (!activeEmpire.value || !planningDerivedMap.value) {
+      return { flows: [], empireGroups: { operations: [], supply: [] } }
+    }
+    const map = planningDerivedMap.value
+    const rawFlows = map.getEmpireFlows()
+
+    const filtered = rawFlows.filter(flow => {
+      if (flow.netRate <= 0) return true
+      return flow.contributions.some(c => {
+        const cache = map.getCache(c.id)
+        return (cache?.warePriorityLevels[flow.wareId] ?? 0) > 0
+      })
+    })
+
+    const result = classifyAndEnrichFlows(filtered, gameData.waresMap)
+
+    const stationNameMap = new Map(activeEmpire.value.stations.map(s => [s.id, s.name]))
+    const sectorNameMap = new Map(Object.entries(gameData.maps.sectors).map(([id, s]) => [id, s.name]))
+
+    for (const flow of result.flows) {
+      flow.contributions = flow.contributions.map(c => {
+        const dc = c as { name?: string; stationName?: string }
+        if (dc.name || dc.stationName) return c
+        if (c.class === 'station') {
+          return { ...c, name: stationNameMap.get(c.id) || c.id }
+        }
+        if (c.class === 'sector') {
+          return { ...c, name: sectorNameMap.get(c.id) || c.id }
+        }
+        return { ...c, name: c.id }
+      })
+    }
+
+    return result
+  }
+
+  const empireDerivedProductionFlows = computed(() => {
+    const raw = planningDerivedMap.value?.getEmpireFlows() || []
+    if (raw.length === 0) return []
+    const deps = getDerivedStaticDeps()
+    if (!deps) return []
+    const stationNameMap: Record<string, string> = {}
+    activeEmpire.value?.stations.forEach(s => { stationNameMap[s.id] = s.name })
+    const sectorNameMap: Record<string, string> = {}
+    sourceView.sectors.value.forEach(s => { sectorNameMap[s.id] = s.name })
+    return deriveProductionFlows({
+      productionFlows: raw,
+      autoIndustryModules: [],
+      plannedModules: [],
+      modulesMap: deps.modulesMap,
+      waresMap: deps.waresMap,
+      stationNameMap,
+      sectorNameMap,
+      settings: {
+        racePreference: 'argon',
+        resourceBufferHours: 2,
+        primaryProductBufferHours: 2,
+        secondaryProductBufferHours: 2,
+        buyMultiplier: overviewBuyMultiplier.value,
+        sellMultiplier: overviewSellMultiplier.value,
+        transportMinutes: 30,
+        transportShipCapacity: 0,
+        sunlight: 100
+      },
+      warePriorityLevels: {}
+    })
+  })
 
   function getSavedStationGroupedFlows(station: StationPlan): GroupedFlows {
     const deps = getDerivedStaticDeps()
@@ -882,6 +955,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     titlePlaceholder,
     savedEmpires,
     getStationFlowCache,
+    getEmpireGroupedFlows,
     getSavedStationGroupedFlows,
     initializeAllStationDerived,
     clearStationCaches,
@@ -923,6 +997,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     updateStationName: updateStationNameFromActive,
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },
     updateBuildPriceMultiplier: (value: number) => { buildPriceMultiplier.value = value },
-    toggleMineral: toggleMineralFromActive
+    toggleMineral: toggleMineralFromActive,
+
+    empireDerivedProductionFlows,
+    overviewBuyMultiplier,
+    overviewSellMultiplier
   }
 })
