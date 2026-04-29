@@ -1,106 +1,88 @@
-# build-plan 任务
+# build-plan 任务（修订版）
 
 ## 任务列表
 
-### T1: 定义类型（BuildGoal / BuildConstraints / BuildPlan）[x]
+### T1: 更新类型定义 [x]
 
-- 新建 `src/types/build-plan.ts`
-- 定义 `BuildGoal` union type（self-sufficient、production-rate、build-module、fleet占位）
-- 定义 `BuildConstraints`（timeBudget、creditBudget、goals）
-- 定义 `BuildMaterial`、`BuildStep`、`BuildPlan`
-- 定义 `CalculateBuildPlanInput` / `CalculateBuildPlanOutput`
-- 文件: `src/types/build-plan.ts`
+- 修改 `src/types/build-plan.ts`
+- 新增 `BuildSchemeStep` 接口
+- 新增 `BuildScheme` 接口（label、description、purposeModules、steps、totalDuration、totalCredits、stepsCount、isFeasible）
+- 更新 `BuildPlan`：移除 `constraints`（预算约束），新增 `schemes: BuildScheme[]`
+- 更新 `CalculateBuildPlanInput`：移除 `timeBudget`/`creditBudget`，新增 `currentNetProduction`
 
-### T2: 实现算法 helper（calculateBuildPlan）[x]
+### T2: 重写算法 calculateBuildPlan [x]
 
 - 文件: `src/store/logic/calculateBuildPlan.ts`
-- 参数对象模式，不绑定 store
-- 实现两阶段轮建造算法：
+- 引入 `calculateAutoFillModules` 调用
+- 实现目标类型分支：
+  - 自举 → 仅方案1（贪婪算法）
+  - 产量/建筑 → 方案3→2→1 递进
+- 方案3：目标模块 + autoFill → 识别建材模块（产出在 R3 中的模块）→ 剔除 → 方案3'
+- 方案2：按 R3' 的 whichWares + R3 的 targetRates 规划产线 → autoFill
+- 方案1：greedyFill(R2 + R3_remaining) → autoFill
+- 产能需求计算：总需求量 / 总建造时间
+- 输出 `BuildScheme[]`
 
-  **Phase 1 - 初始产线**：
-  - 用 `planProducerGroup('hullparts')` 建造 1 条 hullparts 产线（含上游），tier 升序
-  - 不建 claytronics，不建完整自给自足链
+### T3: 修改 Store [x]
 
-  **Phase 2 - 建筑材料满足度填补 (buildmat)**：
-  - 循环直到时间耗尽：
-    a. 计算已建模块总耗时 T
-    b. 对每种 buildCost 物资，算每小时消耗率 R = 总消耗量 / T
-    c. 算当前自产率 P（net production from currentModules）
-    d. 满足度 S = P / R
-    e. 选 S 最低的建材，调用 `planProducerGroup(wareId)`：
-       - 添加 1 座该物资的生产者
-       - 递归补足 production input 缺口
-    f. 按 tier 升序建造该产线组
+- `src/store/useBlueprintProductionStore.ts`
+- 移除 `buildConstraints` 中的预算输入依赖
+- 新增 `empireCurrentNetProduction` computed
+- `computePlan()` 调用新算法
+- 移除 `setTimeBudget`/`setCreditBudget` actions
 
-  **planProducerGroup**：
-  - 基于 currentModules 规划 1 个产线组（1 生产者 + 所需上游）
-  - 迭代补足所有 production input（最多 20 次），直到闭环
+### T4: 修改 Presenter [x]
 
-  **停止**：时间耗尽（不等于失败）
-  **金钱**：仅加速（NPC 买），耗尽后自产不停止
+- `src/components/empire/presenters/useBuildPlanPresenter.ts`
+- 移除 `setTimeBudget`/`setCreditBudget` emits
+- 新增 `schemes` prop
+- 调整 `progress`/`warnings` 计算适配新结构
 
-### T3: 扩展 useBlueprintProductionStore [x]
+### T5: 修改约束面板 [x]
 
-- 新增 state：`buildConstraints`（Ref<BuildConstraints>）、`buildPlan`（Ref<BuildPlan | null>）
-- 新增 computed：`empireModules`（所有 station 的 SavedModule 汇总）
-- 新增 actions：`setBuildGoal()`、`removeBuildGoal()`、`setTimeBudget()`、`setCreditBudget()`、`computePlan()`
-- `computePlan` 调用 `calculateBuildPlan` helper
-- 文件: `src/store/useBlueprintProductionStore.ts`
+- `src/components/empire/BuildPlanConstraintsPanel.vue`
+- 移除预算输入（时间/金钱输入框 + 标签）
+- 保留目标管理（类型选择、ware搜索、模块搜索、添加/删除）
+- 保留计算按钮
 
-### T4: 实现 presenter（useBuildPlanPresenter）[x]
+### T6: 重写方案面板 + 浮动窗口 [x]
 
-- 新建 `src/components/empire/presenters/useBuildPlanPresenter.ts`
-- 返回 props：goals、constraints、buildPlan、progress、warnings、currentFlows
-- 返回 emits：addGoal、removeGoal、setTimeBudget、setCreditBudget、computePlan
-- 负责将 store 数据转为 UI 展示结构（进度百分比、警告文本等）
+- `src/components/empire/BuildPlanPanel.vue` → 重写为方案卡片列表
+  - 每张卡片显示 方案名称、主要目的产物列表、预估时间、预估金钱
+  - 卡片点击 emit `select-scheme` 事件
+- `src/components/empire/BuildPlanStepsModal.vue` → **新增**浮动窗口
+  - 深色半透明遮罩
+  - 居中窗口显示该方案详细步骤
+  - 步骤：合并连续相同模块，显示模块名、材料清单、时间、花费
+  - 关闭按钮
 
-### T5: 实现约束面板（BuildPlanConstraintsPanel.vue）[x]
+### T7: 修改 WorkbenchView [x]
 
-- 新建 `src/components/empire/BuildPlanConstraintsPanel.vue`
-- 显示目标列表（可添加/删除目标行）
-- 目标类型下拉（自举 / 目标产量 / 目标建筑）
-- 目标产量：ware 搜索 + 产出率输入
-- 目标建筑：模块搜索 + 数量输入
-- 时间预算输入（小时）
-- 金钱预算输入（credits）
-- 计算按钮
-- 进度条（已完成/总步数）
-
-### T6: 实现建造计划面板（BuildPlanPanel.vue）[x]
-
-- 新建 `src/components/empire/BuildPlanPanel.vue`
-- 显示建造步骤列表（有序）
-- 每行：步骤序号、模块名、预计耗时、累计花费
-- 可展开/折叠的材料清单详情
-- 停止提示（若因预算耗尽而中断）
-- 空状态提示（未计算时）
-
-### T7: 修改 BlueprintProductionWorkbenchView [x]
-
-- 将 overview 模式渲染从当前空面板改为新面板
-- 左面板：`BuildPlanConstraintsPanel`
-- 中面板：`BuildPlanPanel`
-- 右面板：`EmpireWareFlowsDashboard`（复用）
-- 引入 presenter 并绑定 props/emits
-- 文件: `src/components/empire/BlueprintProductionWorkbenchView.vue`
+- `src/components/empire/BlueprintProductionWorkbenchView.vue`
+- 左面板传入移除预算后的 props
+- 中面板集成新 BuildPlanPanel + BuildPlanStepsModal
+- 右面板不变
 
 ### T8: 构建验证 [x]
 
 - `npm run build` 通过
+- 无 TypeScript 编译错误
 
-### T9: 初始化 activeEmpireStation 为 null 时保持在总览 [x]
+### T9: 更新 i18n [x]
 
-- `src/store/useBlueprintProductionStore.ts`：`loadEmpire` 中 `storedTabId === null` 时保持 `activeStationId = null`
-- 刷新页面时不会自动跳转到第一个 station
+- `src/locales/en.json` / `zh-CN.json`
+- 移除预算相关 key
+- 新增方案相关 key（方案名称、目的产物、浮动窗口标题等）
 
 ## 依赖顺序
 
 ```
-T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8
+T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
 ```
 
-T5 和 T6 可以并行开发。
+T4/T5 可并行。
+T6 内部 BuildPlanPanel + BuildPlanStepsModal 可并行开发。
 
 ## 元注释
 
-T1 中 BuildGoal/BuildPlan 类型如果合并到一个文件便于维护，可放在新建的 `src/types/build-plan.ts` 中，保持与 `x4.ts` 的对齐方式一致（`import type` 引用）。
+T1 中 `BuildScheme` 新增类型统一放在 `src/types/build-plan.ts`。

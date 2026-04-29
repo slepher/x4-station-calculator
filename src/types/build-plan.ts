@@ -1,3 +1,12 @@
+import type { SavedModule, StationSettings, X4Module, X4Ware } from './x4'
+
+export interface BuildGroup {
+  reason: string
+  modules: SavedModule[]
+}
+
+export type BuildGoalType = 'self-sufficient' | 'production-rate' | 'build-module'
+
 export type BuildGoal =
   | { type: 'self-sufficient' }
   | { type: 'production-rate'; wareId: string; ratePerHour: number }
@@ -18,6 +27,29 @@ export interface BuildMaterial {
   creditsNeeded: number
 }
 
+export interface BuildSchemeStep {
+  order: number
+  moduleId: string
+  moduleCount: number
+  moduleBuildTime: number
+  materials: BuildMaterial[]
+  estimatedDuration: number
+  estimatedCredits: number
+  reason: string
+  groupIndex: number
+}
+
+export interface BuildScheme {
+  label: string
+  description: string
+  purposeModules: string[]
+  steps: BuildSchemeStep[]
+  totalDuration: number
+  totalCredits: number
+  stepsCount: number
+  isFeasible: boolean
+}
+
 export interface BuildStep {
   order: number
   moduleId: string
@@ -31,8 +63,7 @@ export interface BuildStep {
 
 export interface BuildPlan {
   goals: BuildGoal[]
-  constraints: BuildConstraints
-  steps: BuildStep[]
+  schemes: BuildScheme[]
   totalDuration: number
   totalCredits: number
   goalsAchieved: BuildGoal[]
@@ -41,15 +72,12 @@ export interface BuildPlan {
   haltReason: string
 }
 
-import type { SavedModule, StationSettings, X4Module, X4Ware } from './x4'
-
 export interface CalculateBuildPlanInput {
   goals: BuildGoal[]
-  timeBudget: number
-  creditBudget: number
   currentModules: SavedModule[]
   settings: StationSettings
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
   modulesByOutputMap: Record<string, X4Module[]>
+  currentNetProduction: Record<string, number>
 }

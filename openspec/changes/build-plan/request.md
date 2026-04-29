@@ -2,84 +2,73 @@
 
 ## 目标
 
-在 Blueprint 的星区总览视图（overview）中新增产能爬坡建造规划功能。用户设定时间预算和金钱预算后，系统根据用户指定的多个建造目标，自动规划模组建造顺序，包含前置产能依赖链，并显示预计所需时间和金钱花费。
+在 Blueprint 的星区总览视图（overview）中新增产能爬坡建造规划功能。用户设定建造目标（自举/目标产量/目标建筑）后，系统根据当前帝国产能自动生成 1~3 个递进建造方案（方案1→方案2→方案3），用户点击方案卡片弹出浮动窗口查看详细建造步骤。移除时间/金钱约束，改为统计消耗。
 
-## 已确认方案（审核重点）
+## 目标类型 → 方案生成映射
 
-### 目标类型（列表，可多个）
+| 目标类型 | 生成的方案 | 说明 |
+|----------|-----------|------|
+| **自举** (self-sufficient) | 仅方案1 | 贪婪循环，从 hullparts 种子开始逐个加瓶颈生产者 |
+| **目标产量** (production-rate) | 方案3→2→1 递进 | 方案3=目标产线+autoFill，方案2=输入产线，方案1=自给自足 |
+| **目标建筑** (build-module) | 方案3→2→1 递进 | 同上 |
 
-- **自举（self-sufficient）**：以 Claytronics + Hull Parts 达到正净产出为终点。无额外参数。
-- **目标产量（production-rate）**：要求指定 ware 的净产出率达到 N/小时。参数：`wareId` + `ratePerHour`。
-- **目标建筑（build-module）**：要求建造指定数量的某个模块及其前置链。参数：`moduleId` + `count`。
-- **舰队（fleet）**：占位接口，本次不实现。
+## 算法流程
 
-### 约束模型
+### 目标产量 / 目标建筑
 
-- **时间预算 T**：所有建造步骤中模块 buildTime 的累计上限。材料凑齐时间不单独计算（材料凑齐时间由产能自动产出决定，不计入 T）。
-- **金钱预算 C**：从 NPC 购买材料的 credits 累计上限。零产能时全部材料从 NPC 购买，自产后自产部分不花钱。采用 ware 的 `price` 字段作为买入价。
+```
+Phase 1 — 方案3全量：
+  1. expandGoalDependencies → 目标模块
+  2. calculateAutoFillModules → allMods3（目标 + 运营 input 链）
+  3. R3 = buildRates(allMods3)，识别建材模块（产出在 R3 中的非目标模块）
+  4. 从 allMods3 剔除建材模块 → scheme3'
+  5. R3' = buildRates(scheme3') — 当前产能 ≥ R3'？→ 只显示方案3
 
-### 算法原则
+Phase 2 — 方案2：
+  6. whichWares = R3'.keys, targetRates = R3
+  7. planProductionForRates + autoFill → allMods2
+  8. R2 = buildRates(allMods2)
 
-- 从目标列表递归展开上游产能依赖链。
-- 贪婪瓶颈优先：始终选择当前瓶颈最大的 ware，建造其最优生产模块。
-- 金钱效率权衡：在瓶颈相当的候选中，优先选择金钱消耗更低的模块。
-- 逐步模拟：每建完一个模块后更新产能，重新评估瓶颈，决定下一步。
-- 当所有目标达成或时间/金钱任一耗尽时停止。
+Phase 3 — 方案1：
+  9. r3Remaining = R3 - R3'（方案2不覆盖的建材）
+  10. scheme1Target = max_merge(R2.rates, r3Remaining)（非叠加，取 max）
+  11. greedyFill + autoFill → 自给自足产线
+```
 
-### UI 布局
+## 核心规则
 
-- **位置**：Blueprint 的 overview 视图（无 station 选中时自动显示）。
-- **Tab**：名称为"星区总览"（复用现有 `sector.overview` i18n key），图标为 playerHQ（与 live 的 overview tab 一致）。
-- **比例**：`lg:col-span-3` / `lg:col-span-4` / `lg:col-span-5`（3:4:5）。
-- **左面板**：约束条件（目标列表添加/删除、时间预算、金钱预算、重新计算按钮、步骤进度条）。
-- **中面板**：建造计划步骤列表（每步显示模块名、材料清单、预计耗时、金钱花费）。
-- **右面板**：总产能汇总（复用现有 `EmpireWareFlowsDashboard` 控件）。
+- **建造顺序 1→2→3**：方案各自独立建造，前方案投产后的产出对后方案可用
+- **建造开始消耗材料**：每步的 buildCost 在步开始时从库存扣除或购买
+- **建造完成开始生产**：模块在步结束时投产，产出累入库存
+- **builtSoFar 按步累加**：前步完工的模块在后步建造期间产出
+- **能量电池不作为主要产物**：不出现在目的产物列表中，不作为贪婪瓶颈
+- **一座一座建造**：`count > 1` 的模块展开为独立步骤，前步产出帮后步
+- **算法内部跟踪库存**：库存不够时 `creditsNeeded > 0` 表示需购买
 
-### Store / Helper 架构
+## 每步显示
 
-- Store 接口放在 `useBlueprintProductionStore`（修改现有 store）。
-- 计算逻辑作为纯函数 helper `/src/store/logic/calculateBuildPlan.ts`。
-- Store 提供对外接口（actions）、成员状态、computed 计算结果。
-- Helper 通过参数对象接收所需数据，不绑定 store。
+```
+#N  ModuleName ×count
+    建造: X.XXh  累计: X.XXh  步骤费: XXX  累计费: XXX
+    材料明细:
+      WareName  ×qty  自产: rate/h  +produced  买: credits  (单价: price)
+```
 
-### Presenter / Component
+- **×qty** = 该步消耗的材料数量
+- **自产** = 已有模块对该物资的净产出速率
+- **+produced** = 本步建造期间的自产量（自产速率 × 本步建造时间）
+- **买** = 算法库存不足时的购买金额。0 表示库存充足
 
-- 新 presenter：`useBuildPlanPresenter`。
-- 新组件：`BuildPlanPanel.vue`（中面板）、`BuildPlanConstraintsPanel.vue`（左面板）。
-- 右面板复用现有 `EmpireWareFlowsDashboard.vue`。
+## 涉及文件
 
-## 边界
-
-### In Scope
-
-- 三种目标类型（自举、目标产量、目标建筑）的建造计划生成。
-- 时间预算和金钱预算双约束。
-- NPC 购买材料的价格计算（ware.price）。
-- 贪婪瓶颈优先的规划算法。
-- 替代现有 blueprint overview 空白内容的 UI 面板（左约束 / 中计划 / 右产能）。
-- Store → Presenter → Component 三层架构。
-
-### Out of Scope
-
-- 舰队目标（fleet）的完整实现（仅保留类型占位接口）。
-- 地球改造目标（缺少游戏数据）。
-- 并行建造（多模块同时建造）模拟。
-- 规划结果的持久化存储。
-- 舰队配装方案（equipment）的展开计算。
-
-## 验收标准（DoD）
-
-1. Blueprint overview 视图显示新的 3:4:5 面板布局（左约束/中计划/右产能）。
-2. 用户可添加多种类型的目标（自举、产量、建筑），以列表形式管理。
-3. 用户可设定时间预算和金钱预算。
-4. 系统根据目标和约束生成建造计划步骤列表。
-5. 每个步骤显示模块名称、材料清单、预计耗时、金钱花费。
-6. 目标全部达成或时间/金钱耗尽时停止生成步骤并给出提示。
-7. 自举目标以 Claytronics + Hull Parts 正净产出为终止条件。
-8. 右面板通过 EmpireWareFlowsDashboard 显示所有 station 的 net ware flow 汇总。
-9. 无 TypeScript 编译错误。
-10. 构建通过（`npm run build`）。
-
-## 未决项
-
-无
+| 文件 | 描述 |
+|------|------|
+| `src/types/build-plan.ts` | 类型定义：BuildScheme、BuildSchemeStep、BuildGroup |
+| `src/store/logic/calculateBuildPlan.ts` | 核心算法：方案生成、greedyFill、autoFill 集成 |
+| `src/store/useBlueprintProductionStore.ts` | Store 接口 |
+| `src/components/empire/presenters/useBuildPlanPresenter.ts` | Presenter 层 |
+| `src/components/empire/BuildPlanConstraintsPanel.vue` | 左面板（目标管理、计算按钮） |
+| `src/components/empire/BuildPlanPanel.vue` | 中面板（方案卡片列表） |
+| `src/components/empire/BuildPlanStepsModal.vue` | 浮动窗口（方案步骤明细） |
+| `src/components/empire/BlueprintProductionWorkbenchView.vue` | 工作台集成 |
+| `analysis/scripts/findBuildPlanDefaults.ts` | 分析脚本，运行 `npx tsx analysis/scripts/findBuildPlanDefaults.ts` |

@@ -148,22 +148,17 @@ const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
     <div class="col-span-12 lg:col-span-3">
       <BuildPlanConstraintsPanel
         :goals="buildPlanPresenter.props.goals.value"
-        :time-budget="buildPlanPresenter.props.constraints.value.timeBudget"
-        :credit-budget="buildPlanPresenter.props.constraints.value.creditBudget"
         :build-plan="buildPlanPresenter.props.buildPlan.value"
         :loading="buildPlanPresenter.props.loading.value"
-        :progress="buildPlanPresenter.props.progress.value"
         :warnings="buildPlanPresenter.props.warnings.value"
         @add-goal="buildPlanPresenter.emits.addGoal"
         @remove-goal="buildPlanPresenter.emits.removeGoal"
-        @set-time-budget="buildPlanPresenter.emits.setTimeBudget"
-        @set-credit-budget="buildPlanPresenter.emits.setCreditBudget"
         @compute-plan="buildPlanPresenter.emits.computePlan"
       />
     </div>
     <div class="col-span-12 lg:col-span-4">
       <BuildPlanPanel
-        :build-plan="buildPlanPresenter.props.buildPlan.value"
+        :schemes="buildPlanPresenter.props.schemes.value"
         :loading="buildPlanPresenter.props.loading.value"
       />
     </div>

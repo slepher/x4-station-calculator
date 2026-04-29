@@ -6,67 +6,85 @@ import type {
 } from '@/types/x4'
 import type {
   BuildGoal,
-  BuildStep,
-  BuildPlan,
+  BuildScheme,
+  BuildSchemeStep,
   BuildMaterial,
-  BuildConstraints,
-  CalculateBuildPlanInput
+  CalculateBuildPlanInput,
+  BuildPlan,
+  BuildGroup
 } from '@/types/build-plan'
 import { getProductionEfficiency, findBestProducer } from './bestModuleSelector'
+import { calculateAutoFillModules } from './calculateProductionFlows'
 
-function calculateNetProduction(
+export function calculateNetProduction(
   modules: SavedModule[],
   modulesMap: Record<string, X4Module>,
   bonus: boolean,
   sunlight: number
 ): Record<string, number> {
   const state: Record<string, number> = {}
-
   for (const item of modules) {
     const mod = modulesMap[item.id]
     if (!mod) continue
-
     const eff = getProductionEfficiency(mod, bonus)
-
     for (const [ware, val] of Object.entries(mod.outputs)) {
       let sf = 1.0
       if (ware === 'energycells') sf = sunlight / 100.0
       state[ware] = (state[ware] || 0) + item.count * val * eff * sf
     }
-
     for (const [ware, val] of Object.entries(mod.inputs)) {
       state[ware] = (state[ware] || 0) - item.count * val
     }
   }
-
   return state
 }
 
-function isGoalMet(
-  goal: BuildGoal,
-  netProduction: Record<string, number>,
-  modules: SavedModule[]
-): boolean {
-  switch (goal.type) {
-    case 'self-sufficient': {
-      const clayNet = netProduction['claytronics'] ?? 0
-      const hullNet = netProduction['hullparts'] ?? 0
-      return clayNet > 0 && hullNet > 0
-    }
-    case 'production-rate': {
-      const net = netProduction[goal.wareId] ?? 0
-      return net >= goal.ratePerHour
-    }
-    case 'build-module': {
-      const builtCount = modules.filter(m => m.id === goal.moduleId).reduce((s, m) => s + m.count, 0)
-      return builtCount >= goal.count
-    }
-    default:
-      return true
+function mergeModules(modules: SavedModule[]): SavedModule[] {
+  const map = new Map<string, number>()
+  for (const m of modules) {
+    map.set(m.id, (map.get(m.id) || 0) + m.count)
   }
+  return Array.from(map.entries()).map(([id, count]) => ({ id, count }))
 }
 
-export function expandGoalDependencies(
+interface BuildRatesResult {
+  rates: Record<string, number>
+  totalTime: number
+  totalCost: number
+}
+
+function computeBuildRates(
+  modules: SavedModule[],
+  moduleMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>
+): BuildRatesResult {
+  const materials: Record<string, number> = {}
+  let totalTime = 0
+  for (const m of modules) {
+    const mod = moduleMap[m.id]
+    if (!mod) continue
+    totalTime += mod.buildTime * m.count
+    const cost = Object.keys(mod.buildCost).length > 0 ? mod.buildCost : mod.inputs
+    for (const [wareId, qty] of Object.entries(cost)) {
+      materials[wareId] = (materials[wareId] || 0) + qty * m.count
+    }
+  }
+  const rates: Record<string, number> = {}
+  let totalCost = 0
+  for (const [wareId, qty] of Object.entries(materials)) {
+    const ware = waresMap[wareId]
+    if (!ware) continue
+    totalCost += qty * ware.price
+    const isResource = ware.transport === 'solid' || ware.transport === 'liquid'
+    const hasProducer = Object.values(moduleMap).some(x => x.outputs[wareId] && x.type === 'production')
+    if (!isResource && hasProducer && totalTime > 0) {
+      rates[wareId] = qty / (totalTime / 3600)
+    }
+  }
+  return { rates, totalTime, totalCost }
+}
+
+function expandGoalDependencies(
   goal: BuildGoal,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>
@@ -80,16 +98,12 @@ export function expandGoalDependencies(
   function expandWareUpstream(wareId: string, targetRate: number, visited: Set<string>) {
     if (visited.has(wareId)) return
     visited.add(wareId)
-
     const producer = findBestProducer(wareId, 'argon', [], modulesMap, waresMap)
     if (!producer) return
-
     const outputRate = producer.outputs[wareId] || 0
     if (outputRate <= 0) return
-
     const countNeeded = Math.ceil(targetRate / outputRate)
     addModule(producer.id, countNeeded)
-
     for (const [inputWare, inputRate] of Object.entries(producer.inputs)) {
       const isResource = waresMap[inputWare]?.transport === 'solid' || waresMap[inputWare]?.transport === 'liquid'
       const hasProducer = Object.values(modulesMap).some(m => m.outputs[inputWare] && m.type === 'production')
@@ -101,8 +115,7 @@ export function expandGoalDependencies(
 
   switch (goal.type) {
     case 'self-sufficient': {
-      const selfSufficientWares = ['claytronics', 'hullparts']
-      for (const wareId of selfSufficientWares) {
+      for (const wareId of ['claytronics', 'hullparts']) {
         expandWareUpstream(wareId, 1, new Set())
       }
       break
@@ -115,15 +128,6 @@ export function expandGoalDependencies(
       const mod = modulesMap[goal.moduleId]
       if (!mod) break
       addModule(goal.moduleId, goal.count)
-      for (const [wareId, qty] of Object.entries(mod.buildCost)) {
-        const ware = waresMap[wareId]
-        if (!ware) continue
-        const isResource = ware.transport === 'solid' || ware.transport === 'liquid'
-        const hasProducer = Object.values(modulesMap).some(m => m.outputs[wareId] && m.type === 'production')
-        if (!isResource && hasProducer) {
-          expandWareUpstream(wareId, qty * goal.count, new Set())
-        }
-      }
       break
     }
   }
@@ -131,280 +135,399 @@ export function expandGoalDependencies(
   return Object.entries(required).map(([id, count]) => ({ id, count }))
 }
 
-export function simulateConstruction(
-  initialModules: SavedModule[],
-  goals: BuildGoal[],
-  timeBudget: number,
-  creditBudget: number,
+function makeSchemeSteps(
+  groups: BuildGroup[],
+  moduleMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+  settings: StationSettings,
+  contextModules?: SavedModule[]
+): BuildSchemeStep[] {
+  let builtSoFar: SavedModule[] = contextModules ? [...contextModules] : []
+
+  let cumDuration = 0
+  let cumCredits = 0
+  let order = 0
+  const result: BuildSchemeStep[] = []
+  const stock = new Map<string, number>()
+
+  for (let gi = 0; gi < groups.length; gi++) {
+    const group = groups[gi]!
+    const sorted = [...group.modules].sort(
+      (a, b) => (moduleMap[a.id]?.tier || 0) - (moduleMap[b.id]?.tier || 0)
+    )
+    for (const m of sorted) {
+    const mod = moduleMap[m.id]
+    if (!mod) continue
+    for (let ci = 0; ci < m.count; ci++) {
+    const buildTime = mod.buildTime
+    const net = calculateNetProduction(builtSoFar, moduleMap, settings.considerWorkforceForAutoFill, settings.sunlight)
+    const cost = Object.keys(mod.buildCost).length > 0 ? mod.buildCost : mod.inputs
+    const materials: BuildMaterial[] = Object.entries(cost).map(([wareId, val]) => {
+      const totalQty = (val as number)
+      const prodRate = Math.max(0, net[wareId] || 0)
+      const warePrice = waresMap[wareId]?.price || 0
+      const prevStock = stock.get(wareId) || 0
+      const coveredByStock = Math.min(totalQty, prevStock)
+      const deficitQty = totalQty - coveredByStock
+      const credits = deficitQty * warePrice
+      stock.set(wareId, prevStock - coveredByStock)
+      return {
+        wareId,
+        quantity: totalQty,
+        currentProdRate: prodRate,
+        estimatedTime: 0,
+        creditsNeeded: credits
+      }
+    })
+    // add production to stock
+    for (const [wareId, val] of Object.entries(net)) {
+      const rate = val as number
+      if (rate > 0) stock.set(wareId, (stock.get(wareId) || 0) + rate * buildTime / 3600)
+    }
+
+    cumDuration += buildTime
+    cumCredits += materials.reduce((s, mat) => s + mat.creditsNeeded, 0)
+
+    builtSoFar = mergeModules([...builtSoFar, { id: m.id, count: 1 }])
+
+    order++
+    result.push({
+      order,
+      moduleId: m.id,
+      moduleCount: 1,
+      moduleBuildTime: buildTime,
+      materials,
+      estimatedDuration: cumDuration,
+      estimatedCredits: cumCredits,
+      reason: group.reason,
+      groupIndex: gi
+    })
+  }
+  }
+  }
+  return result
+}
+
+function makeScheme(
+  groups: BuildGroup[],
+  label: string,
+  description: string,
+  purposeModules: string[],
+  settings: StationSettings,
+  moduleMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+  contextModules?: SavedModule[]
+): BuildScheme {
+  const steps = makeSchemeSteps(groups, moduleMap, waresMap, settings, contextModules)
+  const lastStep = steps[steps.length - 1]
+  return {
+    label,
+    description,
+    purposeModules,
+    steps,
+    totalDuration: lastStep?.estimatedDuration || 0,
+    totalCredits: lastStep?.estimatedCredits || 0,
+    stepsCount: steps.length,
+    isFeasible: steps.length > 0
+  }
+}
+
+function greedyFill(
+  targetRates: Record<string, number>,
+  currentEmpireModules: SavedModule[],
+  _targetScheme2Rates: Record<string, number>,
   settings: StationSettings,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>
-): { steps: BuildStep[]; halted: boolean; haltReason: string } {
-  const steps: BuildStep[] = []
-  const currentModules: SavedModule[] = initialModules.map(m => ({ ...m }))
-  let remainingTime = timeBudget
-  let remainingCredits = creditBudget
-  const localGoals: BuildGoal[] = goals.map(g => ({ ...g }))
+): BuildGroup[] {
+  let built: SavedModule[] = []
+  let maxIterations = 30
+  const groups: BuildGroup[] = []
+  let prevAutoModules: SavedModule[] = []
 
   function addModule(modList: SavedModule[], modId: string, count: number) {
     const existing = modList.find(m => m.id === modId)
     if (existing) existing.count += count
     else modList.push({ id: modId, count })
   }
-  function calcBuildMatConsumption(): { wareId: string; rate: number }[] {
+
+  function findLowestSatisfaction(contextNet: Record<string, number>): string | null {
+    if (built.length === 0) {
+      let best: string | null = null
+      let highest = 0
+      for (const [wareId, rate] of Object.entries(targetRates)) {
+        if (wareId === 'energycells') continue
+        const prodRate = Math.max(0, contextNet[wareId] ?? 0)
+        if (prodRate < rate && rate > highest) {
+          highest = rate
+          best = wareId
+        }
+      }
+      return best
+    }
     const totals = new Map<string, number>()
     let totalBuildTime = 0
-    for (const s of steps) {
-      totalBuildTime += s.moduleBuildTime
-      for (const m of s.materials) {
-        if (m.quantity > 0) {
-          totals.set(m.wareId, (totals.get(m.wareId) || 0) + m.quantity)
-        }
+    for (const m of built) {
+      const mod = modulesMap[m.id]
+      if (!mod) continue
+      totalBuildTime += mod.buildTime * m.count
+      const cost = Object.keys(mod.buildCost).length > 0 ? mod.buildCost : mod.inputs
+      for (const [wareId, qty] of Object.entries(cost)) {
+        totals.set(wareId, (totals.get(wareId) || 0) + qty * m.count)
       }
     }
-    return Array.from(totals.entries())
-      .map(([wareId, qty]) => ({
-        wareId,
-        rate: totalBuildTime > 0 ? qty / (totalBuildTime / 3600) : 0
-      }))
+    const cons = Array.from(totals.entries())
+      .map(([wareId, qty]) => ({ wareId, rate: totalBuildTime > 0 ? qty / (totalBuildTime / 3600) : 0 }))
       .filter(item => {
+        if (item.wareId === 'energycells') return false
         const w = waresMap[item.wareId]
         if (!w || w.transport === 'solid' || w.transport === 'liquid') return false
-        const p = findBestProducer(item.wareId, settings.racePreference, currentModules, modulesMap, waresMap)
-        return !!p
+        return !!findBestProducer(item.wareId, settings.racePreference, [...currentEmpireModules, ...built], modulesMap, waresMap)
       })
-  }
-
-  function findLowestSatisfaction(): { wareId: string; satRate: number } | null {
-    const cons = calcBuildMatConsumption()
-    const net = calculateNetProduction(currentModules, modulesMap, settings.considerWorkforceForAutoFill, settings.sunlight)
-    let best: { wareId: string; satRate: number } | null = null
+    let bestWare: string | null = null
+    let worstSat = Infinity
     for (const c of cons) {
-      const demand = c.rate
-      if (demand <= 0) continue
-      const prodRate = Math.max(0, net[c.wareId] ?? 0)
-      const satRate = prodRate / demand
-      if (!best || satRate < best.satRate) {
-        best = { wareId: c.wareId, satRate }
+      if (c.rate <= 0) continue
+      const prodRate = Math.max(0, contextNet[c.wareId] ?? 0)
+      const satRate = prodRate / c.rate
+      if (satRate < worstSat) {
+        worstSat = satRate
+        bestWare = c.wareId
       }
     }
-    return best
+    return bestWare
   }
 
-  function planProducerGroup(targetWare: string): SavedModule[] {
-    const p = findBestProducer(targetWare, settings.racePreference, currentModules, modulesMap, waresMap)
-    if (!p) return []
-    const planned = currentModules.map(m => ({ ...m }))
-    addModule(planned, p.id, 1)
-    let changed = true
-    let safeguard = 20
-    while (changed && safeguard-- > 0) {
-      changed = false
-      const curNet = calculateNetProduction(planned, modulesMap, settings.considerWorkforceForAutoFill, settings.sunlight)
-      for (const pid of planned.map(m => m.id)) {
-        const mod = modulesMap[pid]
-        if (!mod) continue
-        for (const inputWare of Object.keys(mod.inputs)) {
-          const ware = waresMap[inputWare]
-          if (!ware || ware.transport === 'solid' || ware.transport === 'liquid') continue
-          if (!Object.values(modulesMap).some(x => x.outputs[inputWare] && x.type === 'production')) continue
-          const existingNet = curNet[inputWare] ?? 0
-          if (existingNet >= 0) continue
-          const p2 = findBestProducer(inputWare, settings.racePreference, planned, modulesMap, waresMap)
-          if (!p2) continue
-          const outRate = p2.outputs[inputWare] ?? 0
-          if (outRate <= 0) continue
-          const cnt = Math.ceil(Math.abs(existingNet) / outRate)
-          addModule(planned, p2.id, cnt)
-          if (cnt > 0) changed = true
-        }
-      }
-    }
-    const target = new Map<string, number>()
-    for (const m of planned) target.set(m.id, Math.max(target.get(m.id) || 0, m.count))
-    return Array.from(target.entries())
-      .map(([id, count]) => ({ id, count }))
-      .filter(m => (currentModules.find(x => x.id === m.id)?.count || 0) < m.count)
-      .sort((a, b) => (modulesMap[a.id]?.tier || 0) - (modulesMap[b.id]?.tier || 0))
+  function getAutoModules(mods: SavedModule[]): SavedModule[] {
+    const r = calculateAutoFillModules({
+      plannedModules: mergeModules([...currentEmpireModules, ...mods]),
+      settings, modulesMap, waresMap, lockedWares: []
+    })
+    return [...r.autoIndustryModules, ...r.autoHabitationModules]
   }
-
-  let phase: 'initial' | 'buildmat' = 'initial'
-  let queue: SavedModule[] = []
-  let currentGroupReason = ''
-  let maxIterations = 500
 
   while (maxIterations-- > 0) {
-    if (remainingTime <= 0) break
+    const combined = [...currentEmpireModules, ...built]
+    const contextNet = calculateNetProduction(
+      combined,
+      modulesMap,
+      settings.considerWorkforceForAutoFill,
+      settings.sunlight
+    )
 
-    const net = calculateNetProduction(currentModules, modulesMap, settings.considerWorkforceForAutoFill, settings.sunlight)
-
-    if (queue.length === 0) {
-      if (phase === 'initial') {
-        if (localGoals.some(g => g.type === 'self-sufficient' || g.type === 'production-rate')) {
-          queue = planProducerGroup('hullparts')
-          currentGroupReason = 'Initial hull part line'
-        }
-        phase = 'buildmat'
-        if (queue.length > 0) continue
-      }
-
-      if (phase === 'buildmat') {
-        const need = findLowestSatisfaction()
-        if (need) {
-          queue = planProducerGroup(need.wareId)
-          currentGroupReason = `Build mat: ${need.wareId} (sat ${(need.satRate * 100).toFixed(0)}%)`
-        }
-        if (queue.length === 0) break
-      }
+    let allMet = true
+    for (const [wareId, rate] of Object.entries(targetRates)) {
+      if ((contextNet[wareId] || 0) < rate) allMet = false
     }
+    if (allMet) break
 
-    if (queue.length === 0) break
+    let bottleneck: string | null = null
+    if (built.length === 0 && targetRates['hullparts'] !== undefined) {
+      bottleneck = 'hullparts'
+    } else {
+      bottleneck = findLowestSatisfaction(contextNet)
+    }
+    if (!bottleneck) break
 
-    const next = queue[0]
-    if (!next) break
-    const mod = modulesMap[next.id]
-    if (!mod) break
+    const producer = findBestProducer(bottleneck, settings.racePreference, combined, modulesMap, waresMap)
+    if (!producer) break
 
-    const existingCount = currentModules.find(m => m.id === next.id)?.count || 0
-    const stillNeeded = Math.max(0, next.count - existingCount)
-    const stepCount = 1
-    if (stillNeeded <= stepCount) queue.shift()
-    else next.count -= stepCount
-    const moduleBuildTime = mod.buildTime * stepCount
-    if (moduleBuildTime > remainingTime) break
+    if (bottleneck === 'energycells') continue
 
-    const matWares = Object.keys(mod.buildCost).length > 0 ? mod.buildCost : mod.inputs
-    const materials: BuildMaterial[] = Object.entries(matWares).map(([wareId, qty]) => {
-      const totalQty = qty * stepCount
-      const curNet = net[wareId] ?? 0
-      const prodRate = Math.max(0, curNet)
-      const warePrice = waresMap[wareId]?.price || 0
-      const produced = prodRate * (moduleBuildTime / 3600)
-      const deficitQty = Math.max(0, totalQty - produced)
-      let credits = 0
-      let used = 0
-      if (deficitQty > 0 && remainingCredits > 0) {
-        const aff = Math.floor(remainingCredits / warePrice)
-        const canBuy = Math.min(deficitQty, aff)
-        used = canBuy * warePrice
-        remainingCredits -= used
-        credits = used
-      }
-      const rem = Math.max(0, deficitQty - (used > 0 ? Math.floor(used / warePrice) : 0))
-      let wait = 0
-      if (rem > 0 && prodRate > 0) wait = (rem / prodRate) * 3600
-      else if (rem > 0) wait = (rem / Math.max(1, Object.values(modulesMap).filter(m => m.outputs[wareId]).length)) * 60
-      return { wareId, quantity: totalQty, currentProdRate: prodRate, estimatedTime: wait, creditsNeeded: credits }
+    addModule(built, producer.id, 1)
+
+    const currentAuto = getAutoModules(built)
+    const deltaAuto = currentAuto.filter(m => {
+      const prev = prevAutoModules.find(p => p.id === m.id)
+      return !prev || prev.count < m.count
+    }).map(m => {
+      const prev = prevAutoModules.find(p => p.id === m.id)
+      return { id: m.id, count: m.count - (prev?.count || 0) }
     })
+    prevAutoModules = currentAuto.map(m => ({ ...m }))
 
-    const maxWait = Math.max(0, ...materials.map(m => m.estimatedTime))
-    const stepTime = moduleBuildTime + maxWait
-    if (stepTime > remainingTime) break
-
-    remainingTime -= stepTime
-    addModule(currentModules, next.id, stepCount)
-
-    steps.push({
-      order: steps.length + 1,
-      moduleId: next.id,
-      moduleCount: stepCount,
-      moduleBuildTime,
-      materials,
-      estimatedDuration: timeBudget - remainingTime,
-      estimatedCredits: creditBudget - remainingCredits,
-      reason: currentGroupReason
-    })
+    const groupMods = mergeModules([{ id: producer.id, count: 1 }, ...deltaAuto])
+    groups.push({ reason: `Build mat: ${bottleneck}`, modules: groupMods })
   }
 
-  return { steps, halted: false, haltReason: '' }
+  return groups
+}
+
+function planProductionForRates(
+  whichRates: Record<string, number>,
+  targetRates: Record<string, number>,
+  currentNetProd: Record<string, number>,
+  settings: StationSettings,
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>
+): SavedModule[] {
+  const modules: Record<string, number> = {}
+
+  for (const wareId of Object.keys(whichRates)) {
+    const targetRate = (targetRates[wareId] || whichRates[wareId] || 0)
+    const existingRate = currentNetProd[wareId] || 0
+    if (existingRate >= targetRate) continue
+
+    const producer = findBestProducer(wareId, settings.racePreference, [], modulesMap, waresMap)
+    if (!producer) continue
+
+    const eff = getProductionEfficiency(producer, settings.considerWorkforceForAutoFill)
+    let sf = 1.0
+    if (wareId === 'energycells') sf = settings.sunlight / 100.0
+    const singleOutput = (producer.outputs[wareId] || 0) * eff * sf
+    if (singleOutput <= 0) continue
+
+    const deficitRate = targetRate - existingRate
+    const countNeeded = Math.ceil(deficitRate / singleOutput)
+    if (countNeeded > 0) {
+      modules[producer.id] = (modules[producer.id] || 0) + countNeeded
+    }
+  }
+
+  return Object.entries(modules).map(([id, count]) => ({ id, count }))
 }
 
 export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
-  const { goals, timeBudget, creditBudget, currentModules, settings, modulesMap, waresMap } = input
+  const { goals, currentModules, settings, modulesMap, waresMap, currentNetProduction } = input
 
-  const constraints: BuildConstraints = {
-    timeBudget,
-    creditBudget,
-    goals: [...goals]
-  }
+  const allSchemes: BuildScheme[] = []
 
-  const currentNet = calculateNetProduction(
-    currentModules,
-    modulesMap,
-    settings.considerWorkforceForAutoFill,
-    settings.sunlight
-  )
+  for (const goal of goals) {
+    if (goal.type === 'self-sufficient') {
+      const base = expandGoalDependencies(goal, modulesMap, waresMap)
+      const autoFill = calculateAutoFillModules({
+        plannedModules: base,
+        settings,
+        modulesMap,
+        waresMap,
+        lockedWares: []
+      })
+      const allMods = mergeModules([...base, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
+      const scheme = makeScheme(
+        [{ reason: '自给自足产线', modules: allMods }],
+        '自给自足',
+        '建造基础材料产线，实现自给自足',
+        ['claytronics', 'hullparts', 'plasmaconductors', 'advancedcomposites'],
+        settings,
+        modulesMap,
+        waresMap,
+        currentModules
+      )
+      if (scheme.stepsCount > 0) allSchemes.push(scheme)
+    } else if (goal.type === 'production-rate' || goal.type === 'build-module') {
+      const base3 = expandGoalDependencies(goal, modulesMap, waresMap)
+      const autoFill3 = calculateAutoFillModules({
+        plannedModules: base3,
+        settings,
+        modulesMap,
+        waresMap,
+        lockedWares: []
+      })
+      const allMods3 = mergeModules([...base3, ...autoFill3.autoIndustryModules, ...autoFill3.autoHabitationModules])
+      const { rates: rates3 } = computeBuildRates(allMods3, modulesMap, waresMap)
 
-  const goalsAchieved: BuildGoal[] = []
-  const goalsRemaining: BuildGoal[] = []
+      const goalModIds = new Set(base3.map(m => m.id))
+      const buildMatModuleIds = new Set<string>()
+      for (const m of allMods3) {
+        if (goalModIds.has(m.id)) continue
+        const mod = modulesMap[m.id]
+        if (!mod) continue
+        const isBuildMat = Object.keys(mod.outputs).some(w => rates3[w] !== undefined)
+        if (isBuildMat) buildMatModuleIds.add(m.id)
+      }
 
-  for (const g of goals) {
-    if (isGoalMet(g, currentNet, currentModules)) {
-      goalsAchieved.push(g)
-    } else {
-      goalsRemaining.push(g)
-    }
-  }
+      const scheme3Prime = allMods3.filter(m => !buildMatModuleIds.has(m.id))
+      const { rates: rates3prime } = computeBuildRates(scheme3Prime, modulesMap, waresMap)
 
-  if (goalsRemaining.length === 0) {
-    return {
-      goals,
-      constraints,
-      steps: [],
-      totalDuration: 0,
-      totalCredits: 0,
-      goalsAchieved,
-      goalsRemaining: [],
-      halted: false,
-      haltReason: ''
-    }
-  }
+      const capacityOK = Object.entries(rates3prime).every(
+        ([wareId, rate]) => (currentNetProduction[wareId] || 0) >= rate
+      )
 
-  const { steps, halted, haltReason } = simulateConstruction(
-    currentModules,
-    goals,
-    timeBudget,
-    creditBudget,
-    settings,
-    modulesMap,
-    waresMap
-  )
+      const scheme3Purpose = goal.type === 'build-module'
+        ? [goal.moduleId]
+        : base3.filter(m => {
+            const mod = modulesMap[m.id]
+            return mod && !mod.outputs['energycells']
+          }).map(m => m.id)
 
-  const lastStep = steps.length > 0 ? steps[steps.length - 1] : undefined
-  const totalDuration = lastStep?.estimatedDuration ?? 0
-  const totalCredits = lastStep?.estimatedCredits ?? 0
+      if (capacityOK) {
+        const s3 = makeScheme([{ reason: '', modules: allMods3 }], '目标目标',
+          `目标${goal.type === 'production-rate' ? '产线' : '建筑'}系列模块`,
+          scheme3Purpose, settings, modulesMap, waresMap, currentModules)
+        if (s3.stepsCount > 0) allSchemes.push(s3)
+        continue
+      }
 
-  const finalNet = calculateNetProduction(
-    [...currentModules, ...steps.map(s => ({ id: s.moduleId, count: s.moduleCount }))],
-    modulesMap,
-    settings.considerWorkforceForAutoFill,
-    settings.sunlight
-  )
+      const prodMods = planProductionForRates(
+        rates3prime, rates3, currentNetProduction,
+        settings, modulesMap, waresMap
+      )
+      const autoFill2 = calculateAutoFillModules({
+        plannedModules: prodMods,
+        settings,
+        modulesMap,
+        waresMap,
+        lockedWares: []
+      })
+      const allMods2 = mergeModules([...prodMods, ...autoFill2.autoIndustryModules, ...autoFill2.autoHabitationModules])
+      const { rates: rates2 } = computeBuildRates(allMods2, modulesMap, waresMap)
 
-  goalsAchieved.length = 0
-  goalsRemaining.length = 0
+      const r3Remaining: Record<string, number> = {}
+      for (const [wareId, rate] of Object.entries(rates3)) {
+        if (rates3prime[wareId] === undefined) {
+          r3Remaining[wareId] = rate
+        }
+      }
 
-  for (const g of goals) {
-    const simModules = [
-      ...currentModules,
-      ...steps.map(s => ({ id: s.moduleId, count: s.moduleCount }))
-    ]
-    if (isGoalMet(g, finalNet, simModules)) {
-      goalsAchieved.push(g)
-    } else {
-      goalsRemaining.push(g)
+      const scheme1Target: Record<string, number> = {}
+      for (const [wareId, rate] of Object.entries(rates2)) {
+        scheme1Target[wareId] = Math.max(scheme1Target[wareId] || 0, rate)
+      }
+      for (const [wareId, rate] of Object.entries(r3Remaining)) {
+        scheme1Target[wareId] = Math.max(scheme1Target[wareId] || 0, rate)
+      }
+
+      let scheme1Groups: BuildGroup[] = []
+      if (Object.keys(scheme1Target).length > 0) {
+        scheme1Groups = greedyFill(scheme1Target, currentModules, {}, settings, modulesMap, waresMap)
+      }
+
+      const scheme1Flat = scheme1Groups.flatMap(g => g.modules)
+      if (scheme1Groups.length > 0) {
+        const s1 = makeScheme(scheme1Groups, '自给自足',
+          '建造基础材料产线，实现自给自足',
+          ['claytronics', 'hullparts', 'plasmaconductors', 'advancedcomposites'],
+          settings, modulesMap, waresMap, currentModules)
+        if (s1.stepsCount > 0) allSchemes.push(s1)
+      }
+
+      if (allMods2.length > 0) {
+        const s1Flat = scheme1Flat.length > 0 ? scheme1Flat : []
+        const s2Purpose = Object.keys(rates3prime).filter(w => w !== 'energycells')
+        const s2 = makeScheme([{ reason: '', modules: allMods2 }], '目标输入',
+          '建造目标所需的建材产线模块组',
+          s2Purpose,
+          settings, modulesMap, waresMap,
+          mergeModules([...currentModules, ...s1Flat]))
+        if (s2.stepsCount > 0) allSchemes.push(s2)
+      }
+
+      const priorMods = mergeModules([...currentModules, ...scheme1Flat, ...allMods2])
+      const s3 = makeScheme([{ reason: '', modules: allMods3 }], '目标目标',
+        `目标${goal.type === 'production-rate' ? '产线' : '建筑'}系列模块`,
+        scheme3Purpose, settings, modulesMap, waresMap, priorMods)
+      if (s3.stepsCount > 0) allSchemes.push(s3)
     }
   }
 
   return {
     goals,
-    constraints,
-    steps,
-    totalDuration,
-    totalCredits,
-    goalsAchieved,
-    goalsRemaining,
-    halted,
-    haltReason
+    schemes: allSchemes,
+    totalDuration: allSchemes.reduce((s, sc) => s + sc.totalDuration, 0),
+    totalCredits: allSchemes.reduce((s, sc) => s + sc.totalCredits, 0),
+    goalsAchieved: [],
+    goalsRemaining: [],
+    halted: false,
+    haltReason: ''
   }
 }

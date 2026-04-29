@@ -12,19 +12,14 @@ const gameData = useGameDataStore()
 
 const props = defineProps<{
   goals: BuildGoal[]
-  timeBudget: number
-  creditBudget: number
-  buildPlan: { steps: unknown[]; halted: boolean; haltReason: string; goalsAchieved: unknown[]; goalsRemaining: unknown[] } | null
+  buildPlan: { schemes: unknown[]; halted: boolean; haltReason: string; goalsAchieved: unknown[]; goalsRemaining: unknown[] } | null
   loading: boolean
-  progress: { completed: number; total: number; percentage: number }
   warnings: string[]
 }>()
 
 const emit = defineEmits<{
   addGoal: [goal: BuildGoal]
   removeGoal: [index: number]
-  setTimeBudget: [seconds: number]
-  setCreditBudget: [credits: number]
   computePlan: []
 }>()
 
@@ -37,9 +32,6 @@ const wareSearch = ref('')
 const moduleSearch = ref('')
 const warePickerOpen = ref(false)
 const modulePickerOpen = ref(false)
-
-const localTimeHours = ref(props.timeBudget / 3600)
-const localCreditBudget = ref(props.creditBudget / 1000000)
 
 const filteredWares = computed(() => {
   const q = wareSearch.value.toLowerCase()
@@ -97,8 +89,6 @@ function addGoal() {
 }
 
 function onCompute() {
-  emit('setTimeBudget', localTimeHours.value * 3600)
-  emit('setCreditBudget', localCreditBudget.value * 1000000)
   emit('computePlan')
 }
 
@@ -120,6 +110,8 @@ function goalLabel(goal: BuildGoal): string {
     default: return goal.type
   }
 }
+
+const schemeCount = computed(() => props.buildPlan?.schemes?.length || 0)
 </script>
 
 <template>
@@ -231,32 +223,6 @@ function goalLabel(goal: BuildGoal): string {
         >+ {{ t('sector.build_plan.add') }}</button>
       </div>
 
-      <div class="space-y-2">
-        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">
-          {{ t('sector.build_plan.budget') }}
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-400 w-16">{{ t('sector.build_plan.time') }}:</span>
-          <input
-            v-model.number="localTimeHours"
-            type="number"
-            min="0"
-            class="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-sm text-slate-200"
-          />
-          <span class="text-xs text-slate-400">h</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-400 w-16">{{ t('sector.build_plan.credits') }}:</span>
-          <input
-            v-model.number="localCreditBudget"
-            type="number"
-            min="0"
-            class="flex-1 bg-slate-800 border border-slate-700 rounded px-2 py-1 text-sm text-slate-200"
-          />
-          <span class="text-xs text-slate-400">M</span>
-        </div>
-      </div>
-
       <button
         class="w-full px-4 py-3 text-sm font-bold text-white bg-amber-600 hover:bg-amber-500 rounded transition disabled:opacity-50 disabled:cursor-not-allowed"
         :disabled="loading || goals.length === 0"
@@ -266,17 +232,8 @@ function goalLabel(goal: BuildGoal): string {
         <span v-else>{{ t('sector.build_plan.compute') }}</span>
       </button>
 
-      <div v-if="buildPlan && progress.total > 0" class="space-y-1">
-        <div class="flex justify-between text-xs text-slate-400">
-          <span>{{ t('sector.build_plan.progress') }}</span>
-          <span>{{ progress.percentage }}%</span>
-        </div>
-        <div class="w-full bg-slate-700 rounded h-2">
-          <div
-            class="bg-amber-500 h-2 rounded transition-all"
-            :style="{ width: progress.percentage + '%' }"
-          ></div>
-        </div>
+      <div v-if="schemeCount > 0" class="px-3 py-2 bg-slate-800 rounded border border-slate-700 text-xs text-slate-400">
+        {{ schemeCount }} {{ t('sector.build_plan.schemes_generated') }}
       </div>
 
       <div

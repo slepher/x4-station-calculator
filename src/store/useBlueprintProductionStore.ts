@@ -18,8 +18,8 @@ import type {
   ProductionStationState
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import type { BuildGoal, BuildPlan, BuildConstraints } from '@/types/build-plan'
-import { calculateBuildPlan } from '@/store/logic/calculateBuildPlan'
+import type { BuildGoal, BuildPlan } from '@/types/build-plan'
+import { calculateBuildPlan, calculateNetProduction } from '@/store/logic/calculateBuildPlan'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
@@ -63,11 +63,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
   const refreshKey = ref(0)
 
-  const buildConstraints = ref<BuildConstraints>({
-    timeBudget: 3600 * 168,
-    creditBudget: 200000000,
-    goals: [{ type: 'self-sufficient' }]
-  })
+  const buildGoals = ref<BuildGoal[]>([{ type: 'self-sufficient' }])
 
   const buildPlan = ref<BuildPlan | null>(null)
 
@@ -84,24 +80,23 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return Array.from(moduleMap.entries()).map(([id, count]) => ({ id, count }))
   })
 
+  const empireCurrentNetProduction = computed<Record<string, number>>(() => {
+    const deps = getComputeDeps()
+    if (!deps) return {}
+    return calculateNetProduction(
+      empireModules.value,
+      deps.modulesMap,
+      false,
+      100
+    )
+  })
+
   function setBuildGoal(goal: BuildGoal) {
-    buildConstraints.value = {
-      ...buildConstraints.value,
-      goals: [...buildConstraints.value.goals, goal]
-    }
+    buildGoals.value = [...buildGoals.value, goal]
   }
 
   function removeBuildGoal(index: number) {
-    const newGoals = buildConstraints.value.goals.filter((_, i) => i !== index)
-    buildConstraints.value = { ...buildConstraints.value, goals: newGoals }
-  }
-
-  function setTimeBudget(seconds: number) {
-    buildConstraints.value = { ...buildConstraints.value, timeBudget: seconds }
-  }
-
-  function setCreditBudget(credits: number) {
-    buildConstraints.value = { ...buildConstraints.value, creditBudget: credits }
+    buildGoals.value = buildGoals.value.filter((_, i) => i !== index)
   }
 
   function computePlan() {
@@ -113,10 +108,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
     try {
       const result = calculateBuildPlan({
-        goals: buildConstraints.value.goals,
-        timeBudget: buildConstraints.value.timeBudget,
-        creditBudget: buildConstraints.value.creditBudget,
+        goals: buildGoals.value,
         currentModules: empireModules.value,
+        currentNetProduction: empireCurrentNetProduction.value,
         settings: {
           sunlight: 100,
           useHQ: false,
@@ -1092,14 +1086,13 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     empireDerivedProductionFlows,
     overviewBuyMultiplier,
     overviewSellMultiplier,
-    buildConstraints,
+    buildGoals,
     buildPlan,
     empireModules,
+    empireCurrentNetProduction,
     computeBuildPlanLoading,
     setBuildGoal,
     removeBuildGoal,
-    setTimeBudget,
-    setCreditBudget,
     computePlan
   }
 })

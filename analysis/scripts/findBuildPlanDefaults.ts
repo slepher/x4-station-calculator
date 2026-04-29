@@ -8,12 +8,9 @@ const waresMap: Record<string, any> = Object.fromEntries(WARE.map((w: any) => [w
 const modulesMap: Record<string, any> = Object.fromEntries(MOD.map((m: any) => [m.id, m]))
 
 function modName(id: string): string { const m = modulesMap[id]; return m?.name || id }
+function wareName(id: string): string { const w = waresMap[id]; return w?.name || id }
 
 import { calculateBuildPlan } from '../../src/store/logic/calculateBuildPlan'
-
-const hours = parseInt(process.argv.find(a => a.startsWith('--hours='))?.split('=')[1] || '24', 10)
-const creditsM = parseInt(process.argv.find(a => a.startsWith('--credits='))?.split('=')[1] || '200', 10)
-const credits = creditsM * 1_000_000
 
 const baseSettings = {
   sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
@@ -23,6 +20,9 @@ const baseSettings = {
   primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
   transportShipCapacity: 62000, enforceDlcActivation: false
 }
+
+function fmtCr(n: number): string { return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : `${Math.round(n)}` }
+function fmtH(s: number): string { return `${(s / 3600).toFixed(2)}h` }
 
 function calcNet(mods: any[]) {
   const state: Record<string, number> = {}
@@ -35,98 +35,76 @@ function calcNet(mods: any[]) {
   return state
 }
 
-function calcConsumption(steps: any[]) {
-  const totals = new Map<string, number>()
-  let totalTime = 0
-  for (const s of steps) {
-    totalTime += s.moduleBuildTime
-    for (const mat of s.materials) {
-      if (mat.quantity > 0) totals.set(mat.wareId, (totals.get(mat.wareId) || 0) + mat.quantity)
-    }
-  }
-  return { totals, totalTime }
-}
+const MISSILE_MODULE = 'module_gen_prod_missilecomponents_01'
 
-const TARGET_MATS = ['advancedcomposites', 'plasmaconductors', 'hullparts', 'claytronics']
+console.log('=== Build Plan: Missile Component ×5 (empty empire) ===')
+console.log()
 
 const result = calculateBuildPlan({
-  goals: [{ type: 'self-sufficient' }], timeBudget: hours * 3600, creditBudget: credits,
-  currentModules: [], settings: baseSettings, modulesMap, waresMap, modulesByOutputMap: {}
+  goals: [{ type: 'build-module', moduleId: MISSILE_MODULE, count: 5 }],
+  currentModules: [],
+  currentNetProduction: {},
+  settings: baseSettings,
+  modulesMap,
+  waresMap,
+  modulesByOutputMap: {}
 })
 
-let currentGroup: string | null = null
-let groupSteps: typeof result.steps = []
-let groupId = 0
-const cumulativeTotal = new Map<string, number>()
+for (let si = 0; si < result.schemes.length; si++) {
+  const scheme = result.schemes[si]
+  const sep = '─'.repeat(80)
+  console.log(sep)
+  console.log(`  ${scheme.label}  │  ${fmtH(scheme.totalDuration)}  │  ${fmtCr(scheme.totalCredits)}  │  ${scheme.stepsCount} steps`)
+  console.log(`  ${scheme.description}`)
+  console.log(`  目的模块: ${scheme.purposeModules.map(modName).join(', ')}`)
+  console.log(sep)
 
-for (const step of result.steps) {
-  const r = step.reason
-  const isNew = r !== currentGroup
-  if (isNew && groupSteps.length > 0) {
-    groupId++
-    const allSteps = result.steps.slice(0, step.order - 1)
-    const currentMods: any[] = []
-    for (const s of allSteps) {
-      const ex = currentMods.find((c: any) => c.id === s.moduleId)
-      if (ex) ex.count += s.moduleCount
-      else currentMods.push({ id: s.moduleId, count: s.moduleCount })
-    }
-    const { totals: consTotals, totalTime: consTime } = calcConsumption(allSteps)
-    const net = calcNet(currentMods)
-    const totalH = Math.max(1, consTime / 3600)
-
-    const main = groupSteps[groupSteps.length - 1]
-    console.log(`[Batch ${groupId}] Target: ${modName(main.moduleId)} — ${main.reason}`)
-    console.log(`  Score:`)
-    for (const mat of TARGET_MATS) {
-      const qty = consTotals.get(mat) || 0
-      const prod = net[mat] ?? 0
-      const rate = qty / totalH
-      const sat = rate > 0 ? ((prod / rate) * 100).toFixed(1) : rate === 0 && prod > 0 ? '∞' : '0.0'
-      console.log(`    ${modName(mat)}: qty=${Math.round(qty)} prod=${Math.round(prod)}/h demand=${Math.round(rate)}/h sat=${sat}%`)
-    }
-
-    console.log(`  Build order (${groupSteps.length} modules):`)
-    for (const s of groupSteps) {
-      cumulativeTotal.set(s.moduleId, (cumulativeTotal.get(s.moduleId) || 0) + s.moduleCount)
-      console.log(`    #${s.order} ${modName(s.moduleId)} (tier${modulesMap[s.moduleId]?.tier ?? 0}) +${s.moduleCount}=${cumulativeTotal.get(s.moduleId)} build=${(s.moduleBuildTime / 3600).toFixed(2)}h`)
-    }
-    console.log('')
-    groupSteps = []
+  if (scheme.steps.length === 0) {
+    console.log('  (无建造步骤)')
+    console.log()
+    continue
   }
-  currentGroup = r
-  groupSteps.push(step)
+
+  let cumDur = 0
+  let cumCr = 0
+  let stock = new Map<string, number>()
+  let currentGroup = -1
+  for (const step of scheme.steps) {
+    if (step.groupIndex !== currentGroup) {
+      currentGroup = step.groupIndex
+      console.log(`\n  ▸ ${step.reason || '主产线'}`)
+    }
+
+    const buildTimeH = step.moduleBuildTime / 3600
+    const stepDurInc = step.estimatedDuration - cumDur
+    const stepCrInc = step.estimatedCredits - cumCr
+    cumDur = step.estimatedDuration
+    cumCr = step.estimatedCredits
+
+    console.log(`    #${step.order}  ${modName(step.moduleId)} ×${step.moduleCount}`)
+    console.log(`         建造: ${fmtH(step.moduleBuildTime)}  累计: ${fmtH(cumDur)}  步骤费: ${fmtCr(stepCrInc)}  累计费: ${fmtCr(cumCr)}`)
+
+    if (step.materials.length > 0) {
+      console.log(`         材料明细:`)
+      for (const mat of step.materials) {
+        const price = waresMap[mat.wareId]?.price || 0
+        const consumed = Math.round(mat.quantity)
+        const prevStock = stock.get(mat.wareId) || 0
+        const produced = mat.currentProdRate * buildTimeH
+        const newStock = prevStock - consumed + produced
+        stock.set(mat.wareId, newStock)
+        console.log(`           ${wareName(mat.wareId).padEnd(30)} ×${String(consumed).padStart(6)}  ` +
+          `库存: ${String(Math.round(prevStock)).padStart(7)}  ` +
+          `自产: ${String(Math.round(mat.currentProdRate)).padStart(5)}/h  +${Math.round(produced)}  ` +
+          `买: ${fmtCr(mat.creditsNeeded).padStart(7)}  (单价: ${fmtCr(price)})`)
+      }
+    } else {
+      console.log(`         材料: 无`)
+    }
+  }
+  console.log()
 }
 
-if (groupSteps.length > 0) {
-  groupId++
-  const allSteps = result.steps
-  const currentMods: any[] = []
-  for (const s of allSteps) {
-    const ex = currentMods.find((c: any) => c.id === s.moduleId)
-    if (ex) ex.count += s.moduleCount
-    else currentMods.push({ id: s.moduleId, count: s.moduleCount })
-  }
-  const { totals: consTotals, totalTime: consTime } = calcConsumption(allSteps)
-  const net = calcNet(currentMods)
-  const totalH = Math.max(1, consTime / 3600)
-  const main = groupSteps[groupSteps.length - 1]
-  console.log(`[Batch ${groupId}] Target: ${modName(main.moduleId)} — ${main.reason}`)
-  console.log(`  Score:`)
-  for (const mat of TARGET_MATS) {
-    const qty = consTotals.get(mat) || 0
-    const prod = net[mat] ?? 0
-    const rate = qty / totalH
-    const sat = rate > 0 ? ((prod / rate) * 100).toFixed(1) : rate === 0 && prod > 0 ? '∞' : '0.0'
-    console.log(`    ${modName(mat)}: qty=${Math.round(qty)} prod=${Math.round(prod)}/h demand=${Math.round(rate)}/h sat=${sat}%`)
-  }
-  console.log(`  Build order (${groupSteps.length} modules):`)
-  for (const s of groupSteps) {
-    cumulativeTotal.set(s.moduleId, (cumulativeTotal.get(s.moduleId) || 0) + s.moduleCount)
-    console.log(`    #${s.order} ${modName(s.moduleId)} (tier${modulesMap[s.moduleId]?.tier ?? 0}) +${s.moduleCount}=${cumulativeTotal.get(s.moduleId)} build=${(s.moduleBuildTime / 3600).toFixed(2)}h`)
-  }
-}
-
-// Summary
-const lastStep = result.steps[result.steps.length - 1]
-console.log(`\n--- Summary: ${result.steps.length} steps, ${lastStep ? (lastStep.estimatedDuration / 3600).toFixed(1) : 0}h used, ${lastStep ? (lastStep.estimatedCredits / 1e6).toFixed(0) : 0}M cr ---`)
+console.log('═'.repeat(80))
+console.log(`  总计: ${fmtH(result.totalDuration)}  │  ${fmtCr(result.totalCredits)}`)
+console.log('═'.repeat(80))
