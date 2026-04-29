@@ -39,5 +39,31 @@ test.describe('Live Transit Toolbar - Group Name Binding', () => {
 
     const inputValue = await nameInput.inputValue()
     expect(inputValue).toBe('小行星')
+
+    await nameInput.fill('测试名称')
+    await page.waitForTimeout(300)
+
+    const fillValue = await nameInput.inputValue()
+    expect(fillValue).toBe('测试名称')
+
+    const renamedTab = page.locator('.supply-tab').filter({ hasText: '测试名称' })
+    await expect(renamedTab).toBeVisible({ timeout: 3000 })
+
+    const overviewTab = page.locator('.overview-tab')
+    await expect(overviewTab).toBeVisible({ timeout: 3000 })
+    await overviewTab.click()
+    await page.waitForTimeout(300)
+
+    await expect(renamedTab).toBeVisible({ timeout: 3000 })
+    await renamedTab.click()
+    await page.waitForTimeout(500)
+
+    const restoredInput = page.locator('.live-toolbar .ghost-input')
+    await expect(restoredInput).toBeVisible({ timeout: 3000 })
+    const restoredValue = await restoredInput.inputValue()
+    expect(restoredValue).toBe('测试名称')
+
+    await restoredInput.fill('小行星')
+    await page.waitForTimeout(300)
   })
 })
