@@ -475,6 +475,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (activeStationId.value === stationId) {
         activeStationId.value = activeEmpire.value?.stations[0]?.id || null
       }
+      refreshKey.value++
     }
   }
 

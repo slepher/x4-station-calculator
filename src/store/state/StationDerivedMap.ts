@@ -506,6 +506,8 @@ export class StationDerivedMap {
   removeStation(stationId: string): void {
     this.cacheMap.delete(stationId)
     this.snapshotMap.delete(stationId)
+    this.empireFlowsCache = []
+    this.sectorFlowsCache.clear()
   }
 
   remove(stationId: string): void {
