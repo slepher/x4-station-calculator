@@ -7,7 +7,7 @@
 - [ ] T1. 删 `SupplyStorageFlow` / `SupplyStorageFlowDetail`（x4.ts）
 - [ ] T2. `SectorInternalData` 删 `supplyStorageFlows`
 - [ ] T3. `StationComponentGapFlows.operations/supply` 改为 `DerivedProductionFlow[]`
-- [ ] T4. `DerivedProductionFlow.contributions` 改为 `DerivedFlowContribution[]`
+- [ ] T4. `DerivedFlowContribution` 字段改为 `valueContribution` / `volumeContribution` / `transportContribution`（替代 `netValue` / `storageVolume` / `transportVolume`）
 - [ ] T5. `EmpireGapItem` 类型改为 `DerivedProductionFlow`
 
 ### Phase 2: deriveProductionFlows 统一

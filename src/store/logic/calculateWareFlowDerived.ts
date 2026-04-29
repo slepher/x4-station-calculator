@@ -27,6 +27,7 @@ export interface CalculateWareFlowDerivedInput {
     sunlight: number
   }
   warePriorityLevels: Record<string, number>
+  volumeContributionMethod?: 'sum' | 'max'
 }
 
 export interface CalculateWareFlowDerivedOutput {
@@ -43,7 +44,8 @@ export function deriveProductionFlows(
     settings,
     warePriorityLevels,
     stationNameMap,
-    sectorNameMap
+    sectorNameMap,
+    volumeContributionMethod = 'sum'
   } = input
 
   const wareFlows: DerivedProductionFlow[] = productionFlows.map(prodFlow => {
@@ -81,7 +83,9 @@ export function deriveProductionFlows(
       : 0
 
     const totalOccupiedConsumptionCount = consumptionBufferCount
-    const totalOccupiedCount = consumptionBufferCount + productionBufferCount
+    const totalOccupiedCount = volumeContributionMethod === 'max'
+      ? Math.max(consumptionBufferCount, productionBufferCount)
+      : consumptionBufferCount + productionBufferCount
     const totalOccupiedVolume = totalOccupiedCount * unitVolume
 
     const modulesMap = input.modulesMap
@@ -96,8 +100,11 @@ export function deriveProductionFlows(
             : atom.class === 'sector'
               ? sectorNameMap?.[atom.id] || (atom as any).name || atom.id
               : (atom as any).name || atom.id,
-      netValue: atom.amount * unitPrice,
-      transportVolume: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
+      valueContribution: atom.amount * unitPrice,
+      volumeContribution: atom.amount > 0
+        ? atom.amount * productBufferHours
+        : Math.abs(atom.amount) * settings.resourceBufferHours,
+      transportContribution: Math.abs(atom.amount) * unitVolume
     }))
 
     return {

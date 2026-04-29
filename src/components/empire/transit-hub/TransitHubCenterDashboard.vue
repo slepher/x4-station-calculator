@@ -4,7 +4,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 
-import type { DerivedProductionFlow } from '@/types/production-flow'
+import type { DerivedProductionFlow, DerivedFlowContribution } from '@/types/production-flow'
 import { computeGroupedFlows } from '@/components/empire/composables/useWareFlowGrouping'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
@@ -19,72 +19,6 @@ const { t } = useI18n()
 const { translateWare } = useX4I18n()
 
 type SharedViewMode = 'quantity' | 'volume' | 'economy' | 'transport'
-
-function buildStorageFlowsFromProductionFlows(
-  productionFlows: DerivedProductionFlow[],
-  bufferHours: number
-): any[] {
-  const safeBufferHours = Number.isFinite(bufferHours) && bufferHours > 0 ? bufferHours : 12
-  const byWare = new Map<string, any>()
-
-  productionFlows
-    .filter((flow) => flow.transportType === 'container')
-    .forEach((flow) => {
-      const row = byWare.get(flow.wareId) || {
-        wareId: flow.wareId,
-        orderIndex: flow.orderIndex,
-        tier: flow.tier,
-        transportType: flow.transportType,
-        unitVolume: flow.unitVolume || 1,
-        totalProductionStorageVolume: 0,
-        totalConsumptionStorageVolume: 0,
-        totalRequiredStorageVolume: 0,
-        details: []
-      }
-
-      const details = flow.contributions || []
-      details.forEach((detail, index) => {
-        const amount = Math.abs(detail.amount || 0)
-        if (amount === 0) return
-        row.details.push({
-          ...detail,
-          netValue: 0,
-          storageVolume: amount * (flow.unitVolume || 1) * safeBufferHours,
-          sortOrder: index
-        })
-      })
-
-      byWare.set(flow.wareId, row)
-    })
-
-  return Array.from(byWare.values())
-    .map((row: any) => {
-      const totalProductionStorageVolume = row.details
-        .filter((detail: any) => detail.type === 'production')
-        .reduce((sum: number, detail: any) => sum + (detail.storageVolume || 0), 0)
-      const totalConsumptionStorageVolume = row.details
-        .filter((detail: any) => detail.type === 'consumption')
-        .reduce((sum: number, detail: any) => sum + (detail.storageVolume || 0), 0)
-      return {
-        ...row,
-        totalProductionStorageVolume,
-        totalConsumptionStorageVolume,
-        totalRequiredStorageVolume: Math.max(totalProductionStorageVolume, totalConsumptionStorageVolume),
-        details: [...row.details].sort((a: any, b: any) => {
-          const orderA = Number(a.sortOrder)
-          const orderB = Number(b.sortOrder)
-          if (Number.isFinite(orderA) && Number.isFinite(orderB) && orderA !== orderB) return orderA - orderB
-          return (b.storageVolume || 0) - (a.storageVolume || 0)
-        })
-      }
-    })
-    .filter((item) => item.totalRequiredStorageVolume > 0)
-    .sort((a, b) => {
-      if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
-      if (a.tier !== b.tier) return b.tier - a.tier
-      return a.wareId.localeCompare(b.wareId)
-    })
-}
 
 const props = withDefaults(defineProps<{
   productionFlows: DerivedProductionFlow[]
@@ -135,7 +69,23 @@ const groupedFlows = computed(() => {
     supply: [...grouped.rateGroups.supply, ...grouped.rateGroups.resources]
   }
 })
-const storageFlows = computed(() => buildStorageFlowsFromProductionFlows(props.productionFlows, localProductBufferHours.value))
+const storageFlows = computed(() =>
+  props.productionFlows
+    .filter((flow) => flow.transportType === 'container')
+    .map((flow) => ({
+      wareId: flow.wareId,
+      orderIndex: flow.orderIndex,
+      tier: flow.tier,
+      contributions: (flow.contributions || []).map((c, i) => ({ ...c, sortOrder: i }) as DerivedFlowContribution),
+      totalOccupiedCount: flow.totalOccupiedCount
+    }))
+    .filter((item) => item.totalOccupiedCount > 0)
+    .sort((a, b) => {
+      if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
+      if (a.tier !== b.tier) return b.tier - a.tier
+      return a.wareId.localeCompare(b.wareId)
+    })
+)
 
 const formatNum = (n: number) => new Intl.NumberFormat('en-US').format(Math.round(n))
 const formatSignedAbs = (n: number) => `${n >= 0 ? '+' : '-'}${formatNum(Math.abs(n))}`
@@ -207,22 +157,15 @@ const storageItems = computed(() =>
   storageFlows.value.map((flow) => ({
     ...flow,
     name: wrapFlow({ wareId: flow.wareId }).name
-  })).filter((item) => item.totalRequiredStorageVolume > 0)
-)
-const storageTotalVolume = computed(() =>
-  storageItems.value.reduce((sum, item) => sum + item.totalRequiredStorageVolume, 0)
+  })).filter((item) => item.totalOccupiedCount > 0)
 )
 const hasStorageData = computed(() => storageItems.value.length > 0)
 
 const transportItems = computed(() =>
   storageFlows.value.map((storageFlow) => {
-    const details = (storageFlow.details || [])
-      .map((detail: any) => ({
-        ...detail,
-        transportVolume: Math.abs(detail.amount || 0) * (storageFlow.unitVolume || 0)
-      }))
-      .filter((detail: any) => detail.transportVolume > 0)
-    const totalTransportVolume = details.reduce((sum: number, detail: any) => sum + detail.transportVolume, 0)
+    const details = (storageFlow.contributions || [])
+      .filter((detail) => detail.transportContribution > 0)
+    const totalTransportVolume = details.reduce((sum, detail) => sum + detail.transportContribution, 0)
 
     return {
       wareId: storageFlow.wareId,
@@ -264,7 +207,6 @@ const hasTransportData = computed(() =>
       <TransitHubStorageView
         v-else-if="viewMode === 'volume'"
         :items="storageItems"
-        :total-volume="storageTotalVolume"
         :has-data="hasStorageData"
       />
       <TransitHubTransportView

@@ -11,10 +11,10 @@ export interface FlowContribution {
 
 export interface DerivedFlowContribution extends FlowContribution {
   name: string
-  netValue: number
+  valueContribution: number
+  volumeContribution: number
+  transportContribution: number
   sortOrder?: number
-  storageVolume?: number
-  transportVolume?: number
 }
 
 export interface WareProductionFlow {

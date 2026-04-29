@@ -147,6 +147,10 @@ interface AggregatedStationName {
   count: number
 }
 
+const saveSectorMacrosWithStations = computed<Set<string>>(() => {
+  return new Set(saveSectors.value.map(s => s.sectorMacro))
+})
+
 const saveSectors = computed<SectorWithStations[]>(() => {
   if (!activeArchive.value) return []
 
@@ -838,7 +842,8 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
             <div class="anchor-row">
               <span
                 v-if="draft.anchorSectorMacro"
-                class="pill pill--anchor pill--clickable"
+                class="pill pill--clickable pill--anchor"
+                :class="saveSectorMacrosWithStations.has(draft.anchorSectorMacro) ? '' : 'pill--bg-empty'"
                 @click.stop="focusSectorByMacro(draft.anchorSectorMacro)"
               >
                 {{ getSectorMacroDisplayName(draft.anchorSectorMacro) }}
@@ -866,7 +871,8 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
                   <span
                     v-for="macro in getCoverageSectorsAtJump(jump)"
                     :key="macro"
-                    class="pill pill--coverage pill--clickable"
+                    class="pill pill--clickable pill--coverage"
+                    :class="saveSectorMacrosWithStations.has(macro) ? '' : 'pill--bg-empty'"
                     @click.stop="focusSectorByMacro(macro)"
                   >
                     {{ getSectorMacroDisplayName(macro) }}
@@ -887,11 +893,8 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
                   <span
                     v-for="macro in getCandidateSectorsAtJump(jump)"
                     :key="macro"
-                    class="pill pill--clickable"
-                    :class="{ 
-                      'pill--candidate': !isSectorBoundToOtherGroup(macro, sector.id),
-                      'pill--orange': isSectorBoundToOtherGroup(macro, sector.id)
-                    }"
+                    class="pill pill--clickable pill--candidate"
+                    :class="saveSectorMacrosWithStations.has(macro) ? 'pill--bg-filled' : ''"
                     @click.stop="focusSectorByMacro(macro)"
                   >
                     {{ getSectorMacroDisplayName(macro) }}
@@ -961,7 +964,7 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
         <div v-else-if="sector.isBound && sector.sectorMacro" class="collapsed-binding-pills">
           <div class="collapsed-binding-body collapsed-binding-body--flush">
             <div class="collapsed-anchor-row">
-              <span class="pill pill--anchor pill--clickable" @click.stop="focusSectorByMacro(sector.sectorMacro)">
+              <span class="pill pill--clickable pill--anchor" :class="saveSectorMacrosWithStations.has(sector.sectorMacro) ? '' : 'pill--bg-empty'" @click.stop="focusSectorByMacro(sector.sectorMacro)">
                 {{ getSectorMacroDisplayName(sector.sectorMacro) }}
               </span>
             </div>
@@ -978,6 +981,7 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
                       v-for="macro in getCollapsedCoverageByJump(sector.coverageMacros).get(jump)"
                       :key="macro"
                       class="pill pill--small pill--clickable"
+                      :class="saveSectorMacrosWithStations.has(macro) ? '' : 'pill--bg-empty'"
                       @click.stop="focusSectorByMacro(macro)"
                     >
                       {{ getSectorMacroDisplayName(macro) }}
@@ -1375,6 +1379,14 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
 
 .station-tag {
   @apply rounded-full bg-amber-200/10 px-2 py-0.5 text-xs text-amber-100/70;
+}
+
+.pill--bg-filled {
+  background-color: rgba(253, 230, 138, 0.1);
+}
+
+.pill--bg-empty {
+  background-color: transparent;
 }
 
 .edit-footer {

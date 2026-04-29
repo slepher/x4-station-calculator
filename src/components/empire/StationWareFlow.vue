@@ -6,7 +6,7 @@ import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import LockButton from '../common/LockButton.vue'
 import FavoriteButton from '../common/FavoriteButton.vue'
 import VolumeTooltip from '../common/VolumeTooltip.vue'
-import type { FlowContribution } from '@/types/production-flow'
+import type { DerivedFlowContribution } from '@/types/production-flow'
 
 const { t } = useI18n()
 
@@ -14,7 +14,7 @@ const props = defineProps<{
   resourceId: string
   netRate: number
   name: string
-  details?: FlowContribution[]
+  details?: DerivedFlowContribution[]
   locked?: boolean
   priorityLevel?: number
   netVolume: number
@@ -108,24 +108,24 @@ const formattedDetails = computed(() => {
   if (props.viewMode === 'economy') {
     return processedDetails.value.map(detail => ({
       ...detail,
-      economicAmount: detail.amount * 100,
-      displayAmount: detail.amount * 100
+      economicAmount: detail.valueContribution,
+      displayAmount: detail.valueContribution
     }))
   }
   
   if (props.viewMode === 'volume') {
-    return processedDetails.value.map(detail => {
-      const volumeValue = detail.amount * (props.unitVolume || 0)
-      return { ...detail, volumeAmount: volumeValue, displayAmount: volumeValue }
-    })
+    return processedDetails.value.map(detail => ({
+      ...detail,
+      volumeAmount: detail.volumeContribution,
+      displayAmount: detail.volumeContribution
+    }))
   }
 
   if (props.viewMode === 'transport') {
-    const minutes = props.transportMinutes ?? 30
-    return processedDetails.value.map(detail => {
-      const transportValue = Math.abs(detail.amount || 0) * (props.unitVolume || 0) * (minutes / 60)
-      return { ...detail, displayAmount: transportValue }
-    })
+    return processedDetails.value.map(detail => ({
+      ...detail,
+      displayAmount: detail.transportContribution
+    }))
   }
   
   return processedDetails.value.map(detail => ({ ...detail, displayAmount: detail.amount }))
@@ -214,7 +214,9 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           <div class="item-val-group">
             <span v-if="item.bonusPercent > 0" class="item-bonus">(+{{ item.bonusPercent }}%)</span>
             <span class="item-val" :class="{ 'item-val-transport': viewMode === 'transport' }">
-              {{ viewMode === 'transport' ? '' : (item.displayAmount > 0 ? '+' : '') }}{{ formatNum(item.displayAmount) }}
+              <template v-if="viewMode === 'economy'">{{ (item.displayAmount > 0 ? '+' : '') }}{{ formatNum(item.displayAmount) }} Cr</template>
+              <template v-else-if="viewMode === 'transport' || viewMode === 'volume'">{{ formatNum(item.displayAmount) }}</template>
+              <template v-else>{{ (item.displayAmount > 0 ? '+' : '') }}{{ formatNum(item.displayAmount) }}</template>
             </span>
           </div>
         </template>
