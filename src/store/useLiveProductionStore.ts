@@ -98,7 +98,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const sectorLinks = sourceView?.productionSectorLinks?.value ?? []
     return new StationDerivedMap(deps, {
       hasSector: true,
-      sectorLinks
+      sectorLinks,
+      refreshKey
     })
   }
 
@@ -345,7 +346,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     flowMap: computed(() => liveFlowMap.value)
   })
 
-  const empireProductionFlows = computed(() => planningDerivedMap.value?.getEmpireFlows() || [])
+  const refreshKey = ref(0)
+
+  const empireProductionFlows = computed(() => {
+    void refreshKey.value
+    return planningDerivedMap.value?.getEmpireFlows() || []
+  })
   const empireDerivedProductionFlows = computed(() => {
     const raw = empireProductionFlows.value
     if (raw.length === 0) return []

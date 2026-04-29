@@ -55,6 +55,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const lastSavedSnapshot = ref<string>('')
   const buildPriceMultiplier = ref(0.5)
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
+  const refreshKey = ref(0)
 
   const activeEmpire = ref<EmpirePlan | null>(null)
 
@@ -131,7 +132,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   function createPlanningDerivedMap(): StationDerivedMap | null {
     const deps = getDerivedStaticDeps()
     if (!deps) return null
-    return new StationDerivedMap(deps)
+    return new StationDerivedMap(deps, { refreshKey })
   }
 
   function ensurePlanningDerivedMap(): StationDerivedMap | null {
