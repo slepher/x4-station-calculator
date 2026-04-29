@@ -3338,7 +3338,7 @@
     <t id="11693">如果你更喜欢旧模式，可以在游戏设置菜单中将"默认指令行为"改为"队列"，这样在使用交互菜单时按下%s($INPUT_MODIFIER_ICON$)将会覆盖指令，而不是将其添加到队列中。</t>
     <t id="11694">按"是"试用新的默认修饰键行为，按"否"保持旧行为使用%s($INPUT_MODIFIER_ICON$)覆盖指令。</t>
     <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
+    <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>

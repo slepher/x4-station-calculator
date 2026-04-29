@@ -3124,7 +3124,7 @@
     </product>
     <product id="arg_claytronics" ware="claytronics" owner="argon" type="factory">
       <quotas>
-        <quota galaxy="10"/>
+        <quota galaxy="8"/>
       </quotas>
       <location class="galaxy" macro="xu_ep2_universe_macro" faction="[argon, hatikvah]" relation="self" comparison="ge">
         <economy max="0.50" maxbound="false"/>
@@ -3664,7 +3664,7 @@
     </product>
     <product id="ant_claytronics" ware="claytronics" owner="antigone" type="factory">
       <quotas>
-        <quota galaxy="8"/>
+        <quota galaxy="6"/>
       </quotas>
       <location class="galaxy" macro="xu_ep2_universe_macro" faction="antigone" relation="self" comparison="ge">
         <economy max="0.75" maxbound="false"/>

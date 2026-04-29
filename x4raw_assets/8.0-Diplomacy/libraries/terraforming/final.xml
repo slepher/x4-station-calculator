@@ -1,0 +1,1670 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<terraforming xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="terraforming.xsd">
+  <stats>
+    <stat id="temperature" name="{1001,11401}" default="5" icon="terraforming_temperature" inactivetext="{1001,3828}">
+      <!--freezing: white-->
+      <range end="3" state="0" habitable="false" r="255" g="255" b="255" description="{1001,11402}"/>
+      <!--cold: light blue-->
+      <range end="4" state="1" r="102" g="204" b="204" description="{1001,11403}"/>
+      <!--temperate: green-->
+      <range end="5" state="2" r="0" g="255" b="0" description="{1001,11404}"/>
+      <!--hot: orange-->
+      <range end="6" state="3" r="255" g="127" b="0" description="{1001,11405}"/>
+      <!--burning: red-->
+      <range end="9" state="4" habitable="false" r="255" g="0" b="0" description="{1001,11406}"/>
+    </stat>
+    <stat id="airpressure" name="{1001,11407}" default="5" icon="terraforming_pressure" inactivetext="{1001,3829}">
+      <!--too low: red-->
+      <range end="1" state="0" habitable="false" r="255" g="0" b="0" description="{1001,11408}"/>
+      <!--uncomfortably low: yellow-->
+      <range end="4" state="1" r="255" g="255" b="0" description="{1001,11408}"/>
+      <!--comfortable: green-->
+      <range end="5" state="2" r="0" g="255" b="0" description="{1001,11408}"/>
+      <!--uncomfortably high: yellow-->
+      <range end="8" state="1" r="255" g="255" b="0" description="{1001,11408}"/>
+    </stat>
+    <stat id="oxygen" name="{1001,11410}" default="9" icon="terraforming_oxygen" inactivetext="{1001,3830}">
+      <!--too low: red-->
+      <range end="3" state="0" habitable="false" r="255" g="0" b="0" description="{1001,11411}"/>
+      <!--uncomfortably low: yellow-->
+      <range end="4" state="1" r="255" g="255" b="0" description="{1001,11411}"/>
+      <!--comfortable: green (too high, about 0.5bar, is assumed to be impossible for the purposes of this feature)-->
+      <range end="9" state="2" r="0" g="255" b="0" description="{1001,11411}"/>
+    </stat>
+    <stat id="methane" name="{1001,11412}" default="0" dynamic="true" icon="terraforming_methane" inactivetext="{1001,3831}">
+      <!--none (not displayed)-->
+      <range end="0" state="0" r="0" g="0" b="0"/>
+      <!--comfortably low: green-->
+      <range end="1" state="1" r="0" g="255" b="0" description="{1001,11413}"/>
+      <!--uncomfortably high: yellow-->
+      <range end="6" state="2" r="255" g="255" b="0" description="{1001,11413}"/>
+    </stat>
+    <stat id="carbondioxide" name="{1001,11414}" default="0" dynamic="true" icon="terraforming_carbondioxide" inactivetext="{1001,3832}">
+      <!--none (not displayed)-->
+      <range end="0" state="0" r="0" g="0" b="0"/>
+      <!--low: yellow-->
+      <range end="1" state="1" r="255" g="255" b="0" description="{1001,11415}"/>
+      <!--too high: red-->
+      <range end="6" state="2" habitable="false" r="255" g="0" b="0" description="{1001,11415}"/>
+    </stat>
+    <stat id="humidity" name="{1001,11416}" default="5" icon="terraforming_humidity" inactivetext="{1001,3833}">
+      <!--very dry: red-->
+      <range end="3" state="0" r="255" g="0" b="0" description="{1001,11417}"/>
+      <!--somewhat arid: yellow-->
+      <range end="4" state="1" r="255" g="255" b="0" description="{1001,11417}"/>
+      <!--comfortably humid: green (no such thing as too humid for this feature)-->
+      <range end="6" state="2" r="0" g="255" b="0" description="{1001,11417}"/>
+    </stat>
+    <stat id="seismicactivity" name="{1001,11418}" default="0" dynamic="true" icon="terraforming_seismicactivity" inactivetext="{1001,3834}">
+      <!--none (not displayed)-->
+      <range end="0" state="0" r="0" g="0" b="0"/>
+      <!--manageable: yellow-->
+      <range end="1" state="1" r="255" g="255" b="0" description="{1001,11421}"/>
+      <!--significant: orange-->
+      <range end="2" state="2" r="255" g="127" b="0" description="{1001,11420}"/>
+      <!--severe: red-->
+      <range end="3" state="3" r="255" g="0" b="0" description="{1001,11419}"/>
+    </stat>
+    <stat id="toxicity" name="{1001,11449}" default="0" dynamic="true" icon="terraforming_toxicity" inactivetext="{1001,3835}">
+      <!--none (not displayed)-->
+      <range end="0" state="0" r="0" g="0" b="0"/>
+      <!--any: red-->
+      <range end="3" state="1" habitable="false" r="255" g="0" b="0" description="{1001,11450}"/>
+    </stat>
+    <stat id="radioactivity" name="{1001,11451}" default="0" dynamic="true" icon="terraforming_radioactivity" inactivetext="{1001,3836}">
+      <!--none (not displayed)-->
+      <range end="0" state="0" r="0" g="0" b="0"/>
+      <!--any: red-->
+      <range end="3" state="1" habitable="false" r="255" g="0" b="0" description="{1001,11452}"/>
+    </stat>
+    <stat id="population" name="{1001,11453}" default="0" dynamic="true" icon="terraforming_population" inactivetext="{1001,3837}"/>
+    <stat id="trainee_group" name="{20208,20503}" default="0" dynamic="true" icon="terraforming_population"/>
+    <stat id="trainee_individual" name="{20208,20603}" default="0" dynamic="true" icon="terraforming_population"/>
+    <stat id="xenon_alertness" name="{1001,11426}" default="0" icon="terraforming_xen_alert" inactivetext="{1001,3838}">
+      <!--aware: green-->
+      <range end="2" state="1" r="0" g="255" b="0" description="{1001,11427}"/>
+      <!--suspicious: yellow-->
+      <range end="4" state="2" r="255" g="255" b="0" description="{1001,11427}"/>
+      <!--high alert: red-->
+      <range end="6" state="3" r="255" g="0" b="0" description="{1001,11427}"/>
+    </stat>
+    <stat id="xenon_production" name="{1001,11428}" default="0" icon="terraforming_xen_production" inactivetext="{1001,3839}">
+      <!--linear scale, works a bit different from the other stats-->
+      <range end="10" state="0" r="255" g="0" b="0" description="{1001,11429}"/>
+    </stat>
+    <stat id="salinity" name="{1001,11454}" default="0" icon="terraforming_salinity" inactivetext="{1001,11455}">
+      <!--fresh: white-->
+      <range end="0" state="0" habitable="false" r="255" g="255" b="255" description="{1001,11456}"/>
+      <!--brackish: light blue-->
+      <range end="1" state="1" r="102" g="204" b="204" description="{1001,11457}"/>
+      <!--saline: green-->
+      <range end="2" state="2" r="0" g="255" b="0" description="{1001,11458}"/>
+      <!--briny: orange-->
+      <range end="3" state="3" r="255" g="127" b="0" description="{1001,11459}"/>
+    </stat>
+  </stats>
+  <projectgroups>
+    <projectgroup id="events" name="{1001,11471}"/>
+    <projectgroup id="special" name="{1001,11472}"/>
+    <projectgroup id="power" name="{1001,11473}"/>
+    <projectgroup id="industry" name="{1001,11474}"/>
+    <projectgroup id="cleanup" name="{1001,11475}"/>
+    <projectgroup id="water" name="{1001,11476}"/>
+    <projectgroup id="atmosphere" name="{1001,11477}"/>
+    <projectgroup id="biosphere" name="{1001,11478}"/>
+    <projectgroup id="food_staple" name="{1001,11479}"/>
+    <projectgroup id="food_luxury" name="{1001,11480}"/>
+    <projectgroup id="housing" name="{1001,11481}"/>
+    <projectgroup id="amenities" name="{1001,11482}"/>
+    <projectgroup id="economy" name="{1001,11483}"/>
+    <projectgroup id="training" name="{1001,11484}"/>
+    <projectgroup id="xenon" name="{1001,11485}"/>
+  </projectgroups>
+  <projects>
+    <!-- Projects affecting temperature -->
+    <project id="tmp_cloudparticles" group="water" name="{20227,1010}" description="{20227,1011}" duration="600" repeatcooldown="0" resilient="true" version="3">
+      <effects>
+        <effect stat="temperature" change="-1" min="5"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="graphene" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="85" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="450" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="tmp_moholes" group="special" name="{20227,1020}" description="{20227,1021}" duration="600">
+      <effects>
+        <effect stat="temperature" change="2"/>
+        <effect stat="seismicactivity" change="1"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="hullparts" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="45" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="220" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="tmp_blackdust" group="special" name="{20227,1030}" description="{20227,1031}" duration="600" repeatcooldown="0" resilient="true" version="2">
+      <effects>
+        <effect stat="temperature" change="1" max="5"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="graphene" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="85" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="430" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Projects involving water -->
+    <project id="wat_import" group="water" name="{20227,1060}" description="{20227,1061}" repeatcooldown="0" resilient="true" version="1">
+      <effects>
+        <effect stat="temperature" change="-1" min="6"/>
+        <effect stat="humidity" change="1"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="ice" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="200" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="1000" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="wat_irrigation" group="water" name="{20227,1070}" description="{20227,1071}">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+      </conditions>
+      <effects>
+        <effect stat="humidity" change="1"/>
+      </effects>
+      <resources price="75000000">
+        <ware ware="hullparts" amount="1"/>
+        <ware ware="ice" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="100" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="500" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Projects affecting the atmosphere -->
+    <project id="atm_methane_import" group="atmosphere" name="{20227,1090}" description="{20227,1091}" repeatcooldown="0" resilient="true" version="1">
+      <effects>
+        <effect stat="methane" change="1"/>
+      </effects>
+      <resources price="10000000">
+        <ware ware="methane" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="10" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="50" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="atm_methane_oxidizers" group="cleanup" name="{20227,1100}" description="{20227,1101}">
+      <conditions>
+        <condition stat="methane" min="1"/>
+      </conditions>
+      <resources price="500000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="microchips" amount="2"/>
+        <ware ware="refinedmetals" amount="13"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="200" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="900" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="atm_methane_oxidize" group="cleanup" name="{20227,1102}" duration="60" repeatcooldown="0" resilient="true" version="1">
+      <conditions>
+        <condition stat="methane" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="methane" change="-1"/>
+        <effect stat="carbondioxide" change="1"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="energycells" amount="133"/>
+        <ware ware="graphene" amount="13"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="65" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="300" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="atm_carbon_mineralizers" group="cleanup" name="{20227,1110}" description="{20227,1111}">
+      <conditions>
+        <condition stat="carbondioxide" min="1"/>
+      </conditions>
+      <resources price="500000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="refinedmetals" amount="13"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="200" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="900" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="atm_carbon_mineralize" group="cleanup" name="{20227,1112}" duration="60" repeatcooldown="0" resilient="true" version="1">
+      <conditions>
+        <condition stat="carbondioxide" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="carbondioxide" change="-1"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="advancedcomposites" amount="4"/>
+        <ware ware="energycells" amount="133"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="50" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="200" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="atm_toxin_cleanup" group="cleanup" name="{20227,1132}" description="{20227,1133}" repeatcooldown="0" duration="600">
+      <effects>
+        <effect stat="toxicity" change="-1"/>
+      </effects>
+      <resources price="10000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="shieldcomponents" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="3" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="15" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="atm_nitrogen_fix" group="atmosphere" name="{20227,1670}" description="{20227,1671}" repeatcooldown="0" duration="600">
+      <conditions>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="airpressure" change="-1"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="hydrogen" amount="100"/>
+        <ware ware="energycells" amount="10"/>
+        <ware ware="hullparts" amount="1"/>
+        <ware ware="microchips" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="25" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="atm_helium_import" group="atmosphere" name="{20227,1680}" description="{20227,1681}" repeatcooldown="0" resilient="true" version="1">
+      <effects>
+        <effect stat="airpressure" change="1"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="helium" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="25" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Special terraforming projects -->
+    <project id="ter_volcanocaps" group="special" name="{20227,1140}" description="{20227,1141}">
+      <effects>
+        <effect stat="temperature" change="-2"/>
+        <effect stat="seismicactivity" change="-2"/>
+      </effects>
+      <resources price="1500000000">
+        <ware ware="advancedcomposites" amount="4"/>
+        <ware ware="claytronics" amount="4"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="hullparts" amount="8"/>
+        <ware ware="plasmaconductors" amount="1"/>
+        <ware ware="refinedmetals" amount="8"/>
+        <ware ware="scanningarrays" amount="3"/>
+        <ware ware="shieldcomponents" amount="3"/>
+        <ware ware="smartchips" amount="6"/>
+        <ware ware="superfluidcoolant" amount="15"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="500" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="2500" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ter_radioactive_cleanup" group="cleanup" name="{20227,1160}" description="{20227,1161}" repeatcooldown="0" duration="600">
+      <effects>
+        <effect stat="radioactivity" change="-1"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="scanningarrays" amount="2"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="35" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="175" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Events -->
+    <project id="evt_icemelt" group="events" name="{20227,3010}" description="{20227,3011}" duration="600">
+      <conditions>
+        <condition stat="temperature" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="airpressure" change="1"/>
+      </effects>
+    </project>
+    <project id="evt_quake_mild" group="events" name="{20227,3030}" description="{20227,3031}" duration="1800" repeatcooldown="0">
+      <conditions>
+        <condition stat="seismicactivity" min="1" max="1"/>
+      </conditions>
+      <sideeffects>
+        <sideeffect setback="20" chance="10"/>
+      </sideeffects>
+    </project>
+    <project id="evt_quake_moderate" group="events" name="{20227,3030}" description="{20227,3031}" duration="1800" repeatcooldown="0">
+      <conditions>
+        <condition stat="seismicactivity" min="2" max="2"/>
+      </conditions>
+      <sideeffects>
+        <sideeffect setback="20" chance="20"/>
+      </sideeffects>
+    </project>
+    <project id="evt_quake_severe" group="events" name="{20227,3030}" description="{20227,3031}" duration="1800" repeatcooldown="0">
+      <conditions>
+        <condition stat="seismicactivity" min="3"/>
+      </conditions>
+      <sideeffects>
+        <sideeffect setback="20" chance="30"/>
+        <sideeffect setback="75" chance="5"/>
+      </sideeffects>
+    </project>
+    <project id="evt_globalwarming_co2" group="events" name="{20227,3020}" description="{20227,3021}" duration="3600" repeatcooldown="0">
+      <conditions>
+        <condition stat="carbondioxide" min="1"/>
+        <condition stat="methane" max="0"/>
+        <condition stat="temperature" maxvalue="5"/>
+      </conditions>
+      <effects>
+        <effect stat="temperature" change="1" max="6"/>
+      </effects>
+    </project>
+    <project id="evt_globalwarming_methane" group="events" name="{20227,3020}" description="{20227,3021}" duration="60" repeatcooldown="0">
+      <conditions>
+        <condition stat="methane" min="1"/>
+        <condition stat="temperature" maxvalue="5"/>
+      </conditions>
+      <effects>
+        <effect stat="temperature" change="1" max="6"/>
+      </effects>
+    </project>
+    <!-- Projects affecting the biosphere -->
+    <project id="bio_tailored" group="biosphere" name="{20227,1170}" description="{20227,1171}" duration="600">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <resources price="100000000">
+        <ware ware="energycells" amount="133"/>
+        <ware ware="medicalsupplies" amount="33"/>
+        <ware ware="methane" amount="40"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="60" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="300" buildduration="15"/>
+      </deliveries>
+      <removedprojects>
+        <project id="bio_jumpstart"/>
+      </removedprojects>
+    </project>
+    <project id="bio_jumpstart" group="biosphere" name="{20227,1180}" description="{20227,1181}" duration="300" chance="25">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <sideeffects>
+        <sideeffect project="bio_cull" text="{1001,11431}" chance="25" beneficial="false"/>
+      </sideeffects>
+      <resources price="20000000">
+        <ware ware="methane" amount="40"/>
+        <ware ware="spices" amount="100"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+      <removedprojects>
+        <project id="bio_tailored"/>
+      </removedprojects>
+    </project>
+    <project id="bio_cull" group="biosphere" name="{20227,1190}" description="{20227,1191}" duration="600">
+      <resources price="50000000">
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="10" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="50" buildduration="15"/>
+      </deliveries>
+      <blockedprojects>
+        <project id="agr_fertilize"/>
+      </blockedprojects>
+    </project>
+    <project id="bio_cyanobacteria" group="biosphere" name="{20227,1200}" description="{20227,1201}" duration="600">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="2"/>
+      </effects>
+      <resources price="200000000">
+        <ware ware="energycells" amount="133"/>
+        <ware ware="medicalsupplies" amount="33"/>
+        <ware ware="methane" amount="40"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="100" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="500" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="bio_toxicfruit_genemod" group="biosphere" name="{20227,1210}" description="{20227,1211}" duration="1200">
+      <resources price="25000000">
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="30" buildduration="15"/>
+      </deliveries>
+      <removedprojects>
+        <project id="bio_toxicfruit_cull"/>
+      </removedprojects>
+      <blockedprojects>
+        <project id="atm_toxin_cleanup"/>
+      </blockedprojects>
+    </project>
+    <project id="bio_toxicfruit_cull" group="biosphere" name="{20227,1220}" description="{20227,1221}" duration="600">
+      <sideeffects>
+        <sideeffect project="bio_parasites_cull" text="{1001,11432}" chance="25" beneficial="false"/>
+      </sideeffects>
+      <resources price="15000000">
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="3" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="15" buildduration="15"/>
+      </deliveries>
+      <removedprojects>
+        <project id="bio_toxicfruit_genemod"/>
+      </removedprojects>
+      <blockedprojects>
+        <project id="atm_toxin_cleanup"/>
+      </blockedprojects>
+    </project>
+    <project id="bio_parasites_cull" group="biosphere" name="{20227,1230}" description="{20227,1231}" duration="600">
+      <resources price="25000000">
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="30" buildduration="15"/>
+      </deliveries>
+      <blockedgroups>
+        <group id="food_staple"/>
+        <group id="food_luxury"/>
+      </blockedgroups>
+    </project>
+    <project id="bio_reintroduce" group="biosphere" name="{20227,1240}" description="{20227,1241}" duration="1200">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="2"/>
+      </effects>
+      <rebates>
+        <rebate ware="sunriseflowers" value="100"/>
+        <rebate ware="swampplant" value="100"/>
+      </rebates>
+      <resources price="10000000">
+        <ware ware="methane" amount="40"/>
+        <ware ware="sunriseflowers" amount="25"/>
+        <ware ware="swampplant" amount="24"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="7" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="35" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Projects for power generation -->
+    <project id="pwr_geothermal" group="power" name="{20227,1250}" description="{20227,1251}">
+      <rebates>
+        <rebate waregroup="energy" value="50"/>
+      </rebates>
+      <resources price="10000000">
+        <ware ware="advancedcomposites" amount="10"/>
+        <ware ware="hullparts" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="25" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="pwr_wind" group="power" name="{20227,1260}" description="{20227,1261}">
+      <rebates>
+        <rebate waregroup="energy" value="50"/>
+      </rebates>
+      <resources price="10000000">
+        <ware ware="advancedcomposites" amount="1"/>
+        <ware ware="hullparts" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="25" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="pwr_antimatter" group="power" name="{20227,1270}" description="{20227,1271}">
+      <rebates>
+        <rebate waregroup="energy" value="50"/>
+      </rebates>
+      <resources price="50000000">
+        <ware ware="advancedcomposites" amount="4"/>
+        <ware ware="antimatterconverters" amount="6"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="scanningarrays" amount="2"/>
+        <ware ware="superfluidcoolant" amount="13"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="25" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Industrial projects -->
+    <project id="ind_refineries_clean" group="industry" name="{20227,1280}" description="{20227,1281}">
+      <rebates>
+        <rebate waregroup="minerals" value="10"/>
+        <rebate waregroup="refined" value="10"/>
+      </rebates>
+      <resources price="25000000">
+        <ware ware="claytronics" amount="2"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="smartchips" amount="33"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="7" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="35" buildduration="15"/>
+      </deliveries>
+      <removedprojects>
+        <project id="ind_refineries_cheap"/>
+      </removedprojects>
+    </project>
+    <project id="ind_refineries_cheap" group="industry" name="{20227,1290}" description="{20227,1291}">
+      <sideeffects>
+        <sideeffect stat="toxicity" change="1" chance="25" project="ind_refineries_retrofit"/>
+      </sideeffects>
+      <rebates>
+        <rebate waregroup="minerals" value="10"/>
+        <rebate waregroup="refined" value="10"/>
+      </rebates>
+      <resources price="15000000">
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="smartchips" amount="33"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="6" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="30" buildduration="15"/>
+      </deliveries>
+      <removedprojects>
+        <project id="ind_refineries_clean"/>
+      </removedprojects>
+    </project>
+    <project id="ind_refineries_retrofit" group="industry" name="{20227,1300}" description="{20227,1301}">
+      <resources price="10000000">
+        <ware ware="claytronics" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="5" buildduration="15"/>
+      </deliveries>
+      <blockedprojects>
+        <project id="atm_toxin_cleanup"/>
+      </blockedprojects>
+    </project>
+    <project id="ind_factories" group="industry" name="{20227,1310}" description="{20227,1311}" version="1">
+      <rebates>
+        <rebate waregroup="hightech" value="10"/>
+        <rebate waregroup="shiptech" value="10"/>
+      </rebates>
+      <resources price="25000000">
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="smartchips" amount="33"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="10" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="50" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Agricultural projects -->
+    <project id="agr_hydroponics" group="food_staple" name="{20227,1330}" description="{20227,1331}">
+      <resources price="200000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="medicalsupplies" amount="33"/>
+        <ware ware="smartchips" amount="33"/>
+        <ware ware="spices" amount="100"/>
+        <ware ware="water" amount="40"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="100" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="550" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_fertilize" group="biosphere" name="{20227,1340}" description="{20227,1341}" duration="1200">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <resources price="100000000">
+        <ware ware="medicalsupplies" amount="33"/>
+        <ware ware="methane" amount="40"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="60" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="300" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_forestation" group="biosphere" name="{20227,1350}" description="{20227,1351}" duration="1200" version="1">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="2"/>
+        <effect stat="carbondioxide" change="-2"/>
+      </effects>
+      <resources price="50000000">
+        <ware ware="medicalsupplies" amount="33"/>
+        <ware ware="methane" amount="40"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="30" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="130" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_fields_wheat" group="food_staple" name="{20227,1360}" description="{20227,1361}" duration="600" version="1">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="1"/>
+        <effect stat="carbondioxide" change="-1"/>
+      </effects>
+      <rebates>
+        <rebate waregroup="food" value="10"/>
+      </rebates>
+      <resources price="25000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="wheat" amount="100"/>
+        <ware ware="methane" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_fields_sunrise" group="food_staple" name="{20227,1370}" description="{20227,1371}" duration="600" version="1">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="1"/>
+        <effect stat="carbondioxide" change="-1"/>
+      </effects>
+      <rebates>
+        <rebate waregroup="food" value="10"/>
+      </rebates>
+      <resources price="25000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="sunriseflowers" amount="100"/>
+        <ware ware="methane" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_fields_soja" group="food_staple" name="{20227,1380}" description="{20227,1381}" duration="600" version="1">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="1"/>
+        <effect stat="carbondioxide" change="-1"/>
+      </effects>
+      <rebates>
+        <rebate waregroup="food" value="10"/>
+      </rebates>
+      <resources price="25000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="sojabeans" amount="100"/>
+        <ware ware="methane" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_fields_spices" group="food_luxury" name="{20227,1640}" description="{20227,1641}" duration="600" version="1">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="1"/>
+        <effect stat="carbondioxide" change="-1"/>
+      </effects>
+      <resources price="25000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="spices" amount="100"/>
+        <ware ware="methane" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_vineyards" group="food_luxury" name="{20227,1650}" description="{20227,1651}" duration="600" version="1">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="1"/>
+        <condition stat="airpressure" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="1"/>
+        <effect stat="carbondioxide" change="-1"/>
+      </effects>
+      <resources price="5000000">
+        <ware ware="dronecomponents" amount="20"/>
+        <ware ware="methane" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="7" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Residential projects -->
+    <project id="res_bubblecity" group="housing" name="{20227,1400}" description="{20227,1401}" repeatcooldown="0">
+      <effects>
+        <effect stat="population" change="10000"/>
+      </effects>
+      <resources price="10000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="microchips" amount="2"/>
+        <ware ware="scanningarrays" amount="2"/>
+        <ware ware="water" amount="40"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="res_habmodule" group="housing" name="{20227,1410}" description="{20227,1411}" repeatcooldown="0">
+      <conditions>
+        <condition stat="airpressure" min="1"/>
+        <condition stat="oxygen" min="1"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+      </conditions>
+      <effects>
+        <effect stat="population" change="5000000"/>
+      </effects>
+      <resources price="5000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="advancedelectronics" amount="1"/>
+        <ware ware="hullparts" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="7" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="res_housing_dense" group="housing" name="{20227,1420}" description="{20227,1421}" repeatcooldown="0">
+      <conditions>
+        <condition stat="airpressure" min="1"/>
+        <condition stat="oxygen" min="1"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+      </conditions>
+      <effects>
+        <effect stat="population" change="15000000"/>
+      </effects>
+      <resources price="15000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="hullparts" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="4" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="res_arcology" group="housing" name="{20227,1430}" description="{20227,1431}" repeatcooldown="0">
+      <conditions>
+        <condition stat="airpressure" min="1"/>
+        <condition stat="oxygen" min="1"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+      </conditions>
+      <effects>
+        <effect stat="population" change="200000000"/>
+      </effects>
+      <resources price="200000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="advancedelectronics" amount="4"/>
+        <ware ware="hullparts" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="50" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="250" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="res_housing_luxury" group="housing" name="{20227,1440}" description="{20227,1441}" repeatcooldown="0">
+      <conditions>
+        <condition stat="airpressure" min="2"/>
+        <condition stat="oxygen" min="2"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="methane" max="0"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+      </conditions>
+      <effects>
+        <effect stat="population" change="100"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="advancedelectronics" amount="20"/>
+        <ware ware="hullparts" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Projects for crew training -->
+    <project id="trn_boarding" group="training" name="{20227,1450}" description="{20227,1451}">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="100000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="shieldcomponents" amount="10"/>
+        <ware ware="weaponcomponents" amount="7"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="35" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="180" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="trn_boarding_group" group="training" name="{20227,1460}" description="{20227,1461}" duration="1200" repeatcooldown="0" resilient="true" version="2">
+      <conditions>
+        <condition stat="trainee_group" minvalue="1"/>
+      </conditions>
+      <resources price="50000">
+        <ware ware="weaponcomponents" amount="10"/>
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+      </deliveries>
+    </project>
+    <project id="trn_boarding_single" group="training" name="{20227,1470}" description="{20227,1471}" duration="1200" repeatcooldown="0" resilient="true" version="2">
+      <conditions>
+        <condition stat="trainee_individual" minvalue="1"/>
+      </conditions>
+      <resources price="50000">
+        <ware ware="weaponcomponents" amount="10"/>
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="1" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="trn_boarding_competition" group="training" name="{20227,1480}" description="{20227,1481}" duration="300" repeatcooldown="36000" resilient="true" version="2">
+      <resources price="10000000">
+        <ware ware="weaponcomponents" amount="10"/>
+        <ware ware="medicalsupplies" amount="1"/>
+        <ware ware="nividium" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+      </deliveries>
+    </project>
+    <project id="trn_pilot" group="training" name="{20227,1490}" description="{20227,1491}" version="2">
+      <conditions>
+        <condition stat="airpressure" minvalue="5"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="100000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="shieldcomponents" amount="10"/>
+        <ware ware="weaponcomponents" amount="7"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="35" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="180" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="trn_pilot_canyons" group="training" name="{20227,1490}" description="{20227,1492}">
+      <resources price="10000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="shieldcomponents" amount="10"/>
+        <ware ware="weaponcomponents" amount="7"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="3" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="18" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="trn_pilot_group" group="training" name="{20227,1500}" description="{20227,1501}" duration="1200" repeatcooldown="0" resilient="true" version="2">
+      <conditions>
+        <condition stat="trainee_group" minvalue="1"/>
+      </conditions>
+      <resources price="50000">
+        <ware ware="hullparts" amount="5"/>
+        <ware ware="engineparts" amount="5"/>
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+      </deliveries>
+    </project>
+    <project id="trn_pilot_single" group="training" name="{20227,1510}" description="{20227,1511}" duration="1200" repeatcooldown="0" resilient="true" version="2">
+      <conditions>
+        <condition stat="trainee_individual" minvalue="1"/>
+      </conditions>
+      <resources price="50000">
+        <ware ware="hullparts" amount="5"/>
+        <ware ware="engineparts" amount="5"/>
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="1" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="trn_pilot_competition" group="training" name="{20227,1520}" description="{20227,1521}" duration="300" repeatcooldown="36000" resilient="true" version="2">
+      <resources price="10000000">
+        <ware ware="hullparts" amount="5"/>
+        <ware ware="engineparts" amount="5"/>
+        <ware ware="medicalsupplies" amount="1"/>
+        <ware ware="nividium" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+      </deliveries>
+    </project>
+    <!-- Pojects providing amenities -->
+    <project id="ame_themepark" group="amenities" name="{20227,1530}" description="{20227,1531}" version="1">
+      <conditions>
+        <condition stat="airpressure" min="2"/>
+        <condition stat="oxygen" min="2"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="50000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="microchips" amount="2"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="15" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="75" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ame_zoo" group="amenities" name="{20227,1540}" description="{20227,1541}">
+      <conditions>
+        <condition stat="airpressure" min="2"/>
+        <condition stat="oxygen" min="2"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="methane" max="0"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="50000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="refinedmetals" amount="13"/>
+        <ware ware="scanningarrays" amount="2"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ame_venues" group="amenities" name="{20227,1550}" description="{20227,1551}">
+      <conditions>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="50000000">
+        <ware ware="advancedelectronics" amount="10"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="1"/>
+        <ware ware="microchips" amount="9"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="12" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="60" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ame_resort_tropical" group="amenities" name="{20227,1560}" description="{20227,1561}">
+      <conditions>
+        <condition stat="humidity" min="2"/>
+        <condition stat="oxygen" min="2"/>
+        <condition stat="temperature" min="2" max="3"/>
+        <condition stat="methane" max="0"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="50000000">
+        <ware ware="advancedelectronics" amount="10"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="3"/>
+        <ware ware="microchips" amount="9"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="12" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="60" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ame_resort_winter" group="amenities" name="{20227,1570}" description="{20227,1571}">
+      <conditions>
+        <condition stat="airpressure" min="2"/>
+        <condition stat="oxygen" min="2"/>
+        <condition stat="temperature" min="1" max="2"/>
+        <condition stat="methane" max="0"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="50000000">
+        <ware ware="advancedelectronics" amount="10"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="3"/>
+        <ware ware="microchips" amount="9"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="12" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="60" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ame_finedining" group="amenities" name="{20227,1580}" description="{20227,1581}">
+      <conditions>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="25000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="4"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="7" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="35" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ame_temple" group="amenities" name="{20227,1590}" description="{20227,1591}">
+      <conditions>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="50000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="15" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="80" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ame_art_college" group="amenities" name="{20227,1660}" description="{20227,1661}">
+      <conditions>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="50000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="4"/>
+        <ware ware="teladianium" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="18" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="90" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!-- Projects providing economic payout -->
+    <project id="eco_clinic" group="economy" name="{20227,1600}" description="{20227,1601}">
+      <conditions>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <rebates>
+        <rebate waregroup="pharmaceutical" value="10"/>
+      </rebates>
+      <resources price="10000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="smartchips" amount="33"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="3" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="15" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="eco_clinic_supply" group="economy" name="{20227,1602}" description="{20227,1603}" repeatcooldown="1800" resilient="true" version="1">
+      <resources price="500000" pricescale="population" payout="150">
+        <ware ware="medicalsupplies" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+      </deliveries>
+    </project>
+    <project id="eco_campus" group="economy" name="{20227,1610}" description="{20227,1611}">
+      <conditions>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="10000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="scanningarrays" amount="2"/>
+        <ware ware="superfluidcoolant" amount="13"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="4" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="eco_campus_supply" group="economy" name="{20227,1612}" description="{20227,1613}" repeatcooldown="7200" resilient="true" version="1">
+      <resources price="2000000" payout="250" minwares="2" maxwares="3">
+        <ware ware="advancedcomposites" amount="4"/>
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="antimattercells" amount="10"/>
+        <ware ware="antimatterconverters" amount="6"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="engineparts" amount="11"/>
+        <ware ware="fieldcoils" amount="5"/>
+        <ware ware="foodrations" amount="100"/>
+        <ware ware="graphene" amount="13"/>
+        <ware ware="helium" amount="40"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="hydrogen" amount="40"/>
+        <ware ware="ice" amount="67"/>
+        <ware ware="majadust" amount="10"/>
+        <ware ware="majasnails" amount="33"/>
+        <ware ware="meat" amount="40"/>
+        <ware ware="medicalsupplies" amount="33"/>
+        <ware ware="methane" amount="40"/>
+        <ware ware="microchips" amount="2"/>
+        <ware ware="missilecomponents" amount="200"/>
+        <ware ware="nividium" amount="4"/>
+        <ware ware="nostropoil" amount="67"/>
+        <ware ware="ore" amount="40"/>
+        <ware ware="plasmaconductors" amount="2"/>
+        <ware ware="quantumtubes" amount="7"/>
+        <ware ware="refinedmetals" amount="13"/>
+        <ware ware="scanningarrays" amount="2"/>
+        <ware ware="shieldcomponents" amount="10"/>
+        <ware ware="silicon" amount="15"/>
+        <ware ware="siliconwafers" amount="7"/>
+        <ware ware="smartchips" amount="33"/>
+        <ware ware="sojabeans" amount="29"/>
+        <ware ware="sojahusk" amount="67"/>
+        <ware ware="spacefuel" amount="15"/>
+        <ware ware="spaceweed" amount="13"/>
+        <ware ware="spices" amount="100"/>
+        <ware ware="sunriseflowers" amount="25"/>
+        <ware ware="superfluidcoolant" amount="13"/>
+        <ware ware="swampplant" amount="24"/>
+        <ware ware="teladianium" amount="10"/>
+        <ware ware="water" amount="40"/>
+        <ware ware="weaponcomponents" amount="7"/>
+        <ware ware="wheat" amount="7"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+      </deliveries>
+    </project>
+    <project id="eco_bank" group="economy" name="{20227,1620}" description="{20227,1621}">
+      <conditions>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="10000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="smartchips" amount="33"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="3" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="16" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="eco_bank_supply" group="economy" name="{20227,1622}" description="{20227,1623}" duration="1800" repeatcooldown="600" chance="10" resilient="true" version="2">
+      <resources price="0.1" payout="1500" pricescale="playeraccount" maxprice="100000000000"/>
+    </project>
+    <project id="eco_nividium" group="economy" name="{20227,1630}" description="{20227,1631}">
+      <conditions>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="10000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="10"/>
+        <ware ware="nividium" amount="4"/>
+        <ware ware="plasmaconductors" amount="2"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="3" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="15" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="eco_nividium_supply" group="economy" name="{20227,1632}" description="{20227,1633}" repeatcooldown="3600" resilient="true" version="1">
+      <resources price="1000000" payout="150" pricescale="population">
+        <ware ware="nividium" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="1" buildduration="30"/>
+      </deliveries>
+    </project>
+    <!-- Projects for liberating Xenon planets -->
+    <project id="xen_dis_claim" group="xenon" name="{20227,2010}" description="{20227,2011}">
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="xen_dis_destroy" group="xenon" name="{20227,2020}" description="{20227,2021}">
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <!--Note: the following should be set by MD according to the current state:
+    {20227,2030} 'Under Xenon control'
+    {20227,2031} 'Xenon drones regularly patrol this district, preventing us from passing through it.'
+    {20227,2040} 'Liberated'
+    {20227,2041} 'The Xenon presence has been curbed for the time being, making it safe to pass through.'
+    {20227,2050} 'Destroyed'
+    {20227,2051} 'Without anything to protect, the Xenon are ignoring this ruined district for the time being, making it safe to pass through.'
+    -->
+    <project id="xen_dis_hab" group="xenon" name="{20227,2060}" description="{20227,2061}">
+    </project>
+    <project id="xen_dis_com" group="xenon" name="{20227,2070}" description="{20227,2071}">
+    </project>
+    <project id="xen_dis_farm" group="xenon" name="{20227,2080}" description="{20227,2081}">
+    </project>
+    <project id="xen_dis_admin" group="xenon" name="{20227,2090}" description="{20227,2091}">
+    </project>
+    <project id="xen_dis_ind" group="xenon" name="{20227,2100}" description="{20227,2101}">
+    </project>
+    <project id="xen_dis_rec" group="xenon" name="{20227,2110}" description="{20227,2111}">
+    </project>
+    <project id="xen_core_subvert" group="xenon" name="{20227,2120}" description="{20227,2121}">
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="xen_reactor_detonate" group="xenon" name="{20227,2130}" description="{20227,2131}">
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="evt_xen_reclaim" group="xenon" name="{20227,2140}" description="{20227,2141}">
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="evt_xen_rebuild" group="xenon" name="{20227,2150}" description="{20227,2151}">
+    </project>
+    <project id="xen_drones_emp" group="xenon" name="{20227,2160}" description="{20227,2161}">
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="xen_drones_bombard_reclaim" group="xenon" name="{20227,2170}" description="{20227,2171} {20227,2172}">
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="xen_drones_bombard_rebuild" group="xenon" name="{20227,2170}" description="{20227,2171} {20227,2173}">
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_fields_scruffin" group="food_staple" name="{20227,1390}" description="{20227,1391}" duration="600">
+      <effects>
+        <effect stat="oxygen" change="1"/>
+      </effects>
+      <rebates>
+        <rebate waregroup="food" value="10"/>
+      </rebates>
+      <resources price="25000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="scruffinfruits" amount="100"/>
+        <ware ware="methane" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="wat_surfacing" group="water" name="{20227,1080}" description="{20227,1081}" research="research_tf_tech">
+      <effects>
+        <effect stat="humidity" change="2"/>
+      </effects>
+      <resources price="175000000">
+        <ware ware="computronicsubstrate" amount="1"/>
+        <ware ware="metallicmicrolattice" amount="200"/>
+        <ware ware="siliconcarbide" amount="7"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_02_a_macro" amount="20" buildduration="90"/>
+        <ship macro="ship_gen_s_transdrone_container_02_a_macro" amount="100" buildduration="45"/>
+      </deliveries>
+    </project>
+    <project id="atm_outgassing" group="atmosphere" name="{20227,1120}" description="{20227,1121}" duration="1" research="research_tf_tech" version="1">
+      <conditions>
+        <condition stat="airpressure" min="0" max="1"/>
+      </conditions>
+      <effects>
+        <effect stat="airpressure" value="5"/>
+      </effects>
+      <resources price="100000000">
+        <ware ware="computronicsubstrate" amount="1"/>
+        <ware ware="metallicmicrolattice" amount="200"/>
+        <ware ware="siliconcarbide" amount="7"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_02_a_macro" amount="10" buildduration="90"/>
+        <ship macro="ship_gen_s_transdrone_container_02_a_macro" amount="60" buildduration="45"/>
+      </deliveries>
+    </project>
+    <project id="ter_tectonic_scaffolding" group="special" name="{20227,1150}" description="{20227,1151}" research="research_tf_tech">
+      <conditions>
+        <condition stat="seismicactivity" min="1"/>
+      </conditions>
+      <effects>
+        <effect stat="seismicactivity" value="0"/>
+      </effects>
+      <resources price="1000000000">
+        <ware ware="computronicsubstrate" amount="1"/>
+        <ware ware="metallicmicrolattice" amount="200"/>
+        <ware ware="siliconcarbide" amount="7"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_02_a_macro" amount="100" buildduration="90"/>
+        <ship macro="ship_gen_s_transdrone_container_02_a_macro" amount="500" buildduration="45"/>
+      </deliveries>
+    </project>
+    <project id="ind_von_neumann" group="industry" name="{20227,1320}" description="{20227,1321}" research="research_tf_tech" version="1">
+      <rebates>
+        <rebate waregroup="hightech" value="20"/>
+        <rebate waregroup="shiptech" value="20"/>
+      </rebates>
+      <resources price="250000000">
+        <ware ware="computronicsubstrate" amount="1"/>
+        <ware ware="metallicmicrolattice" amount="200"/>
+        <ware ware="siliconcarbide" amount="7"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_02_a_macro" amount="30" buildduration="90"/>
+        <ship macro="ship_gen_s_transdrone_container_02_a_macro" amount="150" buildduration="45"/>
+      </deliveries>
+    </project>
+    <project id="ter_jumpstart_currents" group="special" name="{20227,1690}" description="{20227,1691}" duration="600">
+      <conditions>
+        <condition stat="humidity" min="2"/>
+      </conditions>
+      <resources price="100000000">
+        <ware ware="dronecomponents" amount="20"/>
+        <ware ware="plankton" amount="10"/>
+        <ware ware="bogas" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="85" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="450" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="pwr_hydro" group="power" name="{20227,1700}" description="{20227,1701}">
+      <conditions>
+        <condition stat="humidity" min="1"/>
+      </conditions>
+      <rebates>
+        <rebate waregroup="energy" value="50"/>
+      </rebates>
+      <resources price="10000000">
+        <ware ware="advancedcomposites" amount="10"/>
+        <ware ware="hullparts" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="5" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="25" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="bio_reconstruct_genes" group="biosphere" name="{20227,1710}" description="{20227,1711}" duration="600">
+      <resources price="500000000"/>
+    </project>
+    <project id="bio_reintroduce_microbes" group="biosphere" name="{20227,1720}" description="{20227,1721}" duration="600">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="2"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="2"/>
+      </effects>
+      <resources price="50000000">
+        <ware ware="methane" amount="40"/>
+        <ware ware="plankton" amount="100"/>
+        <ware ware="bogas" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="7" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="35" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="bio_reintroduce_flora" group="biosphere" name="{20227,1730}" description="{20227,1731}" duration="600">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="2"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="2"/>
+      </effects>
+      <resources price="150000000">
+        <ware ware="methane" amount="40"/>
+        <ware ware="plankton" amount="100"/>
+        <ware ware="bogas" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="7" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="35" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="bio_reintroduce_fauna" group="biosphere" name="{20227,1740}" description="{20227,1741}" duration="600">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="2"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="2"/>
+      </effects>
+      <resources price="150000000">
+        <ware ware="methane" amount="40"/>
+        <ware ware="plankton" amount="100"/>
+        <ware ware="bogas" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="7" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="35" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="bio_reintroduce_megafauna" group="biosphere" name="{20227,1750}" description="{20227,1751}" duration="600">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="2"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="2"/>
+      </effects>
+      <resources price="250000000">
+        <ware ware="methane" amount="40"/>
+        <ware ware="plankton" amount="100"/>
+        <ware ware="bogas" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="7" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="35" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="agr_fields_plankton" group="food_staple" name="{20227,1760}" description="{20227,1761}">
+      <conditions>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="humidity" min="2"/>
+      </conditions>
+      <effects>
+        <effect stat="oxygen" change="1"/>
+        <effect stat="carbondioxide" change="-1"/>
+      </effects>
+      <rebates>
+        <rebate waregroup="food" value="10"/>
+      </rebates>
+      <resources price="25000000">
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="plankton" amount="100"/>
+        <ware ware="bogas" amount="1"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="res_housing_ocean" group="housing" name="{20227,1770}" description="{20227,1771}" repeatcooldown="0" version="1">
+      <conditions>
+        <condition stat="methane" min="1"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+      </conditions>
+      <effects>
+        <effect stat="population" change="5000000"/>
+      </effects>
+      <resources price="50000000">
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="advancedelectronics" amount="4"/>
+        <ware ware="hullparts" amount="10"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="4" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="20" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="ame_pheromone_art_academy" group="amenities" name="{20227,1780}" description="{20227,1781}">
+      <conditions>
+        <condition stat="methane" minvalue="1"/>
+        <condition stat="temperature" min="1" max="3"/>
+        <condition stat="toxicity" max="0"/>
+        <condition stat="radioactivity" max="0"/>
+        <condition stat="population" minvalue="10000"/>
+      </conditions>
+      <resources price="50000000">
+        <ware ware="advancedelectronics" amount="2"/>
+        <ware ware="claytronics" amount="1"/>
+        <ware ware="dronecomponents" amount="2"/>
+        <ware ware="energycells" amount="133"/>
+        <ware ware="hullparts" amount="4"/>
+        <ware ware="microchips" amount="2"/>
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="18" buildduration="30"/>
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="90" buildduration="15"/>
+      </deliveries>
+    </project>
+    <project id="evt_solidify_crust" group="events" name="{20227,3040}" description="{20227,3041}" duration="60" showalways="true" version="1">
+      <conditions>
+        <condition stat="temperature" maxvalue="7"/>
+        <condition stat="seismicactivity" min="2" max="2"/>
+      </conditions>
+      <effects>
+        <effect stat="seismicactivity" change="-1"/>
+        <effect stat="humidity" change="-2"/>
+      </effects>
+    </project>
+    <project id="evt_volcano_extinction" group="events" name="{20227,3050}" description="{20227,3051}" duration="60" showalways="true" version="1">
+      <conditions>
+        <condition stat="temperature" maxvalue="6"/>
+        <condition stat="seismicactivity" min="1" max="1"/>
+      </conditions>
+      <effects>
+        <effect stat="seismicactivity" change="-1"/>
+        <effect stat="humidity" change="-1"/>
+      </effects>
+    </project>
+    <project id="evt_salinization" group="events" name="{20227,3060}" description="{20227,3061}" duration="600">
+      <conditions>
+        <condition stat="salinity" max="2"/>
+        <condition stat="humidity" min="2"/>
+      </conditions>
+      <effects>
+        <effect stat="salinity" change="1"/>
+      </effects>
+    </project>
+  </projects>
+</terraforming>

@@ -2719,7 +2719,7 @@
     <t id="9654">Module de protection</t>
     <t id="9655">Facteur d'accélération \(Turbo\)</t>
     <t id="9656">Perturbe la régénération des boucliers de tailles L et XL</t>
-    <t id="9657">Unknown production method</t>
+    <t id="9657">Méthode de production inconnue</t>
     <t id="9700">(User question)</t>
     <t id="9701">Piratage</t>
     <t id="9702">Vous êtes sur le point de pirater</t>
@@ -3337,9 +3337,9 @@
     <t id="11692">Vous pouvez désormais utiliser des touches de modification pour donner des ordres mis en attente \(%s($INPUT_MODIFIER_ICON$)\) ou prioritaires \(%s($INPUT_MODIFIER_ICON$)\) directement depuis la carte ou le menu d'interaction. Par défaut, les ordres donnés aux vaisseaux sans utiliser ces touches écraseront désormais tout ordre précédemment mis en attente.</t>
     <t id="11693">Si vous préférez l'ancien comportement, vous pouvez changer le paramètre "Comportement d'ordre par défaut" dans le menu des Paramètres du jeu sur "Mettre en attente". Ainsi, appuyer sur %s($INPUT_MODIFIER_ICON$) tout en utilisant le menu d'interaction écrasera les ordres au lieu de l'ajouter à la file d'attente.</t>
     <t id="11694">Appuyez sur Oui si vous souhaitez essayer le nouveau comportement par défaut, ou sur Non si vous souhaitez conserver l'ancien comportement et utiliser %s($INPUT_MODIFIER_ICON$) pour écraser les ordres.</t>
-    <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
-    <t id="11697">Resource Probe coverage</t>
+    <t id="11695">Epave remorquable</t>
+    <t id="11696">Epave recyclable</t>
+    <t id="11697">Portée de la sonde de ressources</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Sauvegarde locale</t>

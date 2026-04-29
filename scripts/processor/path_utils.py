@@ -24,6 +24,7 @@ LIBRARY_FILES: Dict[str, str] = {
     "region_definitions": "region_definitions",
     "regionyields": "regionyields",
     "regionobjectgroups": "regionobjectgroups",
+    "terraforming": "terraforming",
 }
 
 

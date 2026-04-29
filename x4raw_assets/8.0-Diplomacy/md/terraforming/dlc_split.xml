@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//library[@name='SetupGeneralProjects_Biosphere']/actions">
+    <add_terraforming_project cluster="$Cluster" id="'agr_fields_scruffin'">
+      <predecessors>
+        <predecessor id="'agr_fertilize'"/>
+      </predecessors>
+    </add_terraforming_project>
+  </add>
+  <add sel="//cue[@name='Start']/cues">
+    <cue name="Terraforming_Xenon_EmperorsPride">
+      <conditions>
+        <event_cue_signalled/>
+      </conditions>
+      <actions>
+        <find_cluster name="$Cluster_EmperorsPride" macro="macro.cluster_424_macro"/>
+        <add_to_group groupname="$TerraformingClusters" object="$Cluster_EmperorsPride"/>
+        <append_to_list name="$OfferCues" exact="Terraforming_Xenon_EmperorsPride_CreateOffer"/>
+        <signal_cue cue="Refresh_Offers" check="false"/>
+        <initialise_terraforming cluster="$Cluster_EmperorsPride" partname="'part_earthlike'"/>
+        <!--Set initial stats-->
+        <set_terraforming_stat cluster="$Cluster_EmperorsPride" id="'xenon_alertness'" value="0"/>
+        <set_terraforming_stat cluster="$Cluster_EmperorsPride" id="'xenon_production'" value="0"/>
+        <!--Set up projects-->
+        <!--Create mission character-->
+      </actions>
+      <cues>
+        <cue name="Terraforming_Xenon_EmperorsPride_CreateOffer">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <debug_text text="'Creating offer for cue Terraforming_Xenon_EmperorsPride_CreateMission'" chance="$DebugChance"/>
+            <create_offer cue="Terraforming_Xenon_EmperorsPride_CreateMission" type="missiontype.think" actor="md.$PersistentCharacters.$BosoTa" difficulty="level.impossible" faction="faction.player" group="missiongroup.terraforming" name="{30501,1000}" description="{30501,1001}">
+              <briefing>
+                <objective step="1" action="objective.custom" customaction="{30501,2001}"/>
+              </briefing>
+            </create_offer>
+          </actions>
+        </cue>
+
+        <cue name="Terraforming_Xenon_EmperorsPride_CreateMission">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <debug_text text="'Creating mission for cue Terraforming_Xenon_EmperorsPride_CreateMission'" chance="$DebugChance"/>
+            <create_mission cue="Terraforming_Xenon_EmperorsPride_CreateMission" offercue="Terraforming_Xenon_EmperorsPride_CreateMission"/>
+            <!--TODO: check current state, mark objectives as complete when appropriate-->
+            <remove_offer cue="Terraforming_Xenon_EmperorsPride_CreateMission"/>
+            <set_value name="$AcceptedOfferCue" exact="Terraforming_Xenon_EmperorsPride_CreateOffer"/>
+            <do_if value="@$AbortMissionCue">
+              <signal_cue cue="$AbortMissionCue"/>
+            </do_if>
+            <set_value name="$AbortMissionCue" exact="Terraforming_Xenon_EmperorsPride_AbortMission"/>
+          </actions>
+          <cues>
+            <cue name="Terraforming_Xenon_EmperorsPride_AbortMission">
+              <conditions>
+                <event_cue_signalled/>
+              </conditions>
+              <actions>
+                <debug_text text="'Removing mission for cue Terraforming_Xenon_EmperorsPride_CreateMission'" chance="$DebugChance"/>
+                <remove_mission cue="Terraforming_Xenon_EmperorsPride_CreateMission"/>
+                <reset_cue cue="Terraforming_Xenon_EmperorsPride_CreateMission"/>
+                <reset_cue cue="Terraforming_Xenon_EmperorsPride_CreateOffer"/>
+                <signal_cue cue="Refresh_Offers"/>
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+      </cues>
+    </cue>
+  </add>
+
+  <add sel="//cue[@name='Terraforming_Boarding_Competition_Finished']/actions/do_all/do_any">
+    <get_character_definition macro="$Macro" faction="faction.split" tags="tag.marine"/>
+  </add>
+
+  <add sel="//cue[@name='Terraforming_Piloting_Competition_Finished']/actions/do_all/do_any">
+    <get_character_definition macro="$Macro" faction="faction.split" tags="tag.pilot"/>
+  </add>
+</diff>

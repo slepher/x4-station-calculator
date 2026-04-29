@@ -3338,7 +3338,7 @@
     <t id="11693">如果你更喜歡舊模式，可以在遊戲設定選單中將「預設指令行為」改為「佇列」，這樣在使用互動選單時按下%s($INPUT_MODIFIER_ICON$)就會覆蓋指令，而不是把它加入佇列中。</t>
     <t id="11694">按「是」以試用新的預設修飾鍵行為，按「否」保持舊行為，使用%s($INPUT_MODIFIER_ICON$)覆蓋指令。</t>
     <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
+    <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>

@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="/terraforming/projects">
+    <project id="wat_surfacing" group="water" name="{20227,1080}" description="{20227,1081}" research="research_tf_tech">
+      <effects>
+        <effect stat="humidity" change="2" />
+      </effects>
+      <resources price="175000000">
+        <ware ware="computronicsubstrate" amount="1" />
+        <ware ware="metallicmicrolattice" amount="200" />
+        <ware ware="siliconcarbide" amount="7" />
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_02_a_macro" amount="20" buildduration="90" />
+        <ship macro="ship_gen_s_transdrone_container_02_a_macro" amount="100" buildduration="45" />
+      </deliveries>
+    </project>
+    <project id="atm_outgassing" group="atmosphere" name="{20227,1120}" description="{20227,1121}" duration="1" research="research_tf_tech" version="1">
+      <conditions>
+        <condition stat="airpressure" min="0" max="1" />
+      </conditions>
+      <effects>
+        <effect stat="airpressure" value="5" />
+      </effects>
+      <resources price="100000000">
+        <ware ware="computronicsubstrate" amount="1" />
+        <ware ware="metallicmicrolattice" amount="200" />
+        <ware ware="siliconcarbide" amount="7" />
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_02_a_macro" amount="10" buildduration="90" />
+        <ship macro="ship_gen_s_transdrone_container_02_a_macro" amount="60" buildduration="45" />
+      </deliveries>
+    </project>
+    <project id="ter_tectonic_scaffolding" group="special" name="{20227,1150}" description="{20227,1151}" research="research_tf_tech">
+      <conditions>
+        <condition stat="seismicactivity" min="1" />
+      </conditions>
+      <effects>
+        <effect stat="seismicactivity" value="0" />
+      </effects>
+      <resources price="1000000000">
+        <ware ware="computronicsubstrate" amount="1" />
+        <ware ware="metallicmicrolattice" amount="200" />
+        <ware ware="siliconcarbide" amount="7" />
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_02_a_macro" amount="100" buildduration="90" />
+        <ship macro="ship_gen_s_transdrone_container_02_a_macro" amount="500" buildduration="45" />
+      </deliveries>
+    </project>
+    <project id="ind_von_neumann" group="industry" name="{20227,1320}" description="{20227,1321}" research="research_tf_tech" version="1">
+      <rebates>
+        <rebate waregroup="hightech" value="20" />
+        <rebate waregroup="shiptech" value="20" />
+      </rebates>
+      <resources price="250000000">
+        <ware ware="computronicsubstrate" amount="1" />
+        <ware ware="metallicmicrolattice" amount="200" />
+        <ware ware="siliconcarbide" amount="7" />
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_02_a_macro" amount="30" buildduration="90" />
+        <ship macro="ship_gen_s_transdrone_container_02_a_macro" amount="150" buildduration="45" />
+      </deliveries>
+    </project>
+  </add>
+</diff>

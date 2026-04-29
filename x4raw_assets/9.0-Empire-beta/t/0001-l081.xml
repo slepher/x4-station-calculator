@@ -3338,7 +3338,7 @@
     <t id="11693">従来の操作方法を継続する場合は、ゲーム設定メニューの「デフォルトの命令挙動」を「既存命令の後に追加」に変更してください。変更すると、インタラクトメニュー使用中に %s($INPUT_MODIFIER_ICON$) を押しているとき、命令は実行待ちリストに追加されず、既存のすべての実行待ち命令を上書きします。</t>
     <t id="11694">新しい修飾キーの操作を試すなら「はい」、従来の操作を継続するなら「いいえ」を押してください。従来の操作では、%s($INPUT_MODIFIER_ICON$) を使うことで命令を上書きできます。</t>
     <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
+    <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>

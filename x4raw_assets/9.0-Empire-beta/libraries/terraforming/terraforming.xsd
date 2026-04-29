@@ -1,0 +1,657 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" elementFormDefault="qualified">
+
+  <xs:include schemaLocation="common.xsd" />
+
+  <xs:simpleType name="idstring">
+    <xs:restriction base="xs:string">
+      <xs:pattern value="[a-zA-Z_][a-zA-Z0-9_]*" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:simpleType name="colorvalue">
+    <xs:restriction base="xs:integer">
+      <xs:minInclusive value="0" />
+      <xs:maxInclusive value="255" />
+    </xs:restriction>
+  </xs:simpleType>
+
+  <xs:complexType name="statrange">
+    <xs:annotation>
+      <xs:documentation>
+        TODO
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="end" type="xs:nonNegativeInteger" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The end index of this range
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="state" type="xs:nonNegativeInteger" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The state for this range, used in conditions
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="habitable" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          If set to false, this state means the world is not habitable (defaults to true)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="r" type="colorvalue" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Red color value (0-255, default: 0)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="g" type="colorvalue" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Green color value (0-255, default: 0)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="b" type="colorvalue" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Blue color value (0-255, default: 0)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Description (text reference)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="stat">
+    <xs:annotation>
+      <xs:documentation>
+        A stat relevant for terraforming
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="range" type="statrange" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="id" type="idstring" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Unique stat ID
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Name (text reference)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="icon" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Icon ID (see libraries/icons.xml)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="inactivetext" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Text for inactive stats (dynamic but not current)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="default" type="xs:nonNegativeInteger" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The assumed value if this stat has not been set.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="dynamic" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Whether this stat can dynamically be added by effects. If set to true, it starts at 0 when first changed, als will also be removed when it goes back down to 0. Defaults to false.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="shaderparam" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Shader parameter that will be modified based on this stat. Each stat can only change one parameter, and each parameter can only be affected by one stat.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="projectgroup">
+    <xs:annotation>
+      <xs:documentation>
+        A group of terraforming projects
+      </xs:documentation>
+    </xs:annotation>
+    <xs:attribute name="id" type="idstring" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Unique stat ID
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Name (text reference)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="condition">
+    <xs:attribute name="stat" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Stat ID
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          The minimum state of the stat. Ignored if minvalue is set. Defaults to no minimum.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          The maximum state of the stat. Ignored if maxvalue is set. Defaults to no maximum.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="minvalue" type="expression">
+      <xs:annotation>
+        <xs:documentation>
+          The minimum value of the stat. Defaults to no minimum.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="maxvalue" type="expression">
+      <xs:annotation>
+        <xs:documentation>
+          The maximum value of the stat. Defaults to no maximum.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="conditions">
+    <xs:annotation>
+      <xs:documentation>
+        Project conditions
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="condition" type="condition" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:attributeGroup name="effectattributes">
+    <xs:attribute name="text" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Override text (optional if a stat is defined)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="stat" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Either stat ID from list in this file, or "population"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="change" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          Stat change that will be applied
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="min" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          The minimum value of the stat after applying the change. Defaults to no minimum. Ignored if stat is "population"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="max" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          The maximum value of the stat after applying the change. Defaults to no maximum. Ignored if stat is "population"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          Stat value that will be set, used if change if 0. min/max do not apply. Ignored if stat is "population"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="onfail" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Whether this effect also happens on failure. Defaults to false. Ignored if stat is "population"
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="beneficial" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Whether this effect is beneficial. Defaults to true. Only required if it's not a stat change or a setback, in which case the code determines it.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:attributeGroup>
+
+  <xs:complexType name="effect">
+    <xs:attributeGroup ref="effectattributes" />
+  </xs:complexType>
+
+  <xs:complexType name="effects">
+    <xs:sequence>
+      <xs:element name="effect" type="effect" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="sideeffect">
+    <xs:attributeGroup ref="effectattributes" />
+    <xs:attribute name="project" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          ID of the project that blocks progress if this side-effect is triggered
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="setback" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>
+          Percentage of progress lost on current project if side-effect is triggered
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="chance" type="xs:integer" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The chance of this effect to occur in percent. Ignored if it only changes the "population" stat
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="sideeffects">
+    <xs:sequence>
+      <xs:element name="sideeffect" type="sideeffect" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="rebate">
+    <xs:attribute name="waregroup" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The ware group this rebate applies to (see waregroups.xml).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="ware" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The ware this rebate applies to (see wares.xml).
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="value" type="xs:integer" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          The rebate amount in percent.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="rebates">
+    <xs:sequence>
+      <xs:element name="rebate" type="rebate" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="wareamount">
+    <xs:attribute name="ware" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Ware ID
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="amount" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>
+          Amount. Defaults to 1.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="resources">
+    <xs:annotation>
+      <xs:documentation>
+        Required resources. The amounts will be scaled, using the average prices, to reach the defined total price. If no resource wares are given this is a direct payment instead.
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ware" type="wareamount" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+    <xs:attribute name="price" type="xs:float" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Total cost / cost factor (depending on price scale)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="pricescale" type="terraformingpricescalelookup">
+      <xs:annotation>
+        <xs:documentation>
+          Whether and how the price should scale. Defaults to 'absolute'.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="payout" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>
+          The payout of this project upon successful completion, as a percentage of the price. Defaults to 0.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="maxprice" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>
+          The maximum price, applied after pricescale. Defaults to no maximum.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="minwares" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>
+          The minimum amount of wares to randomly choose from the list. Defaults to the total amount.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="maxwares" type="xs:nonNegativeInteger">
+      <xs:annotation>
+        <xs:documentation>
+          The maximum amount of wares to randomly choose from the list. Defaults to the total amount.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="macroamount">
+    <xs:attribute name="macro" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Ship macro
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="amount" type="xs:nonNegativeInteger" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Amount
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="buildduration" type="xs:float">
+      <xs:annotation>
+        <xs:documentation>
+          Build duration override per ship
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="deliveries">
+    <xs:annotation>
+      <xs:documentation>
+        Ships to be built for delivery of resources
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="ship" type="macroamount" minOccurs="1" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="removedprojects">
+    <xs:annotation>
+      <xs:documentation>
+        Projects that will be removed when this one is successful (usually used for mutually exclusive choices)
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="project" minOccurs="1" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                ID of the project to remove when this one completes successfully.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="blockedprojects">
+    <xs:annotation>
+      <xs:documentation>
+        Projects that will be blocked until this project is successful
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="project" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                ID of the project to block until this one completes successfully.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="blockedgroups">
+    <xs:annotation>
+      <xs:documentation>
+        Groups that will be blocked until this project is successful
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="group" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:attribute name="id" type="xs:string">
+            <xs:annotation>
+              <xs:documentation>
+                ID of the project group to block until this one completes successfully.
+              </xs:documentation>
+            </xs:annotation>
+          </xs:attribute>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="project">
+    <xs:annotation>
+      <xs:documentation>
+        A potential terraforming project
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="conditions" type="conditions" minOccurs="0" maxOccurs="1" />
+      <xs:element name="effects" type="effects" minOccurs="0" maxOccurs="1" />
+      <xs:element name="sideeffects" type="sideeffects" minOccurs="0" maxOccurs="1" />
+      <xs:element name="rebates" type="rebates" minOccurs="0" maxOccurs="1" />
+      <xs:element name="resources" type="resources" minOccurs="0" maxOccurs="1" />
+      <xs:element name="deliveries" type="deliveries" minOccurs="0" maxOccurs="1" />
+      <xs:element name="removedprojects" type="removedprojects" minOccurs="0" maxOccurs="1" />
+      <xs:element name="blockedprojects" type="blockedprojects" minOccurs="0" maxOccurs="1" />
+      <xs:element name="blockedgroups" type="blockedgroups" minOccurs="0" maxOccurs="1" />
+    </xs:sequence>
+    <xs:attribute name="id" type="idstring" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Value
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="name" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Name (text reference)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="description" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          Description (text reference)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="group" type="xs:string" use="required">
+      <xs:annotation>
+        <xs:documentation>
+          Group (ID string)
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="duration" type="xs:float">
+      <xs:annotation>
+        <xs:documentation>
+          The time between delivery of all wares and effects taking place. Defaults to 0.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="repeatcooldown" type="xs:float">
+      <xs:annotation>
+        <xs:documentation>
+          The time between effects taking place and this project becoming available again. Defaults to -1, which means that the project is not repeatable.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="chance" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          The chance of success for this project in percent. Defaults to 100.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="resilient" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Whether this project is resilient against setbacks. Defaults to false.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="showalways" type="xs:boolean">
+      <xs:annotation>
+        <xs:documentation>
+          Only for events. If set to true it will always be shown in the interface, even if conditions are not met. Defaults to false.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="research" type="xs:string">
+      <xs:annotation>
+        <xs:documentation>
+          The research item needed before this project becomes available. Defaults to none.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+    <xs:attribute name="version" type="xs:integer">
+      <xs:annotation>
+        <xs:documentation>
+          Version number for this project. Increment after making changes for patching to happen.
+        </xs:documentation>
+      </xs:annotation>
+    </xs:attribute>
+  </xs:complexType>
+
+  <xs:complexType name="stats">
+    <xs:annotation>
+      <xs:documentation>
+        Stat definitions
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="stat" type="stat" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="projectgroups">
+    <xs:annotation>
+      <xs:documentation>
+        Group definitions
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="projectgroup" type="projectgroup" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:complexType name="projects">
+    <xs:annotation>
+      <xs:documentation>
+        Project definitions
+      </xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="project" type="project" minOccurs="0" maxOccurs="unbounded" />
+    </xs:sequence>
+  </xs:complexType>
+
+  <xs:element name="terraforming">
+    <xs:annotation>
+      <xs:documentation>
+        Document element of terraforming.xml
+      </xs:documentation>
+    </xs:annotation>
+    <xs:complexType>
+      <xs:sequence>
+        <xs:element name="stats" type="stats" minOccurs="1" maxOccurs="1" />
+        <xs:element name="projectgroups" type="projectgroups" minOccurs="1" maxOccurs="1" />
+        <xs:element name="projects" type="projects" minOccurs="1" maxOccurs="1" />
+      </xs:sequence>
+    </xs:complexType>
+    <xs:key name="stat_id">
+      <xs:selector xpath="stat" />
+      <xs:field xpath="@id" />
+    </xs:key>
+    <xs:key name="project_id">
+      <xs:selector xpath="project" />
+      <xs:field xpath="@id" />
+    </xs:key>
+  </xs:element>
+
+</xs:schema>

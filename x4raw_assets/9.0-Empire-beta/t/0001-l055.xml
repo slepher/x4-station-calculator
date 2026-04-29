@@ -3338,7 +3338,7 @@
     <t id="11693">Se preferir o comportamento antigo, você pode alterar a configuração "Comportamento de Ordem Padrão" no menu "Configurações do Jogo" para "Fila", de forma que pressionar %s($INPUT_MODIFIER_ICON$) enquanto usa o menu de Interação sobrescreva a ordem em vez de adicioná-la à fila.</t>
     <t id="11694">Pressione Sim se desejar experimentar o novo comportamento padrão do modificador ou Não se desejar manter o comportamento antigo e usar %s($INPUT_MODIFIER_ICON$) para sobrescrever as ordens.</t>
     <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
+    <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>

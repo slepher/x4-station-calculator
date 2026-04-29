@@ -1,0 +1,677 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//cue[@name='Signal_Terraforming_Cues']/actions">
+    <find_sector name="$OceanOfFantasy" macro="macro.cluster_604_sector001_macro" required="1"/>
+    <do_if value="$OceanOfFantasy.isknown">
+      <signal_cue cue="Terraforming_OceanOfFantasy"/>
+      <cancel_cue cue="Terraforming_OceanOfFantasy_Entered_Check"/>
+    </do_if>
+  </add>
+  <add sel="//cue[@name='Start']/cues">
+    <cue name="Terraforming_OceanOfFantasy_Signal" onfail="cancel" comment="Player loaded a save with Terraforming unlocked">
+      <conditions>
+        <check_value value="Signal_Terraforming_Cues.state == cuestate.complete"/>
+      </conditions>
+      <actions>
+        <find_sector name="$OceanOfFantasy" macro="macro.cluster_604_sector001_macro" required="1"/>
+        <do_if value="$OceanOfFantasy.isknown">
+          <signal_cue cue="Terraforming_OceanOfFantasy"/>
+          <cancel_cue cue="Terraforming_OceanOfFantasy_Entered_Check"/>
+        </do_if>
+      </actions>
+    </cue>
+    <cue name="Terraforming_OceanOfFantasy_Entered" comment="Player entered Ocean of Fantasy and has Terraforming unlocked">
+      <actions>
+        <find_sector name="$OceanOfFantasy" macro="macro.cluster_604_sector001_macro" required="1"/>
+      </actions>
+      <cues>
+        <cue name="Terraforming_OceanOfFantasy_Entered_Check">
+          <conditions>
+            <event_object_changed_sector object="player.entity" sector="$OceanOfFantasy"/>
+            <check_value value="Signal_Terraforming_Cues.state == cuestate.complete"/>
+          </conditions>
+          <delay min="if player.debug then 5s else 1200s" max="if player.debug then 10s else 1800s"/>
+          <actions>
+            <signal_cue cue="Terraforming_OceanOfFantasy"/>
+          </actions>
+        </cue>
+      </cues>
+    </cue>
+    <cue name="Terraforming_OceanOfFantasy">
+      <conditions>
+        <event_cue_signalled/>
+      </conditions>
+      <actions>
+        <do_if value="not $Cluster_OceanOfFantasy_Completed?">
+          <find_cluster name="$Cluster_OceanOfFantasy" macro="macro.cluster_604_macro"/>
+          <debug_text text="'Found cluster ' + $Cluster_OceanOfFantasy.name"/>
+          <add_to_group groupname="$TerraformingClusters" object="$Cluster_OceanOfFantasy"/>
+          <append_to_list name="$OfferCues" exact="Terraforming_OceanOfFantasy_CreateOffer"/>
+          <signal_cue cue="Refresh_Offers" check="false"/>
+          <initialise_terraforming cluster="$Cluster_OceanOfFantasy" partname="'part_oof_planet'"/>
+          <!--Set initial stats-->
+          <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'temperature'" value="9"/>
+          <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'humidity'" value="0"/>
+          <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'salinity'" value="0"/>
+          <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'methane'" value="0"/>
+          <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'radioactivity'" value="1"/>
+          <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'toxicity'" value="1"/>
+          <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'seismicactivity'" value="2"/>
+          <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'population'" value="0"/>
+          <set_value name="$GlobalWarmingLimitTable.{$Cluster_OceanOfFantasy}" exact="5"/>
+          <set_value name="$AddedAtmoPressureTable.{$Cluster_OceanOfFantasy}" exact="0"/>
+          <!--Set up projects-->
+          <run_actions ref="SetupStatDependentProjects">
+            <param name="Cluster" value="$Cluster_OceanOfFantasy"/>
+            <param name="GlobalWarmingLimit" value="5"/>
+            <param name="IgnoreHumidity" value="true"/>
+            <param name="IgnoreMethane" value="true"/>
+          </run_actions>
+          <run_actions ref="SetupGeneralProjects_Amenities">
+            <param name="Cluster" value="$Cluster_OceanOfFantasy"/>
+          </run_actions>
+          <run_actions ref="SetupGeneralProjects_Training">
+            <param name="Cluster" value="$Cluster_OceanOfFantasy"/>
+          </run_actions>
+          <run_actions ref="SetupGeneralProjects_Economy">
+            <param name="Cluster" value="$Cluster_OceanOfFantasy"/>
+          </run_actions>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'atm_methane_import'"/>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'wat_import'"/>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'ter_jumpstart_currents'"/>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'pwr_hydro'">
+            <predecessors>
+              <predecessor id="'ter_jumpstart_currents'"/>
+            </predecessors>
+          </add_terraforming_project>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'bio_reconstruct_genes'"/>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'bio_reintroduce_microbes'">
+            <predecessors>
+              <predecessor id="'bio_reconstruct_genes'"/>
+              <predecessor id="'ter_jumpstart_currents'"/>
+            </predecessors>
+          </add_terraforming_project>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'bio_reintroduce_flora'">
+            <predecessors>
+              <predecessor id="'bio_reintroduce_microbes'"/>
+            </predecessors>
+          </add_terraforming_project>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'bio_reintroduce_fauna'">
+            <predecessors>
+              <predecessor id="'bio_reconstruct_genes'"/>
+              <predecessor id="'ter_jumpstart_currents'"/>
+            </predecessors>
+          </add_terraforming_project>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'bio_reintroduce_megafauna'">
+            <predecessors>
+              <predecessor id="'bio_reintroduce_fauna'"/>
+            </predecessors>
+          </add_terraforming_project>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'agr_fields_plankton'">
+            <predecessors>
+              <predecessor id="'bio_reintroduce_flora'"/>
+            </predecessors>
+          </add_terraforming_project>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'res_housing_ocean'"/>
+          <add_terraforming_project cluster="$Cluster_OceanOfFantasy" id="'ame_pheromone_art_academy'"/>
+          <add_terraforming_event cluster="$Cluster_OceanOfFantasy" id="'evt_quake_mild'"/>
+          <add_terraforming_event cluster="$Cluster_OceanOfFantasy" id="'evt_quake_moderate'"/>
+          <add_terraforming_event cluster="$Cluster_OceanOfFantasy" id="'evt_quake_severe'"/>
+          <add_terraforming_event cluster="$Cluster_OceanOfFantasy" id="'evt_solidify_crust'"/>
+          <add_terraforming_event cluster="$Cluster_OceanOfFantasy" id="'evt_volcano_extinction'"/>
+          <add_terraforming_event cluster="$Cluster_OceanOfFantasy" id="'evt_salinization'"/>
+          <set_value name="$Terraforming_OceanOfFantasy_HousingTargetAmount" exact="50000000"/>
+          <!--Create mission character-->
+          <create_cue_actor name="$HaliloGi" cue="namespace" macro="character_boron_female_terraforming_bor_contact_macro">
+            <page exact="10254"/>
+            <owner exact="faction.boron"/>
+            <skills>
+              <skill type="management"  exact="7"/>
+              <skill type="morale"      exact="14"/>
+              <skill type="piloting"    exact="4"/>
+              <skill type="engineering" exact="13"/>
+              <skill type="boarding"    exact="0"/>
+            </skills>
+          </create_cue_actor>
+          <set_entity_traits entity="$HaliloGi" missionactor="true"/>
+          <!--Note: we can't get Leda We here because the cue that sets up the character might not have run yet!-->
+        </do_if>
+      </actions>
+      <cues>
+        <cue name="Terraforming_OceanOfFantasy_SetAtmosphere">
+          <conditions>
+            <check_any>
+              <event_terraforming_stat_changed cluster="$Cluster_OceanOfFantasy" stat="'toxicity'"/>
+              <event_terraforming_stat_changed cluster="$Cluster_OceanOfFantasy" stat="'methane'"/>
+            </check_any>
+            <check_value value="$Cluster_OceanOfFantasy.terraforming.stat.toxicity.value == 0"/>
+          </conditions>
+          <actions>
+            <do_if value="$Cluster_OceanOfFantasy.terraforming.stat.methane.value == 0">
+              <set_world_atmosphere cluster="$Cluster_OceanOfFantasy" partname="'part_oof_planet'" page="1042" line="11021" comment="Hydrogen"/>
+              <reset_cue cue="this"/> <!--we have to check again when the methane stat changes-->
+            </do_if>
+            <do_else>
+              <set_world_atmosphere cluster="$Cluster_OceanOfFantasy" partname="'part_oof_planet'" page="1042" line="11061" comment="Methane/Hydrogen"/>
+            </do_else>
+          </actions>
+        </cue>
+        <cue name="Terraforming_OceanOfFantasy_SetGeology">
+          <conditions>
+            <event_terraforming_stat_changed cluster="$Cluster_OceanOfFantasy" stat="'humidity'"/>
+            <check_value value="$Cluster_OceanOfFantasy.terraforming.stat.humidity.value ge 2"/>
+          </conditions>
+          <actions>
+            <set_world_geology cluster="$Cluster_OceanOfFantasy" partname="'part_oof_planet'" page="1042" line="15141" comment="Ocean"/>
+          </actions>
+        </cue>
+
+        <cue name="Terraforming_OceanOfFantasy_CreateOffer">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <debug_text text="'Creating offer for cue Terraforming_OceanOfFantasy_CreateMission'" chance="$DebugChance"/>
+            <do_if value="$HQ.hasbeenrenamed">
+              <set_value name="$HQName" exact="$HQ.knownname"/>
+            </do_if>
+            <do_else>
+              <set_value name="$HQName" exact="{20102,2011}"/>
+            </do_else>
+            <substitute_text text="$RelocateObjectiveText" source="{1004,1091}">
+              <replace string="'$STATION$'" with="$HQName"/>
+              <replace string="'$LOCATION$'" with="$Cluster_OceanOfFantasy.knownname"/>
+            </substitute_text>
+            <substitute_text text="$HousingObjectiveText" source="{1004,1090}">
+              <replace string="'$AMOUNT$'" with="'%,s'.[$Terraforming_OceanOfFantasy_HousingTargetAmount]"/>
+            </substitute_text>
+            <create_offer cue="Terraforming_OceanOfFantasy_CreateMission" type="missiontype.think" actor="$BosoTa" difficulty="level.veryhard" faction="faction.boron" group="missiongroup.terraforming" name="{30510,1000}" description="{30510,1001}" rewardtext="{30510,1002}">
+              <briefing>
+                <objective step="1" action="objective.relocate" text="$RelocateObjectiveText" encyclopedia="$Cluster_OceanOfFantasy"/>
+                <objective step="2" action="objective.build_project" text="terraforming.project.ter_jumpstart_currents.name"/>
+                <objective step="3" action="objective.build_project" text="terraforming.project.bio_reintroduce_megafauna.name"/>
+                <objective step="4" action="objective.build_housing" text="$HousingObjectiveText"/>
+                <objective step="5" action="objective.build_project" text="terraforming.project.ame_pheromone_art_academy.name"/>
+              </briefing>
+            </create_offer>
+            <remove_value name="$RelocateObjectiveText"/>
+            <remove_value name="$HousingObjectiveText"/>
+          </actions>
+        </cue>
+
+        <cue name="Terraforming_OceanOfFantasy_CreateMission">
+          <conditions>
+            <event_cue_signalled/>
+          </conditions>
+          <actions>
+            <debug_text text="'Creating mission for cue Terraforming_OceanOfFantasy_CreateMission'" chance="$DebugChance"/>
+            <create_mission cue="Terraforming_OceanOfFantasy_CreateMission" offercue="Terraforming_OceanOfFantasy_CreateMission"/>
+            <set_terraforming_mission_activated cluster="$Cluster_OceanOfFantasy" missioncue="Terraforming_OceanOfFantasy_CreateMission"/>
+            <remove_offer cue="Terraforming_OceanOfFantasy_CreateMission"/>
+            <set_value name="$AcceptedOfferCue" exact="Terraforming_OceanOfFantasy_CreateOffer"/>
+            <do_if value="@$AbortMissionCue">
+              <signal_cue cue="$AbortMissionCue"/>
+            </do_if>
+            <set_value name="$AbortMissionCue" exact="Terraforming_OceanOfFantasy_AbortMission"/>
+            <set_value name="$OptionalSteps" exact="0"/>
+            <!--Note: the below action is done here to guarantee that the cue setting up that character has finished-->
+            <set_value name="$LedaWe" exact="md.$PersistentCharacters.$LedaWeActor"/>
+          </actions>
+          <cues>
+            <cue name="Terraforming_OceanOfFantasy_Intro">
+              <actions>
+                <set_value name="$HaliloGiActor" exact="table[
+                  $name = '$HaliloGi',
+                  $location = '$Room',
+                  $monitor = table[
+                    $cutscenekey = 'ShowLogoBoron',
+                    $forceonplayer = true,
+                    $ignoredistance = true
+                  ]
+                ]"/>
+                <set_value name="$LedaWeActor" exact="table[
+                  $name = '$LedaWe',
+                  $location = '$Room',
+                  $monitor = table[
+                    $cutscenekey = 'ShowLogoBoron',
+                    $forceonplayer = true,
+                    $ignoredistance = true
+                  ]
+                ]"/>
+                <set_value name="$BosoTaActor" exact="table[
+                  $name = '$BosoTa',
+                  $location = '$Room',
+                  $monitor = table[
+                    $cutscenekey = 'ShowCharacterBoron',
+                    $forceonplayer = true,
+                    $ignoredistance = true
+                  ]
+                ]"/>
+                <!--TODO: either use a more fitting monitor cutscene (maybe an appropriate podcast logo) or put in the effort to make a real set where both participants are in a room, talking to each other-->
+                <signal_cue_instantly cue="md.NPC_UseCases.UseCase" param="table[
+                  $name = 'Terraforming_OceanOfFantasy_Intro',
+                  $actors = table[ $HaliloGi = $HaliloGi, $LedaWe = $LedaWe ],
+                  $usecasedef = table[
+                    $priority = 100,
+                    $noconversation = true,
+                    $nofullscreenmenu = true,
+                    $queue = true,
+                    $exclusive = true,
+                    $speakpriority = 99,
+                    $locations = [ '$Room' ],
+                    $actors = [ $HaliloGiActor, $LedaWeActor ],
+                    $script = [
+                      table[ $actor = '$HaliloGi', $speak = 30510001 ],
+                      table[ $actor = '$LedaWe', $speak = 30510001 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510002 ],
+                      table[ $actor = '$LedaWe', $speak = 30510002 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510003 ],
+                      table[ $actor = '$LedaWe', $speak = 30510003 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510004 ],
+                      table[ $actor = '$HaliloGi', $lookat = null ],
+                      1s,
+                      table[ $actor = '$HaliloGi', $speak = 30510005 ],
+                    ]
+                  ],
+                ]" />
+              </actions>
+            </cue>
+
+            <cue name="Terraforming_OceanOfFantasy_AbortMission">
+              <conditions>
+                <check_any>
+                  <event_mission_aborted cue="Terraforming_OceanOfFantasy_CreateMission"/>
+                  <event_cue_signalled/>
+                </check_any>
+              </conditions>
+              <actions>
+                <debug_text text="'Removing mission for cue Terraforming_OceanOfFantasy_CreateMission'" chance="$DebugChance"/>
+                <remove_mission cue="Terraforming_OceanOfFantasy_CreateMission"/>
+                <remove_value name="$AcceptedOfferCue"/>
+                <remove_value name="$AbortMissionCue"/>
+                <set_terraforming_mission_deactivated cluster="$Cluster_OceanOfFantasy"/>
+                <reset_cue cue="Terraforming_OceanOfFantasy_CreateMission"/>
+                <reset_cue cue="Terraforming_OceanOfFantasy_CreateOffer"/>
+                <signal_cue cue="Refresh_Offers"/>
+              </actions>
+            </cue>
+
+            <cue name="Terraforming_OceanOfFantasy_Init_ObjectiveManager">
+              <actions>
+                <do_if value="not $Cluster_OceanOfFantasy_Completed?">
+                  <do_if value="$HQ.cluster != $Cluster_OceanOfFantasy">
+                    <do_if value="not $ProjectStep?">
+                      <set_value name="$ProjectStep" exact="1"/>
+                    </do_if>
+                    <set_value name="$RelocateComplete" exact="false"/>
+                  </do_if>
+                  <do_else>
+                    <set_value name="$RelocateComplete" exact="true"/>
+                  </do_else>
+
+                  <do_if value="$Cluster_OceanOfFantasy.terraforming.project.ter_jumpstart_currents.complete == false">
+                    <do_if value="not $ProjectStep?">
+                      <set_value name="$ProjectStep" exact="2"/>
+                    </do_if>
+                    <set_value name="$JumpstartCurrentsComplete" exact="false"/>
+                  </do_if>
+                  <do_else>
+                    <set_value name="$JumpstartCurrentsComplete" exact="true"/>
+                  </do_else>
+
+                  <do_if value="$Cluster_OceanOfFantasy.terraforming.project.bio_reintroduce_megafauna.complete == false">
+                    <do_if value="not $ProjectStep?">
+                      <set_value name="$ProjectStep" exact="3"/>
+                    </do_if>
+                    <set_value name="$MegafaunaComplete" exact="false"/>
+                  </do_if>
+                  <do_else>
+                    <set_value name="$MegafaunaComplete" exact="true"/>
+                  </do_else>
+
+                  <do_if value="$Cluster_OceanOfFantasy.terraforming.stat.population.value lt $Terraforming_OceanOfFantasy_HousingTargetAmount">
+                    <do_if value="not $ProjectStep?">
+                      <set_value name="$ProjectStep" exact="4"/>
+                    </do_if>
+                    <set_value name="$HousingComplete" exact="false"/>
+                  </do_if>
+                  <do_else>
+                    <set_value name="$HousingComplete" exact="true"/>
+                  </do_else>
+
+                  <do_if value="$Cluster_OceanOfFantasy.terraforming.project.ame_pheromone_art_academy.complete == false">
+                    <do_if value="not $ProjectStep?">
+                      <set_value name="$ProjectStep" exact="5"/>
+                    </do_if>
+                    <set_value name="$PheromoneArtAcademyComplete" exact="false"/>
+                  </do_if>
+                  <do_else>
+                    <set_value name="$PheromoneArtAcademyComplete" exact="true"/>
+                  </do_else>
+
+                  <do_if value="$HQ.hasbeenrenamed">
+                    <set_value name="$HQName" exact="$HQ.knownname"/>
+                  </do_if>
+                  <do_else>
+                    <set_value name="$HQName" exact="{20102,2011}"/>
+                  </do_else>
+                  <substitute_text text="$RelocateObjectiveText" source="{1004,1091}">
+                    <replace string="'$STATION$'" with="$HQName"/>
+                    <replace string="'$LOCATION$'" with="$Cluster_OceanOfFantasy.knownname"/>
+                  </substitute_text>
+                  <substitute_text text="$HousingObjectiveText" source="{1004,1090}">
+                    <replace string="'$AMOUNT$'" with="'%,s'.[$Terraforming_OceanOfFantasy_HousingTargetAmount]"/>
+                  </substitute_text>
+
+                  <do_if value="not $HQ.canbuildclass.{class.ship_s}">
+                    <update_mission cue="Terraforming_OceanOfFantasy_CreateMission">
+                      <briefing replace="true">
+                        <objective step="1" action="objective.build_module" object="$HQ" text="{20104,61301}" comment="Build S/M Ship Fabrication Module"/>
+                        <objective step="2" action="objective.relocate" text="$RelocateObjectiveText" encyclopedia="$Cluster_OceanOfFantasy" completed="$RelocateComplete"/>
+                        <objective step="3" action="objective.build_project" text="terraforming.project.ter_jumpstart_currents.name" completed="$JumpstartCurrentsComplete"/>
+                        <objective step="4" action="objective.build_project" text="terraforming.project.bio_reintroduce_megafauna.name" completed="$MegafaunaComplete"/>
+                        <objective step="5" action="objective.build_housing" text="$HousingObjectiveText" completed="$HousingComplete"/>
+                        <objective step="6" action="objective.build_project" text="terraforming.project.ame_pheromone_art_academy.name" completed="$PheromoneArtAcademyComplete"/>
+                      </briefing>
+                    </update_mission>
+                    <do_if value="not $BuildObjective?">
+                      <set_value name="$OptionalSteps" operation="add" exact="1"/>
+                      <set_value name="$BuildObjective"/>
+                      <signal_cue cue="Terraforming_OceanOfFantasy_Trigger_BuildModule_Objective"/>
+                    </do_if>
+                    <set_objective_from_briefing cue="Terraforming_OceanOfFantasy_CreateMission" step="1"/>
+                  </do_if>
+                  <do_else>
+                    <do_if value="$BuildObjective?">
+                      <set_value name="$OptionalSteps" operation="subtract" exact="1"/>
+                      <remove_value name="$BuildObjective"/>
+                    </do_if>
+                    <update_mission cue="Terraforming_OceanOfFantasy_CreateMission">
+                      <briefing replace="true">
+                        <objective step="1" action="objective.relocate" text="$RelocateObjectiveText" encyclopedia="$Cluster_OceanOfFantasy" completed="$RelocateComplete"/>
+                        <objective step="2" action="objective.build_project" text="terraforming.project.ter_jumpstart_currents.name" completed="$JumpstartCurrentsComplete"/>
+                        <objective step="3" action="objective.build_project" text="terraforming.project.bio_reintroduce_megafauna.name" completed="$MegafaunaComplete"/>
+                        <objective step="4" action="objective.build_housing" text="$HousingObjectiveText" completed="$HousingComplete"/>
+                        <objective step="5" action="objective.build_project" text="terraforming.project.ame_pheromone_art_academy.name" completed="$PheromoneArtAcademyComplete"/>
+                      </briefing>
+                    </update_mission>
+                    <do_if value="$OptionalSteps ge 1">
+                      <set_value name="$ProjectStep" operation="add" exact="$OptionalSteps"/>
+                    </do_if>
+                    <do_else>
+                      <set_value name="$OptionalSteps" exact="0"/>
+                    </do_else>
+                    <set_value name="$ProjectStep" operation="add" exact="$OptionalSteps"/>
+                    <set_objective_from_briefing cue="Terraforming_OceanOfFantasy_CreateMission" step="$ProjectStep"/>
+                  </do_else>
+
+                  <remove_value name="$ProjectStep"/>
+                  <remove_value name="$RelocateObjectiveText"/>
+                  <remove_value name="$HousingObjectiveText"/>
+                </do_if>
+              </actions>
+            </cue>
+
+            <cue name="Terraforming_OceanOfFantasy_BuildModule_Check">
+              <actions>
+                <find_object_component groupname="$WharfModules" object="$HQ" class="class.buildmodule">
+                  <match_any>
+                    <match canbuildclass="class.ship_m"/>
+                    <match canbuildclass="class.ship_s"/>
+                  </match_any>
+                </find_object_component>
+              </actions>
+              <cues>
+                <cue name="Terraforming_OceanOfFantasy_BuildModuleDestroyed" instantiate="true">
+                  <conditions>
+                    <event_object_destroyed group="$WharfModules"/>
+                    <check_value value="$WharfModules.count == 1" comment="trigger another check when the last build module is destroyed"/>
+                  </conditions>
+                  <actions>
+                    <signal_cue_instantly cue="Terraforming_OceanOfFantasy_ObjectiveUpdate_v2" param="['RequestBuildModule']"/>
+                  </actions>
+                </cue>
+              </cues>
+            </cue>
+
+            <cue name="Terraforming_OceanOfFantasy_ObjectiveUpdate_v2" instantiate="true">
+              <conditions>
+                <check_any>
+                  <event_terraforming_stat_changed cluster="$Cluster_OceanOfFantasy"/>
+                  <event_terraforming_project_succeeded cluster="$Cluster_OceanOfFantasy"/>
+                  <event_object_changed_cluster object="$HQ"/>
+                  <event_cue_signalled/>
+                </check_any>
+              </conditions>
+              <actions>
+                <do_if value="typeof event.param == datatype.list ">
+                  <do_if value="event.param.{1} == 'ModulesGroup'" comment="make sure the signal came from CheckStation_BuildModule">
+                    <add_to_group groupname="$WharfModules" group="event.param.{2}"/>
+                  </do_if>
+                </do_if>
+                <reset_cue cue="Terraforming_OceanOfFantasy_Init_ObjectiveManager"/>
+              </actions>
+            </cue>
+
+            <cue name="Terraforming_OceanOfFantasy_Trigger_BuildModule_Objective" instantiate="true">
+              <conditions>
+                <event_cue_signalled/>
+              </conditions>
+              <cues>
+                <cue name="Terraforming_OceanOfFantasy_BuildModule" ref="AdditionalObjective_BuildModule">
+                  <!-- Required to Signal the Update Cue when Building is finished -->
+                  <param name="UpdateCue" value="Terraforming_OceanOfFantasy_ObjectiveUpdate_v2"/>
+                  <param name="Station" value="$HQ"/>
+                </cue>
+              </cues>
+            </cue>
+          </cues>
+        </cue>
+
+        <!--Objective cues-->
+        <cue name="Terraforming_OceanOfFantasy_Milestone_1">
+          <conditions>
+            <event_terraforming_project_succeeded cluster="$Cluster_OceanOfFantasy"/>
+          </conditions>
+          <actions>
+          </actions>
+          <cues>
+            <cue name="Terraforming_OceanOfFantasy_Contact1">
+              <actions>
+                <signal_cue_instantly cue="md.NPC_UseCases.UseCase" param="table[
+                  $name = 'Terraforming_OceanOfFantasy_Intro',
+                  $actors = table[ $HaliloGi = $HaliloGi, $LedaWe = $LedaWe ],
+                  $usecasedef = table[
+                    $priority = 100,
+                    $noconversation = true,
+                    $nofullscreenmenu = true,
+                    $queue = true,
+                    $exclusive = true,
+                    $speakpriority = 99,
+                    $locations = [ '$Room' ],
+                    $actors = [ $HaliloGiActor, $LedaWeActor ],
+                    $script = [
+                      table[ $actor = '$HaliloGi', $speak = 30510006 ],
+                      table[ $actor = '$LedaWe', $speak = 30510004 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510007 ],
+                      table[ $actor = '$LedaWe', $speak = 30510005 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510008 ],
+                      table[ $actor = '$LedaWe', $speak = 30510006 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510009 ],
+                    ]
+                  ],
+                ]" />
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+
+        <!--Note: milestone 2 can happen before milestone 1, but that's fine. The conversations are independent.-->
+        <cue name="Terraforming_OceanOfFantasy_Milestone_2">
+          <conditions>
+            <event_terraforming_project_succeeded cluster="$Cluster_OceanOfFantasy" project="'bio_reconstruct_genes'" />
+          </conditions>
+          <actions>
+          </actions>
+          <cues>
+            <cue name="Terraforming_OceanOfFantasy_Contact2">
+              <actions>
+                <signal_cue_instantly cue="md.NPC_UseCases.UseCase" param="table[
+                  $name = 'Terraforming_OceanOfFantasy_Intro',
+                  $actors = table[ $HaliloGi = $HaliloGi, $LedaWe = $LedaWe ],
+                  $usecasedef = table[
+                    $priority = 100,
+                    $noconversation = true,
+                    $nofullscreenmenu = true,
+                    $queue = true,
+                    $exclusive = true,
+                    $speakpriority = 99,
+                    $locations = [ '$Room' ],
+                    $actors = [ $HaliloGiActor, $LedaWeActor ],
+                    $script = [
+                      table[ $actor = '$HaliloGi', $speak = 30510010 ],
+                      table[ $actor = '$LedaWe', $speak = 30510007 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510011 ],
+                      table[ $actor = '$LedaWe', $speak = 30510008 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510012 ],
+                      table[ $actor = '$LedaWe', $speak = 30510009 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510013 ],
+                    ]
+                  ],
+                ]" />
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+
+        <cue name="Terraforming_OceanOfFantasy_MissionComplete" version="3">
+          <conditions>
+            <check_any>
+              <event_terraforming_stat_changed cluster="$Cluster_OceanOfFantasy" stat="'population'"/>
+              <event_terraforming_project_succeeded cluster="$Cluster_OceanOfFantasy"/>
+              <event_terraforming_project_succeeded cluster="$Cluster_OceanOfFantasy" project="'bio_reintroduce_megafauna'" />
+              <event_terraforming_project_succeeded cluster="$Cluster_OceanOfFantasy" project="'ame_pheromone_art_academy'" />
+            </check_any>
+            <check_value value="$Cluster_OceanOfFantasy.terraforming.stat.population.value ge $Terraforming_OceanOfFantasy_HousingTargetAmount"/>
+            <check_value value="$Cluster_OceanOfFantasy.terraforming.project.bio_reintroduce_megafauna.complete"/>
+            <check_value value="$Cluster_OceanOfFantasy.terraforming.project.ame_pheromone_art_academy.complete"/>
+          </conditions>
+          <actions>
+            <cancel_cue cue="Terraforming_OceanOfFantasy_ObjectiveUpdate_v2"/>
+            <set_world_name cluster="$Cluster_OceanOfFantasy" partname="'part_oof_planet'" page="20005" line="1062" comment="Samsara"/>
+            <set_world_settlements cluster="$Cluster_OceanOfFantasy" partname="'part_oof_planet'" page="1042" line="16041" comment="Multiple Cities"/>
+            <remove_from_list name="$OfferCues" exact="Terraforming_OceanOfFantasy_CreateOffer" multiple="false"/>
+            <remove_value name="$AbortMissionCue"/>
+            <remove_mission cue="Terraforming_OceanOfFantasy_CreateMission" type="completed"/>
+            <set_value name="$Cluster_OceanOfFantasy_Completed"/>
+            <set_terraforming_mission_completed cluster="$Cluster_OceanOfFantasy"/>
+            <add_blueprints wares="ware.welfare_bor_artacademy_01"/>
+            <unlock_achievement name="TERRAFORMING_MISSION"/>
+            <unlock_achievement name="KE_TERRAFORMING_OOF" comment="A Trillion Drops in the Ocean"/>
+            <set_value name="stat.terraforming_missions_completed" operation="add"/>
+            <signal_cue_instantly cue="md.Setup_DLC_Boron.Terraforming_Effects_OceanOfFantasy"/>
+            <signal_cue_instantly cue="md.X4Ep1_Mentor_Subscriptions.Add_Player_Office_Trophy" param="tag.trophy_terraforming_ocean_of_phantasy"/>
+          </actions>
+          <patch sinceversion="2" state="complete">
+            <set_world_settlements cluster="$Cluster_OceanOfFantasy" partname="'part_oof_planet'" page="1042" line="16041" comment="Multiple Cities"/>
+          </patch>
+          <patch sinceversion="3" state="complete">
+            <signal_cue_instantly cue="md.X4Ep1_Mentor_Subscriptions.Add_Player_Office_Trophy" param="tag.trophy_terraforming_ocean_of_phantasy"/>
+          </patch>
+          <cues>
+            <cue name="Terraforming_OceanOfFantasy_VideoEmail">
+              <actions>
+                <substitute_text text="$EmailTitle" source="{30500,11001}">
+                  <replace string="'$CLUSTERNAME$'" with="$Cluster_OceanOfFantasy.knownname"/>
+                </substitute_text>
+
+                <write_incoming_message title="$EmailTitle" text="{30500,11002}" source="if player.target then player.target else player.entity.container" highpriority="true" comment="Ocean of Fantasy Terraforming Wrap Email">
+                  <cutscene key="'terraforming_ocean_of_fantasy'"/>
+                </write_incoming_message>
+              </actions>
+            </cue>
+
+            <cue name="Terraforming_OceanOfFantasy_Report3">
+              <actions>
+                <signal_cue_instantly cue="md.NPC_UseCases.UseCase" param="table[
+                  $name = 'Terraforming_OceanOfFantasy_Intro',
+                  $actors = table[ $HaliloGi = $HaliloGi, $LedaWe = $LedaWe, $BosoTa = $BosoTa ],
+                  $usecasedef = table[
+                    $priority = 100,
+                    $noconversation = true,
+                    $nofullscreenmenu = true,
+                    $queue = true,
+                    $exclusive = true,
+                    $speakpriority = 99,
+                    $locations = [ '$Room' ],
+                    $actors = [ $HaliloGiActor, $LedaWeActor, $BosoTaActor ],
+                    $script = [
+                      table[ $actor = '$HaliloGi', $speak = 30510014 ],
+                      table[ $actor = '$LedaWe', $speak = 30510010 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510015 ],
+                      table[ $actor = '$LedaWe', $speak = 30510011 ],
+                      table[ $actor = '$HaliloGi', $speak = 30510016 ],
+                      table[ $actor = '$LedaWe', $speak = 30510012 ],
+                      table[ $actor = '$BosoTa', $speak = 30221205 ],
+                      2s,
+                      table[ $actor = '$LedaWe', $speak = 30510013 ],
+                    ]
+                  ],
+                ]" />
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+
+        <cue name="DEBUG_Terraforming_OceanOfFantasy" onfail="cancel">
+          <conditions>
+            <check_value value="$DebugWarpCues?"/>
+          </conditions>
+          <delay exact="1ms"/>
+          <actions>
+            <append_to_list name="$DebugWarpCues" exact="DEBUG_Terraforming_OceanOfFantasy_WarpPlayerShip"/>
+            <append_to_list name="$DebugSetStatsCues" exact="DEBUG_Terraforming_OceanOfFantasy_SetEndStats"/>
+          </actions>
+          <cues>
+            <cue name="DEBUG_Terraforming_OceanOfFantasy_WarpPlayerShip">
+              <conditions>
+                <event_cue_signalled/>
+              </conditions>
+              <actions>
+                <run_actions ref="DEBUG_Terraforming_WarpPlayerShip">
+                  <param name="Cluster" value="$Cluster_OceanOfFantasy"/>
+                </run_actions>
+              </actions>
+            </cue>
+
+            <cue name="DEBUG_Terraforming_OceanOfFantasy_SetEndStats">
+              <conditions>
+                <event_cue_signalled/>
+              </conditions>
+              <actions>
+                <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'temperature'" value="5"/>
+                <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'seismicactivity'" value="0"/>
+              </actions>
+              <delay exact="5min"/>
+              <actions>
+                <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'humidity'" value="6"/>
+                <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'salinity'" value="2"/>
+                <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'methane'" value="2"/>
+                <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'radioactivity'" value="0"/>
+                <set_terraforming_stat cluster="$Cluster_OceanOfFantasy" id="'toxicity'" value="0"/>
+              </actions>
+            </cue>
+          </cues>
+        </cue>
+      </cues>
+    </cue>
+  </add>
+  
+  <add sel="//cue[@name='Terraforming_Boarding_Competition_Finished']/actions/do_all/do_any">
+    <get_character_definition macro="$Macro" faction="faction.boron" tags="tag.marine" weight="if md.Setup_DLC_Boron.BoronFaction_States.$HereticsEnd_WatchfulGazeGate.isactive then 1 else 0"/>
+  </add>
+
+  <add sel="//cue[@name='Terraforming_Piloting_Competition_Finished']/actions/do_all/do_any">
+    <get_character_definition macro="$Macro" faction="faction.boron" tags="tag.pilot" weight="if md.Setup_DLC_Boron.BoronFaction_States.$HereticsEnd_WatchfulGazeGate.isactive then 1 else 0"/>
+  </add>
+</diff>
