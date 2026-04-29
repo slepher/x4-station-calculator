@@ -1325,7 +1325,7 @@
     "crew": {
       "capacity": 46
     },
-    "hull": 36000,
+    "hull": 40000,
     "physics": {
       "mass": 205.27,
       "drag": {
@@ -1614,7 +1614,7 @@
     "crew": {
       "capacity": 38
     },
-    "hull": 43200,
+    "hull": 46000,
     "physics": {
       "mass": 246.324,
       "drag": {
@@ -1925,7 +1925,7 @@
     "crew": {
       "capacity": 46
     },
-    "hull": 36000,
+    "hull": 40000,
     "physics": {
       "mass": 204.245,
       "drag": {
@@ -2236,7 +2236,7 @@
     "crew": {
       "capacity": 38
     },
-    "hull": 43200,
+    "hull": 46000,
     "physics": {
       "mass": 245.094,
       "drag": {
@@ -5310,7 +5310,7 @@
     "crew": {
       "capacity": 9
     },
-    "hull": 12000,
+    "hull": 14000,
     "physics": {
       "mass": 28.75,
       "drag": {
@@ -5570,7 +5570,7 @@
     "crew": {
       "capacity": 7
     },
-    "hull": 14000,
+    "hull": 16000,
     "physics": {
       "mass": 32.0,
       "drag": {
@@ -5802,11 +5802,11 @@
     "crew": {
       "capacity": 15
     },
-    "hull": 13000,
+    "hull": 14000,
     "physics": {
       "mass": 25.0,
       "drag": {
-        "forward": 5.036,
+        "forward": 4.9,
         "reverse": 20.146,
         "horizontal": 12.0,
         "vertical": 12.0,
@@ -6108,7 +6108,7 @@
     "crew": {
       "capacity": 14
     },
-    "hull": 17000,
+    "hull": 19000,
     "physics": {
       "mass": 34.432,
       "drag": {
@@ -6414,7 +6414,7 @@
     "crew": {
       "capacity": 11
     },
-    "hull": 20000,
+    "hull": 22000,
     "physics": {
       "mass": 41.318,
       "drag": {
@@ -6589,7 +6589,7 @@
     "crew": {
       "capacity": 9
     },
-    "hull": 5400,
+    "hull": 6000,
     "physics": {
       "mass": 30.292,
       "drag": {
@@ -6764,7 +6764,7 @@
     "crew": {
       "capacity": 7
     },
-    "hull": 6650,
+    "hull": 7000,
     "physics": {
       "mass": 38.926,
       "drag": {
@@ -6963,7 +6963,7 @@
     "crew": {
       "capacity": 9
     },
-    "hull": 5400,
+    "hull": 6000,
     "physics": {
       "mass": 32.438,
       "drag": {
@@ -7162,7 +7162,7 @@
     "crew": {
       "capacity": 7
     },
-    "hull": 6650,
+    "hull": 7000,
     "physics": {
       "mass": 36.351,
       "drag": {
@@ -7334,11 +7334,11 @@
     "crew": {
       "capacity": 17
     },
-    "hull": 5000,
+    "hull": 6000,
     "physics": {
-      "mass": 42.966,
+      "mass": 38.0,
       "drag": {
-        "forward": 7.283,
+        "forward": 7.1,
         "reverse": 29.131,
         "horizontal": 17.0,
         "vertical": 17.0,
@@ -7347,8 +7347,8 @@
         "roll": 13.242
       },
       "accfactors": {
-        "horizontal": 1.0,
-        "vertical": 1.0
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -7506,11 +7506,11 @@
     "crew": {
       "capacity": 14
     },
-    "hull": 6000,
+    "hull": 7000,
     "physics": {
-      "mass": 51.559,
+      "mass": 44.0,
       "drag": {
-        "forward": 8.5,
+        "forward": 8.1,
         "reverse": 34.0,
         "horizontal": 19.5,
         "vertical": 19.5,
@@ -7519,8 +7519,8 @@
         "roll": 15.39
       },
       "accfactors": {
-        "horizontal": 1.0,
-        "vertical": 1.0
+        "horizontal": 1,
+        "vertical": 1
       }
     },
     "radarRange": 40000
@@ -7678,12 +7678,12 @@
     "crew": {
       "capacity": 19
     },
-    "hull": 5500,
+    "hull": 5400,
     "physics": {
-      "mass": 38.67,
+      "mass": 36.0,
       "drag": {
-        "forward": 6.55,
-        "reverse": 26.768,
+        "forward": 6.7,
+        "reverse": 26.0,
         "horizontal": 18.5,
         "vertical": 18.5,
         "pitch": 10.4,
@@ -7850,11 +7850,11 @@
     "crew": {
       "capacity": 15
     },
-    "hull": 6600,
+    "hull": 6400,
     "physics": {
-      "mass": 46.403,
+      "mass": 42.0,
       "drag": {
-        "forward": 7.7,
+        "forward": 7.6,
         "reverse": 31.022,
         "horizontal": 21.0,
         "vertical": 21.0,
@@ -12682,17 +12682,17 @@
     "crew": {
       "capacity": 131
     },
-    "hull": 277000,
+    "hull": 275000,
     "physics": {
-      "mass": 707.467,
+      "mass": 1200.0,
       "drag": {
-        "forward": 155.045,
+        "forward": 157.0,
         "reverse": 697.0,
         "horizontal": 100.0,
         "vertical": 100.0,
-        "pitch": 760.0,
-        "yaw": 760.0,
-        "roll": 760.0
+        "pitch": 790.0,
+        "yaw": 790.0,
+        "roll": 790.0
       },
       "accfactors": {
         "horizontal": 1.0,
@@ -12953,17 +12953,17 @@
     "crew": {
       "capacity": 220
     },
-    "hull": 140000,
+    "hull": 174000,
     "physics": {
-      "mass": 891.63,
+      "mass": 820.0,
       "drag": {
         "forward": 258.326,
         "reverse": 903.0,
         "horizontal": 194.0,
         "vertical": 194.0,
-        "pitch": 878.326,
-        "yaw": 878.326,
-        "roll": 878.326
+        "pitch": 790.0,
+        "yaw": 790.0,
+        "roll": 790.0
       },
       "accfactors": {
         "horizontal": 1.25,
@@ -13224,21 +13224,21 @@
     "crew": {
       "capacity": 183
     },
-    "hull": 166000,
+    "hull": 200000,
     "physics": {
-      "mass": 1069.956,
+      "mass": 1000.0,
       "drag": {
         "forward": 293.991,
         "reverse": 990.0,
         "horizontal": 213.0,
         "vertical": 213.0,
-        "pitch": 913.991,
-        "yaw": 913.991,
-        "roll": 913.991
+        "pitch": 827.0,
+        "yaw": 827.0,
+        "roll": 827.0
       },
       "accfactors": {
-        "horizontal": 1.25,
-        "vertical": 1.25
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -15192,11 +15192,11 @@
     "crew": {
       "capacity": 52
     },
-    "hull": 46000,
+    "hull": 42000,
     "physics": {
       "mass": 294.322,
       "drag": {
-        "forward": 70.5,
+        "forward": 74.0,
         "reverse": 317.3,
         "horizontal": 77.0,
         "vertical": 77.0,
@@ -15468,11 +15468,11 @@
     "crew": {
       "capacity": 52
     },
-    "hull": 46000,
+    "hull": 42000,
     "physics": {
       "mass": 294.322,
       "drag": {
-        "forward": 70.5,
+        "forward": 74.0,
         "reverse": 317.0,
         "horizontal": 77.0,
         "vertical": 77.0,
@@ -16086,7 +16086,7 @@
     "crew": {
       "capacity": 6
     },
-    "hull": 7900,
+    "hull": 8400,
     "physics": {
       "mass": 23.782,
       "drag": {
@@ -16383,7 +16383,7 @@
     "crew": {
       "capacity": 6
     },
-    "hull": 8100,
+    "hull": 8800,
     "physics": {
       "mass": 24.216,
       "drag": {
@@ -16712,7 +16712,7 @@
     "crew": {
       "capacity": 8
     },
-    "hull": 10900,
+    "hull": 11500,
     "physics": {
       "mass": 35.0,
       "drag": {
@@ -19507,7 +19507,7 @@
     "crew": {
       "capacity": 154
     },
-    "hull": 195000,
+    "hull": 190000,
     "physics": {
       "mass": 1569.585,
       "drag": {
@@ -19515,9 +19515,9 @@
         "reverse": 1378.709,
         "horizontal": 270.0,
         "vertical": 270.0,
-        "pitch": 750.584,
-        "yaw": 750.584,
-        "roll": 750.584
+        "pitch": 800.0,
+        "yaw": 800.0,
+        "roll": 800.0
       },
       "accfactors": {
         "horizontal": 1.15,
@@ -19797,7 +19797,7 @@
     "crew": {
       "capacity": 8
     },
-    "hull": 12800,
+    "hull": 13800,
     "physics": {
       "mass": 32.748,
       "drag": {
@@ -20087,7 +20087,7 @@
     "crew": {
       "capacity": 6
     },
-    "hull": 10100,
+    "hull": 12500,
     "physics": {
       "mass": 21.615,
       "drag": {
@@ -20607,7 +20607,7 @@
     "crew": {
       "capacity": 16
     },
-    "hull": 8200,
+    "hull": 9200,
     "physics": {
       "mass": 30.969,
       "drag": {
@@ -22249,9 +22249,9 @@
         "reverse": 296.0,
         "horizontal": 48.0,
         "vertical": 48.0,
-        "pitch": 118.0,
-        "yaw": 138.0,
-        "roll": 80.0
+        "pitch": 124.0,
+        "yaw": 144.0,
+        "roll": 85.0
       },
       "accfactors": {
         "horizontal": 1.1,
@@ -22813,7 +22813,7 @@
     "physics": {
       "mass": 180.944,
       "drag": {
-        "forward": 49.999,
+        "forward": 52.0,
         "reverse": 285.708,
         "horizontal": 137.021,
         "vertical": 137.021,
@@ -23044,7 +23044,7 @@
     "physics": {
       "mass": 217.132,
       "drag": {
-        "forward": 54.749,
+        "forward": 58.0,
         "reverse": 312.849,
         "horizontal": 164.425,
         "vertical": 164.425,
@@ -23275,7 +23275,7 @@
     "physics": {
       "mass": 153.679,
       "drag": {
-        "forward": 51.0,
+        "forward": 58.0,
         "reverse": 230.0,
         "horizontal": 62.0,
         "vertical": 62.0,
@@ -23532,7 +23532,7 @@
     "physics": {
       "mass": 180.944,
       "drag": {
-        "forward": 49.999,
+        "forward": 52.0,
         "reverse": 285.708,
         "horizontal": 137.021,
         "vertical": 137.021,
@@ -23789,7 +23789,7 @@
     "physics": {
       "mass": 217.132,
       "drag": {
-        "forward": 54.749,
+        "forward": 58.0,
         "reverse": 312.849,
         "horizontal": 164.425,
         "vertical": 164.425,
@@ -24046,7 +24046,7 @@
     "physics": {
       "mass": 153.678,
       "drag": {
-        "forward": 51.0,
+        "forward": 58.0,
         "reverse": 230.0,
         "horizontal": 62.0,
         "vertical": 62.0,
@@ -25670,7 +25670,7 @@
     "crew": {
       "capacity": 8
     },
-    "hull": 10000,
+    "hull": 13000,
     "physics": {
       "mass": 22.0,
       "drag": {
@@ -25928,7 +25928,7 @@
     "crew": {
       "capacity": 6
     },
-    "hull": 13200,
+    "hull": 15000,
     "physics": {
       "mass": 26.5,
       "drag": {
@@ -26233,17 +26233,17 @@
     "crew": {
       "capacity": 16
     },
-    "hull": 19000,
+    "hull": 20500,
     "physics": {
       "mass": 37.0,
       "drag": {
-        "forward": 10.315,
-        "reverse": 28.882,
+        "forward": 11.35,
+        "reverse": 34.0,
         "horizontal": 10.5,
         "vertical": 10.5,
-        "pitch": 9.4,
-        "yaw": 11.6,
-        "roll": 9.0
+        "pitch": 10.6,
+        "yaw": 12.1,
+        "roll": 10.35
       },
       "accfactors": {
         "horizontal": 1.33,
@@ -26542,13 +26542,13 @@
     "physics": {
       "mass": 44.0,
       "drag": {
-        "forward": 11.965,
-        "reverse": 33.503,
+        "forward": 13.161,
+        "reverse": 39.5,
         "horizontal": 11.5,
         "vertical": 11.5,
-        "pitch": 10.4,
-        "yaw": 12.6,
-        "roll": 10.0
+        "pitch": 11.8,
+        "yaw": 13.5,
+        "roll": 11.5
       },
       "accfactors": {
         "horizontal": 1.33,
@@ -27444,17 +27444,17 @@
     "crew": {
       "capacity": 19
     },
-    "hull": 5000,
+    "hull": 6300,
     "physics": {
-      "mass": 44.0,
+      "mass": 46.0,
       "drag": {
-        "forward": 5.652,
+        "forward": 5.8,
         "reverse": 22.608,
         "horizontal": 26.533,
         "vertical": 26.533,
-        "pitch": 13.702,
-        "yaw": 13.702,
-        "roll": 13.702
+        "pitch": 14.0,
+        "yaw": 14.0,
+        "roll": 15.5
       },
       "accfactors": {
         "horizontal": 1.0,
@@ -27602,17 +27602,17 @@
     "crew": {
       "capacity": 15
     },
-    "hull": 7000,
+    "hull": 7300,
     "physics": {
       "mass": 50.0,
       "drag": {
-        "forward": 6.576,
+        "forward": 6.5,
         "reverse": 26.305,
         "horizontal": 31.84,
         "vertical": 31.84,
-        "pitch": 15.942,
-        "yaw": 15.942,
-        "roll": 15.942
+        "pitch": 16.3,
+        "yaw": 16.3,
+        "roll": 17.7
       },
       "accfactors": {
         "horizontal": 1.0,
@@ -27762,9 +27762,9 @@
     },
     "hull": 5000,
     "physics": {
-      "mass": 40.0,
+      "mass": 38.0,
       "drag": {
-        "forward": 5.19,
+        "forward": 5.1,
         "reverse": 20.76,
         "horizontal": 23.88,
         "vertical": 23.88,
@@ -27918,11 +27918,11 @@
     "crew": {
       "capacity": 16
     },
-    "hull": 6000,
+    "hull": 5900,
     "physics": {
-      "mass": 46.0,
+      "mass": 42.0,
       "drag": {
-        "forward": 6.022,
+        "forward": 5.7,
         "reverse": 24.087,
         "horizontal": 28.656,
         "vertical": 28.656,
@@ -28177,21 +28177,21 @@
     "crew": {
       "capacity": 12
     },
-    "hull": 11000,
+    "hull": 12300,
     "physics": {
-      "mass": 23.192,
+      "mass": 26.0,
       "drag": {
-        "forward": 3.423,
-        "reverse": 13.692,
+        "forward": 3.5,
+        "reverse": 14.0,
         "horizontal": 10.5,
         "vertical": 10.5,
-        "pitch": 8.2,
-        "yaw": 9.0,
-        "roll": 8.2
+        "pitch": 8.3,
+        "yaw": 9.5,
+        "roll": 8.8
       },
       "accfactors": {
-        "horizontal": 1.15,
-        "vertical": 1.15
+        "horizontal": 1.2,
+        "vertical": 1.2
       }
     },
     "radarRange": 40000
@@ -31980,7 +31980,7 @@
     },
     "hull": 303000,
     "physics": {
-      "mass": 771.902,
+      "mass": 850.0,
       "drag": {
         "forward": 153.812,
         "reverse": 878.927,
@@ -32791,17 +32791,17 @@
     "crew": {
       "capacity": 258
     },
-    "hull": 190000,
+    "hull": 178000,
     "physics": {
-      "mass": 1256.778,
+      "mass": 1400.0,
       "drag": {
         "forward": 310.646,
         "reverse": 1242.584,
         "horizontal": 230.0,
         "vertical": 230.0,
-        "pitch": 931.356,
-        "yaw": 931.356,
-        "roll": 931.356
+        "pitch": 1024.0,
+        "yaw": 1024.0,
+        "roll": 1080.0
       },
       "accfactors": {
         "horizontal": 1.2,
@@ -33065,7 +33065,7 @@
     "crew": {
       "capacity": 31
     },
-    "hull": 38000,
+    "hull": 40000,
     "physics": {
       "mass": 195.0,
       "drag": {
@@ -35889,11 +35889,11 @@
     "crew": {
       "capacity": 29
     },
-    "hull": 35000,
+    "hull": 48000,
     "physics": {
       "mass": 159.275,
       "drag": {
-        "forward": 40.867,
+        "forward": 39.8,
         "reverse": 180.0,
         "horizontal": 70.0,
         "vertical": 70.0,
@@ -36186,11 +36186,11 @@
     "crew": {
       "capacity": 29
     },
-    "hull": 35000,
+    "hull": 48000,
     "physics": {
       "mass": 159.275,
       "drag": {
-        "forward": 40.867,
+        "forward": 39.8,
         "reverse": 180.0,
         "horizontal": 70.0,
         "vertical": 70.0,
@@ -36754,7 +36754,7 @@
     "crew": {
       "capacity": 6
     },
-    "hull": 18500,
+    "hull": 21000,
     "physics": {
       "mass": 23.476,
       "drag": {
@@ -37025,12 +37025,12 @@
     "crew": {
       "capacity": 5
     },
-    "hull": 11500,
+    "hull": 13800,
     "physics": {
       "mass": 17.607,
       "drag": {
-        "forward": 2.6,
-        "reverse": 9.87,
+        "forward": 2.5,
+        "reverse": 9.0,
         "horizontal": 5.2,
         "vertical": 5.2,
         "pitch": 9.317,
@@ -37317,7 +37317,7 @@
     "crew": {
       "capacity": 25
     },
-    "hull": 32000,
+    "hull": 33000,
     "physics": {
       "mass": 38.045,
       "drag": {
@@ -37729,7 +37729,7 @@
     "crew": {
       "capacity": 8
     },
-    "hull": 6500,
+    "hull": 5850,
     "physics": {
       "mass": 39.8,
       "drag": {
@@ -40724,7 +40724,7 @@
     "crew": {
       "capacity": 128
     },
-    "hull": 212800,
+    "hull": 220000,
     "physics": {
       "mass": 1120.0,
       "drag": {
@@ -42902,11 +42902,11 @@
     "crew": {
       "capacity": 49
     },
-    "hull": 40000,
+    "hull": 56000,
     "physics": {
       "mass": 266.716,
       "drag": {
-        "forward": 93.4,
+        "forward": 95.0,
         "reverse": 420.0,
         "horizontal": 55.0,
         "vertical": 55.0,
@@ -43844,7 +43844,7 @@
     "cargo": [
       {
         "type": "solid",
-        "capacity": 56300
+        "capacity": 62300
       }
     ],
     "dockarea": [
@@ -43880,11 +43880,11 @@
     "crew": {
       "capacity": 49
     },
-    "hull": 40000,
+    "hull": 56000,
     "physics": {
       "mass": 267.133,
       "drag": {
-        "forward": 93.4,
+        "forward": 95.0,
         "reverse": 420.0,
         "horizontal": 55.0,
         "vertical": 55.0,
@@ -45782,17 +45782,17 @@
     "crew": {
       "capacity": 9
     },
-    "hull": 12000,
+    "hull": 16000,
     "physics": {
-      "mass": 30.0,
+      "mass": 32.0,
       "drag": {
         "forward": 9.0,
-        "reverse": 34.879,
-        "horizontal": 14.177,
+        "reverse": 40.0,
+        "horizontal": 14.8,
         "vertical": 14.177,
-        "pitch": 9.609,
-        "yaw": 9.609,
-        "roll": 9.609
+        "pitch": 10.0,
+        "yaw": 10.0,
+        "roll": 11.5
       },
       "accfactors": {
         "horizontal": 1.0,
@@ -46067,17 +46067,17 @@
     "crew": {
       "capacity": 7
     },
-    "hull": 14000,
+    "hull": 17400,
     "physics": {
-      "mass": 34.121,
+      "mass": 36.0,
       "drag": {
-        "forward": 10.01,
+        "forward": 10.2,
         "reverse": 40.04,
         "horizontal": 17.012,
         "vertical": 17.012,
-        "pitch": 11.03,
-        "yaw": 11.03,
-        "roll": 11.03
+        "pitch": 12.0,
+        "yaw": 12.0,
+        "roll": 13.3
       },
       "accfactors": {
         "horizontal": 1.0,
@@ -46360,17 +46360,17 @@
     "crew": {
       "capacity": 15
     },
-    "hull": 33000,
+    "hull": 36000,
     "physics": {
-      "mass": 68.683,
+      "mass": 68.0,
       "drag": {
         "forward": 15.1,
-        "reverse": 39.0,
+        "reverse": 42.0,
         "horizontal": 16.597,
         "vertical": 16.597,
         "pitch": 13.8,
         "yaw": 13.8,
-        "roll": 15.0
+        "roll": 15.5
       },
       "accfactors": {
         "horizontal": 1.15,
@@ -46653,12 +46653,12 @@
     "crew": {
       "capacity": 12
     },
-    "hull": 39000,
+    "hull": 41000,
     "physics": {
-      "mass": 82.42,
+      "mass": 77.0,
       "drag": {
-        "forward": 19.0,
-        "reverse": 58.71,
+        "forward": 19.2,
+        "reverse": 56.0,
         "horizontal": 19.916,
         "vertical": 19.916,
         "pitch": 16.173,
@@ -47624,17 +47624,17 @@
     "crew": {
       "capacity": 16
     },
-    "hull": 9600,
+    "hull": 10200,
     "physics": {
-      "mass": 63.13,
+      "mass": 64.0,
       "drag": {
         "forward": 11.061,
         "reverse": 44.244,
         "horizontal": 20.402,
         "vertical": 20.402,
-        "pitch": 18.283,
-        "yaw": 18.283,
-        "roll": 18.283
+        "pitch": 18.4,
+        "yaw": 18.4,
+        "roll": 19.2
       },
       "accfactors": {
         "horizontal": 1,
@@ -47795,7 +47795,7 @@
     "crew": {
       "capacity": 13
     },
-    "hull": 10800,
+    "hull": 11800,
     "physics": {
       "mass": 70.0,
       "drag": {
@@ -47803,9 +47803,9 @@
         "reverse": 28.0,
         "horizontal": 19.0,
         "vertical": 19.0,
-        "pitch": 13.8,
-        "yaw": 13.8,
-        "roll": 16.0
+        "pitch": 19.3,
+        "yaw": 19.3,
+        "roll": 21.5
       },
       "accfactors": {
         "horizontal": 1,
@@ -47966,12 +47966,12 @@
     "crew": {
       "capacity": 20
     },
-    "hull": 8750,
+    "hull": 8800,
     "physics": {
-      "mass": 56.817,
+      "mass": 56.0,
       "drag": {
-        "forward": 10.106,
-        "reverse": 40.424,
+        "forward": 10.0,
+        "reverse": 40.0,
         "horizontal": 18.361,
         "vertical": 18.361,
         "pitch": 16.704,
@@ -48139,14 +48139,14 @@
     },
     "hull": 10000,
     "physics": {
-      "mass": 68.18,
+      "mass": 64.0,
       "drag": {
         "forward": 11.825,
         "reverse": 47.299,
         "horizontal": 22.034,
         "vertical": 22.034,
-        "pitch": 19.545,
-        "yaw": 19.545,
+        "pitch": 18.7,
+        "yaw": 18.7,
         "roll": 19.545
       },
       "accfactors": {
@@ -48368,9 +48368,9 @@
     "crew": {
       "capacity": 17
     },
-    "hull": 10000,
+    "hull": 14000,
     "physics": {
-      "mass": 63.0,
+      "mass": 65.0,
       "drag": {
         "forward": 15.8,
         "reverse": 59.0,
@@ -48381,8 +48381,8 @@
         "roll": 21.0
       },
       "accfactors": {
-        "horizontal": 1.15,
-        "vertical": 1.15
+        "horizontal": 1.18,
+        "vertical": 1.18
       }
     },
     "radarRange": 40000
@@ -51437,17 +51437,17 @@
     "crew": {
       "capacity": 135
     },
-    "hull": 239000,
+    "hull": 290000,
     "physics": {
-      "mass": 608.398,
+      "mass": 800.0,
       "drag": {
         "forward": 250.0,
         "reverse": 1109.238,
         "horizontal": 120.0,
         "vertical": 120.0,
-        "pitch": 821.68,
-        "yaw": 821.68,
-        "roll": 821.68
+        "pitch": 770.0,
+        "yaw": 770.0,
+        "roll": 800.0
       },
       "accfactors": {
         "horizontal": 1,
@@ -51846,17 +51846,17 @@
     "crew": {
       "capacity": 112
     },
-    "hull": 287000,
+    "hull": 310000,
     "physics": {
-      "mass": 730.078,
+      "mass": 950.0,
       "drag": {
-        "forward": 280.0,
+        "forward": 290.0,
         "reverse": 1243.086,
         "horizontal": 135.0,
         "vertical": 135.0,
-        "pitch": 846.016,
-        "yaw": 846.016,
-        "roll": 846.016
+        "pitch": 840.0,
+        "yaw": 840.0,
+        "roll": 860.0
       },
       "accfactors": {
         "horizontal": 1,
@@ -52232,11 +52232,11 @@
     "crew": {
       "capacity": 200
     },
-    "hull": 128000,
+    "hull": 162000,
     "physics": {
       "mass": 896.85,
       "drag": {
-        "forward": 324.213,
+        "forward": 310.0,
         "reverse": 1296.85,
         "horizontal": 250.0,
         "vertical": 250.0,
@@ -52618,11 +52618,11 @@
     "crew": {
       "capacity": 166
     },
-    "hull": 152000,
+    "hull": 186000,
     "physics": {
       "mass": 1076.221,
       "drag": {
-        "forward": 369.055,
+        "forward": 360.0,
         "reverse": 1476.221,
         "horizontal": 266.0,
         "vertical": 266.0,
@@ -53336,13 +53336,13 @@
     "physics": {
       "mass": 225.943,
       "drag": {
-        "forward": 89.448,
+        "forward": 86.0,
         "reverse": 357.792,
-        "horizontal": 56.0,
-        "vertical": 56.0,
-        "pitch": 89.2,
-        "yaw": 89.2,
-        "roll": 89.2
+        "horizontal": 50.0,
+        "vertical": 50.0,
+        "pitch": 86.0,
+        "yaw": 86.0,
+        "roll": 89.0
       },
       "accfactors": {
         "horizontal": 1.3,
@@ -53610,7 +53610,7 @@
     "crew": {
       "capacity": 33
     },
-    "hull": 48000,
+    "hull": 58000,
     "physics": {
       "mass": 140.0,
       "drag": {
@@ -53910,7 +53910,7 @@
     "crew": {
       "capacity": 33
     },
-    "hull": 48000,
+    "hull": 58000,
     "physics": {
       "mass": 140.0,
       "drag": {
@@ -54459,7 +54459,7 @@
     "crew": {
       "capacity": 6
     },
-    "hull": 11000,
+    "hull": 12200,
     "physics": {
       "mass": 29.28,
       "drag": {
@@ -55031,12 +55031,12 @@
     "crew": {
       "capacity": 23
     },
-    "hull": 22000,
+    "hull": 26000,
     "physics": {
       "mass": 45.1,
       "drag": {
-        "forward": 25.165,
-        "reverse": 70.461,
+        "forward": 24.8,
+        "reverse": 74.0,
         "horizontal": 11.2,
         "vertical": 11.2,
         "pitch": 10.7,
@@ -55333,7 +55333,7 @@
     "crew": {
       "capacity": 8
     },
-    "hull": 13000,
+    "hull": 13400,
     "physics": {
       "mass": 34.134,
       "drag": {
@@ -55521,7 +55521,7 @@
     "crew": {
       "capacity": 7
     },
-    "hull": 6250,
+    "hull": 7600,
     "physics": {
       "mass": 37.781,
       "drag": {
@@ -55733,7 +55733,7 @@
     "crew": {
       "capacity": 7
     },
-    "hull": 6250,
+    "hull": 7600,
     "physics": {
       "mass": 37.781,
       "drag": {
@@ -55918,7 +55918,7 @@
     "crew": {
       "capacity": 22
     },
-    "hull": 9000,
+    "hull": 11000,
     "physics": {
       "mass": 69.0,
       "drag": {
@@ -58582,9 +58582,9 @@
     "crew": {
       "capacity": 201
     },
-    "hull": 213000,
+    "hull": 265000,
     "physics": {
-      "mass": 542.639,
+      "mass": 700.0,
       "drag": {
         "forward": 125.0,
         "reverse": 562.0,
@@ -58911,7 +58911,7 @@
     "crew": {
       "capacity": 123
     },
-    "hull": 180000,
+    "hull": 238000,
     "physics": {
       "mass": 1080.0,
       "drag": {
@@ -59515,17 +59515,17 @@
     "crew": {
       "capacity": 5
     },
-    "hull": 8400,
+    "hull": 16600,
     "physics": {
-      "mass": 21.36,
+      "mass": 25.0,
       "drag": {
-        "forward": 4.312,
-        "reverse": 17.248,
+        "forward": 4.59,
+        "reverse": 18.0,
         "horizontal": 12.0,
         "vertical": 12.0,
-        "pitch": 10.584,
-        "yaw": 10.584,
-        "roll": 10.584
+        "pitch": 12.6,
+        "yaw": 14.4,
+        "roll": 16.0
       },
       "accfactors": {
         "horizontal": 0.85,
@@ -59771,7 +59771,7 @@
     "crew": {
       "capacity": 1
     },
-    "hull": 12000,
+    "hull": 12600,
     "physics": {
       "mass": 24.634,
       "drag": {
@@ -59965,17 +59965,17 @@
     "crew": {
       "capacity": 1
     },
-    "hull": 8000,
+    "hull": 8400,
     "physics": {
       "mass": 46.638,
       "drag": {
-        "forward": 6.77,
-        "reverse": 30.47,
-        "horizontal": 26.364,
-        "vertical": 26.364,
-        "pitch": 14.159,
-        "yaw": 14.159,
-        "roll": 14.159
+        "forward": 6.4,
+        "reverse": 28.8,
+        "horizontal": 25.0,
+        "vertical": 25.0,
+        "pitch": 15.0,
+        "yaw": 15.0,
+        "roll": 15.0
       },
       "accfactors": {
         "horizontal": 1,
@@ -60463,7 +60463,7 @@
     "crew": {
       "capacity": 9
     },
-    "hull": 10000,
+    "hull": 11600,
     "physics": {
       "mass": 18.9,
       "drag": {
