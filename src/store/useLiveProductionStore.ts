@@ -926,20 +926,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const flows = mode.value === 'live'
       ? liveFlowFacade.getSectorFinalProductionFlows(sectorId)
       : planningFlows
-    const hasArchive = mode.value === 'live' && (archiveStation.value?.modules?.length ?? 0) > 0
-    const derived = hasArchive ? null : buildDerivedTransitState({
-      productionFlows: flows,
+    const derived = buildDerivedTransitState({
+      productionFlows: planningFlows,
       settings: settings.value,
       deps: getComputeDeps()
     })
+    const archiveOverride = mode.value === 'live' && (archiveStation.value?.modules?.length ?? 0) > 0
     return {
       plannedModules: [] as SavedModule[],
-      resolvedModules: derived?.resolvedModules || archiveStation.value?.modules || [],
-      modules: derived?.resolvedModules || archiveStation.value?.modules || [],
-      buildingModules: archiveStation.value?.building?.modules || [],
+      resolvedModules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
+      modules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
+      buildingModules: archiveOverride ? (archiveStation.value!.building?.modules || []) : [],
       autoIndustryModules: [] as SavedModule[],
       autoHabitationModules: [] as SavedModule[],
-      autoInfrastructureModules: derived?.autoInfrastructureModules || [],
+      autoInfrastructureModules: derived.autoInfrastructureModules,
       productionFlows: flows,
       warePriorityLevels: {} as Record<string, number>,
       actualWorkforce: 0,
