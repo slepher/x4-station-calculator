@@ -53,8 +53,9 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
     @delete-station="tabbarPresenter.emits.deleteStation"
   />
   <BlueprintContextToolbar
-    v-if="toolbarPresenter.props.workbenchMode.value === 'station'"
-    :station="toolbarPresenter.props.station.value!"
+    :station="toolbarPresenter.props.station.value"
+    :workbench-mode="toolbarPresenter.props.workbenchMode.value"
+    :title-model="toolbarPresenter.props.titleModel.value"
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
     :station-types="toolbarPresenter.props.stationTypes"
@@ -67,6 +68,7 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
     @update-sunlight="toolbarPresenter.emits.updateSunlight"
     @update-transport-minutes="toolbarPresenter.emits.updateTransportMinutes"
     @update-race-preference="toolbarPresenter.emits.updateRacePreference"
+    @update-title="toolbarPresenter.emits.updateTitle"
     @update-workforce="toolbarPresenter.emits.updateWorkforce"
     @update-show-empire-gaps="toolbarPresenter.emits.updateShowEmpireGaps"
     @open-import="toolbarPresenter.emits.openImport"

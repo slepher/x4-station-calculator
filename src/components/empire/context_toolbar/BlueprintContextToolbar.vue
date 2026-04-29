@@ -11,12 +11,17 @@ const props = defineProps<{
     type: StationType
     count: number
     minerals: string[]
+  } | null
+  workbenchMode: 'overview' | 'station' | 'transit'
+  titleModel: {
+    value: string
+    placeholder: string
   }
   settings: Partial<StationSettings> | StationSettings | null
   races: Array<{ value: string; label: string }>
-  stationTypes: Array<{ value: StationType; label: string }>
-  availableMinerals: string[]
-  singleBerthThroughput: number
+  stationTypes?: Array<{ value: StationType; label: string }>
+  availableMinerals?: string[]
+  singleBerthThroughput?: number
 }>()
 
 const emit = defineEmits<{
@@ -29,24 +34,27 @@ const emit = defineEmits<{
   updateRacePreference: [value: string]
   updateWorkforce: [value: boolean]
   updateShowEmpireGaps: [value: boolean]
+  updateTitle: [value: string]
   openImport: []
 }>()
 
 const { t } = useI18n()
 
+const isOverview = computed(() => props.workbenchMode === 'overview')
+
 const stationName = computed({
-  get: () => props.station.name,
-  set: (name: string) => emit('updateStationName', name)
+  get: () => props.station?.name || '',
+  set: (name: string) => { if (props.station) emit('updateStationName', name) }
 })
 
 const stationType = computed({
-  get: () => props.station.type,
-  set: (type: StationType) => emit('updateStationType', type)
+  get: () => props.station?.type || 'industrial',
+  set: (type: StationType) => { if (props.station) emit('updateStationType', type) }
 })
 
 const stationCount = computed({
-  get: () => props.station.count ?? 1,
-  set: (val: number) => emit('updateStationCount', val)
+  get: () => props.station?.count ?? 1,
+  set: (val: number) => { if (props.station) emit('updateStationCount', val) }
 })
 
 const sunlight = computed({
@@ -74,16 +82,21 @@ const racePreference = computed({
   set: (val: string) => emit('updateRacePreference', val)
 })
 
+const titleValue = computed({
+  get: () => props.titleModel.value,
+  set: (val: string) => emit('updateTitle', val)
+})
+
 const formatThroughput = (n: number) => new Intl.NumberFormat('en-US', {
   maximumFractionDigits: 1,
   minimumFractionDigits: 1
 }).format(n)
 
 const showMineralPopover = ref(false)
-const selectedMinerals = computed(() => props.station.minerals || [])
+const selectedMinerals = computed(() => props.station?.minerals || [])
 
 const toggleMineral = (mineral: string) => {
-  emit('toggleMineral', mineral)
+  if (props.station) emit('toggleMineral', mineral)
 }
 
 const handleOpenImport = () => {
@@ -93,8 +106,31 @@ const handleOpenImport = () => {
 
 <template>
   <div class="context-toolbar">
-    <div class="toolbar-content w-full flex items-center">
-      
+    <div v-if="isOverview" class="toolbar-content w-full flex items-center">
+      <div class="toolbar-section">
+        <div class="input-group">
+          <label class="group-label">{{ t('sector.empire_name') }}</label>
+          <input
+            v-model="titleValue"
+            class="ghost-input w-64 text-lg"
+            :placeholder="props.titleModel.placeholder"
+          />
+        </div>
+      </div>
+
+      <div class="separator mx-6"></div>
+
+      <div class="toolbar-section">
+        <div class="input-group">
+          <label class="group-label">{{ t('toolbar.race_preference') }}</label>
+          <select v-model="racePreference" class="race-select">
+            <option v-for="r in props.races" :key="r.value" :value="r.value">{{ r.label }}</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div v-else class="toolbar-content w-full flex items-center">
       <div class="toolbar-section">
         <div class="input-group">
           <label class="group-label">{{ t('toolbar.station_name') }}</label>
@@ -104,7 +140,7 @@ const handleOpenImport = () => {
         <div class="input-group ml-6">
           <label class="group-label">{{ t('toolbar.station_type') }}</label>
           <select v-model="stationType" class="ghost-select w-20">
-            <option v-for="st in props.stationTypes" :key="st.value" :value="st.value">{{ st.label }}</option>
+            <option v-for="st in props.stationTypes || []" :key="st.value" :value="st.value">{{ st.label }}</option>
           </select>
         </div>
 
@@ -118,7 +154,7 @@ const handleOpenImport = () => {
 
       <div class="toolbar-section">
         <div class="relative">
-          <div 
+          <div
             class="input-group cursor-pointer hover:text-sky-400 transition-colors"
             @click="showMineralPopover = !showMineralPopover"
           >
@@ -135,13 +171,13 @@ const handleOpenImport = () => {
           <div v-if="showMineralPopover" class="mineral-popover">
             <div class="popover-header">{{ t('toolbar.select_resources') }}</div>
             <div class="popover-content">
-              <label 
-                v-for="m in props.availableMinerals" 
-                :key="m" 
+              <label
+                v-for="m in props.availableMinerals || []"
+                :key="m"
                 class="mineral-option"
               >
-                <input 
-                  type="checkbox" 
+                <input
+                  type="checkbox"
                   :checked="selectedMinerals.includes(m)"
                   @change="toggleMineral(m)"
                 />
@@ -171,7 +207,7 @@ const handleOpenImport = () => {
         <div class="input-group ml-6">
           <label class="group-label">{{ t('toolbar.single_berth_throughput') }}</label>
           <div class="count-pill min-w-[120px] justify-end">
-            <span class="text-xs font-mono font-bold text-sky-400">{{ formatThroughput(props.singleBerthThroughput) }}</span>
+            <span class="text-xs font-mono font-bold text-sky-400">{{ formatThroughput(props.singleBerthThroughput || 0) }}</span>
             <span class="text-[10px] text-slate-500 ml-1">m³/h</span>
           </div>
         </div>
@@ -189,7 +225,7 @@ const handleOpenImport = () => {
 
         <div class="input-group ml-6">
           <label class="group-label">{{ t('toolbar.workforce_calc') }}</label>
-          <button 
+          <button
             class="toggle-chip"
             :class="workforce ? 'active-green' : 'inactive'"
             @click="workforce = !workforce"
@@ -202,7 +238,7 @@ const handleOpenImport = () => {
 
         <div class="input-group ml-6">
           <label class="group-label">{{ t('ui.show_sector_gaps') }}</label>
-          <button 
+          <button
             class="toggle-chip"
             :class="showEmpireGaps ? 'active-green' : 'inactive'"
             @click="showEmpireGaps = !showEmpireGaps"
@@ -214,14 +250,13 @@ const handleOpenImport = () => {
           </button>
         </div>
       </div>
-
     </div>
 
     <div class="toolbar-import-slot">
       <button
         class="icon-btn"
         :title="t('logicFlowImport.entry_title')"
-        :data-testid="'logicflow-import-entry-station'"
+        :data-testid="isOverview ? 'logicflow-import-entry-empire' : 'logicflow-import-entry-station'"
         @click="handleOpenImport"
       >
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
