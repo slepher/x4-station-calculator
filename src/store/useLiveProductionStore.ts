@@ -931,7 +931,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       settings: settings.value,
       deps: getComputeDeps()
     })
-    const archiveOverride = mode.value === 'live' && (archiveStation.value?.modules?.length ?? 0) > 0
+    const archiveOverride = mode.value === 'live' && archiveStation.value
     return {
       plannedModules: [] as SavedModule[],
       resolvedModules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
