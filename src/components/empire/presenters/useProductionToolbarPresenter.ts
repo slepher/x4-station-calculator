@@ -1,6 +1,6 @@
 import { computed, ref, type ComputedRef, type Ref } from 'vue'
 import type { ProductionContextState, ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
-import type { SavedModule, StationSettings, StationType } from '@/types/x4'
+import type { SavedModule, StationSettings, StationType, BindingSectorGroup } from '@/types/x4'
 import type { ArchiveStationData } from '@/types/saveArchive'
 import type { BindingStationPlan, TradeStationBinding } from '@/types/x4'
 import i18n from '@/i18n'
@@ -86,7 +86,8 @@ export interface ToolbarPresenterStore {
   toggleMineral?(mineral: string): void
   archiveStation?: ArchiveStationData | null
   bindingStation?: BindingStationPlan | TradeStationBinding | null
-  activeBinding?: { gameGuid: string } | null
+  activeBinding?: { gameGuid: string; groups?: BindingSectorGroup[] } | null
+  updateBindingGroupName?: (sectorId: string, name: string) => void
   toggleMode?: () => void
   createStation?: (name: string, type?: StationType) => unknown
   activeStationId?: string | null
@@ -143,10 +144,13 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
   const props: ToolbarPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     mode: computed(() => store.session.mode),
-    titleModel: computed(() => ({
-      value: store.titleValue,
-      placeholder: store.titlePlaceholder
-    })),
+    titleModel: computed(() => {
+      if (store.session.workbenchMode === 'transit' && store.activeBinding?.groups) {
+        const group = store.activeBinding.groups.find(g => g.id === store.session.activeTransitSectorId)
+        if (group) return { value: group.name, placeholder: store.titlePlaceholder }
+      }
+      return { value: store.titleValue, placeholder: store.titlePlaceholder }
+    }),
     settings: computed(() => store.stationState?.settings || null),
     station: computed(() => {
       const station = store.stationState
@@ -188,7 +192,13 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
   }
 
   const emits: ToolbarPresenterEmits = {
-    updateTitle: (value: string) => store.updateTitle(value),
+    updateTitle: (value: string) => {
+      if (store.session.workbenchMode === 'transit' && store.session.activeTransitSectorId) {
+        store.updateBindingGroupName?.(store.session.activeTransitSectorId, value)
+      } else {
+        store.updateTitle(value)
+      }
+    },
     updateStationName: (value: string) => store.updateStationName(value),
     updateStationType: (value) => store.updateStationType(value),
     updateStationCount: (value: number) => (store.updateStationCount || dummyThrow('updateStationCount'))(value),

@@ -222,7 +222,7 @@ const getResourceName = (wareId: string): string => {
         </div>
       </div>
 
-      <template v-if="props.mode === 'planning'">
+      <template v-if="props.mode === 'planning' || !props.hasArchiveTradeStation">
         <div class="separator mx-6"></div>
 
         <div class="toolbar-section">

@@ -310,3 +310,8 @@ When merging a worktree branch into develop:
 **原因：** 使用 `python3 -c "..."` 会触发沙盒确认弹窗，每次执行都需要用户确认，严重妨碍效率。创建脚本文件执行则不会触发确认。
 
 **违反后果：** 每次违反都需要向用户说明原因并道歉。没有例外，无论代码多简单。
+
+## Refactoring Rules
+
+- **禁止在重构中使用 fallback 链**（如 `a || b || c`、`?.modules?.length ?? 0 > 0` 等兜底逻辑）
+- 分支条件必须精确映射业务状态，每个分支只做一件事，不依赖 sequential fallback 掩盖逻辑缺失

@@ -931,11 +931,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       settings: settings.value,
       deps: getComputeDeps()
     })
+    const archiveOverride = mode.value === 'live' && archiveStation.value
     return {
       plannedModules: [] as SavedModule[],
-      resolvedModules: derived.resolvedModules,
-      modules: derived.resolvedModules,
-      buildingModules: [] as SavedModule[],
+      resolvedModules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
+      modules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
+      buildingModules: archiveOverride ? (archiveStation.value!.building?.modules || []) : [],
       autoIndustryModules: [] as SavedModule[],
       autoHabitationModules: [] as SavedModule[],
       autoInfrastructureModules: derived.autoInfrastructureModules,
@@ -1518,6 +1519,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return Object.fromEntries(entries)
   })
   const updateTitle = (value: string) => { activeBindingName.value = value }
+  const updateBindingGroupName = (groupId: string, name: string) => {
+    const group = activeBinding.value?.groups.find(g => g.id === groupId)
+    if (group && activeBinding.value) {
+      saveBindingStore.updateGroup(activeBinding.value.gameGuid, group.id, { name })
+    }
+  }
   const updateStationNameFromActive = (value: string) => {
     if (editableStationPlan.value) renameStation(editableStationPlan.value.id, value)
   }
@@ -1641,6 +1648,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     wareRuleActions,
     moduleActions,
     updateTitle,
+    updateBindingGroupName,
     updateStationName: updateStationNameFromActive,
     updateStationType: updateStationTypeFromActive,
     updateWareflowViewMode: (value: WareFlowViewMode) => { wareflowViewMode.value = value },

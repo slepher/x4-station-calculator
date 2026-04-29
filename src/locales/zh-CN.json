@@ -5,8 +5,9 @@
     "unnamed_empire": "未命名帝国"
   },
   "sector": {
-    "overview": "星区总览",
-    "new_sector_name": "新建星区",
+    "overview": "总览",
+    "new_sector_name": "新建蓝图",
+    "blueprint_name": "蓝图名称",
     "name_placeholder": "输入星区方案名称...",
     "coming_soon": "星区总览功能即将推出...",
     "stations_count": "个分站",
