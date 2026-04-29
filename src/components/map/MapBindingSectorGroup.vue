@@ -981,6 +981,7 @@ watch(() => draft.value.sectorGroupId, async (sectorId) => {
                       v-for="macro in getCollapsedCoverageByJump(sector.coverageMacros).get(jump)"
                       :key="macro"
                       class="pill pill--small pill--clickable"
+                      :class="saveSectorMacrosWithStations.has(macro) ? '' : 'pill--bg-empty'"
                       @click.stop="focusSectorByMacro(macro)"
                     >
                       {{ getSectorMacroDisplayName(macro) }}
