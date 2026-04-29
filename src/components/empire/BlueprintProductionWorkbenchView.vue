@@ -139,7 +139,9 @@ const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
   </div>
 
   <div v-if="toolbarPresenter.props.workbenchMode.value === 'overview'" class="main-layout mt-6">
-    <div class="col-span-12 lg:col-span-7">
+    <div class="col-span-12 lg:col-span-3"><!-- BuildPlanConstraintsPanel placeholder --></div>
+    <div class="col-span-12 lg:col-span-4"><!-- BuildPlanPanel placeholder --></div>
+    <div class="col-span-12 lg:col-span-5">
       <EmpireWareFlowsDashboard
         :production-flows="blueprintStore.empireDerivedProductionFlows"
         :buy-multiplier="blueprintStore.overviewBuyMultiplier"
