@@ -2112,7 +2112,7 @@
   </ship>
   <!-- Free Families -->
   <ship id="freesplit_destroyer_l" group="spl_destroyer_l">
-    <category tags="[military, destroyer, mission, plunder]" faction="[freesplit, fallensplit]" size="ship_l"/>
+    <category tags="[military, destroyer, mission, plunderer]" faction="[freesplit, fallensplit]" size="ship_l"/>
     <pilot>
       <select faction="split" tags="fighterpilot"/>
     </pilot>
@@ -2120,7 +2120,7 @@
     <people ref="split_veteran_military_crew"/>
   </ship>
   <ship id="freesplit_corvette_m" group="frf_corvette_m">
-    <category tags="[military, medium, corvette, mission, plunder]" faction="[freesplit, fallensplit]" size="ship_m"/>
+    <category tags="[military, medium, corvette, mission, plunderer]" faction="[freesplit, fallensplit]" size="ship_m"/>
     <pilot>
       <select faction="freesplit" tags="fighterpilot"/>
     </pilot>
@@ -2128,7 +2128,7 @@
     <people ref="split_elite_military_crew"/>
   </ship>
   <ship id="freesplit_fighter_s" group="frf_fighter_s">
-    <category tags="[military, fighter, selection, mission, plunder, smuggler]" faction="[freesplit, fallensplit]" size="ship_s"/>
+    <category tags="[military, fighter, selection, mission, plunderer, smuggler]" faction="[freesplit, fallensplit]" size="ship_s"/>
     <pilot>
       <select faction="freesplit" tags="fighterpilot"/>
     </pilot>
@@ -2136,7 +2136,7 @@
     <people ref="split_military_crew"/>
   </ship>
   <ship id="freesplit_fighter_heavy_s" group="frf_fighter_heavy_s">
-    <category tags="[military, fighter, heavy, mission, plunder, smuggler]" faction="[freesplit, fallensplit]" size="ship_s"/>
+    <category tags="[military, fighter, heavy, mission, plunderer, smuggler]" faction="[freesplit, fallensplit]" size="ship_s"/>
     <pilot>
       <select faction="freesplit" tags="fighterpilot"/>
     </pilot>
@@ -2144,7 +2144,7 @@
     <people ref="split_veteran_military_crew"/>
   </ship>
   <ship id="freesplit_fighter_light_s" group="frf_fighter_light_s">
-    <category tags="[military, fighter, light, mission, plunder, smuggler]" faction="[freesplit, fallensplit]" size="ship_s"/>
+    <category tags="[military, fighter, light, mission, plunderer, smuggler]" faction="[freesplit, fallensplit]" size="ship_s"/>
     <pilot>
       <select faction="freesplit" tags="fighterpilot"/>
     </pilot>
@@ -2679,7 +2679,7 @@
   </ship>
   <!-- Yaki -->
   <ship id="yaki_corvette_m" group="yak_military_m">
-    <category tags="[military, medium, corvette, mission, plunder]" faction="yaki" size="ship_m"/>
+    <category tags="[military, medium, corvette, mission, plunderer]" faction="yaki" size="ship_m"/>
     <pilot>
       <select faction="yaki" tags="fighterpilot"/>
     </pilot>
@@ -2688,7 +2688,7 @@
     <people ref="yaki_elite_military_crew"/>
   </ship>
   <ship id="yaki_fighter_s" group="yak_military_s">
-    <category tags="[military, fighter, mission, plunder]" faction="yaki" size="ship_s"/>
+    <category tags="[military, fighter, mission, plunderer]" faction="yaki" size="ship_s"/>
     <pilot>
       <select faction="yaki" tags="fighterpilot"/>
     </pilot>

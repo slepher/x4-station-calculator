@@ -2965,6 +2965,8 @@
   <entry name="landmarks_gen_asteroidmine_01_asteroid_01" value="assets\structures\landmarks\landmarks_gen_asteroidmine_01_asteroid_01"/>
   <entry name="landmarks_gen_asteroidmine_01_entrance_01" value="assets\structures\landmarks\landmarks_gen_asteroidmine_01_entrance_01"/>
   <entry name="landmarks_gen_asteroidmine_01" value="assets\structures\landmarks\landmarks_gen_asteroidmine_01"/>
+  <entry name="sm_gen_audiolog_01" value="assets\props\StorageModules\sm_gen_audiolog_01"/>
+  <entry name="scs_gen_asteroid_32_entranceplug_01" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_entranceplug_01"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>

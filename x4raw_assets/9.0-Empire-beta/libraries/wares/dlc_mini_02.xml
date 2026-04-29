@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 21.04.2026 16:40:52-->
+<!--Last exported: 23.04.2026 16:37:01-->
 <diff>
   <add sel="/wares">
     <ware id="engine_arg_m_corvette_01_mk1" name="{20107,9034}" description="{20107,9032}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
@@ -127,7 +127,7 @@
       </production>
       <component ref="turret_gen_m_disabler_01_mk1_macro" />
       <restriction licence="envoy_access" />
-      <use threshold="0" />
+      <use threshold="0.7" />
       <owner faction="ministry" />
     </ware>
     <ware id="turret_gen_m_gatling_01_mk1" name="{20105,7054}" description="{20105,7052}" group="turrets" transport="equipment" volume="1" tags="equipment turret">

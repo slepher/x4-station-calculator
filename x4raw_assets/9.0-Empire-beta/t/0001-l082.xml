@@ -3338,7 +3338,7 @@
     <t id="11693">이전의 동작 방법을 선호하시면 게임 설정의 대기열 메뉴에서 기본 명령 행동을 바꿀 수 있으며, 그렇게 하면 상호작용 메뉴에서 %s($INPUT_MODIFIER_ICON$) 을/를 눌러 명령을 대기열에 추가하는 대신 명령 대기열을 덮어쓸 수 있습니다.</t>
     <t id="11694">새로운 기본 수정키 방식을 사용하고 싶으시면 '네'를, 이전의 방식대로 %s($INPUT_MODIFIER_ICON$)을/를 눌러 명령을 덮어쓰고 싶으시면 '아니오'를 선택하십시오.</t>
     <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
+    <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>

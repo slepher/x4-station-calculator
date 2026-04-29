@@ -401,7 +401,7 @@
 
   <!-- Yaki -->
   <ship id="yaki_corvette_m" group="yak_military_m">
-    <category tags="[military, medium, corvette, mission, plunder]" faction="yaki" size="ship_m"/>
+    <category tags="[military, medium, corvette, mission, plunderer]" faction="yaki" size="ship_m"/>
     <pilot>
       <select faction="yaki" tags="fighterpilot"/>
     </pilot>
@@ -410,7 +410,7 @@
     <people ref="yaki_elite_military_crew"/>
   </ship>
   <ship id="yaki_fighter_s" group="yak_military_s">
-    <category tags="[military, fighter, mission, plunder]" faction="yaki" size="ship_s"/>
+    <category tags="[military, fighter, mission, plunderer]" faction="yaki" size="ship_s"/>
     <pilot>
       <select faction="yaki" tags="fighterpilot"/>
     </pilot>

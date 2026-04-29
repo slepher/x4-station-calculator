@@ -3,15 +3,15 @@
   <!-- Resource Areas Sizes (in meters)-->
   <!--
   Minerals:
-   Tiny:    10000
-   Small:   15000
-   Medium:  25000
-   Large:   50000
+   Tiny:    20000
+   Small:   30000
+   Medium:  50000
+   Large:  100000
   Gases:
-   Tiny:    10000
-   Small:   15000
-   Medium:  25000
-   Large:   50000
+   Tiny:    20000
+   Small:   30000
+   Medium:  50000
+   Large:  100000
   -->
   <!-- Resource Areas Respawn Timer (in minutes, times for Nividium in brackets)-->
   <!--
@@ -77,19 +77,19 @@
   -->
   <!-- objectyieldfactor (for mineral and scrap areas)-->
   <!--
-  verylow   0.5
-  low       0.7
+  verylow   0.2
+  low       0.5
   medium    1.0
   high      2.0
-  veryhigh  3.0
+  veryhigh  5.0
   -->
   <!-- gatherspeedfactor (for gas areas)-->
   <!--
-  verylow   0.5
-  low       0.7
+  verylow   0.2
+  low       0.5
   medium    1.0
   high      2.0
-  veryhigh  3.0
+  veryhigh  5.0
   -->
   <!-- scaneffectcolor -->
   <!--
@@ -122,948 +122,948 @@
   <!-- == Sphere Resource Areas - Tiny == -->
   <!-- ================================== -->
   <!-- Ore -->
-  <definition id="sphere_tiny_ore_verylow" tag="verylow" ware="ore" scaneffectcolor="resource_ore" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_ore_verylow" tag="verylow" ware="ore" scaneffectcolor="resource_ore" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_ore_low" tag="low" ware="ore" scaneffectcolor="resource_ore" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_ore_low" tag="low" ware="ore" scaneffectcolor="resource_ore" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_ore_medium" tag="medium" ware="ore" scaneffectcolor="resource_ore" respawndelay="35" yield="35000" rating="3" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_ore_high" tag="high" ware="ore" scaneffectcolor="resource_ore" respawndelay="45" yield="50000" rating="5" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_ore_high" tag="high" ware="ore" scaneffectcolor="resource_ore" respawndelay="45" yield="50000" rating="5" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_ore_veryhigh" tag="veryhigh" ware="ore" scaneffectcolor="resource_ore" respawndelay="60" yield="100000" rating="6" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_ore_veryhigh" tag="veryhigh" ware="ore" scaneffectcolor="resource_ore" respawndelay="60" yield="100000" rating="6" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- Silicon -->
-  <definition id="sphere_tiny_silicon_verylow" tag="verylow" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_silicon_verylow" tag="verylow" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_silicon_low" tag="low" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_silicon_low" tag="low" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_silicon_medium" tag="medium" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="35" yield="35000" rating="3" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_silicon_high" tag="high" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="45" yield="50000" rating="5" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_silicon_high" tag="high" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="45" yield="50000" rating="5" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_silicon_veryhigh" tag="veryhigh" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="60" yield="100000" rating="6" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_silicon_veryhigh" tag="veryhigh" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="60" yield="100000" rating="6" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- Ice -->
-  <definition id="sphere_tiny_ice_verylow" tag="verylow" ware="ice" scaneffectcolor="resource_ice" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_ice_verylow" tag="verylow" ware="ice" scaneffectcolor="resource_ice" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_ice_low" tag="low" ware="ice" scaneffectcolor="resource_ice" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_ice_low" tag="low" ware="ice" scaneffectcolor="resource_ice" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_ice_medium" tag="medium" ware="ice" scaneffectcolor="resource_ice" respawndelay="35" yield="35000" rating="3" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_ice_high" tag="high" ware="ice" scaneffectcolor="resource_ice" respawndelay="45" yield="50000" rating="5" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_ice_high" tag="high" ware="ice" scaneffectcolor="resource_ice" respawndelay="45" yield="50000" rating="5" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_ice_veryhigh" tag="veryhigh" ware="ice" scaneffectcolor="resource_ice" respawndelay="60" yield="100000" rating="6" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_ice_veryhigh" tag="veryhigh" ware="ice" scaneffectcolor="resource_ice" respawndelay="60" yield="100000" rating="6" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- Nividium -->
-  <definition id="sphere_tiny_nividium_verylow" tag="verylow" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="50" yield="500" rating="1" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_nividium_verylow" tag="verylow" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="50" yield="500" rating="1" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_nividium_low" tag="low" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="75" yield="1000" rating="2" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_nividium_low" tag="low" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="75" yield="1000" rating="2" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_nividium_medium" tag="medium" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="110" yield="1500" rating="3" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_nividium_high" tag="high" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="150" yield="3500" rating="5" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_nividium_veryhigh" tag="veryhigh" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="180" yield="5000" rating="6" objectyieldfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_nividium_veryhigh" tag="veryhigh" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="180" yield="5000" rating="6" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- Hydrogen -->
-  <definition id="sphere_tiny_hydrogen_verylow" tag="verylow" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="25" yield="10000" rating="1" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_hydrogen_verylow" tag="verylow" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="25" yield="10000" rating="1" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_hydrogen_low" tag="low" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="30" yield="15000" rating="2" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_hydrogen_low" tag="low" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="30" yield="15000" rating="2" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_hydrogen_medium" tag="medium" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="35" yield="35000" rating="3" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_hydrogen_high" tag="high" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="45" yield="50000" rating="5" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_hydrogen_veryhigh" tag="veryhigh" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="60" yield="100000" rating="6" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_hydrogen_veryhigh" tag="veryhigh" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="60" yield="100000" rating="6" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- Helium -->
-  <definition id="sphere_tiny_helium_verylow" tag="verylow" ware="helium" scaneffectcolor="resource_helium" respawndelay="25" yield="10000" rating="1" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_helium_verylow" tag="verylow" ware="helium" scaneffectcolor="resource_helium" respawndelay="25" yield="10000" rating="1" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_helium_low" tag="low" ware="helium" scaneffectcolor="resource_helium" respawndelay="30" yield="15000" rating="2" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_helium_low" tag="low" ware="helium" scaneffectcolor="resource_helium" respawndelay="30" yield="15000" rating="2" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_helium_medium" tag="medium" ware="helium" scaneffectcolor="resource_helium" respawndelay="35" yield="35000" rating="3" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_helium_high" tag="high" ware="helium" scaneffectcolor="resource_helium" respawndelay="45" yield="50000" rating="5" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_helium_veryhigh" tag="veryhigh" ware="helium" scaneffectcolor="resource_helium" respawndelay="60" yield="100000" rating="6" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_helium_veryhigh" tag="veryhigh" ware="helium" scaneffectcolor="resource_helium" respawndelay="60" yield="100000" rating="6" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- Methane -->
-  <definition id="sphere_tiny_methane_verylow" tag="verylow" ware="methane" scaneffectcolor="resource_methane" respawndelay="25" yield="10000" rating="1" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_methane_verylow" tag="verylow" ware="methane" scaneffectcolor="resource_methane" respawndelay="25" yield="10000" rating="1" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_methane_low" tag="low" ware="methane" scaneffectcolor="resource_methane" respawndelay="30" yield="15000" rating="2" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_methane_low" tag="low" ware="methane" scaneffectcolor="resource_methane" respawndelay="30" yield="15000" rating="2" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_methane_medium" tag="medium" ware="methane" scaneffectcolor="resource_methane" respawndelay="35" yield="35000" rating="3" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_methane_high" tag="high" ware="methane" scaneffectcolor="resource_methane" respawndelay="45" yield="50000" rating="5" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_methane_veryhigh" tag="veryhigh" ware="methane" scaneffectcolor="resource_methane" respawndelay="60" yield="100000" rating="6" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_methane_veryhigh" tag="veryhigh" ware="methane" scaneffectcolor="resource_methane" respawndelay="60" yield="100000" rating="6" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- Raw Scrap -->
-  <definition id="sphere_tiny_rawscrap_verylow" tag="verylow" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_rawscrap_verylow" tag="verylow" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_rawscrap_low" tag="low" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_rawscrap_low" tag="low" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_rawscrap_medium" tag="medium" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="35" yield="35000" rating="3" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_rawscrap_high" tag="high" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="45" yield="50000" rating="5" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_rawscrap_high" tag="high" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="45" yield="50000" rating="5" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_rawscrap_veryhigh" tag="veryhigh" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="60" yield="100000" rating="6" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_rawscrap_veryhigh" tag="veryhigh" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="60" yield="100000" rating="6" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- Allographyne Scrap -->
-  <definition id="sphere_tiny_rawkhaakscrap_verylow" tag="verylow" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_tiny_rawkhaakscrap_verylow" tag="verylow" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="25" yield="10000" rating="1" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_rawkhaakscrap_low" tag="low" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_tiny_rawkhaakscrap_low" tag="low" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="30" yield="15000" rating="2" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <definition id="sphere_tiny_rawkhaakscrap_medium" tag="medium" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="35" yield="35000" rating="3" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_rawkhaakscrap_high" tag="high" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="45" yield="50000" rating="5" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_rawkhaakscrap_high" tag="high" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="45" yield="50000" rating="5" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
-  <definition id="sphere_tiny_rawkhaakscrap_veryhigh" tag="veryhigh" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="60" yield="100000" rating="6" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_tiny_rawkhaakscrap_veryhigh" tag="veryhigh" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="60" yield="100000" rating="6" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="10000"/>
+      <size r="20000"/>
     </boundary>
   </definition>
   <!-- =================================== -->
   <!-- == Sphere Resource Areas - Small == -->
   <!-- =================================== -->
   <!-- Ore -->
-  <definition id="sphere_small_ore_verylow" tag="verylow" ware="ore" scaneffectcolor="resource_ore" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_ore_verylow" tag="verylow" ware="ore" scaneffectcolor="resource_ore" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_ore_low" tag="low" ware="ore" scaneffectcolor="resource_ore" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_ore_low" tag="low" ware="ore" scaneffectcolor="resource_ore" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_ore_medium" tag="medium" ware="ore" scaneffectcolor="resource_ore" respawndelay="40" yield="100000" rating="6" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_ore_high" tag="high" ware="ore" scaneffectcolor="resource_ore" respawndelay="55" yield="250000" rating="9" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_ore_high" tag="high" ware="ore" scaneffectcolor="resource_ore" respawndelay="55" yield="250000" rating="9" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_ore_veryhigh" tag="veryhigh" ware="ore" scaneffectcolor="resource_ore" respawndelay="70" yield="500000" rating="11" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_ore_veryhigh" tag="veryhigh" ware="ore" scaneffectcolor="resource_ore" respawndelay="70" yield="500000" rating="11" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- Silicon -->
-  <definition id="sphere_small_silicon_verylow" tag="verylow" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_silicon_verylow" tag="verylow" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_silicon_low" tag="low" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_silicon_low" tag="low" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_silicon_medium" tag="medium" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="40" yield="100000" rating="6" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_silicon_high" tag="high" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="55" yield="250000" rating="9" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_silicon_high" tag="high" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="55" yield="250000" rating="9" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_silicon_veryhigh" tag="veryhigh" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="70" yield="500000" rating="11" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_silicon_veryhigh" tag="veryhigh" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="70" yield="500000" rating="11" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- Ice -->
-  <definition id="sphere_small_ice_verylow" tag="verylow" ware="ice" scaneffectcolor="resource_ice" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_ice_verylow" tag="verylow" ware="ice" scaneffectcolor="resource_ice" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_ice_low" tag="low" ware="ice" scaneffectcolor="resource_ice" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_ice_low" tag="low" ware="ice" scaneffectcolor="resource_ice" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_ice_medium" tag="medium" ware="ice" scaneffectcolor="resource_ice" respawndelay="40" yield="100000" rating="6" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_ice_high" tag="high" ware="ice" scaneffectcolor="resource_ice" respawndelay="55" yield="250000" rating="9" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_ice_high" tag="high" ware="ice" scaneffectcolor="resource_ice" respawndelay="55" yield="250000" rating="9" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_ice_veryhigh" tag="veryhigh" ware="ice" scaneffectcolor="resource_ice" respawndelay="70" yield="500000" rating="11" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_ice_veryhigh" tag="veryhigh" ware="ice" scaneffectcolor="resource_ice" respawndelay="70" yield="500000" rating="11" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- Nividium -->
-  <definition id="sphere_small_nividium_verylow" tag="verylow" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="85" yield="1500" rating="3" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_nividium_verylow" tag="verylow" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="85" yield="1500" rating="3" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_nividium_low" tag="low" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="115" yield="2500" rating="4" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_nividium_low" tag="low" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="115" yield="2500" rating="4" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_nividium_medium" tag="medium" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="140" yield="5000" rating="6" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_nividium_high" tag="high" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="170" yield="10000" rating="9" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_nividium_veryhigh" tag="veryhigh" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="210" yield="25000" rating="11" objectyieldfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_nividium_veryhigh" tag="veryhigh" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="210" yield="25000" rating="11" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- Hydrogen -->
-  <definition id="sphere_small_hydrogen_verylow" tag="verylow" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="30" yield="25000" rating="3" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_hydrogen_verylow" tag="verylow" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="30" yield="25000" rating="3" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_hydrogen_low" tag="low" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="35" yield="50000" rating="4" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_hydrogen_low" tag="low" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="35" yield="50000" rating="4" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_hydrogen_medium" tag="medium" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="40" yield="100000" rating="6" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_hydrogen_high" tag="high" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="55" yield="250000" rating="9" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_hydrogen_veryhigh" tag="veryhigh" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="70" yield="500000" rating="11" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_hydrogen_veryhigh" tag="veryhigh" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="70" yield="500000" rating="11" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- Helium -->
-  <definition id="sphere_small_helium_verylow" tag="verylow" ware="helium" scaneffectcolor="resource_helium" respawndelay="30" yield="25000" rating="3" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_helium_verylow" tag="verylow" ware="helium" scaneffectcolor="resource_helium" respawndelay="30" yield="25000" rating="3" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_helium_low" tag="low" ware="helium" scaneffectcolor="resource_helium" respawndelay="35" yield="50000" rating="4" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_helium_low" tag="low" ware="helium" scaneffectcolor="resource_helium" respawndelay="35" yield="50000" rating="4" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_helium_medium" tag="medium" ware="helium" scaneffectcolor="resource_helium" respawndelay="40" yield="100000" rating="6" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_helium_high" tag="high" ware="helium" scaneffectcolor="resource_helium" respawndelay="55" yield="250000" rating="9" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_helium_veryhigh" tag="veryhigh" ware="helium" scaneffectcolor="resource_helium" respawndelay="70" yield="500000" rating="11" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_helium_veryhigh" tag="veryhigh" ware="helium" scaneffectcolor="resource_helium" respawndelay="70" yield="500000" rating="11" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- Methane -->
-  <definition id="sphere_small_methane_verylow" tag="verylow" ware="methane" scaneffectcolor="resource_methane" respawndelay="30" yield="25000" rating="3" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_methane_verylow" tag="verylow" ware="methane" scaneffectcolor="resource_methane" respawndelay="30" yield="25000" rating="3" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_methane_low" tag="low" ware="methane" scaneffectcolor="resource_methane" respawndelay="35" yield="50000" rating="4" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_methane_low" tag="low" ware="methane" scaneffectcolor="resource_methane" respawndelay="35" yield="50000" rating="4" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_methane_medium" tag="medium" ware="methane" scaneffectcolor="resource_methane" respawndelay="40" yield="100000" rating="6" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_methane_high" tag="high" ware="methane" scaneffectcolor="resource_methane" respawndelay="55" yield="250000" rating="9" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_methane_veryhigh" tag="veryhigh" ware="methane" scaneffectcolor="resource_methane" respawndelay="70" yield="500000" rating="11" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_methane_veryhigh" tag="veryhigh" ware="methane" scaneffectcolor="resource_methane" respawndelay="70" yield="500000" rating="11" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- Raw Scrap -->
-  <definition id="sphere_small_rawscrap_verylow" tag="verylow" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_rawscrap_verylow" tag="verylow" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_rawscrap_low" tag="low" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_rawscrap_low" tag="low" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_rawscrap_medium" tag="medium" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="40" yield="100000" rating="6" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_rawscrap_high" tag="high" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="55" yield="250000" rating="9" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_rawscrap_high" tag="high" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="55" yield="250000" rating="9" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_rawscrap_veryhigh" tag="veryhigh" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="70" yield="500000" rating="11" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_rawscrap_veryhigh" tag="veryhigh" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="70" yield="500000" rating="11" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- Allographyne Scrap -->
-  <definition id="sphere_small_rawkhaakscrap_verylow" tag="verylow" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_small_rawkhaakscrap_verylow" tag="verylow" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="30" yield="25000" rating="3" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_rawkhaakscrap_low" tag="low" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_small_rawkhaakscrap_low" tag="low" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="35" yield="50000" rating="4" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <definition id="sphere_small_rawkhaakscrap_medium" tag="medium" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="40" yield="100000" rating="6" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_rawkhaakscrap_high" tag="high" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="55" yield="250000" rating="9" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_rawkhaakscrap_high" tag="high" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="55" yield="250000" rating="9" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
-  <definition id="sphere_small_rawkhaakscrap_veryhigh" tag="veryhigh" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="70" yield="500000" rating="11" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_small_rawkhaakscrap_veryhigh" tag="veryhigh" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="70" yield="500000" rating="11" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="15000"/>
+      <size r="30000"/>
     </boundary>
   </definition>
   <!-- ==================================== -->
   <!-- == Sphere Resource Areas - Medium == -->
   <!-- ==================================== -->
   <!-- Ore -->
-  <definition id="sphere_medium_ore_verylow" tag="verylow" ware="ore" scaneffectcolor="resource_ore" respawndelay="50" yield="75000" rating="6" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_ore_verylow" tag="verylow" ware="ore" scaneffectcolor="resource_ore" respawndelay="50" yield="75000" rating="6" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_ore_low" tag="low" ware="ore" scaneffectcolor="resource_ore" respawndelay="60" yield="150000" rating="9" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_ore_low" tag="low" ware="ore" scaneffectcolor="resource_ore" respawndelay="60" yield="150000" rating="9" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_ore_medium" tag="medium" ware="ore" scaneffectcolor="resource_ore" respawndelay="70" yield="250000" rating="10" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_ore_high" tag="high" ware="ore" scaneffectcolor="resource_ore" respawndelay="90" yield="350000" rating="12" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_ore_high" tag="high" ware="ore" scaneffectcolor="resource_ore" respawndelay="90" yield="350000" rating="12" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_ore_veryhigh" tag="veryhigh" ware="ore" scaneffectcolor="resource_ore" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_ore_veryhigh" tag="veryhigh" ware="ore" scaneffectcolor="resource_ore" respawndelay="110" yield="750000" rating="13" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- Silicon -->
-  <definition id="sphere_medium_silicon_verylow" tag="verylow" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="50" yield="75000" rating="6" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_silicon_verylow" tag="verylow" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="50" yield="75000" rating="6" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_silicon_low" tag="low" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="60" yield="150000" rating="9" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_silicon_low" tag="low" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="60" yield="150000" rating="9" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_silicon_medium" tag="medium" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="70" yield="250000" rating="10" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_silicon_high" tag="high" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="90" yield="350000" rating="12" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_silicon_high" tag="high" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="90" yield="350000" rating="12" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_silicon_veryhigh" tag="veryhigh" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_silicon_veryhigh" tag="veryhigh" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="110" yield="750000" rating="13" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- Ice -->
-  <definition id="sphere_medium_ice_verylow" tag="verylow" ware="ice" scaneffectcolor="resource_ice" respawndelay="50" yield="75000" rating="6" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_ice_verylow" tag="verylow" ware="ice" scaneffectcolor="resource_ice" respawndelay="50" yield="75000" rating="6" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_ice_low" tag="low" ware="ice" scaneffectcolor="resource_ice" respawndelay="60" yield="150000" rating="9" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_ice_low" tag="low" ware="ice" scaneffectcolor="resource_ice" respawndelay="60" yield="150000" rating="9" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_ice_medium" tag="medium" ware="ice" scaneffectcolor="resource_ice" respawndelay="70" yield="250000" rating="10" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_ice_high" tag="high" ware="ice" scaneffectcolor="resource_ice" respawndelay="90" yield="350000" rating="12" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_ice_high" tag="high" ware="ice" scaneffectcolor="resource_ice" respawndelay="90" yield="350000" rating="12" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_ice_veryhigh" tag="veryhigh" ware="ice" scaneffectcolor="resource_ice" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_ice_veryhigh" tag="veryhigh" ware="ice" scaneffectcolor="resource_ice" respawndelay="110" yield="750000" rating="13" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- Nividium -->
-  <definition id="sphere_medium_nividium_verylow" tag="verylow" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="150" yield="5000" rating="6" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_nividium_verylow" tag="verylow" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="150" yield="5000" rating="6" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_nividium_low" tag="low" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="180" yield="10000" rating="9" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_nividium_low" tag="low" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="180" yield="10000" rating="9" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_nividium_medium" tag="medium" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="225" yield="15000" rating="10" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_nividium_high" tag="high" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="300" yield="35000" rating="12" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_nividium_veryhigh" tag="veryhigh" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="360" yield="50000" rating="13" objectyieldfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_nividium_veryhigh" tag="veryhigh" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="360" yield="50000" rating="13" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- Hydrogen -->
-  <definition id="sphere_medium_hydrogen_verylow" tag="verylow" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="50" yield="75000" rating="6" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_hydrogen_verylow" tag="verylow" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="50" yield="75000" rating="6" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_hydrogen_low" tag="low" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="60" yield="150000" rating="9" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_hydrogen_low" tag="low" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="60" yield="150000" rating="9" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_hydrogen_medium" tag="medium" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="70" yield="250000" rating="10" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_hydrogen_high" tag="high" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="90" yield="350000" rating="12" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_hydrogen_veryhigh" tag="veryhigh" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_hydrogen_veryhigh" tag="veryhigh" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- Helium -->
-  <definition id="sphere_medium_helium_verylow" tag="verylow" ware="helium" scaneffectcolor="resource_helium" respawndelay="50" yield="75000" rating="6" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_helium_verylow" tag="verylow" ware="helium" scaneffectcolor="resource_helium" respawndelay="50" yield="75000" rating="6" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_helium_low" tag="low" ware="helium" scaneffectcolor="resource_helium" respawndelay="60" yield="150000" rating="9" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_helium_low" tag="low" ware="helium" scaneffectcolor="resource_helium" respawndelay="60" yield="150000" rating="9" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_helium_medium" tag="medium" ware="helium" scaneffectcolor="resource_helium" respawndelay="70" yield="250000" rating="10" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_helium_high" tag="high" ware="helium" scaneffectcolor="resource_helium" respawndelay="90" yield="350000" rating="12" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_helium_veryhigh" tag="veryhigh" ware="helium" scaneffectcolor="resource_helium" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_helium_veryhigh" tag="veryhigh" ware="helium" scaneffectcolor="resource_helium" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- Methane -->
-  <definition id="sphere_medium_methane_verylow" tag="verylow" ware="methane" scaneffectcolor="resource_methane" respawndelay="50" yield="75000" rating="6" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_methane_verylow" tag="verylow" ware="methane" scaneffectcolor="resource_methane" respawndelay="50" yield="75000" rating="6" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_methane_low" tag="low" ware="methane" scaneffectcolor="resource_methane" respawndelay="60" yield="150000" rating="9" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_methane_low" tag="low" ware="methane" scaneffectcolor="resource_methane" respawndelay="60" yield="150000" rating="9" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_methane_medium" tag="medium" ware="methane" scaneffectcolor="resource_methane" respawndelay="70" yield="250000" rating="10" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_methane_high" tag="high" ware="methane" scaneffectcolor="resource_methane" respawndelay="90" yield="350000" rating="12" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_methane_veryhigh" tag="veryhigh" ware="methane" scaneffectcolor="resource_methane" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_methane_veryhigh" tag="veryhigh" ware="methane" scaneffectcolor="resource_methane" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- Raw Scrap -->
-  <definition id="sphere_medium_rawscrap_verylow" tag="verylow" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="50" yield="75000" rating="6" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_rawscrap_verylow" tag="verylow" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="50" yield="75000" rating="6" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_rawscrap_low" tag="low" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="60" yield="150000" rating="9" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_rawscrap_low" tag="low" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="60" yield="150000" rating="9" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_rawscrap_medium" tag="medium" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="70" yield="250000" rating="10" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_rawscrap_high" tag="high" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="90" yield="350000" rating="12" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_rawscrap_high" tag="high" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="90" yield="350000" rating="12" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_rawscrap_veryhigh" tag="veryhigh" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_rawscrap_veryhigh" tag="veryhigh" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="110" yield="750000" rating="13" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- Allographyne Scrap -->
-  <definition id="sphere_medium_rawkhaakscrap_verylow" tag="verylow" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="30" yield="50000" rating="6" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_medium_rawkhaakscrap_verylow" tag="verylow" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="30" yield="50000" rating="6" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_rawkhaakscrap_low" tag="low" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="35" yield="100000" rating="9" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_medium_rawkhaakscrap_low" tag="low" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="35" yield="100000" rating="9" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <definition id="sphere_medium_rawkhaakscrap_medium" tag="medium" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="70" yield="250000" rating="10" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_rawkhaakscrap_high" tag="high" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="90" yield="350000" rating="12" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_rawkhaakscrap_high" tag="high" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="90" yield="350000" rating="12" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
-  <definition id="sphere_medium_rawkhaakscrap_veryhigh" tag="veryhigh" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_medium_rawkhaakscrap_veryhigh" tag="veryhigh" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="110" yield="750000" rating="13" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="25000"/>
+      <size r="50000"/>
     </boundary>
   </definition>
   <!-- =================================== -->
   <!-- == Sphere Resource Areas - Large == -->
   <!-- =================================== -->
   <!-- Ore -->
-  <definition id="sphere_large_ore_verylow" tag="verylow" ware="ore" scaneffectcolor="resource_ore" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_ore_verylow" tag="verylow" ware="ore" scaneffectcolor="resource_ore" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_ore_low" tag="low" ware="ore" scaneffectcolor="resource_ore" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_ore_low" tag="low" ware="ore" scaneffectcolor="resource_ore" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_ore_medium" tag="medium" ware="ore" scaneffectcolor="resource_ore" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_ore_high" tag="high" ware="ore" scaneffectcolor="resource_ore" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_ore_high" tag="high" ware="ore" scaneffectcolor="resource_ore" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_ore_veryhigh" tag="veryhigh" ware="ore" scaneffectcolor="resource_ore" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_ore_veryhigh" tag="veryhigh" ware="ore" scaneffectcolor="resource_ore" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <!-- Silicon -->
-  <definition id="sphere_large_silicon_verylow" tag="verylow" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_silicon_verylow" tag="verylow" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_silicon_low" tag="low" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_silicon_low" tag="low" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_silicon_medium" tag="medium" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_silicon_high" tag="high" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_silicon_high" tag="high" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_silicon_veryhigh" tag="veryhigh" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_silicon_veryhigh" tag="veryhigh" ware="silicon" scaneffectcolor="resource_silicon" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <!-- Ice -->
-  <definition id="sphere_large_ice_verylow" tag="verylow" ware="ice" scaneffectcolor="resource_ice" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_ice_verylow" tag="verylow" ware="ice" scaneffectcolor="resource_ice" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_ice_low" tag="low" ware="ice" scaneffectcolor="resource_ice" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_ice_low" tag="low" ware="ice" scaneffectcolor="resource_ice" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_ice_medium" tag="medium" ware="ice" scaneffectcolor="resource_ice" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_ice_high" tag="high" ware="ice" scaneffectcolor="resource_ice" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_ice_high" tag="high" ware="ice" scaneffectcolor="resource_ice" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_ice_veryhigh" tag="veryhigh" ware="ice" scaneffectcolor="resource_ice" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_ice_veryhigh" tag="veryhigh" ware="ice" scaneffectcolor="resource_ice" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <!-- Nividium -->
-  <definition id="sphere_large_nividium_verylow" tag="verylow" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="225" yield="15000" rating="8" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_nividium_verylow" tag="verylow" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="225" yield="15000" rating="8" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_nividium_low" tag="low" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="270" yield="25000" rating="11" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_nividium_low" tag="low" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="270" yield="25000" rating="11" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_nividium_medium" tag="medium" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="360" yield="50000" rating="13" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_nividium_high" tag="high" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="450" yield="30000" rating="14" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_nividium_veryhigh" tag="veryhigh" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="540" yield="100000" rating="15" objectyieldfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_nividium_veryhigh" tag="veryhigh" ware="nividium" scaneffectcolor="resource_nividium" respawndelay="540" yield="100000" rating="15" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <!-- Hydrogen -->
-  <definition id="sphere_large_hydrogen_verylow" tag="verylow" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="70" yield="250000" rating="8" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_hydrogen_verylow" tag="verylow" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="70" yield="250000" rating="8" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_hydrogen_low" tag="low" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="90" yield="500000" rating="11" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_hydrogen_low" tag="low" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="90" yield="500000" rating="11" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_hydrogen_medium" tag="medium" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_hydrogen_high" tag="high" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="130" yield="1000000" rating="14" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_hydrogen_veryhigh" tag="veryhigh" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="160" yield="1500000" rating="15" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_hydrogen_veryhigh" tag="veryhigh" ware="hydrogen" scaneffectcolor="resource_hydrogen" respawndelay="160" yield="1500000" rating="15" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <!-- Helium -->
-  <definition id="sphere_large_helium_verylow" tag="verylow" ware="helium" scaneffectcolor="resource_helium" respawndelay="70" yield="250000" rating="8" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_helium_verylow" tag="verylow" ware="helium" scaneffectcolor="resource_helium" respawndelay="70" yield="250000" rating="8" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_helium_low" tag="low" ware="helium" scaneffectcolor="resource_helium" respawndelay="90" yield="500000" rating="11" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_helium_low" tag="low" ware="helium" scaneffectcolor="resource_helium" respawndelay="90" yield="500000" rating="11" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_helium_medium" tag="medium" ware="helium" scaneffectcolor="resource_helium" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_helium_high" tag="high" ware="helium" scaneffectcolor="resource_helium" respawndelay="130" yield="1000000" rating="14" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_helium_veryhigh" tag="veryhigh" ware="helium" scaneffectcolor="resource_helium" respawndelay="160" yield="1500000" rating="15" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_helium_veryhigh" tag="veryhigh" ware="helium" scaneffectcolor="resource_helium" respawndelay="160" yield="1500000" rating="15" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <!-- Methane -->
-  <definition id="sphere_large_methane_verylow" tag="verylow" ware="methane" scaneffectcolor="resource_methane" respawndelay="70" yield="250000" rating="8" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_methane_verylow" tag="verylow" ware="methane" scaneffectcolor="resource_methane" respawndelay="70" yield="250000" rating="8" gatherspeedfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_methane_low" tag="low" ware="methane" scaneffectcolor="resource_methane" respawndelay="90" yield="500000" rating="11" gatherspeedfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_methane_low" tag="low" ware="methane" scaneffectcolor="resource_methane" respawndelay="90" yield="500000" rating="11" gatherspeedfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_methane_medium" tag="medium" ware="methane" scaneffectcolor="resource_methane" respawndelay="110" yield="750000" rating="13" gatherspeedfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_methane_high" tag="high" ware="methane" scaneffectcolor="resource_methane" respawndelay="130" yield="1000000" rating="14" gatherspeedfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_methane_veryhigh" tag="veryhigh" ware="methane" scaneffectcolor="resource_methane" respawndelay="160" yield="1500000" rating="15" gatherspeedfactor="3.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_methane_veryhigh" tag="veryhigh" ware="methane" scaneffectcolor="resource_methane" respawndelay="160" yield="1500000" rating="15" gatherspeedfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <!-- Raw Scrap -->
-  <definition id="sphere_large_rawscrap_verylow" tag="verylow" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_rawscrap_verylow" tag="verylow" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_rawscrap_low" tag="low" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_rawscrap_low" tag="low" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_rawscrap_medium" tag="medium" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_rawscrap_high" tag="high" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_rawscrap_high" tag="high" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_rawscrap_veryhigh" tag="veryhigh" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_rawscrap_veryhigh" tag="veryhigh" ware="rawscrap" scaneffectcolor="resource_rawscrap" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <!-- Allographyne Scrap -->
-  <definition id="sphere_large_rawkhaakscrap_verylow" tag="verylow" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
+  <definition id="sphere_large_rawkhaakscrap_verylow" tag="verylow" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="70" yield="250000" rating="8" objectyieldfactor="0.2" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.1" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_rawkhaakscrap_low" tag="low" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.7" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
+  <definition id="sphere_large_rawkhaakscrap_low" tag="low" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="90" yield="500000" rating="11" objectyieldfactor="0.5" scaneffect="scfx_dynamic_lowyield_01" scaneffectintensity="0.3" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
   <definition id="sphere_large_rawkhaakscrap_medium" tag="medium" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="110" yield="750000" rating="13" objectyieldfactor="1.0" scaneffect="scfx_dynamic_normalyield_01" scaneffectintensity="0.6" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_rawkhaakscrap_high" tag="high" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="1.2" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_rawkhaakscrap_high" tag="high" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="130" yield="1000000" rating="14" objectyieldfactor="2.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
-  <definition id="sphere_large_rawkhaakscrap_veryhigh" tag="veryhigh" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="1.5" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
+  <definition id="sphere_large_rawkhaakscrap_veryhigh" tag="veryhigh" ware="rawkhaakscrap" scaneffectcolor="resource_rawkhaakscrap" respawndelay="160" yield="1500000" rating="15" objectyieldfactor="5.0" scaneffect="scfx_dynamic_highyield_01" scaneffectintensity="1.0" scaneffectamount="3">
     <boundary class="sphere">
-      <size r="50000"/>
+      <size r="100000"/>
     </boundary>
   </definition>
 </regionyields>

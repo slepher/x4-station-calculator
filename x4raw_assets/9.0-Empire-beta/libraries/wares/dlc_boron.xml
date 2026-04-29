@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 21.04.2026 16:40:37-->
+<!--Last exported: 23.04.2026 16:36:43-->
 <diff>
   <add sel="/wares/production">
     <method id="boron" name="{20206,801}">
@@ -1358,7 +1358,7 @@
       </production>
       <component ref="turret_bor_l_disruptor_01_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="1" />
+      <use threshold="0.9" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_l_flak_01_mk1" name="{20105,5444}" description="{20105,5442}" group="weapons" transport="equipment" volume="1" tags="equipment turret">
@@ -1372,7 +1372,7 @@
       </production>
       <component ref="turret_bor_l_flak_01_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.8" />
+      <use threshold="0.7" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_l_laser_01_mk1" name="{20105,5454}" description="{20105,5452}" group="weapons" transport="equipment" volume="1" tags="equipment turret">
@@ -1526,7 +1526,7 @@
       </production>
       <component ref="turret_bor_m_railgun_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.8" />
+      <use threshold="0.7" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_m_railgun_02_mk1" name="{20105,4974}" description="{20105,4972}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
@@ -1540,7 +1540,7 @@
       </production>
       <component ref="turret_bor_m_railgun_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.8" />
+      <use threshold="0.7" />
       <owner faction="boron" />
     </ware>
     <ware id="weapon_bor_l_beam_01_mk1" name="{20105,3064}" description="{20105,3062}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
@@ -1579,7 +1579,7 @@
       </production>
       <component ref="weapon_bor_m_flak_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.2" />
+      <use threshold="0.7" />
       <owner faction="boron" />
     </ware>
     <ware id="weapon_bor_m_guided_01_mk1" name="{20105,2544}" description="{20105,2542}" group="weapons" transport="equipment" volume="1" tags="deprecated">
@@ -1632,7 +1632,7 @@
       </production>
       <component ref="weapon_bor_m_railgun_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.6" />
+      <use threshold="0.7" />
       <owner faction="boron" />
     </ware>
     <ware id="weapon_bor_m_torpedo_01_mk1" name="{20105,2554}" description="{20105,2552}" group="weapons" transport="equipment" volume="1" tags="deprecated">
