@@ -66,13 +66,10 @@ const formattedDetails = computed(() => {
   if (!props.details) return []
   
   if (props.viewMode === 'economy') {
-    return processedDetails.value.map(detail => {
-      const extra = detail as unknown as Record<string, number>
-      return {
-        ...detail,
-        displayAmount: extra.netValue ?? detail.amount * 100
-      }
-    })
+    return processedDetails.value.map(detail => ({
+      ...detail,
+      displayAmount: detail.valueContribution
+    }))
   }
   
   return processedDetails.value.map(detail => ({
@@ -111,7 +108,8 @@ const getStationCount = (detail: DerivedFlowContribution) => detail.count || 1
           </span>
           <div class="item-val-group">
             <span class="item-val">
-              {{ item.displayAmount > 0 ? '+' : '' }}{{ formatNum(item.displayAmount) }}
+              <template v-if="viewMode === 'economy'">{{ item.displayAmount > 0 ? '+' : '' }}{{ formatNum(item.displayAmount) }} Cr</template>
+              <template v-else>{{ item.displayAmount > 0 ? '+' : '' }}{{ formatNum(item.displayAmount) }}</template>
             </span>
           </div>
         </template>

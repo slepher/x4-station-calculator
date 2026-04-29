@@ -114,7 +114,9 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
               amount: flow.netRate || 0,
               bonusPercent: 0,
               name: sectorName,
-              netValue: 0,
+              valueContribution: 0,
+              volumeContribution: Math.abs(flow.netRate || 0) * (flow.unitVolume || 0),
+              transportContribution: Math.abs(flow.netRate || 0) * (flow.unitVolume || 0),
               sortOrder: externalSortOrder
             }]
         appendFlow(operationsByWare, flow, contributions)
@@ -137,7 +139,9 @@ export function buildStationComponentGapFlows(input: BuildStationComponentGapFlo
               amount: flow.netRate || 0,
               bonusPercent: 0,
               name: sectorName,
-              netValue: 0,
+              valueContribution: 0,
+              volumeContribution: Math.abs(flow.netRate || 0) * (flow.unitVolume || 0),
+              transportContribution: Math.abs(flow.netRate || 0) * (flow.unitVolume || 0),
               sortOrder: externalSortOrder
             }]
         appendFlow(supplyByWare, flow, contributions)

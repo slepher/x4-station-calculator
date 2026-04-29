@@ -219,10 +219,10 @@ const transportItems = computed(() =>
     const details = (storageFlow.details || [])
       .map((detail: any) => ({
         ...detail,
-        transportVolume: Math.abs(detail.amount || 0) * (storageFlow.unitVolume || 0)
+        transportContribution: Math.abs(detail.amount || 0) * (storageFlow.unitVolume || 0)
       }))
-      .filter((detail: any) => detail.transportVolume > 0)
-    const totalTransportVolume = details.reduce((sum: number, detail: any) => sum + detail.transportVolume, 0)
+      .filter((detail: any) => detail.transportContribution > 0)
+    const totalTransportVolume = details.reduce((sum: number, detail: any) => sum + detail.transportContribution, 0)
 
     return {
       wareId: storageFlow.wareId,

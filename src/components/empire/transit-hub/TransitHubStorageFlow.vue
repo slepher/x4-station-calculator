@@ -4,12 +4,16 @@ import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
 import type { DerivedFlowContribution } from '@/types/production-flow'
 
+interface StorageFlowDetail extends DerivedFlowContribution {
+  storageVolume: number
+}
+
 const props = defineProps<{
   resourceId: string
   name: string
   unitVolume: number
   totalRequiredStorageVolume: number
-  details: DerivedFlowContribution[]
+  details: StorageFlowDetail[]
 }>()
 
 const { t } = useI18n()

@@ -96,8 +96,11 @@ export function deriveProductionFlows(
             : atom.class === 'sector'
               ? sectorNameMap?.[atom.id] || (atom as any).name || atom.id
               : (atom as any).name || atom.id,
-      netValue: atom.amount * unitPrice,
-      transportVolume: shouldCountTransport ? Math.abs(atom.amount) * unitVolume : 0
+      valueContribution: atom.amount * unitPrice,
+      volumeContribution: atom.amount > 0
+        ? atom.amount * productBufferHours
+        : Math.abs(atom.amount) * settings.resourceBufferHours,
+      transportContribution: Math.abs(atom.amount) * unitVolume
     }))
 
     return {

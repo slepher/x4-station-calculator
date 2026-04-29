@@ -22,8 +22,10 @@ deriveProductionFlows() ← 唯一派生入口
   ├── modulesMap → 解析 module name
   ├── stationNameMap → 解析 station name
   ├── sectorNameMap → 解析 sector name
-  ├── waresMap → 计算 netValue
-  └── settings → 计算 transportVolume / storageVolume
+  ├── waresMap / unitPrice → 计算 valueContribution
+  ├── settings.resourceBufferHours → 计算 volumeContribution（消耗侧）
+  ├── settings.priorityLevel → productBufferHours → 计算 volumeContribution（生产侧）
+  └── settings → 计算 transportContribution
   ↓
 DerivedProductionFlow[]（含 DerivedFlowContribution[]）
   ↓

@@ -39,7 +39,9 @@ export function deriveEmpireWareFlows(input: {
       contributions: flow.contributions.map((contrib) => ({
         ...contrib,
         name: (contrib as unknown as Record<string, string>).name || '',
-        netValue: contrib.amount * unitPrice
+        valueContribution: contrib.amount * unitPrice,
+        volumeContribution: Math.abs(contrib.amount) * (flow.unitVolume || 0),
+        transportContribution: Math.abs(contrib.amount) * (flow.unitVolume || 0)
       }))
     }
   }

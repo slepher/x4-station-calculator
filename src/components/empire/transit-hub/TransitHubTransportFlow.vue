@@ -31,7 +31,7 @@ const formattedDetails = computed(() => {
         if (hasOrderA && !hasOrderB) return -1
         if (!hasOrderA && hasOrderB) return 1
       }
-      return (b.transportVolume || 0) - (a.transportVolume || 0)
+      return (b.transportContribution || 0) - (a.transportContribution || 0)
     })
     .map((detail) => {
       const isExternal = detail.class === 'sector'
@@ -83,7 +83,7 @@ const formattedDetails = computed(() => {
           <span :class="item.kindClass">{{ item.kindLabel }}</span>
         </span>
         <div class="item-val-group">
-          <span class="item-val">{{ formatNum(item.transportVolume, 1) }}m³</span>
+          <span class="item-val">{{ formatNum(item.transportContribution, 1) }}m³</span>
         </div>
       </template>
     </CollapsibleDetailList>

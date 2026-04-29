@@ -26,15 +26,30 @@ interface FlowContribution {
 
 ### 派生层 `DerivedFlowContribution`
 
+每个贡献项对 flow 级三个维度的独立贡献：
+
+| 字段 | 公式 | 含义 | UI 显示 |
+|------|------|------|---------|
+| `valueContribution` | `amount × unitPrice` | 该产出/消耗模块的经济价值贡献 | 经济视图，带符号 |
+| `volumeContribution` | `amount > 0 ? amount × productBufferHours : \|amount\| × resourceBufferHours` | 该模块需要为其产量/消耗量预留的存储格子数 | 体积视图，始终为正 |
+| `transportContribution` | `\|amount\| × unitVolume` | 该模块需要运输的体积量 | 运输视图，无符号 |
+
 ```typescript
 interface DerivedFlowContribution extends FlowContribution {
   name: string
-  netValue: number
+  valueContribution: number
+  volumeContribution: number
+  transportContribution: number
   sortOrder?: number
-  storageVolume?: number
-  transportVolume?: number
 }
 ```
+
+其中 `productBufferHours` 由该物资的 `priorityLevel` 决定：
+- level 2（主产物）→ `primaryProductBufferHours`
+- level 1（副产物）→ `secondaryProductBufferHours`
+- level 0（无标记）→ 0
+
+`resourceBufferHours` 固定来自 settings。
 
 ### 统一的流类型 `DerivedProductionFlow`
 
@@ -105,7 +120,7 @@ Vue 组件:
 ## 验收标准（DoD）
 
 1. `FlowContribution` 只含原始字段
-2. `DerivedFlowContribution` 含 name / netValue / sortOrder / storageVolume / transportVolume
+2. `DerivedFlowContribution` 含 name / valueContribution / volumeContribution / transportContribution / sortOrder
 3. `DerivedStationFlowAtom` / `SupplyStorageFlow` / `SupplyStorageFlowDetail` 删除
 4. `groupDerivedProductionFlows` 改为 composable
 5. `buildStorageFlowsFromProductionFlows` 删除
