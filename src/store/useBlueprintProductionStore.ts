@@ -655,8 +655,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       } else {
         activeViewStore.activeEmpireId = empireId
       }
-      
-      if (isValid) {
+
+      if (!storedTabId) {
+        activeStationId.value = null
+      } else if (isValid) {
         activeStationId.value = storedTabId
       } else if (empire.stations.length > 0) {
         activeStationId.value = empire.stations[0]?.id || null

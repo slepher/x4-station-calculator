@@ -109,7 +109,7 @@ const handleOpenImport = () => {
     <div v-if="isOverview" class="toolbar-content w-full flex items-center">
       <div class="toolbar-section">
         <div class="input-group">
-          <label class="group-label">{{ t('sector.empire_name') }}</label>
+          <label class="group-label">{{ t('sector.blueprint_name') }}</label>
           <input
             v-model="titleValue"
             class="ghost-input w-64 text-lg"

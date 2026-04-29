@@ -5,8 +5,9 @@
     "unnamed_empire": "Unnamed Empire"
   },
   "sector": {
-    "overview": "Sector Overview",
-    "new_sector_name": "New Sector",
+    "overview": "Overview",
+    "new_sector_name": "New Blueprint",
+    "blueprint_name": "Blueprint Name",
     "name_placeholder": "Enter sector plan name...",
     "coming_soon": "Sector overview coming soon...",
     "stations_count": "stations",
