@@ -59,7 +59,7 @@
       "cumulative_cost": "Cumul. Cost",
       "stock": "Stock",
       "self_prod": "Self-prod",
-      "produced": "+Produced",
+      "produced": "Produced",
       "buy": "Buy",
       "unit_price": "Unit",
       "search_placeholder": "Search product or module...",

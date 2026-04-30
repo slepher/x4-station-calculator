@@ -59,7 +59,7 @@
       "cumulative_cost": "累计费",
       "stock": "库存",
       "self_prod": "自产",
-      "produced": "+自产",
+      "produced": "自产",
       "buy": "买",
       "unit_price": "单价",
       "search_placeholder": "搜索商品或模块...",
