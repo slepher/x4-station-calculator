@@ -499,7 +499,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           { label: 'D_self_demand', rates: finalSelf },
         ]
         const s1 = makeScheme(jointGroups, '联合自举',
-          'D 联合自举模块',
+          '',
           purposeWares,
           settings, modulesMap, waresMap, currentModules,
           jointSources_display)

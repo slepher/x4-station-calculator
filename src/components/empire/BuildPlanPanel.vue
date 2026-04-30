@@ -57,8 +57,11 @@ function wareName(wareId: string): string {
 
 const schemeIcons: Record<string, string> = {
   '自给自足': '1',
-  '目标建材': '2',
-  '目标产线': '3'
+  '联合自举': '1',
+  '建材自举': '1',
+  '特种产线': '2',
+  '基础建材': '2',
+  '特种孤岛': '1',
 }
 
 const schemeColors: Record<string, string> = {
@@ -132,7 +135,7 @@ const schemeCards = computed<SchemeCardData[]>(() => {
             </div>
           </div>
 
-          <p class="text-xs text-slate-400 mb-2">{{ card.scheme.description }}</p>
+          <p v-if="card.scheme.description" class="text-xs text-slate-400 mb-2">{{ card.scheme.description }}</p>
 
           <div v-if="card.primaryModuleLines.length > 0" class="mb-2">
             <div class="text-[10px] text-slate-500 mb-0.5">{{ t('sector.build_plan.primary_modules') }}</div>
