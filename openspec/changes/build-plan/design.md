@@ -195,13 +195,84 @@ const primaryModuleIds = mergedModules
 
 ### 9. Store 变更
 
-- `buildGoals: Ref<BuildGoal[]>`（代替原 buildConstraints）
+- `buildGoals: Ref<BuildGoal[]>`（代替原 buildConstraints，不再含 self-sufficient 变体）
+- `selfSufficient: Ref<boolean>`（独立参数，持久化）
+- `setSelfSufficient(val: boolean)` action
 - `buildPlan: Ref<BuildPlan | null>`（含 `schemes`）
 - `empireCurrentNetProduction: ComputedRef<Record<string, number>>`
 - `computePlan()` 调用新算法
 - 移除 `setTimeBudget`/`setCreditBudget`
 
-### 10. i18n
+### 10. selfSufficient 分离
+
+`self-sufficient` 从 `BuildGoal[]` 分离为独立 boolean 参数：
+
+- **类型变更**：`BuildGoal` 移除 `{ type: 'self-sufficient' }` 变体，仅保留 `production-rate` 和 `build-module`
+- **Store**：新增 `selfSufficient: Ref<boolean>` + `setSelfSufficient` action，持久化到 localStorage
+- **算法**：`CalculateBuildPlanInput` 新增 `selfSufficient: boolean`，算法从参数读取而非 goals 数组
+- **UI**：左面板底部 checkbox 控制，与 production-rate / build-module 目标共存
+- **目标合并规则**更新：
+  - `selfSufficient=true + 有其他目标`：合并所有其他目标 → 方案3 → 无视当前产能，直接生成方案1+2+3
+  - `selfSufficient=false + 有其他目标`：合并所有其他目标 → 方案3 → 当前产能足够则只出方案3
+  - `selfSufficient=true + 无其他目标`：只生成方案1（自给自足）
+  - `selfSufficient=false + 无其他目标`：无方案
+
+### 11. 约束面板 UI 重构
+
+#### 布局（上→下）
+
+1. **BuildGoalSearchBox** — 组合搜索框
+   - 样式对标 `MapSavePoiSearchControl.vue`：左侧搜索输入 + 右侧 category dropdown
+   - Category 选项：product（商品）/ module（模块）
+   - 切换 category 时清空搜索输入
+   - Teleport to body 弹层，显示分组搜索结果
+   - 点击结果直接添加到目标列表（不经过中间确认）
+
+2. **目标卡片列表** — `WarePlanningItem` 组件
+   - 样式对标 `StationPlanningItem`：颜色条 + 名称 + 数量输入 + × 删除
+   - 颜色条：使用 `module_group.color_rgb`（通过 `X4Ware.group` → `localizedModuleGroupsMap` 映射）
+   - production-rate 目标：显示 ware 翻译名，数量为 ratePerHour（整数，min=1）
+   - build-module 目标：显示 module 翻译名，数量为 count（整数，min=1）
+   - 点击搜索结果添加时默认数量：
+     - production-rate：`findModuleForWare(wareId, racePreference).outputs[wareId]` 的整数值
+     - build-module：1
+
+3. **计算按钮** — 保持
+
+4. **self-sufficient checkbox** — 计算按钮下方，勾选即启用，与目标共存
+
+5. **方案计数 + warnings** — 保持
+
+#### BuildGoalSearchBox 弹层
+
+- **product 模式**：分组显示 ware，用 `X4Ware.group` 映射到 `localizedModuleGroupsMap` 做分组 header
+- **module 模式**：复用 `generateFilteredModulesGrouped()` 分组逻辑
+- 每个结果项：color-indicator（module_group.color_rgb）+ 翻译名 + DLC tag（active/inactive）
+
+#### 涉及新文件
+
+| 文件 | 说明 |
+|------|------|
+| `BuildGoalSearchBox.vue` | 组合搜索框（左input+右类型下拉+Teleport弹层） |
+| `WarePlanningItem.vue` | 目标卡片（对标StationPlanningItem样式） |
+| `src/store/logic/searchWare.ts` | `generateFilteredWaresGrouped()` 商品分组搜索 |
+
+#### 涉及类型变更
+
+| 类型 | 说明 |
+|------|------|
+| `LocalizedX4Ware` | 含 `localeName`，对标 `LocalizedX4Module` |
+| `WareGroupResult` | 含 `group` + `displayLabel` + `wares`，对标 `ModuleGroupResult` |
+| `GroupedWareItem` | 含 `displayLabel` + `moduleGroup`，对标 `GroupedModuleItem` |
+
+#### 涉及 Store 变更
+
+| Store | 变更 |
+|-------|------|
+| `useGameDataStore` | 新增 `localizedWaresMap` ref + 暴露 |
+| `useGameData.ts` | 新增 `buildLocalizedWaresMap()` |
+
+### 12. i18n
 
 `sector.build_plan` 命名空间，新增 key：
 - `primary_modules` / `derived_modules`
@@ -209,7 +280,7 @@ const primaryModuleIds = mergedModules
 - `produced` / `stock` / `self_prod` / `buy` / `unit_price`
 - `build` / `cumulative` / `step_cost` / `cumulative_cost`
 
-### 11. 分析脚本
+### 13. 分析脚本
 
 `analysis/scripts/findBuildPlanDefaults.ts`
 

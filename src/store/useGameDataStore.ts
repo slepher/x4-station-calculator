@@ -9,6 +9,7 @@ import type {
   RaceMedicalConsumption,
   LocalizedX4Module,
   LocalizedX4ModuleGroup,
+  LocalizedX4Ware,
   ModuleGroupResult,
   VersionConfig,
   VersionsFile,
@@ -39,6 +40,7 @@ import {
   buildMedicalConsumptionMap,
   buildLocalizedModulesMap,
   buildLocalizedModuleGroupsMap,
+  buildLocalizedWaresMap,
   findModuleForWare as findModuleForWareFn,
   precomputeCandidateWares
 } from './logic/useGameData'
@@ -64,7 +66,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const modulesByMacroId = ref<Record<string, X4Module>>({})
   const modulesByOutputMap = ref<Record<string, X4Module[]>>({})
   const localizedModulesMap = ref<Record<string, LocalizedX4Module>>({})
-  const localizedWaresMap = ref<Record<string, { id: string, localeName: string }>>({})
+  const localizedWaresMap = ref<Record<string, LocalizedX4Ware>>({})
   const localizedModuleGroupsMap = ref<Record<string, LocalizedX4ModuleGroup>>({})
   const medicalConsumptionMap = ref<RaceMedicalConsumption>({})
   const wareSetsByIndustrialRace = ref<Record<string, Set<string>>>({})
@@ -272,14 +274,11 @@ export const useGameDataStore = defineStore('gameData', () => {
 
   function prepareLocalizedWares() {
     const isEn = currentLocale.value === 'en'
-    const newWareMap: Record<string, { id: string, localeName: string }> = {}
-    Object.values(waresMap.value).forEach(w => {
-      newWareMap[w.id] = {
-        id: w.id,
-        localeName: isEn ? (w.name || '') : translateWare(w)
-      }
-    })
-    localizedWaresMap.value = newWareMap
+    localizedWaresMap.value = buildLocalizedWaresMap(
+      Object.values(waresMap.value),
+      isEn,
+      translateWare
+    )
   }
 
   function buildVolumeCompressionMap() {

@@ -74,15 +74,107 @@
 - 移除预算相关 key
 - 新增方案相关 key（方案名称、目的产物、浮动窗口标题等）
 
+### T10: selfSufficient 分离 + 类型更新 [x]
+
+- 修改 `src/types/build-plan.ts`：
+  - `BuildGoal` 移除 `{ type: 'self-sufficient' }` 变体
+  - `CalculateBuildPlanInput` 新增 `selfSufficient: boolean`
+  - `BuildPlan` 新增 `selfSufficient: boolean`
+- 修改 `src/types/x4.ts`：
+  - 新增 `LocalizedX4Ware`（含 `localeName`）
+  - 新增 `WareGroupResult`（含 `group` + `displayLabel` + `wares`）
+  - 新增 `GroupedWareItem`（含 `displayLabel` + `moduleGroup`）
+
+### T11: 算法适配 selfSufficient 参数 [x]
+
+- 文件: `src/store/logic/calculateBuildPlan.ts`
+- `selfSufficient` 从 goals 数组改为 `input.selfSufficient` 参数读取
+- 目标合并规则更新（见 design.md §10）
+
+### T12: Store 新增 selfSufficient [x]
+
+- `src/store/useBlueprintProductionStore.ts`
+- 新增 `selfSufficient: Ref<boolean>` + `setSelfSufficient(val: boolean)` action
+- 持久化到 localStorage
+- `computePlan()` 传入 `selfSufficient` 到算法
+
+### T13: GameData 新增商品本地化 [x]
+
+- `src/store/logic/useGameData.ts`：新增 `buildLocalizedWaresMap()`
+- `src/store/useGameDataStore.ts`：新增 `localizedWaresMap` ref + 暴露
+
+### T14: 新增商品分组搜索 [x]
+
+- 新建 `src/store/logic/searchWare.ts`
+- 实现 `generateFilteredWaresGrouped(query, currentLocale, localizedWaresMap, localizedModuleGroupsMap, includeWare?)`
+- 用 `X4Ware.group` 映射到 `localizedModuleGroupsMap` 做分组 header 和排序
+- 对标 `generateFilteredModulesGrouped()` 的搜索/分组/排序逻辑
+
+### T15: 新增 WarePlanningItem 组件 [x]
+
+- 新建 `src/components/empire/WarePlanningItem.vue`
+- 对标 `StationPlanningItem` 样式：颜色条（`module_group.color_rgb`）+ 名称 + 数量输入 + × 删除
+- Props: `goal: BuildGoal`, 翻译函数返回的 display name
+- Emits: `update:value`（数量修改）, `remove`
+- 数量输入用 `X4NumberInput`，min=1 step=1 整数
+- DLC tag 显示（ware 和 module 均有 dlc_tag）
+
+### T16: 新增 BuildGoalSearchBox 组件 [x]
+
+- 新建 `src/components/empire/BuildGoalSearchBox.vue`
+- 样式对标 `MapSavePoiSearchControl.vue`：左侧搜索输入 + 右侧 category dropdown
+- Category 选项：product / module
+- 切换 category 时清空搜索输入
+- Teleport to body 弹层，分组显示搜索结果
+- product 模式：调用 `generateFilteredWaresGrouped()`，用 `localizedModuleGroupsMap` 分组
+- module 模式：调用 `generateFilteredModulesGrouped()`
+- 每个结果项：color-indicator（module_group.color_rgb）+ 翻译名 + DLC tag
+- 点击结果直接 emit `add-goal`，不经过中间确认
+- Focus/Blur 控制对标 `StationModulePicker`（focusSnapshot 回退、popover mousedown prevent、ESC 关闭）
+
+### T17: 重写 BuildPlanConstraintsPanel [x]
+
+- 重写布局（上→下）：
+  1. BuildGoalSearchBox（搜索+类型切换，点击直接添加到列表）
+  2. 目标卡片列表（WarePlanningItem，可调数量、可删除）
+  3. 计算按钮
+  4. self-sufficient checkbox + 方案计数 + warnings
+- 移除原有的：类型 select、ware/module 手写下拉、添加按钮、rate/count 输入
+- 默认添加数量：
+  - production-rate：`findModuleForWare(wareId, racePreference).outputs[wareId]` 取整
+  - build-module：1
+
+### T18: Presenter 适配 [x]
+
+- `src/components/empire/presenters/useBuildPlanPresenter.ts`
+- 新增 `selfSufficient` / `setSelfSufficient` 透传
+- 新增 `updateGoal(index: number, value: number)` emit（目标数量修改）
+
+### T19: i18n 更新 [x]
+
+- `src/locales/en.json` / `zh-CN.json`
+- 新增 self-sufficient checkbox key
+- 新增 BuildGoalSearchBox category label key
+- 新增 WarePlanningItem 相关 key
+
+### T20: 构建验证 [x]
+
+- `npm run build` 通过
+- 无 TypeScript 编译错误
+
 ## 依赖顺序
 
 ```
-T1 → T2 → T3 → T4 → T5 → T6 → T7 → T8 → T9
+T1-T9（已完成）
+T10 → T11 → T12
+T10 → T13 → T14
+T10 + T13 → T15
+T13 + T14 → T16
+T15 + T16 → T17
+T12 → T18
+T17 + T18 → T19 → T20
 ```
 
-T4/T5 可并行。
-T6 内部 BuildPlanPanel + BuildPlanStepsModal 可并行开发。
-
-## 元注释
-
-T1 中 `BuildScheme` 新增类型统一放在 `src/types/build-plan.ts`。
+T10/T13 可并行。
+T11/T12 依赖 T10，可在 T13 并行期间串行执行。
+T15/T16 可并行（T15 依赖 T10+T13，T16 依赖 T13+T14）。

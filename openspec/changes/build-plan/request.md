@@ -2,15 +2,15 @@
 
 ## 目标
 
-在 Blueprint 的星区总览视图（overview）中新增产能爬坡建造规划功能。用户设定建造目标（自举/目标产量/目标建筑）后，系统根据当前帝国产能自动生成 1~3 个递进建造方案（方案1→方案2→方案3），用户点击方案卡片弹出浮动窗口查看详细建造步骤。移除时间/金钱约束，改为统计消耗。
+在 Blueprint 的星区总览视图（overview）中新增产能爬坡建造规划功能。用户设定建造目标（目标产量/目标建筑）和自给自足开关后，系统根据当前帝国产能自动生成 1~3 个递进建造方案（方案1→方案2→方案3），用户点击方案卡片弹出浮动窗口查看详细建造步骤。移除时间/金钱约束，改为统计消耗。
 
 ## 目标类型 → 方案生成映射
 
 | 目标类型 | 生成的方案 | 说明 |
 |----------|-----------|------|
-| **自举** (self-sufficient) | 仅方案1 | 贪婪循环，从 hullparts 种子开始逐个加瓶颈生产者 |
 | **目标产量** (production-rate) | 方案3→2→1 递进 | 方案3=目标产线+autoFill，方案2=输入产线，方案1=自给自足 |
 | **目标建筑** (build-module) | 方案3→2→1 递进 | 同上 |
+| **自给自足** (self-sufficient) | 仅方案1 | 贪婪循环，从 hullparts 种子开始逐个加瓶颈生产者。作为独立 boolean 参数，可与上述目标共存 |
 
 ## 算法流程
 
@@ -67,7 +67,10 @@ Phase 3 — 方案1：
 | `src/store/logic/calculateBuildPlan.ts` | 核心算法：方案生成、greedyFill、autoFill 集成 |
 | `src/store/useBlueprintProductionStore.ts` | Store 接口 |
 | `src/components/empire/presenters/useBuildPlanPresenter.ts` | Presenter 层 |
-| `src/components/empire/BuildPlanConstraintsPanel.vue` | 左面板（目标管理、计算按钮） |
+| `src/components/empire/BuildPlanConstraintsPanel.vue` | 左面板（搜索+目标卡片列表+计算按钮+self-sufficient checkbox） |
+| `src/components/empire/BuildGoalSearchBox.vue` | 组合搜索框（左input+右类型下拉，Teleport弹层分组结果） |
+| `src/components/empire/WarePlanningItem.vue` | 目标卡片（对标StationPlanningItem） |
+| `src/store/logic/searchWare.ts` | 商品分组搜索函数 |
 | `src/components/empire/BuildPlanPanel.vue` | 中面板（方案卡片列表） |
 | `src/components/empire/BuildPlanStepsModal.vue` | 浮动窗口（方案步骤明细） |
 | `src/components/empire/BlueprintProductionWorkbenchView.vue` | 工作台集成 |

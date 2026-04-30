@@ -148,11 +148,15 @@ const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
     <div class="col-span-12 lg:col-span-3">
       <BuildPlanConstraintsPanel
         :goals="buildPlanPresenter.props.goals.value"
+        :selfSufficient="buildPlanPresenter.props.selfSufficient.value"
+        :racePreference="buildPlanPresenter.props.racePreference.value"
         :build-plan="buildPlanPresenter.props.buildPlan.value"
         :loading="buildPlanPresenter.props.loading.value"
         :warnings="buildPlanPresenter.props.warnings.value"
         @add-goal="buildPlanPresenter.emits.addGoal"
         @remove-goal="buildPlanPresenter.emits.removeGoal"
+        @update-goal="buildPlanPresenter.emits.updateGoal"
+        @set-self-sufficient="buildPlanPresenter.emits.setSelfSufficient"
         @compute-plan="buildPlanPresenter.emits.computePlan"
       />
     </div>

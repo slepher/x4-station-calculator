@@ -65,8 +65,10 @@ function computeBuildRates(
     const mod = moduleMap[m.id]
     if (!mod) continue
     totalTime += mod.buildTime * m.count
-    const cost = Object.keys(mod.buildCost).length > 0 ? mod.buildCost : mod.inputs
+    const cost = mod.buildCost
+    if (!cost || Object.keys(cost).length === 0) continue
     for (const [wareId, qty] of Object.entries(cost)) {
+      if (wareId === 'energycells') continue
       materials[wareId] = (materials[wareId] || 0) + qty * m.count
     }
   }
@@ -76,11 +78,7 @@ function computeBuildRates(
     const ware = waresMap[wareId]
     if (!ware) continue
     totalCost += qty * ware.price
-    const isResource = ware.transport === 'solid' || ware.transport === 'liquid'
-    const hasProducer = Object.values(moduleMap).some(x => x.outputs[wareId] && x.type === 'production')
-    if (!isResource && hasProducer && totalTime > 0 && wareId !== 'energycells') {
-      rates[wareId] = qty / (totalTime / 3600)
-    }
+    rates[wareId] = qty / (totalTime / 3600)
   }
   return { rates, totalTime, totalCost }
 }
@@ -115,12 +113,6 @@ function expandGoalDependencies(
   }
 
   switch (goal.type) {
-    case 'self-sufficient': {
-      for (const wareId of ['claytronics', 'hullparts']) {
-        expandWareUpstream(wareId, 1, new Set())
-      }
-      break
-    }
     case 'production-rate': {
       expandWareUpstream(goal.wareId, goal.ratePerHour, new Set())
       break
@@ -162,7 +154,7 @@ function makeSchemeSteps(
     for (let ci = 0; ci < m.count; ci++) {
     const buildTime = mod.buildTime
     const net = calculateNetProduction(builtSoFar, moduleMap, settings.considerWorkforceForAutoFill, settings.sunlight)
-    const cost = Object.keys(mod.buildCost).length > 0 ? mod.buildCost : mod.inputs
+    const cost = mod.buildCost && Object.keys(mod.buildCost).length > 0 ? mod.buildCost : {}
     const buildTimeH = buildTime / 3600
     const materials: BuildMaterial[] = Object.entries(cost).map(([wareId, val]) => {
       const totalQty = (val as number)
@@ -226,8 +218,8 @@ function makeScheme(
   const steps = makeSchemeSteps(groups, moduleMap, waresMap, settings, contextModules)
   const lastStep = steps[steps.length - 1]
   const mergedModules = mergeModules(groups.flatMap(g => g.modules))
-  const netProduction = calculateNetProduction(
-    [...(contextModules || []), ...mergedModules],
+  const ownNetProduction = calculateNetProduction(
+    mergedModules,
     moduleMap, settings.considerWorkforceForAutoFill, settings.sunlight
   )
   const buildMaterialTotals: Record<string, number> = {}
@@ -236,7 +228,7 @@ function makeScheme(
     const mod = moduleMap[m.id]
     if (!mod) continue
     totalModuleBuildTime += mod.buildTime * m.count
-    const cost = Object.keys(mod.buildCost).length > 0 ? mod.buildCost : mod.inputs
+    const cost = mod.buildCost && Object.keys(mod.buildCost).length > 0 ? mod.buildCost : {}
     for (const [wareId, qty] of Object.entries(cost)) {
       buildMaterialTotals[wareId] = (buildMaterialTotals[wareId] || 0) + (qty as number) * m.count
     }
@@ -262,7 +254,7 @@ function makeScheme(
     modules: mergedModules,
     targetRates,
     targetRateSources: targetRateSources || [],
-    netProduction,
+    netProduction: ownNetProduction,
     steps,
     totalDuration: lastStep?.estimatedDuration || 0,
     totalCredits: lastStep?.estimatedCredits || 0,
@@ -438,14 +430,12 @@ function planProductionForRates(
 }
 
 export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
-  const { goals, currentModules, settings, modulesMap, waresMap, currentNetProduction } = input
+  const { goals, selfSufficient, currentModules, settings, modulesMap, waresMap, currentNetProduction } = input
 
   const allSchemes: BuildScheme[] = []
-  const hasSelfSufficient = goals.some(g => g.type === 'self-sufficient')
-  const otherGoals = goals.filter(g => g.type !== 'self-sufficient')
 
-  if (otherGoals.length > 0) {
-    const base3 = otherGoals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap))
+  if (goals.length > 0) {
+    const base3 = goals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap))
     const merged3 = mergeModules(base3)
     const autoFill3 = calculateAutoFillModules({
       plannedModules: merged3,
@@ -457,7 +447,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
     const allMods3 = mergeModules([...merged3, ...autoFill3.autoIndustryModules, ...autoFill3.autoHabitationModules])
     const { rates: rates3 } = computeBuildRates(allMods3, modulesMap, waresMap)
 
-    const purposeWareSet = new Set(otherGoals.flatMap(g => {
+    const purposeWareSet = new Set(goals.flatMap(g => {
       if (g.type === 'build-module') return Object.keys(modulesMap[g.moduleId]?.outputs || {}).filter(w => w !== 'energycells')
       if (g.type === 'production-rate') return [g.wareId]
       return []
@@ -476,7 +466,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
 
     const uniquePurpose = [...purposeWareSet]
 
-    if (!hasSelfSufficient) {
+    if (!selfSufficient) {
       const capacityOK = Object.entries(rates3prime).every(
         ([wareId, rate]) => (currentNetProduction[wareId] || 0) >= rate
       )
@@ -486,7 +476,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           uniquePurpose, settings, modulesMap, waresMap, currentModules,
           [{ label: '目标建材', rates: rates3 }])
         if (s3.stepsCount > 0) allSchemes.push(s3)
-        return { goals, schemes: allSchemes, totalDuration: allSchemes.reduce((s, sc) => s + sc.totalDuration, 0), totalCredits: allSchemes.reduce((s, sc) => s + sc.totalCredits, 0), goalsAchieved: [], goalsRemaining: [], halted: false, haltReason: '' }
+        return { goals, selfSufficient, schemes: allSchemes, totalDuration: allSchemes.reduce((s, sc) => s + sc.totalDuration, 0), totalCredits: allSchemes.reduce((s, sc) => s + sc.totalCredits, 0), goalsAchieved: [], goalsRemaining: [], halted: false, haltReason: '' }
       }
     }
 
@@ -562,8 +552,11 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
     if (s3.stepsCount > 0) allSchemes.push(s3)
   }
 
-  if (hasSelfSufficient && otherGoals.length === 0) {
-    const base = expandGoalDependencies({ type: 'self-sufficient' }, modulesMap, waresMap)
+  if (selfSufficient && goals.length === 0) {
+    const seedWares = ['claytronics', 'hullparts']
+    const base = seedWares.flatMap(wareId =>
+      expandGoalDependencies({ type: 'production-rate', wareId, ratePerHour: 1 }, modulesMap, waresMap)
+    )
     const autoFill = calculateAutoFillModules({
       plannedModules: base,
       settings,
@@ -589,6 +582,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
 
   return {
     goals,
+    selfSufficient,
     schemes: allSchemes,
     totalDuration: allSchemes.reduce((s, sc) => s + sc.totalDuration, 0),
     totalCredits: allSchemes.reduce((s, sc) => s + sc.totalCredits, 0),

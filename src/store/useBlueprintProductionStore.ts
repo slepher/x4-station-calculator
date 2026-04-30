@@ -63,7 +63,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const planningDerivedMap = shallowRef<StationDerivedMap | null>(null)
   const refreshKey = ref(0)
 
-  const buildGoals = ref<BuildGoal[]>([{ type: 'self-sufficient' }])
+  const buildGoals = ref<BuildGoal[]>([])
+
+  const selfSufficient = ref(false)
 
   const buildPlan = ref<BuildPlan | null>(null)
 
@@ -99,6 +101,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     buildGoals.value = buildGoals.value.filter((_, i) => i !== index)
   }
 
+  function setSelfSufficient(val: boolean) {
+    selfSufficient.value = val
+  }
+
   function computePlan() {
     const deps = getComputeDeps()
     if (!deps) return
@@ -109,6 +115,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     try {
       const result = calculateBuildPlan({
         goals: buildGoals.value,
+        selfSufficient: selfSufficient.value,
         currentModules: empireModules.value,
         currentNetProduction: empireCurrentNetProduction.value,
         settings: {
@@ -1087,12 +1094,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     overviewBuyMultiplier,
     overviewSellMultiplier,
     buildGoals,
+    selfSufficient,
     buildPlan,
     empireModules,
     empireCurrentNetProduction,
     computeBuildPlanLoading,
     setBuildGoal,
     removeBuildGoal,
+    setSelfSufficient,
     computePlan
   }
 })

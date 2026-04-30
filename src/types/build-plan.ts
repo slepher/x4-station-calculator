@@ -5,10 +5,9 @@ export interface BuildGroup {
   modules: SavedModule[]
 }
 
-export type BuildGoalType = 'self-sufficient' | 'production-rate' | 'build-module'
+export type BuildGoalType = 'production-rate' | 'build-module'
 
 export type BuildGoal =
-  | { type: 'self-sufficient' }
   | { type: 'production-rate'; wareId: string; ratePerHour: number }
   | { type: 'build-module'; moduleId: string; count: number }
   | { type: 'fleet'; shipId: string; quantity: number }
@@ -77,6 +76,7 @@ export interface BuildStep {
 
 export interface BuildPlan {
   goals: BuildGoal[]
+  selfSufficient: boolean
   schemes: BuildScheme[]
   totalDuration: number
   totalCredits: number
@@ -88,6 +88,7 @@ export interface BuildPlan {
 
 export interface CalculateBuildPlanInput {
   goals: BuildGoal[]
+  selfSufficient: boolean
   currentModules: SavedModule[]
   settings: StationSettings
   modulesMap: Record<string, X4Module>
