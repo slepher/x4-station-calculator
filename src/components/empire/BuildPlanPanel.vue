@@ -132,7 +132,7 @@ const schemeCards = computed<SchemeCardData[]>(() => {
               <span
                 class="w-7 h-7 rounded-full bg-amber-600 text-white text-xs font-bold flex items-center justify-center shrink-0"
               >{{ schemeIcons[card.scheme.label] || schemes.indexOf(card.scheme) + 1 }}</span>
-              <span class="text-sm font-bold text-slate-200">{{ t('build_plan.' + card.scheme.label) }}</span>
+              <span class="text-sm font-bold text-slate-200">{{ t('sector.build_plan.' + card.scheme.label) }}</span>
             </div>
             <div class="text-xs text-slate-400 font-mono">
               {{ formatDuration(card.scheme.totalDuration) }} │ {{ formatCredits(card.scheme.totalCredits) }} │ {{ card.scheme.stepsCount }} {{ t('sector.build_plan.steps_count').toLowerCase() }}
