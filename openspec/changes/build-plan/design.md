@@ -164,7 +164,7 @@ A↔B 外层循环迭代：
 
 #### 嵌套联合自举（BootstrapMode.NestedJoint）
 
-D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
+A 先计算 → D（A+B 联合）自举 → C 目标产线：
 
 ```
 1. R_C_raw = computeBuildRates(C)
@@ -181,21 +181,27 @@ D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
    **R_C 定义**：C 建材消耗中 A 能生产的 wares 的消耗率（hullparts, claytronics）。
    **R_C_rest 定义**：C 建材消耗中 B 能生产的 wares 的消耗率（advancedcomposites, plasmaconductors）。
 
-2. B 需求（不自举，一次性计算）：
-   B_demand = R_C_rest（C 建材消耗中 B 能生产的部分：advancedcomposites, plasmaconductors）
-   根据 B_demand 一次性计算 B 主要模块列表（无 autoFill）
-   bPrimaryModules = computeBModules(B_demand)
+2. A 计算（满足 R_C）：
+   greedyFill(sources=[R_C], fullBootstrap=false) → A 模块
+   （A 满足 C 建材消耗中 A 能生产的部分：hullparts, claytronics）
 
 3. D = A+B 联合自举：
-   D 初始模块 = bPrimaryModules（B 主要模块）
-   greedyFill(sources=[R_C], fullBootstrap=true, context=bPrimaryModules) → D 模块
-   （R_C = C 建材消耗中 A 能生产的部分，D 需自举这部分 + D 自身建材消耗）
-   D = merge(bPrimaryModules + greedyFill结果 + autoFill)
+   B_demand = R_C_rest（C 建材消耗中 B 能生产的部分）
+   根据 B_demand 一次性计算 B 主要模块列表（无 autoFill）
+   bPrimaryModules = computeBModules(B_demand)
+   
+   D 初始模块 = merge(A模块 + bPrimaryModules)
+   greedyFill(sources=[], fullBootstrap=true, context=D初始) → D 自举
+   （D 自身建材消耗中 D 能产出的部分需自给）
+   D = merge(D初始 + greedyFill结果 + autoFill)
    
 4. 输出显示：
    D 方案 targetRateSources:
-   - C建材需求（R_C，C 建材消耗中 A 能生产的部分）
+   - C建材需求（R_C + R_C_rest，C 全部建材消耗）
    - D_self_demand（D 自身建材消耗，D 产出 ∩ D buildCost）
+   
+   A 方案（从 D 中提取）：
+   - C建材需求（R_C，C 建材消耗中 A 能生产的部分）
    
    B 方案（从 D 中提取）：
    - C_rest（C 建材消耗中 B 能生产的部分，即 R_C_rest）
@@ -203,14 +209,14 @@ D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
    C 方案：
    - 目标产线
 
-输出：方案1（D 联合自举）、方案2（B 子集）、方案3（C 目标产线）
+输出：方案1（D 联合自举）、方案2（A 子集）、方案3（B 子集）、方案4（C 目标产线）
 ```
 
 **关键区分**：
-- **D 自举**：使用 `fullBootstrap=true`，D 自身建材消耗中 D 能产出的部分需自给
-- **D 同时满足 R_C**：C 建材消耗中 A 能生产的部分（hullparts, claytronics）
-- **B 不自举**：一次性计算，仅满足 C 建材消耗中 B 能生产的部分（R_C_rest）
-- **嵌套结构**：D 包含 A+B，A 负责 wareList（A 能生产），B 负责 R_C_rest（B 能生产）
+- **A 先计算**：greedyFill 满足 R_C（C 建材消耗中 A 能生产的部分）
+- **D 联合自举**：fullBootstrap=true，D = A+B 联合自举自身建材消耗
+- **B 不自举**：一次性计算，仅满足 R_C_rest
+- **嵌套结构**：A 先独立计算，然后 D(A+B) 自举，B 作为 D 的一部分
 
 #### 孤立特种自举（BootstrapMode.IsolatedSpecialized）
 
