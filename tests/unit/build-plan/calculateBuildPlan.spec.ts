@@ -215,7 +215,7 @@ describe('BootstrapMode.Joint', () => {
     }))
 
     expect(result.schemes.length).toBe(2)
-    expect(result.schemes[0]!.label).toBe('A+B 联合自举')
+    expect(result.schemes[0]!.label).toBe('D 联合自举')
     expect(result.schemes[1]!.label).toBe('目标产线')
   })
 
@@ -226,7 +226,28 @@ describe('BootstrapMode.Joint', () => {
     }))
 
     expect(result.schemes.length).toBe(1)
-    expect(result.schemes[0]!.label).toBe('A+B 联合自举')
+    expect(result.schemes[0]!.label).toBe('D 联合自举')
+  })
+
+  it('purposeModules contains C buildCost wares that D produces', () => {
+    const goal: BuildGoal = {
+      type: 'production-rate',
+      wareId: 'missilecomponents',
+      ratePerHour: 1337.6
+    }
+
+    const result = calculateBuildPlan(makeInput({
+      bootstrapMode: BootstrapMode.Joint,
+      goals: [goal],
+      currentNetProduction: {}
+    }))
+
+    const dScheme = result.schemes[0]!
+    expect(dScheme.purposeModules).toContain('hullparts')
+    expect(dScheme.purposeModules).toContain('claytronics')
+    expect(dScheme.purposeModules).not.toContain('ore')
+    expect(dScheme.purposeModules).not.toContain('energycells')
+    expect(dScheme.purposeModules).not.toContain('silicon')
   })
 
   it('outputs bootstrapMode in BuildPlan result', () => {

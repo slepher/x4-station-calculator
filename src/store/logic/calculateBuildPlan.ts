@@ -557,7 +557,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
         if (mod) for (const w of Object.keys(mod.outputs)) aProduced.add(w)
       }
 
-      function computeBModules(aModules: SavedModule[]): SavedModule[] {
+      function computeBPrimaryModules(aModules: SavedModule[]): SavedModule[] {
         const aRates = computeBuildRates(aModules, modulesMap, waresMap)
         const bDemand: Record<string, number> = {}
         for (const [w, r] of Object.entries(aRates.rates)) {
@@ -584,9 +584,14 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
         return bResult
       }
 
-      let bModules = computeBModules(aFlat)
+      let bPrimaryModules = computeBPrimaryModules(aFlat)
 
       for (let iter = 0; iter < 10; iter++) {
+        const bAutoFill = calculateAutoFillModules({
+          plannedModules: mergeModules([...currentModules, ...aFlat, ...bPrimaryModules]),
+          settings, modulesMap, waresMap, lockedWares: []
+        })
+        const bModules = mergeModules([...bPrimaryModules, ...bAutoFill.autoIndustryModules, ...bAutoFill.autoHabitationModules])
         const bRates = computeBuildRates(bModules, modulesMap, waresMap)
         const cPlusB: Record<string, number> = {}
         for (const [w, r] of Object.entries(rC)) cPlusB[w] = r + (bRates.rates[w] || 0)
@@ -598,20 +603,26 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
         )
         aFlat = mergeModules([...aFlat, ...aDelta.flatMap(g => g.modules)])
 
-        const prevBModules = bModules
-        bModules = computeBModules(aFlat)
+        const prevBPrimaryModules = bPrimaryModules
+        bPrimaryModules = computeBPrimaryModules(aFlat)
 
         let bChanged = false
-        if (bModules.length !== prevBModules.length) {
+        if (bPrimaryModules.length !== prevBPrimaryModules.length) {
           bChanged = true
         } else {
-          for (const m of bModules) {
-            const prev = prevBModules.find(p => p.id === m.id)
+          for (const m of bPrimaryModules) {
+            const prev = prevBPrimaryModules.find(p => p.id === m.id)
             if (!prev || prev.count !== m.count) { bChanged = true; break }
           }
         }
         if (!bChanged) break
       }
+
+      const bAutoFill = calculateAutoFillModules({
+        plannedModules: mergeModules([...currentModules, ...aFlat, ...bPrimaryModules]),
+        settings, modulesMap, waresMap, lockedWares: []
+      })
+      const bModules = mergeModules([...bPrimaryModules, ...bAutoFill.autoIndustryModules, ...bAutoFill.autoHabitationModules])
 
       const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
 
@@ -638,7 +649,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
             Object.entries(bRates.rates).filter(([w]) => w !== 'energycells')
           ) },
         ]
-        const bPurposeWares = [...new Set(bModules.flatMap(m => {
+        const bPurposeWares = [...new Set(bPrimaryModules.flatMap(m => {
           const mod = modulesMap[m.id]
           if (!mod) return []
           return Object.keys(mod.outputs).filter(w => w !== 'energycells')

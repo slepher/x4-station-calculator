@@ -48,6 +48,38 @@ const baseSettings = {
 function fmtCr(n: number): string { return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : `${Math.round(n)}` }
 function fmtH(s: number): string { return `${(s / 3600).toFixed(2)}h` }
 
+if (process.argv.includes('--help') || process.argv.includes('-h')) {
+  console.log(`Usage: npx tsx analysis/scripts/findBuildPlanDefaults.ts [options]
+
+Options:
+  --bootstrap=<mode>  Bootstrap mode (default: none)
+                       none       - No bootstrap, only target production line
+                       joint      - D (A+B) joint bootstrap with full self-sustain
+                       coupled    - Coupled iterative: A↔B loop with B one-shot calculation
+                       isolated   - Isolated specialized: B first, then A, no loop
+
+  --module="Name*N"   Build-module goal (comma-separated for multiple)
+                       Name: module name (fuzzy match)
+                       N: count (default: 1)
+                       Example: --module="Missile Component Production*5"
+
+  --ware="Name*R"     Production-rate goal (comma-separated for multiple)
+                       Name: ware name (fuzzy match)
+                       R: rate per hour (default: 1000)
+                       Example: --ware="Hull Parts*1000"
+
+  --help, -h           Show this help message
+
+Default (no --module or --ware): Missile Component Production ×5
+
+Examples:
+  npx tsx analysis/scripts/findBuildPlanDefaults.ts
+  npx tsx analysis/scripts/findBuildPlanDefaults.ts --bootstrap=joint
+  npx tsx analysis/scripts/findBuildPlanDefaults.ts --bootstrap=coupled --module="Missile Component Production*5"
+  npx tsx analysis/scripts/findBuildPlanDefaults.ts --bootstrap=isolated --ware="Hull Parts*2000"`)
+  process.exit(0)
+}
+
 let parsedBootstrap = BootstrapMode.None
 const bootstrapFlag = process.argv.find(a => a.startsWith('--bootstrap='))
 if (bootstrapFlag) {
