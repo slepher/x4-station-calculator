@@ -39,10 +39,11 @@ interface BuildRateSource {
 interface BuildScheme {
   label: string
   description: string
-  purposeModules: string[]   // 主要目的产物（不含 energycells）
+  purposeModules: string[]   // 主要目的产物 ware ID（不含 energycells）
+  primaryModuleIds: string[] // 产出 purposeModules 中 ware 的模块 ID 列表
   modules: SavedModule[]
   targetRates: Record<string, number>       // max_merge of all targetRateSources
-  targetRateSources: BuildRateSource[]      // 各来源的建材需求速率（方案1建材、方案2建材、方案3剩余建材）
+  targetRateSources: BuildRateSource[]      // 各来源的建材需求速率
   netProduction: Record<string, number>     // 方案完工后（含 context）的净产出
   steps: BuildSchemeStep[]
   totalDuration: number
@@ -65,38 +66,55 @@ interface BuildGroup {
 
 **输出**: `BuildPlan` → `schemes: BuildScheme[]`
 
-#### 自举目标（self-sufficient）
+#### 目标合并规则
+
+- **有 self-sufficient + 有其他目标**：合并所有其他目标 → 方案3 → 无视当前产能，直接生成方案1+2+3
+- **无 self-sufficient + 有其他目标**：合并所有其他目标 → 方案3 → 当前产能足够则只出方案3，不足则生成方案1+2+3
+- **仅 self-sufficient**：只生成方案1
+
+#### self-sufficient 目标
 
 ```
 expandGoalDependencies + calculateAutoFillModules → allMods
-makeScheme → 方案1
+makeScheme → 方案1（自给自足）
 ```
 
 #### 目标产量 / 目标建筑（production-rate / build-module）
 
+所有其他目标合并后执行一次：
+
 ```
 Phase 1 — allMods3：
-  1. expandGoalDependencies → 目标模块
+  1. 合并所有目标的 expandGoalDependencies → merged3
   2. calculateAutoFillModules → allMods3
-  3. R3 = buildRates(allMods3)
-  4. 识别建材模块（产出在 R3 中的非目标模块）→ 从 allMods3 剔除
-  5. scheme3' = allMods3 - 建材模块
-  6. R3' = buildRates(scheme3')
-  7. 当前产能 ≥ R3'？→ 是则只显示方案3
+  3. R3 = computeBuildRates(allMods3)（仅 buildCost，无 fallback 到 inputs）
+  4. purposeWareSet = 所有目标的产物 ware ID 集合
+  5. 识别建材模块：allMods3 中输出在 R3 中的模块（不区分目标/非目标模块）
+  6. R3' = allMods3 - 建材模块
+  7. R3'M = computeBuildRates(R3')
+  8. 无 self-sufficient 且当前产能 ≥ R3'M？→ 是则只显示方案3
 
-Phase 2 — 方案2：
-  8. whichWares = R3'.keys，targetRates = R3
-     R2 必须满足 R3 对 R3' 全部 ware 的产能需求（用 R3 的速率，非 R3' 速率）
-     即 R3 = ABC XYZ，R3' = ABC → R2 按 R3[ABC] 速率产 ABC，不存在 R2 覆盖不了需要 R1 兜底的情况
-  9. planProductionForRates + autoFill → allMods2
-  10. R2 = buildRates(allMods2)
+Phase 2 — 方案2（目标建材）：
+  9. whichWares = R3'M.keys，targetRates = R3
+     R2 必须满足 R3 对 R3'M 全部 ware 的产能需求（用 R3 的速率，非 R3'M 速率）
+  10. planProductionForRates + autoFill → allMods2
+  11. R2 = computeBuildRates(allMods2)
 
-Phase 3 — 方案1：
-  11. r3Remaining = R3.keys \ R3'.keys（R3 中有但 R3' 中没有的 ware，即建材模块自身的建材消耗）
-  12. scheme1Target = max_merge(R1建材, R2建材, r3Remaining)  // 非叠加，取 max
-  13. greedyFill(sources=[R1建材, R2建材, r3Remaining]) → 自给自足产线
-      greedyFill 分别验证每个 source 的满足率，全部满足才退出
+Phase 3 — 方案1（自给自足）：
+  12. r3Remaining = R3.keys \ R3'M.keys（R3 中有但 R3'M 中没有的 ware）
+  13. scheme1Target = max_merge(R1建材, R2建材, r3Remaining)
+  14. greedyFill(sources=[R1建材, R2建材, r3Remaining]) → 自给自足产线
 ```
+
+**`computeBuildRates` 规则**：
+- 仅使用 `mod.buildCost`，无 fallback 到 `mod.inputs`
+- 模块无 `buildCost` 则跳过（不将运行时输入混入建材消耗）
+- `energycells` 不参与 rates 计算
+
+**`buildMatModuleIds` 规则**：
+- 所有模块统一判断：输出在 R3 中的 → 建材模块
+- 不区分目标模块/非目标模块（无 `goalModIds` 跳过逻辑）
+- 建材模块从 R3' 中剔除，其 buildCost 归入 r3Remaining
 
 ### 3. greedyFill（方案1贪婪循环）
 
@@ -119,7 +137,7 @@ seed: 如果 targetRates 含 hullparts, 第一个瓶颈固定为 hullparts
 ```
 
 **能量电池排除**：
-- `energycells` 不参与 `buildRates` 计算（`computeBuildRates` 中过滤）
+- `energycells` 不参与 `computeBuildRates` 计算（过滤）
 - `findLowestSatisfaction` 中 `energycells` 不参与瓶颈计算
 - 产出 `energycells` 的模块不出现在 `purposeModules`
 
@@ -139,40 +157,43 @@ seed: 如果 targetRates 含 hullparts, 第一个瓶颈固定为 hullparts
 - 方案2 context = currentModules + 方案1 模块
 - 方案3 context = currentModules + 方案1 + 方案2 模块
 
-### 6. 每步输出格式
+### 6. 方案标签
 
-```
-#N  ModuleName ×1
-    建造: X.XXh  累计: X.XXh  步骤费: XXX  累计费: XXX
-    材料明细:
-      WareName  ×qty  自产: rate/h  +produced  买: credits  (单价: price)
-```
+| 方案 | 标签 | 说明 |
+|------|------|------|
+| 方案1 | 自给自足 | 基础建材产线 |
+| 方案2 | 目标建材 | 满足方案3建材需求的模块组 |
+| 方案3 | 目标产线 | 目标产物系列模块 |
 
-- **自产** = builtSoFar 对该物资的净产出速率（含所有前置方案的已建模块）
-- **+produced** = 本步建造期间的自产量
-- **买** = 算法内部库存不足时的购买金额。`0` 表示算法库存充足
+### 7. UI 方案卡片
 
-### 7. 方案1产能验证格式
+方案卡片显示内容：
+- **摘要行**：`4.09h │ 1.20M │ 20 steps`
+- **主要模块**：`primaryModuleIds` 对应的模块（如 Missile Component Production ×5）
+- **配套模块**：非 primaryModuleIds 的模块（如 Energy Cell Production ×1）
+- **主要产出**：`netProduction` 中 purposeModules 对应 ware 的净产出速率（如 Missile Components 1337.6/h）
+- **建材消耗**：`buildMaterialTotals`（过滤 energycells），如 Hull Parts ×79227
 
-```
-── 方案1 产能对各方案需求的满足率 ──
-── 方案1建材 ──
-  建造总时间: X.XXh  模块数: N
-  ✓ WareName  ×totalQty  需要: XXX.X/h  产能: XXX.X/h  满足: XXX%
-── 方案2建材 ──
-  建造总时间: X.XXh  模块数: N
-  ✓ WareName  ×totalQty  需要: XXX.X/h  产能: XXX.X/h  满足: XXX%
-── 方案3剩余建材 ──
-  建造总时间: X.XXh  模块数: N
-  ✓ WareName  ×totalQty  需要: XXX.X/h  产能: XXX.X/h  满足: XXX%
+`primaryModuleIds` 由 `makeScheme` 根据 `purposeModules`（ware集合）匹配模块输出计算：
+```typescript
+const purposeWareSet = new Set(purposeModules)
+const primaryModuleIds = mergedModules
+  .filter(m => mod && Object.keys(mod.outputs).some(w => purposeWareSet.has(w)))
+  .map(m => m.id)
 ```
 
-- **×totalQty** = 该方案对该物资的建材消耗总量
-- **需要** = 该来源的建材消耗速率
-- **产能** = 方案1完工后的净产出速率
-- **energycells 不显示**
+### 8. UI 步骤明细
 
-### 8. Store 变更
+- **逐步展开**：每个 step 独立一行，不合并相同模块
+- **累计数量**：只显示累计数（如 `2`），不显示 `+1=2`
+- **材料明细**：CSS grid 列对齐，表头+数据行格式
+
+表头列：
+| Materials | ×Count | Stock | Self-prod/h | +Produced | Buy | Unit |
+
+- **energycells 保留**：材料明细中不过滤 energycells
+
+### 9. Store 变更
 
 - `buildGoals: Ref<BuildGoal[]>`（代替原 buildConstraints）
 - `buildPlan: Ref<BuildPlan | null>`（含 `schemes`）
@@ -180,16 +201,25 @@ seed: 如果 targetRates 含 hullparts, 第一个瓶颈固定为 hullparts
 - `computePlan()` 调用新算法
 - 移除 `setTimeBudget`/`setCreditBudget`
 
-### 9. UI 变更
+### 10. i18n
 
-| 组件 | 变更 |
-|------|------|
-| `BuildPlanConstraintsPanel.vue` | 移除预算输入，保留目标管理和计算按钮 |
-| `BuildPlanPanel.vue` | 重写为方案卡片列表 |
-| `BuildPlanStepsModal.vue` | **新增**浮动窗口，展示方案详细步骤 |
-| `BlueprintProductionWorkbenchView.vue` | 集成新三栏布局 |
-| `EmpireWareFlowsDashboard.vue` | 不变 |
+`sector.build_plan` 命名空间，新增 key：
+- `primary_modules` / `derived_modules`
+- `main_production` / `build_materials`
+- `produced` / `stock` / `self_prod` / `buy` / `unit_price`
+- `build` / `cumulative` / `step_cost` / `cumulative_cost`
 
-### 10. 分析脚本
+### 11. 分析脚本
 
-`analysis/scripts/findBuildPlanDefaults.ts` — 运行 `npx tsx analysis/scripts/findBuildPlanDefaults.ts`，输出导弹部件×5 在空帝国下的完整方案明细。
+`analysis/scripts/findBuildPlanDefaults.ts`
+
+```bash
+# 默认：导弹部件×5
+npx tsx analysis/scripts/findBuildPlanDefaults.ts
+
+# 指定模块和产量目标
+npx tsx analysis/scripts/findBuildPlanDefaults.ts --module="Missile Component Production*5" --ware="Hull Parts*1000"
+```
+
+- `--module="Name*N"` — 模块名称（`module.name`）模糊匹配，N 为数量
+- `--ware="Name*R"` — 商品名称（`ware.name`）模糊匹配，R 为每小时产量
