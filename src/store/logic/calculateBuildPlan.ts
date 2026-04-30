@@ -53,6 +53,7 @@ interface BuildRatesResult {
   rates: Record<string, number>
   totalTime: number
   totalCost: number
+  materials: Record<string, number>
 }
 
 function computeBuildRates(
@@ -65,7 +66,8 @@ function computeBuildRates(
   for (const m of modules) {
     const mod = moduleMap[m.id]
     if (!mod) continue
-    totalTime += mod.buildTime * m.count
+    const mt = mod.buildTime * m.count
+    totalTime += mt
     const cost = mod.buildCost
     if (!cost || Object.keys(cost).length === 0) continue
     for (const [wareId, qty] of Object.entries(cost)) {
@@ -81,7 +83,7 @@ function computeBuildRates(
     totalCost += qty * ware.price
     rates[wareId] = qty / (totalTime / 3600)
   }
-  return { rates, totalTime, totalCost }
+  return { rates, totalTime, totalCost, materials }
 }
 
 function expandGoalDependencies(
@@ -271,12 +273,12 @@ function greedyFill(
   currentEmpireModules: SavedModule[],
   settings: StationSettings,
   modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>
+  waresMap: Record<string, X4Ware>,
+  fullBootstrap: boolean = true
 ): BuildGroup[] {
   let built: SavedModule[] = []
   let maxIterations = 60
   const groups: BuildGroup[] = []
-  let prevAutoModules: SavedModule[] = []
 
   const targetRates: Record<string, number> = {}
   for (const src of targetRateSources) {
@@ -289,6 +291,47 @@ function greedyFill(
     const existing = modList.find(m => m.id === modId)
     if (existing) existing.count += count
     else modList.push({ id: modId, count })
+  }
+
+  function getAutoModules(mods: SavedModule[]): SavedModule[] {
+    const r = calculateAutoFillModules({
+      plannedModules: mergeModules([...currentEmpireModules, ...mods]),
+      settings, modulesMap, waresMap, lockedWares: []
+    })
+    return [...r.autoIndustryModules, ...r.autoHabitationModules]
+  }
+
+  let currentAutoModules: SavedModule[] = []
+
+  function fullBuilt(): SavedModule[] {
+    return mergeModules([...built, ...currentAutoModules])
+  }
+
+  function selfDemand(): BuildRateSource | null {
+    const fb = fullBuilt()
+    if (fb.length === 0) return null
+    const br = computeBuildRates(fb, modulesMap, waresMap)
+    const filtered: Record<string, number> = {}
+    if (fullBootstrap) {
+      const produced = new Set<string>()
+      for (const m of fb) {
+        const mod = modulesMap[m.id]
+        if (!mod) continue
+        for (const w of Object.keys(mod.outputs)) produced.add(w)
+      }
+      for (const [w, rate] of Object.entries(br.rates)) {
+        if (w !== 'energycells' && produced.has(w)) filtered[w] = rate
+      }
+    } else {
+      const sourceWares = new Set<string>()
+      for (const src of targetRateSources) {
+        for (const w of Object.keys(src.rates)) sourceWares.add(w)
+      }
+      for (const [w, rate] of Object.entries(br.rates)) {
+        if (w !== 'energycells' && sourceWares.has(w)) filtered[w] = rate
+      }
+    }
+    return Object.keys(filtered).length > 0 ? { label: 'self_demand', rates: filtered } : null
   }
 
   function findLowestSatisfaction(contextNet: Record<string, number>): string | null {
@@ -305,9 +348,10 @@ function greedyFill(
       }
       return best
     }
+    const fb = fullBuilt()
     const totals = new Map<string, number>()
     let totalBuildTime = 0
-    for (const m of built) {
+    for (const m of fb) {
       const mod = modulesMap[m.id]
       if (!mod) continue
       totalBuildTime += mod.buildTime * m.count
@@ -336,19 +380,18 @@ function greedyFill(
         bestWare = c.wareId
       }
     }
-    return bestWare
-  }
-
-  function getAutoModules(mods: SavedModule[]): SavedModule[] {
-    const r = calculateAutoFillModules({
-      plannedModules: mergeModules([...currentEmpireModules, ...mods]),
-      settings, modulesMap, waresMap, lockedWares: []
-    })
-    return [...r.autoIndustryModules, ...r.autoHabitationModules]
+    if (bestWare) return bestWare
+    for (const [wareId, rate] of Object.entries(targetRates)) {
+      if (wareId === 'energycells') continue
+      const prodRate = Math.max(0, contextNet[wareId] ?? 0)
+      if (prodRate < rate) return wareId
+    }
+    return null
   }
 
   while (maxIterations-- > 0) {
-    const combined = [...currentEmpireModules, ...built]
+    currentAutoModules = getAutoModules(built)
+    const combined = [...currentEmpireModules, ...fullBuilt()]
     const contextNet = calculateNetProduction(
       combined,
       modulesMap,
@@ -357,9 +400,12 @@ function greedyFill(
     )
 
     let allMet = true
-    for (const src of targetRateSources) {
+    const allSources = [...targetRateSources]
+    const sd = selfDemand()
+    if (sd) allSources.push(sd)
+    for (const src of allSources) {
       for (const [wareId, rate] of Object.entries(src.rates)) {
-        if ((contextNet[wareId] || 0) < rate) allMet = false
+        if ((contextNet[wareId] || 0) + 0.001 < rate) allMet = false
       }
     }
     if (allMet) break
@@ -379,15 +425,15 @@ function greedyFill(
 
     addModule(built, producer.id, 1)
 
-    const currentAuto = getAutoModules(built)
-    const deltaAuto = currentAuto.filter(m => {
-      const prev = prevAutoModules.find(p => p.id === m.id)
+    const newAuto = getAutoModules(built)
+    const deltaAuto = newAuto.filter(m => {
+      const prev = currentAutoModules.find(p => p.id === m.id)
       return !prev || prev.count < m.count
     }).map(m => {
-      const prev = prevAutoModules.find(p => p.id === m.id)
+      const prev = currentAutoModules.find(p => p.id === m.id)
       return { id: m.id, count: m.count - (prev?.count || 0) }
     })
-    prevAutoModules = currentAuto.map(m => ({ ...m }))
+    currentAutoModules = newAuto
 
     const groupMods = mergeModules([{ id: producer.id, count: 1 }, ...deltaAuto])
     groups.push({ reason: `Build mat: ${bottleneck}`, modules: groupMods })
@@ -446,26 +492,31 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
     if (bootstrapMode === BootstrapMode.Joint) {
       const jointGroups = greedyFill(
         [{ label: '目标建材', rates: rates3 }],
-        currentModules, settings, modulesMap, waresMap
+        currentModules, settings, modulesMap, waresMap,
+        true
       )
       if (jointGroups.length > 0) {
         const jointFlat = jointGroups.flatMap(g => g.modules)
-        const jointAllRates = computeBuildRates(jointFlat, modulesMap, waresMap).rates
-        const jointSelfDemand: Record<string, number> = {}
-        for (const [w, r] of Object.entries(jointAllRates)) {
-          if (w === 'claytronics' || w === 'hullparts' || w === 'advancedcomposites' || w === 'plasmaconductors') {
-            jointSelfDemand[w] = r
-          }
+        const allRates = computeBuildRates(jointFlat, modulesMap, waresMap)
+        const produced = new Set<string>()
+        for (const m of jointFlat) {
+          const mod = modulesMap[m.id]
+          if (mod) for (const w of Object.keys(mod.outputs)) produced.add(w)
         }
-        const jointSources: BuildRateSource[] = [
+        const finalSelf: Record<string, number> = {}
+        for (const [w, r] of Object.entries(allRates.rates)) {
+          if (w !== 'energycells' && produced.has(w)) finalSelf[w] = r
+        }
+        const purposeWares = Object.keys(rates3).filter(w => w !== 'energycells' && produced.has(w))
+        const jointSources_display: BuildRateSource[] = [
           { label: 'C', rates: rates3 },
-          { label: 'A+B_autoFill', rates: jointSelfDemand },
+          { label: 'D_self_demand', rates: finalSelf },
         ]
-        const s1 = makeScheme(jointGroups, 'A+B 联合自举',
-          'A+B 联合自举模块',
-          ['claytronics', 'hullparts', 'plasmaconductors', 'advancedcomposites'],
+        const s1 = makeScheme(jointGroups, 'D 联合自举',
+          'D 联合自举模块',
+          purposeWares,
           settings, modulesMap, waresMap, currentModules,
-          jointSources)
+          jointSources_display)
         if (s1.stepsCount > 0) allSchemes.push(s1)
       }
       const s3 = makeScheme([{ reason: '', modules: allMods3 }], '目标产线',
@@ -477,63 +528,131 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
     }
 
     if (bootstrapMode === BootstrapMode.CoupledIterative) {
-      const aGroups = greedyFill(
-        [{ label: '目标建材', rates: rates3 }],
-        currentModules, settings, modulesMap, waresMap
-      )
-      let aFlat = aGroups.flatMap(g => g.modules)
-      let aCombined = [...currentModules, ...aFlat]
-      const aBuildRates = computeBuildRates(aFlat, modulesMap, waresMap)
-
-      function filterBOutputs(input: Record<string, number>): Record<string, number> {
-        const out: Record<string, number> = {}
-        for (const [wareId, rate] of Object.entries(input)) {
-          if (wareId === 'advancedcomposites' || wareId === 'plasmaconductors') out[wareId] = rate
-        }
-        return out
+      const rC_raw = rates3
+      const cBuildCostWares = new Set(Object.keys(rC_raw))
+      const cPrime = allMods3.filter(m => {
+        const mod = modulesMap[m.id]
+        if (!mod) return true
+        return !Object.keys(mod.outputs).some(w => cBuildCostWares.has(w))
+      })
+      const cPrimeRates = computeBuildRates(cPrime, modulesMap, waresMap)
+      const wareList = new Set(Object.keys(cPrimeRates.materials))
+      const rC: Record<string, number> = {}
+      const rC_rest: Record<string, number> = {}
+      for (const [w, r] of Object.entries(rC_raw)) {
+        if (wareList.has(w)) rC[w] = r
+        else rC_rest[w] = r
       }
 
-      const bSources: BuildRateSource[] = [
-        { label: 'A建材需求(B产出)', rates: filterBOutputs(aBuildRates.rates) },
-        { label: 'C建材需求(B产出)', rates: filterBOutputs(rates3) },
-      ]
-      const bGroups = greedyFill(bSources, currentModules, settings, modulesMap, waresMap)
-      const bFlat = bGroups.flatMap(g => g.modules)
-      const bAutoFill = calculateAutoFillModules({
-        plannedModules: mergeModules([...aCombined, ...bFlat]),
-        settings, modulesMap, waresMap, lockedWares: []
-      })
-      const bAutoFillMods = mergeModules([...bAutoFill.autoIndustryModules, ...bAutoFill.autoHabitationModules])
-      const bFullRates = computeBuildRates([...bFlat, ...bAutoFillMods], modulesMap, waresMap)
-      const cPlusBRates: Record<string, number> = {}
-      for (const [w, r] of Object.entries(rates3)) cPlusBRates[w] = r + (bFullRates.rates[w] || 0)
+      const aGroups = greedyFill(
+        [{ label: 'C建材需求', rates: rC }],
+        currentModules, settings, modulesMap, waresMap,
+        false
+      )
+      let aFlat = mergeModules([...currentModules, ...aGroups.flatMap(g => g.modules)])
 
-      if (aGroups.length > 0) {
-        const aSelfDemand: Record<string, number> = {}
-        for (const [w, r] of Object.entries(aBuildRates.rates)) {
-          if (w === 'claytronics' || w === 'hullparts') aSelfDemand[w] = r
+      const aProduced = new Set<string>()
+      for (const m of aFlat) {
+        const mod = modulesMap[m.id]
+        if (mod) for (const w of Object.keys(mod.outputs)) aProduced.add(w)
+      }
+
+      function computeBModules(aModules: SavedModule[]): SavedModule[] {
+        const aRates = computeBuildRates(aModules, modulesMap, waresMap)
+        const bDemand: Record<string, number> = {}
+        for (const [w, r] of Object.entries(aRates.rates)) {
+          if (w === 'energycells') continue
+          if (aProduced.has(w)) continue
+          bDemand[w] = Math.max(bDemand[w] || 0, r)
         }
+        for (const [w, r] of Object.entries(rC_rest)) {
+          if (w === 'energycells') continue
+          bDemand[w] = Math.max(bDemand[w] || 0, r)
+        }
+        const bResult: SavedModule[] = []
+        for (const [wareId, demand] of Object.entries(bDemand)) {
+          if (demand <= 0) continue
+          const producer = findBestProducer(wareId, settings.racePreference, [...currentModules, ...aModules], modulesMap, waresMap)
+          if (!producer) continue
+          const outputRate = producer.outputs[wareId] || 0
+          if (outputRate <= 0) continue
+          const count = Math.ceil(demand / outputRate)
+          const existing = bResult.find(m => m.id === producer.id)
+          if (existing) existing.count = Math.max(existing.count, count)
+          else bResult.push({ id: producer.id, count })
+        }
+        return bResult
+      }
+
+      let bModules = computeBModules(aFlat)
+
+      for (let iter = 0; iter < 10; iter++) {
+        const bRates = computeBuildRates(bModules, modulesMap, waresMap)
+        const cPlusB: Record<string, number> = {}
+        for (const [w, r] of Object.entries(rC)) cPlusB[w] = r + (bRates.rates[w] || 0)
+
+        const aDelta = greedyFill(
+          [{ label: 'C+B建材需求', rates: cPlusB }],
+          aFlat, settings, modulesMap, waresMap,
+          false
+        )
+        aFlat = mergeModules([...aFlat, ...aDelta.flatMap(g => g.modules)])
+
+        const prevBModules = bModules
+        bModules = computeBModules(aFlat)
+
+        let bChanged = false
+        if (bModules.length !== prevBModules.length) {
+          bChanged = true
+        } else {
+          for (const m of bModules) {
+            const prev = prevBModules.find(p => p.id === m.id)
+            if (!prev || prev.count !== m.count) { bChanged = true; break }
+          }
+        }
+        if (!bChanged) break
+      }
+
+      const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
+
+      if (aFlat.length > 0) {
+        const aRates = computeBuildRates(aFlat, modulesMap, waresMap)
         const aSources: BuildRateSource[] = [
-          { label: 'C+B', rates: cPlusBRates },
-          { label: 'A_autoFill', rates: aSelfDemand },
+          { label: 'C', rates: rC },
+          { label: 'A_self_demand', rates: Object.fromEntries(
+            Object.entries(aRates.rates).filter(([w]) => w !== 'energycells' && wareList.has(w))
+          ) },
         ]
-        const s1 = makeScheme(aGroups, 'A 建材自举',
+        const s1 = makeScheme([{ reason: 'A 建材自举', modules: aFlat }], 'A 建材自举',
           'A 建材自举模块',
-          ['claytronics', 'hullparts'],
+          aPurposeWares,
           settings, modulesMap, waresMap, currentModules,
           aSources)
         if (s1.stepsCount > 0) allSchemes.push(s1)
       }
-      if (bGroups.length > 0) {
-        const s2 = makeScheme(bGroups, 'B 特种产线',
+
+      if (bModules.length > 0) {
+        const bRates = computeBuildRates(bModules, modulesMap, waresMap)
+        const bSources: BuildRateSource[] = [
+          { label: 'B_demand', rates: Object.fromEntries(
+            Object.entries(bRates.rates).filter(([w]) => w !== 'energycells')
+          ) },
+        ]
+        const bPurposeWares = [...new Set(bModules.flatMap(m => {
+          const mod = modulesMap[m.id]
+          if (!mod) return []
+          return Object.keys(mod.outputs).filter(w => w !== 'energycells')
+        }))]
+        const s2 = makeScheme([{ reason: 'B 特种产线', modules: bModules }], 'B 特种产线',
           'B 特种产线模块',
-          ['advancedcomposites', 'plasmaconductors'],
+          bPurposeWares,
           settings, modulesMap, waresMap,
-          mergeModules(aCombined),
+          mergeModules(aFlat),
           bSources)
         if (s2.stepsCount > 0) allSchemes.push(s2)
       }
-      const prior = mergeModules([...aCombined, ...bFlat, ...bAutoFillMods])
+
+      const prior = mergeModules([...aFlat, ...bModules])
       const s3 = makeScheme([{ reason: '', modules: allMods3 }], '目标产线',
         '目标产线系列模块',
         uniquePurpose, settings, modulesMap, waresMap, prior,
@@ -543,50 +662,94 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
     }
 
     if (bootstrapMode === BootstrapMode.IsolatedSpecialized) {
-      const aInitGroups = greedyFill(
-        [{ label: '目标建材', rates: rates3 }],
-        currentModules, settings, modulesMap, waresMap
+      const rC_raw = rates3
+      const cBuildCostWares = new Set(Object.keys(rC_raw))
+      const cPrime = allMods3.filter(m => {
+        const mod = modulesMap[m.id]
+        if (!mod) return true
+        return !Object.keys(mod.outputs).some(w => cBuildCostWares.has(w))
+      })
+      const cPrimeRates = computeBuildRates(cPrime, modulesMap, waresMap)
+      const wareList = new Set(Object.keys(cPrimeRates.materials))
+      const rC: Record<string, number> = {}
+      const rC_rest: Record<string, number> = {}
+      for (const [w, r] of Object.entries(rC_raw)) {
+        if (wareList.has(w)) rC[w] = r
+        else rC_rest[w] = r
+      }
+
+      const aGroups = greedyFill(
+        [{ label: 'C建材需求', rates: rC }],
+        currentModules, settings, modulesMap, waresMap,
+        false
       )
-      const aInitFlat = aInitGroups.flatMap(g => g.modules)
-      const aInitRates = computeBuildRates(aInitFlat, modulesMap, waresMap)
+      const aFlat = mergeModules([...currentModules, ...aGroups.flatMap(g => g.modules)])
+
+      const aProduced = new Set<string>()
+      for (const m of aFlat) {
+        const mod = modulesMap[m.id]
+        if (mod) for (const w of Object.keys(mod.outputs)) aProduced.add(w)
+      }
+      const aRates = computeBuildRates(aFlat, modulesMap, waresMap)
+      const aCantSelfProduce: Record<string, number> = {}
+      for (const [w, r] of Object.entries(aRates.rates)) {
+        if (w !== 'energycells' && !aProduced.has(w)) aCantSelfProduce[w] = r
+      }
+
+      const bDemandSources: BuildRateSource[] = [
+        { label: 'R_C_rest', rates: rC_rest },
+        { label: 'A_不能自产', rates: aCantSelfProduce },
+      ]
       const bDemand: Record<string, number> = {}
-      for (const [wareId, rate] of Object.entries(aInitRates.rates)) {
-        if (wareId === 'advancedcomposites' || wareId === 'plasmaconductors') {
-          bDemand[wareId] = rate
+      for (const src of bDemandSources) {
+        for (const [w, r] of Object.entries(src.rates)) {
+          bDemand[w] = Math.max(bDemand[w] || 0, r)
         }
       }
-      const bGroups = greedyFill(
-        [{ label: 'B 特种建材', rates: bDemand }],
-        currentModules, settings, modulesMap, waresMap
-      )
+      const bPrimaryModules: SavedModule[] = []
+      for (const [wareId, demand] of Object.entries(bDemand)) {
+        if (demand <= 0) continue
+        const producer = findBestProducer(wareId, settings.racePreference, currentModules, modulesMap, waresMap)
+        if (!producer) continue
+        const outputRate = producer.outputs[wareId] || 0
+        if (outputRate <= 0) continue
+        const count = Math.ceil(demand / outputRate)
+        const existing = bPrimaryModules.find(m => m.id === producer.id)
+        if (existing) existing.count = Math.max(existing.count, count)
+        else bPrimaryModules.push({ id: producer.id, count })
+      }
+      const bAutoFill = calculateAutoFillModules({
+        plannedModules: mergeModules([...currentModules, ...bPrimaryModules]),
+        settings, modulesMap, waresMap, lockedWares: []
+      })
+      const bModules = mergeModules([...bPrimaryModules, ...bAutoFill.autoIndustryModules, ...bAutoFill.autoHabitationModules])
 
-      if (bGroups.length > 0) {
-        const s1 = makeScheme(bGroups, 'B 特种孤岛',
+      if (bModules.length > 0) {
+        const s1 = makeScheme([{ reason: 'B 特种孤岛', modules: bModules }], 'B 特种孤岛',
           'B 特种孤岛模块',
-          ['advancedcomposites', 'plasmaconductors'],
+          Object.keys(bDemand).filter(w => w !== 'energycells'),
           settings, modulesMap, waresMap, currentModules,
-          [{ label: 'B 特种建材', rates: bDemand }])
+          bDemandSources)
         if (s1.stepsCount > 0) allSchemes.push(s1)
       }
-      if (aInitGroups.length > 0) {
-        const bCombined = [...currentModules, ...bGroups.flatMap(g => g.modules)]
-        const aSelfDemand: Record<string, number> = {}
-        for (const [w, r] of Object.entries(aInitRates.rates)) {
-          if (w === 'claytronics' || w === 'hullparts') aSelfDemand[w] = r
-        }
+      if (aFlat.length > 0) {
         const aSources: BuildRateSource[] = [
-          { label: 'C', rates: rates3 },
-          { label: 'A_autoFill', rates: aSelfDemand },
+          { label: 'C', rates: rC },
+          { label: 'A_self_demand', rates: Object.fromEntries(
+            Object.entries(aRates.rates).filter(([w]) => w !== 'energycells' && wareList.has(w))
+          ) },
         ]
-        const s2 = makeScheme(aInitGroups, 'A 建材自举',
+        const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
+        const bCombined = [...currentModules, ...bModules]
+        const s2 = makeScheme([{ reason: 'A 建材自举', modules: aFlat }], 'A 建材自举',
           'A 建材自举模块',
-          ['claytronics', 'hullparts'],
+          aPurposeWares,
           settings, modulesMap, waresMap,
           mergeModules(bCombined),
           aSources)
         if (s2.stepsCount > 0) allSchemes.push(s2)
       }
-      const prior = mergeModules([...currentModules, ...aInitFlat, ...bGroups.flatMap(g => g.modules)])
+      const prior = mergeModules([...currentModules, ...aFlat, ...bModules])
       const s3 = makeScheme([{ reason: '', modules: allMods3 }], '目标产线',
         '目标产线系列模块',
         uniquePurpose, settings, modulesMap, waresMap, prior,
@@ -617,7 +780,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
       lockedWares: []
     })
     const allMods = mergeModules([...base, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
-    const label = bootstrapMode === BootstrapMode.Joint ? 'A+B 联合自举'
+    const label = bootstrapMode === BootstrapMode.Joint ? 'D 联合自举'
       : bootstrapMode === BootstrapMode.CoupledIterative ? 'A 建材自举'
       : 'B 特种孤岛'
     const scheme = makeScheme(

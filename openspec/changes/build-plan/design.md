@@ -94,78 +94,85 @@ interface BuildGroup {
 
 #### 联合自举（BootstrapMode.Joint）
 
-A+B 视为联合模块，内部通过 greedyFill 直接满足 C 的建材消耗：
+D = A+B 联合模块，通过 greedyFill 直接满足 C 的建材消耗：
 
 ```
-1. C' = C 剔除产出在 C 的 buildCost 中的模块（建材模块）
-2. targetRates = computeBuildRates(C') 的建材消耗速率
-3. greedyFill(sources=[targetRates]) → 联合模块（含 A+B）
-4. 输出：方案1（A+B 联合模块）、方案2（C）
+1. C = expandGoalDependencies + autoFill → 完整目标产线（不做任何剔除）
+2. targetRates = computeBuildRates(C) 的建材消耗速率
+3. greedyFill(sources=[targetRates])
+   → D 模块（含 A+B），自举约束自动确保 D 自身建材消耗被覆盖
+4. 输出：方案1（D 联合自举）、方案2（C）
 ```
 
-A+B 的 autoFill 运营模块消耗由 A 的产出（电子黏土+船体部件）覆盖——greedyFill 在迭代中自动处理。
+greedyFill 内部的 selfDemand 自动推导：D 已建模块产出 ∩ D 的 buildCost 消耗（剔除 energycells）→ 自举约束的 ware 集合。
 
 #### 耦合迭代自举（BootstrapMode.CoupledIterative）
 
-A↔B 外层循环迭代，所有内部迭代均使用 greedyFill：
+A↔B 外层循环迭代：
 
 ```
-1. C' = C 剔除建材模块
-2. R_C = computeBuildRates(C')
+1. R_C_raw = computeBuildRates(C)
+   C' = C 剔除所有产出在 C buildCost 中的模块
+   wareList = computeBuildRates(C') 的 buildCost ware keys
+   R_C = R_C_raw 过滤仅保留 wareList 中的 ware
+   R_C_rest = R_C_raw 中不属于 wareList 的部分
 
-3. 第一轮：
-   3a. greedyFill(sources=[R_C]) → A 模块（自举阶段，外部供应 B 产出）
-   3b. autoFill(A) → A_autoFill
-   3c. 计算 B 的需求：
-       - R_A_mat = A.buildCost + A_autoFill.buildCost 中 B 产出部分
-       - R_C_mat = R_C 中 B 产出部分
-   3d. greedyFill(sources=[
-         { label: "A建材需求(B产出)", rates: filterBOutputs(R_A_mat) },
-         { label: "C建材需求(B产出)", rates: filterBOutputs(R_C) }
-       ]) → B 模块（& 约束：同时满足 A 和 C）
-   3e. autoFill(B) → B_autoFill
+2. A 初始：greedyFill(sources=[R_C], fullBootstrap=false)
+   → A 模块（单一来源，满足 A 能产出的那部分建材需求）
 
-4. 迭代轮（A 和 B 各自所有 source 满足率 ≥ 100% 时收敛）：
-   4a. R_A_demand = [
-         source_label: "C+B",
-         rates: R_C + computeBuildRates(B+B_autoFill)  // C 和 B 对 A 产出的消耗（数值相加）
-       ],
-       [
-         source_label: "A_autoFill",
-         rates: computeBuildRates(A_autoFill)  // A 自身运营模块对 A 产出的消耗
-       ]
-   4b. 检查 A 产出对 R_A_demand 所有 source 的满足率 ≥ 100%？
-   4c. 检查 B 产出对 [A建材需求(B产出), C建材需求(B产出)] 所有 source 的满足率 ≥ 100%？
-   4d. 全部满足 → 收敛，否则：
-   4e. greedyFill(sources=R_A_demand) → 追加 A 模块
-   4f. 回到 3c 重新计算 B
+3. B 需求（& 约束）：
+   source1 = A buildCost 中 A 不能自产的 wares
+   source2 = R_C_rest
+   B 需同时满足两者 → demand[w] = max(source1[w] || 0, source2[w] || 0)
+   一次性计算 B 主要模块列表（无 autoFill）
+
+4. 迭代轮（唯一相加）：
+   C+B = R_C + computeBuildRates(B)  （唯一需要相加的地方）
+   greedyFill(sources=[C+B], fullBootstrap=false) → 追加 A
+   （A 需同时产出满足 C 和 B 建造需求，总量相加）
+   重算 B（& 约束）
+   B 主要模块产线数量不变？→ 退出
+   B 变了 → 继续
 
 5. 输出：方案1（A）、方案2（B）、方案3（C）
 ```
 
-迭代收敛后 A 的产出同时满足 (C+B) & A_autoFill 两个 source 的约束。
+**关键区分**：
+- **相加**：仅迭代轮的 C+B = R_C + B_buildCost（A 需产出总量）
+- **& 约束**：其他地方都用 &（max），如 B 需求、A 初始单一来源
+
+**greedyFill fullBootstrap 参数**：
+- `true`（联合自举）：selfDemand = built 产出 ∩ built buildCost（全自举，剔除 energycells）
+- `false`（耦合迭代）：selfDemand = built buildCost 中仅 source rates 包含的 ware
+
+**R_C 过滤逻辑**：C' 仅用于推导 wareList，R_C 是对 R_C_raw 按 wareList 过滤，剔除建材模块自身 buildCost 对应的 ware。
 
 #### 孤立特种自举（BootstrapMode.IsolatedSpecialized）
 
-B→A→C 单向顺序，无循环依赖：
+B 先建 → A 后建，但计算顺序 A 先算 → B 后算（B 需根据 A 的需求确定）：
 
 ```
-1. 第一轮 — B：
-   1a. 由 C 的建材消耗估算 A 的材料需求
-   1b. greedyFill(sources=[A 材料需求中 B 的产出]) → B 模块（外部供应 A 产出）
-   1c. autoFill(B) → B_autoFill
+1. R_C_raw = computeBuildRates(C)
+   C' = C 剔除所有产出在 C buildCost 中的模块
+   wareList = computeBuildRates(C') 的 buildCost ware keys
+   R_C = R_C_raw 过滤仅保留 wareList 中的 ware
+   R_C_rest = R_C_raw 中不属于 wareList 的部分
 
-2. 第二轮 — A（自迭代）：
-   2a. R_A = computeBuildRates(C) + computeBuildRates(A_autoFill)
-   2b. greedyFill(sources=[R_A]) → A 模块（仅需满足 C + 自身）
-   2c. autoFill(A) → A_autoFill
-   2d. 更新 A 检查满足率 → 不满足则迭代追加 A
+2. 计算 A（用 greedyFill）：
+   greedyFill(sources=[R_C], fullBootstrap=false)
+   → A 模块
 
-3. 第三轮 — C：
-   3a. 输出方案3（C 目标产线）
+3. 计算 B（一次性计算，不用 greedyFill，不自举）：
+   B_demand_source1 = R_C_rest
+   B_demand_source2 = A 模块 buildCost 中不属于 A 产出的 wares
+   B_demand = { source1: R_C_rest, source2: B_demand_source2 }
+   （& 表示两个来源独立满足，B 必须同时满足两者）
+   根据 B_demand 一次性计算 B 模块列表
 
-4. 输出：方案1（B）、方案2（A）、方案3（C）
+4. 输出：方案1（B 先建）、方案2（A 后建）、方案3（C）
 ```
+
+关键：B 需同时满足（&）两个约束源——R_C_rest 和 A 的 buildCost 中 A 不能自产的部分。
 
 #### `computeBuildRates` 规则
 
@@ -185,23 +192,36 @@ B→A→C 单向顺序，无循环依赖：
 
 ```
 输入: targetRateSources: BuildRateSource[]（各来源的建材需求速率）
+      fullBootstrap: boolean（true=全自举，false=仅自举 source 包含的 ware）
 内部: targetRates = max_merge(all sources)
 
 seed: 如果 targetRates 含 hullparts, 第一个瓶颈固定为 hullparts
 
 循环（最多 60 次）:
-  1. contextNet = net(currentEmpire + builtSoFar)
-  2. allMet = 对每个 source，contextNet[ware] >= source.rates[ware] for all wares?
-  3. 全部满足 → 退出
-  4. 否 → findLowestSatisfaction(contextNet)
-     从已建模块的 buildCost 消耗率中找满足率最低的 ware
-  5. 添加一个该 ware 的生产者到 builtSoFar
-  6. autoFill(builtSoFar) → 当前支持模块
-  7. deltaAuto = 当前 autoFill - 前一轮 autoFill（新模块）
-  8. group = [新生产者, ...deltaAuto]
+  1. contextNet = net(currentEmpire + fullBuilt)
+     fullBuilt = built + autoFill
+  2. selfWares:
+     fullBootstrap=true: fullBuilt 产出 ∩ fullBuilt 的 buildCost 消耗（剔除 energycells）
+     fullBootstrap=false: fullBuilt 的 buildCost 消耗中仅 source rates 包含的 ware（剔除 energycells）
+     selfDemand = computeBuildRates(fullBuilt) 中属于 selfWares 的消耗速率
+  3. allSources = [...targetRateSources, { label: "self_demand", rates: selfDemand }]
+  4. allMet = 对 allSources 中每个 source，contextNet[ware] >= source.rates[ware] for all wares?
+  5. 全部满足 → 退出
+  6. 否 → findLowestSatisfaction(contextNet)
+     从 fullBuilt 的 buildCost 消耗率中找满足率最低的 ware
+  7. 添加一个该 ware 的生产者到 builtSoFar
+  8. autoFill(builtSoFar) → 当前支持模块
+  9. deltaAuto = 当前 autoFill - 前一轮 autoFill（新模块）
+  10. group = [新生产者, ...deltaAuto]
 ```
 
-**多 source 满足率检查**：不只检查 targetRates（max_merge 后的），每个 source 独立检查其所有 ware 的满足率 ≥ 100%。这是 `&`（且）约束的实现方式。
+**greedyFill fullBootstrap 参数**：
+- `true`（联合自举）：selfWares = fullBuilt 产出 ∩ fullBuilt buildCost 消耗（剔除 energycells）。D 的 buildCost 消耗了 D 自己能生产的建材，D 必须自给覆盖。
+- `false`（耦合迭代）：selfWares = fullBuilt buildCost 消耗中仅 targetRateSources 各 source.rates 包含的 ware（剔除 energycells）。仅自举外部明确需要的 ware，不自举额外产出。
+
+**多 source 满足率检查**：每个 source（含 selfDemand）独立检查其所有 ware 的满足率 ≥ 100%。这是 `&`（且）约束的实现方式。
+
+**多 source 满足率检查**：不只检查 targetRates（max_merge 后的），每个 source（含 selfDemand）独立检查其所有 ware 的满足率 ≥ 100%。这是 `&`（且）约束的实现方式。
 
 **能量电池排除**：
 - `energycells` 不参与 `computeBuildRates` 计算（过滤）
