@@ -5,23 +5,40 @@
 ### T1: 更新类型定义 [x]
 
 - 修改 `src/types/build-plan.ts`
+- 新增 `BootstrapMode` 枚举（None / Joint / CoupledIterative / IsolatedSpecialized）
 - 新增 `BuildSchemeStep` 接口
 - 新增 `BuildScheme` 接口（label、description、purposeModules、steps、totalDuration、totalCredits、stepsCount、isFeasible）
 - 更新 `BuildPlan`：移除 `constraints`（预算约束），新增 `schemes: BuildScheme[]`
-- 更新 `CalculateBuildPlanInput`：移除 `timeBudget`/`creditBudget`，新增 `currentNetProduction`
+- 更新 `CalculateBuildPlanInput`：移除 `timeBudget`/`creditBudget`，新增 `currentNetProduction`，新增 `bootstrapMode: BootstrapMode`
 
-### T2: 重写算法 calculateBuildPlan [x]
+### T2a: 重写算法框架 calculateBuildPlan [x]
 
 - 文件: `src/store/logic/calculateBuildPlan.ts`
 - 引入 `calculateAutoFillModules` 调用
-- 实现目标类型分支：
-  - 自举 → 仅方案1（贪婪算法）
-  - 产量/建筑 → 方案3→2→1 递进
-- 方案3：目标模块 + autoFill → 识别建材模块（产出在 R3 中的模块）→ 剔除 → 方案3'
+- 实现 `bootstrapMode` 分支逻辑（见 design.md §2）
+- 方案3：目标模块 + autoFill → 识别建材模块 → 剔除 → 方案3'
 - 方案2：按 R3' 的 whichWares + R3 的 targetRates 规划产线 → autoFill
-- 方案1：greedyFill(R2 + R3_remaining) → autoFill
-- 产能需求计算：总需求量 / 总建造时间
 - 输出 `BuildScheme[]`
+
+### T2b: 不自举/联合自举 [x]
+
+- 不自举：当前产能足够则只输出方案3（目标产线），不足则输出方案2+3
+- 联合自举：greedyFill(C_buildCost) → A+B 联合模块，输出方案1(A+B) + 方案2(C)
+- 前置知识：电子黏土+船体部件是大部分建筑模块的材料；A 模块本身用 先进复合材料+等离子导体
+
+### T2c: 耦合迭代自举 [x]
+
+- A↔B 外层循环，所有内部迭代用 greedyFill
+- A 的产出（电子黏土+船体部件）需同时满足 (C+B) & A_autoFill 两个 source 的约束
+- 每轮：greedyFill → A → autoFill(A) → greedyFill → B → autoFill(B) → 检查两个 source 满足率 ≥ 100%
+- 不满足则追加 A → 重新计算 B → 直至收敛
+
+### T2d: 孤立特种自举 [x]
+
+- B→A→C 单向顺序，无循环依赖
+- B：greedyFill(A 材料需求中 B 的产出)，外部供应
+- A：greedyFill(C + A_autoFill)，自迭代
+- 输出方案1(B) + 方案2(A) + 方案3(C)
 
 ### T3: 修改 Store [x]
 
@@ -74,29 +91,31 @@
 - 移除预算相关 key
 - 新增方案相关 key（方案名称、目的产物、浮动窗口标题等）
 
-### T10: selfSufficient 分离 + 类型更新 [x]
+### T10: BootstrapMode 类型更新 [x]
 
 - 修改 `src/types/build-plan.ts`：
+  - 新增 `BootstrapMode` 枚举（None / Joint / CoupledIterative / IsolatedSpecialized）
   - `BuildGoal` 移除 `{ type: 'self-sufficient' }` 变体
-  - `CalculateBuildPlanInput` 新增 `selfSufficient: boolean`
-  - `BuildPlan` 新增 `selfSufficient: boolean`
+  - `CalculateBuildPlanInput` 新增 `bootstrapMode: BootstrapMode`
+  - `BuildPlan` 新增 `bootstrapMode: BootstrapMode`
 - 修改 `src/types/x4.ts`：
   - 新增 `LocalizedX4Ware`（含 `localeName`）
   - 新增 `WareGroupResult`（含 `group` + `displayLabel` + `wares`）
   - 新增 `GroupedWareItem`（含 `displayLabel` + `moduleGroup`）
 
-### T11: 算法适配 selfSufficient 参数 [x]
+### T11: 算法适配 bootstrapMode 参数 [x]
 
 - 文件: `src/store/logic/calculateBuildPlan.ts`
-- `selfSufficient` 从 goals 数组改为 `input.selfSufficient` 参数读取
-- 目标合并规则更新（见 design.md §10）
+- `bootstrapMode` 从参数读取，走对应分支（见 design.md §2）
+- `selfSufficient` 相关逻辑全部移除
 
-### T12: Store 新增 selfSufficient [x]
+### T12: Store 新增 bootstrapMode [x]
 
 - `src/store/useBlueprintProductionStore.ts`
-- 新增 `selfSufficient: Ref<boolean>` + `setSelfSufficient(val: boolean)` action
+- 移除 `selfSufficient: Ref<boolean>` 和 `setSelfSufficient`
+- 新增 `bootstrapMode: Ref<BootstrapMode>` + `setBootstrapMode(mode: BootstrapMode)` action
 - 持久化到 localStorage
-- `computePlan()` 传入 `selfSufficient` 到算法
+- `computePlan()` 传入 `bootstrapMode` 到算法
 
 ### T13: GameData 新增商品本地化 [x]
 
@@ -138,8 +157,9 @@
   1. BuildGoalSearchBox（搜索+类型切换，点击直接添加到列表）
   2. 目标卡片列表（WarePlanningItem，可调数量、可删除）
   3. 计算按钮
-  4. self-sufficient checkbox + 方案计数 + warnings
+  4. **通用自举模式 dropdown**（四个选项）+ 方案计数 + warnings
 - 移除原有的：类型 select、ware/module 手写下拉、添加按钮、rate/count 输入
+- 移除 self-sufficient checkbox
 - 默认添加数量：
   - production-rate：`findModuleForWare(wareId, racePreference).outputs[wareId]` 取整
   - build-module：1
@@ -147,13 +167,16 @@
 ### T18: Presenter 适配 [x]
 
 - `src/components/empire/presenters/useBuildPlanPresenter.ts`
-- 新增 `selfSufficient` / `setSelfSufficient` 透传
+- 移除 `selfSufficient` / `setSelfSufficient` 透传
+- 新增 `bootstrapMode` / `setBootstrapMode` 透传
 - 新增 `updateGoal(index: number, value: number)` emit（目标数量修改）
 
 ### T19: i18n 更新 [x]
 
 - `src/locales/en.json` / `zh-CN.json`
-- 新增 self-sufficient checkbox key
+- 移除 self-sufficient checkbox key
+- 新增 bootstrap_mode / bootstrap_none / bootstrap_joint / bootstrap_coupled / bootstrap_isolated key
+- 新增各模式方案标签 key
 - 新增 BuildGoalSearchBox category label key
 - 新增 WarePlanningItem 相关 key
 
@@ -168,13 +191,15 @@
 T1-T9（已完成）
 T10 → T11 → T12
 T10 → T13 → T14
+T2a → T2b → T2c → T2d（按顺序实现 4 种模式，T2b-T2d 可并行）
 T10 + T13 → T15
 T13 + T14 → T16
 T15 + T16 → T17
-T12 → T18
+T10 + T12 → T18
 T17 + T18 → T19 → T20
 ```
 
-T10/T13 可并行。
-T11/T12 依赖 T10，可在 T13 并行期间串行执行。
+T10/T13/T2a 可并行。
+T11/T12/T2b→T2d 依赖 T10，可在 T13 并行期间串行执行。
+T2b/T2c/T2d 逻辑独立，可并行实现。
 T15/T16 可并行（T15 依赖 T10+T13，T16 依赖 T13+T14）。

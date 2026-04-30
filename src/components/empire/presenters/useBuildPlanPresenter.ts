@@ -1,10 +1,10 @@
 import { computed, type ComputedRef } from 'vue'
-import type { BuildGoal, BuildPlan, BuildScheme } from '@/types/build-plan'
+import type { BuildGoal, BuildPlan, BuildScheme, BootstrapMode } from '@/types/build-plan'
 import type { EmpireGroupedFlows } from '@/types/x4'
 
 export interface BuildPlanPresenterProps {
   goals: ComputedRef<BuildGoal[]>
-  selfSufficient: ComputedRef<boolean>
+  bootstrapMode: ComputedRef<BootstrapMode>
   racePreference: ComputedRef<string>
   buildPlan: ComputedRef<BuildPlan | null>
   loading: ComputedRef<boolean>
@@ -17,7 +17,7 @@ export interface BuildPlanPresenterEmits {
   addGoal: (goal: BuildGoal) => void
   removeGoal: (index: number) => void
   updateGoal: (index: number, value: number) => void
-  setSelfSufficient: (val: boolean) => void
+  setBootstrapMode: (mode: BootstrapMode) => void
   computePlan: () => void
 }
 
@@ -29,20 +29,20 @@ export interface UseBuildPlanPresenterReturn {
 export interface BuildPlanPresenterStore {
   activeEmpire: { stations: import('@/types/x4').StationPlan[] } | null
   buildGoals: BuildGoal[]
-  selfSufficient: boolean
+  bootstrapMode: BootstrapMode
   buildPlan: BuildPlan | null
   computeBuildPlanLoading: boolean
   getEmpireGroupedFlows(): EmpireGroupedFlows
   setBuildGoal(goal: BuildGoal): void
   removeBuildGoal(index: number): void
-  setSelfSufficient(val: boolean): void
+  setBootstrapMode(mode: BootstrapMode): void
   computePlan(): void
 }
 
 export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildPlanPresenterReturn {
   const props: BuildPlanPresenterProps = {
     goals: computed(() => store.buildGoals),
-    selfSufficient: computed(() => store.selfSufficient),
+    bootstrapMode: computed(() => store.bootstrapMode),
     racePreference: computed(() => 'argon'),
     buildPlan: computed(() => store.buildPlan),
     loading: computed(() => store.computeBuildPlanLoading),
@@ -72,7 +72,7 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
         store.buildGoals[index] = { ...goal, count: value }
       }
     },
-    setSelfSufficient: (val) => store.setSelfSufficient(val),
+    setBootstrapMode: (mode) => store.setBootstrapMode(mode),
     computePlan: () => store.computePlan()
   }
 

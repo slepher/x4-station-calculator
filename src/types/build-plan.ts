@@ -1,5 +1,14 @@
 import type { SavedModule, StationSettings, X4Module, X4Ware } from './x4'
 
+export const BootstrapMode = {
+  None: 'none',
+  Joint: 'joint',
+  CoupledIterative: 'coupled',
+  IsolatedSpecialized: 'isolated',
+} as const
+
+export type BootstrapMode = (typeof BootstrapMode)[keyof typeof BootstrapMode]
+
 export interface BuildGroup {
   reason: string
   modules: SavedModule[]
@@ -77,6 +86,7 @@ export interface BuildStep {
 export interface BuildPlan {
   goals: BuildGoal[]
   selfSufficient: boolean
+  bootstrapMode: BootstrapMode
   schemes: BuildScheme[]
   totalDuration: number
   totalCredits: number
@@ -89,6 +99,7 @@ export interface BuildPlan {
 export interface CalculateBuildPlanInput {
   goals: BuildGoal[]
   selfSufficient: boolean
+  bootstrapMode: BootstrapMode
   currentModules: SavedModule[]
   settings: StationSettings
   modulesMap: Record<string, X4Module>

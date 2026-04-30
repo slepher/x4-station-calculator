@@ -34,7 +34,7 @@ function resolveWareId(name: string): string | null {
 }
 
 import { calculateBuildPlan } from '../../src/store/logic/calculateBuildPlan'
-import type { BuildGoal } from '../../src/types/build-plan'
+import { BootstrapMode, type BuildGoal } from '../../src/types/build-plan'
 
 const baseSettings = {
   sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
@@ -47,6 +47,15 @@ const baseSettings = {
 
 function fmtCr(n: number): string { return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : `${Math.round(n)}` }
 function fmtH(s: number): string { return `${(s / 3600).toFixed(2)}h` }
+
+let parsedBootstrap = BootstrapMode.None
+const bootstrapFlag = process.argv.find(a => a.startsWith('--bootstrap='))
+if (bootstrapFlag) {
+  const val = bootstrapFlag.slice('--bootstrap='.length).toLowerCase()
+  if (val === 'joint') parsedBootstrap = BootstrapMode.Joint
+  else if (val === 'coupled' || val === 'iterative') parsedBootstrap = BootstrapMode.CoupledIterative
+  else if (val === 'isolated') parsedBootstrap = BootstrapMode.IsolatedSpecialized
+}
 
 function parseArgs(): BuildGoal[] {
   const goals: BuildGoal[] = []
@@ -95,6 +104,8 @@ console.log()
 
 const result = calculateBuildPlan({
   goals,
+  selfSufficient: false,
+  bootstrapMode: parsedBootstrap,
   currentModules: [],
   currentNetProduction: {},
   settings: baseSettings,
@@ -162,19 +173,20 @@ for (let si = 0; si < result.schemes.length; si++) {
   }
 
   console.log()
-  if (si === 0 && scheme.targetRateSources.length > 0) {
-    console.log(`  ── 方案1 产能对各方案需求的满足率 ──`)
-    for (let srcIdx = 0; srcIdx < scheme.targetRateSources.length; srcIdx++) {
-      const src = scheme.targetRateSources[srcIdx]
-      const targetScheme = result.schemes[srcIdx]
+  if (scheme.targetRateSources.length > 0) {
+    console.log(`  ── 本方案产能对各约束来源的满足率 ──`)
+    for (const src of scheme.targetRateSources) {
       console.log(`  ── ${src.label} ──`)
-      console.log(`    建造总时间: ${fmtH(targetScheme.totalModuleBuildTime)}  模块数: ${targetScheme.modules.reduce((s, m) => s + m.count, 0)}`)
+      if (Object.keys(src.rates).length === 0) {
+        console.log(`    (空)`)
+        continue
+      }
       for (const wareId of Object.keys(src.rates).sort()) {
         const target = src.rates[wareId]
         const net = scheme.netProduction[wareId] || 0
         const sat = target > 0 ? (net / target * 100) : (net >= 0 ? 100 : 0)
         const mark = sat >= 100 ? '✓' : '✗'
-        const totalQty = targetScheme.buildMaterialTotals[wareId] || 0
+        const totalQty = scheme.buildMaterialTotals[wareId] || 0
         console.log(`    ${mark} ${wareName(wareId).padEnd(30)} ×${String(Math.round(totalQty)).padStart(7)}  需要: ${String(target.toFixed(1)).padStart(8)}/h  ` +
           `产能: ${String(net.toFixed(1)).padStart(8)}/h  满足: ${sat.toFixed(0)}%`)
       }

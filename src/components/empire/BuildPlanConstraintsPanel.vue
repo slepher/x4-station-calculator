@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import BuildGoalSearchBox from './BuildGoalSearchBox.vue'
 import WarePlanningItem from './WarePlanningItem.vue'
-import type { BuildGoal } from '@/types/build-plan'
+import { BootstrapMode, type BuildGoal } from '@/types/build-plan'
 import type { LocalizedX4Ware, LocalizedX4Module, LocalizedX4ModuleGroup } from '@/types/x4'
 
 const { t } = useI18n()
@@ -12,7 +12,7 @@ const gameData = useGameDataStore()
 
 const props = defineProps<{
   goals: BuildGoal[]
-  selfSufficient: boolean
+  bootstrapMode: BootstrapMode
   racePreference: string
   buildPlan: { schemes: unknown[]; halted: boolean; haltReason: string; goalsAchieved: unknown[]; goalsRemaining: unknown[] } | null
   loading: boolean
@@ -23,7 +23,7 @@ const emit = defineEmits<{
   addGoal: [goal: BuildGoal]
   removeGoal: [index: number]
   updateGoal: [index: number, value: number]
-  setSelfSufficient: [val: boolean]
+  setBootstrapMode: [mode: BootstrapMode]
   computePlan: []
 }>()
 
@@ -71,9 +71,16 @@ function onRemoveGoal(index: number) {
   emit('removeGoal', index)
 }
 
-function onToggleSelfSufficient(e: Event) {
-  emit('setSelfSufficient', (e.target as HTMLInputElement).checked)
+function onBootstrapModeChange(e: Event) {
+  emit('setBootstrapMode', (e.target as HTMLSelectElement).value as BootstrapMode)
 }
+
+const bootstrapOptions = [
+  { value: BootstrapMode.None, label: 'sector.build_plan.bootstrap_none' },
+  { value: BootstrapMode.Joint, label: 'sector.build_plan.bootstrap_joint' },
+  { value: BootstrapMode.CoupledIterative, label: 'sector.build_plan.bootstrap_coupled' },
+  { value: BootstrapMode.IsolatedSpecialized, label: 'sector.build_plan.bootstrap_isolated' },
+]
 </script>
 
 <template>
@@ -110,14 +117,19 @@ function onToggleSelfSufficient(e: Event) {
       </button>
 
       <div class="flex items-center gap-2 px-3 py-2 bg-slate-800/50 rounded border border-slate-700/50">
-        <label class="flex items-center gap-2 cursor-pointer">
-          <input
-            type="checkbox"
-            :checked="selfSufficient"
-            @change="onToggleSelfSufficient"
-            class="w-4 h-4 rounded border-slate-600 bg-slate-800 text-amber-500 focus:ring-amber-500/50"
-          />
-          <span class="text-xs text-slate-300">{{ t('sector.build_plan.self_sufficient') }}</span>
+        <label class="flex items-center gap-2">
+          <span class="text-xs text-slate-300 whitespace-nowrap">{{ t('sector.build_plan.bootstrap_mode') }}</span>
+          <select
+            :value="bootstrapMode"
+            @change="onBootstrapModeChange"
+            class="w-full text-xs bg-slate-700 border border-slate-600 rounded px-2 py-1 text-slate-200 focus:ring-amber-500/50 focus:border-amber-500/50"
+          >
+            <option
+              v-for="opt in bootstrapOptions"
+              :key="opt.value"
+              :value="opt.value"
+            >{{ t(opt.label) }}</option>
+          </select>
         </label>
         <div v-if="schemeCount > 0" class="text-xs text-slate-400 ml-auto">
           {{ schemeCount }} {{ t('sector.build_plan.schemes_generated') }}

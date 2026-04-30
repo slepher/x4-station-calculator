@@ -18,7 +18,7 @@ import type {
   ProductionStationState
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import type { BuildGoal, BuildPlan } from '@/types/build-plan'
+import { BootstrapMode, type BuildGoal, type BuildPlan } from '@/types/build-plan'
 import { calculateBuildPlan, calculateNetProduction } from '@/store/logic/calculateBuildPlan'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -65,7 +65,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   const buildGoals = ref<BuildGoal[]>([])
 
-  const selfSufficient = ref(false)
+  const bootstrapMode = ref<BootstrapMode>(BootstrapMode.None)
 
   const buildPlan = ref<BuildPlan | null>(null)
 
@@ -101,8 +101,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     buildGoals.value = buildGoals.value.filter((_, i) => i !== index)
   }
 
-  function setSelfSufficient(val: boolean) {
-    selfSufficient.value = val
+  function setBootstrapMode(mode: BootstrapMode) {
+    bootstrapMode.value = mode
   }
 
   function computePlan() {
@@ -115,7 +115,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     try {
       const result = calculateBuildPlan({
         goals: buildGoals.value,
-        selfSufficient: selfSufficient.value,
+        selfSufficient: false,
+        bootstrapMode: bootstrapMode.value,
         currentModules: empireModules.value,
         currentNetProduction: empireCurrentNetProduction.value,
         settings: {
@@ -1094,14 +1095,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     overviewBuyMultiplier,
     overviewSellMultiplier,
     buildGoals,
-    selfSufficient,
+    bootstrapMode,
     buildPlan,
     empireModules,
     empireCurrentNetProduction,
     computeBuildPlanLoading,
     setBuildGoal,
     removeBuildGoal,
-    setSelfSufficient,
+    setBootstrapMode,
     computePlan
   }
 })

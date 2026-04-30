@@ -9,6 +9,13 @@ Blueprint overview 视图当前仅显示单一线性建造步骤列表，缺少�
 ### 1. 类型定义
 
 ```typescript
+enum BootstrapMode {
+  None = 'none',                    // 不自举
+  Joint = 'joint',                  // 联合自举
+  CoupledIterative = 'coupled',     // 耦合迭代自举
+  IsolatedSpecialized = 'isolated', // 孤立特种自举
+}
+
 interface BuildMaterial {
   wareId: string
   quantity: number
@@ -62,49 +69,105 @@ interface BuildGroup {
 
 ### 2. 算法（`calculateBuildPlan`）
 
-**输入**: `CalculateBuildPlanInput`（goals、currentModules、currentNetProduction、settings、modulesMap、waresMap）
+**输入**: `CalculateBuildPlanInput`（goals、currentModules、currentNetProduction、settings、modulesMap、waresMap、bootstrapMode: BootstrapMode）
 
 **输出**: `BuildPlan` → `schemes: BuildScheme[]`
 
-#### 目标合并规则
+#### 通用分支逻辑
 
-- **有 self-sufficient + 有其他目标**：合并所有其他目标 → 方案3 → 无视当前产能，直接生成方案1+2+3
-- **无 self-sufficient + 有其他目标**：合并所有其他目标 → 方案3 → 当前产能足够则只出方案3，不足则生成方案1+2+3
-- **仅 self-sufficient**：只生成方案1
-
-#### self-sufficient 目标
+`bootstrapMode` 决定方案数量和 bootstrap 层算法。所有模式共用目标产线 C 的初始计算：
 
 ```
-expandGoalDependencies + calculateAutoFillModules → allMods
-makeScheme → 方案1（自给自足）
+1. 合并所有 production-rate / build-module 目标
+2. expandGoalDependencies → merged3
+3. calculateAutoFillModules → allMods3（目标产线）
+4. C = allMods3
 ```
 
-#### 目标产量 / 目标建筑（production-rate / build-module）
+无目标时仅当 bootstrapMode ≠ None 才生成方案，否则空。
 
-所有其他目标合并后执行一次：
+#### 不自举（BootstrapMode.None）
+
+无 bootstrap 层：
+- 当前产能 ≥ computeBuildRates(C)？→ 只输出方案3（C）
+- 不足 → 输出方案2（输入建材）+ 方案3
+
+#### 联合自举（BootstrapMode.Joint）
+
+A+B 视为联合模块，内部通过 greedyFill 直接满足 C 的建材消耗：
 
 ```
-Phase 1 — allMods3：
-  1. 合并所有目标的 expandGoalDependencies → merged3
-  2. calculateAutoFillModules → allMods3
-  3. R3 = computeBuildRates(allMods3)（仅 buildCost，无 fallback 到 inputs）
-  4. purposeWareSet = 所有目标的产物 ware ID 集合
-  5. 识别建材模块：allMods3 中输出在 R3 中的模块（不区分目标/非目标模块）
-  6. R3' = allMods3 - 建材模块
-  7. R3'M = computeBuildRates(R3')
-  8. 无 self-sufficient 且当前产能 ≥ R3'M？→ 是则只显示方案3
-
-Phase 2 — 方案2（目标建材）：
-  9. whichWares = R3'M.keys，targetRates = R3
-     R2 必须满足 R3 对 R3'M 全部 ware 的产能需求（用 R3 的速率，非 R3'M 速率）
-  10. planProductionForRates + autoFill → allMods2
-  11. R2 = computeBuildRates(allMods2)
-
-Phase 3 — 方案1（自给自足）：
-  12. r3Remaining = R3.keys \ R3'M.keys（R3 中有但 R3'M 中没有的 ware）
-  13. scheme1Target = max_merge(R1建材, R2建材, r3Remaining)
-  14. greedyFill(sources=[R1建材, R2建材, r3Remaining]) → 自给自足产线
+1. C' = C 剔除产出在 C 的 buildCost 中的模块（建材模块）
+2. targetRates = computeBuildRates(C') 的建材消耗速率
+3. greedyFill(sources=[targetRates]) → 联合模块（含 A+B）
+4. 输出：方案1（A+B 联合模块）、方案2（C）
 ```
+
+A+B 的 autoFill 运营模块消耗由 A 的产出（电子黏土+船体部件）覆盖——greedyFill 在迭代中自动处理。
+
+#### 耦合迭代自举（BootstrapMode.CoupledIterative）
+
+A↔B 外层循环迭代，所有内部迭代均使用 greedyFill：
+
+```
+1. C' = C 剔除建材模块
+2. R_C = computeBuildRates(C')
+
+3. 第一轮：
+   3a. greedyFill(sources=[R_C]) → A 模块（自举阶段，外部供应 B 产出）
+   3b. autoFill(A) → A_autoFill
+   3c. 计算 B 的需求：
+       - R_A_mat = A.buildCost + A_autoFill.buildCost 中 B 产出部分
+       - R_C_mat = R_C 中 B 产出部分
+   3d. greedyFill(sources=[
+         { label: "A建材需求(B产出)", rates: filterBOutputs(R_A_mat) },
+         { label: "C建材需求(B产出)", rates: filterBOutputs(R_C) }
+       ]) → B 模块（& 约束：同时满足 A 和 C）
+   3e. autoFill(B) → B_autoFill
+
+4. 迭代轮（A 和 B 各自所有 source 满足率 ≥ 100% 时收敛）：
+   4a. R_A_demand = [
+         source_label: "C+B",
+         rates: R_C + computeBuildRates(B+B_autoFill)  // C 和 B 对 A 产出的消耗（数值相加）
+       ],
+       [
+         source_label: "A_autoFill",
+         rates: computeBuildRates(A_autoFill)  // A 自身运营模块对 A 产出的消耗
+       ]
+   4b. 检查 A 产出对 R_A_demand 所有 source 的满足率 ≥ 100%？
+   4c. 检查 B 产出对 [A建材需求(B产出), C建材需求(B产出)] 所有 source 的满足率 ≥ 100%？
+   4d. 全部满足 → 收敛，否则：
+   4e. greedyFill(sources=R_A_demand) → 追加 A 模块
+   4f. 回到 3c 重新计算 B
+
+5. 输出：方案1（A）、方案2（B）、方案3（C）
+```
+
+迭代收敛后 A 的产出同时满足 (C+B) & A_autoFill 两个 source 的约束。
+
+#### 孤立特种自举（BootstrapMode.IsolatedSpecialized）
+
+B→A→C 单向顺序，无循环依赖：
+
+```
+1. 第一轮 — B：
+   1a. 由 C 的建材消耗估算 A 的材料需求
+   1b. greedyFill(sources=[A 材料需求中 B 的产出]) → B 模块（外部供应 A 产出）
+   1c. autoFill(B) → B_autoFill
+
+2. 第二轮 — A（自迭代）：
+   2a. R_A = computeBuildRates(C) + computeBuildRates(A_autoFill)
+   2b. greedyFill(sources=[R_A]) → A 模块（仅需满足 C + 自身）
+   2c. autoFill(A) → A_autoFill
+   2d. 更新 A 检查满足率 → 不满足则迭代追加 A
+
+3. 第三轮 — C：
+   3a. 输出方案3（C 目标产线）
+
+4. 输出：方案1（B）、方案2（A）、方案3（C）
+```
+
+#### `computeBuildRates` 规则
 
 **`computeBuildRates` 规则**：
 - 仅使用 `mod.buildCost`，无 fallback 到 `mod.inputs`
@@ -116,7 +179,9 @@ Phase 3 — 方案1（自给自足）：
 - 不区分目标模块/非目标模块（无 `goalModIds` 跳过逻辑）
 - 建材模块从 R3' 中剔除，其 buildCost 归入 r3Remaining
 
-### 3. greedyFill（方案1贪婪循环）
+### 3. greedyFill（通用迭代引擎）
+
+所有自举模式均使用 greedyFill 作为内部迭代引擎，输入 targetRateSources 因模式而异。
 
 ```
 输入: targetRateSources: BuildRateSource[]（各来源的建材需求速率）
@@ -135,6 +200,8 @@ seed: 如果 targetRates 含 hullparts, 第一个瓶颈固定为 hullparts
   7. deltaAuto = 当前 autoFill - 前一轮 autoFill（新模块）
   8. group = [新生产者, ...deltaAuto]
 ```
+
+**多 source 满足率检查**：不只检查 targetRates（max_merge 后的），每个 source 独立检查其所有 ware 的满足率 ≥ 100%。这是 `&`（且）约束的实现方式。
 
 **能量电池排除**：
 - `energycells` 不参与 `computeBuildRates` 计算（过滤）
@@ -157,13 +224,14 @@ seed: 如果 targetRates 含 hullparts, 第一个瓶颈固定为 hullparts
 - 方案2 context = currentModules + 方案1 模块
 - 方案3 context = currentModules + 方案1 + 方案2 模块
 
-### 6. 方案标签
+### 6. 方案标签（因自举模式而异）
 
-| 方案 | 标签 | 说明 |
-|------|------|------|
-| 方案1 | 自给自足 | 基础建材产线 |
-| 方案2 | 目标建材 | 满足方案3建材需求的模块组 |
-| 方案3 | 目标产线 | 目标产物系列模块 |
+| 自举模式 | 方案数 | 方案1 | 方案2 | 方案3 |
+|---------|-------|-------|-------|-------|
+| 不自举 | 1 | - | - | 目标产线 |
+| 联合自举 | 2 | A+B 联合自举 | 目标产线 | - |
+| 耦合迭代自举 | 3 | A 建材自举 | B 特种产线 | 目标产线 |
+| 孤立特种自举 | 3 | B 特种孤岛 | A 建材自举 | 目标产线 |
 
 ### 7. UI 方案卡片
 
@@ -196,26 +264,28 @@ const primaryModuleIds = mergedModules
 ### 9. Store 变更
 
 - `buildGoals: Ref<BuildGoal[]>`（代替原 buildConstraints，不再含 self-sufficient 变体）
-- `selfSufficient: Ref<boolean>`（独立参数，持久化）
-- `setSelfSufficient(val: boolean)` action
+- `bootstrapMode: Ref<BootstrapMode>`（独立参数，持久化，默认 `BootstrapMode.None`）
+- `setBootstrapMode(mode: BootstrapMode)` action
 - `buildPlan: Ref<BuildPlan | null>`（含 `schemes`）
 - `empireCurrentNetProduction: ComputedRef<Record<string, number>>`
-- `computePlan()` 调用新算法
+- `computePlan()` 调用新算法，传入 `bootstrapMode`
 - 移除 `setTimeBudget`/`setCreditBudget`
 
-### 10. selfSufficient 分离
+### 10. 通用自举模式
 
-`self-sufficient` 从 `BuildGoal[]` 分离为独立 boolean 参数：
+`self-sufficient` checkbox 替换为 `BootstrapMode` 下拉框：
 
-- **类型变更**：`BuildGoal` 移除 `{ type: 'self-sufficient' }` 变体，仅保留 `production-rate` 和 `build-module`
-- **Store**：新增 `selfSufficient: Ref<boolean>` + `setSelfSufficient` action，持久化到 localStorage
-- **算法**：`CalculateBuildPlanInput` 新增 `selfSufficient: boolean`，算法从参数读取而非 goals 数组
-- **UI**：左面板底部 checkbox 控制，与 production-rate / build-module 目标共存
-- **目标合并规则**更新：
-  - `selfSufficient=true + 有其他目标`：合并所有其他目标 → 方案3 → 无视当前产能，直接生成方案1+2+3
-  - `selfSufficient=false + 有其他目标`：合并所有其他目标 → 方案3 → 当前产能足够则只出方案3
-  - `selfSufficient=true + 无其他目标`：只生成方案1（自给自足）
-  - `selfSufficient=false + 无其他目标`：无方案
+- **类型变更**：新增 `BootstrapMode` 枚举，`BuildGoal` 移除 `{ type: 'self-sufficient' }` 变体
+- **Store**：新增 `bootstrapMode: Ref<BootstrapMode>` + `setBootstrapMode` action，持久化到 localStorage
+- **算法**：`CalculateBuildPlanInput` 新增 `bootstrapMode: BootstrapMode`，算法根据模式走不同分支
+- **UI**：左面板底部 dropdown 控制，与 production-rate / build-module 目标共存
+
+#### 目标合并规则（通用）
+
+- **其他目标存在 + bootstrapMode ≠ None**：无视当前产能，生成 bootstrap 方案 + 方案3
+- **其他目标存在 + bootstrapMode = None**：当前产能足够则只出方案3，不足则出方案2+3
+- **无其他目标 + bootstrapMode ≠ None**：生成 bootstrap-only 方案（无目标产线）
+- **无其他目标 + bootstrapMode = None**：无方案
 
 ### 11. 约束面板 UI 重构
 
@@ -239,7 +309,7 @@ const primaryModuleIds = mergedModules
 
 3. **计算按钮** — 保持
 
-4. **self-sufficient checkbox** — 计算按钮下方，勾选即启用，与目标共存
+4. **通用自举模式 dropdown** — 计算按钮下方，四个选项：不自举、联合自举、耦合迭代自举、孤立特种自举
 
 5. **方案计数 + warnings** — 保持
 
@@ -279,6 +349,8 @@ const primaryModuleIds = mergedModules
 - `main_production` / `build_materials`
 - `produced` / `stock` / `self_prod` / `buy` / `unit_price`
 - `build` / `cumulative` / `step_cost` / `cumulative_cost`
+- `bootstrap_mode` / `bootstrap_none` / `bootstrap_joint` / `bootstrap_coupled` / `bootstrap_isolated`
+- 各模式方案标签：`scheme_label_joint_a` / `scheme_label_joint_c` 等
 
 ### 13. 分析脚本
 
