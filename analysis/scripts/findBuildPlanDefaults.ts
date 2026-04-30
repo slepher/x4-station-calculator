@@ -7,10 +7,34 @@ const MOD = JSON.parse(readFileSync(resolve('src/assets/x4_game_data/8.0-Diploma
 const waresMap: Record<string, any> = Object.fromEntries(WARE.map((w: any) => [w.id, w]))
 const modulesMap: Record<string, any> = Object.fromEntries(MOD.map((m: any) => [m.id, m]))
 
+const waresByName: Record<string, any> = {}
+for (const w of WARE) waresByName[w.name.toLowerCase()] = w
+const modulesByName: Record<string, any> = {}
+for (const m of MOD) modulesByName[m.name.toLowerCase()] = m
+
 function modName(id: string): string { const m = modulesMap[id]; return m?.name || id }
 function wareName(id: string): string { const w = waresMap[id]; return w?.name || id }
 
+function resolveModuleId(name: string): string | null {
+  const key = name.toLowerCase().replace(/\s+/g, '')
+  for (const m of MOD) {
+    if (m.name.toLowerCase().replace(/\s+/g, '') === key) return m.id
+  }
+  const partial = MOD.find((m: any) => m.name.toLowerCase().includes(name.toLowerCase()))
+  return partial?.id || null
+}
+
+function resolveWareId(name: string): string | null {
+  const key = name.toLowerCase().replace(/\s+/g, '')
+  for (const w of WARE) {
+    if (w.name.toLowerCase().replace(/\s+/g, '') === key) return w.id
+  }
+  const partial = WARE.find((w: any) => w.name.toLowerCase().includes(name.toLowerCase()))
+  return partial?.id || null
+}
+
 import { calculateBuildPlan } from '../../src/store/logic/calculateBuildPlan'
+import type { BuildGoal } from '../../src/types/build-plan'
 
 const baseSettings = {
   sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
@@ -24,24 +48,53 @@ const baseSettings = {
 function fmtCr(n: number): string { return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : `${Math.round(n)}` }
 function fmtH(s: number): string { return `${(s / 3600).toFixed(2)}h` }
 
-function calcNet(mods: any[]) {
-  const state: Record<string, number> = {}
-  for (const item of mods) {
-    const m = modulesMap[item.id]
-    if (!m) continue
-    for (const [w, val] of Object.entries(m.outputs)) state[w] = (state[w] || 0) + (item.count as number) * (val as number)
-    for (const [w, val] of Object.entries(m.inputs)) state[w] = (state[w] || 0) - (item.count as number) * (val as number)
+function parseArgs(): BuildGoal[] {
+  const goals: BuildGoal[] = []
+  const moduleArg = process.argv.find(a => a.startsWith('--module='))
+  const wareArg = process.argv.find(a => a.startsWith('--ware='))
+
+  if (moduleArg) {
+    const value = moduleArg.slice('--module='.length)
+    for (const part of value.split(',')) {
+      const [name, countStr] = part.split('*')
+      const modId = resolveModuleId(name.trim())
+      if (!modId) { console.error(`Module not found: ${name.trim()}`); process.exit(1) }
+      const count = parseInt(countStr || '1')
+      goals.push({ type: 'build-module', moduleId: modId, count })
+    }
   }
-  return state
+
+  if (wareArg) {
+    const value = wareArg.slice('--ware='.length)
+    for (const part of value.split(',')) {
+      const [name, rateStr] = part.split('*')
+      const wareId = resolveWareId(name.trim())
+      if (!wareId) { console.error(`Ware not found: ${name.trim()}`); process.exit(1) }
+      const ratePerHour = parseFloat(rateStr || '1000')
+      goals.push({ type: 'production-rate', wareId, ratePerHour })
+    }
+  }
+
+  if (goals.length === 0) {
+    goals.push({ type: 'build-module', moduleId: 'module_gen_prod_missilecomponents_01', count: 5 })
+  }
+
+  return goals
 }
 
-const MISSILE_MODULE = 'module_gen_prod_missilecomponents_01'
+const goals = parseArgs()
 
-console.log('=== Build Plan: Missile Component ×5 (empty empire) ===')
+const goalDesc = goals.map(g => {
+  if (g.type === 'build-module') return `${modName(g.moduleId)} ×${g.count}`
+  if (g.type === 'production-rate') return `${wareName(g.wareId)} ${g.ratePerHour}/h`
+  return '自给自足'
+}).join(', ')
+
+console.log(`=== Build Plan: ${goalDesc} (empty empire) ===`)
 console.log()
 
 const result = calculateBuildPlan({
-  goals: [{ type: 'build-module', moduleId: MISSILE_MODULE, count: 5 }],
+  goals,
   currentModules: [],
   currentNetProduction: {},
   settings: baseSettings,
@@ -56,7 +109,18 @@ for (let si = 0; si < result.schemes.length; si++) {
   console.log(sep)
   console.log(`  ${scheme.label}  │  ${fmtH(scheme.totalDuration)}  │  ${fmtCr(scheme.totalCredits)}  │  ${scheme.stepsCount} steps`)
   console.log(`  ${scheme.description}`)
-  console.log(`  目的模块: ${scheme.purposeModules.map(modName).join(', ')}`)
+  console.log(`  目的产物: ${scheme.purposeModules.map(wareName).join(', ')}`)
+
+  const primarySet = new Set(scheme.primaryModuleIds)
+  const primaryModules = scheme.modules.filter(m => primarySet.has(m.id))
+  const derivedModules = scheme.modules.filter(m => !primarySet.has(m.id))
+  if (primaryModules.length > 0) {
+    console.log(`  主要模块: ${primaryModules.map(m => `${modName(m.id)} ×${m.count}`).join(', ')}`)
+  }
+  if (derivedModules.length > 0) {
+    console.log(`  配套模块: ${derivedModules.map(m => `${modName(m.id)} ×${m.count}`).join(', ')}`)
+  }
+
   console.log(sep)
 
   if (scheme.steps.length === 0) {
@@ -67,7 +131,6 @@ for (let si = 0; si < result.schemes.length; si++) {
 
   let cumDur = 0
   let cumCr = 0
-  let stock = new Map<string, number>()
   let currentGroup = -1
   for (const step of scheme.steps) {
     if (step.groupIndex !== currentGroup) {
@@ -75,7 +138,6 @@ for (let si = 0; si < result.schemes.length; si++) {
       console.log(`\n  ▸ ${step.reason || '主产线'}`)
     }
 
-    const buildTimeH = step.moduleBuildTime / 3600
     const stepDurInc = step.estimatedDuration - cumDur
     const stepCrInc = step.estimatedCredits - cumCr
     cumDur = step.estimatedDuration
@@ -89,19 +151,36 @@ for (let si = 0; si < result.schemes.length; si++) {
       for (const mat of step.materials) {
         const price = waresMap[mat.wareId]?.price || 0
         const consumed = Math.round(mat.quantity)
-        const prevStock = stock.get(mat.wareId) || 0
-        const produced = mat.currentProdRate * buildTimeH
-        const newStock = prevStock - consumed + produced
-        stock.set(mat.wareId, newStock)
         console.log(`           ${wareName(mat.wareId).padEnd(30)} ×${String(consumed).padStart(6)}  ` +
-          `库存: ${String(Math.round(prevStock)).padStart(7)}  ` +
-          `自产: ${String(Math.round(mat.currentProdRate)).padStart(5)}/h  +${Math.round(produced)}  ` +
+          `库存: ${String(Math.round(mat.stockBefore)).padStart(7)}  ` +
+          `自产: ${String(Math.round(mat.currentProdRate)).padStart(5)}/h  +${Math.round(mat.producedDuringBuild)}  ` +
           `买: ${fmtCr(mat.creditsNeeded).padStart(7)}  (单价: ${fmtCr(price)})`)
       }
     } else {
       console.log(`         材料: 无`)
     }
   }
+
+  console.log()
+  if (si === 0 && scheme.targetRateSources.length > 0) {
+    console.log(`  ── 方案1 产能对各方案需求的满足率 ──`)
+    for (let srcIdx = 0; srcIdx < scheme.targetRateSources.length; srcIdx++) {
+      const src = scheme.targetRateSources[srcIdx]
+      const targetScheme = result.schemes[srcIdx]
+      console.log(`  ── ${src.label} ──`)
+      console.log(`    建造总时间: ${fmtH(targetScheme.totalModuleBuildTime)}  模块数: ${targetScheme.modules.reduce((s, m) => s + m.count, 0)}`)
+      for (const wareId of Object.keys(src.rates).sort()) {
+        const target = src.rates[wareId]
+        const net = scheme.netProduction[wareId] || 0
+        const sat = target > 0 ? (net / target * 100) : (net >= 0 ? 100 : 0)
+        const mark = sat >= 100 ? '✓' : '✗'
+        const totalQty = targetScheme.buildMaterialTotals[wareId] || 0
+        console.log(`    ${mark} ${wareName(wareId).padEnd(30)} ×${String(Math.round(totalQty)).padStart(7)}  需要: ${String(target.toFixed(1)).padStart(8)}/h  ` +
+          `产能: ${String(net.toFixed(1)).padStart(8)}/h  满足: ${sat.toFixed(0)}%`)
+      }
+    }
+  }
+
   console.log()
 }
 

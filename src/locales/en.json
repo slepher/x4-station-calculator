@@ -48,7 +48,19 @@
       "add": "Add",
       "materials": "Materials",
       "no_materials": "No materials required",
-      "reason": "Reason"
+      "reason": "Reason",
+      "primary_modules": "Primary Modules",
+      "derived_modules": "Support Modules",
+      "main_production": "Main Production",
+      "build_materials": "Build Materials",
+      "build": "Build",
+      "cumulative": "Cumul.",
+      "step_cost": "Step Cost",
+      "cumulative_cost": "Cumul. Cost",
+      "stock": "Stock",
+      "self_prod": "Self-prod",
+      "buy": "Buy",
+      "unit_price": "Unit"
     }
   },
   "sectorManagement": {

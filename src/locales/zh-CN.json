@@ -48,7 +48,19 @@
       "add": "添加",
       "materials": "所需材料",
       "no_materials": "无需材料",
-      "reason": "原因"
+      "reason": "原因",
+      "primary_modules": "主要模块",
+      "derived_modules": "配套模块",
+      "main_production": "主要产出",
+      "build_materials": "建材消耗",
+      "build": "建造",
+      "cumulative": "累计",
+      "step_cost": "步骤费",
+      "cumulative_cost": "累计费",
+      "stock": "库存",
+      "self_prod": "自产",
+      "buy": "买",
+      "unit_price": "单价"
     }
   },
   "sectorManagement": {
