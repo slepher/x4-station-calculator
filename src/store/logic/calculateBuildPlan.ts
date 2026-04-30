@@ -498,7 +498,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           { label: 'C', rates: rates3 },
           { label: 'D_self_demand', rates: finalSelf },
         ]
-        const s1 = makeScheme(jointGroups, 'D 联合自举',
+        const s1 = makeScheme(jointGroups, '联合自举',
           'D 联合自举模块',
           purposeWares,
           settings, modulesMap, waresMap, currentModules,
@@ -649,7 +649,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           { label: 'B建材需求', rates: bRatesFiltered, materials: bMaterials },
           { label: 'A_self_demand', rates: aSelfDemand, materials: aSelfDemandMaterials },
         ]
-        const s1 = makeScheme([{ reason: 'A 建材自举', modules: aFlat }], 'A 建材自举',
+        const s1 = makeScheme([{ reason: 'A 建材自举', modules: aFlat }], '建材自举',
           'A 建材自举模块',
           aPurposeWares,
           settings, modulesMap, waresMap, currentModules,
@@ -686,7 +686,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           if (!mod) return []
           return Object.keys(mod.outputs).filter(w => w !== 'energycells')
         }))]
-        const s2 = makeScheme([{ reason: 'B 特种产线', modules: bModules }], 'B 特种产线',
+        const s2 = makeScheme([{ reason: 'B 特种产线', modules: bModules }], '特种产线',
           'B 特种产线模块',
           bPurposeWares,
           settings, modulesMap, waresMap,
@@ -780,7 +780,7 @@ const dModules = dGroups.flatMap(g => g.modules)
         { label: 'C_rest建材需求', rates: rC_rest, materials: cRestMaterials },
         { label: 'D_self_demand', rates: dSelfDemand, materials: dRates.materials },
       ]
-      const s1 = makeScheme(dGroups, 'D 联合自举',
+      const s1 = makeScheme(dGroups, '联合自举',
         'D(A+B) 联合自举模块',
         dPurposeWares,
         settings, modulesMap, waresMap, currentModules,
@@ -802,7 +802,7 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
       const aSources: BuildRateSource[] = [
         { label: 'C建材需求', rates: rC, materials: cPrimeMaterials },
       ]
-        const s2 = makeScheme([{ reason: 'A 子集', modules: aModules }], 'A 子集',
+        const s2 = makeScheme([{ reason: 'A 子集', modules: aModules }], '基础建材',
           'A 基础建材模块',
           aPurposeWares,
           settings, modulesMap, waresMap, currentModules,
@@ -884,7 +884,7 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
       const bModules = mergeModules([...bPrimaryModules, ...bAutoFill.autoIndustryModules, ...bAutoFill.autoHabitationModules])
 
       if (bModules.length > 0) {
-        const s1 = makeScheme([{ reason: 'B 特种孤岛', modules: bModules }], 'B 特种孤岛',
+        const s1 = makeScheme([{ reason: 'B 特种孤岛', modules: bModules }], '特种孤岛',
           'B 特种孤岛模块',
           Object.keys(bDemand).filter(w => w !== 'energycells'),
           settings, modulesMap, waresMap, currentModules,

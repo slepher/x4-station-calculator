@@ -121,6 +121,30 @@ interface BuildGroup {
 | 2 | A 建材自举 | A 建材自举模块 | greedyFill 自举 |
 | 3 | 目标产线 | 目标产线系列模块 | 必选 |
 
+### 方案输出结构（无帝国产能依赖）
+
+#### BootstrapMode.None
+1. 目标产线
+
+#### BootstrapMode.Joint
+1. 联合自举
+2. 目标产线
+
+#### BootstrapMode.CoupledIterative
+1. 建材自举
+2. 特种产线
+3. 目标产线
+
+#### BootstrapMode.NestedJoint
+1. 联合自举
+2. 基础建材
+3. 目标产线
+
+#### BootstrapMode.IsolatedSpecialized
+1. 特种孤岛
+2. 建材自举
+3. 目标产线
+
 #### 不自举（BootstrapMode.None）
 
 无 bootstrap 层：
