@@ -76,23 +76,23 @@ function onBootstrapModeChange(e: Event) {
 }
 
 const bootstrapOptions = [
-  { value: BootstrapMode.None, label: 'sector.build_plan.bootstrap_none' },
-  { value: BootstrapMode.Joint, label: 'sector.build_plan.bootstrap_joint' },
-  { value: BootstrapMode.CoupledIterative, label: 'sector.build_plan.bootstrap_coupled' },
-  { value: BootstrapMode.IsolatedSpecialized, label: 'sector.build_plan.bootstrap_isolated' },
-  { value: BootstrapMode.NestedJoint, label: 'sector.build_plan.bootstrap_nested' },
+  { value: BootstrapMode.None, label: 'build_plan.bootstrap_none' },
+  { value: BootstrapMode.Joint, label: 'build_plan.bootstrap_joint' },
+  { value: BootstrapMode.CoupledIterative, label: 'build_plan.bootstrap_coupled' },
+  { value: BootstrapMode.IsolatedSpecialized, label: 'build_plan.bootstrap_isolated' },
+  { value: BootstrapMode.NestedJoint, label: 'build_plan.bootstrap_nested' },
 ]
 </script>
 
 <template>
   <div class="panel-card">
-    <div class="panel-header">{{ t('sector.build_plan.title') }}</div>
+    <div class="panel-header">{{ t('build_plan.title') }}</div>
     <div class="panel-content space-y-3">
 
       <BuildGoalSearchBox :racePreference="racePreference" @addGoal="emit('addGoal', $event)" />
 
       <div v-if="visibleGoals.length === 0" class="text-xs text-slate-500 italic text-center py-2">
-        {{ t('sector.build_plan.no_goals') }}
+        {{ t('build_plan.no_goals') }}
       </div>
       <div v-else class="goal-list space-y-1">
         <WarePlanningItem
@@ -113,13 +113,13 @@ const bootstrapOptions = [
         :disabled="loading"
         @click="onCompute"
       >
-        <span v-if="loading">{{ t('sector.build_plan.computing') }}</span>
-        <span v-else>{{ t('sector.build_plan.compute') }}</span>
+        <span v-if="loading">{{ t('build_plan.computing') }}</span>
+        <span v-else>{{ t('build_plan.compute') }}</span>
       </button>
 
       <div class="flex items-center gap-2 px-3 py-2 bg-slate-800/50 rounded border border-slate-700/50">
         <label class="flex items-center gap-2">
-          <span class="text-xs text-slate-300 whitespace-nowrap">{{ t('sector.build_plan.bootstrap_mode') }}</span>
+          <span class="text-xs text-slate-300 whitespace-nowrap">{{ t('build_plan.bootstrap_mode') }}</span>
           <select
             :value="bootstrapMode"
             @change="onBootstrapModeChange"
@@ -133,7 +133,7 @@ const bootstrapOptions = [
           </select>
         </label>
         <div v-if="schemeCount > 0" class="text-xs text-slate-400 ml-auto">
-          {{ schemeCount }} {{ t('sector.build_plan.schemes_generated') }}
+          {{ schemeCount }} {{ t('build_plan.schemes_generated') }}
         </div>
       </div>
 

@@ -109,14 +109,14 @@ const schemeCards = computed<SchemeCardData[]>(() => {
 
 <template>
   <div class="panel-card">
-    <div class="panel-header">{{ t('sector.build_plan.schemes') }}</div>
+    <div class="panel-header">{{ t('build_plan.schemes') }}</div>
     <div class="panel-content">
       <div v-if="!loading && schemes.length === 0" class="py-8 text-center text-xs text-slate-500">
-        {{ t('sector.build_plan.no_plan') }}
+        {{ t('build_plan.no_plan') }}
       </div>
 
       <div v-if="loading" class="py-8 text-center text-xs text-slate-400">
-        {{ t('sector.build_plan.computing') }}
+        {{ t('build_plan.computing') }}
       </div>
 
       <div v-if="schemes.length > 0" class="space-y-3">
@@ -132,17 +132,17 @@ const schemeCards = computed<SchemeCardData[]>(() => {
               <span
                 class="w-7 h-7 rounded-full bg-amber-600 text-white text-xs font-bold flex items-center justify-center shrink-0"
               >{{ schemeIcons[card.scheme.label] || schemes.indexOf(card.scheme) + 1 }}</span>
-              <span class="text-sm font-bold text-slate-200">{{ t('sector.build_plan.' + card.scheme.label) }}</span>
+              <span class="text-sm font-bold text-slate-200">{{ t('build_plan.' + card.scheme.label) }}</span>
             </div>
             <div class="text-xs text-slate-400 font-mono">
-              {{ formatDuration(card.scheme.totalDuration) }} │ {{ formatCredits(card.scheme.totalCredits) }} │ {{ card.scheme.stepsCount }} {{ t('sector.build_plan.steps_count').toLowerCase() }}
+              {{ formatDuration(card.scheme.totalDuration) }} │ {{ formatCredits(card.scheme.totalCredits) }} │ {{ card.scheme.stepsCount }} {{ t('build_plan.steps_count').toLowerCase() }}
             </div>
           </div>
 
           <p v-if="card.scheme.description" class="text-xs text-slate-400 mb-2">{{ card.scheme.description }}</p>
 
           <div v-if="card.primaryModuleLines.length > 0" class="mb-2">
-            <div class="text-[10px] text-slate-500 mb-0.5">{{ t('sector.build_plan.primary_modules') }}</div>
+            <div class="text-[10px] text-slate-500 mb-0.5">{{ t('build_plan.primary_modules') }}</div>
             <div class="flex flex-wrap gap-1">
               <span
                 v-for="(line, i) in card.primaryModuleLines"
@@ -153,7 +153,7 @@ const schemeCards = computed<SchemeCardData[]>(() => {
           </div>
 
           <div v-if="card.derivedModuleLines.length > 0" class="mb-2">
-            <div class="text-[10px] text-slate-500 mb-0.5">{{ t('sector.build_plan.derived_modules') }}</div>
+            <div class="text-[10px] text-slate-500 mb-0.5">{{ t('build_plan.derived_modules') }}</div>
             <div class="flex flex-wrap gap-1">
               <span
                 v-for="(line, i) in card.derivedModuleLines"
@@ -164,7 +164,7 @@ const schemeCards = computed<SchemeCardData[]>(() => {
           </div>
 
           <div v-if="card.productionLines.length > 0" class="mb-2">
-            <div class="text-[10px] text-slate-500 mb-0.5">{{ t('sector.build_plan.main_production') }}</div>
+            <div class="text-[10px] text-slate-500 mb-0.5">{{ t('build_plan.main_production') }}</div>
             <div class="flex flex-wrap gap-x-3 gap-y-0.5">
               <span
                 v-for="p in card.productionLines"
@@ -175,7 +175,7 @@ const schemeCards = computed<SchemeCardData[]>(() => {
           </div>
 
           <div v-if="card.materialLines.length > 0">
-            <div class="text-[10px] text-slate-500 mb-0.5">{{ t('sector.build_plan.build_materials') }}</div>
+            <div class="text-[10px] text-slate-500 mb-0.5">{{ t('build_plan.build_materials') }}</div>
             <div class="flex flex-wrap gap-x-3 gap-y-0.5">
               <span
                 v-for="m in card.materialLines"

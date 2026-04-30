@@ -133,8 +133,8 @@ const handlePopoverMouseDown = (e: MouseEvent) => {
 }
 
 const categoryOptions = computed(() => [
-  { value: 'product', label: t('sector.build_plan.category_product') },
-  { value: 'module', label: t('sector.build_plan.category_module') }
+  { value: 'product', label: t('build_plan.category_product') },
+  { value: 'module', label: t('build_plan.category_module') }
 ])
 </script>
 
@@ -146,7 +146,7 @@ const categoryOptions = computed(() => [
         :value="searchQuery"
         class="search-input"
         data-testid="goal-search-input"
-        :placeholder="t('sector.build_plan.search_placeholder')"
+        :placeholder="t('build_plan.search_placeholder')"
         @input="searchQuery = ($event.target as HTMLInputElement).value"
         @focus="onFocus"
         @blur="onBlur"
