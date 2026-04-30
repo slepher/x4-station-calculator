@@ -349,50 +349,27 @@ function greedyFill(
       }
       return best
     }
-    const fb = fullBuilt()
-    const totals = new Map<string, number>()
-    let totalBuildTime = 0
-    for (const m of fb) {
-      const mod = modulesMap[m.id]
-      if (!mod) continue
-      totalBuildTime += mod.buildTime * m.count
-      const cost = mod.buildCost
-      if (!cost || Object.keys(cost).length === 0) continue
-      for (const [wareId, qty] of Object.entries(cost)) {
-        totals.set(wareId, (totals.get(wareId) || 0) + qty * m.count)
-      }
-    }
-    const cons = Array.from(totals.entries())
-      .map(([wareId, qty]) => ({ wareId, rate: totalBuildTime > 0 ? qty / (totalBuildTime / 3600) : 0 }))
-      .filter(item => {
-        if (item.wareId === 'energycells') return false
-        if (!fullBootstrap && !sourceWares.has(item.wareId)) return false
-        const w = waresMap[item.wareId]
-        if (!w || w.transport === 'solid' || w.transport === 'liquid') return false
-        return !!findBestProducer(item.wareId, settings.racePreference, [...currentEmpireModules, ...built], modulesMap, waresMap)
-      })
     
-    // First, find any UNMET ware in self_demand (sat < 100%)
-    let unmetWare: string | null = null
+    // Find ware with lowest satisfaction across ALL sources (targetRateSources + self_demand)
+    let bestWare: string | null = null
     let worstSat = Infinity
-    for (const c of cons) {
-      if (c.rate <= 0) continue
-      const prodRate = Math.max(0, contextNet[c.wareId] ?? 0)
-      const satRate = prodRate / c.rate
-      if (satRate < 1.0 && satRate < worstSat) {
-        worstSat = satRate
-        unmetWare = c.wareId
+    
+    // Check all sources
+    for (const src of [...targetRateSources, selfDemand()]) {
+      if (!src) continue
+      for (const [wareId, rate] of Object.entries(src.rates)) {
+        if (wareId === 'energycells') continue
+        if (rate <= 0) continue
+        const prodRate = Math.max(0, contextNet[wareId] ?? 0)
+        const satRate = prodRate / rate
+        if (satRate < worstSat) {
+          worstSat = satRate
+          bestWare = wareId
+        }
       }
     }
-    if (unmetWare) return unmetWare
     
-    // If all self_demand met, find unmet ware in targetRates
-    for (const [wareId, rate] of Object.entries(targetRates)) {
-      if (wareId === 'energycells') continue
-      const prodRate = Math.max(0, contextNet[wareId] ?? 0)
-      if (prodRate + 0.001 < rate) return wareId
-    }
-    return null
+    return bestWare
   }
 
   while (maxIterations-- > 0) {
