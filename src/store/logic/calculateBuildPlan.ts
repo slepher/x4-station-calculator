@@ -643,11 +643,19 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
       }
 
       if (bModules.length > 0) {
-        const bRates = computeBuildRates(bModules, modulesMap, waresMap)
+        const aRates = computeBuildRates(aFlat, modulesMap, waresMap)
+        const aFinalProduced = new Set<string>()
+        for (const m of aFlat) {
+          const mod = modulesMap[m.id]
+          if (mod) for (const w of Object.keys(mod.outputs)) aFinalProduced.add(w)
+        }
+        const aCantSelfProduce: Record<string, number> = {}
+        for (const [w, r] of Object.entries(aRates.rates)) {
+          if (w !== 'energycells' && !aFinalProduced.has(w)) aCantSelfProduce[w] = r
+        }
         const bSources: BuildRateSource[] = [
-          { label: 'B_demand', rates: Object.fromEntries(
-            Object.entries(bRates.rates).filter(([w]) => w !== 'energycells')
-          ) },
+          { label: 'A不能自产', rates: aCantSelfProduce },
+          { label: 'C_rest', rates: rC_rest },
         ]
         const bPurposeWares = [...new Set(bPrimaryModules.flatMap(m => {
           const mod = modulesMap[m.id]
