@@ -112,21 +112,25 @@ A↔B 外层循环迭代：
 
 ```
 1. R_C_raw = computeBuildRates(C)
-   C' = C 剔除所有产出在 C buildCost 中的模块（剔除建材模块）
+   建材模块 = A+B（产出 A ware 和 B ware 的模块）
+   - A 模块产出：advancedcomposites, plasmaconductors
+   - B 模块产出：hullparts, claytronics
+   C' = C 剔除建材模块（剔除产出 A ware 或 B ware 的模块）
    wareList = computeBuildRates(C') 的 buildCost ware keys
    R_C = R_C_raw 过滤仅保留 wareList 中的 ware
    R_C_rest = R_C_raw 中不属于 wareList 的部分
 
-   **wareList 定义**：C'（非建材模块）的 buildCost wares = B 能生产的 ware（建材模块能产出的 ware）。
+   **建材模块定义**：A+B = 产出 A ware（advancedcomposites, plasmaconductors）或 B ware（hullparts, claytronics）的模块。
+   **wareList 定义**：C'（非建材模块）的 buildCost wares = B 能生产的 ware（hullparts, claytronics）。
    **R_C 定义**：C 建材消耗中 B 能生产的 wares 的消耗率，由 A 满足。
-   **R_C_rest 定义**：C 建材消耗中 B 不能生产的 wares 的消耗率，由 B 满足。
+   **R_C_rest 定义**：C 建材消耗中 B 不能生产的 wares 的消耗率（advancedcomposites, plasmaconductors），由 B 满足。
 
 2. A 初始：greedyFill(sources=[R_C], fullBootstrap=false)
-   → A 模块（满足 C 建材消耗中 B 能生产的部分）
+   → A 模块（满足 C 建材消耗中 B 能生产的部分：hullparts, claytronics）
 
 3. B 需求（& 约束）：
    source1 = A buildCost 中 A 不能自产的 wares
-   source2 = R_C_rest（C 建材消耗中 B 不能生产的部分）
+   source2 = R_C_rest（C 建材消耗中 B 不能生产的部分：advancedcomposites, plasmaconductors）
    B 需同时满足两者 → demand[w] = max(source1[w] || 0, source2[w] || 0)
    一次性计算 B 主要模块列表（无 autoFill）
 
@@ -164,17 +168,21 @@ D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
 
 ```
 1. R_C_raw = computeBuildRates(C)
-   C' = C 剔除所有产出在 C buildCost 中的模块（剔除建材模块）
+   建材模块 = A+B（产出 A ware 和 B ware 的模块）
+   - A 模块产出：advancedcomposites, plasmaconductors
+   - B 模块产出：hullparts, claytronics
+   C' = C 剔除建材模块（剔除产出 A ware 或 B ware 的模块）
    wareList = computeBuildRates(C') 的 buildCost ware keys
    R_C = R_C_raw 过滤仅保留 wareList 中的 ware
    R_C_rest = R_C_raw 中不属于 wareList 的部分
 
-   **wareList 定义**：C'（非建材模块）的 buildCost wares = B 能生产的 ware（建材模块能产出的 ware）。
+   **建材模块定义**：A+B = 产出 A ware（advancedcomposites, plasmaconductors）或 B ware（hullparts, claytronics）的模块。
+   **wareList 定义**：C'（非建材模块）的 buildCost wares = B 能生产的 ware（hullparts, claytronics）。
    **R_C 定义**：C 建材消耗中 B 能生产的 wares 的消耗率，由 D 中的 A 满足。
-   **R_C_rest 定义**：C 建材消耗中 B 不能生产的 wares 的消耗率，由 B 满足。
+   **R_C_rest 定义**：C 建材消耗中 B 不能生产的 wares 的消耗率（advancedcomposites, plasmaconductors），由 B 满足。
 
 2. B 需求（不自举，一次性计算）：
-   B_demand = R_C_rest（C 建材消耗中 B 不能生产的部分）
+   B_demand = R_C_rest（C 建材消耗中 B 不能生产的部分：advancedcomposites, plasmaconductors）
    根据 B_demand 一次性计算 B 主要模块列表（无 autoFill）
    bPrimaryModules = computeBModules(B_demand)
 
