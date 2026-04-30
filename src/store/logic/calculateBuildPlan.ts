@@ -774,22 +774,17 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
         else bPrimaryModules.push({ id: producer.id, count })
       }
 
-      // D 初始 + autoFill
-      const dInitial = mergeModules([...currentModules, ...aModules, ...bPrimaryModules])
-      const dAutoFill = calculateAutoFillModules({
-        plannedModules: dInitial,
-        settings, modulesMap, waresMap, lockedWares: []
-      })
-      const dWithAutoFill = mergeModules([...dInitial, ...dAutoFill.autoIndustryModules, ...dAutoFill.autoHabitationModules])
-
-      // D greedyFill(fullBootstrap=true) 自举
+      // D greedyFill(fullBootstrap=true) 自举，满足 C 建材需求 + D 自身建材消耗
       const dGroups = greedyFill(
-        [],
-        dWithAutoFill, settings, modulesMap, waresMap,
+        [
+          { label: 'C建材需求', rates: rC },
+          { label: 'C_rest建材需求', rates: rC_rest },
+        ],
+        [], settings, modulesMap, waresMap,
         true
       )
-      const dExtra = dGroups.flatMap(g => g.modules)
-      const dModules = mergeModules([...dWithAutoFill, ...dExtra])
+      const dBuilt = dGroups.flatMap(g => g.modules)
+      const dModules = mergeModules([...aModules, ...bPrimaryModules, ...dBuilt])
 
       // D scheme
       const dPurposeWares = [...new Set([...Object.keys(rC), ...Object.keys(rC_rest)].filter(w => w !== 'energycells'))]
