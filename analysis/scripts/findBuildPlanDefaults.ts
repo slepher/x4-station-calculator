@@ -57,6 +57,7 @@ Options:
                        joint      - D (A+B) joint bootstrap with full self-sustain
                        coupled    - Coupled iterative: A↔B loop with B one-shot calculation
                        isolated   - Isolated specialized: B first, then A, no loop
+                       nested     - Nested joint: A first, then D(A+B) joint bootstrap
 
   --module="Name*N"   Build-module goal (comma-separated for multiple)
                        Name: module name (fuzzy match)
@@ -76,7 +77,8 @@ Examples:
   npx vite-node analysis/scripts/findBuildPlanDefaults.ts
   npx vite-node analysis/scripts/findBuildPlanDefaults.ts --bootstrap=joint
   npx vite-node analysis/scripts/findBuildPlanDefaults.ts --bootstrap=coupled --module="Missile Component Production*5"
-  npx vite-node analysis/scripts/findBuildPlanDefaults.ts --bootstrap=isolated --ware="Hull Parts*2000"`)
+  npx vite-node analysis/scripts/findBuildPlanDefaults.ts --bootstrap=isolated --ware="Hull Parts*2000"
+  npx vite-node analysis/scripts/findBuildPlanDefaults.ts --bootstrap=nested`)
   process.exit(0)
 }
 
