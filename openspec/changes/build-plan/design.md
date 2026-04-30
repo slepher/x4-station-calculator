@@ -126,20 +126,27 @@ A↔B 外层循环迭代：
    B 需同时满足两者 → demand[w] = max(source1[w] || 0, source2[w] || 0)
    一次性计算 B 主要模块列表（无 autoFill）
 
-4. 迭代轮（唯一相加）：
-   C+B = R_C + computeBuildRates(B)  （唯一需要相加的地方）
-   greedyFill(sources=[C+B], fullBootstrap=false) → 追加 A
-   （A 需同时产出满足 C 和 B 建造需求，总量相加）
+4. 迭代轮（& 约束）：
+   greedyFill(sources=[C建材需求, B建材需求], fullBootstrap=false) → 追加 A
+   （A 需同时满足 C 和 B 的建材需求，两者独立约束）
    重算 B（& 约束）
    B 主要模块产线数量不变？→ 退出
    B 变了 → 继续
 
-5. 输出：方案1（A）、方案2（B）、方案3（C）
+5. 输出显示（三个独立 & 约束）：
+   A 方案 targetRateSources:
+   - C建材需求（materials 来自 C'）
+   - B建材需求（materials 来自 B，过滤 wareList）
+   - A_self_demand（materials 来自 A，过滤 wareList）
+   
+   输出：方案1（A）、方案2（B）、方案3（C）
 ```
 
 **关键区分**：
-- **相加**：仅迭代轮的 C+B = R_C + B_buildCost（A 需产出总量）
-- **& 约束**：其他地方都用 &（max），如 B 需求、A 初始单一来源
+- **迭代过程**：greedyFill 传入 C 和 B 作为独立 source（& 约束）
+- **最终显示 & 约束**：所有方案输出均采用 `&`（独立约束）模式，每个约束独立检查满足率
+
+**重要声明**：所有方案的最终输出均采用 `&`（独立约束）模式，不包含 `+`（数值相加）的约束。迭代过程和最终显示均为独立约束。
 
 **greedyFill fullBootstrap 参数**：
 - `true`（联合自举）：selfDemand = built 产出 ∩ built buildCost（全自举，剔除 energycells）
@@ -217,16 +224,20 @@ seed: 如果 targetRates 含 hullparts, 第一个瓶颈固定为 hullparts
 
 **greedyFill fullBootstrap 参数**：
 - `true`（联合自举）：selfWares = fullBuilt 产出 ∩ fullBuilt buildCost 消耗（剔除 energycells）。D 的 buildCost 消耗了 D 自己能生产的建材，D 必须自给覆盖。
-- `false`（耦合迭代）：selfWares = fullBuilt buildCost 消耗中仅 targetRateSources 各 source.rates 包含的 ware（剔除 energycells）。仅自举外部明确需要的 ware，不自举额外产出。
+- `false`（耦合迭代/孤立特种）：selfWares = fullBuilt buildCost 消耗中仅 targetRateSources 各 source.rates 包含的 ware（剔除 energycells）。仅自举外部明确需要的 ware，不自举额外产出。
+- `findLowestSatisfaction` 同样过滤：当 `fullBootstrap=false` 时，只考虑 sourceWares 的建材消耗率作为瓶颈候选。
 
 **多 source 满足率检查**：每个 source（含 selfDemand）独立检查其所有 ware 的满足率 ≥ 100%。这是 `&`（且）约束的实现方式。
-
-**多 source 满足率检查**：不只检查 targetRates（max_merge 后的），每个 source（含 selfDemand）独立检查其所有 ware 的满足率 ≥ 100%。这是 `&`（且）约束的实现方式。
 
 **能量电池排除**：
 - `energycells` 不参与 `computeBuildRates` 计算（过滤）
 - `findLowestSatisfaction` 中 `energycells` 不参与瓶颈计算
 - 产出 `energycells` 的模块不出现在 `purposeModules`
+
+**BuildRateSource 建材总量**：
+- `BuildRateSource` 类型新增 `materials?: Record<string, number>` 字段
+- 每个 source 显示对应的建材总量，而非方案级别的总量
+- 例如 A 方案显示：C建材需求（C 的 materials）、B建材需求（B 的 materials）、A_self_demand（A 的 materials）
 
 ### 4. 消耗与生产时序
 

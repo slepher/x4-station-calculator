@@ -52,6 +52,7 @@ export interface BuildSchemeStep {
 export interface BuildRateSource {
   label: string
   rates: Record<string, number>
+  materials?: Record<string, number>
 }
 
 export interface BuildScheme {

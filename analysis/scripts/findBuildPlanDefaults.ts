@@ -206,7 +206,7 @@ for (let si = 0; si < result.schemes.length; si++) {
 
   console.log()
   if (scheme.targetRateSources.length > 0) {
-    console.log(`  ── 本方案产能对各约束来源的满足率 ──`)
+    console.log(`  ── 产能对各约束来源的满足率 ──`)
     for (const src of scheme.targetRateSources) {
       console.log(`  ── ${src.label} ──`)
       if (Object.keys(src.rates).length === 0) {
@@ -218,8 +218,8 @@ for (let si = 0; si < result.schemes.length; si++) {
         const net = scheme.netProduction[wareId] || 0
         const sat = target > 0 ? (net / target * 100) : (net >= 0 ? 100 : 0)
         const mark = sat >= 100 ? '✓' : '✗'
-        const totalQty = scheme.buildMaterialTotals[wareId] || 0
-        console.log(`    ${mark} ${wareName(wareId).padEnd(30)} ×${String(Math.round(totalQty)).padStart(7)}  需要: ${String(target.toFixed(1)).padStart(8)}/h  ` +
+        const matQty = src.materials?.[wareId] || 0
+        console.log(`    ${mark} ${wareName(wareId).padEnd(30)} ×${String(Math.round(matQty)).padStart(7)}  需要: ${String(target.toFixed(1)).padStart(8)}/h  ` +
           `产能: ${String(net.toFixed(1)).padStart(8)}/h  满足: ${sat.toFixed(0)}%`)
       }
     }
