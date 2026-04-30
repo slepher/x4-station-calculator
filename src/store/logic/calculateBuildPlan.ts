@@ -409,14 +409,15 @@ function greedyFill(
 
     if (bottleneck === 'energycells') continue
 
+    const lastAutoModules = currentAutoModules
     addModule(built, producer.id, 1)
 
     const newAuto = getAutoModules(built)
     const deltaAuto = newAuto.filter(m => {
-      const prev = currentAutoModules.find(p => p.id === m.id)
+      const prev = lastAutoModules.find(p => p.id === m.id)
       return !prev || prev.count < m.count
     }).map(m => {
-      const prev = currentAutoModules.find(p => p.id === m.id)
+      const prev = lastAutoModules.find(p => p.id === m.id)
       return { id: m.id, count: m.count - (prev?.count || 0) }
     })
     currentAutoModules = newAuto
@@ -780,7 +781,7 @@ const dModules = dGroups.flatMap(g => g.modules)
         { label: 'C_rest建材需求', rates: rC_rest, materials: cRestMaterials },
         { label: 'D_self_demand', rates: dSelfDemand },
       ]
-      const s1 = makeScheme([{ reason: 'D 联合自举', modules: dModules }], 'D 联合自举',
+      const s1 = makeScheme(dGroups, 'D 联合自举',
         'D(A+B) 联合自举模块',
         dPurposeWares,
         settings, modulesMap, waresMap, currentModules,
