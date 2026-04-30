@@ -80,6 +80,7 @@ const bootstrapOptions = [
   { value: BootstrapMode.Joint, label: 'sector.build_plan.bootstrap_joint' },
   { value: BootstrapMode.CoupledIterative, label: 'sector.build_plan.bootstrap_coupled' },
   { value: BootstrapMode.IsolatedSpecialized, label: 'sector.build_plan.bootstrap_isolated' },
+  { value: BootstrapMode.NestedJoint, label: 'sector.build_plan.bootstrap_nested' },
 ]
 </script>
 

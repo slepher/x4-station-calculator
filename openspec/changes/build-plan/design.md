@@ -188,15 +188,19 @@ A 先计算 → D（A+B 联合）自举 → C 目标产线：
    aModules = merge(aPrimaryModules + aAutoFill)
 
 3. D = A+B 联合自举：
-   B_demand = R_C_rest（C 建材消耗中 B 能生产的部分）
-   bPrimaryModules = computeBModules(B_demand)（一次性计算）
-   
-   D 初始模块 = merge(aModules + bPrimaryModules)
-   D_autoFill = calculateAutoFillModules(D 初始)
-   D = greedyFill(fullBootstrap=true, context=merge(D 初始 + D_autoFill))
+   D 初始需求 = A buildCost + C 的 R_C_rest
+   greedyFill(
+     sources=[
+       {label: 'A建材需求', rates: computeBuildRates(aModules)},
+       {label: 'C_rest建材需求', rates: R_C_rest}
+     ],
+     fullBootstrap=true,
+     currentEmpireModules=currentModules
+   )
+   → D 自动添加 A+B 模块，从空开始逐个添加
    （D 自身建材消耗中 D 能产出的部分需自给，fullBootstrap=true）
    
-4. 输出显示（3 个方案）：
+3. 输出显示（2 个方案）：
    D 方案 targetRateSources:
    - C建材需求（R_C & R_C_rest，C 全部建材消耗，两个独立约束）
    - D_self_demand（D 自身建材消耗，D 产出 ∩ D buildCost）
@@ -211,11 +215,10 @@ A 先计算 → D（A+B 联合）自举 → C 目标产线：
 ```
 
 **关键区分**：
-- **A 一次性计算**：computeAModules + autoFill，满足 R_C（C 建材消耗中 A 能生产的部分）
-- **D 联合自举**：fullBootstrap=true，D = A+B 联合自举自身建材消耗 + autoFill
-- **B 不自举**：一次性计算满足 R_C_rest，不单独显示方案
+- **D greedyFill 从空开始**：自动添加 A+B 模块，fullBootstrap=true
+- **A 方案从 D 提取**：输出时从 D 中提取 A 类模块（产出 hullparts/claytronics）
 - **A 和 B 独立约束**：R_C & R_C_rest，不用 + 连接
-- **所有模块都需要 autoFill**：A、B、D 都有 autoFill 处理运行时输入
+- **所有模块都需要 autoFill**：D greedyFill 内部 autoFill 处理运行时输入
 
 #### 孤立特种自举（BootstrapMode.IsolatedSpecialized）
 

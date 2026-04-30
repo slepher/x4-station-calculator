@@ -371,22 +371,26 @@ function greedyFill(
         if (!w || w.transport === 'solid' || w.transport === 'liquid') return false
         return !!findBestProducer(item.wareId, settings.racePreference, [...currentEmpireModules, ...built], modulesMap, waresMap)
       })
-    let bestWare: string | null = null
+    
+    // First, find any UNMET ware in self_demand (sat < 100%)
+    let unmetWare: string | null = null
     let worstSat = Infinity
     for (const c of cons) {
       if (c.rate <= 0) continue
       const prodRate = Math.max(0, contextNet[c.wareId] ?? 0)
       const satRate = prodRate / c.rate
-      if (satRate < worstSat) {
+      if (satRate < 1.0 && satRate < worstSat) {
         worstSat = satRate
-        bestWare = c.wareId
+        unmetWare = c.wareId
       }
     }
-    if (bestWare) return bestWare
+    if (unmetWare) return unmetWare
+    
+    // If all self_demand met, find unmet ware in targetRates
     for (const [wareId, rate] of Object.entries(targetRates)) {
       if (wareId === 'energycells') continue
       const prodRate = Math.max(0, contextNet[wareId] ?? 0)
-      if (prodRate < rate) return wareId
+      if (prodRate + 0.001 < rate) return wareId
     }
     return null
   }
@@ -404,6 +408,7 @@ function greedyFill(
     const allSources = [...targetRateSources]
     const sd = selfDemand()
     if (sd) allSources.push(sd)
+    
     let allMet = true
     for (const src of allSources) {
       for (const [wareId, rate] of Object.entries(src.rates)) {
@@ -759,32 +764,18 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
         settings, modulesMap, waresMap, lockedWares: []
       })
       const aModules = mergeModules([...aPrimaryModules, ...aAutoFill.autoIndustryModules, ...aAutoFill.autoHabitationModules])
+      const aRates = computeBuildRates(aModules, modulesMap, waresMap)
 
-      // B 一次性计算
-      const bPrimaryModules: SavedModule[] = []
-      for (const [wareId, demand] of Object.entries(rC_rest)) {
-        if (demand <= 0 || wareId === 'energycells') continue
-        const producer = findBestProducer(wareId, settings.racePreference, [...currentModules, ...aModules], modulesMap, waresMap)
-        if (!producer) continue
-        const outputRate = producer.outputs[wareId] || 0
-        if (outputRate <= 0) continue
-        const count = Math.ceil(demand / outputRate)
-        const existing = bPrimaryModules.find(m => m.id === producer.id)
-        if (existing) existing.count = Math.max(existing.count, count)
-        else bPrimaryModules.push({ id: producer.id, count })
-      }
-
-      // D greedyFill(fullBootstrap=true) 自举，满足 C 建材需求 + D 自身建材消耗
+      // D greedyFill(fullBootstrap=true) 从空开始，sources = A buildCost + R_C_rest
       const dGroups = greedyFill(
         [
-          { label: 'C建材需求', rates: rC },
+          { label: 'A建材需求', rates: aRates.rates },
           { label: 'C_rest建材需求', rates: rC_rest },
         ],
-        [], settings, modulesMap, waresMap,
+        currentModules, settings, modulesMap, waresMap,
         true
       )
-      const dBuilt = dGroups.flatMap(g => g.modules)
-      const dModules = mergeModules([...aModules, ...bPrimaryModules, ...dBuilt])
+const dModules = dGroups.flatMap(g => g.modules)
 
       // D scheme
       const dPurposeWares = [...new Set([...Object.keys(rC), ...Object.keys(rC_rest)].filter(w => w !== 'energycells'))]
@@ -798,9 +789,9 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
       for (const [w, r] of Object.entries(dRates.rates)) {
         if (w !== 'energycells' && dProduced.has(w)) dSelfDemand[w] = r
       }
-      const cMaterials: Record<string, number> = {}
-      for (const [w, qty] of Object.entries(cPrimeRates.materials)) {
-        if (w !== 'energycells') cMaterials[w] = qty
+      const aMaterials: Record<string, number> = {}
+      for (const [w, qty] of Object.entries(aRates.materials)) {
+        if (w !== 'energycells') aMaterials[w] = qty
       }
       const cRestMaterials: Record<string, number> = {}
       const allMods3Rates = computeBuildRates(allMods3, modulesMap, waresMap)
@@ -808,7 +799,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
         if (w !== 'energycells' && !wareList.has(w)) cRestMaterials[w] = qty
       }
       const dSources: BuildRateSource[] = [
-        { label: 'C建材需求', rates: rC, materials: cMaterials },
+        { label: 'A建材需求', rates: aRates.rates, materials: aMaterials },
         { label: 'C_rest建材需求', rates: rC_rest, materials: cRestMaterials },
         { label: 'D_self_demand', rates: dSelfDemand },
       ]
@@ -821,15 +812,19 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
 
       // A scheme (从 D 提取)
       if (aModules.length > 0) {
-        const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
-        const aRates = computeBuildRates(aModules, modulesMap, waresMap)
-        const aSelfDemandMaterials: Record<string, number> = {}
-        for (const [w, qty] of Object.entries(aRates.materials)) {
-          if (w !== 'energycells' && wareList.has(w)) aSelfDemandMaterials[w] = qty
-        }
-        const aSources: BuildRateSource[] = [
-          { label: 'C建材需求', rates: rC, materials: cMaterials },
-        ]
+const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
+      const aRates = computeBuildRates(aModules, modulesMap, waresMap)
+      const aSelfDemandMaterials: Record<string, number> = {}
+      for (const [w, qty] of Object.entries(aRates.materials)) {
+        if (w !== 'energycells' && wareList.has(w)) aSelfDemandMaterials[w] = qty
+      }
+      const cPrimeMaterials: Record<string, number> = {}
+      for (const [w, qty] of Object.entries(cPrimeRates.materials)) {
+        if (w !== 'energycells' && wareList.has(w)) cPrimeMaterials[w] = qty
+      }
+      const aSources: BuildRateSource[] = [
+        { label: 'C建材需求', rates: rC, materials: cPrimeMaterials },
+      ]
         const s2 = makeScheme([{ reason: 'A 子集', modules: aModules }], 'A 子集',
           'A 基础建材模块',
           aPurposeWares,

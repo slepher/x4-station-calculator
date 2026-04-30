@@ -43,6 +43,7 @@
       "bootstrap_joint": "Joint Bootstrap",
       "bootstrap_coupled": "Coupled Iterative",
       "bootstrap_isolated": "Isolated Specialized",
+      "bootstrap_nested": "Nested Joint",
       "production_rate": "Production Rate",
       "build_module": "Build Module",
       "select_ware": "Select Ware...",
