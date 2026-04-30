@@ -49,7 +49,7 @@ function fmtCr(n: number): string { return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M`
 function fmtH(s: number): string { return `${(s / 3600).toFixed(2)}h` }
 
 if (process.argv.includes('--help') || process.argv.includes('-h')) {
-  console.log(`Usage: npx tsx analysis/scripts/findBuildPlanDefaults.ts [options]
+  console.log(`Usage: npx vite-node analysis/scripts/findBuildPlanDefaults.ts [options]
 
 Options:
   --bootstrap=<mode>  Bootstrap mode (default: none)
@@ -73,10 +73,10 @@ Options:
 Default (no --module or --ware): Missile Component Production ×5
 
 Examples:
-  npx tsx analysis/scripts/findBuildPlanDefaults.ts
-  npx tsx analysis/scripts/findBuildPlanDefaults.ts --bootstrap=joint
-  npx tsx analysis/scripts/findBuildPlanDefaults.ts --bootstrap=coupled --module="Missile Component Production*5"
-  npx tsx analysis/scripts/findBuildPlanDefaults.ts --bootstrap=isolated --ware="Hull Parts*2000"`)
+  npx vite-node analysis/scripts/findBuildPlanDefaults.ts
+  npx vite-node analysis/scripts/findBuildPlanDefaults.ts --bootstrap=joint
+  npx vite-node analysis/scripts/findBuildPlanDefaults.ts --bootstrap=coupled --module="Missile Component Production*5"
+  npx vite-node analysis/scripts/findBuildPlanDefaults.ts --bootstrap=isolated --ware="Hull Parts*2000"`)
   process.exit(0)
 }
 

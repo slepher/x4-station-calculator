@@ -378,10 +378,10 @@ const primaryModuleIds = mergedModules
 
 ```bash
 # 默认：导弹部件×5
-npx tsx analysis/scripts/findBuildPlanDefaults.ts
+npx vite-node analysis/scripts/findBuildPlanDefaults.ts
 
 # 指定模块和产量目标
-npx tsx analysis/scripts/findBuildPlanDefaults.ts --module="Missile Component Production*5" --ware="Hull Parts*1000"
+npx vite-node analysis/scripts/findBuildPlanDefaults.ts --module="Missile Component Production*5" --ware="Hull Parts*1000"
 ```
 
 - `--module="Name*N"` — 模块名称（`module.name`）模糊匹配，N 为数量
