@@ -202,11 +202,12 @@ A 先计算 → D（A+B 联合）自举 → C 目标产线：
    
 3. 输出显示（2 个方案）：
    D 方案 targetRateSources:
-   - C建材需求（R_C & R_C_rest，C 全部建材消耗，两个独立约束）
-   - D_self_demand（D 自身建材消耗，D 产出 ∩ D buildCost）
+   - A建材需求（rates: A buildCost rates, materials: A buildCost 总量）
+   - C_rest建材需求（rates: R_C_rest, materials: C buildCost 中 B ware 的总量）
+   - D_self_demand（rates: D buildCost 中 D 能产出的 ware, materials: D buildCost 总量）
    
    A 方案（从 D 中提取）：
-   - C建材需求（R_C，C 建材消耗中 A 能生产的部分）
+   - C建材需求（rates: R_C, materials: C' buildCost 总量）
    
    C 方案：
    - 目标产线
