@@ -5,6 +5,7 @@ export const BootstrapMode = {
   Joint: 'joint',
   CoupledIterative: 'coupled',
   IsolatedSpecialized: 'isolated',
+  NestedJoint: 'nested',
 } as const
 
 export type BootstrapMode = (typeof BootstrapMode)[keyof typeof BootstrapMode]

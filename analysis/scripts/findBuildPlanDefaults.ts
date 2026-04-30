@@ -87,6 +87,7 @@ if (bootstrapFlag) {
   if (val === 'joint') parsedBootstrap = BootstrapMode.Joint
   else if (val === 'coupled' || val === 'iterative') parsedBootstrap = BootstrapMode.CoupledIterative
   else if (val === 'isolated') parsedBootstrap = BootstrapMode.IsolatedSpecialized
+  else if (val === 'nested') parsedBootstrap = BootstrapMode.NestedJoint
 }
 
 function parseArgs(): BuildGoal[] {

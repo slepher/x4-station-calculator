@@ -722,6 +722,137 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
       return planResult(goals, selfSufficient, bootstrapMode, allSchemes)
     }
 
+    if (bootstrapMode === BootstrapMode.NestedJoint) {
+      const rC_raw = rates3
+      const cBuildCostWares = new Set(Object.keys(rC_raw))
+      const cPrime = allMods3.filter(m => {
+        const mod = modulesMap[m.id]
+        if (!mod) return true
+        return !Object.keys(mod.outputs).some(w => cBuildCostWares.has(w))
+      })
+      const cPrimeRates = computeBuildRates(cPrime, modulesMap, waresMap)
+      const wareList = new Set(Object.keys(cPrimeRates.materials))
+      const rC: Record<string, number> = {}
+      const rC_rest: Record<string, number> = {}
+      for (const [w, r] of Object.entries(rC_raw)) {
+        if (wareList.has(w)) rC[w] = r
+        else rC_rest[w] = r
+      }
+
+      // A 一次性计算
+      const aPrimaryModules: SavedModule[] = []
+      for (const [wareId, demand] of Object.entries(rC)) {
+        if (demand <= 0 || wareId === 'energycells') continue
+        const producer = findBestProducer(wareId, settings.racePreference, currentModules, modulesMap, waresMap)
+        if (!producer) continue
+        const outputRate = producer.outputs[wareId] || 0
+        if (outputRate <= 0) continue
+        const count = Math.ceil(demand / outputRate)
+        const existing = aPrimaryModules.find(m => m.id === producer.id)
+        if (existing) existing.count = Math.max(existing.count, count)
+        else aPrimaryModules.push({ id: producer.id, count })
+      }
+
+      // A autoFill
+      const aAutoFill = calculateAutoFillModules({
+        plannedModules: mergeModules([...currentModules, ...aPrimaryModules]),
+        settings, modulesMap, waresMap, lockedWares: []
+      })
+      const aModules = mergeModules([...aPrimaryModules, ...aAutoFill.autoIndustryModules, ...aAutoFill.autoHabitationModules])
+
+      // B 一次性计算
+      const bPrimaryModules: SavedModule[] = []
+      for (const [wareId, demand] of Object.entries(rC_rest)) {
+        if (demand <= 0 || wareId === 'energycells') continue
+        const producer = findBestProducer(wareId, settings.racePreference, [...currentModules, ...aModules], modulesMap, waresMap)
+        if (!producer) continue
+        const outputRate = producer.outputs[wareId] || 0
+        if (outputRate <= 0) continue
+        const count = Math.ceil(demand / outputRate)
+        const existing = bPrimaryModules.find(m => m.id === producer.id)
+        if (existing) existing.count = Math.max(existing.count, count)
+        else bPrimaryModules.push({ id: producer.id, count })
+      }
+
+      // D 初始 + autoFill
+      const dInitial = mergeModules([...currentModules, ...aModules, ...bPrimaryModules])
+      const dAutoFill = calculateAutoFillModules({
+        plannedModules: dInitial,
+        settings, modulesMap, waresMap, lockedWares: []
+      })
+      const dWithAutoFill = mergeModules([...dInitial, ...dAutoFill.autoIndustryModules, ...dAutoFill.autoHabitationModules])
+
+      // D greedyFill(fullBootstrap=true) 自举
+      const dGroups = greedyFill(
+        [],
+        dWithAutoFill, settings, modulesMap, waresMap,
+        true
+      )
+      const dExtra = dGroups.flatMap(g => g.modules)
+      const dModules = mergeModules([...dWithAutoFill, ...dExtra])
+
+      // D scheme
+      const dPurposeWares = [...new Set([...Object.keys(rC), ...Object.keys(rC_rest)].filter(w => w !== 'energycells'))]
+      const dRates = computeBuildRates(dModules, modulesMap, waresMap)
+      const dSelfDemand: Record<string, number> = {}
+      const dProduced = new Set<string>()
+      for (const m of dModules) {
+        const mod = modulesMap[m.id]
+        if (mod) for (const w of Object.keys(mod.outputs)) dProduced.add(w)
+      }
+      for (const [w, r] of Object.entries(dRates.rates)) {
+        if (w !== 'energycells' && dProduced.has(w)) dSelfDemand[w] = r
+      }
+      const cMaterials: Record<string, number> = {}
+      for (const [w, qty] of Object.entries(cPrimeRates.materials)) {
+        if (w !== 'energycells') cMaterials[w] = qty
+      }
+      const cRestMaterials: Record<string, number> = {}
+      const allMods3Rates = computeBuildRates(allMods3, modulesMap, waresMap)
+      for (const [w, qty] of Object.entries(allMods3Rates.materials)) {
+        if (w !== 'energycells' && !wareList.has(w)) cRestMaterials[w] = qty
+      }
+      const dSources: BuildRateSource[] = [
+        { label: 'C建材需求', rates: rC, materials: cMaterials },
+        { label: 'C_rest建材需求', rates: rC_rest, materials: cRestMaterials },
+        { label: 'D_self_demand', rates: dSelfDemand },
+      ]
+      const s1 = makeScheme([{ reason: 'D 联合自举', modules: dModules }], 'D 联合自举',
+        'D(A+B) 联合自举模块',
+        dPurposeWares,
+        settings, modulesMap, waresMap, currentModules,
+        dSources)
+      if (s1.stepsCount > 0) allSchemes.push(s1)
+
+      // A scheme (从 D 提取)
+      if (aModules.length > 0) {
+        const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
+        const aRates = computeBuildRates(aModules, modulesMap, waresMap)
+        const aSelfDemandMaterials: Record<string, number> = {}
+        for (const [w, qty] of Object.entries(aRates.materials)) {
+          if (w !== 'energycells' && wareList.has(w)) aSelfDemandMaterials[w] = qty
+        }
+        const aSources: BuildRateSource[] = [
+          { label: 'C建材需求', rates: rC, materials: cMaterials },
+        ]
+        const s2 = makeScheme([{ reason: 'A 子集', modules: aModules }], 'A 子集',
+          'A 基础建材模块',
+          aPurposeWares,
+          settings, modulesMap, waresMap, currentModules,
+          aSources)
+        if (s2.stepsCount > 0) allSchemes.push(s2)
+      }
+
+      // C scheme
+      const prior = mergeModules(dModules)
+      const s3 = makeScheme([{ reason: '', modules: allMods3 }], '目标产线',
+        '目标产线系列模块',
+        uniquePurpose, settings, modulesMap, waresMap, prior,
+        [])
+      if (s3.stepsCount > 0) allSchemes.push(s3)
+      return planResult(goals, selfSufficient, bootstrapMode, allSchemes)
+    }
+
     if (bootstrapMode === BootstrapMode.IsolatedSpecialized) {
       const rC_raw = rates3
       const cBuildCostWares = new Set(Object.keys(rC_raw))
