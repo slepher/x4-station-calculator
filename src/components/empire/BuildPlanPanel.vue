@@ -56,18 +56,22 @@ function wareName(wareId: string): string {
 }
 
 const schemeIcons: Record<string, string> = {
-  '自给自足': '1',
-  '联合自举': '1',
-  '建材自举': '1',
-  '特种产线': '2',
-  '基础建材': '2',
-  '特种孤岛': '1',
+  'scheme_self_sufficient': '1',
+  'scheme_joint': '1',
+  'scheme_materials': '1',
+  'scheme_specialized': '2',
+  'scheme_basic_materials': '2',
+  'scheme_isolated': '1',
 }
 
 const schemeColors: Record<string, string> = {
-  '自给自足': 'border-emerald-600 hover:bg-emerald-900/20',
-  '目标建材': 'border-amber-600 hover:bg-amber-900/20',
-  '目标产线': 'border-blue-600 hover:bg-blue-900/20'
+  'scheme_self_sufficient': 'border-emerald-600 hover:bg-emerald-900/20',
+  'scheme_joint': 'border-emerald-600 hover:bg-emerald-900/20',
+  'scheme_materials': 'border-emerald-600 hover:bg-emerald-900/20',
+  'scheme_specialized': 'border-amber-600 hover:bg-amber-900/20',
+  'scheme_basic_materials': 'border-emerald-600 hover:bg-emerald-900/20',
+  'scheme_isolated': 'border-amber-600 hover:bg-amber-900/20',
+  'scheme_production_line': 'border-blue-600 hover:bg-blue-900/20',
 }
 
 interface SchemeCardData {
@@ -128,7 +132,7 @@ const schemeCards = computed<SchemeCardData[]>(() => {
               <span
                 class="w-7 h-7 rounded-full bg-amber-600 text-white text-xs font-bold flex items-center justify-center shrink-0"
               >{{ schemeIcons[card.scheme.label] || schemes.indexOf(card.scheme) + 1 }}</span>
-              <span class="text-sm font-bold text-slate-200">{{ card.scheme.label }}</span>
+              <span class="text-sm font-bold text-slate-200">{{ t('build_plan.' + card.scheme.label) }}</span>
             </div>
             <div class="text-xs text-slate-400 font-mono">
               {{ formatDuration(card.scheme.totalDuration) }} │ {{ formatCredits(card.scheme.totalCredits) }} │ {{ card.scheme.stepsCount }} {{ t('sector.build_plan.steps_count').toLowerCase() }}
