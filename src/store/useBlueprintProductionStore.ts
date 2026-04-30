@@ -117,8 +117,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         goals: buildGoals.value,
         selfSufficient: false,
         bootstrapMode: bootstrapMode.value,
-        currentModules: empireModules.value,
-        currentNetProduction: empireCurrentNetProduction.value,
+        currentModules: [],  // 不看 empire 现有模块
+        currentNetProduction: {},  // 未使用，历史遗留
         settings: {
           sunlight: 100,
           useHQ: false,
