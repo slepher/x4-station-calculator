@@ -778,7 +778,7 @@ const dModules = dGroups.flatMap(g => g.modules)
       const dSources: BuildRateSource[] = [
         { label: 'A建材需求', rates: aRates.rates, materials: aMaterials },
         { label: 'C_rest建材需求', rates: rC_rest, materials: cRestMaterials },
-        { label: 'D_self_demand', rates: dSelfDemand },
+        { label: 'D_self_demand', rates: dSelfDemand, materials: dRates.materials },
       ]
       const s1 = makeScheme(dGroups, 'D 联合自举',
         'D(A+B) 联合自举模块',
