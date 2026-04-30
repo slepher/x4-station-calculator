@@ -117,15 +117,16 @@ A↔B 外层循环迭代：
    R_C = R_C_raw 过滤仅保留 wareList 中的 ware
    R_C_rest = R_C_raw 中不属于 wareList 的部分
 
-   **wareList 定义**：C'（非建材模块）的 buildCost wares，即 C 建材消耗中 B（建材模块）不能生产的 wares，由 A 负责。
-   **R_C_rest 定义**：C 建材消耗中 B（建材模块）能生产的 wares（建材模块产出对应的 buildCost），由 B 负责。
+   **wareList 定义**：C'（非建材模块）的 buildCost wares = B 能生产的 ware（建材模块能产出的 ware）。
+   **R_C 定义**：C 建材消耗中 B 能生产的 wares 的消耗率，由 A 满足。
+   **R_C_rest 定义**：C 建材消耗中 B 不能生产的 wares 的消耗率，由 B 满足。
 
 2. A 初始：greedyFill(sources=[R_C], fullBootstrap=false)
-   → A 模块（满足 C 建材消耗中 B 不能生产的部分）
+   → A 模块（满足 C 建材消耗中 B 能生产的部分）
 
 3. B 需求（& 约束）：
    source1 = A buildCost 中 A 不能自产的 wares
-   source2 = R_C_rest（C 建材消耗中 B 能生产的部分）
+   source2 = R_C_rest（C 建材消耗中 B 不能生产的部分）
    B 需同时满足两者 → demand[w] = max(source1[w] || 0, source2[w] || 0)
    一次性计算 B 主要模块列表（无 autoFill）
 
@@ -168,11 +169,12 @@ D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
    R_C = R_C_raw 过滤仅保留 wareList 中的 ware
    R_C_rest = R_C_raw 中不属于 wareList 的部分
 
-   **wareList 定义**：C 建材消耗中 B（建材模块）不能生产的 wares，由 D 中的 A 负责。
-   **R_C_rest 定义**：C 建材消耗中 B（建材模块）能生产的 wares，由 B 负责。
+   **wareList 定义**：C'（非建材模块）的 buildCost wares = B 能生产的 ware（建材模块能产出的 ware）。
+   **R_C 定义**：C 建材消耗中 B 能生产的 wares 的消耗率，由 D 中的 A 满足。
+   **R_C_rest 定义**：C 建材消耗中 B 不能生产的 wares 的消耗率，由 B 满足。
 
 2. B 需求（不自举，一次性计算）：
-   B_demand = R_C_rest（C 建材消耗中 B 能生产的部分）
+   B_demand = R_C_rest（C 建材消耗中 B 不能生产的部分）
    根据 B_demand 一次性计算 B 主要模块列表（无 autoFill）
    bPrimaryModules = computeBModules(B_demand)
 
@@ -187,7 +189,7 @@ D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
    - D_self_demand（D 自身建材消耗，D 产出 ∩ D buildCost）
    
    B 方案（从 D 中提取）：
-   - C_rest（C 建材消耗中 B 能生产的部分，即 R_C_rest）
+   - C_rest（C 建材消耗中 B 不能生产的部分，即 R_C_rest）
    
    C 方案：
    - 目标产线
@@ -197,8 +199,8 @@ D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
 
 **关键区分**：
 - **D 自举**：使用 `fullBootstrap=true`，D 自身建材消耗中 D 能产出的部分需自给
-- **B 不自举**：一次性计算，仅满足 C 建材消耗中 B 能生产的部分（R_C_rest）
-- **嵌套结构**：D 包含 A+B，A 负责 wareList（B 不能生产），B 负责 R_C_rest（B 能生产）
+- **B 不自举**：一次性计算，仅满足 C 建材消耗中 B 不能生产的部分（R_C_rest）
+- **嵌套结构**：D 包含 A+B，A 负责 wareList（B 能生产），B 负责 R_C_rest（B 不能生产）
 
 #### 孤立特种自举（BootstrapMode.IsolatedSpecialized）
 
