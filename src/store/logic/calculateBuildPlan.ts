@@ -375,8 +375,9 @@ function greedyFill(
   while (maxIterations-- > 0) {
     currentAutoModules = getAutoModules(built)
     const combined = [...currentEmpireModules, ...fullBuilt()]
+    // 不看 empire 现有产能，只看 built + autoFill 的产能
     const contextNet = calculateNetProduction(
-      combined,
+      fullBuilt(),
       modulesMap,
       settings.considerWorkforceForAutoFill,
       settings.sunlight
@@ -392,9 +393,7 @@ function greedyFill(
         if ((contextNet[wareId] || 0) + 0.001 < rate) allMet = false
       }
     }
-    if (allMet) {
-      break
-    }
+    if (allMet) break
 
     let bottleneck: string | null = null
     if (built.length === 0 && targetRates['hullparts'] !== undefined) {
