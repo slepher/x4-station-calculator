@@ -169,35 +169,36 @@ D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
 ```
 1. R_C_raw = computeBuildRates(C)
    建材模块 = A+B（产出 A ware 和 B ware 的模块）
-   - A 模块产出：advancedcomposites, plasmaconductors
-   - B 模块产出：hullparts, claytronics
+   - A 模块产出：hullparts, claytronics（A ware）
+   - B 模块产出：advancedcomposites, plasmaconductors（B ware）
    C' = C 剔除建材模块（剔除产出 A ware 或 B ware 的模块）
    wareList = computeBuildRates(C') 的 buildCost ware keys
    R_C = R_C_raw 过滤仅保留 wareList 中的 ware
    R_C_rest = R_C_raw 中不属于 wareList 的部分
 
-   **建材模块定义**：A+B = 产出 A ware（advancedcomposites, plasmaconductors）或 B ware（hullparts, claytronics）的模块。
-   **wareList 定义**：C'（非建材模块）的 buildCost wares = B 能生产的 ware（hullparts, claytronics）。
-   **R_C 定义**：C 建材消耗中 B 能生产的 wares 的消耗率，由 D 中的 A 满足。
-   **R_C_rest 定义**：C 建材消耗中 B 不能生产的 wares 的消耗率（advancedcomposites, plasmaconductors），由 B 满足。
+   **建材模块定义**：A+B = 产出 A ware（hullparts, claytronics）或 B ware（advancedcomposites, plasmaconductors）的模块。
+   **wareList 定义**：C'（非建材模块）的 buildCost wares = A 能生产的 ware（hullparts, claytronics）。
+   **R_C 定义**：C 建材消耗中 A 能生产的 wares 的消耗率（hullparts, claytronics）。
+   **R_C_rest 定义**：C 建材消耗中 B 能生产的 wares 的消耗率（advancedcomposites, plasmaconductors）。
 
 2. B 需求（不自举，一次性计算）：
-   B_demand = R_C_rest（C 建材消耗中 B 不能生产的部分：advancedcomposites, plasmaconductors）
+   B_demand = R_C_rest（C 建材消耗中 B 能生产的部分：advancedcomposites, plasmaconductors）
    根据 B_demand 一次性计算 B 主要模块列表（无 autoFill）
    bPrimaryModules = computeBModules(B_demand)
 
 3. D = A+B 联合自举：
    D 初始模块 = bPrimaryModules（B 主要模块）
-   greedyFill(sources=[D建材需求], fullBootstrap=true) → D 模块
-   （D建材需求 = computeBuildRates(D初始) 的 rates，D 自身建材消耗）
+   greedyFill(sources=[R_C], fullBootstrap=true, context=bPrimaryModules) → D 模块
+   （R_C = C 建材消耗中 A 能生产的部分，D 需自举这部分 + D 自身建材消耗）
    D = merge(bPrimaryModules + greedyFill结果 + autoFill)
    
 4. 输出显示：
    D 方案 targetRateSources:
+   - C建材需求（R_C，C 建材消耗中 A 能生产的部分）
    - D_self_demand（D 自身建材消耗，D 产出 ∩ D buildCost）
    
    B 方案（从 D 中提取）：
-   - C_rest（C 建材消耗中 B 不能生产的部分，即 R_C_rest）
+   - C_rest（C 建材消耗中 B 能生产的部分，即 R_C_rest）
    
    C 方案：
    - 目标产线
@@ -207,8 +208,9 @@ D（A+B 联合）自举 → B 计算满足 C 建材需求 → C 目标产线：
 
 **关键区分**：
 - **D 自举**：使用 `fullBootstrap=true`，D 自身建材消耗中 D 能产出的部分需自给
-- **B 不自举**：一次性计算，仅满足 C 建材消耗中 B 不能生产的部分（R_C_rest）
-- **嵌套结构**：D 包含 A+B，A 负责 wareList（B 能生产），B 负责 R_C_rest（B 不能生产）
+- **D 同时满足 R_C**：C 建材消耗中 A 能生产的部分（hullparts, claytronics）
+- **B 不自举**：一次性计算，仅满足 C 建材消耗中 B 能生产的部分（R_C_rest）
+- **嵌套结构**：D 包含 A+B，A 负责 wareList（A 能生产），B 负责 R_C_rest（B 能生产）
 
 #### 孤立特种自举（BootstrapMode.IsolatedSpecialized）
 
