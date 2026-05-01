@@ -199,7 +199,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
       {{ t('buildFlow.build_flow_zone_title') }}
     </div>
 
-    <div class="flex flex-wrap gap-3 relative">
+    <div class="flex flex-wrap gap-9 relative">
       <div
         v-for="card in presenter.lineCards.value"
         :key="card.groupId"
@@ -216,62 +216,59 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                 v-for="tag in card.buildMaterialTags"
                 :key="tag.tagId"
                 :data-tag-id="tag.tagId"
-                class="build-flow-tag build-flow-target-tag group relative inline-flex items-center whitespace-nowrap"
+                class="build-flow-tag build-flow-target-tag whitespace-nowrap"
                 @dragenter.prevent="onTargetDragEnter(tag.tagId)"
                 @dragleave="onTargetDragLeave"
                 @dragover.prevent
                 @drop.prevent="onTargetDrop('line-build-material', card.groupId)"
               >
-              <span
-                class="target-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden transition-all duration-200"
-                :class="[
-                  boundTargetTagIds.has(tag.tagId)
-                    ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
-                    : 'bg-gray-700/40 border-gray-500/50'
-                ]"
-              >
                 <button
-                  class="target-tag-add-btn"
+                  class="target-tag-segment target-tag-segment-add"
+                  :class="boundTargetTagIds.has(tag.tagId)
+                    ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
+                    : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
                   @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'line-build-material', card.groupId, $event)"
                 >+</button>
+                <span
+                  class="target-tag-segment target-tag-segment-main"
+                  :class="[
+                    boundTargetTagIds.has(tag.tagId)
+                      ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
+                      : 'bg-gray-700/40 border-gray-500/50 text-gray-300'
+                  ]"
+                >
+                  <span class="target-tag-text">{{ tag.label }}</span>
+                  <button
+                    v-if="boundTargetTagIds.has(tag.tagId)"
+                    class="target-tag-unbind"
+                    @click.stop="onUnbind(computeTargetKey(tag, 'line-build-material'))"
+                    :title="t('buildFlow.build_flow_unbind')"
+                  >&times;</button>
+                </span>
               </span>
-              <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] rounded border border-transparent select-none"
-                :class="boundTargetTagIds.has(tag.tagId) ? 'text-orange-300' : 'text-gray-300'"
-              >
-                {{ tag.label }}
-                <button
-                  v-if="boundTargetTagIds.has(tag.tagId)"
-                  class="text-[9px] text-orange-400 hover:text-orange-200 ml-auto"
-                  @click.stop="onUnbind(computeTargetKey(tag, 'line-build-material'))"
-                  :title="t('buildFlow.build_flow_unbind')"
-                >&times;</button>
-              </span>
-            </span>
             </div>
           </div>
 
           <div class="flex flex-col gap-1 shrink-0">
               <div class="flex justify-end">
-              <div class="build-flow-source-list flex flex-col gap-1 items-start">
+              <div class="build-flow-source-list flex flex-col gap-1 items-end">
                 <div class="text-[10px] text-gray-500 mb-0.5">{{ t('buildFlow.build_flow_source_materials') }}</div>
                 <span
                   v-for="tag in card.sourceTags"
                   :key="tag.tagId"
                   :data-tag-id="tag.tagId"
-                  class="build-flow-tag build-flow-source-tag relative inline-flex items-center whitespace-nowrap"
+                  class="build-flow-tag build-flow-source-tag whitespace-nowrap"
                   draggable="true"
                   @dragstart="onSourceDragStart(card.groupId, tag.wareId)"
                   @dragend="onSourceDragEnd"
                 >
-                  <span class="source-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden">
-                    <button
-                      class="source-tag-add-btn"
-                      @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
-                    >+</button>
+                  <span class="source-tag-segment source-tag-segment-main">
+                    <span class="source-tag-text">{{ tag.label }}</span>
                   </span>
-                  <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] text-green-300 cursor-grab select-none">
-                    {{ tag.label }}
-                  </span>
+                  <button
+                    class="source-tag-segment source-tag-segment-add"
+                    @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
+                  >+</button>
                 </span>
               </div>
             </div>
@@ -291,32 +288,31 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             v-for="tag in presenter.outputCard.value.outputTags"
             :key="tag.tagId"
             :data-tag-id="tag.tagId"
-            class="build-flow-tag build-flow-target-tag group relative inline-flex items-center whitespace-nowrap"
+            class="build-flow-tag build-flow-target-tag whitespace-nowrap"
             @dragenter.prevent="onTargetDragEnter(tag.tagId)"
             @dragleave="onTargetDragLeave"
             @dragover.prevent
             @drop.prevent="onTargetDrop('output-material')"
           >
+            <button
+              class="target-tag-segment target-tag-segment-add"
+              :class="boundTargetTagIds.has(tag.tagId)
+                ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
+                : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
+              @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, $event)"
+            >+</button>
             <span
-              class="target-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden transition-all duration-200"
+              class="target-tag-segment target-tag-segment-main"
               :class="[
                 boundTargetTagIds.has(tag.tagId)
                   ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
-                  : 'bg-gray-700/40 border-gray-500/50'
+                  : 'bg-gray-700/40 border-gray-500/50 text-gray-300'
               ]"
             >
-              <button
-                class="target-tag-add-btn"
-                @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, $event)"
-              >+</button>
-            </span>
-            <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] rounded border border-transparent select-none"
-              :class="boundTargetTagIds.has(tag.tagId) ? 'text-orange-300' : 'text-gray-300'"
-            >
-              {{ tag.label }}
+              <span class="target-tag-text">{{ tag.label }}</span>
               <button
                 v-if="boundTargetTagIds.has(tag.tagId)"
-                class="text-[9px] text-orange-400 hover:text-orange-200 ml-auto"
+                class="target-tag-unbind"
                 @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))"
                 :title="t('buildFlow.build_flow_unbind')"
               >&times;</button>
@@ -363,65 +359,87 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 </template>
 
 <style scoped>
-.build-flow-source-list {
-  width: 154px;
+.build-flow-source-list,
+.build-flow-target-list {
+  width: 142px;
 }
 
-.build-flow-target-list {
-  width: 154px;
+.build-flow-source-tag,
+.build-flow-target-tag {
+  width: 142px;
+  height: 24px;
+  display: inline-flex;
+  align-items: center;
+  overflow: visible;
+  z-index: 1;
 }
 
 .build-flow-source-tag {
-  width: 154px;
-  overflow: visible;
-}
-
-.source-tag-bg {
-  width: 130px;
-  @apply bg-green-700/40 border border-green-600/50 rounded;
-  @apply transition-all duration-200;
-  overflow: visible;
-}
-
-.build-flow-source-tag:hover .source-tag-bg {
-  width: 154px;
-}
-
-.source-tag-add-btn {
-  width: 24px;
-  @apply absolute right-0 top-0 bottom-0 flex items-center justify-center;
-  @apply text-white text-[10px] font-bold cursor-pointer rounded-r;
-  @apply opacity-0 translate-x-full transition-all duration-200;
-}
-
-.build-flow-source-tag:hover .source-tag-add-btn {
-  @apply opacity-100 translate-x-0;
+  justify-content: flex-end;
+  margin-right: -16px;
 }
 
 .build-flow-target-tag {
-  width: 154px;
-  overflow: visible;
+  justify-content: flex-start;
+  margin-left: -16px;
 }
 
-.target-tag-bg {
-  width: 130px;
-  @apply border rounded;
-  @apply transition-all duration-200;
-  overflow: visible;
+.source-tag-segment,
+.target-tag-segment {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 24px;
+  border-width: 1px;
+  font-size: 11px;
+  z-index: 2;
 }
 
-.group:hover .target-tag-bg {
-  width: 154px;
+.source-tag-segment-main {
+  width: 118px;
+  justify-content: flex-start;
+  padding-left: 0.375rem;
+  padding-right: 0.5rem;
+  @apply rounded-l-md border-r-0 bg-green-700/40 border-green-600/50 text-green-300;
 }
 
-.target-tag-add-btn {
+.target-tag-segment-main {
+  width: 118px;
+  justify-content: flex-end;
+  padding-left: 0.5rem;
+  padding-right: 0.375rem;
+  @apply rounded-r-md border-l-0;
+}
+
+.source-tag-text {
+  @apply truncate text-left;
+  flex: 1 1 auto;
+}
+
+.target-tag-text {
+  @apply truncate text-right;
+  flex: 1 1 auto;
+}
+
+.source-tag-segment-add,
+.target-tag-segment-add {
   width: 24px;
-  @apply absolute right-0 top-0 bottom-0 flex items-center justify-center;
-  @apply text-white text-[10px] font-bold cursor-pointer rounded-r;
-  @apply opacity-0 translate-x-full transition-all duration-200;
+  height: 24px;
+  flex: 0 0 24px;
+  @apply flex items-center justify-center text-[10px] font-bold cursor-pointer;
 }
 
-.group:hover .target-tag-add-btn {
-  @apply opacity-100 translate-x-0;
+.source-tag-segment-add {
+  margin-left: -1px;
+  @apply rounded-r-md border-l-0 bg-green-700/40 border-green-600/50 text-green-300;
+}
+
+.target-tag-segment-add {
+  margin-right: -1px;
+  @apply rounded-l-md border-r-0;
+}
+
+.target-tag-unbind {
+  @apply ml-1 text-[9px] text-orange-400 hover:text-orange-200;
 }
 </style>

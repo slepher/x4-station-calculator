@@ -40,6 +40,7 @@
 - [x] T14. 为来源标签与目标标签提供稳定 DOM 锚点标识
 - [x] T15. 实现 `CandidateZone -> BuildFlowZone -> PlanningZone` 的固定布局顺序
 - [x] T16. 实现规划区相关拖拽期间 `BuildFlowZone` 的自动隐藏与拖拽结束后的恢复显示
+- [ ] T16a. 将三类 tag 改为常驻外伸 `+` 按钮布局，并保证按钮柄部盖住 card 边框
 
 ### Phase 4: 交互
 
