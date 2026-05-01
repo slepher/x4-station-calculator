@@ -165,7 +165,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           <div class="flex flex-col gap-1 shrink-0">
             <div class="text-[10px] text-gray-500 mb-0.5 text-right">{{ t('buildFlow.build_flow_source_materials') }}</div>
             <div class="flex justify-end">
-              <div class="flex flex-col gap-1 items-start w-40 box-border mr-[-26px] pr-[26px]">
+              <div class="flex flex-col gap-1 items-start w-[180px] box-border mr-[-26px] pr-[26px]">
                 <span
                   v-for="tag in card.sourceTags"
                   :key="tag.tagId"
@@ -256,7 +256,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 
 <style scoped>
 .build-flow-source-tag {
-  @apply px-1.5 transition-all duration-200;
+  @apply w-30 box-border px-1.5 pr-5 transition-all duration-200;
 }
 
 .build-flow-source-tag:hover {
