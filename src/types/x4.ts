@@ -705,6 +705,7 @@ export interface LogicFlowPlan {
   name: string
   groups: SavedFlowGroup[]
   settings: LogicFlowSettings
+  buildFlow?: BuildFlowPlanData
   lastUpdated: number
 }
 
@@ -712,6 +713,38 @@ export interface SavedFlowPlansState {
   version: number
   activeId: string | null
   list: LogicFlowPlan[]
+}
+
+// --- Build Flow Types ---
+
+export type BuildFlowTargetType = 'line-build-material' | 'output-material'
+
+export interface BuildFlowAssignment {
+  wareId: string
+  sourceGroupId: string
+  targetType: BuildFlowTargetType
+  targetGroupId?: string
+}
+
+export interface BuildFlowPlanData {
+  assignments: BuildFlowAssignment[]
+}
+
+export interface BuildFlowTag {
+  tagId: string
+  wareId: string
+  label: string
+}
+
+export interface BuildFlowLineCard {
+  groupId: string
+  title: string
+  sourceTags: BuildFlowTag[]
+  buildMaterialTags: BuildFlowTag[]
+}
+
+export interface BuildFlowOutputCard {
+  outputTags: BuildFlowTag[]
 }
 
 // Ship Blueprint Storage Types

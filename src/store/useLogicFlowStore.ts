@@ -1,10 +1,17 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { computeExpandUpstream, type ExpandContext, type GroupSnapshot } from './logic/logicFlowStream'
 import { migrateFlowStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_FLOW_VERSION } from './logic/storageVersions'
-import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings } from '@/types/x4'
+import { getLogicFlowGroupDisplayName } from './logic/logicFlowGroupName'
+import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings, BuildFlowAssignment } from '@/types/x4'
+import {
+  deriveBuildFlowView,
+  addAssignment as addBuildFlowAssignment,
+  removeAssignment as removeBuildFlowAssignment,
+  cleanupStaleAssignments as cleanupStaleBuildFlowAssignments
+} from './logic/buildFlowDerivation'
 
 export const useLogicFlowStore = defineStore('logicFlow', () => {
   const gameData = useGameDataStore()
@@ -26,6 +33,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const savedPlans = ref<SavedFlowPlansState>({ version: CURRENT_FLOW_VERSION, activeId: null, list: [] })
   const lastSavedSnapshot = ref<string>('')
   const settings = ref<LogicFlowSettings>({ isDefaultLocked: true })
+  const buildFlowAssignments = ref<BuildFlowAssignment[]>([])
+  const isBuildFlowDragging = ref(false)
 
   function buildSnapshot() {
     return JSON.stringify({ groups: groups.value, settings: settings.value })
@@ -34,6 +43,50 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function buildEmptySnapshot() {
     return JSON.stringify({ groups: [], settings: { isDefaultLocked: true } })
   }
+
+  // --- Build Flow ---
+
+  const buildFlowView = computed(() => {
+    const displayNames = new Map<string, string>()
+    for (const group of groups.value) {
+      const displayName = getLogicFlowGroupDisplayName(group, (wareId: string) => gameData.getWareDisplayName(wareId))
+      displayNames.set(group.id, displayName)
+    }
+    return deriveBuildFlowView(groups.value, gameData.modulesMap, gameData.waresMap, displayNames)
+  })
+
+  const buildFlowLineCards = computed(() => buildFlowView.value.lineCards)
+  const buildFlowOutputCard = computed(() => buildFlowView.value.outputCard)
+  const demandMaterialSet = computed(() => buildFlowView.value.demandMaterialSet)
+
+  function bindBuildFlowAssignment(assignment: BuildFlowAssignment) {
+    buildFlowAssignments.value = addBuildFlowAssignment(buildFlowAssignments.value, assignment)
+  }
+
+  function unbindBuildFlowAssignment(targetKey: string) {
+    buildFlowAssignments.value = removeBuildFlowAssignment(buildFlowAssignments.value, targetKey)
+  }
+
+  function runBuildFlowCleanup() {
+    buildFlowAssignments.value = cleanupStaleBuildFlowAssignments(
+      buildFlowAssignments.value,
+      groups.value,
+      demandMaterialSet.value,
+      gameData.modulesMap
+    )
+  }
+
+  function startBuildFlowDrag() {
+    isBuildFlowDragging.value = true
+  }
+
+  function stopBuildFlowDrag() {
+    isBuildFlowDragging.value = false
+  }
+
+  watch(groups, () => {
+    runBuildFlowCleanup()
+  }, { deep: true })
 
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
@@ -999,6 +1052,9 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       name: planName,
       groups: groups.value.map(toSavedFlowGroup),
       settings: { ...settings.value },
+      buildFlow: buildFlowAssignments.value.length > 0
+        ? { assignments: [...buildFlowAssignments.value] }
+        : undefined,
       lastUpdated: Date.now()
     }
 
@@ -1053,6 +1109,9 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function applyPlan(plan: LogicFlowPlan) {
     groups.value = []
     activeGroupId.value = null
+    buildFlowAssignments.value = plan.buildFlow?.assignments
+      ? [...plan.buildFlow.assignments]
+      : []
     currentPlanName.value = plan.name
     savedPlans.value.activeId = plan.id
     settings.value = { ...plan.settings }
@@ -1179,6 +1238,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function clearAll() {
     groups.value = []
     activeGroupId.value = null
+    buildFlowAssignments.value = []
     currentPlanName.value = ''
     savedPlans.value.activeId = null
     settings.value = { isDefaultLocked: true }
@@ -1269,5 +1329,16 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     applyPlan,
     deletePlan,
     clearAll,
+    // Build Flow
+    buildFlowAssignments,
+    buildFlowLineCards,
+    buildFlowOutputCard,
+    demandMaterialSet,
+    isBuildFlowDragging,
+    bindBuildFlowAssignment,
+    unbindBuildFlowAssignment,
+    runBuildFlowCleanup,
+    startBuildFlowDrag,
+    stopBuildFlowDrag,
   }
 })
