@@ -170,12 +170,12 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                   v-for="tag in card.sourceTags"
                   :key="tag.tagId"
                   :data-tag-id="tag.tagId"
-                  class="build-flow-tag build-flow-source-tag group relative inline-flex items-center w-[120px] h-5 whitespace-nowrap"
+                  class="build-flow-tag build-flow-source-tag group relative inline-flex items-center w-[140px] h-5 whitespace-nowrap"
                   draggable="true"
                   @dragstart="onSourceDragStart(card.groupId, tag.wareId)"
                   @dragend="onSourceDragEnd"
                 >
-                  <span class="source-tag-bg absolute inset-y-0 left-0 w-full rounded overflow-hidden pointer-events-none">
+                  <span class="source-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden pointer-events-none">
                     <button
                       class="source-tag-add-btn"
                       @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
@@ -264,11 +264,12 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 }
 
 .source-tag-bg {
+  width: 120px;
   @apply bg-green-700/40 border border-green-600/50 rounded;
 }
 
 .group:hover .source-tag-bg {
-  width: calc(100% + 20px);
+  width: 140px;
 }
 
 .source-tag-add-btn {
