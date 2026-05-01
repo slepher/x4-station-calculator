@@ -360,11 +360,11 @@ function onTargetTagClick(wareId: string, tagId: string, targetType: BuildFlowTa
   width: 24px;
   @apply absolute right-0 top-0 bottom-0 flex items-center justify-center;
   @apply text-white text-[10px] font-bold cursor-pointer rounded-r;
-  @apply opacity-0 pointer-events-none translate-x-full transition-all duration-200;
+  @apply opacity-0 translate-x-full transition-all duration-200;
 }
 
 .build-flow-source-tag:hover .source-tag-add-btn {
-  @apply opacity-100 pointer-events-auto translate-x-0;
+  @apply opacity-100 translate-x-0;
 }
 
 .build-flow-target-tag {
@@ -387,10 +387,10 @@ function onTargetTagClick(wareId: string, tagId: string, targetType: BuildFlowTa
   width: 24px;
   @apply absolute right-0 top-0 bottom-0 flex items-center justify-center;
   @apply text-white text-[10px] font-bold cursor-pointer rounded-r;
-  @apply opacity-0 pointer-events-none translate-x-full transition-all duration-200;
+  @apply opacity-0 translate-x-full transition-all duration-200;
 }
 
 .group:hover .target-tag-add-btn {
-  @apply opacity-100 pointer-events-auto translate-x-0;
+  @apply opacity-100 translate-x-0;
 }
 </style>
