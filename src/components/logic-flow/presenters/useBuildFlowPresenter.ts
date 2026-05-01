@@ -44,6 +44,7 @@ export interface UseBuildFlowPresenterReturn {
   outputCard: ComputedRef<BuildFlowOutputCard>
   edges: ComputedRef<BuildFlowEdge[]>
   isDragging: ComputedRef<boolean>
+  boundTargetTagIds: ComputedRef<Set<string>>
   getTargetsForSource(wareId: string): MenuTargetItem[]
   bindFromMenu(sourceGroupId: string, wareId: string, target: MenuTargetItem): void
   bindFromDrag(sourceGroupId: string, wareId: string, targetType: BuildFlowTargetType, targetGroupId?: string): void
@@ -51,7 +52,6 @@ export interface UseBuildFlowPresenterReturn {
   startDrag(): void
   stopDrag(): void
   getTargetKeyForAssignment(assignment: BuildFlowAssignment): string
-  isTagBoundAsTarget(tagId: string): ComputedRef<boolean>
   getBoundSourceForTarget(targetKey: string): ComputedRef<BuildFlowAssignment | undefined>
 }
 
@@ -64,6 +64,17 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
   const lineCards = computed(() => store.lineCards.value)
   const outputCard = computed(() => store.outputCard.value)
   const isDragging = computed(() => store.isDragging.value)
+
+  const boundTargetTagIds = computed(() => {
+    const ids = new Set<string>()
+    for (const a of getAssignments()) {
+      const tagId = a.targetType === 'line-build-material'
+        ? `build-flow-target:line:${a.targetGroupId}:${a.wareId}`
+        : `build-flow-target:output:${a.wareId}`
+      ids.add(tagId)
+    }
+    return ids
+  })
 
   const edges = computed<BuildFlowEdge[]>(() => {
     return getAssignments().map((a) => {
@@ -157,17 +168,6 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     return computeTargetKey(assignment)
   }
 
-  function isTagBoundAsTarget(tagId: string): ComputedRef<boolean> {
-    return computed(() => {
-      return getAssignments().some(a => {
-        const targetTagId = a.targetType === 'line-build-material'
-          ? `build-flow-target:line:${a.targetGroupId}:${a.wareId}`
-          : `build-flow-target:output:${a.wareId}`
-        return targetTagId === tagId
-      })
-    })
-  }
-
   function getBoundSourceForTarget(targetKey: string): ComputedRef<BuildFlowAssignment | undefined> {
     return computed(() => {
       return getAssignments().find(a => computeTargetKey(a) === targetKey)
@@ -179,6 +179,7 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     outputCard,
     edges,
     isDragging,
+    boundTargetTagIds,
     getTargetsForSource,
     bindFromMenu,
     bindFromDrag,
@@ -186,7 +187,6 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     startDrag,
     stopDrag,
     getTargetKeyForAssignment,
-    isTagBoundAsTarget,
     getBoundSourceForTarget
   }
 }

@@ -143,7 +143,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
               :class="[
                 hoverTargetTagId === tag.tagId
                   ? 'bg-blue-700/60 border-blue-500'
-                  : presenter.isTagBoundAsTarget(tag.tagId).value
+                  : presenter.boundTargetTagIds.value.has(tag.tagId)
                     ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
                     : 'bg-gray-700/40 border-gray-500/50 text-gray-300'
               ]"
@@ -154,7 +154,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             >
               {{ tag.label }}
               <button
-                v-if="presenter.isTagBoundAsTarget(tag.tagId).value"
+                v-if="presenter.boundTargetTagIds.value.has(tag.tagId)"
                 class="text-[9px] text-orange-400 hover:text-orange-200 ml-auto"
                 @click.stop="onUnbind(computeTargetKey(tag, 'line-build-material'))"
                 :title="t('buildFlow.build_flow_unbind')"
@@ -207,7 +207,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             :class="[
               hoverTargetTagId === tag.tagId
                 ? 'bg-blue-700/60 border-blue-500'
-                : presenter.isTagBoundAsTarget(tag.tagId).value
+                : presenter.boundTargetTagIds.value.has(tag.tagId)
                   ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
                   : 'bg-gray-700/40 border-gray-500/50 text-gray-300'
             ]"
@@ -218,7 +218,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           >
             {{ tag.label }}
             <button
-              v-if="presenter.isTagBoundAsTarget(tag.tagId).value"
+              v-if="presenter.boundTargetTagIds.value.has(tag.tagId)"
               class="text-[9px] text-orange-400 hover:text-orange-200 ml-auto"
               @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))"
               :title="t('buildFlow.build_flow_unbind')"
