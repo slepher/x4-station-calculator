@@ -164,18 +164,18 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 
           <div class="flex flex-col gap-1 shrink-0">
             <div class="text-[10px] text-gray-500 mb-0.5 text-right">{{ t('buildFlow.build_flow_source_materials') }}</div>
-            <div class="flex justify-end">
-              <div class="flex flex-col gap-1 items-start w-[180px] box-border mr-[-26px] pr-[26px]">
+              <div class="flex justify-end">
+              <div class="build-flow-source-list flex flex-col gap-1 items-start">
                 <span
                   v-for="tag in card.sourceTags"
                   :key="tag.tagId"
                   :data-tag-id="tag.tagId"
-                  class="build-flow-tag build-flow-source-tag relative inline-flex items-center w-[140px] h-5 whitespace-nowrap"
+                  class="build-flow-tag build-flow-source-tag relative inline-flex items-center h-5 whitespace-nowrap"
                   draggable="true"
                   @dragstart="onSourceDragStart(card.groupId, tag.wareId)"
                   @dragend="onSourceDragEnd"
                 >
-                  <span class="source-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden pointer-events-none">
+                  <span class="source-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden">
                     <button
                       class="source-tag-add-btn"
                       @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
@@ -259,26 +259,34 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 </template>
 
 <style scoped>
+.build-flow-source-list {
+  width: 154px;
+}
+
 .build-flow-source-tag {
-  width: 120px;
+  width: 130px;
+  overflow: visible;
 }
 
 .source-tag-bg {
-  width: 120px;
+  width: 130px;
   @apply bg-green-700/40 border border-green-600/50 rounded;
+  @apply transition-all duration-200;
+  overflow: visible;
 }
 
 .build-flow-source-tag:hover .source-tag-bg {
-  width: 140px;
+  width: 154px;
 }
 
 .source-tag-add-btn {
-  @apply absolute right-0 top-0 bottom-0 w-5 flex items-center justify-center;
-  @apply text-green-400 text-[10px] font-bold;
-  @apply translate-x-full transition-transform duration-200;
+  width: 24px;
+  @apply absolute right-0 top-0 bottom-0 flex items-center justify-center;
+  @apply text-white text-[10px] font-bold cursor-pointer rounded-r;
+  @apply opacity-0 pointer-events-none translate-x-full transition-all duration-200;
 }
 
 .build-flow-source-tag:hover .source-tag-add-btn {
-  @apply translate-x-0;
+  @apply opacity-100 pointer-events-auto translate-x-0;
 }
 </style>
