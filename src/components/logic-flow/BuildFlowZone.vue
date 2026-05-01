@@ -163,9 +163,9 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           </div>
 
           <div class="flex flex-col gap-1 shrink-0">
-            <div class="text-[10px] text-gray-500 mb-0.5 text-right">{{ t('buildFlow.build_flow_source_materials') }}</div>
               <div class="flex justify-end">
               <div class="build-flow-source-list flex flex-col gap-1 items-start">
+                <div class="text-[10px] text-gray-500 mb-0.5">{{ t('buildFlow.build_flow_source_materials') }}</div>
                 <span
                   v-for="tag in card.sourceTags"
                   :key="tag.tagId"
