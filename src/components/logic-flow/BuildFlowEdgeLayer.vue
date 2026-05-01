@@ -31,10 +31,7 @@ function getArrowPoints(tipX: number, tipY: number, fromX: number, fromY: number
 
 interface EdgeLine {
   id: string
-  x1: number
-  y1: number
-  x2: number
-  y2: number
+  d: string
   arrow: string
 }
 
@@ -58,7 +55,10 @@ export default {
       if (!container) return
 
       const containerRect = container.getBoundingClientRect()
-      const newLines: EdgeLine[] = []
+
+      // First pass: find overhead channel Y and collect positions
+      let minY = Infinity
+      const edgePositions: Array<{ edge: BuildFlowEdge; x1: number; y1: number; x2: number; y2: number }> = []
 
       for (const edge of props.edges) {
         const sourceEl = container.querySelector(`[data-tag-id="${edge.sourceTagId}"]`)
@@ -68,14 +68,27 @@ export default {
         const sourceRect = sourceEl.getBoundingClientRect()
         const targetRect = targetEl.getBoundingClientRect()
 
-        const x1 = sourceRect.left + sourceRect.width / 2 - containerRect.left
+        const x1 = sourceRect.right - containerRect.left
         const y1 = sourceRect.top + sourceRect.height / 2 - containerRect.top
-        const x2 = targetRect.left + targetRect.width / 2 - containerRect.left
+        const x2 = targetRect.left - containerRect.left
         const y2 = targetRect.top + targetRect.height / 2 - containerRect.top
 
-        const arrow = getArrowPoints(x2, y2, x1, y1)
+        edgePositions.push({ edge, x1, y1, x2, y2 })
+        minY = Math.min(minY, y1, y2)
+      }
 
-        newLines.push({ id: edge.id, x1, y1, x2, y2, arrow })
+      const routeY = Math.max(minY - 30, 8)
+      const newLines: EdgeLine[] = []
+
+      for (const ep of edgePositions) {
+        const { edge, x1, y1, x2, y2 } = ep
+        const exitX = x1 + 20
+        const approachX = x2 - 20
+
+        const d = `M ${x1},${y1} L ${exitX},${y1} L ${exitX},${routeY} L ${approachX},${routeY} L ${approachX},${y2} L ${x2},${y2}`
+        const arrow = getArrowPoints(x2, y2, approachX, y2)
+
+        newLines.push({ id: edge.id, d, arrow })
       }
 
       lines.value = newLines
@@ -109,16 +122,14 @@ export default {
     class="build-flow-edge-layer pointer-events-none absolute inset-0 w-full h-full overflow-visible"
     style="z-index: 10;"
   >
-    <line
+    <path
       v-for="line in lines"
       :key="line.id"
-      :x1="line.x1"
-      :y1="line.y1"
-      :x2="line.x2"
-      :y2="line.y2"
+      :d="line.d"
       stroke="rgba(251, 146, 60, 0.7)"
       stroke-width="2"
       stroke-linecap="round"
+      fill="none"
     />
     <polygon
       v-for="line in lines"
