@@ -256,7 +256,11 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 
 <style scoped>
 .build-flow-source-tag {
-  @apply w-20 box-border px-1.5 pr-5;
+  @apply px-1.5 transition-all duration-200;
+}
+
+.build-flow-source-tag:hover {
+  @apply pr-[26px];
 }
 
 .source-tag-add-btn {
