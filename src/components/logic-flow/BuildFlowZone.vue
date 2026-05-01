@@ -256,7 +256,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 
 <style scoped>
 .build-flow-source-tag {
-  @apply w-32 box-border px-1.5;
+  @apply w-20 box-border px-1.5 pr-5;
 }
 
 .source-tag-add-btn {
