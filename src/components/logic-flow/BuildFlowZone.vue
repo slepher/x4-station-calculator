@@ -170,16 +170,20 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                   v-for="tag in card.sourceTags"
                   :key="tag.tagId"
                   :data-tag-id="tag.tagId"
-                  class="build-flow-tag build-flow-source-tag relative overflow-hidden inline-flex items-center gap-1 py-0.5 text-[11px] rounded bg-green-700/40 text-green-300 border border-green-600/50 cursor-grab select-none hover:bg-green-700/60 transition-colors whitespace-nowrap"
+                  class="build-flow-tag build-flow-source-tag group relative inline-flex items-center w-[120px] h-5 whitespace-nowrap"
                   draggable="true"
                   @dragstart="onSourceDragStart(card.groupId, tag.wareId)"
                   @dragend="onSourceDragEnd"
                 >
-                  {{ tag.label }}
-                  <button
-                    class="source-tag-add-btn"
-                    @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
-                  >+</button>
+                  <span class="source-tag-bg absolute inset-y-0 left-0 w-full rounded overflow-hidden pointer-events-none">
+                    <button
+                      class="source-tag-add-btn"
+                      @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
+                    >+</button>
+                  </span>
+                  <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-0.5 text-[11px] text-green-300 cursor-grab select-none">
+                    {{ tag.label }}
+                  </span>
                 </span>
               </div>
             </div>
@@ -256,11 +260,15 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 
 <style scoped>
 .build-flow-source-tag {
-  @apply w-30 box-border px-1.5 pr-5 transition-all duration-200;
+  width: 120px;
 }
 
-.build-flow-source-tag:hover {
-  @apply pr-[26px];
+.source-tag-bg {
+  @apply bg-green-700/40 border border-green-600/50 rounded;
+}
+
+.group:hover .source-tag-bg {
+  width: calc(100% + 20px);
 }
 
 .source-tag-add-btn {
@@ -269,7 +277,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
   @apply translate-x-full transition-transform duration-200;
 }
 
-.build-flow-source-tag:hover .source-tag-add-btn {
+.group:hover .source-tag-add-btn {
   @apply translate-x-0;
 }
 </style>
