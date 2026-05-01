@@ -37,6 +37,7 @@ export interface MenuTargetItem {
   tagId: string
   targetKey: string
   isBound: boolean
+  bindingState?: 'self' | 'other' | 'none'
 }
 
 export interface UseBuildFlowPresenterReturn {
@@ -101,7 +102,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
           cardTitle: card.title,
           tagId: tag.tagId,
           targetKey,
-          isBound: assignments.some(a => computeTargetKey(a) === targetKey)
+          isBound: assignments.some(a => computeTargetKey(a) === targetKey),
+          bindingState: 'none'
         })
       }
     }
@@ -115,7 +117,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
         cardTitle: '',
         tagId: tag.tagId,
         targetKey,
-        isBound: assignments.some(a => computeTargetKey(a) === targetKey)
+        isBound: assignments.some(a => computeTargetKey(a) === targetKey),
+        bindingState: 'none'
       })
     }
     return targets
@@ -136,7 +139,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
           cardTitle: card.title,
           tagId: tag.tagId,
           targetKey,
-          isBound: assignments.some(a => a.sourceGroupId === card.groupId && a.wareId === wareId)
+          isBound: assignments.some(a => a.sourceGroupId === card.groupId && a.wareId === wareId),
+          bindingState: 'none'
         })
       }
     }

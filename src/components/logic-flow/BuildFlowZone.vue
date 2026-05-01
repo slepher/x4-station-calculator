@@ -78,9 +78,25 @@ const menuPosition = ref<{ x: number; y: number }>({ x: 0, y: 0 })
 function onPlusClick(groupId: string, wareId: string, tagId: string, event: MouseEvent) {
   const targets = presenter.getTargetsForSource(wareId)
   if (targets.length === 0) return
+  menuTargets.value = targets.map((item) => {
+    const assignment = logicFlow.buildFlowAssignments.find((candidate) => {
+      if (candidate.targetType === 'line-build-material') {
+        return item.targetKey === `line:${candidate.targetGroupId}:${candidate.wareId}`
+      }
+      return item.targetKey === `output:${candidate.wareId}`
+    })
+    let bindingState: 'self' | 'other' | 'none' = 'none'
+    if (assignment) {
+      bindingState = assignment.sourceGroupId === groupId ? 'self' : 'other'
+    }
+    return {
+      ...item,
+      isBound: assignment != null,
+      bindingState
+    }
+  })
   menuSourceTag.value = { groupId, wareId, tagId }
   menuTargetTag.value = null
-  menuTargets.value = targets
   const btn = (event.target as HTMLElement).closest('.source-tag-add-btn') || (event.currentTarget as HTMLElement)
   const rect = btn.getBoundingClientRect()
   const menuWidth = 192
@@ -110,7 +126,12 @@ function onTargetTagPlusClick(wareId: string, tagId: string, targetType: BuildFl
     ...item,
     isBound: currentBoundAssignment != null
       && currentBoundAssignment.sourceGroupId === item.targetGroupId
+      && currentBoundAssignment.wareId === item.wareId,
+    bindingState: currentBoundAssignment != null
+      && currentBoundAssignment.sourceGroupId === item.targetGroupId
       && currentBoundAssignment.wareId === item.wareId
+      ? 'self'
+      : 'none'
   }))
   const btn = (event.target as HTMLElement).closest('.target-tag-add-btn') || (event.currentTarget as HTMLElement)
   const rect = btn.getBoundingClientRect()
@@ -324,7 +345,13 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             v-for="target in menuTargets"
             :key="target.targetKey"
             class="w-full text-left px-3 py-1.5 text-xs transition-colors"
-            :class="target.isBound ? 'text-orange-400 bg-orange-900/20' : 'text-gray-300 hover:bg-gray-700'"
+            :class="[
+              target.bindingState === 'self'
+                ? 'text-emerald-300 bg-emerald-900/20'
+                : target.bindingState === 'other'
+                  ? 'text-amber-300 bg-amber-900/20'
+                  : 'text-gray-300 hover:bg-gray-700'
+            ]"
             @click="onMenuSelect(target)"
           >
             <span class="flex-1 truncate">{{ target.targetType === 'line-build-material' ? target.cardTitle : t('buildFlow.build_flow_output_card_title') }}</span>
