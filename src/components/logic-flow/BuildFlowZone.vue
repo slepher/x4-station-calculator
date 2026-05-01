@@ -155,7 +155,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
               {{ tag.label }}
               <button
                 v-if="presenter.isTagBoundAsTarget(tag.tagId).value"
-                class="text-[9px] text-orange-400 hover:text-orange-200 ml-0.5"
+                class="text-[9px] text-orange-400 hover:text-orange-200 ml-auto"
                 @click.stop="onUnbind(computeTargetKey(tag, 'line-build-material'))"
                 :title="t('buildFlow.build_flow_unbind')"
               >&times;</button>
@@ -219,7 +219,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             {{ tag.label }}
             <button
               v-if="presenter.isTagBoundAsTarget(tag.tagId).value"
-              class="text-[9px] text-orange-400 hover:text-orange-200 ml-0.5"
+              class="text-[9px] text-orange-400 hover:text-orange-200 ml-auto"
               @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))"
               :title="t('buildFlow.build_flow_unbind')"
             >&times;</button>
@@ -246,7 +246,8 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           <button
             v-for="target in menuTargets"
             :key="target.targetKey"
-            class="w-full text-left px-3 py-1.5 text-xs text-gray-300 hover:bg-gray-700 transition-colors"
+            class="w-full text-left px-3 py-1.5 text-xs transition-colors"
+            :class="target.isBound ? 'text-orange-400 bg-orange-900/20' : 'text-gray-300 hover:bg-gray-700'"
             @click="onMenuSelect(target)"
           >
             <span class="flex-1 truncate">{{ target.targetType === 'line-build-material' ? target.cardTitle : t('buildFlow.build_flow_output_card_title') }}</span>

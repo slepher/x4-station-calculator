@@ -36,6 +36,7 @@ export interface MenuTargetItem {
   cardTitle: string
   tagId: string
   targetKey: string
+  isBound: boolean
 }
 
 export interface UseBuildFlowPresenterReturn {
@@ -87,6 +88,7 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
 
   function getTargetsForSource(wareId: string): MenuTargetItem[] {
     const targets: MenuTargetItem[] = []
+    const assignments = getAssignments()
     for (const card of store.lineCards.value) {
       for (const tag of card.buildMaterialTags) {
         if (tag.wareId !== wareId) continue
@@ -98,7 +100,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
           wareLabel: tag.label,
           cardTitle: card.title,
           tagId: tag.tagId,
-          targetKey
+          targetKey,
+          isBound: assignments.some(a => computeTargetKey(a) === targetKey)
         })
       }
     }
@@ -111,7 +114,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
         wareLabel: tag.label,
         cardTitle: '',
         tagId: tag.tagId,
-        targetKey
+        targetKey,
+        isBound: assignments.some(a => computeTargetKey(a) === targetKey)
       })
     }
     return targets
