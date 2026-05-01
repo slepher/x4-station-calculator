@@ -45,6 +45,7 @@ export interface UseBuildFlowPresenterReturn {
   edges: ComputedRef<BuildFlowEdge[]>
   isDragging: ComputedRef<boolean>
   getTargetsForSource(wareId: string): MenuTargetItem[]
+  getSourcesForTarget(wareId: string): MenuTargetItem[]
   bindFromMenu(sourceGroupId: string, wareId: string, target: MenuTargetItem): void
   bindFromDrag(sourceGroupId: string, wareId: string, targetType: BuildFlowTargetType, targetGroupId?: string): void
   unbind(targetKey: string): void
@@ -120,6 +121,28 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     return targets
   }
 
+  function getSourcesForTarget(wareId: string): MenuTargetItem[] {
+    const sources: MenuTargetItem[] = []
+    const assignments = getAssignments()
+    for (const card of store.lineCards.value) {
+      for (const tag of card.sourceTags) {
+        if (tag.wareId !== wareId) continue
+        const targetKey = `line:${card.groupId}:${wareId}`
+        sources.push({
+          targetType: 'line-build-material',
+          targetGroupId: card.groupId,
+          wareId,
+          wareLabel: tag.label,
+          cardTitle: card.title,
+          tagId: tag.tagId,
+          targetKey,
+          isBound: assignments.some(a => a.sourceGroupId === card.groupId && a.wareId === wareId)
+        })
+      }
+    }
+    return sources
+  }
+
   function bindFromMenu(sourceGroupId: string, wareId: string, target: MenuTargetItem): void {
     const assignment: BuildFlowAssignment = {
       wareId,
@@ -168,6 +191,7 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     edges,
     isDragging,
     getTargetsForSource,
+    getSourcesForTarget,
     bindFromMenu,
     bindFromDrag,
     unbind,
