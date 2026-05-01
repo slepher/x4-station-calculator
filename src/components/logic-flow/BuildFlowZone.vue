@@ -153,16 +153,6 @@ function onDocumentClick(e: MouseEvent) {
 
 onMounted(() => document.addEventListener('click', onDocumentClick, true))
 onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
-
-function onSourceTagClick(groupId: string, wareId: string, tagId: string, event: MouseEvent) {
-  if (!(event.target as HTMLElement).closest('.source-tag-add-btn')) return
-  onPlusClick(groupId, wareId, tagId, event)
-}
-
-function onTargetTagClick(wareId: string, tagId: string, targetType: BuildFlowTargetType, targetGroupId: string | undefined, event: MouseEvent) {
-  if (!(event.target as HTMLElement).closest('.target-tag-add-btn')) return
-  onTargetTagPlusClick(wareId, tagId, targetType, targetGroupId, event)
-}
 </script>
 
 <template>
@@ -196,7 +186,6 @@ function onTargetTagClick(wareId: string, tagId: string, targetType: BuildFlowTa
                 @dragleave="onTargetDragLeave"
                 @dragover.prevent
                 @drop.prevent="onTargetDrop('line-build-material', card.groupId)"
-                @click="onTargetTagClick(tag.wareId, tag.tagId, 'line-build-material', card.groupId, $event)"
               >
               <span
                 class="target-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden pointer-events-none transition-all duration-200"
@@ -208,6 +197,7 @@ function onTargetTagClick(wareId: string, tagId: string, targetType: BuildFlowTa
               >
                 <button
                   class="target-tag-add-btn"
+                  @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'line-build-material', card.groupId, $event)"
                 >+</button>
               </span>
               <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] rounded border border-transparent select-none"
@@ -237,11 +227,11 @@ function onTargetTagClick(wareId: string, tagId: string, targetType: BuildFlowTa
                   draggable="true"
                   @dragstart="onSourceDragStart(card.groupId, tag.wareId)"
                   @dragend="onSourceDragEnd"
-                  @click="onSourceTagClick(card.groupId, tag.wareId, tag.tagId, $event)"
                 >
                   <span class="source-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden pointer-events-none">
                     <button
                       class="source-tag-add-btn"
+                      @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
                     >+</button>
                   </span>
                   <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] text-green-300 cursor-grab select-none">
@@ -271,7 +261,6 @@ function onTargetTagClick(wareId: string, tagId: string, targetType: BuildFlowTa
             @dragleave="onTargetDragLeave"
             @dragover.prevent
             @drop.prevent="onTargetDrop('output-material')"
-            @click="onTargetTagClick(tag.wareId, tag.tagId, 'output-material', undefined, $event)"
           >
             <span
               class="target-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden pointer-events-none transition-all duration-200"
@@ -283,6 +272,7 @@ function onTargetTagClick(wareId: string, tagId: string, targetType: BuildFlowTa
             >
               <button
                 class="target-tag-add-btn"
+                @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, $event)"
               >+</button>
             </span>
             <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] rounded border border-transparent select-none"
