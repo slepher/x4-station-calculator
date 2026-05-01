@@ -250,7 +250,6 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             @click="onMenuSelect(target)"
           >
             <span class="flex-1 truncate">{{ target.targetType === 'line-build-material' ? target.cardTitle : t('buildFlow.build_flow_output_card_title') }}</span>
-            <span class="text-[10px] text-gray-500 ml-1">{{ target.wareLabel }}</span>
           </button>
         </div>
       </div>
