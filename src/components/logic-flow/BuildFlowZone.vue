@@ -170,7 +170,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                   v-for="tag in card.sourceTags"
                   :key="tag.tagId"
                   :data-tag-id="tag.tagId"
-                  class="build-flow-tag build-flow-source-tag group relative inline-flex items-center w-[140px] h-5 whitespace-nowrap"
+                  class="build-flow-tag build-flow-source-tag relative inline-flex items-center w-[140px] h-5 whitespace-nowrap"
                   draggable="true"
                   @dragstart="onSourceDragStart(card.groupId, tag.wareId)"
                   @dragend="onSourceDragEnd"
@@ -268,7 +268,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
   @apply bg-green-700/40 border border-green-600/50 rounded;
 }
 
-.group:hover .source-tag-bg {
+.build-flow-source-tag:hover .source-tag-bg {
   width: 140px;
 }
 
@@ -278,7 +278,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
   @apply translate-x-full transition-transform duration-200;
 }
 
-.group:hover .source-tag-add-btn {
+.build-flow-source-tag:hover .source-tag-add-btn {
   @apply translate-x-0;
 }
 </style>
