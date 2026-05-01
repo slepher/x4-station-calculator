@@ -56,8 +56,8 @@ export default {
 
       const containerRect = container.getBoundingClientRect()
 
-      // First pass: find overhead channel Y and collect positions
-      let minY = Infinity
+      // Find card tops to place overhead channel above all cards
+      let minCardTop = Infinity
       const edgePositions: Array<{ edge: BuildFlowEdge; x1: number; y1: number; x2: number; y2: number }> = []
 
       for (const edge of props.edges) {
@@ -74,10 +74,11 @@ export default {
         const y2 = targetRect.top + targetRect.height / 2 - containerRect.top
 
         edgePositions.push({ edge, x1, y1, x2, y2 })
-        minY = Math.min(minY, y1, y2)
+        minCardTop = Math.min(minCardTop, sourceRect.top, targetRect.top)
       }
 
-      const routeY = Math.max(minY - 30, 8)
+      // Overhead channel: 60px above the highest card top (relative to container)
+      const routeY = Math.max(minCardTop - containerRect.top - 60, 8)
       const newLines: EdgeLine[] = []
 
       for (const ep of edgePositions) {
@@ -96,8 +97,14 @@ export default {
 
     let observer: ResizeObserver | null = null
 
+    function scheduleRecalculate() {
+      requestAnimationFrame(() => recalculate())
+    }
+
     onMounted(() => {
-      recalculate()
+      scheduleRecalculate()
+      // Fallback: recalculate after fonts/layout settle
+      setTimeout(() => recalculate(), 300)
       observer = new ResizeObserver(() => recalculate())
       if (svgRef.value?.parentElement) {
         observer.observe(svgRef.value.parentElement)
@@ -108,8 +115,8 @@ export default {
       observer?.disconnect()
     })
 
-    watch(() => props.edges, () => nextTick(recalculate), { deep: true })
-    watch(() => props.edges.length, () => nextTick(recalculate))
+    watch(() => props.edges, () => nextTick(scheduleRecalculate), { deep: true })
+    watch(() => props.edges.length, () => nextTick(scheduleRecalculate))
 
     return { svgRef, lines }
   }
