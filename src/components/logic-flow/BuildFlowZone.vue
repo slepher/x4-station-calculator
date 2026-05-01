@@ -193,7 +193,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                       @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
                     >+</button>
                   </span>
-                  <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-0.5 text-[11px] text-green-300 cursor-grab select-none">
+                  <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] text-green-300 cursor-grab select-none">
                     {{ tag.label }}
                   </span>
                 </span>
