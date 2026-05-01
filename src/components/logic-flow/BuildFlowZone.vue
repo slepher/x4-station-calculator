@@ -201,77 +201,76 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 
     <div class="flex flex-wrap gap-9 relative">
       <div
-        v-for="card in presenter.lineCards.value"
+        v-for="(card, idx) in presenter.lineCards.value"
         :key="card.groupId"
         class="build-flow-line-card bg-gray-800/60 border border-gray-600 rounded p-2 min-w-[280px]"
       >
         <div class="text-xs text-gray-300 font-medium mb-2 truncate" :title="card.title">
           {{ card.title }}
         </div>
-        <div class="flex gap-3 justify-between">
-          <div class="flex flex-col gap-1 shrink-0">
-            <div class="text-[10px] text-gray-500 mb-0.5">{{ t('buildFlow.build_flow_build_materials') }}</div>
-            <div class="build-flow-target-list flex flex-col gap-1 items-start">
-              <span
-                v-for="tag in card.buildMaterialTags"
-                :key="tag.tagId"
-                :data-tag-id="tag.tagId"
-                class="build-flow-tag build-flow-target-tag whitespace-nowrap"
-                @dragenter.prevent="onTargetDragEnter(tag.tagId)"
-                @dragleave="onTargetDragLeave"
-                @dragover.prevent
-                @drop.prevent="onTargetDrop('line-build-material', card.groupId)"
-              >
-                <button
-                  class="target-tag-segment target-tag-segment-add"
-                  :class="boundTargetTagIds.has(tag.tagId)
-                    ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
-                    : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
-                  @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'line-build-material', card.groupId, $event)"
-                >+</button>
-                <span
-                  class="target-tag-segment target-tag-segment-main"
-                  :class="[
-                    boundTargetTagIds.has(tag.tagId)
-                      ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
-                      : 'bg-gray-700/40 border-gray-500/50 text-gray-300'
-                  ]"
-                >
-                  <span class="target-tag-text">{{ tag.label }}</span>
-                  <button
-                    v-if="boundTargetTagIds.has(tag.tagId)"
-                    class="target-tag-unbind"
-                    @click.stop="onUnbind(computeTargetKey(tag, 'line-build-material'))"
-                    :title="t('buildFlow.build_flow_unbind')"
-                  >&times;</button>
-                </span>
-              </span>
-            </div>
+        <div class="flex flex-col gap-1">
+          <div class="flex justify-between">
+            <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_build_materials') }}</span>
+            <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_source_materials') }}</span>
           </div>
+          <div
+            v-for="row in presenter.cardRows.value[idx]"
+            :key="row.wareId"
+            class="flex justify-between items-center"
+            style="min-height: 24px"
+          >
+            <span
+              v-if="row.buildMaterialTag"
+              :data-tag-id="row.buildMaterialTag.tagId"
+              class="build-flow-tag build-flow-target-tag whitespace-nowrap"
+              @dragenter.prevent="onTargetDragEnter(row.buildMaterialTag.tagId)"
+              @dragleave="onTargetDragLeave"
+              @dragover.prevent
+              @drop.prevent="onTargetDrop('line-build-material', card.groupId)"
+            >
+              <button
+                class="target-tag-segment target-tag-segment-add"
+                :class="boundTargetTagIds.has(row.buildMaterialTag.tagId)
+                  ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
+                  : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
+                @click.stop="onTargetTagPlusClick(row.buildMaterialTag.wareId, row.buildMaterialTag.tagId, 'line-build-material', card.groupId, $event)"
+              >+</button>
+              <span
+                class="target-tag-segment target-tag-segment-main"
+                :class="[
+                  boundTargetTagIds.has(row.buildMaterialTag.tagId)
+                    ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
+                    : 'bg-gray-700/40 border-gray-500/50 text-gray-300'
+                ]"
+              >
+                <span class="target-tag-text">{{ row.buildMaterialTag.label }}</span>
+                <button
+                  v-if="boundTargetTagIds.has(row.buildMaterialTag.tagId)"
+                  class="target-tag-unbind"
+                  @click.stop="onUnbind(computeTargetKey(row.buildMaterialTag, 'line-build-material'))"
+                  :title="t('buildFlow.build_flow_unbind')"
+                >&times;</button>
+              </span>
+            </span>
+            <div v-else class="w-[142px] h-[24px] shrink-0"></div>
 
-          <div class="flex flex-col gap-1 shrink-0">
-              <div class="flex justify-end">
-              <div class="build-flow-source-list flex flex-col gap-1 items-end">
-                <div class="text-[10px] text-gray-500 mb-0.5">{{ t('buildFlow.build_flow_source_materials') }}</div>
-                <span
-                  v-for="tag in card.sourceTags"
-                  :key="tag.tagId"
-                  :data-tag-id="tag.tagId"
-                  class="build-flow-tag build-flow-source-tag whitespace-nowrap"
-                  draggable="true"
-                  @dragstart="onSourceDragStart(card.groupId, tag.wareId)"
-                  @dragend="onSourceDragEnd"
-                >
-                  <span class="source-tag-segment source-tag-segment-main">
-                    <span class="source-tag-text">{{ tag.label }}</span>
-                  </span>
-                  <button
-                    class="source-tag-segment source-tag-segment-add"
-                    @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
-                  >+</button>
-                </span>
-              </div>
-            </div>
+            <span
+              v-if="row.sourceTag"
+              :data-tag-id="row.sourceTag.tagId"
+              class="build-flow-tag build-flow-source-tag whitespace-nowrap"
+              draggable="true"
+              @dragstart="onSourceDragStart(card.groupId, row.sourceTag.wareId)"
+              @dragend="onSourceDragEnd"
+            >
+              <span class="source-tag-segment source-tag-segment-main">
+                <span class="source-tag-text">{{ row.sourceTag.label }}</span>
+              </span>
+              <button
+                class="source-tag-segment source-tag-segment-add"
+                @click.stop="onPlusClick(card.groupId, row.sourceTag.wareId, row.sourceTag.tagId, $event)"
+              >+</button>
+            </span>
+            <div v-else class="w-[142px] h-[24px] shrink-0"></div>
           </div>
         </div>
       </div>
@@ -359,7 +358,6 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 </template>
 
 <style scoped>
-.build-flow-source-list,
 .build-flow-target-list {
   width: 142px;
 }

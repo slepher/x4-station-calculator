@@ -3,6 +3,7 @@ import type {
   BuildFlowAssignment,
   BuildFlowLineCard,
   BuildFlowOutputCard,
+  BuildFlowTag,
   BuildFlowTargetType
 } from '@/types/x4'
 import { computeTargetKey } from '@/store/logic/buildFlowDerivation'
@@ -40,9 +41,16 @@ export interface MenuTargetItem {
   bindingState?: 'self' | 'other' | 'none'
 }
 
+export interface BuildFlowRow {
+  wareId: string
+  buildMaterialTag: BuildFlowTag | null
+  sourceTag: BuildFlowTag | null
+}
+
 export interface UseBuildFlowPresenterReturn {
   lineCards: ComputedRef<BuildFlowLineCard[]>
   outputCard: ComputedRef<BuildFlowOutputCard>
+  cardRows: ComputedRef<BuildFlowRow[][]>
   edges: ComputedRef<BuildFlowEdge[]>
   isDragging: ComputedRef<boolean>
   getTargetsForSource(wareId: string): MenuTargetItem[]
@@ -65,6 +73,24 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
   const lineCards = computed(() => store.lineCards.value)
   const outputCard = computed(() => store.outputCard.value)
   const isDragging = computed(() => store.isDragging.value)
+
+  const cardRows = computed<BuildFlowRow[][]>(() => {
+    return store.lineCards.value.map(card => {
+      const seenWareIds = new Set<string>()
+      const rows: BuildFlowRow[] = []
+      for (const tag of card.buildMaterialTags) {
+        seenWareIds.add(tag.wareId)
+        const sourceTag = card.sourceTags.find(t => t.wareId === tag.wareId) || null
+        rows.push({ wareId: tag.wareId, buildMaterialTag: tag, sourceTag })
+      }
+      for (const tag of card.sourceTags) {
+        if (seenWareIds.has(tag.wareId)) continue
+        seenWareIds.add(tag.wareId)
+        rows.push({ wareId: tag.wareId, buildMaterialTag: null, sourceTag: tag })
+      }
+      return rows
+    })
+  })
 
   const edges = computed<BuildFlowEdge[]>(() => {
     return getAssignments().map((a) => {
@@ -192,6 +218,7 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
   return {
     lineCards,
     outputCard,
+    cardRows,
     edges,
     isDragging,
     getTargetsForSource,

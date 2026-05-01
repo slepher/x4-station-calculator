@@ -1184,6 +1184,21 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
           ? (newGroup.lockedLineage || 'default')
           : (module.race || module.method || newGroup.subCategory || 'default')
 
+        const existingNode = newGroup.nodes.find(n => n.moduleId === savedNode.module)
+        if (existingNode) {
+          if (existingNode.source === 'auto') {
+            existingNode.source = 'manual'
+            existingNode.isAuto = false
+            existingNode.isRoot = true
+            if (module.inputs) {
+              Object.keys(module.inputs).forEach(inputWareId => {
+                expandUpstream(newGroup.id, inputWareId, 'auto', existingNode.lineage)
+              })
+            }
+          }
+          continue
+        }
+
         const manualNode: FlowNode = {
           id: crypto.randomUUID(),
           wareId,
