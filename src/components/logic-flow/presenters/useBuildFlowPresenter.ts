@@ -44,7 +44,6 @@ export interface UseBuildFlowPresenterReturn {
   outputCard: ComputedRef<BuildFlowOutputCard>
   edges: ComputedRef<BuildFlowEdge[]>
   isDragging: ComputedRef<boolean>
-  boundTargetTagIds: ComputedRef<Set<string>>
   getTargetsForSource(wareId: string): MenuTargetItem[]
   bindFromMenu(sourceGroupId: string, wareId: string, target: MenuTargetItem): void
   bindFromDrag(sourceGroupId: string, wareId: string, targetType: BuildFlowTargetType, targetGroupId?: string): void
@@ -64,17 +63,6 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
   const lineCards = computed(() => store.lineCards.value)
   const outputCard = computed(() => store.outputCard.value)
   const isDragging = computed(() => store.isDragging.value)
-
-  const boundTargetTagIds = computed(() => {
-    const ids = new Set<string>()
-    for (const a of getAssignments()) {
-      const tagId = a.targetType === 'line-build-material'
-        ? `build-flow-target:line:${a.targetGroupId}:${a.wareId}`
-        : `build-flow-target:output:${a.wareId}`
-      ids.add(tagId)
-    }
-    return ids
-  })
 
   const edges = computed<BuildFlowEdge[]>(() => {
     return getAssignments().map((a) => {
@@ -179,7 +167,6 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     outputCard,
     edges,
     isDragging,
-    boundTargetTagIds,
     getTargetsForSource,
     bindFromMenu,
     bindFromDrag,

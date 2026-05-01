@@ -3,6 +3,7 @@ import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useBuildFlowPresenter, type MenuTargetItem } from './presenters/useBuildFlowPresenter'
+import BuildFlowEdgeLayer from './BuildFlowEdgeLayer.vue'
 import type { BuildFlowTag, BuildFlowTargetType } from '@/types/x4'
 
 const { t } = useI18n()
@@ -24,6 +25,17 @@ const shouldHide = computed(() => {
 })
 
 const hasContent = computed(() => presenter.lineCards.value.length > 0)
+
+const boundTargetTagIds = computed(() => {
+  const ids = new Set<string>()
+  for (const a of logicFlow.buildFlowAssignments) {
+    const tagId = a.targetType === 'line-build-material'
+      ? `build-flow-target:line:${a.targetGroupId}:${a.wareId}`
+      : `build-flow-target:output:${a.wareId}`
+    ids.add(tagId)
+  }
+  return ids
+})
 
 // --- Drag state ---
 const draggingTag = ref<{ groupId: string; wareId: string } | null>(null)
@@ -143,7 +155,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
               :class="[
                 hoverTargetTagId === tag.tagId
                   ? 'bg-blue-700/60 border-blue-500'
-                  : presenter.boundTargetTagIds.value.has(tag.tagId)
+                  : boundTargetTagIds.has(tag.tagId)
                     ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
                     : 'bg-gray-700/40 border-gray-500/50 text-gray-300'
               ]"
@@ -154,7 +166,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             >
               {{ tag.label }}
               <button
-                v-if="presenter.boundTargetTagIds.value.has(tag.tagId)"
+                v-if="boundTargetTagIds.has(tag.tagId)"
                 class="text-[9px] text-orange-400 hover:text-orange-200 ml-auto"
                 @click.stop="onUnbind(computeTargetKey(tag, 'line-build-material'))"
                 :title="t('buildFlow.build_flow_unbind')"
@@ -207,7 +219,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             :class="[
               hoverTargetTagId === tag.tagId
                 ? 'bg-blue-700/60 border-blue-500'
-                : presenter.boundTargetTagIds.value.has(tag.tagId)
+                : boundTargetTagIds.has(tag.tagId)
                   ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
                   : 'bg-gray-700/40 border-gray-500/50 text-gray-300'
             ]"
@@ -218,7 +230,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           >
             {{ tag.label }}
             <button
-              v-if="presenter.boundTargetTagIds.value.has(tag.tagId)"
+              v-if="boundTargetTagIds.has(tag.tagId)"
               class="text-[9px] text-orange-400 hover:text-orange-200 ml-auto"
               @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))"
               :title="t('buildFlow.build_flow_unbind')"
