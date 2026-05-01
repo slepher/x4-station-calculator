@@ -322,7 +322,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 }
 
 .build-flow-source-tag {
-  width: 130px;
+  width: 154px;
   overflow: visible;
 }
 
@@ -349,7 +349,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 }
 
 .build-flow-target-tag {
-  width: 130px;
+  width: 154px;
   overflow: visible;
 }
 
