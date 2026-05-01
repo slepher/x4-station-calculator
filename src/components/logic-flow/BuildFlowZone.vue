@@ -95,9 +95,23 @@ function onPlusClick(groupId: string, wareId: string, tagId: string, event: Mous
 function onTargetTagPlusClick(wareId: string, tagId: string, targetType: BuildFlowTargetType, targetGroupId: string | undefined, event: MouseEvent) {
   const sources = presenter.getSourcesForTarget(wareId)
   if (sources.length === 0) return
+  const currentTargetKey = targetType === 'line-build-material'
+    ? `line:${targetGroupId}:${wareId}`
+    : `output:${wareId}`
+  const currentBoundAssignment = logicFlow.buildFlowAssignments.find((assignment) => {
+    if (assignment.targetType === 'line-build-material') {
+      return currentTargetKey === `line:${assignment.targetGroupId}:${assignment.wareId}`
+    }
+    return currentTargetKey === `output:${assignment.wareId}`
+  })
   menuSourceTag.value = null
   menuTargetTag.value = { wareId, tagId, targetType, targetGroupId }
-  menuTargets.value = sources
+  menuTargets.value = sources.map((item) => ({
+    ...item,
+    isBound: currentBoundAssignment != null
+      && currentBoundAssignment.sourceGroupId === item.targetGroupId
+      && currentBoundAssignment.wareId === item.wareId
+  }))
   const btn = (event.target as HTMLElement).closest('.target-tag-add-btn') || (event.currentTarget as HTMLElement)
   const rect = btn.getBoundingClientRect()
   const menuWidth = 192
@@ -188,7 +202,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                 @drop.prevent="onTargetDrop('line-build-material', card.groupId)"
               >
               <span
-                class="target-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden pointer-events-none transition-all duration-200"
+                class="target-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden transition-all duration-200"
                 :class="[
                   boundTargetTagIds.has(tag.tagId)
                     ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
@@ -228,7 +242,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                   @dragstart="onSourceDragStart(card.groupId, tag.wareId)"
                   @dragend="onSourceDragEnd"
                 >
-                  <span class="source-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden pointer-events-none">
+                  <span class="source-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden">
                     <button
                       class="source-tag-add-btn"
                       @click.stop="onPlusClick(card.groupId, tag.wareId, tag.tagId, $event)"
@@ -263,7 +277,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             @drop.prevent="onTargetDrop('output-material')"
           >
             <span
-              class="target-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden pointer-events-none transition-all duration-200"
+              class="target-tag-bg absolute inset-y-0 left-0 rounded overflow-hidden transition-all duration-200"
               :class="[
                 boundTargetTagIds.has(tag.tagId)
                   ? 'bg-orange-700/40 border-orange-500/50 text-orange-300'
@@ -298,12 +312,12 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 
     <Teleport to="body">
       <div
-        v-if="menuSourceTag"
-        class="fixed z-50 bg-gray-800 border border-gray-600 rounded shadow-lg py-1 min-w-[192px]"
+        v-if="menuSourceTag || menuTargetTag"
+        class="build-flow-menu fixed z-50 bg-gray-800 border border-gray-600 rounded shadow-lg py-1 min-w-[192px]"
         :style="{ left: `${menuPosition.x}px`, top: `${menuPosition.y}px` }"
       >
         <div class="px-3 py-1.5 text-[10px] text-gray-500 uppercase tracking-wide border-b border-gray-700">
-          {{ t('buildFlow.build_flow_source_materials') }}
+          {{ menuSourceTag ? t('buildFlow.build_flow_source_materials') : t('buildFlow.build_flow_build_materials') }}
         </div>
         <div class="max-h-60 overflow-y-auto custom-scrollbar">
           <button
