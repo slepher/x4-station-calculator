@@ -54,7 +54,7 @@ export function isGroupInBuildFlow(
 export function computeSourceTags(
   group: ProductionLineGroup,
   demandMaterialSet: Set<string>,
-  waresMap: Record<string, { name: string }>
+  getWareLabel: (wareId: string) => string
 ): BuildFlowTag[] {
   const manualProducts = getManualProductNodes(group)
   const seen = new Set<string>()
@@ -63,11 +63,10 @@ export function computeSourceTags(
     if (!demandMaterialSet.has(node.wareId)) continue
     if (seen.has(node.wareId)) continue
     seen.add(node.wareId)
-    const ware = waresMap[node.wareId]
     tags.push({
       tagId: `build-flow-source:${group.id}:${node.wareId}`,
       wareId: node.wareId,
-      label: ware?.name || node.wareId
+      label: getWareLabel(node.wareId)
     })
   }
   return tags
@@ -77,7 +76,7 @@ export function computeBuildMaterialTags(
   group: ProductionLineGroup,
   outputMaterialWareIds: Set<string>,
   modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, { name: string }>
+  getWareLabel: (wareId: string) => string
 ): BuildFlowTag[] {
   const scopeNodes = getModuleScopeNodes(group, modulesMap)
   const materialWareIds = new Set<string>()
@@ -91,11 +90,10 @@ export function computeBuildMaterialTags(
     }
   }
   return Array.from(materialWareIds).map(wareId => {
-    const ware = waresMap[wareId]
     return {
       tagId: `build-flow-target:line:${group.id}:${wareId}`,
       wareId,
-      label: ware?.name || wareId
+      label: getWareLabel(wareId)
     }
   })
 }
@@ -122,8 +120,8 @@ export function computeOutputTags(
 export function deriveBuildFlowView(
   groups: ProductionLineGroup[],
   modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, { name: string }>,
-  groupDisplayNames: Map<string, string>
+  groupDisplayNames: Map<string, string>,
+  getWareLabel: (wareId: string) => string
 ): {
   demandMaterialSet: Set<string>
   lineCards: BuildFlowLineCard[]
@@ -134,7 +132,7 @@ export function deriveBuildFlowView(
   const lineCardsWithSource: Array<{ group: ProductionLineGroup; sourceTags: BuildFlowTag[] }> = []
   for (const group of groups) {
     if (!isGroupInBuildFlow(group, demandMaterialSet)) continue
-    const sourceTags = computeSourceTags(group, demandMaterialSet, waresMap)
+    const sourceTags = computeSourceTags(group, demandMaterialSet, getWareLabel)
     lineCardsWithSource.push({ group, sourceTags })
   }
 
@@ -149,7 +147,7 @@ export function deriveBuildFlowView(
     groupId: group.id,
     title: groupDisplayNames.get(group.id) || group.name || group.id,
     sourceTags,
-    buildMaterialTags: computeBuildMaterialTags(group, outputMaterialWareIds, modulesMap, waresMap)
+    buildMaterialTags: computeBuildMaterialTags(group, outputMaterialWareIds, modulesMap, getWareLabel)
   }))
 
   const outputTags = computeOutputTags(lineCards)

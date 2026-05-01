@@ -52,7 +52,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       const displayName = getLogicFlowGroupDisplayName(group, (wareId: string) => gameData.getWareDisplayName(wareId))
       displayNames.set(group.id, displayName)
     }
-    return deriveBuildFlowView(groups.value, gameData.modulesMap, gameData.waresMap, displayNames)
+    return deriveBuildFlowView(groups.value, gameData.modulesMap, displayNames, (wareId) => gameData.getWareDisplayName(wareId))
   })
 
   const buildFlowLineCards = computed(() => buildFlowView.value.lineCards)
