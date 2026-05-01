@@ -71,7 +71,7 @@ function onTargetDrop(targetType: BuildFlowTargetType, targetGroupId?: string) {
 
 // --- Menu state ---
 const menuSourceTag = ref<{ groupId: string; wareId: string; tagId: string } | null>(null)
-const menuTargetTag = ref<{ wareId: string; tagId: string } | null>(null)
+const menuTargetTag = ref<{ wareId: string; tagId: string; targetType: BuildFlowTargetType; targetGroupId?: string } | null>(null)
 const menuTargets = ref<MenuTargetItem[]>([])
 const menuPosition = ref<{ x: number; y: number }>({ x: 0, y: 0 })
 
@@ -91,11 +91,11 @@ function onPlusClick(groupId: string, wareId: string, tagId: string, event: Mous
   menuPosition.value = { x, y: rect.top }
 }
 
-function onTargetTagPlusClick(wareId: string, tagId: string, event: MouseEvent) {
+function onTargetTagPlusClick(wareId: string, tagId: string, targetType: BuildFlowTargetType, targetGroupId: string | undefined, event: MouseEvent) {
   const sources = presenter.getSourcesForTarget(wareId)
   if (sources.length === 0) return
   menuSourceTag.value = null
-  menuTargetTag.value = { wareId, tagId }
+  menuTargetTag.value = { wareId, tagId, targetType, targetGroupId }
   menuTargets.value = sources
   const rect = (event.currentTarget as HTMLElement).getBoundingClientRect()
   const menuWidth = 192
@@ -107,9 +107,16 @@ function onTargetTagPlusClick(wareId: string, tagId: string, event: MouseEvent) 
   menuPosition.value = { x, y: rect.top }
 }
 
-function onMenuSelect(target: MenuTargetItem) {
+function onMenuSelect(item: MenuTargetItem) {
   if (menuSourceTag.value) {
-    presenter.bindFromMenu(menuSourceTag.value.groupId, menuSourceTag.value.wareId, target)
+    presenter.bindFromMenu(menuSourceTag.value.groupId, menuSourceTag.value.wareId, item)
+  } else if (menuTargetTag.value) {
+    logicFlow.bindBuildFlowAssignment({
+      wareId: menuTargetTag.value.wareId,
+      sourceGroupId: item.targetGroupId!,
+      targetType: menuTargetTag.value.targetType,
+      targetGroupId: menuTargetTag.value.targetGroupId
+    })
   }
   closeMenu()
 }
@@ -188,7 +195,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
               >
                 <button
                   class="target-tag-add-btn"
-                  @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, $event)"
+                  @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'line-build-material', card.groupId, $event)"
                 >+</button>
               </span>
               <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] rounded border border-transparent select-none"
@@ -263,7 +270,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             >
               <button
                 class="target-tag-add-btn"
-                @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, $event)"
+                @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, $event)"
               >+</button>
             </span>
             <span class="relative z-10 inline-flex items-center gap-1 px-1.5 py-[3px] text-[11px] rounded border border-transparent select-none"
