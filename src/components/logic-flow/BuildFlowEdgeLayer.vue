@@ -114,7 +114,7 @@ function recalculate() {
       const gapStart = y1 < y2 ? srcCardBot : tgtCardBot
       const gapEnd = y1 < y2 ? tgtCardTop : srcCardTop
       const gapSize = Math.max(gapEnd - gapStart, 4)
-      const p2Y = gapStart + ((modeBIdx + 1) * gapSize) / Math.max(modeBCount + 1, 1)
+      const p2Y = gapStart + ((modeBCount - modeBIdx) * gapSize) / Math.max(modeBCount + 1, 1)
       console.log(`[modeB] i=${modeBIdx} start=(${x1.toFixed(0)},${y1.toFixed(0)}) p1X=${p1X.toFixed(0)} p3X=${p3X.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
       modeBIdx++
