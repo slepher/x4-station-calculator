@@ -14,14 +14,9 @@ const shouldHide = computed(() => {
   return logicFlow.isDragging && !logicFlow.isBuildFlowDragging
 })
 
-const hasContent = computed(() => {
-  const result = logicFlow.buildFlowLineCards.length > 0
-  console.log('[BuildFlowZone] hasContent:', result, 'lineCards:', logicFlow.buildFlowLineCards.length)
-  return result
-})
+const hasContent = computed(() => logicFlow.buildFlowLineCards.length > 0)
 
 function syncGraphData() {
-  console.log('[BuildFlowZone] syncGraphData called, graphHandle:', graphHandle.value ? 'present' : 'null')
   if (!graphHandle.value) return
   graphHandle.value.syncGraph(
     logicFlow.buildFlowGroups,
@@ -32,17 +27,14 @@ function syncGraphData() {
 watch(
   () => [logicFlow.buildFlowGroups, logicFlow.buildFlowAssignments],
   () => {
-    console.log('[BuildFlowZone] watch triggered, buildFlowGroups:', logicFlow.buildFlowGroups.length, 'assignments:', logicFlow.buildFlowAssignments.length)
     nextTick(syncGraphData)
   },
   { deep: true }
 )
 
 onMounted(() => {
-  console.log('[BuildFlowZone] mounted, containerRef:', containerRef.value ? 'present' : 'null', 'hasContent:', hasContent.value)
   if (containerRef.value) {
     graphHandle.value = useBuildFlowGraph(containerRef.value)
-    console.log('[BuildFlowZone] graph created')
     nextTick(syncGraphData)
   }
 })
@@ -55,7 +47,7 @@ onUnmounted(() => {
 
 <template>
   <div
-    v-show="hasContent && !shouldHide"
+    v-show="!shouldHide"
     class="build-flow-zone border border-dashed border-gray-600 rounded-lg p-3 space-y-3"
   >
     <div class="text-xs text-gray-400 font-medium uppercase tracking-wide">
@@ -64,7 +56,10 @@ onUnmounted(() => {
 
     <div ref="containerRef" class="build-flow-graph-container"></div>
 
-    <BuildFlowTeleport />
+    <div v-if="!hasContent" class="text-xs text-gray-500 py-4">
+      {{ t('logicFlow.noGroups') }}
+    </div>
+    <BuildFlowTeleport v-else />
   </div>
 </template>
 
