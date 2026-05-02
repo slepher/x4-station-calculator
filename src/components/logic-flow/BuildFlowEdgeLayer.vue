@@ -73,13 +73,13 @@ function recalculate() {
 
   const srcMidX = new Map<string, number>()
   let srcIdx = 0
-  const outputX2 = positioned.filter(p => p.x2 > p.x1).map(p => p.x2)
-  const gapEnd = outputX2.length > 0 ? Math.min(...outputX2) : containerRect.width
+  const outTagEl = container.querySelector('[class*="build-flow-output-card"] [data-tag-id]')
+  const gapEnd = outTagEl ? outTagEl.getBoundingClientRect().left - containerRect.left : containerRect.width - 16
   for (const pos of positioned) {
     const sk = `${pos.edge.sourceGroupId}:${pos.edge.wareId}`
     if (!srcMidX.has(sk)) {
-      const gap = gapEnd - pos.x1 - 8
-      srcMidX.set(sk, pos.x1 + 4 + (srcIdx * gap) / Math.max(srcIdx + 1, 1))
+      const gap = Math.max(gapEnd - pos.x1 - 8, 4)
+      srcMidX.set(sk, pos.x1 + 4 + (srcIdx * gap) / Math.max(positioned.length, 1))
       srcIdx++
     }
   }
