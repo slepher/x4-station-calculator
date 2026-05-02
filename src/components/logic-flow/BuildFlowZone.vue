@@ -1,6 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { VueFlow } from '@vue-flow/core'
+import '@vue-flow/core/dist/style.css'
+import '@vue-flow/core/dist/theme-default.css'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useBuildFlowPresenter, type MenuTargetItem } from './presenters/useBuildFlowPresenter'
 import type { BuildFlowTag, BuildFlowTargetType } from '@/types/x4'
