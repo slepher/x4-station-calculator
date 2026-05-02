@@ -193,7 +193,7 @@ watch(() => props.edges.length, () => {
         orient="auto"
         markerUnits="userSpaceOnUse"
       >
-        <polygon points="0 0, 10 4, 0 8" fill="rgba(251, 146, 60, 0.8)" />
+        <polygon points="0 0, 10 4, 0 8" fill="currentColor" />
       </marker>
     </defs>
     <path
@@ -201,6 +201,7 @@ watch(() => props.edges.length, () => {
       :key="line.id"
       :d="line.d"
       :stroke="line.color || 'rgba(251, 146, 60, 0.7)'"
+      :style="{ color: line.color || 'rgba(251, 146, 60, 0.7)' }"
       stroke-width="3"
       stroke-linecap="round"
       fill="none"
