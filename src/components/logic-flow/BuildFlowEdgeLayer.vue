@@ -77,9 +77,9 @@ function recalculate() {
   const gapEnd = outTagEl ? outTagEl.getBoundingClientRect().left - containerRect.left : containerRect.width - 16
   for (const pos of positioned) {
     const sk = `${pos.edge.sourceGroupId}:${pos.edge.wareId}`
-    if (!srcMidX.has(sk)) {
+    if (!srcMidX.has(sk) && !(pos.edge as any).isSelfConnection) {
       const gap = Math.max(gapEnd - pos.x1 - 8, 4)
-      srcMidX.set(sk, pos.x1 + 4 + (srcIdx * gap) / Math.max(positioned.length, 1))
+      srcMidX.set(sk, pos.x1 + 4 + (srcIdx * gap) / Math.max(positioned.filter(p => !(p.edge as any).isSelfConnection).length, 1))
       srcIdx++
     }
   }
