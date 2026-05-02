@@ -72,6 +72,7 @@ function recalculate() {
   const results: RoutedEdge[] = []
 
   const srcMidX = new Map<string, number>()
+  const totalSources = new Set(positioned.filter(p => !(p.edge as any).isSelfConnection).map(p => `${p.edge.sourceGroupId}:${p.edge.wareId}`)).size
   let srcIdx = 0
   const outTagEl = container.querySelector('[class*="build-flow-output-card"] [data-tag-id]')
   const gapEnd = outTagEl ? outTagEl.getBoundingClientRect().left - containerRect.left : containerRect.width - 16
@@ -79,7 +80,7 @@ function recalculate() {
     const sk = `${pos.edge.sourceGroupId}:${pos.edge.wareId}`
     if (!srcMidX.has(sk) && !(pos.edge as any).isSelfConnection) {
       const gap = Math.max(gapEnd - pos.x1 - 8, 4)
-      srcMidX.set(sk, pos.x1 + 4 + (srcIdx * gap) / Math.max(positioned.filter(p => !(p.edge as any).isSelfConnection).length, 1))
+      srcMidX.set(sk, pos.x1 + 4 + (srcIdx * gap) / Math.max(totalSources, 1))
       srcIdx++
     }
   }
