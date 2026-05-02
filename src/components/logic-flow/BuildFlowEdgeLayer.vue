@@ -49,6 +49,7 @@ function recalculate() {
   gaps.push({ y: (last?.bottom ?? 0) + 8, idx: cardBounds.length - 1 })
   console.log('[EdgeLayer] cardBounds:', cardBounds.map(c => ({top: c.top.toFixed(0), bottom: c.bottom.toFixed(0)})))
   console.log('[EdgeLayer] gaps:', gaps.map(g => ({idx: g.idx, y: g.y.toFixed(0)})))
+  console.log('[EdgeLayer] edges:', positioned.map(p => ({ y1: p.y1.toFixed(0), y2: p.y2.toFixed(0) })))
 
   const positioned: Array<{
     edge: BuildFlowEdge
