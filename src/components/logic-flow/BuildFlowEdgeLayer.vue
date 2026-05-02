@@ -71,9 +71,20 @@ function recalculate() {
 
   if (positioned.length === 0) { lines.value = []; return }
 
+  const results: RoutedEdge[] = []
   positioned.sort((a, b) => a.y1 - b.y1)
 
-  const results: RoutedEdge[] = []
+  const gapGroups = new Map<string, typeof positioned>()
+  for (const p of positioned) {
+    if ((p.edge as any).isSelfConnection) continue
+    if (p.x2 > p.x1) continue
+    const gk = `${p.srcCardBot}:${p.srcCardTop}-${p.tgtCardTop}:${p.tgtCardBot}`
+    if (!gapGroups.has(gk)) gapGroups.set(gk, [])
+    gapGroups.get(gk)!.push(p)
+  }
+
+  const gapCounters = new Map<string, number>()
+  for (const gk of gapGroups.keys()) gapCounters.set(gk, 0)
 
   const srcMidX = new Map<string, number>()
   const totalSources = new Set(positioned.filter(p => !(p.edge as any).isSelfConnection).map(p => `${p.edge.sourceGroupId}:${p.edge.wareId}`)).size
@@ -89,7 +100,6 @@ function recalculate() {
     }
   }
 
-  let modeBIdx = 0
   positioned.forEach((pos) => {
     const { edge, x1, y1, x2, y2, srcCardBot, srcCardTop, tgtCardBot, tgtCardTop } = pos
     const isSelf = (edge as any).isSelfConnection
@@ -106,20 +116,22 @@ function recalculate() {
       if (Math.abs(y1 - y2) < 4) {
         d = `M ${x1},${y1} L ${x2},${y2}`
       } else {
-        console.log(`[modeA] ware=${edge.wareId} midX=${midX.toFixed(0)} start=(${x1.toFixed(0)},${y1.toFixed(0)}) end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
     } else {
-      const modeBCount = positioned.filter(p => !(p.edge as any).isSelfConnection && p.x2 <= p.x1).length
+      const gk = `${srcCardBot}:${srcCardTop}-${tgtCardTop}:${tgtCardBot}`
+      const ei = gapCounters.get(gk) ?? 0
+      gapCounters.set(gk, ei + 1)
+      const totalInGap = gapGroups.get(gk)?.length ?? 1
+
       const p1X = midX
-      const p3X = 4 + ((modeBIdx + 1) * (x2 - 8)) / Math.max(modeBCount + 1, 1)
       const gapStart = y1 < y2 ? srcCardBot : tgtCardBot
-      const gapEnd = y1 < y2 ? tgtCardTop : srcCardTop
-      const gapSize = Math.max(gapEnd - gapStart, 4)
-      const p2Y = gapStart + ((modeBCount - modeBIdx) * gapSize) / Math.max(modeBCount + 1, 1)
-      console.log(`[modeB] i=${modeBIdx} start=(${x1.toFixed(0)},${y1.toFixed(0)}) p1X=${p1X.toFixed(0)} p3X=${p3X.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
+      const gapEnd2 = y1 < y2 ? tgtCardTop : srcCardTop
+      const gapSize = Math.max(gapEnd2 - gapStart, 4)
+      const p2Y = gapStart + ((ei + 1) * gapSize) / Math.max(totalInGap + 1, 1)
+      const p3X = 4 + ((ei + 1) * (x2 - 8)) / Math.max(totalInGap + 1, 1)
+      console.log(`[modeB] gap=${gk.slice(0,20)} ei=${ei}/${totalInGap} p1X=${p1X.toFixed(0)} p3X=${p3X.toFixed(0)}`)
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
-      modeBIdx++
     }
 
     const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d, color: ec.color, colorIdx: ec.idx })
