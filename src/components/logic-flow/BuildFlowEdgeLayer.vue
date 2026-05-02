@@ -77,8 +77,13 @@ function recalculate() {
     const offset = BASE_OFFSET + i * GAP
     let d: string
 
-    if (x2 > x1 + offset * 2) {
-      d = `M ${x1},${y1} L ${x1 + offset},${y1} L ${x1 + offset},${y2} L ${x2},${y2}`
+    if (x2 > x1) {
+      if (Math.abs(y1 - y2) < 4) {
+        d = `M ${x1},${y1} L ${x2},${y2}`
+      } else {
+        const midX = (x1 + x2) / 2 + i * 4
+        d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
+      }
     } else {
       const p1X = x1 + offset
       const p2Y = y1 < y2 ? cardY2 + 4 + i * 4 : y1 - cardY1 - 4 - i * 4
