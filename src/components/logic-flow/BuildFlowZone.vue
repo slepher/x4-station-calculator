@@ -210,7 +210,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
         :key="group.groupKey"
         class="build-flow-group border border-gray-700 rounded p-3"
       >
-        <div class="flex gap-4 items-center">
+        <div class="flex justify-between items-center">
           <div class="flex flex-col gap-16 shrink-0 ml-[84px] self-start" style="width: 320px">
             <div
               v-for="card in group.lineCards"
