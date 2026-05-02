@@ -932,6 +932,11 @@
     "build_flow_output_card_title": "产出区",
     "build_flow_output_materials": "产出建材",
     "build_flow_unbind": "解绑",
-    "build_flow_empty_hint": "无产线命中建筑材料需求"
+    "build_flow_empty_hint": "无产线命中建筑材料需求",
+    "build_flow_archive_line": "归档产线",
+    "build_flow_archived_count": "已归档 ({count})",
+    "build_flow_archived_lines": "已归档产线",
+    "build_flow_unarchive": "恢复",
+    "build_flow_no_archived_lines": "无归档产线"
   }
 }

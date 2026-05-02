@@ -12,12 +12,16 @@ const logicFlow = useLogicFlowStore()
 const presenter = useBuildFlowPresenter({
   lineCards: computed(() => logicFlow.buildFlowLineCards),
   buildFlowGroups: computed(() => logicFlow.buildFlowGroups),
+  archivedLineCards: computed(() => logicFlow.buildFlowArchivedLineCards),
   assignments: computed(() => logicFlow.buildFlowAssignments),
   isDragging: computed(() => logicFlow.isBuildFlowDragging),
+  archivedGroupIds: computed(() => logicFlow.archivedBuildFlowGroupIds),
   bindAssignment: logicFlow.bindBuildFlowAssignment,
   unbindAssignment: logicFlow.unbindBuildFlowAssignment,
   startBuildFlowDrag: logicFlow.startBuildFlowDrag,
-  stopBuildFlowDrag: logicFlow.stopBuildFlowDrag
+  stopBuildFlowDrag: logicFlow.stopBuildFlowDrag,
+  archiveGroup: logicFlow.archiveBuildFlowGroup,
+  unarchiveGroup: logicFlow.unarchiveBuildFlowGroup
 })
 
 const shouldHide = computed(() => {
@@ -25,6 +29,9 @@ const shouldHide = computed(() => {
 })
 
 const hasContent = computed(() => presenter.lineCards.value.length > 0)
+const hasArchived = computed(() => presenter.archivedGroupIds.value.length > 0)
+
+const showArchiveModal = ref(false)
 
 const cardIndexByGroupId = computed(() => {
   const map = new Map<string, number>()
@@ -225,8 +232,17 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
     v-if="hasContent && !shouldHide"
     class="build-flow-zone border border-dashed border-gray-600 rounded-lg p-3 space-y-3"
   >
-    <div class="text-xs text-gray-400 font-medium uppercase tracking-wide">
-      {{ t('buildFlow.build_flow_zone_title') }}
+    <div class="flex justify-between items-center">
+      <div class="text-xs text-gray-400 font-medium uppercase tracking-wide">
+        {{ t('buildFlow.build_flow_zone_title') }}
+      </div>
+      <button
+        v-if="hasArchived"
+        class="text-xs text-gray-500 hover:text-gray-300 transition-colors"
+        @click="showArchiveModal = true"
+      >
+        {{ t('buildFlow.build_flow_archived_count', { count: presenter.archivedGroupIds.value.length }) }}
+      </button>
     </div>
 
     <div class="build-flow-groups grid gap-5" :class="presenter.buildFlowGroups.value.length === 1 ? '' : 'grid-cols-2'">
@@ -240,9 +256,18 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             <div
               v-for="card in sg.lineCards"
               :key="card.groupId"
-              class="build-flow-line-card bg-gray-800/60 border border-gray-600 rounded p-2"
+              class="build-flow-line-card bg-gray-800/60 border border-gray-600 rounded p-2 relative"
             >
-              <div class="text-xs text-gray-300 font-medium mb-2 truncate" :title="card.title">{{ card.title }}</div>
+              <button
+                class="archive-btn absolute top-1 right-1 w-5 h-5 flex items-center justify-center text-gray-500 hover:text-amber-400 transition-colors"
+                :title="t('buildFlow.build_flow_archive_line')"
+                @click="presenter.archiveGroup(card.groupId)"
+              >
+                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-10 4h4" />
+                </svg>
+              </button>
+              <div class="text-xs text-gray-300 font-medium mb-2 truncate pr-4" :title="card.title">{{ card.title }}</div>
               <div class="flex flex-col gap-1">
                 <div class="flex justify-between">
                   <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_build_materials') }}</span>
@@ -361,6 +386,39 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           >
             <span class="flex-1 truncate">{{ target.targetType === 'line-build-material' ? target.cardTitle : t('buildFlow.build_flow_output_card_title') }}</span>
           </button>
+        </div>
+      </div>
+    </Teleport>
+
+    <Teleport to="body">
+      <div
+        v-if="showArchiveModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-black/50"
+        @click.self="showArchiveModal = false"
+      >
+        <div class="bg-gray-800 border border-gray-600 rounded-lg shadow-lg w-80 max-h-60 overflow-hidden">
+          <div class="flex justify-between items-center px-4 py-3 border-b border-gray-700">
+            <div class="text-sm font-medium text-gray-200">{{ t('buildFlow.build_flow_archived_lines') }}</div>
+            <button class="text-gray-500 hover:text-gray-300" @click="showArchiveModal = false">&times;</button>
+          </div>
+          <div class="p-2 overflow-y-auto max-h-40 custom-scrollbar">
+            <div
+              v-for="card in presenter.archivedLineCards.value"
+              :key="card.groupId"
+              class="flex justify-between items-center px-3 py-2 rounded hover:bg-gray-700/50"
+            >
+              <div class="text-xs text-gray-300 truncate">{{ card.title }}</div>
+              <button
+                class="text-xs text-amber-400 hover:text-amber-200 transition-colors"
+                @click="presenter.unarchiveGroup(card.groupId)"
+              >
+                {{ t('buildFlow.build_flow_unarchive') }}
+              </button>
+            </div>
+            <div v-if="presenter.archivedLineCards.value.length === 0" class="text-xs text-gray-500 text-center py-4">
+              {{ t('buildFlow.build_flow_no_archived_lines') }}
+            </div>
+          </div>
         </div>
       </div>
     </Teleport>

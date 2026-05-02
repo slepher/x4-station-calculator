@@ -11,12 +11,16 @@ import { computeTargetKey } from '@/store/logic/buildFlowDerivation'
 export interface BuildFlowPresenterStore {
   lineCards: ComputedRef<BuildFlowLineCard[]>
   buildFlowGroups: ComputedRef<BuildFlowGroup[]>
+  archivedLineCards: ComputedRef<BuildFlowLineCard[]>
   assignments: Ref<BuildFlowAssignment[]> | BuildFlowAssignment[]
   isDragging: ComputedRef<boolean>
+  archivedGroupIds: Ref<string[]> | string[]
   bindAssignment(assignment: BuildFlowAssignment): void
   unbindAssignment(targetKey: string): void
   startBuildFlowDrag(): void
   stopBuildFlowDrag(): void
+  archiveGroup(groupId: string): void
+  unarchiveGroup(groupId: string): void
 }
 
 export interface BuildFlowEdge {
@@ -54,6 +58,8 @@ export interface UseBuildFlowPresenterReturn {
   cardRows: ComputedRef<BuildFlowRow[][]>
   edges: ComputedRef<BuildFlowEdge[]>
   isDragging: ComputedRef<boolean>
+  archivedGroupIds: ComputedRef<string[]>
+  archivedLineCards: ComputedRef<BuildFlowLineCard[]>
   getTargetsForSource(wareId: string, sourceGroupId: string): MenuTargetItem[]
   getSourcesForTarget(wareId: string, targetGroupKey: string): MenuTargetItem[]
   bindFromMenu(sourceGroupId: string, wareId: string, target: MenuTargetItem): void
@@ -63,6 +69,8 @@ export interface UseBuildFlowPresenterReturn {
   stopDrag(): void
   getTargetKeyForAssignment(assignment: BuildFlowAssignment): string
   getBoundSourceForTarget(targetKey: string): ComputedRef<BuildFlowAssignment | undefined>
+  archiveGroup(groupId: string): void
+  unarchiveGroup(groupId: string): void
 }
 
 export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildFlowPresenterReturn {
@@ -71,9 +79,16 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     return Array.isArray(a) ? a : a.value
   }
 
+  const getArchivedGroupIds = () => {
+    const a = store.archivedGroupIds
+    return Array.isArray(a) ? a : a.value
+  }
+
   const lineCards = computed(() => store.lineCards.value)
   const buildFlowGroups = computed(() => store.buildFlowGroups.value)
   const isDragging = computed(() => store.isDragging.value)
+  const archivedGroupIds = computed(() => getArchivedGroupIds())
+  const archivedLineCards = computed(() => store.archivedLineCards.value)
 
   const groupIdToGroupKey = computed(() => {
     const map = new Map<string, string>()
@@ -225,6 +240,14 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     store.stopBuildFlowDrag()
   }
 
+  function archiveGroup(groupId: string): void {
+    store.archiveGroup(groupId)
+  }
+
+  function unarchiveGroup(groupId: string): void {
+    store.unarchiveGroup(groupId)
+  }
+
   function getTargetKeyForAssignment(assignment: BuildFlowAssignment): string {
     return computeTargetKey(assignment)
   }
@@ -241,6 +264,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     cardRows,
     edges,
     isDragging,
+    archivedGroupIds,
+    archivedLineCards,
     getTargetsForSource,
     getSourcesForTarget,
     bindFromMenu,
@@ -249,6 +274,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     startDrag,
     stopDrag,
     getTargetKeyForAssignment,
-    getBoundSourceForTarget
+    getBoundSourceForTarget,
+    archiveGroup,
+    unarchiveGroup
   }
 }

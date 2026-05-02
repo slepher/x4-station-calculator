@@ -437,3 +437,184 @@ Vue 组件通过 presenter 取数和触发行为，不得直接访问 store。
 - `BuildFlowZone` 的自动隐藏必须彻底脱离命中树，避免隐藏但仍占据拖拽命中区域。
 - 分组是动态推导结果，不持久化。分组重组时必须清理跨组 assignments。
 - 分组容器内连线仍在同一 SVG 层渲染，需确保分组容器的 position 不会导致连线坐标系偏移。
+
+---
+
+## 增量功能：产线归档 (Archive)
+
+### 目标
+
+允许用户将建筑产线区内的产线"归档"，归档后的产线不再参与建筑产线区的计算与显示，但仍存在于规划区。用户可通过标题栏图标查看和恢复归档产线。
+
+### 数据模型
+
+在 `BuildFlowPlanData` 新增可选字段：
+
+```ts
+interface BuildFlowPlanData {
+  assignments: BuildFlowAssignment[]
+  archivedGroupIds?: string[]  // 新增：归档产线的 groupId 列表
+}
+```
+
+### 派生计算调整
+
+#### computeDemandMaterialSet
+
+新增 `archivedGroupIds` 参数，排除归档产线的 buildCost：
+
+```ts
+export function computeDemandMaterialSet(
+  groups: ProductionLineGroup[],
+  modulesMap: Record<string, X4Module>,
+  archivedGroupIds: Set<string>  // 新增参数
+): Set<string>
+```
+
+逻辑变更：遍历 groups 时跳过 `archivedGroupIds.has(group.id)` 的产线。
+
+#### deriveBuildFlowView
+
+新增 `archivedGroupIds` 参数，透传至 `computeDemandMaterialSet`，并在筛选入选产线时排除归档产线：
+
+```ts
+export function deriveBuildFlowView(
+  groups: ProductionLineGroup[],
+  modulesMap: Record<string, X4Module>,
+  groupDisplayNames: Map<string, string>,
+  getWareLabel: (wareId: string) => string,
+  archivedGroupIds: Set<string>  // 新增参数
+): { ... }
+```
+
+### Store 新增
+
+#### 状态
+
+```ts
+const archivedGroupIds = ref<string[]>([])
+```
+
+#### 方法
+
+```ts
+function archiveGroup(groupId: string): void {
+  if (archivedGroupIds.value.includes(groupId)) return
+  archivedGroupIds.value.push(groupId)
+  // 清理该产线相关的 assignments
+  buildFlowAssignments.value = buildFlowAssignments.value.filter(a => 
+    a.sourceGroupId !== groupId && a.targetGroupId !== groupId
+  )
+}
+
+function unarchiveGroup(groupId: string): void {
+  const idx = archivedGroupIds.value.indexOf(groupId)
+  if (idx === -1) return
+  archivedGroupIds.value.splice(idx, 1)
+}
+```
+
+#### 持久化
+
+`saveCurrentPlan` 新增 `archivedGroupIds` 写入：
+
+```ts
+buildFlow: {
+  assignments: [...buildFlowAssignments.value],
+  archivedGroupIds: archivedGroupIds.value.length > 0 
+    ? [...archivedGroupIds.value] 
+    : undefined
+}
+```
+
+`applyPlan` 新增恢复：
+
+```ts
+archivedGroupIds.value = plan.buildFlow?.archivedGroupIds 
+  ? [...plan.buildFlow.archivedGroupIds] 
+  : []
+```
+
+### UI 设计
+
+#### 产线 Card 右上角 Archive 图标
+
+在每个产线 card 标题行右侧添加 archive 图标（仅对非归档产线显示）：
+
+- 图标：使用 archive-box 或类似图标
+- 点击效果：调用 `archiveGroup(groupId)`
+- 视觉：灰色小图标，hover 时高亮
+
+#### 标题栏 Archive 图标
+
+在 `BuildFlowZone` 标题行右侧添加 archive 图标：
+
+- 仅当 `archivedGroupIds.length > 0` 时显示
+- 图标样式与产线 card 的 archive 图标一致
+- 点击效果：弹出 Modal 显示归档产线列表
+
+#### Archive Modal
+
+Modal 内容：
+
+- 标题：已归档产线
+- 列表：每条归档产线显示为简化版 card（只显示产线名称）
+- 每条 card 右上角：点击恢复图标，调用 `unarchiveGroup(groupId)`，恢复后 card 从列表消失
+- 若列表为空（全部恢复），Modal 自动关闭
+
+### Presenter 调整
+
+`useBuildFlowPresenter` 新增：
+
+```ts
+interface BuildFlowPresenterStore {
+  // ...existing
+  archivedGroupIds: ComputedRef<string[]>
+  archiveGroup(groupId: string): void
+  unarchiveGroup(groupId: string): void
+}
+
+// 新增返回
+archivedLineCards: ComputedRef<BuildFlowLineCard[]>  // 归档产线的 card 数据
+```
+
+`archivedLineCards` 计算逻辑：从 `lineCards` 中筛选 `archivedGroupIds` 包含的产线。
+
+### Locales 新增
+
+```json
+// zh-CN
+{
+  "build_flow_archive": "归档",
+  "build_flow_unarchive": "恢复",
+  "build_flow_archived_title": "已归档产线",
+  "build_flow_archived_empty": "无归档产线"
+}
+
+// en
+{
+  "build_flow_archive": "Archive",
+  "build_flow_unarchive": "Restore",
+  "build_flow_archived_title": "Archived Lines",
+  "build_flow_archived_empty": "No archived lines"
+}
+```
+
+### 涉及文件
+
+| 文件 | 改动 |
+|---|---|
+| `src/types/x4.ts` | `BuildFlowPlanData` 新增 `archivedGroupIds` |
+| `src/store/logic/buildFlowDerivation.ts` | `computeDemandMaterialSet` / `deriveBuildFlowView` 新增参数 |
+| `src/store/useLogicFlowStore.ts` | 新增 `archivedGroupIds` / `archiveGroup` / `unarchiveGroup`，修改 `saveCurrentPlan` / `applyPlan` |
+| `src/components/logic-flow/presenters/useBuildFlowPresenter.ts` | 新增 `archivedLineCards` / archive 方法 |
+| `src/components/logic-flow/BuildFlowZone.vue` | 新增 archive 图标 + Modal |
+| `src/locales/zh-CN.json` / `en.json` | 新增 i18n 文本 |
+
+### 行为边界
+
+- 归档产线不参与"需求原材料"计算（buildCost 排除）
+- 归档产线不显示在建筑产线区
+- 归档时清理该产线相关的 assignments（来源或目标）
+- 归档产线仍存在于规划区，不受影响
+- 恢复归档产线后重新参与建筑产线区计算

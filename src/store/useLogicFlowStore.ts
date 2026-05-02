@@ -35,6 +35,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const settings = ref<LogicFlowSettings>({ isDefaultLocked: true })
   const buildFlowAssignments = ref<BuildFlowAssignment[]>([])
   const isBuildFlowDragging = ref(false)
+  const archivedBuildFlowGroupIds = ref<string[]>([])
 
   function buildSnapshot() {
     return JSON.stringify({ groups: groups.value, settings: settings.value, buildFlowAssignments: buildFlowAssignments.value })
@@ -52,10 +53,11 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       const displayName = getLogicFlowGroupDisplayName(group, (wareId: string) => gameData.getWareDisplayName(wareId))
       displayNames.set(group.id, displayName)
     }
-    return deriveBuildFlowView(groups.value, gameData.modulesMap, displayNames, (wareId) => gameData.getWareDisplayName(wareId))
+    return deriveBuildFlowView(groups.value, gameData.modulesMap, displayNames, (wareId) => gameData.getWareDisplayName(wareId), archivedBuildFlowGroupIds.value)
   })
 
   const buildFlowLineCards = computed(() => buildFlowView.value.lineCards)
+  const buildFlowArchivedLineCards = computed(() => buildFlowView.value.archivedLineCards)
   const buildFlowGroups = computed(() => buildFlowView.value.buildFlowGroups)
   const demandMaterialSet = computed(() => buildFlowView.value.demandMaterialSet)
 
@@ -83,6 +85,21 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
 
   function stopBuildFlowDrag() {
     isBuildFlowDragging.value = false
+  }
+
+  function archiveBuildFlowGroup(groupId: string) {
+    if (!archivedBuildFlowGroupIds.value.includes(groupId)) {
+      archivedBuildFlowGroupIds.value.push(groupId)
+      runBuildFlowCleanup()
+    }
+  }
+
+  function unarchiveBuildFlowGroup(groupId: string) {
+    const idx = archivedBuildFlowGroupIds.value.indexOf(groupId)
+    if (idx !== -1) {
+      archivedBuildFlowGroupIds.value.splice(idx, 1)
+      runBuildFlowCleanup()
+    }
   }
 
   watch(groups, () => {
@@ -1053,8 +1070,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       name: planName,
       groups: groups.value.map(toSavedFlowGroup),
       settings: { ...settings.value },
-      buildFlow: buildFlowAssignments.value.length > 0
-        ? { assignments: [...buildFlowAssignments.value] }
+      buildFlow: (buildFlowAssignments.value.length > 0 || archivedBuildFlowGroupIds.value.length > 0)
+        ? { assignments: [...buildFlowAssignments.value], archivedGroupIds: [...archivedBuildFlowGroupIds.value] }
         : undefined,
       lastUpdated: Date.now()
     }
@@ -1112,6 +1129,9 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     activeGroupId.value = null
     buildFlowAssignments.value = plan.buildFlow?.assignments
       ? [...plan.buildFlow.assignments]
+      : []
+    archivedBuildFlowGroupIds.value = plan.buildFlow?.archivedGroupIds
+      ? [...plan.buildFlow.archivedGroupIds]
       : []
     currentPlanName.value = plan.name
     savedPlans.value.activeId = plan.id
@@ -1255,6 +1275,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     groups.value = []
     activeGroupId.value = null
     buildFlowAssignments.value = []
+    archivedBuildFlowGroupIds.value = []
     currentPlanName.value = ''
     savedPlans.value.activeId = null
     settings.value = { isDefaultLocked: true }
@@ -1348,13 +1369,17 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     // Build Flow
     buildFlowAssignments,
     buildFlowLineCards,
+    buildFlowArchivedLineCards,
     buildFlowGroups,
     demandMaterialSet,
     isBuildFlowDragging,
+    archivedBuildFlowGroupIds,
     bindBuildFlowAssignment,
     unbindBuildFlowAssignment,
     runBuildFlowCleanup,
     startBuildFlowDrag,
     stopBuildFlowDrag,
+    archiveBuildFlowGroup,
+    unarchiveBuildFlowGroup,
   }
 })

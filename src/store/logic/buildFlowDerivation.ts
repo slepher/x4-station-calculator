@@ -27,10 +27,13 @@ export function getManualProductNodes(group: ProductionLineGroup): FlowNode[] {
 
 export function computeDemandMaterialSet(
   groups: ProductionLineGroup[],
-  modulesMap: Record<string, X4Module>
+  modulesMap: Record<string, X4Module>,
+  archivedGroupIds?: string[]
 ): Set<string> {
   const wareSet = new Set<string>()
+  const archivedSet = new Set(archivedGroupIds || [])
   for (const group of groups) {
+    if (archivedSet.has(group.id)) continue
     const scopeNodes = getModuleScopeNodes(group, modulesMap)
     for (const node of scopeNodes) {
       const mod = modulesMap[node.moduleId!]
@@ -187,29 +190,45 @@ export function deriveBuildFlowView(
   groups: ProductionLineGroup[],
   modulesMap: Record<string, X4Module>,
   groupDisplayNames: Map<string, string>,
-  getWareLabel: (wareId: string) => string
+  getWareLabel: (wareId: string) => string,
+  archivedGroupIds?: string[]
 ): {
   demandMaterialSet: Set<string>
   lineCards: BuildFlowLineCard[]
+  archivedLineCards: BuildFlowLineCard[]
   buildFlowGroups: BuildFlowGroup[]
 } {
-  const demandMaterialSet = computeDemandMaterialSet(groups, modulesMap)
+  const demandMaterialSet = computeDemandMaterialSet(groups, modulesMap, archivedGroupIds)
+  const archivedSet = new Set(archivedGroupIds || [])
 
-  const lineCardsWithSource: Array<{ group: ProductionLineGroup; sourceTags: BuildFlowTag[] }> = []
+  const activeItems: Array<{ group: ProductionLineGroup; sourceTags: BuildFlowTag[] }> = []
+  const archivedItems: Array<{ group: ProductionLineGroup; sourceTags: BuildFlowTag[] }> = []
+  
   for (const group of groups) {
     if (!isGroupInBuildFlow(group, demandMaterialSet)) continue
     const sourceTags = computeSourceTags(group, demandMaterialSet, getWareLabel)
-    lineCardsWithSource.push({ group, sourceTags })
+    if (archivedSet.has(group.id)) {
+      archivedItems.push({ group, sourceTags })
+    } else {
+      activeItems.push({ group, sourceTags })
+    }
   }
 
   const outputMaterialWareIds = new Set<string>()
-  for (const item of lineCardsWithSource) {
+  for (const item of activeItems) {
     for (const tag of item.sourceTags) {
       outputMaterialWareIds.add(tag.wareId)
     }
   }
 
-  const lineCards: BuildFlowLineCard[] = lineCardsWithSource.map(({ group, sourceTags }) => ({
+  const lineCards: BuildFlowLineCard[] = activeItems.map(({ group, sourceTags }) => ({
+    groupId: group.id,
+    title: groupDisplayNames.get(group.id) || group.name || group.id,
+    sourceTags,
+    buildMaterialTags: computeBuildMaterialTags(group, outputMaterialWareIds, modulesMap, getWareLabel)
+  }))
+
+  const archivedLineCards: BuildFlowLineCard[] = archivedItems.map(({ group, sourceTags }) => ({
     groupId: group.id,
     title: groupDisplayNames.get(group.id) || group.name || group.id,
     sourceTags,
@@ -218,7 +237,7 @@ export function deriveBuildFlowView(
 
   const buildFlowGroups = computeBuildFlowGroups(lineCards)
 
-  return { demandMaterialSet, lineCards, buildFlowGroups }
+  return { demandMaterialSet, lineCards, archivedLineCards, buildFlowGroups }
 }
 
 export function computeTargetKey(assignment: BuildFlowAssignment): string {

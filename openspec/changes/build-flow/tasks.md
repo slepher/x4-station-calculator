@@ -65,18 +65,40 @@
 
 当前阶段 UI 改动仅限于：将单一产出区 card 拆为按组的多个产出区 card。产线 card 布局不变。
 
-- [ ] T27. 在 `src/types/x4.ts` 新增 `BuildFlowGroup` 类型（`groupKey`、`lineCardGroupIds`、`outputTags`），移除 `BuildFlowOutputCard` 类型
-- [ ] T28. 在 `buildFlowDerivation.ts` 实现 `computeBuildFlowGroups()` 递归扩散分组算法
-- [ ] T29. 重构 `deriveBuildFlowView()` 返回 `BuildFlowGroup[]` 替代原来的 `lineCards + outputCard`，保持 demandMaterialSet 不变
-- [ ] T30. 适配 `useLogicFlowStore`：将 `buildFlowLineCards` / `buildFlowOutputCard` 替换为 `buildFlowGroups` computed
-- [ ] T31. 适配 `useBuildFlowPresenter`：
+- [x] T27. 在 `src/types/x4.ts` 新增 `BuildFlowGroup` 类型（`groupKey`、`lineCardGroupIds`、`outputTags`），移除 `BuildFlowOutputCard` 类型
+- [x] T28. 在 `buildFlowDerivation.ts` 实现 `computeBuildFlowGroups()` 递归扩散分组算法
+- [x] T29. 重构 `deriveBuildFlowView()` 返回 `BuildFlowGroup[]` 替代原来的 `lineCards + outputCard`，保持 demandMaterialSet 不变
+- [x] T30. 适配 `useLogicFlowStore`：将 `buildFlowLineCards` / `buildFlowOutputCard` 替换为 `buildFlowGroups` computed
+- [x] T31. 适配 `useBuildFlowPresenter`：
   - `BuildFlowPresenterStore` 接口替换 `outputCard` 为 `buildFlowGroups`
   - `getTargetsForSource()` 限制为同组内目标
   - `getSourcesForTarget()` 限制为同组内来源
   - `edges` 计算不变
-- [ ] T32. 适配 `BuildFlowZone.vue`：渲染多个产出区 card（每组一个），替代原来单一产出区；菜单目标列表过滤为同组内
-- [ ] T33. 在 `cleanupStaleAssignments()` 新增跨组 assignment 清理规则
-- [ ] T34. 执行 `npm run build` 确认构建通过
+- [x] T32. 适配 `BuildFlowZone.vue`：渲染多个产出区 card（每组一个），替代原来单一产出区；菜单目标列表过滤为同组内
+- [x] T33. 在 `cleanupStaleAssignments()` 新增跨组 assignment 清理规则
+- [x] T34. 执行 `npm run build` 确认构建通过
+
+### Phase 8: 产线归档 (Archive)
+
+- [x] T35. 在 `src/types/x4.ts` 的 `BuildFlowPlanData` 新增 `archivedGroupIds?: string[]` 字段
+- [x] T36. 修改 `buildFlowDerivation.ts`：
+  - `computeDemandMaterialSet` 新增 `archivedGroupIds` 参数，排除归档产线
+  - `deriveBuildFlowView` 新增 `archivedGroupIds` 参数，透传并排除归档产线
+- [x] T37. 修改 `useLogicFlowStore.ts`：
+  - 新增 `archivedGroupIds` ref
+  - 新增 `archiveGroup` / `unarchiveGroup` 方法
+  - 修改 `saveCurrentPlan` 保存 `archivedGroupIds`
+  - 修改 `applyPlan` 恢复 `archivedGroupIds`
+  - 修改 `buildFlowView` computed 传递 `archivedGroupIds`
+- [x] T38. 修改 `useBuildFlowPresenter.ts`：
+  - `BuildFlowPresenterStore` 接口新增 `archivedGroupIds` / `archiveGroup` / `unarchiveGroup`
+  - 新增 `archivedLineCards` computed 返回归档产线数据
+- [x] T39. 修改 `BuildFlowZone.vue`：
+  - 产线 card 右上角添加 archive 图标（仅非归档产线）
+  - 标题栏右侧添加 archive 图标（仅当有归档产线时显示）
+  - 新增 Archive Modal 组件，显示归档产线列表，提供恢复功能
+- [x] T40. 在 `locales/zh-CN.json` 和 `locales/en.json` 新增归档相关 i18n 文本
+- [x] T41. 执行 `npm run build` 确认构建通过
 
 ## 完成定义
 

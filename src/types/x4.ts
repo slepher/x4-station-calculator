@@ -728,6 +728,7 @@ export interface BuildFlowAssignment {
 
 export interface BuildFlowPlanData {
   assignments: BuildFlowAssignment[]
+  archivedGroupIds?: string[]
 }
 
 export interface BuildFlowTag {
