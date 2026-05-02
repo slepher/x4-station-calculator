@@ -100,6 +100,7 @@ function recalculate() {
     const approachX = x2 - approachOffset
     const d = `M ${x1},${y1} L ${exitX},${y1} L ${exitX},${routeY} L ${approachX},${routeY} L ${approachX},${y2} L ${x2},${y2}`
     results.push({ id: edge.id, d })
+    console.log(`[edge] ${edge.id.slice(0,30)} gap=${bestGap!.idx} lane=${lane} routeY=${routeY.toFixed(1)} | ${x1.toFixed(0)},${y1.toFixed(0)} → ${x2.toFixed(0)},${y2.toFixed(0)}`) 
   })
 
   lines.value = results
