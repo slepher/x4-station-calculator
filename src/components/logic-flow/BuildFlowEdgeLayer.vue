@@ -101,6 +101,7 @@ function recalculate() {
       if (Math.abs(y1 - y2) < 4) {
         d = `M ${x1},${y1} L ${x2},${y2}`
       } else {
+        console.log(`[modeA] ware=${edge.wareId} midX=${midX.toFixed(0)} start=(${x1.toFixed(0)},${y1.toFixed(0)}) end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
     } else {
