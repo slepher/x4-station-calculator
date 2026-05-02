@@ -70,7 +70,17 @@ function recalculate() {
   if (positioned.length === 0) { lines.value = []; return }
 
   const results: RoutedEdge[] = []
-  let modeAIdx = 0
+
+  const srcMidX = new Map<string, number>()
+  let srcIdx = 0
+  for (const pos of positioned) {
+    const sk = `${pos.edge.sourceGroupId}:${pos.edge.wareId}`
+    if (!srcMidX.has(sk)) {
+      srcMidX.set(sk, pos.x1 + 4 + (srcIdx * (containerRect.width - pos.x1 - 8)) / Math.max(positioned.length, 1))
+      srcIdx++
+    }
+  }
+
   let modeBIdx = 0
   positioned.forEach((pos) => {
     const { edge, x1, y1, x2, y2, srcCardBot, srcCardTop, tgtCardBot, tgtCardTop } = pos
@@ -80,20 +90,19 @@ function recalculate() {
       return
     }
 
+    const sk = `${edge.sourceGroupId}:${edge.wareId}`
+    const midX = srcMidX.get(sk) ?? x1 + 4
     let d: string
 
     if (x2 > x1) {
       if (Math.abs(y1 - y2) < 4) {
         d = `M ${x1},${y1} L ${x2},${y2}`
       } else {
-        const midX = Math.min(x1 + (modeAIdx + 1) * 4, x2 - 4)
-        console.log(`[modeA] i=${modeAIdx} start=(${x1.toFixed(0)},${y1.toFixed(0)}) midX=${midX.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
-      modeAIdx++
     } else {
       const modeBCount = positioned.filter(p => !(p.edge as any).isSelfConnection && p.x2 <= p.x1).length
-      const p1X = x1 + 4 + (modeBIdx * (containerRect.width - x1 - 8)) / Math.max(modeBCount, 1)
+      const p1X = midX
       const p3X = 4 + (modeBIdx * (x2 - 8)) / Math.max(modeBCount, 1)
       const gapStart = y1 < y2 ? srcCardBot : tgtCardBot
       const gapEnd = y1 < y2 ? tgtCardTop : srcCardTop
