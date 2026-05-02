@@ -71,6 +71,8 @@ function recalculate() {
 
   if (positioned.length === 0) { lines.value = []; return }
 
+  positioned.sort((a, b) => a.y1 - b.y1)
+
   const results: RoutedEdge[] = []
 
   const srcMidX = new Map<string, number>()
