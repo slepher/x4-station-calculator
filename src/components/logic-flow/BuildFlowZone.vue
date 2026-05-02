@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { VueFlow } from '@vue-flow/core'
+import { VueFlow, Handle, Position } from '@vue-flow/core'
 import '@vue-flow/core/dist/style.css'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useBuildFlowPresenter, type MenuTargetItem } from './presenters/useBuildFlowPresenter'
@@ -78,8 +78,9 @@ const groupEdges = computed(() => {
   for (const a of logicFlow.buildFlowAssignments) {
     const gKey = getGroupKeyForGroupId(presenter.buildFlowGroups.value, a.sourceGroupId)
     if (!result.has(gKey)) result.set(gKey, [])
-    const targetId = a.targetType === 'line-build-material' ? `line:${a.targetGroupId}` : `output:${gKey}`
-    result.get(gKey)!.push({ id: `e:${a.sourceGroupId}:${a.wareId}:${a.targetType}`, source: `line:${a.sourceGroupId}`, target: targetId, type: 'step', style: { stroke: 'rgba(251,146,60,0.7)', strokeWidth: 2 } })
+    const targetNodeId = a.targetType === 'line-build-material' ? `line:${a.targetGroupId}` : `output:${gKey}`
+    const targetHandle = a.targetType === 'line-build-material' ? `tgt:${a.wareId}` : `out:${a.wareId}`
+    result.get(gKey)!.push({ id: `e:${a.sourceGroupId}:${a.wareId}:${a.targetType}`, source: `line:${a.sourceGroupId}`, sourceHandle: `src:${a.wareId}`, target: targetNodeId, targetHandle, type: 'step', style: { stroke: 'rgba(251,146,60,0.7)', strokeWidth: 2 } })
   }
   return result
 })
@@ -267,14 +268,15 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           :no-wheel-class-name="'no-wheel'"
         >
           <template #node-card="nodeProps">
-            <div class="bg-gray-800/60 border border-gray-600 rounded p-2" style="width:320px">
+            <div class="bg-gray-800/60 border border-gray-600 rounded p-2 relative" style="width:320px">
               <div class="text-xs text-gray-300 font-medium mb-2 truncate">{{ nodeProps.data.card.title }}</div>
               <div class="flex flex-col gap-1">
                 <div class="flex justify-between">
                   <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_build_materials') }}</span>
                   <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_source_materials') }}</span>
                 </div>
-                <div v-for="row in nodeProps.data.cardRows" :key="row.wareId" class="flex justify-between items-center" style="min-height: 24px">
+                <div v-for="(row) in nodeProps.data.cardRows" :key="row.wareId" class="flex justify-between items-center" style="min-height: 24px; position: relative">
+                  <Handle v-if="row.buildMaterialTag" type="target" :position="Position.Left" :id="`tgt:${row.wareId}`" :style="{ top: '12px' }" class="!bg-transparent !border-0 !w-2 !h-2" />
                   <span v-if="row.buildMaterialTag" class="build-flow-tag build-flow-target-tag whitespace-nowrap" :data-tag-id="row.buildMaterialTag.tagId" @dragover.prevent @drop.prevent="onTargetDrop('line-build-material', nodeProps.data.card.groupId)">
                     <button class="target-tag-segment target-tag-segment-add" :class="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'" @click.stop="onTargetTagPlusClick(row.buildMaterialTag.wareId, row.buildMaterialTag.tagId, 'line-build-material', nodeProps.data.card.groupId, nodeProps.data.groupKey, $event)">+</button>
                     <span class="target-tag-segment target-tag-segment-main" :class="[boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300']">
@@ -283,6 +285,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                     </span>
                   </span>
                   <div v-else class="w-[142px] h-[24px] shrink-0"></div>
+                  <Handle v-if="row.sourceTag" type="source" :position="Position.Right" :id="`src:${row.wareId}`" :style="{ top: '12px' }" class="!bg-transparent !border-0 !w-2 !h-2" />
                   <span v-if="row.sourceTag" class="build-flow-tag build-flow-source-tag whitespace-nowrap" :data-tag-id="row.sourceTag.tagId" draggable="true" @dragstart="onSourceDragStart(nodeProps.data.card.groupId, row.sourceTag.wareId)" @dragend="onSourceDragEnd">
                     <span class="source-tag-segment source-tag-segment-main"><span class="source-tag-text">{{ row.sourceTag.label }}</span></span>
                     <button class="source-tag-segment source-tag-segment-add" @click.stop="onPlusClick(nodeProps.data.card.groupId, row.sourceTag.wareId, row.sourceTag.tagId, $event)">+</button>
@@ -293,11 +296,12 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             </div>
           </template>
           <template #node-output="nodeProps">
-            <div class="bg-gray-800/60 border border-gray-600 rounded p-2" style="width:160px">
+            <div class="bg-gray-800/60 border border-gray-600 rounded p-2 relative" style="width:160px">
               <div class="text-xs text-gray-300 font-medium mb-2">{{ t('buildFlow.build_flow_output_card_title') }}</div>
               <div class="flex justify-start mb-1"><span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_output_materials') }}</span></div>
               <div class="build-flow-target-list flex flex-col gap-1 items-start">
-                <span v-for="tag in nodeProps.data.outputTags" :key="tag.tagId" class="build-flow-tag build-flow-target-tag whitespace-nowrap" :data-tag-id="tag.tagId" @dragover.prevent @drop.prevent="onTargetDrop('output-material')">
+                <span v-for="tag in nodeProps.data.outputTags" :key="tag.tagId" class="build-flow-tag build-flow-target-tag whitespace-nowrap relative" :data-tag-id="tag.tagId" @dragover.prevent @drop.prevent="onTargetDrop('output-material')">
+                  <Handle type="target" :position="Position.Left" :id="`out:${tag.wareId}`" :style="{ top: '12px' }" class="!bg-transparent !border-0 !w-2 !h-2" />
                   <button class="target-tag-segment target-tag-segment-add" :class="boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'" @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, nodeProps.data.groupKey, $event)">+</button>
                   <span class="target-tag-segment target-tag-segment-main" :class="[boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300']">
                     <span class="target-tag-text">{{ tag.label }}</span>
