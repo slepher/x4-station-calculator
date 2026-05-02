@@ -1,10 +1,9 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { VueFlow, Handle, Position } from '@vue-flow/core'
-import '@vue-flow/core/dist/style.css'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useBuildFlowPresenter, type MenuTargetItem } from './presenters/useBuildFlowPresenter'
+import BuildFlowEdgeLayer from './BuildFlowEdgeLayer.vue'
 import type { BuildFlowTag, BuildFlowTargetType } from '@/types/x4'
 
 const { t } = useI18n()
@@ -53,45 +52,6 @@ function getSortedRows(cardGroupId: string, order: Map<string, number>) {
   return rows
 }
 
-const CARD_W = 320, OUT_W = 160, CARD_GAP = 64
-const groupNodes = computed(() => {
-  const result: any[] = []
-  const groups = presenter.buildFlowGroups.value
-  groups.forEach((group, gi) => {
-    const nodes: any[] = []
-    let y = 0
-    group.lineCards.forEach(card => {
-      const rows = Math.max(card.sourceTags.length, card.buildMaterialTags.length)
-      const h = 50 + rows * 28
-      nodes.push({ id: `line:${card.groupId}`, type: 'card', position: { x: 96, y }, data: { card, groupKey: group.groupKey, cardRows: getSortedRows(card.groupId, sortedGroupTags.value[gi]?.order ?? new Map()) }, style: { width: `${CARD_W}px`, height: `${h}px` } })
-      y += h + CARD_GAP
-    })
-    const outH = 50 + group.outputTags.length * 28
-    nodes.push({ id: `output:${group.groupKey}`, type: 'output', position: { x: 480, y: Math.max(0, (y - outH) / 2) }, data: { outputTags: sortedGroupTags.value[gi]?.outputTags ?? [], groupKey: group.groupKey }, style: { width: `${OUT_W}px`, height: `${outH}px` } })
-    result.push({ groupKey: group.groupKey, nodes, height: Math.max(y, outH) + 16 })
-  })
-  return result
-})
-
-const groupEdges = computed(() => {
-  const result = new Map<string, any[]>()
-  for (const a of logicFlow.buildFlowAssignments) {
-    const gKey = getGroupKeyForGroupId(presenter.buildFlowGroups.value, a.sourceGroupId)
-    if (!gKey) continue
-    if (!result.has(gKey)) result.set(gKey, [])
-    const targetNodeId = a.targetType === 'line-build-material' ? `line:${a.targetGroupId}` : `output:${gKey}`
-    const targetHandle = a.targetType === 'line-build-material' ? `tgt:${a.wareId}` : `out:${a.wareId}`
-    const edge = { id: `e:${a.sourceGroupId}:${a.wareId}:${a.targetType}`, source: `line:${a.sourceGroupId}`, sourceHandle: `src:${a.wareId}`, target: targetNodeId, targetHandle, type: 'step', style: { stroke: 'rgba(251,146,60,0.7)', strokeWidth: 2 } }
-    result.get(gKey)!.push(edge)
-  }
-  return result
-})
-
-function getGroupKeyForGroupId(groups: any[], groupId: string) {
-  for (const g of groups) if (g.lineCards.some((c: any) => c.groupId === groupId)) return g.groupKey
-  return ''
-}
-
 const boundTargetTagIds = computed(() => {
   const ids = new Set<string>()
   for (const a of logicFlow.buildFlowAssignments) {
@@ -105,6 +65,7 @@ const boundTargetTagIds = computed(() => {
 
 // --- Drag state ---
 const draggingTag = ref<{ groupId: string; wareId: string } | null>(null)
+const hoverTargetTagId = ref<string | null>(null)
 
 function onSourceDragStart(groupId: string, wareId: string) {
   draggingTag.value = { groupId, wareId }
@@ -113,7 +74,16 @@ function onSourceDragStart(groupId: string, wareId: string) {
 
 function onSourceDragEnd() {
   draggingTag.value = null
+  hoverTargetTagId.value = null
   presenter.stopDrag()
+}
+
+function onTargetDragEnter(tagId: string) {
+  hoverTargetTagId.value = tagId
+}
+
+function onTargetDragLeave() {
+  hoverTargetTagId.value = null
 }
 
 function onTargetDrop(targetType: BuildFlowTargetType, targetGroupId?: string) {
@@ -121,6 +91,7 @@ function onTargetDrop(targetType: BuildFlowTargetType, targetGroupId?: string) {
   const { groupId, wareId } = draggingTag.value
   presenter.bindFromDrag(groupId, wareId, targetType, targetGroupId)
   draggingTag.value = null
+  hoverTargetTagId.value = null
   presenter.stopDrag()
 }
 
@@ -248,80 +219,144 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 <template>
   <div
     v-if="hasContent && !shouldHide"
-    class="build-flow-zone border border-dashed border-gray-600 rounded-lg p-3"
+    class="build-flow-zone border border-dashed border-gray-600 rounded-lg p-3 space-y-3"
   >
-    <div class="text-xs text-gray-400 font-medium uppercase tracking-wide mb-2">
+    <div class="text-xs text-gray-400 font-medium uppercase tracking-wide">
       {{ t('buildFlow.build_flow_zone_title') }}
     </div>
-    <div class="grid gap-5" :class="groupNodes.length === 1 ? '' : 'grid-cols-2'">
+
+    <div class="build-flow-groups grid gap-5" :class="presenter.buildFlowGroups.value.length === 1 ? '' : 'grid-cols-2'">
       <div
-        v-for="gn in groupNodes"
-        :key="gn.groupKey"
-        class="border border-gray-700 rounded p-3"
-        :style="{ height: `${gn.height}px` }"
+        v-for="sg in sortedGroupTags"
+        :key="sg.groupKey"
+        class="build-flow-group border border-gray-700 rounded p-3 flex flex-col justify-center relative"
       >
-        <VueFlow
-          :nodes="gn.nodes"
-          :edges="groupEdges.get(gn.groupKey) ?? []"
-          :default-viewport="{ x: 0, y: 0, zoom: 1 }"
-          :min-zoom="1"
-          :max-zoom="1"
-          :nodes-draggable="false"
-          :pan-on-drag="false"
-          :zoom-on-scroll="false"
-        >
-          <template #node-card="nodeProps">
-            <div class="bg-gray-800/60 border border-gray-600 rounded p-2 relative" style="width:320px">
-              <div class="text-xs text-gray-300 font-medium mb-2 truncate">{{ nodeProps.data.card.title }}</div>
+        <div class="flex items-start">
+          <div class="flex flex-col gap-16 shrink-0 ml-[84px]" style="width: 320px">
+            <div
+              v-for="card in sg.lineCards"
+              :key="card.groupId"
+              class="build-flow-line-card bg-gray-800/60 border border-gray-600 rounded p-2"
+            >
+              <div class="text-xs text-gray-300 font-medium mb-2 truncate" :title="card.title">{{ card.title }}</div>
               <div class="flex flex-col gap-1">
                 <div class="flex justify-between">
                   <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_build_materials') }}</span>
                   <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_source_materials') }}</span>
                 </div>
-                <div v-for="(row) in nodeProps.data.cardRows" :key="row.wareId" class="flex justify-between items-center" style="min-height: 24px; position: relative">
-                  <Handle v-if="row.buildMaterialTag" type="target" :position="Position.Left" :id="`tgt:${row.wareId}`" :style="{ top: '12px' }" class="!bg-transparent !border-0 !w-2 !h-2" />
-                  <span v-if="row.buildMaterialTag" class="build-flow-tag build-flow-target-tag whitespace-nowrap" :data-tag-id="row.buildMaterialTag.tagId" @dragover.prevent @drop.prevent="onTargetDrop('line-build-material', nodeProps.data.card.groupId)">
-                    <button class="target-tag-segment target-tag-segment-add" :class="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'" @click.stop="onTargetTagPlusClick(row.buildMaterialTag.wareId, row.buildMaterialTag.tagId, 'line-build-material', nodeProps.data.card.groupId, nodeProps.data.groupKey, $event)">+</button>
-                    <span class="target-tag-segment target-tag-segment-main" :class="[boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300']">
+                <div
+                  v-for="row in getSortedRows(card.groupId, sg.order)"
+                  :key="row.wareId"
+                  class="flex justify-between items-center"
+                  style="min-height: 24px"
+                >
+                  <span
+                    v-if="row.buildMaterialTag"
+                    :data-tag-id="row.buildMaterialTag.tagId"
+                    class="build-flow-tag build-flow-target-tag whitespace-nowrap"
+                    @dragenter.prevent="onTargetDragEnter(row.buildMaterialTag.tagId)"
+                    @dragleave="onTargetDragLeave"
+                    @dragover.prevent
+                    @drop.prevent="onTargetDrop('line-build-material', card.groupId)"
+                  >
+                    <button
+                      class="target-tag-segment target-tag-segment-add"
+                      :class="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
+                      @click.stop="onTargetTagPlusClick(row.buildMaterialTag.wareId, row.buildMaterialTag.tagId, 'line-build-material', card.groupId, sg.groupKey, $event)"
+                    >+</button>
+                    <span
+                      class="target-tag-segment target-tag-segment-main"
+                      :class="[boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300']"
+                    >
                       <span class="target-tag-text">{{ row.buildMaterialTag.label }}</span>
-                      <button v-if="boundTargetTagIds.has(row.buildMaterialTag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(row.buildMaterialTag, 'line-build-material'))">&times;</button>
+                      <button v-if="boundTargetTagIds.has(row.buildMaterialTag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(row.buildMaterialTag, 'line-build-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
                     </span>
                   </span>
                   <div v-else class="w-[142px] h-[24px] shrink-0"></div>
-                  <Handle v-if="row.sourceTag" type="source" :position="Position.Right" :id="`src:${row.wareId}`" :style="{ top: '12px' }" class="!bg-transparent !border-0 !w-2 !h-2" />
-                  <span v-if="row.sourceTag" class="build-flow-tag build-flow-source-tag whitespace-nowrap" :data-tag-id="row.sourceTag.tagId" draggable="true" @dragstart="onSourceDragStart(nodeProps.data.card.groupId, row.sourceTag.wareId)" @dragend="onSourceDragEnd">
+                  <span
+                    v-if="row.sourceTag"
+                    :data-tag-id="row.sourceTag.tagId"
+                    class="build-flow-tag build-flow-source-tag whitespace-nowrap"
+                    draggable="true"
+                    @dragstart="onSourceDragStart(card.groupId, row.sourceTag.wareId)"
+                    @dragend="onSourceDragEnd"
+                  >
                     <span class="source-tag-segment source-tag-segment-main"><span class="source-tag-text">{{ row.sourceTag.label }}</span></span>
-                    <button class="source-tag-segment source-tag-segment-add" @click.stop="onPlusClick(nodeProps.data.card.groupId, row.sourceTag.wareId, row.sourceTag.tagId, $event)">+</button>
+                    <button class="source-tag-segment source-tag-segment-add" @click.stop="onPlusClick(card.groupId, row.sourceTag.wareId, row.sourceTag.tagId, $event)">+</button>
                   </span>
                   <div v-else class="w-[142px] h-[24px] shrink-0"></div>
                 </div>
               </div>
             </div>
-          </template>
-          <template #node-output="nodeProps">
-            <div class="bg-gray-800/60 border border-gray-600 rounded p-2 relative" style="width:160px">
-              <div class="text-xs text-gray-300 font-medium mb-2">{{ t('buildFlow.build_flow_output_card_title') }}</div>
-              <div class="flex justify-start mb-1"><span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_output_materials') }}</span></div>
-              <div class="build-flow-target-list flex flex-col gap-1 items-start">
-                <span v-for="tag in nodeProps.data.outputTags" :key="tag.tagId" class="build-flow-tag build-flow-target-tag whitespace-nowrap relative" :data-tag-id="tag.tagId" @dragover.prevent @drop.prevent="onTargetDrop('output-material')">
-                  <Handle type="target" :position="Position.Left" :id="`out:${tag.wareId}`" :style="{ top: '12px' }" class="!bg-transparent !border-0 !w-2 !h-2" />
-                  <button class="target-tag-segment target-tag-segment-add" :class="boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'" @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, nodeProps.data.groupKey, $event)">+</button>
-                  <span class="target-tag-segment target-tag-segment-main" :class="[boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300']">
-                    <span class="target-tag-text">{{ tag.label }}</span>
-                    <button v-if="boundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))">&times;</button>
-                  </span>
-                </span>
-              </div>
+          </div>
+          <div
+            v-if="sg.outputTags.length > 0"
+            class="build-flow-output-card bg-gray-800/60 border border-gray-600 rounded p-2 shrink-0 self-center ml-auto mr-5"
+            style="width: 160px"
+          >
+            <div class="text-xs text-gray-300 font-medium mb-2">{{ t('buildFlow.build_flow_output_card_title') }}</div>
+            <div class="flex justify-start mb-1">
+              <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_output_materials') }}</span>
             </div>
-          </template>
-        </VueFlow>
+            <div class="build-flow-target-list flex flex-col gap-1 items-start">
+              <span
+                v-for="tag in sg.outputTags"
+                :key="tag.tagId"
+                :data-tag-id="tag.tagId"
+                class="build-flow-tag build-flow-target-tag whitespace-nowrap"
+                @dragenter.prevent="onTargetDragEnter(tag.tagId)"
+                @dragleave="onTargetDragLeave"
+                @dragover.prevent
+                @drop.prevent="onTargetDrop('output-material')"
+              >
+                <button
+                  class="target-tag-segment target-tag-segment-add"
+                  :class="boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
+                  @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, sg.groupKey, $event)"
+                >+</button>
+                <span
+                  class="target-tag-segment target-tag-segment-main"
+                  :class="[boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300']"
+                >
+                  <span class="target-tag-text">{{ tag.label }}</span>
+                  <button v-if="boundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
+                </span>
+              </span>
+            </div>
+          </div>
+        </div>
+        <BuildFlowEdgeLayer
+          v-if="presenter.edges.value.length > 0"
+          :edges="presenter.edges.value"
+        />
       </div>
     </div>
+
     <Teleport to="body">
-      <div v-if="menuSourceTag || menuTargetTag" class="build-flow-menu fixed z-50 bg-gray-800 border border-gray-600 rounded shadow-lg py-1 min-w-[192px]" :style="{ left: `${menuPosition.x}px`, top: `${menuPosition.y}px` }">
-        <div class="px-3 py-1.5 text-[10px] text-gray-500 uppercase tracking-wide border-b border-gray-700">{{ menuSourceTag ? t('buildFlow.build_flow_source_materials') : t('buildFlow.build_flow_build_materials') }}</div>
+      <div
+        v-if="menuSourceTag || menuTargetTag"
+        class="build-flow-menu fixed z-50 bg-gray-800 border border-gray-600 rounded shadow-lg py-1 min-w-[192px]"
+        :style="{ left: `${menuPosition.x}px`, top: `${menuPosition.y}px` }"
+      >
+        <div class="px-3 py-1.5 text-[10px] text-gray-500 uppercase tracking-wide border-b border-gray-700">
+          {{ menuSourceTag ? t('buildFlow.build_flow_source_materials') : t('buildFlow.build_flow_build_materials') }}
+        </div>
         <div class="max-h-60 overflow-y-auto custom-scrollbar">
-          <button v-for="target in menuTargets" :key="target.targetKey" class="w-full text-left px-3 py-1.5 text-xs transition-colors" :class="[target.bindingState === 'self' ? 'text-emerald-300 bg-emerald-900/20' : target.bindingState === 'other' ? 'text-amber-300 bg-amber-900/20' : 'text-gray-300 hover:bg-gray-700']" @click="onMenuSelect(target)"><span class="flex-1 truncate">{{ target.targetType === 'line-build-material' ? target.cardTitle : t('buildFlow.build_flow_output_card_title') }}</span></button>
+          <button
+            v-for="target in menuTargets"
+            :key="target.targetKey"
+            class="w-full text-left px-3 py-1.5 text-xs transition-colors"
+            :class="[
+              target.bindingState === 'self'
+                ? 'text-emerald-300 bg-emerald-900/20'
+                : target.bindingState === 'other'
+                  ? 'text-amber-300 bg-amber-900/20'
+                  : 'text-gray-300 hover:bg-gray-700'
+            ]"
+            @click="onMenuSelect(target)"
+          >
+            <span class="flex-1 truncate">{{ target.targetType === 'line-build-material' ? target.cardTitle : t('buildFlow.build_flow_output_card_title') }}</span>
+          </button>
         </div>
       </div>
     </Teleport>
@@ -415,8 +450,4 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 .target-tag-unbind {
   @apply ml-1 text-[9px] text-orange-400 hover:text-orange-200;
 }
-</style>
-
-<style>
-.vue-flow__node { background: transparent !important; }
 </style>
