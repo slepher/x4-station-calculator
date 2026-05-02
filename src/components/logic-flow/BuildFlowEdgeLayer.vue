@@ -80,7 +80,7 @@ function recalculate() {
     const sk = `${pos.edge.sourceGroupId}:${pos.edge.wareId}`
     if (!srcMidX.has(sk) && !(pos.edge as any).isSelfConnection) {
       const gap = Math.max(gapEnd - pos.x1 - 8, 4)
-      srcMidX.set(sk, pos.x1 + 4 + (srcIdx * gap) / Math.max(totalSources, 1))
+      srcMidX.set(sk, pos.x1 + 4 + ((srcIdx + 1) * gap) / Math.max(totalSources + 1, 1))
       srcIdx++
     }
   }
@@ -112,7 +112,7 @@ function recalculate() {
       const gapStart = y1 < y2 ? srcCardBot : tgtCardBot
       const gapEnd = y1 < y2 ? tgtCardTop : srcCardTop
       const gapSize = Math.max(gapEnd - gapStart, 4)
-      const p2Y = gapStart + (modeBIdx + 0.5) * gapSize / Math.max(modeBCount, 1)
+      const p2Y = gapStart + ((modeBIdx + 1) * gapSize) / Math.max(modeBCount + 1, 1)
       console.log(`[modeB] i=${modeBIdx} start=(${x1.toFixed(0)},${y1.toFixed(0)}) p1X=${p1X.toFixed(0)} p3X=${p3X.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
       modeBIdx++
