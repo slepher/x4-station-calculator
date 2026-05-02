@@ -78,9 +78,9 @@ function recalculate() {
   for (const p of positioned) {
     if ((p.edge as any).isSelfConnection) continue
     if (p.x2 > p.x1) continue
-    const lo = Math.min(p.srcCardBot, p.tgtCardBot, p.srcCardTop, p.tgtCardTop)
-    const hi = Math.max(p.srcCardBot, p.tgtCardBot, p.srcCardTop, p.tgtCardTop)
-    const gk = `${lo.toFixed(0)}|${hi.toFixed(0)}`
+    const gs = p.y1 < p.y2 ? p.srcCardBot : p.tgtCardBot
+    const ge = p.y1 < p.y2 ? p.tgtCardTop : p.srcCardTop
+    const gk = `${gs.toFixed(0)}|${ge.toFixed(0)}`
     if (!gapGroups.has(gk)) gapGroups.set(gk, [])
     gapGroups.get(gk)!.push(p)
   }
@@ -124,9 +124,9 @@ function recalculate() {
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
     } else {
-      const lo = Math.min(srcCardBot, tgtCardBot, srcCardTop, tgtCardTop)
-      const hi = Math.max(srcCardBot, tgtCardBot, srcCardTop, tgtCardTop)
-      const gk = `${lo.toFixed(0)}|${hi.toFixed(0)}`
+      const gs = y1 < y2 ? srcCardBot : tgtCardBot
+      const ge = y1 < y2 ? tgtCardTop : srcCardTop
+      const gk = `${gs.toFixed(0)}|${ge.toFixed(0)}`
       const ei = gapCounters.get(gk) ?? 0
       gapCounters.set(gk, ei + 1)
       const totalInGap = gapGroups.get(gk)?.length ?? 1
