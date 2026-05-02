@@ -108,7 +108,7 @@ function recalculate() {
     } else {
       const modeBCount = positioned.filter(p => !(p.edge as any).isSelfConnection && p.x2 <= p.x1).length
       const p1X = midX
-      const p3X = 4 + (modeBIdx * (x2 - 8)) / Math.max(modeBCount, 1)
+      const p3X = x2 - 4 - modeBIdx * 4
       const gapStart = y1 < y2 ? srcCardBot : tgtCardBot
       const gapEnd = y1 < y2 ? tgtCardTop : srcCardTop
       const gapSize = Math.max(gapEnd - gapStart, 4)
