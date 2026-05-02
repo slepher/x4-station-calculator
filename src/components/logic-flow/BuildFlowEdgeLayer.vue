@@ -81,7 +81,7 @@ function recalculate() {
       if (Math.abs(y1 - y2) < 4) {
         d = `M ${x1},${y1} L ${x2},${y2}`
       } else {
-        const midX = x1 + (x2 - x1) * (i + 0.5) / positioned.length
+        const midX = Math.min(x1 + (i + 1) * 4, x2 - 4)
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
     } else {
