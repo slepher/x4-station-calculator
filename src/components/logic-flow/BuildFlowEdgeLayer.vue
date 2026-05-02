@@ -20,8 +20,11 @@ function recalculate() {
   const container = svgRef.value.parentElement
   if (!container) return
 
+  console.log('[EdgeLayer] recalculate edges:', props.edges.length, 'container rect:', container.getBoundingClientRect())
+
   const containerRect = container.getBoundingClientRect()
   if (containerRect.width === 0) {
+    console.log('[EdgeLayer] container width 0, retry')
     scheduleRecalculate()
     return
   }
@@ -41,7 +44,10 @@ function recalculate() {
   for (const edge of props.edges) {
     const sourceEl = container.querySelector(`[data-tag-id="${edge.sourceTagId}"]`)
     const targetEl = container.querySelector(`[data-tag-id="${edge.targetTagId}"]`)
-    if (!sourceEl || !targetEl) continue
+    if (!sourceEl || !targetEl) {
+      console.log('[EdgeLayer] missing element for', edge.id, 'source:', !!sourceEl, 'target:', !!targetEl, 'sourceTagId:', edge.sourceTagId, 'targetTagId:', edge.targetTagId)
+      continue
+    }
 
     const sourceRect = sourceEl.getBoundingClientRect()
     const targetRect = targetEl.getBoundingClientRect()
