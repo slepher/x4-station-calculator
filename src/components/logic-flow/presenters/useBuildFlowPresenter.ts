@@ -27,6 +27,7 @@ export interface BuildFlowEdge {
   sourceGroupId: string
   targetType: BuildFlowTargetType
   targetGroupId?: string
+  isSelfConnection: boolean
 }
 
 export interface MenuTargetItem {
@@ -111,6 +112,7 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
       } else {
         targetTagId = `build-flow-target:output:${a.wareId}`
       }
+      const isSelfConnection = a.targetType === 'line-build-material' && a.sourceGroupId === a.targetGroupId
       return {
         id: `edge:${a.sourceGroupId}:${a.wareId}->${computeTargetKey(a)}`,
         sourceTagId,
@@ -118,7 +120,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
         wareId: a.wareId,
         sourceGroupId: a.sourceGroupId,
         targetType: a.targetType,
-        targetGroupId: a.targetGroupId
+        targetGroupId: a.targetGroupId,
+        isSelfConnection
       }
     })
   })

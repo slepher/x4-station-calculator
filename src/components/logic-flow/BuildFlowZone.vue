@@ -225,9 +225,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
       {{ t('buildFlow.build_flow_zone_title') }}
     </div>
 
-      {{console.log('[zone] assignments:', logicFlow.buildFlowAssignments.length, 'presenter edges:', presenter.edges.value.length, presenter.edges.value.slice(0,2))}}
     <div class="build-flow-groups grid gap-5" :class="presenter.buildFlowGroups.value.length === 1 ? '' : 'grid-cols-2'">
-      {{console.log('[zone] groups:', presenter.buildFlowGroups.value.length, 'edges:', presenter.edges.value.length, presenter.edges.value)}}
       <div
         v-for="sg in sortedGroupTags"
         :key="sg.groupKey"

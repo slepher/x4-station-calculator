@@ -24,7 +24,6 @@ function recalculate() {
 
   const containerRect = container.getBoundingClientRect()
   if (containerRect.width === 0) {
-    console.log('[EdgeLayer] container width 0, retry')
     scheduleRecalculate()
     return
   }
@@ -44,18 +43,16 @@ function recalculate() {
   for (const edge of props.edges) {
     const sourceEl = container.querySelector(`[data-tag-id="${edge.sourceTagId}"]`)
     const targetEl = container.querySelector(`[data-tag-id="${edge.targetTagId}"]`)
-    if (!sourceEl || !targetEl) {
-      console.log('[EdgeLayer] missing element for', edge.id, 'source:', !!sourceEl, 'target:', !!targetEl, 'sourceTagId:', edge.sourceTagId, 'targetTagId:', edge.targetTagId)
-      continue
-    }
+    if (!sourceEl || !targetEl) continue
 
     const sourceRect = sourceEl.getBoundingClientRect()
     const targetRect = targetEl.getBoundingClientRect()
     if (sourceRect.width === 0 || targetRect.width === 0) continue
 
-    const x1 = sourceRect.right - containerRect.left
+    const isSelf = (edge as any).isSelfConnection
+    const x1 = isSelf ? sourceRect.left - containerRect.left : sourceRect.right - containerRect.left
     const y1 = sourceRect.top + sourceRect.height / 2 - containerRect.top
-    const x2 = targetRect.left - containerRect.left
+    const x2 = isSelf ? targetRect.right - containerRect.left : targetRect.left - containerRect.left
     const y2 = targetRect.top + targetRect.height / 2 - containerRect.top
 
     positioned.push({ edge, x1, y1, x2, y2 })
@@ -69,10 +66,15 @@ function recalculate() {
 
   positioned.forEach((pos, i) => {
     const { edge, x1, y1, x2, y2 } = pos
+    const isSelf = (edge as any).isSelfConnection
+    if (isSelf) {
+      const d = `M ${x1},${y1} L ${x2},${y2}`
+      results.push({ id: edge.id, d })
+      return
+    }
     const routeY = baseRouteY - i * laneSpacing
     const exitX = x1 + exitOffset
     const approachX = x2 - approachOffset
-
     const d = `M ${x1},${y1} L ${exitX},${y1} L ${exitX},${routeY} L ${approachX},${routeY} L ${approachX},${y2} L ${x2},${y2}`
     results.push({ id: edge.id, d })
   })
