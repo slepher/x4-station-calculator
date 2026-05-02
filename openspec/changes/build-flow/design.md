@@ -48,42 +48,35 @@
 
 ### 分组容器布局
 
-建筑产线区按分组渲染，每个分组是一个带边框/背景的容器。分组容器之间竖向排列。
+建筑产线区按分组渲染，每个分组是一个带边框/背景的容器。分组容器之间采用 CSS Grid 横向排列（1 组占满宽度，2 组各半宽，3+ 组每行最多 2 个换行，间距 20px）。
 
-每个分组容器内部：
+每个分组容器内部采用水平 flex 布局（`justify-between`）：
 
-- 产线 card 竖向排列
-- 该组的"产出区" card
+- **左列**：产线 card 竖向排列（`flex-col gap-16`），ml=92px，card 宽度 308px
+- **右列**：该组的"产出区" card，mr=16px，垂直居中（`self-center`），宽度 160px
+
+产线 card 间距 64px。产出区 card 通过 `ml-auto` 推到右侧，`self-center` 垂直居中。
 
 ### Card 布局结构
 
 每个产线 card 的内部布局为：
 
-- 顶部整行：产线名称（使用 `getLogicFlowGroupDisplayName` 获取，与规划区产线名称一致）
+- 顶部整行：产线名称
 - 下方横向区域（`flex justify-between`）：
   - 左侧列："产线建材"标签，竖向排列
   - 右侧列："产线原材料"标签，竖向排列，右对齐（`items-end`）
 
-"产出区" card 内"现产原材料"标签竖向排列。
+"产出区" card 内"产出建材"标签竖向排列。
 
 ### Tag 排版结构
 
-建筑流标签不再使用"hover 后展开背景，再把 `+` 按钮滑出"的方案，统一改为常驻外伸按钮布局：
+标签常驻外伸按钮布局：
 
-- `产线原材料`
-  - 文字左对齐
-  - `+` 固定在右侧
-  - 按钮向 card 右边外伸
-- `产线建材`
-  - 文字右对齐
-  - `+` 固定在左侧
-  - 按钮向 card 左边外伸
-- `产出区`
-  - 文字右对齐
-  - `+` 固定在左侧
-  - 按钮向 card 左边外伸
+- `产线原材料`：文字左对齐，`+` 固定在右侧，按钮向 card 右边外伸
+- `产线建材`：文字右对齐，`+` 固定在左侧，按钮向 card 左边外伸
+- `产出建材`：文字右对齐，`+` 固定在左侧，按钮向 card 左边外伸
 
-按钮不是浮在 tag 外的独立点，而应与 tag 表面形成连续柄部。柄部与按钮的视觉层级必须高于 card 边框，以确保边框被完整覆盖。
+标签初始填充为透明。当标签被连线绑定时，标签和按钮染为对应 ware 的颜色（8 色调色板，按 wareId 排序分配）。箭头颜色与连线/标签颜色一致，每条边独立着色。
 
 ## 数据模型
 
@@ -294,38 +287,56 @@ output-material: `output:${wareId}`
 
 ## 连线设计
 
-连线层需要能够根据关系记录定位两端锚点，因此 presenter 应为每个标签提供稳定的锚点标识。
+连线使用 SVG overlay 方案（`BuildFlowEdgeLayer` 组件），在分组容器内部用绝对定位的 `<svg>` 元素绘制路径。
 
-建议锚点 key 设计：
+### 锚点标识
 
-```ts
-source: build-flow-source:<groupId>:<wareId>
-target(line): build-flow-target:line:<groupId>:<wareId>
-target(output): build-flow-target:output:<wareId>
+标签通过 `data-tag-id` 属性提供稳定 DOM 锚点：
+- `build-flow-source:${groupId}:${wareId}` — 产线产出标签
+- `build-flow-target:line:${targetGroupId}:${wareId}` — 产线建材标签
+- `build-flow-target:output:${wareId}` — 产出建材标签
+
+### 路由算法
+
+每条边根据起点和终点的 X/Y 坐标关系采用不同的路由策略：
+
+**Mode A（终点在右侧，x2 > x1）**：3 段线
 ```
+Start → P1(midX, y1) → P2(midX, y2) → End
+```
+midX 按源点（sourceGroupId + wareId）在产线区 x1 到产出区 x2 之间的 gap 内均分分配。
 
-关系转边时：
+**Mode B（终点在左侧，x2 ≤ x1）**：5 段线
+```
+Start → P1(midX, y1) → P2(midX, p2Y) → P3(p3X, p2Y) → P4(p3X, y2) → End
+```
+- midX/p1X：与 Mode A 共享同一分配池（每个源点一个值）
+- p2Y：在目标 card 与上一张 card 之间的缝隙（card[i].bottom → card[i+1].top）内均分
+- p3X：从容器左边在目标 x2 范围内均分
 
-- 起点 = `sourceGroupId + wareId`
-- 终点 = `targetType + targetGroupId? + wareId`
+**自身连接**：同一 card 内产出 tag 左边缘直连建材 tag 右边缘。
 
-连线层职责：
+### 响应机制
 
-- 根据锚点 DOM 位置绘制 SVG 路径
-- 布局变化时重算
-- 覆盖 / 解绑时移除旧边
+- `watch(edges)` 监听数据变化 → 调用重算
+- `MutationObserver` 监测 tag DOM 变化
+- `ResizeObserver` 监测容器尺寸变化
+- `requestAnimationFrame` 确保 DOM 就绪后计算
+
+### 颜色
+
+每条边按 wareId 分配独立颜色（8 色调色板，wareId 排序后 index % 8），与标签颜色一致。箭头使用 per-color SVG marker defs。
 
 ## 涉及文件
 
-建议变更集中在以下区域：
-
 | 文件/目录 | 角色 |
 |---|---|
-| `src/store/logic/buildFlowDerivation.ts` | 新增 `computeBuildFlowGroups()` 分组推导函数 |
-| `src/types/x4.ts` | 新增 `BuildFlowGroup` 类型，移除 `BuildFlowOutputCard` 类型 |
-| `src/store/useLogicFlowStore.ts` | 适配分组推导，替换 `buildFlowOutputCard` 为 `buildFlowGroups` |
-| `src/components/logic-flow/presenters/useBuildFlowPresenter.ts` | 适配分组结构，按组组装 card、菜单目标列表 |
-| `src/components/logic-flow/BuildFlowZone.vue` | 按分组容器渲染，每组内含产线 cards + 产出区 card |
+| `src/components/logic-flow/BuildFlowZone.vue` | 主组件：分组布局 + card/tag 渲染 + 菜单交互 + 响应式显示/隐藏 |
+| `src/components/logic-flow/BuildFlowEdgeLayer.vue` | SVG 连线层：DOM 锚点定位 + 5 段式路由 + 颜色分配 |
+| `src/components/logic-flow/presenters/useBuildFlowPresenter.ts` | Presenter：组装 card、tag、菜单、edge 数据 |
+| `src/store/logic/buildFlowDerivation.ts` | 派生计算：需求原材料、入选产线、分组推导、assignments CRUD |
+| `src/store/useLogicFlowStore.ts` | Store：状态管理、持久化、失效清理 |
+| `src/types/x4.ts` | 类型定义：BuildFlowGroup、BuildFlowTag、BuildFlowAssignment 等 |
 
 ## Assignments 失效清理
 

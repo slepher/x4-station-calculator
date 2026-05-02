@@ -80,16 +80,16 @@
 
 ## 完成定义
 
-- [ ] 建筑产线区从现有 `ProductionLineGroup` 自动推导
-- [ ] buildCost 口径正确：排除 `isIsolated` 节点和 `tier === 0` 模块
-- [ ] 关系数据独立于现有产线运行时数据，但属于单条 `LogicFlowPlan`
-- [ ] "产线原材料""产线建材""分组产出区"按已确认口径正确展示
-- [ ] 分组算法正确执行递归扩散，产出区按组分配到多个 card
-- [ ] 仅允许同 `wareId` 同组内来源标签与目标标签建立关系
-- [ ] 目标标签唯一绑定、支持覆盖与解绑
-- [ ] groups 变更后 assignments 失效清理自动执行（含跨组清理）
-- [ ] 绑定完成后显示有向线
-- [ ] 规划区相关拖拽期间 `BuildFlowZone` 自动隐藏且不干扰拖拽
-- [ ] 保存/加载/另存为正确处理 `buildFlow` 字段
-- [ ] 旧版 plan 无 `buildFlow` 字段时不报错
-- [ ] `npm run build` 通过
+- [x] 建筑产线区从现有 `ProductionLineGroup` 自动推导
+- [x] buildCost 口径正确：排除 `isIsolated` 节点和 `tier === 0` 模块
+- [x] 关系数据独立于现有产线运行时数据，但属于单条 `LogicFlowPlan`
+- [x] "产线原材料""产线建材""产出建材"按已确认口径正确展示
+- [x] 分组算法正确执行递归扩散，产出区按组分配到多个 card
+- [x] 仅允许同 `wareId` 同组内来源标签与目标标签建立关系
+- [x] 目标标签唯一绑定、支持覆盖与解绑
+- [x] groups 变更后 assignments 失效清理自动执行（含跨组清理）
+- [x] 绑定完成后显示有向线（SVG overlay + 5 段式路由）
+- [x] 规划区相关拖拽期间 `BuildFlowZone` 自动隐藏且不干扰拖拽
+- [x] 保存/加载/另存为正确处理 `buildFlow` 字段
+- [x] 旧版 plan 无 `buildFlow` 字段时不报错
+- [x] `npm run build` 通过
