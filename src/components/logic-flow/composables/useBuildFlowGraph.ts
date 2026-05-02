@@ -73,7 +73,6 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
     },
     embedding: { enabled: false },
   })
-
   graph.on('node:change:position', ({ node }) => {
     const parent = node.getParent()
     if (parent) {
