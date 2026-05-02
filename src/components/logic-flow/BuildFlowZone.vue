@@ -64,10 +64,10 @@ const boundTargetTagIds = computed(() => {
 })
 
 const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
-const wareColorMap = new Map<string, string>()
 function getWareColor(wareId: string) {
-  if (!wareColorMap.has(wareId)) wareColorMap.set(wareId, COLORS[wareColorMap.size % COLORS.length]!)
-  return wareColorMap.get(wareId) ?? COLORS[0]!
+  let h = 0
+  for (let i = 0; i < wareId.length; i++) h = ((h << 5) - h) + wareId.charCodeAt(i) | 0
+  return COLORS[Math.abs(h) % COLORS.length]
 }
 
 // --- Drag state ---
