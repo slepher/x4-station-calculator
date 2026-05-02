@@ -274,7 +274,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             style="width: 160px"
           >
             <div class="text-xs text-gray-300 font-medium mb-2">{{ t('buildFlow.build_flow_output_card_title') }}</div>
-            <div class="flex justify-end mb-1">
+            <div class="flex justify-start mb-1">
               <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_output_materials') }}</span>
             </div>
             <div class="build-flow-target-list flex flex-col gap-1 items-start">
