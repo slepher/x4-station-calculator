@@ -30,16 +30,25 @@ export function computeDemandMaterialSet(
   modulesMap: Record<string, X4Module>
 ): Set<string> {
   const wareSet = new Set<string>()
+  let skippedNoModule = 0
+  let skippedTierZero = 0
+  let skippedIsolated = 0
+  let skippedNoModuleId = 0
   for (const group of groups) {
-    const scopeNodes = getModuleScopeNodes(group, modulesMap)
-    for (const node of scopeNodes) {
-      const mod = modulesMap[node.moduleId!]
-      if (!mod) continue
+    for (const node of group.nodes) {
+      if (node.isIsolated) { skippedIsolated++; continue }
+      if (!node.moduleId) { skippedNoModuleId++; continue }
+      const mod = modulesMap[node.moduleId]
+      if (!mod) { skippedNoModule++; continue }
+      if (mod.tier <= 0) { skippedTierZero++; continue }
       for (const wareId of Object.keys(mod.buildCost)) {
         wareSet.add(wareId)
       }
     }
   }
+  console.log('[BuildFlowDerivation] computeDemandMaterialSet: wareSet size:', wareSet.size,
+    'skipped: noModuleId:', skippedNoModuleId, 'noModule:', skippedNoModule,
+    'tierZero:', skippedTierZero, 'isolated:', skippedIsolated)
   return wareSet
 }
 
@@ -194,10 +203,13 @@ export function deriveBuildFlowView(
   buildFlowGroups: BuildFlowGroup[]
 } {
   const demandMaterialSet = computeDemandMaterialSet(groups, modulesMap)
+  console.log('[BuildFlowDerivation] deriveBuildFlowView: groups:', groups.length, 'demandMaterialSet size:', demandMaterialSet.size)
 
   const lineCardsWithSource: Array<{ group: ProductionLineGroup; sourceTags: BuildFlowTag[] }> = []
   for (const group of groups) {
-    if (!isGroupInBuildFlow(group, demandMaterialSet)) continue
+    const inBuildFlow = isGroupInBuildFlow(group, demandMaterialSet)
+    console.log('[BuildFlowDerivation] group:', group.id, 'nodes:', group.nodes.length, 'inBuildFlow:', inBuildFlow)
+    if (!inBuildFlow) continue
     const sourceTags = computeSourceTags(group, demandMaterialSet, getWareLabel)
     lineCardsWithSource.push({ group, sourceTags })
   }

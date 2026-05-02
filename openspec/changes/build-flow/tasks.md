@@ -50,12 +50,12 @@
 - [x] T20. 实现目标覆盖行为
 - [x] T21. 实现目标解绑入口
 
-### Phase 5: 有向线
+### Phase 5: 有向线（X6 Edge 替代手写 SVG）
 
-- [x] T22. 基于已建立关系渲染来源标签到目标标签的有向线
-- [x] T23. 在覆盖时更新连线
-- [x] T24. 在解绑时删除连线
-- [x] T25. 在布局变化时重算连线锚点
+- [x] T22. 基于已建立关系渲染来源标签到目标标签的有向线（X6 edge）
+- [x] T23. 在覆盖时更新连线（X6 自动管理 edge 生命周期）
+- [x] T24. 在解绑时删除连线（X6 自动删除 edge）
+- [x] T25. 在布局变化时重算连线锚点（X6 自动跟随节点位置）
 
 ### Phase 6: 构建验证
 
@@ -63,20 +63,23 @@
 
 ### Phase 7: 建筑材料分组
 
-当前阶段 UI 改动仅限于：将单一产出区 card 拆为按组的多个产出区 card。产线 card 布局不变。
+当前阶段 UI 改动：将单一产出区 card 拆为按组的多个产出区 card，分组横向排列，组内左右分列布局，产线 card 可拖拽排序。
 
-- [ ] T27. 在 `src/types/x4.ts` 新增 `BuildFlowGroup` 类型（`groupKey`、`lineCardGroupIds`、`outputTags`），移除 `BuildFlowOutputCard` 类型
-- [ ] T28. 在 `buildFlowDerivation.ts` 实现 `computeBuildFlowGroups()` 递归扩散分组算法
-- [ ] T29. 重构 `deriveBuildFlowView()` 返回 `BuildFlowGroup[]` 替代原来的 `lineCards + outputCard`，保持 demandMaterialSet 不变
-- [ ] T30. 适配 `useLogicFlowStore`：将 `buildFlowLineCards` / `buildFlowOutputCard` 替换为 `buildFlowGroups` computed
-- [ ] T31. 适配 `useBuildFlowPresenter`：
+- [x] T27. 在 `src/types/x4.ts` 新增 `BuildFlowGroup` 类型（`groupKey`、`lineCards`、`outputTags`），移除 `BuildFlowOutputCard` 类型
+- [x] T28. 在 `buildFlowDerivation.ts` 实现 `computeBuildFlowGroups()` 递归扩散分组算法
+- [x] T29. 重构 `deriveBuildFlowView()` 返回 `BuildFlowGroup[]` 替代原来的 `lineCards + outputCard`，保持 demandMaterialSet 不变
+- [x] T30. 适配 `useLogicFlowStore`：将 `buildFlowLineCards` / `buildFlowOutputCard` 替换为 `buildFlowGroups` computed
+- [x] T31. 适配 `useBuildFlowPresenter`：
   - `BuildFlowPresenterStore` 接口替换 `outputCard` 为 `buildFlowGroups`
   - `getTargetsForSource()` 限制为同组内目标
   - `getSourcesForTarget()` 限制为同组内来源
   - `edges` 计算不变
-- [ ] T32. 适配 `BuildFlowZone.vue`：渲染多个产出区 card（每组一个），替代原来单一产出区；菜单目标列表过滤为同组内
-- [ ] T33. 在 `cleanupStaleAssignments()` 新增跨组 assignment 清理规则
-- [ ] T34. 执行 `npm run build` 确认构建通过
+- [x] T32. 适配 `BuildFlowZone.vue`：渲染多个产出区 card（每组一个），替代原来单一产出区；菜单目标列表过滤为同组内
+- [x] T33. 在 `cleanupStaleAssignments()` 新增跨组 assignment 清理规则
+- [x] T34. 执行 `npm run build` 确认构建通过
+- [x] T35. 分组容器横向排列（`flex-row`），替代当前竖向排列（X6 Graph 自动横向排列分组）
+- [x] T36. 组内左右分列布局：产线 cards 左列竖排，产出区 card 右列（X6 节点定位实现）
+- [x] T37. 组内产线 card 拖拽排序（X6 nodeMovable 自由拖拽），初始位置为默认顺序
 
 ## 完成定义
 
@@ -88,7 +91,7 @@
 - [ ] 仅允许同 `wareId` 同组内来源标签与目标标签建立关系
 - [ ] 目标标签唯一绑定、支持覆盖与解绑
 - [ ] groups 变更后 assignments 失效清理自动执行（含跨组清理）
-- [ ] 绑定完成后显示有向线
+- [x] 绑定完成后显示有向线（X6 edge 自动跟随节点）
 - [ ] 规划区相关拖拽期间 `BuildFlowZone` 自动隐藏且不干扰拖拽
 - [ ] 保存/加载/另存为正确处理 `buildFlow` 字段
 - [ ] 旧版 plan 无 `buildFlow` 字段时不报错
