@@ -37,11 +37,11 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const isBuildFlowDragging = ref(false)
 
   function buildSnapshot() {
-    return JSON.stringify({ groups: groups.value, settings: settings.value })
+    return JSON.stringify({ groups: groups.value, settings: settings.value, buildFlowAssignments: buildFlowAssignments.value })
   }
 
   function buildEmptySnapshot() {
-    return JSON.stringify({ groups: [], settings: { isDefaultLocked: true } })
+    return JSON.stringify({ groups: [], settings: { isDefaultLocked: true }, buildFlowAssignments: [] })
   }
 
   // --- Build Flow ---
@@ -56,7 +56,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   })
 
   const buildFlowLineCards = computed(() => buildFlowView.value.lineCards)
-  const buildFlowOutputCard = computed(() => buildFlowView.value.outputCard)
+  const buildFlowGroups = computed(() => buildFlowView.value.buildFlowGroups)
   const demandMaterialSet = computed(() => buildFlowView.value.demandMaterialSet)
 
   function bindBuildFlowAssignment(assignment: BuildFlowAssignment) {
@@ -72,7 +72,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       buildFlowAssignments.value,
       groups.value,
       demandMaterialSet.value,
-      gameData.modulesMap
+      gameData.modulesMap,
+      buildFlowGroups.value
     )
   }
 
@@ -1347,7 +1348,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     // Build Flow
     buildFlowAssignments,
     buildFlowLineCards,
-    buildFlowOutputCard,
+    buildFlowGroups,
     demandMaterialSet,
     isBuildFlowDragging,
     bindBuildFlowAssignment,

@@ -4,11 +4,11 @@ import type {
   X4Module,
   BuildFlowAssignment,
   BuildFlowLineCard,
-  BuildFlowOutputCard,
+  BuildFlowGroup,
   BuildFlowTag
 } from '@/types/x4'
 
-export type { BuildFlowAssignment, BuildFlowLineCard, BuildFlowOutputCard, BuildFlowTag }
+export type { BuildFlowAssignment, BuildFlowLineCard, BuildFlowGroup, BuildFlowTag }
 
 function getModuleScopeNodes(group: ProductionLineGroup, modulesMap: Record<string, X4Module>): FlowNode[] {
   return group.nodes.filter(node => {
@@ -98,23 +98,89 @@ export function computeBuildMaterialTags(
   })
 }
 
-export function computeOutputTags(
-  lineCards: BuildFlowLineCard[]
-): BuildFlowTag[] {
-  const seen = new Set<string>()
-  const tags: BuildFlowTag[] = []
+export function computeBuildFlowGroups(lineCards: BuildFlowLineCard[]): BuildFlowGroup[] {
+  const U = new Set<string>()
   for (const card of lineCards) {
     for (const tag of card.sourceTags) {
-      if (seen.has(tag.wareId)) continue
-      seen.add(tag.wareId)
-      tags.push({
-        tagId: `build-flow-target:output:${tag.wareId}`,
-        wareId: tag.wareId,
-        label: tag.label
-      })
+      U.add(tag.wareId)
     }
   }
-  return tags
+
+  const cardBySourceWare = new Map<string, BuildFlowLineCard[]>()
+  for (const card of lineCards) {
+    for (const tag of card.sourceTags) {
+      let arr = cardBySourceWare.get(tag.wareId)
+      if (!arr) {
+        arr = []
+        cardBySourceWare.set(tag.wareId, arr)
+      }
+      arr.push(card)
+    }
+  }
+
+  const buildMatWareIdsByCard = new Map<string, Set<string>>()
+  for (const card of lineCards) {
+    const wares = new Set<string>()
+    for (const tag of card.buildMaterialTags) {
+      wares.add(tag.wareId)
+    }
+    buildMatWareIdsByCard.set(card.groupId, wares)
+  }
+
+  const visitedWares = new Set<string>()
+  const result: BuildFlowGroup[] = []
+
+  for (const seedWare of U) {
+    if (visitedWares.has(seedWare)) continue
+
+    const groupCards = new Map<string, BuildFlowLineCard>()
+    const queue: string[] = [seedWare]
+
+    while (queue.length > 0) {
+      const wareId = queue.shift()!
+      if (visitedWares.has(wareId)) continue
+      visitedWares.add(wareId)
+
+      const cards = cardBySourceWare.get(wareId)
+      if (!cards) continue
+
+      for (const card of cards) {
+        if (groupCards.has(card.groupId)) continue
+        groupCards.set(card.groupId, card)
+
+        const buildMats = buildMatWareIdsByCard.get(card.groupId)
+        if (buildMats) {
+          for (const matWareId of buildMats) {
+            if (U.has(matWareId) && !visitedWares.has(matWareId)) {
+              queue.push(matWareId)
+            }
+          }
+        }
+      }
+    }
+
+    const orderedCards = Array.from(groupCards.values())
+    orderedCards.sort((a, b) => a.groupId.localeCompare(b.groupId))
+
+    const outputSeen = new Set<string>()
+    const outputTags: BuildFlowTag[] = []
+    for (const card of orderedCards) {
+      for (const tag of card.sourceTags) {
+        if (outputSeen.has(tag.wareId)) continue
+        outputSeen.add(tag.wareId)
+        outputTags.push({
+          tagId: `build-flow-target:output:${tag.wareId}`,
+          wareId: tag.wareId,
+          label: tag.label
+        })
+      }
+    }
+
+    const groupKey = orderedCards.map(c => c.groupId).sort().join(':')
+    result.push({ groupKey, lineCards: orderedCards, outputTags })
+  }
+
+  return result
 }
 
 export function deriveBuildFlowView(
@@ -125,7 +191,7 @@ export function deriveBuildFlowView(
 ): {
   demandMaterialSet: Set<string>
   lineCards: BuildFlowLineCard[]
-  outputCard: BuildFlowOutputCard
+  buildFlowGroups: BuildFlowGroup[]
 } {
   const demandMaterialSet = computeDemandMaterialSet(groups, modulesMap)
 
@@ -150,10 +216,9 @@ export function deriveBuildFlowView(
     buildMaterialTags: computeBuildMaterialTags(group, outputMaterialWareIds, modulesMap, getWareLabel)
   }))
 
-  const outputTags = computeOutputTags(lineCards)
-  const outputCard: BuildFlowOutputCard = { outputTags }
+  const buildFlowGroups = computeBuildFlowGroups(lineCards)
 
-  return { demandMaterialSet, lineCards, outputCard }
+  return { demandMaterialSet, lineCards, buildFlowGroups }
 }
 
 export function computeTargetKey(assignment: BuildFlowAssignment): string {
@@ -184,7 +249,8 @@ export function cleanupStaleAssignments(
   assignments: BuildFlowAssignment[],
   groups: ProductionLineGroup[],
   demandMaterialSet: Set<string>,
-  modulesMap: Record<string, X4Module>
+  modulesMap: Record<string, X4Module>,
+  buildFlowGroups: BuildFlowGroup[]
 ): BuildFlowAssignment[] {
   const groupIdSet = new Set(groups.map(g => g.id))
   const buildFlowGroupIds = new Set<string>()
@@ -223,6 +289,13 @@ export function cleanupStaleAssignments(
     buildMaterialTagWareIdsByGroup.set(group.id, buildMatWares)
   }
 
+  const groupIdToGroupKey = new Map<string, string>()
+  for (const bg of buildFlowGroups) {
+    for (const card of bg.lineCards) {
+      groupIdToGroupKey.set(card.groupId, bg.groupKey)
+    }
+  }
+
   return assignments.filter(a => {
     if (!groupIdSet.has(a.sourceGroupId)) return false
     if (!buildFlowGroupIds.has(a.sourceGroupId)) return false
@@ -234,8 +307,16 @@ export function cleanupStaleAssignments(
       if (!buildFlowGroupIds.has(a.targetGroupId)) return false
       const targetBuildMats = buildMaterialTagWareIdsByGroup.get(a.targetGroupId)
       if (!targetBuildMats || !targetBuildMats.has(a.wareId)) return false
+
+      const sourceGroupKey = groupIdToGroupKey.get(a.sourceGroupId)
+      const targetGroupKey = groupIdToGroupKey.get(a.targetGroupId)
+      if (sourceGroupKey !== targetGroupKey) return false
     } else {
       if (!outputWareIds.has(a.wareId)) return false
+
+      const sourceGroupKey = groupIdToGroupKey.get(a.sourceGroupId)
+      const outputGroup = buildFlowGroups.find(bg => bg.outputTags.some(t => t.wareId === a.wareId))
+      if (outputGroup && sourceGroupKey !== outputGroup.groupKey) return false
     }
 
     return true

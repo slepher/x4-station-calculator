@@ -2,7 +2,7 @@ import { computed, type ComputedRef, type Ref } from 'vue'
 import type {
   BuildFlowAssignment,
   BuildFlowLineCard,
-  BuildFlowOutputCard,
+  BuildFlowGroup,
   BuildFlowTag,
   BuildFlowTargetType
 } from '@/types/x4'
@@ -10,7 +10,7 @@ import { computeTargetKey } from '@/store/logic/buildFlowDerivation'
 
 export interface BuildFlowPresenterStore {
   lineCards: ComputedRef<BuildFlowLineCard[]>
-  outputCard: ComputedRef<BuildFlowOutputCard>
+  buildFlowGroups: ComputedRef<BuildFlowGroup[]>
   assignments: Ref<BuildFlowAssignment[]> | BuildFlowAssignment[]
   isDragging: ComputedRef<boolean>
   bindAssignment(assignment: BuildFlowAssignment): void
@@ -49,12 +49,12 @@ export interface BuildFlowRow {
 
 export interface UseBuildFlowPresenterReturn {
   lineCards: ComputedRef<BuildFlowLineCard[]>
-  outputCard: ComputedRef<BuildFlowOutputCard>
+  buildFlowGroups: ComputedRef<BuildFlowGroup[]>
   cardRows: ComputedRef<BuildFlowRow[][]>
   edges: ComputedRef<BuildFlowEdge[]>
   isDragging: ComputedRef<boolean>
-  getTargetsForSource(wareId: string): MenuTargetItem[]
-  getSourcesForTarget(wareId: string): MenuTargetItem[]
+  getTargetsForSource(wareId: string, sourceGroupId: string): MenuTargetItem[]
+  getSourcesForTarget(wareId: string, targetGroupKey: string): MenuTargetItem[]
   bindFromMenu(sourceGroupId: string, wareId: string, target: MenuTargetItem): void
   bindFromDrag(sourceGroupId: string, wareId: string, targetType: BuildFlowTargetType, targetGroupId?: string): void
   unbind(targetKey: string): void
@@ -71,8 +71,18 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
   }
 
   const lineCards = computed(() => store.lineCards.value)
-  const outputCard = computed(() => store.outputCard.value)
+  const buildFlowGroups = computed(() => store.buildFlowGroups.value)
   const isDragging = computed(() => store.isDragging.value)
+
+  const groupIdToGroupKey = computed(() => {
+    const map = new Map<string, string>()
+    for (const bg of store.buildFlowGroups.value) {
+      for (const card of bg.lineCards) {
+        map.set(card.groupId, bg.groupKey)
+      }
+    }
+    return map
+  })
 
   const cardRows = computed<BuildFlowRow[][]>(() => {
     return store.lineCards.value.map(card => {
@@ -113,10 +123,14 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     })
   })
 
-  function getTargetsForSource(wareId: string): MenuTargetItem[] {
+  function getTargetsForSource(wareId: string, sourceGroupId: string): MenuTargetItem[] {
     const targets: MenuTargetItem[] = []
     const assignments = getAssignments()
-    for (const card of store.lineCards.value) {
+    const sourceGroupKey = groupIdToGroupKey.value.get(sourceGroupId)
+    const sourceGroup = store.buildFlowGroups.value.find(bg => bg.groupKey === sourceGroupKey)
+    if (!sourceGroup) return targets
+
+    for (const card of sourceGroup.lineCards) {
       for (const tag of card.buildMaterialTags) {
         if (tag.wareId !== wareId) continue
         const targetKey = `line:${card.groupId}:${wareId}`
@@ -133,7 +147,7 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
         })
       }
     }
-    for (const tag of store.outputCard.value.outputTags) {
+    for (const tag of sourceGroup.outputTags) {
       if (tag.wareId !== wareId) continue
       const targetKey = `output:${wareId}`
       targets.push({
@@ -150,10 +164,13 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     return targets
   }
 
-  function getSourcesForTarget(wareId: string): MenuTargetItem[] {
+  function getSourcesForTarget(wareId: string, targetGroupKey: string): MenuTargetItem[] {
     const sources: MenuTargetItem[] = []
     const assignments = getAssignments()
-    for (const card of store.lineCards.value) {
+    const targetGroup = store.buildFlowGroups.value.find(bg => bg.groupKey === targetGroupKey)
+    if (!targetGroup) return sources
+
+    for (const card of targetGroup.lineCards) {
       for (const tag of card.sourceTags) {
         if (tag.wareId !== wareId) continue
         const targetKey = `line:${card.groupId}:${wareId}`
@@ -217,7 +234,7 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
 
   return {
     lineCards,
-    outputCard,
+    buildFlowGroups,
     cardRows,
     edges,
     isDragging,

@@ -743,7 +743,9 @@ export interface BuildFlowLineCard {
   buildMaterialTags: BuildFlowTag[]
 }
 
-export interface BuildFlowOutputCard {
+export interface BuildFlowGroup {
+  groupKey: string
+  lineCards: BuildFlowLineCard[]
   outputTags: BuildFlowTag[]
 }
 

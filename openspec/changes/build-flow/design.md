@@ -2,10 +2,11 @@
 
 ## 目标
 
-在不污染现有 `logicFlow.groups` / `FlowNode` 业务结构的前提下，为 `logic-flow` 增加一套“建筑流”派生视图和独立关系层。该层负责：
+在不污染现有 `logicFlow.groups` / `FlowNode` 业务结构的前提下，为 `logic-flow` 增加一套"建筑流"派生视图和独立关系层。该层负责：
 
 - 从现有产线推导建筑相关来源与目标
-- 维护来源标签到目标标签的唯一绑定关系
+- 按关联关系对建筑材料自动分组
+- 维护来源标签到目标标签的唯一绑定关系（组内）
 - 支持拖拽 / 菜单 / 覆盖 / 解绑
 - 以有向线形式可视化关系
 
@@ -16,13 +17,14 @@
 - `store`
   - 负责基础状态与关系存储
   - 负责基于 `logicFlow.groups` 的原始派生计算
+  - 负责建筑材料分组推导
 - `presenter`
-  - 负责面向 UI 组装 card、tag、目标列表、连线锚点数据
+  - 负责面向 UI 组装分组、card、tag、目标列表、连线锚点数据
 - `vue`
-  - 负责渲染 card / tag / menu / edge
+  - 负责渲染分组容器、card / tag / menu / edge
   - 只通过 presenter 读取展示数据和触发行为
 
-本次不要求重构整个旧版 `logic-flow`，但新增“建筑产线区”逻辑不得继续扩散新的“Vue 直连 store 做复杂组装”的写法。
+本次不要求重构整个旧版 `logic-flow`，但新增"建筑产线区"逻辑不得继续扩散新的"Vue 直连 store 做复杂组装"的写法。
 
 ## 布局与可见性
 
@@ -36,7 +38,7 @@
 
 - 与当前页面连续工作台的视觉风格更一致
 - 不引入额外 section 控件与状态
-- 规划拖拽干扰问题通过“拖拽期间自动隐藏”解决即可
+- 规划拖拽干扰问题通过"拖拽期间自动隐藏"解决即可
 
 运行时可见性规则：
 
@@ -44,20 +46,29 @@
 - 拖拽结束后自动恢复显示
 - 该状态只用于避免无关区域参与 hover / drop / 命中，不做持久化
 
+### 分组容器布局
+
+建筑产线区按分组渲染，每个分组是一个带边框/背景的容器。分组容器之间竖向排列。
+
+每个分组容器内部：
+
+- 产线 card 竖向排列
+- 该组的"产出区" card
+
 ### Card 布局结构
 
 每个产线 card 的内部布局为：
 
 - 顶部整行：产线名称（使用 `getLogicFlowGroupDisplayName` 获取，与规划区产线名称一致）
 - 下方横向区域（`flex justify-between`）：
-  - 左侧列：“产线建材”标签，竖向排列
-  - 右侧列：“产线原材料”标签，竖向排列，右对齐（`items-end`）
+  - 左侧列："产线建材"标签，竖向排列
+  - 右侧列："产线原材料"标签，竖向排列，右对齐（`items-end`）
 
-“产出区” card 内“现产原材料”标签竖向排列。
+"产出区" card 内"现产原材料"标签竖向排列。
 
 ### Tag 排版结构
 
-建筑流标签不再使用“hover 后展开背景，再把 `+` 按钮滑出”的方案，统一改为常驻外伸按钮布局：
+建筑流标签不再使用"hover 后展开背景，再把 `+` 按钮滑出"的方案，统一改为常驻外伸按钮布局：
 
 - `产线原材料`
   - 文字左对齐
@@ -78,6 +89,22 @@
 
 建议引入一套独立关系模型，避免向 `ProductionLineGroup` / `FlowNode` 混入建筑流字段。
 
+### 分组模型
+
+```ts
+interface BuildFlowGroup {
+  groupKey: string
+  lineCards: BuildFlowLineCard[]
+  outputTags: BuildFlowTag[]
+}
+```
+
+其中：
+
+- `groupKey` = 组内所有 lineCard.groupId 排序后以 `:` 连接，如 `"g1:g2:g3"`。确定性标识，分组重组时自然更新。
+- `lineCards` = 该组内的所有产线 card
+- `outputTags` = 组内产线 sourceTags 并集
+
 ### 派生视图模型
 
 ```ts
@@ -86,10 +113,6 @@ interface BuildFlowLineCard {
   title: string
   sourceTags: BuildFlowTag[]
   buildMaterialTags: BuildFlowTag[]
-}
-
-interface BuildFlowOutputCard {
-  outputTags: BuildFlowTag[]
 }
 
 interface BuildFlowTag {
@@ -103,7 +126,8 @@ interface BuildFlowTag {
 
 - `sourceTags` = 产线原材料
 - `buildMaterialTags` = 产线建材
-- `outputTags` = 现产原材料
+
+注意：`BuildFlowOutputCard` 不再作为独立类型，产出区内容由 `BuildFlowGroup.outputTags` 承载。
 
 ### 关系模型
 
@@ -125,6 +149,8 @@ interface BuildFlowAssignment {
 - 目标端一对一
 - 覆盖时按目标键定位旧关系并替换
 - 解绑时按目标键删除
+
+**注意**：`BuildFlowAssignment` 结构不变，不包含 groupKey。分组信息是推导结果，不需要持久化。产出区的 target key 仍为 `output:{wareId}`，因为同一 wareId 在分组后只会出现在一个组的产出区中（分组的定义保证了这一点：每个 wareId 只属于一个连通分量）。
 
 ### 持久化模型
 
@@ -172,7 +198,7 @@ interface LogicFlowPlan {
 Record<wareId, amount>
 ```
 
-其 key 集合作为“需求原材料”集合。模块口径同 Step 1（排除 isolated 和 tier 0）。
+其 key 集合作为"需求原材料"集合。模块口径同 Step 1（排除 isolated 和 tier 0）。
 
 ### 3. 建筑产线筛选
 
@@ -187,9 +213,35 @@ Record<wareId, amount>
 - `产线建材`
   - = 该产线自身模块（`!isIsolated && tier > 0`）`buildCost` 材料集合与"现产原材料"的交集
 
-### 5. 产出区内容
+### 5. 建筑材料分组
 
-将全部入选产线的 `产线原材料` 去重并集，作为“现产原材料”。
+对入选产线执行递归扩散分组：
+
+```
+1. U = 全部入选产线 sourceTags 的 wareId 并集
+2. visitedWares = ∅, result = []
+3. while U - visitedWares 非空：
+   a. 取 seed ∉ visitedWares
+   b. BFS 扩散：
+      - 找到 sourceTags 包含 seed 的所有产线 → 加入当前组
+      - 收集这些产线 buildMaterialTags 中的 wareId
+      - 对每个 ∈ U 且 ∉ visitedWares 的 wareId，继续扩散
+   c. groupOutput = 当前组内产线 sourceTags 并集
+   d. visitedWares ∪= groupOutput
+   e. groupKey = 组内 groupId 排序后 join(':')
+   f. result.push({ groupKey, lineCards, outputTags })
+4. 返回 result
+```
+
+关键性质：
+
+- 同一产线的所有 sourceTags 天然同组（因为它们通过同一产线的 buildMaterialTags 连通）
+- 每条入选产线必属于且仅属于一个组
+- 同一 wareId 只出现在一个组的产出区中
+
+### 6. 产出区内容
+
+每个分组的产出区 = 组内产线 sourceTags 并集。不再有全局单一产出区。
 
 ## 交互设计
 
@@ -197,13 +249,19 @@ Record<wareId, amount>
 
 来源标签（产线原材料）需要具备两种入口：
 
-- 拖拽到同 `wareId` 的目标标签
+- 拖拽到同 `wareId` 的目标标签（仅同组内）
 - 点击常驻 `+` 打开目标菜单
 
-目标菜单列表应只显示同 `wareId` 的目标标签，包括：
+目标菜单列表应只显示同组内同 `wareId` 的目标标签，包括：
 
-- 其他产线 card 中的同名 `产线建材`
-- 产出区中的同名 `现产原材料`
+- 同组内其他产线 card 中的同名 `产线建材`
+- 同组内产出区中的同名 `现产原材料`
+
+### 跨组限制
+
+- 拖拽投放时，若来源与目标不在同一组，投放无效
+- 菜单列表不展示跨组目标
+- 分组重组后，已存储的 assignment 如果变成跨组，在失效清理中自动删除
 
 ### 覆盖语义
 
@@ -231,6 +289,8 @@ Record<wareId, amount>
 line-build-material: `line:${targetGroupId}:${wareId}`
 output-material: `output:${wareId}`
 ```
+
+产出区 target key 仍不含 groupKey。因为分组保证了同一 wareId 只属于一个组的产出区，`output:{wareId}` 仍然是全局唯一的。
 
 ## 连线设计
 
@@ -261,11 +321,11 @@ target(output): build-flow-target:output:<wareId>
 
 | 文件/目录 | 角色 |
 |---|---|
-| `src/store/useLogicFlowStore.ts` 或相邻新 store 模块 | 持有建筑流关系状态与基础计算能力 |
-| `src/components/logic-flow/presenters/useBuildFlowPresenter.ts` | 组装建筑产线区 card / tag / menu / edge 数据 |
-| `src/components/logic-flow/LogicFlowWorkbenchView.vue` | 挂载建筑产线区 |
-| `src/components/logic-flow/` 下新增建筑产线区组件 | 渲染 card、tag、菜单、解绑入口 |
-| `src/components/logic-flow/` 下新增边组件 | 渲染建筑流有向线 |
+| `src/store/logic/buildFlowDerivation.ts` | 新增 `computeBuildFlowGroups()` 分组推导函数 |
+| `src/types/x4.ts` | 新增 `BuildFlowGroup` 类型，移除 `BuildFlowOutputCard` 类型 |
+| `src/store/useLogicFlowStore.ts` | 适配分组推导，替换 `buildFlowOutputCard` 为 `buildFlowGroups` |
+| `src/components/logic-flow/presenters/useBuildFlowPresenter.ts` | 适配分组结构，按组组装 card、菜单目标列表 |
+| `src/components/logic-flow/BuildFlowZone.vue` | 按分组容器渲染，每组内含产线 cards + 产出区 card |
 
 ## Assignments 失效清理
 
@@ -273,7 +333,7 @@ target(output): build-flow-target:output:<wareId>
 
 ### 清理时机
 
-每次派生视图重新计算后（即 groups 变化触发 `demandMaterialSet`、入选产线、产出区标签重新推导时），执行一轮失效清理。
+每次派生视图重新计算后（即 groups 变化触发 `demandMaterialSet`、入选产线、分组、产出区标签重新推导时），执行一轮失效清理。
 
 ### 清理规则
 
@@ -287,6 +347,7 @@ target(output): build-flow-target:output:<wareId>
 6. **目标标签失效**：
    - `targetType === 'line-build-material'`：若目标产线的产线建材中不再包含 `assignment.wareId`，删除该 assignment。
    - `targetType === 'output-material'`：若产出区的现产原材料中不再包含 `assignment.wareId`，删除该 assignment。
+7. **跨组绑定**（新增）：若来源产线与目标不在同一分组，删除该 assignment。
 
 ### 清理结果
 
@@ -314,6 +375,8 @@ interface LogicFlowPlan {
   lastUpdated: number
 }
 ```
+
+分组信息（`BuildFlowGroup`）不持久化，每次加载时从 groups 重新推导。
 
 ### Save 路径
 
@@ -343,13 +406,13 @@ interface LogicFlowPlan {
 
 ## Presenter 路径
 
-新增 presenter 文件路径为 `src/components/logic-flow/presenters/useBuildFlowPresenter.ts`，遵循 empire 功能的 `use<Feature>Presenter.ts` 命名约定。
+Presenter 文件路径为 `src/components/logic-flow/presenters/useBuildFlowPresenter.ts`，遵循 empire 功能的 `use<Feature>Presenter.ts` 命名约定。
 
 Presenter 职责：
 
-- 接收 store 提供的派生数据（line cards、output card、demandMaterialSet）
+- 接收 store 提供的派生数据（buildFlowGroups、demandMaterialSet）
 - 接收 store 提供的 assignments
-- 组装 UI 直接消费的展示结构：card 列表、标签列表、菜单目标列表、edge 锚点数据
+- 按分组组装 UI 直接消费的展示结构：分组列表、组内 card 列表、标签列表、菜单目标列表（组内过滤）、edge 锚点数据
 - 提供行为方法：`bindAssignment()`、`unbindAssignment()`，供 Vue 组件调用
 
 Vue 组件通过 presenter 取数和触发行为，不得直接访问 store。
@@ -358,6 +421,8 @@ Vue 组件通过 presenter 取数和触发行为，不得直接访问 store。
 
 - 旧版 `logic-flow` 目前仍有较多 Vue 直连 store 写法，本次新增功能应避免把新逻辑继续堆进现有大组件。
 - `buildCost` 统计必须基于产线自身模块，而不是只看主要产品对应模块。
-- 目标唯一性必须以“目标标签键”实现，而不是只按 `wareId` 实现；否则不同 card 上同名标签会互相污染。
+- 目标唯一性必须以"目标标签键"实现，而不是只按 `wareId` 实现；否则不同 card 上同名标签会互相污染。
 - 连线锚点需要稳定且可重算，避免依赖文案文本或数组索引。
 - `BuildFlowZone` 的自动隐藏必须彻底脱离命中树，避免隐藏但仍占据拖拽命中区域。
+- 分组是动态推导结果，不持久化。分组重组时必须清理跨组 assignments。
+- 分组容器内连线仍在同一 SVG 层渲染，需确保分组容器的 position 不会导致连线坐标系偏移。
