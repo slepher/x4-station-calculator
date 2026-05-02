@@ -66,13 +66,12 @@ const boundTargetTagIds = computed(() => {
 const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
 const wareColorMap = new Map<string, string>()
 function getWareColor(wareId: string) {
-  if (!wareColorMap.has(wareId)) wareColorMap.set(wareId, COLORS[wareColorMap.size % COLORS.length])
-  return wareColorMap.get(wareId)!
+  if (!wareColorMap.has(wareId)) wareColorMap.set(wareId, COLORS[wareColorMap.size % COLORS.length]!)
+  return wareColorMap.get(wareId) ?? COLORS[0]!
 }
 
 // --- Drag state ---
 const draggingTag = ref<{ groupId: string; wareId: string } | null>(null)
-const hoverTargetTagId = ref<string | null>(null)
 
 function onSourceDragStart(groupId: string, wareId: string) {
   draggingTag.value = { groupId, wareId }
@@ -81,16 +80,7 @@ function onSourceDragStart(groupId: string, wareId: string) {
 
 function onSourceDragEnd() {
   draggingTag.value = null
-  hoverTargetTagId.value = null
   presenter.stopDrag()
-}
-
-function onTargetDragEnter(tagId: string) {
-  hoverTargetTagId.value = tagId
-}
-
-function onTargetDragLeave() {
-  hoverTargetTagId.value = null
 }
 
 function onTargetDrop(targetType: BuildFlowTargetType, targetGroupId?: string) {
@@ -98,7 +88,6 @@ function onTargetDrop(targetType: BuildFlowTargetType, targetGroupId?: string) {
   const { groupId, wareId } = draggingTag.value
   presenter.bindFromDrag(groupId, wareId, targetType, targetGroupId)
   draggingTag.value = null
-  hoverTargetTagId.value = null
   presenter.stopDrag()
 }
 
@@ -273,15 +262,6 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                       class="target-tag-segment target-tag-segment-main"
                       :style="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? { backgroundColor: getWareColor(row.wareId) + '40', borderColor: getWareColor(row.wareId) + '80', color: getWareColor(row.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
                     >
-                    <button
-                      class="target-tag-segment target-tag-segment-add"
-                      :class="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
-                      @click.stop="onTargetTagPlusClick(row.buildMaterialTag.wareId, row.buildMaterialTag.tagId, 'line-build-material', card.groupId, sg.groupKey, $event)"
-                    >+</button>
-                    <span
-                      class="target-tag-segment target-tag-segment-main"
-                      :class="[boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300']"
-                    >
                       <span class="target-tag-text">{{ row.buildMaterialTag.label }}</span>
                       <button v-if="boundTargetTagIds.has(row.buildMaterialTag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(row.buildMaterialTag, 'line-build-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
                     </span>
@@ -318,8 +298,6 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                 :key="tag.tagId"
                 :data-tag-id="tag.tagId"
                 class="build-flow-tag build-flow-target-tag whitespace-nowrap"
-                @dragenter.prevent="onTargetDragEnter(tag.tagId)"
-                @dragleave="onTargetDragLeave"
                 @dragover.prevent
                 @drop.prevent="onTargetDrop('output-material')"
               >
