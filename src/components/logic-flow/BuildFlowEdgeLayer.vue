@@ -21,17 +21,23 @@ function recalculate() {
   const container = svgRef.value.parentElement
   if (!container) return
 
-  const GAP = 16
-  const BASE_OFFSET = 30
+  const GAP = 12
+  const BASE_OFFSET = 24
   const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
 
   const containerRect = container.getBoundingClientRect()
   if (containerRect.width === 0) { scheduleRecalculate(); return }
 
+  const cardEls = container.querySelectorAll('.build-flow-line-card')
+  const cardBounds: Array<{ top: number; bottom: number }> = []
+  cardEls.forEach(el => { const r = el.getBoundingClientRect(); cardBounds.push({ top: r.top - containerRect.top, bottom: r.bottom - containerRect.top }) })
+  cardBounds.sort((a, b) => a.top - b.top)
+
   const positioned: Array<{
     edge: BuildFlowEdge
     x1: number; y1: number
     x2: number; y2: number
+    cardY1: number; cardY2: number
   }> = []
 
   for (const edge of props.edges) {
@@ -47,14 +53,21 @@ function recalculate() {
     const y1 = sourceRect.top + sourceRect.height / 2 - containerRect.top
     const x2 = isSelf ? targetRect.right - containerRect.left : targetRect.left - containerRect.left
     const y2 = targetRect.top + targetRect.height / 2 - containerRect.top
-    positioned.push({ edge, x1, y1, x2, y2 })
+
+    let cardY1 = y1, cardY2 = y2
+    for (const cb of cardBounds) {
+      if (y1 >= cb.top && y1 <= cb.bottom) cardY1 = cb.bottom
+      if (y2 >= cb.top && y2 <= cb.bottom) cardY2 = cb.bottom
+    }
+
+    positioned.push({ edge, x1, y1, x2, y2, cardY1, cardY2 })
   }
 
   if (positioned.length === 0) { lines.value = []; return }
 
   const results: RoutedEdge[] = []
   positioned.forEach((pos, i) => {
-    const { edge, x1, y1, x2, y2 } = pos
+    const { edge, x1, y1, x2, y2, cardY1, cardY2 } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
       results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: COLORS[i % COLORS.length] })
@@ -68,7 +81,7 @@ function recalculate() {
       d = `M ${x1},${y1} L ${x1 + offset},${y1} L ${x1 + offset},${y2} L ${x2},${y2}`
     } else {
       const p1X = x1 + offset
-      const p2Y = Math.min(y1, y2) - offset
+      const p2Y = y1 < y2 ? cardY2 + 4 + i * 4 : y1 - cardY1 - 4 - i * 4
       const p3X = x2 - offset
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
     }
