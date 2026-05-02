@@ -12,7 +12,7 @@ const logicFlow = useLogicFlowStore()
 const presenter = useBuildFlowPresenter({
   lineCards: computed(() => logicFlow.buildFlowLineCards),
   buildFlowGroups: computed(() => logicFlow.buildFlowGroups),
-  assignments: logicFlow.buildFlowAssignments,
+  assignments: computed(() => logicFlow.buildFlowAssignments),
   isDragging: computed(() => logicFlow.isBuildFlowDragging),
   bindAssignment: logicFlow.bindBuildFlowAssignment,
   unbindAssignment: logicFlow.unbindBuildFlowAssignment,
