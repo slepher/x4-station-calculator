@@ -21,8 +21,6 @@ function recalculate() {
   const container = svgRef.value.parentElement
   if (!container) return
 
-  const GAP = 12
-  const BASE_OFFSET = 24
   const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
 
   const containerRect = container.getBoundingClientRect()
@@ -67,6 +65,7 @@ function recalculate() {
 
   const results: RoutedEdge[] = []
   let modeAIdx = 0
+  let modeBIdx = 0
   positioned.forEach((pos, i) => {
     const { edge, x1, y1, x2, y2, cardY1, cardY2 } = pos
     const isSelf = (edge as any).isSelfConnection
@@ -87,12 +86,12 @@ function recalculate() {
       }
       modeAIdx++
     } else {
-      const offset = BASE_OFFSET + i * GAP
-      const p1X = x1 + offset
-      const p2Y = y1 < y2 ? cardY2 + 4 + i * 4 : y1 - cardY1 - 4 - i * 4
-      const p3X = x2 - offset
-      console.log(`[modeB] i=${i} start=(${x1.toFixed(0)},${y1.toFixed(0)}) p1X=${p1X.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
+      const p1X = x1 + 4 + modeBIdx * 4
+      const p2Y = y1 < y2 ? cardY2 + 4 + modeBIdx * 4 : y1 - cardY1 - 4 - modeBIdx * 4
+      const p3X = x2 - 4 - modeBIdx * 4
+      console.log(`[modeB] i=${modeBIdx} start=(${x1.toFixed(0)},${y1.toFixed(0)}) p1X=${p1X.toFixed(0)} p3X=${p3X.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
+      modeBIdx++
     }
 
     results.push({ id: edge.id, d, color: COLORS[i % COLORS.length] })
