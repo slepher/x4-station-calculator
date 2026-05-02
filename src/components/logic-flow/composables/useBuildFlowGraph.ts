@@ -32,6 +32,14 @@ const LEFT_COL_WIDTH = LINE_CARD_WIDTH + CARD_GAP_Y
 const RIGHT_COL_OFFSET = LEFT_COL_WIDTH + 40
 const GROUP_DRAG_PADDING = 60
 
+function resolveShapeFromInteractionArg(target: unknown): string | null {
+  if (!target || typeof target !== 'object') return null
+  const maybeCell = target as { getShape?: () => string; cell?: { getShape?: () => string } }
+  if (typeof maybeCell.getShape === 'function') return maybeCell.getShape()
+  if (maybeCell.cell && typeof maybeCell.cell.getShape === 'function') return maybeCell.cell.getShape()
+  return null
+}
+
 export function useBuildFlowGraph(containerEl: HTMLElement) {
   const graph = new Graph({
     container: containerEl,
