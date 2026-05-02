@@ -32,6 +32,22 @@ const LEFT_COL_WIDTH = LINE_CARD_WIDTH + CARD_GAP_Y
 const RIGHT_COL_OFFSET = LEFT_COL_WIDTH + 40
 const GROUP_DRAG_PADDING = 60
 
+function resolveShapeFromInteractionArg(target: unknown): string | null {
+  if (!target || typeof target !== 'object') return null
+  const maybeCell = target as { getShape?: () => string; cell?: { getShape?: () => string } }
+  if (typeof maybeCell.getShape === 'function') return maybeCell.getShape()
+  if (maybeCell.cell && typeof maybeCell.cell.getShape === 'function') return maybeCell.cell.getShape()
+  return null
+}
+
+function isEdgeInteractionArg(target: unknown): boolean {
+  if (!target || typeof target !== 'object') return false
+  const maybeCell = target as { isEdge?: () => boolean; cell?: { isEdge?: () => boolean } }
+  if (typeof maybeCell.isEdge === 'function') return maybeCell.isEdge()
+  if (maybeCell.cell && typeof maybeCell.cell.isEdge === 'function') return maybeCell.cell.isEdge()
+  return false
+}
+
 export function useBuildFlowGraph(containerEl: HTMLElement) {
   const graph = new Graph({
     container: containerEl,
@@ -41,7 +57,20 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
     panning: false,
     mousewheel: false,
     connecting: { snap: false, allowLoop: false, allowNode: false, allowEdge: false, allowPort: false, allowMulti: false, highlight: false, validateConnection: () => false },
-    interacting: { nodeMovable: true },
+    interacting: (cellView: unknown) => {
+      if (isEdgeInteractionArg(cellView)) {
+        return {
+          edgeMovable: false,
+          vertexAddable: false,
+          vertexMovable: false,
+          vertexDeletable: false,
+          arrowheadMovable: false,
+        }
+      }
+      const shape = resolveShapeFromInteractionArg(cellView)
+      const movable = shape === 'build-flow-line-card' || shape === 'build-flow-output-card'
+      return { nodeMovable: movable }
+    },
     embedding: { enabled: false },
   })
 
@@ -53,10 +82,6 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
   })
 
   function syncGraph(groups: BuildFlowGroup[], assignments: BuildFlowAssignment[]) {
-    console.log('[BuildFlowGraph] syncGraph called, groups:', groups.length, 'assignments:', assignments.length)
-    if (groups.length > 0) {
-      console.log('[BuildFlowGraph] first group:', JSON.stringify(groups[0], null, 2).substring(0, 500))
-    }
     const existingNodeIds = new Set(graph.getNodes().map(n => n.id))
     const existingEdgeIds = new Set(graph.getEdges().map(e => e.id))
     const desiredNodeIds = new Set<string>()
@@ -98,7 +123,6 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
       const groupHeight = maxCardHeight + GROUP_DRAG_PADDING * 2
 
       if (!existingNodeIds.has(groupNodeId)) {
-        console.log('[BuildFlowGraph] addNode group:', groupNodeId, 'shape: rect', 'width:', groupWidth)
         graph.addNode({
           id: groupNodeId,
           shape: 'rect',
@@ -116,6 +140,7 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
             },
           },
           interacting: { nodeMovable: false },
+          zIndex: 0,
         })
         existingNodeIds.add(groupNodeId)
       } else {
@@ -137,7 +162,6 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
         const y = layout.y + GROUP_DRAG_PADDING + offsetY
 
         if (!existingNodeIds.has(cardNodeId)) {
-          console.log('[BuildFlowGraph] addNode line-card:', cardNodeId, 'shape: build-flow-line-card')
           graph.addNode({
             id: cardNodeId,
             shape: 'build-flow-line-card',
@@ -146,6 +170,7 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
             width: LINE_CARD_WIDTH,
             height: layout.height,
             data: { card: layout.card, groupKey: group.groupKey },
+            zIndex: 10,
           })
           existingNodeIds.add(cardNodeId)
         } else {
@@ -162,7 +187,6 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
       const outY = GROUP_PAD + GROUP_DRAG_PADDING + offsetY
 
       if (!existingNodeIds.has(outputNodeId)) {
-        console.log('[BuildFlowGraph] addNode output-card:', outputNodeId, 'shape: build-flow-output-card')
         graph.addNode({
           id: outputNodeId,
           shape: 'build-flow-output-card',
@@ -171,6 +195,7 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
           width: OUTPUT_CARD_WIDTH,
           height: outputEstHeight,
           data: { outputTags: group.outputTags, groupKey: group.groupKey },
+          zIndex: 10,
         })
         existingNodeIds.add(outputNodeId)
       } else {
@@ -206,8 +231,39 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
               targetMarker: { name: 'block', width: 10, height: 8 },
             },
           },
+          zIndex: 5,
+          interacting: {
+            edgeMovable: false,
+            vertexAddable: false,
+            vertexMovable: false,
+            vertexDeletable: false,
+            arrowheadMovable: false,
+          },
         })
         existingEdgeIds.add(edgeId)
+      }
+
+      const edge = graph.getCellById(edgeId)
+      if (edge && edge.isEdge()) {
+        setTimeout(() => {
+          const sourceEl = containerEl.querySelector(`[data-tag-id="build-flow-source:${assignment.sourceGroupId}:${assignment.wareId}"]`) as HTMLElement | null
+          const targetTagId = assignment.targetType === 'line-build-material'
+            ? `build-flow-target:line:${assignment.targetGroupId}:${assignment.wareId}`
+            : `build-flow-target:output:${assignment.wareId}`
+          const targetEl = containerEl.querySelector(`[data-tag-id="${targetTagId}"]`) as HTMLElement | null
+          if (!sourceEl || !targetEl) return
+          const sourceRect = sourceEl.getBoundingClientRect()
+          const targetRect = targetEl.getBoundingClientRect()
+          const containerRect = containerEl.getBoundingClientRect()
+          edge.setSource({
+            x: sourceRect.right - containerRect.left,
+            y: sourceRect.top - containerRect.top + sourceRect.height / 2,
+          })
+          edge.setTarget({
+            x: targetRect.left - containerRect.left,
+            y: targetRect.top - containerRect.top + targetRect.height / 2,
+          })
+        }, 0)
       }
     }
 
@@ -233,7 +289,6 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
       }
     }
 
-    console.log('[BuildFlowGraph] syncGraph done, total nodes:', graph.getNodes().length, 'edges:', graph.getEdges().length)
   }
 
   function dispose() {
