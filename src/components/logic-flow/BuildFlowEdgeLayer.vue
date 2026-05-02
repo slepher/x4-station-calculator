@@ -12,9 +12,10 @@ interface RoutedEdge {
   id: string
   d: string
   color?: string
+  colorIdx?: number
 }
 
-const lines = ref<RoutedEdge[]>([])
+const wareColorArr = ref<string[]>([])
 
 function recalculate() {
   if (!svgRef.value) return
@@ -22,6 +23,16 @@ function recalculate() {
   if (!container) return
 
   const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
+
+  const wareColorMap = new Map<string, string>()
+
+  function getColor(edge: BuildFlowEdge): { color: string; idx: number } {
+    if (!wareColorMap.has(edge.wareId)) {
+      wareColorMap.set(edge.wareId, wareColorMap.size)
+    }
+    const idx = wareColorMap.get(edge.wareId)!
+    return { color: COLORS[idx % COLORS.length], idx }
+  }
 
   const containerRect = container.getBoundingClientRect()
   if (containerRect.width === 0) { scheduleRecalculate(); return }
@@ -71,10 +82,11 @@ function recalculate() {
     const { edge, x1, y1, x2, y2, srcCardBot, srcCardTop, tgtCardBot, tgtCardTop } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
-      results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: COLORS[i % COLORS.length] })
+      results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: c.color, colorIdx: c.idx })
       return
     }
 
+    const c = getColor(edge)
     let d: string
 
     if (x2 > x1) {
@@ -99,9 +111,10 @@ function recalculate() {
       modeBIdx++
     }
 
-    results.push({ id: edge.id, d, color: COLORS[i % COLORS.length] })
+    results.push({ id: edge.id, d, color: c.color, colorIdx: c.idx })
   })
   lines.value = results
+  wareColorArr.value = COLORS
 }
 
 let resizeObserver: ResizeObserver | null = null
@@ -164,16 +177,8 @@ watch(() => props.edges.length, () => {
     style="z-index: 10;"
   >
     <defs>
-      <marker
-        id="build-flow-arrowhead"
-        markerWidth="10"
-        markerHeight="8"
-        refX="10"
-        refY="4"
-        orient="auto"
-        markerUnits="userSpaceOnUse"
-      >
-        <polygon points="0 0, 10 4, 0 8" fill="rgba(251, 146, 60, 0.8)" />
+      <marker v-for="(c, ci) in wareColorArr" :key="ci" :id="`arrow-${ci}`" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+        <polygon points="0 0, 10 4, 0 8" :fill="c" />
       </marker>
     </defs>
     <path
@@ -184,7 +189,7 @@ watch(() => props.edges.length, () => {
       stroke-width="3"
       stroke-linecap="round"
       fill="none"
-      marker-end="url(#build-flow-arrowhead)"
+      :marker-end="line.colorIdx != null ? `url(#arrow-${line.colorIdx})` : 'url(#build-flow-arrowhead)'"
     />
   </svg>
 </template>
