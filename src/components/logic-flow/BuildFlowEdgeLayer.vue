@@ -78,7 +78,9 @@ function recalculate() {
   for (const p of positioned) {
     if ((p.edge as any).isSelfConnection) continue
     if (p.x2 > p.x1) continue
-    const gk = `${p.srcCardBot.toFixed(0)}|${p.srcCardTop.toFixed(0)}|${p.tgtCardTop.toFixed(0)}|${p.tgtCardBot.toFixed(0)}`
+    const lo = Math.min(p.srcCardBot, p.tgtCardBot, p.srcCardTop, p.tgtCardTop)
+    const hi = Math.max(p.srcCardBot, p.tgtCardBot, p.srcCardTop, p.tgtCardTop)
+    const gk = `${lo.toFixed(0)}|${hi.toFixed(0)}`
     if (!gapGroups.has(gk)) gapGroups.set(gk, [])
     gapGroups.get(gk)!.push(p)
   }
@@ -86,9 +88,7 @@ function recalculate() {
   const gapCounters = new Map<string, number>()
   for (const [gk, group] of gapGroups) {
     const parts = gk.split('|').map(Number)
-    const gs = Math.min(parts[0] ?? 0, parts[3] ?? 0)
-    const ge = Math.max(parts[1] ?? 0, parts[2] ?? 0)
-    console.log(`[gap] y:${gs.toFixed(0)}-${ge.toFixed(0)} edges:${group.length}`)
+    console.log(`[gap] y:${(parts[0]??0).toFixed(0)}-${(parts[1]??0).toFixed(0)} edges:${group.length}`)
   }
 
   const srcMidX = new Map<string, number>()
@@ -124,7 +124,9 @@ function recalculate() {
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
     } else {
-      const gk = `${srcCardBot.toFixed(0)}|${srcCardTop.toFixed(0)}|${tgtCardTop.toFixed(0)}|${tgtCardBot.toFixed(0)}`
+      const lo = Math.min(srcCardBot, tgtCardBot, srcCardTop, tgtCardTop)
+      const hi = Math.max(srcCardBot, tgtCardBot, srcCardTop, tgtCardTop)
+      const gk = `${lo.toFixed(0)}|${hi.toFixed(0)}`
       const ei = gapCounters.get(gk) ?? 0
       gapCounters.set(gk, ei + 1)
       const totalInGap = gapGroups.get(gk)?.length ?? 1
