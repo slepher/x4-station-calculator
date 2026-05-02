@@ -20,7 +20,8 @@ function recalculate() {
   const container = svgRef.value.parentElement
   if (!container) return
 
-  console.log('[EdgeLayer] recalculate edges:', props.edges.length, 'container rect:', container.getBoundingClientRect())
+  const exitOffset = 16
+  const approachOffset = 16
 
   const containerRect = container.getBoundingClientRect()
   if (containerRect.width === 0) {
@@ -28,12 +29,25 @@ function recalculate() {
     return
   }
 
-  const laneSpacing = 10
-  const baseOverhead = 60
-  const exitOffset = 20
-  const approachOffset = 20
+  const cardEls = container.querySelectorAll('.build-flow-line-card')
+  const cardBounds: Array<{ top: number; bottom: number; y: number; height: number }> = []
+  cardEls.forEach(el => {
+    const r = el.getBoundingClientRect()
+    cardBounds.push({ top: r.top - containerRect.top, bottom: r.bottom - containerRect.top, y: r.top - containerRect.top + r.height / 2, height: r.height })
+  })
+  cardBounds.sort((a, b) => a.top - b.top)
 
-  let minCardTop = Infinity
+  type Gap = { y: number; idx: number }
+  const gaps: Gap[] = []
+  gaps.push({ y: 0, idx: -1 })
+  for (let i = 0; i < cardBounds.length - 1; i++) {
+    const a = cardBounds[i]!, b = cardBounds[i + 1]!
+    const gapY = (a.bottom + b.top) / 2
+    gaps.push({ y: gapY, idx: i })
+  }
+  const last = cardBounds[cardBounds.length - 1]
+  gaps.push({ y: (last?.bottom ?? 0) + 8, idx: cardBounds.length - 1 })
+
   const positioned: Array<{
     edge: BuildFlowEdge
     x1: number; y1: number
@@ -56,23 +70,32 @@ function recalculate() {
     const y2 = targetRect.top + targetRect.height / 2 - containerRect.top
 
     positioned.push({ edge, x1, y1, x2, y2 })
-    minCardTop = Math.min(minCardTop, sourceRect.top, targetRect.top)
   }
 
   if (positioned.length === 0) return
 
-  const baseRouteY = Math.max(minCardTop - containerRect.top - baseOverhead, 8)
+  const gapLaneCounts = new Array(gaps.length).fill(0)
   const results: RoutedEdge[] = []
 
-  positioned.forEach((pos, i) => {
+  positioned.forEach((pos) => {
     const { edge, x1, y1, x2, y2 } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
-      const d = `M ${x1},${y1} L ${x2},${y2}`
-      results.push({ id: edge.id, d })
+      results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}` })
       return
     }
-    const routeY = baseRouteY - i * laneSpacing
+
+    let bestGap = gaps[0]
+    let bestDist = Infinity
+    for (const g of gaps) {
+      const d = Math.abs(g.y - y1) + Math.abs(g.y - y2)
+      if (d < bestDist) { bestDist = d; bestGap = g }
+    }
+
+    const lane = gapLaneCounts[bestGap!.idx + 1]++
+    const maxLanes = Math.max(...gapLaneCounts, 1)
+    const spacing = maxLanes > 3 ? 6 : 10
+    const routeY = bestGap!.y + lane * spacing
     const exitX = x1 + exitOffset
     const approachX = x2 - approachOffset
     const d = `M ${x1},${y1} L ${exitX},${y1} L ${exitX},${routeY} L ${approachX},${routeY} L ${approachX},${y2} L ${x2},${y2}`
