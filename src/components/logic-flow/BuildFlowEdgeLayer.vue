@@ -17,10 +17,12 @@ interface RoutedEdge {
 const lines = ref<RoutedEdge[]>([])
 
 const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
+
 function getEdgeColor(wareId: string) {
-  let h = 0
-  for (let i = 0; i < wareId.length; i++) h = ((h << 5) - h) + wareId.charCodeAt(i) | 0
-  return COLORS[Math.abs(h) % COLORS.length]
+  const ids = new Set(props.edges.map(e => e.wareId))
+  const sorted = [...ids].sort()
+  const i = sorted.indexOf(wareId)
+  return COLORS[i >= 0 ? i % COLORS.length : 0]
 }
 
 function recalculate() {

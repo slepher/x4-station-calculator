@@ -64,10 +64,18 @@ const boundTargetTagIds = computed(() => {
 })
 
 const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
+
+const sortedWareIds = computed(() => {
+  const ids = new Set<string>()
+  for (const card of presenter.lineCards.value) {
+    for (const tag of card.sourceTags) ids.add(tag.wareId)
+  }
+  return [...ids].sort()
+})
+
 function getWareColor(wareId: string) {
-  let h = 0
-  for (let i = 0; i < wareId.length; i++) h = ((h << 5) - h) + wareId.charCodeAt(i) | 0
-  return COLORS[Math.abs(h) % COLORS.length]
+  const i = sortedWareIds.value.indexOf(wareId)
+  return COLORS[i >= 0 ? i % COLORS.length : 0]
 }
 
 // --- Drag state ---
