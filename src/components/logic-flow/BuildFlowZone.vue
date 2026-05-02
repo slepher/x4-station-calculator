@@ -331,6 +331,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             for (const card of sg.lineCards) if (card.groupId === e.sourceGroupId) return true
             return false
           })"
+          :ware-ids="sortedWareIds"
         />
       </div>
     </div>

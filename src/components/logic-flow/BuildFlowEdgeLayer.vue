@@ -4,6 +4,7 @@ import type { BuildFlowEdge } from '@/components/logic-flow/presenters/useBuildF
 
 const props = defineProps<{
   edges: BuildFlowEdge[]
+  wareIds: string[]
 }>()
 
 const svgRef = ref<SVGSVGElement | null>(null)
@@ -19,9 +20,7 @@ const lines = ref<RoutedEdge[]>([])
 const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
 
 function getEdgeColor(wareId: string) {
-  const ids = new Set(props.edges.map(e => e.wareId))
-  const sorted = [...ids].sort()
-  const i = sorted.indexOf(wareId)
+  const i = props.wareIds.indexOf(wareId)
   return COLORS[i >= 0 ? i % COLORS.length : 0]
 }
 
