@@ -66,6 +66,7 @@ function recalculate() {
   if (positioned.length === 0) { lines.value = []; return }
 
   const results: RoutedEdge[] = []
+  let modeAIdx = 0
   positioned.forEach((pos, i) => {
     const { edge, x1, y1, x2, y2, cardY1, cardY2 } = pos
     const isSelf = (edge as any).isSelfConnection
@@ -74,17 +75,18 @@ function recalculate() {
       return
     }
 
-    const offset = BASE_OFFSET + i * GAP
     let d: string
 
     if (x2 > x1) {
       if (Math.abs(y1 - y2) < 4) {
         d = `M ${x1},${y1} L ${x2},${y2}`
       } else {
-        const midX = Math.min(x1 + (i + 1) * 4, x2 - 4)
+        const midX = Math.min(x1 + (modeAIdx + 1) * 4, x2 - 4)
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
+      modeAIdx++
     } else {
+      const offset = BASE_OFFSET + i * GAP
       const p1X = x1 + offset
       const p2Y = y1 < y2 ? cardY2 + 4 + i * 4 : y1 - cardY1 - 4 - i * 4
       const p3X = x2 - offset
