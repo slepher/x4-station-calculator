@@ -35,7 +35,8 @@ function recalculate() {
     edge: BuildFlowEdge
     x1: number; y1: number
     x2: number; y2: number
-    cardY1: number; cardY2: number
+    srcCardBot: number; srcCardTop: number
+    tgtCardBot: number; tgtCardTop: number
   }> = []
 
   for (const edge of props.edges) {
@@ -52,13 +53,13 @@ function recalculate() {
     const x2 = isSelf ? targetRect.right - containerRect.left : targetRect.left - containerRect.left
     const y2 = targetRect.top + targetRect.height / 2 - containerRect.top
 
-    let cardY1 = y1, cardY2 = y2
+    let srcCardBot = y1, srcCardTop = y1, tgtCardBot = y2, tgtCardTop = y2
     for (const cb of cardBounds) {
-      if (y1 >= cb.top && y1 <= cb.bottom) cardY1 = cb.bottom
-      if (y2 >= cb.top && y2 <= cb.bottom) cardY2 = cb.bottom
+      if (y1 >= cb.top && y1 <= cb.bottom) { srcCardBot = cb.bottom; srcCardTop = cb.top }
+      if (y2 >= cb.top && y2 <= cb.bottom) { tgtCardBot = cb.bottom; tgtCardTop = cb.top }
     }
 
-    positioned.push({ edge, x1, y1, x2, y2, cardY1, cardY2 })
+    positioned.push({ edge, x1, y1, x2, y2, srcCardBot, srcCardTop, tgtCardBot, tgtCardTop })
   }
 
   if (positioned.length === 0) { lines.value = []; return }
@@ -67,7 +68,7 @@ function recalculate() {
   let modeAIdx = 0
   let modeBIdx = 0
   positioned.forEach((pos, i) => {
-    const { edge, x1, y1, x2, y2, cardY1, cardY2 } = pos
+    const { edge, x1, y1, x2, y2, srcCardBot, srcCardTop, tgtCardBot, tgtCardTop } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
       results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: COLORS[i % COLORS.length] })
@@ -87,7 +88,11 @@ function recalculate() {
       modeAIdx++
     } else {
       const p1X = x1 + 4 + modeBIdx * 4
-      const p2Y = y1 < y2 ? cardY2 + 4 + modeBIdx * 4 : y1 - cardY1 - 4 - modeBIdx * 4
+      const N = positioned.filter(p => !(p.edge as any).isSelfConnection && p.x2 <= p.x1).length
+      const gapStart = y1 < y2 ? srcCardBot : tgtCardBot
+      const gapEnd = y1 < y2 ? tgtCardTop : srcCardTop
+      const gapSize = Math.max(gapEnd - gapStart, 4)
+      const p2Y = gapStart + (modeBIdx + 0.5) * gapSize / N
       const p3X = x2 - 4 - modeBIdx * 4
       console.log(`[modeB] i=${modeBIdx} start=(${x1.toFixed(0)},${y1.toFixed(0)}) p1X=${p1X.toFixed(0)} p3X=${p3X.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
