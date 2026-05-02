@@ -74,18 +74,27 @@ function recalculate() {
   const results: RoutedEdge[] = []
   positioned.sort((a, b) => a.y1 - b.y1)
 
+  const gapsByCard: Array<{ start: number; end: number }> = []
+  if (cardBounds.length > 0) gapsByCard.push({ start: 0, end: cardBounds[0]!.top })
+  for (let i = 0; i < cardBounds.length - 1; i++) {
+    gapsByCard.push({ start: cardBounds[i]!.bottom, end: cardBounds[i + 1]!.top })
+  }
+  if (cardBounds.length > 0) gapsByCard.push({ start: cardBounds[cardBounds.length - 1]!.bottom, end: containerRect.height })
+
   const gapGroups = new Map<string, typeof positioned>()
   for (const p of positioned) {
     if ((p.edge as any).isSelfConnection) continue
     if (p.x2 > p.x1) continue
-    let gapAbove = 4, gapBelow = 4
+    let gk = ''
     for (const cb of cardBounds) {
-      if (cb.top < p.tgtCardTop && cb.bottom > gapAbove) gapAbove = cb.bottom
-      if (cb.top > p.srcCardTop && (gapBelow === 4 || cb.top < gapBelow)) gapBelow = cb.top
+      if (p.y1 < p.y2 ? cb.top === p.tgtCardTop : cb.top === p.srcCardTop) {
+        const idx = cardBounds.indexOf(cb)
+        const gap = gapsByCard[idx]
+        gk = gap ? `${gap.start.toFixed(0)}|${gap.end.toFixed(0)}` : `0|0`
+        break
+      }
     }
-    const gs = p.y1 < p.y2 ? gapAbove : p.tgtCardBot
-    const ge = p.y1 < p.y2 ? p.tgtCardTop : gapBelow
-    const gk = `${gs.toFixed(0)}|${ge.toFixed(0)}`
+    if (!gk) continue
     if (!gapGroups.has(gk)) gapGroups.set(gk, [])
     gapGroups.get(gk)!.push(p)
   }
@@ -111,7 +120,7 @@ function recalculate() {
   }
 
   positioned.forEach((pos) => {
-    const { edge, x1, y1, x2, y2, srcCardBot, srcCardTop, tgtCardBot, tgtCardTop } = pos
+    const { edge, x1, y1, x2, y2, srcCardTop, tgtCardTop } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
       const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: ec.color, colorIdx: ec.idx })
@@ -129,16 +138,23 @@ function recalculate() {
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
     } else {
-      let gapAbove = 4, gapBelow = 4
+      let gk = ''
+      let gapStart = 4, gapEnd = 4, gapSize = 4
       for (const cb of cardBounds) {
-        if (cb.top < tgtCardTop && cb.bottom > gapAbove) gapAbove = cb.bottom
-        if (cb.top > srcCardTop && (gapBelow === 4 || cb.top < gapBelow)) gapBelow = cb.top
+        if (y1 < y2 ? cb.top === tgtCardTop : cb.top === srcCardTop) {
+          const idx = cardBounds.indexOf(cb)
+          const gap = gapsByCard[idx]
+          if (gap) {
+            gapStart = gap.start
+            gapEnd = gap.end
+            gapSize = Math.max(gapEnd - gapStart, 4)
+            gk = `${gapStart.toFixed(0)}|${gapEnd.toFixed(0)}`
+          }
+          break
+        }
       }
-      const gapStart = y1 < y2 ? gapAbove : tgtCardBot
-      const gapEnd = y1 < y2 ? tgtCardTop : gapBelow
-      const gapSize = Math.max(gapEnd - gapStart, 4)
+      if (!gk) return
 
-      const gk = `${gapStart.toFixed(0)}|${gapEnd.toFixed(0)}`
       const ei = gapCounters.get(gk) ?? 0
       gapCounters.set(gk, ei + 1)
       const totalInGap = gapGroups.get(gk)?.length ?? 1
