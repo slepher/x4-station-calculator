@@ -82,6 +82,7 @@ function recalculate() {
         d = `M ${x1},${y1} L ${x2},${y2}`
       } else {
         const midX = Math.min(x1 + (modeAIdx + 1) * 4, x2 - 4)
+        console.log(`[modeA] i=${modeAIdx} start=(${x1.toFixed(0)},${y1.toFixed(0)}) midX=${midX.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
       modeAIdx++
@@ -90,6 +91,7 @@ function recalculate() {
       const p1X = x1 + offset
       const p2Y = y1 < y2 ? cardY2 + 4 + i * 4 : y1 - cardY1 - 4 - i * 4
       const p3X = x2 - offset
+      console.log(`[modeB] i=${i} start=(${x1.toFixed(0)},${y1.toFixed(0)}) p1X=${p1X.toFixed(0)} end=(${x2.toFixed(0)},${y2.toFixed(0)})`)
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
     }
 
