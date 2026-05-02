@@ -236,7 +236,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
         class="build-flow-group border border-gray-700 rounded p-3 flex flex-col justify-center relative"
       >
         <div class="flex items-start">
-          <div class="flex flex-col gap-16 shrink-0 ml-[68px]" style="width: 320px">
+          <div class="flex flex-col gap-16 shrink-0 ml-[68px]" style="width: 308px">
             <div
               v-for="card in sg.lineCards"
               :key="card.groupId"
