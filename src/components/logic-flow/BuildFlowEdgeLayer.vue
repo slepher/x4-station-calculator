@@ -13,6 +13,7 @@ interface RoutedEdge {
   id: string
   d: string
   color?: string
+  colorIdx: number
 }
 
 const lines = ref<RoutedEdge[]>([])
@@ -21,7 +22,7 @@ const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67
 
 function getEdgeColor(wareId: string) {
   const i = props.wareIds.indexOf(wareId)
-  return COLORS[i >= 0 ? i % COLORS.length : 0]
+  return { color: COLORS[i >= 0 ? i % COLORS.length : 0], idx: i >= 0 ? i % COLORS.length : 0 }
 }
 
 function recalculate() {
@@ -91,7 +92,7 @@ function recalculate() {
     const { edge, x1, y1, x2, y2, srcCardBot, srcCardTop, tgtCardBot, tgtCardTop } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
-      results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: getEdgeColor(edge.wareId) })
+      const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: ec.color, colorIdx: ec.idx })
       return
     }
 
@@ -119,7 +120,7 @@ function recalculate() {
       modeBIdx++
     }
 
-    results.push({ id: edge.id, d, color: getEdgeColor(edge.wareId) })
+    const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d, color: ec.color, colorIdx: ec.idx })
   })
   lines.value = results
 }
@@ -184,16 +185,8 @@ watch(() => props.edges.length, () => {
     style="z-index: 10;"
   >
     <defs>
-      <marker
-        id="build-flow-arrowhead"
-        markerWidth="10"
-        markerHeight="8"
-        refX="10"
-        refY="4"
-        orient="auto"
-        markerUnits="userSpaceOnUse"
-      >
-        <polygon points="0 0, 10 4, 0 8" fill="currentColor" />
+      <marker v-for="(c, ci) in COLORS" :key="ci" :id="`arrow-${ci}`" markerWidth="10" markerHeight="8" refX="10" refY="4" orient="auto" markerUnits="userSpaceOnUse">
+        <polygon points="0 0, 10 4, 0 8" :fill="c" />
       </marker>
     </defs>
     <path
@@ -201,11 +194,10 @@ watch(() => props.edges.length, () => {
       :key="line.id"
       :d="line.d"
       :stroke="line.color || 'rgba(251, 146, 60, 0.7)'"
-      :style="{ color: line.color || 'rgba(251, 146, 60, 0.7)' }"
       stroke-width="3"
       stroke-linecap="round"
       fill="none"
-      marker-end="url(#build-flow-arrowhead)"
+      :marker-end="`url(#arrow-${line.colorIdx})`"
     />
   </svg>
 </template>
