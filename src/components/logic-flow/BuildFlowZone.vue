@@ -31,6 +31,26 @@ const cardIndexByGroupId = computed(() => {
   return map
 })
 
+const sortedGroupTags = computed(() => {
+  return presenter.buildFlowGroups.value.map(group => {
+    const sorted = [...group.outputTags].sort((a, b) => a.wareId.localeCompare(b.wareId))
+    const order = new Map(sorted.map((t, i) => [t.wareId, i]))
+    return { groupKey: group.groupKey, outputTags: sorted, order, lineCards: group.lineCards }
+  })
+})
+
+function getSortedRows(cardGroupId: string, order: Map<string, number>) {
+  const idx = cardIndexByGroupId.value.get(cardGroupId)
+  if (idx === undefined) return []
+  const rows = [...(presenter.cardRows.value[idx] ?? [])]
+  rows.sort((a, b) => {
+    const ia = order.get(a.wareId) ?? 999
+    const ib = order.get(b.wareId) ?? 999
+    return ia - ib
+  })
+  return rows
+}
+
 const boundTargetTagIds = computed(() => {
   const ids = new Set<string>()
   for (const a of logicFlow.buildFlowAssignments) {
@@ -206,14 +226,14 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
 
     <div class="build-flow-groups grid gap-5" :class="presenter.buildFlowGroups.value.length === 1 ? '' : 'grid-cols-2'">
       <div
-        v-for="group in presenter.buildFlowGroups.value"
-        :key="group.groupKey"
+        v-for="sg in sortedGroupTags"
+        :key="sg.groupKey"
         class="build-flow-group border border-gray-700 rounded p-3 flex flex-col justify-center"
       >
         <div class="flex items-start">
           <div class="flex flex-col gap-16 shrink-0 ml-[84px]" style="width: 320px">
             <div
-              v-for="card in group.lineCards"
+              v-for="card in sg.lineCards"
               :key="card.groupId"
               class="build-flow-line-card bg-gray-800/60 border border-gray-600 rounded p-2"
             >
@@ -224,7 +244,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                   <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_source_materials') }}</span>
                 </div>
                 <div
-                  v-for="row in presenter.cardRows.value[cardIndexByGroupId.get(card.groupId)!]"
+                  v-for="row in getSortedRows(card.groupId, sg.order)"
                   :key="row.wareId"
                   class="flex justify-between items-center"
                   style="min-height: 24px"
@@ -241,7 +261,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                     <button
                       class="target-tag-segment target-tag-segment-add"
                       :class="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
-                      @click.stop="onTargetTagPlusClick(row.buildMaterialTag.wareId, row.buildMaterialTag.tagId, 'line-build-material', card.groupId, group.groupKey, $event)"
+                      @click.stop="onTargetTagPlusClick(row.buildMaterialTag.wareId, row.buildMaterialTag.tagId, 'line-build-material', card.groupId, sg.groupKey, $event)"
                     >+</button>
                     <span
                       class="target-tag-segment target-tag-segment-main"
@@ -269,7 +289,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             </div>
           </div>
           <div
-            v-if="group.outputTags.length > 0"
+            v-if="sg.outputTags.length > 0"
             class="build-flow-output-card bg-gray-800/60 border border-gray-600 rounded p-2 shrink-0 self-center ml-auto mr-5"
             style="width: 160px"
           >
@@ -279,7 +299,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             </div>
             <div class="build-flow-target-list flex flex-col gap-1 items-start">
               <span
-                v-for="tag in group.outputTags"
+                v-for="tag in sg.outputTags"
                 :key="tag.tagId"
                 :data-tag-id="tag.tagId"
                 class="build-flow-tag build-flow-target-tag whitespace-nowrap"
@@ -291,7 +311,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                 <button
                   class="target-tag-segment target-tag-segment-add"
                   :class="boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
-                  @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, group.groupKey, $event)"
+                  @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, sg.groupKey, $event)"
                 >+</button>
                 <span
                   class="target-tag-segment target-tag-segment-main"
