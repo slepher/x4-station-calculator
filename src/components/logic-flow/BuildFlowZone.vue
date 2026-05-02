@@ -63,6 +63,13 @@ const boundTargetTagIds = computed(() => {
   return ids
 })
 
+const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
+const wareColorMap = new Map<string, string>()
+function getWareColor(wareId: string) {
+  if (!wareColorMap.has(wareId)) wareColorMap.set(wareId, COLORS[wareColorMap.size % COLORS.length])
+  return wareColorMap.get(wareId)!
+}
+
 // --- Drag state ---
 const draggingTag = ref<{ groupId: string; wareId: string } | null>(null)
 const hoverTargetTagId = ref<string | null>(null)
@@ -254,11 +261,18 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                     v-if="row.buildMaterialTag"
                     :data-tag-id="row.buildMaterialTag.tagId"
                     class="build-flow-tag build-flow-target-tag whitespace-nowrap"
-                    @dragenter.prevent="onTargetDragEnter(row.buildMaterialTag.tagId)"
-                    @dragleave="onTargetDragLeave"
                     @dragover.prevent
                     @drop.prevent="onTargetDrop('line-build-material', card.groupId)"
                   >
+                    <button
+                      class="target-tag-segment target-tag-segment-add"
+                      :style="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? { backgroundColor: getWareColor(row.wareId) + '40', borderColor: getWareColor(row.wareId) + '80', color: getWareColor(row.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
+                      @click.stop="onTargetTagPlusClick(row.buildMaterialTag.wareId, row.buildMaterialTag.tagId, 'line-build-material', card.groupId, sg.groupKey, $event)"
+                    >+</button>
+                    <span
+                      class="target-tag-segment target-tag-segment-main"
+                      :style="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? { backgroundColor: getWareColor(row.wareId) + '40', borderColor: getWareColor(row.wareId) + '80', color: getWareColor(row.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
+                    >
                     <button
                       class="target-tag-segment target-tag-segment-add"
                       :class="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
@@ -281,8 +295,8 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                     @dragstart="onSourceDragStart(card.groupId, row.sourceTag.wareId)"
                     @dragend="onSourceDragEnd"
                   >
-                    <span class="source-tag-segment source-tag-segment-main"><span class="source-tag-text">{{ row.sourceTag.label }}</span></span>
-                    <button class="source-tag-segment source-tag-segment-add" @click.stop="onPlusClick(card.groupId, row.sourceTag.wareId, row.sourceTag.tagId, $event)">+</button>
+                    <span class="source-tag-segment source-tag-segment-main" :style="{ backgroundColor: getWareColor(row.wareId) + '40', borderColor: getWareColor(row.wareId) + '80', color: getWareColor(row.wareId) }"><span class="source-tag-text">{{ row.sourceTag.label }}</span></span>
+                    <button class="source-tag-segment source-tag-segment-add" :style="{ backgroundColor: getWareColor(row.wareId) + '40', borderColor: getWareColor(row.wareId) + '80', color: getWareColor(row.wareId) }" @click.stop="onPlusClick(card.groupId, row.sourceTag.wareId, row.sourceTag.tagId, $event)">+</button>
                   </span>
                   <div v-else class="w-[142px] h-[24px] shrink-0"></div>
                 </div>
@@ -311,12 +325,12 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
               >
                 <button
                   class="target-tag-segment target-tag-segment-add"
-                  :class="boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300'"
+                  :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
                   @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, sg.groupKey, $event)"
                 >+</button>
                 <span
                   class="target-tag-segment target-tag-segment-main"
-                  :class="[boundTargetTagIds.has(tag.tagId) ? 'bg-orange-700/40 border-orange-500/50 text-orange-300' : 'bg-gray-700/40 border-gray-500/50 text-gray-300']"
+                  :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
                 >
                   <span class="target-tag-text">{{ tag.label }}</span>
                   <button v-if="boundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
