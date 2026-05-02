@@ -77,10 +77,12 @@ const groupEdges = computed(() => {
   const result = new Map<string, any[]>()
   for (const a of logicFlow.buildFlowAssignments) {
     const gKey = getGroupKeyForGroupId(presenter.buildFlowGroups.value, a.sourceGroupId)
+    if (!gKey) continue
     if (!result.has(gKey)) result.set(gKey, [])
     const targetNodeId = a.targetType === 'line-build-material' ? `line:${a.targetGroupId}` : `output:${gKey}`
     const targetHandle = a.targetType === 'line-build-material' ? `tgt:${a.wareId}` : `out:${a.wareId}`
-    result.get(gKey)!.push({ id: `e:${a.sourceGroupId}:${a.wareId}:${a.targetType}`, source: `line:${a.sourceGroupId}`, sourceHandle: `src:${a.wareId}`, target: targetNodeId, targetHandle, type: 'step', style: { stroke: 'rgba(251,146,60,0.7)', strokeWidth: 2 } })
+    const edge = { id: `e:${a.sourceGroupId}:${a.wareId}:${a.targetType}`, source: `line:${a.sourceGroupId}`, sourceHandle: `src:${a.wareId}`, target: targetNodeId, targetHandle, type: 'step', style: { stroke: 'rgba(251,146,60,0.7)', strokeWidth: 2 } }
+    result.get(gKey)!.push(edge)
   }
   return result
 })
