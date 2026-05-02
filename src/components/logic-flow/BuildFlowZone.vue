@@ -210,7 +210,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
         :key="group.groupKey"
         class="build-flow-group border border-gray-700 rounded p-3 flex flex-col justify-center"
       >
-        <div class="flex gap-4 items-start">
+        <div class="flex items-start">
           <div class="flex flex-col gap-16 shrink-0 ml-[84px]" style="width: 320px">
             <div
               v-for="card in group.lineCards"
@@ -270,7 +270,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           </div>
           <div
             v-if="group.outputTags.length > 0"
-            class="build-flow-output-card bg-gray-800/60 border border-gray-600 rounded p-2 shrink-0 mr-5"
+            class="build-flow-output-card bg-gray-800/60 border border-gray-600 rounded p-2 shrink-0 self-center ml-auto mr-5"
             style="width: 160px"
           >
             <div class="text-xs text-gray-300 font-medium mb-2">{{ t('buildFlow.build_flow_output_card_title') }}</div>
