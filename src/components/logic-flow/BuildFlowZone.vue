@@ -327,7 +327,10 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
         </div>
         <BuildFlowEdgeLayer
           v-if="presenter.edges.value.length > 0"
-          :edges="presenter.edges.value"
+          :edges="presenter.edges.value.filter(e => {
+            for (const card of sg.lineCards) if (card.groupId === e.sourceGroupId) return true
+            return false
+          })"
         />
       </div>
     </div>
