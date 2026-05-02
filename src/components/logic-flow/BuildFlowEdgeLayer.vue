@@ -78,8 +78,13 @@ function recalculate() {
   for (const p of positioned) {
     if ((p.edge as any).isSelfConnection) continue
     if (p.x2 > p.x1) continue
-    const gs = p.y1 < p.y2 ? p.srcCardBot : p.tgtCardBot
-    const ge = p.y1 < p.y2 ? p.tgtCardTop : p.srcCardTop
+    let gapAbove = 4, gapBelow = 4
+    for (const cb of cardBounds) {
+      if (cb.top < p.tgtCardTop && cb.bottom > gapAbove) gapAbove = cb.bottom
+      if (cb.top > p.srcCardTop && (gapBelow === 4 || cb.top < gapBelow)) gapBelow = cb.top
+    }
+    const gs = p.y1 < p.y2 ? gapAbove : p.tgtCardBot
+    const ge = p.y1 < p.y2 ? p.tgtCardTop : gapBelow
     const gk = `${gs.toFixed(0)}|${ge.toFixed(0)}`
     if (!gapGroups.has(gk)) gapGroups.set(gk, [])
     gapGroups.get(gk)!.push(p)
@@ -124,17 +129,21 @@ function recalculate() {
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
     } else {
-      const gs = y1 < y2 ? srcCardBot : tgtCardBot
-      const ge = y1 < y2 ? tgtCardTop : srcCardTop
-      const gk = `${gs.toFixed(0)}|${ge.toFixed(0)}`
+      let gapAbove = 4, gapBelow = 4
+      for (const cb of cardBounds) {
+        if (cb.top < tgtCardTop && cb.bottom > gapAbove) gapAbove = cb.bottom
+        if (cb.top > srcCardTop && (gapBelow === 4 || cb.top < gapBelow)) gapBelow = cb.top
+      }
+      const gapStart = y1 < y2 ? gapAbove : tgtCardBot
+      const gapEnd = y1 < y2 ? tgtCardTop : gapBelow
+      const gapSize = Math.max(gapEnd - gapStart, 4)
+
+      const gk = `${gapStart.toFixed(0)}|${gapEnd.toFixed(0)}`
       const ei = gapCounters.get(gk) ?? 0
       gapCounters.set(gk, ei + 1)
       const totalInGap = gapGroups.get(gk)?.length ?? 1
 
       const p1X = midX
-      const gapStart = y1 < y2 ? srcCardBot : tgtCardBot
-      const gapEnd2 = y1 < y2 ? tgtCardTop : srcCardTop
-      const gapSize = Math.max(gapEnd2 - gapStart, 4)
       const p2Y = gapStart + ((ei + 1) * gapSize) / Math.max(totalInGap + 1, 1)
       const p3X = 4 + ((ei + 1) * (x2 - 8)) / Math.max(totalInGap + 1, 1)
       console.log(`[modeB] gap=${gk.slice(0,20)} ei=${ei}/${totalInGap} p1X=${p1X.toFixed(0)} p3X=${p3X.toFixed(0)}`)
