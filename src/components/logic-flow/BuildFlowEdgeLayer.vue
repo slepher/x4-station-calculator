@@ -11,6 +11,7 @@ const svgRef = ref<SVGSVGElement | null>(null)
 interface RoutedEdge {
   id: string
   d: string
+  color?: string
 }
 
 const lines = ref<RoutedEdge[]>([])
@@ -20,36 +21,12 @@ function recalculate() {
   const container = svgRef.value.parentElement
   if (!container) return
 
-  const exitOffset = 16
-  const approachOffset = 16
+  const GAP = 16
+  const BASE_OFFSET = 30
+  const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
 
   const containerRect = container.getBoundingClientRect()
-  if (containerRect.width === 0) {
-    scheduleRecalculate()
-    return
-  }
-
-  const cardEls = container.querySelectorAll('.build-flow-line-card')
-  const cardBounds: Array<{ top: number; bottom: number; y: number; height: number }> = []
-  cardEls.forEach(el => {
-    const r = el.getBoundingClientRect()
-    cardBounds.push({ top: r.top - containerRect.top, bottom: r.bottom - containerRect.top, y: r.top - containerRect.top + r.height / 2, height: r.height })
-  })
-  cardBounds.sort((a, b) => a.top - b.top)
-
-  type Gap = { y: number; idx: number }
-  const gaps: Gap[] = []
-  gaps.push({ y: 0, idx: -1 })
-  for (let i = 0; i < cardBounds.length - 1; i++) {
-    const a = cardBounds[i]!, b = cardBounds[i + 1]!
-    const gapY = (a.bottom + b.top) / 2
-    gaps.push({ y: gapY, idx: i })
-  }
-  const last = cardBounds[cardBounds.length - 1]
-  gaps.push({ y: (last?.bottom ?? 0) + 8, idx: cardBounds.length - 1 })
-  console.log('[EdgeLayer] cardBounds:', cardBounds.map(c => ({top: c.top.toFixed(0), bottom: c.bottom.toFixed(0)})))
-  console.log('[EdgeLayer] gaps:', gaps.map(g => ({idx: g.idx, y: g.y.toFixed(0)})))
-  console.log('[EdgeLayer] edges:', positioned.map(p => ({ y1: p.y1.toFixed(0), y2: p.y2.toFixed(0) })))
+  if (containerRect.width === 0) { scheduleRecalculate(); return }
 
   const positioned: Array<{
     edge: BuildFlowEdge
@@ -61,7 +38,6 @@ function recalculate() {
     const sourceEl = container.querySelector(`[data-tag-id="${edge.sourceTagId}"]`)
     const targetEl = container.querySelector(`[data-tag-id="${edge.targetTagId}"]`)
     if (!sourceEl || !targetEl) continue
-
     const sourceRect = sourceEl.getBoundingClientRect()
     const targetRect = targetEl.getBoundingClientRect()
     if (sourceRect.width === 0 || targetRect.width === 0) continue
@@ -71,41 +47,34 @@ function recalculate() {
     const y1 = sourceRect.top + sourceRect.height / 2 - containerRect.top
     const x2 = isSelf ? targetRect.right - containerRect.left : targetRect.left - containerRect.left
     const y2 = targetRect.top + targetRect.height / 2 - containerRect.top
-
     positioned.push({ edge, x1, y1, x2, y2 })
   }
 
-  if (positioned.length === 0) return
+  if (positioned.length === 0) { lines.value = []; return }
 
-  const gapLaneCounts = new Array(gaps.length).fill(0)
   const results: RoutedEdge[] = []
-
-  positioned.forEach((pos) => {
+  positioned.forEach((pos, i) => {
     const { edge, x1, y1, x2, y2 } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
-      results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}` })
+      results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: COLORS[i % COLORS.length] })
       return
     }
 
-    let bestGap = gaps[0]
-    let bestDist = Infinity
-    for (const g of gaps) {
-      const d = Math.abs(g.y - y1) + Math.abs(g.y - y2)
-      if (d < bestDist) { bestDist = d; bestGap = g }
+    const offset = BASE_OFFSET + i * GAP
+    let d: string
+
+    if (x2 > x1 + offset * 2) {
+      d = `M ${x1},${y1} L ${x1 + offset},${y1} L ${x1 + offset},${y2} L ${x2},${y2}`
+    } else {
+      const p1X = x1 + offset
+      const p2Y = Math.min(y1, y2) - offset
+      const p3X = x2 - offset
+      d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
     }
 
-    const lane = gapLaneCounts[bestGap!.idx + 1]++
-    const maxLanes = Math.max(...gapLaneCounts, 1)
-    const spacing = maxLanes > 3 ? 6 : 10
-    const routeY = bestGap!.y + lane * spacing
-    const exitX = x1 + exitOffset
-    const approachX = x2 - approachOffset
-    const d = `M ${x1},${y1} L ${exitX},${y1} L ${exitX},${routeY} L ${approachX},${routeY} L ${approachX},${y2} L ${x2},${y2}`
-    results.push({ id: edge.id, d })
-    console.log(`[edge] ${edge.id.slice(0,30)} gap=${bestGap!.idx} lane=${lane} routeY=${routeY.toFixed(1)} | ${x1.toFixed(0)},${y1.toFixed(0)} → ${x2.toFixed(0)},${y2.toFixed(0)}`) 
+    results.push({ id: edge.id, d, color: COLORS[i % COLORS.length] })
   })
-
   lines.value = results
 }
 
@@ -185,8 +154,8 @@ watch(() => props.edges.length, () => {
       v-for="line in lines"
       :key="line.id"
       :d="line.d"
-      stroke="rgba(251, 146, 60, 0.7)"
-      stroke-width="2"
+      :stroke="line.color || 'rgba(251, 146, 60, 0.7)'"
+      stroke-width="3"
       stroke-linecap="round"
       fill="none"
       marker-end="url(#build-flow-arrowhead)"
