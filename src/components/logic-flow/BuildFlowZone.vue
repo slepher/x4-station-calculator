@@ -267,7 +267,8 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
           :min-zoom="1"
           :max-zoom="1"
           :nodes-draggable="false"
-          :no-wheel-class-name="'no-wheel'"
+          :pan-on-drag="false"
+          :zoom-on-scroll="false"
         >
           <template #node-card="nodeProps">
             <div class="bg-gray-800/60 border border-gray-600 rounded p-2 relative" style="width:320px">
