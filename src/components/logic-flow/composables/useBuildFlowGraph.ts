@@ -42,8 +42,9 @@ export function useBuildFlowGraph(containerEl: HTMLElement) {
     mousewheel: false,
     connecting: { snap: false, allowLoop: false, allowNode: false, allowEdge: false, allowPort: false, allowMulti: false, highlight: false, validateConnection: () => false },
     interacting: {
-      nodeMovable: (cell) => {
-        const shape = cell.getShape()
+      nodeMovable: (cell: unknown) => {
+        if (!cell || typeof (cell as { getShape?: unknown }).getShape !== 'function') return false
+        const shape = (cell as { getShape: () => string }).getShape()
         return shape === 'build-flow-line-card' || shape === 'build-flow-output-card'
       },
     },
