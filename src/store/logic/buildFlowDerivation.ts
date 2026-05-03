@@ -165,13 +165,19 @@ export function computeBuildFlowGroups(lineCards: BuildFlowLineCard[]): BuildFlo
     const orderedCards = Array.from(groupCards.values())
     orderedCards.sort((a, b) => a.groupId.localeCompare(b.groupId))
 
-    const outputSeen = new Set<string>()
-    const outputTags: BuildFlowTag[] = []
+    const outputBuildSeen = new Set<string>()
+    const outputBuildTags: BuildFlowTag[] = []
+    const outputMaterialTags: BuildFlowTag[] = []
     for (const card of orderedCards) {
       for (const tag of card.sourceTags) {
-        if (outputSeen.has(tag.wareId)) continue
-        outputSeen.add(tag.wareId)
-        outputTags.push({
+        if (outputBuildSeen.has(tag.wareId)) continue
+        outputBuildSeen.add(tag.wareId)
+        outputBuildTags.push({
+          tagId: `build-flow-target:output-build:${tag.wareId}`,
+          wareId: tag.wareId,
+          label: tag.label
+        })
+        outputMaterialTags.push({
           tagId: `build-flow-target:output:${tag.wareId}`,
           wareId: tag.wareId,
           label: tag.label
@@ -180,7 +186,7 @@ export function computeBuildFlowGroups(lineCards: BuildFlowLineCard[]): BuildFlo
     }
 
     const groupKey = orderedCards.map(c => c.groupId).sort().join(':')
-    result.push({ groupKey, lineCards: orderedCards, outputTags })
+    result.push({ groupKey, lineCards: orderedCards, outputBuildTags, outputMaterialTags })
   }
 
   return result
@@ -243,6 +249,9 @@ export function deriveBuildFlowView(
 export function computeTargetKey(assignment: BuildFlowAssignment): string {
   if (assignment.targetType === 'line-build-material') {
     return `line:${assignment.targetGroupId}:${assignment.wareId}`
+  }
+  if (assignment.targetType === 'output-build-material') {
+    return `output-build:${assignment.wareId}`
   }
   return `output:${assignment.wareId}`
 }
@@ -330,11 +339,17 @@ export function cleanupStaleAssignments(
       const sourceGroupKey = groupIdToGroupKey.get(a.sourceGroupId)
       const targetGroupKey = groupIdToGroupKey.get(a.targetGroupId)
       if (sourceGroupKey !== targetGroupKey) return false
+    } else if (a.targetType === 'output-build-material') {
+      if (!outputWareIds.has(a.wareId)) return false
+
+      const sourceGroupKey = groupIdToGroupKey.get(a.sourceGroupId)
+      const outputGroup = buildFlowGroups.find(bg => bg.outputBuildTags.some(t => t.wareId === a.wareId))
+      if (outputGroup && sourceGroupKey !== outputGroup.groupKey) return false
     } else {
       if (!outputWareIds.has(a.wareId)) return false
 
       const sourceGroupKey = groupIdToGroupKey.get(a.sourceGroupId)
-      const outputGroup = buildFlowGroups.find(bg => bg.outputTags.some(t => t.wareId === a.wareId))
+      const outputGroup = buildFlowGroups.find(bg => bg.outputMaterialTags.some(t => t.wareId === a.wareId))
       if (outputGroup && sourceGroupKey !== outputGroup.groupKey) return false
     }
 

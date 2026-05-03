@@ -729,7 +729,7 @@ export interface SavedFlowPlansState {
 
 // --- Build Flow Types ---
 
-export type BuildFlowTargetType = 'line-build-material' | 'output-material'
+export type BuildFlowTargetType = 'line-build-material' | 'output-build-material' | 'output-material'
 
 export interface BuildFlowAssignment {
   wareId: string
@@ -759,7 +759,8 @@ export interface BuildFlowLineCard {
 export interface BuildFlowGroup {
   groupKey: string
   lineCards: BuildFlowLineCard[]
-  outputTags: BuildFlowTag[]
+  outputBuildTags: BuildFlowTag[]
+  outputMaterialTags: BuildFlowTag[]
 }
 
 // Ship Blueprint Storage Types
