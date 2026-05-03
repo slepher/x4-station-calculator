@@ -316,26 +316,46 @@ output-material: `output:${wareId}`
 
 每条边根据起点和终点的 X/Y 坐标关系采用不同的路由策略。
 
-**共享原则**：同一 source（sourceGroupId + wareId）共享 midX；同一 source 在同一 gap 内共享 p2Y、p3X。
+#### Gap 类型定义
 
-**Mode A（终点在右侧，x2 > x1）**：3 段线
+分组容器内存在三种空间 gap：
+
+- **产线产出 gap**：产线 card 右边缘到产出区 card 左边缘之间的水平空间。Mode A 的 midX 在此 gap 内按 source 均分分配。分配顺序（x 从小到大）：
+  1. 只有产线建材终点的 source（纯 Mode B）
+  2. 同时有产线产出终点和产线建材终点的 source（Mode A + B 混合）
+  3. 只有产出终点的 source（纯 Mode A）
+  4. 同类内按起点 y 从小到大排序
+- **产线建材 gap**：产线 card 左边缘到 group 容器左边框之间的水平空间。Mode B 的 p3X 在此 gap 内按 source 均分分配，分配顺序按起点 y1 从小到大。
+- **产线间 gap**：相邻产线 card 之间的垂直缝隙（card[i].bottom → card[i+1].top）。Mode B 的 p2Y 分配规则：
+  1. 对每个 source，确定终点 y 范围：单终点为 `[sY, eY]`（起点到终点），多终点为 `[e1Y, enY]`（最小终点到最大终点）
+  2. 筛选完全落在终点 y 范围内的产线间 gap（gap.start ≥ yMin && gap.end ≤ yMax）
+  3. 从满足约束的候选 gap 中，选择中心点距起点 y1 最近的 gap
+  4. 同一 gap 内的 source 按起点 y1 从小到大排序，依次均分 p2Y 位置
+
+#### 共享原则
+
+同一 source（sourceGroupId + wareId）共享 midX；同一 source 在同一 gap 内共享 p2Y、p3X。
+
+#### Mode A（终点在右侧，x2 > x1）：3 段线
 ```
 Start → P1(midX, y1) → P2(midX, y2) → End
 ```
-- midX 按 source（sourceGroupId + wareId）在产线区 x1 到产出区 x2 之间的 gap 内均分分配
+- midX 在产线产出 gap 内按 source 均分分配
 - 同一 source 的所有边共享同一个 midX
 - 若 `|y1 - y2| < 4`（近乎水平），退化为直线
 
-**Mode B（终点在左侧，x2 ≤ x1）**：5 段线
+#### Mode B（终点在左侧，x2 ≤ x1）：5 段线
 ```
 Start → P1(p1X, y1) → P2(p1X, p2Y) → P3(p3X, p2Y) → P4(p3X, y2) → End
 ```
 - p1X (= midX)：与 Mode A 共享同一分配池（每个 source 一个值）
-- p2Y：在目标 card 与上一张 card 之间的缝隙（card gap）内，按 source 均分（同一 source 共享 p2Y，不同 source 之间均分）
-- p3X：在 `[4, x2-4]` 范围内按 source 均分（同一 source 共享 p3X）
+- p2Y：在产线间 gap 内按 source 均分（同一 source 共享 p2Y，不同 source 之间均分）
+- p3X：在产线建材 gap 内按 source 均分（同一 source 共享 p3X）
 - 每个 gap 内的 source 计数独立，ei 从 0 开始，不跨 gap 累计
 
-**自身连接**：同一 card 内产出 tag 左边缘直连建材 tag 右边缘。
+#### 自身连接
+
+同一 card 内产出 tag 左边缘直连建材 tag 右边缘。
 
 ### 响应机制
 

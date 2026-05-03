@@ -18,7 +18,7 @@ interface RoutedEdge {
 
 const lines = ref<RoutedEdge[]>([])
 
-const DEBUG_LOG = false
+const DEBUG_LOG = true
 
 const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
 
@@ -44,8 +44,6 @@ function recalculate() {
     edge: BuildFlowEdge
     x1: number; y1: number
     x2: number; y2: number
-    srcCardBot: number; srcCardTop: number
-    tgtCardBot: number; tgtCardTop: number
   }> = []
 
   for (const edge of props.edges) {
@@ -62,13 +60,7 @@ function recalculate() {
     const x2 = isSelf ? targetRect.right - containerRect.left : targetRect.left - containerRect.left
     const y2 = targetRect.top + targetRect.height / 2 - containerRect.top
 
-    let srcCardBot = y1, srcCardTop = y1, tgtCardBot = y2, tgtCardTop = y2
-    for (const cb of cardBounds) {
-      if (y1 >= cb.top && y1 <= cb.bottom) { srcCardBot = cb.bottom; srcCardTop = cb.top }
-      if (y2 >= cb.top && y2 <= cb.bottom) { tgtCardBot = cb.bottom; tgtCardTop = cb.top }
-    }
-
-    positioned.push({ edge, x1, y1, x2, y2, srcCardBot, srcCardTop, tgtCardBot, tgtCardTop })
+    positioned.push({ edge, x1, y1, x2, y2 })
   }
 
   if (positioned.length === 0) { lines.value = []; return }
@@ -76,54 +68,123 @@ function recalculate() {
   const results: RoutedEdge[] = []
   positioned.sort((a, b) => a.y1 - b.y1)
 
-  const gapsByCard: Array<{ start: number; end: number }> = []
-  if (cardBounds.length > 0) gapsByCard.push({ start: 0, end: cardBounds[0]!.top })
+  const lineGaps: Array<{ start: number; end: number }> = []
   for (let i = 0; i < cardBounds.length - 1; i++) {
-    gapsByCard.push({ start: cardBounds[i]!.bottom, end: cardBounds[i + 1]!.top })
+    const g = { start: cardBounds[i]!.bottom, end: cardBounds[i + 1]!.top }
+    if (g.end > g.start) lineGaps.push(g)
   }
-  if (cardBounds.length > 0) gapsByCard.push({ start: cardBounds[cardBounds.length - 1]!.bottom, end: containerRect.height })
 
-  const gapGroups = new Map<string, typeof positioned>()
-  const gapSources = new Map<string, Set<string>>()
-  for (const p of positioned) {
-    if ((p.edge as any).isSelfConnection) continue
-    if (p.x2 > p.x1) continue
-    let gk = ''
-    for (const cb of cardBounds) {
-      if (p.y1 < p.y2 ? cb.top === p.tgtCardTop : cb.top === p.srcCardTop) {
-        const idx = cardBounds.indexOf(cb)
-        const gap = gapsByCard[idx]
-        gk = gap ? `${gap.start.toFixed(0)}|${gap.end.toFixed(0)}` : `0|0`
-        break
+  const modeBEdges = positioned.filter(p => !(p.edge as any).isSelfConnection && p.x2 <= p.x1)
+  const sourceYRange = new Map<string, { y1: number; yMin: number; yMax: number }>()
+  for (const p of modeBEdges) {
+    const sk = `${p.edge.sourceGroupId}:${p.edge.wareId}`
+    const existing = sourceYRange.get(sk)
+    if (existing) {
+      existing.yMin = Math.min(existing.yMin, p.y2)
+      existing.yMax = Math.max(existing.yMax, p.y2)
+    } else {
+      sourceYRange.set(sk, { y1: p.y1, yMin: p.y2, yMax: p.y2 })
+    }
+  }
+  for (const [, range] of sourceYRange) {
+    if (range.yMin === range.yMax) {
+      range.yMin = Math.min(range.y1, range.yMin)
+      range.yMax = Math.max(range.y1, range.yMax)
+    }
+  }
+
+  const sourceGapAssignment = new Map<string, { gapIdx: number; start: number; end: number }>()
+  for (const [sk, range] of sourceYRange) {
+    const candidates = lineGaps
+      .map((g, idx) => ({ idx, start: g.start, end: g.end, center: (g.start + g.end) / 2 }))
+      .filter(g => g.start >= range.yMin && g.end <= range.yMax)
+    if (candidates.length === 0) continue
+    candidates.sort((a, b) => Math.abs(a.center - range.y1) - Math.abs(b.center - range.y1))
+    const chosen = candidates[0]!
+    sourceGapAssignment.set(sk, { gapIdx: chosen.idx, start: chosen.start, end: chosen.end })
+    if (DEBUG_LOG) {
+      console.log(`[gapAssign] src=${sk} yRange=[${range.yMin.toFixed(0)},${range.yMax.toFixed(0)}] y1=${range.y1.toFixed(0)} chosenGap=[${chosen.start.toFixed(0)},${chosen.end.toFixed(0)}] idx=${chosen.idx}`)
+    }
+  }
+
+  const gapSourcesSorted = new Map<number, string[]>()
+  for (const [sk, assign] of sourceGapAssignment) {
+    if (!gapSourcesSorted.has(assign.gapIdx)) gapSourcesSorted.set(assign.gapIdx, [])
+    gapSourcesSorted.get(assign.gapIdx)!.push(sk)
+  }
+  for (const [, srcs] of gapSourcesSorted) {
+    srcs.sort((a, b) => (sourceYRange.get(a)?.y1 ?? 0) - (sourceYRange.get(b)?.y1 ?? 0))
+  }
+  const gapSlotPosition = new Map<string, { p2Y: number; p3X: number }>()
+  for (const [gIdx, srcs] of gapSourcesSorted) {
+    const gap = lineGaps[gIdx]
+    if (!gap) continue
+    const gapSize = gap.end - gap.start
+    for (let i = 0; i < srcs.length; i++) {
+      const sk = srcs[i]!
+      const p2Y = gap.start + ((i + 1) * gapSize) / Math.max(srcs.length + 1, 1)
+      const existing = gapSlotPosition.get(sk)
+      if (existing) {
+        existing.p2Y = p2Y
+      } else {
+        gapSlotPosition.set(sk, { p2Y, p3X: 0 })
       }
     }
-    if (!gk) continue
-    if (!gapGroups.has(gk)) gapGroups.set(gk, [])
-    gapGroups.get(gk)!.push(p)
-    const sk = `${p.edge.sourceGroupId}:${p.edge.wareId}`
-    if (!gapSources.has(gk)) gapSources.set(gk, new Set())
-    gapSources.get(gk)!.add(sk)
   }
 
-  const gapSlotCounters = new Map<string, { p2Y: number; p3X: number }>()
-  const gapSlotIndex = new Map<string, number>()
+  const allModeBSources = [...sourceYRange.keys()]
+  allModeBSources.sort((a, b) => (sourceYRange.get(a)?.y1 ?? 0) - (sourceYRange.get(b)?.y1 ?? 0))
+  const lineCardEls = container.querySelectorAll('.build-flow-line-card')
+  let buildMatGapEnd = containerRect.width - 16
+  lineCardEls.forEach(el => {
+    const r = el.getBoundingClientRect()
+    const left = r.left - containerRect.left
+    if (left < buildMatGapEnd) buildMatGapEnd = left
+  })
+  for (let i = 0; i < allModeBSources.length; i++) {
+    const sk = allModeBSources[i]!
+    const p3X = 4 + ((i + 1) * (buildMatGapEnd - 8)) / Math.max(allModeBSources.length + 1, 1)
+    const existing = gapSlotPosition.get(sk)
+    if (existing) {
+      existing.p3X = p3X
+    } else {
+      gapSlotPosition.set(sk, { p2Y: 0, p3X })
+    }
+  }
 
   const srcMidX = new Map<string, number>()
-  const totalSources = new Set(positioned.filter(p => !(p.edge as any).isSelfConnection).map(p => `${p.edge.sourceGroupId}:${p.edge.wareId}`)).size
-  let srcIdx = 0
+  const allSources = new Map<string, { y1: number; hasModeA: boolean; hasModeB: boolean }>()
+  for (const pos of positioned) {
+    if ((pos.edge as any).isSelfConnection) continue
+    const sk = `${pos.edge.sourceGroupId}:${pos.edge.wareId}`
+    const existing = allSources.get(sk)
+    const isModeA = pos.x2 > pos.x1
+    if (existing) {
+      if (isModeA) existing.hasModeA = true
+      else existing.hasModeB = true
+    } else {
+      allSources.set(sk, { y1: pos.y1, hasModeA: isModeA, hasModeB: !isModeA })
+    }
+  }
+  const sortedSources = [...allSources.entries()].sort((a, b) => {
+    const categoryA = a[1].hasModeB && !a[1].hasModeA ? 0 : a[1].hasModeA && a[1].hasModeB ? 1 : 2
+    const categoryB = b[1].hasModeB && !b[1].hasModeA ? 0 : b[1].hasModeA && b[1].hasModeB ? 1 : 2
+    if (categoryA !== categoryB) return categoryA - categoryB
+    return a[1].y1 - b[1].y1
+  })
+  const totalSources = sortedSources.length
   const outTagEl = container.querySelector('[class*="build-flow-output-card"] [data-tag-id]')
   const gapEnd = outTagEl ? outTagEl.getBoundingClientRect().left - containerRect.left : containerRect.width - 16
-  for (const pos of positioned) {
-    const sk = `${pos.edge.sourceGroupId}:${pos.edge.wareId}`
-    if (!srcMidX.has(sk) && !(pos.edge as any).isSelfConnection) {
-      const gap = Math.max(gapEnd - pos.x1 - 8, 4)
-      srcMidX.set(sk, pos.x1 + 4 + ((srcIdx + 1) * gap) / Math.max(totalSources + 1, 1))
-      srcIdx++
-    }
+  for (let i = 0; i < sortedSources.length; i++) {
+    const [sk] = sortedSources[i]!
+    const firstPos = positioned.find(p => `${p.edge.sourceGroupId}:${p.edge.wareId}` === sk && !(p.edge as any).isSelfConnection)
+    if (!firstPos) continue
+    const gap = Math.max(gapEnd - firstPos.x1 - 8, 4)
+    srcMidX.set(sk, firstPos.x1 + 4 + ((i + 1) * gap) / Math.max(totalSources + 1, 1))
   }
 
   positioned.forEach((pos) => {
-    const { edge, x1, y1, x2, y2, srcCardTop, tgtCardTop } = pos
+    const { edge, x1, y1, x2, y2 } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
       const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: ec.color, colorIdx: ec.idx })
@@ -141,40 +202,18 @@ function recalculate() {
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
       }
     } else {
-      let gk = ''
-      let gapStart = 4, gapEnd = 4, gapSize = 4
-      for (const cb of cardBounds) {
-        if (y1 < y2 ? cb.top === tgtCardTop : cb.top === srcCardTop) {
-          const idx = cardBounds.indexOf(cb)
-          const gap = gapsByCard[idx]
-          if (gap) {
-            gapStart = gap.start
-            gapEnd = gap.end
-            gapSize = Math.max(gapEnd - gapStart, 4)
-            gk = `${gapStart.toFixed(0)}|${gapEnd.toFixed(0)}`
-          }
-          break
-        }
-      }
-      if (!gk) return
-
-      const slotKey = `${gk}|${sk}`
-      if (!gapSlotCounters.has(slotKey)) {
-        const ei = gapSlotIndex.get(gk) ?? 0
-        gapSlotIndex.set(gk, ei + 1)
-        const srcsInGap = gapSources.get(gk)?.size ?? 1
-        const p2Y = gapStart + ((ei + 1) * gapSize) / Math.max(srcsInGap + 1, 1)
-        const p3X = 4 + ((ei + 1) * (x2 - 8)) / Math.max(srcsInGap + 1, 1)
-        gapSlotCounters.set(slotKey, { p2Y, p3X })
-        if (DEBUG_LOG) {
-          console.log(`[modeB] gap=${gk} src=${sk} ei=${ei}/${srcsInGap} gapRange=[${gapStart.toFixed(0)},${gapEnd.toFixed(0)}] p1X=${midX.toFixed(0)} p2Y=${p2Y.toFixed(0)} p3X=${p3X.toFixed(0)} x2=${x2.toFixed(0)}`)
-        }
-      }
-      const slot = gapSlotCounters.get(slotKey)!
+      const slot = gapSlotPosition.get(sk)
+      if (!slot) return
 
       const p1X = midX
       const p2Y = slot.p2Y
       const p3X = slot.p3X
+      if (DEBUG_LOG) {
+        const assign = sourceGapAssignment.get(sk)
+        const srcsInGap = gapSourcesSorted.get(assign?.gapIdx ?? -1) ?? []
+        const ei = srcsInGap.indexOf(sk)
+        console.log(`[modeB] src=${sk} gap=[${assign?.start.toFixed(0)},${assign?.end.toFixed(0)}] ei=${ei}/${srcsInGap.length} y1=${y1.toFixed(0)} p1X=${p1X.toFixed(0)} p2Y=${p2Y.toFixed(0)} p3X=${p3X.toFixed(0)}`)
+      }
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
     }
 
