@@ -559,6 +559,25 @@ function unarchiveGroup(groupId: string): void {
   if (idx === -1) return
   archivedGroupIds.value.splice(idx, 1)
 }
+
+// 删除产线时同步清理归档记录
+function removeGroup(groupId: string): void {
+  const idx = groups.value.findIndex(g => g.id === groupId)
+  if (idx !== -1) {
+    groups.value.splice(idx, 1)
+    // 同步清理归档记录
+    const archivedIdx = archivedGroupIds.value.indexOf(groupId)
+    if (archivedIdx !== -1) {
+      archivedGroupIds.value.splice(archivedIdx, 1)
+    }
+  }
+}
+
+// 清空所有产线时同步清理归档记录
+function clearAllGroups(): void {
+  groups.value = []
+  archivedGroupIds.value = []
+}
 ```
 
 #### 持久化
@@ -665,3 +684,167 @@ archivedLineCards: ComputedRef<BuildFlowLineCard[]>  // 归档产线的 card 数
 - 归档时清理该产线相关的 assignments（来源或目标）
 - 归档产线仍存在于规划区，不受影响
 - 恢复归档产线后重新参与建筑产线区计算
+
+---
+
+## 增量功能：默认连线（虚拟连线）
+
+### 目标
+
+系统在每次推导重算后，对所有未被用户手动绑定的产出区目标自动建立默认连线，减少用户重复操作。默认连线仅在内存中生成，不持久化，用户手动绑定后自动覆盖，解绑后在下次重算时恢复。
+
+### 数据模型
+
+不在现有 `BuildFlowAssignment` 或 `BuildFlowPlanData` 中新增字段。虚拟连线独立于持久化 assignments，在 store 中以单独的 computed/ref 维护：
+
+```ts
+// 在 useLogicFlowStore 中新增
+const virtualEdges = computed(() => computeVirtualEdges(
+  buildFlowGroups.value,
+  buildFlowAssignments.value,
+  archivedBuildFlowGroupIds.value,
+  groups
+))
+```
+
+`VirtualEdge` 类型：
+
+```ts
+interface VirtualEdge {
+  wareId: string
+  sourceGroupId: string
+  targetType: 'output-build-material' | 'output-material'
+  targetGroupId: ''  // 产出区目标无 groupId
+  isArchived: boolean  // true = 连到归档产线（无线仅涂色）
+  isDashed: boolean    // true = 虚线，false = 无线（仅涂色）
+}
+```
+
+### 搜索算法
+
+#### computeVirtualEdges()
+
+输入：
+- `buildFlowGroups` — 建筑流分组视图
+- `assignments` — 当前手动绑定的 assignments
+- `archivedGroupIds` — 归档产线 ID 列表
+- `groups` — 全量 `ProductionLineGroup[]`（用于搜索归档产线的 sourceTags）
+
+输出：`VirtualEdge[]`
+
+伪代码：
+
+```
+function computeVirtualEdges(buildFlowGroups, assignments, archivedGroupIds, allGroups):
+  result = []
+  assignedTargetKeys = collectAssignedTargetKeys(assignments)
+  // format: Map<targetType -> targetKey>
+  // targetKey for output-build: "output-build:{wareId}"
+  // targetKey for output: "output:{wareId}"
+
+  for each group in buildFlowGroups:
+    for each tag in group.outputBuildTags:
+      targetKey = "output-build:" + tag.wareId
+      if assignedTargetKeys.has(targetKey):
+        continue  // 已有手动绑定
+      // 搜索本组内非归档产线（按 logic-flow 顺序）
+      source = findFirstSourceInGroup(group, tag.wareId, archivedGroupIds)
+      if source:
+        result.push({
+          wareId: tag.wareId,
+          sourceGroupId: source.groupId,
+          targetType: 'output-build-material',
+          isArchived: false,
+          isDashed: true
+        })
+
+    for each tag in group.outputMaterialTags:
+      targetKey = "output:" + tag.wareId
+      if assignedTargetKeys.has(targetKey):
+        continue  // 已有手动绑定
+      // 第一步：搜索已归档产线（全局，logic-flow 顺序）
+      archivedSource = findFirstArchivedSource(allGroups, archivedGroupIds, tag.wareId)
+      if archivedSource:
+        result.push({
+          wareId: tag.wareId,
+          sourceGroupId: archivedSource.groupId,
+          targetType: 'output-material',
+          isArchived: true,
+          isDashed: false  // 无线仅涂色
+        })
+        continue
+      // 第二步：搜索本组内非归档产线
+      source = findFirstSourceInGroup(group, tag.wareId, archivedGroupIds)
+      if source:
+        result.push({
+          wareId: tag.wareId,
+          sourceGroupId: source.groupId,
+          targetType: 'output-material',
+          isArchived: false,
+          isDashed: true
+        })
+      // 未找到：不做任何操作，标签保持透明
+
+  return result
+```
+
+辅助函数：
+
+**findFirstSourceInGroup(group, wareId, archivedGroupIds)**
+- 按 `lineCards` 在 group 中的排列顺序遍历
+- 跳过 `archivedGroupIds` 中存在的产线
+- 返回第一个 `lineCard.sourceTags` 包含 `wareId` 的产线的 `groupId`
+- 若无匹配，返回 `null`
+
+**findFirstArchivedSource(allGroups, archivedGroupIds, wareId)**
+- 收集所有 `archivedGroupIds` 对应的 group
+- 按 `allGroups` 的排列顺序遍历（logic-flow 顺序）
+- 对该 group 计算其 sourceTags（`source === 'manual' && !isIsolated` 节点产物），并过滤仅保留 sourceTags 包含 `wareId` 的
+- 若该 group 的 sourceTags 包含 `wareId`，返回该 group 的 `id`
+- 若无匹配，返回 `null`
+
+### 生命周期
+
+1. **推导重算时**：`deriveBuildFlowView()` 完成后，立即执行 `computeVirtualEdges()`
+2. **手动绑定后**：用户绑定后，目标键被加入 `assignedTargetKeys`，`virtualEdges` computed 自动排除该目标（依赖 `buildFlowAssignments`）
+3. **解绑后**：目标键从 `assignedTargetKeys` 移除，`virtualEdges` computed 自动重新包含该目标
+4. **归档/恢复时**：`archivedGroupIds` 变化触发 `virtualEdges` 重算
+
+### 视觉表现
+
+| 场景 | 连线样式 | 标签涂色 |
+|---|---|---|
+| 建材区 → 非归档产线 | 虚线（`stroke-dasharray`），颜色按 wareId 分配 | 涂色 |
+| 材料区 → 归档产线 | 无线 | 涂色 |
+| 材料区 → 非归档产线 | 虚线，颜色按 wareId 分配 | 涂色 |
+| 手动绑定 → 任何目标 | 实线，颜色按 wareId 分配 | 涂色 |
+| 未匹配 | 无线 | 透明 |
+
+颜色使用与手动连线相同的 8 色调色板（`['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']`），按 wareId 排序后的 index % 8 分配。
+
+### Presenter 调整
+
+`useBuildFlowPresenter` 新增：
+
+```ts
+// 新增 computed
+virtualEdges: ComputedRef<VirtualEdge[]>
+
+// edges 计算变更：合并手动 assignment edges 和 virtual edges
+edges: ComputedRef<BuildFlowEdge[]>
+```
+
+合并规则：
+- 手动 assignment edges 优先（实线）
+- 如果某 targetKey 在 manual edges 中存在，不在 virtual edges 中重复
+- virtual edges 渲染为虚线或无线
+
+### 涉及文件
+
+| 文件 | 改动 |
+|---|---|
+| `src/types/x4.ts` | 新增 `VirtualEdge` 接口 |
+| `src/store/logic/buildFlowDerivation.ts` | 新增 `computeVirtualEdges()` 导出函数 |
+| `src/store/useLogicFlowStore.ts` | 新增 `buildFlowVirtualEdges` computed |
+| `src/components/logic-flow/presenters/useBuildFlowPresenter.ts` | 新增 `virtualEdges`，合并 `edges` |
+| `src/components/logic-flow/BuildFlowEdgeLayer.vue` | 支持虚线 `stroke-dasharray` 渲染；支持无线（仅涂色不画线） |

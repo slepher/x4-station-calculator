@@ -4,7 +4,8 @@ import type {
   BuildFlowLineCard,
   BuildFlowGroup,
   BuildFlowTag,
-  BuildFlowTargetType
+  BuildFlowTargetType,
+  VirtualEdge
 } from '@/types/x4'
 import { computeTargetKey } from '@/store/logic/buildFlowDerivation'
 
@@ -15,6 +16,7 @@ export interface BuildFlowPresenterStore {
   assignments: Ref<BuildFlowAssignment[]> | BuildFlowAssignment[]
   isDragging: ComputedRef<boolean>
   archivedGroupIds: Ref<string[]> | string[]
+  virtualEdges?: ComputedRef<VirtualEdge[]>
   bindAssignment(assignment: BuildFlowAssignment): void
   unbindAssignment(targetKey: string): void
   startBuildFlowDrag(): void
@@ -32,6 +34,7 @@ export interface BuildFlowEdge {
   targetType: BuildFlowTargetType
   targetGroupId?: string
   isSelfConnection: boolean
+  isDashed?: boolean
 }
 
 export interface MenuTargetItem {
@@ -57,6 +60,7 @@ export interface UseBuildFlowPresenterReturn {
   buildFlowGroups: ComputedRef<BuildFlowGroup[]>
   cardRows: ComputedRef<BuildFlowRow[][]>
   edges: ComputedRef<BuildFlowEdge[]>
+  virtualTargetTagIds: ComputedRef<Set<string>>
   isDragging: ComputedRef<boolean>
   archivedGroupIds: ComputedRef<string[]>
   archivedLineCards: ComputedRef<BuildFlowLineCard[]>
@@ -118,8 +122,21 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     })
   })
 
+  const virtualEdges = computed(() => store.virtualEdges?.value ?? [])
+  const virtualTargetTagIds = computed(() => {
+    const ids = new Set<string>()
+    for (const ve of virtualEdges.value) {
+      if (ve.targetType === 'output-build-material') {
+        ids.add(`build-flow-target:output-build:${ve.wareId}`)
+      } else {
+        ids.add(`build-flow-target:output:${ve.wareId}`)
+      }
+    }
+    return ids
+  })
+
   const edges = computed<BuildFlowEdge[]>(() => {
-    return getAssignments().map((a) => {
+    const manualEdges = getAssignments().map((a) => {
       const sourceTagId = `build-flow-source:${a.sourceGroupId}:${a.wareId}`
       let targetTagId: string
       if (a.targetType === 'line-build-material') {
@@ -138,9 +155,31 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
         sourceGroupId: a.sourceGroupId,
         targetType: a.targetType,
         targetGroupId: a.targetGroupId,
-        isSelfConnection
+        isSelfConnection,
+        isDashed: undefined
       }
     })
+    const virtualDashedEdges: BuildFlowEdge[] = virtualEdges.value
+      .filter(ve => ve.isDashed)
+      .map(ve => {
+        let targetTagId: string
+        if (ve.targetType === 'output-build-material') {
+          targetTagId = `build-flow-target:output-build:${ve.wareId}`
+        } else {
+          targetTagId = `build-flow-target:output:${ve.wareId}`
+        }
+        return {
+          id: `virtual-edge:${ve.sourceGroupId}:${ve.wareId}->${ve.targetType}:${ve.wareId}`,
+          sourceTagId: `build-flow-source:${ve.sourceGroupId}:${ve.wareId}`,
+          targetTagId,
+          wareId: ve.wareId,
+          sourceGroupId: ve.sourceGroupId,
+          targetType: ve.targetType,
+          isSelfConnection: false,
+          isDashed: true
+        }
+      })
+    return [...manualEdges, ...virtualDashedEdges]
   })
 
   function getTargetsForSource(wareId: string, sourceGroupId: string): MenuTargetItem[] {
@@ -279,6 +318,7 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
     buildFlowGroups,
     cardRows,
     edges,
+    virtualTargetTagIds,
     isDragging,
     archivedGroupIds,
     archivedLineCards,
