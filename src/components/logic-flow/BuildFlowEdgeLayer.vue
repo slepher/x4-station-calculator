@@ -76,14 +76,22 @@ function recalculate() {
 
   const modeBEdges = positioned.filter(p => !(p.edge as any).isSelfConnection && p.x2 <= p.x1)
   const sourceYRange = new Map<string, { y1: number; yMin: number; yMax: number }>()
+  const sourceEndYRange = new Map<string, { yMin: number; yMax: number }>()
   for (const p of modeBEdges) {
     const sk = `${p.edge.sourceGroupId}:${p.edge.wareId}`
     const existing = sourceYRange.get(sk)
+    const eExisting = sourceEndYRange.get(sk)
     if (existing) {
       existing.yMin = Math.min(existing.yMin, p.y2)
       existing.yMax = Math.max(existing.yMax, p.y2)
     } else {
       sourceYRange.set(sk, { y1: p.y1, yMin: p.y2, yMax: p.y2 })
+    }
+    if (eExisting) {
+      eExisting.yMin = Math.min(eExisting.yMin, p.y2)
+      eExisting.yMax = Math.max(eExisting.yMax, p.y2)
+    } else {
+      sourceEndYRange.set(sk, { yMin: p.y2, yMax: p.y2 })
     }
   }
   for (const [, range] of sourceYRange) {
@@ -133,7 +141,41 @@ function recalculate() {
   }
 
   const allModeBSources = [...sourceYRange.keys()]
-  allModeBSources.sort((a, b) => (sourceYRange.get(a)?.y1 ?? 0) - (sourceYRange.get(b)?.y1 ?? 0))
+  const sourceP3XInterval = new Map<string, { yMin: number; yMax: number }>()
+  for (const sk of allModeBSources) {
+    const endRange = sourceEndYRange.get(sk)!
+    const p2Y = gapSlotPosition.get(sk)?.p2Y ?? 0
+    if (endRange.yMin === endRange.yMax) {
+      sourceP3XInterval.set(sk, { yMin: Math.min(p2Y, endRange.yMin), yMax: Math.max(p2Y, endRange.yMin) })
+    } else {
+      sourceP3XInterval.set(sk, { yMin: endRange.yMin, yMax: endRange.yMax })
+    }
+  }
+  const sortedByYMin = [...sourceP3XInterval.entries()].sort((a, b) => a[1].yMin - b[1].yMin)
+  if (DEBUG_LOG) {
+    for (const [sk, interval] of sortedByYMin) {
+      const range = sourceYRange.get(sk)
+      console.log(`[p3xInterval] src=${sk} yMin=${interval.yMin.toFixed(0)} yMax=${interval.yMax.toFixed(0)} y1=${(range?.y1 ?? 0).toFixed(0)} p2Y=${(gapSlotPosition.get(sk)?.p2Y ?? 0).toFixed(0)}`)
+    }
+  }
+  const tracks: number[] = []
+  const sourceTrack = new Map<string, number>()
+  for (const [sk, interval] of sortedByYMin) {
+    let placed = -1
+    for (let t = 0; t < tracks.length; t++) {
+      if (tracks[t]! + 1 < interval.yMin) {
+        placed = t
+        tracks[t] = interval.yMax
+        break
+      }
+    }
+    if (placed === -1) {
+      placed = tracks.length
+      tracks.push(interval.yMax)
+    }
+    sourceTrack.set(sk, placed)
+  }
+  const totalTracks = tracks.length
   const lineCardEls = container.querySelectorAll('.build-flow-line-card')
   let buildMatGapEnd = containerRect.width - 16
   lineCardEls.forEach(el => {
@@ -141,14 +183,18 @@ function recalculate() {
     const left = r.left - containerRect.left
     if (left < buildMatGapEnd) buildMatGapEnd = left
   })
-  for (let i = 0; i < allModeBSources.length; i++) {
-    const sk = allModeBSources[i]!
-    const p3X = 4 + ((i + 1) * (buildMatGapEnd - 8)) / Math.max(allModeBSources.length + 1, 1)
+  for (const sk of allModeBSources) {
+    const t = sourceTrack.get(sk) ?? 0
+    const p3X = 4 + ((t + 1) * (buildMatGapEnd - 8)) / Math.max(totalTracks + 1, 1)
     const existing = gapSlotPosition.get(sk)
     if (existing) {
       existing.p3X = p3X
     } else {
       gapSlotPosition.set(sk, { p2Y: 0, p3X })
+    }
+    if (DEBUG_LOG) {
+      const interval = sourceP3XInterval.get(sk)!
+      console.log(`[p3x] src=${sk} interval=[${interval.yMin.toFixed(0)},${interval.yMax.toFixed(0)}] track=${t}/${totalTracks} p3X=${p3X.toFixed(0)}`)
     }
   }
 
@@ -212,7 +258,7 @@ function recalculate() {
         const assign = sourceGapAssignment.get(sk)
         const srcsInGap = gapSourcesSorted.get(assign?.gapIdx ?? -1) ?? []
         const ei = srcsInGap.indexOf(sk)
-        console.log(`[modeB] src=${sk} gap=[${assign?.start.toFixed(0)},${assign?.end.toFixed(0)}] ei=${ei}/${srcsInGap.length} y1=${y1.toFixed(0)} p1X=${p1X.toFixed(0)} p2Y=${p2Y.toFixed(0)} p3X=${p3X.toFixed(0)}`)
+        console.log(`[modeB] src=${sk} gap=[${assign?.start.toFixed(0)},${assign?.end.toFixed(0)}] ei=${ei}/${srcsInGap.length} y1=${y1.toFixed(0)} y2=${y2.toFixed(0)} p1X=${p1X.toFixed(0)} p2Y=${p2Y.toFixed(0)} p3X=${p3X.toFixed(0)}`)
       }
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
     }
