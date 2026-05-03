@@ -373,22 +373,22 @@
       <statistics>
         <max>
           <hull value="708000.028133"/>
-          <shield value="1363629.538249" delay="21.500000" rate="4908.799805"/>
-          <weapon burst="571943.799982" sustained="44460.099993"/>
+          <shield value="1363629.538249" delay="19.000000" rate="5189.599609"/>
+          <weapon burst="572899.708603" sustained="45627.993296"/>
           <turret burst="0.000000" sustained="0.000000"/>
           <groups>
-            <shield value="57120.001602" delay="18.000000" rate="732.550049"/>
-            <turret burst="28255.296252" sustained="28255.296252"/>
+            <shield value="57834.001622" delay="16.600000" rate="832.649963"/>
+            <turret burst="21100.805739" sustained="21100.805739"/>
           </groups>
           <dock ship_m="4" ship_s="21"/>
           <engine forward="654.197083" acceleration="240.461624" yaw="0.106842" pitch="0.106842" roll="0.098501"/>
           <boost speed="3687.281982" acceleration="595.097168" duration="46.000000" recharge="1.086957"/>
-          <travel speed="23460.857422" acceleration="390.891632" chargetime="26.000000"/>
+          <travel speed="23460.857422" acceleration="398.882843" chargetime="26.000000"/>
           <thruster>
             <horizontal speed="81.924576" acceleration="27.677221"/>
             <vertical speed="81.924576" acceleration="27.677221"/>
           </thruster>
-          <capacity crew="406" container="56000" solid="0" liquid="0" condensate="0" ship_m="8" ship_s="100" unit="247" missile="6144" countermeasure="44" deployable="454"/>
+          <capacity crew="406" container="71500" solid="0" liquid="0" condensate="0" ship_m="8" ship_s="100" unit="247" missile="6144" countermeasure="44" deployable="454"/>
           <radar range="48000.000000"/>
         </max>
       </statistics>
@@ -496,22 +496,22 @@
       <statistics>
         <max>
           <hull value="291180.011570"/>
-          <shield value="587520.016479" delay="20.000000" rate="3088.799805"/>
-          <weapon burst="19118.160267" sustained="11763.424452"/>
+          <shield value="587520.016479" delay="19.000000" rate="3088.799805"/>
+          <weapon burst="20552.023199" sustained="12338.136097"/>
           <turret burst="0.000000" sustained="0.000000"/>
           <groups>
-            <shield value="38080.001068" delay="18.000000" rate="488.366608"/>
-            <turret burst="7468.700904" sustained="7468.700904"/>
+            <shield value="38556.001081" delay="16.600000" rate="555.099976"/>
+            <turret burst="7388.213044" sustained="7388.213044"/>
           </groups>
           <dock ship_m="1" ship_s="8"/>
-          <engine forward="719.769653" acceleration="199.581970" yaw="0.617508" pitch="0.617508" roll="0.654893"/>
-          <boost speed="5130.219727" acceleration="692.683472" duration="46.000000" recharge="1.111111"/>
-          <travel speed="30203.595703" acceleration="557.803650" chargetime="18.000000"/>
+          <engine forward="739.066040" acceleration="199.581970" yaw="0.617508" pitch="0.617508" roll="0.654893"/>
+          <boost speed="5267.755859" acceleration="692.683472" duration="46.000000" recharge="1.111111"/>
+          <travel speed="31013.324219" acceleration="644.648926" chargetime="18.000000"/>
           <thruster>
             <horizontal speed="142.842850" acceleration="50.044029"/>
             <vertical speed="142.842850" acceleration="50.044029"/>
           </thruster>
-          <capacity crew="226" container="62000" solid="57600" liquid="54000" condensate="0" ship_m="2" ship_s="16" unit="74" missile="2684" countermeasure="24" deployable="254"/>
+          <capacity crew="226" container="62000" solid="62300" liquid="58500" condensate="0" ship_m="2" ship_s="16" unit="74" missile="2684" countermeasure="24" deployable="254"/>
           <radar range="96000.000000"/>
         </max>
       </statistics>
@@ -610,8 +610,8 @@
       <storage countermeasure="8" deployable="100"/>
       <statistics>
         <max>
-          <hull value="46800.001860"/>
-          <shield value="65620.001841" delay="18.000000" rate="608.399963"/>
+          <hull value="49200.001955"/>
+          <shield value="65620.001841" delay="16.600000" rate="713.699951"/>
           <weapon burst="31000.345813" sustained="7625.688953"/>
           <turret burst="1202.400035" sustained="1202.400035"/>
           <groups>
@@ -620,7 +620,7 @@
           </groups>
           <dock ship_m="0" ship_s="1"/>
           <engine forward="1958.642334" acceleration="540.628540" yaw="1.817550" pitch="2.341844" roll="3.076601"/>
-          <boost speed="14855.317383" acceleration="3265.203369" duration="31.680000" recharge="1.207729"/>
+          <boost speed="14855.317383" acceleration="3022.367676" duration="31.680000" recharge="1.207729"/>
           <travel speed="24723.839844" acceleration="1065.411865" chargetime="8.000000"/>
           <thruster>
             <horizontal speed="511.653534" acceleration="196.443314"/>
@@ -715,8 +715,8 @@
       <statistics>
         <max>
           <hull value="7680.000305"/>
-          <shield value="16768.800470" delay="19.000000" rate="2189.199951"/>
-          <weapon burst="11422.800159" sustained="5550.764252"/>
+          <shield value="16768.800470" delay="18.500000" rate="2189.199951"/>
+          <weapon burst="11422.800330" sustained="5550.764252"/>
           <turret burst="0.000000" sustained="0.000000"/>
           <groups>
             <shield value="0.000000" delay="0.000000" rate="0.000000"/>

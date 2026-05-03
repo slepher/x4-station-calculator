@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="/terraforming/projects">
+    <project id="agr_fields_scruffin" group="food_staple" name="{20227,1390}" description="{20227,1391}" duration="600">
+      <effects>
+        <effect stat="oxygen" change="1" />
+      </effects>
+      <rebates>
+        <rebate waregroup="food" value="10" />
+      </rebates>
+      <resources price="25000000">
+        <ware ware="dronecomponents" amount="2" />
+        <ware ware="scruffinfruits" amount="100" />
+        <ware ware="methane" amount="1" />
+      </resources>
+      <deliveries>
+        <ship macro="ship_gen_m_transdrone_container_01_a_macro" amount="20" buildduration="30" />
+        <ship macro="ship_gen_s_transdrone_container_01_a_macro" amount="100" buildduration="15" />
+      </deliveries>
+    </project>
+  </add>
+</diff>

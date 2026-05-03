@@ -8,11 +8,25 @@ import {
   deriveBuildFlowView,
   computeBuildFlowGroups,
   cleanupStaleAssignments,
+  computeVirtualEdges,
   type BuildFlowLineCard,
   type BuildFlowGroup,
   type BuildFlowAssignment
 } from '@/store/logic/buildFlowDerivation'
 import type { ProductionLineGroup, X4Module, FlowNode } from '@/types/x4'
+
+vi.mock('@/store/useGameDataStore', () => ({
+  useGameDataStore: () => ({
+    modulesMap: {
+      'module_gen_prod_hullparts_01': { id: 'module_gen_prod_hullparts_01', macroId: 'module_gen_prod_hullparts_01_macro', wareId: 'module_gen_prod_hullparts_01', nameId: '{20104,2}', name: 'Hull Part Production', dlc_tag: '', type: 'production', method: 'default', isPlayerBlueprint: true, group: 'production_gen', race: 'argon', buildTime: 60, buildCost: { graphene: 50, refinedmetals: 30, energycells: 10 }, cycleTime: 60, workforce: { needed: 10, capacity: 50, maxBonus: 0 }, outputs: { hullparts: 100 }, inputs: {}, dockingCount: 0, color: '#ffffff', color_rgb: '255,255,255', tier: 2 },
+      'module_gen_prod_graphene_01': { id: 'module_gen_prod_graphene_01', macroId: 'module_gen_prod_graphene_01_macro', wareId: 'module_gen_prod_graphene_01', nameId: '{20104,1}', name: 'Graphene Production', dlc_tag: '', type: 'production', method: 'default', isPlayerBlueprint: true, group: 'production_gen', race: 'argon', buildTime: 60, buildCost: { methane: 20 }, cycleTime: 60, workforce: { needed: 10, capacity: 50, maxBonus: 0 }, outputs: { graphene: 100 }, inputs: {}, dockingCount: 0, color: '#ffffff', color_rgb: '255,255,255', tier: 1 }
+    },
+    waresMap: { hullparts: { id: 'hullparts', tier: 2 }, graphene: { id: 'graphene', tier: 1 }, refinedmetals: { id: 'refinedmetals', tier: 1 } },
+    getWareDisplayName: (wareId: string) => wareId.toUpperCase()
+  })
+}))
+
+import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 
 function createMockModule(id: string, outputs: Record<string, number>, buildCost: Record<string, number>, tier: number): X4Module {
   return {
@@ -238,21 +252,8 @@ describe('buildFlowDerivation', () => {
     expect(result.length).toBe(0)
   })
 
-  it('1.5 测试 archiveGroup 清理相关 assignments', async () => {
+  it('1.5 测试 archiveGroup 清理相关 assignments', () => {
     // 1.5.1 在 useLogicFlowStore.ts 对 archiveBuildFlowGroup 编写单元测试
-    const gameDataMocks = vi.hoisted(() => ({
-      modulesMap: buildMockModulesMap(),
-      waresMap: {
-        hullparts: { id: 'hullparts', tier: 2 },
-        graphene: { id: 'graphene', tier: 1 },
-        refinedmetals: { id: 'refinedmetals', tier: 1 }
-      },
-      getWareDisplayName: (wareId: string) => wareId.toUpperCase()
-    }))
-    vi.mock('@/store/useGameDataStore', () => ({
-      useGameDataStore: () => gameDataMocks
-    }))
-    const { useLogicFlowStore } = await import('@/store/useLogicFlowStore')
     setActivePinia(createPinia())
     const logicFlow = useLogicFlowStore()
     // 1.5.2 给定产线 X 存在作为来源的 assignment 和作为目标的 assignment
@@ -284,6 +285,127 @@ describe('buildFlowDerivation', () => {
       a => a.sourceGroupId === 'group-x' || a.targetGroupId === 'group-x'
     )
     expect(xRelated.length).toBe(0)
-    vi.unmock('@/store/useGameDataStore')
+  })
+
+  describe('computeVirtualEdges', () => {
+    it('建材区默认连线: 分组内非归档产线匹配时生成虚线虚拟连线', () => {
+      const group: BuildFlowGroup = {
+        groupKey: 'group-a',
+        lineCards: [
+          {
+            groupId: 'group-a',
+            title: '产线A',
+            sourceTags: [{ tagId: 'src:a:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }],
+            buildMaterialTags: []
+          }
+        ],
+        outputBuildTags: [{ tagId: 'tgt:output-build:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }],
+        outputMaterialTags: [{ tagId: 'tgt:output:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }]
+      }
+      const buildFlowGroups = [group]
+      const assignments: BuildFlowAssignment[] = []
+      const archivedGroupIds: string[] = []
+      const allGroups: ProductionLineGroup[] = []
+
+      const result = computeVirtualEdges(buildFlowGroups, assignments, archivedGroupIds, allGroups)
+
+      const buildEdge = result.find(e => e.targetType === 'output-build-material')
+      expect(buildEdge).toBeDefined()
+      expect(buildEdge!.wareId).toBe('hullparts')
+      expect(buildEdge!.sourceGroupId).toBe('group-a')
+      expect(buildEdge!.isArchived).toBe(false)
+      expect(buildEdge!.isDashed).toBe(true)
+    })
+
+    it('材料区优先搜索归档产线: 归档产线匹配时无线仅涂色', () => {
+      const group: BuildFlowGroup = {
+        groupKey: 'group-a',
+        lineCards: [
+          {
+            groupId: 'group-a',
+            title: '产线A',
+            sourceTags: [{ tagId: 'src:a:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }],
+            buildMaterialTags: []
+          }
+        ],
+        outputBuildTags: [],
+        outputMaterialTags: [{ tagId: 'tgt:output:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }]
+      }
+      const buildFlowGroups = [group]
+      const assignments: BuildFlowAssignment[] = []
+      const archivedGroupIds = ['group-archived']
+      const allGroups: ProductionLineGroup[] = [
+        createMockGroup('group-archived', 'Archive', [
+          createManualNode('hullparts')
+        ])
+      ]
+
+      const result = computeVirtualEdges(buildFlowGroups, assignments, archivedGroupIds, allGroups)
+
+      const matEdge = result.find(e => e.targetType === 'output-material')
+      expect(matEdge).toBeDefined()
+      expect(matEdge!.sourceGroupId).toBe('group-archived')
+      expect(matEdge!.isArchived).toBe(true)
+      expect(matEdge!.isDashed).toBe(false)
+    })
+
+    it('材料区归档产线无匹配时回退到非归档产线: 虚线', () => {
+      const group: BuildFlowGroup = {
+        groupKey: 'group-a',
+        lineCards: [
+          {
+            groupId: 'group-a',
+            title: '产线A',
+            sourceTags: [{ tagId: 'src:a:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }],
+            buildMaterialTags: []
+          }
+        ],
+        outputBuildTags: [],
+        outputMaterialTags: [{ tagId: 'tgt:output:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }]
+      }
+      const buildFlowGroups = [group]
+      const assignments: BuildFlowAssignment[] = []
+      const archivedGroupIds = ['group-archived']
+      const allGroups: ProductionLineGroup[] = [
+        createMockGroup('group-archived', 'Archive', [
+          createManualNode('graphene')
+        ])
+      ]
+
+      const result = computeVirtualEdges(buildFlowGroups, assignments, archivedGroupIds, allGroups)
+
+      const matEdge = result.find(e => e.targetType === 'output-material')
+      expect(matEdge).toBeDefined()
+      expect(matEdge!.sourceGroupId).toBe('group-a')
+      expect(matEdge!.isArchived).toBe(false)
+      expect(matEdge!.isDashed).toBe(true)
+    })
+
+    it('已手动绑定的产出标签不生成虚拟连线', () => {
+      const group: BuildFlowGroup = {
+        groupKey: 'group-a',
+        lineCards: [
+          {
+            groupId: 'group-a',
+            title: '产线A',
+            sourceTags: [{ tagId: 'src:a:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }],
+            buildMaterialTags: []
+          }
+        ],
+        outputBuildTags: [{ tagId: 'tgt:output-build:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }],
+        outputMaterialTags: [{ tagId: 'tgt:output:hullparts', wareId: 'hullparts', label: 'HULLPARTS' }]
+      }
+      const buildFlowGroups = [group]
+      const assignments: BuildFlowAssignment[] = [
+        { wareId: 'hullparts', sourceGroupId: 'group-a', targetType: 'output-build-material' }
+      ]
+      const archivedGroupIds: string[] = []
+      const allGroups: ProductionLineGroup[] = []
+
+      const result = computeVirtualEdges(buildFlowGroups, assignments, archivedGroupIds, allGroups)
+
+      const buildEdge = result.find(e => e.targetType === 'output-build-material')
+      expect(buildEdge).toBeUndefined()
+    })
   })
 })

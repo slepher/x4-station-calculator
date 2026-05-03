@@ -763,6 +763,14 @@ export interface BuildFlowGroup {
   outputMaterialTags: BuildFlowTag[]
 }
 
+export interface VirtualEdge {
+  wareId: string
+  sourceGroupId: string
+  targetType: 'output-build-material' | 'output-material'
+  isArchived: boolean
+  isDashed: boolean
+}
+
 // Ship Blueprint Storage Types
 export interface ShipBlueprintShield {
   equipment_id: string

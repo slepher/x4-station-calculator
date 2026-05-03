@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<diff>
+  <add sel="//cue[@name='Terraforming_Boarding_Competition_Finished']/actions/do_all/do_any">
+    <get_character_definition macro="$Macro" faction="faction.scavenger" tags="tag.marine"/>
+    <get_character_definition macro="$Macro" faction="faction.loanshark" tags="tag.marine"/>
+  </add>
+
+  <add sel="//cue[@name='Terraforming_Piloting_Competition_Finished']/actions/do_all/do_any">
+    <get_character_definition macro="$Macro" faction="faction.scavenger" tags="tag.pilot"/>
+    <get_character_definition macro="$Macro" faction="faction.loanshark" tags="tag.pilot"/>
+  </add>
+</diff>

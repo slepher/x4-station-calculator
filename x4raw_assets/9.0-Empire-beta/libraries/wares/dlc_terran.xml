@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 21.04.2026 16:40:33-->
+<!--Last exported: 23.04.2026 16:36:39-->
 <diff>
   <add sel="/wares/production">
     <method id="terran" name="{20206,901}">
@@ -1906,7 +1906,7 @@
       </production>
       <component ref="turret_ter_l_beam_01_mk1_macro" />
       <restriction licence="capitalequipment" />
-      <use threshold="1" />
+      <use threshold="0.9" />
       <owner faction="pioneers" />
       <owner faction="terran" />
     </ware>
@@ -1938,7 +1938,7 @@
       </production>
       <component ref="turret_ter_l_gatling_01_mk1_macro" />
       <restriction licence="capitalequipment" />
-      <use threshold="0.37" />
+      <use threshold="0.4" />
       <owner faction="pioneers" />
       <owner faction="terran" />
     </ware>
@@ -2002,7 +2002,7 @@
       </production>
       <component ref="turret_ter_m_beam_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.99" />
+      <use threshold="0.9" />
       <owner faction="terran" />
     </ware>
     <ware id="turret_ter_m_beam_02_mk1" name="{20105,7124}" description="{20105,7122}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
@@ -2017,7 +2017,7 @@
       </production>
       <component ref="turret_ter_m_beam_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.99" />
+      <use threshold="0.9" />
       <owner faction="terran" />
     </ware>
     <ware id="turret_ter_m_dumbfire_01_mk1" name="{20105,4904}" description="{20105,4902}" group="turrets" transport="equipment" volume="1" tags="missilelauncher noplayerblueprint turret">
@@ -2063,7 +2063,7 @@
       </production>
       <component ref="turret_ter_m_gatling_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.45" />
+      <use threshold="0.4" />
       <owner faction="terran" />
     </ware>
     <ware id="turret_ter_m_gatling_02_mk1" name="{20105,7134}" description="{20105,7132}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
@@ -2078,7 +2078,7 @@
       </production>
       <component ref="turret_ter_m_gatling_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.45" />
+      <use threshold="0.4" />
       <owner faction="terran" />
     </ware>
     <ware id="turret_ter_m_guided_01_mk1" name="{20105,4914}" description="{20105,4912}" group="turrets" transport="equipment" volume="1" tags="missilelauncher noplayerblueprint turret">
@@ -2245,7 +2245,7 @@
       </production>
       <component ref="weapon_ter_m_beam_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.87" />
+      <use threshold="0.9" />
       <owner faction="terran" />
     </ware>
     <ware id="weapon_ter_m_gatling_01_mk1" name="{20105,2384}" description="{20105,2382}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
@@ -2276,7 +2276,7 @@
       </production>
       <component ref="weapon_ter_m_gatling_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.5" />
+      <use threshold="0.4" />
       <owner faction="terran" />
     </ware>
     <ware id="weapon_ter_m_laser_01_mk1" name="{20105,2464}" description="{20105,2462}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
@@ -2307,7 +2307,7 @@
       </production>
       <component ref="weapon_ter_m_laser_01_mk2_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.8" />
+      <use threshold="0.4" />
       <owner faction="pioneers" />
       <owner faction="terran" />
     </ware>
@@ -2323,7 +2323,7 @@
       </production>
       <component ref="weapon_ter_s_beam_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.6" />
+      <use threshold="0.7" />
       <owner faction="terran" />
     </ware>
     <ware id="weapon_ter_s_beam_01_mk2" name="{20105,1374}" description="{20105,1372}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
@@ -2338,7 +2338,7 @@
       </production>
       <component ref="weapon_ter_s_beam_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.87" />
+      <use threshold="0.9" />
       <owner faction="terran" />
     </ware>
     <ware id="weapon_ter_s_gatling_01_mk1" name="{20105,1384}" description="{20105,1382}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
@@ -2369,7 +2369,7 @@
       </production>
       <component ref="weapon_ter_s_gatling_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.5" />
+      <use threshold="0.4" />
       <owner faction="terran" />
     </ware>
     <ware id="weapon_ter_s_laser_01_mk1" name="{20105,1464}" description="{20105,1462}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
@@ -2400,7 +2400,7 @@
       </production>
       <component ref="weapon_ter_s_laser_01_mk2_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.8" />
+      <use threshold="0.4" />
       <owner faction="pioneers" />
       <owner faction="terran" />
     </ware>

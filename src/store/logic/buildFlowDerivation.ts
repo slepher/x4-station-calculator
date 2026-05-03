@@ -5,10 +5,11 @@ import type {
   BuildFlowAssignment,
   BuildFlowLineCard,
   BuildFlowGroup,
-  BuildFlowTag
+  BuildFlowTag,
+  VirtualEdge
 } from '@/types/x4'
 
-export type { BuildFlowAssignment, BuildFlowLineCard, BuildFlowGroup, BuildFlowTag }
+export type { BuildFlowAssignment, BuildFlowLineCard, BuildFlowGroup, BuildFlowTag, VirtualEdge }
 
 function getModuleScopeNodes(group: ProductionLineGroup, modulesMap: Record<string, X4Module>): FlowNode[] {
   return group.nodes.filter(node => {
@@ -102,6 +103,9 @@ export function computeBuildMaterialTags(
 }
 
 export function computeBuildFlowGroups(lineCards: BuildFlowLineCard[]): BuildFlowGroup[] {
+  const cardOrder = new Map<string, number>()
+  lineCards.forEach((card, idx) => cardOrder.set(card.groupId, idx))
+
   const U = new Set<string>()
   for (const card of lineCards) {
     for (const tag of card.sourceTags) {
@@ -163,7 +167,7 @@ export function computeBuildFlowGroups(lineCards: BuildFlowLineCard[]): BuildFlo
     }
 
     const orderedCards = Array.from(groupCards.values())
-    orderedCards.sort((a, b) => a.groupId.localeCompare(b.groupId))
+    orderedCards.sort((a, b) => (cardOrder.get(a.groupId) ?? 0) - (cardOrder.get(b.groupId) ?? 0))
 
     const outputBuildSeen = new Set<string>()
     const outputBuildTags: BuildFlowTag[] = []
@@ -244,6 +248,84 @@ export function deriveBuildFlowView(
   const buildFlowGroups = computeBuildFlowGroups(lineCards)
 
   return { demandMaterialSet, lineCards, archivedLineCards, buildFlowGroups }
+}
+
+export function computeVirtualEdges(
+  buildFlowGroups: BuildFlowGroup[],
+  assignments: BuildFlowAssignment[],
+  archivedGroupIds: string[],
+  allGroups: ProductionLineGroup[]
+): VirtualEdge[] {
+  const assignedTargetKeys = new Set(assignments.map(computeTargetKey))
+  const archivedSet = new Set(archivedGroupIds)
+  const result: VirtualEdge[] = []
+
+  const archivedSourceWareIds = new Map<string, string[]>()
+  for (const group of allGroups) {
+    if (!archivedSet.has(group.id)) continue
+    const wares = getManualProductNodes(group).map(n => n.wareId)
+    if (wares.length > 0) archivedSourceWareIds.set(group.id, wares)
+  }
+
+  for (const group of buildFlowGroups) {
+    for (const tag of group.outputBuildTags) {
+      const targetKey = `output-build:${tag.wareId}`
+      if (assignedTargetKeys.has(targetKey)) continue
+      const sourceId = findFirstNonArchivedSourceInGroup(group, tag.wareId, archivedSet)
+      if (sourceId) {
+        result.push({
+          wareId: tag.wareId,
+          sourceGroupId: sourceId,
+          targetType: 'output-build-material',
+          isArchived: false,
+          isDashed: true
+        })
+      }
+    }
+
+    for (const tag of group.outputMaterialTags) {
+      const targetKey = `output:${tag.wareId}`
+      if (assignedTargetKeys.has(targetKey)) continue
+      let foundArchived = false
+      for (const [gId, wares] of archivedSourceWareIds) {
+        if (wares.includes(tag.wareId)) {
+          result.push({
+            wareId: tag.wareId,
+            sourceGroupId: gId,
+            targetType: 'output-material',
+            isArchived: true,
+            isDashed: false
+          })
+          foundArchived = true
+          break
+        }
+      }
+      if (foundArchived) continue
+
+      const sourceId = findFirstNonArchivedSourceInGroup(group, tag.wareId, archivedSet)
+      if (sourceId) {
+        result.push({
+          wareId: tag.wareId,
+          sourceGroupId: sourceId,
+          targetType: 'output-material',
+          isArchived: false,
+          isDashed: true
+        })
+      }
+    }
+  }
+
+  return result
+}
+
+function findFirstNonArchivedSourceInGroup(group: BuildFlowGroup, wareId: string, archivedSet: Set<string>): string | null {
+  for (const card of group.lineCards) {
+    if (archivedSet.has(card.groupId)) continue
+    if (card.sourceTags.some(t => t.wareId === wareId)) {
+      return card.groupId
+    }
+  }
+  return null
 }
 
 export function computeTargetKey(assignment: BuildFlowAssignment): string {

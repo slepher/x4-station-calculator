@@ -663,6 +663,8 @@ def run_distillation_for_version(m_config, v_config, config_dir, xml_diff):
         os.path.join('libraries', 'shipgroups.xml'),
         os.path.join('libraries', 'loadouts.xml'),
         os.path.join('libraries', 'defaults.xml'),
+        os.path.join('libraries', 'terraforming.xml'),
+        os.path.join('md', 'terraforming.xml'),
         os.path.join('md', 'factionlogic.xml'),
         os.path.join('md', 'khaak_activity.xml'),
     ]

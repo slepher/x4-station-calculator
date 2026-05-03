@@ -10,7 +10,8 @@ import {
   deriveBuildFlowView,
   addAssignment as addBuildFlowAssignment,
   removeAssignment as removeBuildFlowAssignment,
-  cleanupStaleAssignments as cleanupStaleBuildFlowAssignments
+  cleanupStaleAssignments as cleanupStaleBuildFlowAssignments,
+  computeVirtualEdges
 } from './logic/buildFlowDerivation'
 
 export const useLogicFlowStore = defineStore('logicFlow', () => {
@@ -60,6 +61,12 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const buildFlowArchivedLineCards = computed(() => buildFlowView.value.archivedLineCards)
   const buildFlowGroups = computed(() => buildFlowView.value.buildFlowGroups)
   const demandMaterialSet = computed(() => buildFlowView.value.demandMaterialSet)
+  const buildFlowVirtualEdges = computed(() => computeVirtualEdges(
+    buildFlowGroups.value,
+    buildFlowAssignments.value,
+    archivedBuildFlowGroupIds.value,
+    groups.value
+  ))
 
   function bindBuildFlowAssignment(assignment: BuildFlowAssignment) {
     buildFlowAssignments.value = addBuildFlowAssignment(buildFlowAssignments.value, assignment)
@@ -534,6 +541,10 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       if (activeGroupId.value === groupId) {
         activeGroupId.value = groups.value[0]?.id || null
       }
+      const archivedIdx = archivedBuildFlowGroupIds.value.indexOf(groupId)
+      if (archivedIdx !== -1) {
+        archivedBuildFlowGroupIds.value.splice(archivedIdx, 1)
+      }
     }
   }
 
@@ -816,6 +827,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function clearAllGroups() {
     groups.value = []
     activeGroupId.value = null
+    archivedBuildFlowGroupIds.value = []
   }
 
   /**
@@ -1374,6 +1386,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     demandMaterialSet,
     isBuildFlowDragging,
     archivedBuildFlowGroupIds,
+    buildFlowVirtualEdges,
     bindBuildFlowAssignment,
     unbindBuildFlowAssignment,
     runBuildFlowCleanup,

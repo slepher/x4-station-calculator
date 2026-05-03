@@ -3338,7 +3338,7 @@
     <t id="11693">Se preferisci il comportamento precedente, puoi impostare in "Coda" la Modalità Ordini di Default nelle Impostazioni di Gioco. In questo modo, premere %s($INPUT_MODIFIER_ICON$) dal menu Interazione sovrascriverà l'ordine invece di aggiungerlo in coda.</t>
     <t id="11694">Seleziona Sì se vuoi provare il nuovo comportamento di default del modificatore, oppure No se preferisci mantenere il vecchio comportamento e usare %s($INPUT_MODIFIER_ICON$) per sovrascrivere gli ordini.</t>
     <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
+    <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>

@@ -7689,7 +7689,7 @@
     "recharge": {
       "max": 4800.0,
       "rate": 52.0,
-      "delay": 3.0
+      "delay": 4.0
     }
   },
   {
@@ -7718,7 +7718,7 @@
     "recharge": {
       "max": 4800.0,
       "rate": 52.0,
-      "delay": 3.0
+      "delay": 4.0
     }
   },
   {
@@ -7746,7 +7746,7 @@
     "recharge": {
       "max": 4800.0,
       "rate": 52.0,
-      "delay": 3.0
+      "delay": 4.0
     }
   },
   {
@@ -7774,7 +7774,7 @@
     "recharge": {
       "max": 745.0,
       "rate": 40.0,
-      "delay": 2.0
+      "delay": 4.0
     }
   },
   {
@@ -8233,7 +8233,7 @@
     },
     "recharge": {
       "max": 37332.0,
-      "rate": 202.0,
+      "rate": 218.0,
       "delay": 3.0
     }
   },
@@ -8265,8 +8265,8 @@
       }
     },
     "recharge": {
-      "max": 43690.0,
-      "rate": 270.0,
+      "max": 44045.0,
+      "rate": 292.0,
       "delay": 3.0
     }
   },
@@ -8300,7 +8300,7 @@
     },
     "recharge": {
       "max": 3848.0,
-      "rate": 60.0,
+      "rate": 64.0,
       "delay": 2.5
     }
   },
@@ -8334,7 +8334,7 @@
     },
     "recharge": {
       "max": 4932.0,
-      "rate": 85.0,
+      "rate": 94.0,
       "delay": 2.5
     }
   },
@@ -8368,7 +8368,7 @@
     },
     "recharge": {
       "max": 3848.0,
-      "rate": 60.0,
+      "rate": 64.0,
       "delay": 2.5
     }
   },
@@ -8402,7 +8402,7 @@
     },
     "recharge": {
       "max": 4932.0,
-      "rate": 85.0,
+      "rate": 94.0,
       "delay": 2.5
     }
   },
@@ -8434,8 +8434,8 @@
     },
     "recharge": {
       "max": 740.0,
-      "rate": 33.0,
-      "delay": 4.0
+      "rate": 35.0,
+      "delay": 3.5
     }
   },
   {
@@ -8467,8 +8467,8 @@
     },
     "recharge": {
       "max": 888.0,
-      "rate": 50.0,
-      "delay": 4.0
+      "rate": 54.0,
+      "delay": 3.5
     }
   },
   {
@@ -8500,8 +8500,8 @@
     },
     "recharge": {
       "max": 1258.0,
-      "rate": 78.0,
-      "delay": 4.0
+      "rate": 88.0,
+      "delay": 3.5
     }
   },
   {
@@ -8533,7 +8533,7 @@
     },
     "recharge": {
       "max": 100800.0,
-      "rate": 422.0,
+      "rate": 454.0,
       "delay": 3.0
     }
   },
@@ -9555,7 +9555,7 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 76.0,
+      "rate": 78.0,
       "delay": 5.0
     }
   },
@@ -9596,7 +9596,7 @@
     },
     "recharge": {
       "max": 9720.0,
-      "rate": 94.0,
+      "rate": 97.0,
       "delay": 5.0
     }
   },
@@ -9733,9 +9733,9 @@
       }
     },
     "recharge": {
-      "max": 1200.0,
-      "rate": 28.0,
-      "delay": 7.0
+      "max": 1440.0,
+      "rate": 45.0,
+      "delay": 6.0
     }
   },
   {
@@ -20514,8 +20514,8 @@
     "bullet": "bullet_ter_s_laser_02_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 2.0,
-      "coolrate": 940.0
+      "cooldelay": 1.0,
+      "coolrate": 2000.0
     }
   },
   {
