@@ -70,11 +70,6 @@ function findLineBuildMaterialConnection(
       }
     }
   }
-  for (const ve of buildFlowView.virtualEdges) {
-    if (ve.wareId === wareId && ve.targetType === 'line-build-material') {
-      return { sourceGroupId: ve.sourceGroupId }
-    }
-  }
   return null
 }
 

@@ -766,7 +766,7 @@ export interface BuildFlowGroup {
 export interface VirtualEdge {
   wareId: string
   sourceGroupId: string
-  targetType: 'output-build-material' | 'output-material' | 'line-build-material'
+  targetType: 'output-build-material' | 'output-material'
   isArchived: boolean
   isDashed: boolean
 }
