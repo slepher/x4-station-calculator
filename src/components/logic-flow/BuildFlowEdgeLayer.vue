@@ -20,11 +20,54 @@ const lines = ref<RoutedEdge[]>([])
 
 const DEBUG_LOG = true
 
+const PAD = 4
+const CONTAINER_PAD = 16
+const EDGE_GAP = 1
+const STRAIGHT_THRESHOLD = 4
+
 const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
 
 function getEdgeColor(wareId: string) {
   const i = props.wareIds.indexOf(wareId)
   return { color: COLORS[i >= 0 ? i % COLORS.length : 0], idx: i >= 0 ? i % COLORS.length : 0 }
+}
+
+function leftEdgeAlloc(
+  intervals: Array<{ key: string; yMin: number; yMax: number }>,
+  trackStart: number,
+  trackEnd: number
+): Map<string, number> {
+  const sorted = [...intervals].sort((a, b) => a.yMin - b.yMin)
+  const tracks: number[] = []
+  const keyTrack = new Map<string, number>()
+  for (const item of sorted) {
+    let placed = -1
+    for (let t = 0; t < tracks.length; t++) {
+      if (tracks[t]! + EDGE_GAP < item.yMin) {
+        placed = t
+        tracks[t] = item.yMax
+        break
+      }
+    }
+    if (placed === -1) {
+      placed = tracks.length
+      tracks.push(item.yMax)
+    }
+    keyTrack.set(item.key, placed)
+  }
+  const totalTracks = tracks.length
+  const result = new Map<string, number>()
+  for (const item of intervals) {
+    const t = keyTrack.get(item.key) ?? 0
+    const x = trackStart + ((t + 1) * (trackEnd - trackStart - PAD * 2)) / Math.max(totalTracks + 1, 1)
+    result.set(item.key, x)
+  }
+  if (DEBUG_LOG) {
+    for (const item of sorted) {
+      console.log(`[leftEdge] key=${item.key} interval=[${item.yMin.toFixed(0)},${item.yMax.toFixed(0)}] track=${keyTrack.get(item.key)}/${totalTracks} pos=${result.get(item.key)?.toFixed(0)}`)
+    }
+  }
+  return result
 }
 
 function recalculate() {
@@ -141,92 +184,59 @@ function recalculate() {
   }
 
   const allModeBSources = [...sourceYRange.keys()]
-  const sourceP3XInterval = new Map<string, { yMin: number; yMax: number }>()
+  const p3xIntervals: Array<{ key: string; yMin: number; yMax: number }> = []
   for (const sk of allModeBSources) {
     const endRange = sourceEndYRange.get(sk)!
     const p2Y = gapSlotPosition.get(sk)?.p2Y ?? 0
     if (endRange.yMin === endRange.yMax) {
-      sourceP3XInterval.set(sk, { yMin: Math.min(p2Y, endRange.yMin), yMax: Math.max(p2Y, endRange.yMin) })
+      p3xIntervals.push({ key: sk, yMin: Math.min(p2Y, endRange.yMin), yMax: Math.max(p2Y, endRange.yMin) })
     } else {
-      sourceP3XInterval.set(sk, { yMin: endRange.yMin, yMax: endRange.yMax })
+      p3xIntervals.push({ key: sk, yMin: endRange.yMin, yMax: endRange.yMax })
+    }
+    if (DEBUG_LOG) {
+      const last = p3xIntervals[p3xIntervals.length - 1]!
+      console.log(`[p3xInterval] src=${sk} yMin=${last.yMin.toFixed(0)} yMax=${last.yMax.toFixed(0)} y1=${(sourceYRange.get(sk)?.y1 ?? 0).toFixed(0)} p2Y=${p2Y.toFixed(0)}`)
     }
   }
-  const sortedByYMin = [...sourceP3XInterval.entries()].sort((a, b) => a[1].yMin - b[1].yMin)
-  if (DEBUG_LOG) {
-    for (const [sk, interval] of sortedByYMin) {
-      const range = sourceYRange.get(sk)
-      console.log(`[p3xInterval] src=${sk} yMin=${interval.yMin.toFixed(0)} yMax=${interval.yMax.toFixed(0)} y1=${(range?.y1 ?? 0).toFixed(0)} p2Y=${(gapSlotPosition.get(sk)?.p2Y ?? 0).toFixed(0)}`)
-    }
-  }
-  const tracks: number[] = []
-  const sourceTrack = new Map<string, number>()
-  for (const [sk, interval] of sortedByYMin) {
-    let placed = -1
-    for (let t = 0; t < tracks.length; t++) {
-      if (tracks[t]! + 1 < interval.yMin) {
-        placed = t
-        tracks[t] = interval.yMax
-        break
-      }
-    }
-    if (placed === -1) {
-      placed = tracks.length
-      tracks.push(interval.yMax)
-    }
-    sourceTrack.set(sk, placed)
-  }
-  const totalTracks = tracks.length
   const lineCardEls = container.querySelectorAll('.build-flow-line-card')
-  let buildMatGapEnd = containerRect.width - 16
+  let buildMatGapEnd = containerRect.width - CONTAINER_PAD
   lineCardEls.forEach(el => {
     const r = el.getBoundingClientRect()
     const left = r.left - containerRect.left
     if (left < buildMatGapEnd) buildMatGapEnd = left
   })
-  for (const sk of allModeBSources) {
-    const t = sourceTrack.get(sk) ?? 0
-    const p3X = 4 + ((t + 1) * (buildMatGapEnd - 8)) / Math.max(totalTracks + 1, 1)
+  const p3xMap = leftEdgeAlloc(p3xIntervals, PAD, buildMatGapEnd)
+  for (const [sk, p3X] of p3xMap) {
     const existing = gapSlotPosition.get(sk)
     if (existing) {
       existing.p3X = p3X
     } else {
       gapSlotPosition.set(sk, { p2Y: 0, p3X })
     }
-    if (DEBUG_LOG) {
-      const interval = sourceP3XInterval.get(sk)!
-      console.log(`[p3x] src=${sk} interval=[${interval.yMin.toFixed(0)},${interval.yMax.toFixed(0)}] track=${t}/${totalTracks} p3X=${p3X.toFixed(0)}`)
-    }
   }
 
-  const srcMidX = new Map<string, number>()
-  const allSources = new Map<string, { y1: number; hasModeA: boolean; hasModeB: boolean }>()
+  const outTagEl = container.querySelector('[class*="build-flow-output-card"] [data-tag-id]')
+  const gapEnd = outTagEl ? outTagEl.getBoundingClientRect().left - containerRect.left : containerRect.width - CONTAINER_PAD
+
+  const sourceP1XInterval = new Map<string, { yMin: number; yMax: number }>()
   for (const pos of positioned) {
     if ((pos.edge as any).isSelfConnection) continue
     const sk = `${pos.edge.sourceGroupId}:${pos.edge.wareId}`
-    const existing = allSources.get(sk)
-    const isModeA = pos.x2 > pos.x1
+    const existing = sourceP1XInterval.get(sk)
+    const low = pos.x2 > pos.x1 ? pos.y2 : (gapSlotPosition.get(sk)?.p2Y ?? pos.y2)
     if (existing) {
-      if (isModeA) existing.hasModeA = true
-      else existing.hasModeB = true
+      existing.yMin = Math.min(existing.yMin, pos.y1, low)
+      existing.yMax = Math.max(existing.yMax, pos.y1, low)
     } else {
-      allSources.set(sk, { y1: pos.y1, hasModeA: isModeA, hasModeB: !isModeA })
+      const hi = Math.max(pos.y1, low)
+      sourceP1XInterval.set(sk, { yMin: Math.min(pos.y1, low), yMax: hi })
     }
   }
-  const sortedSources = [...allSources.entries()].sort((a, b) => {
-    const categoryA = a[1].hasModeB && !a[1].hasModeA ? 0 : a[1].hasModeA && a[1].hasModeB ? 1 : 2
-    const categoryB = b[1].hasModeB && !b[1].hasModeA ? 0 : b[1].hasModeA && b[1].hasModeB ? 1 : 2
-    if (categoryA !== categoryB) return categoryA - categoryB
-    return a[1].y1 - b[1].y1
-  })
-  const totalSources = sortedSources.length
-  const outTagEl = container.querySelector('[class*="build-flow-output-card"] [data-tag-id]')
-  const gapEnd = outTagEl ? outTagEl.getBoundingClientRect().left - containerRect.left : containerRect.width - 16
-  for (let i = 0; i < sortedSources.length; i++) {
-    const [sk] = sortedSources[i]!
-    const firstPos = positioned.find(p => `${p.edge.sourceGroupId}:${p.edge.wareId}` === sk && !(p.edge as any).isSelfConnection)
-    if (!firstPos) continue
-    const gap = Math.max(gapEnd - firstPos.x1 - 8, 4)
-    srcMidX.set(sk, firstPos.x1 + 4 + ((i + 1) * gap) / Math.max(totalSources + 1, 1))
+  const p1xIntervals = [...sourceP1XInterval.entries()].map(([sk, r]) => ({ key: sk, yMin: r.yMin, yMax: r.yMax }))
+  const minX1 = Math.min(...positioned.filter(p => !(p.edge as any).isSelfConnection).map(p => p.x1))
+  const srcMidX = leftEdgeAlloc(p1xIntervals, minX1 + PAD, gapEnd)
+  if (DEBUG_LOG) {
+    console.log(`[p1xRange] minX1=${minX1.toFixed(0)} gapEnd=${gapEnd.toFixed(0)}`) 
   }
 
   positioned.forEach((pos) => {
@@ -238,14 +248,20 @@ function recalculate() {
     }
 
     const sk = `${edge.sourceGroupId}:${edge.wareId}`
-    const midX = srcMidX.get(sk) ?? x1 + 4
+    const midX = srcMidX.get(sk) ?? x1 + PAD
     let d: string
 
     if (x2 > x1) {
-      if (Math.abs(y1 - y2) < 4) {
+      if (Math.abs(y1 - y2) < STRAIGHT_THRESHOLD) {
         d = `M ${x1},${y1} L ${x2},${y2}`
+        if (DEBUG_LOG) {
+          console.log(`[modeA] src=${sk} straight x1=${x1.toFixed(0)} x2=${x2.toFixed(0)} y1=${y1.toFixed(0)} y2=${y2.toFixed(0)}`)
+        }
       } else {
         d = `M ${x1},${y1} L ${midX},${y1} L ${midX},${y2} L ${x2},${y2}`
+        if (DEBUG_LOG) {
+          console.log(`[modeA] src=${sk} x1=${x1.toFixed(0)} x2=${x2.toFixed(0)} y1=${y1.toFixed(0)} y2=${y2.toFixed(0)} p1X=${midX.toFixed(0)}`)
+        }
       }
     } else {
       const slot = gapSlotPosition.get(sk)
@@ -258,7 +274,7 @@ function recalculate() {
         const assign = sourceGapAssignment.get(sk)
         const srcsInGap = gapSourcesSorted.get(assign?.gapIdx ?? -1) ?? []
         const ei = srcsInGap.indexOf(sk)
-        console.log(`[modeB] src=${sk} gap=[${assign?.start.toFixed(0)},${assign?.end.toFixed(0)}] ei=${ei}/${srcsInGap.length} y1=${y1.toFixed(0)} y2=${y2.toFixed(0)} p1X=${p1X.toFixed(0)} p2Y=${p2Y.toFixed(0)} p3X=${p3X.toFixed(0)}`)
+        console.log(`[modeB] src=${sk} gap=[${assign?.start.toFixed(0)},${assign?.end.toFixed(0)}] ei=${ei}/${srcsInGap.length} x1=${x1.toFixed(0)} x2=${x2.toFixed(0)} y1=${y1.toFixed(0)} y2=${y2.toFixed(0)} p1X=${p1X.toFixed(0)} p2Y=${p2Y.toFixed(0)} p3X=${p3X.toFixed(0)}`)
       }
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
     }

@@ -316,17 +316,24 @@ output-material: `output:${wareId}`
 
 每条边根据起点和终点的 X/Y 坐标关系采用不同的路由策略。
 
+#### Left-Edge 贪心通道分配
+
+p1X（产线产出 gap）和 p3X（产线建材 gap）均使用 Left-Edge（左边缘）贪心算法分配通道，核心思想是区间图着色：
+
+1. 对每个 source，计算其在对应 channel 方向上的垂直投影区间 `[yMin, yMax]`
+2. 所有 source 按 yMin 从小到大排序
+3. 贪心分配：对每条 source，依次检查已有通道，若某通道当前占用终点 + `EDGE_GAP` < 该 source 的 yMin，则复用该通道并更新占用终点为 yMax；否则开辟新通道
+4. 通道总数 N 确定后，在 gap 内按 N+1 均分分配各通道的 x 坐标
+
+通道内按起点 y1 从小到大排序。
+
 #### Gap 类型定义
 
 分组容器内存在三种空间 gap：
 
-- **产线产出 gap**：产线 card 右边缘到产出区 card 左边缘之间的水平空间。Mode A 的 midX 在此 gap 内按 source 均分分配。分配顺序（x 从小到大）：
-  1. 只有产线建材终点的 source（纯 Mode B）
-  2. 同时有产线产出终点和产线建材终点的 source（Mode A + B 混合）
-  3. 只有产出终点的 source（纯 Mode A）
-  4. 同类内按起点 y 从小到大排序
-- **产线建材 gap**：产线 card 左边缘到 group 容器左边框之间的水平空间。Mode B 的 p3X 在此 gap 内按 source 均分分配，分配顺序按起点 y1 从小到大。
-- **产线间 gap**：相邻产线 card 之间的垂直缝隙（card[i].bottom → card[i+1].top）。Mode B 的 p2Y 分配规则：
+- **产线产出 gap**：产线 card 右边缘到产出区 card 左边缘之间的水平空间。p1X（midX）在此 gap 内按 Left-Edge 算法分配，每个 source 的区间覆盖 `[min(y1, 所有 Mode A 终点 y2, p2Y), max(y1, 所有 Mode A 终点 y2, p2Y)]`（即 source 在 x=p1X 处占用的垂直范围）。
+- **产线建材 gap**：产线 card 左边缘到 group 容器左边框之间的水平空间。p3X 在此 gap 内按 Left-Edge 算法分配，每个 source 的区间为：单终点 `[min(p2Y, eY), max(p2Y, eY)]`，多终点 `[e1Y, enY]`（最小终点到最大终点）。
+- **产线间 gap**：相邻产线 card 之间的垂直缝隙（card[i].bottom → card[i+1].top）。p2Y 在此 gap 内不参与 Left-Edge，而是按 gap 内 source 数量 N+1 均分。分配规则：
   1. 对每个 source，确定终点 y 范围：单终点为 `[sY, eY]`（起点到终点），多终点为 `[e1Y, enY]`（最小终点到最大终点）
   2. 筛选完全落在终点 y 范围内的产线间 gap（gap.start ≥ yMin && gap.end ≤ yMax）
   3. 从满足约束的候选 gap 中，选择中心点距起点 y1 最近的 gap
@@ -334,24 +341,22 @@ output-material: `output:${wareId}`
 
 #### 共享原则
 
-同一 source（sourceGroupId + wareId）共享 midX；同一 source 在同一 gap 内共享 p2Y、p3X。
+同一 source（sourceGroupId + wareId）共享 p1X（midX）、p2Y、p3X。
 
 #### Mode A（终点在右侧，x2 > x1）：3 段线
 ```
 Start → P1(midX, y1) → P2(midX, y2) → End
 ```
-- midX 在产线产出 gap 内按 source 均分分配
-- 同一 source 的所有边共享同一个 midX
-- 若 `|y1 - y2| < 4`（近乎水平），退化为直线
+- midX 由 Left-Edge 算法在产线产出 gap 内分配
+- 若 `|y1 - y2| < STRAIGHT_THRESHOLD`（近乎水平），退化为直线
 
 #### Mode B（终点在左侧，x2 ≤ x1）：5 段线
 ```
 Start → P1(p1X, y1) → P2(p1X, p2Y) → P3(p3X, p2Y) → P4(p3X, y2) → End
 ```
-- p1X (= midX)：与 Mode A 共享同一分配池（每个 source 一个值）
-- p2Y：在产线间 gap 内按 source 均分（同一 source 共享 p2Y，不同 source 之间均分）
-- p3X：在产线建材 gap 内按 source 均分（同一 source 共享 p3X）
-- 每个 gap 内的 source 计数独立，ei 从 0 开始，不跨 gap 累计
+- p1X (= midX)：由 Left-Edge 算法在产线产出 gap 内分配，与 Mode A 共享同一分配池
+- p2Y：在产线间 gap 内按 gap 内 source 数量 N+1 均分
+- p3X：由 Left-Edge 算法在产线建材 gap 内分配
 
 #### 自身连接
 
