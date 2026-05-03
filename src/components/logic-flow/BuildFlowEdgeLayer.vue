@@ -18,6 +18,8 @@ interface RoutedEdge {
 
 const lines = ref<RoutedEdge[]>([])
 
+const DEBUG_LOG = false
+
 const COLORS = ['#f97316','#eab308','#22d3ee','#a78bfa','#fb923c','#facc15','#67e8f9','#c4b5fd']
 
 function getEdgeColor(wareId: string) {
@@ -82,6 +84,7 @@ function recalculate() {
   if (cardBounds.length > 0) gapsByCard.push({ start: cardBounds[cardBounds.length - 1]!.bottom, end: containerRect.height })
 
   const gapGroups = new Map<string, typeof positioned>()
+  const gapSources = new Map<string, Set<string>>()
   for (const p of positioned) {
     if ((p.edge as any).isSelfConnection) continue
     if (p.x2 > p.x1) continue
@@ -97,13 +100,13 @@ function recalculate() {
     if (!gk) continue
     if (!gapGroups.has(gk)) gapGroups.set(gk, [])
     gapGroups.get(gk)!.push(p)
+    const sk = `${p.edge.sourceGroupId}:${p.edge.wareId}`
+    if (!gapSources.has(gk)) gapSources.set(gk, new Set())
+    gapSources.get(gk)!.add(sk)
   }
 
-  const gapCounters = new Map<string, number>()
-  for (const [gk, group] of gapGroups) {
-    const parts = gk.split('|').map(Number)
-    console.log(`[gap] y:${(parts[0]??0).toFixed(0)}-${(parts[1]??0).toFixed(0)} edges:${group.length}`)
-  }
+  const gapSlotCounters = new Map<string, { p2Y: number; p3X: number }>()
+  const gapSlotIndex = new Map<string, number>()
 
   const srcMidX = new Map<string, number>()
   const totalSources = new Set(positioned.filter(p => !(p.edge as any).isSelfConnection).map(p => `${p.edge.sourceGroupId}:${p.edge.wareId}`)).size
@@ -155,14 +158,23 @@ function recalculate() {
       }
       if (!gk) return
 
-      const ei = gapCounters.get(gk) ?? 0
-      gapCounters.set(gk, ei + 1)
-      const totalInGap = gapGroups.get(gk)?.length ?? 1
+      const slotKey = `${gk}|${sk}`
+      if (!gapSlotCounters.has(slotKey)) {
+        const ei = gapSlotIndex.get(gk) ?? 0
+        gapSlotIndex.set(gk, ei + 1)
+        const srcsInGap = gapSources.get(gk)?.size ?? 1
+        const p2Y = gapStart + ((ei + 1) * gapSize) / Math.max(srcsInGap + 1, 1)
+        const p3X = 4 + ((ei + 1) * (x2 - 8)) / Math.max(srcsInGap + 1, 1)
+        gapSlotCounters.set(slotKey, { p2Y, p3X })
+        if (DEBUG_LOG) {
+          console.log(`[modeB] gap=${gk} src=${sk} ei=${ei}/${srcsInGap} gapRange=[${gapStart.toFixed(0)},${gapEnd.toFixed(0)}] p1X=${midX.toFixed(0)} p2Y=${p2Y.toFixed(0)} p3X=${p3X.toFixed(0)} x2=${x2.toFixed(0)}`)
+        }
+      }
+      const slot = gapSlotCounters.get(slotKey)!
 
       const p1X = midX
-      const p2Y = gapStart + ((ei + 1) * gapSize) / Math.max(totalInGap + 1, 1)
-      const p3X = 4 + ((ei + 1) * (x2 - 8)) / Math.max(totalInGap + 1, 1)
-      console.log(`[modeB] gap=${gk.slice(0,20)} ei=${ei}/${totalInGap} p1X=${p1X.toFixed(0)} p3X=${p3X.toFixed(0)}`)
+      const p2Y = slot.p2Y
+      const p3X = slot.p3X
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
     }
 
