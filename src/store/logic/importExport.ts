@@ -457,8 +457,10 @@ function remapFlowIds(input: SavedFlowPlansState): { state: SavedFlowPlansState;
     const newPlanId = crypto.randomUUID()
     planIdMap.set(plan.id, newPlanId)
 
+    const groupIdMap = new Map<string, string>()
     const groups: SavedFlowGroup[] = (plan.groups || []).map((group) => {
       const newGroupId = crypto.randomUUID()
+      groupIdMap.set(group.id, newGroupId)
       const nodes: SavedFlowNode[] = (group.nodes || []).map((node) => deepClone(node))
 
       return {
@@ -468,10 +470,23 @@ function remapFlowIds(input: SavedFlowPlansState): { state: SavedFlowPlansState;
       }
     })
 
+    const remappedBuildFlow = plan.buildFlow
+      ? {
+          assignments: plan.buildFlow.assignments.map(a => ({
+            ...a,
+            sourceGroupId: groupIdMap.get(a.sourceGroupId) || a.sourceGroupId,
+            targetGroupId: a.targetGroupId
+              ? (groupIdMap.get(a.targetGroupId) || a.targetGroupId)
+              : undefined
+          }))
+        }
+      : undefined
+
     return {
       ...deepClone(plan),
       id: newPlanId,
       groups,
+      buildFlow: remappedBuildFlow,
       lastUpdated: Date.now()
     }
   })

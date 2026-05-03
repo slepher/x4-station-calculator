@@ -1,10 +1,17 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { computeExpandUpstream, type ExpandContext, type GroupSnapshot } from './logic/logicFlowStream'
 import { migrateFlowStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_FLOW_VERSION } from './logic/storageVersions'
-import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings } from '@/types/x4'
+import { getLogicFlowGroupDisplayName } from './logic/logicFlowGroupName'
+import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings, BuildFlowAssignment } from '@/types/x4'
+import {
+  deriveBuildFlowView,
+  addAssignment as addBuildFlowAssignment,
+  removeAssignment as removeBuildFlowAssignment,
+  cleanupStaleAssignments as cleanupStaleBuildFlowAssignments
+} from './logic/buildFlowDerivation'
 
 export const useLogicFlowStore = defineStore('logicFlow', () => {
   const gameData = useGameDataStore()
@@ -26,14 +33,78 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const savedPlans = ref<SavedFlowPlansState>({ version: CURRENT_FLOW_VERSION, activeId: null, list: [] })
   const lastSavedSnapshot = ref<string>('')
   const settings = ref<LogicFlowSettings>({ isDefaultLocked: true })
+  const buildFlowAssignments = ref<BuildFlowAssignment[]>([])
+  const isBuildFlowDragging = ref(false)
+  const archivedBuildFlowGroupIds = ref<string[]>([])
 
   function buildSnapshot() {
-    return JSON.stringify({ groups: groups.value, settings: settings.value })
+    return JSON.stringify({ groups: groups.value, settings: settings.value, buildFlowAssignments: buildFlowAssignments.value })
   }
 
   function buildEmptySnapshot() {
-    return JSON.stringify({ groups: [], settings: { isDefaultLocked: true } })
+    return JSON.stringify({ groups: [], settings: { isDefaultLocked: true }, buildFlowAssignments: [] })
   }
+
+  // --- Build Flow ---
+
+  const buildFlowView = computed(() => {
+    const displayNames = new Map<string, string>()
+    for (const group of groups.value) {
+      const displayName = getLogicFlowGroupDisplayName(group, (wareId: string) => gameData.getWareDisplayName(wareId))
+      displayNames.set(group.id, displayName)
+    }
+    return deriveBuildFlowView(groups.value, gameData.modulesMap, displayNames, (wareId) => gameData.getWareDisplayName(wareId), archivedBuildFlowGroupIds.value)
+  })
+
+  const buildFlowLineCards = computed(() => buildFlowView.value.lineCards)
+  const buildFlowArchivedLineCards = computed(() => buildFlowView.value.archivedLineCards)
+  const buildFlowGroups = computed(() => buildFlowView.value.buildFlowGroups)
+  const demandMaterialSet = computed(() => buildFlowView.value.demandMaterialSet)
+
+  function bindBuildFlowAssignment(assignment: BuildFlowAssignment) {
+    buildFlowAssignments.value = addBuildFlowAssignment(buildFlowAssignments.value, assignment)
+  }
+
+  function unbindBuildFlowAssignment(targetKey: string) {
+    buildFlowAssignments.value = removeBuildFlowAssignment(buildFlowAssignments.value, targetKey)
+  }
+
+  function runBuildFlowCleanup() {
+    buildFlowAssignments.value = cleanupStaleBuildFlowAssignments(
+      buildFlowAssignments.value,
+      groups.value,
+      demandMaterialSet.value,
+      gameData.modulesMap,
+      buildFlowGroups.value
+    )
+  }
+
+  function startBuildFlowDrag() {
+    isBuildFlowDragging.value = true
+  }
+
+  function stopBuildFlowDrag() {
+    isBuildFlowDragging.value = false
+  }
+
+  function archiveBuildFlowGroup(groupId: string) {
+    if (!archivedBuildFlowGroupIds.value.includes(groupId)) {
+      archivedBuildFlowGroupIds.value.push(groupId)
+      runBuildFlowCleanup()
+    }
+  }
+
+  function unarchiveBuildFlowGroup(groupId: string) {
+    const idx = archivedBuildFlowGroupIds.value.indexOf(groupId)
+    if (idx !== -1) {
+      archivedBuildFlowGroupIds.value.splice(idx, 1)
+      runBuildFlowCleanup()
+    }
+  }
+
+  watch(groups, () => {
+    runBuildFlowCleanup()
+  }, { deep: true })
 
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
@@ -999,6 +1070,9 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       name: planName,
       groups: groups.value.map(toSavedFlowGroup),
       settings: { ...settings.value },
+      buildFlow: (buildFlowAssignments.value.length > 0 || archivedBuildFlowGroupIds.value.length > 0)
+        ? { assignments: [...buildFlowAssignments.value], archivedGroupIds: [...archivedBuildFlowGroupIds.value] }
+        : undefined,
       lastUpdated: Date.now()
     }
 
@@ -1053,6 +1127,12 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function applyPlan(plan: LogicFlowPlan) {
     groups.value = []
     activeGroupId.value = null
+    buildFlowAssignments.value = plan.buildFlow?.assignments
+      ? [...plan.buildFlow.assignments]
+      : []
+    archivedBuildFlowGroupIds.value = plan.buildFlow?.archivedGroupIds
+      ? [...plan.buildFlow.archivedGroupIds]
+      : []
     currentPlanName.value = plan.name
     savedPlans.value.activeId = plan.id
     settings.value = { ...plan.settings }
@@ -1125,6 +1205,21 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
           ? (newGroup.lockedLineage || 'default')
           : (module.race || module.method || newGroup.subCategory || 'default')
 
+        const existingNode = newGroup.nodes.find(n => n.moduleId === savedNode.module)
+        if (existingNode) {
+          if (existingNode.source === 'auto') {
+            existingNode.source = 'manual'
+            existingNode.isAuto = false
+            existingNode.isRoot = true
+            if (module.inputs) {
+              Object.keys(module.inputs).forEach(inputWareId => {
+                expandUpstream(newGroup.id, inputWareId, 'auto', existingNode.lineage)
+              })
+            }
+          }
+          continue
+        }
+
         const manualNode: FlowNode = {
           id: crypto.randomUUID(),
           wareId,
@@ -1179,6 +1274,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function clearAll() {
     groups.value = []
     activeGroupId.value = null
+    buildFlowAssignments.value = []
+    archivedBuildFlowGroupIds.value = []
     currentPlanName.value = ''
     savedPlans.value.activeId = null
     settings.value = { isDefaultLocked: true }
@@ -1269,5 +1366,20 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     applyPlan,
     deletePlan,
     clearAll,
+    // Build Flow
+    buildFlowAssignments,
+    buildFlowLineCards,
+    buildFlowArchivedLineCards,
+    buildFlowGroups,
+    demandMaterialSet,
+    isBuildFlowDragging,
+    archivedBuildFlowGroupIds,
+    bindBuildFlowAssignment,
+    unbindBuildFlowAssignment,
+    runBuildFlowCleanup,
+    startBuildFlowDrag,
+    stopBuildFlowDrag,
+    archiveBuildFlowGroup,
+    unarchiveBuildFlowGroup,
   }
 })

@@ -979,5 +979,19 @@
     "station_flag_tradestation": "Trade Station",
     "station_flag_nest": "Nest",
     "station_flag_hive": "Hive"
+  },
+  "buildFlow": {
+    "build_flow_zone_title": "Build Flow",
+    "build_flow_source_materials": "Line Outputs",
+    "build_flow_build_materials": "Build Materials",
+    "build_flow_output_card_title": "Output",
+    "build_flow_output_materials": "Output Materials",
+    "build_flow_unbind": "Unbind",
+    "build_flow_empty_hint": "No production lines match build material demand",
+    "build_flow_archive_line": "Archive Line",
+    "build_flow_archived_count": "Archived ({count})",
+    "build_flow_archived_lines": "Archived Lines",
+    "build_flow_unarchive": "Restore",
+    "build_flow_no_archived_lines": "No archived lines"
   }
 }
