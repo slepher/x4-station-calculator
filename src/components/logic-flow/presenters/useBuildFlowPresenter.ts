@@ -124,6 +124,8 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
       let targetTagId: string
       if (a.targetType === 'line-build-material') {
         targetTagId = `build-flow-target:line:${a.targetGroupId}:${a.wareId}`
+      } else if (a.targetType === 'output-build-material') {
+        targetTagId = `build-flow-target:output-build:${a.wareId}`
       } else {
         targetTagId = `build-flow-target:output:${a.wareId}`
       }
@@ -165,7 +167,21 @@ export function useBuildFlowPresenter(store: BuildFlowPresenterStore): UseBuildF
         })
       }
     }
-    for (const tag of sourceGroup.outputTags) {
+    for (const tag of sourceGroup.outputBuildTags) {
+      if (tag.wareId !== wareId) continue
+      const targetKey = `output-build:${wareId}`
+      targets.push({
+        targetType: 'output-build-material',
+        wareId,
+        wareLabel: tag.label,
+        cardTitle: '',
+        tagId: tag.tagId,
+        targetKey,
+        isBound: assignments.some(a => computeTargetKey(a) === targetKey),
+        bindingState: 'none'
+      })
+    }
+    for (const tag of sourceGroup.outputMaterialTags) {
       if (tag.wareId !== wareId) continue
       const targetKey = `output:${wareId}`
       targets.push({

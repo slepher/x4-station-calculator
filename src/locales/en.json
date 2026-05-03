@@ -929,6 +929,8 @@
     "build_flow_source_materials": "Line Outputs",
     "build_flow_build_materials": "Build Materials",
     "build_flow_output_card_title": "Output",
+    "build_flow_output_build_title": "Output Builds",
+    "build_flow_output_material_title": "Output Materials",
     "build_flow_output_materials": "Output Materials",
     "build_flow_unbind": "Unbind",
     "build_flow_empty_hint": "No production lines match build material demand",

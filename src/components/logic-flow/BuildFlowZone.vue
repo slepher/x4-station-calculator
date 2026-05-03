@@ -41,9 +41,10 @@ const cardIndexByGroupId = computed(() => {
 
 const sortedGroupTags = computed(() => {
   return presenter.buildFlowGroups.value.map(group => {
-    const sorted = [...group.outputTags].sort((a, b) => a.wareId.localeCompare(b.wareId))
-    const order = new Map(sorted.map((t, i) => [t.wareId, i]))
-    return { groupKey: group.groupKey, outputTags: sorted, order, lineCards: group.lineCards }
+    const sortedBuild = [...group.outputBuildTags].sort((a, b) => a.wareId.localeCompare(b.wareId))
+    const sortedMaterial = [...group.outputMaterialTags].sort((a, b) => a.wareId.localeCompare(b.wareId))
+    const order = new Map(sortedMaterial.map((t, i) => [t.wareId, i]))
+    return { groupKey: group.groupKey, outputBuildTags: sortedBuild, outputMaterialTags: sortedMaterial, order, lineCards: group.lineCards }
   })
 })
 
@@ -62,9 +63,14 @@ function getSortedRows(cardGroupId: string, order: Map<string, number>) {
 const boundTargetTagIds = computed(() => {
   const ids = new Set<string>()
   for (const a of logicFlow.buildFlowAssignments) {
-    const tagId = a.targetType === 'line-build-material'
-      ? `build-flow-target:line:${a.targetGroupId}:${a.wareId}`
-      : `build-flow-target:output:${a.wareId}`
+    let tagId: string
+    if (a.targetType === 'line-build-material') {
+      tagId = `build-flow-target:line:${a.targetGroupId}:${a.wareId}`
+    } else if (a.targetType === 'output-build-material') {
+      tagId = `build-flow-target:output-build:${a.wareId}`
+    } else {
+      tagId = `build-flow-target:output:${a.wareId}`
+    }
     ids.add(tagId)
   }
   return ids
@@ -112,15 +118,22 @@ const menuTargetTag = ref<{ wareId: string; tagId: string; targetType: BuildFlow
 const menuTargets = ref<MenuTargetItem[]>([])
 const menuPosition = ref<{ x: number; y: number }>({ x: 0, y: 0 })
 
+function computeTargetKey_raw(a: { targetType: BuildFlowTargetType; targetGroupId?: string; wareId: string }): string {
+  if (a.targetType === 'line-build-material') {
+    return `line:${a.targetGroupId}:${a.wareId}`
+  }
+  if (a.targetType === 'output-build-material') {
+    return `output-build:${a.wareId}`
+  }
+  return `output:${a.wareId}`
+}
+
 function onPlusClick(groupId: string, wareId: string, tagId: string, event: MouseEvent) {
   const targets = presenter.getTargetsForSource(wareId, groupId)
   if (targets.length === 0) return
   menuTargets.value = targets.map((item) => {
     const assignment = logicFlow.buildFlowAssignments.find((candidate) => {
-      if (candidate.targetType === 'line-build-material') {
-        return item.targetKey === `line:${candidate.targetGroupId}:${candidate.wareId}`
-      }
-      return item.targetKey === `output:${candidate.wareId}`
+      return item.targetKey === computeTargetKey_raw(candidate)
     })
     let bindingState: 'self' | 'other' | 'none' = 'none'
     if (assignment) {
@@ -148,14 +161,9 @@ function onPlusClick(groupId: string, wareId: string, tagId: string, event: Mous
 function onTargetTagPlusClick(wareId: string, tagId: string, targetType: BuildFlowTargetType, targetGroupId: string | undefined, groupKey: string, event: MouseEvent) {
   const sources = presenter.getSourcesForTarget(wareId, groupKey)
   if (sources.length === 0) return
-  const currentTargetKey = targetType === 'line-build-material'
-    ? `line:${targetGroupId}:${wareId}`
-    : `output:${wareId}`
+  const currentTargetKey = computeTargetKey_raw({ targetType, targetGroupId, wareId })
   const currentBoundAssignment = logicFlow.buildFlowAssignments.find((assignment) => {
-    if (assignment.targetType === 'line-build-material') {
-      return currentTargetKey === `line:${assignment.targetGroupId}:${assignment.wareId}`
-    }
-    return currentTargetKey === `output:${assignment.wareId}`
+    return currentTargetKey === computeTargetKey_raw(assignment)
   })
   menuSourceTag.value = null
   menuTargetTag.value = { wareId, tagId, targetType, targetGroupId }
@@ -209,6 +217,9 @@ function computeTargetKey(tag: BuildFlowTag, targetType: BuildFlowTargetType): s
   if (targetType === 'line-build-material') {
     const match = tag.tagId.match(/^build-flow-target:line:([^:]+):(.+)$/)
     if (match) return `line:${match[1]}:${match[2]}`
+  }
+  if (targetType === 'output-build-material') {
+    return `output-build:${tag.wareId}`
   }
   if (targetType === 'output-material') {
     return `output:${tag.wareId}`
@@ -316,37 +327,64 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
               </div>
             </div>
           </div>
-          <div
-            v-if="sg.outputTags.length > 0"
-            class="build-flow-output-card bg-gray-800/60 border border-gray-600 rounded p-2 shrink-0 self-center ml-auto mr-1"
-            style="width: 160px"
-          >
-            <div class="text-xs text-gray-300 font-medium mb-2">{{ t('buildFlow.build_flow_output_card_title') }}</div>
-            <div class="flex justify-start mb-1">
-              <span class="text-[10px] text-gray-500">{{ t('buildFlow.build_flow_output_materials') }}</span>
-            </div>
-            <div class="build-flow-target-list flex flex-col gap-1 items-start">
-              <span
-                v-for="tag in sg.outputTags"
-                :key="tag.tagId"
-                :data-tag-id="tag.tagId"
-                class="build-flow-tag build-flow-target-tag whitespace-nowrap"
-                @dragover.prevent
-                @drop.prevent="onTargetDrop('output-material')"
-              >
-                <button
-                  class="target-tag-segment target-tag-segment-add"
-                  :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
-                  @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, sg.groupKey, $event)"
-                >+</button>
+          <div class="flex flex-col gap-2 shrink-0 self-center ml-auto mr-1" style="width: 160px">
+            <div
+              v-if="sg.outputBuildTags.length > 0"
+              class="build-flow-output-card build-flow-output-build-card bg-gray-800/60 border border-gray-600 rounded p-2"
+            >
+              <div class="text-xs text-gray-300 font-medium mb-1">{{ t('buildFlow.build_flow_output_build_title') }}</div>
+              <div class="build-flow-target-list flex flex-col gap-1 items-start">
                 <span
-                  class="target-tag-segment target-tag-segment-main"
-                  :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
+                  v-for="tag in sg.outputBuildTags"
+                  :key="tag.tagId"
+                  :data-tag-id="tag.tagId"
+                  class="build-flow-tag build-flow-target-tag whitespace-nowrap"
+                  @dragover.prevent
+                  @drop.prevent="onTargetDrop('output-build-material')"
                 >
-                  <span class="target-tag-text">{{ tag.label }}</span>
-                  <button v-if="boundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
+                  <button
+                    class="target-tag-segment target-tag-segment-add"
+                    :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
+                    @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-build-material', undefined, sg.groupKey, $event)"
+                  >+</button>
+                  <span
+                    class="target-tag-segment target-tag-segment-main"
+                    :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
+                  >
+                    <span class="target-tag-text">{{ tag.label }}</span>
+                    <button v-if="boundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-build-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
+                  </span>
                 </span>
-              </span>
+              </div>
+            </div>
+            <div
+              v-if="sg.outputMaterialTags.length > 0"
+              class="build-flow-output-card build-flow-output-material-card bg-gray-800/60 border border-gray-600 rounded p-2"
+            >
+              <div class="text-xs text-gray-300 font-medium mb-1">{{ t('buildFlow.build_flow_output_material_title') }}</div>
+              <div class="build-flow-target-list flex flex-col gap-1 items-start">
+                <span
+                  v-for="tag in sg.outputMaterialTags"
+                  :key="tag.tagId"
+                  :data-tag-id="tag.tagId"
+                  class="build-flow-tag build-flow-target-tag whitespace-nowrap"
+                  @dragover.prevent
+                  @drop.prevent="onTargetDrop('output-material')"
+                >
+                  <button
+                    class="target-tag-segment target-tag-segment-add"
+                    :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
+                    @click.stop="onTargetTagPlusClick(tag.wareId, tag.tagId, 'output-material', undefined, sg.groupKey, $event)"
+                  >+</button>
+                  <span
+                    class="target-tag-segment target-tag-segment-main"
+                    :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
+                  >
+                    <span class="target-tag-text">{{ tag.label }}</span>
+                    <button v-if="boundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
+                  </span>
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -384,7 +422,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
             ]"
             @click="onMenuSelect(target)"
           >
-            <span class="flex-1 truncate">{{ target.targetType === 'line-build-material' ? target.cardTitle : t('buildFlow.build_flow_output_card_title') }}</span>
+            <span class="flex-1 truncate">{{ target.targetType === 'line-build-material' ? target.cardTitle : target.targetType === 'output-build-material' ? t('buildFlow.build_flow_output_build_title') : t('buildFlow.build_flow_output_material_title') }}</span>
           </button>
         </div>
       </div>

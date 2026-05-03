@@ -53,9 +53,9 @@
 每个分组容器内部采用水平 flex 布局（`justify-between`）：
 
 - **左列**：产线 card 竖向排列（`flex-col gap-16`），ml=92px，card 宽度 308px
-- **右列**：该组的"产出区" card，mr=16px，垂直居中（`self-center`），宽度 160px
+- **右列**：该组的"产出区"双 card（建材区 + 材料区），mr=16px，垂直居中（`self-center`），宽度 160px
 
-产线 card 间距 64px。产出区 card 通过 `ml-auto` 推到右侧，`self-center` 垂直居中。
+产线 card 间距 64px。产出区双 card 通过 `ml-auto` 推到右侧，`self-center` 垂直居中，双 card 之间竖向排列。
 
 ### Card 布局结构
 
@@ -66,7 +66,11 @@
   - 左侧列："产线建材"标签，竖向排列
   - 右侧列："产线原材料"标签，竖向排列，右对齐（`items-end`）
 
-"产出区" card 内"产出建材"标签竖向排列。
+"产出区"拆分为两个 card：
+- **建材区**（副标题"产出建材"）：标签内容 = 组内产线 sourceTags 并集
+- **材料区**（副标题"产出材料"）：标签内容 = 组内产线 sourceTags 并集
+
+两个 card 显示相同 wareId 集合，但各自独立作为连线目标。
 
 ### Tag 排版结构
 
@@ -75,6 +79,7 @@
 - `产线原材料`：文字左对齐，`+` 固定在右侧，按钮向 card 右边外伸
 - `产线建材`：文字右对齐，`+` 固定在左侧，按钮向 card 左边外伸
 - `产出建材`：文字右对齐，`+` 固定在左侧，按钮向 card 左边外伸
+- `产出材料`：文字右对齐，`+` 固定在左侧，按钮向 card 左边外伸
 
 标签初始填充为透明。当标签被连线绑定时，标签和按钮染为对应 ware 的颜色（8 色调色板，按 wareId 排序分配）。箭头颜色与连线/标签颜色一致，每条边独立着色。
 
@@ -88,7 +93,8 @@
 interface BuildFlowGroup {
   groupKey: string
   lineCards: BuildFlowLineCard[]
-  outputTags: BuildFlowTag[]
+  outputBuildTags: BuildFlowTag[]
+  outputMaterialTags: BuildFlowTag[]
 }
 ```
 
@@ -96,7 +102,10 @@ interface BuildFlowGroup {
 
 - `groupKey` = 组内所有 lineCard.groupId 排序后以 `:` 连接，如 `"g1:g2:g3"`。确定性标识，分组重组时自然更新。
 - `lineCards` = 该组内的所有产线 card
-- `outputTags` = 组内产线 sourceTags 并集
+- `outputBuildTags` = 组内产线 sourceTags 并集（建材区标签）
+- `outputMaterialTags` = 组内产线 sourceTags 并集（材料区标签）
+
+注意：`outputBuildTags` 和 `outputMaterialTags` 的 wareId 集合相同，但分属不同 card，连线目标独立。
 
 ### 派生视图模型
 
@@ -120,12 +129,12 @@ interface BuildFlowTag {
 - `sourceTags` = 产线原材料
 - `buildMaterialTags` = 产线建材
 
-注意：`BuildFlowOutputCard` 不再作为独立类型，产出区内容由 `BuildFlowGroup.outputTags` 承载。
+注意：`BuildFlowOutputCard` 不再作为独立类型，产出区内容由 `BuildFlowGroup.outputBuildTags` 和 `BuildFlowGroup.outputMaterialTags` 承载。
 
 ### 关系模型
 
 ```ts
-type BuildFlowTargetType = 'line-build-material' | 'output-material'
+type BuildFlowTargetType = 'line-build-material' | 'output-build-material' | 'output-material'
 
 interface BuildFlowAssignment {
   wareId: string
@@ -143,7 +152,7 @@ interface BuildFlowAssignment {
 - 覆盖时按目标键定位旧关系并替换
 - 解绑时按目标键删除
 
-**注意**：`BuildFlowAssignment` 结构不变，不包含 groupKey。分组信息是推导结果，不需要持久化。产出区的 target key 仍为 `output:{wareId}`，因为同一 wareId 在分组后只会出现在一个组的产出区中（分组的定义保证了这一点：每个 wareId 只属于一个连通分量）。
+**注意**：`BuildFlowAssignment` 结构不变，不包含 groupKey。分组信息是推导结果，不需要持久化。
 
 ### 持久化模型
 
@@ -222,7 +231,7 @@ Record<wareId, amount>
    c. groupOutput = 当前组内产线 sourceTags 并集
    d. visitedWares ∪= groupOutput
    e. groupKey = 组内 groupId 排序后 join(':')
-   f. result.push({ groupKey, lineCards, outputTags })
+   f. result.push({ groupKey, lineCards, outputBuildTags, outputMaterialTags })
 4. 返回 result
 ```
 
@@ -234,7 +243,11 @@ Record<wareId, amount>
 
 ### 6. 产出区内容
 
-每个分组的产出区 = 组内产线 sourceTags 并集。不再有全局单一产出区。
+每个分组的产出区拆分为两个 card：
+- **建材区**（副标题"产出建材"）：标签 = 组内产线 sourceTags 并集
+- **材料区**（副标题"产出材料"）：标签 = 组内产线 sourceTags 并集
+
+两个 card 的标签 wareId 集合相同，但各自独立作为连线目标。
 
 ## 交互设计
 
@@ -248,7 +261,8 @@ Record<wareId, amount>
 目标菜单列表应只显示同组内同 `wareId` 的目标标签，包括：
 
 - 同组内其他产线 card 中的同名 `产线建材`
-- 同组内产出区中的同名 `现产原材料`
+- 同组内建材区中的同名 `产出建材`
+- 同组内材料区中的同名 `产出材料`
 
 ### 跨组限制
 
@@ -280,10 +294,11 @@ Record<wareId, amount>
 
 ```ts
 line-build-material: `line:${targetGroupId}:${wareId}`
+output-build-material: `output-build:${wareId}`
 output-material: `output:${wareId}`
 ```
 
-产出区 target key 仍不含 groupKey。因为分组保证了同一 wareId 只属于一个组的产出区，`output:{wareId}` 仍然是全局唯一的。
+`output-build:{wareId}` 和 `output:{wareId}` 各自独立。同一 wareId 可同时分别连到建材区和材料区（一个起点可连任意终点，一个终点只能有一个起点）。
 
 ## 连线设计
 
@@ -294,25 +309,31 @@ output-material: `output:${wareId}`
 标签通过 `data-tag-id` 属性提供稳定 DOM 锚点：
 - `build-flow-source:${groupId}:${wareId}` — 产线产出标签
 - `build-flow-target:line:${targetGroupId}:${wareId}` — 产线建材标签
-- `build-flow-target:output:${wareId}` — 产出建材标签
+- `build-flow-target:output-build:${wareId}` — 产出建材标签
+- `build-flow-target:output:${wareId}` — 产出材料标签
 
 ### 路由算法
 
-每条边根据起点和终点的 X/Y 坐标关系采用不同的路由策略：
+每条边根据起点和终点的 X/Y 坐标关系采用不同的路由策略。
+
+**共享原则**：同一 source（sourceGroupId + wareId）共享 midX；同一 source 在同一 gap 内共享 p2Y、p3X。
 
 **Mode A（终点在右侧，x2 > x1）**：3 段线
 ```
 Start → P1(midX, y1) → P2(midX, y2) → End
 ```
-midX 按源点（sourceGroupId + wareId）在产线区 x1 到产出区 x2 之间的 gap 内均分分配。
+- midX 按 source（sourceGroupId + wareId）在产线区 x1 到产出区 x2 之间的 gap 内均分分配
+- 同一 source 的所有边共享同一个 midX
+- 若 `|y1 - y2| < 4`（近乎水平），退化为直线
 
 **Mode B（终点在左侧，x2 ≤ x1）**：5 段线
 ```
-Start → P1(midX, y1) → P2(midX, p2Y) → P3(p3X, p2Y) → P4(p3X, y2) → End
+Start → P1(p1X, y1) → P2(p1X, p2Y) → P3(p3X, p2Y) → P4(p3X, y2) → End
 ```
-- midX/p1X：与 Mode A 共享同一分配池（每个源点一个值）
-- p2Y：在目标 card 与上一张 card 之间的缝隙（card[i].bottom → card[i+1].top）内均分
-- p3X：从容器左边在目标 x2 范围内均分
+- p1X (= midX)：与 Mode A 共享同一分配池（每个 source 一个值）
+- p2Y：在目标 card 与上一张 card 之间的缝隙（card gap）内，按 source 均分（同一 source 共享 p2Y，不同 source 之间均分）
+- p3X：在 `[4, x2-4]` 范围内按 source 均分（同一 source 共享 p3X）
+- 每个 gap 内的 source 计数独立，ei 从 0 开始，不跨 gap 累计
 
 **自身连接**：同一 card 内产出 tag 左边缘直连建材 tag 右边缘。
 
@@ -357,7 +378,8 @@ Start → P1(midX, y1) → P2(midX, p2Y) → P3(p3X, p2Y) → P4(p3X, y2) → En
 5. **目标产线不再入选**（仅 `targetType === 'line-build-material'`）：若 `targetGroupId` 对应的产线不再属于建筑产线区，删除该 assignment。
 6. **目标标签失效**：
    - `targetType === 'line-build-material'`：若目标产线的产线建材中不再包含 `assignment.wareId`，删除该 assignment。
-   - `targetType === 'output-material'`：若产出区的现产原材料中不再包含 `assignment.wareId`，删除该 assignment。
+   - `targetType === 'output-build-material'`：若建材区的产出建材中不再包含 `assignment.wareId`，删除该 assignment。
+   - `targetType === 'output-material'`：若材料区的产出材料中不再包含 `assignment.wareId`，删除该 assignment。
 7. **跨组绑定**（新增）：若来源产线与目标不在同一分组，删除该 assignment。
 
 ### 清理结果
