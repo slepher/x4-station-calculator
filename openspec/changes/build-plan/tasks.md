@@ -185,6 +185,52 @@
 - `npm run build` 通过
 - 无 TypeScript 编译错误
 
+## Logic-Flow 导入菜单
+
+### T21: Presenter 扩展 [x]
+
+- `src/components/empire/presenters/useBuildPlanPresenter.ts`
+- 新增 `FlowPlanItem` 接口（id, name, index）
+- `BuildPlanPresenterProps` 新增 `flowPlanName: ComputedRef<string>`、`loadableFlowPlans: ComputedRef<FlowPlanItem[]>`
+- `BuildPlanPresenterEmits` 新增 `loadFlowPlan: (planId: string) => void`
+- `useBuildPlanPresenter` 内部调用 `useLogicFlowStore()` 获取方案列表
+- `flowPlanName` 根据 `savedPlans.activeId` 查找当前方案名称
+- `loadableFlowPlans` 映射 `savedPlans.list` 为 `FlowPlanItem[]`
+- `loadFlowPlan` 按 `planId` 查找 index 后调用 `logicFlow.loadPlan(index)`
+
+### T22: BuildPlanConstraintsPanel 添加导入菜单 [x]
+
+- `src/components/empire/BuildPlanConstraintsPanel.vue`
+- 新增 props: `flowPlanName`, `loadableFlowPlans`
+- 新增 emit: `loadFlowPlan`
+- `panel-header` 改为 `flex items-center justify-between`，左侧标题，右侧按钮
+- 按钮显示当前 flow 方案名（无方案时显示 `build_plan.import_flow_placeholder`）
+- 按钮右侧 chevron 箭头图标
+- 点击按钮 → `Teleport to body` 弹出浮动菜单
+- 菜单定位：Y 轴顶部对齐按钮顶部，X 轴左边缘对齐面板右边缘 + 8px
+- 菜单列出 `loadableFlowPlans`，当前激活方案高亮（`flow-plan-menu-item-active`）
+- 空列表显示 `build_plan.import_flow_empty`
+- 点击方案 → `emit('loadFlowPlan', planId)` → 关闭菜单
+- 点击菜单外部 → `mousedown` 监听 → 关闭菜单
+- `resize`/`scroll` 时更新菜单位置
+- `onUnmounted` 清理事件监听
+
+### T23: i18n 更新 [x]
+
+- `src/locales/zh-CN.json`: `import_flow_placeholder`="无", `import_flow_tooltip`="载入逻辑产线方案", `import_flow_empty`="暂无已保存的逻辑产线方案"
+- `src/locales/en.json`: `import_flow_placeholder`="None", `import_flow_tooltip`="Load Logic Flow Plan", `import_flow_empty`="No saved logic flow plans"
+
+### T24: WorkbenchView 集成 [x]
+
+- `src/components/empire/BlueprintProductionWorkbenchView.vue`
+- `BuildPlanConstraintsPanel` 传入新 props: `:flowPlanName`, `:loadableFlowPlans`
+- 绑定新 emit: `@load-flow-plan`
+
+### T25: 构建验证 [x]
+
+- `npm run build` 通过
+- 无 TypeScript 编译错误
+
 ## 依赖顺序
 
 ```
@@ -203,3 +249,92 @@ T10/T13/T2a 可并行。
 T11/T12/T2b→T2d 依赖 T10，可在 T13 并行期间串行执行。
 T2b/T2c/T2d 逻辑独立，可并行实现。
 T15/T16 可并行（T15 依赖 T10+T13，T16 依赖 T13+T14）。
+
+---
+
+## 产线自动分配
+
+### T26: 类型定义更新 [x]
+
+- 修改 `src/types/build-plan.ts`
+- `BuildGoal` 新增 `{ type: 'derived-rate'; wareId: string; ratePerHour: number }` 变体
+- 新增 `ProductionLineAllocation` 接口
+
+### T27: 产线分配核心算法 [x]
+
+- 新建 `src/store/logic/computeProductionLineAllocation.ts`
+- 实现 `computeProductionLineAllocation(goals, flowPlan, buildFlowView) → ProductionLineAllocation[]`
+- 三级匹配：build-flow outputMaterialTag → logic-flow manual/auto node → 未命中
+- 派生 goal 生成：walkUpstream 递归检测 isolated 节点
+- `buildCoveredSet()` + `findConnection()` 辅助函数
+- 派生 goal 的 `covered` 集合检查包含 user goal wares + 所有产线节点 wareIds（排除 isolated）
+- **依赖**: build-flow 和 logic-flow 的 store 数据
+- **Tests**: `tests/unit/build-plan/computeProductionLineAllocation.spec.ts` (13 tests)
+
+### T28: Store 适配 [x]
+
+- `src/store/useBlueprintProductionStore.ts`
+- `computePlan()` 接受可选 `effectiveGoals` 参数，支持传入全量 goals（user + derived）
+- `buildGoals` 类型层面已支持 `derived-rate`
+
+### T29: Presenter 扩展 [x]
+
+- `src/components/empire/presenters/useBuildPlanPresenter.ts`
+- 引入 `useLogicFlowStore` 获取当前活跃 plan 的 `groups`
+- 引入 `useGameDataStore` 获取 `modulesMap`, `modulesByOutputMap`
+- 新增 computed `allocations: ComputedRef<ProductionLineAllocation[]>`
+- `allocations` 依赖：`goals`、`flowPlan.groups`、`buildFlowView`
+- `computePlan` 传入 allocations 中的全量有效 goals
+- `updateGoal` 对 `derived-rate` 类型禁止修改（no-op）
+- `BuildPlanPresenterStore` 接口更新：`computePlan(effectiveGoals?: BuildGoal[])`
+
+### T30: UI 产线分配区域 [x]
+
+- 新建 `src/components/empire/ProductionLineAllocationSection.vue`
+- Props: `allocations`, `goals`, `racePreference`
+- 渲染：
+  - 每条产线一个分组（group header + goal list）
+  - user goal: 数量编辑 + 删除按钮
+  - derived goal: 锁定图标 + 0/h 显示，不可编辑不可删除
+  - "未命中"分组虚线边框，末尾显示
+- 无 goal 时 `v-if` 隐藏整个区域
+- Emits: `update-goal(index, value)`, `remove-goal(index)`（仅对 user goal）
+- 通过 `getStoreIndex(goal)` 映射 UI item 到 store 索引
+
+### T31: BuildPlanConstraintsPanel 布局调整 [x]
+
+- `src/components/empire/BuildPlanConstraintsPanel.vue`
+- 移除原有 WarePlanningItem 列表渲染和 `getGoalDisplayInfo`/`visibleGoals`
+- 在 `BuildGoalSearchBox` 下方插入 `ProductionLineAllocationSection`
+- Props 新增 `allocations: ProductionLineAllocation[]`
+- 保留 `schemeCount` computed
+
+### T32: WorkbenchView 集成 [x]
+
+- `src/components/empire/BlueprintProductionWorkbenchView.vue`
+- `BuildPlanConstraintsPanel` 传入新 prop: `:allocations`
+
+### T33: i18n 更新 [x]
+
+- `src/locales/en.json` / `zh-CN.json`
+- `build_plan.unmatched` = "Unmatched" / "未命中"
+- `build_plan.derived_locked` = "Auto-generated; quantity calculated during compute" / "自动生成，数量由计算阶段确定"
+
+### T34: 构建验证 [x]
+
+- `npm run build` 通过
+- 无 TypeScript 编译错误
+- 新 unit tests: 13/13 通过
+
+### 依赖顺序
+
+```
+T26 → T27 → T29
+T29 + T27 → T28 (Store 轻量适配)
+T29 + T26 → T30
+T30 → T31
+T31 + T29 → T32
+T32 → T33 → T34
+```
+
+T26 可与其他任务并行准备，T27/T28/T29 可部分并行（T27 纯算法无 store 依赖，T28/T29 均依赖 T26）。

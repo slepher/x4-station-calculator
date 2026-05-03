@@ -34,7 +34,10 @@ function resolveWareId(name: string): string | null {
 }
 
 import { calculateBuildPlan } from '../../src/store/logic/calculateBuildPlan'
-import { BootstrapMode, type BuildGoal } from '../../src/types/build-plan'
+import { buildFlowPlanGraph } from '../../src/store/logic/buildFlowPlanGraph'
+import { computeFlowPlanLines, makeSchemes } from '../../src/store/logic/calculateBuildFlowPlan'
+import { BootstrapMode, type BuildGoal, type BuildFlowPlanView } from '../../src/types/build-plan'
+import type { BuildFlowGroup, BuildFlowLineCard, BuildFlowTag } from '../../src/types/x4'
 
 const baseSettings = {
   sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
@@ -92,6 +95,14 @@ if (bootstrapFlag) {
   else if (val === 'nested') parsedBootstrap = BootstrapMode.NestedJoint
 }
 
+const useClassical = process.argv.includes('--classical')
+const useJson = process.argv.includes('--json')
+const useDebugGreedy = process.argv.includes('--debug-greedy')
+
+if (useDebugGreedy) {
+  ;(globalThis as any).__GREEDY_DEBUG__ = true
+}
+
 function parseArgs(): BuildGoal[] {
   const goals: BuildGoal[] = []
   const moduleArg = process.argv.find(a => a.startsWith('--module='))
@@ -128,16 +139,110 @@ function parseArgs(): BuildGoal[] {
 
 const goals = parseArgs()
 
+// ---- Mock build-flow data builders for new algorithm ----
+
+function tag(wareId: string, suffix: string): BuildFlowTag {
+  return { tagId: `tag-${wareId}-${suffix}`, wareId, label: wareId }
+}
+
+function card(groupId: string, name: string, sourceWares: string[], buildWares: string[]): BuildFlowLineCard {
+  return { groupId, title: name, sourceTags: sourceWares.map(w => tag(w, 'src')), buildMaterialTags: buildWares.map(w => tag(w, 'bld')) }
+}
+
+function group(lineCards: BuildFlowLineCard[]): BuildFlowGroup {
+  const allSourceWares = new Set(lineCards.flatMap(c => c.sourceTags.map(t => t.wareId)))
+  return { groupKey: lineCards.map(c => c.groupId).join(':'), lineCards, outputBuildTags: [...allSourceWares].map(w => tag(w, 'outbuild')), outputMaterialTags: [...allSourceWares].map(w => tag(w, 'outmat')) }
+}
+
+function makeJointFlowView(): BuildFlowPlanView {
+  const dCard = card('D', 'D 联合产线', ['hullparts', 'claytronics', 'advancedcomposites', 'plasmaconductors'], ['hullparts', 'claytronics', 'advancedcomposites', 'plasmaconductors'])
+  return { buildFlowGroups: [group([dCard])], assignments: [
+    { wareId: 'hullparts', sourceGroupId: 'D', targetType: 'output-build-material' },
+    { wareId: 'claytronics', sourceGroupId: 'D', targetType: 'output-build-material' },
+    { wareId: 'advancedcomposites', sourceGroupId: 'D', targetType: 'output-build-material' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'D', targetType: 'output-build-material' },
+    { wareId: 'hullparts', sourceGroupId: 'D', targetType: 'line-build-material', targetGroupId: 'D' },
+    { wareId: 'claytronics', sourceGroupId: 'D', targetType: 'line-build-material', targetGroupId: 'D' },
+    { wareId: 'advancedcomposites', sourceGroupId: 'D', targetType: 'line-build-material', targetGroupId: 'D' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'D', targetType: 'line-build-material', targetGroupId: 'D' },
+  ], virtualEdges: [] }
+}
+
+function makeCoupledFlowView(): BuildFlowPlanView {
+  const aCard = card('A', 'A 建材产线', ['hullparts', 'claytronics'], ['hullparts', 'claytronics', 'advancedcomposites', 'plasmaconductors'])
+  const bCard = card('B', 'B 特种产线', ['advancedcomposites', 'plasmaconductors'], ['hullparts', 'claytronics'])
+  return { buildFlowGroups: [group([aCard, bCard])], assignments: [
+    { wareId: 'hullparts', sourceGroupId: 'A', targetType: 'output-build-material' },
+    { wareId: 'claytronics', sourceGroupId: 'A', targetType: 'output-build-material' },
+    { wareId: 'advancedcomposites', sourceGroupId: 'B', targetType: 'output-build-material' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'B', targetType: 'output-build-material' },
+    // A self: hullparts→A, claytronics→A
+    { wareId: 'hullparts', sourceGroupId: 'A', targetType: 'line-build-material', targetGroupId: 'A' },
+    { wareId: 'claytronics', sourceGroupId: 'A', targetType: 'line-build-material', targetGroupId: 'A' },
+    // A→B: advanced→B, plasma→B
+    { wareId: 'advancedcomposites', sourceGroupId: 'B', targetType: 'line-build-material', targetGroupId: 'A' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'B', targetType: 'line-build-material', targetGroupId: 'A' },
+    // B→A: hullparts→A, claytronics→A
+    { wareId: 'hullparts', sourceGroupId: 'A', targetType: 'line-build-material', targetGroupId: 'B' },
+    { wareId: 'claytronics', sourceGroupId: 'A', targetType: 'line-build-material', targetGroupId: 'B' },
+  ], virtualEdges: [] }
+}
+
+function makeNestedFlowView(): BuildFlowPlanView {
+  const aCard = card('A_N', 'A 基础建材', ['hullparts', 'claytronics'], ['hullparts', 'claytronics', 'advancedcomposites', 'plasmaconductors'])
+  const dCard = card('D_N', 'D 联合自举', ['hullparts', 'claytronics', 'advancedcomposites', 'plasmaconductors'], ['hullparts', 'claytronics', 'advancedcomposites', 'plasmaconductors'])
+  return { buildFlowGroups: [group([aCard, dCard])], assignments: [
+    { wareId: 'hullparts', sourceGroupId: 'A_N', targetType: 'output-build-material' },
+    { wareId: 'claytronics', sourceGroupId: 'A_N', targetType: 'output-build-material' },
+    { wareId: 'advancedcomposites', sourceGroupId: 'D_N', targetType: 'output-build-material' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'D_N', targetType: 'output-build-material' },
+    // A_N→D_N: all 4 from D_N for A_N
+    { wareId: 'hullparts', sourceGroupId: 'D_N', targetType: 'line-build-material', targetGroupId: 'A_N' },
+    { wareId: 'claytronics', sourceGroupId: 'D_N', targetType: 'line-build-material', targetGroupId: 'A_N' },
+    { wareId: 'advancedcomposites', sourceGroupId: 'D_N', targetType: 'line-build-material', targetGroupId: 'A_N' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'D_N', targetType: 'line-build-material', targetGroupId: 'A_N' },
+    // D_N self: all 4 from D_N for D_N
+    { wareId: 'hullparts', sourceGroupId: 'D_N', targetType: 'line-build-material', targetGroupId: 'D_N' },
+    { wareId: 'claytronics', sourceGroupId: 'D_N', targetType: 'line-build-material', targetGroupId: 'D_N' },
+    { wareId: 'advancedcomposites', sourceGroupId: 'D_N', targetType: 'line-build-material', targetGroupId: 'D_N' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'D_N', targetType: 'line-build-material', targetGroupId: 'D_N' },
+  ], virtualEdges: [] }
+}
+
+function makeIsolatedFlowView(): BuildFlowPlanView {
+  const aCard = card('A_I', 'A 建材产线', ['hullparts', 'claytronics'], ['hullparts', 'claytronics', 'advancedcomposites', 'plasmaconductors'])
+  const bCard = card('B_I', 'B 特种孤岛', ['advancedcomposites', 'plasmaconductors'], [])
+  return { buildFlowGroups: [group([aCard, bCard])], assignments: [
+    { wareId: 'hullparts', sourceGroupId: 'A_I', targetType: 'output-build-material' },
+    { wareId: 'claytronics', sourceGroupId: 'A_I', targetType: 'output-build-material' },
+    { wareId: 'advancedcomposites', sourceGroupId: 'B_I', targetType: 'output-build-material' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'B_I', targetType: 'output-build-material' },
+    // A self: hullparts→A_I, claytronics→A_I
+    { wareId: 'hullparts', sourceGroupId: 'A_I', targetType: 'line-build-material', targetGroupId: 'A_I' },
+    { wareId: 'claytronics', sourceGroupId: 'A_I', targetType: 'line-build-material', targetGroupId: 'A_I' },
+    // A→B: advanced→B_I, plasma→B_I
+    { wareId: 'advancedcomposites', sourceGroupId: 'B_I', targetType: 'line-build-material', targetGroupId: 'A_I' },
+    { wareId: 'plasmaconductors', sourceGroupId: 'B_I', targetType: 'line-build-material', targetGroupId: 'A_I' },
+  ], virtualEdges: [] }
+}
+
+const flowViewBuilders: Record<string, () => BuildFlowPlanView> = {
+  joint: makeJointFlowView,
+  coupled: makeCoupledFlowView,
+  nested: makeNestedFlowView,
+  isolated: makeIsolatedFlowView,
+}
+
 const goalDesc = goals.map(g => {
   if (g.type === 'build-module') return `${modName(g.moduleId)} ×${g.count}`
   if (g.type === 'production-rate') return `${wareName(g.wareId)} ${g.ratePerHour}/h`
   return '自给自足'
 }).join(', ')
 
-console.log(`=== Build Plan: ${goalDesc} (empty empire) ===`)
+console.log(`=== Build Plan: ${goalDesc} (empty empire) ${useClassical ? '[CLASSICAL]' : '[NEW]'} ===`)
 console.log()
 
-const result = calculateBuildPlan({
+const baseInput = {
   goals,
   selfSufficient: false,
   bootstrapMode: parsedBootstrap,
@@ -147,13 +252,79 @@ const result = calculateBuildPlan({
   modulesMap,
   waresMap,
   modulesByOutputMap: {}
-})
+} as const
+
+let result: ReturnType<typeof calculateBuildPlan>
+
+if (useClassical) {
+  result = calculateBuildPlan(baseInput)
+} else {
+  // New algorithm: get C modules, build graph, compute, make schemes
+  const cResult = calculateBuildPlan({ ...baseInput, bootstrapMode: BootstrapMode.None })
+  const cModules = cResult.schemes.length > 0 ? cResult.schemes[cResult.schemes.length - 1]!.modules : []
+
+  const modeKey = parsedBootstrap as string
+  const buildFlowView = flowViewBuilders[modeKey]?.() || null
+
+  if (!buildFlowView) {
+    result = cResult
+  } else {
+    const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap)
+    if (useDebugGreedy) {
+      console.log('[GRAPH] nodes:', [...graph.nodes.keys()])
+      console.log('[GRAPH] edges:')
+      for (const e of graph.edges) {
+        console.log(`  ${e.fromLineKey} → ${e.toLineKey} (${e.wareId}) [${e.sourceLabel}]`)
+      }
+      console.log('[GRAPH] sccGroups:', graph.sccGroups)
+    }
+    graph.cGoalWareIds = goals.map(g => {
+      if (g.type === 'production-rate' || g.type === 'derived-rate') return g.wareId
+      const mod = modulesMap[g.moduleId]
+      if (mod?.outputs) return Object.keys(mod.outputs)[0]!
+      return g.moduleId
+    })
+    computeFlowPlanLines(graph, modulesMap, waresMap, baseSettings, [])
+    const schemes = makeSchemes(graph, modulesMap, waresMap, baseSettings)
+    result = {
+      goals,
+      selfSufficient: false,
+      bootstrapMode: parsedBootstrap,
+      schemes,
+      totalDuration: 0, totalCredits: 0,
+      goalsAchieved: goals, goalsRemaining: [], halted: false, haltReason: '',
+    }
+  }
+}
+
+if (useJson) {
+  console.log(JSON.stringify(result.schemes.map(s => ({
+    label: s.label,
+    description: s.description,
+    modules: s.modules.map(m => ({ id: m.id, name: modName(m.id), count: m.count })),
+    netProduction: s.netProduction,
+    targetRateSources: s.targetRateSources,
+    buildMaterialTotals: s.buildMaterialTotals,
+    totalDuration: s.totalDuration,
+    totalCredits: s.totalCredits,
+    stepsCount: s.stepsCount,
+    steps: s.steps.map(st => ({
+      moduleId: st.moduleId,
+      moduleName: modName(st.moduleId),
+      count: st.moduleCount,
+      duration: st.estimatedDuration,
+      credits: st.estimatedCredits,
+      reason: st.reason,
+    })),
+  })), null, 2))
+  process.exit(0)
+}
 
 for (let si = 0; si < result.schemes.length; si++) {
   const scheme = result.schemes[si]
   const sep = '─'.repeat(80)
   console.log(sep)
-  console.log(`  ${scheme.label}  │  ${fmtH(scheme.totalDuration)}  │  ${fmtCr(scheme.totalCredits)}  │  ${scheme.stepsCount} steps`)
+  console.log(`  ${scheme.label}  │  ${fmtH(scheme.totalDuration)}  │  ${fmtCr(scheme.totalCredits)}  │  ${scheme.stepsCount} steps  │  ${fmtCr(scheme.totalCredits / Math.max(1, scheme.totalDuration / 3600))}/h`)
   console.log(`  ${scheme.description}`)
   console.log(`  目的产物: ${scheme.purposeModules.map(wareName).join(', ')}`)
 

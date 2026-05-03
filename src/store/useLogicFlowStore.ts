@@ -1379,6 +1379,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     deletePlan,
     clearAll,
     // Build Flow
+    buildFlowView,
     buildFlowAssignments,
     buildFlowLineCards,
     buildFlowArchivedLineCards,

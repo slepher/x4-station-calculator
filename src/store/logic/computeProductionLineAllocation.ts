@@ -1,0 +1,301 @@
+import type { BuildGoal, ProductionLineAllocation } from '@/types/build-plan'
+import type {
+  X4Module,
+  ProductionLineGroup,
+  BuildFlowGroup,
+  BuildFlowAssignment,
+  VirtualEdge,
+  FlowNode,
+} from '@/types/x4'
+
+interface BuildFlowView {
+  buildFlowGroups: BuildFlowGroup[]
+  assignments: BuildFlowAssignment[]
+  virtualEdges: VirtualEdge[]
+}
+
+/**
+ * 为每个 goal 提取对应的 wareId
+ */
+function extractWareId(goal: BuildGoal, modulesMap: Record<string, X4Module>): string {
+  if (goal.type === 'production-rate' || goal.type === 'derived-rate') {
+    return goal.wareId
+  }
+  if (goal.type === 'build-module') {
+    const mod = modulesMap[goal.moduleId]
+    if (mod && mod.outputs) {
+      const outputWares = Object.keys(mod.outputs)
+      if (outputWares.length > 0) return outputWares[0]!
+    }
+    return goal.moduleId
+  }
+  return ''
+}
+
+/**
+ * 在 build-flow 中查找 outputMaterialTag 的连线
+ */
+function findConnection(
+  wareId: string,
+  assignments: BuildFlowAssignment[],
+  virtualEdges: VirtualEdge[],
+): string | null {
+  for (const a of assignments) {
+    if (a.targetType === 'output-material' && a.wareId === wareId) {
+      return a.sourceGroupId
+    }
+  }
+  for (const e of virtualEdges) {
+    if (e.targetType === 'output-material' && e.wareId === wareId) {
+      return e.sourceGroupId
+    }
+  }
+  return null
+}
+
+/**
+ * 查找生产指定 ware 的模块（取第一个）
+ */
+function findModuleForWare(
+  wareId: string,
+  modulesByOutputMap: Record<string, X4Module[]>,
+): X4Module | undefined {
+  const modules = modulesByOutputMap[wareId]
+  if (modules && modules.length > 0) {
+    return modules[0]
+  }
+  return undefined
+}
+
+/**
+ * 构建 covered 集合
+ */
+function buildCoveredSet(
+  goals: BuildGoal[],
+  flowGroups: ProductionLineGroup[],
+  modulesMap: Record<string, X4Module>,
+): Set<string> {
+  const covered = new Set<string>()
+
+  for (const goal of goals) {
+    if (goal.type === 'production-rate') {
+      covered.add(goal.wareId)
+    } else if (goal.type === 'build-module') {
+      const mod = modulesMap[goal.moduleId]
+      if (mod && mod.outputs) {
+        for (const w of Object.keys(mod.outputs)) {
+          covered.add(w)
+        }
+      }
+    }
+  }
+
+  for (const group of flowGroups) {
+    for (const node of group.nodes) {
+      if (!node.isIsolated) {
+        covered.add(node.wareId)
+      }
+    }
+  }
+
+  return covered
+}
+
+/**
+ * 在 flow groups 中查找 isolated node
+ */
+function findIsolatedNode(groups: ProductionLineGroup[], wareId: string): FlowNode | null {
+  for (const group of groups) {
+    for (const node of group.nodes) {
+      if (node.isIsolated && node.wareId === wareId) {
+        return node
+      }
+    }
+  }
+  return null
+}
+
+/**
+ * 递归向上游遍历，生成派生 goals
+ */
+function walkUpstream(
+  module: X4Module,
+  covered: Set<string>,
+  flowGroups: ProductionLineGroup[],
+  modulesByOutputMap: Record<string, X4Module[]>,
+): BuildGoal[] {
+  if (!module || !module.inputs) return []
+  const derived: BuildGoal[] = []
+
+  for (const inputWareId of Object.keys(module.inputs)) {
+    const isolatedNode = findIsolatedNode(flowGroups, inputWareId)
+    if (isolatedNode && !covered.has(inputWareId)) {
+      derived.push({ type: 'derived-rate', wareId: inputWareId, ratePerHour: 0 })
+      covered.add(inputWareId)
+    }
+
+    const nextModule = findModuleForWare(inputWareId, modulesByOutputMap)
+    if (nextModule) {
+      derived.push(...walkUpstream(nextModule, covered, flowGroups, modulesByOutputMap))
+    }
+  }
+
+  return derived
+}
+
+/**
+ * 生成派生 goals
+ */
+function generateDerivedGoals(
+  userGoals: BuildGoal[],
+  flowGroups: ProductionLineGroup[],
+  modulesMap: Record<string, X4Module>,
+  modulesByOutputMap: Record<string, X4Module[]>,
+): BuildGoal[] {
+  const covered = buildCoveredSet(userGoals, flowGroups, modulesMap)
+  const allDerived: BuildGoal[] = []
+
+  for (const goal of userGoals) {
+    let mod: X4Module | undefined
+    if (goal.type === 'production-rate') {
+      mod = findModuleForWare(goal.wareId, modulesByOutputMap)
+    } else if (goal.type === 'build-module') {
+      mod = modulesMap[goal.moduleId]
+    }
+    if (!mod) continue
+
+    allDerived.push(...walkUpstream(mod, covered, flowGroups, modulesByOutputMap))
+  }
+
+  return allDerived
+}
+
+/**
+ * 产线自动分配核心算法
+ */
+export function computeProductionLineAllocation(
+  goals: BuildGoal[],
+  flowGroups: ProductionLineGroup[],
+  buildFlowView: BuildFlowView | null,
+  modulesMap: Record<string, X4Module>,
+  modulesByOutputMap: Record<string, X4Module[]>,
+): ProductionLineAllocation[] {
+  const groupMap = new Map<string, BuildGoal[]>()
+  const unmatchedGoals: BuildGoal[] = []
+
+  // 1. 生成派生 goals
+  const derivedGoals = flowGroups.length > 0
+    ? generateDerivedGoals(goals, flowGroups, modulesMap, modulesByOutputMap)
+    : []
+  const allGoals = [...goals, ...derivedGoals]
+
+  // 2. 为每个 goal 分配产线
+  for (const goal of allGoals) {
+    const wareId = extractWareId(goal, modulesMap)
+    let assigned = false
+
+    // Layer 1: Build-flow outputMaterialTag 匹配
+    if (buildFlowView) {
+      for (const bfg of buildFlowView.buildFlowGroups) {
+        for (const tag of bfg.outputMaterialTags) {
+          if (tag.wareId === wareId) {
+            const sourceGroupId = findConnection(wareId, buildFlowView.assignments, buildFlowView.virtualEdges)
+            if (sourceGroupId && flowGroups.some((g) => g.id === sourceGroupId)) {
+              const list = groupMap.get(sourceGroupId) || []
+              list.push(goal)
+              groupMap.set(sourceGroupId, list)
+              assigned = true
+              break
+            }
+          }
+        }
+        if (assigned) break
+      }
+    }
+    if (assigned) continue
+
+    // Layer 2: Logic-flow 节点匹配
+    // manual
+    for (const group of flowGroups) {
+      let matched = false
+      for (const node of group.nodes) {
+        if (node.source === 'manual') {
+          if ((goal.type === 'production-rate' || goal.type === 'derived-rate') && node.wareId === wareId) {
+            matched = true
+            break
+          }
+          if (goal.type === 'build-module' && node.moduleId === goal.moduleId) {
+            matched = true
+            break
+          }
+        }
+      }
+      if (matched) {
+        const list = groupMap.get(group.id) || []
+        list.push(goal)
+        groupMap.set(group.id, list)
+        assigned = true
+        break
+      }
+    }
+    if (assigned) continue
+
+    // auto
+    for (const group of flowGroups) {
+      let matched = false
+      for (const node of group.nodes) {
+        if (node.source === 'auto') {
+          if ((goal.type === 'production-rate' || goal.type === 'derived-rate') && node.wareId === wareId) {
+            matched = true
+            break
+          }
+          if (goal.type === 'build-module' && node.moduleId === goal.moduleId) {
+            matched = true
+            break
+          }
+        }
+      }
+      if (matched) {
+        const list = groupMap.get(group.id) || []
+        list.push(goal)
+        groupMap.set(group.id, list)
+        assigned = true
+        break
+      }
+    }
+    if (assigned) continue
+
+    // Layer 3: 未命中
+    unmatchedGoals.push(goal)
+  }
+
+  // 3. 构建输出
+  const result: ProductionLineAllocation[] = []
+
+  const groupIdToName = new Map<string, string>()
+  for (const g of flowGroups) {
+    groupIdToName.set(g.id, g.name || g.id)
+  }
+
+  for (const [groupId, goalList] of groupMap) {
+    if (goalList.length > 0) {
+      result.push({
+        groupId,
+        groupName: groupIdToName.get(groupId) || groupId,
+        isUnmatched: false,
+        goals: goalList,
+      })
+    }
+  }
+
+  if (unmatchedGoals.length > 0) {
+    result.push({
+      groupId: undefined,
+      groupName: '',
+      isUnmatched: true,
+      goals: unmatchedGoals,
+    })
+  }
+
+  return result
+}

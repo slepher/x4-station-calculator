@@ -21,6 +21,14 @@ export type BuildGoal =
   | { type: 'production-rate'; wareId: string; ratePerHour: number }
   | { type: 'build-module'; moduleId: string; count: number }
   | { type: 'fleet'; shipId: string; quantity: number }
+  | { type: 'derived-rate'; wareId: string; ratePerHour: number }
+
+export interface ProductionLineAllocation {
+  groupId?: string
+  groupName: string
+  isUnmatched: boolean
+  goals: BuildGoal[]
+}
 
 export interface BuildConstraints {
   timeBudget: number
@@ -108,4 +116,43 @@ export interface CalculateBuildPlanInput {
   waresMap: Record<string, X4Ware>
   modulesByOutputMap: Record<string, X4Module[]>
   currentNetProduction: Record<string, number>
+}
+
+// --- Build Flow Plan Types ---
+
+/** 依赖图中的产线节点 */
+export interface BuildFlowPlanLine {
+  lineGroupId: string
+  lineName: string
+  trackedWares: Set<string>
+  modules: SavedModule[]
+  moduleIds: string[]
+  isSelfBootstrap: boolean
+  netProduction: Record<string, number>
+  buildGroups?: BuildGroup[]
+}
+
+/** 依赖图中的边 */
+export interface BuildFlowPlanEdge {
+  fromLineKey: string
+  toLineKey: string
+  wareId: string
+  sourceLabel: string
+}
+
+/** 依赖图 */
+export interface BuildFlowPlanGraph {
+  nodes: Map<string, BuildFlowPlanLine>
+  edges: BuildFlowPlanEdge[]
+  sccGroups: string[][]
+  cModules: SavedModule[]
+  cBuildCostRates: Record<string, number>
+  cGoalWareIds?: string[]
+}
+
+/** BuildFlow 视图数据（与 computeProductionLineAllocation.ts 中类型一致） */
+export interface BuildFlowPlanView {
+  buildFlowGroups: import('./x4').BuildFlowGroup[]
+  assignments: import('./x4').BuildFlowAssignment[]
+  virtualEdges: import('./x4').VirtualEdge[]
 }

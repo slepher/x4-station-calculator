@@ -1,5 +1,59 @@
 # build-plan 设计
 
+## 核心目的
+
+给定目标产线 C（通过目标模块或目标产量定义），构建一条完整的产线。如果用户有需求，则同时构建**建设该产线所需的建材产线**。建材产线的产量必须满足约束：
+
+**建材消耗速率 = 目标全产线的建材总量 / 目标全产线的总建造时间**
+
+如果建材产线存在自举需求（建材产线自身建造也消耗自身能产出的建材），则需要**同时**满足（使用 `&` 独立约束，不是 `+` 数值相加）：
+
+1. 目标产线的建材消耗速率
+2. 建材产线自身的建材消耗速率
+
+建设需求可以是满足部分材料，也可以是满足全部材料。所有复杂的自举算法（联合自举、耦合迭代自举、嵌套联合自举、孤立特种自举）都是为了解决这一个自引用问题而设计的不同策略。
+
+## 核心公式
+
+**建材消耗速率** = `buildCost 总量 / buildTime 总量`
+
+这就是 `computeBuildRates` 的核心逻辑：对一组模块，统计其 `buildCost` 中各建材的总量，除以所有模块的 `buildTime` 总量，得到每种建材的消耗速率（单位/h）。
+
+## `&` 约束 vs `+` 约束
+
+- **`&`（独立约束）**：每个约束源独立检查满足率 ≥ 100%。多个 source 不是把需求加在一起再检查，而是每个 source 各自必须满足。
+- **`+`（数值相加）**：把多个 source 的需求合并后检查总满足率。**本系统不使用此方式**。
+
+自举场景中，建材产线 A 必须同时满足 C 的建材需求 `&` B 的建材需求 `&` A 自身的建材需求。每个约束独立成立，不能因一个约束过剩而补偿另一个约束的不足。
+
+## 五种自举模式 = 五种解自引用的策略
+
+| 模式 | 策略 | 自举方式 |
+|------|------|---------|
+| None | 不建建材产线 | 直接建设 C |
+| Joint | D=A+B 联合 | greedyFill 全自举（selfDemand = 产出 ∩ 消耗） |
+| CoupledIterative | A↔B 迭代 | A 需同时满足 C 和 B 的建材需求，B 变了就重算 A |
+| NestedJoint | A 先算 → D(A+B) 全自举 | A 一次性计算，D 从空开始 greedyFill |
+| IsolatedSpecialized | B 孤岛 → A 自迭代 | B 外部供应孤立建设，A 自迭代满足 C+自身 |
+
+## 领域术语
+
+| 术语 | 含义 |
+|------|------|
+| C | 目标产线（Target Production Line） |
+| A | 基础建材产线：产出 hullparts（船体部件）+ claytronics（电子黏土）的生产模块 |
+| B | 特种建材产线：产出 advancedcomposites（先进复合材料）+ plasmaconductors（等离子导体）的生产模块 |
+| D | A+B 联合模块（仅联合自举/嵌套联合自举模式使用） |
+| A_autoFill | A 产线 autoFill 追加的运营/支持模块 |
+| 通用自举模式 | 控制建材产线自举策略的下拉选项，替代原 self-sufficient checkbox |
+| 联合自举 | D=A+B 联合模块，通过 greedyFill 全自举直接满足 C 的建材需求 |
+| 耦合迭代自举 | A↔B 外层循环迭代：A 必须同时满足 (C+B) & A_autoFill 对 hullparts+claytronics 的消耗 |
+| 嵌套联合自举 | A 先一次性计算 → D(A+B) 从空开始 greedyFill 全自举 → C 目标产线 |
+| 孤立特种自举 | B→A→C 单向顺序：B 孤立建设（外部供应），A 自迭代满足 C+自身 |
+| 不自举 | 无建材自举，仅出目标产线 |
+| greedyFill | 通用迭代引擎：每次找满足率最低的瓶颈建材，添加一个生产者，直到所有 source 满足率 ≥ 100% |
+| max_merge | 多个 source 的 rates 逐 ware 取最大值 |
+
 ## 问题
 
 Blueprint overview 视图当前仅显示单一线性建造步骤列表，缺少方案选择和对比能力。用户无法基于当前帝国产能获得多个递进建造方案。
@@ -323,6 +377,8 @@ B 先建 → A 后建，但计算顺序 A 先算 → B 后算（B 需根据 A �
 
 所有自举模式均使用 greedyFill 作为内部迭代引擎，输入 targetRateSources 因模式而异。
 
+**greedyFill 的作用**：每次找满足率最低的瓶颈建材，添加一个生产者，直到所有 source（含 self_demand）的满足率 ≥ 100%。
+
 ```
 输入: targetRateSources: BuildRateSource[]（各来源的建材需求速率）
       fullBootstrap: boolean（true=全自举，false=仅自举 source 包含的 ware）
@@ -523,3 +579,159 @@ npx vite-node analysis/scripts/findBuildPlanDefaults.ts --module="Missile Compon
 
 - `--module="Name*N"` — 模块名称（`module.name`）模糊匹配，N 为数量
 - `--ware="Name*R"` — 商品名称（`ware.name`）模糊匹配，R 为每小时产量
+
+### 14. 产线自动分配
+
+#### 领域术语
+
+| 术语 | 含义 |
+|------|------|
+| 产线分配 | 将建造规划中的 goal 根据多级匹配规则分配到 logic-flow 中的 `ProductionLineGroup` |
+| 派生 goal | 由系统自动生成的目标，用于补全 upstream isolated 节点的需求 |
+| 未命中 | 虚拟分组标签，存储无法匹配到任何产线的 goal |
+| outputMaterialTag | build-flow 中每个 `BuildFlowGroup` 的材料产出区标签，含 `wareId` |
+| 连线 | output tag 连接到 source 产线的边：实线 = `BuildFlowAssignment`，虚线 = `VirtualEdge` |
+
+#### 算法
+
+```
+function computeProductionLineAllocation(goals, flowPlan, buildFlowView):
+  allocations = []
+  covered = buildCoveredSet(goals, flowPlan.groups)
+
+  // Step 1: 生成派生 goals
+  for each user goal (type in ['production-rate', 'build-module']):
+    module = getProductionModule(goal)
+    walkUpstream(module, covered, flowPlan):
+      for each inputWareId in module.inputs:
+        isolatedNode = findIsolatedNode(flowPlan.groups, inputWareId)
+        if isolatedNode && !covered.has(inputWareId):
+          derivedGoal = { type: 'derived-rate', wareId: inputWareId, ratePerHour: 0 }
+          goals.push(derivedGoal)
+          covered.add(inputWareId)
+        next = findModuleForWare(inputWareId)
+        if next: walkUpstream(next, covered, flowPlan)
+
+  // Step 2: 为所有 goal（user + derived）分配产线
+  for each goal in goals:
+    wareId = extractWareId(goal)
+
+    // Layer 1: Build-flow outputMaterialTag 匹配
+    for each bfg in buildFlowView.buildFlowGroups:
+      for each tag in bfg.outputMaterialTags:
+        if tag.wareId == wareId:
+          sourceGroupId = findConnection(tag, buildFlowView.assignments, buildFlowView.virtualEdges)
+          if sourceGroupId && flowPlan has group with id == sourceGroupId:
+            allocations[sourceGroupId].push(goal)
+            continue to next goal
+
+    // Layer 2: Logic-flow 节点匹配
+    for each group in flowPlan.groups:
+      matched = false
+      for each node in group.nodes:
+        if node.source == 'manual':
+          if (goal.type in ['production-rate', 'derived-rate'] && node.wareId == wareId)
+            || (goal.type == 'build-module' && node.moduleId == goal.moduleId):
+            allocations[group.id].push(goal)
+            matched = true; break
+      if matched: continue to next goal
+
+    for each group in flowPlan.groups:
+      matched = false
+      for each node in group.nodes:
+        if node.source == 'auto':
+          if (goal.type in ['production-rate', 'derived-rate'] && node.wareId == wareId)
+            || (goal.type == 'build-module' && node.moduleId == goal.moduleId):
+            allocations[group.id].push(goal)
+            matched = true; break
+      if matched: continue to next goal
+
+    // Layer 3: 未命中
+    allocations['__unmatched__'].push(goal)
+
+  // Step 3: 输出
+  return buildAllocationOutput(allocations, flowPlan.groups)
+```
+
+**`buildCoveredSet`**:
+```
+covered = new Set()
+for each user goal:
+  if production-rate: covered.add(goal.wareId)
+  if build-module:
+    module = findModule(goal.moduleId)
+    for each outputWareId in Object.keys(module.outputs):
+      covered.add(outputWareId)
+for each group in flowPlan.groups:
+  for each node in group.nodes:
+    covered.add(node.wareId)
+return covered
+```
+
+**`findConnection`**:
+```
+for each assignment in buildFlowView.assignments:
+  if assignment.targetType == 'output-material' && assignment.wareId == wareId:
+    return assignment.sourceGroupId
+for each edge in buildFlowView.virtualEdges:
+  if edge.targetType == 'output-material' && edge.wareId == wareId:
+    return edge.sourceGroupId
+return null
+```
+
+#### 数据模型
+
+```typescript
+// src/types/build-plan.ts 新增
+export type BuildGoal =
+  | { type: 'production-rate'; wareId: string; ratePerHour: number }
+  | { type: 'build-module'; moduleId: string; count: number }
+  | { type: 'fleet'; shipId: string; quantity: number }
+  | { type: 'derived-rate'; wareId: string; ratePerHour: number }
+
+export interface ProductionLineAllocation {
+  groupId?: string          // logic-flow group id，未命中为 undefined
+  groupName: string         // 产线显示名
+  isUnmatched: boolean
+  goals: BuildGoal[]
+}
+```
+
+#### Presenter 接口
+
+```typescript
+// useBuildPlanPresenter 新增 props
+allocations: ComputedRef<ProductionLineAllocation[]>
+
+// useBuildPlanPresenter 新增 emits
+// 派生 goal 不可编辑/删除，由系统自动管理
+// user goal 的编辑/删除不变，分配区域中直接操作
+```
+
+#### UI 布局
+
+```
+.panel-content
+  ├── BuildGoalSearchBox
+  ├── 产线分配区域
+  │     ├── 产线组 header（可折叠？暂不可折叠）
+  │     │   ├── [user] WarePlanningItem（可编辑数量、可删除）
+  │     │   └── [derived] 派生 goal（锁定标志、不可编辑、不可删除）
+  │     └── 未命中（灰色/虚线下划线）
+  │           ├── [user] WarePlanningItem（可编辑数量、可删除）
+  │           └── [derived] 派生 goal（锁定标志、不可编辑、不可删除）
+  ├── 计算按钮
+  ├── bootstrap mode selector
+  └── warnings
+```
+
+- 仅展示有 goal 的产线，"未命中"在末尾（可同时包含 user goal 和 derived goal）
+- 无 goal 时分配区域整体隐藏
+- 无活跃 logic-flow plan → 全部归入"未命中"
+- 派生 goal 初始 ratePerHour = 0，显示锁定图标
+
+#### 存储策略
+
+- `derived-rate` 不持久化到 localStorage，每次组件挂载/goals 变化/flow 变化时实时重算
+- user goal 持久化不变
+- `computePlan()` 调用时将全量 goals（user + derived）传入算法，算法在内部计算派生 goal 的实际需求量

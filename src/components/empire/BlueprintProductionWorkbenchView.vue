@@ -148,16 +148,21 @@ const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
     <div class="col-span-12 lg:col-span-3">
       <BuildPlanConstraintsPanel
         :goals="buildPlanPresenter.props.goals.value"
-        :bootstrapMode="buildPlanPresenter.props.bootstrapMode.value"
+        :buildFlowMode="buildPlanPresenter.props.buildFlowMode.value"
         :racePreference="buildPlanPresenter.props.racePreference.value"
         :build-plan="buildPlanPresenter.props.buildPlan.value"
         :loading="buildPlanPresenter.props.loading.value"
         :warnings="buildPlanPresenter.props.warnings.value"
+        :flowPlanName="buildPlanPresenter.props.flowPlanName.value"
+        :activeFlowPlanId="buildPlanPresenter.props.activeFlowPlanId.value"
+        :loadableFlowPlans="buildPlanPresenter.props.loadableFlowPlans.value"
+        :allocations="buildPlanPresenter.props.allocations.value"
         @add-goal="buildPlanPresenter.emits.addGoal"
         @remove-goal="buildPlanPresenter.emits.removeGoal"
         @update-goal="buildPlanPresenter.emits.updateGoal"
-        @set-bootstrap-mode="buildPlanPresenter.emits.setBootstrapMode"
+        @set-build-flow-mode="buildPlanPresenter.emits.setBuildFlowMode"
         @compute-plan="buildPlanPresenter.emits.computePlan"
+        @load-flow-plan="buildPlanPresenter.emits.loadFlowPlan"
       />
     </div>
     <div class="col-span-12 lg:col-span-4">

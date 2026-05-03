@@ -20,12 +20,7 @@
     "steps_count": "Steps",
     "no_steps": "No build steps in this scheme",
     "goals_remaining": "goal(s) not achieved",
-    "bootstrap_mode": "Bootstrap Mode",
-    "bootstrap_none": "None",
-    "bootstrap_joint": "Joint Bootstrap",
-    "bootstrap_coupled": "Coupled Iterative",
-    "bootstrap_isolated": "Isolated Specialized",
-    "bootstrap_nested": "Nested Joint",
+    "build_flow_mode": "Build Material Lines",
     "scheme_joint": "Joint Bootstrap",
     "scheme_materials": "Materials Bootstrap",
     "scheme_specialized": "Specialized Production",
@@ -58,7 +53,12 @@
     "unit_price": "Unit",
     "search_placeholder": "Search product or module...",
     "category_product": "Product",
-    "category_module": "Module"
+    "category_module": "Module",
+    "import_flow_placeholder": "None",
+    "import_flow_tooltip": "Load Logic Flow Plan",
+    "import_flow_empty": "No saved logic flow plans",
+    "unmatched": "Unmatched",
+    "derived_locked": "Auto-generated; quantity calculated during compute"
   },
   "sector": {
     "overview": "Overview",

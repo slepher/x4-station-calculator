@@ -18,8 +18,11 @@ import type {
   ProductionStationState
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import { BootstrapMode, type BuildGoal, type BuildPlan } from '@/types/build-plan'
+import { BootstrapMode, type BuildGoal, type BuildPlan, type BuildFlowPlanView } from '@/types/build-plan'
 import { calculateBuildPlan, calculateNetProduction } from '@/store/logic/calculateBuildPlan'
+import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
+import { computeFlowPlanLines, makeSchemes } from '@/store/logic/calculateBuildFlowPlan'
+import { useLogicFlowStore } from './useLogicFlowStore'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
@@ -65,7 +68,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   const buildGoals = ref<BuildGoal[]>([])
 
-  const bootstrapMode = ref<BootstrapMode>(BootstrapMode.None)
+  const buildFlowMode = ref<boolean>(false)
 
   const buildPlan = ref<BuildPlan | null>(null)
 
@@ -101,52 +104,158 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     buildGoals.value = buildGoals.value.filter((_, i) => i !== index)
   }
 
-  function setBootstrapMode(mode: BootstrapMode) {
-    bootstrapMode.value = mode
+  function setBuildFlowMode(mode: boolean) {
+    buildFlowMode.value = mode
   }
 
-  function computePlan() {
+  function computePlan(effectiveGoals?: BuildGoal[]) {
     const deps = getComputeDeps()
     if (!deps) return
     if (!activeEmpire.value) return
 
+    const goals = effectiveGoals ?? buildGoals.value
+
     computeBuildPlanLoading.value = true
 
     try {
-      const result = calculateBuildPlan({
-        goals: buildGoals.value,
-        selfSufficient: false,
-        bootstrapMode: bootstrapMode.value,
-        currentModules: [],  // 不看 empire 现有模块
-        currentNetProduction: {},  // 未使用，历史遗留
-        settings: {
-          sunlight: 100,
-          useHQ: false,
-          manualWorkforce: 0,
-          workforcePercent: 100,
-          workforceAuto: true,
-          considerWorkforceForAutoFill: false,
-          supplyWorkforceBonus: false,
-          buyMultiplier: 0.5,
-          sellMultiplier: 0.5,
-          minersEnabled: true,
-          internalSupply: true,
-          showEmpireGaps: false,
-          racePreference: 'argon',
-          resourceBufferHours: 1,
-          primaryProductBufferHours: 12,
-          secondaryProductBufferHours: 2,
-          transportMinutes: 30,
-          transportShipCapacity: 62000,
-          enforceDlcActivation: false
-        },
-        modulesMap: deps.modulesMap,
-        waresMap: deps.waresMap,
-        modulesByOutputMap: gameData.modulesByOutputMap || {}
-      })
-      buildPlan.value = result
+      if (buildFlowMode.value) {
+        // New build-flow-plan algorithm
+        const result = calculateBuildFlowPlanInternal(goals, deps)
+        buildPlan.value = result
+      } else {
+        const result = calculateBuildPlan({
+          goals,
+          selfSufficient: false,
+          bootstrapMode: BootstrapMode.None,
+          currentModules: [],
+          currentNetProduction: {},
+          settings: {
+            sunlight: 100,
+            useHQ: false,
+            manualWorkforce: 0,
+            workforcePercent: 100,
+            workforceAuto: true,
+            considerWorkforceForAutoFill: false,
+            supplyWorkforceBonus: false,
+            buyMultiplier: 0.5,
+            sellMultiplier: 0.5,
+            minersEnabled: true,
+            internalSupply: true,
+            showEmpireGaps: false,
+            racePreference: 'argon',
+            resourceBufferHours: 1,
+            primaryProductBufferHours: 12,
+            secondaryProductBufferHours: 2,
+            transportMinutes: 30,
+            transportShipCapacity: 62000,
+            enforceDlcActivation: false
+          },
+          modulesMap: deps.modulesMap,
+          waresMap: deps.waresMap,
+          modulesByOutputMap: gameData.modulesByOutputMap || {}
+        })
+        buildPlan.value = result
+      }
     } finally {
       computeBuildPlanLoading.value = false
+    }
+  }
+
+  function calculateBuildFlowPlanInternal(goals: BuildGoal[], deps: StationComputeDeps): BuildPlan {
+    // Step 1: Get C modules from the existing algorithm (bootstrapMode=None)
+    const cResult = calculateBuildPlan({
+      goals,
+      selfSufficient: false,
+      bootstrapMode: BootstrapMode.None,
+      currentModules: [],
+      currentNetProduction: {},
+      settings: {
+        sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
+        workforceAuto: true, considerWorkforceForAutoFill: false, supplyWorkforceBonus: false,
+        buyMultiplier: 0.5, sellMultiplier: 0.5, minersEnabled: true, internalSupply: true,
+        showEmpireGaps: false, racePreference: 'argon', resourceBufferHours: 1,
+        primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
+        transportShipCapacity: 62000, enforceDlcActivation: false
+      },
+      modulesMap: deps.modulesMap,
+      waresMap: deps.waresMap,
+      modulesByOutputMap: gameData.modulesByOutputMap || {}
+    })
+
+    const cSchemes = cResult.schemes || []
+    const cModules = cSchemes.length > 0 ? cSchemes[cSchemes.length - 1]!.modules : []
+
+    // Step 2: Get buildFlowView from logicFlow store
+    let buildFlowView: BuildFlowPlanView | null = null
+    try {
+      const logicFlow = useLogicFlowStore()
+      const bfView = logicFlow.buildFlowView
+      if (bfView && bfView.buildFlowGroups && bfView.buildFlowGroups.length > 0) {
+        buildFlowView = {
+          buildFlowGroups: bfView.buildFlowGroups,
+          assignments: logicFlow.buildFlowAssignments,
+          virtualEdges: logicFlow.buildFlowVirtualEdges,
+        }
+      }
+    } catch {
+      // LogicFlow store not available, use null
+    }
+
+    if (!buildFlowView) {
+      // Fallback: no flow plan → only C (same as unchecked)
+      return cResult
+    }
+
+    // Step 3: Build dependency graph
+    const graph = buildFlowPlanGraph(cModules, buildFlowView, deps.modulesMap)
+
+    // Pass goal ware IDs for C scheme label
+    const goalWareIds: string[] = []
+    for (const g of goals) {
+      if (g.type === 'production-rate' || g.type === 'derived-rate') {
+        goalWareIds.push(g.wareId)
+      } else if (g.type === 'build-module') {
+        const mod = deps.modulesMap[g.moduleId]
+        if (mod?.outputs) {
+          for (const w of Object.keys(mod.outputs)) {
+            if (!goalWareIds.includes(w)) goalWareIds.push(w)
+          }
+        }
+      }
+    }
+    graph.cGoalWareIds = goalWareIds
+
+    // Step 4: Compute line modules
+    computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, {
+      sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
+      workforceAuto: true, considerWorkforceForAutoFill: false, supplyWorkforceBonus: false,
+      buyMultiplier: 0.5, sellMultiplier: 0.5, minersEnabled: true, internalSupply: true,
+      showEmpireGaps: false, racePreference: 'argon', resourceBufferHours: 1,
+      primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
+      transportShipCapacity: 62000, enforceDlcActivation: false
+    }, [])
+
+    // Step 5: Generate schemes
+    const schemes = makeSchemes(graph, deps.modulesMap, deps.waresMap, {
+      sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
+      workforceAuto: true, considerWorkforceForAutoFill: false, supplyWorkforceBonus: false,
+      buyMultiplier: 0.5, sellMultiplier: 0.5, minersEnabled: true, internalSupply: true,
+      showEmpireGaps: false, racePreference: 'argon', resourceBufferHours: 1,
+      primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
+      transportShipCapacity: 62000, enforceDlcActivation: false
+    })
+
+    return {
+      goals,
+      selfSufficient: false,
+      bootstrapMode: BootstrapMode.None,
+      schemes,
+      totalDuration: 0,
+      totalCredits: 0,
+      goalsAchieved: goals,
+      goalsRemaining: [],
+      halted: false,
+      haltReason: ''
     }
   }
 
@@ -1096,14 +1205,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     overviewBuyMultiplier,
     overviewSellMultiplier,
     buildGoals,
-    bootstrapMode,
+    buildFlowMode,
     buildPlan,
     empireModules,
     empireCurrentNetProduction,
     computeBuildPlanLoading,
     setBuildGoal,
     removeBuildGoal,
-    setBootstrapMode,
+    setBuildFlowMode,
     computePlan
   }
 })

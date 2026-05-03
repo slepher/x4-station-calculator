@@ -20,12 +20,7 @@
     "steps_count": "步骤数",
     "no_steps": "该方案无建造步骤",
     "goals_remaining": "个目标未达成",
-    "bootstrap_mode": "通用自举模式",
-    "bootstrap_none": "不自举",
-    "bootstrap_joint": "联合自举",
-    "bootstrap_coupled": "耦合迭代自举",
-    "bootstrap_isolated": "孤立特种自举",
-    "bootstrap_nested": "嵌套联合自举",
+    "build_flow_mode": "建材产线",
     "scheme_joint": "联合自举",
     "scheme_materials": "建材自举",
     "scheme_specialized": "特种产线",
@@ -58,7 +53,12 @@
     "unit_price": "单价",
     "search_placeholder": "搜索商品或模块...",
     "category_product": "商品",
-    "category_module": "模块"
+    "category_module": "模块",
+    "import_flow_placeholder": "无",
+    "import_flow_tooltip": "载入逻辑产线方案",
+    "import_flow_empty": "暂无已保存的逻辑产线方案",
+    "unmatched": "未命中",
+    "derived_locked": "自动生成，数量由计算阶段确定"
   },
   "sector": {
     "overview": "总览",

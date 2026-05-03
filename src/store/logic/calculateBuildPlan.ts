@@ -18,6 +18,11 @@ import {
 import { getProductionEfficiency, findBestProducer } from './bestModuleSelector'
 import { calculateAutoFillModules } from './calculateProductionFlows'
 
+const DEBUG_GREEDY = false
+
+export function setGreedyDebug(enabled: boolean) { ;(globalThis as any).__GREEDY_DEBUG__ = enabled }
+function isGreedyDebug() { return DEBUG_GREEDY || (globalThis as any).__GREEDY_DEBUG__ }
+
 export function calculateNetProduction(
   modules: SavedModule[],
   modulesMap: Record<string, X4Module>,
@@ -131,7 +136,7 @@ function expandGoalDependencies(
   return Object.entries(required).map(([id, count]) => ({ id, count }))
 }
 
-function makeSchemeSteps(
+export function makeSchemeSteps(
   groups: BuildGroup[],
   moduleMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
@@ -309,7 +314,7 @@ function greedyFill(
   let currentAutoModules: SavedModule[] = []
 
   function fullBuilt(): SavedModule[] {
-    return mergeModules([...built, ...currentAutoModules])
+    return mergeModules([...currentEmpireModules, ...built, ...currentAutoModules])
   }
 
   function selfDemand(): BuildRateSource | null {
@@ -393,15 +398,42 @@ function greedyFill(
         if ((contextNet[wareId] || 0) + 0.001 < rate) allMet = false
       }
     }
+    if (isGreedyDebug()) {
+      const builtSummary = built.map(m => `${m.id}:${m.count}`).join(',')
+      const autoSummary = currentAutoModules.map(m => `${m.id}:${m.count}`).join(',')
+      console.log(`[OLD] iter ${built.length}: built=[${builtSummary}], auto=[${autoSummary}]`)
+      console.log(`[OLD]   contextNet:`, JSON.stringify(Object.fromEntries(
+        Object.entries(contextNet).filter(([,v]) => Math.abs(v as number) > 0.1)
+      )))
+      for (const src of allSources) {
+        console.log(`[OLD]   ----- ${src.label} -----`)
+        let srcMet = true
+        for (const [w, rate] of Object.entries(src.rates)) {
+          if (rate <= 0) continue
+          const prod = contextNet[w] || 0
+          const sat = rate > 0 ? (prod / rate * 100) : 0
+          console.log(`[OLD]     ${w}: 需要=${rate.toFixed(0)}/h  产能=${prod.toFixed(0)}/h  满足=${sat.toFixed(0)}%`)
+          if (prod + 0.001 < rate) srcMet = false
+        }
+        if (!srcMet) console.log(`[OLD]     -> NOT met`)
+      }
+      console.log(`[OLD]   allMet=${allMet}`)
+    }
     if (allMet) break
 
     let bottleneck: string | null = null
+    if (isGreedyDebug() && built.length === 0) {
+      console.log('[OLD] built.length === 0, targetRates:', JSON.stringify(targetRates))
+      console.log('[OLD] contextNet:', JSON.stringify(contextNet))
+    }
     if (built.length === 0 && targetRates['hullparts'] !== undefined) {
       bottleneck = 'hullparts'
+      if (isGreedyDebug()) console.log('[OLD] seed -> hullparts')
     } else {
       bottleneck = findLowestSatisfaction(contextNet)
     }
     if (!bottleneck) break
+    if (isGreedyDebug()) console.log(`[OLD] iter ${built.length}: bottleneck=${bottleneck}`)
 
     const producer = findBestProducer(bottleneck, settings.racePreference, combined, modulesMap, waresMap)
     if (!producer) break
@@ -590,16 +622,46 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           if (w !== 'energycells' && wareList.has(w)) bRatesFiltered[w] = r
         }
 
-        const aDelta = greedyFill(
-          [
-            { label: 'C建材需求', rates: rC },
-            { label: 'B建材需求', rates: bRatesFiltered },
-          ],
-          aFlat, settings, modulesMap, waresMap,
-          false
-        )
-        aFlat = mergeModules([...aFlat, ...aDelta.flatMap(g => g.modules)])
-        allAGroups = [...allAGroups, ...aDelta]
+        // Check if aFlat already satisfies C + B demand
+        const aAutoFill = calculateAutoFillModules({
+          plannedModules: mergeModules([...currentModules, ...aFlat]),
+          settings, modulesMap, waresMap, lockedWares: []
+        })
+        const aWithAuto = mergeModules([...aFlat, ...aAutoFill.autoIndustryModules, ...aAutoFill.autoHabitationModules])
+        const aNet = calculateNetProduction(aWithAuto, modulesMap, false, settings.sunlight)
+        let alreadySatisfied = true
+        for (const [w, rate] of Object.entries(rC)) {
+          if (w === 'energycells' || rate <= 0) continue
+          if ((aNet[w] || 0) + 0.001 < rate) { alreadySatisfied = false; break }
+        }
+        if (alreadySatisfied) {
+          for (const [w, rate] of Object.entries(bRatesFiltered)) {
+            if (w === 'energycells' || rate <= 0) continue
+            if ((aNet[w] || 0) + 0.001 < rate) { alreadySatisfied = false; break }
+          }
+        }
+
+        if (isGreedyDebug()) {
+          console.log(`[OLD] COUPLED iter ${iter}: aFlat=[${aFlat.map(m => `${m.id}:${m.count}`).join(',')}], alreadySatisfied=${alreadySatisfied}`)
+          console.log(`[OLD]   rC rates:`, rC)
+          console.log(`[OLD]   bRatesFiltered:`, bRatesFiltered)
+          console.log(`[OLD]   aNet (key wares): hullparts=${(aNet['hullparts']||0).toFixed(0)}, claytronics=${(aNet['claytronics']||0).toFixed(0)}`)
+        }
+
+        if (!alreadySatisfied) {
+          const aDelta = greedyFill(
+            [
+              { label: 'C建材需求', rates: rC },
+              { label: 'B建材需求', rates: bRatesFiltered },
+            ],
+            aFlat, settings, modulesMap, waresMap,
+            false
+          )
+          aFlat = mergeModules([...aFlat, ...aDelta.flatMap(g => g.modules)])
+          allAGroups = [...allAGroups, ...aDelta]
+        } else {
+          break
+        }
 
         const prevBPrimaryModules = bPrimaryModules
         bPrimaryModules = computeBPrimaryModules(aFlat)

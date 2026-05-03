@@ -13,6 +13,12 @@ const props = defineProps<{
   scheme: BuildScheme
 }>()
 
+function getSchemeLabel(label: string): string {
+  const key = 'build_plan.' + label
+  const translated = t(key)
+  return translated === key ? label : translated
+}
+
 const emit = defineEmits<{
   close: []
 }>()
@@ -121,7 +127,7 @@ const stepRows = computed(() => {
         <!-- Header -->
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700 shrink-0">
           <div>
-            <h2 class="text-lg font-bold text-slate-200">{{ t('build_plan.' + scheme.label) }}</h2>
+            <h2 class="text-lg font-bold text-slate-200">{{ getSchemeLabel(scheme.label) }}</h2>
             <p class="text-xs text-slate-400 mt-0.5">{{ scheme.description }}</p>
           </div>
           <button
