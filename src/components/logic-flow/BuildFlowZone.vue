@@ -327,12 +327,13 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
               </div>
             </div>
           </div>
-          <div class="flex flex-col gap-2 shrink-0 self-center ml-auto mr-1" style="width: 160px">
+          <div class="flex flex-col gap-16 shrink-0 self-center ml-auto mr-1" style="width: 160px">
             <div
               v-if="sg.outputBuildTags.length > 0"
               class="build-flow-output-card build-flow-output-build-card bg-gray-800/60 border border-gray-600 rounded p-2"
             >
-              <div class="text-xs text-gray-300 font-medium mb-1">{{ t('buildFlow.build_flow_output_build_title') }}</div>
+              <div class="text-xs text-gray-300 font-medium mb-2">{{ t('buildFlow.build_flow_output_build_title') }}</div>
+              <div class="text-[10px] text-gray-500 mb-1">{{ t('buildFlow.build_flow_output_build_sub') }}</div>
               <div class="build-flow-target-list flex flex-col gap-1 items-start">
                 <span
                   v-for="tag in sg.outputBuildTags"
@@ -361,7 +362,8 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
               v-if="sg.outputMaterialTags.length > 0"
               class="build-flow-output-card build-flow-output-material-card bg-gray-800/60 border border-gray-600 rounded p-2"
             >
-              <div class="text-xs text-gray-300 font-medium mb-1">{{ t('buildFlow.build_flow_output_material_title') }}</div>
+              <div class="text-xs text-gray-300 font-medium mb-2">{{ t('buildFlow.build_flow_output_material_title') }}</div>
+              <div class="text-[10px] text-gray-500 mb-1">{{ t('buildFlow.build_flow_output_material_sub') }}</div>
               <div class="build-flow-target-list flex flex-col gap-1 items-start">
                 <span
                   v-for="tag in sg.outputMaterialTags"
