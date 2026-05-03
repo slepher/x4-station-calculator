@@ -115,3 +115,20 @@
 - [x] 保存/加载/另存为正确处理 `buildFlow` 字段
 - [x] 旧版 plan 无 `buildFlow` 字段时不报错
 - [x] `npm run build` 通过
+- [x] 建材区未手动绑定的标签自动生成默认虚线连线并涂色
+- [x] 材料区未手动绑定的标签优先匹配归档产线（仅涂色无线），其次匹配非归档产线（虚线涂色）
+- [x] 手动绑定覆盖默认连线，解绑后重算时恢复
+- [x] 默认连线不持久化
+
+### Phase 9: 默认连线（虚拟连线）
+
+- [x] T42. 在 `src/types/x4.ts` 新增 `VirtualEdge` 接口
+- [x] T43. 在 `buildFlowDerivation.ts` 新增 `computeVirtualEdges()` 函数，实现建材区和材料区的默认搜索算法
+- [x] T44. 在 `useLogicFlowStore.ts` 新增 `buildFlowVirtualEdges` computed，依赖 `buildFlowGroups`、`buildFlowAssignments`、`archivedBuildFlowGroupIds`、`groups`
+- [x] T45. 修改 `useBuildFlowPresenter.ts`：新增 `virtualEdges` computed，合并 `edges`（手动实线优先，虚拟虚线补充）
+- [x] T46. 修改 `BuildFlowEdgeLayer.vue`：支持虚线 `stroke-dasharray` 渲染；支持无线模式（仅涂色不画线）
+- [x] T47. 确认解绑后默认连线在重算时自动恢复（通过 computed 响应式保证）
+  - `buildFlowVirtualEdges` 是 computed，依赖 `buildFlowAssignments`，解绑后自动重算
+- [x] T48. 确认归档/恢复触发默认连线重算
+  - `buildFlowVirtualEdges` 依赖 `archivedBuildFlowGroupIds` 和 `buildFlowGroups`，归档/恢复触发重算
+- [x] T49. 执行 `npm run build` 确认构建通过

@@ -14,6 +14,7 @@ interface RoutedEdge {
   d: string
   color?: string
   colorIdx: number
+  isDashed?: boolean
 }
 
 const lines = ref<RoutedEdge[]>([])
@@ -243,7 +244,7 @@ function recalculate() {
     const { edge, x1, y1, x2, y2 } = pos
     const isSelf = (edge as any).isSelfConnection
     if (isSelf) {
-      const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: ec.color, colorIdx: ec.idx })
+      const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d: `M ${x1},${y1} L ${x2},${y2}`, color: ec.color, colorIdx: ec.idx, isDashed: edge.isDashed })
       return
     }
 
@@ -279,7 +280,7 @@ function recalculate() {
       d = `M ${x1},${y1} L ${p1X},${y1} L ${p1X},${p2Y} L ${p3X},${p2Y} L ${p3X},${y2} L ${x2},${y2}`
     }
 
-    const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d, color: ec.color, colorIdx: ec.idx })
+    const ec = getEdgeColor(edge.wareId); results.push({ id: edge.id, d, color: ec.color, colorIdx: ec.idx, isDashed: edge.isDashed })
   })
   lines.value = results
 }
@@ -348,15 +349,16 @@ watch(() => props.edges.length, () => {
         <polygon points="0 0, 10 4, 0 8" :fill="c" />
       </marker>
     </defs>
-    <path
-      v-for="line in lines"
-      :key="line.id"
-      :d="line.d"
-      :stroke="line.color || 'rgba(251, 146, 60, 0.7)'"
-      stroke-width="3"
-      stroke-linecap="round"
-      fill="none"
-      :marker-end="`url(#arrow-${line.colorIdx})`"
-    />
+<path
+  v-for="line in lines"
+  :key="line.id"
+  :d="line.d"
+  :stroke="line.color || 'rgba(251, 146, 60, 0.7)'"
+  stroke-width="3"
+  stroke-linecap="round"
+  fill="none"
+  :stroke-dasharray="line.isDashed ? '8,4' : undefined"
+  :marker-end="line.isDashed ? undefined : `url(#arrow-${line.colorIdx})`"
+/>
   </svg>
 </template>

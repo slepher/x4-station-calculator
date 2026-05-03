@@ -16,6 +16,7 @@ const presenter = useBuildFlowPresenter({
   assignments: computed(() => logicFlow.buildFlowAssignments),
   isDragging: computed(() => logicFlow.isBuildFlowDragging),
   archivedGroupIds: computed(() => logicFlow.archivedBuildFlowGroupIds),
+  virtualEdges: computed(() => logicFlow.buildFlowVirtualEdges),
   bindAssignment: logicFlow.bindBuildFlowAssignment,
   unbindAssignment: logicFlow.unbindBuildFlowAssignment,
   startBuildFlowDrag: logicFlow.startBuildFlowDrag,
@@ -61,6 +62,25 @@ function getSortedRows(cardGroupId: string, order: Map<string, number>) {
 }
 
 const boundTargetTagIds = computed(() => {
+  const ids = new Set<string>()
+  for (const a of logicFlow.buildFlowAssignments) {
+    let tagId: string
+    if (a.targetType === 'line-build-material') {
+      tagId = `build-flow-target:line:${a.targetGroupId}:${a.wareId}`
+    } else if (a.targetType === 'output-build-material') {
+      tagId = `build-flow-target:output-build:${a.wareId}`
+    } else {
+      tagId = `build-flow-target:output:${a.wareId}`
+    }
+    ids.add(tagId)
+  }
+  for (const tagId of presenter.virtualTargetTagIds.value) {
+    ids.add(tagId)
+  }
+  return ids
+})
+
+const manualBoundTargetTagIds = computed(() => {
   const ids = new Set<string>()
   for (const a of logicFlow.buildFlowAssignments) {
     let tagId: string
@@ -262,7 +282,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
         :key="sg.groupKey"
         class="build-flow-group border border-gray-700 rounded p-3 flex flex-col justify-center relative"
       >
-        <div class="flex items-start">
+        <div class="flex items-center">
           <div class="flex flex-col gap-16 shrink-0 ml-[80px]" style="width: 308px">
             <div
               v-for="card in sg.lineCards"
@@ -307,7 +327,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                       :style="boundTargetTagIds.has(row.buildMaterialTag.tagId) ? { backgroundColor: getWareColor(row.wareId) + '40', borderColor: getWareColor(row.wareId) + '80', color: getWareColor(row.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
                     >
                       <span class="target-tag-text">{{ row.buildMaterialTag.label }}</span>
-                      <button v-if="boundTargetTagIds.has(row.buildMaterialTag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(row.buildMaterialTag, 'line-build-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
+                      <button v-if="manualBoundTargetTagIds.has(row.buildMaterialTag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(row.buildMaterialTag, 'line-build-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
                     </span>
                   </span>
                   <div v-else class="w-[142px] h-[24px] shrink-0"></div>
@@ -353,7 +373,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                     :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
                   >
                     <span class="target-tag-text">{{ tag.label }}</span>
-                    <button v-if="boundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-build-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
+                    <button v-if="manualBoundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-build-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
                   </span>
                 </span>
               </div>
@@ -383,7 +403,7 @@ onUnmounted(() => document.removeEventListener('click', onDocumentClick, true))
                     :style="boundTargetTagIds.has(tag.tagId) ? { backgroundColor: getWareColor(tag.wareId) + '40', borderColor: getWareColor(tag.wareId) + '80', color: getWareColor(tag.wareId) } : { backgroundColor: 'transparent', borderColor: '#4b5563', color: '#9ca3af' }"
                   >
                     <span class="target-tag-text">{{ tag.label }}</span>
-                    <button v-if="boundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
+                    <button v-if="manualBoundTargetTagIds.has(tag.tagId)" class="target-tag-unbind" @click.stop="onUnbind(computeTargetKey(tag, 'output-material'))" :title="t('buildFlow.build_flow_unbind')">&times;</button>
                   </span>
                 </span>
               </div>
