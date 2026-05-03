@@ -18,7 +18,7 @@
       </effect-->
     </fields>
   </region>
-  
+
   <region name="torus_radiation_2" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="box">
       <size x="100" y="85" z="250" />
@@ -37,7 +37,7 @@
       </effect-->
     </fields>
   </region>
-  
+
   <region name="torus_radiation1b" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="box">
       <size x="100" y="95" z="45" />
@@ -56,7 +56,7 @@
       </effect-->
     </fields>
   </region>
-  
+
   <region name="torus_radiation2b" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="box">
       <size x="110" y="95" z="350" />
@@ -75,7 +75,7 @@
       </effect-->
     </fields>
   </region>
-  
+
   <!-- Asteroid Belt -->
   <region name="asteroidbelt_main" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -118,7 +118,7 @@
       <asteroid groupref="asteroid_silicon_xs" densityfactor="1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.35" maxnoisevalue="1"/>
     </fields>
   </region>
-  
+
   <region name="blue_pink_large" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
       <size r="3500000" linear="40000" />
@@ -155,7 +155,7 @@
       <asteroid groupref="asteroid_silicon_xs" densityfactor="1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.35" maxnoisevalue="1"/>
     </fields>
   </region>
-  
+
   <!-- Mercury -->
   <region name="mercury_field" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -179,7 +179,7 @@
       <nebula ref="fogpattern_v2_macro" localred="16" localgreen="19" localblue="22" localdensity="0.075" uniformred="10" uniformgreen="14" uniformblue="20" uniformdensity="0.13" backgroundfog="false" resources="helium" />
     </fields>
   </region>
-  
+
   <!-- Saturn -->
   <region name="saturn_field" density="1.0" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -206,16 +206,16 @@
       </volumetricfog>
       <nebula ref="fogpattern_v2_macro" localred="16" localgreen="19" localblue="22" localdensity="0.01" uniformred="14" uniformgreen="14" uniformblue="14" uniformdensity="0.30" backgroundfog="true" resources="hydrogen" />
       <nebula ref="fogpattern_v2_macro" localred="16" localgreen="19" localblue="22" localdensity="0.01" uniformred="14" uniformgreen="14" uniformblue="14" uniformdensity="0.30" backgroundfog="true" resources="helium" />
-      <asteroid groupref="asteroid_ore_m_highyield" densityfactor="12" rotation="360" rotationvariation="8" noisescale="15000" seed="8888" minnoisevalue="0.1" maxnoisevalue="1"/>
-      <asteroid groupref="asteroid_ice_m_highyield" densityfactor="3" rotation="0" rotationvariation="16" noisescale="5000" seed="26041984" minnoisevalue="0.75" maxnoisevalue="1"/>
-      <asteroid groupref="asteroid_ore_s_highyield" densityfactor="12" rotation="360" rotationvariation="16" noisescale="1500" seed="8888" minnoisevalue="0.2" maxnoisevalue="1"/>
-      <asteroid groupref="asteroid_ore_xs_highyield" densityfactor="20" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.2" maxnoisevalue="1"/>
-      <asteroid groupref="asteroid_silicon_m_highyield" densityfactor="2" rotation="360" rotationvariation="8" noisescale="15000" seed="8888" minnoisevalue="0.5" maxnoisevalue="1"/>
-      <asteroid groupref="asteroid_silicon_s_highyield" densityfactor="2" rotation="360" rotationvariation="16" noisescale="1500" seed="8888" minnoisevalue="0.5" maxnoisevalue="1"/>
-      <asteroid groupref="asteroid_silicon_xs_highyield" densityfactor="1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.35" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_ore_m" densityfactor="12" rotation="360" rotationvariation="8" noisescale="15000" seed="8888" minnoisevalue="0.1" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_ice_m" densityfactor="3" rotation="0" rotationvariation="16" noisescale="5000" seed="26041984" minnoisevalue="0.75" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_ore_s" densityfactor="12" rotation="360" rotationvariation="16" noisescale="1500" seed="8888" minnoisevalue="0.2" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_ore_xs" densityfactor="20" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.2" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_silicon_m" densityfactor="2" rotation="360" rotationvariation="8" noisescale="15000" seed="8888" minnoisevalue="0.5" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_silicon_s" densityfactor="2" rotation="360" rotationvariation="16" noisescale="1500" seed="8888" minnoisevalue="0.5" maxnoisevalue="1"/>
+      <asteroid groupref="asteroid_silicon_xs" densityfactor="1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.35" maxnoisevalue="1"/>
     </fields>
   </region>
-  
+
   <!-- Titan -->
   <region name="titan_field" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -240,7 +240,7 @@
       <nebula ref="fogpattern_v2_macro" localred="16" localgreen="19" localblue="22" localdensity="0.075" uniformred="10" uniformgreen="14" uniformblue="20" uniformdensity="0.13" backgroundfog="false" resources="methane" />
     </fields>
   </region>
-  
+
   <!-- Neptune -->
   <region name="neptune_field" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -265,7 +265,7 @@
       <nebula ref="fogpattern_v2_macro" localred="16" localgreen="19" localblue="22" localdensity="0.075" uniformred="10" uniformgreen="14" uniformblue="20" uniformdensity="0.13" backgroundfog="false" resources="helium" />
     </fields>
   </region>
-  
+
   <!-- Oort Cloud -->
   <region name="oort_field" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -304,7 +304,7 @@
       <asteroid groupref="asteroid_silicon_xs" densityfactor="1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.35" maxnoisevalue="1"/>
     </fields>
   </region>
-  
+
   <!-- Gaian Prophecy -->
   <region name="cluster114_region01" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -345,7 +345,7 @@
       <asteroid groupref="asteroid_silicon_xs" densityfactor="1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.35" maxnoisevalue="1"/>
     </fields>
   </region>
-  
+
   <!-- Savage Spour I -->
   <region name="cluster112_s1_region01" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -388,7 +388,7 @@
       <asteroid groupref="asteroid_silicon_xs" densityfactor="1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.35" maxnoisevalue="1"/>
     </fields>
   </region>
-  
+
   <!-- Savage Spur II -->
   <region name="cluster112_s2_region01" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="box">
@@ -419,7 +419,7 @@
       <asteroid groupref="asteroid_silicon_xs" densityfactor="1" rotation="360" rotationvariation="32" noisescale="1500" seed="8888" minnoisevalue="0.35" maxnoisevalue="1"/>
     </fields>
   </region>
-  
+
   <!-- Segaris -->
   <region name="cluster113_region01" density="0.10" rotation="0" noisescale="15000" seed="8888" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="cylinder">
@@ -459,7 +459,7 @@
       <asteroid groupref="asteroid_ice_m" densityfactor="1.0" rotation="0" rotationvariation="16" noisescale="15000" seed="888" minnoisevalue="0.7" maxnoisevalue="1"/>
     </fields>
   </region>
-  
+
   <region name="cluster113_region02" density="1" rotation="0" noisescale="10000" seed="32" minnoisevalue="0.15" maxnoisevalue="1">
     <boundary class="splinetube">
       <size r="18000" />

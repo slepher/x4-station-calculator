@@ -2719,7 +2719,7 @@
     <t id="9654">Výrobní modul</t>
     <t id="9655">Násobitel zrychlení při posílení</t>
     <t id="9656">Narušuje dobíjení štítů velikosti L a XL</t>
-    <t id="9657">Unknown production method</t>
+    <t id="9657">Neznámý způsob výroby</t>
     <t id="9700">(Uživatelská otázka)</t>
     <t id="9701">Hackování</t>
     <t id="9702">Chystáte se hacknout</t>
@@ -3337,9 +3337,9 @@
     <t id="11692">Nyní můžete pomocí modifikovaných kláves zadávat příkazy ve frontě \(%s($INPUT_MODIFIER_ICON$)\) a prioritní \(%s($INPUT_MODIFIER_ICON$)\) přímo z mapy nebo z menu Interakce. Ve výchozím nastavení nyní příkazy zadané lodím bez použití těchto modifikovaných kláves přepíší všechny dříve zadané příkazy ve frontě.</t>
     <t id="11693">Pokud dáváte přednost starému chování, můžete změnit nastavení Výchozí chování objednávky v nabídce Nastavení hry na Fronta, takže stisknutí %s($INPUT_MODIFIER_ICON$) při použití nabídky Interakce přepíše objednávku místo jejího přidání do fronty.</t>
     <t id="11694">Stiskněte Ano, pokud chcete vyzkoušet nové výchozí chování modifikátoru, nebo Ne, pokud chcete zachovat staré chování a použít %s($INPUT_MODIFIER_ICON$) k přepsání příkazů.</t>
-    <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
-    <t id="11697">Resource Probe coverage</t>
+    <t id="11695">Odtahovatelný vrak</t>
+    <t id="11696">Rozebíratelný vrak</t>
+    <t id="11697">Pokrytí sondou na suroviny</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Uložit offline</t>
@@ -3931,9 +3931,9 @@
     <t id="13226">Aktuálně upravovaná loď má nekompatibilní rakety.</t>
     <t id="13227">Stabilita cestovního pohonu</t>
     <t id="13300">(Input bar)</t>
-    <t id="13301">Otáčení - Pan</t>
+    <t id="13301">Posun pohledu</t>
     <t id="13302">Reset pozice</t>
-    <t id="13303">Rotace</t>
+    <t id="13303">Otáčení pohledu</t>
     <t id="13304">Reset rotace</t>
     <t id="13305">Přiblížení</t>
     <t id="13306">Emulace kurzoru myši</t>

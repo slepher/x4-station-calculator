@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 21.04.2026 16:40:46-->
+<!--Last exported: 23.04.2026 16:36:54-->
 <diff>
   <add sel="/wares">
     <ware id="engine_arg_s_racer_01_mk1" name="{20107,1834}" description="{20107,1842}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -684,7 +684,7 @@
       </production>
       <component ref="turret_ter_m_laser_03_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="1" />
+      <use threshold="0.99" />
       <owner faction="terran" />
     </ware>
     <ware id="turret_ter_m_laser_04_mk1" name="{20105,7014}" description="{20105,7012}" group="turrets" transport="equipment" volume="1" tags="equipment missiononly turret">
@@ -698,7 +698,7 @@
       </production>
       <component ref="turret_ter_m_laser_04_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="1" />
+      <use threshold="0.99" />
       <owner faction="terran" />
     </ware>
     <ware id="turret_xen_xl_battleship_01_mk1" name="{20105,9074}" description="{20105,9072}" group="turrets" transport="equipment" volume="1" tags="equipment noplayerblueprint turret">
@@ -749,7 +749,7 @@
       </production>
       <component ref="weapon_ter_m_laser_02_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="1" />
+      <use threshold="0.99" />
       <owner faction="terran" />
     </ware>
     <ware id="weapon_ter_s_laser_02_mk1" name="{20105,1564}" description="{20105,1562}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">
@@ -763,7 +763,7 @@
       </production>
       <component ref="weapon_ter_s_laser_02_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0" />
+      <use threshold="0.99" />
       <owner faction="terran" />
     </ware>
     <ware id="weapon_ter_s_plasma_01_mk1" name="{20105,1554}" description="{20105,1552}" group="weapons" transport="equipment" volume="1" tags="equipment missiononly weapon">

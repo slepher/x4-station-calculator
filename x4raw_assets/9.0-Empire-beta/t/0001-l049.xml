@@ -3338,7 +3338,7 @@
     <t id="11693">Wenn du das alte Verhalten bevorzugst, kannst du die Einstellung für das Standard-Befehlsverhalten im Menü Spieleinstellungen auf Warteschlange ändern. Dann wird durch Drücken von %s($INPUT_MODIFIER_ICON$) im Interaktionsmenü der Befehl überschrieben statt an die Warteschlange angehängt.</t>
     <t id="11694">Klicke auf Ja, wenn du das neue Standardverhalten für Modifikatoren ausprobieren möchtest, oder auf Nein, wenn du das alte Verhalten beibehalten und %s($INPUT_MODIFIER_ICON$) zum Überschreiben von Befehlen nutzen willst.</t>
     <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantleable Wreck</t>
+    <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
