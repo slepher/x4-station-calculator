@@ -169,17 +169,17 @@ Phase 3 — 方案1：
 
 **Layer 2: Logic-flow 节点匹配（兜底）**
 
-在 logic-flow 的 `ProductionLineGroup` 中按产线列表顺序扫描：
+在 logic-flow 的 `ProductionLineGroup` 中按产线列表顺序扫描，**排除 isolated 节点**（isolated 节点仅作为占位符，不代表该产线实际生产该 ware）：
 - **Manual 级**：
-  - `production-rate` / `derived-rate`: `node.source === 'manual' && node.wareId === goal.wareId`
-  - `build-module`: `node.source === 'manual' && node.moduleId === goal.moduleId`
-- **Auto 级**（manual 未命中时）：同上但 `node.source === 'auto'`
+  - `production-rate` / `derived-rate`: `node.source === 'manual' && !node.isIsolated && node.wareId === goal.wareId`
+  - `build-module`: `node.source === 'manual' && !node.isIsolated && node.moduleId === goal.moduleId`
+- **Auto 级**（manual 未命中时）：同上但 `node.source === 'auto' && !node.isIsolated`
 
 命中即停，分配到第一条匹配的产线。
 
-**Layer 3: 未命中**
+**Layer 3: 待规划产线**
 
-两层均未命中 → 分配到虚拟分组 "未命中"（纯 UI 标签，无实际 `ProductionLineGroup`）。
+两层均未命中 → 分配到虚拟分组 "待规划产线"（纯 UI 标签，无实际 `ProductionLineGroup`）。表示这些产物无法归入已设计的产线，将统一由一条产线生产。
 
 ### 派生 goal 生成
 
@@ -190,9 +190,10 @@ for each user goal:
   module = getProductionModule(goal)
   walkUpstream(module, covered):
     for each inputWareId in module.inputs:
-      if flow 中存在 isolated node (wareId == inputWareId) && !covered.has(inputWareId):
+      if flow 中存在 isolated node (wareId == inputWareId) && !seenIsolatedWares.has(inputWareId):
         add derivedGoal { type: 'derived-rate', wareId: inputWareId, ratePerHour: 0 }
-        covered.add(inputWareId)
+        seenIsolatedWares.add(inputWareId)
+      if covered.has(inputWareId): continue
       nextModule = findModuleForWare(inputWareId)
       if nextModule: walkUpstream(nextModule, covered)
 ```
@@ -212,19 +213,19 @@ for each user goal:
         ├── [NEW] 产线分配区域 ← 替代原 WarePlanningItem 列表
         │     ├── 产线A (groupId: xxx)
         │     │   ├── [user] Missile Components × 500/h [可编辑] [×删除]
-        │     │   └── [derived] Hull Parts × 0/h [锁定]
+        │     │   └── [derived] Hull Parts [锁定]
         │     ├── 产线B
-        │     └── 未命中
+        │     └── 待规划产线
         │         ├── [user] Weapon Components × 200/h [可编辑] [×删除]
-        │         └── [derived] Refined Metals × 0/h [锁定]
+        │         └── [derived] Refined Metals [锁定]
         ├── 计算按钮
         ├── bootstrap mode selector
         └── warnings
 ```
 
-- 仅展示有 goal 的产线，"未命中"始终在末尾（可同时包含 user goal 和 derived goal）
+- 仅展示有 goal 的产线，"待规划产线"始终在末尾（可同时包含 user goal 和 derived goal）
 - 无 goal 时整个分配区域隐藏
-- 无活跃 logic-flow plan 时全部归入"未命中"
+- 无活跃 logic-flow plan 时全部归入"待规划产线"
 
 ### 数据模型
 

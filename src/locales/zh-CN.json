@@ -57,7 +57,7 @@
     "import_flow_placeholder": "无",
     "import_flow_tooltip": "载入逻辑产线方案",
     "import_flow_empty": "暂无已保存的逻辑产线方案",
-    "unmatched": "未命中",
+    "unmatched": "待规划产线",
     "derived_locked": "自动生成，数量由计算阶段确定"
   },
   "sector": {

@@ -57,7 +57,7 @@
     "import_flow_placeholder": "None",
     "import_flow_tooltip": "Load Logic Flow Plan",
     "import_flow_empty": "No saved logic flow plans",
-    "unmatched": "Unmatched",
+    "unmatched": "Unplanned Line",
     "derived_locked": "Auto-generated; quantity calculated during compute"
   },
   "sector": {

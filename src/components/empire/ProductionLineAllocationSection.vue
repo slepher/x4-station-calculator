@@ -134,7 +134,6 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
                   <path d="M7 11V7a5 5 0 0110 0v4" />
                 </svg>
               </span>
-              <span class="derived-rate">0/h</span>
             </template>
             <template v-else>
               <X4NumberInput

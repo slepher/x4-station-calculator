@@ -98,6 +98,9 @@ function buildCoveredSet(
     }
   }
 
+  console.log('[buildCoveredSet] covered:', [...covered])
+  console.log('[buildCoveredSet] isolated wares NOT in covered:', flowGroups.flatMap(g => g.nodes).filter(n => n.isIsolated).map(n => n.wareId))
+
   return covered
 }
 
@@ -117,26 +120,31 @@ function findIsolatedNode(groups: ProductionLineGroup[], wareId: string): FlowNo
 
 /**
  * 递归向上游遍历，生成派生 goals
+ * @param covered 非孤立节点的已覆盖 ware 集合
+ * @param seenIsolatedWares 已生成 derived goal 的孤立 ware 集合（防止重复）
  */
 function walkUpstream(
   module: X4Module,
   covered: Set<string>,
   flowGroups: ProductionLineGroup[],
   modulesByOutputMap: Record<string, X4Module[]>,
+  seenIsolatedWares: Set<string>,
 ): BuildGoal[] {
   if (!module || !module.inputs) return []
   const derived: BuildGoal[] = []
 
   for (const inputWareId of Object.keys(module.inputs)) {
     const isolatedNode = findIsolatedNode(flowGroups, inputWareId)
-    if (isolatedNode && !covered.has(inputWareId)) {
+    if (isolatedNode && !seenIsolatedWares.has(inputWareId)) {
       derived.push({ type: 'derived-rate', wareId: inputWareId, ratePerHour: 0 })
-      covered.add(inputWareId)
+      seenIsolatedWares.add(inputWareId)
     }
+
+    if (covered.has(inputWareId)) continue
 
     const nextModule = findModuleForWare(inputWareId, modulesByOutputMap)
     if (nextModule) {
-      derived.push(...walkUpstream(nextModule, covered, flowGroups, modulesByOutputMap))
+      derived.push(...walkUpstream(nextModule, covered, flowGroups, modulesByOutputMap, seenIsolatedWares))
     }
   }
 
@@ -153,6 +161,7 @@ function generateDerivedGoals(
   modulesByOutputMap: Record<string, X4Module[]>,
 ): BuildGoal[] {
   const covered = buildCoveredSet(userGoals, flowGroups, modulesMap)
+  const seenIsolatedWares = new Set<string>()
   const allDerived: BuildGoal[] = []
 
   for (const goal of userGoals) {
@@ -164,7 +173,7 @@ function generateDerivedGoals(
     }
     if (!mod) continue
 
-    allDerived.push(...walkUpstream(mod, covered, flowGroups, modulesByOutputMap))
+    allDerived.push(...walkUpstream(mod, covered, flowGroups, modulesByOutputMap, seenIsolatedWares))
   }
 
   return allDerived
@@ -189,6 +198,13 @@ export function computeProductionLineAllocation(
     : []
   const allGoals = [...goals, ...derivedGoals]
 
+  console.log('[allocation] allGoals:', allGoals.map(g => ({ type: g.type, wareId: (g as any).wareId, moduleId: (g as any).moduleId })))
+  console.log('[allocation] flowGroups:', flowGroups.map(g => ({
+    id: g.id,
+    name: g.name,
+    nodes: g.nodes.map(n => ({ wareId: n.wareId, source: n.source, isIsolated: n.isIsolated, moduleId: n.moduleId }))
+  })))
+
   // 2. 为每个 goal 分配产线
   for (const goal of allGoals) {
     const wareId = extractWareId(goal, modulesMap)
@@ -201,6 +217,7 @@ export function computeProductionLineAllocation(
           if (tag.wareId === wareId) {
             const sourceGroupId = findConnection(wareId, buildFlowView.assignments, buildFlowView.virtualEdges)
             if (sourceGroupId && flowGroups.some((g) => g.id === sourceGroupId)) {
+              console.log(`[allocation] goal ${goal.type}:${wareId} → Layer1 → group ${sourceGroupId}`)
               const list = groupMap.get(sourceGroupId) || []
               list.push(goal)
               groupMap.set(sourceGroupId, list)
@@ -219,7 +236,7 @@ export function computeProductionLineAllocation(
     for (const group of flowGroups) {
       let matched = false
       for (const node of group.nodes) {
-        if (node.source === 'manual') {
+        if (node.source === 'manual' && !node.isIsolated) {
           if ((goal.type === 'production-rate' || goal.type === 'derived-rate') && node.wareId === wareId) {
             matched = true
             break
@@ -244,7 +261,7 @@ export function computeProductionLineAllocation(
     for (const group of flowGroups) {
       let matched = false
       for (const node of group.nodes) {
-        if (node.source === 'auto') {
+        if (node.source === 'auto' && !node.isIsolated) {
           if ((goal.type === 'production-rate' || goal.type === 'derived-rate') && node.wareId === wareId) {
             matched = true
             break
@@ -256,6 +273,7 @@ export function computeProductionLineAllocation(
         }
       }
       if (matched) {
+        console.log(`[allocation] goal ${goal.type}:${wareId} → Layer2/auto → group ${group.id}`)
         const list = groupMap.get(group.id) || []
         list.push(goal)
         groupMap.set(group.id, list)
@@ -266,6 +284,7 @@ export function computeProductionLineAllocation(
     if (assigned) continue
 
     // Layer 3: 未命中
+    console.log(`[allocation] goal ${goal.type}:${wareId} → UNMATCHED`)
     unmatchedGoals.push(goal)
   }
 
