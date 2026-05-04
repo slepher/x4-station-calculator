@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
 import { ref, watch, computed } from 'vue'
-import { useI18n } from 'vue-i18n'
+import i18n from '@/i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { loadLanguageAsync, setGameFolderName } from '@/i18n'
 import type {
@@ -45,7 +45,16 @@ import {
 import type { GameDataFiles } from './logic/useGameData'
 
 export const useGameDataStore = defineStore('gameData', () => {
-  const { locale: currentLocale, t } = useI18n()
+  // 从 i18n.global 获取（不依赖 Vue 组件上下文）
+  // writable computed 以支持 changeLanguage() 设置
+  const currentLocale = computed({
+    get: () => i18n.global.locale.value,
+    set: (val: string) => { 
+      // Vue I18n Composition API 模式下 locale 是 WritableRef
+      (i18n.global.locale as any).value = val 
+    }
+  })
+  const t = i18n.global.t.bind(i18n.global)
   const { translateModule, translateModuleGroup, translateWare, translateDlc } = useX4I18n()
 
   // Version management state
