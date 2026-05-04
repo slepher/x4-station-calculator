@@ -310,7 +310,7 @@ describe('computeProductionLineAllocation', () => {
   // ------------------------------------------------------------------
   // Derived goal: isolated node upstream triggers derivation
   // ------------------------------------------------------------------
-  it('generates derived-rate goal when isolated node is upstream of user goal', () => {
+  it('generates derived-production goal when isolated node is upstream of user goal', () => {
     const parentWare = 'missilecomponents'
     const inputWare = 'hullparts'
     const parentModule = makeModule({
@@ -340,9 +340,9 @@ describe('computeProductionLineAllocation', () => {
     )
 
     const allGoals = result.flatMap((a) => a.goals)
-    const derived = allGoals.find((g) => g.type === 'derived-rate')
+    const derived = allGoals.find((g) => g.type === 'derived-production')
     expect(derived).toBeDefined()
-    expect(derived!.type).toBe('derived-rate')
+    expect(derived!.type).toBe('derived-production')
     expect((derived as { wareId: string }).wareId).toBe(inputWare)
     expect((derived as { ratePerHour: number }).ratePerHour).toBe(0)
   })
@@ -381,7 +381,7 @@ describe('computeProductionLineAllocation', () => {
     )
 
     const allGoals = result.flatMap((a) => a.goals)
-    const derived = allGoals.filter((g) => g.type === 'derived-rate')
+    const derived = allGoals.filter((g) => g.type === 'derived-production')
     expect(derived).toHaveLength(0)
   })
 
@@ -480,7 +480,7 @@ describe('computeProductionLineAllocation', () => {
     const derivedAlloc = result.find((a) => a.groupId === 'g2')
     expect(derivedAlloc).toBeDefined()
     expect(derivedAlloc!.goals).toHaveLength(1)
-    expect(derivedAlloc!.goals[0].type).toBe('derived-rate')
+    expect(derivedAlloc!.goals[0].type).toBe('derived-production')
   })
 
   // ------------------------------------------------------------------
@@ -525,7 +525,7 @@ describe('computeProductionLineAllocation', () => {
     )
 
     const allGoals = result.flatMap((a) => a.goals)
-    const derived = allGoals.filter((g) => g.type === 'derived-rate')
+    const derived = allGoals.filter((g) => g.type === 'derived-production')
     expect(derived).toHaveLength(1)
     expect((derived[0] as { wareId: string }).wareId).toBe(wareRM)
   })

@@ -22,6 +22,8 @@ export type BuildGoal =
   | { type: 'build-module'; moduleId: string; count: number }
   | { type: 'fleet'; shipId: string; quantity: number }
   | { type: 'derived-rate'; wareId: string; ratePerHour: number }
+  | { type: 'derived-production'; wareId: string; ratePerHour: number }
+  | { type: 'derived-build-material'; wareId: string; ratePerHour: number }
 
 export interface ProductionLineAllocation {
   groupId?: string
@@ -80,6 +82,9 @@ export interface BuildScheme {
   isFeasible: boolean
   totalModuleBuildTime: number
   buildMaterialTotals: Record<string, number>
+  manualWares?: BuildGoal[]
+  manualModules?: SavedModule[]
+  derivedWareIds?: string[]
 }
 
 export interface BuildSchemeGroup {
@@ -131,6 +136,7 @@ export interface BuildFlowPlanLine {
   lineGroupId: string
   lineName: string
   trackedWares: Set<string>
+  isolatedWares: Set<string>
   modules: SavedModule[]
   moduleIds: string[]
   isSelfBootstrap: boolean

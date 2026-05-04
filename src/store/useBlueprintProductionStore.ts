@@ -25,6 +25,7 @@ import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
 import { computeFlowPlanLines, makeSchemes, makeSchemesWithGroups, expandGoalDependencies, mergeModules } from '@/store/logic/calculateBuildFlowPlan'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
+import { mergeIntoExistingPlan, rebuildSchemeGroups } from '@/store/logic/mergeIntoExistingPlan'
 import { useLogicFlowStore } from './useLogicFlowStore'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -167,13 +168,14 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
           buildMaterial: i18n.global.t('build_plan.group_build_material'),
           production: i18n.global.t('build_plan.group_production'),
         })
-        schemeGroups.value = groups
-        const allSchemes = groups.flatMap(g => g.schemes)
+        const flatIncoming = groups.flatMap(g => g.schemes)
+        const mergedSchemes = mergeIntoExistingPlan(flatIncoming, buildPlan.value)
+        schemeGroups.value = rebuildSchemeGroups(groups, mergedSchemes)
         buildPlan.value = {
           goals,
           selfSufficient: false,
           bootstrapMode: BootstrapMode.None,
-          schemes: allSchemes,
+          schemes: mergedSchemes,
           totalDuration: 0,
           totalCredits: 0,
           goalsAchieved: goals,
@@ -184,7 +186,10 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       } else {
         schemeGroups.value = []
         const result = calculateBuildFlowPlanInternal(goals, deps)
-        buildPlan.value = result
+        buildPlan.value = {
+          ...result,
+          schemes: mergeIntoExistingPlan(result.schemes, buildPlan.value),
+        }
       }
     } finally {
       computeBuildPlanLoading.value = false
@@ -218,7 +223,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       // Only generate C scheme (no material lines)
       const cGoalWareIds: string[] = []
       for (const g of goals) {
-        if (g.type === 'production-rate' || g.type === 'derived-rate') {
+        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
           cGoalWareIds.push(g.wareId)
         } else if (g.type === 'build-module') {
           const mod = deps.modulesMap[g.moduleId]
@@ -280,7 +285,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       // No flow plan: return only C scheme
       const cGoalWareIds: string[] = []
       for (const g of goals) {
-        if (g.type === 'production-rate' || g.type === 'derived-rate') {
+        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
           cGoalWareIds.push(g.wareId)
         } else if (g.type === 'build-module') {
           const mod = deps.modulesMap[g.moduleId]
@@ -328,7 +333,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     // Pass goal ware IDs for C scheme label
     const goalWareIds: string[] = []
     for (const g of goals) {
-      if (g.type === 'production-rate' || g.type === 'derived-rate') {
+      if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
         goalWareIds.push(g.wareId)
       } else if (g.type === 'build-module') {
         const mod = deps.modulesMap[g.moduleId]
@@ -368,7 +373,12 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     for (const [groupId, node] of graph.nodes) {
       const goals: BuildGoal[] = []
       for (const wareId of node.trackedWares) {
-        goals.push({ type: 'derived-rate' as const, wareId, ratePerHour: 0 })
+        const isIsolated = node.isolatedWares?.has(wareId)
+        if (isIsolated) {
+          goals.push({ type: 'derived-production', wareId, ratePerHour: 0 })
+        } else {
+          goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
+        }
       }
       if (goals.length > 0) {
         result.push({

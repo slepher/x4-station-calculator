@@ -28,7 +28,13 @@ function getStoreIndex(goal: BuildGoal): number | undefined {
 }
 
 function isDerived(goal: BuildGoal): boolean {
-  return goal.type === 'derived-rate'
+  return goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material'
+}
+
+function derivedTag(goal: BuildGoal): string | null {
+  if (goal.type === 'derived-build-material') return t('build_plan.build_material_short')
+  if (goal.type === 'derived-production') return t('build_plan.production_short')
+  return null
 }
 
 function getGoalDisplayInfo(goal: BuildGoal): {
@@ -37,7 +43,7 @@ function getGoalDisplayInfo(goal: BuildGoal): {
   moduleInfo?: LocalizedX4Module
   moduleGroup?: LocalizedX4ModuleGroup
 } {
-  if (goal.type === 'production-rate' || goal.type === 'derived-rate') {
+  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
     const ware = gameData.localizedWaresMap[goal.wareId]
     const module = gameData.findModuleForWare(goal.wareId, props.racePreference)
     const group = module?.group ? gameData.localizedModuleGroupsMap[module.group] : undefined
@@ -69,7 +75,7 @@ function getColorBarStyle(goal: BuildGoal): Record<string, string> {
 }
 
 function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null {
-  if (goal.type === 'production-rate' || goal.type === 'derived-rate') {
+  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
     const ware = gameData.localizedWaresMap[goal.wareId]
     if (ware && ware.dlc_tag !== 'base') {
       return {
@@ -131,6 +137,7 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
 
           <div class="goal-controls">
             <template v-if="readonly || isDerived(goal)">
+              <span v-if="derivedTag(goal)" class="derived-tag">{{ derivedTag(goal) }}</span>
               <span class="derived-badge" :title="t('build_plan.derived_locked')">
                 <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -195,7 +202,7 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
 }
 
 .allocation-goal-list {
-  @apply divide-y divide-slate-700/30 max-h-36 overflow-y-auto;
+  @apply divide-y divide-slate-700/30;
 }
 
 .goal-row {
@@ -242,8 +249,16 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
   @apply text-slate-500;
 }
 
-.derived-rate {
-  @apply text-xs text-slate-500;
+.derived-tag {
+  @apply text-[10px] px-1 py-0.5 rounded font-medium;
+}
+
+.derived-tag:has(+ .derived-badge) {
+  @apply mr-1;
+}
+
+.goal-row--derived .derived-tag {
+  @apply bg-amber-800/40 text-amber-300;
 }
 
 .remove-btn {

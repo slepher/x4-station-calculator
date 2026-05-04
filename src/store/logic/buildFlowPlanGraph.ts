@@ -291,6 +291,7 @@ export function buildFlowPlanGraph(
           lineGroupId: targetKey,
           lineName: getGroupDisplayName(targetKey, buildFlowView),
           trackedWares: new Set([wid]),
+          isolatedWares: new Set(item.isIsolatedExpansion ? [wid] : []),
           modules: [],
           moduleIds: [],
           isSelfBootstrap: false,
@@ -330,6 +331,7 @@ export function buildFlowPlanGraph(
       } else {
         const node = graph.nodes.get(targetKey)!
         node.trackedWares.add(wid)
+        if (item.isIsolatedExpansion) node.isolatedWares.add(wid)
       }
 
       graph.edges.push({

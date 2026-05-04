@@ -39,11 +39,8 @@ const buildMaterialAllocations = computed(() => {
   return props.buildFlowPlanAllocations.map(bma => {
     const prodAlloc = props.allocations.find(a => a.groupId === bma.groupId)
     if (!prodAlloc) return bma
-    const existingWares = new Set(bma.goals.map(g => (g as any).wareId))
-    const merged = prodAlloc.goals.filter(g => !existingWares.has((g as any).wareId))
-    return merged.length > 0
-      ? { ...bma, goals: [...bma.goals, ...merged] }
-      : bma
+    // Merge all production goals into build material allocation (overlapping wares coexist)
+    return { ...bma, goals: [...bma.goals, ...prodAlloc.goals] }
   })
 })
 
@@ -180,12 +177,14 @@ onUnmounted(() => {
       <template v-if="buildFlowMode && buildMaterialAllocations.length > 0">
         <ProductionLineAllocationSection
           :allocations="buildMaterialAllocations"
-          :goals="[]"
+          :goals="goals"
           :racePreference="racePreference"
           :title="t('build_plan.group_build_material')"
-          :readonly="true"
+          @update-goal="onUpdateGoal"
+          @remove-goal="onRemoveGoal"
         />
         <ProductionLineAllocationSection
+          v-if="productionLineAllocations.length > 0"
           :allocations="productionLineAllocations"
           :goals="goals"
           :racePreference="racePreference"

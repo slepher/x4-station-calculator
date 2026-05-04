@@ -14,6 +14,11 @@
 | isolated 扩展 | 依赖图 BFS 中检查产线 isolated 节点，搜索产出该 ware 的产线并加入图 |
 | 提前计算 | 勾上 checkbox 时执行依赖图 + SCC + 分配，不等点击"计算" |
 | 叠加相加 | 重叠产线的建材需求速率 + 生产需求速率直接相加 |
+| ware（手工） | 用户手动添加的 ware 需求，同 wareId 合并（速率叠加） |
+| module（手工） | 用户手动添加的模块，同 moduleId 合并（数量叠加） |
+| derived ware | 系统自动推导的需求，同 wareId 合并（仅标记存在，无数值） |
+| derived-build-material | 依赖图 BFS 中沿连线扩散发现的建材需求（`outputBuildTags` / `buildMaterialTags`） |
+| derived-production | 依赖图 BFS 中通过 isolated 扩展发现的产出需求（`findGroupProducingWare`） |
 
 ## 问题
 
@@ -22,6 +27,10 @@
 ## 方案
 
 ### 1. 核心架构
+
+C 按产线分配拆分是**始终执行**的行为，不依赖建材产线 checkbox。建材产线 checkbox 控制的是"是否启用依赖图 + derivedWare + 分组展示"。
+
+#### 勾上 checkbox（提前计算）
 
 ```
 勾上 checkbox
@@ -34,21 +43,53 @@
   │
   ├─ 建材产线分配预览（derived goals from isolated）
   │
-  └─ 存入 store
+  └─ 存入 store（buildFlowPlanGraphResult / buildFlowPlanAllocations）
+```
 
-点击"计算"
+#### 点击"计算建造方案"（两种模式共享同一入口）
+
+```
+点击"计算建造方案"
   │
-  ├─ 读取已有依赖图
+  ├─ computeProductionLineAllocation(goals, flowGroups, buildFlowView)
+  │     ├─ generateDerivedGoals() — upstream walk 找 isolated
+  │     ├─ 三层匹配分配产线（L1 build-flow / L2 manual / L2.5 isolated / L3 unmatched）
+  │     └─ ProductionLineAllocation[]（每产线一组）
   │
-  ├─ computeFlowPlanLines(graph) → 每条产线的模块数
+  ├─ splitCToLineSchemes(allocations, ...)
+  │    按产线分配拆分为多个子 scheme（每产线独立 expand + autoFill）
+  │    → 三域合并到已有 plan（ware/module 保留 + 叠加，derivedWare 替换）
   │
-  ├─ C 按产线分配拆分 → 多个生产产线 scheme
-  │
-  ├─ 重叠产线合并需求 → 建材产线 scheme（含叠加速率）
+  ├─ [若有 graph] 重叠产线合并需求 → derivedWare 域合并
   │
   └─ makeSchemes() → 分组输出
-        ├── 建材产线分组
-        └── 生产产线分组
+       ├── [勾选时] 建材产线分组 + 生产产线分组
+       └── [未勾选时] 单一分组（全为生产产线，无 derivedWare）
+```
+
+#### 产线 plan 三域合并模型
+
+每条产线只有一个 plan，plan 内部按来源分三个隔离的合并域：
+
+| 域 | 来源 | 带数值？ | 合并规则 | 重算行为 |
+|----|------|----------|----------|----------|
+| **ware** | 用户手动添加的 ware 需求 | 有（`ratePerHour`） | 同 wareId 速率叠加 | **保留** |
+| **module** | 用户手动添加的模块 | 有（`count`） | 同 moduleId 数量叠加 | **保留** |
+| **derivedWare** | 系统自动推导的下游需求 | **无**（仅标记存在，`ratePerHour=0`） | 同 wareId 合并（存在即标记） | **整份替换** |
+
+- **域间不交叉**: ware 不与 derivedWare 合并，ware 也不与 module 合并
+- **共存**: 同一 ware 可同时在 ware 域和 derivedWare 域存在，分别显示互不覆盖
+- **derivedWare 无数值**: derivedWare 仅标记"产线需要提供该 ware"并参与 module 计算，不计入最终显示速率
+- **derivedWare 两个子类型**:
+  - `derived-build-material` — 沿 `outputBuildTags` / `buildMaterialTags` 连线扩散发现的建材需求
+  - `derived-production` — 通过 isolated 扩展（`findGroupProducingWare`）发现的产出需求
+  - 两者在 merge 行为上无区别（同属 derivedWare 域），但在 UI 上显示不同 tag（"建材"/"产出"）
+
+```
+一条产线 plan:
+  ├─ ware:        [HullParts=30/m,  Claytronics=10/m]    ← manual, 保留
+  ├─ module:      [HullPartsFab×2,  ClaytronicsFab×1]    ← manual, 保留
+  └─ derivedWare: [HullParts, EnergyCells]                ← 重算时整份替换，仅标记存在
 ```
 
 ### 2. 依赖图构建算法变更
@@ -226,22 +267,50 @@ watch(
 
 #### computePlan 变更
 
-```typescript
-function computePlan(effectiveGoals?: BuildGoal[]): void {
-  // 如果已有 buildFlowPlanGraphResult，直接使用
-  // 否则现场计算（与现有逻辑一致）
-  const graph = buildFlowPlanGraphResult.value
-  if (graph) {
-    computeFlowPlanLines(graph, ...)
-    const schemes = makeSchemesWithGroups(graph, ...)
-    buildPlan.value = { ... }
-  } else {
-    // 现有逻辑
-  }
-}
+无论是否勾选建材产线，都走同一入口：
+
+```
+computePlan(goals):
+  // Phase 1: 产线分配（始终执行）
+  allocs = computeProductionLineAllocation(goals, flowGroups, buildFlowView)
+
+  // Phase 2: C 按产线拆分（始终执行）
+  lineSchemes = splitCToLineSchemes(goals, allocs, ...)
+
+  // Phase 3: 若有依赖图（勾选建材产线时），处理 derivedWare + 重叠 + 分组
+  graph = buildFlowPlanGraphResult.value
+  if graph:
+    lineSchemes = mergeOverlappingLines(graph.nodes, lineSchemes)
+    // 为每产线补充 derivedWare 域
+    lineSchemes = applyDerivedWare(lineSchemes, graph)
+    // 分组输出：建材产线 + 生产产线
+    buildPlan.value = makeSchemesWithGroups(lineSchemes, graph)
+  else:
+    // 无依赖图：不分组，无 derivedWare
+    buildPlan.value = { schemes: lineSchemes, groups: 'single' }
+
+  // 按三域模型合并到已有 plan：
+  //   derivedWare → 整份替换
+  //   ware/module → 保留原有，新增叠加
+  buildPlan.value = mergeIntoExistingPlan(buildPlan.value, existingPlan)
 ```
 
 ### 4. C 按产线分配拆分
+
+#### 合并规则
+
+对每条产线，C 拆分的结果按三域模型写入 plan：
+
+| 域 | 来源 | 行为 |
+|----|------|------|
+| **ware** | C 拆分中的 user goals | 同产线已有 ware 域合并（同 wareId 速率叠加），**不覆盖** |
+| **module** | C 拆分中的 autoFill 模块 | 同产线已有 module 域合并（同 moduleId 数量叠加），**不覆盖** |
+| **derivedWare** | 来自依赖图 trackedWares 的 `derived-rate` goal | **整份替换**该产线原有 derivedWare 域 |
+
+关键约束：
+- 同一条产线**不会**因多次触发计算而产生多个 plan
+- 每次重算只刷新 derivedWare 域，ware/module 域保留用户手工内容
+- derivedWare 域内同 wareId 合并（去重标记，无数值叠加）
 
 #### 拆分逻辑
 
@@ -316,6 +385,13 @@ function mergeOverlappingLines(graphNodes, productionSchemes):
 
 #### 叠加相加
 
+叠加相加操作始终在**同一域内**进行（derivedWare 对 derivedWare、ware 对 ware），跨域不叠加。
+
+对于重叠产线：
+- **derivedWare 域** = 依赖图 trackedWares（建材需求） + C 拆分生产需求（同 wareId 合并）
+- **ware 域** = 用户手工添加的 ware 需求（保留不动）
+- **module 域** = 用户手工添加的模块（保留不动）
+
 ```typescript
 function mergeAdditive(
   rates1: Record<string, number>,
@@ -376,10 +452,12 @@ function makeSchemesWithGroups(graph, allocations, modulesMap, waresMap, setting
 
 #### 数据来源
 
-建材产线分配预览的 derived goal 来自依赖图中各产线的 isolated 节点：
-- 依赖图产线 L 有 isolated 节点 wareId=W
-- 在 logic-flow groups 中搜索产出 W 的产线 B
-- B 即为 L 的建材上游，W 成为 derived goal
+建材产线分配预览的 derived goal 来自依赖图中各产线的 trackedWares，按来源分为两个子类型：
+
+| 子类型 | 来源 | 触发路径 |
+|--------|------|----------|
+| `derived-build-material` | BFS 沿 `outputBuildTags` / `buildMaterialTags` 连线扩散到该产线的 ware | `findOutputBuildConnection` / `findLineBuildMaterialConnection` |
+| `derived-production` | BFS 中 isolated 扩展发现该产线需要提供某 isolated ware | `findGroupProducingWare` → 加入 `isolatedWares` |
 
 #### 预览数据结构
 
@@ -398,12 +476,13 @@ function computeBuildFlowPlanAllocations(graph, cModules, deps):
   result = []
 
   for each [groupId, node] of graph.nodes:
-    // 该产线在依赖图中的 tracked wares → 作为目标
-    goals = node.trackedWares.map(w => ({
-      type: 'derived-rate',
-      wareId: w,
-      ratePerHour: 0
-    }))
+    goals = []
+    for each wareId in node.trackedWares:
+      // 区分来源：isolatedWares 中的标记为产出，其余为建材
+      if node.isolatedWares.has(wareId):
+        goals.push({ type: 'derived-production', wareId, ratePerHour: 0 })
+      else:
+        goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
 
     // 检查该产线是否也分配了 user goals
     userGoalsForLine = getUserGoalsForGroup(groupId, buildGoals, allocations)

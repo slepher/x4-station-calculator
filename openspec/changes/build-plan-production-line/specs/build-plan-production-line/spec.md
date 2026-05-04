@@ -98,6 +98,38 @@
 **并且** 搜索优先级：manual 节点 > auto 节点
 **并且** 建材产线 isolated 扩展和非建材 derived goal 搜索共用此函数
 
+### Requirement: 产线 plan 三域合并模型
+
+**前提** 一条产线已存在 plan（含前次计算结果）
+**当** 系统再次执行 computePlan（goals 变化 / 用户手动触发重算）
+**那么** 不创建新 plan，而是**按三域合并到已有 plan**
+**并且** **ware 域**（手工添加的 ware 需求）：保留不动，新增同 wareId 速率叠加
+**并且** **module 域**（手工添加的模块）：保留不动，新增同 moduleId 数量叠加
+**并且** **derivedWare 域**（系统推导的下游需求）：整份替换为本次结果
+**并且** 同一条产线始终只有一个 plan
+
+#### Scenario: 重算时 manual 域被保留
+
+**前提** 产线 L 已有 plan，plan.ware 包含 HullParts=30/m，plan.module 包含 HullPartsFab×2
+**当** 产线 L 因 goals 变化触发重算
+**那么** derivedWare 域被刷新
+**并且** plan.ware 仍包含 HullParts=30/m
+**并且** plan.module 仍包含 HullPartsFab×2
+
+#### Scenario: 同 ware 在 manual 和 derived 同时存在
+
+**前提** 产线 L 的 plan.ware 包含 HullParts=30/m
+**当** 重算后 derivedWare 域包含 HullParts
+**那么** plan.ware 和 plan.derivedWare 同时标记 HullParts
+**并且** 两者互不合并、互不覆盖
+
+#### Scenario: 多次触发不产生多 plan 堆叠
+
+**前提** 产线 L 已有 plan
+**当** 多次触发 computePlan
+**那么** 产线 L 始终只有一个 plan
+**并且** 每次只刷新 derivedWare 域
+
 ### Requirement: C 按产线分配拆分
 
 **前提** 用户点击"计算建造方案"
@@ -117,11 +149,11 @@
 
 ### Requirement: 产线唯一性
 
-**前提** 一条产线按 groupId 在依赖图和产线分配中均出现
+**前提** "建材产线"已勾选，一条产线按 groupId 在依赖图和产线分配中均出现
 **当** 系统构建 scheme 分组
 **那么** 该产线归入建材产线分组
 **并且** 只出一个 scheme
-**并且** 建材需求速率 + 生产需求速率叠加相加
+**并且** derivedWare 域合并依赖图需求和产线分配需求
 
 #### Scenario: 重叠产线归入建材分组
 
@@ -141,32 +173,39 @@
 
 **前提** scheme 生成完成
 **当** UI 渲染 scheme 卡片
-**那么** 按"建材产线"和"生产产线"两大分组展示
-**并且** 建造顺序：先建材后生产
-**并且** 组内按依赖拓扑序
+**那么** 分组方式取决于是否勾选建材产线
+**并且** **勾选时**：按"建材产线"和"生产产线"两大分组展示，建造顺序先建材后生产，组内按依赖拓扑序
+**并且** **未勾选时**：所有 scheme 归入单一分组（全部视为生产产线），无建材分组
 
-#### Scenario: 两大分组渲染
+#### Scenario: 勾选时两大分组渲染
 
-**前提** 存在建材产线 schemes 和生产产线 schemes
+**前提** "建材产线"已勾选，存在建材产线 schemes 和生产产线 schemes
 **当** BuildPlanPanel 渲染
 **那么** 先渲染"建材产线"分组标题和卡片
 **然后** 渲染"生产产线"分组标题和卡片
+
+#### Scenario: 未勾选时单一分组
+
+**前提** "建材产线"未勾选
+**当** BuildPlanPanel 渲染
+**那么** 所有 scheme 在同一分组中展示，无分组标题
 
 ### Requirement: 建材产线分配预览
 
 **前提** 用户勾上"建材产线"checkbox
 **当** 约束面板渲染
-**那么** 在现有产线分配区域上方显示建材产线分配预览
-**并且** 格式与现有产线分配区域一致（目标展示目标，derived 展示 derived）
-**并且** derived goal 来源为依赖图产线的 isolated 节点
-**并且** 建材产线分配预览为只读（不可编辑/删除）
+**那么** 显示建材产线分配区域，内含产线及其 goals
+**并且** derived goal 来源为依赖图产线的 trackedWares，区分两个子类型：
+- `derived-build-material`：沿 `outputBuildTags` / `buildMaterialTags` 连线扩散发现
+- `derived-production`：通过 isolated 扩展（`findGroupProducingWare`）发现
+**并且** 同一分配区域内 manual 和 derived goals 均可编辑（derived 因 `isDerived` 锁定数量）
 
-#### Scenario: 勾上后显示建材分配预览
+#### Scenario: 勾上后显示建材分配
 
 **前提** 用户勾上"建材产线"
 **当** 依赖图包含产线 L（trackedWares = [hullparts]）
-**那么** 建材产线分配预览中显示产线 L
-**并且** L 的 goals 中包含 derived-rate hullparts
+**那么** 建材产线分配区显示产线 L
+**并且** L 的 goals 中包含 derived-build-material hullparts
 
 #### Scenario: 未勾上时不显示
 

@@ -210,7 +210,9 @@ export function expandGoalDependencies(
       addModule(goal.moduleId, goal.count)
       break
     }
-    case 'derived-rate': {
+    case 'derived-rate':
+    case 'derived-production':
+    case 'derived-build-material': {
       expandWareUpstream(goal.wareId, goal.ratePerHour, new Set())
       break
     }
@@ -829,7 +831,7 @@ export function splitCToLineSchemes(
     const netProduction = calculateNetProduction(lineModules, modulesMap, settings.considerWorkforceForAutoFill, settings.sunlight)
     const purposeModules: string[] = []
     for (const g of goals) {
-      if (g.type === 'production-rate' || g.type === 'derived-rate') {
+      if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
         if (!purposeModules.includes(g.wareId)) purposeModules.push(g.wareId)
       } else if (g.type === 'build-module') {
         const mod = modulesMap[g.moduleId]

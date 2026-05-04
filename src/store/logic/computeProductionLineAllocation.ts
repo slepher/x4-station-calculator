@@ -18,7 +18,7 @@ interface BuildFlowView {
  * 为每个 goal 提取对应的 wareId
  */
 function extractWareId(goal: BuildGoal, modulesMap: Record<string, X4Module>): string {
-  if (goal.type === 'production-rate' || goal.type === 'derived-rate') {
+  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
     return goal.wareId
   }
   if (goal.type === 'build-module') {
@@ -122,7 +122,7 @@ function walkUpstream(
   for (const inputWareId of Object.keys(module.inputs)) {
     const isolatedResult = findGroupWithIsolatedWare(inputWareId, flowGroups)
     if (isolatedResult && !seenIsolatedWares.has(inputWareId)) {
-      derived.push({ type: 'derived-rate', wareId: inputWareId, ratePerHour: 0 })
+      derived.push({ type: 'derived-production', wareId: inputWareId, ratePerHour: 0 })
       seenIsolatedWares.add(inputWareId)
     }
 
@@ -223,7 +223,7 @@ export function computeProductionLineAllocation(
       let matched = false
       for (const node of group.nodes) {
         if (node.source === 'manual' && !node.isIsolated) {
-          if ((goal.type === 'production-rate' || goal.type === 'derived-rate') && node.wareId === wareId) {
+          if ((goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') && node.wareId === wareId) {
             matched = true
             break
           }
@@ -248,7 +248,7 @@ export function computeProductionLineAllocation(
       let matched = false
       for (const node of group.nodes) {
         if (node.source === 'auto' && !node.isIsolated) {
-          if ((goal.type === 'production-rate' || goal.type === 'derived-rate') && node.wareId === wareId) {
+          if ((goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') && node.wareId === wareId) {
             matched = true
             break
           }
@@ -269,8 +269,8 @@ export function computeProductionLineAllocation(
     }
     if (assigned) continue
 
-    // Layer 2.5: Isolated node matching (for derived-rate goals)
-    if (goal.type === 'derived-rate') {
+    // Layer 2.5: Isolated node matching (for derived goals)
+    if (goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
       for (const group of flowGroups) {
         for (const node of group.nodes) {
           if (node.isIsolated && node.wareId === wareId) {
