@@ -58,6 +58,9 @@
     "import_flow_tooltip": "载入逻辑产线方案",
     "import_flow_empty": "暂无已保存的逻辑产线方案",
     "unmatched": "待规划产线",
+    "group_build_material": "建材产线",
+    "group_production": "生产产线",
+    "build_material_allocation": "建材产线分配",
     "derived_locked": "自动生成，数量由计算阶段确定"
   },
   "sector": {

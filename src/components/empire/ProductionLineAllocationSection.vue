@@ -13,6 +13,8 @@ const props = defineProps<{
   allocations: ProductionLineAllocation[]
   goals: BuildGoal[]
   racePreference: string
+  readonly?: boolean
+  title?: string
 }>()
 
 const emit = defineEmits<{
@@ -91,6 +93,7 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
 
 <template>
   <div v-if="allocations.length > 0" class="allocation-section space-y-2">
+    <div v-if="title" class="allocation-section-title">{{ title }}</div>
     <div
       v-for="alloc in allocations"
       :key="alloc.groupId || '__unmatched__'"
@@ -127,7 +130,7 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
           </div>
 
           <div class="goal-controls">
-            <template v-if="isDerived(goal)">
+            <template v-if="readonly || isDerived(goal)">
               <span class="derived-badge" :title="t('build_plan.derived_locked')">
                 <svg class="h-3 w-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <rect x="3" y="11" width="18" height="11" rx="2" ry="2" />
@@ -164,8 +167,12 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
 </template>
 
 <style scoped>
-.allocation-section {
-}
+  .allocation-section {
+  }
+
+  .allocation-section-title {
+    @apply text-xs font-semibold text-slate-400 uppercase tracking-wider;
+  }
 
 .allocation-group {
   @apply bg-slate-800/40 border border-slate-700/60 rounded overflow-hidden;

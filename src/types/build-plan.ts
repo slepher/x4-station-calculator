@@ -82,6 +82,12 @@ export interface BuildScheme {
   buildMaterialTotals: Record<string, number>
 }
 
+export interface BuildSchemeGroup {
+  groupType: 'build-material' | 'production'
+  groupLabel: string
+  schemes: BuildScheme[]
+}
+
 export interface BuildStep {
   order: number
   moduleId: string

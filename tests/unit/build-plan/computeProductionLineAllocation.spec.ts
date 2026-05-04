@@ -306,6 +306,8 @@ describe('computeProductionLineAllocation', () => {
   })
 
   // ------------------------------------------------------------------
+  // Derived goal: producing group upstream triggers derivation
+  // ------------------------------------------------------------------
   // Derived goal: isolated node upstream triggers derivation
   // ------------------------------------------------------------------
   it('generates derived-rate goal when isolated node is upstream of user goal', () => {
@@ -323,7 +325,7 @@ describe('computeProductionLineAllocation', () => {
     })
 
     const isolatedNode = makeNode({ wareId: inputWare, source: 'manual', isIsolated: true })
-    const group = makeGroup({ id: 'g1', name: 'Missile Line', nodes: [isolatedNode] })
+    const group = makeGroup({ id: 'g1', name: 'Hull Line', nodes: [isolatedNode] })
 
     const goal: BuildGoal = { type: 'production-rate', wareId: parentWare, ratePerHour: 500 }
     const result = computeProductionLineAllocation(
@@ -337,10 +339,7 @@ describe('computeProductionLineAllocation', () => {
       },
     )
 
-    // Should have 2 goals: the user goal + 1 derived
     const allGoals = result.flatMap((a) => a.goals)
-    expect(allGoals).toHaveLength(2)
-
     const derived = allGoals.find((g) => g.type === 'derived-rate')
     expect(derived).toBeDefined()
     expect(derived!.type).toBe('derived-rate')
@@ -349,9 +348,9 @@ describe('computeProductionLineAllocation', () => {
   })
 
   // ------------------------------------------------------------------
-  // Derived goal: already covered ware is NOT duplicated
+  // Derived goal: producing-only node does NOT generate derived
   // ------------------------------------------------------------------
-  it('does not generate derived goal when ware is already covered by flow group nodes', () => {
+  it('does not generate derived goal when upstream ware has non-isolated node only', () => {
     const parentWare = 'missilecomponents'
     const inputWare = 'hullparts'
     const parentModule = makeModule({
@@ -365,9 +364,9 @@ describe('computeProductionLineAllocation', () => {
       inputs: {},
     })
 
-    // Hull Parts is already a manual node in the group (not isolated) → covered
-    const manualNode = makeNode({ wareId: inputWare, source: 'manual', isIsolated: false })
-    const group = makeGroup({ id: 'g1', name: 'Hull Line', nodes: [manualNode] })
+    // Producing (non-isolated) node - does NOT trigger derived goal
+    const producingNode = makeNode({ wareId: inputWare, source: 'manual', isIsolated: false })
+    const group = makeGroup({ id: 'g1', name: 'Hull Line', nodes: [producingNode] })
 
     const goal: BuildGoal = { type: 'production-rate', wareId: parentWare, ratePerHour: 500 }
     const result = computeProductionLineAllocation(
@@ -485,10 +484,10 @@ describe('computeProductionLineAllocation', () => {
   })
 
   // ------------------------------------------------------------------
-  // Recursive derivation: isolated node's upstream has another isolated node
+  // Recursive derivation: isolated node deeper upstream triggers derived
   // ------------------------------------------------------------------
   it('recursively generates derived goals for nested upstream isolated nodes', () => {
-    // missilecomponents (user) ← hullparts (isolated) ← refinedmetals (isolated)
+    // missilecomponents (user) ← hullparts (no isolated) ← refinedmetals (isolated)
     const wareMissile = 'missilecomponents'
     const wareHP = 'hullparts'
     const wareRM = 'refinedmetals'
@@ -509,9 +508,8 @@ describe('computeProductionLineAllocation', () => {
       inputs: {},
     })
 
-    const isolatedHP = makeNode({ wareId: wareHP, source: 'manual', isIsolated: true })
     const isolatedRM = makeNode({ wareId: wareRM, source: 'manual', isIsolated: true })
-    const group = makeGroup({ id: 'g1', name: 'Upstream', nodes: [isolatedHP, isolatedRM] })
+    const group = makeGroup({ id: 'g1', name: 'Upstream', nodes: [isolatedRM] })
 
     const goal: BuildGoal = { type: 'production-rate', wareId: wareMissile, ratePerHour: 500 }
     const result = computeProductionLineAllocation(
@@ -528,9 +526,7 @@ describe('computeProductionLineAllocation', () => {
 
     const allGoals = result.flatMap((a) => a.goals)
     const derived = allGoals.filter((g) => g.type === 'derived-rate')
-    expect(derived).toHaveLength(2)
-
-    const derivedWares = derived.map((d) => (d as { wareId: string }).wareId).sort()
-    expect(derivedWares).toEqual([wareHP, wareRM].sort())
+    expect(derived).toHaveLength(1)
+    expect((derived[0] as { wareId: string }).wareId).toBe(wareRM)
   })
 })

@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest'
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
 import type { BuildFlowPlanView } from '@/types/build-plan'
-import type { BuildFlowGroup, BuildFlowTag, BuildFlowLineCard, BuildFlowAssignment } from '@/types/x4'
+import type { BuildFlowGroup, BuildFlowTag, BuildFlowLineCard, BuildFlowAssignment, FlowNode, ProductionLineGroup } from '@/types/x4'
 import type { SavedModule, X4Module, X4Ware } from '@/types/x4'
 
 function makeModule(overrides: Partial<X4Module> & { id: string }): X4Module {
@@ -71,6 +71,36 @@ function makeBuildFlowGroup(lineCards: BuildFlowLineCard[]): BuildFlowGroup {
     lineCards,
     outputBuildTags: [...allSourceWares].map(w => makeBuildFlowTag(w, '-outbuild')),
     outputMaterialTags: [...allSourceWares].map(w => makeBuildFlowTag(w, '-outmat')),
+  }
+}
+
+let nodeIdCounter = 0
+function makeNode(overrides: Partial<FlowNode> & { wareId: string }): FlowNode {
+  return {
+    id: overrides.id || `node_${++nodeIdCounter}`,
+    wareId: overrides.wareId,
+    moduleId: overrides.moduleId,
+    race: overrides.race || 'argon',
+    lineage: overrides.lineage || '',
+    column: overrides.column ?? 1,
+    isIsolated: overrides.isIsolated ?? false,
+    isAuto: overrides.isAuto ?? (overrides.source === 'auto'),
+    isRoot: overrides.isRoot ?? (overrides.source === 'manual'),
+    source: overrides.source || 'manual',
+    order: overrides.order ?? 0,
+    isPreview: overrides.isPreview,
+  }
+}
+
+function makeGroup(overrides: Partial<ProductionLineGroup> & { id: string }): ProductionLineGroup {
+  return {
+    id: overrides.id,
+    name: overrides.name || overrides.id,
+    category: overrides.category || 'industrial',
+    subCategory: overrides.subCategory || 'default',
+    isLocked: overrides.isLocked ?? false,
+    lockedLineage: overrides.lockedLineage || '',
+    nodes: overrides.nodes || [],
   }
 }
 
@@ -259,5 +289,123 @@ describe('buildFlowPlanGraph', () => {
     expect(scc).toContain('L1')
     expect(scc).toContain('L2')
     expect(scc.length).toBe(2)
+  })
+
+  // ------------------------------------------------------------------
+  // Isolated expansion
+  // ------------------------------------------------------------------
+
+  it('adds producing line via isolated expansion when no buildFlow groups param given', () => {
+    // When no groups param is given, isolated expansion is skipped
+    const cModules: SavedModule[] = [{ id: 'module_claytronics', count: 1 }]
+
+    const l1Card = makeBuildFlowLineCard('g1', ['hullparts'], [])
+    const group = makeBuildFlowGroup([l1Card])
+
+    const buildFlowView: BuildFlowPlanView = {
+      buildFlowGroups: [group],
+      assignments: [
+        { wareId: 'hullparts', sourceGroupId: 'g1', targetType: 'output-build-material' },
+      ],
+      virtualEdges: [],
+    }
+
+    const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, [])
+
+    // Only g1 from build flow
+    expect(graph.nodes.size).toBe(1)
+    expect(graph.nodes.has('g1')).toBe(true)
+  })
+
+  it('expands isolated ware to producing line via findGroupProducingWare', () => {
+    const cModules: SavedModule[] = [{ id: 'module_claytronics', count: 1 }]
+
+    const l1Card = makeBuildFlowLineCard('g1', ['hullparts'], [])
+    const buildFlowGroup = makeBuildFlowGroup([l1Card])
+
+    const buildFlowView: BuildFlowPlanView = {
+      buildFlowGroups: [buildFlowGroup],
+      assignments: [
+        { wareId: 'hullparts', sourceGroupId: 'g1', targetType: 'output-build-material' },
+      ],
+      virtualEdges: [],
+    }
+
+    // g1 has isolated node for advComp, g2 produces advComp
+    const isolatedAdvComp = makeNode({ wareId: 'advancedcomposites', source: 'manual', isIsolated: true })
+    const producingAdvComp = makeNode({ wareId: 'advancedcomposites', source: 'manual' })
+    const logicGroup1 = makeGroup({ id: 'g1', nodes: [isolatedAdvComp] })
+    const logicGroup2 = makeGroup({ id: 'g2', nodes: [producingAdvComp] })
+
+    const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, [logicGroup1, logicGroup2])
+
+    expect(graph.nodes.size).toBe(2)
+    expect(graph.nodes.has('g1')).toBe(true)
+    expect(graph.nodes.has('g2')).toBe(true)
+
+    const g2Node = graph.nodes.get('g2')!
+    expect(g2Node.trackedWares).toEqual(new Set(['advancedcomposites']))
+
+    // Edge: g1 → g2 (advancedcomposites)
+    const edge = graph.edges.find(e => e.fromLineKey === 'g1' && e.toLineKey === 'g2')
+    expect(edge).toBeDefined()
+    expect(edge!.wareId).toBe('advancedcomposites')
+
+    // No SCCs
+    expect(graph.sccGroups.length).toBe(0)
+  })
+
+  it('does not add edge for isolated ware with no producing line', () => {
+    const cModules: SavedModule[] = [{ id: 'module_claytronics', count: 1 }]
+
+    const l1Card = makeBuildFlowLineCard('g1', ['hullparts'], [])
+    const buildFlowGroup = makeBuildFlowGroup([l1Card])
+
+    const buildFlowView: BuildFlowPlanView = {
+      buildFlowGroups: [buildFlowGroup],
+      assignments: [
+        { wareId: 'hullparts', sourceGroupId: 'g1', targetType: 'output-build-material' },
+      ],
+      virtualEdges: [],
+    }
+
+    // g1 has isolated node for advComp, but no producing line exists
+    const isolatedAdvComp = makeNode({ wareId: 'advancedcomposites', source: 'manual', isIsolated: true })
+    const logicGroup1 = makeGroup({ id: 'g1', nodes: [isolatedAdvComp] })
+
+    const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, [logicGroup1])
+
+    // Only g1 from build flow
+    expect(graph.nodes.size).toBe(1)
+    expect(graph.nodes.has('g1')).toBe(true)
+  })
+
+  it('only adds edge for isolated ware already in graph, no duplicate node', () => {
+    const cModules: SavedModule[] = [{ id: 'module_claytronics', count: 1 }]
+
+    const l1Card = makeBuildFlowLineCard('g1', ['hullparts'], ['advancedcomposites'])
+    const buildFlowGroup = makeBuildFlowGroup([l1Card])
+
+    const buildFlowView: BuildFlowPlanView = {
+      buildFlowGroups: [buildFlowGroup],
+      assignments: [
+        { wareId: 'hullparts', sourceGroupId: 'g1', targetType: 'output-build-material' },
+        { wareId: 'advancedcomposites', sourceGroupId: 'g2', targetType: 'line-build-material', targetGroupId: 'g1' },
+      ],
+      virtualEdges: [],
+    }
+
+    // g2 is already in buildFlow (via buildMaterialTags), g1 has isolated node for advComp
+    const isolatedAdvComp = makeNode({ wareId: 'advancedcomposites', source: 'manual', isIsolated: true })
+    const producingAdvComp = makeNode({ wareId: 'advancedcomposites', source: 'manual' })
+    const logicGroup1 = makeGroup({ id: 'g1', nodes: [isolatedAdvComp] })
+    const logicGroup2 = makeGroup({ id: 'g2', nodes: [producingAdvComp] })
+
+    const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, [logicGroup1, logicGroup2])
+
+    // g2 should be in graph (from build flow), not duplicated
+    expect(graph.nodes.size).toBe(2)
+    expect(graph.nodes.has('g1')).toBe(true)
+    expect(graph.nodes.has('g2')).toBe(true)
   })
 })

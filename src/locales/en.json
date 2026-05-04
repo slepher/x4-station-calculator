@@ -58,6 +58,9 @@
     "import_flow_tooltip": "Load Logic Flow Plan",
     "import_flow_empty": "No saved logic flow plans",
     "unmatched": "Unplanned Line",
+    "group_build_material": "Build Material Lines",
+    "group_production": "Production Lines",
+    "build_material_allocation": "Build Material Allocation",
     "derived_locked": "Auto-generated; quantity calculated during compute"
   },
   "sector": {

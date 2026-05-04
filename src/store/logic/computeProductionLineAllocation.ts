@@ -5,8 +5,8 @@ import type {
   BuildFlowGroup,
   BuildFlowAssignment,
   VirtualEdge,
-  FlowNode,
 } from '@/types/x4'
+import { findGroupWithIsolatedWare } from './productionLineSearch'
 
 interface BuildFlowView {
   buildFlowGroups: BuildFlowGroup[]
@@ -105,20 +105,6 @@ function buildCoveredSet(
 }
 
 /**
- * 在 flow groups 中查找 isolated node
- */
-function findIsolatedNode(groups: ProductionLineGroup[], wareId: string): FlowNode | null {
-  for (const group of groups) {
-    for (const node of group.nodes) {
-      if (node.isIsolated && node.wareId === wareId) {
-        return node
-      }
-    }
-  }
-  return null
-}
-
-/**
  * 递归向上游遍历，生成派生 goals
  * @param covered 非孤立节点的已覆盖 ware 集合
  * @param seenIsolatedWares 已生成 derived goal 的孤立 ware 集合（防止重复）
@@ -134,8 +120,8 @@ function walkUpstream(
   const derived: BuildGoal[] = []
 
   for (const inputWareId of Object.keys(module.inputs)) {
-    const isolatedNode = findIsolatedNode(flowGroups, inputWareId)
-    if (isolatedNode && !seenIsolatedWares.has(inputWareId)) {
+    const isolatedResult = findGroupWithIsolatedWare(inputWareId, flowGroups)
+    if (isolatedResult && !seenIsolatedWares.has(inputWareId)) {
       derived.push({ type: 'derived-rate', wareId: inputWareId, ratePerHour: 0 })
       seenIsolatedWares.add(inputWareId)
     }
@@ -279,6 +265,24 @@ export function computeProductionLineAllocation(
         groupMap.set(group.id, list)
         assigned = true
         break
+      }
+    }
+    if (assigned) continue
+
+    // Layer 2.5: Isolated node matching (for derived-rate goals)
+    if (goal.type === 'derived-rate') {
+      for (const group of flowGroups) {
+        for (const node of group.nodes) {
+          if (node.isIsolated && node.wareId === wareId) {
+            console.log(`[allocation] goal ${goal.type}:${wareId} → Layer2.5/isolated → group ${group.id}`)
+            const list = groupMap.get(group.id) || []
+            list.push(goal)
+            groupMap.set(group.id, list)
+            assigned = true
+            break
+          }
+        }
+        if (assigned) break
       }
     }
     if (assigned) continue

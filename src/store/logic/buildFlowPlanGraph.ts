@@ -7,7 +7,9 @@ import type {
 import type {
   X4Module,
   SavedModule,
+  ProductionLineGroup,
 } from '@/types/x4'
+import { findGroupProducingWare } from './productionLineSearch'
 
 interface GraphNode extends Omit<BuildFlowPlanLine, 'trackedWares'> {
   trackedWares: Set<string>
@@ -73,20 +75,6 @@ function findLineBuildMaterialConnection(
   return null
 }
 
-function getGroupBuildMaterialWares(
-  groupId: string,
-  buildFlowView: BuildFlowPlanView
-): string[] {
-  for (const group of buildFlowView.buildFlowGroups) {
-    for (const card of group.lineCards) {
-      if (card.groupId === groupId) {
-        return card.buildMaterialTags.map(t => t.wareId)
-      }
-    }
-  }
-  return []
-}
-
 function getGroupDisplayName(
   groupId: string,
   buildFlowView: BuildFlowPlanView
@@ -99,6 +87,75 @@ function getGroupDisplayName(
     }
   }
   return groupId
+}
+
+export function getGroupIsolatedWares(
+  groupId: string,
+  groups: ProductionLineGroup[],
+): string[] {
+  const group = groups.find(g => g.id === groupId)
+  if (!group) return []
+  return group.nodes.filter(n => n.isIsolated).map(n => n.wareId)
+}
+
+export function isGroupInBuildFlowView(
+  groupId: string,
+  buildFlowView: BuildFlowPlanView,
+): boolean {
+  return buildFlowView.buildFlowGroups.some(group =>
+    group.lineCards.some(card => card.groupId === groupId),
+  )
+}
+
+export function getGroupBuildMaterialWaresWithConnection(
+  groupId: string,
+  buildFlowView: BuildFlowPlanView,
+): string[] {
+  for (const group of buildFlowView.buildFlowGroups) {
+    for (const card of group.lineCards) {
+      if (card.groupId === groupId) {
+        return card.buildMaterialTags
+          .map(t => t.wareId)
+          .filter(w => hasAnyConnection(w, groupId, buildFlowView))
+      }
+    }
+  }
+  return []
+}
+
+export function getGroupBuildCostWaresWithConnection(
+  groupId: string,
+  buildFlowView: BuildFlowPlanView,
+  groups: ProductionLineGroup[],
+  modulesMap: Record<string, X4Module>,
+): string[] {
+  const flowGroup = groups.find(g => g.id === groupId)
+  if (!flowGroup) return []
+
+  const moduleIds = new Set(flowGroup.nodes.filter(n => n.moduleId).map(n => n.moduleId!))
+  const buildCostWares = new Set<string>()
+
+  for (const modId of moduleIds) {
+    const mod = modulesMap[modId]
+    if (!mod || !mod.buildCost) continue
+    for (const wareId of Object.keys(mod.buildCost)) {
+      if (wareId !== 'energycells') {
+        buildCostWares.add(wareId)
+      }
+    }
+  }
+
+  return [...buildCostWares].filter(w => findOutputBuildConnection(w, buildFlowView) !== null)
+}
+
+function hasAnyConnection(
+  wareId: string,
+  targetGroupId: string,
+  buildFlowView: BuildFlowPlanView,
+): boolean {
+  if (findOutputBuildConnection(wareId, buildFlowView)) return true
+  if (findLineBuildMaterialConnection(wareId, buildFlowView, targetGroupId)) return true
+  return false
 }
 
 /**
@@ -154,7 +211,6 @@ function findSCCs(graph: Graph): string[][] {
         scc.push(w)
       } while (w !== v)
 
-      // Only keep SCCs with ≥ 2 nodes or self-loop
       let hasSelfLoop = false
       for (const edge of graph.edges) {
         if (edge.fromLineKey === v && edge.toLineKey === v) {
@@ -180,7 +236,8 @@ function findSCCs(graph: Graph): string[][] {
 export function buildFlowPlanGraph(
   cModules: SavedModule[],
   buildFlowView: BuildFlowPlanView | null,
-  modulesMap: Record<string, X4Module>
+  modulesMap: Record<string, X4Module>,
+  groups: ProductionLineGroup[] = [],
 ): BuildFlowPlanGraph {
   const graph: Graph = {
     nodes: new Map(),
@@ -200,21 +257,31 @@ export function buildFlowPlanGraph(
     }
   }
 
-  // BFS queue: { wareIds, fromKey, fromLabel }
   interface QueueItem {
     wareIds: string[]
     fromKey: string
     fromLabel: string
+    isIsolatedExpansion: boolean
   }
-  const queue: QueueItem[] = [{ wareIds: cWares, fromKey: '__C__', fromLabel: 'C buildCost' }]
+  const queue: QueueItem[] = [{ wareIds: cWares, fromKey: '__C__', fromLabel: 'C buildCost', isIsolatedExpansion: false }]
   const addedGroups = new Set<string>()
 
   while (queue.length > 0) {
     const item = queue.shift()!
     for (const wid of item.wareIds) {
-      const conn = item.fromKey === '__C__'
-        ? findOutputBuildConnection(wid, buildFlowView)
-        : findLineBuildMaterialConnection(wid, buildFlowView, item.fromKey)
+      let conn: { sourceGroupId: string } | null = null
+
+      if (item.isIsolatedExpansion) {
+        const result = findGroupProducingWare(wid, groups)
+        if (result) {
+          conn = result
+        }
+      } else if (item.fromKey === '__C__') {
+        conn = findOutputBuildConnection(wid, buildFlowView)
+      } else {
+        conn = findLineBuildMaterialConnection(wid, buildFlowView, item.fromKey)
+      }
+
       if (!conn) continue
 
       const targetKey = conn.sourceGroupId
@@ -232,14 +299,33 @@ export function buildFlowPlanGraph(
         graph.nodes.set(targetKey, node)
         addedGroups.add(targetKey)
 
-        // Get line buildMaterialTags for further BFS
-        const lineBuildWares = getGroupBuildMaterialWares(targetKey, buildFlowView)
+        let lineBuildWares: string[] = []
+
+        if (isGroupInBuildFlowView(targetKey, buildFlowView)) {
+          lineBuildWares = getGroupBuildMaterialWaresWithConnection(targetKey, buildFlowView)
+        } else if (groups.length > 0) {
+          lineBuildWares = getGroupBuildCostWaresWithConnection(targetKey, buildFlowView, groups, modulesMap)
+        }
+
         if (lineBuildWares.length > 0) {
           queue.push({
             wareIds: lineBuildWares,
             fromKey: targetKey,
             fromLabel: node.lineName + ' buildCost',
+            isIsolatedExpansion: false,
           })
+        }
+
+        if (groups.length > 0) {
+          const isolatedWares = getGroupIsolatedWares(targetKey, groups)
+          if (isolatedWares.length > 0) {
+            queue.push({
+              wareIds: isolatedWares,
+              fromKey: targetKey,
+              fromLabel: node.lineName + ' isolated',
+              isIsolatedExpansion: true,
+            })
+          }
         }
       } else {
         const node = graph.nodes.get(targetKey)!
@@ -255,7 +341,6 @@ export function buildFlowPlanGraph(
     }
   }
 
-  // SCC Detection using Tarjan's algorithm
   const sccGroups = findSCCs(graph)
 
   return {

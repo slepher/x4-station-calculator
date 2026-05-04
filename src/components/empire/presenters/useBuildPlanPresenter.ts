@@ -1,5 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
-import type { BuildGoal, BuildPlan, BuildScheme, ProductionLineAllocation } from '@/types/build-plan'
+import type { BuildGoal, BuildPlan, BuildScheme, BuildSchemeGroup, ProductionLineAllocation } from '@/types/build-plan'
 import type { EmpireGroupedFlows } from '@/types/x4'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -18,12 +18,15 @@ export interface BuildPlanPresenterProps {
   buildPlan: ComputedRef<BuildPlan | null>
   loading: ComputedRef<boolean>
   schemes: ComputedRef<BuildScheme[]>
+  schemeGroups: ComputedRef<BuildSchemeGroup[]>
   warnings: ComputedRef<string[]>
   currentFlows: ComputedRef<EmpireGroupedFlows>
   flowPlanName: ComputedRef<string>
   activeFlowPlanId: ComputedRef<string | null>
   loadableFlowPlans: ComputedRef<FlowPlanItem[]>
   allocations: ComputedRef<ProductionLineAllocation[]>
+  buildFlowPlanAllocations: ComputedRef<ProductionLineAllocation[]>
+  buildFlowPlanLoading: ComputedRef<boolean>
 }
 
 export interface BuildPlanPresenterEmits {
@@ -45,6 +48,9 @@ export interface BuildPlanPresenterStore {
   buildGoals: BuildGoal[]
   buildFlowMode: boolean
   buildPlan: BuildPlan | null
+  buildFlowPlanAllocations: ProductionLineAllocation[]
+  buildFlowPlanLoading: boolean
+  schemeGroups: BuildSchemeGroup[]
   computeBuildPlanLoading: boolean
   getEmpireGroupedFlows(): EmpireGroupedFlows
   setBuildGoal(goal: BuildGoal): void
@@ -92,6 +98,7 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
     buildPlan: computed(() => store.buildPlan),
     loading: computed(() => store.computeBuildPlanLoading),
     schemes: computed(() => store.buildPlan?.schemes || []),
+    schemeGroups: computed(() => store.schemeGroups),
     warnings: computed(() => {
       const plan = store.buildPlan
       if (!plan) return []
@@ -118,6 +125,8 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
       }))
     }),
     allocations,
+    buildFlowPlanAllocations: computed(() => store.buildFlowPlanAllocations),
+    buildFlowPlanLoading: computed(() => store.buildFlowPlanLoading),
   }
 
   const emits: BuildPlanPresenterEmits = {

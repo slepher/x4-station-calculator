@@ -157,6 +157,8 @@ const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
         :activeFlowPlanId="buildPlanPresenter.props.activeFlowPlanId.value"
         :loadableFlowPlans="buildPlanPresenter.props.loadableFlowPlans.value"
         :allocations="buildPlanPresenter.props.allocations.value"
+        :buildFlowPlanAllocations="buildPlanPresenter.props.buildFlowPlanAllocations.value"
+        :buildFlowPlanLoading="buildPlanPresenter.props.buildFlowPlanLoading.value"
         @add-goal="buildPlanPresenter.emits.addGoal"
         @remove-goal="buildPlanPresenter.emits.removeGoal"
         @update-goal="buildPlanPresenter.emits.updateGoal"
@@ -169,6 +171,7 @@ const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
       <BuildPlanPanel
         :schemes="buildPlanPresenter.props.schemes.value"
         :loading="buildPlanPresenter.props.loading.value"
+        :schemeGroups="buildPlanPresenter.props.schemeGroups.value"
       />
     </div>
     <div class="col-span-12 lg:col-span-5">

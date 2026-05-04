@@ -19,6 +19,8 @@ const props = defineProps<{
   activeFlowPlanId: string | null
   loadableFlowPlans: FlowPlanItem[]
   allocations: ProductionLineAllocation[]
+  buildFlowPlanAllocations?: ProductionLineAllocation[]
+  buildFlowPlanLoading?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -31,6 +33,27 @@ const emit = defineEmits<{
 }>()
 
 const schemeCount = computed(() => props.buildPlan?.schemes?.length || 0)
+
+const buildMaterialAllocations = computed(() => {
+  if (!props.buildFlowMode || !props.buildFlowPlanAllocations) return []
+  return props.buildFlowPlanAllocations.map(bma => {
+    const prodAlloc = props.allocations.find(a => a.groupId === bma.groupId)
+    if (!prodAlloc) return bma
+    const existingWares = new Set(bma.goals.map(g => (g as any).wareId))
+    const merged = prodAlloc.goals.filter(g => !existingWares.has((g as any).wareId))
+    return merged.length > 0
+      ? { ...bma, goals: [...bma.goals, ...merged] }
+      : bma
+  })
+})
+
+const productionLineAllocations = computed(() => {
+  if (!props.buildFlowMode || !props.buildFlowPlanAllocations || props.buildFlowPlanAllocations.length === 0) {
+    return props.allocations
+  }
+  const buildMatGroupIds = new Set(props.buildFlowPlanAllocations.map(a => a.groupId))
+  return props.allocations.filter(a => !a.groupId || !buildMatGroupIds.has(a.groupId))
+})
 
 function onCompute() {
   emit('computePlan')
@@ -154,7 +177,25 @@ onUnmounted(() => {
 
       <BuildGoalSearchBox :racePreference="racePreference" @addGoal="emit('addGoal', $event)" />
 
+      <template v-if="buildFlowMode && buildMaterialAllocations.length > 0">
+        <ProductionLineAllocationSection
+          :allocations="buildMaterialAllocations"
+          :goals="[]"
+          :racePreference="racePreference"
+          :title="t('build_plan.group_build_material')"
+          :readonly="true"
+        />
+        <ProductionLineAllocationSection
+          :allocations="productionLineAllocations"
+          :goals="goals"
+          :racePreference="racePreference"
+          :title="t('build_plan.group_production')"
+          @update-goal="onUpdateGoal"
+          @remove-goal="onRemoveGoal"
+        />
+      </template>
       <ProductionLineAllocationSection
+        v-else
         :allocations="allocations"
         :goals="goals"
         :racePreference="racePreference"
