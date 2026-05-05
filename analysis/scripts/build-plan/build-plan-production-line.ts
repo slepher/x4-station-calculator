@@ -2,7 +2,8 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { deriveBuildFlowView, computeVirtualEdges } from '@/store/logic/buildFlowDerivation'
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
-import { expandGoalDependencies, mergeModules, computeFlowPlanLines, makeSchemesWithGroups } from '@/store/logic/calculateBuildFlowPlan'
+import { expandGoalDependencies, mergeModules, computeFlowPlanLines, makeSchemesWithGroups, expandGoalsWithAutoFill } from '@/store/logic/calculateBuildFlowPlan'
+import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 import { computeGap } from '@/store/logic/computeGap'
 import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup } from '@/types/build-plan'
@@ -177,8 +178,7 @@ const derived = deriveBuildFlowView(groups, modulesMap, groupDisplayNames, getWa
 const virtualEdges = computeVirtualEdges(derived.buildFlowGroups, assignments, archivedGroupIds, groups)
 const buildFlowView: BuildFlowPlanView = { buildFlowGroups: derived.buildFlowGroups, assignments, virtualEdges }
 
-const baseModules = goals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap))
-const cModules = mergeModules(baseModules)
+const cModules = expandGoalsWithAutoFill(goals, modulesMap, waresMap, settings)
 const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, groups)
 
 // ---- Compute line modules & grouped schemes ----

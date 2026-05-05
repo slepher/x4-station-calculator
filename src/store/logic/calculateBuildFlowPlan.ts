@@ -31,6 +31,28 @@ export function mergeModules(modules: SavedModule[]): SavedModule[] {
   return Array.from(map.entries()).map(([id, count]) => ({ id, count }))
 }
 
+export function expandGoalsWithAutoFill(
+  goals: BuildGoal[],
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+  settings: StationSettings,
+): SavedModule[] {
+  let result: SavedModule[] = []
+  for (const goal of goals) {
+    const base = expandGoalDependencies(goal, modulesMap, waresMap)
+    const merged = mergeModules(base)
+    const autoFill = calculateAutoFillModules({
+      plannedModules: merged,
+      settings,
+      modulesMap,
+      waresMap,
+      lockedWares: [],
+    })
+    result = mergeModules([...result, ...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
+  }
+  return result
+}
+
 function computeBuildRates(
   modules: SavedModule[],
   modulesMap: Record<string, X4Module>
