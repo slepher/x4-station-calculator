@@ -369,11 +369,24 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   function computeBuildFlowPlanAllocations(
     graph: BuildFlowPlanGraph,
   ): ProductionLineAllocation[] {
+    // Collect wares flowing through isolated edges per producer groupId
+    const isolatedProducerWares = new Map<string, Set<string>>()
+    for (const edge of graph.edges) {
+      if (edge.sourceLabel.includes('isolated')) {
+        const set = isolatedProducerWares.get(edge.toLineKey) || new Set()
+        set.add(edge.wareId)
+        isolatedProducerWares.set(edge.toLineKey, set)
+      }
+    }
+
     const result: ProductionLineAllocation[] = []
     for (const [groupId, node] of graph.nodes) {
       const goals: BuildGoal[] = []
+      const isolatedWares = isolatedProducerWares.get(groupId) || new Set()
       for (const wareId of node.trackedWares) {
-        goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
+        if (!isolatedWares.has(wareId)) {
+          goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
+        }
       }
       if (goals.length > 0) {
         result.push({
