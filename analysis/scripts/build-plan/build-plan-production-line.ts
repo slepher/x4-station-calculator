@@ -4,6 +4,7 @@ import { deriveBuildFlowView, computeVirtualEdges } from '@/store/logic/buildFlo
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
 import { expandGoalDependencies, mergeModules, computeFlowPlanLines, makeSchemesWithGroups } from '@/store/logic/calculateBuildFlowPlan'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
+import { computeGap } from '@/store/logic/computeGap'
 import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup } from '@/types/build-plan'
 import type { X4Module, X4Ware, ProductionLineGroup, FlowNode, SavedFlowGroup, BuildFlowAssignment, VirtualEdge } from '@/types/x4'
 
@@ -191,6 +192,12 @@ if (useJson) console.log = savedLog
 
 const schemeGroups = makeSchemesWithGroups(graph, lineAllocations, modulesMap, waresMap, settings)
 
+// Compute gap for required-production wares
+const gap = computeGap(lineAllocations, modulesMap, waresMap)
+const gapSummary = Object.keys(gap).length > 0
+  ? Object.entries(gap).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`).join(', ')
+  : '(无)'
+
 // ---- Output ----
 
 if (useJson) {
@@ -330,6 +337,56 @@ for (const sg of schemeGroups) {
       }
     }
   }
+}
+
+// ── 需求来源与满足率明细 ──
+console.log(`\n${sep}`)
+console.log('  需求来源与满足率:')
+
+const allocByGroupId = new Map(lineAllocations.filter(a => a.groupId).map(a => [a.groupId!, a]))
+
+for (const [groupId, node] of graph.nodes) {
+  const alloc = allocByGroupId.get(groupId)
+  const tag = node.isSelfBootstrap ? 'SELF-BOOT' : (graph.sccGroups.some(scc => scc.includes(groupId)) ? 'SCC' : 'DAG')
+  console.log(`\n  [${tag}] ${node.lineName}`)
+
+  // Manual goals from allocation
+  const manualWares: string[] = []
+  const manualModules: string[] = []
+  const requiredWares: { id: string; name: string }[] = []
+  if (alloc) {
+    for (const g of alloc.goals) {
+      if (g.type === 'production-rate') manualWares.push(`${wareName(g.wareId)} ${g.ratePerHour}/h`)
+      else if (g.type === 'build-module') manualModules.push(`${modName(g.moduleId)} ×${g.count}`)
+      else if (g.type === 'required-production') requiredWares.push({ id: g.wareId, name: wareName(g.wareId) })
+    }
+  }
+  if (manualWares.length > 0) console.log(`    手工ware: ${manualWares.join(', ')}`)
+  if (manualModules.length > 0) console.log(`    手工module: ${manualModules.join(', ')}`)
+  if (requiredWares.length > 0) {
+    const gapRates = requiredWares.map(w => `${w.name}: ${(gap[w.id] || 0).toFixed(1)}/h`)
+    console.log(`    gap: ${gapRates.join(', ')}`)
+  }
+
+  // Net production & satisfaction
+  const net = node.netProduction
+  if (net && Object.keys(net).length > 0) {
+    console.log('    满足率:')
+    for (const [wareId, rate] of Object.entries(net)) {
+      if ((rate as number) <= 0.01) continue
+      const gapReq = (alloc?.goals || []).some(g => g.type === 'required-production' && g.wareId === wareId) ? (gap[wareId] || 0) : 0
+      const manualReq = (alloc?.goals || []).filter(g => g.type === 'production-rate' && g.wareId === wareId)
+        .reduce((s, g) => s + g.ratePerHour, 0)
+      const buildCostReq = (node as any)._buildCostRates?.[wareId] || 0
+      const total = Math.max(gapReq + manualReq + buildCostReq, 0.001)
+      const sat = Math.min((rate as number) / total * 100, 999)
+      console.log(`      ${wareName(wareId).padEnd(20)}: 产出 ${(rate as number).toFixed(1)}/h, 目标 ${total.toFixed(1)}/h, 满足率 ${sat.toFixed(1)}%`)
+    }
+  }
+}
+
+if (Object.keys(gap).length > 0) {
+  console.log(`\n  gap 汇总: ${Object.entries(gap).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`).join(', ')}`)
 }
 
 console.log(`\n${sep}`)
