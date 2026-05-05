@@ -358,7 +358,59 @@ function splitCToLineSchemes(goals, allocations, modulesMap, waresMap):
   return result
 ```
 
-### 5. 重叠产线合并
+### 5. Gap 计算
+
+#### 定义
+
+`gap[wareId]` = 所有包含 `required-production` wareId 的产线，其模块对该 ware 的 `inputs` 消耗速率之和。
+
+```
+function computeGap(allocations, modulesMap):
+  gap: Record<wareId, number> = {}
+  for each alloc in allocations:
+    for each goal in alloc.goals:
+      if goal.type == 'required-production':
+        for each module of alloc:
+          gap[goal.wareId] += module.inputs[goal.wareId] * module.count
+  return gap
+```
+
+#### 在生产计算中的应用
+
+对于非 greedy 产线（`computeDagLine`）：
+
+```
+目标产量[ware] = max(建材需求[ware] || 0, gap[ware] || 0) 
+                + 手动ware[ware] + module换算[ware]
+```
+
+其中：
+- `建材需求` = `collectDemandSources` 返回的 edge.rates（各来源 `Math.max`）
+- `gap` = `computeGap` 结果中本产线 `required-production` 对应的消耗
+- `手动ware` = 用户手工添加的 `production-rate` goal 的 `ratePerHour`
+- `module换算` = 用户手工添加的 `build-module` goal 的模块产出速率
+
+对于 greedy 产线（`self-bootstrap` / SCC）：
+
+```
+满足率[ware] = 当前产出 / (建材需求[ware] + gap[ware] + 手动ware[ware] + module换算[ware])
+
+当 建材需求[ware] = 0 时：
+  先忽略该 ware，等其他所有 ware 满足率 ≥ 100% 后，
+  逐个添加该 ware 的模块（每次 +1），
+  然后重新检查所有 wares 的满足率（因为新增模块可能引入新建材需求），
+  循环直到 建材需求=0 的 wares 也不再新增模块为止。
+```
+
+#### 输入参数变化
+
+`computeDagLine` / `greedyFillForLine` 新增参数：
+
+```typescript
+gap: Record<string, number>       // required-production  消耗速率
+manualWares: Record<string, number>  // 手工 ware 的 ratePerHour
+manualModuleRates: Record<string, number>  // 手工 module 的产出速率
+```
 
 #### 检测与合并
 

@@ -212,8 +212,7 @@ export function expandGoalDependencies(
     }
     case 'derived-rate':
     case 'derived-production':
-    case 'derived-build-material':
-    case 'required-production': {
+    case 'derived-build-material': {
       expandWareUpstream(goal.wareId, goal.ratePerHour, new Set())
       break
     }
@@ -263,7 +262,8 @@ function greedyFillForLine(
   currentEmpireModules: SavedModule[],
   settings: StationSettings,
   modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>
+  waresMap: Record<string, X4Ware>,
+  _gap2: Record<string, number> = {},
 ): BuildGroup[] {
   const built: SavedModule[] = []
   const groups: BuildGroup[] = []
@@ -322,6 +322,19 @@ function greedyFillForLine(
     }
   }
 
+  // Add gap rates additively to external source rates
+  for (const [w, r] of Object.entries(_gap2)) {
+    if (r > 0) sourceRates[w] = (sourceRates[w] || 0) + r
+  }
+
+  // Identify wares with build material demand (non-zero in external sources)
+  const hasExternalDemand = new Set<string>()
+  for (const src of externalSources) {
+    for (const [w, r] of Object.entries(src.rates)) {
+      if (r > 0) hasExternalDemand.add(w)
+    }
+  }
+
   while (true) {
     currentAutoModules = getAutoModules(built)
     const net = contextNet()
@@ -329,6 +342,21 @@ function greedyFillForLine(
     const allSources = [...externalSources]
     const sd = selfDemand()
     if (sd) allSources.push(sd)
+    // Add gap rates additively to the first external source
+    const gapRates: Record<string, number> = {}
+    for (const [w, r] of Object.entries(_gap2)) {
+      if (r > 0) gapRates[w] = r
+    }
+    if (Object.keys(gapRates).length > 0 && allSources.length > 0) {
+      const first = allSources[0]
+      if (first) {
+        for (const [w, r] of Object.entries(gapRates)) {
+          first.rates[w] = (first.rates[w] || 0) + r
+        }
+      }
+    } else if (Object.keys(gapRates).length > 0) {
+      allSources.push({ label: 'gap_demand', rates: gapRates })
+    }
 
     let allMet = true
     for (const src of allSources) {
@@ -362,15 +390,32 @@ function greedyFillForLine(
       }
       if (isGreedyDebug()) console.log(`[NEW] built=0 bottleneck: ${bottleneckWare} (highest rate: ${highest})`)
     } else {
+      // Phase 1: bottleneck among external-demand wares (建材>0)
       for (const src of allSources) {
         for (const [wareId, rate] of Object.entries(src.rates)) {
           if (wareId === 'energycells' || rate <= 0) continue
+          if (!hasExternalDemand.has(wareId)) continue
           const prodRate = Math.max(0, net[wareId] ?? 0)
           const satRate = prodRate / rate
           if (satRate < worstSat) {
             worstSat = satRate
             bottleneckWare = wareId
           }
+        }
+      }
+      // Phase 2: if all external-demand wares satisfied, try zero-build wares
+      if (!bottleneckWare) {
+        for (const src of allSources) {
+          for (const [wareId, rate] of Object.entries(src.rates)) {
+            if (wareId === 'energycells' || rate <= 0) continue
+            if (hasExternalDemand.has(wareId)) continue
+            const prodRate = Math.max(0, net[wareId] ?? 0)
+            if (prodRate + 0.001 < rate) {
+              bottleneckWare = wareId
+              break
+            }
+          }
+          if (bottleneckWare) break
         }
       }
     }
@@ -541,17 +586,18 @@ export function computeFlowPlanLines(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
-  currentEmpireModules: SavedModule[]
+  currentEmpireModules: SavedModule[],
+  gap: Record<string, number> = {},
 ): void {
   const order = buildTopologicalOrder(graph)
 
   for (const entry of order) {
     if (Array.isArray(entry)) {
-      computeSCCGroup(entry, graph, modulesMap, waresMap, settings, currentEmpireModules)
+      computeSCCGroup(entry, graph, modulesMap, waresMap, settings, currentEmpireModules, gap)
     } else {
       const node = graph.nodes.get(entry)
       if (!node) continue
-      computeDagLine(node, graph, modulesMap, waresMap, settings, currentEmpireModules)
+      computeDagLine(node, graph, modulesMap, waresMap, settings, currentEmpireModules, gap)
     }
   }
 }
@@ -562,9 +608,22 @@ function computeDagLine(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
-  currentEmpireModules: SavedModule[]
+  currentEmpireModules: SavedModule[],
+  gap: Record<string, number> = {},
 ): void {
   const demandSources = collectDemandSources(node, graph, modulesMap)
+
+  // Add gap rates as additive demand — max(建材) + gap
+  if (Object.keys(gap).length > 0 && demandSources.length > 0) {
+    const first = demandSources[0]
+    if (first) {
+      for (const [w, r] of Object.entries(gap)) {
+        if (r > 0) first.rates[w] = (first.rates[w] || 0) + r
+      }
+    }
+  } else if (Object.keys(gap).length > 0) {
+    demandSources.push({ label: 'gap_demand', rates: { ...gap } })
+  }
 
   // Check self-bootstrap
   const buildCostWares = getBuildCostWares(node, modulesMap)
@@ -597,15 +656,32 @@ function computeSCCGroup(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
-  currentEmpireModules: SavedModule[]
+  currentEmpireModules: SavedModule[],
+  _gap: Record<string, number> = {},
 ): void {
   const sccNodes = sccKeys.map(k => graph.nodes.get(k)!).filter(Boolean)
   if (sccNodes.length === 0) return
+
+  // Pre-compute gapRates once
+  const gapRates: Record<string, number> = {}
+  for (const [w, r] of Object.entries(_gap)) {
+    if (r > 0) gapRates[w] = r
+  }
 
   // Single-node SCC: call greedyFillForLine once (same as old algorithm)
   if (sccNodes.length === 1) {
     const node = sccNodes[0]!
     const demandSources = collectDemandSources(node, graph, modulesMap)
+    if (Object.keys(gapRates).length > 0 && demandSources.length > 0) {
+      const first = demandSources[0]
+      if (first) {
+        for (const [w, r] of Object.entries(gapRates)) {
+          first.rates[w] = (first.rates[w] || 0) + r
+        }
+      }
+    } else if (Object.keys(gapRates).length > 0) {
+      demandSources.push({ label: 'gap_demand', rates: { ...gapRates } })
+    }
     const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
@@ -628,6 +704,18 @@ function computeSCCGroup(
       const selfWares = new Set<string>()
       for (const w of node.trackedWares) {
         if (buildCostWares.has(w)) selfWares.add(w)
+      }
+
+      // Add gap rates additively to the first demand source
+      if (Object.keys(gapRates).length > 0 && demandSources.length > 0) {
+        const first = demandSources[0]
+        if (first) {
+          for (const [w, r] of Object.entries(gapRates)) {
+            first.rates[w] = (first.rates[w] || 0) + r
+          }
+        }
+      } else if (Object.keys(gapRates).length > 0) {
+        demandSources.push({ label: 'gap_demand', rates: { ...gapRates } })
       }
 
       if (selfWares.size > 0) {
@@ -832,7 +920,7 @@ export function splitCToLineSchemes(
     const netProduction = calculateNetProduction(lineModules, modulesMap, settings.considerWorkforceForAutoFill, settings.sunlight)
     const purposeModules: string[] = []
     for (const g of goals) {
-      if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production') {
+      if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
         if (!purposeModules.includes(g.wareId)) purposeModules.push(g.wareId)
       } else if (g.type === 'build-module') {
         const mod = modulesMap[g.moduleId]

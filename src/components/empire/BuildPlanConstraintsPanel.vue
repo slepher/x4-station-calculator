@@ -39,7 +39,10 @@ const buildMaterialAllocations = computed(() => {
   return props.buildFlowPlanAllocations.map(bma => {
     const prodAlloc = props.allocations.find(a => a.groupId === bma.groupId)
     if (!prodAlloc) return bma
-    return { ...bma, goals: [...bma.goals, ...prodAlloc.goals] }
+    // Dedup by (type, wareId) pair — keep distinct goals from both sources
+    const existing = new Set(bma.goals.map(g => `${g.type}:${(g as any).wareId ?? ''}`))
+    const extra = prodAlloc.goals.filter(g => !existing.has(`${g.type}:${(g as any).wareId ?? ''}`))
+    return extra.length > 0 ? { ...bma, goals: [...bma.goals, ...extra] } : bma
   })
 })
 

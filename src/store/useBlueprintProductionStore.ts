@@ -26,6 +26,7 @@ import { computeFlowPlanLines, makeSchemes, makeSchemesWithGroups, expandGoalDep
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
 import { mergeIntoExistingPlan, rebuildSchemeGroups } from '@/store/logic/mergeIntoExistingPlan'
+import { computeGap } from '@/store/logic/computeGap'
 import { useLogicFlowStore } from './useLogicFlowStore'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -135,7 +136,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
           primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
           transportShipCapacity: 62000, enforceDlcActivation: false,
         }
-        computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [])
 
         let flowGroups: ProductionLineGroup[] = []
         let buildFlowView: BuildFlowPlanView | null = null
@@ -158,6 +158,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         const lineAllocations = flowGroups.length > 0
           ? computeProductionLineAllocation(goals, flowGroups, buildFlowView, deps.modulesMap, modulesByOutputMap)
           : []
+
+        const gap = computeGap(lineAllocations, deps.modulesMap, deps.waresMap)
+        computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [], gap)
 
         const localizedAllocations = lineAllocations.map(a => ({
           ...a,
@@ -223,7 +226,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       // Only generate C scheme (no material lines)
       const cGoalWareIds: string[] = []
       for (const g of goals) {
-        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production') {
+        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
           cGoalWareIds.push(g.wareId)
         } else if (g.type === 'build-module') {
           const mod = deps.modulesMap[g.moduleId]
@@ -285,7 +288,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       // No flow plan: return only C scheme
       const cGoalWareIds: string[] = []
       for (const g of goals) {
-        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production') {
+        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
           cGoalWareIds.push(g.wareId)
         } else if (g.type === 'build-module') {
           const mod = deps.modulesMap[g.moduleId]
@@ -333,7 +336,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     // Pass goal ware IDs for C scheme label
     const goalWareIds: string[] = []
     for (const g of goals) {
-      if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production') {
+      if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
         goalWareIds.push(g.wareId)
       } else if (g.type === 'build-module') {
         const mod = deps.modulesMap[g.moduleId]
@@ -369,23 +372,39 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   function computeBuildFlowPlanAllocations(
     graph: BuildFlowPlanGraph,
   ): ProductionLineAllocation[] {
-    // Collect wares flowing through isolated edges per producer groupId
-    const isolatedProducerWares = new Map<string, Set<string>>()
+    // For each isolated edge, track consumer-side and producer-side
+    const consumerRequired = new Map<string, Set<string>>()   // fromLineKey → {wareIds}  → required-production
+    const producerSupplied = new Map<string, Set<string>>()    // toLineKey   → {wareIds}  → derived-production
+
     for (const edge of graph.edges) {
       if (edge.sourceLabel.includes('isolated')) {
-        const set = isolatedProducerWares.get(edge.toLineKey) || new Set()
-        set.add(edge.wareId)
-        isolatedProducerWares.set(edge.toLineKey, set)
+        // Consumer side: needs this ware but doesn't produce it
+        const cSet = consumerRequired.get(edge.fromLineKey) || new Set()
+        cSet.add(edge.wareId)
+        consumerRequired.set(edge.fromLineKey, cSet)
+        // Producer side: supplies this ware to meet consumer's need
+        const pSet = producerSupplied.get(edge.toLineKey) || new Set()
+        pSet.add(edge.wareId)
+        producerSupplied.set(edge.toLineKey, pSet)
       }
     }
 
     const result: ProductionLineAllocation[] = []
     for (const [groupId, node] of graph.nodes) {
       const goals: BuildGoal[] = []
-      const isolatedWares = isolatedProducerWares.get(groupId) || new Set()
+      const derivedSet = producerSupplied.get(groupId) || new Set()
+      const requiredSet = consumerRequired.get(groupId) || new Set()
+
       for (const wareId of node.trackedWares) {
-        if (!isolatedWares.has(wareId)) {
+        if (derivedSet.has(wareId)) {
+          goals.push({ type: 'derived-production', wareId, ratePerHour: 0 })
+        } else {
           goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
+        }
+      }
+      for (const wareId of requiredSet) {
+        if (!goals.some(g => (g as any).wareId === wareId)) {
+          goals.push({ type: 'required-production', wareId, ratePerHour: 0 })
         }
       }
       if (goals.length > 0) {
