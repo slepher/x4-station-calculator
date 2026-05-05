@@ -345,7 +345,7 @@ console.log('  需求来源与满足率:')
 
 const allocByGroupId = new Map(lineAllocations.filter(a => a.groupId).map(a => [a.groupId!, a]))
 // Build scheme lookup by label for target rates
-const schemeByLabel = new Map<string, { targetRates: Record<string, number> }>()
+const schemeByLabel = new Map<string, BuildScheme>()
 for (const sg of schemeGroups) {
   for (const s of sg.schemes) schemeByLabel.set(s.label, s)
 }
@@ -373,24 +373,49 @@ for (const [groupId, node] of graph.nodes) {
     const gapRates = requiredWares.map(w => `${w.name}: ${(gap[w.id] || 0).toFixed(1)}/h`)
     console.log(`    gap: ${gapRates.join(', ')}`)
   }
-  if (scheme && scheme.targetRates && Object.keys(scheme.targetRates).length > 0) {
-    console.log('    总目标速率:')
-    for (const [w, r] of Object.entries(scheme.targetRates)) {
-      if ((r as number) > 0) console.log(`      ${wareName(w)}: ${(r as number).toFixed(1)}/h`)
-    }
-  }
 
   // Net production & satisfaction
   const net = node.netProduction
   if (net && Object.keys(net).length > 0) {
-    console.log('    满足率:')
-    for (const [wareId, rate] of Object.entries(net)) {
-      if ((rate as number) <= 0.01) continue
-      let total = 0.001
-      if (scheme?.targetRates?.[wareId]) total = scheme.targetRates[wareId]
-      else if (gap[wareId]) total = gap[wareId]
-      const sat = Math.min((rate as number) / total * 100, 999)
-      console.log(`      ${wareName(wareId).padEnd(20)}: 产出 ${(rate as number).toFixed(1)}/h, 目标 ${total.toFixed(1)}/h, 满足率 ${sat.toFixed(1)}%`)
+    const targetSet = new Set(Object.keys(scheme?.targetRates || {}))
+    for (const w of Object.keys(gap)) targetSet.add(w)
+    const tracked = Object.entries(net).filter(([w]) => targetSet.has(w))
+    if (tracked.length > 0) {
+      console.log('    满足率:')
+      for (const [wareId, rate] of tracked) {
+        if ((rate as number) <= 0.01) continue
+        // Compute demand breakdown
+        const gapReq = gap[wareId] || 0
+        const manualWareReq = (alloc?.goals || []).filter(g => g.type === 'production-rate' && g.wareId === wareId)
+          .reduce((s, g) => s + g.ratePerHour, 0)
+        const manualModReq = (alloc?.goals || []).filter(g => g.type === 'build-module').reduce((s, g) => {
+          const mod = modulesMap[g.moduleId]
+          const out = mod?.outputs?.[wareId]
+          return out ? s + out / (mod.cycleTime || 60) * 3600 * g.count : s
+        }, 0)
+        const buildMatMax = scheme?.targetRates?.[wareId] || 0
+        const total = Math.max(buildMatMax + gapReq + manualWareReq + manualModReq, 0.001)
+        const sat = Math.min((rate as number) / total * 100, 999)
+        console.log(`      ${wareName(wareId)}:`)
+        console.log(`        建材max:   ${buildMatMax.toFixed(1)}/h`)
+        for (const src of (scheme?.targetRateSources || [])) {
+          const r = src.rates[wareId]
+          if (!r || r <= 0) continue
+          const qty = src.materials?.[wareId]
+          const buildTime = qty ? qty / r * 3600 : 0
+          const line = qty
+            ? `总量 ${qty.toFixed(0)} 单元, 建筑时间 ${buildTime.toFixed(0)}s, 速率 ${r.toFixed(1)}/h`
+            : `速率 ${r.toFixed(1)}/h`
+          console.log(`          ${src.label}: ${line}`)
+        }
+        if (gapReq > 0) console.log(`        gap:       ${gapReq.toFixed(1)}/h`)
+        if (manualWareReq > 0) console.log(`        手动ware:  ${manualWareReq.toFixed(1)}/h`)
+        if (manualModReq > 0) console.log(`        手动module:${manualModReq.toFixed(1)}/h`)
+        console.log(`        ────────`)
+        console.log(`        目标合计:  ${total.toFixed(1)}/h`)
+        console.log(`        产出:     ${(rate as number).toFixed(1)}/h`)
+        console.log(`        满足率:   ${sat.toFixed(1)}%`)
+      }
     }
   }
 }
