@@ -344,9 +344,15 @@ console.log(`\n${sep}`)
 console.log('  需求来源与满足率:')
 
 const allocByGroupId = new Map(lineAllocations.filter(a => a.groupId).map(a => [a.groupId!, a]))
+// Build scheme lookup by label for target rates
+const schemeByLabel = new Map<string, { targetRates: Record<string, number> }>()
+for (const sg of schemeGroups) {
+  for (const s of sg.schemes) schemeByLabel.set(s.label, s)
+}
 
 for (const [groupId, node] of graph.nodes) {
   const alloc = allocByGroupId.get(groupId)
+  const scheme = schemeByLabel.get(node.lineName)
   const tag = node.isSelfBootstrap ? 'SELF-BOOT' : (graph.sccGroups.some(scc => scc.includes(groupId)) ? 'SCC' : 'DAG')
   console.log(`\n  [${tag}] ${node.lineName}`)
 
@@ -367,6 +373,12 @@ for (const [groupId, node] of graph.nodes) {
     const gapRates = requiredWares.map(w => `${w.name}: ${(gap[w.id] || 0).toFixed(1)}/h`)
     console.log(`    gap: ${gapRates.join(', ')}`)
   }
+  if (scheme && scheme.targetRates && Object.keys(scheme.targetRates).length > 0) {
+    console.log('    总目标速率:')
+    for (const [w, r] of Object.entries(scheme.targetRates)) {
+      if ((r as number) > 0) console.log(`      ${wareName(w)}: ${(r as number).toFixed(1)}/h`)
+    }
+  }
 
   // Net production & satisfaction
   const net = node.netProduction
@@ -374,11 +386,9 @@ for (const [groupId, node] of graph.nodes) {
     console.log('    满足率:')
     for (const [wareId, rate] of Object.entries(net)) {
       if ((rate as number) <= 0.01) continue
-      const gapReq = (alloc?.goals || []).some(g => g.type === 'required-production' && g.wareId === wareId) ? (gap[wareId] || 0) : 0
-      const manualReq = (alloc?.goals || []).filter(g => g.type === 'production-rate' && g.wareId === wareId)
-        .reduce((s, g) => s + g.ratePerHour, 0)
-      const buildCostReq = (node as any)._buildCostRates?.[wareId] || 0
-      const total = Math.max(gapReq + manualReq + buildCostReq, 0.001)
+      let total = 0.001
+      if (scheme?.targetRates?.[wareId]) total = scheme.targetRates[wareId]
+      else if (gap[wareId]) total = gap[wareId]
       const sat = Math.min((rate as number) / total * 100, 999)
       console.log(`      ${wareName(wareId).padEnd(20)}: 产出 ${(rate as number).toFixed(1)}/h, 目标 ${total.toFixed(1)}/h, 满足率 ${sat.toFixed(1)}%`)
     }
@@ -401,9 +411,12 @@ console.log(`\n  产线 ↔ 目标映射:`)
 for (const alloc of lineAllocations) {
   const name = alloc.groupName || alloc.groupId?.slice(0, 8) || '(待规划)'
   const goalStrs = alloc.goals.map(g => {
-    if (g.type === 'production-rate' || g.type === 'derived-rate')
-      return `${wareName(g.wareId)}${g.type === 'derived-rate' ? '(derived)' : ''} ${g.ratePerHour}/h`
-    return `${modName(g.moduleId)} ×${g.count}`
+    if (g.type === 'production-rate') return `${wareName(g.wareId)} ${g.ratePerHour}/h`
+    if (g.type === 'build-module') return `${modName(g.moduleId)} ×${g.count}`
+    if (g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production')
+      return `${wareName(g.wareId)} (${g.type})`
+    if (g.type === 'derived-rate') return `${wareName(g.wareId)}(derived) ${g.ratePerHour}/h`
+    return `?`
   })
   console.log(`  ${alloc.isUnmatched ? '⚠' : ' '} ${name}: ${goalStrs.join(', ')}`)
 }
