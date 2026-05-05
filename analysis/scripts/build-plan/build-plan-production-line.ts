@@ -181,22 +181,25 @@ const buildFlowView: BuildFlowPlanView = { buildFlowGroups: derived.buildFlowGro
 const cModules = expandGoalsWithAutoFill(goals, modulesMap, waresMap, settings)
 const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, groups)
 
-// ---- Compute line modules & grouped schemes ----
-
-computeFlowPlanLines(graph, modulesMap, waresMap, settings, [])
-
+// ---- Compute gap first, then line modules with gap ----
 const savedLog = console.log
 if (useJson) console.log = () => {}
 const lineAllocations = computeProductionLineAllocation(goals, groups, buildFlowView, modulesMap, modulesByOutputMap)
 if (useJson) console.log = savedLog
 
-const schemeGroups = makeSchemesWithGroups(graph, lineAllocations, modulesMap, waresMap, settings)
+// Pass 1: compute line modules without gap to get module data for graph nodes
+computeFlowPlanLines(graph, modulesMap, waresMap, settings, [])
 
-// Compute gap for required-production wares
-const gap = computeGap(lineAllocations, modulesMap, waresMap)
+// Compute gap from allocations + graph node modules (now populated)
+const gap = computeGap(lineAllocations, modulesMap, waresMap, graph.nodes)
 const gapSummary = Object.keys(gap).length > 0
   ? Object.entries(gap).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`).join(', ')
   : '(无)'
+
+// Pass 2: recompute with gap
+computeFlowPlanLines(graph, modulesMap, waresMap, settings, [], gap)
+
+const schemeGroups = makeSchemesWithGroups(graph, lineAllocations, modulesMap, waresMap, settings)
 
 // ---- Output ----
 

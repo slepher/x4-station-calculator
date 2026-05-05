@@ -1,11 +1,31 @@
 import type { X4Module, X4Ware, SavedModule } from '@/types/x4'
-import type { ProductionLineAllocation } from '@/types/build-plan'
+import type { ProductionLineAllocation, BuildFlowPlanLine } from '@/types/build-plan'
 import { expandGoalDependencies, mergeModules } from './calculateBuildFlowPlan'
+
+function addInputConsumption(
+  gap: Record<string, number>,
+  modules: SavedModule[],
+  requiredWares: string[],
+  modulesMap: Record<string, X4Module>,
+): void {
+  for (const m of modules) {
+    const mod = modulesMap[m.id]
+    if (!mod || !mod.inputs) continue
+    const cycleHourly = 3600 / (mod.cycleTime || 60)
+    for (const w of requiredWares) {
+      const inputPerCycle = mod.inputs[w]
+      if (inputPerCycle) {
+        gap[w] = (gap[w] || 0) + inputPerCycle * m.count * cycleHourly
+      }
+    }
+  }
+}
 
 export function computeGap(
   allocations: ProductionLineAllocation[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
+  graphNodes?: Map<string, BuildFlowPlanLine>,
 ): Record<string, number> {
   const gap: Record<string, number> = {}
 
@@ -18,7 +38,6 @@ export function computeGap(
     }
     if (requiredWares.length === 0) continue
 
-    // Expand all production-type goals to get total modules
     let allModules: SavedModule[] = []
     for (const goal of alloc.goals) {
       if (goal.type === 'build-module') {
@@ -30,17 +49,15 @@ export function computeGap(
         ])
       }
     }
+    addInputConsumption(gap, allModules, requiredWares, modulesMap)
+  }
 
-    for (const m of allModules) {
-      const mod = modulesMap[m.id]
-      if (!mod || !mod.inputs) continue
-      const cycleHourly = 3600 / (mod.cycleTime || 60)
-      for (const w of requiredWares) {
-        const inputPerCycle = mod.inputs[w]
-        if (inputPerCycle) {
-          gap[w] = (gap[w] || 0) + inputPerCycle * m.count * cycleHourly
-        }
-      }
+  // Also compute gap from graph nodes' isolatedWares + modules
+  if (graphNodes) {
+    for (const [, node] of graphNodes) {
+      if (!node.isolatedWares || node.isolatedWares.size === 0) continue
+      const requiredWares = [...node.isolatedWares]
+      addInputConsumption(gap, node.modules, requiredWares, modulesMap)
     }
   }
 

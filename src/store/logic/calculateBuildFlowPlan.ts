@@ -716,10 +716,26 @@ function computeDagLine(
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
   currentEmpireModules: SavedModule[],
-  _gap: Record<string, number> = {},
+  gap: Record<string, number> = {},
 ): void {
   const demandSources = collectDemandSources(node, graph, modulesMap)
   node.demandSources = demandSources
+
+  // Add gap rates additively to demand sources
+  const gapRates: Record<string, number> = {}
+  for (const [w, r] of Object.entries(gap)) {
+    if (r > 0) gapRates[w] = r
+  }
+  if (Object.keys(gapRates).length > 0 && demandSources.length > 0) {
+    const first = demandSources[0]
+    if (first) {
+      for (const [w, r] of Object.entries(gapRates)) {
+        first.rates[w] = (first.rates[w] || 0) + r
+      }
+    }
+  } else if (Object.keys(gapRates).length > 0) {
+    demandSources.push({ label: 'gap_demand', rates: { ...gapRates } })
+  }
 
   // Check self-bootstrap
   const buildCostWares = getBuildCostWares(node, modulesMap)
