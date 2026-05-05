@@ -31,12 +31,31 @@ export function mergeModules(modules: SavedModule[]): SavedModule[] {
   return Array.from(map.entries()).map(([id, count]) => ({ id, count }))
 }
 
+/** Unified autoFill wrapper — always passes line's isolatedWares as lockedWares */
+export function autoFillForLine(
+  plannedModules: SavedModule[],
+  isolatedWares: Set<string>,
+  settings: StationSettings,
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+): { autoIndustryModules: SavedModule[]; autoHabitationModules: SavedModule[] } {
+  return calculateAutoFillModules({
+    plannedModules,
+    settings,
+    modulesMap,
+    waresMap,
+    lockedWares: [...isolatedWares],
+  })
+}
+
 export function expandGoalsWithAutoFill(
   goals: BuildGoal[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
+  isolatedWares: Set<string> = new Set(),
 ): SavedModule[] {
+  const lockedWares = [...isolatedWares]
   let result: SavedModule[] = []
   for (const goal of goals) {
     const base = expandGoalDependencies(goal, modulesMap, waresMap)
@@ -46,7 +65,7 @@ export function expandGoalsWithAutoFill(
       settings,
       modulesMap,
       waresMap,
-      lockedWares: [],
+      lockedWares,
     })
     result = mergeModules([...result, ...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
   }
@@ -343,6 +362,7 @@ function greedyFillForLine(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   _gap2: Record<string, number> = {},
+  lockedWares: string[] = [],
 ): BuildGroup[] {
   const built: SavedModule[] = []
   const groups: BuildGroup[] = []
@@ -355,7 +375,7 @@ function greedyFillForLine(
       settings,
       modulesMap,
       waresMap,
-      lockedWares: [],
+      lockedWares,
     })
     return [...r.autoIndustryModules, ...r.autoHabitationModules]
   }
@@ -710,15 +730,17 @@ function computeDagLine(
   node.isSelfBootstrap = selfWares.size > 0
 
   if (node.isSelfBootstrap && selfWares.size > 0) {
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap)
+    const locked = [...(node.isolatedWares ?? [])]
+    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
   } else {
     node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference)
-    const autoFill = calculateAutoFillModules({
-      plannedModules: mergeModules([...currentEmpireModules, ...node.modules]),
-      settings, modulesMap, waresMap, lockedWares: [],
-    })
+    const autoFill = autoFillForLine(
+      mergeModules([...currentEmpireModules, ...node.modules]),
+      node.isolatedWares ?? new Set(),
+      settings, modulesMap, waresMap,
+    )
     node.modules = mergeModules([...node.modules, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
     node.buildGroups = [{ reason: node.lineName, modules: node.modules }]
   }
@@ -797,15 +819,17 @@ function computeSCCGroup(
       }
 
       if (selfWares.size > 0) {
-        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap)
+        const locked = [...(node.isolatedWares ?? [])]
+        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked)
         node.buildGroups = groups
         node.modules = mergeModules(groups.flatMap(g => g.modules))
       } else {
         node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference)
-        const autoFill = calculateAutoFillModules({
-          plannedModules: mergeModules([...currentEmpireModules, ...node.modules]),
-          settings, modulesMap, waresMap, lockedWares: [],
-        })
+        const autoFill = autoFillForLine(
+          mergeModules([...currentEmpireModules, ...node.modules]),
+          node.isolatedWares ?? new Set(),
+          settings, modulesMap, waresMap,
+        )
         node.modules = mergeModules([...node.modules, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
         node.buildGroups = [{ reason: node.lineName, modules: node.modules }]
       }
