@@ -647,13 +647,21 @@ function collectDemandSources(
     if (Object.keys(rates).length === 0) continue
 
     const label = edge.sourceLabel
-    const existing = byLabel.get(label)
+    // Dedup: group by upstream node base name (strip action suffix)
+    const baseLabel = label.replace(/ (buildCost|isolated)$/, '')
+    const existing = byLabel.get(baseLabel)
     if (existing) {
       for (const [w, r] of Object.entries(rates)) {
         existing.rates[w] = Math.max(existing.rates[w] || 0, r)
       }
+      // Merge materials too
+      if (materials && existing.materials) {
+        for (const [w, q] of Object.entries(materials)) {
+          existing.materials[w] = Math.max(existing.materials[w] || 0, q)
+        }
+      }
     } else {
-      byLabel.set(label, { label, rates, materials })
+      byLabel.set(baseLabel, { label: baseLabel, rates, materials })
     }
   }
 
