@@ -53,6 +53,63 @@ export function expandGoalsWithAutoFill(
   return result
 }
 
+export function computeSourceSatisfaction(
+  targetRate: number,
+  prodRate: number,
+): number {
+  if (targetRate <= 0) return prodRate > 0 ? 999 : 0
+  return Math.min(prodRate / targetRate * 100, 999)
+}
+
+export interface SourceSatisfaction {
+  label: string
+  rate: number
+  satisfaction: number
+}
+
+export interface WareSatisfaction {
+  wareId: string
+  sources: SourceSatisfaction[]
+  totalTarget: number
+  totalProd: number
+}
+
+export function computeWareSatisfactions(
+  scheme: BuildScheme,
+  netProduction: Record<string, number>,
+  gap: Record<string, number>,
+  manualWares: Record<string, number>,
+  manualModules: Record<string, number>,
+): WareSatisfaction[] {
+  const results: WareSatisfaction[] = []
+  for (const [wareId, prodRate] of Object.entries(netProduction)) {
+    if (prodRate <= 0.01) continue
+    if (!scheme.targetRates?.[wareId] && !gap[wareId] && !manualWares[wareId] && !manualModules[wareId]) continue
+
+    const sources: SourceSatisfaction[] = []
+    for (const src of scheme.targetRateSources || []) {
+      const r = src.rates[wareId]
+      if (r && r > 0) {
+        sources.push({ label: src.label, rate: r, satisfaction: computeSourceSatisfaction(r, prodRate) })
+      }
+    }
+    if ((gap[wareId] || 0) > 0) {
+      sources.push({ label: 'gap', rate: gap[wareId] || 0, satisfaction: computeSourceSatisfaction(gap[wareId] || 0, prodRate) })
+    }
+    if ((manualWares[wareId] || 0) > 0) {
+      sources.push({ label: 'manual_ware', rate: manualWares[wareId] || 0, satisfaction: computeSourceSatisfaction(manualWares[wareId] || 0, prodRate) })
+    }
+    if ((manualModules[wareId] || 0) > 0) {
+      sources.push({ label: 'manual_module', rate: manualModules[wareId] || 0, satisfaction: computeSourceSatisfaction(manualModules[wareId] || 0, prodRate) })
+    }
+
+    const maxBuildMat = scheme.targetRates?.[wareId] || 0
+    const allTarget = maxBuildMat + (gap[wareId] || 0) + (manualWares[wareId] || 0) + (manualModules[wareId] || 0)
+    results.push({ wareId, sources, totalTarget: allTarget, totalProd: prodRate })
+  }
+  return results
+}
+
 function computeBuildRates(
   modules: SavedModule[],
   modulesMap: Record<string, X4Module>
@@ -631,21 +688,10 @@ function computeDagLine(
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
   currentEmpireModules: SavedModule[],
-  gap: Record<string, number> = {},
+  _gap: Record<string, number> = {},
 ): void {
   const demandSources = collectDemandSources(node, graph, modulesMap)
-
-  // Add gap rates as additive demand — max(建材) + gap
-  if (Object.keys(gap).length > 0 && demandSources.length > 0) {
-    const first = demandSources[0]
-    if (first) {
-      for (const [w, r] of Object.entries(gap)) {
-        if (r > 0) first.rates[w] = (first.rates[w] || 0) + r
-      }
-    }
-  } else if (Object.keys(gap).length > 0) {
-    demandSources.push({ label: 'gap_demand', rates: { ...gap } })
-  }
+  node.demandSources = demandSources
 
   // Check self-bootstrap
   const buildCostWares = getBuildCostWares(node, modulesMap)
@@ -694,6 +740,7 @@ function computeSCCGroup(
   if (sccNodes.length === 1) {
     const node = sccNodes[0]!
     const demandSources = collectDemandSources(node, graph, modulesMap)
+    node.demandSources = demandSources
     if (Object.keys(gapRates).length > 0 && demandSources.length > 0) {
       const first = demandSources[0]
       if (first) {
@@ -721,6 +768,7 @@ function computeSCCGroup(
     for (const key of sorted) {
       const node = graph.nodes.get(key)!
       const demandSources = collectDemandSources(node, graph, modulesMap)
+      node.demandSources = demandSources
 
       const buildCostWares = getBuildCostWares(node, modulesMap)
       const selfWares = new Set<string>()

@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { deriveBuildFlowView, computeVirtualEdges } from '@/store/logic/buildFlowDerivation'
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
-import { expandGoalDependencies, mergeModules, computeFlowPlanLines, makeSchemesWithGroups, expandGoalsWithAutoFill } from '@/store/logic/calculateBuildFlowPlan'
+import { expandGoalDependencies, mergeModules, computeFlowPlanLines, makeSchemesWithGroups, expandGoalsWithAutoFill, computeWareSatisfactions } from '@/store/logic/calculateBuildFlowPlan'
 import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 import { computeGap } from '@/store/logic/computeGap'
@@ -374,59 +374,37 @@ for (const [groupId, node] of graph.nodes) {
     console.log(`    gap: ${gapRates.join(', ')}`)
   }
 
-  // Net production & satisfaction
-  const net = node.netProduction
-  if (net && Object.keys(net).length > 0) {
-    const targetSet = new Set(Object.keys(scheme?.targetRates || {}))
-    for (const w of Object.keys(gap)) targetSet.add(w)
-    const tracked = Object.entries(net).filter(([w]) => targetSet.has(w))
-    if (tracked.length > 0) {
-      console.log('    满足率:')
-      for (const [wareId, rate] of tracked) {
-        if ((rate as number) <= 0.01) continue
-        // Compute demand breakdown
-        const gapReq = gap[wareId] || 0
-        const manualWareReq = (alloc?.goals || []).filter(g => g.type === 'production-rate' && g.wareId === wareId)
-          .reduce((s, g) => s + g.ratePerHour, 0)
-        const manualModReq = (alloc?.goals || []).filter(g => g.type === 'build-module').reduce((s, g) => {
-          const mod = modulesMap[g.moduleId]
-          const out = mod?.outputs?.[wareId]
-          return out ? s + out / (mod.cycleTime || 60) * 3600 * g.count : s
-        }, 0)
-        const buildMatMax = scheme?.targetRates?.[wareId] || 0
-        const total = Math.max(buildMatMax + gapReq + manualWareReq + manualModReq, 0.001)
-        const sat = Math.min((rate as number) / total * 100, 999)
-        console.log(`      ${wareName(wareId)}:`)
-        console.log(`        建材max:   ${buildMatMax.toFixed(1)}/h`)
-        const shownLabels = new Set<string>()
-        for (const src of (scheme?.targetRateSources || [])) {
-          const r = src.rates[wareId]
-          if (!r || r <= 0) continue
-          const qty = src.materials?.[wareId]
-          const buildTime = qty ? qty / r * 3600 : 0
-          const line = qty
-            ? `总量 ${qty.toFixed(0)} 单元, 建筑时间 ${buildTime.toFixed(0)}s, 速率 ${r.toFixed(1)}/h`
-            : `速率 ${r.toFixed(1)}/h`
-          // Deduplicate: show same upstream node + rate only once
-          const key = `${src.label.split(' ')[0]}:${r.toFixed(1)}`
-          if (!shownLabels.has(key)) {
-            console.log(`          ${src.label}: ${line}`)
-            shownLabels.add(key)
+  // Single call to compute satisfactions from algorithm's perspective
+  if (scheme) {
+    const manualWaresRates: Record<string, number> = {}
+    const manualModRates: Record<string, number> = {}
+    for (const g of alloc?.goals || []) {
+      if (g.type === 'production-rate') manualWaresRates[g.wareId] = (manualWaresRates[g.wareId] || 0) + g.ratePerHour
+      if (g.type === 'build-module') {
+        const mod = modulesMap[g.moduleId]
+        if (mod?.outputs) {
+          for (const [w, r] of Object.entries(mod.outputs)) {
+            if (r > 0) manualModRates[w] = (manualModRates[w] || 0) + r / (mod.cycleTime || 60) * 3600 * g.count
           }
         }
-        if (gapReq > 0) console.log(`        gap:       ${gapReq.toFixed(1)}/h`)
-        if (manualWareReq > 0) console.log(`        手动ware:  ${manualWareReq.toFixed(1)}/h`)
-        if (manualModReq > 0) console.log(`        手动module:${manualModReq.toFixed(1)}/h`)
+      }
+    }
+    const satisfactions = computeWareSatisfactions(scheme, node.netProduction, gap, manualWaresRates, manualModRates)
+    if (satisfactions.length > 0) {
+      console.log('    满足率:')
+      for (const ws of satisfactions) {
+        console.log(`      ${wareName(ws.wareId)}:`)
+        for (const src of ws.sources) {
+          const qty = scheme.targetRateSources?.find(s => s.label === src.label)?.materials?.[ws.wareId]
+          const buildTime = qty ? qty / src.rate * 3600 : 0
+          const detail = qty ? `总量 ${qty.toFixed(0)} 单元, 建筑时间 ${buildTime.toFixed(0)}s` : ''
+          console.log(`        ${src.label}: ${src.rate.toFixed(1)}/h 满足率 ${src.satisfaction.toFixed(1)}%${detail ? ` (${detail})` : ''}`)
+        }
         console.log(`        ────────`)
-        console.log(`        目标合计:  ${total.toFixed(1)}/h`)
-        console.log(`        产出:     ${(rate as number).toFixed(1)}/h`)
-        console.log(`        满足率:   ${sat.toFixed(1)}%`)
+        console.log(`        目标合计: ${ws.totalTarget.toFixed(1)}/h, 产出 ${ws.totalProd.toFixed(1)}/h, 满足率 ${(ws.totalProd / (ws.totalTarget || 0.001) * 100).toFixed(1)}%`)
       }
     }
   }
-}
-
-if (Object.keys(gap).length > 0) {
   console.log(`\n  gap 汇总: ${Object.entries(gap).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`).join(', ')}`)
 }
 

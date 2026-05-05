@@ -143,6 +143,7 @@ export interface BuildFlowPlanLine {
   isSelfBootstrap: boolean
   netProduction: Record<string, number>
   buildGroups?: BuildGroup[]
+  demandSources?: BuildRateSource[]
 }
 
 /** 依赖图中的边 */
