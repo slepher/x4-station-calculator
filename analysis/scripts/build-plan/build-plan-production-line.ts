@@ -398,6 +398,7 @@ for (const [groupId, node] of graph.nodes) {
         const sat = Math.min((rate as number) / total * 100, 999)
         console.log(`      ${wareName(wareId)}:`)
         console.log(`        建材max:   ${buildMatMax.toFixed(1)}/h`)
+        const shownLabels = new Set<string>()
         for (const src of (scheme?.targetRateSources || [])) {
           const r = src.rates[wareId]
           if (!r || r <= 0) continue
@@ -406,7 +407,12 @@ for (const [groupId, node] of graph.nodes) {
           const line = qty
             ? `总量 ${qty.toFixed(0)} 单元, 建筑时间 ${buildTime.toFixed(0)}s, 速率 ${r.toFixed(1)}/h`
             : `速率 ${r.toFixed(1)}/h`
-          console.log(`          ${src.label}: ${line}`)
+          // Deduplicate: show same upstream node + rate only once
+          const key = `${src.label.split(' ')[0]}:${r.toFixed(1)}`
+          if (!shownLabels.has(key)) {
+            console.log(`          ${src.label}: ${line}`)
+            shownLabels.add(key)
+          }
         }
         if (gapReq > 0) console.log(`        gap:       ${gapReq.toFixed(1)}/h`)
         if (manualWareReq > 0) console.log(`        手动ware:  ${manualWareReq.toFixed(1)}/h`)
