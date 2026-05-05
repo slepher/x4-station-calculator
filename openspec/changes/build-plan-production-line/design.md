@@ -235,12 +235,21 @@ function computeBuildFlowPlanPreview(): void {
 
   buildFlowPlanLoading.value = true
   try {
-    // Step 1: C modules
+    // Step 1: C modules — 每个 goal 独立 expand + autoFill，不合并后统一 autoFill
     const goals = buildGoals.value
-    const baseModules = goals.flatMap(g => expandGoalDependencies(g, deps.modulesMap, deps.waresMap))
-    const mergedC = mergeModules(baseModules)
-    const autoFillC = calculateAutoFillModules({ ... })
-    const cModules = mergeModules([...mergedC, ...autoFillC.autoIndustryModules, ...autoFillC.autoHabitationModules])
+    let cModules: SavedModule[] = []
+    for (const goal of goals) {
+      const base = expandGoalDependencies(goal, deps.modulesMap, deps.waresMap)
+      const merged = mergeModules(base)
+      const autoFill = calculateAutoFillModules({
+        plannedModules: merged,
+        settings,
+        modulesMap: deps.modulesMap,
+        waresMap: deps.waresMap,
+        lockedWares: [],  // preview 阶段尚未分配到产线，无 lockedWares
+      })
+      cModules = mergeModules([...cModules, ...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
+    }
 
     // Step 2: Build dependency graph (含 isolated 扩展)
     const buildFlowView = getBuildFlowView()
@@ -452,12 +461,24 @@ function makeSchemesWithGroups(graph, allocations, modulesMap, waresMap, setting
 
 #### 数据来源
 
-建材产线分配预览的 derived goal 来自依赖图中各产线的 trackedWares，按来源分为两个子类型：
+建材产线分配预览的 goals 分为三类：
 
-| 子类型 | 来源 | 触发路径 |
-|--------|------|----------|
-| `derived-build-material` | BFS 沿 `outputBuildTags` / `buildMaterialTags` 连线扩散到该产线的 ware | `findOutputBuildConnection` / `findLineBuildMaterialConnection` |
-| `derived-production` | BFS 中 isolated 扩展发现该产线需要提供某 isolated ware | `findGroupProducingWare` → 加入 `isolatedWares` |
+| 类型 | tag | 含义 | 来源 |
+|------|-----|------|------|
+| `derived-build-material` | 建材 | 下游产线 buildCost 连线扩散到本产线，需要本产线产出 | edge.rates |
+| `derived-production` | 产出 | isolated 扩展找到的生产该 ware 的产线，该产线需要产出 | `findGroupProducingWare` |
+| `required-production` | 需求 | 本产线 goal 的 input 链向上游走，遇到的 isolated ware | `walkUpstream` |
+
+关系链：
+
+```
+产线 A（消费）                   产线 B（生产）
+  required-production B  ──────→  derived-production B
+  [需求]                           [产出]
+```
+
+- `required-production` ：产线 A 需要 ware B，但 A 不自产（isolated）。该 ware 会作为缺口标记在 A 的分配预览中。
+- `derived-production` ：沿 `required-production` 找到生产 ware B 的产线 B，B 需要产出 B 来满足 A。该标记在 B 的分配预览中。
 
 #### 预览数据结构
 

@@ -18,7 +18,7 @@ interface BuildFlowView {
  * 为每个 goal 提取对应的 wareId
  */
 function extractWareId(goal: BuildGoal, modulesMap: Record<string, X4Module>): string {
-  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
+  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') {
     return goal.wareId
   }
   if (goal.type === 'build-module') {
@@ -145,10 +145,11 @@ function generateDerivedGoals(
   flowGroups: ProductionLineGroup[],
   modulesMap: Record<string, X4Module>,
   modulesByOutputMap: Record<string, X4Module[]>,
-): BuildGoal[] {
+): { derivedGoals: BuildGoal[]; requiredMap: Map<string, string[]> } {
   const covered = buildCoveredSet(userGoals, flowGroups, modulesMap)
   const seenIsolatedWares = new Set<string>()
   const allDerived: BuildGoal[] = []
+  const requiredMap = new Map<string, string[]>()
 
   for (const goal of userGoals) {
     let mod: X4Module | undefined
@@ -159,10 +160,20 @@ function generateDerivedGoals(
     }
     if (!mod) continue
 
-    allDerived.push(...walkUpstream(mod, covered, flowGroups, modulesByOutputMap, seenIsolatedWares))
+    const beforeSize = seenIsolatedWares.size
+    const derived = walkUpstream(mod, covered, flowGroups, modulesByOutputMap, seenIsolatedWares)
+    if (seenIsolatedWares.size > beforeSize) {
+      const wares: string[] = []
+      for (const d of derived) {
+        if ('wareId' in d) wares.push(d.wareId)
+      }
+      const key = extractWareId(goal, modulesMap)
+      if (key) requiredMap.set(key, wares)
+    }
+    allDerived.push(...derived)
   }
 
-  return allDerived
+  return { derivedGoals: allDerived, requiredMap }
 }
 
 /**
@@ -179,10 +190,14 @@ export function computeProductionLineAllocation(
   const unmatchedGoals: BuildGoal[] = []
 
   // 1. 生成派生 goals
-  const derivedGoals = flowGroups.length > 0
-    ? generateDerivedGoals(goals, flowGroups, modulesMap, modulesByOutputMap)
-    : []
-  const allGoals = [...goals, ...derivedGoals]
+  let derivedGoalList: BuildGoal[] = []
+  const requiredMap = new Map<string, string[]>()
+  if (flowGroups.length > 0) {
+    const result = generateDerivedGoals(goals, flowGroups, modulesMap, modulesByOutputMap)
+    derivedGoalList = result.derivedGoals
+    result.requiredMap.forEach((v, k) => requiredMap.set(k, v))
+  }
+  const allGoals = [...goals, ...derivedGoalList]
 
   console.log('[allocation] allGoals:', allGoals.map(g => ({ type: g.type, wareId: (g as any).wareId, moduleId: (g as any).moduleId })))
   console.log('[allocation] flowGroups:', flowGroups.map(g => ({
@@ -223,7 +238,7 @@ export function computeProductionLineAllocation(
       let matched = false
       for (const node of group.nodes) {
         if (node.source === 'manual' && !node.isIsolated) {
-          if ((goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') && node.wareId === wareId) {
+          if ((goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') && node.wareId === wareId) {
             matched = true
             break
           }
@@ -248,7 +263,7 @@ export function computeProductionLineAllocation(
       let matched = false
       for (const node of group.nodes) {
         if (node.source === 'auto' && !node.isIsolated) {
-          if ((goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') && node.wareId === wareId) {
+          if ((goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') && node.wareId === wareId) {
             matched = true
             break
           }
@@ -270,7 +285,7 @@ export function computeProductionLineAllocation(
     if (assigned) continue
 
     // Layer 2.5: Isolated node matching (for derived goals)
-    if (goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
+    if (goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') {
       for (const group of flowGroups) {
         for (const node of group.nodes) {
           if (node.isIsolated && node.wareId === wareId) {
@@ -302,11 +317,27 @@ export function computeProductionLineAllocation(
 
   for (const [groupId, goalList] of groupMap) {
     if (goalList.length > 0) {
+      const goals = [...goalList]
+      // 添加 required-production
+      const existingWares = new Set(goals.map(g => (g as any).wareId))
+      for (const g of goalList) {
+        const sourceKey = extractWareId(g, modulesMap)
+        if (!sourceKey) continue
+        const required = requiredMap.get(sourceKey)
+        if (required) {
+          for (const wareId of required) {
+            if (!existingWares.has(wareId)) {
+              goals.push({ type: 'required-production', wareId, ratePerHour: 0 })
+              existingWares.add(wareId)
+            }
+          }
+        }
+      }
       result.push({
         groupId,
         groupName: groupIdToName.get(groupId) || groupId,
         isUnmatched: false,
-        goals: goalList,
+        goals,
       })
     }
   }

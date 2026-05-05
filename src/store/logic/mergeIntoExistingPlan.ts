@@ -1,4 +1,5 @@
-import type { BuildGoal, BuildScheme, BuildPlan, BuildSchemeGroup, SavedModule } from '@/types/build-plan'
+import type { BuildGoal, BuildScheme, BuildPlan, BuildSchemeGroup } from '@/types/build-plan'
+import type { SavedModule } from '@/types/x4'
 
 function mergeModules(a: SavedModule[], b: SavedModule[]): SavedModule[] {
   const map = new Map<string, number>()
@@ -28,7 +29,7 @@ export function rebuildSchemeGroups(
   let idx = 0
   return groups.map(g => ({
     ...g,
-    schemes: g.schemes.map(() => mergedSchemes[idx++]),
+    schemes: g.schemes.map(() => mergedSchemes[idx++]!),
   }))
 }
 

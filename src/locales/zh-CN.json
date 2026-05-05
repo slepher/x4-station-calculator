@@ -63,7 +63,8 @@
     "build_material_allocation": "建材产线分配",
     "derived_locked": "自动生成，数量由计算阶段确定",
     "build_material_short": "建材",
-    "production_short": "产出"
+    "production_short": "产出",
+    "required_short": "需求"
   },
   "sector": {
     "overview": "总览",

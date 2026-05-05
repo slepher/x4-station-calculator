@@ -135,7 +135,7 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
     updateGoal: (index, value) => {
       const goal = store.buildGoals[index]
       if (!goal) return
-      if (goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') return
+      if (goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') return
       if (goal.type === 'production-rate') {
         store.buildGoals[index] = { ...goal, ratePerHour: value }
       } else if (goal.type === 'build-module') {

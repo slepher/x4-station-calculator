@@ -28,12 +28,13 @@ function getStoreIndex(goal: BuildGoal): number | undefined {
 }
 
 function isDerived(goal: BuildGoal): boolean {
-  return goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material'
+  return goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production'
 }
 
 function derivedTag(goal: BuildGoal): string | null {
   if (goal.type === 'derived-build-material') return t('build_plan.build_material_short')
   if (goal.type === 'derived-production') return t('build_plan.production_short')
+  if (goal.type === 'required-production') return t('build_plan.required_short')
   return null
 }
 
@@ -43,7 +44,7 @@ function getGoalDisplayInfo(goal: BuildGoal): {
   moduleInfo?: LocalizedX4Module
   moduleGroup?: LocalizedX4ModuleGroup
 } {
-  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
+  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') {
     const ware = gameData.localizedWaresMap[goal.wareId]
     const module = gameData.findModuleForWare(goal.wareId, props.racePreference)
     const group = module?.group ? gameData.localizedModuleGroupsMap[module.group] : undefined
@@ -75,7 +76,7 @@ function getColorBarStyle(goal: BuildGoal): Record<string, string> {
 }
 
 function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null {
-  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
+  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') {
     const ware = gameData.localizedWaresMap[goal.wareId]
     if (ware && ware.dlc_tag !== 'base') {
       return {

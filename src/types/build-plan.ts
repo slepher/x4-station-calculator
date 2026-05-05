@@ -24,6 +24,7 @@ export type BuildGoal =
   | { type: 'derived-rate'; wareId: string; ratePerHour: number }
   | { type: 'derived-production'; wareId: string; ratePerHour: number }
   | { type: 'derived-build-material'; wareId: string; ratePerHour: number }
+  | { type: 'required-production'; wareId: string; ratePerHour: number }
 
 export interface ProductionLineAllocation {
   groupId?: string

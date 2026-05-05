@@ -282,6 +282,12 @@ export function buildFlowPlanGraph(
         conn = findLineBuildMaterialConnection(wid, buildFlowView, item.fromKey)
       }
 
+      // Track isolated ware on the consumer line regardless of whether a producer was found
+      if (item.isIsolatedExpansion) {
+        const consumerNode = graph.nodes.get(item.fromKey)
+        if (consumerNode) consumerNode.isolatedWares.add(wid)
+      }
+
       if (!conn) continue
 
       const targetKey = conn.sourceGroupId
@@ -291,7 +297,7 @@ export function buildFlowPlanGraph(
           lineGroupId: targetKey,
           lineName: getGroupDisplayName(targetKey, buildFlowView),
           trackedWares: new Set([wid]),
-          isolatedWares: new Set(item.isIsolatedExpansion ? [wid] : []),
+          isolatedWares: new Set(),
           modules: [],
           moduleIds: [],
           isSelfBootstrap: false,
@@ -331,7 +337,6 @@ export function buildFlowPlanGraph(
       } else {
         const node = graph.nodes.get(targetKey)!
         node.trackedWares.add(wid)
-        if (item.isIsolatedExpansion) node.isolatedWares.add(wid)
       }
 
       graph.edges.push({

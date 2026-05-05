@@ -223,7 +223,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       // Only generate C scheme (no material lines)
       const cGoalWareIds: string[] = []
       for (const g of goals) {
-        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
+        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production') {
           cGoalWareIds.push(g.wareId)
         } else if (g.type === 'build-module') {
           const mod = deps.modulesMap[g.moduleId]
@@ -285,7 +285,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       // No flow plan: return only C scheme
       const cGoalWareIds: string[] = []
       for (const g of goals) {
-        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
+        if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production') {
           cGoalWareIds.push(g.wareId)
         } else if (g.type === 'build-module') {
           const mod = deps.modulesMap[g.moduleId]
@@ -333,7 +333,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     // Pass goal ware IDs for C scheme label
     const goalWareIds: string[] = []
     for (const g of goals) {
-      if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
+      if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production') {
         goalWareIds.push(g.wareId)
       } else if (g.type === 'build-module') {
         const mod = deps.modulesMap[g.moduleId]
@@ -373,12 +373,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     for (const [groupId, node] of graph.nodes) {
       const goals: BuildGoal[] = []
       for (const wareId of node.trackedWares) {
-        const isIsolated = node.isolatedWares?.has(wareId)
-        if (isIsolated) {
-          goals.push({ type: 'derived-production', wareId, ratePerHour: 0 })
-        } else {
-          goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
-        }
+        goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
       }
       if (goals.length > 0) {
         result.push({

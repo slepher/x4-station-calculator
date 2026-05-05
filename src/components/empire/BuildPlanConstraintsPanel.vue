@@ -39,7 +39,6 @@ const buildMaterialAllocations = computed(() => {
   return props.buildFlowPlanAllocations.map(bma => {
     const prodAlloc = props.allocations.find(a => a.groupId === bma.groupId)
     if (!prodAlloc) return bma
-    // Merge all production goals into build material allocation (overlapping wares coexist)
     return { ...bma, goals: [...bma.goals, ...prodAlloc.goals] }
   })
 })
