@@ -364,6 +364,7 @@ function greedyFillForLine(
   _gap2: Record<string, number> = {},
   lockedWares: string[] = [],
   requiredWares: Set<string> = new Set(),
+  trackedWares: Set<string> = new Set(),
 ): BuildGroup[] {
   const built: SavedModule[] = []
   const groups: BuildGroup[] = []
@@ -410,7 +411,7 @@ function greedyFillForLine(
       for (const w of Object.keys(mod.outputs)) produced.add(w)
     }
     for (const [w, rate] of Object.entries(br)) {
-      if (w !== 'energycells' && produced.has(w) && !requiredWares.has(w)) filtered[w] = rate
+      if (w !== 'energycells' && produced.has(w) && !requiredWares.has(w) && trackedWares.has(w)) filtered[w] = rate
     }
     return Object.keys(filtered).length > 0 ? { label: 'self_demand', rates: filtered } : null
   }
@@ -778,16 +779,16 @@ function computeDagLine(
   node.isSelfBootstrap = selfWares.size > 0
 
   if (node.isSelfBootstrap && selfWares.size > 0) {
-    const locked = [...(node.isolatedWares ?? [])]
+    const locked = [...(requiredWaresByGroup.get(node.lineGroupId) || new Set())]
     const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked, reqWares)
+    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked, reqWares, node.trackedWares)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
   } else {
     node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference)
     const autoFill = autoFillForLine(
       mergeModules([...currentEmpireModules, ...node.modules]),
-      node.isolatedWares ?? new Set(),
+      requiredWaresByGroup.get(node.lineGroupId) || new Set(),
       settings, modulesMap, waresMap,
     )
     node.modules = mergeModules([...node.modules, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
@@ -841,7 +842,7 @@ function computeSCCGroup(
       demandSources.push({ label: 'gap_demand', rates: { ...gapRates } })
     }
     const required = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, [], required)
+    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, [], required, node.trackedWares)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
     updateNodeDerivedFields(node, modulesMap, settings)
@@ -887,16 +888,16 @@ function computeSCCGroup(
       }
 
       if (selfWares.size > 0) {
-        const locked = [...(node.isolatedWares ?? [])]
+        const locked = [...(requiredWaresByGroup.get(node.lineGroupId) || new Set())]
         const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked, reqWares)
+        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked, reqWares, node.trackedWares)
         node.buildGroups = groups
         node.modules = mergeModules(groups.flatMap(g => g.modules))
       } else {
         node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference)
         const autoFill = autoFillForLine(
           mergeModules([...currentEmpireModules, ...node.modules]),
-          node.isolatedWares ?? new Set(),
+          requiredWaresByGroup.get(node.lineGroupId) || new Set(),
           settings, modulesMap, waresMap,
         )
         node.modules = mergeModules([...node.modules, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
