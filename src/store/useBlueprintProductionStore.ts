@@ -160,7 +160,23 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
           : []
 
         const gap = computeGap(lineAllocations, deps.modulesMap, deps.waresMap)
-        computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [], gap)
+        const requiredWaresByGroup = new Map<string, Set<string>>()
+        for (const alloc of lineAllocations) {
+          if (!alloc.groupId) continue
+          const wares = new Set<string>()
+          for (const g of alloc.goals) {
+            if (g.type === 'required-production') wares.add(g.wareId)
+          }
+          if (wares.size > 0) requiredWaresByGroup.set(alloc.groupId, wares)
+        }
+        for (const [gid, node] of graph.nodes) {
+          if (node.isolatedWares?.size) {
+            const existing = requiredWaresByGroup.get(gid) || new Set()
+            for (const w of node.isolatedWares) existing.add(w)
+            requiredWaresByGroup.set(gid, existing)
+          }
+        }
+        computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [], gap, requiredWaresByGroup)
 
         const localizedAllocations = lineAllocations.map(a => ({
           ...a,

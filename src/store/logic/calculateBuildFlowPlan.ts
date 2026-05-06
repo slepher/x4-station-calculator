@@ -660,10 +660,9 @@ function collectDemandSources(
       const upstreamNode = graph.nodes.get(edge.fromLineKey)
       if (upstreamNode && upstreamNode.modules.length > 0) {
         const br = computeBuildRates(upstreamNode.modules, modulesMap)
-        // Only include rates for wares this node tracks
-        for (const [w, r] of Object.entries(br)) {
-          if (r > 0 && node.trackedWares.has(w)) rates[w] = r
-        }
+        // Only include rate for the edge's specific wareId
+        const rate = br[edge.wareId]
+        if (rate && rate > 0) rates[edge.wareId] = rate
         materials = computeBuildMaterials(upstreamNode.modules, modulesMap)
       }
     }
@@ -691,16 +690,17 @@ export function computeFlowPlanLines(
   settings: StationSettings,
   currentEmpireModules: SavedModule[],
   gap: Record<string, number> = {},
+  requiredWaresByGroup: Map<string, Set<string>> = new Map(),
 ): void {
   const order = buildTopologicalOrder(graph)
 
   for (const entry of order) {
     if (Array.isArray(entry)) {
-      computeSCCGroup(entry, graph, modulesMap, waresMap, settings, currentEmpireModules, gap)
+      computeSCCGroup(entry, graph, modulesMap, waresMap, settings, currentEmpireModules, gap, requiredWaresByGroup)
     } else {
       const node = graph.nodes.get(entry)
       if (!node) continue
-      computeDagLine(node, graph, modulesMap, waresMap, settings, currentEmpireModules, gap)
+      computeDagLine(node, graph, modulesMap, waresMap, settings, currentEmpireModules, gap, requiredWaresByGroup)
     }
   }
 }
@@ -713,9 +713,18 @@ function computeDagLine(
   settings: StationSettings,
   currentEmpireModules: SavedModule[],
   gap: Record<string, number> = {},
+  requiredWaresByGroup: Map<string, Set<string>> = new Map(),
 ): void {
   const demandSources = collectDemandSources(node, graph, modulesMap)
   node.demandSources = demandSources
+
+  // Remove wares that are required (not to be produced locally) from demand
+  const requiredWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
+  for (const src of demandSources) {
+    for (const wareId of requiredWares) {
+      delete src.rates[wareId]
+    }
+  }
 
   // Add tracked-ware-filtered gap rates additively to demand sources
   const gapRates: Record<string, number> = {}
@@ -768,6 +777,7 @@ function computeSCCGroup(
   settings: StationSettings,
   currentEmpireModules: SavedModule[],
   _gap: Record<string, number> = {},
+  requiredWaresByGroup: Map<string, Set<string>> = new Map(),
 ): void {
   const sccNodes = sccKeys.map(k => graph.nodes.get(k)!).filter(Boolean)
   if (sccNodes.length === 0) return
@@ -783,6 +793,10 @@ function computeSCCGroup(
     const node = sccNodes[0]!
     const demandSources = collectDemandSources(node, graph, modulesMap)
     node.demandSources = demandSources
+    const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
+    for (const src of demandSources) {
+      for (const w of reqWares) delete src.rates[w]
+    }
     // Filter gapRates by node's trackedWares
     const nodeGap: Record<string, number> = {}
     for (const [w, r] of Object.entries(gapRates)) {
@@ -816,6 +830,10 @@ function computeSCCGroup(
       const node = graph.nodes.get(key)!
       const demandSources = collectDemandSources(node, graph, modulesMap)
       node.demandSources = demandSources
+      const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
+      for (const src of demandSources) {
+        for (const w of reqWares) delete src.rates[w]
+      }
 
       const buildCostWares = getBuildCostWares(node, modulesMap)
       const selfWares = new Set<string>()

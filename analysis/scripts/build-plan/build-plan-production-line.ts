@@ -181,23 +181,35 @@ const buildFlowView: BuildFlowPlanView = { buildFlowGroups: derived.buildFlowGro
 const cModules = expandGoalsWithAutoFill(goals, modulesMap, waresMap, settings)
 const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, groups)
 
-// ---- Compute gap first, then line modules with gap ----
+// ---- Compute gap & required wares, then line modules ----
 const savedLog = console.log
 if (useJson) console.log = () => {}
 const lineAllocations = computeProductionLineAllocation(goals, groups, buildFlowView, modulesMap, modulesByOutputMap)
 if (useJson) console.log = savedLog
 
-// Pass 1: compute line modules without gap to get module data for graph nodes
-computeFlowPlanLines(graph, modulesMap, waresMap, settings, [])
+// Compute gap from allocations (doesn't need graph node modules)
+const gap = computeGap(lineAllocations, modulesMap, waresMap)
 
-// Compute gap from allocations + graph node modules (now populated)
-const gap = computeGap(lineAllocations, modulesMap, waresMap, graph.nodes)
-const gapSummary = Object.keys(gap).length > 0
-  ? Object.entries(gap).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`).join(', ')
-  : '(无)'
+// Build required wares map from allocations + graph nodes' isolatedWares
+const requiredWaresByGroup = new Map<string, Set<string>>()
+for (const alloc of lineAllocations) {
+  if (!alloc.groupId) continue
+  const wares = new Set<string>()
+  for (const g of alloc.goals) {
+    if (g.type === 'required-production') wares.add(g.wareId)
+  }
+  if (wares.size > 0) requiredWaresByGroup.set(alloc.groupId, wares)
+}
+for (const [gid, node] of graph.nodes) {
+  if (node.isolatedWares?.size) {
+    const existing = requiredWaresByGroup.get(gid) || new Set()
+    for (const w of node.isolatedWares) existing.add(w)
+    requiredWaresByGroup.set(gid, existing)
+  }
+}
 
-// Pass 2: recompute with gap
-computeFlowPlanLines(graph, modulesMap, waresMap, settings, [], gap)
+// Single pass with all constraints
+computeFlowPlanLines(graph, modulesMap, waresMap, settings, [], gap, requiredWaresByGroup)
 
 const schemeGroups = makeSchemesWithGroups(graph, lineAllocations, modulesMap, waresMap, settings)
 
