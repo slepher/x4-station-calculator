@@ -2,227 +2,260 @@
 
 ## Purpose
 
-将建材产线计算提前到勾上 checkbox 时执行，C 按产线分配拆分，scheme 按建材/生产分组展示，依赖图融入 isolated 扩展，产线唯一且重叠归建材分组。
+统一 `build-plan-production-line` 的行为定义：`preview` 负责责任分配、依赖图、SCC；`compute` 负责读取 `preview` 结果并求解主要模块 / 辅助模块；Vue 与 analysis script 必须使用同一计算结果。
 
 ## ADDED Requirements
 
-### Requirement: 提前计算依赖图与分配
+### Requirement: 当前代码实现不构成需求依据
 
-**前提** 用户在建造规划面板中勾上"建材产线"checkbox
-**当** 系统检测到 checkbox 状态、buildGoals、logic-flow 或 build-flow 数据变化
-**那么** 立即执行依赖图构建（含 isolated 扩展）、SCC 检测、建材产线分配
-**并且** 结果存入 store（buildFlowPlanGraphResult、buildFlowPlanAllocations）
-**并且** 点击"计算建造方案"仍需手动触发，基于已有依赖图生成完整 steps 明细
+**前提** 当前仓库中已存在 `build-plan-production-line` 相关实现  
+**当** 开发者审查、修改或扩展该功能  
+**那么** 系统需求 MUST 以本 change 文档为准  
+**并且** MUST NOT 以当前代码行为反推需求正确性  
+**并且** 若代码与文档冲突，默认按文档修正代码
 
-#### Scenario: 勾上 checkbox 触发提前计算
+#### Scenario: 当前代码与文档冲突时以文档为准
 
-**前提** 用户已添加 buildGoals 且有活跃 logic-flow plan
-**当** 用户勾上"建材产线"checkbox
-**那么** 系统立即执行依赖图构建 + SCC 检测 + 建材产线分配
-**并且** buildFlowPlanGraphResult 不为 null
+**前提** 当前实现行为与本 spec 描述不一致  
+**当** 开发者决定后续改造方向  
+**那么** 开发者按文档修正实现  
+**并且** 不因兼容错误实现而回退需求定义
 
-#### Scenario: goals 变化触发重算
+### Requirement: Preview 阶段负责责任分配而非模块求解
 
-**前提** "建材产线"已勾上
-**当** 用户添加或删除 buildGoal
-**那么** 系统自动重算依赖图 + 分配
+**前提** 系统处于 build-flow 规划上下文  
+**当** 系统执行 preview  
+**那么** 系统 MUST 决定需要建造哪些产线  
+**并且** MUST 为每条产线分配责任  
+**并且** MUST 产出依赖图与 SCC  
+**并且** MUST NOT 在 preview 阶段产出最终主要模块数量、辅助模块数量或 steps
 
-#### Scenario: 未勾上时无提前计算
+#### Scenario: 目标变化触发 preview
 
-**前提** "建材产线"未勾上
-**那么** buildFlowPlanGraphResult 为 null
-**并且** buildFlowPlanAllocations 为空数组
+**前提** 用户已有 buildGoals  
+**当** 用户修改目标模块或目标产物  
+**那么** 系统立即执行 preview  
+**并且** 结果中包含责任分配、依赖图、SCC
 
-### Requirement: 依赖图 isolated 扩展
+#### Scenario: checkbox 状态变化触发 preview
 
-**前提** 依赖图 BFS 执行中
-**当** 一条产线 L 加入图后
-**那么** 检查 L 的 isolated 节点
-**并且** 通过共用函数 `findGroupProducingWare` 在所有 logic-flow groups 中搜索产出该 ware 的产线 B（manual > auto 优先级）
-**并且** B 已在图中则仅加边 L→B
-**并且** B 不在图中则加入图、加边 L→B、递归检查 B 的 isolated
-**并且** 新增边方向为消费→供给（与现有图一致）
-**并且** B 自身建材来源：若 B 在 buildFlowGroups 中则用 buildMaterialTags 扩散；若 B 不在 buildFlowGroups 中则用 outputBuildTags 连线查找
-**并且** 无连线时忽略，不回退搜索其他来源，视为外部供应
+**前提** 系统处于 build-flow 规划上下文  
+**当** 用户勾选或取消“建材产线”checkbox  
+**那么** 系统自动重跑 preview  
+**并且** 刷新责任分配、依赖图、SCC
+
+### Requirement: Checkbox 只控制是否按建筑材料需求规划建材产线
+
+**前提** 系统处于 build-flow 规划上下文  
+**当** 用户切换“建材产线”checkbox  
+**那么** checkbox MUST 只控制“是否按建筑材料需求规划建材产线”  
+**并且** MUST NOT 被解释为进入或退出 build-flow mode
+
+#### Scenario: 勾选 checkbox 启用建材产线规划
+
+**前提** checkbox 当前未勾选  
+**当** 用户勾选 checkbox  
+**那么** preview 结果包含按建筑材料需求规划出的建材产线责任、依赖图与 SCC
+
+#### Scenario: 取消 checkbox 移除建材产线规划
+
+**前提** checkbox 当前已勾选  
+**当** 用户取消 checkbox  
+**那么** preview 结果移除按建筑材料需求规划出的建材产线责任、依赖图与 SCC
+
+### Requirement: 单条产线可同时承担三类责任且必须合并满足
+
+**前提** 一条产线在 preview 中被分配责任  
+**当** 该线进入 compute 求解  
+**那么** 系统 MUST 将该线全部责任合并后统一求解  
+**并且** 责任类型至少包括：
+- `derived-build-material`
+- `derived-production` / `required-production`
+- `target-production`
+
+#### Scenario: 一条线同时承担建材与用户目标
+
+**前提** 产线 L 同时承担 `derived-build-material` 与 `target-production`  
+**当** 用户点击“计算建造方案”  
+**那么** 系统先合并 L 的全部责任  
+**并且** 用合并后结果统一计算 L 的主要模块与辅助模块
+
+### Requirement: 相关产线集合来自 preview 显式挂接结果
+
+**前提** preview 已完成责任分配  
+**当** compute 需要确定某条责任关联哪些产线  
+**那么** 系统 MUST 使用 preview 阶段显式挂接到该责任上的相关产线集合  
+**并且** MUST NOT 在 compute 阶段临时重新推导不同的相关产线集合
+**并且** MUST NOT 继续使用仅含 `goals` 的扁平 `ProductionLineAllocation` 作为 preview 真相层
+
+#### Scenario: 责任挂接的相关产线在 compute 中直接复用
+
+**前提** 某条责任在 preview 中已挂接 `[A, B, C]`  
+**当** compute 读取该责任  
+**那么** 系统使用 `[A, B, C]` 作为该责任的相关产线集合
+
+### Requirement: Preview 真相层必须显式保存责任对象
+
+**前提** 系统完成 preview  
+**当** store 保存 preview 结果  
+**那么** 系统 MUST 为每条产线显式保存责任对象集合  
+**并且** 每条责任 MUST 至少包含：
+- 责任类型
+- 责任来源
+- `relatedLineGroupIds`
+**并且** MUST NOT 仅保存为扁平 `goals` 列表
+
+#### Scenario: Store 保存可直接复用的 preview truth
+
+**前提** preview 已完成  
+**当** compute 或 presenter 读取 preview 结果  
+**那么** 它们直接读取责任对象与 `relatedLineGroupIds`  
+**并且** 不需要再临时猜测责任类型或相关产线
+
+### Requirement: derived-build-material 目标速率按 buildCost 需求除以建造时间计算
+
+**前提** compute 正在求解某条产线的某种材料，且责任类型为 `derived-build-material`  
+**当** 系统根据责任收集到相关产线集合  
+**那么** 该材料目标速率 MUST 按如下公式计算：
+
+`目标速率 = 所有相关产线的所有建筑 buildCost 中，对该材料总需求 / 所有相关产线的所有建筑总建造时间`
+
+**并且** MUST NOT 使用 per-source `Math.max` 作为最终规则
+
+### Requirement: derived-production 目标速率按运营消耗加用户目标计算
+
+**前提** compute 正在求解某条产线的某种材料，且责任类型为 `derived-production`  
+**当** 系统根据责任收集到相关产线集合  
+**那么** 该材料目标速率 MUST 按如下公式计算：
+
+`目标速率 = sum(−netProduction[material] from relatedLines) + sum(targetProduction.ratePerHour for same ware on this line)`
+
+**并且** MUST NOT 使用 buildCost/time 公式<br/>
+**并且** 当同一 ware 同时有 `derived-production` 与 `target-production` 时，必须在求解前合并速率
+
+#### Scenario: 多个相关产线共同决定目标速率
+
+**前提** 责任挂接到相关产线 A、B、C  
+**当** 系统计算材料 W 的目标速率  
+**那么** 系统汇总 A、B、C 全部建筑对 W 的总需求  
+**并且** 汇总 A、B、C 全部建筑总建造时间  
+**并且** 用两者相除得到 W 的目标速率
+
+### Requirement: Compute 阶段先求主要模块，再派生辅助模块
+
+**前提** 用户点击“计算建造方案”  
+**当** 系统执行 compute  
+**那么** 系统 MUST 先根据目标速率求主要模块数量  
+**并且** 再由主要模块派生辅助模块数量  
+**并且** MUST NOT 将辅助模块作为独立责任源重新参与责任分配
+**并且** MUST NOT 在 compute 阶段重新按原始 `goals` 再次执行产线分配
+
+#### Scenario: 主要模块稳定后派生辅助模块
+
+**前提** 某条产线主要模块数量已求得  
+**当** 系统继续完成该线求解  
+**那么** 系统根据主要模块结果派生辅助模块数量
+
+### Requirement: SCC 迭代只以主要模块数量稳定为收敛判据
+
+**前提** preview 依赖图中存在 SCC / 循环依赖  
+**当** compute 对 SCC 进行求解  
+**那么** 系统 MUST 迭代重算主要模块数量  
+**并且** 当主要模块数量不再变化时视为稳定  
+**并且** MUST NOT 以辅助模块数量是否变化作为单独收敛判据
+
+#### Scenario: 主模块稳定即停止迭代
+
+**前提** SCC 内各产线主要模块数量在本轮与上轮完全一致  
+**当** 系统检查收敛状态  
+**那么** 系统停止迭代  
+**并且** 用稳定后的主要模块结果派生辅助模块
+
+### Requirement: 依赖图 BFS 融入 isolated 扩展
+
+**前提** preview 正在构建依赖图  
+**当** 一条产线 L 被加入图中  
+**那么** 系统检查 L 的 isolated 节点  
+**并且** 使用 manual > auto 优先级搜索产出该 ware 的产线  
+**并且** 新增边方向保持“消费方 -> 供给方”  
+**并且** 若无连线则忽略，不回退搜索其他来源
 
 #### Scenario: isolated 扩展找到新产线
 
-**前提** 产线 L 在依赖图中，L 有 isolated 节点 wareId=W
-**当** `findGroupProducingWare(W, groups)` 返回产线 B
-**并且** B 不在图中
-**那么** B 加入图，新增边 L→B（wareId=W）
-**并且** 递归检查 B 的 isolated 节点
+**前提** 产线 L 有 isolated ware W  
+**当** 系统找到产出 W 的产线 B 且 B 尚未入图  
+**那么** B 被加入图中  
+**并且** 系统添加边 `L -> B`
 
-#### Scenario: isolated 扩展产线已存在
+#### Scenario: isolated 扩展无连线时忽略
 
-**前提** 产线 L 在依赖图中，L 有 isolated 节点 wareId=W
-**当** `findGroupProducingWare(W, groups)` 返回产线 B
-**并且** B 已在图中
-**那么** 仅新增边 L→B（wareId=W），不重复加入节点
+**前提** 产线 B 的 build material 或 output build 没有连线  
+**当** preview 尝试继续扩展  
+**那么** 该来源被忽略  
+**并且** 系统不回退到其他搜索方式
 
-#### Scenario: isolated 扩展无匹配产线
+### Requirement: 最终分组中重叠产线必须归入建材组且责任合并
 
-**前提** 产线 L 在依赖图中，L 有 isolated 节点 wareId=W
-**当** `findGroupProducingWare(W, groups)` 返回 null
-**那么** 该 ware 被忽略，不加边不加节点
+**前提** 同一 `groupId` 同时出现在依赖图与责任分配结果中  
+**当** 系统生成最终 scheme groups  
+**那么** 该产线 MUST 只出现一次  
+**并且** MUST 归入建材产线组  
+**并且** MUST 合并其建材责任与生产责任后再求解
+**并且** MUST NOT 先分别求解两份 scheme 再在结果层事后拼接
 
-#### Scenario: isolated 扩展 B 在 buildFlowGroups 中有定义
+#### Scenario: 重叠产线不再重复出现在生产组
 
-**前提** 产线 L 有 isolated 节点，搜索到产线 B 加入图
-**当** B 在 buildFlowGroups 中有定义（buildMaterialTags 存在）
-**那么** B 的建材来源按 buildMaterialTags 中有连线的标签继续扩散
+**前提** 产线 L 同时属于建材链路和生产责任  
+**当** 系统输出最终 grouped schemes  
+**那么** L 只在建材产线组出现  
+**并且** 生产组不再出现第二张 L 卡片
 
-#### Scenario: isolated 扩展 B 不在 buildFlowGroups 中
+### Requirement: Vue 与 analysis script 必须共用同一计算入口
 
-**前提** 产线 L 有 isolated 节点，搜索到产线 B 加入图
-**当** B 不在 buildFlowGroups 中
-**那么** B 的建材来源通过 outputBuildTags 连线查找
+**前提** 系统需要展示 build-plan 结果  
+**当** Vue 面板渲染或 analysis script 输出结果  
+**那么** 两者 MUST 使用同一套 preview / compute 核心计算入口  
+**并且** MUST NOT 各自维护不同责任分配、速率计算或分组逻辑
+**并且** presenter / Vue MUST NOT 再二次拼装 preview 责任结果
 
-#### Scenario: isolated 扩展 B 的 buildMaterialTags 无连线
+#### Scenario: analysis script 与 Vue 输出同源
 
-**前提** 产线 L 有 isolated 节点，搜索到产线 B 加入图
-**当** B 在 buildFlowGroups 中，但 B 的某个 buildMaterialTag 无连线
-**那么** 该 buildMaterialTag 被忽略，视为外部供应，不回退搜索其他来源
+**前提** 相同输入 goals 与 flow 数据  
+**当** 用户查看 Vue 结果并运行 analysis script  
+**那么** 两者使用同一核心计算入口  
+**并且** 结果语义保持一致
 
-#### Scenario: isolated 扩展 B 的 outputBuildTags 无连线
+### Requirement: Store / Presenter / Vue 职责必须分层
 
-**前提** 产线 L 有 isolated 节点，搜索到产线 B 加入图
-**当** B 不在 buildFlowGroups 中，B 的某 buildCost ware 在 outputBuildTags 中无连线
-**那么** 该 ware 被忽略，视为外部供应，不回退搜索其他来源
+**前提** 系统实现 build-plan-production-line  
+**当** 开发者调整 store、presenter 与 Vue 组件  
+**那么** store MUST 保存 preview / compute 真相层结果  
+**并且** presenter MUST 只做展示字段映射  
+**并且** Vue MUST 只展示 presenter 输出  
+**并且** presenter / Vue MUST NOT 重新拼装 preview 责任或 compute 求解逻辑
 
-### Requirement: 共用搜索函数
+### Requirement: 用户目标区与 preview 区必须分离
 
-**前提** 多处逻辑需要在 logic-flow groups 中搜索产出指定 ware 的产线
-**当** 调用 `findGroupProducingWare(wareId, groups)`
-**那么** 返回 `{ sourceGroupId }` 或 null
-**并且** 搜索优先级：manual 节点 > auto 节点
-**并且** 建材产线 isolated 扩展和非建材 derived goal 搜索共用此函数
+**前提** 约束面板需要同时展示用户输入与 preview 分配结果  
+**当** Vue 渲染 build-plan 约束面板  
+**那么** 系统 MUST 保留独立“用户目标区”作为唯一可编辑输入区  
+**并且** 建造目标区 MUST NOT 按产线分组  
+**并且** 该区域只允许编辑和删除用户手动添加的 `production-rate` / `build-module`  
+**并且** preview 区 MUST 只展示分配结果  
+**并且** preview 区中的 `target-production` / `derived-build-material` / `derived-production` / `required-production` MUST 以 tag 方式展示  
+**并且** preview 区 MUST NOT 显示数量输入或删除按钮
 
-### Requirement: 产线 plan 三域合并模型
+#### Scenario: preview 区中的 target-production 只显示“目标”tag
 
-**前提** 一条产线已存在 plan（含前次计算结果）
-**当** 系统再次执行 computePlan（goals 变化 / 用户手动触发重算）
-**那么** 不创建新 plan，而是**按三域合并到已有 plan**
-**并且** **ware 域**（手工添加的 ware 需求）：保留不动，新增同 wareId 速率叠加
-**并且** **module 域**（手工添加的模块）：保留不动，新增同 moduleId 数量叠加
-**并且** **derivedWare 域**（系统推导的下游需求）：整份替换为本次结果
-**并且** 同一条产线始终只有一个 plan
+**前提** preview 某条责任类型为 `target-production`  
+**当** 约束面板渲染该责任  
+**那么** 界面显示“目标”tag  
+**并且** 不显示数量输入  
+**并且** 不允许用户直接删除该 preview 条目
 
-#### Scenario: 重算时 manual 域被保留
+#### Scenario: 约束面板直接展示 preview truth
 
-**前提** 产线 L 已有 plan，plan.ware 包含 HullParts=30/m，plan.module 包含 HullPartsFab×2
-**当** 产线 L 因 goals 变化触发重算
-**那么** derivedWare 域被刷新
-**并且** plan.ware 仍包含 HullParts=30/m
-**并且** plan.module 仍包含 HullPartsFab×2
-
-#### Scenario: 同 ware 在 manual 和 derived 同时存在
-
-**前提** 产线 L 的 plan.ware 包含 HullParts=30/m
-**当** 重算后 derivedWare 域包含 HullParts
-**那么** plan.ware 和 plan.derivedWare 同时标记 HullParts
-**并且** 两者互不合并、互不覆盖
-
-#### Scenario: 多次触发不产生多 plan 堆叠
-
-**前提** 产线 L 已有 plan
-**当** 多次触发 computePlan
-**那么** 产线 L 始终只有一个 plan
-**并且** 每次只刷新 derivedWare 域
-
-### Requirement: C 按产线分配拆分
-
-**前提** 用户点击"计算建造方案"
-**当** 系统生成 scheme
-**那么** C 不再作为单一整体 scheme
-**并且** C 按产线分配拆分为多个子 scheme
-**并且** 每个子 scheme 对应一条已分配的产线
-**并且** 每个产线根据自己分配到的 goals 独立 expandGoalDependencies + autoFill
-**并且** 未分配到任何产线的 goals 归入"待规划产线"
-
-#### Scenario: 多产线分配后 C 拆分
-
-**前提** buildGoals 分配到产线 A 和产线 B
-**当** 用户点击"计算"
-**那么** 生成产线 A scheme 和产线 B scheme（各自独立计算模块）
-**并且** 不生成整体 C scheme
-
-### Requirement: 产线唯一性
-
-**前提** "建材产线"已勾选，一条产线按 groupId 在依赖图和产线分配中均出现
-**当** 系统构建 scheme 分组
-**那么** 该产线归入建材产线分组
-**并且** 只出一个 scheme
-**并且** derivedWare 域合并依赖图需求和产线分配需求
-
-#### Scenario: 重叠产线归入建材分组
-
-**前提** 产线 L 同时出现在依赖图（产出建材）和产线分配（产出目标产品）
-**当** 系统构建 scheme 分组
-**那么** L 归入建材产线分组
-**并且** L 的 scheme 同时满足建材需求和生产需求（速率叠加相加）
-**并且** 生产产线分组中不包含 L
-
-#### Scenario: 非重叠产线归入生产分组
-
-**前提** 产线 M 仅出现在产线分配中，不在依赖图中
-**当** 系统构建 scheme 分组
-**那么** M 归入生产产线分组
-
-### Requirement: scheme 分组展示
-
-**前提** scheme 生成完成
-**当** UI 渲染 scheme 卡片
-**那么** 分组方式取决于是否勾选建材产线
-**并且** **勾选时**：按"建材产线"和"生产产线"两大分组展示，建造顺序先建材后生产，组内按依赖拓扑序
-**并且** **未勾选时**：所有 scheme 归入单一分组（全部视为生产产线），无建材分组
-
-#### Scenario: 勾选时两大分组渲染
-
-**前提** "建材产线"已勾选，存在建材产线 schemes 和生产产线 schemes
-**当** BuildPlanPanel 渲染
-**那么** 先渲染"建材产线"分组标题和卡片
-**然后** 渲染"生产产线"分组标题和卡片
-
-#### Scenario: 未勾选时单一分组
-
-**前提** "建材产线"未勾选
-**当** BuildPlanPanel 渲染
-**那么** 所有 scheme 在同一分组中展示，无分组标题
-
-### Requirement: 建材产线分配预览
-
-**前提** 用户勾上"建材产线"checkbox
-**当** 约束面板渲染
-**那么** 显示建材产线分配区域，内含产线及其 goals
-**并且** derived goal 来源为依赖图产线的 trackedWares，区分两个子类型：
-- `derived-build-material`：沿 `outputBuildTags` / `buildMaterialTags` 连线扩散发现
-- `derived-production`：通过 isolated 扩展（`findGroupProducingWare`）发现
-**并且** 同一分配区域内 manual 和 derived goals 均可编辑（derived 因 `isDerived` 锁定数量）
-
-#### Scenario: 勾上后显示建材分配
-
-**前提** 用户勾上"建材产线"
-**当** 依赖图包含产线 L（trackedWares = [hullparts]）
-**那么** 建材产线分配区显示产线 L
-**并且** L 的 goals 中包含 derived-build-material hullparts
-
-#### Scenario: 未勾上时不显示
-
-**前提** 用户未勾上"建材产线"
-**那么** 建材产线分配预览区不显示
-
-### Requirement: 待规划产线不参与建材分组
-
-**前提** 某些 goals 未匹配到任何产线
-**当** 系统构建 scheme 分组
-**那么** 待规划产线（unmatched）不参与建材分组检查
-**并且** 始终归入生产产线分组
-
-### Requirement: SCC 数据存储
-
-**前提** 依赖图构建完成
-**当** SCC 检测执行
-**那么** SCC 数据存入 store（buildFlowPlanGraphResult.sccGroups）
-**并且** 供 computePlan 内部计算使用
-**并且** 预留未来 UI 标注循环依赖（当前不展示）
+**前提** checkbox 已勾选且 preview 已完成  
+**当** 约束面板展示“建材产线分配”预览区  
+**那么** presenter 直接从 preview truth 映射展示字段  
+**并且** Vue 不再把 preview allocation 与 production allocation 二次合并

@@ -1,13 +1,14 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { deriveBuildFlowView, computeVirtualEdges } from '@/store/logic/buildFlowDerivation'
-import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
-import { expandGoalDependencies, mergeModules, computeFlowPlanLines, makeSchemesWithGroups, expandGoalsWithAutoFill, computeWareSatisfactions, buildRequiredWaresMap } from '@/store/logic/calculateBuildFlowPlan'
-import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
-import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
-import { computeGap } from '@/store/logic/computeGap'
-import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup } from '@/types/build-plan'
-import type { X4Module, X4Ware, ProductionLineGroup, FlowNode, SavedFlowGroup, BuildFlowAssignment, VirtualEdge } from '@/types/x4'
+import { computeWareSatisfactions } from '@/store/logic/calculateBuildFlowPlan'
+import {
+  createBuildFlowPlanPreview,
+  computeBuildFlowPlan,
+  DEFAULT_BUILD_PLAN_SETTINGS,
+} from '@/store/logic/buildPlanProductionLine'
+import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup, PreviewResult, ProductionLineAllocation } from '@/types/build-plan'
+import type { X4Module, X4Ware, ProductionLineGroup, FlowNode, SavedFlowGroup, BuildFlowAssignment, VirtualEdge, SavedModule } from '@/types/x4'
 
 const WARE_DATA = JSON.parse(readFileSync(resolve('src/assets/x4_game_data/8.0-Diplomacy/data/wares.json'), 'utf-8'))
 const MOD_DATA = JSON.parse(readFileSync(resolve('src/assets/x4_game_data/8.0-Diplomacy/data/modules.json'), 'utf-8'))
@@ -178,27 +179,62 @@ const derived = deriveBuildFlowView(groups, modulesMap, groupDisplayNames, getWa
 const virtualEdges = computeVirtualEdges(derived.buildFlowGroups, assignments, archivedGroupIds, groups)
 const buildFlowView: BuildFlowPlanView = { buildFlowGroups: derived.buildFlowGroups, assignments, virtualEdges }
 
-const cModules = expandGoalsWithAutoFill(goals, modulesMap, waresMap, settings)
-const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, groups)
+const preview = createBuildFlowPlanPreview(
+  goals,
+  groups,
+  buildFlowView,
+  modulesMap,
+  waresMap,
+  DEFAULT_BUILD_PLAN_SETTINGS,
+)
+if (!preview) {
+  console.error('Failed to compute build-flow preview')
+  process.exit(1)
+}
 
-// ---- Compute gap, modules, gap from graph, recompute ----
 const savedLog = console.log
 if (useJson) console.log = () => {}
-const lineAllocations = computeProductionLineAllocation(goals, groups, buildFlowView, modulesMap, modulesByOutputMap)
+const result = computeBuildFlowPlan({
+  preview,
+  modulesMap,
+  waresMap,
+  modulesByOutputMap,
+  settings: DEFAULT_BUILD_PLAN_SETTINGS,
+})
 if (useJson) console.log = savedLog
 
-const requiredWaresByGroup = buildRequiredWaresMap(graph, lineAllocations)
-
-// Pass 1: gap from allocations only, compute modules
-const gap = computeGap(lineAllocations, modulesMap, waresMap)
-computeFlowPlanLines(graph, modulesMap, waresMap, settings, [], gap, requiredWaresByGroup)
-
-// Pass 2: add gap from graph nodes (now have modules), recompute
-const graphGap = computeGap([], modulesMap, waresMap, graph.nodes)
-for (const [w, r] of Object.entries(graphGap)) gap[w] = (gap[w] || 0) + r
-computeFlowPlanLines(graph, modulesMap, waresMap, settings, [], gap, requiredWaresByGroup)
-
-const schemeGroups = makeSchemesWithGroups(graph, lineAllocations, modulesMap, waresMap, settings)
+const graph = preview.graph
+const schemeGroups = result.schemeGroups
+const lineAllocations: ProductionLineAllocation[] = preview.lines.map(line => ({
+  groupId: line.groupId,
+  groupName: line.groupName,
+  isUnmatched: line.isUnmatched,
+  goals: line.responsibilities.flatMap(r => {
+    if (r.type === 'target-production') {
+      if (r.moduleId) {
+        return [{
+          type: 'target-production' as const,
+          moduleId: r.moduleId,
+          count: r.count || 1,
+        }]
+      }
+      if (r.wareId) {
+        return [{
+          type: 'target-production' as const,
+          wareId: r.wareId,
+          ratePerHour: r.ratePerHour || 0,
+        }]
+      }
+      return []
+    }
+    if (!r.wareId) return []
+    return [{
+      type: r.type,
+      wareId: r.wareId,
+      ratePerHour: r.ratePerHour || 0,
+    }]
+  }),
+}))
 
 // ---- Output ----
 
@@ -369,19 +405,26 @@ for (const [groupId, node] of graph.nodes) {
   }
 
   // --- 2. 聚合需求 ---
-  if (da) {
-    console.log(`  聚合需求 (总时间 ${da.totalSeconds}s = ${(da.totalSeconds / 3600).toFixed(2)}h, 总材料 ${Math.round(da.totalMaterialQty)} 单元):`)
-    for (const [wareId, rate] of Object.entries(da.aggregateRates)) {
+  const aggregateRates = da?.aggregateRates || scheme?.targetRates || computeLine?.targetRates || {}
+  if (da || Object.keys(aggregateRates).length > 0) {
+    const totalSeconds = da?.totalSeconds || 0
+    const totalHours = totalSeconds / 3600
+    const totalMaterialQty = da?.totalMaterialQty || 0
+    console.log(`  聚合需求 (总时间 ${totalSeconds}s = ${totalHours.toFixed(2)}h, 总材料 ${Math.round(totalMaterialQty)} 单元):`)
+    for (const [wareId, rate] of Object.entries(aggregateRates)) {
       console.log(`    ${wareName(wareId)}: ${rate.toFixed(1)}/h`)
     }
   }
 
-  // --- 3. gap / manual ---
+  // --- 3. manual ---
   const manualWaresRates: Record<string, number> = {}
   const manualModRates: Record<string, number> = {}
   if (alloc) {
     for (const g of alloc.goals) {
       if (g.type === 'production-rate') manualWaresRates[g.wareId] = (manualWaresRates[g.wareId] || 0) + g.ratePerHour
+      if (g.type === 'target-production' && g.wareId) {
+        manualWaresRates[g.wareId] = (manualWaresRates[g.wareId] || 0) + (g.ratePerHour || 0)
+      }
       if (g.type === 'build-module') {
         const mod = modulesMap[g.moduleId]
         if (mod?.outputs) {
@@ -390,14 +433,18 @@ for (const [groupId, node] of graph.nodes) {
           }
         }
       }
+      if (g.type === 'target-production' && g.moduleId) {
+        const mod = modulesMap[g.moduleId]
+        if (mod?.outputs) {
+          for (const [w, r] of Object.entries(mod.outputs)) {
+            if (r > 0) manualModRates[w] = (manualModRates[w] || 0) + r * (g.count || 1)
+          }
+        }
+      }
     }
   }
 
-  const relevantWares = new Set<string>([...Object.keys(da?.aggregateRates || {}), ...node.trackedWares])
-  const relevantGap: Record<string, number> = {}
-  for (const [w, r] of Object.entries(gap)) {
-    if (r > 0 && relevantWares.has(w)) relevantGap[w] = r
-  }
+  const relevantWares = new Set<string>([...Object.keys(aggregateRates), ...node.trackedWares])
   const relevantManualWares: Record<string, number> = {}
   for (const [w, r] of Object.entries(manualWaresRates)) {
     if (relevantWares.has(w)) relevantManualWares[w] = r
@@ -407,14 +454,9 @@ for (const [groupId, node] of graph.nodes) {
     if (relevantWares.has(w)) relevantManualMods[w] = r
   }
 
-  const hasGap = Object.keys(relevantGap).length > 0
   const hasManual = Object.keys(relevantManualWares).length > 0 || Object.keys(relevantManualMods).length > 0
-  if (hasGap || hasManual) {
+  if (hasManual) {
     const parts: string[] = []
-    if (hasGap) {
-      const gs = Object.entries(relevantGap).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`)
-      parts.push(`gap: [${gs.join(', ')}]`)
-    }
     if (Object.keys(relevantManualWares).length > 0) {
       const ws = Object.entries(relevantManualWares).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`)
       parts.push(`manual ware: [${ws.join(', ')}]`)
@@ -423,23 +465,25 @@ for (const [groupId, node] of graph.nodes) {
       const ms = Object.entries(relevantManualMods).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`)
       parts.push(`manual module: [${ms.join(', ')}]`)
     }
-    console.log(`  gap / manual: ${parts.join('; ')}`)
+    console.log(`  manual: ${parts.join('; ')}`)
   } else {
-    console.log('  gap / manual: (无)')
+    console.log('  manual: (无)')
   }
 
-  // --- 4. target = 聚合 + gap + ware + module ---
-  const allWares = new Set<string>([...Object.keys(da?.aggregateRates || {}), ...Object.keys(relevantGap), ...Object.keys(relevantManualWares), ...Object.keys(relevantManualMods)])
+  // --- 4. target = 聚合 + ware + module ---
+  const allWares = new Set<string>([
+    ...Object.keys(aggregateRates),
+    ...Object.keys(relevantManualWares),
+    ...Object.keys(relevantManualMods),
+  ])
   if (allWares.size > 0) {
-    console.log('  target = 聚合 + gap + ware + module:')
+    console.log('  target = 聚合 + ware + module:')
     for (const w of allWares) {
-      const agg = (da?.aggregateRates[w]) || 0
-      const g = gap[w] || 0
+      const agg = aggregateRates[w] || 0
       const mw = manualWaresRates[w] || 0
       const mm = manualModRates[w] || 0
-      const total = agg + g + mw + mm
+      const total = agg + mw + mm
       const extras: string[] = []
-      if (g > 0) extras.push(`gap +${g.toFixed(1)}`)
       if (mw > 0) extras.push(`ware +${mw.toFixed(1)}`)
       if (mm > 0) extras.push(`module +${mm.toFixed(1)}`)
       const extraStr = extras.length > 0 ? ` (${extras.join(', ')})` : ''
@@ -452,7 +496,7 @@ for (const [groupId, node] of graph.nodes) {
   if (allWares.size > 0) {
     console.log('  产出 vs 目标:')
     for (const w of allWares) {
-      const target = (da?.aggregateRates[w] || 0) + (gap[w] || 0) + (manualWaresRates[w] || 0) + (manualModRates[w] || 0)
+      const target = (aggregateRates[w] || 0) + (manualWaresRates[w] || 0) + (manualModRates[w] || 0)
       const p = Math.max(0, prod[w] || 0)
       const diff = p - target
       const status = diff >= -0.001 ? '✓' : '✗'

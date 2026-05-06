@@ -19,14 +19,18 @@ import type {
   ProductionStationState
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
-import { BootstrapMode, type BuildGoal, type BuildPlan, type BuildFlowPlanView, type BuildFlowPlanGraph, type ProductionLineAllocation, type BuildSchemeGroup } from '@/types/build-plan'
+import { BootstrapMode, type BuildGoal, type BuildPlan, type BuildFlowPlanView, type BuildFlowPlanGraph, type ProductionLineAllocation, type BuildSchemeGroup, type PreviewResult, type ComputeResult } from '@/types/build-plan'
 import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
-import { computeFlowPlanLines, makeSchemes, makeSchemesWithGroups, expandGoalDependencies, mergeModules, buildRequiredWaresMap } from '@/store/logic/calculateBuildFlowPlan'
-import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
+import { computeFlowPlanLines, makeSchemes, expandGoalDependencies, mergeModules } from '@/store/logic/calculateBuildFlowPlan'
 import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
 import { mergeIntoExistingPlan, rebuildSchemeGroups } from '@/store/logic/mergeIntoExistingPlan'
-import { computeGap } from '@/store/logic/computeGap'
+import {
+  createBuildFlowPlanPreview,
+  computeBuildFlowPlanSchemeGroups,
+  computeBuildFlowPlan,
+  DEFAULT_BUILD_PLAN_SETTINGS,
+} from '@/store/logic/buildPlanProductionLine'
 import { useLogicFlowStore } from './useLogicFlowStore'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -61,6 +65,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const gameData = useGameDataStore()
   const empireDataStore = useEmpireDataStore()
   const activeViewStore = useActiveViewStore()
+  const logicFlowStore = useLogicFlowStore()
   const { savedEmpires } = storeToRefs(empireDataStore)
 
   const isReady = ref(false)
@@ -77,6 +82,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
 
   const buildFlowPlanGraphResult = shallowRef<BuildFlowPlanGraph | null>(null)
   const buildFlowPlanAllocations = ref<ProductionLineAllocation[]>([])
+  const previewResult = shallowRef<PreviewResult | null>(null)
+  const computeResult = shallowRef<ComputeResult | null>(null)
   const buildFlowPlanLoading = ref(false)
   const schemeGroups = ref<BuildSchemeGroup[]>([])
 
@@ -116,26 +123,45 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     buildFlowMode.value = mode
   }
 
-  function computePlan(effectiveGoals?: BuildGoal[]) {
+  function computePlan(_effectiveGoals?: BuildGoal[]) {
     const deps = getComputeDeps()
     if (!deps) return
     if (!activeEmpire.value) return
 
-    const goals = effectiveGoals ?? buildGoals.value
+    const goals = buildGoals.value
 
     computeBuildPlanLoading.value = true
 
     try {
-      if (buildFlowMode.value && buildFlowPlanGraphResult.value) {
-        const graph = buildFlowPlanGraphResult.value
-        const settings: StationSettings = {
-          sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
-          workforceAuto: true, considerWorkforceForAutoFill: false, supplyWorkforceBonus: false,
-          buyMultiplier: 0.5, sellMultiplier: 0.5, minersEnabled: true, internalSupply: true,
-          showEmpireGaps: false, racePreference: 'argon', resourceBufferHours: 1,
-          primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
-          transportShipCapacity: 62000, enforceDlcActivation: false,
+      // Prefer new preview → compute flow
+      if (previewResult.value) {
+        const result = computeBuildFlowPlan({
+          preview: previewResult.value,
+          modulesMap: deps.modulesMap,
+          waresMap: deps.waresMap,
+          modulesByOutputMap: gameData.modulesByOutputMap || {},
+          settings: DEFAULT_BUILD_PLAN_SETTINGS,
+        })
+        computeResult.value = result
+
+        const flatIncoming = result.schemeGroups.flatMap(g => g.schemes)
+        const mergedSchemes = mergeIntoExistingPlan(flatIncoming, buildPlan.value)
+        schemeGroups.value = rebuildSchemeGroups(result.schemeGroups, mergedSchemes)
+        buildPlan.value = {
+          goals,
+          selfSufficient: false,
+          bootstrapMode: BootstrapMode.None,
+          schemes: mergedSchemes,
+          totalDuration: 0,
+          totalCredits: 0,
+          goalsAchieved: goals,
+          goalsRemaining: [],
+          halted: false,
+          haltReason: '',
         }
+      } else if (buildFlowMode.value && buildFlowPlanGraphResult.value) {
+        // Fallback: use old entry point for backward compat
+        const graph = buildFlowPlanGraphResult.value
 
         let flowGroups: ProductionLineGroup[] = []
         let buildFlowView: BuildFlowPlanView | null = null
@@ -154,27 +180,23 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
           // LogicFlow store not available
         }
 
-        const modulesByOutputMap = gameData.modulesByOutputMap || {}
-        const lineAllocations = flowGroups.length > 0
-          ? computeProductionLineAllocation(goals, flowGroups, buildFlowView, deps.modulesMap, modulesByOutputMap)
-          : []
-
-        const gap = computeGap(lineAllocations, deps.modulesMap, deps.waresMap)
-        const requiredWaresByGroup = buildRequiredWaresMap(graph, lineAllocations)
-        computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [], gap, requiredWaresByGroup)
-
-        const localizedAllocations = lineAllocations.map(a => ({
-          ...a,
-          groupName: a.groupName || i18n.global.t('build_plan.unmatched'),
-        }))
-
-        const groups = makeSchemesWithGroups(graph, localizedAllocations, deps.modulesMap, deps.waresMap, settings, {
-          buildMaterial: i18n.global.t('build_plan.group_build_material'),
-          production: i18n.global.t('build_plan.group_production'),
-        })
-        const flatIncoming = groups.flatMap(g => g.schemes)
+        const result = computeBuildFlowPlanSchemeGroups(
+          graph,
+          goals,
+          flowGroups,
+          buildFlowView,
+          deps.modulesMap,
+          deps.waresMap,
+          gameData.modulesByOutputMap || {},
+          DEFAULT_BUILD_PLAN_SETTINGS,
+          {
+            buildMaterial: i18n.global.t('build_plan.group_build_material'),
+            production: i18n.global.t('build_plan.group_production'),
+          },
+        )
+        const flatIncoming = result.schemeGroups.flatMap(g => g.schemes)
         const mergedSchemes = mergeIntoExistingPlan(flatIncoming, buildPlan.value)
-        schemeGroups.value = rebuildSchemeGroups(groups, mergedSchemes)
+        schemeGroups.value = rebuildSchemeGroups(result.schemeGroups, mergedSchemes)
         buildPlan.value = {
           goals,
           selfSufficient: false,
@@ -370,63 +392,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
   }
 
-  function computeBuildFlowPlanAllocations(
-    graph: BuildFlowPlanGraph,
-  ): ProductionLineAllocation[] {
-    // For each isolated edge, track consumer-side and producer-side
-    const consumerRequired = new Map<string, Set<string>>()   // fromLineKey → {wareIds}  → required-production
-    const producerSupplied = new Map<string, Set<string>>()    // toLineKey   → {wareIds}  → derived-production
-
-    for (const edge of graph.edges) {
-      if (edge.sourceLabel.includes('isolated')) {
-        // Consumer side: needs this ware but doesn't produce it
-        const cSet = consumerRequired.get(edge.fromLineKey) || new Set()
-        cSet.add(edge.wareId)
-        consumerRequired.set(edge.fromLineKey, cSet)
-        // Producer side: supplies this ware to meet consumer's need
-        const pSet = producerSupplied.get(edge.toLineKey) || new Set()
-        pSet.add(edge.wareId)
-        producerSupplied.set(edge.toLineKey, pSet)
-      }
-    }
-
-    const result: ProductionLineAllocation[] = []
-    for (const [groupId, node] of graph.nodes) {
-      const goals: BuildGoal[] = []
-      const derivedSet = producerSupplied.get(groupId) || new Set()
-      const requiredSet = consumerRequired.get(groupId) || new Set()
-
-      for (const wareId of node.trackedWares) {
-        if (derivedSet.has(wareId)) {
-          goals.push({ type: 'derived-production', wareId, ratePerHour: 0 })
-        } else {
-          goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
-        }
-      }
-      for (const wareId of requiredSet) {
-        if (!goals.some(g => (g as any).wareId === wareId)) {
-          goals.push({ type: 'required-production', wareId, ratePerHour: 0 })
-        }
-      }
-      if (goals.length > 0) {
-        result.push({
-          groupId,
-          groupName: node.lineName,
-          isUnmatched: false,
-          goals,
-        })
-      }
-    }
-    return result
-  }
-
   function computeBuildFlowPlanPreview() {
-    if (!buildFlowMode.value) {
-      buildFlowPlanGraphResult.value = null
-      buildFlowPlanAllocations.value = []
-      return
-    }
-
     const deps = getComputeDeps()
     if (!deps) return
 
@@ -436,30 +402,13 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       if (goals.length === 0) {
         buildFlowPlanGraphResult.value = null
         buildFlowPlanAllocations.value = []
+        previewResult.value = null
         return
       }
 
-      const baseModules = goals.flatMap(g => expandGoalDependencies(g, deps.modulesMap, deps.waresMap))
-      const mergedC = mergeModules(baseModules)
-      const settings: StationSettings = {
-        sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
-        workforceAuto: true, considerWorkforceForAutoFill: false, supplyWorkforceBonus: false,
-        buyMultiplier: 0.5, sellMultiplier: 0.5, minersEnabled: true, internalSupply: true,
-        showEmpireGaps: false, racePreference: 'argon', resourceBufferHours: 1,
-        primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
-        transportShipCapacity: 62000, enforceDlcActivation: false,
-      }
-      const autoFillC = calculateAutoFillModules({
-        plannedModules: mergedC,
-        settings,
-        modulesMap: deps.modulesMap,
-        waresMap: deps.waresMap,
-        lockedWares: [],
-      })
-      const cModules = mergeModules([...mergedC, ...autoFillC.autoIndustryModules, ...autoFillC.autoHabitationModules])
-
-      let buildFlowView: BuildFlowPlanView | null = null
+      // 1. Get groups & buildFlowView from logic flow store
       let groups: ProductionLineGroup[] = []
+      let buildFlowView: BuildFlowPlanView | null = null
       try {
         const logicFlow = useLogicFlowStore()
         groups = (logicFlow as any).groups || []
@@ -475,16 +424,58 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         // LogicFlow store not available
       }
 
-      if (!buildFlowView) {
+      const preview = createBuildFlowPlanPreview(
+        goals,
+        groups,
+        buildFlowView,
+        deps.modulesMap,
+        deps.waresMap,
+        DEFAULT_BUILD_PLAN_SETTINGS,
+        buildFlowMode.value,
+      )
+
+      if (!preview) {
         buildFlowPlanGraphResult.value = null
         buildFlowPlanAllocations.value = []
+        previewResult.value = null
         return
       }
 
-      const graph = buildFlowPlanGraph(cModules, buildFlowView, deps.modulesMap, groups)
-      buildFlowPlanGraphResult.value = graph
+      // Store new preview truth
+      previewResult.value = preview
 
-      buildFlowPlanAllocations.value = computeBuildFlowPlanAllocations(graph)
+      // Backward-compat derivations
+      buildFlowPlanGraphResult.value = preview.graph
+      buildFlowPlanAllocations.value = preview.lines.map(line => ({
+        groupId: line.groupId,
+        groupName: line.groupName,
+        isUnmatched: line.isUnmatched,
+        goals: line.responsibilities.flatMap((responsibility): BuildGoal[] => {
+          if (responsibility.type === 'target-production') {
+            if (responsibility.moduleId) {
+              return [{
+                type: 'target-production',
+                moduleId: responsibility.moduleId,
+                count: responsibility.count || 1,
+              }]
+            }
+            if (responsibility.wareId) {
+              return [{
+                type: 'target-production',
+                wareId: responsibility.wareId,
+                ratePerHour: responsibility.ratePerHour || 0,
+              }]
+            }
+            return []
+          }
+          if (!responsibility.wareId) return []
+          return [{
+            type: responsibility.type,
+            wareId: responsibility.wareId,
+            ratePerHour: responsibility.ratePerHour || 0,
+          }]
+        }),
+      }))
     } finally {
       buildFlowPlanLoading.value = false
     }
@@ -493,6 +484,17 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   watch(
     [buildFlowMode, buildGoals],
     () => { computeBuildFlowPlanPreview() },
+  )
+
+  watch(
+    [
+      () => logicFlowStore.groups,
+      () => logicFlowStore.buildFlowGroups,
+      () => logicFlowStore.buildFlowAssignments,
+      () => logicFlowStore.buildFlowVirtualEdges,
+    ],
+    () => { computeBuildFlowPlanPreview() },
+    { deep: true },
   )
 
   const activeEmpire = ref<EmpirePlan | null>(null)
@@ -1445,6 +1447,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     buildPlan,
     buildFlowPlanGraphResult,
     buildFlowPlanAllocations,
+    previewResult,
+    computeResult,
     buildFlowPlanLoading,
     schemeGroups,
     empireModules,

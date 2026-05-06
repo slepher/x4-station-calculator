@@ -2,693 +2,649 @@
 
 ## 目标
 
-将建材产线计算提前到勾上 checkbox 时执行，C 按产线分配拆分，scheme 按建材/生产分组展示，依赖图融入 isolated 扩展。
+为 `build-plan-production-line` 建立单一、稳定的数据流：
+
+1. `preview` 负责责任分配、依赖图、SCC。
+2. `compute` 负责读取 `preview` 结果并求解主要模块 / 辅助模块。
+3. Vue 与 analysis script 只消费共享结果，不自行重建逻辑。
 
 ## 领域术语
 
 | 术语 | 含义 |
 |------|------|
-| 建材产线 | 依赖图中的产线，产出 C 或其他产线的 buildCost 所需建材 |
-| 生产产线 | C 拆分后不属于建材分组的产线，产出目标产品 |
-| 重叠产线 | 同时出现在依赖图和产线分配中的产线（groupId 相同） |
-| isolated 扩展 | 依赖图 BFS 中检查产线 isolated 节点，搜索产出该 ware 的产线并加入图 |
-| 提前计算 | 勾上 checkbox 时执行依赖图 + SCC + 分配，不等点击"计算" |
-| 叠加相加 | 重叠产线的建材需求速率 + 生产需求速率直接相加 |
-| ware（手工） | 用户手动添加的 ware 需求，同 wareId 合并（速率叠加） |
-| module（手工） | 用户手动添加的模块，同 moduleId 合并（数量叠加） |
-| derived ware | 系统自动推导的需求，同 wareId 合并（仅标记存在，无数值） |
-| derived-build-material | 依赖图 BFS 中沿连线扩散发现的建材需求（`outputBuildTags` / `buildMaterialTags`） |
-| derived-production | 依赖图 BFS 中通过 isolated 扩展发现的产出需求（`findGroupProducingWare`） |
+| preview | 在 build-flow 规划上下文中，根据目标变化或 checkbox 状态变化而重算的责任分配阶段 |
+| compute | 用户点击“计算建造方案”后执行的模块求解阶段 |
+| 责任 | 一条产线需要承担的供给义务 |
+| `derived-build-material` | 为其他建筑 / 产线提供建材的 preview 责任 |
+| `derived-production` | 为其他产线提供产物的 preview 责任 |
+| `required-production` | 某条产线自身仍需要其他产线供给的 preview 责任 |
+| `target-production` | 用户目标在 preview 中的只读责任表示 |
+| 相关产线集合 | 在 preview 阶段已显式挂到某条责任上的产线集合 |
+| 主要模块 | 用于满足目标产率的核心生产模块 |
+| 辅助模块 | 由主要模块派生出的配套模块 |
+| 重叠产线 | 同一 `groupId` 同时出现在依赖图和责任分配中的产线 |
+| 稳定 | 迭代中主要模块数量不再变化 |
 
 ## 问题
 
-当前 build-plan 的建材产线计算在点击"计算建造方案"时才执行，用户无法在勾上"建材产线"后预览分配结果。C 作为整体 scheme 无法反映各产线的独立建造情况。依赖图仅沿 outputBuildTags 扩散，不覆盖产线 isolated 节点对应的上游产线。
+当前文档同时混入了：
+
+1. preview 与 compute 的职责
+2. 责任分配与模块求解
+3. 多套不一致的目标速率解释
+4. 多套不一致的 SCC 收敛判据
+
+导致实现者无法判断：
+
+- 哪一步该决定责任归属
+- 哪一步该计算模块数
+- 目标速率按什么公式求
+- Vue 与 analysis script 是否必须同源
+
+当前代码也已经暴露出以下偏差，不能继续作为设计依据：
+
+1. checkbox 被实现成 build-flow mode 开关
+2. preview 未显式保存责任模型
+3. compute 会重新按 goals 分配产线，而不是读取 preview 结果
+4. 目标速率仍然主要围绕 graph edge / demandSource 聚合，不是围绕“责任 -> 相关产线集合 -> 建筑集合”
+5. 重叠产线在 scheme 层事后合并，而不是在求解前先合并责任
+6. SCC 收敛当前看的是 `node.modules`，包含辅助模块，不符合需求
+
+因此：**设计以本文档为准，不以当前代码实现为准。**
 
 ## 方案
 
-### 1. 核心架构
-
-C 按产线分配拆分是**始终执行**的行为，不依赖建材产线 checkbox。建材产线 checkbox 控制的是"是否启用依赖图 + derivedWare + 分组展示"。
-
-#### 勾上 checkbox（提前计算）
+### 1. 总体数据流
 
 ```
-勾上 checkbox
-  │
-  ├─ C = expandGoalDependencies + autoFill（现有逻辑）
-  │
-  ├─ buildFlowPlanGraph(C, buildFlowView, groups) → 依赖图（含 isolated 扩展）
-  │     │
-  │     └─ SCC 检测
-  │
-  ├─ 建材产线分配预览（derived goals from isolated）
-  │
-  └─ 存入 store（buildFlowPlanGraphResult / buildFlowPlanAllocations）
+目标模块 / 目标产物变化
+或 checkbox 状态变化
+  -> preview
+     -> 责任分配
+     -> 依赖图
+     -> SCC
+     -> preview store result
+
+用户点击“计算建造方案”
+  -> compute
+     -> 读取 preview result
+     -> 合并单线责任
+     -> 基于相关产线集合求目标速率
+     -> 计算主要模块
+     -> 派生辅助模块
+     -> 若存在 SCC 则迭代直到主要模块稳定
+     -> 输出最终 scheme groups
 ```
 
-#### 点击"计算建造方案"（两种模式共享同一入口）
+补充约束：
 
-```
-点击"计算建造方案"
-  │
-  ├─ computeProductionLineAllocation(goals, flowGroups, buildFlowView)
-  │     ├─ generateDerivedGoals() — upstream walk 找 isolated
-  │     ├─ 三层匹配分配产线（L1 build-flow / L2 manual / L2.5 isolated / L3 unmatched）
-  │     └─ ProductionLineAllocation[]（每产线一组）
-  │
-  ├─ splitCToLineSchemes(allocations, ...)
-  │    按产线分配拆分为多个子 scheme（每产线独立 expand + autoFill）
-  │    → 三域合并到已有 plan（ware/module 保留 + 叠加，derivedWare 替换）
-  │
-  ├─ [若有 graph] 重叠产线合并需求 → derivedWare 域合并
-  │
-  └─ makeSchemes() → 分组输出
-       ├── [勾选时] 建材产线分组 + 生产产线分组
-       └── [未勾选时] 单一分组（全为生产产线，无 derivedWare）
-```
+1. `build-flow mode` 是常驻规划上下文
+2. checkbox 不是 `build-flow mode` 开关
+3. checkbox 只控制是否启用“按建筑材料需求规划建材产线”
+4. checkbox 勾选 / 取消都会触发 preview 重算
 
-#### 产线 plan 三域合并模型
+### 2. Preview 阶段设计
 
-每条产线只有一个 plan，plan 内部按来源分三个隔离的合并域：
+#### 2.1 输入
 
-| 域 | 来源 | 带数值？ | 合并规则 | 重算行为 |
-|----|------|----------|----------|----------|
-| **ware** | 用户手动添加的 ware 需求 | 有（`ratePerHour`） | 同 wareId 速率叠加 | **保留** |
-| **module** | 用户手动添加的模块 | 有（`count`） | 同 moduleId 数量叠加 | **保留** |
-| **derivedWare** | 系统自动推导的下游需求 | **无**（仅标记存在，`ratePerHour=0`） | 同 wareId 合并（存在即标记） | **整份替换** |
+- `buildGoals`
+- logic-flow groups
+- build-flow view
+- checkbox 状态（是否按建筑材料需求规划建材产线）
 
-- **域间不交叉**: ware 不与 derivedWare 合并，ware 也不与 module 合并
-- **共存**: 同一 ware 可同时在 ware 域和 derivedWare 域存在，分别显示互不覆盖
-- **derivedWare 无数值**: derivedWare 仅标记"产线需要提供该 ware"并参与 module 计算，不计入最终显示速率
-- **derivedWare 两个子类型**:
-  - `derived-build-material` — 沿 `outputBuildTags` / `buildMaterialTags` 连线扩散发现的建材需求
-  - `derived-production` — 通过 isolated 扩展（`findGroupProducingWare`）发现的产出需求
-  - 两者在 merge 行为上无区别（同属 derivedWare 域），但在 UI 上显示不同 tag（"建材"/"产出"）
+#### 2.2 输出
 
-```
-一条产线 plan:
-  ├─ ware:        [HullParts=30/m,  Claytronics=10/m]    ← manual, 保留
-  ├─ module:      [HullPartsFab×2,  ClaytronicsFab×1]    ← manual, 保留
-  └─ derivedWare: [HullParts, EnergyCells]                ← 重算时整份替换，仅标记存在
-```
+preview 必须产出三类数据：
 
-### 2. 依赖图构建算法变更
+1. 责任分配结果
+2. 依赖图
+3. SCC
 
-在现有 `buildFlowPlanGraph` 的 BFS 中融入 isolated 扩展：
+#### 2.3 责任分配结果结构
 
-```
-输入: cModules, buildFlowView, groups(所有 logic-flow groups), modulesMap, waresMap
-输出: BuildFlowPlanGraph
+每条产线在 preview 中至少需要保存：
 
-function buildFlowPlanGraph(cModules, buildFlowView, groups, modulesMap, waresMap):
-  graph = { nodes: new Map(), edges: [], sccGroups: [] }
-  graph.cModules = cModules
-  graph.cBuildCostRates = computeBuildRates(cModules)
-  cWares = Object.keys(graph.cBuildCostRates).filter(w => w !== 'energycells')
-
-  // BFS queue: { wareIds, fromKey, fromLabel, isIsolatedExpansion }
-  queue = [
-    { wareIds: cWares, fromKey: '__C__', fromLabel: 'C buildCost', isIsolatedExpansion: false }
-  ]
-  addedGroups = new Set<string>()
-
-  while queue not empty:
-    { wareIds, fromKey, fromLabel, isIsolatedExpansion } = queue.shift()
-
-    for each wid in wareIds:
-      // 查找连线来源
-      if !isIsolatedExpansion:
-        conn = findOutputBuildConnection(wid, buildFlowView)
-              || findLineBuildMaterialConnection(wid, buildFlowView, fromKey)
-      else:
-        conn = findGroupProducingWare(wid, groups, manual > auto)
-
-      if !conn: continue
-
-      targetKey = conn.sourceGroupId
-
-      if !addedGroups.has(targetKey):
-        // 新建产线节点
-        node = {
-          lineGroupId: targetKey,
-          lineName: getGroupDisplayName(targetKey),
-          trackedWares: new Set([wid]),
-          modules: [], moduleIds: [], isSelfBootstrap: false,
-          netProduction: {}
-        }
-        graph.nodes.set(targetKey, node)
-        addedGroups.add(targetKey)
-
-        // 1) 沿 outputBuildTags/lineBuildMaterial 继续扩散
-        //    根据 B 是否在 buildFlowGroups 中决定扩散方式：
-        //    无连线时忽略，不回退搜索其他来源，视为外部供应
-        if isGroupInBuildFlowView(targetKey, buildFlowView):
-          // B 在建材产线区有定义 → B 的 buildMaterialTags 作为建材来源
-          // 只取有连线的 buildMaterialTags（无连线 = 不考虑建材如何解决）
-          lineBuildWares = getGroupBuildMaterialWaresWithConnection(targetKey, buildFlowView)
-        else:
-          // B 不在建材产线区 → B 的建材来源通过 outputBuildTags 连线查找
-          // 无连线 = 忽略，视为外部供应
-          lineBuildWares = getGroupBuildCostWaresWithConnection(targetKey, buildFlowView)
-
-        if lineBuildWares.length > 0:
-          queue.push({
-            wareIds: lineBuildWares,
-            fromKey: targetKey,
-            fromLabel: node.lineName + ' buildCost',
-            isIsolatedExpansion: false
-          })
-
-        // 2) 检查 isolated 节点 → 搜索上游产线
-        isolatedWares = getGroupIsolatedWares(targetKey, groups)
-        if isolatedWares.length > 0:
-          queue.push({
-            wareIds: isolatedWares,
-            fromKey: targetKey,
-            fromLabel: node.lineName + ' isolated',
-            isIsolatedExpansion: true
-          })
-      else:
-        // 产线已存在，扩充追踪 ware
-        node = graph.nodes.get(targetKey)
-        node.trackedWares.add(wid)
-
-      // 添加边
-      graph.edges.push({
-        fromLineKey: fromKey,
-        toLineKey: targetKey,
-        wareId: wid,
-        sourceLabel: fromLabel
-      })
-
-  // SCC 识别
-  graph.sccGroups = findSCCs(graph)
-
-  return graph
-```
-
-**`findGroupProducingWare`（共用函数）**: 在所有 logic-flow groups 中搜索产出指定 ware 的产线：
-- 先搜 manual 节点（`source === 'manual' && !isIsolated && node.wareId === wareId`）
-- 再搜 auto 节点
-- 返回第一个匹配的 `{ sourceGroupId }`
-- **共用调用方**：
-  1. 建材产线 isolated 扩展（本文档，`buildFlowPlanGraph` BFS）
-  2. 非建材产线的 derived goal 搜索（`computeProductionLineAllocation` 中 `walkUpstream` → `findIsolatedNode` 重构为调用此函数）
-- 提取为独立导出函数，便于后续统一修改搜索算法（如优先级规则、搜索范围等）
-- 建议位置：`src/store/logic/productionLineSearch.ts`（新建）或 `src/store/logic/computeProductionLineAllocation.ts`（提取并导出）
-
-**`getGroupIsolatedWares`**: 返回指定 groupId 的所有 isolated 节点的 wareId 列表。
-
-**`isGroupInBuildFlowView`**: 判断 groupId 是否在 buildFlowGroups 中存在（建材产线区是否有定义）。
-
-**`getGroupBuildMaterialWaresWithConnection`**: 返回指定 groupId 的 buildMaterialTags 中**有连线**的 wareId 列表。无连线的 buildMaterialTag 视为"不考虑建材如何解决"，不纳入扩散。
-
-**`getGroupBuildCostWaresWithConnection`**: 对不在 buildFlowGroups 中的产线，返回其 buildCost 中通过 outputBuildTags **有连线**的 wareId 列表。无连线 = 忽略，视为外部供应。
-
-### 3. Store 变更
-
-#### 新增状态
-
-```typescript
-// useBlueprintProductionStore
-
-// 提前计算结果
-const buildFlowPlanGraphResult = shallowRef<BuildFlowPlanGraph | null>(null)
-const buildFlowPlanAllocations = ref<ProductionLineAllocation[]>([])
-
-// 计算状态
-const buildFlowPlanLoading = ref(false)
-```
-
-#### 提前计算函数
-
-```typescript
-function computeBuildFlowPlanPreview(): void {
-  if (!buildFlowMode.value) {
-    buildFlowPlanGraphResult.value = null
-    buildFlowPlanAllocations.value = []
-    return
-  }
-
-  const deps = getComputeDeps()
-  if (!deps) return
-
-  buildFlowPlanLoading.value = true
-  try {
-    // Step 1: C modules — 每个 goal 独立 expand + autoFill，不合并后统一 autoFill
-    const goals = buildGoals.value
-    let cModules: SavedModule[] = []
-    for (const goal of goals) {
-      const base = expandGoalDependencies(goal, deps.modulesMap, deps.waresMap)
-      const merged = mergeModules(base)
-      const autoFill = calculateAutoFillModules({
-        plannedModules: merged,
-        settings,
-        modulesMap: deps.modulesMap,
-        waresMap: deps.waresMap,
-        lockedWares: [],  // preview 阶段尚未分配到产线，无 lockedWares
-      })
-      cModules = mergeModules([...cModules, ...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
-    }
-
-    // Step 2: Build dependency graph (含 isolated 扩展)
-    const buildFlowView = getBuildFlowView()
-    const graph = buildFlowPlanGraph(cModules, buildFlowView, logicFlowGroups, deps.modulesMap)
-    buildFlowPlanGraphResult.value = graph
-
-    // Step 3: 建材产线分配预览
-    buildFlowPlanAllocations.value = computeBuildFlowPlanAllocations(graph, cModules, deps)
-  } finally {
-    buildFlowPlanLoading.value = false
-  }
-}
-```
-
-#### watch 触发
-
-```typescript
-watch(
-  [buildFlowMode, buildGoals, logicFlowDependentData],
-  () => { computeBuildFlowPlanPreview() },
-  { immediate: true }
-)
-```
-
-#### computePlan 变更
-
-无论是否勾选建材产线，都走同一入口：
-
-```
-computePlan(goals):
-  // Phase 1: 产线分配（始终执行）
-  allocs = computeProductionLineAllocation(goals, flowGroups, buildFlowView)
-
-  // Phase 2: C 按产线拆分（始终执行）
-  lineSchemes = splitCToLineSchemes(goals, allocs, ...)
-
-  // Phase 3: 若有依赖图（勾选建材产线时），处理 derivedWare + 重叠 + 分组
-  graph = buildFlowPlanGraphResult.value
-  if graph:
-    lineSchemes = mergeOverlappingLines(graph.nodes, lineSchemes)
-    // 为每产线补充 derivedWare 域
-    lineSchemes = applyDerivedWare(lineSchemes, graph)
-    // 分组输出：建材产线 + 生产产线
-    buildPlan.value = makeSchemesWithGroups(lineSchemes, graph)
-  else:
-    // 无依赖图：不分组，无 derivedWare
-    buildPlan.value = { schemes: lineSchemes, groups: 'single' }
-
-  // 按三域模型合并到已有 plan：
-  //   derivedWare → 整份替换
-  //   ware/module → 保留原有，新增叠加
-  buildPlan.value = mergeIntoExistingPlan(buildPlan.value, existingPlan)
-```
-
-### 4. C 按产线分配拆分
-
-#### 合并规则
-
-对每条产线，C 拆分的结果按三域模型写入 plan：
-
-| 域 | 来源 | 行为 |
-|----|------|------|
-| **ware** | C 拆分中的 user goals | 同产线已有 ware 域合并（同 wareId 速率叠加），**不覆盖** |
-| **module** | C 拆分中的 autoFill 模块 | 同产线已有 module 域合并（同 moduleId 数量叠加），**不覆盖** |
-| **derivedWare** | 来自依赖图 trackedWares 的 `derived-rate` goal | **整份替换**该产线原有 derivedWare 域 |
-
-关键约束：
-- 同一条产线**不会**因多次触发计算而产生多个 plan
-- 每次重算只刷新 derivedWare 域，ware/module 域保留用户手工内容
-- derivedWare 域内同 wareId 合并（去重标记，无数值叠加）
-
-#### 拆分逻辑
-
-```
-输入: goals, allocations(ProductionLineAllocation[]), modulesMap, waresMap
-输出: ProductionLineScheme[]
-
-function splitCToLineSchemes(goals, allocations, modulesMap, waresMap):
-  result = []
-
-  for each alloc in allocations:
-    if alloc.isUnmatched: continue  // 待规划产线单独处理
-
-    // 该产线的 goals
-    lineGoals = alloc.goals
-
-    // 独立计算模块
-    baseModules = lineGoals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap))
-    merged = mergeModules(baseModules)
-    autoFill = calculateAutoFillModules({ plannedModules: merged, ... })
-    lineModules = mergeModules([...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
-
-    result.push({
-      groupId: alloc.groupId,
-      lineName: alloc.groupName,
-      goals: lineGoals,
-      modules: lineModules,
-    })
-
-  // 待规划产线
-  unmatchedAlloc = allocations.find(a => a.isUnmatched)
-  if unmatchedAlloc && unmatchedAlloc.goals.length > 0:
-    // 同样独立计算
-    ...
-
-  return result
-```
-
-### 5. Gap 计算
-
-#### 定义
-
-`gap[wareId]` = 所有包含 `required-production` wareId 的产线，其模块对该 ware 的 `inputs` 消耗速率之和。
-
-```
-function computeGap(allocations, modulesMap):
-  gap: Record<wareId, number> = {}
-  for each alloc in allocations:
-    for each goal in alloc.goals:
-      if goal.type == 'required-production':
-        for each module of alloc:
-          gap[goal.wareId] += module.inputs[goal.wareId] * module.count
-  return gap
-```
-
-#### 在生产计算中的应用
-
-对于非 greedy 产线（`computeDagLine`）：
-
-```
-目标产量[ware] = max(建材需求[ware] || 0, gap[ware] || 0) 
-                + 手动ware[ware] + module换算[ware]
-```
-
-其中：
-- `建材需求` = `collectDemandSources` 返回的 edge.rates（各来源 `Math.max`）
-- `gap` = `computeGap` 结果中本产线 `required-production` 对应的消耗
-- `手动ware` = 用户手工添加的 `production-rate` goal 的 `ratePerHour`
-- `module换算` = 用户手工添加的 `build-module` goal 的模块产出速率
-
-对于 greedy 产线（`self-bootstrap` / SCC）：
-
-```
-满足率[ware] = 当前产出 / (建材需求[ware] + gap[ware] + 手动ware[ware] + module换算[ware])
-
-当 建材需求[ware] = 0 时：
-  先忽略该 ware，等其他所有 ware 满足率 ≥ 100% 后，
-  逐个添加该 ware 的模块（每次 +1），
-  然后重新检查所有 wares 的满足率（因为新增模块可能引入新建材需求），
-  循环直到 建材需求=0 的 wares 也不再新增模块为止。
-```
-
-#### 输入参数变化
-
-`computeDagLine` / `greedyFillForLine` 新增参数：
-
-```typescript
-gap: Record<string, number>       // required-production  消耗速率
-manualWares: Record<string, number>  // 手工 ware 的 ratePerHour
-manualModuleRates: Record<string, number>  // 手工 module 的产出速率
-```
-
-#### 检测与合并
-
-```
-输入: 依赖图 nodes(Map<groupId, BuildFlowPlanLine>), 生产产线 schemes[]
-输出: 分组后的 schemes
-
-function mergeOverlappingLines(graphNodes, productionSchemes):
-  buildLineGroupIds = new Set(graphNodes.keys())
-
-  for each prodScheme in productionSchemes:
-    if buildLineGroupIds.has(prodScheme.groupId):
-      // 重叠：归入建材产线分组
-      // 合并需求：建材需求速率 + 生产需求速率 叠加相加
-      graphNode = graphNodes.get(prodScheme.groupId)
-      mergedRates = mergeAdditive(graphNode.demandRates, prodScheme.targetRates)
-      graphNode.demandRates = mergedRates
-      // 标记为重叠
-      graphNode.isOverlapping = true
-      graphNode.productionGoals = prodScheme.goals
-    else:
-      // 纯生产产线
-      productionGroupSchemes.push(prodScheme)
-
-  // 建材产线分组
-  buildGroupSchemes = makeSchemesFromGraph(graph)
-
-  return {
-    buildMaterialSchemes: buildGroupSchemes,   // 建材产线分组
-    productionSchemes: productionGroupSchemes  // 生产产线分组
-  }
-```
-
-#### 叠加相加
-
-叠加相加操作始终在**同一域内**进行（derivedWare 对 derivedWare、ware 对 ware），跨域不叠加。
-
-对于重叠产线：
-- **derivedWare 域** = 依赖图 trackedWares（建材需求） + C 拆分生产需求（同 wareId 合并）
-- **ware 域** = 用户手工添加的 ware 需求（保留不动）
-- **module 域** = 用户手工添加的模块（保留不动）
-
-```typescript
-function mergeAdditive(
-  rates1: Record<string, number>,
-  rates2: Record<string, number>
-): Record<string, number> {
-  const result: Record<string, number> = { ...rates1 }
-  for (const [ware, rate] of Object.entries(rates2)) {
-    result[ware] = (result[ware] || 0) + rate
-  }
-  return result
-}
-```
-
-### 6. 分组 Scheme 输出
-
-#### 类型定义
-
-```typescript
-// src/types/build-plan.ts 新增
-
-export interface BuildSchemeGroup {
-  groupType: 'build-material' | 'production'
-  groupLabel: string  // "建材产线" 或 "生产产线"
-  schemes: BuildScheme[]
-}
-```
-
-#### makeSchemesWithGroups
-
-```
-function makeSchemesWithGroups(graph, allocations, modulesMap, waresMap, settings):
-  // 1. 建材产线 schemes（从依赖图）
-  buildSchemes = makeSchemes(graph, modulesMap, waresMap, settings)
-
-  // 2. 生产产线 schemes（C 拆分）
-  productionSchemes = splitCToLineSchemes(goals, allocations, modulesMap, waresMap)
-
-  // 3. 重叠检测与合并
-  { buildMaterialSchemes, productionSchemes: pureProductionSchemes } =
-    mergeOverlappingLines(graph.nodes, productionSchemes)
-
-  // 4. 构建分组
-  return [
-    {
-      groupType: 'build-material',
-      groupLabel: t('build_plan.group_build_material'),
-      schemes: buildMaterialSchemes
-    },
-    {
-      groupType: 'production',
-      groupLabel: t('build_plan.group_production'),
-      schemes: pureProductionSchemes
-    }
-  ]
-```
-
-### 7. 建材产线分配预览
-
-#### 数据来源
-
-建材产线分配预览的 goals 分为三类：
-
-| 类型 | tag | 含义 | 来源 |
-|------|-----|------|------|
-| `derived-build-material` | 建材 | 下游产线 buildCost 连线扩散到本产线，需要本产线产出 | edge.rates |
-| `derived-production` | 产出 | isolated 扩展找到的生产该 ware 的产线，该产线需要产出 | `findGroupProducingWare` |
-| `required-production` | 需求 | 本产线 goal 的 input 链向上游走，遇到的 isolated ware | `walkUpstream` |
-
-关系链：
-
-```
-产线 A（消费）                   产线 B（生产）
-  required-production B  ──────→  derived-production B
-  [需求]                           [产出]
-```
-
-- `required-production` ：产线 A 需要 ware B，但 A 不自产（isolated）。该 ware 会作为缺口标记在 A 的分配预览中。
-- `derived-production` ：沿 `required-production` 找到生产 ware B 的产线 B，B 需要产出 B 来满足 A。该标记在 B 的分配预览中。
-
-#### 预览数据结构
-
-```typescript
-interface BuildFlowPlanAllocation {
-  groupId: string
+```ts
+interface PreviewLineAssignment {
+  groupId: string | undefined
   groupName: string
-  goals: BuildGoal[]  // 含 user goals 和 derived goals
+  responsibilities: PreviewResponsibility[]
+}
+
+interface PreviewResponsibility {
+  type: 'derived-build-material' | 'derived-production' | 'required-production' | 'target-production'
+  wareId?: string
+  moduleId?: string
+  count?: number
+  ratePerHour?: number
+  relatedLineGroupIds: string[]
+  source: string
 }
 ```
 
-#### 计算逻辑
+建议在正式实现中补齐更完整字段：
 
-```
-function computeBuildFlowPlanAllocations(graph, cModules, deps):
-  result = []
+```ts
+interface PreviewResult {
+  buildMaterialPlanningEnabled: boolean
+  lines: PreviewLinePlan[]
+  graph: BuildFlowPlanGraph | null
+  sccGroups: string[][]
+}
 
-  for each [groupId, node] of graph.nodes:
-    goals = []
-    for each wareId in node.trackedWares:
-      // 区分来源：isolatedWares 中的标记为产出，其余为建材
-      if node.isolatedWares.has(wareId):
-        goals.push({ type: 'derived-production', wareId, ratePerHour: 0 })
-      else:
-        goals.push({ type: 'derived-build-material', wareId, ratePerHour: 0 })
+interface PreviewLinePlan {
+  groupId?: string
+  groupName: string
+  isUnmatched: boolean
+  responsibilities: PreviewResponsibility[]
+}
 
-    // 检查该产线是否也分配了 user goals
-    userGoalsForLine = getUserGoalsForGroup(groupId, buildGoals, allocations)
-    goals = [...userGoalsForLine, ...goals]
-
-    result.push({
-      groupId,
-      groupName: node.lineName,
-      goals
-    })
-
-  return result
-```
-
-### 8. Presenter 变更
-
-#### `useBuildPlanPresenter` 新增
-
-```typescript
-// 建材产线分配预览
-buildFlowPlanAllocations: ComputedRef<ProductionLineAllocation[]>
-
-// scheme 分组
-schemeGroups: ComputedRef<BuildSchemeGroup[]>
-
-// 提前计算 loading
-buildFlowPlanLoading: ComputedRef<boolean>
+interface PreviewResponsibility {
+  id: string
+  type: 'derived-build-material' | 'derived-production' | 'required-production' | 'target-production'
+  wareId?: string
+  moduleId?: string
+  count?: number
+  ratePerHour?: number
+  relatedLineGroupIds: string[]
+  sourceRef: string
+}
 ```
 
-### 9. UI 变更
+关键点：
 
-#### BuildPlanConstraintsPanel.vue
+1. 一条产线可同时拥有多条责任
+2. 三类责任都在 preview 中确定
+3. compute 不允许重新改写责任归属
+4. 预览区中的 `target-production` 只作为分配结果展示，不承担原始目标编辑
 
-在现有产线分配区域上方新增建材产线分配预览：
+与当前代码关系：
 
-```html
-<!-- 建材产线分配预览（勾上后显示） -->
-<ProductionLineAllocationSection
-  v-if="buildFlowMode && buildFlowPlanAllocations.length > 0"
-  :allocations="buildFlowPlanAllocations"
-  :goals="[]"
-  :racePreference="racePreference"
-  :title="t('build_plan.build_material_allocation')"
-  :readonly="true"
-/>
+1. 当前 `ProductionLineAllocation.goals` 只能表达“某线挂了哪些 goal”
+2. 不能表达显式责任类型、责任来源、相关产线集合
+3. 因此 `ProductionLineAllocation` 不能继续充当 preview 真相层
+4. 应新增独立 preview 结果类型，`ProductionLineAllocation` 最多作为过渡期 UI 兼容视图
 
-<!-- 现有产线分配区域 -->
-<ProductionLineAllocationSection ... />
+#### 2.3.1 现有类型到新类型的映射
+
+推荐映射方式：
+
+| 现有类型 | 新定位 | 处理方式 |
+|----------|--------|----------|
+| `ProductionLineAllocation` | 兼容 UI 的过渡视图 | 不再作为真相层 |
+| `BuildFlowPlanGraph` | preview 图结果 | 保留并继续复用 |
+| `BuildGoal` | 输入目标定义 | 保留 |
+| `PreviewResult` | preview 真相层 | 新增 |
+| `PreviewLinePlan` | 单线责任真相层 | 新增 |
+| `PreviewResponsibility` | 单条责任真相层 | 新增 |
+
+#### 2.4 依赖图
+
+preview 构建依赖图时：
+
+1. 在 `build-flow mode` 中，只要目标模块 / 目标产物变化，或 checkbox 状态变化，就重建依赖图
+2. checkbox 只控制依赖图是否包含“按建筑材料需求规划建材产线”对应的建材链路
+3. 从 C 的 build cost 开始 BFS
+4. 融入 isolated 扩展
+5. 新增边方向保持“消费方 -> 供给方”
+6. isolated 搜索产线优先级：
+   - manual
+   - auto
+7. 若 build material / output build 无连线：
+   - 直接忽略
+   - 不回退搜索其他来源
+
+#### 2.5 SCC
+
+preview 完成依赖图后立即检测 SCC，并写入 store。
+
+SCC 在 preview 阶段只负责：
+
+1. 给 compute 提供迭代边界
+2. 为未来 UI 保留循环依赖信息
+
+preview 本身不求解最终模块数。
+
+### 3. Compute 阶段设计
+
+#### 3.1 原则
+
+compute 只做求解，不做重新分配。
+
+禁止行为：
+
+1. 再次决定某个 goal 该归谁
+2. 在 Vue 层临时追加责任
+3. 在 analysis script 里维护第二套责任归属规则
+4. 在 compute 阶段重新调用当前的 `computeProductionLineAllocation(goals, ...)`
+
+#### 3.2 单线求解模型
+
+对单条产线，compute 流程必须是：
+
+```text
+该线全部责任
+  -> 合并责任
+  -> 取责任挂接到的相关产线集合
+  -> 收集这些相关产线的全部建筑
+  -> 对每个材料计算目标速率
+  -> 解主要模块
+  -> 派生辅助模块
 ```
 
-建材产线分配预览区为只读，不可编辑/删除 derived goals。
+这意味着 compute 的正确输入应该是：
 
-#### BuildPlanPanel.vue
-
-scheme 卡片按分组渲染：
-
-```html
-<div v-for="group in schemeGroups" :key="group.groupType">
-  <div class="scheme-group-header">{{ group.groupLabel }}</div>
-  <div v-for="scheme in group.schemes" :key="scheme.label">
-    <!-- 现有 scheme 卡片 -->
-  </div>
-</div>
+```ts
+interface ComputeLineInput {
+  groupId?: string
+  groupName: string
+  responsibilities: PreviewResponsibility[]
+  relatedLineGroupIds: string[]
+}
 ```
 
-### 10. 涉及文件
+而不是当前代码里的：
 
-| 文件 | 角色 |
-|------|------|
-| `src/types/build-plan.ts` | 新增 `BuildSchemeGroup`、`BuildFlowPlanAllocation` 类型 |
-| `src/store/logic/productionLineSearch.ts` | **新增** — 共用函数 `findGroupProducingWare`，供建材 isolated 扩展和非建材 derived 搜索共用 |
-| `src/store/logic/buildFlowPlanGraph.ts` | 修改：BFS 融入 isolated 扩展、调用 `findGroupProducingWare`、新增 `getGroupIsolatedWares` |
-| `src/store/logic/computeProductionLineAllocation.ts` | 修改：`findIsolatedNode`/`walkUpstream` 重构为调用 `findGroupProducingWare` |
-| `src/store/logic/calculateBuildFlowPlan.ts` | 修改：C 拆分逻辑、重叠合并、`makeSchemesWithGroups` |
-| `src/store/useBlueprintProductionStore.ts` | 新增 `buildFlowPlanGraphResult`、`buildFlowPlanAllocations`、`computeBuildFlowPlanPreview`、watch 触发 |
-| `src/components/empire/presenters/useBuildPlanPresenter.ts` | 新增 `buildFlowPlanAllocations`、`schemeGroups`、`buildFlowPlanLoading` |
-| `src/components/empire/BuildPlanConstraintsPanel.vue` | 新增建材产线分配预览区 |
-| `src/components/empire/ProductionLineAllocationSection.vue` | 支持只读模式 + 标题 prop |
-| `src/components/empire/BuildPlanPanel.vue` | scheme 卡片按分组渲染 |
-| `src/locales/zh-CN.json` | 新增 `build_plan.group_build_material`、`build_plan.group_production`、`build_plan.build_material_allocation` |
-| `src/locales/en.json` | 新增对应英文 |
-| `analysis/scripts/build-plan/build-plan-production-line.ts` | **新增** — 命令行测试脚本，加载 flow fixture、反序列化、推导 BuildFlow 视图 + 默认连线、构建依赖图、输出分配组和 SCC 循环图 |
+- `goals`
+- `ProductionLineAllocation[]`
+- graph 上临时拼出来的 `requiredWaresByGroup`
 
-### 11. i18n
+#### 3.2.1 与当前代码的关系
 
-新增 key：
+当前实现中：
 
-| key | zh-CN | en |
-|-----|-------|-----|
-| `build_plan.group_build_material` | 建材产线 | Build Material Lines |
-| `build_plan.group_production` | 生产产线 | Production Lines |
-| `build_plan.build_material_allocation` | 建材产线分配 | Build Material Allocation |
+1. `computeBuildFlowPlanSchemeGroups()` 仍然接受 `goals`
+2. 它内部重新调用 `computeProductionLineAllocation()`
+3. `collectDemandSources()` 主要围绕 graph edge 聚合 demand
 
-### 12. 命令行测试脚本
+这些都只能视为过渡实现，不是最终设计。
 
-路径：`analysis/scripts/build-plan/build-plan-production-line.ts`
+#### 3.2.2 Compute 输入 / 输出契约
 
-运行：`npx vite-node analysis/scripts/build-plan/build-plan-production-line.ts [options]`
+建议正式固定为：
 
-参数：
+```ts
+interface ComputeInput {
+  preview: PreviewResult
+  modulesMap: Record<string, X4Module>
+  waresMap: Record<string, X4Ware>
+  settings: StationSettings
+}
 
-| 参数 | 说明 | 默认值 |
-|------|------|--------|
-| `--module="Name*N"` | 目标建筑（逗号分隔，`*N` 为数量） | - |
-| `--ware="Name*R"` | 目标产量（逗号分隔，`*R` 为速率/h） | - |
-| `--flow=<path>` | logic-flow fixture JSON 路径 | `tests/fixtures/logic-flow-module.json` |
-| `--index=<N>` | 使用第几个 flow plan | `0` |
-| `--json` | JSON 输出 | - |
-| `--help` | 帮助 | - |
+interface ComputeResult {
+  lines: ComputeLineResult[]
+  schemeGroups: BuildSchemeGroup[]
+}
 
-默认目标：Missile Component Production ×5
+interface ComputeLineResult {
+  groupId?: string
+  groupName: string
+  mergedResponsibilities: PreviewResponsibility[]
+  relatedLineGroupIds: string[]
+  targetRates: Record<string, number>
+  primaryModules: SavedModule[]
+  auxiliaryModules: SavedModule[]
+  allModules: SavedModule[]
+}
+```
 
-输出内容：
-1. **产线组**：反序列化后的 ProductionLineGroup 列表（产出/isolated/上游节点）
-2. **BuildFlow 视图**：分组、产出建材/材料标签
-3. **BuildFlow 连线**：手动 assignments + 虚拟 virtualEdges
-4. **依赖图**：节点（追踪 wares、自举标记）、边（消费→供给）
-5. **SCC 循环图**：强连通分量列表
+要求：
 
-数据加载流程：
-1. 读取 `--flow` 指向的 JSON 文件
-2. 反序列化 `SavedFlowGroup` → `ProductionLineGroup`（含 isolated 节点、manual 节点 + auto 上游扩展）
-3. 读取 `buildFlow.assignments`
-4. 调用 `deriveBuildFlowView()` 推导 BuildFlow 分组视图
-5. 调用 `computeVirtualEdges()` 补充默认连线
-6. 组装 `BuildFlowPlanView`
-7. 计算目标产线 C 模块
-8. 调用 `buildFlowPlanGraph()` 构建依赖图
-9. 输出分配结果和 SCC 循环图
+1. `ComputeInput` 不再直接接收裸 `goals`
+2. `ComputeResult` 必须显式分离 `primaryModules` 与 `auxiliaryModules`
+3. `BuildSchemeGroup` 只是最终展示视图，不是求解真相层
 
-### 13. 风险与约束
+#### 3.3 目标速率公式
 
-- 依赖图构建新增 isolated 扩展后，图可能变大，需注意性能（BFS 层级一般不深）
-- 重叠产线的叠加相加是简单合并，不处理 & 约束（与现有 build-flow-plan 的 & 约束机制不同，需在实现时确认是否统一）
-- C 拆分后各产线独立计算，模块可能有重复（与 build-flow-plan 一致，预期行为）
-- 提前计算的 watch 需避免频繁重算（debounce 或 shallowRef 比对）
+两种责任类型使用不同的目标速率公式：
+
+**derived-build-material（建材供给）:**
+
+```text
+targetRate(material) =
+   所有相关产线的所有建筑 buildCost 中，该材料总需求
+   /
+   所有相关产线的所有建筑总建造时间
+```
+
+需求维度: `module.buildCost[material] × module.count` 累加  
+时间维度: `module.buildTime × module.count` 累加
+
+**derived-production（原料供给）:**
+
+```text
+targetRate(material) =
+   sum(−netProduction[material] of all relatedLines)
+   +
+   sum(targetProduction.ratePerHour for this ware on this line)
+```
+
+需求维度: 相关产线的模块运行时净消耗（模块 outputs − inputs，负值表示消耗）  
+与建造时间无关
+
+这里的"相关产线"必须来自 preview 中该责任保存的 `relatedLineGroupIds`。
+
+禁止旧规则：
+
+1. per-source `Math.max`
+2. 不分责任类型，统一用 sum(qty)/sum(time)
+3. 只看本线建筑，不看责任挂接的相关产线集合
+
+对现状代码的改造要求：
+
+1. `collectDemandSources()` 可以保留为图辅助分析层
+2. 但不能继续作为责任真相层
+3. `planProductionForRates()` / `bootstrapFillForLine()` 的输入应改为"已按责任与相关产线集合算好的 target rates"
+4. 目标速率不应继续直接从 graph edge / upstream line 模块推导为最终规则
+
+#### 3.3.1 责任到目标速率的推荐函数边界
+
+推荐新增明确边界的纯函数：
+
+```ts
+function mergeLineResponsibilities(
+  line: PreviewLinePlan,
+): PreviewResponsibility[]
+
+function collectBuildingsForResponsibilities(
+  responsibilities: PreviewResponsibility[],
+  preview: PreviewResult,
+): SavedModule[]
+
+function computeTargetRatesFromBuildings(
+  buildings: SavedModule[],
+  modulesMap: Record<string, X4Module>,
+): Record<string, number>
+```
+
+含义：
+
+1. `mergeLineResponsibilities()` 负责单线责任合并
+2. `collectBuildingsForResponsibilities()` 负责从 `relatedLineGroupIds` 展开建筑集合
+3. `computeTargetRatesFromBuildings()` 负责 `sum(qty)/sum(time)` 公式
+
+现有 `collectDemandSources()` / `computeGap()` 若继续存在，应退居辅助层，不再承担上述职责。
+
+#### 3.4 主要模块与辅助模块
+
+计算顺序固定：
+
+1. 先根据目标速率求主要模块数量
+2. 再根据主要模块派生辅助模块数量
+
+辅助模块不是独立收敛变量。
+
+当前代码中的 `node.modules` 混合了：
+
+1. 主要模块
+2. autoFill 产出的辅助模块
+
+后续设计需要显式区分这两个层次，至少在 SCC 收敛判据上必须可分离。
+
+### 4. SCC / 循环依赖求解
+
+#### 4.1 何时需要迭代
+
+当依赖图存在 SCC 时，compute 不能单轮结束。
+
+#### 4.2 迭代过程
+
+```text
+loop:
+  1. 基于当前状态重算 SCC 内各线目标速率
+  2. 重算各线主要模块数量
+  3. 若主要模块数量与上一轮完全一致 -> stable -> break
+```
+
+#### 4.3 收敛判据
+
+只看主要模块数量：
+
+```text
+primary modules unchanged -> stable
+```
+
+不看辅助模块数量，原因：
+
+1. 辅助模块由主要模块派生
+2. 主要模块稳定后，辅助模块随之确定
+
+对现状代码的改造要求：
+
+1. 当前基于 `node.modules` 的稳定判断必须拆开
+2. 需要单独保存或可推导“主要模块快照”
+3. SCC 循环只比较主要模块快照是否变化
+
+#### 4.3.1 主要模块快照建议结构
+
+```ts
+type PrimaryModuleSnapshot = Map<string, string>
+// key = lineGroupId
+// value = "module_id:count;module_id:count"
+```
+
+要求：
+
+1. 快照只包含主要模块
+2. 不包含 autoFill / habitation / auxiliary 模块
+3. SCC 迭代中比较 `PrimaryModuleSnapshot` 是否变化
+
+### 5. 分组与重叠产线
+
+最终输出分两组：
+
+1. 建材产线组
+2. 生产产线组
+
+重叠产线规则：
+
+1. 相同 `groupId` 只允许出现一次
+2. 必须归入建材产线组
+3. 其建材责任与生产责任必须合并求解
+
+构建顺序：
+
+1. 先建材产线
+2. 再生产产线
+3. 组内按依赖拓扑序
+
+### 6. UI / Script 一致性
+
+必须存在单一共享入口，例如：
+
+```text
+computeBuildFlowPlanPreview(...)
+computeBuildFlowPlan(...)
+```
+
+要求：
+
+1. store 使用该入口
+2. Vue 只展示该入口结果
+3. analysis script 也调用该入口
+
+禁止：
+
+1. Vue 内部重新推导分组
+2. analysis script 复制 store 逻辑
+3. preview / compute 在不同地方各写一套变体
+
+#### 6.1 推荐共享入口签名
+
+建议最终固定为两个共享入口：
+
+```ts
+function computeBuildFlowPlanPreview(
+  goals: BuildGoal[],
+  groups: ProductionLineGroup[],
+  buildFlowView: BuildFlowPlanView | null,
+  buildMaterialPlanningEnabled: boolean,
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+  settings: StationSettings,
+): PreviewResult
+
+function computeBuildFlowPlan(
+  input: ComputeInput,
+): ComputeResult
+```
+
+要求：
+
+1. store 调用这两个入口
+2. analysis script 调用这两个入口
+3. presenter / Vue 不直接触碰求解细节
+
+现状说明：
+
+1. analysis script 已接到共享入口，这是可保留部分
+2. 但 presenter 仍在把 preview allocation 与 production allocation 二次拼装
+3. 说明 store 输出还不是最终真相层
+4. 正确方向应是：store 直接输出可展示的 preview truth，presenter 只做轻量映射
+
+### 7. 组件职责
+
+#### Store
+
+- 保存 preview 结果
+- 驱动 compute
+- 输出最终 grouped schemes
+
+补充：
+
+- Store 必须持有 preview truth，而不是只持有 graph + 派生 goals
+- Store 必须作为唯一责任分配真相源
+
+#### Presenter
+
+- 仅做 UI 所需字段整理
+- 不改写责任归属
+- 不改写求解公式
+- 用户目标区与 preview 区必须分开映射
+
+补充：
+
+- Presenter 不应再把 preview allocation 与 compute allocation 合并生成“伪 preview”
+- Presenter 必须保留独立“用户目标区”数据，并将 preview 区映射为只读 tag 视图
+
+#### Vue
+
+- 仅展示 store / presenter 已提供结果
+- 不得在组件内部重新定义 preview / compute 逻辑
+
+## 基于当前代码的迁移设计
+
+### 迁移目标
+
+在尽量复用现有图构建、scheme 渲染、steps 生成能力的前提下，替换错误的真相层。
+
+### 可复用部分
+
+1. `buildFlowPlanGraph()` 及其 isolated 扩展
+2. `makeSchemeSteps()` 及现有 steps 输出结构
+3. `BuildSchemeGroup` / UI 卡片渲染骨架
+4. analysis script 已接入共享入口的结构
+
+### 必须替换或降级为辅助层的部分
+
+1. `ProductionLineAllocation` 作为 preview 真相层的职责
+2. `compute` 阶段重新调用 `computeProductionLineAllocation()`
+3. `collectDemandSources()` 直接代表最终责任需求的职责
+4. scheme 层事后重叠合并的求解方式
+5. 基于 `node.modules` 的 SCC 收敛判断
+
+### 推荐迁移顺序
+
+1. 新增 preview truth 类型，显式保存 responsibilities + relatedLineGroupIds
+2. Store 的 preview 结果改为输出 preview truth
+3. compute 改为只吃 preview truth，不再吃裸 `goals`
+4. 在 compute 内先合并责任，再生成 per-line targetRates
+5. SCC 收敛改为只看主要模块快照
+6. Presenter / Vue 删除二次责任拼装逻辑
+7. analysis script 继续复用共享入口，但共享入口改为新真相层
+
+### 迁移到现有文件的落点建议
+
+#### `src/types/build-plan.ts`
+
+新增：
+
+1. `PreviewResult`
+2. `PreviewLinePlan`
+3. `PreviewResponsibility`
+4. `ComputeInput`
+5. `ComputeResult`
+6. `ComputeLineResult`
+7. `PrimaryModuleSnapshot`
+
+保留但降级：
+
+1. `ProductionLineAllocation` -> 过渡 UI 视图
+2. `BuildSchemeGroup` -> 最终展示视图
+
+#### `src/store/logic/buildPlanProductionLine.ts`
+
+职责收敛为：
+
+1. 生成 `PreviewResult`
+2. 生成 `ComputeResult`
+3. 暴露单一共享入口
+
+不再承担：
+
+1. 在 compute 内二次分配 goals
+2. 将 preview 压扁回 `ProductionLineAllocation.goals`
+
+#### `src/store/logic/calculateBuildFlowPlan.ts`
+
+保留：
+
+1. 图线求解辅助能力
+2. steps / scheme 生成
+3. bootstrap / SCC 求解底层算法
+
+调整：
+
+1. 输入改为显式 target rates / primary modules / auxiliary modules
+2. 不再假设 graph edge demand 就是最终责任需求
+
+#### `src/store/useBlueprintProductionStore.ts`
+
+调整为：
+
+1. state 保存 `previewResult`
+2. state 保存 `computeResult`
+3. checkbox / goals / flow 变化时只更新 `previewResult`
+4. 点击 compute 时只消费 `previewResult`
+
+#### `src/components/empire/presenters/useBuildPlanPresenter.ts`
+
+删除：
+
+1. 对 preview allocation 与 production allocation 的二次拼装
+
+改为：
+
+1. 从 `previewResult` 映射 UI 所需数据
+2. 从 `computeResult` 映射 scheme groups
+
+#### `analysis/scripts/build-plan/build-plan-production-line.ts`
+
+保留：
+
+1. fixture 解析
+2. 命令行参数处理
+
+改为：
+
+1. 调用新 `computeBuildFlowPlanPreview()`
+2. 调用新 `computeBuildFlowPlan()`
+3. 输出 `previewResult` 与 `computeResult` 派生视图
+
+## 实现约束
+
+1. 单条产线三类责任必须在求解前合并
+2. 相关产线集合必须来自 preview 显式挂接结果
+3. 速率公式必须使用“总需求 / 总建造时间”
+4. SCC 收敛只看主要模块数量
+5. analysis script 与 Vue 必须共用单一计算入口

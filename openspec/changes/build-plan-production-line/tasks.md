@@ -1,57 +1,96 @@
 # build-plan-production-line 任务
 
-## Phase 1: 共用搜索函数
+## Phase 1: Preview / Compute 边界重构
 
-- [x] T1: 新建 `src/store/logic/productionLineSearch.ts`，提取 `findGroupProducingWare` 为独立导出函数（manual > auto 优先级，返回 `{ sourceGroupId }`）
-- [x] T2: 重构 `src/store/logic/computeProductionLineAllocation.ts`，将 `findIsolatedNode` / `walkUpstream` 中的产线搜索逻辑改为调用 `findGroupProducingWare`
+- [x] T0: 审查当前实现偏差并记录"需求以文档为准，当前代码有 bug，不得以代码行为反推需求"
+- [x] T1: 明确 `preview` 数据结构，支持单条产线同时保存建材责任、gap 责任、用户目标责任
+- [x] T2: 在 store 中拆清 `preview` 输出与 `compute` 输出，禁止 `preview` 阶段产出最终主要模块 / 辅助模块 / steps
+- [x] T3: 将点击"计算建造方案"后的正式求解改为严格读取 `preview` 已分配结果，不再重新决定责任归属
+- [x] T3.1: 在 `src/store/useBlueprintProductionStore.ts` 中新增或固定 `previewResult` / `computeResult` 状态字段
+- [x] T3.2: 将 checkbox、目标模块、目标产物变动统一改为只驱动 `previewResult` 重算
+- [x] T3.3: 将"计算建造方案"按钮路径改为只消费 `previewResult`
 
-## Phase 2: 依赖图 isolated 扩展
+## Phase 2: 责任与相关产线模型
 
-- [x] T3: 在 `src/store/logic/buildFlowPlanGraph.ts` 新增 `getGroupIsolatedWares`、`isGroupInBuildFlowView`、`getGroupBuildMaterialWaresWithConnection`、`getGroupBuildCostWaresWithConnection` 函数
-- [x] T4: 修改 `buildFlowPlanGraph` BFS，融入 isolated 扩展：新增 `isIsolatedExpansion` 队列标记，isolated 扩展时调用 `findGroupProducingWare`，递归检查新入图产线的 isolated；B 的建材来源根据是否在 buildFlowGroups 中分别走 buildMaterialTags 或 outputBuildTags；无连线时忽略不回退
-- [x] T5: `buildFlowPlanGraph` 新增 `groups` 参数（所有 logic-flow groups），用于 isolated 搜索
+- [x] T4: 为每条责任补全 `relatedLineGroupIds` 等字段，确保"相关产线集合"来自 `preview` 显式挂接结果
+- [x] T5: 替换现有 `ProductionLineAllocation.goals` 作为 preview 真相层的职责，新增显式 preview truth 类型
+- [x] T6: 清理现有实现中任何运行时重新推导"相关产线集合"的分支，统一改为读取 `preview` 结果
+- [x] T7: 校准约束面板预览展示，使其直接反映 preview 责任分配结果，而不是 presenter 二次拼装结果
+- [x] T7.1: 在 `src/types/build-plan.ts` 中新增 `PreviewResult` / `PreviewLinePlan` / `PreviewResponsibility`
+- [x] T7.2: 在 `src/components/empire/presenters/useBuildPlanPresenter.ts` 中删除 preview allocation 与 production allocation 的二次合并
+- [x] T7.3: 在 `src/components/empire/BuildPlanConstraintsPanel.vue` 中仅消费 presenter 输出，不再直接补逻辑
 
-## Phase 3: 类型定义
+## Phase 3: 目标速率公式统一
 
-- [x] T6: `src/types/build-plan.ts` 新增 `BuildSchemeGroup` 接口（`groupType: 'build-material' | 'production'`、`groupLabel`、`schemes`）
+- [x] T8: 将单线求解目标速率统一为 `所有相关产线的所有建筑，对该材料总需求 / 所有相关产线的所有建筑总建造时间`
+- [x] T9: 将现有 `collectDemandSources()` / graph edge 聚合逻辑降级为辅助分析层，不再充当最终责任真相
+- [x] T10: 清理旧的 per-source `Math.max` 规则或其他与正式公式冲突的逻辑
+- [x] T11: 确保单条产线内三类责任先合并，再统一计算目标速率，不按责任类型拆开分别求解
+- [x] T11.1: 在 `src/store/logic/buildPlanProductionLine.ts` 中固定责任合并 -> 建筑集合 -> 目标速率 的共享主链
+- [x] T11.2: 在 `src/store/logic/calculateBuildFlowPlan.ts` 中将 graph edge demand 相关逻辑降级为辅助层输入，而非最终目标速率真相
 
-## Phase 4: Store 提前计算
+## Phase 4: 主模块 / 辅助模块求解
 
-- [x] T7: `useBlueprintProductionStore` 新增 `buildFlowPlanGraphResult`（shallowRef）、`buildFlowPlanAllocations`（ref）、`buildFlowPlanLoading`（ref）
-- [x] T8: 新增 `computeBuildFlowPlanPreview` 函数：勾上时执行依赖图构建 + SCC + 建材产线分配
-- [x] T9: 新增 watch：监听 `buildFlowMode`、`buildGoals`、logic-flow/build-flow 依赖数据变化，触发 `computeBuildFlowPlanPreview`
+- [x] T12: 调整 `compute` 主流程，使其只消费 preview truth，不再重新调用 `computeProductionLineAllocation(goals, ...)`
+- [x] T13: 调整 `compute` 主流程，先根据目标速率求主要模块数量
+- [x] T14: 调整辅助模块计算，使其严格由主要模块结果派生，不作为独立责任源参与重新分配
+- [x] T15: 清理任何"辅助模块变化也参与收敛判断"的逻辑
+- [x] T15.1: 在 `ComputeResult` 中显式分离 `primaryModules` / `auxiliaryModules` / `allModules`
 
-## Phase 5: C 拆分 + 重叠合并 + 分组输出
+## Phase 5: SCC / 循环依赖收敛
 
-- [x] T10: `calculateBuildFlowPlan.ts` 新增 `splitCToLineSchemes` 函数：C 按产线分配拆分，每个产线独立 expandGoalDependencies + autoFill
-- [x] T11: 新增 `mergeOverlappingLines` 函数：检测重叠产线（groupId 同时在依赖图和产线分配中），归入建材分组，需求速率叠加相加
-- [x] T12: 新增 `makeSchemesWithGroups` 函数：输出 `BuildSchemeGroup[]`（建材产线分组 + 生产产线分组）
-- [x] T13: 修改 `computePlan`：使用已有 `buildFlowPlanGraphResult`，调用 `makeSchemesWithGroups` 生成分组 schemes
+- [x] T16: 对 SCC 场景实现迭代求解，按轮重算主要模块数量
+- [x] T17: 显式区分"主要模块快照"与"辅助模块/autoFill 模块"，避免继续使用 `node.modules` 直接判断收敛
+- [x] T18: 将收敛判据统一为"主要模块数量不再变化"
+- [x] T19: 清理旧的与辅助模块或其他次级指标相关的收敛判据
+- [x] T19.1: 在 `src/types/build-plan.ts` 中新增 `PrimaryModuleSnapshot`
+- [x] T19.2: 在 `src/store/logic/calculateBuildFlowPlan.ts` 中仅比较 `PrimaryModuleSnapshot`
 
-## Phase 6: 建材产线分配预览
+## Phase 6: 分组与重叠产线
 
-- [x] T14: 新增 `computeBuildFlowPlanAllocations` 函数：从依赖图节点提取建材产线分配（trackedWares → derived goals），与产线分配逻辑一致
-- [x] T15: `useBuildPlanPresenter` 新增 `buildFlowPlanAllocations` computed
+- [x] T20: 统一最终 grouped schemes 生成逻辑，确保分组只有"建材产线"与"生产产线"
+- [x] T21: 重叠产线（同一 `groupId`）只保留一份 scheme，并归入建材组
+- [x] T22: 将重叠产线的建材责任与生产责任前移到求解前合并，移除 scheme 结果层事后拼接模式
+- [x] T23: 组内排序统一按依赖拓扑序，整体验证"先建材后生产"
 
-## Phase 7: UI
+## Phase 7: 单一共享入口
 
-- [x] T16: `ProductionLineAllocationSection.vue` 支持 `readonly` prop 和 `title` prop，建材分配预览区为只读
-- [x] T17: `BuildPlanConstraintsPanel.vue` 在现有产线分配区域上方新增建材产线分配预览区（勾上后显示）
-- [x] T18: `BuildPlanPanel.vue` scheme 卡片按 `BuildSchemeGroup` 分组渲染（建材产线/生产产线两大分组）
+- [x] T24: 抽出并固定共享核心入口，覆盖 preview truth 生成与 compute 求解两阶段
+- [x] T25: store 改为仅调用共享入口，不再维护平行逻辑
+- [x] T26: `analysis/scripts/build-plan/build-plan-production-line.ts` 改为仅调用共享入口，不复制 store 计算逻辑
+- [x] T27: Vue / presenter 改为只消费结果，不再做二次分组、二次责任拼装或临时补丁式合并
+- [x] T27.1: 固定共享入口为 `createBuildFlowPlanPreview(...)` 与 `computeBuildFlowPlan(...)`
+- [x] T27.2: `analysis/scripts/build-plan/build-plan-production-line.ts` 输出 `previewResult` 与 `computeResult` 派生视图
 
-## Phase 8: i18n
+## Phase 8: 文档与验证
 
-- [x] T19: `zh-CN.json` 新增 `build_plan.group_build_material`（建材产线）、`build_plan.group_production`（生产产线）、`build_plan.build_material_allocation`（建材产线分配）
-- [x] T20: `en.json` 新增对应英文
+- [x] T28: 确认实现行为与本 change 的 `request.md` / `design.md` / `spec.md` 一致
+- [x] T29: 补充最小验证方案，覆盖 preview 责任分配、目标速率公式、SCC 收敛、重叠产线归组、script/Vue 同源输出
+- [x] T30: 代码完成后执行 `npm run build`
 
-## Phase 9: 命令行测试脚本
+## 验证方案摘要
 
-- [x] T22: 新建 `analysis/scripts/build-plan/build-plan-production-line.ts`，支持 `--module`/`--ware`/`--flow`/`--index`/`--json` 参数
-- [x] T23: 实现 `deserializePlan` 函数：SavedFlowGroup → ProductionLineGroup（含 isolated 节点、manual 节点）
-- [x] T24: 载入 `buildFlow.assignments`，调用 `deriveBuildFlowView` + `computeVirtualEdges` 补充默认连线，组装 `BuildFlowPlanView`
-- [x] T25: 计算目标产线 C 模块，调用 `buildFlowPlanGraph` 构建依赖图
-- [x] T26: 输出：产线组、BuildFlow 视图、BuildFlow 连线（含虚拟连线）、依赖图（节点/边）、SCC 循环图
+### Preview 责任分配
+- `createBuildFlowPlanPreview()` 返回 `PreviewResult`，含 `lines: PreviewLinePlan[]`，每条 line 的 `responsibilities: PreviewResponsibility[]`
+- 责任类型明确为 `derived-build-material` / `derived-production` / `required-production` / `target-production`
+- 每条责任显式携带 `relatedLineGroupIds`
+- Presener 直接从 `previewResult.lines` 推导 `buildMaterialPreviewAllocations`，不再与 `allocations` 二次合并
 
-## Phase 10: 构建验证
+### 目标速率公式
+- `computeTargetRatesFromBuildings()` 使用 `sum(qty) / sum(time)` 公式
+- `collectBuildingsForResponsibilities()` 从 `relatedLineGroupIds` 展开建筑集合
 
-- [x] T27: `npm run build` 通过
+### SCC 收敛
+- `makePrimaryModuleSnapshot()` 只比较主要模块（filter by `node.moduleIds`）
+- `computeSCCGroup` 使用 primary module snapshot 判断收敛，不再检查辅助模块
+
+### 重叠产线归组
+- `mergeGraphAndAllocationLines()` 在 preview 阶段合并 graph 责任与 `target-production` 责任
+- `computeBuildFlowPlan` 在求解后将 C-line 模块合并进 graph node
+- `makeSchemesWithGroups` 过滤掉已在 graph 中出现过的 allocation，消除事后拼接
+- `mergeOverlappingLines` 不再被调用
+
+### script/Vue 同源
+- `analysis/scripts/build-plan/build-plan-production-line.ts` 调用 `createBuildFlowPlanPreview()` + `computeBuildFlowPlan()`
+- `useBlueprintProductionStore` 调用同样的共享入口
+- store 暴露 `previewResult` / `computeResult` 状态

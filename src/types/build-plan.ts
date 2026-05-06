@@ -21,6 +21,7 @@ export type BuildGoal =
   | { type: 'production-rate'; wareId: string; ratePerHour: number }
   | { type: 'build-module'; moduleId: string; count: number }
   | { type: 'fleet'; shipId: string; quantity: number }
+  | { type: 'target-production'; wareId?: string; moduleId?: string; ratePerHour?: number; count?: number }
   | { type: 'derived-rate'; wareId: string; ratePerHour: number }
   | { type: 'derived-production'; wareId: string; ratePerHour: number }
   | { type: 'derived-build-material'; wareId: string; ratePerHour: number }
@@ -180,3 +181,72 @@ export interface BuildFlowPlanView {
   assignments: import('./x4').BuildFlowAssignment[]
   virtualEdges: import('./x4').VirtualEdge[]
 }
+
+// --- Preview / Compute truth types (build-plan-production-line design) ---
+
+/** 责任类型 */
+export type ResponsibilityType =
+  | 'target-production'
+  | 'derived-build-material'
+  | 'derived-production'
+  | 'required-production'
+
+/** 单条责任 */
+export interface PreviewResponsibility {
+  id: string
+  type: ResponsibilityType
+  wareId?: string
+  moduleId?: string
+  count?: number
+  ratePerHour?: number
+  relatedLineGroupIds: string[]
+  sourceRef: string
+}
+
+/** 单条产线的 preview 责任分配 */
+export interface PreviewLinePlan {
+  groupId?: string
+  groupName: string
+  isUnmatched: boolean
+  responsibilities: PreviewResponsibility[]
+}
+
+/** Preview 阶段结果 */
+export interface PreviewResult {
+  buildMaterialPlanningEnabled: boolean
+  lines: PreviewLinePlan[]
+  graph: BuildFlowPlanGraph | null
+  sccGroups: string[][]
+}
+
+/** Compute 阶段输入 */
+export interface ComputeInput {
+  preview: PreviewResult
+  modulesMap: Record<string, X4Module>
+  waresMap: Record<string, X4Ware>
+  modulesByOutputMap: Record<string, X4Module[]>
+  settings: StationSettings
+}
+
+/** 单条产线的 compute 结果 */
+export interface ComputeLineResult {
+  groupId?: string
+  groupName: string
+  mergedResponsibilities: PreviewResponsibility[]
+  relatedLineGroupIds: string[]
+  targetRates: Record<string, number>
+  primaryModules: SavedModule[]
+  auxiliaryModules: SavedModule[]
+  allModules: SavedModule[]
+}
+
+/** Compute 阶段结果 */
+export interface ComputeResult {
+  lines: ComputeLineResult[]
+  schemeGroups: BuildSchemeGroup[]
+}
+
+/** 主要模块快照（SCC 收敛判据） */
+export type PrimaryModuleSnapshot = Map<string, string>
+// key = lineGroupId
+// value = "module_id:count;module_id:count"

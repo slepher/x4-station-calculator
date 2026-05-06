@@ -165,7 +165,7 @@ function generateDerivedGoals(
     if (seenIsolatedWares.size > beforeSize) {
       const wares: string[] = []
       for (const d of derived) {
-        if ('wareId' in d) wares.push(d.wareId)
+        if ('wareId' in d && d.wareId) wares.push(d.wareId)
       }
       const key = extractWareId(goal, modulesMap)
       if (key) requiredMap.set(key, wares)

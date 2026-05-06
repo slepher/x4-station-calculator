@@ -1,5 +1,13 @@
 import { computed, type ComputedRef } from 'vue'
-import type { BuildGoal, BuildPlan, BuildScheme, BuildSchemeGroup, ProductionLineAllocation } from '@/types/build-plan'
+import type {
+  BuildGoal,
+  BuildPlan,
+  BuildScheme,
+  BuildSchemeGroup,
+  PreviewLinePlan,
+  PreviewResult,
+  ProductionLineAllocation,
+} from '@/types/build-plan'
 import type { EmpireGroupedFlows } from '@/types/x4'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
@@ -26,6 +34,8 @@ export interface BuildPlanPresenterProps {
   loadableFlowPlans: ComputedRef<FlowPlanItem[]>
   allocations: ComputedRef<ProductionLineAllocation[]>
   buildFlowPlanAllocations: ComputedRef<ProductionLineAllocation[]>
+  buildMaterialPreviewAllocations: ComputedRef<ProductionLineAllocation[]>
+  productionPreviewAllocations: ComputedRef<ProductionLineAllocation[]>
   buildFlowPlanLoading: ComputedRef<boolean>
 }
 
@@ -49,6 +59,7 @@ export interface BuildPlanPresenterStore {
   buildFlowMode: boolean
   buildPlan: BuildPlan | null
   buildFlowPlanAllocations: ProductionLineAllocation[]
+  previewResult: PreviewResult | null
   buildFlowPlanLoading: boolean
   schemeGroups: BuildSchemeGroup[]
   computeBuildPlanLoading: boolean
@@ -91,6 +102,24 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
     )
   })
 
+  /**
+   * 建材产线 preview: 直接从 PreviewResult.lines 映射，不再与 allocations 二次合并。
+   * 重叠产线（groupId 同时出现在 build-material 和 production 中）归入建材组。
+   */
+  const buildMaterialPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
+    if (!store.buildFlowMode || !store.previewResult) return []
+    return store.previewResult.lines
+      .filter(line => line.responsibilities.some(r => r.type === 'derived-build-material'))
+      .map(previewLineToAllocation)
+  })
+
+  const productionPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
+    if (!store.buildFlowMode || !store.previewResult) return []
+    return store.previewResult.lines
+      .filter(line => !line.responsibilities.some(r => r.type === 'derived-build-material'))
+      .map(previewLineToAllocation)
+  })
+
   const props: BuildPlanPresenterProps = {
     goals: computed(() => store.buildGoals),
     buildFlowMode: computed(() => store.buildFlowMode),
@@ -126,6 +155,8 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
     }),
     allocations,
     buildFlowPlanAllocations: computed(() => store.buildFlowPlanAllocations),
+    buildMaterialPreviewAllocations,
+    productionPreviewAllocations,
     buildFlowPlanLoading: computed(() => store.buildFlowPlanLoading),
   }
 
@@ -135,12 +166,14 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
     updateGoal: (index, value) => {
       const goal = store.buildGoals[index]
       if (!goal) return
-      if (goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') return
+      if (goal.type === 'target-production' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') return
+      const updated = [...store.buildGoals]
       if (goal.type === 'production-rate') {
-        store.buildGoals[index] = { ...goal, ratePerHour: value }
+        updated[index] = { ...goal, ratePerHour: value }
       } else if (goal.type === 'build-module') {
-        store.buildGoals[index] = { ...goal, count: value }
+        updated[index] = { ...goal, count: value }
       }
+      store.buildGoals = updated
     },
     setBuildFlowMode: (mode) => store.setBuildFlowMode(mode),
     computePlan: () => {
@@ -154,4 +187,52 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
   }
 
   return { props, emits }
+}
+
+function previewLineToAllocation(line: PreviewLinePlan): ProductionLineAllocation {
+  return {
+    groupId: line.groupId,
+    groupName: line.groupName,
+    isUnmatched: line.isUnmatched,
+    goals: line.responsibilities.flatMap((responsibility): BuildGoal[] => {
+      if (responsibility.type === 'target-production') {
+        if (responsibility.moduleId) {
+          return [{
+            type: 'target-production',
+            moduleId: responsibility.moduleId,
+            count: responsibility.count || 1,
+          }]
+        }
+        if (responsibility.wareId) {
+          return [{
+            type: 'target-production',
+            wareId: responsibility.wareId,
+            ratePerHour: responsibility.ratePerHour || 0,
+          }]
+        }
+        return []
+      }
+
+      if (!responsibility.wareId) return []
+      if (responsibility.type === 'derived-build-material') {
+        return [{
+          type: 'derived-build-material',
+          wareId: responsibility.wareId,
+          ratePerHour: responsibility.ratePerHour || 0,
+        }]
+      }
+      if (responsibility.type === 'derived-production') {
+        return [{
+          type: 'derived-production',
+          wareId: responsibility.wareId,
+          ratePerHour: responsibility.ratePerHour || 0,
+        }]
+      }
+      return [{
+        type: 'required-production',
+        wareId: responsibility.wareId,
+        ratePerHour: responsibility.ratePerHour || 0,
+      }]
+    }),
+  }
 }

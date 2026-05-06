@@ -62,6 +62,7 @@
     "group_production": "Production Lines",
     "build_material_allocation": "Build Material Allocation",
     "derived_locked": "Auto-generated; quantity calculated during compute",
+    "target_short": "Target",
     "build_material_short": "Mat",
     "production_short": "Prod",
     "required_short": "Req"

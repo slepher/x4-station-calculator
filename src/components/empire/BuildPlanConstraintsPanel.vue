@@ -1,12 +1,12 @@
 <script setup lang="ts">
 import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 import BuildGoalSearchBox from './BuildGoalSearchBox.vue'
 import ProductionLineAllocationSection from './ProductionLineAllocationSection.vue'
+import WarePlanningItem from './WarePlanningItem.vue'
 import { type BuildGoal, type ProductionLineAllocation } from '@/types/build-plan'
 import type { FlowPlanItem } from '@/components/empire/presenters/useBuildPlanPresenter'
-
-const { t } = useI18n()
 
 const props = defineProps<{
   goals: BuildGoal[]
@@ -19,7 +19,8 @@ const props = defineProps<{
   activeFlowPlanId: string | null
   loadableFlowPlans: FlowPlanItem[]
   allocations: ProductionLineAllocation[]
-  buildFlowPlanAllocations?: ProductionLineAllocation[]
+  buildMaterialPreviewAllocations?: ProductionLineAllocation[]
+  productionPreviewAllocations?: ProductionLineAllocation[]
   buildFlowPlanLoading?: boolean
 }>()
 
@@ -32,27 +33,14 @@ const emit = defineEmits<{
   loadFlowPlan: [planId: string]
 }>()
 
+const { t } = useI18n()
+const gameData = useGameDataStore()
 const schemeCount = computed(() => props.buildPlan?.schemes?.length || 0)
-
-const buildMaterialAllocations = computed(() => {
-  if (!props.buildFlowMode || !props.buildFlowPlanAllocations) return []
-  return props.buildFlowPlanAllocations.map(bma => {
-    const prodAlloc = props.allocations.find(a => a.groupId === bma.groupId)
-    if (!prodAlloc) return bma
-    // Dedup by (type, wareId) pair — keep distinct goals from both sources
-    const existing = new Set(bma.goals.map(g => `${g.type}:${(g as any).wareId ?? ''}`))
-    const extra = prodAlloc.goals.filter(g => !existing.has(`${g.type}:${(g as any).wareId ?? ''}`))
-    return extra.length > 0 ? { ...bma, goals: [...bma.goals, ...extra] } : bma
-  })
-})
-
-const productionLineAllocations = computed(() => {
-  if (!props.buildFlowMode || !props.buildFlowPlanAllocations || props.buildFlowPlanAllocations.length === 0) {
-    return props.allocations
-  }
-  const buildMatGroupIds = new Set(props.buildFlowPlanAllocations.map(a => a.groupId))
-  return props.allocations.filter(a => !a.groupId || !buildMatGroupIds.has(a.groupId))
-})
+const editableGoals = computed(() =>
+  props.goals.filter((goal): goal is BuildGoal & { type: 'production-rate' | 'build-module' } =>
+    goal.type === 'production-rate' || goal.type === 'build-module'
+  )
+)
 
 function onCompute() {
   emit('computePlan')
@@ -64,6 +52,29 @@ function onUpdateGoal(index: number, value: number) {
 
 function onRemoveGoal(index: number) {
   emit('removeGoal', index)
+}
+
+function getGoalDisplayInfo(goal: BuildGoal & { type: 'production-rate' | 'build-module' }) {
+  if (goal.type === 'production-rate') {
+    const wareInfo = gameData.localizedWaresMap[goal.wareId]
+    const module = gameData.findModuleForWare(goal.wareId, props.racePreference)
+    const moduleGroup = module?.group ? gameData.localizedModuleGroupsMap[module.group] : undefined
+    return {
+      displayName: wareInfo?.localeName || goal.wareId,
+      wareInfo,
+      moduleInfo: undefined,
+      moduleGroup,
+    }
+  }
+
+  const moduleInfo = gameData.localizedModulesMap[goal.moduleId]
+  const moduleGroup = moduleInfo?.group ? gameData.localizedModuleGroupsMap[moduleInfo.group] : undefined
+  return {
+    displayName: moduleInfo?.localeName || goal.moduleId,
+    wareInfo: undefined,
+    moduleInfo,
+    moduleGroup,
+  }
 }
 
 const flowMenuOpen = ref(false)
@@ -176,33 +187,44 @@ onUnmounted(() => {
 
       <BuildGoalSearchBox :racePreference="racePreference" @addGoal="emit('addGoal', $event)" />
 
-      <template v-if="buildFlowMode && buildMaterialAllocations.length > 0">
+      <div class="space-y-2">
+        <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">{{ t('build_plan.goals') }}</div>
+        <div v-if="editableGoals.length > 0" class="space-y-2">
+          <WarePlanningItem
+            v-for="(goal, index) in editableGoals"
+            :key="`${goal.type}-${goal.type === 'production-rate' ? goal.wareId : goal.moduleId}-${index}`"
+            :goal="goal"
+            :displayName="getGoalDisplayInfo(goal).displayName"
+            :wareInfo="getGoalDisplayInfo(goal).wareInfo"
+            :moduleInfo="getGoalDisplayInfo(goal).moduleInfo"
+            :moduleGroup="getGoalDisplayInfo(goal).moduleGroup"
+            @update:value="onUpdateGoal(goals.indexOf(goal), $event)"
+            @remove="onRemoveGoal(goals.indexOf(goal))"
+          />
+        </div>
+      </div>
+
+      <template v-if="buildFlowMode && buildMaterialPreviewAllocations && buildMaterialPreviewAllocations.length > 0">
         <ProductionLineAllocationSection
-          :allocations="buildMaterialAllocations"
+          :allocations="buildMaterialPreviewAllocations"
           :goals="goals"
           :racePreference="racePreference"
-          :title="t('build_plan.group_build_material')"
+          readonly
+          :title="t('build_plan.build_material_allocation')"
           @update-goal="onUpdateGoal"
           @remove-goal="onRemoveGoal"
         />
         <ProductionLineAllocationSection
-          v-if="productionLineAllocations.length > 0"
-          :allocations="productionLineAllocations"
+          v-if="productionPreviewAllocations && productionPreviewAllocations.length > 0"
+          :allocations="productionPreviewAllocations"
           :goals="goals"
           :racePreference="racePreference"
+          readonly
           :title="t('build_plan.group_production')"
           @update-goal="onUpdateGoal"
           @remove-goal="onRemoveGoal"
         />
       </template>
-      <ProductionLineAllocationSection
-        v-else
-        :allocations="allocations"
-        :goals="goals"
-        :racePreference="racePreference"
-        @update-goal="onUpdateGoal"
-        @remove-goal="onRemoveGoal"
-      />
 
       <div v-if="allocations.length === 0 && goals.length === 0" class="text-xs text-slate-500 italic text-center py-2">
         {{ t('build_plan.no_goals') }}

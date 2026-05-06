@@ -52,30 +52,6 @@ export function autoFillForLine(
   })
 }
 
-export function expandGoalsWithAutoFill(
-  goals: BuildGoal[],
-  modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>,
-  settings: StationSettings,
-  isolatedWares: Set<string> = new Set(),
-): SavedModule[] {
-  const lockedWares = [...isolatedWares]
-  let result: SavedModule[] = []
-  for (const goal of goals) {
-    const base = expandGoalDependencies(goal, modulesMap, waresMap)
-    const merged = mergeModules(base)
-    const autoFill = calculateAutoFillModules({
-      plannedModules: merged,
-      settings,
-      modulesMap,
-      waresMap,
-      lockedWares,
-    })
-    result = mergeModules([...result, ...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
-  }
-  return result
-}
-
 export function computeSourceSatisfaction(
   targetRate: number,
   prodRate: number,
@@ -344,6 +320,7 @@ function planProductionForRates(
   waresMap: Record<string, X4Ware>,
   race: string,
   gap: Record<string, number> = {},
+  trackedWares?: Set<string>,
 ): SavedModule[] {
   const totalQty: Record<string, number> = {}
   let totalSeconds = 0
@@ -378,6 +355,7 @@ function planProductionForRates(
 
   for (const [wareId, targetRate] of Object.entries(targetRates)) {
     if (targetRate <= 0) continue
+    if (trackedWares && !trackedWares.has(wareId)) continue
     const producer = findBestProducer(wareId, race, [], modulesMap, waresMap)
     if (!producer) continue
 
@@ -809,7 +787,7 @@ function computeDemandAnalysis(node: BuildFlowPlanLine): void {
     totalMaterialQty,
   }
 }
-function buildTopologicalOrder(graph: BuildFlowPlanGraph): Array<string[] | string> {
+export function buildTopologicalOrder(graph: BuildFlowPlanGraph): Array<string[] | string> {
   const inDegree = new Map<string, number>()
   for (const [key] of graph.nodes) inDegree.set(key, 0)
   for (const edge of graph.edges) {
@@ -927,7 +905,7 @@ function collectDemandSources(
     const existing = byLabel.get(label)
     if (existing) {
       for (const [w, r] of Object.entries(rates)) {
-        existing.rates[w] = Math.max(existing.rates[w] || 0, r)
+        existing.rates[w] = (existing.rates[w] || 0) + r
       }
     } else {
       byLabel.set(label, { label, rates, materials })
@@ -1027,7 +1005,7 @@ function computeDagLine(
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
   } else {
-    node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference, gapForPlan)
+    node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference, gapForPlan, node.trackedWares)
     const autoFill = autoFillForLine(
       mergeModules([...currentEmpireModules, ...node.modules]),
       [...(requiredWaresByGroup.get(node.lineGroupId) || [])].map(w => ({ type: 'required-production' as const, wareId: w, ratePerHour: 0 })),
@@ -1122,7 +1100,7 @@ function computeSCCGroup(
         for (const [w, r] of Object.entries(gapRates)) {
           if (node.trackedWares.has(w)) nodeGapForPlan[w] = r
         }
-        node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference, nodeGapForPlan)
+        node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference, nodeGapForPlan, node.trackedWares)
         const autoFill = autoFillForLine(
           mergeModules([...currentEmpireModules, ...node.modules]),
           [...(requiredWaresByGroup.get(node.lineGroupId) || [])].map(w => ({ type: 'required-production' as const, wareId: w, ratePerHour: 0 })),
@@ -1135,7 +1113,7 @@ function computeSCCGroup(
       updateNodeDerivedFields(node, modulesMap, settings)
       computeDemandAnalysis(node)
 
-      const countKey = node.modules.map(m => `${m.id}:${m.count}`).sort().join(';')
+      const countKey = makePrimaryModuleSnapshot(node)
 
       if (prevCounts.get(key) !== countKey) {
         stable = false
@@ -1146,6 +1124,17 @@ function computeSCCGroup(
     if (stable) break
     if (maxIterations-- <= 0) break
   }
+}
+
+function makePrimaryModuleSnapshot(
+  node: BuildFlowPlanLine,
+): string {
+  const primaryIds = new Set(node.moduleIds)
+  return node.modules
+    .filter(m => primaryIds.has(m.id))
+    .map(m => `${m.id}:${m.count}`)
+    .sort()
+    .join(';')
 }
 
 function updateNodeDerivedFields(
@@ -1232,7 +1221,7 @@ function makeSchemeFromLine(
   const targetRates: Record<string, number> = {}
   for (const src of demandSources) {
     for (const [wareId, rate] of Object.entries(src.rates)) {
-      targetRates[wareId] = Math.max(targetRates[wareId] || 0, rate)
+      targetRates[wareId] = (targetRates[wareId] || 0) + rate
     }
   }
 
@@ -1272,8 +1261,7 @@ function makeSchemeFromLine(
     : [{ reason: node.lineName, modules: node.modules }]
 
   const steps = makeSchemeSteps(groups, modulesMap, waresMap, settings, contextModules)
-
-  return {
+  const scheme: BuildScheme = {
     label: node.lineName,
     description: `产出: ${wareNames}`,
     purposeModules,
@@ -1291,6 +1279,8 @@ function makeSchemeFromLine(
     buildMaterialTotals,
     moduleBuildDetails,
   }
+  ;(scheme as any)._groupId = node.lineGroupId
+  return scheme
 }
 
 export function splitCToLineSchemes(
@@ -1300,6 +1290,16 @@ export function splitCToLineSchemes(
   settings: StationSettings,
 ): BuildScheme[] {
   const schemes: BuildScheme[] = []
+
+  function buildTargetRatesFromGoals(goals: BuildGoal[]): Record<string, number> {
+    const targetRates: Record<string, number> = {}
+    for (const goal of goals) {
+      if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
+        targetRates[goal.wareId] = (targetRates[goal.wareId] || 0) + goal.ratePerHour
+      }
+    }
+    return targetRates
+  }
 
   function makeLineScheme(
     lineName: string,
@@ -1358,13 +1358,13 @@ export function splitCToLineSchemes(
     const groups: BuildGroup[] = [{ reason: lineName, modules: lineModules }]
     const steps = makeSchemeSteps(groups, modulesMap, waresMap, settings)
 
-    return {
+    const scheme: BuildScheme = {
       label: lineName || '目标产线',
       description: `产出: ${purposeModules.map(w => waresMap[w]?.name || w).join(', ')}`,
       purposeModules,
       primaryModuleIds: primaryModuleIds.length > 0 ? primaryModuleIds : lineModules.map(m => m.id),
       modules: lineModules,
-      targetRates: {},
+      targetRates: buildTargetRatesFromGoals(goals),
       targetRateSources: [],
       netProduction,
       steps,
@@ -1376,6 +1376,8 @@ export function splitCToLineSchemes(
       buildMaterialTotals,
       moduleBuildDetails,
     }
+    ;(scheme as any)._goals = goals
+    return scheme
   }
 
   for (const alloc of allocations) {
@@ -1399,6 +1401,105 @@ export function splitCToLineSchemes(
   return schemes
 }
 
+function sumRecordValues(
+  left: Record<string, number>,
+  right: Record<string, number>,
+): Record<string, number> {
+  const result: Record<string, number> = { ...left }
+  for (const [key, value] of Object.entries(right)) {
+    result[key] = (result[key] || 0) + value
+  }
+  return result
+}
+
+function mergeSchemePair(
+  buildScheme: BuildScheme,
+  productionScheme: BuildScheme,
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+  settings: StationSettings,
+): BuildScheme {
+  const mergedModules = mergeModules([...buildScheme.modules, ...productionScheme.modules])
+  const purposeModules = [...new Set([...buildScheme.purposeModules, ...productionScheme.purposeModules])]
+  const purposeWareSet = new Set(purposeModules)
+  const buildGroups: BuildGroup[] = [{ reason: buildScheme.label, modules: mergedModules }]
+  const steps = makeSchemeSteps(buildGroups, modulesMap, waresMap, settings)
+
+  let totalModuleBuildTime = 0
+  for (const module of mergedModules) {
+    const mod = modulesMap[module.id]
+    if (!mod) continue
+    totalModuleBuildTime += mod.buildTime * module.count
+  }
+
+  return {
+    ...buildScheme,
+    description: `产出: ${purposeModules.map(w => waresMap[w]?.name || w).join(', ')}`,
+    purposeModules,
+    primaryModuleIds: mergedModules
+      .filter(module => {
+        const mod = modulesMap[module.id]
+        return mod && Object.keys(mod.outputs).some(wareId => purposeWareSet.has(wareId))
+      })
+      .map(module => module.id),
+    modules: mergedModules,
+    targetRates: sumRecordValues(buildScheme.targetRates, productionScheme.targetRates),
+    targetRateSources: [...buildScheme.targetRateSources, ...productionScheme.targetRateSources],
+    netProduction: calculateNetProduction(
+      mergedModules,
+      modulesMap,
+      settings.considerWorkforceForAutoFill,
+      settings.sunlight,
+    ),
+    steps,
+    totalDuration: steps.length > 0 ? steps[steps.length - 1]!.estimatedDuration : 0,
+    totalCredits: steps.length > 0 ? steps[steps.length - 1]!.estimatedCredits : 0,
+    stepsCount: steps.length,
+    isFeasible: mergedModules.length > 0,
+    totalModuleBuildTime,
+    buildMaterialTotals: sumRecordValues(buildScheme.buildMaterialTotals, productionScheme.buildMaterialTotals),
+    moduleBuildDetails: computeModuleBuildDetails(mergedModules, modulesMap),
+  }
+}
+
+export function mergeOverlappingLines(
+  buildSchemes: BuildScheme[],
+  productionSchemes: BuildScheme[],
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+  settings: StationSettings,
+): { buildSchemes: BuildScheme[]; productionSchemes: BuildScheme[] } {
+  const buildByGroupId = new Map<string, BuildScheme>()
+  for (const scheme of buildSchemes) {
+    const groupId = (scheme as any)._groupId
+    if (typeof groupId === 'string' && groupId.length > 0) {
+      buildByGroupId.set(groupId, scheme)
+    }
+  }
+
+  const nextBuildSchemes = [...buildSchemes]
+  const nextProductionSchemes: BuildScheme[] = []
+
+  for (const productionScheme of productionSchemes) {
+    const groupId = (productionScheme as any)._groupId
+    if (!groupId || !buildByGroupId.has(groupId)) {
+      nextProductionSchemes.push(productionScheme)
+      continue
+    }
+
+    const buildScheme = buildByGroupId.get(groupId)!
+    const merged = mergeSchemePair(buildScheme, productionScheme, modulesMap, waresMap, settings)
+    const index = nextBuildSchemes.indexOf(buildScheme)
+    if (index >= 0) nextBuildSchemes[index] = merged
+    buildByGroupId.set(groupId, merged)
+  }
+
+  return {
+    buildSchemes: nextBuildSchemes,
+    productionSchemes: nextProductionSchemes,
+  }
+}
+
 export function makeSchemesWithGroups(
   graph: BuildFlowPlanGraph,
   allocations: ProductionLineAllocation[],
@@ -1407,72 +1508,50 @@ export function makeSchemesWithGroups(
   settings: StationSettings,
   groupLabels?: { buildMaterial: string; production: string },
 ): BuildSchemeGroup[] {
-  // 1. Build-material schemes from graph nodes (excluding C scheme)
+  // 1. Build-material schemes from graph nodes
   const order = buildTopologicalOrder(graph)
   order.reverse()
   const builtSoFar: SavedModule[] = []
   const buildSchemes: BuildScheme[] = []
+  const graphGroupIds = new Set<string>()
   for (const entry of order) {
     if (Array.isArray(entry)) {
       for (const key of entry) {
         const node = graph.nodes.get(key)
         if (!node || node.modules.length === 0) continue
+        graphGroupIds.add(key)
         buildSchemes.push(makeSchemeFromLine(node, graph, modulesMap, waresMap, settings, builtSoFar))
         builtSoFar.push(...node.modules)
       }
     } else {
       const node = graph.nodes.get(entry)
       if (!node || node.modules.length === 0) continue
+      graphGroupIds.add(entry)
       buildSchemes.push(makeSchemeFromLine(node, graph, modulesMap, waresMap, settings, builtSoFar))
       builtSoFar.push(...node.modules)
     }
   }
 
-  const buildNodeGroupIds = new Set<string>()
-  for (const [groupId] of graph.nodes) {
-    buildNodeGroupIds.add(groupId)
-  }
+  // 2. Production schemes: filter out allocations whose groupId already in graph (overlapping lines)
+  //    Overlapping lines are already solved in graph nodes with merged responsibilities
+  const productionAllocations = allocations.filter(
+    a => !a.groupId || !graphGroupIds.has(a.groupId)
+  )
+  const splitSchemes = splitCToLineSchemes(productionAllocations, modulesMap, waresMap, settings)
 
-  // 2. Production schemes from C split
-  const productionSchemes = splitCToLineSchemes(allocations, modulesMap, waresMap, settings)
-
-  // 3. Detect overlaps: skip production schemes that overlap with graph nodes
-  const overlappingGroupIds = new Set<string>()
-  for (const prodScheme of productionSchemes) {
-    const groupId = (prodScheme as any)._groupId
-    if (groupId && buildNodeGroupIds.has(groupId)) {
-      overlappingGroupIds.add(groupId)
-    }
-  }
-
-  const mergedBuildSchemes: BuildScheme[] = [...buildSchemes]
-  const mergedProductionSchemes: BuildScheme[] = []
-
-  for (const prodScheme of productionSchemes) {
-    const groupId = (prodScheme as any)._groupId
-    if (groupId && overlappingGroupIds.has(groupId)) {
-      // Overlap: production demand is already satisfied by the graph node's scheme.
-      // The build-material scheme from the graph already covers this line.
-      // TODO: 叠加相加 — add production target rates to the graph node's demand sources.
-    } else {
-      mergedProductionSchemes.push(prodScheme)
-    }
-  }
-
-  // 4. Clean up internal _groupId
-  for (const s of mergedBuildSchemes) delete (s as any)._groupId
-  for (const s of mergedProductionSchemes) delete (s as any)._groupId
+  for (const scheme of buildSchemes) delete (scheme as any)._groupId
+  for (const scheme of splitSchemes) delete (scheme as any)._groupId
 
   return [
     {
       groupType: 'build-material',
       groupLabel: groupLabels?.buildMaterial || 'Build Material Lines',
-      schemes: mergedBuildSchemes,
+      schemes: buildSchemes,
     },
     {
       groupType: 'production',
       groupLabel: groupLabels?.production || 'Production Lines',
-      schemes: mergedProductionSchemes,
+      schemes: splitSchemes,
     },
   ]
 }

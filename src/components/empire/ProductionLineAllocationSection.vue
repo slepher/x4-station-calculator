@@ -27,11 +27,33 @@ function getStoreIndex(goal: BuildGoal): number | undefined {
   return idx >= 0 ? idx : undefined
 }
 
+function isSameGoal(left: BuildGoal, right: BuildGoal): boolean {
+  if (left.type !== right.type) return false
+  if (left.type === 'production-rate' && right.type === 'production-rate') {
+    return left.wareId === right.wareId && left.ratePerHour === right.ratePerHour
+  }
+  if (left.type === 'build-module' && right.type === 'build-module') {
+    return left.moduleId === right.moduleId && left.count === right.count
+  }
+  if ('wareId' in left && 'wareId' in right) {
+    return left.wareId === right.wareId && ('ratePerHour' in left ? left.ratePerHour : 0) === ('ratePerHour' in right ? right.ratePerHour : 0)
+  }
+  return false
+}
+
+function getGoalStoreIndex(goal: BuildGoal): number | undefined {
+  const direct = getStoreIndex(goal)
+  if (direct !== undefined) return direct
+  const fallbackIndex = props.goals.findIndex(storeGoal => isSameGoal(storeGoal, goal))
+  return fallbackIndex >= 0 ? fallbackIndex : undefined
+}
+
 function isDerived(goal: BuildGoal): boolean {
-  return goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production'
+  return goal.type === 'target-production' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production'
 }
 
 function derivedTag(goal: BuildGoal): string | null {
+  if (goal.type === 'target-production') return t('build_plan.target_short')
   if (goal.type === 'derived-build-material') return t('build_plan.build_material_short')
   if (goal.type === 'derived-production') return t('build_plan.production_short')
   if (goal.type === 'required-production') return t('build_plan.required_short')
@@ -44,7 +66,17 @@ function getGoalDisplayInfo(goal: BuildGoal): {
   moduleInfo?: LocalizedX4Module
   moduleGroup?: LocalizedX4ModuleGroup
 } {
-  if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') {
+  if (goal.type === 'target-production' && goal.moduleId) {
+    const module = gameData.localizedModulesMap[goal.moduleId]
+    const group = module?.group ? gameData.localizedModuleGroupsMap[module.group] : undefined
+    return {
+      displayName: module?.localeName || goal.moduleId,
+      moduleInfo: module,
+      moduleGroup: group,
+    }
+  }
+  if (goal.type === 'production-rate' || goal.type === 'target-production' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') {
+    if (!goal.wareId) return { displayName: '' }
     const ware = gameData.localizedWaresMap[goal.wareId]
     const module = gameData.findModuleForWare(goal.wareId, props.racePreference)
     const group = module?.group ? gameData.localizedModuleGroupsMap[module.group] : undefined
@@ -91,6 +123,26 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
       return {
         label: gameData.getDlcDisplayName(module.dlc_tag),
         isActive: gameData.isDlcActive(module.dlc_tag),
+      }
+    }
+  }
+  if (goal.type === 'target-production') {
+    if (goal.wareId) {
+      const ware = gameData.localizedWaresMap[goal.wareId]
+      if (ware && ware.dlc_tag !== 'base') {
+        return {
+          label: gameData.getDlcDisplayName(ware.dlc_tag),
+          isActive: gameData.isDlcActive(ware.dlc_tag),
+        }
+      }
+    }
+    if (goal.moduleId) {
+      const module = gameData.localizedModulesMap[goal.moduleId]
+      if (module && module.dlc_tag !== 'base') {
+        return {
+          label: gameData.getDlcDisplayName(module.dlc_tag),
+          isActive: gameData.isDlcActive(module.dlc_tag),
+        }
       }
     }
   }
@@ -151,7 +203,8 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
                 :modelValue="goal.type === 'production-rate' ? goal.ratePerHour : (goal.type === 'build-module' ? goal.count : 0)"
                 @update:modelValue="(v: number) => {
                   const si = getStoreIndex(goal)
-                  if (si !== undefined) emit('update-goal', si, v)
+                  const resolvedIndex = si ?? getGoalStoreIndex(goal)
+                  if (resolvedIndex !== undefined) emit('update-goal', resolvedIndex, v)
                 }"
                 width-class="w-14"
                 :min="1"
@@ -162,7 +215,7 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
                 class="remove-btn"
                 :title="t('planning.remove')"
                 @click="() => {
-                  const si = getStoreIndex(goal)
+                  const si = getGoalStoreIndex(goal)
                   if (si !== undefined) emit('remove-goal', si)
                 }"
               >×</button>
