@@ -138,6 +138,9 @@ export interface CalculateBuildPlanInput {
 export interface DemandDetail {
   perWareSources: Record<string, { label: string; qty: number; seconds: number; rate: number }[]>
   aggregateRates: Record<string, number>
+  gapRates: Record<string, number>
+  targetRates: Record<string, number>
+  perWareTotals: Record<string, { seconds: number; qty: number }>
   totalSeconds: number
   totalMaterialQty: number
 }

@@ -770,12 +770,14 @@ function computeDemandAnalysis(node: BuildFlowPlanLine): void {
 
   const totalHours = totalSeconds / 3600
   const aggregateRates: Record<string, number> = {}
+  const perWareTotals: Record<string, { seconds: number; qty: number }> = {}
   let totalMaterialQty = 0
   if (totalHours > 0) {
     for (const [wareId, entries] of Object.entries(perWareSources)) {
       let sumQty = 0
       for (const e of entries) sumQty += e.qty
       aggregateRates[wareId] = sumQty / totalHours
+      perWareTotals[wareId] = { seconds: totalSeconds, qty: sumQty }
       totalMaterialQty += sumQty
     }
   }
@@ -783,6 +785,9 @@ function computeDemandAnalysis(node: BuildFlowPlanLine): void {
   node.demandAnalysis = {
     perWareSources,
     aggregateRates,
+    gapRates: {},
+    targetRates: { ...aggregateRates },
+    perWareTotals,
     totalSeconds,
     totalMaterialQty,
   }

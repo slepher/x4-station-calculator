@@ -405,14 +405,17 @@ for (const [groupId, node] of graph.nodes) {
   }
 
   // --- 2. 聚合需求 ---
-  const aggregateRates = da?.aggregateRates || scheme?.targetRates || computeLine?.targetRates || {}
+  const aggregateRates = da?.aggregateRates || {}
   if (da || Object.keys(aggregateRates).length > 0) {
-    const totalSeconds = da?.totalSeconds || 0
-    const totalHours = totalSeconds / 3600
-    const totalMaterialQty = da?.totalMaterialQty || 0
-    console.log(`  聚合需求 (总时间 ${totalSeconds}s = ${totalHours.toFixed(2)}h, 总材料 ${Math.round(totalMaterialQty)} 单元):`)
+    console.log('  聚合需求:')
     for (const [wareId, rate] of Object.entries(aggregateRates)) {
-      console.log(`    ${wareName(wareId)}: ${rate.toFixed(1)}/h`)
+      const totals = da?.perWareTotals?.[wareId]
+      if (totals) {
+        const totalHours = totals.seconds / 3600
+        console.log(`    ${wareName(wareId)}: ${rate.toFixed(1)}/h  (总时间 ${totals.seconds}s = ${totalHours.toFixed(2)}h, 总材料 ${Math.round(totals.qty)} 单元)`)
+      } else {
+        console.log(`    ${wareName(wareId)}: ${rate.toFixed(1)}/h`)
+      }
     }
   }
 
@@ -444,7 +447,8 @@ for (const [groupId, node] of graph.nodes) {
     }
   }
 
-  const relevantWares = new Set<string>([...Object.keys(aggregateRates), ...node.trackedWares])
+  const finalTargetRates = da?.targetRates || scheme?.targetRates || computeLine?.targetRates || {}
+  const relevantWares = new Set<string>([...Object.keys(finalTargetRates), ...node.trackedWares])
   const relevantManualWares: Record<string, number> = {}
   for (const [w, r] of Object.entries(manualWaresRates)) {
     if (relevantWares.has(w)) relevantManualWares[w] = r
@@ -470,24 +474,21 @@ for (const [groupId, node] of graph.nodes) {
     console.log('  manual: (无)')
   }
 
-  // --- 4. target = 聚合 + ware + module ---
+  // --- 4. target = 聚合 + gap + ware + module ---
   const allWares = new Set<string>([
-    ...Object.keys(aggregateRates),
+    ...Object.keys(finalTargetRates),
     ...Object.keys(relevantManualWares),
     ...Object.keys(relevantManualMods),
   ])
   if (allWares.size > 0) {
-    console.log('  target = 聚合 + ware + module:')
+    console.log('  target = 聚合 + gap + ware + module:')
     for (const w of allWares) {
       const agg = aggregateRates[w] || 0
+      const gap = da?.gapRates?.[w] || 0
       const mw = manualWaresRates[w] || 0
       const mm = manualModRates[w] || 0
-      const total = agg + mw + mm
-      const extras: string[] = []
-      if (mw > 0) extras.push(`ware +${mw.toFixed(1)}`)
-      if (mm > 0) extras.push(`module +${mm.toFixed(1)}`)
-      const extraStr = extras.length > 0 ? ` (${extras.join(', ')})` : ''
-      console.log(`    ${wareName(w)}: ${agg.toFixed(1)}/h${extraStr} = ${total.toFixed(1)}/h`)
+      const total = agg + gap + mw + mm
+      console.log(`    ${wareName(w)}: ${agg.toFixed(1)}/h + ${gap.toFixed(1)}/h + ${mw.toFixed(1)}/h + ${mm.toFixed(1)}/h = ${total.toFixed(1)}/h`)
     }
   }
 
@@ -496,7 +497,7 @@ for (const [groupId, node] of graph.nodes) {
   if (allWares.size > 0) {
     console.log('  产出 vs 目标:')
     for (const w of allWares) {
-      const target = (aggregateRates[w] || 0) + (manualWaresRates[w] || 0) + (manualModRates[w] || 0)
+      const target = (aggregateRates[w] || 0) + (da?.gapRates?.[w] || 0) + (manualWaresRates[w] || 0) + (manualModRates[w] || 0)
       const p = Math.max(0, prod[w] || 0)
       const diff = p - target
       const status = diff >= -0.001 ? '✓' : '✗'

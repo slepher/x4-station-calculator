@@ -258,54 +258,107 @@ function mergeGraphAndAllocationLines(
 ): PreviewLinePlan[] {
   const result: PreviewLinePlan[] = [...graphLines]
   const graphGroupIds = new Set(graphLines.map(l => l.groupId).filter(Boolean) as string[])
+  const lineByGroupId = new Map(graphLines.map(line => [line.groupId, line]))
+
+  const requiredConsumersByWare = new Map<string, Set<string>>()
+  for (const graphLine of graphLines) {
+    if (!graphLine.groupId) continue
+    for (const responsibility of graphLine.responsibilities) {
+      if (responsibility.type !== 'required-production') continue
+      if (!responsibility.wareId) continue
+      const consumers = requiredConsumersByWare.get(responsibility.wareId) || new Set<string>()
+      consumers.add(graphLine.groupId)
+      requiredConsumersByWare.set(responsibility.wareId, consumers)
+    }
+  }
+  for (const alloc of allocations) {
+    if (!alloc.groupId) continue
+    for (const goal of alloc.goals) {
+      if (goal.type !== 'required-production') continue
+      const consumers = requiredConsumersByWare.get(goal.wareId) || new Set<string>()
+      consumers.add(alloc.groupId)
+      requiredConsumersByWare.set(goal.wareId, consumers)
+    }
+  }
 
   let respIdCounter = 0
   for (const alloc of allocations) {
+    const isGraphOverlap = Boolean(alloc.groupId && graphGroupIds.has(alloc.groupId))
     const respLine: PreviewLinePlan = {
       groupId: alloc.groupId,
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
-      responsibilities: alloc.goals.map(g => goalToResponsibility(g, `goal:${alloc.groupId || 'unmatched'}`, ++respIdCounter, alloc.groupId)),
+      responsibilities: alloc.goals
+        .map(g => goalToResponsibility(g, `goal:${alloc.groupId || 'unmatched'}`, ++respIdCounter, alloc.groupId))
+        .filter(resp => isGraphOverlap
+          ? (resp.type === 'target-production' || resp.type === 'derived-production')
+          : (resp.type === 'target-production' || resp.type === 'required-production')),
     }
 
-    if (alloc.groupId && graphGroupIds.has(alloc.groupId)) {
-      // 重叠产线：合并到已有 graph line
-      const existing = result.find(l => l.groupId === alloc.groupId)
+    if (isGraphOverlap && alloc.groupId) {
+      const existing = lineByGroupId.get(alloc.groupId)
       if (existing) {
-        existing.responsibilities = [...existing.responsibilities, ...respLine.responsibilities]
+        for (const responsibility of respLine.responsibilities) {
+          if (responsibility.type === 'derived-production' && responsibility.wareId) {
+            const consumers = requiredConsumersByWare.get(responsibility.wareId)
+            responsibility.relatedLineGroupIds = consumers ? [...consumers] : []
+          }
+        }
+        existing.responsibilities = dedupeResponsibilities([
+          ...existing.responsibilities,
+          ...respLine.responsibilities,
+        ])
       }
     } else if (!alloc.isUnmatched) {
-      // 仅出现在 allocation 中，graph 中没有该 node
-      result.push(respLine)
+      result.push({
+        ...respLine,
+        responsibilities: dedupeResponsibilities(respLine.responsibilities),
+      })
     }
   }
 
-  const productionGroupIds = result
-    .filter(line => line.groupId && line.responsibilities.some(resp => resp.type === 'target-production'))
-    .map(line => line.groupId!) 
+  const externalTargetGroupIds = allocations
+    .filter(alloc => alloc.groupId && !graphGroupIds.has(alloc.groupId))
+    .filter(alloc => alloc.goals.some(goal => goal.type === 'build-module' || goal.type === 'production-rate'))
+    .map(alloc => alloc.groupId!)
 
   for (const line of result) {
     for (const responsibility of line.responsibilities) {
       if (responsibility.type !== 'derived-build-material') continue
       responsibility.relatedLineGroupIds = [...new Set([
         ...responsibility.relatedLineGroupIds,
-        ...productionGroupIds,
+        ...externalTargetGroupIds,
       ])]
     }
-  }
-
-  for (const line of result) {
-    if (!line.groupId) continue
-    for (const responsibility of line.responsibilities) {
-      if (responsibility.type !== 'derived-production') continue
-      const isSelfOnly = responsibility.relatedLineGroupIds.length === 1
-        && responsibility.relatedLineGroupIds[0] === line.groupId
-      if (!isSelfOnly && responsibility.relatedLineGroupIds.length > 0) continue
-      responsibility.relatedLineGroupIds = [...productionGroupIds]
-    }
+    line.responsibilities = dedupeResponsibilities(line.responsibilities)
   }
 
   return result
+}
+
+function dedupeResponsibilities(
+  responsibilities: PreviewResponsibility[],
+): PreviewResponsibility[] {
+  const map = new Map<string, PreviewResponsibility>()
+  for (const responsibility of responsibilities) {
+    const relatedLineGroupIds = [...new Set(responsibility.relatedLineGroupIds)].sort()
+    const key = [
+      responsibility.type,
+      responsibility.wareId || '',
+      responsibility.moduleId || '',
+      String(responsibility.count || ''),
+      String(responsibility.ratePerHour || ''),
+      relatedLineGroupIds.join(','),
+    ].join('|')
+
+    if (!map.has(key)) {
+      map.set(key, {
+        ...responsibility,
+        relatedLineGroupIds,
+      })
+    }
+  }
+  return [...map.values()]
 }
 
 // ─── Compute 阶段 ──────────────────────────────────────────────
@@ -391,15 +444,18 @@ function computeTargetRatesForResponsibilities(
 
   const rates: Record<string, number> = {}
 
-  const buildMaterialResponsibilities = responsibilities.filter(resp => resp.type === 'derived-build-material')
-  const buildMaterialBuildings = collectBuildingsForResponsibilities(
-    buildMaterialResponsibilities,
-    preview,
-    resolvedModulesByGroupId,
-  )
-  const buildMaterialRates = computeTargetRatesFromBuildings(buildMaterialBuildings, modulesMap)
-  for (const [wareId, rate] of Object.entries(buildMaterialRates)) {
-    rates[wareId] = (rates[wareId] || 0) + rate
+  for (const responsibility of responsibilities) {
+    if (responsibility.type !== 'derived-build-material') continue
+    if (!responsibility.wareId) continue
+    const buildings = collectBuildingsForResponsibilities(
+      [responsibility],
+      preview,
+      resolvedModulesByGroupId,
+    )
+    const buildMaterialRates = computeTargetRatesFromBuildings(buildings, modulesMap)
+    const rate = buildMaterialRates[responsibility.wareId] || 0
+    if (rate <= 0) continue
+    rates[responsibility.wareId] = (rates[responsibility.wareId] || 0) + rate
   }
 
   for (const responsibility of responsibilities) {
@@ -767,9 +823,14 @@ function buildDemandDetailForLine(
       .filter(resp => resp.type !== 'required-production' && resp.wareId)
       .map(resp => resp.wareId!),
   )
-  const sourceSummaries = new Map<string, { seconds: number; perWareQty: Record<string, number> }>()
-  let totalSeconds = 0
-  let totalMaterialQty = 0
+  const buildMaterialWares = new Set(
+    line.mergedResponsibilities
+      .filter(resp => resp.type === 'derived-build-material' && resp.wareId)
+      .map(resp => resp.wareId!),
+  )
+  const perWareSources: Record<string, { label: string; qty: number; seconds: number; rate: number }[]> = {}
+  const buildSourceSecondsByWare = new Map<string, Map<string, number>>()
+  const buildMaterialQtyByWare: Record<string, number> = {}
 
   for (const responsibility of line.mergedResponsibilities) {
     if (!responsibility.wareId) continue
@@ -779,63 +840,111 @@ function buildDemandDetailForLine(
     for (const relatedGroupId of responsibility.relatedLineGroupIds) {
       const relatedScheme = schemeByGroupId.get(relatedGroupId)
       if (!relatedScheme) continue
-      const { seconds, materials } = summarizeBuildModules(relatedScheme.modules, modulesMap)
-      if (seconds <= 0) continue
-
-      let qty = 0
       if (responsibility.type === 'derived-build-material') {
-        qty = materials[responsibility.wareId] || 0
-      } else if (responsibility.type === 'derived-production') {
-        const demandRate = Math.max(0, -((relatedScheme.netProduction || {})[responsibility.wareId] || 0))
-        qty = demandRate * (seconds / 3600)
-      }
+        const { seconds, materials } = summarizeBuildModules(relatedScheme.modules, modulesMap)
+        if (seconds <= 0) continue
+        const qty = materials[responsibility.wareId] || 0
+        if (qty <= 0) continue
 
-      if (qty <= 0) continue
-
-      const source = sourceSummaries.get(relatedScheme.label)
-      if (source) {
-        source.perWareQty[responsibility.wareId] = (source.perWareQty[responsibility.wareId] || 0) + qty
-      } else {
-        sourceSummaries.set(relatedScheme.label, {
+        pushDemandEntry(
+          perWareSources,
+          responsibility.wareId,
+          relatedScheme.label,
+          qty,
           seconds,
-          perWareQty: {
-            [responsibility.wareId]: qty,
-          },
-        })
-        totalSeconds += seconds
+        )
+        const wareSeconds = buildSourceSecondsByWare.get(responsibility.wareId) || new Map<string, number>()
+        if (!wareSeconds.has(relatedScheme.label)) {
+          wareSeconds.set(relatedScheme.label, seconds)
+        }
+        buildSourceSecondsByWare.set(responsibility.wareId, wareSeconds)
+        buildMaterialQtyByWare[responsibility.wareId] = (buildMaterialQtyByWare[responsibility.wareId] || 0) + qty
+        continue
       }
-    }
-  }
 
-  const perWareSources: Record<string, { label: string; qty: number; seconds: number; rate: number }[]> = {}
-  for (const [label, source] of sourceSummaries) {
-    for (const [wareId, qty] of Object.entries(source.perWareQty)) {
-      if (qty <= 0) continue
-      totalMaterialQty += qty
-      const entries = perWareSources[wareId] || []
-      entries.push({
-        label,
-        qty,
-        seconds: source.seconds,
-        rate: qty / (source.seconds / 3600),
-      })
-      perWareSources[wareId] = entries
+      if (responsibility.type !== 'derived-production') continue
+      const demandRate = Math.max(0, -((relatedScheme.netProduction || {})[responsibility.wareId] || 0))
+      if (demandRate <= 0) continue
+      pushDemandEntry(
+        perWareSources,
+        responsibility.wareId,
+        relatedScheme.label,
+        demandRate,
+        3600,
+      )
     }
   }
 
   const aggregateRates: Record<string, number> = {}
+  const gapRates: Record<string, number> = {}
   for (const [wareId, rate] of Object.entries(line.targetRates)) {
-    if (trackedWares.has(wareId)) {
+    if (buildMaterialWares.has(wareId)) {
       aggregateRates[wareId] = rate
+    }
+  }
+  for (const responsibility of line.mergedResponsibilities) {
+    if (responsibility.type !== 'derived-production') continue
+    if (!responsibility.wareId) continue
+    let rate = 0
+    for (const relatedGroupId of responsibility.relatedLineGroupIds) {
+      const relatedScheme = schemeByGroupId.get(relatedGroupId)
+      if (!relatedScheme) continue
+      rate += Math.max(0, -((relatedScheme.netProduction || {})[responsibility.wareId] || 0))
+    }
+    if (rate > 0) {
+      gapRates[responsibility.wareId] = (gapRates[responsibility.wareId] || 0) + rate
+    }
+  }
+
+  const perWareTotals: Record<string, { seconds: number; qty: number }> = {}
+  let totalSeconds = 0
+  let totalMaterialQty = 0
+  for (const wareId of Object.keys(perWareSources)) {
+    const buildSourceSeconds = buildSourceSecondsByWare.get(wareId)
+    if (buildSourceSeconds && buildSourceSeconds.size > 0) {
+      let seconds = 0
+      for (const sourceSeconds of buildSourceSeconds.values()) {
+        seconds += sourceSeconds
+      }
+      const qty = buildMaterialQtyByWare[wareId] || 0
+      perWareTotals[wareId] = { seconds, qty }
+      totalSeconds += seconds
+      totalMaterialQty += qty
     }
   }
 
   return {
     perWareSources,
     aggregateRates,
+    gapRates,
+    targetRates: { ...line.targetRates },
+    perWareTotals,
     totalSeconds,
     totalMaterialQty,
   }
+}
+
+function pushDemandEntry(
+  perWareSources: Record<string, { label: string; qty: number; seconds: number; rate: number }[]>,
+  wareId: string,
+  label: string,
+  qty: number,
+  seconds: number,
+): void {
+  const entries = perWareSources[wareId] || []
+  const existing = entries.find(entry => entry.label === label && entry.seconds === seconds)
+  if (existing) {
+    existing.qty += qty
+    existing.rate = existing.qty / (existing.seconds / 3600)
+  } else {
+    entries.push({
+      label,
+      qty,
+      seconds,
+      rate: qty / (seconds / 3600),
+    })
+  }
+  perWareSources[wareId] = entries
 }
 
 /**
@@ -916,18 +1025,13 @@ function buildGoalsFromResponsibilities(
   responsibilities: PreviewResponsibility[],
   targetRates: Record<string, number>,
 ): BuildGoal[] {
-  const derivedProductionWares = new Set<string>()
-  for (const responsibility of responsibilities) {
-    if (responsibility.type === 'derived-production' && responsibility.wareId) {
-      derivedProductionWares.add(responsibility.wareId)
-    }
-  }
+  const moduleGoals: BuildGoal[] = []
+  const wareKinds = new Map<string, { hasDerivedBuildMaterial: boolean; hasDerivedProduction: boolean; hasRequiredProduction: boolean; manualRate: number }>()
 
-  const goals: BuildGoal[] = []
   for (const responsibility of responsibilities) {
     if (responsibility.type === 'target-production') {
       if (responsibility.moduleId) {
-        goals.push({
+        moduleGoals.push({
           type: 'build-module',
           moduleId: responsibility.moduleId,
           count: responsibility.count || 1,
@@ -935,38 +1039,66 @@ function buildGoalsFromResponsibilities(
         continue
       }
       if (responsibility.wareId) {
-        if (!derivedProductionWares.has(responsibility.wareId)) {
-          goals.push({
-            type: 'production-rate',
-            wareId: responsibility.wareId,
-            ratePerHour: responsibility.ratePerHour || 0,
-          })
+        const current = wareKinds.get(responsibility.wareId) || {
+          hasDerivedBuildMaterial: false,
+          hasDerivedProduction: false,
+          hasRequiredProduction: false,
+          manualRate: 0,
         }
+        current.manualRate += responsibility.ratePerHour || 0
+        wareKinds.set(responsibility.wareId, current)
       }
       continue
     }
 
     if (!responsibility.wareId) continue
-    const ratePerHour = targetRates[responsibility.wareId] || 0
-    if (responsibility.type === 'derived-build-material') {
-      goals.push({
-        type: 'derived-build-material',
-        wareId: responsibility.wareId,
-        ratePerHour,
-      })
-    } else if (responsibility.type === 'derived-production') {
+    const current = wareKinds.get(responsibility.wareId) || {
+      hasDerivedBuildMaterial: false,
+      hasDerivedProduction: false,
+      hasRequiredProduction: false,
+      manualRate: 0,
+    }
+    if (responsibility.type === 'derived-build-material') current.hasDerivedBuildMaterial = true
+    if (responsibility.type === 'derived-production') current.hasDerivedProduction = true
+    if (responsibility.type === 'required-production') current.hasRequiredProduction = true
+    wareKinds.set(responsibility.wareId, current)
+  }
+
+  const goals: BuildGoal[] = [...moduleGoals]
+  for (const [wareId, kinds] of wareKinds) {
+    const ratePerHour = targetRates[wareId] || 0
+    if (kinds.hasDerivedProduction) {
       goals.push({
         type: 'derived-production',
-        wareId: responsibility.wareId,
+        wareId,
         ratePerHour,
       })
-    } else if (responsibility.type === 'required-production') {
+      continue
+    }
+    if (kinds.hasDerivedBuildMaterial) {
       goals.push({
-        type: 'required-production',
-        wareId: responsibility.wareId,
+        type: 'derived-build-material',
+        wareId,
         ratePerHour,
+      })
+      continue
+    }
+    if (kinds.manualRate > 0) {
+      goals.push({
+        type: 'production-rate',
+        wareId,
+        ratePerHour: kinds.manualRate,
       })
     }
+  }
+
+  for (const [wareId, kinds] of wareKinds) {
+    if (!kinds.hasRequiredProduction) continue
+    goals.push({
+      type: 'required-production',
+      wareId,
+      ratePerHour: targetRates[wareId] || 0,
+    })
   }
   return goals
 }
