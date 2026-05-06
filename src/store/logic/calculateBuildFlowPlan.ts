@@ -683,6 +683,34 @@ function collectDemandSources(
   return [...byLabel.values()]
 }
 
+/** Build requiredWaresByGroup from graph edges + allocations */
+export function buildRequiredWaresMap(
+  graph: BuildFlowPlanGraph,
+  allocations: ProductionLineAllocation[],
+): Map<string, Set<string>> {
+  const map = new Map<string, Set<string>>()
+  // From allocation goals
+  for (const alloc of allocations) {
+    if (!alloc.groupId) continue
+    for (const g of alloc.goals) {
+      if (g.type === 'required-production') {
+        const s = map.get(alloc.groupId) || new Set()
+        s.add(g.wareId)
+        map.set(alloc.groupId, s)
+      }
+    }
+  }
+  // From graph edges (same logic as computeBuildFlowPlanAllocations)
+  for (const edge of graph.edges) {
+    if (edge.sourceLabel.includes('isolated')) {
+      const s = map.get(edge.fromLineKey) || new Set()
+      s.add(edge.wareId)
+      map.set(edge.fromLineKey, s)
+    }
+  }
+  return map
+}
+
 export function computeFlowPlanLines(
   graph: BuildFlowPlanGraph,
   modulesMap: Record<string, X4Module>,
@@ -718,12 +746,10 @@ function computeDagLine(
   const demandSources = collectDemandSources(node, graph, modulesMap)
   node.demandSources = demandSources
 
-  // Remove wares that are required (not to be produced locally) from demand
-  const requiredWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
+  // Remove required wares from demand (not to be produced locally)
+  const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
   for (const src of demandSources) {
-    for (const wareId of requiredWares) {
-      delete src.rates[wareId]
-    }
+    for (const w of reqWares) delete src.rates[w]
   }
 
   // Add tracked-ware-filtered gap rates additively to demand sources

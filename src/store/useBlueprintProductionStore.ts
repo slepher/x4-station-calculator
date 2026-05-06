@@ -22,7 +22,7 @@ import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import { BootstrapMode, type BuildGoal, type BuildPlan, type BuildFlowPlanView, type BuildFlowPlanGraph, type ProductionLineAllocation, type BuildSchemeGroup } from '@/types/build-plan'
 import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
-import { computeFlowPlanLines, makeSchemes, makeSchemesWithGroups, expandGoalDependencies, mergeModules } from '@/store/logic/calculateBuildFlowPlan'
+import { computeFlowPlanLines, makeSchemes, makeSchemesWithGroups, expandGoalDependencies, mergeModules, buildRequiredWaresMap } from '@/store/logic/calculateBuildFlowPlan'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
 import { mergeIntoExistingPlan, rebuildSchemeGroups } from '@/store/logic/mergeIntoExistingPlan'
@@ -160,22 +160,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
           : []
 
         const gap = computeGap(lineAllocations, deps.modulesMap, deps.waresMap)
-        const requiredWaresByGroup = new Map<string, Set<string>>()
-        for (const alloc of lineAllocations) {
-          if (!alloc.groupId) continue
-          const wares = new Set<string>()
-          for (const g of alloc.goals) {
-            if (g.type === 'required-production') wares.add(g.wareId)
-          }
-          if (wares.size > 0) requiredWaresByGroup.set(alloc.groupId, wares)
-        }
-        for (const [gid, node] of graph.nodes) {
-          if (node.isolatedWares?.size) {
-            const existing = requiredWaresByGroup.get(gid) || new Set()
-            for (const w of node.isolatedWares) existing.add(w)
-            requiredWaresByGroup.set(gid, existing)
-          }
-        }
+        const requiredWaresByGroup = buildRequiredWaresMap(graph, lineAllocations)
         computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [], gap, requiredWaresByGroup)
 
         const localizedAllocations = lineAllocations.map(a => ({

@@ -2,7 +2,7 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { deriveBuildFlowView, computeVirtualEdges } from '@/store/logic/buildFlowDerivation'
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
-import { expandGoalDependencies, mergeModules, computeFlowPlanLines, makeSchemesWithGroups, expandGoalsWithAutoFill, computeWareSatisfactions } from '@/store/logic/calculateBuildFlowPlan'
+import { expandGoalDependencies, mergeModules, computeFlowPlanLines, makeSchemesWithGroups, expandGoalsWithAutoFill, computeWareSatisfactions, buildRequiredWaresMap } from '@/store/logic/calculateBuildFlowPlan'
 import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 import { computeGap } from '@/store/logic/computeGap'
@@ -190,23 +190,8 @@ if (useJson) console.log = savedLog
 // Compute gap from allocations (doesn't need graph node modules)
 const gap = computeGap(lineAllocations, modulesMap, waresMap)
 
-// Build required wares map from allocations + graph nodes' isolatedWares
-const requiredWaresByGroup = new Map<string, Set<string>>()
-for (const alloc of lineAllocations) {
-  if (!alloc.groupId) continue
-  const wares = new Set<string>()
-  for (const g of alloc.goals) {
-    if (g.type === 'required-production') wares.add(g.wareId)
-  }
-  if (wares.size > 0) requiredWaresByGroup.set(alloc.groupId, wares)
-}
-for (const [gid, node] of graph.nodes) {
-  if (node.isolatedWares?.size) {
-    const existing = requiredWaresByGroup.get(gid) || new Set()
-    for (const w of node.isolatedWares) existing.add(w)
-    requiredWaresByGroup.set(gid, existing)
-  }
-}
+// Build required wares map from allocations + graph edges
+const requiredWaresByGroup = buildRequiredWaresMap(graph, lineAllocations)
 
 // Single pass with all constraints
 computeFlowPlanLines(graph, modulesMap, waresMap, settings, [], gap, requiredWaresByGroup)
