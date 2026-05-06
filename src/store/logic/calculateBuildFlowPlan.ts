@@ -1089,12 +1089,16 @@ export function splitCToLineSchemes(
     if (goals.length === 0) return null
     const baseModules = goals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap))
     const merged = mergeModules(baseModules)
+    const lockedWares: string[] = []
+    for (const g of goals) {
+      if (g.type === 'required-production') lockedWares.push(g.wareId)
+    }
     const autoFill = calculateAutoFillModules({
       plannedModules: merged,
       settings,
       modulesMap,
       waresMap,
-      lockedWares: [],
+      lockedWares,
     })
     const lineModules = mergeModules([...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
     if (lineModules.length === 0) return null
