@@ -86,6 +86,7 @@ export interface BuildScheme {
   manualWares?: BuildGoal[]
   manualModules?: SavedModule[]
   derivedWareIds?: string[]
+  moduleBuildDetails?: { moduleId: string; count: number; buildTime: number; materials: Record<string, number> }[]
 }
 
 export interface BuildSchemeGroup {
@@ -132,6 +133,14 @@ export interface CalculateBuildPlanInput {
 
 // --- Build Flow Plan Types ---
 
+/** 单条产线的需求分析数据 */
+export interface DemandDetail {
+  perWareSources: Record<string, { label: string; qty: number; seconds: number; rate: number }[]>
+  aggregateRates: Record<string, number>
+  totalSeconds: number
+  totalMaterialQty: number
+}
+
 /** 依赖图中的产线节点 */
 export interface BuildFlowPlanLine {
   lineGroupId: string
@@ -144,6 +153,7 @@ export interface BuildFlowPlanLine {
   netProduction: Record<string, number>
   buildGroups?: BuildGroup[]
   demandSources?: BuildRateSource[]
+  demandAnalysis?: DemandDetail
 }
 
 /** 依赖图中的边 */

@@ -321,6 +321,23 @@ export function expandGoalDependencies(
   return Object.entries(required).map(([id, count]) => ({ id, count }))
 }
 
+function computeModuleBuildDetails(
+  modules: SavedModule[],
+  modulesMap: Record<string, X4Module>,
+): { moduleId: string; count: number; buildTime: number; materials: Record<string, number> }[] {
+  return modules.map(m => {
+    const mod = modulesMap[m.id]
+    const buildTime = mod?.buildTime || 0
+    const materials: Record<string, number> = {}
+    if (mod?.buildCost) {
+      for (const [w, qty] of Object.entries(mod.buildCost)) {
+        if (w !== 'energycells') materials[w] = (qty as number) * m.count
+      }
+    }
+    return { moduleId: m.id, count: m.count, buildTime, materials }
+  })
+}
+
 function planProductionForRates(
   demandSources: BuildRateSource[],
   modulesMap: Record<string, X4Module>,
@@ -328,13 +345,30 @@ function planProductionForRates(
   race: string,
   gap: Record<string, number> = {},
 ): SavedModule[] {
-  const targetRates: Record<string, number> = {}
+  const totalQty: Record<string, number> = {}
+  let totalSeconds = 0
+
   for (const src of demandSources) {
-    for (const [wareId, rate] of Object.entries(src.rates)) {
-      targetRates[wareId] = Math.max(targetRates[wareId] || 0, rate)
+    const materials = src.materials
+    if (!materials) continue
+    let srcSeconds = 0
+    for (const [w, rate] of Object.entries(src.rates)) {
+      if (rate > 0 && materials[w]) { srcSeconds = (materials[w] / rate) * 3600; break }
+    }
+    if (srcSeconds === 0) continue
+    totalSeconds += srcSeconds
+    for (const [w, qty] of Object.entries(materials)) {
+      if (w !== 'energycells') totalQty[w] = (totalQty[w] || 0) + qty
     }
   }
-  // Add gap after Math.max (gap must stack on top of the highest source rate)
+
+  const totalHours = totalSeconds / 3600
+  const targetRates: Record<string, number> = {}
+  if (totalHours > 0) {
+    for (const [w, qty] of Object.entries(totalQty)) {
+      targetRates[w] = qty / totalHours
+    }
+  }
   for (const [w, r] of Object.entries(gap)) {
     if (r > 0) targetRates[w] = (targetRates[w] || 0) + r
   }
@@ -362,6 +396,7 @@ function planProductionForRates(
   return mergeModules(modules)
 }
 
+// @ts-ignore — kept for future use (alternative SCC multi-node algorithm)
 function greedyFillForLine(
   externalSources: BuildRateSource[],
   currentEmpireModules: SavedModule[],
@@ -567,6 +602,213 @@ function greedyFillForLine(
   return groups
 }
 
+export function bootstrapFillForLine(
+  externalSources: BuildRateSource[],
+  currentEmpireModules: SavedModule[],
+  settings: StationSettings,
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+  gap: Record<string, number> = {},
+  lockedWares: string[] = [],
+  requiredWares: Set<string> = new Set(),
+  trackedWares: Set<string> = new Set(),
+): BuildGroup[] {
+  const built: SavedModule[] = []
+  const groups: BuildGroup[] = []
+  const lockedSet = new Set(lockedWares)
+
+  function getAutoModules(mods: SavedModule[]): SavedModule[] {
+    const full = mergeModules([...currentEmpireModules, ...mods])
+    const r = calculateAutoFillModules({ plannedModules: full, settings, modulesMap, waresMap, lockedWares })
+    return [...r.autoIndustryModules, ...r.autoHabitationModules]
+  }
+
+  let currentAutoModules: SavedModule[] = []
+
+  function fullBuilt(): SavedModule[] {
+    return mergeModules([...built, ...currentAutoModules])
+  }
+
+  function netProduction(): Record<string, number> {
+    return calculateNetProduction(fullBuilt(), modulesMap, settings.considerWorkforceForAutoFill, settings.sunlight)
+  }
+
+  function selfDemandRates(): Record<string, number> {
+    const fb = fullBuilt()
+    if (fb.length === 0) return {}
+    const br = computeBuildRates(fb, modulesMap)
+    const produced = new Set<string>()
+    for (const m of fb) {
+      const mod = modulesMap[m.id]
+      if (!mod) continue
+      for (const w of Object.keys(mod.outputs)) produced.add(w)
+    }
+    const result: Record<string, number> = {}
+    for (const [w, rate] of Object.entries(br)) {
+      if (w !== 'energycells' && produced.has(w) && !requiredWares.has(w) && trackedWares.has(w)) result[w] = rate
+    }
+    for (const src of externalSources) {
+      for (const [w] of Object.entries(src.rates)) delete result[w]
+    }
+    return result
+  }
+
+  function computeTargetRates(): Record<string, number> {
+    const totalQty: Record<string, number> = {}
+    let totalSeconds = 0
+
+    for (const src of externalSources) {
+      const materials = src.materials
+      if (!materials) continue
+      let srcSeconds = 0
+      for (const [w, rate] of Object.entries(src.rates)) {
+        if (rate > 0 && materials[w]) { srcSeconds = (materials[w] / rate) * 3600; break }
+      }
+      if (srcSeconds === 0) continue
+      totalSeconds += srcSeconds
+      for (const [w, qty] of Object.entries(materials)) {
+        if (w !== 'energycells') totalQty[w] = (totalQty[w] || 0) + qty
+      }
+    }
+
+    const fb = fullBuilt()
+    if (fb.length > 0) {
+      const sd = selfDemandRates()
+      if (Object.keys(sd).length > 0) {
+        const selfMat = computeBuildMaterials(fb, modulesMap)
+        let selfSec = 0
+        for (const [w, rate] of Object.entries(sd)) {
+          if (rate > 0 && selfMat[w]) { selfSec = (selfMat[w] / rate) * 3600; break }
+        }
+        if (selfSec > 0) {
+          totalSeconds += selfSec
+          for (const [w, qty] of Object.entries(selfMat)) {
+            if (w !== 'energycells') totalQty[w] = (totalQty[w] || 0) + qty
+          }
+        }
+      }
+    }
+
+    const totalHours = totalSeconds / 3600
+    const result: Record<string, number> = {}
+    if (totalHours > 0) {
+      for (const [w, qty] of Object.entries(totalQty)) {
+        result[w] = qty / totalHours
+      }
+    }
+    for (const [w, r] of Object.entries(gap)) {
+      if (r > 0) result[w] = (result[w] || 0) + r
+    }
+    return result
+  }
+
+  let maxIterations = 10
+
+  while (maxIterations-- > 0) {
+    const snapshot = fullBuilt().map(m => `${m.id}:${m.count}`).sort().join(';')
+
+    currentAutoModules = getAutoModules(built)
+    const targetRates = computeTargetRates()
+    const net = netProduction()
+    const newModules: SavedModule[] = []
+    const produced = new Map<string, number>()
+
+    for (const [wareId, targetRate] of Object.entries(targetRates)) {
+      if (targetRate <= 0 || wareId === 'energycells' || lockedSet.has(wareId)) continue
+      if (!trackedWares.has(wareId)) continue
+
+      const combined = mergeModules([...currentEmpireModules, ...built, ...currentAutoModules])
+      const producer = findBestProducer(wareId, settings.racePreference, combined, modulesMap, waresMap)
+      if (!producer) continue
+
+      const outputPerModule = (producer.outputs[wareId] || 0) as number
+      if (outputPerModule <= 0) continue
+
+      const currentProd = Math.max(0, net[wareId] ?? 0) + (produced.get(wareId) || 0)
+      const remaining = targetRate - currentProd
+      if (remaining <= 0) continue
+
+      const count = Math.ceil(remaining / outputPerModule)
+      if (count <= 0) continue
+      newModules.push({ id: producer.id, count })
+      produced.set(wareId, currentProd + count * outputPerModule)
+    }
+
+    if (newModules.length === 0) break
+
+    for (const m of newModules) {
+      const existing = built.find(b => b.id === m.id)
+      if (existing) existing.count += m.count
+      else built.push({ ...m })
+    }
+
+    const newAuto = getAutoModules(built)
+    const deltaAuto = newAuto.filter(m => {
+      const prev = currentAutoModules.find(p => p.id === m.id)
+      return !prev || prev.count < m.count
+    }).map(m => {
+      const prev = currentAutoModules.find(p => p.id === m.id)
+      return { id: m.id, count: m.count - (prev?.count || 0) }
+    })
+    currentAutoModules = newAuto
+
+    const groupMods = mergeModules([...newModules, ...deltaAuto])
+    if (groupMods.length > 0) {
+      groups.push({ reason: `Bootstrap fill`, modules: groupMods })
+    }
+
+    const newSnapshot = fullBuilt().map(m => `${m.id}:${m.count}`).sort().join(';')
+    if (newSnapshot === snapshot) break
+  }
+
+  return groups
+}
+
+function computeDemandAnalysis(node: BuildFlowPlanLine): void {
+  const sources = node.demandSources
+  if (!sources || sources.length === 0) { node.demandAnalysis = undefined; return }
+
+  const perWareSources: Record<string, { label: string; qty: number; seconds: number; rate: number }[]> = {}
+  let totalSeconds = 0
+
+  for (const src of sources) {
+    const materials = src.materials
+    if (!materials) continue
+    let srcSeconds = 0
+    for (const [w, rate] of Object.entries(src.rates)) {
+      if (rate > 0 && materials[w]) { srcSeconds = (materials[w] / rate) * 3600; break }
+    }
+    if (srcSeconds === 0) continue
+    totalSeconds += srcSeconds
+
+    for (const [wareId, qty] of Object.entries(materials)) {
+      if (wareId === 'energycells') continue
+      if (!node.trackedWares.has(wareId)) continue
+      const entries = perWareSources[wareId] || []
+      entries.push({ label: src.label, qty, seconds: srcSeconds, rate: qty / (srcSeconds / 3600) })
+      perWareSources[wareId] = entries
+    }
+  }
+
+  const totalHours = totalSeconds / 3600
+  const aggregateRates: Record<string, number> = {}
+  let totalMaterialQty = 0
+  if (totalHours > 0) {
+    for (const [wareId, entries] of Object.entries(perWareSources)) {
+      let sumQty = 0
+      for (const e of entries) sumQty += e.qty
+      aggregateRates[wareId] = sumQty / totalHours
+      totalMaterialQty += sumQty
+    }
+  }
+
+  node.demandAnalysis = {
+    perWareSources,
+    aggregateRates,
+    totalSeconds,
+    totalMaterialQty,
+  }
+}
 function buildTopologicalOrder(graph: BuildFlowPlanGraph): Array<string[] | string> {
   const inDegree = new Map<string, number>()
   for (const [key] of graph.nodes) inDegree.set(key, 0)
@@ -781,7 +1023,7 @@ function computeDagLine(
   if (node.isSelfBootstrap && selfWares.size > 0) {
     const locked = [...(requiredWaresByGroup.get(node.lineGroupId) || new Set())]
     const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapForPlan, locked, reqWares, node.trackedWares)
+    const groups = bootstrapFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapForPlan, locked, reqWares, node.trackedWares)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
   } else {
@@ -794,6 +1036,7 @@ function computeDagLine(
     node.modules = mergeModules([...node.modules, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
     node.buildGroups = [{ reason: node.lineName, modules: node.modules }]
   }
+  computeDemandAnalysis(node)
 }
 
 function computeSCCGroup(
@@ -838,10 +1081,11 @@ function computeSCCGroup(
       }
     }
     const required = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapRates, [], required, node.trackedWares)
+    const groups = bootstrapFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapRates, [], required, node.trackedWares)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
     updateNodeDerivedFields(node, modulesMap, settings)
+    computeDemandAnalysis(node)
     return
   }
 
@@ -870,7 +1114,7 @@ function computeSCCGroup(
       if (selfWares.size > 0) {
         const locked = [...(requiredWaresByGroup.get(node.lineGroupId) || new Set())]
         const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapRates, locked, reqWares, node.trackedWares)
+        const groups = bootstrapFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapRates, locked, reqWares, node.trackedWares)
         node.buildGroups = groups
         node.modules = mergeModules(groups.flatMap(g => g.modules))
       } else {
@@ -889,6 +1133,7 @@ function computeSCCGroup(
       }
 
       updateNodeDerivedFields(node, modulesMap, settings)
+      computeDemandAnalysis(node)
 
       const countKey = node.modules.map(m => `${m.id}:${m.count}`).sort().join(';')
 
@@ -1013,6 +1258,8 @@ function makeSchemeFromLine(
     }
   }
 
+  const moduleBuildDetails = computeModuleBuildDetails(mergedModules, modulesMap)
+
   const netProduction = calculateNetProduction(
     node.modules, modulesMap,
     settings.considerWorkforceForAutoFill, settings.sunlight
@@ -1042,6 +1289,7 @@ function makeSchemeFromLine(
     isFeasible: mergedModules.length > 0,
     totalModuleBuildTime,
     buildMaterialTotals,
+    moduleBuildDetails,
   }
 }
 
@@ -1097,6 +1345,8 @@ export function splitCToLineSchemes(
       }
     }
 
+    const moduleBuildDetails = computeModuleBuildDetails(lineModules, modulesMap)
+
     const purposeWareSet = new Set(purposeModules)
     const primaryModuleIds = lineModules
       .filter(m => {
@@ -1124,6 +1374,7 @@ export function splitCToLineSchemes(
       isFeasible: lineModules.length > 0,
       totalModuleBuildTime,
       buildMaterialTotals,
+      moduleBuildDetails,
     }
   }
 
@@ -1254,6 +1505,8 @@ function makeSchemeForC(
     }
   }
 
+  const moduleBuildDetails = computeModuleBuildDetails(mergedModules, modulesMap)
+
   const groups: BuildGroup[] = [{
     reason: '目标产线',
     modules: graph.cModules,
@@ -1298,5 +1551,6 @@ function makeSchemeForC(
     isFeasible: mergedModules.length > 0,
     totalModuleBuildTime,
     buildMaterialTotals,
+    moduleBuildDetails,
   }
 }

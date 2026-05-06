@@ -295,38 +295,37 @@ for (const sg of schemeGroups) {
     console.log(`     ├─ 模块总数: ${scheme.modules.length}`)
     console.log(`     ├─ 建造步骤: ${scheme.stepsCount}`)
 
-    const primarySet = new Set(scheme.primaryModuleIds)
-    const primaryModules = scheme.modules.filter(m => primarySet.has(m.id))
-    const derivedModules = scheme.modules.filter(m => !primarySet.has(m.id))
-    if (primaryModules.length > 0) {
-      console.log(`     ├─ 主要模块:`)
-      for (const m of primaryModules) {
-        const mod = modulesMap[m.id]
-        const outputStr = mod?.outputs ? Object.entries(mod.outputs)
-          .filter(([, v]) => (v as number) > 0)
-          .map(([w, v]) => `${wareName(w)} ${v}/cycle`)
-          .join(', ') : ''
-        console.log(`     │   ${modName(m.id)} ×${m.count}${outputStr ? `  (${outputStr})` : ''}`)
-      }
-    }
-    if (derivedModules.length > 0) {
-      console.log(`     ├─ 配套模块:`)
-      for (const m of derivedModules) {
-        console.log(`     │   ${modName(m.id)} ×${m.count}`)
+    // 模块明细
+    if (scheme.moduleBuildDetails && scheme.moduleBuildDetails.length > 0) {
+      console.log(`     ├─ 模块 × 数量:`)
+      for (const md of scheme.moduleBuildDetails) {
+        const timeStr = md.buildTime > 0 ? `  (建筑 ${md.buildTime}s × ${md.count} = ${md.buildTime * md.count}s)` : ''
+        console.log(`     │   ${modName(md.moduleId)} ×${md.count}${timeStr}`)
+        const matEntries = Object.entries(md.materials).filter(([, qty]) => qty > 0)
+        if (matEntries.length > 0) {
+          const matStr = matEntries.map(([w, qty]) => `${wareName(w)} ${Math.round(qty)}`).join(', ')
+          console.log(`     │     BuildCost: ${matStr}`)
+        }
       }
     }
 
+    // 建材汇总
     const buildCost = Object.entries(scheme.buildMaterialTotals)
       .filter(([, qty]) => qty > 0)
       .sort((a, b) => b[1] - a[1])
     if (buildCost.length > 0) {
       const totalCredits = buildCost.reduce((sum, [w, qty]) => sum + qty * (waresMap[w]?.price || 0), 0)
-      console.log(`     └─ 建材需求:`)
+      const totalQty = buildCost.reduce((sum, [, qty]) => sum + qty, 0)
+      const totalTime = scheme.totalModuleBuildTime
+      const totalHours = totalTime > 0 ? totalTime / 3600 : 1
+      console.log(`     ├─ 建材汇总 (建筑时间 ${totalTime}s = ${totalHours.toFixed(2)}h):`)
       for (const [wareId, qty] of buildCost) {
         const price = waresMap[wareId]?.price || 0
-        console.log(`         ${wareName(wareId).padEnd(28)} ×${String(Math.round(qty)).padStart(8)}  ≈ ${(qty * price / 1e6).toFixed(2)}M cr`)
+        const rate = totalTime > 0 ? qty / totalHours : 0
+        console.log(`     │   ${wareName(wareId).padEnd(24)} ${String(Math.round(qty)).padStart(8)}  ${rate.toFixed(1)}/h  ${(qty * price / 1e6).toFixed(2)}M cr`)
       }
-      console.log(`         建材总价: ${(totalCredits / 1e6).toFixed(2)}M cr`)
+      console.log(`     │   ───────────────────────────────────────────────`)
+      console.log(`     │   总数量: ${Math.round(totalQty)}  总价: ${(totalCredits / 1e6).toFixed(2)}M cr`)
     }
 
     const prodRates = Object.entries(scheme.netProduction)
@@ -341,12 +340,11 @@ for (const sg of schemeGroups) {
   }
 }
 
-// ── 需求来源与满足率明细 ──
+// ── 需求来源与满足率明细 (新格式: 按材料聚合, 显示 sum qty / sum time) ──
 console.log(`\n${sep}`)
-console.log('  需求来源与满足率:')
+console.log('  需求来源与满足率 (新格式):')
 
 const allocByGroupId = new Map(lineAllocations.filter(a => a.groupId).map(a => [a.groupId!, a]))
-// Build scheme lookup by label for target rates
 const schemeByLabel = new Map<string, BuildScheme>()
 for (const sg of schemeGroups) {
   for (const s of sg.schemes) schemeByLabel.set(s.label, s)
@@ -358,29 +356,31 @@ for (const [groupId, node] of graph.nodes) {
   const tag = node.isSelfBootstrap ? 'SELF-BOOT' : (graph.sccGroups.some(scc => scc.includes(groupId)) ? 'SCC' : 'DAG')
   console.log(`\n  [${tag}] ${node.lineName}`)
 
-  // Manual goals from allocation
-  const manualWares: string[] = []
-  const manualModules: string[] = []
-  const requiredWares: { id: string; name: string }[] = []
-  if (alloc) {
-    for (const g of alloc.goals) {
-      if (g.type === 'production-rate') manualWares.push(`${wareName(g.wareId)} ${g.ratePerHour}/h`)
-      else if (g.type === 'build-module') manualModules.push(`${modName(g.moduleId)} ×${g.count}`)
-      else if (g.type === 'required-production') requiredWares.push({ id: g.wareId, name: wareName(g.wareId) })
+  // --- 1. 需求来源明细 (从 node.demandAnalysis 直接读取) ---
+  const da = node.demandAnalysis
+  if (da && Object.keys(da.perWareSources).length > 0) {
+    console.log('  需求来源明细:')
+    for (const [wareId, entries] of Object.entries(da.perWareSources)) {
+      console.log(`    ${wareName(wareId)}:`)
+      for (const e of entries) {
+        console.log(`      ${e.label}  ${Math.round(e.qty)} / ${e.seconds}s → ${e.rate.toFixed(1)}/h`)
+      }
     }
   }
-  if (manualWares.length > 0) console.log(`    手工ware: ${manualWares.join(', ')}`)
-  if (manualModules.length > 0) console.log(`    手工module: ${manualModules.join(', ')}`)
-  if (requiredWares.length > 0) {
-    const gapRates = requiredWares.map(w => `${w.name}: ${(gap[w.id] || 0).toFixed(1)}/h`)
-    console.log(`    gap: ${gapRates.join(', ')}`)
+
+  // --- 2. 聚合需求 ---
+  if (da) {
+    console.log(`  聚合需求 (总时间 ${da.totalSeconds}s = ${(da.totalSeconds / 3600).toFixed(2)}h, 总材料 ${Math.round(da.totalMaterialQty)} 单元):`)
+    for (const [wareId, rate] of Object.entries(da.aggregateRates)) {
+      console.log(`    ${wareName(wareId)}: ${rate.toFixed(1)}/h`)
+    }
   }
 
-  // Single call to compute satisfactions from algorithm's perspective
-  if (scheme) {
-    const manualWaresRates: Record<string, number> = {}
-    const manualModRates: Record<string, number> = {}
-    for (const g of alloc?.goals || []) {
+  // --- 3. gap / manual ---
+  const manualWaresRates: Record<string, number> = {}
+  const manualModRates: Record<string, number> = {}
+  if (alloc) {
+    for (const g of alloc.goals) {
       if (g.type === 'production-rate') manualWaresRates[g.wareId] = (manualWaresRates[g.wareId] || 0) + g.ratePerHour
       if (g.type === 'build-module') {
         const mod = modulesMap[g.moduleId]
@@ -391,25 +391,77 @@ for (const [groupId, node] of graph.nodes) {
         }
       }
     }
-    const satisfactions = computeWareSatisfactions(scheme, node.netProduction, gap, manualWaresRates, manualModRates)
-    if (satisfactions.length > 0) {
-      console.log('    满足率:')
-      for (const ws of satisfactions) {
-        console.log(`      ${wareName(ws.wareId)}:`)
-        for (const src of ws.sources) {
-          const qty = scheme.targetRateSources?.find(s => s.label === src.label)?.materials?.[ws.wareId]
-          const buildTime = qty ? qty / src.rate * 3600 : 0
-          const detail = qty ? `总量 ${qty.toFixed(0)} 单元, 建筑时间 ${buildTime.toFixed(0)}s` : ''
-          const status = src.satisfaction.satisfied ? '✓' : '✗'
-          console.log(`        ${src.label}: ${src.rate.toFixed(1)}/h 满足率 ${src.satisfaction.satRate.toFixed(1)}% ${status} (产出 ${ws.totalProd.toFixed(1)}/h${detail ? `, ${detail}` : ''})`)
-        }
-        console.log(`        ────────`)
-        console.log(`        产出: ${ws.totalProd.toFixed(1)}/h, 各来源${ws.sources.every(s => s.satisfaction.satisfied) ? '全部满足 ✓' : '有未满足 ✗'}`)
-      }
+  }
+
+  const relevantWares = new Set<string>([...Object.keys(da?.aggregateRates || {}), ...node.trackedWares])
+  const relevantGap: Record<string, number> = {}
+  for (const [w, r] of Object.entries(gap)) {
+    if (r > 0 && relevantWares.has(w)) relevantGap[w] = r
+  }
+  const relevantManualWares: Record<string, number> = {}
+  for (const [w, r] of Object.entries(manualWaresRates)) {
+    if (relevantWares.has(w)) relevantManualWares[w] = r
+  }
+  const relevantManualMods: Record<string, number> = {}
+  for (const [w, r] of Object.entries(manualModRates)) {
+    if (relevantWares.has(w)) relevantManualMods[w] = r
+  }
+
+  const hasGap = Object.keys(relevantGap).length > 0
+  const hasManual = Object.keys(relevantManualWares).length > 0 || Object.keys(relevantManualMods).length > 0
+  if (hasGap || hasManual) {
+    const parts: string[] = []
+    if (hasGap) {
+      const gs = Object.entries(relevantGap).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`)
+      parts.push(`gap: [${gs.join(', ')}]`)
+    }
+    if (Object.keys(relevantManualWares).length > 0) {
+      const ws = Object.entries(relevantManualWares).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`)
+      parts.push(`manual ware: [${ws.join(', ')}]`)
+    }
+    if (Object.keys(relevantManualMods).length > 0) {
+      const ms = Object.entries(relevantManualMods).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`)
+      parts.push(`manual module: [${ms.join(', ')}]`)
+    }
+    console.log(`  gap / manual: ${parts.join('; ')}`)
+  } else {
+    console.log('  gap / manual: (无)')
+  }
+
+  // --- 4. target = 聚合 + gap + ware + module ---
+  const allWares = new Set<string>([...Object.keys(da?.aggregateRates || {}), ...Object.keys(relevantGap), ...Object.keys(relevantManualWares), ...Object.keys(relevantManualMods)])
+  if (allWares.size > 0) {
+    console.log('  target = 聚合 + gap + ware + module:')
+    for (const w of allWares) {
+      const agg = (da?.aggregateRates[w]) || 0
+      const g = gap[w] || 0
+      const mw = manualWaresRates[w] || 0
+      const mm = manualModRates[w] || 0
+      const total = agg + g + mw + mm
+      const extras: string[] = []
+      if (g > 0) extras.push(`gap +${g.toFixed(1)}`)
+      if (mw > 0) extras.push(`ware +${mw.toFixed(1)}`)
+      if (mm > 0) extras.push(`module +${mm.toFixed(1)}`)
+      const extraStr = extras.length > 0 ? ` (${extras.join(', ')})` : ''
+      console.log(`    ${wareName(w)}: ${agg.toFixed(1)}/h${extraStr} = ${total.toFixed(1)}/h`)
     }
   }
-  console.log(`\n  gap 汇总: ${Object.entries(gap).map(([w, r]) => `${wareName(w)}: ${r.toFixed(1)}/h`).join(', ')}`)
+
+  // --- 5. 产出 vs 目标 ---
+  const prod = node.netProduction
+  if (allWares.size > 0) {
+    console.log('  产出 vs 目标:')
+    for (const w of allWares) {
+      const target = (da?.aggregateRates[w] || 0) + (gap[w] || 0) + (manualWaresRates[w] || 0) + (manualModRates[w] || 0)
+      const p = Math.max(0, prod[w] || 0)
+      const diff = p - target
+      const status = diff >= -0.001 ? '✓' : '✗'
+      const label = diff >= -0.001 ? '过剩' : '缺口'
+      console.log(`    ${wareName(w)}: ${p.toFixed(1)}/h  ${p >= target - 0.001 ? '≥' : '<'} ${target.toFixed(1)}/h  ${status}  (${label} ${Math.abs(diff).toFixed(1)}/h)`)
+    }
+  }
 }
+
 
 console.log(`\n${sep}`)
 console.log('  依赖图摘要:')
