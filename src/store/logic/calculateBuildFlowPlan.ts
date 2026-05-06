@@ -363,6 +363,7 @@ function greedyFillForLine(
   waresMap: Record<string, X4Ware>,
   _gap2: Record<string, number> = {},
   lockedWares: string[] = [],
+  requiredWares: Set<string> = new Set(),
 ): BuildGroup[] {
   const built: SavedModule[] = []
   const groups: BuildGroup[] = []
@@ -409,7 +410,7 @@ function greedyFillForLine(
       for (const w of Object.keys(mod.outputs)) produced.add(w)
     }
     for (const [w, rate] of Object.entries(br)) {
-      if (w !== 'energycells' && produced.has(w)) filtered[w] = rate
+      if (w !== 'energycells' && produced.has(w) && !requiredWares.has(w)) filtered[w] = rate
     }
     return Object.keys(filtered).length > 0 ? { label: 'self_demand', rates: filtered } : null
   }
@@ -778,7 +779,8 @@ function computeDagLine(
 
   if (node.isSelfBootstrap && selfWares.size > 0) {
     const locked = [...(node.isolatedWares ?? [])]
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked)
+    const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
+    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked, reqWares)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
   } else {
@@ -838,7 +840,8 @@ function computeSCCGroup(
     } else if (Object.keys(gapRates).length > 0) {
       demandSources.push({ label: 'gap_demand', rates: { ...gapRates } })
     }
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap)
+    const required = requiredWaresByGroup.get(node.lineGroupId) || new Set()
+    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, [], required)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
     updateNodeDerivedFields(node, modulesMap, settings)
@@ -885,7 +888,8 @@ function computeSCCGroup(
 
       if (selfWares.size > 0) {
         const locked = [...(node.isolatedWares ?? [])]
-        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked)
+        const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
+        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked, reqWares)
         node.buildGroups = groups
         node.modules = mergeModules(groups.flatMap(g => g.modules))
       } else {
