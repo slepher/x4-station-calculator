@@ -420,6 +420,14 @@ function greedyFillForLine(
     for (const [w, rate] of Object.entries(br)) {
       if (w !== 'energycells' && produced.has(w) && !requiredWares.has(w) && trackedWares.has(w)) filtered[w] = rate
     }
+    // Remove wares already covered by external demand (avoid double-counting)
+    for (const src of externalSources) {
+      for (const [w] of Object.entries(src.rates)) {
+        if (filtered[w] !== undefined && !requiredWares.has(w)) {
+          delete filtered[w]
+        }
+      }
+    }
     return Object.keys(filtered).length > 0 ? { label: 'self_demand', rates: filtered } : null
   }
 
@@ -888,11 +896,6 @@ function computeSCCGroup(
         if (Object.keys(filteredGap).length > 0) {
           demandSources.push({ label: 'gap_demand', rates: { ...filteredGap } })
         }
-      }
-
-      if (node.lineName === '烷氦') {
-        const qtSrcs = demandSources.filter(s => s.rates['quantumtubes'] > 0).map(s => ({ label: s.label, rate: s.rates['quantumtubes'] }))
-        console.log(`[QT_SCC] demandSources: ${JSON.stringify(qtSrcs)} gap: ${gapRates['quantumtubes'] || 0}`)
       }
 
       if (selfWares.size > 0) {
