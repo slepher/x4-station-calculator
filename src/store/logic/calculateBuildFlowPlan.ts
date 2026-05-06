@@ -444,10 +444,10 @@ function greedyFillForLine(
     const allSources = [...externalSources]
     const sd = selfDemand()
     if (sd) allSources.push(sd)
-    // Add gap rates additively to the first external source
+    // Add gap rates filtered by trackedWares
     const gapRates: Record<string, number> = {}
     for (const [w, r] of Object.entries(_gap2)) {
-      if (r > 0) gapRates[w] = r
+      if (r > 0 && trackedWares.has(w)) gapRates[w] = r
     }
     if (Object.keys(gapRates).length > 0 && allSources.length > 0) {
       const first = allSources[0]
@@ -839,7 +839,13 @@ function computeSCCGroup(
         }
       }
     } else if (Object.keys(gapRates).length > 0) {
-      demandSources.push({ label: 'gap_demand', rates: { ...gapRates } })
+      const filteredGap: Record<string, number> = {}
+      for (const [w, r] of Object.entries(gapRates)) {
+        if (node.trackedWares.has(w)) filteredGap[w] = r
+      }
+      if (Object.keys(filteredGap).length > 0) {
+        demandSources.push({ label: 'gap_demand', rates: { ...filteredGap } })
+      }
     }
     const required = requiredWaresByGroup.get(node.lineGroupId) || new Set()
     const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, [], required, node.trackedWares)
@@ -884,7 +890,14 @@ function computeSCCGroup(
           }
         }
       } else if (Object.keys(gapRates).length > 0) {
-        demandSources.push({ label: 'gap_demand', rates: { ...gapRates } })
+        // Filter gapRates by trackedWares before pushing as separate source
+        const filteredGap: Record<string, number> = {}
+        for (const [w, r] of Object.entries(gapRates)) {
+          if (node.trackedWares.has(w)) filteredGap[w] = r
+        }
+        if (Object.keys(filteredGap).length > 0) {
+          demandSources.push({ label: 'gap_demand', rates: { ...filteredGap } })
+        }
       }
 
       if (selfWares.size > 0) {
@@ -906,10 +919,7 @@ function computeSCCGroup(
 
       updateNodeDerivedFields(node, modulesMap, settings)
 
-      const countKey = node.moduleIds.map(id => {
-        const m = node.modules.find(mod => mod.id === id)
-        return `${id}:${m?.count || 0}`
-      }).join(';')
+      const countKey = node.modules.map(m => `${m.id}:${m.count}`).sort().join(';')
 
       if (prevCounts.get(key) !== countKey) {
         stable = false
