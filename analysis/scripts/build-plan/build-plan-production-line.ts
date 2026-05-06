@@ -181,19 +181,21 @@ const buildFlowView: BuildFlowPlanView = { buildFlowGroups: derived.buildFlowGro
 const cModules = expandGoalsWithAutoFill(goals, modulesMap, waresMap, settings)
 const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, groups)
 
-// ---- Compute gap & required wares, then line modules ----
+// ---- Compute gap, modules, gap from graph, recompute ----
 const savedLog = console.log
 if (useJson) console.log = () => {}
 const lineAllocations = computeProductionLineAllocation(goals, groups, buildFlowView, modulesMap, modulesByOutputMap)
 if (useJson) console.log = savedLog
 
-// Compute gap from allocations (doesn't need graph node modules)
-const gap = computeGap(lineAllocations, modulesMap, waresMap)
-
-// Build required wares map from allocations + graph edges
 const requiredWaresByGroup = buildRequiredWaresMap(graph, lineAllocations)
 
-// Single pass with all constraints
+// Pass 1: gap from allocations only, compute modules
+const gap = computeGap(lineAllocations, modulesMap, waresMap)
+computeFlowPlanLines(graph, modulesMap, waresMap, settings, [], gap, requiredWaresByGroup)
+
+// Pass 2: add gap from graph nodes (now have modules), recompute
+const graphGap = computeGap([], modulesMap, waresMap, graph.nodes)
+for (const [w, r] of Object.entries(graphGap)) gap[w] = (gap[w] || 0) + r
 computeFlowPlanLines(graph, modulesMap, waresMap, settings, [], gap, requiredWaresByGroup)
 
 const schemeGroups = makeSchemesWithGroups(graph, lineAllocations, modulesMap, waresMap, settings)
