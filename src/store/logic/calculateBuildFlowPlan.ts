@@ -436,6 +436,7 @@ function greedyFillForLine(
     if (r > 0) sourceRates[w] = (sourceRates[w] || 0) + r
   }
 
+
   // Identify wares with build material demand (non-zero in external sources)
   const hasExternalDemand = new Set<string>()
   for (const src of externalSources) {
@@ -887,6 +888,11 @@ function computeSCCGroup(
         if (Object.keys(filteredGap).length > 0) {
           demandSources.push({ label: 'gap_demand', rates: { ...filteredGap } })
         }
+      }
+
+      if (node.lineName === '烷氦') {
+        const qtSrcs = demandSources.filter(s => s.rates['quantumtubes'] > 0).map(s => ({ label: s.label, rate: s.rates['quantumtubes'] }))
+        console.log(`[QT_SCC] demandSources: ${JSON.stringify(qtSrcs)} gap: ${gapRates['quantumtubes'] || 0}`)
       }
 
       if (selfWares.size > 0) {
