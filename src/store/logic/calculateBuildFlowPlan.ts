@@ -31,20 +31,24 @@ export function mergeModules(modules: SavedModule[]): SavedModule[] {
   return Array.from(map.entries()).map(([id, count]) => ({ id, count }))
 }
 
-/** Unified autoFill wrapper — always passes line's isolatedWares as lockedWares */
+/** Unified autoFill wrapper — derives lockedWares from required-production goals */
 export function autoFillForLine(
   plannedModules: SavedModule[],
-  isolatedWares: Set<string>,
+  goals: BuildGoal[],
   settings: StationSettings,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
 ): { autoIndustryModules: SavedModule[]; autoHabitationModules: SavedModule[] } {
+  const lockedWares: string[] = []
+  for (const g of goals) {
+    if (g.type === 'required-production') lockedWares.push(g.wareId)
+  }
   return calculateAutoFillModules({
     plannedModules,
     settings,
     modulesMap,
     waresMap,
-    lockedWares: [...isolatedWares],
+    lockedWares,
   })
 }
 
@@ -788,14 +792,12 @@ function computeDagLine(
     node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference)
     const autoFill = autoFillForLine(
       mergeModules([...currentEmpireModules, ...node.modules]),
-      requiredWaresByGroup.get(node.lineGroupId) || new Set(),
+      [...(requiredWaresByGroup.get(node.lineGroupId) || [])].map(w => ({ type: 'required-production' as const, wareId: w, ratePerHour: 0 })),
       settings, modulesMap, waresMap,
     )
     node.modules = mergeModules([...node.modules, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
     node.buildGroups = [{ reason: node.lineName, modules: node.modules }]
   }
-
-  updateNodeDerivedFields(node, modulesMap, settings)
 }
 
 function computeSCCGroup(
@@ -910,7 +912,7 @@ function computeSCCGroup(
         node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference)
         const autoFill = autoFillForLine(
           mergeModules([...currentEmpireModules, ...node.modules]),
-          requiredWaresByGroup.get(node.lineGroupId) || new Set(),
+          [...(requiredWaresByGroup.get(node.lineGroupId) || [])].map(w => ({ type: 'required-production' as const, wareId: w, ratePerHour: 0 })),
           settings, modulesMap, waresMap,
         )
         node.modules = mergeModules([...node.modules, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
@@ -1089,16 +1091,10 @@ export function splitCToLineSchemes(
     if (goals.length === 0) return null
     const baseModules = goals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap))
     const merged = mergeModules(baseModules)
-    const lockedWares: string[] = []
-    for (const g of goals) {
-      if (g.type === 'required-production') lockedWares.push(g.wareId)
-    }
     const autoFill = autoFillForLine(
       merged,
-      new Set(lockedWares),
-      settings,
-      modulesMap,
-      waresMap,
+      goals,
+      settings, modulesMap, waresMap,
     )
     const lineModules = mergeModules([...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
     if (lineModules.length === 0) return null
