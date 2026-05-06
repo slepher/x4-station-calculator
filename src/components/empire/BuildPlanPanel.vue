@@ -20,9 +20,8 @@ const selectedScheme = ref<BuildScheme | null>(null)
 const modalOpen = ref(false)
 
 function getSchemeLabel(label: string): string {
-  const key = 'build_plan.' + label
-  const translated = t(key)
-  return translated === key ? label : translated
+  if (!label.startsWith('scheme_')) return label
+  return t('build_plan.' + label)
 }
 
 function openScheme(scheme: BuildScheme) {
