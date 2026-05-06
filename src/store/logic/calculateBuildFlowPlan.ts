@@ -367,6 +367,7 @@ function greedyFillForLine(
   const built: SavedModule[] = []
   const groups: BuildGroup[] = []
   let maxIterations = 60
+  const lockedSet = new Set(lockedWares)
 
   function getAutoModules(mods: SavedModule[]): SavedModule[] {
     const full = mergeModules([...currentEmpireModules, ...mods])
@@ -480,6 +481,7 @@ function greedyFillForLine(
       for (const src of externalSources) {
         for (const [wareId, rate] of Object.entries(src.rates)) {
           if (wareId === 'energycells' || rate <= 0) continue
+          if (lockedSet.has(wareId)) continue
           const prodRate = Math.max(0, net[wareId] ?? 0)
           if (prodRate < rate && rate > highest) {
             highest = rate
@@ -494,6 +496,7 @@ function greedyFillForLine(
         for (const [wareId, rate] of Object.entries(src.rates)) {
           if (wareId === 'energycells' || rate <= 0) continue
           if (!hasExternalDemand.has(wareId)) continue
+          if (lockedSet.has(wareId)) continue
           const prodRate = Math.max(0, net[wareId] ?? 0)
           const satRate = prodRate / rate
           if (satRate < worstSat) {
@@ -508,6 +511,7 @@ function greedyFillForLine(
           for (const [wareId, rate] of Object.entries(src.rates)) {
             if (wareId === 'energycells' || rate <= 0) continue
             if (hasExternalDemand.has(wareId)) continue
+            if (lockedSet.has(wareId)) continue
             const prodRate = Math.max(0, net[wareId] ?? 0)
             if (prodRate + 0.001 < rate) {
               bottleneckWare = wareId
@@ -667,21 +671,13 @@ function collectDemandSources(
     if (Object.keys(rates).length === 0) continue
 
     const label = edge.sourceLabel
-    // Dedup: group by upstream node base name (strip action suffix)
-    const baseLabel = label.replace(/ (buildCost|isolated)$/, '')
-    const existing = byLabel.get(baseLabel)
+    const existing = byLabel.get(label)
     if (existing) {
       for (const [w, r] of Object.entries(rates)) {
         existing.rates[w] = Math.max(existing.rates[w] || 0, r)
       }
-      // Merge materials too
-      if (materials && existing.materials) {
-        for (const [w, q] of Object.entries(materials)) {
-          existing.materials[w] = Math.max(existing.materials[w] || 0, q)
-        }
-      }
     } else {
-      byLabel.set(baseLabel, { label: baseLabel, rates, materials })
+      byLabel.set(label, { label, rates, materials })
     }
   }
 
@@ -721,10 +717,10 @@ function computeDagLine(
   const demandSources = collectDemandSources(node, graph, modulesMap)
   node.demandSources = demandSources
 
-  // Add gap rates additively to demand sources
+  // Add tracked-ware-filtered gap rates additively to demand sources
   const gapRates: Record<string, number> = {}
   for (const [w, r] of Object.entries(gap)) {
-    if (r > 0) gapRates[w] = r
+    if (r > 0 && node.trackedWares.has(w)) gapRates[w] = r
   }
   if (Object.keys(gapRates).length > 0 && demandSources.length > 0) {
     const first = demandSources[0]
@@ -787,10 +783,15 @@ function computeSCCGroup(
     const node = sccNodes[0]!
     const demandSources = collectDemandSources(node, graph, modulesMap)
     node.demandSources = demandSources
-    if (Object.keys(gapRates).length > 0 && demandSources.length > 0) {
+    // Filter gapRates by node's trackedWares
+    const nodeGap: Record<string, number> = {}
+    for (const [w, r] of Object.entries(gapRates)) {
+      if (node.trackedWares.has(w)) nodeGap[w] = r
+    }
+    if (Object.keys(nodeGap).length > 0 && demandSources.length > 0) {
       const first = demandSources[0]
       if (first) {
-        for (const [w, r] of Object.entries(gapRates)) {
+        for (const [w, r] of Object.entries(nodeGap)) {
           first.rates[w] = (first.rates[w] || 0) + r
         }
       }
@@ -822,11 +823,15 @@ function computeSCCGroup(
         if (buildCostWares.has(w)) selfWares.add(w)
       }
 
-      // Add gap rates additively to the first demand source
-      if (Object.keys(gapRates).length > 0 && demandSources.length > 0) {
+      // Add tracked-ware-filtered gap rates additively to demand sources
+      const nodeGap: Record<string, number> = {}
+      for (const [w, r] of Object.entries(gapRates)) {
+        if (node.trackedWares.has(w)) nodeGap[w] = r
+      }
+      if (Object.keys(nodeGap).length > 0 && demandSources.length > 0) {
         const first = demandSources[0]
         if (first) {
-          for (const [w, r] of Object.entries(gapRates)) {
+          for (const [w, r] of Object.entries(nodeGap)) {
             first.rates[w] = (first.rates[w] || 0) + r
           }
         }
