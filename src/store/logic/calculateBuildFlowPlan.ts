@@ -836,14 +836,6 @@ function computeSCCGroup(
           first.rates[w] = (first.rates[w] || 0) + r
         }
       }
-    } else if (Object.keys(gapRates).length > 0) {
-      const filteredGap: Record<string, number> = {}
-      for (const [w, r] of Object.entries(gapRates)) {
-        if (node.trackedWares.has(w)) filteredGap[w] = r
-      }
-      if (Object.keys(filteredGap).length > 0) {
-        demandSources.push({ label: 'gap_demand', rates: { ...filteredGap } })
-      }
     }
     const required = requiredWaresByGroup.get(node.lineGroupId) || new Set()
     const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapRates, [], required, node.trackedWares)
@@ -873,29 +865,6 @@ function computeSCCGroup(
       const selfWares = new Set<string>()
       for (const w of node.trackedWares) {
         if (buildCostWares.has(w)) selfWares.add(w)
-      }
-
-      // Add tracked-ware-filtered gap rates additively to demand sources
-      const nodeGap: Record<string, number> = {}
-      for (const [w, r] of Object.entries(gapRates)) {
-        if (node.trackedWares.has(w)) nodeGap[w] = r
-      }
-      if (Object.keys(nodeGap).length > 0 && demandSources.length > 0) {
-        const first = demandSources[0]
-        if (first) {
-          for (const [w, r] of Object.entries(nodeGap)) {
-            first.rates[w] = (first.rates[w] || 0) + r
-          }
-        }
-      } else if (Object.keys(gapRates).length > 0) {
-        // Filter gapRates by trackedWares before pushing as separate source
-        const filteredGap: Record<string, number> = {}
-        for (const [w, r] of Object.entries(gapRates)) {
-          if (node.trackedWares.has(w)) filteredGap[w] = r
-        }
-        if (Object.keys(filteredGap).length > 0) {
-          demandSources.push({ label: 'gap_demand', rates: { ...filteredGap } })
-        }
       }
 
       if (selfWares.size > 0) {
