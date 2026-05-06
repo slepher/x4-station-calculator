@@ -400,10 +400,11 @@ for (const [groupId, node] of graph.nodes) {
           const qty = scheme.targetRateSources?.find(s => s.label === src.label)?.materials?.[ws.wareId]
           const buildTime = qty ? qty / src.rate * 3600 : 0
           const detail = qty ? `总量 ${qty.toFixed(0)} 单元, 建筑时间 ${buildTime.toFixed(0)}s` : ''
-          console.log(`        ${src.label}: ${src.rate.toFixed(1)}/h 满足率 ${src.satisfaction.toFixed(1)}%${detail ? ` (${detail})` : ''}`)
+          const status = src.satisfaction.satisfied ? '✓' : '✗'
+          console.log(`        ${src.label}: ${src.rate.toFixed(1)}/h 满足率 ${src.satisfaction.satRate.toFixed(1)}% ${status} (产出 ${ws.totalProd.toFixed(1)}/h${detail ? `, ${detail}` : ''})`)
         }
         console.log(`        ────────`)
-        console.log(`        目标合计: ${ws.totalTarget.toFixed(1)}/h, 产出 ${ws.totalProd.toFixed(1)}/h, 满足率 ${(ws.totalProd / (ws.totalTarget || 0.001) * 100).toFixed(1)}%`)
+        console.log(`        产出: ${ws.totalProd.toFixed(1)}/h, 各来源${ws.sources.every(s => s.satisfaction.satisfied) ? '全部满足 ✓' : '有未满足 ✗'}`)
       }
     }
   }

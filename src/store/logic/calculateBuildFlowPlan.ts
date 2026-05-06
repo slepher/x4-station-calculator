@@ -79,21 +79,21 @@ export function expandGoalsWithAutoFill(
 export function computeSourceSatisfaction(
   targetRate: number,
   prodRate: number,
-): number {
-  if (targetRate <= 0) return prodRate > 0 ? 999 : 0
-  return Math.min(prodRate / targetRate * 100, 999)
+): { satisfied: boolean; satRate: number } {
+  const satisfied = prodRate + 0.001 >= targetRate
+  const satRate = targetRate > 0 ? Math.min(prodRate / targetRate * 100, 999) : 999
+  return { satisfied, satRate }
 }
 
 export interface SourceSatisfaction {
   label: string
   rate: number
-  satisfaction: number
+  satisfaction: { satisfied: boolean; satRate: number }
 }
 
 export interface WareSatisfaction {
   wareId: string
   sources: SourceSatisfaction[]
-  totalTarget: number
   totalProd: number
 }
 
@@ -126,9 +126,7 @@ export function computeWareSatisfactions(
       sources.push({ label: 'manual_module', rate: manualModules[wareId] || 0, satisfaction: computeSourceSatisfaction(manualModules[wareId] || 0, prodRate) })
     }
 
-    const maxBuildMat = scheme.targetRates?.[wareId] || 0
-    const allTarget = maxBuildMat + (gap[wareId] || 0) + (manualWares[wareId] || 0) + (manualModules[wareId] || 0)
-    results.push({ wareId, sources, totalTarget: allTarget, totalProd: prodRate })
+    results.push({ wareId, sources, totalProd: prodRate })
   }
   return results
 }
@@ -327,13 +325,18 @@ function planProductionForRates(
   demandSources: BuildRateSource[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  race: string
+  race: string,
+  gap: Record<string, number> = {},
 ): SavedModule[] {
   const targetRates: Record<string, number> = {}
   for (const src of demandSources) {
     for (const [wareId, rate] of Object.entries(src.rates)) {
       targetRates[wareId] = Math.max(targetRates[wareId] || 0, rate)
     }
+  }
+  // Add gap after Math.max (gap must stack on top of the highest source rate)
+  for (const [w, r] of Object.entries(gap)) {
+    if (r > 0) targetRates[w] = (targetRates[w] || 0) + r
   }
 
   const produced = new Map<string, number>()
@@ -448,19 +451,12 @@ function greedyFillForLine(
     const allSources = [...externalSources]
     const sd = selfDemand()
     if (sd) allSources.push(sd)
-    // Add gap rates filtered by trackedWares
+    // Add gap as separate demand source (not merged into first — swallowed by Math.max)
     const gapRates: Record<string, number> = {}
     for (const [w, r] of Object.entries(_gap2)) {
       if (r > 0 && trackedWares.has(w)) gapRates[w] = r
     }
-    if (Object.keys(gapRates).length > 0 && allSources.length > 0) {
-      const first = allSources[0]
-      if (first) {
-        for (const [w, r] of Object.entries(gapRates)) {
-          first.rates[w] = (first.rates[w] || 0) + r
-        }
-      }
-    } else if (Object.keys(gapRates).length > 0) {
+    if (Object.keys(gapRates).length > 0) {
       allSources.push({ label: 'gap_demand', rates: gapRates })
     }
 
@@ -473,6 +469,7 @@ function greedyFillForLine(
       }
       if (!allMet) break
     }
+    if (allMet) break
     if (allMet) break
 
     let worstSat = Infinity
@@ -758,20 +755,10 @@ function computeDagLine(
     for (const w of reqWares) delete src.rates[w]
   }
 
-  // Add tracked-ware-filtered gap rates additively to demand sources
-  const gapRates: Record<string, number> = {}
+  // Tracked-ware-filtered gap for planProductionForRates
+  const gapForPlan: Record<string, number> = {}
   for (const [w, r] of Object.entries(gap)) {
-    if (r > 0 && node.trackedWares.has(w)) gapRates[w] = r
-  }
-  if (Object.keys(gapRates).length > 0 && demandSources.length > 0) {
-    const first = demandSources[0]
-    if (first) {
-      for (const [w, r] of Object.entries(gapRates)) {
-        first.rates[w] = (first.rates[w] || 0) + r
-      }
-    }
-  } else if (Object.keys(gapRates).length > 0) {
-    demandSources.push({ label: 'gap_demand', rates: { ...gapRates } })
+    if (r > 0 && node.trackedWares.has(w)) gapForPlan[w] = r
   }
 
   // Check self-bootstrap
@@ -785,11 +772,11 @@ function computeDagLine(
   if (node.isSelfBootstrap && selfWares.size > 0) {
     const locked = [...(requiredWaresByGroup.get(node.lineGroupId) || new Set())]
     const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked, reqWares, node.trackedWares)
+    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapForPlan, locked, reqWares, node.trackedWares)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
   } else {
-    node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference)
+    node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference, gapForPlan)
     const autoFill = autoFillForLine(
       mergeModules([...currentEmpireModules, ...node.modules]),
       [...(requiredWaresByGroup.get(node.lineGroupId) || [])].map(w => ({ type: 'required-production' as const, wareId: w, ratePerHour: 0 })),
@@ -850,7 +837,7 @@ function computeSCCGroup(
       }
     }
     const required = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, [], required, node.trackedWares)
+    const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapRates, [], required, node.trackedWares)
     node.buildGroups = groups
     node.modules = mergeModules(groups.flatMap(g => g.modules))
     updateNodeDerivedFields(node, modulesMap, settings)
@@ -905,11 +892,15 @@ function computeSCCGroup(
       if (selfWares.size > 0) {
         const locked = [...(requiredWaresByGroup.get(node.lineGroupId) || new Set())]
         const reqWares = requiredWaresByGroup.get(node.lineGroupId) || new Set()
-        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, {}, locked, reqWares, node.trackedWares)
+        const groups = greedyFillForLine(demandSources, currentEmpireModules, settings, modulesMap, waresMap, gapRates, locked, reqWares, node.trackedWares)
         node.buildGroups = groups
         node.modules = mergeModules(groups.flatMap(g => g.modules))
       } else {
-        node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference)
+        const nodeGapForPlan: Record<string, number> = {}
+        for (const [w, r] of Object.entries(gapRates)) {
+          if (node.trackedWares.has(w)) nodeGapForPlan[w] = r
+        }
+        node.modules = planProductionForRates(demandSources, modulesMap, waresMap, settings.racePreference, nodeGapForPlan)
         const autoFill = autoFillForLine(
           mergeModules([...currentEmpireModules, ...node.modules]),
           [...(requiredWaresByGroup.get(node.lineGroupId) || [])].map(w => ({ type: 'required-production' as const, wareId: w, ratePerHour: 0 })),
