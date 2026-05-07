@@ -68,6 +68,16 @@
 - [x] T29: 补充最小验证方案，覆盖 preview 责任分配、目标速率公式、SCC 收敛、重叠产线归组、script/Vue 同源输出
 - [x] T30: 代码完成后执行 `npm run build`
 
+## Phase 9: Build Plan Store 拆分
+
+- [ ] T31: 新增独立 `useBuildPlanStore`，承载 build-plan 真相层状态与动作
+- [ ] T32: 将 `buildGoals` / `buildFlowMode` / `buildPlan` / `previewResult` / `computeResult` / `schemeGroups` / loading 状态从 `useBlueprintProductionStore` 迁移到 `useBuildPlanStore`
+- [ ] T33: 将 preview watcher 与 compute 入口迁移到 `useBuildPlanStore`
+- [ ] T34: `useBuildPlanPresenter` 改为以 `useBuildPlanStore` 为主输入，仅组合 blueprint store 的 empire overview 数据
+- [ ] T35: `BlueprintProductionWorkbenchView` overview 入口改为同时注入 blueprint store 与 build-plan store
+- [ ] T36: 清理 `useBlueprintProductionStore` 中遗留的 build-plan 真相层导出与双写路径
+- [ ] T37: 为新 store / presenter 边界补充单元测试
+
 ## 验证方案摘要
 
 ### Preview 责任分配

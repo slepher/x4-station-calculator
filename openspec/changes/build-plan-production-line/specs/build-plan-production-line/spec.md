@@ -225,6 +225,30 @@
 **那么** 两者使用同一核心计算入口  
 **并且** 结果语义保持一致
 
+### Requirement: Build-plan 真相层必须使用独立 store
+
+**前提** 系统实现 build-plan overview  
+**当** store 保存或更新 build-plan 相关状态  
+**那么** 系统 MUST 使用独立 build-plan store 作为以下状态的唯一真相层：
+- `buildGoals`
+- `buildFlowMode`
+- `buildPlan`
+- `previewResult`
+- `computeResult`
+- `schemeGroups`
+- preview / compute loading 状态
+
+**并且** `useBlueprintProductionStore` MUST 保留 empire / station planning 领域职责  
+**并且** `useBlueprintProductionStore` MUST NOT 继续作为 build-plan 真相层  
+**并且** Presenter MAY 组合多个 store，但 Vue MUST 通过 presenter 消费这些结果
+
+#### Scenario: overview 页面组合两个 store
+
+**前提** 用户打开 blueprint production overview 页面  
+**当** 页面渲染 build-plan 相关面板  
+**那么** build-plan 相关输入、预览和计算结果来自独立 build-plan store  
+**并且** empire flow、station planning、save/load 仍来自 `useBlueprintProductionStore`
+
 ### Requirement: Store / Presenter / Vue 职责必须分层
 
 **前提** 系统实现 build-plan-production-line  

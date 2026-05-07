@@ -1,6 +1,7 @@
 <script setup lang="ts">
 import { onMounted, watch } from 'vue'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
+import { useBuildPlanStore } from '@/store/useBuildPlanStore'
 import { useActiveViewStore } from '@/store/useActiveViewStore'
 import { useProductionTabbarPresenter } from '@/components/empire/presenters/useProductionTabbarPresenter'
 import { useProductionToolbarPresenter } from '@/components/empire/presenters/useProductionToolbarPresenter'
@@ -19,6 +20,7 @@ import BuildPlanPanel from '@/components/empire/BuildPlanPanel.vue'
 import EmpireWareFlowsDashboard from '@/components/empire/EmpireWareFlowsDashboard.vue'
 
 const blueprintStore = useBlueprintProductionStore()
+const buildPlanStore = useBuildPlanStore()
 const activeViewStore = useActiveViewStore()
 
 onMounted(() => {
@@ -39,7 +41,10 @@ const toolbarPresenter = useProductionToolbarPresenter(blueprintStore)
 const planningPresenter = useProductionPlanningPresenter(blueprintStore)
 const wareflowPresenter = useProductionWareflowPresenter(blueprintStore)
 const dashboardPresenter = useProductionDashboardPresenter(blueprintStore)
-const buildPlanPresenter = useBuildPlanPresenter(blueprintStore)
+const buildPlanPresenter = useBuildPlanPresenter({
+  buildPlanStore,
+  blueprintStore,
+})
 </script>
 
 <template>

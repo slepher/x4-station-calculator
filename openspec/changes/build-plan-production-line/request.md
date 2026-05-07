@@ -133,6 +133,10 @@
   - script 一套
   - store 一套
   - Vue 再二次拼装一套
+- `build-plan` 真相层状态不得继续混在 `useBlueprintProductionStore`
+- 必须将 `buildGoals` / `buildFlowMode` / `buildPlan` / `previewResult` / `computeResult` / `schemeGroups` / loading 等 build-plan 状态迁移到独立 store
+- `useBlueprintProductionStore` 保留 empire / station planning / save-load / empire flow 职责，不再承担 build-plan 真相层
+- overview 页面允许组合多个 store，但 build-plan 的输入、预览、正式求解与展示结果必须以独立 build-plan store 为唯一状态入口
 
 ### 基于当前代码的改造方向
 
@@ -156,6 +160,7 @@
 - 明确依赖图 isolated 扩展规则
 - 明确最终分组展示规则
 - 明确 Vue / analysis script 共用单一计算入口
+- 将 build-plan 真相层状态从 `useBlueprintProductionStore` 迁移到独立 store
 - 更新 OpenSpec 文档以反映以上结论
 
 ### Out of Scope
@@ -176,7 +181,8 @@
 5. 文档明确说明循环依赖只以“主要模块数量稳定”为收敛判据
 6. 文档明确说明 Vue 与 analysis script 必须共用同一计算入口
 7. 文档明确说明当前代码实现有 bug，需求以文档为准
-8. `request.md` / `design.md` / `spec.md` / `tasks.md` 之间不存在互相冲突的旧描述
+8. 文档明确说明 build-plan 真相层必须从 `useBlueprintProductionStore` 拆出到独立 store
+9. `request.md` / `design.md` / `spec.md` / `tasks.md` 之间不存在互相冲突的旧描述
 
 ## 未决项
 

@@ -7,6 +7,7 @@
 1. `preview` 负责责任分配、依赖图、SCC。
 2. `compute` 负责读取 `preview` 结果并求解主要模块 / 辅助模块。
 3. Vue 与 analysis script 只消费共享结果，不自行重建逻辑。
+4. `build-plan` 真相层状态由独立 store 承载，不再混入 `useBlueprintProductionStore`。
 
 ## 领域术语
 
@@ -57,8 +58,9 @@
 ### 1. 总体数据流
 
 ```
-目标模块 / 目标产物变化
-或 checkbox 状态变化
+build-plan store
+  -> 持有 buildGoals / buildFlowMode / buildPlan / previewResult / computeResult / schemeGroups
+  -> 监听目标模块 / 目标产物变化、checkbox 状态变化、logic-flow 变化
   -> preview
      -> 责任分配
      -> 依赖图
@@ -66,7 +68,7 @@
      -> preview store result
 
 用户点击“计算建造方案”
-  -> compute
+  -> build-plan store.compute
      -> 读取 preview result
      -> 合并单线责任
      -> 基于相关产线集合求目标速率
@@ -74,6 +76,10 @@
      -> 派生辅助模块
      -> 若存在 SCC 则迭代直到主要模块稳定
      -> 输出最终 scheme groups
+
+blueprint production store
+  -> 保留 activeEmpire / station planning / empire aggregation / save-load
+  -> 不再持有 build-plan preview / compute 真相层
 ```
 
 补充约束：
@@ -82,6 +88,39 @@
 2. checkbox 不是 `build-flow mode` 开关
 3. checkbox 只控制是否启用“按建筑材料需求规划建材产线”
 4. checkbox 勾选 / 取消都会触发 preview 重算
+5. `useBlueprintProductionStore` 不再持有 build-plan 真相层状态
+6. overview 页面通过 presenter 组合 `useBuildPlanStore` 与 `useBlueprintProductionStore`
+
+### 1.1 Store 边界
+
+推荐拆分：
+
+```ts
+useBlueprintProductionStore
+  - activeEmpire
+  - activeStation
+  - station planning / empire aggregation
+  - save/load/dirty for empire
+
+useBuildPlanStore
+  - buildGoals
+  - buildFlowMode
+  - buildPlan
+  - previewResult
+  - computeResult
+  - schemeGroups
+  - buildFlowPlanLoading
+  - computeBuildPlanLoading
+  - computeBuildFlowPlanPreview()
+  - computePlan()
+```
+
+约束：
+
+1. build-plan store 可以依赖 game-data 与 logic-flow store
+2. build-plan store 不应反向依赖 `useBlueprintProductionStore`，避免形成循环依赖
+3. `useBlueprintProductionStore` 若仍需要展示 empire overview 流数据，保持原职责即可
+4. Presenter 负责把两个 store 组合给 overview Vue；Vue 不直接拼装 store 间数据
 
 ### 2. Preview 阶段设计
 
@@ -217,6 +256,7 @@ compute 只做求解，不做重新分配。
 2. 在 Vue 层临时追加责任
 3. 在 analysis script 里维护第二套责任归属规则
 4. 在 compute 阶段重新调用当前的 `computeProductionLineAllocation(goals, ...)`
+5. 在 `useBlueprintProductionStore` 中继续保留 build-plan 真相层状态并与新 store 双写
 
 #### 3.2 单线求解模型
 

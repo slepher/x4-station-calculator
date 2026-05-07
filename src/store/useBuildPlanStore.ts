@@ -1,0 +1,428 @@
+import { defineStore } from 'pinia'
+import { ref, shallowRef, watch } from 'vue'
+import i18n from '@/i18n'
+import type { ProductionLineGroup, StationSettings } from '@/types/x4'
+import type {
+  BuildGoal,
+  BuildPlan,
+  BuildFlowPlanGraph,
+  BuildFlowPlanView,
+  BuildSchemeGroup,
+  ComputeResult,
+  PreviewResult,
+  ProductionLineAllocation,
+} from '@/types/build-plan'
+import { BootstrapMode } from '@/types/build-plan'
+import { useGameDataStore } from './useGameDataStore'
+import { useLogicFlowStore } from './useLogicFlowStore'
+import type { StationComputeDeps } from './state/stationSettings'
+import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
+import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
+import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
+import { computeFlowPlanLines, expandGoalDependencies, makeSchemes, mergeModules } from '@/store/logic/calculateBuildFlowPlan'
+import { mergeIntoExistingPlan, rebuildSchemeGroups } from '@/store/logic/mergeIntoExistingPlan'
+import {
+  computeBuildFlowPlan,
+  computeBuildFlowPlanSchemeGroups,
+  createBuildFlowPlanPreview,
+  DEFAULT_BUILD_PLAN_SETTINGS,
+} from '@/store/logic/buildPlanProductionLine'
+
+export const useBuildPlanStore = defineStore('buildPlan', () => {
+  const gameData = useGameDataStore()
+  const logicFlowStore = useLogicFlowStore()
+
+  const buildGoals = ref<BuildGoal[]>([])
+  const buildFlowMode = ref<boolean>(false)
+  const buildPlan = ref<BuildPlan | null>(null)
+
+  const buildFlowPlanGraphResult = shallowRef<BuildFlowPlanGraph | null>(null)
+  const buildFlowPlanAllocations = ref<ProductionLineAllocation[]>([])
+  const previewResult = shallowRef<PreviewResult | null>(null)
+  const computeResult = shallowRef<ComputeResult | null>(null)
+  const buildFlowPlanLoading = ref(false)
+  const schemeGroups = ref<BuildSchemeGroup[]>([])
+  const computeBuildPlanLoading = ref(false)
+
+  function getComputeDeps(): StationComputeDeps | null {
+    const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
+    if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
+    return {
+      modulesMap,
+      waresMap,
+      medicalConsumptionMap,
+      enforceDlcActivation,
+      isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag),
+    }
+  }
+
+  function setBuildGoal(goal: BuildGoal) {
+    buildGoals.value = [...buildGoals.value, goal]
+  }
+
+  function removeBuildGoal(index: number) {
+    buildGoals.value = buildGoals.value.filter((_, i) => i !== index)
+  }
+
+  function setBuildFlowMode(mode: boolean) {
+    buildFlowMode.value = mode
+  }
+
+  function calculateBuildFlowPlanInternal(goals: BuildGoal[], deps: StationComputeDeps): BuildPlan {
+    const settings: StationSettings = {
+      sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
+      workforceAuto: true, considerWorkforceForAutoFill: false, supplyWorkforceBonus: false,
+      buyMultiplier: 0.5, sellMultiplier: 0.5, minersEnabled: true, internalSupply: true,
+      showEmpireGaps: false, racePreference: 'argon', resourceBufferHours: 1,
+      primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
+      transportShipCapacity: 62000, enforceDlcActivation: false,
+    }
+
+    const baseModules = goals.flatMap((goal) => expandGoalDependencies(goal, deps.modulesMap, deps.waresMap))
+    const mergedTargetModules = mergeModules(baseModules)
+    const autoFillTargetModules = calculateAutoFillModules({
+      plannedModules: mergedTargetModules,
+      settings,
+      modulesMap: deps.modulesMap,
+      waresMap: deps.waresMap,
+      lockedWares: [],
+    })
+    const targetModules = mergeModules([
+      ...mergedTargetModules,
+      ...autoFillTargetModules.autoIndustryModules,
+      ...autoFillTargetModules.autoHabitationModules,
+    ])
+
+    if (!buildFlowMode.value) {
+      const targetGoalWareIds: string[] = []
+      for (const goal of goals) {
+        if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
+          targetGoalWareIds.push(goal.wareId)
+          continue
+        }
+        if (goal.type !== 'build-module') continue
+        const module = deps.modulesMap[goal.moduleId]
+        if (!module?.outputs) continue
+        for (const wareId of Object.keys(module.outputs)) {
+          if (!targetGoalWareIds.includes(wareId)) targetGoalWareIds.push(wareId)
+        }
+      }
+
+      return {
+        goals,
+        selfSufficient: false,
+        bootstrapMode: BootstrapMode.None,
+        schemes: [{
+          label: '目标产线',
+          description: '目标产线',
+          purposeModules: targetGoalWareIds,
+          primaryModuleIds: targetModules.map((module) => module.id),
+          modules: targetModules,
+          targetRates: {},
+          targetRateSources: [],
+          netProduction: calculateNetProduction(targetModules, deps.modulesMap, false, 100),
+          steps: [],
+          totalDuration: 0,
+          totalCredits: 0,
+          stepsCount: 0,
+          isFeasible: targetModules.length > 0,
+          totalModuleBuildTime: 0,
+          buildMaterialTotals: {},
+        }],
+        totalDuration: 0,
+        totalCredits: 0,
+        goalsAchieved: goals,
+        goalsRemaining: [],
+        halted: false,
+        haltReason: '',
+      }
+    }
+
+    let buildFlowView: BuildFlowPlanView | null = null
+    const flowView = logicFlowStore.buildFlowView
+    if (flowView && flowView.buildFlowGroups && flowView.buildFlowGroups.length > 0) {
+      buildFlowView = {
+        buildFlowGroups: flowView.buildFlowGroups,
+        assignments: logicFlowStore.buildFlowAssignments,
+        virtualEdges: logicFlowStore.buildFlowVirtualEdges,
+      }
+    }
+
+    if (!buildFlowView) {
+      const targetGoalWareIds: string[] = []
+      for (const goal of goals) {
+        if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
+          targetGoalWareIds.push(goal.wareId)
+          continue
+        }
+        if (goal.type !== 'build-module') continue
+        const module = deps.modulesMap[goal.moduleId]
+        if (!module?.outputs) continue
+        for (const wareId of Object.keys(module.outputs)) {
+          if (!targetGoalWareIds.includes(wareId)) targetGoalWareIds.push(wareId)
+        }
+      }
+
+      return {
+        goals,
+        selfSufficient: false,
+        bootstrapMode: BootstrapMode.None,
+        schemes: [{
+          label: '目标产线',
+          description: '目标产线',
+          purposeModules: targetGoalWareIds,
+          primaryModuleIds: targetModules.map((module) => module.id),
+          modules: targetModules,
+          targetRates: {},
+          targetRateSources: [],
+          netProduction: calculateNetProduction(targetModules, deps.modulesMap, false, 100),
+          steps: [],
+          totalDuration: 0,
+          totalCredits: 0,
+          stepsCount: 0,
+          isFeasible: targetModules.length > 0,
+          totalModuleBuildTime: 0,
+          buildMaterialTotals: {},
+        }],
+        totalDuration: 0,
+        totalCredits: 0,
+        goalsAchieved: goals,
+        goalsRemaining: [],
+        halted: false,
+        haltReason: '',
+      }
+    }
+
+    const graph = buildFlowPlanGraph(targetModules, buildFlowView, deps.modulesMap)
+    const goalWareIds: string[] = []
+    for (const goal of goals) {
+      if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
+        goalWareIds.push(goal.wareId)
+        continue
+      }
+      if (goal.type !== 'build-module') continue
+      const module = deps.modulesMap[goal.moduleId]
+      if (!module?.outputs) continue
+      for (const wareId of Object.keys(module.outputs)) {
+        if (!goalWareIds.includes(wareId)) goalWareIds.push(wareId)
+      }
+    }
+    graph.targetGoalWareIds = goalWareIds
+
+    computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [])
+    const schemes = makeSchemes(graph, deps.modulesMap, deps.waresMap, settings)
+
+    return {
+      goals,
+      selfSufficient: false,
+      bootstrapMode: BootstrapMode.None,
+      schemes,
+      totalDuration: 0,
+      totalCredits: 0,
+      goalsAchieved: goals,
+      goalsRemaining: [],
+      halted: false,
+      haltReason: '',
+    }
+  }
+
+  function computeBuildFlowPlanPreview() {
+    const deps = getComputeDeps()
+    if (!deps) return
+
+    buildFlowPlanLoading.value = true
+    try {
+      const goals = buildGoals.value
+      if (goals.length === 0) {
+        buildFlowPlanGraphResult.value = null
+        buildFlowPlanAllocations.value = []
+        previewResult.value = null
+        return
+      }
+
+      const groups: ProductionLineGroup[] = logicFlowStore.groups || []
+      let buildFlowView: BuildFlowPlanView | null = null
+      const flowView = logicFlowStore.buildFlowView
+      if (flowView && flowView.buildFlowGroups && flowView.buildFlowGroups.length > 0) {
+        buildFlowView = {
+          buildFlowGroups: flowView.buildFlowGroups,
+          assignments: logicFlowStore.buildFlowAssignments || [],
+          virtualEdges: logicFlowStore.buildFlowVirtualEdges || [],
+        }
+      }
+
+      const preview = createBuildFlowPlanPreview(
+        goals,
+        groups,
+        buildFlowView,
+        deps.modulesMap,
+        deps.waresMap,
+        DEFAULT_BUILD_PLAN_SETTINGS,
+        buildFlowMode.value,
+      )
+
+      if (!preview) {
+        buildFlowPlanGraphResult.value = null
+        buildFlowPlanAllocations.value = []
+        previewResult.value = null
+        return
+      }
+
+      previewResult.value = preview
+      buildFlowPlanGraphResult.value = preview.graph
+      buildFlowPlanAllocations.value = preview.lines.map((line) => ({
+        groupId: line.groupId,
+        groupName: line.groupName,
+        isUnmatched: line.isUnmatched,
+        goals: line.responsibilities.flatMap((responsibility): BuildGoal[] => {
+          if (responsibility.type === 'target-production') {
+            if (responsibility.moduleId) {
+              return [{
+                type: 'target-production',
+                moduleId: responsibility.moduleId,
+                count: responsibility.count || 1,
+              }]
+            }
+            if (responsibility.wareId) {
+              return [{
+                type: 'target-production',
+                wareId: responsibility.wareId,
+                ratePerHour: responsibility.ratePerHour || 0,
+              }]
+            }
+            return []
+          }
+          if (!responsibility.wareId) return []
+          return [{
+            type: responsibility.type,
+            wareId: responsibility.wareId,
+            ratePerHour: responsibility.ratePerHour || 0,
+          }]
+        }),
+      }))
+    } finally {
+      buildFlowPlanLoading.value = false
+    }
+  }
+
+  function computePlan() {
+    const deps = getComputeDeps()
+    if (!deps) return
+
+    const goals = buildGoals.value
+    computeBuildPlanLoading.value = true
+
+    try {
+      if (previewResult.value) {
+        const result = computeBuildFlowPlan({
+          preview: previewResult.value,
+          modulesMap: deps.modulesMap,
+          waresMap: deps.waresMap,
+          modulesByOutputMap: gameData.modulesByOutputMap || {},
+          settings: DEFAULT_BUILD_PLAN_SETTINGS,
+        })
+        computeResult.value = result
+
+        const flatIncoming = result.schemeGroups.flatMap((group) => group.schemes)
+        const mergedSchemes = mergeIntoExistingPlan(flatIncoming, buildPlan.value)
+        schemeGroups.value = rebuildSchemeGroups(result.schemeGroups, mergedSchemes)
+        buildPlan.value = {
+          goals,
+          selfSufficient: false,
+          bootstrapMode: BootstrapMode.None,
+          schemes: mergedSchemes,
+          totalDuration: 0,
+          totalCredits: 0,
+          goalsAchieved: goals,
+          goalsRemaining: [],
+          halted: false,
+          haltReason: '',
+        }
+        return
+      }
+
+      if (buildFlowMode.value && buildFlowPlanGraphResult.value) {
+        const result = computeBuildFlowPlanSchemeGroups(
+          buildFlowPlanGraphResult.value,
+          goals,
+          logicFlowStore.groups || [],
+          logicFlowStore.buildFlowView
+            ? {
+              buildFlowGroups: logicFlowStore.buildFlowView.buildFlowGroups,
+              assignments: logicFlowStore.buildFlowAssignments || [],
+              virtualEdges: logicFlowStore.buildFlowVirtualEdges || [],
+            }
+            : null,
+          deps.modulesMap,
+          deps.waresMap,
+          gameData.modulesByOutputMap || {},
+          DEFAULT_BUILD_PLAN_SETTINGS,
+          {
+            buildMaterial: i18n.global.t('build_plan.group_build_material'),
+            production: i18n.global.t('build_plan.group_production'),
+          },
+        )
+        const flatIncoming = result.schemeGroups.flatMap((group) => group.schemes)
+        const mergedSchemes = mergeIntoExistingPlan(flatIncoming, buildPlan.value)
+        schemeGroups.value = rebuildSchemeGroups(result.schemeGroups, mergedSchemes)
+        buildPlan.value = {
+          goals,
+          selfSufficient: false,
+          bootstrapMode: BootstrapMode.None,
+          schemes: mergedSchemes,
+          totalDuration: 0,
+          totalCredits: 0,
+          goalsAchieved: goals,
+          goalsRemaining: [],
+          halted: false,
+          haltReason: '',
+        }
+        return
+      }
+
+      schemeGroups.value = []
+      const result = calculateBuildFlowPlanInternal(goals, deps)
+      buildPlan.value = {
+        ...result,
+        schemes: mergeIntoExistingPlan(result.schemes, buildPlan.value),
+      }
+    } finally {
+      computeBuildPlanLoading.value = false
+    }
+  }
+
+  watch([buildFlowMode, buildGoals], () => {
+    computeBuildFlowPlanPreview()
+  })
+
+  watch(
+    [
+      () => logicFlowStore.groups,
+      () => logicFlowStore.buildFlowGroups,
+      () => logicFlowStore.buildFlowAssignments,
+      () => logicFlowStore.buildFlowVirtualEdges,
+    ],
+    () => {
+      computeBuildFlowPlanPreview()
+    },
+    { deep: true },
+  )
+
+  return {
+    buildGoals,
+    buildFlowMode,
+    buildPlan,
+    buildFlowPlanGraphResult,
+    buildFlowPlanAllocations,
+    previewResult,
+    computeResult,
+    buildFlowPlanLoading,
+    schemeGroups,
+    computeBuildPlanLoading,
+    setBuildGoal,
+    removeBuildGoal,
+    setBuildFlowMode,
+    computePlan,
+    computeBuildFlowPlanPreview,
+  }
+})

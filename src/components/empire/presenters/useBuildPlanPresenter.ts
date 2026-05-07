@@ -54,7 +54,10 @@ export interface UseBuildPlanPresenterReturn {
 }
 
 export interface BuildPlanPresenterStore {
-  activeEmpire: { stations: import('@/types/x4').StationPlan[] } | null
+  getEmpireGroupedFlows(): EmpireGroupedFlows
+}
+
+export interface BuildPlanPresenterBuildPlanStore {
   buildGoals: BuildGoal[]
   buildFlowMode: boolean
   buildPlan: BuildPlan | null
@@ -63,14 +66,18 @@ export interface BuildPlanPresenterStore {
   buildFlowPlanLoading: boolean
   schemeGroups: BuildSchemeGroup[]
   computeBuildPlanLoading: boolean
-  getEmpireGroupedFlows(): EmpireGroupedFlows
   setBuildGoal(goal: BuildGoal): void
   removeBuildGoal(index: number): void
   setBuildFlowMode(mode: boolean): void
-  computePlan(effectiveGoals?: BuildGoal[]): void
+  computePlan(): void
 }
 
-export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildPlanPresenterReturn {
+export interface BuildPlanPresenterInput {
+  buildPlanStore: BuildPlanPresenterBuildPlanStore
+  blueprintStore: BuildPlanPresenterStore
+}
+
+export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildPlanPresenterInput): UseBuildPlanPresenterReturn {
   const logicFlow = useLogicFlowStore()
   const gameData = useGameDataStore()
 
@@ -81,9 +88,9 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
         groupId: undefined,
         groupName: '',
         isUnmatched: true,
-        goals: [...store.buildGoals],
+        goals: [...buildPlanStore.buildGoals],
       }
-      return store.buildGoals.length > 0 ? [unmatched] : []
+      return buildPlanStore.buildGoals.length > 0 ? [unmatched] : []
     }
 
     const groups = logicFlow.groups
@@ -94,7 +101,7 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
     }
 
     return computeProductionLineAllocation(
-      store.buildGoals,
+      buildPlanStore.buildGoals,
       groups,
       buildFlowView,
       gameData.modulesMap,
@@ -107,29 +114,29 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
    * 重叠产线（groupId 同时出现在 build-material 和 production 中）归入建材组。
    */
   const buildMaterialPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
-    if (!store.previewResult || !store.previewResult.buildMaterialPlanningEnabled) return []
-    return store.previewResult.lines
+    if (!buildPlanStore.previewResult || !buildPlanStore.previewResult.buildMaterialPlanningEnabled) return []
+    return buildPlanStore.previewResult.lines
       .filter(line => line.responsibilities.some(r => r.type === 'derived-build-material'))
       .map(previewLineToAllocation)
   })
 
   const productionPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
-    if (!store.previewResult) return []
-    return store.previewResult.lines
+    if (!buildPlanStore.previewResult) return []
+    return buildPlanStore.previewResult.lines
       .filter(line => !line.responsibilities.some(r => r.type === 'derived-build-material'))
       .map(previewLineToAllocation)
   })
 
   const props: BuildPlanPresenterProps = {
-    goals: computed(() => store.buildGoals),
-    buildFlowMode: computed(() => store.buildFlowMode),
+    goals: computed(() => buildPlanStore.buildGoals),
+    buildFlowMode: computed(() => buildPlanStore.buildFlowMode),
     racePreference: computed(() => 'argon'),
-    buildPlan: computed(() => store.buildPlan),
-    loading: computed(() => store.computeBuildPlanLoading),
-    schemes: computed(() => store.buildPlan?.schemes || []),
-    schemeGroups: computed(() => store.schemeGroups),
+    buildPlan: computed(() => buildPlanStore.buildPlan),
+    loading: computed(() => buildPlanStore.computeBuildPlanLoading),
+    schemes: computed(() => buildPlanStore.buildPlan?.schemes || []),
+    schemeGroups: computed(() => buildPlanStore.schemeGroups),
     warnings: computed(() => {
-      const plan = store.buildPlan
+      const plan = buildPlanStore.buildPlan
       if (!plan) return []
       const w: string[] = []
       if (plan.halted) w.push(plan.haltReason)
@@ -138,7 +145,7 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
       }
       return w
     }),
-    currentFlows: computed(() => store.getEmpireGroupedFlows()),
+    currentFlows: computed(() => blueprintStore.getEmpireGroupedFlows()),
     flowPlanName: computed(() => {
       const activeId = logicFlow.savedPlans.activeId
       if (!activeId) return ''
@@ -154,32 +161,29 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
       }))
     }),
     allocations,
-    buildFlowPlanAllocations: computed(() => store.buildFlowPlanAllocations),
+    buildFlowPlanAllocations: computed(() => buildPlanStore.buildFlowPlanAllocations),
     buildMaterialPreviewAllocations,
     productionPreviewAllocations,
-    buildFlowPlanLoading: computed(() => store.buildFlowPlanLoading),
+    buildFlowPlanLoading: computed(() => buildPlanStore.buildFlowPlanLoading),
   }
 
   const emits: BuildPlanPresenterEmits = {
-    addGoal: (goal) => store.setBuildGoal(goal),
-    removeGoal: (index) => store.removeBuildGoal(index),
+    addGoal: (goal) => buildPlanStore.setBuildGoal(goal),
+    removeGoal: (index) => buildPlanStore.removeBuildGoal(index),
     updateGoal: (index, value) => {
-      const goal = store.buildGoals[index]
+      const goal = buildPlanStore.buildGoals[index]
       if (!goal) return
       if (goal.type === 'target-production' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') return
-      const updated = [...store.buildGoals]
+      const updated = [...buildPlanStore.buildGoals]
       if (goal.type === 'production-rate') {
         updated[index] = { ...goal, ratePerHour: value }
       } else if (goal.type === 'build-module') {
         updated[index] = { ...goal, count: value }
       }
-      store.buildGoals = updated
+      buildPlanStore.buildGoals = updated
     },
-    setBuildFlowMode: (mode) => store.setBuildFlowMode(mode),
-    computePlan: () => {
-      const effectiveGoals = allocations.value.flatMap(a => a.goals)
-      store.computePlan(effectiveGoals)
-    },
+    setBuildFlowMode: (mode) => buildPlanStore.setBuildFlowMode(mode),
+    computePlan: () => buildPlanStore.computePlan(),
     loadFlowPlan: (planId) => {
       const index = logicFlow.savedPlans.list.findIndex(p => p.id === planId)
       if (index >= 0) logicFlow.loadPlan(index)
