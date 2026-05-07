@@ -98,9 +98,6 @@ function buildCoveredSet(
     }
   }
 
-  console.log('[buildCoveredSet] covered:', [...covered])
-  console.log('[buildCoveredSet] isolated wares NOT in covered:', flowGroups.flatMap(g => g.nodes).filter(n => n.isIsolated).map(n => n.wareId))
-
   return covered
 }
 
@@ -199,13 +196,6 @@ export function computeProductionLineAllocation(
   }
   const allGoals = [...goals, ...derivedGoalList]
 
-  console.log('[allocation] allGoals:', allGoals.map(g => ({ type: g.type, wareId: (g as any).wareId, moduleId: (g as any).moduleId })))
-  console.log('[allocation] flowGroups:', flowGroups.map(g => ({
-    id: g.id,
-    name: g.name,
-    nodes: g.nodes.map(n => ({ wareId: n.wareId, source: n.source, isIsolated: n.isIsolated, moduleId: n.moduleId }))
-  })))
-
   // 2. 为每个 goal 分配产线
   for (const goal of allGoals) {
     const wareId = extractWareId(goal, modulesMap)
@@ -218,7 +208,6 @@ export function computeProductionLineAllocation(
           if (tag.wareId === wareId) {
             const sourceGroupId = findConnection(wareId, buildFlowView.assignments, buildFlowView.virtualEdges)
             if (sourceGroupId && flowGroups.some((g) => g.id === sourceGroupId)) {
-              console.log(`[allocation] goal ${goal.type}:${wareId} → Layer1 → group ${sourceGroupId}`)
               const list = groupMap.get(sourceGroupId) || []
               list.push(goal)
               groupMap.set(sourceGroupId, list)
@@ -274,7 +263,6 @@ export function computeProductionLineAllocation(
         }
       }
       if (matched) {
-        console.log(`[allocation] goal ${goal.type}:${wareId} → Layer2/auto → group ${group.id}`)
         const list = groupMap.get(group.id) || []
         list.push(goal)
         groupMap.set(group.id, list)
@@ -289,7 +277,6 @@ export function computeProductionLineAllocation(
       for (const group of flowGroups) {
         for (const node of group.nodes) {
           if (node.isIsolated && node.wareId === wareId) {
-            console.log(`[allocation] goal ${goal.type}:${wareId} → Layer2.5/isolated → group ${group.id}`)
             const list = groupMap.get(group.id) || []
             list.push(goal)
             groupMap.set(group.id, list)
@@ -303,7 +290,6 @@ export function computeProductionLineAllocation(
     if (assigned) continue
 
     // Layer 3: 未命中
-    console.log(`[allocation] goal ${goal.type}:${wareId} → UNMATCHED`)
     unmatchedGoals.push(goal)
   }
 

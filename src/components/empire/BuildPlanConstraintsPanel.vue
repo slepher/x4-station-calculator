@@ -204,8 +204,9 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <template v-if="buildFlowMode && buildMaterialPreviewAllocations && buildMaterialPreviewAllocations.length > 0">
+      <template v-if="(buildMaterialPreviewAllocations && buildMaterialPreviewAllocations.length > 0) || (productionPreviewAllocations && productionPreviewAllocations.length > 0)">
         <ProductionLineAllocationSection
+          v-if="buildMaterialPreviewAllocations && buildMaterialPreviewAllocations.length > 0"
           :allocations="buildMaterialPreviewAllocations"
           :goals="goals"
           :racePreference="racePreference"

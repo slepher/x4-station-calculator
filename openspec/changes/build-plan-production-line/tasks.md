@@ -86,7 +86,7 @@
 
 ### 重叠产线归组
 - `mergeGraphAndAllocationLines()` 在 preview 阶段合并 graph 责任与 `target-production` 责任
-- `computeBuildFlowPlan` 在求解后将 C-line 模块合并进 graph node
+- `computeBuildFlowPlan` 在求解后将目标产线模块合并进 graph node
 - `makeSchemesWithGroups` 过滤掉已在 graph 中出现过的 allocation，消除事后拼接
 - `mergeOverlappingLines` 不再被调用
 

@@ -107,14 +107,14 @@ export function useBuildPlanPresenter(store: BuildPlanPresenterStore): UseBuildP
    * 重叠产线（groupId 同时出现在 build-material 和 production 中）归入建材组。
    */
   const buildMaterialPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
-    if (!store.buildFlowMode || !store.previewResult) return []
+    if (!store.previewResult || !store.previewResult.buildMaterialPlanningEnabled) return []
     return store.previewResult.lines
       .filter(line => line.responsibilities.some(r => r.type === 'derived-build-material'))
       .map(previewLineToAllocation)
   })
 
   const productionPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
-    if (!store.buildFlowMode || !store.previewResult) return []
+    if (!store.previewResult) return []
     return store.previewResult.lines
       .filter(line => !line.responsibilities.some(r => r.type === 'derived-build-material'))
       .map(previewLineToAllocation)

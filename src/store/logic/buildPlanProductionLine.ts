@@ -7,7 +7,7 @@ import {
   expandGoalDependencies,
   makeSchemesWithGroups,
   mergeModules,
-  splitCToLineSchemes,
+  splitTargetLineSchemes,
 } from '@/store/logic/calculateBuildFlowPlan'
 import type {
   BuildFlowPlanGraph,
@@ -60,8 +60,8 @@ function createEmptyGraph(): BuildFlowPlanGraph {
     nodes: new Map(),
     edges: [],
     sccGroups: [],
-    cModules: [],
-    cBuildCostRates: {},
+    targetModules: [],
+    targetBuildCostRates: {},
   }
 }
 
@@ -90,20 +90,20 @@ export function enrichGoalsWithIsolatedRequirements(
   ]
 }
 
-export function buildCModulesForProductionLine(
+export function buildTargetModulesForProductionLine(
   goals: BuildGoal[],
   groups: ProductionLineGroup[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
-): { enrichedGoals: BuildGoal[]; cModules: SavedModule[] } {
+): { enrichedGoals: BuildGoal[]; targetModules: SavedModule[] } {
   const enrichedGoals = enrichGoalsWithIsolatedRequirements(goals, groups)
   const baseModules = enrichedGoals.flatMap(goal => expandGoalDependencies(goal, modulesMap, waresMap))
   const mergedBase = mergeModules(baseModules)
   const autoFill = autoFillForLine(mergedBase, enrichedGoals, settings, modulesMap, waresMap)
   return {
     enrichedGoals,
-    cModules: mergeModules([...mergedBase, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules]),
+    targetModules: mergeModules([...mergedBase, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules]),
   }
 }
 
@@ -223,14 +223,14 @@ export function createBuildFlowPlanPreview(
   if (!buildMaterialPlanningEnabled) {
     return {
       buildMaterialPlanningEnabled: false,
-      lines: allocations.map(allocationToPreviewLine),
+      lines: buildAllocationOnlyPreviewLines(allocations),
       graph: null,
       sccGroups: [],
     }
   }
 
-  const { cModules } = buildCModulesForProductionLine(goals, groups, modulesMap, waresMap, settings)
-  const graph = buildFlowPlanGraph(cModules, buildFlowView, modulesMap, groups)
+  const { targetModules } = buildTargetModulesForProductionLine(goals, groups, modulesMap, waresMap, settings)
+  const graph = buildFlowPlanGraph(targetModules, buildFlowView, modulesMap, groups)
 
   // 1. Graph-based lines (derived-build-material + derived-production + required-production responsibilities)
   const graphLines = computePreviewLinePlans(graph)
@@ -309,7 +309,7 @@ function mergeGraphAndAllocationLines(
           ...respLine.responsibilities,
         ])
       }
-    } else if (!alloc.isUnmatched) {
+    } else {
       result.push({
         ...respLine,
         responsibilities: dedupeResponsibilities(respLine.responsibilities),
@@ -359,6 +359,42 @@ function dedupeResponsibilities(
     }
   }
   return [...map.values()]
+}
+
+function buildAllocationOnlyPreviewLines(
+  allocations: ProductionLineAllocation[],
+): PreviewLinePlan[] {
+  const requiredConsumersByWare = new Map<string, Set<string>>()
+  for (const alloc of allocations) {
+    if (!alloc.groupId) continue
+    for (const goal of alloc.goals) {
+      if (goal.type !== 'required-production') continue
+      const consumers = requiredConsumersByWare.get(goal.wareId) || new Set<string>()
+      consumers.add(alloc.groupId)
+      requiredConsumersByWare.set(goal.wareId, consumers)
+    }
+  }
+
+  let respIdCounter = 0
+  return allocations.map((alloc) => {
+    const responsibilities = alloc.goals
+      .map(goal => goalToResponsibility(goal, `goal:${alloc.groupId || 'unmatched'}`, ++respIdCounter, alloc.groupId))
+      .map((responsibility) => {
+        if (responsibility.type !== 'derived-production' || !responsibility.wareId) return responsibility
+        const consumers = requiredConsumersByWare.get(responsibility.wareId)
+        return {
+          ...responsibility,
+          relatedLineGroupIds: consumers ? [...consumers] : [],
+        }
+      })
+
+    return {
+      groupId: alloc.groupId,
+      groupName: alloc.groupName,
+      isUnmatched: alloc.isUnmatched,
+      responsibilities: dedupeResponsibilities(responsibilities),
+    }
+  })
 }
 
 // ─── Compute 阶段 ──────────────────────────────────────────────
@@ -614,9 +650,14 @@ export function computeBuildFlowPlan(
     lines.push(lineResult)
   }
 
-  const compatAllocations = preview.lines.map(line => {
-    const goals = line.groupId ? allocationGoalsByGroupId.get(line.groupId) || [] : []
-    return toCompatAllocation(line, goals)
+  const compatAllocations = preview.lines.map((previewLine, index) => {
+    const computedLine = lines[index]
+    const goals = previewLine.groupId
+      ? allocationGoalsByGroupId.get(previewLine.groupId) || []
+      : computedLine
+        ? buildGoalsFromResponsibilities(computedLine.mergedResponsibilities, computedLine.targetRates)
+        : []
+    return toCompatAllocation(previewLine, goals)
   })
 
   const schemeGroups = preview.buildMaterialPlanningEnabled
@@ -631,7 +672,7 @@ export function computeBuildFlowPlan(
       {
         groupType: 'production' as const,
         groupLabel: 'Production Lines',
-        schemes: splitCToLineSchemes(compatAllocations, modulesMap, waresMap, settings),
+        schemes: splitTargetLineSchemes(compatAllocations, modulesMap, waresMap, settings),
       }
     ]
 
@@ -678,7 +719,9 @@ function seedResolvedModulesFromTargets(
   for (const previewLine of previewLines) {
     const groupId = previewLine.groupId
     if (!groupId) continue
-    const seedResponsibilities = previewLine.responsibilities.filter(resp => resp.type === 'target-production')
+    const seedResponsibilities = previewLine.responsibilities.filter(resp =>
+      resp.type === 'target-production' || resp.type === 'required-production'
+    )
     if (seedResponsibilities.length === 0) continue
 
     const targetRates: Record<string, number> = {}
@@ -859,19 +902,7 @@ function buildDemandDetailForLine(
         }
         buildSourceSecondsByWare.set(responsibility.wareId, wareSeconds)
         buildMaterialQtyByWare[responsibility.wareId] = (buildMaterialQtyByWare[responsibility.wareId] || 0) + qty
-        continue
       }
-
-      if (responsibility.type !== 'derived-production') continue
-      const demandRate = Math.max(0, -((relatedScheme.netProduction || {})[responsibility.wareId] || 0))
-      if (demandRate <= 0) continue
-      pushDemandEntry(
-        perWareSources,
-        responsibility.wareId,
-        relatedScheme.label,
-        demandRate,
-        3600,
-      )
     }
   }
 
@@ -1208,16 +1239,6 @@ export function computeBuildFlowPlanSchemeGroups(
       goals: buildGoalsFromResponsibilities(line.mergedResponsibilities, line.targetRates),
     })),
     schemeGroups: result.schemeGroups,
-  }
-}
-
-function allocationToPreviewLine(allocation: ProductionLineAllocation): PreviewLinePlan {
-  return {
-    groupId: allocation.groupId,
-    groupName: allocation.groupName,
-    isUnmatched: allocation.isUnmatched,
-    responsibilities: allocation.goals.map((goal, index) =>
-      goalToResponsibility(goal, `goal:${allocation.groupId || 'unmatched'}`, index + 1, allocation.groupId)),
   }
 }
 

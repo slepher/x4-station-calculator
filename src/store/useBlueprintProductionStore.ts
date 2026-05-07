@@ -232,30 +232,30 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
       transportShipCapacity: 62000, enforceDlcActivation: false
     }
 
-    // Step 1: Generate C modules using new functions
+    // Step 1: Generate target modules using current goals
     const baseModules = goals.flatMap(g => expandGoalDependencies(g, deps.modulesMap, deps.waresMap))
-    const mergedC = mergeModules(baseModules)
-    const autoFillC = calculateAutoFillModules({
-      plannedModules: mergedC,
+    const mergedTargetModules = mergeModules(baseModules)
+    const autoFillTargetModules = calculateAutoFillModules({
+      plannedModules: mergedTargetModules,
       settings,
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
       lockedWares: []
     })
-    const cModules = mergeModules([...mergedC, ...autoFillC.autoIndustryModules, ...autoFillC.autoHabitationModules])
+    const targetModules = mergeModules([...mergedTargetModules, ...autoFillTargetModules.autoIndustryModules, ...autoFillTargetModules.autoHabitationModules])
 
     // Step 2: Check buildFlowMode
     if (!buildFlowMode.value) {
-      // Only generate C scheme (no material lines)
-      const cGoalWareIds: string[] = []
+      // Only generate target-line scheme (no material lines)
+      const targetGoalWareIds: string[] = []
       for (const g of goals) {
         if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
-          cGoalWareIds.push(g.wareId)
+          targetGoalWareIds.push(g.wareId)
         } else if (g.type === 'build-module') {
           const mod = deps.modulesMap[g.moduleId]
           if (mod?.outputs) {
             for (const w of Object.keys(mod.outputs)) {
-              if (!cGoalWareIds.includes(w)) cGoalWareIds.push(w)
+              if (!targetGoalWareIds.includes(w)) targetGoalWareIds.push(w)
             }
           }
         }
@@ -268,17 +268,17 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         schemes: [{
           label: '目标产线',
           description: '目标产线',
-          purposeModules: cGoalWareIds,
-          primaryModuleIds: cModules.map(m => m.id),
-          modules: cModules,
+          purposeModules: targetGoalWareIds,
+          primaryModuleIds: targetModules.map(m => m.id),
+          modules: targetModules,
           targetRates: {},
           targetRateSources: [],
-          netProduction: calculateNetProduction(cModules, deps.modulesMap, false, 100),
+          netProduction: calculateNetProduction(targetModules, deps.modulesMap, false, 100),
           steps: [],
           totalDuration: 0,
           totalCredits: 0,
           stepsCount: 0,
-          isFeasible: cModules.length > 0,
+          isFeasible: targetModules.length > 0,
           totalModuleBuildTime: 0,
           buildMaterialTotals: {}
         }],
@@ -308,16 +308,16 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
 
     if (!buildFlowView) {
-      // No flow plan: return only C scheme
-      const cGoalWareIds: string[] = []
+      // No flow plan: return only target-line scheme
+      const targetGoalWareIds: string[] = []
       for (const g of goals) {
         if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
-          cGoalWareIds.push(g.wareId)
+          targetGoalWareIds.push(g.wareId)
         } else if (g.type === 'build-module') {
           const mod = deps.modulesMap[g.moduleId]
           if (mod?.outputs) {
             for (const w of Object.keys(mod.outputs)) {
-              if (!cGoalWareIds.includes(w)) cGoalWareIds.push(w)
+              if (!targetGoalWareIds.includes(w)) targetGoalWareIds.push(w)
             }
           }
         }
@@ -330,17 +330,17 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         schemes: [{
           label: '目标产线',
           description: '目标产线',
-          purposeModules: cGoalWareIds,
-          primaryModuleIds: cModules.map(m => m.id),
-          modules: cModules,
+          purposeModules: targetGoalWareIds,
+          primaryModuleIds: targetModules.map(m => m.id),
+          modules: targetModules,
           targetRates: {},
           targetRateSources: [],
-          netProduction: calculateNetProduction(cModules, deps.modulesMap, false, 100),
+          netProduction: calculateNetProduction(targetModules, deps.modulesMap, false, 100),
           steps: [],
           totalDuration: 0,
           totalCredits: 0,
           stepsCount: 0,
-          isFeasible: cModules.length > 0,
+          isFeasible: targetModules.length > 0,
           totalModuleBuildTime: 0,
           buildMaterialTotals: {}
         }],
@@ -354,9 +354,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     }
 
     // Step 4: Build dependency graph
-    const graph = buildFlowPlanGraph(cModules, buildFlowView, deps.modulesMap)
+    const graph = buildFlowPlanGraph(targetModules, buildFlowView, deps.modulesMap)
 
-    // Pass goal ware IDs for C scheme label
+    // Pass goal ware IDs for target-line scheme label
     const goalWareIds: string[] = []
     for (const g of goals) {
       if (g.type === 'production-rate' || g.type === 'derived-rate' || g.type === 'derived-production' || g.type === 'derived-build-material') {
@@ -370,7 +370,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         }
       }
     }
-    graph.cGoalWareIds = goalWareIds
+    graph.targetGoalWareIds = goalWareIds
 
     // Step 5: Compute line modules
     computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [])

@@ -104,6 +104,7 @@ function showHelp() {
 Options:
   --module="Name*N"     Build-module goal (comma-separated)
   --ware="Name*R"       Production-rate goal (comma-separated)
+  --no-build-material   Disable build-material line planning
   --flow=<path>         Logic-flow fixture JSON path (default: tests/fixtures/logic-flow-module.json)
   --index=<N>           Use the N-th flow plan in the fixture (default: 0)
   --json                JSON output mode (default for --json: full output)
@@ -155,6 +156,7 @@ const flowIndex = indexArg ? parseInt(indexArg.slice('--index='.length)) : 0
 const jsonMode = process.argv.find(a => a.startsWith('--json'))
 const useJson = jsonMode !== undefined
 const useCompactJson = jsonMode === '--json=compact'
+const buildMaterialPlanningEnabled = !process.argv.includes('--no-build-material')
 
 const fixtureRaw = JSON.parse(readFileSync(resolve(flowPath), 'utf-8'))
 const plansList = fixtureRaw.list || []
@@ -186,6 +188,7 @@ const preview = createBuildFlowPlanPreview(
   modulesMap,
   waresMap,
   DEFAULT_BUILD_PLAN_SETTINGS,
+  buildMaterialPlanningEnabled,
 )
 if (!preview) {
   console.error('Failed to compute build-flow preview')
@@ -261,21 +264,24 @@ if (useJson) {
         if (g.type === 'build-module') return `${modName(g.moduleId)} ×${g.count}`
         return `${wareName(g.wareId)} ${g.ratePerHour}/h`
       }),
+      buildMaterialPlanningEnabled,
       schemeGroups: schemeGroups.map(groupOutput),
-      dependencyGraph: {
-        nodes: [...graph.nodes.entries()].map(([id, node]) => ({
-          id: id.slice(0, 8),
-          lineName: node.lineName,
-          trackedWares: [...node.trackedWares],
-        })),
-        edges: graph.edges.map(e => ({
-          from: e.fromLineKey.slice(0, 8),
-          to: e.toLineKey.slice(0, 8),
-          wareId: e.wareId,
-          label: e.sourceLabel,
-        })),
-        sccGroups: graph.sccGroups.map(scc => scc.map(id => id.slice(0, 8))),
-      },
+      dependencyGraph: graph
+        ? {
+            nodes: [...graph.nodes.entries()].map(([id, node]) => ({
+              id: id.slice(0, 8),
+              lineName: node.lineName,
+              trackedWares: [...node.trackedWares],
+            })),
+            edges: graph.edges.map(e => ({
+              from: e.fromLineKey.slice(0, 8),
+              to: e.toLineKey.slice(0, 8),
+              wareId: e.wareId,
+              label: e.sourceLabel,
+            })),
+            sccGroups: graph.sccGroups.map(scc => scc.map(id => id.slice(0, 8))),
+          }
+        : null,
     }
     console.log(JSON.stringify(output, null, 2))
   } else {
@@ -285,21 +291,24 @@ if (useJson) {
         ...(g.type === 'build-module' ? { moduleId: g.moduleId, name: modName(g.moduleId), count: g.count } : {}),
         ...(g.type === 'production-rate' ? { wareId: g.wareId, name: wareName(g.wareId), ratePerHour: g.ratePerHour } : {}),
       })),
+      buildMaterialPlanningEnabled,
       schemeGroups: schemeGroups.map(groupOutput),
-      dependencyGraph: {
-        nodes: [...graph.nodes.entries()].map(([id, node]) => ({
-          lineGroupId: id, lineName: node.lineName,
-          trackedWares: [...node.trackedWares].map(w => ({ wareId: w, wareName: wareName(w) })),
-          modules: node.modules, isSelfBootstrap: node.isSelfBootstrap,
-        })),
-        edges: graph.edges.map(e => ({
-          fromLineKey: e.fromLineKey, toLineKey: e.toLineKey,
-          wareId: e.wareId, wareName: wareName(e.wareId), sourceLabel: e.sourceLabel,
-        })),
-        sccGroups: graph.sccGroups,
-        cModules: graph.cModules.map(m => ({ id: m.id, name: modName(m.id), count: m.count })),
-        cBuildCostRates: graph.cBuildCostRates,
-      },
+      dependencyGraph: graph
+        ? {
+            nodes: [...graph.nodes.entries()].map(([id, node]) => ({
+              lineGroupId: id, lineName: node.lineName,
+              trackedWares: [...node.trackedWares].map(w => ({ wareId: w, wareName: wareName(w) })),
+              modules: node.modules, isSelfBootstrap: node.isSelfBootstrap,
+            })),
+            edges: graph.edges.map(e => ({
+              fromLineKey: e.fromLineKey, toLineKey: e.toLineKey,
+              wareId: e.wareId, wareName: wareName(e.wareId), sourceLabel: e.sourceLabel,
+            })),
+            sccGroups: graph.sccGroups,
+            targetModules: graph.targetModules.map(m => ({ id: m.id, name: modName(m.id), count: m.count })),
+            targetBuildCostRates: graph.targetBuildCostRates,
+          }
+        : null,
     }
     console.log(JSON.stringify(output, null, 2))
   }
@@ -317,6 +326,7 @@ console.log(`  目标: ${goals.map(g => {
   return ''
 }).join(', ')}`)
 console.log(`  方案: ${selectedPlan.name || '(unnamed)'}`)
+console.log(`  建材产线规划: ${buildMaterialPlanningEnabled ? '开启' : '关闭'}`)
 console.log(sep)
 
 for (const sg of schemeGroups) {
@@ -376,15 +386,15 @@ for (const sg of schemeGroups) {
   }
 }
 
-// ── 需求来源与满足率明细 (新格式: 按材料聚合, 显示 sum qty / sum time) ──
-console.log(`\n${sep}`)
-console.log('  需求来源与满足率 (新格式):')
-
 const allocByGroupId = new Map(lineAllocations.filter(a => a.groupId).map(a => [a.groupId!, a]))
 const schemeByLabel = new Map<string, BuildScheme>()
 for (const sg of schemeGroups) {
   for (const s of sg.schemes) schemeByLabel.set(s.label, s)
 }
+
+if (graph) {
+console.log(`\n${sep}`)
+console.log('  需求来源与满足率 (新格式):')
 
 for (const [groupId, node] of graph.nodes) {
   const alloc = allocByGroupId.get(groupId)
@@ -514,6 +524,7 @@ console.log(`  节点: ${graph.nodes.size}, 边: ${graph.edges.length}, SCC: ${g
 for (const scc of graph.sccGroups) {
   const names = scc.map(id => graph.nodes.get(id)?.lineName || id.slice(0, 8))
   console.log(`    SCC: [${names.join(' ↔ ')}]`)
+}
 }
 
 console.log(`\n  产线 ↔ 目标映射:`)

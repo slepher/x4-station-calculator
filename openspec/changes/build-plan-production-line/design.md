@@ -184,7 +184,7 @@ preview 构建依赖图时：
 
 1. 在 `build-flow mode` 中，只要目标模块 / 目标产物变化，或 checkbox 状态变化，就重建依赖图
 2. checkbox 只控制依赖图是否包含“按建筑材料需求规划建材产线”对应的建材链路
-3. 从 C 的 build cost 开始 BFS
+3. 从目标模块集合的建材需求开始 BFS
 4. 融入 isolated 扩展
 5. 新增边方向保持“消费方 -> 供给方”
 6. isolated 搜索产线优先级：

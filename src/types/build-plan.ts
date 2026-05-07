@@ -173,9 +173,9 @@ export interface BuildFlowPlanGraph {
   nodes: Map<string, BuildFlowPlanLine>
   edges: BuildFlowPlanEdge[]
   sccGroups: string[][]
-  cModules: SavedModule[]
-  cBuildCostRates: Record<string, number>
-  cGoalWareIds?: string[]
+  targetModules: SavedModule[]
+  targetBuildCostRates: Record<string, number>
+  targetGoalWareIds?: string[]
 }
 
 /** BuildFlow 视图数据（与 computeProductionLineAllocation.ts 中类型一致） */

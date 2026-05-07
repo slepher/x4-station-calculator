@@ -234,7 +234,7 @@ function findSCCs(graph: Graph): string[][] {
 }
 
 export function buildFlowPlanGraph(
-  cModules: SavedModule[],
+  targetModules: SavedModule[],
   buildFlowView: BuildFlowPlanView | null,
   modulesMap: Record<string, X4Module>,
   groups: ProductionLineGroup[] = [],
@@ -244,16 +244,16 @@ export function buildFlowPlanGraph(
     edges: [],
   }
 
-  const cBuildCostRates = computeBuildRates(cModules, modulesMap)
-  const cWares = Object.keys(cBuildCostRates).filter(w => w !== 'energycells')
+  const targetBuildCostRates = computeBuildRates(targetModules, modulesMap)
+  const targetWares = Object.keys(targetBuildCostRates).filter(w => w !== 'energycells')
 
   if (!buildFlowView || buildFlowView.buildFlowGroups.length === 0) {
     return {
       nodes: new Map(),
       edges: [],
       sccGroups: [],
-      cModules,
-      cBuildCostRates,
+      targetModules,
+      targetBuildCostRates,
     }
   }
 
@@ -263,7 +263,7 @@ export function buildFlowPlanGraph(
     fromLabel: string
     isIsolatedExpansion: boolean
   }
-  const queue: QueueItem[] = [{ wareIds: cWares, fromKey: '__C__', fromLabel: 'C buildCost', isIsolatedExpansion: false }]
+  const queue: QueueItem[] = [{ wareIds: targetWares, fromKey: '__C__', fromLabel: 'target buildCost', isIsolatedExpansion: false }]
   const addedGroups = new Set<string>()
 
   while (queue.length > 0) {
@@ -354,7 +354,7 @@ export function buildFlowPlanGraph(
     nodes: graph.nodes as Map<string, BuildFlowPlanLine>,
     edges: graph.edges,
     sccGroups,
-    cModules,
-    cBuildCostRates,
+    targetModules,
+    targetBuildCostRates,
   }
 }

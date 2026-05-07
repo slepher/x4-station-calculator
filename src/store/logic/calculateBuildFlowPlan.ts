@@ -497,9 +497,6 @@ function greedyFillForLine(
     let worstSat = Infinity
     let bottleneckWare: string | null = null
 
-    if (isGreedyDebug() && built.length === 0) {
-      console.log('[NEW] built.length === 0, externalSources:', JSON.stringify(externalSources.map(s => ({ label: s.label, rates: s.rates }))))
-    }
     if (built.length === 0) {
       // Empty built: pick ware with highest unsatisfied external rate (like old algorithm)
       let highest = 0
@@ -888,11 +885,11 @@ function collectDemandSources(
     let materials: Record<string, number> | undefined
 
     if (edge.fromLineKey === '__C__') {
-      const rate = graph.cBuildCostRates[edge.wareId]
+      const rate = graph.targetBuildCostRates[edge.wareId]
       if (rate !== undefined && rate > 0) {
         rates[edge.wareId] = rate
       }
-      materials = computeBuildMaterials(graph.cModules, modulesMap)
+      materials = computeBuildMaterials(graph.targetModules, modulesMap)
     } else {
       const upstreamNode = graph.nodes.get(edge.fromLineKey)
       if (upstreamNode && upstreamNode.modules.length > 0) {
@@ -1206,8 +1203,8 @@ export function makeSchemes(
     }
   }
 
-  const cScheme = makeSchemeForC(graph, modulesMap, waresMap, settings, builtSoFar)
-  schemes.push(cScheme)
+  const targetLineScheme = makeSchemeForTargetLine(graph, modulesMap, waresMap, settings, builtSoFar)
+  schemes.push(targetLineScheme)
   return schemes
 }
 
@@ -1288,7 +1285,7 @@ function makeSchemeFromLine(
   return scheme
 }
 
-export function splitCToLineSchemes(
+export function splitTargetLineSchemes(
   allocations: ProductionLineAllocation[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
@@ -1542,7 +1539,7 @@ export function makeSchemesWithGroups(
   const productionAllocations = allocations.filter(
     a => !a.groupId || !graphGroupIds.has(a.groupId)
   )
-  const splitSchemes = splitCToLineSchemes(productionAllocations, modulesMap, waresMap, settings)
+  const splitSchemes = splitTargetLineSchemes(productionAllocations, modulesMap, waresMap, settings)
 
   for (const scheme of buildSchemes) delete (scheme as any)._groupId
   for (const scheme of splitSchemes) delete (scheme as any)._groupId
@@ -1561,14 +1558,14 @@ export function makeSchemesWithGroups(
   ]
 }
 
-function makeSchemeForC(
+function makeSchemeForTargetLine(
   graph: BuildFlowPlanGraph,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
   contextModules?: SavedModule[]
 ): BuildScheme {
-  const mergedModules = mergeModules(graph.cModules)
+  const mergedModules = mergeModules(graph.targetModules)
 
   const netProduction = calculateNetProduction(
     mergedModules, modulesMap,
@@ -1593,14 +1590,14 @@ function makeSchemeForC(
 
   const groups: BuildGroup[] = [{
     reason: '目标产线',
-    modules: graph.cModules,
+    modules: graph.targetModules,
   }]
 
   const steps = makeSchemeSteps(groups, modulesMap, waresMap, settings, contextModules)
 
-  // purposeModules = goal ware IDs, fallback to all C output wares
-  const purposeArr = graph.cGoalWareIds && graph.cGoalWareIds.length > 0
-    ? graph.cGoalWareIds
+  // purposeModules = goal ware IDs, fallback to all target-line output wares
+  const purposeArr = graph.targetGoalWareIds && graph.targetGoalWareIds.length > 0
+    ? graph.targetGoalWareIds
     : (() => {
         const s = new Set<string>()
         for (const m of mergedModules) {
@@ -1625,7 +1622,7 @@ function makeSchemeForC(
       })
       .map(m => m.id),
     modules: mergedModules,
-    targetRates: graph.cBuildCostRates,
+    targetRates: graph.targetBuildCostRates,
     targetRateSources: [],
     netProduction,
     steps,
