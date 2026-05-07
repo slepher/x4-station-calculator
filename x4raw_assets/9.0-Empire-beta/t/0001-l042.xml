@@ -3341,6 +3341,7 @@
     <t id="11696">Rozebíratelný vrak</t>
     <t id="11697">Pokrytí sondou na suroviny</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Uložit offline</t>
     <t id="11702">Přepsat offline uložení</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">Zaměřit model stanice</t>
     <t id="13327">Fronta prioritních příkazů</t>
     <t id="13328">Rychlost získávání surovin(zdrojů; položka záhlaví sloupce tabulky)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Sbohem</t>
@@ -7690,7 +7694,7 @@
     <t id="1000">Výchozí</t>
     <t id="1001">Výchozí - Klávesnice a myš / ovladač</t>
     <t id="1011">Výchozí - Joystick</t>
-    <t id="1021">Výchozí - ovladač  \(alternativa 1\)</t>
+    <t id="1021">Výchozí - ovladač  \(alternativní\)</t>
     <t id="1031">Výchozí - Joystick \(OSX/Linux\)</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Single\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Dual\)</t>
+    <t id="1131">Výchozí - WASD klávesnice a myš \(Alternativní\)</t>
     <t id="2001">Bezdrátový ovladač Sony DUALSHOCK3</t>
     <t id="2011">Bezdrátový ovladač Sony DUALSHOCK4</t>
     <t id="2021">Bezdrátový ovladač Sony DualSense</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)Postavit továrnu</t>
     <t id="5213">(objective)Zabrat pozemek na určeném místě</t>
     <t id="5214">(objective Extend:)Rozšířit parcelu na požadovanou velikost</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Plány se nakupují od zástupců frakcí a diplomatů.</t>
     <t id="5300">(postavit a dodat flotilu)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Rozsáhlé senzorové pole</t>
     <t id="200">Umístění: $DESTINATION$ \(na určeném místě\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">Aby se jednalo o platnou obrannou stanici, musí být jeden z obranných modulů správním střediskem.</t>
     <t id="301">Výdaje budou v rámci možností hrazeny velkoryse.</t>
     <t id="302">Odhadované minimální stavební náklady</t>

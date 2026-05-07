@@ -3341,6 +3341,7 @@
     <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">オフラインで保存する</t>
     <t id="11702">オフラインセーブデータを上書きする</t>
@@ -3933,7 +3934,7 @@
     <t id="13300">(Input bar)</t>
     <t id="13301">カメラ水平移動</t>
     <t id="13302">位置をリセット</t>
-    <t id="13303">回転</t>
+    <t id="13303">カメラ回転</t>
     <t id="13304">回転をリセット</t>
     <t id="13305">ズーム</t>
     <t id="13306">エミュレートマウスカーソル</t>
@@ -3947,7 +3948,7 @@
     <t id="13314">マップを閉じる</t>
     <t id="13315">コンテキストメニューを閉じる</t>
     <t id="13316">高優先度命令</t>
-    <t id="13317">命令を実行待ちリストへ</t>
+    <t id="13317">命令を実行待ちリストに送る</t>
     <t id="13318">長押し</t>
     <t id="13319">ドラッグ</t>
     <t id="13320">ダブルタップ</t>
@@ -3957,8 +3958,11 @@
     <t id="13324">モジュールを確定</t>
     <t id="13325">モジュール選択をキャンセル</t>
     <t id="13326">ステーションモデルにフォーカス</t>
-    <t id="13327">命令を実行待ちリストの先頭へ</t>
+    <t id="13327">命令を実行待ちリストの先頭に送る</t>
     <t id="13328">採掘/採集効率(of resources; header item for table column)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">失礼する</t>
@@ -7690,7 +7694,7 @@
     <t id="1000">基本設定</t>
     <t id="1001">基本設定 - キーボードとマウス / コントローラー</t>
     <t id="1011">基本設定 - ジョイスティック</t>
-    <t id="1021">基本設定 - コントローラー \(別タイプ 1\)</t>
+    <t id="1021">基本設定 - コントローラー \(別タイプ\)</t>
     <t id="1031">基本設定 - ジョイスティック \(OSX/Linux\)</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Single\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Dual\)</t>
+    <t id="1131">基本設定 - キーボード \(WASD\) とマウス \(別タイプ\)</t>
     <t id="2001">SONY ワイヤレスコントローラー DUALSHOCK3</t>
     <t id="2011">SONY ワイヤレスコントローラー DUALSHOCK4</t>
     <t id="2021">SONY ワイヤレスコントローラー DualSense </t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)工場</t>
     <t id="5213">(objective)指定の箇所に建築計画を主張する</t>
     <t id="5214">(objective Extend:)建築計画を必要な広さまで拡張する</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">設計図は派閥の代表者か外交官から購入できます。</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">広域センサーアレイ</t>
     <t id="200">建築宙域: $DESTINATION$ \(の特定の箇所\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">有効な防衛ステーションの建築には、防衛モジュールのうち、ひとつ以上が管理センターである必要があります。</t>
     <t id="301">妥当な範囲で費用の負担が行われます。</t>
     <t id="302">建築費用の最小見積り額</t>

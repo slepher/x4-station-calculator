@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 21.04.2026 16:40:43-->
+<!--Last exported: 06.05.2026 10:16:09-->
 <diff>
   <add sel="/wares/production">
     <method id="closedloop" name="{20206,1201}" />
@@ -1249,7 +1249,7 @@
   <add sel="/wares/ware[@id='missile_gen_l_dumbfire_01_mk1']">
     <production time="3" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
-        <ware ware="energycells" amount="40" />
+        <ware ware="energycells" amount="35" />
         <ware ware="hullparts" amount="1" />
       </primary>
     </production>
@@ -1265,7 +1265,7 @@
   <add sel="/wares/ware[@id='missile_gen_m_dumbfire_01_mk1']">
     <production time="3" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
-        <ware ware="energycells" amount="23" />
+        <ware ware="energycells" amount="22" />
       </primary>
     </production>
   </add>
@@ -1287,7 +1287,7 @@
   <add sel="/wares/ware[@id='missile_gen_m_smart_01_mk1']">
     <production time="3" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
-        <ware ware="energycells" amount="34" />
+        <ware ware="energycells" amount="37" />
         <ware ware="hullparts" amount="1" />
       </primary>
     </production>
@@ -1323,7 +1323,7 @@
   <add sel="/wares/ware[@id='missile_gen_s_guided_01_mk1']">
     <production time="3" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
-        <ware ware="energycells" amount="22" />
+        <ware ware="energycells" amount="21" />
       </primary>
     </production>
   </add>
@@ -1345,7 +1345,7 @@
   <add sel="/wares/ware[@id='missile_gen_s_smart_01_mk1']">
     <production time="3" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
-        <ware ware="energycells" amount="21" />
+        <ware ware="energycells" amount="23" />
       </primary>
     </production>
   </add>
@@ -2175,8 +2175,8 @@
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1" />
-        <ware ware="energycells" amount="77" />
-        <ware ware="hullparts" amount="8" />
+        <ware ware="energycells" amount="154" />
+        <ware ware="hullparts" amount="11" />
       </primary>
     </production>
   </add>
@@ -2220,8 +2220,8 @@
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2" />
-        <ware ware="energycells" amount="39" />
-        <ware ware="hullparts" amount="12" />
+        <ware ware="energycells" amount="149" />
+        <ware ware="hullparts" amount="16" />
       </primary>
     </production>
   </add>
@@ -2237,9 +2237,9 @@
   <add sel="/wares/ware[@id='weapon_gen_m_laser_01_mk2']">
     <production time="10" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
-        <ware ware="claytronics" amount="5" />
-        <ware ware="energycells" amount="68" />
-        <ware ware="hullparts" amount="29" />
+        <ware ware="claytronics" amount="12" />
+        <ware ware="energycells" amount="246" />
+        <ware ware="hullparts" amount="73" />
       </primary>
     </production>
   </add>
@@ -2317,9 +2317,9 @@
   <add sel="/wares/ware[@id='weapon_gen_m_torpedo_02_mk1']">
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
-        <ware ware="claytronics" amount="4" />
-        <ware ware="energycells" amount="146" />
-        <ware ware="hullparts" amount="26" />
+        <ware ware="claytronics" amount="6" />
+        <ware ware="energycells" amount="122" />
+        <ware ware="hullparts" amount="36" />
       </primary>
     </production>
   </add>
@@ -2420,8 +2420,9 @@
   <add sel="/wares/ware[@id='weapon_gen_s_dumbfire_02_mk1']">
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
-        <ware ware="energycells" amount="123" />
-        <ware ware="hullparts" amount="5" />
+        <ware ware="claytronics" amount="1" />
+        <ware ware="energycells" amount="41" />
+        <ware ware="hullparts" amount="6" />
       </primary>
     </production>
   </add>
@@ -2464,8 +2465,8 @@
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="1" />
-        <ware ware="energycells" amount="74" />
-        <ware ware="hullparts" amount="8" />
+        <ware ware="energycells" amount="125" />
+        <ware ware="hullparts" amount="9" />
       </primary>
     </production>
   </add>
@@ -2475,15 +2476,6 @@
         <ware ware="claytronics" amount="1" />
         <ware ware="energycells" amount="52" />
         <ware ware="hullparts" amount="7" />
-      </primary>
-    </production>
-  </add>
-  <add sel="/wares/ware[@id='weapon_gen_s_laser_01_mk2']">
-    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
-      <primary>
-        <ware ware="claytronics" amount="3" />
-        <ware ware="energycells" amount="92" />
-        <ware ware="hullparts" amount="19" />
       </primary>
     </production>
   </add>
@@ -2562,8 +2554,8 @@
     <production time="5" amount="1" method="closedloop" name="{20206,1201}">
       <primary>
         <ware ware="claytronics" amount="2" />
-        <ware ware="energycells" amount="30" />
-        <ware ware="hullparts" amount="11" />
+        <ware ware="energycells" amount="113" />
+        <ware ware="hullparts" amount="14" />
       </primary>
     </production>
   </add>

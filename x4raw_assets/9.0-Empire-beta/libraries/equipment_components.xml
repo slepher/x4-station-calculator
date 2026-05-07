@@ -77,7 +77,7 @@
   </component>
   <component name="engine_kha_m_combat_02_mk1" class="engine">
     <connections>
-      <connection name="connection_engine01" tags="engine medium component standard "/>
+      <connection name="connection_engine01" tags="component engine medium standard "/>
     </connections>
   </component>
   <component name="engine_kha_s_combat_01_mk1" class="engine">

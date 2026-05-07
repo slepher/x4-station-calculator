@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 23.04.2026 16:36:43-->
+<!--Last exported: 06.05.2026 11:38:20-->
 <diff>
   <add sel="/wares/production">
     <method id="boron" name="{20206,801}">
@@ -137,12 +137,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="engine_bor_xl_travel_01_mk1" name="{20107,4124}" description="{20107,4122}" group="engines" transport="equipment" volume="1" tags="engine equipment">
-      <price min="496537" average="557907" max="619277" />
+      <price min="652752" average="725280" max="797808" />
       <production time="30" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="antimatterconverters" amount="124" />
-          <ware ware="energycells" amount="130" />
-          <ware ware="engineparts" amount="286" />
+          <ware ware="antimatterconverters" amount="204" />
+          <ware ware="energycells" amount="566" />
+          <ware ware="engineparts" amount="547" />
         </primary>
       </production>
       <component ref="engine_bor_xl_travel_01_mk1_macro" />
@@ -1049,12 +1049,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_xl_standard_01_mk1" name="{20106,4074}" description="{20106,4072}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="263288" average="292542" max="321796" />
+      <price min="355439" average="394932" max="434425" />
       <production time="20" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="365" />
-          <ware ware="fieldcoils" amount="92" />
-          <ware ware="shieldcomponents" amount="77" />
+          <ware ware="energycells" amount="493" />
+          <ware ware="fieldcoils" amount="124" />
+          <ware ware="shieldcomponents" amount="105" />
         </primary>
       </production>
       <component ref="shield_bor_xl_standard_01_mk1_macro" />
@@ -1063,12 +1063,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_xl_standard_01_mk2" name="{20106,4084}" description="{20106,4082}" group="shields" transport="equipment" volume="1" tags="equipment shield">
-      <price min="1825520" average="2028355" max="2231191" />
+      <price min="2190623" average="2434026" max="2677429" />
       <production time="20" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="3169" />
-          <ware ware="fieldcoils" amount="800" />
-          <ware ware="shieldcomponents" amount="674" />
+          <ware ware="energycells" amount="3803" />
+          <ware ware="fieldcoils" amount="960" />
+          <ware ware="shieldcomponents" amount="809" />
         </primary>
       </production>
       <component ref="shield_bor_xl_standard_01_mk2_macro" />
@@ -1142,12 +1142,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="ship_bor_m_corvette_01_a" name="{20101,51001}" description="{20101,51011}" transport="ship" volume="1" tags="ship">
-      <price min="660895" average="734328" max="807761" />
+      <price min="1321790" average="1468656" max="1615522" />
       <production time="35" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="573" />
-          <ware ware="hullparts" amount="746" />
-          <ware ware="water" amount="346" />
+          <ware ware="energycells" amount="1147" />
+          <ware ware="hullparts" amount="1493" />
+          <ware ware="water" amount="692" />
         </primary>
       </production>
       <component ref="ship_bor_m_corvette_01_a_macro" />
@@ -1155,12 +1155,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="ship_bor_m_corvette_02_a" name="{20101,51002}" description="{20101,51012}" transport="ship" volume="1" tags="limited nocustomgamestart nodiplomacyblueprint ship">
-      <price min="730905" average="812117" max="893329" />
+      <price min="1461811" average="1624234" max="1786657" />
       <production time="35" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="634" />
-          <ware ware="hullparts" amount="825" />
-          <ware ware="water" amount="383" />
+          <ware ware="energycells" amount="1268" />
+          <ware ware="hullparts" amount="1651" />
+          <ware ware="water" amount="766" />
         </primary>
       </production>
       <component ref="ship_bor_m_corvette_02_a_macro" />
@@ -1168,12 +1168,12 @@
       <owner faction="ownerless" />
     </ware>
     <ware id="ship_bor_m_gunboat_01_a" name="{20101,51101}" description="{20101,51111}" transport="ship" volume="1" tags="ship">
-      <price min="519734" average="626185" max="732637" />
+      <price min="1127133" average="1252370" max="1377607" />
       <production time="35" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="140" />
-          <ware ware="hullparts" amount="510" />
-          <ware ware="water" amount="308" />
+          <ware ware="energycells" amount="978" />
+          <ware ware="hullparts" amount="1273" />
+          <ware ware="water" amount="590" />
         </primary>
       </production>
       <component ref="ship_bor_m_gunboat_01_a_macro" />
@@ -1322,12 +1322,12 @@
       <owner faction="boron" />
     </ware>
     <ware id="ship_bor_xl_carrier_01_a" name="{20101,50101}" description="{20101,50111}" transport="ship" volume="1" tags="ship">
-      <price min="18129693" average="21843004" max="25556315" />
+      <price min="22017749" average="24464165" max="26910582" />
       <production time="780" amount="1" method="default" name="{20206,801}">
         <primary>
-          <ware ware="energycells" amount="4425" />
-          <ware ware="hullparts" amount="18800" />
-          <ware ware="water" amount="6880" />
+          <ware ware="energycells" amount="19112" />
+          <ware ware="hullparts" amount="24873" />
+          <ware ware="water" amount="11539" />
         </primary>
       </production>
       <component ref="ship_bor_xl_carrier_01_a_macro" />
@@ -1358,7 +1358,7 @@
       </production>
       <component ref="turret_bor_l_disruptor_01_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.9" />
+      <use threshold="0.91" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_l_flak_01_mk1" name="{20105,5444}" description="{20105,5442}" group="weapons" transport="equipment" volume="1" tags="equipment turret">
@@ -1372,7 +1372,7 @@
       </production>
       <component ref="turret_bor_l_flak_01_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_l_laser_01_mk1" name="{20105,5454}" description="{20105,5452}" group="weapons" transport="equipment" volume="1" tags="equipment turret">
@@ -1414,7 +1414,7 @@
       </production>
       <component ref="turret_bor_m_arc_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.91" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_m_arc_02_mk1" name="{20105,4964}" description="{20105,4962}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
@@ -1428,7 +1428,7 @@
       </production>
       <component ref="turret_bor_m_arc_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.71" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_m_dumbfire_01_mk1" name="{20105,7004}" description="{20105,7002}" group="turrets" transport="equipment" volume="1" tags="equipment missilelauncher turret">
@@ -1442,7 +1442,7 @@
       </production>
       <component ref="turret_bor_m_dumbfire_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.55" />
+      <use threshold="0.41" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_m_guided_01_mk1" name="{20105,4994}" description="{20105,4992}" group="turrets" transport="equipment" volume="1" tags="equipment missilelauncher turret">
@@ -1456,7 +1456,7 @@
       </production>
       <component ref="turret_bor_m_guided_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.75" />
+      <use threshold="0.71" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_m_laser_01_mk1" name="{20105,4954}" description="{20105,4952}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
@@ -1526,7 +1526,7 @@
       </production>
       <component ref="turret_bor_m_railgun_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="boron" />
     </ware>
     <ware id="turret_bor_m_railgun_02_mk1" name="{20105,4974}" description="{20105,4972}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
@@ -1540,7 +1540,7 @@
       </production>
       <component ref="turret_bor_m_railgun_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="boron" />
     </ware>
     <ware id="weapon_bor_l_beam_01_mk1" name="{20105,3064}" description="{20105,3062}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
@@ -1579,7 +1579,7 @@
       </production>
       <component ref="weapon_bor_m_flak_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.41" />
       <owner faction="boron" />
     </ware>
     <ware id="weapon_bor_m_guided_01_mk1" name="{20105,2544}" description="{20105,2542}" group="weapons" transport="equipment" volume="1" tags="deprecated">
@@ -1632,7 +1632,7 @@
       </production>
       <component ref="weapon_bor_m_railgun_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="boron" />
     </ware>
     <ware id="weapon_bor_m_torpedo_01_mk1" name="{20105,2554}" description="{20105,2552}" group="weapons" transport="equipment" volume="1" tags="deprecated">
@@ -1657,7 +1657,7 @@
       </production>
       <component ref="weapon_bor_s_arc_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.6" />
+      <use threshold="0.71" />
       <owner faction="boron" />
     </ware>
     <ware id="weapon_bor_s_dumbfire_01_mk1" name="{20105,1524}" description="{20105,1522}" group="weapons" transport="equipment" volume="1" tags="deprecated">
@@ -1682,7 +1682,7 @@
       </production>
       <component ref="weapon_bor_s_gatling_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.2" />
+      <use threshold="0.31" />
       <owner faction="boron" />
     </ware>
     <ware id="weapon_bor_s_guided_01_mk1" name="{20105,1534}" description="{20105,1532}" group="weapons" transport="equipment" volume="1" tags="deprecated">

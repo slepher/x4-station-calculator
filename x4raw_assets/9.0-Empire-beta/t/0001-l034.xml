@@ -3341,6 +3341,7 @@
     <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Guardar sin conexión</t>
     <t id="11702">Sobrescribir partida sin conexión</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">Enfocar el modelo de la estación</t>
     <t id="13327">Orden de prioridad en cola</t>
     <t id="13328">Tasa de recolección</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Adiós</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Sencillo\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Doble\)</t>
+    <t id="1131">Default - WASD Keyboard &amp; Mouse \(Alternative\)</t>
     <t id="2001">Control inalámbrico Sony DUALSHOCK3</t>
     <t id="2011">Control inalámbrico Sony DUALSHOCK4</t>
     <t id="2021">Control inalámbrico Sony DualSense</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)Construir Factoría</t>
     <t id="5213">(objective)Reclamar una parcela en la ubicación designada</t>
     <t id="5214">Expande la parcela al tamaño requerido</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Los planos se pueden comprar de los representantes de facción y los diplomáticos.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Matriz de sensores de área amplia</t>
     <t id="200">Destino: $DESTINATION$ \(en la ubicación en especifico\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">Para que sea una Estación de Defensa valida al menos uno de los módulos deber ser un Centro Administrativo.</t>
     <t id="301">Los gastos se rembolsarán, conforme sea apropiado.</t>
     <t id="302">Precio mínimo de construcción estimado</t>

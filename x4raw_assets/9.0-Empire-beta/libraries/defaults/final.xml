@@ -430,7 +430,7 @@
         <point position="2.6" value="0.15"/>
         <point position="2.9" value="0.1"/>
       </steeringcurve>
-      <traveldrivestability maxvalue="13500"/>
+      <traveldrivestability maxvalue="15000"/>
     </properties>
     <connections>
       <connection name="con_playercontrol" tags="playercontrol" value="-1" match="all"/>
@@ -870,6 +870,17 @@
         <soundcontext entered="soundcontext_entered" left="soundcontext_left"/>
       </effects>
       <internalsound engine="0.75"/>
+    </properties>
+  </dataset>
+  <dataset class="collectabledata">
+    <connections>
+      <connection name="drop" tags="drop"/>
+    </connections>
+    <properties>
+      <explosioneffect strength="10"/>
+      <effects>
+        <explosion ref="ship_explosion_generator"/>
+      </effects>
     </properties>
   </dataset>
   <dataset class="collectablewares">

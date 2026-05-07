@@ -18,7 +18,7 @@
   </suns>
   <planets>
     <planet class="textref" geology="textref" atmosphere="textref" population="textref" maxpopulation="number" settlements="textref" part="partname" atmopart="partname">
-      <moons>  
+      <moons>
         <moon geology="textref" atmosphere="textref" population="textref" maxpopulation="number" settlements="textref" part="partname" atmopart="partname">
         <moon …>
         …
@@ -42,7 +42,7 @@
 <!-- available text ids from page 1042
 10001 - 10991 Generic 10011 name, 10012 descr
  <t id="10011">None</t>{1042,10011}(None)
- 
+
 11001 - 11991 Atmosphere Types
  <t id="11011">Methane</t>{1042,11011}(Methane)
  <t id="11021">Hydrogen</t>{1042,11021}(Hydrogen)
@@ -155,7 +155,7 @@
  <t id="112">l</t>{20403,112}(l)
  <t id="113">m</t>{20403,113}(m)
  <t id="114">n</t>{20403,114}(n)
-  
+
 20402 - Moon Names
  <t id="1">n</t>{20402,1}(I)
  <t id="2">n</t>{20402,2}(II)
@@ -214,21 +214,16 @@
     <properties>
       <identification name="{20004,7020011}" description="{20004,7020012}" />
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ice_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="2" ref="sphere_tiny_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="2" ref="sphere_large_ore_low"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="4" ref="sphere_medium_helium_medium_veryslow" />
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_veryslow" />
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_veryslow" />
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow" />
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_fast" />
+        <resourcearea amount="2" ref="sphere_huge_silicon_verylow_veryslow" />
+        <resourcearea amount="5" ref="sphere_medium_silicon_low_fast" />
+        <resourcearea amount="2" ref="sphere_huge_ice_low_slow" />
+        <resourcearea amount="5" ref="sphere_medium_ice_low_fast" />
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow" />
       </resourceareas>
       <area sunlight="1.11" economy="0.5" security="0.5" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -250,24 +245,19 @@
     <properties>
       <identification name="{20004,7030011}" description="{20004,7030012}" />
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_small_helium_high"/>
-        <resourcearea amount="1" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_ice_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_high"/>
-        <resourcearea amount="4" ref="sphere_large_methane_verylow"/>
-        <resourcearea amount="5" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="6" ref="sphere_small_methane_high"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_low"/>
-        <resourcearea amount="1" ref="sphere_large_ore_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="1" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_slow" />
+        <resourcearea amount="1" ref="sphere_medium_helium_medium_average" />
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_slow" />
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_average" />
+        <resourcearea amount="3" ref="sphere_large_methane_high_slow" />
+        <resourcearea amount="6" ref="sphere_medium_methane_medium_average" />
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow" />
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_fast" />
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_slow" />
+        <resourcearea amount="5" ref="sphere_large_silicon_low_average" />
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow" />
+        <resourcearea amount="5" ref="sphere_large_ice_medium_fast" />
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow" />
       </resourceareas>
       <area sunlight="1.06" economy="0.75" security="0.75" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -303,13 +293,11 @@
     <properties>
       <identification name="{20004,7040011}" description="{20004,7040012}" />
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_large_ice_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="2" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow" />
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_fast" />
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow" />
+        <resourcearea amount="3" ref="sphere_large_ice_medium_average" />
+        <resourcearea amount="2" ref="sphere_small_nividium_verylow_veryslow" />
       </resourceareas>
       <area sunlight="0.71" economy="0.50" security="0.50" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -344,16 +332,15 @@
     <properties>
       <identification name="{20004,7050011}" description="{20004,7050012}" />
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="4" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_medium_slow" />
+        <resourcearea amount="4" ref="sphere_large_ore_high_fast" />
+        <resourcearea amount="5" ref="sphere_small_ore_medium_veryfast" />
+        <resourcearea amount="2" ref="sphere_huge_silicon_medium_slow" />
+        <resourcearea amount="6" ref="sphere_large_silicon_medium_average" />
+        <resourcearea amount="3" ref="sphere_huge_ice_medium_slow" />
+        <resourcearea amount="5" ref="sphere_medium_ice_medium_average" />
+        <resourcearea amount="5" ref="sphere_small_ice_medium_veryfast" />
+        <resourcearea amount="3" ref="sphere_small_nividium_verylow_veryslow" />
       </resourceareas>
       <area sunlight="1.63" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -389,14 +376,12 @@
     <properties>
       <identification name="{20004,7060011}" description="{20004,7060012}" />
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="4" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_low_average" />
+        <resourcearea amount="4" ref="sphere_large_ore_low_fast" />
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_average" />
+        <resourcearea amount="4" ref="sphere_large_silicon_low_fast" />
+        <resourcearea amount="2" ref="sphere_huge_ice_low_slow" />
+        <resourcearea amount="4" ref="sphere_large_ice_low_average" />
       </resourceareas>
       <area sunlight="0.88" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -432,15 +417,11 @@
     <properties>
       <identification name="{20004,7080011}" description="{20004,7080012}" />
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="1" ref="sphere_medium_rawkhaakscrap_verylow"/>
-        <resourcearea amount="2" ref="sphere_tiny_rawkhaakscrap_verylow"/>
-        <resourcearea amount="2" ref="sphere_large_rawscrap_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="2" ref="sphere_small_rawscrap_high"/>
-        <resourcearea amount="1" ref="sphere_medium_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_medium"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_verylow_average" />
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_veryfast" />
+        <resourcearea amount="2" ref="sphere_huge_rawscrap_medium_slow" />
+        <resourcearea amount="3" ref="sphere_medium_rawscrap_high_fast" />
+        <resourcearea amount="2" ref="sphere_small_rawkhaakscrap_low_veryslow" />
       </resourceareas>
       <area sunlight="4.08" economy="0.25" security="0.50" tags="noaggressivespawn" jobs="false"/>
       <worlds>

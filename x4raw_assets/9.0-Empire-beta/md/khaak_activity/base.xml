@@ -2,7 +2,7 @@
 <mdscript xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" name="Khaak_Activity" xsi:noNamespaceSchemaLocation="md.xsd">
   <cues>
     <!--TODO @Owen Cue to be signalled externally to request ignoring a sector. Would result in $Sector and $WatchedSector entries being cleaned (as long as they don't contain a station already)-->
-    <cue name="Manager" mapeditor="false" version="8">
+    <cue name="Manager" mapeditor="false" version="9">
       <conditions>
         <event_cue_signalled cue="md.Setup.Start"/>
         <check_value value="player.galaxy.macro == macro.xu_ep2_universe_macro" comment="only in main-galaxy"/>
@@ -40,7 +40,7 @@
         ##############-->
         <create_group groupname="$HiveStations"/>
         <set_value name="$HiveStationGateRange" exact="3" comment="the gate distance where the hive can place an outpost to impact NPC mining"/>
-        <set_value name="$HiveStationMacros" exact="[macro.landmarks_kha_hive_03_macro]"/>
+        <set_value name="$HiveStationMacros" exact="[macro.landmarks_kha_hive_01_macro, macro.landmarks_kha_hive_03_macro]" comment="Note: macro.landmarks_kha_hive_01_macro is deprecated"/>
         <set_value name="$NextHiveStationMinSpawnTime" exact="player.age"/>
         <set_value name="$FreeHiveSpawnQuota" exact="0" comment="Amount of hives which are allowed to be spawned on the next evaluation, with 100% chance, within the allowed quota."/>
         <set_value name="$HiveSectorCooldown" exact="96h"/>
@@ -118,7 +118,7 @@
         <remove_value name="$NextBaseStationMinSpawnTime"/>
         <remove_value name="$BaseStationMaxCount"/>
         <set_value name="$HiveStationGateRange" exact="3" comment="the gate distance where the hive can place an outpost to impact NPC mining"/>
-        <set_value name="$HiveStationMacros" exact="[macro.landmarks_kha_hive_03_macro]"/>
+        <set_value name="$HiveStationMacros" exact="[macro.landmarks_kha_hive_01_macro]" comment="Historical, updated again in patch 9"/>
         <set_value name="$NextHiveStationMinSpawnTime" exact="player.age"/>
         <set_value name="$FreeHiveSpawnQuota" exact="2" comment="Create some new hives when patching"/>
         <set_value name="$HiveSectorCooldown" exact="48h"/>
@@ -247,6 +247,9 @@
       <patch sinceversion="8">
         <set_value name="$SectorResourceYieldTable" exact="table[]"/>
       </patch>
+      <patch sinceversion="9">
+        <set_value name="$HiveStationMacros" exact="[macro.landmarks_kha_hive_01_macro, macro.landmarks_kha_hive_03_macro]" comment="Note: macro.landmarks_kha_hive_01_macro is deprecated"/>
+      </patch>
       <cues>
         <cue name="TriggerReport" instantiate="true">
           <conditions>
@@ -286,7 +289,7 @@
           </actions>
         </cue>
         <!--event.param = station-->
-        <cue name="StationManager" instantiate="true" namespace="this" version="5">
+        <cue name="StationManager" instantiate="true" namespace="this" version="6">
           <conditions>
             <event_cue_signalled/>
           </conditions>
@@ -361,6 +364,19 @@
             <do_if value="not $Station.exists">
               <debug_text text="'Cleaning up left over instance of Khaak station manager for destroyed station'" filter="savegame"/>
               <cancel_cue cue="this"/>
+            </do_if>
+          </patch>
+          <patch sinceversion="6">
+            <do_if value="not $IsHive and $Station.macro.ismacro.{macro.landmarks_kha_hive_03_macro}">
+              <set_value name="$IsHive" exact="true"/>
+              <set_value name="Manager.$HivePresenceTable.{$Station.sector}" exact="table[$LastKnownTime = player.age, $Station = $Station]"/>
+              <set_value name="Manager.$DefenceShipQuotaTable.{$Station}" exact="Manager.$MaxHiveDefenceShipQuota / 4"/>
+              <find_sector_in_range groupname="Manager.$WatchedSectors" object="$Station" excluded="Manager.$IgnoredSectors" maxdistance="Manager.$HiveStationGateRange" multiple="true"/>
+              <remove_value name="$OutpostSelfKillDelta"/>
+              <remove_value name="$LastPlayerMiningEvent"/>
+              <remove_value name="Manager.$OutpostShipGroupTable.{$Station}"/>
+              <cancel_cue cue="StationManager_MinerAttacked_Check"/>
+              <debug_text text="'Flagging Khaak station ' + $Station + ' ' + $Station.knownname + ' in ' + $Station.sector.knownname + ' to be a hive'" filter="savegame"/>
             </do_if>
           </patch>
           <cues>
