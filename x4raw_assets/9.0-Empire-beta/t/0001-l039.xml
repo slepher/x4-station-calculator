@@ -2719,7 +2719,7 @@
     <t id="9654">Modulo di Produzione</t>
     <t id="9655">Moltiplicatore Accelerazione Postbruciatori</t>
     <t id="9656">Interrompe la Ricarica degli Scudi L e XL</t>
-    <t id="9657">Unknown production method</t>
+    <t id="9657">Metodo di produzione sconosciuto</t>
     <t id="9700">(User question)</t>
     <t id="9701">Hacking</t>
     <t id="9702">Stai per hackerare un sistema</t>
@@ -3337,10 +3337,11 @@
     <t id="11692">Ora è possibile usare tasti modificatori per assegnare ordini in coda \(%s($INPUT_MODIFIER_ICON$)\) e prioritari \(%s($INPUT_MODIFIER_ICON$)\) direttamente dalla mappa o dal menu Interazione. Di default, gli ordini assegnati alle navi senza l'utilizzo di questi tasti modificatori sovrascriveranno qualsiasi ordine messo precedentemente in coda.</t>
     <t id="11693">Se preferisci il comportamento precedente, puoi impostare in "Coda" la Modalità Ordini di Default nelle Impostazioni di Gioco. In questo modo, premere %s($INPUT_MODIFIER_ICON$) dal menu Interazione sovrascriverà l'ordine invece di aggiungerlo in coda.</t>
     <t id="11694">Seleziona Sì se vuoi provare il nuovo comportamento di default del modificatore, oppure No se preferisci mantenere il vecchio comportamento e usare %s($INPUT_MODIFIER_ICON$) per sovrascrivere gli ordini.</t>
-    <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantlable Wreck</t>
-    <t id="11697">Resource Probe coverage</t>
+    <t id="11695">Relitto Trainabile</t>
+    <t id="11696">Relitto Smantellabile</t>
+    <t id="11697">Copertura Sonda Mineraria</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Salva offline</t>
     <t id="11702">Sovrascrivi salvataggio offline</t>
@@ -3931,9 +3932,9 @@
     <t id="13226">La nave attualmente in modifica monta missili incompatibili.</t>
     <t id="13227">Stabilità Motore da Viaggio</t>
     <t id="13300">(Input bar)</t>
-    <t id="13301">Panoramica</t>
+    <t id="13301">Visuale Scorrimento</t>
     <t id="13302">Resetta Posizione</t>
-    <t id="13303">Ruota</t>
+    <t id="13303">Ruota Visuale</t>
     <t id="13304">Resetta Rotazione</t>
     <t id="13305">Zoom</t>
     <t id="13306">Emulazione Puntatore Mouse</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">Focalizza Modulo della Stazione</t>
     <t id="13327">Ordine Prioritario in Coda</t>
     <t id="13328">Tasso di Raccolta(of resources; header item for table column)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Arrivederci</t>
@@ -7690,7 +7694,7 @@
     <t id="1000">Default</t>
     <t id="1001">Default - Tastiera &amp; Mouse / Controller</t>
     <t id="1011">Default - Joystick</t>
-    <t id="1021">Default - Controller \(Alternativo 1\)</t>
+    <t id="1021">Default - Controller \(Alternativo\)</t>
     <t id="1031">Default - Joystick \(OSX/Linux\)</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Singolo\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Doppio\)</t>
+    <t id="1131">Default - Tastiera WASD &amp; Mouse \(Alternativo\)</t>
     <t id="2001">Sony DUALSHOCK3 wireless controller</t>
     <t id="2011">Sony DUALSHOCK4 wireless controller</t>
     <t id="2021">Sony DualSense wireless controller</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)Costruisci Fabbrica</t>
     <t id="5213">(objective)Reclama un lotto in una posizione specifica</t>
     <t id="5214">(objective Extend:)Espandi il lotto alle dimensioni richieste</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">I progetti vengono acquistati presso i rappresentanti delle fazioni e i diplomatici.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Sensori ad Ampio Raggio</t>
     <t id="200">Destinazione: $DESTINATION$ \(alla posizione specificata\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">Per essere una Stazione Difensiva valida, uno dei Moduli di Difesa deve essere un Centro Amministrativo.</t>
     <t id="301">Le spese saranno coperte generosamente, entro limiti ragionevoli.</t>
     <t id="302">Costo minimo di costruzione stimato</t>

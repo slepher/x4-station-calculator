@@ -20,7 +20,7 @@
   </suns>
   <planets>
     <planet class="textref" geology="textref" atmosphere="textref" population="textref" maxpopulation="number" settlements="textref" part="partname" atmopart="partname">
-      <moons>  
+      <moons>
         <moon geology="textref" atmosphere="textref" population="textref" maxpopulation="number" settlements="textref" part="partname" atmopart="partname">
         <moon …>
         …
@@ -44,7 +44,7 @@
 <!-- available text ids from page 1042
 10001 - 10991 Generic 10011 name, 10012 descr
  <t id="10011">None</t>{1042,10011}(None)
- 
+
 11001 - 11991 Atmosphere Types
  <t id="11011">Methane</t>{1042,11011}(Methane)
  <t id="11021">Hydrogen</t>{1042,11021}(Hydrogen)
@@ -158,7 +158,7 @@
  <t id="112">l</t>{20403,112}(l)
  <t id="113">m</t>{20403,113}(m)
  <t id="114">n</t>{20403,114}(n)
-  
+
 20402 - Moon Names
  <t id="1">n</t>{20402,1}(I)
  <t id="2">n</t>{20402,2}(II)
@@ -190,12 +190,10 @@
     <properties>
       <identification name="{20004,7300011}" description="{20004,7300012}" />
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_medium_ice_verylow"/>
-        <resourcearea amount="3" ref="sphere_small_ice_high"/>
-        <resourcearea amount="3" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_verylow"/>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
+        <resourcearea amount="2" ref="sphere_medium_methane_medium_veryslow" />
+        <resourcearea amount="2" ref="sphere_huge_ore_verylow_veryslow" />
+        <resourcearea amount="2" ref="sphere_huge_ice_verylow_veryslow" />
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow" />
       </resourceareas>
       <area sunlight="1" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>
     </properties>

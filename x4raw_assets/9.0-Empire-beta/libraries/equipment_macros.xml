@@ -743,7 +743,7 @@
       <boost duration="27" recharge="92" thrust="6.89" acceleration="4.21" attack="10" release="6" coast="1.2"/>
       <travel charge="18" thrust="27.48" attack="91" release="22.5"/>
       <thrust forward="10550" reverse="10022.5"/>
-      <hull max="17700" threshold="0.3"/>
+      <hull max="20680" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -776,7 +776,7 @@
       <boost duration="24.3" recharge="92" thrust="5.74" acceleration="3.5" attack="10" release="4" coast="1.2"/>
       <travel charge="16" thrust="38.16" attack="82" release="37.5"/>
       <thrust forward="8545.5" reverse="8118.23"/>
-      <hull max="17700" threshold="0.3"/>
+      <hull max="20680" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -1050,7 +1050,7 @@
       <boost duration="46" recharge="200" thrust="5.04" acceleration="2.02" attack="14" release="4" coast="1.5"/>
       <travel charge="0" thrust="37.62" attack="95.5" release="1.25"/>
       <thrust forward="7912.5" reverse="8703.75"/>
-      <hull max="16000" threshold="0.3"/>
+      <hull max="18000" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_02"/>
@@ -2000,7 +2000,7 @@
       <boost duration="33.6" recharge="136" thrust="4.2" acceleration="1.84" attack="10" release="4" coast="1.25"/>
       <travel charge="14" thrust="27.54" attack="72" release="22.5"/>
       <thrust forward="11600" reverse="10440"/>
-      <hull max="14000" threshold="0.3"/>
+      <hull max="18800" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -2033,7 +2033,7 @@
       <boost duration="27.89" recharge="136" thrust="3.63" acceleration="1.93" attack="10" release="4" coast="1.25"/>
       <travel charge="12" thrust="40.68" attack="67" release="37.5"/>
       <thrust forward="9187" reverse="8268"/>
-      <hull max="14000" threshold="0.3"/>
+      <hull max="18800" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -2066,10 +2066,10 @@
       <boost duration="24" recharge="130" thrust="2.5" acceleration="1.45" attack="10" release="5" coast="1.2"/>
       <travel charge="26" thrust="26" attack="75" release="22.5"/>
       <thrust forward="18504" reverse="18504"/>
-      <hull max="16000" threshold="0.15"/>
+      <hull max="18800" threshold="0.15"/>
       <effects>
-        <boosting ref="gen_xl_boosteffect_01"/>
         <traveling ref="gen_traveldrive_fx_xl"/>
+        <boosting ref="gen_xl_boosteffect_01"/>
       </effects>
       <sounds>
         <enginedetail ref="enginedetail_ship_xl_01"/>
@@ -2784,7 +2784,7 @@
       <boost duration="33.6" recharge="128" thrust="5.04" acceleration="2.44" attack="10" release="5" coast="1.2"/>
       <travel charge="15" thrust="15.44" attack="72.8" release="22.5"/>
       <thrust forward="13715" reverse="13715"/>
-      <hull max="16000" threshold="0.3"/>
+      <hull max="20680" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -2816,7 +2816,7 @@
       <boost duration="28.56" recharge="128" thrust="3.92" acceleration="2.11" attack="10" release="4" coast="1.25"/>
       <travel charge="15" thrust="21.45" attack="69.2" release="37.5"/>
       <thrust forward="11109.15" reverse="11109.15"/>
-      <hull max="16000" threshold="0.3"/>
+      <hull max="20680" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -3576,7 +3576,7 @@
       <boost duration="46" recharge="120" thrust="3.75" acceleration="2.11" attack="10" release="5" coast="1.2"/>
       <travel charge="9" thrust="25.74" attack="57" release="18"/>
       <thrust forward="10400" reverse="11440"/>
-      <hull max="18500" threshold="0.3"/>
+      <hull max="22560" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -3608,7 +3608,7 @@
       <boost duration="36" recharge="120" thrust="2.66" acceleration="1.35" attack="10" release="3" coast="1.25"/>
       <travel charge="8" thrust="33.75" attack="49" release="30"/>
       <thrust forward="8898" reverse="9678"/>
-      <hull max="18500" threshold="0.3"/>
+      <hull max="22560" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -4403,8 +4403,8 @@
       <identification name="{20107,4104}" basename="{20107,4101}" shortname="{20107,4105}" makerrace="terran" description="{20107,4102}" mk="1"/>
       <boost duration="44" recharge="100" thrust="4.8" acceleration="1.62" attack="10" release="3" coast="1.3"/>
       <travel charge="5" thrust="26.6" attack="42" release="1.5"/>
-      <thrust forward="9284" reverse="10212"/>
-      <hull max="15000" threshold="0.3"/>
+      <thrust forward="9495" reverse="10444"/>
+      <hull max="22560" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -4436,7 +4436,7 @@
       <boost duration="36" recharge="100" thrust="3.9" acceleration="1.54" attack="10" release="3" coast="1.3"/>
       <travel charge="3" thrust="36" attack="37.6" release="2.5"/>
       <thrust forward="7691" reverse="8460"/>
-      <hull max="15000" threshold="0.3"/>
+      <hull max="22560" threshold="0.3"/>
       <effects>
         <traveling ref="gen_traveldrive_fx_xl"/>
         <boosting ref="gen_xl_boosteffect_01"/>
@@ -4988,7 +4988,7 @@
       <identification name="{20105,6304}" basename="{20105,6301}" description="{20105,6302}"/>
       <ammunition value="6" reload="15"/>
       <missile amount="1" barrelamount="4" lifetime="30" range="10000" guided="1" icon="hud_ms_ter_l_flagship_01_heavy_mk1" retarget="1" tags="ship_ter_l_flagship_01" targetable="1"/>
-      <explosiondamage value="1250"/>
+      <explosiondamage value="1250" shielddisruption="10"/>
       <reload time="0.25"/>
       <hull max="10"/>
       <effects>
@@ -6195,7 +6195,7 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2054}" basename="{20106,2051}" shortname="{20106,2055}" makerrace="paranid" description="{20106,2052}" mk="2"/>
-      <recharge max="5200" rate="183" delay="8"/>
+      <recharge max="5400" rate="183" delay="8"/>
       <hull max="500" integrated="1"/>
     </properties>
   </macro>
@@ -6407,7 +6407,7 @@
     <component ref="shield_arg_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2064}" basename="{20106,2061}" shortname="{20106,2065}" makerrace="teladi" description="{20106,2062}" mk="2"/>
-      <recharge max="8840" rate="90" delay="13.3"/>
+      <recharge max="8840" rate="90" delay="14.3"/>
       <hull max="800" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -6494,7 +6494,7 @@
     <component ref="shield_ter_l_standard_02_mk1"/>
     <properties>
       <identification name="{20106,3164}" basename="{20106,3161}" shortname="{20106,3165}" makerrace="terran" description="{20106,3162}" mk="1"/>
-      <recharge max="57600" rate="162" delay="6.5" disruptionstability="10"/>
+      <recharge max="57600" rate="162" delay="6.2" disruptionstability="10"/>
       <hull max="2400" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
@@ -6507,7 +6507,7 @@
     <component ref="shield_ter_l_standard_02_mk2"/>
     <properties>
       <identification name="{20106,3174}" basename="{20106,3171}" shortname="{20106,3175}" makerrace="terran" description="{20106,3172}" mk="2"/>
-      <recharge max="71424" rate="227" delay="6.5" disruptionstability="10"/>
+      <recharge max="71424" rate="227" delay="6.2" disruptionstability="10"/>
       <hull max="2400" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
@@ -6520,7 +6520,7 @@
     <component ref="shield_ter_l_standard_02_mk3"/>
     <properties>
       <identification name="{20106,3184}" basename="{20106,3181}" shortname="{20106,3185}" makerrace="terran" description="{20106,3182}" mk="3"/>
-      <recharge max="86400" rate="324" delay="6.5" disruptionstability="10"/>
+      <recharge max="86400" rate="324" delay="6.2" disruptionstability="10"/>
       <hull max="2400" threshold="0.2"/>
       <effects>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
@@ -6533,79 +6533,79 @@
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2114}" basename="{20106,2111}" shortname="{20106,2115}" makerrace="terran" description="{20106,2112}" mk="1"/>
-      <recharge max="6000" rate="104" delay="16.6"/>
-      <hull max="600" integrated="1"/>
+      <recharge max="6000" rate="104" delay="16.2"/>
+      <hull max="800" integrated="1"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_standard_01_mk2_macro" class="shieldgenerator" alias="shield_ter_m_standard_02_mk2_macro">
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2124}" basename="{20106,2121}" shortname="{20106,2125}" makerrace="terran" description="{20106,2122}" mk="2"/>
-      <recharge max="7800" rate="143" delay="16.6"/>
-      <hull max="600" integrated="1"/>
+      <recharge max="7800" rate="143" delay="16.2"/>
+      <hull max="800" integrated="1"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_standard_01_mk3_macro" class="shieldgenerator" alias="shield_ter_m_standard_02_mk3_macro">
     <component ref="shield_gen_m_virtual_01"/>
     <properties>
       <identification name="{20106,2134}" basename="{20106,2131}" shortname="{20106,2135}" makerrace="terran" description="{20106,2132}" mk="3"/>
-      <recharge max="9720" rate="174" delay="16.6"/>
-      <hull max="600" integrated="1"/>
+      <recharge max="9720" rate="174" delay="16.2"/>
+      <hull max="800" integrated="1"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_standard_02_mk1_macro" class="shieldgenerator">
     <component ref="shield_ter_m_standard_02_mk1"/>
     <properties>
       <identification name="{20106,2114}" basename="{20106,2111}" shortname="{20106,2115}" makerrace="terran" description="{20106,2112}" mk="1"/>
-      <recharge max="6000" rate="104" delay="16.6"/>
-      <hull max="600" integrated="0"/>
+      <recharge max="6000" rate="104" delay="16.2"/>
+      <hull max="800" integrated="0"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_standard_02_mk2_macro" class="shieldgenerator">
     <component ref="shield_ter_m_standard_02_mk2"/>
     <properties>
       <identification name="{20106,2124}" basename="{20106,2121}" shortname="{20106,2125}" makerrace="terran" description="{20106,2122}" mk="2"/>
-      <recharge max="7800" rate="143" delay="16.6"/>
-      <hull max="600" integrated="0"/>
+      <recharge max="7800" rate="143" delay="16.2"/>
+      <hull max="800" integrated="0"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_standard_02_mk3_macro" class="shieldgenerator">
     <component ref="shield_ter_m_standard_02_mk3"/>
     <properties>
       <identification name="{20106,2134}" basename="{20106,2131}" shortname="{20106,2135}" makerrace="terran" description="{20106,2132}" mk="3"/>
-      <recharge max="9720" rate="174" delay="16.6"/>
-      <hull max="600" integrated="0"/>
+      <recharge max="9720" rate="174" delay="16.2"/>
+      <hull max="800" integrated="0"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_standard_04_mk1_macro" class="shieldgenerator">
     <component ref="shield_ter_m_standard_04_mk1"/>
     <properties>
       <identification name="{20106,2174}" basename="{20106,2171}" shortname="{20106,2175}" makerrace="terran" description="{20106,2172}" mk="1"/>
-      <recharge max="6000" rate="56" delay="5"/>
-      <hull max="600" integrated="0"/>
+      <recharge max="6000" rate="63" delay="4.6"/>
+      <hull max="800" integrated="0"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_standard_04_mk2_macro" class="shieldgenerator">
     <component ref="shield_ter_m_standard_04_mk2"/>
     <properties>
       <identification name="{20106,2184}" basename="{20106,2181}" shortname="{20106,2185}" makerrace="terran" description="{20106,2182}" mk="2"/>
-      <recharge max="7800" rate="76" delay="5"/>
-      <hull max="600" integrated="0"/>
+      <recharge max="7800" rate="80" delay="4.6"/>
+      <hull max="800" integrated="0"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_standard_04_mk3_macro" class="shieldgenerator">
     <component ref="shield_ter_m_standard_04_mk3"/>
     <properties>
       <identification name="{20106,2194}" basename="{20106,2191}" shortname="{20106,2195}" makerrace="terran" description="{20106,2192}" mk="3"/>
-      <recharge max="9720" rate="94" delay="5"/>
-      <hull max="600" integrated="0"/>
+      <recharge max="9720" rate="102" delay="4.6"/>
+      <hull max="800" integrated="0"/>
     </properties>
   </macro>
   <macro name="shield_ter_m_virtual_01_mk1_macro" class="shieldgenerator" alias="shield_ter_m_standard_04_mk1_macro">
     <component ref="shield_ter_m_virtual_01"/>
     <properties>
       <identification name="{20106,2174}" basename="{20106,2171}" shortname="{20106,2175}" makerrace="terran" description="{20106,2172}" mk="1"/>
-      <recharge max="6000" rate="56" delay="5"/>
+      <recharge max="6000" rate="63" delay="4.6"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6613,7 +6613,7 @@
     <component ref="shield_ter_m_virtual_01"/>
     <properties>
       <identification name="{20106,2184}" basename="{20106,2181}" shortname="{20106,2185}" makerrace="terran" description="{20106,2182}" mk="2"/>
-      <recharge max="7800" rate="78" delay="5"/>
+      <recharge max="7800" rate="80" delay="4.6"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6621,7 +6621,7 @@
     <component ref="shield_ter_m_virtual_01"/>
     <properties>
       <identification name="{20106,2194}" basename="{20106,2191}" shortname="{20106,2195}" makerrace="terran" description="{20106,2192}" mk="3"/>
-      <recharge max="9720" rate="97" delay="5"/>
+      <recharge max="9720" rate="102" delay="4.6"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6629,7 +6629,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1164}" basename="{20106,1161}" shortname="{20106,1165}" makerrace="terran" description="{20106,1162}" mk="1"/>
-      <recharge max="1200" rate="63" delay="18.5"/>
+      <recharge max="1200" rate="63" delay="18"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6637,7 +6637,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1174}" basename="{20106,1171}" shortname="{20106,1175}" makerrace="terran" description="{20106,1172}" mk="2"/>
-      <recharge max="1440" rate="93" delay="18.5"/>
+      <recharge max="1440" rate="93" delay="18"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6645,7 +6645,7 @@
     <component ref="shield_gen_s_virtual_01"/>
     <properties>
       <identification name="{20106,1184}" basename="{20106,1181}" shortname="{20106,1185}" makerrace="terran" description="{20106,1182}" mk="3"/>
-      <recharge max="2100" rate="144" delay="18.5"/>
+      <recharge max="2100" rate="144" delay="18"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -6653,7 +6653,7 @@
     <component ref="shield_ter_s_virtual_01"/>
     <properties>
       <identification name="{20106,1224}" basename="{20106,1221}" shortname="{20106,1225}" makerrace="terran" description="{20106,1222}" mk="1"/>
-      <recharge max="1440" rate="45" delay="6"/>
+      <recharge max="1440" rate="48" delay="6"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -7658,13 +7658,12 @@
       <identification name="{20105,5204}" basename="{20105,5201}" shortname="{20105,5205}" makerrace="argon" description="{20105,5202}" mk="1"/>
       <bullet class="bullet_arg_turret_l_mining_01_mk1_macro"/>
       <rotationspeed max="40"/>
-      <rotationacceleration max="80"/>
-      <reload rate="0.5" time="1"/>
+      <rotationacceleration max="60"/>
       <hull max="4000" threshold="0.2"/>
       <effects>
+        <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
         <sefx_damage_medium ref="surfacemodule_damage_l_medium"/>
-        <sefx_damage_high ref="surfacemodule_damage_l_high"/>
       </effects>
     </properties>
   </macro>
@@ -7822,7 +7821,6 @@
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
       <rotationspeed max="120"/>
       <rotationacceleration max="240"/>
-      <reload rate="1" time="1"/>
       <hull threshold="0.2" integrated="1"/>
     </properties>
   </macro>
@@ -7833,7 +7831,6 @@
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
       <rotationspeed max="120"/>
       <rotationacceleration max="240"/>
-      <reload rate="1" time="1"/>
       <hull max="1200" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -7931,8 +7928,7 @@
       <bullet class="bullet_bor_turret_l_mining_01_mk1_macro"/>
       <rotationspeed max="40"/>
       <rotationacceleration max="60"/>
-      <reload rate="1" time="1"/>
-      <hull max="3450" threshold="0.2"/>
+      <hull max="4000" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
@@ -8011,7 +8007,6 @@
       <bullet class="bullet_bor_turret_m_mining_01_mk1_macro"/>
       <rotationspeed max="120"/>
       <rotationacceleration max="240"/>
-      <reload rate="1" time="1"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -8022,7 +8017,6 @@
       <bullet class="bullet_bor_turret_m_mining_01_mk1_macro"/>
       <rotationspeed max="120"/>
       <rotationacceleration max="240"/>
-      <reload rate="1" time="1"/>
       <hull max="1200" integrated="0"/>
     </properties>
   </macro>
@@ -8206,10 +8200,9 @@
     <properties>
       <identification name="{20105,5214}" basename="{20105,5211}" shortname="{20105,5215}" makerrace="paranid" description="{20105,5212}" mk="1"/>
       <bullet class="bullet_par_turret_l_mining_01_mk1_macro"/>
-      <rotationspeed max="20"/>
-      <rotationacceleration max="40"/>
-      <reload rate="0.5" time="1"/>
-      <hull max="3600" threshold="0.2"/>
+      <rotationspeed max="40"/>
+      <rotationacceleration max="60"/>
+      <hull max="4000" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
@@ -8352,9 +8345,8 @@
     <properties>
       <identification name="{20105,4214}" basename="{20105,4211}" shortname="{20105,4215}" makerrace="paranid" description="{20105,4212}" mk="1"/>
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
-      <rotationspeed max="60"/>
-      <rotationacceleration max="120"/>
-      <reload rate="1" time="1"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="240"/>
       <hull threshold="0.2" integrated="1"/>
     </properties>
   </macro>
@@ -8363,9 +8355,8 @@
     <properties>
       <identification name="{20105,4214}" basename="{20105,4211}" shortname="{20105,4215}" makerrace="paranid" description="{20105,4212}" mk="1"/>
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
-      <rotationspeed max="60"/>
-      <rotationacceleration max="120"/>
-      <reload rate="1" time="1"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="240"/>
       <hull max="1200" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -8507,10 +8498,9 @@
     <properties>
       <identification name="{20105,5294}" basename="{20105,5291}" shortname="{20105,5295}" makerrace="split" description="{20105,5292}" mk="1"/>
       <bullet class="bullet_spl_turret_l_mining_01_mk1_macro"/>
-      <rotationspeed max="30"/>
+      <rotationspeed max="40"/>
       <rotationacceleration max="60"/>
-      <reload rate="0.5" time="1"/>
-      <hull max="3600" threshold="0.2"/>
+      <hull max="4000" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
@@ -8672,9 +8662,8 @@
     <properties>
       <identification name="{20105,4374}" basename="{20105,4371}" shortname="{20105,4375}" makerrace="split" description="{20105,4372}" mk="1"/>
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
-      <rotationspeed max="90"/>
-      <rotationacceleration max="180"/>
-      <reload rate="1" time="1"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="240"/>
       <hull threshold="0.2" integrated="1"/>
     </properties>
   </macro>
@@ -8683,9 +8672,8 @@
     <properties>
       <identification name="{20105,4374}" basename="{20105,4371}" shortname="{20105,4375}" makerrace="split" description="{20105,4372}" mk="1"/>
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
-      <rotationspeed max="90"/>
-      <rotationacceleration max="180"/>
-      <reload rate="1" time="1"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="240"/>
       <hull max="1200" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -8800,14 +8788,13 @@
     <properties>
       <identification name="{20105,5224}" basename="{20105,5221}" shortname="{20105, 5225}" makerrace="teladi" description="{20105, 5222}" mk="1"/>
       <bullet class="bullet_tel_turret_l_mining_01_mk1_macro"/>
-      <rotationspeed max="20"/>
-      <rotationacceleration max="40"/>
-      <reload rate="0.5" time="1"/>
-      <hull max="4400" threshold="0.2"/>
+      <rotationspeed max="40"/>
+      <rotationacceleration max="60"/>
+      <hull max="4000" threshold="0.2"/>
       <effects>
+        <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
         <sefx_damage_medium ref="surfacemodule_damage_l_medium"/>
-        <sefx_damage_high ref="surfacemodule_damage_l_high"/>
       </effects>
     </properties>
   </macro>
@@ -8946,9 +8933,8 @@
     <properties>
       <identification name="{20105,4224}" basename="{20105,4221}" shortname="{20105,4225}" makerrace="teladi" description="{20105, 4222}" mk="1"/>
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
-      <rotationspeed max="60"/>
-      <rotationacceleration max="120"/>
-      <reload rate="1" time="1"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="240"/>
       <hull threshold="0.2" integrated="1"/>
     </properties>
   </macro>
@@ -8957,9 +8943,8 @@
     <properties>
       <identification name="{20105,4224}" basename="{20105,4221}" shortname="{20105,4225}" makerrace="teladi" description="{20105, 4222}" mk="1"/>
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
-      <rotationspeed max="60"/>
-      <rotationacceleration max="120"/>
-      <reload rate="1" time="1"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="240"/>
       <hull max="1200" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -9088,9 +9073,9 @@
     <properties>
       <identification name="{20105,5374}" basename="{20105,5371}" shortname="{20105,5375}" makerrace="terran" description="{20105,5372}" mk="1"/>
       <bullet class="bullet_ter_turret_l_mining_01_mk1_macro"/>
-      <rotationspeed max="20"/>
-      <rotationacceleration max="40"/>
-      <hull max="3600" threshold="0.2"/>
+      <rotationspeed max="40"/>
+      <rotationacceleration max="60"/>
+      <hull max="4000" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
@@ -9231,9 +9216,8 @@
     <properties>
       <identification name="{20105,4894}" basename="{20105,4891}" shortname="{20105,4895}" makerrace="terran" description="{20105,4892}" mk="1"/>
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
-      <rotationspeed max="75"/>
-      <rotationacceleration max="150"/>
-      <reload/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="240"/>
       <hull integrated="1"/>
     </properties>
   </macro>
@@ -9242,8 +9226,8 @@
     <properties>
       <identification name="{20105,4894}" basename="{20105,4891}" shortname="{20105,4895}" makerrace="terran" description="{20105,4892}" mk="1"/>
       <bullet class="bullet_gen_turret_m_mining_01_mk1_macro"/>
-      <rotationspeed max="75"/>
-      <rotationacceleration max="150"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="240"/>
       <hull max="1200" threshold="0.2"/>
     </properties>
   </macro>
@@ -9292,8 +9276,8 @@
     <properties>
       <identification name="{20105,7024}" basename="{20105,7021}" shortname="{20105,7025}" makerrace="xenon" description="{20105,7022}" mk="1"/>
       <bullet class="bullet_xen_turret_m_gatling_01_mk1_macro"/>
-      <rotationspeed max="60"/>
-      <rotationacceleration max="90"/>
+      <rotationspeed max="90"/>
+      <rotationacceleration max="135"/>
       <hull threshold="0.2" integrated="1"/>
     </properties>
   </macro>
@@ -9302,8 +9286,8 @@
     <properties>
       <identification name="{20105,7024}" basename="{20105,7021}" shortname="{20105,7025}" makerrace="xenon" description="{20105,7022}" mk="1"/>
       <bullet class="bullet_xen_turret_m_gatling_01_mk1_macro"/>
-      <rotationspeed max="60"/>
-      <rotationacceleration max="90"/>
+      <rotationspeed max="90"/>
+      <rotationacceleration max="135"/>
       <hull max="1500" threshold="0.2" integrated="0"/>
     </properties>
   </macro>
@@ -9992,8 +9976,8 @@
       <identification name="{20105,1084}" basename="{20105,1081}" shortname="{20105,1085}" description="{20105,1082}" mk="1"/>
       <bullet class="bullet_gen_s_beam_01_mk1_macro"/>
       <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="1700" reenable="7000"/>
-      <rotationspeed max="100"/>
-      <rotationacceleration max="140"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="150"/>
       <hull max="500" hittable="0"/>
       <effects>
         <firing start="startshooting_gen_s_beam_01_mk1" stop="stopshooting_gen_s_beam_01_mk1"/>
@@ -10006,8 +9990,8 @@
       <identification name="{20105,1094}" basename="{20105,1091}" shortname="{20105,1095}" description="{20105,1092}" mk="2"/>
       <bullet class="bullet_gen_s_beam_01_mk2_macro"/>
       <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="1700" reenable="7000"/>
-      <rotationspeed max="100"/>
-      <rotationacceleration max="140"/>
+      <rotationspeed max="120"/>
+      <rotationacceleration max="150"/>
       <hull max="500" hittable="0"/>
       <effects>
         <firing start="startshooting_gen_s_beam_01_mk1" stop="stopshooting_gen_s_beam_01_mk1"/>
@@ -10426,7 +10410,7 @@
     <properties>
       <identification name="{20105,1224}" basename="{20105,1221}" shortname="{20105,1225}" makerrace="paranid" description="{20105,1222}" mk="1"/>
       <bullet class="bullet_par_s_railgun_01_mk1_macro"/>
-      <heat overheat="10000" cooldelay="2" overheatcooldelay="4" coolrate="870" reenable="1000"/>
+      <heat overheat="10000" cooldelay="1.5" overheatcooldelay="4" coolrate="900" reenable="1000"/>
       <rotationspeed max="20"/>
       <rotationacceleration max="30"/>
       <hull max="500" hittable="0"/>
@@ -10442,7 +10426,7 @@
     <properties>
       <identification name="{20105,1234}" basename="{20105,1231}" shortname="{20105,1235}" makerrace="paranid" description="{20105,1232}" mk="2"/>
       <bullet class="bullet_par_s_railgun_01_mk2_macro"/>
-      <heat overheat="10000" cooldelay="2" overheatcooldelay="4" coolrate="965" reenable="1000"/>
+      <heat overheat="10000" cooldelay="1.5" overheatcooldelay="4" coolrate="980" reenable="1000"/>
       <rotationspeed max="20"/>
       <rotationacceleration max="30"/>
       <hull max="500" hittable="0"/>

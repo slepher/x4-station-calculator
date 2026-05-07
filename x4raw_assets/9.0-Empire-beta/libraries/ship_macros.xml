@@ -1173,7 +1173,7 @@
       </jerk>
       <explosiondamage value="500" shield="2500"/>
       <storage missile="12"/>
-      <hull max="14000"/>
+      <hull max="16500"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -1192,7 +1192,7 @@
       </sounds>
       <physics mass="28.75">
         <inertia pitch="5.723" yaw="5.723" roll="4.578"/>
-        <drag forward="5.443" reverse="21.773" horizontal="12" vertical="12" pitch="9.897" yaw="9.897" roll="9.897"/>
+        <drag forward="5.8" reverse="21.773" horizontal="12" vertical="12" pitch="9.897" yaw="9.897" roll="9.897"/>
         <accfactors forward="1.3"/>
       </physics>
       <thruster tags="medium"/>
@@ -1237,7 +1237,7 @@
       </jerk>
       <explosiondamage value="500" shield="2500"/>
       <storage missile="12"/>
-      <hull max="16000"/>
+      <hull max="18800"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -1256,7 +1256,7 @@
       </sounds>
       <physics mass="32">
         <inertia pitch="6.578" yaw="6.578" roll="5.263"/>
-        <drag forward="6.257" reverse="25.028" horizontal="13.8" vertical="13.8" pitch="11.376" yaw="11.376" roll="11.376"/>
+        <drag forward="6.5" reverse="25.028" horizontal="13.8" vertical="13.8" pitch="11.376" yaw="11.376" roll="11.376"/>
         <accfactors forward="1.3"/>
       </physics>
       <thruster tags="medium"/>
@@ -1300,16 +1300,15 @@
       </jerk>
       <explosiondamage value="500" shield="2500"/>
       <storage missile="12"/>
-      <hull max="14000"/>
+      <hull max="14600"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
-        <point position="1.1" value="0.8"/>
-        <point position="1.3" value="0.6"/>
-        <point position="1.5" value="0.35"/>
+        <point position="1.2" value="0.8"/>
+        <point position="1.5" value="0.55"/>
+        <point position="1.8" value="0.35"/>
         <point position="2" value="0.25"/>
-        <point position="2.3" value="0.15"/>
         <point position="2.7" value="0.15"/>
       </steeringcurve>
       <purpose primary="fight"/>
@@ -1319,7 +1318,7 @@
       </sounds>
       <physics mass="25">
         <inertia pitch="4.289" yaw="4.289" roll="3.431"/>
-        <drag forward="4.9" reverse="20.146" horizontal="12" vertical="12" pitch="8.241" yaw="8.241" roll="8.241"/>
+        <drag forward="4.7" reverse="20.146" horizontal="12" vertical="12" pitch="8.241" yaw="8.241" roll="8.241"/>
         <accfactors forward="1.3"/>
       </physics>
       <thruster tags="medium"/>
@@ -4207,7 +4206,7 @@
       </jerk>
       <explosiondamage value="1000" shield="5000" shielddisruption="10"/>
       <storage missile="160" unit="10"/>
-      <hull max="162500"/>
+      <hull max="180700"/>
       <secrecy level="3"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
@@ -4274,7 +4273,7 @@
       </jerk>
       <explosiondamage value="1500" shield="7500" shielddisruption="10"/>
       <storage missile="1160" unit="10"/>
-      <hull max="300000"/>
+      <hull max="330000"/>
       <threatscore value="35"/>
       <secrecy level="3"/>
       <steeringcurve>
@@ -5480,7 +5479,7 @@
       </physics>
       <thruster tags="extralarge"/>
       <ship type="builder"/>
-      <traveldrivestability maxvalue="16250"/>
+      <traveldrivestability maxvalue="16500"/>
     </properties>
     <connections>
       <connection ref="con_cockpit_01">
@@ -5549,7 +5548,7 @@
       </physics>
       <thruster tags="extralarge"/>
       <ship type="carrier"/>
-      <traveldrivestability maxvalue="16250"/>
+      <traveldrivestability maxvalue="16500"/>
     </properties>
     <connections>
       <connection ref="con_buildmodule_01">
@@ -5646,7 +5645,7 @@
       <modifiers>
         <shield rechargerate="0.8"/>
       </modifiers>
-      <traveldrivestability maxvalue="16250"/>
+      <traveldrivestability maxvalue="16500"/>
     </properties>
     <connections>
       <connection ref="con_buildmodule_01">
@@ -12344,19 +12343,18 @@
       <secrecy level="2"/>
       <steeringcurve>
         <point position="1.01" value="1"/>
-        <point position="1.1" value="0.8"/>
-        <point position="1.3" value="0.6"/>
-        <point position="1.5" value="0.32"/>
-        <point position="1.7" value="0.22"/>
-        <point position="2" value="0.17"/>
-        <point position="2.3" value="0.1"/>
-        <point position="2.6" value="0.08"/>
+        <point position="1.2" value="0.8"/>
+        <point position="1.5" value="0.5"/>
+        <point position="1.8" value="0.3"/>
+        <point position="2" value="0.26"/>
+        <point position="2.3" value="0.22"/>
+        <point position="2.6" value="0.13"/>
       </steeringcurve>
       <purpose primary="fight"/>
       <people capacity="5"/>
       <physics mass="17.607">
         <inertia pitch="5" yaw="5" roll="5"/>
-        <drag forward="2.5" reverse="9" horizontal="5.2" vertical="5.2" pitch="9.317" yaw="9.317" roll="9.317"/>
+        <drag forward="2.5" reverse="9" horizontal="5.2" vertical="5.2" pitch="9.317" yaw="9.317" roll="10.6"/>
         <accfactors forward="1.3" reverse="1.15" horizontal="1.3" vertical="1.3"/>
       </physics>
       <thruster tags="medium"/>
@@ -21211,8 +21209,7 @@
             <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group07" exact="2" optional="1"/>
             <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group08" exact="4" optional="1"/>
             <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group09" exact="4" optional="1"/>
-            <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group10" exact="1" optional="1"/>
-            <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group11" exact="1" optional="1"/>
+            <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group10" exact="2" optional="1"/>
             <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group12" exact="4" optional="1"/>
             <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group13" exact="4" optional="1"/>
             <shields macro="shield_xen_m_standard_02_mk2_macro" path=".." group="group14" exact="8" optional="1"/>

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 23.04.2026 16:37:01-->
+<!--Last exported: 06.05.2026 10:16:17-->
 <diff>
   <add sel="/wares">
     <ware id="engine_arg_m_corvette_01_mk1" name="{20107,9034}" description="{20107,9032}" group="engines" transport="equipment" volume="1" tags="engine equipment hiddenwithoutlicence onlyownerbuild">
@@ -127,7 +127,7 @@
       </production>
       <component ref="turret_gen_m_disabler_01_mk1_macro" />
       <restriction licence="envoy_access" />
-      <use threshold="0.7" />
+      <use threshold="0.91" />
       <owner faction="ministry" />
     </ware>
     <ware id="turret_gen_m_gatling_01_mk1" name="{20105,7054}" description="{20105,7052}" group="turrets" transport="equipment" volume="1" tags="equipment turret">
@@ -141,7 +141,7 @@
       </production>
       <component ref="turret_gen_m_gatling_01_mk1_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0" />
+      <use threshold="0.41" />
       <owner faction="scaleplate" />
     </ware>
     <ware id="turret_gen_m_shieldpierce_01_mk1" name="{20105,7034}" description="{20105,7032}" group="turrets" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild turret">
@@ -155,7 +155,7 @@
       </production>
       <component ref="turret_gen_m_shieldpierce_01_mk1_macro" />
       <restriction licence="envoy_access" />
-      <use threshold="1" />
+      <use threshold="0.91" />
       <owner faction="argon" />
     </ware>
     <ware id="weapon_gen_m_disabler_01_mk1" name="{20105,2594}" description="{20105,2592}" group="weapons" transport="equipment" volume="1" tags="equipment hiddenwithoutlicence onlyownerbuild weapon">
@@ -169,7 +169,7 @@
       </production>
       <component ref="weapon_gen_m_disabler_01_mk1_macro" />
       <restriction licence="envoy_access" />
-      <use threshold="0" />
+      <use threshold="0.91" />
       <owner faction="ministry" />
       <owner faction="scaleplate" />
     </ware>
@@ -184,7 +184,7 @@
       </production>
       <component ref="weapon_gen_m_shieldpierce_01_mk1_macro" />
       <restriction licence="envoy_access" />
-      <use threshold="1" />
+      <use threshold="0" />
       <owner faction="argon" />
     </ware>
   </add>
