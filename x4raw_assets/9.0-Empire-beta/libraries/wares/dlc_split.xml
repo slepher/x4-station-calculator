@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 23.04.2026 16:36:46-->
+<!--Last exported: 06.05.2026 10:16:05-->
 <diff>
   <add sel="/wares/production">
     <method id="split" name="{20206,701}">
@@ -1461,7 +1461,7 @@
       </production>
       <component ref="turret_spl_l_beam_01_mk1_macro" />
       <restriction licence="capitalequipment" />
-      <use threshold="0.9" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1477,7 +1477,7 @@
       </production>
       <component ref="turret_spl_l_dumbfire_01_mk1_macro" />
       <restriction licence="capitalequipment" />
-      <use threshold="0.61" />
+      <use threshold="0.41" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1493,7 +1493,7 @@
       </production>
       <component ref="turret_spl_l_guided_01_mk1_macro" />
       <restriction licence="capitalequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1541,7 +1541,7 @@
       </production>
       <component ref="turret_spl_l_plasma_01_mk1_macro" />
       <restriction licence="capitalequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1557,7 +1557,7 @@
       </production>
       <component ref="turret_spl_m_beam_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.9" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1573,7 +1573,7 @@
       </production>
       <component ref="turret_spl_m_beam_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.9" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1604,7 +1604,7 @@
       </production>
       <component ref="turret_spl_m_dumbfire_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.55" />
+      <use threshold="0.41" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1620,7 +1620,7 @@
       </production>
       <component ref="turret_spl_m_flak_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
     </ware>
@@ -1635,7 +1635,7 @@
       </production>
       <component ref="turret_spl_m_flak_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
     </ware>
@@ -1650,7 +1650,7 @@
       </production>
       <component ref="turret_spl_m_gatling_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.41" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1666,7 +1666,7 @@
       </production>
       <component ref="turret_spl_m_gatling_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.41" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1697,7 +1697,7 @@
       </production>
       <component ref="turret_spl_m_guided_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.63" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1777,7 +1777,7 @@
       </production>
       <component ref="turret_spl_m_plasma_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1793,7 +1793,7 @@
       </production>
       <component ref="turret_spl_m_plasma_02_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1857,7 +1857,7 @@
       </production>
       <component ref="weapon_spl_m_gatling_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0" />
+      <use threshold="0.31" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1873,7 +1873,7 @@
       </production>
       <component ref="weapon_spl_m_gatling_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1889,7 +1889,7 @@
       </production>
       <component ref="weapon_spl_m_railgun_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="split" />
     </ware>
@@ -1904,7 +1904,7 @@
       </production>
       <component ref="weapon_spl_m_railgun_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.9" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="split" />
     </ware>
@@ -1925,17 +1925,17 @@
       <owner faction="split" />
     </ware>
     <ware id="weapon_spl_m_shotgun_01_mk2" name="{20105,2314}" description="{20105,2312}" transport="equipment" volume="1" tags="equipment weapon">
-      <price min="50696" average="56329" max="61962" />
+      <price min="126503" average="140559" max="154615" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="advancedelectronics" amount="12" />
-          <ware ware="energycells" amount="116" />
-          <ware ware="weaponcomponents" amount="13" />
+          <ware ware="advancedelectronics" amount="32" />
+          <ware ware="energycells" amount="289" />
+          <ware ware="weaponcomponents" amount="32" />
         </primary>
       </production>
       <component ref="weapon_spl_m_shotgun_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.31" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1951,7 +1951,7 @@
       </production>
       <component ref="weapon_spl_m_sticky_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.41" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1967,7 +1967,7 @@
       </production>
       <component ref="weapon_spl_m_sticky_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1983,7 +1983,7 @@
       </production>
       <component ref="weapon_spl_s_gatling_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.21" />
+      <use threshold="0.31" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -1999,7 +1999,7 @@
       </production>
       <component ref="weapon_spl_s_gatling_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -2015,7 +2015,7 @@
       </production>
       <component ref="weapon_spl_s_railgun_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="split" />
     </ware>
@@ -2030,7 +2030,7 @@
       </production>
       <component ref="weapon_spl_s_railgun_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.9" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="split" />
     </ware>
@@ -2051,17 +2051,17 @@
       <owner faction="split" />
     </ware>
     <ware id="weapon_spl_s_shotgun_01_mk2" name="{20105,1314}" description="{20105,1312}" transport="equipment" volume="1" tags="equipment weapon">
-      <price min="33797" average="37552" max="41307" />
+      <price min="84336" average="93706" max="103077" />
       <production time="10" amount="1" method="default" name="{20206,101}">
         <primary>
-          <ware ware="advancedelectronics" amount="8" />
-          <ware ware="energycells" amount="77" />
-          <ware ware="weaponcomponents" amount="8" />
+          <ware ware="advancedelectronics" amount="21" />
+          <ware ware="energycells" amount="193" />
+          <ware ware="weaponcomponents" amount="21" />
         </primary>
       </production>
       <component ref="weapon_spl_s_shotgun_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.31" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -2077,7 +2077,7 @@
       </production>
       <component ref="weapon_spl_s_sticky_01_mk1_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.41" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />
@@ -2093,7 +2093,7 @@
       </production>
       <component ref="weapon_spl_s_sticky_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.71" />
       <owner faction="court" />
       <owner faction="freesplit" />
       <owner faction="split" />

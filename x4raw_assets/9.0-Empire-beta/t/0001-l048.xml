@@ -3341,6 +3341,7 @@
     <t id="11696">Wrak nadający się do demontażu</t>
     <t id="11697">Zasięg sondy zasobów</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Zapis offline</t>
     <t id="11702">Nadpisz zapis offline</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">Koncentruj na modelu stacji</t>
     <t id="13327">Zakolejkuj priorytetowy rozkaz</t>
     <t id="13328">Szybkość zbierania(zasobów; pozycja nagłówka dla kolumny tabeli)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Do widzenia</t>
@@ -7690,7 +7694,7 @@
     <t id="1000">Domyślnie</t>
     <t id="1001">Domyślnie - Klawiatura i Mysz / Kontroler</t>
     <t id="1011">Domyślnie - Joystick</t>
-    <t id="1021">Domyślnie - Kontroler \(Alternatywa 1\)</t>
+    <t id="1021">Domyślnie - Kontroler \(Alternatywne\)</t>
     <t id="1031">Domyślnie - Joystick \(OSX/Linux\)</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Pojedynczy\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Podwójny\)</t>
+    <t id="1131">Domyślne - WSAD klawiatura i mysz \(Alternatywne\)</t>
     <t id="2001">Kontroler Sony DUALSHOCK3</t>
     <t id="2011">Kontroler Sony DUALSHOCK4</t>
     <t id="2021">Kontroler Sony DualSense</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)Zbuduj stację</t>
     <t id="5213">(objective)Przejmij działkę w określonej lokalizacji</t>
     <t id="5214">(cel Rozszerz:)Rozszerz działkę do wymaganego rozmiaru</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Plany są kupowane od przedstawicieli frakcji i dyplomatów.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Szerokopasmowe matryce czujników</t>
     <t id="200">Miejsce docelowe: $DESTINATION$ \(w określonym miejscu\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">Aby Stacja Obrony działała, jeden z modułów obrony musi być centrum nadzorującym.</t>
     <t id="301">Wydatki zostaną hojnie pokryte, w granicach rozsądku rzecz jasna.</t>
     <t id="302">Szacowany minimalny koszt budowy</t>

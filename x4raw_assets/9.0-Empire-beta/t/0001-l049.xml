@@ -3341,6 +3341,7 @@
     <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Offline speichern</t>
     <t id="11702">Offline-Spielstand überschreiben</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">Stationsmodell fokussieren</t>
     <t id="13327">Eingereihter Prioritätsbefehl</t>
     <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Auf Wiedersehen</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Single\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Dual\)</t>
+    <t id="1131">Default - WASD Keyboard &amp; Mouse \(Alternative\)</t>
     <t id="2001">Sony DUALSHOCK3 Wireless Controller</t>
     <t id="2011">Sony DUALSHOCK4 Wireless Controller</t>
     <t id="2021">Sony DualSense Wireless Controller</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)Baue Fabrik</t>
     <t id="5213">(objective)Beanspruche Bauplatz an spezifischem Ort</t>
     <t id="5214">(objective Extend:)Erweitere den Bauplatz auf die erforderliche Größe</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Blaupausen kauft man bei Fraktions\-repräsentanten und Diplomaten.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Weitbereich\-sensor\-bündel</t>
     <t id="200">Ziel: $DESTINATION$ \(an spezifischem Ort\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">Für eine richtige Verteidigungsstation muss eins der Verteidigungsmodule ein Administrationszentrum sein.</t>
     <t id="301">Auslagen werden im angemessenen Rahmen großzügig erstattet.</t>
     <t id="302">Geschätzte Mindest\-bau\-kosten</t>

@@ -3337,10 +3337,11 @@
     <t id="11692">Vous pouvez désormais utiliser des touches de modification pour donner des ordres mis en attente \(%s($INPUT_MODIFIER_ICON$)\) ou prioritaires \(%s($INPUT_MODIFIER_ICON$)\) directement depuis la carte ou le menu d'interaction. Par défaut, les ordres donnés aux vaisseaux sans utiliser ces touches écraseront désormais tout ordre précédemment mis en attente.</t>
     <t id="11693">Si vous préférez l'ancien comportement, vous pouvez changer le paramètre "Comportement d'ordre par défaut" dans le menu des Paramètres du jeu sur "Mettre en attente". Ainsi, appuyer sur %s($INPUT_MODIFIER_ICON$) tout en utilisant le menu d'interaction écrasera les ordres au lieu de l'ajouter à la file d'attente.</t>
     <t id="11694">Appuyez sur Oui si vous souhaitez essayer le nouveau comportement par défaut, ou sur Non si vous souhaitez conserver l'ancien comportement et utiliser %s($INPUT_MODIFIER_ICON$) pour écraser les ordres.</t>
-    <t id="11695">Epave remorquable</t>
-    <t id="11696">Epave recyclable</t>
+    <t id="11695">Épave remorquable</t>
+    <t id="11696">Épave recyclable</t>
     <t id="11697">Portée de la sonde de ressources</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Sauvegarde locale</t>
     <t id="11702">Ecraser la sauvegarde locale</t>
@@ -3931,9 +3932,9 @@
     <t id="13226">Le vaisseau actuel possède des missiles incompatibles.</t>
     <t id="13227">Stabilité du moteur de voyage</t>
     <t id="13300">(Input bar)</t>
-    <t id="13301">Translation(ou panoramique, il faut voir ce que fait cette action)</t>
+    <t id="13301">Déplacer la vue(Translation ou panoramique, il faut voir ce que fait cette action)</t>
     <t id="13302">Réinitialiser la vue</t>
-    <t id="13303">Pivoter</t>
+    <t id="13303">Pivoter la vue</t>
     <t id="13304">Réinitialiser l'orientation</t>
     <t id="13305">Zoom</t>
     <t id="13306">Émulation de la souris</t>
@@ -3958,7 +3959,10 @@
     <t id="13325">Annuler la sélection du module</t>
     <t id="13326">Centrer sur la station</t>
     <t id="13327">Ordre prioritaire en attente</t>
-    <t id="13328">Vitesse de collecte</t>
+    <t id="13328">Vitesse de collecte(des ressources; titre d'une colonne dans une table)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Au revoir</t>
@@ -7690,7 +7694,7 @@
     <t id="1000">Défaut</t>
     <t id="1001">Défaut - Clavier &amp; Souris / Contrôleur</t>
     <t id="1011">Défaut - Joystick</t>
-    <t id="1021">Défaut - Contrôleur \(alternative 1\)</t>
+    <t id="1021">Par défaut - Manette \(Alternatif\)</t>
     <t id="1031">Défaut - Joystick \(OSX/Linux\)</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Simple\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Double\)</t>
+    <t id="1131">Par défaut - Clavier ZQSD et Souris \(Alternatif\)</t>
     <t id="2001">Manette sans fil Sony DUALSHOCK3</t>
     <t id="2011">Manette sans fil Sony DUALSHOCK4</t>
     <t id="2021">Manette sans fil Sony DualSense</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)Construire une usine</t>
     <t id="5213">Revendiquer le terrain sur le lieu spécifié</t>
     <t id="5214">(objectif Extend :)Agrandir le tracé aux dimensions requises</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Les plans sont achetés auprès des représentants de faction et des diplomates.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Réseaux de capteurs à portée étendue</t>
     <t id="200">Destination : $DESTINATION$ \(à l'endroit indiqué\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">Pour être valide en tant que station de défense, l'un des modules de défense doit être un centre administratif</t>
     <t id="301">Les dépenses seront généreusement compensées, dans les limites du raisonnable.</t>
     <t id="302">Coût de construction minimum estimé</t>

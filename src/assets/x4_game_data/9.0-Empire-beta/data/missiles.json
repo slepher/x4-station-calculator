@@ -402,20 +402,20 @@
     ],
     "cost": {
       "default": {
-        "energycells": 42.0,
-        "missilecomponents": 19.0
+        "energycells": 38.0,
+        "missilecomponents": 17.0
       },
       "xenon": {
-        "energycells": 10.0,
-        "ore": 5.0,
+        "energycells": 9.0,
+        "ore": 4.0,
         "silicon": 3.0
       },
       "terran": {
-        "energycells": 16.0,
-        "metallicmicrolattice": 12.0
+        "energycells": 14.0,
+        "metallicmicrolattice": 11.0
       },
       "closedloop": {
-        "energycells": 40.0,
+        "energycells": 35.0,
         "hullparts": 1.0
       }
     },
@@ -487,20 +487,20 @@
     ],
     "cost": {
       "default": {
-        "energycells": 18.0,
+        "energycells": 17.0,
         "missilecomponents": 8.0
       },
       "xenon": {
-        "energycells": 5.0,
+        "energycells": 4.0,
         "ore": 2.0,
         "silicon": 1.0
       },
       "terran": {
-        "energycells": 7.0,
+        "energycells": 6.0,
         "metallicmicrolattice": 5.0
       },
       "closedloop": {
-        "energycells": 23.0
+        "energycells": 22.0
       }
     },
     "amount": 2,
@@ -528,7 +528,7 @@
     ],
     "cost": {
       "default": {
-        "energycells": 20.0,
+        "energycells": 21.0,
         "missilecomponents": 9.0
       },
       "xenon": {
@@ -537,7 +537,7 @@
         "silicon": 2.0
       },
       "terran": {
-        "energycells": 7.0,
+        "energycells": 8.0,
         "metallicmicrolattice": 5.0
       },
       "closedloop": {
@@ -569,18 +569,18 @@
     ],
     "cost": {
       "default": {
-        "energycells": 20.0,
-        "missilecomponents": 9.0,
-        "smartchips": 4.0
+        "energycells": 24.0,
+        "missilecomponents": 7.0,
+        "smartchips": 3.0
       },
       "xenon": {
-        "energycells": 10.0,
-        "ore": 5.0,
-        "silicon": 3.0
+        "energycells": 8.0,
+        "ore": 4.0,
+        "silicon": 2.0
       },
       "terran": {
-        "energycells": 10.0,
-        "metallicmicrolattice": 13.0
+        "energycells": 8.0,
+        "metallicmicrolattice": 10.0
       },
       "closedloop": {
         "energycells": 26.0,
@@ -612,21 +612,21 @@
     ],
     "cost": {
       "default": {
-        "energycells": 28.0,
-        "missilecomponents": 8.0,
+        "energycells": 31.0,
+        "missilecomponents": 9.0,
         "smartchips": 4.0
       },
       "xenon": {
-        "energycells": 9.0,
-        "ore": 4.0,
+        "energycells": 10.0,
+        "ore": 5.0,
         "silicon": 3.0
       },
       "terran": {
-        "energycells": 9.0,
-        "metallicmicrolattice": 12.0
+        "energycells": 10.0,
+        "metallicmicrolattice": 13.0
       },
       "closedloop": {
-        "energycells": 34.0,
+        "energycells": 37.0,
         "hullparts": 1.0
       }
     },
@@ -729,7 +729,7 @@
     ],
     "cost": {
       "default": {
-        "energycells": 10.0,
+        "energycells": 12.0,
         "missilecomponents": 5.0
       },
       "xenon": {
@@ -812,7 +812,7 @@
     ],
     "cost": {
       "default": {
-        "energycells": 13.0,
+        "energycells": 12.0,
         "missilecomponents": 4.0,
         "smartchips": 2.0
       },
@@ -823,10 +823,10 @@
       },
       "terran": {
         "energycells": 4.0,
-        "metallicmicrolattice": 6.0
+        "metallicmicrolattice": 5.0
       },
       "closedloop": {
-        "energycells": 22.0
+        "energycells": 21.0
       }
     },
     "amount": 1,
@@ -930,21 +930,21 @@
     ],
     "cost": {
       "default": {
-        "energycells": 12.0,
-        "missilecomponents": 3.0,
+        "energycells": 14.0,
+        "missilecomponents": 4.0,
         "smartchips": 2.0
       },
       "xenon": {
-        "energycells": 4.0,
+        "energycells": 5.0,
         "ore": 2.0,
         "silicon": 1.0
       },
       "terran": {
-        "energycells": 4.0,
-        "metallicmicrolattice": 5.0
+        "energycells": 5.0,
+        "metallicmicrolattice": 6.0
       },
       "closedloop": {
-        "energycells": 21.0
+        "energycells": 23.0
       }
     },
     "amount": 1,

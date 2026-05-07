@@ -4124,88 +4124,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 11
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 12
-        },
-        {
-          "ref": "sphere_tiny_ore_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_tiny_silicon_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 3000000,
-          "respawn": 2863636,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 3650000,
-          "respawn": 2861905,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 500,
-          "respawn": 600,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 6150000,
-          "respawn": 6163203,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3350000,
-          "respawn": 3249351,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -4426,108 +4346,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ice_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ice_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_methane_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_methane_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 9
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 11
-        },
-        {
-          "ref": "sphere_tiny_ore_veryhigh",
-          "amount": 9
-        },
-        {
-          "ref": "sphere_tiny_rawscrap_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_silicon_low",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_tiny_silicon_veryhigh",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 100000,
-          "respawn": 150000,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 800000,
-          "respawn": 845455,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 250000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 65000,
-          "respawn": 115714,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 5900000,
-          "respawn": 5828571,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 15000,
-          "respawn": 30000,
-          "rating": 3
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 3909091,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -4687,70 +4507,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_tiny_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_low",
-          "amount": 9
-        },
-        {
-          "ref": "sphere_small_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_tiny_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_low",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_silicon_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_tiny_silicon_veryhigh",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 1500000,
-          "respawn": 1519481,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 1000,
-          "respawn": 800,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 2450000,
-          "respawn": 2750000,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2300000,
-          "respawn": 2650000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -4968,78 +4726,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_tiny_silicon_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 900000,
-          "respawn": 1028571,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 5750000,
-          "respawn": 4452381,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4200000,
-          "respawn": 3664286,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2450000,
-          "respawn": 2420779,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_45_sector001_macro"
@@ -5177,58 +4865,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ice_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_tiny_silicon_high",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 350000,
-          "respawn": 364286,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 1000,
-          "respawn": 800,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 250000,
-          "respawn": 214286,
-          "rating": 4
-        },
-        {
-          "ware": "silicon",
-          "reserve": 250000,
-          "respawn": 390476,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_16_sector001_macro"
@@ -5624,86 +5262,8 @@
       },
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 10
-        },
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_nividium_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 11
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 12500000,
-          "respawn": 9545455,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 6500000,
-          "respawn": 5103896,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 10000,
-          "respawn": 5217,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 13000000,
-          "respawn": 10207792,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -5964,28 +5524,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 11
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 9250000,
-          "respawn": 7547619,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -6159,74 +5699,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ore_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_silicon_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_helium_low",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 100000,
-          "respawn": 171429,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 850000,
-          "respawn": 968182,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 250000,
-          "respawn": 214286,
-          "rating": 4
-        },
-        {
-          "ware": "nividium",
-          "reserve": 1500,
-          "respawn": 818,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 100000,
-          "respawn": 171429,
-          "rating": 4
-        },
-        {
-          "ware": "silicon",
-          "reserve": 75000,
-          "respawn": 150000,
-          "rating": 4
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -6401,48 +5875,8 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_verylow",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 150000,
-          "respawn": 150000,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1250000,
-          "respawn": 1071429,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 200000,
-          "respawn": 300000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -6557,28 +5991,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 5000000,
-          "respawn": 3904762,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -6910,56 +6324,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 5500000,
-          "respawn": 4800866,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 15000,
-          "respawn": 6429,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3250000,
-          "respawn": 2493506,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_31_sector001_macro",
@@ -7749,66 +7115,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_methane_verylow",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 400000,
-          "respawn": 422727,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1250000,
-          "respawn": 1071429,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 1000000,
-          "respawn": 857143,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 1300000,
-          "respawn": 1217143,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro",
@@ -8348,76 +7656,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_nividium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 2000000,
-          "respawn": 1948052,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 4500000,
-          "respawn": 3857143,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 10000,
-          "respawn": 3529,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 1750000,
-          "respawn": 1500000,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2500000,
-          "respawn": 2435065,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -8964,58 +8204,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ice_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_ice_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 150000,
-          "respawn": 150000,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 300000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 400000,
-          "respawn": 433333,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 200000,
-          "respawn": 300000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -9152,58 +8342,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_ice_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_silicon_high",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 75000,
-          "respawn": 90000,
-          "rating": 3
-        },
-        {
-          "ware": "nividium",
-          "reserve": 500,
-          "respawn": 600,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 550000,
-          "respawn": 664286,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 500000,
-          "respawn": 566667,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -9444,64 +8584,8 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 4750000,
-          "respawn": 3829004,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3800000,
-          "respawn": 2851515,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 2928571,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_17_sector001_macro": {
@@ -9681,82 +8765,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_nividium_veryhigh",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "methane",
-          "reserve": 6500000,
-          "respawn": 5000000,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 70000,
-          "respawn": 19143,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 7100000,
-          "respawn": 5019048,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 7500000,
-          "respawn": 5952381,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -10154,104 +9164,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_methane_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_silicon_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_helium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_helium_low",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 55000,
-          "respawn": 110000,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 350000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 750000,
-          "respawn": 759740,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 350000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 500,
-          "respawn": 600,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 125000,
-          "respawn": 175714,
-          "rating": 4
-        },
-        {
-          "ware": "silicon",
-          "reserve": 170000,
-          "respawn": 270000,
-          "rating": 4
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro",
         "cluster_20_sector001_macro",
@@ -10486,82 +9400,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_verylow",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_ore_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_helium_high",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 250000,
-          "respawn": 366667,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 350000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 50000,
-          "respawn": 100000,
-          "rating": 4
-        },
-        {
-          "ware": "nividium",
-          "reserve": 500,
-          "respawn": 600,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 200000,
-          "respawn": 216667,
-          "rating": 4
-        },
-        {
-          "ware": "silicon",
-          "reserve": 250000,
-          "respawn": 214286,
-          "rating": 4
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -10698,86 +9538,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_methane_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_tiny_silicon_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 150000,
-          "respawn": 150000,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 600000,
-          "respawn": 600000,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 150000,
-          "respawn": 216667,
-          "rating": 4
-        },
-        {
-          "ware": "nividium",
-          "reserve": 1000,
-          "respawn": 800,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 750000,
-          "respawn": 761905,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 750000,
-          "respawn": 750000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -11219,80 +9981,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_rawscrap_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_rawscrap_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_silicon_medium",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 800000,
-          "respawn": 845455,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 500,
-          "respawn": 600,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 825000,
-          "respawn": 908182,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 2250000,
-          "respawn": 2067100,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 450000,
-          "respawn": 514286,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -11444,46 +10134,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 5750000,
-          "respawn": 3642191,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 6000000,
-          "respawn": 4351648,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -12423,96 +11075,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ice_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_tiny_ice_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_tiny_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_silicon_verylow",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 200000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1500000,
-          "respawn": 1519481,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 440000,
-          "respawn": 690000,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 50000,
-          "respawn": 85714,
-          "rating": 3
-        },
-        {
-          "ware": "nividium",
-          "reserve": 1500,
-          "respawn": 818,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 700000,
-          "respawn": 900000,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 575000,
-          "respawn": 578571,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro",
@@ -12765,74 +11329,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 7450000,
-          "respawn": 4983983,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 7000000,
-          "respawn": 5523810,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 250000,
-          "respawn": 214286,
-          "rating": 4
-        },
-        {
-          "ware": "silicon",
-          "reserve": 8500000,
-          "respawn": 6116883,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro"
@@ -12981,64 +11479,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 5750000,
-          "respawn": 4547619,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 7500000,
-          "respawn": 5857143,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5750000,
-          "respawn": 4547619,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro"
@@ -13217,60 +11659,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_nividium_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_nividium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 5250000,
-          "respawn": 4119048,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 205000,
-          "respawn": 45588,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3250000,
-          "respawn": 2675325,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -13429,78 +11819,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_verylow",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_nividium_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ore_verylow",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 3750000,
-          "respawn": 3214286,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 190000,
-          "respawn": 41429,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3250000,
-          "respawn": 2961039,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 3220779,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -13685,104 +12005,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_helium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_helium_low",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 125000,
-          "respawn": 175714,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1400000,
-          "respawn": 1800000,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 2000000,
-          "respawn": 2123377,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 2000000,
-          "respawn": 2123377,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 10000,
-          "respawn": 4286,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3750000,
-          "respawn": 3623377,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2250000,
-          "respawn": 2220779,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -14075,90 +12299,8 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 400000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1250000,
-          "respawn": 1568182,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 4000000,
-          "respawn": 3428571,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 30000,
-          "respawn": 8000,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 2000000,
-          "respawn": 2006494,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2500000,
-          "respawn": 2493506,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -14669,96 +12811,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_methane_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_nividium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_medium",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 250000,
-          "respawn": 214286,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 400000,
-          "respawn": 600000,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 300000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 35000,
-          "respawn": 74000,
-          "rating": 3
-        },
-        {
-          "ware": "nividium",
-          "reserve": 6000,
-          "respawn": 2704,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 1000000,
-          "respawn": 1200000,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 1250000,
-          "respawn": 1392857,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_31_sector001_macro",
@@ -15070,38 +13124,8 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 9
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_rawscrap_verylow",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 8250000,
-          "respawn": 6214286,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 75000,
-          "respawn": 90000,
-          "rating": 3
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_32_sector001_macro": {
@@ -15464,88 +13488,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_rawscrap_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 7
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 7000000,
-          "respawn": 5523810,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 25000,
-          "respawn": 9762,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 8000000,
-          "respawn": 5454545,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 25000,
-          "respawn": 50000,
-          "rating": 3
-        },
-        {
-          "ware": "silicon",
-          "reserve": 6000000,
-          "respawn": 4980519,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -15732,52 +13676,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 9
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 1300000,
-          "respawn": 1390909,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 5800000,
-          "respawn": 4438095,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 3740260,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -16022,30 +13922,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_rawscrap_low",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 300000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 150000,
-          "respawn": 150000,
-          "rating": 4
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_34_sector001_macro": {
@@ -16485,78 +14363,8 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 550000,
-          "respawn": 664286,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 2750000,
-          "respawn": 2415584,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 1950000,
-          "respawn": 1618182,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3300000,
-          "respawn": 2745455,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_36_sector001_macro": {
@@ -16713,64 +14521,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_verylow",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 4500000,
-          "respawn": 3476190,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4750000,
-          "respawn": 4071429,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4750000,
-          "respawn": 3785714,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro"
@@ -17010,52 +14762,8 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 10
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "methane",
-          "reserve": 2000000,
-          "respawn": 1948052,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 2750000,
-          "respawn": 2590909,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3500000,
-          "respawn": 3233766,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_38_sector001_macro": {
@@ -17201,98 +14909,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 9
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_nividium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_nividium_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 1650000,
-          "respawn": 1718182,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 6500000,
-          "respawn": 5571429,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 750000,
-          "respawn": 701299,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 42500,
-          "respawn": 17008,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3000000,
-          "respawn": 2863636,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2000000,
-          "respawn": 1714286,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_37_sector001_macro"
       ]
@@ -17617,60 +15235,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "nividium",
-          "reserve": 13000,
-          "respawn": 5922,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 7750000,
-          "respawn": 6166667,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4500000,
-          "respawn": 3768398,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -17823,46 +15389,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 6000000,
-          "respawn": 4857143,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3250000,
-          "respawn": 2493506,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -18294,64 +15822,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_rawscrap_low",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_tiny_rawscrap_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 3500000,
-          "respawn": 2474026,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 4950000,
-          "respawn": 3509524,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4000000,
-          "respawn": 3186147,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -18499,78 +15971,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_nividium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 5500000,
-          "respawn": 4471861,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 30000,
-          "respawn": 10952,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 7250000,
-          "respawn": 5279221,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4500000,
-          "respawn": 3556277,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_45_sector001_macro"
       ]
@@ -18785,78 +16187,8 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_rawkhaakscrap_verylow",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_rawkhaakscrap_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_rawscrap_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_rawscrap_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_rawscrap_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 5000000,
-          "respawn": 4467532,
-          "rating": 5
-        },
-        {
-          "ware": "rawkhaakscrap",
-          "reserve": 65000,
-          "respawn": 130000,
-          "rating": 4
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 7950000,
-          "respawn": 5776190,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4250000,
-          "respawn": 3175325,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_46_sector001_macro": {
@@ -18991,106 +16323,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_nividium_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_helium_low",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 265000,
-          "respawn": 244286,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1000000,
-          "respawn": 1032468,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 6250000,
-          "respawn": 4976190,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 105000,
-          "respawn": 33176,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 5750000,
-          "respawn": 4452381,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4000000,
-          "respawn": 3142857,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -19242,116 +16476,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_methane_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 400000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 550000,
-          "respawn": 664286,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 2750000,
-          "respawn": 2023810,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 350000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 95000,
-          "respawn": 26286,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3000000,
-          "respawn": 2380952,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5000000,
-          "respawn": 3904762,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -19516,96 +16642,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_rawkhaakscrap_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_rawkhaakscrap_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_rawscrap_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 10
-        },
-        {
-          "ref": "sphere_small_rawscrap_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 4750000,
-          "respawn": 3785714,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3500000,
-          "respawn": 3043290,
-          "rating": 5
-        },
-        {
-          "ware": "rawkhaakscrap",
-          "reserve": 65000,
-          "respawn": 115714,
-          "rating": 4
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 4250000,
-          "respawn": 3627706,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5300000,
-          "respawn": 3723810,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -19738,96 +16776,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_methane_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_verylow",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 8
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 350000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 5750000,
-          "respawn": 4642857,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 1550000,
-          "respawn": 1254545,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 7000000,
-          "respawn": 6000000,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 7750000,
-          "respawn": 5928571,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -19948,74 +16898,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_verylow",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 4000000,
-          "respawn": 3095238,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 30000,
-          "respawn": 10588,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 5250000,
-          "respawn": 4316017,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5300000,
-          "respawn": 3641558,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -20158,82 +17042,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_verylow",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_nividium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 2750000,
-          "respawn": 2590909,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 65000,
-          "respawn": 17085,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3500000,
-          "respawn": 2889610,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 2512987,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -20423,110 +17233,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ore_verylow",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 1250000,
-          "respawn": 1188312,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 3250000,
-          "respawn": 2521645,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 4500000,
-          "respawn": 3571429,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 4500000,
-          "respawn": 3476190,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3000000,
-          "respawn": 2571429,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 1250000,
-          "respawn": 1246753,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_37_sector001_macro"
       ]
@@ -20659,70 +17367,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 4000000,
-          "respawn": 3428571,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 500,
-          "respawn": 600,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 3750000,
-          "respawn": 3119048,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2750000,
-          "respawn": 2166667,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_711_sector001_macro": {
@@ -20853,74 +17499,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_verylow",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_tiny_nividium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 3000000,
-          "respawn": 2805195,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 3500,
-          "respawn": 1400,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 2500000,
-          "respawn": 2164502,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3500000,
-          "respawn": 2809524,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_712_sector001_macro": {
@@ -21067,70 +17647,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 3000000,
-          "respawn": 2103896,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 15000,
-          "respawn": 6429,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3000000,
-          "respawn": 2279221,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3500000,
-          "respawn": 2474026,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_713_sector001_macro": {
@@ -21292,110 +17810,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 1500000,
-          "respawn": 1461039,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1700000,
-          "respawn": 1557576,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 4900000,
-          "respawn": 3552381,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 3000000,
-          "respawn": 2103896,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4750000,
-          "respawn": 3370130,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 6250000,
-          "respawn": 4547619,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_714_sector001_macro": {
@@ -21755,110 +18171,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_verylow",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 1750000,
-          "respawn": 1580087,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 2250000,
-          "respawn": 1833333,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 1750000,
-          "respawn": 1463203,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 20000,
-          "respawn": 8571,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4000000,
-          "respawn": 3142857,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4500000,
-          "respawn": 3857143,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_720_sector001_macro": {
@@ -22024,80 +18338,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_tiny_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_rawscrap_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_tiny_rawscrap_veryhigh",
-          "amount": 7
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 200000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 350000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 200000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 2500000,
-          "respawn": 2448052,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 2700000,
-          "respawn": 2706494,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -22243,110 +18485,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 8
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 1100000,
-          "respawn": 993074,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 3750000,
-          "respawn": 3220779,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 3250000,
-          "respawn": 2595238,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 5000,
-          "respawn": 2143,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 6250000,
-          "respawn": 4738095,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 7500000,
-          "respawn": 6047619,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_722_sector001_macro": {
@@ -22720,66 +18860,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_tiny_methane_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "methane",
-          "reserve": 10000,
-          "respawn": 24000,
-          "rating": 2
-        },
-        {
-          "ware": "nividium",
-          "reserve": 10000,
-          "respawn": 4286,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4150000,
-          "respawn": 3296970,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4500000,
-          "respawn": 3922078,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_723_sector001_macro": {
@@ -22923,24 +19005,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 5800000,
-          "respawn": 4438095,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_724_sector001_macro": {
@@ -23070,70 +19136,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_rawkhaakscrap_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_rawkhaakscrap_verylow",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_rawscrap_verylow",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 1200000,
-          "respawn": 1268182,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 5500000,
-          "respawn": 4428571,
-          "rating": 5
-        },
-        {
-          "ware": "rawkhaakscrap",
-          "reserve": 70000,
-          "respawn": 148000,
-          "rating": 4
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 1750000,
-          "respawn": 1500000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_725_sector001_macro": {
@@ -23321,82 +19325,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 100000,
-          "respawn": 150000,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 200000,
-          "respawn": 304762,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 200000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 500,
-          "respawn": 600,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 1750000,
-          "respawn": 1792208,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 1950000,
-          "respawn": 1735714,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro"
@@ -23746,106 +19676,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_hydrogen_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_nividium_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 550000,
-          "respawn": 533333,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1500000,
-          "respawn": 1461039,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 1000000,
-          "respawn": 761905,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 17500,
-          "respawn": 8199,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 5500000,
-          "respawn": 4238095,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 2928571,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -24008,64 +19840,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 3500000,
-          "respawn": 2532468,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4250000,
-          "respawn": 3357143,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5000000,
-          "respawn": 3904762,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_403_sector001_macro": {
@@ -25682,64 +21458,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 3000000,
-          "respawn": 2337662,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3400000,
-          "respawn": 2552381,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4250000,
-          "respawn": 3116883,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -25917,82 +21637,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 2500000,
-          "respawn": 2069264,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 8450000,
-          "respawn": 5841126,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 6000000,
-          "respawn": 4675325,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 6750000,
-          "respawn": 5084416,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_412_sector001_macro": {
@@ -26153,82 +21799,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_helium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 2850000,
-          "respawn": 2185714,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 2500000,
-          "respawn": 1792208,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 3750000,
-          "respawn": 2928571,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 4500000,
-          "respawn": 3038961,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_413_sector001_macro": {
@@ -26363,82 +21935,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_helium_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 3250000,
-          "respawn": 2500000,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 5750000,
-          "respawn": 4051948,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 4500000,
-          "respawn": 3476190,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 8250000,
-          "respawn": 5785714,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_414_sector001_macro": {
@@ -26584,28 +22082,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_rawscrap_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_rawscrap_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_rawscrap_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "rawscrap",
-          "reserve": 5550000,
-          "respawn": 4089610,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_415_sector001_macro": {
@@ -26781,96 +22259,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 2700000,
-          "respawn": 1830303,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 3500000,
-          "respawn": 2794372,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 10500,
-          "respawn": 4886,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 5250000,
-          "respawn": 4214286,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 6000000,
-          "respawn": 4441558,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_416_sector001_macro": {
@@ -27222,28 +22612,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 11450000,
-          "respawn": 6973993,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_417_sector001_macro": {
@@ -27573,136 +22943,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_hydrogen_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_hydrogen_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ice_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_methane_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_tiny_nividium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_rawkhaakscrap_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_rawkhaakscrap_verylow",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_rawscrap_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_tiny_rawscrap_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 100000,
-          "respawn": 150000,
-          "rating": 4
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 250000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 1000000,
-          "respawn": 1178571,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 150000,
-          "respawn": 257143,
-          "rating": 4
-        },
-        {
-          "ware": "nividium",
-          "reserve": 3500,
-          "respawn": 1400,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 4250000,
-          "respawn": 3175325,
-          "rating": 5
-        },
-        {
-          "ware": "rawkhaakscrap",
-          "reserve": 45000,
-          "respawn": 98000,
-          "rating": 3
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 1200000,
-          "respawn": 1309524,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2500000,
-          "respawn": 2069264,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_419_sector001_macro": {
@@ -28041,38 +23283,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 3000000,
-          "respawn": 2571429,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 1950000,
-          "respawn": 1735714,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -28253,24 +23465,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_rawscrap_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_rawscrap_medium",
-          "amount": 1
-        }
-      ],
-      "resources": [
-        {
-          "ware": "rawscrap",
-          "reserve": 250000,
-          "respawn": 300000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -28433,52 +23629,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 7
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 3950000,
-          "respawn": 2919048,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3250000,
-          "respawn": 2785714,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2750000,
-          "respawn": 2766234,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -29147,46 +24299,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 5400000,
-          "respawn": 3426840,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5750000,
-          "respawn": 4357143,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_425_sector001_macro": {
@@ -29303,46 +24417,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 3250000,
-          "respawn": 2961039,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4100000,
-          "respawn": 2763636,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_100_sector001_macro": {
@@ -29497,132 +24573,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_nividium_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 5750000,
-          "respawn": 4127706,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 5750000,
-          "respawn": 5015152,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 6950000,
-          "respawn": 5204762,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 5500000,
-          "respawn": 4471861,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 26000,
-          "respawn": 10543,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 6250000,
-          "respawn": 5015152,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5750000,
-          "respawn": 4642857,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -30412,28 +25364,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 7
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 7500000,
-          "respawn": 5668831,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_107_sector001_macro": {
@@ -30938,46 +25870,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 9
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_large_methane_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_methane_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 8000000,
-          "respawn": 6155844,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 5600000,
-          "respawn": 4114286,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_108_sector003_macro": {
@@ -31120,96 +26014,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 9
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_ice_verylow",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ice_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 4300000,
-          "respawn": 2784416,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 4500000,
-          "respawn": 3958874,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 3750000,
-          "respawn": 3321429,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4250000,
-          "respawn": 3166667,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 6000000,
-          "respawn": 4761905,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_109_sector001_macro": {
@@ -31502,46 +26308,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_helium_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 3750000,
-          "respawn": 2928571,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 6500000,
-          "respawn": 5095238,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_111_sector001_macro": {
@@ -31879,110 +26647,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_methane_verylow",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_helium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 2750000,
-          "respawn": 2400433,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 3000000,
-          "respawn": 2556277,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 4500000,
-          "respawn": 3857143,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 30000,
-          "respawn": 8000,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4400000,
-          "respawn": 3037229,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5750000,
-          "respawn": 4285714,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -32130,114 +26796,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_nividium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 4250000,
-          "respawn": 2941558,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 4500000,
-          "respawn": 3768398,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 4500000,
-          "respawn": 3740260,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 35000,
-          "respawn": 12731,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4550000,
-          "respawn": 3245455,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4750000,
-          "respawn": 3829004,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -32411,132 +26971,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_methane_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_methane_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 3250000,
-          "respawn": 2493506,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 2250000,
-          "respawn": 1854978,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 5000000,
-          "respawn": 3904762,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 1450000,
-          "respawn": 1482468,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 6500,
-          "respawn": 2961,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 4500000,
-          "respawn": 3389610,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5000000,
-          "respawn": 3876623,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -32721,106 +27157,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_helium_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 1700000,
-          "respawn": 1813636,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 4000000,
-          "respawn": 2844156,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 2500000,
-          "respawn": 1733766,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 15000,
-          "respawn": 4000,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 5500000,
-          "respawn": 4333333,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 7250000,
-          "respawn": 5642857,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -33165,132 +27503,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_methane_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_nividium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 9
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_helium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 3500000,
-          "respawn": 2809524,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 8250000,
-          "respawn": 5335498,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 4750000,
-          "respawn": 3982684,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 6650000,
-          "respawn": 4264502,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 55000,
-          "respawn": 16286,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 6250000,
-          "respawn": 5502165,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 7250000,
-          "respawn": 5738095,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_500_sector001_macro": {
@@ -33485,128 +27699,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_methane_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_tiny_nividium_veryhigh",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 6750000,
-          "respawn": 5084416,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 4250000,
-          "respawn": 3554113,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 6500000,
-          "respawn": 5409091,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 5300000,
-          "respawn": 3641558,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 5000,
-          "respawn": 1667,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 5000000,
-          "respawn": 3251082,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5100000,
-          "respawn": 3503896,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -33762,128 +27856,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ice_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ice_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_tiny_nividium_high",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 7100000,
-          "respawn": 4809091,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 7100000,
-          "respawn": 4750649,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 8150000,
-          "respawn": 4869231,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 6000000,
-          "respawn": 4207792,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 3500,
-          "respawn": 1400,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 5250000,
-          "respawn": 3699134,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4100000,
-          "respawn": 3019048,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -34053,118 +28027,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_methane_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_medium",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 7250000,
-          "respawn": 4945887,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 8450000,
-          "respawn": 5841126,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 9800000,
-          "respawn": 6464069,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 5900000,
-          "respawn": 3812121,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4050000,
-          "respawn": 3505195,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 2734848,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -34366,100 +28230,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_large_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_nividium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 10
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 10
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 4050000,
-          "respawn": 2803896,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 6600000,
-          "respawn": 5248485,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 45000,
-          "respawn": 14952,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 6750000,
-          "respawn": 5435065,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4500000,
-          "respawn": 4207792,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_45_sector001_macro"
@@ -34641,28 +28413,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 9
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 8600000,
-          "respawn": 6590476,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -34836,94 +28588,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_tiny_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_ore_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_rawscrap_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_silicon_medium",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 6750000,
-          "respawn": 5681818,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 5750000,
-          "respawn": 4461039,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 1000,
-          "respawn": 800,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 250000,
-          "respawn": 300000,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 2000000,
-          "respawn": 2006494,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 200000,
-          "respawn": 300000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -35046,66 +28712,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_veryhigh",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_nividium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_veryhigh",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 8250000,
-          "respawn": 4500000,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 15000,
-          "respawn": 6286,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 6750000,
-          "respawn": 3681818,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 6750000,
-          "respawn": 3681818,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_601_sector001_macro": {
@@ -35236,100 +28844,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_helium_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 2500000,
-          "respawn": 2069264,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 4050000,
-          "respawn": 2803896,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 2250000,
-          "respawn": 1811688,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 6500000,
-          "respawn": 4870130,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4900000,
-          "respawn": 3465801,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -35493,46 +29009,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 4000000,
-          "respawn": 3238095,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 2928571,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -35707,64 +29185,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_hydrogen_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 7
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 2800000,
-          "respawn": 1966234,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 6750000,
-          "respawn": 4598901,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 7000000,
-          "respawn": 5298701,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -35913,20 +29335,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_rawscrap_low",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "rawscrap",
-          "reserve": 1500000,
-          "respawn": 1000000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -36205,40 +29615,8 @@
       },
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_small_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_silicon_medium",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "nividium",
-          "reserve": 2500,
-          "respawn": 1304,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 150000,
-          "respawn": 150000,
-          "rating": 4
-        },
-        {
-          "ware": "silicon",
-          "reserve": 300000,
-          "respawn": 450000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_606_sector001_macro": {
@@ -36906,28 +30284,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_helium_high",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_helium_veryhigh",
-          "amount": 9
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 8500000,
-          "respawn": 6251082,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_606_sector003_macro": {
@@ -37372,82 +30730,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 8
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_methane_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_methane_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 4000000,
-          "respawn": 3471861,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 4500000,
-          "respawn": 3155844,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4000000,
-          "respawn": 3186147,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4750000,
-          "respawn": 3136364,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_608_sector001_macro": {
@@ -37719,56 +31003,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_hydrogen_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_hydrogen_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "hydrogen",
-          "reserve": 7650000,
-          "respawn": 5121645,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4750000,
-          "respawn": 4071429,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4750000,
-          "respawn": 4071429,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_609_sector001_macro": {
@@ -38044,64 +31280,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_helium_low",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_verylow",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 4750000,
-          "respawn": 3733766,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 3750000,
-          "respawn": 3023810,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4000000,
-          "respawn": 3779221,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_701_sector001_macro": {
@@ -38431,112 +31611,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_hydrogen_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_tiny_methane_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_tiny_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_high",
-          "amount": 6
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 500000,
-          "respawn": 428571,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 1250000,
-          "respawn": 1188312,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 3750000,
-          "respawn": 2833333,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 500000,
-          "respawn": 650000,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 500,
-          "respawn": 600,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 3750000,
-          "respawn": 3023810,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 4000000,
-          "respawn": 3493506,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -38710,124 +31786,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_helium_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_helium_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_hydrogen_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_hydrogen_medium",
-          "amount": 7
-        },
-        {
-          "ref": "sphere_small_hydrogen_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_methane_verylow",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_methane_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_methane_high",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_tiny_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_silicon_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 1750000,
-          "respawn": 1675325,
-          "rating": 5
-        },
-        {
-          "ware": "hydrogen",
-          "reserve": 3250000,
-          "respawn": 2690476,
-          "rating": 5
-        },
-        {
-          "ware": "ice",
-          "reserve": 3500000,
-          "respawn": 2948052,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 3750000,
-          "respawn": 3564935,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 1000,
-          "respawn": 800,
-          "rating": 3
-        },
-        {
-          "ware": "ore",
-          "reserve": 2000000,
-          "respawn": 1794372,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 2000000,
-          "respawn": 1619048,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_704_sector001_macro": {
@@ -39010,56 +31970,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_low",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 2250000,
-          "respawn": 1833333,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 2500,
-          "respawn": 1304,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 4250000,
-          "respawn": 3452381,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_45_sector001_macro"
       ]
@@ -39216,74 +32128,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_large_ice_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ice_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_nividium_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 6
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 4
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 5750000,
-          "respawn": 4227273,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 2500,
-          "respawn": 1304,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 5500000,
-          "respawn": 3779221,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 5250000,
-          "respawn": 3798701,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_706_sector001_macro": {
@@ -39424,60 +32270,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_ice_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ice_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_large_silicon_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_silicon_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_silicon_veryhigh",
-          "amount": 2
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 3050000,
-          "respawn": 2414286,
-          "rating": 5
-        },
-        {
-          "ware": "ore",
-          "reserve": 4250000,
-          "respawn": 3175325,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 3750000,
-          "respawn": 2512987,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -39614,70 +32408,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_rawkhaakscrap_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_tiny_rawkhaakscrap_verylow",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_large_rawscrap_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_rawscrap_high",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_medium_silicon_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_small_silicon_medium",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ore",
-          "reserve": 1250000,
-          "respawn": 1246753,
-          "rating": 5
-        },
-        {
-          "ware": "rawkhaakscrap",
-          "reserve": 70000,
-          "respawn": 148000,
-          "rating": 4
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 2750000,
-          "respawn": 2006494,
-          "rating": 5
-        },
-        {
-          "ware": "silicon",
-          "reserve": 450000,
-          "respawn": 600000,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_730_sector001_macro": {
@@ -39810,58 +32542,8 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_medium_ice_verylow",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ice_high",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_methane_medium",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_small_nividium_verylow",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 2
-        },
-        {
-          "ref": "sphere_small_ore_high",
-          "amount": 3
-        }
-      ],
-      "resources": [
-        {
-          "ware": "ice",
-          "reserve": 1125000,
-          "respawn": 1268182,
-          "rating": 5
-        },
-        {
-          "ware": "methane",
-          "reserve": 300000,
-          "respawn": 450000,
-          "rating": 5
-        },
-        {
-          "ware": "nividium",
-          "reserve": 1500,
-          "respawn": 1059,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 1250000,
-          "respawn": 1246753,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_740_sector001_macro": {
@@ -39980,56 +32662,8 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [
-        {
-          "ref": "sphere_small_helium_medium",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_large_ore_verylow",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_medium_ore_medium",
-          "amount": 5
-        },
-        {
-          "ref": "sphere_small_ore_veryhigh",
-          "amount": 3
-        },
-        {
-          "ref": "sphere_large_rawscrap_low",
-          "amount": 1
-        },
-        {
-          "ref": "sphere_medium_rawscrap_medium",
-          "amount": 4
-        },
-        {
-          "ref": "sphere_small_rawscrap_high",
-          "amount": 5
-        }
-      ],
-      "resources": [
-        {
-          "ware": "helium",
-          "reserve": 100000,
-          "respawn": 150000,
-          "rating": 4
-        },
-        {
-          "ware": "ore",
-          "reserve": 3500000,
-          "respawn": 3000000,
-          "rating": 5
-        },
-        {
-          "ware": "rawscrap",
-          "reserve": 2750000,
-          "respawn": 2554113,
-          "rating": 5
-        }
-      ],
+      "regions": [],
+      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
