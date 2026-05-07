@@ -573,13 +573,10 @@ export function computeBuildFlowPlan(
   const resolvedModulesByGroupId = new Map<string, SavedModule[]>()
   const lineResultsByGroupId = new Map<string, ComputeLineResult>()
   const linesByGroupId = new Map<string, PreviewLinePlan>()
-  const graphLineIds: string[] = []
 
   for (const line of preview.lines) {
     if (!line.groupId) continue
-    if (!graph.nodes.has(line.groupId)) continue
     linesByGroupId.set(line.groupId, line)
-    graphLineIds.push(line.groupId)
   }
 
   seedResolvedModulesFromTargets(
@@ -593,15 +590,20 @@ export function computeBuildFlowPlan(
     settings,
   )
 
-  if (graphLineIds.length > 0) {
-    const order = buildTopologicalOrder(graph).flatMap(entry => Array.isArray(entry) ? entry : [entry])
-      .filter(groupId => linesByGroupId.has(groupId))
+  const graphOrder = buildTopologicalOrder(graph).flatMap(entry => Array.isArray(entry) ? entry : [entry])
+    .filter(groupId => linesByGroupId.has(groupId))
+  const fallbackOrder = preview.lines
+    .map(line => line.groupId)
+    .filter((groupId): groupId is string => Boolean(groupId))
+  const iterationOrder = graphOrder.length > 0 ? graphOrder : fallbackOrder
+
+  if (iterationOrder.length > 0) {
     let iterations = 60
 
     while (iterations-- > 0) {
       let stable = true
 
-      for (const groupId of order) {
+      for (const groupId of iterationOrder) {
         const previewLine = linesByGroupId.get(groupId)
         if (!previewLine) continue
 
@@ -1099,6 +1101,7 @@ function buildGoalsFromResponsibilities(
   for (const [wareId, kinds] of wareKinds) {
     const ratePerHour = targetRates[wareId] || 0
     if (kinds.hasDerivedProduction) {
+      if (ratePerHour <= 0) continue
       goals.push({
         type: 'derived-production',
         wareId,
@@ -1107,6 +1110,7 @@ function buildGoalsFromResponsibilities(
       continue
     }
     if (kinds.hasDerivedBuildMaterial) {
+      if (ratePerHour <= 0) continue
       goals.push({
         type: 'derived-build-material',
         wareId,

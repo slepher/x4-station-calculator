@@ -1,6 +1,7 @@
 import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { deriveBuildFlowView, computeVirtualEdges } from '@/store/logic/buildFlowDerivation'
+import { hydrateSavedFlowGroups } from '@/store/logic/hydrateSavedFlowGroups'
 import { computeWareSatisfactions } from '@/store/logic/calculateBuildFlowPlan'
 import {
   createBuildFlowPlanPreview,
@@ -8,7 +9,7 @@ import {
   DEFAULT_BUILD_PLAN_SETTINGS,
 } from '@/store/logic/buildPlanProductionLine'
 import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup, PreviewResult, ProductionLineAllocation } from '@/types/build-plan'
-import type { X4Module, X4Ware, ProductionLineGroup, FlowNode, SavedFlowGroup, BuildFlowAssignment, VirtualEdge, SavedModule } from '@/types/x4'
+import type { X4Module, X4Ware, ProductionLineGroup, SavedFlowGroup, BuildFlowAssignment } from '@/types/x4'
 
 const WARE_DATA = JSON.parse(readFileSync(resolve('src/assets/x4_game_data/8.0-Diplomacy/data/wares.json'), 'utf-8'))
 const MOD_DATA = JSON.parse(readFileSync(resolve('src/assets/x4_game_data/8.0-Diplomacy/data/modules.json'), 'utf-8'))
@@ -40,6 +41,28 @@ const settings = {
 function modName(id: string): string { const m = modulesMap[id]; return m?.name || id }
 function wareName(id: string): string { const w = waresMap[id]; return w?.name || id }
 
+function printModuleDetailsSection(
+  title: string,
+  moduleDetails: Array<{
+    moduleId: string
+    count: number
+    buildTime: number
+    materials: Record<string, number>
+  }>,
+) {
+  if (moduleDetails.length === 0) return
+  console.log(`     ├─ ${title}:`)
+  for (const md of moduleDetails) {
+    const timeStr = md.buildTime > 0 ? `  (建筑 ${md.buildTime}s × ${md.count} = ${md.buildTime * md.count}s)` : ''
+    console.log(`     │   ${modName(md.moduleId)} ×${md.count}${timeStr}`)
+    const matEntries = Object.entries(md.materials).filter(([, qty]) => qty > 0)
+    if (matEntries.length > 0) {
+      const matStr = matEntries.map(([w, qty]) => `${wareName(w)} ${Math.round(qty)}`).join(', ')
+      console.log(`     │     BuildCost: ${matStr}`)
+    }
+  }
+}
+
 function resolveModuleId(name: string): string | null {
   const key = name.toLowerCase().replace(/\s+/g, '')
   for (const m of MOD_DATA) {
@@ -56,46 +79,6 @@ function resolveWareId(name: string): string | null {
   }
   const partial = WARE_DATA.find((w: any) => w.name.toLowerCase().includes(name.toLowerCase()))
   return partial?.id || null
-}
-
-let nodeIdCounter = 0
-
-function deserializePlan(savedGroups: SavedFlowGroup[]): ProductionLineGroup[] {
-  return savedGroups.map(savedGroup => {
-    const nodes: FlowNode[] = []
-    for (const savedNode of savedGroup.nodes) {
-      if (savedNode.module) {
-        const mod = modulesMap[savedNode.module]
-        if (!mod) continue
-        const outputWares = Object.keys(mod.outputs || {})
-        const wareId = outputWares.length > 0 ? outputWares[0]! : savedNode.module
-        nodes.push({
-          id: `node_${++nodeIdCounter}`,
-          wareId,
-          moduleId: savedNode.module,
-          race: mod.race || 'argon',
-          lineage: '', column: mod.tier ?? 1,
-          isIsolated: false, isAuto: false, isRoot: true, source: 'manual', order: 0,
-        })
-      } else if (savedNode.isolated) {
-        nodes.push({
-          id: `node_${++nodeIdCounter}`,
-          wareId: savedNode.isolated,
-          race: 'argon', lineage: '', column: 1,
-          isIsolated: true, isAuto: false, isRoot: false, source: 'manual', order: 0,
-        })
-      }
-    }
-    return {
-      id: savedGroup.id,
-      name: savedGroup.name || '',
-      category: savedGroup.category,
-      subCategory: savedGroup.subCategory,
-      isLocked: savedGroup.isLocked ?? false,
-      lockedLineage: savedGroup.lockedLineage || '',
-      nodes,
-    }
-  })
 }
 
 function showHelp() {
@@ -168,7 +151,16 @@ const savedGroups: SavedFlowGroup[] = selectedPlan.groups || []
 const rawAssignments: any[] = selectedPlan.buildFlow?.assignments || []
 const archivedGroupIds: string[] = selectedPlan.buildFlow?.archivedGroupIds || []
 
-const groups = deserializePlan(savedGroups)
+const groups = hydrateSavedFlowGroups(savedGroups, {
+  waresMap,
+  modulesMap,
+  modulesByOutputMap,
+  findModuleForWare: (wareId: string, lineage: string) => {
+    const modules = modulesByOutputMap[wareId] || []
+    const exact = modules.find(mod => mod.race === lineage || mod.method === lineage)
+    return exact || modules[0] || null
+  },
+})
 const assignments: BuildFlowAssignment[] = rawAssignments.map((a: any) => ({
   wareId: a.wareId, sourceGroupId: a.sourceGroupId, targetType: a.targetType || 'output-build-material', targetGroupId: a.targetGroupId,
 }))
@@ -343,16 +335,11 @@ for (const sg of schemeGroups) {
 
     // 模块明细
     if (scheme.moduleBuildDetails && scheme.moduleBuildDetails.length > 0) {
-      console.log(`     ├─ 模块 × 数量:`)
-      for (const md of scheme.moduleBuildDetails) {
-        const timeStr = md.buildTime > 0 ? `  (建筑 ${md.buildTime}s × ${md.count} = ${md.buildTime * md.count}s)` : ''
-        console.log(`     │   ${modName(md.moduleId)} ×${md.count}${timeStr}`)
-        const matEntries = Object.entries(md.materials).filter(([, qty]) => qty > 0)
-        if (matEntries.length > 0) {
-          const matStr = matEntries.map(([w, qty]) => `${wareName(w)} ${Math.round(qty)}`).join(', ')
-          console.log(`     │     BuildCost: ${matStr}`)
-        }
-      }
+      const primarySet = new Set(scheme.primaryModuleIds)
+      const primaryModuleDetails = scheme.moduleBuildDetails.filter(md => primarySet.has(md.moduleId))
+      const derivedModuleDetails = scheme.moduleBuildDetails.filter(md => !primarySet.has(md.moduleId))
+      printModuleDetailsSection('主要模块 × 数量', primaryModuleDetails)
+      printModuleDetailsSection('次要模块 × 数量', derivedModuleDetails)
     }
 
     // 建材汇总
@@ -533,6 +520,8 @@ for (const alloc of lineAllocations) {
   const goalStrs = alloc.goals.map(g => {
     if (g.type === 'production-rate') return `${wareName(g.wareId)} ${g.ratePerHour}/h`
     if (g.type === 'build-module') return `${modName(g.moduleId)} ×${g.count}`
+    if (g.type === 'target-production' && g.moduleId) return `${modName(g.moduleId)} ×${g.count || 1}`
+    if (g.type === 'target-production' && g.wareId) return `${wareName(g.wareId)} ${(g.ratePerHour || 0).toFixed(1)}/h`
     if (g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production')
       return `${wareName(g.wareId)} (${g.type})`
     if (g.type === 'derived-rate') return `${wareName(g.wareId)}(derived) ${g.ratePerHour}/h`
