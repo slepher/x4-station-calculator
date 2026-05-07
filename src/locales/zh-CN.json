@@ -65,7 +65,11 @@
     "target_short": "目标",
     "build_material_short": "建材",
     "production_short": "产出",
-    "required_short": "需求"
+    "required_short": "需求",
+    "new_plan": "新建",
+    "no_plans": "暂无已保存的方案",
+    "default_plan_name": "建造规划",
+    "no_active_plan": "无"
   },
   "sector": {
     "overview": "总览",
@@ -899,7 +903,8 @@
     "flow": "流程",
     "ship": "舰船",
     "save": "存档",
-    "save_binding": "存档绑定"
+    "save_binding": "存档绑定",
+    "build_plan": "建造方案"
   },
   "production": {
     "source_empire": "帝国",

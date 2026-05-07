@@ -65,7 +65,11 @@
     "target_short": "Target",
     "build_material_short": "Mat",
     "production_short": "Prod",
-    "required_short": "Req"
+    "required_short": "Req",
+    "new_plan": "New",
+    "no_plans": "No saved plans",
+    "default_plan_name": "Build Plan",
+    "no_active_plan": "None"
   },
   "sector": {
     "overview": "Overview",
@@ -898,7 +902,8 @@
     "flow": "Flow",
     "ship": "Ship",
     "save": "Save Archive",
-    "save_binding": "Save Binding"
+    "save_binding": "Save Binding",
+    "build_plan": "Build Plan"
   },
   "production": {
     "source_empire": "Empire",

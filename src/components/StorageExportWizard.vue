@@ -7,6 +7,7 @@ import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useBuildPlanStore } from '@/store/useBuildPlanStore'
 import {
   buildExportPayload,
   buildSaveExportData,
@@ -31,6 +32,7 @@ const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
 const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
+const buildPlanStore = useBuildPlanStore()
 
 const currentVersionLabel = computed(() =>
   gameDataStore.displayFullVersion(undefined, undefined, false)
@@ -63,7 +65,8 @@ watch(
       logicFlowStore.savedPlans,
       shipBuildStore.savedBlueprints,
       gameDataStore,
-      saveBindingStore.savedBindings
+      saveBindingStore.savedBindings,
+      buildPlanStore.savedPlans
     )
     
     const saveExportData = await buildSaveExportData(saveStore.savedArchivesState, gameDataStore)
@@ -91,6 +94,8 @@ const moduleTitle = (key: ImportModuleKey) => {
       return t('moduleNames.save')
     case 'x4_save_bindings':
       return t('moduleNames.save_binding')
+    case 'x4_build_plan_goals':
+      return t('moduleNames.build_plan')
     default:
       return key
   }
@@ -112,7 +117,8 @@ const handleDownload = async () => {
     logicFlowStore.savedPlans,
     shipBuildStore.savedBlueprints,
     gameDataStore,
-    saveBindingStore.savedBindings
+    saveBindingStore.savedBindings,
+    buildPlanStore.savedPlans
   )
 
   if (includeSaveArchives.value && saveStore.savedArchivesState.list.length > 0) {

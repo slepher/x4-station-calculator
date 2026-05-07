@@ -158,9 +158,9 @@ const buildPlanPresenter = useBuildPlanPresenter({
         :build-plan="buildPlanPresenter.props.buildPlan.value"
         :loading="buildPlanPresenter.props.loading.value"
         :warnings="buildPlanPresenter.props.warnings.value"
-        :flowPlanName="buildPlanPresenter.props.flowPlanName.value"
-        :activeFlowPlanId="buildPlanPresenter.props.activeFlowPlanId.value"
-        :loadableFlowPlans="buildPlanPresenter.props.loadableFlowPlans.value"
+        :planName="buildPlanPresenter.props.planName.value"
+        :activePlanId="buildPlanPresenter.props.activePlanId.value"
+        :loadablePlanItems="buildPlanPresenter.props.loadablePlanItems.value"
         :allocations="buildPlanPresenter.props.allocations.value"
         :buildMaterialPreviewAllocations="buildPlanPresenter.props.buildMaterialPreviewAllocations.value"
         :productionPreviewAllocations="buildPlanPresenter.props.productionPreviewAllocations.value"
@@ -170,7 +170,10 @@ const buildPlanPresenter = useBuildPlanPresenter({
         @update-goal="buildPlanPresenter.emits.updateGoal"
         @set-build-flow-mode="buildPlanPresenter.emits.setBuildFlowMode"
         @compute-plan="buildPlanPresenter.emits.computePlan"
-        @load-flow-plan="buildPlanPresenter.emits.loadFlowPlan"
+        @create-new-plan="buildPlanPresenter.emits.createNewPlan"
+        @switch-plan="buildPlanPresenter.emits.switchPlan"
+        @delete-plan="buildPlanPresenter.emits.deletePlan"
+        @set-plan-name="buildPlanPresenter.emits.setPlanName"
       />
     </div>
     <div class="col-span-12 lg:col-span-4">

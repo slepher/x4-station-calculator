@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia'
-import { ref, shallowRef, watch } from 'vue'
+import { ref, shallowRef, watch, computed } from 'vue'
 import i18n from '@/i18n'
 import type { ProductionLineGroup, StationSettings } from '@/types/x4'
 import type {
@@ -11,8 +11,11 @@ import type {
   ComputeResult,
   PreviewResult,
   ProductionLineAllocation,
+  SavedBuildPlanGoalsState,
+  BuildPlanGoalSnapshot,
 } from '@/types/build-plan'
 import { BootstrapMode } from '@/types/build-plan'
+import { CURRENT_BUILD_PLAN_GOALS_VERSION } from './logic/storageVersions'
 import { useGameDataStore } from './useGameDataStore'
 import { useLogicFlowStore } from './useLogicFlowStore'
 import type { StationComputeDeps } from './state/stationSettings'
@@ -36,6 +39,12 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
   const buildFlowMode = ref<boolean>(false)
   const buildPlan = ref<BuildPlan | null>(null)
 
+  const savedPlans = ref<SavedBuildPlanGoalsState>({
+    version: CURRENT_BUILD_PLAN_GOALS_VERSION,
+    activeId: null,
+    list: []
+  })
+
   const buildFlowPlanGraphResult = shallowRef<BuildFlowPlanGraph | null>(null)
   const buildFlowPlanAllocations = ref<ProductionLineAllocation[]>([])
   const previewResult = shallowRef<PreviewResult | null>(null)
@@ -43,6 +52,135 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
   const buildFlowPlanLoading = ref(false)
   const schemeGroups = ref<BuildSchemeGroup[]>([])
   const computeBuildPlanLoading = ref(false)
+
+  function getDefaultPlanName(): string {
+    const n = savedPlans.value.list.length + 1
+    return i18n.global.t('build_plan.default_plan_name') + ' ' + n
+  }
+
+  function savePlansToStorage() {
+    localStorage.setItem(gameData.getStorageKey('build_plan_goals'), JSON.stringify(savedPlans.value))
+  }
+
+  function loadPlansFromStorage() {
+    const raw = localStorage.getItem(gameData.getStorageKey('build_plan_goals'))
+    if (!raw) return
+    try {
+      const data = JSON.parse(raw) as SavedBuildPlanGoalsState
+      if (data && typeof data.version === 'number') {
+        savedPlans.value = data
+        if (data.activeId) {
+          const plan = data.list.find(p => p.id === data.activeId)
+          if (plan) {
+            buildGoals.value = plan.buildGoals
+          }
+        }
+      }
+    } catch {
+      // ignore corrupt data
+    }
+  }
+
+  function syncGoalsToActivePlan() {
+    const id = savedPlans.value.activeId
+    if (!id) return
+    const plan = savedPlans.value.list.find(p => p.id === id)
+    if (!plan) return
+    plan.buildGoals = [...buildGoals.value]
+    plan.lastUpdated = Date.now()
+    savePlansToStorage()
+  }
+
+  function ensureActivePlan() {
+    if (savedPlans.value.activeId) return
+    const newPlan: BuildPlanGoalSnapshot = {
+      id: crypto.randomUUID(),
+      name: getDefaultPlanName(),
+      buildGoals: [...buildGoals.value],
+      logicFlowPlanId: logicFlowStore.savedPlans.activeId,
+      lastUpdated: Date.now(),
+    }
+    savedPlans.value.list.push(newPlan)
+    savedPlans.value.activeId = newPlan.id
+    savePlansToStorage()
+  }
+
+  function createNewPlan() {
+    const newPlan: BuildPlanGoalSnapshot = {
+      id: crypto.randomUUID(),
+      name: getDefaultPlanName(),
+      buildGoals: [],
+      logicFlowPlanId: logicFlowStore.savedPlans.activeId,
+      lastUpdated: Date.now(),
+    }
+    savedPlans.value.list.push(newPlan)
+    savedPlans.value.activeId = newPlan.id
+    buildGoals.value = []
+    savePlansToStorage()
+  }
+
+  function switchPlan(planId: string) {
+    const plan = savedPlans.value.list.find(p => p.id === planId)
+    if (!plan) return
+    buildGoals.value = [...plan.buildGoals]
+    savedPlans.value.activeId = planId
+
+    if (plan.logicFlowPlanId) {
+      const lfIndex = logicFlowStore.savedPlans.list.findIndex(p => p.id === plan.logicFlowPlanId)
+      if (lfIndex >= 0) {
+        logicFlowStore.loadPlan(lfIndex)
+      }
+    }
+
+    savePlansToStorage()
+  }
+
+  function deletePlan(planId: string) {
+    const idx = savedPlans.value.list.findIndex(p => p.id === planId)
+    if (idx < 0) return
+    savedPlans.value.list.splice(idx, 1)
+
+    if (savedPlans.value.activeId === planId) {
+      if (savedPlans.value.list.length > 0) {
+        const nextPlan = savedPlans.value.list[0]!
+        savedPlans.value.activeId = nextPlan.id
+        buildGoals.value = [...nextPlan.buildGoals]
+      } else {
+        savedPlans.value.activeId = null
+        buildGoals.value = []
+      }
+    }
+
+    savePlansToStorage()
+  }
+
+  function updateLogicFlowPlanId() {
+    const id = savedPlans.value.activeId
+    if (!id) return
+    const plan = savedPlans.value.list.find(p => p.id === id)
+    if (!plan) return
+    plan.logicFlowPlanId = logicFlowStore.savedPlans.activeId
+    plan.lastUpdated = Date.now()
+    savePlansToStorage()
+  }
+
+  const activePlanName = computed({
+    get: () => {
+      const id = savedPlans.value.activeId
+      if (!id) return ''
+      const plan = savedPlans.value.list.find(p => p.id === id)
+      return plan?.name || ''
+    },
+    set: (name: string) => {
+      const id = savedPlans.value.activeId
+      if (!id) return
+      const plan = savedPlans.value.list.find(p => p.id === id)
+      if (!plan) return
+      plan.name = name
+      plan.lastUpdated = Date.now()
+      savePlansToStorage()
+    }
+  })
 
   function getComputeDeps(): StationComputeDeps | null {
     const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
@@ -57,11 +195,14 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
   }
 
   function setBuildGoal(goal: BuildGoal) {
+    ensureActivePlan()
     buildGoals.value = [...buildGoals.value, goal]
+    syncGoalsToActivePlan()
   }
 
   function removeBuildGoal(index: number) {
     buildGoals.value = buildGoals.value.filter((_, i) => i !== index)
+    syncGoalsToActivePlan()
   }
 
   function setBuildFlowMode(mode: boolean) {
@@ -408,6 +549,15 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     { deep: true },
   )
 
+  watch(
+    () => logicFlowStore.savedPlans.activeId,
+    () => {
+      updateLogicFlowPlanId()
+    }
+  )
+
+  loadPlansFromStorage()
+
   return {
     buildGoals,
     buildFlowMode,
@@ -419,10 +569,19 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     buildFlowPlanLoading,
     schemeGroups,
     computeBuildPlanLoading,
+    savedPlans,
+    activePlanName,
     setBuildGoal,
     removeBuildGoal,
     setBuildFlowMode,
     computePlan,
     computeBuildFlowPlanPreview,
+    createNewPlan,
+    switchPlan,
+    deletePlan,
+    ensureActivePlan,
+    syncGoalsToActivePlan,
+    loadPlansFromStorage,
+    savePlansToStorage,
   }
 })

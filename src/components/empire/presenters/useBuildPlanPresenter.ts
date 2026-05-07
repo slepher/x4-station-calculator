@@ -19,6 +19,12 @@ export interface FlowPlanItem {
   index: number
 }
 
+export interface PlanItem {
+  id: string
+  name: string
+  index: number
+}
+
 export interface BuildPlanPresenterProps {
   goals: ComputedRef<BuildGoal[]>
   buildFlowMode: ComputedRef<boolean>
@@ -29,14 +35,14 @@ export interface BuildPlanPresenterProps {
   schemeGroups: ComputedRef<BuildSchemeGroup[]>
   warnings: ComputedRef<string[]>
   currentFlows: ComputedRef<EmpireGroupedFlows>
-  flowPlanName: ComputedRef<string>
-  activeFlowPlanId: ComputedRef<string | null>
-  loadableFlowPlans: ComputedRef<FlowPlanItem[]>
   allocations: ComputedRef<ProductionLineAllocation[]>
   buildFlowPlanAllocations: ComputedRef<ProductionLineAllocation[]>
   buildMaterialPreviewAllocations: ComputedRef<ProductionLineAllocation[]>
   productionPreviewAllocations: ComputedRef<ProductionLineAllocation[]>
   buildFlowPlanLoading: ComputedRef<boolean>
+  planName: ComputedRef<string>
+  activePlanId: ComputedRef<string | null>
+  loadablePlanItems: ComputedRef<PlanItem[]>
 }
 
 export interface BuildPlanPresenterEmits {
@@ -45,7 +51,10 @@ export interface BuildPlanPresenterEmits {
   updateGoal: (index: number, value: number) => void
   setBuildFlowMode: (mode: boolean) => void
   computePlan: () => void
-  loadFlowPlan: (planId: string) => void
+  createNewPlan: () => void
+  switchPlan: (planId: string) => void
+  deletePlan: (planId: string) => void
+  setPlanName: (name: string) => void
 }
 
 export interface UseBuildPlanPresenterReturn {
@@ -66,10 +75,16 @@ export interface BuildPlanPresenterBuildPlanStore {
   buildFlowPlanLoading: boolean
   schemeGroups: BuildSchemeGroup[]
   computeBuildPlanLoading: boolean
+  savedPlans: { activeId: string | null; list: { id: string; name: string; buildGoals: BuildGoal[] }[] }
+  activePlanName: string
   setBuildGoal(goal: BuildGoal): void
   removeBuildGoal(index: number): void
   setBuildFlowMode(mode: boolean): void
   computePlan(): void
+  createNewPlan(): void
+  switchPlan(planId: string): void
+  deletePlan(planId: string): void
+  syncGoalsToActivePlan(): void
 }
 
 export interface BuildPlanPresenterInput {
@@ -109,10 +124,6 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     )
   })
 
-  /**
-   * 建材产线 preview: 直接从 PreviewResult.lines 映射，不再与 allocations 二次合并。
-   * 重叠产线（groupId 同时出现在 build-material 和 production 中）归入建材组。
-   */
   const buildMaterialPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
     if (!buildPlanStore.previewResult || !buildPlanStore.previewResult.buildMaterialPlanningEnabled) return []
     return buildPlanStore.previewResult.lines
@@ -146,25 +157,20 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
       return w
     }),
     currentFlows: computed(() => blueprintStore.getEmpireGroupedFlows()),
-    flowPlanName: computed(() => {
-      const activeId = logicFlow.savedPlans.activeId
-      if (!activeId) return ''
-      const plan = logicFlow.savedPlans.list.find(p => p.id === activeId)
-      return plan?.name || ''
-    }),
-    activeFlowPlanId: computed(() => logicFlow.savedPlans.activeId),
-    loadableFlowPlans: computed(() => {
-      return logicFlow.savedPlans.list.map((plan, index) => ({
-        id: plan.id,
-        name: plan.name,
-        index
-      }))
-    }),
     allocations,
     buildFlowPlanAllocations: computed(() => buildPlanStore.buildFlowPlanAllocations),
     buildMaterialPreviewAllocations,
     productionPreviewAllocations,
     buildFlowPlanLoading: computed(() => buildPlanStore.buildFlowPlanLoading),
+    planName: computed(() => buildPlanStore.activePlanName),
+    activePlanId: computed(() => buildPlanStore.savedPlans.activeId),
+    loadablePlanItems: computed(() => {
+      return buildPlanStore.savedPlans.list.map((plan, index) => ({
+        id: plan.id,
+        name: plan.name,
+        index
+      }))
+    }),
   }
 
   const emits: BuildPlanPresenterEmits = {
@@ -181,13 +187,14 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
         updated[index] = { ...goal, count: value }
       }
       buildPlanStore.buildGoals = updated
+      buildPlanStore.syncGoalsToActivePlan()
     },
     setBuildFlowMode: (mode) => buildPlanStore.setBuildFlowMode(mode),
     computePlan: () => buildPlanStore.computePlan(),
-    loadFlowPlan: (planId) => {
-      const index = logicFlow.savedPlans.list.findIndex(p => p.id === planId)
-      if (index >= 0) logicFlow.loadPlan(index)
-    }
+    createNewPlan: () => buildPlanStore.createNewPlan(),
+    switchPlan: (planId) => buildPlanStore.switchPlan(planId),
+    deletePlan: (planId) => buildPlanStore.deletePlan(planId),
+    setPlanName: (name) => { buildPlanStore.activePlanName = name },
   }
 
   return { props, emits }

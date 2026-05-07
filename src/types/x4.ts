@@ -853,6 +853,7 @@ export interface VersionConfig {
     ship_blueprints: string
     setting: string
     save_archives: string
+    build_plan_goals: string
   }
   indexeddb_name?: string
 }

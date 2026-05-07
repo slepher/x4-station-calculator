@@ -253,3 +253,19 @@ export interface ComputeResult {
 export type PrimaryModuleSnapshot = Map<string, string>
 // key = lineGroupId
 // value = "module_id:count;module_id:count"
+
+// --- Build Plan Goals Persistence Types ---
+
+export interface BuildPlanGoalSnapshot {
+  id: string
+  name: string
+  buildGoals: BuildGoal[]
+  logicFlowPlanId: string | null
+  lastUpdated: number
+}
+
+export interface SavedBuildPlanGoalsState {
+  version: number
+  activeId: string | null
+  list: BuildPlanGoalSnapshot[]
+}
