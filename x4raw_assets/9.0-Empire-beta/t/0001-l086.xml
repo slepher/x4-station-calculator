@@ -2719,7 +2719,7 @@
     <t id="9654">生产模块</t>
     <t id="9655">助推加速倍率</t>
     <t id="9656">打断L及XL级护盾回充</t>
-    <t id="9657">Unknown production method</t>
+    <t id="9657">未知生产方式</t>
     <t id="9700">(User question)</t>
     <t id="9701">骇入中</t>
     <t id="9702">你即将开始骇入</t>
@@ -3337,10 +3337,11 @@
     <t id="11692">现在你可以使用组合键，直接在地图或交互菜单中下达队列 \(%s($INPUT_MODIFIER_ICON$)\) 和优先 \(%s($INPUT_MODIFIER_ICON$)\) 指令. 默认情况下，不使用组合键下达的指令会覆盖已队列的指令。</t>
     <t id="11693">如果你更喜欢旧模式，可以在游戏设置菜单中将"默认指令行为"改为"队列"，这样在使用交互菜单时按下%s($INPUT_MODIFIER_ICON$)将会覆盖指令，而不是将其添加到队列中。</t>
     <t id="11694">按"是"试用新的默认修饰键行为，按"否"保持旧行为使用%s($INPUT_MODIFIER_ICON$)覆盖指令。</t>
-    <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantlable Wreck</t>
-    <t id="11697">Resource Probe coverage</t>
+    <t id="11695">可拖曳残骸</t>
+    <t id="11696">可拆解残骸</t>
+    <t id="11697">资源探测器覆盖范围</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">离线存档</t>
     <t id="11702">覆盖离线存档</t>
@@ -3931,9 +3932,9 @@
     <t id="13226">正在编辑的飞船有无法兼容的导弹。</t>
     <t id="13227">巡航模式稳定性</t>
     <t id="13300">(Input bar)</t>
-    <t id="13301">全景</t>
+    <t id="13301">全景视图</t>
     <t id="13302">重置位置</t>
-    <t id="13303">旋转</t>
+    <t id="13303">旋转视图</t>
     <t id="13304">重置旋转角度</t>
     <t id="13305">缩放</t>
     <t id="13306">模拟鼠标指针</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">聚焦空间站模型</t>
     <t id="13327">队列中的优先指令</t>
     <t id="13328">收集速率(of resources; header item for table column)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">再见</t>
@@ -4132,7 +4136,7 @@
     <t id="3021502">能告诉我有关这场冲突的事吗？</t>
     <t id="3021503">你们准备做什么？</t>
     <t id="3021504">我愿意加入对Argon的战争。</t>
-    <t id="3021505">让我回到你身边。</t>
+    <t id="3021505">以后再聊。</t>
   </page>
   <page id="1003" title="Statistics" descr="0" voice="no">
     <t id="1">总时间</t>
@@ -7690,7 +7694,7 @@
     <t id="1000">默认</t>
     <t id="1001">默认 - 键盘和鼠标 / 手柄</t>
     <t id="1011">默认 - 操纵杆</t>
-    <t id="1021">默认 - 手柄（备选1）</t>
+    <t id="1021">默认 - 控制器\（备选\）</t>
     <t id="1031">默认 - 飞行摇杆（OSX/Linux）</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Single\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Dual\)</t>
+    <t id="1131">默认 - WASD 键盘和鼠标\（备选\）</t>
     <t id="2001">索尼 DUALSHOCK3 无线手柄</t>
     <t id="2011">索尼 DUALSHOCK4 无线手柄</t>
     <t id="2021">索尼 DualSense 无线手柄</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)建造工厂</t>
     <t id="5213">(objective)在指定位置接管空域</t>
     <t id="5214">(objective Extend:)将建筑规划扩展至所需的尺寸。</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">蓝图可向派系代表和外交官购买。</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">广域传感器阵列</t>
     <t id="200">目的地：$DESTINATION$（指定位置）</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">为建造有效的防御空间站，其中一个防御模块必须是管理中心。</t>
     <t id="301">在合理范围内的费用将会被很大方地负担。</t>
     <t id="302">预估最低建造成本</t>

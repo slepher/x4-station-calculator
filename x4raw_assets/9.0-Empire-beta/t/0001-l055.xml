@@ -2719,7 +2719,7 @@
     <t id="9654">Módulo de Produção</t>
     <t id="9655">Multiplicador de Aceleração do Impulso</t>
     <t id="9656">Interrompe a recarga de escudos G e GG.</t>
-    <t id="9657">Unknown production method</t>
+    <t id="9657">Método de produção desconhecido</t>
     <t id="9700">(User question)</t>
     <t id="9701">Hackeamento</t>
     <t id="9702">Você está prestes a hackear.</t>
@@ -3337,10 +3337,11 @@
     <t id="11692">Agora você pode usar teclas modificadoras para dar ordens enfileiradas \(%s($INPUT_MODIFIER_ICON$)\) e prioritárias \(%s($INPUT_MODIFIER_ICON$)\) diretamente do mapa ou do menu de Interação. Por padrão, as ordens enviadas às naves sem o uso dessas teclas modificadoras substituirão qualquer ordem enfileirada anteriormente.</t>
     <t id="11693">Se preferir o comportamento antigo, você pode alterar a configuração "Comportamento de Ordem Padrão" no menu "Configurações do Jogo" para "Fila", de forma que pressionar %s($INPUT_MODIFIER_ICON$) enquanto usa o menu de Interação sobrescreva a ordem em vez de adicioná-la à fila.</t>
     <t id="11694">Pressione Sim se desejar experimentar o novo comportamento padrão do modificador ou Não se desejar manter o comportamento antigo e usar %s($INPUT_MODIFIER_ICON$) para sobrescrever as ordens.</t>
-    <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantlable Wreck</t>
-    <t id="11697">Resource Probe coverage</t>
+    <t id="11695">Destroço Rebocável</t>
+    <t id="11696">Destroço Desmontável</t>
+    <t id="11697">Cobertura da Sonda de Recursos</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Salvar off-line</t>
     <t id="11702">Gravar por cima do jogo salvo off-line</t>
@@ -3931,9 +3932,9 @@
     <t id="13226">A versão editada da nave atualmente possui mísseis incompatíveis.</t>
     <t id="13227">Estabilidade do Modo Viagem</t>
     <t id="13300">(Input bar)</t>
-    <t id="13301">Movimentar</t>
+    <t id="13301">Visão Panorâmica</t>
     <t id="13302">Redefinir Posição</t>
-    <t id="13303">Girar</t>
+    <t id="13303">Girar Visão</t>
     <t id="13304">Redefinir Rotação</t>
     <t id="13305">Zoom</t>
     <t id="13306">Cursor de Mouse Emulado</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">Modelo de Estação de Foco</t>
     <t id="13327">Ordem de Prioridade na Fila</t>
     <t id="13328">Taxa de coleta (de recursos; item de cabeçalho para coluna da tabela)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Tchau</t>
@@ -7690,7 +7694,7 @@
     <t id="1000">Padrão</t>
     <t id="1001">Padrão - Teclado &amp; Mouse / Controle</t>
     <t id="1011">Padrão - Joystick</t>
-    <t id="1021">Padrão - Controle \(Alternativo 1\)</t>
+    <t id="1021">Padrão - Controle \(Alternativo\)</t>
     <t id="1031">Padrão - Joystick \(OSX/Linux\)</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constelação Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Único\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Dual\)</t>
+    <t id="1131">Padrão - Teclado WASD e Mouse \(Alternativo\)</t>
     <t id="2001">Controle sem fio Sony DUALSHOCK3</t>
     <t id="2011">Controle sem fio Sony DUALSHOCK4</t>
     <t id="2021">Controle sem fio Sony DualSense</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)Construir fábrica</t>
     <t id="5213">(objective)Reivindicar terreno no lugar marcado</t>
     <t id="5214">(objective Extend:)Expandir o terreno até o tamanho necessário</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Os esquemas são comprados de representantes de facções e diplomatas.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Matrizes de Sensores de Área Ampla</t>
     <t id="200">Destino: $DESTINATION$ \(no local marcado\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">Para ser uma Estação de Defesa válida, um dos módulos de defesa tem que ser um Cenro Administrativo.</t>
     <t id="301">Os custos serão cobertos de maneira generosa, dentro do razoável.</t>
     <t id="302">Custo mínimo estimado para construção</t>

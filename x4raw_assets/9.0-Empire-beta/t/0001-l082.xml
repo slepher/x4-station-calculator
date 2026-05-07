@@ -2719,7 +2719,7 @@
     <t id="9654">생산 모듈</t>
     <t id="9655">부스터 가속 배율</t>
     <t id="9656">L 및 XL급 보호막의 재충전 방해</t>
-    <t id="9657">Unknown production method</t>
+    <t id="9657">미확인 생산 방법</t>
     <t id="9700">(User question)</t>
     <t id="9701">해킹</t>
     <t id="9702">해킹이 곧 시작됩니다</t>
@@ -3337,10 +3337,11 @@
     <t id="11692">이제 지도나 다른 상호작용 메뉴에서 바로 수정키를 눌러 명령을 대기열에 추가할 수도 \(%s($INPUT_MODIFIER_ICON$)\), 우선 명령으로 지정할 수도 \(%s($INPUT_MODIFIER_ICON$)\) 있습니다. 수정키를 누르지 않은 채로 함선에 추가하는 명령은 기존의 대기열을 덮어쓰도록 기본 설정이 되어 있습니다.</t>
     <t id="11693">이전의 동작 방법을 선호하시면 게임 설정의 대기열 메뉴에서 기본 명령 행동을 바꿀 수 있으며, 그렇게 하면 상호작용 메뉴에서 %s($INPUT_MODIFIER_ICON$) 을/를 눌러 명령을 대기열에 추가하는 대신 명령 대기열을 덮어쓸 수 있습니다.</t>
     <t id="11694">새로운 기본 수정키 방식을 사용하고 싶으시면 '네'를, 이전의 방식대로 %s($INPUT_MODIFIER_ICON$)을/를 눌러 명령을 덮어쓰고 싶으시면 '아니오'를 선택하십시오.</t>
-    <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantlable Wreck</t>
-    <t id="11697">Resource Probe coverage</t>
+    <t id="11695">예인 가능한 잔해</t>
+    <t id="11696">분해 가능한 잔해</t>
+    <t id="11697">자원 탐사정 범위</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">오프라인 저장</t>
     <t id="11702">오프라인 저장 덮어쓰기</t>
@@ -3752,8 +3753,8 @@
     <t id="12786">AMD FSR Frame Generation</t>
     <t id="12787">실험적 향상된 컨트롤러 지원</t>
     <t id="12788">AMD FSR</t>
-    <t id="12789">If this is your first time in X4, we suggest you try out some Tutorials before starting your journey into the Open Universe of X4.</t>
-    <t id="12790">Start New Open Universe</t>
+    <t id="12789">X4를 처음 플레이하시는 분들께는 X4의 오픈 유니버스 여정을 시작하시기 전에 다양한 튜토리얼을 시도해보실 것을 추천드립니다.</t>
+    <t id="12790">새 오픈 유니버스 시작</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">대사관 행동</t>
     <t id="12803">외교관</t>
@@ -3933,7 +3934,7 @@
     <t id="13300">(Input bar)</t>
     <t id="13301">둘러보기</t>
     <t id="13302">위치 되돌리기</t>
-    <t id="13303">회전</t>
+    <t id="13303">시점 회전</t>
     <t id="13304">위치 되돌리기</t>
     <t id="13305">확대</t>
     <t id="13306">가상 마우스 커서</t>
@@ -3958,7 +3959,10 @@
     <t id="13325">모듈 선택 취소</t>
     <t id="13326">스테이션 모델 초점</t>
     <t id="13327">대기 중인 우선 명령</t>
-    <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13328">수집률(of resources; header item for table column)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">안녕히</t>
@@ -7690,7 +7694,7 @@
     <t id="1000">기본</t>
     <t id="1001">기본 - 키보드 &amp; 마우스 / 컨트롤러</t>
     <t id="1011">기본 - 조이스틱</t>
-    <t id="1021">기본 - 컨트롤러</t>
+    <t id="1021">기본 - 컨트롤러 \(대안\)</t>
     <t id="1031">기본 - 조이스틱 \(OSX/Linux\)</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(싱글\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(듀얼\)</t>
+    <t id="1131">기본 - WASD 키보드 &amp; 마우스 \(대안\)</t>
     <t id="2001">Sony DUALSHOCK 3 무선 컨트롤러</t>
     <t id="2011">Sony DUALSHOCK™4 무선 컨트롤러</t>
     <t id="2021">Sony DualSense 무선 컨트롤러</t>
@@ -8670,7 +8675,7 @@
     <t id="9929">이 옵션을 선택하면 이미 자산을 배치한 섹터를 잠금 해제하는 데 필요한 옵션 선택이 취소되기 때문에 선택할 수 없습니다.</t>
     <t id="9930">이 사용자 지정 게임에는 아직 잠금 해제되지 않은 제한된 개체가 포함되어 있으므로 선택할 수 없습니다.</t>
     <t id="9931">이 사용자 지정 게임에는 호환이 되지 않는 장비가 들어있습니다. 호환되지 않는 장비는 설치되지 않습니다.</t>
-    <t id="9932">This custom game contains wares or blueprints that are no longer valid. Affected items will not be used.</t>
+    <t id="9932">이 사용자 지정 게임에는 더 이상 유효하지 않은 품목이나 청사진이 포함되어 있습니다. 해당 아이템은 사용할 수 없어집니다.</t>
     <t id="10000">(Generic Error / Info){1001,10003}</t>
     <t id="11300">(Online)</t>
     <t id="11301">이 임무를 수락하면 다른 모든 다중우주 작전 임무를 중단하게 됩니다.</t>
@@ -61993,13 +61998,14 @@
     <t id="5107">(objective.wait)승객 승선(female)</t>
     <t id="5200">(build station)</t>
     <t id="5201">(objective1)적절한 위치를 찾으십시오.</t>
-    <t id="5202">(objective2)부지를 확보하십시오.</t>
-    <t id="5203">(objective4)소유권 이전</t>
+    <t id="5202">(objective2)부지를 구매하십시오.</t>
+    <t id="5203">(objective4)소유권을 이전합니다.</t>
     <t id="5210">(objective3)스테이션을 건설하십시오.</t>
-    <t id="5211">(objective3)방어스테이션을 건설하십시오.</t>
+    <t id="5211">(objective3)방어 스테이션을 건설하십시오.</t>
     <t id="5212">(objective3)공장을 건설하십시오.</t>
-    <t id="5213">(objective)명시된 구역 소유</t>
+    <t id="5213">(objective)명시된 부지를 구매하십시오.</t>
     <t id="5214">(objective Extend:)필요한 크기에 맞게 부지를 확장하십시오.</t>
+    <t id="5215">(objective)명시된 섹터에 부지를 구매하십시오.</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">청사진은 세력 대표 및 외교관으로부터 구입할 수 있습니다.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">광역 센서 기기</t>
     <t id="200">목적지: $DESTINATION$ \(지정된 장소에\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">유효한 방어 스테이션이 되려면, 방어 모듈중 하나는 행정 센터여야 합니다.</t>
     <t id="301">비용은 합리적인 범위 내에서 관대하게 충당됩니다.</t>
     <t id="302">예상 최소 건설비용</t>

@@ -3341,6 +3341,7 @@
     <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Save offline</t>
     <t id="11702">Overwrite offline save</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">Focus Station Model</t>
     <t id="13327">Queued Priority Order</t>
     <t id="13328">Gather Rate(of resources; header item for table column)</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Hoşçakal</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(SINGLE\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(DUAL\)</t>
+    <t id="1131">Default - WASD Keyboard &amp; Mouse \(Alternative\)</t>
     <t id="2001">Sony DUALSHOCK3 kablosuz kumanda</t>
     <t id="2011">Sony DUALSHOCK4 kablosuz kumanda</t>
     <t id="2021">Sony DualSense kablosuz kumanda</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">Fabrika Kur</t>
     <t id="5213">Belirtilen konumdaki araziyi elde edin</t>
     <t id="5214">(objective Extend:)Expand plot to required size</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Şemalar Birlik temsilcilerinden ve diplomatlardan satın alınır.</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">Wide Area Sensor Arrays</t>
     <t id="200">Destination: $DESTINATION$ \(at specified location\)</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">To be a valid Defence Station, one of the Defence Modules must be an Administrative Centre.</t>
     <t id="301">Expenses will be covered generously, within reason.</t>
     <t id="302">Estimated minimum build cost</t>

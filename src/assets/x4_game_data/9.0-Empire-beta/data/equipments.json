@@ -1542,9 +1542,9 @@
     "size": "extralarge",
     "cost": {
       "default": {
-        "antimatterconverters": 124.0,
-        "energycells": 130.0,
-        "engineparts": 286.0
+        "antimatterconverters": 204.0,
+        "energycells": 566.0,
+        "engineparts": 547.0
       }
     },
     "thrust": {
@@ -5222,10 +5222,10 @@
     "size": "large",
     "cost": {
       "default": {
-        "computronicsubstrate": 36.0,
-        "energycells": 1000.0,
-        "metallicmicrolattice": 233.0,
-        "siliconcarbide": 35.0
+        "computronicsubstrate": 24.0,
+        "energycells": 844.0,
+        "metallicmicrolattice": 270.0,
+        "siliconcarbide": 29.0
       }
     },
     "thrust": {
@@ -6128,13 +6128,15 @@
     "size": "small",
     "cost": {
       "default": {
-        "energycells": 50.0,
-        "engineparts": 15.0
+        "antimatterconverters": 27.0,
+        "energycells": 75.0,
+        "engineparts": 73.0
       },
       "terran": {
-        "energycells": 155.0,
-        "metallicmicrolattice": 15.0,
-        "siliconcarbide": 4.0
+        "computronicsubstrate": 3.0,
+        "energycells": 100.0,
+        "metallicmicrolattice": 32.0,
+        "siliconcarbide": 3.0
       }
     },
     "thrust": {
@@ -6176,15 +6178,15 @@
     "size": "extralarge",
     "cost": {
       "default": {
-        "computronicsubstrate": 41.0,
-        "energycells": 4000.0,
-        "metallicmicrolattice": 253.0,
-        "siliconcarbide": 39.0
+        "computronicsubstrate": 33.0,
+        "energycells": 1131.0,
+        "metallicmicrolattice": 362.0,
+        "siliconcarbide": 38.0
       }
     },
     "thrust": {
-      "forward": 9284.0,
-      "reverse": 10212.0
+      "forward": 9495.0,
+      "reverse": 10444.0
     },
     "boost": {
       "duration": 44.0,
@@ -6221,10 +6223,10 @@
     "size": "extralarge",
     "cost": {
       "default": {
-        "computronicsubstrate": 44.0,
-        "energycells": 4000.0,
-        "metallicmicrolattice": 227.0,
-        "siliconcarbide": 39.0
+        "computronicsubstrate": 30.0,
+        "energycells": 1040.0,
+        "metallicmicrolattice": 333.0,
+        "siliconcarbide": 35.0
       }
     },
     "thrust": {
@@ -7477,9 +7479,9 @@
     "size": "extralarge",
     "cost": {
       "default": {
-        "energycells": 365.0,
-        "fieldcoils": 92.0,
-        "shieldcomponents": 77.0
+        "energycells": 493.0,
+        "fieldcoils": 124.0,
+        "shieldcomponents": 105.0
       }
     },
     "recharge": {
@@ -7510,9 +7512,9 @@
     "size": "extralarge",
     "cost": {
       "default": {
-        "energycells": 3169.0,
-        "fieldcoils": 800.0,
-        "shieldcomponents": 674.0
+        "energycells": 3803.0,
+        "fieldcoils": 960.0,
+        "shieldcomponents": 809.0
       }
     },
     "recharge": {
@@ -7934,7 +7936,7 @@
       }
     },
     "recharge": {
-      "max": 5200.0,
+      "max": 5400.0,
       "rate": 183.0,
       "delay": 8.0
     }
@@ -8754,7 +8756,7 @@
     "recharge": {
       "max": 8840.0,
       "rate": 90.0,
-      "delay": 13.3
+      "delay": 14.3
     }
   },
   {
@@ -8977,10 +8979,10 @@
     "size": "large",
     "cost": {
       "default": {
-        "computronicsubstrate": 13.0,
-        "energycells": 1696.0,
-        "metallicmicrolattice": 181.0,
-        "siliconcarbide": 25.0
+        "computronicsubstrate": 10.0,
+        "energycells": 1357.0,
+        "metallicmicrolattice": 144.0,
+        "siliconcarbide": 20.0
       }
     },
     "recharge": {
@@ -9011,10 +9013,10 @@
     "size": "large",
     "cost": {
       "default": {
-        "computronicsubstrate": 55.0,
-        "energycells": 7143.0,
-        "metallicmicrolattice": 761.0,
-        "siliconcarbide": 107.0
+        "computronicsubstrate": 40.0,
+        "energycells": 5286.0,
+        "metallicmicrolattice": 563.0,
+        "siliconcarbide": 79.0
       }
     },
     "recharge": {
@@ -9061,7 +9063,7 @@
     "recharge": {
       "max": 57600.0,
       "rate": 162.0,
-      "delay": 6.5
+      "delay": 6.2
     }
   },
   {
@@ -9087,21 +9089,21 @@
     "size": "large",
     "cost": {
       "default": {
-        "energycells": 857.0,
-        "fieldcoils": 216.0,
-        "shieldcomponents": 182.0
+        "energycells": 685.0,
+        "fieldcoils": 173.0,
+        "shieldcomponents": 145.0
       },
       "terran": {
-        "computronicsubstrate": 13.0,
-        "energycells": 1698.0,
-        "metallicmicrolattice": 181.0,
-        "siliconcarbide": 25.0
+        "computronicsubstrate": 10.0,
+        "energycells": 1357.0,
+        "metallicmicrolattice": 144.0,
+        "siliconcarbide": 20.0
       }
     },
     "recharge": {
       "max": 71424.0,
       "rate": 227.0,
-      "delay": 6.5
+      "delay": 6.2
     }
   },
   {
@@ -9127,21 +9129,21 @@
     "size": "large",
     "cost": {
       "default": {
-        "energycells": 3141.0,
-        "fieldcoils": 793.0,
-        "shieldcomponents": 668.0
+        "energycells": 2325.0,
+        "fieldcoils": 587.0,
+        "shieldcomponents": 494.0
       },
       "terran": {
-        "computronicsubstrate": 36.0,
-        "energycells": 4712.0,
-        "metallicmicrolattice": 502.0,
-        "siliconcarbide": 71.0
+        "computronicsubstrate": 40.0,
+        "energycells": 5286.0,
+        "metallicmicrolattice": 563.0,
+        "siliconcarbide": 79.0
       }
     },
     "recharge": {
       "max": 86400.0,
       "rate": 324.0,
-      "delay": 6.5
+      "delay": 6.2
     }
   },
   {
@@ -9176,7 +9178,7 @@
     "recharge": {
       "max": 6000.0,
       "rate": 104.0,
-      "delay": 16.6
+      "delay": 16.2
     }
   },
   {
@@ -9203,15 +9205,15 @@
     "cost": {
       "default": {
         "computronicsubstrate": 4.0,
-        "energycells": 615.0,
+        "energycells": 550.0,
         "metallicmicrolattice": 48.0,
-        "siliconcarbide": 14.0
+        "siliconcarbide": 12.0
       }
     },
     "recharge": {
       "max": 7800.0,
       "rate": 143.0,
-      "delay": 16.6
+      "delay": 16.2
     }
   },
   {
@@ -9237,16 +9239,16 @@
     "size": "medium",
     "cost": {
       "default": {
-        "computronicsubstrate": 34.0,
-        "energycells": 4456.0,
-        "metallicmicrolattice": 475.0,
-        "siliconcarbide": 67.0
+        "computronicsubstrate": 29.0,
+        "energycells": 3787.0,
+        "metallicmicrolattice": 404.0,
+        "siliconcarbide": 57.0
       }
     },
     "recharge": {
       "max": 9720.0,
       "rate": 174.0,
-      "delay": 16.6
+      "delay": 16.2
     }
   },
   {
@@ -9281,7 +9283,7 @@
     "recharge": {
       "max": 6000.0,
       "rate": 104.0,
-      "delay": 16.6
+      "delay": 16.2
     }
   },
   {
@@ -9308,15 +9310,15 @@
     "cost": {
       "default": {
         "computronicsubstrate": 4.0,
-        "energycells": 610.0,
-        "metallicmicrolattice": 48.0,
-        "siliconcarbide": 14.0
+        "energycells": 567.0,
+        "metallicmicrolattice": 60.0,
+        "siliconcarbide": 11.0
       }
     },
     "recharge": {
       "max": 7800.0,
       "rate": 143.0,
-      "delay": 16.6
+      "delay": 16.2
     }
   },
   {
@@ -9342,16 +9344,16 @@
     "size": "medium",
     "cost": {
       "default": {
-        "computronicsubstrate": 34.0,
-        "energycells": 4456.0,
-        "metallicmicrolattice": 475.0,
-        "siliconcarbide": 67.0
+        "computronicsubstrate": 29.0,
+        "energycells": 3787.0,
+        "metallicmicrolattice": 404.0,
+        "siliconcarbide": 57.0
       }
     },
     "recharge": {
       "max": 9720.0,
       "rate": 174.0,
-      "delay": 16.6
+      "delay": 16.2
     }
   },
   {
@@ -9391,8 +9393,8 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 56.0,
-      "delay": 5.0
+      "rate": 63.0,
+      "delay": 4.6
     }
   },
   {
@@ -9432,8 +9434,8 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 76.0,
-      "delay": 5.0
+      "rate": 80.0,
+      "delay": 4.6
     }
   },
   {
@@ -9473,8 +9475,8 @@
     },
     "recharge": {
       "max": 9720.0,
-      "rate": 94.0,
-      "delay": 5.0
+      "rate": 102.0,
+      "delay": 4.6
     }
   },
   {
@@ -9514,8 +9516,8 @@
     },
     "recharge": {
       "max": 6000.0,
-      "rate": 56.0,
-      "delay": 5.0
+      "rate": 63.0,
+      "delay": 4.6
     }
   },
   {
@@ -9555,8 +9557,8 @@
     },
     "recharge": {
       "max": 7800.0,
-      "rate": 78.0,
-      "delay": 5.0
+      "rate": 80.0,
+      "delay": 4.6
     }
   },
   {
@@ -9596,8 +9598,8 @@
     },
     "recharge": {
       "max": 9720.0,
-      "rate": 97.0,
-      "delay": 5.0
+      "rate": 102.0,
+      "delay": 4.6
     }
   },
   {
@@ -9629,7 +9631,7 @@
     "recharge": {
       "max": 1200.0,
       "rate": 63.0,
-      "delay": 18.5
+      "delay": 18.0
     }
   },
   {
@@ -9662,7 +9664,7 @@
     "recharge": {
       "max": 1440.0,
       "rate": 93.0,
-      "delay": 18.5
+      "delay": 18.0
     }
   },
   {
@@ -9696,7 +9698,7 @@
     "recharge": {
       "max": 2100.0,
       "rate": 144.0,
-      "delay": 18.5
+      "delay": 18.0
     }
   },
   {
@@ -9722,19 +9724,19 @@
     "size": "small",
     "cost": {
       "default": {
-        "energycells": 18.0,
-        "fieldcoils": 4.0,
-        "shieldcomponents": 3.0
+        "energycells": 31.0,
+        "fieldcoils": 7.0,
+        "shieldcomponents": 6.0
       },
       "terran": {
         "energycells": 83.0,
         "metallicmicrolattice": 14.0,
-        "siliconcarbide": 2.0
+        "siliconcarbide": 3.0
       }
     },
     "recharge": {
       "max": 1440.0,
-      "rate": 45.0,
+      "rate": 48.0,
       "delay": 6.0
     }
   },
@@ -9800,10 +9802,10 @@
     "size": "extralarge",
     "cost": {
       "default": {
-        "computronicsubstrate": 11.0,
-        "energycells": 1410.0,
-        "metallicmicrolattice": 150.0,
-        "siliconcarbide": 21.0
+        "computronicsubstrate": 9.0,
+        "energycells": 1250.0,
+        "metallicmicrolattice": 131.0,
+        "siliconcarbide": 19.0
       }
     },
     "recharge": {
@@ -9834,10 +9836,10 @@
     "size": "extralarge",
     "cost": {
       "default": {
-        "computronicsubstrate": 86.0,
-        "energycells": 11139.0,
-        "metallicmicrolattice": 1188.0,
-        "siliconcarbide": 168.0
+        "computronicsubstrate": 70.0,
+        "energycells": 9134.0,
+        "metallicmicrolattice": 974.0,
+        "siliconcarbide": 137.0
       }
     },
     "recharge": {
@@ -16887,20 +16889,20 @@
     "size": "medium",
     "cost": {
       "default": {
-        "advancedcomposites": 5.0,
-        "energycells": 51.0,
-        "weaponcomponents": 5.0
+        "advancedcomposites": 7.0,
+        "energycells": 64.0,
+        "weaponcomponents": 7.0
       },
       "terran": {
         "computronicsubstrate": 1.0,
-        "energycells": 42.0,
-        "metallicmicrolattice": 14.0,
-        "siliconcarbide": 2.0
+        "energycells": 48.0,
+        "metallicmicrolattice": 18.0,
+        "siliconcarbide": 4.0
       },
       "closedloop": {
         "claytronics": 1.0,
-        "energycells": 77.0,
-        "hullparts": 8.0
+        "energycells": 154.0,
+        "hullparts": 11.0
       }
     },
     "bullet": "missile_gen_s_dumbfire_01_mk1_macro"
@@ -17110,20 +17112,20 @@
     "size": "medium",
     "cost": {
       "default": {
-        "advancedcomposites": 7.0,
-        "energycells": 72.0,
-        "weaponcomponents": 8.0
+        "advancedcomposites": 10.0,
+        "energycells": 97.0,
+        "weaponcomponents": 10.0
       },
       "terran": {
-        "computronicsubstrate": 1.0,
-        "energycells": 55.0,
+        "computronicsubstrate": 2.0,
+        "energycells": 75.0,
         "metallicmicrolattice": 15.0,
-        "siliconcarbide": 5.0
+        "siliconcarbide": 3.0
       },
       "closedloop": {
         "claytronics": 2.0,
-        "energycells": 39.0,
-        "hullparts": 12.0
+        "energycells": 149.0,
+        "hullparts": 16.0
       }
     },
     "bullet": "missile_gen_m_guided_01_mk1_macro"
@@ -17197,20 +17199,20 @@
     "size": "medium",
     "cost": {
       "default": {
-        "advancedelectronics": 12.0,
-        "energycells": 110.0,
-        "weaponcomponents": 12.0
+        "advancedelectronics": 30.0,
+        "energycells": 276.0,
+        "weaponcomponents": 31.0
       },
       "terran": {
-        "computronicsubstrate": 2.0,
-        "energycells": 83.0,
-        "metallicmicrolattice": 26.0,
-        "siliconcarbide": 3.0
+        "computronicsubstrate": 6.0,
+        "energycells": 209.0,
+        "metallicmicrolattice": 66.0,
+        "siliconcarbide": 7.0
       },
       "closedloop": {
-        "claytronics": 5.0,
-        "energycells": 68.0,
-        "hullparts": 29.0
+        "claytronics": 12.0,
+        "energycells": 246.0,
+        "hullparts": 73.0
       }
     },
     "bullet": "bullet_gen_m_laser_01_mk2_macro",
@@ -17639,20 +17641,20 @@
     "size": "medium",
     "cost": {
       "default": {
-        "advancedelectronics": 11.0,
-        "energycells": 103.0,
-        "weaponcomponents": 11.0
+        "advancedelectronics": 15.0,
+        "energycells": 139.0,
+        "weaponcomponents": 15.0
       },
       "terran": {
-        "computronicsubstrate": 2.0,
-        "energycells": 85.0,
-        "metallicmicrolattice": 28.0,
+        "computronicsubstrate": 3.0,
+        "energycells": 105.0,
+        "metallicmicrolattice": 33.0,
         "siliconcarbide": 4.0
       },
       "closedloop": {
-        "claytronics": 4.0,
-        "energycells": 146.0,
-        "hullparts": 26.0
+        "claytronics": 6.0,
+        "energycells": 122.0,
+        "hullparts": 36.0
       }
     },
     "bullet": "missile_gen_s_torpedo_01_mk1_macro"
@@ -18059,18 +18061,19 @@
     "size": "small",
     "cost": {
       "default": {
-        "advancedcomposites": 3.0,
-        "energycells": 34.0,
-        "weaponcomponents": 3.0
+        "advancedcomposites": 4.0,
+        "energycells": 41.0,
+        "weaponcomponents": 4.0
       },
       "terran": {
         "energycells": 32.0,
-        "metallicmicrolattice": 15.0,
-        "siliconcarbide": 5.0
+        "metallicmicrolattice": 20.0,
+        "siliconcarbide": 6.0
       },
       "closedloop": {
-        "energycells": 123.0,
-        "hullparts": 5.0
+        "claytronics": 1.0,
+        "energycells": 41.0,
+        "hullparts": 6.0
       }
     },
     "bullet": "missile_gen_s_dumbfire_01_mk1_macro"
@@ -18278,20 +18281,20 @@
     "size": "small",
     "cost": {
       "default": {
-        "advancedcomposites": 5.0,
-        "energycells": 48.0,
-        "weaponcomponents": 5.0
+        "advancedcomposites": 6.0,
+        "energycells": 61.0,
+        "weaponcomponents": 6.0
       },
       "terran": {
         "computronicsubstrate": 1.0,
-        "energycells": 45.0,
-        "metallicmicrolattice": 18.0,
-        "siliconcarbide": 1.0
+        "energycells": 30.0,
+        "metallicmicrolattice": 10.0,
+        "siliconcarbide": 4.0
       },
       "closedloop": {
         "claytronics": 1.0,
-        "energycells": 74.0,
-        "hullparts": 8.0
+        "energycells": 125.0,
+        "hullparts": 9.0
       }
     },
     "bullet": "missile_gen_s_guided_01_mk1_macro"
@@ -18364,20 +18367,15 @@
     "size": "small",
     "cost": {
       "default": {
-        "advancedelectronics": 8.0,
-        "energycells": 73.0,
-        "weaponcomponents": 8.0
+        "advancedelectronics": 20.0,
+        "energycells": 184.0,
+        "weaponcomponents": 20.0
       },
       "terran": {
-        "computronicsubstrate": 1.0,
-        "energycells": 63.0,
-        "metallicmicrolattice": 26.0,
+        "computronicsubstrate": 4.0,
+        "energycells": 139.0,
+        "metallicmicrolattice": 44.0,
         "siliconcarbide": 5.0
-      },
-      "closedloop": {
-        "claytronics": 3.0,
-        "energycells": 92.0,
-        "hullparts": 19.0
       }
     },
     "bullet": "bullet_gen_s_laser_01_mk2_macro",
@@ -18764,20 +18762,20 @@
     "size": "small",
     "cost": {
       "default": {
-        "advancedcomposites": 7.0,
-        "energycells": 68.0,
-        "weaponcomponents": 7.0
+        "advancedcomposites": 9.0,
+        "energycells": 87.0,
+        "weaponcomponents": 9.0
       },
       "terran": {
-        "computronicsubstrate": 1.0,
-        "energycells": 52.0,
-        "metallicmicrolattice": 12.0,
-        "siliconcarbide": 5.0
+        "computronicsubstrate": 2.0,
+        "energycells": 66.0,
+        "metallicmicrolattice": 21.0,
+        "siliconcarbide": 2.0
       },
       "closedloop": {
         "claytronics": 2.0,
-        "energycells": 30.0,
-        "hullparts": 11.0
+        "energycells": 113.0,
+        "hullparts": 14.0
       }
     },
     "bullet": "missile_gen_s_torpedo_01_mk1_macro"
@@ -19074,8 +19072,8 @@
     "bullet": "bullet_par_s_railgun_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 2.0,
-      "coolrate": 870.0
+      "cooldelay": 1.5,
+      "coolrate": 900.0
     }
   },
   {
@@ -19109,8 +19107,8 @@
     "bullet": "bullet_par_s_railgun_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
-      "cooldelay": 2.0,
-      "coolrate": 965.0
+      "cooldelay": 1.5,
+      "coolrate": 980.0
     }
   },
   {
@@ -19379,9 +19377,9 @@
     "size": "medium",
     "cost": {
       "default": {
-        "advancedelectronics": 12.0,
-        "energycells": 116.0,
-        "weaponcomponents": 13.0
+        "advancedelectronics": 32.0,
+        "energycells": 289.0,
+        "weaponcomponents": 32.0
       }
     },
     "bullet": "bullet_spl_m_shotgun_01_mk2_macro",
@@ -19659,9 +19657,9 @@
     "size": "small",
     "cost": {
       "default": {
-        "advancedelectronics": 8.0,
-        "energycells": 77.0,
-        "weaponcomponents": 8.0
+        "advancedelectronics": 21.0,
+        "energycells": 193.0,
+        "weaponcomponents": 21.0
       }
     },
     "bullet": "bullet_spl_s_shotgun_01_mk2_macro",

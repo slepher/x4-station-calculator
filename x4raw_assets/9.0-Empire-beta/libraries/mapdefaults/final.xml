@@ -35,18 +35,16 @@
       <identification name="{20004,10011}" description="{20004,10012}"/>
       <!--backgroundcolor r="255" g="255" b="255"/-->
       <resourceareas>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="5" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="2" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="11" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="12" ref="sphere_small_ore_high"/>
-        <resourcearea amount="8" ref="sphere_tiny_ore_high"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
-        <resourcearea amount="6" ref="sphere_tiny_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_medium_average"/>
+        <resourcearea amount="8" ref="sphere_tiny_ore_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_silicon_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ice_medium_average"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_slow"/>
       </resourceareas>
       <area sunlight="1.23" economy="0.5" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -56,20 +54,16 @@
     <properties>
       <identification name="{20004,10021}" description="{20004,10022}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_low"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="1" ref="sphere_medium_ice_low"/>
-        <resourcearea amount="1" ref="sphere_small_ice_medium"/>
-        <resourcearea amount="1" ref="sphere_small_methane_low"/>
-        <resourcearea amount="1" ref="sphere_tiny_methane_low"/>
-        <resourcearea amount="9" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="11" ref="sphere_small_ore_high"/>
-        <resourcearea amount="9" ref="sphere_tiny_ore_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_tiny_rawscrap_low"/>
-        <resourcearea amount="8" ref="sphere_medium_silicon_low"/>
-        <resourcearea amount="7" ref="sphere_small_silicon_high"/>
-        <resourcearea amount="8" ref="sphere_tiny_silicon_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_helium_medium"/>
+        <resourcearea amount="2" ref="sphere_small_helium_low_veryslow"/>
+        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_small_methane_low_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="8" ref="sphere_tiny_ore_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_low_slow"/>
+        <resourcearea amount="3" ref="sphere_tiny_rawscrap_verylow_veryslow"/>
       </resourceareas>
       <resourcebounds>
         <max x="370000" y="50000" z="300000"/>
@@ -82,15 +76,12 @@
     <properties>
       <identification name="{20004,10031}" description="{20004,10032}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_low"/>
-        <resourcearea amount="9" ref="sphere_medium_ore_low"/>
-        <resourcearea amount="6" ref="sphere_small_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_tiny_ore_veryhigh"/>
-        <resourcearea amount="8" ref="sphere_medium_silicon_low"/>
-        <resourcearea amount="7" ref="sphere_small_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_tiny_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_slow"/>
       </resourceareas>
       <area sunlight="1.29" economy="0.5" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -132,17 +123,12 @@
     <properties>
       <identification name="{20004,20011}" description="{20004,20012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_methane_low"/>
-        <resourcearea amount="3" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="5" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
-        <resourcearea amount="2" ref="sphere_tiny_silicon_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="4" ref="sphere_small_helium_medium"/>
+        <resourcearea amount="2" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_small_methane_low_veryfast"/>
+        <resourcearea amount="4" ref="sphere_huge_ore_low_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_low_average"/>
       </resourceareas>
       <area sunlight="0.9" economy="0.5" security="0.25" tags="allowrandomanomaly"/>
       <worlds>
@@ -223,12 +209,10 @@
     <properties>
       <identification name="{20004,30011}" description="{20004,30012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="1" ref="sphere_small_ice_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_low"/>
-        <resourcearea amount="1" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_low"/>
-        <resourcearea amount="2" ref="sphere_tiny_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_low_slow"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_verylow_veryslow"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_slow"/>
       </resourceareas>
       <area sunlight="1.15" economy="0.5" security="0.25" tags="allowrandomanomaly"/>
       <worlds>
@@ -261,26 +245,17 @@
     <properties>
       <identification name="{20004,40011}" description="{20004,40012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="10" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="4" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="6" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="11" ref="sphere_small_ore_veryhigh"/>
-        <!-- Additional resources for the long highway region -->
-        <!--
-        <resourcearea amount="2" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_veryhigh"/>
-        <resourcearea amount="10" ref="sphere_small_silicon_veryhigh"/>
-        -->
+        <resourcearea amount="4" ref="sphere_large_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_hydrogen_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_ore_high_fast"/>
+        <resourcearea amount="2" ref="sphere_medium_ore_high_veryfast"/>
+        <resourcearea amount="8" ref="sphere_small_ore_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ice_medium_fast"/>
+        <resourcearea amount="8" ref="sphere_medium_ice_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_low_fast"/>
       </resourceareas>
       <area sunlight="0.82" economy="0.5" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -320,9 +295,9 @@
     <properties>
       <identification name="{20004,50011}" description="{20004,50012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="11" ref="sphere_small_hydrogen_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.43" economy="0.5" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -393,13 +368,12 @@
     <properties>
       <identification name="{20004,60011}" description="{20004,60012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="1" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_low"/>
-        <resourcearea amount="5" ref="sphere_tiny_silicon_low"/>
-        <resourcearea amount="2" ref="sphere_small_helium_low"/>
+        <resourcearea amount="1" ref="sphere_small_helium_low_veryslow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_low_slow"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1.16" economy="0.5" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -412,11 +386,9 @@
     <properties>
       <identification name="{20004,60021}" description="{20004,60022}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_verylow"/>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="1" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_helium_low"/>
+        <resourcearea amount="1" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="4" ref="sphere_medium_methane_medium_veryslow"/>
       </resourceareas>
       <area sunlight="1.19" economy="0.5" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -447,9 +419,8 @@
     <properties>
       <identification name="{20004,70011}" description="{20004,70012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_ore_low"/>
-        <resourcearea amount="8" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="9" ref="sphere_medium_ore_medium_average"/>
       </resourceareas>
       <area sunlight="3.67" economy="0.5" security="0.25" tags="allowrandomanomaly"/>
       <worlds>
@@ -480,13 +451,12 @@
     <properties>
       <identification name="{20004,80011}" description="{20004,80012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="6" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="8" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="2" ref="sphere_small_hydrogen_low_veryfast"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_high_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_medium_fast"/>
       </resourceareas>
       <area sunlight="0.98" economy="0.75" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -576,14 +546,10 @@
     <properties>
       <identification name="{20004,110011}" description="{20004,110012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="1" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_medium_methane_verylow"/>
-        <resourcearea amount="2" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_helium_low"/>
-        <resourcearea amount="1" ref="sphere_small_helium_high"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="1" ref="sphere_large_methane_high_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_medium_average"/>
       </resourceareas>
       <area sunlight="1.94" economy="0.75" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -639,15 +605,15 @@
     <properties>
       <identification name="{20004,130011}" description="{20004,130012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="6" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="6" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_high"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ice_medium_average"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_low_fast"/>
       </resourceareas>
       <area sunlight="0.59" economy="0.75" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -713,12 +679,10 @@
     <properties>
       <identification name="{20004,150011}" description="{20004,150012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="1" ref="sphere_small_hydrogen_low"/>
-        <resourcearea amount="2" ref="sphere_medium_ice_low"/>
-        <resourcearea amount="2" ref="sphere_tiny_ice_high"/>
-        <resourcearea amount="2" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_helium_low"/>
+        <resourcearea amount="1" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_low_slow"/>
       </resourceareas>
       <area sunlight="1.33" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -731,12 +695,10 @@
     <properties>
       <identification name="{20004,150021}" description="{20004,150022}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_ice_verylow"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="1" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_low"/>
-        <resourcearea amount="4" ref="sphere_tiny_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_low_slow"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1.15" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -771,15 +733,12 @@
     <properties>
       <identification name="{20004,160011}" description="{20004,160012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ore_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_high_average"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_average"/>
       </resourceareas>
       <area sunlight="2.01" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -807,18 +766,16 @@
     <properties>
       <identification name="{20004,170011}" description="{20004,170012}"/>
       <resourceareas>
-        <resourcearea amount="6" ref="sphere_large_methane_low"/>
-        <resourcearea amount="6" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_veryhigh"/>
-        <resourcearea amount="7" ref="sphere_large_ore_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="8" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_large_methane_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_methane_high_average"/>
+        <resourcearea amount="2" ref="sphere_small_methane_low_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_high_average"/>
+        <resourcearea amount="8" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_high_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="8" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_high_fast"/>
       </resourceareas>
       <area sunlight="1" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -852,19 +809,13 @@
     <properties>
       <identification name="{20004,180011}" description="{20004,180012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_low"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ice_high"/>
-        <resourcearea amount="1" ref="sphere_medium_methane_low"/>
-        <resourcearea amount="2" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="1" ref="sphere_medium_ore_verylow"/>
-        <resourcearea amount="1" ref="sphere_small_ore_low"/>
-        <resourcearea amount="1" ref="sphere_small_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_tiny_silicon_medium"/>
-        <resourcearea amount="1" ref="sphere_small_helium_verylow"/>
-        <resourcearea amount="2" ref="sphere_tiny_helium_low"/>
+        <resourcearea amount="1" ref="sphere_small_helium_low_veryslow"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="3" ref="sphere_medium_ore_low_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_silicon_low_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_ice_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1.33" economy="0.75" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -893,15 +844,12 @@
     <properties>
       <identification name="{20004,190011}" description="{20004,190012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_low"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_methane_verylow"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="1" ref="sphere_medium_ore_low"/>
-        <resourcearea amount="1" ref="sphere_tiny_ore_high"/>
-        <resourcearea amount="1" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_helium_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_helium_high"/>
+        <resourcearea amount="5" ref="sphere_small_helium_low_veryslow"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_small_methane_low_veryslow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_low_veryslow"/>
+        <resourcearea amount="7" ref="sphere_medium_silicon_low_veryslow"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1.16" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -914,16 +862,12 @@
     <properties>
       <identification name="{20004,190021}" description="{20004,190022}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_low"/>
-        <resourcearea amount="1" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_methane_high"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_low"/>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_tiny_ore_high"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_tiny_silicon_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_helium_low"/>
+        <resourcearea amount="3" ref="sphere_small_helium_low_veryslow"/>
+        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="3" ref="sphere_small_methane_low_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_slow"/>
       </resourceareas>
       <area sunlight="1.02" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -1004,16 +948,12 @@
     <properties>
       <identification name="{20004,210011}" description="{20004,210012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_low"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="1" ref="sphere_medium_ore_verylow"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="1" ref="sphere_large_rawscrap_low"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="4" ref="sphere_small_rawscrap_high"/>
-        <resourcearea amount="1" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_medium"/>
+        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_rawscrap_veryhigh_veryslow"/>
+        <resourcearea amount="3" ref="sphere_tiny_rawscrap_medium_average"/>
       </resourceareas>
       <area sunlight="1.26" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -1026,12 +966,8 @@
     <properties>
       <identification name="{20004,210021}" description="{20004,210022}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_ore_high"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="4" ref="sphere_small_ore_high"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_high"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_large_ore_low_slow"/>
+        <resourcearea amount="1" ref="sphere_large_silicon_low_slow"/>
       </resourceareas>
       <area sunlight="1.15" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -1120,17 +1056,13 @@
     <properties>
       <identification name="{20004,240011}" description="{20004,240012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_small_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_tiny_ice_medium"/>
-        <resourcearea amount="1" ref="sphere_small_methane_low"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_tiny_ore_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_verylow"/>
-        <resourcearea amount="2" ref="sphere_small_helium_medium"/>
+        <resourcearea amount="1" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="1" ref="sphere_small_methane_low_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_low_slow"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="2.08" economy="0.75" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -1158,16 +1090,16 @@
     <properties>
       <identification name="{20004,250011}" description="{20004,250012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_ore_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="6" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="7" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="4" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_ore_high_average"/>
+        <resourcearea amount="4" ref="sphere_tiny_ore_medium_veryfast"/>
+        <resourcearea amount="4" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_high_average"/>
+        <resourcearea amount="8" ref="sphere_tiny_silicon_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_large_rawscrap_medium_slow"/>
       </resourceareas>
       <area sunlight="1.77" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -1177,15 +1109,15 @@
     <properties>
       <identification name="{20004,250021}" description="{20004,250022}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_large_ore_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="7" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="5" ref="sphere_small_hydrogen_low_veryfast"/>
+        <resourcearea amount="3" ref="sphere_large_ore_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_ore_high_average"/>
+        <resourcearea amount="5" ref="sphere_tiny_ore_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_large_silicon_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_silicon_high_average"/>
+        <resourcearea amount="5" ref="sphere_tiny_silicon_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.47" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -1236,14 +1168,11 @@
     <properties>
       <identification name="{20004,260011}" description="{20004,260012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_medium_nividium_high"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_high"/>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="1" ref="sphere_large_ore_veryhigh_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_ore_high_average"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_veryhigh_average"/>
       </resourceareas>
       <area sunlight="1.09" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -1256,17 +1185,13 @@
     <properties>
       <identification name="{20004,260021}" description="{20004,260022}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_verylow"/>
-        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_medium_nividium_high"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="6" ref="sphere_large_ore_verylow"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="6" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_ore_high_average"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_veryhigh_average"/>
       </resourceareas>
       <area sunlight="0.93" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -1299,19 +1224,16 @@
     <properties>
       <identification name="{20004,270011}" description="{20004,270012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_medium_hydrogen_low"/>
-        <resourcearea amount="8" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="7" ref="sphere_small_ice_high"/>
-        <resourcearea amount="1" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="7" ref="sphere_small_methane_high"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="8" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="7" ref="sphere_small_ore_high"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
-        <resourcearea amount="1" ref="sphere_medium_helium_verylow"/>
-        <resourcearea amount="1" ref="sphere_small_helium_low"/>
+        <resourcearea amount="3" ref="sphere_small_helium_low_veryslow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="2" ref="sphere_large_methane_high_slow"/>
+        <resourcearea amount="4" ref="sphere_small_methane_low_average"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_low_veryslow"/>
+        <resourcearea amount="4" ref="sphere_huge_silicon_low_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_average"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_low_fast"/>
       </resourceareas>
       <area sunlight="1.64" economy="0.25" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -1343,17 +1265,15 @@
     <properties>
       <identification name="{20004,280011}" description="{20004,280012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_helium_low"/>
-        <resourcearea amount="1" ref="sphere_small_helium_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="6" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_high"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_ore_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_silicon_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_ice_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_low_slow"/>
       </resourceareas>
       <area sunlight="1.26" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -1391,17 +1311,15 @@
     <properties>
       <identification name="{20004,290021}" description="{20004,290022}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_ice_low"/>
-        <resourcearea amount="1" ref="sphere_small_methane_verylow"/>
-        <resourcearea amount="1" ref="sphere_tiny_methane_verylow"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_high"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_low"/>
-        <resourcearea amount="4" ref="sphere_small_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_medium"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_small_methane_low_veryslow"/>
+        <resourcearea amount="4" ref="sphere_medium_ore_veryhigh_slow"/>
+        <resourcearea amount="6" ref="sphere_tiny_ore_high_average"/>
+        <resourcearea amount="4" ref="sphere_medium_silicon_veryhigh_slow"/>
+        <resourcearea amount="6" ref="sphere_tiny_silicon_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_ice_low_slow"/>
+        <resourcearea amount="1" ref="sphere_tiny_nividium_low_veryslow"/>
       </resourceareas>
       <area sunlight="0.91" economy="0.75" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -1463,10 +1381,10 @@
     <properties>
       <identification name="{20004,310011}" description="{20004,310012}"/>
       <resourceareas>
-        <resourcearea amount="9" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_rawscrap_verylow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_ore_high_average"/>
+        <resourcearea amount="2" ref="sphere_tiny_ore_high_veryfast"/>
+        <resourcearea amount="2" ref="sphere_tiny_rawscrap_low_veryslow"/>
       </resourceareas>
       <area sunlight="1.81" economy="0.25" security="0.25" tags="allowrandomanomaly"/>
       <worlds>
@@ -1501,18 +1419,17 @@
     <properties>
       <identification name="{20004,320011}" description="{20004,320012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="7" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_nividium_low"/>
-        <resourcearea amount="6" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="8" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_rawscrap_verylow"/>
-        <resourcearea amount="6" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="7" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="4" ref="sphere_large_ore_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_ore_high_average"/>
+        <resourcearea amount="1" ref="sphere_small_ore_high_veryfast"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_silicon_high_average"/>
+        <resourcearea amount="1" ref="sphere_small_silicon_high_veryfast"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_tiny_rawscrap_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1.42" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -1525,12 +1442,12 @@
     <properties>
       <identification name="{20004,320021}" description="{20004,320022}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_low"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="8" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="6" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="9" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="4" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="8" ref="sphere_small_ore_medium_average"/>
+        <resourcearea amount="2" ref="sphere_small_ore_high_veryfast"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="6" ref="sphere_small_silicon_medium_average"/>
       </resourceareas>
       <area sunlight="1.29" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -1557,8 +1474,8 @@
     <properties>
       <identification name="{20004,330011}" description="{20004,330012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_rawscrap_low"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="3" ref="sphere_medium_rawscrap_low_slow"/>
       </resourceareas>
       <area sunlight="2.39" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -1616,17 +1533,11 @@
     <properties>
       <identification name="{20004,350011}" description="{20004,350012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="1" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ice_high"/>
-        <resourcearea amount="1" ref="sphere_large_ore_low"/>
-        <resourcearea amount="2" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="1" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_low_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_ice_high_average"/>
       </resourceareas>
       <area sunlight="1" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -1656,15 +1567,10 @@
     <properties>
       <identification name="{20004,360011}" description="{20004,360012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="6" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_ore_verylow"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="4" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="4" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_medium_slow"/>
       </resourceareas>
       <area sunlight="0.88" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -1682,12 +1588,10 @@
     <properties>
       <identification name="{20004,370011}" description="{20004,370012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_small_methane_high"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_high"/>
-        <resourcearea amount="10" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_large_methane_high_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="5" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_huge_silicon_medium_slow"/>
       </resourceareas>
       <area sunlight="0.89" economy="0.75" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -1705,19 +1609,13 @@
     <properties>
       <identification name="{20004,380011}" description="{20004,380012}"/>
       <resourceareas>
-        <resourcearea amount="8" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="9" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="1" ref="sphere_small_ice_high"/>
-        <resourcearea amount="2" ref="sphere_medium_nividium_low"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_high"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_medium_helium_low"/>
-        <resourcearea amount="3" ref="sphere_small_helium_high"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_veryslow"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_huge_silicon_verylow_slow"/>
+        <resourcearea amount="2" ref="sphere_large_nividium_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.18" economy="0.75" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -1747,14 +1645,12 @@
     <properties>
       <identification name="{20004,400011}" description="{20004,400012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_tiny_nividium_medium"/>
-        <resourcearea amount="5" ref="sphere_large_ore_low"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="7" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_medium_average"/>
+        <resourcearea amount="3" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="4" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_low_average"/>
+        <resourcearea amount="2" ref="sphere_medium_nividium_low_average"/>
       </resourceareas>
       <area sunlight="0.55" economy="0.75" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -1772,12 +1668,10 @@
     <properties>
       <identification name="{20004,410011}" description="{20004,410012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="6" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_low_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_low_average"/>
       </resourceareas>
       <area sunlight="0.47" economy="0.75" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -1821,15 +1715,12 @@
     <properties>
       <identification name="{20004,430011}" description="{20004,430012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="8" ref="sphere_large_rawscrap_low"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="2" ref="sphere_tiny_rawscrap_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_low_average"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_low_average"/>
+        <resourcearea amount="2" ref="sphere_huge_rawscrap_veryhigh_veryslow"/>
+        <resourcearea amount="6" ref="sphere_small_rawscrap_medium_average"/>
       </resourceareas>
       <area sunlight="0.82" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -1848,17 +1739,11 @@
     <properties>
       <identification name="{20004,440011}" description="{20004,440012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_ice_low"/>
-        <resourcearea amount="8" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_high"/>
-        <resourcearea amount="2" ref="sphere_medium_nividium_low"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="4" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_low_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_low_average"/>
+        <resourcearea amount="1" ref="sphere_huge_nividium_low_veryfast"/>
       </resourceareas>
       <area sunlight="1.18" economy="0.75" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -1874,17 +1759,14 @@
     <properties>
       <identification name="{20004,450011}" description="{20004,450012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="8" ref="sphere_small_ore_high"/>
-        <resourcearea amount="2" ref="sphere_small_rawkhaakscrap_verylow"/>
-        <resourcearea amount="1" ref="sphere_tiny_rawkhaakscrap_low"/>
-        <resourcearea amount="6" ref="sphere_large_rawscrap_low"/>
-        <resourcearea amount="7" ref="sphere_medium_rawscrap_high"/>
-        <resourcearea amount="5" ref="sphere_small_rawscrap_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="4" ref="sphere_huge_ore_verylow_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_verylow_average"/>
+        <resourcearea amount="4" ref="sphere_huge_silicon_verylow_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_verylow_average"/>
+        <resourcearea amount="3" ref="sphere_huge_rawscrap_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_rawscrap_high_average"/>
+        <resourcearea amount="5" ref="sphere_tiny_rawscrap_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_small_rawkhaakscrap_low_veryfast"/>
       </resourceareas>
       <area sunlight="1.47" economy="0.75" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -1899,21 +1781,15 @@
     <properties>
       <identification name="{20004,460011}" description="{20004,460012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ice_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="6" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_small_nividium_high"/>
-        <resourcearea amount="3" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="5" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_helium_low"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_hydrogen_veryhigh_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_medium_ore_high_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_medium_fast"/>
+        <resourcearea amount="4" ref="sphere_large_ice_verylow_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_nividium_medium_veryfast"/>
       </resourceareas>
       <area sunlight="0.65" economy="0.25" security="0.25" tags="allowrandomanomaly"/>
       <worlds>
@@ -1934,22 +1810,15 @@
     <properties>
       <identification name="{20004,470011}" description="{20004,470012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="2" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_methane_low"/>
-        <resourcearea amount="2" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_ore_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_medium_helium_low"/>
-        <resourcearea amount="1" ref="sphere_small_helium_medium"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_high_average"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_slow"/>
+        <resourcearea amount="2" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="2" ref="sphere_large_ice_verylow_slow"/>
+        <resourcearea amount="1" ref="sphere_large_nividium_high_veryfast"/>
       </resourceareas>
       <area sunlight="1.06" economy="0.75" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -1994,20 +1863,16 @@
     <properties>
       <identification name="{20004,480011}" description="{20004,480012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_ice_low"/>
-        <resourcearea amount="7" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_ore_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_high"/>
-        <resourcearea amount="1" ref="sphere_small_rawkhaakscrap_low"/>
-        <resourcearea amount="1" ref="sphere_tiny_rawkhaakscrap_low"/>
-        <resourcearea amount="2" ref="sphere_large_rawscrap_low"/>
-        <resourcearea amount="10" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="3" ref="sphere_small_rawscrap_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="8" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_average"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_low_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_ice_veryhigh_average"/>
+        <resourcearea amount="2" ref="sphere_huge_rawscrap_veryhigh_slow"/>
+        <resourcearea amount="6" ref="sphere_tiny_rawscrap_medium_average"/>
+        <resourcearea amount="1" ref="sphere_tiny_rawkhaakscrap_low_average"/>
       </resourceareas>
       <area sunlight="0.93" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -2056,20 +1921,16 @@
     <properties>
       <identification name="{20004,490011}" description="{20004,490012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_helium_low"/>
-        <resourcearea amount="2" ref="sphere_small_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_methane_low"/>
-        <resourcearea amount="2" ref="sphere_small_methane_high"/>
-        <resourcearea amount="7" ref="sphere_large_ore_verylow"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="8" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="8" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_methane_veryhigh_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_large_ore_high_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_medium_fast"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_low_veryfast"/>
       </resourceareas>
       <area sunlight="1.72" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -2105,16 +1966,13 @@
     <properties>
       <identification name="{20004,500011}" description="{20004,500012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_hydrogen_verylow"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_high"/>
-        <resourcearea amount="5" ref="sphere_large_ore_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_ore_high_average"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_high_average"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_medium_slow"/>
       </resourceareas>
       <area sunlight="1.41" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -2124,18 +1982,13 @@
     <properties>
       <identification name="{20004,500021}" description="{20004,500022}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_verylow"/>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="1" ref="sphere_large_nividium_low"/>
-        <resourcearea amount="2" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_high"/>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_high_average"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_high_average"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_high_average"/>
       </resourceareas>
       <area sunlight="1.28" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -2165,22 +2018,17 @@
     <properties>
       <identification name="{20004,7090011}" description="{20004,7090012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_helium_high"/>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_large_ice_low"/>
-        <resourcearea amount="2" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_methane_low"/>
-        <resourcearea amount="4" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="3" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_ore_verylow"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_veryslow"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_low_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_low_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ice_low_average"/>
       </resourceareas>
       <area sunlight="1.24" economy="0.75" security="0.5" tags="cardinalsdomain allowrandomanomaly"/>
       <worlds>
@@ -2212,15 +2060,13 @@
     <properties>
       <identification name="{20004,7100011}" description="{20004,7100012}"/>
       <resourceareas>
-        <resourcearea amount="8" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="1" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_silicon_low_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_average"/>
+        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="0.93" economy="0.1" security="0.1" tags="anarchy allowrandomanomaly"/>
       <worlds>
@@ -2253,16 +2099,14 @@
     <properties>
       <identification name="{20004,7110011}" description="{20004,7110012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_ice_verylow"/>
-        <resourcearea amount="4" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_high"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_high"/>
-        <resourcearea amount="1" ref="sphere_large_ore_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_high"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="8" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="1" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="1" ref="sphere_large_ore_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_ice_medium_average"/>
+        <resourcearea amount="1" ref="sphere_tiny_nividium_low_slow"/>
       </resourceareas>
       <area sunlight="0.53" economy="0.1" security="0.1" tags="anarchy allowrandomanomaly"/>
       <worlds>
@@ -2286,15 +2130,13 @@
     <properties>
       <identification name="{20004,7120011}" description="{20004,7120012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_low_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_average"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_medium_fast"/>
       </resourceareas>
       <area sunlight="0.02" economy="0.1" security="0.1" tags="anarchy allowrandomanomaly"/>
       <worlds>
@@ -2330,22 +2172,16 @@
     <properties>
       <identification name="{20004,7130011}" description="{20004,7130012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_small_helium_high"/>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ice_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="2" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_veryslow"/>
+        <resourcearea amount="8" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="2" ref="sphere_large_methane_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_ore_high_average"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ice_medium_average"/>
       </resourceareas>
       <area sunlight="0.82" economy="0.75" security="0.5" tags="ceosdoubt allowrandomanomaly"/>
       <worlds>
@@ -2406,22 +2242,16 @@
     <properties>
       <identification name="{20004,7150011}" description="{20004,7150012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_large_helium_low"/>
-        <resourcearea amount="2" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_small_helium_high"/>
-        <resourcearea amount="1" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_large_methane_low"/>
-        <resourcearea amount="4" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_small_methane_high"/>
-        <resourcearea amount="4" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_verylow"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_veryslow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_large_methane_high_slow"/>
+        <resourcearea amount="1" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_ore_veryhigh_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_medium_slow"/>
       </resourceareas>
       <area sunlight="1.41" economy="0.1" security="0.1" tags="allowrandomanomaly"/>
       <worlds>
@@ -2458,16 +2288,12 @@
     <properties>
       <identification name="{20004,7200011}" description="{20004,7200012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_small_helium_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_low"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_high"/>
-        <resourcearea amount="5" ref="sphere_tiny_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="5" ref="sphere_small_rawscrap_high"/>
-        <resourcearea amount="7" ref="sphere_tiny_rawscrap_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_low_average"/>
+        <resourcearea amount="3" ref="sphere_huge_rawscrap_high_veryfast"/>
       </resourceareas>
       <area sunlight="1.34" economy="0.25" security="0.1" tags="allowrandomanomaly"/>
       <worlds>
@@ -2503,22 +2329,18 @@
     <properties>
       <identification name="{20004,7210011}" description="{20004,7210012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="2" ref="sphere_small_helium_high"/>
-        <resourcearea amount="3" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="2" ref="sphere_large_methane_low"/>
-        <resourcearea amount="3" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="3" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="6" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="8" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_large_helium_high_veryslow"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="3" ref="sphere_large_methane_high_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_high_fast"/>
+        <resourcearea amount="6" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_slow"/>
+        <resourcearea amount="3" ref="sphere_large_silicon_high_fast"/>
+        <resourcearea amount="6" ref="sphere_small_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_nividium_low_average"/>
       </resourceareas>
       <area sunlight="0.71" economy="0.25" security="0.1" tags="allowrandomanomaly"/>
       <worlds>
@@ -2554,14 +2376,12 @@
     <properties>
       <identification name="{20004,7220011}" description="{20004,7220012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_tiny_methane_verylow"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="5" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_tiny_methane_verylow_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ore_high_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_low_veryslow"/>
       </resourceareas>
       <area sunlight="0.89" economy="0.25" security="0.1" tags="allowrandomanomaly"/>
       <worlds>
@@ -2597,8 +2417,9 @@
     <properties>
       <identification name="{20004,7230011}" description="{20004,7230012}"/>
       <resourceareas>
-        <resourcearea amount="8" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="6" ref="sphere_small_helium_veryhigh"/>
+        <resourcearea amount="4" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_helium_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.66" economy="0.25" security="0.1" tags="allowrandomanomaly"/>
       <worlds>
@@ -2632,15 +2453,12 @@
     <properties>
       <identification name="{20004,7240011}" description="{20004,7240012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_medium_helium_low"/>
-        <resourcearea amount="3" ref="sphere_small_helium_high"/>
-        <resourcearea amount="3" ref="sphere_large_methane_low"/>
-        <resourcearea amount="4" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="6" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_rawkhaakscrap_verylow"/>
-        <resourcearea amount="2" ref="sphere_tiny_rawkhaakscrap_verylow"/>
-        <resourcearea amount="4" ref="sphere_large_rawscrap_verylow"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_medium"/>
+        <resourcearea amount="1" ref="sphere_large_helium_high_veryslow"/>
+        <resourcearea amount="5" ref="sphere_large_methane_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_rawscrap_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_tiny_rawscrap_low_average"/>
+        <resourcearea amount="2" ref="sphere_tiny_rawkhaakscrap_low_average"/>
       </resourceareas>
       <area sunlight="1.42" economy="0.25" security="0.1" tags="allowrandomanomaly"/>
       <worlds>
@@ -2670,15 +2488,12 @@
     <properties>
       <identification name="{20004,7250011}" description="{20004,7250012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_small_helium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_low"/>
-        <resourcearea amount="2" ref="sphere_tiny_hydrogen_high"/>
-        <resourcearea amount="2" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="0.83" economy="0.5" security="0.25"/>
       <worlds>
@@ -2772,21 +2587,14 @@
     <properties>
       <identification name="{20004,4010011}" description="{20004,4010012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="2" ref="sphere_small_helium_medium"/>
-        <resourcearea amount="1" ref="sphere_large_hydrogen_verylow"/>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="1" ref="sphere_large_methane_low"/>
-        <resourcearea amount="2" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="5" ref="sphere_large_ore_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_hydrogen_veryhigh_veryslow"/>
+        <resourcearea amount="1" ref="sphere_large_methane_high_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_high_average"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_silicon_high_average"/>
+        <resourcearea amount="2" ref="sphere_large_nividium_medium_slow"/>
       </resourceareas>
       <area sunlight="0.71" economy="0.75" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -2817,15 +2625,12 @@
     <properties>
       <identification name="{20004,4020011}" description="{20004,4020012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_veryhigh_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_ice_medium_average"/>
       </resourceareas>
       <area sunlight="2.39" economy="0.5" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -3002,15 +2807,12 @@
     <properties>
       <identification name="{20004,4120011}" description="{20004,4120012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_high"/>
-        <resourcearea amount="1" ref="sphere_large_ore_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_average"/>
+        <resourcearea amount="4" ref="sphere_large_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_average"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_low_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ice_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.17" economy="0.25" security="0.3" tags="allowrandomanomaly"/>
     </properties>
@@ -3036,18 +2838,15 @@
     <properties>
       <identification name="{20004,4110011}" description="{20004,4110012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="7" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="6" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="8" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_low_average"/>
+        <resourcearea amount="12" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_average"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_veryhigh_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_ice_medium_average"/>
+        <resourcearea amount="8" ref="sphere_small_ice_medium_veryfast"/>
       </resourceareas>
       <area sunlight="2.45" economy="0.5" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -3065,18 +2864,15 @@
     <properties>
       <identification name="{20004,4100011}" description="{20004,4100012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_large_ice_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="2" ref="sphere_small_methane_high"/>
-        <resourcearea amount="2" ref="sphere_large_helium_low"/>
-        <resourcearea amount="1" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="3" ref="sphere_small_helium_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_ice_high_veryfast"/>
+        <resourcearea amount="2" ref="sphere_medium_ice_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.26" economy="0.5" security="0.7" tags="allowrandomanomaly"/>
     </properties>
@@ -3094,18 +2890,17 @@
     <properties>
       <identification name="{20004,4090011}" description="{20004,4090012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ice_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="7" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="6" ref="sphere_small_methane_high"/>
-        <resourcearea amount="3" ref="sphere_large_helium_low"/>
-        <resourcearea amount="3" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_helium_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="5" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="4" ref="sphere_small_hydrogen_low_veryfast"/>
+        <resourcearea amount="3" ref="sphere_large_methane_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_methane_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_methane_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_ice_high_fast"/>
+        <resourcearea amount="6" ref="sphere_medium_ice_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.31" economy="0.5" security="0.7" tags="allowrandomanomaly"/>
       <worlds>
@@ -3139,9 +2934,9 @@
     <properties>
       <identification name="{20004,4140011}" description="{20004,4140012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_rawscrap_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_high"/>
-        <resourcearea amount="6" ref="sphere_small_rawscrap_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_rawscrap_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_medium_rawscrap_high_average"/>
+        <resourcearea amount="1" ref="sphere_tiny_rawscrap_high_veryfast"/>
       </resourceareas>
       <area sunlight="1.63" economy="0.5" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -3175,20 +2970,17 @@
     <properties>
       <identification name="{20004,4150011}" description="{20004,4150012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ice_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ice_high"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="3" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_medium_average"/>
+        <resourcearea amount="8" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_high_fast"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_ice_high_fast"/>
+        <resourcearea amount="2" ref="sphere_medium_nividium_low_fast"/>
       </resourceareas>
       <area sunlight="0.77" economy="0.75" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -3224,9 +3016,9 @@
     <properties>
       <identification name="{20004,4160021}" description="{20004,4160022}"/>
       <resourceareas>
-        <resourcearea amount="6" ref="sphere_large_ice_high"/>
-        <resourcearea amount="7" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="6" ref="sphere_small_ice_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_slow"/>
+        <resourcearea amount="5" ref="sphere_large_ice_medium_average"/>
+        <resourcearea amount="10" ref="sphere_medium_ice_medium_veryfast"/>
       </resourceareas>
       <area sunlight="0.71" economy="0.5" security="0.5" tags="allowrandomanomaly"/>
     </properties>
@@ -3279,24 +3071,18 @@
     <properties>
       <identification name="{20004,4180011}" description="{20004,4180012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_small_helium_medium"/>
-        <resourcearea amount="1" ref="sphere_medium_hydrogen_low"/>
-        <resourcearea amount="1" ref="sphere_small_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_small_methane_low"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_high"/>
-        <resourcearea amount="2" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_rawkhaakscrap_verylow"/>
-        <resourcearea amount="2" ref="sphere_tiny_rawkhaakscrap_verylow"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="4" ref="sphere_small_rawscrap_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_rawscrap_high"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_small_helium_low_veryslow"/>
+        <resourcearea amount="1" ref="sphere_medium_hydrogen_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_medium_average"/>
+        <resourcearea amount="4" ref="sphere_medium_ore_high_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_low_average"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_low_veryfast"/>
+        <resourcearea amount="1" ref="sphere_medium_rawscrap_high_veryfast"/>
+        <resourcearea amount="3" ref="sphere_tiny_rawscrap_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_small_rawkhaakscrap_low_fast"/>
       </resourceareas>
       <area sunlight="0.85" economy="0.7" security="0.25" tags="allowrandomanomaly"/>
       <worlds>
@@ -3360,10 +3146,9 @@
     <properties>
       <identification name="{20004,4200011}" description="{20004,4200012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="4" ref="sphere_large_ore_medium_average"/>
+        <resourcearea amount="2" ref="sphere_medium_ore_high_veryfast"/>
+        <resourcearea amount="1" ref="sphere_large_silicon_medium_slow"/>
       </resourceareas>
       <area sunlight="1.33" economy="0.25" security="0.5" tags="allowrandomanomaly"/>
       <worlds>
@@ -3394,8 +3179,8 @@
     <properties>
       <identification name="{20004,4210011}" description="{20004,4210012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_medium_rawscrap_low"/>
-        <resourcearea amount="1" ref="sphere_small_rawscrap_medium"/>
+        <resourcearea amount="1" ref="sphere_tiny_rawscrap_medium_veryslow"/>
+        <resourcearea amount="1" ref="sphere_tiny_rawscrap_low_veryslow"/>
       </resourceareas>
       <area sunlight="0.81" economy="0.5" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -3413,12 +3198,12 @@
     <properties>
       <identification name="{20004,4220011}" description="{20004,4220012}"/>
       <resourceareas>
-        <resourcearea amount="7" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="7" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_low_veryslow"/>
+        <resourcearea amount="2" ref="sphere_large_ore_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_low_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ice_medium_average"/>
       </resourceareas>
       <area sunlight="1.08" economy="0.25" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -3492,12 +3277,12 @@
     <properties>
       <identification name="{20004,4240021}" description="{20004,4240022}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="1" ref="sphere_large_ore_high_fast"/>
+        <resourcearea amount="8" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_high_fast"/>
+        <resourcearea amount="5" ref="sphere_small_silicon_low_veryfast"/>
       </resourceareas>
       <area sunlight="0.65" economy="0.75" security="0.75" tags="allowrandomanomaly"/>
       <worlds>
@@ -3519,12 +3304,10 @@
     <properties>
       <identification name="{20004,4250011}" description="{20004,4250012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="7" ref="sphere_small_ore_high"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_veryhigh_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_silicon_medium_fast"/>
       </resourceareas>
       <resourcebounds>
         <center y="-200000"/>
@@ -3587,26 +3370,25 @@
     <properties>
       <identification name="{20004,1000011}" description="{20004,1000012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="5" ref="sphere_small_helium_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="8" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_large_ice_low"/>
-        <resourcearea amount="7" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="6" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_methane_low"/>
-        <resourcearea amount="8" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_small_methane_high"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="6" ref="sphere_tiny_nividium_high"/>
-        <resourcearea amount="5" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="8" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="7" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="4" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_helium_medium_average"/>
+        <resourcearea amount="3" ref="sphere_medium_helium_medium_veryfast"/>
+        <resourcearea amount="4" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="4" ref="sphere_large_methane_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_methane_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_average"/>
+        <resourcearea amount="5" ref="sphere_large_ore_medium_fast"/>
+        <resourcearea amount="10" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="5" ref="sphere_large_silicon_medium_fast"/>
+        <resourcearea amount="10" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_medium_average"/>
+        <resourcearea amount="5" ref="sphere_large_ice_medium_fast"/>
+        <resourcearea amount="5" ref="sphere_large_ice_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_nividium_medium_veryfast"/>
       </resourceareas>
       <sounds>
         <music ref="music_dlc_terran_soundtrack_terran_periphery"/>
@@ -3745,9 +3527,9 @@
     <properties>
       <identification name="{20004,1060011}" description="{20004,1060012}" image="enc_cluster106"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="8" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="7" ref="sphere_small_helium_high"/>
+        <resourcearea amount="3" ref="sphere_large_helium_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_helium_medium_veryfast"/>
       </resourceareas>
       <sounds>
         <music ref="music_dlc_terran_soundtrack_terran_core"/>
@@ -3794,20 +3576,16 @@
     <properties>
       <identification name="{20004,1080031}" description="{20004,1080032}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="9" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="6" ref="sphere_large_ice_verylow"/>
-        <resourcearea amount="5" ref="sphere_medium_ice_low"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_ore_low"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="2" ref="sphere_small_helium_veryhigh"/>
+        <resourcearea amount="4" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="5" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="10" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_medium_average"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_veryfast"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_low_average"/>
+        <resourcearea amount="10" ref="sphere_medium_ice_low_veryfast"/>
       </resourceareas>
       <resourcebounds>
         <max x="300000" y="150000" z="300000"/>
@@ -3823,12 +3601,12 @@
     <properties>
       <identification name="{20004,1080021}" description="{20004,1080022}" image="enc_cluster108_sector02"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="9" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="8" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_large_methane_low"/>
-        <resourcearea amount="6" ref="sphere_medium_methane_high"/>
-        <resourcearea amount="4" ref="sphere_small_methane_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_large_methane_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_methane_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_veryfast"/>
       </resourceareas>
       <sounds>
         <music ref="music_dlc_terran_soundtrack_terran_periphery"/>
@@ -3861,12 +3639,11 @@
     <properties>
       <identification name="{20004,1100011}" description="{20004,1100012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="8" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_helium_low"/>
-        <resourcearea amount="5" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_helium_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="4" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_hydrogen_medium_veryfast"/>
       </resourceareas>
       <sounds>
         <music ref="music_dlc_terran_soundtrack_terran_pioneers"/>
@@ -3899,26 +3676,21 @@
     <properties>
       <identification name="{20004,1160011}" description="{20004,1160012}"/>
       <resourceareas>
-        <resourcearea amount="6" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_ice_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ice_high"/>
-        <resourcearea amount="5" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_methane_high"/>
-        <resourcearea amount="3" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="4" ref="sphere_large_ore_low"/>
-        <resourcearea amount="8" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="9" ref="sphere_small_ore_high"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="7" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_helium_low"/>
-        <resourcearea amount="4" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_small_helium_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_large_methane_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_methane_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_methane_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_average"/>
+        <resourcearea amount="4" ref="sphere_large_ore_high_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="5" ref="sphere_large_silicon_high_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_medium_average"/>
+        <resourcearea amount="4" ref="sphere_large_ice_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_nividium_medium_veryfast"/>
       </resourceareas>
       <sounds>
         <music ref="music_dlc_terran_soundtrack_oort_cloud"/>
@@ -3956,22 +3728,17 @@
     <properties>
       <identification name="{20004,1120011}" description="{20004,1120012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_methane_verylow"/>
-        <resourcearea amount="4" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="5" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
-        <resourcearea amount="2" ref="sphere_large_helium_low"/>
-        <resourcearea amount="3" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="4" ref="sphere_small_helium_high"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_medium_average"/>
+        <resourcearea amount="6" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_nividium_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.17" economy="0.25" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -3981,23 +3748,17 @@
     <properties>
       <identification name="{20004,1120021}" description="{20004,1120022}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="2" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="6" ref="sphere_small_methane_high"/>
-        <resourcearea amount="3" ref="sphere_small_nividium_high"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="6" ref="sphere_large_ore_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="2" ref="sphere_small_ore_high"/>
-        <resourcearea amount="5" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_high"/>
-        <resourcearea amount="3" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_small_helium_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="6" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_nividium_medium_veryfast"/>
       </resourceareas>
       <area sunlight="1.25" economy="0.25" security="0.25" tags="allowrandomanomaly"/>
     </properties>
@@ -4062,26 +3823,18 @@
     <properties>
       <identification name="{20004,1130011}" description="{20004,1130012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ice_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_large_methane_verylow"/>
-        <resourcearea amount="3" ref="sphere_medium_methane_low"/>
-        <resourcearea amount="3" ref="sphere_small_methane_high"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_medium"/>
-        <resourcearea amount="3" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_high"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_high"/>
-        <resourcearea amount="2" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_small_helium_high"/>
+        <resourcearea amount="3" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="7" ref="sphere_large_methane_high_veryslow"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_fast"/>
+        <resourcearea amount="4" ref="sphere_large_ice_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_large_nividium_low_veryfast"/>
       </resourceareas>
       <sounds>
         <music ref="music_dlc_terran_soundtrack_pioneers"/>
@@ -4139,21 +3892,16 @@
     <properties>
       <identification name="{20004,1140011}" description="{20004,1140012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="2" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_small_methane_high"/>
-        <resourcearea amount="1" ref="sphere_medium_nividium_medium"/>
-        <resourcearea amount="4" ref="sphere_large_ore_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="7" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_medium_helium_low"/>
-        <resourcearea amount="5" ref="sphere_small_helium_high"/>
+        <resourcearea amount="1" ref="sphere_huge_helium_veryhigh_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="4" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_nividium_medium_veryfast"/>
       </resourceareas>
       <sounds>
         <music ref="music_dlc_terran_soundtrack_pioneers"/>
@@ -4267,25 +4015,21 @@
         <ware ware="condensate" amount="100"/>
       </resources>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="6" ref="sphere_small_helium_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="4" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="6" ref="sphere_large_ice_low"/>
-        <resourcearea amount="7" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="7" ref="sphere_small_ice_high"/>
-        <resourcearea amount="3" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_methane_high"/>
-        <resourcearea amount="4" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="6" ref="sphere_large_helium_high_average"/>
+        <resourcearea amount="4" ref="sphere_medium_helium_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="6" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="8" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ice_low_average"/>
+        <resourcearea amount="8" ref="sphere_medium_ice_low_veryfast"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_low_average"/>
       </resourceareas>
       <area sunlight="13.9" economy="0.25" security="0.75" thewave="true"/>
     </properties>
@@ -4298,25 +4042,23 @@
         <ware ware="condensate" amount="100"/>
       </resources>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="5" ref="sphere_small_helium_high"/>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_large_ice_high"/>
-        <resourcearea amount="7" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_medium"/>
-        <resourcearea amount="5" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_small_methane_high"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_high"/>
-        <resourcearea amount="2" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_helium_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_helium_medium_veryfast"/>
+        <resourcearea amount="3" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_low_average"/>
+        <resourcearea amount="3" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_low_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_average"/>
+        <resourcearea amount="8" ref="sphere_medium_ice_low_veryfast"/>
+        <resourcearea amount="3" ref="sphere_medium_nividium_verylow_veryfast"/>
       </resourceareas>
       <area sunlight="13.9" economy="0.25" security="0.75" thewave="true"/>
     </properties>
@@ -4329,24 +4071,22 @@
         <ware ware="condensate" amount="100"/>
       </resources>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="5" ref="sphere_small_helium_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="6" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="6" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="8" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="5" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_methane_high"/>
-        <resourcearea amount="4" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_high"/>
-        <resourcearea amount="8" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_high"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="5" ref="sphere_small_silicon_medium"/>
+        <resourcearea amount="3" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_helium_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_helium_medium_veryfast"/>
+        <resourcearea amount="4" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="1" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_ore_low_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_silicon_low_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ice_low_average"/>
+        <resourcearea amount="8" ref="sphere_medium_ice_low_veryfast"/>
       </resourceareas>
       <area sunlight="13.9" economy="0.25" security="0.75" thewave="true"/>
     </properties>
@@ -4377,21 +4117,17 @@
     <properties>
       <identification name="{20004,5010011}" description="{20004,5010012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_ice_low"/>
-        <resourcearea amount="6" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="8" ref="sphere_small_ice_high"/>
-        <resourcearea amount="1" ref="sphere_large_nividium_verylow"/>
-        <resourcearea amount="2" ref="sphere_medium_nividium_low"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="4" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="10" ref="sphere_small_ore_high"/>
-        <resourcearea amount="1" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="10" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="4" ref="sphere_huge_ore_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_average"/>
+        <resourcearea amount="12" ref="sphere_small_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ice_medium_average"/>
+        <resourcearea amount="8" ref="sphere_medium_ice_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_medium_nividium_medium_veryfast"/>
       </resourceareas>
       <area sunlight="0.20" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -4409,9 +4145,9 @@
     <properties>
       <identification name="{20004,5020011}" description="{20004,5020012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="6" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="9" ref="sphere_small_hydrogen_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryfast"/>
       </resourceareas>
       <area sunlight="0.16" economy="0.25" security="0.75"/>
     </properties>
@@ -4429,18 +4165,15 @@
     <properties>
       <identification name="{20004,5030011}" description="{20004,5030012}"/>
       <resourceareas>
-        <resourcearea amount="6" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="8" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="2" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="6" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_low"/>
-        <resourcearea amount="1" ref="sphere_medium_ore_low"/>
-        <resourcearea amount="1" ref="sphere_small_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="5" ref="sphere_small_rawscrap_high"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_medium"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_verylow_slow"/>
+        <resourcearea amount="1" ref="sphere_large_nividium_verylow_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_rawscrap_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_small_rawscrap_medium_average"/>
       </resourceareas>
       <area sunlight="0.11" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -4465,14 +4198,16 @@
     <properties>
       <identification name="{20004,5040011}" description="{20004,5040012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_hydrogen_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_medium_nividium_verylow"/>
-        <resourcearea amount="2" ref="sphere_small_nividium_medium"/>
-        <resourcearea amount="2" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="2" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_medium_average"/>
+        <resourcearea amount="8" ref="sphere_small_ore_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="8" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_medium_nividium_medium_veryfast"/>
       </resourceareas>
       <area sunlight="0.05" economy="0.25" security="0.75" tags="allowrandomanomaly"/>
     </properties>
@@ -4497,21 +4232,16 @@
     <properties>
       <identification name="{20004,6010011}" description="{20004,6010012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="3" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="2" ref="sphere_small_methane_high"/>
-        <resourcearea amount="3" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="5" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_high"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_helium_low"/>
-        <resourcearea amount="4" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="2" ref="sphere_small_helium_high"/>
+        <resourcearea amount="1" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_high_average"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_high_fast"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_medium_veryfast"/>
       </resourceareas>
     </properties>
   </dataset>
@@ -4543,12 +4273,10 @@
     <properties>
       <identification name="{20004,6020011}" description="{20004,6020012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_ore_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_fast"/>
+        <resourcearea amount="8" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_fast"/>
+        <resourcearea amount="5" ref="sphere_large_silicon_medium_veryfast"/>
       </resourceareas>
       <worlds>
         <world factor="0.83" part="part_barrenshores"/>
@@ -4587,15 +4315,14 @@
     <properties>
       <identification name="{20004,6030011}" description="{20004,6030012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="2" ref="sphere_small_helium_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_hydrogen_high"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="7" ref="sphere_small_methane_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="1" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_methane_high_average"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_veryfast"/>
       </resourceareas>
       <worlds>
         <world factor="1.28" part="part_greatreef"/>
@@ -4682,7 +4409,7 @@
     <properties>
       <identification name="{20004,6040011}" description="{20004,6040012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_rawscrap_low"/>
+        <resourcearea amount="8" ref="sphere_medium_rawscrap_medium_veryfast"/>
       </resourceareas>
       <worlds>
         <world part="part_oof_planet"/>
@@ -4716,9 +4443,8 @@
     <properties>
       <identification name="{20004,6050011}" description="{20004,6050012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="1" ref="sphere_medium_ore_low"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_medium"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_verylow_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_verylow_slow"/>
       </resourceareas>
     </properties>
   </dataset>
@@ -4760,9 +4486,9 @@
     <properties>
       <identification name="{20004,6060021}" description="{20004,6060022}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_helium_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_helium_high"/>
-        <resourcearea amount="9" ref="sphere_small_helium_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_helium_high_average"/>
+        <resourcearea amount="2" ref="sphere_medium_helium_medium_veryfast"/>
       </resourceareas>
       <worlds>
         <world factor="0.15" part="part_kingdomend"/>
@@ -4798,18 +4524,14 @@
     <properties>
       <identification name="{20004,6070011}" description="{20004,6070012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_large_ice_low"/>
-        <resourcearea amount="8" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_high"/>
-        <resourcearea amount="3" ref="sphere_large_methane_medium"/>
-        <resourcearea amount="5" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="2" ref="sphere_small_methane_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_large_ore_low"/>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_high"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_methane_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_medium_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_high_fast"/>
+        <resourcearea amount="5" ref="sphere_medium_ice_medium_veryfast"/>
       </resourceareas>
     </properties>
   </dataset>
@@ -4841,13 +4563,13 @@
     <properties>
       <identification name="{20004,6080011}" description="{20004,6080012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_large_hydrogen_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_hydrogen_high"/>
-        <resourcearea amount="5" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="7" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="7" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_hydrogen_veryhigh_slow"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_average"/>
+        <resourcearea amount="6" ref="sphere_medium_hydrogen_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_average"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_low_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_average"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_low_veryfast"/>
       </resourceareas>
       <worlds>
         <world factor="0.41" part="part_atreusclouds"/>
@@ -4877,15 +4599,12 @@
     <properties>
       <identification name="{20004,6090011}" description="{20004,6090012}"/>
       <resourceareas>
-        <resourcearea amount="6" ref="sphere_large_helium_low"/>
-        <resourcearea amount="3" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="4" ref="sphere_small_helium_high"/>
-        <resourcearea amount="2" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="4" ref="sphere_large_silicon_verylow"/>
-        <resourcearea amount="6" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="2" ref="sphere_huge_helium_veryhigh_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_average"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_low_veryfast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_medium_veryfast"/>
       </resourceareas>
       <worlds>
         <world factor="2.71" part="part_menelaus"/>
@@ -4972,21 +4691,16 @@
     <properties>
       <identification name="{20004,7020011}" description="{20004,7020012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_high"/>
-        <resourcearea amount="4" ref="sphere_large_ice_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="2" ref="sphere_tiny_methane_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_verylow"/>
-        <resourcearea amount="2" ref="sphere_large_ore_low"/>
-        <resourcearea amount="7" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="6" ref="sphere_small_silicon_high"/>
+        <resourcearea amount="4" ref="sphere_medium_helium_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_large_hydrogen_high_veryslow"/>
+        <resourcearea amount="3" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_fast"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_verylow_veryslow"/>
+        <resourcearea amount="5" ref="sphere_medium_silicon_low_fast"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_low_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ice_low_fast"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1.11" economy="0.5" security="0.5" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -5007,24 +4721,19 @@
     <properties>
       <identification name="{20004,7030011}" description="{20004,7030012}"/>
       <resourceareas>
-        <resourcearea amount="4" ref="sphere_medium_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_small_helium_high"/>
-        <resourcearea amount="1" ref="sphere_large_hydrogen_low"/>
-        <resourcearea amount="7" ref="sphere_medium_hydrogen_medium"/>
-        <resourcearea amount="2" ref="sphere_small_hydrogen_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_ice_low"/>
-        <resourcearea amount="4" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_high"/>
-        <resourcearea amount="4" ref="sphere_large_methane_verylow"/>
-        <resourcearea amount="5" ref="sphere_medium_methane_medium"/>
-        <resourcearea amount="6" ref="sphere_small_methane_high"/>
-        <resourcearea amount="1" ref="sphere_tiny_nividium_low"/>
-        <resourcearea amount="1" ref="sphere_large_ore_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="1" ref="sphere_large_silicon_low"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_large_helium_high_slow"/>
+        <resourcearea amount="1" ref="sphere_medium_helium_medium_average"/>
+        <resourcearea amount="3" ref="sphere_large_hydrogen_high_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_hydrogen_medium_average"/>
+        <resourcearea amount="3" ref="sphere_large_methane_high_slow"/>
+        <resourcearea amount="6" ref="sphere_medium_methane_medium_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_slow"/>
+        <resourcearea amount="5" ref="sphere_large_silicon_low_average"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_large_ice_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1.06" economy="0.75" security="0.75" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -5059,13 +4768,11 @@
     <properties>
       <identification name="{20004,7040011}" description="{20004,7040012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_large_ice_low"/>
-        <resourcearea amount="3" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="2" ref="sphere_large_ore_low"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ore_medium_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_large_ice_medium_average"/>
+        <resourcearea amount="2" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="0.71" economy="0.50" security="0.50" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -5099,16 +4806,15 @@
     <properties>
       <identification name="{20004,7050011}" description="{20004,7050012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_large_ice_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_ice_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_low"/>
-        <resourcearea amount="4" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="6" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="2" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="4" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="3" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ore_high_fast"/>
+        <resourcearea amount="5" ref="sphere_small_ore_medium_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_silicon_medium_slow"/>
+        <resourcearea amount="6" ref="sphere_large_silicon_medium_average"/>
+        <resourcearea amount="3" ref="sphere_huge_ice_medium_slow"/>
+        <resourcearea amount="5" ref="sphere_medium_ice_medium_average"/>
+        <resourcearea amount="5" ref="sphere_small_ice_medium_veryfast"/>
+        <resourcearea amount="3" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1.63" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -5143,14 +4849,12 @@
     <properties>
       <identification name="{20004,7060011}" description="{20004,7060012}"/>
       <resourceareas>
-        <resourcearea amount="3" ref="sphere_medium_ice_high"/>
-        <resourcearea amount="4" ref="sphere_small_ice_veryhigh"/>
-        <resourcearea amount="2" ref="sphere_large_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="4" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="3" ref="sphere_large_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_medium_silicon_medium"/>
-        <resourcearea amount="2" ref="sphere_small_silicon_veryhigh"/>
+        <resourcearea amount="1" ref="sphere_huge_ore_low_average"/>
+        <resourcearea amount="4" ref="sphere_large_ore_low_fast"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_average"/>
+        <resourcearea amount="4" ref="sphere_large_silicon_low_fast"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_low_slow"/>
+        <resourcearea amount="4" ref="sphere_large_ice_low_average"/>
       </resourceareas>
       <area sunlight="0.88" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -5185,15 +4889,11 @@
     <properties>
       <identification name="{20004,7080011}" description="{20004,7080012}"/>
       <resourceareas>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
-        <resourcearea amount="1" ref="sphere_medium_rawkhaakscrap_verylow"/>
-        <resourcearea amount="2" ref="sphere_tiny_rawkhaakscrap_verylow"/>
-        <resourcearea amount="2" ref="sphere_large_rawscrap_medium"/>
-        <resourcearea amount="3" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="2" ref="sphere_small_rawscrap_high"/>
-        <resourcearea amount="1" ref="sphere_medium_silicon_low"/>
-        <resourcearea amount="3" ref="sphere_small_silicon_medium"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_verylow_average"/>
+        <resourcearea amount="1" ref="sphere_huge_silicon_low_veryfast"/>
+        <resourcearea amount="2" ref="sphere_huge_rawscrap_medium_slow"/>
+        <resourcearea amount="3" ref="sphere_medium_rawscrap_high_fast"/>
+        <resourcearea amount="2" ref="sphere_small_rawkhaakscrap_low_veryslow"/>
       </resourceareas>
       <area sunlight="4.08" economy="0.25" security="0.50" tags="noaggressivespawn" jobs="false"/>
       <worlds>
@@ -6510,12 +6210,10 @@
     <properties>
       <identification name="{20004,7300011}" description="{20004,7300012}"/>
       <resourceareas>
-        <resourcearea amount="5" ref="sphere_medium_ice_verylow"/>
-        <resourcearea amount="3" ref="sphere_small_ice_high"/>
-        <resourcearea amount="3" ref="sphere_small_methane_medium"/>
-        <resourcearea amount="1" ref="sphere_small_nividium_verylow"/>
-        <resourcearea amount="2" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_high"/>
+        <resourcearea amount="2" ref="sphere_medium_methane_medium_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_verylow_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ice_verylow_veryslow"/>
+        <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow"/>
       </resourceareas>
       <area sunlight="1" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>
     </properties>
@@ -6539,13 +6237,9 @@
     <properties>
       <identification name="{20004,7400011}" description="{20004,7400012}"/>
       <resourceareas>
-        <resourcearea amount="1" ref="sphere_small_helium_medium"/>
-        <resourcearea amount="3" ref="sphere_large_ore_verylow"/>
-        <resourcearea amount="5" ref="sphere_medium_ore_medium"/>
-        <resourcearea amount="3" ref="sphere_small_ore_veryhigh"/>
-        <resourcearea amount="1" ref="sphere_large_rawscrap_low"/>
-        <resourcearea amount="4" ref="sphere_medium_rawscrap_medium"/>
-        <resourcearea amount="5" ref="sphere_small_rawscrap_high"/>
+        <resourcearea amount="2" ref="sphere_small_helium_low_veryslow"/>
+        <resourcearea amount="2" ref="sphere_huge_ore_medium_slow"/>
+        <resourcearea amount="1" ref="sphere_huge_rawscrap_medium_veryfast"/>
       </resourceareas>
       <area sunlight="2.66" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>
     </properties>

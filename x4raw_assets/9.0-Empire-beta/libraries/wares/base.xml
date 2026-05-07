@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='UTF-8'?>
-<!--Last exported: 24.04.2026 12:17:48-->
+<!--Last exported: 06.05.2026 10:15:59-->
 <wares>
   <production>
     <method id="argon" name="{20206,201}">
@@ -2958,7 +2958,7 @@
         <ware ware="rawkhaakscrap" amount="1"/>
       </primary>
     </production>
-    <icon active="ware_scrapmetal" video="ware_khaakscrapmetal_macro"/>
+    <icon active="ware_khaakscrapmetal" video="ware_khaakscrapmetal_macro"/>
   </ware>
   <ware id="majadust" name="{20201,1801}" description="{20201,1802}" factoryname="{20201,1804}" group="pharmaceutical" transport="container" volume="6" illegal="holyorder paranid" tags="container economy">
     <price min="94" average="208" max="323"/>
@@ -3196,17 +3196,17 @@
     <container ref="sm_gen_pickup_equipment_01_macro"/>
   </ware>
   <ware id="missile_gen_l_dumbfire_01_mk1" name="{20105,6374}" description="{20105,6372}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
-    <price min="2152" average="2532" max="2912"/>
+    <price min="1936" average="2278" max="2620"/>
     <production time="3" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="42"/>
-        <ware ware="missilecomponents" amount="19"/>
+        <ware ware="energycells" amount="38"/>
+        <ware ware="missilecomponents" amount="17"/>
       </primary>
     </production>
     <production time="3" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="10"/>
-        <ware ware="ore" amount="5"/>
+        <ware ware="energycells" amount="9"/>
+        <ware ware="ore" amount="4"/>
         <ware ware="silicon" amount="3"/>
       </primary>
     </production>
@@ -3235,16 +3235,16 @@
     <use threshold="0"/>
   </ware>
   <ware id="missile_gen_m_dumbfire_01_mk1" name="{20105,6344}" description="{20105,6342}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
-    <price min="928" average="1091" max="1255"/>
+    <price min="881" average="1036" max="1191"/>
     <production time="3" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="18"/>
+        <ware ware="energycells" amount="17"/>
         <ware ware="missilecomponents" amount="8"/>
       </primary>
     </production>
     <production time="3" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="5"/>
+        <ware ware="energycells" amount="4"/>
         <ware ware="ore" amount="2"/>
         <ware ware="silicon" amount="1"/>
       </primary>
@@ -3254,10 +3254,10 @@
     <use threshold="0"/>
   </ware>
   <ware id="missile_gen_m_dumbfire_01_mk2" name="{20105,6364}" description="{20105,6362}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
-    <price min="1008" average="1186" max="1364"/>
+    <price min="1058" average="1245" max="1432"/>
     <production time="3" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
+        <ware ware="energycells" amount="21"/>
         <ware ware="missilecomponents" amount="9"/>
       </primary>
     </production>
@@ -3273,10 +3273,30 @@
     <use threshold="0.36"/>
   </ware>
   <ware id="missile_gen_m_guided_01_mk1" name="{20105,6394}" description="{20105,6392}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
-    <price min="2142" average="2520" max="2898"/>
+    <price min="1671" average="1966" max="2261"/>
     <production time="3" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="20"/>
+        <ware ware="energycells" amount="24"/>
+        <ware ware="missilecomponents" amount="7"/>
+        <ware ware="smartchips" amount="3"/>
+      </primary>
+    </production>
+    <production time="3" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
+      <primary>
+        <ware ware="energycells" amount="8"/>
+        <ware ware="ore" amount="4"/>
+        <ware ware="silicon" amount="2"/>
+      </primary>
+    </production>
+    <component ref="missile_gen_m_guided_01_mk1_macro"/>
+    <container ref="sm_gen_pickup_equipment_01_macro"/>
+    <use threshold="0"/>
+  </ware>
+  <ware id="missile_gen_m_smart_01_mk1" name="{20105,6454}" description="{20105,6452}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
+    <price min="2105" average="2477" max="2849"/>
+    <production time="3" amount="1" method="default" name="{20206,101}">
+      <primary>
+        <ware ware="energycells" amount="31"/>
         <ware ware="missilecomponents" amount="9"/>
         <ware ware="smartchips" amount="4"/>
       </primary>
@@ -3285,26 +3305,6 @@
       <primary>
         <ware ware="energycells" amount="10"/>
         <ware ware="ore" amount="5"/>
-        <ware ware="silicon" amount="3"/>
-      </primary>
-    </production>
-    <component ref="missile_gen_m_guided_01_mk1_macro"/>
-    <container ref="sm_gen_pickup_equipment_01_macro"/>
-    <use threshold="0"/>
-  </ware>
-  <ware id="missile_gen_m_smart_01_mk1" name="{20105,6454}" description="{20105,6452}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
-    <price min="1914" average="2252" max="2590"/>
-    <production time="3" amount="1" method="default" name="{20206,101}">
-      <primary>
-        <ware ware="energycells" amount="28"/>
-        <ware ware="missilecomponents" amount="8"/>
-        <ware ware="smartchips" amount="4"/>
-      </primary>
-    </production>
-    <production time="3" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
-      <primary>
-        <ware ware="energycells" amount="9"/>
-        <ware ware="ore" amount="4"/>
         <ware ware="silicon" amount="3"/>
       </primary>
     </production>
@@ -3332,10 +3332,10 @@
     <use threshold="0"/>
   </ware>
   <ware id="missile_gen_s_dumbfire_01_mk2" name="{20105,6354}" description="{20105,6352}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
-    <price min="533" average="627" max="721"/>
+    <price min="597" average="702" max="807"/>
     <production time="3" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="10"/>
+        <ware ware="energycells" amount="12"/>
         <ware ware="missilecomponents" amount="5"/>
       </primary>
     </production>
@@ -3371,10 +3371,10 @@
     <use threshold="0.33"/>
   </ware>
   <ware id="missile_gen_s_guided_01_mk1" name="{20105,6384}" description="{20105,6382}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
-    <price min="884" average="1040" max="1196"/>
+    <price min="858" average="1009" max="1160"/>
     <production time="3" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="13"/>
+        <ware ware="energycells" amount="12"/>
         <ware ware="missilecomponents" amount="4"/>
         <ware ware="smartchips" amount="2"/>
       </primary>
@@ -3411,17 +3411,17 @@
     <use threshold="0.34"/>
   </ware>
   <ware id="missile_gen_s_smart_01_mk1" name="{20105,6444}" description="{20105,6442}" group="missiles" transport="equipment" volume="1" tags="equipment missile">
-    <price min="804" average="946" max="1088"/>
+    <price min="965" average="1135" max="1305"/>
     <production time="3" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="energycells" amount="12"/>
-        <ware ware="missilecomponents" amount="3"/>
+        <ware ware="energycells" amount="14"/>
+        <ware ware="missilecomponents" amount="4"/>
         <ware ware="smartchips" amount="2"/>
       </primary>
     </production>
     <production time="3" amount="1" method="xenon" name="{20206,601}" tags="noplayerbuild">
       <primary>
-        <ware ware="energycells" amount="4"/>
+        <ware ware="energycells" amount="5"/>
         <ware ware="ore" amount="2"/>
         <ware ware="silicon" amount="1"/>
       </primary>
@@ -9375,7 +9375,7 @@
   </ware>
   <ware id="rawkhaakscrap" name="{20201,7501}" description="{20201,7502}" group="refined" transport="solid" volume="10" tags="processed recycling solid">
     <price min="30" average="40" max="50"/>
-    <icon active="ware_scrapmetal" video="ware_rawkhaakscrap_macro"/>
+    <icon active="ware_khaakscrapmetal" video="ware_rawkhaakscrap_macro"/>
   </ware>
   <ware id="rawscrap" name="{20201,6801}" description="{20201,6802}" group="refined" transport="solid" volume="10" tags="processed recycling solid">
     <price min="153" average="180" max="207"/>
@@ -13464,7 +13464,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_l_allround_01_mk2_macro"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
   </ware>
   <ware id="thruster_gen_l_allround_01_mk3" name="{20107, 12024}" description="{20107, 12022}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="6328619" average="7031799" max="7734979"/>
@@ -13483,7 +13483,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_l_allround_01_mk3_macro"/>
-    <use threshold="1"/>
+    <use threshold="0.91"/>
   </ware>
   <ware id="thruster_gen_m_allround_01_mk1" name="{20107, 11004}" description="{20107, 11002}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="11717" average="13019" max="14321"/>
@@ -13521,7 +13521,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_m_allround_01_mk2_macro"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
   </ware>
   <ware id="thruster_gen_m_allround_01_mk3" name="{20107, 11024}" description="{20107, 11022}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="289300" average="321445" max="353589"/>
@@ -13540,7 +13540,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_m_allround_01_mk3_macro"/>
-    <use threshold="1"/>
+    <use threshold="0.71"/>
   </ware>
   <ware id="thruster_gen_m_combat_01_mk1" name="{20107,11054}" description="{20107,11052}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="14899" average="16555" max="18210"/>
@@ -13578,7 +13578,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_m_combat_01_mk2_macro"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
   </ware>
   <ware id="thruster_gen_m_combat_01_mk3" name="{20107, 11074}" description="{20107, 11072}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="368854" average="409838" max="450821"/>
@@ -13597,7 +13597,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_m_combat_01_mk3_macro"/>
-    <use threshold="1"/>
+    <use threshold="0.71"/>
   </ware>
   <ware id="thruster_gen_s_allround_01_mk1" name="{20107,10004}" description="{20107,10002}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="5353" average="5948" max="6542"/>
@@ -13635,7 +13635,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_s_allround_01_mk2_macro"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
   </ware>
   <ware id="thruster_gen_s_allround_01_mk3" name="{20107, 10024}" description="{20107, 10022}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="157946" average="175495" max="193045"/>
@@ -13654,7 +13654,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_s_allround_01_mk3_macro"/>
-    <use threshold="1"/>
+    <use threshold="0.71"/>
   </ware>
   <ware id="thruster_gen_s_combat_01_mk1" name="{20107,10054}" description="{20107,10052}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="6241" average="6934" max="7628"/>
@@ -13692,7 +13692,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_s_combat_01_mk2_macro"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
   </ware>
   <ware id="thruster_gen_s_combat_01_mk3" name="{20107,10074}" description="{20107,10072}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="199757" average="221952" max="244147"/>
@@ -13711,7 +13711,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_s_combat_01_mk3_macro"/>
-    <use threshold="1"/>
+    <use threshold="0.71"/>
   </ware>
   <ware id="thruster_gen_xl_allround_01_mk1" name="{20107,13004}" description="{20107,13002}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="538346" average="598162" max="657978"/>
@@ -13749,7 +13749,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_xl_allround_01_mk2_macro"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
   </ware>
   <ware id="thruster_gen_xl_allround_01_mk3" name="{20107, 13024}" description="{20107, 13022}" group="thrusters" transport="equipment" volume="1" tags="equipment thruster">
     <price min="13451392" average="14945991" max="16440590"/>
@@ -13768,7 +13768,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_xl_allround_01_mk3_macro"/>
-    <use threshold="1"/>
+    <use threshold="0.91"/>
   </ware>
   <ware id="turretcomponents" name="{20201,4601}" description="{20201,4602}" factoryname="{20201,4604}" group="shiptech" transport="container" volume="20" tags="container economy stationbuilding">
     <price min="164" average="273" max="383"/>
@@ -13813,7 +13813,7 @@
     </production>
     <component ref="turret_arg_l_dumbfire_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.54"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -13829,7 +13829,7 @@
     </production>
     <component ref="turret_arg_l_guided_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.62"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -13881,7 +13881,7 @@
     </production>
     <component ref="turret_arg_l_plasma_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -13945,7 +13945,7 @@
     </production>
     <component ref="turret_arg_m_dumbfire_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -13961,7 +13961,7 @@
     </production>
     <component ref="turret_arg_m_flak_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="argon"/>
     <owner faction="buccaneers"/>
@@ -13977,7 +13977,7 @@
     </production>
     <component ref="turret_arg_m_flak_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="argon"/>
     <owner faction="buccaneers"/>
@@ -13993,7 +13993,7 @@
     </production>
     <component ref="turret_arg_m_gatling_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -14010,7 +14010,7 @@
     </production>
     <component ref="turret_arg_m_gatling_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -14040,7 +14040,7 @@
     </production>
     <component ref="turret_arg_m_guided_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.63"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -14128,7 +14128,7 @@
     </production>
     <component ref="turret_arg_m_plasma_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -14145,7 +14145,7 @@
     </production>
     <component ref="turret_arg_m_plasma_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -14162,7 +14162,7 @@
     </production>
     <component ref="turret_arg_m_shotgun_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -14179,7 +14179,7 @@
     </production>
     <component ref="turret_arg_m_shotgun_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -14227,7 +14227,7 @@
     </production>
     <component ref="turret_par_l_beam_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.9"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14245,7 +14245,7 @@
     </production>
     <component ref="turret_par_l_dumbfire_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.54"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="holyorder"/>
     <owner faction="paranid"/>
@@ -14262,7 +14262,7 @@
     </production>
     <component ref="turret_par_l_guided_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.62"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="holyorder"/>
     <owner faction="paranid"/>
@@ -14315,7 +14315,7 @@
     </production>
     <component ref="turret_par_l_plasma_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14333,7 +14333,7 @@
     </production>
     <component ref="turret_par_m_beam_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.9"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14351,7 +14351,7 @@
     </production>
     <component ref="turret_par_m_beam_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.9"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14383,7 +14383,7 @@
     </production>
     <component ref="turret_par_m_dumbfire_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="holyorder"/>
     <owner faction="paranid"/>
@@ -14400,7 +14400,7 @@
     </production>
     <component ref="turret_par_m_gatling_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14418,7 +14418,7 @@
     </production>
     <component ref="turret_par_m_gatling_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14450,7 +14450,7 @@
     </production>
     <component ref="turret_par_m_guided_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.63"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="holyorder"/>
     <owner faction="paranid"/>
@@ -14539,7 +14539,7 @@
     </production>
     <component ref="turret_par_m_plasma_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14557,7 +14557,7 @@
     </production>
     <component ref="turret_par_m_plasma_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14575,7 +14575,7 @@
     </production>
     <component ref="turret_par_m_shotgun_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14593,7 +14593,7 @@
     </production>
     <component ref="turret_par_m_shotgun_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -14627,7 +14627,7 @@
     </production>
     <component ref="turret_tel_l_dumbfire_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.54"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14643,7 +14643,7 @@
     </production>
     <component ref="turret_tel_l_guided_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.62"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14692,7 +14692,7 @@
     </production>
     <component ref="turret_tel_l_plasma_01_mk1_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14753,7 +14753,7 @@
     </production>
     <component ref="turret_tel_m_dumbfire_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14769,7 +14769,7 @@
     </production>
     <component ref="turret_tel_m_gatling_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14785,7 +14785,7 @@
     </production>
     <component ref="turret_tel_m_gatling_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14814,7 +14814,7 @@
     </production>
     <component ref="turret_tel_m_guided_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.63"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14896,7 +14896,7 @@
     </production>
     <component ref="turret_tel_m_plasma_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14912,7 +14912,7 @@
     </production>
     <component ref="turret_tel_m_plasma_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14928,7 +14928,7 @@
     </production>
     <component ref="turret_tel_m_shotgun_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14944,7 +14944,7 @@
     </production>
     <component ref="turret_tel_m_shotgun_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -15147,7 +15147,7 @@
     </production>
     <component ref="weapon_arg_m_ion_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.9"/>
+    <use threshold="0.91"/>
     <owner faction="alliance"/>
     <owner faction="argon"/>
     <owner faction="buccaneers"/>
@@ -15163,7 +15163,7 @@
     </production>
     <component ref="weapon_arg_m_ion_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.9"/>
+    <use threshold="0.91"/>
     <owner faction="alliance"/>
     <owner faction="argon"/>
     <owner faction="buccaneers"/>
@@ -15179,7 +15179,7 @@
     </production>
     <component ref="weapon_arg_s_ion_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.91"/>
     <owner faction="alliance"/>
     <owner faction="argon"/>
     <owner faction="buccaneers"/>
@@ -15195,7 +15195,7 @@
     </production>
     <component ref="weapon_arg_s_ion_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.9"/>
+    <use threshold="0.91"/>
     <owner faction="alliance"/>
     <owner faction="argon"/>
     <owner faction="buccaneers"/>
@@ -15287,7 +15287,7 @@
     </production>
     <component ref="weapon_gen_m_beam_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15321,18 +15321,18 @@
     <component ref="weapon_gen_m_dumbfire_01_mk2_macro"/>
   </ware>
   <ware id="weapon_gen_m_dumbfire_02_mk1" name="{20105,2614}" description="{20105,2612}" group="weapons" transport="equipment" volume="1" tags="equipment missilelauncher weapon">
-    <price min="22478" average="24975" max="27473"/>
+    <price min="28097" average="31219" max="34341"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedcomposites" amount="5"/>
-        <ware ware="energycells" amount="51"/>
-        <ware ware="weaponcomponents" amount="5"/>
+        <ware ware="advancedcomposites" amount="7"/>
+        <ware ware="energycells" amount="64"/>
+        <ware ware="weaponcomponents" amount="7"/>
       </primary>
     </production>
     <component ref="weapon_gen_m_dumbfire_02_mk1_macro"/>
     <icon video="weapon_gen_m_dumbfire_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.07"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15377,7 +15377,7 @@
     </production>
     <component ref="weapon_gen_m_gatling_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15411,18 +15411,18 @@
     <component ref="weapon_gen_m_guided_01_mk2_macro"/>
   </ware>
   <ware id="weapon_gen_m_guided_02_mk1" name="{20105,2634}" description="{20105,2632}" group="weapons" transport="equipment" volume="1" tags="equipment missilelauncher weapon">
-    <price min="31469" average="34965" max="38462"/>
+    <price min="42483" average="47203" max="51923"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedcomposites" amount="7"/>
-        <ware ware="energycells" amount="72"/>
-        <ware ware="weaponcomponents" amount="8"/>
+        <ware ware="advancedcomposites" amount="10"/>
+        <ware ware="energycells" amount="97"/>
+        <ware ware="weaponcomponents" amount="10"/>
       </primary>
     </production>
     <component ref="weapon_gen_m_guided_02_mk1_macro"/>
     <icon video="weapon_gen_m_guided_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.15"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15458,17 +15458,17 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="weapon_gen_m_laser_01_mk2" name="{20105,2014}" description="{20105,2012}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
-    <price min="48281" average="53646" max="59011"/>
+    <price min="120479" average="133866" max="147253"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedelectronics" amount="12"/>
-        <ware ware="energycells" amount="110"/>
-        <ware ware="weaponcomponents" amount="12"/>
+        <ware ware="advancedelectronics" amount="30"/>
+        <ware ware="energycells" amount="276"/>
+        <ware ware="weaponcomponents" amount="31"/>
       </primary>
     </production>
     <component ref="weapon_gen_m_laser_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15514,7 +15514,7 @@
     </production>
     <component ref="weapon_gen_m_mining_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.36" purposes="mine"/>
+    <use threshold="0.31" purposes="mine"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15536,7 +15536,7 @@
     </production>
     <component ref="weapon_gen_m_plasma_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15558,7 +15558,7 @@
     </production>
     <component ref="weapon_gen_m_plasma_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15602,7 +15602,7 @@
     </production>
     <component ref="weapon_gen_m_shotgun_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15636,18 +15636,18 @@
     <component ref="weapon_gen_m_torpedo_01_mk2_macro"/>
   </ware>
   <ware id="weapon_gen_m_torpedo_02_mk1" name="{20105,2654}" description="{20105,2652}" group="weapons" transport="equipment" volume="1" tags="equipment missilelauncher weapon">
-    <price min="44955" average="49950" max="54945"/>
+    <price min="60690" average="67433" max="74176"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedelectronics" amount="11"/>
-        <ware ware="energycells" amount="103"/>
-        <ware ware="weaponcomponents" amount="11"/>
+        <ware ware="advancedelectronics" amount="15"/>
+        <ware ware="energycells" amount="139"/>
+        <ware ware="weaponcomponents" amount="15"/>
       </primary>
     </production>
     <component ref="weapon_gen_m_torpedo_02_mk1_macro"/>
     <icon video="weapon_gen_m_torpedo_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15723,7 +15723,7 @@
     </production>
     <component ref="weapon_gen_s_beam_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15745,7 +15745,7 @@
     </production>
     <component ref="weapon_gen_s_burst_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="paranid"/>
@@ -15762,7 +15762,7 @@
     </production>
     <component ref="weapon_gen_s_burst_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="paranid"/>
@@ -15779,7 +15779,7 @@
     </production>
     <component ref="weapon_gen_s_cannon_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
     <owner faction="ministry"/>
@@ -15796,7 +15796,7 @@
     </production>
     <component ref="weapon_gen_s_cannon_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
     <owner faction="ministry"/>
@@ -15825,18 +15825,18 @@
     <component ref="weapon_gen_s_dumbfire_01_mk2_macro"/>
   </ware>
   <ware id="weapon_gen_s_dumbfire_02_mk1" name="{20105,2604}" description="{20105,2602}" group="weapons" transport="equipment" volume="1" tags="equipment missilelauncher weapon">
-    <price min="14985" average="16650" max="18315"/>
+    <price min="17982" average="19980" max="21978"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedcomposites" amount="3"/>
-        <ware ware="energycells" amount="34"/>
-        <ware ware="weaponcomponents" amount="3"/>
+        <ware ware="advancedcomposites" amount="4"/>
+        <ware ware="energycells" amount="41"/>
+        <ware ware="weaponcomponents" amount="4"/>
       </primary>
     </production>
     <component ref="weapon_gen_s_dumbfire_02_mk1_macro"/>
     <icon video="weapon_gen_s_dumbfire_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.04"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15881,7 +15881,7 @@
     </production>
     <component ref="weapon_gen_s_gatling_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15915,18 +15915,18 @@
     <component ref="weapon_gen_s_guided_01_mk2_macro"/>
   </ware>
   <ware id="weapon_gen_s_guided_02_mk1" name="{20105,2624}" description="{20105,2622}" group="weapons" transport="equipment" volume="1" tags="equipment missilelauncher weapon">
-    <price min="20979" average="23310" max="25641"/>
+    <price min="26853" average="29837" max="32821"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedcomposites" amount="5"/>
-        <ware ware="energycells" amount="48"/>
-        <ware ware="weaponcomponents" amount="5"/>
+        <ware ware="advancedcomposites" amount="6"/>
+        <ware ware="energycells" amount="61"/>
+        <ware ware="weaponcomponents" amount="6"/>
       </primary>
     </production>
     <component ref="weapon_gen_s_guided_02_mk1_macro"/>
     <icon video="weapon_gen_s_guided_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.05"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -15961,17 +15961,17 @@
     <owner faction="trinity"/>
   </ware>
   <ware id="weapon_gen_s_laser_01_mk2" name="{20105,1014}" description="{20105,1012}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
-    <price min="32188" average="35764" max="39340"/>
+    <price min="80320" average="89244" max="98168"/>
     <production time="10" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedelectronics" amount="8"/>
-        <ware ware="energycells" amount="73"/>
-        <ware ware="weaponcomponents" amount="8"/>
+        <ware ware="advancedelectronics" amount="20"/>
+        <ware ware="energycells" amount="184"/>
+        <ware ware="weaponcomponents" amount="20"/>
       </primary>
     </production>
     <component ref="weapon_gen_s_laser_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -16015,7 +16015,7 @@
     </production>
     <component ref="weapon_gen_s_mining_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.35" purposes="mine"/>
+    <use threshold="0.31" purposes="mine"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -16037,7 +16037,7 @@
     </production>
     <component ref="weapon_gen_s_plasma_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -16059,7 +16059,7 @@
     </production>
     <component ref="weapon_gen_s_plasma_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -16103,7 +16103,7 @@
     </production>
     <component ref="weapon_gen_s_shotgun_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -16137,18 +16137,18 @@
     <component ref="weapon_gen_s_torpedo_01_mk2_macro"/>
   </ware>
   <ware id="weapon_gen_s_torpedo_02_mk1" name="{20105,2644}" description="{20105,2642}" group="weapons" transport="equipment" volume="1" tags="equipment missilelauncher weapon">
-    <price min="29970" average="33300" max="36630"/>
+    <price min="38362" average="42624" max="46886"/>
     <production time="5" amount="1" method="default" name="{20206,101}">
       <primary>
-        <ware ware="advancedcomposites" amount="7"/>
-        <ware ware="energycells" amount="68"/>
-        <ware ware="weaponcomponents" amount="7"/>
+        <ware ware="advancedcomposites" amount="9"/>
+        <ware ware="energycells" amount="87"/>
+        <ware ware="weaponcomponents" amount="9"/>
       </primary>
     </production>
     <component ref="weapon_gen_s_torpedo_02_mk1_macro"/>
     <icon video="weapon_gen_s_torpedo_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.13"/>
+    <use threshold="0"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -16216,7 +16216,7 @@
     </production>
     <component ref="weapon_par_m_railgun_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="paranid"/>
@@ -16233,7 +16233,7 @@
     </production>
     <component ref="weapon_par_m_railgun_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.9"/>
+    <use threshold="0.91"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="paranid"/>
@@ -16250,7 +16250,7 @@
     </production>
     <component ref="weapon_par_s_railgun_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="paranid"/>
@@ -16267,7 +16267,7 @@
     </production>
     <component ref="weapon_par_s_railgun_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.9"/>
+    <use threshold="0.91"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="paranid"/>
@@ -16300,7 +16300,7 @@
     </production>
     <component ref="weapon_tel_m_charge_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="teladi"/>
   </ware>
@@ -16315,7 +16315,7 @@
     </production>
     <component ref="weapon_tel_m_charge_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="teladi"/>
   </ware>
@@ -16330,7 +16330,7 @@
     </production>
     <component ref="weapon_tel_s_charge_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="teladi"/>
   </ware>
@@ -16345,7 +16345,7 @@
     </production>
     <component ref="weapon_tel_s_charge_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="alliance"/>
     <owner faction="teladi"/>
   </ware>

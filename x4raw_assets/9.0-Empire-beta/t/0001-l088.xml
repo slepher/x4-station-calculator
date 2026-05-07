@@ -3341,6 +3341,7 @@
     <t id="11696">Dismantlable Wreck</t>
     <t id="11697">Resource Probe coverage</t>
     <t id="11698">{1001,11697}</t>
+    <t id="11699">(resource type)Solid</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">離線存檔</t>
     <t id="11702">覆蓋離線存檔</t>
@@ -3959,6 +3960,9 @@
     <t id="13326">聚焦空間站模型</t>
     <t id="13327">隊列中的優先指令</t>
     <t id="13328">資源採集速率</t>
+    <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
+    <t id="13401">(resource type)Gas</t>
+    <t id="13402">(resource type)Scrap</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">再見</t>
@@ -7711,6 +7715,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Single\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Dual\)</t>
+    <t id="1131">Default - WASD Keyboard &amp; Mouse \(Alternative\)</t>
     <t id="2001">Sony DUALSHOCK3 無線控制器</t>
     <t id="2011">Sony DUALSHOCK4 無線控制器</t>
     <t id="2021">Sony DualSense 無線控制器</t>
@@ -62000,6 +62005,7 @@
     <t id="5212">(objective3)建造工廠</t>
     <t id="5213">(objective)在指定地點佔領地塊</t>
     <t id="5214">(objective Extend:)將建築規劃擴展至所需尺寸。</t>
+    <t id="5215">(objective)Buy plot in specified sector</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">藍圖可向派系代表和外交官購買。</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62512,6 +62518,7 @@
     <t id="113">{20104,150101}(Wide Area Sensor Array)</t>
     <t id="114">廣域感測器陣列</t>
     <t id="200">目的地：$DESTINATION$（指定位置）</t>
+    <t id="201">Destination: $DESTINATION$</t>
     <t id="300">要成為有效的防禦空間站，其中一個防禦模組必須是行政中心。</t>
     <t id="301">費用將在合理範圍內慷慨支付。</t>
     <t id="302">預估最低建造成本</t>

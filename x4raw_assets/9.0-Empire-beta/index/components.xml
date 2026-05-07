@@ -2720,7 +2720,6 @@
   <entry name="env_asteroid_pierced_xl_02" value="assets\environments\asteroids\env_asteroid_pierced_xl_02"/>
   <entry name="test_markus_audiolog_01" value="assets\test\markus\test_markus_audiolog_01"/>
   <entry name="test_markus_par_m_frigate_01" value="assets\test\markus\test_markus_par_m_frigate_01"/>
-  <entry name="sm_gen_wares_audiolog_01" value="assets\props\StorageModules\sm_gen_wares_audiolog_01"/>
   <entry name="batchtest_markus_arg_s_fighter_01" value="assets\test\martin\batchtest\batchtest_markus_arg_s_fighter_01"/>
   <entry name="batchtest_markus_arg_s_fighter_02" value="assets\test\martin\batchtest\batchtest_markus_arg_s_fighter_02"/>
   <entry name="batchtest_markus_arg_s_fighter_05" value="assets\test\markus\batchtest2\batchtest_markus_arg_s_fighter_05"/>
@@ -2881,7 +2880,6 @@
   <entry name="test_steven_ship_par_m_frigate_01" value="assets\test\steven\test_steven_ship_par_m_frigate_01"/>
   <entry name="test_steven_ship_gen_s_fighter_01" value="assets\test\steven\test_steven_ship_gen_s_fighter_01"/>
   <entry name="test_steven_ship_arg_s_fighter_04" value="assets\test\steven\test_steven_ship_arg_s_fighter_04"/>
-  <entry name="test_lino_env_asteroid_shard" value="assets\test\lino\test_lino_env_asteroid_shard"/>
   <entry name="env_asteroid_shard_m_01" value="assets\environments\asteroids\env_asteroid_shard_m_01"/>
   <entry name="env_asteroid_shard_l_01" value="assets\environments\asteroids\env_asteroid_shard_l_01"/>
   <entry name="env_asteroid_shard_xl_01" value="assets\environments\asteroids\env_asteroid_shard_xl_01"/>
@@ -2967,6 +2965,7 @@
   <entry name="landmarks_gen_asteroidmine_01" value="assets\structures\landmarks\landmarks_gen_asteroidmine_01"/>
   <entry name="sm_gen_audiolog_01" value="assets\props\StorageModules\sm_gen_audiolog_01"/>
   <entry name="scs_gen_asteroid_32_entranceplug_01" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_entranceplug_01"/>
+  <entry name="scs_gen_asteroid_32_entranceplug_02" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_entranceplug_02"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>
