@@ -64,9 +64,19 @@ const updatePopoverPosition = async () => {
   if (!searchBoxEl.value) return
   
   const searchRect = searchBoxEl.value.getBoundingClientRect()
+  const panelCard = searchBoxEl.value.closest('.panel-card')
+  
+  let baseLeft = searchRect.right
+  if (panelCard) {
+    const panelRect = panelCard.getBoundingClientRect()
+    baseLeft = panelRect.right + 8
+  } else {
+    baseLeft = searchRect.right + 8
+  }
+  
   popoverPosition.value = {
-    top: searchRect.bottom + 4,
-    left: searchRect.left
+    top: searchRect.top,
+    left: baseLeft
   }
 }
 
@@ -272,7 +282,7 @@ const categoryOptions = computed(() => [
 
 .fade-slide-enter-from,
 .fade-slide-leave-to {
-  @apply opacity-0 transform -translate-y-1;
+  @apply opacity-0 transform translate-x-2;
 }
 </style>
 
