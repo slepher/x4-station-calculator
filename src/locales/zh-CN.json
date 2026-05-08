@@ -558,6 +558,7 @@
     "limit": "上限",
     "actual": "实际",
     "workforce_label": "工人",
+    "workforce_idle_label": "闲置工人",
     "auto_calc": "自动计算",
     "inc_phq": "包含总部 (PHQ)",
     "view_cost": "成本视图",

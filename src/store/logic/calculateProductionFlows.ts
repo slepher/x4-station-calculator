@@ -3,7 +3,7 @@ import type {
   X4Module,
   X4Ware,
   StationSettings,
-  RaceMedicalConsumption
+  WorkforceConsumptionMap
 } from '../../types/x4'
 import type { FlowContribution, WareProductionFlow } from '../../types/production-flow'
 import type { WorkforceEntry } from '../../types/saveArchive'
@@ -143,7 +143,7 @@ export interface CalculateProductionFlowsCoreInput {
   autoHabitationModules: SavedModule[]
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
-  medicalConsumptionMap: RaceMedicalConsumption
+  workforceConsumptionMap: WorkforceConsumptionMap
   settings: StationSettings
   warePriority: Record<string, number>
   actualWorkforceOverride?: number
@@ -166,7 +166,7 @@ export function calculateProductionFlowsCore(
     autoHabitationModules,
     modulesMap,
     waresMap,
-    medicalConsumptionMap,
+    workforceConsumptionMap,
     settings,
     warePriority,
     actualWorkforceOverride,
@@ -179,7 +179,7 @@ export function calculateProductionFlowsCore(
     allModules,
     modulesMap,
     waresMap,
-    medicalConsumptionMap,
+    workforceConsumptionMap,
     settings,
     warePriority,
     actualWorkforceOverride,
@@ -200,7 +200,7 @@ export interface CalculateProductionFlowsInput {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
   lockedWares: string[]
-  medicalConsumptionMap: RaceMedicalConsumption
+  workforceConsumptionMap: WorkforceConsumptionMap
   warePriority: Record<string, number>
 }
 
@@ -221,7 +221,7 @@ export function calculateProductionFlows(
     modulesMap,
     waresMap,
     lockedWares,
-    medicalConsumptionMap,
+    workforceConsumptionMap,
     warePriority
   } = input
 
@@ -239,7 +239,7 @@ export function calculateProductionFlows(
     autoHabitationModules: autoFillResult.autoHabitationModules,
     modulesMap,
     waresMap,
-    medicalConsumptionMap,
+    workforceConsumptionMap,
     settings,
     warePriority
   })
@@ -305,11 +305,101 @@ interface ProductionFlowsInternalResult {
   saturation: number
 }
 
+function aggregateRaceEntries(entries: WorkforceEntry[]): WorkforceEntry[] {
+  const byRace = new Map<string, number>()
+
+  entries.forEach(entry => {
+    if (entry.amount <= 0) return
+    byRace.set(entry.race, (byRace.get(entry.race) || 0) + entry.amount)
+  })
+
+  return Array.from(byRace.entries()).map(([race, amount]) => ({ race, amount }))
+}
+
+function buildRaceEntriesFromCensus(
+  censusItems: Array<{ race: string; residents: number }>
+): WorkforceEntry[] {
+  return aggregateRaceEntries(
+    censusItems.map(item => ({
+      race: item.race,
+      amount: item.residents
+    }))
+  )
+}
+
+function applySharedWorkforceConsumption(
+  raceEntries: WorkforceEntry[],
+  neededWorkforce: number,
+  workforceConsumptionMap: WorkforceConsumptionMap,
+  getOrInitFlow: (wareId: string) => WareProductionFlow
+): number {
+  const totalResidents = raceEntries.reduce((sum, entry) => sum + entry.amount, 0)
+  const busyWorkers = Math.min(totalResidents, neededWorkforce)
+
+  raceEntries.forEach(entry => {
+    const raceKey = entry.race in workforceConsumptionMap ? entry.race : 'default'
+    const raceConsumption = workforceConsumptionMap[raceKey]
+
+    if (!raceConsumption) return
+
+    const raceBusy = totalResidents > 0
+      ? (entry.amount / totalResidents) * busyWorkers
+      : 0
+    const raceIdle = entry.amount - raceBusy
+
+    if (raceBusy > 0) {
+      const busyWares = raceConsumption.busy || {}
+      for (const [wareId, perPersonPerHour] of Object.entries(busyWares)) {
+        const hourlyAmount = raceBusy * perPersonPerHour
+
+        if (hourlyAmount <= 0) continue
+
+        const flowEntry = getOrInitFlow(wareId)
+        flowEntry.consumption += hourlyAmount
+
+        const contribution: FlowContribution = {
+          id: entry.race,
+          class: 'workforce',
+          type: 'consumption',
+          count: raceBusy,
+          amount: -hourlyAmount,
+          bonusPercent: 0
+        }
+        flowEntry.contributions.push(contribution)
+      }
+    }
+
+    if (raceIdle > 0) {
+      const idleWares = raceConsumption.idle || {}
+      for (const [wareId, perPersonPerHour] of Object.entries(idleWares)) {
+        const hourlyAmount = raceIdle * perPersonPerHour
+
+        if (hourlyAmount <= 0) continue
+
+        const flowEntry = getOrInitFlow(wareId)
+        flowEntry.consumption += hourlyAmount
+
+        const contribution: FlowContribution = {
+          id: entry.race,
+          class: 'workforce_idle',
+          type: 'consumption',
+          count: raceIdle,
+          amount: -hourlyAmount,
+          bonusPercent: 0
+        }
+        flowEntry.contributions.push(contribution)
+      }
+    }
+  })
+
+  return busyWorkers
+}
+
 function calculateProductionFlowsInternal(
   plannedModules: SavedModule[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  medicalConsumptionMap: RaceMedicalConsumption,
+  workforceConsumptionMap: WorkforceConsumptionMap,
   settings: StationSettings,
   _warePriority: Record<string, number>,
   actualWorkforceOverride?: number,
@@ -350,62 +440,60 @@ function calculateProductionFlowsInternal(
   let saturation: number
 
   if (workforceOverride && workforceOverride.length > 0) {
-    actualWorkforce = actualWorkforceOverride ?? workforceOverride.reduce((sum, w) => sum + w.amount, 0)
-    saturation = saturationOverride ?? calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
-
-    workforceOverride.forEach(entry => {
-      const raceKey = entry.race in medicalConsumptionMap ? entry.race : 'default'
-      const consumption = medicalConsumptionMap[raceKey]
-
-      if (!consumption) return
-
-      for (const [wareId, perPersonPerSec] of Object.entries(consumption)) {
-        const hourlyAmount = entry.amount * (perPersonPerSec as number) * 3600
-
-        const flowEntry = getOrInitFlow(wareId)
-        flowEntry.consumption += hourlyAmount
-
-        const contribution: FlowContribution = {
-          id: entry.race,
-          class: 'workforce',
-          type: 'consumption',
-          count: entry.amount,
-          amount: -hourlyAmount,
-          bonusPercent: 0
-        }
-        flowEntry.contributions.push(contribution)
-      }
-    })
+    const neededWorkforce = workforceBreakdown.needed.total
+    const raceEntries = aggregateRaceEntries(workforceOverride)
+    actualWorkforce = applySharedWorkforceConsumption(
+      raceEntries,
+      neededWorkforce,
+      workforceConsumptionMap,
+      getOrInitFlow
+    )
+    saturation = saturationOverride ?? calculateEfficiencySaturation(neededWorkforce, actualWorkforce)
   } else {
-    actualWorkforce = actualWorkforceOverride ?? calculateActualWorkforce(workforceBreakdown, settings)
+    const requestedWorkforce = actualWorkforceOverride ?? calculateActualWorkforce(workforceBreakdown, settings)
+    actualWorkforce = requestedWorkforce
     saturation = saturationOverride ?? calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
 
-    const censusItems = calculateWorkforceCensus(plannedModules, modulesMap, actualWorkforce)
+    const censusItems = calculateWorkforceCensus(plannedModules, modulesMap, requestedWorkforce)
 
-    censusItems.forEach(item => {
-      const raceKey = item.race in medicalConsumptionMap ? item.race : 'default'
-      const wares = medicalConsumptionMap[raceKey]
+    if (settings.workforceAuto) {
+      censusItems.forEach(item => {
+        const raceKey = item.race in workforceConsumptionMap ? item.race : 'default'
+        const raceConsumption = workforceConsumptionMap[raceKey]
 
-      if (!wares) return
+        if (!raceConsumption) return
 
-      for (const [wareId, perPersonPerSecond] of Object.entries(wares)) {
-        const entry = getOrInitFlow(wareId)
+        const busyWares = raceConsumption.busy || {}
+        for (const [wareId, perPersonPerHour] of Object.entries(busyWares)) {
+          const entry = getOrInitFlow(wareId)
 
-        const hourlyAmount = item.residents * (perPersonPerSecond as number) * 3600
+          const hourlyAmount = item.residents * perPersonPerHour
 
-        entry.consumption += hourlyAmount
+          if (hourlyAmount <= 0) continue
 
-        const contribution: FlowContribution = {
-          id: item.race,
-          class: 'workforce',
-          type: 'consumption',
-          count: item.residents,
-          amount: -hourlyAmount,
-          bonusPercent: 0
+          entry.consumption += hourlyAmount
+
+          const contribution: FlowContribution = {
+            id: item.race,
+            class: 'workforce',
+            type: 'consumption',
+            count: item.residents,
+            amount: -hourlyAmount,
+            bonusPercent: 0
+          }
+          entry.contributions.push(contribution)
         }
-        entry.contributions.push(contribution)
-      }
-    })
+      })
+    } else {
+      const raceEntries = buildRaceEntriesFromCensus(censusItems)
+      actualWorkforce = applySharedWorkforceConsumption(
+        raceEntries,
+        workforceBreakdown.needed.total,
+        workforceConsumptionMap,
+        getOrInitFlow
+      )
+      saturation = saturationOverride ?? calculateEfficiencySaturation(workforceBreakdown.needed.total, actualWorkforce)
+    }
   }
 
   plannedModules.forEach(item => {

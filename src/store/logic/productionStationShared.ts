@@ -1,4 +1,4 @@
-import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, RaceMedicalConsumption } from '@/types/x4'
+import type { StationPlan, SavedModule, StationSettings, X4Module, X4Ware, WorkforceConsumptionMap } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { StationComputeDeps } from '../state/stationSettings'
 import type { StationDerivedCache, StationDerivedSeed, StationDerivedStaticDeps } from '../state/StationDerivedMap'
@@ -21,7 +21,7 @@ export interface ActiveStationState {
 export interface ComputeDepsInput {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
-  medicalConsumptionMap: RaceMedicalConsumption
+  workforceConsumptionMap: WorkforceConsumptionMap
   enforceDlcActivation: boolean
   isModuleDlcActive: (moduleId: string) => boolean
 }
@@ -30,7 +30,7 @@ export function buildComputeDeps(input: ComputeDepsInput): StationComputeDeps {
   return {
     modulesMap: input.modulesMap,
     waresMap: input.waresMap,
-    medicalConsumptionMap: input.medicalConsumptionMap,
+    workforceConsumptionMap: input.workforceConsumptionMap,
     enforceDlcActivation: input.enforceDlcActivation,
     isModuleDlcActive: input.isModuleDlcActive
   }
@@ -171,7 +171,7 @@ export function computeStationFlow(
   const staticDeps: StationDerivedStaticDeps = {
     modulesMap: deps.modulesMap,
     waresMap: deps.waresMap,
-    medicalConsumptionMap: deps.medicalConsumptionMap
+    workforceConsumptionMap: deps.workforceConsumptionMap
   }
   const flowMap = new StationDerivedMap(staticDeps)
   const seed: StationDerivedSeed = {

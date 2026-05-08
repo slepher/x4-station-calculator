@@ -126,7 +126,7 @@ class X4PrecisionLoader:
         self.wares_data = []         
         self.i18n_data = {}         
         self.recipes = {} 
-        self.race_consumption = {}  # 种群消耗速率 (每人每秒)
+        self.race_consumption = {}  # 种群消耗速率 (每人每小时) race -> {idle, busy} -> wareId -> perPersonPerHour
         self.module_groups_result = []  # 模块分组结果 (合并 types 和 waregroups)
         self.ware_tier_map = {}     # 缓存物品层级映射
         self.all_methods = set()
@@ -262,7 +262,8 @@ class X4PrecisionLoader:
                 is_valid = False
                 
                 # C. 工人消耗 (Food/Medical)
-                if transport == 'workunit' and w_id == 'workunit_busy':
+                if transport == 'workunit' and w_id in ('workunit_idle', 'workunit_busy'):
+                    state = 'busy' if w_id == 'workunit_busy' else 'idle'
                     for prod in ware.findall('production'):
                         method = prod.get('method', 'default')
                         p_time = float(prod.get('time', 600))
@@ -271,9 +272,10 @@ class X4PrecisionLoader:
                         for r in prod.findall('primary/ware'):
                             c_ware = r.get('ware')
                             c_amount = float(r.get('amount'))
-                            # 计算每人每秒消耗量
-                            consumables[c_ware] = c_amount / (p_amount * p_time)
-                        self.race_consumption[method] = consumables
+                            consumables[c_ware] = c_amount / (p_amount * p_time) * 3600
+                        if method not in self.race_consumption:
+                            self.race_consumption[method] = {}
+                        self.race_consumption[method][state] = consumables
 
                 # A. 商品
                 if transport in {'container', 'solid', 'liquid'} and 'module' not in tags:

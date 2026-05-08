@@ -11,7 +11,7 @@ import type {
   X4SlotTag,
   X4ShipType,
   X4Ware,
-  RaceMedicalConsumption,
+  WorkforceConsumptionMap,
   X4Bullet,
   X4Map,
   X4RegionYield,
@@ -57,7 +57,7 @@ export type GameDataFiles = {
   wares: X4Ware[]
   modules: X4Module[]
   moduleGroups: X4ModuleGroup[]
-  consumption: RaceMedicalConsumption
+  consumption: WorkforceConsumptionMap
   ships: X4Ship[]
   shipRaces: X4ShipRace[]
   shipTypes: X4ShipType[]
@@ -118,7 +118,7 @@ export async function loadGameDataFiles(
     loadJsonFromBundle<X4Ware[]>(folderName, 'wares.json', loaders),
     loadJsonFromBundle<X4Module[]>(folderName, 'modules.json', loaders),
     loadJsonFromBundle<X4ModuleGroup[]>(folderName, 'module_groups.json', loaders),
-    loadJsonFromBundle<RaceMedicalConsumption>(folderName, 'consumption.json', loaders),
+    loadJsonFromBundle<WorkforceConsumptionMap>(folderName, 'consumption.json', loaders),
     loadJsonFromBundle<X4Ship[]>(folderName, 'ships.json', loaders),
     loadJsonFromBundle<X4ShipRace[]>(folderName, 'ship_races.json', loaders),
     loadJsonFromBundle<X4ShipType[]>(folderName, 'ship_types.json', loaders),
@@ -269,7 +269,7 @@ export function buildModulesByOutputMap(modulesMap: Record<string, X4Module>): R
   return outputMap
 }
 
-export function buildMedicalConsumptionMap(consumption: RaceMedicalConsumption): RaceMedicalConsumption {
+export function buildWorkforceConsumptionMap(consumption: WorkforceConsumptionMap): WorkforceConsumptionMap {
   return consumption
 }
 

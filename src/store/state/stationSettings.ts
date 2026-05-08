@@ -1,5 +1,5 @@
 import type { StationSettings, X4Module, X4Ware } from '@/types/x4'
-import type { RaceMedicalConsumption } from '@/types/x4'
+import type { WorkforceConsumptionMap } from '@/types/x4'
 
 export const DEFAULT_STATION_SETTINGS: StationSettings = {
   sunlight: 100,
@@ -26,7 +26,7 @@ export const DEFAULT_STATION_SETTINGS: StationSettings = {
 export interface StationComputeDeps {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
-  medicalConsumptionMap: RaceMedicalConsumption
+  workforceConsumptionMap: WorkforceConsumptionMap
   enforceDlcActivation?: boolean
   isModuleDlcActive?: (moduleId: string) => boolean
 }

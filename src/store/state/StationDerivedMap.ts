@@ -1,6 +1,7 @@
 import { reactive, type Ref } from 'vue'
-import type { GroupedFlows, SavedModule, StationSettings, X4Module, WareFlow } from '@/types/x4'
+import type { GroupedFlows, SavedModule, StationSettings, X4Module, WareFlow, WorkforceConsumptionMap } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
+import { isWorkforceContributionClass } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
@@ -12,7 +13,7 @@ import { parseSectorLinkKey } from '@/store/logic/sectorLinks'
 export interface StationDerivedStaticDeps {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, any>
-  medicalConsumptionMap: Record<string, any>
+  workforceConsumptionMap: WorkforceConsumptionMap
 }
 
 export interface ComputeInfrastructureModulesInput {
@@ -247,7 +248,7 @@ function groupProductionFlows(flows: WareProductionFlow[]): GroupedFlows {
 
   wareFlows.forEach(flow => {
     if (flow.netRate > 0) result.rateGroups.positive.push(flow)
-    else if (flow.contributions.some(c => c.class === 'workforce')) result.rateGroups.supply.push(flow)
+    else if (flow.contributions.some(c => isWorkforceContributionClass(c.class))) result.rateGroups.supply.push(flow)
     else if (flow.transportType === 'container') result.rateGroups.operations.push(flow)
     else result.rateGroups.resources.push(flow)
 
@@ -535,7 +536,7 @@ export class StationDerivedMap {
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
       lockedWares,
-      medicalConsumptionMap: deps.medicalConsumptionMap,
+      workforceConsumptionMap: deps.workforceConsumptionMap,
       warePriority
     })
     
@@ -581,13 +582,10 @@ export class StationDerivedMap {
         autoHabitationModules: [],
         modulesMap: deps.modulesMap,
         waresMap: deps.waresMap,
-        medicalConsumptionMap: deps.medicalConsumptionMap,
+        workforceConsumptionMap: deps.workforceConsumptionMap,
         settings: fullSettings,
         warePriority: snapshot.warePriority,
-        workforceOverride: snapshot.workforcesOverride,
-        actualWorkforceOverride: snapshot.workforcesOverride
-          ? snapshot.workforcesOverride.reduce((sum, w) => sum + w.amount, 0)
-          : undefined
+        workforceOverride: snapshot.workforcesOverride
       })
       productionFlows = coreResult.productionFlows
       actualWorkforce = coreResult.actualWorkforce
@@ -599,7 +597,7 @@ export class StationDerivedMap {
         modulesMap: deps.modulesMap,
         waresMap: deps.waresMap,
         lockedWares: snapshot.lockedWares,
-        medicalConsumptionMap: deps.medicalConsumptionMap,
+        workforceConsumptionMap: deps.workforceConsumptionMap,
         warePriority: snapshot.warePriority
       })
       autoIndustryModules = result.autoIndustryModules
@@ -666,7 +664,7 @@ export class StationDerivedMap {
       const count = snapshot.count ?? 1
       const filteredFlows = filterProductionFlowsByPriority(cache.productionFlows, cache.warePriorityLevels)
       const scaledFlows = filteredFlows
-        .filter(f => !(f.netRate < 0 && !f.contributions.some(c => c.class === 'workforce') && f.transportType !== 'container'))
+        .filter(f => !(f.netRate < 0 && !f.contributions.some(c => isWorkforceContributionClass(c.class)) && f.transportType !== 'container'))
         .map(flow => {
           const netRate = flow.netRate * count
           return {

@@ -14,7 +14,6 @@ function createGroupedFlows(params: {
     unitVolume: 1,
     production: Math.max(item.netRate, 0),
     consumption: Math.max(-item.netRate, 0),
-    workforceConsumption: 0,
     netRate: item.netRate,
     unitPrice: 1,
     netValue: item.netRate,
@@ -24,7 +23,6 @@ function createGroupedFlows(params: {
       stationCount: 1,
       production: Math.max(item.netRate, 0),
       consumption: Math.max(-item.netRate, 0),
-      workforceConsumption: 0,
       netRate: item.netRate,
       netValue: item.netRate
     }]

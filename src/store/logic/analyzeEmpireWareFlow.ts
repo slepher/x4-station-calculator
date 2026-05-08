@@ -26,7 +26,7 @@ function multiplyProductionFlow(flow: WareProductionFlow, multiplier: number): W
 
 function classifyProductionFlow(flow: WareProductionFlow): 'positive' | 'supply' | 'operations' | 'resources' {
   if (flow.netRate >= 0) return 'positive'
-  if (flow.contributions.some(c => c.class === 'workforce')) return 'supply'
+  if (flow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')) return 'supply'
   if (flow.transportType === 'container') return 'operations'
   return 'resources'
 }

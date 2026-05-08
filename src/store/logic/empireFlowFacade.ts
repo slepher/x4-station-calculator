@@ -51,7 +51,7 @@ export function classifyAndEnrichFlows(
   const operations: EmpireWareFlow[] = []
 
   for (const flow of flows) {
-    const isWorkforce = flow.contributions.some(c => c.class === 'workforce')
+    const isWorkforce = flow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')
     const isNonContainer = flow.transportType !== 'container'
     const category = (isWorkforce || isNonContainer) ? 'supply' : 'operations'
 

@@ -27,7 +27,7 @@ describe('productionSettingActions', () => {
       getComputeDeps: () => ({
         modulesMap: {},
         waresMap: {},
-        medicalConsumptionMap: { default: {} }
+        workforceConsumptionMap: { default: { idle: {}, busy: {} } }
       }),
       mergeSettings: (base: StationSettings, patch: Partial<StationSettings>) => ({ ...base, ...patch }),
       now: () => 1,
@@ -57,7 +57,7 @@ describe('productionSettingActions', () => {
       getComputeDeps: () => ({
         modulesMap: {},
         waresMap: {},
-        medicalConsumptionMap: { default: {} }
+        workforceConsumptionMap: { default: { idle: {}, busy: {} } }
       }),
       mergeSettings: (base: StationSettings, patch: Partial<StationSettings>) => ({ ...base, ...patch }),
       now: () => 1,
