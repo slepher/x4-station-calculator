@@ -221,10 +221,10 @@ function extractSummary(plan: ReturnType<typeof calculateBuildPlan>) {
     label: s.label,
     primaryModuleIds: s.primaryModuleIds,
     allModules: s.modules.map(m => `${m.id}:${m.count}`),
-    steps: s.steps.map(st => ({
-      moduleId: st.moduleId,
-      count: st.moduleCount,
-      reason: st.reason,
+    moduleSummaries: s.moduleSummaries.map(ms => ({
+      moduleId: ms.moduleId,
+      moduleCount: ms.moduleCount,
+      materials: ms.materials.length,
     })),
     netProduction: Object.fromEntries(
       Object.entries(s.netProduction)
@@ -257,13 +257,13 @@ function printSources(s: SchemeSummary) {
   }
 }
 
-function printSteps(s: SchemeSummary) {
-  if (s.steps.length > 0) {
-    console.log(`    Steps: ${s.steps.length}`)
-    s.steps.slice(0, 8).forEach(st => {
-      console.log(`      # ${st.moduleId} ×${st.count} (${st.reason})`)
+function printModuleSummaries(s: SchemeSummary) {
+  if (s.moduleSummaries.length > 0) {
+    console.log(`    Module Summaries: ${s.moduleSummaries.length}`)
+    s.moduleSummaries.slice(0, 8).forEach(ms => {
+      console.log(`      ${ms.moduleId} ×${ms.moduleCount} (${ms.materials} materials)`)
     })
-    if (s.steps.length > 8) console.log(`      ... +${s.steps.length - 8} more`)
+    if (s.moduleSummaries.length > 8) console.log(`      ... +${s.moduleSummaries.length - 8} more`)
   }
 }
 
@@ -303,12 +303,12 @@ if (classicalMode) {
           }
         })
       }
-      if (s.steps.length > 0) {
-        console.log(`    Steps: ${s.steps.length}`)
-        s.steps.slice(0, 5).forEach(st => {
-          console.log(`      #${st.moduleId} ×${st.count} (${st.reason})`)
+      if (s.moduleSummaries.length > 0) {
+        console.log(`    Module Summaries: ${s.moduleSummaries.length}`)
+        s.moduleSummaries.slice(0, 5).forEach(ms => {
+          console.log(`      ${ms.moduleId} ×${ms.moduleCount} (${ms.materials} materials)`)
         })
-        if (s.steps.length > 5) console.log(`      ... +${s.steps.length - 5} more`)
+        if (s.moduleSummaries.length > 5) console.log(`      ... +${s.moduleSummaries.length - 5} more`)
       }
     })
   }
@@ -329,13 +329,13 @@ if (classicalMode) {
       classicalSummary.forEach(s => {
         console.log(`  ${s.label}: [${s.allModules.join(', ')}]`)
         printSources(s)
-        printSteps(s)
+        printModuleSummaries(s)
       })
       console.log('--- NEW ---')
       newSummary.forEach(s => {
         console.log(`  ${s.label}: [${s.allModules.join(', ')}]`)
         printSources(s)
-        printSteps(s)
+        printModuleSummaries(s)
       })
     }
   }

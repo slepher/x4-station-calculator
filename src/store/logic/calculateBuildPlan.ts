@@ -8,8 +8,8 @@ import {
   BootstrapMode,
   type BuildGoal,
   type BuildScheme,
-  type BuildSchemeStep,
-  type BuildMaterial,
+  type BuildSchemeModuleSummary,
+  type BuildSchemeModuleMaterialSummary,
   type CalculateBuildPlanInput,
   type BuildPlan,
   type BuildGroup,
@@ -76,7 +76,6 @@ function computeBuildRates(
     const cost = mod.buildCost
     if (!cost || Object.keys(cost).length === 0) continue
     for (const [wareId, qty] of Object.entries(cost)) {
-      if (wareId === 'energycells') continue
       materials[wareId] = (materials[wareId] || 0) + qty * m.count
     }
   }
@@ -89,6 +88,75 @@ function computeBuildRates(
     rates[wareId] = qty / (totalTime / 3600)
   }
   return { rates, totalTime, totalCost, materials }
+}
+
+function computeModuleSummaries(
+  modules: SavedModule[],
+  moduleMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>
+): BuildSchemeModuleSummary[] {
+  const moduleGroups = new Map<string, SavedModule[]>()
+  for (const m of modules) {
+    const list = moduleGroups.get(m.id) || []
+    list.push(m)
+    moduleGroups.set(m.id, list)
+  }
+  
+  const summaries: BuildSchemeModuleSummary[] = []
+  
+  for (const [moduleId, modList] of moduleGroups.entries()) {
+    const mod = moduleMap[moduleId]
+    if (!mod) continue
+    
+    const totalCount = modList.reduce((sum, m) => sum + m.count, 0)
+    const moduleDuration = mod.buildTime * totalCount
+    
+    const materialMap = new Map<string, number>()
+    const cost = mod.buildCost
+    if (cost && Object.keys(cost).length > 0) {
+      for (const [wareId, qty] of Object.entries(cost)) {
+        const quantity = (qty as number) * totalCount
+        materialMap.set(wareId, quantity)
+      }
+    }
+    
+    const materials: BuildSchemeModuleMaterialSummary[] = []
+    let moduleCredits = 0
+    
+    for (const [wareId, quantity] of materialMap.entries()) {
+      const ware = waresMap[wareId]
+      if (!ware) continue
+      const unitPrice = ware.price
+      const totalCredits = quantity * unitPrice
+      moduleCredits += totalCredits
+      materials.push({
+        wareId,
+        quantity,
+        totalCredits,
+        unitPrice
+      })
+    }
+    
+    materials.sort((a, b) => b.totalCredits - a.totalCredits)
+    
+    summaries.push({
+      moduleId,
+      moduleCount: totalCount,
+      totalDuration: moduleDuration,
+      totalCredits: moduleCredits,
+      materials
+    })
+  }
+  
+  summaries.sort((a, b) => {
+    const modA = moduleMap[a.moduleId]
+    const modB = moduleMap[b.moduleId]
+    if (!modA || !modB) return 0
+    if (modA.tier !== modB.tier) return modA.tier - modB.tier
+    return modA.name.localeCompare(modB.name)
+  })
+  
+  return summaries
 }
 
 function expandGoalDependencies(
@@ -136,82 +204,6 @@ function expandGoalDependencies(
   return Object.entries(required).map(([id, count]) => ({ id, count }))
 }
 
-export function makeSchemeSteps(
-  groups: BuildGroup[],
-  moduleMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>,
-  settings: StationSettings,
-  contextModules?: SavedModule[]
-): BuildSchemeStep[] {
-  let builtSoFar: SavedModule[] = contextModules ? [...contextModules] : []
-
-  let cumDuration = 0
-  let cumCredits = 0
-  let order = 0
-  const result: BuildSchemeStep[] = []
-  const stock = new Map<string, number>()
-
-  for (let gi = 0; gi < groups.length; gi++) {
-    const group = groups[gi]!
-    const sorted = [...group.modules].sort(
-      (a, b) => (moduleMap[a.id]?.tier || 0) - (moduleMap[b.id]?.tier || 0)
-    )
-    for (const m of sorted) {
-    const mod = moduleMap[m.id]
-    if (!mod) continue
-    for (let ci = 0; ci < m.count; ci++) {
-    const buildTime = mod.buildTime
-    const net = calculateNetProduction(builtSoFar, moduleMap, settings.considerWorkforceForAutoFill, settings.sunlight)
-    const cost = mod.buildCost && Object.keys(mod.buildCost).length > 0 ? mod.buildCost : {}
-    const buildTimeH = buildTime / 3600
-    const materials: BuildMaterial[] = Object.entries(cost).map(([wareId, val]) => {
-      const totalQty = (val as number)
-      const prodRate = Math.max(0, net[wareId] || 0)
-      const warePrice = waresMap[wareId]?.price || 0
-      const prevStock = stock.get(wareId) || 0
-      const coveredByStock = Math.min(totalQty, prevStock)
-      const deficitQty = totalQty - coveredByStock
-      const credits = deficitQty * warePrice
-      stock.set(wareId, prevStock - coveredByStock)
-      const produced = prodRate * buildTimeH
-      return {
-        wareId,
-        quantity: totalQty,
-        currentProdRate: prodRate,
-        stockBefore: prevStock,
-        producedDuringBuild: produced,
-        estimatedTime: 0,
-        creditsNeeded: credits
-      }
-    })
-    for (const [wareId, val] of Object.entries(net)) {
-      const rate = val as number
-      if (rate > 0) stock.set(wareId, (stock.get(wareId) || 0) + rate * buildTimeH)
-    }
-
-    cumDuration += buildTime
-    cumCredits += materials.reduce((s, mat) => s + mat.creditsNeeded, 0)
-
-    builtSoFar = mergeModules([...builtSoFar, { id: m.id, count: 1 }])
-
-    order++
-    result.push({
-      order,
-      moduleId: m.id,
-      moduleCount: 1,
-      moduleBuildTime: buildTime,
-      materials,
-      estimatedDuration: cumDuration,
-      estimatedCredits: cumCredits,
-      reason: group.reason,
-      groupIndex: gi
-    })
-  }
-  }
-  }
-  return result
-}
-
 function makeScheme(
   groups: BuildGroup[],
   label: string,
@@ -220,12 +212,15 @@ function makeScheme(
   settings: StationSettings,
   moduleMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  contextModules?: SavedModule[],
+  _contextModules?: SavedModule[],
   targetRateSources?: BuildRateSource[]
 ): BuildScheme {
-  const steps = makeSchemeSteps(groups, moduleMap, waresMap, settings, contextModules)
-  const lastStep = steps[steps.length - 1]
   const mergedModules = mergeModules(groups.flatMap(g => g.modules))
+  const moduleSummaries = computeModuleSummaries(mergedModules, moduleMap, waresMap)
+  
+  const totalDuration = moduleSummaries.reduce((sum, s) => sum + s.totalDuration, 0)
+  const totalCredits = moduleSummaries.reduce((sum, s) => sum + s.totalCredits, 0)
+  
   const ownNetProduction = calculateNetProduction(
     mergedModules,
     moduleMap, settings.considerWorkforceForAutoFill, settings.sunlight
@@ -263,11 +258,10 @@ function makeScheme(
     targetRates,
     targetRateSources: targetRateSources || [],
     netProduction: ownNetProduction,
-    steps,
-    totalDuration: lastStep?.estimatedDuration || 0,
-    totalCredits: lastStep?.estimatedCredits || 0,
-    stepsCount: steps.length,
-    isFeasible: steps.length > 0,
+    totalDuration,
+    totalCredits,
+    moduleSummaries,
+    isFeasible: mergedModules.length > 0,
     totalModuleBuildTime,
     buildMaterialTotals
   }
@@ -535,13 +529,13 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           purposeWares,
           settings, modulesMap, waresMap, currentModules,
           jointSources_display)
-        if (s1.stepsCount > 0) allSchemes.push(s1)
+        if (s1.isFeasible) allSchemes.push(s1)
       }
       const s3 = makeScheme([{ reason: '', modules: allMods3 }], 'scheme_production_line',
         '',
         uniquePurpose, settings, modulesMap, waresMap, currentModules,
         [])
-      if (s3.stepsCount > 0) allSchemes.push(s3)
+      if (s3.isFeasible) allSchemes.push(s3)
       return planResult(goals, selfSufficient, bootstrapMode, allSchemes)
     }
 
@@ -718,7 +712,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           aPurposeWares,
           settings, modulesMap, waresMap, currentModules,
           aSources)
-        if (s1.stepsCount > 0) allSchemes.push(s1)
+        if (s1.isFeasible) allSchemes.push(s1)
       }
 
       if (bModules.length > 0) {
@@ -756,7 +750,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
           settings, modulesMap, waresMap,
           mergeModules(aFlat),
           bSources)
-        if (s2.stepsCount > 0) allSchemes.push(s2)
+        if (s2.isFeasible) allSchemes.push(s2)
       }
 
       const prior = mergeModules([...aFlat, ...bModules])
@@ -764,7 +758,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
         '',
         uniquePurpose, settings, modulesMap, waresMap, prior,
         [])
-      if (s3.stepsCount > 0) allSchemes.push(s3)
+      if (s3.isFeasible) allSchemes.push(s3)
       return planResult(goals, selfSufficient, bootstrapMode, allSchemes)
     }
 
@@ -849,7 +843,7 @@ const dModules = dGroups.flatMap(g => g.modules)
         dPurposeWares,
         settings, modulesMap, waresMap, currentModules,
         dSources)
-      if (s1.stepsCount > 0) allSchemes.push(s1)
+      if (s1.isFeasible) allSchemes.push(s1)
 
       // A scheme (从 D 提取)
       if (aModules.length > 0) {
@@ -871,7 +865,7 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
           aPurposeWares,
           settings, modulesMap, waresMap, currentModules,
           aSources)
-        if (s2.stepsCount > 0) allSchemes.push(s2)
+        if (s2.isFeasible) allSchemes.push(s2)
       }
 
       // C scheme
@@ -880,7 +874,7 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
         '',
         uniquePurpose, settings, modulesMap, waresMap, prior,
         [])
-      if (s3.stepsCount > 0) allSchemes.push(s3)
+      if (s3.isFeasible) allSchemes.push(s3)
       return planResult(goals, selfSufficient, bootstrapMode, allSchemes)
     }
 
@@ -937,7 +931,7 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
           bPurposeWares,
           settings, modulesMap, waresMap, currentModules,
           bDemandSources)
-        if (s1.stepsCount > 0) allSchemes.push(s1)
+        if (s1.isFeasible) allSchemes.push(s1)
       }
       if (aFlat.length > 0) {
         const aSources: BuildRateSource[] = [
@@ -954,14 +948,14 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
           settings, modulesMap, waresMap,
           mergeModules(bCombined),
           aSources)
-        if (s2.stepsCount > 0) allSchemes.push(s2)
+        if (s2.isFeasible) allSchemes.push(s2)
       }
       const prior = mergeModules([...currentModules, ...aFlat, ...bModules])
       const s3 = makeScheme([{ reason: '', modules: allMods3 }], 'scheme_production_line',
         '',
         uniquePurpose, settings, modulesMap, waresMap, prior,
         [])
-      if (s3.stepsCount > 0) allSchemes.push(s3)
+      if (s3.isFeasible) allSchemes.push(s3)
       return planResult(goals, selfSufficient, bootstrapMode, allSchemes)
     }
 
@@ -970,7 +964,7 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
         '',
         uniquePurpose, settings, modulesMap, waresMap, currentModules,
         [])
-      if (s3.stepsCount > 0) allSchemes.push(s3)
+      if (s3.isFeasible) allSchemes.push(s3)
     }
   }
 
@@ -1001,7 +995,7 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
       currentModules,
       [{ label: 'scheme_self_sufficient', rates: computeBuildRates(allMods, modulesMap, waresMap).rates }]
     )
-    if (scheme.stepsCount > 0) allSchemes.push(scheme)
+    if (scheme.isFeasible) allSchemes.push(scheme)
   }
 
   return planResult(goals, selfSufficient, bootstrapMode, allSchemes)

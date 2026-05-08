@@ -246,7 +246,7 @@ if (useJson) {
       netProduction: Object.fromEntries(Object.entries(s.netProduction).filter(([, v]) => Math.abs(v) > 0.01)),
       buildMaterialTotals: s.buildMaterialTotals,
       isFeasible: s.isFeasible,
-      stepsCount: s.stepsCount,
+      moduleSummariesCount: s.moduleSummaries?.length || 0,
     })),
   })
 

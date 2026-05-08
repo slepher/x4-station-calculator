@@ -4,10 +4,10 @@ import type {
   BuildRateSource,
   BuildScheme,
   BuildSchemeGroup,
+  BuildSchemeModuleSummary,
+  BuildSchemeModuleMaterialSummary,
   BuildGroup,
   BuildGoal,
-  BuildSchemeStep,
-  BuildMaterial,
   ProductionLineAllocation,
 } from '@/types/build-plan'
 import type {
@@ -140,7 +140,6 @@ function computeBuildMaterials(
     const mod = modulesMap[m.id]
     if (!mod?.buildCost) continue
     for (const [wareId, qty] of Object.entries(mod.buildCost)) {
-      if (wareId === 'energycells') continue
       result[wareId] = (result[wareId] || 0) + qty * m.count
     }
   }
@@ -170,80 +169,73 @@ function calculateNetProduction(
   return state
 }
 
-export function makeSchemeSteps(
-  groups: BuildGroup[],
+function computeModuleSummaries(
+  modules: SavedModule[],
   moduleMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>,
-  settings: StationSettings,
-  contextModules?: SavedModule[]
-): BuildSchemeStep[] {
-  let builtSoFar: SavedModule[] = contextModules ? [...contextModules] : []
-
-  let cumDuration = 0
-  let cumCredits = 0
-  let order = 0
-  const result: BuildSchemeStep[] = []
-  const stock = new Map<string, number>()
-
-  for (let gi = 0; gi < groups.length; gi++) {
-    const group = groups[gi]!
-    const sorted = [...group.modules].sort(
-      (a, b) => (moduleMap[a.id]?.tier || 0) - (moduleMap[b.id]?.tier || 0)
-    )
-    for (const m of sorted) {
-      const mod = moduleMap[m.id]
-      if (!mod) continue
-      for (let ci = 0; ci < m.count; ci++) {
-        const buildTime = mod.buildTime
-        const net = calculateNetProduction(builtSoFar, moduleMap, settings.considerWorkforceForAutoFill, settings.sunlight)
-        const cost = mod.buildCost && Object.keys(mod.buildCost).length > 0 ? mod.buildCost : {}
-        const buildTimeH = buildTime / 3600
-        const materials: BuildMaterial[] = Object.entries(cost).map(([wareId, val]) => {
-          const totalQty = (val as number)
-          const prodRate = Math.max(0, net[wareId] || 0)
-          const warePrice = waresMap[wareId]?.price || 0
-          const prevStock = stock.get(wareId) || 0
-          const coveredByStock = Math.min(totalQty, prevStock)
-          const deficitQty = totalQty - coveredByStock
-          const credits = deficitQty * warePrice
-          stock.set(wareId, prevStock - coveredByStock)
-          const produced = prodRate * buildTimeH
-          return {
-            wareId,
-            quantity: totalQty,
-            currentProdRate: prodRate,
-            stockBefore: prevStock,
-            producedDuringBuild: produced,
-            estimatedTime: 0,
-            creditsNeeded: credits
-          }
-        })
-        for (const [wareId, val] of Object.entries(net)) {
-          const rate = val as number
-          if (rate > 0) stock.set(wareId, (stock.get(wareId) || 0) + rate * buildTimeH)
-        }
-
-        cumDuration += buildTime
-        cumCredits += materials.reduce((s, mat) => s + mat.creditsNeeded, 0)
-
-        builtSoFar = mergeModules([...builtSoFar, { id: m.id, count: 1 }])
-
-        order++
-        result.push({
-          order,
-          moduleId: m.id,
-          moduleCount: 1,
-          moduleBuildTime: buildTime,
-          materials,
-          estimatedDuration: cumDuration,
-          estimatedCredits: cumCredits,
-          reason: group.reason,
-          groupIndex: gi
-        })
+  waresMap: Record<string, X4Ware>
+): BuildSchemeModuleSummary[] {
+  const moduleGroups = new Map<string, SavedModule[]>()
+  for (const m of modules) {
+    const list = moduleGroups.get(m.id) || []
+    list.push(m)
+    moduleGroups.set(m.id, list)
+  }
+  
+  const summaries: BuildSchemeModuleSummary[] = []
+  
+  for (const [moduleId, modList] of moduleGroups.entries()) {
+    const mod = moduleMap[moduleId]
+    if (!mod) continue
+    
+    const totalCount = modList.reduce((sum, m) => sum + m.count, 0)
+    const moduleDuration = mod.buildTime * totalCount
+    
+    const materialMap = new Map<string, number>()
+    const cost = mod.buildCost
+    if (cost && Object.keys(cost).length > 0) {
+      for (const [wareId, qty] of Object.entries(cost)) {
+        const quantity = (qty as number) * totalCount
+        materialMap.set(wareId, quantity)
       }
     }
+    
+    const materials: BuildSchemeModuleMaterialSummary[] = []
+    let moduleCredits = 0
+    
+    for (const [wareId, quantity] of materialMap.entries()) {
+      const ware = waresMap[wareId]
+      if (!ware) continue
+      const unitPrice = ware.price
+      const totalCredits = quantity * unitPrice
+      moduleCredits += totalCredits
+      materials.push({
+        wareId,
+        quantity,
+        totalCredits,
+        unitPrice
+      })
+    }
+    
+    materials.sort((a, b) => b.totalCredits - a.totalCredits)
+    
+    summaries.push({
+      moduleId,
+      moduleCount: totalCount,
+      totalDuration: moduleDuration,
+      totalCredits: moduleCredits,
+      materials
+    })
   }
-  return result
+  
+  summaries.sort((a, b) => {
+    const modA = moduleMap[a.moduleId]
+    const modB = moduleMap[b.moduleId]
+    if (!modA || !modB) return 0
+    if (modA.tier !== modB.tier) return modA.tier - modB.tier
+    return modA.name.localeCompare(modB.name)
+  })
+  
+  return summaries
 }
 
 export function expandGoalDependencies(
@@ -1214,7 +1206,7 @@ function makeSchemeFromLine(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
-  contextModules?: SavedModule[]
+  _contextModules?: SavedModule[]
 ): BuildScheme {
   const demandSources = collectDemandSources(node, graph, modulesMap)
   const purposeModules = [...node.trackedWares]
@@ -1258,11 +1250,10 @@ function makeSchemeFromLine(
 
   const wareNames = [...node.trackedWares].map(w => waresMap[w]?.name || w).join(', ')
 
-  const groups: BuildGroup[] = node.buildGroups && node.buildGroups.length > 0
-    ? node.buildGroups
-    : [{ reason: node.lineName, modules: node.modules }]
-
-  const steps = makeSchemeSteps(groups, modulesMap, waresMap, settings, contextModules)
+  const moduleSummaries = computeModuleSummaries(mergedModules, modulesMap, waresMap)
+  const totalDuration = moduleSummaries.reduce((sum, s) => sum + s.totalDuration, 0)
+  const totalCredits = moduleSummaries.reduce((sum, s) => sum + s.totalCredits, 0)
+  
   const scheme: BuildScheme = {
     label: node.lineName,
     description: `产出: ${wareNames}`,
@@ -1272,10 +1263,9 @@ function makeSchemeFromLine(
     targetRates,
     targetRateSources: demandSources,
     netProduction,
-    steps,
-    totalDuration: steps.length > 0 ? steps[steps.length - 1]!.estimatedDuration : 0,
-    totalCredits: steps.length > 0 ? steps[steps.length - 1]!.estimatedCredits : 0,
-    stepsCount: steps.length,
+    totalDuration,
+    totalCredits,
+    moduleSummaries,
     isFeasible: mergedModules.length > 0,
     totalModuleBuildTime,
     buildMaterialTotals,
@@ -1342,7 +1332,6 @@ export function splitTargetLineSchemes(
       const cost = mod.buildCost
       if (!cost || Object.keys(cost).length === 0) continue
       for (const [wareId, qty] of Object.entries(cost)) {
-        if (wareId === 'energycells') continue
         buildMaterialTotals[wareId] = (buildMaterialTotals[wareId] || 0) + (qty as number) * m.count
       }
     }
@@ -1357,8 +1346,9 @@ export function splitTargetLineSchemes(
       })
       .map(m => m.id)
 
-    const groups: BuildGroup[] = [{ reason: lineName, modules: lineModules }]
-    const steps = makeSchemeSteps(groups, modulesMap, waresMap, settings)
+    const moduleSummaries = computeModuleSummaries(lineModules, modulesMap, waresMap)
+    const totalDuration = moduleSummaries.reduce((sum, s) => sum + s.totalDuration, 0)
+    const totalCredits = moduleSummaries.reduce((sum, s) => sum + s.totalCredits, 0)
 
     const scheme: BuildScheme = {
       label: lineName || '目标产线',
@@ -1369,10 +1359,9 @@ export function splitTargetLineSchemes(
       targetRates: buildTargetRatesFromGoals(goals),
       targetRateSources: [],
       netProduction,
-      steps,
-      totalDuration: steps.length > 0 ? steps[steps.length - 1]!.estimatedDuration : 0,
-      totalCredits: steps.length > 0 ? steps[steps.length - 1]!.estimatedCredits : 0,
-      stepsCount: steps.length,
+      totalDuration,
+      totalCredits,
+      moduleSummaries,
       isFeasible: lineModules.length > 0,
       totalModuleBuildTime,
       buildMaterialTotals,
@@ -1424,8 +1413,10 @@ function mergeSchemePair(
   const mergedModules = mergeModules([...buildScheme.modules, ...productionScheme.modules])
   const purposeModules = [...new Set([...buildScheme.purposeModules, ...productionScheme.purposeModules])]
   const purposeWareSet = new Set(purposeModules)
-  const buildGroups: BuildGroup[] = [{ reason: buildScheme.label, modules: mergedModules }]
-  const steps = makeSchemeSteps(buildGroups, modulesMap, waresMap, settings)
+
+  const moduleSummaries = computeModuleSummaries(mergedModules, modulesMap, waresMap)
+  const totalDuration = moduleSummaries.reduce((sum, s) => sum + s.totalDuration, 0)
+  const totalCredits = moduleSummaries.reduce((sum, s) => sum + s.totalCredits, 0)
 
   let totalModuleBuildTime = 0
   for (const module of mergedModules) {
@@ -1453,10 +1444,9 @@ function mergeSchemePair(
       settings.considerWorkforceForAutoFill,
       settings.sunlight,
     ),
-    steps,
-    totalDuration: steps.length > 0 ? steps[steps.length - 1]!.estimatedDuration : 0,
-    totalCredits: steps.length > 0 ? steps[steps.length - 1]!.estimatedCredits : 0,
-    stepsCount: steps.length,
+    totalDuration,
+    totalCredits,
+    moduleSummaries,
     isFeasible: mergedModules.length > 0,
     totalModuleBuildTime,
     buildMaterialTotals: sumRecordValues(buildScheme.buildMaterialTotals, productionScheme.buildMaterialTotals),
@@ -1563,7 +1553,7 @@ function makeSchemeForTargetLine(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
-  contextModules?: SavedModule[]
+  _contextModules?: SavedModule[]
 ): BuildScheme {
   const mergedModules = mergeModules(graph.targetModules)
 
@@ -1581,19 +1571,15 @@ function makeSchemeForTargetLine(
     const cost = mod.buildCost
     if (!cost || Object.keys(cost).length === 0) continue
     for (const [wareId, qty] of Object.entries(cost)) {
-      if (wareId === 'energycells') continue
       buildMaterialTotals[wareId] = (buildMaterialTotals[wareId] || 0) + (qty as number) * m.count
     }
   }
 
   const moduleBuildDetails = computeModuleBuildDetails(mergedModules, modulesMap)
 
-  const groups: BuildGroup[] = [{
-    reason: '目标产线',
-    modules: graph.targetModules,
-  }]
-
-  const steps = makeSchemeSteps(groups, modulesMap, waresMap, settings, contextModules)
+  const moduleSummaries = computeModuleSummaries(mergedModules, modulesMap, waresMap)
+  const totalDuration = moduleSummaries.reduce((sum, s) => sum + s.totalDuration, 0)
+  const totalCredits = moduleSummaries.reduce((sum, s) => sum + s.totalCredits, 0)
 
   // purposeModules = goal ware IDs, fallback to all target-line output wares
   const purposeArr = graph.targetGoalWareIds && graph.targetGoalWareIds.length > 0
@@ -1604,7 +1590,7 @@ function makeSchemeForTargetLine(
           const mod = modulesMap[m.id]
           if (!mod) continue
           for (const w of Object.keys(mod.outputs)) {
-            if (w !== 'energycells') s.add(w)
+            s.add(w)
           }
         }
         return [...s]
@@ -1625,10 +1611,9 @@ function makeSchemeForTargetLine(
     targetRates: graph.targetBuildCostRates,
     targetRateSources: [],
     netProduction,
-    steps,
-    totalDuration: steps.length > 0 ? steps[steps.length - 1]!.estimatedDuration : 0,
-    totalCredits: steps.length > 0 ? steps[steps.length - 1]!.estimatedCredits : 0,
-    stepsCount: steps.length,
+    totalDuration,
+    totalCredits,
+    moduleSummaries,
     isFeasible: mergedModules.length > 0,
     totalModuleBuildTime,
     buildMaterialTotals,

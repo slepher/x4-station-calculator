@@ -183,12 +183,12 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
   })
 
   function getComputeDeps(): StationComputeDeps | null {
-    const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
-    if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
+    const { modulesMap, waresMap, workforceConsumptionMap, enforceDlcActivation } = gameData
+    if (!gameData.isReady || !modulesMap || !waresMap || !workforceConsumptionMap) return null
     return {
       modulesMap,
       waresMap,
-      medicalConsumptionMap,
+      workforceConsumptionMap,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag),
     }
@@ -262,10 +262,9 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
           targetRates: {},
           targetRateSources: [],
           netProduction: calculateNetProduction(targetModules, deps.modulesMap, false, 100),
-          steps: [],
           totalDuration: 0,
           totalCredits: 0,
-          stepsCount: 0,
+          moduleSummaries: [],
           isFeasible: targetModules.length > 0,
           totalModuleBuildTime: 0,
           buildMaterialTotals: {},
@@ -317,10 +316,9 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
           targetRates: {},
           targetRateSources: [],
           netProduction: calculateNetProduction(targetModules, deps.modulesMap, false, 100),
-          steps: [],
           totalDuration: 0,
           totalCredits: 0,
-          stepsCount: 0,
+          moduleSummaries: [],
           isFeasible: targetModules.length > 0,
           totalModuleBuildTime: 0,
           buildMaterialTotals: {},

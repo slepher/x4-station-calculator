@@ -68,6 +68,21 @@ export interface BuildRateSource {
   materials?: Record<string, number>
 }
 
+export interface BuildSchemeModuleMaterialSummary {
+  wareId: string
+  quantity: number
+  totalCredits: number
+  unitPrice: number
+}
+
+export interface BuildSchemeModuleSummary {
+  moduleId: string
+  moduleCount: number
+  totalDuration: number
+  totalCredits: number
+  materials: BuildSchemeModuleMaterialSummary[]
+}
+
 export interface BuildScheme {
   label: string
   description: string
@@ -77,10 +92,9 @@ export interface BuildScheme {
   targetRates: Record<string, number>
   targetRateSources: BuildRateSource[]
   netProduction: Record<string, number>
-  steps: BuildSchemeStep[]
   totalDuration: number
   totalCredits: number
-  stepsCount: number
+  moduleSummaries: BuildSchemeModuleSummary[]
   isFeasible: boolean
   totalModuleBuildTime: number
   buildMaterialTotals: Record<string, number>

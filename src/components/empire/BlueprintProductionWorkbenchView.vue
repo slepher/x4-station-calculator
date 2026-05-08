@@ -181,6 +181,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
         :schemes="buildPlanPresenter.props.schemes.value"
         :loading="buildPlanPresenter.props.loading.value"
         :schemeGroups="buildPlanPresenter.props.schemeGroups.value"
+        @export-to-station="void 0"
       />
     </div>
     <div class="col-span-12 lg:col-span-5">

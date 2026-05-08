@@ -16,6 +16,10 @@ const props = defineProps<{
   schemeGroups?: BuildSchemeGroup[]
 }>()
 
+const emit = defineEmits<{
+  (e: 'export-to-station'): void
+}>()
+
 const selectedScheme = ref<BuildScheme | null>(null)
 const modalOpen = ref(false)
 
@@ -97,7 +101,6 @@ function toCardData(scheme: BuildScheme): SchemeCardData {
   const derivedModuleLines = derivedModules.map(m => `${moduleName(m.id)} ×${m.count}`)
 
   const materialLines = Object.entries(scheme.buildMaterialTotals)
-    .filter(([wareId]) => wareId !== 'energycells')
     .sort((a, b) => b[1] - a[1])
     .map(([wareId, qty]) => ({ name: wareName(wareId), qty }))
 
@@ -117,11 +120,31 @@ function computeCards(schemes: BuildScheme[]): SchemeCardData[] {
 const schemeCards = computed<SchemeCardData[]>(() => {
   return props.schemes.map(toCardData)
 })
+
+const canExport = computed(() => props.schemes.length > 0 && !props.loading)
+
+function handleExportToStation() {
+  if (!canExport.value) return
+  emit('export-to-station')
+}
 </script>
 
 <template>
   <div class="panel-card">
-    <div class="panel-header">{{ t('build_plan.schemes') }}</div>
+    <div class="flex items-center justify-between gap-3 border-b border-slate-700 px-4 py-[9px]">
+      <span class="text-sm font-semibold uppercase tracking-wider text-slate-300">{{ t('build_plan.schemes') }}</span>
+      <button
+        type="button"
+        class="inline-flex shrink-0 items-center rounded-md border px-3 py-1.5 text-xs font-semibold normal-case tracking-normal transition-colors"
+        :class="canExport
+          ? 'border-cyan-600/70 bg-cyan-500/12 text-cyan-200 hover:border-cyan-500 hover:bg-cyan-500/20'
+          : 'cursor-not-allowed border-slate-700 bg-slate-800/60 text-slate-500'"
+        :disabled="!canExport"
+        @click="handleExportToStation"
+      >
+        {{ t('build_plan.export_to_station') }}
+      </button>
+    </div>
     <div class="panel-content">
       <div v-if="!loading && schemes.length === 0" class="py-8 text-center text-xs text-slate-500">
         {{ t('build_plan.no_plan') }}
@@ -133,7 +156,12 @@ const schemeCards = computed<SchemeCardData[]>(() => {
 
       <div v-if="schemeGroups && schemeGroups.length > 0" class="space-y-4">
         <div v-for="group in schemeGroups" :key="group.groupType" class="space-y-2">
-          <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider px-1">{{ group.groupLabel }}</div>
+          <div
+            v-if="schemeGroups.length > 1"
+            class="px-1 text-xs font-semibold uppercase tracking-wider text-slate-400"
+          >
+            {{ group.groupLabel }}
+          </div>
           <div
             v-for="card in computeCards(group.schemes)"
             :key="card.scheme.label"
@@ -148,9 +176,9 @@ const schemeCards = computed<SchemeCardData[]>(() => {
                 >{{ schemeIcons[card.scheme.label] || group.schemes.indexOf(card.scheme) + 1 }}</span>
                  <span class="text-sm font-bold text-slate-200">{{ getSchemeLabel(card.scheme.label) }}</span>
               </div>
-              <div class="text-xs text-slate-400 font-mono">
-                {{ formatDuration(card.scheme.totalDuration) }} │ {{ formatCredits(card.scheme.totalCredits) }} │ {{ card.scheme.stepsCount }} {{ t('build_plan.steps_count').toLowerCase() }}
-              </div>
+<div class="text-xs text-slate-400 font-mono">
+                 {{ formatDuration(card.scheme.totalDuration) }} │ {{ formatCredits(card.scheme.totalCredits) }}
+               </div>
             </div>
 
             <p v-if="card.scheme.description" class="text-xs text-slate-400 mb-2">{{ card.scheme.description }}</p>
@@ -217,9 +245,9 @@ const schemeCards = computed<SchemeCardData[]>(() => {
               >{{ schemeIcons[card.scheme.label] || schemes.indexOf(card.scheme) + 1 }}</span>
                <span class="text-sm font-bold text-slate-200">{{ getSchemeLabel(card.scheme.label) }}</span>
             </div>
-            <div class="text-xs text-slate-400 font-mono">
-              {{ formatDuration(card.scheme.totalDuration) }} │ {{ formatCredits(card.scheme.totalCredits) }} │ {{ card.scheme.stepsCount }} {{ t('build_plan.steps_count').toLowerCase() }}
-            </div>
+<div class="text-xs text-slate-400 font-mono">
+               {{ formatDuration(card.scheme.totalDuration) }} │ {{ formatCredits(card.scheme.totalCredits) }}
+             </div>
           </div>
 
           <p v-if="card.scheme.description" class="text-xs text-slate-400 mb-2">{{ card.scheme.description }}</p>
@@ -278,3 +306,13 @@ const schemeCards = computed<SchemeCardData[]>(() => {
     @close="closeModal"
   />
 </template>
+
+<style scoped>
+.panel-card {
+  @apply bg-transparent border-0 rounded-none overflow-visible;
+}
+
+.panel-content {
+  @apply p-4;
+}
+</style>

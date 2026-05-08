@@ -307,15 +307,7 @@ if (useJson) {
     buildMaterialTotals: s.buildMaterialTotals,
     totalDuration: s.totalDuration,
     totalCredits: s.totalCredits,
-    stepsCount: s.stepsCount,
-    steps: s.steps.map(st => ({
-      moduleId: st.moduleId,
-      moduleName: modName(st.moduleId),
-      count: st.moduleCount,
-      duration: st.estimatedDuration,
-      credits: st.estimatedCredits,
-      reason: st.reason,
-    })),
+    moduleSummariesCount: s.moduleSummaries?.length || 0,
   })), null, 2))
   process.exit(0)
 }
