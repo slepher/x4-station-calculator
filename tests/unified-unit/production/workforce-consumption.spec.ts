@@ -4,7 +4,7 @@ import path from 'path'
 import { fileURLToPath } from 'url'
 import { calculateProductionFlowsCore } from '../../../src/store/logic/calculateProductionFlows'
 import { calculateWareFlowDerived } from '../../../src/store/logic/calculateWareFlowDerived'
-import type { StationSettings, X4Module, X4Ware, SavedModule, RaceMedicalConsumption, GroupedFlows } from '../../../src/types/x4'
+import type { StationSettings, X4Module, X4Ware, SavedModule, WorkforceConsumptionMap, GroupedFlows } from '../../../src/types/x4'
 
 const __filename = fileURLToPath(import.meta.url)
 const __dirname = path.dirname(__filename)
@@ -14,11 +14,12 @@ function callComputeFlows(
   plannedModules: SavedModule[],
   modules: Record<string, X4Module>,
   wares: Record<string, X4Ware>,
-  consumption: RaceMedicalConsumption,
+  consumption: WorkforceConsumptionMap,
   settings: StationSettings,
   warePriority: Record<string, number>,
   actualWorkforceOverride?: number,
-  saturationOverride?: number
+  saturationOverride?: number,
+  workforceOverride?: Array<{ race: string; amount: number }>
 ): GroupedFlows {
   const coreResult = calculateProductionFlowsCore({
     plannedModules,
@@ -26,11 +27,12 @@ function callComputeFlows(
     autoHabitationModules: [],
     modulesMap: modules,
     waresMap: wares,
-    medicalConsumptionMap: consumption,
+    workforceConsumptionMap: consumption,
     settings,
     warePriority,
     actualWorkforceOverride,
-    saturationOverride
+    saturationOverride,
+    workforceOverride
   })
 
   const derivedResult = calculateWareFlowDerived({
@@ -38,6 +40,7 @@ function callComputeFlows(
     autoIndustryModules: [],
     plannedModules,
     modulesMap: modules,
+    waresMap: wares,
     settings: {
       racePreference: settings.racePreference,
       resourceBufferHours: settings.resourceBufferHours,
@@ -58,7 +61,7 @@ function callComputeFlows(
 describe('Split Supply Operations - workforceConsumption', () => {
   let modules: Record<string, X4Module> = {}
   let wares: Record<string, X4Ware> = {}
-  let consumption: RaceMedicalConsumption = {}
+  let consumption: WorkforceConsumptionMap = {}
 
   beforeAll(() => {
     const modulesArray = JSON.parse(fs.readFileSync(path.join(DATA_PATH, 'modules.json'), 'utf-8')) as X4Module[]
@@ -126,13 +129,13 @@ describe('Split Supply Operations - workforceConsumption', () => {
     expect(medicalsuppliesFlow).toBeDefined()
 
     if (foodrationsFlow) {
-      expect(foodrationsFlow.workforceConsumption).toBeGreaterThan(0)
-      expect(foodrationsFlow.consumption).toBe(foodrationsFlow.workforceConsumption)
+      expect(foodrationsFlow.consumption).toBeGreaterThan(0)
+      expect(foodrationsFlow.contributions.some(c => c.class === 'workforce')).toBe(true)
     }
 
     if (medicalsuppliesFlow) {
-      expect(medicalsuppliesFlow.workforceConsumption).toBeGreaterThan(0)
-      expect(medicalsuppliesFlow.consumption).toBe(medicalsuppliesFlow.workforceConsumption)
+      expect(medicalsuppliesFlow.consumption).toBeGreaterThan(0)
+      expect(medicalsuppliesFlow.contributions.some(c => c.class === 'workforce')).toBe(true)
     }
   })
 
@@ -183,7 +186,7 @@ describe('Split Supply Operations - workforceConsumption', () => {
     expect(hullpartsFlow).toBeDefined()
 
     if (hullpartsFlow && hullpartsFlow.netRate < 0) {
-      expect(hullpartsFlow.workforceConsumption).toBe(0)
+      expect(hullpartsFlow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')).toBe(false)
 
       const hullpartsInOperations = result.rateGroups.operations.find(f => f.wareId === 'hullparts')
       expect(hullpartsInOperations).toBeDefined()
@@ -219,10 +222,69 @@ describe('Split Supply Operations - workforceConsumption', () => {
     expect(foodrationsFlow).toBeDefined()
 
     if (foodrationsFlow && foodrationsFlow.netRate < 0) {
-      expect(foodrationsFlow.workforceConsumption).toBeGreaterThan(0)
+      expect(foodrationsFlow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')).toBe(true)
 
       const foodrationsInSupply = result.rateGroups.supply.find(f => f.wareId === 'foodrations')
       expect(foodrationsInSupply).toBeDefined()
     }
+  })
+
+  it('手动 workforce 大于需求时，额外人数作为 idle contribution 进入 wareflow', () => {
+    const habModuleId = 'module_arg_hab_m_01'
+    const weaponComponentsModuleId = Object.keys(modules).find(k => k.includes('weaponcomponents'))
+
+    expect(modules[habModuleId]).toBeDefined()
+    expect(weaponComponentsModuleId).toBeDefined()
+    if (!weaponComponentsModuleId) return
+
+    const settings: StationSettings = {
+      ...defaultSettings,
+      workforceAuto: false,
+      manualWorkforce: 1000
+    }
+
+    const result = callComputeFlows(
+      [
+        { id: habModuleId, count: 1 },
+        { id: weaponComponentsModuleId, count: 1 }
+      ],
+      modules,
+      wares,
+      consumption,
+      settings,
+      {}
+    )
+
+    const foodrationsFlow = result.flows.find(f => f.wareId === 'foodrations')
+    expect(foodrationsFlow).toBeDefined()
+    if (!foodrationsFlow) return
+
+    expect(foodrationsFlow.contributions.some(c => c.class === 'workforce')).toBe(true)
+    expect(foodrationsFlow.contributions.some(c => c.class === 'workforce_idle')).toBe(true)
+  })
+
+  it('无岗位需求时不生成 0 值 busy contribution，只保留 idle contribution', () => {
+    const habModuleId = 'module_arg_hab_m_01'
+    const settings: StationSettings = {
+      ...defaultSettings,
+      workforceAuto: false,
+      manualWorkforce: 100
+    }
+
+    const result = callComputeFlows(
+      [{ id: habModuleId, count: 1 }],
+      modules,
+      wares,
+      consumption,
+      settings,
+      {}
+    )
+
+    const foodrationsFlow = result.flows.find(f => f.wareId === 'foodrations')
+    expect(foodrationsFlow).toBeDefined()
+    if (!foodrationsFlow) return
+
+    expect(foodrationsFlow.contributions.some(c => c.class === 'workforce')).toBe(false)
+    expect(foodrationsFlow.contributions.some(c => c.class === 'workforce_idle')).toBe(true)
   })
 })

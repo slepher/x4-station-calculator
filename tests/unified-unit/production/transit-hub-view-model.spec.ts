@@ -15,7 +15,6 @@ describe('transitHubViewModel', () => {
           unitVolume: 2,
           production: 10,
           consumption: 0,
-          workforceConsumption: 0,
           netRate: 10,
           unitPrice: 1,
           netValue: 10,
@@ -25,7 +24,6 @@ describe('transitHubViewModel', () => {
             stationCount: 1,
             production: 10,
             consumption: 0,
-            workforceConsumption: 0,
             netRate: 10,
             netValue: 10
           }]

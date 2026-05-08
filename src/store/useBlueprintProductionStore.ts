@@ -112,12 +112,12 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   }
 
   function getComputeDeps(): StationComputeDeps | null {
-    const { modulesMap, waresMap, medicalConsumptionMap, enforceDlcActivation } = gameData
-    if (!gameData.isReady || !modulesMap || !waresMap || !medicalConsumptionMap) return null
+    const { modulesMap, waresMap, workforceConsumptionMap, enforceDlcActivation } = gameData
+    if (!gameData.isReady || !modulesMap || !waresMap || !workforceConsumptionMap) return null
     return {
       modulesMap,
       waresMap,
-      medicalConsumptionMap,
+      workforceConsumptionMap,
       enforceDlcActivation,
       isModuleDlcActive: (moduleId: string) => gameData.isDlcActive(modulesMap[moduleId]?.dlc_tag)
     }
@@ -129,7 +129,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     return {
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
-      medicalConsumptionMap: deps.medicalConsumptionMap
+      workforceConsumptionMap: deps.workforceConsumptionMap
     }
   }
 

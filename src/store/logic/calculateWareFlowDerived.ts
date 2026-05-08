@@ -62,7 +62,7 @@ export function deriveProductionFlows(
 
     const priorityLevel = warePriorityLevels?.[prodFlow.wareId] ?? 0
     const isMainOrSecondary = priorityLevel > 0
-    const isSupplyGap = prodFlow.contributions.some(c => c.class === 'workforce')
+    const isSupplyGap = prodFlow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')
     const isResourceFlow = prodFlow.transportType !== 'container'
     const isDeficit = prodFlow.netRate < 0
     const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow || isDeficit
@@ -93,7 +93,7 @@ export function deriveProductionFlows(
       ...atom,
       name: atom.class === 'module'
         ? modulesMap[atom.id]?.name || atom.id
-        : atom.class === 'workforce'
+        : atom.class === 'workforce' || atom.class === 'workforce_idle'
           ? atom.id
           : atom.class === 'station'
             ? stationNameMap?.[atom.id] || (atom as any).name || atom.id
@@ -151,7 +151,7 @@ function groupDerivedProductionFlows(
 
   wareFlows.forEach(flow => {
     if (flow.netRate > 0) groupedFlows.rateGroups.positive.push(flow)
-    else if (flow.contributions.some(c => c.class === 'workforce')) groupedFlows.rateGroups.supply.push(flow)
+    else if (flow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')) groupedFlows.rateGroups.supply.push(flow)
     else if (flow.transportType === 'container') groupedFlows.rateGroups.operations.push(flow)
     else groupedFlows.rateGroups.resources.push(flow)
 

@@ -30,7 +30,7 @@ vi.mock('@/store/useGameDataStore', async () => {
     })
     const localizedModulesMap = ref({})
     const localizedModuleGroupsMap = ref({})
-    const medicalConsumptionMap = ref({})
+    const workforceConsumptionMap = ref({})
     const searchQuery = ref('')
     const currentLocale = ref('en')
     const activeDlcs = ref<string[]>([])
@@ -43,7 +43,7 @@ vi.mock('@/store/useGameDataStore', async () => {
       modulesMap,
       localizedModulesMap,
       localizedModuleGroupsMap,
-      medicalConsumptionMap,
+      workforceConsumptionMap,
       searchQuery,
       currentLocale,
       activeDlcs,
@@ -144,7 +144,6 @@ function makeFlow(wareId: string, netRate: number): WareFlow {
     unitVolume: 1,
     production,
     consumption,
-    workforceConsumption: 0,
     netRate,
     productionVolume: production,
     consumptionVolume: consumption,

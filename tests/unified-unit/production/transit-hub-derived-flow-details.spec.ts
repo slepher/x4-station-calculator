@@ -14,7 +14,6 @@ describe('deriveProductionFlows transit hub details', () => {
         unitVolume: 1,
         production: 10,
         consumption: 4,
-        workforceConsumption: 0,
         netRate: 6,
         contributions: [
           {
@@ -32,7 +31,6 @@ describe('deriveProductionFlows transit hub details', () => {
             stationCount: 2,
             production: 10,
             consumption: 4,
-            workforceConsumption: 0,
             netRate: 6
           }
         ]

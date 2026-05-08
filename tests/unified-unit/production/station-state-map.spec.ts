@@ -77,7 +77,7 @@ describe('StationStateMap', () => {
     map.recompute('A', {
       modulesMap,
       waresMap,
-      medicalConsumptionMap: { default: {} }
+      workforceConsumptionMap: { default: { idle: {}, busy: {} } }
     })
 
     const state = map.get('A')!

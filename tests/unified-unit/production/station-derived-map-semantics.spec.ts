@@ -6,7 +6,7 @@ describe('StationDerivedMap semantics', () => {
     const map = new StationDerivedMap({
       modulesMap: {},
       waresMap: {},
-      medicalConsumptionMap: {}
+      workforceConsumptionMap: {}
     })
 
     map.upsertStation('plan-station', {
@@ -27,7 +27,7 @@ describe('StationDerivedMap semantics', () => {
     const map = new StationDerivedMap({
       modulesMap: {},
       waresMap: {},
-      medicalConsumptionMap: {}
+      workforceConsumptionMap: {}
     })
 
     map.upsertStation('archive-station', {

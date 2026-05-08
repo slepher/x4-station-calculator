@@ -6,7 +6,7 @@ import { loadLanguageAsync, setGameFolderName } from '@/i18n'
 import type {
   X4Module,
   X4Ware,
-  RaceMedicalConsumption,
+  WorkforceConsumptionMap,
   LocalizedX4Module,
   LocalizedX4ModuleGroup,
   ModuleGroupResult,
@@ -36,7 +36,7 @@ import {
   buildModulesMap,
   buildModulesByMacroIdMap,
   buildModulesByOutputMap,
-  buildMedicalConsumptionMap,
+  buildWorkforceConsumptionMap,
   buildLocalizedModulesMap,
   buildLocalizedModuleGroupsMap,
   findModuleForWare as findModuleForWareFn,
@@ -75,7 +75,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const localizedModulesMap = ref<Record<string, LocalizedX4Module>>({})
   const localizedWaresMap = ref<Record<string, { id: string, localeName: string }>>({})
   const localizedModuleGroupsMap = ref<Record<string, LocalizedX4ModuleGroup>>({})
-  const medicalConsumptionMap = ref<RaceMedicalConsumption>({})
+  const workforceConsumptionMap = ref<WorkforceConsumptionMap>({})
   const wareSetsByIndustrialRace = ref<Record<string, Set<string>>>({})
   const wareSetsByRace = ref<Record<string, Set<string>>>({})
   const volumeCompressionMap = ref<Record<string, number>>({})
@@ -394,7 +394,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     modulesMap.value = buildModulesMap(data.modules)
     modulesByMacroId.value = buildModulesByMacroIdMap(modulesMap.value)
     modulesByOutputMap.value = buildModulesByOutputMap(modulesMap.value)
-    medicalConsumptionMap.value = buildMedicalConsumptionMap(data.consumption)
+    workforceConsumptionMap.value = buildWorkforceConsumptionMap(data.consumption)
 
     const isEn = currentLocale.value === 'en'
     localizedModulesMap.value = buildLocalizedModulesMap(data.modules, isEn, translateModule)
@@ -533,7 +533,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     localizedModulesMap,
     localizedWaresMap,
     localizedModuleGroupsMap,
-    medicalConsumptionMap,
+    workforceConsumptionMap,
     wareSetsByIndustrialRace,
     wareSetsByRace,
     volumeCompressionMap,

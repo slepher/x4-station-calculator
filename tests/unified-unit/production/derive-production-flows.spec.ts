@@ -13,7 +13,6 @@ describe('deriveProductionFlows', () => {
       unitVolume: 2,
       production: 10,
       consumption: 4,
-      workforceConsumption: 0,
       netRate: 6,
       contributions: [
         { moduleId: 'prod_energy', count: 1, type: 'production', amount: 10, bonusPercent: 0 },
@@ -26,7 +25,6 @@ describe('deriveProductionFlows', () => {
           stationCount: 1,
           production: 10,
           consumption: 4,
-          workforceConsumption: 0,
           netRate: 6
         }
       ]
@@ -100,7 +98,6 @@ describe('deriveProductionFlows', () => {
         unitVolume: 10,
         production: 0,
         consumption: 3,
-        workforceConsumption: 0,
         netRate: -3,
         productionVolume: 0,
         consumptionVolume: 30,

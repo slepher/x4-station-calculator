@@ -343,13 +343,25 @@ export interface X4Module {
 }
 
 /**
- * 种族医疗消耗数据结构
+ * 种族工人消耗数据结构 (per person per hour)
  */
-export interface RaceMedicalConsumption {
-  [race: string]: {
-    [wareId: string]: number; // 商品ID -> 每小时每人消耗量
-  };
+export interface WorkforceStateConsumption {
+  [wareId: string]: number; // per person per hour
 }
+
+export interface RaceWorkforceConsumption {
+  idle: WorkforceStateConsumption
+  busy: WorkforceStateConsumption
+}
+
+export interface WorkforceConsumptionMap {
+  [race: string]: RaceWorkforceConsumption
+}
+
+/**
+ * @deprecated Use WorkforceConsumptionMap instead
+ */
+export type RaceMedicalConsumption = WorkforceConsumptionMap
 
 /**
  * 游戏数据根结构

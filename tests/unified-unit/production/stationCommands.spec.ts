@@ -58,7 +58,7 @@ const mockWaresMap: Record<string, any> = {
 const mockComputeDeps = {
   modulesMap: mockModulesMap,
   waresMap: mockWaresMap,
-  medicalConsumptionMap: { argon: { food: 1, medical: 1 } },
+  workforceConsumptionMap: { argon: { idle: { food: 1, medical: 1 }, busy: { food: 1, medical: 1 } } },
   buildPriceMultiplier: 0.5,
   enforceDlcActivation: false,
   isModuleDlcActive: () => true

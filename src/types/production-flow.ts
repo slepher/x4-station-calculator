@@ -1,8 +1,14 @@
 import type { TransportType, WareFlow } from './x4'
 
+export type WorkforceContributionClass = 'workforce' | 'workforce_idle'
+
+export function isWorkforceContributionClass(cls: string): cls is WorkforceContributionClass {
+  return cls === 'workforce' || cls === 'workforce_idle'
+}
+
 export interface FlowContribution {
   id: string
-  class: 'module' | 'workforce' | 'station' | 'sector'
+  class: 'module' | WorkforceContributionClass | 'station' | 'sector'
   type: 'production' | 'consumption'
   count: number
   amount: number

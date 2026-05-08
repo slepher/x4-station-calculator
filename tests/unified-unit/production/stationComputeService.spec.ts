@@ -48,14 +48,14 @@ const mockWaresMap: Record<string, any> = {
   }
 }
 
-const mockMedicalConsumptionMap: any = {
-  argon: { food: 1, medical: 1 }
+const mockWorkforceConsumptionMap: any = {
+  argon: { idle: { food: 1, medical: 1 }, busy: { food: 1, medical: 1 } }
 }
 
 const mockComputeDeps = buildStationComputeDeps({
   modulesMap: mockModulesMap,
   waresMap: mockWaresMap,
-  medicalConsumptionMap: mockMedicalConsumptionMap,
+  workforceConsumptionMap: mockWorkforceConsumptionMap,
   buildPriceMultiplier: 0.5,
   enforceDlcActivation: false,
   isModuleDlcActive: () => true
@@ -89,13 +89,13 @@ describe('stationComputeService', () => {
       const deps = buildStationComputeDeps({
         modulesMap: mockModulesMap,
         waresMap: mockWaresMap,
-        medicalConsumptionMap: mockMedicalConsumptionMap,
+        workforceConsumptionMap: mockWorkforceConsumptionMap,
         buildPriceMultiplier: 0.5
       })
 
       expect(deps.modulesMap).toBe(mockModulesMap)
       expect(deps.waresMap).toBe(mockWaresMap)
-      expect(deps.medicalConsumptionMap).toBe(mockMedicalConsumptionMap)
+      expect(deps.workforceConsumptionMap).toBe(mockWorkforceConsumptionMap)
       expect(deps.buildPriceMultiplier).toBe(0.5)
     })
 

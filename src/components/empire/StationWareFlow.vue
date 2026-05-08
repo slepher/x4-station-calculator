@@ -206,6 +206,9 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
               <template v-if="item.class === 'workforce'">
                 {{ t(`race.${item.id}`) }} {{ t('station.workforce_label') }}
               </template>
+              <template v-else-if="item.class === 'workforce_idle'">
+                {{ t(`race.${item.id}`) }} {{ t('station.workforce_idle_label') }}
+              </template>
               <template v-else>
                 {{ translateModule(item.id) }}
               </template>

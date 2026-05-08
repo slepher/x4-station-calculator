@@ -8,7 +8,7 @@ describe('production phase boundary', () => {
     const flowMapApi = new StationDerivedMap({
       modulesMap: {},
       waresMap: {},
-      medicalConsumptionMap: {}
+      workforceConsumptionMap: {}
     }) as unknown as Record<string, unknown>
 
     expect('computeSectorAggregation' in flowMapApi).toBe(false)
@@ -27,7 +27,6 @@ describe('production phase boundary', () => {
         unitVolume: 1,
         production: 10,
         consumption: 0,
-        workforceConsumption: 0,
         netRate: 10,
         contributions: []
       }],

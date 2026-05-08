@@ -89,7 +89,7 @@ export function calculateInfrastructureModules(input: InfrastructureInput): Save
   for (const flow of productionFlows) {
     const priorityLevel = warePriorityLevels[flow.wareId] ?? 0
     const isMainOrSecondary = priorityLevel > 0
-    const isSupplyGap = flow.contributions.some(c => c.class === 'workforce')
+    const isSupplyGap = flow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')
     const isResourceFlow = flow.transportType !== 'container'
     const isDeficit = flow.netRate < 0
     const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow || isDeficit

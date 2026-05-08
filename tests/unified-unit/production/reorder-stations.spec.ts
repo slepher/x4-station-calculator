@@ -17,7 +17,7 @@ vi.mock('@/store/useGameDataStore', () => ({
     isReady: true,
     waresMap: {},
     modulesMap: {},
-    medicalConsumptionMap: {}
+    workforceConsumptionMap: {}
   }))
 }))
 
