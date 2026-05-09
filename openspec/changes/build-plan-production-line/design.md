@@ -229,6 +229,32 @@ preview 构建依赖图时：
 6. isolated 搜索产线优先级：
    - manual
    - auto
+   
+#### 2.6 目标到产线的全局分配算法
+
+当前 `computeProductionLineAllocation` 采用逐 goal 顺序扫描：
+- 每个 goal 独立走 manual → auto → unmatched
+- 先匹配 manual 的产线，再匹配 auto 的产线
+- 问题：auto 阶段无法区分"已分配产线"和"未分配产线"，只是按 flowGroups 数组顺序取第一个
+
+改为全局两轮扫描分配：
+
+```text
+第一轮（manual 全局分配）：
+  for each goal:
+    扫描所有产线的 manual 节点 → 匹配则 assign，标记该产线为"已分配"
+
+第二轮（auto 优先在已分配产线中查找）：
+  扫描所有 未分配 的 goal:
+    优先在"已分配"的产线中查找 auto 节点 → 匹配则 assign
+    其次在其他"未分配"的产线中查找 auto 节点 → 匹配则 assign
+    仍未匹配 → unmatched
+```
+
+效果：
+1. 所有目标先走完 manual 分配，确保 manual 节点优先被利用
+2. auto 阶段优先在已有 manual 分配的产线中找，将新目标聚集到已有产线
+3. 避免新目标分散到多个产线
 7. 若 build material / output build 无连线：
    - 直接忽略
    - 不回退搜索其他来源

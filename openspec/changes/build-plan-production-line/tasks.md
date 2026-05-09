@@ -76,7 +76,8 @@
 - [ ] T34: `useBuildPlanPresenter` 改为以 `useBuildPlanStore` 为主输入，仅组合 blueprint store 的 empire overview 数据
 - [ ] T35: `BlueprintProductionWorkbenchView` overview 入口改为同时注入 blueprint store 与 build-plan store
 - [ ] T36: 清理 `useBlueprintProductionStore` 中遗留的 build-plan 真相层导出与双写路径
-- [ ] T37: 为新 store / presenter 边界补充单元测试
+- [x] T38: 将 `computeProductionLineAllocation` 改为全局两轮分配：先 manual 全局分配，再 auto 优先在已分配产线中查找
+- [x] T39: 执行 `npm run build`
 
 ## 验证方案摘要
 

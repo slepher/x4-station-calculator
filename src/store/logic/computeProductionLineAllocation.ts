@@ -197,11 +197,14 @@ export function computeProductionLineAllocation(
   const allGoals = [...goals, ...derivedGoalList]
 
   // 2. 为每个 goal 分配产线
+  const assignedGroupIds = new Set<string>()
+
+  // Layer 1: Build-flow outputMaterialTag 匹配（逐 goal 独立处理）
+  const afterLayer1: BuildGoal[] = []
   for (const goal of allGoals) {
     const wareId = extractWareId(goal, modulesMap)
     let assigned = false
 
-    // Layer 1: Build-flow outputMaterialTag 匹配
     if (buildFlowView) {
       for (const bfg of buildFlowView.buildFlowGroups) {
         for (const tag of bfg.outputMaterialTags) {
@@ -211,6 +214,7 @@ export function computeProductionLineAllocation(
               const list = groupMap.get(sourceGroupId) || []
               list.push(goal)
               groupMap.set(sourceGroupId, list)
+              assignedGroupIds.add(sourceGroupId)
               assigned = true
               break
             }
@@ -219,10 +223,18 @@ export function computeProductionLineAllocation(
         if (assigned) break
       }
     }
-    if (assigned) continue
 
-    // Layer 2: Logic-flow 节点匹配
-    // manual
+    if (!assigned) {
+      afterLayer1.push(goal)
+    }
+  }
+
+  // Round 1: Manual 全局分配
+  const afterManual: BuildGoal[] = []
+  for (const goal of afterLayer1) {
+    const wareId = extractWareId(goal, modulesMap)
+    let assigned = false
+
     for (const group of flowGroups) {
       let matched = false
       for (const node of group.nodes) {
@@ -241,14 +253,28 @@ export function computeProductionLineAllocation(
         const list = groupMap.get(group.id) || []
         list.push(goal)
         groupMap.set(group.id, list)
+        assignedGroupIds.add(group.id)
         assigned = true
         break
       }
     }
-    if (assigned) continue
 
-    // auto
+    if (!assigned) {
+      afterManual.push(goal)
+    }
+  }
+
+  // Round 2: Auto 分配 — 优先在「已分配产线」中查找
+  const unassignedAfterAuto: BuildGoal[] = []
+
+  // 第一优先：在已分配产线中找 auto 节点
+  const afterFirstAuto: BuildGoal[] = []
+  for (const goal of afterManual) {
+    const wareId = extractWareId(goal, modulesMap)
+    let assigned = false
+
     for (const group of flowGroups) {
+      if (!assignedGroupIds.has(group.id)) continue
       let matched = false
       for (const node of group.nodes) {
         if (node.source === 'auto' && !node.isIsolated) {
@@ -270,10 +296,52 @@ export function computeProductionLineAllocation(
         break
       }
     }
-    if (assigned) continue
 
-    // Layer 2.5: Isolated node matching (for derived goals)
+    if (!assigned) {
+      afterFirstAuto.push(goal)
+    }
+  }
+
+  // 第二优先：在其余产线中找 auto 节点
+  for (const goal of afterFirstAuto) {
+    const wareId = extractWareId(goal, modulesMap)
+    let assigned = false
+
+    for (const group of flowGroups) {
+      if (assignedGroupIds.has(group.id)) continue
+      let matched = false
+      for (const node of group.nodes) {
+        if (node.source === 'auto' && !node.isIsolated) {
+          if ((goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') && node.wareId === wareId) {
+            matched = true
+            break
+          }
+          if (goal.type === 'build-module' && node.moduleId === goal.moduleId) {
+            matched = true
+            break
+          }
+        }
+      }
+      if (matched) {
+        const list = groupMap.get(group.id) || []
+        list.push(goal)
+        groupMap.set(group.id, list)
+        assignedGroupIds.add(group.id)
+        assigned = true
+        break
+      }
+    }
+
+    if (!assigned) {
+      unassignedAfterAuto.push(goal)
+    }
+  }
+
+  // Layer 2.5: Isolated node matching（仅 derived 类型）
+  for (const goal of unassignedAfterAuto) {
     if (goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material' || goal.type === 'required-production') {
+      const wareId = extractWareId(goal, modulesMap)
+      let assigned = false
       for (const group of flowGroups) {
         for (const node of group.nodes) {
           if (node.isIsolated && node.wareId === wareId) {
@@ -286,11 +354,12 @@ export function computeProductionLineAllocation(
         }
         if (assigned) break
       }
+      if (!assigned) {
+        unmatchedGoals.push(goal)
+      }
+    } else {
+      unmatchedGoals.push(goal)
     }
-    if (assigned) continue
-
-    // Layer 3: 未命中
-    unmatchedGoals.push(goal)
   }
 
   // 3. 构建输出
