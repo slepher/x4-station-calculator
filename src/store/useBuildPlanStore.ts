@@ -632,7 +632,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
 
   watch([buildFlowMode, buildGoals], () => {
     computeBuildFlowPlanPreview()
-  })
+  }, { deep: true })
 
   watch(
     [
