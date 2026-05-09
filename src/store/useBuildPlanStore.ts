@@ -18,6 +18,8 @@ import { BootstrapMode } from '@/types/build-plan'
 import { CURRENT_BUILD_PLAN_GOALS_VERSION } from './logic/storageVersions'
 import { useGameDataStore } from './useGameDataStore'
 import { useLogicFlowStore } from './useLogicFlowStore'
+import { useShipBuildStore } from './useShipBuildStore'
+import { resolveBlueprintMaterialCost } from './logic/resolveBlueprintMaterialCost'
 import type { StationComputeDeps } from './state/stationSettings'
 import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
@@ -200,6 +202,52 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     syncGoalsToActivePlan()
   }
 
+  function addFleetEntry(shipId: string, blueprintId: string) {
+    ensureActivePlan()
+    const existing = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
+    if (existing) {
+      const entry = existing.entries.find(e => e.blueprintId === blueprintId)
+      if (entry) {
+        entry.quantity++
+      } else {
+        existing.entries.push({ shipId, blueprintId, quantity: 1 })
+      }
+    } else {
+      buildGoals.value = [...buildGoals.value, {
+        type: 'fleet' as const,
+        buildTime: 3600,
+        entries: [{ shipId, blueprintId, quantity: 1 }],
+      }]
+    }
+    syncGoalsToActivePlan()
+  }
+
+  function removeFleetEntry(blueprintId: string) {
+    const fleetGoal = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
+    if (!fleetGoal) return
+    fleetGoal.entries = fleetGoal.entries.filter(e => e.blueprintId !== blueprintId)
+    if (fleetGoal.entries.length === 0) {
+      buildGoals.value = buildGoals.value.filter(g => g.type !== 'fleet')
+    }
+    syncGoalsToActivePlan()
+  }
+
+  function updateFleetBuildTime(seconds: number) {
+    const fleetGoal = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
+    if (!fleetGoal) return
+    fleetGoal.buildTime = Math.max(600, seconds)
+    syncGoalsToActivePlan()
+  }
+
+  function updateFleetEntryQuantity(blueprintId: string, qty: number) {
+    const fleetGoal = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
+    if (!fleetGoal) return
+    const entry = fleetGoal.entries.find(e => e.blueprintId === blueprintId)
+    if (!entry) return
+    entry.quantity = qty
+    syncGoalsToActivePlan()
+  }
+
   function removeBuildGoal(index: number) {
     buildGoals.value = buildGoals.value.filter((_, i) => i !== index)
     syncGoalsToActivePlan()
@@ -365,6 +413,55 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     }
   }
 
+  function resolveFleetMergedRates(fleetGoal: Extract<BuildGoal, { type: 'fleet' }>): { wareId: string; ratePerHour: number }[] {
+    const shipBuildStore = useShipBuildStore()
+    shipBuildStore.loadBlueprintsFromStorage()
+    const totalByWare: Record<string, number> = {}
+
+    for (const entry of fleetGoal.entries) {
+      const blueprint = shipBuildStore.findBlueprintById(entry.blueprintId)
+      const ship = shipBuildStore.findShip(entry.shipId)
+      if (!blueprint || !ship) continue
+
+      const materials = resolveBlueprintMaterialCost(
+        blueprint,
+        ship,
+        shipBuildStore.equipmentMap,
+        shipBuildStore.consumablesMap,
+        shipBuildStore.dronesMap,
+        shipBuildStore.missilesMap,
+      )
+
+      for (const [wareId, qty] of Object.entries(materials)) {
+        totalByWare[wareId] = (totalByWare[wareId] || 0) + qty * entry.quantity
+      }
+    }
+
+    return Object.entries(totalByWare).map(([wareId, totalQty]) => ({
+      wareId,
+      ratePerHour: Math.ceil(totalQty / fleetGoal.buildTime * 3600),
+    }))
+  }
+
+  function expandFleetGoals(goals: BuildGoal[]): BuildGoal[] {
+    const expanded: BuildGoal[] = []
+    for (const goal of goals) {
+      if (goal.type === 'fleet') {
+        const rates = resolveFleetMergedRates(goal)
+        for (const rate of rates) {
+          expanded.push({
+            type: 'production-rate',
+            wareId: rate.wareId,
+            ratePerHour: rate.ratePerHour,
+          })
+        }
+      } else {
+        expanded.push(goal)
+      }
+    }
+    return expanded
+  }
+
   function computeBuildFlowPlanPreview() {
     const deps = getComputeDeps()
     if (!deps) return
@@ -379,6 +476,8 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
         return
       }
 
+      const expandedGoals = expandFleetGoals(goals)
+
       const groups: ProductionLineGroup[] = logicFlowStore.groups || []
       let buildFlowView: BuildFlowPlanView | null = null
       const flowView = logicFlowStore.buildFlowView
@@ -391,7 +490,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       }
 
       const preview = createBuildFlowPlanPreview(
-        goals,
+        expandedGoals,
         groups,
         buildFlowView,
         deps.modulesMap,
@@ -449,6 +548,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     if (!deps) return
 
     const goals = buildGoals.value
+    const expandedGoals = expandFleetGoals(goals)
     computeBuildPlanLoading.value = true
 
     try {
@@ -483,7 +583,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       if (buildFlowMode.value && buildFlowPlanGraphResult.value) {
         const result = computeBuildFlowPlanSchemeGroups(
           buildFlowPlanGraphResult.value,
-          goals,
+          expandedGoals,
           logicFlowStore.groups || [],
           logicFlowStore.buildFlowView
             ? {
@@ -520,7 +620,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       }
 
       schemeGroups.value = []
-      const result = calculateBuildFlowPlanInternal(goals, deps)
+      const result = calculateBuildFlowPlanInternal(expandedGoals, deps)
       buildPlan.value = {
         ...result,
         schemes: mergeIntoExistingPlan(result.schemes, buildPlan.value),
@@ -581,5 +681,9 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     syncGoalsToActivePlan,
     loadPlansFromStorage,
     savePlansToStorage,
+    addFleetEntry,
+    removeFleetEntry,
+    updateFleetBuildTime,
+    updateFleetEntryQuantity,
   }
 })

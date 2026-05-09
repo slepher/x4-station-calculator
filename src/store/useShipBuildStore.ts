@@ -705,6 +705,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     loadedBuiltInConnectionsSnapshot.value = null
   }
 
+  // Auto-load blueprints from storage on store creation
+  loadBlueprintsFromStorage()
+
   // If active blueprint exists, auto-load the corresponding blueprint after a tick
   if (savedBlueprints.value.activeBlueprintId) {
     const activeBlueprint = findBlueprintById(savedBlueprints.value.activeBlueprintId)
@@ -1773,6 +1776,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     getBlueprintsForShip,
     getLoadableBlueprintsForShip,
     isBuiltInBlueprintId,
+    findBlueprintById,
     loadBlueprintsFromStorage,
     updateBlueprintStorage,
     clearLoadoutForCurrentShip,

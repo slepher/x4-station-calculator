@@ -75,7 +75,15 @@
     "new_plan": "New",
     "no_plans": "No saved plans",
     "default_plan_name": "Build Plan",
-    "no_active_plan": "None"
+    "no_active_plan": "None",
+    "fleet_title": "Fleet",
+    "fleet_search_placeholder": "Search fleet blueprint...",
+    "fleet_empty": "No saved ship blueprints",
+    "fleet_blueprint_missing": "Blueprint missing",
+    "fleet_no_materials": "No materials",
+    "fleet_rates": "Derived Rates",
+    "fleet_toggle": "Toggle fleet search",
+    "category_fleet": "Fleet"
   },
   "sector": {
     "overview": "Overview",

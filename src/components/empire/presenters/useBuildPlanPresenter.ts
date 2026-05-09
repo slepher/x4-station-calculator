@@ -4,6 +4,10 @@ import type {
   BuildPlan,
   BuildScheme,
   BuildSchemeGroup,
+  FleetGoalView,
+  FleetEntryView,
+  FleetMergedRate,
+  FleetMaterialItem,
   PreviewLinePlan,
   PreviewResult,
   ProductionLineAllocation,
@@ -11,6 +15,8 @@ import type {
 import type { EmpireGroupedFlows } from '@/types/x4'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useShipBuildStore } from '@/store/useShipBuildStore'
+import { resolveBlueprintMaterialCost } from '@/store/logic/resolveBlueprintMaterialCost'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 
 export interface FlowPlanItem {
@@ -43,6 +49,7 @@ export interface BuildPlanPresenterProps {
   planName: ComputedRef<string>
   activePlanId: ComputedRef<string | null>
   loadablePlanItems: ComputedRef<PlanItem[]>
+  fleetGoalView: ComputedRef<FleetGoalView | null>
 }
 
 export interface BuildPlanPresenterEmits {
@@ -55,6 +62,10 @@ export interface BuildPlanPresenterEmits {
   switchPlan: (planId: string) => void
   deletePlan: (planId: string) => void
   setPlanName: (name: string) => void
+  addFleetEntry: (shipId: string, blueprintId: string) => void
+  removeFleetEntry: (blueprintId: string) => void
+  updateFleetBuildTime: (seconds: number) => void
+  updateFleetEntryQuantity: (blueprintId: string, qty: number) => void
 }
 
 export interface UseBuildPlanPresenterReturn {
@@ -85,6 +96,10 @@ export interface BuildPlanPresenterBuildPlanStore {
   switchPlan(planId: string): void
   deletePlan(planId: string): void
   syncGoalsToActivePlan(): void
+  addFleetEntry(shipId: string, blueprintId: string): void
+  removeFleetEntry(blueprintId: string): void
+  updateFleetBuildTime(seconds: number): void
+  updateFleetEntryQuantity(blueprintId: string, qty: number): void
 }
 
 export interface BuildPlanPresenterInput {
@@ -95,6 +110,80 @@ export interface BuildPlanPresenterInput {
 export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildPlanPresenterInput): UseBuildPlanPresenterReturn {
   const logicFlow = useLogicFlowStore()
   const gameData = useGameDataStore()
+  const shipBuildStore = useShipBuildStore()
+
+  const fleetGoalView = computed<FleetGoalView | null>(() => {
+    const fleetGoal = buildPlanStore.buildGoals.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
+    if (!fleetGoal) return null
+
+    const entries: FleetEntryView[] = fleetGoal.entries.map(entry => {
+      const blueprint = shipBuildStore.findBlueprintById(entry.blueprintId)
+      const ship = shipBuildStore.findShip(entry.shipId)
+      const isBlueprintMissing = !blueprint
+
+      const materials: FleetMaterialItem[] = []
+      if (blueprint && ship) {
+        const costMap = resolveBlueprintMaterialCost(
+          blueprint,
+          ship,
+          shipBuildStore.equipmentMap,
+          shipBuildStore.consumablesMap,
+          shipBuildStore.dronesMap,
+          shipBuildStore.missilesMap,
+        )
+        for (const [wareId, qty] of Object.entries(costMap)) {
+          const totalQty = qty * entry.quantity
+          materials.push({
+            wareId,
+            wareName: gameData.localizedWaresMap[wareId]?.localeName || wareId,
+            totalQty,
+          })
+        }
+        materials.sort((a, b) => {
+          const tierA = gameData.waresMap[a.wareId]?.tier ?? 0
+          const tierB = gameData.waresMap[b.wareId]?.tier ?? 0
+          if (tierB !== tierA) return tierB - tierA
+          return a.wareName.localeCompare(b.wareName)
+        })
+      }
+
+      return {
+        shipId: entry.shipId,
+        shipName: ship?.name || entry.shipId,
+        blueprintId: entry.blueprintId,
+        blueprintName: blueprint?.name || entry.blueprintId,
+        quantity: entry.quantity,
+        materials,
+        isBlueprintMissing,
+      }
+    })
+
+    const totalByWare: Record<string, number> = {}
+    for (const entry of entries) {
+      for (const mat of entry.materials) {
+        totalByWare[mat.wareId] = (totalByWare[mat.wareId] || 0) + mat.totalQty
+      }
+    }
+
+    const mergedRates: FleetMergedRate[] = Object.entries(totalByWare)
+      .map(([wareId, totalQty]) => ({
+        wareId,
+        wareName: gameData.localizedWaresMap[wareId]?.localeName || wareId,
+        ratePerHour: Math.ceil(totalQty / fleetGoal.buildTime * 3600),
+      }))
+      .sort((a, b) => {
+        const tierA = gameData.waresMap[a.wareId]?.tier ?? 0
+        const tierB = gameData.waresMap[b.wareId]?.tier ?? 0
+        if (tierB !== tierA) return tierB - tierA
+        return a.wareName.localeCompare(b.wareName)
+      })
+
+    return {
+      buildTime: fleetGoal.buildTime,
+      entries,
+      mergedRates,
+    }
+  })
 
   const allocations = computed<ProductionLineAllocation[]>(() => {
     const activePlanId = logicFlow.savedPlans.activeId
@@ -171,6 +260,7 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
         index
       }))
     }),
+    fleetGoalView,
   }
 
   const emits: BuildPlanPresenterEmits = {
@@ -195,6 +285,10 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     switchPlan: (planId) => buildPlanStore.switchPlan(planId),
     deletePlan: (planId) => buildPlanStore.deletePlan(planId),
     setPlanName: (name) => { buildPlanStore.activePlanName = name },
+    addFleetEntry: (shipId, blueprintId) => buildPlanStore.addFleetEntry(shipId, blueprintId),
+    removeFleetEntry: (blueprintId) => buildPlanStore.removeFleetEntry(blueprintId),
+    updateFleetBuildTime: (seconds) => buildPlanStore.updateFleetBuildTime(seconds),
+    updateFleetEntryQuantity: (blueprintId, qty) => buildPlanStore.updateFleetEntryQuantity(blueprintId, qty),
   }
 
   return { props, emits }

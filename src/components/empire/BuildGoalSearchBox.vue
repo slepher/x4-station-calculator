@@ -4,6 +4,7 @@ import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { generateFilteredWaresGrouped } from '@/store/logic/searchWare'
 import { generateFilteredModulesGrouped } from '@/store/logic/searchModule'
+import FleetGoalSearchBox from './FleetGoalSearchBox.vue'
 import type { BuildGoal } from '@/types/build-plan'
 import type { WareGroupResult, ModuleGroupResult } from '@/types/x4'
 
@@ -13,6 +14,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   addGoal: [goal: BuildGoal]
+  addFleetEntry: [shipId: string, blueprintId: string]
 }>()
 
 const gameData = useGameDataStore()
@@ -24,7 +26,7 @@ const isFocused = ref(false)
 const focusSnapshot = ref('')
 const popoverPosition = ref({ top: 0, left: 0 })
 const searchQuery = ref('')
-const selectedCategory = ref<'product' | 'module'>('product')
+const selectedCategory = ref<'product' | 'module' | 'fleet'>('product')
 
 watch(selectedCategory, () => {
   searchQuery.value = ''
@@ -143,14 +145,20 @@ const handlePopoverMouseDown = (e: MouseEvent) => {
 }
 
 const categoryOptions = computed(() => [
-  { value: 'product', label: t('build_plan.category_product') },
-  { value: 'module', label: t('build_plan.category_module') }
+  { value: 'product' as const, label: t('build_plan.category_product') },
+  { value: 'module' as const, label: t('build_plan.category_module') },
+  { value: 'fleet' as const, label: t('build_plan.category_fleet') },
 ])
 </script>
 
 <template>
   <div class="goal-search-box-container">
-    <div ref="searchBoxEl" class="search-box-wrapper group" :class="{ 'focused': isFocused }">
+    <FleetGoalSearchBox
+      v-if="selectedCategory === 'fleet'"
+      @addFleetEntry="(shipId, blueprintId) => emit('addFleetEntry', shipId, blueprintId)"
+    />
+    <template v-else>
+      <div ref="searchBoxEl" class="search-box-wrapper group" :class="{ 'focused': isFocused }">
       <input
         ref="searchInput"
         :value="searchQuery"
@@ -247,6 +255,7 @@ const categoryOptions = computed(() => [
         </div>
       </Transition>
     </Teleport>
+    </template>
   </div>
 </template>
 

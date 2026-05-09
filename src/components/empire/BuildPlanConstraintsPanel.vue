@@ -5,9 +5,10 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useTitleEditor } from '@/composables/useTitleEditor'
 import BuildGoalSearchBox from './BuildGoalSearchBox.vue'
+import FleetGoalCard from './FleetGoalCard.vue'
 import ProductionLineAllocationSection from './ProductionLineAllocationSection.vue'
 import WarePlanningItem from './WarePlanningItem.vue'
-import { type BuildGoal, type ProductionLineAllocation } from '@/types/build-plan'
+import { type BuildGoal, type ProductionLineAllocation, type FleetGoalView } from '@/types/build-plan'
 import type { PlanItem } from '@/components/empire/presenters/useBuildPlanPresenter'
 
 const props = defineProps<{
@@ -24,6 +25,7 @@ const props = defineProps<{
   buildMaterialPreviewAllocations?: ProductionLineAllocation[]
   productionPreviewAllocations?: ProductionLineAllocation[]
   buildFlowPlanLoading?: boolean
+  fleetGoalView?: FleetGoalView | null
 }>()
 
 const emit = defineEmits<{
@@ -36,6 +38,10 @@ const emit = defineEmits<{
   switchPlan: [planId: string]
   deletePlan: [planId: string]
   setPlanName: [name: string]
+  addFleetEntry: [shipId: string, blueprintId: string]
+  removeFleetEntry: [blueprintId: string]
+  updateFleetBuildTime: [seconds: number]
+  updateFleetEntryQuantity: [blueprintId: string, qty: number]
 }>()
 
 const { t } = useI18n()
@@ -270,10 +276,21 @@ onUnmounted(() => {
     </div>
     <div class="panel-content space-y-3">
 
-      <BuildGoalSearchBox :racePreference="racePreference" @addGoal="emit('addGoal', $event)" />
+      <BuildGoalSearchBox
+        :racePreference="racePreference"
+        @addGoal="emit('addGoal', $event)"
+        @addFleetEntry="(shipId, blueprintId) => emit('addFleetEntry', shipId, blueprintId)"
+      />
 
       <div class="space-y-2">
         <div class="text-xs font-semibold text-slate-400 uppercase tracking-wider">{{ t('build_plan.goals') }}</div>
+        <FleetGoalCard
+          v-if="fleetGoalView"
+          :fleetView="fleetGoalView"
+          @removeFleetEntry="emit('removeFleetEntry', $event)"
+          @updateFleetBuildTime="emit('updateFleetBuildTime', $event)"
+          @updateFleetEntryQuantity="(bpId, qty) => emit('updateFleetEntryQuantity', bpId, qty)"
+        />
         <div v-if="editableGoals.length > 0" class="space-y-2">
           <WarePlanningItem
             v-for="(goal, index) in editableGoals"

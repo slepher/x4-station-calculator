@@ -3,6 +3,8 @@
  * X4 风格通用数字输入组件 (交互增强版)
  * 解决：1. 长度固定不抖动 2. 箭头真实可点 3. 缝隙对齐
  */
+import { ref, watch } from 'vue'
+
 interface Props {
   modelValue: number
   min?: number
@@ -24,24 +26,47 @@ const emit = defineEmits<{
   (e: 'update:modelValue', val: number): void
 }>()
 
+const rawValue = ref(String(props.modelValue))
+const isFocused = ref(false)
+
+watch(() => props.modelValue, (val) => {
+  if (!isFocused.value) {
+    rawValue.value = String(val)
+  }
+})
+
 const updateValue = (delta: number) => {
   if (props.disabled) return
   const newVal = Math.max(props.min, Math.min(props.modelValue + delta, props.max))
+  rawValue.value = String(newVal)
   emit('update:modelValue', newVal)
 }
 
 const handleInput = (e: Event) => {
   const target = e.target as HTMLInputElement
-  let val = parseInt(target.value) || 0
-  const clamped = Math.max(props.min, Math.min(val, props.max))
-  if (clamped !== val) target.value = clamped.toString()
-  emit('update:modelValue', clamped)
+  rawValue.value = target.value
+  const val = parseInt(target.value)
+  if (!Number.isNaN(val)) {
+    emit('update:modelValue', val)
+  }
+}
+
+const handleBlur = () => {
+  isFocused.value = false
+  let val = parseInt(rawValue.value)
+  if (Number.isNaN(val) || val < props.min) {
+    val = props.min
+  } else if (val > props.max) {
+    val = props.max
+  }
+  rawValue.value = String(val)
+  emit('update:modelValue', val)
 }
 </script>
 
 <template>
   <div class="x4-input-container group" :class="[widthClass, { 'is-disabled': disabled }]">
-    <input type="number" :value="modelValue" :disabled="disabled" @input="handleInput" class="x4-num-input" />
+    <input type="number" :value="rawValue" :disabled="disabled" @input="handleInput" @focus="isFocused = true" @blur="handleBlur" class="x4-num-input" />
 
     <div class="x4-spin-buttons">
       <button class="spin-up" @click="updateValue(step)" tabindex="-1">

@@ -75,7 +75,15 @@
     "new_plan": "新建",
     "no_plans": "暂无已保存的方案",
     "default_plan_name": "建造规划",
-    "no_active_plan": "无"
+    "no_active_plan": "无",
+    "fleet_title": "舰队",
+    "fleet_search_placeholder": "搜索舰队蓝图...",
+    "fleet_empty": "无已保存的飞船蓝图",
+    "fleet_blueprint_missing": "蓝图缺失",
+    "fleet_no_materials": "无材料",
+    "fleet_rates": "派生产能",
+    "fleet_toggle": "切换舰队搜索",
+    "category_fleet": "舰队"
   },
   "sector": {
     "overview": "总览",

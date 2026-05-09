@@ -165,6 +165,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
         :buildMaterialPreviewAllocations="buildPlanPresenter.props.buildMaterialPreviewAllocations.value"
         :productionPreviewAllocations="buildPlanPresenter.props.productionPreviewAllocations.value"
         :buildFlowPlanLoading="buildPlanPresenter.props.buildFlowPlanLoading.value"
+        :fleetGoalView="buildPlanPresenter.props.fleetGoalView.value"
         @add-goal="buildPlanPresenter.emits.addGoal"
         @remove-goal="buildPlanPresenter.emits.removeGoal"
         @update-goal="buildPlanPresenter.emits.updateGoal"
@@ -174,6 +175,10 @@ const buildPlanPresenter = useBuildPlanPresenter({
         @switch-plan="buildPlanPresenter.emits.switchPlan"
         @delete-plan="buildPlanPresenter.emits.deletePlan"
         @set-plan-name="buildPlanPresenter.emits.setPlanName"
+        @add-fleet-entry="buildPlanPresenter.emits.addFleetEntry"
+        @remove-fleet-entry="buildPlanPresenter.emits.removeFleetEntry"
+        @update-fleet-build-time="buildPlanPresenter.emits.updateFleetBuildTime"
+        @update-fleet-entry-quantity="buildPlanPresenter.emits.updateFleetEntryQuantity"
       />
     </div>
     <div class="col-span-12 lg:col-span-4">

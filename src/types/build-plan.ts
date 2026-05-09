@@ -17,10 +17,44 @@ export interface BuildGroup {
 
 export type BuildGoalType = 'production-rate' | 'build-module'
 
+export interface FleetEntry {
+  shipId: string
+  blueprintId: string
+  quantity: number
+}
+
+export interface FleetMaterialItem {
+  wareId: string
+  wareName: string
+  totalQty: number
+}
+
+export interface FleetEntryView {
+  shipId: string
+  shipName: string
+  blueprintId: string
+  blueprintName: string
+  quantity: number
+  materials: FleetMaterialItem[]
+  isBlueprintMissing: boolean
+}
+
+export interface FleetMergedRate {
+  wareId: string
+  wareName: string
+  ratePerHour: number
+}
+
+export interface FleetGoalView {
+  buildTime: number
+  entries: FleetEntryView[]
+  mergedRates: FleetMergedRate[]
+}
+
 export type BuildGoal =
   | { type: 'production-rate'; wareId: string; ratePerHour: number }
   | { type: 'build-module'; moduleId: string; count: number }
-  | { type: 'fleet'; shipId: string; quantity: number }
+  | { type: 'fleet'; buildTime: number; entries: FleetEntry[] }
   | { type: 'target-production'; wareId?: string; moduleId?: string; ratePerHour?: number; count?: number }
   | { type: 'derived-rate'; wareId: string; ratePerHour: number }
   | { type: 'derived-production'; wareId: string; ratePerHour: number }
