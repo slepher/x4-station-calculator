@@ -517,10 +517,16 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     activeStationId.value = stationId
   }
 
-  function updateStationModules(stationId: string, modules: SavedModule[]) {
+function updateStationModules(stationId: string, modules: SavedModule[]) {
     if (empireDataStore.updateStationModulesInEmpire(activeEmpire.value, stationId, modules)) {
-      syncPlanStationDerivedSnapshot(stationId)
+      planningDerivedMap.value!.updateModules(stationId, modules)
     }
+  }
+
+  function findStationByName(name: string): { id: string; modules: SavedModule[] } | null {
+    const station = activeEmpire.value?.stations?.find(s => s.name === name)
+    if (!station) return null
+    return { id: station.id, modules: station.modules || [] }
   }
 
   function updateStationType(stationId: string, type: StationType) {
@@ -1001,6 +1007,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     selectTransitSector: (_sectorId: string | null) => {},
     setExpandedSector: (_sectorId: string | null) => {},
     getStationById,
+    findStationByName,
     updateStationModules,
     updateStationType: updateStationTypeFromActive,
     updateStationCount: updateStationCountFromActive,

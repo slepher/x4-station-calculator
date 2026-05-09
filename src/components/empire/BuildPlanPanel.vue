@@ -17,11 +17,12 @@ const props = defineProps<{
 }>()
 
 const emit = defineEmits<{
-  (e: 'export-to-station'): void
+  (e: 'export-to-station', mode: 'overwrite' | 'direct'): void
 }>()
 
 const selectedScheme = ref<BuildScheme | null>(null)
 const modalOpen = ref(false)
+const showExportMenu = ref(false)
 
 function getSchemeLabel(label: string): string {
   if (!label.startsWith('scheme_')) return label
@@ -123,9 +124,22 @@ const schemeCards = computed<SchemeCardData[]>(() => {
 
 const canExport = computed(() => props.schemes.length > 0 && !props.loading)
 
-function handleExportToStation() {
-  if (!canExport.value) return
-  emit('export-to-station')
+function toggleExportMenu() {
+  showExportMenu.value = !showExportMenu.value
+}
+
+function closeExportMenu() {
+  showExportMenu.value = false
+}
+
+function handleExportOverwrite() {
+  emit('export-to-station', 'overwrite')
+  closeExportMenu()
+}
+
+function handleExportDirect() {
+  emit('export-to-station', 'direct')
+  closeExportMenu()
 }
 </script>
 
@@ -133,17 +147,30 @@ function handleExportToStation() {
   <div class="panel-card">
     <div class="flex items-center justify-between gap-3 border-b border-slate-700 px-4 py-[9px]">
       <span class="text-sm font-semibold uppercase tracking-wider text-slate-300">{{ t('build_plan.schemes') }}</span>
-      <button
-        type="button"
-        class="inline-flex shrink-0 items-center rounded-md border px-3 py-1.5 text-xs font-semibold normal-case tracking-normal transition-colors"
-        :class="canExport
-          ? 'border-cyan-600/70 bg-cyan-500/12 text-cyan-200 hover:border-cyan-500 hover:bg-cyan-500/20'
-          : 'cursor-not-allowed border-slate-700 bg-slate-800/60 text-slate-500'"
-        :disabled="!canExport"
-        @click="handleExportToStation"
-      >
-        {{ t('build_plan.export_to_station') }}
-      </button>
+      <div class="export-menu-container" v-if="canExport">
+        <button
+          type="button"
+          class="inline-flex shrink-0 items-center rounded-md border px-3 py-1.5 text-xs font-semibold normal-case tracking-normal transition-colors"
+          :class="canExport
+            ? 'border-cyan-600/70 bg-cyan-500/12 text-cyan-200 hover:border-cyan-500 hover:bg-cyan-500/20'
+            : 'cursor-not-allowed border-slate-700 bg-slate-800/60 text-slate-500'"
+          :disabled="!canExport"
+          @click="toggleExportMenu"
+        >
+          {{ t('build_plan.export_to_station') }}
+          <svg class="ml-1.5 h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+          </svg>
+        </button>
+        <div v-if="showExportMenu" class="export-menu">
+          <button class="export-menu-item" @click="handleExportOverwrite">
+            {{ t('build_plan.export_overwrite') }}
+          </button>
+          <button class="export-menu-item" @click="handleExportDirect">
+            {{ t('build_plan.export_direct') }}
+          </button>
+        </div>
+      </div>
     </div>
     <div class="panel-content">
       <div v-if="!loading && schemes.length === 0" class="py-8 text-center text-xs text-slate-500">
@@ -314,5 +341,38 @@ function handleExportToStation() {
 
 .panel-content {
   @apply p-4;
+}
+
+.export-menu-container {
+  position: relative;
+}
+
+.export-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 120px;
+  background: rgb(30 41 59);
+  border: 1px solid rgb(71 85 105);
+  border-radius: 4px;
+  padding: 4px 0;
+  z-index: 50;
+}
+
+.export-menu-item {
+  width: 100%;
+  padding: 8px 12px;
+  text-align: left;
+  font-size: 12px;
+  color: rgb(226 232 240);
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.15s;
+}
+
+.export-menu-item:hover {
+  background: rgb(51 65 85);
 }
 </style>

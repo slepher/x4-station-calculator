@@ -12,7 +12,7 @@ import type {
   PreviewResult,
   ProductionLineAllocation,
 } from '@/types/build-plan'
-import type { EmpireGroupedFlows } from '@/types/x4'
+import type { EmpireGroupedFlows, SavedModule, StationType } from '@/types/x4'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
@@ -66,6 +66,7 @@ export interface BuildPlanPresenterEmits {
   removeFleetEntry: (blueprintId: string) => void
   updateFleetBuildTime: (seconds: number) => void
   updateFleetEntryQuantity: (blueprintId: string, qty: number) => void
+  exportToStations: (mode: 'overwrite' | 'direct') => void
 }
 
 export interface UseBuildPlanPresenterReturn {
@@ -75,6 +76,9 @@ export interface UseBuildPlanPresenterReturn {
 
 export interface BuildPlanPresenterStore {
   getEmpireGroupedFlows(): EmpireGroupedFlows
+  createStation(name?: string, type?: StationType): string | null
+  updateStationModules(stationId: string, modules: SavedModule[]): void
+  findStationByName(name: string): { id: string; modules: SavedModule[] } | null
 }
 
 export interface BuildPlanPresenterBuildPlanStore {
@@ -289,6 +293,42 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     removeFleetEntry: (blueprintId) => buildPlanStore.removeFleetEntry(blueprintId),
     updateFleetBuildTime: (seconds) => buildPlanStore.updateFleetBuildTime(seconds),
     updateFleetEntryQuantity: (blueprintId, qty) => buildPlanStore.updateFleetEntryQuantity(blueprintId, qty),
+    exportToStations: (mode) => {
+      const schemeGroups = buildPlanStore.schemeGroups
+      const allSchemes: BuildScheme[] = []
+      
+      for (const group of schemeGroups) {
+        allSchemes.push(...group.schemes)
+      }
+      
+      for (const scheme of allSchemes) {
+        const stationName = scheme.label
+        
+        const primaryModuleIds = scheme.primaryModuleIds || []
+        const modules = scheme.modules || []
+        
+        const primaryModules = primaryModuleIds.length > 0
+          ? modules.filter(m => primaryModuleIds.includes(m.id))
+          : modules
+        
+        if (mode === 'overwrite') {
+          const existing = blueprintStore.findStationByName(stationName)
+          if (existing) {
+            blueprintStore.updateStationModules(existing.id, primaryModules)
+          } else {
+            const stationId = blueprintStore.createStation(stationName, 'industrial')
+            if (stationId) {
+              blueprintStore.updateStationModules(stationId, primaryModules)
+            }
+          }
+        } else {
+          const stationId = blueprintStore.createStation(stationName, 'industrial')
+          if (stationId) {
+            blueprintStore.updateStationModules(stationId, primaryModules)
+          }
+        }
+      }
+    },
   }
 
   return { props, emits }

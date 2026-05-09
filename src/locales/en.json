@@ -23,6 +23,8 @@
     "show_steps": "Show Steps",
     "loading_steps": "Loading steps...",
     "export_to_station": "Export to Station",
+    "export_overwrite": "Overwrite Same Name",
+    "export_direct": "Direct Export",
     "quantity": "Qty",
     "count": "Qty",
     "goals_remaining": "goal(s) not achieved",
