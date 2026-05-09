@@ -94,24 +94,6 @@ Manages production line groups with upstream expansion:
 - Drag-and-drop support for adding wares to groups
 - Lineage tracking for race-specific module selection
 
-#### 5. `useBuildPlanStore` - Build Plan Goals
-
-Manages build plan goals including fleet goals:
-- `buildGoals` - Reactive array of `BuildGoal` union type
-- Fleet goal (`{ type: 'fleet', buildTime, entries: FleetEntry[] }`) stores ship blueprint references
-- Methods: `addFleetEntry`, `removeFleetEntry`, `updateFleetBuildTime`, `updateFleetEntryQuantity`
-- Fleet goals are expanded to `production-rate` sub-goals in preview/compute via `expandFleetGoals()`
-- Blueprint material resolution: `resolveBlueprintMaterialCost()` in `src/store/logic/resolveBlueprintMaterialCost.ts`
-- Persistence via `savedPlans` in localStorage
-
-#### 6. `useShipBuildStore` - Ship Blueprint Storage
-
-Provides blueprint data for fleet goal material resolution:
-- `savedBlueprints` - Persisted ship blueprints with equipment/storage configurations
-- `findBlueprintById(id)` - Lookup blueprint by ID
-- `findShip(id)` - Lookup ship definition by ID
-- Blueprints auto-loaded from localStorage on store creation
-
 ### State Management Pattern: StationStateMap
 
 `StationStateMap` (in `src/store/state/StationStateMap.ts`) is a reactive state container outside Pinia:
@@ -144,19 +126,11 @@ Core types in `src/types/x4.ts`:
 - `FlowNode` / `ProductionLineGroup` - Logic flow entities
 - `EmpirePlan` - V2 empire storage schema
 
-Additional types in `src/types/build-plan.ts`:
-- `BuildGoal` - Union type supporting `production-rate`, `build-module`, `fleet`, `derived-production`, `derived-build-material`, `required-production`, `target-production`
-- `FleetEntry` - `{ shipId, blueprintId, quantity }` - Single blueprint reference in fleet goal
-- `FleetGoalView` - Presenter view model with `entries` (FleetEntryView[]) and `mergedRates` (FleetMergedRate[])
-- `PreviewResult` / `ComputeResult` / `PreviewLinePlan` / `PreviewResponsibility` - Preview/compute pipeline types
-
 ### Key Utilities
 
 - `@/store/logic/useGameData.ts` - Game data builders and pre-computation
 - `@/store/logic/analyzeWareFlow.ts` - Flow analysis with buffer calculations
 - `@/store/logic/logicFlowStream.ts` - Upstream expansion algorithm
-- `@/store/logic/resolveBlueprintMaterialCost.ts` - Resolve ship blueprint material costs by method, used by fleet goal expansion and FleetGoalView presenter
-- `@/store/logic/buildPlanProductionLine.ts` - Preview/compute pipeline (createBuildFlowPlanPreview, computeBuildFlowPlan)
 
 ### Testing Structure
 
