@@ -63,6 +63,10 @@
 ### 蓝图材料解析
 - resolveBlueprintMaterialCost 按 blueprint.materialMethod 分别从 ship.production、equipment.cost、storage 物品 cost 取材料
 - 合并为 Record<wareId, totalQty>
+- 注意：wareId 使用游戏数据原始 ID（如 `advancedelectronics` 而非 `electronicmatrix`）
+
+### 已知问题
+- `useShipBuildStore` 的 `loadBlueprintsFromStorage()` 已在 store setup 中自动调用 + `resolveFleetMergedRates()` 防御性二次加载，避免 fleet 展开时蓝图为空
 
 ### Rate 计算
 - rate = Math.ceil(所有 entry 同 wareId 总量之和 / buildTime × 3600)

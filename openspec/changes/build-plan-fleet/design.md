@@ -25,14 +25,14 @@
 ### 1. 总体数据流
 
 ```
-用户搜索 fleet → FleetGoalSearchBox
+用户搜索 fleet → FleetGoalSearchBox（集成在 BuildGoalSearchBox 的下拉菜单中）
   → addFleetEntry(shipId, blueprintId)
   → useBuildPlanStore.buildGoals 新增/追加 fleet goal
-  → watcher 触发 preview 重算
-  → createBuildFlowPlanPreview()
-    → 解析 fleet goal 的蓝图材料
+  → syncGoalsToActivePlan → watcher 触发 preview 重算
+  → computeBuildFlowPlanPreview()
+    → expandFleetGoals() 解析蓝图材料
     → 展开为 production-rate 子目标
-    → 合并到 preview 责任分配
+    → 合并到 buildGoal 数组后调用 createBuildFlowPlanPreview()
   → previewResult 更新
   → presenter 映射 FleetGoalView
   → FleetGoalCard 渲染
@@ -145,19 +145,31 @@ const mergedRates = Object.entries(totalByWare)
 
 #### 4.1 Fleet 展开为 production-rate
 
-在 `createBuildFlowPlanPreview()` 入口处，对 fleet goal 展开为多个 `production-rate` 子目标：
+不在 `createBuildFlowPlanPreview()` 内部处理，而是在调用前的 `expandFleetGoals()` 中展开：
 
 ```ts
-if (goal.type === 'fleet') {
-  for (const rate of resolveFleetMergedRates(goal)) {
-    expandedGoals.push({
-      type: 'production-rate',
-      wareId: rate.wareId,
-      ratePerHour: rate.ratePerHour
-    })
+// useBuildPlanStore.ts
+function expandFleetGoals(goals: BuildGoal[]): BuildGoal[] {
+  const expanded: BuildGoal[] = []
+  for (const goal of goals) {
+    if (goal.type === 'fleet') {
+      const rates = resolveFleetMergedRates(goal)
+      for (const rate of rates) {
+        expanded.push({
+          type: 'production-rate',
+          wareId: rate.wareId,
+          ratePerHour: rate.ratePerHour,
+        })
+      }
+    } else {
+      expanded.push(goal)
+    }
   }
+  return expanded
 }
 ```
+
+`expandFleetGoals()` 在 `computeBuildFlowPlanPreview()` 和 `computePlan()` 中均被调用，确保预览和计算阶段都使用展开后的目标。
 
 #### 4.2 与现有目标的共存
 
@@ -167,10 +179,17 @@ if (goal.type === 'fleet') {
 
 #### 4.3 蓝图数据获取
 
-`createBuildFlowPlanPreview()` 是纯函数，需要从外部注入蓝图解析结果：
+`resolveFleetMergedRates()` 内嵌在 `useBuildPlanStore` 中，直接从 `useShipBuildStore()` 读取蓝图和装备数据：
 
-- 方案：在 `createBuildFlowPlanPreview()` 的调用处（`useBuildPlanStore` 的 watcher 中），从 `useShipBuildStore` 查询蓝图并解析材料，将解析结果作为额外参数传入
-- preview 入口保留原始 fleet goal 结构，内部处理展开
+```ts
+function resolveFleetMergedRates(fleetGoal) {
+  const shipBuildStore = useShipBuildStore()
+  shipBuildStore.loadBlueprintsFromStorage()  // 防御性加载
+  // ... 遍历 entries 调用 resolveBlueprintMaterialCost
+}
+```
+
+注意：`useShipBuildStore` 初始化时 blueprints 可能未加载，需要在 `resolveFleetMergedRates()` 中防御性调用 `loadBlueprintsFromStorage()`。同时 `useShipBuildStore` 的 setup 中已添加自动调用 `loadBlueprintsFromStorage()`。
 
 ### 5. Store 专用方法
 
@@ -201,10 +220,11 @@ updateFleetEntryQuantity(blueprintId: string, qty: number)
 #### 6.1 FleetGoalSearchBox
 
 独立组件，位于 `src/components/empire/FleetGoalSearchBox.vue`：
-- 类别下拉显示 fleet 时渲染
+- 不单独暴露下拉菜单，而是集成在 `BuildGoalSearchBox` 的类别 `<select>` 中新增 `fleet` 选项
+- 选中 fleet 时 `BuildGoalSearchBox` 内部渲染 `FleetGoalSearchBox`，emit `addFleetEntry`
 - 右侧弹出搜索结果
-- 搜索逻辑：从 shipBuildStore 获取所有有已保存蓝图的舰船，按 i18n 名称搜索
-- 结果分组：按舰船 class 排序，同 class 内按名称排序，item 为已保存蓝图
+- 搜索逻辑：从 shipBuildStore 获取所有有已保存蓝图的舰船（排除 built-in preset），按 i18n 名称搜索
+- 结果分组：按舰船 class 排序（s/m/l/xl），同 class 内按名称排序，item 为已保存蓝图
 - 点击 item → emit `addFleetEntry(shipId, blueprintId)`
 
 #### 6.2 FleetGoalCard
@@ -251,3 +271,19 @@ updateFleetEntryQuantity(blueprintId: string, qty: number)
 3. 蓝图被删除时 entry 显示 warning，材料按 0 计算
 4. 始终只有一个 Fleet goal
 5. Fleet 卡片始终在 Goals 区顶部
+
+## 实现记录
+
+### Bug 修复：X4NumberInput 最小值的即时验证问题
+- **问题**：`X4NumberInput.handleInput` 在输入过程中即时 clamp 到 `props.min`，导致 min=1 时无法输入"10"（输入"0"即被 clamp 为 1）
+- **修复**：输入时只 emit raw value，blur 时 clamp 到最小值；使用 `rawValue` ref 保留输入过程中的字符串
+
+### Bug 修复：useShipBuildStore 蓝图未加载导致 fleet 展开为空
+- **问题**：`resolveFleetMergedRates()` 调用 `useShipBuildStore().findBlueprintById()` 时 blueprints 未从 localStorage 加载（`loadBlueprintsFromStorage()` 只在 `initialize()` 中调用），返回空数组，导致 fleet 展开为 0 个 production-rate 目标
+- **修复**：
+  1. `useShipBuildStore` setup 中自动调用 `loadBlueprintsFromStorage()`
+  2. `resolveFleetMergedRates()` 中防御性调用 `shipBuildStore.loadBlueprintsFromStorage()`
+
+### 设计变更：FleetGoalSearchBox 集成方式
+- **原设计**：`BuildPlanConstraintsPanel` 中独立控制切换 FleetGoalSearchBox
+- **实际实现**：在 `BuildGoalSearchBox` 的类别下拉菜单中新增 `fleet` 选项，选中时内部渲染 FleetGoalSearchBox，避免面板层布局变化
