@@ -303,12 +303,13 @@ export function computeProductionLineAllocation(
   }
 
   // 第二优先：在其余产线中找 auto 节点
+  const preAssignedGroupIds = new Set(assignedGroupIds)
   for (const goal of afterFirstAuto) {
     const wareId = extractWareId(goal, modulesMap)
     let assigned = false
 
     for (const group of flowGroups) {
-      if (assignedGroupIds.has(group.id)) continue
+      if (preAssignedGroupIds.has(group.id)) continue
       let matched = false
       for (const node of group.nodes) {
         if (node.source === 'auto' && !node.isIsolated) {

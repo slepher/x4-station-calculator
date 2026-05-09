@@ -490,8 +490,10 @@ function computeTargetRatesForResponsibilities(
     )
     const buildMaterialRates = computeTargetRatesFromBuildings(buildings, modulesMap)
     const rate = buildMaterialRates[responsibility.wareId] || 0
-    if (rate <= 0) continue
-    rates[responsibility.wareId] = (rates[responsibility.wareId] || 0) + rate
+    const targetRate = targetProductionRates[responsibility.wareId] || 0
+    const combinedRate = rate + targetRate
+    if (combinedRate <= 0) continue
+    rates[responsibility.wareId] = (rates[responsibility.wareId] || 0) + combinedRate
   }
 
   for (const responsibility of responsibilities) {
