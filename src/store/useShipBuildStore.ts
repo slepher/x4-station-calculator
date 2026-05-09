@@ -337,6 +337,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     shipId,
     connections: [],
     storage: JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE)),
+    materialMethod: 'default',
     lastUpdated: Date.now()
   })
 
@@ -529,6 +530,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       shipId,
       connections: [],
       storage: JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE)),
+      materialMethod: 'default',
       lastUpdated: Date.now()
     }
 
@@ -786,6 +788,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         name: '',
         shipId: shipId || '',
         connections: [],
+        materialMethod: 'default',
         lastUpdated: Date.now()
       }
     }
@@ -1018,6 +1021,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       shipId,
       connections: blueprint.value ? JSON.parse(JSON.stringify(blueprint.value.connections)) : [],
       storage: blueprint.value?.storage ? JSON.parse(JSON.stringify(blueprint.value.storage)) : undefined,
+      materialMethod: blueprint.value?.materialMethod || 'default',
       lastUpdated: Date.now()
     }
 
@@ -1059,12 +1063,14 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       if (shouldApplyToCurrentSaved && blueprint.value) {
         const currentId = blueprint.value.id
         const currentName = blueprint.value.name
+        const currentMaterialMethod = blueprint.value.materialMethod
         const currentLastUpdated = blueprint.value.lastUpdated
         blueprint.value = {
           ...JSON.parse(JSON.stringify(bp)),
           id: currentId,
           name: currentName,
           shipId: builtIn.shipId,
+          materialMethod: currentMaterialMethod,
           lastUpdated: currentLastUpdated
         }
         loadedBuiltInPreset.value = null
@@ -1300,6 +1306,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         name: '',
         shipId: shipId || '',
         connections: [],
+        materialMethod: 'default',
         lastUpdated: Date.now()
       }
     }
@@ -1516,6 +1523,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
 
   const setStatsViewMode = (mode: ShipBuildStatsViewMode) => {
     statsViewMode.value = mode
+  }
+
+  const setMaterialMethod = (method: string) => {
+    if (!blueprint.value) return
+    blueprint.value.materialMethod = method
+    forceDirty.value = true
   }
 
   const setMockTagPatch = (patch: ShipBuildMockTagPatch | null) => {
@@ -1774,6 +1787,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     buildPreviewBlueprint,
     applyGroupAssignment,
     setStatsViewMode,
+    setMaterialMethod,
     setMockTagPatch,
     setDisplayResolvers
   }

@@ -818,6 +818,7 @@ export interface ShipBlueprint {
   hull?: ShipBlueprintHull
   /** Storage configuration for C 槽 and U 槽 */
   storage?: ShipBlueprintStorage
+  materialMethod: string
   lastUpdated: number
 }
 
