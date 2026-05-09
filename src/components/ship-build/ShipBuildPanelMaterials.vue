@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
@@ -18,7 +18,6 @@ const { translateShip, translateWare, translateEquipment, translate } = useX4I18
 const store = useShipBuildStore()
 
 // ============ 内部状态 ============
-const materialMethod = ref('default')
 const materialPriceMultiplier = ref(0.5)
 
 // ============ Storage 物品数据映射 ============
@@ -89,10 +88,13 @@ const materialMethodOptions = computed(() => {
   const options: string[] = []
   const optionSet = new Set<string>()
 
+  // 判断飞船本体是否支持 xenon
+  const shipHasXenon = selectedShip.value?.production.some(p => p.method === 'xenon')
+
   // 从 ship production 获取方法
   selectedShip.value?.production.forEach((item) => {
     if (optionSet.has(item.method)) return
-    if (item.method === 'xenon') return // Filter out xenon
+    if (item.method === 'xenon' && !shipHasXenon) return // Filter out xenon if ship doesn't support it
     optionSet.add(item.method)
     options.push(item.method)
   })
@@ -106,7 +108,7 @@ const materialMethodOptions = computed(() => {
         if (equipment) {
           Object.keys(equipment.cost || {}).forEach((method) => {
             if (optionSet.has(method)) return
-            if (method === 'xenon') return // Filter out xenon
+            if (method === 'xenon' && !shipHasXenon) return // Filter out xenon if ship doesn't support it
             optionSet.add(method)
             options.push(method)
           })
@@ -118,7 +120,7 @@ const materialMethodOptions = computed(() => {
         if (shieldEquipment) {
           Object.keys(shieldEquipment.cost || {}).forEach((method) => {
             if (optionSet.has(method)) return
-            if (method === 'xenon') return // Filter out xenon
+            if (method === 'xenon' && !shipHasXenon) return // Filter out xenon if ship doesn't support it
             optionSet.add(method)
             options.push(method)
           })
@@ -136,7 +138,7 @@ const materialMethodOptions = computed(() => {
       if (data?.cost) {
         Object.keys(data.cost).forEach((method) => {
           if (optionSet.has(method)) return
-          if (method === 'xenon') return
+          if (method === 'xenon' && !shipHasXenon) return
           optionSet.add(method)
           options.push(method)
         })
@@ -148,7 +150,7 @@ const materialMethodOptions = computed(() => {
       if (data?.cost) {
         Object.keys(data.cost).forEach((method) => {
           if (optionSet.has(method)) return
-          if (method === 'xenon') return
+          if (method === 'xenon' && !shipHasXenon) return
           optionSet.add(method)
           options.push(method)
         })
@@ -160,7 +162,7 @@ const materialMethodOptions = computed(() => {
       if (data?.cost) {
         Object.keys(data.cost).forEach((method) => {
           if (optionSet.has(method)) return
-          if (method === 'xenon') return
+          if (method === 'xenon' && !shipHasXenon) return
           optionSet.add(method)
           options.push(method)
         })
@@ -172,7 +174,7 @@ const materialMethodOptions = computed(() => {
       if (data?.cost) {
         Object.keys(data.cost).forEach((method) => {
           if (optionSet.has(method)) return
-          if (method === 'xenon') return
+          if (method === 'xenon' && !shipHasXenon) return
           optionSet.add(method)
           options.push(method)
         })
@@ -186,14 +188,30 @@ const materialMethodOptions = computed(() => {
   return options
 })
 
-// 监听 methodOptions 变化，自动调整 materialMethod
-if (materialMethodOptions.value.length > 0 && !materialMethodOptions.value.includes(materialMethod.value)) {
-  materialMethod.value = materialMethodOptions.value[0] || 'default'
-}
+// Material method computed with setter for persistence
+const materialMethod = computed({
+  get: () => props.shipBlueprint?.materialMethod || 'default',
+  set: (value: string) => {
+    store.setMaterialMethod(value)
+  }
+})
+
+// 监听 methodOptions 变化，自动调整 materialMethod 并持久化
+watch(
+  [materialMethodOptions, () => props.shipBlueprint?.materialMethod],
+  ([options, currentMethod]) => {
+    if (options.length > 0 && currentMethod && !options.includes(currentMethod)) {
+      const newMethod = options[0] || 'default'
+      store.setMaterialMethod(newMethod)
+    }
+  },
+  { immediate: true }
+)
 
 const shipMaterialGroup = computed(() => {
   if (!selectedShip.value) return null
-  const shipCost = resolveShipCostByMethod(selectedShip.value, materialMethod.value)
+  const currentMethod = props.shipBlueprint?.materialMethod || 'default'
+  const shipCost = resolveShipCostByMethod(selectedShip.value, currentMethod)
   const items = mapCostToMaterialItems(shipCost)
   return {
     shipId: selectedShip.value.id,
@@ -244,7 +262,8 @@ const equipmentMaterialGroups = computed(() => {
   })
 
   const groups = Array.from(grouped.values()).map(({ equipment, quantity }) => {
-    const equipmentCost = resolveCostByMethod(equipment.cost, materialMethod.value)
+    const currentMethod = props.shipBlueprint?.materialMethod || 'default'
+    const equipmentCost = resolveCostByMethod(equipment.cost, currentMethod)
     const items = mapCostToMaterialItems(equipmentCost, quantity)
     return {
       equipmentId: equipment.id,
@@ -263,6 +282,7 @@ const storageMaterialGroups = computed(() => {
   if (!props.shipBlueprint?.storage) return []
 
   const storage = props.shipBlueprint.storage
+  const currentMethod = props.shipBlueprint?.materialMethod || 'default'
   const groups: Array<{
     storageId: string
     storageName: string
@@ -274,7 +294,7 @@ const storageMaterialGroups = computed(() => {
   storage.deployables.forEach((item) => {
     const data = consumablesMap.get(item.id)
     if (data?.cost) {
-      const cost = resolveCostByMethod(data.cost, materialMethod.value)
+      const cost = resolveCostByMethod(data.cost, currentMethod)
       const materialItems = mapCostToMaterialItems(cost, item.count)
       if (materialItems.length > 0) {
         groups.push({
@@ -291,7 +311,7 @@ const storageMaterialGroups = computed(() => {
   if (storage.countermeasure) {
     const data = consumablesMap.get(storage.countermeasure.id)
     if (data?.cost) {
-      const cost = resolveCostByMethod(data.cost, materialMethod.value)
+      const cost = resolveCostByMethod(data.cost, currentMethod)
       const materialItems = mapCostToMaterialItems(cost, storage.countermeasure.count)
       if (materialItems.length > 0) {
         groups.push({
@@ -308,7 +328,7 @@ const storageMaterialGroups = computed(() => {
   storage.drones.forEach((item) => {
     const data = dronesMap.get(item.id)
     if (data?.cost) {
-      const cost = resolveCostByMethod(data.cost, materialMethod.value)
+      const cost = resolveCostByMethod(data.cost, currentMethod)
       const materialItems = mapCostToMaterialItems(cost, item.count)
       if (materialItems.length > 0) {
         groups.push({
@@ -325,7 +345,7 @@ const storageMaterialGroups = computed(() => {
   storage.missiles.forEach((item) => {
     const data = missilesMap.get(item.id)
     if (data?.cost) {
-      const cost = resolveCostByMethod(data.cost, materialMethod.value)
+      const cost = resolveCostByMethod(data.cost, currentMethod)
       const materialItems = mapCostToMaterialItems(cost, item.count)
       if (materialItems.length > 0) {
         groups.push({

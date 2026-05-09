@@ -364,6 +364,7 @@ function normalizeShipBlueprintShape(input: SavedShipBlueprintsState & { list?: 
       connections: Array.isArray(blueprint.connections) ? deepClone(blueprint.connections) : [],
       storage,
       hull,
+      materialMethod: typeof blueprint.materialMethod === 'string' ? blueprint.materialMethod : 'default',
       lastUpdated: Number(blueprint.lastUpdated) || Date.now() + index
     }
   }).filter((blueprint) => {
