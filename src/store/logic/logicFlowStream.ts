@@ -21,6 +21,13 @@ interface ExpandResult {
   updatedNodes: Array<{ nodeId: string; updates: Partial<FlowNode> }>
 }
 
+export function isRawMaterialWare(
+  wareId: string,
+  modulesByOutputMap: Record<string, X4Module[]>
+): boolean {
+  return !((modulesByOutputMap[wareId]?.length ?? 0) > 0)
+}
+
 export function computeExpandUpstream(
   ctx: ExpandContext,
   group: GroupSnapshot,
@@ -36,8 +43,8 @@ export function computeExpandUpstream(
   const ware = ctx.waresMap[wareId]
   if (!ware) return result
 
-  const isT0 = ware.tier === 0 || wareId === 'energycells'
-  if (isT0) {
+  const isRawMaterial = isRawMaterialWare(wareId, ctx.modulesByOutputMap || {})
+  if (isRawMaterial) {
     const existingT0Node = group.nodes.find(n => n.wareId === wareId)
     if (!existingT0Node) {
       result.newNodes.push({

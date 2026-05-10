@@ -57,10 +57,11 @@ const filteredWares = computed(() => {
       // 1. 按 Tier 升序 (0, 1, 2, 3)
       if (a.tier !== b.tier) return a.tier - b.tier
       
-      // 2. 特殊逻辑：如果是 Tier 0，能量电池始终排在最下面
       if (a.tier === 0) {
-        if (a.id === 'energycells' && b.id !== 'energycells') return 1
-        if (a.id !== 'energycells' && b.id === 'energycells') return -1
+        const aRaw = gameData.isRawMaterialWare(a.id)
+        const bRaw = gameData.isRawMaterialWare(b.id)
+        if (aRaw && !bRaw) return -1
+        if (!aRaw && bRaw) return 1
       }
 
       // 3. 同 Tier 内，已规划的排在上面
@@ -108,9 +109,7 @@ const handleSwitchCategory = (cat: 'industrial' | 'agricultural') => {
 const handleDragStart = (evt: any) => {
   const wareId = evt.item.getAttribute('data-ware-id')
   if (wareId) {
-    // T0 资源不可被拖拽，立即停止
-    const ware = gameData.waresMap[wareId]
-    if (ware && ware.tier === 0) {
+    if (gameData.isRawMaterialWare(wareId)) {
       logicFlow.stopDragging()
       return
     }
@@ -384,7 +383,7 @@ defineExpose({
             :group="{ name: 'wares', pull: 'clone', put: false }"
             :clone="(original: any) => ({ ...original, instanceId: Date.now() + Math.random() })"
             :sort="false"
-            :disabled="tier === 0"
+            :disabled="(waresByTier[tier] || []).length > 0 && (waresByTier[tier] || []).every((w: any) => gameData.isRawMaterialWare(w.id))"
             item-key="id"
             :data-subcategory="activeSubCategory"
             @start="handleDragStart"
@@ -394,10 +393,10 @@ defineExpose({
               <div 
                 :data-ware-id="ware.id"
                 :data-tier="ware.tier"
-                :draggable="ware.tier > 0"
+                :draggable="!gameData.isRawMaterialWare(ware.id)"
                 class="ware-card-wrapper group"
                 :class="[
-                  ware.tier === 0 ? 'is-locked-tier cursor-not-allowed opacity-70' : 'is-draggable-tier cursor-grab',
+                  gameData.isRawMaterialWare(ware.id) ? 'is-locked-tier cursor-not-allowed opacity-70' : 'is-draggable-tier cursor-grab',
                   isWarePlanned(ware.id) ? 'ware-card-planned' : 'ware-card-default',
                   gameData.searchQuery && (
                     ware.id.toLowerCase().includes(gameData.searchQuery.toLowerCase()) || 
@@ -406,8 +405,7 @@ defineExpose({
                   ) ? 'ware-card-match' : ''
                 ]"
               >
-                <!-- Background Layer (expands on hover for non-T0) -->
-                <div class="ware-card-bg" v-if="ware.tier > 0 && ware.id !== 'energycells'">
+                <div class="ware-card-bg" v-if="!gameData.isRawMaterialWare(ware.id)">
                   <button 
                     class="ware-card-add-btn"
                     @click.stop="toggleMenu($event, ware.id)"
@@ -416,8 +414,7 @@ defineExpose({
                   </button>
                 </div>
 
-                <!-- Background Layer for T0 (no button, just styling) -->
-                <div class="ware-card-bg" v-else-if="ware.tier === 0"></div>
+                <div class="ware-card-bg" v-else-if="gameData.isRawMaterialWare(ware.id)"></div>
 
                 <!-- Content Layer -->
                 <div class="ware-card-content">
@@ -440,11 +437,11 @@ defineExpose({
                     </div>
 
                     <!-- T0 Resources + Compression Rate (Layer 2) -->
-                    <div class="ware-info-overlay" v-if="ware.tier > 0">
+                    <div class="ware-info-overlay" v-if="!gameData.isRawMaterialWare(ware.id)">
                       <!-- T0 Resources with Gradient Mask -->
                       <div class="resource-preview-container">
                         <div 
-                          v-for="resId in Object.keys(logicFlow.calculateRequiredT0Wares(ware.id, activeSubCategory) || {}).sort()" 
+                          v-for="resId in Object.keys(logicFlow.calculateRequiredRawMaterials(ware.id, activeSubCategory) || {}).sort()" 
                           :key="resId"
                           class="resource-tag"
                         >

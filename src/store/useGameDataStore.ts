@@ -44,6 +44,7 @@ import {
   findModuleForWare as findModuleForWareFn,
   precomputeCandidateWares
 } from './logic/useGameData'
+import { isRawMaterialWare as isRawMaterialWareFn } from './logic/logicFlowStream'
 import type { GameDataFiles } from './logic/useGameData'
 
 export const useGameDataStore = defineStore('gameData', () => {
@@ -261,6 +262,10 @@ export const useGameDataStore = defineStore('gameData', () => {
 
   function findModuleForWare(wareId: string, lineage: string): X4Module | null {
     return findModuleForWareFn(wareId, lineage, modulesByOutputMap.value)
+  }
+
+  function isRawMaterialWare(wareId: string): boolean {
+    return isRawMaterialWareFn(wareId, modulesByOutputMap.value)
   }
 
   function getModuleDisplayName(moduleId: string | undefined): string {
@@ -568,6 +573,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     initialize,
     changeLanguage,
     findModuleForWare,
+    isRawMaterialWare,
     getModuleDisplayName,
     getWareDisplayName,
     getDlcDisplayName,
