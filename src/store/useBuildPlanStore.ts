@@ -513,29 +513,47 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
         groupName: line.groupName,
         isUnmatched: line.isUnmatched,
         lineage: line.lineage,
-        goals: line.responsibilities.flatMap((responsibility): BuildGoal[] => {
-          if (responsibility.type === 'target-production') {
-            if (responsibility.moduleId) {
+        goals: line.items.flatMap((item): BuildGoal[] => {
+          if (item.kind === 'derived') {
+            const targetGoals = (item.targets || []).flatMap((target): BuildGoal[] => {
+              if (target.type === 'build-module') {
+                return [{
+                  type: 'build-module',
+                  moduleId: item.moduleId,
+                  count: target.count || 1,
+                }]
+              }
+              if (item.wareId) {
+                return [{
+                  type: 'production-rate',
+                  wareId: item.wareId,
+                  ratePerHour: target.ratePerHour || 0,
+                }]
+              }
+              return []
+            })
+            if (targetGoals.length > 0) return targetGoals
+            if (item.wareId && item.derived.includes('production')) {
               return [{
-                type: 'target-production',
-                moduleId: responsibility.moduleId,
-                count: responsibility.count || 1,
+                type: 'derived-production',
+                wareId: item.wareId,
+                ratePerHour: 0,
               }]
             }
-            if (responsibility.wareId) {
+            if (item.wareId && item.derived.includes('build-material')) {
               return [{
-                type: 'target-production',
-                wareId: responsibility.wareId,
-                ratePerHour: responsibility.ratePerHour || 0,
+                type: 'derived-build-material',
+                wareId: item.wareId,
+                ratePerHour: 0,
               }]
             }
             return []
           }
-          if (!responsibility.wareId) return []
+          if (!item.required.includes('production') && !item.required.includes('build-material')) return []
           return [{
-            type: responsibility.type,
-            wareId: responsibility.wareId,
-            ratePerHour: responsibility.ratePerHour || 0,
+            type: 'required-production',
+            wareId: item.wareId,
+            ratePerHour: 0,
           }]
         }),
       }))

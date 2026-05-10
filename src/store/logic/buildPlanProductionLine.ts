@@ -1,10 +1,9 @@
-import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
+import { buildFlowPlanGraph, ROOT_BUILD_COST_KEY } from '@/store/logic/buildFlowPlanGraph'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 import { findBestProducer } from '@/store/logic/bestModuleSelector'
 import {
   autoFillForLine,
   buildTopologicalOrder,
-  expandGoalDependencies,
   makeSchemesWithGroups,
   mergeModules,
   splitTargetLineSchemes,
@@ -19,10 +18,12 @@ import type {
   ComputeInput,
   ComputeResult,
   ComputeLineResult,
+  PreviewDerivedItem,
+  PreviewDerivedTag,
+  PreviewItem,
   PreviewLinePlan,
-  PreviewResponsibility,
   PreviewResult,
-  ResponsibilityType,
+  PreviewRequiredTag,
   ProductionLineAllocation,
 } from '@/types/build-plan'
 import type {
@@ -90,21 +91,77 @@ export function enrichGoalsWithIsolatedRequirements(
   ]
 }
 
-export function buildTargetModulesForProductionLine(
-  goals: BuildGoal[],
+function collectExpandedModulesFromGroup(
+  groupId: string,
   groups: ProductionLineGroup[],
+): SavedModule[] {
+  const group = groups.find(item => item.id === groupId)
+  if (!group) return []
+
+  return mergeModules(
+    group.nodes
+      .filter(node => !node.isIsolated && node.moduleId)
+      .map(node => ({ id: node.moduleId!, count: 1 })),
+  )
+}
+
+function extractTargetGoalWares(
+  goals: BuildGoal[],
   modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>,
-  settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
-): { enrichedGoals: BuildGoal[]; targetModules: SavedModule[] } {
-  const enrichedGoals = enrichGoalsWithIsolatedRequirements(goals, groups)
-  const baseModules = enrichedGoals.flatMap(goal => expandGoalDependencies(goal, modulesMap, waresMap, settings.racePreference))
-  const mergedBase = mergeModules(baseModules)
-  const autoFill = autoFillForLine(mergedBase, enrichedGoals, settings, modulesMap, waresMap)
-  return {
-    enrichedGoals,
-    targetModules: mergeModules([...mergedBase, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules]),
+): string[] {
+  const wares = new Set<string>()
+  for (const goal of goals) {
+    if (goal.type === 'production-rate') {
+      wares.add(goal.wareId)
+      continue
+    }
+    if (goal.type !== 'build-module') continue
+    const module = modulesMap[goal.moduleId]
+    if (!module?.outputs) continue
+    for (const wareId of Object.keys(module.outputs)) {
+      wares.add(wareId)
+    }
   }
+  return [...wares]
+}
+
+export function buildPreviewTargetModulesForProductionLine(
+  goals: BuildGoal[],
+  allocations: ProductionLineAllocation[],
+  groups: ProductionLineGroup[],
+): SavedModule[] {
+  const targetModules: SavedModule[] = []
+  const coveredGroupIds = new Set<string>()
+
+  for (const allocation of allocations) {
+    const hasTargetGoal = allocation.goals.some(goal =>
+      goal.type === 'build-module' || goal.type === 'production-rate',
+    )
+    if (!hasTargetGoal) continue
+
+    if (allocation.groupId) {
+      if (coveredGroupIds.has(allocation.groupId)) continue
+      coveredGroupIds.add(allocation.groupId)
+      targetModules.push(...collectExpandedModulesFromGroup(allocation.groupId, groups))
+      continue
+    }
+
+    for (const goal of allocation.goals) {
+      if (goal.type !== 'build-module') continue
+      targetModules.push({ id: goal.moduleId, count: 1 })
+    }
+  }
+
+  if (targetModules.length > 0) {
+    return mergeModules(targetModules)
+  }
+
+  for (const goal of goals) {
+    if (goal.type !== 'build-module') continue
+    targetModules.push({ id: goal.moduleId, count: 1 })
+  }
+
+  return mergeModules(targetModules)
 }
 
 /**
@@ -113,8 +170,12 @@ export function buildTargetModulesForProductionLine(
  */
 export function computePreviewLinePlans(
   graph: BuildFlowPlanGraph,
+  groups: ProductionLineGroup[],
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
   lineageByGroupId: Map<string, string> = new Map(),
 ): PreviewLinePlan[] {
+  const groupById = new Map(groups.map(group => [group.id, group]))
   const consumerRequired = new Map<string, Set<string>>()
   const producerSupplied = new Map<string, Set<string>>()
 
@@ -132,49 +193,87 @@ export function computePreviewLinePlans(
   }
 
   const lines: PreviewLinePlan[] = []
-  let respIdCounter = 0
 
   for (const [groupId, node] of graph.nodes) {
-    const responsibilities: PreviewResponsibility[] = []
+    const items: PreviewItem[] = []
     const derivedSet = producerSupplied.get(groupId) || new Set<string>()
     const requiredSet = consumerRequired.get(groupId) || new Set<string>()
+    const group = groupById.get(groupId)
+    const lineage = lineageByGroupId.get(groupId) || 'default'
 
     for (const wareId of node.trackedWares) {
-      const type: ResponsibilityType = derivedSet.has(wareId) ? 'derived-production' : 'derived-build-material'
+      const derivedTag: PreviewDerivedTag = derivedSet.has(wareId) ? 'production' : 'build-material'
       const relatedLineGroupIds = collectRelatedLineGroupsForBuildMaterial(groupId, wareId, graph)
-      responsibilities.push({
-        id: `resp_${++respIdCounter}`,
-        type,
+      const moduleId = resolvePreviewDerivedModuleId(wareId, group, lineage, modulesMap, waresMap)
+      if (!moduleId) continue
+      items.push({
+        kind: 'derived',
         wareId,
+        moduleId,
+        derived: [derivedTag],
         relatedLineGroupIds,
         sourceRef: `graph:${groupId}:${wareId}`,
       })
     }
 
     for (const wareId of requiredSet) {
-      // required Wares that are not already in trackedWares (consumers declaring need)
-      // These are covered if another node produces them; for this line it's a required-production marker
       if (node.trackedWares.has(wareId)) continue
-      responsibilities.push({
-        id: `resp_${++respIdCounter}`,
-        type: 'required-production',
+      items.push({
+        kind: 'required',
         wareId,
+        required: ['production'],
         relatedLineGroupIds: [groupId],
         sourceRef: `graph-required:${groupId}:${wareId}`,
       })
     }
 
-    if (responsibilities.length === 0) continue
+    if (items.length === 0) continue
     lines.push({
       groupId,
       groupName: node.lineName,
       isUnmatched: false,
-      lineage: lineageByGroupId.get(groupId) || 'default',
-      responsibilities,
+      lineage,
+      items: mergePreviewItems(items),
     })
   }
 
   return lines
+}
+
+function resolvePreviewDerivedModuleId(
+  wareId: string,
+  group: ProductionLineGroup | undefined,
+  lineage: string,
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+): string | null {
+  if (!group) {
+    const producer = findBestProducer(wareId, lineage, [], modulesMap, waresMap)
+    return producer?.id || null
+  }
+
+  const manualMatches = group.nodes.filter(node =>
+    node.source === 'manual'
+    && !node.isIsolated
+    && node.wareId === wareId
+    && node.moduleId,
+  )
+  const manualLineageMatches = manualMatches.filter(node => node.lineage === lineage)
+  if (manualLineageMatches.length > 0) return manualLineageMatches[0]!.moduleId || null
+  if (manualMatches.length > 0) return manualMatches[0]!.moduleId || null
+
+  const autoMatches = group.nodes.filter(node =>
+    node.source === 'auto'
+    && !node.isIsolated
+    && node.wareId === wareId
+    && node.moduleId,
+  )
+  const autoLineageMatches = autoMatches.filter(node => node.lineage === lineage)
+  if (autoLineageMatches.length > 0) return autoLineageMatches[0]!.moduleId || null
+  if (autoMatches.length > 0) return autoMatches[0]!.moduleId || null
+
+  const producer = findBestProducer(wareId, lineage, [], modulesMap, waresMap)
+  return producer?.id || null
 }
 
 /**
@@ -188,7 +287,7 @@ function collectRelatedLineGroupsForBuildMaterial(
 ): string[] {
   const related = new Set<string>()
   for (const edge of graph.edges) {
-    if (edge.wareId === wareId && edge.toLineKey === groupId && edge.fromLineKey !== '__C__') {
+    if (edge.wareId === wareId && edge.toLineKey === groupId && edge.fromLineKey !== ROOT_BUILD_COST_KEY) {
       related.add(edge.fromLineKey)
     }
   }
@@ -205,7 +304,7 @@ export function createBuildFlowPlanPreview(
   buildFlowView: BuildFlowPlanView | null,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
+  _settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
   buildMaterialPlanningEnabled = true,
 ): PreviewResult | null {
   if (!buildFlowView) return null
@@ -225,7 +324,7 @@ export function createBuildFlowPlanPreview(
   if (!buildMaterialPlanningEnabled) {
     return {
       buildMaterialPlanningEnabled: false,
-      lines: buildAllocationOnlyPreviewLines(allocations),
+      lines: buildAllocationOnlyPreviewLines(allocations, modulesMap, waresMap),
       graph: null,
       sccGroups: [],
     }
@@ -237,15 +336,16 @@ export function createBuildFlowPlanPreview(
     lineageByGroupId.set(group.id, lineage || 'default')
   }
 
-  const { targetModules } = buildTargetModulesForProductionLine(goals, groups, modulesMap, waresMap, settings)
+  const targetModules = buildPreviewTargetModulesForProductionLine(goals, allocations, groups)
   const graph = buildFlowPlanGraph(targetModules, buildFlowView, modulesMap, groups)
+  graph.targetGoalWareIds = extractTargetGoalWares(goals, modulesMap)
 
   // 1. Graph-based lines (derived-build-material + derived-production + required-production responsibilities)
-  const graphLines = computePreviewLinePlans(graph, lineageByGroupId)
+  const graphLines = computePreviewLinePlans(graph, groups, modulesMap, waresMap, lineageByGroupId)
 
   // 2. Compute production allocations (target-production responsibilities)
   // 3. Merge: graph-based lines + target-production responsibilities from allocations
-  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId)
+  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId, modulesMap, waresMap)
 
   return {
     buildMaterialPlanningEnabled: true,
@@ -262,8 +362,10 @@ export function createBuildFlowPlanPreview(
  */
 function mergeGraphAndAllocationLines(
   graphLines: PreviewLinePlan[],
-  allocations: { groupId?: string; groupName: string; isUnmatched: boolean; goals: BuildGoal[] }[],
+  allocations: { groupId?: string; groupName: string; isUnmatched: boolean; goals: BuildGoal[]; lineage: string }[],
   lineageByGroupId: Map<string, string> = new Map(),
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
 ): PreviewLinePlan[] {
   const result: PreviewLinePlan[] = [...graphLines]
   const graphGroupIds = new Set(graphLines.map(l => l.groupId).filter(Boolean) as string[])
@@ -272,12 +374,11 @@ function mergeGraphAndAllocationLines(
   const requiredConsumersByWare = new Map<string, Set<string>>()
   for (const graphLine of graphLines) {
     if (!graphLine.groupId) continue
-    for (const responsibility of graphLine.responsibilities) {
-      if (responsibility.type !== 'required-production') continue
-      if (!responsibility.wareId) continue
-      const consumers = requiredConsumersByWare.get(responsibility.wareId) || new Set<string>()
+    for (const item of graphLine.items) {
+      if (item.kind !== 'required') continue
+      const consumers = requiredConsumersByWare.get(item.wareId) || new Set<string>()
       consumers.add(graphLine.groupId)
-      requiredConsumersByWare.set(responsibility.wareId, consumers)
+      requiredConsumersByWare.set(item.wareId, consumers)
     }
   }
   for (const alloc of allocations) {
@@ -290,7 +391,6 @@ function mergeGraphAndAllocationLines(
     }
   }
 
-  let respIdCounter = 0
   for (const alloc of allocations) {
     const isGraphOverlap = Boolean(alloc.groupId && graphGroupIds.has(alloc.groupId))
     const respLine: PreviewLinePlan = {
@@ -298,31 +398,36 @@ function mergeGraphAndAllocationLines(
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
       lineage: (alloc.groupId && lineageByGroupId.get(alloc.groupId)) || 'default',
-      responsibilities: alloc.goals
-        .map(g => goalToResponsibility(g, `goal:${alloc.groupId || 'unmatched'}`, ++respIdCounter, alloc.groupId))
-        .filter(resp => isGraphOverlap
-          ? (resp.type === 'target-production' || resp.type === 'derived-production')
-          : (resp.type === 'target-production' || resp.type === 'required-production')),
+      items: alloc.goals
+        .map(g => goalToPreviewItem(
+          g,
+          `goal:${alloc.groupId || 'unmatched'}`,
+          respLineLineage(alloc.groupId, alloc.lineage, lineageByGroupId),
+          modulesMap,
+          waresMap,
+          alloc.groupId,
+        ))
+        .filter((item): item is PreviewItem => Boolean(item))
+        .filter(item => isGraphOverlap
+          ? item.kind === 'derived'
+          : true),
     }
 
     if (isGraphOverlap && alloc.groupId) {
       const existing = lineByGroupId.get(alloc.groupId)
       if (existing) {
-        for (const responsibility of respLine.responsibilities) {
-          if (responsibility.type === 'derived-production' && responsibility.wareId) {
-            const consumers = requiredConsumersByWare.get(responsibility.wareId)
-            responsibility.relatedLineGroupIds = consumers ? [...consumers] : []
+        for (const item of respLine.items) {
+          if (item.kind === 'derived' && item.wareId && item.derived.includes('production')) {
+            const consumers = requiredConsumersByWare.get(item.wareId)
+            item.relatedLineGroupIds = consumers ? [...consumers] : []
           }
         }
-        existing.responsibilities = dedupeResponsibilities([
-          ...existing.responsibilities,
-          ...respLine.responsibilities,
-        ])
+        existing.items = mergePreviewItems([...existing.items, ...respLine.items])
       }
     } else {
       result.push({
         ...respLine,
-        responsibilities: dedupeResponsibilities(respLine.responsibilities),
+        items: mergePreviewItems(respLine.items),
       })
     }
   }
@@ -333,39 +438,61 @@ function mergeGraphAndAllocationLines(
     .map(alloc => alloc.groupId!)
 
   for (const line of result) {
-    for (const responsibility of line.responsibilities) {
-      if (responsibility.type !== 'derived-build-material') continue
-      responsibility.relatedLineGroupIds = [...new Set([
-        ...responsibility.relatedLineGroupIds,
+    for (const item of line.items) {
+      if (item.kind !== 'derived' || !item.derived.includes('build-material')) continue
+      item.relatedLineGroupIds = [...new Set([
+        ...item.relatedLineGroupIds,
         ...externalTargetGroupIds,
       ])]
     }
-    line.responsibilities = dedupeResponsibilities(line.responsibilities)
+    line.items = mergePreviewItems(line.items)
   }
 
   return result
 }
 
-function dedupeResponsibilities(
-  responsibilities: PreviewResponsibility[],
-): PreviewResponsibility[] {
-  const map = new Map<string, PreviewResponsibility>()
-  for (const responsibility of responsibilities) {
-    const relatedLineGroupIds = [...new Set(responsibility.relatedLineGroupIds)].sort()
-    const key = [
-      responsibility.type,
-      responsibility.wareId || '',
-      responsibility.moduleId || '',
-      String(responsibility.count || ''),
-      String(responsibility.ratePerHour || ''),
-      relatedLineGroupIds.join(','),
-    ].join('|')
+function respLineLineage(
+  groupId: string | undefined,
+  allocationLineage: string,
+  lineageByGroupId: Map<string, string>,
+): string {
+  return (groupId && lineageByGroupId.get(groupId)) || allocationLineage || 'default'
+}
+
+function mergePreviewItems(
+  items: PreviewItem[],
+): PreviewItem[] {
+  const map = new Map<string, PreviewItem>()
+  for (const item of items) {
+    const relatedLineGroupIds = [...new Set(item.relatedLineGroupIds)].sort()
+    const key = item.kind === 'derived'
+      ? ['derived', item.wareId || '', item.moduleId].join('|')
+      : ['required', item.wareId].join('|')
 
     if (!map.has(key)) {
-      map.set(key, {
-        ...responsibility,
-        relatedLineGroupIds,
-      })
+      map.set(key, item.kind === 'derived'
+        ? {
+            ...item,
+            derived: [...new Set(item.derived)].sort() as PreviewDerivedTag[],
+            targets: item.targets ? [...item.targets] : undefined,
+            relatedLineGroupIds,
+          }
+        : {
+            ...item,
+            required: [...new Set(item.required)].sort() as PreviewRequiredTag[],
+            relatedLineGroupIds,
+          })
+      continue
+    }
+
+    const existing = map.get(key)!
+    if (existing.kind === 'derived' && item.kind === 'derived') {
+      existing.derived = [...new Set([...existing.derived, ...item.derived])].sort() as PreviewDerivedTag[]
+      existing.targets = [...(existing.targets || []), ...(item.targets || [])]
+      existing.relatedLineGroupIds = [...new Set([...existing.relatedLineGroupIds, ...relatedLineGroupIds])].sort()
+    } else if (existing.kind === 'required' && item.kind === 'required') {
+      existing.required = [...new Set([...existing.required, ...item.required])].sort() as PreviewRequiredTag[]
+      existing.relatedLineGroupIds = [...new Set([...existing.relatedLineGroupIds, ...relatedLineGroupIds])].sort()
     }
   }
   return [...map.values()]
@@ -373,6 +500,8 @@ function dedupeResponsibilities(
 
 function buildAllocationOnlyPreviewLines(
   allocations: ProductionLineAllocation[],
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
 ): PreviewLinePlan[] {
   const requiredConsumersByWare = new Map<string, Set<string>>()
   for (const alloc of allocations) {
@@ -385,15 +514,22 @@ function buildAllocationOnlyPreviewLines(
     }
   }
 
-  let respIdCounter = 0
   return allocations.map((alloc) => {
-    const responsibilities = alloc.goals
-      .map(goal => goalToResponsibility(goal, `goal:${alloc.groupId || 'unmatched'}`, ++respIdCounter, alloc.groupId))
-      .map((responsibility) => {
-        if (responsibility.type !== 'derived-production' || !responsibility.wareId) return responsibility
-        const consumers = requiredConsumersByWare.get(responsibility.wareId)
+    const items = alloc.goals
+      .map(goal => goalToPreviewItem(
+        goal,
+        `goal:${alloc.groupId || 'unmatched'}`,
+        alloc.lineage,
+        modulesMap,
+        waresMap,
+        alloc.groupId,
+      ))
+      .filter((item): item is PreviewItem => Boolean(item))
+      .map((item) => {
+        if (item.kind !== 'derived' || !item.wareId || !item.derived.includes('production')) return item
+        const consumers = requiredConsumersByWare.get(item.wareId)
         return {
-          ...responsibility,
+          ...item,
           relatedLineGroupIds: consumers ? [...consumers] : [],
         }
       })
@@ -403,7 +539,7 @@ function buildAllocationOnlyPreviewLines(
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
       lineage: alloc.lineage || 'default',
-      responsibilities: dedupeResponsibilities(responsibilities),
+      items: mergePreviewItems(items),
     }
   })
 }
@@ -415,21 +551,21 @@ function buildAllocationOnlyPreviewLines(
  */
 export function mergeLineResponsibilities(
   line: PreviewLinePlan,
-): PreviewResponsibility[] {
-  return line.responsibilities
+): PreviewItem[] {
+  return line.items
 }
 
 /**
  * 从责任挂接的 relatedLineGroupIds 收集建筑集合。
  */
 export function collectBuildingsForResponsibilities(
-  responsibilities: PreviewResponsibility[],
+  items: PreviewItem[],
   preview: PreviewResult,
   resolvedModulesByGroupId?: Map<string, SavedModule[]>,
 ): SavedModule[] {
   const relatedGroupIds = new Set<string>()
-  for (const resp of responsibilities) {
-    for (const gid of resp.relatedLineGroupIds) {
+  for (const item of items) {
+    for (const gid of item.relatedLineGroupIds) {
       relatedGroupIds.add(gid)
     }
   }
@@ -481,60 +617,60 @@ export function computeTargetRatesFromBuildings(
 }
 
 function computeTargetRatesForResponsibilities(
-  responsibilities: PreviewResponsibility[],
+  items: PreviewItem[],
   preview: PreviewResult,
   resolvedModulesByGroupId: Map<string, SavedModule[]>,
   modulesMap: Record<string, X4Module>,
   settings: StationSettings,
 ): Record<string, number> {
-  const targetProductionRates = collectTargetProductionRates(responsibilities)
+  const targetProductionRates = collectTargetProductionRates(items)
 
   const rates: Record<string, number> = {}
 
-  for (const responsibility of responsibilities) {
-    if (responsibility.type !== 'derived-build-material') continue
-    if (!responsibility.wareId) continue
+  for (const item of items) {
+    if (item.kind !== 'derived' || !item.wareId || !item.derived.includes('build-material')) continue
     const buildings = collectBuildingsForResponsibilities(
-      [responsibility],
+      [item],
       preview,
       resolvedModulesByGroupId,
     )
     const buildMaterialRates = computeTargetRatesFromBuildings(buildings, modulesMap)
-    const rate = buildMaterialRates[responsibility.wareId] || 0
-    const targetRate = targetProductionRates[responsibility.wareId] || 0
+    const rate = buildMaterialRates[item.wareId] || 0
+    const targetRate = targetProductionRates[item.wareId] || 0
     const combinedRate = rate + targetRate
     if (combinedRate <= 0) continue
-    rates[responsibility.wareId] = (rates[responsibility.wareId] || 0) + combinedRate
+    rates[item.wareId] = (rates[item.wareId] || 0) + combinedRate
   }
 
-  for (const responsibility of responsibilities) {
-    if (responsibility.type !== 'derived-production') continue
-    if (!responsibility.wareId) continue
+  for (const item of items) {
+    if (item.kind !== 'derived' || !item.wareId || !item.derived.includes('production')) continue
     const operationalRate = computeOperationalDemandRateForWare(
-      responsibility.wareId,
-      responsibility.relatedLineGroupIds,
+      item.wareId,
+      item.relatedLineGroupIds,
       preview,
       resolvedModulesByGroupId,
       modulesMap,
       settings,
     )
-    const targetRate = targetProductionRates[responsibility.wareId] || 0
+    const targetRate = targetProductionRates[item.wareId] || 0
     const combinedRate = operationalRate + targetRate
     if (combinedRate <= 0) continue
-    rates[responsibility.wareId] = (rates[responsibility.wareId] || 0) + combinedRate
+    rates[item.wareId] = (rates[item.wareId] || 0) + combinedRate
   }
 
   return rates
 }
 
 function collectTargetProductionRates(
-  responsibilities: PreviewResponsibility[],
+  items: PreviewItem[],
 ): Record<string, number> {
   const rates: Record<string, number> = {}
-  for (const resp of responsibilities) {
-    if (resp.type !== 'target-production') continue
-    if (!resp.wareId) continue
-    rates[resp.wareId] = (rates[resp.wareId] || 0) + (resp.ratePerHour || 0)
+  for (const item of items) {
+    if (item.kind !== 'derived' || !item.wareId || !item.targets) continue
+    for (const target of item.targets) {
+      if (target.type === 'build-module') continue
+      rates[item.wareId] = (rates[item.wareId] || 0) + (target.ratePerHour || 0)
+    }
   }
   return rates
 }
@@ -635,7 +771,7 @@ export function computeBuildFlowPlan(
         if (snapshot !== previousSnapshot) stable = false
 
         lineResultsByGroupId.set(groupId, lineResult)
-        allocationGoalsByGroupId.set(groupId, buildGoalsFromResponsibilities(lineResult.mergedResponsibilities, lineResult.targetRates))
+        allocationGoalsByGroupId.set(groupId, buildGoalsFromItems(lineResult.mergedItems, lineResult.targetRates))
         resolvedModulesByGroupId.set(groupId, lineResult.allModules)
         syncGraphNodeComputedState(graph, lineResult, modulesMap, settings)
       }
@@ -660,7 +796,7 @@ export function computeBuildFlowPlan(
       settings,
     )
     if (previewLine.groupId) {
-      allocationGoalsByGroupId.set(previewLine.groupId, buildGoalsFromResponsibilities(lineResult.mergedResponsibilities, lineResult.targetRates))
+      allocationGoalsByGroupId.set(previewLine.groupId, buildGoalsFromItems(lineResult.mergedItems, lineResult.targetRates))
     }
     lines.push(lineResult)
   }
@@ -670,7 +806,7 @@ export function computeBuildFlowPlan(
     const goals = previewLine.groupId
       ? allocationGoalsByGroupId.get(previewLine.groupId) || []
       : computedLine
-        ? buildGoalsFromResponsibilities(computedLine.mergedResponsibilities, computedLine.targetRates)
+        ? buildGoalsFromItems(computedLine.mergedItems, computedLine.targetRates)
         : []
     return toCompatAllocation(previewLine, goals)
   })
@@ -734,21 +870,17 @@ function seedResolvedModulesFromTargets(
   for (const previewLine of previewLines) {
     const groupId = previewLine.groupId
     if (!groupId) continue
-    const seedResponsibilities = previewLine.responsibilities.filter(resp =>
-      resp.type === 'target-production' || resp.type === 'required-production'
-    )
-    if (seedResponsibilities.length === 0) continue
-
-    const targetRates: Record<string, number> = {}
-    const goals = buildGoalsFromResponsibilities(seedResponsibilities, targetRates)
-    const allModules = computeGoalModules(goals, modulesMap, waresMap, settings, previewLine.lineage)
+    const targetRates = collectTargetProductionRates(previewLine.items)
+    const goals = buildGoalsFromItems(previewLine.items, targetRates)
+    if (goals.length === 0) continue
+    const allModules = computeGoalModules(goals, modulesMap, waresMap, settings, previewLine.lineage, buildPreferredModuleIds(previewLine.items))
     const primaryModules = separatePrimaryModules(allModules, goals, modulesMap)
     const auxiliaryModules = separateAuxiliaryModules(allModules, primaryModules)
     const lineResult: ComputeLineResult = {
       groupId: previewLine.groupId,
       groupName: previewLine.groupName,
-      mergedResponsibilities: mergeLineResponsibilities(previewLine),
-      relatedLineGroupIds: [...new Set(previewLine.responsibilities.flatMap(resp => resp.relatedLineGroupIds))],
+      mergedItems: mergeLineResponsibilities(previewLine),
+      relatedLineGroupIds: [...new Set(previewLine.items.flatMap(item => item.relatedLineGroupIds))],
       targetRates,
       primaryModules,
       auxiliaryModules,
@@ -756,7 +888,7 @@ function seedResolvedModulesFromTargets(
     }
 
     resolvedModulesByGroupId.set(groupId, allModules)
-    allocationGoalsByGroupId.set(groupId, buildGoalsFromResponsibilities(lineResult.mergedResponsibilities, targetRates))
+    allocationGoalsByGroupId.set(groupId, buildGoalsFromItems(lineResult.mergedItems, targetRates))
     lineResultsByGroupId.set(groupId, lineResult)
     syncGraphNodeComputedState(graph, lineResult, modulesMap, settings)
   }
@@ -770,24 +902,24 @@ function computeLineResult(
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
 ): ComputeLineResult {
-  const mergedResponsibilities = mergeLineResponsibilities(previewLine)
+  const mergedItems = mergeLineResponsibilities(previewLine)
   const targetRates = computeTargetRatesForResponsibilities(
-    mergedResponsibilities,
+    mergedItems,
     preview,
     resolvedModulesByGroupId,
     modulesMap,
     settings,
   )
-  const mergedGoals = buildGoalsFromResponsibilities(mergedResponsibilities, targetRates)
-  const allModules = computeGoalModules(mergedGoals, modulesMap, waresMap, settings, previewLine.lineage)
+  const mergedGoals = buildGoalsFromItems(mergedItems, targetRates)
+  const allModules = computeGoalModules(mergedGoals, modulesMap, waresMap, settings, previewLine.lineage, buildPreferredModuleIds(mergedItems))
   const primaryModules = separatePrimaryModules(allModules, mergedGoals, modulesMap)
   const auxiliaryModules = separateAuxiliaryModules(allModules, primaryModules)
 
   return {
     groupId: previewLine.groupId,
     groupName: previewLine.groupName,
-    mergedResponsibilities,
-    relatedLineGroupIds: [...new Set(mergedResponsibilities.flatMap(r => r.relatedLineGroupIds))],
+    mergedItems,
+    relatedLineGroupIds: [...new Set(mergedItems.flatMap(item => item.relatedLineGroupIds))],
     targetRates,
     primaryModules,
     auxiliaryModules,
@@ -877,46 +1009,45 @@ function buildDemandDetailForLine(
   modulesMap: Record<string, X4Module>,
 ): DemandDetail {
   const trackedWares = new Set(
-    line.mergedResponsibilities
-      .filter(resp => resp.type !== 'required-production' && resp.wareId)
-      .map(resp => resp.wareId!),
+    line.mergedItems
+      .filter((item): item is PreviewDerivedItem => item.kind === 'derived' && Boolean(item.wareId))
+      .map(item => item.wareId!),
   )
   const buildMaterialWares = new Set(
-    line.mergedResponsibilities
-      .filter(resp => resp.type === 'derived-build-material' && resp.wareId)
-      .map(resp => resp.wareId!),
+    line.mergedItems
+      .filter((item): item is PreviewDerivedItem => item.kind === 'derived' && item.derived.includes('build-material') && Boolean(item.wareId))
+      .map(item => item.wareId!),
   )
   const perWareSources: Record<string, { label: string; qty: number; seconds: number; rate: number }[]> = {}
   const buildSourceSecondsByWare = new Map<string, Map<string, number>>()
   const buildMaterialQtyByWare: Record<string, number> = {}
 
-  for (const responsibility of line.mergedResponsibilities) {
-    if (!responsibility.wareId) continue
-    if (!trackedWares.has(responsibility.wareId)) continue
-    if (responsibility.type === 'required-production') continue
+  for (const item of line.mergedItems) {
+    if (item.kind !== 'derived' || !item.wareId) continue
+    if (!trackedWares.has(item.wareId)) continue
 
-    for (const relatedGroupId of responsibility.relatedLineGroupIds) {
+    for (const relatedGroupId of item.relatedLineGroupIds) {
       const relatedScheme = schemeByGroupId.get(relatedGroupId)
       if (!relatedScheme) continue
-      if (responsibility.type === 'derived-build-material') {
+      if (item.derived.includes('build-material')) {
         const { seconds, materials } = summarizeBuildModules(relatedScheme.modules, modulesMap)
         if (seconds <= 0) continue
-        const qty = materials[responsibility.wareId] || 0
+        const qty = materials[item.wareId] || 0
         if (qty <= 0) continue
 
         pushDemandEntry(
           perWareSources,
-          responsibility.wareId,
+          item.wareId,
           relatedScheme.label,
           qty,
           seconds,
         )
-        const wareSeconds = buildSourceSecondsByWare.get(responsibility.wareId) || new Map<string, number>()
+        const wareSeconds = buildSourceSecondsByWare.get(item.wareId) || new Map<string, number>()
         if (!wareSeconds.has(relatedScheme.label)) {
           wareSeconds.set(relatedScheme.label, seconds)
         }
-        buildSourceSecondsByWare.set(responsibility.wareId, wareSeconds)
-        buildMaterialQtyByWare[responsibility.wareId] = (buildMaterialQtyByWare[responsibility.wareId] || 0) + qty
+        buildSourceSecondsByWare.set(item.wareId, wareSeconds)
+        buildMaterialQtyByWare[item.wareId] = (buildMaterialQtyByWare[item.wareId] || 0) + qty
       }
     }
   }
@@ -928,17 +1059,16 @@ function buildDemandDetailForLine(
       aggregateRates[wareId] = rate
     }
   }
-  for (const responsibility of line.mergedResponsibilities) {
-    if (responsibility.type !== 'derived-production') continue
-    if (!responsibility.wareId) continue
+  for (const item of line.mergedItems) {
+    if (item.kind !== 'derived' || !item.wareId || !item.derived.includes('production')) continue
     let rate = 0
-    for (const relatedGroupId of responsibility.relatedLineGroupIds) {
+    for (const relatedGroupId of item.relatedLineGroupIds) {
       const relatedScheme = schemeByGroupId.get(relatedGroupId)
       if (!relatedScheme) continue
-      rate += Math.max(0, -((relatedScheme.netProduction || {})[responsibility.wareId] || 0))
+      rate += Math.max(0, -((relatedScheme.netProduction || {})[item.wareId] || 0))
     }
     if (rate > 0) {
-      gapRates[responsibility.wareId] = (gapRates[responsibility.wareId] || 0) + rate
+      gapRates[item.wareId] = (gapRates[item.wareId] || 0) + rate
     }
   }
 
@@ -1002,8 +1132,9 @@ function computeGoalModules(
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
   lineage: string = 'argon',
+  preferredModuleIdsByWare: Map<string, string> = new Map(),
 ): SavedModule[] {
-  const baseModules = expandGoalsRespectingLockedWares(goals, modulesMap, waresMap, lineage)
+  const baseModules = expandGoalsRespectingLockedWares(goals, modulesMap, waresMap, lineage, preferredModuleIdsByWare)
   const merged = mergeModules(baseModules)
   const autoFill = autoFillForLine(merged, goals, settings, modulesMap, waresMap)
   return mergeModules([...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
@@ -1014,6 +1145,7 @@ function expandGoalsRespectingLockedWares(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   racePreference: string,
+  preferredModuleIdsByWare: Map<string, string>,
 ): SavedModule[] {
   const lockedWares = new Set(
     goals
@@ -1031,7 +1163,10 @@ function expandGoalsRespectingLockedWares(
     if (visited.has(wareId)) return
     visited.add(wareId)
 
-    const producer = findBestProducer(wareId, racePreference, [], modulesMap, waresMap)
+    const lockedModuleId = preferredModuleIdsByWare.get(wareId)
+    const producer = lockedModuleId
+      ? modulesMap[lockedModuleId]
+      : findBestProducer(wareId, racePreference, [], modulesMap, waresMap)
     if (!producer) return
     const outputRate = producer.outputs[wareId] || 0
     if (outputRate <= 0) return
@@ -1069,47 +1204,62 @@ function expandGoalsRespectingLockedWares(
   return Object.entries(required).map(([id, count]) => ({ id, count }))
 }
 
-function buildGoalsFromResponsibilities(
-  responsibilities: PreviewResponsibility[],
+function buildPreferredModuleIds(
+  items: PreviewItem[],
+): Map<string, string> {
+  const map = new Map<string, string>()
+  for (const item of items) {
+    if (item.kind !== 'derived') continue
+    if (!item.wareId) continue
+    map.set(item.wareId, item.moduleId)
+  }
+  return map
+}
+
+function buildGoalsFromItems(
+  items: PreviewItem[],
   targetRates: Record<string, number>,
 ): BuildGoal[] {
   const moduleGoals: BuildGoal[] = []
   const wareKinds = new Map<string, { hasDerivedBuildMaterial: boolean; hasDerivedProduction: boolean; hasRequiredProduction: boolean; manualRate: number }>()
 
-  for (const responsibility of responsibilities) {
-    if (responsibility.type === 'target-production') {
-      if (responsibility.moduleId) {
-        moduleGoals.push({
-          type: 'build-module',
-          moduleId: responsibility.moduleId,
-          count: responsibility.count || 1,
-        })
-        continue
+  for (const item of items) {
+    if (item.kind === 'derived') {
+      for (const target of item.targets || []) {
+        if (target.type === 'build-module') {
+          moduleGoals.push({
+            type: 'build-module',
+            moduleId: item.moduleId,
+            count: target.count || 1,
+          })
+        }
       }
-      if (responsibility.wareId) {
-        const current = wareKinds.get(responsibility.wareId) || {
+      if (item.wareId) {
+        const current = wareKinds.get(item.wareId) || {
           hasDerivedBuildMaterial: false,
           hasDerivedProduction: false,
           hasRequiredProduction: false,
           manualRate: 0,
         }
-        current.manualRate += responsibility.ratePerHour || 0
-        wareKinds.set(responsibility.wareId, current)
+        if (item.derived.includes('build-material')) current.hasDerivedBuildMaterial = true
+        if (item.derived.includes('production')) current.hasDerivedProduction = true
+        for (const target of item.targets || []) {
+          if (target.type !== 'build-module') current.manualRate += target.ratePerHour || 0
+        }
+        wareKinds.set(item.wareId, current)
       }
       continue
     }
 
-    if (!responsibility.wareId) continue
-    const current = wareKinds.get(responsibility.wareId) || {
+    const current = wareKinds.get(item.wareId) || {
       hasDerivedBuildMaterial: false,
       hasDerivedProduction: false,
       hasRequiredProduction: false,
       manualRate: 0,
     }
-    if (responsibility.type === 'derived-build-material') current.hasDerivedBuildMaterial = true
-    if (responsibility.type === 'derived-production') current.hasDerivedProduction = true
-    if (responsibility.type === 'required-production') current.hasRequiredProduction = true
-    wareKinds.set(responsibility.wareId, current)
+    if (item.required.includes('build-material')) current.hasRequiredProduction = true
+    if (item.required.includes('production')) current.hasRequiredProduction = true
+    wareKinds.set(item.wareId, current)
   }
 
   const goals: BuildGoal[] = [...moduleGoals]
@@ -1257,55 +1407,78 @@ export function computeBuildFlowPlanSchemeGroups(
       groupName: line.groupName,
       isUnmatched: false,
       lineage: preview.lines.find(pl => pl.groupId === line.groupId)?.lineage || 'default',
-      goals: buildGoalsFromResponsibilities(line.mergedResponsibilities, line.targetRates),
+      goals: buildGoalsFromItems(line.mergedItems, line.targetRates),
     })),
     schemeGroups: result.schemeGroups,
   }
 }
 
-function goalToResponsibility(
+function goalToPreviewItem(
   goal: BuildGoal,
   sourceRef: string,
-  idSuffix: number,
+  lineage: string,
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
   groupId?: string,
-): PreviewResponsibility {
-  const base = {
-    id: `resp_goal_${groupId || 'unmatched'}_${idSuffix}`,
-    relatedLineGroupIds: groupId ? [groupId] : [],
-    sourceRef,
-  }
+): PreviewItem | null {
+  const relatedLineGroupIds = groupId ? [groupId] : []
 
   if (goal.type === 'build-module') {
     return {
-      ...base,
-      type: 'target-production',
+      kind: 'derived',
       moduleId: goal.moduleId,
-      count: goal.count,
+      derived: ['target'],
+      targets: [{ type: 'build-module', count: goal.count }],
+      relatedLineGroupIds,
+      sourceRef,
     }
   }
 
   if (goal.type === 'production-rate') {
-    return {
-      ...base,
-      type: 'target-production',
+    const moduleId = findBestProducer(goal.wareId, lineage, [], modulesMap, waresMap)?.id
+    return moduleId ? {
+      kind: 'derived',
       wareId: goal.wareId,
-      ratePerHour: goal.ratePerHour,
-    }
+      moduleId,
+      derived: ['target'],
+      targets: [{ type: 'production-rate', ratePerHour: goal.ratePerHour }],
+      relatedLineGroupIds,
+      sourceRef,
+    } : null
   }
 
   if (goal.type === 'derived-build-material') {
-    return {
-      ...base,
-      type: 'derived-build-material',
+    const moduleId = findBestProducer(goal.wareId, lineage, [], modulesMap, waresMap)?.id
+    return moduleId ? {
+      kind: 'derived',
       wareId: goal.wareId,
-      ratePerHour: goal.ratePerHour,
-    }
+      moduleId,
+      derived: ['build-material'],
+      relatedLineGroupIds,
+      sourceRef,
+    } : null
   }
 
-  return {
-    ...base,
-    type: goal.type === 'required-production' ? 'required-production' : 'derived-production',
-    wareId: 'wareId' in goal ? goal.wareId : undefined,
-    ratePerHour: 'ratePerHour' in goal ? goal.ratePerHour : undefined,
+  if (goal.type === 'derived-production') {
+    const moduleId = findBestProducer(goal.wareId, lineage, [], modulesMap, waresMap)?.id
+    return moduleId ? {
+      kind: 'derived',
+      wareId: goal.wareId,
+      moduleId,
+      derived: ['production'],
+      relatedLineGroupIds,
+      sourceRef,
+    } : null
   }
+
+  if (goal.type === 'required-production') {
+    return {
+      kind: 'required',
+      wareId: goal.wareId,
+      required: ['production'],
+      relatedLineGroupIds,
+      sourceRef,
+    }
+  }
+  return null
 }

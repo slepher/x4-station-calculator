@@ -43,8 +43,8 @@ export interface BuildPlanPresenterProps {
   currentFlows: ComputedRef<EmpireGroupedFlows>
   allocations: ComputedRef<ProductionLineAllocation[]>
   buildFlowPlanAllocations: ComputedRef<ProductionLineAllocation[]>
-  buildMaterialPreviewAllocations: ComputedRef<ProductionLineAllocation[]>
-  productionPreviewAllocations: ComputedRef<ProductionLineAllocation[]>
+  buildMaterialPreviewLines: ComputedRef<PreviewLinePlan[]>
+  productionPreviewLines: ComputedRef<PreviewLinePlan[]>
   buildFlowPlanLoading: ComputedRef<boolean>
   planName: ComputedRef<string>
   activePlanId: ComputedRef<string | null>
@@ -74,11 +74,24 @@ export interface UseBuildPlanPresenterReturn {
   emits: BuildPlanPresenterEmits
 }
 
+interface ExportStationSnapshot {
+  id: string
+  modules: SavedModule[]
+  lockedWares?: string[]
+  warePriority?: Record<string, number>
+}
+
 export interface BuildPlanPresenterStore {
   getEmpireGroupedFlows(): EmpireGroupedFlows
   createStation(name?: string, type?: StationType): string | null
   updateStationModules(stationId: string, modules: SavedModule[]): void
-  findStationByName(name: string): { id: string; modules: SavedModule[] } | null
+  findStationByName(name: string): ExportStationSnapshot | null
+  getStationById(stationId: string): ExportStationSnapshot | null
+  applyImportedStationPayload(stationId: string, payload: {
+    modules: SavedModule[]
+    lockedWares: string[]
+    warePriority: Record<string, number>
+  }): void
 }
 
 export interface BuildPlanPresenterBuildPlanStore {
@@ -115,6 +128,20 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
   const logicFlow = useLogicFlowStore()
   const gameData = useGameDataStore()
   const shipBuildStore = useShipBuildStore()
+
+  function collectIsolatedLockedWaresForScheme(scheme: BuildScheme): string[] {
+    const groupId = (scheme as any)._groupId
+    if (typeof groupId !== 'string' || groupId.length === 0) return []
+
+    const group = logicFlow.groups.find(item => item.id === groupId)
+    if (!group) return []
+
+    return [...new Set(
+      group.nodes
+        .filter(node => node.isIsolated)
+        .map(node => node.wareId),
+    )]
+  }
 
   const fleetGoalView = computed<FleetGoalView | null>(() => {
     const fleetGoal = buildPlanStore.buildGoals.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
@@ -218,18 +245,22 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     )
   })
 
-  const buildMaterialPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
+  const buildMaterialPreviewLines = computed<PreviewLinePlan[]>(() => {
     if (!buildPlanStore.previewResult || !buildPlanStore.previewResult.buildMaterialPlanningEnabled) return []
     return buildPlanStore.previewResult.lines
-      .filter(line => line.responsibilities.some(r => r.type === 'derived-build-material'))
-      .map(previewLineToAllocation)
+      .filter((line: PreviewLinePlan) => line.items.some((item) =>
+        (item.kind === 'derived' && item.derived.includes('build-material'))
+        || (item.kind === 'required' && item.required.includes('build-material'))
+      ))
   })
 
-  const productionPreviewAllocations = computed<ProductionLineAllocation[]>(() => {
+  const productionPreviewLines = computed<PreviewLinePlan[]>(() => {
     if (!buildPlanStore.previewResult) return []
     return buildPlanStore.previewResult.lines
-      .filter(line => !line.responsibilities.some(r => r.type === 'derived-build-material'))
-      .map(previewLineToAllocation)
+      .filter((line: PreviewLinePlan) => !line.items.some((item) =>
+        (item.kind === 'derived' && item.derived.includes('build-material'))
+        || (item.kind === 'required' && item.required.includes('build-material'))
+      ))
   })
 
   const props: BuildPlanPresenterProps = {
@@ -253,8 +284,8 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     currentFlows: computed(() => blueprintStore.getEmpireGroupedFlows()),
     allocations,
     buildFlowPlanAllocations: computed(() => buildPlanStore.buildFlowPlanAllocations),
-    buildMaterialPreviewAllocations,
-    productionPreviewAllocations,
+    buildMaterialPreviewLines,
+    productionPreviewLines,
     buildFlowPlanLoading: computed(() => buildPlanStore.buildFlowPlanLoading),
     planName: computed(() => buildPlanStore.activePlanName),
     activePlanId: computed(() => buildPlanStore.savedPlans.activeId),
@@ -311,21 +342,36 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
         const primaryModules = primaryModuleIds.length > 0
           ? modules.filter(m => primaryModuleIds.includes(m.id))
           : modules
+        const lockedWares = collectIsolatedLockedWaresForScheme(scheme)
         
         if (mode === 'overwrite') {
           const existing = blueprintStore.findStationByName(stationName)
           if (existing) {
-            blueprintStore.updateStationModules(existing.id, primaryModules)
+            blueprintStore.applyImportedStationPayload(existing.id, {
+              modules: primaryModules,
+              lockedWares,
+              warePriority: existing.warePriority || {},
+            })
           } else {
             const stationId = blueprintStore.createStation(stationName, 'industrial')
-            if (stationId) {
-              blueprintStore.updateStationModules(stationId, primaryModules)
+            const station = stationId ? blueprintStore.getStationById(stationId) : null
+            if (station) {
+              blueprintStore.applyImportedStationPayload(station.id, {
+                modules: primaryModules,
+                lockedWares,
+                warePriority: station.warePriority || {},
+              })
             }
           }
         } else {
           const stationId = blueprintStore.createStation(stationName, 'industrial')
-          if (stationId) {
-            blueprintStore.updateStationModules(stationId, primaryModules)
+          const station = stationId ? blueprintStore.getStationById(stationId) : null
+          if (station) {
+            blueprintStore.applyImportedStationPayload(station.id, {
+              modules: primaryModules,
+              lockedWares,
+              warePriority: station.warePriority || {},
+            })
           }
         }
       }
@@ -333,53 +379,4 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
   }
 
   return { props, emits }
-}
-
-function previewLineToAllocation(line: PreviewLinePlan): ProductionLineAllocation {
-  return {
-    groupId: line.groupId,
-    groupName: line.groupName,
-    isUnmatched: line.isUnmatched,
-    lineage: line.lineage,
-    goals: line.responsibilities.flatMap((responsibility): BuildGoal[] => {
-      if (responsibility.type === 'target-production') {
-        if (responsibility.moduleId) {
-          return [{
-            type: 'target-production',
-            moduleId: responsibility.moduleId,
-            count: responsibility.count || 1,
-          }]
-        }
-        if (responsibility.wareId) {
-          return [{
-            type: 'target-production',
-            wareId: responsibility.wareId,
-            ratePerHour: responsibility.ratePerHour || 0,
-          }]
-        }
-        return []
-      }
-
-      if (!responsibility.wareId) return []
-      if (responsibility.type === 'derived-build-material') {
-        return [{
-          type: 'derived-build-material',
-          wareId: responsibility.wareId,
-          ratePerHour: responsibility.ratePerHour || 0,
-        }]
-      }
-      if (responsibility.type === 'derived-production') {
-        return [{
-          type: 'derived-production',
-          wareId: responsibility.wareId,
-          ratePerHour: responsibility.ratePerHour || 0,
-        }]
-      }
-      return [{
-        type: 'required-production',
-        wareId: responsibility.wareId,
-        ratePerHour: responsibility.ratePerHour || 0,
-      }]
-    }),
-  }
 }

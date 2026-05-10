@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest'
 import { computeFlowPlanLines, makeSchemes } from '@/store/logic/calculateBuildFlowPlan'
+import { ROOT_BUILD_COST_KEY } from '@/store/logic/buildFlowPlanGraph'
 import type { BuildFlowPlanGraph, BuildFlowPlanLine, BuildFlowPlanView } from '@/types/build-plan'
 import type { BuildFlowGroup, BuildFlowTag, BuildFlowLineCard, BuildFlowAssignment, SavedModule, X4Module, X4Ware, StationSettings } from '@/types/x4'
 
@@ -117,11 +118,11 @@ describe('computeFlowPlanLines', () => {
     const graph: BuildFlowPlanGraph = {
       nodes: new Map([['L1', node1]]),
       edges: [
-        { fromLineKey: '__C__', toLineKey: 'L1', wareId: 'hullparts', sourceLabel: 'C buildCost' },
+        { fromLineKey: ROOT_BUILD_COST_KEY, toLineKey: 'L1', wareId: 'hullparts', sourceLabel: 'target line buildCost' },
       ],
       sccGroups: [],
-      cModules: [{ id: 'module_claytronics', count: 1 }],
-      cBuildCostRates,
+      targetModules: [{ id: 'module_claytronics', count: 1 }],
+      targetBuildCostRates: cBuildCostRates,
     }
 
     computeFlowPlanLines(graph, modulesMap, waresMap, DEFAULT_SETTINGS, [])
@@ -154,11 +155,11 @@ describe('makeSchemes', () => {
     const graph: BuildFlowPlanGraph = {
       nodes: new Map([['L1', node1]]),
       edges: [
-        { fromLineKey: '__C__', toLineKey: 'L1', wareId: 'hullparts', sourceLabel: 'C buildCost' },
+        { fromLineKey: ROOT_BUILD_COST_KEY, toLineKey: 'L1', wareId: 'hullparts', sourceLabel: 'target line buildCost' },
       ],
       sccGroups: [],
-      cModules,
-      cBuildCostRates,
+      targetModules: cModules,
+      targetBuildCostRates: cBuildCostRates,
     }
 
     const schemes = makeSchemes(graph, modulesMap, waresMap, DEFAULT_SETTINGS)

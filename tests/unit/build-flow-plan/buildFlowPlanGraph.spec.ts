@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest'
-import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
+import { buildFlowPlanGraph, ROOT_BUILD_COST_KEY } from '@/store/logic/buildFlowPlanGraph'
 import type { BuildFlowPlanView } from '@/types/build-plan'
 import type { BuildFlowGroup, BuildFlowTag, BuildFlowLineCard, BuildFlowAssignment, FlowNode, ProductionLineGroup } from '@/types/x4'
 import type { SavedModule, X4Module, X4Ware } from '@/types/x4'
@@ -178,10 +178,10 @@ describe('buildFlowPlanGraph', () => {
     expect(l1Node.lineGroupId).toBe('L1')
     expect(l1Node.trackedWares).toEqual(new Set(['hullparts']))
 
-    // One edge: __C__ → L1
+    // One edge: root → L1
     expect(graph.edges.length).toBe(1)
     expect(graph.edges[0]).toMatchObject({
-      fromLineKey: '__C__',
+      fromLineKey: ROOT_BUILD_COST_KEY,
       toLineKey: 'L1',
       wareId: 'hullparts',
     })
@@ -222,9 +222,9 @@ describe('buildFlowPlanGraph', () => {
     const l2Node = graph.nodes.get('L2')!
     expect(l2Node.trackedWares).toEqual(new Set(['plasmaconductors']))
 
-    // Edges: __C__→L1 (hullparts), L1→L2 (plasmaconductors)
+    // Edges: root→L1 (hullparts), L1→L2 (plasmaconductors)
     expect(graph.edges.length).toBe(2)
-    const cL1Edge = graph.edges.find(e => e.fromLineKey === '__C__' && e.toLineKey === 'L1')
+    const cL1Edge = graph.edges.find(e => e.fromLineKey === ROOT_BUILD_COST_KEY && e.toLineKey === 'L1')
     expect(cL1Edge).toBeDefined()
     expect(cL1Edge!.wareId).toBe('hullparts')
 

@@ -16,6 +16,7 @@ import type {
   SavedModule,
   StationSettings,
 } from '@/types/x4'
+import { ROOT_BUILD_COST_KEY } from './buildFlowPlanGraph'
 import { findBestProducer } from './bestModuleSelector'
 import { calculateAutoFillModules } from './calculateProductionFlows'
 
@@ -877,7 +878,7 @@ function collectDemandSources(
     let rates: Record<string, number> = {}
     let materials: Record<string, number> | undefined
 
-    if (edge.fromLineKey === '__C__') {
+    if (edge.fromLineKey === ROOT_BUILD_COST_KEY) {
       const rate = graph.targetBuildCostRates[edge.wareId]
       if (rate !== undefined && rate > 0) {
         rates[edge.wareId] = rate
@@ -1494,6 +1495,28 @@ export function mergeOverlappingLines(
   }
 }
 
+function mergeOverlappingSchemePurpose(
+  buildScheme: BuildScheme,
+  productionScheme: BuildScheme,
+  modulesMap: Record<string, X4Module>,
+  waresMap: Record<string, X4Ware>,
+): BuildScheme {
+  const purposeModules = [...new Set([...buildScheme.purposeModules, ...productionScheme.purposeModules])]
+  const purposeWareSet = new Set(purposeModules)
+
+  return {
+    ...buildScheme,
+    description: `产出: ${purposeModules.map(w => waresMap[w]?.name || w).join(', ')}`,
+    purposeModules,
+    primaryModuleIds: buildScheme.modules
+      .filter(module => {
+        const mod = modulesMap[module.id]
+        return mod && Object.keys(mod.outputs).some(wareId => purposeWareSet.has(wareId))
+      })
+      .map(module => module.id),
+  }
+}
+
 export function makeSchemesWithGroups(
   graph: BuildFlowPlanGraph,
   allocations: ProductionLineAllocation[],
@@ -1526,15 +1549,33 @@ export function makeSchemesWithGroups(
     }
   }
 
-  // 2. Production schemes: filter out allocations whose groupId already in graph (overlapping lines)
-  //    Overlapping lines are already solved in graph nodes with merged responsibilities
-  const productionAllocations = allocations.filter(
-    a => !a.groupId || !graphGroupIds.has(a.groupId)
-  )
-  const splitSchemes = splitTargetLineSchemes(productionAllocations, modulesMap, waresMap, settings)
+  const splitSchemes = splitTargetLineSchemes(allocations, modulesMap, waresMap, settings)
+
+  const buildByGroupId = new Map<string, BuildScheme>()
+  for (const scheme of buildSchemes) {
+    const groupId = (scheme as any)._groupId
+    if (typeof groupId === 'string' && groupId.length > 0) {
+      buildByGroupId.set(groupId, scheme)
+    }
+  }
+
+  const productionSchemes: BuildScheme[] = []
+  for (const scheme of splitSchemes) {
+    const groupId = (scheme as any)._groupId
+    if (!groupId || !buildByGroupId.has(groupId)) {
+      productionSchemes.push(scheme)
+      continue
+    }
+
+    const buildScheme = buildByGroupId.get(groupId)!
+    const merged = mergeOverlappingSchemePurpose(buildScheme, scheme, modulesMap, waresMap)
+    const index = buildSchemes.indexOf(buildScheme)
+    if (index >= 0) buildSchemes[index] = merged
+    buildByGroupId.set(groupId, merged)
+  }
 
   for (const scheme of buildSchemes) delete (scheme as any)._groupId
-  for (const scheme of splitSchemes) delete (scheme as any)._groupId
+  for (const scheme of productionSchemes) delete (scheme as any)._groupId
 
   return [
     {
@@ -1545,7 +1586,7 @@ export function makeSchemesWithGroups(
     {
       groupType: 'production',
       groupLabel: groupLabels?.production || 'Production Lines',
-      schemes: splitSchemes,
+      schemes: productionSchemes,
     },
   ]
 }

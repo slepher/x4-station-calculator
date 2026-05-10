@@ -8,7 +8,8 @@ import {
   computeBuildFlowPlan,
   DEFAULT_BUILD_PLAN_SETTINGS,
 } from '@/store/logic/buildPlanProductionLine'
-import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup, PreviewResult, ProductionLineAllocation } from '@/types/build-plan'
+import { ROOT_BUILD_COST_KEY } from '@/store/logic/buildFlowPlanGraph'
+import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup, ProductionLineAllocation } from '@/types/build-plan'
 import type { X4Module, X4Ware, ProductionLineGroup, SavedFlowGroup, BuildFlowAssignment } from '@/types/x4'
 
 const WARE_DATA = JSON.parse(readFileSync(resolve('src/assets/x4_game_data/8.0-Diplomacy/data/wares.json'), 'utf-8'))
@@ -36,6 +37,10 @@ const settings = {
   showEmpireGaps: false, racePreference: 'argon', resourceBufferHours: 1,
   primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
   transportShipCapacity: 62000, enforceDlcActivation: false,
+}
+
+function displayGraphKey(key: string): string {
+  return key === ROOT_BUILD_COST_KEY ? 'root' : key
 }
 
 function modName(id: string): string { const m = modulesMap[id]; return m?.name || id }
@@ -205,29 +210,47 @@ const lineAllocations: ProductionLineAllocation[] = preview.lines.map(line => ({
   groupName: line.groupName,
   isUnmatched: line.isUnmatched,
   lineage: line.lineage,
-  goals: line.responsibilities.flatMap(r => {
-    if (r.type === 'target-production') {
-      if (r.moduleId) {
+  goals: line.items.flatMap(item => {
+    if (item.kind === 'derived') {
+      const targetGoals = (item.targets || []).flatMap(target => {
+        if (target.type === 'build-module') {
+          return [{
+            type: 'build-module' as const,
+            moduleId: item.moduleId,
+            count: target.count || 1,
+          }]
+        }
+        if (item.wareId) {
+          return [{
+            type: 'production-rate' as const,
+            wareId: item.wareId,
+            ratePerHour: target.ratePerHour || 0,
+          }]
+        }
+        return []
+      })
+      if (targetGoals.length > 0) return targetGoals
+      if (!item.wareId) return []
+      if (item.derived.includes('production')) {
         return [{
-          type: 'target-production' as const,
-          moduleId: r.moduleId,
-          count: r.count || 1,
+          type: 'derived-production' as const,
+          wareId: item.wareId,
+          ratePerHour: 0,
         }]
       }
-      if (r.wareId) {
+      if (item.derived.includes('build-material')) {
         return [{
-          type: 'target-production' as const,
-          wareId: r.wareId,
-          ratePerHour: r.ratePerHour || 0,
+          type: 'derived-build-material' as const,
+          wareId: item.wareId,
+          ratePerHour: 0,
         }]
       }
       return []
     }
-    if (!r.wareId) return []
     return [{
-      type: r.type,
-      wareId: r.wareId,
-      ratePerHour: r.ratePerHour || 0,
+      type: 'required-production' as const,
+      wareId: item.wareId,
+      ratePerHour: 0,
     }]
   }),
 }))
@@ -267,7 +290,7 @@ if (useJson) {
               trackedWares: [...node.trackedWares],
             })),
             edges: graph.edges.map(e => ({
-              from: e.fromLineKey.slice(0, 8),
+              from: displayGraphKey(e.fromLineKey).slice(0, 8),
               to: e.toLineKey.slice(0, 8),
               wareId: e.wareId,
               label: e.sourceLabel,
@@ -294,7 +317,7 @@ if (useJson) {
               modules: node.modules, isSelfBootstrap: node.isSelfBootstrap,
             })),
             edges: graph.edges.map(e => ({
-              fromLineKey: e.fromLineKey, toLineKey: e.toLineKey,
+              fromLineKey: displayGraphKey(e.fromLineKey), toLineKey: e.toLineKey,
               wareId: e.wareId, wareName: wareName(e.wareId), sourceLabel: e.sourceLabel,
             })),
             sccGroups: graph.sccGroups,

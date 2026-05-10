@@ -236,24 +236,35 @@ export interface BuildFlowPlanView {
 
 // --- Preview / Compute truth types (build-plan-production-line design) ---
 
-/** 责任类型 */
-export type ResponsibilityType =
-  | 'target-production'
-  | 'derived-build-material'
-  | 'derived-production'
-  | 'required-production'
+export type PreviewDerivedTag = 'target' | 'production' | 'build-material'
 
-/** 单条责任 */
-export interface PreviewResponsibility {
-  id: string
-  type: ResponsibilityType
-  wareId?: string
-  moduleId?: string
+export type PreviewRequiredTag = 'production' | 'build-material'
+
+export interface PreviewDerivedTarget {
+  type: 'build-module' | 'production-rate' | 'fleet-rate'
   count?: number
   ratePerHour?: number
+}
+
+export interface PreviewDerivedItem {
+  kind: 'derived'
+  wareId?: string
+  moduleId: string
+  derived: PreviewDerivedTag[]
+  targets?: PreviewDerivedTarget[]
   relatedLineGroupIds: string[]
   sourceRef: string
 }
+
+export interface PreviewRequiredItem {
+  kind: 'required'
+  wareId: string
+  required: PreviewRequiredTag[]
+  relatedLineGroupIds: string[]
+  sourceRef: string
+}
+
+export type PreviewItem = PreviewDerivedItem | PreviewRequiredItem
 
 /** 单条产线的 preview 责任分配 */
 export interface PreviewLinePlan {
@@ -261,7 +272,7 @@ export interface PreviewLinePlan {
   groupName: string
   isUnmatched: boolean
   lineage: string
-  responsibilities: PreviewResponsibility[]
+  items: PreviewItem[]
 }
 
 /** Preview 阶段结果 */
@@ -285,7 +296,7 @@ export interface ComputeInput {
 export interface ComputeLineResult {
   groupId?: string
   groupName: string
-  mergedResponsibilities: PreviewResponsibility[]
+  mergedItems: PreviewItem[]
   relatedLineGroupIds: string[]
   targetRates: Record<string, number>
   primaryModules: SavedModule[]

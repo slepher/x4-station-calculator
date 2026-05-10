@@ -14,6 +14,9 @@ import { findGroupProducingWare } from './productionLineSearch'
 interface GraphNode extends Omit<BuildFlowPlanLine, 'trackedWares'> {
   trackedWares: Set<string>
 }
+
+export const ROOT_BUILD_COST_KEY = '__root_build_cost__'
+
 type Graph = {
   nodes: Map<string, GraphNode>
   edges: BuildFlowPlanEdge[]
@@ -177,7 +180,7 @@ function findSCCs(graph: Graph): string[][] {
     adj.set(key, [])
   }
   for (const edge of graph.edges) {
-    if (edge.fromLineKey !== '__C__' && graph.nodes.has(edge.fromLineKey)) {
+    if (edge.fromLineKey !== ROOT_BUILD_COST_KEY && graph.nodes.has(edge.fromLineKey)) {
       const list = adj.get(edge.fromLineKey)
       if (list && !list.includes(edge.toLineKey)) {
         list.push(edge.toLineKey)
@@ -263,7 +266,12 @@ export function buildFlowPlanGraph(
     fromLabel: string
     isIsolatedExpansion: boolean
   }
-  const queue: QueueItem[] = [{ wareIds: targetWares, fromKey: '__C__', fromLabel: 'target buildCost', isIsolatedExpansion: false }]
+  const queue: QueueItem[] = [{
+    wareIds: targetWares,
+    fromKey: ROOT_BUILD_COST_KEY,
+    fromLabel: 'target line buildCost',
+    isIsolatedExpansion: false,
+  }]
   const addedGroups = new Set<string>()
 
   while (queue.length > 0) {
@@ -276,7 +284,7 @@ export function buildFlowPlanGraph(
         if (result) {
           conn = result
         }
-      } else if (item.fromKey === '__C__') {
+      } else if (item.fromKey === ROOT_BUILD_COST_KEY) {
         conn = findOutputBuildConnection(wid, buildFlowView)
       } else {
         conn = findLineBuildMaterialConnection(wid, buildFlowView, item.fromKey)

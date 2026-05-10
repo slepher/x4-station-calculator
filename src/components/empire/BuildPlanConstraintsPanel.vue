@@ -6,9 +6,9 @@ import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useTitleEditor } from '@/composables/useTitleEditor'
 import BuildGoalSearchBox from './BuildGoalSearchBox.vue'
 import FleetGoalCard from './FleetGoalCard.vue'
-import ProductionLineAllocationSection from './ProductionLineAllocationSection.vue'
+import PreviewLinePlanSection from './PreviewLinePlanSection.vue'
 import WarePlanningItem from './WarePlanningItem.vue'
-import { type BuildGoal, type ProductionLineAllocation, type FleetGoalView } from '@/types/build-plan'
+import { type BuildGoal, type PreviewLinePlan, type ProductionLineAllocation, type FleetGoalView } from '@/types/build-plan'
 import type { PlanItem } from '@/components/empire/presenters/useBuildPlanPresenter'
 
 const props = defineProps<{
@@ -22,8 +22,8 @@ const props = defineProps<{
   activePlanId: string | null
   loadablePlanItems: PlanItem[]
   allocations: ProductionLineAllocation[]
-  buildMaterialPreviewAllocations?: ProductionLineAllocation[]
-  productionPreviewAllocations?: ProductionLineAllocation[]
+  buildMaterialPreviewLines?: PreviewLinePlan[]
+  productionPreviewLines?: PreviewLinePlan[]
   buildFlowPlanLoading?: boolean
   fleetGoalView?: FleetGoalView | null
 }>()
@@ -306,26 +306,16 @@ onUnmounted(() => {
         </div>
       </div>
 
-      <template v-if="(buildMaterialPreviewAllocations && buildMaterialPreviewAllocations.length > 0) || (productionPreviewAllocations && productionPreviewAllocations.length > 0)">
-        <ProductionLineAllocationSection
-          v-if="buildMaterialPreviewAllocations && buildMaterialPreviewAllocations.length > 0"
-          :allocations="buildMaterialPreviewAllocations"
-          :goals="goals"
-          :racePreference="racePreference"
-          readonly
+      <template v-if="(buildMaterialPreviewLines && buildMaterialPreviewLines.length > 0) || (productionPreviewLines && productionPreviewLines.length > 0)">
+        <PreviewLinePlanSection
+          v-if="buildMaterialPreviewLines && buildMaterialPreviewLines.length > 0"
+          :lines="buildMaterialPreviewLines"
           :title="t('build_plan.build_material_allocation')"
-          @update-goal="onUpdateGoal"
-          @remove-goal="onRemoveGoal"
         />
-        <ProductionLineAllocationSection
-          v-if="productionPreviewAllocations && productionPreviewAllocations.length > 0"
-          :allocations="productionPreviewAllocations"
-          :goals="goals"
-          :racePreference="racePreference"
-          readonly
+        <PreviewLinePlanSection
+          v-if="productionPreviewLines && productionPreviewLines.length > 0"
+          :lines="productionPreviewLines"
           :title="t('build_plan.group_production')"
-          @update-goal="onUpdateGoal"
-          @remove-goal="onRemoveGoal"
         />
       </template>
 

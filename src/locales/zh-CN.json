@@ -68,7 +68,7 @@
     "derived_locked": "自动生成，数量由计算阶段确定",
     "target_short": "目标",
     "build_material_short": "建材",
-    "production_short": "产出",
+    "production_short": "材料",
     "required_short": "需求",
     "new_plan": "新建",
     "no_plans": "暂无已保存的方案",
