@@ -196,6 +196,7 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
         groupId: undefined,
         groupName: '',
         isUnmatched: true,
+        lineage: 'default',
         goals: [...buildPlanStore.buildGoals],
       }
       return buildPlanStore.buildGoals.length > 0 ? [unmatched] : []
@@ -339,6 +340,7 @@ function previewLineToAllocation(line: PreviewLinePlan): ProductionLineAllocatio
     groupId: line.groupId,
     groupName: line.groupName,
     isUnmatched: line.isUnmatched,
+    lineage: line.lineage,
     goals: line.responsibilities.flatMap((responsibility): BuildGoal[] => {
       if (responsibility.type === 'target-production') {
         if (responsibility.moduleId) {

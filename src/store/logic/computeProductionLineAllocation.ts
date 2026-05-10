@@ -367,8 +367,11 @@ export function computeProductionLineAllocation(
   const result: ProductionLineAllocation[] = []
 
   const groupIdToName = new Map<string, string>()
+  const groupIdToLineage = new Map<string, string>()
   for (const g of flowGroups) {
     groupIdToName.set(g.id, g.name || g.id)
+    const lineage = g.isLocked ? (g.lockedLineage || g.subCategory) : g.subCategory
+    groupIdToLineage.set(g.id, lineage || 'default')
   }
 
   for (const [groupId, goalList] of groupMap) {
@@ -393,6 +396,7 @@ export function computeProductionLineAllocation(
         groupId,
         groupName: groupIdToName.get(groupId) || groupId,
         isUnmatched: false,
+        lineage: groupIdToLineage.get(groupId) || 'default',
         goals,
       })
     }
@@ -403,6 +407,7 @@ export function computeProductionLineAllocation(
       groupId: undefined,
       groupName: '',
       isUnmatched: true,
+      lineage: 'default',
       goals: unmatchedGoals,
     })
   }

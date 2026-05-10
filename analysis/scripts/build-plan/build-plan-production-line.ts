@@ -204,6 +204,7 @@ const lineAllocations: ProductionLineAllocation[] = preview.lines.map(line => ({
   groupId: line.groupId,
   groupName: line.groupName,
   isUnmatched: line.isUnmatched,
+  lineage: line.lineage,
   goals: line.responsibilities.flatMap(r => {
     if (r.type === 'target-production') {
       if (r.moduleId) {

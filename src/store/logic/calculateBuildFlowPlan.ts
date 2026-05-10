@@ -241,7 +241,8 @@ function computeModuleSummaries(
 export function expandGoalDependencies(
   goal: BuildGoal,
   modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>
+  waresMap: Record<string, X4Ware>,
+  racePreference: string = 'argon',
 ): SavedModule[] {
   const required: Record<string, number> = {}
 
@@ -252,7 +253,7 @@ export function expandGoalDependencies(
   function expandWareUpstream(wareId: string, targetRate: number, visited: Set<string>) {
     if (visited.has(wareId)) return
     visited.add(wareId)
-    const producer = findBestProducer(wareId, 'argon', [], modulesMap, waresMap)
+    const producer = findBestProducer(wareId, racePreference, [], modulesMap, waresMap)
     if (!producer) return
     const outputRate = producer.outputs[wareId] || 0
     if (outputRate <= 0) return
@@ -1296,9 +1297,10 @@ export function splitTargetLineSchemes(
   function makeLineScheme(
     lineName: string,
     goals: BuildGoal[],
+    lineage: string = settings.racePreference,
   ): BuildScheme | null {
     if (goals.length === 0) return null
-    const baseModules = goals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap))
+    const baseModules = goals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap, lineage))
     const merged = mergeModules(baseModules)
     const autoFill = autoFillForLine(
       merged,
@@ -1373,7 +1375,7 @@ export function splitTargetLineSchemes(
 
   for (const alloc of allocations) {
     if (alloc.isUnmatched) continue
-    const scheme = makeLineScheme(alloc.groupName, alloc.goals)
+    const scheme = makeLineScheme(alloc.groupName, alloc.goals, alloc.lineage)
     if (scheme) {
       ;(scheme as any)._groupId = alloc.groupId
       schemes.push(scheme)
@@ -1382,7 +1384,7 @@ export function splitTargetLineSchemes(
 
   const unmatchedAlloc = allocations.find(a => a.isUnmatched)
   if (unmatchedAlloc && unmatchedAlloc.goals.length > 0) {
-    const scheme = makeLineScheme('待规划产线', unmatchedAlloc.goals)
+    const scheme = makeLineScheme('待规划产线', unmatchedAlloc.goals, unmatchedAlloc.lineage)
     if (scheme) {
       ;(scheme as any)._groupId = undefined
       schemes.push(scheme)

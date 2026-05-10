@@ -22,6 +22,7 @@ const { t } = useI18n()
 
 const searchInput = ref<HTMLInputElement | null>(null)
 const searchBoxEl = ref<HTMLDivElement | null>(null)
+const fleetSearchBoxRef = ref<InstanceType<typeof FleetGoalSearchBox> | null>(null)
 const isFocused = ref(false)
 const focusSnapshot = ref('')
 const popoverPosition = ref({ top: 0, left: 0 })
@@ -30,6 +31,13 @@ const selectedCategory = ref<'product' | 'module' | 'fleet'>('product')
 
 watch(selectedCategory, () => {
   searchQuery.value = ''
+  nextTick(() => {
+    if (selectedCategory.value === 'fleet') {
+      fleetSearchBoxRef.value?.searchInput?.focus()
+    } else {
+      searchInput.value?.focus()
+    }
+  })
 })
 
 const filteredWaresGrouped = computed<WareGroupResult[]>(() => {
@@ -153,23 +161,33 @@ const categoryOptions = computed(() => [
 
 <template>
   <div class="goal-search-box-container">
-    <FleetGoalSearchBox
-      v-if="selectedCategory === 'fleet'"
-      @addFleetEntry="(shipId, blueprintId) => emit('addFleetEntry', shipId, blueprintId)"
-    />
-    <template v-else>
-      <div ref="searchBoxEl" class="search-box-wrapper group" :class="{ 'focused': isFocused }">
-      <input
-        ref="searchInput"
-        :value="searchQuery"
-        class="search-input"
-        data-testid="goal-search-input"
-        :placeholder="t('build_plan.search_placeholder')"
-        @input="searchQuery = ($event.target as HTMLInputElement).value"
-        @focus="onFocus"
-        @blur="onBlur"
-        @keydown.esc="onEsc"
-      />
+    <div ref="searchBoxEl" class="search-box-wrapper group" :class="{ 'focused': isFocused }">
+      <template v-if="selectedCategory === 'fleet'">
+        <FleetGoalSearchBox
+          ref="fleetSearchBoxRef"
+          @addFleetEntry="(shipId, blueprintId) => emit('addFleetEntry', shipId, blueprintId)"
+        />
+      </template>
+      <template v-else>
+        <input
+          ref="searchInput"
+          :value="searchQuery"
+          class="search-input"
+          data-testid="goal-search-input"
+          :placeholder="t('build_plan.search_placeholder')"
+          @input="searchQuery = ($event.target as HTMLInputElement).value"
+          @focus="onFocus"
+          @blur="onBlur"
+          @keydown.esc="onEsc"
+        />
+        <button
+          v-show="searchQuery"
+          class="clear-btn opacity-0 group-hover:opacity-100 transition-opacity duration-200"
+          @mousedown.prevent="onClearClick"
+        >
+          ×
+        </button>
+      </template>
       <select
         v-model="selectedCategory"
         class="category-select"
@@ -179,13 +197,6 @@ const categoryOptions = computed(() => [
           {{ opt.label }}
         </option>
       </select>
-      <button
-        v-show="searchQuery"
-        class="clear-btn opacity-0 group-hover:opacity-100 transition-opacity duration-200"
-        @mousedown.prevent="onClearClick"
-      >
-        ×
-      </button>
     </div>
 
     <Teleport to="body">
@@ -255,7 +266,6 @@ const categoryOptions = computed(() => [
         </div>
       </Transition>
     </Teleport>
-    </template>
   </div>
 </template>
 

@@ -65,6 +65,7 @@ export interface ProductionLineAllocation {
   groupId?: string
   groupName: string
   isUnmatched: boolean
+  lineage: string
   goals: BuildGoal[]
 }
 
@@ -259,6 +260,7 @@ export interface PreviewLinePlan {
   groupId?: string
   groupName: string
   isUnmatched: boolean
+  lineage: string
   responsibilities: PreviewResponsibility[]
 }
 

@@ -162,7 +162,8 @@ function computeModuleSummaries(
 function expandGoalDependencies(
   goal: BuildGoal,
   modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>
+  waresMap: Record<string, X4Ware>,
+  racePreference: string = 'argon',
 ): SavedModule[] {
   const required: Record<string, number> = {}
 
@@ -173,7 +174,7 @@ function expandGoalDependencies(
   function expandWareUpstream(wareId: string, targetRate: number, visited: Set<string>) {
     if (visited.has(wareId)) return
     visited.add(wareId)
-    const producer = findBestProducer(wareId, 'argon', [], modulesMap, waresMap)
+    const producer = findBestProducer(wareId, racePreference, [], modulesMap, waresMap)
     if (!producer) return
     const outputRate = producer.outputs[wareId] || 0
     if (outputRate <= 0) return
@@ -483,7 +484,7 @@ export function calculateBuildPlan(input: CalculateBuildPlanInput): BuildPlan {
   const allSchemes: BuildScheme[] = []
 
   if (goals.length > 0) {
-    const base3 = goals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap))
+    const base3 = goals.flatMap(g => expandGoalDependencies(g, modulesMap, waresMap, settings.racePreference))
     const merged3 = mergeModules(base3)
     const autoFill3 = calculateAutoFillModules({
       plannedModules: merged3,
@@ -971,7 +972,7 @@ const aPurposeWares = Object.keys(rC).filter(w => w !== 'energycells')
   if (goals.length === 0 && bootstrapMode !== BootstrapMode.None) {
     const seedWares = ['claytronics', 'hullparts']
     const base = seedWares.flatMap(wareId =>
-      expandGoalDependencies({ type: 'production-rate', wareId, ratePerHour: 1 }, modulesMap, waresMap)
+      expandGoalDependencies({ type: 'production-rate', wareId, ratePerHour: 1 }, modulesMap, waresMap, settings.racePreference)
     )
     const autoFill = calculateAutoFillModules({
       plannedModules: base,

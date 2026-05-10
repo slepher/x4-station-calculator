@@ -267,7 +267,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       transportShipCapacity: 62000, enforceDlcActivation: false,
     }
 
-    const baseModules = goals.flatMap((goal) => expandGoalDependencies(goal, deps.modulesMap, deps.waresMap))
+    const baseModules = goals.flatMap((goal) => expandGoalDependencies(goal, deps.modulesMap, deps.waresMap, settings.racePreference))
     const mergedTargetModules = mergeModules(baseModules)
     const autoFillTargetModules = calculateAutoFillModules({
       plannedModules: mergedTargetModules,
@@ -512,6 +512,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
         groupId: line.groupId,
         groupName: line.groupName,
         isUnmatched: line.isUnmatched,
+        lineage: line.lineage,
         goals: line.responsibilities.flatMap((responsibility): BuildGoal[] => {
           if (responsibility.type === 'target-production') {
             if (responsibility.moduleId) {

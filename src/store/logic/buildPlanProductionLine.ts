@@ -98,7 +98,7 @@ export function buildTargetModulesForProductionLine(
   settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
 ): { enrichedGoals: BuildGoal[]; targetModules: SavedModule[] } {
   const enrichedGoals = enrichGoalsWithIsolatedRequirements(goals, groups)
-  const baseModules = enrichedGoals.flatMap(goal => expandGoalDependencies(goal, modulesMap, waresMap))
+  const baseModules = enrichedGoals.flatMap(goal => expandGoalDependencies(goal, modulesMap, waresMap, settings.racePreference))
   const mergedBase = mergeModules(baseModules)
   const autoFill = autoFillForLine(mergedBase, enrichedGoals, settings, modulesMap, waresMap)
   return {
@@ -113,6 +113,7 @@ export function buildTargetModulesForProductionLine(
  */
 export function computePreviewLinePlans(
   graph: BuildFlowPlanGraph,
+  lineageByGroupId: Map<string, string> = new Map(),
 ): PreviewLinePlan[] {
   const consumerRequired = new Map<string, Set<string>>()
   const producerSupplied = new Map<string, Set<string>>()
@@ -168,6 +169,7 @@ export function computePreviewLinePlans(
       groupId,
       groupName: node.lineName,
       isUnmatched: false,
+      lineage: lineageByGroupId.get(groupId) || 'default',
       responsibilities,
     })
   }
@@ -229,15 +231,21 @@ export function createBuildFlowPlanPreview(
     }
   }
 
+  const lineageByGroupId = new Map<string, string>()
+  for (const group of groups) {
+    const lineage = group.isLocked ? (group.lockedLineage || group.subCategory) : group.subCategory
+    lineageByGroupId.set(group.id, lineage || 'default')
+  }
+
   const { targetModules } = buildTargetModulesForProductionLine(goals, groups, modulesMap, waresMap, settings)
   const graph = buildFlowPlanGraph(targetModules, buildFlowView, modulesMap, groups)
 
   // 1. Graph-based lines (derived-build-material + derived-production + required-production responsibilities)
-  const graphLines = computePreviewLinePlans(graph)
+  const graphLines = computePreviewLinePlans(graph, lineageByGroupId)
 
   // 2. Compute production allocations (target-production responsibilities)
   // 3. Merge: graph-based lines + target-production responsibilities from allocations
-  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations)
+  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId)
 
   return {
     buildMaterialPlanningEnabled: true,
@@ -255,6 +263,7 @@ export function createBuildFlowPlanPreview(
 function mergeGraphAndAllocationLines(
   graphLines: PreviewLinePlan[],
   allocations: { groupId?: string; groupName: string; isUnmatched: boolean; goals: BuildGoal[] }[],
+  lineageByGroupId: Map<string, string> = new Map(),
 ): PreviewLinePlan[] {
   const result: PreviewLinePlan[] = [...graphLines]
   const graphGroupIds = new Set(graphLines.map(l => l.groupId).filter(Boolean) as string[])
@@ -288,6 +297,7 @@ function mergeGraphAndAllocationLines(
       groupId: alloc.groupId,
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
+      lineage: (alloc.groupId && lineageByGroupId.get(alloc.groupId)) || 'default',
       responsibilities: alloc.goals
         .map(g => goalToResponsibility(g, `goal:${alloc.groupId || 'unmatched'}`, ++respIdCounter, alloc.groupId))
         .filter(resp => isGraphOverlap
@@ -392,6 +402,7 @@ function buildAllocationOnlyPreviewLines(
       groupId: alloc.groupId,
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
+      lineage: alloc.lineage || 'default',
       responsibilities: dedupeResponsibilities(responsibilities),
     }
   })
@@ -730,7 +741,7 @@ function seedResolvedModulesFromTargets(
 
     const targetRates: Record<string, number> = {}
     const goals = buildGoalsFromResponsibilities(seedResponsibilities, targetRates)
-    const allModules = computeGoalModules(goals, modulesMap, waresMap, settings)
+    const allModules = computeGoalModules(goals, modulesMap, waresMap, settings, previewLine.lineage)
     const primaryModules = separatePrimaryModules(allModules, goals, modulesMap)
     const auxiliaryModules = separateAuxiliaryModules(allModules, primaryModules)
     const lineResult: ComputeLineResult = {
@@ -768,7 +779,7 @@ function computeLineResult(
     settings,
   )
   const mergedGoals = buildGoalsFromResponsibilities(mergedResponsibilities, targetRates)
-  const allModules = computeGoalModules(mergedGoals, modulesMap, waresMap, settings)
+  const allModules = computeGoalModules(mergedGoals, modulesMap, waresMap, settings, previewLine.lineage)
   const primaryModules = separatePrimaryModules(allModules, mergedGoals, modulesMap)
   const auxiliaryModules = separateAuxiliaryModules(allModules, primaryModules)
 
@@ -990,8 +1001,9 @@ function computeGoalModules(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings,
+  lineage: string = 'argon',
 ): SavedModule[] {
-  const baseModules = expandGoalsRespectingLockedWares(goals, modulesMap, waresMap)
+  const baseModules = expandGoalsRespectingLockedWares(goals, modulesMap, waresMap, lineage)
   const merged = mergeModules(baseModules)
   const autoFill = autoFillForLine(merged, goals, settings, modulesMap, waresMap)
   return mergeModules([...merged, ...autoFill.autoIndustryModules, ...autoFill.autoHabitationModules])
@@ -1001,6 +1013,7 @@ function expandGoalsRespectingLockedWares(
   goals: BuildGoal[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
+  racePreference: string,
 ): SavedModule[] {
   const lockedWares = new Set(
     goals
@@ -1018,7 +1031,7 @@ function expandGoalsRespectingLockedWares(
     if (visited.has(wareId)) return
     visited.add(wareId)
 
-    const producer = findBestProducer(wareId, 'argon', [], modulesMap, waresMap)
+    const producer = findBestProducer(wareId, racePreference, [], modulesMap, waresMap)
     if (!producer) return
     const outputRate = producer.outputs[wareId] || 0
     if (outputRate <= 0) return
@@ -1200,6 +1213,7 @@ function toCompatAllocation(
     groupId: line.groupId,
     groupName: line.groupName,
     isUnmatched: line.isUnmatched,
+    lineage: line.lineage,
     goals,
   }
 }
@@ -1242,6 +1256,7 @@ export function computeBuildFlowPlanSchemeGroups(
       groupId: line.groupId,
       groupName: line.groupName,
       isUnmatched: false,
+      lineage: preview.lines.find(pl => pl.groupId === line.groupId)?.lineage || 'default',
       goals: buildGoalsFromResponsibilities(line.mergedResponsibilities, line.targetRates),
     })),
     schemeGroups: result.schemeGroups,
