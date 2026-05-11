@@ -10,6 +10,7 @@ import type {
   LocalizedX4Module,
   LocalizedX4ModuleGroup,
   LocalizedX4Ware,
+  LocalizedX4Ship,
   ModuleGroupResult,
   VersionConfig,
   VersionsFile,
@@ -41,6 +42,7 @@ import {
   buildLocalizedModulesMap,
   buildLocalizedModuleGroupsMap,
   buildLocalizedWaresMap,
+  buildLocalizedShipsMap,
   findModuleForWare as findModuleForWareFn,
   precomputeCandidateWares
 } from './logic/useGameData'
@@ -58,7 +60,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     }
   })
   const t = i18n.global.t.bind(i18n.global)
-  const { translateModule, translateModuleGroup, translateWare, translateDlc } = useX4I18n()
+  const { translateModule, translateModuleGroup, translateWare, translateDlc, translateShip } = useX4I18n()
 
   // Version management state
   const versionsConfig = ref<VersionConfig[]>([])
@@ -77,6 +79,7 @@ export const useGameDataStore = defineStore('gameData', () => {
   const modulesByOutputMap = ref<Record<string, X4Module[]>>({})
   const localizedModulesMap = ref<Record<string, LocalizedX4Module>>({})
   const localizedWaresMap = ref<Record<string, LocalizedX4Ware>>({})
+  const localizedShipsMap = ref<Record<string, LocalizedX4Ship>>({})
   const localizedModuleGroupsMap = ref<Record<string, LocalizedX4ModuleGroup>>({})
   const workforceConsumptionMap = ref<WorkforceConsumptionMap>({})
   const wareSetsByIndustrialRace = ref<Record<string, Set<string>>>({})
@@ -422,6 +425,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     drones.value = data.drones
     consumables.value = data.consumables
     ships.value = data.ships
+    localizedShipsMap.value = buildLocalizedShipsMap(data.ships, isEn, translateShip)
     equipments.value = data.equipments
     maps.value = data.maps
     regionyields.value = data.regionyields
@@ -476,6 +480,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     if (gameData.value) {
       localizedModulesMap.value = buildLocalizedModulesMap(gameData.value.modules, isEn, translateModule)
       localizedModuleGroupsMap.value = buildLocalizedModuleGroupsMap(gameData.value.moduleGroups, isEn, translateModuleGroup)
+      localizedShipsMap.value = buildLocalizedShipsMap(gameData.value.ships, isEn, translateShip)
     }
 
     const { wareSetsByIndustrialRace: industrial, wareSetsByRace: race } = precomputeCandidateWares(
@@ -499,6 +504,7 @@ export const useGameDataStore = defineStore('gameData', () => {
       if (gameData.value) {
         localizedModulesMap.value = buildLocalizedModulesMap(gameData.value.modules, isEn, translateModule)
         localizedModuleGroupsMap.value = buildLocalizedModuleGroupsMap(gameData.value.moduleGroups, isEn, translateModuleGroup)
+        localizedShipsMap.value = buildLocalizedShipsMap(gameData.value.ships, isEn, translateShip)
       }
 
       const { wareSetsByIndustrialRace: industrial, wareSetsByRace: race } = precomputeCandidateWares(
@@ -537,6 +543,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     modulesByOutputMap,
     localizedModulesMap,
     localizedWaresMap,
+    localizedShipsMap,
     localizedModuleGroupsMap,
     workforceConsumptionMap,
     wareSetsByIndustrialRace,

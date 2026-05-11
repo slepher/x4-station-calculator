@@ -337,7 +337,10 @@ export function createBuildFlowPlanPreview(
   }
 
   const targetModules = buildPreviewTargetModulesForProductionLine(goals, allocations, groups)
-  const graph = buildFlowPlanGraph(targetModules, buildFlowView, modulesMap, groups)
+  const targetGroupIds = allocations
+    .filter(a => a.groupId && a.goals.some(g => g.type === 'build-module' || g.type === 'production-rate'))
+    .map(a => a.groupId!)
+  const graph = buildFlowPlanGraph(targetModules, buildFlowView, modulesMap, groups, targetGroupIds)
   graph.targetGoalWareIds = extractTargetGoalWares(goals, modulesMap)
 
   // 1. Graph-based lines (derived-build-material + derived-production + required-production responsibilities)

@@ -376,6 +376,7 @@ export interface X4GameData {
 export type LocalizedX4Module = X4Module & { localeName: string }
 export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
 export type LocalizedX4Ware = X4Ware & { localeName: string }
+export type LocalizedX4Ship = X4Ship & { localeName: string }
 
 export interface GroupedWareItem extends LocalizedX4Ware {
   displayLabel: string

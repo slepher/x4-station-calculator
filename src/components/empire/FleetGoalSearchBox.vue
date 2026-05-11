@@ -2,15 +2,15 @@
 import { ref, computed, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import { useX4I18n } from '@/utils/UseX4I18n'
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 const emit = defineEmits<{
   addFleetEntry: [shipId: string, blueprintId: string]
 }>()
 
 const shipBuildStore = useShipBuildStore()
+const gameData = useGameDataStore()
 const { t } = useI18n()
-const { translateShip } = useX4I18n()
 
 const searchInput = ref<HTMLInputElement | null>(null)
 const isFocused = ref(false)
@@ -21,6 +21,9 @@ const searchQuery = ref('')
 interface FleetSearchShip {
   shipId: string
   shipName: string
+  displayLabel: string
+  localeName: string
+  name: string
   className: string
   classOrder: number
   blueprints: Array<{ id: string; name: string }>
@@ -36,17 +39,22 @@ const CLASS_ORDER: Record<string, number> = {
 const shipItems = computed<FleetSearchShip[]>(() => {
   const result: FleetSearchShip[] = []
   for (const bucket of shipBuildStore.savedBlueprints.ships) {
-    const ship = shipBuildStore.findShip(bucket.shipId)
-    if (!ship) continue
+    const localizedShip = gameData.localizedShipsMap[bucket.shipId]
+    if (!localizedShip) continue
     const userBlueprints = bucket.blueprints.filter(
       (bp) => !shipBuildStore.isBuiltInBlueprintId(bp.id)
     )
     if (userBlueprints.length === 0) continue
+    const localeName = localizedShip.localeName || ''
+    const originalName = localizedShip.name || ''
     result.push({
       shipId: bucket.shipId,
-      shipName: translateShip(ship),
-      className: ship.class,
-      classOrder: CLASS_ORDER[ship.class] ?? 99,
+      shipName: localeName || originalName || localizedShip.id,
+      displayLabel: localeName || originalName || localizedShip.id,
+      localeName,
+      name: originalName,
+      className: localizedShip.class,
+      classOrder: CLASS_ORDER[localizedShip.class] ?? 99,
       blueprints: userBlueprints.map((bp) => ({
         id: bp.id,
         name: bp.name || bp.id,
@@ -58,12 +66,39 @@ const shipItems = computed<FleetSearchShip[]>(() => {
 
 const filteredResults = computed<FleetSearchShip[]>(() => {
   const query = searchQuery.value.toLowerCase().trim()
+  const isEn = gameData.currentLocale === 'en'
   let items = shipItems.value
   if (query) {
     items = items.filter((item) => {
-      if (item.shipName.toLowerCase().includes(query)) return true
+      const localeName = item.localeName.toLowerCase()
+      const originalName = item.name.toLowerCase()
+      const id = item.shipId.toLowerCase()
+      if (isEn) {
+        if (originalName.includes(query) || id.includes(query)) return true
+      } else {
+        if (localeName.includes(query) || originalName.includes(query) || id.includes(query)) return true
+      }
       return item.blueprints.some((bp) => bp.name.toLowerCase().includes(query))
+    }).map((item) => {
+      const localeName = item.localeName.toLowerCase()
+      const originalName = item.name.toLowerCase()
+      const id = item.shipId.toLowerCase()
+      const localeHit = !isEn && localeName.includes(query)
+      const nameHit = originalName.includes(query)
+      const idHit = id.includes(query)
+
+      let label = item.localeName || item.name || item.shipId
+      if (isEn) {
+        if (idHit && !nameHit) label += ` (${item.shipId})`
+      } else {
+        if (nameHit && !localeHit) label += ` (${item.name})`
+        else if (idHit && !localeHit && !nameHit) label += ` (${item.shipId})`
+      }
+
+      return { ...item, displayLabel: label }
     })
+  } else {
+    items = items.map((item) => ({ ...item, displayLabel: item.localeName || item.name || item.shipId }))
   }
   return items.sort((a, b) => {
     if (a.classOrder !== b.classOrder) return a.classOrder - b.classOrder
@@ -185,7 +220,7 @@ defineExpose({ searchInput, isFocused, searchQuery, onFocus, onBlur, onEsc, onCl
           >
             <div class="group-header">
               <span class="class-badge">{{ CLASS_LABELS[ship.className] || ship.className }}</span>
-              {{ ship.shipName }}
+              {{ ship.displayLabel }}
             </div>
             <div
               v-for="bp in ship.blueprints"

@@ -26,6 +26,7 @@ import type {
 export type LocalizedX4Module = X4Module & { localeName: string }
 export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
 export type LocalizedX4Ware = X4Ware & { localeName: string }
+export type LocalizedX4Ship = X4Ship & { localeName: string }
 export type ShipBuildDatas = {
   shipMap: Map<string, X4Ship>
   shipByMacroMap: Map<string, X4Ship>
@@ -315,6 +316,21 @@ export function buildLocalizedWaresMap(
     map[w.id] = {
       ...w,
       localeName: isEn ? (w.name || '') : translateWare(w)
+    }
+  })
+  return map
+}
+
+export function buildLocalizedShipsMap(
+  ships: X4Ship[],
+  isEn: boolean,
+  translateShip: (s: X4Ship) => string
+): Record<string, LocalizedX4Ship> {
+  const map: Record<string, LocalizedX4Ship> = {}
+  ships.forEach(s => {
+    map[s.id] = {
+      ...s,
+      localeName: isEn ? (s.name || '') : translateShip(s)
     }
   })
   return map

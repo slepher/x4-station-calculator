@@ -241,6 +241,7 @@ export function buildFlowPlanGraph(
   buildFlowView: BuildFlowPlanView | null,
   modulesMap: Record<string, X4Module>,
   groups: ProductionLineGroup[] = [],
+  targetGroupIds: string[] = [],
 ): BuildFlowPlanGraph {
   const graph: Graph = {
     nodes: new Map(),
@@ -273,6 +274,18 @@ export function buildFlowPlanGraph(
     isIsolatedExpansion: false,
   }]
   const addedGroups = new Set<string>()
+
+  for (const groupId of targetGroupIds) {
+    const isolatedWares = getGroupIsolatedWares(groupId, groups)
+    if (isolatedWares.length > 0) {
+      queue.push({
+        wareIds: isolatedWares,
+        fromKey: ROOT_BUILD_COST_KEY,
+        fromLabel: 'target line isolated',
+        isIsolatedExpansion: true,
+      })
+    }
+  }
 
   while (queue.length > 0) {
     const item = queue.shift()!
