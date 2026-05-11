@@ -6,7 +6,7 @@ import type {
   BuildFlowAssignment,
   VirtualEdge,
 } from '@/types/x4'
-import { findGroupWithIsolatedWare } from './productionLineSearch'
+import { generateDerivedGoalsFromLogicFlow } from './logicFlowResponsibility'
 
 interface BuildFlowView {
   buildFlowGroups: BuildFlowGroup[]
@@ -54,126 +54,6 @@ function findConnection(
 }
 
 /**
- * 查找生产指定 ware 的模块（取第一个）
- */
-function findModuleForWare(
-  wareId: string,
-  modulesByOutputMap: Record<string, X4Module[]>,
-): X4Module | undefined {
-  const modules = modulesByOutputMap[wareId]
-  if (modules && modules.length > 0) {
-    return modules[0]
-  }
-  return undefined
-}
-
-/**
- * 构建 covered 集合
- */
-function buildCoveredSet(
-  goals: BuildGoal[],
-  flowGroups: ProductionLineGroup[],
-  modulesMap: Record<string, X4Module>,
-): Set<string> {
-  const covered = new Set<string>()
-
-  for (const goal of goals) {
-    if (goal.type === 'production-rate') {
-      covered.add(goal.wareId)
-    } else if (goal.type === 'build-module') {
-      const mod = modulesMap[goal.moduleId]
-      if (mod && mod.outputs) {
-        for (const w of Object.keys(mod.outputs)) {
-          covered.add(w)
-        }
-      }
-    }
-  }
-
-  for (const group of flowGroups) {
-    for (const node of group.nodes) {
-      if (!node.isIsolated) {
-        covered.add(node.wareId)
-      }
-    }
-  }
-
-  return covered
-}
-
-/**
- * 递归向上游遍历，生成派生 goals
- * @param covered 非孤立节点的已覆盖 ware 集合
- * @param seenIsolatedWares 已生成 derived goal 的孤立 ware 集合（防止重复）
- */
-function walkUpstream(
-  module: X4Module,
-  covered: Set<string>,
-  flowGroups: ProductionLineGroup[],
-  modulesByOutputMap: Record<string, X4Module[]>,
-  seenIsolatedWares: Set<string>,
-): BuildGoal[] {
-  if (!module || !module.inputs) return []
-  const derived: BuildGoal[] = []
-
-  for (const inputWareId of Object.keys(module.inputs)) {
-    const isolatedResult = findGroupWithIsolatedWare(inputWareId, flowGroups)
-    if (isolatedResult && !seenIsolatedWares.has(inputWareId)) {
-      derived.push({ type: 'derived-production', wareId: inputWareId, ratePerHour: 0 })
-      seenIsolatedWares.add(inputWareId)
-    }
-
-    if (covered.has(inputWareId)) continue
-
-    const nextModule = findModuleForWare(inputWareId, modulesByOutputMap)
-    if (nextModule) {
-      derived.push(...walkUpstream(nextModule, covered, flowGroups, modulesByOutputMap, seenIsolatedWares))
-    }
-  }
-
-  return derived
-}
-
-/**
- * 生成派生 goals
- */
-function generateDerivedGoals(
-  userGoals: BuildGoal[],
-  flowGroups: ProductionLineGroup[],
-  modulesMap: Record<string, X4Module>,
-  modulesByOutputMap: Record<string, X4Module[]>,
-): { derivedGoals: BuildGoal[]; requiredMap: Map<string, string[]> } {
-  const covered = buildCoveredSet(userGoals, flowGroups, modulesMap)
-  const seenIsolatedWares = new Set<string>()
-  const allDerived: BuildGoal[] = []
-  const requiredMap = new Map<string, string[]>()
-
-  for (const goal of userGoals) {
-    let mod: X4Module | undefined
-    if (goal.type === 'production-rate') {
-      mod = findModuleForWare(goal.wareId, modulesByOutputMap)
-    } else if (goal.type === 'build-module') {
-      mod = modulesMap[goal.moduleId]
-    }
-    if (!mod) continue
-
-    const beforeSize = seenIsolatedWares.size
-    const derived = walkUpstream(mod, covered, flowGroups, modulesByOutputMap, seenIsolatedWares)
-    if (seenIsolatedWares.size > beforeSize) {
-      const wares: string[] = []
-      for (const d of derived) {
-        if ('wareId' in d && d.wareId) wares.push(d.wareId)
-      }
-      const key = extractWareId(goal, modulesMap)
-      if (key) requiredMap.set(key, wares)
-    }
-    allDerived.push(...derived)
-  }
-
-  return { derivedGoals: allDerived, requiredMap }
-}
-
-/**
  * 产线自动分配核心算法
  */
 export function computeProductionLineAllocation(
@@ -190,7 +70,7 @@ export function computeProductionLineAllocation(
   let derivedGoalList: BuildGoal[] = []
   const requiredMap = new Map<string, string[]>()
   if (flowGroups.length > 0) {
-    const result = generateDerivedGoals(goals, flowGroups, modulesMap, modulesByOutputMap)
+    const result = generateDerivedGoalsFromLogicFlow(goals, flowGroups, buildFlowView, modulesMap, modulesByOutputMap)
     derivedGoalList = result.derivedGoals
     result.requiredMap.forEach((v, k) => requiredMap.set(k, v))
   }
@@ -378,16 +258,20 @@ export function computeProductionLineAllocation(
     if (goalList.length > 0) {
       const goals = [...goalList]
       // 添加 required-production
-      const existingWares = new Set(goals.map(g => (g as any).wareId))
+      const existingRequiredWares = new Set(
+        goals
+          .filter((goal): goal is Extract<BuildGoal, { type: 'required-production' }> => goal.type === 'required-production')
+          .map(goal => goal.wareId),
+      )
       for (const g of goalList) {
         const sourceKey = extractWareId(g, modulesMap)
         if (!sourceKey) continue
         const required = requiredMap.get(sourceKey)
         if (required) {
           for (const wareId of required) {
-            if (!existingWares.has(wareId)) {
+            if (!existingRequiredWares.has(wareId)) {
               goals.push({ type: 'required-production', wareId, ratePerHour: 0 })
-              existingWares.add(wareId)
+              existingRequiredWares.add(wareId)
             }
           }
         }

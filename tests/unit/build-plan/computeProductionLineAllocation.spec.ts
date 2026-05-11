@@ -529,4 +529,152 @@ describe('computeProductionLineAllocation', () => {
     expect(derived).toHaveLength(1)
     expect((derived[0] as { wareId: string }).wareId).toBe(wareRM)
   })
+
+  it('keeps required on isolated consumer and assigns derived to actual producer instead of auto fallback', () => {
+    const targetWare = 'missilecomponents'
+    const inputWare = 'energycells'
+    const targetModule = makeModule({
+      id: 'mod_missile',
+      outputs: { [targetWare]: 500 },
+      inputs: { [inputWare]: 100 },
+    })
+    const inputModule = makeModule({
+      id: 'mod_ec',
+      outputs: { [inputWare]: 1000 },
+      inputs: {},
+      race: 'terran',
+    })
+
+    const targetNode = makeNode({
+      wareId: targetWare,
+      source: 'manual',
+      moduleId: targetModule.id,
+    })
+    const targetIsolated = makeNode({
+      wareId: inputWare,
+      source: 'manual',
+      isIsolated: true,
+    })
+    const targetGroup = makeGroup({
+      id: 'g-target',
+      name: 'Missile Line',
+      nodes: [targetNode, targetIsolated],
+    })
+
+    const producerNode = makeNode({
+      wareId: inputWare,
+      source: 'manual',
+      moduleId: inputModule.id,
+      race: 'terran',
+      lineage: 'terran',
+    })
+    const producerGroup = makeGroup({
+      id: 'g-producer',
+      name: 'Explicit Energy Producer',
+      subCategory: 'terran',
+      nodes: [producerNode],
+    })
+
+    const autoEnergyNode = makeNode({
+      wareId: inputWare,
+      source: 'auto',
+      moduleId: inputModule.id,
+      race: 'terran',
+      lineage: 'terran',
+    })
+    const autoOwnerGroup = makeGroup({
+      id: 'g-auto',
+      name: 'Terran Auto Energy',
+      subCategory: 'terran',
+      nodes: [autoEnergyNode],
+    })
+
+    const goal: BuildGoal = { type: 'production-rate', wareId: targetWare, ratePerHour: 500 }
+    const result = computeProductionLineAllocation(
+      [goal],
+      [targetGroup, producerGroup, autoOwnerGroup],
+      null,
+      { [targetModule.id]: targetModule, [inputModule.id]: inputModule },
+      {
+        [targetWare]: [targetModule],
+        [inputWare]: [inputModule],
+      },
+    )
+
+    const targetAlloc = result.find((item) => item.groupId === 'g-target')
+    expect(targetAlloc).toBeDefined()
+    expect(targetAlloc!.goals.some((g) => g.type === 'derived-production' && 'wareId' in g && g.wareId === inputWare)).toBe(false)
+    expect(targetAlloc!.goals.some((g) => g.type === 'required-production' && 'wareId' in g && g.wareId === inputWare)).toBe(true)
+
+    const producerAlloc = result.find((item) => item.groupId === 'g-producer')
+    expect(producerAlloc).toBeDefined()
+    expect(producerAlloc!.goals.some((g) => g.type === 'derived-production' && 'wareId' in g && g.wareId === inputWare)).toBe(true)
+
+    const autoAlloc = result.find((item) => item.groupId === 'g-auto')
+    expect(autoAlloc?.goals.some((g) => 'wareId' in g && g.wareId === inputWare) ?? false).toBe(false)
+  })
+
+  it('does not treat isolated ware from unrelated group as upstream boundary for another goal owner', () => {
+    const targetWare = 'computronicsubstrate'
+    const inputWare = 'energycells'
+    const targetModule = makeModule({
+      id: 'mod_cs',
+      outputs: { [targetWare]: 400 },
+      inputs: { [inputWare]: 80 },
+      race: 'terran',
+    })
+    const inputModule = makeModule({
+      id: 'mod_ec',
+      outputs: { [inputWare]: 1000 },
+      inputs: {},
+      race: 'terran',
+    })
+
+    const terranGroup = makeGroup({
+      id: 'g-terran',
+      name: 'Terran Line',
+      subCategory: 'terran',
+      nodes: [
+        makeNode({
+          wareId: targetWare,
+          source: 'manual',
+          moduleId: targetModule.id,
+          race: 'terran',
+          lineage: 'terran',
+        }),
+      ],
+    })
+
+    const unrelatedGroup = makeGroup({
+      id: 'g-missile',
+      name: 'Missile Line',
+      nodes: [
+        makeNode({
+          wareId: 'missilecomponents',
+          source: 'manual',
+        }),
+        makeNode({
+          wareId: inputWare,
+          source: 'manual',
+          isIsolated: true,
+        }),
+      ],
+    })
+
+    const goal: BuildGoal = { type: 'production-rate', wareId: targetWare, ratePerHour: 400 }
+    const result = computeProductionLineAllocation(
+      [goal],
+      [terranGroup, unrelatedGroup],
+      null,
+      { [targetModule.id]: targetModule, [inputModule.id]: inputModule },
+      {
+        [targetWare]: [targetModule],
+        [inputWare]: [inputModule],
+      },
+    )
+
+    const terranAlloc = result.find((item) => item.groupId === 'g-terran')
+    expect(terranAlloc).toBeDefined()
+    expect(terranAlloc!.goals.some((g) => 'wareId' in g && g.wareId === inputWare)).toBe(false)
+  })
 })
