@@ -178,9 +178,16 @@ export function computePreviewLinePlans(
   const groupById = new Map(groups.map(group => [group.id, group]))
   const consumerRequired = new Map<string, Set<string>>()
   const producerSupplied = new Map<string, Set<string>>()
+  const producerBuildMaterial = new Map<string, Set<string>>()
 
   // 消费方通过 isolated 边声明它需要某 ware；供给方通过 isolated 边声明它提供某 ware
   for (const edge of graph.edges) {
+    if (edge.fromLineKey !== ROOT_BUILD_COST_KEY) {
+      const producerSet = producerBuildMaterial.get(edge.toLineKey) || new Set<string>()
+      producerSet.add(edge.wareId)
+      producerBuildMaterial.set(edge.toLineKey, producerSet)
+    }
+
     if (!edge.sourceLabel.includes('isolated')) continue
 
     const consumerSet = consumerRequired.get(edge.fromLineKey) || new Set<string>()
@@ -197,12 +204,16 @@ export function computePreviewLinePlans(
   for (const [groupId, node] of graph.nodes) {
     const items: PreviewItem[] = []
     const derivedSet = producerSupplied.get(groupId) || new Set<string>()
+    const buildMaterialSet = producerBuildMaterial.get(groupId) || new Set<string>()
     const requiredSet = consumerRequired.get(groupId) || new Set<string>()
     const group = groupById.get(groupId)
     const lineage = lineageByGroupId.get(groupId) || 'default'
 
     for (const wareId of node.trackedWares) {
-      const derivedTag: PreviewDerivedTag = derivedSet.has(wareId) ? 'production' : 'build-material'
+      const derivedTags: PreviewDerivedTag[] = []
+      if (buildMaterialSet.has(wareId)) derivedTags.push('build-material')
+      if (derivedSet.has(wareId)) derivedTags.push('production')
+      if (derivedTags.length === 0) derivedTags.push('build-material')
       const relatedLineGroupIds = collectRelatedLineGroupsForBuildMaterial(groupId, wareId, graph)
       const moduleId = resolvePreviewDerivedModuleId(wareId, group, lineage, modulesMap, waresMap)
       if (!moduleId) continue
@@ -210,7 +221,7 @@ export function computePreviewLinePlans(
         kind: 'derived',
         wareId,
         moduleId,
-        derived: [derivedTag],
+        derived: derivedTags,
         relatedLineGroupIds,
         sourceRef: `graph:${groupId}:${wareId}`,
       })
@@ -627,7 +638,6 @@ function computeTargetRatesForResponsibilities(
   settings: StationSettings,
 ): Record<string, number> {
   const targetProductionRates = collectTargetProductionRates(items)
-
   const rates: Record<string, number> = {}
 
   for (const item of items) {
@@ -639,10 +649,8 @@ function computeTargetRatesForResponsibilities(
     )
     const buildMaterialRates = computeTargetRatesFromBuildings(buildings, modulesMap)
     const rate = buildMaterialRates[item.wareId] || 0
-    const targetRate = targetProductionRates[item.wareId] || 0
-    const combinedRate = rate + targetRate
-    if (combinedRate <= 0) continue
-    rates[item.wareId] = (rates[item.wareId] || 0) + combinedRate
+    if (rate <= 0) continue
+    rates[item.wareId] = (rates[item.wareId] || 0) + rate
   }
 
   for (const item of items) {
@@ -655,10 +663,13 @@ function computeTargetRatesForResponsibilities(
       modulesMap,
       settings,
     )
-    const targetRate = targetProductionRates[item.wareId] || 0
-    const combinedRate = operationalRate + targetRate
-    if (combinedRate <= 0) continue
-    rates[item.wareId] = (rates[item.wareId] || 0) + combinedRate
+    if (operationalRate <= 0) continue
+    rates[item.wareId] = (rates[item.wareId] || 0) + operationalRate
+  }
+
+  for (const [wareId, targetRate] of Object.entries(targetProductionRates)) {
+    if (targetRate <= 0) continue
+    rates[wareId] = (rates[wareId] || 0) + targetRate
   }
 
   return rates
@@ -699,13 +710,12 @@ function computeOperationalDemandRateForWare(
     }
     if (modules.length === 0) continue
 
-    const netProduction = calculateNetProductionForModules(
-      modules,
-      modulesMap,
-      settings.sunlight,
-      settings.considerWorkforceForAutoFill,
-    )
-    const demand = -(netProduction[wareId] || 0)
+    let demand = 0
+    for (const module of modules) {
+      const definition = modulesMap[module.id]
+      if (!definition) continue
+      demand += (definition.inputs?.[wareId] || 0) * module.count
+    }
     if (demand > 0) totalRate += demand
   }
 
@@ -1055,13 +1065,7 @@ function buildDemandDetailForLine(
     }
   }
 
-  const aggregateRates: Record<string, number> = {}
   const gapRates: Record<string, number> = {}
-  for (const [wareId, rate] of Object.entries(line.targetRates)) {
-    if (buildMaterialWares.has(wareId)) {
-      aggregateRates[wareId] = rate
-    }
-  }
   for (const item of line.mergedItems) {
     if (item.kind !== 'derived' || !item.wareId || !item.derived.includes('production')) continue
     let rate = 0
@@ -1090,6 +1094,13 @@ function buildDemandDetailForLine(
       totalSeconds += seconds
       totalMaterialQty += qty
     }
+  }
+
+  const aggregateRates: Record<string, number> = {}
+  for (const wareId of buildMaterialWares) {
+    const totals = perWareTotals[wareId]
+    if (!totals || totals.seconds <= 0 || totals.qty <= 0) continue
+    aggregateRates[wareId] = totals.qty / (totals.seconds / 3600)
   }
 
   return {
@@ -1152,8 +1163,12 @@ function expandGoalsRespectingLockedWares(
 ): SavedModule[] {
   const lockedWares = new Set(
     goals
-      .filter((goal): goal is Extract<BuildGoal, { type: 'required-production' }> => goal.type === 'required-production')
-      .map(goal => goal.wareId),
+      .flatMap((goal) => {
+        if (goal.type === 'required-production') return [goal.wareId]
+        if (goal.type === 'production-rate') return [goal.wareId]
+        if (goal.type === 'target-production' && goal.wareId) return [goal.wareId]
+        return []
+      }),
   )
   const required: Record<string, number> = {}
 
@@ -1161,8 +1176,13 @@ function expandGoalsRespectingLockedWares(
     required[moduleId] = (required[moduleId] || 0) + count
   }
 
-  function expandWareUpstream(wareId: string, targetRate: number, visited: Set<string>): void {
-    if (lockedWares.has(wareId)) return
+  function expandWareUpstream(
+    wareId: string,
+    targetRate: number,
+    visited: Set<string>,
+    allowLockedRoot = false,
+  ): void {
+    if (lockedWares.has(wareId) && !allowLockedRoot) return
     if (visited.has(wareId)) return
     visited.add(wareId)
 
@@ -1200,7 +1220,7 @@ function expandGoalsRespectingLockedWares(
       || goal.type === 'derived-production'
       || goal.type === 'derived-build-material'
     ) {
-      expandWareUpstream(goal.wareId, goal.ratePerHour, new Set())
+      expandWareUpstream(goal.wareId, goal.ratePerHour, new Set(), true)
     }
   }
 
@@ -1269,7 +1289,25 @@ function buildGoalsFromItems(
   for (const [wareId, kinds] of wareKinds) {
     const ratePerHour = targetRates[wareId] || 0
     if (kinds.hasDerivedProduction) {
+      if (kinds.hasDerivedBuildMaterial) {
+        const combinedRate = ratePerHour + kinds.manualRate
+        if (combinedRate <= 0) continue
+        goals.push({
+          type: 'derived-build-material',
+          wareId,
+          ratePerHour: combinedRate,
+        })
+        continue
+      }
       if (ratePerHour <= 0) continue
+      if (kinds.manualRate > 0) {
+        goals.push({
+          type: 'production-rate',
+          wareId,
+          ratePerHour,
+        })
+        continue
+      }
       goals.push({
         type: 'derived-production',
         wareId,
@@ -1278,11 +1316,12 @@ function buildGoalsFromItems(
       continue
     }
     if (kinds.hasDerivedBuildMaterial) {
-      if (ratePerHour <= 0) continue
+      const combinedRate = ratePerHour + kinds.manualRate
+      if (combinedRate <= 0) continue
       goals.push({
         type: 'derived-build-material',
         wareId,
-        ratePerHour,
+        ratePerHour: combinedRate,
       })
       continue
     }
