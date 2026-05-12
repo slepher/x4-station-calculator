@@ -912,8 +912,8 @@
     "silicon": "硅"
   },
   "moduleNames": {
-    "sector": "星区",
-    "flow": "流程",
+    "sector": "蓝图产能",
+    "flow": "逻辑组网",
     "ship": "舰船",
     "save": "存档",
     "save_binding": "存档绑定",

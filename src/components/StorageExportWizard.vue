@@ -53,6 +53,49 @@ const exportFileName = ref(buildDefaultFileName())
 const moduleStats = ref<{ key: ImportModuleKey; count: number }[]>([])
 const includeSaveArchives = ref(false)
 
+type DisplayModuleKey = ImportModuleKey | 'x4_save_group'
+
+interface DisplayModule {
+  key: DisplayModuleKey
+  title: string
+  description: string
+  count: number
+}
+
+const displayModules = computed<DisplayModule[]>(() => {
+  const result: DisplayModule[] = []
+  let saveCount = 0
+  let bindingCount = 0
+
+  for (const entry of moduleStats.value) {
+    if (entry.key === 'x4_save_archives') {
+      saveCount = entry.count
+      continue
+    }
+    if (entry.key === 'x4_save_bindings') {
+      bindingCount = entry.count
+      continue
+    }
+    result.push({
+      key: entry.key,
+      title: moduleTitle(entry.key),
+      description: moduleDescription(entry.key),
+      count: entry.count
+    })
+  }
+
+  if (saveCount > 0 || bindingCount > 0) {
+    result.push({
+      key: 'x4_save_group',
+      title: t('moduleNames.save') + ' / ' + t('moduleNames.save_binding'),
+      description: t('importExport.save_module_description'),
+      count: saveCount + bindingCount
+    })
+  }
+
+  return result
+})
+
 watch(
   () => props.isOpen,
   async (open) => {
@@ -112,26 +155,38 @@ const handleDownload = async () => {
   const raw = exportFileName.value.trim()
   const withExt = raw ? (raw.endsWith('.json') ? raw : `${raw}.json`) : buildDefaultFileName()
   
-  const basePayload = buildExportPayload(
-    blueprintStore.savedEmpires,
-    logicFlowStore.savedPlans,
-    shipBuildStore.savedBlueprints,
-    gameDataStore,
-    saveBindingStore.savedBindings,
-    buildPlanStore.savedPlans
-  )
+  if (includeSaveArchives.value) {
+    const basePayload = buildExportPayload(
+      blueprintStore.savedEmpires,
+      logicFlowStore.savedPlans,
+      shipBuildStore.savedBlueprints,
+      gameDataStore,
+      saveBindingStore.savedBindings,
+      buildPlanStore.savedPlans
+    )
 
-  if (includeSaveArchives.value && saveStore.savedArchivesState.list.length > 0) {
-    const saveExportData = await buildSaveExportData(saveStore.savedArchivesState, gameDataStore)
-    const payload = {
-      ...basePayload,
-      data: {
-        ...basePayload.data,
-        x4_save_archives: saveExportData
+    if (saveStore.savedArchivesState.list.length > 0) {
+      const saveExportData = await buildSaveExportData(saveStore.savedArchivesState, gameDataStore)
+      const payload = {
+        ...basePayload,
+        data: {
+          ...basePayload.data,
+          x4_save_archives: saveExportData
+        }
       }
+      triggerJsonDownload(withExt, payload)
+    } else {
+      triggerJsonDownload(withExt, basePayload)
     }
-    triggerJsonDownload(withExt, payload)
   } else {
+    const basePayload = buildExportPayload(
+      blueprintStore.savedEmpires,
+      logicFlowStore.savedPlans,
+      shipBuildStore.savedBlueprints,
+      gameDataStore,
+      undefined,
+      buildPlanStore.savedPlans
+    )
     triggerJsonDownload(withExt, basePayload)
   }
 
@@ -168,21 +223,21 @@ const handleDownload = async () => {
         <div class="text-xs uppercase tracking-wider text-slate-400">{{ t('importExport.modules') }}</div>
         <div class="space-y-2" data-testid="storage-export-config">
           <div
-            v-for="entry in moduleStats"
+            v-for="entry in displayModules"
             :key="entry.key"
             class="flex items-center justify-between px-3 py-2 rounded border border-slate-700 bg-slate-900/40"
             :data-testid="`storage-export-module-${entry.key}`"
           >
             <div class="flex items-center gap-2">
               <input
-                v-if="entry.key === 'x4_save_archives'"
+                v-if="entry.key === 'x4_save_group'"
                 type="checkbox"
                 v-model="includeSaveArchives"
                 class="rounded border-slate-600 bg-slate-900 text-emerald-500 focus:ring-emerald-500 focus:ring-offset-slate-900"
               />
               <div class="flex flex-col">
-                <span class="text-sm text-slate-100">{{ moduleTitle(entry.key) }}</span>
-                <span v-if="moduleDescription(entry.key)" class="text-xs text-slate-500">{{ moduleDescription(entry.key) }}</span>
+                <span class="text-sm text-slate-100">{{ entry.title }}</span>
+                <span v-if="entry.description" class="text-xs text-slate-500">{{ entry.description }}</span>
               </div>
             </div>
             <span class="text-xs text-slate-400">{{ t('importExport.module_count', { count: entry.count }) }}</span>
