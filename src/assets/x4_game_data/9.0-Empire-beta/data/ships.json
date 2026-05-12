@@ -29220,7 +29220,7 @@
     "crew": {
       "capacity": 2
     },
-    "hull": 4700,
+    "hull": 4800,
     "physics": {
       "mass": 12.038,
       "drag": {
