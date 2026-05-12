@@ -19,7 +19,6 @@ import { CURRENT_BUILD_PLAN_GOALS_VERSION } from './logic/storageVersions'
 import { useGameDataStore } from './useGameDataStore'
 import { useLogicFlowStore } from './useLogicFlowStore'
 import { useShipBuildStore } from './useShipBuildStore'
-import { resolveBlueprintMaterialCost } from './logic/resolveBlueprintMaterialCost'
 import type { StationComputeDeps } from './state/stationSettings'
 import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
 import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
@@ -423,13 +422,8 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       const ship = shipBuildStore.findShip(entry.shipId)
       if (!blueprint || !ship) continue
 
-      const materials = resolveBlueprintMaterialCost(
-        blueprint,
-        ship,
-        shipBuildStore.equipmentMap,
-        shipBuildStore.consumablesMap,
-        shipBuildStore.dronesMap,
-        shipBuildStore.missilesMap,
+      const materials = Object.fromEntries(
+        shipBuildStore.getBuildAnalysis(blueprint).summaryItems.map((item) => [item.wareId, item.count]),
       )
 
       for (const [wareId, qty] of Object.entries(materials)) {

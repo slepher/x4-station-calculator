@@ -40,13 +40,13 @@
 
 **前提**：
 - blueprint storage 中存在 deployable、countermeasure、drone 或 missile 条目
-- 对应 ware 包含 production 配方
 
 **当**：
 - 系统计算 storage 分组建造时间
 
 **那么**：
-- 每个 storage 条目的建造时间 MUST 使用其 ware production time
+- 每个 storage 条目 MUST 保留在统一分析结果中
+- 每个 storage 条目的建造时间 MUST 固定为 `0`
 - storage 容量配置本身 MUST NOT 被视为一个独立可计时建造项
 
 ### Requirement: Unified Ship Blueprint Build Analysis Logic
@@ -175,6 +175,7 @@
 - MUST 显示船体条目建造时间
 - MUST 显示装备聚合条目建造时间
 - MUST 显示 storage 聚合条目建造时间（若存在相关条目）
+- storage 聚合条目当前 MUST 显示为 `0`
 
 #### Scenario: Time Tab Does Not Introduce Sectioned Group Areas
 

@@ -695,7 +695,7 @@ function computeOperationalDemandRateForWare(
   preview: PreviewResult,
   resolvedModulesByGroupId: Map<string, SavedModule[]>,
   modulesMap: Record<string, X4Module>,
-  settings: StationSettings,
+  _settings: StationSettings,
 ): number {
   let totalRate = 0
 

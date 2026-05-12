@@ -1719,6 +1719,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     shipByMacroMap,
     raceMap,
     typeMap,
+    waresMap,
     equipmentMap,
     consumablesMap,
     dronesMap,

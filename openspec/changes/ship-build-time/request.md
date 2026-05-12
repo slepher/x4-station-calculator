@@ -17,8 +17,9 @@
 ### 2. storage 范围解释
 
 - `shipBlueprint.storage` 作为容量配置本身没有独立建造时间。
-- 但 storage 面板中展示的条目，即 `deployables / countermeasure / drones / missiles`，各自作为 ware 具有 production time。
-- 因此时间视图必须覆盖这些 storage 条目，而不是将 storage 组整体排除在外。
+- storage 面板中展示的条目，即 `deployables / countermeasure / drones / missiles`，在统一分析中仍然作为独立条目保留，保证材料/金额结构完整。
+- 但这些 storage 条目的 `build time` 现阶段按需求固定为 `0`。
+- 因此时间视图必须覆盖这些 storage 条目，但展示值为 `0`，而不是将 storage 组整体排除在外。
 
 ### 3. 统一蓝图建造分析逻辑
 
@@ -80,7 +81,7 @@
 - 新增可复用的蓝图建造分析 `logic` 模块
 - `useShipBuildStore` 接入统一分析结果
 - `ShipBuildPanelMaterials` 增加时间视图
-- storage 条目时间纳入分析
+- storage 条目保留在时间视图分析中，但其时间值固定为 `0`
 - 为未来 `build-plan` 复用预留统一分析接口
 
 ### Out of Scope
@@ -98,7 +99,7 @@
 3. `useShipBuildStore` 可暴露当前蓝图的统一建造分析结果。
 4. `ShipBuildPanelMaterials` 至少支持 `materials` 与 `time` 两个 tab，并基于同一份分析结果切换显示。
 5. 时间 tab 中总时间与平铺聚合条目的时间值可正确展示，且结构与当前材料面板一致。
-6. storage 条目（deployables / countermeasure / drones / missiles）在存在 production time 时纳入时间汇总。
+6. storage 条目（deployables / countermeasure / drones / missiles）在时间视图中保留，但当前需求下其 build time 固定为 `0`。
 7. 材料与时间对同一条目使用相同 method 与相同 fallback 规则。
 8. 统一分析 `logic` 可被其他 store 以蓝图原始数据调用，不依赖 `ShipBuildPanelMaterials.vue` 的内部状态。
 9. 现有 `materials` tab 行为不因时间视图引入而退化。

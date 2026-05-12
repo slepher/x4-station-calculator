@@ -3,12 +3,12 @@ import { readFileSync } from 'fs'
 import { resolve } from 'path'
 import { deriveBuildFlowView, computeVirtualEdges } from '@/store/logic/buildFlowDerivation'
 import { hydrateSavedFlowGroups } from '@/store/logic/hydrateSavedFlowGroups'
+import { analyzeShipBlueprintBuild, DEFAULT_SHIP_BUILD_PRICE_MULTIPLIER } from '@/store/logic/analyzeShipBlueprintBuild'
 import {
   createBuildFlowPlanPreview,
   computeBuildFlowPlan,
   DEFAULT_BUILD_PLAN_SETTINGS,
 } from '@/store/logic/buildPlanProductionLine'
-import { resolveBlueprintMaterialCost } from '@/store/logic/resolveBlueprintMaterialCost'
 import type { BuildFlowPlanView, BuildGoal } from '@/types/build-plan'
 import type {
   BuildFlowAssignment,
@@ -54,6 +54,9 @@ for (const drone of DRONE_DATA) dronesMap.set(drone.id, drone)
 const missilesMap = new Map<string, X4Missile>()
 for (const missile of MISSILE_DATA) missilesMap.set(missile.id, missile)
 
+const wareMap = new Map<string, X4Ware>()
+for (const ware of WARE_DATA) wareMap.set(ware.id, ware)
+
 const modulesByOutputMap: Record<string, X4Module[]> = {}
 for (const module of MOD_DATA) {
   if (!module.outputs) continue
@@ -87,15 +90,18 @@ function expandFleetGoals(goals: BuildGoal[], blueprintMap: Map<string, ShipBlue
       const ship = shipsMap.get(blueprint?.shipId || entry.shipId)
       if (!ship || !blueprint) continue
 
-      const materials = resolveBlueprintMaterialCost(
+      const analysis = analyzeShipBlueprintBuild({
         blueprint,
         ship,
-        equipmentMap,
-        consumablesMap,
-        dronesMap,
-        missilesMap,
-      )
-      for (const [wareId, qty] of Object.entries(materials)) {
+        equipments: equipmentMap,
+        wares: wareMap,
+        consumables: consumablesMap,
+        drones: dronesMap,
+        missiles: missilesMap,
+        priceMultiplier: DEFAULT_SHIP_BUILD_PRICE_MULTIPLIER,
+      })
+      for (const item of analysis.summaryItems) {
+        const { wareId, count: qty } = item
         totalByWare[wareId] = (totalByWare[wareId] || 0) + qty * entry.quantity
       }
     }

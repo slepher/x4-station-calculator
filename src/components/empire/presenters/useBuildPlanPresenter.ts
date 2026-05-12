@@ -16,7 +16,6 @@ import type { EmpireGroupedFlows, SavedModule, StationType } from '@/types/x4'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import { resolveBlueprintMaterialCost } from '@/store/logic/resolveBlueprintMaterialCost'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 
 export interface FlowPlanItem {
@@ -154,19 +153,11 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
 
       const materials: FleetMaterialItem[] = []
       if (blueprint && ship) {
-        const costMap = resolveBlueprintMaterialCost(
-          blueprint,
-          ship,
-          shipBuildStore.equipmentMap,
-          shipBuildStore.consumablesMap,
-          shipBuildStore.dronesMap,
-          shipBuildStore.missilesMap,
-        )
-        for (const [wareId, qty] of Object.entries(costMap)) {
-          const totalQty = qty * entry.quantity
+        for (const item of shipBuildStore.getBuildAnalysis(blueprint).summaryItems) {
+          const totalQty = item.count * entry.quantity
           materials.push({
-            wareId,
-            wareName: gameData.localizedWaresMap[wareId]?.localeName || wareId,
+            wareId: item.wareId,
+            wareName: gameData.localizedWaresMap[item.wareId]?.localeName || item.wareId,
             totalQty,
           })
         }

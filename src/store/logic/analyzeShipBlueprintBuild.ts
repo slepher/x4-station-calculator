@@ -13,7 +13,7 @@ import type {
 
 export const DEFAULT_SHIP_BUILD_PRICE_MULTIPLIER = 0.5
 
-type AnalyzeShipBlueprintBuildInput = {
+export type AnalyzeShipBlueprintBuildInput = {
   blueprint: ShipBlueprint | null
   ship: X4Ship | null
   equipments: Map<string, X4Equipment>

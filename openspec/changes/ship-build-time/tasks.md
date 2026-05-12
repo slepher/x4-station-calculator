@@ -18,7 +18,7 @@
 - [x] 3.1 新增可复用的 ship blueprint build analysis logic 模块
 - [x] 3.2 将 ship/equipment/storage 的材料、金额、时间分析统一收敛到该模块
 - [x] 3.3 在该模块中实现 method 解析与 `default` fallback 规则
-- [x] 3.4 确保 storage 条目（deployables / countermeasure / drones / missiles）参与时间汇总
+- [x] 3.4 确保 storage 条目（deployables / countermeasure / drones / missiles）保留在时间视图中，且 build time 固定为 `0`
 
 ### 4. Ship Build Store 接入
 
@@ -52,7 +52,7 @@
 
 1. 时间字段必须取自 ware production 配方，而不是 macro 的性能时间字段
 2. 材料与时间必须共享 method 与 fallback 规则
-3. storage 组要计入时间，但计时对象是条目而不是容量配置
+3. storage 组要保留在时间视图结构中，但条目时间固定为 `0`，且容量配置本身不是计时对象
 4. 统一 analysis 必须可被 `build-plan` 复用
 5. `tasks.md` 不包含测试编写或测试执行任务
 

@@ -83,15 +83,17 @@ group 数据一次性返回材料、金额、时间，不按 tab 分拆不同数
 ### 4. storage 条目参与时间分析
 
 **决策**：
-storage 组纳入时间视图。
+storage 组纳入时间视图，但条目时间固定为 `0`。
 
 **理由**：
-- 尽管 storage 容量不是可计时项，但 storage 面板中的实际条目对应 ware，具有 production time
-- 如果排除 storage，用户看到的总时间会和总材料不一致
+- 尽管 storage 容量不是可计时项，storage 面板中的实际条目仍需作为统一分析的独立条目存在
+- 当前需求明确要求这些 storage 条目的时间值固定为 `0`
+- 如果排除 storage，用户看到的条目结构会和材料视图不一致
 
 **边界说明**：
-- 计时对象是 deployable / countermeasure / drone / missile 条目
+- deployable / countermeasure / drone / missile 条目仍参与统一分析
 - 不是 `shipBlueprint.storage` 容量字段本身
+- 时间展示固定为 `0`
 
 ### 5. method 与 fallback 一致性
 
@@ -227,6 +229,7 @@ ShipBlueprint + game data
    - 部分条目可能缺少当前 method
    - 必须统一回退 `default`
    - 若连 `default` 也缺失，则时间为 `0`，并保持条目可计算
+   - storage 条目即使存在 build time 数据，当前需求下也仍显示为 `0`
 
 4. **build-plan 复用约束**
    - 本次不实现 build-plan UI

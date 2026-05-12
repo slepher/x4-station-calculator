@@ -32,6 +32,19 @@ vi.mock('@/store/useGameDataStore', () => ({
   }),
 }))
 
+vi.mock('@/store/useShipBuildStore', () => ({
+  useShipBuildStore: () => ({
+    loadBlueprintsFromStorage: vi.fn(),
+    findBlueprintById: vi.fn(() => null),
+    findShip: vi.fn(() => null),
+    equipmentMap: new Map(),
+    waresMap: new Map(),
+    consumablesMap: new Map(),
+    dronesMap: new Map(),
+    missilesMap: new Map(),
+  }),
+}))
+
 import { useBuildPlanPresenter } from '@/components/empire/presenters/useBuildPlanPresenter'
 
 type BuildPlanStoreStub = {
@@ -43,10 +56,20 @@ type BuildPlanStoreStub = {
   buildFlowPlanLoading: boolean
   schemeGroups: BuildSchemeGroup[]
   computeBuildPlanLoading: boolean
+  savedPlans: { activeId: string | null; list: { id: string; name: string; buildGoals: BuildGoal[] }[] }
+  activePlanName: string
   setBuildGoal: (goal: BuildGoal) => void
   removeBuildGoal: (index: number) => void
   setBuildFlowMode: (mode: boolean) => void
   computePlan: () => void
+  createNewPlan: () => void
+  switchPlan: (planId: string) => void
+  deletePlan: (planId: string) => void
+  syncGoalsToActivePlan: () => void
+  addFleetEntry: (shipId: string, blueprintId: string) => void
+  removeFleetEntry: (blueprintId: string) => void
+  updateFleetBuildTime: (seconds: number) => void
+  updateFleetEntryQuantity: (blueprintId: string, qty: number) => void
 }
 
 type BlueprintStoreStub = {
@@ -63,10 +86,23 @@ function createBuildPlanStoreStub(): BuildPlanStoreStub {
     buildFlowPlanLoading: false,
     schemeGroups: [],
     computeBuildPlanLoading: false,
+    savedPlans: {
+      activeId: 'plan-1',
+      list: [{ id: 'plan-1', name: 'Flow Plan 1', buildGoals: [] }],
+    },
+    activePlanName: 'Flow Plan 1',
     setBuildGoal: vi.fn(),
     removeBuildGoal: vi.fn(),
     setBuildFlowMode: vi.fn(),
     computePlan: vi.fn(),
+    createNewPlan: vi.fn(),
+    switchPlan: vi.fn(),
+    deletePlan: vi.fn(),
+    syncGoalsToActivePlan: vi.fn(),
+    addFleetEntry: vi.fn(),
+    removeFleetEntry: vi.fn(),
+    updateFleetBuildTime: vi.fn(),
+    updateFleetEntryQuantity: vi.fn(),
   }
 }
 
@@ -92,6 +128,6 @@ describe('useBuildPlanPresenter', () => {
 
     expect(presenter.props.goals.value).toEqual(buildPlanStore.buildGoals)
     expect(presenter.props.buildFlowMode.value).toBe(true)
-    expect(presenter.props.flowPlanName.value).toBe('Flow Plan 1')
+    expect(presenter.props.planName.value).toBe('Flow Plan 1')
   })
 })
