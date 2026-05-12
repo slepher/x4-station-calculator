@@ -1,4 +1,5 @@
 import { computed, type ComputedRef } from 'vue'
+import i18n from '@/i18n'
 import type {
   BuildGoal,
   BuildPlan,
@@ -8,6 +9,7 @@ import type {
   FleetEntryView,
   FleetMergedRate,
   FleetMaterialItem,
+  FleetShipyardGroup,
   PreviewLinePlan,
   PreviewResult,
   ProductionLineAllocation,
@@ -69,6 +71,8 @@ export interface BuildPlanPresenterEmits {
   removeFleetEntry: (blueprintId: string) => void
   updateFleetBuildTime: (seconds: number) => void
   updateFleetEntryQuantity: (blueprintId: string, qty: number) => void
+  clearFleetGroup: (groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf') => void
+  updateFleetShipyardCount: (groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number) => void
   exportToStations: (mode: 'overwrite' | 'direct') => void
 }
 
@@ -124,6 +128,8 @@ export interface BuildPlanPresenterBuildPlanStore {
   removeFleetEntry(blueprintId: string): void
   updateFleetBuildTime(seconds: number): void
   updateFleetEntryQuantity(blueprintId: string, qty: number): void
+  clearFleetGroup(groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf'): void
+  updateFleetShipyardCount(groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number): void
 }
 
 export interface BuildPlanPresenterInput {
@@ -159,9 +165,13 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
       const ship = shipBuildStore.findShip(entry.shipId)
       const isBlueprintMissing = !blueprint
 
+      let buildTime = 0
       const materials: FleetMaterialItem[] = []
       if (blueprint && ship) {
-        for (const item of shipBuildStore.getBuildAnalysis(blueprint).summaryItems) {
+        const analysis = shipBuildStore.getBuildAnalysis(blueprint)
+        buildTime = analysis.totalBuildTime
+
+        for (const item of analysis.summaryItems) {
           const totalQty = item.count * entry.quantity
           materials.push({
             wareId: item.wareId,
@@ -183,10 +193,41 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
         blueprintId: entry.blueprintId,
         blueprintName: blueprint?.name || entry.blueprintId,
         quantity: entry.quantity,
+        buildTime,
+        totalBuildTime: buildTime * entry.quantity,
         materials,
         isBlueprintMissing,
       }
     })
+
+    const groupDefinitions: { type: 'shipyard_l' | 'shipyard_xl' | 'wharf'; label: string; count: number }[] = [
+      { type: 'shipyard_xl', label: i18n.global.t('build_plan.fleet_shipyard_xl'), count: fleetGoal.shipyardXLCount },
+      { type: 'shipyard_l', label: i18n.global.t('build_plan.fleet_shipyard_l'), count: fleetGoal.shipyardLCount },
+      { type: 'wharf', label: i18n.global.t('build_plan.fleet_wharf'), count: fleetGoal.wharfCount },
+    ]
+
+    const groups: FleetShipyardGroup[] = groupDefinitions.map(def => {
+      const groupEntries = entries.filter(e => {
+        if (e.isBlueprintMissing) return false
+        const ship = shipBuildStore.findShip(e.shipId)
+        if (!ship) return false
+        if (def.type === 'shipyard_l') return ship.class === 'ship_l'
+        if (def.type === 'shipyard_xl') return ship.class === 'ship_xl'
+        return ship.class === 'ship_m' || ship.class === 'ship_s'
+      })
+      const totalShipTime = groupEntries.reduce((sum, e) => sum + e.buildTime * e.quantity, 0)
+      const maxSingleBuildTime = groupEntries.reduce((max, e) => Math.max(max, e.buildTime), 0)
+      return {
+        type: def.type,
+        label: def.label,
+        shipyardCount: def.count,
+        entries: groupEntries,
+        groupTotalBuildTime: Math.max(maxSingleBuildTime, Math.ceil(totalShipTime / Math.max(1, def.count))),
+      }
+    })
+
+    const actualTotalBuildTime = Math.max(0, ...groups.map(g => g.groupTotalBuildTime))
+    const effectiveBuildTime = Math.max(actualTotalBuildTime, fleetGoal.buildTime)
 
     const totalByWare: Record<string, number> = {}
     for (const entry of entries) {
@@ -199,7 +240,8 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
       .map(([wareId, totalQty]) => ({
         wareId,
         wareName: gameData.localizedWaresMap[wareId]?.localeName || wareId,
-        ratePerHour: Math.ceil(totalQty / fleetGoal.buildTime * 3600),
+        totalQty,
+        ratePerHour: Math.ceil(totalQty / effectiveBuildTime * 3600),
       }))
       .sort((a, b) => {
         const tierA = gameData.waresMap[a.wareId]?.tier ?? 0
@@ -210,6 +252,12 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
 
     return {
       buildTime: fleetGoal.buildTime,
+      shipyardLCount: fleetGoal.shipyardLCount,
+      shipyardXLCount: fleetGoal.shipyardXLCount,
+      wharfCount: fleetGoal.wharfCount,
+      groups,
+      actualTotalBuildTime,
+      effectiveBuildTime,
       entries,
       mergedRates,
     }
@@ -348,6 +396,8 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     removeFleetEntry: (blueprintId) => buildPlanStore.removeFleetEntry(blueprintId),
     updateFleetBuildTime: (seconds) => buildPlanStore.updateFleetBuildTime(seconds),
     updateFleetEntryQuantity: (blueprintId, qty) => buildPlanStore.updateFleetEntryQuantity(blueprintId, qty),
+    clearFleetGroup: (groupType) => buildPlanStore.clearFleetGroup(groupType),
+    updateFleetShipyardCount: (groupType, count) => buildPlanStore.updateFleetShipyardCount(groupType, count),
     exportToStations: (mode) => {
       const lineageToRace = (lineage: string) => lineage === 'default' ? 'argon' : lineage
       const schemeGroups = buildPlanStore.schemeGroups

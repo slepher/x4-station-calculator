@@ -25,6 +25,11 @@ function resolveShipCostByMethod(
   return target?.cost || {}
 }
 
+export interface BlueprintMaterialResult {
+  materials: Record<string, number>
+  buildTime: number
+}
+
 export function resolveBlueprintMaterialCost(
   blueprint: ShipBlueprint,
   ship: X4Ship,
@@ -32,9 +37,14 @@ export function resolveBlueprintMaterialCost(
   consumablesMap: Map<string, X4Consumable>,
   dronesMap: Map<string, X4Drone>,
   missilesMap: Map<string, X4Missile>,
-): Record<string, number> {
+): BlueprintMaterialResult {
   const method = blueprint.materialMethod || 'default'
   const result: Record<string, number> = {}
+
+  const targetProduction =
+    ship.production.find((item) => item.method === method) ||
+    ship.production.find((item) => item.method === 'default')
+  const buildTime = targetProduction?.time || 0
 
   const addCost = (cost: Partial<Record<string, number>>, multiplier: number) => {
     for (const [wareId, qty] of Object.entries(cost)) {
@@ -105,5 +115,5 @@ export function resolveBlueprintMaterialCost(
     }
   }
 
-  return result
+  return { materials: result, buildTime }
 }

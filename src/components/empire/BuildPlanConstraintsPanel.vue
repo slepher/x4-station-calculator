@@ -45,6 +45,8 @@ const emit = defineEmits<{
   removeFleetEntry: [blueprintId: string]
   updateFleetBuildTime: [seconds: number]
   updateFleetEntryQuantity: [blueprintId: string, qty: number]
+  clearFleetGroup: [groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf']
+  updateFleetShipyardCount: [groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number]
 }>()
 
 const { t } = useI18n()
@@ -279,6 +281,8 @@ onUnmounted(() => {
           @removeFleetEntry="emit('removeFleetEntry', $event)"
           @updateFleetBuildTime="emit('updateFleetBuildTime', $event)"
           @updateFleetEntryQuantity="(bpId, qty) => emit('updateFleetEntryQuantity', bpId, qty)"
+          @clearFleetGroup="(groupType) => emit('clearFleetGroup', groupType)"
+          @updateFleetShipyardCount="(groupType, count) => emit('updateFleetShipyardCount', groupType, count)"
         />
         <div v-if="editableGoals.length > 0" class="space-y-2">
           <WarePlanningItem

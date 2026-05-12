@@ -10,8 +10,10 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   removeFleetEntry: [blueprintId: string]
+  clearFleetGroup: [groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf']
   updateFleetBuildTime: [seconds: number]
   updateFleetEntryQuantity: [blueprintId: string, qty: number]
+  updateFleetShipyardCount: [groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number]
 }>()
 
 const { t } = useI18n()
@@ -28,12 +30,25 @@ const isEntryExpanded = (blueprintId: string) => {
 const formatQty = (qty: number) => {
   return new Intl.NumberFormat('en-US').format(Math.round(qty))
 }
+
+const formatTime = (seconds: number) => {
+  const h = Math.floor(seconds / 3600)
+  const m = Math.round((seconds % 3600) / 60)
+  return m > 0 ? `${h}h${m}m` : `${h}h`
+}
 </script>
 
 <template>
   <div class="fleet-goal-card" data-testid="fleet-goal-card">
     <div class="fleet-header">
       <span class="fleet-title">{{ t('build_plan.fleet_title') }}</span>
+      <span class="fleet-time-info">
+        <span class="fleet-time-label">{{ t('build_plan.fleet_actual_time') }}:</span>
+        <span class="fleet-time-value">{{ formatTime(fleetView.actualTotalBuildTime) }}</span>
+        <span class="fleet-time-sep">/</span>
+        <span class="fleet-time-label">{{ t('build_plan.fleet_effective_time') }}:</span>
+        <span class="fleet-time-value fleet-time-effective">{{ formatTime(fleetView.effectiveBuildTime) }}</span>
+      </span>
       <div class="fleet-build-time-group">
         <X4NumberInput
           :modelValue="fleetView.buildTime"
@@ -45,44 +60,78 @@ const formatQty = (qty: number) => {
       </div>
     </div>
 
-    <div class="fleet-entries">
+    <div class="fleet-groups">
       <div
-        v-for="entry in fleetView.entries"
-        :key="entry.blueprintId"
-        class="fleet-entry"
-        :class="{ 'fleet-entry--missing': entry.isBlueprintMissing }"
+        v-for="group in fleetView.groups"
+        :key="group.type"
+        v-show="group.entries.length > 0"
+        class="fleet-group"
       >
-        <div class="fleet-entry-header" @click="toggleEntry(entry.blueprintId)">
-          <span class="fleet-entry-arrow" :class="{ 'expanded': isEntryExpanded(entry.blueprintId) }">▶</span>
-          <span v-if="entry.isBlueprintMissing" class="fleet-entry-warning" :title="t('build_plan.fleet_blueprint_missing')">⚠</span>
-          <span class="fleet-entry-name">{{ entry.blueprintName }}</span>
-          <div @click.stop>
+        <div class="fleet-group-header">
+          <span class="fleet-group-label">{{ group.label }}</span>
+          <span class="fleet-group-time">{{ formatTime(group.groupTotalBuildTime) }}</span>
+          <div class="fleet-group-count">
             <X4NumberInput
-              :modelValue="entry.quantity"
+              :modelValue="group.shipyardCount"
               :min="1"
               widthClass="w-16"
-              :data-testid="`fleet-entry-qty-${entry.blueprintId}`"
-              @update:modelValue="emit('updateFleetEntryQuantity', entry.blueprintId, $event)"
+              :data-testid="`fleet-shipyard-count-${group.type}`"
+              @update:modelValue="emit('updateFleetShipyardCount', group.type, $event)"
             />
           </div>
           <button
-            class="fleet-entry-remove"
-            :data-testid="`fleet-entry-remove-${entry.blueprintId}`"
-            @click.stop="emit('removeFleetEntry', entry.blueprintId)"
-          >✕</button>
+            class="fleet-group-clear"
+            :data-testid="`fleet-group-clear-${group.type}`"
+            @click="emit('clearFleetGroup', group.type)"
+          >&#10005;</button>
         </div>
 
-        <div v-if="isEntryExpanded(entry.blueprintId)" class="fleet-entry-materials">
+        <div class="fleet-entries">
           <div
-            v-for="mat in entry.materials"
-            :key="mat.wareId"
-            class="fleet-material-row"
+            v-for="entry in group.entries"
+            :key="entry.blueprintId"
+            class="fleet-entry"
+            :class="{ 'fleet-entry--missing': entry.isBlueprintMissing }"
           >
-            <span class="fleet-material-name">{{ mat.wareName }}</span>
-            <span class="fleet-material-qty">{{ formatQty(mat.totalQty) }}</span>
-          </div>
-          <div v-if="entry.materials.length === 0" class="fleet-material-empty">
-            {{ entry.isBlueprintMissing ? t('build_plan.fleet_blueprint_missing') : t('build_plan.fleet_no_materials') }}
+            <div class="fleet-entry-header" @click="toggleEntry(entry.blueprintId)">
+              <span class="fleet-entry-arrow" :class="{ 'expanded': isEntryExpanded(entry.blueprintId) }">&#9654;</span>
+              <span v-if="entry.isBlueprintMissing" class="fleet-entry-warning" :title="t('build_plan.fleet_blueprint_missing')">&#9888;</span>
+              <span class="fleet-entry-name">{{ entry.blueprintName }}<span class="fleet-entry-total-time">{{ formatTime(entry.totalBuildTime) }}</span></span>
+              <div @click.stop class="fleet-entry-qty-group">
+                <X4NumberInput
+                  :modelValue="entry.quantity"
+                  :min="1"
+                  widthClass="w-16"
+                  :data-testid="`fleet-entry-qty-${entry.blueprintId}`"
+                  @update:modelValue="emit('updateFleetEntryQuantity', entry.blueprintId, $event)"
+                />
+              </div>
+              <button
+                class="fleet-entry-remove"
+                :data-testid="`fleet-entry-remove-${entry.blueprintId}`"
+                @click.stop="emit('removeFleetEntry', entry.blueprintId)"
+              >&#10005;</button>
+            </div>
+
+            <div v-if="isEntryExpanded(entry.blueprintId)" class="fleet-entry-detail">
+              <div class="fleet-entry-build-time">
+                <span class="fleet-detail-label">{{ t('build_plan.fleet_single_build_time') }}:</span>
+                <span class="fleet-detail-value">{{ formatTime(entry.buildTime) }}</span>
+              </div>
+              <div class="fleet-entry-materials">
+                <div
+                  v-for="mat in entry.materials"
+                  :key="mat.wareId"
+                  class="fleet-material-row"
+                >
+                  <span class="fleet-material-name">{{ mat.wareName }}</span>
+                  <span class="fleet-material-qty">{{ formatQty(mat.totalQty) }}</span>
+                </div>
+                <div v-if="entry.materials.length === 0" class="fleet-material-empty">
+                  {{ entry.isBlueprintMissing ? t('build_plan.fleet_blueprint_missing') : t('build_plan.fleet_no_materials') }}
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -96,8 +145,8 @@ const formatQty = (qty: number) => {
           :key="rate.wareId"
           class="fleet-rate-row"
         >
-          <span class="fleet-rate-name">{{ rate.wareName }}</span>
-          <span class="fleet-rate-value">{{ rate.ratePerHour }}</span>
+          <span class="fleet-rate-name">{{ rate.wareName }} &times; {{ formatQty(rate.totalQty) }}</span>
+          <span class="fleet-rate-value">{{ rate.ratePerHour }}/h</span>
         </div>
       </div>
     </div>
@@ -117,20 +166,64 @@ const formatQty = (qty: number) => {
   @apply text-sm font-semibold text-amber-400;
 }
 
-.fleet-build-time-group {
-  @apply flex items-center gap-1 ml-auto;
+.fleet-time-info {
+  @apply flex items-center gap-1 text-[11px] text-slate-400;
 }
 
-.fleet-build-time-input {
-  @apply w-16 bg-slate-700/50 border border-slate-600 rounded px-1.5 py-0.5 text-xs text-slate-200 text-right outline-none focus:border-amber-500;
+.fleet-time-label {
+  @apply text-slate-500;
+}
+
+.fleet-time-value {
+  @apply text-slate-300 font-mono;
+}
+
+.fleet-time-effective {
+  @apply text-amber-300;
+}
+
+.fleet-time-sep {
+  @apply text-slate-600 mx-0.5;
+}
+
+.fleet-build-time-group {
+  @apply flex items-center gap-1 ml-auto;
 }
 
 .fleet-build-time-label {
   @apply text-xs text-slate-400;
 }
 
-.fleet-entries {
+.fleet-groups {
   @apply divide-y divide-slate-700/30;
+}
+
+.fleet-group {
+}
+
+.fleet-group-header {
+  @apply flex items-center gap-1.5 px-3 py-1.5 bg-slate-800/40;
+}
+
+.fleet-group-label {
+  @apply text-xs font-semibold text-slate-300;
+}
+
+.fleet-group-time {
+  @apply text-[11px] text-slate-400 font-mono;
+}
+
+.fleet-group-count {
+  @apply ml-auto;
+}
+
+.fleet-group-clear,
+.fleet-entry-remove {
+  @apply w-5 h-5 flex items-center justify-center rounded text-xs text-slate-500 hover:text-red-400 hover:bg-red-900/30 transition-colors shrink-0;
+}
+
+.fleet-entries {
+  @apply divide-y divide-slate-700/20;
 }
 
 .fleet-entry {
@@ -146,7 +239,7 @@ const formatQty = (qty: number) => {
 }
 
 .fleet-entry-header {
-  @apply flex items-center gap-1.5 py-2 cursor-pointer;
+  @apply flex items-center gap-1.5 py-1.5 cursor-pointer;
 }
 
 .fleet-entry-arrow {
@@ -165,32 +258,48 @@ const formatQty = (qty: number) => {
   @apply text-xs text-slate-300 truncate flex-1 min-w-0;
 }
 
-.fleet-entry-qty-input {
-  @apply w-12 bg-slate-700/50 border border-slate-600 rounded px-1 py-0.5 text-xs text-slate-200 text-right outline-none focus:border-amber-500;
+.fleet-entry-total-time {
+  @apply text-[11px] text-slate-400 font-mono ml-2 shrink-0;
 }
 
-.fleet-entry-qty-label {
-  @apply text-xs text-slate-500;
+.fleet-entry-qty-group {
+  @apply shrink-0;
 }
 
 .fleet-entry-remove {
   @apply w-5 h-5 flex items-center justify-center rounded text-xs text-slate-500 hover:text-red-400 hover:bg-red-900/30 transition-colors;
 }
 
+.fleet-entry-detail {
+  @apply pl-6 pb-2 space-y-1;
+}
+
+.fleet-entry-build-time {
+  @apply flex items-center gap-1 text-[11px];
+}
+
+.fleet-detail-label {
+  @apply text-slate-500;
+}
+
+.fleet-detail-value {
+  @apply text-slate-300 font-mono;
+}
+
 .fleet-entry-materials {
-  @apply pl-6 pb-2 space-y-0.5;
+  @apply space-y-0.5;
 }
 
 .fleet-material-row {
   @apply flex items-center w-full bg-slate-800/40 border border-slate-700/50 px-2 py-1 rounded;
 }
 
-.fleet-material-qty {
-  @apply text-xs text-slate-400 font-mono shrink-0;
-}
-
 .fleet-material-name {
   @apply flex-1 min-w-0 truncate text-xs text-slate-300;
+}
+
+.fleet-material-qty {
+  @apply text-xs text-slate-400 font-mono shrink-0;
 }
 
 .fleet-material-empty {

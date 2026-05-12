@@ -79,7 +79,7 @@ describe('ship blueprint build analysis for build-plan', () => {
         missilesMap,
       )
 
-      expect(deriveMaterialMapFromAnalysis(blueprint, ship!)).toEqual(legacy)
+      expect(deriveMaterialMapFromAnalysis(blueprint, ship!)).toEqual(legacy.materials)
     }
   })
 })

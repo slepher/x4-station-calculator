@@ -85,7 +85,13 @@
     "fleet_no_materials": "No materials",
     "fleet_rates": "Derived Rates",
     "fleet_toggle": "Toggle fleet search",
-    "category_fleet": "Fleet"
+    "category_fleet": "Fleet",
+    "fleet_shipyard_l": "Shipyard L",
+    "fleet_shipyard_xl": "Shipyard XL",
+    "fleet_wharf": "Wharf",
+    "fleet_actual_time": "Actual",
+    "fleet_effective_time": "Effective",
+    "fleet_single_build_time": "Per unit"
   },
   "sector": {
     "overview": "Overview",

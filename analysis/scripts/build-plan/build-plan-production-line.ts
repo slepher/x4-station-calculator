@@ -86,8 +86,8 @@ function expandFleetGoals(goals: BuildGoal[], blueprintMap: Map<string, ShipBlue
         const ship = shipsMap.get(blueprint?.shipId || entry.shipId)
         if (!ship) continue
         if (!blueprint) continue
-        const materials = resolveBlueprintMaterialCost(blueprint, ship, equipmentMap, consumablesMap, dronesMap, missilesMap)
-        for (const [wareId, qty] of Object.entries(materials)) {
+        const result = resolveBlueprintMaterialCost(blueprint, ship, equipmentMap, consumablesMap, dronesMap, missilesMap)
+        for (const [wareId, qty] of Object.entries(result.materials)) {
           totalByWare[wareId] = (totalByWare[wareId] || 0) + qty * entry.quantity
         }
       }

@@ -296,6 +296,9 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
         type: 'fleet' as const,
         buildTime: 3600,
         entries: [{ shipId, blueprintId, quantity: 1 }],
+        shipyardLCount: 1,
+        shipyardXLCount: 1,
+        wharfCount: 1,
       }]
     }
     syncGoalsToActivePlan()
@@ -324,6 +327,35 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     const entry = fleetGoal.entries.find(e => e.blueprintId === blueprintId)
     if (!entry) return
     entry.quantity = qty
+    syncGoalsToActivePlan()
+  }
+
+  function updateFleetShipyardCount(groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number) {
+    const fleetGoal = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
+    if (!fleetGoal) return
+    const clamped = Math.max(1, count)
+    if (groupType === 'shipyard_l') fleetGoal.shipyardLCount = clamped
+    else if (groupType === 'shipyard_xl') fleetGoal.shipyardXLCount = clamped
+    else fleetGoal.wharfCount = clamped
+    syncGoalsToActivePlan()
+  }
+
+  function clearFleetGroup(groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf') {
+    const fleetGoal = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
+    if (!fleetGoal) return
+    const classFilter = groupType === 'shipyard_l' ? 'ship_l' : groupType === 'shipyard_xl' ? 'ship_xl' : undefined
+    const shipBuildStore = useShipBuildStore()
+    fleetGoal.entries = fleetGoal.entries.filter(entry => {
+      if (classFilter === undefined) {
+        const ship = shipBuildStore.findShip(entry.shipId)
+        return ship?.class !== 'ship_m' && ship?.class !== 'ship_s'
+      }
+      const ship = shipBuildStore.findShip(entry.shipId)
+      return ship?.class !== classFilter
+    })
+    if (fleetGoal.entries.length === 0) {
+      buildGoals.value = buildGoals.value.filter(g => g.type !== 'fleet')
+    }
     syncGoalsToActivePlan()
   }
 
@@ -488,25 +520,45 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
   function resolveFleetMergedRates(fleetGoal: Extract<BuildGoal, { type: 'fleet' }>): { wareId: string; ratePerHour: number }[] {
     const shipBuildStore = useShipBuildStore()
     shipBuildStore.loadBlueprintsFromStorage()
+
     const totalByWare: Record<string, number> = {}
+    const groupTotalTimes: [number, number, number] = [0, 0, 0]
+    const groupMaxSingleTimes: [number, number, number] = [0, 0, 0]
+    const groupKeys = ['shipyard_xl', 'shipyard_l', 'wharf'] as const
+    const groupCounts: [number, number, number] = [fleetGoal.shipyardXLCount, fleetGoal.shipyardLCount, fleetGoal.wharfCount]
 
     for (const entry of fleetGoal.entries) {
       const blueprint = shipBuildStore.findBlueprintById(entry.blueprintId)
       const ship = shipBuildStore.findShip(entry.shipId)
       if (!blueprint || !ship) continue
 
+      const analysis = shipBuildStore.getBuildAnalysis(blueprint)
       const materials = Object.fromEntries(
-        shipBuildStore.getBuildAnalysis(blueprint).summaryItems.map((item) => [item.wareId, item.count]),
+        analysis.summaryItems.map((item) => [item.wareId, item.count]),
       )
 
       for (const [wareId, qty] of Object.entries(materials)) {
         totalByWare[wareId] = (totalByWare[wareId] || 0) + qty * entry.quantity
       }
+
+      const buildTime = analysis.totalBuildTime
+
+      const groupIdx = ship.class === 'ship_xl' ? 0 : ship.class === 'ship_l' ? 1 : 2
+      groupTotalTimes[groupIdx] += buildTime * entry.quantity
+      if (buildTime > groupMaxSingleTimes[groupIdx]) {
+        groupMaxSingleTimes[groupIdx] = buildTime
+      }
     }
+
+    const groupBuildTimes = groupKeys.map((_, i) =>
+      Math.max(groupMaxSingleTimes[i]!, Math.ceil(groupTotalTimes[i]! / Math.max(1, groupCounts[i]!)))
+    )
+    const actualTotalBuildTime = Math.max(0, ...groupBuildTimes)
+    const effectiveBuildTime = Math.max(actualTotalBuildTime, fleetGoal.buildTime)
 
     return Object.entries(totalByWare).map(([wareId, totalQty]) => ({
       wareId,
-      ratePerHour: Math.ceil(totalQty / fleetGoal.buildTime * 3600),
+      ratePerHour: Math.ceil(totalQty / effectiveBuildTime * 3600),
     }))
   }
 
@@ -768,5 +820,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     removeFleetEntry,
     updateFleetBuildTime,
     updateFleetEntryQuantity,
+    updateFleetShipyardCount,
+    clearFleetGroup,
   }
 })

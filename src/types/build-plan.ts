@@ -35,6 +35,8 @@ export interface FleetEntryView {
   blueprintId: string
   blueprintName: string
   quantity: number
+  buildTime: number
+  totalBuildTime: number
   materials: FleetMaterialItem[]
   isBlueprintMissing: boolean
 }
@@ -42,11 +44,28 @@ export interface FleetEntryView {
 export interface FleetMergedRate {
   wareId: string
   wareName: string
+  totalQty: number
   ratePerHour: number
+}
+
+export type FleetShipyardGroupType = 'shipyard_l' | 'shipyard_xl' | 'wharf'
+
+export interface FleetShipyardGroup {
+  type: FleetShipyardGroupType
+  label: string
+  shipyardCount: number
+  entries: FleetEntryView[]
+  groupTotalBuildTime: number
 }
 
 export interface FleetGoalView {
   buildTime: number
+  shipyardLCount: number
+  shipyardXLCount: number
+  wharfCount: number
+  groups: FleetShipyardGroup[]
+  actualTotalBuildTime: number
+  effectiveBuildTime: number
   entries: FleetEntryView[]
   mergedRates: FleetMergedRate[]
 }
@@ -54,7 +73,7 @@ export interface FleetGoalView {
 export type BuildGoal =
   | { type: 'production-rate'; wareId: string; ratePerHour: number }
   | { type: 'build-module'; moduleId: string; count: number }
-  | { type: 'fleet'; buildTime: number; entries: FleetEntry[] }
+  | { type: 'fleet'; buildTime: number; entries: FleetEntry[]; shipyardLCount: number; shipyardXLCount: number; wharfCount: number }
   | { type: 'target-production'; wareId?: string; moduleId?: string; ratePerHour?: number; count?: number }
   | { type: 'derived-rate'; wareId: string; ratePerHour: number }
   | { type: 'derived-production'; wareId: string; ratePerHour: number }
