@@ -2944,6 +2944,7 @@
     <t id="11153">Befehlsliste ersetzen</t>
     <t id="11154">An Showroom andocken</t>
     <t id="11155">Andock\-anforderung senden</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)Rolle</t>
     <t id="11201">Möchtest du diese Person wirklich entlassen?</t>
     <t id="11202">%s($NPC_NAME$) entlassen</t>

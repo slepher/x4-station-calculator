@@ -2944,6 +2944,7 @@
     <t id="11153">Replace Order Queue</t>
     <t id="11154">Dock at Showroom</t>
     <t id="11155">Request Ship to Dock here</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)Role</t>
     <t id="11201">Are you sure you want to fire this person?</t>
     <t id="11202">Fire %s($NPC_NAME$)</t>

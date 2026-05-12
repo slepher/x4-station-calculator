@@ -2944,6 +2944,7 @@
     <t id="11153">명령 대기열 교체</t>
     <t id="11154">전시장 도크</t>
     <t id="11155">이곳에 함선 도킹 요청</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)역할</t>
     <t id="11201">확실히 해고하시겠습니까?</t>
     <t id="11202">%s($NPC_NAME$) 해고</t>
@@ -3341,7 +3342,7 @@
     <t id="11696">분해 가능한 잔해</t>
     <t id="11697">자원 탐사정 범위</t>
     <t id="11698">{1001,11697}</t>
-    <t id="11699">(resource type)Solid</t>
+    <t id="11699">광물</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">오프라인 저장</t>
     <t id="11702">오프라인 저장 덮어쓰기</t>
@@ -3961,8 +3962,8 @@
     <t id="13327">대기 중인 우선 명령</t>
     <t id="13328">수집률(of resources; header item for table column)</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
-    <t id="13401">(resource type)Gas</t>
-    <t id="13402">(resource type)Scrap</t>
+    <t id="13401">가스</t>
+    <t id="13402">폐품</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">안녕히</t>

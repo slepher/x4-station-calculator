@@ -2944,6 +2944,7 @@
     <t id="11153">Replace Order Queue</t>
     <t id="11154">Dock at Showroom</t>
     <t id="11155">Request Ship to Dock here</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)Role</t>
     <t id="11201">Are you sure you want to fire this person?</t>
     <t id="11202">Fire %s($NPC_NAME$)</t>
@@ -9717,7 +9718,7 @@
     <t id="3003">https://www.gog.com/game/x4_tides_of_avarice</t>
     <t id="3011">Forced to resort to scavenging, Riptide Rakers have used recycling to reinvent their production chains.</t>
     <t id="3021">Adding to the problems caused by scarcity of resources, The Tide makes life in Avarice even more miserable.</t>
-    <t id="3031">The Vigor Syndicate's powerful grip on primary resources undermines their attempts to be seen as anything but pirates.</t>
+    <t id="3031">Vigor Örgüt'ünün birincil kaynaklar üzerindeki güçlü hakimiyeti, korsan olmadıkları söylemlerine ciddi şüphe düşürüyor.</t>
     <t id="4000">(Kingdom End)</t>
     <t id="4003">https://www.gog.com/game/x4_kingdom_end</t>
     <t id="4011">Signs of gate activity lead to a cross-species investigation into what could turn out to be the discovery of the decade.</t>
@@ -19138,7 +19139,7 @@
     <t id="30220129">(spoken to female player 'you'){10111,30220128}</t>
     <t id="30220130">Head over to Nopileos' Fortune; it's only one system away.</t>
     <t id="30220131">(spoken to female player){10111,30220130}</t>
-    <t id="30220132">There's an old meeting-point under the highway where we used to trade gossip about the local syndicates.</t>
+    <t id="30220132">Otoyolun altında, yerel çeteler ve mafyalar hakkında bilgi paylaşıp dedikodu yaptığımız eski bir buluşma noktası var.</t>
     <t id="30220133">Don't be put off by her... (slight pause before 'unconventional')unconventional demeanor.</t>
     <t id="30220134">(spoken to female player){10111,30220133}</t>
     <t id="30220135">She's not exactly quick to trust people, but once you've passed muster she'll be your most dependable ally.</t>
@@ -19868,7 +19869,7 @@
     <t id="30221500">(Split Diplomatic Story - Chapter 5 - Chose)</t>
     <t id="30221501">Right, I think that's all we need to know for now.</t>
     <t id="30221502">Both the Zyarth Patriarchy and the Cabal of Curbs have a chance of uniting the Free Families under their rule.</t>
-    <t id="30221503">Maybe not all of the Free Families; there are still the occasional pirate bands and mob bosses.</t>
+    <t id="30221503">Belki Özgür Hanların hepsi olmayabilir; hala ara sıra korsan çeteleri ve mafya babaları var.</t>
     <t id="30221504">Anyway, it's time to decide whose effort we are going support.</t>
     <t id="30221505">You'd better meet me to discuss this.</t>
     <t id="30221506">(spoken to female 'you'){,30221505}</t>
@@ -20288,7 +20289,7 @@
     <t id="30251905">(3/3)You know... it is an option.</t>
     <t id="30252000">(Criminal Story)</t>
     <t id="30252101">Nonsense! You should never pass up an opportunity to gain such insight into this place's socio-economic structure!</t>
-    <t id="30252102">Besides, in a system owned by the Syndicate, who is the real criminal?</t>
+    <t id="30252102">Ayrıca, Örgüt'ün kontrolde olduğu bir sistemde asıl suçlu kimdir?</t>
     <t id="30252401">Wildcard, eh? Now we're getting somewhere!(dal and boso, Wildcard is a new nickname the player just earned)</t>
     <t id="30252601">It sure will! If we get our hands on this, we'll have a real edge in a competitive market.(dal and boso)</t>
     <t id="30252602">The fewer people that know about this, the greater our advantage!(dal and boso)</t>
@@ -20328,10 +20329,10 @@
     <t id="30253681">Tragic as it is, it remains business as usual. Nothing to learn here.</t>
     <t id="30253691">Good luck with that. But I don't think there is much for me to learn. I'll dive right back into evaluating the capabilities of the Boron military, before anyone else puts an analysis on the market.</t>
     <t id="30289100">(PirateDLC BattlecruiserXL - optional dialog)</t>
-    <t id="30289101">My sources have informed me that one of the local syndicate leaders has a base on a confiscated ship, which is residing in a scrapyard.</t>
+    <t id="30289101">Kaynaklarım bana yerel örgüt liderlerinden birinin hurdalıkta bulunan el konulmuş bir gemide üssü olduğunu bildirdi.</t>
     <t id="30289102">This must be it...(referencing the XL battleship)</t>
     <t id="30289103">It was confiscated from the Riptide Rakers because of the danger it posed; it could be retrofitted into a battleworthy cruiser.</t>
-    <t id="30289104">I wonder why the Syndicate didn't make the effort to mount those weapons themselves.</t>
+    <t id="30289104">Örgüt'ün neden bu silahları kendileri monte etmek için çaba sarf etmediğini merak ediyorum.</t>
     <t id="30289105">Just imagine it being fully armed, it would be of unmatched firepower; a real game changer.</t>
     <t id="30292000">(Boso Gamestart)</t>
     <t id="30292001">Hey there, nice place you have. This will be very suitable for my work.</t>
@@ -20422,7 +20423,7 @@
     <t id="2007">Kendine iyi bak.</t>
     <t id="2009">Sonunda.</t>
     <t id="3000">(* Diplomat specific lines *)</t>
-    <t id="3001">Yakında Vigor Mafyası masanızda yerini alacaktır.</t>
+    <t id="3001">Yakında Vigor Örgütü masanızda yerini alacaktır.</t>
     <t id="3002">(Diplomat Arrival Confirmation)I have arrived at your embassy, and am looking forward to doing business with you.</t>
     <t id="3003">(Player deteriorates relations, diplomat leaves)You will regret crossing the Vigor Syndicate!</t>
     <t id="3004">Askeri destek sağlamak için birkaç akıncı göndereceğiz.</t>
@@ -23168,7 +23169,7 @@
   <page id="10175" title="Mission Argon/Terran NPC Male 14 / Pirate GS 1 Player / Shady Bar Contact" descr="Lines for Mission Argon NPC Male 14" voice="yes">
     <t id="2000">(* Pleasantries *)</t>
     <t id="99900">(* Gamestart Narration * - Pirate DLC GS 1 / Syndicate Runner)</t>
-    <t id="99901">Vigor Mafyası mı? Tabii ki sorularınıza cevap verebilirim memur bey. Talih Kuşu'nun koruyucuları diyorlar kendilerine ve sundukları koruma da saygıdeğer işadamlarının hakkını verdiği bir hizmettir. Sistemde onların bilgisi dışında gerçekleşen hiçbir şey yoktur. Her hangi bir para transferi söz konusu olduğunda gerek fiziksel gerek sanal olsun, hep onların bunun farkında olduğunu düşünmek gerekmektedir. Şu anda bildiğim kadarıyla bir para aklama eylemi gerçekleşmemektedir, hayır. Büyük çaplı finansal transferler mi? Evet fakat bunlar çoğunlukla Servet Tutkusu'ndaki ihtiyaç sahibi olanlara aktarılan meblağalardır. Ne dediniz? Torbacılar mı? Bence böyle söylentilere kulak asmamalısınız memur bey. Mafya'nın gözetimi altında hiçbir yasadışı madde kaçakcılığı olmamıştır ve bu kendimi bildim bileli böyledir.</t>
+    <t id="99901">Vigor Örgütü mü? Tabii ki sorularınıza cevap verebilirim memur bey. Talih Kuşu'nun koruyucuları diyorlar kendilerine ve sundukları koruma da saygıdeğer işadamlarının hakkını verdiği bir hizmettir. Sistemde onların bilgisi dışında gerçekleşen hiçbir şey yoktur. Her hangi bir para transferi söz konusu olduğunda gerek fiziksel gerek sanal olsun, hep onların bunun farkında olduğunu düşünmek gerekmektedir. Şu anda bildiğim kadarıyla bir para aklama eylemi gerçekleşmemektedir, hayır. Büyük çaplı finansal transferler mi? Evet fakat bunlar çoğunlukla Servet Tutkusu'ndaki ihtiyaç sahibi olanlara aktarılan meblağalardır. Ne dediniz? Torbacılar mı? Bence böyle söylentilere kulak asmamalısınız memur bey. Mafya'nın gözetimi altında hiçbir yasadışı madde kaçakcılığı olmamıştır ve bu kendimi bildim bileli böyledir.</t>
     <t id="99902">(line 2 is spoken by a different character)</t>
     <t id="30252400">(Chapter 4)</t>
     <t id="30252401">İş mi arıyorsun?</t>
@@ -23192,15 +23193,15 @@
     <t id="30287014">Aynen.</t>
     <t id="30287020">Senin işverenin. En azından bugünlük.</t>
     <t id="30287021">Ve açıkcası bu konunun daha fazla konuşulması da asıl mesele ile alakasız.</t>
-    <t id="30287030">Vigor Mafyası şu anda Talih Kuşu'ndaki muhtemelen en güçlü organizasyondur.</t>
-    <t id="30287031">(2/2)Farklı büyüklük ve nüfuza sahip çeşitli kuruluşlardan oluşurlar. Alt ve orta düzey patronların zaman zaman birbirlerine karşı hak iddia ettikleri bilinse de, Mafya liderliği ustalıkla gizemli, istikrarlı ve güvenilir kalmaktadır.</t>
-    <t id="30287040">(1/2, "Avarice" {20005,9033} ile aynı) Mafya üyeleri en belirgin şekilde koruma ve borç para verme işleriyle uğraşırlar. Ancak ana gelir kaynakları, özellikle Servet Tutkusu'na giden ve oradan gelen transit trafik söz konusu olduğunda, haraç kesmeleridir.</t>
+    <t id="30287030">Vigor Örgütü şu anda Talih Kuşu'ndaki muhtemelen en güçlü organizasyondur.</t>
+    <t id="30287031">(2/2)Farklı büyüklük ve nüfuza sahip çeşitli kuruluşlardan oluşurlar. Alt ve orta düzey patronların zaman zaman birbirlerine karşı hak iddia ettikleri bilinse de, Örgüt liderliği ustalıkla gizemli, istikrarlı ve güvenilir kalmaktadır.</t>
+    <t id="30287040">(1/2, "Avarice" {20005,9033} ile aynı) Örgüt üyeleri en belirgin şekilde koruma ve borç para verme işleriyle uğraşırlar. Ancak ana gelir kaynakları, özellikle Servet Tutkusu'na giden ve oradan gelen transit trafik söz konusu olduğunda, haraç kesmeleridir.</t>
     <t id="30287041">(2/2, iyi niyetli uyarı)Biz girişimciler arasında bir tavsiye: Dosyanızda size özel teslimatlar için "eskort" olarak birçok kez  atanmış haydutların olduğunu görebiliyorum. Ancak, bu onlardan güvende olduğunuz anlamına gelmez. Kimse güvende değil.</t>
     <t id="30287050">Tarih dersi vakti ha? Elbette!</t>
     <t id="30287051">(2/6, "Karanlık" Sıçrama Geçitleri kapandıktan sonraki izolasyon dönemi için kullanılan bir terimdir, "Windfall" {20005,9057} ile aynıdır) Karanlık Talih Kuşu'na indiğinde, bu yerde bol miktarda su, yiyecek, muhteşem manzaralar ve lüks konutlar vardı; bana sorarsanız felaketi bekleyen bir durum.</t>
     <t id="30287052">(3/6)Bana değişimin yavaş yavaş gerçekleştiği söylendi. İnsanlar hayatlarını kumarda kaybetmeye devam etti. Özel güvenlik en yüksek parayı verene hizmet etmeye devam etti, ancak artık yüksek teknolojili aletlerin ve organik madde imalatçılarının mülkiyeti uğruna savaşılacak bir şey haline gelmişti.</t>
     <t id="30287053">(4/6, "Yeniden Hizalama" Sıçrama Geçitleri yeniden etkinleştirilmesi için kullanılan yerleşik bir terimdir) Servet Tutkusu ile Yeniden Hizalama, bu sektörün hayatı boyunca gördüğü en yıkıcı altüst oluşu getirdi, Karanlık'ın özgürleştirici izolasyonundan açık ara daha kötüydü.</t>
-    <t id="30287054">(5/6, hayal kırıklığına uğramış)Mafya'nın nasıl galip geldiğini bilemiyorum. İlk hegemonyası Servet Tutkusu'ndaki güçlerle yapılan geçici anlaşmalara dayanıyor gibi görünüyor, ancak Tırmıkçılar'ın neden kendilerini isteyerek onların hizmetine verdiğini bugüne kadar anlayamadım.</t>
+    <t id="30287054">(5/6, hayal kırıklığına uğramış)Vigor Örgütü'nün nasıl galip geldiğini bilemiyorum. İlk hegemonyası Servet Tutkusu'ndaki güçlerle yapılan geçici anlaşmalara dayanıyor gibi görünüyor, ancak Tırmıkçılar'ın neden kendilerini isteyerek onların hizmetine verdiğini bugüne kadar anlayamadım.</t>
     <t id="30287055">(6/6, gerçeğe dönüş) Ah, afedersin dalmışım. Konuşulacak başka bir şey var mıydı?</t>
     <t id="30287060">(1/3)Aurora istasyonu ve Aurora Kumarhanesi adına, teslimatınızın alınmasıyla birlikte sözleşmemizin yerine getirildiğini resmen teyit etmekteyim.</t>
     <t id="30287061">(2/3) Anlaşmamız uyarınca, bu noktaya kadar göstermiş olduğunuz güvenilirlik için size bir tazminat sunma talimatı aldım.</t>
@@ -23214,7 +23215,7 @@
     <t id="30287081">(2/2, uyararak)Bunu gümrük kontrolleri için ücretsiz bir geçiş olarak değerlendirmeyin. Kendilerini görünmez sanan kaçakçılar yakaladım. Görünmez değillerdi.</t>
     <t id="30287090">(yoğun, yavaşça heceleyerek, kelimesi kelimesine) Birbirimizi tanımıyoruz.</t>
     <t id="30288100">(Criminal Plot - Gamestart / Chapter 0)</t>
-    <t id="30288101">(1/3)(umutlu, sadece oyuncuyla konuşur ve 30288XXX satırın tamamında ona mahkum arkadaşı olarak hitap eder)Hey, gardiyana benzemiyorsun... Mafya'dan mısın? Beni kurtarmak için mi buradasın?</t>
+    <t id="30288101">(1/3)(umutlu, sadece oyuncuyla konuşur ve 30288XXX satırın tamamında ona mahkum arkadaşı olarak hitap eder)Hey, gardiyana benzemiyorsun... Örgütten misin? Beni kurtarmak için mi buradasın?</t>
     <t id="30288102">Söz veriyorum, bir daha yakalanmayacağım! Hala işi yeni yeni öğreniyorum!</t>
     <t id="30288103">(3/3) ("Tamam" demeden önce derin bir iç çeker) Hayır mı? Tamam o zaman.</t>
   </page>
@@ -23316,7 +23317,7 @@
     <t id="30251360">Farkedilmeden uzaklaşıyorum. İyi şanslar pilot!</t>
     <t id="30251361">Tanışmak güzeldi!</t>
     <t id="30251362">Hı hı.</t>
-    <t id="30251371">Mafya el koyduğundan beri de işgal altında.</t>
+    <t id="30251371">Örgüt el koyduğundan beri de işgal altında.</t>
     <t id="30251372">Görünüşe göre, biz Tırmıkçılar için fazla hırslı ve militaristti, bu yüzden el değiştirdi.</t>
     <t id="30251373">Ancak, taretleri patlatmadan nasıl bağlayacaklarını asla çözemediler, bu yüzden burada bir ya da iki sonsuz yıldır yapım aşamasında oturuyordu.</t>
     <t id="30251374">Şu anki sahibinin pek dost canlısı olmadığını duydum, o yüzden uzak dursan iyi olur.</t>
@@ -32693,7 +32694,7 @@
     <t id="12107">(Promotion ceremony - cntd, friendly)You are among the few who appears to have the clarity to see our goals as something worth pursuing. Our group wishes to encourage those such as you to continue.</t>
     <t id="12108">(Promotion ceremony - cntd, allied)The path you have chosen remains clear and we are happy to walk it with you. The quest for knowledge must be rewarded and recognised by your peers.</t>
     <t id="12109">(Promotion ceremony - handing over 'medal', friendly)I'm pleased to present you with a new rank amongst our organisation.</t>
-    <t id="12110">(Promotion ceremony - handing over 'medal', allied)It's an honour to present you with a new rank amongst our organisation.</t>
+    <t id="12110">Örgüt içinde size yeni bir rütbe takdim etmekten onur duyuyoruz.</t>
     <t id="12111">(Promotion ceremony)This rank comes with benefit worthy of such a scholar.</t>
     <t id="12112">(Promotion ceremony - fluff line to spread notifications out 1)As you would expect, these benefits are tied to the rank. Should you lose it, the benefits will go too. A simple matter.</t>
     <t id="12113">(Promotion ceremony - fluff line to spread notifications out 2)But with your aptitude, you must recognise that as a foolish outcome.</t>

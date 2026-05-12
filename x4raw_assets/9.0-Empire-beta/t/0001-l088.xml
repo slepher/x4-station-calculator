@@ -2944,6 +2944,7 @@
     <t id="11153">替換指令隊列</t>
     <t id="11154">停靠於展廳</t>
     <t id="11155">請求飛船停靠於此處</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)職務</t>
     <t id="11201">您確定要解雇這個人？</t>
     <t id="11202">解雇%s($NPC_NAME$)</t>

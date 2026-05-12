@@ -2944,6 +2944,7 @@
     <t id="11153">Zastąp kolejkę rozkazów</t>
     <t id="11154">Zadokuj na wystawie</t>
     <t id="11155">Poproś o dokowanie tutaj</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)Funkcja</t>
     <t id="11201">Jesteś pewien, że chcesz zwolnić tę osobę?</t>
     <t id="11202">Zwolnij %s($NPC_NAME$)</t>
@@ -3341,7 +3342,7 @@
     <t id="11696">Wrak nadający się do demontażu</t>
     <t id="11697">Zasięg sondy zasobów</t>
     <t id="11698">{1001,11697}</t>
-    <t id="11699">(resource type)Solid</t>
+    <t id="11699">(resource type)Stały</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Zapis offline</t>
     <t id="11702">Nadpisz zapis offline</t>
@@ -3961,8 +3962,8 @@
     <t id="13327">Zakolejkuj priorytetowy rozkaz</t>
     <t id="13328">Szybkość zbierania(zasobów; pozycja nagłówka dla kolumny tabeli)</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
-    <t id="13401">(resource type)Gas</t>
-    <t id="13402">(resource type)Scrap</t>
+    <t id="13401">(resource type)Gaz</t>
+    <t id="13402">(resource type)Złom</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Do widzenia</t>
@@ -61998,14 +61999,14 @@
     <t id="5107">(objective.wait)na przybycie pasażera(female)</t>
     <t id="5200">(build station)</t>
     <t id="5201">(objective1)Znajdź odpowiednią lokalizację</t>
-    <t id="5202">(objective2)Przejmij działkę</t>
+    <t id="5202">(objective2)Kup działkę</t>
     <t id="5203">(objective4)Przekaż kontrolę</t>
     <t id="5210">(objective3)Buduj stację</t>
     <t id="5211">(objective3)Zbuduj Stację Obronną</t>
     <t id="5212">(objective3)Zbuduj stację</t>
-    <t id="5213">(objective)Przejmij działkę w określonej lokalizacji</t>
+    <t id="5213">(objective)Kup działkę w określonej lokalizacji</t>
     <t id="5214">(cel Rozszerz:)Rozszerz działkę do wymaganego rozmiaru</t>
-    <t id="5215">(objective)Buy plot in specified sector</t>
+    <t id="5215">(objective)Kup działkę w odpowiednim sektorze</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Plany są kupowane od przedstawicieli frakcji i dyplomatów.</t>
     <t id="5300">(build and deliver fleet)</t>

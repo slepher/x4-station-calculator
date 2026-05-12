@@ -6161,7 +6161,7 @@
     <component ref="shield_par_l_standard_01_mk1"/>
     <properties>
       <identification name="{20106,3014}" basename="{20106,3011}" shortname="{20106,3015}" makerrace="paranid" description="{20106,3012}" mk="1"/>
-      <recharge max="38400" rate="365" delay="8.5" disruptionstability="10"/>
+      <recharge max="40320" rate="365" delay="8" disruptionstability="10"/>
       <hull max="2400" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
@@ -6174,7 +6174,7 @@
     <component ref="shield_par_l_standard_01_mk2"/>
     <properties>
       <identification name="{20106,3054}" basename="{20106,3051}" shortname="{20106,3055}" makerrace="paranid" description="{20106,3052}" mk="2"/>
-      <recharge max="46080" rate="530" delay="8.5" disruptionstability="10"/>
+      <recharge max="48000" rate="530" delay="8" disruptionstability="10"/>
       <hull max="2400" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
@@ -6267,8 +6267,8 @@
     <component ref="shield_spl_l_standard_01_mk1"/>
     <properties>
       <identification name="{20106,3084}" basename="{20106,3081}" shortname="{20106,3085}" makerrace="split" description="{20106,3082}" mk="1"/>
-      <recharge max="37332" rate="218" delay="3" disruptionstability="10"/>
-      <hull max="3000" threshold="0.2"/>
+      <recharge max="38845" rate="220" delay="3" disruptionstability="10"/>
+      <hull max="4000" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
@@ -6280,8 +6280,8 @@
     <component ref="shield_spl_l_standard_01_mk2"/>
     <properties>
       <identification name="{20106,3094}" basename="{20106,3091}" shortname="{20106,3095}" makerrace="split" description="{20106,3092}" mk="2"/>
-      <recharge max="44045" rate="292" delay="3" disruptionstability="10"/>
-      <hull max="3000" threshold="0.2"/>
+      <recharge max="46886" rate="302" delay="3" disruptionstability="10"/>
+      <hull max="4000" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
         <sefx_damage_low ref="surfacemodule_damage_l_low"/>
@@ -8513,8 +8513,8 @@
     <properties>
       <identification name="{20105,5254}" basename="{20105,5251}" shortname="{20105,5255}" makerrace="split" description="{20105,5252}" mk="1"/>
       <bullet class="bullet_spl_turret_l_plasma_01_mk1_macro"/>
-      <rotationspeed max="25"/>
-      <rotationacceleration max="37"/>
+      <rotationspeed max="30"/>
+      <rotationacceleration max="45"/>
       <hull max="3600" threshold="0.2"/>
       <effects>
         <sefx_damage_high ref="surfacemodule_damage_l_high"/>
@@ -9697,7 +9697,7 @@
     <properties>
       <identification name="{20105,2024}" basename="{20105,2021}" shortname="{20105,2025}" description="{20105,2022}" mk="1"/>
       <bullet class="bullet_gen_m_gatling_01_mk1_macro"/>
-      <heat overheat="10000" cooldelay="2" overheatcooldelay="2" coolrate="1000" reenable="8000"/>
+      <heat overheat="10000" cooldelay="2" overheatcooldelay="2" coolrate="1100" reenable="8000"/>
       <rotationspeed max="250"/>
       <rotationacceleration max="350"/>
       <hull max="1001" hittable="0"/>
@@ -9716,7 +9716,7 @@
     <properties>
       <identification name="{20105,2034}" basename="{20105,2031}" shortname="{20105,2035}" description="{20105,2032}" mk="2"/>
       <bullet class="bullet_gen_m_gatling_01_mk2_macro"/>
-      <heat overheat="10000" cooldelay="2" overheatcooldelay="2" coolrate="1000" reenable="8000"/>
+      <heat overheat="10000" cooldelay="2" overheatcooldelay="2" coolrate="1100" reenable="8000"/>
       <rotationspeed max="250"/>
       <rotationacceleration max="350"/>
       <hull max="1001" hittable="0"/>
@@ -10098,7 +10098,7 @@
     <properties>
       <identification name="{20105,1024}" basename="{20105,1021}" shortname="{20105,1025}" description="{20105,1022}" mk="1"/>
       <bullet class="bullet_gen_s_gatling_01_mk1_macro"/>
-      <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="1000" reenable="8000"/>
+      <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="1100" reenable="8000"/>
       <rotationspeed max="300"/>
       <rotationacceleration max="450"/>
       <hull max="500" hittable="0"/>
@@ -10117,7 +10117,7 @@
     <properties>
       <identification name="{20105,1034}" basename="{20105,1031}" shortname="{20105,1035}" description="{20105,1032}" mk="2"/>
       <bullet class="bullet_gen_s_gatling_01_mk2_macro"/>
-      <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="1000" reenable="8000"/>
+      <heat overheat="10000" cooldelay="1" overheatcooldelay="2" coolrate="1100" reenable="8000"/>
       <rotationspeed max="300"/>
       <rotationacceleration max="450"/>
       <hull max="500" hittable="0"/>

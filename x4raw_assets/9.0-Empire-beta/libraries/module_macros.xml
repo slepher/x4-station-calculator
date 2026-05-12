@@ -1681,52 +1681,52 @@
     </properties>
     <connections>
       <connection ref="ConnectionFor_launchtube_arg_m_01_macro">
-        <macro ref="launchtube_arg_m_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_m_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_m_01_macro1">
-        <macro ref="launchtube_arg_m_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_m_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_m_01_macro2">
-        <macro ref="launchtube_arg_m_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_m_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_m_01_macro3">
-        <macro ref="launchtube_arg_m_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_m_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro1">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro10">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro11">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro2">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro3">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro4">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro5">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro6">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro7">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro8">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="ConnectionFor_launchtube_arg_s_01_macro9">
-        <macro ref="launchtube_arg_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_arg_s_01_macro" connection="con_launchtube_01"/>
       </connection>
     </connections>
   </macro>
