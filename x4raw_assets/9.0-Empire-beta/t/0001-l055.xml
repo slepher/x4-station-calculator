@@ -2944,6 +2944,7 @@
     <t id="11153">Substituir Ordem Prioritária</t>
     <t id="11154">Pousar no Showroom</t>
     <t id="11155">Solicite que a nave pouse aqui</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)Posição</t>
     <t id="11201">Você tem certeza que quer demitir essa pessoa?</t>
     <t id="11202">Demitir %s($NPC_NAME$)</t>
@@ -3341,7 +3342,7 @@
     <t id="11696">Destroço Desmontável</t>
     <t id="11697">Cobertura da Sonda de Recursos</t>
     <t id="11698">{1001,11697}</t>
-    <t id="11699">(resource type)Solid</t>
+    <t id="11699">(resource type)Sólido</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Salvar off-line</t>
     <t id="11702">Gravar por cima do jogo salvo off-line</t>
@@ -3961,8 +3962,8 @@
     <t id="13327">Ordem de Prioridade na Fila</t>
     <t id="13328">Taxa de coleta (de recursos; item de cabeçalho para coluna da tabela)</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
-    <t id="13401">(resource type)Gas</t>
-    <t id="13402">(resource type)Scrap</t>
+    <t id="13401">(resource type)Gás</t>
+    <t id="13402">(resource type)Sucata</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Tchau</t>

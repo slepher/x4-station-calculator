@@ -7835,9 +7835,9 @@
       }
     },
     "recharge": {
-      "max": 38400.0,
+      "max": 40320.0,
       "rate": 365.0,
-      "delay": 8.5
+      "delay": 8.0
     }
   },
   {
@@ -7868,9 +7868,9 @@
       }
     },
     "recharge": {
-      "max": 46080.0,
+      "max": 48000.0,
       "rate": 530.0,
-      "delay": 8.5
+      "delay": 8.0
     }
   },
   {
@@ -8234,8 +8234,8 @@
       }
     },
     "recharge": {
-      "max": 37332.0,
-      "rate": 218.0,
+      "max": 38845.0,
+      "rate": 220.0,
       "delay": 3.0
     }
   },
@@ -8267,8 +8267,8 @@
       }
     },
     "recharge": {
-      "max": 44045.0,
-      "rate": 292.0,
+      "max": 46886.0,
+      "rate": 302.0,
       "delay": 3.0
     }
   },
@@ -16950,7 +16950,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 2.0,
-      "coolrate": 1000.0
+      "coolrate": 1100.0
     }
   },
   {
@@ -16996,7 +16996,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 2.0,
-      "coolrate": 1000.0
+      "coolrate": 1100.0
     }
   },
   {
@@ -18121,7 +18121,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 1.0,
-      "coolrate": 1000.0
+      "coolrate": 1100.0
     }
   },
   {
@@ -18167,7 +18167,7 @@
     "heat": {
       "overheat": 10000.0,
       "cooldelay": 1.0,
-      "coolrate": 1000.0
+      "coolrate": 1100.0
     }
   },
   {
@@ -18376,6 +18376,11 @@
         "energycells": 139.0,
         "metallicmicrolattice": 44.0,
         "siliconcarbide": 5.0
+      },
+      "closedloop": {
+        "claytronics": 8.0,
+        "energycells": 161.0,
+        "hullparts": 48.0
       }
     },
     "bullet": "bullet_gen_s_laser_01_mk2_macro",

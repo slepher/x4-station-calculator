@@ -2944,6 +2944,7 @@
     <t id="11153">Nahradit frontu příkazů</t>
     <t id="11154">Zakotvit v předváděcím hangáru</t>
     <t id="11155">Požádat loď, aby zde zakotvila</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)Úkol</t>
     <t id="11201">Opravdu chceš propustit tuto osobu?</t>
     <t id="11202">Propustit %s($NPC_NAME$)</t>
@@ -3341,7 +3342,7 @@
     <t id="11696">Rozebíratelný vrak</t>
     <t id="11697">Pokrytí sondou na suroviny</t>
     <t id="11698">{1001,11697}</t>
-    <t id="11699">(resource type)Solid</t>
+    <t id="11699">(typ zdroje)Ruda</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Uložit offline</t>
     <t id="11702">Přepsat offline uložení</t>
@@ -3961,8 +3962,8 @@
     <t id="13327">Fronta prioritních příkazů</t>
     <t id="13328">Rychlost získávání surovin(zdrojů; položka záhlaví sloupce tabulky)</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
-    <t id="13401">(resource type)Gas</t>
-    <t id="13402">(resource type)Scrap</t>
+    <t id="13401">(typ zdroje)Plyn</t>
+    <t id="13402">(typ zdroje)Šrot</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Sbohem</t>
@@ -61998,14 +61999,14 @@
     <t id="5107">(objective.wait) na příchod cestující(female)</t>
     <t id="5200">(build station)</t>
     <t id="5201">(objective1)Najít vhodné místo</t>
-    <t id="5202">(objective2)Zabrat pozemek</t>
+    <t id="5202">(objective2)Koupit pozemek</t>
     <t id="5203">(objective4)Předat kontrolu</t>
     <t id="5210">(objective3)Postavit stanici</t>
     <t id="5211">(objective3)Postavit obrannou stanici</t>
     <t id="5212">(objective3)Postavit továrnu</t>
-    <t id="5213">(objective)Zabrat pozemek na určeném místě</t>
+    <t id="5213">(objektivní)Koupě pozemku v určené lokalitě</t>
     <t id="5214">(objective Extend:)Rozšířit parcelu na požadovanou velikost</t>
-    <t id="5215">(objective)Buy plot in specified sector</t>
+    <t id="5215">(objektivní)Koupit pozemek v daném sektoru</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Plány se nakupují od zástupců frakcí a diplomatů.</t>
     <t id="5300">(postavit a dodat flotilu)</t>

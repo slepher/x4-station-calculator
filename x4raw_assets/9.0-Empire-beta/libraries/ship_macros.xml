@@ -4427,7 +4427,7 @@
       <physics mass="310">
         <inertia pitch="240" yaw="240" roll="200"/>
         <drag forward="96.868" reverse="369.02" horizontal="70" vertical="70" pitch="120" yaw="120" roll="110"/>
-        <accfactors horizontal="1.35" vertical="1.35"/>
+        <accfactors forward="0.8" horizontal="1.35" vertical="1.35"/>
       </physics>
       <thruster tags="large"/>
       <ship type="destroyer"/>
@@ -9924,7 +9924,7 @@
         <angular value="0.7"/>
       </jerk>
       <storage missile="0"/>
-      <hull max="4700"/>
+      <hull max="4800"/>
       <glow engine="1"/>
       <secrecy level="2"/>
       <steeringcurve>
@@ -14494,7 +14494,7 @@
       <physics mass="325">
         <inertia pitch="210" yaw="210" roll="210"/>
         <drag forward="60" reverse="190" horizontal="26" vertical="26" pitch="97" yaw="97" roll="90"/>
-        <accfactors forward="0.85" reverse="0.9" horizontal="1.44" vertical="1.44"/>
+        <accfactors forward="0.95" reverse="0.9" horizontal="1.44" vertical="1.44"/>
       </physics>
       <thruster tags="large"/>
       <ship type="destroyer"/>
@@ -19932,58 +19932,58 @@
         <macro ref="cockpit_gen_invisible_01_macro" connection="ship"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_a">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_j">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_k">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_l">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_m">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_n">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_o">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_p">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_q">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_arg_s_01_r">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="launchtube_arg_s_01_b">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="launchtube_arg_s_01_c">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="launchtube_arg_s_01_d">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="launchtube_arg_s_01_e">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="launchtube_arg_s_01_f">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="launchtube_arg_s_01_g">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="launchtube_arg_s_01_h">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="launchtube_arg_s_01_i">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
     </connections>
   </macro>
@@ -20068,58 +20068,58 @@
         <macro ref="dock_gen_xs_ship_01_macro" connection="Connection_component"/>
       </connection>
       <connection ref="con_launchtube_s_01_a">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_b">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_c">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_d">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_e">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_f">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_g">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_h">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_i">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_j">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_k">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_l">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_m">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_n">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_o">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_p">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_q">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_r">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_shipstorage_s_01">
         <macro ref="shipstorage_gen_s_02_macro" connection="object"/>
@@ -20207,58 +20207,58 @@
         <macro ref="dock_gen_xs_ship_01_macro" connection="Connection_component"/>
       </connection>
       <connection ref="con_launchtube_s_01_a">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_b">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_c">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_d">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_e">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_f">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_g">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_h">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_i">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_j">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_k">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_l">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_m">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_n">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_o">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_p">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_q">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_launchtube_s_01_r">
-        <macro ref="launchtube_xen_s_01_macro" connection="Connection02"/>
+        <macro ref="launchtube_xen_s_01_macro" connection="con_launchtube_01"/>
       </connection>
       <connection ref="con_shipstorage_s_01">
         <macro ref="shipstorage_gen_s_02_macro" connection="object"/>

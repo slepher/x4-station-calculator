@@ -2944,6 +2944,7 @@
     <t id="11153">Reemplazar la cola de órdenes</t>
     <t id="11154">Aterrizar en el módulo de exposición</t>
     <t id="11155">Solicitar que la nave aterrice aquí</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)Rol</t>
     <t id="11201">¿Estas seguro que quieres disparar a esta persona?</t>
     <t id="11202">Disparar a %s($NPC_NAME$)</t>

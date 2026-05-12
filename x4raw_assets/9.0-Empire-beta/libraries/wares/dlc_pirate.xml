@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 06.05.2026 10:16:09-->
+<!--Last exported: 07.05.2026 13:39:25-->
 <diff>
   <add sel="/wares/production">
     <method id="closedloop" name="{20206,1201}" />
@@ -2476,6 +2476,15 @@
         <ware ware="claytronics" amount="1" />
         <ware ware="energycells" amount="52" />
         <ware ware="hullparts" amount="7" />
+      </primary>
+    </production>
+  </add>
+  <add sel="/wares/ware[@id='weapon_gen_s_laser_01_mk2']">
+    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="8" />
+        <ware ware="energycells" amount="161" />
+        <ware ware="hullparts" amount="48" />
       </primary>
     </production>
   </add>

@@ -2572,7 +2572,7 @@
   <entry name="test_bullet_gen_s_railgun_01" value="assets\test\effects\test_bullet_gen_s_railgun_01"/>
   <entry name="test_hidden_flag_02" value="assets\test\markus\test_hidden_flag_02"/>
   <entry name="test_room_gen_playeroffice_01" value="assets\test\lino\test_room_gen_playeroffice_01"/>
-  <entry name="test_teladi_mesh_v3" value="assets\test\markus\test_teladi_mesh_v3"/>
+  <entry name="test_teladi_mesh_v3" value="assets\test\martin\test_teladi_mesh_v3"/>
   <entry name="test_ship_ter_s_scout_01" value="assets\test\etienne\ter\test_ship_ter_s_scout_01"/>
   <entry name="test_ship_ter_s_fighter_01" value="assets\test\etienne\ter\test_ship_ter_s_fighter_01"/>
   <entry name="test_ship_ter_s_scout_02" value="assets\test\etienne\ter\test_ship_ter_s_scout_02"/>
@@ -2966,6 +2966,8 @@
   <entry name="sm_gen_audiolog_01" value="assets\props\StorageModules\sm_gen_audiolog_01"/>
   <entry name="scs_gen_asteroid_32_entranceplug_01" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_entranceplug_01"/>
   <entry name="scs_gen_asteroid_32_entranceplug_02" value="assets\structures\spacesuit_construction_set\scs_gen_asteroid_32_entranceplug_02"/>
+  <entry name="test_weapon_xen_l_pewpew_1_mk1" value="assets\test\unai\xenon gun\test_weapon_xen_l_pewpew_1_mk1"/>
+  <entry name="test_weapon_xen_l_pewpew_3_mk1" value="assets\test\unai\test_weapon_xen_l_pewpew_3_mk1"/>
   <entry name="station_spl_tradestation_base_01" value="extensions\ego_dlc_split\assets\structures\station_spl_tradestation_base_01"/>
   <entry name="defence_spl_claim_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_claim_01"/>
   <entry name="defence_spl_disc_01" value="extensions\ego_dlc_split\assets\structures\defence\defence_spl_disc_01"/>

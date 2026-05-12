@@ -1487,7 +1487,7 @@
     <t id="7505">Pilote automatique</t>
     <t id="7506">Assistance de vol</t>
     <t id="7507">Amarrer</t>
-    <t id="7508">Désamarrer</t>
+    <t id="7508">Décoller</t>
     <t id="7509">Retournez au vaisseau</t>
     <t id="7510">\(Dés\)Activer le mode voyage</t>
     <t id="7511">MATS</t>
@@ -2944,6 +2944,7 @@
     <t id="11153">Écraser la file d'attente</t>
     <t id="11154">Amarrer sur le Hall d'exposition</t>
     <t id="11155">Ordonner au vaisseau de s'amarrer ici</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">Rôle</t>
     <t id="11201">Voulez-vous vraiment virer cette personne ?</t>
     <t id="11202">Virer %s</t>
@@ -3341,7 +3342,7 @@
     <t id="11696">Épave recyclable</t>
     <t id="11697">Portée de la sonde de ressources</t>
     <t id="11698">{1001,11697}</t>
-    <t id="11699">(resource type)Solid</t>
+    <t id="11699">Solide</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">Sauvegarde locale</t>
     <t id="11702">Ecraser la sauvegarde locale</t>
@@ -3961,8 +3962,8 @@
     <t id="13327">Ordre prioritaire en attente</t>
     <t id="13328">Vitesse de collecte(des ressources; titre d'une colonne dans une table)</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
-    <t id="13401">(resource type)Gas</t>
-    <t id="13402">(resource type)Scrap</t>
+    <t id="13401">Gaz(euse)</t>
+    <t id="13402">Débris</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">Au revoir</t>
@@ -4309,7 +4310,7 @@
     <t id="54">Rappeler les drones</t>
     <t id="55">Lancer</t>
     <t id="56">Equiper</t>
-    <t id="57">Désamarrer</t>
+    <t id="57">Décoller</t>
     <t id="58">Prendre le contrôle du vaisseau</t>
     <t id="59">Se lever</t>
     <t id="60">Aller sur</t>
@@ -5416,7 +5417,7 @@
     <t id="1026">Ce tutoriel nécessite que vous possédiez déjà une station.</t>
     <t id="1027">Ce tutoriel nécessite que vous soyez sur un de vos vaisseaux.</t>
     <t id="1030">Ouvrez le menu de la station avec $INPUT_ACTION_OPEN_COCKPIT_MENU$ et sélectionnez "REVENIR AU VAISSEAU" ou appuyez sur $INPUT_ACTION_DOCK_ACTION$ pour retourner rapidement à votre vaisseau.</t>
-    <t id="1031">Sélectionnez "DÉSAMARRER" ou appuyez sur $INPUT_ACTION_DOCK_ACTION$ pour vous désamarrer.</t>
+    <t id="1031">Sélectionnez "DÉCOLLER" ou appuyez sur $INPUT_ACTION_DOCK_ACTION$ pour vous désamarrer.</t>
     <t id="1040">Pour vous assoir, cliquez sur la chaise ou appuyez sur $INPUT_STATE_INTERACTION_MENU$ pour interagir.</t>
     <t id="1041">Pour prendre le contrôle, cliquez sur le terminal de contrôle du vaisseau ou appuyez sur $INPUT_STATE_INTERACTION_MENU$ pour interagir.</t>
     <t id="1042">Pour vous asseoir, appuyez sur $INPUT_STATE_INTERACTION_MENU$ pour interagir.</t>
@@ -9377,7 +9378,7 @@
     <t id="10082">Opérer dans l'espace profond</t>
     <t id="10083">Piller, pirater ou les deux ?</t>
     <t id="10084">Enquête de police</t>
-    <t id="10085">Position</t>
+    <t id="10085">Positionner</t>
     <t id="10086">Afficher la sortie debug</t>
     <t id="10087">Produit</t>
     <t id="10088">Acheté au prix relatif</t>
@@ -61998,14 +61999,14 @@
     <t id="5107">l'arrivée de la passagère</t>
     <t id="5200">(build station)</t>
     <t id="5201">(objective1)Trouver un lieu adapté</t>
-    <t id="5202">(objective2)Revendiquer le terrain</t>
+    <t id="5202">(objectif2)Acheter le terrain</t>
     <t id="5203">(objective4)Transférer le contrôle</t>
     <t id="5210">(objective3)Construire une station</t>
     <t id="5211">(objective3)Construire une station de défense</t>
     <t id="5212">(objective3)Construire une usine</t>
-    <t id="5213">Revendiquer le terrain sur le lieu spécifié</t>
+    <t id="5213">(objectif)Acheter le terrain à l'endroit spécifié</t>
     <t id="5214">(objectif Extend :)Agrandir le tracé aux dimensions requises</t>
-    <t id="5215">(objective)Buy plot in specified sector</t>
+    <t id="5215">(objectif)Acheter le terrain dans le secteur indiqué</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">Les plans sont achetés auprès des représentants de faction et des diplomates.</t>
     <t id="5300">(build and deliver fleet)</t>

@@ -350,7 +350,7 @@
     <component ref="engine_arg_m_allround_01_mk2_macro"/>
     <icon video="engine_arg_m_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -377,7 +377,7 @@
     <component ref="engine_arg_m_allround_01_mk3_macro"/>
     <icon video="engine_arg_m_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -431,7 +431,7 @@
     <component ref="engine_arg_m_combat_01_mk2_macro"/>
     <icon video="engine_arg_m_combat_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -514,7 +514,7 @@
     <component ref="engine_arg_m_travel_01_mk2_macro"/>
     <icon video="engine_arg_m_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -541,7 +541,7 @@
     <component ref="engine_arg_m_travel_01_mk3_macro"/>
     <icon video="engine_arg_m_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -594,7 +594,7 @@
     <component ref="engine_arg_s_allround_01_mk2_macro"/>
     <icon video="engine_arg_s_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -621,7 +621,7 @@
     <component ref="engine_arg_s_allround_01_mk3_macro"/>
     <icon video="engine_arg_s_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -675,7 +675,7 @@
     <component ref="engine_arg_s_combat_01_mk2_macro"/>
     <icon video="engine_arg_s_combat_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -755,7 +755,7 @@
     <component ref="engine_arg_s_travel_01_mk2_macro"/>
     <icon video="engine_arg_s_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -782,7 +782,7 @@
     <component ref="engine_arg_s_travel_01_mk3_macro"/>
     <icon video="engine_arg_s_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -968,7 +968,7 @@
     <component ref="engine_par_m_allround_01_mk2_macro"/>
     <icon video="engine_par_m_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -988,7 +988,7 @@
     <component ref="engine_par_m_allround_01_mk3_macro"/>
     <icon video="engine_par_m_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1029,7 +1029,7 @@
     <component ref="engine_par_m_combat_01_mk2_macro"/>
     <icon video="engine_par_m_combat_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1049,7 +1049,7 @@
     <component ref="engine_par_m_combat_01_mk3_macro"/>
     <icon video="engine_par_m_combat_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.7"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1089,7 +1089,7 @@
     <component ref="engine_par_m_travel_01_mk2_macro"/>
     <icon video="engine_par_m_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1109,7 +1109,7 @@
     <component ref="engine_par_m_travel_01_mk3_macro"/>
     <icon video="engine_par_m_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1148,7 +1148,7 @@
     <component ref="engine_par_s_allround_01_mk2_macro"/>
     <icon video="engine_par_s_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1168,7 +1168,7 @@
     <component ref="engine_par_s_allround_01_mk3_macro"/>
     <icon video="engine_par_s_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1207,7 +1207,7 @@
     <component ref="engine_par_s_combat_01_mk2_macro"/>
     <icon video="engine_par_s_combat_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1228,7 +1228,7 @@
     <component ref="engine_par_s_combat_01_mk3_macro"/>
     <icon video="engine_par_s_combat_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.7"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1268,7 +1268,7 @@
     <component ref="engine_par_s_travel_01_mk2_macro"/>
     <icon video="engine_par_s_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1288,7 +1288,7 @@
     <component ref="engine_par_s_travel_01_mk3_macro"/>
     <icon video="engine_par_s_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -1397,7 +1397,7 @@
     <component ref="engine_tel_m_allround_01_mk2_macro"/>
     <icon video="engine_tel_m_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -1421,7 +1421,7 @@
     <component ref="engine_tel_m_allround_01_mk3_macro"/>
     <icon video="engine_tel_m_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -1462,7 +1462,7 @@
     <component ref="engine_tel_m_combat_01_mk2_macro"/>
     <icon video="engine_tel_m_combat_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="scaleplate"/>
@@ -1515,7 +1515,7 @@
     <component ref="engine_tel_m_travel_01_mk2_macro"/>
     <icon video="engine_tel_m_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -1532,7 +1532,7 @@
     <component ref="engine_tel_m_travel_01_mk3_macro"/>
     <icon video="engine_tel_m_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -1573,7 +1573,7 @@
     <component ref="engine_tel_s_allround_01_mk2_macro"/>
     <icon video="engine_tel_s_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -1590,7 +1590,7 @@
     <component ref="engine_tel_s_allround_01_mk3_macro"/>
     <icon video="engine_tel_s_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -1624,7 +1624,7 @@
     <component ref="engine_tel_s_combat_01_mk2_macro"/>
     <icon video="engine_tel_s_combat_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="scaleplate"/>
@@ -1676,7 +1676,7 @@
     <component ref="engine_tel_s_travel_01_mk2_macro"/>
     <icon video="engine_tel_s_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -1693,7 +1693,7 @@
     <component ref="engine_tel_s_travel_01_mk3_macro"/>
     <icon video="engine_tel_s_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -3859,7 +3859,7 @@
     </production>
     <component ref="missile_gen_s_emp_01_mk1_macro"/>
     <container ref="sm_gen_pickup_equipment_01_macro"/>
-    <use threshold="0.33"/>
+    <use threshold="0.71"/>
     <production time="3" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="energycells" amount="5"/>
@@ -10986,7 +10986,7 @@
     </production>
     <component ref="shield_arg_l_standard_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -11041,7 +11041,7 @@
     <component ref="shield_arg_m_standard_01_mk2_macro"/>
     <icon video="shield_arg_m_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -11095,7 +11095,7 @@
     </production>
     <component ref="shield_arg_m_standard_02_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -11149,7 +11149,7 @@
     <component ref="shield_arg_s_standard_01_mk2_macro"/>
     <icon video="shield_arg_s_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -11175,7 +11175,7 @@
     <component ref="shield_arg_s_standard_01_mk3_macro"/>
     <icon video="shield_arg_s_standard_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="antigone"/>
     <owner faction="argon"/>
@@ -11287,7 +11287,7 @@
     </production>
     <component ref="shield_par_l_standard_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.65"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -11326,7 +11326,7 @@
     <component ref="shield_par_m_standard_01_mk2_macro"/>
     <icon video="shield_arg_m_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.65"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -11363,7 +11363,7 @@
     </production>
     <component ref="shield_par_m_standard_02_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.65"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -11401,7 +11401,7 @@
     <component ref="shield_par_s_standard_01_mk2_macro"/>
     <icon video="shield_arg_s_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.65"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -11421,7 +11421,7 @@
     <component ref="shield_par_s_standard_01_mk3_macro"/>
     <icon video="shield_arg_s_standard_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.85"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="buccaneers"/>
     <owner faction="holyorder"/>
@@ -11475,7 +11475,7 @@
     </production>
     <component ref="shield_tel_l_standard_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -11518,7 +11518,7 @@
     <component ref="shield_tel_m_standard_01_mk2_macro"/>
     <icon video="shield_arg_m_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -11567,7 +11567,7 @@
     </production>
     <component ref="shield_tel_m_standard_02_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -11610,7 +11610,7 @@
     <component ref="shield_tel_s_standard_01_mk2_macro"/>
     <icon video="shield_arg_s_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -11628,7 +11628,7 @@
     <component ref="shield_tel_s_standard_01_mk3_macro"/>
     <icon video="shield_arg_s_standard_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="alliance"/>
     <owner faction="ministry"/>
     <owner faction="teladi"/>
@@ -14545,7 +14545,7 @@
     <component ref="scanner_gen_s_longrange_01_mk2_macro"/>
     <icon video="ware_software_macro"/>
     <software predecessor="software_scannerlongrangemk1"/>
-    <use threshold="0.5"/>
+    <use threshold="0.31"/>
   </ware>
   <ware id="software_scannerminingmk1" name="{20108,1021}" description="{20108,1022}" factoryname="{20108,121}" group="software" transport="equipment" volume="1" tags="noblueprint noplayerblueprint scanner">
     <price min="21814" average="24238" max="26661"/>
@@ -14915,7 +14915,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_m_allround_01_mk3_macro"/>
-    <use threshold="0.71"/>
+    <use threshold="0.7"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="15"/>
@@ -15015,7 +15015,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_m_combat_01_mk3_macro"/>
-    <use threshold="0.71"/>
+    <use threshold="0.7"/>
     <production time="10" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="19"/>
@@ -15115,7 +15115,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_s_allround_01_mk3_macro"/>
-    <use threshold="0.71"/>
+    <use threshold="0.7"/>
     <production time="5" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="8"/>
@@ -15215,7 +15215,7 @@
       </primary>
     </production>
     <component ref="thruster_gen_s_combat_01_mk3_macro"/>
-    <use threshold="0.71"/>
+    <use threshold="0.7"/>
     <production time="5" amount="1" method="terran" name="{20206,901}">
       <primary>
         <ware ware="computronicsubstrate" amount="10"/>
@@ -18560,6 +18560,13 @@
     <owner faction="loanshark"/>
     <owner faction="scavenger"/>
     <owner faction="kaori"/>
+    <production time="10" amount="1" method="closedloop" name="{20206,1201}">
+      <primary>
+        <ware ware="claytronics" amount="8"/>
+        <ware ware="energycells" amount="161"/>
+        <ware ware="hullparts" amount="48"/>
+      </primary>
+    </production>
   </ware>
   <ware id="weapon_gen_s_mining_01_mk1" name="{20105,1104}" description="{20105,1102}" group="weapons" transport="equipment" volume="1" tags="equipment weapon">
     <price min="7772" average="8636" max="9500"/>
@@ -19437,7 +19444,7 @@
     <component ref="engine_spl_m_allround_01_mk2_macro"/>
     <icon video="engine_spl_m_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19454,7 +19461,7 @@
     <component ref="engine_spl_m_allround_01_mk3_macro"/>
     <icon video="engine_spl_m_allround_01_mk3_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19487,7 +19494,7 @@
     <component ref="engine_spl_m_combat_01_mk2_macro"/>
     <icon video="engine_spl_m_combat_01_mk2_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.41"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19504,7 +19511,7 @@
     <component ref="engine_spl_m_combat_01_mk3_macro"/>
     <icon video="engine_spl_m_combat_01_mk3_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.7"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19521,7 +19528,7 @@
     <component ref="engine_spl_m_combat_01_mk4_macro"/>
     <icon video="engine_spl_m_combat_01_mk4_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="court"/>
     <owner faction="split"/>
   </ware>
@@ -19553,7 +19560,7 @@
     <component ref="engine_spl_m_travel_01_mk2_macro"/>
     <icon video="engine_spl_m_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19570,7 +19577,7 @@
     <component ref="engine_spl_m_travel_01_mk3_macro"/>
     <icon video="engine_spl_m_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19603,7 +19610,7 @@
     <component ref="engine_spl_s_allround_01_mk2_macro"/>
     <icon video="engine_spl_s_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19620,7 +19627,7 @@
     <component ref="engine_spl_s_allround_01_mk3_macro"/>
     <icon video="engine_spl_s_allround_01_mk3_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19653,7 +19660,7 @@
     <component ref="engine_spl_s_combat_01_mk2_macro"/>
     <icon video="engine_spl_s_combat_01_mk2_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.41"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19670,7 +19677,7 @@
     <component ref="engine_spl_s_combat_01_mk3_macro"/>
     <icon video="engine_spl_s_combat_01_mk3_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.7"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19687,7 +19694,7 @@
     <component ref="engine_spl_s_combat_01_mk4_macro"/>
     <icon video="engine_spl_s_combat_01_mk4_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.71"/>
     <owner faction="court"/>
     <owner faction="split"/>
   </ware>
@@ -19719,7 +19726,7 @@
     <component ref="engine_spl_s_travel_01_mk2_macro"/>
     <icon video="engine_spl_s_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19736,7 +19743,7 @@
     <component ref="engine_spl_s_travel_01_mk3_macro"/>
     <icon video="engine_spl_s_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19801,7 +19808,7 @@
     <component ref="missile_gen_s_disruptor_01_mk1_macro"/>
     <container ref="sm_gen_pickup_equipment_01_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.51"/>
+    <use threshold="0.71"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -19823,7 +19830,7 @@
     <component ref="missile_gen_s_interceptor_01_mk1_macro"/>
     <container ref="sm_gen_pickup_equipment_01_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.73"/>
+    <use threshold="0.71"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -20403,7 +20410,7 @@
     </production>
     <component ref="shield_spl_l_standard_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="split"/>
   </ware>
@@ -20436,7 +20443,7 @@
     <component ref="shield_spl_m_standard_01_mk2_macro"/>
     <icon video="shield_spl_m_standard_01_mk2_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.65"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="split"/>
   </ware>
@@ -20467,7 +20474,7 @@
     </production>
     <component ref="shield_spl_m_standard_02_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.65"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="split"/>
   </ware>
@@ -20499,7 +20506,7 @@
     <component ref="shield_spl_s_standard_01_mk2_macro"/>
     <icon video="shield_spl_s_standard_01_mk2_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.65"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -20516,7 +20523,7 @@
     <component ref="shield_spl_s_standard_01_mk3_macro"/>
     <icon video="shield_spl_s_standard_01_mk3_video_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="court"/>
     <owner faction="split"/>
   </ware>
@@ -21038,7 +21045,7 @@
     </production>
     <component ref="turret_spl_m_gatling_01_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.41"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -21054,7 +21061,7 @@
     </production>
     <component ref="turret_spl_m_gatling_02_mk1_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.41"/>
+    <use threshold="0.31"/>
     <owner faction="court"/>
     <owner faction="freesplit"/>
     <owner faction="split"/>
@@ -21581,7 +21588,7 @@
     <component ref="engine_ter_m_allround_01_mk2_macro"/>
     <icon video="engine_ter_m_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21598,7 +21605,7 @@
     <component ref="engine_ter_m_allround_01_mk3_macro"/>
     <icon video="engine_ter_m_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21632,7 +21639,7 @@
     <component ref="engine_ter_m_combat_01_mk2_macro"/>
     <icon video="engine_ter_m_combat_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21683,7 +21690,7 @@
     <component ref="engine_ter_m_travel_01_mk2_macro"/>
     <icon video="engine_ter_m_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21700,7 +21707,7 @@
     <component ref="engine_ter_m_travel_01_mk3_macro"/>
     <icon video="engine_ter_m_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21733,7 +21740,7 @@
     <component ref="engine_ter_s_allround_01_mk2_macro"/>
     <icon video="engine_ter_s_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21750,7 +21757,7 @@
     <component ref="engine_ter_s_allround_01_mk3_macro"/>
     <icon video="engine_ter_s_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21783,7 +21790,7 @@
     <component ref="engine_ter_s_combat_01_mk2_macro"/>
     <icon video="engine_ter_s_combat_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21833,7 +21840,7 @@
     <component ref="engine_ter_s_travel_01_mk2_macro"/>
     <icon video="engine_ter_s_travel_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -21850,7 +21857,7 @@
     <component ref="engine_ter_s_travel_01_mk3_macro"/>
     <icon video="engine_ter_s_travel_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22746,7 +22753,7 @@
     </production>
     <component ref="shield_ter_l_standard_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22762,7 +22769,7 @@
     </production>
     <component ref="shield_ter_l_standard_01_mk3_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22796,7 +22803,7 @@
     <component ref="shield_ter_m_standard_01_mk2_macro"/>
     <icon video="shield_ter_m_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22813,7 +22820,7 @@
     <component ref="shield_ter_m_standard_01_mk3_macro"/>
     <icon video="shield_ter_m_standard_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22845,7 +22852,7 @@
     </production>
     <component ref="shield_ter_m_standard_02_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22861,7 +22868,7 @@
     </production>
     <component ref="shield_ter_m_standard_02_mk3_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22892,7 +22899,7 @@
     <component ref="shield_ter_s_standard_01_mk2_macro"/>
     <icon video="shield_ter_s_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22909,7 +22916,7 @@
     <component ref="shield_ter_s_standard_01_mk3_macro"/>
     <icon video="shield_ter_s_standard_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -22941,7 +22948,7 @@
     </production>
     <component ref="shield_ter_xl_standard_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="pioneers"/>
     <owner faction="terran"/>
   </ware>
@@ -24531,7 +24538,7 @@
     <component ref="engine_bor_m_allround_01_mk2_macro"/>
     <icon video="engine_bor_m_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="boron"/>
   </ware>
   <ware id="engine_bor_m_allround_01_mk3" name="{20107,2834}" description="{20107,2832}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -24546,7 +24553,7 @@
     <component ref="engine_bor_m_allround_01_mk3_macro"/>
     <icon video="engine_bor_m_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="boron"/>
   </ware>
   <ware id="engine_bor_s_allround_01_mk1" name="{20107,1804}" description="{20107,1802}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -24575,7 +24582,7 @@
     <component ref="engine_bor_s_allround_01_mk2_macro"/>
     <icon video="engine_bor_s_allround_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.4"/>
+    <use threshold="0.31"/>
     <owner faction="boron"/>
   </ware>
   <ware id="engine_bor_s_allround_01_mk3" name="{20107,1824}" description="{20107,1822}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -24590,7 +24597,7 @@
     <component ref="engine_bor_s_allround_01_mk3_macro"/>
     <icon video="engine_bor_s_allround_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="boron"/>
   </ware>
   <ware id="engine_bor_xl_travel_01_mk1" name="{20107,4124}" description="{20107,4122}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -25360,7 +25367,7 @@
     </production>
     <component ref="shield_bor_l_standard_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="boron"/>
   </ware>
   <ware id="shield_bor_l_standard_01_mk3" name="{20106,3154}" description="{20106,3152}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -25374,7 +25381,7 @@
     </production>
     <component ref="shield_bor_l_standard_01_mk3_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="boron"/>
   </ware>
   <ware id="shield_bor_m_standard_01_mk1" name="{20106,2144}" description="{20106,2142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -25402,7 +25409,7 @@
     </production>
     <component ref="shield_bor_m_standard_01_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="boron"/>
   </ware>
   <ware id="shield_bor_m_standard_01_mk3" name="{20106,2164}" description="{20106,2162}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -25416,7 +25423,7 @@
     </production>
     <component ref="shield_bor_m_standard_01_mk3_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="boron"/>
   </ware>
   <ware id="shield_bor_m_standard_02_mk1" name="{20106,2144}" description="{20106,2142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -25444,7 +25451,7 @@
     </production>
     <component ref="shield_bor_m_standard_02_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="boron"/>
   </ware>
   <ware id="shield_bor_m_standard_02_mk3" name="{20106,2164}" description="{20106,2162}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -25458,7 +25465,7 @@
     </production>
     <component ref="shield_bor_m_standard_02_mk3_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="boron"/>
   </ware>
   <ware id="shield_bor_s_standard_01_mk1" name="{20106,1194}" description="{20106,1192}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -25487,7 +25494,7 @@
     <component ref="shield_bor_s_standard_01_mk2_macro"/>
     <icon video="shield_bor_s_standard_01_mk2_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="boron"/>
   </ware>
   <ware id="shield_bor_s_standard_01_mk3" name="{20106,1214}" description="{20106,1212}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -25502,7 +25509,7 @@
     <component ref="shield_bor_s_standard_01_mk3_macro"/>
     <icon video="shield_bor_s_standard_01_mk3_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.7"/>
+    <use threshold="0.41"/>
     <owner faction="boron"/>
   </ware>
   <ware id="shield_bor_xl_standard_01_mk1" name="{20106,4074}" description="{20106,4072}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -25530,7 +25537,7 @@
     </production>
     <component ref="shield_bor_xl_standard_01_mk2_macro"/>
     <restriction licence="militaryequipment"/>
-    <use threshold="0.5"/>
+    <use threshold="0.31"/>
     <owner faction="boron"/>
   </ware>
   <ware id="ship_bor_l_carrier_01_a" name="{20101,51801}" description="{20101,51811}" transport="ship" volume="1" tags="ship">
@@ -26682,7 +26689,7 @@
     </production>
     <component ref="shield_ter_l_standard_02_mk2_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_l_standard_02_mk3" name="{20106,3184}" description="{20106,3182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -26704,7 +26711,7 @@
     </production>
     <component ref="shield_ter_l_standard_02_mk3_macro"/>
     <restriction licence="capitalequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_standard_04_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -26748,7 +26755,7 @@
     </production>
     <component ref="shield_ter_m_standard_04_mk2_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_standard_04_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -26770,7 +26777,7 @@
     </production>
     <component ref="shield_ter_m_standard_04_mk3_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_virtual_01_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -26816,7 +26823,7 @@
     <component ref="shield_ter_m_virtual_01_mk2_macro"/>
     <icon video="shield_ter_m_virtual_01_mk1_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.25"/>
+    <use threshold="0.31"/>
     <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_m_virtual_01_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -26839,7 +26846,7 @@
     <component ref="shield_ter_m_virtual_01_mk3_macro"/>
     <icon video="shield_ter_m_virtual_01_mk1_video_macro"/>
     <restriction licence="generaluseequipment"/>
-    <use threshold="0.55"/>
+    <use threshold="0.41"/>
     <owner faction="terran"/>
   </ware>
   <ware id="shield_ter_s_virtual_01_mk1" name="{20106,1224}" description="{20106,1222}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">

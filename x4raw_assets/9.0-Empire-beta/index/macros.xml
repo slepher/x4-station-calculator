@@ -2888,6 +2888,40 @@
   <entry name="sm_gen_audiolog_01_macro" value="assets\props\storagemodules\macros\sm_gen_audiolog_01_macro"/>
   <entry name="scs_gen_asteroid_32_entranceplug_01_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_32_entranceplug_01_macro"/>
   <entry name="scs_gen_asteroid_32_entranceplug_02_macro" value="assets\structures\spacesuit_construction_set\macros\scs_gen_asteroid_32_entranceplug_02_macro"/>
+  <entry name="env_asteroid_shard_l_01_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_l_01_macro"/>
+  <entry name="env_asteroid_shard_l_02_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_l_02_macro"/>
+  <entry name="env_asteroid_shard_l_03_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_l_03_macro"/>
+  <entry name="env_asteroid_shard_l_04_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_l_04_macro"/>
+  <entry name="env_asteroid_shard_m_01_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_m_01_macro"/>
+  <entry name="env_asteroid_shard_m_02_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_m_02_macro"/>
+  <entry name="env_asteroid_shard_m_03_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_m_03_macro"/>
+  <entry name="env_asteroid_shard_m_04_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_m_04_macro"/>
+  <entry name="env_asteroid_shard_m_05_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_m_05_macro"/>
+  <entry name="env_asteroid_shard_xl_01_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_xl_01_macro"/>
+  <entry name="env_asteroid_shard_xl_02_macro" value="assets\environments\asteroids\macros\env_asteroid_shard_xl_02_macro"/>
+  <entry name="env_asteroid_nugget_l_01_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_l_01_macro"/>
+  <entry name="env_asteroid_nugget_l_02_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_l_02_macro"/>
+  <entry name="env_asteroid_nugget_l_03_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_l_03_macro"/>
+  <entry name="env_asteroid_nugget_m_01_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_m_01_macro"/>
+  <entry name="env_asteroid_nugget_m_02_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_m_02_macro"/>
+  <entry name="env_asteroid_nugget_m_03_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_m_03_macro"/>
+  <entry name="env_asteroid_nugget_m_04_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_m_04_macro"/>
+  <entry name="env_asteroid_nugget_m_05_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_m_05_macro"/>
+  <entry name="env_asteroid_nugget_xl_01_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_xl_01_macro"/>
+  <entry name="env_asteroid_nugget_xl_02_macro" value="assets\environments\asteroids\macros\env_asteroid_nugget_xl_02_macro"/>
+  <entry name="env_asteroid_orb_l_01_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_l_01_macro"/>
+  <entry name="env_asteroid_orb_l_02_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_l_02_macro"/>
+  <entry name="env_asteroid_orb_l_03_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_l_03_macro"/>
+  <entry name="env_asteroid_orb_l_04_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_l_04_macro"/>
+  <entry name="env_asteroid_orb_m_01_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_m_01_macro"/>
+  <entry name="env_asteroid_orb_m_02_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_m_02_macro"/>
+  <entry name="env_asteroid_orb_m_03_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_m_03_macro"/>
+  <entry name="env_asteroid_orb_m_04_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_m_04_macro"/>
+  <entry name="env_asteroid_orb_m_05_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_m_05_macro"/>
+  <entry name="env_asteroid_orb_xl_01_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_xl_01_macro"/>
+  <entry name="env_asteroid_orb_xl_02_macro" value="assets\environments\asteroids\macros\env_asteroid_orb_xl_02_macro"/>
+  <entry name="test_markus_crystal_big_01_macro" value="assets\test\markus\macros\test_markus_crystal_big_01_macro"/>
+  <entry name="test_lino_reflections_01_macro" value="assets\test\lino\macros\test_lino_reflections_01_macro"/>
   <entry name="cluster_sm_split_macro" value="extensions\ego_dlc_split\assets\environments\cluster\macros\cluster_sm_split_macro"/>
   <entry name="cluster_400_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>
   <entry name="cluster_401_macro" value="extensions\ego_dlc_split\maps\XU_ep2_universe\dlc4_clusters"/>

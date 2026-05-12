@@ -2944,6 +2944,7 @@
     <t id="11153">Sostituisci Coda degli Ordini</t>
     <t id="11154">Attracca allo Showroom</t>
     <t id="11155">Richiedi alla Nave di Attraccare qui</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(map range 32xx and 83xx continued)Ruolo</t>
     <t id="11201">Sei sicuro di voler licenziare questa persona?</t>
     <t id="11202">Licenzia %s($NPC_NAME$)</t>

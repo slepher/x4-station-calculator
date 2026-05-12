@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 06.05.2026 10:16:12-->
+<!--Last exported: 08.05.2026 13:02:58-->
 <diff>
   <add sel="/wares">
     <ware id="engine_arg_s_racer_01_mk1" name="{20107,1834}" description="{20107,1842}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -417,7 +417,7 @@
       </production>
       <component ref="shield_ter_l_standard_02_mk2_macro" />
       <restriction licence="capitalequipment" />
-      <use threshold="0.25" />
+      <use threshold="0.31" />
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_l_standard_02_mk3" name="{20106,3184}" description="{20106,3182}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -431,7 +431,7 @@
       </production>
       <component ref="shield_ter_l_standard_02_mk3_macro" />
       <restriction licence="capitalequipment" />
-      <use threshold="0.55" />
+      <use threshold="0.41" />
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_standard_04_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -459,7 +459,7 @@
       </production>
       <component ref="shield_ter_m_standard_04_mk2_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.25" />
+      <use threshold="0.31" />
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_standard_04_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -473,7 +473,7 @@
       </production>
       <component ref="shield_ter_m_standard_04_mk3_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.55" />
+      <use threshold="0.41" />
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_virtual_01_mk1" name="{20106,2174}" description="{20106,2172}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -503,7 +503,7 @@
       <component ref="shield_ter_m_virtual_01_mk2_macro" />
       <icon video="shield_ter_m_virtual_01_mk1_video_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.25" />
+      <use threshold="0.31" />
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_m_virtual_01_mk3" name="{20106,2194}" description="{20106,2192}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">
@@ -518,7 +518,7 @@
       <component ref="shield_ter_m_virtual_01_mk3_macro" />
       <icon video="shield_ter_m_virtual_01_mk1_video_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.55" />
+      <use threshold="0.41" />
       <owner faction="terran" />
     </ware>
     <ware id="shield_ter_s_virtual_01_mk1" name="{20106,1224}" description="{20106,1222}" group="shields" transport="equipment" volume="1" tags="equipment nocustomgamestart shield">

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--Last exported: 06.05.2026 11:38:20-->
+<!--Last exported: 08.05.2026 13:02:48-->
 <diff>
   <add sel="/wares/production">
     <method id="boron" name="{20206,801}">
@@ -74,7 +74,7 @@
       <component ref="engine_bor_m_allround_01_mk2_macro" />
       <icon video="engine_bor_m_allround_01_mk2_video_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.31" />
       <owner faction="boron" />
     </ware>
     <ware id="engine_bor_m_allround_01_mk3" name="{20107,2834}" description="{20107,2832}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -89,7 +89,7 @@
       <component ref="engine_bor_m_allround_01_mk3_macro" />
       <icon video="engine_bor_m_allround_01_mk3_video_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.41" />
       <owner faction="boron" />
     </ware>
     <ware id="engine_bor_s_allround_01_mk1" name="{20107,1804}" description="{20107,1802}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -118,7 +118,7 @@
       <component ref="engine_bor_s_allround_01_mk2_macro" />
       <icon video="engine_bor_s_allround_01_mk2_video_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.4" />
+      <use threshold="0.31" />
       <owner faction="boron" />
     </ware>
     <ware id="engine_bor_s_allround_01_mk3" name="{20107,1824}" description="{20107,1822}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -133,7 +133,7 @@
       <component ref="engine_bor_s_allround_01_mk3_macro" />
       <icon video="engine_bor_s_allround_01_mk3_video_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.41" />
       <owner faction="boron" />
     </ware>
     <ware id="engine_bor_xl_travel_01_mk1" name="{20107,4124}" description="{20107,4122}" group="engines" transport="equipment" volume="1" tags="engine equipment">
@@ -903,7 +903,7 @@
       </production>
       <component ref="shield_bor_l_standard_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.25" />
+      <use threshold="0.31" />
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_l_standard_01_mk3" name="{20106,3154}" description="{20106,3152}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -917,7 +917,7 @@
       </production>
       <component ref="shield_bor_l_standard_01_mk3_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.41" />
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_01_mk1" name="{20106,2144}" description="{20106,2142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -945,7 +945,7 @@
       </production>
       <component ref="shield_bor_m_standard_01_mk2_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.25" />
+      <use threshold="0.31" />
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_01_mk3" name="{20106,2164}" description="{20106,2162}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -959,7 +959,7 @@
       </production>
       <component ref="shield_bor_m_standard_01_mk3_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.41" />
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_02_mk1" name="{20106,2144}" description="{20106,2142}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -987,7 +987,7 @@
       </production>
       <component ref="shield_bor_m_standard_02_mk2_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.25" />
+      <use threshold="0.31" />
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_m_standard_02_mk3" name="{20106,2164}" description="{20106,2162}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -1001,7 +1001,7 @@
       </production>
       <component ref="shield_bor_m_standard_02_mk3_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.41" />
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_s_standard_01_mk1" name="{20106,1194}" description="{20106,1192}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -1030,7 +1030,7 @@
       <component ref="shield_bor_s_standard_01_mk2_macro" />
       <icon video="shield_bor_s_standard_01_mk2_video_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.25" />
+      <use threshold="0.31" />
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_s_standard_01_mk3" name="{20106,1214}" description="{20106,1212}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -1045,7 +1045,7 @@
       <component ref="shield_bor_s_standard_01_mk3_macro" />
       <icon video="shield_bor_s_standard_01_mk3_video_macro" />
       <restriction licence="generaluseequipment" />
-      <use threshold="0.7" />
+      <use threshold="0.41" />
       <owner faction="boron" />
     </ware>
     <ware id="shield_bor_xl_standard_01_mk1" name="{20106,4074}" description="{20106,4072}" group="shields" transport="equipment" volume="1" tags="equipment shield">
@@ -1073,7 +1073,7 @@
       </production>
       <component ref="shield_bor_xl_standard_01_mk2_macro" />
       <restriction licence="militaryequipment" />
-      <use threshold="0.5" />
+      <use threshold="0.31" />
       <owner faction="boron" />
     </ware>
     <ware id="ship_bor_l_carrier_01_a" name="{20101,51801}" description="{20101,51811}" transport="ship" volume="1" tags="ship">

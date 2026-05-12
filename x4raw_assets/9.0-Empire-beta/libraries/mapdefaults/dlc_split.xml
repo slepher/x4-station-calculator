@@ -223,7 +223,7 @@
         <resourcearea amount="4" ref="sphere_large_ore_high_average" />
         <resourcearea amount="1" ref="sphere_huge_silicon_veryhigh_slow" />
         <resourcearea amount="2" ref="sphere_large_silicon_high_average" />
-        <resourcearea amount="2" ref="sphere_large_nividium_medium_slow" />
+        <resourcearea amount="2" ref="sphere_large_nividium_low_slow" />
       </resourceareas>
       <area sunlight="0.71" economy="0.75" security="0.5" tags="allowrandomanomaly" />
       <worlds>
@@ -711,7 +711,7 @@
         <resourcearea amount="1" ref="sphere_small_nividium_low_veryfast" />
         <resourcearea amount="1" ref="sphere_medium_rawscrap_high_veryfast" />
         <resourcearea amount="3" ref="sphere_tiny_rawscrap_medium_veryfast" />
-        <resourcearea amount="1" ref="sphere_small_rawkhaakscrap_low_fast" />
+        <resourcearea amount="3" ref="sphere_tiny_rawkhaakscrap_verylow_average" />
       </resourceareas>
       <area sunlight="0.85" economy="0.7" security="0.25" tags="allowrandomanomaly"/>
       <worlds>

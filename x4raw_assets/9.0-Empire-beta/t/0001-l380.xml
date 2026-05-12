@@ -2944,6 +2944,7 @@
     <t id="11153">Replace Order Queue</t>
     <t id="11154">Dock at Showroom</t>
     <t id="11155">Request Ship to Dock here</t>
+    <t id="11161">Repeat Last Order</t>
     <t id="11200">(діапазон карт 32хх і 83хх продовження)Роль</t>
     <t id="11201">Ви впевнені, що хочете звільнити цю персону?</t>
     <t id="11202">Звільнити %s($NPC_NAME$)</t>
