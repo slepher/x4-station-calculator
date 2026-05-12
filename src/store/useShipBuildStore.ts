@@ -8,6 +8,7 @@ import type {
   EquipmentType,
   SavedShipBlueprintsState,
   ShipBlueprint,
+  ShipBlueprintBuildAnalysis,
   ShipBlueprintStorage,
   ShipBlueprintBucket,
   ShipBlueprintConnection,
@@ -24,6 +25,7 @@ import type { FitConnectionRow, FitMode } from '@/components/ship-build/fitTypes
 import { migrateShipBlueprintStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_SHIP_BLUEPRINT_VERSION } from './logic/storageVersions'
 import { buildConsumableDatas, buildShipBuildDatas } from './logic/useGameData'
+import { analyzeShipBlueprintBuild, DEFAULT_SHIP_BUILD_PRICE_MULTIPLIER } from './logic/analyzeShipBlueprintBuild'
 
 const BUILT_IN_BLUEPRINT_ID_PREFIX = '__built_in_ship_blueprint__'
 const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
@@ -44,42 +46,6 @@ export type ShipBuildMockTagPatch = {
     size?: ShipEquipmentSize
     tags: string[]
   }>
-}
-
-export type ShipBuildMaterialItem = {
-  wareId: string
-  count: number
-  value: number
-}
-
-export type ShipBuildMaterialShipGroup = {
-  shipId: string
-  value: number
-  items: ShipBuildMaterialItem[]
-}
-
-export type ShipBuildMaterialHullGroup = {
-  shipId: string
-  value: number
-  items: ShipBuildMaterialItem[]
-}
-
-export type ShipBuildMaterialEquipmentGroup = {
-  equipmentId: string
-  equipmentName: string
-  quantity: number
-  value: number
-  items: ShipBuildMaterialItem[]
-}
-
-export type ShipBuildMaterialAnalysis = {
-  methodOptions: string[]
-  selectedMethod: string
-  priceMultiplier: number
-  totalValue: number
-  summaryItems: ShipBuildMaterialItem[]
-  shipGroup: ShipBuildMaterialShipGroup | null
-  equipmentGroups: ShipBuildMaterialEquipmentGroup[]
 }
 
 type BuiltInPresetKey = 'empty' | 'low' | 'mid' | 'high'
@@ -176,6 +142,25 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     })
     return map
   })
+
+  const getBuildAnalysis = (
+    targetBlueprint: ShipBlueprint | null | undefined = blueprint.value,
+    priceMultiplier = DEFAULT_SHIP_BUILD_PRICE_MULTIPLIER
+  ): ShipBlueprintBuildAnalysis => {
+    const effectiveBlueprint = targetBlueprint || null
+    return analyzeShipBlueprintBuild({
+      blueprint: effectiveBlueprint,
+      ship: findShip(effectiveBlueprint?.shipId),
+      equipments: equipmentMap.value,
+      wares: waresMap.value,
+      consumables: consumablesMap.value,
+      drones: dronesMap.value,
+      missiles: missilesMap.value,
+      priceMultiplier
+    })
+  }
+
+  const currentBuildAnalysis = computed(() => getBuildAnalysis(blueprint.value))
 
   // Load blueprints from localStorage
   const loadBlueprintsFromStorage = () => {
@@ -1793,6 +1778,8 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     setStatsViewMode,
     setMaterialMethod,
     setMockTagPatch,
-    setDisplayResolvers
+    setDisplayResolvers,
+    getBuildAnalysis,
+    currentBuildAnalysis
   }
 })

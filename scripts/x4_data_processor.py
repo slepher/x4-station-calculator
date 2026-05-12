@@ -857,6 +857,14 @@ class X4PrecisionLoader:
             cost[method] = recipe.get('inputs', {})
         return cost
 
+    def _build_time_by_method(self, ware_id):
+        if not ware_id: return {}
+        recipe_group = self.recipes.get(ware_id, {})
+        build_time = {}
+        for method, recipe in recipe_group.items():
+            build_time[method] = recipe.get('time', 0)
+        return build_time
+
     def _build_methods(self, ware_info):
         ware_id = ware_info.get("id")
         if not ware_id:
@@ -869,7 +877,8 @@ class X4PrecisionLoader:
             build.append({
                 "method": method,
                 "noplayerbuild": "noplayerbuild" in tags,
-                "cost": recipe.get("inputs", {})
+                "cost": recipe.get("inputs", {}),
+                "time": recipe.get("time", 0)
             })
         return build
 
@@ -1913,7 +1922,8 @@ class X4PrecisionLoader:
                     "ammunitionTags": [],
                     "integrated": hull_integrated,
                     "size": equip_size,
-                    "cost": self._build_cost(ware_id)
+                    "cost": self._build_cost(ware_id),
+                    "buildTime": self._build_time_by_method(ware_id)
                 }
 
                 # 提取各类型装备数据到顶层
@@ -2074,7 +2084,8 @@ class X4PrecisionLoader:
                     "race": ident_info.get('race'),
                     "deployable": ident_info.get('deployable', False),
                     "tags": self._split_tags(ware_info.get('tags', '')),
-                    "cost": self._build_cost(ware_id)
+                    "cost": self._build_cost(ware_id),
+                    "buildTime": self._build_time_by_method(ware_id)
                 }
 
                 # 根据 class 分类
@@ -2143,6 +2154,7 @@ class X4PrecisionLoader:
                     "tags": self._split_tags(ware_info.get('tags', '')),
                     "missileTags": [],
                     "cost": self._build_cost(ware_id),
+                    "buildTime": self._build_time_by_method(ware_id),
                     "amount": 0,
                     "lifetime": 0,
                     "range": 0,

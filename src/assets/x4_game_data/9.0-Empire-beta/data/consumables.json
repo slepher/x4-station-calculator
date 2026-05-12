@@ -31,6 +31,12 @@
         "energycells": 30.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 1.0,
+      "xenon": 10.0,
+      "terran": 1.0,
+      "closedloop": 1.0
     }
   },
   {
@@ -63,6 +69,12 @@
       "closedloop": {
         "energycells": 14.0
       }
+    },
+    "buildTime": {
+      "default": 60.0,
+      "xenon": 60.0,
+      "terran": 60.0,
+      "closedloop": 60.0
     }
   },
   {
@@ -98,6 +110,12 @@
         "energycells": 54.0,
         "hullparts": 2.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     }
   },
   {
@@ -132,6 +150,12 @@
         "energycells": 54.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 60.0,
+      "xenon": 60.0,
+      "terran": 60.0,
+      "closedloop": 60.0
     }
   },
   {
@@ -169,6 +193,12 @@
         "energycells": 51.0,
         "hullparts": 17.0
       }
+    },
+    "buildTime": {
+      "default": 60.0,
+      "xenon": 60.0,
+      "terran": 60.0,
+      "closedloop": 60.0
     }
   },
   {
@@ -189,6 +219,9 @@
     ],
     "cost": {
       "default": {}
+    },
+    "buildTime": {
+      "default": 10.0
     }
   },
   {
@@ -209,6 +242,9 @@
     ],
     "cost": {
       "default": {}
+    },
+    "buildTime": {
+      "default": 10.0
     }
   },
   {
@@ -226,7 +262,8 @@
       "noplayerblueprint",
       "scanner"
     ],
-    "cost": {}
+    "cost": {},
+    "buildTime": {}
   },
   {
     "id": "software_scannerminingmk2",
@@ -243,7 +280,8 @@
       "noplayerblueprint",
       "scanner"
     ],
-    "cost": {}
+    "cost": {},
+    "buildTime": {}
   },
   {
     "id": "software_scannerobjectmk1",
@@ -263,6 +301,9 @@
     ],
     "cost": {
       "default": {}
+    },
+    "buildTime": {
+      "default": 10.0
     }
   },
   {
@@ -283,6 +324,9 @@
     ],
     "cost": {
       "default": {}
+    },
+    "buildTime": {
+      "default": 10.0
     }
   },
   {
@@ -304,6 +348,9 @@
         "energycells": 6.0,
         "weaponcomponents": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     }
   },
   {
@@ -338,6 +385,12 @@
         "energycells": 45.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     }
   },
   {
@@ -373,6 +426,12 @@
         "energycells": 70.0,
         "hullparts": 2.0
       }
+    },
+    "buildTime": {
+      "default": 60.0,
+      "xenon": 10.0,
+      "terran": 60.0,
+      "closedloop": 60.0
     }
   },
   {
@@ -410,6 +469,12 @@
         "energycells": 119.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 60.0,
+      "xenon": 10.0,
+      "terran": 60.0,
+      "closedloop": 60.0
     }
   }
 ]
