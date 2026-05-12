@@ -25,6 +25,7 @@ export interface X4ShipProduction {
   method: string;
   noplayerbuild: boolean;
   cost: Record<string, number>;
+  time: number;
 }
 
 export type EquipmentType = 'engine' | 'shield' | 'turret' | 'weapon' | 'thruster' | 'consumables' | 'units';
@@ -130,6 +131,7 @@ export interface X4Equipment {
   ammunitionTags: string[];
   integrated: boolean;
   cost: Record<string, Partial<Record<string, number>>>;
+  buildTime?: Partial<Record<string, number>>;
   // 引擎数据 (engine)
   thrust?: {
     forward?: number;
@@ -179,6 +181,7 @@ export interface X4Missile {
   tags: string[];
   missileTags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
+  buildTime?: Partial<Record<string, number>>;
   amount: number;
   lifetime: number;
   range: number;
@@ -230,6 +233,7 @@ export interface X4Drone {
   cargo: Array<{ type: 'container' | 'solid' | 'liquid' | 'condensate'; capacity: number }>;
   tags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
+  buildTime?: Partial<Record<string, number>>;
 }
 
 /**
@@ -247,6 +251,7 @@ export interface X4Consumable {
   deployable: boolean;
   tags: string[];
   cost: Record<string, Partial<Record<string, number>>>;
+  buildTime?: Partial<Record<string, number>>;
 }
 
 /**
@@ -820,6 +825,40 @@ export interface ShipBlueprint {
   storage?: ShipBlueprintStorage
   materialMethod: string
   lastUpdated: number
+}
+
+export type ShipBlueprintBuildEntryKind = 'ship' | 'equipment' | 'storage'
+export type ShipBlueprintStorageEntryType = 'deployable' | 'countermeasure' | 'drone' | 'missile'
+
+export interface ShipBuildMaterialItem {
+  wareId: string
+  count: number
+  value: number
+}
+
+export interface ShipBlueprintBuildEntry {
+  key: string
+  kind: ShipBlueprintBuildEntryKind
+  entityId: string
+  quantity: number
+  totalValue: number
+  unitBuildTime: number
+  totalBuildTime: number
+  materialItems: ShipBuildMaterialItem[]
+  storageType?: ShipBlueprintStorageEntryType
+}
+
+export interface ShipBlueprintBuildAnalysis {
+  methodOptions: string[]
+  selectedMethod: string
+  priceMultiplier: number
+  totalValue: number
+  totalBuildTime: number
+  summaryItems: ShipBuildMaterialItem[]
+  shipEntry: ShipBlueprintBuildEntry | null
+  equipmentEntries: ShipBlueprintBuildEntry[]
+  storageEntries: ShipBlueprintBuildEntry[]
+  entries: ShipBlueprintBuildEntry[]
 }
 
 export interface ShipBlueprintBucket {
