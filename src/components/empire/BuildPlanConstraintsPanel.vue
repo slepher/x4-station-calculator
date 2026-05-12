@@ -2,14 +2,13 @@
 import { computed, ref, onMounted, onUnmounted, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useTitleEditor } from '@/composables/useTitleEditor'
 import BuildGoalSearchBox from './BuildGoalSearchBox.vue'
 import FleetGoalCard from './FleetGoalCard.vue'
 import PreviewLinePlanSection from './PreviewLinePlanSection.vue'
 import WarePlanningItem from './WarePlanningItem.vue'
 import { type BuildGoal, type PreviewLinePlan, type ProductionLineAllocation, type FleetGoalView } from '@/types/build-plan'
-import type { PlanItem } from '@/components/empire/presenters/useBuildPlanPresenter'
+import type { FlowPlanItem, PlanItem } from '@/components/empire/presenters/useBuildPlanPresenter'
 
 const props = defineProps<{
   goals: BuildGoal[]
@@ -21,6 +20,9 @@ const props = defineProps<{
   planName: string
   activePlanId: string | null
   loadablePlanItems: PlanItem[]
+  flowPlanName: string
+  selectedFlowPlanId: string | null
+  loadableFlowPlans: FlowPlanItem[]
   allocations: ProductionLineAllocation[]
   buildMaterialPreviewLines?: PreviewLinePlan[]
   productionPreviewLines?: PreviewLinePlan[]
@@ -38,6 +40,7 @@ const emit = defineEmits<{
   switchPlan: [planId: string]
   deletePlan: [planId: string]
   setPlanName: [name: string]
+  loadFlowPlan: [planId: string | null]
   addFleetEntry: [shipId: string, blueprintId: string]
   removeFleetEntry: [blueprintId: string]
   updateFleetBuildTime: [seconds: number]
@@ -46,7 +49,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const gameData = useGameDataStore()
-const logicFlowStore = useLogicFlowStore()
 const schemeCount = computed(() => props.buildPlan?.schemes?.length || 0)
 const editableGoals = computed(() =>
   props.goals.filter((goal): goal is BuildGoal & { type: 'production-rate' | 'build-module' } =>
@@ -136,19 +138,7 @@ const flowTriggerRef = ref<HTMLElement | null>(null)
 const flowMenuStyle = ref<Record<string, string>>({})
 
 const flowButtonLabel = computed(() => {
-  const activeId = logicFlowStore.savedPlans.activeId
-  if (!activeId) return t('build_plan.import_flow_placeholder')
-  const plan = logicFlowStore.savedPlans.list.find(p => p.id === activeId)
-  return plan?.name || t('build_plan.import_flow_placeholder')
-})
-
-const activeFlowPlanId = computed(() => logicFlowStore.savedPlans.activeId)
-const loadableFlowPlans = computed(() => {
-  return logicFlowStore.savedPlans.list.map((plan, index) => ({
-    id: plan.id,
-    name: plan.name,
-    index
-  }))
+  return props.flowPlanName || t('build_plan.import_flow_placeholder')
 })
 
 function closeFlowMenu() {
@@ -176,8 +166,7 @@ function toggleFlowMenu() {
 }
 
 function handleFlowSelect(planId: string) {
-  const index = logicFlowStore.savedPlans.list.findIndex(p => p.id === planId)
-  if (index >= 0) logicFlowStore.loadPlan(index)
+  emit('loadFlowPlan', planId)
   closeFlowMenu()
 }
 
@@ -364,7 +353,7 @@ onUnmounted(() => {
                   v-for="item in loadableFlowPlans"
                   :key="item.id"
                   class="flow-plan-menu-item"
-                  :class="item.id === activeFlowPlanId ? 'flow-plan-menu-item-active' : ''"
+                  :class="item.id === selectedFlowPlanId ? 'flow-plan-menu-item-active' : ''"
                   @click="handleFlowSelect(item.id)"
                 >
                   {{ item.name }}

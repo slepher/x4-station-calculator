@@ -48,6 +48,9 @@ export interface BuildPlanPresenterProps {
   planName: ComputedRef<string>
   activePlanId: ComputedRef<string | null>
   loadablePlanItems: ComputedRef<PlanItem[]>
+  flowPlanName: ComputedRef<string>
+  selectedFlowPlanId: ComputedRef<string | null>
+  loadableFlowPlans: ComputedRef<FlowPlanItem[]>
   fleetGoalView: ComputedRef<FleetGoalView | null>
 }
 
@@ -61,6 +64,7 @@ export interface BuildPlanPresenterEmits {
   switchPlan: (planId: string) => void
   deletePlan: (planId: string) => void
   setPlanName: (name: string) => void
+  loadFlowPlan: (planId: string | null) => void
   addFleetEntry: (shipId: string, blueprintId: string) => void
   removeFleetEntry: (blueprintId: string) => void
   updateFleetBuildTime: (seconds: number) => void
@@ -78,6 +82,9 @@ interface ExportStationSnapshot {
   modules: SavedModule[]
   lockedWares?: string[]
   warePriority?: Record<string, number>
+  settings?: {
+    racePreference?: string
+  }
 }
 
 export interface BuildPlanPresenterStore {
@@ -102,8 +109,9 @@ export interface BuildPlanPresenterBuildPlanStore {
   buildFlowPlanLoading: boolean
   schemeGroups: BuildSchemeGroup[]
   computeBuildPlanLoading: boolean
-  savedPlans: { activeId: string | null; list: { id: string; name: string; buildGoals: BuildGoal[] }[] }
+  savedPlans: { activeId: string | null; list: { id: string; name: string; buildGoals: BuildGoal[]; logicFlowPlanId?: string | null }[] }
   activePlanName: string
+  setLogicFlowPlanId(planId: string | null): void
   setBuildGoal(goal: BuildGoal): void
   removeBuildGoal(index: number): void
   setBuildFlowMode(mode: boolean): void
@@ -254,6 +262,26 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
       ))
   })
 
+  const selectedFlowPlanId = computed<string | null>(() => {
+    const activePlan = buildPlanStore.savedPlans.list.find(plan => plan.id === buildPlanStore.savedPlans.activeId)
+    return activePlan?.logicFlowPlanId || null
+  })
+
+  const flowPlanName = computed(() => {
+    const selectedId = selectedFlowPlanId.value
+    if (!selectedId) return ''
+    const plan = logicFlow.savedPlans.list.find(item => item.id === selectedId)
+    return plan?.name || ''
+  })
+
+  const loadableFlowPlans = computed<FlowPlanItem[]>(() => {
+    return logicFlow.savedPlans.list.map((plan, index) => ({
+      id: plan.id,
+      name: plan.name,
+      index,
+    }))
+  })
+
   const props: BuildPlanPresenterProps = {
     goals: computed(() => buildPlanStore.buildGoals),
     buildFlowMode: computed(() => buildPlanStore.buildFlowMode),
@@ -287,6 +315,9 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
         index
       }))
     }),
+    flowPlanName,
+    selectedFlowPlanId,
+    loadableFlowPlans,
     fleetGoalView,
   }
 
@@ -312,11 +343,13 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     switchPlan: (planId) => buildPlanStore.switchPlan(planId),
     deletePlan: (planId) => buildPlanStore.deletePlan(planId),
     setPlanName: (name) => { buildPlanStore.activePlanName = name },
+    loadFlowPlan: (planId) => buildPlanStore.setLogicFlowPlanId(planId),
     addFleetEntry: (shipId, blueprintId) => buildPlanStore.addFleetEntry(shipId, blueprintId),
     removeFleetEntry: (blueprintId) => buildPlanStore.removeFleetEntry(blueprintId),
     updateFleetBuildTime: (seconds) => buildPlanStore.updateFleetBuildTime(seconds),
     updateFleetEntryQuantity: (blueprintId, qty) => buildPlanStore.updateFleetEntryQuantity(blueprintId, qty),
     exportToStations: (mode) => {
+      const lineageToRace = (lineage: string) => lineage === 'default' ? 'argon' : lineage
       const schemeGroups = buildPlanStore.schemeGroups
       const allSchemes: BuildScheme[] = []
       
@@ -326,6 +359,7 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
       
       for (const scheme of allSchemes) {
         const stationName = scheme.label
+        const racePreference = lineageToRace(scheme.lineage || 'default')
         
         const primaryModuleIds = scheme.primaryModuleIds || []
         const modules = scheme.modules || []
@@ -343,6 +377,9 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
               lockedWares,
               warePriority: existing.warePriority || {},
             })
+            if (existing.settings) {
+              existing.settings.racePreference = racePreference
+            }
           } else {
             const stationId = blueprintStore.createStation(stationName, 'industrial')
             const station = stationId ? blueprintStore.getStationById(stationId) : null
@@ -352,6 +389,9 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
                 lockedWares,
                 warePriority: station.warePriority || {},
               })
+              if (station.settings) {
+                station.settings.racePreference = racePreference
+              }
             }
           }
         } else {
@@ -363,6 +403,9 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
               lockedWares,
               warePriority: station.warePriority || {},
             })
+            if (station.settings) {
+              station.settings.racePreference = racePreference
+            }
           }
         }
       }

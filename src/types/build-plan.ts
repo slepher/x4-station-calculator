@@ -120,6 +120,8 @@ export interface BuildSchemeModuleSummary {
 
 export interface BuildScheme {
   label: string
+  description?: string
+  lineage?: string
   purposeModules: string[]
   primaryModuleIds: string[]
   modules: SavedModule[]
@@ -313,6 +315,21 @@ export interface ComputeResult {
 export type PrimaryModuleSnapshot = Map<string, string>
 // key = lineGroupId
 // value = "module_id:count;module_id:count"
+
+export interface LogicFlowPlanSnapshot {
+  planId: string | null
+  groups: import('./x4').ProductionLineGroup[]
+  buildFlowView: BuildFlowPlanView | null
+  buildFlowAssignments: import('./x4').BuildFlowAssignment[]
+  buildFlowVirtualEdges: import('./x4').VirtualEdge[]
+}
+
+export interface ResolvedBuildPlanLogicFlowState {
+  requestedPlanId: string | null
+  resolvedPlanId: string | null
+  source: 'active-store' | 'rebuilt-plan' | 'none'
+  snapshot: LogicFlowPlanSnapshot | null
+}
 
 // --- Build Plan Goals Persistence Types ---
 

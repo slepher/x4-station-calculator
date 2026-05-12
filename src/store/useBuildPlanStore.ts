@@ -9,8 +9,10 @@ import type {
   BuildFlowPlanView,
   BuildSchemeGroup,
   ComputeResult,
+  LogicFlowPlanSnapshot,
   PreviewResult,
   ProductionLineAllocation,
+  ResolvedBuildPlanLogicFlowState,
   SavedBuildPlanGoalsState,
   BuildPlanGoalSnapshot,
 } from '@/types/build-plan'
@@ -25,6 +27,10 @@ import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
 import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
 import { computeFlowPlanLines, expandGoalDependencies, makeSchemes, mergeModules } from '@/store/logic/calculateBuildFlowPlan'
 import { mergeIntoExistingPlan, rebuildSchemeGroups } from '@/store/logic/mergeIntoExistingPlan'
+import {
+  createActiveLogicFlowSnapshot,
+  rebuildLogicFlowSnapshotFromPlan,
+} from '@/store/logic/buildPlanLogicFlowSource'
 import {
   computeBuildFlowPlan,
   computeBuildFlowPlanSchemeGroups,
@@ -53,6 +59,12 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
   const buildFlowPlanLoading = ref(false)
   const schemeGroups = ref<BuildSchemeGroup[]>([])
   const computeBuildPlanLoading = ref(false)
+  const resolvedLogicFlowState = shallowRef<ResolvedBuildPlanLogicFlowState>({
+    requestedPlanId: null,
+    resolvedPlanId: null,
+    source: 'none',
+    snapshot: null,
+  })
 
   function getDefaultPlanName(): string {
     const n = savedPlans.value.list.length + 1
@@ -80,6 +92,12 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     } catch {
       // ignore corrupt data
     }
+  }
+
+  function getActivePlanSnapshot(): BuildPlanGoalSnapshot | null {
+    const id = savedPlans.value.activeId
+    if (!id) return null
+    return savedPlans.value.list.find(plan => plan.id === id) || null
   }
 
   function syncGoalsToActivePlan() {
@@ -118,6 +136,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     savedPlans.value.activeId = newPlan.id
     buildGoals.value = []
     savePlansToStorage()
+    resolveLogicFlowStateForBuildPlan()
   }
 
   function switchPlan(planId: string) {
@@ -125,15 +144,8 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     if (!plan) return
     buildGoals.value = [...plan.buildGoals]
     savedPlans.value.activeId = planId
-
-    if (plan.logicFlowPlanId) {
-      const lfIndex = logicFlowStore.savedPlans.list.findIndex(p => p.id === plan.logicFlowPlanId)
-      if (lfIndex >= 0) {
-        logicFlowStore.loadPlan(lfIndex)
-      }
-    }
-
     savePlansToStorage()
+    resolveLogicFlowStateForBuildPlan()
   }
 
   function deletePlan(planId: string) {
@@ -153,16 +165,84 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     }
 
     savePlansToStorage()
+    resolveLogicFlowStateForBuildPlan()
   }
 
-  function updateLogicFlowPlanId() {
-    const id = savedPlans.value.activeId
-    if (!id) return
-    const plan = savedPlans.value.list.find(p => p.id === id)
+  function setLogicFlowPlanId(planId: string | null) {
+    ensureActivePlan()
+    const plan = getActivePlanSnapshot()
     if (!plan) return
-    plan.logicFlowPlanId = logicFlowStore.savedPlans.activeId
+    plan.logicFlowPlanId = planId
     plan.lastUpdated = Date.now()
     savePlansToStorage()
+    resolveLogicFlowStateForBuildPlan()
+  }
+
+  function getSelectedLogicFlowPlanId(): string | null {
+    return getActivePlanSnapshot()?.logicFlowPlanId || null
+  }
+
+  function resolveLogicFlowStateForBuildPlan(): ResolvedBuildPlanLogicFlowState {
+    const requestedPlanId = getSelectedLogicFlowPlanId()
+    if (!requestedPlanId) {
+      const nextState: ResolvedBuildPlanLogicFlowState = {
+        requestedPlanId: null,
+        resolvedPlanId: null,
+        source: 'none',
+        snapshot: null,
+      }
+      resolvedLogicFlowState.value = nextState
+      return nextState
+    }
+
+    if (requestedPlanId === logicFlowStore.savedPlans.activeId) {
+      const snapshot: LogicFlowPlanSnapshot = createActiveLogicFlowSnapshot({
+        activePlanId: logicFlowStore.savedPlans.activeId,
+        groups: logicFlowStore.groups || [],
+        buildFlowView: logicFlowStore.buildFlowView,
+        buildFlowAssignments: logicFlowStore.buildFlowAssignments || [],
+        buildFlowVirtualEdges: logicFlowStore.buildFlowVirtualEdges || [],
+      })
+      const nextState: ResolvedBuildPlanLogicFlowState = {
+        requestedPlanId,
+        resolvedPlanId: requestedPlanId,
+        source: 'active-store',
+        snapshot,
+      }
+      resolvedLogicFlowState.value = nextState
+      return nextState
+    }
+
+    const plan = logicFlowStore.savedPlans.list.find(item => item.id === requestedPlanId)
+    if (!plan) {
+      const nextState: ResolvedBuildPlanLogicFlowState = {
+        requestedPlanId,
+        resolvedPlanId: null,
+        source: 'none',
+        snapshot: null,
+      }
+      resolvedLogicFlowState.value = nextState
+      return nextState
+    }
+
+    const snapshot = rebuildLogicFlowSnapshotFromPlan(plan, {
+      modulesMap: gameData.modulesMap,
+      waresMap: gameData.waresMap,
+      modulesByOutputMap: gameData.modulesByOutputMap || {},
+      getWareDisplayName: (wareId: string) => gameData.getWareDisplayName(wareId),
+    })
+    const nextState: ResolvedBuildPlanLogicFlowState = {
+      requestedPlanId,
+      resolvedPlanId: plan.id,
+      source: 'rebuilt-plan',
+      snapshot,
+    }
+    resolvedLogicFlowState.value = nextState
+    return nextState
+  }
+
+  function getResolvedSnapshot(): LogicFlowPlanSnapshot | null {
+    return resolveLogicFlowStateForBuildPlan().snapshot
   }
 
   const activePlanName = computed({
@@ -325,15 +405,8 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       }
     }
 
-    let buildFlowView: BuildFlowPlanView | null = null
-    const flowView = logicFlowStore.buildFlowView
-    if (flowView && flowView.buildFlowGroups && flowView.buildFlowGroups.length > 0) {
-      buildFlowView = {
-        buildFlowGroups: flowView.buildFlowGroups,
-        assignments: logicFlowStore.buildFlowAssignments,
-        virtualEdges: logicFlowStore.buildFlowVirtualEdges,
-      }
-    }
+    const resolvedSnapshot = getResolvedSnapshot()
+    const buildFlowView = resolvedSnapshot?.buildFlowView || null
 
     if (!buildFlowView) {
       const targetGoalWareIds: string[] = []
@@ -464,6 +537,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     try {
       const goals = buildGoals.value
       if (goals.length === 0) {
+        resolveLogicFlowStateForBuildPlan()
         buildFlowPlanGraphResult.value = null
         buildFlowPlanAllocations.value = []
         previewResult.value = null
@@ -471,17 +545,9 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       }
 
       const expandedGoals = expandFleetGoals(goals)
-
-      const groups: ProductionLineGroup[] = logicFlowStore.groups || []
-      let buildFlowView: BuildFlowPlanView | null = null
-      const flowView = logicFlowStore.buildFlowView
-      if (flowView && flowView.buildFlowGroups && flowView.buildFlowGroups.length > 0) {
-        buildFlowView = {
-          buildFlowGroups: flowView.buildFlowGroups,
-          assignments: logicFlowStore.buildFlowAssignments || [],
-          virtualEdges: logicFlowStore.buildFlowVirtualEdges || [],
-        }
-      }
+      const resolvedSnapshot = getResolvedSnapshot()
+      const groups: ProductionLineGroup[] = resolvedSnapshot?.groups || []
+      const buildFlowView: BuildFlowPlanView | null = resolvedSnapshot?.buildFlowView || null
 
       const preview = createBuildFlowPlanPreview(
         expandedGoals,
@@ -594,17 +660,12 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       }
 
       if (buildFlowMode.value && buildFlowPlanGraphResult.value) {
+        const resolvedSnapshot = getResolvedSnapshot()
         const result = computeBuildFlowPlanSchemeGroups(
           buildFlowPlanGraphResult.value,
           expandedGoals,
-          logicFlowStore.groups || [],
-          logicFlowStore.buildFlowView
-            ? {
-              buildFlowGroups: logicFlowStore.buildFlowView.buildFlowGroups,
-              assignments: logicFlowStore.buildFlowAssignments || [],
-              virtualEdges: logicFlowStore.buildFlowVirtualEdges || [],
-            }
-            : null,
+          resolvedSnapshot?.groups || [],
+          resolvedSnapshot?.buildFlowView || null,
           deps.modulesMap,
           deps.waresMap,
           gameData.modulesByOutputMap || {},
@@ -649,10 +710,9 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
 
   watch(
     [
-      () => logicFlowStore.groups,
-      () => logicFlowStore.buildFlowGroups,
-      () => logicFlowStore.buildFlowAssignments,
-      () => logicFlowStore.buildFlowVirtualEdges,
+      () => getSelectedLogicFlowPlanId(),
+      () => logicFlowStore.savedPlans.list,
+      () => logicFlowStore.savedPlans.activeId,
     ],
     () => {
       computeBuildFlowPlanPreview()
@@ -661,13 +721,21 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
   )
 
   watch(
-    () => logicFlowStore.savedPlans.activeId,
+    [
+      () => logicFlowStore.groups,
+      () => logicFlowStore.buildFlowGroups,
+      () => logicFlowStore.buildFlowAssignments,
+      () => logicFlowStore.buildFlowVirtualEdges,
+    ],
     () => {
-      updateLogicFlowPlanId()
-    }
+      if (resolvedLogicFlowState.value.source !== 'active-store') return
+      computeBuildFlowPlanPreview()
+    },
+    { deep: true },
   )
 
   loadPlansFromStorage()
+  resolveLogicFlowStateForBuildPlan()
 
   return {
     buildGoals,
@@ -680,11 +748,13 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     buildFlowPlanLoading,
     schemeGroups,
     computeBuildPlanLoading,
+    resolvedLogicFlowState,
     savedPlans,
     activePlanName,
     setBuildGoal,
     removeBuildGoal,
     setBuildFlowMode,
+    setLogicFlowPlanId,
     computePlan,
     computeBuildFlowPlanPreview,
     createNewPlan,

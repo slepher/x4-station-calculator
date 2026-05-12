@@ -189,7 +189,6 @@ const hasEmptyModules = computed(() => props.scheme.modules.length === 0)
         <div class="flex items-center justify-between px-6 py-4 border-b border-slate-700 shrink-0">
           <div>
             <h2 class="text-lg font-bold text-slate-200">{{ getSchemeLabel(scheme.label) }}</h2>
-
           </div>
           <button
             class="w-8 h-8 flex items-center justify-center rounded-full bg-slate-800 hover:bg-slate-700 text-slate-400 hover:text-slate-200 transition text-lg font-bold"

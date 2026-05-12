@@ -1256,6 +1256,7 @@ function makeSchemeFromLine(
   
   const scheme: BuildScheme = {
     label: node.lineName,
+    lineage: settings.racePreference,
     purposeModules,
     primaryModuleIds,
     modules: mergedModules,
@@ -1352,6 +1353,7 @@ export function splitTargetLineSchemes(
 
     const scheme: BuildScheme = {
       label: lineName || '目标产线',
+      lineage,
       purposeModules,
       primaryModuleIds: primaryModuleIds.length > 0 ? primaryModuleIds : lineModules.map(m => m.id),
       modules: lineModules,
@@ -1494,7 +1496,6 @@ function mergeOverlappingSchemePurpose(
   buildScheme: BuildScheme,
   productionScheme: BuildScheme,
   modulesMap: Record<string, X4Module>,
-  waresMap: Record<string, X4Ware>,
 ): BuildScheme {
   const purposeModules = [...new Set([...buildScheme.purposeModules, ...productionScheme.purposeModules])]
   const purposeWareSet = new Set(purposeModules)
@@ -1562,7 +1563,7 @@ export function makeSchemesWithGroups(
     }
 
     const buildScheme = buildByGroupId.get(groupId)!
-    const merged = mergeOverlappingSchemePurpose(buildScheme, scheme, modulesMap, waresMap)
+    const merged = mergeOverlappingSchemePurpose(buildScheme, scheme, modulesMap)
     const index = buildSchemes.indexOf(buildScheme)
     if (index >= 0) buildSchemes[index] = merged
     buildByGroupId.set(groupId, merged)
@@ -1636,7 +1637,7 @@ function makeSchemeForTargetLine(
 
   return {
     label: '目标产线',
-    description: '目标产线',
+    lineage: settings.racePreference,
     purposeModules: purposeArr,
     primaryModuleIds: mergedModules
       .filter(m => {
