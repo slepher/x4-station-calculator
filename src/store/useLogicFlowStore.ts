@@ -39,11 +39,11 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const archivedBuildFlowGroupIds = ref<string[]>([])
 
   function buildSnapshot() {
-    return JSON.stringify({ groups: groups.value, settings: settings.value, buildFlowAssignments: buildFlowAssignments.value })
+    return JSON.stringify({ planName: currentPlanName.value, groups: groups.value, settings: settings.value, buildFlowAssignments: buildFlowAssignments.value })
   }
 
   function buildEmptySnapshot() {
-    return JSON.stringify({ groups: [], settings: { isDefaultLocked: true }, buildFlowAssignments: [] })
+    return JSON.stringify({ planName: '', groups: [], settings: { isDefaultLocked: true }, buildFlowAssignments: [] })
   }
 
   // --- Build Flow ---
