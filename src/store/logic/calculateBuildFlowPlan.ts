@@ -1250,15 +1250,12 @@ function makeSchemeFromLine(
     settings.considerWorkforceForAutoFill, settings.sunlight
   )
 
-  const wareNames = [...node.trackedWares].map(w => waresMap[w]?.name || w).join(', ')
-
   const moduleSummaries = computeModuleSummaries(mergedModules, modulesMap, waresMap)
   const totalDuration = moduleSummaries.reduce((sum, s) => sum + s.totalDuration, 0)
   const totalCredits = moduleSummaries.reduce((sum, s) => sum + s.totalCredits, 0)
   
   const scheme: BuildScheme = {
     label: node.lineName,
-    description: `产出: ${wareNames}`,
     purposeModules,
     primaryModuleIds,
     modules: mergedModules,
@@ -1355,7 +1352,6 @@ export function splitTargetLineSchemes(
 
     const scheme: BuildScheme = {
       label: lineName || '目标产线',
-      description: `产出: ${purposeModules.map(w => waresMap[w]?.name || w).join(', ')}`,
       purposeModules,
       primaryModuleIds: primaryModuleIds.length > 0 ? primaryModuleIds : lineModules.map(m => m.id),
       modules: lineModules,
@@ -1430,7 +1426,6 @@ function mergeSchemePair(
 
   return {
     ...buildScheme,
-    description: `产出: ${purposeModules.map(w => waresMap[w]?.name || w).join(', ')}`,
     purposeModules,
     primaryModuleIds: mergedModules
       .filter(module => {
@@ -1506,7 +1501,6 @@ function mergeOverlappingSchemePurpose(
 
   return {
     ...buildScheme,
-    description: `产出: ${purposeModules.map(w => waresMap[w]?.name || w).join(', ')}`,
     purposeModules,
     primaryModuleIds: buildScheme.modules
       .filter(module => {

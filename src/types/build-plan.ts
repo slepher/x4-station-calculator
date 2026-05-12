@@ -120,7 +120,6 @@ export interface BuildSchemeModuleSummary {
 
 export interface BuildScheme {
   label: string
-  description: string
   purposeModules: string[]
   primaryModuleIds: string[]
   modules: SavedModule[]

@@ -209,8 +209,6 @@ function handleExportDirect() {
              </div>
           </div>
 
-          <p v-if="card.scheme.description" class="text-xs text-slate-400 mb-2">{{ card.scheme.description }}</p>
-
           <div v-if="card.primaryModuleLines.length > 0" class="mb-2">
             <div class="text-[10px] text-slate-500 mb-0.5">{{ t('build_plan.primary_modules') }}</div>
             <div class="flex flex-wrap gap-1">
