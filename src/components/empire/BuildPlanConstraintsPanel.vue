@@ -12,7 +12,7 @@ import type { FlowPlanItem, PlanItem } from '@/components/empire/presenters/useB
 
 const props = defineProps<{
   goals: BuildGoal[]
-  buildFlowMode: boolean
+  buildMaterialPlanningEnabled: boolean
   racePreference: string
   buildPlan: { schemes: unknown[]; halted: boolean; haltReason: string; goalsAchieved: unknown[]; goalsRemaining: unknown[] } | null
   loading: boolean
@@ -34,7 +34,7 @@ const emit = defineEmits<{
   addGoal: [goal: BuildGoal]
   removeGoal: [index: number]
   updateGoal: [index: number, value: number]
-  setBuildFlowMode: [mode: boolean]
+  setBuildMaterialPlanningEnabled: [enabled: boolean]
   computePlan: []
   createNewPlan: []
   switchPlan: [planId: string]
@@ -167,7 +167,7 @@ function toggleFlowMenu() {
   }
 }
 
-function handleFlowSelect(planId: string) {
+function handleFlowSelect(planId: string | null) {
   emit('loadFlowPlan', planId)
   closeFlowMenu()
 }
@@ -320,8 +320,8 @@ onUnmounted(() => {
         <label class="flex items-center gap-2 cursor-pointer">
           <input
             type="checkbox"
-            :checked="buildFlowMode"
-            @change="emit('setBuildFlowMode', ($event.target as HTMLInputElement).checked)"
+            :checked="buildMaterialPlanningEnabled"
+            @change="emit('setBuildMaterialPlanningEnabled', ($event.target as HTMLInputElement).checked)"
             class="w-3.5 h-3.5 rounded border-slate-500 bg-slate-700 text-amber-500 focus:ring-amber-500/50"
           />
           <span class="text-xs text-slate-300 whitespace-nowrap">{{ t('build_plan.build_flow_mode') }}</span>
@@ -349,20 +349,15 @@ onUnmounted(() => {
               :style="flowMenuStyle"
               data-testid="build-plan-flow-menu"
             >
-              <template v-if="loadableFlowPlans.length === 0">
-                <div class="flow-plan-menu-empty">{{ t('build_plan.import_flow_empty') }}</div>
-              </template>
-              <template v-else>
-                <button
-                  v-for="item in loadableFlowPlans"
-                  :key="item.id"
-                  class="flow-plan-menu-item"
-                  :class="item.id === selectedFlowPlanId ? 'flow-plan-menu-item-active' : ''"
-                  @click="handleFlowSelect(item.id)"
-                >
-                  {{ item.name }}
-                </button>
-              </template>
+              <button
+                v-for="item in loadableFlowPlans"
+                :key="item.id || '__unplanned__'"
+                class="flow-plan-menu-item"
+                :class="item.id === selectedFlowPlanId ? 'flow-plan-menu-item-active' : ''"
+                @click="handleFlowSelect(item.id)"
+              >
+                {{ item.name }}
+              </button>
             </div>
           </div>
         </div>

@@ -19,7 +19,8 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const expandedEntries = ref<Record<string, boolean>>({})
 
-const toggleEntry = (blueprintId: string) => {
+const toggleEntry = (blueprintId: string, isBlueprintMissing: boolean) => {
+  if (isBlueprintMissing) return
   expandedEntries.value[blueprintId] = !expandedEntries.value[blueprintId]
 }
 
@@ -93,12 +94,31 @@ const formatTime = (seconds: number) => {
             class="fleet-entry"
             :class="{ 'fleet-entry--missing': entry.isBlueprintMissing }"
           >
-            <div class="fleet-entry-header" @click="toggleEntry(entry.blueprintId)">
-              <span class="fleet-entry-arrow" :class="{ 'expanded': isEntryExpanded(entry.blueprintId) }">&#9654;</span>
+            <div
+              class="fleet-entry-header"
+              :class="{ 'fleet-entry-header--disabled': entry.isBlueprintMissing }"
+              @click="toggleEntry(entry.blueprintId, entry.isBlueprintMissing)"
+            >
+              <span
+                class="fleet-entry-arrow"
+                :class="{
+                  'expanded': isEntryExpanded(entry.blueprintId),
+                  'fleet-entry-arrow--hidden': entry.isBlueprintMissing,
+                }"
+              >&#9654;</span>
               <span v-if="entry.isBlueprintMissing" class="fleet-entry-warning" :title="t('build_plan.fleet_blueprint_missing')">&#9888;</span>
-              <span class="fleet-entry-name">{{ entry.blueprintName }}<span class="fleet-entry-total-time">{{ formatTime(entry.totalBuildTime) }}</span></span>
+              <span class="fleet-entry-name">
+                {{ entry.blueprintName }}
+                <span v-if="!entry.isBlueprintMissing" class="fleet-entry-total-time">{{ formatTime(entry.totalBuildTime) }}</span>
+              </span>
               <div @click.stop class="fleet-entry-qty-group">
+                <span
+                  v-if="entry.isBlueprintMissing"
+                  class="fleet-entry-qty-readonly"
+                  :data-testid="`fleet-entry-qty-${entry.blueprintId}`"
+                >{{ formatQty(entry.quantity) }}</span>
                 <X4NumberInput
+                  v-else
                   :modelValue="entry.quantity"
                   :min="1"
                   widthClass="w-16"
@@ -242,8 +262,16 @@ const formatTime = (seconds: number) => {
   @apply flex items-center gap-1.5 py-1.5 cursor-pointer;
 }
 
+.fleet-entry-header--disabled {
+  @apply cursor-default;
+}
+
 .fleet-entry-arrow {
   @apply text-[10px] text-slate-500 transition-transform duration-100;
+}
+
+.fleet-entry-arrow--hidden {
+  @apply opacity-0;
 }
 
 .fleet-entry-arrow.expanded {
@@ -264,6 +292,10 @@ const formatTime = (seconds: number) => {
 
 .fleet-entry-qty-group {
   @apply shrink-0;
+}
+
+.fleet-entry-qty-readonly {
+  @apply inline-flex items-center justify-end min-w-16 px-2 py-1 rounded border border-slate-700 bg-slate-900/40 text-sm text-slate-300 font-mono;
 }
 
 .fleet-entry-remove {

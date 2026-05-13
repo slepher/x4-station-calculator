@@ -176,6 +176,88 @@ function loadPlanData(index: number): {
 }
 
 describe('buildPlanProductionLine regression', () => {
+  it('uses settings.racePreference for unmatched derived module selection', () => {
+    const preview = createBuildFlowPlanPreview(
+      [{ type: 'production-rate', wareId: 'energycells', ratePerHour: 100 }],
+      [{
+        id: 'group-unrelated',
+        name: 'Unrelated',
+        category: 'production',
+        subCategory: 'argon',
+        isLocked: false,
+        lockedLineage: undefined,
+        nodes: [],
+      }],
+      {
+        buildFlowGroups: [],
+        assignments: [],
+        virtualEdges: [],
+      },
+      modulesMap,
+      waresMap,
+      {
+        ...DEFAULT_BUILD_PLAN_SETTINGS,
+        racePreference: 'terran',
+      },
+      false,
+    )
+
+    expect(preview).not.toBeNull()
+    expect(preview!.lines).toHaveLength(1)
+    expect(preview!.lines[0]?.isUnmatched).toBe(true)
+
+    const item = preview!.lines[0]?.items[0]
+    expect(item?.kind).toBe('derived')
+    if (item?.kind === 'derived') {
+      expect(item.moduleId).toBe('module_ter_prod_energycells_01')
+    }
+  })
+
+  it('returns unmatched preview lines when logic-flow is null', () => {
+    const preview = createBuildFlowPlanPreview(
+      [{ type: 'production-rate', wareId: 'energycells', ratePerHour: 100 }],
+      [],
+      null,
+      modulesMap,
+      waresMap,
+      DEFAULT_BUILD_PLAN_SETTINGS,
+      true,
+    )
+
+    expect(preview).not.toBeNull()
+    expect(preview!.buildMaterialPlanningEnabled).toBe(true)
+    expect(preview!.graph).toBeNull()
+    expect(preview!.sccGroups).toEqual([])
+    expect(preview!.lines).toHaveLength(1)
+    expect(preview!.lines[0]?.isUnmatched).toBe(true)
+  })
+
+  it('computes schemes from unmatched preview lines when logic-flow is null', () => {
+    const preview = createBuildFlowPlanPreview(
+      [{ type: 'production-rate', wareId: 'energycells', ratePerHour: 100 }],
+      [],
+      null,
+      modulesMap,
+      waresMap,
+      DEFAULT_BUILD_PLAN_SETTINGS,
+      true,
+    )
+
+    expect(preview).not.toBeNull()
+
+    const result = computeBuildFlowPlan({
+      preview: preview!,
+      modulesMap,
+      waresMap,
+      modulesByOutputMap,
+      settings: DEFAULT_BUILD_PLAN_SETTINGS,
+    })
+
+    expect(result.schemeGroups).toHaveLength(1)
+    expect(result.schemeGroups[0]?.groupType).toBe('production')
+    expect(result.schemeGroups[0]?.schemes.length).toBeGreaterThan(0)
+  })
+
   it('keeps manual target rates when a ware is both build-material and target', () => {
     const { goals, groups, buildFlowView } = loadPlanData(2)
     const preview = createBuildFlowPlanPreview(

@@ -315,11 +315,9 @@ export function createBuildFlowPlanPreview(
   buildFlowView: BuildFlowPlanView | null,
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
-  _settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
+  settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
   buildMaterialPlanningEnabled = true,
 ): PreviewResult | null {
-  if (!buildFlowView) return null
-
   const modulesByOutputMap: Record<string, X4Module[]> = {}
   for (const mod of Object.values(modulesMap)) {
     if (!mod.outputs) continue
@@ -328,14 +326,21 @@ export function createBuildFlowPlanPreview(
       modulesByOutputMap[w]!.push(mod)
     }
   }
-  const allocations = groups.length > 0
-    ? computeProductionLineAllocation(goals, groups, buildFlowView, modulesMap, modulesByOutputMap)
-    : []
+  const allocations = computeProductionLineAllocation(goals, groups, buildFlowView, modulesMap, modulesByOutputMap)
+
+  if (!buildFlowView) {
+    return {
+      buildMaterialPlanningEnabled,
+      lines: buildAllocationOnlyPreviewLines(allocations, modulesMap, waresMap, settings),
+      graph: null,
+      sccGroups: [],
+    }
+  }
 
   if (!buildMaterialPlanningEnabled) {
     return {
       buildMaterialPlanningEnabled: false,
-      lines: buildAllocationOnlyPreviewLines(allocations, modulesMap, waresMap),
+      lines: buildAllocationOnlyPreviewLines(allocations, modulesMap, waresMap, settings),
       graph: null,
       sccGroups: [],
     }
@@ -359,7 +364,7 @@ export function createBuildFlowPlanPreview(
 
   // 2. Compute production allocations (target-production responsibilities)
   // 3. Merge: graph-based lines + target-production responsibilities from allocations
-  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId, modulesMap, waresMap)
+  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId, modulesMap, waresMap, settings)
 
   return {
     buildMaterialPlanningEnabled: true,
@@ -380,6 +385,7 @@ function mergeGraphAndAllocationLines(
   lineageByGroupId: Map<string, string> = new Map(),
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
+  settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
 ): PreviewLinePlan[] {
   const result: PreviewLinePlan[] = [...graphLines]
   const graphGroupIds = new Set(graphLines.map(l => l.groupId).filter(Boolean) as string[])
@@ -420,6 +426,7 @@ function mergeGraphAndAllocationLines(
           modulesMap,
           waresMap,
           alloc.groupId,
+          settings,
         ))
         .filter((item): item is PreviewItem => Boolean(item))
         .filter(item => isGraphOverlap
@@ -516,6 +523,7 @@ function buildAllocationOnlyPreviewLines(
   allocations: ProductionLineAllocation[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
+  settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
 ): PreviewLinePlan[] {
   const requiredConsumersByWare = new Map<string, Set<string>>()
   for (const alloc of allocations) {
@@ -537,6 +545,7 @@ function buildAllocationOnlyPreviewLines(
         modulesMap,
         waresMap,
         alloc.groupId,
+        settings,
       ))
       .filter((item): item is PreviewItem => Boolean(item))
       .map((item) => {
@@ -730,6 +739,7 @@ export function computeBuildFlowPlan(
   input: ComputeInput,
 ): ComputeResult {
   const { preview, modulesMap, waresMap, settings } = input
+  const hasPreviewGraph = preview.graph !== null
   const graph = preview.graph ?? createEmptyGraph()
   const allocationGoalsByGroupId = new Map<string, BuildGoal[]>()
   const resolvedModulesByGroupId = new Map<string, SavedModule[]>()
@@ -824,7 +834,7 @@ export function computeBuildFlowPlan(
     return toCompatAllocation(previewLine, goals)
   })
 
-  const schemeGroups = preview.buildMaterialPlanningEnabled
+  const schemeGroups = preview.buildMaterialPlanningEnabled && hasPreviewGraph
     ? makeSchemesWithGroups(
       graph,
       compatAllocations,
@@ -840,7 +850,7 @@ export function computeBuildFlowPlan(
       }
     ]
 
-  if (preview.buildMaterialPlanningEnabled) {
+  if (preview.buildMaterialPlanningEnabled && hasPreviewGraph) {
     const groupIdByName = new Map<string, string>()
     for (const line of lines) {
       if (!line.groupId) continue
@@ -1462,8 +1472,10 @@ function goalToPreviewItem(
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   groupId?: string,
+  settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
 ): PreviewItem | null {
   const relatedLineGroupIds = groupId ? [groupId] : []
+  const producerLineage = groupId ? lineage : settings.racePreference
 
   if (goal.type === 'build-module') {
     return {
@@ -1477,7 +1489,7 @@ function goalToPreviewItem(
   }
 
   if (goal.type === 'production-rate') {
-    const moduleId = findBestProducer(goal.wareId, lineage, [], modulesMap, waresMap)?.id
+    const moduleId = findBestProducer(goal.wareId, producerLineage, [], modulesMap, waresMap)?.id
     return moduleId ? {
       kind: 'derived',
       wareId: goal.wareId,
@@ -1490,7 +1502,7 @@ function goalToPreviewItem(
   }
 
   if (goal.type === 'derived-build-material') {
-    const moduleId = findBestProducer(goal.wareId, lineage, [], modulesMap, waresMap)?.id
+    const moduleId = findBestProducer(goal.wareId, producerLineage, [], modulesMap, waresMap)?.id
     return moduleId ? {
       kind: 'derived',
       wareId: goal.wareId,
@@ -1502,7 +1514,7 @@ function goalToPreviewItem(
   }
 
   if (goal.type === 'derived-production') {
-    const moduleId = findBestProducer(goal.wareId, lineage, [], modulesMap, waresMap)?.id
+    const moduleId = findBestProducer(goal.wareId, producerLineage, [], modulesMap, waresMap)?.id
     return moduleId ? {
       kind: 'derived',
       wareId: goal.wareId,

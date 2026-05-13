@@ -153,7 +153,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
     <div class="col-span-12 lg:col-span-3">
       <BuildPlanConstraintsPanel
         :goals="buildPlanPresenter.props.goals.value"
-        :buildFlowMode="buildPlanPresenter.props.buildFlowMode.value"
+        :buildMaterialPlanningEnabled="buildPlanPresenter.props.buildMaterialPlanningEnabled.value"
         :racePreference="buildPlanPresenter.props.racePreference.value"
         :build-plan="buildPlanPresenter.props.buildPlan.value"
         :loading="buildPlanPresenter.props.loading.value"
@@ -172,7 +172,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
         @add-goal="buildPlanPresenter.emits.addGoal"
         @remove-goal="buildPlanPresenter.emits.removeGoal"
         @update-goal="buildPlanPresenter.emits.updateGoal"
-        @set-build-flow-mode="buildPlanPresenter.emits.setBuildFlowMode"
+        @set-build-material-planning-enabled="buildPlanPresenter.emits.setBuildMaterialPlanningEnabled"
         @compute-plan="buildPlanPresenter.emits.computePlan"
         @create-new-plan="buildPlanPresenter.emits.createNewPlan"
         @switch-plan="buildPlanPresenter.emits.switchPlan"

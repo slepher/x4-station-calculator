@@ -21,7 +21,7 @@ import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
 
 export interface FlowPlanItem {
-  id: string
+  id: string | null
   name: string
   index: number
 }
@@ -34,7 +34,7 @@ export interface PlanItem {
 
 export interface BuildPlanPresenterProps {
   goals: ComputedRef<BuildGoal[]>
-  buildFlowMode: ComputedRef<boolean>
+  buildMaterialPlanningEnabled: ComputedRef<boolean>
   racePreference: ComputedRef<string>
   buildPlan: ComputedRef<BuildPlan | null>
   loading: ComputedRef<boolean>
@@ -60,7 +60,7 @@ export interface BuildPlanPresenterEmits {
   addGoal: (goal: BuildGoal) => void
   removeGoal: (index: number) => void
   updateGoal: (index: number, value: number) => void
-  setBuildFlowMode: (mode: boolean) => void
+  setBuildMaterialPlanningEnabled: (enabled: boolean) => void
   computePlan: () => void
   createNewPlan: () => void
   switchPlan: (planId: string) => void
@@ -106,7 +106,7 @@ export interface BuildPlanPresenterStore {
 
 export interface BuildPlanPresenterBuildPlanStore {
   buildGoals: BuildGoal[]
-  buildFlowMode: boolean
+  buildMaterialPlanningEnabled: boolean
   buildPlan: BuildPlan | null
   buildFlowPlanAllocations: ProductionLineAllocation[]
   previewResult: PreviewResult | null
@@ -118,7 +118,7 @@ export interface BuildPlanPresenterBuildPlanStore {
   setLogicFlowPlanId(planId: string | null): void
   setBuildGoal(goal: BuildGoal): void
   removeBuildGoal(index: number): void
-  setBuildFlowMode(mode: boolean): void
+  setBuildMaterialPlanningEnabled(enabled: boolean): void
   computePlan(): void
   createNewPlan(): void
   switchPlan(planId: string): void
@@ -159,15 +159,30 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
   const fleetGoalView = computed<FleetGoalView | null>(() => {
     const fleetGoal = buildPlanStore.buildGoals.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
     if (!fleetGoal) return null
+    const savedBlueprintBuckets = shipBuildStore.savedBlueprints.ships
+    const savedBlueprintIds = new Set(
+      savedBlueprintBuckets.flatMap(bucket => bucket.blueprints.map(bp => bp.id)),
+    )
 
     const entries: FleetEntryView[] = fleetGoal.entries.map(entry => {
-      const blueprint = shipBuildStore.findBlueprintById(entry.blueprintId)
-      const ship = shipBuildStore.findShip(entry.shipId)
+      const blueprint = savedBlueprintIds.has(entry.blueprintId)
+        ? shipBuildStore.findBlueprintById(entry.blueprintId)
+        : null
+      const localizedShip = gameData.localizedShipsMap[entry.shipId]
       const isBlueprintMissing = !blueprint
+
+      if (isBlueprintMissing) {
+        console.warn('[BuildPlan][FleetGoalView] Missing blueprint for fleet entry', {
+          blueprintId: entry.blueprintId,
+          shipId: entry.shipId,
+          hasShipData: !!localizedShip,
+          savedBlueprintShipBuckets: savedBlueprintBuckets.length,
+        })
+      }
 
       let buildTime = 0
       const materials: FleetMaterialItem[] = []
-      if (blueprint && ship) {
+      if (blueprint && localizedShip) {
         const analysis = shipBuildStore.getBuildAnalysis(blueprint)
         buildTime = analysis.totalBuildTime
 
@@ -189,9 +204,9 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
 
       return {
         shipId: entry.shipId,
-        shipName: ship?.name || entry.shipId,
+        shipName: localizedShip?.localeName || localizedShip?.name || entry.shipId,
         blueprintId: entry.blueprintId,
-        blueprintName: blueprint?.name || entry.blueprintId,
+        blueprintName: blueprint?.name || localizedShip?.localeName || localizedShip?.name || entry.blueprintId,
         quantity: entry.quantity,
         buildTime,
         totalBuildTime: buildTime * entry.quantity,
@@ -208,12 +223,11 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
 
     const groups: FleetShipyardGroup[] = groupDefinitions.map(def => {
       const groupEntries = entries.filter(e => {
-        if (e.isBlueprintMissing) return false
-        const ship = shipBuildStore.findShip(e.shipId)
-        if (!ship) return false
-        if (def.type === 'shipyard_l') return ship.class === 'ship_l'
-        if (def.type === 'shipyard_xl') return ship.class === 'ship_xl'
-        return ship.class === 'ship_m' || ship.class === 'ship_s'
+        const shipClass = gameData.localizedShipsMap[e.shipId]?.class
+        if (!shipClass) return false
+        if (def.type === 'shipyard_l') return shipClass === 'ship_l'
+        if (def.type === 'shipyard_xl') return shipClass === 'ship_xl'
+        return shipClass === 'ship_m' || shipClass === 'ship_s'
       })
       const totalShipTime = groupEntries.reduce((sum, e) => sum + e.buildTime * e.quantity, 0)
       const maxSingleBuildTime = groupEntries.reduce((max, e) => Math.max(max, e.buildTime), 0)
@@ -225,6 +239,18 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
         groupTotalBuildTime: Math.max(maxSingleBuildTime, Math.ceil(totalShipTime / Math.max(1, def.count))),
       }
     })
+
+    const ungroupedEntries = entries.filter(entry => !groups.some(group => group.entries.includes(entry)))
+    if (ungroupedEntries.length > 0) {
+      console.warn('[BuildPlan][FleetGoalView] Fleet entries could not be grouped', {
+        entries: ungroupedEntries.map(entry => ({
+          blueprintId: entry.blueprintId,
+          shipId: entry.shipId,
+          shipClass: gameData.localizedShipsMap[entry.shipId]?.class || null,
+          isBlueprintMissing: entry.isBlueprintMissing,
+        })),
+      })
+    }
 
     const actualTotalBuildTime = Math.max(0, ...groups.map(g => g.groupTotalBuildTime))
     const effectiveBuildTime = Math.max(actualTotalBuildTime, fleetGoal.buildTime)
@@ -317,22 +343,26 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
 
   const flowPlanName = computed(() => {
     const selectedId = selectedFlowPlanId.value
-    if (!selectedId) return ''
+    if (!selectedId) return i18n.global.t('build_plan.import_flow_unplanned')
     const plan = logicFlow.savedPlans.list.find(item => item.id === selectedId)
-    return plan?.name || ''
+    return plan?.name || i18n.global.t('build_plan.import_flow_unplanned')
   })
 
   const loadableFlowPlans = computed<FlowPlanItem[]>(() => {
-    return logicFlow.savedPlans.list.map((plan, index) => ({
+    return [{
+      id: null,
+      name: i18n.global.t('build_plan.import_flow_unplanned'),
+      index: -1,
+    }, ...logicFlow.savedPlans.list.map((plan, index) => ({
       id: plan.id,
       name: plan.name,
       index,
-    }))
+    }))]
   })
 
   const props: BuildPlanPresenterProps = {
     goals: computed(() => buildPlanStore.buildGoals),
-    buildFlowMode: computed(() => buildPlanStore.buildFlowMode),
+    buildMaterialPlanningEnabled: computed(() => buildPlanStore.buildMaterialPlanningEnabled),
     racePreference: computed(() => 'argon'),
     buildPlan: computed(() => buildPlanStore.buildPlan),
     loading: computed(() => buildPlanStore.computeBuildPlanLoading),
@@ -385,7 +415,7 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
       buildPlanStore.buildGoals = updated
       buildPlanStore.syncGoalsToActivePlan()
     },
-    setBuildFlowMode: (mode) => buildPlanStore.setBuildFlowMode(mode),
+    setBuildMaterialPlanningEnabled: (enabled) => buildPlanStore.setBuildMaterialPlanningEnabled(enabled),
     computePlan: () => buildPlanStore.computePlan(),
     createNewPlan: () => buildPlanStore.createNewPlan(),
     switchPlan: (planId) => buildPlanStore.switchPlan(planId),

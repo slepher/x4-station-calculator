@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, shallowRef, watch, computed } from 'vue'
 import i18n from '@/i18n'
-import type { ProductionLineGroup, StationSettings } from '@/types/x4'
+import type { ProductionLineGroup } from '@/types/x4'
 import type {
   BuildGoal,
   BuildPlan,
@@ -22,10 +22,6 @@ import { useGameDataStore } from './useGameDataStore'
 import { useLogicFlowStore } from './useLogicFlowStore'
 import { useShipBuildStore } from './useShipBuildStore'
 import type { StationComputeDeps } from './state/stationSettings'
-import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
-import { buildFlowPlanGraph } from '@/store/logic/buildFlowPlanGraph'
-import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
-import { computeFlowPlanLines, expandGoalDependencies, makeSchemes, mergeModules } from '@/store/logic/calculateBuildFlowPlan'
 import { mergeIntoExistingPlan, rebuildSchemeGroups } from '@/store/logic/mergeIntoExistingPlan'
 import {
   createActiveLogicFlowSnapshot,
@@ -33,7 +29,6 @@ import {
 } from '@/store/logic/buildPlanLogicFlowSource'
 import {
   computeBuildFlowPlan,
-  computeBuildFlowPlanSchemeGroups,
   createBuildFlowPlanPreview,
   DEFAULT_BUILD_PLAN_SETTINGS,
 } from '@/store/logic/buildPlanProductionLine'
@@ -43,7 +38,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
   const logicFlowStore = useLogicFlowStore()
 
   const buildGoals = ref<BuildGoal[]>([])
-  const buildFlowMode = ref<boolean>(false)
+  const buildMaterialPlanningEnabled = ref<boolean>(false)
   const buildPlan = ref<BuildPlan | null>(null)
 
   const savedPlans = ref<SavedBuildPlanGoalsState>({
@@ -344,14 +339,12 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     const fleetGoal = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
     if (!fleetGoal) return
     const classFilter = groupType === 'shipyard_l' ? 'ship_l' : groupType === 'shipyard_xl' ? 'ship_xl' : undefined
-    const shipBuildStore = useShipBuildStore()
     fleetGoal.entries = fleetGoal.entries.filter(entry => {
+      const shipClass = gameData.localizedShipsMap[entry.shipId]?.class
       if (classFilter === undefined) {
-        const ship = shipBuildStore.findShip(entry.shipId)
-        return ship?.class !== 'ship_m' && ship?.class !== 'ship_s'
+        return shipClass !== 'ship_m' && shipClass !== 'ship_s'
       }
-      const ship = shipBuildStore.findShip(entry.shipId)
-      return ship?.class !== classFilter
+      return shipClass !== classFilter
     })
     if (fleetGoal.entries.length === 0) {
       buildGoals.value = buildGoals.value.filter(g => g.type !== 'fleet')
@@ -364,157 +357,8 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     syncGoalsToActivePlan()
   }
 
-  function setBuildFlowMode(mode: boolean) {
-    buildFlowMode.value = mode
-  }
-
-  function calculateBuildFlowPlanInternal(goals: BuildGoal[], deps: StationComputeDeps): BuildPlan {
-    const settings: StationSettings = {
-      sunlight: 100, useHQ: false, manualWorkforce: 0, workforcePercent: 100,
-      workforceAuto: true, considerWorkforceForAutoFill: false, supplyWorkforceBonus: false,
-      buyMultiplier: 0.5, sellMultiplier: 0.5, minersEnabled: true, internalSupply: true,
-      showEmpireGaps: false, racePreference: 'argon', resourceBufferHours: 1,
-      primaryProductBufferHours: 12, secondaryProductBufferHours: 2, transportMinutes: 30,
-      transportShipCapacity: 62000, enforceDlcActivation: false,
-    }
-
-    const baseModules = goals.flatMap((goal) => expandGoalDependencies(goal, deps.modulesMap, deps.waresMap, settings.racePreference))
-    const mergedTargetModules = mergeModules(baseModules)
-    const autoFillTargetModules = calculateAutoFillModules({
-      plannedModules: mergedTargetModules,
-      settings,
-      modulesMap: deps.modulesMap,
-      waresMap: deps.waresMap,
-      lockedWares: [],
-    })
-    const targetModules = mergeModules([
-      ...mergedTargetModules,
-      ...autoFillTargetModules.autoIndustryModules,
-      ...autoFillTargetModules.autoHabitationModules,
-    ])
-
-    if (!buildFlowMode.value) {
-      const targetGoalWareIds: string[] = []
-      for (const goal of goals) {
-        if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
-          targetGoalWareIds.push(goal.wareId)
-          continue
-        }
-        if (goal.type !== 'build-module') continue
-        const module = deps.modulesMap[goal.moduleId]
-        if (!module?.outputs) continue
-        for (const wareId of Object.keys(module.outputs)) {
-          if (!targetGoalWareIds.includes(wareId)) targetGoalWareIds.push(wareId)
-        }
-      }
-
-      return {
-        goals,
-        selfSufficient: false,
-        bootstrapMode: BootstrapMode.None,
-        schemes: [{
-          label: '目标产线',
-          description: '目标产线',
-          purposeModules: targetGoalWareIds,
-          primaryModuleIds: targetModules.map((module) => module.id),
-          modules: targetModules,
-          targetRates: {},
-          targetRateSources: [],
-          netProduction: calculateNetProduction(targetModules, deps.modulesMap, false, 100),
-          totalDuration: 0,
-          totalCredits: 0,
-          moduleSummaries: [],
-          isFeasible: targetModules.length > 0,
-          totalModuleBuildTime: 0,
-          buildMaterialTotals: {},
-        }],
-        totalDuration: 0,
-        totalCredits: 0,
-        goalsAchieved: goals,
-        goalsRemaining: [],
-        halted: false,
-        haltReason: '',
-      }
-    }
-
-    const resolvedSnapshot = getResolvedSnapshot()
-    const buildFlowView = resolvedSnapshot?.buildFlowView || null
-
-    if (!buildFlowView) {
-      const targetGoalWareIds: string[] = []
-      for (const goal of goals) {
-        if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
-          targetGoalWareIds.push(goal.wareId)
-          continue
-        }
-        if (goal.type !== 'build-module') continue
-        const module = deps.modulesMap[goal.moduleId]
-        if (!module?.outputs) continue
-        for (const wareId of Object.keys(module.outputs)) {
-          if (!targetGoalWareIds.includes(wareId)) targetGoalWareIds.push(wareId)
-        }
-      }
-
-      return {
-        goals,
-        selfSufficient: false,
-        bootstrapMode: BootstrapMode.None,
-        schemes: [{
-          label: '目标产线',
-          description: '目标产线',
-          purposeModules: targetGoalWareIds,
-          primaryModuleIds: targetModules.map((module) => module.id),
-          modules: targetModules,
-          targetRates: {},
-          targetRateSources: [],
-          netProduction: calculateNetProduction(targetModules, deps.modulesMap, false, 100),
-          totalDuration: 0,
-          totalCredits: 0,
-          moduleSummaries: [],
-          isFeasible: targetModules.length > 0,
-          totalModuleBuildTime: 0,
-          buildMaterialTotals: {},
-        }],
-        totalDuration: 0,
-        totalCredits: 0,
-        goalsAchieved: goals,
-        goalsRemaining: [],
-        halted: false,
-        haltReason: '',
-      }
-    }
-
-    const graph = buildFlowPlanGraph(targetModules, buildFlowView, deps.modulesMap)
-    const goalWareIds: string[] = []
-    for (const goal of goals) {
-      if (goal.type === 'production-rate' || goal.type === 'derived-rate' || goal.type === 'derived-production' || goal.type === 'derived-build-material') {
-        goalWareIds.push(goal.wareId)
-        continue
-      }
-      if (goal.type !== 'build-module') continue
-      const module = deps.modulesMap[goal.moduleId]
-      if (!module?.outputs) continue
-      for (const wareId of Object.keys(module.outputs)) {
-        if (!goalWareIds.includes(wareId)) goalWareIds.push(wareId)
-      }
-    }
-    graph.targetGoalWareIds = goalWareIds
-
-    computeFlowPlanLines(graph, deps.modulesMap, deps.waresMap, settings, [])
-    const schemes = makeSchemes(graph, deps.modulesMap, deps.waresMap, settings)
-
-    return {
-      goals,
-      selfSufficient: false,
-      bootstrapMode: BootstrapMode.None,
-      schemes,
-      totalDuration: 0,
-      totalCredits: 0,
-      goalsAchieved: goals,
-      goalsRemaining: [],
-      halted: false,
-      haltReason: '',
-    }
+  function setBuildMaterialPlanningEnabled(enabled: boolean) {
+    buildMaterialPlanningEnabled.value = enabled
   }
 
   function resolveFleetMergedRates(fleetGoal: Extract<BuildGoal, { type: 'fleet' }>): { wareId: string; ratePerHour: number }[] {
@@ -530,7 +374,15 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     for (const entry of fleetGoal.entries) {
       const blueprint = shipBuildStore.findBlueprintById(entry.blueprintId)
       const ship = shipBuildStore.findShip(entry.shipId)
-      if (!blueprint || !ship) continue
+      if (!blueprint || !ship) {
+        console.warn('[BuildPlan][FleetRates] Skipping fleet entry during merged-rate expansion', {
+          blueprintId: entry.blueprintId,
+          shipId: entry.shipId,
+          hasBlueprint: !!blueprint,
+          hasShip: !!ship,
+        })
+        continue
+      }
 
       const analysis = shipBuildStore.getBuildAnalysis(blueprint)
       const materials = Object.fromEntries(
@@ -608,7 +460,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
         deps.modulesMap,
         deps.waresMap,
         DEFAULT_BUILD_PLAN_SETTINGS,
-        buildFlowMode.value,
+        buildMaterialPlanningEnabled.value,
       )
 
       if (!preview) {
@@ -679,84 +531,46 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     if (!deps) return
 
     const goals = buildGoals.value
-    const expandedGoals = expandFleetGoals(goals)
     computeBuildPlanLoading.value = true
 
     try {
-      if (previewResult.value) {
-        const result = computeBuildFlowPlan({
-          preview: previewResult.value,
-          modulesMap: deps.modulesMap,
-          waresMap: deps.waresMap,
-          modulesByOutputMap: gameData.modulesByOutputMap || {},
-          settings: DEFAULT_BUILD_PLAN_SETTINGS,
-        })
-        computeResult.value = result
-
-        const flatIncoming = result.schemeGroups.flatMap((group) => group.schemes)
-        const mergedSchemes = mergeIntoExistingPlan(flatIncoming, buildPlan.value)
-        schemeGroups.value = rebuildSchemeGroups(result.schemeGroups, mergedSchemes)
-        buildPlan.value = {
-          goals,
-          selfSufficient: false,
-          bootstrapMode: BootstrapMode.None,
-          schemes: mergedSchemes,
-          totalDuration: 0,
-          totalCredits: 0,
-          goalsAchieved: goals,
-          goalsRemaining: [],
-          halted: false,
-          haltReason: '',
-        }
+      if (!previewResult.value) {
+        computeResult.value = null
+        schemeGroups.value = []
+        buildPlan.value = null
         return
       }
 
-      if (buildFlowMode.value && buildFlowPlanGraphResult.value) {
-        const resolvedSnapshot = getResolvedSnapshot()
-        const result = computeBuildFlowPlanSchemeGroups(
-          buildFlowPlanGraphResult.value,
-          expandedGoals,
-          resolvedSnapshot?.groups || [],
-          resolvedSnapshot?.buildFlowView || null,
-          deps.modulesMap,
-          deps.waresMap,
-          gameData.modulesByOutputMap || {},
-          DEFAULT_BUILD_PLAN_SETTINGS,
-          {
-            buildMaterial: i18n.global.t('build_plan.group_build_material'),
-            production: i18n.global.t('build_plan.group_production'),
-          },
-        )
-        const flatIncoming = result.schemeGroups.flatMap((group) => group.schemes)
-        const mergedSchemes = mergeIntoExistingPlan(flatIncoming, buildPlan.value)
-        schemeGroups.value = rebuildSchemeGroups(result.schemeGroups, mergedSchemes)
-        buildPlan.value = {
-          goals,
-          selfSufficient: false,
-          bootstrapMode: BootstrapMode.None,
-          schemes: mergedSchemes,
-          totalDuration: 0,
-          totalCredits: 0,
-          goalsAchieved: goals,
-          goalsRemaining: [],
-          halted: false,
-          haltReason: '',
-        }
-        return
-      }
+      const result = computeBuildFlowPlan({
+        preview: previewResult.value,
+        modulesMap: deps.modulesMap,
+        waresMap: deps.waresMap,
+        modulesByOutputMap: gameData.modulesByOutputMap || {},
+        settings: DEFAULT_BUILD_PLAN_SETTINGS,
+      })
+      computeResult.value = result
 
-      schemeGroups.value = []
-      const result = calculateBuildFlowPlanInternal(expandedGoals, deps)
+      const flatIncoming = result.schemeGroups.flatMap((group) => group.schemes)
+      const mergedSchemes = mergeIntoExistingPlan(flatIncoming, buildPlan.value)
+      schemeGroups.value = rebuildSchemeGroups(result.schemeGroups, mergedSchemes)
       buildPlan.value = {
-        ...result,
-        schemes: mergeIntoExistingPlan(result.schemes, buildPlan.value),
+        goals,
+        selfSufficient: false,
+        bootstrapMode: BootstrapMode.None,
+        schemes: mergedSchemes,
+        totalDuration: 0,
+        totalCredits: 0,
+        goalsAchieved: goals,
+        goalsRemaining: [],
+        halted: false,
+        haltReason: '',
       }
     } finally {
       computeBuildPlanLoading.value = false
     }
   }
 
-  watch([buildFlowMode, buildGoals], () => {
+  watch([buildMaterialPlanningEnabled, buildGoals], () => {
     computeBuildFlowPlanPreview()
   }, { deep: true })
 
@@ -791,7 +605,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
 
   return {
     buildGoals,
-    buildFlowMode,
+    buildMaterialPlanningEnabled,
     buildPlan,
     buildFlowPlanGraphResult,
     buildFlowPlanAllocations,
@@ -805,7 +619,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     activePlanName,
     setBuildGoal,
     removeBuildGoal,
-    setBuildFlowMode,
+    setBuildMaterialPlanningEnabled,
     setLogicFlowPlanId,
     computePlan,
     computeBuildFlowPlanPreview,
