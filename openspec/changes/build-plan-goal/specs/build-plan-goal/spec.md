@@ -30,7 +30,7 @@
 **当** 系统渲染 Fleet 卡片或计算派生 rate
 **那么** entries MUST 按 ship.class 分为三组：大型船厂(ship_l)、超大型船厂(ship_xl)、船坞(ship_m+ship_s)
 **并且** 每组标题 MUST 提供可编辑的 shipyardCount（最小 1）
-**并且** 空组 MUST 仍显示
+**并且** 空组 MUST NOT 显示
 
 ### Requirement: Fleet 建造时间计算
 
@@ -66,7 +66,12 @@
 **前提** Fleet entry 引用的蓝图被删除
 **当** 系统解析 Fleet goal
 **那么** 该 entry MUST 显示 warning 状态
+**并且** MUST 继续保留在对应 ship.class 分组中
+**并且** MUST 显示舰船名称，而不是回退为 blueprint 标识
 **并且** 材料需求和建造时间 MUST 按 0 计算
+**并且** 列表行 MUST NOT 显示建造时间
+**并且** 该 entry MUST NOT 支持展开
+**并且** 数量 MUST 显示为固定值且 MUST NOT 允许修改
 **并且** MUST NOT 自动移除该 entry
 
 ### Requirement: 删除最后一个 entry 自动移除 Fleet goal
@@ -163,6 +168,6 @@
 
 **前提** 用户添加 goal
 **当** logic-flow 中存在 isolated 节点为其上游产品
-**那么** 系统 MUST 自动生成 derived-rate 类型目标
-**并且** derived-rate MUST 不持久化
+**那么** 系统 MUST 自动生成 derived-production 类型目标
+**并且** derived-production MUST 不持久化
 **并且** goals 或 logic-flow 变化时 MUST 全量重算
