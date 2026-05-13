@@ -159,6 +159,7 @@ describe('useBuildPlanPresenter', () => {
     buildPlanStore.buildGoals = [{
       type: 'fleet',
       buildTime: 3600,
+      buildTimeMode: 'actual',
       shipyardLCount: 1,
       shipyardXLCount: 1,
       wharfCount: 1,
@@ -196,6 +197,7 @@ describe('useBuildPlanPresenter', () => {
     buildPlanStore.buildGoals = [{
       type: 'fleet',
       buildTime: 3600,
+      buildTimeMode: 'actual',
       shipyardLCount: 1,
       shipyardXLCount: 1,
       wharfCount: 1,

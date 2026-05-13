@@ -76,6 +76,16 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     try {
       const data = JSON.parse(raw) as SavedBuildPlanGoalsState
       if (data && typeof data.version === 'number') {
+        if (data.version < 2) {
+          for (const plan of data.list) {
+            for (const goal of plan.buildGoals) {
+              if (goal.type === 'fleet' && !('buildTimeMode' in goal)) {
+                ;(goal as Extract<BuildGoal, { type: 'fleet' }>).buildTimeMode = 'actual'
+              }
+            }
+          }
+          data.version = CURRENT_BUILD_PLAN_GOALS_VERSION
+        }
         savedPlans.value = data
         if (data.activeId) {
           const plan = data.list.find(p => p.id === data.activeId)
@@ -290,6 +300,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       buildGoals.value = [...buildGoals.value, {
         type: 'fleet' as const,
         buildTime: 3600,
+        buildTimeMode: 'actual',
         entries: [{ shipId, blueprintId, quantity: 1 }],
         shipyardLCount: 1,
         shipyardXLCount: 1,
@@ -313,6 +324,13 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     const fleetGoal = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
     if (!fleetGoal) return
     fleetGoal.buildTime = Math.max(600, seconds)
+    syncGoalsToActivePlan()
+  }
+
+  function updateFleetBuildTimeMode(mode: 'actual' | 'planned') {
+    const fleetGoal = buildGoals.value.find((g): g is Extract<BuildGoal, { type: 'fleet' }> => g.type === 'fleet')
+    if (!fleetGoal) return
+    fleetGoal.buildTimeMode = mode ?? 'actual'
     syncGoalsToActivePlan()
   }
 
@@ -406,7 +424,9 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
       Math.max(groupMaxSingleTimes[i]!, Math.ceil(groupTotalTimes[i]! / Math.max(1, groupCounts[i]!)))
     )
     const actualTotalBuildTime = Math.max(0, ...groupBuildTimes)
-    const effectiveBuildTime = Math.max(actualTotalBuildTime, fleetGoal.buildTime)
+    const effectiveBuildTime = (fleetGoal.buildTimeMode ?? 'actual') === 'planned'
+      ? fleetGoal.buildTime
+      : actualTotalBuildTime || fleetGoal.buildTime
 
     return Object.entries(totalByWare).map(([wareId, totalQty]) => ({
       wareId,
@@ -633,6 +653,7 @@ export const useBuildPlanStore = defineStore('buildPlan', () => {
     addFleetEntry,
     removeFleetEntry,
     updateFleetBuildTime,
+    updateFleetBuildTimeMode,
     updateFleetEntryQuantity,
     updateFleetShipyardCount,
     clearFleetGroup,

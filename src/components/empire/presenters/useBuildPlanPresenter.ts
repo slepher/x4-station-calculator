@@ -70,6 +70,7 @@ export interface BuildPlanPresenterEmits {
   addFleetEntry: (shipId: string, blueprintId: string) => void
   removeFleetEntry: (blueprintId: string) => void
   updateFleetBuildTime: (seconds: number) => void
+  updateFleetBuildTimeMode: (mode: 'actual' | 'planned') => void
   updateFleetEntryQuantity: (blueprintId: string, qty: number) => void
   clearFleetGroup: (groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf') => void
   updateFleetShipyardCount: (groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number) => void
@@ -127,6 +128,7 @@ export interface BuildPlanPresenterBuildPlanStore {
   addFleetEntry(shipId: string, blueprintId: string): void
   removeFleetEntry(blueprintId: string): void
   updateFleetBuildTime(seconds: number): void
+  updateFleetBuildTimeMode(mode: 'actual' | 'planned'): void
   updateFleetEntryQuantity(blueprintId: string, qty: number): void
   clearFleetGroup(groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf'): void
   updateFleetShipyardCount(groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number): void
@@ -253,7 +255,9 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     }
 
     const actualTotalBuildTime = Math.max(0, ...groups.map(g => g.groupTotalBuildTime))
-    const effectiveBuildTime = Math.max(actualTotalBuildTime, fleetGoal.buildTime)
+    const effectiveBuildTime = (fleetGoal.buildTimeMode ?? 'actual') === 'planned'
+      ? fleetGoal.buildTime
+      : actualTotalBuildTime || fleetGoal.buildTime
 
     const totalByWare: Record<string, number> = {}
     for (const entry of entries) {
@@ -278,6 +282,7 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
 
     return {
       buildTime: fleetGoal.buildTime,
+      buildTimeMode: fleetGoal.buildTimeMode ?? 'actual',
       shipyardLCount: fleetGoal.shipyardLCount,
       shipyardXLCount: fleetGoal.shipyardXLCount,
       wharfCount: fleetGoal.wharfCount,
@@ -425,6 +430,7 @@ export function useBuildPlanPresenter({ buildPlanStore, blueprintStore }: BuildP
     addFleetEntry: (shipId, blueprintId) => buildPlanStore.addFleetEntry(shipId, blueprintId),
     removeFleetEntry: (blueprintId) => buildPlanStore.removeFleetEntry(blueprintId),
     updateFleetBuildTime: (seconds) => buildPlanStore.updateFleetBuildTime(seconds),
+    updateFleetBuildTimeMode: (mode) => buildPlanStore.updateFleetBuildTimeMode(mode),
     updateFleetEntryQuantity: (blueprintId, qty) => buildPlanStore.updateFleetEntryQuantity(blueprintId, qty),
     clearFleetGroup: (groupType) => buildPlanStore.clearFleetGroup(groupType),
     updateFleetShipyardCount: (groupType, count) => buildPlanStore.updateFleetShipyardCount(groupType, count),

@@ -64,3 +64,14 @@
 
 - [x] T40: 新增 build_plan.fleet_* / build_plan.new_plan / build_plan.no_plan 等 i18n key
 - [x] T41: npm run build 通过
+
+## Phase 9: Fleet buildTimeMode
+
+- [ ] T42: FleetGoal type 新增 `buildTimeMode: 'actual' | 'planned'` 字段，默认 `'actual'`
+- [ ] T43: FleetGoalView 新增 `buildTimeMode` 字段
+- [ ] T44: useBuildPlanStore 新增 `updateFleetBuildTimeMode(mode)` 方法
+- [ ] T45: effectiveBuildTime 计算逻辑改为：actual → actualTotalBuildTime；planned → buildTime
+- [ ] T46: FleetGoalCard 标题栏改为原生 `<select>` 下拉菜单，选项显示"实际 (Xh)"和"规划 (Yh)"
+- [ ] T47: 选中 `actual` 时隐藏 buildTime 输入框；选中 `planned` 时显示
+- [ ] T48: i18n 更新 `fleet_effective_time` → `fleet_planned_time`，新增 `fleet_actual_time` 和 `fleet_planned_time` key
+- [ ] T49: buildTimeMode 持久化到方案

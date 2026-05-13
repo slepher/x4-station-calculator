@@ -60,6 +60,7 @@ export interface FleetShipyardGroup {
 
 export interface FleetGoalView {
   buildTime: number
+  buildTimeMode: 'actual' | 'planned'
   shipyardLCount: number
   shipyardXLCount: number
   wharfCount: number
@@ -73,7 +74,7 @@ export interface FleetGoalView {
 export type BuildGoal =
   | { type: 'production-rate'; wareId: string; ratePerHour: number }
   | { type: 'build-module'; moduleId: string; count: number }
-  | { type: 'fleet'; buildTime: number; entries: FleetEntry[]; shipyardLCount: number; shipyardXLCount: number; wharfCount: number }
+  | { type: 'fleet'; buildTime: number; buildTimeMode: 'actual' | 'planned'; entries: FleetEntry[]; shipyardLCount: number; shipyardXLCount: number; wharfCount: number }
   | { type: 'target-production'; wareId?: string; moduleId?: string; ratePerHour?: number; count?: number }
   | { type: 'derived-rate'; wareId: string; ratePerHour: number }
   | { type: 'derived-production'; wareId: string; ratePerHour: number }

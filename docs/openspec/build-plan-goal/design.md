@@ -13,7 +13,8 @@
 | buildTime | Fleet 建造时间（秒），默认 3600，最小 600 |
 | shipyardCount | 各类型船厂数量，默认 1，最小 1 |
 | 船厂分组 | 按 ship.class 分为大型船厂(ship_l)、超大型船厂(ship_xl)、船坞(ship_m+ship_s) |
-| effectiveBuildTime | max(实际总花费, 设定buildTime)，用于派生 rate |
+| effectiveBuildTime | 由 buildTimeMode 决定：actual→actualTotalBuildTime，planned→buildTime |
+| buildTimeMode | Fleet 建造时间模式：`'actual'`（实际）或 `'planned'`（规划），默认 `'actual'` |
 | SavedBuildPlanGoalsState | 方案持久化结构 |
 | logicFlowPlanId | 建造目标方案关联的逻辑产线方案 id |
 | 无规划 | logicFlowPlanId = null 的合法方案状态，表示所有目标直接进入待规划产线 |
@@ -29,13 +30,7 @@
 export type BuildGoal =
   | { type: 'production-rate'; wareId: string; ratePerHour: number }
   | { type: 'build-module'; moduleId: string; count: number }
-  | { type: 'fleet'; buildTime: number; entries: FleetEntry[]; shipyardLCount: number; shipyardXLCount: number; wharfCount: number }
-
-export interface FleetEntry {
-  shipId: string
-  blueprintId: string
-  quantity: number
-}
+  | { type: 'fleet'; buildTime: number; buildTimeMode: 'actual' | 'planned'; entries: FleetEntry[]; shipyardLCount: number; shipyardXLCount: number; wharfCount: number }
 ```
 
 ### Fleet 视图对象
@@ -51,6 +46,7 @@ export interface FleetShipyardGroup {
 
 export interface FleetGoalView {
   buildTime: number
+  buildTimeMode: 'actual' | 'planned'
   shipyardLCount: number
   shipyardXLCount: number
   wharfCount: number
@@ -155,6 +151,7 @@ const resolvedLogicFlowState = shallowRef<ResolvedBuildPlanLogicFlowState>({
 - `addFleetEntry(shipId, blueprintId)` — 自动创建/追加 Fleet goal
 - `removeFleetEntry(blueprintId)` — 移除 entry，entries 为空时移除 Fleet goal
 - `updateFleetBuildTime(seconds)` — 更新 buildTime
+- `updateFleetBuildTimeMode(mode)` — 更新 buildTimeMode
 - `updateFleetEntryQuantity(blueprintId, qty)` — 更新 entry quantity
 - `updateFleetShipyardCount(groupType, count)` — 更新船厂数量
 
@@ -235,14 +232,16 @@ for each user goal:
 - 单艘建造时间：来自 `resolveBlueprintMaterialCost` 携带的 `production.time`
 - 每组总建造时间：`ceil(Σ(单艘buildTime × quantity) / shipyardCount)`
 - 实际总花费：`max(所有组总建造时间)`
-- 有效建造时间：`max(实际总花费, 设定buildTime)`
+- 有效建造时间（effectiveBuildTime）：由 buildTimeMode 决定
+  - `actual`：effectiveBuildTime = actualTotalBuildTime
+  - `planned`：effectiveBuildTime = buildTime
 - 派生 rate：`Math.ceil(同 wareId 总需求 / effectiveBuildTime × 3600)`
 
 ## UI 组件架构
 
 - `BuildGoalSearchBox` — 组合搜索框（product / module / fleet 三类别）
 - `FleetGoalSearchBox` — Fleet 专用搜索框
-- `FleetGoalCard` — Fleet 卡片（标题栏 + 船厂分组 + 条目列表 + rate 汇总）
+- `FleetGoalCard` — Fleet 卡片（标题栏 + 原生 select 下拉菜单(实际/规划) + 船厂分组 + 条目列表 + rate 汇总）
 - `WarePlanningItem` — 目标卡片（颜色条 + 名称 + 数量输入 + 删除）
 - `ProductionLineAllocationSection` — 产线分配区域
 

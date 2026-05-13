@@ -87,7 +87,7 @@
     "fleet_shipyard_xl": "超大型船厂",
     "fleet_wharf": "船坞",
     "fleet_actual_time": "实际",
-    "fleet_effective_time": "有效",
+    "fleet_effective_time": "规划",
     "fleet_single_build_time": "单艘建造"
   },
   "sector": {

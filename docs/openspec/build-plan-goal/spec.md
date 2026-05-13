@@ -36,9 +36,23 @@
 
 **前提** Fleet goal 存在
 **当** 系统计算建造时间
-**那么** effectiveBuildTime MUST 为 `max(实际总花费, 设定buildTime)`
+**那么** effectiveBuildTime MUST 由 buildTimeMode 决定：
+- `actual` 模式：effectiveBuildTime = actualTotalBuildTime
+- `planned` 模式：effectiveBuildTime = buildTime
+**并且** buildTimeMode 默认 MUST 为 `'actual'`
+**并且** buildTimeMode MUST 持久化到方案
 **并且** 每组总建造时间 MUST 为 `ceil(sum(单艘buildTime × quantity) / shipyardCount)`
 **并且** 派生 rate MUST 按 `Math.ceil(totalQty / effectiveBuildTime × 3600)` 计算
+
+### Requirement: Fleet 建造时间模式 UI
+
+**前提** Fleet goal 存在
+**当** 系统渲染 FleetGoalCard 标题栏
+**那么** MUST 使用原生 `<select>` 下拉菜单显示两个选项
+**并且** 选项一 MUST 显示 `实际 (格式化时间)` 文本，value 为 `'actual'`
+**并且** 选项二 MUST 显示 `规划 (格式化时间)` 文本，value 为 `'planned'`
+**并且** 选中 `actual` 时 MUST 隐藏 buildTime 输入框
+**并且** 选中 `planned` 时 MUST 显示 buildTime 输入框
 
 ### Requirement: Fleet 派生 rate 进入 preview/compute 管线
 

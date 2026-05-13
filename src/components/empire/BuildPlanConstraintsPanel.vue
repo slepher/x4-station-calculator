@@ -44,6 +44,7 @@ const emit = defineEmits<{
   addFleetEntry: [shipId: string, blueprintId: string]
   removeFleetEntry: [blueprintId: string]
   updateFleetBuildTime: [seconds: number]
+  updateFleetBuildTimeMode: [mode: 'actual' | 'planned']
   updateFleetEntryQuantity: [blueprintId: string, qty: number]
   clearFleetGroup: [groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf']
   updateFleetShipyardCount: [groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number]
@@ -51,7 +52,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const gameData = useGameDataStore()
-const schemeCount = computed(() => props.buildPlan?.schemes?.length || 0)
 const editableGoals = computed(() =>
   props.goals.filter((goal): goal is BuildGoal & { type: 'production-rate' | 'build-module' } =>
     goal.type === 'production-rate' || goal.type === 'build-module'
@@ -280,6 +280,7 @@ onUnmounted(() => {
           :fleetView="fleetGoalView"
           @removeFleetEntry="emit('removeFleetEntry', $event)"
           @updateFleetBuildTime="emit('updateFleetBuildTime', $event)"
+          @updateFleetBuildTimeMode="emit('updateFleetBuildTimeMode', $event)"
           @updateFleetEntryQuantity="(bpId, qty) => emit('updateFleetEntryQuantity', bpId, qty)"
           @clearFleetGroup="(groupType) => emit('clearFleetGroup', groupType)"
           @updateFleetShipyardCount="(groupType, count) => emit('updateFleetShipyardCount', groupType, count)"
@@ -326,9 +327,7 @@ onUnmounted(() => {
           />
           <span class="text-xs text-slate-300 whitespace-nowrap">{{ t('build_plan.build_flow_mode') }}</span>
         </label>
-        <div v-if="schemeCount > 0" class="text-xs text-slate-400">
-          {{ schemeCount }} {{ t('build_plan.schemes_generated') }}
-        </div>
+
         <div class="ml-auto">
           <div class="flow-plan-picker" ref="flowMenuRef">
             <button

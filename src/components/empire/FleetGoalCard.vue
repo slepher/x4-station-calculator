@@ -12,6 +12,7 @@ const emit = defineEmits<{
   removeFleetEntry: [blueprintId: string]
   clearFleetGroup: [groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf']
   updateFleetBuildTime: [seconds: number]
+  updateFleetBuildTimeMode: [mode: 'actual' | 'planned']
   updateFleetEntryQuantity: [blueprintId: string, qty: number]
   updateFleetShipyardCount: [groupType: 'shipyard_l' | 'shipyard_xl' | 'wharf', count: number]
 }>()
@@ -43,14 +44,15 @@ const formatTime = (seconds: number) => {
   <div class="fleet-goal-card" data-testid="fleet-goal-card">
     <div class="fleet-header">
       <span class="fleet-title">{{ t('build_plan.fleet_title') }}</span>
-      <span class="fleet-time-info">
-        <span class="fleet-time-label">{{ t('build_plan.fleet_actual_time') }}:</span>
-        <span class="fleet-time-value">{{ formatTime(fleetView.actualTotalBuildTime) }}</span>
-        <span class="fleet-time-sep">/</span>
-        <span class="fleet-time-label">{{ t('build_plan.fleet_effective_time') }}:</span>
-        <span class="fleet-time-value fleet-time-effective">{{ formatTime(fleetView.effectiveBuildTime) }}</span>
-      </span>
-      <div class="fleet-build-time-group">
+      <select
+        class="fleet-mode-select"
+        :value="fleetView.buildTimeMode"
+        @change="emit('updateFleetBuildTimeMode', ($event.target as HTMLSelectElement).value as 'actual' | 'planned')"
+      >
+        <option value="actual">{{ t('build_plan.fleet_actual_time') }} ({{ formatTime(fleetView.actualTotalBuildTime) }})</option>
+        <option value="planned">{{ t('build_plan.fleet_effective_time') }} ({{ formatTime(fleetView.buildTime) }})</option>
+      </select>
+      <div v-if="fleetView.buildTimeMode === 'planned'" class="fleet-build-time-group">
         <X4NumberInput
           :modelValue="fleetView.buildTime"
           :min="600"
@@ -186,24 +188,8 @@ const formatTime = (seconds: number) => {
   @apply text-sm font-semibold text-amber-400;
 }
 
-.fleet-time-info {
-  @apply flex items-center gap-1 text-[11px] text-slate-400;
-}
-
-.fleet-time-label {
-  @apply text-slate-500;
-}
-
-.fleet-time-value {
-  @apply text-slate-300 font-mono;
-}
-
-.fleet-time-effective {
-  @apply text-amber-300;
-}
-
-.fleet-time-sep {
-  @apply text-slate-600 mx-0.5;
+.fleet-mode-select {
+  @apply text-[11px] text-slate-300 bg-slate-700 border border-slate-600 rounded px-1.5 py-0.5 cursor-pointer;
 }
 
 .fleet-build-time-group {

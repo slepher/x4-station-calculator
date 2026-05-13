@@ -182,6 +182,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
         @add-fleet-entry="buildPlanPresenter.emits.addFleetEntry"
         @remove-fleet-entry="buildPlanPresenter.emits.removeFleetEntry"
         @update-fleet-build-time="buildPlanPresenter.emits.updateFleetBuildTime"
+        @update-fleet-build-time-mode="buildPlanPresenter.emits.updateFleetBuildTimeMode"
         @update-fleet-entry-quantity="buildPlanPresenter.emits.updateFleetEntryQuantity"
         @clear-fleet-group="buildPlanPresenter.emits.clearFleetGroup"
         @update-fleet-shipyard-count="buildPlanPresenter.emits.updateFleetShipyardCount"

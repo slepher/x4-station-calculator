@@ -29,9 +29,13 @@ export type BuildGoal =
 
 - 始终只有一个 Fleet goal（单卡片），在 Goals 区顶部
 - `buildTime` 默认 3600s，最小 600s
+- `buildTimeMode` 取值 `'actual' | 'planned'`，默认 `'actual'`，持久化到方案
 - `shipyardLCount` / `shipyardXLCount` / `wharfCount` 各默认 1，最小 1
 - entries 按 ship.class 分为三组：大型船厂(ship_l)、超大型船厂(ship_xl)、船坞(ship_m+ship_s)
 - Fleet 派生 rate 基于 effectiveBuildTime 计算后作为 `target-production` 进入 preview/compute 管线
+- effectiveBuildTime 由 buildTimeMode 决定：`actual` → actualTotalBuildTime；`planned` → buildTime
+- FleetGoalCard 标题栏使用原生 `<select>` 下拉菜单显示"实际 (Xh)"和"规划 (Yh)"两个选项
+- 选择"实际"时隐藏 buildTime 输入框；选择"规划"时显示 buildTime 输入框
 - 蓝图被删除时 entry 显示 warning，材料和建造时间按 0 计算
 
 ### 方案持久化

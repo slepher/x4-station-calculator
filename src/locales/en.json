@@ -91,7 +91,7 @@
     "fleet_shipyard_xl": "Shipyard XL",
     "fleet_wharf": "Wharf",
     "fleet_actual_time": "Actual",
-    "fleet_effective_time": "Effective",
+    "fleet_effective_time": "Planned",
     "fleet_single_build_time": "Per unit"
   },
   "sector": {
