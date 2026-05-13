@@ -1258,6 +1258,8 @@ function makeSchemeFromLine(
     label: node.lineName,
     lineage: settings.racePreference,
     purposeModules,
+    isolatedWareIds: [...node.isolatedWares],
+    stepTargetRates: node.demandAnalysis?.targetRates ? { ...node.demandAnalysis.targetRates } : undefined,
     primaryModuleIds,
     modules: mergedModules,
     targetRates,

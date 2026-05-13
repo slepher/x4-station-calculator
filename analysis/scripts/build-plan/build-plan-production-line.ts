@@ -9,7 +9,12 @@ import {
 } from '@/store/logic/buildPlanProductionLine'
 import { ROOT_BUILD_COST_KEY } from '@/store/logic/buildFlowPlanGraph'
 import { resolveBlueprintMaterialCost } from '@/store/logic/resolveBlueprintMaterialCost'
-import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup, ProductionLineAllocation } from '@/types/build-plan'
+import { buildStepsScheme } from '@/components/empire/presenters/buildPlanStepsLogic'
+import {
+  parseBuildPlanProductionLineArgs,
+  renderBuildPlanProductionLineHelp,
+} from './buildPlanProductionLineArgs'
+import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup, PreviewItem, ProductionLineAllocation } from '@/types/build-plan'
 import type { X4Module, X4Ware, X4Ship, X4Equipment, X4Consumable, X4Drone, X4Missile, ProductionLineGroup, SavedFlowGroup, BuildFlowAssignment, ShipBlueprint, SavedShipBlueprintsState } from '@/types/x4'
 
 const WARE_DATA: X4Ware[] = JSON.parse(readFileSync(resolve('src/assets/x4_game_data/8.0-Diplomacy/data/wares.json'), 'utf-8'))
@@ -65,6 +70,88 @@ function displayGraphKey(key: string): string {
 
 function modName(id: string): string { const m = modulesMap[id]; return m?.name || id }
 function wareName(id: string): string { const w = waresMap[id]; return w?.name || id }
+function fmtCr(n: number): string { return n >= 1e6 ? `${(n / 1e6).toFixed(2)}M` : n >= 1e3 ? `${(n / 1e3).toFixed(1)}K` : `${Math.round(n)}` }
+function fmtH(s: number): string { return `${(s / 3600).toFixed(2)}h` }
+
+function mergeSavedModules(modules: Array<{ id: string; count: number }>): Array<{ id: string; count: number }> {
+  const counts = new Map<string, number>()
+  for (const module of modules) {
+    counts.set(module.id, (counts.get(module.id) || 0) + module.count)
+  }
+  return [...counts.entries()].map(([id, count]) => ({ id, count }))
+}
+
+function calculateNetProductionForModules(modules: Array<{ id: string; count: number }>): Record<string, number> {
+  const state: Record<string, number> = {}
+  for (const item of modules) {
+    const mod = modulesMap[item.id]
+    if (!mod) continue
+    const eff = settings.considerWorkforceForAutoFill ? 1.3 : 1.0
+    for (const [ware, val] of Object.entries(mod.outputs)) {
+      let sf = 1.0
+      if (ware === 'energycells') sf = settings.sunlight / 100.0
+      state[ware] = (state[ware] || 0) + item.count * (val as number) * eff * sf
+    }
+    for (const [ware, val] of Object.entries(mod.inputs)) {
+      state[ware] = (state[ware] || 0) - item.count * (val as number)
+    }
+  }
+  return state
+}
+
+function getBuildMaterialTargetRateEntries(scheme: BuildScheme): Array<[string, number]> {
+  const rates = scheme.stepTargetRates || scheme.targetRates
+  return Object.entries(rates)
+    .filter(([, rate]) => rate > 0)
+    .filter(([wareId]) => wareId !== 'energycells')
+}
+
+function formatPreviewLineTargets(items: PreviewItem[]): string[] {
+  const labels: string[] = []
+  const derivedByWare = new Map<string, Set<string>>()
+  const requiredByWare = new Map<string, Set<string>>()
+
+  for (const item of items) {
+    if (item.kind === 'derived') {
+      for (const target of item.targets || []) {
+        if (target.type === 'build-module') {
+          labels.push(`${modName(item.moduleId)} ×${target.count || 1}`)
+          continue
+        }
+        if (target.type === 'production-rate' && item.wareId) {
+          labels.push(`${wareName(item.wareId)} ${(target.ratePerHour || 0).toFixed(1)}/h`)
+          continue
+        }
+      }
+
+      if (item.wareId) {
+        for (const tag of item.derived || []) {
+          if (tag === 'target') continue
+          const tags = derivedByWare.get(item.wareId) || new Set<string>()
+          tags.add(tag)
+          derivedByWare.set(item.wareId, tags)
+        }
+      }
+      continue
+    }
+
+    for (const tag of item.required || []) {
+      const tags = requiredByWare.get(item.wareId) || new Set<string>()
+      tags.add(tag)
+      requiredByWare.set(item.wareId, tags)
+    }
+  }
+
+  for (const [wareId, tags] of derivedByWare) {
+    labels.push(`${wareName(wareId)} { derived: [${[...tags].join(', ')}] }`)
+  }
+
+  for (const [wareId, tags] of requiredByWare) {
+    labels.push(`${wareName(wareId)} { required: [${[...tags].join(', ')}] }`)
+  }
+
+  return [...new Set(labels)]
+}
 
 function buildBlueprintMap(state: SavedShipBlueprintsState | undefined): Map<string, ShipBlueprint> {
   const map = new Map<string, ShipBlueprint>()
@@ -142,31 +229,11 @@ function resolveWareId(name: string): string | null {
 }
 
 function showHelp() {
-  console.log(`Usage: npx vite-node analysis/scripts/build-plan/build-plan-production-line.ts [options]
-
-Options:
-  --file=<path>         Export JSON path (default: tests/fixtures/export.json)
-  --index=<N>           Use the N-th build plan in the file (default: 0)
-  --no-build-material   Disable build-material line planning
-  --json                JSON output mode (default for --json: full output)
-  --json=compact        Compact JSON output (scheme groups only)
-  --help, -h            Show this help
-
-Legacy options (override --file):
-  --module="Name*N"     Build-module goal (comma-separated)
-  --ware="Name*R"       Production-rate goal (comma-separated)
-  --flow=<path>         Logic-flow fixture JSON path
-
-Default: reads build-plan[0] from tests/fixtures/export.json
-
-Examples:
-  npx vite-node analysis/scripts/build-plan/build-plan-production-line.ts
-  npx vite-node analysis/scripts/build-plan/build-plan-production-line.ts --index=2
-  npx vite-node analysis/scripts/build-plan/build-plan-production-line.ts --json`)
+  console.log(renderBuildPlanProductionLineHelp())
   process.exit(0)
 }
-
-if (process.argv.includes('--help') || process.argv.includes('-h')) showHelp()
+const cliArgs = parseBuildPlanProductionLineArgs(process.argv.slice(2))
+if (cliArgs.help) showHelp()
 
 interface PlanData {
   goals: BuildGoal[]
@@ -202,7 +269,7 @@ function buildGroupsAndFlowView(savedGroups: SavedFlowGroup[], rawAssignments: a
 }
 
 function loadFromExport(fileArg: string | undefined, planIndex: number, buildMaterialEnabled: boolean): PlanData {
-  const filePath = fileArg ? fileArg.slice('--file='.length) : 'tests/fixtures/export.json'
+  const filePath = fileArg || 'tests/fixtures/export.json'
   const exportRaw = JSON.parse(readFileSync(resolve(filePath), 'utf-8'))
   const data = exportRaw.data || exportRaw
 
@@ -242,15 +309,14 @@ function loadFromExport(fileArg: string | undefined, planIndex: number, buildMat
 }
 
 function loadLegacy(buildMaterialEnabled: boolean): PlanData | null {
-  const moduleArg = process.argv.find(a => a.startsWith('--module='))
-  const wareArg = process.argv.find(a => a.startsWith('--ware='))
-  const flowArg = process.argv.find(a => a.startsWith('--flow='))
+  const moduleArg = cliArgs.module
+  const wareArg = cliArgs.ware
+  const flowArg = cliArgs.flow
   if (!moduleArg && !wareArg && !flowArg) return null
 
   const goals: BuildGoal[] = []
   if (moduleArg) {
-    const value = moduleArg.slice('--module='.length)
-    for (const part of value.split(',')) {
+    for (const part of moduleArg.split(',')) {
       const [name, countStr] = part.split('*')
       const modId = resolveModuleId(name.trim())
       if (!modId) { console.error(`Module not found: ${name.trim()}`); process.exit(1) }
@@ -258,8 +324,7 @@ function loadLegacy(buildMaterialEnabled: boolean): PlanData | null {
     }
   }
   if (wareArg) {
-    const value = wareArg.slice('--ware='.length)
-    for (const part of value.split(',')) {
+    for (const part of wareArg.split(',')) {
       const [name, rateStr] = part.split('*')
       const wareId = resolveWareId(name.trim())
       if (!wareId) { console.error(`Ware not found: ${name.trim()}`); process.exit(1) }
@@ -268,9 +333,8 @@ function loadLegacy(buildMaterialEnabled: boolean): PlanData | null {
   }
   if (goals.length === 0) goals.push({ type: 'build-module', moduleId: 'module_gen_prod_missilecomponents_01', count: 5 })
 
-  const flowPath = flowArg ? flowArg.slice('--flow='.length) : 'tests/fixtures/logic-flow-module.json'
-  const flowIndexArg = process.argv.find(a => a.startsWith('--index='))
-  const flowIndex = flowIndexArg ? parseInt(flowIndexArg.slice('--index='.length)) : 0
+  const flowPath = flowArg || 'tests/fixtures/logic-flow-module.json'
+  const flowIndex = cliArgs.index
 
   const fixtureRaw = JSON.parse(readFileSync(resolve(flowPath), 'utf-8'))
   const plansList = fixtureRaw.list || []
@@ -292,13 +356,12 @@ function loadLegacy(buildMaterialEnabled: boolean): PlanData | null {
   }
 }
 
-const fileArg = process.argv.find(a => a.startsWith('--file='))
-const indexArg = process.argv.find(a => a.startsWith('--index='))
-const planIndex = indexArg ? parseInt(indexArg.slice('--index='.length)) : 0
-const jsonMode = process.argv.find(a => a.startsWith('--json'))
-const useJson = jsonMode !== undefined
-const useCompactJson = jsonMode === '--json=compact'
-const buildMaterialPlanningEnabled = !process.argv.includes('--no-build-material')
+const fileArg = cliArgs.file
+const planIndex = cliArgs.index
+const jsonMode = cliArgs.json
+const useJson = jsonMode !== undefined && jsonMode !== false
+const useCompactJson = jsonMode === 'compact'
+const buildMaterialPlanningEnabled = !cliArgs.noBuildMaterial
 
 const planData = loadLegacy(buildMaterialPlanningEnabled) ?? loadFromExport(fileArg, planIndex, buildMaterialPlanningEnabled)
 const { goals, selectedPlanName, groups, buildFlowView, buildMaterialPlanningEnabled: bmEnabled } = planData
@@ -664,19 +727,116 @@ for (const scc of graph.sccGroups) {
 }
 
 console.log(`\n  产线 ↔ 目标映射:`)
-for (const alloc of lineAllocations) {
-  const name = alloc.groupName || alloc.groupId?.slice(0, 8) || '(待规划)'
-  const goalStrs = alloc.goals.map(g => {
-    if (g.type === 'production-rate') return `${wareName(g.wareId)} ${g.ratePerHour}/h`
-    if (g.type === 'build-module') return `${modName(g.moduleId)} ×${g.count}`
-    if (g.type === 'target-production' && g.moduleId) return `${modName(g.moduleId)} ×${g.count || 1}`
-    if (g.type === 'target-production' && g.wareId) return `${wareName(g.wareId)} ${(g.ratePerHour || 0).toFixed(1)}/h`
-    if (g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production')
-      return `${wareName(g.wareId)} (${g.type})`
-    if (g.type === 'derived-rate') return `${wareName(g.wareId)}(derived) ${g.ratePerHour}/h`
-    return `?`
-  })
-  console.log(`  ${alloc.isUnmatched ? '⚠' : ' '} ${name}: ${goalStrs.join(', ')}`)
+for (const line of preview.lines) {
+  const name = line.groupName || line.groupId?.slice(0, 8) || '(待规划)'
+  const targetStrs = formatPreviewLineTargets(line.items)
+  console.log(`  ${line.isUnmatched ? '⚠' : ' '} ${name}: ${targetStrs.join(', ')}`)
+}
+
+const buildMaterialSchemeGroup = schemeGroups.find(group => group.groupType === 'build-material')
+if (buildMaterialSchemeGroup && buildMaterialSchemeGroup.schemes.length > 0) {
+  console.log(`\n${sep}`)
+  console.log('  建材产线建造步骤:')
+  for (const scheme of buildMaterialSchemeGroup.schemes) {
+    const stepsScheme = buildStepsScheme(
+      scheme,
+      'build-material',
+      modulesMap,
+      waresMap,
+      DEFAULT_BUILD_PLAN_SETTINGS,
+    )
+    console.log(`\n  ── ${scheme.label}`)
+    if (!stepsScheme || stepsScheme.steps.length === 0) {
+      console.log('    (无建造步骤)')
+      continue
+    }
+
+    let cumDur = 0
+    let cumCr = 0
+    let currentGroup = -1
+    for (const step of stepsScheme.steps) {
+      if (step.groupIndex !== currentGroup) {
+        currentGroup = step.groupIndex
+        console.log(`\n  ▸ ${step.reason || '主产线'}`)
+      }
+
+      const stepDurInc = step.estimatedDuration - cumDur
+      const stepCrInc = step.estimatedCredits - cumCr
+      cumDur = step.estimatedDuration
+      cumCr = step.estimatedCredits
+
+      console.log(`    #${step.order}  ${modName(step.moduleId)} ×${step.moduleCount}`)
+      console.log(`         建造: ${fmtH(step.moduleBuildTime)}  累计: ${fmtH(cumDur)}  步骤费: ${fmtCr(stepCrInc)}  累计费: ${fmtCr(cumCr)}`)
+
+      if (step.materials.length > 0) {
+        console.log('         材料明细:')
+        for (const mat of step.materials) {
+          const price = waresMap[mat.wareId]?.price || 0
+          const consumed = Math.round(mat.quantity)
+          console.log(
+            `           ${wareName(mat.wareId).padEnd(30)} ×${String(consumed).padStart(6)}  `
+            + `库存: ${String(Math.round(mat.stockBefore)).padStart(7)}  `
+            + `自产: ${String(Math.round(mat.currentProdRate)).padStart(5)}/h  +${Math.round(mat.producedDuringBuild)}  `
+            + `买: ${fmtCr(mat.creditsNeeded).padStart(7)}  (单价: ${fmtCr(price)})`,
+          )
+        }
+      } else {
+        console.log('         材料: 无')
+      }
+    }
+
+    const targetWareIds = new Set(getBuildMaterialTargetRateEntries(scheme).map(([wareId]) => wareId))
+    const primaryModuleIds = new Set(
+      scheme.primaryModuleIds.filter(moduleId => {
+        const mod = modulesMap[moduleId]
+        if (!mod?.outputs) return false
+        return Object.keys(mod.outputs).some(wareId => targetWareIds.has(wareId))
+      }),
+    )
+    const schemePrimaryModules = mergeSavedModules(
+      scheme.modules.filter(module => primaryModuleIds.has(module.id)),
+    )
+    const exitPrimaryModules = mergeSavedModules(
+      (stepsScheme.greedyDebug?.exitModules || []).filter(module => primaryModuleIds.has(module.id)),
+    )
+
+    console.log('\n  ── Step 回放 vs Compute 对比 ──')
+    const primaryIds = new Set([
+      ...schemePrimaryModules.map(module => module.id),
+      ...exitPrimaryModules.map(module => module.id),
+    ])
+    if (primaryIds.size > 0) {
+      console.log('  Greedy 退出时主模块数量:')
+      for (const moduleId of [...primaryIds].sort()) {
+        const stepCount = exitPrimaryModules.find(module => module.id === moduleId)?.count || 0
+        const computeCount = schemePrimaryModules.find(module => module.id === moduleId)?.count || 0
+        const extraCount = computeCount - stepCount
+        const status = extraCount === 0 ? '✓' : '→'
+        const suffix = extraCount > 0 ? `, final=${computeCount} (+${extraCount} after tail-fill)` : `, final=${computeCount}`
+        console.log(`    ${status} ${modName(moduleId)}: exit=${stepCount}${suffix}`)
+      }
+    }
+
+    if (stepsScheme.greedyDebug && stepsScheme.greedyDebug.exitSatisfactions.length > 0) {
+      console.log('  Greedy 退出检查满足率:')
+      for (const row of stepsScheme.greedyDebug.exitSatisfactions) {
+        const computeProd = Math.max(0, scheme.netProduction[row.wareId] || 0)
+        const exitSat = row.targetRate > 0 ? row.prodRate / row.targetRate * 100 : 0
+        const computeSat = row.targetRate > 0 ? computeProd / row.targetRate * 100 : 0
+        const diff = row.prodRate - computeProd
+        const status = Math.abs(diff) < 0.001 ? '✓' : '→'
+        const suffix = Math.abs(diff) < 0.001
+          ? `compute=${computeProd.toFixed(1)}/h (${computeSat.toFixed(1)}%)`
+          : `final=${computeProd.toFixed(1)}/h (${computeSat.toFixed(1)}%, +${(computeProd - row.prodRate).toFixed(1)}/h after tail-fill)`
+        console.log(
+          `    ${status} ${wareName(row.wareId)}: `
+          + `exit=${row.prodRate.toFixed(1)}/h (${exitSat.toFixed(1)}%, ${row.satisfied ? 'met' : 'unmet'}), `
+          + `${suffix}, `
+          + `target=${row.targetRate.toFixed(1)}/h, diff=${diff.toFixed(1)}/h`,
+        )
+      }
+    }
+  }
 }
 
 console.log(sep)

@@ -148,7 +148,7 @@ export function buildPreviewTargetModulesForProductionLine(
 
     for (const goal of allocation.goals) {
       if (goal.type !== 'build-module') continue
-      targetModules.push({ id: goal.moduleId, count: 1 })
+      targetModules.push({ id: goal.moduleId, count: goal.count })
     }
   }
 
@@ -158,7 +158,7 @@ export function buildPreviewTargetModulesForProductionLine(
 
   for (const goal of goals) {
     if (goal.type !== 'build-module') continue
-    targetModules.push({ id: goal.moduleId, count: 1 })
+    targetModules.push({ id: goal.moduleId, count: goal.count })
   }
 
   return mergeModules(targetModules)
@@ -182,7 +182,7 @@ export function computePreviewLinePlans(
 
   // 消费方通过 isolated 边声明它需要某 ware；供给方通过 isolated 边声明它提供某 ware
   for (const edge of graph.edges) {
-    if (edge.fromLineKey !== ROOT_BUILD_COST_KEY) {
+    if (edge.sourceLabel.includes('buildCost')) {
       const producerSet = producerBuildMaterial.get(edge.toLineKey) || new Set<string>()
       producerSet.add(edge.wareId)
       producerBuildMaterial.set(edge.toLineKey, producerSet)
@@ -364,7 +364,7 @@ export function createBuildFlowPlanPreview(
 
   // 2. Compute production allocations (target-production responsibilities)
   // 3. Merge: graph-based lines + target-production responsibilities from allocations
-  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId, modulesMap, waresMap, settings)
+  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId, groups, modulesMap, waresMap, settings)
 
   return {
     buildMaterialPlanningEnabled: true,
@@ -383,6 +383,7 @@ function mergeGraphAndAllocationLines(
   graphLines: PreviewLinePlan[],
   allocations: { groupId?: string; groupName: string; isUnmatched: boolean; goals: BuildGoal[]; lineage: string }[],
   lineageByGroupId: Map<string, string> = new Map(),
+  groups: ProductionLineGroup[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
@@ -390,6 +391,16 @@ function mergeGraphAndAllocationLines(
   const result: PreviewLinePlan[] = [...graphLines]
   const graphGroupIds = new Set(graphLines.map(l => l.groupId).filter(Boolean) as string[])
   const lineByGroupId = new Map(graphLines.map(line => [line.groupId, line]))
+  const previewAllocations = allocations.map((alloc, index) => {
+    let previewGroupId = alloc.groupId
+    if (!previewGroupId && alloc.isUnmatched) {
+      previewGroupId = buildUnmatchedPreviewGroupId(index)
+    }
+    return {
+      ...alloc,
+      previewGroupId,
+    }
+  })
 
   const requiredConsumersByWare = new Map<string, Set<string>>()
   for (const graphLine of graphLines) {
@@ -401,48 +412,50 @@ function mergeGraphAndAllocationLines(
       requiredConsumersByWare.set(item.wareId, consumers)
     }
   }
-  for (const alloc of allocations) {
-    if (!alloc.groupId) continue
+  for (const alloc of previewAllocations) {
+    if (!alloc.previewGroupId) continue
     for (const goal of alloc.goals) {
       if (goal.type !== 'required-production') continue
       const consumers = requiredConsumersByWare.get(goal.wareId) || new Set<string>()
-      consumers.add(alloc.groupId)
+      consumers.add(alloc.previewGroupId)
       requiredConsumersByWare.set(goal.wareId, consumers)
     }
   }
 
-  for (const alloc of allocations) {
-    const isGraphOverlap = Boolean(alloc.groupId && graphGroupIds.has(alloc.groupId))
+  for (const alloc of previewAllocations) {
+    const isGraphOverlap = alloc.previewGroupId !== undefined && graphGroupIds.has(alloc.previewGroupId)
+    let lineage = 'default'
+    if (alloc.previewGroupId) {
+      const existingLineage = lineageByGroupId.get(alloc.previewGroupId)
+      if (existingLineage) lineage = existingLineage
+      else if (alloc.lineage) lineage = alloc.lineage
+    } else if (alloc.lineage) {
+      lineage = alloc.lineage
+    }
     const respLine: PreviewLinePlan = {
-      groupId: alloc.groupId,
+      groupId: alloc.previewGroupId,
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
-      lineage: (alloc.groupId && lineageByGroupId.get(alloc.groupId)) || 'default',
+      lineage,
       items: alloc.goals
         .map(g => goalToPreviewItem(
           g,
-          `goal:${alloc.groupId || 'unmatched'}`,
-          respLineLineage(alloc.groupId, alloc.lineage, lineageByGroupId),
+          `goal:${alloc.previewGroupId || 'unmatched'}`,
+          respLineLineage(alloc.previewGroupId, alloc.lineage, lineageByGroupId),
           modulesMap,
           waresMap,
-          alloc.groupId,
+          alloc.previewGroupId,
           settings,
         ))
         .filter((item): item is PreviewItem => Boolean(item))
         .filter(item => isGraphOverlap
-          ? item.kind === 'derived'
+          ? item.kind === 'derived' && item.derived.includes('target')
           : true),
     }
 
-    if (isGraphOverlap && alloc.groupId) {
-      const existing = lineByGroupId.get(alloc.groupId)
+    if (isGraphOverlap && alloc.previewGroupId) {
+      const existing = lineByGroupId.get(alloc.previewGroupId)
       if (existing) {
-        for (const item of respLine.items) {
-          if (item.kind === 'derived' && item.wareId && item.derived.includes('production')) {
-            const consumers = requiredConsumersByWare.get(item.wareId)
-            item.relatedLineGroupIds = consumers ? [...consumers] : []
-          }
-        }
         existing.items = mergePreviewItems([...existing.items, ...respLine.items])
       }
     } else {
@@ -453,17 +466,23 @@ function mergeGraphAndAllocationLines(
     }
   }
 
-  const externalTargetGroupIds = allocations
-    .filter(alloc => alloc.groupId && !graphGroupIds.has(alloc.groupId))
-    .filter(alloc => alloc.goals.some(goal => goal.type === 'build-module' || goal.type === 'production-rate'))
-    .map(alloc => alloc.groupId!)
+  const externalTargetLines = previewAllocations
+    .filter(alloc => alloc.previewGroupId !== undefined && !graphGroupIds.has(alloc.previewGroupId))
+    .filter(alloc => hasTargetGoals(alloc.goals))
+    .map(alloc => ({
+      groupId: alloc.previewGroupId!,
+      buildMaterialWares: collectAllocationBuildMaterialWares(alloc, groups, modulesMap),
+    }))
 
   for (const line of result) {
     for (const item of line.items) {
       if (item.kind !== 'derived' || !item.derived.includes('build-material')) continue
+      const relatedExternalTargets = externalTargetLines
+        .filter(target => item.wareId && target.buildMaterialWares.has(item.wareId))
+        .map(target => target.groupId)
       item.relatedLineGroupIds = [...new Set([
         ...item.relatedLineGroupIds,
-        ...externalTargetGroupIds,
+        ...relatedExternalTargets,
       ])]
     }
     line.items = mergePreviewItems(line.items)
@@ -519,6 +538,43 @@ function mergePreviewItems(
   return [...map.values()]
 }
 
+function hasTargetGoals(goals: BuildGoal[]): boolean {
+  return goals.some(goal => goal.type === 'build-module' || goal.type === 'production-rate')
+}
+
+export function collectAllocationBuildMaterialWares(
+  allocation: { groupId?: string; goals: BuildGoal[] },
+  groups: ProductionLineGroup[],
+  modulesMap: Record<string, X4Module>,
+): Set<string> {
+  const targetModules: SavedModule[] = []
+
+  if (allocation.groupId) {
+    targetModules.push(...collectExpandedModulesFromGroup(allocation.groupId, groups))
+  } else {
+    for (const goal of allocation.goals) {
+      if (goal.type !== 'build-module') continue
+      targetModules.push({ id: goal.moduleId, count: goal.count })
+    }
+  }
+
+  const wares = new Set<string>()
+  for (const module of mergeModules(targetModules)) {
+    const definition = modulesMap[module.id]
+    if (!definition?.buildCost) continue
+    for (const wareId of Object.keys(definition.buildCost)) {
+      if (wareId === 'energycells') continue
+      wares.add(wareId)
+    }
+  }
+
+  return wares
+}
+
+function buildUnmatchedPreviewGroupId(index: number): string {
+  return `__preview_unmatched__:${index}`
+}
+
 function buildAllocationOnlyPreviewLines(
   allocations: ProductionLineAllocation[],
   modulesMap: Record<string, X4Module>,
@@ -526,25 +582,27 @@ function buildAllocationOnlyPreviewLines(
   settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
 ): PreviewLinePlan[] {
   const requiredConsumersByWare = new Map<string, Set<string>>()
-  for (const alloc of allocations) {
-    if (!alloc.groupId) continue
+  for (const [index, alloc] of allocations.entries()) {
+    const effectiveGroupId = alloc.groupId || (alloc.isUnmatched ? buildUnmatchedPreviewGroupId(index) : undefined)
+    if (!effectiveGroupId) continue
     for (const goal of alloc.goals) {
       if (goal.type !== 'required-production') continue
       const consumers = requiredConsumersByWare.get(goal.wareId) || new Set<string>()
-      consumers.add(alloc.groupId)
+      consumers.add(effectiveGroupId)
       requiredConsumersByWare.set(goal.wareId, consumers)
     }
   }
 
-  return allocations.map((alloc) => {
+  return allocations.map((alloc, index) => {
+    const effectiveGroupId = alloc.groupId || (alloc.isUnmatched ? buildUnmatchedPreviewGroupId(index) : undefined)
     const items = alloc.goals
       .map(goal => goalToPreviewItem(
         goal,
-        `goal:${alloc.groupId || 'unmatched'}`,
+        `goal:${effectiveGroupId || 'unmatched'}`,
         alloc.lineage,
         modulesMap,
         waresMap,
-        alloc.groupId,
+        effectiveGroupId,
         settings,
       ))
       .filter((item): item is PreviewItem => Boolean(item))
@@ -558,7 +616,7 @@ function buildAllocationOnlyPreviewLines(
       })
 
     return {
-      groupId: alloc.groupId,
+      groupId: effectiveGroupId,
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
       lineage: alloc.lineage || 'default',
@@ -874,6 +932,23 @@ export function computeBuildFlowPlan(
         schemeByGroupId,
         modulesMap,
       )
+      const scheme = schemeByGroupId.get(line.groupId)
+      if (scheme && node.demandAnalysis) {
+        const buildMaterialTargetWares = new Set(
+          line.mergedItems
+            .filter((item): item is PreviewDerivedItem =>
+              item.kind === 'derived'
+              && Boolean(item.wareId)
+              && item.derived.includes('build-material'))
+            .map(item => item.wareId!),
+        )
+        const stepTargetRates: Record<string, number> = {}
+        for (const wareId of buildMaterialTargetWares) {
+          const aggregateRate = node.demandAnalysis.aggregateRates[wareId] || 0
+          if (aggregateRate > 0) stepTargetRates[wareId] = aggregateRate
+        }
+        scheme.stepTargetRates = stepTargetRates
+      }
     }
   }
 

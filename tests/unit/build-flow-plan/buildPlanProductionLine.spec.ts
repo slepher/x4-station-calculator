@@ -394,4 +394,5 @@ describe('buildPlanProductionLine regression', () => {
     expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_graphene_01')?.count).toBe(4)
     expect(methaneOreLine!.allModules.find(module => module.id === 'module_gen_prod_refinedmetals_01')?.count).toBe(5)
   })
+
 })

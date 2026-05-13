@@ -2,7 +2,7 @@
 
 ## 目标
 
-为 build-plan compute 建立单一、稳定的数据流：compute 只读取 preview 结果并求解主要模块 / 辅助模块；默认 compute 不生成 steps；Vue 与 analysis script 只消费共享结果。
+为 build-plan compute 建立单一、稳定的数据流：compute 只读取 preview 结果并求解主要模块 / 辅助模块，输出静态 BuildScheme；steps 由独立 change 文档定义，不再混入 compute 设计。
 
 ## 领域术语
 
@@ -20,7 +20,6 @@
 | 稳定 | 迭代中主要模块数量不再变化 |
 | BuildScheme | compute 产出的默认静态方案真相层 |
 | moduleSummaries | BuildScheme 中用于默认详情视图的模块汇总 |
-| BuildStepsScheme | Vue/presenter 侧专用 steps 视图模型，不进入 store 真相层 |
 | effectiveBuildTime | max(实际总花费, 设定buildTime)，用于 Fleet 派生 rate |
 | 无规划 preview | `logicFlowPlanId = null` 时生成的 preview；lines 存在，但 `graph = null` |
 
@@ -32,8 +31,8 @@
 2. 目标速率主要围绕 graph edge / demandSource 聚合，不是围绕"责任 → 相关产线集合 → 建筑集合"
 3. 重叠产线在 scheme 层事后合并，而不是在求解前先合并责任
 4. SCC 收敛看的是 `node.modules`（含辅助模块），不符合需求
-5. 默认 compute 直接生成 steps，使 steps 成为默认真相层的一部分
-6. `energycells` 被错误排除出部分材料统计与成本统计
+5. 文档层曾把 steps 方案混入 compute，导致职责边界不清
+6. `energycells` 曾被错误排除出部分静态材料统计与成本统计
 7. analysis script 与 Vue 存在各自维护不同逻辑的风险
 
 ## 方案
@@ -51,15 +50,12 @@
     → 若存在 SCC 则迭代直到主要模块稳定
     → 输出 BuildScheme（含 moduleSummaries，无 steps）
     → 分组为 BuildSchemeGroup[]
-
-用户打开 scheme 详情弹窗
-  → 默认展示 BuildScheme.moduleSummaries
-
-用户打开 steps 开关
-  → 弹窗局部 logic 调用 makeSchemeSteps()
-  → 生成 BuildStepsScheme
-  → 切换成纯 steps 列表
 ```
+
+说明：
+
+1. compute 到此结束，不进入 steps 生成。
+2. steps 详细方案由 `build-plan-steps` 文档定义。
 
 ### 2. Compute 输入/输出契约
 
@@ -89,10 +85,11 @@ interface ComputeLineResult {
 ```
 
 约束：
-1. ComputeInput 不再直接接收裸 goals
-2. ComputeResult 必须显式分离 primaryModules / auxiliaryModules / allModules
-3. BuildSchemeGroup 只是最终展示视图，不是求解真相层
-4. 当 `preview.graph = null` 时，compute 仍需对 preview.lines 求解，分组退化为 production schemes
+
+1. `ComputeInput` 不再直接接收裸 goals
+2. `ComputeResult` 必须显式分离 `primaryModules` / `auxiliaryModules` / `allModules`
+3. `BuildSchemeGroup` 只是最终展示视图，不是求解真相层
+4. 当 `preview.graph = null` 时，compute 仍需对 `preview.lines` 求解，分组退化为 production schemes
 
 ### 3. 单线求解模型
 
@@ -117,7 +114,7 @@ targetRate(material) =
    所有相关产线的所有建筑总建造时间
 ```
 
-需求维度：`module.buildCost[material] × module.count` 累加
+需求维度：`module.buildCost[material] × module.count` 累加  
 时间维度：`module.buildTime × module.count` 累加
 
 #### 4.2 derived-production（原料供给）
@@ -129,7 +126,7 @@ targetRate(material) =
    sum(targetProduction.ratePerHour for this ware on this line)
 ```
 
-需求维度：相关产线的模块运行时净消耗
+需求维度：相关产线的模块运行时净消耗  
 与建造时间无关
 
 #### 4.3 推荐函数边界
@@ -141,8 +138,9 @@ function computeTargetRatesFromBuildings(buildings: SavedModule[], modulesMap: R
 ```
 
 禁止旧规则：
-1. per-source Math.max
-2. 不分责任类型，统一用 sum(qty)/sum(time)
+
+1. per-source `Math.max`
+2. 不分责任类型，统一用 `sum(qty)/sum(time)`
 3. 只看本线建筑，不看责任挂接的相关产线集合
 
 ### 5. SCC / 循环依赖求解
@@ -177,9 +175,28 @@ type PrimaryModuleSnapshot = Map<string, string>
 ```
 
 要求：
+
 1. 快照只包含主要模块
 2. 不包含 autoFill / habitation / auxiliary 模块
-3. SCC 迭代中比较 PrimaryModuleSnapshot 是否变化
+3. SCC 迭代中比较 `PrimaryModuleSnapshot` 是否变化
+
+#### 5.4 当前已知限制
+
+在 SCC / 强耦合产线中，某个 ware 的目标可能会随着其他产线的主模块变化而下降。
+
+当前 compute 的约束是：
+
+1. 迭代过程中只会新增主要模块与辅助模块；
+2. 一旦某轮已经为某个 ware 增加了主要模块，后续即使目标回落，也不会回退已增加的模块；
+3. 因此最终结果可能保留“较早阶段为更高目标加上的主要模块”。
+
+表现上会出现：
+
+1. 某轮中间状态已经满足较晚阶段目标；
+2. 最终 `compute` 结果仍然比该中间状态多出若干主要模块；
+3. 这些额外主要模块并不一定对应最终时刻仍然存在的更高目标，而可能是 SCC 单调增量求解过程中留下的残留。
+
+当前 change 只记录该现象，不在本次实现中解决“目标回落后是否允许主要模块回退”问题。
 
 ### 6. 分组与重叠产线
 
@@ -190,7 +207,7 @@ type PrimaryModuleSnapshot = Map<string, string>
 
 重叠产线规则：
 
-1. 相同 groupId 只允许出现一次
+1. 相同 `groupId` 只允许出现一次
 2. 必须归入建材产线组
 3. 其建材责任与生产责任必须合并求解
 4. 不允许先分别求解两份 scheme 再在结果层事后拼接
@@ -211,7 +228,6 @@ interface BuildScheme {
   totalDuration: number
   totalCredits: number
   moduleSummaries: BuildSchemeModuleSummary[]
-  // 其他现有静态字段保持原有职责
 }
 
 interface BuildSchemeModuleSummary {
@@ -231,71 +247,30 @@ interface BuildSchemeModuleMaterialSummary {
 ```
 
 约束：
-1. moduleSummaries 由 compute 直接生成，已排序
+
+1. `moduleSummaries` 由 compute 直接生成，已排序
 2. 模块排序：tier 升序 → module.name 升序
 3. 材料排序：totalCredits 降序
 4. Vue 不再二次排序
+5. steps 不属于 `BuildScheme` 真相层
 
-### 8. 默认模式详情视图
+### 8. 静态汇总口径
 
-#### 8.1 状态栏
-
-- 显示总耗时、总花费
-- 不显示步骤数
-
-#### 8.2 手风琴头部
-
-- 模块名称、数量、总耗时、总花费
-
-#### 8.3 展开区
-
-- 材料名称、总数量、总花费、单价
-
-#### 8.4 静态汇总口径
-
-- totalDuration = `sum(module.buildTime × count)`
-- totalCredits = `sum(buildCost[ware] × count × ware.price)`
+- `totalDuration = sum(module.buildTime × count)`
+- `totalCredits = sum(buildCost[ware] × count × ware.price)`
 - 材料数量 = `buildCost[ware] × count`
-- 不考虑库存抵扣与建造期间自产
+- 静态口径不考虑库存抵扣与建造期间自产
 
-### 9. BuildStepsScheme 视图模型
+### 9. Energy Cells 口径修正
 
-```typescript
-interface BuildStepsScheme {
-  baseScheme: BuildScheme
-  steps: BuildSchemeStep[]
-  stepsCount: number
-  stepsTotalCredits: number
-}
-```
-
-约束：
-1. BuildStepsScheme 只存在于 Vue / presenter 范围
-2. 不放入 store 真相层类型定义
-3. 不回写 useBuildPlanStore / buildPlan / schemeGroups
-4. 不覆盖 BuildScheme.totalCredits
-
-### 10. Steps 懒计算
-
-- 详情弹窗打开时不计算 steps
-- 用户打开 steps 开关时才计算
-- 计算期间显示弹窗局部 loading
-- 同一弹窗会话内可复用计算结果
-- 当 scheme.modules 变化时局部缓存失效
-- makeSchemeSteps() 从默认 compute 核心模块迁出，放到详情弹窗 steps 懒计算使用的局部 logic 模块
-- 继续复用同一套 makeSchemeSteps() 算法，不允许再写第二套
-
-### 11. Energy Cells 口径修正
-
-energycells 只允许在"循环建材产线寻找"语义下作为特殊项；不得再从材料展示和成本统计中剔除。
+`energycells` 只允许在“循环建材产线寻找”语义下作为特殊项；不得再从静态材料展示和成本统计中剔除。
 
 需要统一修正：
-1. moduleSummaries.materials 纳入 energycells
-2. 静态 totalCredits 纳入 energycells
-3. steps 明细纳入 energycells
-4. steps 累计花费纳入 energycells
 
-### 12. 单一共享入口
+1. `moduleSummaries.materials` 纳入 `energycells`
+2. 静态 `totalCredits` 纳入 `energycells`
+
+### 10. 单一共享入口
 
 ```ts
 function computeBuildFlowPlanPreview(
@@ -314,11 +289,12 @@ function computeBuildFlowPlan(
 ```
 
 要求：
+
 1. store 调用这两个入口
 2. analysis script 调用这两个入口
 3. presenter / Vue 不直接触碰求解细节
 
-### 13. Store 边界
+### 11. Store 边界
 
 ```ts
 useBlueprintProductionStore
@@ -340,44 +316,24 @@ useBuildPlanStore
 ```
 
 约束：
+
 1. build-plan store 可以依赖 game-data 与 logic-flow store
-2. build-plan store 不应反向依赖 useBlueprintProductionStore
+2. build-plan store 不应反向依赖 `useBlueprintProductionStore`
 3. Presenter 负责把两个 store 组合给 overview Vue
-
-### 14. Steps 算法归属
-
-makeSchemeSteps() 核心算法：
-
-- 步骤拆分：每个 module.count 拆分成 N 个步骤（每步 moduleCount: 1）
-- 按 tier 排序，低 tier 优先建造
-- 累积计算：时长、资金、产量、库存
-- 建材消耗优先级：需求量 → 库存抵扣 → 剩余需购买 → Credits 计算
-- builtSoFar 跨产线传递（按拓扑序）
-- 重叠产线只在建材组出现一次
-
-该算法迁出默认 compute 核心模块后，只能被详情弹窗 steps 计算链路依赖。
-
-### 15. 异常兜底
-
-若出现意外情况导致当前 scheme 模块为空：
-
-1. 详情弹窗直接显示空模板
-2. 不显示 steps 开关
-3. 该行为仅用于异常兜底，不改变正常流程定义
 
 ## 影响面
 
 主要影响：
+
 1. `src/types/build-plan.ts`
 2. `src/store/logic/buildPlanProductionLine.ts`
 3. `src/store/logic/calculateBuildFlowPlan.ts`
 4. `src/store/useBuildPlanStore.ts`
 5. `src/components/empire/presenters/useBuildPlanPresenter.ts`
 6. `src/components/empire/BuildPlanConstraintsPanel.vue`
-7. `src/locales/en.json`
-8. `src/locales/zh-CN.json`
 
 不影响：
+
 1. preview 责任分配算法
 2. build-flow graph 构建算法
 3. build-flow 连线编辑交互

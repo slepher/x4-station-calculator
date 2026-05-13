@@ -21,6 +21,7 @@ const emit = defineEmits<{
 }>()
 
 const selectedScheme = ref<BuildScheme | null>(null)
+const selectedSchemeGroupType = ref<BuildSchemeGroup['groupType']>('production')
 const modalOpen = ref(false)
 const showExportMenu = ref(false)
 
@@ -29,8 +30,9 @@ function getSchemeLabel(label: string): string {
   return t('build_plan.' + label)
 }
 
-function openScheme(scheme: BuildScheme) {
+function openScheme(scheme: BuildScheme, groupType: BuildSchemeGroup['groupType']) {
   selectedScheme.value = scheme
+  selectedSchemeGroupType.value = groupType
   modalOpen.value = true
 }
 
@@ -87,13 +89,14 @@ const schemeColors: Record<string, string> = {
 
 interface SchemeCardData {
   scheme: BuildScheme
+  schemeGroupType: BuildSchemeGroup['groupType']
   primaryModuleLines: string[]
   derivedModuleLines: string[]
   materialLines: Array<{ name: string; qty: number }>
   productionLines: Array<{ name: string; rate: number }>
 }
 
-function toCardData(scheme: BuildScheme): SchemeCardData {
+function toCardData(scheme: BuildScheme, schemeGroupType: BuildSchemeGroup['groupType']): SchemeCardData {
   const primarySet = new Set(scheme.primaryModuleIds)
   const primaryModules = scheme.modules.filter(m => primarySet.has(m.id))
   const derivedModules = scheme.modules.filter(m => !primarySet.has(m.id))
@@ -111,11 +114,11 @@ function toCardData(scheme: BuildScheme): SchemeCardData {
     .sort((a, b) => b[1] - a[1])
     .map(([wareId, rate]) => ({ name: wareName(wareId), rate }))
 
-  return { scheme, primaryModuleLines, derivedModuleLines, materialLines, productionLines }
+  return { scheme, schemeGroupType, primaryModuleLines, derivedModuleLines, materialLines, productionLines }
 }
 
 const schemeCards = computed<SchemeCardData[]>(() => {
-  return props.schemes.map(toCardData)
+  return props.schemes.map(scheme => toCardData(scheme, 'production'))
 })
 
 const mixedSchemeCards = computed<SchemeCardData[]>(() => {
@@ -123,11 +126,11 @@ const mixedSchemeCards = computed<SchemeCardData[]>(() => {
     return schemeCards.value
   }
 
-  const mergedSchemes: BuildScheme[] = []
+  const mergedSchemes: Array<{ scheme: BuildScheme; groupType: BuildSchemeGroup['groupType'] }> = []
   for (const group of props.schemeGroups) {
-    mergedSchemes.push(...group.schemes)
+    mergedSchemes.push(...group.schemes.map(scheme => ({ scheme, groupType: group.groupType })))
   }
-  return mergedSchemes.map(toCardData)
+  return mergedSchemes.map(({ scheme, groupType }) => toCardData(scheme, groupType))
 })
 
 const canExport = computed(() => props.schemes.length > 0 && !props.loading)
@@ -195,7 +198,7 @@ function handleExportDirect() {
           :key="card.scheme.label"
           class="border-2 rounded-lg p-4 cursor-pointer transition-all duration-200 bg-slate-800/50"
           :class="schemeColors[card.scheme.label] || 'border-slate-600 hover:bg-slate-700/50'"
-          @click="openScheme(card.scheme)"
+          @click="openScheme(card.scheme, card.schemeGroupType)"
         >
           <div class="flex items-start justify-between mb-2">
             <div class="flex items-center gap-2">
@@ -260,6 +263,7 @@ function handleExportDirect() {
   <BuildPlanStepsModal
     v-if="modalOpen && selectedScheme"
     :scheme="selectedScheme"
+    :scheme-group-type="selectedSchemeGroupType"
     @close="closeModal"
   />
 </template>
