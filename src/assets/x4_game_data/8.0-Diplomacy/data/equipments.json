@@ -31,6 +31,10 @@
         "hullparts": 108.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
+    },
     "thrust": {
       "forward": 3900.0,
       "reverse": 3705.0
@@ -80,6 +84,10 @@
         "hullparts": 111.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
+    },
     "thrust": {
       "forward": 3159.0,
       "reverse": 3001.05
@@ -127,6 +135,10 @@
         "energycells": 99.0,
         "hullparts": 3.0
       }
+    },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
     },
     "thrust": {
       "forward": 960.0,
@@ -177,6 +189,10 @@
         "hullparts": 18.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1152.0,
       "reverse": 1152.0
@@ -226,6 +242,10 @@
         "hullparts": 88.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1296.0,
       "reverse": 1296.0
@@ -273,6 +293,10 @@
         "energycells": 109.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
     },
     "thrust": {
       "forward": 1084.8,
@@ -323,6 +347,10 @@
         "hullparts": 21.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1301.76,
       "reverse": 1301.76
@@ -371,6 +399,10 @@
         "energycells": 293.0,
         "hullparts": 106.0
       }
+    },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
     },
     "thrust": {
       "forward": 1464.48,
@@ -423,6 +455,10 @@
         "hullparts": 60.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1484.1,
       "reverse": 1336.0
@@ -474,6 +510,10 @@
         "hullparts": 144.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1706.0,
       "reverse": 1535.0
@@ -521,6 +561,10 @@
         "energycells": 97.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
     },
     "thrust": {
       "forward": 864.0,
@@ -571,6 +615,10 @@
         "hullparts": 20.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1036.8,
       "reverse": 1036.8
@@ -620,6 +668,10 @@
         "hullparts": 101.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1166.4,
       "reverse": 1166.4
@@ -666,6 +718,10 @@
         "energycells": 42.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "thrust": {
       "forward": 384.0,
@@ -716,6 +772,10 @@
         "hullparts": 8.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "forward": 460.8,
       "reverse": 460.8
@@ -765,6 +825,10 @@
         "hullparts": 38.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "forward": 518.4,
       "reverse": 518.4
@@ -811,6 +875,10 @@
         "energycells": 52.0,
         "hullparts": 2.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "thrust": {
       "forward": 433.92,
@@ -861,6 +929,10 @@
         "hullparts": 12.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "forward": 520.7,
       "reverse": 520.7
@@ -910,6 +982,10 @@
         "hullparts": 56.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "forward": 585.79,
       "reverse": 585.79
@@ -953,6 +1029,9 @@
         "engineparts": 71.0,
         "fieldcoils": 38.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 563.0,
@@ -1000,6 +1079,10 @@
         "energycells": 54.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "thrust": {
       "forward": 345.6,
@@ -1050,6 +1133,10 @@
         "hullparts": 10.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "forward": 414.72,
       "reverse": 414.72
@@ -1098,6 +1185,10 @@
         "energycells": 126.0,
         "hullparts": 51.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "thrust": {
       "forward": 466.56,
@@ -1148,6 +1239,10 @@
         "hullparts": 142.0
       }
     },
+    "buildTime": {
+      "default": 30.0,
+      "closedloop": 30.0
+    },
     "thrust": {
       "forward": 10550.0,
       "reverse": 10022.5
@@ -1197,6 +1292,10 @@
         "hullparts": 147.0
       }
     },
+    "buildTime": {
+      "default": 30.0,
+      "closedloop": 30.0
+    },
     "thrust": {
       "forward": 8545.5,
       "reverse": 8118.23
@@ -1241,6 +1340,9 @@
         "engineparts": 185.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "thrust": {
       "forward": 3000.0,
       "reverse": 3300.0
@@ -1283,6 +1385,9 @@
         "energycells": 30.0,
         "engineparts": 10.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 750.0,
@@ -1328,6 +1433,9 @@
         "engineparts": 35.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 930.0,
       "reverse": 1023.0
@@ -1372,6 +1480,9 @@
         "engineparts": 118.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1035.0,
       "reverse": 1138.5
@@ -1414,6 +1525,9 @@
         "energycells": 18.0,
         "engineparts": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 300.0,
@@ -1459,6 +1573,9 @@
         "engineparts": 30.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 372.0,
       "reverse": 409.2
@@ -1503,6 +1620,9 @@
         "engineparts": 110.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 415.0,
       "reverse": 455.4
@@ -1546,6 +1666,9 @@
         "energycells": 130.0,
         "engineparts": 286.0
       }
+    },
+    "buildTime": {
+      "default": 30.0
     },
     "thrust": {
       "forward": 7912.5,
@@ -1597,6 +1720,10 @@
         "engineparts": 250.0
       }
     },
+    "buildTime": {
+      "closedloop": 20.0,
+      "default": 20.0
+    },
     "thrust": {
       "forward": 2415.0,
       "reverse": 3250.0
@@ -1640,6 +1767,9 @@
         "energycells": 453.0,
         "engineparts": 77.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 710.0,
@@ -1685,6 +1815,9 @@
         "engineparts": 103.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 710.0,
       "reverse": 710.0
@@ -1725,6 +1858,7 @@
     "integrated": true,
     "size": "large",
     "cost": {},
+    "buildTime": {},
     "thrust": {
       "forward": 5058.0,
       "reverse": 5564.0
@@ -1752,6 +1886,7 @@
     "integrated": true,
     "size": "medium",
     "cost": {},
+    "buildTime": {},
     "thrust": {
       "forward": 1400.0,
       "reverse": 1600.0
@@ -1791,6 +1926,7 @@
     "integrated": true,
     "size": "medium",
     "cost": {},
+    "buildTime": {},
     "thrust": {
       "forward": 1400.0,
       "reverse": 1662.0
@@ -1830,6 +1966,7 @@
     "integrated": true,
     "size": "small",
     "cost": {},
+    "buildTime": {},
     "thrust": {
       "forward": 500.0,
       "reverse": 770.0
@@ -1870,6 +2007,7 @@
     "integrated": true,
     "size": "extralarge",
     "cost": {},
+    "buildTime": {},
     "thrust": {
       "forward": 36000.0,
       "reverse": 39000.0
@@ -1901,6 +2039,9 @@
         "energycells": 25.0,
         "engineparts": 67.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "thrust": {
       "forward": 4420.0,
@@ -1946,6 +2087,9 @@
         "engineparts": 76.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "thrust": {
       "forward": 3500.0,
       "reverse": 3151.0
@@ -1989,6 +2133,9 @@
         "energycells": 15.0,
         "engineparts": 5.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1045.0,
@@ -2034,6 +2181,9 @@
         "engineparts": 22.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1251.0,
       "reverse": 1251.0
@@ -2077,6 +2227,9 @@
         "energycells": 60.0,
         "engineparts": 110.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1410.75,
@@ -2122,6 +2275,9 @@
         "engineparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1201.75,
       "reverse": 1201.75
@@ -2165,6 +2321,9 @@
         "energycells": 30.0,
         "engineparts": 26.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1442.1,
@@ -2210,6 +2369,9 @@
         "engineparts": 130.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1622.36,
       "reverse": 1622.36
@@ -2253,6 +2415,9 @@
         "energycells": 15.0,
         "engineparts": 6.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 919.6,
@@ -2298,6 +2463,9 @@
         "engineparts": 25.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1103.52,
       "reverse": 1103.52
@@ -2342,6 +2510,9 @@
         "engineparts": 125.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1241.46,
       "reverse": 1241.46
@@ -2384,6 +2555,9 @@
         "energycells": 10.0,
         "engineparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 412.0,
@@ -2429,6 +2603,9 @@
         "engineparts": 10.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 494.4,
       "reverse": 494.4
@@ -2473,6 +2650,9 @@
         "engineparts": 45.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 556.2,
       "reverse": 556.2
@@ -2515,6 +2695,9 @@
         "energycells": 10.0,
         "engineparts": 6.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 473.8,
@@ -2560,6 +2743,9 @@
         "engineparts": 16.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 568.56,
       "reverse": 568.56
@@ -2603,6 +2789,9 @@
         "energycells": 40.0,
         "engineparts": 65.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 639.63,
@@ -2648,6 +2837,9 @@
         "engineparts": 71.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 500.0,
       "reverse": 720.0
@@ -2690,6 +2882,9 @@
         "energycells": 10.0,
         "engineparts": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 362.56,
@@ -2735,6 +2930,9 @@
         "engineparts": 14.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 435.07,
       "reverse": 435.07
@@ -2778,6 +2976,9 @@
         "energycells": 40.0,
         "engineparts": 60.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 489.46,
@@ -2823,6 +3024,9 @@
         "engineparts": 89.0
       }
     },
+    "buildTime": {
+      "default": 30.0
+    },
     "thrust": {
       "forward": 11600.0,
       "reverse": 10440.0
@@ -2866,6 +3070,9 @@
         "energycells": 56.0,
         "engineparts": 91.0
       }
+    },
+    "buildTime": {
+      "default": 30.0
     },
     "thrust": {
       "forward": 9187.0,
@@ -2911,6 +3118,9 @@
         "engineparts": 93.0
       }
     },
+    "buildTime": {
+      "default": 140.0
+    },
     "thrust": {
       "forward": 18504.0,
       "reverse": 18504.0
@@ -2954,6 +3164,9 @@
         "energycells": 37.0,
         "engineparts": 101.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "thrust": {
       "forward": 5200.0,
@@ -2999,6 +3212,9 @@
         "engineparts": 143.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "thrust": {
       "forward": 4212.0,
       "reverse": 4212.0
@@ -3041,6 +3257,9 @@
         "energycells": 25.0,
         "engineparts": 10.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1300.0,
@@ -3086,6 +3305,9 @@
         "engineparts": 41.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1560.0,
       "reverse": 1560.0
@@ -3130,6 +3352,9 @@
         "engineparts": 141.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1755.0,
       "reverse": 1755.0
@@ -3172,6 +3397,9 @@
         "energycells": 36.0,
         "engineparts": 11.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1482.0,
@@ -3217,6 +3445,9 @@
         "engineparts": 42.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1778.4,
       "reverse": 1778.4
@@ -3260,6 +3491,9 @@
         "energycells": 126.0,
         "engineparts": 169.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 2000.7,
@@ -3305,6 +3539,9 @@
         "engineparts": 1039.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 2104.0,
       "reverse": 2104.0
@@ -3347,6 +3584,9 @@
         "energycells": 36.0,
         "engineparts": 10.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1170.0,
@@ -3392,6 +3632,9 @@
         "engineparts": 37.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1404.0,
       "reverse": 1404.0
@@ -3436,6 +3679,9 @@
         "engineparts": 227.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1579.5,
       "reverse": 1579.5
@@ -3478,6 +3724,9 @@
         "energycells": 22.0,
         "engineparts": 3.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 510.0,
@@ -3523,6 +3772,9 @@
         "engineparts": 17.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 612.0,
       "reverse": 612.0
@@ -3567,6 +3819,9 @@
         "engineparts": 73.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 688.5,
       "reverse": 688.5
@@ -3609,6 +3864,9 @@
         "energycells": 22.0,
         "engineparts": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 581.4,
@@ -3654,6 +3912,9 @@
         "engineparts": 27.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 697.68,
       "reverse": 697.68
@@ -3697,6 +3958,9 @@
         "energycells": 72.0,
         "engineparts": 107.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 784.89,
@@ -3742,6 +4006,9 @@
         "engineparts": 710.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 826.0,
       "reverse": 826.0
@@ -3784,6 +4051,9 @@
         "energycells": 22.0,
         "engineparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 459.0,
@@ -3829,6 +4099,9 @@
         "engineparts": 23.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 550.8,
       "reverse": 550.8
@@ -3872,6 +4145,9 @@
         "energycells": 77.0,
         "engineparts": 119.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 619.65,
@@ -3917,6 +4193,9 @@
         "engineparts": 283.0
       }
     },
+    "buildTime": {
+      "default": 30.0
+    },
     "thrust": {
       "forward": 13715.0,
       "reverse": 13715.0
@@ -3960,6 +4239,9 @@
         "energycells": 120.0,
         "engineparts": 321.0
       }
+    },
+    "buildTime": {
+      "default": 30.0
     },
     "thrust": {
       "forward": 11109.15,
@@ -4005,6 +4287,9 @@
         "engineparts": 67.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "thrust": {
       "forward": 4000.0,
       "reverse": 4400.0
@@ -4049,6 +4334,9 @@
         "engineparts": 76.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "thrust": {
       "forward": 3384.0,
       "reverse": 3722.0
@@ -4092,6 +4380,9 @@
         "energycells": 15.0,
         "engineparts": 5.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 940.0,
@@ -4142,6 +4433,10 @@
         "hullparts": 18.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1128.0,
       "reverse": 1240.8
@@ -4185,6 +4480,9 @@
         "energycells": 60.0,
         "engineparts": 110.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1269.0,
@@ -4234,6 +4532,10 @@
         "hullparts": 4.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1099.8,
       "reverse": 1209.78
@@ -4278,6 +4580,9 @@
         "engineparts": 26.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1319.76,
       "reverse": 1451.74
@@ -4321,6 +4626,9 @@
         "energycells": 60.0,
         "engineparts": 130.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1484.73,
@@ -4373,6 +4681,10 @@
         "hullparts": 50.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1342.0,
       "reverse": 1208.0
@@ -4424,6 +4736,10 @@
         "hullparts": 121.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1543.0,
       "reverse": 1389.0
@@ -4468,6 +4784,9 @@
         "engineparts": 6.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 902.4,
       "reverse": 992.64
@@ -4511,6 +4830,9 @@
         "energycells": 30.0,
         "engineparts": 25.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1082.88,
@@ -4561,6 +4883,10 @@
         "hullparts": 101.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "closedloop": 15.0
+    },
     "thrust": {
       "forward": 1218.24,
       "reverse": 1340.06
@@ -4603,6 +4929,9 @@
         "energycells": 10.0,
         "engineparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 370.0,
@@ -4648,6 +4977,9 @@
         "engineparts": 10.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 444.0,
       "reverse": 488.4
@@ -4692,6 +5024,9 @@
         "engineparts": 45.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 499.5,
       "reverse": 549.45
@@ -4734,6 +5069,9 @@
         "energycells": 10.0,
         "engineparts": 6.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 432.9,
@@ -4779,6 +5117,9 @@
         "engineparts": 16.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 519.48,
       "reverse": 571.43
@@ -4822,6 +5163,9 @@
         "energycells": 40.0,
         "engineparts": 65.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 584.42,
@@ -4867,6 +5211,9 @@
         "engineparts": 85.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 488.0,
       "reverse": 555.0
@@ -4909,6 +5256,9 @@
         "energycells": 10.0,
         "engineparts": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 355.2,
@@ -4954,6 +5304,9 @@
         "engineparts": 14.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 426.24,
       "reverse": 468.86
@@ -4997,6 +5350,9 @@
         "energycells": 40.0,
         "engineparts": 60.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 479.52,
@@ -5042,6 +5398,9 @@
         "engineparts": 89.0
       }
     },
+    "buildTime": {
+      "default": 30.0
+    },
     "thrust": {
       "forward": 10400.0,
       "reverse": 11440.0
@@ -5085,6 +5444,9 @@
         "energycells": 50.0,
         "engineparts": 100.0
       }
+    },
+    "buildTime": {
+      "default": 30.0
     },
     "thrust": {
       "forward": 8898.0,
@@ -5130,6 +5492,9 @@
         "metallicmicrolattice": 182.0,
         "siliconcarbide": 30.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "thrust": {
       "forward": 3520.0,
@@ -5183,6 +5548,10 @@
         "siliconcarbide": 45.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "terran": 20.0
+    },
     "thrust": {
       "forward": 3696.0,
       "reverse": 4250.4
@@ -5227,6 +5596,9 @@
         "metallicmicrolattice": 233.0,
         "siliconcarbide": 35.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "thrust": {
       "forward": 2851.2,
@@ -5273,6 +5645,9 @@
         "siliconcarbide": 1.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 850.0,
       "reverse": 977.5
@@ -5317,6 +5692,9 @@
         "metallicmicrolattice": 63.0,
         "siliconcarbide": 5.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1020.0,
@@ -5363,6 +5741,9 @@
         "siliconcarbide": 31.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1147.5,
       "reverse": 1319.63
@@ -5407,6 +5788,9 @@
         "metallicmicrolattice": 21.0,
         "siliconcarbide": 3.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 977.5,
@@ -5453,6 +5837,9 @@
         "siliconcarbide": 8.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 1173.0,
       "reverse": 1348.95
@@ -5497,6 +5884,9 @@
         "metallicmicrolattice": 204.0,
         "siliconcarbide": 35.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1319.63,
@@ -5543,6 +5933,9 @@
         "siliconcarbide": 2.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 765.0,
       "reverse": 879.75
@@ -5588,6 +5981,9 @@
         "siliconcarbide": 10.0
       }
     },
+    "buildTime": {
+      "default": 15.0
+    },
     "thrust": {
       "forward": 918.0,
       "reverse": 1055.7
@@ -5632,6 +6028,9 @@
         "metallicmicrolattice": 214.0,
         "siliconcarbide": 35.0
       }
+    },
+    "buildTime": {
+      "default": 15.0
     },
     "thrust": {
       "forward": 1032.75,
@@ -5685,6 +6084,10 @@
         "siliconcarbide": 5.0
       }
     },
+    "buildTime": {
+      "default": 15.0,
+      "terran": 15.0
+    },
     "thrust": {
       "forward": 1170.0,
       "reverse": 2004.0
@@ -5728,6 +6131,9 @@
         "metallicmicrolattice": 35.0,
         "siliconcarbide": 2.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 324.0,
@@ -5774,6 +6180,9 @@
         "siliconcarbide": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 388.8,
       "reverse": 447.12
@@ -5819,6 +6228,9 @@
         "siliconcarbide": 13.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 437.4,
       "reverse": 503.01
@@ -5862,6 +6274,9 @@
         "metallicmicrolattice": 36.0,
         "siliconcarbide": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 372.6,
@@ -5908,6 +6323,9 @@
         "siliconcarbide": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 447.12,
       "reverse": 514.19
@@ -5953,6 +6371,9 @@
         "siliconcarbide": 22.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 503.01,
       "reverse": 578.46
@@ -5996,6 +6417,9 @@
         "metallicmicrolattice": 35.0,
         "siliconcarbide": 3.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 291.6,
@@ -6042,6 +6466,9 @@
         "siliconcarbide": 6.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "thrust": {
       "forward": 349.92,
       "reverse": 402.41
@@ -6086,6 +6513,9 @@
         "metallicmicrolattice": 114.0,
         "siliconcarbide": 17.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 393.66,
@@ -6137,6 +6567,10 @@
         "siliconcarbide": 4.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "thrust": {
       "forward": 462.0,
       "reverse": 554.4
@@ -6181,6 +6615,9 @@
         "metallicmicrolattice": 253.0,
         "siliconcarbide": 39.0
       }
+    },
+    "buildTime": {
+      "default": 30.0
     },
     "thrust": {
       "forward": 9284.0,
@@ -6227,6 +6664,9 @@
         "siliconcarbide": 39.0
       }
     },
+    "buildTime": {
+      "default": 30.0
+    },
     "thrust": {
       "forward": 7520.04,
       "reverse": 8272.0
@@ -6270,6 +6710,9 @@
         "ore": 411.0,
         "silicon": 411.0
       }
+    },
+    "buildTime": {
+      "default": 8.0
     },
     "thrust": {
       "forward": 4206.0,
@@ -6320,6 +6763,10 @@
         "silicon": 411.0
       }
     },
+    "buildTime": {
+      "default": 8.0,
+      "xenon": 8.0
+    },
     "thrust": {
       "forward": 4206.0,
       "reverse": 4627.0
@@ -6364,6 +6811,9 @@
         "silicon": 19.0
       }
     },
+    "buildTime": {
+      "default": 4.0
+    },
     "thrust": {
       "forward": 1286.0,
       "reverse": 1486.0
@@ -6407,6 +6857,9 @@
         "ore": 17.0,
         "silicon": 17.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "thrust": {
       "forward": 1224.0,
@@ -6457,6 +6910,10 @@
         "silicon": 19.0
       }
     },
+    "buildTime": {
+      "default": 4.0,
+      "xenon": 4.0
+    },
     "thrust": {
       "forward": 1286.0,
       "reverse": 1486.0
@@ -6500,6 +6957,9 @@
         "ore": 7.0,
         "silicon": 7.0
       }
+    },
+    "buildTime": {
+      "default": 2.0
     },
     "thrust": {
       "forward": 503.0,
@@ -6550,6 +7010,10 @@
         "silicon": 7.0
       }
     },
+    "buildTime": {
+      "default": 2.0,
+      "xenon": 2.0
+    },
     "thrust": {
       "forward": 503.0,
       "reverse": 768.0
@@ -6593,6 +7057,9 @@
         "ore": 541.0,
         "silicon": 541.0
       }
+    },
+    "buildTime": {
+      "default": 16.0
     },
     "thrust": {
       "forward": 11076.0,
@@ -6638,6 +7105,9 @@
         "silicon": 660.0
       }
     },
+    "buildTime": {
+      "default": 1.0
+    },
     "thrust": {
       "forward": 35312.0,
       "reverse": 38844.0
@@ -6674,6 +7144,10 @@
         "energycells": 77.0,
         "hullparts": 13.0
       }
+    },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
     },
     "recharge": {
       "max": 38844.0,
@@ -6713,6 +7187,10 @@
         "hullparts": 63.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
+    },
     "recharge": {
       "max": 46282.0,
       "rate": 268.0,
@@ -6750,6 +7228,10 @@
         "energycells": 104.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "recharge": {
       "max": 5147.0,
@@ -6790,6 +7272,10 @@
         "hullparts": 19.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "recharge": {
       "max": 6133.0,
       "rate": 41.0,
@@ -6827,6 +7313,10 @@
         "energycells": 104.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
     },
     "recharge": {
       "max": 5147.0,
@@ -6867,6 +7357,10 @@
         "hullparts": 19.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
+    },
     "recharge": {
       "max": 6133.0,
       "rate": 41.0,
@@ -6900,6 +7394,9 @@
         "fieldcoils": 3.0,
         "shieldcomponents": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 827.0,
@@ -6936,6 +7433,10 @@
       "closedloop": {
         "energycells": 17.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "recharge": {
       "max": 827.0,
@@ -6974,6 +7475,10 @@
         "energycells": 81.0,
         "hullparts": 3.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "recharge": {
       "max": 988.0,
@@ -7014,6 +7519,10 @@
         "hullparts": 15.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "recharge": {
       "max": 1411.0,
       "rate": 219.0,
@@ -7052,6 +7561,10 @@
         "hullparts": 70.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
+    },
     "recharge": {
       "max": 129481.0,
       "rate": 492.0,
@@ -7084,6 +7597,9 @@
         "fieldcoils": 13.0,
         "shieldcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 40045.0,
@@ -7118,6 +7634,9 @@
         "shieldcomponents": 55.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 47879.0,
       "rate": 246.0,
@@ -7150,6 +7669,9 @@
         "fieldcoils": 320.0,
         "shieldcomponents": 240.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 68399.0,
@@ -7185,6 +7707,9 @@
         "shieldcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 5197.0,
       "rate": 31.0,
@@ -7218,6 +7743,9 @@
         "fieldcoils": 20.0,
         "shieldcomponents": 25.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 6214.0,
@@ -7253,6 +7781,9 @@
         "shieldcomponents": 96.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 8877.0,
       "rate": 68.0,
@@ -7286,6 +7817,9 @@
         "fieldcoils": 5.0,
         "shieldcomponents": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 5197.0,
@@ -7321,6 +7855,9 @@
         "shieldcomponents": 25.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 6214.0,
       "rate": 40.0,
@@ -7355,6 +7892,9 @@
         "shieldcomponents": 96.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 8877.0,
       "rate": 68.0,
@@ -7387,6 +7927,9 @@
         "energycells": 5.0,
         "shieldcomponents": 2.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 852.0,
@@ -7422,6 +7965,9 @@
         "shieldcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 1019.0,
       "rate": 134.0,
@@ -7456,6 +8002,9 @@
         "shieldcomponents": 27.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 1455.0,
       "rate": 229.0,
@@ -7489,6 +8038,9 @@
         "shieldcomponents": 45.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 133766.0,
       "rate": 517.0,
@@ -7521,6 +8073,9 @@
         "fieldcoils": 510.0,
         "shieldcomponents": 210.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 159937.0,
@@ -7563,6 +8118,10 @@
         "hullparts": 18.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
+    },
     "recharge": {
       "max": 6746.0,
       "rate": 45.0,
@@ -7603,6 +8162,10 @@
         "shieldcomponents": 20.0
       }
     },
+    "buildTime": {
+      "closedloop": 10.0,
+      "default": 10.0
+    },
     "recharge": {
       "max": 50911.0,
       "rate": 709.0,
@@ -7636,6 +8199,9 @@
         "shieldcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 827.0,
       "rate": 82.0,
@@ -7664,6 +8230,7 @@
     "integrated": true,
     "size": "large",
     "cost": {},
+    "buildTime": {},
     "recharge": {
       "max": 150000.0,
       "rate": 140.0,
@@ -7693,6 +8260,7 @@
     "integrated": true,
     "size": "medium",
     "cost": {},
+    "buildTime": {},
     "recharge": {
       "max": 4632.0,
       "rate": 25.0,
@@ -7722,6 +8290,7 @@
     "integrated": true,
     "size": "medium",
     "cost": {},
+    "buildTime": {},
     "recharge": {
       "max": 4632.0,
       "rate": 25.0,
@@ -7750,6 +8319,7 @@
     "integrated": true,
     "size": "medium",
     "cost": {},
+    "buildTime": {},
     "recharge": {
       "max": 4500.0,
       "rate": 25.0,
@@ -7779,6 +8349,7 @@
     "integrated": true,
     "size": "small",
     "cost": {},
+    "buildTime": {},
     "recharge": {
       "max": 745.0,
       "rate": 79.0,
@@ -7807,6 +8378,7 @@
     "integrated": true,
     "size": "extralarge",
     "cost": {},
+    "buildTime": {},
     "recharge": {
       "max": 130000.0,
       "rate": 550.0,
@@ -7840,6 +8412,9 @@
         "shieldcomponents": 10.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 34960.0,
       "rate": 184.0,
@@ -7872,6 +8447,9 @@
         "fieldcoils": 65.0,
         "shieldcomponents": 50.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 41654.0,
@@ -7907,6 +8485,9 @@
         "shieldcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 4632.0,
       "rate": 28.0,
@@ -7940,6 +8521,9 @@
         "fieldcoils": 15.0,
         "shieldcomponents": 25.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 5520.0,
@@ -7975,6 +8559,9 @@
         "shieldcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 4632.0,
       "rate": 28.0,
@@ -8008,6 +8595,9 @@
         "fieldcoils": 15.0,
         "shieldcomponents": 25.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 5520.0,
@@ -8043,6 +8633,9 @@
         "shieldcomponents": 4.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 1289.0,
       "rate": 135.0,
@@ -8075,6 +8668,9 @@
         "energycells": 5.0,
         "shieldcomponents": 1.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 745.0,
@@ -8110,6 +8706,9 @@
         "shieldcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 889.0,
       "rate": 135.0,
@@ -8144,6 +8743,9 @@
         "shieldcomponents": 25.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 1270.0,
       "rate": 232.0,
@@ -8176,6 +8778,9 @@
         "fieldcoils": 82.0,
         "shieldcomponents": 30.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 116532.0,
@@ -8210,6 +8815,9 @@
         "shieldcomponents": 30.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 158600.0,
       "rate": 662.0,
@@ -8243,6 +8851,9 @@
         "shieldcomponents": 23.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 33018.0,
       "rate": 140.0,
@@ -8275,6 +8886,9 @@
         "fieldcoils": 31.0,
         "shieldcomponents": 129.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 39340.0,
@@ -8310,6 +8924,9 @@
         "shieldcomponents": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 4375.0,
       "rate": 21.0,
@@ -8343,6 +8960,9 @@
         "fieldcoils": 6.0,
         "shieldcomponents": 41.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 5213.0,
@@ -8378,6 +8998,9 @@
         "shieldcomponents": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 4375.0,
       "rate": 21.0,
@@ -8412,6 +9035,9 @@
         "shieldcomponents": 41.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 5213.0,
       "rate": 33.0,
@@ -8444,6 +9070,9 @@
         "energycells": 5.0,
         "shieldcomponents": 1.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 703.0,
@@ -8479,6 +9108,9 @@
         "shieldcomponents": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 840.0,
       "rate": 103.0,
@@ -8513,6 +9145,9 @@
         "shieldcomponents": 37.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 1200.0,
       "rate": 177.0,
@@ -8545,6 +9180,9 @@
         "fieldcoils": 41.0,
         "shieldcomponents": 117.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 110058.0,
@@ -8579,6 +9217,9 @@
         "shieldcomponents": 10.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 42729.0,
       "rate": 166.0,
@@ -8611,6 +9252,9 @@
         "fieldcoils": 65.0,
         "shieldcomponents": 50.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 50911.0,
@@ -8649,6 +9293,10 @@
         "energycells": 104.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "recharge": {
       "max": 5662.0,
@@ -8689,6 +9337,10 @@
         "hullparts": 19.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "recharge": {
       "max": 6746.0,
       "rate": 39.0,
@@ -8726,6 +9378,10 @@
         "energycells": 104.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "recharge": {
       "max": 5662.0,
@@ -8766,6 +9422,10 @@
         "hullparts": 19.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "recharge": {
       "max": 6746.0,
       "rate": 39.0,
@@ -8800,6 +9460,9 @@
         "shieldcomponents": 4.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 450.0,
       "rate": 150.0,
@@ -8832,6 +9495,9 @@
         "energycells": 5.0,
         "shieldcomponents": 1.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 910.0,
@@ -8867,6 +9533,9 @@
         "shieldcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 1087.0,
       "rate": 122.0,
@@ -8901,6 +9570,9 @@
         "shieldcomponents": 25.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 1552.0,
       "rate": 210.0,
@@ -8933,6 +9605,9 @@
         "fieldcoils": 82.0,
         "shieldcomponents": 30.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 142429.0,
@@ -8968,6 +9643,9 @@
         "siliconcarbide": 8.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 40786.0,
       "rate": 173.0,
@@ -9002,6 +9680,9 @@
         "siliconcarbide": 22.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 48597.0,
       "rate": 247.0,
@@ -9035,6 +9716,9 @@
         "metallicmicrolattice": 393.0,
         "siliconcarbide": 61.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 69424.0,
@@ -9076,6 +9760,10 @@
         "metallicmicrolattice": 15.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "terran": 20.0
+    },
     "recharge": {
       "max": 40786.0,
       "rate": 173.0,
@@ -9115,6 +9803,10 @@
         "metallicmicrolattice": 165.0,
         "siliconcarbide": 14.0
       }
+    },
+    "buildTime": {
+      "default": 20.0,
+      "terran": 20.0
     },
     "recharge": {
       "max": 48597.0,
@@ -9156,6 +9848,10 @@
         "siliconcarbide": 42.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "terran": 20.0
+    },
     "recharge": {
       "max": 69424.0,
       "rate": 424.0,
@@ -9190,6 +9886,9 @@
         "metallicmicrolattice": 28.0,
         "siliconcarbide": 1.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 5405.0,
@@ -9226,6 +9925,9 @@
         "siliconcarbide": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 6439.0,
       "rate": 45.0,
@@ -9260,6 +9962,9 @@
         "metallicmicrolattice": 206.0,
         "siliconcarbide": 32.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 9199.0,
@@ -9296,6 +10001,9 @@
         "siliconcarbide": 1.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 5405.0,
       "rate": 29.0,
@@ -9331,6 +10039,9 @@
         "siliconcarbide": 8.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 6439.0,
       "rate": 45.0,
@@ -9365,6 +10076,9 @@
         "metallicmicrolattice": 206.0,
         "siliconcarbide": 32.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 9199.0,
@@ -9407,6 +10121,10 @@
         "siliconcarbide": 4.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "recharge": {
       "max": 5405.0,
       "rate": 29.0,
@@ -9447,6 +10165,10 @@
         "metallicmicrolattice": 32.0,
         "siliconcarbide": 20.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
     },
     "recharge": {
       "max": 6439.0,
@@ -9489,6 +10211,10 @@
         "siliconcarbide": 135.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "recharge": {
       "max": 9199.0,
       "rate": 77.0,
@@ -9529,6 +10255,10 @@
         "metallicmicrolattice": 27.0,
         "siliconcarbide": 2.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
     },
     "recharge": {
       "max": 5405.0,
@@ -9571,6 +10301,10 @@
         "siliconcarbide": 2.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "recharge": {
       "max": 6439.0,
       "rate": 45.0,
@@ -9612,6 +10346,10 @@
         "siliconcarbide": 18.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "recharge": {
       "max": 9199.0,
       "rate": 77.0,
@@ -9644,6 +10382,9 @@
         "energycells": 50.0,
         "metallicmicrolattice": 12.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 869.0,
@@ -9679,6 +10420,9 @@
         "siliconcarbide": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 1037.0,
       "rate": 141.0,
@@ -9713,6 +10457,9 @@
         "metallicmicrolattice": 48.0,
         "siliconcarbide": 6.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 1482.0,
@@ -9752,6 +10499,10 @@
         "metallicmicrolattice": 20.0,
         "siliconcarbide": 2.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
     },
     "recharge": {
       "max": 869.0,
@@ -9793,6 +10544,10 @@
         "siliconcarbide": 13.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "recharge": {
       "max": 4102.0,
       "rate": 643.0,
@@ -9827,6 +10582,9 @@
         "siliconcarbide": 21.0
       }
     },
+    "buildTime": {
+      "default": 20.0
+    },
     "recharge": {
       "max": 135955.0,
       "rate": 544.0,
@@ -9860,6 +10618,9 @@
         "metallicmicrolattice": 764.0,
         "siliconcarbide": 133.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 161988.0,
@@ -9899,6 +10660,10 @@
         "silicon": 51.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "xenon": 20.0
+    },
     "recharge": {
       "max": 36902.0,
       "rate": 194.0,
@@ -9936,6 +10701,10 @@
         "ore": 138.0,
         "silicon": 138.0
       }
+    },
+    "buildTime": {
+      "default": 20.0,
+      "xenon": 20.0
     },
     "recharge": {
       "max": 43968.0,
@@ -9975,6 +10744,10 @@
         "silicon": 51.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "xenon": 20.0
+    },
     "recharge": {
       "max": 40000.0,
       "rate": 195.0,
@@ -10013,6 +10786,10 @@
         "silicon": 138.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "xenon": 20.0
+    },
     "recharge": {
       "max": 43968.0,
       "rate": 300.0,
@@ -10046,6 +10823,9 @@
         "ore": 16.0,
         "silicon": 16.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 4890.0,
@@ -10081,6 +10861,9 @@
         "silicon": 34.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 5826.0,
       "rate": 45.0,
@@ -10114,6 +10897,9 @@
         "ore": 16.0,
         "silicon": 16.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     }
   },
   {
@@ -10143,6 +10929,9 @@
         "ore": 34.0,
         "silicon": 34.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 5826.0,
@@ -10183,6 +10972,10 @@
         "silicon": 16.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "recharge": {
       "max": 4890.0,
       "rate": 29.0,
@@ -10222,6 +11015,10 @@
         "silicon": 16.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "recharge": {
       "max": 4890.0,
       "rate": 29.0,
@@ -10256,6 +11053,9 @@
         "silicon": 2.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "recharge": {
       "max": 786.0,
       "rate": 92.0,
@@ -10289,6 +11089,9 @@
         "ore": 5.0,
         "silicon": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "recharge": {
       "max": 938.0,
@@ -10328,6 +11131,10 @@
         "silicon": 2.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "recharge": {
       "max": 786.0,
       "rate": 92.0,
@@ -10361,6 +11168,9 @@
         "silicon": 420.0
       }
     },
+    "buildTime": {
+      "default": 1.0
+    },
     "recharge": {
       "max": 86060.0,
       "rate": 200.0,
@@ -10393,6 +11203,9 @@
         "ore": 278.0,
         "silicon": 278.0
       }
+    },
+    "buildTime": {
+      "default": 20.0
     },
     "recharge": {
       "max": 123007.0,
@@ -10440,6 +11253,12 @@
         "energycells": 175.0,
         "hullparts": 86.0
       }
+    },
+    "buildTime": {
+      "default": 20.0,
+      "xenon": 10.0,
+      "terran": 20.0,
+      "closedloop": 20.0
     },
     "thrust": {
       "pitch": 704.0,
@@ -10489,6 +11308,12 @@
         "hullparts": 429.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "xenon": 10.0,
+      "terran": 20.0,
+      "closedloop": 20.0
+    },
     "thrust": {
       "pitch": 859.0,
       "yaw": 859.0,
@@ -10537,6 +11362,12 @@
         "hullparts": 2145.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "xenon": 10.0,
+      "terran": 20.0,
+      "closedloop": 20.0
+    },
     "thrust": {
       "pitch": 972.0,
       "yaw": 972.0,
@@ -10583,6 +11414,12 @@
         "energycells": 100.0,
         "hullparts": 3.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "thrust": {
       "pitch": 240.0,
@@ -10632,6 +11469,12 @@
         "hullparts": 18.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "pitch": 293.0,
       "yaw": 293.0,
@@ -10680,6 +11523,12 @@
         "hullparts": 90.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "pitch": 331.0,
       "yaw": 331.0,
@@ -10726,6 +11575,12 @@
         "energycells": 131.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "thrust": {
       "pitch": 278.4,
@@ -10775,6 +11630,12 @@
         "hullparts": 24.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "pitch": 339.65,
       "yaw": 339.65,
@@ -10823,6 +11684,12 @@
         "hullparts": 119.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "thrust": {
       "pitch": 384.2,
       "yaw": 384.2,
@@ -10867,6 +11734,12 @@
         "energycells": 37.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 5.0,
+      "xenon": 10.0,
+      "terran": 5.0,
+      "closedloop": 5.0
     },
     "thrust": {
       "pitch": 160.0,
@@ -10916,6 +11789,12 @@
         "hullparts": 24.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "xenon": 10.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "thrust": {
       "pitch": 184.0,
       "yaw": 184.0,
@@ -10964,6 +11843,12 @@
         "hullparts": 60.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "xenon": 10.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "thrust": {
       "pitch": 200.0,
       "yaw": 200.0,
@@ -11009,6 +11894,12 @@
         "energycells": 57.0,
         "hullparts": 2.0
       }
+    },
+    "buildTime": {
+      "default": 5.0,
+      "xenon": 10.0,
+      "terran": 5.0,
+      "closedloop": 5.0
     },
     "thrust": {
       "pitch": 182.4,
@@ -11058,6 +11949,12 @@
         "hullparts": 12.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "xenon": 10.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "thrust": {
       "pitch": 210.0,
       "yaw": 210.0,
@@ -11105,6 +12002,12 @@
         "energycells": 162.0,
         "hullparts": 48.0
       }
+    },
+    "buildTime": {
+      "default": 5.0,
+      "xenon": 10.0,
+      "terran": 5.0,
+      "closedloop": 5.0
     },
     "thrust": {
       "pitch": 228.0,
@@ -11154,6 +12057,12 @@
         "hullparts": 183.0
       }
     },
+    "buildTime": {
+      "default": 30.0,
+      "xenon": 10.0,
+      "terran": 30.0,
+      "closedloop": 30.0
+    },
     "thrust": {
       "pitch": 1360.0,
       "yaw": 1360.0,
@@ -11201,6 +12110,12 @@
         "energycells": 1737.0,
         "hullparts": 917.0
       }
+    },
+    "buildTime": {
+      "default": 30.0,
+      "xenon": 10.0,
+      "terran": 30.0,
+      "closedloop": 30.0
     },
     "thrust": {
       "pitch": 1659.0,
@@ -11250,6 +12165,12 @@
         "hullparts": 4585.0
       }
     },
+    "buildTime": {
+      "default": 30.0,
+      "xenon": 10.0,
+      "terran": 30.0,
+      "closedloop": 30.0
+    },
     "thrust": {
       "pitch": 1877.0,
       "yaw": 1877.0,
@@ -11290,6 +12211,10 @@
         "hullparts": 44.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_arg_turret_l_beam_01_mk1_macro"
   },
   {
@@ -11326,6 +12251,10 @@
         "energycells": 166.0,
         "hullparts": 22.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "missile_dumbfire_heavy_mk1_macro"
   },
@@ -11364,6 +12293,10 @@
         "hullparts": 24.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "missile_guided_heavy_mk1_macro"
   },
   {
@@ -11399,6 +12332,10 @@
         "hullparts": 16.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_arg_turret_l_laser_01_mk1_macro"
   },
   {
@@ -11432,6 +12369,10 @@
         "energycells": 121.0,
         "hullparts": 14.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_arg_turret_l_mining_01_mk1_macro"
   },
@@ -11467,6 +12408,10 @@
         "energycells": 180.0,
         "hullparts": 28.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_arg_turret_l_plasma_01_mk1_macro"
   },
@@ -11504,6 +12449,10 @@
         "hullparts": 15.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_beam_01_mk1_macro"
   },
   {
@@ -11539,6 +12488,10 @@
         "energycells": 110.0,
         "hullparts": 15.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_turret_m_beam_01_mk1_macro"
   },
@@ -11576,6 +12529,10 @@
         "energycells": 67.0,
         "hullparts": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
@@ -11615,6 +12572,10 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
   {
@@ -11650,6 +12611,10 @@
         "energycells": 76.0,
         "hullparts": 18.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_m_flak_01_mk1_macro"
   },
@@ -11687,6 +12652,10 @@
         "hullparts": 18.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_m_flak_01_mk1_macro"
   },
   {
@@ -11722,6 +12691,10 @@
         "energycells": 54.0,
         "hullparts": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_turret_m_gatling_01_mk1_macro"
   },
@@ -11759,6 +12732,10 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_gatling_01_mk1_macro"
   },
   {
@@ -11795,6 +12772,10 @@
         "energycells": 75.0,
         "hullparts": 8.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "missile_guided_light_mk1_macro"
   },
@@ -11834,6 +12815,10 @@
         "hullparts": 8.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "missile_guided_light_mk1_macro"
   },
   {
@@ -11869,6 +12854,10 @@
         "energycells": 33.0,
         "hullparts": 6.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
@@ -11906,6 +12895,10 @@
         "hullparts": 6.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
   {
@@ -11940,6 +12933,10 @@
         "hullparts": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
   {
@@ -11973,6 +12970,10 @@
         "energycells": 123.0,
         "hullparts": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
@@ -12010,6 +13011,10 @@
         "hullparts": 9.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_plasma_01_mk1_macro"
   },
   {
@@ -12045,6 +13050,10 @@
         "energycells": 114.0,
         "hullparts": 9.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_turret_m_plasma_01_mk1_macro"
   },
@@ -12082,6 +13091,10 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_shotgun_01_mk1_macro"
   },
   {
@@ -12118,6 +13131,10 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_shotgun_01_mk1_macro"
   },
   {
@@ -12147,6 +13164,9 @@
         "energycells": 25.0,
         "turretcomponents": 40.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_turret_l_disruptor_01_mk1_macro"
   },
@@ -12178,6 +13198,9 @@
         "turretcomponents": 39.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_bor_turret_l_flak_01_mk1_macro"
   },
   {
@@ -12208,6 +13231,9 @@
         "turretcomponents": 24.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_bor_turret_l_laser_01_mk1_macro"
   },
   {
@@ -12236,6 +13262,9 @@
         "energycells": 210.0,
         "turretcomponents": 21.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_turret_l_mining_01_mk1_macro"
   },
@@ -12268,6 +13297,9 @@
         "turretcomponents": 15.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_bor_turret_m_arc_01_mk1_macro"
   },
   {
@@ -12298,6 +13330,9 @@
         "energycells": 15.0,
         "turretcomponents": 15.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_turret_m_arc_01_mk1_macro"
   },
@@ -12332,6 +13367,9 @@
         "turretcomponents": 6.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
   {
@@ -12365,6 +13403,9 @@
         "turretcomponents": 12.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_guided_light_mk1_macro"
   },
   {
@@ -12395,6 +13436,9 @@
         "energycells": 5.0,
         "turretcomponents": 12.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_turret_m_laser_01_mk1_macro"
   },
@@ -12427,6 +13471,9 @@
         "turretcomponents": 12.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_bor_turret_m_laser_01_mk1_macro"
   },
   {
@@ -12457,6 +13504,9 @@
         "turretcomponents": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_bor_turret_m_mining_01_mk1_macro"
   },
   {
@@ -12486,6 +13536,9 @@
         "energycells": 85.0,
         "turretcomponents": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_turret_m_mining_01_mk1_macro"
   },
@@ -12518,6 +13571,9 @@
         "turretcomponents": 20.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_bor_turret_m_railgun_01_mk1_macro"
   },
   {
@@ -12548,6 +13604,9 @@
         "energycells": 25.0,
         "turretcomponents": 20.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_turret_m_railgun_01_mk1_macro"
   },
@@ -12587,6 +13646,10 @@
         "hullparts": 17.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_disabler_01_mk1_macro"
   },
   {
@@ -12622,6 +13685,10 @@
         "energycells": 79.0,
         "hullparts": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_turret_m_gatling_02_mk1_macro"
   },
@@ -12664,6 +13731,11 @@
         "hullparts": 9.0
       }
     },
+    "buildTime": {
+      "default": 20.0,
+      "terran": 20.0,
+      "closedloop": 20.0
+    },
     "bullet": "bullet_gen_m_scrapbeam_01_mk1_macro"
   },
   {
@@ -12702,6 +13774,10 @@
         "hullparts": 20.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_shieldpierce_01_mk1_macro"
   },
   {
@@ -12738,6 +13814,10 @@
         "turretcomponents": 20.0
       }
     },
+    "buildTime": {
+      "closedloop": 20.0,
+      "default": 20.0
+    },
     "bullet": "bullet_gen_m_yacht_beam_01_mk1_macro"
   },
   {
@@ -12763,6 +13843,7 @@
     "integrated": true,
     "size": "large",
     "cost": {},
+    "buildTime": {},
     "bullet": "bullet_kha_turret_l_beam_01_mk1_macro"
   },
   {
@@ -12789,6 +13870,7 @@
     "integrated": false,
     "size": "medium",
     "cost": {},
+    "buildTime": {},
     "bullet": "bullet_kha_turret_m_beam_01_macro"
   },
   {
@@ -12818,6 +13900,9 @@
         "energycells": 10.0,
         "turretcomponents": 30.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_par_turret_l_beam_01_mk1_macro"
   },
@@ -12851,6 +13936,9 @@
         "turretcomponents": 15.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_heavy_mk1_macro"
   },
   {
@@ -12883,6 +13971,9 @@
         "turretcomponents": 30.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_guided_heavy_mk1_macro"
   },
   {
@@ -12913,6 +14004,9 @@
         "turretcomponents": 20.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_par_turret_l_laser_01_mk1_macro"
   },
   {
@@ -12941,6 +14035,9 @@
         "energycells": 210.0,
         "turretcomponents": 21.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_par_turret_l_mining_01_mk1_macro"
   },
@@ -12971,6 +14068,9 @@
         "energycells": 10.0,
         "turretcomponents": 39.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_par_turret_l_plasma_01_mk1_macro"
   },
@@ -13003,6 +14103,9 @@
         "turretcomponents": 10.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_beam_01_mk1_macro"
   },
   {
@@ -13033,6 +14136,9 @@
         "energycells": 10.0,
         "turretcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_beam_01_mk1_macro"
   },
@@ -13065,6 +14171,9 @@
         "energycells": 10.0,
         "turretcomponents": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
@@ -13099,6 +14208,9 @@
         "turretcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
   {
@@ -13129,6 +14241,9 @@
         "energycells": 5.0,
         "turretcomponents": 12.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_gatling_01_mk1_macro"
   },
@@ -13161,6 +14276,9 @@
         "turretcomponents": 12.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_gatling_01_mk1_macro"
   },
   {
@@ -13192,6 +14310,9 @@
         "energycells": 10.0,
         "turretcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_guided_light_mk1_macro"
   },
@@ -13226,6 +14347,9 @@
         "turretcomponents": 10.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_guided_light_mk1_macro"
   },
   {
@@ -13256,6 +14380,9 @@
         "energycells": 5.0,
         "turretcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
@@ -13288,6 +14415,9 @@
         "turretcomponents": 10.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
   {
@@ -13318,6 +14448,9 @@
         "turretcomponents": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
   {
@@ -13347,6 +14480,9 @@
         "energycells": 85.0,
         "turretcomponents": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
@@ -13379,6 +14515,9 @@
         "turretcomponents": 13.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_plasma_01_mk1_macro"
   },
   {
@@ -13409,6 +14548,9 @@
         "energycells": 10.0,
         "turretcomponents": 13.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_plasma_01_mk1_macro"
   },
@@ -13441,6 +14583,9 @@
         "turretcomponents": 8.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_shotgun_01_mk1_macro"
   },
   {
@@ -13472,6 +14617,9 @@
         "turretcomponents": 8.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_shotgun_01_mk1_macro"
   },
   {
@@ -13500,6 +14648,9 @@
         "energycells": 15.0,
         "turretcomponents": 6.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_pir_turret_l_battleship_01_laser_01_mk1_macro"
   },
@@ -13531,6 +14682,9 @@
         "turretcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_pir_turret_m_battleship_01_gatling_01_mk1_macro"
   },
   {
@@ -13560,6 +14714,9 @@
         "energycells": 42.0,
         "turretcomponents": 46.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_turret_l_beam_01_mk1_macro"
   },
@@ -13593,6 +14750,9 @@
         "turretcomponents": 21.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_heavy_mk1_macro"
   },
   {
@@ -13625,6 +14785,9 @@
         "turretcomponents": 39.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_guided_heavy_mk1_macro"
   },
   {
@@ -13655,6 +14818,9 @@
         "turretcomponents": 29.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_turret_l_laser_01_mk1_macro"
   },
   {
@@ -13683,6 +14849,9 @@
         "energycells": 47.0,
         "turretcomponents": 30.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_turret_l_mining_01_mk1_macro"
   },
@@ -13713,6 +14882,9 @@
         "energycells": 132.0,
         "turretcomponents": 43.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_turret_l_plasma_01_mk1_macro"
   },
@@ -13745,6 +14917,9 @@
         "turretcomponents": 17.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_beam_01_mk1_macro"
   },
   {
@@ -13776,6 +14951,9 @@
         "turretcomponents": 17.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_beam_01_mk1_macro"
   },
   {
@@ -13806,6 +14984,9 @@
         "energycells": 64.0,
         "turretcomponents": 13.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
@@ -13839,6 +15020,9 @@
         "turretcomponents": 13.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
   {
@@ -13869,6 +15053,9 @@
         "energycells": 45.0,
         "turretcomponents": 27.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_m_flak_01_mk1_macro"
   },
@@ -13901,6 +15088,9 @@
         "turretcomponents": 27.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_m_flak_01_mk1_macro"
   },
   {
@@ -13931,6 +15121,9 @@
         "turretcomponents": 13.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_gatling_01_mk1_macro"
   },
   {
@@ -13960,6 +15153,9 @@
         "energycells": 52.0,
         "turretcomponents": 13.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_gatling_01_mk1_macro"
   },
@@ -13992,6 +15188,9 @@
         "energycells": 48.0,
         "turretcomponents": 11.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_guided_light_mk1_macro"
   },
@@ -14026,6 +15225,9 @@
         "turretcomponents": 11.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_guided_light_mk1_macro"
   },
   {
@@ -14055,6 +15257,9 @@
         "energycells": 52.0,
         "turretcomponents": 11.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
@@ -14086,6 +15291,9 @@
         "turretcomponents": 11.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
   {
@@ -14116,6 +15324,9 @@
         "turretcomponents": 10.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
   {
@@ -14145,6 +15356,9 @@
         "energycells": 18.0,
         "turretcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
@@ -14177,6 +15391,9 @@
         "turretcomponents": 16.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_plasma_01_mk1_macro"
   },
   {
@@ -14208,6 +15425,9 @@
         "turretcomponents": 16.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_plasma_01_mk1_macro"
   },
   {
@@ -14237,6 +15457,9 @@
         "energycells": 30.0,
         "turretcomponents": 14.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_shotgun_01_mk1_macro"
   },
@@ -14268,6 +15491,9 @@
         "turretcomponents": 14.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_shotgun_01_mk1_macro"
   },
   {
@@ -14297,6 +15523,9 @@
         "energycells": 10.0,
         "turretcomponents": 30.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_tel_turret_l_beam_01_mk1_macro"
   },
@@ -14330,6 +15559,9 @@
         "turretcomponents": 15.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_heavy_mk1_macro"
   },
   {
@@ -14362,6 +15594,9 @@
         "turretcomponents": 30.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_guided_heavy_mk1_macro"
   },
   {
@@ -14392,6 +15627,9 @@
         "turretcomponents": 20.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_tel_turret_l_laser_01_mk1_macro"
   },
   {
@@ -14420,6 +15658,9 @@
         "energycells": 210.0,
         "turretcomponents": 21.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_tel_turret_l_mining_01_mk1_macro"
   },
@@ -14450,6 +15691,9 @@
         "energycells": 10.0,
         "turretcomponents": 39.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_tel_turret_l_plasma_01_mk1_macro"
   },
@@ -14482,6 +15726,9 @@
         "turretcomponents": 10.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_beam_01_mk1_macro"
   },
   {
@@ -14512,6 +15759,9 @@
         "energycells": 10.0,
         "turretcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_beam_01_mk1_macro"
   },
@@ -14545,6 +15795,9 @@
         "turretcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
   {
@@ -14577,6 +15830,9 @@
         "energycells": 10.0,
         "turretcomponents": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
@@ -14614,6 +15870,10 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_gatling_01_mk1_macro"
   },
   {
@@ -14650,6 +15910,10 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_gatling_01_mk1_macro"
   },
   {
@@ -14681,6 +15945,9 @@
         "energycells": 10.0,
         "turretcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_guided_light_mk1_macro"
   },
@@ -14714,6 +15981,9 @@
         "energycells": 10.0,
         "turretcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_guided_light_mk1_macro"
   },
@@ -14751,6 +16021,10 @@
         "hullparts": 6.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
   {
@@ -14787,6 +16061,10 @@
         "hullparts": 6.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
   {
@@ -14817,6 +16095,9 @@
         "turretcomponents": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
   {
@@ -14846,6 +16127,9 @@
         "energycells": 85.0,
         "turretcomponents": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
@@ -14878,6 +16162,9 @@
         "turretcomponents": 13.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_plasma_01_mk1_macro"
   },
   {
@@ -14908,6 +16195,9 @@
         "energycells": 10.0,
         "turretcomponents": 13.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_plasma_01_mk1_macro"
   },
@@ -14945,6 +16235,10 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_shotgun_01_mk1_macro"
   },
   {
@@ -14981,6 +16275,10 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_turret_m_shotgun_01_mk1_macro"
   },
   {
@@ -15011,6 +16309,9 @@
         "metallicmicrolattice": 100.0,
         "siliconcarbide": 14.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_turret_l_beam_01_mk1_macro"
   },
@@ -15045,6 +16346,9 @@
         "siliconcarbide": 9.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_heavy_mk1_macro"
   },
   {
@@ -15075,6 +16379,9 @@
         "metallicmicrolattice": 66.0,
         "siliconcarbide": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_turret_l_gatling_01_mk1_macro"
   },
@@ -15109,6 +16416,9 @@
         "siliconcarbide": 11.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_guided_heavy_mk1_macro"
   },
   {
@@ -15140,6 +16450,9 @@
         "siliconcarbide": 8.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_turret_l_laser_01_mk1_macro"
   },
   {
@@ -15170,6 +16483,9 @@
         "metallicmicrolattice": 64.0,
         "siliconcarbide": 6.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_turret_l_mining_01_mk1_macro"
   },
@@ -15203,6 +16519,9 @@
         "siliconcarbide": 4.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_turret_m_beam_01_mk1_macro"
   },
   {
@@ -15234,6 +16553,9 @@
         "metallicmicrolattice": 36.0,
         "siliconcarbide": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_turret_m_beam_01_mk1_macro"
   },
@@ -15267,6 +16589,9 @@
         "metallicmicrolattice": 33.0,
         "siliconcarbide": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
@@ -15302,6 +16627,9 @@
         "siliconcarbide": 4.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
   {
@@ -15333,6 +16661,9 @@
         "metallicmicrolattice": 60.0,
         "siliconcarbide": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_turret_m_gatling_01_mk1_macro"
   },
@@ -15366,6 +16697,9 @@
         "siliconcarbide": 4.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_turret_m_gatling_01_mk1_macro"
   },
   {
@@ -15398,6 +16732,9 @@
         "metallicmicrolattice": 53.0,
         "siliconcarbide": 6.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "missile_guided_light_mk1_macro"
   },
@@ -15433,6 +16770,9 @@
         "siliconcarbide": 6.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "missile_guided_light_mk1_macro"
   },
   {
@@ -15465,6 +16805,9 @@
         "siliconcarbide": 3.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
   {
@@ -15496,6 +16839,9 @@
         "metallicmicrolattice": 44.0,
         "siliconcarbide": 3.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_laser_01_mk1_macro"
   },
@@ -15535,6 +16881,10 @@
         "siliconcarbide": 3.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "bullet": "bullet_ter_turret_m_laser_02_mk1_macro"
   },
   {
@@ -15573,6 +16923,10 @@
         "siliconcarbide": 3.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "bullet": "bullet_ter_turret_m_laser_02_mk1_macro"
   },
   {
@@ -15604,6 +16958,9 @@
         "metallicmicrolattice": 43.0,
         "siliconcarbide": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
@@ -15637,6 +16994,9 @@
         "siliconcarbide": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_gen_turret_m_mining_01_mk1_macro"
   },
   {
@@ -15666,6 +17026,9 @@
         "ore": 15.0,
         "silicon": 15.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_xen_turret_l_laser_01_mk1_macro"
   },
@@ -15702,6 +17065,10 @@
         "silicon": 30.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "bullet": "bullet_xen_turret_l_plasma_01_mk1_macro"
   },
   {
@@ -15732,6 +17099,9 @@
         "ore": 29.0,
         "silicon": 29.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_xen_turret_m_beam_01_mk1_macro"
   },
@@ -15769,6 +17139,10 @@
         "silicon": 20.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "bullet": "bullet_xen_turret_m_gatling_01_mk1_macro"
   },
   {
@@ -15805,6 +17179,10 @@
         "silicon": 20.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "bullet": "bullet_xen_turret_m_gatling_01_mk1_macro"
   },
   {
@@ -15835,6 +17213,9 @@
         "ore": 29.0,
         "silicon": 29.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_xen_turret_m_laser_01_mk1_macro"
   },
@@ -15867,6 +17248,9 @@
         "silicon": 29.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_xen_turret_m_laser_01_mk1_macro"
   },
   {
@@ -15896,6 +17280,9 @@
         "silicon": 50.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_xen_turret_xl_beam_01_mk1_macro"
   },
   {
@@ -15924,6 +17311,9 @@
         "energycells": 10.0,
         "weaponcomponents": 170.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_arg_l_laser_01_mk1_macro",
     "heat": {
@@ -15959,6 +17349,9 @@
         "energycells": 10.0,
         "weaponcomponents": 77.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_arg_m_ion_01_mk1_macro",
     "heat": {
@@ -15996,6 +17389,9 @@
         "weaponcomponents": 205.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_arg_m_ion_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -16030,6 +17426,9 @@
         "energycells": 10.0,
         "weaponcomponents": 44.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_arg_s_ion_01_mk1_macro",
     "heat": {
@@ -16066,6 +17465,9 @@
         "energycells": 984.0,
         "weaponcomponents": 227.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_arg_s_ion_01_mk2_macro",
     "heat": {
@@ -16105,6 +17507,9 @@
         "siliconcarbide": 322.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_atf_xl_beam_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -16138,6 +17543,9 @@
         "energycells": 78.0,
         "weaponcomponents": 380.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_l_beam_01_mk1_macro",
     "heat": {
@@ -16177,6 +17585,9 @@
         "weaponcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 5.0
+    },
     "bullet": "missile_dumbfire_heavy_mk1_macro"
   },
   {
@@ -16205,6 +17616,9 @@
         "energycells": 45.0,
         "weaponcomponents": 50.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_m_flak_01_mk1_macro",
     "heat": {
@@ -16244,6 +17658,9 @@
         "weaponcomponents": 10.0
       }
     },
+    "buildTime": {
+      "default": 5.0
+    },
     "bullet": "missile_guided_heavy_mk1_macro"
   },
   {
@@ -16273,6 +17690,9 @@
         "energycells": 37.0,
         "weaponcomponents": 42.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_m_laser_01_mk1_macro",
     "heat": {
@@ -16308,6 +17728,9 @@
         "weaponcomponents": 8.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_bor_m_mining_01_mk1_macro"
   },
   {
@@ -16337,6 +17760,9 @@
         "energycells": 675.0,
         "weaponcomponents": 217.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_m_railgun_01_mk1_macro",
     "heat": {
@@ -16376,6 +17802,9 @@
         "weaponcomponents": 25.0
       }
     },
+    "buildTime": {
+      "default": 5.0
+    },
     "bullet": "missile_torpedo_heavy_mk1_macro"
   },
   {
@@ -16405,6 +17834,9 @@
         "energycells": 55.0,
         "weaponcomponents": 44.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_s_arc_01_mk1_macro",
     "heat": {
@@ -16444,6 +17876,9 @@
         "weaponcomponents": 1.0
       }
     },
+    "buildTime": {
+      "default": 5.0
+    },
     "bullet": "missile_dumbfire_heavy_mk1_macro"
   },
   {
@@ -16473,6 +17908,9 @@
         "energycells": 30.0,
         "weaponcomponents": 30.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_s_gatling_01_mk1_macro",
     "heat": {
@@ -16512,6 +17950,9 @@
         "weaponcomponents": 2.0
       }
     },
+    "buildTime": {
+      "default": 5.0
+    },
     "bullet": "missile_guided_light_mk1_macro"
   },
   {
@@ -16541,6 +17982,9 @@
         "energycells": 35.0,
         "weaponcomponents": 25.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_bor_s_laser_01_mk1_macro",
     "heat": {
@@ -16576,6 +18020,9 @@
         "weaponcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_bor_s_mining_01_mk1_macro"
   },
   {
@@ -16608,6 +18055,9 @@
         "energycells": 10.0,
         "weaponcomponents": 5.0
       }
+    },
+    "buildTime": {
+      "default": 5.0
     },
     "bullet": "missile_torpedo_light_mk1_macro"
   },
@@ -16649,6 +18099,11 @@
         "energycells": 78.0,
         "hullparts": 8.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_m_beam_01_mk1_macro",
     "heat": {
@@ -16696,6 +18151,11 @@
         "hullparts": 41.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_m_beam_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -16737,6 +18197,10 @@
         "energycells": 283.0,
         "hullparts": 111.0
       }
+    },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
     },
     "bullet": "bullet_gen_m_disabler_01_mk1_macro",
     "heat": {
@@ -16786,6 +18250,11 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_dumbfire_heavy_mk1_macro"
   },
   {
@@ -16829,6 +18298,11 @@
         "hullparts": 37.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_dumbfire_heavy_mk2_macro"
   },
   {
@@ -16869,6 +18343,11 @@
         "energycells": 115.0,
         "hullparts": 15.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_m_gatling_01_mk1_macro",
     "heat": {
@@ -16915,6 +18394,11 @@
         "energycells": 175.0,
         "hullparts": 75.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_m_gatling_01_mk2_macro",
     "heat": {
@@ -16964,6 +18448,11 @@
         "hullparts": 15.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_guided_heavy_mk1_macro"
   },
   {
@@ -17007,6 +18496,11 @@
         "hullparts": 75.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_guided_heavy_mk1_macro"
   },
   {
@@ -17047,6 +18541,11 @@
         "energycells": 41.0,
         "hullparts": 6.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_m_laser_01_mk1_macro",
     "heat": {
@@ -17094,6 +18593,11 @@
         "hullparts": 32.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_m_laser_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -17138,6 +18642,11 @@
         "hullparts": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_m_mining_01_mk1_macro"
   },
   {
@@ -17179,6 +18688,11 @@
         "hullparts": 25.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_m_mining_01_mk2_macro"
   },
   {
@@ -17219,6 +18733,11 @@
         "energycells": 118.0,
         "hullparts": 9.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_m_plasma_01_mk1_macro",
     "heat": {
@@ -17266,6 +18785,11 @@
         "hullparts": 48.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_m_plasma_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -17307,6 +18831,10 @@
         "energycells": 232.0,
         "hullparts": 82.0
       }
+    },
+    "buildTime": {
+      "default": 20.0,
+      "closedloop": 20.0
     },
     "bullet": "bullet_gen_m_shieldpierce_01_mk1_macro",
     "heat": {
@@ -17354,6 +18882,11 @@
         "hullparts": 9.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_m_shotgun_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -17399,6 +18932,11 @@
         "energycells": 121.0,
         "hullparts": 36.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_m_shotgun_01_mk2_macro",
     "heat": {
@@ -17448,6 +18986,11 @@
         "hullparts": 25.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_torpedo_heavy_mk1_macro"
   },
   {
@@ -17491,6 +19034,11 @@
         "hullparts": 128.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_torpedo_heavy_mk1_macro"
   },
   {
@@ -17525,6 +19073,10 @@
         "energycells": 200.0,
         "weaponcomponents": 120.0
       }
+    },
+    "buildTime": {
+      "closedloop": 10.0,
+      "default": 10.0
     },
     "bullet": "bullet_gen_m_yacht_laser_01_mk1_macro",
     "heat": {
@@ -17572,6 +19124,11 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_beam_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -17618,6 +19175,11 @@
         "hullparts": 34.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_beam_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -17657,6 +19219,10 @@
         "energycells": 86.0,
         "hullparts": 8.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_s_burst_01_mk1_macro",
     "heat": {
@@ -17698,6 +19264,10 @@
         "hullparts": 24.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_burst_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -17738,6 +19308,10 @@
         "hullparts": 17.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_cannon_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -17777,6 +19351,10 @@
         "energycells": 108.0,
         "hullparts": 24.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_s_cannon_01_mk2_macro",
     "heat": {
@@ -17824,6 +19402,11 @@
         "hullparts": 2.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_dumbfire_light_mk1_macro"
   },
   {
@@ -17866,6 +19449,11 @@
         "hullparts": 4.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_dumbfire_light_mk2_macro"
   },
   {
@@ -17906,6 +19494,11 @@
         "energycells": 63.0,
         "hullparts": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_s_gatling_01_mk1_macro",
     "heat": {
@@ -17953,6 +19546,11 @@
         "hullparts": 37.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_gatling_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -17999,6 +19597,11 @@
         "hullparts": 2.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_guided_light_mk1_macro"
   },
   {
@@ -18042,6 +19645,11 @@
         "hullparts": 13.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_guided_light_mk1_macro"
   },
   {
@@ -18082,6 +19690,11 @@
         "energycells": 20.0,
         "hullparts": 5.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_s_laser_01_mk1_macro",
     "heat": {
@@ -18129,6 +19742,11 @@
         "hullparts": 28.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_laser_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18172,6 +19790,11 @@
         "hullparts": 2.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_mining_01_mk1_macro"
   },
   {
@@ -18213,6 +19836,11 @@
         "hullparts": 11.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_mining_01_mk2_macro"
   },
   {
@@ -18252,6 +19880,11 @@
         "energycells": 105.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_s_plasma_01_mk1_macro",
     "heat": {
@@ -18299,6 +19932,11 @@
         "hullparts": 18.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_plasma_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18345,6 +19983,11 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
+    },
     "bullet": "bullet_gen_s_shotgun_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18390,6 +20033,11 @@
         "energycells": 102.0,
         "hullparts": 46.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_s_shotgun_01_mk2_macro",
     "heat": {
@@ -18439,6 +20087,11 @@
         "hullparts": 7.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_torpedo_light_mk1_macro"
   },
   {
@@ -18482,6 +20135,11 @@
         "hullparts": 37.0
       }
     },
+    "buildTime": {
+      "default": 5.0,
+      "terran": 5.0,
+      "closedloop": 5.0
+    },
     "bullet": "missile_torpedo_light_mk1_macro"
   },
   {
@@ -18508,6 +20166,7 @@
     "integrated": true,
     "size": "large",
     "cost": {},
+    "buildTime": {},
     "bullet": "bullet_kha_l_beam_02_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18538,6 +20197,7 @@
     "integrated": true,
     "size": "medium",
     "cost": {},
+    "buildTime": {},
     "bullet": "bullet_kha_m_beam_01_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18568,6 +20228,7 @@
     "integrated": true,
     "size": "small",
     "cost": {},
+    "buildTime": {},
     "bullet": "bullet_kha_s_beam_01_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18599,6 +20260,7 @@
     "integrated": true,
     "size": "extralarge",
     "cost": {},
+    "buildTime": {},
     "bullet": "bullet_kha_xl_beam_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18632,6 +20294,9 @@
         "energycells": 10.0,
         "weaponcomponents": 180.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_par_l_laser_01_mk1_macro",
     "heat": {
@@ -18668,6 +20333,9 @@
         "weaponcomponents": 281.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_par_l_laser_02_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18702,6 +20370,9 @@
         "energycells": 10.0,
         "weaponcomponents": 75.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_par_m_railgun_01_mk1_macro",
     "heat": {
@@ -18739,6 +20410,9 @@
         "weaponcomponents": 391.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_par_m_railgun_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18773,6 +20447,9 @@
         "energycells": 10.0,
         "weaponcomponents": 55.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_par_s_railgun_01_mk1_macro",
     "heat": {
@@ -18810,6 +20487,9 @@
         "weaponcomponents": 295.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_par_s_railgun_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18843,6 +20523,9 @@
         "energycells": 30.0,
         "weaponcomponents": 300.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_pir_xl_laser_01_mk1_macro",
     "heat": {
@@ -18878,6 +20561,9 @@
         "weaponcomponents": 201.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_l_laser_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18911,6 +20597,9 @@
         "energycells": 32.0,
         "weaponcomponents": 30.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_m_gatling_01_mk1_macro",
     "heat": {
@@ -18947,6 +20636,9 @@
         "weaponcomponents": 53.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_m_gatling_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -18981,6 +20673,9 @@
         "energycells": 29.0,
         "weaponcomponents": 102.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_m_railgun_01_mk1_macro",
     "heat": {
@@ -19018,6 +20713,9 @@
         "weaponcomponents": 415.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_m_railgun_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19052,6 +20750,9 @@
         "energycells": 35.0,
         "weaponcomponents": 14.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_m_shotgun_01_mk1_macro",
     "heat": {
@@ -19088,6 +20789,9 @@
         "weaponcomponents": 48.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_m_shotgun_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19122,6 +20826,9 @@
         "energycells": 33.0,
         "weaponcomponents": 15.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_m_sticky_01_mk1_macro",
     "heat": {
@@ -19158,6 +20865,9 @@
         "weaponcomponents": 67.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_m_sticky_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19191,6 +20901,9 @@
         "energycells": 33.0,
         "weaponcomponents": 14.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_s_gatling_01_mk1_macro",
     "heat": {
@@ -19227,6 +20940,9 @@
         "weaponcomponents": 66.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_s_gatling_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19261,6 +20977,9 @@
         "energycells": 29.0,
         "weaponcomponents": 82.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_s_railgun_01_mk1_macro",
     "heat": {
@@ -19298,6 +21017,9 @@
         "weaponcomponents": 296.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_s_railgun_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19332,6 +21054,9 @@
         "energycells": 33.0,
         "weaponcomponents": 10.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_s_shotgun_01_mk1_macro",
     "heat": {
@@ -19368,6 +21093,9 @@
         "weaponcomponents": 49.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_s_shotgun_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19401,6 +21129,9 @@
         "energycells": 31.0,
         "weaponcomponents": 7.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_spl_s_sticky_01_mk1_macro",
     "heat": {
@@ -19437,6 +21168,9 @@
         "weaponcomponents": 15.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_spl_s_sticky_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19470,6 +21204,9 @@
         "energycells": 10.0,
         "weaponcomponents": 160.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_tel_l_laser_01_mk1_macro",
     "heat": {
@@ -19506,6 +21243,9 @@
         "weaponcomponents": 14.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_tel_m_charge_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19540,6 +21280,9 @@
         "energycells": 10.0,
         "weaponcomponents": 70.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_tel_m_charge_01_mk2_macro",
     "heat": {
@@ -19576,6 +21319,9 @@
         "weaponcomponents": 3.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_tel_s_charge_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19611,6 +21357,9 @@
         "weaponcomponents": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_tel_s_charge_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19645,6 +21394,9 @@
         "metallicmicrolattice": 500.0,
         "siliconcarbide": 100.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_l_gatling_01_mk1_macro",
     "heat": {
@@ -19690,6 +21442,10 @@
         "siliconcarbide": 98.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "bullet": "missile_flagship_heavy_mk1_macro"
   },
   {
@@ -19719,6 +21475,9 @@
         "metallicmicrolattice": 230.0,
         "siliconcarbide": 40.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_m_beam_01_mk1_macro",
     "heat": {
@@ -19755,6 +21514,9 @@
         "siliconcarbide": 121.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_m_beam_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19790,6 +21552,9 @@
         "siliconcarbide": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_m_gatling_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19824,6 +21589,9 @@
         "metallicmicrolattice": 96.0,
         "siliconcarbide": 13.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_m_gatling_01_mk2_macro",
     "heat": {
@@ -19861,6 +21629,9 @@
         "siliconcarbide": 3.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_m_laser_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19896,6 +21667,9 @@
         "metallicmicrolattice": 75.0,
         "siliconcarbide": 13.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_m_laser_01_mk2_macro",
     "heat": {
@@ -19939,6 +21713,10 @@
         "siliconcarbide": 3.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "bullet": "bullet_ter_m_laser_02_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -19973,6 +21751,9 @@
         "metallicmicrolattice": 161.0,
         "siliconcarbide": 23.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_s_beam_01_mk1_macro",
     "heat": {
@@ -20009,6 +21790,9 @@
         "siliconcarbide": 107.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_s_beam_01_mk2_macro",
     "heat": {
       "overheat": 10000.0,
@@ -20044,6 +21828,9 @@
         "siliconcarbide": 8.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_s_gatling_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -20078,6 +21865,9 @@
         "metallicmicrolattice": 145.0,
         "siliconcarbide": 22.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_s_gatling_01_mk2_macro",
     "heat": {
@@ -20115,6 +21905,9 @@
         "siliconcarbide": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0
+    },
     "bullet": "bullet_ter_s_laser_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -20150,6 +21943,9 @@
         "metallicmicrolattice": 77.0,
         "siliconcarbide": 12.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_ter_s_laser_01_mk2_macro",
     "heat": {
@@ -20193,6 +21989,10 @@
         "siliconcarbide": 4.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "bullet": "bullet_ter_s_laser_02_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -20235,6 +22035,10 @@
         "siliconcarbide": 2.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "terran": 10.0
+    },
     "bullet": "bullet_ter_s_plasma_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -20275,6 +22079,10 @@
         "silicon": 45.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "bullet": "bullet_xen_m_beam_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -20309,6 +22117,9 @@
         "ore": 30.0,
         "silicon": 30.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_xen_m_laser_01_mk1_macro",
     "heat": {
@@ -20350,6 +22161,10 @@
         "silicon": 30.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "bullet": "bullet_xen_m_laser_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -20384,6 +22199,9 @@
         "ore": 30.0,
         "silicon": 30.0
       }
+    },
+    "buildTime": {
+      "default": 10.0
     },
     "bullet": "bullet_xen_m_mining_01_mk1_macro"
   },
@@ -20420,6 +22238,10 @@
         "silicon": 30.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 10.0
+    },
     "bullet": "bullet_xen_m_mining_02_mk1_macro"
   },
   {
@@ -20455,6 +22277,10 @@
         "silicon": 5.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "xenon": 4.0
+    },
     "bullet": "bullet_xen_s_gatling_01_mk1_macro",
     "heat": {
       "overheat": 10000.0,
@@ -20488,6 +22314,9 @@
         "energycells": 5.0,
         "ore": 2.0
       }
+    },
+    "buildTime": {
+      "default": 4.0
     },
     "bullet": "bullet_xen_s_laser_01_mk1_macro",
     "heat": {

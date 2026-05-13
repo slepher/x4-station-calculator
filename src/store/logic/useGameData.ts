@@ -11,7 +11,7 @@ import type {
   X4SlotTag,
   X4ShipType,
   X4Ware,
-  RaceMedicalConsumption,
+  WorkforceConsumptionMap,
   X4Bullet,
   X4Map,
   X4RegionYield,
@@ -25,6 +25,8 @@ import type {
 
 export type LocalizedX4Module = X4Module & { localeName: string }
 export type LocalizedX4ModuleGroup = X4ModuleGroup & { localeName: string }
+export type LocalizedX4Ware = X4Ware & { localeName: string }
+export type LocalizedX4Ship = X4Ship & { localeName: string }
 export type ShipBuildDatas = {
   shipMap: Map<string, X4Ship>
   shipByMacroMap: Map<string, X4Ship>
@@ -56,7 +58,7 @@ export type GameDataFiles = {
   wares: X4Ware[]
   modules: X4Module[]
   moduleGroups: X4ModuleGroup[]
-  consumption: RaceMedicalConsumption
+  consumption: WorkforceConsumptionMap
   ships: X4Ship[]
   shipRaces: X4ShipRace[]
   shipTypes: X4ShipType[]
@@ -117,7 +119,7 @@ export async function loadGameDataFiles(
     loadJsonFromBundle<X4Ware[]>(folderName, 'wares.json', loaders),
     loadJsonFromBundle<X4Module[]>(folderName, 'modules.json', loaders),
     loadJsonFromBundle<X4ModuleGroup[]>(folderName, 'module_groups.json', loaders),
-    loadJsonFromBundle<RaceMedicalConsumption>(folderName, 'consumption.json', loaders),
+    loadJsonFromBundle<WorkforceConsumptionMap>(folderName, 'consumption.json', loaders),
     loadJsonFromBundle<X4Ship[]>(folderName, 'ships.json', loaders),
     loadJsonFromBundle<X4ShipRace[]>(folderName, 'ship_races.json', loaders),
     loadJsonFromBundle<X4ShipType[]>(folderName, 'ship_types.json', loaders),
@@ -268,7 +270,7 @@ export function buildModulesByOutputMap(modulesMap: Record<string, X4Module>): R
   return outputMap
 }
 
-export function buildMedicalConsumptionMap(consumption: RaceMedicalConsumption): RaceMedicalConsumption {
+export function buildWorkforceConsumptionMap(consumption: WorkforceConsumptionMap): WorkforceConsumptionMap {
   return consumption
 }
 
@@ -299,6 +301,36 @@ export function buildLocalizedModuleGroupsMap(
     map[mg.id] = {
       ...mg,
       localeName: isEn ? (mg.name || '') : translateModuleGroup(mg)
+    }
+  })
+  return map
+}
+
+export function buildLocalizedWaresMap(
+  wares: X4Ware[],
+  isEn: boolean,
+  translateWare: (w: X4Ware) => string
+): Record<string, LocalizedX4Ware> {
+  const map: Record<string, LocalizedX4Ware> = {}
+  wares.forEach(w => {
+    map[w.id] = {
+      ...w,
+      localeName: isEn ? (w.name || '') : translateWare(w)
+    }
+  })
+  return map
+}
+
+export function buildLocalizedShipsMap(
+  ships: X4Ship[],
+  isEn: boolean,
+  translateShip: (s: X4Ship) => string
+): Record<string, LocalizedX4Ship> {
+  const map: Record<string, LocalizedX4Ship> = {}
+  ships.forEach(s => {
+    map[s.id] = {
+      ...s,
+      localeName: isEn ? (s.name || '') : translateShip(s)
     }
   })
   return map
@@ -384,7 +416,7 @@ export function precomputeCandidateWares(
       resultSet.add(wareId)
 
       const ware = waresMap[wareId]
-      if (ware && ware.tier === 0) return
+      if (ware && !((modulesByOutputMap[wareId]?.length ?? 0) > 0)) return
 
       const module = findModuleForWare(wareId, raceKey, modulesByOutputMap)
       if (module && module.inputs) {
@@ -415,7 +447,7 @@ export function precomputeCandidateWares(
       resultSet.add(wareId)
 
       const ware = waresMap[wareId]
-      if (ware && ware.tier === 0) return
+      if (ware && !((modulesByOutputMap[wareId]?.length ?? 0) > 0)) return
 
       const module = findModuleForWare(wareId, race, modulesByOutputMap)
       if (module && module.inputs) {

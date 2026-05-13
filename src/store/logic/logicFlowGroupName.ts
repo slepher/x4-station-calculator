@@ -53,7 +53,3 @@ export function getLogicFlowGroupDisplayName(
   if (!wareId) return emptyLabel
   return getWareDisplayName(wareId)
 }
-
-export function getLogicFlowGroupTopManualNode(group: GroupLike): GroupNode | null {
-  return pickTopManualNode(group.nodes)
-}

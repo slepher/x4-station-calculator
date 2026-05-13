@@ -76,7 +76,7 @@ export function findStandardPowerPlant(
   modules: Record<string, X4Module>,
   wares: Record<string, X4Ware>
 ): X4Module | undefined {
-  return findBestProducer('energycells', race, existingModules, modules, wares);
+  return findBestProducer('energycells', race, existingModules, modules, wares)
 }
 
 /**

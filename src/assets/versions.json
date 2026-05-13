@@ -12,8 +12,10 @@
         "logic_flow": "x4_logic_flow_plans",
         "ship_blueprints": "x4_ship_blueprints",
         "setting": "x4-setting",
-        "save_archives": "x4_save_archives"
-      }
+        "save_archives": "x4_save_archives",
+        "build_plan_goals": "x4_build_plan_goals"
+      },
+      "indexeddb_name": "x4_save_archive_db"
     },
     {
       "version": "9.0",
@@ -26,8 +28,10 @@
         "logic_flow": "x4_logic_flow_plans_v9_beta",
         "ship_blueprints": "x4_ship_blueprints_v9_beta",
         "setting": "x4-setting_v9_beta",
-        "save_archives": "x4_save_archives_v9_beta"
-      }
+        "save_archives": "x4_save_archives_v9_beta",
+        "build_plan_goals": "x4_build_plan_goals_v9_beta"
+      },
+      "indexeddb_name": "x4_save_archive_db_v9_beta"
     }
   ]
 }

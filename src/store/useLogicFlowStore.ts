@@ -1,10 +1,18 @@
 import { defineStore } from 'pinia'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { computeExpandUpstream, type ExpandContext, type GroupSnapshot } from './logic/logicFlowStream'
 import { migrateFlowStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_FLOW_VERSION } from './logic/storageVersions'
-import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings } from '@/types/x4'
+import { getLogicFlowGroupDisplayName } from './logic/logicFlowGroupName'
+import type { FlowNode, ProductionLineGroup, SavedFlowNode, SavedFlowGroup, LogicFlowPlan, SavedFlowPlansState, LogicFlowSettings, BuildFlowAssignment } from '@/types/x4'
+import {
+  deriveBuildFlowView,
+  addAssignment as addBuildFlowAssignment,
+  removeAssignment as removeBuildFlowAssignment,
+  cleanupStaleAssignments as cleanupStaleBuildFlowAssignments,
+  computeVirtualEdges
+} from './logic/buildFlowDerivation'
 
 export const useLogicFlowStore = defineStore('logicFlow', () => {
   const gameData = useGameDataStore()
@@ -26,21 +34,89 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   const savedPlans = ref<SavedFlowPlansState>({ version: CURRENT_FLOW_VERSION, activeId: null, list: [] })
   const lastSavedSnapshot = ref<string>('')
   const settings = ref<LogicFlowSettings>({ isDefaultLocked: true })
+  const buildFlowAssignments = ref<BuildFlowAssignment[]>([])
+  const isBuildFlowDragging = ref(false)
+  const archivedBuildFlowGroupIds = ref<string[]>([])
 
   function buildSnapshot() {
-    return JSON.stringify({ groups: groups.value, settings: settings.value })
+    return JSON.stringify({ planName: currentPlanName.value, groups: groups.value, settings: settings.value, buildFlowAssignments: buildFlowAssignments.value })
   }
 
   function buildEmptySnapshot() {
-    return JSON.stringify({ groups: [], settings: { isDefaultLocked: true } })
+    return JSON.stringify({ planName: '', groups: [], settings: { isDefaultLocked: true }, buildFlowAssignments: [] })
   }
+
+  // --- Build Flow ---
+
+  const buildFlowView = computed(() => {
+    const displayNames = new Map<string, string>()
+    for (const group of groups.value) {
+      const displayName = getLogicFlowGroupDisplayName(group, (wareId: string) => gameData.getWareDisplayName(wareId))
+      displayNames.set(group.id, displayName)
+    }
+    return deriveBuildFlowView(groups.value, gameData.modulesMap, displayNames, (wareId) => gameData.getWareDisplayName(wareId), archivedBuildFlowGroupIds.value)
+  })
+
+  const buildFlowLineCards = computed(() => buildFlowView.value.lineCards)
+  const buildFlowArchivedLineCards = computed(() => buildFlowView.value.archivedLineCards)
+  const buildFlowGroups = computed(() => buildFlowView.value.buildFlowGroups)
+  const demandMaterialSet = computed(() => buildFlowView.value.demandMaterialSet)
+  const buildFlowVirtualEdges = computed(() => computeVirtualEdges(
+    buildFlowGroups.value,
+    buildFlowAssignments.value,
+    archivedBuildFlowGroupIds.value,
+    groups.value
+  ))
+
+  function bindBuildFlowAssignment(assignment: BuildFlowAssignment) {
+    buildFlowAssignments.value = addBuildFlowAssignment(buildFlowAssignments.value, assignment)
+  }
+
+  function unbindBuildFlowAssignment(targetKey: string) {
+    buildFlowAssignments.value = removeBuildFlowAssignment(buildFlowAssignments.value, targetKey)
+  }
+
+  function runBuildFlowCleanup() {
+    buildFlowAssignments.value = cleanupStaleBuildFlowAssignments(
+      buildFlowAssignments.value,
+      groups.value,
+      demandMaterialSet.value,
+      gameData.modulesMap,
+      buildFlowGroups.value
+    )
+  }
+
+  function startBuildFlowDrag() {
+    isBuildFlowDragging.value = true
+  }
+
+  function stopBuildFlowDrag() {
+    isBuildFlowDragging.value = false
+  }
+
+  function archiveBuildFlowGroup(groupId: string) {
+    if (!archivedBuildFlowGroupIds.value.includes(groupId)) {
+      archivedBuildFlowGroupIds.value.push(groupId)
+      runBuildFlowCleanup()
+    }
+  }
+
+  function unarchiveBuildFlowGroup(groupId: string) {
+    const idx = archivedBuildFlowGroupIds.value.indexOf(groupId)
+    if (idx !== -1) {
+      archivedBuildFlowGroupIds.value.splice(idx, 1)
+      runBuildFlowCleanup()
+    }
+  }
+
+  watch(groups, () => {
+    runBuildFlowCleanup()
+  }, { deep: true })
 
   // 同步到 state 以便持久化（可选，但目前主要用于测试注入）
   const startDragging = (wareId: string, lineage?: string) => {
-    // T0 资源不可被拖拽 - 每次调用时重新获取 gameData 实例
     const gameDataStore = useGameDataStore()
-    const ware = gameDataStore.waresMap[wareId]
-    if (ware && ware.tier === 0) {
+    if (gameDataStore.isRawMaterialWare(wareId)) {
       return
     }
     isDragging.value = true
@@ -310,19 +386,17 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   /**
    * 计算指定 WareId 所需的所有 T0 资源（不含能量电池）
    */
-  function calculateRequiredT0Wares(wareId: string, race: string = 'default'): Record<string, number> {
+  function calculateRequiredRawMaterials(wareId: string, race: string = 'default'): Record<string, number> {
     const res: Record<string, number> = {}
     const visited = new Set<string>()
 
     const trace = (id: string, amount: number) => {
-      if (id === 'energycells') return // 排除能量电池
-      
       const ware = gameData.waresMap[id]
       if (!ware) {
         return
       }
 
-      if (ware.tier === 0) {
+      if (gameData.isRawMaterialWare(id)) {
         res[id] = (res[id] || 0) + amount
         return
       }
@@ -330,7 +404,6 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       if (visited.has(id)) return
       visited.add(id)
 
-      // 寻找模块
       const module = gameData.findModuleForWare(id, race)
       if (module && module.inputs) {
         Object.entries(module.inputs).forEach(([inputId, inputAmount]) => {
@@ -343,30 +416,24 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     return res
   }
 
-  /**
-   * 计算指定组的 T0 资源需求（可选包含正在拖拽的模块）
-   */
-  function getGroupT0Resources(groupId: string, includeDragging: boolean = false): Record<string, number> {
+  function getGroupRawMaterials(groupId: string, includeDragging: boolean = false): Record<string, number> {
     const group = groups.value.find(g => g.id === groupId)
     if (!group) return {}
 
     const total: Record<string, number> = {}
     
-    // 1. 计算现有 manual 节点的 T0 需求（排除隔离节点）
     group.nodes.filter(n => n.source === 'manual' && !n.isIsolated).forEach(node => {
-      const resources = calculateRequiredT0Wares(node.wareId, node.race)
+      const resources = calculateRequiredRawMaterials(node.wareId, node.race)
       Object.entries(resources).forEach(([id, amount]) => {
         total[id] = (total[id] || 0) + amount
       })
     })
 
-    // 2. 如果需要包含拖拽中的模块
     if (includeDragging && draggingWareId.value) {
-      // 检查是否已经是重复项
       const isDup = group.nodes.some(n => n.wareId === draggingWareId.value)
       if (!isDup) {
         const race = group.category === 'industrial' ? group.subCategory : 'default'
-        const resources = calculateRequiredT0Wares(draggingWareId.value, race)
+        const resources = calculateRequiredRawMaterials(draggingWareId.value, race)
         Object.entries(resources).forEach(([id, amount]) => {
           total[id] = (total[id] || 0) + amount
         })
@@ -383,21 +450,14 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
    * 2. 对每个节点，获取其 T0 需求
    * 3. 将需求展平，并去重（保留第一次出现的位置）
    */
-  function getSortedGroupT0Resources(nodes: FlowNode[]): string[] {
+  function getSortedGroupRawMaterials(nodes: FlowNode[]): string[] {
     const allResources: string[] = []
     const seen = new Set<string>()
 
     nodes.forEach(node => {
-      // 计算该节点的 T0 需求
-      const resources = calculateRequiredT0Wares(node.wareId, node.race)
-      // calculateRequiredT0Wares 返回的是 Record<id, amount>，键序是不确定的
-      // 但对于单个节点，我们希望保持稳定的内部顺序（例如按字母序，或者按 inputs 定义序）
-      // 这里暂时按 wareId 字母序，或者如果 inputs 有固定顺序更好。
-      // 由于 calculateRequiredT0Wares 使用递归，Object.entries 的顺序依赖于 JS 引擎。
-      // 为了稳定，我们对单个节点的资源按名称排序，或者保持原样。
-      // 用户希望 "Dependency-Follow"，即该节点的依赖紧随其后。
+      const resources = calculateRequiredRawMaterials(node.wareId, node.race)
       
-      const nodeResources = Object.keys(resources).sort() // 简单的字母序作为该节点内部的顺序
+      const nodeResources = Object.keys(resources).sort()
       
       nodeResources.forEach(resId => {
         if (!seen.has(resId)) {
@@ -462,6 +522,10 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       groups.value.splice(idx, 1)
       if (activeGroupId.value === groupId) {
         activeGroupId.value = groups.value[0]?.id || null
+      }
+      const archivedIdx = archivedBuildFlowGroupIds.value.indexOf(groupId)
+      if (archivedIdx !== -1) {
+        archivedBuildFlowGroupIds.value.splice(archivedIdx, 1)
       }
     }
   }
@@ -745,6 +809,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function clearAllGroups() {
     groups.value = []
     activeGroupId.value = null
+    archivedBuildFlowGroupIds.value = []
   }
 
   /**
@@ -860,9 +925,7 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     const group = groups.value.find(g => g.id === groupId)
     if (!group) return 'available'
 
-    // 0. T0 资源始终可用
-    const ware = gameData.waresMap[wareId]
-    if (ware && (ware.tier === 0 || wareId === 'energycells')) {
+    if (gameData.isRawMaterialWare(wareId)) {
       return 'available'
     }
 
@@ -999,6 +1062,9 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
       name: planName,
       groups: groups.value.map(toSavedFlowGroup),
       settings: { ...settings.value },
+      buildFlow: (buildFlowAssignments.value.length > 0 || archivedBuildFlowGroupIds.value.length > 0)
+        ? { assignments: [...buildFlowAssignments.value], archivedGroupIds: [...archivedBuildFlowGroupIds.value] }
+        : undefined,
       lastUpdated: Date.now()
     }
 
@@ -1053,6 +1119,12 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function applyPlan(plan: LogicFlowPlan) {
     groups.value = []
     activeGroupId.value = null
+    buildFlowAssignments.value = plan.buildFlow?.assignments
+      ? [...plan.buildFlow.assignments]
+      : []
+    archivedBuildFlowGroupIds.value = plan.buildFlow?.archivedGroupIds
+      ? [...plan.buildFlow.archivedGroupIds]
+      : []
     currentPlanName.value = plan.name
     savedPlans.value.activeId = plan.id
     settings.value = { ...plan.settings }
@@ -1125,6 +1197,21 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
           ? (newGroup.lockedLineage || 'default')
           : (module.race || module.method || newGroup.subCategory || 'default')
 
+        const existingNode = newGroup.nodes.find(n => n.moduleId === savedNode.module)
+        if (existingNode) {
+          if (existingNode.source === 'auto') {
+            existingNode.source = 'manual'
+            existingNode.isAuto = false
+            existingNode.isRoot = true
+            if (module.inputs) {
+              Object.keys(module.inputs).forEach(inputWareId => {
+                expandUpstream(newGroup.id, inputWareId, 'auto', existingNode.lineage)
+              })
+            }
+          }
+          continue
+        }
+
         const manualNode: FlowNode = {
           id: crypto.randomUUID(),
           wareId,
@@ -1179,6 +1266,8 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
   function clearAll() {
     groups.value = []
     activeGroupId.value = null
+    buildFlowAssignments.value = []
+    archivedBuildFlowGroupIds.value = []
     currentPlanName.value = ''
     savedPlans.value.activeId = null
     settings.value = { isDefaultLocked: true }
@@ -1243,9 +1332,9 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     connectAndExpand,
     isWareInAnyGroup,
     reorderNodes,
-    calculateRequiredT0Wares,
-    getGroupT0Resources,
-    getSortedGroupT0Resources,
+    calculateRequiredRawMaterials,
+    getGroupRawMaterials,
+    getSortedGroupRawMaterials,
     isNodeDepended,
     downgradeNode,
     convertToIsolatedAuto,
@@ -1269,5 +1358,22 @@ export const useLogicFlowStore = defineStore('logicFlow', () => {
     applyPlan,
     deletePlan,
     clearAll,
+    // Build Flow
+    buildFlowView,
+    buildFlowAssignments,
+    buildFlowLineCards,
+    buildFlowArchivedLineCards,
+    buildFlowGroups,
+    demandMaterialSet,
+    isBuildFlowDragging,
+    archivedBuildFlowGroupIds,
+    buildFlowVirtualEdges,
+    bindBuildFlowAssignment,
+    unbindBuildFlowAssignment,
+    runBuildFlowCleanup,
+    startBuildFlowDrag,
+    stopBuildFlowDrag,
+    archiveBuildFlowGroup,
+    unarchiveBuildFlowGroup,
   }
 })

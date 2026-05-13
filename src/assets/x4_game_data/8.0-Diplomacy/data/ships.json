@@ -19,7 +19,8 @@
         "cost": {
           "energycells": 1008.0,
           "hullparts": 4433.0
-        }
+        },
+        "time": 182.0
       }
     ],
     "slots": [
@@ -371,7 +372,8 @@
         "cost": {
           "energycells": 1206.0,
           "hullparts": 5306.0
-        }
+        },
+        "time": 218.0
       }
     ],
     "slots": [
@@ -723,7 +725,8 @@
         "cost": {
           "energycells": 1200.0,
           "hullparts": 5640.0
-        }
+        },
+        "time": 218.0
       }
     ],
     "slots": [
@@ -1078,7 +1081,8 @@
         "cost": {
           "energycells": 461.0,
           "hullparts": 1216.0
-        }
+        },
+        "time": 83.0
       }
     ],
     "slots": [
@@ -1367,7 +1371,8 @@
         "cost": {
           "energycells": 560.0,
           "hullparts": 1478.0
-        }
+        },
+        "time": 101.0
       }
     ],
     "slots": [
@@ -1656,7 +1661,8 @@
         "cost": {
           "energycells": 460.0,
           "hullparts": 1213.0
-        }
+        },
+        "time": 83.0
       }
     ],
     "slots": [
@@ -1967,7 +1973,8 @@
         "cost": {
           "energycells": 559.0,
           "hullparts": 1475.0
-        }
+        },
+        "time": 101.0
       }
     ],
     "slots": [
@@ -2275,7 +2282,8 @@
         "cost": {
           "energycells": 1080.0,
           "hullparts": 2851.0
-        }
+        },
+        "time": 195.0
       }
     ],
     "slots": [
@@ -2538,7 +2546,8 @@
         "cost": {
           "energycells": 1302.0,
           "hullparts": 3436.0
-        }
+        },
+        "time": 235.0
       }
     ],
     "slots": [
@@ -2801,7 +2810,8 @@
         "cost": {
           "energycells": 1121.0,
           "hullparts": 2960.0
-        }
+        },
+        "time": 203.0
       }
     ],
     "slots": [
@@ -3064,7 +3074,8 @@
         "cost": {
           "energycells": 1347.0,
           "hullparts": 3557.0
-        }
+        },
+        "time": 244.0
       }
     ],
     "slots": [
@@ -3327,7 +3338,8 @@
         "cost": {
           "energycells": 1091.0,
           "hullparts": 2880.0
-        }
+        },
+        "time": 197.0
       }
     ],
     "slots": [
@@ -3590,7 +3602,8 @@
         "cost": {
           "energycells": 1761.0,
           "hullparts": 4649.0
-        }
+        },
+        "time": 319.0
       }
     ],
     "slots": [
@@ -3853,7 +3866,8 @@
         "cost": {
           "energycells": 1592.0,
           "hullparts": 4204.0
-        }
+        },
+        "time": 288.0
       }
     ],
     "slots": [
@@ -4162,7 +4176,8 @@
         "cost": {
           "energycells": 1913.0,
           "hullparts": 5049.0
-        }
+        },
+        "time": 346.0
       }
     ],
     "slots": [
@@ -4471,7 +4486,8 @@
         "cost": {
           "energycells": 1264.0,
           "hullparts": 3336.0
-        }
+        },
+        "time": 229.0
       }
     ],
     "slots": [
@@ -4780,7 +4796,8 @@
         "cost": {
           "energycells": 1513.0,
           "hullparts": 3994.0
-        }
+        },
+        "time": 274.0
       }
     ],
     "slots": [
@@ -5089,7 +5106,8 @@
         "cost": {
           "energycells": 134.0,
           "hullparts": 708.0
-        }
+        },
+        "time": 24.0
       }
     ],
     "slots": [
@@ -5338,7 +5356,8 @@
         "cost": {
           "energycells": 159.0,
           "hullparts": 838.0
-        }
+        },
+        "time": 29.0
       }
     ],
     "slots": [
@@ -5587,7 +5606,8 @@
         "cost": {
           "energycells": 132.0,
           "hullparts": 699.0
-        }
+        },
+        "time": 24.0
       }
     ],
     "slots": [
@@ -5808,7 +5828,8 @@
         "cost": {
           "energycells": 172.0,
           "hullparts": 909.0
-        }
+        },
+        "time": 31.0
       }
     ],
     "slots": [
@@ -6090,7 +6111,8 @@
         "cost": {
           "energycells": 205.0,
           "hullparts": 1080.0
-        }
+        },
+        "time": 37.0
       }
     ],
     "slots": [
@@ -6375,7 +6397,8 @@
         "cost": {
           "energycells": 66.0,
           "hullparts": 117.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -6550,7 +6573,8 @@
         "cost": {
           "energycells": 84.0,
           "hullparts": 148.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -6725,7 +6749,8 @@
         "cost": {
           "energycells": 69.0,
           "hullparts": 121.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -6925,7 +6950,8 @@
         "cost": {
           "energycells": 81.0,
           "hullparts": 143.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -7122,7 +7148,8 @@
         "cost": {
           "energycells": 90.0,
           "hullparts": 159.0
-        }
+        },
+        "time": 16.0
       }
     ],
     "slots": [
@@ -7294,7 +7321,8 @@
         "cost": {
           "energycells": 108.0,
           "hullparts": 191.0
-        }
+        },
+        "time": 20.0
       }
     ],
     "slots": [
@@ -7466,7 +7494,8 @@
         "cost": {
           "energycells": 90.0,
           "hullparts": 159.0
-        }
+        },
+        "time": 16.0
       }
     ],
     "slots": [
@@ -7638,7 +7667,8 @@
         "cost": {
           "energycells": 108.0,
           "hullparts": 191.0
-        }
+        },
+        "time": 20.0
       }
     ],
     "slots": [
@@ -7810,7 +7840,8 @@
         "cost": {
           "energycells": 56.0,
           "hullparts": 122.0
-        }
+        },
+        "time": 10.0
       }
     ],
     "slots": [
@@ -7994,7 +8025,8 @@
         "cost": {
           "energycells": 68.0,
           "hullparts": 148.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -8178,7 +8210,8 @@
         "cost": {
           "energycells": 32.0,
           "hullparts": 71.0
-        }
+        },
+        "time": 6.0
       }
     ],
     "slots": [
@@ -8336,7 +8369,8 @@
         "cost": {
           "energycells": 39.0,
           "hullparts": 86.0
-        }
+        },
+        "time": 7.0
       }
     ],
     "slots": [
@@ -8494,7 +8528,8 @@
         "cost": {
           "energycells": 48.0,
           "hullparts": 105.0
-        }
+        },
+        "time": 9.0
       }
     ],
     "slots": [
@@ -8746,7 +8781,8 @@
         "cost": {
           "energycells": 42.0,
           "hullparts": 93.0
-        }
+        },
+        "time": 8.0
       }
     ],
     "slots": [
@@ -8958,7 +8994,8 @@
         "cost": {
           "energycells": 79.0,
           "hullparts": 173.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -9183,7 +9220,8 @@
         "cost": {
           "energycells": 95.0,
           "hullparts": 209.0
-        }
+        },
+        "time": 17.0
       }
     ],
     "slots": [
@@ -9408,7 +9446,8 @@
         "cost": {
           "energycells": 71.0,
           "hullparts": 157.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -9636,7 +9675,8 @@
         "cost": {
           "energycells": 35.0,
           "hullparts": 77.0
-        }
+        },
+        "time": 6.0
       }
     ],
     "slots": [
@@ -9819,7 +9859,8 @@
         "cost": {
           "energycells": 37.0,
           "hullparts": 81.0
-        }
+        },
+        "time": 7.0
       }
     ],
     "slots": [
@@ -10003,7 +10044,8 @@
         "cost": {
           "energycells": 44.0,
           "hullparts": 98.0
-        }
+        },
+        "time": 8.0
       }
     ],
     "slots": [
@@ -10187,7 +10229,8 @@
         "cost": {
           "energycells": 66.0,
           "hullparts": 144.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -10369,7 +10412,8 @@
         "cost": {
           "energycells": 78.0,
           "hullparts": 172.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -10551,7 +10595,8 @@
         "cost": {
           "energycells": 34.0,
           "hullparts": 74.0
-        }
+        },
+        "time": 6.0
       }
     ],
     "slots": [
@@ -10735,7 +10780,8 @@
         "cost": {
           "energycells": 42.0,
           "hullparts": 91.0
-        }
+        },
+        "time": 8.0
       }
     ],
     "slots": [
@@ -10921,7 +10967,8 @@
         "cost": {
           "energycells": 2428.0,
           "hullparts": 8545.0
-        }
+        },
+        "time": 439.0
       }
     ],
     "slots": [
@@ -11194,7 +11241,8 @@
         "cost": {
           "energycells": 2913.0,
           "hullparts": 10254.0
-        }
+        },
+        "time": 527.0
       }
     ],
     "slots": [
@@ -11465,7 +11513,8 @@
         "cost": {
           "energycells": 2685.0,
           "hullparts": 9450.0
-        }
+        },
+        "time": 486.0
       }
     ],
     "slots": [
@@ -11863,7 +11912,8 @@
         "cost": {
           "energycells": 3220.0,
           "hullparts": 11335.0
-        }
+        },
+        "time": 583.0
       }
     ],
     "slots": [
@@ -12261,7 +12311,8 @@
         "cost": {
           "energycells": 4000.0,
           "hullparts": 13805.0
-        }
+        },
+        "time": 586.0
       }
     ],
     "slots": [
@@ -12659,7 +12710,8 @@
         "cost": {
           "energycells": 2288.0,
           "hullparts": 8055.0
-        }
+        },
+        "time": 414.0
       }
     ],
     "slots": [
@@ -12930,7 +12982,8 @@
         "cost": {
           "energycells": 2744.0,
           "hullparts": 9659.0
-        }
+        },
+        "time": 496.0
       }
     ],
     "slots": [
@@ -13202,7 +13255,8 @@
           "computronicsubstrate": 352.0,
           "energycells": 1296.0,
           "metallicmicrolattice": 590.0
-        }
+        },
+        "time": 234.0
       }
     ],
     "slots": [
@@ -13653,7 +13707,8 @@
           "computronicsubstrate": 619.0,
           "energycells": 2854.0,
           "metallicmicrolattice": 1300.0
-        }
+        },
+        "time": 516.0
       }
     ],
     "slots": [
@@ -14157,7 +14212,8 @@
           "energycells": 1320.0,
           "hullparts": 5200.0,
           "water": 3660.0
-        }
+        },
+        "time": 175.0
       }
     ],
     "slots": [
@@ -14537,7 +14593,8 @@
           "energycells": 1140.0,
           "hullparts": 5570.0,
           "water": 2385.0
-        }
+        },
+        "time": 175.0
       }
     ],
     "slots": [
@@ -14940,7 +14997,8 @@
           "energycells": 500.0,
           "hullparts": 1080.0,
           "water": 800.0
-        }
+        },
+        "time": 55.0
       }
     ],
     "slots": [
@@ -15173,7 +15231,8 @@
           "energycells": 500.0,
           "hullparts": 1130.0,
           "water": 520.0
-        }
+        },
+        "time": 55.0
       }
     ],
     "slots": [
@@ -15446,7 +15505,8 @@
           "energycells": 1500.0,
           "hullparts": 3900.0,
           "water": 760.0
-        }
+        },
+        "time": 130.0
       }
     ],
     "slots": [
@@ -15767,7 +15827,8 @@
           "energycells": 110.0,
           "hullparts": 540.0,
           "water": 245.0
-        }
+        },
+        "time": 35.0
       }
     ],
     "slots": [
@@ -16068,7 +16129,8 @@
           "energycells": 140.0,
           "hullparts": 510.0,
           "water": 308.0
-        }
+        },
+        "time": 35.0
       }
     ],
     "slots": [
@@ -16375,7 +16437,8 @@
           "energycells": 70.0,
           "hullparts": 131.0,
           "water": 83.0
-        }
+        },
+        "time": 25.0
       }
     ],
     "slots": [
@@ -16588,7 +16651,8 @@
           "energycells": 73.0,
           "hullparts": 145.0,
           "water": 55.0
-        }
+        },
+        "time": 25.0
       }
     ],
     "slots": [
@@ -16821,7 +16885,8 @@
           "energycells": 92.0,
           "hullparts": 210.0,
           "water": 108.0
-        }
+        },
+        "time": 18.0
       }
     ],
     "slots": [
@@ -17017,7 +17082,8 @@
           "energycells": 65.0,
           "hullparts": 118.0,
           "water": 25.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -17202,7 +17268,8 @@
           "energycells": 79.0,
           "hullparts": 201.0,
           "water": 110.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -17418,7 +17485,8 @@
           "energycells": 39.0,
           "hullparts": 74.0,
           "water": 12.0
-        }
+        },
+        "time": 10.0
       }
     ],
     "slots": [
@@ -17590,7 +17658,8 @@
           "energycells": 40.0,
           "hullparts": 90.0,
           "water": 20.0
-        }
+        },
+        "time": 10.0
       }
     ],
     "slots": [
@@ -17761,7 +17830,8 @@
           "energycells": 40.0,
           "hullparts": 102.0,
           "water": 37.0
-        }
+        },
+        "time": 10.0
       }
     ],
     "slots": [
@@ -17944,7 +18014,8 @@
           "energycells": 62.0,
           "hullparts": 180.0,
           "water": 20.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -18095,7 +18166,8 @@
           "energycells": 2866.0,
           "hullparts": 9575.0,
           "water": 6440.0
-        }
+        },
+        "time": 527.0
       }
     ],
     "slots": [
@@ -18413,7 +18485,8 @@
           "energycells": 4425.0,
           "hullparts": 18800.0,
           "water": 6880.0
-        }
+        },
+        "time": 780.0
       }
     ],
     "slots": [
@@ -18813,7 +18886,8 @@
           "energycells": 3738.0,
           "hullparts": 15380.0,
           "water": 4560.0
-        }
+        },
+        "time": 780.0
       }
     ],
     "slots": [
@@ -19142,7 +19216,8 @@
         "cost": {
           "energycells": 146.0,
           "hullparts": 1209.0
-        }
+        },
+        "time": 26.0
       },
       {
         "method": "closedloop",
@@ -19151,7 +19226,8 @@
           "claytronics": 75.0,
           "energycells": 798.0,
           "hullparts": 427.0
-        }
+        },
+        "time": 26.0
       }
     ],
     "slots": [
@@ -19434,7 +19510,8 @@
         "cost": {
           "energycells": 105.0,
           "hullparts": 872.0
-        }
+        },
+        "time": 19.0
       },
       {
         "method": "closedloop",
@@ -19443,7 +19520,8 @@
           "claytronics": 54.0,
           "energycells": 587.0,
           "hullparts": 308.0
-        }
+        },
+        "time": 19.0
       }
     ],
     "slots": [
@@ -19726,7 +19804,8 @@
         "cost": {
           "energycells": 136.0,
           "hullparts": 375.0
-        }
+        },
+        "time": 25.0
       },
       {
         "method": "terran",
@@ -19735,7 +19814,8 @@
           "computronicsubstrate": 47.0,
           "energycells": 54.0,
           "siliconcarbide": 9.0
-        }
+        },
+        "time": 25.0
       }
     ],
     "slots": [
@@ -19969,7 +20049,8 @@
         "cost": {
           "energycells": 56.0,
           "hullparts": 70.0
-        }
+        },
+        "time": 10.0
       }
     ],
     "slots": [
@@ -20165,7 +20246,8 @@
         "cost": {
           "energycells": 69.0,
           "hullparts": 86.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -20361,7 +20443,8 @@
         "cost": {
           "energycells": 1075.0,
           "hullparts": 4732.0
-        }
+        },
+        "time": 195.0
       }
     ],
     "slots": [
@@ -20777,7 +20860,8 @@
         "cost": {
           "energycells": 1292.0,
           "hullparts": 5683.0
-        }
+        },
+        "time": 234.0
       }
     ],
     "slots": [
@@ -21193,7 +21277,8 @@
         "cost": {
           "energycells": 1066.0,
           "hullparts": 4886.0
-        }
+        },
+        "time": 276.0
       }
     ],
     "slots": [
@@ -21609,7 +21694,8 @@
         "cost": {
           "energycells": 468.0,
           "hullparts": 3235.0
-        }
+        },
+        "time": 85.0
       }
     ],
     "slots": [
@@ -21949,7 +22035,8 @@
         "cost": {
           "energycells": 407.0,
           "hullparts": 1074.0
-        }
+        },
+        "time": 74.0
       }
     ],
     "slots": [
@@ -22180,7 +22267,8 @@
         "cost": {
           "energycells": 492.0,
           "hullparts": 1298.0
-        }
+        },
+        "time": 89.0
       }
     ],
     "slots": [
@@ -22411,7 +22499,8 @@
         "cost": {
           "energycells": 406.0,
           "hullparts": 1492.0
-        }
+        },
+        "time": 91.0
       }
     ],
     "slots": [
@@ -22642,7 +22731,8 @@
         "cost": {
           "energycells": 407.0,
           "hullparts": 1074.0
-        }
+        },
+        "time": 74.0
       }
     ],
     "slots": [
@@ -22899,7 +22989,8 @@
         "cost": {
           "energycells": 492.0,
           "hullparts": 1298.0
-        }
+        },
+        "time": 89.0
       }
     ],
     "slots": [
@@ -23156,7 +23247,8 @@
         "cost": {
           "energycells": 393.0,
           "hullparts": 1493.0
-        }
+        },
+        "time": 91.0
       }
     ],
     "slots": [
@@ -23410,7 +23502,8 @@
         "cost": {
           "energycells": 703.0,
           "hullparts": 1856.0
-        }
+        },
+        "time": 127.0
       }
     ],
     "slots": [
@@ -23684,7 +23777,8 @@
         "cost": {
           "energycells": 849.0,
           "hullparts": 2242.0
-        }
+        },
+        "time": 154.0
       }
     ],
     "slots": [
@@ -23958,7 +24052,8 @@
         "cost": {
           "energycells": 703.0,
           "hullparts": 1856.0
-        }
+        },
+        "time": 108.0
       }
     ],
     "slots": [
@@ -24232,7 +24327,8 @@
         "cost": {
           "energycells": 849.0,
           "hullparts": 2242.0
-        }
+        },
+        "time": 130.0
       }
     ],
     "slots": [
@@ -24506,7 +24602,8 @@
         "cost": {
           "energycells": 739.0,
           "hullparts": 3264.0
-        }
+        },
+        "time": 178.0
       }
     ],
     "slots": [
@@ -24780,7 +24877,8 @@
         "cost": {
           "energycells": 111.0,
           "hullparts": 587.0
-        }
+        },
+        "time": 20.0
       }
     ],
     "slots": [
@@ -25043,7 +25141,8 @@
         "cost": {
           "energycells": 133.0,
           "hullparts": 704.0
-        }
+        },
+        "time": 24.0
       }
     ],
     "slots": [
@@ -25306,7 +25405,8 @@
         "cost": {
           "energycells": 196.0,
           "hullparts": 1036.0
-        }
+        },
+        "time": 35.0
       }
     ],
     "slots": [
@@ -25600,7 +25700,8 @@
         "cost": {
           "energycells": 236.0,
           "hullparts": 1248.0
-        }
+        },
+        "time": 43.0
       }
     ],
     "slots": [
@@ -25897,7 +25998,8 @@
         "cost": {
           "energycells": 69.0,
           "hullparts": 122.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -26072,7 +26174,8 @@
         "cost": {
           "energycells": 85.0,
           "hullparts": 149.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -26247,7 +26350,8 @@
         "cost": {
           "energycells": 69.0,
           "hullparts": 122.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -26447,7 +26551,8 @@
         "cost": {
           "energycells": 85.0,
           "hullparts": 149.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -26644,7 +26749,8 @@
         "cost": {
           "energycells": 92.0,
           "hullparts": 162.0
-        }
+        },
+        "time": 17.0
       }
     ],
     "slots": [
@@ -26802,7 +26908,8 @@
         "cost": {
           "energycells": 120.0,
           "hullparts": 210.0
-        }
+        },
+        "time": 22.0
       }
     ],
     "slots": [
@@ -26960,7 +27067,8 @@
         "cost": {
           "energycells": 92.0,
           "hullparts": 162.0
-        }
+        },
+        "time": 17.0
       }
     ],
     "slots": [
@@ -27118,7 +27226,8 @@
         "cost": {
           "energycells": 120.0,
           "hullparts": 210.0
-        }
+        },
+        "time": 22.0
       }
     ],
     "slots": [
@@ -27276,7 +27385,8 @@
         "cost": {
           "energycells": 98.0,
           "hullparts": 272.0
-        }
+        },
+        "time": 18.0
       }
     ],
     "slots": [
@@ -27525,7 +27635,8 @@
         "cost": {
           "energycells": 66.0,
           "hullparts": 145.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -27721,7 +27832,8 @@
         "cost": {
           "energycells": 79.0,
           "hullparts": 174.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -27917,7 +28029,8 @@
         "cost": {
           "energycells": 75.0,
           "hullparts": 164.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -28115,7 +28228,8 @@
         "cost": {
           "energycells": 89.0,
           "hullparts": 196.0
-        }
+        },
+        "time": 16.0
       }
     ],
     "slots": [
@@ -28313,7 +28427,8 @@
         "cost": {
           "energycells": 66.0,
           "hullparts": 228.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -28566,7 +28681,8 @@
         "cost": {
           "energycells": 35.0,
           "hullparts": 77.0
-        }
+        },
+        "time": 6.0
       }
     ],
     "slots": [
@@ -28764,7 +28880,8 @@
         "cost": {
           "energycells": 34.0,
           "hullparts": 74.0
-        }
+        },
+        "time": 6.0
       }
     ],
     "slots": [
@@ -28946,7 +29063,8 @@
         "cost": {
           "energycells": 41.0,
           "hullparts": 90.0
-        }
+        },
+        "time": 7.0
       }
     ],
     "slots": [
@@ -29128,7 +29246,8 @@
         "cost": {
           "energycells": 63.0,
           "hullparts": 139.0
-        }
+        },
+        "time": 11.0
       }
     ],
     "slots": [
@@ -29324,7 +29443,8 @@
         "cost": {
           "energycells": 77.0,
           "hullparts": 170.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -29522,7 +29642,8 @@
         "cost": {
           "energycells": 2971.0,
           "hullparts": 16432.0
-        }
+        },
+        "time": 537.0
       }
     ],
     "slots": [
@@ -29795,7 +29916,8 @@
         "cost": {
           "energycells": 2913.0,
           "hullparts": 10254.0
-        }
+        },
+        "time": 527.0
       }
     ],
     "slots": [
@@ -30066,7 +30188,8 @@
         "cost": {
           "energycells": 3493.0,
           "hullparts": 12295.0
-        }
+        },
+        "time": 632.0
       }
     ],
     "slots": [
@@ -30475,7 +30598,8 @@
         "cost": {
           "energycells": 4190.0,
           "hullparts": 14749.0
-        }
+        },
+        "time": 758.0
       }
     ],
     "slots": [
@@ -30884,7 +31008,8 @@
         "cost": {
           "energycells": 1506.0,
           "hullparts": 16670.0
-        }
+        },
+        "time": 682.0
       }
     ],
     "slots": [
@@ -31293,7 +31418,8 @@
         "cost": {
           "energycells": 2565.0,
           "hullparts": 9029.0
-        }
+        },
+        "time": 464.0
       }
     ],
     "slots": [
@@ -31564,7 +31690,8 @@
         "cost": {
           "energycells": 3078.0,
           "hullparts": 10835.0
-        }
+        },
+        "time": 557.0
       }
     ],
     "slots": [
@@ -31835,7 +31962,8 @@
         "cost": {
           "energycells": 1319.0,
           "hullparts": 14691.0
-        }
+        },
+        "time": 541.0
       }
     ],
     "slots": [
@@ -32109,7 +32237,8 @@
         "cost": {
           "energycells": 354.0,
           "hullparts": 1470.0
-        }
+        },
+        "time": 86.0
       }
     ],
     "slots": [
@@ -32380,7 +32509,8 @@
         "cost": {
           "energycells": 1056.0,
           "hullparts": 7301.0
-        }
+        },
+        "time": 258.75
       }
     ],
     "slots": [
@@ -32721,7 +32851,8 @@
         "cost": {
           "energycells": 1094.0,
           "hullparts": 4539.0
-        }
+        },
+        "time": 239.2
       }
     ],
     "slots": [
@@ -32926,7 +33057,8 @@
         "cost": {
           "energycells": 141.0,
           "hullparts": 40.0
-        }
+        },
+        "time": 10.35
       }
     ],
     "slots": [
@@ -33110,7 +33242,8 @@
         "cost": {
           "energycells": 47.0,
           "hullparts": 164.0
-        }
+        },
+        "time": 11.5
       }
     ],
     "slots": [
@@ -33306,7 +33439,8 @@
         "cost": {
           "energycells": 74.0,
           "hullparts": 257.0
-        }
+        },
+        "time": 18.4
       }
     ],
     "slots": [
@@ -33544,7 +33678,8 @@
         "cost": {
           "energycells": 59.0,
           "hullparts": 204.0
-        }
+        },
+        "time": 14.95
       }
     ],
     "slots": [
@@ -33714,7 +33849,8 @@
         "cost": {
           "energycells": 55.0,
           "hullparts": 191.0
-        }
+        },
+        "time": 13.8
       }
     ],
     "slots": [
@@ -33884,7 +34020,8 @@
         "cost": {
           "energycells": 2996.0,
           "hullparts": 16569.0
-        }
+        },
+        "time": 542.0
       }
     ],
     "slots": [
@@ -34287,7 +34424,8 @@
         "cost": {
           "energycells": 1957.0,
           "hullparts": 10827.0
-        }
+        },
+        "time": 479.55
       }
     ],
     "slots": [
@@ -34558,7 +34696,8 @@
         "cost": {
           "energycells": 1710.0,
           "hullparts": 11822.0
-        }
+        },
+        "time": 309.0
       }
     ],
     "slots": [
@@ -34957,7 +35096,8 @@
         "cost": {
           "energycells": 365.0,
           "hullparts": 1513.0
-        }
+        },
+        "time": 66.0
       }
     ],
     "slots": [
@@ -35211,7 +35351,8 @@
         "cost": {
           "energycells": 365.0,
           "hullparts": 1513.0
-        }
+        },
+        "time": 66.0
       }
     ],
     "slots": [
@@ -35505,7 +35646,8 @@
         "cost": {
           "energycells": 666.0,
           "hullparts": 2761.0
-        }
+        },
+        "time": 120.0
       }
     ],
     "slots": [
@@ -35802,7 +35944,8 @@
         "cost": {
           "energycells": 142.0,
           "hullparts": 1179.0
-        }
+        },
+        "time": 26.0
       }
     ],
     "slots": [
@@ -36066,7 +36209,8 @@
         "cost": {
           "energycells": 84.0,
           "hullparts": 701.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -36330,7 +36474,8 @@
         "cost": {
           "energycells": 248.0,
           "hullparts": 2060.0
-        }
+        },
+        "time": 45.0
       }
     ],
     "slots": [
@@ -36628,7 +36773,8 @@
         "cost": {
           "energycells": 72.0,
           "hullparts": 198.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -36815,7 +36961,8 @@
         "cost": {
           "energycells": 80.0,
           "hullparts": 220.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -37039,7 +37186,8 @@
         "cost": {
           "energycells": 126.0,
           "hullparts": 348.0
-        }
+        },
+        "time": 23.0
       }
     ],
     "slots": [
@@ -37223,7 +37371,8 @@
         "cost": {
           "energycells": 53.0,
           "hullparts": 182.0
-        }
+        },
+        "time": 10.0
       }
     ],
     "slots": [
@@ -37420,7 +37569,8 @@
         "cost": {
           "energycells": 69.0,
           "hullparts": 239.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -37618,7 +37768,8 @@
         "cost": {
           "energycells": 34.0,
           "hullparts": 116.0
-        }
+        },
+        "time": 6.0
       }
     ],
     "slots": [
@@ -37816,7 +37967,8 @@
         "cost": {
           "energycells": 92.0,
           "hullparts": 317.0
-        }
+        },
+        "time": 17.0
       }
     ],
     "slots": [
@@ -38066,7 +38218,8 @@
         "cost": {
           "energycells": 74.0,
           "hullparts": 254.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -38293,7 +38446,8 @@
         "cost": {
           "energycells": 35.0,
           "hullparts": 120.0
-        }
+        },
+        "time": 6.0
       }
     ],
     "slots": [
@@ -38491,7 +38645,8 @@
         "cost": {
           "energycells": 40.0,
           "hullparts": 137.0
-        }
+        },
+        "time": 7.0
       }
     ],
     "slots": [
@@ -38649,7 +38804,8 @@
         "cost": {
           "energycells": 67.0,
           "hullparts": 232.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -38847,7 +39003,8 @@
         "cost": {
           "energycells": 2864.0,
           "hullparts": 11286.0
-        }
+        },
+        "time": 500.0
       }
     ],
     "slots": [
@@ -39118,7 +39275,8 @@
         "cost": {
           "energycells": 5565.0,
           "hullparts": 30775.0
-        }
+        },
+        "time": 1007.0
       }
     ],
     "slots": [
@@ -39719,7 +39877,8 @@
         "cost": {
           "energycells": 2941.0,
           "hullparts": 16264.0
-        }
+        },
+        "time": 532.0
       }
     ],
     "slots": [
@@ -40024,7 +40183,8 @@
         "cost": {
           "energycells": 1127.0,
           "hullparts": 4960.0
-        }
+        },
+        "time": 204.0
       }
     ],
     "slots": [
@@ -40425,7 +40585,8 @@
         "cost": {
           "energycells": 1349.0,
           "hullparts": 5933.0
-        }
+        },
+        "time": 244.0
       }
     ],
     "slots": [
@@ -40826,7 +40987,8 @@
         "cost": {
           "energycells": 1300.0,
           "hullparts": 6350.0
-        }
+        },
+        "time": 244.0
       }
     ],
     "slots": [
@@ -41227,7 +41389,8 @@
         "cost": {
           "energycells": 530.0,
           "hullparts": 1398.0
-        }
+        },
+        "time": 96.0
       }
     ],
     "slots": [
@@ -41554,7 +41717,8 @@
         "cost": {
           "energycells": 636.0,
           "hullparts": 1678.0
-        }
+        },
+        "time": 115.0
       }
     ],
     "slots": [
@@ -41881,7 +42045,8 @@
         "cost": {
           "energycells": 650.0,
           "hullparts": 1720.0
-        }
+        },
+        "time": 115.0
       }
     ],
     "slots": [
@@ -42205,7 +42370,8 @@
         "cost": {
           "energycells": 530.0,
           "hullparts": 1398.0
-        }
+        },
+        "time": 96.0
       }
     ],
     "slots": [
@@ -42532,7 +42698,8 @@
         "cost": {
           "energycells": 636.0,
           "hullparts": 1678.0
-        }
+        },
+        "time": 115.0
       }
     ],
     "slots": [
@@ -42859,7 +43026,8 @@
         "cost": {
           "energycells": 650.0,
           "hullparts": 1720.0
-        }
+        },
+        "time": 115.0
       }
     ],
     "slots": [
@@ -43180,7 +43348,8 @@
         "cost": {
           "energycells": 935.0,
           "hullparts": 2467.0
-        }
+        },
+        "time": 169.0
       }
     ],
     "slots": [
@@ -43504,7 +43673,8 @@
         "cost": {
           "energycells": 1127.0,
           "hullparts": 2975.0
-        }
+        },
+        "time": 204.0
       }
     ],
     "slots": [
@@ -43828,7 +43998,8 @@
         "cost": {
           "energycells": 858.0,
           "hullparts": 2266.0
-        }
+        },
+        "time": 155.0
       }
     ],
     "slots": [
@@ -44152,7 +44323,8 @@
         "cost": {
           "energycells": 1025.0,
           "hullparts": 2705.0
-        }
+        },
+        "time": 185.0
       }
     ],
     "slots": [
@@ -44476,7 +44648,8 @@
         "cost": {
           "energycells": 1250.0,
           "hullparts": 3175.0
-        }
+        },
+        "time": 204.0
       }
     ],
     "slots": [
@@ -44797,7 +44970,8 @@
         "cost": {
           "energycells": 131.0,
           "hullparts": 694.0
-        }
+        },
+        "time": 24.0
       }
     ],
     "slots": [
@@ -45071,7 +45245,8 @@
         "cost": {
           "energycells": 156.0,
           "hullparts": 821.0
-        }
+        },
+        "time": 28.0
       }
     ],
     "slots": [
@@ -45345,7 +45520,8 @@
         "cost": {
           "energycells": 186.0,
           "hullparts": 985.0
-        }
+        },
+        "time": 34.0
       }
     ],
     "slots": [
@@ -45627,7 +45803,8 @@
         "cost": {
           "energycells": 226.0,
           "hullparts": 1192.0
-        }
+        },
+        "time": 41.0
       }
     ],
     "slots": [
@@ -45912,7 +46089,8 @@
         "cost": {
           "energycells": 62.0,
           "hullparts": 109.0
-        }
+        },
+        "time": 11.0
       }
     ],
     "slots": [
@@ -46100,7 +46278,8 @@
         "cost": {
           "energycells": 75.0,
           "hullparts": 132.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -46288,7 +46467,8 @@
         "cost": {
           "energycells": 62.0,
           "hullparts": 109.0
-        }
+        },
+        "time": 11.0
       }
     ],
     "slots": [
@@ -46501,7 +46681,8 @@
         "cost": {
           "energycells": 75.0,
           "hullparts": 132.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -46711,7 +46892,8 @@
         "cost": {
           "energycells": 138.0,
           "hullparts": 244.0
-        }
+        },
+        "time": 25.0
       }
     ],
     "slots": [
@@ -46882,7 +47064,8 @@
         "cost": {
           "energycells": 161.0,
           "hullparts": 283.0
-        }
+        },
+        "time": 29.0
       }
     ],
     "slots": [
@@ -47053,7 +47236,8 @@
         "cost": {
           "energycells": 138.0,
           "hullparts": 244.0
-        }
+        },
+        "time": 25.0
       }
     ],
     "slots": [
@@ -47224,7 +47408,8 @@
         "cost": {
           "energycells": 161.0,
           "hullparts": 283.0
-        }
+        },
+        "time": 29.0
       }
     ],
     "slots": [
@@ -47395,7 +47580,8 @@
         "cost": {
           "energycells": 141.0,
           "hullparts": 390.0
-        }
+        },
+        "time": 26.0
       }
     ],
     "slots": [
@@ -47614,7 +47800,8 @@
         "cost": {
           "energycells": 69.0,
           "hullparts": 152.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -47811,7 +47998,8 @@
         "cost": {
           "energycells": 82.0,
           "hullparts": 181.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -48008,7 +48196,8 @@
         "cost": {
           "energycells": 66.0,
           "hullparts": 146.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -48219,7 +48408,8 @@
         "cost": {
           "energycells": 80.0,
           "hullparts": 176.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -48433,7 +48623,8 @@
         "cost": {
           "energycells": 38.0,
           "hullparts": 84.0
-        }
+        },
+        "time": 7.0
       }
     ],
     "slots": [
@@ -48617,7 +48808,8 @@
         "cost": {
           "energycells": 39.0,
           "hullparts": 85.0
-        }
+        },
+        "time": 7.0
       }
     ],
     "slots": [
@@ -48787,7 +48979,8 @@
         "cost": {
           "energycells": 47.0,
           "hullparts": 102.0
-        }
+        },
+        "time": 8.0
       }
     ],
     "slots": [
@@ -48957,7 +49150,8 @@
         "cost": {
           "energycells": 59.0,
           "hullparts": 129.0
-        }
+        },
+        "time": 11.0
       }
     ],
     "slots": [
@@ -49151,7 +49345,8 @@
         "cost": {
           "energycells": 70.0,
           "hullparts": 154.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -49345,7 +49540,8 @@
         "cost": {
           "energycells": 71.0,
           "hullparts": 156.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [
@@ -49528,7 +49724,8 @@
         "cost": {
           "energycells": 84.0,
           "hullparts": 185.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -49713,7 +49910,8 @@
         "cost": {
           "energycells": 2428.0,
           "hullparts": 8545.0
-        }
+        },
+        "time": 439.0
       }
     ],
     "slots": [
@@ -49986,7 +50184,8 @@
         "cost": {
           "energycells": 2913.0,
           "hullparts": 10254.0
-        }
+        },
+        "time": 527.0
       }
     ],
     "slots": [
@@ -50257,7 +50456,8 @@
         "cost": {
           "energycells": 2972.0,
           "hullparts": 10462.0
-        }
+        },
+        "time": 538.0
       }
     ],
     "slots": [
@@ -50666,7 +50866,8 @@
         "cost": {
           "energycells": 3568.0,
           "hullparts": 12559.0
-        }
+        },
+        "time": 645.0
       }
     ],
     "slots": [
@@ -51075,7 +51276,8 @@
         "cost": {
           "energycells": 2072.0,
           "hullparts": 7291.0
-        }
+        },
+        "time": 375.0
       }
     ],
     "slots": [
@@ -51461,7 +51663,8 @@
         "cost": {
           "energycells": 2486.0,
           "hullparts": 8750.0
-        }
+        },
+        "time": 450.0
       }
     ],
     "slots": [
@@ -51848,7 +52051,8 @@
           "computronicsubstrate": 281.0,
           "energycells": 1034.0,
           "metallicmicrolattice": 471.0
-        }
+        },
+        "time": 187.0
       }
     ],
     "slots": [
@@ -52268,7 +52472,8 @@
         "cost": {
           "energycells": 1850.0,
           "hullparts": 4950.0
-        }
+        },
+        "time": 187.0
       },
       {
         "method": "terran",
@@ -52277,7 +52482,8 @@
           "computronicsubstrate": 124.0,
           "energycells": 1365.0,
           "metallicmicrolattice": 315.0
-        }
+        },
+        "time": 187.0
       }
     ],
     "slots": [
@@ -52565,7 +52771,8 @@
           "computronicsubstrate": 67.0,
           "energycells": 415.0,
           "metallicmicrolattice": 189.0
-        }
+        },
+        "time": 75.0
       }
     ],
     "slots": [
@@ -52843,7 +53050,8 @@
           "computronicsubstrate": 67.0,
           "energycells": 415.0,
           "metallicmicrolattice": 189.0
-        }
+        },
+        "time": 75.0
       }
     ],
     "slots": [
@@ -53140,7 +53348,8 @@
           "computronicsubstrate": 105.0,
           "energycells": 646.0,
           "metallicmicrolattice": 294.0
-        }
+        },
+        "time": 117.0
       }
     ],
     "slots": [
@@ -53427,7 +53636,8 @@
           "computronicsubstrate": 42.0,
           "energycells": 128.0,
           "metallicmicrolattice": 58.0
-        }
+        },
+        "time": 23.0
       }
     ],
     "slots": [
@@ -53692,7 +53902,8 @@
         "cost": {
           "energycells": 170.0,
           "hullparts": 950.0
-        }
+        },
+        "time": 15.0
       },
       {
         "method": "terran",
@@ -53701,7 +53912,8 @@
           "computronicsubstrate": 24.0,
           "energycells": 285.0,
           "metallicmicrolattice": 42.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -53951,7 +54163,8 @@
           "computronicsubstrate": 67.0,
           "energycells": 207.0,
           "metallicmicrolattice": 94.0
-        }
+        },
+        "time": 37.0
       }
     ],
     "slots": [
@@ -54273,7 +54486,8 @@
           "computronicsubstrate": 49.0,
           "energycells": 150.0,
           "metallicmicrolattice": 68.0
-        }
+        },
+        "time": 27.0
       }
     ],
     "slots": [
@@ -54553,7 +54767,8 @@
           "computronicsubstrate": 9.0,
           "energycells": 83.0,
           "metallicmicrolattice": 38.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -54741,7 +54956,8 @@
           "computronicsubstrate": 9.0,
           "energycells": 83.0,
           "metallicmicrolattice": 38.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -54951,7 +55167,8 @@
           "computronicsubstrate": 17.0,
           "energycells": 157.0,
           "metallicmicrolattice": 72.0
-        }
+        },
+        "time": 28.0
       }
     ],
     "slots": [
@@ -55136,7 +55353,8 @@
           "computronicsubstrate": 9.0,
           "energycells": 66.0,
           "metallicmicrolattice": 30.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -55326,7 +55544,8 @@
           "computronicsubstrate": 8.0,
           "energycells": 60.0,
           "metallicmicrolattice": 27.0
-        }
+        },
+        "time": 11.0
       }
     ],
     "slots": [
@@ -55552,7 +55771,8 @@
           "computronicsubstrate": 8.0,
           "energycells": 62.0,
           "metallicmicrolattice": 28.0
-        }
+        },
+        "time": 11.0
       }
     ],
     "slots": [
@@ -55763,7 +55983,8 @@
         "cost": {
           "energycells": 115.0,
           "hullparts": 265.0
-        }
+        },
+        "time": 15.0
       },
       {
         "method": "terran",
@@ -55772,7 +55993,8 @@
           "computronicsubstrate": 7.0,
           "energycells": 85.0,
           "metallicmicrolattice": 25.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -55958,7 +56180,8 @@
           "computronicsubstrate": 11.0,
           "energycells": 80.0,
           "metallicmicrolattice": 36.0
-        }
+        },
+        "time": 14.0
       }
     ],
     "slots": [
@@ -56191,7 +56414,8 @@
           "computronicsubstrate": 4.0,
           "energycells": 28.0,
           "metallicmicrolattice": 13.0
-        }
+        },
+        "time": 5.0
       }
     ],
     "slots": [
@@ -56351,7 +56575,8 @@
           "computronicsubstrate": 5.0,
           "energycells": 35.0,
           "metallicmicrolattice": 16.0
-        }
+        },
+        "time": 6.0
       }
     ],
     "slots": [
@@ -56511,7 +56736,8 @@
           "computronicsubstrate": 8.0,
           "energycells": 60.0,
           "metallicmicrolattice": 27.0
-        }
+        },
+        "time": 11.0
       }
     ],
     "slots": [
@@ -56696,7 +56922,8 @@
           "computronicsubstrate": 7.0,
           "energycells": 51.0,
           "metallicmicrolattice": 23.0
-        }
+        },
+        "time": 9.0
       }
     ],
     "slots": [
@@ -56832,7 +57059,8 @@
         "cost": {
           "energycells": 435.0,
           "hullparts": 870.0
-        }
+        },
+        "time": 60.0
       },
       {
         "method": "terran",
@@ -56842,7 +57070,8 @@
           "energycells": 1785.0,
           "metallicmicrolattice": 155.0,
           "siliconcarbide": 15.0
-        }
+        },
+        "time": 60.0
       }
     ],
     "slots": [
@@ -57080,7 +57309,8 @@
           "computronicsubstrate": 500.0,
           "energycells": 2303.0,
           "metallicmicrolattice": 1049.0
-        }
+        },
+        "time": 417.0
       }
     ],
     "slots": [
@@ -57352,7 +57582,8 @@
           "computronicsubstrate": 575.0,
           "energycells": 2650.0,
           "metallicmicrolattice": 1207.0
-        }
+        },
+        "time": 479.0
       }
     ],
     "slots": [
@@ -57774,7 +58005,8 @@
           "computronicsubstrate": 621.0,
           "energycells": 2859.0,
           "metallicmicrolattice": 1303.0
-        }
+        },
+        "time": 517.0
       }
     ],
     "slots": [
@@ -58103,7 +58335,8 @@
           "energycells": 2503.0,
           "ore": 1640.0,
           "silicon": 1640.0
-        }
+        },
+        "time": 460.0
       }
     ],
     "slots": [
@@ -58510,7 +58743,8 @@
           "energycells": 120.0,
           "ore": 100.0,
           "silicon": 100.0
-        }
+        },
+        "time": 20.0
       }
     ],
     "slots": [
@@ -58711,7 +58945,8 @@
           "energycells": 110.0,
           "ore": 85.0,
           "silicon": 85.0
-        }
+        },
+        "time": 20.0
       }
     ],
     "slots": [
@@ -58972,7 +59207,8 @@
           "energycells": 85.0,
           "ore": 71.0,
           "silicon": 72.0
-        }
+        },
+        "time": 15.0
       }
     ],
     "slots": [
@@ -59163,7 +59399,8 @@
           "energycells": 60.0,
           "ore": 70.0,
           "silicon": 70.0
-        }
+        },
+        "time": 12.0
       }
     ],
     "slots": [
@@ -59398,7 +59635,8 @@
         "cost": {
           "energycells": 113.0,
           "hullparts": 933.0
-        }
+        },
+        "time": 20.0
       }
     ],
     "slots": [
@@ -59669,7 +59907,8 @@
         "cost": {
           "energycells": 73.0,
           "hullparts": 252.0
-        }
+        },
+        "time": 13.0
       }
     ],
     "slots": [

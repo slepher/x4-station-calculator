@@ -1,4 +1,5 @@
 import type { FlowNode, X4Module, X4Ware } from '@/types/x4'
+import { findModuleForWare } from './useGameData'
 
 export interface ExpandContext {
   waresMap: Record<string, X4Ware>
@@ -15,40 +16,16 @@ export interface GroupSnapshot {
   subCategory: string
 }
 
-export interface ExpandResult {
+interface ExpandResult {
   newNodes: FlowNode[]
   updatedNodes: Array<{ nodeId: string; updates: Partial<FlowNode> }>
 }
 
-export function findModuleForWare(
+export function isRawMaterialWare(
   wareId: string,
-  lineage: string,
   modulesByOutputMap: Record<string, X4Module[]>
-): X4Module | null {
-  const producers = (modulesByOutputMap[wareId] || []).filter(m => m.method !== 'recycling')
-  if (producers.length === 0) return null
-
-  let found = producers.find(m => m.race === lineage)
-  if (found) return found
-
-  found = producers.find(m => m.method === lineage)
-  if (found) return found
-
-  if (lineage === 'teladi') {
-    found = producers.find(m => m.race === 'default')
-    if (found) return found
-  }
-
-  found = producers.find(m => m.method === 'default')
-  if (found) return found
-
-  const agriRaces = ['argon', 'boron', 'paranid', 'split']
-  if (agriRaces.includes(lineage)) {
-    found = producers.find(m => m.race === 'default')
-    if (found) return found
-  }
-
-  return producers[0] || null
+): boolean {
+  return !((modulesByOutputMap[wareId]?.length ?? 0) > 0)
 }
 
 export function computeExpandUpstream(
@@ -66,8 +43,8 @@ export function computeExpandUpstream(
   const ware = ctx.waresMap[wareId]
   if (!ware) return result
 
-  const isT0 = ware.tier === 0 || wareId === 'energycells'
-  if (isT0) {
+  const isRawMaterial = isRawMaterialWare(wareId, ctx.modulesByOutputMap || {})
+  if (isRawMaterial) {
     const existingT0Node = group.nodes.find(n => n.wareId === wareId)
     if (!existingT0Node) {
       result.newNodes.push({

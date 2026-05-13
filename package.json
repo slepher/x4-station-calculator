@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite --base /",
     "wdev": "python3 scripts/worktree-server.py",
-    "build": "vue-tsc -b && vite build",
+    "build": "node scripts/check-production-compat.mjs && vue-tsc -b && vite build",
     "build-rust": "cd rust-parser && ./build.sh",
     "preview": "vite preview",
     "test:e2e": "npm exec playwright test",
@@ -39,8 +39,8 @@
     "yaml": "^2.8.2"
   },
   "optionalDependencies": {
-    "@esbuild/linux-x64": "^0.27.3",
-    "@esbuild/darwin-x64": "^0.27.3"
+    "@esbuild/darwin-x64": "^0.27.3",
+    "@esbuild/linux-x64": "^0.27.3"
   },
   "devDependencies": {
     "@pinia/testing": "^1.0.3",

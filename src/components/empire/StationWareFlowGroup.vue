@@ -1,22 +1,45 @@
 <script setup lang="ts">
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import StationWareFlow from './StationWareFlow.vue'
-import { useStationStore } from '@/store/useStationStore'
 
-defineProps<{
+const props = defineProps<{
   title: string
   items: any[]
   viewMode: 'quantity' | 'volume' | 'economy' | 'transport'
+  isWareLocked?: (wareId: string) => boolean
+  getResolvedLevel?: (wareId: string) => number
+  isWareOperable?: (wareId: string) => boolean
+  isPlannedWare?: (wareId: string) => boolean
+  transportMinutes?: number
+  resourceBufferHours?: number
+  primaryProductBufferHours?: number
+  secondaryProductBufferHours?: number
+  modulesMap?: Record<string, any>
+  onToggleWareLock?: (wareId: string) => void
+  onToggleWarePriority?: (wareId: string) => void
 }>()
 
-const store = useStationStore()
+function handleToggleLock(wareId: string) {
+  console.log('[StationWareFlowGroup] handleToggleLock', { wareId, hasCallback: !!props.onToggleWareLock })
+  if (props.onToggleWareLock) {
+    props.onToggleWareLock(wareId)
+  } else {
+    console.warn('[StationWareFlowGroup] onToggleWareLock callback missing!')
+  }
+}
+
+function handleTogglePriority(wareId: string) {
+  if (props.onToggleWarePriority) {
+    props.onToggleWarePriority(wareId)
+  }
+}
 </script>
 
 <template>
-  <div v-if="items.length > 0" class="group-container">
+  <div v-if="items.length > 0" class="group-container" data-testid="wareflow-group">
     <CollapsibleDetailList>
       <template #title>
-        <h4 class="group-title">{{ title }}</h4>
+        <h4 class="group-title" data-testid="wareflow-group-title">{{ title }}</h4>
       </template>
       <template #header>
         <slot></slot>
@@ -39,12 +62,18 @@ const store = useStationStore()
       :totalOccupiedCount="item.totalOccupiedCount"
       :totalOccupiedConsumptionCount="item.totalOccupiedConsumptionCount"
       :details="item.contributions"
-      :locked="store.isWareLocked(item.id)"
-      :priorityLevel="store.getResolvedLevel(item.id)"
+      :locked="isWareLocked?.(item.id) ?? false"
+      :priorityLevel="getResolvedLevel?.(item.id) ?? 0"
       :viewMode="viewMode"
-      :transportMinutes="store.settings.transportMinutes"
-      @update:locked="store.toggleWareLock(item.id)"
-      @update:priorityLevel="store.toggleWarePriority(item.id)"
+      :transportMinutes="transportMinutes ?? 30"
+      :nonOperable="!(isWareOperable?.(item.id) ?? true)"
+      :isPlanned="isPlannedWare?.(item.id) ?? false"
+      :resourceBufferHours="resourceBufferHours ?? 1"
+      :primaryProductBufferHours="primaryProductBufferHours ?? 12"
+      :secondaryProductBufferHours="secondaryProductBufferHours ?? 2"
+      :modulesMap="modulesMap"
+      @update:locked="handleToggleLock(item.id)"
+      @update:priorityLevel="handleTogglePriority(item.id)"
     />
   </div>
 </template>

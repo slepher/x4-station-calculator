@@ -25,6 +25,10 @@
         "hullparts": 3.0
       }
     },
+    "buildTime": {
+      "default": 60.0,
+      "closedloop": 60.0
+    },
     "purposePrimary": "fight",
     "droneTags": [],
     "noplayerblueprint": true,
@@ -65,6 +69,12 @@
         "energycells": 21.0,
         "hullparts": 5.0
       }
+    },
+    "buildTime": {
+      "default": 90.0,
+      "xenon": 10.0,
+      "terran": 90.0,
+      "closedloop": 90.0
     },
     "purposePrimary": "fight",
     "droneTags": [],
@@ -107,6 +117,12 @@
         "hullparts": 6.0
       }
     },
+    "buildTime": {
+      "default": 1800.0,
+      "xenon": 1800.0,
+      "terran": 1800.0,
+      "closedloop": 1800.0
+    },
     "purposePrimary": "fight",
     "droneTags": [],
     "noplayerblueprint": false,
@@ -145,6 +161,12 @@
         "energycells": 126.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 30.0,
+      "xenon": 30.0,
+      "terran": 30.0,
+      "closedloop": 30.0
     },
     "purposePrimary": "mine",
     "droneTags": [
@@ -192,6 +214,12 @@
         "energycells": 126.0,
         "hullparts": 4.0
       }
+    },
+    "buildTime": {
+      "default": 30.0,
+      "xenon": 30.0,
+      "terran": 30.0,
+      "closedloop": 30.0
     },
     "purposePrimary": "mine",
     "droneTags": [
@@ -241,6 +269,12 @@
         "hullparts": 3.0
       }
     },
+    "buildTime": {
+      "default": 60.0,
+      "xenon": 3.0,
+      "terran": 60.0,
+      "closedloop": 60.0
+    },
     "purposePrimary": "build",
     "droneTags": [
       "build"
@@ -282,6 +316,12 @@
         "energycells": 104.0,
         "hullparts": 3.0
       }
+    },
+    "buildTime": {
+      "default": 60.0,
+      "xenon": 6.0,
+      "terran": 60.0,
+      "closedloop": 60.0
     },
     "purposePrimary": "trade",
     "droneTags": [],
@@ -327,6 +367,12 @@
         "hullparts": 4.0
       }
     },
+    "buildTime": {
+      "default": 1800.0,
+      "xenon": 1800.0,
+      "terran": 1800.0,
+      "closedloop": 1800.0
+    },
     "purposePrimary": "fight",
     "droneTags": [],
     "noplayerblueprint": false,
@@ -367,6 +413,12 @@
         "hullparts": 3.0
       }
     },
+    "buildTime": {
+      "default": 60.0,
+      "xenon": 3.0,
+      "terran": 60.0,
+      "closedloop": 60.0
+    },
     "purposePrimary": "build",
     "droneTags": [],
     "noplayerblueprint": false,
@@ -394,6 +446,9 @@
         "smartchips": 10.0
       }
     },
+    "buildTime": {
+      "default": 60.0
+    },
     "purposePrimary": "fight",
     "droneTags": [],
     "noplayerblueprint": true,
@@ -420,6 +475,9 @@
         "energycells": 50.0,
         "smartchips": 10.0
       }
+    },
+    "buildTime": {
+      "default": 60.0
     },
     "purposePrimary": "trade",
     "droneTags": [],
@@ -453,6 +511,9 @@
         "smartchips": 10.0
       }
     },
+    "buildTime": {
+      "default": 60.0
+    },
     "purposePrimary": "fight",
     "droneTags": [],
     "noplayerblueprint": true,
@@ -479,6 +540,9 @@
         "energycells": 50.0,
         "smartchips": 10.0
       }
+    },
+    "buildTime": {
+      "default": 60.0
     },
     "purposePrimary": "fight",
     "droneTags": [],
@@ -507,6 +571,9 @@
         "smartchips": 10.0
       }
     },
+    "buildTime": {
+      "default": 60.0
+    },
     "purposePrimary": "fight",
     "droneTags": [],
     "noplayerblueprint": true,
@@ -533,6 +600,9 @@
         "metallicmicrolattice": 2.0,
         "siliconcarbide": 2.0
       }
+    },
+    "buildTime": {
+      "default": 60.0
     },
     "purposePrimary": "fight",
     "droneTags": [],

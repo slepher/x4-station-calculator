@@ -21,11 +21,11 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const defaultTabs = computed<TopSwitchItem[]>(() => [
-  { key: 'production', label: t('view.production'), activeClass: 'bg-blue-600 text-white shadow-lg' },
+  { key: 'blueprint-production', label: t('view.blueprint_production'), activeClass: 'bg-blue-600 text-white shadow-lg' },
+  { key: 'live-production', label: t('view.live_production'), activeClass: 'bg-cyan-600 text-white shadow-lg' },
   { key: 'maps', label: t('view.maps'), activeClass: 'bg-amber-500 text-slate-900 shadow-lg' },
   { key: 'flow', label: t('view.logical_flow'), activeClass: 'bg-purple-600 text-white shadow-lg' },
-  { key: 'ship-build', label: t('view.ship_build'), activeClass: 'bg-emerald-600 text-white shadow-lg' },
-  { key: 'save-import', label: t('view.save_import'), activeClass: 'bg-cyan-600 text-white shadow-lg' }
+  { key: 'ship-build', label: t('view.ship_build'), activeClass: 'bg-emerald-600 text-white shadow-lg' }
 ])
 
 const resolvedTabs = computed<TopSwitchItem[]>(() => {

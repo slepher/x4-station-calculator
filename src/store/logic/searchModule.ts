@@ -19,6 +19,73 @@ const GROUP_PRIORITY: Record<string, number> = {
   energy: 4
 }
 
+export const MODULE_TYPE_PRIORITY = TYPE_PRIORITY
+export const MODULE_GROUP_PRIORITY = GROUP_PRIORITY
+
+function getModuleTypePriority(
+  type?: string,
+  groupId?: string,
+  localizedModuleGroupsMap?: Record<string, LocalizedX4ModuleGroup>
+): number {
+  if (type) return TYPE_PRIORITY[type] || 99
+  const resolvedType = localizedModuleGroupsMap?.[groupId || '']?.type || groupId || 'others'
+  return TYPE_PRIORITY[resolvedType] || 99
+}
+
+function getModuleGroupPriority(groupId: string | undefined): number {
+  return GROUP_PRIORITY[groupId || ''] || 99
+}
+
+function getModulePickerLabel(module: {
+  localeName?: string
+  name?: string
+  id: string
+}): string {
+  return module.localeName || module.name || module.id
+}
+
+export function compareModuleGroupsByPickerOrder(
+  groupA: string,
+  groupB: string,
+  localizedModuleGroupsMap: Record<string, LocalizedX4ModuleGroup>
+): number {
+  const pTypeA = getModuleTypePriority(undefined, groupA, localizedModuleGroupsMap)
+  const pTypeB = getModuleTypePriority(undefined, groupB, localizedModuleGroupsMap)
+  if (pTypeA !== pTypeB) return pTypeA - pTypeB
+
+  const pGroupA = getModuleGroupPriority(groupA)
+  const pGroupB = getModuleGroupPriority(groupB)
+  if (pGroupA !== pGroupB) return pGroupA - pGroupB
+
+  return groupA.localeCompare(groupB)
+}
+
+export function compareModulesByPickerOrder(
+  a: { id: string; group?: string; tier?: number; localeName?: string; name?: string; type?: string },
+  b: { id: string; group?: string; tier?: number; localeName?: string; name?: string; type?: string },
+  localizedModuleGroupsMap?: Record<string, LocalizedX4ModuleGroup>
+): number {
+  const typePriorityA = getModuleTypePriority(a.type, a.group, localizedModuleGroupsMap)
+  const typePriorityB = getModuleTypePriority(b.type, b.group, localizedModuleGroupsMap)
+  if (typePriorityA !== typePriorityB) return typePriorityA - typePriorityB
+
+  const groupPriorityA = getModuleGroupPriority(a.group)
+  const groupPriorityB = getModuleGroupPriority(b.group)
+  if (groupPriorityA !== groupPriorityB) return groupPriorityA - groupPriorityB
+
+  const tierDiff = (b.tier || 0) - (a.tier || 0)
+  if (tierDiff !== 0) return tierDiff
+
+  return getModulePickerLabel(a).localeCompare(getModulePickerLabel(b))
+}
+
+export function sortModulesBySearchPriority(
+  modules: { id: string; group?: string; tier?: number; localeName?: string; name?: string; type?: string }[],
+  localizedModuleGroupsMap?: Record<string, LocalizedX4ModuleGroup>
+): void {
+  modules.sort((a, b) => compareModulesByPickerOrder(a, b, localizedModuleGroupsMap))
+}
+
 /**
  * 生成分组的模块搜索结果
  * @param query 搜索查询字符串
@@ -120,35 +187,11 @@ export function generateFilteredModulesGrouped(
   })
 
   return Object.keys(groups)
-    .sort((a, b) => {
-      const typeA = localizedModuleGroupsMap[a]?.type || a
-      const typeB = localizedModuleGroupsMap[b]?.type || b
-
-      // 1. 第一级排序：按 Type 优先级
-      const pTypeA = TYPE_PRIORITY[typeA] || 99
-      const pTypeB = TYPE_PRIORITY[typeB] || 99
-      if (pTypeA !== pTypeB) return pTypeA - pTypeB
-
-      // 2. 第二级排序：按特定的 Group ID 优先级
-      const pGroupA = GROUP_PRIORITY[a] || 99
-      const pGroupB = GROUP_PRIORITY[b] || 99
-      if (pGroupA !== pGroupB) return pGroupA - pGroupB
-
-      // 3. 第三级排序：默认字母序
-      return a.localeCompare(b)
-    })
+    .sort((a, b) => compareModuleGroupsByPickerOrder(a, b, localizedModuleGroupsMap))
     .map(group => ({
       group,
       displayLabel: typeMetadata[group]?.displayLabel || group,
       modules: (groups[group] || [])
-        // 按Tier排序，高级产品在前，同Tier内按名称字母顺序排序
-        .sort((a, b) => {
-          // 首先按Tier降序排序（高Tier在前）
-          const tierDiff = (b.tier || 0) - (a.tier || 0);
-          if (tierDiff !== 0) return tierDiff;
-          
-          // 同Tier内按名称字母顺序排序
-          return (a.displayLabel || '').localeCompare(b.displayLabel || '');
-        })
+        .sort((a, b) => compareModulesByPickerOrder(a, b, localizedModuleGroupsMap))
     }))
 }

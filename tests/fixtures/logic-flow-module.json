@@ -1,0 +1,238 @@
+{
+  "version": 3,
+  "activeId": "245bf4e4-ce82-40a4-adbc-f4a5fdc4e5ca",
+  "list": [
+    {
+      "id": "245bf4e4-ce82-40a4-adbc-f4a5fdc4e5ca",
+      "name": "模块化组网",
+      "groups": [
+        {
+          "id": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+          "name": "电子黏土",
+          "category": "industrial",
+          "subCategory": "default",
+          "isLocked": true,
+          "lockedLineage": "default",
+          "nodes": [
+            {
+              "module": "module_gen_prod_claytronics_01"
+            },
+            {
+              "isolated": "quantumtubes"
+            }
+          ]
+        },
+        {
+          "id": "a6091308-697d-4886-b50c-73e854fc19c2",
+          "name": "烷矿",
+          "category": "industrial",
+          "subCategory": "default",
+          "isLocked": true,
+          "lockedLineage": "default",
+          "nodes": [
+            {
+              "module": "module_gen_prod_advancedcomposites_01"
+            },
+            {
+              "module": "module_gen_prod_hullparts_01"
+            }
+          ]
+        },
+        {
+          "id": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+          "name": "烷氦",
+          "category": "industrial",
+          "subCategory": "default",
+          "isLocked": true,
+          "lockedLineage": "default",
+          "nodes": [
+            {
+              "module": "module_gen_prod_plasmaconductors_01"
+            },
+            {
+              "module": "module_gen_prod_quantumtubes_01"
+            }
+          ]
+        },
+        {
+          "id": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+          "name": "地球人",
+          "category": "industrial",
+          "subCategory": "terran",
+          "isLocked": true,
+          "lockedLineage": "terran",
+          "nodes": [
+            {
+              "module": "module_ter_prod_siliconcarbide_01"
+            },
+            {
+              "module": "module_ter_prod_computronicsubstrate_01"
+            },
+            {
+              "module": "module_ter_prod_metallicmicrolattice_01"
+            }
+          ]
+        },
+        {
+          "id": "72455d4a-e6d3-4329-a934-fb7268d1261a",
+          "name": "导弹部件",
+          "category": "industrial",
+          "subCategory": "default",
+          "isLocked": true,
+          "lockedLineage": "default",
+          "nodes": [
+            {
+              "module": "module_gen_prod_missilecomponents_01"
+            },
+            {
+              "isolated": "advancedcomposites"
+            },
+            {
+              "isolated": "hullparts"
+            }
+          ]
+        }
+      ],
+      "settings": {
+        "isDefaultLocked": true
+      },
+      "buildFlow": {
+        "assignments": [
+          {
+            "wareId": "siliconcarbide",
+            "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+            "targetType": "line-build-material",
+            "targetGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e"
+          },
+          {
+            "wareId": "siliconcarbide",
+            "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+            "targetType": "output-material"
+          },
+          {
+            "wareId": "claytronics",
+            "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+            "targetType": "line-build-material",
+            "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+          },
+          {
+            "wareId": "advancedcomposites",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "line-build-material",
+            "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+          },
+          {
+            "wareId": "advancedcomposites",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "line-build-material",
+            "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+          },
+          {
+            "wareId": "hullparts",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "line-build-material",
+            "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+          },
+          {
+            "wareId": "hullparts",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "line-build-material",
+            "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+          },
+          {
+            "wareId": "hullparts",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "line-build-material",
+            "targetGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4"
+          },
+          {
+            "wareId": "plasmaconductors",
+            "sourceGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+            "targetType": "line-build-material",
+            "targetGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44"
+          },
+          {
+            "wareId": "plasmaconductors",
+            "sourceGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+            "targetType": "line-build-material",
+            "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+          },
+          {
+            "wareId": "claytronics",
+            "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+            "targetType": "line-build-material",
+            "targetGroupId": "a6091308-697d-4886-b50c-73e854fc19c2"
+          },
+          {
+            "wareId": "claytronics",
+            "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+            "targetType": "line-build-material",
+            "targetGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4"
+          },
+          {
+            "wareId": "claytronics",
+            "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+            "targetType": "output-build-material"
+          },
+          {
+            "wareId": "claytronics",
+            "sourceGroupId": "52171cf6-3d20-4a53-916d-8e3837db0b44",
+            "targetType": "output-material"
+          },
+          {
+            "wareId": "advancedcomposites",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "output-build-material"
+          },
+          {
+            "wareId": "hullparts",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "output-build-material"
+          },
+          {
+            "wareId": "advancedcomposites",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "output-material"
+          },
+          {
+            "wareId": "hullparts",
+            "sourceGroupId": "a6091308-697d-4886-b50c-73e854fc19c2",
+            "targetType": "output-material"
+          },
+          {
+            "wareId": "plasmaconductors",
+            "sourceGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+            "targetType": "output-build-material"
+          },
+          {
+            "wareId": "computronicsubstrate",
+            "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+            "targetType": "line-build-material",
+            "targetGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e"
+          },
+          {
+            "wareId": "computronicsubstrate",
+            "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+            "targetType": "output-build-material"
+          },
+          {
+            "wareId": "computronicsubstrate",
+            "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+            "targetType": "output-material"
+          },
+          {
+            "wareId": "siliconcarbide",
+            "sourceGroupId": "c039ed16-9c52-4cb0-9619-66a5c5b3f70e",
+            "targetType": "output-build-material"
+          },
+          {
+            "wareId": "plasmaconductors",
+            "sourceGroupId": "ef301aa7-de87-4cac-8026-786deb13d5e4",
+            "targetType": "output-material"
+          }
+        ]
+      },
+      "lastUpdated": 1777870298145
+    }
+  ]
+}

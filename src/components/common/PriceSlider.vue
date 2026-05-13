@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const props = defineProps<{
@@ -11,14 +11,26 @@ const props = defineProps<{
 const emit = defineEmits(['update:modelValue'])
 const { t } = useI18n()
 
+const draftValue = ref(props.modelValue)
+
+watch(() => props.modelValue, (value) => {
+  draftValue.value = value
+})
+
 const priceText = computed(() => {
-  return Math.abs(props.modelValue - 0.5) < 0.001
+  return Math.abs(draftValue.value - 0.5) < 0.001
     ? t('common.average')
-    : `${Math.round(props.modelValue * 100)}%`
+    : `${Math.round(draftValue.value * 100)}%`
 })
 
 const updateValue = (e: Event) => {
-  emit('update:modelValue', parseFloat((e.target as HTMLInputElement).value))
+  draftValue.value = parseFloat((e.target as HTMLInputElement).value)
+}
+
+const commitValue = (e: Event) => {
+  const nextValue = parseFloat((e.target as HTMLInputElement).value)
+  draftValue.value = nextValue
+  emit('update:modelValue', nextValue)
 }
 </script>
 
@@ -31,23 +43,20 @@ const updateValue = (e: Event) => {
           {{ priceText }}
         </span>
       </div>
-      <input type="range" :value="modelValue" @input="updateValue" min="0" max="1" step="0.05"
+      <input type="range" :value="draftValue" @input="updateValue" @change="commitValue" min="0" max="1" step="0.05"
         :class="['custom-range', type === 'buy' ? 'range-buy' : 'range-sell']">
     </div>
   </div>
 </template>
 
 <style scoped>
-/* 占满 flex 容器分配的 1/2 空间 */
 .slider-container {
   @apply flex-1;
 }
 
-/* 核心：确保文字和滑块在一行内，并限制最大宽度防止过长 */
 .slider-wrapper {
   @apply space-y-1.5;
   max-width: 240px;
-  /* 固定一个合适的宽度值，确保在不同页面视觉一致 */
 }
 
 .slider-header {
@@ -62,11 +71,35 @@ const updateValue = (e: Event) => {
   @apply w-full h-1 bg-slate-700 rounded-lg appearance-none cursor-pointer focus:outline-none;
 }
 
+.custom-range::-webkit-slider-thumb {
+  @apply appearance-none w-4 h-4 rounded-full cursor-pointer;
+}
+
+.custom-range::-moz-range-thumb {
+  @apply w-4 h-4 rounded-full border-0 cursor-pointer;
+}
+
 .range-buy {
   @apply accent-sky-500;
 }
 
+.range-buy::-webkit-slider-thumb {
+  @apply bg-sky-500;
+}
+
+.range-buy::-moz-range-thumb {
+  @apply bg-sky-500;
+}
+
 .range-sell {
   @apply accent-emerald-500;
+}
+
+.range-sell::-webkit-slider-thumb {
+  @apply bg-emerald-500;
+}
+
+.range-sell::-moz-range-thumb {
+  @apply bg-emerald-500;
 }
 </style>

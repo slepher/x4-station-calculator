@@ -1,55 +1,67 @@
 <script setup lang="ts">
 import { computed } from 'vue'
-import { useStationStore } from '@/store/useStationStore'
+import { useGameDataStore } from '@/store/useGameDataStore'
+import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
 import LockButton from '../common/LockButton.vue'
 import FavoriteButton from '../common/FavoriteButton.vue'
 import VolumeTooltip from '../common/VolumeTooltip.vue'
+import type { DerivedFlowContribution } from '@/types/production-flow'
+
+const { t } = useI18n()
 
 const props = defineProps<{
   resourceId: string
   netRate: number
   name: string
-  details?: any[]
-  locked?: boolean // 新增 locked 属性
-  priorityLevel?: number // 新增：产物优先级级别 (0, 1, 2)
-  // 新增体积和经济数据
+  details?: DerivedFlowContribution[]
+  locked?: boolean
+  priorityLevel?: number
   netVolume: number
   transportDemand?: number
   netValue: number
   transportType: string
   unitVolume: number
-  // 新增仓储规划数据
   totalOccupiedVolume: number
   totalOccupiedCount: number
   totalOccupiedConsumptionCount: number
-  // 新增视图模式属性
   viewMode: 'quantity' | 'volume' | 'economy' | 'transport'
   transportMinutes?: number
+  nonOperable?: boolean
+  isPlanned?: boolean
+  resourceBufferHours?: number
+  primaryProductBufferHours?: number
+  secondaryProductBufferHours?: number
+  modulesMap?: Record<string, any>
 }>()
 
 const emit = defineEmits<{
   (e: 'update:locked', value: boolean): void
-  (e: 'update:priorityLevel', value: number): void // 新增：优先级变更事件
+  (e: 'update:priorityLevel', value: number): void
 }>()
 
-const store = useStationStore()
-
-const translateModule = (moduleId: string) => {
-    const store = useStationStore()
-    const module = store.modules[moduleId]
-    return module ? module.localeName : moduleId;
+function handleToggleLock(value: boolean) {
+  emit('update:locked', value)
 }
 
-// 计算是否可操作
-const nonOperable = computed(() => !store.isWareOperable(props.resourceId))
+function handleTogglePriority(value: number) {
+  emit('update:priorityLevel', value)
+}
+
+const gameData = useGameDataStore()
+
+const translateModule = (moduleId: string) => {
+  const module = props.modulesMap?.[moduleId] || gameData.localizedModulesMap[moduleId]
+  return module ? module.localeName : moduleId
+}
+
+const nonOperableComputed = computed(() => props.nonOperable ?? false)
 
 const formatNum = (n: number, digits: number = 1) => new Intl.NumberFormat('en-US', {
   maximumFractionDigits: digits,
   minimumFractionDigits: digits
 }).format(n)
 
-// 根据视图模式显示不同的主值
 const displayValue = computed(() => {
   if (props.viewMode === 'economy' && props.netValue !== undefined) {
     return props.netValue
@@ -65,10 +77,7 @@ const displayValue = computed(() => {
   return props.netRate
 })
 
-// 根据视图模式显示不同的符号
-const displaySign = computed(() => {
-    return displayValue.value >= 0 ? '+' : ''
-})
+const displaySign = computed(() => displayValue.value >= 0 ? '+' : '')
 
 const formattedDisplayValue = computed(() => {
   if (props.viewMode === 'economy') {
@@ -83,7 +92,6 @@ const formattedDisplayValue = computed(() => {
   return displaySign.value + formatNum(displayValue.value)
 })
 
-// 明细排序与处理
 const processedDetails = computed(() => {
   if (!props.details) return []
   return [...props.details].sort((a, b) => {
@@ -94,102 +102,70 @@ const processedDetails = computed(() => {
   })
 })
 
-// 根据视图模式格式化明细数据
 const formattedDetails = computed(() => {
   if (!props.details) return []
   
-  // 如果是经济视图，需要将明细数据转换为经济数据
   if (props.viewMode === 'economy') {
-    return processedDetails.value.map(detail => {
-      // 使用analyzeWareFlow函数计算的实际valueFlow数据
-      const economicValue = detail.valueFlow !== undefined ? detail.valueFlow : detail.amount * 100
-      return {
-        ...detail,
-        economicAmount: economicValue,
-        displayAmount: economicValue
-      }
-    })
+    return processedDetails.value.map(detail => ({
+      ...detail,
+      economicAmount: detail.valueContribution,
+      displayAmount: detail.valueContribution
+    }))
   }
   
-  // 如果是体积视图，需要将明细数据转换为体积数据
   if (props.viewMode === 'volume') {
-    return processedDetails.value.map(detail => {
-      // 使用analyzeWareFlow函数计算的实际volumeFlow数据
-      const volumeValue = detail.volumeFlow !== undefined ? detail.volumeFlow : detail.amount * (props.unitVolume || 0)
-      return {
-        ...detail,
-        volumeAmount: volumeValue,
-        displayAmount: volumeValue
-      }
-    })
+    return processedDetails.value.map(detail => ({
+      ...detail,
+      volumeAmount: detail.volumeContribution,
+      displayAmount: detail.volumeContribution
+    }))
   }
 
   if (props.viewMode === 'transport') {
-    const minutes = props.transportMinutes ?? 30
-    return processedDetails.value.map(detail => {
-      const transportValue = detail.transportFlow !== undefined
-        ? detail.transportFlow
-        : Math.abs(detail.amount || 0) * (props.unitVolume || 0) * (minutes / 60)
-      return {
-        ...detail,
-        displayAmount: transportValue
-      }
-    })
+    return processedDetails.value.map(detail => ({
+      ...detail,
+      displayAmount: detail.transportContribution
+    }))
   }
   
-  // 默认视图模式，显示原始产量数据
-  return processedDetails.value.map(detail => ({
-    ...detail,
-    displayAmount: detail.amount
-  }))
+  return processedDetails.value.map(detail => ({ ...detail, displayAmount: detail.amount }))
 })
 
 const hasProduction = computed(() => props.details?.some(d => d.amount > 0) ?? false)
-const hasConsumption = computed(() => props.details?.some(d => d.amount < 0) ?? false)
+const hasConsumption = computed(() => props.details?.some(d => d.type === 'consumption') ?? false)
 
-// 计算是否为用户规划的产物 (Planned Ware)
-const isPlanned = computed(() => {
-  return store.plannedModules.some(m => {
-    const info = store.modules[m.id]
-    return info && info.outputs && Object.keys(info.outputs).includes(props.resourceId)
-  })
-})
+const isPlannedComputed = computed(() => props.isPlanned ?? false)
 
-// 计算可用优先级 (Available Levels)
 const availableLevels = computed(() => {
-  if (isPlanned.value) {
-    // 用户规划产物: 必须保留，不能设为无需求 (0)
+  if (isPlannedComputed.value) {
     return [1, 2]
   } else if (hasProduction.value) {
-    // 自动/副产物: 不能设为主产物 (2)，防止死循环
     return [0, 1]
   } else {
-    // 纯消耗: 只能是无需求 (0)
     return [0]
   }
 })
 
-// FavoriteButton 的禁用状态仅取决于是否有多个选项
 const favoriteDisabled = computed(() => availableLevels.value.length <= 1)
 
 const classWithSymbol = (displayValue: number, className:string) => [className, className + '-' + (displayValue >= 0 ? 'pos' : 'neg')]
 </script>
 
 <template>
-  <div class="flow-wrapper" :data-resource-id="resourceId">
+  <div class="flow-wrapper" data-testid="flow-wrapper" :data-resource-id="resourceId">
     <div class="flow-content">
       <CollapsibleDetailList
         :data="formattedDetails"
         :isPositive="displayValue >= 0"
       >
         <template #title>
-          <span class="header-name">{{ name }}</span>
+          <span class="header-name" data-testid="flow-name">{{ name }}</span>
         </template>
         <template #header>
-          <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'">
+          <div :class="classWithSymbol(displayValue, 'value')" v-if="viewMode === 'economy' || viewMode === 'quantity'" data-testid="flow-value">
             {{ formattedDisplayValue }}
           </div>
-          <div v-if="viewMode === 'transport'" class="value value-transport">
+          <div v-if="viewMode === 'transport'" class="value value-transport" data-testid="flow-value">
             {{ formattedDisplayValue }}
             <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
               <rect x="1" y="3" width="15" height="13"></rect>
@@ -200,7 +176,7 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           </div>
           <tippy v-if="viewMode === 'volume'" theme="x4" :allowHTML="true" interactive>
             <div class="volume-trigger-container">
-              <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none">
+              <span class="volume-count-main text-blue-400 font-mono font-bold text-sm leading-none" data-testid="volume-count">
                 {{ Math.ceil(totalOccupiedCount) }}
               </span>
               <div class="icon-anchor">
@@ -226,12 +202,24 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
           <span class="item-name">
             <span class="qty">{{ item.count }}</span>
             <span class="symbol">x</span>
-            <span class="name">{{ translateModule(item.moduleId) }}</span>
+            <span class="name">
+              <template v-if="item.class === 'workforce'">
+                {{ t(`race.${item.id}`) }} {{ t('station.workforce_label') }}
+              </template>
+              <template v-else-if="item.class === 'workforce_idle'">
+                {{ t(`race.${item.id}`) }} {{ t('station.workforce_idle_label') }}
+              </template>
+              <template v-else>
+                {{ translateModule(item.id) }}
+              </template>
+            </span>
           </span>
           <div class="item-val-group">
             <span v-if="item.bonusPercent > 0" class="item-bonus">(+{{ item.bonusPercent }}%)</span>
             <span class="item-val" :class="{ 'item-val-transport': viewMode === 'transport' }">
-              {{ viewMode === 'transport' ? '' : (item.displayAmount > 0 ? '+' : '') }}{{ formatNum(item.displayAmount) }}
+              <template v-if="viewMode === 'economy'">{{ (item.displayAmount > 0 ? '+' : '') }}{{ formatNum(item.displayAmount) }} Cr</template>
+              <template v-else-if="viewMode === 'transport' || viewMode === 'volume'">{{ formatNum(item.displayAmount) }}</template>
+              <template v-else>{{ (item.displayAmount > 0 ? '+' : '') }}{{ formatNum(item.displayAmount) }}</template>
             </span>
           </div>
         </template>
@@ -243,16 +231,16 @@ const classWithSymbol = (displayValue: number, className:string) => [className, 
         :disabled="favoriteDisabled"
         :has-consumption="hasConsumption"
         :has-production="hasProduction"
-        :resource-buffer-hours="store.settings.resourceBufferHours"
-        :primary-product-buffer-hours="store.settings.primaryProductBufferHours"
-        :secondary-product-buffer-hours="store.settings.secondaryProductBufferHours"
+        :resource-buffer-hours="resourceBufferHours ?? 1"
+        :primary-product-buffer-hours="primaryProductBufferHours ?? 12"
+        :secondary-product-buffer-hours="secondaryProductBufferHours ?? 2"
         :available-levels="availableLevels"
-        @update:level="emit('update:priorityLevel', $event)"
+        @update:level="handleTogglePriority($event)"
       />
       <LockButton
         :locked="locked"
-        :disabled="nonOperable"
-        @update:locked="emit('update:locked', $event)"
+        :disabled="nonOperableComputed"
+        @update:locked="handleToggleLock($event)"
       />
     </div>
   </div>

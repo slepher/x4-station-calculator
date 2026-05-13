@@ -120,7 +120,6 @@ function migrateLegacyV1ToV2(raw: V1StorageState): SavedEmpiresState {
   return {
     version: 2,
     activeId: list[0]?.id || null,
-    activeStationId: list[0]?.stations[0]?.id || null,
     list
   }
 }
@@ -164,16 +163,9 @@ function normalizeEmpireStateShape(raw: SavedEmpiresState, warnings?: string[]):
     activeId = list[0]?.id || null
   }
 
-  let activeStationId = raw.activeStationId || null
-  if (activeStationId && !list.some((empire) => (empire.stations || []).some((station) => station.id === activeStationId))) {
-    const activeEmpire = list.find((empire) => empire.id === activeId) || list[0]
-    activeStationId = activeEmpire?.stations?.[0]?.id || null
-  }
-
   return {
     version: raw.version,
     activeId,
-    activeStationId,
     list
   }
 }
@@ -194,7 +186,6 @@ export function migrateEmpireStateToCurrent(
       working = {
         version: 2,
         activeId: (input as SavedEmpiresState).activeId || null,
-        activeStationId: (input as SavedEmpiresState).activeStationId || null,
         list: deepClone((input as SavedEmpiresState).list || [])
       }
     }
@@ -203,7 +194,6 @@ export function migrateEmpireStateToCurrent(
     working = {
       version: typeof inState.version === 'number' ? inState.version : 2,
       activeId: inState.activeId || null,
-      activeStationId: inState.activeStationId || null,
       list: deepClone(inState.list || [])
     }
   }
@@ -213,6 +203,17 @@ export function migrateEmpireStateToCurrent(
   }
 
   working = normalizeEmpireStateShape(working, warnings)
+
+  if (working.version === 4) {
+    working.list.forEach(empire => {
+      delete (empire as any).sectors
+      delete (empire as any).sectorLinks
+      empire.stations.forEach(station => {
+        delete (station as any).sectorId
+        delete (station as any).location
+      })
+    })
+  }
 
   const needModuleNormalization = working.version <= 2 || working.version > CURRENT_EMPIRE_VERSION
   if (needModuleNormalization) {
@@ -291,6 +292,7 @@ function normalizeFlowShape(input: SavedFlowPlansState, warnings: string[]): Sav
     settings: {
       isDefaultLocked: Boolean(plan.settings?.isDefaultLocked ?? true)
     },
+    buildFlow: plan.buildFlow ? { assignments: plan.buildFlow.assignments || [] } : undefined,
     lastUpdated: Number(plan.lastUpdated) || Date.now()
   }))
 
@@ -362,6 +364,7 @@ function normalizeShipBlueprintShape(input: SavedShipBlueprintsState & { list?: 
       connections: Array.isArray(blueprint.connections) ? deepClone(blueprint.connections) : [],
       storage,
       hull,
+      materialMethod: typeof blueprint.materialMethod === 'string' ? blueprint.materialMethod : 'default',
       lastUpdated: Number(blueprint.lastUpdated) || Date.now() + index
     }
   }).filter((blueprint) => {

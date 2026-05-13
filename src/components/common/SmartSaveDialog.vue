@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, nextTick } from 'vue'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { buildSmartSavePlan, type SmartSaveStep } from '@/utils/smartSavePolicy'
 import { useI18n } from 'vue-i18n'
@@ -11,7 +11,7 @@ const props = defineProps<{
   isOpen: boolean
   intent: 'NEW' | 'SAVE_AS'
   initialName?: string
-  storeType?: 'station' | 'logicFlow' | 'ship-build'
+  storeType?: 'blueprint-production' | 'live-production' | 'logicFlow' | 'ship-build'
   mode?: 'default' | 'import'
 }>()
 
@@ -22,7 +22,7 @@ const emit = defineEmits<{
   (e: 'invalid', payload: { reason: 'EMPTY_NAME' }): void
 }>()
 const logicFlowStore = useLogicFlowStore()
-const empireStore = useEmpireStore()
+const blueprintStore = useBlueprintProductionStore()
 const shipBuildStore = useShipBuildStore()
 const { t } = useI18n()
 
@@ -44,8 +44,12 @@ watch(() => props.isOpen, (val) => {
     } else if (props.intent === 'SAVE_AS') {
       const baseName = props.storeType === 'logicFlow' 
         ? (logicFlowStore.savedPlans.activeId ? logicFlowStore.savedPlans.list.find((l: LogicFlowPlan) => l.id === logicFlowStore.savedPlans.activeId)?.name : '')
-        : empireStore.activeEmpire?.name
-      inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t(defaultNameKey.value)
+        : blueprintStore.activeEmpire?.name
+      if (isNewPlan.value) {
+        inputName.value = baseName || t(defaultNameKey.value)
+      } else {
+        inputName.value = baseName ? `${baseName} ${t('menu.copy_suffix')}` : t(defaultNameKey.value)
+      }
     } else {
       inputName.value = t(defaultNameKey.value)
     }
@@ -63,7 +67,10 @@ const isNewPlan = computed(() => {
   if (props.storeType === 'logicFlow') {
     return !logicFlowStore.savedPlans.activeId
   }
-  return !empireStore.activeEmpire
+  if (props.storeType === 'live-production') {
+    return false
+  }
+  return !blueprintStore.savedEmpires.activeId
 })
 
 const currentPlanName = computed(() => {
@@ -76,7 +83,7 @@ const currentPlanName = computed(() => {
     }
     return ''
   }
-  return empireStore.activeEmpire?.name || t(defaultNameKey.value)
+  return blueprintStore.activeEmpire?.name || t(defaultNameKey.value)
 })
 
 const dialogTitle = computed(() => {
@@ -148,7 +155,7 @@ const handleDiscard = () => {
 </script>
 
 <template>
-  <div v-if="isOpen"
+  <div v-if="isOpen" data-testid="dialog-backdrop"
     class="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 backdrop-blur-sm p-4 animate-fade-in">
     <div
       class="w-full max-w-md bg-slate-800 border border-slate-600 rounded-lg shadow-2xl flex flex-col overflow-hidden transition-all duration-300">

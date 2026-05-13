@@ -108,10 +108,10 @@ const filteredGroups = computed<SectorPoiGroup[]>(() => {
     }
 
     if (searchState.value.productModuleTags.length > 0 || searchState.value.factionTags.length > 0) {
-      const modulesByMacroId = gameData.modulesByMacroId
+      const modulesMap = gameData.modulesMap
       groups = groups.map((group) => {
         const filteredItems = (group.rawItems || []).filter((item) =>
-          filterStationBySearchState(item, searchState.value, modulesByMacroId)
+          filterStationBySearchState(item, searchState.value, modulesMap)
         )
         return {
           ...group,
@@ -202,6 +202,7 @@ function getPoiLabel(poi: SavePoiOverlayItem): string {
       <input
         v-model="searchQuery"
         class="search-input"
+        name="coord-search"
         :placeholder="t('map.save_coord_search_placeholder')"
         type="text"
       />

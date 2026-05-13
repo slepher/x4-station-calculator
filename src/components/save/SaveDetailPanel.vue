@@ -8,7 +8,8 @@ import type {
   NpcStationEntry,
   FactionStationEntry,
   DatavaultEntry,
-  AbandonedShipEntry
+  AbandonedShipEntry,
+  CodeMap
 } from '@/types/saveArchive'
 
 const props = defineProps<{
@@ -30,6 +31,10 @@ const tabs = computed(() => [
 
 function formatCoord(value: number): string {
   return (value / 1000).toFixed(1) + 'km'
+}
+
+function recordValues<T>(record: CodeMap<T> | undefined): T[] {
+  return record ? Object.values(record) : []
 }
 
 type DetailTabKey =
@@ -61,13 +66,13 @@ function buildSectorGroups<T>(extractor: (sector: NonNullable<SaveArchive['secto
 }
 
 const tabData = computed<Record<DetailTabKey, DetailSectorGroup<unknown>[]>>(() => ({
-  'player-stations': buildSectorGroups((sector) => sector.playerStations || []),
-  'xenon-stations': buildSectorGroups((sector) => sector.xenonStations || []),
-  'khaak-stations': buildSectorGroups((sector) => sector.khaakStations || []),
-  'npc-stations': buildSectorGroups((sector) => sector.npcStations || []),
-  'abandoned-ships': buildSectorGroups((sector) => sector.abandonedShips || []),
-  'datavaults': buildSectorGroups((sector) => sector.datavaults || []),
-  'erlking-vaults': buildSectorGroups((sector) => sector.erlkingVaults || [])
+  'player-stations': buildSectorGroups((sector) => recordValues(sector.player_stations)),
+  'xenon-stations': buildSectorGroups((sector) => recordValues(sector.xenon_stations)),
+  'khaak-stations': buildSectorGroups((sector) => recordValues(sector.khaak_stations)),
+  'npc-stations': buildSectorGroups((sector) => recordValues(sector.npc_stations)),
+  'abandoned-ships': buildSectorGroups((sector) => recordValues(sector.abandoned_ships)),
+  'datavaults': buildSectorGroups((sector) => recordValues(sector.datavaults)),
+  'erlking-vaults': buildSectorGroups((sector) => recordValues(sector.erlking_vaults))
 }))
 
 const currentTabData = computed(() => tabData.value[activeTab.value as DetailTabKey] || [])
@@ -79,8 +84,9 @@ function formatWares(wares: DatavaultEntry['wares'] | undefined): string {
 }
 
 function formatNpcModules(modules: NpcStationEntry['modules'] | undefined): string {
-  if (!modules || modules.length === 0) return ''
-  return modules.map((entry) => `${entry.ref} x${entry.amount}`).join(', ')
+  const values = modules ? Object.values(modules) : []
+  if (values.length === 0) return ''
+  return values.map((entry) => `${entry.ref} x${entry.amount}`).join(', ')
 }
 
 function formatStationFlags(item: NpcStationEntry | FactionStationEntry): string {

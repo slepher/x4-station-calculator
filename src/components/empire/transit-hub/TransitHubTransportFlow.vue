@@ -2,21 +2,13 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
-
-interface TransportDetail {
-  stationId: string
-  stationName: string
-  stationCount: number
-  kind: 'production' | 'consumption'
-  transportVolume: number
-  sortOrder?: number
-}
+import type { DerivedFlowContribution } from '@/types/production-flow'
 
 const props = defineProps<{
   resourceId: string
   name: string
   totalTransportVolume: number
-  details: TransportDetail[]
+  details: DerivedFlowContribution[]
 }>()
 const { t } = useI18n()
 
@@ -39,20 +31,20 @@ const formattedDetails = computed(() => {
         if (hasOrderA && !hasOrderB) return -1
         if (!hasOrderA && hasOrderB) return 1
       }
-      return b.transportVolume - a.transportVolume
+      return (b.transportContribution || 0) - (a.transportContribution || 0)
     })
     .map((detail) => {
-      const isExternal = String(detail.stationId || '').startsWith('external:')
+      const isExternal = detail.class === 'sector'
       const kindLabel = isExternal
-        ? (detail.kind === 'consumption'
+        ? (detail.type === 'production'
             ? t('sectorManagement.supply_storage_input')
             : t('sectorManagement.supply_storage_output'))
-        : (detail.kind === 'production'
+        : (detail.type === 'production'
             ? t('sectorManagement.supply_storage_production')
             : t('sectorManagement.supply_storage_consumption'))
       const kindClass = isExternal
-        ? (detail.kind === 'consumption' ? 'kind-pos' : 'kind-neg')
-        : (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
+        ? (detail.type === 'production' ? 'kind-pos' : 'kind-neg')
+        : (detail.type === 'production' ? 'kind-pos' : 'kind-neg')
       return {
         ...detail,
         kindLabel,
@@ -85,13 +77,13 @@ const formattedDetails = computed(() => {
 
       <template #row="{ item }">
         <span class="item-name">
-          <span class="qty">{{ item.stationCount }}</span>
+          <span class="qty">{{ item.count }}</span>
           <span class="symbol">x</span>
-          <span class="name">{{ item.stationName }}</span>
+          <span class="name">{{ item.name }}</span>
           <span :class="item.kindClass">{{ item.kindLabel }}</span>
         </span>
         <div class="item-val-group">
-          <span class="item-val">{{ formatNum(item.transportVolume, 1) }}m³</span>
+          <span class="item-val">{{ formatNum(item.transportContribution, 1) }}m³</span>
         </div>
       </template>
     </CollapsibleDetailList>

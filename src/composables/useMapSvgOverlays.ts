@@ -59,6 +59,7 @@ export function useMapSvgOverlays(args: {
   } | null>(null)
   const sectorViewportSettleTimer = ref<number | null>(null)
   const lastLoggedSavePoiDebugKey = ref<string | null>(null)
+  const loggedSavePoiDataErrors = new Set<string>()
 
   const clearSectorViewportSettleTimer = () => {
     if (sectorViewportSettleTimer.value !== null) {
@@ -72,11 +73,47 @@ export function useMapSvgOverlays(args: {
     return sectorRatioToClusterRatio(sector.normalized, sectorPointToLocalRatio(sector, point))
   }
 
+  const buildPoiVisualState = (
+    poi: SavePoiOverlayItem,
+    largeIconScreenSize: number,
+    clampedScale: number
+  ) => {
+    const factionId = getPoiFactionId(poi)
+    const factionColor = factionId && args.factionColorMap.value?.[factionId]
+      ? args.factionColorMap.value[factionId]
+      : null
+    const poiColor = factionColor || SAVE_POI_COLORS[poi.category]
+    const poiFilterId = factionColor ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` : null
+    const iconSize = isLargeMapSavePoiIcon(poi)
+      ? largeIconScreenSize / clampedScale
+      : getMapSavePoiBaseIconSize(poi)
+
+    return {
+      color: poiColor,
+      factionFilterId: poiFilterId,
+      iconSize
+    }
+  }
+
   const resolveSectorByMacro = (macro: string | null | undefined) =>
     mapStore?.resolveSectorByMacro(macro) || resolveMapSectorByMacro({
       clusters: args.clusters.value,
       sectors: args.sectors.value
     }, macro)
+
+  const logSavePoiDataError = (poi: SavePoiOverlayItem, reason: string) => {
+    const key = `${poi.key}:${reason}`
+    if (loggedSavePoiDataErrors.has(key)) return
+    loggedSavePoiDataErrors.add(key)
+    console.error('[MapOverlay][SavePoiData]', reason, {
+      key: poi.key,
+      code: poi.code,
+      category: poi.category,
+      sectorMacro: poi.sectorMacro,
+      hasTx: poi.position.tx !== undefined,
+      hasTy: poi.position.ty !== undefined
+    })
+  }
 
   const buildVisibleSectorKeys = (
     viewportBounds: {
@@ -156,16 +193,27 @@ export function useMapSvgOverlays(args: {
 
   const overlayScreenItems = computed(() => {
     const { centers, clusterRadius } = args.layoutState.value
+    const clampedScale = Math.max(args.currentScale.value, 1e-6)
+    const largeIconScreenSize = getMapDynamicLargePoiIconSize({
+      clusterRadius,
+      currentScale: args.currentScale.value,
+      maxScale: args.maxScale.value
+    })
     return args.placementOverlays.value
       .map((overlay) => {
         const cluster = args.clusters.value[overlay.location.cluster_id]
         const sector = args.sectors.value[overlay.location.sector_id]
         const center = centers[overlay.location.cluster_id]
         if (!cluster || !sector || !center) return null
-        const ratio = resolveSectorScreenRatio(sector, overlay.location.pos)
+        const ratio = overlay.localRatio
+          ? sectorRatioToClusterRatio(sector.normalized, overlay.localRatio)
+          : resolveSectorScreenRatio(sector, overlay.location.pos)
         if (!ratio) return null
         const point = clusterRatioToScreen(center, clusterRadius, ratio)
-        return { ...overlay, x: point.x, y: point.y }
+        const visualState = overlay.savePoiVisual
+          ? buildPoiVisualState(overlay.savePoiVisual, largeIconScreenSize, clampedScale)
+          : {}
+        return { ...overlay, ...visualState, x: point.x, y: point.y }
       })
       .filter((item): item is PlacementOverlay & { x: number; y: number } => !!item)
   })
@@ -191,7 +239,14 @@ export function useMapSvgOverlays(args: {
     if (!factionColorMap) return []
     const filters: Array<{ id: string; matrix: string }> = []
     const addedColors = new Set<string>()
-    args.savePoiOverlays.value.forEach((poi) => {
+    const visiblePois = [
+      ...args.savePoiOverlays.value,
+      ...args.placementOverlays.value
+        .map((overlay) => overlay.savePoiVisual)
+        .filter((poi): poi is SavePoiOverlayItem => Boolean(poi)),
+      ...(args.placementPreview.value?.savePoiVisual ? [args.placementPreview.value.savePoiVisual] : [])
+    ]
+    visiblePois.forEach((poi) => {
       const factionId = getPoiFactionId(poi)
       if (!factionId) return
       const color = factionColorMap[factionId]
@@ -206,7 +261,6 @@ export function useMapSvgOverlays(args: {
 
   const savePoiScreenItems = computed(() => {
     const { centers, clusterRadius } = args.layoutState.value
-    const factionColorMap = args.factionColorMap.value
     const viewportBounds = args.viewportContentBounds.value
     const clampedScale = Math.max(args.currentScale.value, 1e-6)
     const largeIconScreenSize = getMapDynamicLargePoiIconSize({
@@ -239,7 +293,14 @@ export function useMapSvgOverlays(args: {
         const sector = resolved.sector as Sector
         const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
         const sectorCenter = sector.normalized?.center_offset_ratio
-        if (!center || poi.position.tx === undefined || poi.position.ty === undefined || !sectorCenter || !sectorRadiusRatio) return null
+        if (poi.position.tx === undefined || poi.position.ty === undefined) {
+          logSavePoiDataError(poi, 'missing-tx-ty')
+          return null
+        }
+        if (!center || !sectorCenter || !sectorRadiusRatio) {
+          logSavePoiDataError(poi, 'missing-sector-layout')
+          return null
+        }
         if (hideConditionalSmallIcons && shouldHideSavePoiSmallIconAtClusterOverview(poi)) return null
         if (!hideConditionalSmallIcons && activeVisibleSectorKeys && viewportBounds && shouldHideSavePoiSmallIconAtClusterOverview(poi) && cluster) {
           if (!activeVisibleSectorKeys.has(`${resolved.clusterId}:${sector.id}`)) return null
@@ -259,22 +320,13 @@ export function useMapSvgOverlays(args: {
             point.y <= viewportBounds.bottom + SAVE_POI_VIEWPORT_MARGIN
           if (!withinX || !withinY) return null
         }
-        const iconSize = isLargeMapSavePoiIcon(poi)
-          ? largeIconScreenSize / clampedScale
-          : getMapSavePoiBaseIconSize(poi)
-
-        const factionId = getPoiFactionId(poi)
-        const factionColor = factionId && factionColorMap?.[factionId] ? factionColorMap[factionId] : null
-        const poiColor = factionColor || SAVE_POI_COLORS[poi.category]
-        const poiFilterId = factionColor ? `faction-color-${svgIdSafe(factionColor.replace('#', ''))}` : null
+        const visualState = buildPoiVisualState(poi, largeIconScreenSize, clampedScale)
 
         return {
           ...poi,
           x: point.x,
           y: point.y,
-          color: poiColor,
-          factionFilterId: poiFilterId,
-          iconSize
+          ...visualState
         }
       })
       .filter((item): item is SavePoiOverlayItem & { x: number; y: number; color: string; factionFilterId: string | null; iconSize: number } => item !== null)
@@ -323,10 +375,21 @@ export function useMapSvgOverlays(args: {
     const sector = args.sectors.value[preview.location.sector_id]
     const center = args.layoutState.value.centers[preview.location.cluster_id]
     if (!cluster || !sector || !center) return null
-    const ratio = resolveSectorScreenRatio(sector, preview.location.pos)
+    const ratio = preview.localRatio
+      ? sectorRatioToClusterRatio(sector.normalized, preview.localRatio)
+      : resolveSectorScreenRatio(sector, preview.location.pos)
     if (!ratio) return null
     const point = clusterRatioToScreen(center, args.layoutState.value.clusterRadius, ratio)
-    return { ...preview, x: point.x, y: point.y }
+    const clampedScale = Math.max(args.currentScale.value, 1e-6)
+    const largeIconScreenSize = getMapDynamicLargePoiIconSize({
+      clusterRadius: args.layoutState.value.clusterRadius,
+      currentScale: args.currentScale.value,
+      maxScale: args.maxScale.value
+    })
+    const visualState = preview.savePoiVisual
+      ? buildPoiVisualState(preview.savePoiVisual, largeIconScreenSize, clampedScale)
+      : {}
+    return { ...preview, ...visualState, x: point.x, y: point.y }
   })
 
   return {

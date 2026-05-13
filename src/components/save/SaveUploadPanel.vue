@@ -109,7 +109,7 @@ async function processXmlFile(file: File) {
       { type: 'module' }
     )
 
-    worker.onmessage = (e: MessageEvent<SaveParserRustMessage>) => {
+    worker.onmessage = async (e: MessageEvent<SaveParserRustMessage>) => {
       const msg = e.data
 
       if (msg.type === 'progress') {
@@ -126,9 +126,11 @@ async function processXmlFile(file: File) {
         const processedArchive = postProcessRustSaveArchive(
           msg.data, 
           gameDataStore.modulesByMacroId,
-          gameDataStore.maps
+          gameDataStore.maps,
+          gameDataStore.ships,
+          gameDataStore.equipments
         )
-        saveStore.addArchive(processedArchive)
+        await saveStore.addArchive(processedArchive)
         saveStore.setParsingState(false, '', null)
         emit('upload-complete', processedArchive)
         worker.terminate()

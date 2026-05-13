@@ -1,31 +1,22 @@
 import type {
   StationPlan,
-  GroupedFlows,
-  WareFlow,
   EmpireWareFlow,
   EmpireGroupedFlows,
-  StationFlowAtom
+  X4Ware
 } from '../../types/x4'
+import type { FlowContribution, WareProductionFlow } from '../../types/production-flow'
 
 interface StationFlowData {
   station: StationPlan;
-  flows: GroupedFlows;
+  flows: WareProductionFlow[];
 }
 
-function multiplyFlow(flow: WareFlow, multiplier: number): WareFlow {
+function multiplyProductionFlow(flow: WareProductionFlow, multiplier: number): WareProductionFlow {
   return {
     ...flow,
     production: flow.production * multiplier,
     consumption: flow.consumption * multiplier,
-    workforceConsumption: flow.workforceConsumption * multiplier,
     netRate: flow.netRate * multiplier,
-    productionVolume: flow.productionVolume * multiplier,
-    consumptionVolume: flow.consumptionVolume * multiplier,
-    netVolume: flow.netVolume * multiplier,
-    totalOccupiedCount: flow.totalOccupiedCount * multiplier,
-    totalOccupiedConsumptionCount: flow.totalOccupiedConsumptionCount * multiplier,
-    totalOccupiedVolume: flow.totalOccupiedVolume * multiplier,
-    netValue: flow.netValue * multiplier,
     contributions: flow.contributions.map(c => ({
       ...c,
       amount: c.amount * multiplier
@@ -33,8 +24,16 @@ function multiplyFlow(flow: WareFlow, multiplier: number): WareFlow {
   }
 }
 
-function aggregateFlows(
-  flowsByWareId: Map<string, { flow: WareFlow; station: StationPlan }[]>
+function classifyProductionFlow(flow: WareProductionFlow): 'positive' | 'supply' | 'operations' | 'resources' {
+  if (flow.netRate >= 0) return 'positive'
+  if (flow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')) return 'supply'
+  if (flow.transportType === 'container') return 'operations'
+  return 'resources'
+}
+
+function aggregateProductionFlows(
+  flowsByWareId: Map<string, { flow: WareProductionFlow; station: StationPlan }[]>,
+  waresMap: Record<string, X4Ware>
 ): EmpireWareFlow[] {
   const result: EmpireWareFlow[] = []
   
@@ -45,30 +44,26 @@ function aggregateFlows(
     if (!firstItem) return
     
     const firstFlow = firstItem.flow
+    const ware = waresMap[wareId]
     let totalProduction = 0
     let totalConsumption = 0
-    let totalWorkforceConsumption = 0
     let totalNetRate = 0
-    let totalNetValue = 0
-    const contributions: StationFlowAtom[] = []
+    const contributions: FlowContribution[] = []
     
     items.forEach(({ flow, station }) => {
       totalProduction += flow.production
       totalConsumption += flow.consumption
-      totalWorkforceConsumption += flow.workforceConsumption
       totalNetRate += flow.netRate
-      totalNetValue += flow.netValue
       
       contributions.push({
-        stationId: station.id,
-        stationName: station.name,
-        stationCount: station.count ?? 1,
-        production: flow.production,
-        consumption: flow.consumption,
-        workforceConsumption: flow.workforceConsumption,
-        netRate: flow.netRate,
-        netValue: flow.netValue
-      })
+        id: station.id,
+        class: 'station',
+        type: flow.netRate > 0 ? 'production' : 'consumption',
+        count: station.count ?? 1,
+        amount: flow.netRate,
+        bonusPercent: 0,
+        stationName: station.name
+      } as FlowContribution & { stationName: string })
     })
     
     result.push({
@@ -79,10 +74,10 @@ function aggregateFlows(
       unitVolume: firstFlow.unitVolume,
       production: totalProduction,
       consumption: totalConsumption,
-      workforceConsumption: totalWorkforceConsumption,
       netRate: totalNetRate,
-      unitPrice: firstFlow.unitPrice,
-      netValue: totalNetValue,
+      minPrice: ware?.minPrice || 0,
+      avgPrice: ware?.price || 0,
+      maxPrice: ware?.maxPrice || 0,
       contributions
     })
   })
@@ -99,16 +94,15 @@ function mergeEmpireFlow(target: EmpireWareFlow, source: EmpireWareFlow): Empire
     ...target,
     production: target.production + source.production,
     consumption: target.consumption + source.consumption,
-    workforceConsumption: target.workforceConsumption + source.workforceConsumption,
     netRate: target.netRate + source.netRate,
-    netValue: target.netValue + source.netValue,
     contributions: [...target.contributions, ...source.contributions]
   }
 }
 
 export function analyzeEmpireWareFlow(
   stations: StationPlan[],
-  getStationFlowCache: (stationId: string) => GroupedFlows | null
+  getStationProductionFlows: (stationId: string) => WareProductionFlow[] | null,
+  waresMap: Record<string, X4Ware>
 ): EmpireGroupedFlows {
   const stationFlowData: StationFlowData[] = []
   
@@ -116,44 +110,37 @@ export function analyzeEmpireWareFlow(
     const count = station.count ?? 1
     if (count === 0) return
     
-    const flows = getStationFlowCache(station.id)
-    if (!flows) return
+    const flows = getStationProductionFlows(station.id)
+    if (!flows || flows.length === 0) return
     
     stationFlowData.push({ station, flows })
   })
   
-  const supplyByWareId = new Map<string, { flow: WareFlow; station: StationPlan }[]>()
-  const candidatesByWareId = new Map<string, { flow: WareFlow; station: StationPlan }[]>()
+  const supplyByWareId = new Map<string, { flow: WareProductionFlow; station: StationPlan }[]>()
+  const candidatesByWareId = new Map<string, { flow: WareProductionFlow; station: StationPlan }[]>()
   
   stationFlowData.forEach(({ station, flows }) => {
     const count = station.count ?? 1
     
-    flows.rateGroups.supply.forEach(flow => {
-      const multiplied = multiplyFlow(flow, count)
-      if (!supplyByWareId.has(flow.wareId)) {
-        supplyByWareId.set(flow.wareId, [])
+    flows.forEach(flow => {
+      const multiplied = multiplyProductionFlow(flow, count)
+      const category = classifyProductionFlow(flow)
+      
+      if (category === 'supply') {
+        if (!supplyByWareId.has(flow.wareId)) {
+          supplyByWareId.set(flow.wareId, [])
+        }
+        supplyByWareId.get(flow.wareId)!.push({ flow: multiplied, station })
+      } else if (category === 'positive' || category === 'operations') {
+        if (!candidatesByWareId.has(flow.wareId)) {
+          candidatesByWareId.set(flow.wareId, [])
+        }
+        candidatesByWareId.get(flow.wareId)!.push({ flow: multiplied, station })
       }
-      supplyByWareId.get(flow.wareId)!.push({ flow: multiplied, station })
-    })
-    
-    flows.rateGroups.operations.forEach(flow => {
-      const multiplied = multiplyFlow(flow, count)
-      if (!candidatesByWareId.has(flow.wareId)) {
-        candidatesByWareId.set(flow.wareId, [])
-      }
-      candidatesByWareId.get(flow.wareId)!.push({ flow: multiplied, station })
-    })
-    
-    flows.rateGroups.positive.forEach(flow => {
-      const multiplied = multiplyFlow(flow, count)
-      if (!candidatesByWareId.has(flow.wareId)) {
-        candidatesByWareId.set(flow.wareId, [])
-      }
-      candidatesByWareId.get(flow.wareId)!.push({ flow: multiplied, station })
     })
   })
   
-  const supplyFlows = aggregateFlows(supplyByWareId)
+  const supplyFlows = aggregateProductionFlows(supplyByWareId, waresMap)
   const supplyByWareIdMap = new Map<string, EmpireWareFlow>()
   supplyFlows.forEach(flow => {
     supplyByWareIdMap.set(flow.wareId, flow)
@@ -162,7 +149,7 @@ export function analyzeEmpireWareFlow(
   
   const operations: EmpireWareFlow[] = []
   
-  const candidateFlows = aggregateFlows(candidatesByWareId)
+  const candidateFlows = aggregateProductionFlows(candidatesByWareId, waresMap)
   candidateFlows.forEach(flow => {
     if (supplyWareIdSet.has(flow.wareId)) {
       const existingSupply = supplyByWareIdMap.get(flow.wareId)
@@ -175,6 +162,7 @@ export function analyzeEmpireWareFlow(
       operations.push(flow)
     }
   })
+  
   const mergedSupplyFlows = Array.from(supplyByWareIdMap.values()).sort((a, b) => {
     if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
     if (a.tier !== b.tier) return b.tier - a.tier
