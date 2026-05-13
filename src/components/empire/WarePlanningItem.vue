@@ -55,7 +55,7 @@ const isDlcActive = computed(() => gameData.isDlcActive(dlcTag.value))
 </script>
 
 <template>
-  <div class="ware-row group/row">
+  <div class="ware-row group/row" :data-testid="`goal-item-${goal.type === 'production-rate' ? goal.wareId : goal.moduleId}`">
     <div class="color-bar" :style="colorBarStyle"></div>
 
     <div class="ware-info">

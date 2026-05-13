@@ -337,7 +337,7 @@ onUnmounted(() => {
               @click="toggleFlowMenu"
               ref="flowTriggerRef"
             >
-              <span class="flow-plan-label">{{ flowButtonLabel }}</span>
+              <span class="flow-plan-label" data-testid="build-plan-flow-menu-label">{{ flowButtonLabel }}</span>
               <svg class="h-3 w-3 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M9 6l6 6-6 6" />
               </svg>
@@ -353,6 +353,7 @@ onUnmounted(() => {
                 :key="item.id || '__unplanned__'"
                 class="flow-plan-menu-item"
                 :class="item.id === selectedFlowPlanId ? 'flow-plan-menu-item-active' : ''"
+                :data-testid="`flow-plan-menu-item-${item.id || 'unplanned'}`"
                 @click="handleFlowSelect(item.id)"
               >
                 {{ item.name }}

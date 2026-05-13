@@ -83,7 +83,7 @@ function getDlcTag(item: PreviewItem): { label: string; isActive: boolean } | nu
 </script>
 
 <template>
-  <div v-if="lines.length > 0" class="allocation-section space-y-2">
+  <div v-if="lines.length > 0" class="allocation-section space-y-2" data-testid="preview-section">
     <div v-if="title" class="allocation-section-title">{{ title }}</div>
     <div
       v-for="line in lines"

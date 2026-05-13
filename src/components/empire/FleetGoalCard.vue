@@ -54,6 +54,7 @@ const formatTime = (seconds: number) => {
       </select>
       <div v-if="fleetView.buildTimeMode === 'planned'" class="fleet-build-time-group">
         <X4NumberInput
+          data-testid="fleet-build-time-input"
           :modelValue="fleetView.buildTime"
           :min="600"
           widthClass="w-20"
@@ -108,7 +109,7 @@ const formatTime = (seconds: number) => {
                   'fleet-entry-arrow--hidden': entry.isBlueprintMissing,
                 }"
               >&#9654;</span>
-              <span v-if="entry.isBlueprintMissing" class="fleet-entry-warning" :title="t('build_plan.fleet_blueprint_missing')">&#9888;</span>
+              <span v-if="entry.isBlueprintMissing" class="fleet-entry-warning" data-testid="fleet-entry-warning" :title="t('build_plan.fleet_blueprint_missing')">&#9888;</span>
               <span class="fleet-entry-name">
                 {{ entry.blueprintName }}
                 <span v-if="!entry.isBlueprintMissing" class="fleet-entry-total-time">{{ formatTime(entry.totalBuildTime) }}</span>

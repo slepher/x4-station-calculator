@@ -151,7 +151,7 @@ function getDlcTag(goal: BuildGoal): { label: string; isActive: boolean } | null
 </script>
 
 <template>
-  <div v-if="allocations.length > 0" class="allocation-section space-y-2">
+  <div v-if="allocations.length > 0" class="allocation-section space-y-2" data-testid="allocation-section">
     <div v-if="title" class="allocation-section-title">{{ title }}</div>
     <div
       v-for="alloc in allocations"
