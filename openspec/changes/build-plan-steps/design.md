@@ -198,6 +198,7 @@ greedy done
 4. tail-fill 步骤要和 greedy 步骤在 reason 语义上区分开。
 5. tail-fill 仍然只属于 steps 视图层，不反向影响 compute 真相层。
 
+
 ### 7. 默认模式与 steps mode 的关系
 
 #### 7.1 默认模式

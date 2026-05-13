@@ -75,6 +75,24 @@
 **并且** 当相关产线的主要模块数量不再变化时 MUST 视为收敛
 **并且** MUST NOT 以辅助模块数量作为单独收敛判据
 
+### Requirement: Compute MUST document monotonic overbuild in coupled lines as a known limitation
+
+**前提** 当前产线位于 SCC / 强耦合依赖中  
+**并且** 某些 ware 的目标会在迭代过程中随其他主要模块变化而下降  
+**当** 系统执行 compute 迭代  
+**那么** 系统 MAY 保留较早阶段已经增加的主要模块  
+**并且** 系统 MUST NOT 假定目标下降后已增加主要模块会自动回退  
+**并且** 文档 MUST 将该现象记录为当前已知限制
+
+#### Scenario: final compute keeps modules added before demand shrank
+
+**前提** 某个 ware 在较早迭代阶段需要更高产能  
+**并且** 后续由于 SCC 内其他产线变化，该 ware 的最终目标下降  
+**当** 系统完成最终 compute  
+**那么** 某个较早中间状态 MAY 已满足较晚阶段目标  
+**并且** 最终方案 MAY 仍保留较早阶段增加的额外主要模块  
+**并且** 该差异 SHOULD 被解释为单调增量求解的残留，而不是目标来源错误
+
 ### Requirement: 最终分组中重叠产线必须归入建材组且责任合并
 
 **前提** 某条产线同时出现在建材依赖图和生产责任结果中

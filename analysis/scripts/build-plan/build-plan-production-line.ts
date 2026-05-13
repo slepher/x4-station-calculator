@@ -14,7 +14,7 @@ import {
   parseBuildPlanProductionLineArgs,
   renderBuildPlanProductionLineHelp,
 } from './buildPlanProductionLineArgs'
-import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup, ProductionLineAllocation } from '@/types/build-plan'
+import type { BuildFlowPlanView, BuildGoal, BuildSchemeGroup, PreviewItem, ProductionLineAllocation } from '@/types/build-plan'
 import type { X4Module, X4Ware, X4Ship, X4Equipment, X4Consumable, X4Drone, X4Missile, ProductionLineGroup, SavedFlowGroup, BuildFlowAssignment, ShipBlueprint, SavedShipBlueprintsState } from '@/types/x4'
 
 const WARE_DATA: X4Ware[] = JSON.parse(readFileSync(resolve('src/assets/x4_game_data/8.0-Diplomacy/data/wares.json'), 'utf-8'))
@@ -97,6 +97,60 @@ function calculateNetProductionForModules(modules: Array<{ id: string; count: nu
     }
   }
   return state
+}
+
+function getBuildMaterialTargetRateEntries(scheme: BuildScheme): Array<[string, number]> {
+  const rates = scheme.stepTargetRates || scheme.targetRates
+  return Object.entries(rates)
+    .filter(([, rate]) => rate > 0)
+    .filter(([wareId]) => wareId !== 'energycells')
+}
+
+function formatPreviewLineTargets(items: PreviewItem[]): string[] {
+  const labels: string[] = []
+  const derivedByWare = new Map<string, Set<string>>()
+  const requiredByWare = new Map<string, Set<string>>()
+
+  for (const item of items) {
+    if (item.kind === 'derived') {
+      for (const target of item.targets || []) {
+        if (target.type === 'build-module') {
+          labels.push(`${modName(item.moduleId)} ×${target.count || 1}`)
+          continue
+        }
+        if (target.type === 'production-rate' && item.wareId) {
+          labels.push(`${wareName(item.wareId)} ${(target.ratePerHour || 0).toFixed(1)}/h`)
+          continue
+        }
+      }
+
+      if (item.wareId) {
+        for (const tag of item.derived || []) {
+          if (tag === 'target') continue
+          const tags = derivedByWare.get(item.wareId) || new Set<string>()
+          tags.add(tag)
+          derivedByWare.set(item.wareId, tags)
+        }
+      }
+      continue
+    }
+
+    for (const tag of item.required || []) {
+      const tags = requiredByWare.get(item.wareId) || new Set<string>()
+      tags.add(tag)
+      requiredByWare.set(item.wareId, tags)
+    }
+  }
+
+  for (const [wareId, tags] of derivedByWare) {
+    labels.push(`${wareName(wareId)} { derived: [${[...tags].join(', ')}] }`)
+  }
+
+  for (const [wareId, tags] of requiredByWare) {
+    labels.push(`${wareName(wareId)} { required: [${[...tags].join(', ')}] }`)
+  }
+
+  return [...new Set(labels)]
 }
 
 function buildBlueprintMap(state: SavedShipBlueprintsState | undefined): Map<string, ShipBlueprint> {
@@ -673,19 +727,10 @@ for (const scc of graph.sccGroups) {
 }
 
 console.log(`\n  产线 ↔ 目标映射:`)
-for (const alloc of lineAllocations) {
-  const name = alloc.groupName || alloc.groupId?.slice(0, 8) || '(待规划)'
-  const goalStrs = alloc.goals.map(g => {
-    if (g.type === 'production-rate') return `${wareName(g.wareId)} ${g.ratePerHour}/h`
-    if (g.type === 'build-module') return `${modName(g.moduleId)} ×${g.count}`
-    if (g.type === 'target-production' && g.moduleId) return `${modName(g.moduleId)} ×${g.count || 1}`
-    if (g.type === 'target-production' && g.wareId) return `${wareName(g.wareId)} ${(g.ratePerHour || 0).toFixed(1)}/h`
-    if (g.type === 'derived-production' || g.type === 'derived-build-material' || g.type === 'required-production')
-      return `${wareName(g.wareId)} (${g.type})`
-    if (g.type === 'derived-rate') return `${wareName(g.wareId)}(derived) ${g.ratePerHour}/h`
-    return `?`
-  })
-  console.log(`  ${alloc.isUnmatched ? '⚠' : ' '} ${name}: ${goalStrs.join(', ')}`)
+for (const line of preview.lines) {
+  const name = line.groupName || line.groupId?.slice(0, 8) || '(待规划)'
+  const targetStrs = formatPreviewLineTargets(line.items)
+  console.log(`  ${line.isUnmatched ? '⚠' : ' '} ${name}: ${targetStrs.join(', ')}`)
 }
 
 const buildMaterialSchemeGroup = schemeGroups.find(group => group.groupType === 'build-material')
@@ -740,7 +785,14 @@ if (buildMaterialSchemeGroup && buildMaterialSchemeGroup.schemes.length > 0) {
       }
     }
 
-    const primaryModuleIds = new Set(scheme.primaryModuleIds)
+    const targetWareIds = new Set(getBuildMaterialTargetRateEntries(scheme).map(([wareId]) => wareId))
+    const primaryModuleIds = new Set(
+      scheme.primaryModuleIds.filter(moduleId => {
+        const mod = modulesMap[moduleId]
+        if (!mod?.outputs) return false
+        return Object.keys(mod.outputs).some(wareId => targetWareIds.has(wareId))
+      }),
+    )
     const schemePrimaryModules = mergeSavedModules(
       scheme.modules.filter(module => primaryModuleIds.has(module.id)),
     )
@@ -758,8 +810,10 @@ if (buildMaterialSchemeGroup && buildMaterialSchemeGroup.schemes.length > 0) {
       for (const moduleId of [...primaryIds].sort()) {
         const stepCount = exitPrimaryModules.find(module => module.id === moduleId)?.count || 0
         const computeCount = schemePrimaryModules.find(module => module.id === moduleId)?.count || 0
-        const status = stepCount === computeCount ? '✓' : '✗'
-        console.log(`    ${status} ${modName(moduleId)}: exit=${stepCount}, compute=${computeCount}`)
+        const extraCount = computeCount - stepCount
+        const status = extraCount === 0 ? '✓' : '→'
+        const suffix = extraCount > 0 ? `, final=${computeCount} (+${extraCount} after tail-fill)` : `, final=${computeCount}`
+        console.log(`    ${status} ${modName(moduleId)}: exit=${stepCount}${suffix}`)
       }
     }
 
@@ -770,11 +824,14 @@ if (buildMaterialSchemeGroup && buildMaterialSchemeGroup.schemes.length > 0) {
         const exitSat = row.targetRate > 0 ? row.prodRate / row.targetRate * 100 : 0
         const computeSat = row.targetRate > 0 ? computeProd / row.targetRate * 100 : 0
         const diff = row.prodRate - computeProd
-        const status = Math.abs(diff) < 0.001 ? '✓' : '✗'
+        const status = Math.abs(diff) < 0.001 ? '✓' : '→'
+        const suffix = Math.abs(diff) < 0.001
+          ? `compute=${computeProd.toFixed(1)}/h (${computeSat.toFixed(1)}%)`
+          : `final=${computeProd.toFixed(1)}/h (${computeSat.toFixed(1)}%, +${(computeProd - row.prodRate).toFixed(1)}/h after tail-fill)`
         console.log(
           `    ${status} ${wareName(row.wareId)}: `
           + `exit=${row.prodRate.toFixed(1)}/h (${exitSat.toFixed(1)}%, ${row.satisfied ? 'met' : 'unmet'}), `
-          + `compute=${computeProd.toFixed(1)}/h (${computeSat.toFixed(1)}%), `
+          + `${suffix}, `
           + `target=${row.targetRate.toFixed(1)}/h, diff=${diff.toFixed(1)}/h`,
         )
       }

@@ -148,7 +148,7 @@ export function buildPreviewTargetModulesForProductionLine(
 
     for (const goal of allocation.goals) {
       if (goal.type !== 'build-module') continue
-      targetModules.push({ id: goal.moduleId, count: 1 })
+      targetModules.push({ id: goal.moduleId, count: goal.count })
     }
   }
 
@@ -158,7 +158,7 @@ export function buildPreviewTargetModulesForProductionLine(
 
   for (const goal of goals) {
     if (goal.type !== 'build-module') continue
-    targetModules.push({ id: goal.moduleId, count: 1 })
+    targetModules.push({ id: goal.moduleId, count: goal.count })
   }
 
   return mergeModules(targetModules)
@@ -182,7 +182,7 @@ export function computePreviewLinePlans(
 
   // 消费方通过 isolated 边声明它需要某 ware；供给方通过 isolated 边声明它提供某 ware
   for (const edge of graph.edges) {
-    if (edge.fromLineKey !== ROOT_BUILD_COST_KEY) {
+    if (edge.sourceLabel.includes('buildCost')) {
       const producerSet = producerBuildMaterial.get(edge.toLineKey) || new Set<string>()
       producerSet.add(edge.wareId)
       producerBuildMaterial.set(edge.toLineKey, producerSet)
@@ -364,7 +364,7 @@ export function createBuildFlowPlanPreview(
 
   // 2. Compute production allocations (target-production responsibilities)
   // 3. Merge: graph-based lines + target-production responsibilities from allocations
-  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId, modulesMap, waresMap, settings)
+  const mergedLines = mergeGraphAndAllocationLines(graphLines, allocations, lineageByGroupId, groups, modulesMap, waresMap, settings)
 
   return {
     buildMaterialPlanningEnabled: true,
@@ -383,6 +383,7 @@ function mergeGraphAndAllocationLines(
   graphLines: PreviewLinePlan[],
   allocations: { groupId?: string; groupName: string; isUnmatched: boolean; goals: BuildGoal[]; lineage: string }[],
   lineageByGroupId: Map<string, string> = new Map(),
+  groups: ProductionLineGroup[],
   modulesMap: Record<string, X4Module>,
   waresMap: Record<string, X4Ware>,
   settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
@@ -448,19 +449,13 @@ function mergeGraphAndAllocationLines(
         ))
         .filter((item): item is PreviewItem => Boolean(item))
         .filter(item => isGraphOverlap
-          ? item.kind === 'derived'
+          ? item.kind === 'derived' && item.derived.includes('target')
           : true),
     }
 
     if (isGraphOverlap && alloc.previewGroupId) {
       const existing = lineByGroupId.get(alloc.previewGroupId)
       if (existing) {
-        for (const item of respLine.items) {
-          if (item.kind === 'derived' && item.wareId && item.derived.includes('production')) {
-            const consumers = requiredConsumersByWare.get(item.wareId)
-            item.relatedLineGroupIds = consumers ? [...consumers] : []
-          }
-        }
         existing.items = mergePreviewItems([...existing.items, ...respLine.items])
       }
     } else {
@@ -471,17 +466,23 @@ function mergeGraphAndAllocationLines(
     }
   }
 
-  const externalTargetGroupIds = previewAllocations
+  const externalTargetLines = previewAllocations
     .filter(alloc => alloc.previewGroupId !== undefined && !graphGroupIds.has(alloc.previewGroupId))
     .filter(alloc => hasTargetGoals(alloc.goals))
-    .map(alloc => alloc.previewGroupId!)
+    .map(alloc => ({
+      groupId: alloc.previewGroupId!,
+      buildMaterialWares: collectAllocationBuildMaterialWares(alloc, groups, modulesMap),
+    }))
 
   for (const line of result) {
     for (const item of line.items) {
       if (item.kind !== 'derived' || !item.derived.includes('build-material')) continue
+      const relatedExternalTargets = externalTargetLines
+        .filter(target => item.wareId && target.buildMaterialWares.has(item.wareId))
+        .map(target => target.groupId)
       item.relatedLineGroupIds = [...new Set([
         ...item.relatedLineGroupIds,
-        ...externalTargetGroupIds,
+        ...relatedExternalTargets,
       ])]
     }
     line.items = mergePreviewItems(line.items)
@@ -539,6 +540,35 @@ function mergePreviewItems(
 
 function hasTargetGoals(goals: BuildGoal[]): boolean {
   return goals.some(goal => goal.type === 'build-module' || goal.type === 'production-rate')
+}
+
+export function collectAllocationBuildMaterialWares(
+  allocation: { groupId?: string; goals: BuildGoal[] },
+  groups: ProductionLineGroup[],
+  modulesMap: Record<string, X4Module>,
+): Set<string> {
+  const targetModules: SavedModule[] = []
+
+  if (allocation.groupId) {
+    targetModules.push(...collectExpandedModulesFromGroup(allocation.groupId, groups))
+  } else {
+    for (const goal of allocation.goals) {
+      if (goal.type !== 'build-module') continue
+      targetModules.push({ id: goal.moduleId, count: goal.count })
+    }
+  }
+
+  const wares = new Set<string>()
+  for (const module of mergeModules(targetModules)) {
+    const definition = modulesMap[module.id]
+    if (!definition?.buildCost) continue
+    for (const wareId of Object.keys(definition.buildCost)) {
+      if (wareId === 'energycells') continue
+      wares.add(wareId)
+    }
+  }
+
+  return wares
 }
 
 function buildUnmatchedPreviewGroupId(index: number): string {
@@ -904,16 +934,18 @@ export function computeBuildFlowPlan(
       )
       const scheme = schemeByGroupId.get(line.groupId)
       if (scheme && node.demandAnalysis) {
+        const buildMaterialTargetWares = new Set(
+          line.mergedItems
+            .filter((item): item is PreviewDerivedItem =>
+              item.kind === 'derived'
+              && Boolean(item.wareId)
+              && item.derived.includes('build-material'))
+            .map(item => item.wareId!),
+        )
         const stepTargetRates: Record<string, number> = {}
-        const allWares = new Set([
-          ...Object.keys(node.demandAnalysis.aggregateRates || {}),
-          ...Object.keys(node.demandAnalysis.gapRates || {}),
-        ])
-        for (const wareId of allWares) {
+        for (const wareId of buildMaterialTargetWares) {
           const aggregateRate = node.demandAnalysis.aggregateRates[wareId] || 0
-          const gapRate = node.demandAnalysis.gapRates[wareId] || 0
-          const totalRate = aggregateRate + gapRate
-          if (totalRate > 0) stepTargetRates[wareId] = totalRate
+          if (aggregateRate > 0) stepTargetRates[wareId] = aggregateRate
         }
         scheme.stepTargetRates = stepTargetRates
       }

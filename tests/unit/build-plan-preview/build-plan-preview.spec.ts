@@ -3,8 +3,9 @@
  */
 import { describe, expect, it, vi } from 'vitest'
 import { createPinia, setActivePinia } from 'pinia'
-import type { BuildGoal, PreviewDerivedItem, PreviewRequiredItem, PreviewItem, PreviewLinePlan } from '@/types/build-plan'
+import type { BuildFlowPlanGraph, BuildGoal, PreviewDerivedItem, PreviewRequiredItem, PreviewItem, PreviewLinePlan } from '@/types/build-plan'
 import { computeProductionLineAllocation } from '@/store/logic/computeProductionLineAllocation'
+import { collectAllocationBuildMaterialWares, computePreviewLinePlans } from '@/store/logic/buildPlanProductionLine'
 
 // ── 1.5 Lineage resolution ──────────────────────────────────────────────
 
@@ -145,5 +146,101 @@ describe('1.6 computeProductionLineAllocation 全局两轮分配', () => {
     const result = computeProductionLineAllocation(goals, flowGroups, buildFlowView, {}, {})
     const unmatched = result.find((a: any) => a.isUnmatched)
     expect(unmatched).toBeDefined()
+  })
+})
+
+describe('preview responsibility tagging', () => {
+  it('marks build-material only for buildCost edges, not isolated edges', () => {
+    const graph: BuildFlowPlanGraph = {
+      nodes: new Map([
+        ['g1', {
+          lineGroupId: 'g1',
+          lineName: 'Line A',
+          trackedWares: new Set(['quantumtubes', 'energycells']),
+          isolatedWares: new Set(),
+          modules: [],
+          moduleIds: [],
+          isSelfBootstrap: false,
+          netProduction: {},
+        }],
+      ]),
+      edges: [
+        {
+          fromLineKey: '__root_build_cost__',
+          toLineKey: 'g1',
+          wareId: 'quantumtubes',
+          sourceLabel: 'target line buildCost',
+        },
+        {
+          fromLineKey: 'consumer1',
+          toLineKey: 'g1',
+          wareId: 'energycells',
+          sourceLabel: 'Some Line isolated',
+        },
+      ],
+      sccGroups: [],
+      targetModules: [],
+      targetBuildCostRates: {},
+    }
+
+    const groups: any[] = [{
+      id: 'g1',
+      name: 'Line A',
+      nodes: [
+        { id: 'n1', source: 'manual', wareId: 'quantumtubes', moduleId: 'm_qt', isIsolated: false, lineage: 'argon' },
+        { id: 'n2', source: 'manual', wareId: 'energycells', moduleId: 'm_ec', isIsolated: false, lineage: 'argon' },
+      ],
+      subCategory: 'argon',
+      isLocked: false,
+    }]
+
+    const modulesMap: any = {
+      m_qt: { id: 'm_qt', outputs: { quantumtubes: 1 }, inputs: {}, name: 'Quantum Tubes Prod' },
+      m_ec: { id: 'm_ec', outputs: { energycells: 1 }, inputs: {}, name: 'Energy Cells Prod' },
+    }
+    const waresMap: any = {
+      quantumtubes: { id: 'quantumtubes', name: 'Quantum Tubes' },
+      energycells: { id: 'energycells', name: 'Energy Cells' },
+    }
+    const lineageByGroupId = new Map([['g1', 'argon']])
+
+    const lines = computePreviewLinePlans(graph, groups, modulesMap, waresMap, lineageByGroupId)
+    expect(lines).toHaveLength(1)
+
+    const line = lines[0]!
+    const qt = line.items.find(item => item.kind === 'derived' && item.wareId === 'quantumtubes') as PreviewDerivedItem
+    const ec = line.items.find(item => item.kind === 'derived' && item.wareId === 'energycells') as PreviewDerivedItem
+
+    expect(qt.derived).toEqual(['build-material'])
+    expect(ec.derived).toEqual(['production'])
+  })
+
+  it('collects external target build-material wares from target modules only', () => {
+    const groups: any[] = [{
+      id: 'g1',
+      name: 'Target Line',
+      nodes: [
+        { id: 'n1', source: 'manual', wareId: 'finalware', moduleId: 'm_target', isIsolated: false, lineage: 'argon' },
+      ],
+      subCategory: 'argon',
+      isLocked: false,
+    }]
+    const modulesMap: any = {
+      m_target: {
+        id: 'm_target',
+        buildCost: { claytronics: 10, hullparts: 5, energycells: 20 },
+      },
+    }
+
+    const wares = collectAllocationBuildMaterialWares(
+      {
+        groupId: 'g1',
+        goals: [{ type: 'production-rate', wareId: 'finalware', ratePerHour: 100 }],
+      },
+      groups,
+      modulesMap,
+    )
+
+    expect([...wares].sort()).toEqual(['claytronics', 'hullparts'])
   })
 })

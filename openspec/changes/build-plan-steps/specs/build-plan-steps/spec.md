@@ -101,6 +101,7 @@
 **并且** 每个尾部步骤都包含该次主模块补入触发的 `autoFill diff`  
 **并且** 用户可区分它们属于“最终方案补齐”而非“最低满足度驱动”
 
+
 ### Requirement: Vue MUST use a dedicated BuildStepsScheme view model
 
 **前提** 详情弹窗需要展示 steps mode  
