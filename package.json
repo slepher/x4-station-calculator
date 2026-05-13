@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite --base /",
     "wdev": "python3 scripts/worktree-server.py",
-    "build": "node scripts/check-production-compat.mjs && rm -rf node_modules/.tmp/tsconfig.app.tsbuildinfo && vue-tsc -b && vite build",
+    "build": "node scripts/check-production-compat.mjs && vue-tsc -b && vite build",
+    "full-build": "node scripts/check-production-compat.mjs && rm -rf node_modules/.tmp/tsconfig.app.tsbuildinfo && vue-tsc -b && vite build",
     "build-rust": "cd rust-parser && ./build.sh",
     "preview": "vite preview",
     "test:e2e": "npm exec playwright test",
