@@ -15,11 +15,9 @@ import type {
   SavePoiOverlayItem,
   SavePoiSectorGroup,
   StationEntry,
-  PlayerStationEntry,
-  FactionStationEntry,
-  NpcStationEntry,
   DatavaultEntry,
-  AbandonedShipEntry
+  AbandonedShipEntry,
+  CodeMap
 } from '@/types/saveArchive'
 import { useGameDataStore } from './useGameDataStore'
 import {
@@ -67,14 +65,19 @@ function createEmptySectorData(name: string): SectorData {
     clusterGates: [],
     superhighwayGates: [],
     highways: [],
-    playerStations: [],
-    xenonStations: [],
-    khaakStations: [],
-    npcStations: [],
-    datavaults: [],
-    erlkingVaults: [],
-    abandonedShips: []
+    player_stations: {},
+    xenon_stations: {},
+    khaak_stations: {},
+    npc_stations: {},
+    player_buildstorages: {},
+    datavaults: {},
+    erlking_vaults: {},
+    abandoned_ships: {}
   }
+}
+
+function recordValues<T>(record: CodeMap<T> | undefined): T[] {
+  return record ? Object.values(record) : []
 }
 
 function createEmptySaveArchivesState(): SavedSaveArchivesState {
@@ -102,6 +105,12 @@ function createDefaultSaveArchiveSettings(): SaveArchiveSettings {
   return {
     visibility: createDefaultSavePoiVisibility()
   }
+}
+
+function getLatestArchiveMetaForGuid(list: ArchiveMeta[], guid: string): ArchiveMeta | null {
+  const matches = list.filter((item) => item.guid === guid && isArchiveParserVersionValidByString(item.parser_version))
+  if (matches.length === 0) return null
+  return [...matches].sort((a, b) => b.time - a.time)[0] || null
 }
 
 function migrateSaveArchiveSettingsToCurrent(raw: unknown): SaveArchiveSettings {
@@ -229,39 +238,26 @@ export function deriveSavePoiCategoryData(
 
   return {
     playerStation: createPoiCategoryData('playerStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
-      (sector.playerStations || []).filter((item) => shouldIncludePoiItem('playerStation', sectorMacro, sector.name, item, options))
+      recordValues(sector.player_stations).filter((item) => shouldIncludePoiItem('playerStation', sectorMacro, sector.name, item, options))
     )),
     npcStation: createPoiCategoryData('npcStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
-      (sector.npcStations || []).filter((item) => shouldIncludePoiItem('npcStation', sectorMacro, sector.name, item, options))
+      recordValues(sector.npc_stations).filter((item) => shouldIncludePoiItem('npcStation', sectorMacro, sector.name, item, options))
     )),
     xenonStation: createPoiCategoryData('xenonStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
-      (sector.xenonStations || []).filter((item) => shouldIncludePoiItem('xenonStation', sectorMacro, sector.name, item, options))
+      recordValues(sector.xenon_stations).filter((item) => shouldIncludePoiItem('xenonStation', sectorMacro, sector.name, item, options))
     )),
     khaakStation: createPoiCategoryData('khaakStation', buildPoiGroups(sectors, (sectorMacro, sector) =>
-      (sector.khaakStations || []).filter((item) => shouldIncludePoiItem('khaakStation', sectorMacro, sector.name, item, options))
+      recordValues(sector.khaak_stations).filter((item) => shouldIncludePoiItem('khaakStation', sectorMacro, sector.name, item, options))
     )),
-    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.abandonedShips || [])),
-    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.datavaults || [])),
-    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (_sectorMacro, sector) => sector.erlkingVaults || []))
+    abandonedShip: createPoiCategoryData('abandonedShip', buildPoiGroups(sectors, (_sectorMacro, sector) => recordValues(sector.abandoned_ships))),
+    datavault: createPoiCategoryData('datavault', buildPoiGroups(sectors, (_sectorMacro, sector) => recordValues(sector.datavaults))),
+    erlkingVault: createPoiCategoryData('erlkingVault', buildPoiGroups(sectors, (_sectorMacro, sector) => recordValues(sector.erlking_vaults)))
   }
-}
-
-function classifyLegacyStation(station: StationEntry): keyof Pick<SectorData, 'playerStations' | 'xenonStations' | 'khaakStations' | 'npcStations'> {
-  if (station.owner === 'player') return 'playerStations'
-  if (station.owner === 'xenon') return 'xenonStations'
-  if (station.owner === 'khaak') return 'khaakStations'
-  return 'npcStations'
 }
 
 function normalizeSectorData(
   sectorId: string,
-  sector: SectorData & {
-    stations?: StationEntry[]
-    player_stations?: PlayerStationEntry[]
-    xenon_stations?: FactionStationEntry[]
-    khaak_stations?: FactionStationEntry[]
-    npc_stations?: NpcStationEntry[]
-  }
+  sector: SectorData
 ): SectorData {
   const normalized = createEmptySectorData(sector.name || sectorId)
   normalized.is_known = Boolean(sector.is_known)
@@ -270,37 +266,14 @@ function normalizeSectorData(
   normalized.clusterGates = Array.isArray(sector.clusterGates) ? sector.clusterGates : []
   normalized.superhighwayGates = Array.isArray(sector.superhighwayGates) ? sector.superhighwayGates : []
   normalized.highways = Array.isArray(sector.highways) ? sector.highways : []
-  normalized.datavaults = Array.isArray(sector.datavaults)
-    ? sector.datavaults.map((entry) => ({
-      ...entry,
-      unlocked: entry.unlocked === true,
-      wares: Array.isArray(entry.wares) ? entry.wares : []
-    }))
-    : []
-  normalized.erlkingVaults = Array.isArray(sector.erlkingVaults)
-    ? sector.erlkingVaults.map((entry) => ({
-      ...entry,
-      unlocked: entry.unlocked === true,
-      wares: Array.isArray(entry.wares) ? entry.wares : []
-    }))
-    : []
-  normalized.abandonedShips = Array.isArray(sector.abandonedShips) ? sector.abandonedShips : []
-
-  if (Array.isArray(sector.playerStations)) normalized.playerStations = sector.playerStations as PlayerStationEntry[]
-  else if (Array.isArray(sector.player_stations)) normalized.playerStations = sector.player_stations as PlayerStationEntry[]
-  if (Array.isArray(sector.xenonStations)) normalized.xenonStations = sector.xenonStations as FactionStationEntry[]
-  else if (Array.isArray(sector.xenon_stations)) normalized.xenonStations = sector.xenon_stations as FactionStationEntry[]
-  if (Array.isArray(sector.khaakStations)) normalized.khaakStations = sector.khaakStations as FactionStationEntry[]
-  else if (Array.isArray(sector.khaak_stations)) normalized.khaakStations = sector.khaak_stations as FactionStationEntry[]
-  if (Array.isArray(sector.npcStations)) normalized.npcStations = sector.npcStations as NpcStationEntry[]
-  else if (Array.isArray(sector.npc_stations)) normalized.npcStations = sector.npc_stations as NpcStationEntry[]
-
-  if (Array.isArray(sector.stations)) {
-    for (const station of sector.stations) {
-      const key = classifyLegacyStation(station)
-      ;(normalized[key] as StationEntry[]).push(station)
-    }
-  }
+  normalized.datavaults = sector.datavaults || {}
+  normalized.erlking_vaults = sector.erlking_vaults || {}
+  normalized.abandoned_ships = sector.abandoned_ships || {}
+  normalized.player_stations = sector.player_stations || {}
+  normalized.xenon_stations = sector.xenon_stations || {}
+  normalized.khaak_stations = sector.khaak_stations || {}
+  normalized.npc_stations = sector.npc_stations || {}
+  normalized.player_buildstorages = sector.player_buildstorages || {}
 
   return normalized
 }
@@ -320,7 +293,29 @@ function isArchiveParserVersionValid(archive: Pick<SaveArchive, 'meta'>): boolea
   return archive.meta.parser_version === CURRENT_PARSER_VERSION
 }
 
-function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
+function isArchiveParserVersionValidByString(parserVersion: string): boolean {
+  return parserVersion === CURRENT_PARSER_VERSION
+}
+
+function upsertArchiveMeta(list: ArchiveMeta[], meta: ArchiveMeta): ArchiveMeta[] {
+  const index = list.findIndex((item) => item.id === meta.id)
+  if (index >= 0) {
+    const next = [...list]
+    next[index] = meta
+    return next
+  }
+  return [...list, meta]
+}
+
+function removeArchiveMeta(list: ArchiveMeta[], archiveId: string): ArchiveMeta[] {
+  return list.filter((item) => item.id !== archiveId)
+}
+
+function createStubArchiveFromMeta(meta: ArchiveMeta, currentVersion?: string): SaveArchive {
+  const isValid = isArchiveParserVersionValidByString(meta.parser_version)
+  const isCompatible = currentVersion
+    ? normalizeVersion(meta.version) === normalizeVersion(currentVersion)
+    : true
   return {
     meta: {
       guid: meta.guid,
@@ -329,34 +324,21 @@ function createStubArchiveFromMeta(meta: ArchiveMeta): SaveArchive {
       playerName: meta.playerName,
       version: meta.version,
       filename: meta.filename,
-      parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
+      parser_version: meta.parser_version,
       post_processor_version: meta.post_processor_version as SaveMeta['post_processor_version'],
       source: meta.source
     },
     sectors: {},
-    isCompatible: meta.isCompatible,
-    isValid: meta.parser_version === CURRENT_PARSER_VERSION
+    isCompatible,
+    isValid
   }
 }
 
-function upsertArchiveMeta(list: ArchiveMeta[], meta: ArchiveMeta): ArchiveMeta[] {
-  const next = [...list]
-  const index = next.findIndex((item) => item.id === meta.id)
-  if (index >= 0) next[index] = meta
-  else next.push(meta)
-  next.sort((a, b) => b.time - a.time)
-  return next
-}
-
-function removeArchiveMeta(list: ArchiveMeta[], archiveId: string): ArchiveMeta[] {
-  return list.filter((item) => item.id !== archiveId)
-}
-
-function buildArchiveGroups(metaList: ArchiveMeta[]): Map<string, ArchiveGroup> {
+function buildArchiveGroups(metaList: ArchiveMeta[], currentVersion?: string): Map<string, ArchiveGroup> {
   const groups = new Map<string, ArchiveGroup>()
 
   for (const meta of metaList) {
-    const archive = createStubArchiveFromMeta(meta)
+    const archive = createStubArchiveFromMeta(meta, currentVersion)
     const existing = groups.get(meta.guid)
     if (existing) {
       existing.saves.push(archive)
@@ -394,7 +376,7 @@ export const useSaveStore = defineStore('save', () => {
   }
 
   function rebuildArchivesFromState() {
-    archives.value = buildArchiveGroups(savedArchivesState.value.list)
+    archives.value = buildArchiveGroups(savedArchivesState.value.list, gameDataStore.currentVersion)
   }
 
   function loadData(data: SavedSaveArchivesState) {
@@ -435,15 +417,29 @@ export const useSaveStore = defineStore('save', () => {
       parser_version: archive.meta.parser_version,
       post_processor_version: archive.meta.post_processor_version,
       source: archive.meta.source,
-      isCompatible: archive.isCompatible,
-      isValid: archive.isValid,
       createdAt: existingCreatedAt || new Date(),
       sectorCount: Object.keys(archive.sectors).length
     }
   }
 
+  let archiveRestoreRequestId = 0
+
   async function restoreSelectedArchive(archiveId: string): Promise<void> {
-    const fullArchive = await loadArchiveDetailFromDB(getStorageKey(), archiveId)
+    const requestId = ++archiveRestoreRequestId
+    const resolvedArchiveId = savedArchivesState.value.list.some((item) => item.id === archiveId)
+      ? archiveId
+      : getLatestArchiveMetaForGuid(savedArchivesState.value.list, archiveId)?.id || null
+
+    if (!resolvedArchiveId) {
+      if (requestId !== archiveRestoreRequestId) return
+      selectedArchive.value = null
+      savedArchivesState.value.activeArchiveId = null
+      writeSavedState()
+      return
+    }
+
+    const fullArchive = await loadArchiveDetailFromDB(gameDataStore, resolvedArchiveId)
+    if (requestId !== archiveRestoreRequestId) return
     if (!fullArchive) {
       selectedArchive.value = null
       savedArchivesState.value.activeArchiveId = null
@@ -461,16 +457,18 @@ export const useSaveStore = defineStore('save', () => {
         fullArchive,
         gameDataStore.modulesByMacroId,
         gameDataStore.maps,
-        gameDataStore.ships
+        gameDataStore.ships,
+        gameDataStore.equipments
       )
       reprocessedArchive.isCompatible = checkVersionCompatibility(reprocessedArchive.meta.version)
       reprocessedArchive.isValid = isArchiveParserVersionValid(reprocessedArchive)
-      await saveArchiveToDB(getStorageKey(), reprocessedArchive)
-      const existingMeta = savedArchivesState.value.list.find((item) => item.id === archiveId)
+      await saveArchiveToDB(gameDataStore, reprocessedArchive)
+      const existingMeta = savedArchivesState.value.list.find((item) => item.id === resolvedArchiveId)
       const nextMeta = buildArchiveMeta(reprocessedArchive, existingMeta?.createdAt)
       savedArchivesState.value.list = upsertArchiveMeta(savedArchivesState.value.list, nextMeta)
       writeSavedState()
       rebuildArchivesFromState()
+      if (requestId !== archiveRestoreRequestId) return
       selectedArchive.value = reprocessedArchive
       return
     }
@@ -523,6 +521,14 @@ export const useSaveStore = defineStore('save', () => {
       if (savedArchivesState.value.activeArchiveId) {
         await restoreSelectedArchive(savedArchivesState.value.activeArchiveId)
       }
+      
+      // Check if restored archive is valid
+      const restoredArchive = selectedArchive.value
+      if (restoredArchive && !isArchiveParserVersionValid(restoredArchive)) {
+        selectedArchive.value = null
+        savedArchivesState.value.activeArchiveId = null
+        writeSavedState()
+      }
     } catch (error) {
       console.error('[saveStore] initialization failed:', error)
       isInitialized.value = false
@@ -538,7 +544,7 @@ export const useSaveStore = defineStore('save', () => {
     return normalizedVersion === currentVersion
   }
 
-  function addArchive(archive: SaveArchive): void {
+  async function addArchive(archive: SaveArchive): Promise<void> {
     archive.sectors = Object.fromEntries(
       Object.entries(archive.sectors).map(([sectorId, sector]) => [sectorId, normalizeSectorData(sectorId, sector as SectorData & { stations?: StationEntry[] })])
     )
@@ -552,11 +558,14 @@ export const useSaveStore = defineStore('save', () => {
     savedArchivesState.value.activeArchiveId = archiveId
     writeSavedState()
     rebuildArchivesFromState()
-    selectedArchive.value = archive
 
-    saveArchiveToDB(getStorageKey(), archive).catch(error => {
+    try {
+      await saveArchiveToDB(gameDataStore, archive)
+    } catch (error) {
       console.error('[saveStore] failed to persist archive:', error)
-    })
+    }
+
+    selectedArchive.value = archive
   }
 
   async function selectArchive(guid: string, time: number): Promise<void> {
@@ -569,6 +578,29 @@ export const useSaveStore = defineStore('save', () => {
 
     savedArchivesState.value.activeArchiveId = archiveId
     writeSavedState()
+    await restoreSelectedArchive(archiveId)
+  }
+
+  async function selectArchiveGroup(guid: string): Promise<void> {
+    const latestMeta = getLatestArchiveMetaForGuid(savedArchivesState.value.list, guid)
+    if (!latestMeta) {
+      selectedArchive.value = null
+      return
+    }
+
+    savedArchivesState.value.activeArchiveId = guid
+    writeSavedState()
+    await restoreSelectedArchive(guid)
+  }
+
+  async function previewArchive(guid: string, time: number): Promise<void> {
+    const archiveId = createArchiveId(guid, time)
+    const exists = savedArchivesState.value.list.some((item) => item.id === archiveId)
+    if (!exists) {
+      selectedArchive.value = null
+      return
+    }
+
     await restoreSelectedArchive(archiveId)
   }
 
@@ -586,6 +618,9 @@ export const useSaveStore = defineStore('save', () => {
     savedArchivesState.value.list = removeArchiveMeta(savedArchivesState.value.list, archiveId)
     if (savedArchivesState.value.activeArchiveId === archiveId) {
       savedArchivesState.value.activeArchiveId = null
+    } else if (savedArchivesState.value.activeArchiveId === guid) {
+      const remaining = savedArchivesState.value.list.filter((item) => item.id !== archiveId && item.guid === guid)
+      savedArchivesState.value.activeArchiveId = remaining.length > 0 ? guid : null
     }
     if (selectedArchive.value?.meta.guid === guid && selectedArchive.value?.meta.time === time) {
       selectedArchive.value = null
@@ -593,7 +628,7 @@ export const useSaveStore = defineStore('save', () => {
     writeSavedState()
     rebuildArchivesFromState()
 
-    removeArchiveFromDB(getStorageKey(), archiveId).catch(error => {
+    removeArchiveFromDB(gameDataStore, archiveId).catch(error => {
       console.error('[saveStore] failed to remove archive from DB:', error)
     })
   }
@@ -609,14 +644,14 @@ export const useSaveStore = defineStore('save', () => {
     isParsing.value = false
     writeSavedState()
 
-    clearArchivesFromDB(getStorageKey()).catch(error => {
+    clearArchivesFromDB(gameDataStore).catch(error => {
       console.error('[saveStore] failed to clear DB:', error)
     })
   }
 
   async function exportToJson(guid: string, time: number): Promise<void> {
     const archiveId = createArchiveId(guid, time)
-    let archive = await loadArchiveDetailFromDB(getStorageKey(), archiveId)
+    let archive = await loadArchiveDetailFromDB(gameDataStore, archiveId)
 
     if (!archive) {
       const group = archives.value.get(guid)
@@ -625,6 +660,19 @@ export const useSaveStore = defineStore('save', () => {
     }
 
     if (!archive) return
+
+    const needsReprocess = archive.meta.post_processor_version !== CURRENT_POST_PROCESSOR_VERSION
+      || !hasValidPosition(archive)
+
+    if (needsReprocess) {
+      archive = postProcessRustSaveArchive(
+        archive,
+        gameDataStore.modulesByMacroId,
+        gameDataStore.maps,
+        gameDataStore.ships,
+        gameDataStore.equipments
+      )
+    }
 
     const exportData = {
       meta: archive.meta,
@@ -645,6 +693,17 @@ export const useSaveStore = defineStore('save', () => {
     document.body.removeChild(link)
 
     URL.revokeObjectURL(url)
+  }
+
+  function hasValidPosition(archive: SaveArchive): boolean {
+    for (const sector of Object.values(archive.sectors)) {
+      for (const station of Object.values(sector.player_stations || {})) {
+        if (station.relative_position && !station.position) {
+          return false
+        }
+      }
+    }
+    return true
   }
 
   function importFromJson(jsonData: unknown): { success: boolean; error?: string; errorDetail?: SaveParserErrorDetail } {
@@ -697,7 +756,11 @@ export const useSaveStore = defineStore('save', () => {
         meta: {
           ...meta,
           filename: typeof meta.filename === 'string' ? meta.filename : '',
-          parser_version: meta.parser_version === 'v1' ? 'v1' : 'v2',
+          parser_version: meta.parser_version === 'v1'
+            ? 'v1'
+            : meta.parser_version === 'v2'
+              ? 'v2'
+              : 'v3',
           post_processor_version: meta.post_processor_version === 'v1'
             ? 'v1'
             : meta.post_processor_version === 'v2'
@@ -714,7 +777,7 @@ export const useSaveStore = defineStore('save', () => {
 
       const finalArchive = archive.meta.post_processor_version === CURRENT_POST_PROCESSOR_VERSION
         ? archive
-        : postProcessRustSaveArchive(archive, gameDataStore.modulesByMacroId, gameDataStore.maps, gameDataStore.ships)
+        : postProcessRustSaveArchive(archive, gameDataStore.modulesByMacroId, gameDataStore.maps, gameDataStore.ships, gameDataStore.equipments)
 
       addArchive(finalArchive)
       return { success: true }
@@ -761,6 +824,8 @@ export const useSaveStore = defineStore('save', () => {
     checkVersionCompatibility,
     addArchive,
     selectArchive,
+    selectArchiveGroup,
+    previewArchive,
     clearSelection,
     removeArchive,
     clearAll,

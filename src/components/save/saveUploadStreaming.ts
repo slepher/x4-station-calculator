@@ -38,12 +38,19 @@ export async function streamFileToSaveParserWorker(options: StreamFileToSavePars
   })
 
   const reader = file.stream().getReader()
+  let sourceChunkCount = 0
   while (true) {
     const { done, value } = await reader.read()
     if (done) break
     if (!value || value.length === 0) continue
+    sourceChunkCount += 1
     const transferable = toTransferableBuffer(value)
-    worker.postMessage({ type: 'parse_chunk', chunk: transferable }, [transferable])
+    worker.postMessage({
+      type: 'parse_chunk',
+      chunk: transferable,
+      sentAtMs: Date.now(),
+      chunkIndex: sourceChunkCount
+    }, [transferable])
   }
 
   worker.postMessage({ type: 'parse_end' })

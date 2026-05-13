@@ -17,11 +17,14 @@ const logicFlow = useLogicFlowStore()
 const moduleDisplayName = computed(() => gameData.getModuleDisplayName(props.node.moduleId))
 const wareDisplayName = computed(() => gameData.getWareDisplayName(props.node.wareId))
 
-const isRawResource = computed(() => props.node.column === 0 || props.node.wareId === 'energycells')
+const isRawResource = computed(() => gameData.isRawMaterialWare(props.node.wareId))
 
 const volumeCompressionRate = computed(() => {
-  // 显示条件：有 moduleId、非 isolated、非 T0、模块有输入
-  if (!props.node.moduleId || props.node.isIsolated || props.node.column === 0) {
+  if (!props.node.moduleId || props.node.isIsolated) {
+    return undefined
+  }
+  const module = gameData.modulesMap[props.node.moduleId]
+  if (!module?.inputs || Object.keys(module.inputs).length === 0) {
     return undefined
   }
   return gameData.getModuleVolumeCompression(props.node.moduleId)
@@ -57,10 +60,7 @@ const getTierBg = (tier: number) => {
 const isDepended = computed(() => logicFlow.isNodeDepended(props.groupId, props.node.wareId))
 
 const canIsolate = computed(() => {
-  // 基础资源不能隔离（本身就是基础）
   if (isRawResource.value) return false
-  // 只有当该节点被下游依赖时，才允许隔离 (✂️)
-  // 手动添加且没有下游的节点，无法隔离
   return isDepended.value
 })
 

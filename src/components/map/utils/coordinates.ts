@@ -14,6 +14,10 @@ type SectorRawPoint = {
   sy?: number
 } | null | undefined
 
+type SectorScaleOptions = {
+  scalePerRadius?: number | null
+}
+
 const snapToSectorCenterGrid = (value: number) => Math.round(value / SECTOR_CENTER_GRID) * SECTOR_CENTER_GRID
 
 export const getSectorZoneBoundingCenter = (sector: Sector) => {
@@ -46,9 +50,17 @@ export const getSectorZoneBoundingCenter = (sector: Sector) => {
 }
 
 export const sectorPointToLocalRatio = (sector: Sector, point: SectorRawPoint): Ratio | null => {
+  return sectorPointToLocalRatioWithScale(sector, point)
+}
+
+export const sectorPointToLocalRatioWithScale = (
+  sector: Sector,
+  point: SectorRawPoint,
+  options?: SectorScaleOptions
+): Ratio | null => {
   if (!point) return null
 
-  const scalePerRadius = getSectorScalePerRadius(sector)
+  const scalePerRadius = resolveSectorScalePerRadius(sector, options)
   if (point.x !== undefined && point.z !== undefined && scalePerRadius) {
     const center = getSectorZoneBoundingCenter(sector)
     return {
@@ -65,9 +77,17 @@ export const sectorPointToLocalRatio = (sector: Sector, point: SectorRawPoint): 
 }
 
 export const sectorLocalRatioToRawPoint = (sector: Sector, localRatio?: Ratio | null): { x: number; z: number } | null => {
+  return sectorLocalRatioToRawPointWithScale(sector, localRatio)
+}
+
+export const sectorLocalRatioToRawPointWithScale = (
+  sector: Sector,
+  localRatio?: Ratio | null,
+  options?: SectorScaleOptions
+): { x: number; z: number } | null => {
   if (!localRatio) return null
 
-  const scalePerRadius = getSectorScalePerRadius(sector)
+  const scalePerRadius = resolveSectorScalePerRadius(sector, options)
   if (!scalePerRadius) return null
 
   const center = getSectorZoneBoundingCenter(sector)
@@ -109,6 +129,13 @@ export const getSectorScalePerRadius = (sector: Sector): number => {
   const innerRatio = Number(normalized?.scale_basis?.hex_inner_ratio || DEFAULT_HEX_INNER_RATIO)
   const extentRatio = Number(normalized?.scale_basis?.extent_ratio || DEFAULT_EXTENT_RATIO)
   return (innerRatio * extentRatio) / maxExtent
+}
+
+export const resolveSectorScalePerRadius = (sector: Sector, options?: SectorScaleOptions): number => {
+  if (typeof options?.scalePerRadius === 'number' && Number.isFinite(options.scalePerRadius) && options.scalePerRadius > 0) {
+    return options.scalePerRadius
+  }
+  return getSectorScalePerRadius(sector)
 }
 
 export const sectorRatioToClusterRatio = (sectorNorm: Sector['normalized'], localRatio?: Ratio | null): Ratio | null => {

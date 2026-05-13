@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
 import { useSaveStore } from '@/store/useSaveStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import { useStatusStore } from '@/store/useStatusStore'
+import { useBuildPlanStore } from '@/store/useBuildPlanStore'
 import {
   applyImportPayload,
   normalizeImportPayload,
@@ -27,12 +29,14 @@ const emit = defineEmits<{
 }>()
 
 const { t } = useI18n()
-const empireStore = useEmpireStore()
+const blueprintStore = useBlueprintProductionStore()
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
 const shipBuildStore = useShipBuildStore()
 const saveStore = useSaveStore()
+const saveBindingStore = useSaveBindingStore()
 const statusStore = useStatusStore()
+const buildPlanStore = useBuildPlanStore()
 
 const fileName = ref('')
 const parseError = ref('')
@@ -44,7 +48,9 @@ const selectedModules = ref<Record<ImportModuleKey, boolean>>({
   x4_empire_data: false,
   x4_logic_flow_plans: false,
   x4_ship_blueprints: false,
-  x4_save_archives: false
+  x4_save_archives: false,
+  x4_save_bindings: false,
+  x4_build_plan_goals: false
 })
 
 const hasParsedPayload = computed(() => parsedPayload.value !== null)
@@ -54,7 +60,7 @@ const sanitizeSummaries = computed(() => preparedPayload.value?.sanitizeSummarie
 
 const setDefaultSelections = (selectAll: boolean) => {
   const keys = new Set(availableKeys.value)
-  ;(['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints', 'x4_save_archives'] as ImportModuleKey[]).forEach((key) => {
+  ;(['x4_empire_data', 'x4_logic_flow_plans', 'x4_ship_blueprints', 'x4_save_archives', 'x4_save_bindings', 'x4_build_plan_goals'] as ImportModuleKey[]).forEach((key) => {
     selectedModules.value[key] = selectAll ? keys.has(key) : selectedModules.value[key] && keys.has(key)
   })
 }
@@ -73,7 +79,9 @@ watch(
       x4_empire_data: false,
       x4_logic_flow_plans: false,
       x4_ship_blueprints: false,
-      x4_save_archives: false
+      x4_save_archives: false,
+      x4_save_bindings: false,
+      x4_build_plan_goals: false
     }
   }
 )
@@ -95,6 +103,10 @@ const moduleTitle = (key: ImportModuleKey) => {
       return t('moduleNames.ship')
     case 'x4_save_archives':
       return t('moduleNames.save')
+    case 'x4_save_bindings':
+      return t('moduleNames.save_binding')
+    case 'x4_build_plan_goals':
+      return t('moduleNames.build_plan')
     default:
       return key
   }
@@ -156,10 +168,12 @@ const handleApplyImport = async () => {
     payload: parsedPayload.value,
     preparedPayload: preparedPayload.value,
     gameDataStore,
-    empireStore,
+    blueprintStore,
     logicFlowStore,
     shipBuildStore,
-    saveStore
+    saveStore,
+    saveBindingStore,
+    buildPlanStore
   })
 
   if (result.applied.length === 0) {

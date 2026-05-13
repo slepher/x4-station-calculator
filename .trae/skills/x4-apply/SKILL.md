@@ -9,7 +9,7 @@ metadata:
 
 This skill is the single implementation entry for `/x4:apply`.
 It extends `openspec-apply-change` with X4-specific bug discipline.
-It does not execute test cases during apply.
+It supports TDD (test-driven development) during apply, including running individual unit tests, but must not execute E2E tests or full test suite runs.
 
 ## Input
 
@@ -27,12 +27,17 @@ It does not execute test cases during apply.
 
 1. Read and follow `.trae/skills/openspec-apply-change/SKILL.md` as the base implementation workflow.
 2. Read apply context files from OpenSpec instructions and implement pending items in `tasks.md`.
-3. Mark each completed task immediately (`- [ ]` -> `- [x]`).
-4. If a bug is found during implementation, run the bug loop below before continuing.
-5. After all code modifications are complete, run build validation:
+3. When using TDD (`/tdd` flag), follow TDD tracer-bullet loop per task:
+   - RED: Write one unit test → verify it fails (`npm run test:unit -- tests/unit/<file>`)
+   - GREEN: Write minimal implementation to pass
+   - REFACTOR: Clean up while keeping tests green
+   - Mark task complete
+4. Mark each completed task immediately (`- [ ]` -> `- [x]`).
+5. If a bug is found during implementation, run the bug loop below before continuing.
+6. After all code modifications are complete, run build validation:
    - `npm run build`
    - if compile errors exist, fix and rerun build until pass or explicit blocker
-6. Stop when all implementation tasks are done and build passes, or a blocker requires user decision.
+7. Stop when all implementation tasks are done and build passes, or a blocker requires user decision.
 
 ## Bug Loop (MANDATORY when bug found)
 
@@ -43,7 +48,8 @@ It does not execute test cases during apply.
 
 Required actions:
 - Add bug record to `openspec/changes/<change-name>/bugs.md`.
-- Do not run tests in `/x4:apply`; execute verification in `/x4:verify`.
+- Do not run E2E tests or full test suites in `/x4:apply`; execute verification in `/x4:verify`.
+- TDD unit tests (individual files via `npm run test:unit -- tests/unit/...`) are allowed during apply.
 
 ## Unrelated Bug Handling
 
@@ -57,7 +63,9 @@ If a discovered bug is out of current change scope:
 - `/x4:apply` is implementation-focused.
 - Do not treat `/x4:apply` as final full verification.
 - Full build + full test + final pass/fail decision belongs to `/x4:verify`.
-- `/x4:apply` runs build validation after modifications and no test commands.
+- `/x4:apply` runs build validation after code modifications.
+- TDD cycle (`npm run test:unit -- tests/unit/<path>`) is allowed during apply for individual unit tests.
+- Do NOT run E2E tests (`playwright`, `npm run test:e2e`) or full unit test suites during apply.
 
 ## Constraints
 
@@ -65,7 +73,8 @@ If a discovered bug is out of current change scope:
   - do not rewrite non-target logic
   - do not add/remove comments unless explicitly requested
   - do not reformat unrelated code
-- Do not execute `npm run test:*` or `playwright` in `/x4:apply`.
+- Do not execute full test suites (`npm run test:unit` without path, `npm run test:e2e`) or `playwright` in `/x4:apply`.
+- TDD unit tests are allowed: `npm run test:unit -- tests/unit/<specific-file>`.
 
 ## Output
 

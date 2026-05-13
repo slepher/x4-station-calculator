@@ -2,25 +2,19 @@
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
 import CollapsibleDetailList from '@/components/common/CollapsibleDetailList.vue'
-import type { SupplyStorageFlowDetail } from '@/types/x4'
+import type { DerivedFlowContribution } from '@/types/production-flow'
 
 const props = defineProps<{
   resourceId: string
   name: string
-  unitVolume: number
-  totalRequiredStorageVolume: number
-  details: SupplyStorageFlowDetail[]
+  totalOccupiedCount: number
+  contributions: DerivedFlowContribution[]
 }>()
 
 const { t } = useI18n()
 
-const totalRequiredCount = computed(() => {
-  if (!props.unitVolume || props.unitVolume <= 0) return 0
-  return Math.ceil(props.totalRequiredStorageVolume / props.unitVolume)
-})
-
 const formattedDetails = computed(() => {
-  return [...props.details]
+  return [...props.contributions]
     .sort((a, b) => {
       const orderA = Number((a as any).sortOrder)
       const orderB = Number((b as any).sortOrder)
@@ -31,25 +25,22 @@ const formattedDetails = computed(() => {
         if (hasOrderA && !hasOrderB) return -1
         if (!hasOrderA && hasOrderB) return 1
       }
-      if (a.kind !== b.kind) return a.kind === 'production' ? -1 : 1
-      return b.storageVolume - a.storageVolume
+      if (a.type !== b.type) return a.type === 'production' ? -1 : 1
+      return (b.volumeContribution || 0) - (a.volumeContribution || 0)
     })
     .map((detail) => ({
       ...detail,
-      isExternal: String(detail.stationId || '').startsWith('external:'),
-      storageCount: (!props.unitVolume || props.unitVolume <= 0)
-        ? 0
-        : Math.ceil(detail.storageVolume / props.unitVolume),
-      kindLabel: String(detail.stationId || '').startsWith('external:')
-        ? (detail.kind === 'consumption'
+      isExternal: detail.class === 'sector',
+      kindLabel: detail.class === 'sector'
+        ? (detail.type === 'production'
             ? t('sectorManagement.supply_storage_input')
             : t('sectorManagement.supply_storage_output'))
-        : (detail.kind === 'production'
+        : (detail.type === 'production'
             ? t('sectorManagement.supply_storage_production')
             : t('sectorManagement.supply_storage_consumption')),
-      kindClass: String(detail.stationId || '').startsWith('external:')
-        ? (detail.kind === 'consumption' ? 'kind-pos' : 'kind-neg')
-        : (detail.kind === 'production' ? 'kind-pos' : 'kind-neg')
+      kindClass: detail.class === 'sector'
+        ? (detail.type === 'production' ? 'kind-pos' : 'kind-neg')
+        : (detail.type === 'production' ? 'kind-pos' : 'kind-neg')
     }))
 })
 </script>
@@ -65,7 +56,7 @@ const formattedDetails = computed(() => {
       </template>
       <template #header>
         <div class="value value-pos">
-          {{ totalRequiredCount }}
+          {{ Math.ceil(totalOccupiedCount) }}
           <svg class="w-3.5 h-3.5 text-blue-300/70" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
             <path d="m3.3 7 8.7 5 8.7-5"/>
@@ -76,15 +67,15 @@ const formattedDetails = computed(() => {
 
       <template #row="{ item }">
         <span class="item-name">
-          <span class="qty">{{ item.stationCount }}</span>
+          <span class="qty">{{ item.count }}</span>
           <span class="symbol">x</span>
-          <span class="name">{{ item.stationName }}</span>
+          <span class="name">{{ item.name }}</span>
           <span :class="item.kindClass">
             {{ item.kindLabel }}
           </span>
         </span>
         <div class="item-val-group">
-          <span class="item-count">{{ item.storageCount }}</span>
+          <span class="item-count">{{ Math.ceil(item.volumeContribution) }}</span>
         </div>
       </template>
     </CollapsibleDetailList>

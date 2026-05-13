@@ -126,7 +126,7 @@ class X4PrecisionLoader:
         self.wares_data = []         
         self.i18n_data = {}         
         self.recipes = {} 
-        self.race_consumption = {}  # 种群消耗速率 (每人每秒)
+        self.race_consumption = {}  # 种群消耗速率 (每人每小时) race -> {idle, busy} -> wareId -> perPersonPerHour
         self.module_groups_result = []  # 模块分组结果 (合并 types 和 waregroups)
         self.ware_tier_map = {}     # 缓存物品层级映射
         self.all_methods = set()
@@ -262,7 +262,8 @@ class X4PrecisionLoader:
                 is_valid = False
                 
                 # C. 工人消耗 (Food/Medical)
-                if transport == 'workunit' and w_id == 'workunit_busy':
+                if transport == 'workunit' and w_id in ('workunit_idle', 'workunit_busy'):
+                    state = 'busy' if w_id == 'workunit_busy' else 'idle'
                     for prod in ware.findall('production'):
                         method = prod.get('method', 'default')
                         p_time = float(prod.get('time', 600))
@@ -271,9 +272,10 @@ class X4PrecisionLoader:
                         for r in prod.findall('primary/ware'):
                             c_ware = r.get('ware')
                             c_amount = float(r.get('amount'))
-                            # 计算每人每秒消耗量
-                            consumables[c_ware] = c_amount / (p_amount * p_time)
-                        self.race_consumption[method] = consumables
+                            consumables[c_ware] = c_amount / (p_amount * p_time) * 3600
+                        if method not in self.race_consumption:
+                            self.race_consumption[method] = {}
+                        self.race_consumption[method][state] = consumables
 
                 # A. 商品
                 if transport in {'container', 'solid', 'liquid'} and 'module' not in tags:
@@ -855,6 +857,14 @@ class X4PrecisionLoader:
             cost[method] = recipe.get('inputs', {})
         return cost
 
+    def _build_time_by_method(self, ware_id):
+        if not ware_id: return {}
+        recipe_group = self.recipes.get(ware_id, {})
+        build_time = {}
+        for method, recipe in recipe_group.items():
+            build_time[method] = recipe.get('time', 0)
+        return build_time
+
     def _build_methods(self, ware_info):
         ware_id = ware_info.get("id")
         if not ware_id:
@@ -867,7 +877,8 @@ class X4PrecisionLoader:
             build.append({
                 "method": method,
                 "noplayerbuild": "noplayerbuild" in tags,
-                "cost": recipe.get("inputs", {})
+                "cost": recipe.get("inputs", {}),
+                "time": recipe.get("time", 0)
             })
         return build
 
@@ -1911,7 +1922,8 @@ class X4PrecisionLoader:
                     "ammunitionTags": [],
                     "integrated": hull_integrated,
                     "size": equip_size,
-                    "cost": self._build_cost(ware_id)
+                    "cost": self._build_cost(ware_id),
+                    "buildTime": self._build_time_by_method(ware_id)
                 }
 
                 # 提取各类型装备数据到顶层
@@ -2072,7 +2084,8 @@ class X4PrecisionLoader:
                     "race": ident_info.get('race'),
                     "deployable": ident_info.get('deployable', False),
                     "tags": self._split_tags(ware_info.get('tags', '')),
-                    "cost": self._build_cost(ware_id)
+                    "cost": self._build_cost(ware_id),
+                    "buildTime": self._build_time_by_method(ware_id)
                 }
 
                 # 根据 class 分类
@@ -2141,6 +2154,7 @@ class X4PrecisionLoader:
                     "tags": self._split_tags(ware_info.get('tags', '')),
                     "missileTags": [],
                     "cost": self._build_cost(ware_id),
+                    "buildTime": self._build_time_by_method(ware_id),
                     "amount": 0,
                     "lifetime": 0,
                     "range": 0,

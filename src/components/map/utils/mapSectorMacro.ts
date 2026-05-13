@@ -1,1 +1,1 @@
-export { resolveMapSectorByMacro } from '@/components/map/mapSectorMacro'
+export { resolveMapSectorByMacro, resolveSectorMacroById } from '@/components/map/mapSectorMacro'

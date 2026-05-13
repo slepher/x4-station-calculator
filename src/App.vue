@@ -6,43 +6,49 @@ import TestTemplateFlow from './components/test/GLM-Parent.vue'
 import MetricPanelPlayground from './components/test/MetricPanelPlayground.vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
-import { useEmpireStore } from '@/store/useEmpireStore'
 import { useShipBuildStore } from '@/store/useShipBuildStore'
-import { useStationStore } from '@/store/useStationStore'
+import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
+import { useLiveProductionStore } from '@/store/useLiveProductionStore'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useMapStore } from '@/store/useMapStore'
+import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useActiveViewStore } from '@/store/useActiveViewStore'
+import { saveArchiveToDB, createArchiveId, loadPlayerStationsFlatByArchiveId } from '@/db/saveArchiveDB'
 
 const gameDataStore = useGameDataStore()
 const logicFlowStore = useLogicFlowStore()
-const empireStore = useEmpireStore()
 const shipBuildStore = useShipBuildStore()
-const stationStore = useStationStore()
+const blueprintStore = useBlueprintProductionStore()
+const liveStore = useLiveProductionStore()
 const saveStore = useSaveStore()
 const mapStore = useMapStore()
+const saveBindingStore = useSaveBindingStore()
+const activeViewStore = useActiveViewStore()
 
 const currentView = ref<'main' | 'drag-test' | 'template-flow' | 'metric-panel-test'>('main')
 const isInitializing = ref(true)
 
-// Unified initialization coordinator
 async function initializeApp() {
   console.log('[App] Starting unified initialization...')
   isInitializing.value = true
 
   try {
-    // Step 1: Initialize gameData first (sets version and storage keys)
     await gameDataStore.initialize()
-    console.log('[App] GameData initialized. Version:', gameDataStore.currentVersion, 'Beta:', gameDataStore.isBeta)
+    console.log('[App] GameData initialized')
 
-    // Step 2: Initialize business stores in parallel (they all depend on gameData)
+    await saveStore.initialize()
+    await saveBindingStore.initialize()
+    
+    await blueprintStore.initialize()
+    await liveStore.initialize()
+    
     await Promise.all([
-      empireStore.initialize(),
       logicFlowStore.init(),
       mapStore.initialize(),
-      shipBuildStore.initialize(),
-      saveStore.initialize()
+      shipBuildStore.initialize()
     ])
 
-    console.log('[App] All stores initialized. Empire ready:', empireStore.isReady)
+    console.log('[App] All stores initialized')
   } catch (e) {
     console.error('[App] Initialization failed:', e)
   } finally {
@@ -50,7 +56,6 @@ async function initializeApp() {
   }
 }
 
-// Start initialization immediately
 initializeApp()
 
 onMounted(() => {
@@ -68,8 +73,7 @@ onMounted(() => {
   }
 })
 
-// Expose stores for testing
-const isReady = computed(() => empireStore.isReady && gameDataStore.isReady)
+const isReady = computed(() => blueprintStore.isReady && gameDataStore.isReady)
 
 const checkExportStores = () => {
   const isTest = (window as any).isTestEnv ||
@@ -77,24 +81,27 @@ const checkExportStores = () => {
                  window.localStorage.getItem('isTestEnv') === 'true';
 
   if (import.meta.env.DEV || isTest) {
-    if (!(window as any).stationStore) {
+    if (!(window as any).blueprintStore) {
       console.log('[App] Exporting stores to window for test env');
-      (window as any).stationStore = stationStore;
+      (window as any).blueprintStore = blueprintStore;
+      (window as any).liveStore = liveStore;
       (window as any).gameDataStore = gameDataStore;
       (window as any).logicFlowStore = logicFlowStore;
-      (window as any).empireStore = empireStore;
       (window as any).shipBuildStore = shipBuildStore;
-      (window as any).store = stationStore;
+      (window as any).saveBindingStore = saveBindingStore;
+      (window as any).saveStore = saveStore;
+      (window as any).mapStore = mapStore;
+      (window as any).activeViewStore = activeViewStore;
+      (window as any).store = blueprintStore;
+      (window as any).saveArchiveDB = { saveArchiveToDB, createArchiveId, loadPlayerStationsFlatByArchiveId };
     }
     return true;
   }
   return false;
 };
 
-// Expose stores immediately for test access
 checkExportStores();
 
-// Retry for edge cases
 setTimeout(checkExportStores, 100);
 setTimeout(checkExportStores, 500);
 </script>
@@ -105,7 +112,7 @@ setTimeout(checkExportStores, 500);
     <TestTemplateFlow v-else-if="currentView === 'template-flow'" />
     <MetricPanelPlayground v-else-if="currentView === 'metric-panel-test'" />
     <MainWorkbench v-else-if="isReady"/>
-    <div v-else class="loading-gate">Initializing... (GameData: {{ gameDataStore.isReady }}, Empire: {{ empireStore.isReady }})</div>
+    <div v-else class="loading-gate">Initializing... (GameData: {{ gameDataStore.isReady }}, Blueprint: {{ blueprintStore.isReady }})</div>
   </div>
 </template>
 

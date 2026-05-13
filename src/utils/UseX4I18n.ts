@@ -1,4 +1,4 @@
-import { useI18n } from 'vue-i18n';
+import i18n from '@/i18n';
 import type { X4Module, X4Ware, X4ModuleGroup, X4Ship, X4ShipType, X4EquipmentType, X4Equipment, X4SlotTag, X4Dlc, X4Faction } from '../types/x4';
 import { useStatusStore } from '../store/useStatusStore';
 import { ref } from 'vue';
@@ -7,7 +7,9 @@ import { ref } from 'vue';
 const missingKeys = ref(new Map<string, string>());
 
 export function useX4I18n() {
-  const { t, te } = useI18n();
+  // 从 i18n.global 获取（不依赖 Vue 组件上下文）
+  const t = i18n.global.t.bind(i18n.global);
+  const te = i18n.global.te.bind(i18n.global);
   const statusStore = useStatusStore();
 
   const translate = (id: string, nameId: string, category: 'module' | 'ware' | 'type' | 'ship' | 'ship_type' | 'equipment_type' | 'equipment' | 'slot_tag' | 'dlc' | 'faction'): string => {

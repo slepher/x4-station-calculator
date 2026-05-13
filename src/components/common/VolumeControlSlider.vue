@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 
 const props = defineProps<{
   modelValue: number,
@@ -13,6 +13,12 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue'])
 
+const draftValue = ref(props.modelValue)
+
+watch(() => props.modelValue, (value) => {
+  draftValue.value = value
+})
+
 // 默认最小值为0，最大值为24小时，步长为1小时
 const minValue = computed(() => props.min ?? 0)
 const maxValue = computed(() => props.max ?? 24)
@@ -20,7 +26,7 @@ const stepValue = computed(() => props.step ?? 1)
 const unitText = computed(() => props.unit ?? 'h')
 
 const displayValue = computed(() => {
-  const rounded = Math.round(props.modelValue * 10) / 10
+  const rounded = Math.round(draftValue.value * 10) / 10
   // 如果单位是 m³，使用千分位分隔符
   if (unitText.value === 'm³') {
     return new Intl.NumberFormat('en-US').format(rounded) + unitText.value
@@ -29,7 +35,14 @@ const displayValue = computed(() => {
 })
 
 const updateValue = (e: Event) => {
-  emit('update:modelValue', parseFloat((e.target as HTMLInputElement).value))
+  const nextValue = parseFloat((e.target as HTMLInputElement).value)
+  draftValue.value = nextValue
+}
+
+const commitValue = (e: Event) => {
+  const nextValue = parseFloat((e.target as HTMLInputElement).value)
+  draftValue.value = nextValue
+  emit('update:modelValue', nextValue)
 }
 </script>
 
@@ -44,7 +57,7 @@ const updateValue = (e: Event) => {
           {{ displayValue }}
         </span>
       </div>
-      <input type="range" :value="modelValue" @input="updateValue" 
+      <input type="range" :value="draftValue" @input="updateValue" @change="commitValue"
         :min="minValue" :max="maxValue" :step="stepValue"
         :class="['custom-range', 
           type === 'resource' ? 'range-resource' : 

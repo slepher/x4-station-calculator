@@ -2,11 +2,13 @@ import { defineStore } from 'pinia'
 import { computed, ref, watch } from 'vue'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
+import { useActiveViewStore } from './useActiveViewStore'
 import type {
   ConnectionValue,
   EquipmentType,
   SavedShipBlueprintsState,
   ShipBlueprint,
+  ShipBlueprintBuildAnalysis,
   ShipBlueprintStorage,
   ShipBlueprintBucket,
   ShipBlueprintConnection,
@@ -23,6 +25,7 @@ import type { FitConnectionRow, FitMode } from '@/components/ship-build/fitTypes
 import { migrateShipBlueprintStateToCurrent } from './logic/stateMigrations'
 import { CURRENT_SHIP_BLUEPRINT_VERSION } from './logic/storageVersions'
 import { buildConsumableDatas, buildShipBuildDatas } from './logic/useGameData'
+import { analyzeShipBlueprintBuild, DEFAULT_SHIP_BUILD_PRICE_MULTIPLIER } from './logic/analyzeShipBlueprintBuild'
 
 const BUILT_IN_BLUEPRINT_ID_PREFIX = '__built_in_ship_blueprint__'
 const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
@@ -32,7 +35,7 @@ const EMPTY_SHIP_STORAGE: ShipBlueprintStorage = {
   missiles: []
 }
 
-export type StationActiveView = 'production' | 'flow' | 'ship-build' | 'maps' | 'save-import'
+export type StationActiveView = 'blueprint-production' | 'live-production' | 'flow' | 'ship-build' | 'maps'
 export type ShipBuildStatsViewMode = 'summary' | 'detail'
 export type ShipBuildViewMode = 'selector' | 'workbench'
 export type ShipBuildMockTagPatch = {
@@ -43,42 +46,6 @@ export type ShipBuildMockTagPatch = {
     size?: ShipEquipmentSize
     tags: string[]
   }>
-}
-
-export type ShipBuildMaterialItem = {
-  wareId: string
-  count: number
-  value: number
-}
-
-export type ShipBuildMaterialShipGroup = {
-  shipId: string
-  value: number
-  items: ShipBuildMaterialItem[]
-}
-
-export type ShipBuildMaterialHullGroup = {
-  shipId: string
-  value: number
-  items: ShipBuildMaterialItem[]
-}
-
-export type ShipBuildMaterialEquipmentGroup = {
-  equipmentId: string
-  equipmentName: string
-  quantity: number
-  value: number
-  items: ShipBuildMaterialItem[]
-}
-
-export type ShipBuildMaterialAnalysis = {
-  methodOptions: string[]
-  selectedMethod: string
-  priceMultiplier: number
-  totalValue: number
-  summaryItems: ShipBuildMaterialItem[]
-  shipGroup: ShipBuildMaterialShipGroup | null
-  equipmentGroups: ShipBuildMaterialEquipmentGroup[]
 }
 
 type BuiltInPresetKey = 'empty' | 'low' | 'mid' | 'high'
@@ -92,6 +59,7 @@ const BUILT_IN_PRESETS: Array<{ key: BuiltInPresetKey; labelKey: string }> = [
 
 export const useShipBuildStore = defineStore('ship-build', () => {
   const gameData = useGameDataStore()
+  const activeViewStore = useActiveViewStore()
 
   const canUseDlcTag = (dlcTag: string | null | undefined) => {
     if (!gameData.enforceDlcActivation) return true
@@ -135,9 +103,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
   const dronesMap = computed(() => consumableDatas.value.dronesMap)
   const missilesMap = computed(() => consumableDatas.value.missilesMap)
 
-  const activeView = ref<StationActiveView>(
-    (localStorage.getItem('x4_station_active_view') as StationActiveView) || 'production'
-  )
+  const activeView = computed({
+    get: () => activeViewStore.activeView,
+    set: (val: StationActiveView) => { activeViewStore.setActiveView(val) }
+  })
   const viewMode = ref<ShipBuildViewMode>('selector')
   const statsViewMode = ref<ShipBuildStatsViewMode>('summary')
   const fitMode = ref<FitMode>('connection')
@@ -174,9 +143,24 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     return map
   })
 
-  watch(activeView, (val) => {
-    localStorage.setItem('x4_station_active_view', val)
-  })
+  const getBuildAnalysis = (
+    targetBlueprint: ShipBlueprint | null | undefined = blueprint.value,
+    priceMultiplier = DEFAULT_SHIP_BUILD_PRICE_MULTIPLIER
+  ): ShipBlueprintBuildAnalysis => {
+    const effectiveBlueprint = targetBlueprint || null
+    return analyzeShipBlueprintBuild({
+      blueprint: effectiveBlueprint,
+      ship: findShip(effectiveBlueprint?.shipId),
+      equipments: equipmentMap.value,
+      wares: waresMap.value,
+      consumables: consumablesMap.value,
+      drones: dronesMap.value,
+      missiles: missilesMap.value,
+      priceMultiplier
+    })
+  }
+
+  const currentBuildAnalysis = computed(() => getBuildAnalysis(blueprint.value))
 
   // Load blueprints from localStorage
   const loadBlueprintsFromStorage = () => {
@@ -338,6 +322,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     shipId,
     connections: [],
     storage: JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE)),
+    materialMethod: 'default',
     lastUpdated: Date.now()
   })
 
@@ -530,6 +515,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       shipId,
       connections: [],
       storage: JSON.parse(JSON.stringify(EMPTY_SHIP_STORAGE)),
+      materialMethod: 'default',
       lastUpdated: Date.now()
     }
 
@@ -704,6 +690,9 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     loadedBuiltInConnectionsSnapshot.value = null
   }
 
+  // Auto-load blueprints from storage on store creation
+  loadBlueprintsFromStorage()
+
   // If active blueprint exists, auto-load the corresponding blueprint after a tick
   if (savedBlueprints.value.activeBlueprintId) {
     const activeBlueprint = findBlueprintById(savedBlueprints.value.activeBlueprintId)
@@ -787,6 +776,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         name: '',
         shipId: shipId || '',
         connections: [],
+        materialMethod: 'default',
         lastUpdated: Date.now()
       }
     }
@@ -1019,6 +1009,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       shipId,
       connections: blueprint.value ? JSON.parse(JSON.stringify(blueprint.value.connections)) : [],
       storage: blueprint.value?.storage ? JSON.parse(JSON.stringify(blueprint.value.storage)) : undefined,
+      materialMethod: blueprint.value?.materialMethod || 'default',
       lastUpdated: Date.now()
     }
 
@@ -1060,12 +1051,14 @@ export const useShipBuildStore = defineStore('ship-build', () => {
       if (shouldApplyToCurrentSaved && blueprint.value) {
         const currentId = blueprint.value.id
         const currentName = blueprint.value.name
+        const currentMaterialMethod = blueprint.value.materialMethod
         const currentLastUpdated = blueprint.value.lastUpdated
         blueprint.value = {
           ...JSON.parse(JSON.stringify(bp)),
           id: currentId,
           name: currentName,
           shipId: builtIn.shipId,
+          materialMethod: currentMaterialMethod,
           lastUpdated: currentLastUpdated
         }
         loadedBuiltInPreset.value = null
@@ -1301,6 +1294,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
         name: '',
         shipId: shipId || '',
         connections: [],
+        materialMethod: 'default',
         lastUpdated: Date.now()
       }
     }
@@ -1519,6 +1513,12 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     statsViewMode.value = mode
   }
 
+  const setMaterialMethod = (method: string) => {
+    if (!blueprint.value) return
+    blueprint.value.materialMethod = method
+    forceDirty.value = true
+  }
+
   const setMockTagPatch = (patch: ShipBuildMockTagPatch | null) => {
     mockTagPatch.value = patch
   }
@@ -1719,6 +1719,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     shipByMacroMap,
     raceMap,
     typeMap,
+    waresMap,
     equipmentMap,
     consumablesMap,
     dronesMap,
@@ -1761,6 +1762,7 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     getBlueprintsForShip,
     getLoadableBlueprintsForShip,
     isBuiltInBlueprintId,
+    findBlueprintById,
     loadBlueprintsFromStorage,
     updateBlueprintStorage,
     clearLoadoutForCurrentShip,
@@ -1775,7 +1777,10 @@ export const useShipBuildStore = defineStore('ship-build', () => {
     buildPreviewBlueprint,
     applyGroupAssignment,
     setStatsViewMode,
+    setMaterialMethod,
     setMockTagPatch,
-    setDisplayResolvers
+    setDisplayResolvers,
+    getBuildAnalysis,
+    currentBuildAnalysis
   }
 })

@@ -46,10 +46,11 @@ const connections = ref<{ d: string, id: string }[]>([])
       if (!nodes) return
       
       const sorted = [...nodes].sort((a, b) => {
-        // A. 特殊规则：能量电池在 Tier 0 中永远最后
         if (colIndex === 0) {
-          if (a.wareId === 'energycells' && b.wareId !== 'energycells') return 1
-          if (a.wareId !== 'energycells' && b.wareId === 'energycells') return -1
+          const aRaw = gameData.isRawMaterialWare(a.wareId)
+          const bRaw = gameData.isRawMaterialWare(b.wareId)
+          if (aRaw && !bRaw) return -1
+          if (!aRaw && bRaw) return 1
         }
 
         // B. 锁定状态（EXT/Locked）置底

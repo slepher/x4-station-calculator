@@ -30,6 +30,12 @@
         "energycells": 37.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 129.6,
     "range": 7000.0,
@@ -70,6 +76,12 @@
         "energycells": 17.0
       }
     },
+    "buildTime": {
+      "default": 1.5,
+      "xenon": 2.0,
+      "terran": 1.5,
+      "closedloop": 1.0
+    },
     "amount": 1,
     "lifetime": 30.0,
     "range": 5500.0,
@@ -101,6 +113,10 @@
       "closedloop": {
         "energycells": 24.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "amount": 1,
     "lifetime": 15.0,
@@ -142,6 +158,12 @@
         "energycells": 10.0
       }
     },
+    "buildTime": {
+      "default": 1.0,
+      "xenon": 10.0,
+      "terran": 1.0,
+      "closedloop": 1.0
+    },
     "amount": 1,
     "lifetime": 25.92,
     "range": 9000.0,
@@ -181,6 +203,12 @@
       "closedloop": {
         "energycells": 28.0
       }
+    },
+    "buildTime": {
+      "default": 1.5,
+      "xenon": 10.0,
+      "terran": 1.5,
+      "closedloop": 1.0
     },
     "amount": 1,
     "lifetime": 25.92,
@@ -222,6 +250,12 @@
         "energycells": 6.0
       }
     },
+    "buildTime": {
+      "default": 1.0,
+      "xenon": 10.0,
+      "terran": 1.0,
+      "closedloop": 1.0
+    },
     "amount": 1,
     "lifetime": 6.0,
     "range": 7000.0,
@@ -261,6 +295,12 @@
       "closedloop": {
         "energycells": 13.0
       }
+    },
+    "buildTime": {
+      "default": 1.5,
+      "xenon": 10.0,
+      "terran": 1.5,
+      "closedloop": 1.0
     },
     "amount": 1,
     "lifetime": 6.0,
@@ -302,6 +342,12 @@
         "energycells": 16.0
       }
     },
+    "buildTime": {
+      "default": 1.0,
+      "xenon": 10.0,
+      "terran": 1.0,
+      "closedloop": 1.0
+    },
     "amount": 1,
     "lifetime": 10.0,
     "range": 20000.0,
@@ -340,6 +386,11 @@
         "hullparts": 1.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 30.0,
     "range": 10000.0,
@@ -376,6 +427,11 @@
         "energycells": 6.0,
         "metallicmicrolattice": 8.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "closedloop": 3.0,
+      "terran": 3.0
     },
     "amount": 1,
     "lifetime": 16.0,
@@ -418,6 +474,12 @@
         "energycells": 35.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
     },
     "amount": 4,
     "lifetime": 12.0,
@@ -462,6 +524,12 @@
         "hullparts": 1.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 88.0,
     "range": 12000.0,
@@ -503,6 +571,12 @@
         "energycells": 22.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 2,
     "lifetime": 10.0,
     "range": 5500.0,
@@ -543,6 +617,12 @@
       "closedloop": {
         "energycells": 25.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
     },
     "amount": 2,
     "lifetime": 10.0,
@@ -587,6 +667,12 @@
         "hullparts": 1.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 17.5,
     "range": 12000.0,
@@ -630,6 +716,12 @@
         "hullparts": 1.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 20.0,
     "range": 9000.0,
@@ -662,6 +754,10 @@
       "closedloop": {
         "energycells": 22.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "closedloop": 3.0
     },
     "amount": 1,
     "lifetime": 15.0,
@@ -704,6 +800,12 @@
         "energycells": 12.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 4.0,
     "range": 2800.0,
@@ -744,6 +846,12 @@
       "closedloop": {
         "energycells": 13.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
     },
     "amount": 1,
     "lifetime": 4.0,
@@ -787,6 +895,12 @@
         "energycells": 24.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 10.0,
     "range": 22000.0,
@@ -828,6 +942,12 @@
       "closedloop": {
         "energycells": 21.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
     },
     "amount": 1,
     "lifetime": 12.5,
@@ -871,6 +991,12 @@
         "energycells": 16.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 8.0,
     "range": 7000.0,
@@ -904,6 +1030,10 @@
         "energycells": 33.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "closedloop": 3.0
     },
     "amount": 5,
     "lifetime": 30.0,
@@ -947,6 +1077,12 @@
         "energycells": 23.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 16.0,
     "range": 8000.0,
@@ -988,6 +1124,12 @@
       "closedloop": {
         "energycells": 22.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
     },
     "amount": 8,
     "lifetime": 15.0,
@@ -1032,6 +1174,12 @@
         "hullparts": 1.0
       }
     },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 3.0,
+      "terran": 3.0,
+      "closedloop": 3.0
+    },
     "amount": 1,
     "lifetime": 40.0,
     "range": 5000.0,
@@ -1074,6 +1222,12 @@
         "energycells": 28.0
       }
     },
+    "buildTime": {
+      "default": 2.0,
+      "xenon": 10.0,
+      "terran": 2.0,
+      "closedloop": 2.0
+    },
     "amount": 1,
     "lifetime": 43.2,
     "range": 6000.0,
@@ -1114,6 +1268,12 @@
       "closedloop": {
         "energycells": 12.0
       }
+    },
+    "buildTime": {
+      "default": 1.0,
+      "xenon": 10.0,
+      "terran": 1.0,
+      "closedloop": 1.0
     },
     "amount": 1,
     "lifetime": 10.0,
@@ -1157,6 +1317,12 @@
         "energycells": 34.0
       }
     },
+    "buildTime": {
+      "default": 4.0,
+      "xenon": 10.0,
+      "terran": 4.0,
+      "closedloop": 4.0
+    },
     "amount": 1,
     "lifetime": 43.2,
     "range": 7000.0,
@@ -1198,6 +1364,12 @@
         "energycells": 15.0
       }
     },
+    "buildTime": {
+      "default": 2.0,
+      "xenon": 10.0,
+      "terran": 2.0,
+      "closedloop": 2.0
+    },
     "amount": 1,
     "lifetime": 10.0,
     "range": 5000.0,
@@ -1230,6 +1402,10 @@
         "energycells": 22.0
       }
     },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
+    },
     "amount": 5,
     "lifetime": 30.0,
     "range": 39000.0,
@@ -1260,6 +1436,10 @@
       "closedloop": {
         "energycells": 19.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "amount": 12,
     "lifetime": 15.0,
@@ -1303,6 +1483,12 @@
         "energycells": 36.0
       }
     },
+    "buildTime": {
+      "default": 2.0,
+      "xenon": 10.0,
+      "terran": 2.0,
+      "closedloop": 2.0
+    },
     "amount": 1,
     "lifetime": 43.2,
     "range": 5500.0,
@@ -1344,6 +1530,12 @@
         "energycells": 18.0
       }
     },
+    "buildTime": {
+      "default": 1.0,
+      "xenon": 10.0,
+      "terran": 1.0,
+      "closedloop": 1.0
+    },
     "amount": 1,
     "lifetime": 10.0,
     "range": 4000.0,
@@ -1375,6 +1567,10 @@
       "closedloop": {
         "energycells": 29.0
       }
+    },
+    "buildTime": {
+      "default": 10.0,
+      "closedloop": 10.0
     },
     "amount": 1,
     "lifetime": 43.2,
@@ -1418,6 +1614,12 @@
         "energycells": 33.0
       }
     },
+    "buildTime": {
+      "default": 2.0,
+      "xenon": 10.0,
+      "terran": 2.0,
+      "closedloop": 2.0
+    },
     "amount": 8,
     "lifetime": 43.2,
     "range": 5500.0,
@@ -1458,6 +1660,12 @@
       "closedloop": {
         "energycells": 16.0
       }
+    },
+    "buildTime": {
+      "default": 1.0,
+      "xenon": 10.0,
+      "terran": 1.0,
+      "closedloop": 1.0
     },
     "amount": 8,
     "lifetime": 10.0,
@@ -1503,6 +1711,12 @@
         "hullparts": 5.0
       }
     },
+    "buildTime": {
+      "default": 6.0,
+      "xenon": 10.0,
+      "terran": 6.0,
+      "closedloop": 6.0
+    },
     "amount": 1,
     "lifetime": 180.0,
     "range": 9000.0,
@@ -1545,6 +1759,12 @@
         "energycells": 36.0,
         "hullparts": 1.0
       }
+    },
+    "buildTime": {
+      "default": 3.0,
+      "xenon": 10.0,
+      "terran": 3.0,
+      "closedloop": 3.0
     },
     "amount": 1,
     "lifetime": 50.0,

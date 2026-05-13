@@ -1,6 +1,5 @@
 <script setup lang="ts">
-import type { X4Module } from '@/types/x4'
-import type { SavedModule } from '@/store/useStationStore'
+import type { X4Module, SavedModule } from '@/types/x4'
 import { useX4I18n } from '@/utils/UseX4I18n';
 import X4NumberInput from '@/components/common/X4NumberInput.vue';
 import { useI18n } from 'vue-i18n';

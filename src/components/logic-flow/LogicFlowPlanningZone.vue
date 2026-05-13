@@ -41,9 +41,7 @@ const getDropStatus = (group: ProductionLineGroup, event?: any): string => {
   const wareId = logicFlow.draggingWareId || (event?.item?._underlying_vm_?.id)
   if (!wareId) return 'available'
   
-  // T0 资源不可被拖入规划区
-  const ware = gameData.waresMap[wareId]
-  if (ware && ware.tier === 0) return 'rejected'
+  if (gameData.isRawMaterialWare(wareId)) return 'rejected'
   
   const effectiveLineage = getEffectiveLineage(group, event)
   return logicFlow.getWareGroupStatus(group.id, wareId, effectiveLineage)
@@ -62,9 +60,8 @@ const isDropAllowedForStatus = (status: string): boolean => {
  * 注意：紧凑模式排除能量电池
  */
 const getFormattedResources = (group: ProductionLineGroup, includeDragging: boolean) => {
-  // 1. 获取实际存储的 T0 节点（column === 0，排除能量电池和隔离节点）
   const existingT0Nodes = group.nodes
-    .filter((n: FlowNode) => n.column === 0 && n.wareId !== 'energycells' && !n.isIsolated)
+    .filter((n: FlowNode) => n.column === 0 && gameData.isRawMaterialWare(n.wareId) && !n.isIsolated)
   
   const existingT0Ids = new Set(existingT0Nodes.map(n => n.wareId))
   
@@ -88,28 +85,22 @@ const getFormattedResources = (group: ProductionLineGroup, includeDragging: bool
     // 【修复】先检查拖拽是否被拒绝或重复，如果是则不显示预览
     const dropStatus = getDropStatus(group)
     if (dropStatus !== 'rejected' && dropStatus !== 'duplicated') {
-      const draggingWare = gameData.waresMap[logicFlow.draggingWareId]
-      if (draggingWare && draggingWare.tier > 0) {
+      if (!gameData.isRawMaterialWare(logicFlow.draggingWareId)) {
         const lineage = getEffectiveLineage(group)
         
-        // 自定义递归追踪：遇到隔离节点时停止
         const traceT0 = (wareId: string, visited: Set<string>): string[] => {
           if (wareId === 'energycells') return []
           
           const ware = gameData.waresMap[wareId]
           if (!ware) return []
           
-          // T0 资源直接返回
-          if (ware.tier === 0) return [wareId]
+          if (gameData.isRawMaterialWare(wareId)) return [wareId]
           
-          // 防止循环
           if (visited.has(wareId)) return []
           visited.add(wareId)
           
-          // 遇到隔离节点，停止追踪（隔离节点不参与供应链）
           if (isolatedWareIds.has(wareId)) return []
           
-          // 递归追踪上游
           const module = gameData.findModuleForWare(wareId, lineage)
           if (!module || !module.inputs) return []
           
@@ -125,8 +116,7 @@ const getFormattedResources = (group: ProductionLineGroup, includeDragging: bool
         const uniqueT0 = [...new Set(requiredT0)]
         
         uniqueT0.forEach(wareId => {
-          // 排除能量电池、已存在的 T0 资源、以及组内已有非隔离节点供应的资源
-          if (wareId !== 'energycells' && !existingT0Ids.has(wareId) && !existingNonIsolatedWareIds.has(wareId)) {
+          if (gameData.isRawMaterialWare(wareId) && !existingT0Ids.has(wareId) && !existingNonIsolatedWareIds.has(wareId)) {
             newIds.push(wareId)
           }
         })
@@ -152,11 +142,10 @@ const getNewLineResources = () => {
   const ware = gameData.waresMap[logicFlow.draggingWareId]
   if (!ware) return []
   
-  // 计算拖拽产物的 T0 需求（排除能量电池）
   const lineage = logicFlow.draggingLineage || 'default'
-  const requiredT0 = logicFlow.calculateRequiredT0Wares(logicFlow.draggingWareId, lineage)
+  const requiredRaw = logicFlow.calculateRequiredRawMaterials(logicFlow.draggingWareId, lineage)
   
-  return Object.keys(requiredT0).filter(wareId => wareId !== 'energycells')
+  return Object.keys(requiredRaw).filter(wareId => gameData.isRawMaterialWare(wareId))
 }
 
 /**
@@ -166,7 +155,7 @@ const getNewLineModuleName = (): string => {
   if (!logicFlow.draggingWareId) return ''
   
   const ware = gameData.waresMap[logicFlow.draggingWareId]
-  if (!ware || ware.tier === 0) {
+  if (!ware || gameData.isRawMaterialWare(logicFlow.draggingWareId)) {
     return gameData.getWareDisplayName(logicFlow.draggingWareId)
   }
   
@@ -184,9 +173,7 @@ const getNewLineModuleName = (): string => {
  * 获取紧凑版节点显示名称
  */
 const getCompactNodeDisplayName = (node: any, group: any): string => {
-  // T0 资源显示产品名称
-  const ware = gameData.waresMap[node.wareId]
-  if (ware?.tier === 0) {
+  if (gameData.isRawMaterialWare(node.wareId)) {
     return gameData.getWareDisplayName(node.wareId)
   }
   
@@ -217,7 +204,7 @@ const getCompactNodeDisplayName = (node: any, group: any): string => {
  */
 const getCompactGroupTitle = (group: ProductionLineGroup): { title: string; t0Resources: string[] } => {
   // 获取 T0 资源（排除能量电池和隔离节点）
-  const t0Nodes = group.nodes.filter(n => n.column === 0 && n.wareId !== 'energycells' && !n.isIsolated)
+  const t0Nodes = group.nodes.filter(n => n.column === 0 && gameData.isRawMaterialWare(n.wareId) && !n.isIsolated)
   const t0Resources = t0Nodes.map(n => gameData.getWareDisplayName(n.wareId))
 
   return {
@@ -323,9 +310,7 @@ const isDropAllowedForNewZone = () => {
   const wareId = logicFlow.draggingWareId
   if (!wareId) return true
   
-  // T0 资源不可被拖入规划区
-  const ware = gameData.waresMap[wareId]
-  if (ware && ware.tier === 0) return false
+  if (gameData.isRawMaterialWare(wareId)) return false
   
   return true
 }
@@ -340,9 +325,7 @@ const handleAddFromDrop = (event: any) => {
   }
   
   if (ware && ware.id) {
-    // T0 资源不可被添加
-    const wareData = gameData.waresMap[ware.id]
-    if (wareData && wareData.tier === 0) {
+    if (gameData.isRawMaterialWare(ware.id)) {
       return
     }
     

@@ -51,7 +51,7 @@ function pumpRustParser(options: {
 
 type WorkerInputMessage =
   | { type: 'parse_start'; filename?: string; currentVersion?: string; expectedTotalBytes?: number }
-  | { type: 'parse_chunk'; chunk?: ArrayBuffer }
+  | { type: 'parse_chunk'; chunk?: ArrayBuffer; sentAtMs?: number; chunkIndex?: number }
   | { type: 'parse_end' }
 
 type RustParseSession = {
@@ -144,7 +144,6 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
             done: false, inputComplete: false, error: null,
             inputBytesTotal: 0, parsedBytesTotal: 0, bufferedBytes: 0, expectedTotalBytes: 0
           }, true)
-
           await ensureWasmInit()
           const parser = new SaveParser()
           session = createRustParseSession({
@@ -163,7 +162,8 @@ if (typeof self !== 'undefined' && typeof (self as unknown as { importScripts: u
 
         if (e.data.type === 'parse_chunk') {
           if (!e.data.chunk) return
-          await session.pushChunk(new Uint8Array(e.data.chunk))
+          const chunk = new Uint8Array(e.data.chunk)
+          await session.pushChunk(chunk)
           return
         }
 

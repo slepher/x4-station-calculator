@@ -8,6 +8,7 @@ import defensestationIconUrl from '@/components/icons/defensestation.svg'
 import piratestationIconUrl from '@/components/icons/piratestation.svg'
 import hiveIconUrl from '@/components/icons/hive.svg'
 import weaponplatformIconUrl from '@/components/icons/weaponplatform.svg'
+import constructionsiteIconUrl from '@/components/icons/constructionsite.svg'
 import shiptechIconUrl from '@/components/icons/shiptech.svg'
 import hightechIconUrl from '@/components/icons/hightech.svg'
 import refinedIconUrl from '@/components/icons/refined.svg'
@@ -41,6 +42,7 @@ import vaultLockedIconUrl from '@/components/icons/vault_locked.svg'
 import vaultUnlockedIconUrl from '@/components/icons/vault_unlocked.svg'
 import type { SavePoiOverlayItem } from '@/types/saveArchive'
 import type { SavePoiColorMap } from '../types'
+import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
 import {
   MAP_ICON_SIZES,
   getMapSavePoiBaseIconSize,
@@ -51,7 +53,7 @@ export const FALLBACK_OWNER_COLOR = '#94a3b8'
 export const OVERLAY_ICON_SIZE = MAP_ICON_SIZES.placement
 export const SMALL_ICON_SIZE = MAP_ICON_SIZES.savePoiSmall
 export const PREVIEW_ICON_SIZE = MAP_ICON_SIZES.preview
-export const MAP_FONT_FAMILY = "Consolas, 'Courier New', monospace"
+export const MAP_FONT_FAMILY = "'Microsoft YaHei UI', 'Microsoft YaHei', 'PingFang SC', 'Noto Sans CJK SC', 'Source Han Sans SC', sans-serif"
 const CONDITIONAL_SMALL_ICON_CATEGORIES = new Set(['npcStation', 'xenonStation', 'khaakStation'])
 
 export const SAVE_POI_COLORS: SavePoiColorMap = {
@@ -64,7 +66,7 @@ export const SAVE_POI_COLORS: SavePoiColorMap = {
   erlkingVault: '#f97316'
 }
 
-const SAVE_POI_ICON_MAP: Record<string, string> = {
+export const SAVE_POI_ICON_MAP: Record<string, string> = {
   shipyard: shipyardIconUrl,
   wharf: wharfIconUrl,
   equipmentdock: equipmentdockIconUrl,
@@ -75,6 +77,7 @@ const SAVE_POI_ICON_MAP: Record<string, string> = {
   piratestation: piratestationIconUrl,
   hive: hiveIconUrl,
   weaponplatform: weaponplatformIconUrl,
+  constructionsite: constructionsiteIconUrl,
   playerhq: playerhqIconUrl,
   shiptech: shiptechIconUrl,
   hightech: hightechIconUrl,
@@ -144,24 +147,16 @@ export function getSavePoiIconUrl(poi: SavePoiOverlayItem): string | null {
     return poi.unlocked ? vaultUnlockedIconUrl : vaultLockedIconUrl
   }
 
-  if (poi.category === 'playerStation' && poi.is_headquarter) {
-    return playerhqIconUrl
-  }
-
-  if (poi.is_headquarter && poi.tag) {
-    return SAVE_POI_HEADQUARTER_ICON_MAP[poi.tag] || SAVE_POI_ICON_MAP[poi.tag] || null
-  }
-
   if (poi.tag === 'nest') {
     return weaponplatformIconUrl
   }
 
-  if (poi.tag === 'factory' && poi.factoryGroup) {
-    return SAVE_POI_ICON_MAP[poi.factoryGroup] || factoryIconUrl
-  }
-
-  if (poi.tag) {
-    return SAVE_POI_ICON_MAP[poi.tag] || null
+  const iconTag = getPoiIconTag(poi)
+  if (iconTag) {
+    if (poi.is_headquarter) {
+      return SAVE_POI_HEADQUARTER_ICON_MAP[iconTag] || SAVE_POI_ICON_MAP[iconTag] || null
+    }
+    return SAVE_POI_ICON_MAP[iconTag] || null
   }
 
   return null

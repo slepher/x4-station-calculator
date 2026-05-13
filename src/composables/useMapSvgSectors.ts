@@ -223,6 +223,7 @@ export function useMapSvgSectors(args: {
 
       const color = args.resolveOwnerColor(cluster, undefined, clusterId)
       const clusterDlcActive = args.gameData.isDlcActive(cluster.dlc_tag)
+      const clusterSectorCount = cluster.sectors?.length || 0
       const sectors: MapSectorPolygonCluster['sectors'] = []
 
       ;(cluster.sectors || []).forEach((sectorId) => {
@@ -230,7 +231,9 @@ export function useMapSvgSectors(args: {
         if (!sector) return
         const transform = getSectorViewportTransform(cluster, center, clusterRadius, sector)
         const sectorRadiusRatio = Number(sector.normalized?.sector_radius_ratio || 0)
-        const topEdgeY = transform.center.y - transform.sectorRadius * HEX_TOP_EDGE_RATIO
+        const sectorCenterX = clusterSectorCount === 1 ? center.x : transform.center.x
+        const sectorCenterY = clusterSectorCount === 1 ? center.y : transform.center.y
+        const topEdgeY = sectorCenterY - transform.sectorRadius * HEX_TOP_EDGE_RATIO
         const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, transform.sectorRadius * MULTI_SECTOR_LABEL_PAD_RATIO)
         const displayName = args.resolveName(sector.nameId, sector.name || sector.id)
         sectors.push({
@@ -243,8 +246,8 @@ export function useMapSvgSectors(args: {
           resources: Array.isArray((sector as { resources?: SectorResourceEntry[] }).resources)
             ? (sector as { resources?: SectorResourceEntry[] }).resources || []
             : [],
-          sx: transform.center.x,
-          sy: transform.center.y,
+          sx: sectorCenterX,
+          sy: sectorCenterY,
           radius: transform.sectorRadius,
           color: args.resolveOwnerColor(sector, sector.id, clusterId),
           label: displayName,
@@ -257,7 +260,7 @@ export function useMapSvgSectors(args: {
 
       if (sectors.length === 1) {
         const singleRadius = sectors[0]!.radius
-        const topEdgeY = center.y - singleRadius * HEX_TOP_EDGE_RATIO
+        const topEdgeY = sectors[0]!.sy - singleRadius * HEX_TOP_EDGE_RATIO
         const pad = Math.max(MULTI_SECTOR_LABEL_PAD_MIN_PX, singleRadius * MULTI_SECTOR_LABEL_PAD_RATIO)
         rows.push({
           id: clusterId,

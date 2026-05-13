@@ -1,13 +1,30 @@
 <script setup lang="ts">
-import { computed, ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
-import { useEmpireStore } from '@/store/useEmpireStore'
+import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { StationType } from '@/types/x4'
+import type { ProductionTabItem } from '@/types/production-ui'
+import { SAVE_POI_ICON_MAP } from '@/components/map/utils/style'
+import { getPoiIconTag } from '@/store/logic/stationPoiSemantics'
+import playerhqIconUrl from '@/components/icons/playerhq.svg'
+import factoryIconUrl from '@/components/icons/factory.svg'
 
-const empireStore = useEmpireStore()
+const props = defineProps<{
+  tabs: ProductionTabItem[]
+  activeTabId: string | null
+  canCreateStation: boolean
+  canOpenContextMenu: boolean
+}>()
+
+const emit = defineEmits<{
+  selectOverview: []
+  selectStation: [stationId: string]
+  createStation: []
+  renameStation: [stationId: string]
+  duplicateStation: [stationId: string]
+  deleteStation: [stationId: string]
+}>()
+
 const { t } = useI18n()
 
-// 状态管理
 const showMenu = ref(false)
 const menuPosition = ref({ x: 0, y: 0 })
 const menuStationId = ref<string | null>(null)
@@ -17,68 +34,15 @@ const tabsScrollAreaRef = ref<HTMLElement | null>(null)
 const canScrollLeft = ref(false)
 const canScrollRight = ref(false)
 
-// 数据获取
-const stations = computed(() => {
-  return empireStore.orderedStationsBySector
-})
-const sectors = computed(() => empireStore.sectors)
-
-const activeStationId = computed(() => empireStore.activeStationId)
-const activeTransitSectorId = computed(() => empireStore.activeTransitSectorId)
-
-const tabGroups = computed(() => {
-  const unassigned = stations.value.filter((station) => !station.sectorId)
-  const sectorGroups = sectors.value.map((sector) => ({
-    id: sector.id,
-    name: sector.name,
-    stations: stations.value.filter((station) => station.sectorId === sector.id)
-  }))
-  return {
-    unassigned,
-    sectorGroups
-  }
-})
-
-const visibleSectorGroups = computed(() => {
-  const stationCountBySector = new Map<string, number>()
-  tabGroups.value.sectorGroups.forEach((group) => {
-    stationCountBySector.set(group.id, group.stations.length)
-  })
-
-  return tabGroups.value.sectorGroups
-    .map((group) => {
-      const hasOwnStations = group.stations.length > 0
-      const hasLinkedStations = empireStore
-        .getLinkedSectors(group.id)
-        .some((linkedSectorId) => (stationCountBySector.get(linkedSectorId) ?? 0) > 0)
-      return {
-        ...group,
-        showTransitTab: hasOwnStations || hasLinkedStations
-      }
-    })
-    .filter((group) => group.showTransitTab || group.stations.length > 0)
-})
-
-// 图标映射
-const getStationIcon = (type?: StationType): string => {
-  switch (type) {
-    case 'industrial': return '🏭'
-    case 'supply': return '📦'
-    case 'transit': return '🚚'
-    case 'shipyard': return '⚓'
-    default: return '🏭'
-  }
-}
-
-// 核心操作
-const selectStation = (stationId: string | null) => {
-  empireStore.selectStation(stationId)
+const getStationIcon = (tab: ProductionTabItem): string => {
+  if (tab.type === 'overview') return playerhqIconUrl
+  const iconTag = getPoiIconTag(tab)
+  if (iconTag) return SAVE_POI_ICON_MAP[iconTag] || factoryIconUrl
+  return factoryIconUrl
 }
 
 const addNewStation = () => {
-  const name = t('sector.new_station_name')
-  empireStore.createStation(name, 'industrial')
-  // 自动滚动到最右侧
+  emit('createStation')
   setTimeout(() => {
     const scrollContainer = tabsScrollAreaRef.value
     if (scrollContainer) {
@@ -88,20 +52,19 @@ const addNewStation = () => {
   }, 100)
 }
 
-const openSupply = (sectorId: string) => {
-  empireStore.selectTransitSector(sectorId)
+const selectStation = (tab: ProductionTabItem) => {
+  if (tab.type === 'overview') {
+    emit('selectOverview')
+  } else {
+    emit('selectStation', tab.id)
+  }
 }
 
-const openOverview = () => {
-  empireStore.selectStation(null)
-}
-
-// 右键菜单逻辑
 const openMenu = (stationId: string, event: MouseEvent) => {
+  if (!props.canOpenContextMenu) return
   event.preventDefault()
   menuStationId.value = stationId
   
-  // 计算菜单位置，防止溢出屏幕
   const x = Math.min(event.clientX, window.innerWidth - 180)
   const y = Math.min(event.clientY, window.innerHeight - 200)
   
@@ -114,7 +77,6 @@ const closeMenu = () => {
   menuStationId.value = null
 }
 
-// 点击外部关闭菜单
 const handleClickOutside = () => {
   if (showMenu.value) closeMenu()
 }
@@ -147,7 +109,7 @@ const handleWindowResize = () => {
 }
 
 watch(
-  [stations, sectors, activeStationId, activeTransitSectorId],
+  [() => props.tabs, () => props.activeTabId],
   async () => {
     await nextTick()
     updateTabsScrollState()
@@ -165,18 +127,13 @@ onUnmounted(() => {
   window.removeEventListener('resize', handleWindowResize)
 })
 
-// 菜单操作
 const renameStation = () => {
-  // 这里可以触发重命名逻辑，或者让Tab变为可编辑状态
-  // 目前保持原逻辑，选中该站点
-  if (menuStationId.value) selectStation(menuStationId.value)
+  if (menuStationId.value) emit('renameStation', menuStationId.value)
   closeMenu()
 }
 
 const duplicateStation = () => {
-  if (menuStationId.value) {
-    empireStore.duplicateStation(menuStationId.value)
-  }
+  if (menuStationId.value) emit('duplicateStation', menuStationId.value)
   closeMenu()
 }
 
@@ -187,9 +144,7 @@ const confirmDelete = () => {
 }
 
 const deleteStation = () => {
-  if (stationToDelete.value) {
-    empireStore.deleteStation(stationToDelete.value)
-  }
+  if (stationToDelete.value) emit('deleteStation', stationToDelete.value)
   showDeleteConfirm.value = false
   stationToDelete.value = null
 }
@@ -198,7 +153,6 @@ const cancelDelete = () => {
   showDeleteConfirm.value = false
   stationToDelete.value = null
 }
-
 </script>
 
 <template>
@@ -217,83 +171,23 @@ const cancelDelete = () => {
     <div ref="tabsScrollAreaRef" class="tabs-scroll-area custom-scrollbar" @scroll="handleTabsScroll">
       
       <div 
-        class="tab-item overview-tab"
-        :class="{ 'active': activeStationId === null && !activeTransitSectorId }"
-        @click="openOverview"
+        v-for="tab in tabs"
+        :key="tab.id"
+        class="tab-item station-tab"
+        :data-station-id="tab.id !== 'overview' ? tab.id : undefined"
+        data-testid="station-tab"
+        :class="{ 'active': activeTabId === tab.id, 'overview-tab': tab.id === 'overview' }"
+        @click="selectStation(tab)"
+        @contextmenu.stop="openMenu(tab.id, $event)"
       >
         <div class="tab-highlight"></div>
         <div class="tab-content">
-          <span class="tab-icon text-base">📊</span>
-          <span class="tab-label">{{ t('sector.overview') }}</span>
+          <img class="tab-icon w-6 h-6 icon-green" :src="getStationIcon(tab)" alt="" />
+          <span class="tab-label max-w-[120px] truncate">{{ tab.name }}</span>
         </div>
       </div>
 
-      <div
-        v-if="tabGroups.unassigned.length > 0"
-        class="tab-separator tab-separator-unassigned h-6 w-px bg-slate-700/50 mx-1 self-center"
-      ></div>
-
-      <div class="tabs-draggable-list">
-        <div
-          v-if="tabGroups.unassigned.length > 0"
-          class="tab-drop-group"
-        >
-        <div
-          v-for="station in tabGroups.unassigned"
-          :key="station.id"
-          class="tab-item station-tab"
-          :data-station-id="station.id"
-          :class="{ 'active': activeStationId === station.id }"
-          @click="selectStation(station.id)"
-          @contextmenu.stop="openMenu(station.id, $event)"
-        >
-          <div class="tab-highlight"></div>
-          <div class="tab-content">
-            <span class="tab-icon">{{ getStationIcon(station.type) }}</span>
-            <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
-          </div>
-        </div>
-        </div>
-
-        <div
-          v-for="group in visibleSectorGroups"
-          :key="`group-${group.id}`"
-          class="sector-tab-group"
-        >
-          <div class="tab-separator tab-separator-sector h-6 w-px bg-slate-700/50 mx-1 self-center"></div>
-
-          <div
-            v-for="station in group.stations"
-            :key="station.id"
-            class="tab-item station-tab"
-            :data-station-id="station.id"
-            :class="{ 'active': activeStationId === station.id }"
-            @click="selectStation(station.id)"
-            @contextmenu.stop="openMenu(station.id, $event)"
-          >
-            <div class="tab-highlight"></div>
-            <div class="tab-content">
-              <span class="tab-icon">{{ getStationIcon(station.type) }}</span>
-              <span class="tab-label max-w-[120px] truncate">{{ station.name }}</span>
-            </div>
-          </div>
-
-          <div
-            v-if="group.showTransitTab"
-            class="tab-item supply-tab"
-            :class="{ 'active': activeStationId === empireStore.getTransitTabId(group.id) }"
-            @click="openSupply(group.id)"
-          >
-            <div class="tab-highlight"></div>
-            <div class="tab-content">
-              <span class="tab-icon">🚚</span>
-              <span class="tab-label max-w-[120px] truncate">{{ group.name }}</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <button class="add-btn" @click="addNewStation" :title="t('sector.add_station')">
+      <button v-if="canCreateStation" class="add-btn" data-testid="add-station-btn" @click="addNewStation" :title="t('sector.add_station')">
         <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <line x1="12" y1="5" x2="12" y2="19"></line>
           <line x1="5" y1="12" x2="19" y2="12"></line>
@@ -359,14 +253,13 @@ const cancelDelete = () => {
 </template>
 
 <style scoped>
-/* 主容器：与 Toolbar 保持一致的深色背景，但在下方留出一条边框线作为 Tab 的底座 */
 .station-tab-bar-container {
   @apply w-full h-12 bg-slate-900 border-b border-slate-700 select-none relative;
 }
 
 .tabs-scroll-area {
   @apply flex items-end h-full px-10 gap-1 overflow-x-auto;
-  scrollbar-width: none; /* Firefox */
+  scrollbar-width: none;
 }
 
 .tabs-nav-btn {
@@ -383,45 +276,27 @@ const cancelDelete = () => {
   @apply right-2;
 }
 
-.tabs-draggable-list {
-  @apply flex items-end gap-1;
-}
-.tab-drop-group {
-  @apply flex items-end gap-1 rounded-md transition-colors;
-}
-.sector-tab-group {
-  @apply flex items-end gap-1 rounded-md transition-colors;
-}
 .tabs-scroll-area::-webkit-scrollbar {
-  display: none; /* Chrome/Safari */
+  display: none;
 }
 
-/* Tab 基础样式 */
 .tab-item {
   @apply relative h-9 px-4 rounded-t-lg cursor-pointer transition-all duration-200 border-t border-x border-transparent mt-2;
   @apply bg-slate-800/30 text-slate-400;
   @apply hover:bg-slate-800/60 hover:text-slate-200;
-  /* 关键：让 Tab 看起来像是插在底座上的卡片 */
   min-width: 100px;
 }
 
 .station-tab {
   @apply cursor-pointer;
 }
-.supply-tab {
-  @apply cursor-pointer;
-}
 
-/* 选中状态 */
 .tab-item.active {
   @apply bg-slate-800 text-sky-400 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)];
-  /* 底部边框透明，让颜色流向内容区，看起来连通 */
   @apply border-slate-700 border-b-slate-800;
-  /* 稍微抬高一点 */
   @apply h-10 translate-y-[1px] z-10;
 }
 
-/* 顶部高亮条 (类似浏览器 Tab) */
 .tab-highlight {
   @apply absolute top-0 left-0 w-full h-[2px] bg-transparent transition-colors rounded-t-lg;
 }
@@ -437,18 +312,11 @@ const cancelDelete = () => {
   @apply text-xs font-bold tracking-wide;
 }
 
-/* 总览 Tab 特殊样式 */
-.overview-tab {
-  @apply min-w-[fit-content] px-3;
-}
-
-/* 新建按钮 */
 .add-btn {
   @apply h-8 w-8 flex items-center justify-center rounded-lg ml-2 mb-1;
   @apply text-slate-500 hover:text-sky-400 hover:bg-slate-800 border border-transparent hover:border-slate-700 transition-all;
 }
 
-/* 右键菜单 */
 .context-menu {
   @apply fixed z-50 bg-slate-800/95 backdrop-blur-md border border-slate-600 rounded-lg shadow-2xl py-1 min-w-[160px];
   animation: menu-slide-in 0.1s ease-out;
@@ -479,7 +347,6 @@ const cancelDelete = () => {
   @apply h-px bg-slate-700 my-1 mx-2;
 }
 
-/* 模态框样式 */
 .modal-backdrop {
   @apply fixed inset-0 z-[60] flex items-center justify-center bg-black/60 backdrop-blur-sm;
 }
@@ -497,11 +364,14 @@ const cancelDelete = () => {
   @apply px-4 py-1.5 text-xs font-bold bg-red-600 text-white rounded hover:bg-red-500 shadow-lg shadow-red-900/20 transition-all;
 }
 
-/* 动画 */
 .fade-enter-active, .fade-leave-active {
   transition: opacity 0.2s;
 }
 .fade-enter-from, .fade-leave-to {
   opacity: 0;
+}
+
+.icon-green {
+  filter: brightness(0) saturate(100%) invert(64%) sepia(60%) saturate(450%) hue-rotate(84deg) brightness(92%) contrast(91%);
 }
 </style>
