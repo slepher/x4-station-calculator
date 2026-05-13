@@ -143,6 +143,8 @@ export interface BuildScheme {
   description?: string
   lineage?: string
   purposeModules: string[]
+  isolatedWareIds?: string[]
+  stepTargetRates?: Record<string, number>
   primaryModuleIds: string[]
   modules: SavedModule[]
   targetRates: Record<string, number>

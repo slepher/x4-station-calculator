@@ -390,6 +390,16 @@ function mergeGraphAndAllocationLines(
   const result: PreviewLinePlan[] = [...graphLines]
   const graphGroupIds = new Set(graphLines.map(l => l.groupId).filter(Boolean) as string[])
   const lineByGroupId = new Map(graphLines.map(line => [line.groupId, line]))
+  const previewAllocations = allocations.map((alloc, index) => {
+    let previewGroupId = alloc.groupId
+    if (!previewGroupId && alloc.isUnmatched) {
+      previewGroupId = buildUnmatchedPreviewGroupId(index)
+    }
+    return {
+      ...alloc,
+      previewGroupId,
+    }
+  })
 
   const requiredConsumersByWare = new Map<string, Set<string>>()
   for (const graphLine of graphLines) {
@@ -401,31 +411,39 @@ function mergeGraphAndAllocationLines(
       requiredConsumersByWare.set(item.wareId, consumers)
     }
   }
-  for (const alloc of allocations) {
-    if (!alloc.groupId) continue
+  for (const alloc of previewAllocations) {
+    if (!alloc.previewGroupId) continue
     for (const goal of alloc.goals) {
       if (goal.type !== 'required-production') continue
       const consumers = requiredConsumersByWare.get(goal.wareId) || new Set<string>()
-      consumers.add(alloc.groupId)
+      consumers.add(alloc.previewGroupId)
       requiredConsumersByWare.set(goal.wareId, consumers)
     }
   }
 
-  for (const alloc of allocations) {
-    const isGraphOverlap = Boolean(alloc.groupId && graphGroupIds.has(alloc.groupId))
+  for (const alloc of previewAllocations) {
+    const isGraphOverlap = alloc.previewGroupId !== undefined && graphGroupIds.has(alloc.previewGroupId)
+    let lineage = 'default'
+    if (alloc.previewGroupId) {
+      const existingLineage = lineageByGroupId.get(alloc.previewGroupId)
+      if (existingLineage) lineage = existingLineage
+      else if (alloc.lineage) lineage = alloc.lineage
+    } else if (alloc.lineage) {
+      lineage = alloc.lineage
+    }
     const respLine: PreviewLinePlan = {
-      groupId: alloc.groupId,
+      groupId: alloc.previewGroupId,
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
-      lineage: (alloc.groupId && lineageByGroupId.get(alloc.groupId)) || 'default',
+      lineage,
       items: alloc.goals
         .map(g => goalToPreviewItem(
           g,
-          `goal:${alloc.groupId || 'unmatched'}`,
-          respLineLineage(alloc.groupId, alloc.lineage, lineageByGroupId),
+          `goal:${alloc.previewGroupId || 'unmatched'}`,
+          respLineLineage(alloc.previewGroupId, alloc.lineage, lineageByGroupId),
           modulesMap,
           waresMap,
-          alloc.groupId,
+          alloc.previewGroupId,
           settings,
         ))
         .filter((item): item is PreviewItem => Boolean(item))
@@ -434,8 +452,8 @@ function mergeGraphAndAllocationLines(
           : true),
     }
 
-    if (isGraphOverlap && alloc.groupId) {
-      const existing = lineByGroupId.get(alloc.groupId)
+    if (isGraphOverlap && alloc.previewGroupId) {
+      const existing = lineByGroupId.get(alloc.previewGroupId)
       if (existing) {
         for (const item of respLine.items) {
           if (item.kind === 'derived' && item.wareId && item.derived.includes('production')) {
@@ -453,10 +471,10 @@ function mergeGraphAndAllocationLines(
     }
   }
 
-  const externalTargetGroupIds = allocations
-    .filter(alloc => alloc.groupId && !graphGroupIds.has(alloc.groupId))
-    .filter(alloc => alloc.goals.some(goal => goal.type === 'build-module' || goal.type === 'production-rate'))
-    .map(alloc => alloc.groupId!)
+  const externalTargetGroupIds = previewAllocations
+    .filter(alloc => alloc.previewGroupId !== undefined && !graphGroupIds.has(alloc.previewGroupId))
+    .filter(alloc => hasTargetGoals(alloc.goals))
+    .map(alloc => alloc.previewGroupId!)
 
   for (const line of result) {
     for (const item of line.items) {
@@ -519,6 +537,14 @@ function mergePreviewItems(
   return [...map.values()]
 }
 
+function hasTargetGoals(goals: BuildGoal[]): boolean {
+  return goals.some(goal => goal.type === 'build-module' || goal.type === 'production-rate')
+}
+
+function buildUnmatchedPreviewGroupId(index: number): string {
+  return `__preview_unmatched__:${index}`
+}
+
 function buildAllocationOnlyPreviewLines(
   allocations: ProductionLineAllocation[],
   modulesMap: Record<string, X4Module>,
@@ -526,25 +552,27 @@ function buildAllocationOnlyPreviewLines(
   settings: StationSettings = DEFAULT_BUILD_PLAN_SETTINGS,
 ): PreviewLinePlan[] {
   const requiredConsumersByWare = new Map<string, Set<string>>()
-  for (const alloc of allocations) {
-    if (!alloc.groupId) continue
+  for (const [index, alloc] of allocations.entries()) {
+    const effectiveGroupId = alloc.groupId || (alloc.isUnmatched ? buildUnmatchedPreviewGroupId(index) : undefined)
+    if (!effectiveGroupId) continue
     for (const goal of alloc.goals) {
       if (goal.type !== 'required-production') continue
       const consumers = requiredConsumersByWare.get(goal.wareId) || new Set<string>()
-      consumers.add(alloc.groupId)
+      consumers.add(effectiveGroupId)
       requiredConsumersByWare.set(goal.wareId, consumers)
     }
   }
 
-  return allocations.map((alloc) => {
+  return allocations.map((alloc, index) => {
+    const effectiveGroupId = alloc.groupId || (alloc.isUnmatched ? buildUnmatchedPreviewGroupId(index) : undefined)
     const items = alloc.goals
       .map(goal => goalToPreviewItem(
         goal,
-        `goal:${alloc.groupId || 'unmatched'}`,
+        `goal:${effectiveGroupId || 'unmatched'}`,
         alloc.lineage,
         modulesMap,
         waresMap,
-        alloc.groupId,
+        effectiveGroupId,
         settings,
       ))
       .filter((item): item is PreviewItem => Boolean(item))
@@ -558,7 +586,7 @@ function buildAllocationOnlyPreviewLines(
       })
 
     return {
-      groupId: alloc.groupId,
+      groupId: effectiveGroupId,
       groupName: alloc.groupName,
       isUnmatched: alloc.isUnmatched,
       lineage: alloc.lineage || 'default',
@@ -874,6 +902,21 @@ export function computeBuildFlowPlan(
         schemeByGroupId,
         modulesMap,
       )
+      const scheme = schemeByGroupId.get(line.groupId)
+      if (scheme && node.demandAnalysis) {
+        const stepTargetRates: Record<string, number> = {}
+        const allWares = new Set([
+          ...Object.keys(node.demandAnalysis.aggregateRates || {}),
+          ...Object.keys(node.demandAnalysis.gapRates || {}),
+        ])
+        for (const wareId of allWares) {
+          const aggregateRate = node.demandAnalysis.aggregateRates[wareId] || 0
+          const gapRate = node.demandAnalysis.gapRates[wareId] || 0
+          const totalRate = aggregateRate + gapRate
+          if (totalRate > 0) stepTargetRates[wareId] = totalRate
+        }
+        scheme.stepTargetRates = stepTargetRates
+      }
     }
   }
 

@@ -2,59 +2,94 @@
 
 ## 目标
 
-为 build-plan 详情弹窗建立两层清晰的数据边界：
-
-1. store / compute 只产出默认静态 scheme 结果。
-2. Vue 弹窗默认消费静态汇总数据。
-3. steps 仅在弹窗中按需生成并以局部视图模型承载。
+为 build-plan 的 steps 建立独立且完整的方案文档，使 steps 脱离 compute 主文档，成为只服务详情弹窗的局部视图能力，并覆盖新的建材 greedy 增量规则。
 
 ## 问题
 
-当前 build-plan 详情链路存在以下边界混乱：
+当前 steps 文档和相关变更说明存在三类混乱：
 
-1. 默认 compute 阶段直接生成 steps，使 steps 成为默认真相层的一部分。
-2. 详情弹窗默认以 steps 作为主体视图，无法在不生成 steps 的前提下稳定展示 scheme 细节。
-3. `BuildScheme.totalCredits` 与 steps 累计成本缺乏语义隔离，容易被同一字段混用。
-4. `makeSchemeSteps()` 留在核心 compute 模块中，强化了“steps 属于默认 compute”的错误边界。
-5. `energycells` 在当前实现与相关说明中被错误排除出部分材料统计与成本统计。
+1. steps 边界混乱：`build-plan-compute` 与 `build-plan-steps` 同时描述 steps，职责重复。
+2. steps 算法混乱：旧文档仍假设复用 `makeSchemeSteps()`，而该算法本质是静态展开，不符合新的 greedy 建材步骤语义。
+3. steps 适用范围混乱：旧文档默认所有 scheme 都可切到 steps 模式，没有体现“仅建材方案适用”的新限制。
 
-因此，本 change 需要把“默认静态汇总视图”和“按需 steps 视图”拆开。
+因此，这次文档重写需要同时解决“归属单一化”和“方案更新”两个问题。
 
 ## 方案
 
-### 1. 总体数据流
+### 1. 文档边界重构
+
+重构后的职责如下：
+
+```text
+build-plan-compute
+  -> preview / compute 真相层
+  -> 主要模块 / 辅助模块求解
+  -> BuildScheme 静态输出
+  -> 与 steps 的边界说明
+
+build-plan-steps
+  -> 详情弹窗 steps mode 的唯一完整来源
+  -> steps 适用范围
+  -> steps 算法
+  -> steps 视图模型
+  -> steps 交互与异常口径
+```
+
+要求：
+
+1. `build-plan-compute` 不再承担 steps 算法和视图细节。
+2. `build-plan-steps` 必须足够完整，单独可读。
+
+### 2. 总体数据流
 
 ```text
 用户点击“计算建造方案”
-  -> build-plan compute
+  -> compute
      -> 求解 modules
-     -> 计算静态 totalDuration
-     -> 计算静态 totalCredits
+     -> 计算 totalDuration
+     -> 计算 totalCredits
      -> 生成 moduleSummaries
      -> 返回 BuildScheme（无 steps）
 
-用户打开 scheme 详情弹窗
-  -> 默认展示 BuildScheme.moduleSummaries
+用户打开详情弹窗
+  -> 默认展示 moduleSummaries
 
-用户打开 steps 开关
-  -> 弹窗局部 logic 调用 makeSchemeSteps()
-  -> 生成 BuildStepsScheme
-  -> 切换成纯 steps 列表
+用户切换到 steps mode
+  -> 判定当前 scheme 是否为建材方案
+  -> 若不是建材方案：不提供 steps mode
+  -> 若是建材方案：
+     -> 弹窗局部计算 BuildStepsScheme
+     -> 先执行 greedy satisfaction 主循环
+     -> 每轮回放主建筑 + autoFill diff
+     -> 再按剩余主模块种类执行 ordered tail-fill
+     -> 渲染纯 step 列表
 ```
 
-关键边界：
+### 3. steps mode 适用范围
 
-1. 默认 compute 不生成 steps。
-2. steps 懒计算不回写 store。
-3. Vue 默认模式与 steps 模式消费不同的数据载体。
+steps mode 不是通用的 scheme 视图，而是建材方案专用视图。
 
-### 2. 真相层模型
+#### 3.1 允许进入的场景
 
-#### 2.1 BuildScheme
+- 当前 scheme 属于建材产线组
+- 当前 scheme 对应建材责任求解结果
 
-`BuildScheme` 保持默认静态真相层语义，只新增默认详情视图需要的汇总字段。
+#### 3.2 不允许进入的场景
 
-建议结构：
+- 当前 scheme 属于生产产线组
+- 当前 scheme 没有建材目标 rate 语义
+- 当前 scheme 模块为空
+
+UI 约束：
+
+1. 非建材 scheme 不显示 steps 开关。
+2. 空模块 scheme 不显示 steps 开关。
+
+### 4. 数据模型
+
+#### 4.1 BuildScheme
+
+`BuildScheme` 继续作为 compute 的静态真相层：
 
 ```ts
 interface BuildScheme {
@@ -64,48 +99,12 @@ interface BuildScheme {
   totalDuration: number
   totalCredits: number
   moduleSummaries: BuildSchemeModuleSummary[]
-  // 其他现有静态字段保持原有职责
 }
 ```
 
-其中：
+#### 4.2 BuildStepsScheme
 
-- `totalDuration` = 静态总建造时长
-- `totalCredits` = 静态材料总成本
-- `moduleSummaries` = 默认详情视图使用的已排序模块汇总
-
-#### 2.2 Module Summary
-
-```ts
-interface BuildSchemeModuleSummary {
-  moduleId: string
-  moduleCount: number
-  totalDuration: number
-  totalCredits: number
-  materials: BuildSchemeModuleMaterialSummary[]
-}
-
-interface BuildSchemeModuleMaterialSummary {
-  wareId: string
-  quantity: number
-  totalCredits: number
-  unitPrice: number
-}
-```
-
-约束：
-
-1. `moduleSummaries` 由 compute 直接生成。
-2. `moduleSummaries` 已排序，Vue 不再二次排序。
-3. 每个模块项的 `materials` 也必须已排序。
-
-### 3. Vue 专用 steps 视图模型
-
-#### 3.1 BuildStepsScheme
-
-steps 不进入 store 真相层，改为 Vue / presenter 侧局部模型。
-
-建议结构：
+steps 使用独立视图模型：
 
 ```ts
 interface BuildStepsScheme {
@@ -118,158 +117,147 @@ interface BuildStepsScheme {
 
 约束：
 
-1. `BuildStepsScheme` 只存在于 Vue / presenter 范围。
-2. 不放入 `src/types/build-plan.ts` 这类 store 真相层类型文件。
-3. 不回写 `useBuildPlanStore`、`buildPlan`、`schemeGroups`。
+1. `BuildStepsScheme` 只存在于 Vue / presenter 层。
+2. 不进入 store 真相层类型定义。
+3. 不回写 `useBuildPlanStore`、`buildPlan`、`computeResult`、`schemeGroups`。
 
-#### 3.2 BuildStepsScheme 与 BuildScheme 的关系
+### 5. greedy satisfaction 主循环
 
-- 默认模式：直接使用 `BuildScheme`
-- steps 模式：使用 `BuildStepsScheme.baseScheme` + `steps` 派生字段
+#### 5.1 目标
 
-这样可以避免两套完整 scheme 结构并行漂移。
+steps mode 要表达“建材产线如何一步一步长出来”，而不是“最终模块如何按静态顺序展开”。
 
-### 4. 默认模式详情视图
+#### 5.2 输入语义
 
-默认模式仍采用手风琴交互，但语义改为“模块汇总项”。
+steps greedy 主循环需要的最小输入：
 
-#### 4.1 状态栏
+1. 当前建材 scheme 的目标建材 rates
+2. 当前建材 scheme 的最终 `BuildScheme.modules`
+3. 当前建材 scheme 的 isolated ware 集合
+4. 模块生产能力、建造耗时、建造材料
 
-- 显示 `总耗时`
-- 显示 `总花费`
-- 不显示 `步骤数`
+重点：
 
-#### 4.2 手风琴头部字段
+1. 目标比较集合只包含建材目标 ware。
+2. 不混入生产责任、自消费扩张目标或其他非建材语义。
 
-- 模块名称
-- 数量
-- 总耗时
-- 总花费
-
-#### 4.3 展开区字段
-
-- 材料名称
-- 总数量
-- 总花费
-- 单价
-
-### 5. steps 模式详情视图
-
-steps 模式不混用默认模式主体，直接切换为纯 steps 列表。
-
-#### 5.1 状态栏
-
-- `总耗时`：沿用 `BuildScheme.totalDuration`
-- `总花费`：显示 `BuildStepsScheme.stepsTotalCredits`
-- `步骤数`：显示 `BuildStepsScheme.stepsCount`
-
-#### 5.2 主体
-
-- 保留现有 step 列表视图样式
-- 不再显示默认模式的模块汇总主体
-
-### 6. 静态汇总口径
-
-#### 6.1 时长
-
-- `BuildScheme.totalDuration` = `sum(module.buildTime × count)`
-- `moduleSummary.totalDuration` = 当前模块总建造时长
-
-总时长在默认模式与 steps 模式必须一致。
-
-#### 6.2 花费
-
-默认模式花费全部按静态材料总成本：
+#### 5.3 主循环规则
 
 ```text
-module totalCredits = sum(buildCost[ware] × moduleCount × ware.price)
-scheme totalCredits = sum(all module totalCredits)
-material totalCredits = quantity × unitPrice
+built = []
+
+loop:
+  1. 用 built 计算当前净产能
+  2. 对每个目标建材计算 satisfaction = currentNet / targetRate
+  3. 找出 satisfaction 最低的建材
+  4. 为该建材选择最佳 producer
+  5. 增加 1 个主建筑
+  6. 基于当前主建筑集合运行 autoFill
+  7. 计算本轮主建筑 + autoFill diff
+  8. 记录一步
+  9. 若所有目标建材都满足 -> break
 ```
 
-默认模式不考虑：
+补充约束：
 
-- 库存抵扣
-- 建造期间自产
-- steps 顺序
+1. 每轮 `autoFill` 必须与正式 compute 共享 isolated ware 约束。
+2. 若某个 ware 被 isolated，steps 中的 `autoFill` 不得自动补该 ware 的上游建筑。
 
-#### 6.3 排序
+#### 5.4 必须排除的旧行为
 
-模块排序：
+新算法不允许继续沿用以下旧 `greedyFill` 语义：
 
-1. `tier` 升序
-2. `module.name` 升序
+1. `built.length === 0` 时强制 `hullparts` 起步。
+2. 用 per-source `Math.max` 合并目标速率。
+3. 在瓶颈选择中把 `selfDemand` 与建材目标并列混算。
+4. 让 greedy step 的主语义依赖本轮 autoFill 增量。
 
-材料排序：
+### 6. 尾部补齐阶段
 
-1. `totalCredits` 降序
+greedy 主循环结束时，不保证已经把最终 scheme 的所有建筑都逐步选完。
 
-### 7. steps 懒计算
-
-#### 7.1 触发方式
-
-- 详情弹窗打开时不计算
-- 用户打开 `steps` 开关时才计算
-- 计算期间显示弹窗局部 loading
-
-#### 7.2 缓存与失效
-
-- 同一弹窗会话内可复用计算结果
-- 当 `scheme.modules` 变化时，局部缓存失效
-- 关闭弹窗后结果自然释放
-
-### 8. makeSchemeSteps 的归属调整
-
-当前 `makeSchemeSteps()` 属于旧边界的一部分，需要迁出默认 compute 核心模块。
-
-调整后边界：
+因此需要单独的 tail-fill 阶段：
 
 ```text
-store core compute
-  -> 生成 BuildScheme
-  -> 不依赖 makeSchemeSteps
-
-vue/presenter local logic
-  -> 引用 makeSchemeSteps
-  -> 生成 BuildStepsScheme
+greedy done
+  -> compare(final scheme.modules, built)
+  -> find remaining primary modules
+  -> for each remaining primary module type:
+       add remaining primary count
+       run autoFill again
+       append primary + autoFill diff as one tail-fill batch
+  -> if support-only modules still remain:
+       append support fallback steps
 ```
 
 约束：
 
-1. 继续复用同一套 `makeSchemeSteps()` 算法。
-2. 不允许再写第二套 steps 生成逻辑。
-3. 该函数迁移后只能被详情弹窗 steps 计算链路依赖。
+1. tail-fill 的第一优先级是“最终 scheme 仍需要，但 greedy 主循环未显式补入”的主模块。
+2. tail-fill 必须按主模块种类分批执行，而不是把剩余模块一次性平铺到末尾。
+3. 每个 tail-fill batch 都要重新跑一次 `autoFill diff`，保持与 greedy 主循环一致的增量语义。
+4. tail-fill 步骤要和 greedy 步骤在 reason 语义上区分开。
+5. tail-fill 仍然只属于 steps 视图层，不反向影响 compute 真相层。
 
-### 9. Energy Cells 口径修正
+### 7. 默认模式与 steps mode 的关系
 
-`energycells` 只允许在“循环建材产线寻找”语义下作为特殊项；不得再从材料展示和成本统计中剔除。
+#### 7.1 默认模式
 
-需要统一修正以下口径：
+- 主体：模块汇总手风琴
+- 状态栏：总耗时 + 总花费
+- 不显示步骤数
+- 使用静态汇总口径
 
-1. `moduleSummaries.materials` 纳入 `energycells`
-2. 静态 `totalCredits` 纳入 `energycells`
-3. steps 明细纳入 `energycells`
-4. steps 累计花费纳入 `energycells`
+#### 7.2 steps mode
+
+- 主体：纯 step 列表
+- 状态栏：总耗时 + 总花费 + 步骤数
+- 总耗时沿用 `BuildScheme.totalDuration`
+- 总花费使用 steps 累计口径
+
+### 8. steps 懒计算与缓存
+
+#### 8.1 触发
+
+- 弹窗打开时不计算
+- 用户切换到 steps mode 时才计算
+
+#### 8.2 局部状态
+
+- 计算期间显示弹窗局部 loading
+- 同一弹窗会话内可复用结果
+- 当 `scheme.modules` 变化时缓存失效
+- 关闭弹窗后局部结果释放
+
+### 9. Energy Cells 口径
+
+`energycells` 的处理分成两层：
+
+1. greedy 选材语义层：
+   - 允许在建材瓶颈搜索中保留特殊处理
+2. steps 展示与成本层：
+   - 必须纳入材料展示
+   - 必须纳入 step 成本统计
+   - 必须纳入 stepsTotalCredits
 
 ### 10. 异常兜底
 
-若出现意外情况导致当前 scheme 模块为空：
+若当前 scheme 不满足 steps mode 前提：
 
-1. 详情弹窗直接显示空模板
-2. 不显示 steps 开关
-3. 该行为仅用于异常兜底，不改变正常流程定义
+1. 模块为空
+2. 非建材 scheme
+3. 缺少合法的建材目标输入
+
+则：
+
+1. 不进入正常 steps mode
+2. 不显示 steps 开关或直接停留在默认模式
+3. 不将异常兜底行为写回真相层
 
 ## 影响面
 
-本 change 只调整以下层次：
+本 change 的文档影响面：
 
-1. build-plan compute 输出结构
-2. build-plan 详情弹窗 presenter / local logic
-3. steps 生成函数的模块归属
-4. 相关 OpenSpec 文档
+1. `openspec/changes/build-plan-steps/*`
+2. `openspec/changes/build-plan-compute/*`
 
-不影响：
-
-1. preview 责任分配
-2. compute 主模块 / 辅助模块求解
-3. build-flow graph / SCC 主算法
+运行时实现影响面仅作为后续 apply 参考，不在本次文档改动中展开。

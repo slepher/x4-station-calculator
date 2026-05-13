@@ -5,7 +5,7 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
 import type { BuildScheme, BuildSchemeStep } from '@/types/build-plan'
 import type { StationSettings } from '@/types/x4'
-import { buildStepsScheme, type BuildStepsScheme } from './presenters/buildPlanStepsLogic'
+import { buildStepsScheme, canBuildStepsScheme, type BuildStepsScheme, type BuildStepsSchemeGroupType } from './presenters/buildPlanStepsLogic'
 
 const { t } = useI18n()
 const { translateModule, translateWare } = useX4I18n()
@@ -22,6 +22,7 @@ const DEFAULT_BUILD_PLAN_SETTINGS: StationSettings = {
 
 const props = defineProps<{
   scheme: BuildScheme
+  schemeGroupType: BuildStepsSchemeGroupType
 }>()
 
 const KNOWN_SCHEME_KEYS = [
@@ -69,10 +70,12 @@ watch(showStepsMode, (newVal) => {
     setTimeout(() => {
       cachedStepsScheme.value = buildStepsScheme(
         props.scheme,
+        props.schemeGroupType,
         gameData.modulesMap,
         gameData.waresMap,
         DEFAULT_BUILD_PLAN_SETTINGS
       )
+      if (!cachedStepsScheme.value) showStepsMode.value = false
       stepsLoading.value = false
     }, 0)
   }
@@ -174,6 +177,7 @@ const stepRows = computed(() => {
 })
 
 const hasEmptyModules = computed(() => props.scheme.modules.length === 0)
+const canShowStepsToggle = computed(() => canBuildStepsScheme(props.scheme, props.schemeGroupType))
 </script>
 
 <template>
@@ -215,7 +219,7 @@ const hasEmptyModules = computed(() => props.scheme.modules.length === 0)
             </div>
             
             <!-- Steps toggle -->
-            <div v-if="!hasEmptyModules" class="ml-auto flex items-center gap-2">
+            <div v-if="canShowStepsToggle" class="ml-auto flex items-center gap-2">
               <span class="text-xs text-slate-400">{{ t('build_plan.show_steps') }}</span>
               <button
                 type="button"

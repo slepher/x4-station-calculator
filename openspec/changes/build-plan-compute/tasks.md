@@ -69,37 +69,20 @@
 - [x] T30: 落实静态总耗时、静态总花费、材料总量、材料总花费、单价计算
 - [x] T31: 落实模块排序与材料排序规则（tier 升序 + name 升序 / totalCredits 降序）
 
-## Phase 9: Steps 逻辑边界重构
+## Phase 9: Energy Cells 静态口径修正
 
-- [x] T32: 将 makeSchemeSteps() 从默认 compute 核心模块迁出
-- [x] T33: 保持 steps 模式继续复用同一套算法
-- [x] T34: Vue / presenter 范围新增 BuildStepsScheme 类型与组装逻辑
-- [x] T35: BuildStepsScheme 不进入 store 真相层，不回写 store
+- [x] T32: 修正默认静态材料明细与静态成本统计中 energycells 的错误排除
+- [x] T33: 确保 energycells 仅在"循环建材产线寻找"语义中保留特殊处理
 
-## Phase 10: 详情弹窗两态展示
+## Phase 10: Build Plan Store 拆分
 
-- [x] T36: 详情弹窗状态栏增加 steps 开关，默认关闭
-- [x] T37: 默认模式显示模块汇总手风琴
-- [x] T38: 默认模式展开区显示材料明细
-- [x] T39: steps 模式切换为纯 step 列表
-- [x] T40: 增加弹窗局部 loading、局部缓存与缓存失效逻辑
-- [x] T41: 空模块场景空模板兜底，隐藏 steps 开关
+- [ ] T34: 新增独立 useBuildPlanStore，承载 build-plan 真相层状态与动作
+- [ ] T35: 将 buildGoals / buildMaterialPlanningEnabled / buildPlan / previewResult / computeResult / schemeGroups / loading 状态从 useBlueprintProductionStore 迁移到 useBuildPlanStore
+- [ ] T36: 将 preview watcher 与 compute 入口迁移到 useBuildPlanStore
+- [ ] T37: useBuildPlanPresenter 改为以 useBuildPlanStore 为主输入
+- [ ] T38: BlueprintProductionWorkbenchView overview 入口改为同时注入两个 store
+- [ ] T39: 清理 useBlueprintProductionStore 中遗留的 build-plan 真相层导出与双写路径
 
-## Phase 11: Energy Cells 口径修正
+## Phase 11: 构建验证
 
-- [x] T42: 修正默认模式材料明细与静态成本统计中 energycells 的错误排除
-- [x] T43: 修正 steps 模式材料明细与 steps 成本统计中 energycells 的错误排除
-- [x] T44: energycells 仅在"循环建材产线寻找"语义中保留特殊处理
-
-## Phase 12: Build Plan Store 拆分
-
-- [ ] T45: 新增独立 useBuildPlanStore，承载 build-plan 真相层状态与动作
-- [ ] T46: 将 buildGoals / buildMaterialPlanningEnabled / buildPlan / previewResult / computeResult / schemeGroups / loading 状态从 useBlueprintProductionStore 迁移到 useBuildPlanStore
-- [ ] T47: 将 preview watcher 与 compute 入口迁移到 useBuildPlanStore
-- [ ] T48: useBuildPlanPresenter 改为以 useBuildPlanStore 为主输入
-- [ ] T49: BlueprintProductionWorkbenchView overview 入口改为同时注入两个 store
-- [ ] T50: 清理 useBlueprintProductionStore 中遗留的 build-plan 真相层导出与双写路径
-
-## Phase 13: 构建验证
-
-- [x] T51: npm run build 通过
+- [x] T40: npm run build 通过

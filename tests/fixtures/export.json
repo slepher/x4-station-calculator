@@ -1,7 +1,7 @@
 {
   "format": "x4-import-export",
   "version": 1,
-  "exportedAt": "2026-05-11T12:39:39.091Z",
+  "exportedAt": "2026-05-13T10:37:48.128Z",
   "game_vsn": "8.0",
   "beta": false,
   "data": {
@@ -11,7 +11,7 @@
       "list": [
         {
           "id": "a83e4f9a-b651-4fab-9089-5f05e2b2f7d1",
-          "name": "新建蓝图",
+          "name": "新建蓝图1",
           "sectors": [],
           "sectorLinks": [],
           "stations": [
@@ -21,12 +21,7 @@
               "sectorId": null,
               "type": "industrial",
               "count": 1,
-              "modules": [
-                {
-                  "id": "module_gen_prod_claytronics_01",
-                  "count": 1
-                }
-              ],
+              "modules": [],
               "settings": {
                 "sunlight": 100,
                 "useHQ": false,
@@ -48,7 +43,7 @@
                 "transportShipCapacity": 62000,
                 "enforceDlcActivation": false
               },
-              "lastUpdated": 1777638303304,
+              "lastUpdated": 1778579525873,
               "lockedWares": [],
               "warePriority": {}
             }
@@ -58,7 +53,7 @@
     },
     "x4_logic_flow_plans": {
       "version": 3,
-      "activeId": "245bf4e4-ce82-40a4-adbc-f4a5fdc4e5ca",
+      "activeId": "7f6f8de9-cb79-4ad3-ae19-b053b52f8b8b",
       "list": [
         {
           "id": "7f6f8de9-cb79-4ad3-ae19-b053b52f8b8b",
@@ -629,21 +624,21 @@
               }
             ]
           },
-          "lastUpdated": 1778406372413
+          "lastUpdated": 1778568652936
         }
       ]
     },
     "x4_ship_blueprints": {
       "version": 3,
       "activeShipId": "ship_atf_l_destroyer_01_a",
-      "activeBlueprintId": "f19be396-db41-47a7-b1bd-f5f153be2d95",
+      "activeBlueprintId": "1a29f565-a472-4124-88f3-b55015a396b1",
       "ships": [
         {
           "shipId": "ship_atf_l_destroyer_01_a",
           "blueprints": [
             {
-              "id": "f19be396-db41-47a7-b1bd-f5f153be2d95",
-              "name": "席恩 蓝图",
+              "id": "1a29f565-a472-4124-88f3-b55015a396b1",
+              "name": "席恩",
               "shipId": "ship_atf_l_destroyer_01_a",
               "connections": [
                 {
@@ -813,7 +808,7 @@
                 "missiles": []
               },
               "materialMethod": "terran",
-              "lastUpdated": 1778332938515
+              "lastUpdated": 1778579657181
             }
           ]
         },
@@ -984,46 +979,8 @@
         }
       ]
     },
-    "x4_save_bindings": {
-      "version": 1,
-      "list": [
-        {
-          "gameGuid": "CB8837FE-98C1-42F8-9D6A-ED0ADC539111",
-          "bindingName": "slepher",
-          "selectedArchiveTime": null,
-          "groups": [
-            {
-              "id": "6068524b-5fbb-4c38-962f-d766551a9bdf",
-              "name": "阿尔忒弥斯的朦胧",
-              "order": 0,
-              "sectorMacro": "cluster_715_sector001_macro",
-              "jumpRange": 2,
-              "coverageSectorMacros": [
-                {
-                  "ref": "cluster_26_sector001_macro",
-                  "jump": 1
-                }
-              ],
-              "connectedGroupIds": [],
-              "tradeStation": {
-                "id": "71080964-232d-4926-8068-d7af0f1e928a",
-                "name": "Trade Station",
-                "sectorMacro": "cluster_715_sector001_macro",
-                "position": {
-                  "x": 0,
-                  "y": 0,
-                  "z": 0
-                }
-              }
-            }
-          ],
-          "stationPlans": [],
-          "updatedAt": 1778163207007
-        }
-      ]
-    },
     "x4_build_plan_goals": {
-      "version": 1,
+      "version": 2,
       "activeId": "b00d82c6-42a7-471e-9ef4-86d2f2c7e566",
       "list": [
         {
@@ -1054,33 +1011,16 @@
           "name": "建造规划 2",
           "buildGoals": [
             {
-              "type": "build-module",
-              "moduleId": "module_ter_prod_computronicsubstrate_01",
-              "count": 1
-            }
-          ],
-          "logicFlowPlanId": "245bf4e4-ce82-40a4-adbc-f4a5fdc4e5ca",
-          "lastUpdated": 1778347614729
-        },
-        {
-          "id": "b00d82c6-42a7-471e-9ef4-86d2f2c7e566",
-          "name": "建造规划 3",
-          "buildGoals": [
-            {
               "type": "fleet",
               "buildTime": 3600,
               "entries": [
                 {
                   "shipId": "ship_ter_l_destroyer_01_a",
                   "blueprintId": "9e81a1fe-d921-4795-a59f-3c13d8250805",
-                  "quantity": 3
-                },
-                {
-                  "shipId": "ship_atf_l_destroyer_01_a",
-                  "blueprintId": "f19be396-db41-47a7-b1bd-f5f153be2d95",
                   "quantity": 1
                 }
-              ]
+              ],
+              "buildTimeMode": "actual"
             },
             {
               "type": "build-module",
@@ -1089,7 +1029,20 @@
             }
           ],
           "logicFlowPlanId": "245bf4e4-ce82-40a4-adbc-f4a5fdc4e5ca",
-          "lastUpdated": 1778502756343
+          "lastUpdated": 1778503834288
+        },
+        {
+          "id": "b00d82c6-42a7-471e-9ef4-86d2f2c7e566",
+          "name": "建造规划 3",
+          "buildGoals": [
+            {
+              "type": "build-module",
+              "moduleId": "module_gen_prod_missilecomponents_01",
+              "count": 1
+            }
+          ],
+          "logicFlowPlanId": "7f6f8de9-cb79-4ad3-ae19-b053b52f8b8b",
+          "lastUpdated": 1778668592972
         }
       ]
     }

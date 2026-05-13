@@ -2,7 +2,7 @@
 
 ## Purpose
 
-定义 build-plan compute 阶段的完整行为规范：compute 只读取 preview 结果并求解主要模块/辅助模块；默认 compute 不生成 steps；目标速率按责任类型区分公式；SCC 收敛只看主要模块。
+定义 build-plan compute 阶段的完整行为规范：compute 只读取 preview 结果并求解主要模块/辅助模块；默认输出静态 BuildScheme；目标速率按责任类型区分公式；SCC 收敛只看主要模块。
 
 ## ADDED Requirements
 
@@ -97,81 +97,31 @@
 **那么** build-plan 真相层 MUST 由独立 store 承载
 **并且** MUST NOT 继续依附在 blueprint production 的旧职责容器中
 
-### Requirement: 默认 compute 阶段不得生成 steps
+### Requirement: Compute MUST output static BuildScheme only
 
 **前提** 用户执行普通 compute
 **当** 系统产出 BuildScheme
-**那么** 系统 MUST 跳过 steps 生成
-**并且** compute 仍 MUST 计算静态 `totalDuration`、静态 `totalCredits` 与 `moduleSummaries`
+**那么** 系统 MUST 输出静态 `modules`、静态 `totalDuration`、静态 `totalCredits` 与 `moduleSummaries`
+**并且** MUST NOT 在 compute 文档中继续定义 steps 详细方案
 
-### Requirement: BuildScheme MUST 提供默认详情视图所需的 module summaries
+### Requirement: BuildScheme MUST provide pre-sorted module summaries
 
-**前提** Vue 需要展示默认详情弹窗
-**当** compute 产出 BuildScheme
-**那么** BuildScheme MUST 提供 `moduleSummaries`
-**并且** 每项 MUST 表达同种模块的汇总信息与材料汇总明细
-
-### Requirement: Module summaries MUST be pre-sorted by compute
-
-**前提** compute 产出 `moduleSummaries`
-**当** Vue 读取该字段
+**前提** compute 产出 `BuildScheme`
+**当** Vue 读取 `moduleSummaries`
 **那么** 模块项 MUST 已排序
 **并且** 材料项 MUST 已排序
 **并且** Vue MUST NOT 再承担该排序责任
 
-### Requirement: Steps MUST be computed lazily inside the modal
+### Requirement: Energy Cells MUST be included in static material display and cost accounting
 
-**前提** 用户打开 build-plan 详情弹窗
-**当** 用户切换到 steps 模式
-**那么** 系统 MUST 在弹窗内按需懒计算 steps
-**并且** 默认详情模式 MUST NOT 预先生成 steps
+**前提** 系统生成 `BuildScheme` 的静态材料明细或静态成本统计
+**当** 某模块建造成本包含 `energycells`
+**那么** 系统 MUST 将 `energycells` 纳入材料展示
+**并且** MUST 将其纳入静态成本统计
 
-### Requirement: Steps result MUST stay out of store truth
+### Requirement: Steps detailed behavior MUST be defined by build-plan-steps
 
-**前提** 系统已生成某个方案的 steps 结果
-**当** steps 计算完成
-**那么** steps 结果 MUST NOT 回写 build-plan store 真相层
-**并且** MUST 仅作为弹窗内的临时视图数据存在
-
-### Requirement: Vue MUST use a dedicated BuildStepsScheme view model
-
-**前提** Vue 需要展示 steps 模式
-**当** 弹窗进入 steps 视图
-**那么** Vue MUST 使用独立的 `BuildStepsScheme` 视图模型
-**并且** MUST NOT 复用默认静态详情结构硬凑 steps 展示
-
-### Requirement: Steps mode MUST display its own credits while keeping duration aligned
-
-**前提** 弹窗处于 steps 模式
-**当** 系统渲染状态栏
-**那么** 总耗时 MUST 与默认模式保持一致
-**并且** 总花费 MUST 使用 step 累计口径
-**并且** MUST 显示步骤数
-
-### Requirement: Steps generation MUST reuse the existing makeSchemeSteps algorithm
-
-**前提** 系统需要从 BuildScheme 生成 steps
-**当** 开发者实现 steps 逻辑
-**那么** 系统 MUST 复用既有 `makeSchemeSteps` 算法
-**并且** MUST NOT 新造一套不兼容的步骤生成规则
-
-### Requirement: Energy Cells MAY stay excluded from build-material search accounting by design
-
-**前提** 系统在 build-material 责任中处理 `energycells`
-**当** 开发者实现 build-material 搜索与公式
-**那么** `energycells` MAY 继续按既有设计被特殊排除
-**并且** 该特殊处理 MUST 被视为设计口径，而不是实现偏差
-
-### Requirement: Modal MUST handle empty-module fallback safely
-
-**前提** 某个方案在默认详情模式下没有可展示的模块汇总
-**当** 用户打开详情弹窗
-**那么** 弹窗 MUST 安全处理空模块场景
-**并且** MUST NOT 因空列表导致异常渲染或状态错乱
-
-### Requirement: 默认详情模式的时长和花费 MUST 使用静态汇总口径
-
-**前提** 用户查看默认详情模式
-**当** 系统展示总耗时与总花费
-**那么** 这两个字段 MUST 使用静态汇总口径
-**并且** MUST NOT 混入 steps 模式下的逐步累计口径
+**前提** 系统存在 steps mode
+**当** 开发者需要查阅或修改 steps 适用范围、算法、视图或懒计算逻辑
+**那么** 系统 MUST 以 `build-plan-steps` 文档为准
+**并且** `build-plan-compute` MUST 只保留 compute 与 steps 的边界说明

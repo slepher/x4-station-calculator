@@ -8,7 +8,7 @@
 2. compute 先求主要模块数量，再派生辅助模块数量
 3. 目标速率公式按责任类型区分（derived-build-material vs derived-production）
 4. SCC 迭代收敛只看主要模块数量
-5. 默认 compute 不生成 steps，steps 仅在详情弹窗中按需懒计算
+5. compute 输出静态 `BuildScheme`，不生成 steps
 6. Vue 与 analysis script 必须共用同一套计算入口
 7. 最终方案分建材产线组与生产产线组，重叠产线归入建材组并合并求解
 
@@ -70,41 +70,21 @@
   - 建材责任与生产责任必须合并求解
 - 建造顺序：先建材产线，后生产产线，组内按依赖拓扑序
 
-### 默认 compute 不生成 steps
-
-- 默认 compute 跳过 steps 生成
-- compute 仍然负责：求解 modules、计算静态 totalDuration、计算静态 totalCredits、生成 moduleSummaries
-- steps 仅在详情弹窗中按需懒计算
-- steps 结果不得回写 store 真相层
-
-### 默认详情弹窗模式
-
-- 详情弹窗默认展示模块汇总手风琴
-- 每项代表同种模块汇总（模块名称 / 数量 / 总耗时 / 总花费）
-- 展开显示材料汇总明细（材料名称 / 总数量 / 总花费 / 单价）
-- 默认模式不显示步骤数
-- 默认模式使用静态汇总口径（不考虑库存抵扣与建造期间自产）
-
-### Steps 模式
-
-- steps 开关位于详情弹窗状态栏
-- 打开后切换为纯 step 列表视图
-- steps 模式状态栏显示：总耗时 + 总花费（step 累计口径）+ 步骤数
-- steps 模式总耗时与默认模式一致
-- steps 结果以 BuildStepsScheme 视图模型承载，不进入 store 真相层
-
 ### BuildScheme 真相层字段
 
 - `BuildScheme` 保留默认静态真相层语义
-- 新增 `moduleSummaries`（已排序：模块按 tier 升序 + name 升序，材料按 totalCredits 降序）
-- 不新增 stepsTotalDuration，totalDuration 继续作为唯一总时长字段
+- `BuildScheme` 输出：
+  - `modules`
+  - `totalDuration`
+  - `totalCredits`
+  - `moduleSummaries`
+- `moduleSummaries` 已排序：模块按 tier 升序 + name 升序，材料按 totalCredits 降序
+- compute 不生成 steps；steps 的完整方案由 `build-plan-steps` 独立文档定义
 
 ### Energy Cells 口径
 
-- energycells 不再被排除在材料展示和成本统计之外
-- 默认模式材料明细与成本统计必须纳入 energycells
-- steps 模式 step 明细与 step 总成本也必须纳入 energycells
-- energycells 仅在"循环建材产线寻找"语义下保留特殊处理
+- compute 输出的静态材料展示与成本统计必须纳入 `energycells`
+- `energycells` 仅在"循环建材产线寻找"语义下保留特殊处理
 
 ### 单一共享入口
 
@@ -126,16 +106,14 @@
 - SCC 迭代与收敛判据
 - 主要模块 / 辅助模块求解
 - 分组与重叠产线
-- 默认 compute 不生成 steps
-- BuildScheme + moduleSummaries
-- BuildStepsScheme 视图模型
-- steps 懒计算与归属
-- Energy Cells 口径
+- BuildScheme 静态输出与 `moduleSummaries`
+- Energy Cells 静态口径
 - 单一共享入口
 - Build Plan Store 拆分
 
 ### Out of Scope
 
+- Steps 详细算法、steps mode 交互、steps 视图模型细节
 - Preview 责任分配
 - 修改 build-flow 数据模型
 - 修改 build-flow 连线编辑交互
@@ -149,9 +127,13 @@
 4. 目标速率公式按责任类型区分
 5. SCC 收敛只看主要模块数量
 6. 重叠产线归入建材组且合并求解
-7. 默认 compute 不生成 steps
-8. BuildScheme 包含 moduleSummaries（已排序）
-9. steps 结果不回写 store
-10. energycells 纳入材料展示和成本统计
-11. Vue 与 analysis script 共用同一计算入口
+7. compute 文档明确只输出静态 `BuildScheme`，不生成 steps
+8. BuildScheme 包含 `moduleSummaries`（已排序）
+9. 静态材料展示与成本统计纳入 `energycells`
+10. Vue 与 analysis script 共用同一计算入口
+11. `build-plan-compute` 与 `build-plan-steps` 之间不存在重复承载完整 steps 方案的冲突
 12. `npm run build` 通过
+
+## 未决项
+
+无
