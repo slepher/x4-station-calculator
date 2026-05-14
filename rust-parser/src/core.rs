@@ -367,9 +367,11 @@ impl SaveParserCore {
                             }
                         }
                     } else if component.class == "storage" {
-                        if let Some(station) = self.current_station_ctx_mut() {
-                            if let Some(ware) = a.get("ware").cloned() {
-                                let amount = to_int(a.get("amount"), 1);
+                        if let Some(ware) = a.get("ware").cloned() {
+                            let amount = to_int(a.get("amount"), 1);
+                            if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                                *buildstorage.cargo_totals.entry(ware).or_insert(0) += amount;
+                            } else if let Some(station) = self.current_station_ctx_mut() {
                                 *station.cargo_totals.entry(ware).or_insert(0) += amount;
                             }
                         }
@@ -390,6 +392,12 @@ impl SaveParserCore {
                     if component.class == "buildstorage" {
                         if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
                             *buildstorage.reservation_totals.entry(ware).or_insert(0) += amount;
+                        }
+                    } else if component.class == "storage" {
+                        if let Some(buildstorage) = self.current_buildstorage_ctx_mut() {
+                            *buildstorage.reservation_totals.entry(ware).or_insert(0) += amount;
+                        } else if let Some(station) = self.current_station_ctx_mut() {
+                            *station.reservation_totals.entry(ware).or_insert(0) += amount;
                         }
                     } else if component.class == "station" {
                         if let Some(station) = self.current_station_ctx_mut() {
@@ -799,7 +807,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v5".into(),
+                parser_version: "v6".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },

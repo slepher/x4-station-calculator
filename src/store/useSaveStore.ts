@@ -760,7 +760,13 @@ export const useSaveStore = defineStore('save', () => {
             ? 'v1'
             : meta.parser_version === 'v2'
               ? 'v2'
-              : 'v3',
+              : meta.parser_version === 'v4'
+                ? 'v4'
+                : meta.parser_version === 'v5'
+                  ? 'v5'
+                  : meta.parser_version === 'v6'
+                    ? 'v6'
+                    : 'v3',
           post_processor_version: meta.post_processor_version === 'v1'
             ? 'v1'
             : meta.post_processor_version === 'v2'

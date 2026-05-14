@@ -217,6 +217,36 @@ mod tests {
     }
 
     #[test]
+    fn assigns_nested_buildstorage_storage_cargo_and_reservations_to_buildstorage() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="station_macro" owner="player" code="AAA" id="[0xstation]"></component><component class="buildstorage" macro="buildstorage_macro" owner="player" code="FIX-154" id="[0xbuildstorage]"><buildtasks><inprogress><build component="[0xstation]"/></inprogress></buildtasks><connections><connection connection="con_storage01"><component class="storage" macro="storage_gen_buildstorage_01_macro" id="[0xstorage]"><cargo><ware ware="energycells" amount="10"/><ware ware="hullparts" amount="20"/></cargo><trade><reservations><reservation ware="hullparts" amount="5"/></reservations></trade></component></connection></connections></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("buildstorage.xml").expect("archive");
+        let sector = archive.sectors.get("sec_alpha").expect("sector");
+        let buildstorage = sector
+            .player_buildstorages
+            .get("FIX-154")
+            .expect("buildstorage");
+
+        assert_eq!(
+            buildstorage.target_station_component_id.as_deref(),
+            Some("0xstation")
+        );
+        assert_eq!(buildstorage.cargo.len(), 2);
+        assert_eq!(buildstorage.cargo[0].ware, "energycells");
+        assert_eq!(buildstorage.cargo[0].amount, 10);
+        assert_eq!(buildstorage.cargo[1].ware, "hullparts");
+        assert_eq!(buildstorage.cargo[1].amount, 20);
+        assert_eq!(buildstorage.reservation.len(), 1);
+        assert_eq!(buildstorage.reservation[0].ware, "hullparts");
+        assert_eq!(buildstorage.reservation[0].amount, 5);
+    }
+
+    #[test]
     fn aggregates_equipments_for_npc_stations() {
         let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="npc_station" owner="argony" code="NPC-1"><construction><sequence><entry index="1" macro="module_dock"><upgrades><groups><shields macro="shield_macro" group="g1" exact="3"/><turrets macro="turret_macro" group="g2" exact="5"/></groups></upgrades></entry><entry index="2" macro="module_dock"><upgrades><groups><shields macro="shield_macro" group="g1" exact="2"/></groups></upgrades></entry></sequence></construction></component></component></savegame>"#;
 
