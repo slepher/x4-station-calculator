@@ -3,10 +3,12 @@
 ## Task 1: Store 新增 moduleScope 状态
 
 - [x] 文件: `src/store/useLiveProductionStore.ts`
-- [x] 新增 `moduleScope` ref，默认 `'built'`
+- [x] 新增 `moduleScope` ref
 - [x] 新增 `cycleModuleScope()` 函数
 - [x] 新增 `hasBuildingModules` computed（基于 `archiveStation?.building?.modules`）
-- [x] watch `activeStationId` 和 `mode`，reset moduleScope 为 `'built'`
+- [x] 新增 `defaultModuleScope` computed，有 buildingModules 时默认 `'building'`
+- [x] watch `activeStationId` 和 `mode`，reset moduleScope 为默认值
+- [x] watch `hasBuildingModules`，动态切换默认值
 - [x] 暴露到 store return
 
 ## Task 2: Toolbar Presenter 透传 moduleScope
@@ -48,11 +50,56 @@
 - [x] `stats-bar` 按字段分流（cost/volume/time/transport→costAnalysis，workers/efficiency→workersAnalysis）
 - [x] 工人相关计算用 `workersAnalysis`
 
-## Task 7: i18n
+## Task 7: i18n（phase 1）
 
 - [x] 文件: `src/locales/zh-CN.json`, `src/locales/en.json`
 - [x] 新增 4 个 key：`toolbar.module_scope`, `toolbar.module_scope_built`, `toolbar.module_scope_building`, `toolbar.module_scope_all`
 
-## Task 8: Build 验证
+## Task 8: Build 验证（phase 1）
+
+- [x] 执行 `npm run build`，确认无编译错误
+
+---
+
+## Task 9: ProductionStationState 新增 buildingCargo / buildingReservation
+
+- [x] 文件: `src/types/production-workbench-contract.ts`
+- [x] `ProductionStationState` 新增 `buildingCargo: WareAmount[]`, `buildingReservation: WareAmount[]`
+- [x] 需 import `WareAmount` from `saveArchive`
+
+## Task 10: Store 透传 buildingCargo / buildingReservation
+
+- [x] 文件: `src/store/useLiveProductionStore.ts`
+- [x] `activeStationState` live 模式下新增 `buildingCargo` 和 `buildingReservation` 透传
+- [x] `activeTransitState` 下补充空数组
+- [x] planning 模式下补充空数组
+- [x] `useBlueprintProductionStore.ts` 同步补充空数组
+
+## Task 11: Dashboard Presenter 透传 buildingCargo / buildingReservation / isBuildingScope
+
+- [x] 文件: `src/components/empire/presenters/useProductionDashboardPresenter.ts`
+- [x] `DashboardPresenterStore` 新增 `buildingCargo?`, `buildingReservation?`
+- [x] `DashboardPresenterProps` 新增 `buildingCargo`, `buildingReservation`, `isBuildingScope`
+- [x] computed 填充：`buildingCargo`, `buildingReservation`, `isBuildingScope`
+
+## Task 12: LiveProductionWorkbenchView 传递新 props
+
+- [x] 文件: `src/components/empire/LiveProductionWorkbenchView.vue`
+- [x] StationDashboard 新增 `:building-cargo`, `:building-reservation`, `:is-building-scope`
+
+## Task 13: StationDashboard 成本视图新增三条目
+
+- [x] 文件: `src/components/empire/StationDashboard.vue`
+- [x] Props 新增 `buildingCargo?`, `buildingReservation?`, `isBuildingScope?`
+- [x] Import `getPriceByMultiplier` and `WareAmount`
+- [x] 计算属性 `buildingCargoItems`, `buildingReservationItems`, `materialGapItems`
+- [x] 模板：成本视图下独立渲染三个 `StationModuleDetail variant="summary"`
+
+## Task 14: i18n（phase 2）
+
+- [x] 文件: `src/locales/zh-CN.json`, `src/locales/en.json`
+- [x] 新增 3 个 key：`station.build_storage_materials`, `station.in_transit_materials`, `station.material_gap`
+
+## Task 15: Build 验证（phase 2）
 
 - [x] 执行 `npm run build`，确认无编译错误

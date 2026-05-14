@@ -7,7 +7,7 @@ import type {
   ProductionStationState
 } from '@/types/production-workbench-contract'
 import type { SectorInternalData } from '@/types/x4'
-import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry } from '@/types/saveArchive'
+import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry, WareAmount } from '@/types/saveArchive'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import { buildStationComponentGapFlows } from './logic/stationGapViewModel'
@@ -916,7 +916,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         autoInfrastructureModules: [],
         resolvedModules: archiveModules,
         modules: archiveModules,
-        buildingModules: archiveStation.value?.building?.modules || []
+        buildingModules: archiveStation.value?.building?.modules || [],
+        buildingCargo: archiveStation.value?.building?.cargo || [],
+        buildingReservation: archiveStation.value?.building?.reservation || []
       }
     }
 
@@ -931,7 +933,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return {
       ...planState,
       modules: planState.resolvedModules,
-      buildingModules: []
+      buildingModules: [],
+      buildingCargo: [],
+      buildingReservation: []
     }
   })
 
@@ -943,6 +947,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         resolvedModules: [] as SavedModule[],
         modules: [] as SavedModule[],
         buildingModules: [] as SavedModule[],
+        buildingCargo: [] as WareAmount[],
+        buildingReservation: [] as WareAmount[],
         autoIndustryModules: [] as SavedModule[],
         autoHabitationModules: [] as SavedModule[],
         autoInfrastructureModules: [] as SavedModule[],
@@ -967,6 +973,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       resolvedModules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
       modules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
       buildingModules: archiveOverride ? (archiveStation.value!.building?.modules || []) : [],
+      buildingCargo: archiveOverride ? (archiveStation.value!.building?.cargo || []) : [],
+      buildingReservation: archiveOverride ? (archiveStation.value!.building?.reservation || []) : [],
       autoIndustryModules: [] as SavedModule[],
       autoHabitationModules: [] as SavedModule[],
       autoInfrastructureModules: derived.autoInfrastructureModules,
@@ -1518,7 +1526,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       empireGaps: empireGapsComputed.value,
       currentEfficiency: state.currentEfficiency,
       actualWorkforce: state.actualWorkforce,
-      buildPriceMultiplier: buildPriceMultiplier.value
+      buildPriceMultiplier: buildPriceMultiplier.value,
+      buildingCargo: state.buildingCargo || [],
+      buildingReservation: state.buildingReservation || []
     }
   })
 

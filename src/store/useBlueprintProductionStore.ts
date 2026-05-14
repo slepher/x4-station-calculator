@@ -902,6 +902,8 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
       resolvedModules: state.resolvedModules,
       modules: state.resolvedModules,
       buildingModules: [],
+      buildingCargo: [],
+      buildingReservation: [],
       autoIndustryModules: state.autoIndustryModules,
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,

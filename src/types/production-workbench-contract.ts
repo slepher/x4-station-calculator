@@ -3,6 +3,7 @@ import type {
   SavedModule,
   StationSettings
 } from './x4'
+import type { WareAmount } from './saveArchive'
 import type { WareProductionFlow, DerivedProductionFlow } from './production-flow'
 import type { EmpireGapItem, WareFlowViewMode, ProductionTabItem as UiProductionTabItem } from './production-ui'
 
@@ -61,6 +62,8 @@ export interface ProductionStationState {
   currentEfficiency: number
   actualWorkforce: number
   buildPriceMultiplier: number
+  buildingCargo: WareAmount[]
+  buildingReservation: WareAmount[]
 }
 
 export type ProductionWorkbenchSessionState = ProductionSessionState

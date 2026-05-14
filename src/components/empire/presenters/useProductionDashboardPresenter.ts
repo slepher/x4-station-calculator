@@ -1,6 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
 import type { ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
 import type { SavedModule } from '@/types/x4'
+import type { WareAmount } from '@/types/saveArchive'
 
 const DEFAULT_DASHBOARD_SETTINGS = {
   transportShipCapacity: 62000,
@@ -16,6 +17,9 @@ export interface DashboardPresenterProps {
   activeModules: ComputedRef<SavedModule[]>
   activeBuildingModules: ComputedRef<SavedModule[]>
   effectiveModules: ComputedRef<SavedModule[]>
+  buildingCargo: ComputedRef<WareAmount[]>
+  buildingReservation: ComputedRef<WareAmount[]>
+  isBuildingScope: ComputedRef<boolean>
   settings: ComputedRef<{
     transportShipCapacity: number
     workforceAuto: boolean
@@ -69,6 +73,9 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
       if (scope === 'all') return [...modules, ...building]
       return modules
     }),
+    buildingCargo: computed(() => store.stationState?.buildingCargo || []),
+    buildingReservation: computed(() => store.stationState?.buildingReservation || []),
+    isBuildingScope: computed(() => store.moduleScope === 'building'),
     settings: computed(() => {
       const s = store.stationState?.settings
       if (!s) return DEFAULT_DASHBOARD_SETTINGS

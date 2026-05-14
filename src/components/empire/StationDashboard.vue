@@ -4,6 +4,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 import type { SavedModule } from '@/types/x4'
+import type { WareAmount } from '@/types/saveArchive'
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import StationModuleDetail from './StationModuleDetail.vue'
 import X4NumberInput from '@/components/common/X4NumberInput.vue'
@@ -11,10 +12,14 @@ import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import { analyzeStation } from '@/store/logic/analyzeStation'
+import { getPriceByMultiplier } from '@/store/logic/calculatorUtils'
 
 const props = defineProps<{
   modules: SavedModule[]
   effectiveModules?: SavedModule[]
+  buildingCargo?: WareAmount[]
+  buildingReservation?: WareAmount[]
+  isBuildingScope?: boolean
   hideWorkersView?: boolean
   settings: {
     transportShipCapacity: number
@@ -371,6 +376,76 @@ const headerTitle = computed(() => {
 const hasDashboardData = computed(() => {
   return data.value.moduleGroups.length > 0 || (viewMode.value === 'workers' && props.settings.useHQ)
 })
+
+const buildingCargoItems = computed(() => {
+  if (!props.buildingCargo?.length) return []
+  return props.buildingCargo.map(c => {
+    const ware = gameDataStore.waresMap[c.ware]
+    const price = ware ? getPriceByMultiplier(ware, buildPriceMultiplier.value) : 0
+    const volume = (ware?.volume || 0) * c.amount
+    return {
+      id: c.ware,
+      count: c.amount,
+      price: c.amount * price,
+      volume,
+      displayName: ware ? translateWare(ware) : c.ware
+    }
+  })
+})
+
+const buildingCargoTotal = computed(() => {
+  if (viewMode.value === 'volume') return buildingCargoItems.value.reduce((sum, item) => sum + item.volume, 0)
+  return buildingCargoItems.value.reduce((sum, item) => sum + item.price, 0)
+})
+
+const buildingReservationItems = computed(() => {
+  if (!props.buildingReservation?.length) return []
+  return props.buildingReservation.map(r => {
+    const ware = gameDataStore.waresMap[r.ware]
+    const price = ware ? getPriceByMultiplier(ware, buildPriceMultiplier.value) : 0
+    const volume = (ware?.volume || 0) * r.amount
+    return {
+      id: r.ware,
+      count: r.amount,
+      price: r.amount * price,
+      volume,
+      displayName: ware ? translateWare(ware) : r.ware
+    }
+  })
+})
+
+const buildingReservationTotal = computed(() => {
+  if (viewMode.value === 'volume') return buildingReservationItems.value.reduce((sum, item) => sum + item.volume, 0)
+  return buildingReservationItems.value.reduce((sum, item) => sum + item.price, 0)
+})
+
+const materialGapItems = computed(() => {
+  if (!props.isBuildingScope) return []
+  const cargoMap = Object.fromEntries((props.buildingCargo || []).map(c => [c.ware, c.amount]))
+  const reservationMap = Object.fromEntries((props.buildingReservation || []).map(r => [r.ware, r.amount]))
+  return costAnalysis.value.summaryItems
+    .map((item: any) => {
+      const cargo = cargoMap[item.id] || 0
+      const reservation = reservationMap[item.id] || 0
+      const gap = item.count - cargo - reservation
+      if (gap <= 0) return null
+      const ware = gameDataStore.waresMap[item.id]
+      const price = ware ? getPriceByMultiplier(ware, buildPriceMultiplier.value) : 0
+      return {
+        id: item.id,
+        count: gap,
+        price: gap * price,
+        volume: gap * (ware?.volume || 0),
+        displayName: ware ? translateWare(ware) : item.id
+      }
+    })
+    .filter(Boolean) as Array<{ id: string; count: number; price: number; volume: number; displayName: string }>
+})
+
+const materialGapTotal = computed(() => {
+  if (viewMode.value === 'volume') return materialGapItems.value.reduce((sum, item) => sum + item.volume, 0)
+  return materialGapItems.value.reduce((sum, item) => sum + item.price, 0)
+})
 </script>
 
 <template>
@@ -418,6 +493,36 @@ const hasDashboardData = computed(() => {
 
     <div class="dashboard-content custom-scrollbar">
       <div v-if="hasDashboardData">
+        <template v-if="viewMode === 'materials' || viewMode === 'volume'">
+          <StationModuleDetail
+            v-if="materialGapItems.length > 0"
+            variant="summary"
+            :title="t('station.material_gap')"
+            :value="materialGapTotal"
+            :items="materialGapItems"
+            :unit="viewMode === 'volume' ? 'm³' : 'Cr'"
+            :is-volume="viewMode === 'volume'"
+          />
+          <StationModuleDetail
+            v-if="buildingReservationItems.length > 0"
+            variant="summary"
+            :title="t('station.in_transit_materials')"
+            :value="buildingReservationTotal"
+            :items="buildingReservationItems"
+            :unit="viewMode === 'volume' ? 'm³' : 'Cr'"
+            :is-volume="viewMode === 'volume'"
+          />
+          <StationModuleDetail
+            v-if="buildingCargoItems.length > 0"
+            variant="summary"
+            :title="t('station.build_storage_materials')"
+            :value="buildingCargoTotal"
+            :items="buildingCargoItems"
+            :unit="viewMode === 'volume' ? 'm³' : 'Cr'"
+            :is-volume="viewMode === 'volume'"
+          />
+        </template>
+
         <StationModuleDetail 
           v-if="viewMode !== 'time'"
           variant="summary"

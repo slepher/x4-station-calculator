@@ -2,15 +2,17 @@
 
 ## Purpose
 
-为实况产能空间站视图的 StationDashboard 提供建造模块范围切换能力，使用户可查看已建设、建设中或所有模块的成本/时间/运输分析数据，同时保持工人视图始终基于已建设模块。
+为实况产能空间站视图的 StationDashboard 提供建造模块范围切换能力，使用户可查看已建设、建设中或所有模块的成本/时间/运输分析数据，同时保持工人视图始终基于已建设模块。并在成本视图中提供建筑仓库材料、在途材料和材料缺口信息。
 
 ## ADDED Requirements
 
 ### Requirement: ModuleScope State
 
-- Store SHALL 新增 `moduleScope: Ref<'built' | 'building' | 'all'>`，默认值 `'built'`。
-- 切换活跃空间站时 SHALL 将 `moduleScope` 重置为 `'built'`。
-- mode 切换时 SHALL 将 `moduleScope` 重置为 `'built'`。
+- Store SHALL 新增 `moduleScope: Ref<'built' | 'building' | 'all'>`。
+- 有 buildingModules 时默认值为 `'building'`，无则为 `'built'`。
+- 切换活跃空间站时 SHALL 将 `moduleScope` 重置为默认值。
+- mode 切换时 SHALL 将 `moduleScope` 重置为默认值。
+- `hasBuildingModules` 从 false→true 且当前为 `built` 时 SHALL 切换到 `building`；从 true→false 且当前非 `built` 时 SHALL 切换到 `built`。
 
 ### Requirement: ModuleScope Toolbar Button
 
@@ -35,7 +37,7 @@
 
 - **前提** mode 为 live，archive 空间站的 buildingModules 不为空
 - **当** 用户查看 LiveStationToolbar
-- **那么** 建造视图按钮显示，前置分隔线显示，默认状态为 built
+- **那么** 建造视图按钮显示，前置分隔线显示，默认状态为 building
 
 #### Scenario: 点击循环三态
 
@@ -85,3 +87,61 @@
   - `'building'` → `stationState.buildingModules`
   - `'all'` → `[...stationState.modules, ...stationState.buildingModules]`
 - LiveProductionWorkbenchView station view SHALL 将 `effectiveModules` 传递给 StationDashboard。
+
+### Requirement: Building Cargo/Reservation Data Pipeline
+
+- `ProductionStationState` SHALL 新增 `buildingCargo: WareAmount[]` 和 `buildingReservation: WareAmount[]`。
+- Store 层 live 模式下 SHALL 从 `archiveStation.building.cargo/reservation` 透传这两个字段。
+- `useProductionDashboardPresenter` SHALL 透传 `buildingCargo` 和 `buildingReservation`。
+- LiveProductionWorkbenchView station view SHALL 将 `buildingCargo` 和 `buildingReservation` 传递给 StationDashboard。
+- `WareAmount.ware` 与 `AnalysisItem.id` 使用同一 ware ID 命名空间，可直接匹配。
+
+#### Scenario: live 模式下 buildingCargo 透传
+
+- **前提** mode 为 live，archiveStation.building.cargo 含 3 种 ware
+- **当** StationDashboard 接收 buildingCargo prop
+- **那么** buildingCargo 包含这 3 种 ware 的 WareAmount 数据
+
+### Requirement: Cost View Build Storage Entries
+
+- StationDashboard 成本视图 SHALL 在 `buildingCargo` 非空时显示「建筑仓库材料」条目。
+- StationDashboard 成本视图 SHALL 在 `buildingReservation` 非空时显示「在途材料」条目。
+- 两个条目 SHALL 使用 `StationModuleDetail variant="summary"` 展示，显示每种 ware 的数量/价格/体积。
+- 三条目 SHALL 仅在成本视图（`viewMode === 'materials'`）下显示。
+
+#### Scenario: 建筑仓库材料显示
+
+- **前提** viewMode 为 materials，buildingCargo 含 hullparts:10 和 claytronics:5
+- **当** 用户查看成本视图
+- **那么** 显示「建筑仓库材料」summary 条目，包含 hullparts 和 claytronics
+
+#### Scenario: 在途材料显示
+
+- **前提** viewMode 为 materials，buildingReservation 含 energycells:200
+- **当** 用户查看成本视图
+- **那么** 显示「在途材料」summary 条目，包含 energycells
+
+### Requirement: Material Gap Entry
+
+- StationDashboard 成本视图 SHALL 仅在 `moduleScope === 'building'`（通过 effectiveModules 推断）时计算和显示「材料缺口」条目。
+- 材料 SHALL 计算：对每个 ware，`缺口 = costAnalysis.summaryItems 中该 ware 的 count - buildingCargo 中该 ware 的 amount - buildingReservation 中该 ware 的 amount`。
+- 仅 SHALL 显示缺口 > 0 的 ware。
+- 条目 SHALL 使用 `StationModuleDetail variant="summary"` 展示。
+
+#### Scenario: building 态下材料缺口计算
+
+- **前提** moduleScope 为 building，costAnalysis 建设总材料需 hullparts:20，buildingCargo 有 hullparts:10，buildingReservation 有 hullparts:5
+- **当** 用户查看成本视图
+- **那么** 显示「材料缺口」条目，hullparts 缺口为 5
+
+#### Scenario: 非 building 态下不显示材料缺口
+
+- **前提** moduleScope 为 built 或 all
+- **当** 用户查看成本视图
+- **那么** 不显示「材料缺口」条目
+
+#### Scenario: 缺口为零时该 ware 不显示
+
+- **前提** moduleScope 为 building，某 ware 总需求 10，cargo 8，reservation 2
+- **当** 用户查看成本视图
+- **那么** 「材料缺口」条目中不包含该 ware（缺口 = 0）

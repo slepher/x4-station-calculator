@@ -250,6 +250,9 @@ const showArchiveModuleList = computed(() => {
       <StationDashboard
         :modules="dashboardPresenter.props.modules.value"
         :effective-modules="dashboardPresenter.props.effectiveModules.value"
+        :building-cargo="dashboardPresenter.props.buildingCargo.value"
+        :building-reservation="dashboardPresenter.props.buildingReservation.value"
+        :is-building-scope="dashboardPresenter.props.isBuildingScope.value"
         :settings="dashboardPresenter.props.settings.value"
         :current-efficiency="dashboardPresenter.props.currentEfficiency.value"
         :actual-workforce="dashboardPresenter.props.actualWorkforce.value"
