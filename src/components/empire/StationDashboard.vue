@@ -14,6 +14,7 @@ import { analyzeStation } from '@/store/logic/analyzeStation'
 
 const props = defineProps<{
   modules: SavedModule[]
+  effectiveModules?: SavedModule[]
   hideWorkersView?: boolean
   settings: {
     transportShipCapacity: number
@@ -62,12 +63,22 @@ const buildPriceMultiplier = computed({
 })
 
 const clampedManualWorkforce = computed(() => {
-  const currentAnalysis = analysis.value
+  const currentAnalysis = workersAnalysis.value
   const capacity = currentAnalysis.totalCapacity || 0
   return Math.max(0, Math.min(props.settings.manualWorkforce, capacity))
 })
 
-const analysis = computed(() => {
+const costAnalysis = computed(() => {
+  return analyzeStation(
+    props.effectiveModules ?? props.modules,
+    gameDataStore.modulesMap,
+    gameDataStore.waresMap,
+    buildPriceMultiplier.value,
+    props.settings.useHQ
+  )
+})
+
+const workersAnalysis = computed(() => {
   return analyzeStation(
     props.modules,
     gameDataStore.modulesMap,
@@ -78,7 +89,7 @@ const analysis = computed(() => {
 })
 
 const maxAllowedWorkforce = computed(() => {
-  const currentAnalysis = analysis.value
+  const currentAnalysis = workersAnalysis.value
   const needed = currentAnalysis.totalNeeded || 0;
   const capacity = currentAnalysis.totalCapacity || 0;
   return Math.min(needed, capacity);
@@ -96,7 +107,7 @@ const displayedEfficiency = computed(() => {
   if (props.forceWorkforceAuto) {
     return props.currentEfficiency
   }
-  const needed = analysis.value.totalNeeded || 0
+  const needed = workersAnalysis.value.totalNeeded || 0
   if (needed === 0) return 1
   return Math.min(1, displayedActualWorkforce.value / needed)
 })
@@ -132,7 +143,7 @@ const saturationPercent = computed({
     if (props.forceWorkforceAuto) {
       return Math.round(props.currentEfficiency * 100)
     }
-    const currentAnalysis = analysis.value
+    const currentAnalysis = workersAnalysis.value
     const capacity = currentAnalysis.totalCapacity || 0;
     if (capacity === 0) return 0;
     const currentVal = displayedActualWorkforce.value
@@ -140,7 +151,7 @@ const saturationPercent = computed({
   },
   set: (val: number) => {
     if (props.forceWorkforceAuto || props.settings.workforceAuto) return;
-    const currentAnalysis = analysis.value
+    const currentAnalysis = workersAnalysis.value
     const capacity = currentAnalysis.totalCapacity || 0;
     emit('updateManualWorkforce', Math.min(Math.round((val / 100) * capacity), capacity));
   }
@@ -194,7 +205,7 @@ const formatTime = (seconds: number) => {
 }
 
 const data = computed(() => {
-  const currentAnalysis = analysis.value
+  const currentAnalysis = viewMode.value === 'workers' ? workersAnalysis.value : costAnalysis.value
   
   if (viewMode.value === 'time') {
     return {
@@ -372,28 +383,28 @@ const hasDashboardData = computed(() => {
       </div>
     </div>
 
-    <div class="stats-bar" v-if="analysis.moduleGroups.length > 0">
+    <div class="stats-bar" v-if="costAnalysis.moduleGroups.length > 0">
       <div class="stat-item" data-testid="cost-stat">
         <span class="stat-label">{{ t('station.summary_cost') }}</span>
-        <span class="stat-value text-red-400">{{ formatLargeNum(analysis.totalCost) }} <small>Cr</small></span>
+        <span class="stat-value text-red-400">{{ formatLargeNum(costAnalysis.totalCost) }} <small>Cr</small></span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_volume') }}</span>
-        <span class="stat-value text-blue-400">{{ formatLargeNum(analysis.totalVolume) }} <small>m³</small></span>
+        <span class="stat-value text-blue-400">{{ formatLargeNum(costAnalysis.totalVolume) }} <small>m³</small></span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_workers_needed') }}</span>
-        <span class="stat-value text-emerald-400">{{ formatNum(analysis.totalNeeded) }}</span>
+        <span class="stat-value text-emerald-400">{{ formatNum(workersAnalysis.totalNeeded) }}</span>
       </div>
 
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_time') }}</span>
-        <span class="stat-value text-red-400">{{ formatTime(analysis.totalTime) }}</span>
+        <span class="stat-value text-red-400">{{ formatTime(costAnalysis.totalTime) }}</span>
       </div>
       <div class="stat-item">
         <span class="stat-label">{{ t('station.summary_transport_trips') }}</span>
         <span class="stat-value text-blue-400">
-          {{ Math.ceil(analysis.totalVolume / transportShipCapacity) }}
+          {{ Math.ceil(costAnalysis.totalVolume / transportShipCapacity) }}
           <small class="text-xs text-slate-500 font-normal">({{ formatLargeNum(transportShipCapacity) }})</small>
         </span>
       </div>
@@ -463,7 +474,7 @@ const hasDashboardData = computed(() => {
             <span class="text-[10px] text-slate-500 font-bold uppercase">{{ t('station.control_actual_workforce') }}</span>
 
             <X4NumberInput v-if="!workforceAuto" v-model="manualWorkforce"
-              :max="analysis.totalCapacity" width-class="w-24" />
+              :max="workersAnalysis.totalCapacity" width-class="w-24" />
             <span v-else class="val-text-display">
               {{ displayedActualWorkforce }}
             </span>

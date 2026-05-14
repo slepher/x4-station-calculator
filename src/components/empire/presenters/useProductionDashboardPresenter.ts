@@ -15,6 +15,7 @@ export interface DashboardPresenterProps {
   modules: ComputedRef<SavedModule[]>
   activeModules: ComputedRef<SavedModule[]>
   activeBuildingModules: ComputedRef<SavedModule[]>
+  effectiveModules: ComputedRef<SavedModule[]>
   settings: ComputedRef<{
     transportShipCapacity: number
     workforceAuto: boolean
@@ -43,6 +44,7 @@ export interface UseProductionDashboardPresenterReturn {
 export interface DashboardPresenterStore {
   session: ProductionSessionState
   stationState: ProductionStationState | null
+  moduleScope?: 'built' | 'building' | 'all'
   settingActions: {
     updateTransportShipCapacity(value: number): void
     updateManualWorkforce(value: number): void
@@ -59,6 +61,14 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
     modules: computed(() => store.stationState?.modules || []),
     activeModules: computed(() => store.stationState?.modules || []),
     activeBuildingModules: computed(() => store.stationState?.buildingModules || []),
+    effectiveModules: computed(() => {
+      const scope = store.moduleScope ?? 'built'
+      const modules = store.stationState?.modules || []
+      const building = store.stationState?.buildingModules || []
+      if (scope === 'building') return building
+      if (scope === 'all') return [...modules, ...building]
+      return modules
+    }),
     settings: computed(() => {
       const s = store.stationState?.settings
       if (!s) return DEFAULT_DASHBOARD_SETTINGS

@@ -43,6 +43,8 @@ export interface ToolbarPresenterProps {
   }) => void
   updateImportStationModules: (stationId: string, modules: SavedModule[]) => void
   getImportStationById: (stationId: string) => { id: string; modules: SavedModule[] } | null
+  moduleScope: ComputedRef<'built' | 'building' | 'all'>
+  hasBuildingModules: ComputedRef<boolean>
 }
 
 export interface ToolbarPresenterEmits {
@@ -59,6 +61,7 @@ export interface ToolbarPresenterEmits {
   openImport: () => void
   toggleMode: () => void
   closeImport: () => void
+  cycleModuleScope: () => void
 }
 
 export interface UseProductionToolbarPresenterReturn {
@@ -98,6 +101,9 @@ export interface ToolbarPresenterStore {
     warePriority: Record<string, number>
   }) => void
   updateStationModules?: (stationId: string, modules: SavedModule[]) => void
+  moduleScope?: 'built' | 'building' | 'all'
+  hasBuildingModules?: boolean
+  cycleModuleScope?: () => void
 }
 
 export function useProductionToolbarPresenter(store: ToolbarPresenterStore): UseProductionToolbarPresenterReturn {
@@ -184,7 +190,9 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     createImportStation,
     applyImportedStationPayload: (stationId, payload) => store.applyImportedStationPayload?.(stationId, payload),
     updateImportStationModules: (stationId, modules) => store.updateStationModules?.(stationId, modules),
-    getImportStationById: (stationId) => store.getStationById?.(stationId) || null
+    getImportStationById: (stationId) => store.getStationById?.(stationId) || null,
+    moduleScope: computed(() => store.moduleScope ?? 'built'),
+    hasBuildingModules: computed(() => store.hasBuildingModules ?? false)
   }
 
   const dummyThrow = (method: string) => () => {
@@ -210,7 +218,8 @@ export function useProductionToolbarPresenter(store: ToolbarPresenterStore): Use
     updateShowEmpireGaps: (value: boolean) => store.settingActions.updateShowEmpireGaps(value),
     openImport: () => { showImportModal.value = true },
     toggleMode: () => store.toggleMode?.(),
-    closeImport: () => { showImportModal.value = false }
+    closeImport: () => { showImportModal.value = false },
+    cycleModuleScope: () => store.cycleModuleScope?.()
   }
 
   return { props, emits }

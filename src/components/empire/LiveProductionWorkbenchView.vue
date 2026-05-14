@@ -114,12 +114,15 @@ const showArchiveModuleList = computed(() => {
     :settings="toolbarPresenter.props.settings.value"
     :races="toolbarPresenter.props.races"
     :single-berth-throughput="toolbarPresenter.props.singleBerthThroughput.value"
+    :module-scope="toolbarPresenter.props.moduleScope.value"
+    :has-building-modules="toolbarPresenter.props.hasBuildingModules.value"
     @update-station-name="toolbarPresenter.emits.updateStationName"
     @toggle-mode="toolbarPresenter.emits.toggleMode"
     @update-race-preference="toolbarPresenter.emits.updateRacePreference"
     @update-workforce="toolbarPresenter.emits.updateWorkforce"
     @update-show-empire-gaps="toolbarPresenter.emits.updateShowEmpireGaps"
     @open-import="toolbarPresenter.emits.openImport"
+    @cycle-module-scope="toolbarPresenter.emits.cycleModuleScope"
   />
 
   <ImportPlanModal
@@ -246,6 +249,7 @@ const showArchiveModuleList = computed(() => {
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
         :modules="dashboardPresenter.props.modules.value"
+        :effective-modules="dashboardPresenter.props.effectiveModules.value"
         :settings="dashboardPresenter.props.settings.value"
         :current-efficiency="dashboardPresenter.props.currentEfficiency.value"
         :actual-workforce="dashboardPresenter.props.actualWorkforce.value"

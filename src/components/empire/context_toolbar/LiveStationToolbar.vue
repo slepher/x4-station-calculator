@@ -25,6 +25,8 @@ const props = defineProps<{
   settings: Partial<StationSettings> | StationSettings | null
   races: Array<{ value: string; label: string }>
   singleBerthThroughput: number
+  moduleScope: 'built' | 'building' | 'all'
+  hasBuildingModules: boolean
 }>()
 
 const emit = defineEmits<{
@@ -34,6 +36,7 @@ const emit = defineEmits<{
   updateWorkforce: [value: boolean]
   updateShowEmpireGaps: [value: boolean]
   openImport: []
+  cycleModuleScope: []
 }>()
 
 const showSectorPopover = ref(false)
@@ -106,6 +109,26 @@ const toggleMode = () => {
 const handleOpenImport = () => {
   emit('openImport')
 }
+
+const showModuleScope = computed(() => props.mode === 'live' && props.hasBuildingModules)
+
+const scopeIcon = computed(() => {
+  if (props.moduleScope === 'building') return '🚧'
+  if (props.moduleScope === 'all') return '📦'
+  return '🏗️'
+})
+
+const scopeLabel = computed(() => {
+  if (props.moduleScope === 'building') return t('toolbar.module_scope_building')
+  if (props.moduleScope === 'all') return t('toolbar.module_scope_all')
+  return t('toolbar.module_scope_built')
+})
+
+const scopeClass = computed(() => {
+  if (props.moduleScope === 'building') return 'active-amber'
+  if (props.moduleScope === 'all') return 'active-sky'
+  return 'active-green'
+})
 </script>
 
 <template>
@@ -227,6 +250,24 @@ const handleOpenImport = () => {
           </div>
         </div>
       </div>
+
+      <template v-if="showModuleScope">
+        <div class="separator mx-6"></div>
+
+        <div class="toolbar-section">
+          <div class="input-group">
+            <label class="group-label">{{ t('toolbar.module_scope') }}</label>
+            <button
+              class="toggle-chip"
+              :class="scopeClass"
+              @click="emit('cycleModuleScope')"
+            >
+              <span class="text-sm">{{ scopeIcon }}</span>
+              <span class="chip-status">{{ scopeLabel }}</span>
+            </button>
+          </div>
+        </div>
+      </template>
 
       <template v-if="props.mode === 'planning'">
         <div class="separator mx-6"></div>
@@ -374,6 +415,16 @@ const handleOpenImport = () => {
   @apply bg-emerald-950/40 border-emerald-500/30 text-emerald-400 shadow-[0_0_8px_rgba(16,185,129,0.2)];
 }
 .toggle-chip.active-green .chip-status { @apply text-emerald-300; }
+
+.toggle-chip.active-amber {
+  @apply bg-amber-900/30 border-amber-600 text-amber-400 shadow-[0_0_8px_rgba(217,119,6,0.2)];
+}
+.toggle-chip.active-amber .chip-status { @apply text-amber-300; }
+
+.toggle-chip.active-sky {
+  @apply bg-sky-900/30 border-sky-600 text-sky-400 shadow-[0_0_8px_rgba(2,132,199,0.2)];
+}
+.toggle-chip.active-sky .chip-status { @apply text-sky-300; }
 
 .mode-toggle-chip {
   @apply min-w-[80px] justify-center;
