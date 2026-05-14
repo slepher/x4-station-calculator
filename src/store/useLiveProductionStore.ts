@@ -650,6 +650,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return (archiveStation.value?.building?.modules?.length ?? 0) > 0
   })
 
+  const defaultModuleScope = computed<'built' | 'building'>(() => {
+    return hasBuildingModules.value ? 'building' : 'built'
+  })
+
   function cycleModuleScope() {
     const order: Array<'built' | 'building' | 'all'> = ['built', 'building', 'all']
     const idx = order.indexOf(moduleScope.value)
@@ -660,12 +664,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   watch(activeStationId, () => {
     if (activeStationId.value) {
       mode.value = initialMode.value
-      moduleScope.value = 'built'
+      moduleScope.value = defaultModuleScope.value
     }
   })
 
   watch(mode, () => {
-    moduleScope.value = 'built'
+    moduleScope.value = defaultModuleScope.value
+  })
+
+  watch(hasBuildingModules, (has) => {
+    if (has && moduleScope.value === 'built') {
+      moduleScope.value = 'building'
+    } else if (!has && moduleScope.value !== 'built') {
+      moduleScope.value = 'built'
+    }
   })
 
   const activeStation = computed<StationPlan | null>(() => {
