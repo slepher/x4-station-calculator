@@ -1,8 +1,8 @@
 import fs from 'node:fs'
-import { fileURLToPath } from 'node:url'
 import path from 'node:path'
 import zlib from 'node:zlib'
 import sax from 'sax'
+import getopts from 'getopts'
 import { createSaveParserRuntime, createSaveXmlFilterRuntime, createComponentXmlFilterRuntime } from '../src/workers/saveParser.worker'
 import type { SaveArchive, ProgressInfo } from '../src/types/saveArchive'
 import { postProcessRustSaveArchive } from '../src/workers/saveParser.post'
@@ -67,62 +67,75 @@ interface ComponentFilterOptions {
   codes: string[]
 }
 
-function printUsage(): void {
-  console.log('Usage: npm exec tsx scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output] [options]')
+function printHelp(): void {
+  console.log('Usage: vite-node scripts/extract_save.tsx <input.xml|input.xml.gz|input.gz> [output] [options]')
+  console.log('')
+  console.log('Extract and parse X4: Foundations save files into JSON or filtered XML.')
+  console.log('')
+  console.log('Positional arguments:')
+  console.log('  input              Input save file (.xml, .xml.gz, or .gz)')
+  console.log('  output             Output file path (default: derived from input name)')
   console.log('')
   console.log('Options:')
-  console.log('  --wasm         Use Rust WASM parser (3.25x faster, experimental)')
-  console.log('  --xml          Output as XML instead of JSON (extracts only relevant data)')
-  console.log('  --class <c>    Filter by component class (e.g., station, sector, ship_l)')
-  console.log('  --code <c>     Filter by component code (comma-separated for multiple, e.g., XAJ-926,FIX-154)')
-  console.log('  --query-xml <q>  Output matching tags with full subtree and ancestor chain as XML')
-  console.log('  --version <v>  Expected game version (e.g., "8.0"). If not set, version check is skipped')
-  console.log('  --skip-post    Skip post-processing (output raw parsed data without tag inference)')
+  console.log('  -h, --help         Show this help message and exit')
+  console.log('  --wasm             Use Rust WASM parser (3.25x faster, experimental)')
+  console.log('  --xml              Output as XML instead of JSON (extracts only relevant data)')
+  console.log('  --class <c>        Filter by component class (e.g., station, sector, ship_l)')
+  console.log('  --code <c>         Filter by component code (comma-separated, e.g., XAJ-926,FIX-154)')
+  console.log('  --query-xml <q>    Output matching tags with full subtree and ancestor chain as XML')
+  console.log('  --version <v>      Expected game version (e.g., "8.0"). Skipped if not set')
+  console.log('  --skip-post        Skip post-processing (output raw parsed data without tag inference)')
+  console.log('')
+  console.log('Examples:')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml.gz --wasm')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml out.json --version 8.0')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --xml')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --query-xml \'<component class="station"/>\'')
+  console.log('  vite-node scripts/extract_save.tsx save_009.xml --class station --code XAJ-926,FIX-154')
 }
 
-function parseArgs(): { input: string; output: string; useWasm: boolean; outputXml: boolean; queryXml: string | null; componentFilter: ComponentFilterOptions | null; expectedVersion: string | null; skipPost: boolean } {
-  const args = process.argv.slice(2)
-  const useWasm = args.includes('--wasm')
-  const outputXml = args.includes('--xml')
-  const skipPost = args.includes('--skip-post')
-  const queryXmlIndex = args.indexOf('--query-xml')
-  const queryXml = queryXmlIndex !== -1 && args[queryXmlIndex + 1] && !args[queryXmlIndex + 1].startsWith('--')
-    ? args[queryXmlIndex + 1]
-    : null
-  
-  let expectedVersion: string | null = null
-  const versionIndex = args.indexOf('--version')
-  if (versionIndex !== -1 && args[versionIndex + 1] && !args[versionIndex + 1].startsWith('--')) {
-    expectedVersion = args[versionIndex + 1]
-  }
-  
-  let componentFilter: ComponentFilterOptions | null = null
-  const classIndex = args.indexOf('--class')
-  const codeIndex = args.indexOf('--code')
-  const codeValue = codeIndex !== -1 && args[codeIndex + 1] && !args[codeIndex + 1].startsWith('--')
-    ? args[codeIndex + 1]
-    : null
-  
-  if (codeValue) {
-    const className = classIndex !== -1 && args[classIndex + 1] && !args[classIndex + 1].startsWith('--')
-      ? args[classIndex + 1]
-      : null
-    const codes = codeValue.split(',').map(c => c.trim()).filter(c => c.length > 0)
-    componentFilter = { className: className || '', codes }
-  }
-  
-  const positional = args.filter((a, i) => {
-    if (a.startsWith('--')) return false
-    if (versionIndex !== -1 && (i === versionIndex + 1)) return false
-    if (queryXmlIndex !== -1 && i === queryXmlIndex + 1) return false
-    if (classIndex !== -1 && i === classIndex + 1) return false
-    if (codeIndex !== -1 && i === codeIndex + 1) return false
-    return true
+interface ParsedArgs {
+  input: string
+  output: string
+  useWasm: boolean
+  outputXml: boolean
+  queryXml: string | null
+  componentFilter: ComponentFilterOptions | null
+  expectedVersion: string | null
+  skipPost: boolean
+}
+
+function parseArgs(): ParsedArgs & { help: boolean } {
+  const rawArgv = process.argv.slice(2)
+  const argv = rawArgv[0] === '--' ? rawArgv.slice(1) : rawArgv
+  const opts = getopts(argv, {
+    alias: {
+      h: 'help',
+    },
+    boolean: ['help', 'wasm', 'xml', 'skip-post'],
+    string: ['class', 'code', 'query-xml', 'version'],
   })
-  
-  const input = positional[0]
-  const output = positional[1]
-  return { input, output, useWasm, outputXml, queryXml, componentFilter, expectedVersion, skipPost }
+
+  const help = opts.help as boolean
+  const useWasm = opts.wasm as boolean
+  const outputXml = opts.xml as boolean
+  const skipPost = opts['skip-post'] as boolean
+  const queryXml = (opts['query-xml'] as string) || null
+  const expectedVersion = (opts.version as string) || null
+
+  let componentFilter: ComponentFilterOptions | null = null
+  const codeValue = opts.code as string | undefined
+  if (codeValue) {
+    const className = (opts.class as string) || ''
+    const codes = codeValue.split(',').map(c => c.trim()).filter(c => c.length > 0)
+    componentFilter = { className, codes }
+  }
+
+  const input = opts._[0] || ''
+  const output = opts._[1] || ''
+
+  return { input, output, useWasm, outputXml, queryXml, componentFilter, expectedVersion, skipPost, help }
 }
 
 function isGzipFile(filePath: string): boolean {
@@ -885,10 +898,15 @@ async function extractSaveWasm(inputPath: string, outputPath: string, expectedVe
 }
 
 async function main(): Promise<void> {
-  const { input, output, useWasm, outputXml, queryXml, componentFilter, expectedVersion, skipPost } = parseArgs()
+  const { input, output, useWasm, outputXml, queryXml, componentFilter, expectedVersion, skipPost, help } = parseArgs()
+
+  if (help) {
+    printHelp()
+    return
+  }
 
   if (!input) {
-    printUsage()
+    printHelp()
     process.exitCode = 1
     return
   }
@@ -916,8 +934,4 @@ async function main(): Promise<void> {
   }
 }
 
-const isDirectExecution = process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)
-
-if (isDirectExecution) {
-  void main()
-}
+void main()
