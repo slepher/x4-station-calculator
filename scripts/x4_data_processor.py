@@ -21,6 +21,23 @@ except ModuleNotFoundError:
     from scripts.processor.step1_map.service import process_map_for_version  # type: ignore
     from scripts.processor.dlc_tag import build_ware_dlc_tag_map  # type: ignore
 
+# 动态导入 terraforming 模块 (目录名 x4-game 含 hyphen, 不可直接 import)
+import importlib
+_process_terraforming = None
+def _get_process_terraforming():
+    global _process_terraforming
+    if _process_terraforming is not None:
+        return _process_terraforming
+    try:
+        mod = importlib.import_module("scripts.x4-game.terraforming.build")
+    except ModuleNotFoundError:
+        try:
+            mod = importlib.import_module("x4-game.terraforming.build")
+        except ModuleNotFoundError:
+            raise ImportError("Cannot import x4-game.terraforming. Run from project root.")
+    _process_terraforming = mod.process_terraforming
+    return _process_terraforming
+
 # =============================================================================
 # ⚙️ 项目配置
 # =============================================================================
@@ -2707,7 +2724,25 @@ class X4PrecisionLoader:
                 item['name'] = en_map[raw_key]
                 count_dlcs += 1
         
-        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC 的英文名称。")
+        # terraforming 数据
+        count_tf = 0
+        if hasattr(self, 'terraforming_data') and self.terraforming_data is not None:
+            tf_data = self.terraforming_data
+            for section in ['stats', 'projectGroups', 'projects']:
+                for item in tf_data.get(section, []):
+                    for key in ('nameId', 'descriptionId', 'inactiveTextId'):
+                        raw_key = item.get(key)
+                        if raw_key and raw_key in en_map:
+                            item[key.replace('Id', '')] = en_map[raw_key]
+                            count_tf += 1
+            for item in tf_data.get('stats', []):
+                for r in item.get('ranges', []):
+                    raw_key = r.get('descriptionId')
+                    if raw_key and raw_key in en_map:
+                        r['description'] = en_map[raw_key]
+                        count_tf += 1
+        
+        print(f"   ✅ 更新了 {count_wares} 个商品, {count_mods} 个模块, {count_wg} 个模块分组, {count_ships} 个飞船, {count_equips} 个装备, {count_ship_types} 个船只类型, {count_slot_tags} 个 slot tag, {count_dlcs} 个 DLC, {count_tf} 个 terraforming 的英文名称。")
 
     # =======================================================
     # 🆕 4.1. 模块类型分析
@@ -2911,6 +2946,11 @@ class X4PrecisionLoader:
         with open(os.path.join(data_dir, "consumables.json"), 'w', encoding='utf-8') as f:
             json.dump(self.consumables_data, f, indent=2, ensure_ascii=False)
 
+        # terraforming 数据
+        if hasattr(self, 'terraforming_data') and self.terraforming_data is not None:
+            with open(os.path.join(data_dir, "terraforming.json"), 'w', encoding='utf-8') as f:
+                json.dump(self.terraforming_data, f, indent=2, ensure_ascii=False)
+
         # 保存语言包
         available_languages = []
         for x4_id, conf in X4_LANG_CONFIG.items():
@@ -2954,6 +2994,7 @@ def run_for_config(effective_config):
     loader._build_bullets()
     loader.process_map_data()
     loader.extract_and_resolve_languages()
+    _get_process_terraforming()(loader)  # terraforming 数据解析
     loader.analyze_ship_types()
     loader.analyze_equipment_types()
     loader.analyze_slot_tags()

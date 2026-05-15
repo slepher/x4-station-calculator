@@ -84,8 +84,8 @@
 - `useProductionToolbarPresenter` SHALL 透传 `moduleScope` 和 `hasBuildingModules`。
 - `useProductionDashboardPresenter` SHALL 根据 `moduleScope` 计算 `effectiveModules`：
   - `'built'` → `stationState.modules`
-  - `'building'` → `stationState.buildingModules`
-  - `'all'` → `[...stationState.modules, ...stationState.buildingModules]`
+  - `'building'` → `stationState.buildingModules` 扣除 `stationState.buildingInProgress`（count-1，剩余>0才保留）
+  - `'all'` → `[...stationState.modules, ...stationState.buildingModules]`（含在建，不扣减）
 - LiveProductionWorkbenchView station view SHALL 将 `effectiveModules` 传递给 StationDashboard。
 
 ### Requirement: Building Cargo/Reservation Data Pipeline
@@ -179,15 +179,28 @@
 
 - StationDashboard SHALL 仅在 `isBuildingScope === true` 时显示在建模块条目。
 - 在建模块条目 SHALL 位于 total cost summary 下方、moduleGroups 上方。
-- 条目 SHALL 包含模块名称、数量（x1）、value（0 Cr）和 [在建] pill tag。
-- 条目 SHALL 使用 `StationModuleDetail variant="module"` 渲染，`badge` prop 显示 [在建]。
+- 条目 SHALL 使用 `StationModuleDetail variant="module"` 渲染，`badge` prop 显示 `t('station.badge_in_progress')`。
+- 条目 SHALL 包含模块名称、数量（x1）、value（根据视图模式显示：材料=总成本、运输=总体积、时间=建造用时）。
+- 条目 SHALL 可展开显示材料/时间明细（通过 `inProgressAnalysis` = `analyzeStation([inProgressModule])` 计算）。
 - `all` / `built` 态下 SHALL NOT 显示该条目。
 
-#### Scenario: building 态下在建模块显示
+#### Scenario: building 态下在建模块显示（材料视图）
 
 - **前提** moduleScope 为 building，inProgressModule 为 `{ id: "dock_area_01", count: 1 }`
-- **当** 用户查看成本视图
-- **那么** total cost summary 下方显示 "Dock Area x1 [在建]"，value 为 0 Cr
+- **当** 用户查看材料视图
+- **那么** total cost summary 下方显示 "Dock Area x1 [在建]"，value 为该模块材料总成本，可展开查看具体材料
+
+#### Scenario: building 态下在建模块显示（运输视图）
+
+- **前提** moduleScope 为 building，inProgressModule 需总体积 5000 m³
+- **当** 用户查看运输视图
+- **那么** 在建条目显示 value = 5000 m³
+
+#### Scenario: building 态下在建模块显示（时间视图）
+
+- **前提** moduleScope 为 building，inProgressModule 建造用时 3600 秒
+- **当** 用户查看时间视图
+- **那么** 在建条目显示 value = 01:00:00
 
 #### Scenario: all 态下不显示在建模块条目
 
@@ -211,4 +224,12 @@
 
 - `StationModuleDetail` SHALL 新增可选 `badge?: string` prop。
 - 当 `badge` 提供时，SHALL 在标题行右端显示 pill tag。
-- pill tag SHALL 使用 amber 配色以强调 in-progress 状态。
+- pill tag SHALL 使用 amber 配色（`text-amber-400 bg-amber-400/10 border-amber-400/30 rounded-full`）。
+
+### Requirement: In-Progress Module Data Computation
+
+- StationDashboard SHALL 通过 `inProgressAnalysis` computed 对 `[buildingInProgress]` 执行 `analyzeStation`。
+- `inProgressModuleEntry` computed SHALL 根据当前 `viewMode` 生成不同数据：
+  - `viewMode === 'time'`：value = `analysis.totalTime`，items = `[{ id: 'build_time', count: 1, price: totalTime }]`
+  - `viewMode === 'volume'`：value = `analysis.totalVolume`，items = summaryItems 含 volume
+  - 其他（材料）：value = `analysis.totalCost`，items = summaryItems 含价格

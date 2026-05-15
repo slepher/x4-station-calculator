@@ -20022,7 +20022,8 @@
     },
     "buildTime": {
       "default": 10.0,
-      "terran": 10.0
+      "terran": 10.0,
+      "closedloop": 10.0
     },
     "bullet": "bullet_gen_s_laser_01_mk2_macro",
     "heat": {

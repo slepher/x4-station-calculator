@@ -87,6 +87,7 @@ export interface ProductionStationState {
 ```typescript
 buildingCargo: ComputedRef<WareAmount[]>
 buildingReservation: ComputedRef<WareAmount[]>
+buildingInProgress: ComputedRef<SavedModule | undefined>
 ```
 
 **新增** `DashboardPresenterStore`：
@@ -94,6 +95,7 @@ buildingReservation: ComputedRef<WareAmount[]>
 ```typescript
 buildingCargo?: WareAmount[]
 buildingReservation?: WareAmount[]
+buildingInProgress?: SavedModule
 ```
 
 **新增** computed 填充：
@@ -101,6 +103,7 @@ buildingReservation?: WareAmount[]
 ```typescript
 buildingCargo: computed(() => store.buildingCargo || []),
 buildingReservation: computed(() => store.buildingReservation || []),
+buildingInProgress: computed(() => store.stationState?.buildingInProgress || undefined),
 ```
 
 ### LiveProductionWorkbenchView.vue（已实现 + 新增）
@@ -110,6 +113,7 @@ StationDashboard station view 调用处新增 props：
 ```html
 :building-cargo="dashboardPresenter.props.buildingCargo.value"
 :building-reservation="dashboardPresenter.props.buildingReservation.value"
+:building-in-progress="dashboardPresenter.props.buildingInProgress.value"
 ```
 
 ### StationDashboard.vue（已实现 + 新增）
@@ -119,6 +123,7 @@ StationDashboard station view 调用处新增 props：
 ```typescript
 buildingCargo?: WareAmount[]
 buildingReservation?: WareAmount[]
+buildingInProgress?: SavedModule
 ```
 
 **成本视图新增三条目**（在 `data` computed 的 `materials` 分支中，或在模板中独立渲染）：
@@ -158,10 +163,7 @@ buildingReservation?: WareAmount[]
 **计算属性**：
 
 ```typescript
-const showMaterialGap = computed(() => {
-  return props.effectiveModules !== undefined
-    && props.effectiveModules !== props.modules
-})
+const showMaterialGap = computed(() => props.isBuildingScope === true)
 
 const buildingCargoItems = computed(() => {
   if (!props.buildingCargo?.length) return []
@@ -199,6 +201,78 @@ const materialGapItems = computed(() => {
     })
     .filter(Boolean)
 })
+```
+
+### 在建模块数据计算
+
+在建模块使用独立的 `analyzeStation` 计算材料/时间/体积明细：
+
+```typescript
+const inProgressAnalysis = computed(() => {
+  if (!props.buildingInProgress) return null
+  return analyzeStation(
+    [props.buildingInProgress],
+    gameDataStore.modulesMap,
+    gameDataStore.waresMap,
+    buildPriceMultiplier.value,
+    props.settings.useHQ
+  )
+})
+
+const inProgressModuleEntry = computed(() => {
+  const ip = props.buildingInProgress
+  const analysis = inProgressAnalysis.value
+  if (!ip || !analysis) return null
+  const isTime = viewMode.value === 'time'
+  const isVolume = viewMode.value === 'volume'
+  return {
+    id: ip.id, count: ip.count,
+    displayName: translateModule(moduleData),
+    value: isTime ? analysis.totalTime : (isVolume ? analysis.totalVolume : analysis.totalCost),
+    unit: isTime ? '' : (isVolume ? 'm³' : 'Cr'),
+    isTime, isVolume,
+    items: isTime
+      ? [{ id: 'build_time', displayName: t('station.item_build_time'), count: 1, price: analysis.totalTime }]
+      : /* summaryItems 带价格/体积 */
+  }
+})
+```
+
+**模板渲染**（在 total cost summary 与 moduleGroups 之间）：
+
+```html
+<StationModuleDetail
+  v-if="inProgressModuleEntry && isBuildingScope"
+  variant="module"
+  :count="inProgressModuleEntry.count"
+  :title="inProgressModuleEntry.displayName"
+  :value="inProgressModuleEntry.value"
+  :items="inProgressModuleEntry.items"
+  :badge="t('station.badge_in_progress')"
+  :unit="inProgressModuleEntry.unit"
+  :is-time="inProgressModuleEntry.isTime"
+  :is-volume="inProgressModuleEntry.isVolume"
+/>
+```
+
+### StationModuleDetail badge prop
+
+```typescript
+// StationModuleDetail.vue props 新增
+badge?: string
+```
+
+```html
+<!-- 标题行新增 amber pill tag -->
+<span v-if="badge" class="badge-pill">{{ badge }}</span>
+```
+
+```css
+.badge-pill {
+  @apply text-[10px] font-bold uppercase text-amber-400
+         bg-amber-400/10 border border-amber-400/30
+         rounded-full px-2 py-0.5 ml-2;
+}
 ```
 
 `showMaterialGap` 的判断逻辑：`effectiveModules` 被传入且与 `modules` 不同时，说明处于 building 或 all 态。但需求明确材料缺口仅 building 态显示，所以需要更精确判断。通过 presenter 传入 `moduleScope` 值或使用一个单独的 boolean prop `isBuildingScope`：
@@ -264,7 +338,9 @@ buildstorageEntry.progress
 
 **`building` 态下**：
 - `effectiveModules` = `buildingModules` 扣除 `inProgressModule` → `costAnalysis` 基于扣减后的模块
-- 在建模块独立渲染在 total cost summary 与 moduleGroups 之间，带有 [在建] pill tag，value = 0 Cr
+- 在建模块独立渲染在 total cost summary 与 moduleGroups 之间，带有 [在建] pill tag
+- value 根据 viewMode 显示：材料=总成本、运输=总体积、时间=建造用时
+- 条目可展开查看明细（通过 `inProgressAnalysis`：`analyzeStation([buildingInProgress])`）
 - gap 自动基于 `costAnalysis`（扣减后），无需额外调整
 
 **`all` 态下**：`effectiveModules` = `modules` + `buildingModules`（含在建），不单独显示在建条目。
