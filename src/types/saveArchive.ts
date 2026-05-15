@@ -413,6 +413,7 @@ export interface ArchiveStationBuildingData {
   modules: SavedModule[]
   cargo: WareAmount[]
   reservation: WareAmount[]
+  inProgressModule?: SavedModule
 }
 
 export interface ArchiveStationPosition {

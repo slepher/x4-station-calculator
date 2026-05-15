@@ -20,6 +20,7 @@ export interface DashboardPresenterProps {
   buildingCargo: ComputedRef<WareAmount[]>
   buildingReservation: ComputedRef<WareAmount[]>
   isBuildingScope: ComputedRef<boolean>
+  buildingInProgress: ComputedRef<SavedModule | undefined>
   settings: ComputedRef<{
     transportShipCapacity: number
     workforceAuto: boolean
@@ -56,6 +57,7 @@ export interface DashboardPresenterStore {
     updateUseHQ(value: boolean): void
   }
   updateBuildPriceMultiplier(value: number): void
+  buildingInProgress?: SavedModule
 }
 
 export function useProductionDashboardPresenter(store: DashboardPresenterStore): UseProductionDashboardPresenterReturn {
@@ -69,13 +71,26 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
       const scope = store.moduleScope ?? 'built'
       const modules = store.stationState?.modules || []
       const building = store.stationState?.buildingModules || []
-      if (scope === 'building') return building
+      const inProgress = store.stationState?.buildingInProgress
+      if (scope === 'building') {
+        if (!inProgress) return building
+        return building.reduce<SavedModule[]>((acc, m) => {
+          if (m.id === inProgress.id) {
+            const remaining = m.count - inProgress.count
+            if (remaining > 0) acc.push({ ...m, count: remaining })
+          } else {
+            acc.push(m)
+          }
+          return acc
+        }, [])
+      }
       if (scope === 'all') return [...modules, ...building]
       return modules
     }),
     buildingCargo: computed(() => store.stationState?.buildingCargo || []),
     buildingReservation: computed(() => store.stationState?.buildingReservation || []),
     isBuildingScope: computed(() => store.moduleScope === 'building'),
+    buildingInProgress: computed(() => store.stationState?.buildingInProgress || undefined),
     settings: computed(() => {
       const s = store.stationState?.settings
       if (!s) return DEFAULT_DASHBOARD_SETTINGS

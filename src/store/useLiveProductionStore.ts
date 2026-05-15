@@ -526,6 +526,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           }
         }
         
+        let inProgressModule: SavedModule | undefined
+        if (buildstorageEntry.progress?.end !== undefined
+          && buildstorageEntry.progress?.sequenceindex !== undefined
+          && buildstorageEntry.constructions) {
+          const seqIndex = buildstorageEntry.progress.sequenceindex
+          const inProgressConst = buildstorageEntry.constructions[seqIndex]
+          if (inProgressConst) {
+            const matchedMod = (buildstorageEntry.modules || []).find(m => m.ref === inProgressConst.ref)
+            if (matchedMod?.module_id) {
+              inProgressModule = { id: matchedMod.module_id, count: 1 }
+            }
+          }
+        }
+        
         return {
           code: record.code,
           name: stationEntry.macro,
@@ -541,7 +555,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           building: {
             modules: buildingModules,
             cargo: buildstorageEntry.cargo || [],
-            reservation: buildstorageEntry.reservation || []
+            reservation: buildstorageEntry.reservation || [],
+            inProgressModule
           },
           cargo: stationEntry.cargo,
           reservation: stationEntry.reservation
@@ -564,7 +579,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       building: {
         modules: buildingModules,
         cargo: [],
-        reservation: []
+        reservation: [],
+        inProgressModule: undefined
       },
       cargo: stationEntry.cargo,
       reservation: stationEntry.reservation
@@ -918,7 +934,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         modules: archiveModules,
         buildingModules: archiveStation.value?.building?.modules || [],
         buildingCargo: archiveStation.value?.building?.cargo || [],
-        buildingReservation: archiveStation.value?.building?.reservation || []
+        buildingReservation: archiveStation.value?.building?.reservation || [],
+        buildingInProgress: archiveStation.value?.building?.inProgressModule || undefined
       }
     }
 
@@ -975,6 +992,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       buildingModules: archiveOverride ? (archiveStation.value!.building?.modules || []) : [],
       buildingCargo: archiveOverride ? (archiveStation.value!.building?.cargo || []) : [],
       buildingReservation: archiveOverride ? (archiveStation.value!.building?.reservation || []) : [],
+      buildingInProgress: archiveOverride ? (archiveStation.value!.building?.inProgressModule || undefined) : undefined,
       autoIndustryModules: [] as SavedModule[],
       autoHabitationModules: [] as SavedModule[],
       autoInfrastructureModules: derived.autoInfrastructureModules,
@@ -1528,7 +1546,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       actualWorkforce: state.actualWorkforce,
       buildPriceMultiplier: buildPriceMultiplier.value,
       buildingCargo: state.buildingCargo || [],
-      buildingReservation: state.buildingReservation || []
+      buildingReservation: state.buildingReservation || [],
+      buildingInProgress: state.buildingInProgress || undefined
     }
   })
 

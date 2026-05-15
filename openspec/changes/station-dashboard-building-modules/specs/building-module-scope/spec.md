@@ -145,3 +145,70 @@
 - **前提** moduleScope 为 building，某 ware 总需求 10，cargo 8，reservation 2
 - **当** 用户查看成本视图
 - **那么** 「材料缺口」条目中不包含该 ware（缺口 = 0）
+
+### Requirement: In-Progress Module Extraction
+
+- `archiveStation` computed SHALL 在 `buildstorageEntry.progress.end` 存在时识别正在建造的模块。
+- `archiveStation` computed SHALL 使用 `progress.sequenceindex` 定位 `constructions[]` 中的在建条目。
+- 提取逻辑 SHALL 匹配 `constructions[sequenceindex].ref` 与 `buildstorageEntry.modules[].ref` 以获取 `module_id`。
+- 匹配成功时 SHALL 产生 `inProgressModule: SavedModule = { id: module_id, count: 1 }`。
+- **当 `progress.end` 不存在时**，SHALL NOT 提取 `inProgressModule`（材料尚未消耗，模块保留在 buildingModules 中）。
+- `buildingModules` SHALL 保持不变（包含所有未建设模块）。
+- `ProductionStationState` SHALL 新增 `buildingInProgress?: SavedModule`。
+
+### Requirement: EffectiveModules Excludes In-Progress in building scope
+
+- `effectiveModules` SHALL 在 `moduleScope === 'building'` 且 `inProgressModule` 存在时，从 `buildingModules` 中扣除 `inProgressModule`。
+- 扣减方式：`buildingModules` 中 `id` 匹配 `inProgressModule.id` 的条目 count - inProgressModule.count，剩余 > 0 才保留。
+- `moduleScope === 'all'` 时 `effectiveModules = modules + buildingModules`（含在建，不做扣减）。
+- `costAnalysis` 自动基于 `effectiveModules` 计算，gap 无需额外调整。
+
+#### Scenario: building 态 effectiveModules 扣减
+
+- **前提** moduleScope 为 building，buildingModules 为 `[{ id: "dock", count: 3 }, { id: "stor", count: 2 }]`，inProgressModule 为 `{ id: "dock", count: 1 }`
+- **当** effectiveModules 被计算
+- **那么** effectiveModules 为 `[{ id: "dock", count: 2 }, { id: "stor", count: 2 }]`
+
+#### Scenario: all 态 effectiveModules 含在建
+
+- **前提** moduleScope 为 all，modules 为 `[{ id: "prod", count: 1 }]`，buildingModules 为 `[{ id: "dock", count: 3 }]`
+- **当** effectiveModules 被计算
+- **那么** effectiveModules 为 `[{ id: "prod", count: 1 }, { id: "dock", count: 3 }]`（含在建）
+
+### Requirement: In-Progress Module Display (building scope only)
+
+- StationDashboard SHALL 仅在 `isBuildingScope === true` 时显示在建模块条目。
+- 在建模块条目 SHALL 位于 total cost summary 下方、moduleGroups 上方。
+- 条目 SHALL 包含模块名称、数量（x1）、value（0 Cr）和 [在建] pill tag。
+- 条目 SHALL 使用 `StationModuleDetail variant="module"` 渲染，`badge` prop 显示 [在建]。
+- `all` / `built` 态下 SHALL NOT 显示该条目。
+
+#### Scenario: building 态下在建模块显示
+
+- **前提** moduleScope 为 building，inProgressModule 为 `{ id: "dock_area_01", count: 1 }`
+- **当** 用户查看成本视图
+- **那么** total cost summary 下方显示 "Dock Area x1 [在建]"，value 为 0 Cr
+
+#### Scenario: all 态下不显示在建模块条目
+
+- **前提** moduleScope 为 all，存在 buildingModules
+- **当** 用户查看成本视图
+- **那么** 不显示在建模块独立条目（在建模块已混入正常 moduleGroups）
+
+### Requirement: Gap is automatically correct
+
+- 由于 `effectiveModules` 已在 `building` 态下扣除了 `inProgressModule`，`costAnalysis` 自动基于扣减后的模块集计算。
+- 当前的 `materialGapItems = costAnalysis.summaryItems - cargo - reservation` 公式无需修改。
+- 在 `building` 态下，gap 自动排除了在建模块的材料。
+
+#### Scenario: building 态下 gap 自动排除在建
+
+- **前提** moduleScope 为 building，buildingModules 需 hullparts:30（含在建 10），inProgressModule 需 hullparts:10，effectiveModules 基于 building-inProgress 算出需 hullparts:20，cargo 有 hullparts:5，reservation 有 hullparts:5
+- **当** 用户查看成本视图
+- **那么** gap 中 hullparts 缺口为 20-5-5 = 10（正确）
+
+### Requirement: StationModuleDetail badge prop
+
+- `StationModuleDetail` SHALL 新增可选 `badge?: string` prop。
+- 当 `badge` 提供时，SHALL 在标题行右端显示 pill tag。
+- pill tag SHALL 使用 amber 配色以强调 in-progress 状态。

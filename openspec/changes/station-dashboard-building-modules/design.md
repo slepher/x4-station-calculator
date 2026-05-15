@@ -6,24 +6,31 @@
 
 ```
 Store (useLiveProductionStore)
-  ├─ moduleScope: Ref<'built'|'building'|'all'>  ← 已实现
-  ├─ hasBuildingModules                           ← 已实现
-  └─ archiveStation.building.cargo/reservation    ← 数据源（已存在，需透传）
+  ├─ moduleScope: Ref<'built'|'building'|'all'>      ← 已实现
+  ├─ hasBuildingModules                               ← 已实现
+  └─ archiveStation.building
+       ├─ cargo/reservation                           ← 数据源
+       └─ inProgressModule: SavedModule?              ← 新增（archiveStation 中提取）
        │
-       ├─→ useProductionToolbarPresenter          ← 已实现
-       │     └─→ LiveStationToolbar.vue           ← 已实现
+       ├─→ useProductionToolbarPresenter              ← 已实现
+       │     └─→ LiveStationToolbar.vue               ← 已实现
        │
        └─→ useProductionDashboardPresenter
-             ├─ effectiveModules                   ← 已实现
-             ├─ buildingCargo: WareAmount[]        ← 新增
-             └─ buildingReservation: WareAmount[]  ← 新增
+             ├─ effectiveModules                       ← 已实现
+             │   ├─ built:    modules
+             │   ├─ building: buildingModules - inProgressModule  ← 扣减在建
+             │   └─ all:      modules + buildingModules           ← 含在建
+             ├─ buildingCargo: WareAmount[]            ← 已实现
+             ├─ buildingReservation: WareAmount[]      ← 已实现
+             └─ buildingInProgress: SavedModule?       ← 新增
                   └─→ LiveProductionWorkbenchView.vue
                         └─→ StationDashboard.vue
-                              ├─ costAnalysis / workersAnalysis  ← 已实现
-                              └─ 成本视图三条目                    ← 新增
+                              ├─ costAnalysis / workersAnalysis  ← 已实现（基于 effectiveModules）
+                              └─ 成本视图条目：
                                    ├─ 建筑仓库材料 (buildingCargo)
                                    ├─ 在途材料 (buildingReservation)
-                                   └─ 材料缺口 (building 态专属)
+                                   ├─ 材料缺口 (building 态，自动基于 costAnalysis)
+                                   └─ 在建模块 [在建] (仅building 态)
 ```
 
 ### 数据流：buildingCargo / buildingReservation
@@ -215,6 +222,61 @@ isBuildingScope: computed(() => store.moduleScope === 'building')
 const showMaterialGap = computed(() => props.isBuildingScope === true)
 ```
 
+### 数据流：inProgressModule 提取
+
+`inProgressModule` 在 `archiveStation` computed 中根据游戏语义提取，不在下游扣减。
+
+**提取逻辑**（`useLiveProductionStore.ts` -> `archiveStation` computed）：
+
+```
+buildstorageEntry.progress
+  ├─ .end exists?    → 建造已开始，材料已消耗
+  └─ .sequenceindex? → 指向 constructions[] 中正在建造的条目
+                          │
+                          ▼
+   constructions[sequenceindex].ref
+     → 匹配 buildstorageEntry.modules[].ref
+       → 获取 module_id
+         → SavedModule { id: module_id, count: 1 }
+```
+
+**特殊规则**：`progress.end` 不存在时（材料尚未消耗），直接保留在 buildingModules 中，不作为 `inProgressModule` 提取。
+
+```
+条件：
+  progress.end !== undefined
+  && progress.sequenceindex !== undefined
+  && constructions?.[sequenceindex] 存在
+  && 匹配到 module_id
+```
+
+**buildingModules 不变**：`buildingModules` 保持不变（仍然是所有未建设模块），`inProgressModule` 是独立信息字段。
+
+### effectiveModules 策略
+
+| Scope | effectiveModules 来源 | 说明 |
+|-------|----------------------|------|
+| `built` | `modules` | 仅已建设，不变 |
+| `building` | `buildingModules` - `inProgressModule` | 扣减在建，材料不计，gap 自动正确 |
+| `all` | `modules` + `buildingModules` | 全量（含在建），不单独显示 |
+
+### Dashboard 呈现逻辑
+
+**`building` 态下**：
+- `effectiveModules` = `buildingModules` 扣除 `inProgressModule` → `costAnalysis` 基于扣减后的模块
+- 在建模块独立渲染在 total cost summary 与 moduleGroups 之间，带有 [在建] pill tag，value = 0 Cr
+- gap 自动基于 `costAnalysis`（扣减后），无需额外调整
+
+**`all` 态下**：`effectiveModules` = `modules` + `buildingModules`（含在建），不单独显示在建条目。
+**`built` 态下**：不受影响。
+
+## New/Changed Decisions
+
+9. **archiveStation 层提取 inProgressModule**：基于游戏语义（`progress.end` 是否存在 + `sequenceindex`）识别正在建造的模块，不在下游做二次推断。
+10. **buildingModules 不变**：inProgressModule 是附加信息字段，不扣减 buildingModules；扣减发生在 presenter 层的 `effectiveModules` 中。
+11. **仅在 `building` 态扣减 + 独立显示**：`all` 态包含在建（在 moduleGroups 中正常出现）。
+12. **gap 无需额外计算**：`effectiveModules` 已扣减在建，`costAnalysis.summaryItems - cargo - reservation` 即为正确 gap。
+
 ### i18n（已实现 + 新增）
 
 **已实现**：`toolbar.module_scope`, `toolbar.module_scope_built`, `toolbar.module_scope_building`, `toolbar.module_scope_all`
@@ -225,14 +287,16 @@ zh-CN.json：
 ```json
 "station.build_storage_materials": "建筑仓库材料",
 "station.in_transit_materials": "在途材料",
-"station.material_gap": "材料缺口"
+"station.material_gap": "材料缺口",
+"station.badge_in_progress": "在建"
 ```
 
 en.json：
 ```json
 "station.build_storage_materials": "Build Storage Materials",
 "station.in_transit_materials": "In-Transit Materials",
-"station.material_gap": "Material Gap"
+"station.material_gap": "Material Gap",
+"station.badge_in_progress": "Building"
 ```
 
 ## Decisions

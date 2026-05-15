@@ -253,6 +253,7 @@ const showArchiveModuleList = computed(() => {
         :building-cargo="dashboardPresenter.props.buildingCargo.value"
         :building-reservation="dashboardPresenter.props.buildingReservation.value"
         :is-building-scope="dashboardPresenter.props.isBuildingScope.value"
+        :building-in-progress="dashboardPresenter.props.buildingInProgress.value"
         :settings="dashboardPresenter.props.settings.value"
         :current-efficiency="dashboardPresenter.props.currentEfficiency.value"
         :actual-workforce="dashboardPresenter.props.actualWorkforce.value"

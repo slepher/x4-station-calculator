@@ -64,6 +64,7 @@ export interface ProductionStationState {
   buildPriceMultiplier: number
   buildingCargo: WareAmount[]
   buildingReservation: WareAmount[]
+  buildingInProgress?: SavedModule
 }
 
 export type ProductionWorkbenchSessionState = ProductionSessionState

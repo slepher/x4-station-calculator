@@ -603,6 +603,7 @@
     "build_storage_materials": "Build Storage Materials",
     "in_transit_materials": "In-Transit Materials",
     "material_gap": "Material Gap",
+    "badge_in_progress": "Building",
     "summary_workers_needed": "Workers Needed",
     "summary_transport_trips": "Transport Trips",
     "summary_efficiency": "WORKFORCE EFFICIENCY",

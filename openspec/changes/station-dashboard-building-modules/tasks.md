@@ -103,3 +103,60 @@
 ## Task 15: Build 验证（phase 2）
 
 - [x] 执行 `npm run build`，确认无编译错误
+
+---
+
+## Task 16: Type 层新增 inProgressModule
+
+- [ ] 文件: `src/types/saveArchive.ts`
+- [ ] `ArchiveStationBuildingData` 新增 `inProgressModule?: SavedModule`
+
+## Task 17: ProductionStationState 新增 buildingInProgress
+
+- [ ] 文件: `src/types/production-workbench-contract.ts`
+- [ ] `ProductionStationState` 新增 `buildingInProgress?: SavedModule`
+
+## Task 18: Store archiveStation 提取 inProgressModule
+
+- [ ] 文件: `src/store/useLiveProductionStore.ts`
+- [ ] `archiveStation` computed 中基于 `progress.end` + `sequenceindex` 提取 `inProgressModule`
+- [ ] 匹配 `constructions[sequenceindex].ref` → `modules[].ref` → `module_id`
+- [ ] `buildingModules` 保持不变（不含扣减）
+- [ ] `activeStationState`/`activeTransitState`/`stationState` 逐层透传 `buildingInProgress`
+
+## Task 19: Presenter 透传 buildingInProgress + 修改 effectiveModules
+
+- [ ] 文件: `src/components/empire/presenters/useProductionDashboardPresenter.ts`
+- [ ] `DashboardPresenterStore` 新增 `buildingInProgress?`
+- [ ] `DashboardPresenterProps` 新增 `buildingInProgress`
+- [ ] computed: `buildingInProgress` 透传
+- [ ] 修改 `effectiveModules`：`building` 范围时从 buildingModules 扣除 inProgressModule
+
+## Task 20: LiveProductionWorkbenchView 传递新 props
+
+- [ ] 文件: `src/components/empire/LiveProductionWorkbenchView.vue`
+- [ ] StationDashboard 新增 `:building-in-progress`
+
+## Task 21: StationModuleDetail 新增 badge prop
+
+- [ ] 文件: `src/components/empire/StationModuleDetail.vue`
+- [ ] Props 新增 `badge?: string`
+- [ ] 模板：标题行显示 amber pill tag
+- [ ] 样式：`.badge-pill`
+
+## Task 22: StationDashboard 在建模块展示
+
+- [ ] 文件: `src/components/empire/StationDashboard.vue`
+- [ ] Props 新增 `buildingInProgress?`
+- [ ] 新增 `inProgressModuleName` computed
+- [ ] 模板：total cost summary 与 moduleGroups 之间渲染在建模块条目
+- [ ] 在建模块仅在 `isBuildingScope && viewMode !== 'time'` 时显示
+
+## Task 23: i18n（phase 3）
+
+- [ ] 文件: `src/locales/zh-CN.json`, `src/locales/en.json`
+- [ ] 新增 `station.badge_in_progress`：「在建」/「Building」
+
+## Task 24: Build 验证（phase 3）
+
+- [ ] 执行 `npm run build`，确认无编译错误

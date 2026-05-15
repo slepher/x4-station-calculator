@@ -20,6 +20,7 @@ const props = defineProps<{
   buildingCargo?: WareAmount[]
   buildingReservation?: WareAmount[]
   isBuildingScope?: boolean
+  buildingInProgress?: SavedModule
   hideWorkersView?: boolean
   settings: {
     transportShipCapacity: number
@@ -446,6 +447,48 @@ const materialGapTotal = computed(() => {
   if (viewMode.value === 'volume') return materialGapItems.value.reduce((sum, item) => sum + item.volume, 0)
   return materialGapItems.value.reduce((sum, item) => sum + item.price, 0)
 })
+
+const inProgressAnalysis = computed(() => {
+  if (!props.buildingInProgress) return null
+  return analyzeStation(
+    [props.buildingInProgress],
+    gameDataStore.modulesMap,
+    gameDataStore.waresMap,
+    buildPriceMultiplier.value,
+    props.settings.useHQ
+  )
+})
+
+const inProgressModuleEntry = computed(() => {
+  const ip = props.buildingInProgress
+  const analysis = inProgressAnalysis.value
+  if (!ip || !analysis) return null
+  const moduleData = gameDataStore.modulesMap[ip.id]
+  const isTime = viewMode.value === 'time'
+  const isVolume = viewMode.value === 'volume'
+  return {
+    id: ip.id,
+    count: ip.count,
+    displayName: moduleData ? translateModule(moduleData) : ip.id,
+    value: isTime ? analysis.totalTime : (isVolume ? analysis.totalVolume : analysis.totalCost),
+    unit: isTime ? '' : (isVolume ? 'm³' : 'Cr'),
+    isTime,
+    isVolume,
+    items: isTime
+      ? [{ id: 'build_time', displayName: t('station.item_build_time'), count: 1, price: analysis.totalTime, displayValue: analysis.totalTime }]
+      : analysis.summaryItems.map((item: any) => {
+          const ware = gameDataStore.waresMap[item.id]
+          const price = ware ? getPriceByMultiplier(ware, buildPriceMultiplier.value) : 0
+          return {
+            id: item.id,
+            count: item.count,
+            price: item.count * price,
+            volume: item.count * (ware?.volume || 0),
+            displayName: ware ? translateWare(ware) : item.id
+          }
+        })
+  }
+})
 </script>
 
 <template>
@@ -532,6 +575,19 @@ const materialGapTotal = computed(() => {
           :unit="data.unit"
           :is-workers="data.isWorkers"
           :is-volume="data.isVolume"
+        />
+
+        <StationModuleDetail
+          v-if="inProgressModuleEntry && isBuildingScope"
+          variant="module"
+          :count="inProgressModuleEntry.count"
+          :title="inProgressModuleEntry.displayName"
+          :value="inProgressModuleEntry.value"
+          :items="inProgressModuleEntry.items"
+          :badge="t('station.badge_in_progress')"
+          :unit="inProgressModuleEntry.unit"
+          :is-time="inProgressModuleEntry.isTime"
+          :is-volume="inProgressModuleEntry.isVolume"
         />
 
         <StationModuleDetail 
