@@ -1,5 +1,10 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
+import type {
+  ProductionSessionState,
+  ProductionStationState,
+  LiveCargoOnlyItem,
+  LiveVolumeAllocationGroup
+} from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { WareProductionFlow, DerivedProductionFlow } from '@/types/production-flow'
 
@@ -20,6 +25,8 @@ export interface WareflowPresenterProps {
   viewMode: ComputedRef<WareFlowViewMode>
   productionFlows: ComputedRef<WareProductionFlow[]>
   derivedProductionFlows: ComputedRef<DerivedProductionFlow[]>
+  liveVolumeAllocationGroups: ComputedRef<LiveVolumeAllocationGroup[]>
+  liveCargoOnlyItems: ComputedRef<LiveCargoOnlyItem[]>
   warePriorityLevels: ComputedRef<Record<string, number>>
   settings: ComputedRef<{
     resourceBufferHours: number
@@ -59,6 +66,8 @@ export interface UseProductionWareflowPresenterReturn {
 export interface WareflowPresenterStore {
   session: ProductionSessionState
   stationState: ProductionStationState | null
+  liveVolumeAllocationGroups?: LiveVolumeAllocationGroup[] | ComputedRef<LiveVolumeAllocationGroup[]>
+  liveCargoOnlyItems?: LiveCargoOnlyItem[] | ComputedRef<LiveCargoOnlyItem[]>
   settingActions: {
     updateResourceBufferHours(value: number): void
     updatePrimaryProductBufferHours(value: number): void
@@ -82,12 +91,22 @@ export interface WareflowPresenterStore {
 }
 
 export function useProductionWareflowPresenter(store: WareflowPresenterStore): UseProductionWareflowPresenterReturn {
+  const readMaybeComputed = <T>(value: T | ComputedRef<T> | undefined, fallback: T): T => {
+    if (value === undefined) return fallback
+    if (typeof value === 'object' && value !== null && 'value' in value) {
+      return (value as ComputedRef<T>).value
+    }
+    return value as T
+  }
+
   const props: WareflowPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
     viewMode: computed(() => store.session.wareflowViewMode),
     productionFlows: computed(() => store.stationState?.productionFlows || []),
     derivedProductionFlows: computed(() => store.stationState?.derivedProductionFlows || []),
+    liveVolumeAllocationGroups: computed(() => readMaybeComputed(store.liveVolumeAllocationGroups, [])),
+    liveCargoOnlyItems: computed(() => readMaybeComputed(store.liveCargoOnlyItems, [])),
     warePriorityLevels: computed(() => store.stationState?.warePriorityLevels || {}),
     settings: computed(() => {
       const s = store.stationState?.settings

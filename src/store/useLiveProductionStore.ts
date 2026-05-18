@@ -4,7 +4,10 @@ import type {
   ProductionWorkbenchCapabilities,
   ProductionSessionState,
   ProductionContextState,
-  ProductionStationState
+  ProductionStationState,
+  LiveVolumeAllocationGroup,
+  LiveCargoOnlyItem,
+  LiveVolumeAllocationItem
 } from '@/types/production-workbench-contract'
 import type { SectorInternalData } from '@/types/x4'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry, WareAmount } from '@/types/saveArchive'
@@ -559,7 +562,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
             inProgressModule
           },
           cargo: stationEntry.cargo,
-          reservation: stationEntry.reservation
+          reservation: stationEntry.reservation,
+          overrides: stationEntry.overrides,
+          targetCounts: stationEntry.overrides?.max
         }
       }
     }
@@ -583,7 +588,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         inProgressModule: undefined
       },
       cargo: stationEntry.cargo,
-      reservation: stationEntry.reservation
+      reservation: stationEntry.reservation,
+      overrides: stationEntry.overrides,
+      targetCounts: stationEntry.overrides?.max
     }
   })
 
@@ -1551,6 +1558,111 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
   })
 
+  function compareAllocationItems(a: LiveVolumeAllocationItem, b: LiveVolumeAllocationItem): number {
+    if (a.orderIndex !== b.orderIndex) return a.orderIndex - b.orderIndex
+    if (a.tier !== b.tier) return b.tier - a.tier
+    if (a.wareId < b.wareId) return -1
+    if (a.wareId > b.wareId) return 1
+    return 0
+  }
+
+  function compareCargoOnlyItems(a: LiveCargoOnlyItem, b: LiveCargoOnlyItem): number {
+    if (a.tier !== b.tier) return b.tier - a.tier
+    if (a.name < b.name) return -1
+    if (a.name > b.name) return 1
+    return 0
+  }
+
+  const liveVolumeAllocationGroups = computed<LiveVolumeAllocationGroup[]>(() => {
+    if (session.value.visualMode !== 'live') return []
+    if (session.value.wareflowViewMode !== 'volume') return []
+
+    const archive = archiveStation.value
+    const state = stationState.value
+    if (!archive || !state) return []
+
+    const cargoMap = new Map<string, number>()
+    for (const item of archive.cargo || []) {
+      cargoMap.set(item.ware, item.amount)
+    }
+
+    const targetMap = new Map<string, number>()
+    for (const item of archive.targetCounts || []) {
+      targetMap.set(item.ware, item.amount)
+    }
+
+    const grouped = new Map<'container' | 'solid' | 'liquid', LiveVolumeAllocationItem[]>([
+      ['container', []],
+      ['solid', []],
+      ['liquid', []]
+    ])
+
+    for (const flow of state.derivedProductionFlows) {
+      const ware = gameData.waresMap[flow.wareId]
+      const localizedWare = gameData.localizedWaresMap[flow.wareId]
+      const recommendedCount = Math.round(flow.totalOccupiedCount)
+      const currentCount = cargoMap.get(flow.wareId) || 0
+      const targetCount = targetMap.get(flow.wareId) || 0
+      const item: LiveVolumeAllocationItem = {
+        wareId: flow.wareId,
+        name: localizedWare?.localeName || ware?.name || flow.wareId,
+        transportType: flow.transportType,
+        orderIndex: flow.orderIndex,
+        tier: flow.tier,
+        currentCount,
+        targetCount,
+        recommendedCount,
+        scaleMaxCount: Math.max(currentCount, targetCount, recommendedCount)
+      }
+      grouped.get(flow.transportType)?.push(item)
+    }
+
+    return (['container', 'solid', 'liquid'] as const).map((key) => {
+      const items = grouped.get(key) || []
+      items.sort(compareAllocationItems)
+      return {
+        key,
+        items,
+        currentTotalVolume: items.reduce((sum, item) => sum + item.currentCount * (gameData.waresMap[item.wareId]?.volume || 0), 0),
+        targetTotalVolume: items.reduce((sum, item) => sum + item.targetCount * (gameData.waresMap[item.wareId]?.volume || 0), 0),
+        recommendedTotalVolume: items.reduce((sum, item) => sum + item.recommendedCount * (gameData.waresMap[item.wareId]?.volume || 0), 0)
+      }
+    })
+  })
+
+  const liveCargoOnlyItems = computed<LiveCargoOnlyItem[]>(() => {
+    if (session.value.visualMode !== 'live') return []
+    if (session.value.wareflowViewMode !== 'volume') return []
+
+    const archive = archiveStation.value
+    const state = stationState.value
+    if (!archive || !state) return []
+
+    const mainWareIds = new Set(state.derivedProductionFlows.map((flow) => flow.wareId))
+    const targetMap = new Map<string, number>()
+    for (const item of archive.targetCounts || []) {
+      targetMap.set(item.ware, item.amount)
+    }
+
+    const items: LiveCargoOnlyItem[] = []
+    for (const item of archive.cargo || []) {
+      if (item.amount <= 0) continue
+      if (mainWareIds.has(item.ware)) continue
+      const ware = gameData.waresMap[item.ware]
+      const localizedWare = gameData.localizedWaresMap[item.ware]
+      items.push({
+        wareId: item.ware,
+        name: localizedWare?.localeName || ware?.name || item.ware,
+        tier: ware?.tier || 0,
+        currentCount: item.amount,
+        targetCount: targetMap.get(item.ware) || 0
+      })
+    }
+
+    items.sort(compareCargoOnlyItems)
+    return items
+  })
+
   const tabSemanticsById = computed<Record<string, { tag?: string; factoryGroup?: string }>>(() => {
     const stationPlansByCode = new Map<string, BindingStationPlan>()
     const stationPlansById = new Map<string, BindingStationPlan>()
@@ -1705,6 +1817,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     session,
     context,
     stationState,
+    liveVolumeAllocationGroups,
+    liveCargoOnlyItems,
     capabilities,
     settingActions,
     wareRuleActions,

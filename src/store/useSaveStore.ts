@@ -756,29 +756,15 @@ export const useSaveStore = defineStore('save', () => {
         meta: {
           ...meta,
           filename: typeof meta.filename === 'string' ? meta.filename : '',
-          parser_version: meta.parser_version === 'v1'
-            ? 'v1'
-            : meta.parser_version === 'v2'
-              ? 'v2'
-              : meta.parser_version === 'v4'
-                ? 'v4'
-                : meta.parser_version === 'v5'
-                  ? 'v5'
-                  : meta.parser_version === 'v6'
-                    ? 'v6'
-                    : 'v3',
-          post_processor_version: meta.post_processor_version === 'v1'
-            ? 'v1'
-            : meta.post_processor_version === 'v2'
-              ? 'v2'
-              : meta.post_processor_version === 'v3' || meta.post_processor_version === 'v4'
-                ? 'v3'
-              : undefined,
+          parser_version: CURRENT_PARSER_VERSION,
+          post_processor_version: meta.post_processor_version === CURRENT_POST_PROCESSOR_VERSION
+            ? CURRENT_POST_PROCESSOR_VERSION
+            : undefined,
           source: 'imported'
         },
         sectors,
         isCompatible: true,
-        isValid: meta.parser_version === CURRENT_PARSER_VERSION
+        isValid: true
       }
 
       const finalArchive = archive.meta.post_processor_version === CURRENT_POST_PROCESSOR_VERSION

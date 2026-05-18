@@ -224,8 +224,11 @@ const showArchiveModuleList = computed(() => {
 
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
+        :visual-mode="wareflowPresenter.props.visualMode.value"
         :view-mode="wareflowPresenter.props.viewMode.value"
         :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
+        :live-volume-allocation-groups="wareflowPresenter.props.liveVolumeAllocationGroups.value"
+        :live-cargo-only-items="wareflowPresenter.props.liveCargoOnlyItems.value"
         :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"

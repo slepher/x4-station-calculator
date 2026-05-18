@@ -39,6 +39,34 @@ export interface ProductionContextState {
   hasArchive: boolean
 }
 
+export interface LiveVolumeAllocationItem {
+  wareId: string
+  name: string
+  transportType: 'container' | 'solid' | 'liquid'
+  orderIndex: number
+  tier: number
+  currentCount: number
+  targetCount: number
+  recommendedCount: number
+  scaleMaxCount: number
+}
+
+export interface LiveVolumeAllocationGroup {
+  key: 'container' | 'solid' | 'liquid'
+  items: LiveVolumeAllocationItem[]
+  currentTotalVolume: number
+  targetTotalVolume: number
+  recommendedTotalVolume: number
+}
+
+export interface LiveCargoOnlyItem {
+  wareId: string
+  name: string
+  tier: number
+  currentCount: number
+  targetCount: number
+}
+
 export interface ProductionStationState {
   entityType: 'station' | 'transit'
   id: string
