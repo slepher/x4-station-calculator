@@ -54,13 +54,11 @@ overrides: Option<StationTradeOverrides>
 仅解析 player station 下的：
 
 ```xml
-<trade>
-  <overrides>
-    <max><ware ... /></max>
-    <buy><ware ... /></buy>
-    <sell><ware ... /></sell>
-  </overrides>
-</trade>
+<overrides>
+  <max><ware ... /></max>
+  <buy><ware ... /></buy>
+  <sell><ware ... /></sell>
+</overrides>
 ```
 
 不从 `<trade>` 的报价单、`desired`、`amount` 推导目标分配。
@@ -173,14 +171,33 @@ Presenter 不参与：
 
 1. 渲染 `container / solid / liquid` 三组
 2. 渲染组头 `Cur / Tar / Rec`
-3. 每行显示 `currentCount / targetCount / recommendedCount`
-4. 渲染 cargo-only bottom section
+3. 每行使用与现有 `StationWareFlow` 接近的壳样式
+4. 进度条主体显示 `currentCount / targetCount`
+5. `recommendedCount` 继续按原 volume 行接近的数字风格显示
+6. 展开区按两列显示 `targetCount / recommendedCount` 的时间结果，精度到分
+7. 渲染 cargo-only bottom section
 
 ### 比例尺
 
 ```typescript
 scaleMaxCount = max(currentCount, targetCount, recommendedCount)
 ```
+
+### 展开时间明细
+
+Store 负责直接产出每个 ware 的明细行：
+
+1. 净产量填满库存时间
+2. 总产量填满库存时间
+3. 净消耗耗尽库存时间
+4. 总消耗耗尽库存时间
+5. 各个下游模块纯消耗库存时间
+
+明细行为：
+
+- 同一行内展示 `targetCount` 与 `recommendedCount` 两列
+- 若某项两列都不存在，则整行省略
+- 下游项按 consumption contribution 逐项展开
 
 ## Testing
 

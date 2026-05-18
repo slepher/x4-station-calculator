@@ -19,19 +19,32 @@
 **那么** 系统渲染独立的 live allocation 视图  
 **并且** MUST NOT 渲染现有的 planning volume row 组件集合
 
-### Requirement: Allocation View Must Display Three Count Values Per Ware
+### Requirement: Allocation Row Must Keep Existing Volume Style And Add Storage Progress
+
+每个 ware 行 MUST 保持接近现有 volume 行的视觉风格，并新增仓储进度条。
+
+#### Scenario: Allocation row reuses existing row style
+
+**前提** 用户位于 `live + volume` 视图  
+**当** 系统渲染某个 ware 行  
+**那么** 该行的视觉风格与现有 volume 行保持接近  
+**并且** 行中新增仓储进度条
+
+### Requirement: Allocation View Must Display Current And Target On Bar With Recommended Separately
 
 每个 ware 行 MUST 同时展示：
 
-- `currentCount`
-- `targetCount`
-- `recommendedCount`
+- 进度条上的 `currentCount`
+- 进度条上的 `targetCount`
+- 单独展示的 `recommendedCount`
 
 #### Scenario: Allocation row shows all three values
 
 **前提** 某个 ware 已进入 live allocation 列表  
 **当** 系统渲染该 ware 行  
-**那么** 用户可同时看到当前库存、目标分配和推荐分配三个 count 值
+**那么** 用户可同时看到当前库存、目标分配和推荐分配三个 count 值  
+**并且** `currentCount / targetCount` 显示在进度条主体内  
+**并且** `recommendedCount` 以独立数值显示
 
 ### Requirement: Current Count Uses Cargo Only
 
@@ -61,11 +74,11 @@
 
 ### Requirement: Rust Parser Must Extract Player Station Trade Overrides
 
-Rust parser MUST 解析 player station 的 `trade.overrides.max/buy/sell`，并将三组 ware amount 数据写入 `playerStations` 解析对象。
+Rust parser MUST 解析 player station 的 `overrides.max/buy/sell`，并将三组 ware amount 数据写入 `playerStations` 解析对象。
 
 #### Scenario: Parser extracts max buy sell lists
 
-**前提** save 中某个 player station 含有 `trade.overrides.max/buy/sell`  
+**前提** save 中某个 player station 含有 `overrides.max/buy/sell`  
 **当** Rust parser 完成解析  
 **那么** `playerStations[stationCode].overrides.max` 包含对应 ware 列表  
 **并且** `playerStations[stationCode].overrides.buy` 包含对应 ware 列表  
@@ -114,6 +127,24 @@ live allocation 视图 MUST 复用当前 volume 视图已有的分组和顺序�
 **前提** 某行 `currentCount=120`，`targetCount=300`，`recommendedCount=240`  
 **当** 系统计算该行进度条比例尺  
 **那么** 比例尺上限为 `300`
+
+### Requirement: Expanded Allocation Detail Must Show Target And Recommended Time Columns
+
+展开区 MUST 在同一张明细表中并列显示基于 `targetCount` 与 `recommendedCount` 的时间结果，精度到分。
+
+#### Scenario: Expanded detail shows target and recommended columns
+
+**前提** 某个 ware 行存在可计算的库存时间项  
+**当** 用户展开该行  
+**那么** 系统显示时间明细表  
+**并且** 表中至少包含 `Target` 与 `Recommended` 两列  
+**并且** 时间精度到分
+
+#### Scenario: Missing time items are omitted
+
+**前提** 某个时间项在 `targetCount` 与 `recommendedCount` 两列下都不可计算  
+**当** 系统渲染展开明细  
+**那么** 该时间项不显示
 
 ## MODIFIED Requirements
 

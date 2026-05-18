@@ -7,11 +7,13 @@ import type {
   ProductionStationState,
   LiveVolumeAllocationGroup,
   LiveCargoOnlyItem,
-  LiveVolumeAllocationItem
+  LiveVolumeAllocationItem,
+  LiveVolumeAllocationDetailRow
 } from '@/types/production-workbench-contract'
 import type { SectorInternalData } from '@/types/x4'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry, WareAmount } from '@/types/saveArchive'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
+import type { DerivedProductionFlow } from '@/types/production-flow'
 import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import { buildStationComponentGapFlows } from './logic/stationGapViewModel'
 import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
@@ -1573,6 +1575,83 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return 0
   }
 
+  function computeDeltaFillMinutes(targetCount: number, currentCount: number, ratePerHour: number): number | undefined {
+    if (targetCount <= currentCount) return undefined
+    if (ratePerHour <= 0) return undefined
+    return ((targetCount - currentCount) / ratePerHour) * 60
+  }
+
+  function computeStockConsumeMinutes(stockCount: number, ratePerHour: number): number | undefined {
+    if (stockCount <= 0) return undefined
+    if (ratePerHour <= 0) return undefined
+    return (stockCount / ratePerHour) * 60
+  }
+
+  function buildAllocationDetailRows(
+    flow: DerivedProductionFlow,
+    currentCount: number,
+    targetCount: number,
+    recommendedCount: number
+  ): LiveVolumeAllocationDetailRow[] {
+    i18n.global.locale.value
+    const rows: LiveVolumeAllocationDetailRow[] = []
+    const netProductionRate = flow.netRate > 0 ? flow.netRate : 0
+    const netConsumptionRate = flow.netRate < 0 ? Math.abs(flow.netRate) : 0
+    const totalProductionRate = flow.production > 0 ? flow.production : 0
+    const totalConsumptionRate = flow.consumption > 0 ? flow.consumption : 0
+
+    const metricRows: LiveVolumeAllocationDetailRow[] = [
+      {
+        key: 'net-fill',
+        label: i18n.global.t('wareflow.allocation_net_fill_time'),
+        targetMinutes: computeDeltaFillMinutes(targetCount, currentCount, netProductionRate),
+        recommendedMinutes: computeDeltaFillMinutes(recommendedCount, currentCount, netProductionRate)
+      },
+      {
+        key: 'gross-fill',
+        label: i18n.global.t('wareflow.allocation_gross_fill_time'),
+        targetMinutes: computeDeltaFillMinutes(targetCount, currentCount, totalProductionRate),
+        recommendedMinutes: computeDeltaFillMinutes(recommendedCount, currentCount, totalProductionRate)
+      },
+      {
+        key: 'net-drain',
+        label: i18n.global.t('wareflow.allocation_net_drain_time'),
+        targetMinutes: computeStockConsumeMinutes(targetCount, netConsumptionRate),
+        recommendedMinutes: computeStockConsumeMinutes(recommendedCount, netConsumptionRate)
+      },
+      {
+        key: 'gross-drain',
+        label: i18n.global.t('wareflow.allocation_gross_drain_time'),
+        targetMinutes: computeStockConsumeMinutes(targetCount, totalConsumptionRate),
+        recommendedMinutes: computeStockConsumeMinutes(recommendedCount, totalConsumptionRate)
+      }
+    ]
+
+    metricRows.forEach((row) => {
+      if (row.targetMinutes === undefined && row.recommendedMinutes === undefined) return
+      rows.push(row)
+    })
+
+    flow.contributions.forEach((contribution, index) => {
+      if (contribution.class !== 'module') return
+      if (contribution.type !== 'consumption') return
+      const pureConsumptionRate = Math.abs(contribution.amount)
+      const localizedModule = gameData.localizedModulesMap[contribution.id]
+      const moduleInfo = gameData.modulesMap[contribution.id]
+      const label = `${i18n.global.t('wareflow.allocation_downstream_prefix')}: ${localizedModule?.localeName || moduleInfo?.name || contribution.id}`
+      const row: LiveVolumeAllocationDetailRow = {
+        key: `downstream-${contribution.id}-${index}`,
+        label,
+        targetMinutes: computeStockConsumeMinutes(targetCount, pureConsumptionRate),
+        recommendedMinutes: computeStockConsumeMinutes(recommendedCount, pureConsumptionRate)
+      }
+      if (row.targetMinutes === undefined && row.recommendedMinutes === undefined) return
+      rows.push(row)
+    })
+
+    return rows
+  }
+
   const liveVolumeAllocationGroups = computed<LiveVolumeAllocationGroup[]>(() => {
     if (session.value.visualMode !== 'live') return []
     if (session.value.wareflowViewMode !== 'volume') return []
@@ -1612,7 +1691,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         currentCount,
         targetCount,
         recommendedCount,
-        scaleMaxCount: Math.max(currentCount, targetCount, recommendedCount)
+        scaleMaxCount: Math.max(currentCount, targetCount, recommendedCount),
+        detailRows: buildAllocationDetailRows(flow, currentCount, targetCount, recommendedCount)
       }
       grouped.get(flow.transportType)?.push(item)
     }
