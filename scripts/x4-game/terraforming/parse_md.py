@@ -91,7 +91,21 @@ def resolve_cluster_objective_texts(
         objs = cluster.get("objectives", [])
         var_texts = cluster.get("variableTexts", {})
 
+        # Filter: remove empty textId and duplicate steps
+        seen_steps: set[int] = set()
+        filtered: list[dict] = []
         for obj in objs:
+            text_id = obj.get("textId", "")
+            step = obj.get("step", 0)
+            if not text_id:
+                continue
+            if step in seen_steps:
+                continue
+            seen_steps.add(step)
+            filtered.append(obj)
+        cluster["objectives"] = filtered
+
+        for obj in filtered:
             text_id = obj.get("textId", "")
             if not text_id.startswith("$"):
                 continue

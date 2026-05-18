@@ -56,6 +56,9 @@ def process_terraforming(loader: Any) -> None:
             except Exception as e:
                 print(f"   ⚠️ 警告: MD terraforming 解析失败: {e}")
 
+        # Filter out clusters with no terraforming projects (e.g. Xenon clusters)
+        clusters = [c for c in clusters if len(c.get("projectIds", [])) > 0]
+
         # Load maps.json to resolve cluster nameIds
         cluster_name_map = _load_cluster_name_ids(base_path)
 
