@@ -51,7 +51,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
         :target-count="item.targetCount"
         :recommended-count="item.recommendedCount"
         :scale-max-count="item.scaleMaxCount"
-        :detail-rows="item.detailRows"
+        :detail-sections="item.detailSections"
       />
     </section>
 

@@ -37,26 +37,26 @@
    - 中间：allocation progress bar，条上显示 `currentCount / targetCount`
    - 右侧：`recommendedCount`，保持现有 volume 行接近的数字风格
 14. 进度条使用统一比例尺，基于 `max(currentCount, targetCount, recommendedCount)` 计算，并在所有 ware 行之间对齐。
-15. 点击展开后，在同一张明细表中并列显示基于 `targetCount` 与 `recommendedCount` 的时间结果，精度到分。
-16. 明细至少包括：
-   - 净产量填满库存时间
-   - 总产量填满库存时间
-   - 净消耗耗尽库存时间
-   - 总消耗耗尽库存时间
-   - 各个下游产线纯消耗库存时间
-17. 任一时间项若不存在，则该项不显示。
-18. 对于不在当前生产和消耗列表中的 ware，在面板最下方单独列出，不混入前面的 allocation 分组。
-19. 该底部单列按 `tier` 降序、`ware.name` 升序排序。
-20. 该底部单列中的 ware 仅显示 `currentCount` 和 `targetCount`，不显示 `recommendedCount`。
-21. cargo-only ware 的 `targetCount` 仍直接来源于 save 中 `playerStation.overrides.max`；如果该 ware 没有 override，则其 `targetCount = 0`。
+15. 点击展开后，明细采用分段结构，而不是单张大表横向堆叠。
+16. 展开区至少拆分为：
+   - `Summary`：从当前库存开始的填充/耗尽时间
+   - `Boundary`：从空库存开始填充、从满库存开始消耗
+   - `Downstream`：各个下游产线纯消耗库存时间
+17. 每段内部继续并列显示基于 `targetCount` 与 `recommendedCount` 的时间结果，精度到分。
+18. `Downstream` 默认折叠，其余段默认展开。
+19. 任一时间项若不存在，则该项不显示。
+20. 对于不在当前生产和消耗列表中的 ware，在面板最下方单独列出，不混入前面的 allocation 分组。
+21. 该底部单列按 `tier` 降序、`ware.name` 升序排序。
+22. 该底部单列中的 ware 仅显示 `currentCount` 和 `targetCount`，不显示 `recommendedCount`。
+23. cargo-only ware 的 `targetCount` 仍直接来源于 save 中 `playerStation.overrides.max`；如果该 ware 没有 override，则其 `targetCount = 0`。
 
 ### 分层职责
 
-22. Rust parser：负责解析 `playerStation.overrides.max/buy/sell`。
-23. Save post-process / type layer：负责把 `overrides` 透传为 `playerStations` 可消费字段。
-24. Store：负责基于 `archiveStation.cargo`、`archiveStation.overrides.max`、`derivedProductionFlows` 组装 live allocation 数据和展开时间明细。
-25. Presenter：负责将 store 输出转换为新组件直接消费的 allocation view model，不在 Vue 中临时拼装。
-26. Vue：只负责按固定 contract 渲染新视图，不处理数据源回退逻辑。
+24. Rust parser：负责解析 `playerStation.overrides.max/buy/sell`。
+25. Save post-process / type layer：负责把 `overrides` 透传为 `playerStations` 可消费字段。
+26. Store：负责基于 `archiveStation.cargo`、`archiveStation.overrides.max`、`derivedProductionFlows` 组装 live allocation 数据和分段式展开时间明细。
+27. Presenter：负责将 store 输出转换为新组件直接消费的 allocation view model，不在 Vue 中临时拼装。
+28. Vue：只负责按固定 contract 渲染新视图，不处理数据源回退逻辑。
 
 ## 边界
 
@@ -67,7 +67,7 @@
 - store 层新增 live allocation view data
 - presenter 透传 live allocation view data
 - 同风格 row + 库存进度条
-- 展开时间明细（`targetCount` / `recommendedCount` 双列，精度到分）
+- 分段式展开时间明细（`Summary / Boundary / Downstream`，`targetCount` / `recommendedCount` 双列，精度到分）
 - 保持现有分组和排序
 - 底部单列的 `current + target` ware 展示
 - 必要 i18n 文案
@@ -91,7 +91,7 @@
 6. `currentCount` 仅基于 `cargo` 计算，`reservation` 不计入当前库存。
 7. `targetCount` 直接来源于 save 中 `playerStation.overrides.max`，不再使用替代方案。
 8. 不在当前生产和消耗列表中的 ware 出现在面板最下方单独区域，不混入主 allocation 分组。
-9. 点开某个 ware 后，明细表按列并列展示 `targetCount` 与 `recommendedCount` 两组时间结果，精度到分，不存在的项不显示。
+9. 点开某个 ware 后，明细按 `Summary / Boundary / Downstream` 分段显示，并在每段内按列并列展示 `targetCount` 与 `recommendedCount` 两组时间结果，精度到分，不存在的项不显示。
 10. 该底部单列中的 ware 仅显示 `currentCount` 与 `targetCount`，不显示 `recommendedCount`。
 11. Rust parser 输出的 `playerStations` 包含 `overrides.max/buy/sell`。
 12. `npm run build` 无编译错误。

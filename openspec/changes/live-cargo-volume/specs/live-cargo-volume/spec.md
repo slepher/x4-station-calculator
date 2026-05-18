@@ -128,9 +128,19 @@ live allocation 视图 MUST 复用当前 volume 视图已有的分组和顺序�
 **当** 系统计算该行进度条比例尺  
 **那么** 比例尺上限为 `300`
 
+### Requirement: Expanded Allocation Detail Must Be Sectioned
+
+展开区 MUST 按 `Summary / Boundary / Downstream` 分段显示时间结果，而不是继续平铺成一张持续扩宽的表。
+
+#### Scenario: Expanded detail is sectioned
+
+**前提** 某个 ware 行存在可计算的库存时间项  
+**当** 用户展开该行  
+**那么** 系统按 `Summary / Boundary / Downstream` 分段显示明细
+
 ### Requirement: Expanded Allocation Detail Must Show Target And Recommended Time Columns
 
-展开区 MUST 在同一张明细表中并列显示基于 `targetCount` 与 `recommendedCount` 的时间结果，精度到分。
+每个展开分段 MUST 并列显示基于 `targetCount` 与 `recommendedCount` 的时间结果，精度到分。
 
 #### Scenario: Expanded detail shows target and recommended columns
 
@@ -139,6 +149,12 @@ live allocation 视图 MUST 复用当前 volume 视图已有的分组和顺序�
 **那么** 系统显示时间明细表  
 **并且** 表中至少包含 `Target` 与 `Recommended` 两列  
 **并且** 时间精度到分
+
+#### Scenario: Boundary section includes empty-fill and full-drain cases
+
+**前提** 某个 ware 行存在可计算的边界时间  
+**当** 用户展开该行  
+**那么** `Boundary` 分段中包含“从空库存开始填充”与“从满库存开始消耗”相关时间项
 
 #### Scenario: Missing time items are omitted
 

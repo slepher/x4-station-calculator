@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { LiveVolumeAllocationDetailRow } from '@/types/production-workbench-contract'
+import type { LiveVolumeAllocationDetailSection } from '@/types/production-workbench-contract'
 
 const props = defineProps<{
   name: string
@@ -9,7 +9,7 @@ const props = defineProps<{
   targetCount: number
   recommendedCount: number
   scaleMaxCount: number
-  detailRows: LiveVolumeAllocationDetailRow[]
+  detailSections: LiveVolumeAllocationDetailSection[]
 }>()
 
 const { t } = useI18n()
@@ -36,10 +36,15 @@ function formatMinutes(totalMinutes: number): string {
   return `${minutes}m`
 }
 
+function formatRate(value: number): string {
+  return `${new Intl.NumberFormat('en-US').format(Math.round(value))}/h`
+}
+
 const targetWidth = computed(() => toPercent(props.targetCount, props.scaleMaxCount))
 const currentWidth = computed(() => toPercent(props.currentCount, props.scaleMaxCount))
 const recommendedLeft = computed(() => toPercent(props.recommendedCount, props.scaleMaxCount))
-const isExpandable = computed(() => props.detailRows.length > 0)
+const isExpandable = computed(() => props.detailSections.length > 0)
+const downstreamOpen = ref(false)
 </script>
 
 <template>
@@ -84,23 +89,56 @@ const isExpandable = computed(() => props.detailRows.length > 0)
 
     <Transition name="expand">
       <div v-if="isOpen && isExpandable" class="list-box">
-        <div class="detail-head">
-          <span class="detail-head-label">{{ t('wareflow.allocation_detail_metric') }}</span>
-          <span class="detail-head-col">{{ t('wareflow.allocation_target_column') }}</span>
-          <span class="detail-head-col">{{ t('wareflow.allocation_recommended_column') }}</span>
-        </div>
         <div
-          v-for="row in detailRows"
-          :key="row.key"
-          class="list-item detail-row"
+          v-for="section in detailSections"
+          :key="section.key"
+          class="detail-section"
         >
-          <span class="detail-label">{{ row.label }}</span>
-          <span class="detail-value">
-            <template v-if="row.targetMinutes !== undefined">{{ formatMinutes(row.targetMinutes) }}</template>
-          </span>
-          <span class="detail-value">
-            <template v-if="row.recommendedMinutes !== undefined">{{ formatMinutes(row.recommendedMinutes) }}</template>
-          </span>
+          <div
+            v-if="section.key !== 'downstream'"
+            class="detail-section-title"
+          >
+            {{ section.title }}
+          </div>
+
+          <button
+            v-else
+            type="button"
+            class="detail-section-toggle"
+            @click.stop="downstreamOpen = !downstreamOpen"
+          >
+            <span>{{ section.title }}</span>
+            <span class="detail-section-toggle-arrow" :class="{ 'detail-section-toggle-arrow-open': downstreamOpen }">▸</span>
+          </button>
+
+          <div v-if="section.key !== 'downstream' || downstreamOpen">
+            <div class="detail-head">
+              <span class="detail-head-label">{{ t('wareflow.allocation_detail_metric') }}</span>
+              <span class="detail-head-col">{{ t('wareflow.allocation_rate_column') }}</span>
+              <span class="detail-head-col">{{ t('wareflow.allocation_current_column') }}</span>
+              <span class="detail-head-col">{{ t('wareflow.allocation_target_column') }}</span>
+              <span class="detail-head-col">{{ t('wareflow.allocation_recommended_column') }}</span>
+            </div>
+            <div
+              v-for="row in section.rows"
+              :key="row.key"
+              class="list-item detail-row"
+            >
+              <span class="detail-label">{{ row.label }}</span>
+              <span class="detail-value">
+                <template v-if="row.ratePerHour !== undefined">{{ formatRate(row.ratePerHour) }}</template>
+              </span>
+              <span class="detail-value">
+                <template v-if="row.currentMinutes !== undefined">{{ formatMinutes(row.currentMinutes) }}</template>
+              </span>
+              <span class="detail-value">
+                <template v-if="row.targetMinutes !== undefined">{{ formatMinutes(row.targetMinutes) }}</template>
+              </span>
+              <span class="detail-value">
+                <template v-if="row.recommendedMinutes !== undefined">{{ formatMinutes(row.recommendedMinutes) }}</template>
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </Transition>
@@ -137,11 +175,16 @@ const isExpandable = computed(() => props.detailRows.length > 0)
 .recommended-icon { @apply w-3.5 h-3.5 shrink-0; }
 
 .list-box { @apply bg-slate-900/60 mx-1 px-4 py-2 text-[11px] rounded-b border-x border-b border-slate-700/30 overflow-hidden; }
-.detail-head { @apply grid gap-3 items-center pb-1.5 mb-1 border-b border-slate-700/30 text-slate-400 uppercase tracking-wide; grid-template-columns: minmax(0, 1fr) 6.5rem 6.5rem; }
+.detail-section { @apply mb-3 last:mb-0; }
+.detail-section-title { @apply text-[11px] font-semibold uppercase tracking-wide text-slate-300 mb-1.5; }
+.detail-section-toggle { @apply w-full flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-300 mb-1.5; }
+.detail-section-toggle-arrow { @apply text-slate-500 transition-transform duration-200; }
+.detail-section-toggle-arrow-open { @apply rotate-90 text-slate-300; }
+.detail-head { @apply grid gap-3 items-center pb-1.5 mb-1 border-b border-slate-700/30 text-slate-400 uppercase tracking-wide; grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
 .detail-head-label { @apply text-left; }
 .detail-head-col { @apply text-right; }
 .list-item { @apply py-1.5 border-b border-slate-700/20 last:border-0; }
-.detail-row { @apply grid gap-3 items-center; grid-template-columns: minmax(0, 1fr) 6.5rem 6.5rem; }
+.detail-row { @apply grid gap-3 items-center; grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
 .detail-label { @apply text-slate-300 truncate; }
 .detail-value { @apply text-right text-slate-200 font-mono; }
 

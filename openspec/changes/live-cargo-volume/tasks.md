@@ -34,6 +34,7 @@
 - [x] 暴露 `liveVolumeAllocationGroups`
 - [x] 暴露 `liveCargoOnlyItems`
 - [x] 为每个 allocation item 产出展开时间明细
+- [x] 将展开时间明细拆成 `Summary / Boundary / Downstream` sections
 
 ## Task 3: 扩展 wareflow presenter
 
@@ -62,6 +63,8 @@
 - [x] 在最下方渲染 cargo-only 单列
 - [x] cargo-only 单列仅显示 ware 名称、当前存量和 target
 - [x] 展开区按列显示 `targetCount / recommendedCount` 时间明细
+- [x] 展开区分段显示 `Summary / Boundary / Downstream`
+- [x] `Downstream` 默认折叠
 
 ## Task 6: 新增 allocation progress row / bar 组件
 

@@ -174,8 +174,10 @@ Presenter 不参与：
 3. 每行使用与现有 `StationWareFlow` 接近的壳样式
 4. 进度条主体显示 `currentCount / targetCount`
 5. `recommendedCount` 继续按原 volume 行接近的数字风格显示
-6. 展开区按两列显示 `targetCount / recommendedCount` 的时间结果，精度到分
-7. 渲染 cargo-only bottom section
+6. 展开区按 `Summary / Boundary / Downstream` 三段显示
+7. 每段内部按两列显示 `targetCount / recommendedCount` 的时间结果，精度到分
+8. `Downstream` 默认折叠
+9. 渲染 cargo-only bottom section
 
 ### 比例尺
 
@@ -187,17 +189,25 @@ scaleMaxCount = max(currentCount, targetCount, recommendedCount)
 
 Store 负责直接产出每个 ware 的明细行：
 
-1. 净产量填满库存时间
-2. 总产量填满库存时间
-3. 净消耗耗尽库存时间
-4. 总消耗耗尽库存时间
-5. 各个下游模块纯消耗库存时间
+1. `Summary`
+   - 从当前库存开始净填满
+   - 从当前库存开始总填满
+   - 从当前库存开始净耗尽
+   - 从当前库存开始总耗尽
+2. `Boundary`
+   - 从空库存开始净填满
+   - 从空库存开始总填满
+   - 从满库存开始净耗尽
+   - 从满库存开始总耗尽
+3. `Downstream`
+   - 各个下游模块纯消耗库存时间
 
 明细行为：
 
-- 同一行内展示 `targetCount` 与 `recommendedCount` 两列
+- 每段内同一行展示 `targetCount` 与 `recommendedCount` 两列
 - 若某项两列都不存在，则整行省略
 - 下游项按 consumption contribution 逐项展开
+- `Downstream` 默认折叠
 
 ## Testing
 

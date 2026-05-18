@@ -49,7 +49,7 @@ export interface LiveVolumeAllocationItem {
   targetCount: number
   recommendedCount: number
   scaleMaxCount: number
-  detailRows: LiveVolumeAllocationDetailRow[]
+  detailSections: LiveVolumeAllocationDetailSection[]
 }
 
 export interface LiveVolumeAllocationGroup {
@@ -63,8 +63,16 @@ export interface LiveVolumeAllocationGroup {
 export interface LiveVolumeAllocationDetailRow {
   key: string
   label: string
+  ratePerHour?: number
+  currentMinutes?: number
   targetMinutes?: number
   recommendedMinutes?: number
+}
+
+export interface LiveVolumeAllocationDetailSection {
+  key: string
+  title: string
+  rows: LiveVolumeAllocationDetailRow[]
 }
 
 export interface LiveCargoOnlyItem {
