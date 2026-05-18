@@ -221,7 +221,7 @@ const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
         name: sector.name || sector.id,
         displayName,
         sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100),
-        resources: Array.isArray(sector.resources) ? sector.resources : [],
+        resources: mapStore.getSectorResources(sector.id),
         scalePerRadius: getSectorScalePerRadius(sector as any)
       }
     })

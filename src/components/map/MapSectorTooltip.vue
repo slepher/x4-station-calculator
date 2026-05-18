@@ -66,9 +66,8 @@ const resourceColorByWare = computed(() => {
 })
 
 const resources = computed(() => {
-  const sector = gameDataStore.maps?.sectors?.[props.sectorId]
-  if (!sector || !Array.isArray((sector as any).resources)) return []
-  const resourceList = (sector as any).resources as Array<{ ware: string; rating?: number; respawn?: number }>
+  const resourceList = mapStore.getSectorResources(props.sectorId) as Array<{ ware: string; rating?: number; respawn?: number }>
+  if (!resourceList.length) return []
   const sortedWareIds = sortResourcesByPriority(resourceList.map(r => r.ware))
   const resourceMap = Object.fromEntries(resourceList.map(r => [r.ware, r]))
   return sortedWareIds.map(wareId => {

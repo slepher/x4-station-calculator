@@ -14,6 +14,7 @@ import type {
   WorkforceConsumptionMap,
   X4Bullet,
   X4Map,
+  X4MapResources,
   X4RegionYield,
   X4Faction,
   X4Language,
@@ -70,6 +71,7 @@ export type GameDataFiles = {
   missiles: X4Missile[]
   bullets: X4Bullet[]
   maps: X4Map
+  mapResources: X4MapResources
   regionyields: X4RegionYield[]
   res: X4Res[]
   factions: X4Faction[]
@@ -113,7 +115,7 @@ export async function loadGameDataFiles(
     ships, shipRaces, shipTypes,
     equipments, equipmentTypes, slotTags,
     consumables, drones, missiles, bullets,
-    maps, regionyields, res, factions,
+    maps, mapResources, regionyields, res, factions,
     defaultMaxes, shipSlots, languages, dlcs
   ] = await Promise.all([
     loadJsonFromBundle<X4Ware[]>(folderName, 'wares.json', loaders),
@@ -131,6 +133,7 @@ export async function loadGameDataFiles(
     loadJsonFromBundle<X4Missile[]>(folderName, 'missiles.json', loaders),
     loadJsonFromBundle<X4Bullet[]>(folderName, 'bullets.json', loaders),
     loadJsonFromBundle<X4Map>(folderName, 'maps.json', loaders),
+    loadJsonFromBundle<X4MapResources>(folderName, 'map_resources.json', loaders),
     loadJsonFromBundle<X4RegionYield[]>(folderName, 'regionyields.json', loaders),
     loadJsonFromBundle<X4Res[]>(folderName, 'res.json', loaders),
     loadJsonFromBundle<X4Faction[]>(folderName, 'factions.json', loaders),
@@ -145,7 +148,7 @@ export async function loadGameDataFiles(
     ships, shipRaces, shipTypes,
     equipments, equipmentTypes, slotTags,
     consumables, drones, missiles, bullets,
-    maps, regionyields, res, factions,
+    maps, mapResources, regionyields, res, factions,
     defaultMaxes, shipSlots, languages, dlcs
   }
 }

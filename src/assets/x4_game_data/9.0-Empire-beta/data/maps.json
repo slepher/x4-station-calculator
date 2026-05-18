@@ -4124,8 +4124,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -4346,8 +4344,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -4507,8 +4503,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -4726,8 +4720,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_45_sector001_macro"
@@ -4865,8 +4857,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_16_sector001_macro"
@@ -5262,8 +5252,6 @@
       },
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -5385,8 +5373,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -5524,8 +5510,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -5699,8 +5683,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -5875,8 +5857,6 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -5991,8 +5971,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -6324,8 +6302,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_31_sector001_macro",
@@ -6635,8 +6611,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro",
         "cluster_20_sector001_macro"
@@ -6873,8 +6847,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro",
         "cluster_37_sector001_macro"
@@ -7115,8 +7087,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro",
@@ -7380,8 +7350,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro",
@@ -7656,8 +7624,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -7931,8 +7897,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro",
@@ -8204,8 +8168,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -8342,8 +8304,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -8584,8 +8544,6 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_17_sector001_macro": {
@@ -8765,8 +8723,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -9164,8 +9120,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro",
         "cluster_20_sector001_macro",
@@ -9400,8 +9354,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -9538,8 +9490,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -9800,8 +9750,6 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_21_sector001_macro": {
@@ -9981,8 +9929,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -10134,8 +10080,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -10471,8 +10415,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_37_sector001_macro"
@@ -10636,8 +10578,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_37_sector001_macro"
       ]
@@ -11075,8 +11015,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro",
@@ -11329,8 +11267,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro"
@@ -11479,8 +11415,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro"
@@ -11659,8 +11593,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -11819,8 +11751,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -12005,8 +11935,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -12299,8 +12227,6 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -12668,8 +12594,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_31_sector001_macro",
@@ -12811,8 +12735,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_31_sector001_macro",
@@ -12951,8 +12873,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -13124,8 +13044,6 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_32_sector001_macro": {
@@ -13488,8 +13406,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -13676,8 +13592,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -13922,8 +13836,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_34_sector001_macro": {
@@ -14209,8 +14121,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro",
         "cluster_45_sector001_macro"
@@ -14363,8 +14273,6 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_36_sector001_macro": {
@@ -14521,8 +14429,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro"
@@ -14762,8 +14668,6 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_38_sector001_macro": {
@@ -14909,8 +14813,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_37_sector001_macro"
       ]
@@ -15058,8 +14960,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_40_sector001_macro": {
@@ -15235,8 +15135,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -15389,8 +15287,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -15549,8 +15445,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -15695,8 +15589,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -15822,8 +15714,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -15971,8 +15861,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_45_sector001_macro"
       ]
@@ -16187,8 +16075,6 @@
         }
       ],
       "has_khaak_hive": true,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_46_sector001_macro": {
@@ -16323,8 +16209,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -16476,8 +16360,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -16642,8 +16524,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -16776,8 +16656,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_28_sector001_macro"
@@ -16898,8 +16776,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -17042,8 +16918,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_20_sector001_macro"
       ]
@@ -17233,8 +17107,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_37_sector001_macro"
       ]
@@ -17367,8 +17239,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_711_sector001_macro": {
@@ -17499,8 +17369,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_712_sector001_macro": {
@@ -17647,8 +17515,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_713_sector001_macro": {
@@ -17810,8 +17676,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_714_sector001_macro": {
@@ -17944,8 +17808,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_35_sector001_macro"
       ]
@@ -18171,8 +18033,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_720_sector001_macro": {
@@ -18338,8 +18198,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -18485,8 +18343,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_722_sector001_macro": {
@@ -18860,8 +18716,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_723_sector001_macro": {
@@ -19005,8 +18859,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_724_sector001_macro": {
@@ -19136,8 +18988,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_725_sector001_macro": {
@@ -19325,8 +19175,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_35_sector001_macro"
@@ -19475,8 +19323,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -19676,8 +19522,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -19840,8 +19684,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_403_sector001_macro": {
@@ -20013,8 +19855,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -20203,8 +20043,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_405_sector001_macro": {
@@ -20410,8 +20248,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_406_sector001_macro": {
@@ -20598,8 +20434,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_407_sector001_macro": {
@@ -20782,8 +20616,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -20953,8 +20785,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -21101,8 +20931,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -21272,8 +21100,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -21458,8 +21284,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -21637,8 +21461,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_412_sector001_macro": {
@@ -21799,8 +21621,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_413_sector001_macro": {
@@ -21935,8 +21755,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_414_sector001_macro": {
@@ -22082,8 +21900,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_415_sector001_macro": {
@@ -22259,8 +22075,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_416_sector001_macro": {
@@ -22428,8 +22242,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_416_sector002_macro": {
@@ -22612,8 +22424,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_417_sector001_macro": {
@@ -22759,8 +22569,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_418_sector001_macro": {
@@ -22943,8 +22751,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_419_sector001_macro": {
@@ -23114,8 +22920,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_420_sector001_macro": {
@@ -23283,8 +23087,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -23465,8 +23267,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -23629,8 +23429,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -23800,8 +23598,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -23948,8 +23744,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -24123,8 +23917,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_424_sector002_macro": {
@@ -24299,8 +24091,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_425_sector001_macro": {
@@ -24417,8 +24207,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_100_sector001_macro": {
@@ -24573,8 +24361,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -24748,8 +24534,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_102_sector001_macro": {
@@ -24904,8 +24688,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_104_sector001_macro": {
@@ -25072,8 +24854,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_104_sector002_macro": {
@@ -25254,8 +25034,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_106_sector001_macro": {
@@ -25364,8 +25142,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_107_sector001_macro": {
@@ -25524,8 +25300,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_108_sector001_macro": {
@@ -25726,8 +25500,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_108_sector002_macro": {
@@ -25870,8 +25642,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_108_sector003_macro": {
@@ -26014,8 +25784,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_109_sector001_macro": {
@@ -26139,8 +25907,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_110_sector001_macro": {
@@ -26308,8 +26074,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_111_sector001_macro": {
@@ -26455,8 +26219,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_112_sector001_macro": {
@@ -26647,8 +26409,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -26796,8 +26556,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -26971,8 +26729,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -27157,8 +26913,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -27367,8 +27121,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -27503,8 +27255,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_500_sector001_macro": {
@@ -27699,8 +27449,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -27856,8 +27604,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -28027,8 +27773,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -28230,8 +27974,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro",
         "cluster_45_sector001_macro"
@@ -28413,8 +28155,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -28588,8 +28328,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -28712,8 +28450,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_601_sector001_macro": {
@@ -28844,8 +28580,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -29009,8 +28743,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -29185,8 +28917,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_31_sector001_macro"
       ]
@@ -29335,8 +29065,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_28_sector001_macro"
       ]
@@ -29615,8 +29343,6 @@
       },
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_606_sector001_macro": {
@@ -29892,8 +29618,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_606_sector002_macro": {
@@ -30284,8 +30008,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_606_sector003_macro": {
@@ -30556,8 +30278,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_607_sector001_macro": {
@@ -30730,8 +30450,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_608_sector001_macro": {
@@ -31003,8 +30721,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_609_sector001_macro": {
@@ -31280,8 +30996,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_701_sector001_macro": {
@@ -31438,8 +31152,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -31611,8 +31323,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_16_sector001_macro"
       ]
@@ -31786,8 +31496,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_704_sector001_macro": {
@@ -31970,8 +31678,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_45_sector001_macro"
       ]
@@ -32128,8 +31834,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_706_sector001_macro": {
@@ -32270,8 +31974,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]
@@ -32408,8 +32110,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_730_sector001_macro": {
@@ -32542,8 +32242,6 @@
         }
       ],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": []
     },
     "cluster_740_sector001_macro": {
@@ -32662,8 +32360,6 @@
       "highways": {},
       "stations": [],
       "has_khaak_hive": false,
-      "regions": [],
-      "resources": [],
       "khaak_hive_sources": [
         "cluster_06_sector002_macro"
       ]

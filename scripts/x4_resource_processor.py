@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 """X4 Resource Processor - Step 2 资源计算入口脚本。
 
-读取已生成的地图 JSON，执行资源计算并回填产量字段。
+读取已生成的地图 JSON，执行资源计算并输出资源副文件。
 
 输出目录自动从输入路径推断：
-- resourceareas.json、maps.json（更新）→ maps_json 所在目录
+- map_resources.json、resourceareas.json → maps_json 所在目录
 - resourcearea_blocks.json → 固定 analysis/resources/
 
 用法:
@@ -14,7 +14,7 @@
     --all-sectors
 
   # 处理所有星区（9.0+ 版本）
-  # 9.0+ 从 JSON 文件加载：regionyield_definitions.json 和 maps.json 的 sector.regions
+  # 9.0+ 从 JSON 文件加载：regionyield_definitions.json 和 maps.json / mapdefaults 的资源定义
   python scripts/x4_resource_processor.py \
     --version 9.0
 
@@ -33,6 +33,7 @@ project_root = Path(__file__).parent.parent
 sys.path.insert(0, str(project_root / "scripts"))
 
 from processor.path_utils import build_output_paths
+from processor import config as processor_config
 from processor.step2_resource.service import process_resources_for_version
 from processor.versioning import load_version_config, merge_version_config
 
@@ -48,6 +49,15 @@ def get_folder_name(version: str) -> str:
         if str(v.get("version")) == version:
             return str(v.get("folder_name", version))
     return version
+
+
+def get_effective_version_config(version: str) -> dict:
+    """获取指定版本的完整运行时配置。"""
+    config = load_version_config()
+    for version_item in config.get("versions", []):
+        if str(version_item.get("version")) == version:
+            return merge_version_config(config, version_item)
+    raise ValueError(f"Version config not found: {version}")
 
 
 def main():
@@ -95,10 +105,14 @@ def main():
     # 使用统一入口构建默认路径
     version = args.version
     folder_name = get_folder_name(version)
+    effective_config = get_effective_version_config(version)
+    processor_config.apply_runtime_config(effective_config)
     default_paths = build_output_paths(PROCESSED_ASSETS_DIR, folder_name)
 
     maps_json_path = Path(args.maps_json) if args.maps_json else Path(default_paths["maps"])
     regions_json_path = Path(args.regions_json) if args.regions_json else Path(default_paths["regions"])
+    regionyields_xml_path = Path(args.regionyields_xml) if args.regionyields_xml else Path(processor_config.DEFAULT_REGIONYIELDS_XML)
+    mapdefaults_xml_path = Path(args.mapdefaults_xml) if args.mapdefaults_xml else Path(processor_config.DEFAULT_MAPDEFAULTS)
 
     # 确定处理的星区：指定 sector 则处理单个，否则处理所有
     sector_id = args.sector if args.sector else None
@@ -109,8 +123,8 @@ def main():
     result = process_resources_for_version(
         version=version,
         maps_json_path=maps_json_path,
-        regionyields_xml_path=Path(args.regionyields_xml) if args.regionyields_xml else None,
-        mapdefaults_xml_path=Path(args.mapdefaults_xml) if args.mapdefaults_xml else None,
+        regionyields_xml_path=regionyields_xml_path,
+        mapdefaults_xml_path=mapdefaults_xml_path,
         regions_json_path=regions_json_path,
         sector_id=sector_id,
         force_recalc_per_block=getattr(args, 'force_recalc_per_block', False),

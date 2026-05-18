@@ -77,6 +77,11 @@ def write_regionyield_definitions(definitions: List[dict], output_path: str) -> 
     _write_json(definitions, output_path)
 
 
+def write_map_resources(payload: dict, output_path: str) -> None:
+    """写入地图资源副文件 (map_resources.json)。"""
+    _write_json(payload, output_path)
+
+
 def write_map(payload: dict, output_path: str) -> None:
     """
     写入地图主文件 (maps.json)。

@@ -28,15 +28,19 @@ describe('useGameData bundled loader', () => {
       [buildGameDataLoaderKey('8.0-Diplomacy', 'missiles.json')]: makeLoader([]),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'bullets.json')]: makeLoader([]),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'maps.json')]: makeLoader({ clusters: {} }),
+      [buildGameDataLoaderKey('8.0-Diplomacy', 'map_resources.json')]: makeLoader({ version: '8.0', resource_model: 'regions', sectors: {}, regionyield_definitions: [] }),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'regionyields.json')]: makeLoader([]),
+      [buildGameDataLoaderKey('8.0-Diplomacy', 'res.json')]: makeLoader([]),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'factions.json')]: makeLoader([]),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'default_maxes.json')]: makeLoader({}),
       [buildGameDataLoaderKey('8.0-Diplomacy', 'ship_slots.json')]: makeLoader({}),
-      [buildGameDataLoaderKey('8.0-Diplomacy', 'languages.json')]: makeLoader([])
+      [buildGameDataLoaderKey('8.0-Diplomacy', 'languages.json')]: makeLoader([]),
+      [buildGameDataLoaderKey('8.0-Diplomacy', 'dlcs.json')]: makeLoader([])
     })
 
     expect(data.wares).toEqual([{ id: 'energycells' }])
     expect(data.maps).toEqual({ clusters: {} })
+    expect(data.mapResources.resource_model).toBe('regions')
   })
 
   it('缺失版本文件时抛出可定位错误', async () => {
