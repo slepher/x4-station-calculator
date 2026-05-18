@@ -112,23 +112,23 @@ const downstreamOpen = ref(false)
           </button>
 
           <div v-if="section.key !== 'downstream' || downstreamOpen">
-            <div class="detail-head">
+            <div :class="['detail-head', section.includeCurrentColumn ? 'detail-head-with-current' : 'detail-head-no-current']">
               <span class="detail-head-label">{{ t('wareflow.allocation_detail_metric') }}</span>
               <span class="detail-head-col">{{ t('wareflow.allocation_rate_column') }}</span>
-              <span class="detail-head-col">{{ t('wareflow.allocation_current_column') }}</span>
+              <span v-if="section.includeCurrentColumn" class="detail-head-col">{{ t('wareflow.allocation_current_column') }}</span>
               <span class="detail-head-col">{{ t('wareflow.allocation_target_column') }}</span>
               <span class="detail-head-col">{{ t('wareflow.allocation_recommended_column') }}</span>
             </div>
             <div
               v-for="row in section.rows"
               :key="row.key"
-              class="list-item detail-row"
+              :class="['list-item detail-row', section.includeCurrentColumn ? 'detail-row-with-current' : 'detail-row-no-current']"
             >
               <span class="detail-label">{{ row.label }}</span>
               <span class="detail-value">
                 <template v-if="row.ratePerHour !== undefined">{{ formatRate(row.ratePerHour) }}</template>
               </span>
-              <span class="detail-value">
+              <span v-if="section.includeCurrentColumn" class="detail-value">
                 <template v-if="row.currentMinutes !== undefined">{{ formatMinutes(row.currentMinutes) }}</template>
               </span>
               <span class="detail-value">
@@ -180,11 +180,15 @@ const downstreamOpen = ref(false)
 .detail-section-toggle { @apply w-full flex items-center justify-between text-[11px] font-semibold uppercase tracking-wide text-slate-300 mb-1.5; }
 .detail-section-toggle-arrow { @apply text-slate-500 transition-transform duration-200; }
 .detail-section-toggle-arrow-open { @apply rotate-90 text-slate-300; }
-.detail-head { @apply grid gap-3 items-center pb-1.5 mb-1 border-b border-slate-700/30 text-slate-400 uppercase tracking-wide; grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
+.detail-head { @apply grid gap-3 items-center pb-1.5 mb-1 border-b border-slate-700/30 text-slate-400 uppercase tracking-wide; }
+.detail-head-with-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
+.detail-head-no-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
 .detail-head-label { @apply text-left; }
 .detail-head-col { @apply text-right; }
 .list-item { @apply py-1.5 border-b border-slate-700/20 last:border-0; }
-.detail-row { @apply grid gap-3 items-center; grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
+.detail-row { @apply grid gap-3 items-center; }
+.detail-row-with-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
+.detail-row-no-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
 .detail-label { @apply text-slate-300 truncate; }
 .detail-value { @apply text-right text-slate-200 font-mono; }
 

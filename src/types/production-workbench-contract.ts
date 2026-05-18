@@ -72,6 +72,7 @@ export interface LiveVolumeAllocationDetailRow {
 export interface LiveVolumeAllocationDetailSection {
   key: string
   title: string
+  includeCurrentColumn: boolean
   rows: LiveVolumeAllocationDetailRow[]
 }
 

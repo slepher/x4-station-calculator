@@ -1591,10 +1591,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   function buildAllocationDetailSection(
     key: string,
     title: string,
+    includeCurrentColumn: boolean,
     rows: LiveVolumeAllocationDetailRow[]
   ): LiveVolumeAllocationDetailSection | null {
     if (rows.length === 0) return null
-    return { key, title, rows }
+    return { key, title, includeCurrentColumn, rows }
   }
 
   function buildAllocationDetailSections(
@@ -1610,7 +1611,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const totalProductionRate = flow.production > 0 ? flow.production : 0
     const totalConsumptionRate = flow.consumption > 0 ? flow.consumption : 0
 
-    const summaryRows = [
+    const fillCurrentRows = [
       {
         key: 'current-net-fill',
         label: i18n.global.t('wareflow.allocation_current_net_fill_time'),
@@ -1624,23 +1625,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         ratePerHour: totalProductionRate,
         targetMinutes: computeDeltaFillMinutes(targetCount, currentCount, totalProductionRate),
         recommendedMinutes: computeDeltaFillMinutes(recommendedCount, currentCount, totalProductionRate)
-      },
-      {
-        key: 'current-net-drain',
-        label: i18n.global.t('wareflow.allocation_current_net_drain_time'),
-        ratePerHour: netConsumptionRate,
-        currentMinutes: computeStockConsumeMinutes(currentCount, netConsumptionRate)
-      },
-      {
-        key: 'current-gross-drain',
-        label: i18n.global.t('wareflow.allocation_current_gross_drain_time'),
-        ratePerHour: totalConsumptionRate,
-        currentMinutes: computeStockConsumeMinutes(currentCount, totalConsumptionRate)
       }
     ] as LiveVolumeAllocationDetailRow[]
-    const visibleSummaryRows = summaryRows.filter((row) => row.currentMinutes !== undefined || row.targetMinutes !== undefined || row.recommendedMinutes !== undefined)
+    const visibleFillCurrentRows = fillCurrentRows.filter((row) => row.currentMinutes !== undefined || row.targetMinutes !== undefined || row.recommendedMinutes !== undefined)
 
-    const boundaryRows = [
+    const fillEmptyRows = [
       {
         key: 'empty-net-fill',
         label: i18n.global.t('wareflow.allocation_empty_net_fill_time'),
@@ -1654,37 +1643,53 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         ratePerHour: totalProductionRate,
         targetMinutes: computeDeltaFillMinutes(targetCount, 0, totalProductionRate),
         recommendedMinutes: computeDeltaFillMinutes(recommendedCount, 0, totalProductionRate)
-      },
+      }
+    ] as LiveVolumeAllocationDetailRow[]
+    const visibleFillEmptyRows = fillEmptyRows.filter((row) => row.currentMinutes !== undefined || row.targetMinutes !== undefined || row.recommendedMinutes !== undefined)
+
+    const drainRows = [
       {
-        key: 'full-net-drain',
-        label: i18n.global.t('wareflow.allocation_full_net_drain_time'),
+        key: 'current-net-drain',
+        label: i18n.global.t('wareflow.allocation_current_net_drain_time'),
         ratePerHour: netConsumptionRate,
+        currentMinutes: computeStockConsumeMinutes(currentCount, netConsumptionRate),
         targetMinutes: computeStockConsumeMinutes(targetCount, netConsumptionRate),
         recommendedMinutes: computeStockConsumeMinutes(recommendedCount, netConsumptionRate)
       },
       {
-        key: 'full-gross-drain',
-        label: i18n.global.t('wareflow.allocation_full_gross_drain_time'),
+        key: 'current-gross-drain',
+        label: i18n.global.t('wareflow.allocation_current_gross_drain_time'),
         ratePerHour: totalConsumptionRate,
+        currentMinutes: computeStockConsumeMinutes(currentCount, totalConsumptionRate),
         targetMinutes: computeStockConsumeMinutes(targetCount, totalConsumptionRate),
         recommendedMinutes: computeStockConsumeMinutes(recommendedCount, totalConsumptionRate)
       }
     ] as LiveVolumeAllocationDetailRow[]
-    const visibleBoundaryRows = boundaryRows.filter((row) => row.currentMinutes !== undefined || row.targetMinutes !== undefined || row.recommendedMinutes !== undefined)
+    const visibleDrainRows = drainRows.filter((row) => row.currentMinutes !== undefined || row.targetMinutes !== undefined || row.recommendedMinutes !== undefined)
 
-    const summarySection = buildAllocationDetailSection(
-      'summary',
-      i18n.global.t('wareflow.allocation_section_summary'),
-      visibleSummaryRows
+    const fillCurrentSection = buildAllocationDetailSection(
+      'fill-current',
+      i18n.global.t('wareflow.allocation_section_fill_current'),
+      false,
+      visibleFillCurrentRows
     )
-    if (summarySection) sections.push(summarySection)
+    if (fillCurrentSection) sections.push(fillCurrentSection)
 
-    const boundarySection = buildAllocationDetailSection(
-      'boundary',
-      i18n.global.t('wareflow.allocation_section_boundary'),
-      visibleBoundaryRows
+    const fillEmptySection = buildAllocationDetailSection(
+      'fill-empty',
+      i18n.global.t('wareflow.allocation_section_fill_empty'),
+      false,
+      visibleFillEmptyRows
     )
-    if (boundarySection) sections.push(boundarySection)
+    if (fillEmptySection) sections.push(fillEmptySection)
+
+    const drainSection = buildAllocationDetailSection(
+      'drain',
+      i18n.global.t('wareflow.allocation_section_drain'),
+      true,
+      visibleDrainRows
+    )
+    if (drainSection) sections.push(drainSection)
 
     const downstreamRows: LiveVolumeAllocationDetailRow[] = []
 
@@ -1694,11 +1699,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       const pureConsumptionRate = Math.abs(contribution.amount)
       const localizedModule = gameData.localizedModulesMap[contribution.id]
       const moduleInfo = gameData.modulesMap[contribution.id]
-      const label = `${i18n.global.t('wareflow.allocation_downstream_prefix')}: ${localizedModule?.localeName || moduleInfo?.name || contribution.id}`
+      const label = localizedModule?.localeName || moduleInfo?.name || contribution.id
       const row: LiveVolumeAllocationDetailRow = {
         key: `downstream-${contribution.id}-${index}`,
         label,
         ratePerHour: pureConsumptionRate,
+        currentMinutes: computeStockConsumeMinutes(currentCount, pureConsumptionRate),
         targetMinutes: computeStockConsumeMinutes(targetCount, pureConsumptionRate),
         recommendedMinutes: computeStockConsumeMinutes(recommendedCount, pureConsumptionRate)
       }
@@ -1709,6 +1715,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const downstreamSection = buildAllocationDetailSection(
       'downstream',
       i18n.global.t('wareflow.allocation_section_downstream'),
+      true,
       downstreamRows
     )
     if (downstreamSection) sections.push(downstreamSection)
