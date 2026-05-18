@@ -874,13 +874,14 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
   const context = computed<ProductionContextState>(() => {
     const sectorId = activeStation.value?.sectorId
     const sectorData = sectorId ? gameData.maps.sectors[sectorId] : null
+    const sectorResources = sectorId ? gameData.mapResources.sectors[sectorId]?.resources || [] : []
     return {
       stationCode: '',
       sectorId: sectorId || null,
       sectorName: sectorData?.name || '',
       sectorNameId: sectorData?.nameId,
       position: undefined,
-      sectorResources: (sectorData?.resources || []).map(r => r.ware),
+      sectorResources: sectorResources.map((resource) => resource.ware),
       sectorSunlight: Math.round((sectorData?.area?.sunlight ?? 1) * 100),
       hasBinding: !!activeStation.value,
       hasArchive: false

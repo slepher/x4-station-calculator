@@ -501,12 +501,6 @@ def generate_map_data(
                     "sector_id": sector_key,
                 })
 
-                # 9.0+ 填充 sector.regions（仅 ref 和 amount）
-                sectors[sector_key].setdefault("regions", []).append({
-                    "ref": ref,
-                    "amount": amount,
-                })
-
         # 9.0+ 不在分支内聚合，等分支结束后统一处理
     else:
         # 8.0- 使用旧版 region 处理逻辑
@@ -672,24 +666,7 @@ def generate_map_data(
                 area_item["sector_id"] = sector_id
                 resourceareas_rows.append(area_item)
 
-                # 8.0 填充 sector.regions（含 ref, position, rotation, boundary, volume_km3）
-                region_entry = {
-                    "ref": area_item.get("ref", ""),
-                    "position": area_item.get("position", {}),
-                }
-                if area_item.get("rotation"):
-                    region_entry["rotation"] = area_item["rotation"]
-                if area_item.get("boundary"):
-                    region_entry["boundary"] = area_item["boundary"]
-                if area_item.get("total_volume_km3"):
-                    region_entry["volume_km3"] = area_item["total_volume_km3"]
-                sectors[sector_id].setdefault("regions", []).append(region_entry)
-
-    # Step 1 不再聚合 sector.resources，由 Step 2 回填
-    # 初始化 sector.regions 为空数组（Step 2 可能会更新）
-    for sector_id in sectors.keys():
-        sectors[sector_id].setdefault("regions", [])
-        sectors[sector_id].setdefault("resources", [])
+    # Step 1 不再向 maps.json 写入任何资源相关字段。
 
     for zone_macro_node in zones_root.findall("./macro[@class='zone']"):
             zone_macro = zone_macro_node.get("name")
@@ -1062,10 +1039,6 @@ def generate_map_data(
         nested_sector["has_khaak_hive"] = sector_id in sectors_with_khaak_hive
         if "khaak_hive_sources" in sector:
             nested_sector["khaak_hive_sources"] = sector.get("khaak_hive_sources")
-        if "regions" in sector:
-            nested_sector["regions"] = sector.get("regions")
-        if "resources" in sector:
-            nested_sector["resources"] = sector.get("resources")
         nested_clusters[cluster_id]["sectors"][sector_id] = nested_sector
 
     for zone_id, zone in zones.items():

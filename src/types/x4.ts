@@ -974,13 +974,6 @@ export interface X4MapSector {
     target_cluster_id?: string
     raw_local_pos?: { x?: number; y?: number; z?: number; sx?: number; sy?: number }
   }>
-  resources?: Array<{
-    ware: string
-    yield?: string
-    level?: number
-    respawn?: number
-    rating?: number
-  }>
   has_khaak_hive?: boolean
   khaak_hive_sources?: string[]
 }
@@ -1011,6 +1004,67 @@ export interface X4MapCluster {
 export interface X4Map {
   clusters: Record<string, X4MapCluster>
   sectors: Record<string, X4MapSector>
+}
+
+export interface X4MapSectorResourceEntry {
+  ware: string
+  reserve?: number
+  respawn?: number
+  rating?: number
+  yield?: string
+  level?: number
+}
+
+export interface X4MapSectorRegionEntry {
+  ref: string
+  amount?: number
+  position?: Record<string, unknown>
+  rotation?: Record<string, unknown>
+  boundary?: Record<string, unknown>
+  volume_km3?: number
+}
+
+export interface X4MapSectorResourceArea {
+  ref: string
+  amount?: number
+  position?: Record<string, unknown>
+  boundary?: Record<string, unknown>
+  lateral_factor?: number
+  radial_factor?: number
+  falloff_factor?: number
+  solid_volume_km3?: number
+  gas_volume_km3?: number
+  resources?: Array<Record<string, unknown>>
+}
+
+export interface X4MapSectorResources {
+  regions: X4MapSectorRegionEntry[]
+  resources: X4MapSectorResourceEntry[]
+  areas: X4MapSectorResourceArea[]
+}
+
+export interface X4MapRegionYieldDefinition {
+  id: string
+  ware: string
+  tag: string
+  size: string
+  radius: number
+  yield: number
+  respawnDelay: number
+  rating: number
+  sustainableYieldPerHour: number
+  objectyieldfactor?: number
+  gatherspeedfactor?: number
+  scaneffect?: string
+  scaneffectintensity?: number
+  scaneffectcolor?: string
+}
+
+export interface X4MapResources {
+  version: string
+  resource_model: string
+  sectors: Record<string, X4MapSectorResources>
+  regionyield_definitions: X4MapRegionYieldDefinition[]
 }
 
 // --- Region Yield Types ---

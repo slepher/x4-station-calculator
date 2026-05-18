@@ -483,10 +483,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const sectorMacro = record.sectorMacro
     
     const sector = gameData.maps?.sectors?.[sectorMacro]
+    const sectorResources = gameData.mapResources.sectors[sectorMacro]?.resources || []
     const sectorData = {
       name: sector?.name || sectorMacro,
       nameId: sector?.nameId,
-      resources: (sector?.resources || []).map(r => r.ware),
+      resources: sectorResources.map((resource) => resource.ware),
       sunlight: Math.round((sector?.area?.sunlight ?? 1) * 100)
     }
     
@@ -621,10 +622,11 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       const sectorMacro = binding.sectorMacro
       if (sectorMacro) {
         const sectorData = gameData.maps.sectors[sectorMacro]
+        const mapSectorResources = gameData.mapResources.sectors[sectorMacro]?.resources || []
         if (sectorData) {
           sectorName = sectorData.name || ''
           sectorNameId = sectorData.nameId
-          sectorResources = (sectorData.resources || []).map(r => r.ware)
+          sectorResources = mapSectorResources.map((resource) => resource.ware)
           sectorSunlight = Math.round((sectorData.area?.sunlight ?? 1) * 100)
         }
       }
