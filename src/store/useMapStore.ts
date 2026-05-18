@@ -3,6 +3,7 @@ import { computed, ref } from 'vue'
 import { useGameDataStore } from './useGameDataStore'
 import { useI18n } from 'vue-i18n'
 import type { X4MapSector } from '@/types/x4'
+import type { X4MapSectorResourceEntry, X4MapSectorResources } from '@/types/x4'
 import type { ResolvedMapSector } from '@/components/map/mapSectorMacro'
 import { getSectorViewportTransform } from '@/components/map/utils/coordinates'
 import type { Cluster, Sector, Vec2 } from '@/components/map/types'
@@ -106,6 +107,10 @@ export const useMapStore = defineStore('map', () => {
     return out
   })
 
+  const sectorResourcesById = computed<Record<string, X4MapSectorResources>>(() => (
+    gameDataStore.mapResources?.sectors || {}
+  ))
+
   function normalizeMacro(value: string | null | undefined): string {
     return (value || '').trim().toLowerCase()
   }
@@ -143,6 +148,18 @@ export const useMapStore = defineStore('map', () => {
 
   function getSectorInfo(sectorId: string): SectorInfo | undefined {
     return sectorsById.value[sectorId]
+  }
+
+  function getSectorResources(sectorId: string): X4MapSectorResourceEntry[] {
+    return sectorResourcesById.value[normalizeMacro(sectorId)]?.resources || []
+  }
+
+  function getSectorResourceDetails(sectorId: string): X4MapSectorResources {
+    return sectorResourcesById.value[normalizeMacro(sectorId)] || {
+      regions: [],
+      resources: [],
+      areas: []
+    }
   }
 
   function getSectorDisplayName(sectorId: string): string {
@@ -200,8 +217,11 @@ export const useMapStore = defineStore('map', () => {
   return {
     initialize,
     sectorsById,
+    sectorResourcesById,
     resolveSectorByMacro,
     getSectorInfo,
+    getSectorResources,
+    getSectorResourceDetails,
     getSectorDisplayName,
     viewportState,
     THREE_CLUSTER_HEIGHT,

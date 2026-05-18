@@ -38,6 +38,7 @@ from processor.step2_resource.modern_processor import (
     build_resourceareas_json_payload,
 )
 from processor.step2_resource.save_replay import calculate_save_resources_all
+from processor.shared.output_manager import write_map_resources
 
 
 def _iter_maps_sectors(maps_data: dict):
@@ -72,6 +73,113 @@ def _iter_maps_sectors(maps_data: dict):
 def _normalize_sector_id(sector_id: str) -> str:
     """统一 sector_id 比较键。"""
     return sector_id.lower() if isinstance(sector_id, str) else ""
+
+
+def _has_any_sector_regions(sector_resource_areas: Dict[str, List[dict]]) -> bool:
+    """判断是否存在至少一个带引用的 sector.regions 集合。"""
+    for areas in sector_resource_areas.values():
+        if areas:
+            return True
+    return False
+
+
+def _iter_sector_ids(maps_data: dict) -> List[str]:
+    """提取 maps.json 中全部 sector id。"""
+    sector_ids: List[str] = []
+    for sector_macro, sector in _iter_maps_sectors(maps_data):
+        if isinstance(sector, dict):
+            sector_ids.append(str(sector.get("id", sector_macro)))
+    return sector_ids
+
+
+def _build_map_resources_payload(
+    version: str,
+    resource_model: str,
+    sector_ids: List[str],
+    sector_regions: Dict[str, List[dict]],
+    sector_resources: Dict[str, List[dict]],
+    areas_by_sector: Dict[str, List[dict]],
+    regionyield_definitions: Optional[List[dict]] = None,
+) -> dict:
+    """组装统一的 map_resources.json 结构。"""
+    normalized_sector_ids = sorted({_normalize_sector_id(sector_id) for sector_id in sector_ids if sector_id})
+    sectors_payload: Dict[str, dict] = {}
+
+    for sector_id in normalized_sector_ids:
+        sectors_payload[sector_id] = {
+            "regions": sector_regions.get(sector_id, []),
+            "resources": sector_resources.get(sector_id, []),
+            "areas": areas_by_sector.get(sector_id, []),
+        }
+
+    for sector_id, areas in areas_by_sector.items():
+        sector_id_normalized = _normalize_sector_id(sector_id)
+        sectors_payload.setdefault(sector_id_normalized, {
+            "regions": sector_regions.get(sector_id_normalized, []),
+            "resources": sector_resources.get(sector_id_normalized, []),
+            "areas": [],
+        })
+        sectors_payload[sector_id_normalized]["areas"] = areas
+
+    return {
+        "version": version,
+        "resource_model": resource_model,
+        "sectors": sectors_payload,
+        "regionyield_definitions": regionyield_definitions or [],
+    }
+
+
+def _load_grouped_resourceareas(path: Path) -> Dict[str, List[dict]]:
+    """读取 resourceareas.json，兼容 list/dict 两种旧格式。"""
+    if not path.exists():
+        return {}
+
+    with path.open("r", encoding="utf-8") as f:
+        payload = json.load(f)
+
+    if isinstance(payload, dict):
+        if "sectors" in payload and isinstance(payload.get("sectors"), dict):
+            grouped = {}
+            for sector_id, sector_payload in payload["sectors"].items():
+                if isinstance(sector_payload, dict):
+                    grouped[_normalize_sector_id(sector_id)] = sector_payload.get("areas", [])
+            return grouped
+
+        if "regions" not in payload:
+            return {
+                _normalize_sector_id(sector_id): areas
+                for sector_id, areas in payload.items()
+                if isinstance(areas, list)
+            }
+
+    grouped: Dict[str, List[dict]] = {}
+    if isinstance(payload, list):
+        for entry in payload:
+            if not isinstance(entry, dict):
+                continue
+            sector_id = _normalize_sector_id(entry.get("sector_id", ""))
+            if not sector_id:
+                continue
+            grouped[sector_id] = entry.get("areas", [])
+    return grouped
+
+
+def _build_sector_regions_from_grouped_resourceareas(
+    grouped_resourceareas: Dict[str, List[dict]]
+) -> Dict[str, List[dict]]:
+    """从 grouped resourceareas 反推 sector.regions 结构。"""
+    sector_regions: Dict[str, List[dict]] = {}
+    for sector_id, areas in grouped_resourceareas.items():
+        sector_regions[_normalize_sector_id(sector_id)] = [
+            {
+                "ref": area.get("ref", ""),
+                "amount": area.get("amount", 1),
+                "position": area.get("position", {}),
+            }
+            for area in areas
+            if isinstance(area, dict) and area.get("ref")
+        ]
+    return sector_regions
 
 
 def process_resources_for_version(
@@ -327,13 +435,9 @@ def _process_90plus_resources(
     output_dir: Path,
     sector_id: Optional[str],
 ) -> Dict[str, object]:
-    """处理 9.0+ 版本资源。
-
-    9.0+ 版本从 JSON 文件读取数据：
-    - regionyield_definitions.json: definition 定义
-    - maps.json 的 sector.regions: resourceareas 引用
-    """
+    """处理 9.0+ 版本资源并输出 map_resources.json。"""
     regionyield_definitions_path = output_dir / "regionyield_definitions.json"
+    map_resources_path = output_dir / "map_resources.json"
 
     if not regionyield_definitions_path.exists():
         return {"status": "error", "message": f"Missing {regionyield_definitions_path}"}
@@ -348,47 +452,80 @@ def _process_90plus_resources(
     with maps_json_path.open("r", encoding="utf-8") as f:
         maps_data = json.load(f)
 
+    sector_ids = _iter_sector_ids(maps_data)
+
     # 3. 从 maps_data 提取 sector.regions
     sector_resource_areas = extract_sector_regions_from_maps_data(maps_data)
 
-    # 4. 过滤指定 sector
+    # 4. 发现旧空文件时，回退到原始 XML 重建 9.0 数据
+    if not definitions:
+        if regionyields_xml_path is None:
+            return {"status": "error", "message": f"Empty {regionyield_definitions_path} and missing regionyields XML"}
+        definitions = migrate_resourcearea_definitions(regionyields_xml_path)
+        with regionyield_definitions_path.open("w", encoding="utf-8") as f:
+            json.dump(list(definitions.values()), f, indent=2)
+
+    if not _has_any_sector_regions(sector_resource_areas):
+        if mapdefaults_xml_path is None:
+            return {"status": "error", "message": f"maps.json has empty sector.regions and missing mapdefaults XML"}
+        sector_resource_areas = migrate_sector_resourceareas(mapdefaults_xml_path)
+
+    # 5. 过滤指定 sector
     if sector_id:
-        sector_id_lower = sector_id.lower()
+        sector_id_lower = _normalize_sector_id(sector_id)
+        sector_ids = [
+            current_sector_id
+            for current_sector_id in sector_ids
+            if _normalize_sector_id(current_sector_id) == sector_id_lower
+        ]
         sector_resource_areas = {
             k: v for k, v in sector_resource_areas.items()
-            if k.lower() == sector_id_lower
+            if _normalize_sector_id(k) == sector_id_lower
         }
 
-    # 5. 构建 resourceareas.json
+    # 6. 构建 resourceareas.json
     resourceareas = build_resourceareas_json_payload(
         sector_resource_areas,
         definitions,
     )
 
-    # 6. 聚合 sector.resources
+    # 7. 聚合 sector.resources
     sector_summaries = build_sector_resource_summaries_from_resourceareas(
         sector_resource_areas,
         definitions,
     )
 
-    # 7. 写入输出文件
+    # 8. 写入输出文件
     output_dir.mkdir(parents=True, exist_ok=True)
 
     resourceareas_path = output_dir / "resourceareas.json"
     with resourceareas_path.open("w", encoding="utf-8") as f:
         json.dump(resourceareas, f, indent=2)
 
-    # 8. 更新 maps_data 的 sector.resources
-    for sector_macro, sector in _iter_maps_sectors(maps_data):
-        if not isinstance(sector, dict):
-            continue
-        sector_macro_lower = sector_macro.lower()
-        if sector_macro_lower in sector_summaries:
-            sector["resources"] = sector_summaries[sector_macro_lower]
-
-    # 9. 写回 maps.json
-    with maps_json_path.open("w", encoding="utf-8") as f:
-        json.dump(maps_data, f, indent=2)
+    grouped_areas = {
+        _normalize_sector_id(entry.get("sector_id", "")): entry.get("areas", [])
+        for entry in resourceareas
+        if isinstance(entry, dict) and entry.get("sector_id")
+    }
+    normalized_sector_regions = {
+        _normalize_sector_id(current_sector_id): areas
+        for current_sector_id, areas in sector_resource_areas.items()
+    }
+    normalized_sector_resources = {
+        _normalize_sector_id(current_sector_id): resources
+        for current_sector_id, resources in sector_summaries.items()
+    }
+    definitions_payload = list(definitions.values())
+    map_resources_payload = _build_map_resources_payload(
+        version="9.0",
+        resource_model="resourceareas",
+        sector_ids=sector_ids,
+        sector_regions=normalized_sector_regions,
+        sector_resources=normalized_sector_resources,
+        areas_by_sector=grouped_areas,
+        regionyield_definitions=definitions_payload,
+    )
+    write_map_resources(map_resources_payload, str(map_resources_path))
 
     return {
         "status": "success",
@@ -397,6 +534,7 @@ def _process_90plus_resources(
         "definitions_count": len(definitions),
         "output_files": [
             str(resourceareas_path),
+            str(map_resources_path),
         ],
     }
 
@@ -426,6 +564,10 @@ def _process_80_resources(
     # 读取 maps.json
     with maps_json_path.open("r", encoding="utf-8") as f:
         maps_data = json.load(f)
+
+    map_resources_path = output_dir / "map_resources.json"
+    resourceareas_path = output_dir / "resourceareas.json"
+    grouped_resourceareas_input = _load_grouped_resourceareas(resourceareas_path)
 
     # 索引 regions
     regions_by_id = {r.get("id"): r for r in regions_data if isinstance(r, dict)}
@@ -461,8 +603,20 @@ def _process_80_resources(
         except Exception:
             blocks_cache = {}
 
+    sector_ids = _iter_sector_ids(maps_data)
+    if sector_id:
+        sector_id_lower = _normalize_sector_id(sector_id)
+        sector_ids = [
+            current_sector_id
+            for current_sector_id in sector_ids
+            if _normalize_sector_id(current_sector_id) == sector_id_lower
+        ]
+
+    sector_regions_from_maps: Dict[str, List[dict]] = {}
+
     # 处理每个 sector
     resourceareas_rows: List[dict] = []
+    has_regions_from_maps = False
 
     for sector_macro, sector in _iter_maps_sectors(maps_data):
         if not isinstance(sector, dict):
@@ -476,8 +630,10 @@ def _process_80_resources(
 
         cluster_id = sector.get("cluster_id", "")
         sector_regions = sector.get("regions", [])
+        sector_regions_from_maps[_normalize_sector_id(current_sector_id)] = sector_regions
 
         for region_ref in sector_regions:
+            has_regions_from_maps = True
             ref = region_ref.get("ref", "")
             amount = region_ref.get("amount", 1)
             position = region_ref.get("position", {})
@@ -562,6 +718,18 @@ def _process_80_resources(
                 "sector_id": current_sector_id,
                 **area_data,
             })
+
+    if not has_regions_from_maps:
+        for grouped_sector_id, areas in grouped_resourceareas_input.items():
+            if sector_id and grouped_sector_id != _normalize_sector_id(sector_id):
+                continue
+            for area in areas:
+                if not isinstance(area, dict):
+                    continue
+                resourceareas_rows.append({
+                    "sector_id": grouped_sector_id,
+                    **area,
+                })
 
     # 聚合 sector.resources
     sector_resources = aggregate_sector_resources_from_resourceareas(resourceareas_rows)
@@ -732,8 +900,6 @@ def _process_80_resources(
     # 写入输出文件
     output_dir.mkdir(parents=True, exist_ok=True)
 
-    resourceareas_path = output_dir / "resourceareas.json"
-
     # 转换为 resourceareas.json 格式
     grouped: Dict[str, List[dict]] = {}
 
@@ -814,17 +980,6 @@ def _process_80_resources(
                 replay_respawn_val = entry.get("replay_respawn", 0)
                 entry["rating"] = calculate_rating(replay_respawn_val, ware)
 
-    # 更新 maps.json 中的 sector.resources
-    for sector_macro, sector in _iter_maps_sectors(maps_data):
-        if not isinstance(sector, dict):
-            continue
-        current_sector_id = sector.get("id", sector_macro)
-        if current_sector_id in sector_resources:
-            sector["resources"] = sector_resources[current_sector_id]
-
-    with maps_json_path.open("w", encoding="utf-8") as f:
-        json.dump(maps_data, f, indent=2)
-
     # 输出 resourcearea_blocks.json 到 analysis/resources/
     # 增量更新：需要保留其他 sector 的缓存数据
     if need_recalc and (sector_id or missing_sectors):
@@ -864,13 +1019,45 @@ def _process_80_resources(
     else:
         blocks_path = None
 
+    normalized_sector_resources = {
+        _normalize_sector_id(current_sector_id): resources
+        for current_sector_id, resources in sector_resources.items()
+    }
+    if has_regions_from_maps:
+        normalized_sector_regions = {
+            current_sector_id: areas
+            for current_sector_id, areas in sector_regions_from_maps.items()
+            if areas
+        }
+    else:
+        normalized_sector_regions = _build_sector_regions_from_grouped_resourceareas(grouped)
+
+    grouped_normalized = {
+        _normalize_sector_id(current_sector_id): areas
+        for current_sector_id, areas in grouped.items()
+    }
+    map_resources_payload = _build_map_resources_payload(
+        version="8.0",
+        resource_model="regions",
+        sector_ids=sector_ids,
+        sector_regions=normalized_sector_regions,
+        sector_resources=normalized_sector_resources,
+        areas_by_sector=grouped_normalized,
+    )
+    write_map_resources(map_resources_payload, str(map_resources_path))
+
     return {
         "status": "success",
         "resource_model": "regions",
         "sectors_processed": len(grouped),
         "output_files": [
-            str(resourceareas_path),
-            str(blocks_path) if blocks_path else None,
+            path
+            for path in [
+                str(resourceareas_path),
+                str(map_resources_path),
+                str(blocks_path) if blocks_path else None,
+            ]
+            if path
         ],
     }
 

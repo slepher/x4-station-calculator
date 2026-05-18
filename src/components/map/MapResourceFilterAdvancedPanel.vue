@@ -2,6 +2,7 @@
 import { computed, ref, watch, watchEffect, onMounted, onBeforeUnmount } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { useGameDataStore } from '@/store/useGameDataStore'
+import { useMapStore } from '@/store/useMapStore'
 import { useBlueprintProductionStore } from '@/store/useBlueprintProductionStore'
 import { useLogicFlowStore } from '@/store/useLogicFlowStore'
 import type { SavedFlowGroup } from '@/types/x4'
@@ -73,6 +74,7 @@ const emit = defineEmits<{
 
 const { t, locale } = useI18n()
 const gameData = useGameDataStore()
+const mapStore = useMapStore()
 const blueprintStore = useBlueprintProductionStore()
 const logicFlowStore = useLogicFlowStore()
 
@@ -382,7 +384,10 @@ const sectorDataById = computed<Record<string, { resources: SectorResourceEntry[
       const sector = sectors[sectorId] as any
       if (!sector) return
       out[sector.id] = {
-        resources: Array.isArray(sector.resources) ? sector.resources : [],
+        resources: mapStore.getSectorResources(sector.id).map((entry) => ({
+          ware: entry.ware,
+          rating: entry.rating || 0
+        })),
         sunlight: Math.round(Number(sector.area?.sunlight || 0) * 100)
       }
     })

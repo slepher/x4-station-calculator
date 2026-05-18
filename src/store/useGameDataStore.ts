@@ -17,6 +17,7 @@ import type {
   GameVersionStorage,
   X4Bullet,
   X4Map,
+  X4MapResources,
   X4RegionYield,
   X4Faction,
   X4Language,
@@ -94,6 +95,12 @@ export const useGameDataStore = defineStore('gameData', () => {
   const ships = ref<X4Ship[]>([])
   const equipments = ref<X4Equipment[]>([])
   const maps = ref<X4Map>({ clusters: {}, sectors: {} })
+  const mapResources = ref<X4MapResources>({
+    version: '',
+    resource_model: '',
+    sectors: {},
+    regionyield_definitions: []
+  })
   const regionyields = ref<X4RegionYield[]>([])
   const res = ref<X4Res[]>([])
   const factions = ref<X4Faction[]>([])
@@ -428,6 +435,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     localizedShipsMap.value = buildLocalizedShipsMap(data.ships, isEn, translateShip)
     equipments.value = data.equipments
     maps.value = data.maps
+    mapResources.value = data.mapResources
     regionyields.value = data.regionyields
     res.value = data.res
     factions.value = data.factions
@@ -559,6 +567,7 @@ export const useGameDataStore = defineStore('gameData', () => {
     ships,
     equipments,
     maps,
+    mapResources,
     regionyields,
     res,
     factions,
