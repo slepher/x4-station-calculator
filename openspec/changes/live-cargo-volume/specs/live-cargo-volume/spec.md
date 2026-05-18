@@ -72,6 +72,25 @@
 **当** Store 组装 live allocation 数据  
 **那么** `targetCount = 0`
 
+### Requirement: Live Production And Allocation Recommendation Must Use Actual Sector Sunlight
+
+live 模式下的产量计算，尤其是 `energycells` 的生产量，以及基于该产量继续推导出的 `recommendedCount` 和库存时间明细，MUST 使用 save station 真实所在 sector 的 sunlight。
+
+#### Scenario: Live energy cell production uses actual sector sunlight instead of stale plan setting
+
+**前提** 某个 save station 绑定到了一个已有 binding plan 的站点  
+**并且** binding plan 中保存的 `settings.sunlight = 100`  
+**并且** 该 save station 当前真实所在 sector 的 sunlight 为 `137`
+**当** 系统构建该站点的 live `productionFlows`
+**那么** `energycells` 的 live 产量按 `137` sunlight 计算  
+**并且** MUST NOT 继续按 `100` sunlight 计算
+
+#### Scenario: Allocation recommendation and detail timings inherit actual sector sunlight
+
+**前提** 某个 ware 的 `recommendedCount` 或填满/耗尽时间依赖 live `energycells` 产量
+**当** 系统渲染 live allocation 行与展开明细
+**那么** 这些结果继承真实 sector sunlight 修正后的 live 产量
+
 ### Requirement: Rust Parser Must Extract Player Station Trade Overrides
 
 Rust parser MUST 解析 player station 的 `overrides.max/buy/sell`，并将三组 ware amount 数据写入 `playerStations` 解析对象。

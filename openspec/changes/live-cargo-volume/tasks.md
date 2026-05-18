@@ -24,6 +24,7 @@
 - [x] 基于 `archiveStation.cargo` 构建 `currentCount` map
 - [x] 基于 `archiveStation.targetCounts` 构建 `targetCount` map
 - [x] 基于 `stationState.derivedProductionFlows` 或等价 live volume 来源提取 `recommendedCount`
+- [x] live save station 的 `settings.sunlight` 使用真实 sector sunlight，而不是遗留 binding plan sunlight
 - [x] 按现有 volume 规则分组为 `container / solid / liquid`
 - [x] 保持当前 volume 视图排序：`orderIndex` → `tier` → `wareId`
 - [x] 计算每个 item 的 `scaleMaxCount`
@@ -96,6 +97,8 @@
 - [x] 验证 `max / buy / sell` 三组均被解析
 - [x] 文件: `tests/unit/save-import/save-parser.spec.ts`
 - [x] 新增 `preserves player station overrides after post processing`
+- [x] 文件: `tests/unit/save-import/live-station-resolver.spec.ts`
+- [x] 新增 `uses actual sector sunlight for save-derived stations even when a binding plan exists`
 - [ ] 新增 `useLiveProductionStore` 的 allocation 数据单测
 - [ ] 新增 presenter 层相关单测
 - [ ] 新增 `live + volume` 组件渲染测试

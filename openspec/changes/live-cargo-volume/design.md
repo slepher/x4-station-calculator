@@ -28,6 +28,7 @@ Rust save parser
 2. `overrides.max` 是 live volume 目标分配的唯一目标来源。
 3. `overrides.buy` 与 `overrides.sell` 本次必须被解析并透传，但不在第一版 UI 中额外渲染。
 4. presenter 和 Vue 不做 fallback 链；缺失 target 时由 store 明确给 `0`。
+5. live 计算链中与产量相关的 sunlight 必须以 save station 当前真实所在 sector 为准；若 binding plan 中存在旧 `settings.sunlight`，不得继续覆盖 live 产量结果。
 
 ## Parser Design
 
@@ -90,6 +91,12 @@ targetCounts = overrides?.max
 
 ### live allocation 数据来源
 
+#### live flow sunlight
+
+live `productionFlows` 与其派生的 `recommendedCount`、展开时间明细，继续复用 `StationDerivedMap` 的生产流计算结果。
+
+但对于来自 save record 的 station seed，`settings.sunlight` 必须按该 record 的 `sectorMacro` 从地图 sector 数据重新写入，而不是直接沿用 binding plan 中的 `settings.sunlight`。
+
 #### currentCount
 
 来源：
@@ -121,6 +128,8 @@ targetCount = 0
 ```typescript
 DerivedProductionFlow.totalOccupiedCount
 ```
+
+其上游 `DerivedProductionFlow` 若涉及 `energycells` 产量，必须已经应用真实 sector sunlight。
 
 ### cargo-only section
 
@@ -218,4 +227,5 @@ Store 负责直接产出每个 ware 的明细行：
 
 1. Rust 单测验证 `player station overrides.max/buy/sell` 解析成功。
 2. TS 单测验证 `postProcessRustSaveArchive` 后 `playerStations.overrides` 保持不丢失。
-3. 后续 UI 落地时再补 `useLiveProductionStore` 和 `live + volume` 视图测试。
+3. 补充单测验证：当 save station 同时存在 binding plan 和真实 sector record 时，live 计算链使用真实 sector sunlight。
+4. 后续 UI 落地时再补 `useLiveProductionStore` 和 `live + volume` 视图测试。

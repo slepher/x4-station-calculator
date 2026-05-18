@@ -22,43 +22,45 @@
    - `recommendedCount`：系统基于现有 volume 推荐逻辑得到的推荐占用 count
 7. `reservation` 表示在途 ware，不计入当前存储量，也不用于 `currentCount`。
 8. `targetCount` 已进入最终数据链路，不再允许使用 `recommendedCount` 或 `currentCount` 作为替代来源。
+9. live 模式下所有与产量相关的计算，尤其是 `energycells` 的生产量和由其推导出的 `recommendedCount` / 仓储时间明细，必须使用站点真实所在星区的 sunlight，而不是 binding plan 中遗留的 setting sunlight。
 
 ### 列表与排序
 
-9. 分组保持现有 volume 视图结构：`container / solid / liquid`。
-10. 排序保持不变：组顺序和组内 ware 顺序均沿用当前 volume 视图已有顺序。
-11. 不新增按差值、告警、缺口等优先级重新排序。
+10. 分组保持现有 volume 视图结构：`container / solid / liquid`。
+11. 排序保持不变：组顺序和组内 ware 顺序均沿用当前 volume 视图已有顺序。
+12. 不新增按差值、告警、缺口等优先级重新排序。
 
 ### 行内展示
 
-12. 每个 ware 行保留现有 volume 行的主视觉层级，只新增库存进度条，不在面板顶部新增总览块。
-13. 行结构为：
+13. 每个 ware 行保留现有 volume 行的主视觉层级，只新增库存进度条，不在面板顶部新增总览块。
+14. 行结构为：
    - 左侧：ware 名称
    - 中间：allocation progress bar，条上显示 `currentCount / targetCount`
    - 右侧：`recommendedCount`，保持现有 volume 行接近的数字风格
-14. 进度条使用统一比例尺，基于 `max(currentCount, targetCount, recommendedCount)` 计算，并在所有 ware 行之间对齐。
-15. 点击展开后，明细采用分段结构，而不是单张大表横向堆叠。
-16. 展开区至少拆分为四张卡片：
+15. 进度条使用统一比例尺，基于 `max(currentCount, targetCount, recommendedCount)` 计算，并在所有 ware 行之间对齐。
+16. 点击展开后，明细采用分段结构，而不是单张大表横向堆叠。
+17. 展开区至少拆分为四张卡片：
    - `从当前库存开始填满`
    - `从空库存开始填满`
    - `消耗`
    - `下游产线`
-17. `填满` 两张卡片仅显示 `每小时量 / 设定 / 推荐` 三列，不显示 `当前` 列。
-18. `消耗` 与 `下游产线` 显示 `每小时量 / 当前 / 设定 / 推荐` 四列。
-19. `Downstream` 默认折叠，其余卡片默认展开。
-20. 任一时间项若不存在，则该项不显示。
-21. 对于不在当前生产和消耗列表中的 ware，在面板最下方单独列出，不混入前面的 allocation 分组。
-22. 该底部单列按 `tier` 降序、`ware.name` 升序排序。
-23. 该底部单列中的 ware 仅显示 `currentCount` 和 `targetCount`，不显示 `recommendedCount`。
-24. cargo-only ware 的 `targetCount` 仍直接来源于 save 中 `playerStation.overrides.max`；如果该 ware 没有 override，则其 `targetCount = 0`。
+18. `填满` 两张卡片仅显示 `每小时量 / 设定 / 推荐` 三列，不显示 `当前` 列。
+19. `消耗` 与 `下游产线` 显示 `每小时量 / 当前 / 设定 / 推荐` 四列。
+20. `Downstream` 默认折叠，其余卡片默认展开。
+21. 任一时间项若不存在，则该项不显示。
+22. 对于不在当前生产和消耗列表中的 ware，在面板最下方单独列出，不混入前面的 allocation 分组。
+23. 该底部单列按 `tier` 降序、`ware.name` 升序排序。
+24. 该底部单列中的 ware 仅显示 `currentCount` 和 `targetCount`，不显示 `recommendedCount`。
+25. cargo-only ware 的 `targetCount` 仍直接来源于 save 中 `playerStation.overrides.max`；如果该 ware 没有 override，则其 `targetCount = 0`。
 
 ### 分层职责
 
-25. Rust parser：负责解析 `playerStation.overrides.max/buy/sell`。
-26. Save post-process / type layer：负责把 `overrides` 透传为 `playerStations` 可消费字段。
-27. Store：负责基于 `archiveStation.cargo`、`archiveStation.overrides.max`、`derivedProductionFlows` 组装 live allocation 数据和四卡片式展开时间明细。
-28. Presenter：负责将 store 输出转换为新组件直接消费的 allocation view model，不在 Vue 中临时拼装。
-29. Vue：只负责按固定 contract 渲染新视图，不处理数据源回退逻辑。
+26. Rust parser：负责解析 `playerStation.overrides.max/buy/sell`。
+27. Save post-process / type layer：负责把 `overrides` 透传为 `playerStations` 可消费字段。
+28. live station resolver / store：负责把 save station 对应的真实 sector sunlight 写回 live 计算链。
+29. Store：负责基于 `archiveStation.cargo`、`archiveStation.overrides.max`、`derivedProductionFlows` 组装 live allocation 数据和四卡片式展开时间明细。
+30. Presenter：负责将 store 输出转换为新组件直接消费的 allocation view model，不在 Vue 中临时拼装。
+31. Vue：只负责按固定 contract 渲染新视图，不处理数据源回退逻辑。
 
 ## 边界
 
@@ -96,7 +98,8 @@
 9. 点开某个 ware 后，明细按四张卡片显示：两张填满卡片、一个消耗卡片、一个下游卡片；其中填满卡片显示 `每小时量 / 设定 / 推荐`，消耗与下游卡片显示 `每小时量 / 当前 / 设定 / 推荐`，精度到分，不存在的项不显示。
 10. 该底部单列中的 ware 仅显示 `currentCount` 与 `targetCount`，不显示 `recommendedCount`。
 11. Rust parser 输出的 `playerStations` 包含 `overrides.max/buy/sell`。
-12. `npm run build` 无编译错误。
+12. live 模式下 `energycells` 的产量以及由其推导出的 `recommendedCount`、填满/耗尽时间，使用站点真实星区 sunlight 计算。
+13. `npm run build` 无编译错误。
 
 ## 未决项
 
