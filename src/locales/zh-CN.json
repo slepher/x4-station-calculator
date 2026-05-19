@@ -702,6 +702,8 @@
     "tier_habitation": "自动生活区",
     "tier_infrastructure": "自动基础设施",
     "tier_supply": "自动补给区",
+    "tier_built": "已建模块区",
+    "tier_building": "在建模块区",
     "consider_workforce_bonus": "考虑工人效率加成",
     "race_preference": "种族偏好",
     "sun_light": "日照",

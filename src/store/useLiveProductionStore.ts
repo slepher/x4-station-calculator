@@ -672,7 +672,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     mode.value = mode.value === 'live' ? 'planning' : 'live'
   }
 
-  const moduleScope = ref<'built' | 'building' | 'all'>('built')
+  const moduleScopeRef = ref<'built' | 'building' | 'all'>('built')
+
+  const moduleScope = computed<'built' | 'building' | 'all'>(() => {
+    if (mode.value !== 'live') return 'built'
+    return moduleScopeRef.value
+  })
 
   const hasBuildingModules = computed(() => {
     return (archiveStation.value?.building?.modules?.length ?? 0) > 0
@@ -684,27 +689,23 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function cycleModuleScope() {
     const order: Array<'built' | 'building' | 'all'> = ['built', 'building', 'all']
-    const idx = order.indexOf(moduleScope.value)
+    const idx = order.indexOf(moduleScopeRef.value)
     const nextIdx = (idx + 1) % order.length
-    moduleScope.value = order[nextIdx]!
+    moduleScopeRef.value = order[nextIdx]!
   }
 
   watch(activeStationId, () => {
     if (activeStationId.value) {
       mode.value = initialMode.value
-      moduleScope.value = defaultModuleScope.value
+      moduleScopeRef.value = defaultModuleScope.value
     }
   })
 
-  watch(mode, () => {
-    moduleScope.value = defaultModuleScope.value
-  })
-
   watch(hasBuildingModules, (has) => {
-    if (has && moduleScope.value === 'built') {
-      moduleScope.value = 'building'
-    } else if (!has && moduleScope.value !== 'built') {
-      moduleScope.value = 'built'
+    if (has && moduleScopeRef.value === 'built') {
+      moduleScopeRef.value = 'building'
+    } else if (!has && moduleScopeRef.value !== 'built') {
+      moduleScopeRef.value = 'built'
     }
   })
 
@@ -789,13 +790,24 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       ...station.settings,
       sunlight: archiveSunlight ?? station.settings?.sunlight ?? DEFAULT_STATION_SETTINGS.sunlight
     }
+
+    const isActiveStation = station.id === activeStationId.value
+    const archive = isActiveStation ? archiveStation.value : null
+    const referenceModules: SavedModule[] = []
+    if (archive) {
+      referenceModules.push(...(archive.modules || []))
+      referenceModules.push(...(archive.building?.modules || []))
+    }
+    console.log('[buildPlanningSeed] station:', station.id, 'isActive:', isActiveStation, 'refModules:', referenceModules.map(m => `${m.id}×${m.count}`))
+
     return {
       modulesMode: 'plan' as const,
       sectorId: station.sectorId,
       modules: usesBindingPlan ? (station.modules || []) : [],
       settings,
       lockedWares: usesBindingPlan ? (station.lockedWares || []) : [],
-      warePriority: usesBindingPlan ? (station.warePriority || {}) : {}
+      warePriority: usesBindingPlan ? (station.warePriority || {}) : {},
+      referenceModules
     }
   }
 
@@ -1889,13 +1901,21 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       }
       const map = ensurePlanningDerivedMap()
       if (!map) return
+      const isActiveStation = station.id === activeStationId.value
+      const archive = isActiveStation ? archiveStation.value : null
+      const refModules: SavedModule[] = []
+      if (archive) {
+        refModules.push(...(archive.modules || []))
+        refModules.push(...(archive.building?.modules || []))
+      }
       map.upsertStation(station.id, {
         modulesMode: 'plan',
         sectorId: station.sectorId,
         modules: station.modules || [],
         settings: station.settings || {},
         lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
+        warePriority: station.warePriority || {},
+        referenceModules: refModules
       })
     },
     shouldRecompute: (station, patch) => {

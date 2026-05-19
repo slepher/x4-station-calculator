@@ -701,6 +701,8 @@
     "tier_habitation": "Auto Habitation",
     "tier_infrastructure": "Auto Infrastructure",
     "tier_supply": "Auto Supply",
+    "tier_built": "Built Modules",
+    "tier_building": "Building Modules",
     "consider_workforce_bonus": "Consider Worker Efficiency Bonus",
     "race_preference": "Race",
     "sun_light": "SUN LIGHT",

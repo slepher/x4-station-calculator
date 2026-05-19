@@ -93,6 +93,7 @@ export interface StationDerivedSnapshot {
   warePriority: Record<string, number>
   workforcesOverride?: WorkforceEntry[]
   archiveSemanticsSource?: StationSemanticDerivedSource
+  referenceModules?: SavedModule[]
 }
 
 export interface StationDerivedSettingsInput {
@@ -114,6 +115,7 @@ export interface StationDerivedSeed {
   workforces?: WorkforceEntry[]
   archiveSemanticsSource?: StationSemanticDerivedSource
   count?: number
+  referenceModules?: SavedModule[]
 }
 
 const DEFAULT_DERIVED_SETTINGS: StationDerivedSettings = {
@@ -247,7 +249,7 @@ function groupProductionFlows(flows: WareProductionFlow[]): GroupedFlows {
   }
 
   wareFlows.forEach(flow => {
-    if (flow.netRate > 0) result.rateGroups.positive.push(flow)
+    if (flow.netRate >= 0) result.rateGroups.positive.push(flow)
     else if (flow.contributions.some(c => isWorkforceContributionClass(c.class))) result.rateGroups.supply.push(flow)
     else if (flow.transportType === 'container') result.rateGroups.operations.push(flow)
     else result.rateGroups.resources.push(flow)
@@ -375,7 +377,7 @@ export class StationDerivedMap {
     let archiveSemanticsSource: StationSemanticDerivedSource | undefined
 
     if (seed.modulesMode === 'plan') {
-      fullModules = this.deriveFullModules(inputModules, settings, lockedWares, warePriority, deps)
+      fullModules = this.deriveFullModules(inputModules, settings, lockedWares, warePriority, deps, seed.referenceModules)
       workforcesOverride = undefined
       archiveSemanticsSource = undefined
     } else {
@@ -394,7 +396,8 @@ export class StationDerivedMap {
       lockedWares,
       warePriority,
       workforcesOverride,
-      archiveSemanticsSource
+      archiveSemanticsSource,
+      referenceModules: seed.referenceModules
     }
 
     this.snapshotMap.set(stationId, snapshot)
@@ -411,7 +414,7 @@ export class StationDerivedMap {
 
     let newFullModules: SavedModule[]
     if (snapshot.modulesMode === 'plan') {
-      newFullModules = this.deriveFullModules(newInputModules, snapshot.settings, snapshot.lockedWares, snapshot.warePriority, deps)
+      newFullModules = this.deriveFullModules(newInputModules, snapshot.settings, snapshot.lockedWares, snapshot.warePriority, deps, snapshot.referenceModules)
     } else {
       newFullModules = newInputModules
     }
@@ -438,7 +441,7 @@ export class StationDerivedMap {
       ...snapshot,
       settings: newSettings,
       fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, newSettings, snapshot.lockedWares, snapshot.warePriority, deps)
+        ? this.deriveFullModules(snapshot.inputModules, newSettings, snapshot.lockedWares, snapshot.warePriority, deps, snapshot.referenceModules)
         : snapshot.fullModules
     }
 
@@ -458,7 +461,7 @@ export class StationDerivedMap {
       ...snapshot,
       lockedWares: newLockedWares,
       fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, newLockedWares, snapshot.warePriority, deps)
+        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, newLockedWares, snapshot.warePriority, deps, snapshot.referenceModules)
         : snapshot.fullModules
     }
 
@@ -478,7 +481,7 @@ export class StationDerivedMap {
       ...snapshot,
       warePriority: newWarePriority,
       fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, snapshot.lockedWares, newWarePriority, deps)
+        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, snapshot.lockedWares, newWarePriority, deps, snapshot.referenceModules)
         : snapshot.fullModules
     }
 
@@ -527,7 +530,8 @@ export class StationDerivedMap {
     settings: StationDerivedSettings,
     lockedWares: string[],
     warePriority: Record<string, number>,
-    deps: StationDerivedStaticDeps
+    deps: StationDerivedStaticDeps,
+    referenceModules?: SavedModule[]
   ): SavedModule[] {
     const fullSettings = toFullSettingsForCompute(settings)
     const result = calculateProductionFlows({
@@ -537,7 +541,8 @@ export class StationDerivedMap {
       waresMap: deps.waresMap,
       lockedWares,
       workforceConsumptionMap: deps.workforceConsumptionMap,
-      warePriority
+      warePriority,
+      referenceModules
     })
     
     const fullModules = [...inputModules]
@@ -598,7 +603,8 @@ export class StationDerivedMap {
         waresMap: deps.waresMap,
         lockedWares: snapshot.lockedWares,
         workforceConsumptionMap: deps.workforceConsumptionMap,
-        warePriority: snapshot.warePriority
+        warePriority: snapshot.warePriority,
+        referenceModules: snapshot.referenceModules
       })
       autoIndustryModules = result.autoIndustryModules
       autoHabitationModules = result.autoHabitationModules

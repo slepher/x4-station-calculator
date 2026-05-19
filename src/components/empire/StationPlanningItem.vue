@@ -18,6 +18,7 @@ const props = defineProps<{
   isNumberFlashing?: boolean
   inactiveByDlc?: boolean
   countDisabled?: boolean
+  threshold?: number
 }>()
 
 const emit = defineEmits<{
@@ -26,9 +27,11 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
-// 计算属性
+const isBelowThreshold = computed(() => {
+  return props.threshold !== undefined && props.item.count < props.threshold
+})
+
 const colorBarStyle = computed(() => {
-  // 优先使用模块的color_rgb，如果没有则根据type使用默认颜色
   const colorRgb = props.info.color_rgb;
   if (colorRgb) {
     return {
@@ -36,15 +39,14 @@ const colorBarStyle = computed(() => {
     };
   }
   
-  // 如果没有颜色信息，使用默认颜色
   const type = props.info.type;
   if (type === 'habitation' || type.includes('habitat')) {
     return {
-      backgroundColor: '#f97316' // orange-500
+      backgroundColor: '#f97316'
     };
   } else {
     return {
-      backgroundColor: '#0ea5e9' // sky-500
+      backgroundColor: '#0ea5e9'
     };
   }
 })
@@ -82,7 +84,10 @@ const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
     </div>
 
     <div class="controls" v-if="!readonly">
-      <div class="ignore-drag input-wrapper" :class="{ 'input-wrapper--flashing': isNumberFlashing }">
+      <div class="ignore-drag input-wrapper" :class="{
+        'input-wrapper--flashing': isNumberFlashing,
+        'input-wrapper--warning': isBelowThreshold
+      }">
         <X4NumberInput :modelValue="item.count" @update:modelValue="emit('update:count', $event)" width-class="w-14"
           :min="1" :disabled="countDisabled" />
       </div>
@@ -212,13 +217,16 @@ const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
   animation: number-flash 0.3s ease-in-out;
 }
 
-/* 新增：输入框容器的闪烁样式 */
 .input-wrapper {
   @apply rounded transition-colors;
 }
 
 .input-wrapper--flashing {
   animation: number-flash 0.3s ease-in-out;
+}
+
+.input-wrapper--warning :deep(.x4-num-input) {
+  color: #f87171 !important;
 }
 
 @keyframes number-flash {

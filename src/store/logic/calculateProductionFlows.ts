@@ -8,7 +8,7 @@ import type {
 import type { FlowContribution, WareProductionFlow } from '../../types/production-flow'
 import type { WorkforceEntry } from '../../types/saveArchive'
 import {
-  findBestProducer,
+  findBestProducerWithRef,
   findBestHabitat,
   getProductionEfficiency
 } from './bestModuleSelector'
@@ -25,6 +25,7 @@ export interface CalculateAutoFillInput {
   modulesMap: Record<string, X4Module>
   waresMap: Record<string, X4Ware>
   lockedWares: string[]
+  referenceModules?: SavedModule[]
 }
 
 export interface CalculateAutoFillOutput {
@@ -40,7 +41,8 @@ export function calculateAutoFillModules(
     settings,
     modulesMap,
     waresMap,
-    lockedWares
+    lockedWares,
+    referenceModules
   } = input
 
   const race = settings.racePreference
@@ -50,6 +52,40 @@ export function calculateAutoFillModules(
   plannedModules.forEach(m => {
     industryModules[m.id] = (industryModules[m.id] || 0) + m.count
   })
+
+  const refMods = referenceModules || []
+
+  const refQuota: Record<string, Record<string, number>> = {}
+  for (const ref of refMods) {
+    const mod = modulesMap[ref.id]
+    if (!mod) {
+      console.log('[autoFill] ref module not in modulesMap:', ref.id, 'count:', ref.count)
+      continue
+    }
+    for (const [wid, rate] of Object.entries(mod.outputs)) {
+      if (!refQuota[ref.id]) refQuota[ref.id] = {}
+      refQuota[ref.id]![wid] = (refQuota[ref.id]![wid] || 0) + rate * ref.count
+    }
+  }
+
+  console.log('[autoFill] race:', race, 'plannedModules:', plannedModules.map(m => `${m.id}×${m.count}`),
+    'refModules:', refMods.map(m => `${m.id}×${m.count}`),
+    'refQuota:', JSON.stringify(refQuota))
+
+  const remainingQuota: Record<string, number> = {}
+
+  function getQuotaForWare(modId: string, wareId: string): number {
+    const key = `${modId}:${wareId}`
+    if (remainingQuota[key] === undefined) {
+      remainingQuota[key] = refQuota[modId]?.[wareId] || 0
+    }
+    return remainingQuota[key]!
+  }
+
+  function consumeQuota(modId: string, wareId: string, amount: number): void {
+    const key = `${modId}:${wareId}`
+    remainingQuota[key] = Math.max(0, (remainingQuota[key] || 0) - amount)
+  }
 
   let loopCount = 0
   let hasDeficit = true
@@ -76,9 +112,23 @@ export function calculateAutoFillModules(
 
       if (lockedWares.includes(wareId)) continue
 
-      const producer = findBestProducer(wareId, race, currentModulesAsSaved, modulesMap, waresMap)
-      if (!producer) continue
+      const quotaForWare: Record<string, number> = {}
+      for (const ref of refMods) {
+        const mod = modulesMap[ref.id]
+        if (!mod) continue
+        quotaForWare[ref.id] = getQuotaForWare(ref.id, wareId)
+      }
 
+      const selection = findBestProducerWithRef(
+        wareId, race, currentModulesAsSaved, modulesMap, waresMap,
+        refMods, quotaForWare
+      )
+      if (!selection) {
+        console.log('[autoFill] no producer for ware:', wareId, 'existingModules:', currentModulesAsSaved.map(m => `${m.id}×${m.count}`))
+        continue
+      }
+
+      const producer = selection.module
       const eff = getProductionEfficiency(producer, globalWorkforceBonus)
 
       let sunlightFactor = 1.0
@@ -87,9 +137,27 @@ export function calculateAutoFillModules(
       }
 
       const singleOutput = (producer.outputs[wareId] || 0) * eff * sunlightFactor
-      if (singleOutput <= 0) continue
+      if (singleOutput <= 0) {
+        console.log('[autoFill] selected producer has zero output for ware:', producer.id, wareId, 'outputs:', producer.outputs)
+        continue
+      }
 
-      const countNeeded = Math.ceil(deficit / singleOutput)
+      let countNeeded = Math.ceil(deficit / singleOutput)
+
+      if (!selection.exhaustedQuota) {
+        const rawOutput = producer.outputs[wareId] || 0
+        const quota = quotaForWare[producer.id] || 0
+        if (quota <= 0) continue
+        const maxFromQuota = Math.floor(quota / rawOutput)
+        if (maxFromQuota <= 0) {
+          console.log('[autoFill] quota exhausted (< 1 module), using unrestricted:', producer.id, 'quota:', quota, 'rawOutput:', rawOutput)
+        } else {
+          const capped = Math.min(countNeeded, maxFromQuota)
+          consumeQuota(producer.id, wareId, capped * rawOutput)
+          countNeeded = capped
+          console.log('[autoFill] quota capped to:', capped)
+        }
+      }
 
       industryModules[producer.id] = (industryModules[producer.id] || 0) + countNeeded
       hasDeficit = true
@@ -202,6 +270,7 @@ export interface CalculateProductionFlowsInput {
   lockedWares: string[]
   workforceConsumptionMap: WorkforceConsumptionMap
   warePriority: Record<string, number>
+  referenceModules?: SavedModule[]
 }
 
 export interface CalculateProductionFlowsOutput {
@@ -230,7 +299,8 @@ export function calculateProductionFlows(
     settings,
     modulesMap,
     waresMap,
-    lockedWares
+    lockedWares,
+    referenceModules: input.referenceModules
   })
 
   const coreResult = calculateProductionFlowsCore({

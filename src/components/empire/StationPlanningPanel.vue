@@ -3,10 +3,10 @@ import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import { ref, watch, nextTick, computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import { generateFilteredModulesGrouped } from '@/store/logic/searchModule'
+import { generateFilteredModulesGrouped, compareModulesByPickerOrder, compareModuleGroupsByPickerOrder } from '@/store/logic/searchModule'
 import StationPlanningItem from './StationPlanningItem.vue'
 import StationModulePicker from './StationModulePicker.vue'
-import type { SavedModule, ModuleGroupResult } from '@/types/x4'
+import type { SavedModule, ModuleGroupResult, X4Module } from '@/types/x4'
 
 const props = defineProps<{
   plannedModules: SavedModule[]
@@ -14,6 +14,9 @@ const props = defineProps<{
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
   enforceDlcActivation: boolean
+  archiveModules?: SavedModule[]
+  buildingModules?: SavedModule[]
+  archiveTotalMap?: Record<string, number>
 }>()
 
 const emit = defineEmits<{
@@ -28,6 +31,99 @@ const searchQuery = ref('')
 const highlightedModuleIds = ref<Set<string>>(new Set())
 const flashingNumberModuleIds = ref<Set<string>>(new Set())
 const lastModuleCounts = ref<Record<string, number>>({})
+
+interface GroupedArchiveModuleItem {
+  moduleId: string
+  savedModule: SavedModule
+  x4Module: X4Module
+  isBuilding: boolean
+}
+
+interface GroupedArchiveGroup {
+  group: string
+  displayLabel: string
+  modules: GroupedArchiveModuleItem[]
+  hasBuilding: boolean
+}
+
+function groupArchiveModulesMixed(built: SavedModule[], building: SavedModule[]): GroupedArchiveGroup[] {
+  const modulesMap = gameDataStore.modulesMap
+  const moduleGroupsMap = gameDataStore.localizedModuleGroupsMap
+  const groups: Record<string, GroupedArchiveModuleItem[]> = {}
+
+  built.forEach((mod) => {
+    const x4Module = modulesMap[mod.id]
+    if (!x4Module) return
+    const group = x4Module.group || ''
+    if (!group) return
+    if (!groups[group]) groups[group] = []
+    groups[group]!.push({
+      moduleId: mod.id,
+      savedModule: mod,
+      x4Module,
+      isBuilding: false
+    })
+  })
+
+  building.forEach((mod) => {
+    const x4Module = modulesMap[mod.id]
+    if (!x4Module) return
+    const group = x4Module.group || ''
+    if (!group) return
+    if (!groups[group]) groups[group] = []
+    groups[group]!.push({
+      moduleId: mod.id,
+      savedModule: mod,
+      x4Module,
+      isBuilding: true
+    })
+  })
+
+  Object.keys(groups).forEach((groupKey) => {
+    const groupModules = groups[groupKey]
+    if (!groupModules) return
+
+    const builtModules = groupModules.filter(m => !m.isBuilding)
+    const buildingMods = groupModules.filter(m => m.isBuilding)
+
+    builtModules.sort((a, b) =>
+      compareModulesByPickerOrder(
+        { id: a.moduleId, group: groupKey },
+        { id: b.moduleId, group: groupKey },
+        moduleGroupsMap
+      )
+    )
+
+    buildingMods.sort((a, b) =>
+      compareModulesByPickerOrder(
+        { id: a.moduleId, group: groupKey },
+        { id: b.moduleId, group: groupKey },
+        moduleGroupsMap
+      )
+    )
+
+    groups[groupKey] = [...builtModules, ...buildingMods]
+  })
+
+  return Object.keys(groups)
+    .sort((a, b) => compareModuleGroupsByPickerOrder(a, b, moduleGroupsMap))
+    .map((groupKey) => ({
+      group: groupKey,
+      displayLabel: moduleGroupsMap[groupKey]?.localeName || groupKey,
+      modules: groups[groupKey] || [],
+      hasBuilding: (groups[groupKey] || []).some(m => m.isBuilding)
+    }))
+}
+
+const groupedArchiveModules = computed(() =>
+  groupArchiveModulesMixed(props.archiveModules || [], props.buildingModules || [])
+)
+
+const hasArchiveData = computed(() => groupedArchiveModules.value.length > 0)
+
+const archiveTotal = (moduleId: string): number => {
+  return props.archiveTotalMap?.[moduleId] ?? 0
+}
 
 const filteredModulesGrouped = computed<ModuleGroupResult[]>(() => {
   return generateFilteredModulesGrouped(
@@ -121,7 +217,8 @@ const handleAddModule = (moduleId: string) => {
       i === existingIndex ? { ...m, count: m.count + 1 } : m
     )
   } else {
-    nextModules = [...props.plannedModules, { id: moduleId, count: 1 }]
+    const defaultCount = archiveTotal(moduleId) || 1
+    nextModules = [...props.plannedModules, { id: moduleId, count: defaultCount }]
   }
   emit('updatePlannedModules', nextModules)
 }
@@ -153,6 +250,23 @@ const handleTransferAutoModule = (module: SavedModule) => {
     nextModules = [...props.plannedModules, { id: module.id, count: module.count }]
   }
   emit('updatePlannedModules', nextModules)
+}
+
+const handleTransferArchiveModule = (moduleId: string) => {
+  const total = archiveTotal(moduleId)
+  if (total <= 0) return
+  const existingIndex = props.plannedModules.findIndex(m => m.id === moduleId)
+  if (existingIndex >= 0) {
+    const current = props.plannedModules[existingIndex]!
+    if (current.count >= total) return
+    const nextModules = props.plannedModules.map((m, i) =>
+      i === existingIndex ? { ...m, count: total } : m
+    )
+    emit('updatePlannedModules', nextModules)
+  } else {
+    const nextModules = [...props.plannedModules, { id: moduleId, count: total }]
+    emit('updatePlannedModules', nextModules)
+  }
 }
 
 const handleUpdateSearchQuery = (value: string) => {
@@ -194,6 +308,7 @@ const handleUpdateSearchQuery = (value: string) => {
               :count-disabled="!isModuleCountEditable(element.id)"
               :class="{ 'module-row--highlight': highlightedModuleIds.has(element.id) }"
               :is-number-flashing="flashingNumberModuleIds.has(element.id)"
+              :threshold="archiveTotal(element.id)"
               @update:count="(val: number) => handleUpdateModuleCount(index, val)" @remove="handleRemoveModule(index)" />
           </template>
         </draggable>
@@ -238,6 +353,40 @@ const handleUpdateSearchQuery = (value: string) => {
         </div>
       </div>
     </div>
+
+    <hr v-if="hasArchiveData" class="archive-separator" />
+
+    <template v-if="hasArchiveData">
+      <div v-for="group in groupedArchiveModules" :key="'archive-group-' + group.group" class="tier-section">
+        <div class="tier-header">
+          <span class="tier-label">{{ group.displayLabel }}</span>
+        </div>
+        <div class="module-list-scroll">
+          <div class="auto-modules-container">
+            <StationPlanningItem
+              v-for="item in group.modules.filter(m => !m.isBuilding)"
+              :key="'built-' + item.moduleId"
+              :item="item.savedModule"
+              :info="item.x4Module"
+              :readonly="true"
+              @transfer="handleTransferArchiveModule(item.moduleId)"
+            />
+            <template v-if="group.hasBuilding">
+              <div class="building-section">
+                <StationPlanningItem
+                  v-for="item in group.modules.filter(m => m.isBuilding)"
+                  :key="'building-' + item.moduleId"
+                  :item="item.savedModule"
+                  :info="item.x4Module"
+                  :readonly="true"
+                  @transfer="handleTransferArchiveModule(item.moduleId)"
+                />
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -284,6 +433,14 @@ const handleUpdateSearchQuery = (value: string) => {
 
 .tier-section.tier-auto .module-list-scroll {
   @apply border-l-2 border-dashed border-slate-600 pl-2;
+}
+
+.archive-separator {
+  @apply border-0 border-b border-slate-700/50 my-1;
+}
+
+.building-section {
+  @apply border-l-2 border-dashed border-amber-600/40 pl-2 ml-1 space-y-2;
 }
 
 .scale-buttons {
