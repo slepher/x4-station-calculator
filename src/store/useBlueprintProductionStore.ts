@@ -5,7 +5,6 @@ import type {
   StationPlan,
   StationType,
   SavedModule,
-  GroupedFlows,
   EmpireGroupedFlows,
   StationSettings,
   EntityLocation,
@@ -19,6 +18,7 @@ import type {
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
+import { findBestProducer } from '@/store/logic/bestModuleSelector'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
@@ -422,27 +422,48 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     })
   })
 
-  function getSavedStationGroupedFlows(station: StationPlan): GroupedFlows {
-    const deps = getDerivedStaticDeps()
+  function getSavedStationGroupedFlows(station: StationPlan): { resources: string[] } {
+    const deps = getComputeDeps()
     if (!deps) {
-      return {
-        flows: [],
-        rateGroups: { positive: [], operations: [], supply: [], resources: [] },
-        volumeGroups: { solid: [], liquid: [], container: [] }
+      return { resources: [] }
+    }
+
+    const { modulesMap, waresMap } = deps
+    const lockedSet = new Set(station.lockedWares || [])
+    const resourceSet = new Set<string>()
+    const visited = new Set<string>()
+
+    function expandUpstream(wareId: string): void {
+      if (lockedSet.has(wareId)) return
+      if (visited.has(wareId)) return
+      visited.add(wareId)
+
+      const ware = waresMap[wareId]
+      if (!ware) return
+
+      const isResource = ware.transport === 'solid' || ware.transport === 'liquid'
+      if (isResource) {
+        resourceSet.add(wareId)
+        return
+      }
+
+      const producer = findBestProducer(wareId, 'argon', [], modulesMap, waresMap)
+      if (!producer?.inputs) return
+
+      for (const inputWareId of Object.keys(producer.inputs)) {
+        expandUpstream(inputWareId)
       }
     }
 
-    const tempMap = new StationDerivedMap(deps)
-    tempMap.upsertStation(station.id, {
-      modulesMode: 'plan',
-      sectorId: station.sectorId,
-      modules: station.modules || [],
-      settings: station.settings || {},
-      lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {},
-      count: station.count
-    })
-    return tempMap.getGrouped(station.id)
+    for (const mod of station.modules || []) {
+      const moduleInfo = modulesMap[mod.id]
+      if (!moduleInfo?.inputs) continue
+      for (const inputWareId of Object.keys(moduleInfo.inputs)) {
+        expandUpstream(inputWareId)
+      }
+    }
+
+    return { resources: [...resourceSet] }
   }
 
   function initializeAllStationDerived() {

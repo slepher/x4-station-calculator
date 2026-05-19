@@ -1,5 +1,5 @@
 import { reactive, type Ref } from 'vue'
-import type { GroupedFlows, SavedModule, StationSettings, X4Module, WareFlow, WorkforceConsumptionMap } from '@/types/x4'
+import type { SavedModule, StationSettings, X4Module, WorkforceConsumptionMap } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import { isWorkforceContributionClass } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
@@ -194,14 +194,6 @@ function warePriorityEqual(a: Record<string, number>, b: Record<string, number>)
   return true
 }
 
-function createEmptyGroupedFlows(): GroupedFlows {
-  return {
-    flows: [],
-    rateGroups: { positive: [], operations: [], supply: [], resources: [] },
-    volumeGroups: { solid: [], liquid: [], container: [] }
-  }
-}
-
 function filterProductionFlowsByPriority(
   flows: WareProductionFlow[],
   priorityLevels: Record<string, number>
@@ -210,56 +202,6 @@ function filterProductionFlowsByPriority(
     if (f.netRate <= 0) return true
     return (priorityLevels[f.wareId] ?? 0) > 0
   })
-}
-
-function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
-  const productionVolume = prod.production * prod.unitVolume
-  const consumptionVolume = prod.consumption * prod.unitVolume
-  const netVolume = prod.netRate * prod.unitVolume
-
-  return {
-    wareId: prod.wareId,
-    orderIndex: prod.orderIndex,
-    tier: prod.tier,
-    transportType: prod.transportType,
-    unitVolume: prod.unitVolume,
-    production: prod.production,
-    consumption: prod.consumption,
-    netRate: prod.netRate,
-    productionVolume,
-    consumptionVolume,
-    netVolume,
-    transportDemand: 0,
-    totalOccupiedCount: 0,
-    totalOccupiedConsumptionCount: 0,
-    totalOccupiedVolume: 0,
-    unitPrice: 0,
-    netValue: 0,
-    contributions: prod.contributions.map((atom) => ({ ...atom }))
-  }
-}
-
-function groupProductionFlows(flows: WareProductionFlow[]): GroupedFlows {
-  const wareFlows = flows.map(convertProductionFlowToWareFlow)
-
-  const result: GroupedFlows = {
-    flows: wareFlows,
-    rateGroups: { positive: [], operations: [], supply: [], resources: [] },
-    volumeGroups: { solid: [], liquid: [], container: [] }
-  }
-
-  wareFlows.forEach(flow => {
-    if (flow.netRate >= 0) result.rateGroups.positive.push(flow)
-    else if (flow.contributions.some(c => isWorkforceContributionClass(c.class))) result.rateGroups.supply.push(flow)
-    else if (flow.transportType === 'container') result.rateGroups.operations.push(flow)
-    else result.rateGroups.resources.push(flow)
-
-    if (flow.transportType === 'solid') result.volumeGroups.solid.push(flow)
-    else if (flow.transportType === 'liquid') result.volumeGroups.liquid.push(flow)
-    else result.volumeGroups.container.push(flow)
-  })
-
-  return result
 }
 
 function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
@@ -837,12 +779,6 @@ export class StationDerivedMap {
 
   getEmpireFlows(): WareProductionFlow[] {
     return this.empireFlowsCache
-  }
-
-  getGrouped(stationId: string): GroupedFlows {
-    const flows = this.getProductionFlows(stationId)
-    if (flows.length === 0) return createEmptyGroupedFlows()
-    return groupProductionFlows(flows)
   }
 
   getModulesMode(stationId: string): 'plan' | 'full' | null {
