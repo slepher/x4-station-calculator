@@ -845,13 +845,6 @@ export class StationDerivedMap {
     return groupProductionFlows(flows)
   }
 
-  getFilteredGrouped(stationId: string, priorityLevels: Record<string, number>): GroupedFlows {
-    const flows = this.getProductionFlows(stationId)
-    const filtered = filterProductionFlowsByPriority(flows, priorityLevels)
-    if (filtered.length === 0) return createEmptyGroupedFlows()
-    return groupProductionFlows(filtered)
-  }
-
   getModulesMode(stationId: string): 'plan' | 'full' | null {
     return this.snapshotMap.get(stationId)?.modulesMode || null
   }

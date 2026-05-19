@@ -352,14 +352,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     map.updateSettings(stationId, station.settings || {})
   }
 
-  function getStationFlowCache(stationId: string): GroupedFlows | null {
-    const map = planningDerivedMap.value
-    if (!map) return null
-    const cache = map?.getCache(stationId)
-    if (!cache) return null
-    return map.getFilteredGrouped(stationId, cache.warePriorityLevels)
-  }
-
   function getEmpireGroupedFlows(): EmpireGroupedFlows {
     if (!activeEmpire.value || !planningDerivedMap.value) {
       return { flows: [], empireGroups: { operations: [], supply: [] } }
@@ -990,7 +982,6 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     titleValue,
     titlePlaceholder,
     savedEmpires,
-    getStationFlowCache,
     getEmpireGroupedFlows,
     getSavedStationGroupedFlows,
     initializeAllStationDerived,
