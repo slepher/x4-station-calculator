@@ -3,7 +3,11 @@ import type { SavedModule, StationSettings, X4Module, WorkforceConsumptionMap } 
 import type { WareProductionFlow } from '@/types/production-flow'
 import { isWorkforceContributionClass } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
-import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
+import {
+  calculateProductionFlows,
+  calculateProductionFlowsCore,
+  type CalculateProductionFlowsOutput
+} from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
@@ -116,6 +120,10 @@ export interface StationDerivedSeed {
   archiveSemanticsSource?: StationSemanticDerivedSource
   count?: number
   referenceModules?: SavedModule[]
+}
+
+interface PlanComputeResult extends CalculateProductionFlowsOutput {
+  fullModules: SavedModule[]
 }
 
 const DEFAULT_DERIVED_SETTINGS: StationDerivedSettings = {
@@ -315,11 +323,20 @@ export class StationDerivedMap {
     const warePriority = normalizeWarePriority(seed.warePriority)
 
     let fullModules: SavedModule[]
+    let planResult: PlanComputeResult | undefined
     let workforcesOverride: WorkforceEntry[] | undefined
     let archiveSemanticsSource: StationSemanticDerivedSource | undefined
 
     if (seed.modulesMode === 'plan') {
-      fullModules = this.deriveFullModules(inputModules, settings, lockedWares, warePriority, deps, seed.referenceModules)
+      planResult = this.computePlanResult(
+        inputModules,
+        settings,
+        lockedWares,
+        warePriority,
+        deps,
+        seed.referenceModules
+      )
+      fullModules = planResult.fullModules
       workforcesOverride = undefined
       archiveSemanticsSource = undefined
     } else {
@@ -343,7 +360,7 @@ export class StationDerivedMap {
     }
 
     this.snapshotMap.set(stationId, snapshot)
-    this.computeInternal(stationId, snapshot, deps, true)
+    this.computeInternal(stationId, snapshot, deps, true, false, planResult)
   }
 
   updateModules(stationId: string, modules: SavedModule[]): void {
@@ -355,8 +372,17 @@ export class StationDerivedMap {
     if (modulesEqual(newInputModules, snapshot.inputModules)) return
 
     let newFullModules: SavedModule[]
+    let planResult: PlanComputeResult | undefined
     if (snapshot.modulesMode === 'plan') {
-      newFullModules = this.deriveFullModules(newInputModules, snapshot.settings, snapshot.lockedWares, snapshot.warePriority, deps, snapshot.referenceModules)
+      planResult = this.computePlanResult(
+        newInputModules,
+        snapshot.settings,
+        snapshot.lockedWares,
+        snapshot.warePriority,
+        deps,
+        snapshot.referenceModules
+      )
+      newFullModules = planResult.fullModules
     } else {
       newFullModules = newInputModules
     }
@@ -368,7 +394,7 @@ export class StationDerivedMap {
     }
 
     this.snapshotMap.set(stationId, newSnapshot)
-    this.computeInternal(stationId, newSnapshot, deps, true)
+    this.computeInternal(stationId, newSnapshot, deps, true, false, planResult)
   }
 
   updateSettings(stationId: string, settings: StationDerivedSettingsInput): void {
@@ -379,16 +405,25 @@ export class StationDerivedMap {
     const newSettings = truncateSettings(settings)
     if (settingsEqual(newSettings, snapshot.settings)) return
 
+    const planResult = snapshot.modulesMode === 'plan'
+      ? this.computePlanResult(
+          snapshot.inputModules,
+          newSettings,
+          snapshot.lockedWares,
+          snapshot.warePriority,
+          deps,
+          snapshot.referenceModules
+        )
+      : undefined
+
     const newSnapshot: StationDerivedSnapshot = {
       ...snapshot,
       settings: newSettings,
-      fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, newSettings, snapshot.lockedWares, snapshot.warePriority, deps, snapshot.referenceModules)
-        : snapshot.fullModules
+      fullModules: planResult?.fullModules ?? snapshot.fullModules
     }
 
     this.snapshotMap.set(stationId, newSnapshot)
-    this.computeInternal(stationId, newSnapshot, deps, false)
+    this.computeInternal(stationId, newSnapshot, deps, false, false, planResult)
   }
 
   updateLockedWares(stationId: string, lockedWares: string[]): void {
@@ -399,16 +434,25 @@ export class StationDerivedMap {
     const newLockedWares = normalizeLockedWares(lockedWares)
     if (lockedWaresEqual(newLockedWares, snapshot.lockedWares)) return
 
+    const planResult = snapshot.modulesMode === 'plan'
+      ? this.computePlanResult(
+          snapshot.inputModules,
+          snapshot.settings,
+          newLockedWares,
+          snapshot.warePriority,
+          deps,
+          snapshot.referenceModules
+        )
+      : undefined
+
     const newSnapshot: StationDerivedSnapshot = {
       ...snapshot,
       lockedWares: newLockedWares,
-      fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, newLockedWares, snapshot.warePriority, deps, snapshot.referenceModules)
-        : snapshot.fullModules
+      fullModules: planResult?.fullModules ?? snapshot.fullModules
     }
 
     this.snapshotMap.set(stationId, newSnapshot)
-    this.computeInternal(stationId, newSnapshot, deps, false)
+    this.computeInternal(stationId, newSnapshot, deps, false, false, planResult)
   }
 
   updateWarePriority(stationId: string, warePriority: Record<string, number>): void {
@@ -419,16 +463,25 @@ export class StationDerivedMap {
     const newWarePriority = normalizeWarePriority(warePriority)
     if (warePriorityEqual(newWarePriority, snapshot.warePriority)) return
 
+    const planResult = snapshot.modulesMode === 'plan'
+      ? this.computePlanResult(
+          snapshot.inputModules,
+          snapshot.settings,
+          snapshot.lockedWares,
+          newWarePriority,
+          deps,
+          snapshot.referenceModules
+        )
+      : undefined
+
     const newSnapshot: StationDerivedSnapshot = {
       ...snapshot,
       warePriority: newWarePriority,
-      fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, snapshot.lockedWares, newWarePriority, deps, snapshot.referenceModules)
-        : snapshot.fullModules
+      fullModules: planResult?.fullModules ?? snapshot.fullModules
     }
 
     this.snapshotMap.set(stationId, newSnapshot)
-    this.computeInternal(stationId, newSnapshot, deps, false)
+    this.computeInternal(stationId, newSnapshot, deps, false, false, planResult)
   }
 
   refreshStation(stationId: string): void {
@@ -467,14 +520,39 @@ export class StationDerivedMap {
     this.sectorExternalCache.clear()
   }
 
-  private deriveFullModules(
+  private buildFullModules(
+    inputModules: SavedModule[],
+    autoIndustryModules: SavedModule[],
+    autoHabitationModules: SavedModule[]
+  ): SavedModule[] {
+    const fullModules = [...inputModules]
+    for (const autoMod of autoIndustryModules) {
+      const existing = fullModules.find(m => m.id === autoMod.id)
+      if (existing) {
+        existing.count += autoMod.count
+      } else {
+        fullModules.push({ id: autoMod.id, count: autoMod.count })
+      }
+    }
+    for (const autoMod of autoHabitationModules) {
+      const existing = fullModules.find(m => m.id === autoMod.id)
+      if (existing) {
+        existing.count += autoMod.count
+      } else {
+        fullModules.push({ id: autoMod.id, count: autoMod.count })
+      }
+    }
+    return fullModules
+  }
+
+  private computePlanResult(
     inputModules: SavedModule[],
     settings: StationDerivedSettings,
     lockedWares: string[],
     warePriority: Record<string, number>,
     deps: StationDerivedStaticDeps,
     referenceModules?: SavedModule[]
-  ): SavedModule[] {
+  ): PlanComputeResult {
     const fullSettings = toFullSettingsForCompute(settings)
     const result = calculateProductionFlows({
       plannedModules: inputModules,
@@ -486,25 +564,15 @@ export class StationDerivedMap {
       warePriority,
       referenceModules
     })
-    
-    const fullModules = [...inputModules]
-    for (const autoMod of result.autoIndustryModules) {
-      const existing = fullModules.find(m => m.id === autoMod.id)
-      if (existing) {
-        existing.count += autoMod.count
-      } else {
-        fullModules.push({ id: autoMod.id, count: autoMod.count })
-      }
+
+    return {
+      ...result,
+      fullModules: this.buildFullModules(
+        inputModules,
+        result.autoIndustryModules,
+        result.autoHabitationModules
+      )
     }
-    for (const autoMod of result.autoHabitationModules) {
-      const existing = fullModules.find(m => m.id === autoMod.id)
-      if (existing) {
-        existing.count += autoMod.count
-      } else {
-        fullModules.push({ id: autoMod.id, count: autoMod.count })
-      }
-    }
-    return fullModules
   }
 
   private computeInternal(
@@ -512,7 +580,8 @@ export class StationDerivedMap {
     snapshot: StationDerivedSnapshot,
     deps: StationDerivedStaticDeps,
     recomputeSemantics: boolean,
-    skipAggregation: boolean = false
+    skipAggregation: boolean = false,
+    planResult?: PlanComputeResult
   ): void {
     const fullSettings = toFullSettingsForCompute(snapshot.settings)
     
@@ -538,16 +607,14 @@ export class StationDerivedMap {
       actualWorkforce = coreResult.actualWorkforce
       currentEfficiency = coreResult.currentEfficiency
     } else {
-      const result = calculateProductionFlows({
-        plannedModules: snapshot.inputModules,
-        settings: fullSettings,
-        modulesMap: deps.modulesMap,
-        waresMap: deps.waresMap,
-        lockedWares: snapshot.lockedWares,
-        workforceConsumptionMap: deps.workforceConsumptionMap,
-        warePriority: snapshot.warePriority,
-        referenceModules: snapshot.referenceModules
-      })
+      const result = planResult ?? this.computePlanResult(
+        snapshot.inputModules,
+        snapshot.settings,
+        snapshot.lockedWares,
+        snapshot.warePriority,
+        deps,
+        snapshot.referenceModules
+      )
       autoIndustryModules = result.autoIndustryModules
       autoHabitationModules = result.autoHabitationModules
       productionFlows = result.productionFlows
