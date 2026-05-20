@@ -2,7 +2,7 @@
 
 ## Purpose
 
-定义实况产能页面在 `planning` 模式且存在 archive 数据时的主 flow 计算口径：系统必须使用 `planned + auto` 与 archive 全量模块逐项 `max` 后的有效模块集来重算 planning 主 `productionFlows`，并让这套 flow 直接替代旧 planning flow，继续驱动后续所有 flow 聚合、volume 主视图与展开明细，同时保持现有隐式职责分离不变。
+定义实况产能页面在 `planning` 模式且存在 archive 数据时的主 flow 计算口径：系统必须使用 `planned + auto` 与 archive 全量模块逐项 `max` 后的有效模块集来重算 planning 主 `productionFlows`，并让这套 flow 直接替代旧 planning flow，继续驱动后续所有 flow 聚合、volume allocation 主视图与展开明细，同时保持现有隐式职责分离不变。
 
 ## ADDED Requirements
 
@@ -179,17 +179,36 @@ archive 侧的全部模块 SHALL 参与逐项 `max`，而不是只让生产模�
 - **当** 用户查看普通 wareflow 列表
 - **那么** 列表展示结果来自新的 canonical planning flow 数据
 
-### Requirement: Planning Volume View And Its Detail Use The Same Canonical Planning Flow Base
+### Requirement: Planning Volume View Reuses The Allocation View Shape Defined By Live Cargo Volume
 
-在启用条件成立时，planning 的 volume 主视图与展开明细 SHALL 一起切换到基于 canonical planning flow 的聚合结果，二者 MUST 使用同一套 planning flow 基准。
+在启用条件成立时，planning 的 volume 主视图 SHALL 不再保留旧 volume list，而是复用 `live-cargo-volume` 定义的 allocation 视图骨架。
 
-#### Scenario: Planning volume main rows use effective flow
+#### Scenario: Planning volume uses allocation shell instead of old list
 
 - **前提** 当前 `visualMode = planning`
 - **并且** 当前 station 存在 `archiveStation`
 - **并且** 当前 `viewMode = volume`
 - **当** 系统渲染 planning volume 主视图
-- **那么** 行数据来自基于 canonical planning flow 继续聚合后的结果
+- **那么** 系统渲染与 `live-cargo-volume` 一致的 allocation 视图骨架
+- **并且** MUST NOT 继续渲染旧的 planning volume list
+
+### Requirement: Planning Volume Current And Target Stay On Archive Data While Recommended And Detail Follow Canonical Planning Flow
+
+在启用条件成立时，planning volume 的 `currentCount / targetCount` SHALL 继续读取 archive 数据；`recommendedCount` 与展开明细 SHALL 使用 canonical planning flow 继续推导。
+
+#### Scenario: Planning volume row mixes archive current target with canonical planning recommendation
+
+- **前提** 当前 `visualMode = planning`
+- **并且** 当前 station 存在 `archiveStation`
+- **并且** 当前 `viewMode = volume`
+- **当** 系统渲染 planning volume 某个 ware 行
+- **那么** `currentCount` 来自 archive `cargo`
+- **并且** `targetCount` 来自 archive `targetCounts`
+- **并且** `recommendedCount` 来自 canonical planning flow 推导结果
+
+### Requirement: Planning Volume View And Its Detail Use The Same Canonical Planning Flow Base
+
+在启用条件成立时，planning 的 volume 主视图与展开明细 SHALL 一起切换到基于 canonical planning flow 的聚合结果，二者 MUST 使用同一套 planning flow 基准。
 
 #### Scenario: Planning volume detail uses the same effective flow source
 

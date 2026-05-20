@@ -2,7 +2,7 @@
 
 ## 目标
 
-在实况产能页面的 `planning` 模式下，当站点存在 archive 数据时，为 planning station state 的主 flow 计算链引入新的有效模块口径，使规划结果始终以“现有建筑不会被拆除、只会在其基础上新增”的语义进行重算。新口径需要直接替代现有 planning `productionFlows`，并作为后续所有 flow 聚合、planning volume 主视图与展开明细的统一基准。
+在实况产能页面的 `planning` 模式下，当站点存在 archive 数据时，为 planning station state 的主 flow 计算链引入新的有效模块口径，使规划结果始终以“现有建筑不会被拆除、只会在其基础上新增”的语义进行重算。新口径需要直接替代现有 planning `productionFlows`，并作为后续所有 flow 聚合、planning volume allocation 主视图与展开明细的统一基准。
 
 ## 已确认方案（审核重点）
 
@@ -53,14 +53,16 @@
 
 25. `StationWareFlowsDashboard` 在 planning 模式下应改为消费新的 canonical planning flow 数据。
 26. `planning` 的普通 wareflow 视图需要切到这套 canonical flow。
-27. `planning` 的 `volume` 视图也需要切到基于该 canonical flow 继续聚合得到的数据。
-28. `planning volume` 的展开明细必须与主视图使用相同的 canonical flow 基准，不允许主视图与明细采用不同数据源。
+27. `planning` 的 `volume` 视图不能继续停留在旧的 volume list 形态，需要一并切到 `live-cargo-volume` 定义的 allocation 视图骨架。
+28. `planning volume` 的 `currentCount / targetCount` 继续读取 archive 中已有的 `cargo / targetCounts`，而 `recommendedCount` 与展开时间明细改为基于 canonical planning flow 继续推导。
+29. `planning volume` 的展开明细必须与主视图使用相同的 canonical flow 基准，不允许主视图与明细采用不同数据源。
+30. 换句话说，`planning + archive + volume` 与 `live + volume` 在 UI 结构上对齐为同一类 allocation 视图，但 `recommended/detail` 的计算真相分别来自 planning canonical flow 与 live flow。
 
 ### 7. 与其他模块的边界
 
-29. `StationDashboard` 另有独立安排，不在本次 change 规划内。
-30. `live-planning-modules` 中左侧 planning 面板的 `recommendedModules`、archive 参考区、红色阈值与 `+N` 展示逻辑不在本次 change 中重新设计。
-31. 本次 change 不修改 `live` 模式 volume allocation 视图语义。
+31. `StationDashboard` 另有独立安排，不在本次 change 规划内。
+32. `live-planning-modules` 中左侧 planning 面板的 `recommendedModules`、archive 参考区、红色阈值与 `+N` 展示逻辑不在本次 change 中重新设计。
+33. 本次 change 不重写 `live` 模式 volume allocation 视图语义，只要求 planning volume 跟它对齐到同一套 allocation 壳与交互结构。
 
 ## 边界
 
@@ -72,7 +74,8 @@
 - 基于新 flow 继续完成 planning 侧 flow-based aggregation
 - `planning + archive` 下 archive 产出 ware 的 lock 禁止约束
 - planning wareflow 视图切换到 canonical planning flow
-- planning volume 视图切换到基于 canonical planning flow 的聚合结果
+- planning volume 视图切换到与 `live-cargo-volume` 一致的 allocation 视图骨架
+- planning volume 的 `current/target` 继续读取 archive，`recommended/detail` 切换到基于 canonical planning flow 的聚合结果
 - planning volume 展开明细切换到同一套 canonical planning flow 基准
 - 保持隐式职责分离不变的前提下，让 archive 全部模块参与逐项 `max`
 - OpenSpec 文档同步
@@ -100,9 +103,10 @@
 11. 所有后续 flow 聚合结果都基于这套新的 planning `productionFlows` 继续计算。
 12. 不允许出现“展示 flow”和“聚合 flow”并行的双轨状态。
 13. planning 的普通 wareflow 视图切换到新的 canonical planning flow。
-14. planning 的 volume 主视图切换到基于该 canonical flow 的聚合结果。
-15. planning 的 volume 展开明细与主视图使用同一套 canonical flow 基准。
-16. `live` 模式、`overview`、`transit` 与 `StationDashboard` 不受本次 change 影响。
+14. planning 的 volume 主视图切换到与 `live-cargo-volume` 一致的 allocation 视图骨架，而不是继续保留旧 volume list。
+15. planning 的 volume 视图中，`currentCount / targetCount` 继续读取 archive 侧已有数据，`recommendedCount` 改为基于 canonical planning flow 推导。
+16. planning 的 volume 展开明细与主视图使用同一套 canonical planning flow 基准。
+17. `live` 模式、`overview`、`transit` 与 `StationDashboard` 不受本次 change 影响。
 
 ## 未决项
 

@@ -5,6 +5,7 @@ import type { StationDerivedCache, StationDerivedSeed, StationDerivedStaticDeps 
 import { deriveInfrastructureModules, StationDerivedMap } from '../state/StationDerivedMap'
 import { DEFAULT_STATION_SETTINGS } from '../state/stationSettings'
 import { deepClone } from '@/utils/deepClone'
+import { calculateProductionFlowsCore } from './calculateProductionFlows'
 
 export interface ActiveStationState {
   actualWorkforce: number
@@ -160,6 +161,134 @@ export function buildDerivedTransitState(
   return {
     autoInfrastructureModules: autoInfrastructure,
     resolvedModules: autoInfrastructure
+  }
+}
+
+function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
+  const counts = new Map<string, number>()
+  const order: string[] = []
+
+  for (const module of modules) {
+    if (!counts.has(module.id)) order.push(module.id)
+    counts.set(module.id, (counts.get(module.id) || 0) + module.count)
+  }
+
+  return order
+    .map((id) => ({ id, count: counts.get(id) || 0 }))
+    .filter((module) => module.count > 0)
+}
+
+function maxSavedModules(preferred: SavedModule[], fallback: SavedModule[]): SavedModule[] {
+  const preferredMerged = mergeSavedModules(preferred)
+  const fallbackMerged = mergeSavedModules(fallback)
+  const preferredCounts = new Map(preferredMerged.map((module) => [module.id, module.count]))
+  const fallbackCounts = new Map(fallbackMerged.map((module) => [module.id, module.count]))
+  const order = [
+    ...preferredMerged.map((module) => module.id),
+    ...fallbackMerged.map((module) => module.id).filter((id) => !preferredCounts.has(id))
+  ]
+
+  return order
+    .map((id) => ({
+      id,
+      count: Math.max(preferredCounts.get(id) || 0, fallbackCounts.get(id) || 0)
+    }))
+    .filter((module) => module.count > 0)
+}
+
+export interface CanonicalPlanningStationState extends ActiveStationState {
+  finalPlannedModules: SavedModule[]
+  effectiveTargetModules: SavedModule[]
+}
+
+export interface BuildCanonicalPlanningStationStateInput {
+  planState: ActiveStationState
+  archiveBuiltModules: SavedModule[]
+  archiveBuildingModules: SavedModule[]
+  settings: StationSettings
+  deps: StationComputeDeps | null
+  calculateInfrastructureModules?: typeof deriveInfrastructureModules
+  calculateCanonicalFlows?: (modules: SavedModule[]) => {
+    productionFlows: WareProductionFlow[]
+    actualWorkforce: number
+    currentEfficiency: number
+  }
+}
+
+export function buildCanonicalPlanningStationState(
+  input: BuildCanonicalPlanningStationStateInput
+): CanonicalPlanningStationState {
+  const archiveCurrentTotalModules = mergeSavedModules([
+    ...input.archiveBuiltModules,
+    ...input.archiveBuildingModules
+  ])
+  const planningBaseModules = mergeSavedModules([
+    ...input.planState.plannedModules,
+    ...input.planState.autoIndustryModules,
+    ...input.planState.autoHabitationModules
+  ])
+  const provisionalEffectiveModules = maxSavedModules(
+    [...planningBaseModules, ...input.planState.autoInfrastructureModules],
+    archiveCurrentTotalModules
+  )
+
+  const canonicalFlowResult = input.calculateCanonicalFlows
+    ? input.calculateCanonicalFlows(provisionalEffectiveModules)
+    : !input.deps
+      ? {
+          productionFlows: input.planState.productionFlows,
+          actualWorkforce: input.planState.actualWorkforce,
+          currentEfficiency: input.planState.currentEfficiency
+        }
+      : calculateProductionFlowsCore({
+          plannedModules: provisionalEffectiveModules,
+          autoIndustryModules: [],
+          autoHabitationModules: [],
+          modulesMap: input.deps.modulesMap,
+          waresMap: input.deps.waresMap,
+          workforceConsumptionMap: input.deps.workforceConsumptionMap,
+          settings: input.settings,
+          warePriority: input.planState.warePriorityLevels
+        })
+
+  const calculateInfrastructure = input.calculateInfrastructureModules || deriveInfrastructureModules
+  const autoInfrastructureModules = !input.deps
+    ? input.planState.autoInfrastructureModules
+    : calculateInfrastructure({
+        productionFlows: canonicalFlowResult.productionFlows,
+        plannedModules: input.planState.plannedModules,
+        autoIndustryModules: input.planState.autoIndustryModules,
+        settings: {
+          racePreference: input.settings.racePreference,
+          resourceBufferHours: input.settings.resourceBufferHours,
+          primaryProductBufferHours: input.settings.primaryProductBufferHours,
+          secondaryProductBufferHours: input.settings.secondaryProductBufferHours,
+          transportShipCapacity: input.settings.transportShipCapacity
+        },
+        warePriorityLevels: input.planState.warePriorityLevels,
+        deps: input.deps
+      })
+  const finalPlannedModules = mergeSavedModules([
+    ...planningBaseModules,
+    ...autoInfrastructureModules
+  ])
+  const effectiveTargetModules = maxSavedModules(finalPlannedModules, archiveCurrentTotalModules)
+  const resolvedModules = [
+    ...input.planState.plannedModules,
+    ...input.planState.autoIndustryModules,
+    ...input.planState.autoHabitationModules,
+    ...autoInfrastructureModules
+  ]
+
+  return {
+    ...input.planState,
+    actualWorkforce: canonicalFlowResult.actualWorkforce,
+    currentEfficiency: canonicalFlowResult.currentEfficiency,
+    productionFlows: canonicalFlowResult.productionFlows,
+    autoInfrastructureModules,
+    resolvedModules,
+    finalPlannedModules,
+    effectiveTargetModules
   }
 }
 

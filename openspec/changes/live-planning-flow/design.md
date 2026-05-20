@@ -5,7 +5,7 @@
 本次变更继续遵循 `store → presenter → vue` 三层结构。
 
 - store 负责 `planning + archive` 条件下的新模块口径、主 flow 替换与后续聚合
-- presenter 负责把新的 canonical planning flow 及其聚合结果透传给中间面板
+- presenter 负责把新的 canonical planning flow 及其聚合结果透传给中间面板，并让 planning volume 复用 `live-cargo-volume` 的 allocation 视图骨架
 - vue 负责按既有 UI 结构切换数据源，不在组件内拼装 `max` 逻辑
 
 ```
@@ -33,7 +33,7 @@ canonical planning productionFlows
 useProductionWareflowPresenter
      │
      ├─ planning wareflow 视图
-     └─ planning volume 视图及展开明细
+     └─ planning volume allocation 视图及展开明细
 ```
 
 ## 设计原则
@@ -45,7 +45,8 @@ useProductionWareflowPresenter
 5. `warePriorityLevels` 保持现状逻辑，避免把本次 change 扩散为优先级语义重写。
 6. 新的 planning `productionFlows` 是 canonical flow，所有 flow-based aggregation 都必须基于它继续计算。
 7. planning volume 主视图与展开明细必须共用同一口径，避免 UI 口径撕裂。
-8. `planning + archive` 下，凡是由 archive 生产模块产出的 ware，禁止执行 lock 操作。
+8. planning volume 不再保留旧 volume list，而是切到与 `live-cargo-volume` 一致的 allocation 视图骨架。
+9. `planning + archive` 下，凡是由 archive 生产模块产出的 ware，禁止执行 lock 操作。
 
 ## 数据模型
 
@@ -109,6 +110,7 @@ effectiveModules = mergeMaxByModuleId(
 5. 这套 `productionFlows` 直接替代旧 planning flow，成为 canonical flow
 6. 所有后续 flow-based aggregation 都基于这套 canonical flow 继续计算
 7. presenter 将 canonical flow 及其聚合结果提供给 planning wareflow / planning volume
+8. planning volume 的 `current/target` 继续由 archive `cargo/targetCounts` 提供，`recommended/detail` 改由 canonical planning flow 提供
 
 ### 3. 为什么允许全部模块参与 max
 
@@ -183,12 +185,14 @@ store 需要明确分支：
 
 ### 1. StationWareFlowsDashboard
 
-中间资源面板在 planning 模式下继续使用现有组件结构，但输入数据改为新的 canonical planning flow 及其聚合结果。
+中间资源面板在 planning 模式下继续使用现有 workbench 入口，但 `volume` 不再停留在旧列表组件；它应切到与 `live-cargo-volume` 一致的 allocation 视图骨架，并把 planning canonical flow 作为推荐量与展开明细的计算基准。
 
 要求：
 
 - 普通 wareflow 行改读新的 canonical planning flow
-- volume 视图改读基于同一 canonical flow 派生出的聚合结果
+- `planning + archive + volume` 复用 `live-cargo-volume` 的 allocation 视图骨架
+- allocation 行中的 `currentCount / targetCount` 继续读取 archive `cargo / targetCounts`
+- allocation 行中的 `recommendedCount` 与展开时间明细改读基于同一 canonical flow 派生出的结果
 - volume 展开明细与主视图同源
 
 ### 2. 不变区域
@@ -196,7 +200,7 @@ store 需要明确分支：
 以下区域保持不变：
 
 - 左侧 `StationPlanningPanel` 的 `recommendedModules`、archive 参考区、auto 显示布局
-- `live` 模式 volume allocation 语义
+- `live` 模式 volume allocation 语义本身
 - `StationDashboard`
 - `overview` / `transit`
 
@@ -252,6 +256,19 @@ store 需要明确分支：
 - 用新口径重算 planning `productionFlows`
 - 让它直接替代旧 planning 主 flow
 - 再让所有依赖 flow 的聚合结果全部从这套 flow 继续推导
+
+### 5. 为什么 planning volume 也要切到 live allocation 壳
+
+`live-cargo-volume` 已经把 `volume` 视图从旧的 wareflow list 转成了 allocation 视图。若 `planning + archive` 仍保留旧 volume list，只替换数据源，会继续留下两类割裂：
+
+- 同样是带 archive 的 volume 语义，live 与 planning 使用两套不同 UI 结构
+- 用户无法直接比较 archive 当前库存 / target 与 planning 推荐量之间的关系
+
+因此这里需要明确：
+
+- planning volume 在 UI 结构上跟随 `live-cargo-volume`
+- live 与 planning 共用 allocation 视图骨架
+- 二者差别只落在 `recommended/detail` 的 flow 计算真相，而不是落在组件形态上
 
 ## Locale / 文档同步
 

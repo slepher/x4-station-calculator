@@ -19,6 +19,7 @@ import LiveStationAllocationView from './LiveStationAllocationView.vue'
 const props = defineProps<{
   visualMode?: 'planning' | 'live'
   viewMode: WareFlowViewMode
+  useAllocationVolumeView?: boolean
   productionFlows: DerivedProductionFlow[]
   liveVolumeAllocationGroups?: LiveVolumeAllocationGroup[]
   liveCargoOnlyItems?: LiveCargoOnlyItem[]
@@ -211,7 +212,9 @@ const rateGroups = computed(() => ([
 ]))
 
 const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
-const isLiveVolumeMode = computed(() => props.visualMode === 'live' && viewMode.value === 'volume')
+const isAllocationVolumeMode = computed(() =>
+  viewMode.value === 'volume' && (props.useAllocationVolumeView ?? props.visualMode === 'live')
+)
 const hasLiveAllocationData = computed(() =>
   (props.liveVolumeAllocationGroups?.some((group) => group.items.length > 0) || false)
   || (props.liveCargoOnlyItems?.length || 0) > 0
@@ -232,7 +235,7 @@ const hasLiveAllocationData = computed(() =>
 
     <div class="list-body custom-scrollbar">
       <LiveStationAllocationView
-        v-if="isLiveVolumeMode"
+        v-if="isAllocationVolumeMode"
         :groups="props.liveVolumeAllocationGroups || []"
         :cargo-only-items="props.liveCargoOnlyItems || []"
       />
@@ -360,8 +363,8 @@ const hasLiveAllocationData = computed(() =>
         <EmptyState v-if="viewMode === 'economy' && groupedFlows.flows.length === 0" />
       </div>
 
-      <EmptyState v-if="groupedFlows.flows.length === 0 && viewMode !== 'economy' && !isLiveVolumeMode" />
-      <EmptyState v-if="isLiveVolumeMode && !hasLiveAllocationData" />
+      <EmptyState v-if="groupedFlows.flows.length === 0 && viewMode !== 'economy' && !isAllocationVolumeMode" />
+      <EmptyState v-if="isAllocationVolumeMode && !hasLiveAllocationData" />
     </div>
 
     <div class="volume-controls-section" v-if="hasFlowData && viewMode === 'volume'">
