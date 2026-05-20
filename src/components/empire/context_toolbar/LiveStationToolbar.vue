@@ -251,24 +251,6 @@ const scopeClass = computed(() => {
         </div>
       </div>
 
-      <template v-if="showModuleScope">
-        <div class="separator mx-6"></div>
-
-        <div class="toolbar-section">
-          <div class="input-group">
-            <label class="group-label">{{ t('toolbar.module_scope') }}</label>
-            <button
-              class="toggle-chip"
-              :class="scopeClass"
-              @click="emit('cycleModuleScope')"
-            >
-              <span class="text-sm">{{ scopeIcon }}</span>
-              <span class="chip-status">{{ scopeLabel }}</span>
-            </button>
-          </div>
-        </div>
-      </template>
-
       <template v-if="props.mode === 'planning'">
         <div class="separator mx-6"></div>
 
@@ -304,6 +286,24 @@ const scopeClass = computed(() => {
               <span class="sr-only">{{ t('ui.show_sector_gaps') }}</span>
               <span class="text-sm">📊</span>
               <span class="chip-status">{{ showEmpireGaps ? 'ON' : 'OFF' }}</span>
+            </button>
+          </div>
+        </div>
+      </template>
+
+      <template v-if="showModuleScope">
+        <div class="separator mx-6"></div>
+
+        <div class="toolbar-section">
+          <div class="input-group">
+            <label class="group-label">{{ t('toolbar.module_scope') }}</label>
+            <button
+              class="toggle-chip"
+              :class="scopeClass"
+              @click="emit('cycleModuleScope')"
+            >
+              <span class="text-sm">{{ scopeIcon }}</span>
+              <span class="chip-status">{{ scopeLabel }}</span>
             </button>
           </div>
         </div>
