@@ -89,20 +89,23 @@ allScopeModules = effectiveTargetModules
 
 ### 3. buildingInProgress 的边界
 
-live 语义下，dashboard building scope 采用过“从 buildingModules 扣除 in-progress”的规则。  
-planning 下不再使用这套规则。
+live 语义下，dashboard building scope 采用“从统计输入里扣除 in-progress，再单独展示 in-progress 卡片”的规则。  
+planning 下主统计也需要保持这套规则。
 
 原因：
 
-- planning 的 `building` 已被重新定义为 `effectiveTarget - built`
-- 若再扣减 `buildingInProgress`，会把 planning building scope 人为缩小
-- 这会破坏“只增不减”的需求语义
+- planning 的 `building` 基础集合虽然仍然定义为 `effectiveTarget - built`
+- 但 dashboard 主统计若不扣减 `buildingInProgress`，会与单独的 in-progress 展示发生重复计入
+- 这个重复会同时污染模块数量、建材、工期与体积
 
 因此 planning 下：
 
 - `buildingInProgress` 继续透传给 dashboard
-- 可以继续用于辅助展示
-- 但不能参与 `displayModules` 或 `workerModules` 的扣减运算
+- 继续用于单独展示
+- `building` scope 的 `displayModules` 需要像 live 一样先扣除 `buildingInProgress`
+- `workerModules` 仍不受它影响，继续固定使用 `allScopeModules`
+- `buildingCargo` 与 `buildingReservation` 继续透传给 dashboard
+- 材料缺口继续在 dashboard 内按 live 既有规则，用当前 `building` scope 需求扣减这两类材料
 
 ## 视图口径
 
@@ -115,6 +118,12 @@ planning 下不再使用这套规则。
 - `all` -> `allScopeModules`
 
 因此它们表达的是“在当前选中 scope 下的建材 / 工期 / 体积成本”。
+
+其中建筑仓库材料、在途材料以及材料缺口的展示规则继续与 live 模式保持一致：
+
+- 建筑仓库材料与在途材料继续作为 dashboard summary 区块展示
+- `materialGap` 继续只在 `building` scope 下计算
+- `materialGap = 已排除 in-progress 的当前 building scope 建材需求 - buildingCargo - buildingReservation`
 
 ### 2. workers
 

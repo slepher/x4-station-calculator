@@ -74,6 +74,19 @@ function subtractSavedModules(source: SavedModule[], base: SavedModule[]): Saved
     .filter((module) => module.count > 0)
 }
 
+function subtractInProgressModule(modules: SavedModule[], inProgress?: SavedModule): SavedModule[] {
+  if (!inProgress) return modules
+  return modules.reduce<SavedModule[]>((acc, module) => {
+    if (module.id === inProgress.id) {
+      const remaining = module.count - inProgress.count
+      if (remaining > 0) acc.push({ ...module, count: remaining })
+      return acc
+    }
+    acc.push(module)
+    return acc
+  }, [])
+}
+
 export function useProductionDashboardPresenter(store: DashboardPresenterStore): UseProductionDashboardPresenterReturn {
   const scope = computed(() => store.moduleScope ?? 'built')
   const isPlanningArchiveStation = computed(() => {
@@ -90,24 +103,19 @@ export function useProductionDashboardPresenter(store: DashboardPresenterStore):
 
   const buildingScopeModules = computed(() => {
     if (isPlanningArchiveStation.value) {
-      return subtractSavedModules(
-        store.stationState?.effectiveTargetModules || [],
-        store.stationState?.archiveBuiltModules || []
+      return subtractInProgressModule(
+        subtractSavedModules(
+          store.stationState?.effectiveTargetModules || [],
+          store.stationState?.archiveBuiltModules || []
+        ),
+        store.stationState?.buildingInProgress
       )
     }
 
-    const building = store.stationState?.buildingModules || []
-    const inProgress = store.stationState?.buildingInProgress
-    if (!inProgress) return building
-    return building.reduce<SavedModule[]>((acc, module) => {
-      if (module.id === inProgress.id) {
-        const remaining = module.count - inProgress.count
-        if (remaining > 0) acc.push({ ...module, count: remaining })
-        return acc
-      }
-      acc.push(module)
-      return acc
-    }, [])
+    return subtractInProgressModule(
+      store.stationState?.buildingModules || [],
+      store.stationState?.buildingInProgress
+    )
   })
 
   const allScopeModules = computed(() => {

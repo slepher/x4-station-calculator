@@ -38,6 +38,8 @@
 - [x] 让 `workers` tab 读取 presenter 提供的 `workerModules`
 - [x] 避免在 `StationDashboard` 内部继续隐式复用单一模块输入
 - [x] 保持组件本身不直接依赖 store
+- [x] planning 下继续透传 `buildingCargo` 与 `buildingReservation`
+- [x] planning 下建筑仓库材料 / 在途材料展示与缺口计算保持 live 语义
 
 ## Task 6: planning workers tab 保持当前交互体验
 

@@ -105,17 +105,17 @@ planning dashboard 的 `building` scope SHALL NOT 削减 archive 中当前已经
 - **当** 系统构建 `buildingScopeModules`
 - **那么** 该 habitation 模块在 `buildingScopeModules` 中数量为 `2`
 
-### Requirement: Planning Dashboard Keeps BuildingInProgress As Display Context Only
+### Requirement: Planning Dashboard Excludes BuildingInProgress From Building Scope Statistics
 
-planning dashboard SHALL 保留 `buildingInProgress` 的展示语义，但 MUST NOT 用它去扣减 planning `building` scope 的模块数量。
+planning dashboard SHALL 保留 `buildingInProgress` 的展示语义，并且 MUST 用 live 模式相同的方式将其从 `building` scope 主统计输入中排除。
 
-#### Scenario: Building in progress is shown but does not shrink building scope
+#### Scenario: Building in progress is shown but not double-counted in building scope
 
 - **前提** archive 中存在 `buildingInProgress`
 - **并且** 当前处于 planning + archive 场景
-- **当** 系统构建 `buildingScopeModules`
-- **那么** 系统不会因为 `buildingInProgress` 存在而扣减 `buildingScopeModules`
-- **并且** dashboard 仍可显示该在建上下文
+- **当** 系统构建 `building` scope 的 dashboard 主统计输入
+- **那么** 系统会先从 `building` scope 统计输入里扣除 `buildingInProgress`
+- **并且** dashboard 仍可单独显示该在建上下文
 
 ### Requirement: Materials Time And Volume Tabs Follow Module Scope In Planning Mode
 
@@ -136,6 +136,32 @@ planning dashboard SHALL 保留 `buildingInProgress` 的展示语义，但 MUST 
 - **并且** `moduleScope = built`
 - **当** 用户查看 `volume` tab
 - **那么** dashboard 使用 `builtScopeModules` 进行统计
+
+### Requirement: Planning Material Stock And Reservation Display Follows Live Semantics
+
+在 planning + archive 下，建筑仓库材料与在途材料 SHALL 继续显示，并沿用 live 模式既有展示语义。
+
+#### Scenario: Planning dashboard shows building cargo and reservation materials
+
+- **前提** 当前 `visualMode = planning`
+- **并且** 当前 station 存在 `archiveStation`
+- **并且** archive 中存在 `building.cargo` 或 `building.reservation`
+- **当** 用户查看 `materials` 或 `volume` tab
+- **那么** dashboard 继续显示建筑仓库材料 summary
+- **并且** dashboard 继续显示在途材料 summary
+
+### Requirement: Planning Building Material Gap Deducts Cargo And Reservation Like Live Mode
+
+在 planning + archive 下，`building` scope 的材料缺口 SHALL 沿用 live 模式既有规则，使用当前 scope 建材需求扣减建筑仓库材料与在途材料。
+
+#### Scenario: Planning building scope material gap deducts stock and reservation
+
+- **前提** 当前 `visualMode = planning`
+- **并且** 当前 station 存在 `archiveStation`
+- **并且** `moduleScope = building`
+- **并且** archive 中存在 `building.cargo` 或 `building.reservation`
+- **当** 用户查看 `materials` 或 `volume` tab
+- **那么** dashboard 的 `materialGap` 会用已排除 `buildingInProgress` 后的 `buildingScopeModules` 建材需求扣减 `building.cargo` 与 `building.reservation`
 
 ### Requirement: Planning Workers Tab Uses All Scope And Ignores Module Scope Switching
 

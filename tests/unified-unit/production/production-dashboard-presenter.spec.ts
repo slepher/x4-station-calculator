@@ -44,7 +44,7 @@ function createStationState(overrides: Partial<ProductionStationState> = {}): Pr
 }
 
 describe('useProductionDashboardPresenter', () => {
-  it('uses planning+archive scope semantics without deducting buildingInProgress', () => {
+  it('uses planning+archive scope semantics while excluding buildingInProgress from building display modules', () => {
     const stationState = createStationState({
       modules: [{ id: 'archive-built-view', count: 99 }],
       archiveBuiltModules: [{ id: 'module-a', count: 10 }],
@@ -82,9 +82,9 @@ describe('useProductionDashboardPresenter', () => {
     })
 
     expect(presenter.props.builtScopeModules.value).toEqual([{ id: 'module-a', count: 10 }])
-    expect(presenter.props.buildingScopeModules.value).toEqual([{ id: 'module-a', count: 2 }, { id: 'module-b', count: 3 }])
+    expect(presenter.props.buildingScopeModules.value).toEqual([{ id: 'module-a', count: 1 }, { id: 'module-b', count: 3 }])
     expect(presenter.props.allScopeModules.value).toEqual([{ id: 'module-a', count: 12 }, { id: 'module-b', count: 3 }])
-    expect(presenter.props.displayModules.value).toEqual([{ id: 'module-a', count: 2 }, { id: 'module-b', count: 3 }])
+    expect(presenter.props.displayModules.value).toEqual([{ id: 'module-a', count: 1 }, { id: 'module-b', count: 3 }])
     expect(presenter.props.workerModules.value).toEqual([{ id: 'module-a', count: 12 }, { id: 'module-b', count: 3 }])
     expect(presenter.props.buildingInProgress.value).toEqual({ id: 'module-a', count: 1 })
   })
