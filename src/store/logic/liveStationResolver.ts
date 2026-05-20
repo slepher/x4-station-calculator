@@ -27,6 +27,7 @@ export function toProductionStation(
   return {
     id: plan.id,
     name: plan.name || plan.saveStationCode || 'Station',
+    sectorId: plan.groupId || null,
     type: plan.type,
     modules: plan.modules || [],
     settings,
@@ -146,7 +147,6 @@ export function deriveBindingStationsFromRecords(
   stationPlans.forEach((plan) => {
     if (emittedPlanIds.has(plan.id)) return
     const station = toProductionStation(plan, sectorsMap)
-    station.sectorId = plan.groupId || null
     result.push({
       station,
       groupId: plan.groupId || null
