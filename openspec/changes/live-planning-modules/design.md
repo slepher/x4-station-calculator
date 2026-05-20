@@ -2,35 +2,41 @@
 
 ## 架构概览
 
-本次变更严格遵循 `store → presenter → vue` 三层结构，所有显示层逻辑在 presenter 完成，store 保持领域数据完整不变。
+本次变更严格遵循 `store → presenter → vue` 三层结构。
+
+- store 负责领域状态、运行时 UI 状态和可复用业务能力
+- presenter 负责 archive 差异、orphan 推荐和 UI 输入数据组装
+- vue 负责渲染 planned/recommended/auto/archive 四个区块
 
 ```
-archiveStation (store)
+archiveStation + planningUiState (store)
      │
      ▼
-useProductionPlanningPresenter  ─── compute archiveTotalMap
-     │                              compute effectiveAuto* (相减)
-     │
+useProductionPlanningPresenter
+     │  compute archiveTotalMap
+     │  compute effectiveAuto*
+     │  compute recommendedModules
+     │  compute orphanArchiveModuleIds
+     │  compute planned item diff annotation
      ▼
-StationPlanningPanelWrapper ─── planning/live 互斥开关不变
-     │                          planning 模式下向 StationPlanningPanel 传入 archive 数据
-     │                          live 模式下继续渲染 ArchiveModuleList（不变）
-     │
+StationPlanningPanelWrapper
+     │  planning/live 互斥开关不变
+     │  planning 模式下向 StationPlanningPanel 传入推荐区与差异数据
      ▼
-StationPlanningPanel ─── planning 模式下接收 archiveModules, buildingModules, archiveTotalMap
-     │                   新增 tier_built / tier_building 两个 section
-     │                   搜索框默认数量联动
-     │                   StationPlanningItem 传入 threshold
-     │
+StationPlanningPanel
+     │  planned 区显示 +N / 红色告警
+     │  recommendedModules 区默认折叠
+     │  auto 区继续显示 effectiveAuto*
+     │  archive 区继续纯参考
      ▼
-StationPlanningItem ─── 新增 threshold prop，count < threshold 时红色渲染
+StationPlanningItem
 ```
 
 ## 数据流
 
 ### 1. archiveTotalMap
 
-在 presenter 中计算，key=moduleId, value=存档总量（built + building）。
+在 presenter 中计算，key = moduleId，value = 存档总量（built + building）。
 
 ```ts
 const archiveTotalMap = computed(() => {
@@ -54,68 +60,136 @@ function deductArchive(modules: SavedModule[], totalMap: Record<string, number>)
 }
 ```
 
-### 3. 存档模块区显示
+### 3. planned 差异数据
 
-存档模块区按 `X4Module.group` 分组，每组一个 tier header。组内已建模块在前、在建模块在后，在建以琥珀色虚线区分（完全与 ArchiveModuleList 一致）。规划区与存档区之间以 `<hr>` 分隔。
+presenter 为 `plannedModules` 提供两类差异信息：
 
-### 4. autoFill 参考模块优先级
+- `threshold`：`archiveTotalMap[module.id]`
+  - 供 `planned.count < archive_total` 时渲染红色 count
+- `diffAnnotation`
+  - 仅当 `planned.count > archive_total` 时生成
+  - 值为 `+${planned.count - archive_total}`
+  - 渲染在模块名称后，表达“比 archive 多了多少”
 
-`calculateAutoFillModules` 新增 `referenceModules: SavedModule[]` 参数。live 模式下 = `archive.modules + archive.building.modules`。
+`planned.count = archive_total` 时不生成任何额外标记。
 
-模块选择优先级（P1–P7）：
+### 4. recommendedModules
 
-| 优先级 | 条件 | 配额 |
-|--------|------|------|
-| P1 | race 匹配 且 在参考模块池中 | 按参考产能上限（消耗后扣减） |
-| P2 | 在参考模块池中（除去 P1 已消耗） | 按剩余参考产能上限 |
-| P3 | race 匹配 且 在 plannedModules 中 | 无上限 |
-| P4 | 在 plannedModules 中 | 无上限 |
-| P5 | race 匹配 且 在参考模块池中 | 无上限 |
-| P6 | 在参考模块池中 | 无上限 |
-| P7 | race 匹配 | 无上限 |
-| P8 | 任意模块 | 无上限 |
+presenter 使用**设计 A：轻 DTO**：
 
-配额按**产能**计算：`ref_count × 该模块目标 ware 的单周期产量`。P1+P2 共享同一份配额，消耗后不再恢复。P5/P6 不再受配额约束。
+- `recommendedModules: SavedModule[]`
+- `orphanArchiveModuleIds: Set<string>`
 
-实现方式：修改 `selectBestModule` / `findBestProducer`，增加 `referenceModules` 参数和配额跟踪。
+`recommendedModules` 中每项的 `count` 表示推荐差额，而不是 archive 原始总量：
+
+```ts
+recommended_count = archive_total - planned_count
+```
+
+仅当模块同时满足以下条件时，才会进入 `recommendedModules`：
+
+- `planned_count < archive_total`
+- 该模块命中 orphan 判定
+
+如果 `plannedModules` 中不存在该模块，则视为 `planned_count = 0`。
+
+`recommendedModules` 中的模块保持 archive 区同样的点击语义：
+
+- 若 planned 中不存在，则以 `archive_total` 加入
+- 若 planned 中已存在且小于 `archive_total`，则提升到 `archive_total`
+- 若 planned 中已存在且不小于 `archive_total`，则不变
+
+### 5. orphan 判定
+
+orphan 判定在 presenter 层完成，不改变 store 领域数据。
+
+输入集合：
+- `archive.modules`
+- `archive.building.modules`
+
+判定规则：
+- 遍历 archive 中的模块
+- 读取该模块的产出 ware
+- 若其**任一产出**在 archive **其他模块**中不存在“模块本身消费关系”，则该模块记为 orphan
+
+约束：
+- 只看模块本身消费关系
+- 不看工人等非模块消耗
+- 不考虑闭环模块
+
+产出结果：
+- `orphanArchiveModuleIds: Set<string>`
+
+### 6. recommended 区折叠状态
+
+折叠状态由 `useLiveProductionStore` 管理，而不是由组件本地状态管理。
+
+- 状态为全局运行时单例
+- 对所有 station 通用
+- 不写入持久化存储
 
 ## 组件变更
 
 ### StationPlanningPanelWrapper
 
-- planning/live 互斥开关**保持不变**：planning 渲染 `StationPlanningPanel`，live 渲染 `ArchiveModuleList`
-- **唯一改动**：planning 模式下，向 `StationPlanningPanel` 额外传入 `archiveModules`、`buildingModules`、`archiveTotalMap` 三个 prop
+- planning/live 互斥开关保持不变
+- planning 模式下新增传递：
+  - `archiveTotalMap`
+  - `recommendedModules`
+  - `recommendedExpanded`
 - live 模式下 `ArchiveModuleList` 完全不变
 
 ### StationPlanningPanel
 
-- 新增 props：`archiveModules: SavedModule[]`, `buildingModules: SavedModule[]`, `archiveTotalMap: Record<string, number>`
-- 存档模块区（已建+在建混合，group 分组，与 ArchiveModuleList 一致），规划区与存档区之间以 `<hr>` 分隔
-- 修改 `handleAddModule`：新模块默认 count 从 `archiveTotalMap` 取，fallback 为 1
-- 修改 `handleTransferArchiveModule`：实现"低于默认→提升，多于默认→不重复"逻辑
-- `StationPlanningItem` 传入 `threshold` prop = `archiveTotalMap[module.id]`
-- 仅当存档数据非空时渲染存档区
+- 结构调整为：
+  1. planned 区
+  2. `recommendedModules` 建议区
+  3. auto 各区
+  4. `<hr>`
+  5. archive 参考区
+- `recommendedModules` 区默认折叠，折叠态只显示推荐模块种类数
+- 展开态显示推荐模块列表，每项 count 为推荐差额
+- `recommendedModules` 中的模块可点击，点击行为与 archive 模块一致
+- archive 区仍保留纯参考职责，不显示 orphan icon 或额外 orphan 标签
+- archive 区展示结构保持当前实现不变
 
 ### StationPlanningItem
 
-- 新增 props：`threshold?: number`
-- 当 `!readonly && threshold !== undefined && item.count < threshold` 时，count 数字以红色渲染（`text-red-400`）
-- 不影响已建/在建区 item 的渲染（它们始终是默认颜色）
+- 新增 `diffAnnotation?: string`
+- 保留 `threshold?: number`
+- `diffAnnotation` 仅用于 `planned > archive_total`
+- `threshold` 仅用于 `planned < archive_total` 的红色告警
+
+## Store 变更
+
+### 运行时 UI 状态
+
+`useLiveProductionStore` 需要新增一个不持久化的运行时状态，例如：
+
+```ts
+recommendedModulesExpanded: boolean
+```
+
+要求：
+- 默认 `false`
+- 所有 station 共用
+- reload 后恢复默认值
 
 ## 不变区域
 
-以下逻辑保持完全不变：
-- `StationDerivedMap.deriveFullModules()` — 自动填充算法
-- `calculateAutoFillModules()` — 自动模块生成
-- `calculateProductionFlows()` — 生产流计算
-- `StationDerivedCache` — 缓存结构
-- `ArchiveModuleList` — live 模式存档展示
-- `StationDashboard` — 仪表盘
-- `StationWareFlowsDashboard` — 货物流仪表盘
+以下逻辑保持不变：
 
-## Locale 新增
+- `calculateAutoFillModules()` 的 P1–P8 优先级与配额规则
+- `ArchiveModuleList` 的 live 模式展示
+- `StationDashboard`
+- `StationWareFlowsDashboard`
+- 持久化数据结构本身
 
-| key | zh-CN | en |
-|-----|-------|----|
-| `planning.tier_built` | 已建模块区 | Built Modules |
-| `planning.tier_building` | 在建模块区 | Building Modules |
+## Locale
+
+本次变更需要为建议区补充文案 key，例如：
+
+- `planning.recommended_modules`
+- `planning.recommended_module_kinds`
+
+具体命名以现有 locale 结构为准，但 request/spec/tasks 需保持一致。
