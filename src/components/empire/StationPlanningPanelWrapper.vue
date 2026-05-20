@@ -7,6 +7,7 @@ import type { SavedModule } from '@/types/x4'
 
 const props = defineProps<{
   plannedModules: SavedModule[]
+  recommendedModules?: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
@@ -14,6 +15,7 @@ const props = defineProps<{
   effectiveAutoHabitationModules?: SavedModule[]
   effectiveAutoInfrastructureModules?: SavedModule[]
   archiveTotalMap?: Record<string, number>
+  recommendedModulesExpanded?: boolean
   enforceDlcActivation: boolean
   showArchive: boolean
   archiveModules?: SavedModule[]
@@ -22,6 +24,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   updatePlannedModules: [modules: SavedModule[]]
+  updateRecommendedModulesExpanded: [expanded: boolean]
 }>()
 
 const { t } = useI18n()
@@ -34,6 +37,10 @@ const displayAutoInfrastructure = computed(() => props.effectiveAutoInfrastructu
 
 const handleUpdatePlannedModules = (modules: SavedModule[]) => {
   emit('updatePlannedModules', modules)
+}
+
+const handleUpdateRecommendedModulesExpanded = (expanded: boolean) => {
+  emit('updateRecommendedModulesExpanded', expanded)
 }
 </script>
 
@@ -49,6 +56,7 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
       <StationPlanningPanel
         v-if="!showArchivePanel"
         :planned-modules="props.plannedModules"
+        :recommended-modules="props.recommendedModules || []"
         :auto-industry-modules="displayAutoIndustry"
         :auto-habitation-modules="displayAutoHabitation"
         :auto-infrastructure-modules="displayAutoInfrastructure"
@@ -56,7 +64,9 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
         :archive-modules="props.archiveModules || []"
         :building-modules="props.buildingModules || []"
         :archive-total-map="props.archiveTotalMap || {}"
+        :recommended-modules-expanded="props.recommendedModulesExpanded ?? false"
         @update-planned-modules="handleUpdatePlannedModules"
+        @update-recommended-modules-expanded="handleUpdateRecommendedModulesExpanded"
       />
       <ArchiveModuleList
         v-else

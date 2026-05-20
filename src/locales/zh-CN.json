@@ -701,6 +701,8 @@
     "tier_industry": "自动工业区",
     "tier_habitation": "自动生活区",
     "tier_infrastructure": "自动基础设施",
+    "recommended_modules": "推荐纳入规划",
+    "recommended_module_kinds": "推荐模块种类数：{count}",
     "tier_supply": "自动补给区",
     "tier_built": "已建模块区",
     "tier_building": "在建模块区",

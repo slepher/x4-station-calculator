@@ -56,6 +56,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const buildPriceMultiplier = ref(0.5)
   const overviewBuyMultiplier = ref(0.5)
   const overviewSellMultiplier = ref(0.5)
+  const recommendedModulesExpanded = ref(false)
   const playerStationRecords = ref<PlayerStationRecord[]>([])
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
@@ -670,6 +671,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
   function toggleMode() {
     mode.value = mode.value === 'live' ? 'planning' : 'live'
+  }
+
+  function setRecommendedModulesExpanded(expanded: boolean) {
+    recommendedModulesExpanded.value = expanded
   }
 
   const moduleScopeRef = ref<'built' | 'building' | 'all'>('built')
@@ -1971,8 +1976,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     setExpandedSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
     getStationById,
     mode,
+    recommendedModulesExpanded,
     canToggle,
     toggleMode,
+    setRecommendedModulesExpanded,
     moduleScope,
     hasBuildingModules,
     cycleModuleScope,

@@ -19,6 +19,7 @@ const props = defineProps<{
   inactiveByDlc?: boolean
   countDisabled?: boolean
   threshold?: number
+  diffAnnotation?: string
 }>()
 
 const emit = defineEmits<{
@@ -58,6 +59,7 @@ const moduleInfoClass = computed(() => {
 const shouldShowDlcTag = computed(() => props.info.dlc_tag !== 'base')
 const dlcLabel = computed(() => gameData.getDlcDisplayName(props.info.dlc_tag))
 const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
+const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.diffAnnotation)
 </script>
 
 <template>
@@ -76,6 +78,7 @@ const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
       <div class="module-title-row">
         <div class="module-name" :title="info.name">
           {{ translateModule(info) }}
+          <span v-if="moduleDiffAnnotation" class="module-diff-annotation">{{ moduleDiffAnnotation }}</span>
         </div>
         <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'">
           {{ dlcLabel }}
@@ -171,6 +174,10 @@ const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
 
 .module-name {
   @apply truncate font-medium text-slate-300 group-hover/row:text-white transition-colors text-xs sm:text-sm;
+}
+
+.module-diff-annotation {
+  @apply ml-1 text-[10px] font-normal text-emerald-300/75;
 }
 
 .module-title-row {

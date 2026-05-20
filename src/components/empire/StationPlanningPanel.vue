@@ -10,6 +10,7 @@ import type { SavedModule, ModuleGroupResult, X4Module } from '@/types/x4'
 
 const props = defineProps<{
   plannedModules: SavedModule[]
+  recommendedModules?: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
@@ -17,10 +18,12 @@ const props = defineProps<{
   archiveModules?: SavedModule[]
   buildingModules?: SavedModule[]
   archiveTotalMap?: Record<string, number>
+  recommendedModulesExpanded?: boolean
 }>()
 
 const emit = defineEmits<{
   updatePlannedModules: [modules: SavedModule[]]
+  updateRecommendedModulesExpanded: [expanded: boolean]
 }>()
 
 const { t } = useI18n()
@@ -120,6 +123,7 @@ const groupedArchiveModules = computed(() =>
 )
 
 const hasArchiveData = computed(() => groupedArchiveModules.value.length > 0)
+const hasRecommendedModules = computed(() => (props.recommendedModules?.length || 0) > 0)
 
 const archiveTotal = (moduleId: string): number => {
   return props.archiveTotalMap?.[moduleId] ?? 0
@@ -272,6 +276,10 @@ const handleTransferArchiveModule = (moduleId: string) => {
 const handleUpdateSearchQuery = (value: string) => {
   searchQuery.value = value
 }
+
+const handleToggleRecommendedModules = () => {
+  emit('updateRecommendedModulesExpanded', !(props.recommendedModulesExpanded ?? false))
+}
 </script>
 
 <template>
@@ -312,6 +320,29 @@ const handleUpdateSearchQuery = (value: string) => {
               @update:count="(val: number) => handleUpdateModuleCount(index, val)" @remove="handleRemoveModule(index)" />
           </template>
         </draggable>
+      </div>
+    </div>
+
+    <div v-if="hasRecommendedModules" class="tier-section tier-recommended">
+      <button type="button" class="tier-header tier-header--recommended" @click="handleToggleRecommendedModules">
+        <span class="tier-label">
+          {{ (props.recommendedModulesExpanded ? '▾' : '▸') + ' ' + t('planning.recommended_modules') }}
+        </span>
+        <span class="tier-meta">
+          {{ t('planning.recommended_module_kinds', { count: props.recommendedModules?.length || 0 }) }}
+        </span>
+      </button>
+      <div v-if="props.recommendedModulesExpanded" class="module-list-scroll">
+        <div class="auto-modules-container recommended-modules-container">
+          <StationPlanningItem
+            v-for="(element, index) in props.recommendedModules"
+            :key="'recommended-' + element.id + '-' + index"
+            :item="element"
+            :info="getModuleInfo(element.id)!"
+            :readonly="true"
+            @transfer="handleTransferArchiveModule(element.id)"
+          />
+        </div>
       </div>
     </div>
 
@@ -429,6 +460,18 @@ const handleUpdateSearchQuery = (value: string) => {
 
 .tier-section.tier-auto {
   @apply opacity-90;
+}
+
+.tier-section.tier-recommended .module-list-scroll {
+  @apply border-l-2 border-dashed border-emerald-500/40 pl-2;
+}
+
+.tier-header--recommended {
+  @apply border-emerald-500/20 bg-emerald-950/20 hover:bg-emerald-900/20;
+}
+
+.tier-meta {
+  @apply ml-auto text-[11px] text-emerald-300/80;
 }
 
 .tier-section.tier-auto .module-list-scroll {

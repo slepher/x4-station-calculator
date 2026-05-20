@@ -700,6 +700,8 @@
     "tier_industry": "Auto Industry",
     "tier_habitation": "Auto Habitation",
     "tier_infrastructure": "Auto Infrastructure",
+    "recommended_modules": "Recommended Modules",
+    "recommended_module_kinds": "{count} recommended kinds",
     "tier_supply": "Auto Supply",
     "tier_built": "Built Modules",
     "tier_building": "Building Modules",

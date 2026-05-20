@@ -101,11 +101,14 @@ const buildPlanPresenter = useBuildPlanPresenter({
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
         :planned-modules="planningPresenter.props.plannedModules.value"
+        :recommended-modules="planningPresenter.props.recommendedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
         :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
         :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
+        :recommended-modules-expanded="planningPresenter.props.recommendedModulesExpanded.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
+        @update-recommended-modules-expanded="planningPresenter.emits.setRecommendedModulesExpanded"
       />
     </div>
 

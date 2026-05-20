@@ -211,6 +211,7 @@ const showArchiveModuleList = computed(() => {
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanelWrapper
         :planned-modules="planningPresenter.props.plannedModules.value"
+        :recommended-modules="planningPresenter.props.recommendedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
         :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
         :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
@@ -218,11 +219,13 @@ const showArchiveModuleList = computed(() => {
         :effective-auto-habitation-modules="planningPresenter.props.effectiveAutoHabitationModules.value"
         :effective-auto-infrastructure-modules="planningPresenter.props.effectiveAutoInfrastructureModules.value"
         :archive-total-map="planningPresenter.props.archiveTotalMap.value"
+        :recommended-modules-expanded="planningPresenter.props.recommendedModulesExpanded.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         :show-archive="planningPresenter.props.visualMode.value === 'live'"
         :archive-modules="planningPresenter.props.liveModules.value"
         :building-modules="planningPresenter.props.liveBuildingModules.value"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
+        @update-recommended-modules-expanded="planningPresenter.emits.setRecommendedModulesExpanded"
       />
     </div>
 

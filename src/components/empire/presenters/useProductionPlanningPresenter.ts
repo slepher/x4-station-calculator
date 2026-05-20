@@ -2,6 +2,7 @@ import { computed, type ComputedRef } from 'vue'
 import type { ProductionContextState, ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
 import type { SavedModule } from '@/types/x4'
 import type { ArchiveStationData } from '@/types/saveArchive'
+import { useGameDataStore } from '@/store/useGameDataStore'
 
 function deductArchive(modules: SavedModule[], totalMap: Record<string, number>): SavedModule[] {
   if (Object.keys(totalMap).length === 0) return modules
@@ -22,6 +23,9 @@ export interface PlanningPresenterProps {
   effectiveAutoHabitationModules: ComputedRef<SavedModule[]>
   effectiveAutoInfrastructureModules: ComputedRef<SavedModule[]>
   archiveTotalMap: ComputedRef<Record<string, number>>
+  orphanArchiveModuleIds: ComputedRef<Set<string>>
+  recommendedModules: ComputedRef<SavedModule[]>
+  recommendedModulesExpanded: ComputedRef<boolean>
   liveModules: ComputedRef<SavedModule[]>
   liveBuildingModules: ComputedRef<SavedModule[]>
   enforceDlcActivation: ComputedRef<boolean>
@@ -29,6 +33,7 @@ export interface PlanningPresenterProps {
 
 export interface PlanningPresenterEmits {
   updatePlannedModules: (modules: SavedModule[]) => void
+  setRecommendedModulesExpanded: (expanded: boolean) => void
 }
 
 export interface UseProductionPlanningPresenterReturn {
@@ -41,12 +46,15 @@ export interface PlanningPresenterStore {
   context: ProductionContextState
   stationState: ProductionStationState | null
   archiveStation?: ArchiveStationData | null
+  recommendedModulesExpanded?: boolean
   moduleActions: {
     updatePlannedModules(modules: SavedModule[]): void
   }
+  setRecommendedModulesExpanded?: (expanded: boolean) => void
 }
 
 export function useProductionPlanningPresenter(store: PlanningPresenterStore): UseProductionPlanningPresenterReturn {
+  const gameDataStore = useGameDataStore()
   const liveModules = computed(() => store.archiveStation?.modules || [])
   const liveBuildingModules = computed(() => store.archiveStation?.building?.modules || [])
 
@@ -64,12 +72,70 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const rawAutoIndustry = computed(() => store.stationState?.autoIndustryModules || [])
   const rawAutoHabitation = computed(() => store.stationState?.autoHabitationModules || [])
   const rawAutoInfrastructure = computed(() => store.stationState?.autoInfrastructureModules || [])
+  const plannedModules = computed(() => store.stationState?.plannedModules || [])
+
+  const orphanArchiveModuleIds = computed<Set<string>>(() => {
+    const archiveModuleIds = Array.from(new Set([
+      ...liveModules.value.map(module => module.id),
+      ...liveBuildingModules.value.map(module => module.id)
+    ]))
+    if (archiveModuleIds.length === 0) return new Set()
+
+    const archiveDefinitions = archiveModuleIds
+      .map(moduleId => gameDataStore.modulesMap[moduleId])
+      .filter((module): module is NonNullable<typeof module> => Boolean(module))
+
+    const orphanIds = new Set<string>()
+    archiveDefinitions.forEach((module) => {
+      const outputWareIds = Object.keys(module.outputs || {})
+      if (outputWareIds.length === 0) return
+
+      const isOrphan = outputWareIds.some((wareId) => {
+        return !archiveDefinitions.some((otherModule) => {
+          if (otherModule.id === module.id) return false
+          return (otherModule.inputs?.[wareId] || 0) > 0
+        })
+      })
+
+      if (isOrphan) {
+        orphanIds.add(module.id)
+      }
+    })
+
+    return orphanIds
+  })
+
+  const recommendedModules = computed<SavedModule[]>(() => {
+    if (orphanArchiveModuleIds.value.size === 0) return []
+
+    const plannedCountMap = plannedModules.value.reduce<Record<string, number>>((map, module) => {
+      map[module.id] = (map[module.id] || 0) + module.count
+      return map
+    }, {})
+
+    return Object.entries(archiveTotalMap.value)
+      .filter(([moduleId, archiveTotal]) => {
+        if (!orphanArchiveModuleIds.value.has(moduleId)) return false
+        return (plannedCountMap[moduleId] || 0) < archiveTotal
+      })
+      .map(([moduleId, archiveTotal]) => ({
+        id: moduleId,
+        count: archiveTotal - (plannedCountMap[moduleId] || 0)
+      }))
+  })
 
   const props: PlanningPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
     hasArchive: computed(() => store.archiveStation != null),
-    plannedModules: computed(() => store.stationState?.plannedModules || []),
+    plannedModules: computed(() => plannedModules.value.map((module) => {
+      const archiveTotal = archiveTotalMap.value[module.id] || 0
+      if (module.count <= archiveTotal) return module
+      return {
+        ...module,
+        diffAnnotation: `+${module.count - archiveTotal}`
+      }
+    })),
     autoIndustryModules: computed(() => rawAutoIndustry.value),
     autoHabitationModules: computed(() => rawAutoHabitation.value),
     autoInfrastructureModules: computed(() => rawAutoInfrastructure.value),
@@ -77,13 +143,17 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
     effectiveAutoHabitationModules: computed(() => deductArchive(rawAutoHabitation.value, archiveTotalMap.value)),
     effectiveAutoInfrastructureModules: computed(() => deductArchive(rawAutoInfrastructure.value, archiveTotalMap.value)),
     archiveTotalMap,
+    orphanArchiveModuleIds,
+    recommendedModules,
+    recommendedModulesExpanded: computed(() => store.recommendedModulesExpanded ?? false),
     liveModules,
     liveBuildingModules,
     enforceDlcActivation: computed(() => store.stationState?.enforceDlcActivation ?? false)
   }
 
   const emits: PlanningPresenterEmits = {
-    updatePlannedModules: (modules) => store.moduleActions.updatePlannedModules(modules)
+    updatePlannedModules: (modules) => store.moduleActions.updatePlannedModules(modules),
+    setRecommendedModulesExpanded: (expanded) => store.setRecommendedModulesExpanded?.(expanded)
   }
 
   return { props, emits }
