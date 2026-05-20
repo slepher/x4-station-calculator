@@ -37,7 +37,7 @@ output_assets/
 
 # 存档提取数据
 save_data/
-save_*.xml
+save_*
 
 # 忽略 Python 脚本生成的临时缓存或日志 (如果有)
 scripts/*.log
