@@ -212,7 +212,6 @@ export function findBestProducerWithRef(
   const p1Pool = refCandidates.filter(m => (remainingQuota[m.id] || 0) > 0 && m.race === race)
   if (p1Pool.length > 0) {
     p1Pool.sort(sortByOutput)
-    console.log('[autoFill] P1 selected:', p1Pool[0]!.id, 'for ware:', wareId, 'race:', race)
     return { module: p1Pool[0]!, exhaustedQuota: false }
   }
 
@@ -226,14 +225,12 @@ export function findBestProducerWithRef(
   // P3: race + existing/planned
   const p3 = pickFrom(existingCandidates, true)
   if (p3) {
-    console.log('[autoFill] P3 selected:', p3.id)
     return { module: p3, exhaustedQuota: true }
   }
 
   // P4: existing/planned
   const p4 = pickFrom(existingCandidates, false)
   if (p4) {
-    console.log('[autoFill] P4 selected:', p4.id)
     return { module: p4, exhaustedQuota: true }
   }
 
@@ -241,32 +238,26 @@ export function findBestProducerWithRef(
   const p5Pool = refCandidates.filter(m => m.race === race)
   if (p5Pool.length > 0) {
     p5Pool.sort(sortByOutput)
-    console.log('[autoFill] P5 selected:', p5Pool[0]!.id, 'available ref ids:', refCandidates.map(m => `${m.id}(${m.race})`))
     return { module: p5Pool[0]!, exhaustedQuota: true }
   }
 
   // P6: ref, 不考虑配额
   if (refCandidates.length > 0) {
     refCandidates.sort(sortByOutput)
-    console.log('[autoFill] P6 selected:', refCandidates[0]!.id, 'available ref ids:', refCandidates.map(m => `${m.id}(${m.race})`))
     return { module: refCandidates[0]!, exhaustedQuota: true }
   }
 
   // P7: race + db
   const p7 = pickFrom(dbCandidates, true)
   if (p7) {
-    console.log('[autoFill] P7 selected:', p7.id, 'race:', race)
     return { module: p7, exhaustedQuota: true }
   }
 
   // P8: db
   const p8 = pickFrom(dbCandidates, false)
   if (p8) {
-    console.log('[autoFill] P8 selected:', p8.id)
     return { module: p8, exhaustedQuota: true }
   }
-
-  console.log('[autoFill] NO PRODUCER found for ware:', wareId, 'refCandidates:', refCandidates.length, 'existingCandidates:', existingCandidates.length, 'dbCandidates:', dbCandidates.length)
 }
 
 export function findStandardPowerPlant(

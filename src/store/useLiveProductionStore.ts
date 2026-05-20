@@ -812,7 +812,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       referenceModules.push(...(archive.modules || []))
       referenceModules.push(...(archive.building?.modules || []))
     }
-    console.log('[buildPlanningSeed] station:', station.id, 'isActive:', isActiveStation, 'refModules:', referenceModules.map(m => `${m.id}×${m.count}`))
 
     return {
       modulesMode: 'plan' as const,

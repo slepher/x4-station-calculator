@@ -57,19 +57,12 @@ export function calculateAutoIndustryModules(
   const refQuota: Record<string, Record<string, number>> = {}
   for (const ref of refMods) {
     const mod = modulesMap[ref.id]
-    if (!mod) {
-      console.log('[autoFill] ref module not in modulesMap:', ref.id, 'count:', ref.count)
-      continue
-    }
+    if (!mod) continue
     for (const [wid, rate] of Object.entries(mod.outputs)) {
       if (!refQuota[ref.id]) refQuota[ref.id] = {}
       refQuota[ref.id]![wid] = (refQuota[ref.id]![wid] || 0) + rate * ref.count
     }
   }
-
-  console.log('[autoFill] race:', race, 'plannedModules:', plannedModules.map(m => `${m.id}×${m.count}`),
-    'refModules:', refMods.map(m => `${m.id}×${m.count}`),
-    'refQuota:', JSON.stringify(refQuota))
 
   const remainingQuota: Record<string, number> = {}
 
@@ -122,10 +115,7 @@ export function calculateAutoIndustryModules(
         wareId, race, currentModulesAsSaved, modulesMap, waresMap,
         refMods, quotaForWare
       )
-      if (!selection) {
-        console.log('[autoFill] no producer for ware:', wareId, 'existingModules:', currentModulesAsSaved.map(m => `${m.id}×${m.count}`))
-        continue
-      }
+      if (!selection) continue
 
       const producer = selection.module
       const eff = getProductionEfficiency(producer, globalWorkforceBonus)
@@ -136,10 +126,7 @@ export function calculateAutoIndustryModules(
       }
 
       const singleOutput = (producer.outputs[wareId] || 0) * eff * sunlightFactor
-      if (singleOutput <= 0) {
-        console.log('[autoFill] selected producer has zero output for ware:', producer.id, wareId, 'outputs:', producer.outputs)
-        continue
-      }
+      if (singleOutput <= 0) continue
 
       let countNeeded = Math.ceil(deficit / singleOutput)
 
@@ -148,13 +135,10 @@ export function calculateAutoIndustryModules(
         const quota = quotaForWare[producer.id] || 0
         if (quota <= 0) continue
         const maxFromQuota = Math.floor(quota / rawOutput)
-        if (maxFromQuota <= 0) {
-          console.log('[autoFill] quota exhausted (< 1 module), using unrestricted:', producer.id, 'quota:', quota, 'rawOutput:', rawOutput)
-        } else {
+        if (maxFromQuota > 0) {
           const capped = Math.min(countNeeded, maxFromQuota)
           consumeQuota(producer.id, wareId, capped * rawOutput)
           countNeeded = capped
-          console.log('[autoFill] quota capped to:', capped)
         }
       }
 
