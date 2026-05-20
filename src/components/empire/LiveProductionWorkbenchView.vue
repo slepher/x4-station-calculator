@@ -169,7 +169,7 @@ const showArchiveModuleList = computed(() => {
 
       <div class="col-span-12 lg:col-span-4">
         <StationDashboard
-          :modules="[...dashboardPresenter.props.activeModules.value, ...dashboardPresenter.props.activeBuildingModules.value]"
+          :display-modules="[...dashboardPresenter.props.activeModules.value, ...dashboardPresenter.props.activeBuildingModules.value]"
           :hide-workers-view="true"
           :settings="dashboardPresenter.props.settings.value"
           :current-efficiency="1"
@@ -233,6 +233,7 @@ const showArchiveModuleList = computed(() => {
       <StationWareFlowsDashboard
         :visual-mode="wareflowPresenter.props.visualMode.value"
         :view-mode="wareflowPresenter.props.viewMode.value"
+        :use-allocation-volume-view="wareflowPresenter.props.useAllocationVolumeView.value"
         :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
         :live-volume-allocation-groups="wareflowPresenter.props.liveVolumeAllocationGroups.value"
         :live-cargo-only-items="wareflowPresenter.props.liveCargoOnlyItems.value"
@@ -258,8 +259,8 @@ const showArchiveModuleList = computed(() => {
 
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
-        :modules="dashboardPresenter.props.modules.value"
-        :effective-modules="dashboardPresenter.props.effectiveModules.value"
+        :display-modules="dashboardPresenter.props.displayModules.value"
+        :worker-modules="dashboardPresenter.props.workerModules.value"
         :building-cargo="dashboardPresenter.props.buildingCargo.value"
         :building-reservation="dashboardPresenter.props.buildingReservation.value"
         :is-building-scope="dashboardPresenter.props.isBuildingScope.value"

@@ -192,8 +192,29 @@ planning dashboard SHALL 继续复用现有 `moduleScope` 控制入口，而不�
 #### Scenario: Planning dashboard uses existing module scope control
 
 - **前提** 当前处于 planning + archive 场景
+- **并且** 仍存在待建设模组
 - **当** 用户查看 toolbar
 - **那么** 系统继续使用现有 `moduleScope` 控件切换 `built / building / all`
+
+### Requirement: Planning Module Scope Visibility And Default Follow Pending Construction
+
+planning dashboard SHALL 根据是否仍存在待建设模组决定 `moduleScope` 的默认值与按钮显示状态。
+
+#### Scenario: Pending construction defaults scope to building
+
+- **前提** 当前处于 planning + archive 场景
+- **并且** `effectiveTargetModules - builtScopeModules` 非空
+- **当** 系统初始化当前 station 的 dashboard scope
+- **那么** 系统显示现有 `moduleScope` 按钮
+- **并且** 默认将 `moduleScope` 设为 `building`
+
+#### Scenario: No pending construction hides scope control and keeps built
+
+- **前提** 当前处于 planning + archive 场景
+- **并且** `effectiveTargetModules - builtScopeModules` 为空
+- **当** 系统初始化当前 station 的 dashboard scope
+- **那么** 系统隐藏现有 `moduleScope` 按钮
+- **并且** 保持 `moduleScope = built`
 
 ### Requirement: Live Overview And Transit Dashboard Semantics Remain Unchanged
 

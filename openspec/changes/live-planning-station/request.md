@@ -24,50 +24,52 @@
 ### 3. StationDashboard 三态语义
 
 10. planning 模式下继续复用现有 `moduleScope` 三态按钮，不新增新的 dashboard 控件。
-11. `built` scope：
+11. 当 `effectiveTargetModules` 相对 `builtModules` 仍存在待建设模组时，继续显示该按钮，并默认将 `moduleScope` 设为 `building`。
+12. 当 `effectiveTargetModules` 相对 `builtModules` 已不存在待建设模组时，隐藏该按钮，并保持 `moduleScope = built`。
+13. `built` scope：
     - `builtScopeModules = builtModules`
-12. `building` scope：
+14. `building` scope：
     - `buildingScopeModules = effectiveTargetModules - builtModules`
-13. `all` scope：
+15. `all` scope：
     - `allScopeModules = effectiveTargetModules`
-14. `building` 的语义是“相对 built 仍待建设的全部模块”。
-15. 由于 `all = max(finalPlannedModules, currentTotalModules)`，所以 `building = all - built` 天然满足：
+16. `building` 的语义是“相对 built 仍待建设的全部模块”。
+17. 由于 `all = max(finalPlannedModules, currentTotalModules)`，所以 `building = all - built` 天然满足：
     - 不会削减 archive 中当前在建模块数量
     - 只会在当前在建基础上继续新增
-16. auto 生成的 habitation / storage / dock / pier 只要进入 `effectiveTargetModules`，也会进入 planning 的 `building` scope。
+18. auto 生成的 habitation / storage / dock / pier 只要进入 `effectiveTargetModules`，也会进入 planning 的 `building` scope。
 
 ### 4. buildingInProgress 的语义
 
-17. `buildingInProgress` 在 planning dashboard 中仍然保留展示意义。
-18. 但 `buildingInProgress` 不参与 planning scope 的模块数量扣减。
-19. 换句话说，planning 下 `building` scope 不采用 live 模式中“从 buildingModules 扣除 in-progress”的规则。
-20. `buildingInProgress` 仅作为“当前 archive 确实存在一个正在施工中的模块”的辅助展示上下文。
+19. `buildingInProgress` 在 planning dashboard 中仍然保留展示意义。
+20. 但 `buildingInProgress` 不参与 planning scope 的模块数量扣减。
+21. 换句话说，planning 下 `building` scope 不采用 live 模式中“从 buildingModules 扣除 in-progress”的规则。
+22. `buildingInProgress` 仅作为“当前 archive 确实存在一个正在施工中的模块”的辅助展示上下文。
 
 ### 5. 四个 tab 的口径
 
-21. `materials / time / volume` 三个 tab 继续跟随当前 `moduleScope` 切换：
+23. `materials / time / volume` 三个 tab 继续跟随当前 `moduleScope` 切换：
     - `built` 看 `builtScopeModules`
     - `building` 看 `buildingScopeModules`
     - `all` 看 `allScopeModules`
-22. `workers` tab 不跟随 `moduleScope` 切换。
-23. `workers` tab 在 planning + archive 下固定使用 `allScopeModules` 作为统计模块口径。
-24. `workers` tab 不使用 archive 中已有的工人数值。
-25. `workers` tab 也不沿用 live 模式下“工人视图固定看 built modules”的旧语义。
-26. `workers` tab 在 planning + archive 下表示“规划完成后的运营状态模拟”。
+24. `workers` tab 不跟随 `moduleScope` 切换。
+25. `workers` tab 在 planning + archive 下固定使用 `allScopeModules` 作为统计模块口径。
+26. `workers` tab 不使用 archive 中已有的工人数值。
+27. `workers` tab 也不沿用 live 模式下“工人视图固定看 built modules”的旧语义。
+28. `workers` tab 在 planning + archive 下表示“规划完成后的运营状态模拟”。
 
 ### 6. workers tab 的交互行为
 
-27. planning 下 `workers` tab 继续保持当前 planning 模式已有的交互体验。
-28. 用户仍可切换 `workforceAuto`。
-29. 用户仍可修改当前工人数值。
-30. `currentEfficiency` 与 `actualWorkforce` 应基于 `allScopeModules` 和当前 planning workforce 输入重算。
-31. planning 下 workers tab 的工人分析结果来自当前 planning 计算输入，而不是 archive 中已有 workforce 状态。
+29. planning 下 `workers` tab 继续保持当前 planning 模式已有的交互体验。
+30. 用户仍可切换 `workforceAuto`。
+31. 用户仍可修改当前工人数值。
+32. `currentEfficiency` 与 `actualWorkforce` 应基于 `allScopeModules` 和当前 planning workforce 输入重算。
+33. planning 下 workers tab 的工人分析结果来自当前 planning 计算输入，而不是 archive 中已有 workforce 状态。
 
 ### 7. 与 live-planning-flow 的边界
 
-32. `live-planning-flow` 负责中间 `wareflow / volume` 的 planning 口径。
-33. `live-planning-station` 负责右侧 `StationDashboard` 的 planning 口径。
-34. 二者都可能依赖 `finalPlannedModules` 或 `effectiveTargetModules`，但输出目标不同，不能互相替代。
+34. `live-planning-flow` 负责中间 `wareflow / volume` 的 planning 口径。
+35. `live-planning-station` 负责右侧 `StationDashboard` 的 planning 口径。
+36. 二者都可能依赖 `finalPlannedModules` 或 `effectiveTargetModules`，但输出目标不同，不能互相替代。
 
 ## 边界
 
@@ -101,12 +103,14 @@
 4. planning 下 `building` scope 使用 `effectiveTargetModules - builtModules`。
 5. planning 下 `all` scope 使用 `effectiveTargetModules`。
 6. planning 下 `building` scope 不会削减 archive 中当前在建数量，只会继续新增。
-7. planning 下 `materials / time / volume` 三个 tab 跟随 `moduleScope` 切换。
-8. planning 下 `workers` tab 不跟随 `moduleScope` 切换，而是固定使用 `allScopeModules`。
-9. planning 下 `workers` tab 不使用 archive 中已有 workforce 数值。
-10. planning 下 `workers` tab 仍支持切换 `workforceAuto` 与修改当前工人数值。
-11. planning 下 `buildingInProgress` 仍可作为展示信息出现，但不参与 scope 数量扣减。
-12. `live` 模式、`overview`、`transit` 与既有非 planning dashboard 语义不受本次 change 影响。
+7. planning 下若存在待建设模组，则显示 `moduleScope` 按钮并默认进入 `building`。
+8. planning 下若不存在待建设模组，则隐藏 `moduleScope` 按钮并保持 `built`。
+9. planning 下 `materials / time / volume` 三个 tab 跟随 `moduleScope` 切换。
+10. planning 下 `workers` tab 不跟随 `moduleScope` 切换，而是固定使用 `allScopeModules`。
+11. planning 下 `workers` tab 不使用 archive 中已有 workforce 数值。
+12. planning 下 `workers` tab 仍支持切换 `workforceAuto` 与修改当前工人数值。
+13. planning 下 `buildingInProgress` 仍可作为展示信息出现，但不参与 scope 数量扣减。
+14. `live` 模式、`overview`、`transit` 与既有非 planning dashboard 语义不受本次 change 影响。
 
 ## 未决项
 

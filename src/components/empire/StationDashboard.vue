@@ -15,8 +15,8 @@ import { analyzeStation } from '@/store/logic/analyzeStation'
 import { getPriceByMultiplier } from '@/store/logic/calculatorUtils'
 
 const props = defineProps<{
-  modules: SavedModule[]
-  effectiveModules?: SavedModule[]
+  displayModules: SavedModule[]
+  workerModules?: SavedModule[]
   buildingCargo?: WareAmount[]
   buildingReservation?: WareAmount[]
   isBuildingScope?: boolean
@@ -76,7 +76,7 @@ const clampedManualWorkforce = computed(() => {
 
 const costAnalysis = computed(() => {
   return analyzeStation(
-    props.effectiveModules ?? props.modules,
+    props.displayModules,
     gameDataStore.modulesMap,
     gameDataStore.waresMap,
     buildPriceMultiplier.value,
@@ -86,7 +86,7 @@ const costAnalysis = computed(() => {
 
 const workersAnalysis = computed(() => {
   return analyzeStation(
-    props.modules,
+    props.workerModules ?? props.displayModules,
     gameDataStore.modulesMap,
     gameDataStore.waresMap,
     buildPriceMultiplier.value,

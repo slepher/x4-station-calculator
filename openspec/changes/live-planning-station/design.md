@@ -32,11 +32,13 @@ StationDashboard
 1. 仅在 `visualMode === 'planning' && archiveStation != null` 时启用新口径。
 2. 不创建新的 dashboard 组件，继续复用 `StationDashboard`。
 3. `moduleScope` 按钮继续复用现有三态控制，不新增 planning 专用切换入口。
-4. planning dashboard 的 `building` 不再等于 archive 原始 `buildingModules`，而是等于 `effectiveTarget - built`。
-5. `buildingInProgress` 保留展示意义，但不参与 planning scope 的数量扣减。
-6. `materials / time / volume` 跟随 `moduleScope` 切换。
-7. `workers` 不跟随 `moduleScope`，固定看 `allScopeModules`。
-8. `workers` 保持 planning 下现有手动 / 自动 workforce 交互，不读取 archive workforce 值。
+4. planning 下仅当仍存在待建设模组时显示 `moduleScope` 按钮，并默认进入 `building`。
+5. planning 下若已不存在待建设模组，则隐藏 `moduleScope` 按钮并固定保持 `built`。
+6. planning dashboard 的 `building` 不再等于 archive 原始 `buildingModules`，而是等于 `effectiveTarget - built`。
+7. `buildingInProgress` 保留展示意义，但不参与 planning scope 的数量扣减。
+8. `materials / time / volume` 跟随 `moduleScope` 切换。
+9. `workers` 不跟随 `moduleScope`，固定看 `allScopeModules`。
+10. `workers` 保持 planning 下现有手动 / 自动 workforce 交互，不读取 archive workforce 值。
 
 ## 数据语义
 
@@ -79,6 +81,11 @@ allScopeModules = effectiveTargetModules
 
 1. 当前 archive 中已在建的模块不会被削减
 2. 规划新增只会在其基础上继续增加
+
+同时它也为 `moduleScope` 的显示与默认值提供了统一判定：
+
+1. 当 `buildingScopeModules` 非空时，说明仍有待建设内容，应显示按钮并默认进入 `building`
+2. 当 `buildingScopeModules` 为空时，说明规划目标已不高于 built，总体不再需要建设，应隐藏按钮并固定 `built`
 
 ### 3. buildingInProgress 的边界
 

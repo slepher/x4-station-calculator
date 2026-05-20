@@ -1,7 +1,7 @@
 import { computed, type ComputedRef } from 'vue'
 import type { ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
 import type { SavedModule } from '@/types/x4'
-import type { WareAmount } from '@/types/saveArchive'
+import type { ArchiveStationData, WareAmount } from '@/types/saveArchive'
 
 const DEFAULT_DASHBOARD_SETTINGS = {
   transportShipCapacity: 62000,
@@ -13,10 +13,13 @@ const DEFAULT_DASHBOARD_SETTINGS = {
 export interface DashboardPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
   visualMode: ComputedRef<'planning' | 'live'>
-  modules: ComputedRef<SavedModule[]>
+  displayModules: ComputedRef<SavedModule[]>
+  workerModules: ComputedRef<SavedModule[]>
   activeModules: ComputedRef<SavedModule[]>
   activeBuildingModules: ComputedRef<SavedModule[]>
-  effectiveModules: ComputedRef<SavedModule[]>
+  builtScopeModules: ComputedRef<SavedModule[]>
+  buildingScopeModules: ComputedRef<SavedModule[]>
+  allScopeModules: ComputedRef<SavedModule[]>
   buildingCargo: ComputedRef<WareAmount[]>
   buildingReservation: ComputedRef<WareAmount[]>
   isBuildingScope: ComputedRef<boolean>
@@ -49,6 +52,7 @@ export interface UseProductionDashboardPresenterReturn {
 export interface DashboardPresenterStore {
   session: ProductionSessionState
   stationState: ProductionStationState | null
+  archiveStation?: ArchiveStationData | null
   moduleScope?: 'built' | 'building' | 'all'
   settingActions: {
     updateTransportShipCapacity(value: number): void
@@ -60,36 +64,77 @@ export interface DashboardPresenterStore {
   buildingInProgress?: SavedModule
 }
 
+function subtractSavedModules(source: SavedModule[], base: SavedModule[]): SavedModule[] {
+  const baseCounts = new Map(base.map((module) => [module.id, module.count]))
+  return source
+    .map((module) => ({
+      id: module.id,
+      count: module.count - (baseCounts.get(module.id) || 0)
+    }))
+    .filter((module) => module.count > 0)
+}
+
 export function useProductionDashboardPresenter(store: DashboardPresenterStore): UseProductionDashboardPresenterReturn {
+  const scope = computed(() => store.moduleScope ?? 'built')
+  const isPlanningArchiveStation = computed(() => {
+    return store.session.workbenchMode === 'station'
+      && store.session.visualMode === 'planning'
+      && store.stationState?.entityType === 'station'
+      && store.archiveStation != null
+  })
+
+  const builtScopeModules = computed(() => {
+    if (isPlanningArchiveStation.value) return store.stationState?.archiveBuiltModules || []
+    return store.stationState?.modules || []
+  })
+
+  const buildingScopeModules = computed(() => {
+    if (isPlanningArchiveStation.value) {
+      return subtractSavedModules(
+        store.stationState?.effectiveTargetModules || [],
+        store.stationState?.archiveBuiltModules || []
+      )
+    }
+
+    const building = store.stationState?.buildingModules || []
+    const inProgress = store.stationState?.buildingInProgress
+    if (!inProgress) return building
+    return building.reduce<SavedModule[]>((acc, module) => {
+      if (module.id === inProgress.id) {
+        const remaining = module.count - inProgress.count
+        if (remaining > 0) acc.push({ ...module, count: remaining })
+        return acc
+      }
+      acc.push(module)
+      return acc
+    }, [])
+  })
+
+  const allScopeModules = computed(() => {
+    if (isPlanningArchiveStation.value) return store.stationState?.effectiveTargetModules || []
+    return [...(store.stationState?.modules || []), ...(store.stationState?.buildingModules || [])]
+  })
+
   const props: DashboardPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
-    modules: computed(() => store.stationState?.modules || []),
+    displayModules: computed(() => {
+      if (scope.value === 'building') return buildingScopeModules.value
+      if (scope.value === 'all') return allScopeModules.value
+      return builtScopeModules.value
+    }),
+    workerModules: computed(() => {
+      if (isPlanningArchiveStation.value) return allScopeModules.value
+      return store.stationState?.modules || []
+    }),
     activeModules: computed(() => store.stationState?.modules || []),
     activeBuildingModules: computed(() => store.stationState?.buildingModules || []),
-    effectiveModules: computed(() => {
-      const scope = store.moduleScope ?? 'built'
-      const modules = store.stationState?.modules || []
-      const building = store.stationState?.buildingModules || []
-      const inProgress = store.stationState?.buildingInProgress
-      if (scope === 'building') {
-        if (!inProgress) return building
-        return building.reduce<SavedModule[]>((acc, m) => {
-          if (m.id === inProgress.id) {
-            const remaining = m.count - inProgress.count
-            if (remaining > 0) acc.push({ ...m, count: remaining })
-          } else {
-            acc.push(m)
-          }
-          return acc
-        }, [])
-      }
-      if (scope === 'all') return [...modules, ...building]
-      return modules
-    }),
+    builtScopeModules,
+    buildingScopeModules,
+    allScopeModules,
     buildingCargo: computed(() => store.stationState?.buildingCargo || []),
     buildingReservation: computed(() => store.stationState?.buildingReservation || []),
-    isBuildingScope: computed(() => store.moduleScope === 'building'),
+    isBuildingScope: computed(() => scope.value === 'building'),
     buildingInProgress: computed(() => store.stationState?.buildingInProgress || undefined),
     settings: computed(() => {
       const s = store.stationState?.settings

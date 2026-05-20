@@ -110,7 +110,7 @@ const handleOpenImport = () => {
   emit('openImport')
 }
 
-const showModuleScope = computed(() => props.mode === 'live' && props.hasBuildingModules)
+const showModuleScope = computed(() => props.hasBuildingModules)
 
 const scopeIcon = computed(() => {
   if (props.moduleScope === 'building') return '🚧'

@@ -110,6 +110,11 @@ export interface ProductionStationState {
   buildingCargo: WareAmount[]
   buildingReservation: WareAmount[]
   buildingInProgress?: SavedModule
+  archiveBuiltModules?: SavedModule[]
+  archiveCurrentTotalModules?: SavedModule[]
+  archiveProducedWareIds?: string[]
+  finalPlannedModules?: SavedModule[]
+  effectiveTargetModules?: SavedModule[]
 }
 
 export type ProductionWorkbenchSessionState = ProductionSessionState

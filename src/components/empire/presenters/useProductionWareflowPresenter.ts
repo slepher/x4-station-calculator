@@ -7,6 +7,7 @@ import type {
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { WareProductionFlow, DerivedProductionFlow } from '@/types/production-flow'
+import type { ArchiveStationData } from '@/types/saveArchive'
 
 const DEFAULT_WAREFLOW_SETTINGS = {
   resourceBufferHours: 1.0,
@@ -23,6 +24,7 @@ export interface WareflowPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
   visualMode: ComputedRef<'planning' | 'live'>
   viewMode: ComputedRef<WareFlowViewMode>
+  useAllocationVolumeView: ComputedRef<boolean>
   productionFlows: ComputedRef<WareProductionFlow[]>
   derivedProductionFlows: ComputedRef<DerivedProductionFlow[]>
   liveVolumeAllocationGroups: ComputedRef<LiveVolumeAllocationGroup[]>
@@ -66,6 +68,7 @@ export interface UseProductionWareflowPresenterReturn {
 export interface WareflowPresenterStore {
   session: ProductionSessionState
   stationState: ProductionStationState | null
+  archiveStation?: ArchiveStationData | null
   liveVolumeAllocationGroups?: LiveVolumeAllocationGroup[] | ComputedRef<LiveVolumeAllocationGroup[]>
   liveCargoOnlyItems?: LiveCargoOnlyItem[] | ComputedRef<LiveCargoOnlyItem[]>
   settingActions: {
@@ -99,10 +102,28 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
     return value as T
   }
 
+  const isPlanningArchiveStation = computed(() => {
+    return store.session.workbenchMode === 'station'
+      && store.session.visualMode === 'planning'
+      && store.stationState?.entityType === 'station'
+      && (store.stationState?.archiveProducedWareIds?.length || 0) > 0
+  })
+
+  const isArchiveProducedWare = (wareId: string): boolean => {
+    if (!isPlanningArchiveStation.value) return false
+    return store.stationState?.archiveProducedWareIds?.includes(wareId) ?? false
+  }
+
+  const useAllocationVolumeView = computed(() => {
+    if (store.session.workbenchMode !== 'station') return false
+    return store.archiveStation != null
+  })
+
   const props: WareflowPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
     viewMode: computed(() => store.session.wareflowViewMode),
+    useAllocationVolumeView,
     productionFlows: computed(() => store.stationState?.productionFlows || []),
     derivedProductionFlows: computed(() => store.stationState?.derivedProductionFlows || []),
     liveVolumeAllocationGroups: computed(() => readMaybeComputed(store.liveVolumeAllocationGroups, [])),
@@ -125,9 +146,15 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
     empireGaps: computed(() => store.stationState?.empireGaps || { operations: [], supply: [] }),
     isWareLocked: (wareId: string) => store.wareRuleActions.isWareLocked(wareId),
     getResolvedLevel: (wareId: string) => store.wareRuleActions.getResolvedLevel(wareId),
-    isWareOperable: (wareId: string) => store.wareRuleActions.isWareOperable(wareId),
+    isWareOperable: (wareId: string) => {
+      if (isArchiveProducedWare(wareId)) return false
+      return store.wareRuleActions.isWareOperable(wareId)
+    },
     isPlannedWare: (wareId: string) => store.wareRuleActions.isPlannedWare(wareId),
-    onToggleWareLock: (wareId: string) => store.wareRuleActions.toggleWareLock(wareId),
+    onToggleWareLock: (wareId: string) => {
+      if (isArchiveProducedWare(wareId)) return
+      store.wareRuleActions.toggleWareLock(wareId)
+    },
     onToggleWarePriority: (wareId: string) => store.wareRuleActions.toggleWarePriority(wareId)
   }
 
