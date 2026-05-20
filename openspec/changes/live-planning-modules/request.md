@@ -4,7 +4,15 @@
 
 在实况产能规划模式（live production workbench）的模组规划器中，让用户直接看出 `plannedModules` 与存档模块总量（`built + building`）之间的差异，并把需要补齐的 orphan 模块集中到一个可折叠的建议区里，降低在 planned、auto、archive 三块区域之间来回对照的成本。
 
-本次增强是在现有 `live-planning-modules` 能力之上继续演进，**保留**自动模块显示相减、搜索默认数量、红色阈值警告，以及 `calculateAutoFillModules` 的参考模块优先级逻辑。
+本次增强是在现有 `live-planning-modules` 能力之上继续演进，**保留**搜索默认数量、红色阈值警告，以及 `calculateAutoFillModules` 的参考模块优先级逻辑；auto 区不切换为 `max` 主数字，而是继续显示 auto 原始数量，并通过红色 count 与名称后 `+/-N` 弱化差异表达 archive 对照关系。
+
+## 术语澄清
+
+- 本 change 中如果讨论“有效模块集合 / effective modules”，指的是用于 planning / flow 语义对照的模块集合：
+  - `max(plannedModules + autoModules, archive.modules + archive.building.modules)`
+- 这里的 `max` 指按 `moduleId` 逐项取更大的 count，而不是数组长度比较。
+- 这一定义**不是** `StationDashboard` 中用于 building scope 展示的 `effectiveModules` prop。
+- `StationDashboard` 那套 `effectiveModules` 属于另一个 change 的能力边界，本 change 不讨论也不修改它。
 
 ## 已确认方案（审核重点）
 
@@ -72,29 +80,67 @@
 - archive 区显示内容与当前实现保持一致，不在本次变更中调整结构与展示方式。
 - orphan 不在 archive 区单独高亮，不附加 icon，不承担推荐职责。
 
-### 7. 自动生成模块显示相减
+### 7. auto 区显示语义改为原始 auto 数量 + 统一差异表达
 
-- **store 层不变**：`deriveFullModules` / `calculateAutoFillModules` 继续产出完整的 `autoIndustryModules`、`autoHabitationModules`、`autoInfrastructureModules`。
-- **presenter 层做相减**：对每个自动模块，从显示数量中扣除存档中该模块的 `(built + building)` 总量：
+- **store 层不变**：`deriveFullModules` / `calculateAutoFillModules` 继续产出原始的 `autoIndustryModules`、`autoHabitationModules`、`autoInfrastructureModules`。
+- **presenter 层继续以 auto 原始数量作为 auto 区主数字**，不切换为 `max` 后数量。
+- 对每个 auto 模块，仍然以 `archive_total = archive.modules + archive.building.modules` 作为对照基准。
+- 模块名称后显示 `diffAnnotation`：
   ```ts
-  display_count = max(0, auto_count - archive_built - archive_building)
+  diff = auto_count - archive_total
   ```
-- 扣除后 `count <= 0` 的模块从显示列表中移除。
+- 若 `diff > 0`，名称后显示绿色弱化 `+N`，表达“auto 原始计算比 archive 多了 N”。
+- 若 `diff < 0`，名称后显示红色弱化 `-N`，表达“auto 原始计算比 archive 少了 N”。
+- 若 `diff = 0`，不显示额外标记。
+- 当 `auto_count < archive_total` 时，auto 区的 `count` 主数字使用红色显示，强调“auto 原始计算值小于 archive 当前数量”。
+- auto 区与 planned 区统一使用“名称后 `+/-N` 小字表达差异”的模式。
 
-### 8. 搜索框添加默认数量
+### 8. planned 区补充 -N 逻辑
+
+- planned 区不再只有 `+N`。
+- 对 `plannedModules`：
+  - `diff = planned.count - archive_total`
+  - `diff > 0` 时显示绿色弱化 `+N`
+  - `diff < 0` 时显示红色弱化 `-N`
+  - `diff = 0` 时不显示差异标记
+- `planned.count < archive_total` 时，count 主数字仍保持红色告警。
+- 这样 planned 与 auto 的差异表达规则统一为：
+  - 主数字显示该区块自己的主数量
+  - 名称后显示彩色 `+/-N`
+
+### 9. 减少用户对 auto 数量语义困惑的方案
+
+- 用户最容易困惑的是：
+  1. auto 区主数字到底表示什么
+  2. 点击 auto 模块后为什么加入到 planned 的数量可能大于当前看到的 auto 数量
+- 为减少困惑，本次建议：
+  1. auto 分组标题下增加一行短说明，例如“数字为 auto 计算结果，名称后 `+/-N` 为相对现有建筑差异”
+  2. 当用户点击 auto 模块加入 planned 时，实际加入数量使用：
+     ```ts
+     target_count = max(auto_count, archive_total)
+     ```
+  3. 如现有组件支持 tooltip，可补充：
+     - `auto raw = X`
+     - `archive current = Y`
+     - `click add -> planned = max(X, Y)`
+- 该方案的目标是同时回答两个问题：
+  - “auto 算出来多少？” → 看主数字
+  - “点击后 planned 会补到多少？” → 看 tooltip / 说明中的 `max(auto, archive)`
+
+### 10. 搜索框添加默认数量
 
 - 从 `StationModulePicker` 搜索框添加新模块时：
   - 若模块已在 `plannedModules` 中，每次点击 `count + 1`（现有行为不变）。
   - 若模块不在 `plannedModules` 中，默认数量 = 存档中该模块的 `built + building` 总量。
 - 无存档数据时，默认数量保持为 1。
 
-### 9. autoFill 参考模块优先级保留
+### 11. autoFill 参考模块优先级保留
 
 - `calculateAutoFillModules` 的参考模块优先级方案保持不变。
 - live 模式下，参考模块继续取 `archive.modules + archive.building.modules`。
 - P1–P8 优先级、按产能计算配额、P1+P2 共享配额的规则全部保留。
 
-### 10. 展开/折叠状态
+### 12. 展开/折叠状态
 
 - `recommendedModules` 的展开/折叠状态存放在 `useLiveProductionStore`。
 - 该状态对所有 station 通用，共享同一个运行时状态。
@@ -108,7 +154,9 @@
 - `recommendedModules` 建议区（默认折叠、显示推荐模块种类数、展开列表）
 - orphan 判定与 orphan 差额推荐
 - archive 区继续保留为纯参考区
-- presenter 层自动模块显示相减
+- auto 区主数字继续显示 auto 原始计算数量
+- auto / planned 区名称后统一显示彩色 `+/-N`
+- auto 区点击加入 planned 时使用 `max(auto_count, archive_total)` 作为目标数量
 - 搜索框新模块默认数量 = archive 总量
 - `plannedModules` 红色阈值警告
 - `calculateAutoFillModules` 参考模块优先级保留
@@ -118,7 +166,7 @@
 
 - live 模式的 `ArchiveModuleList` 行为变更
 - orphan 图标、orphan 在 archive 区的单独视觉提示
-- station dashboard 的 `effectiveModules` 改动
+- `StationDashboard` 中 building scope 用的 `effectiveModules` prop 改动
 - E2E 测试（由独立测试流程负责）
 
 ## 验收标准（DoD）
@@ -130,10 +178,13 @@
 5. 建议区中每个推荐模块显示的数量为 `archive_total - planned.count`。
 6. `recommendedModules` 中的模块可点击，点击后按 archive 总量加入或提升 `plannedModules`。
 7. archive 区仍保留为纯参考区，不显示 orphan 图标或独立 orphan 标记，且沿用当前显示内容不变。
-8. 自动模块区显示数量继续使用 `max(0, auto_count - archive_total)`。
-9. 搜索框添加新模块时，若该模块当前不在 `plannedModules` 中，则默认 count = archive 总量；若已存在，仍每次 `+1`。
-10. `calculateAutoFillModules` 在 live 模式下继续按既有 P1–P8 优先级和配额规则运行。
-11. `recommendedModules` 的展开/折叠状态在 `useLiveProductionStore` 中共享，但刷新后不保留。
+8. 自动模块区主数字继续显示 auto 原始计算数量，而不是 `max` 后数量。
+9. 自动模块区在 `auto_count < archive_total` 时，count 主数字显示为红色。
+10. planned 与 auto 两个区块的模块名称后都显示彩色 `+/-N`，其中 `+N` 为绿色，`-N` 为红色。
+11. 点击 auto 模块加入 planned 时，实际加入数量使用 `max(auto_count, archive_total)`，而不是 auto 当前显示数量。
+12. 搜索框添加新模块时，若该模块当前不在 `plannedModules` 中，则默认 count = archive 总量；若已存在，仍每次 `+1`。
+13. `calculateAutoFillModules` 在 live 模式下继续按既有 P1–P8 优先级和配额规则运行。
+14. `recommendedModules` 的展开/折叠状态在 `useLiveProductionStore` 中共享，但刷新后不保留。
 
 ## 未决项
 

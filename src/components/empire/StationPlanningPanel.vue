@@ -244,14 +244,16 @@ const handleReorderModules = (modules: SavedModule[]) => {
 }
 
 const handleTransferAutoModule = (module: SavedModule) => {
+  const targetCount = Math.max(module.count, archiveTotal(module.id))
   const existingIndex = props.plannedModules.findIndex(m => m.id === module.id)
   let nextModules: SavedModule[]
   if (existingIndex >= 0) {
+    const current = props.plannedModules[existingIndex]!
     nextModules = props.plannedModules.map((m, i) =>
-      i === existingIndex ? { ...m, count: m.count + module.count } : m
+      i === existingIndex ? { ...m, count: Math.max(current.count, targetCount) } : m
     )
   } else {
-    nextModules = [...props.plannedModules, { id: module.id, count: module.count }]
+    nextModules = [...props.plannedModules, { id: module.id, count: targetCount }]
   }
   emit('updatePlannedModules', nextModules)
 }
@@ -354,6 +356,7 @@ const handleToggleRecommendedModules = () => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoIndustryModules" :key="'industry-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
@@ -367,6 +370,7 @@ const handleToggleRecommendedModules = () => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoHabitationModules" :key="'habitation-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
@@ -380,6 +384,7 @@ const handleToggleRecommendedModules = () => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoInfrastructureModules" :key="'infrastructure-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>

@@ -68,18 +68,57 @@ describe('useProductionPlanningPresenter', () => {
       energy_mod: 2,
       support_mod: 1
     })
-    expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([{ id: 'energy_mod', count: 3 }])
+    expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
+      { id: 'energy_mod', count: 5, diffAnnotation: '+3' }
+    ])
     expect(presenter.props.orphanArchiveModuleIds.value).toEqual(new Set(['orphan_mod', 'support_mod']))
     expect(presenter.props.recommendedModules.value).toEqual([
       { id: 'orphan_mod', count: 3 },
       { id: 'support_mod', count: 1 }
     ])
     expect(presenter.props.plannedModules.value).toEqual([
-      { id: 'orphan_mod', count: 1 },
+      { id: 'orphan_mod', count: 1, diffAnnotation: '-3' },
       { id: 'energy_mod', count: 3, diffAnnotation: '+1' }
     ])
 
     presenter.emits.setRecommendedModulesExpanded(true)
     expect(store.setRecommendedModulesExpanded).toHaveBeenCalledWith(true)
+  })
+
+  it('removes stale diff annotation when planned count returns to archive total', () => {
+    const store = reactive({
+      session: {
+        workbenchMode: 'station',
+        visualMode: 'planning'
+      },
+      context: {},
+      stationState: {
+        plannedModules: [{ id: 'energy_mod', count: 2, diffAnnotation: '+1' }],
+        autoIndustryModules: [{ id: 'energy_mod', count: 1 }],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [],
+        enforceDlcActivation: false
+      },
+      archiveStation: {
+        modules: [{ id: 'energy_mod', count: 2 }],
+        building: {
+          modules: []
+        }
+      },
+      recommendedModulesExpanded: false,
+      moduleActions: {
+        updatePlannedModules: vi.fn()
+      },
+      setRecommendedModulesExpanded: vi.fn()
+    })
+
+    const presenter = useProductionPlanningPresenter(store as any)
+
+    expect(presenter.props.plannedModules.value).toEqual([
+      { id: 'energy_mod', count: 2 }
+    ])
+    expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
+      { id: 'energy_mod', count: 1, diffAnnotation: '-1' }
+    ])
   })
 })

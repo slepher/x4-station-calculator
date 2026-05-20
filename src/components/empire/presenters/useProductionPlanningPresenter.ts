@@ -4,11 +4,21 @@ import type { SavedModule } from '@/types/x4'
 import type { ArchiveStationData } from '@/types/saveArchive'
 import { useGameDataStore } from '@/store/useGameDataStore'
 
-function deductArchive(modules: SavedModule[], totalMap: Record<string, number>): SavedModule[] {
-  if (Object.keys(totalMap).length === 0) return modules
-  return modules
-    .map(m => ({ ...m, count: Math.max(0, m.count - (totalMap[m.id] || 0)) }))
-    .filter(m => m.count > 0)
+function annotateDiff(module: SavedModule, totalMap: Record<string, number>): SavedModule {
+  const archiveTotal = totalMap[module.id] || 0
+  const diff = module.count - archiveTotal
+  if (diff === 0) {
+    return {
+      id: module.id,
+      count: module.count
+    }
+  }
+
+  return {
+    id: module.id,
+    count: module.count,
+    diffAnnotation: `${diff > 0 ? '+' : ''}${diff}`
+  }
 }
 
 export interface PlanningPresenterProps {
@@ -128,20 +138,13 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
     hasArchive: computed(() => store.archiveStation != null),
-    plannedModules: computed(() => plannedModules.value.map((module) => {
-      const archiveTotal = archiveTotalMap.value[module.id] || 0
-      if (module.count <= archiveTotal) return module
-      return {
-        ...module,
-        diffAnnotation: `+${module.count - archiveTotal}`
-      }
-    })),
+    plannedModules: computed(() => plannedModules.value.map(module => annotateDiff(module, archiveTotalMap.value))),
     autoIndustryModules: computed(() => rawAutoIndustry.value),
     autoHabitationModules: computed(() => rawAutoHabitation.value),
     autoInfrastructureModules: computed(() => rawAutoInfrastructure.value),
-    effectiveAutoIndustryModules: computed(() => deductArchive(rawAutoIndustry.value, archiveTotalMap.value)),
-    effectiveAutoHabitationModules: computed(() => deductArchive(rawAutoHabitation.value, archiveTotalMap.value)),
-    effectiveAutoInfrastructureModules: computed(() => deductArchive(rawAutoInfrastructure.value, archiveTotalMap.value)),
+    effectiveAutoIndustryModules: computed(() => rawAutoIndustry.value.map(module => annotateDiff(module, archiveTotalMap.value))),
+    effectiveAutoHabitationModules: computed(() => rawAutoHabitation.value.map(module => annotateDiff(module, archiveTotalMap.value))),
+    effectiveAutoInfrastructureModules: computed(() => rawAutoInfrastructure.value.map(module => annotateDiff(module, archiveTotalMap.value))),
     archiveTotalMap,
     orphanArchiveModuleIds,
     recommendedModules,

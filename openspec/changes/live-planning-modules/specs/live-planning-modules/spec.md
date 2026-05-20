@@ -2,7 +2,14 @@
 
 ## Purpose
 
-在实况产能规划模式下，模组规划器 SHALL 同时提供 planned 与 archive 的差异表达、orphan 模块建议区、自动模块相减，以及保留既有 archive 参考区和 autoFill 参考模块优先级，使用户能够更快识别哪些模块已超出存档、哪些 orphan 模块仍需补齐。
+在实况产能规划模式下，模组规划器 SHALL 同时提供 planned 与 archive 的差异表达、orphan 模块建议区、auto 模块的原始 auto 数量与彩色 `+/-N` 差异表达，以及保留既有 archive 参考区和 autoFill 参考模块优先级，使用户能够更快识别哪些模块已超出存档、哪些 orphan 模块仍需补齐。
+
+## Terminology
+
+- 本 spec 若提到“有效模块集合 / effective modules”，指 planning / flow 语义中的模块集合：
+  - `max(plannedModules + autoModules, archive.modules + archive.building.modules)`
+- `max` SHALL 表示按 `moduleId` 逐项比较 count 并取较大值。
+- 本术语 SHALL NOT 指向 `StationDashboard` 中 building scope 使用的 `effectiveModules` prop。
 
 ---
 
@@ -31,7 +38,7 @@
 - **前提** 存档总量 solar = 5，`plannedModules` 含 `{ id: "solar", count: 2 }`
 - **当** 规划器渲染 solar 项
 - **那么** solar 的 count 数字显示为红色
-- **并且** 模块名称后不显示 `+N`
+- **并且** 模块名称后显示红色弱化的 `-3`
 
 ---
 
@@ -156,24 +163,61 @@
 
 ---
 
-### Requirement: 自动模块显示相减
+### Requirement: Auto Modules Must Display Raw Auto Count With Colored Diff Annotation
 
-Presenter 层 SHALL 计算 `effectiveAutoIndustryModules`、`effectiveAutoHabitationModules`、`effectiveAutoInfrastructureModules`：
-- 对每个自动模块，`display_count = max(0, auto_count - archive_built_count - archive_building_count)`
-- `display_count === 0` 的模块从数组中移除
-- store 层的 `autoIndustryModules` 等保持原始完整数值不变
+Presenter 层 SHALL 为 `autoIndustryModules`、`autoHabitationModules`、`autoInfrastructureModules` 计算两层显示语义：
+- 主数字：`auto_count`
+- 名称后差异：`diff = auto_count - archive_built_count - archive_building_count`
 
-#### Scenario: 自动模块被部分扣除
+store 层的 `autoIndustryModules` 等保持原始完整数值不变。
 
-- **前提** `autoIndustryModules` 含 `{ id: "module_hull_01", count: 5 }`，存档中该模块已建 3、在建 1
-- **当** presenter 计算 effectiveAutoIndustryModules
-- **那么** 结果含 `{ id: "module_hull_01", count: 1 }`
+#### Scenario: auto count is lower than archive total
 
-#### Scenario: 自动模块被完全扣除
+- **前提** `autoIndustryModules` 含 `{ id: "module_hull_01", count: 3 }`
+- **并且** 存档中该模块已建 5、在建 0
+- **当** presenter 计算 auto 区显示数据
+- **那么** auto 区主数字显示为 `3`
+- **并且** count 数字显示为红色
+- **并且** 模块名称后显示红色弱化的 `-2`
 
-- **前提** `autoIndustryModules` 含 `{ id: "module_hull_01", count: 3 }`，存档中该模块已建 3、在建 0
-- **当** presenter 计算 effectiveAutoIndustryModules
-- **那么** 结果不含该模块
+#### Scenario: auto count is higher than archive total
+
+- **前提** `autoIndustryModules` 含 `{ id: "module_hull_01", count: 5 }`
+- **并且** 存档中该模块已建 3、在建 1
+- **当** presenter 计算 auto 区显示数据
+- **那么** auto 区主数字显示为 `5`
+- **并且** 模块名称后显示绿色弱化的 `+1`
+
+#### Scenario: auto section uses the same colored name-side diff style as planned section
+
+- **前提** auto 区和 planned 区都存在差异展示
+- **当** 规划器渲染模块项
+- **那么** 两个区块都将差异值显示在模块名称后
+- **并且** `+N` 使用绿色
+- **并且** `-N` 使用红色
+
+### Requirement: Clicking Auto Module Must Add Max Of Auto Count And Archive Total To Planned
+
+系统 SHALL 使用 `max(auto_count, archive_total)` 作为 auto 模块点击加入 planned 时的目标数量，而不是使用 auto 当前显示数量。
+
+#### Scenario: click auto adds archive-preserving target count
+
+- **前提** `autoIndustryModules` 含 `{ id: "module_hull_01", count: 3 }`
+- **并且** archive 总量 `module_hull_01 = 5`
+- **当** 用户点击 auto 区中的该模块
+- **那么** 加入或提升到 `plannedModules` 的目标数量为 `5`
+
+### Requirement: Diff Annotation Must Disappear When Difference Returns To Zero
+
+当某模块的差异数量从非零回到零时，系统 SHALL 移除对应的 `diffAnnotation`，不得保留过期的 `+N` 或 `-N`。
+
+#### Scenario: planned diff annotation is removed when +1 returns to zero
+
+- **前提** 某个 planned 模块之前显示绿色弱化的 `+1`
+- **并且** 用户调整该模块数量后使其与 `archive_total` 相等
+- **当** 规划器重新渲染该模块项
+- **那么** 原先的 `+1` 必须消失
+- **并且** 模块名称后不再显示差异标记
 
 ---
 

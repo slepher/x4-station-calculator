@@ -16,12 +16,15 @@
 ## 3. 修改 `useProductionPlanningPresenter`
 
 - [x] 保留现有 `archiveTotalMap`
-- [x] 保留现有 `effectiveAutoIndustryModules` / `effectiveAutoHabitationModules` / `effectiveAutoInfrastructureModules`
+- [x] 将 `effectiveAutoIndustryModules` / `effectiveAutoHabitationModules` / `effectiveAutoInfrastructureModules` 的显示语义改为“原始 auto 数量 + 名称后彩色 `+/-N`”
 - [x] 新增 orphan 判定逻辑：输入集合为 `built + building`，只看模块本身消费关系
 - [x] 新增 `orphanArchiveModuleIds: Set<string>`
 - [x] 新增 `recommendedModules: SavedModule[]`
 - [x] `recommendedModules` 的 `count` 使用差额 `archive_total - planned_count`
-- [x] 为 planned 模块组装 `diffAnnotation`，仅在 `planned > archive_total` 时输出弱化 `+N`
+- [x] 为 planned 模块组装完整 `+/-N` `diffAnnotation`
+- [x] 为 auto 模块组装 `diff = auto_count - archive_total` 与名称后 `diffAnnotation`
+- [x] `+N` 使用绿色，`-N` 使用红色
+- [x] 修复 planned 模块 diff 从 `+1` 回到 `0` 后标记未消失的 bug
 
 ## 4. 修改 `StationPlanningPanelWrapper`
 
@@ -37,6 +40,10 @@
 - [x] 建议区默认折叠，折叠态显示推荐模块种类数
 - [x] 展开态渲染推荐模块列表，显示差额 count
 - [x] `recommendedModules` 中的模块支持点击添加/提升到 `plannedModules`
+- [x] auto 区主数字继续显示 auto 原始计算数量
+- [x] auto 区在 `auto_count < archive_total` 时将 count 主数字显示为红色
+- [x] auto 区模块名称后显示彩色 `+/-N`
+- [x] 点击 auto 模块时，加入 planned 的数量改为 `max(auto_count, archive_total)`
 - [x] archive 区继续作为纯参考区保留
 - [x] archive 区继续沿用当前显示内容不变
 - [x] orphan 不在 archive 区显示 icon 或额外标签
@@ -45,13 +52,16 @@
 
 - [x] 新增或接入 `diffAnnotation?: string`
 - [x] 保留 `threshold?: number`
-- [x] 模块名称后显示弱化 `+N`，仅用于 `planned > archive_total`
+- [x] planned / auto 模块名称后统一显示彩色 `+/-N`
+- [x] planned 的 `-N` 使用红色显示
+- [x] planned 的 `+N` 使用绿色显示
 - [x] count 红色告警仅用于 `planned < archive_total`
+- [x] 当 diff 回到 0 时，移除旧的 `diffAnnotation`
 
 ## 7. 保留现有联动能力
 
 - [x] 搜索框新模块默认数量继续使用 archive 总量
-- [x] 自动模块区继续使用 `effectiveAuto*`
+- [x] 自动模块区继续由 `effectiveAuto*` 供数，但其页面语义改为“原始 auto 数量 + 彩色 `+/-N` + 点击补到 max”
 - [x] `calculateAutoFillModules` 参考模块优先级与配额逻辑保持不变
 
 ## 8. 构建验证

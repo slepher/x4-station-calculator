@@ -60,6 +60,10 @@ const shouldShowDlcTag = computed(() => props.info.dlc_tag !== 'base')
 const dlcLabel = computed(() => gameData.getDlcDisplayName(props.info.dlc_tag))
 const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
 const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.diffAnnotation)
+const moduleDiffClass = computed(() => {
+  if (!moduleDiffAnnotation.value) return ''
+  return moduleDiffAnnotation.value.startsWith('-') ? 'module-diff-annotation--negative' : 'module-diff-annotation--positive'
+})
 </script>
 
 <template>
@@ -78,7 +82,11 @@ const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.d
       <div class="module-title-row">
         <div class="module-name" :title="info.name">
           {{ translateModule(info) }}
-          <span v-if="moduleDiffAnnotation" class="module-diff-annotation">{{ moduleDiffAnnotation }}</span>
+          <span
+            v-if="moduleDiffAnnotation"
+            class="module-diff-annotation"
+            :class="moduleDiffClass"
+          >{{ moduleDiffAnnotation }}</span>
         </div>
         <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'">
           {{ dlcLabel }}
@@ -98,11 +106,17 @@ const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.d
     </div>
     <div class="controls" v-else>
       <div v-if="!props.noClick" class="count-display ignore-drag" @click="emit('transfer', item)">
-        <span class="count-text count-text--clickable" :class="{ 'count-text--flashing': isNumberFlashing }"
+        <span class="count-text count-text--clickable" :class="{
+          'count-text--flashing': isNumberFlashing,
+          'count-text--warning': isBelowThreshold
+        }"
           :title="t('planning.transfer_to_planning')">{{ item.count }}</span>
       </div>
       <div v-else class="count-display">
-        <span class="count-text count-text--static" :class="{ 'count-text--flashing': isNumberFlashing }">{{ item.count
+        <span class="count-text count-text--static" :class="{
+          'count-text--flashing': isNumberFlashing,
+          'count-text--warning': isBelowThreshold
+        }">{{ item.count
           }}</span>
       </div>
     </div>
@@ -177,7 +191,15 @@ const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.d
 }
 
 .module-diff-annotation {
-  @apply ml-1 text-[10px] font-normal text-emerald-300/75;
+  @apply ml-1 text-[10px] font-normal;
+}
+
+.module-diff-annotation--positive {
+  @apply text-emerald-300/75;
+}
+
+.module-diff-annotation--negative {
+  @apply text-red-300/75;
 }
 
 .module-title-row {
@@ -218,6 +240,10 @@ const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.d
 
 .count-text--static {
   @apply text-slate-500;
+}
+
+.count-text--warning {
+  @apply text-red-400;
 }
 
 .count-text--flashing {
