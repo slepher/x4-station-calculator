@@ -4,7 +4,7 @@ import type { WareProductionFlow } from '@/types/production-flow'
 import { isWorkforceContributionClass } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import {
-  calculateProductionFlows,
+  calculateAutoIndustryModules,
   calculateProductionFlowsCore,
   type CalculateProductionFlowsOutput
 } from '@/store/logic/calculateProductionFlows'
@@ -24,6 +24,7 @@ export interface ComputeInfrastructureModulesInput {
   productionFlows: WareProductionFlow[]
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
+  referenceModules?: SavedModule[]
   settings: Pick<
     StationSettings,
     | 'racePreference'
@@ -43,6 +44,7 @@ export function computeInfrastructureModulesFromFlows(input: ComputeInfrastructu
     productionFlows: input.productionFlows,
     plannedModules: input.plannedModules,
     autoIndustryModules: input.autoIndustryModules,
+    referenceModules: input.referenceModules,
     modulesMap: input.deps.modulesMap,
     settings: input.settings,
     warePriorityLevels: input.warePriorityLevels
@@ -554,23 +556,35 @@ export class StationDerivedMap {
     referenceModules?: SavedModule[]
   ): PlanComputeResult {
     const fullSettings = toFullSettingsForCompute(settings)
-    const result = calculateProductionFlows({
+    const autoIndustryModules = calculateAutoIndustryModules({
       plannedModules: inputModules,
       settings: fullSettings,
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
       lockedWares,
-      workforceConsumptionMap: deps.workforceConsumptionMap,
-      warePriority,
       referenceModules
+    })
+    const coreResult = calculateProductionFlowsCore({
+      plannedModules: inputModules,
+      autoIndustryModules,
+      autoHabitationModules: [],
+      modulesMap: deps.modulesMap,
+      waresMap: deps.waresMap,
+      workforceConsumptionMap: deps.workforceConsumptionMap,
+      settings: fullSettings,
+      warePriority
     })
 
     return {
-      ...result,
+      autoIndustryModules,
+      autoHabitationModules: [],
+      productionFlows: coreResult.productionFlows,
+      actualWorkforce: coreResult.actualWorkforce,
+      currentEfficiency: coreResult.currentEfficiency,
       fullModules: this.buildFullModules(
         inputModules,
-        result.autoIndustryModules,
-        result.autoHabitationModules
+        autoIndustryModules,
+        []
       )
     }
   }

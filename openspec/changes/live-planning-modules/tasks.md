@@ -64,6 +64,28 @@
 - [x] 自动模块区继续由 `effectiveAuto*` 供数，但其页面语义改为“原始 auto 数量 + 彩色 `+/-N` + 点击补到 max”
 - [x] `calculateAutoFillModules` 参考模块优先级与配额逻辑保持不变
 
-## 8. 构建验证
+## 8. 扩展辅助模块 reference-aware priority
+
+- [x] 为 habitation 模块选择器增加 `referenceModules` 参考池能力
+- [x] habitation 候选比较明确使用 `workforce.capacity`
+- [x] 为 storage 模块选择器增加 `referenceModules` 参考池能力
+- [x] storage 候选比较明确使用 `cargo.capacity`
+- [x] 为 pier 模块选择器增加 `referenceModules` 参考池能力
+- [x] pier 候选比较明确使用 `dockingCount` / 泊位能力
+- [x] 统一辅助模块的候选来源顺序：reference -> existing/planned -> db
+- [x] 确认辅助模块只扩展候选优先级，不改变容量/工人/泊位缺口转 count 的现有换算逻辑
+
+## 9. 构建验证
 
 - [x] 完成代码修改后执行 `npm run build`
+
+## 10. 两阶段最终求值重构
+
+- [x] 明确 `autoIndustryModules` 的数量计算不依赖第二阶段最终 `actualWorkforce`
+- [x] 将第一阶段缓存职责收敛为工业自动补全优先
+- [x] 将 `autoHabitationModules` 挪到第二阶段统一计算
+- [x] 在第二阶段基于 `planned + autoIndustry + autoHabitation` 重算最终 flow
+- [x] 将 `autoInfrastructureModules` 固定为基于第二阶段最终 flow 计算
+- [x] 统一 live 与 blueprint 的最终结果语义
+- [x] 为两阶段最终求值补充针对 live / blueprint 的单测
+- [x] 修正第二阶段内部顺序：先确定 canonical 生产模块基准，再计算 `autoHabitationModules`

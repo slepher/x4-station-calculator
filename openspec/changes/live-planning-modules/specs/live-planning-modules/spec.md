@@ -251,3 +251,178 @@ store 层的 `autoIndustryModules` 等保持原始完整数值不变。
 - **当** `calculateAutoFillModules` 选择补齐模块
 - **那么** 仍按既有 P1–P8 顺序匹配
 - **并且** P1 与 P2 共享同一份参考配额
+
+---
+
+### Requirement: Auxiliary Auto Modules Must Also Use Archive-aware Reference Priority
+
+在 live 模式下，辅助 auto 模块的候选选择 SHALL 也参考 `archive.modules + archive.building.modules`，而不只是参考 planned/existing 或数据库默认候选。
+
+这条规则覆盖：
+
+- storage 模块
+- habitation 模块
+- pier 模块
+
+该 requirement 复用的是“参考模块优先”的候选来源语义，而不是工业模块的 ware 产出配额语义。
+
+#### Scenario: storage modules prefer archive/building reference candidates
+
+- **前提** 当前需要补 container storage 容量
+- **并且** archive/building 中存在某个 container storage 模块
+- **当** 系统选择 storage 候选模块
+- **那么** 应优先从 archive/building 中出现过的 container storage 候选中选择
+- **并且** 不应直接跳到数据库默认最大仓储模块
+
+#### Scenario: habitation modules prefer archive/building reference candidates
+
+- **前提** 当前需要补 habitation 容量
+- **并且** archive/building 中存在 habitation 模块
+- **当** 系统选择 habitation 候选模块
+- **那么** 应优先从 archive/building 中出现过的 habitation 候选中选择
+
+#### Scenario: pier modules prefer archive/building reference candidates
+
+- **前提** 当前需要补泊位
+- **并且** archive/building 中存在 pier 模块
+- **当** 系统选择 pier 候选模块
+- **那么** 应优先从 archive/building 中出现过的 pier 候选中选择
+
+---
+
+### Requirement: Auxiliary Reference Selection Must Use Category-specific Capability Metrics
+
+系统在比较辅助模块候选优劣时 SHALL 按模块类别使用不同能力维度，而不是沿用工业模块的产出 ware 指标。
+
+#### Scenario: storage candidates are compared by cargo capacity
+
+- **前提** 存在多个 container storage 候选
+- **当** 系统比较这些 storage 候选
+- **那么** 应按 `cargo.capacity` 作为能力比较维度
+
+#### Scenario: habitation candidates are compared by workforce capacity
+
+- **前提** 存在多个 habitation 候选
+- **当** 系统比较这些 habitation 候选
+- **那么** 应按 `workforce.capacity` 作为能力比较维度
+
+#### Scenario: pier candidates are compared by berth capacity
+
+- **前提** 存在多个 pier 候选
+- **当** 系统比较这些 pier 候选
+- **那么** 应按 `dockingCount` / 泊位能力作为能力比较维度
+
+---
+
+### Requirement: Auxiliary Reference Selection Must Preserve Existing Gap-to-count Semantics
+
+辅助模块的 reference-aware priority SHALL 只影响候选模块的选择顺序，不改变各类辅助模块原有的缺口换算方式。
+
+#### Scenario: storage gap still converts to count by storage capacity
+
+- **前提** 当前需要补齐 container storage 容量
+- **当** 系统完成 storage 自动选择
+- **那么** 仍按容量缺口换算 storage 模块数量
+- **并且** reference-aware priority 只影响“选哪种 storage”
+
+#### Scenario: habitation gap still converts to count by workforce capacity
+
+- **前提** 当前需要补齐 habitation 工人容量
+- **当** 系统完成 habitation 自动选择
+- **那么** 仍按工人容量缺口换算 habitation 模块数量
+- **并且** reference-aware priority 只影响“选哪种 habitation”
+
+#### Scenario: pier gap still converts to count by berth capacity
+
+- **前提** 当前需要补齐泊位
+- **当** 系统完成 pier 自动选择
+- **那么** 仍按泊位缺口换算 pier 模块数量
+- **并且** reference-aware priority 只影响“选哪种 pier”
+
+---
+
+### Requirement: Auto Industry Count Must Not Depend On Final Workforce Result
+
+系统 SHALL 将 `autoIndustryModules` 的数量计算建模为“由 `considerWorkforceForAutoFill` 开关决定的理论效率估算”，而不是依赖第二阶段算出的最终实际工人数量。
+
+#### Scenario: workforce toggle on uses full-efficiency assumption for industry sizing
+
+- **前提** `considerWorkforceForAutoFill = true`
+- **当** 系统计算 `autoIndustryModules`
+- **那么** 应按带工人加成的理论效率估算工业模块数量
+- **并且** 不读取第二阶段最终 `actualWorkforce`
+
+#### Scenario: workforce toggle off uses empty-efficiency assumption for industry sizing
+
+- **前提** `considerWorkforceForAutoFill = false`
+- **当** 系统计算 `autoIndustryModules`
+- **那么** 应按无工人加成的理论效率估算工业模块数量
+- **并且** 不读取第二阶段最终 `actualWorkforce`
+
+---
+
+### Requirement: Live Planning Final Result Must Use Two-stage Evaluation
+
+系统 SHALL 以二阶段顺序生成 live planning 的最终结果，而不是把 habitation / infrastructure 混入第一阶段工业自动补全。
+
+#### Scenario: stage one calculates only autoIndustryModules
+
+- **前提** planning 站点进入自动补全计算
+- **当** 系统执行第一阶段
+- **那么** 第一阶段只产生 `autoIndustryModules`
+- **并且** 不在此阶段产出最终 `autoHabitationModules`
+- **并且** 不在此阶段产出最终 `autoInfrastructureModules`
+
+#### Scenario: stage two recalculates final flow after habitation is added
+
+- **前提** 第一阶段已得到 `autoIndustryModules`
+- **当** 系统执行第二阶段
+- **那么** 系统先确定 `canonicalBaseModules = max(planned + autoIndustry, archive.modules + archive.building.modules)`
+- **并且** 基于这份 `canonicalBaseModules` 计算 `autoHabitationModules`
+- **并且** 再基于 `canonicalBaseModules + autoHabitation` 重算最终 `productionFlows`
+- **并且** 最终 `actualWorkforce` 与 `currentEfficiency` 来自这次重算后的结果
+
+#### Scenario: habitation sizing must follow canonical base instead of pre-canonical base
+
+- **前提** archive 中某生产模块数量大于当前 `planned + autoIndustry` 的数量
+- **当** 系统在第二阶段计算 `autoHabitationModules`
+- **那么** habitation 数量应按 canonical 的 `max(...)` 生产模块基准补齐
+- **并且** 不得继续按较小的 `planned + autoIndustry` 基准补齐
+
+#### Scenario: infrastructure uses final flow from stage two
+
+- **前提** 第二阶段已得到最终 `productionFlows`
+- **当** 系统计算 `autoInfrastructureModules`
+- **那么** 应基于这份最终 `productionFlows` 计算仓储与港口需求
+- **并且** 不得再回头修改 `autoIndustryModules`
+
+---
+
+### Requirement: Blueprint Final Result Must Match Two-stage Semantics
+
+blueprint 视图的最终展示结果 SHALL 与 live planning 的二阶段求值语义一致，即使内部仍允许拆成两步计算。
+
+#### Scenario: blueprint exposes the same final habitation and infrastructure semantics
+
+- **前提** blueprint 与 live 使用同一站点配置和同一计算规则
+- **当** 系统生成 blueprint 侧最终展示数据
+- **那么** blueprint 侧最终 `autoHabitationModules`、最终 `productionFlows`、`autoInfrastructureModules` 的语义应与 live 相同
+- **并且** 不得因为内部拆成两步而改变最终结果
+
+#### Scenario: storage count is still derived from capacity deficit
+
+- **前提** 系统已经算出 container storage 容量缺口
+- **当** 系统使用 reference-aware priority 选中 storage 模块
+- **那么** 最终 `count` 仍按容量缺口换算
+
+#### Scenario: habitation count is still derived from workforce deficit
+
+- **前提** 系统已经算出 habitation 容量缺口
+- **当** 系统使用 reference-aware priority 选中 habitation 模块
+- **那么** 最终 `count` 仍按工人容量缺口换算
+
+#### Scenario: pier count is still derived from berth deficit
+
+- **前提** 系统已经算出泊位缺口
+- **当** 系统使用 reference-aware priority 选中 pier 模块
+- **那么** 最终 `count` 仍按泊位缺口换算

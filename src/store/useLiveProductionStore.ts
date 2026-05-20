@@ -80,6 +80,14 @@ function getProducedWareIds(modules: SavedModule[], modulesMap: Record<string, X
   return [...wareIds]
 }
 
+function archiveCurrentTotalModulesFromArchive(archive: ArchiveStationData | null | undefined): SavedModule[] {
+  if (!archive) return []
+  return mergeSavedModules([
+    ...(archive.modules || []),
+    ...(archive.building?.modules || [])
+  ])
+}
+
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   type DirtyBindingState = 'all' | Set<string> | null
 
@@ -987,6 +995,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const planState = buildDerivedActiveStationState({
       stationId,
       plannedModules: planned,
+      referenceModules: archiveCurrentTotalModulesFromArchive(archiveStation.value),
+      deferSupportModules: true,
       settings: settings.value,
       cache,
       deps: getComputeDeps()
@@ -1003,6 +1013,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
           planState,
           archiveBuiltModules,
           archiveBuildingModules: archiveStation.value?.building?.modules || [],
+          referenceModules: archiveCurrentTotalModules,
           settings: settings.value,
           deps: getComputeDeps()
         })

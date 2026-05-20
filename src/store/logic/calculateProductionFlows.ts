@@ -9,7 +9,7 @@ import type { FlowContribution, WareProductionFlow } from '../../types/productio
 import type { WorkforceEntry } from '../../types/saveArchive'
 import {
   findBestProducerWithRef,
-  findBestHabitat,
+  findBestModuleWithReferenceQuota,
   getProductionEfficiency
 } from './bestModuleSelector'
 import { calculateWorkforceCensus } from './calculatorUtils'
@@ -33,9 +33,9 @@ export interface CalculateAutoFillOutput {
   autoHabitationModules: SavedModule[]
 }
 
-export function calculateAutoFillModules(
+export function calculateAutoIndustryModules(
   input: CalculateAutoFillInput
-): CalculateAutoFillOutput {
+): SavedModule[] {
   const {
     plannedModules,
     settings,
@@ -47,7 +47,6 @@ export function calculateAutoFillModules(
 
   const race = settings.racePreference
   const globalWorkforceBonus = settings.considerWorkforceForAutoFill
-
   const industryModules: Record<string, number> = {}
   plannedModules.forEach(m => {
     industryModules[m.id] = (industryModules[m.id] || 0) + m.count
@@ -172,32 +171,111 @@ export function calculateAutoFillModules(
     .filter(m => m.count > 0)
     .sort((a, b) => (modulesMap[b.id]?.tier || 0) - (modulesMap[a.id]?.tier || 0))
 
+  return autoIndustry
+}
+
+export interface CalculateAutoHabitationInput {
+  plannedModules: SavedModule[]
+  autoIndustryModules: SavedModule[]
+  settings: StationSettings
+  modulesMap: Record<string, X4Module>
+  referenceModules?: SavedModule[]
+}
+
+export function calculateAutoHabitationModules(
+  input: CalculateAutoHabitationInput
+): SavedModule[] {
+  const {
+    plannedModules,
+    autoIndustryModules,
+    settings,
+    modulesMap,
+    referenceModules
+  } = input
+
+  const race = settings.racePreference
+  const globalWorkforceBonus = settings.considerWorkforceForAutoFill
+  const refMods = referenceModules || []
   const autoHabitation: SavedModule[] = []
 
-  const allProducers: SavedModule[] = [...plannedModules, ...autoIndustry]
+  const allProducers: SavedModule[] = [...plannedModules, ...autoIndustryModules]
   const clientPopulation = calculateTotalWorkforceInternal(allProducers, modulesMap)
 
-  if (globalWorkforceBonus && clientPopulation > 0) {
-    const industrialWorkers = calculateTotalWorkforceInternal(allProducers, modulesMap)
-
-    if (industrialWorkers > 0) {
-      const habitat = findBestHabitat(race, allProducers, modulesMap)
-
-      if (habitat) {
-        const habitatCount = Math.ceil(industrialWorkers / habitat.workforce.capacity)
-
-        const existingHabitatCount = plannedModules
-          .filter(m => modulesMap[m.id]?.type === 'habitation')
-          .reduce((sum, m) => sum + m.count, 0)
-
-        const neededHabitats = Math.max(0, habitatCount - existingHabitatCount)
-
-        if (neededHabitats > 0) {
-          autoHabitation.push({ id: habitat.id, count: neededHabitats })
-        }
-      }
-    }
+  if (!(globalWorkforceBonus && clientPopulation > 0)) {
+    return autoHabitation
   }
+
+  const industrialWorkers = calculateTotalWorkforceInternal(allProducers, modulesMap)
+
+  if (industrialWorkers <= 0) {
+    return autoHabitation
+  }
+
+  const existingHabitationCapacity = plannedModules
+    .filter(m => modulesMap[m.id]?.type === 'habitation')
+    .reduce((sum, m) => sum + ((modulesMap[m.id]?.workforce.capacity || 0) * m.count), 0)
+
+  let remainingHabitationCapacity = Math.max(0, industrialWorkers - existingHabitationCapacity)
+  const habitationRefQuota: Record<string, number> = {}
+  for (const ref of refMods) {
+    const module = modulesMap[ref.id]
+    if (!module || module.type !== 'habitation') continue
+    const unitCapacity = module.workforce?.capacity || 0
+    if (unitCapacity <= 0) continue
+    habitationRefQuota[ref.id] = (habitationRefQuota[ref.id] || 0) + unitCapacity * ref.count
+  }
+
+  let habitationLoopCount = 0
+  while (remainingHabitationCapacity > 0 && habitationLoopCount < 50) {
+    habitationLoopCount++
+    const selection = findBestModuleWithReferenceQuota(
+      race,
+      [...allProducers, ...autoHabitation],
+      modulesMap,
+      refMods,
+      habitationRefQuota,
+      (module) => module.type === 'habitation',
+      (a, b) => (b.workforce?.capacity || 0) - (a.workforce?.capacity || 0)
+    )
+
+    if (!selection) break
+
+    const unitCapacity = selection.module.workforce?.capacity || 0
+    if (unitCapacity <= 0) break
+
+    let countNeeded = Math.ceil(remainingHabitationCapacity / unitCapacity)
+    if (!selection.exhaustedQuota) {
+      const quota = habitationRefQuota[selection.module.id] || 0
+      const maxFromQuota = Math.floor(quota / unitCapacity)
+      if (maxFromQuota <= 0) {
+        habitationRefQuota[selection.module.id] = 0
+        continue
+      }
+      countNeeded = Math.min(countNeeded, maxFromQuota)
+      habitationRefQuota[selection.module.id] = Math.max(0, quota - countNeeded * unitCapacity)
+    }
+
+    const existing = autoHabitation.find((module) => module.id === selection.module.id)
+    if (existing) existing.count += countNeeded
+    else autoHabitation.push({ id: selection.module.id, count: countNeeded })
+
+    remainingHabitationCapacity = Math.max(0, remainingHabitationCapacity - countNeeded * unitCapacity)
+  }
+
+  return autoHabitation
+}
+
+export function calculateAutoFillModules(
+  input: CalculateAutoFillInput
+): CalculateAutoFillOutput {
+  const autoIndustry = calculateAutoIndustryModules(input)
+  const autoHabitation = calculateAutoHabitationModules({
+    plannedModules: input.plannedModules,
+    autoIndustryModules: autoIndustry,
+    settings: input.settings,
+    modulesMap: input.modulesMap,
+    referenceModules: input.referenceModules
+  })
 
   return { 
     autoIndustryModules: autoIndustry,

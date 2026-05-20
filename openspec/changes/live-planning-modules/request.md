@@ -6,6 +6,14 @@
 
 本次增强是在现有 `live-planning-modules` 能力之上继续演进，**保留**搜索默认数量、红色阈值警告，以及 `calculateAutoFillModules` 的参考模块优先级逻辑；auto 区不切换为 `max` 主数字，而是继续显示 auto 原始数量，并通过红色 count 与名称后 `+/-N` 弱化差异表达 archive 对照关系。
 
+同时，reference-aware selection 的能力边界不再只覆盖工业生产模块，还要扩展到辅助模块：
+
+- 仓储模块按 `cargo.capacity` 作为能力维度参与参考优先判定
+- 工人模块按 `workforce.capacity` 作为能力维度参与参考优先判定
+- 港口模块按 `dockingCount` / 泊位能力参与参考优先判定
+
+这里的含义不是把工业模块那套“按 ware 产出配额消耗”的实现细节原样复制到辅助模块，而是要求辅助模块在选择候选模块时，也优先贴近 `archive.modules + archive.building.modules` 中已经存在或正在建造的模块类型；只是它们各自比较候选优劣时，使用的是不同能力指标。
+
 ## 术语澄清
 
 - 本 change 中如果讨论“有效模块集合 / effective modules”，指的是用于 planning / flow 语义对照的模块集合：
@@ -140,7 +148,52 @@
 - live 模式下，参考模块继续取 `archive.modules + archive.building.modules`。
 - P1–P8 优先级、按产能计算配额、P1+P2 共享配额的规则全部保留。
 
-### 12. 展开/折叠状态
+### 12. 辅助模块也需要 reference-aware priority
+
+- live 模式下，辅助模块的自动选择也要参考 `archive.modules + archive.building.modules`。
+- 目标不是只算出“缺多少”，还要尽量延续 archive/building 中已经使用的辅助模块类型。
+- 这条规则覆盖：
+  - 仓储模块
+  - 工人模块 / habitation 模块
+  - 港口 / pier 模块
+
+辅助模块的优先比较维度定义如下：
+
+- 仓储模块：按提供的 `cargo.capacity`
+- 工人模块：按提供的 `workforce.capacity`
+- 港口模块：按提供的 `dockingCount` / 泊位能力
+
+优先级语义与生产模块保持一致的部分是“候选来源优先级”，不是“配额算法”本身：
+
+- 优先参考 archive/building 中出现过的模块
+- 参考模块内部优先同族
+- 参考模块无法满足时，再退回现有 planned/existing 候选
+- 最后才退回数据库候选
+
+辅助模块的补齐数量仍按各自缺口计算：
+
+- 仓储缺口按容量补齐
+- 工人缺口按工人容量补齐
+- 港口缺口按泊位补齐
+
+### 14. live planning 的辅助模块与最终 flow 改为第二阶段统一求值
+
+- 这里需要明确：`autoIndustryModules` 的数量计算**不依赖**最终实际工人数量，因此这不是一个需要固定点迭代求解的循环依赖问题。
+- `autoIndustryModules` 只依赖 `considerWorkforceForAutoFill` 开关决定采用哪种理论效率：
+  - 打开：按满效率 / 有工人加成的理论产出估算所需工业模块数量
+  - 关闭：按空效率 / 无工人加成的理论产出估算所需工业模块数量
+- `autoHabitationModules` 不参与反向决定工业模块数量；它只影响最终 `actualWorkforce`、`currentEfficiency` 与包含工人消耗的最终 flow 数据。
+- 因此 live planning 的正确语义应拆成两阶段：
+  1. 第一阶段只计算 `autoIndustryModules`
+  2. 第二阶段先确定 canonical 生产模块基准：
+     - `canonicalBaseModules = max(planned + autoIndustry, archive.modules + archive.building.modules)`
+  3. 再基于这份 `canonicalBaseModules` 计算 `autoHabitationModules`
+  4. 再基于 `canonicalBaseModules + autoHabitation` 重算一次最终 flow
+  5. 最后基于最终 flow 计算 `autoInfrastructureModules`
+- `autoInfrastructureModules` 不应再反向触发工业模块数量重算。
+- blueprint 侧最终展示结果必须保持稳定；内部允许沿用两阶段求值，但最终对外结果必须与单次展示语义一致。
+
+### 13. 展开/折叠状态
 
 - `recommendedModules` 的展开/折叠状态存放在 `useLiveProductionStore`。
 - 该状态对所有 station 通用，共享同一个运行时状态。
@@ -160,6 +213,10 @@
 - 搜索框新模块默认数量 = archive 总量
 - `plannedModules` 红色阈值警告
 - `calculateAutoFillModules` 参考模块优先级保留
+- 辅助模块的 reference-aware priority（仓储/工人模块/港口）
+- live planning / blueprint 共享的二阶段最终求值语义：
+  - 第一阶段只算 `autoIndustryModules`
+  - 第二阶段统一算 `autoHabitationModules`、最终 flow、`autoInfrastructureModules`
 - `recommendedModules` 折叠状态的非持久 store 管理
 
 ### Out of Scope
@@ -184,7 +241,13 @@
 11. 点击 auto 模块加入 planned 时，实际加入数量使用 `max(auto_count, archive_total)`，而不是 auto 当前显示数量。
 12. 搜索框添加新模块时，若该模块当前不在 `plannedModules` 中，则默认 count = archive 总量；若已存在，仍每次 `+1`。
 13. `calculateAutoFillModules` 在 live 模式下继续按既有 P1–P8 优先级和配额规则运行。
-14. `recommendedModules` 的展开/折叠状态在 `useLiveProductionStore` 中共享，但刷新后不保留。
+14. live 模式下，仓储模块会优先参考 archive/building 中已有的同类仓储模块，并以 `cargo.capacity` 作为能力比较维度。
+15. live 模式下，工人模块会优先参考 archive/building 中已有的 habitation 模块，并以 `workforce.capacity` 作为能力比较维度。
+16. live 模式下，港口模块会优先参考 archive/building 中已有的 pier 模块，并以 `dockingCount` / 泊位能力作为能力比较维度。
+17. `recommendedModules` 的展开/折叠状态在 `useLiveProductionStore` 中共享，但刷新后不保留。
+18. `autoIndustryModules` 的数量计算只依赖 `considerWorkforceForAutoFill` 开关，不依赖第二阶段算出的实际工人数，因此系统不得把它建模为固定点循环。
+19. live planning SHALL 先计算 `autoIndustryModules`，再先确定 `canonicalBaseModules = max(planned + autoIndustry, archive.modules + archive.building.modules)`，再基于这份 canonical 基准计算 `autoHabitationModules`，并基于 `canonicalBaseModules + autoHabitation` 重算最终 flow，再据此计算 `autoInfrastructureModules`。
+20. blueprint 视图的最终展示结果 SHALL 与上述二阶段语义一致，不得因为内部求值拆分而改变最终显示结果。
 
 ## 未决项
 
