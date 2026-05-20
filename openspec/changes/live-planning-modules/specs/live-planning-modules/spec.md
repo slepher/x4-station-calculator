@@ -398,6 +398,26 @@ store 层的 `autoIndustryModules` 等保持原始完整数值不变。
 
 ---
 
+### Requirement: Two-stage Derivation Boundary Must Not Be Confused With Cache-layer Boundary
+
+系统 SHALL 区分“station 业务推导阶段”与“缓存真源层 / 当前站展示层”的边界；不得把前者误实现成后者。
+
+#### Scenario: aggregation must continue to read final canonical planning flow
+
+- **前提** planning + archive 场景下，station 已完成产业推导阶段与支撑推导阶段
+- **当** transit / sector / empire 聚合继续读取 planning flow
+- **那么** 聚合必须读取缓存真源层中的最终 canonical planning flow
+- **并且** 不得退回去读取只完成产业推导阶段的中间 flow
+
+#### Scenario: current station display layer must not own a second aggregation truth
+
+- **前提** 当前 active station 需要展示 `autoHabitationModules`、最终 `productionFlows` 与 `autoInfrastructureModules`
+- **当** 系统组装当前站展示态
+- **那么** 展示层可以复用或补充最终结果
+- **并且** 不得让展示层独占一套与缓存真源层不同的 flow 真相
+
+---
+
 ### Requirement: Blueprint Final Result Must Match Two-stage Semantics
 
 blueprint 视图的最终展示结果 SHALL 与 live planning 的二阶段求值语义一致，即使内部仍允许拆成两步计算。

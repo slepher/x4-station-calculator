@@ -16,6 +16,28 @@
 - 这一定义不等同于 `StationDashboard` 的 `effectiveModules` prop。
 - `StationDashboard` 那套 `effectiveModules` 仅属于 dashboard building scope 展示语义，不属于本文设计范围。
 
+### 阶段与层次代词
+
+为了避免把两个不同维度的“阶段”混在一起，本文统一使用：
+
+- **推导阶段**
+  - 指单个 station 的业务计算顺序
+  - 包括：
+    - `产业推导阶段`：确定 `autoIndustryModules`
+    - `支撑推导阶段`：确定 `autoHabitationModules`、最终 flow、`autoInfrastructureModules`
+- **缓存真源层**
+  - 指 `StationDerivedMap` 及其继续向 sector / empire / transit 聚合暴露的数据源
+  - 这里保存的应该是可继续参与聚合的最终 canonical planning flow
+- **当前站展示层**
+  - 指 `productionStationShared` 等为当前 active station 组装 UI 状态的层
+  - 它可以补充展示字段，但不应与缓存真源层持有两套不同的 flow 真相
+
+设计约束：
+
+- “先产业、后支撑”属于**推导阶段分界**
+- “DerivedMap / shared / vue”属于**层次分界**
+- 这两个分界不属于同一个概念，不能互相替代
+
 ```
 archiveStation + planningUiState (store)
      │
@@ -262,17 +284,16 @@ reference-aware priority 只决定“选哪种模块”，不改变“缺口怎�
 职责建议如下：
 
 - `StationDerivedMap`
-  - 保留第一阶段缓存能力
-  - 负责计算 `autoIndustryModules`
-  - 可保留第一阶段中间 flow 供缓存/语义推导使用
+  - 属于缓存真源层
+  - 可以在内部复用“产业推导阶段 / 支撑推导阶段”的计算顺序
+  - 但对外保存的必须是可继续参与 aggregation 的最终 canonical planning flow
 - `productionStationShared`
-  - 负责第二阶段统一求值
-  - 基于真实最终模块总量计算 `autoHabitationModules`
-  - 重算最终 flow
-  - 计算 `autoInfrastructureModules`
+  - 属于当前站展示层
+  - 负责当前 active station 的最终展示态组装
+  - 不应与缓存真源层分叉出另一套聚合基准 flow
 - `useLiveProductionStore` / `useBlueprintProductionStore`
   - 都只消费 shared 层给出的最终结果
-  - 不再分别拥有不一致的 habitation / infrastructure 推导时机
+  - transit / sector / empire 聚合则继续消费缓存真源层中的统一 canonical planning flow
 
 ## 组件变更
 

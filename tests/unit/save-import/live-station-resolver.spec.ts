@@ -1,7 +1,33 @@
 import { describe, expect, it } from 'vitest'
-import { deriveBindingStationsFromRecords } from '@/store/logic/liveStationResolver'
+import { deriveBindingStationsFromRecords, toProductionStation } from '@/store/logic/liveStationResolver'
 
 describe('deriveBindingStationsFromRecords', () => {
+  it('maps binding groupId to station sectorId when converting binding plans', () => {
+    const station = toProductionStation({
+      id: 'binding-station-1',
+      saveStationCode: 'save-station-1',
+      groupId: 'group-alpha',
+      name: 'Bound Station',
+      type: 'industrial',
+      modules: [],
+      settings: {
+        racePreference: 'argon',
+        considerWorkforceForAutoFill: true,
+        showEmpireGaps: false,
+        resourceBufferHours: 2,
+        primaryProductBufferHours: 2,
+        secondaryProductBufferHours: 2,
+        transportMinutes: 30,
+        transportShipCapacity: 40000,
+        buyMultiplier: 0.5,
+        sellMultiplier: 0.5,
+        sunlight: 100
+      }
+    } as any)
+
+    expect(station.sectorId).toBe('group-alpha')
+  })
+
   it('uses actual sector sunlight for save-derived stations even when a binding plan exists', () => {
     const groups = [
       {

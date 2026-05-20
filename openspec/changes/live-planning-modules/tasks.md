@@ -89,3 +89,4 @@
 - [x] 统一 live 与 blueprint 的最终结果语义
 - [x] 为两阶段最终求值补充针对 live / blueprint 的单测
 - [x] 修正第二阶段内部顺序：先确定 canonical 生产模块基准，再计算 `autoHabitationModules`
+- [x] 恢复缓存真源层的最终 canonical planning flow，避免 transit / sector / empire 聚合退回读取中间 flow

@@ -516,8 +516,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return stationId || null
   })
 
-  const archiveStation = computed<ArchiveStationData | null>(() => {
-    const code = archiveStationCode.value
+  function getArchiveStationDataByCode(code: string | null): ArchiveStationData | null {
     if (!code || !activeBinding.value) return null
 
     const archive = selectedArchive.value
@@ -643,6 +642,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       overrides: stationEntry.overrides,
       targetCounts: stationEntry.overrides?.max
     }
+  }
+
+  function getArchiveStationDataByPlanId(planId: string): ArchiveStationData | null {
+    const bindingPlan = activeBinding.value?.stationPlans.find((plan) => plan.id === planId) || null
+    const archiveCode = bindingPlan?.saveStationCode || planId
+    return getArchiveStationDataByCode(archiveCode)
+  }
+
+  const archiveStation = computed<ArchiveStationData | null>(() => {
+    return getArchiveStationDataByCode(archiveStationCode.value)
   })
 
   const context = computed<ProductionContextState>(() => {
@@ -805,8 +814,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       sunlight: archiveSunlight ?? station.settings?.sunlight ?? DEFAULT_STATION_SETTINGS.sunlight
     }
 
-    const isActiveStation = station.id === activeStationId.value
-    const archive = isActiveStation ? archiveStation.value : null
+    const archive = getArchiveStationDataByPlanId(station.id)
     const referenceModules: SavedModule[] = []
     if (archive) {
       referenceModules.push(...(archive.modules || []))
@@ -1318,7 +1326,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       activeStationId.value = stationId
     }
     const station = toProductionStation(plan)
-    station.sectorId = plan.groupId || null
     syncBindingStationDerivedSnapshot(stationId)
     return station
   }
@@ -2025,8 +2032,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       }
       const map = ensurePlanningDerivedMap()
       if (!map) return
-      const isActiveStation = station.id === activeStationId.value
-      const archive = isActiveStation ? archiveStation.value : null
+      const archive = getArchiveStationDataByPlanId(station.id)
       const refModules: SavedModule[] = []
       if (archive) {
         refModules.push(...(archive.modules || []))

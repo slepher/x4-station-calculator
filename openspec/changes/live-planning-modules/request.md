@@ -178,6 +178,22 @@
 
 ### 14. live planning 的辅助模块与最终 flow 改为第二阶段统一求值
 
+为了避免概念混淆，本 change 统一采用以下代词：
+
+- **推导阶段**：
+  - 指单个 station 在业务计算上的先后顺序
+  - 本 change 中特指：
+    1. 产业推导阶段：先确定 `autoIndustryModules`
+    2. 支撑推导阶段：再确定 `autoHabitationModules`、最终 flow、`autoInfrastructureModules`
+- **缓存真源层**：
+  - 指 `StationDerivedMap` 这类会继续被 sector / empire / transit 聚合消费的数据真源
+  - 它的职责是保存可继续参与聚合的最终 planning flow
+- **当前站展示层**：
+  - 指 `productionStationShared` / 当前 active station 的 UI 展示态组装
+  - 它可以复用推导结果，但不应该拥有与缓存真源层不同的 flow 真相
+
+这里必须明确：**推导阶段分界** 与 **缓存层 / 展示层分界** 不是同一个概念，后续实现不得再把“先产业、后支撑”的业务顺序误实现成“DerivedMap 只保留前半段、shared 层补后半段”。
+
 - 这里需要明确：`autoIndustryModules` 的数量计算**不依赖**最终实际工人数量，因此这不是一个需要固定点迭代求解的循环依赖问题。
 - `autoIndustryModules` 只依赖 `considerWorkforceForAutoFill` 开关决定采用哪种理论效率：
   - 打开：按满效率 / 有工人加成的理论产出估算所需工业模块数量
@@ -192,6 +208,7 @@
   5. 最后基于最终 flow 计算 `autoInfrastructureModules`
 - `autoInfrastructureModules` 不应再反向触发工业模块数量重算。
 - blueprint 侧最终展示结果必须保持稳定；内部允许沿用两阶段求值，但最终对外结果必须与单次展示语义一致。
+- 无论内部如何拆阶段，**缓存真源层** 仍必须保存能够继续进入 aggregation 的最终 canonical planning flow。
 
 ### 13. 展开/折叠状态
 

@@ -4,6 +4,7 @@ import type { WareProductionFlow } from '@/types/production-flow'
 import { isWorkforceContributionClass } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
 import {
+  calculateAutoHabitationModules,
   calculateAutoIndustryModules,
   calculateProductionFlowsCore,
   type CalculateProductionFlowsOutput
@@ -162,6 +163,38 @@ function normalizeLockedWares(lockedWares: string[] | undefined): string[] {
 
 function normalizeWarePriority(warePriority: Record<string, number> | undefined): Record<string, number> {
   return warePriority ? { ...warePriority } : {}
+}
+
+function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
+  const counts = new Map<string, number>()
+  const order: string[] = []
+
+  for (const module of modules) {
+    if (!counts.has(module.id)) order.push(module.id)
+    counts.set(module.id, (counts.get(module.id) || 0) + module.count)
+  }
+
+  return order
+    .map((id) => ({ id, count: counts.get(id) || 0 }))
+    .filter((module) => module.count > 0)
+}
+
+function maxSavedModules(preferred: SavedModule[], fallback: SavedModule[]): SavedModule[] {
+  const preferredMerged = mergeSavedModules(preferred)
+  const fallbackMerged = mergeSavedModules(fallback)
+  const preferredCounts = new Map(preferredMerged.map((module) => [module.id, module.count]))
+  const fallbackCounts = new Map(fallbackMerged.map((module) => [module.id, module.count]))
+  const order = [
+    ...preferredMerged.map((module) => module.id),
+    ...fallbackMerged.map((module) => module.id).filter((id) => !preferredCounts.has(id))
+  ]
+
+  return order
+    .map((id) => ({
+      id,
+      count: Math.max(preferredCounts.get(id) || 0, fallbackCounts.get(id) || 0)
+    }))
+    .filter((module) => module.count > 0)
 }
 
 function modulesEqual(a: SavedModule[], b: SavedModule[]): boolean {
@@ -522,31 +555,6 @@ export class StationDerivedMap {
     this.sectorExternalCache.clear()
   }
 
-  private buildFullModules(
-    inputModules: SavedModule[],
-    autoIndustryModules: SavedModule[],
-    autoHabitationModules: SavedModule[]
-  ): SavedModule[] {
-    const fullModules = [...inputModules]
-    for (const autoMod of autoIndustryModules) {
-      const existing = fullModules.find(m => m.id === autoMod.id)
-      if (existing) {
-        existing.count += autoMod.count
-      } else {
-        fullModules.push({ id: autoMod.id, count: autoMod.count })
-      }
-    }
-    for (const autoMod of autoHabitationModules) {
-      const existing = fullModules.find(m => m.id === autoMod.id)
-      if (existing) {
-        existing.count += autoMod.count
-      } else {
-        fullModules.push({ id: autoMod.id, count: autoMod.count })
-      }
-    }
-    return fullModules
-  }
-
   private computePlanResult(
     inputModules: SavedModule[],
     settings: StationDerivedSettings,
@@ -564,10 +572,26 @@ export class StationDerivedMap {
       lockedWares,
       referenceModules
     })
+    const canonicalBaseModules = (referenceModules && referenceModules.length > 0)
+      ? maxSavedModules(
+          [...inputModules, ...autoIndustryModules],
+          referenceModules
+        )
+      : mergeSavedModules([
+          ...inputModules,
+          ...autoIndustryModules
+        ])
+    const autoHabitationModules = calculateAutoHabitationModules({
+      plannedModules: canonicalBaseModules,
+      autoIndustryModules: [],
+      settings: fullSettings,
+      modulesMap: deps.modulesMap,
+      referenceModules
+    })
     const coreResult = calculateProductionFlowsCore({
-      plannedModules: inputModules,
-      autoIndustryModules,
-      autoHabitationModules: [],
+      plannedModules: canonicalBaseModules,
+      autoIndustryModules: [],
+      autoHabitationModules,
       modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
       workforceConsumptionMap: deps.workforceConsumptionMap,
@@ -577,15 +601,14 @@ export class StationDerivedMap {
 
     return {
       autoIndustryModules,
-      autoHabitationModules: [],
+      autoHabitationModules,
       productionFlows: coreResult.productionFlows,
       actualWorkforce: coreResult.actualWorkforce,
       currentEfficiency: coreResult.currentEfficiency,
-      fullModules: this.buildFullModules(
-        inputModules,
-        autoIndustryModules,
-        []
-      )
+      fullModules: mergeSavedModules([
+        ...canonicalBaseModules,
+        ...autoHabitationModules
+      ])
     }
   }
 

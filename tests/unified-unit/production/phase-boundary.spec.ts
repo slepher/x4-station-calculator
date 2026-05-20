@@ -15,42 +15,50 @@ describe('production phase boundary', () => {
     expect('getSectorAggregation' in flowMapApi).toBe(false)
   })
 
-  it('does not read phase-two habitation modules back from cache', () => {
-    const cache: StationDerivedCache = {
-      autoIndustryModules: [{ id: 'auto-industry', count: 1 }],
-      autoHabitationModules: [{ id: 'auto-hab', count: 2 }],
-      productionFlows: [{
-        wareId: 'energycells',
-        orderIndex: 1,
-        tier: 0,
-        transportType: 'container',
-        unitVolume: 1,
-        production: 10,
-        consumption: 0,
-        netRate: 10,
-        contributions: []
-      }],
-      warePriorityLevels: { energycells: 1 },
-      actualWorkforce: 42,
-      currentEfficiency: 0.95
-    }
-
-    const state = buildDerivedActiveStationState({
-      stationId: 'station-1',
-      plannedModules: [{ id: 'planned', count: 3 }],
-      settings: { ...DEFAULT_STATION_SETTINGS },
-      cache,
-      deps: null
+  it('keeps final planning flow in StationDerivedMap cache for aggregation', () => {
+    const flowMap = new StationDerivedMap({
+      modulesMap: {
+        prod: {
+          id: 'prod',
+          macroId: 'module_prod',
+          type: 'production',
+          race: 'argon',
+          outputs: { hullparts: 10 },
+          inputs: {},
+          workforce: { needed: 10, capacity: 0, maxBonus: 0 }
+        } as any,
+        habitat: {
+          id: 'habitat',
+          macroId: 'module_habitat',
+          type: 'habitation',
+          race: 'argon',
+          outputs: {},
+          inputs: {},
+          workforce: { needed: 0, capacity: 20, maxBonus: 0 }
+        } as any
+      },
+      waresMap: {
+        hullparts: { id: 'hullparts', transport: 'container', volume: 1, tier: 1 } as any
+      },
+      workforceConsumptionMap: {}
     })
 
-    expect(state.productionFlows).toBe(cache.productionFlows)
-    expect(state.autoIndustryModules).toEqual(cache.autoIndustryModules)
-    expect(state.autoHabitationModules).toEqual([])
-    expect(state.autoInfrastructureModules).toEqual([])
-    expect(state.resolvedModules).toEqual([
-      { id: 'planned', count: 3 },
-      { id: 'auto-industry', count: 1 }
-    ])
+    flowMap.upsertStation('station-1', {
+      modulesMode: 'plan',
+      modules: [{ id: 'prod', count: 1 }],
+      settings: {
+        considerWorkforceForAutoFill: true,
+        workforceAuto: true,
+        racePreference: 'argon'
+      },
+      referenceModules: [{ id: 'habitat', count: 1 }]
+    })
+
+    const cache = flowMap.getCache('station-1')
+    expect(cache).not.toBeNull()
+    expect(cache!.autoHabitationModules).toEqual([])
+    expect(cache!.actualWorkforce).toBe(10)
+    expect(cache!.currentEfficiency).toBe(1)
     expect((cache as Record<string, unknown>).autoInfrastructureModules).toBeUndefined()
     expect((cache as Record<string, unknown>).resolvedModules).toBeUndefined()
   })
@@ -82,6 +90,7 @@ describe('production phase boundary', () => {
         modulesMap: {
           'planned-prod': {
             id: 'planned-prod',
+            macroId: 'module_planned_prod',
             type: 'production',
             race: 'argon',
             outputs: { hullparts: 10 },
@@ -90,6 +99,7 @@ describe('production phase boundary', () => {
           } as any,
           'auto-industry': {
             id: 'auto-industry',
+            macroId: 'module_auto_industry',
             type: 'production',
             race: 'argon',
             outputs: { energycells: 10 },
@@ -98,6 +108,7 @@ describe('production phase boundary', () => {
           } as any,
           habitat: {
             id: 'habitat',
+            macroId: 'module_habitat',
             type: 'habitation',
             race: 'argon',
             outputs: {},
