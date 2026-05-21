@@ -20,6 +20,7 @@ const props = defineProps<{
   countDisabled?: boolean
   threshold?: number
   diffAnnotation?: string
+  colorByDiff?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -29,10 +30,10 @@ const emit = defineEmits<{
 }>()
 
 const isBelowThreshold = computed(() => {
-  return moduleDiffAnnotation.value?.startsWith('-') ?? false
+  return props.threshold !== undefined && props.item.count < props.threshold
 })
 const isAboveThreshold = computed(() => {
-  return moduleDiffAnnotation.value?.startsWith('+') ?? false
+  return props.colorByDiff && (moduleDiffAnnotation.value?.startsWith('+') ?? false)
 })
 
 const colorBarStyle = computed(() => {

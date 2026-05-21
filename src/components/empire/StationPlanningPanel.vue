@@ -355,7 +355,7 @@ const handleUpdateSearchQuery = (value: string) => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoIndustryModules" :key="'industry-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
-            :threshold="archiveTotal(element.id)"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
@@ -369,7 +369,7 @@ const handleUpdateSearchQuery = (value: string) => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoHabitationModules" :key="'habitation-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
-            :threshold="archiveTotal(element.id)"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
@@ -383,7 +383,7 @@ const handleUpdateSearchQuery = (value: string) => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoInfrastructureModules" :key="'infrastructure-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
-            :threshold="archiveTotal(element.id)"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
