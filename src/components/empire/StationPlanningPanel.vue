@@ -248,7 +248,9 @@ const handleReorderModules = (modules: SavedModule[]) => {
 }
 
 const handleTransferAutoModule = (module: SavedModule) => {
-  const targetCount = Math.max(module.count, archiveTotal(module.id))
+  const info = getModuleInfo(module.id)
+  const isIndustry = info?.type === 'production' && info?.method !== 'recycling'
+  const targetCount = isIndustry ? Math.max(module.count, archiveTotal(module.id)) : module.count
   const existingIndex = props.plannedModules.findIndex(m => m.id === module.id)
   let nextModules: SavedModule[]
   if (existingIndex >= 0) {
