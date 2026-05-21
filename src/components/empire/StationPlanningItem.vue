@@ -94,7 +94,7 @@ const moduleDiffClass = computed(() => {
           >{{ moduleDiffAnnotation }}</span>
         </div>
         <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'"
-          :title="dlcLabel">[DLC]</span>
+          :title="dlcLabel">DLC</span>
       </div>
     </div>
 
