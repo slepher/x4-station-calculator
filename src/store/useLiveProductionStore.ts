@@ -1686,7 +1686,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
-      derivedProductionFlows: planningFlowFacade.deriveFlows(state.productionFlows, isTransit ? { ...settings.value, resourceBufferHours: settings.value.primaryProductBufferHours } : settings.value, state.warePriorityLevels, isTransit ? 'max' : 'sum'),
+      derivedProductionFlows: planningFlowFacade.deriveFlows(state.productionFlows, isTransit ? { ...settings.value, resourceBufferHours: settings.value.primaryProductBufferHours } : settings.value, state.warePriorityLevels),
       warePriorityLevels: state.warePriorityLevels,
       settings: {
         ...settings.value,
@@ -1739,17 +1739,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     key: string,
     title: string,
     includeCurrentColumn: boolean,
+    includeTargetColumn: boolean,
     rows: LiveVolumeAllocationDetailRow[]
   ): LiveVolumeAllocationDetailSection | null {
     if (rows.length === 0) return null
-    return { key, title, includeCurrentColumn, rows }
+    return { key, title, includeCurrentColumn, includeTargetColumn, rows }
   }
 
   function buildAllocationDetailSections(
     flow: DerivedProductionFlow,
     currentCount: number,
     targetCount: number,
-    recommendedCount: number
+    recommendedCount: number,
+    hasArchiveData: boolean
   ): LiveVolumeAllocationDetailSection[] {
     i18n.global.locale.value
     const sections: LiveVolumeAllocationDetailSection[] = []
@@ -1763,14 +1765,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         key: 'current-net-fill',
         label: i18n.global.t('wareflow.allocation_current_net_fill_time'),
         ratePerHour: netProductionRate,
-        targetMinutes: computeDeltaFillMinutes(targetCount, currentCount, netProductionRate),
+        targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, currentCount, netProductionRate) : undefined,
         recommendedMinutes: computeDeltaFillMinutes(recommendedCount, currentCount, netProductionRate)
       },
       {
         key: 'current-gross-fill',
         label: i18n.global.t('wareflow.allocation_current_gross_fill_time'),
         ratePerHour: totalProductionRate,
-        targetMinutes: computeDeltaFillMinutes(targetCount, currentCount, totalProductionRate),
+        targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, currentCount, totalProductionRate) : undefined,
         recommendedMinutes: computeDeltaFillMinutes(recommendedCount, currentCount, totalProductionRate)
       }
     ] as LiveVolumeAllocationDetailRow[]
@@ -1781,14 +1783,14 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         key: 'empty-net-fill',
         label: i18n.global.t('wareflow.allocation_empty_net_fill_time'),
         ratePerHour: netProductionRate,
-        targetMinutes: computeDeltaFillMinutes(targetCount, 0, netProductionRate),
+        targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, 0, netProductionRate) : undefined,
         recommendedMinutes: computeDeltaFillMinutes(recommendedCount, 0, netProductionRate)
       },
       {
         key: 'empty-gross-fill',
         label: i18n.global.t('wareflow.allocation_empty_gross_fill_time'),
         ratePerHour: totalProductionRate,
-        targetMinutes: computeDeltaFillMinutes(targetCount, 0, totalProductionRate),
+        targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, 0, totalProductionRate) : undefined,
         recommendedMinutes: computeDeltaFillMinutes(recommendedCount, 0, totalProductionRate)
       }
     ] as LiveVolumeAllocationDetailRow[]
@@ -1800,7 +1802,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         label: i18n.global.t('wareflow.allocation_current_net_drain_time'),
         ratePerHour: netConsumptionRate,
         currentMinutes: computeStockConsumeMinutes(currentCount, netConsumptionRate),
-        targetMinutes: computeStockConsumeMinutes(targetCount, netConsumptionRate),
+        targetMinutes: hasArchiveData ? computeStockConsumeMinutes(targetCount, netConsumptionRate) : undefined,
         recommendedMinutes: computeStockConsumeMinutes(recommendedCount, netConsumptionRate)
       },
       {
@@ -1808,7 +1810,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         label: i18n.global.t('wareflow.allocation_current_gross_drain_time'),
         ratePerHour: totalConsumptionRate,
         currentMinutes: computeStockConsumeMinutes(currentCount, totalConsumptionRate),
-        targetMinutes: computeStockConsumeMinutes(targetCount, totalConsumptionRate),
+        targetMinutes: hasArchiveData ? computeStockConsumeMinutes(targetCount, totalConsumptionRate) : undefined,
         recommendedMinutes: computeStockConsumeMinutes(recommendedCount, totalConsumptionRate)
       }
     ] as LiveVolumeAllocationDetailRow[]
@@ -1818,14 +1820,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       'fill-current',
       i18n.global.t('wareflow.allocation_section_fill_current'),
       false,
+      hasArchiveData,
       visibleFillCurrentRows
     )
-    if (fillCurrentSection) sections.push(fillCurrentSection)
+    if (fillCurrentSection && hasArchiveData) sections.push(fillCurrentSection)
 
     const fillEmptySection = buildAllocationDetailSection(
       'fill-empty',
       i18n.global.t('wareflow.allocation_section_fill_empty'),
       false,
+      hasArchiveData,
       visibleFillEmptyRows
     )
     if (fillEmptySection) sections.push(fillEmptySection)
@@ -1834,6 +1838,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       'drain',
       i18n.global.t('wareflow.allocation_section_drain'),
       true,
+      hasArchiveData,
       visibleDrainRows
     )
     if (drainSection) sections.push(drainSection)
@@ -1852,7 +1857,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         label,
         ratePerHour: pureConsumptionRate,
         currentMinutes: computeStockConsumeMinutes(currentCount, pureConsumptionRate),
-        targetMinutes: computeStockConsumeMinutes(targetCount, pureConsumptionRate),
+        targetMinutes: hasArchiveData ? computeStockConsumeMinutes(targetCount, pureConsumptionRate) : undefined,
         recommendedMinutes: computeStockConsumeMinutes(recommendedCount, pureConsumptionRate)
       }
       if (row.currentMinutes === undefined && row.targetMinutes === undefined && row.recommendedMinutes === undefined) return
@@ -1863,6 +1868,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       'downstream',
       i18n.global.t('wareflow.allocation_section_downstream'),
       true,
+      hasArchiveData,
       downstreamRows
     )
     if (downstreamSection) sections.push(downstreamSection)
@@ -1871,26 +1877,31 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   }
 
   const useAllocationVolumeView = computed(() => {
-    if (workbenchMode.value !== 'station') return false
-    return archiveStation.value !== null
+    return workbenchMode.value === 'station' || workbenchMode.value === 'transit'
   })
 
   const liveVolumeAllocationGroups = computed<LiveVolumeAllocationGroup[]>(() => {
     if (!useAllocationVolumeView.value) return []
     if (session.value.wareflowViewMode !== 'volume') return []
 
-    const archive = archiveStation.value
     const state = stationState.value
-    if (!archive || !state) return []
+    if (!state) return []
+
+    const archive = archiveStation.value
+    const hasArchive = archive !== null
 
     const cargoMap = new Map<string, number>()
-    for (const item of archive.cargo || []) {
-      cargoMap.set(item.ware, item.amount)
+    if (hasArchive) {
+      for (const item of archive!.cargo || []) {
+        cargoMap.set(item.ware, item.amount)
+      }
     }
 
     const targetMap = new Map<string, number>()
-    for (const item of archive.targetCounts || []) {
-      targetMap.set(item.ware, item.amount)
+    if (hasArchive) {
+      for (const item of archive!.targetCounts || []) {
+        targetMap.set(item.ware, item.amount)
+      }
     }
 
     const grouped = new Map<'container' | 'solid' | 'liquid', LiveVolumeAllocationItem[]>([
@@ -1904,7 +1915,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       const localizedWare = gameData.localizedWaresMap[flow.wareId]
       const recommendedCount = Math.round(flow.totalOccupiedCount)
       const currentCount = cargoMap.get(flow.wareId) || 0
-      const targetCount = targetMap.get(flow.wareId) || 0
+      const targetCount = hasArchive
+        ? (targetMap.get(flow.wareId) || 0)
+        : recommendedCount
       const item: LiveVolumeAllocationItem = {
         wareId: flow.wareId,
         name: localizedWare?.localeName || ware?.name || flow.wareId,
@@ -1915,7 +1928,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         targetCount,
         recommendedCount,
         scaleMaxCount: Math.max(currentCount, targetCount, recommendedCount),
-        detailSections: buildAllocationDetailSections(flow, currentCount, targetCount, recommendedCount)
+        detailSections: buildAllocationDetailSections(flow, currentCount, targetCount, recommendedCount, hasArchive)
       }
       grouped.get(flow.transportType)?.push(item)
     }

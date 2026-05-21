@@ -6,6 +6,7 @@ import type {
   GroupedFlows
 } from '../../types/x4'
 import type { DerivedProductionFlow, DerivedFlowContribution, WareProductionFlow } from '../../types/production-flow'
+import { computeBufferOccupancy } from './calculateBufferOccupancy'
 
 export interface CalculateWareFlowDerivedInput {
   productionFlows: WareProductionFlow[]
@@ -27,7 +28,6 @@ export interface CalculateWareFlowDerivedInput {
     sunlight: number
   }
   warePriorityLevels: Record<string, number>
-  volumeContributionMethod?: 'sum' | 'max'
 }
 
 export interface CalculateWareFlowDerivedOutput {
@@ -44,8 +44,7 @@ export function deriveProductionFlows(
     settings,
     warePriorityLevels,
     stationNameMap,
-    sectorNameMap,
-    volumeContributionMethod = 'sum'
+    sectorNameMap
   } = input
 
   const wareFlows: DerivedProductionFlow[] = productionFlows.map(prodFlow => {
@@ -68,7 +67,17 @@ export function deriveProductionFlows(
     const shouldCountTransport = isMainOrSecondary || isSupplyGap || isResourceFlow || isDeficit
     const transportDemand = shouldCountTransport ? Math.abs(prodFlow.netRate) * unitVolume : 0
 
-    const consumptionBufferCount = prodFlow.consumption * settings.resourceBufferHours
+    const {
+      consumptionBufferCount,
+      totalOccupiedCount,
+      totalOccupiedVolume
+    } = computeBufferOccupancy({
+      flow: { wareId: prodFlow.wareId, consumption: prodFlow.consumption, netRate: prodFlow.netRate, unitVolume },
+      settings,
+      warePriorityLevels: warePriorityLevels || {}
+    }    )
+
+    const totalOccupiedConsumptionCount = consumptionBufferCount
 
     const storagePriorityLevel = warePriorityLevels?.[prodFlow.wareId] ?? 2
     let productBufferHours = 0
@@ -77,16 +86,6 @@ export function deriveProductionFlows(
     } else if (storagePriorityLevel === 1) {
       productBufferHours = settings.secondaryProductBufferHours
     }
-
-    const productionBufferCount = (prodFlow.netRate > 0) && (storagePriorityLevel > 0)
-      ? prodFlow.netRate * productBufferHours
-      : 0
-
-    const totalOccupiedConsumptionCount = consumptionBufferCount
-    const totalOccupiedCount = volumeContributionMethod === 'max'
-      ? Math.max(consumptionBufferCount, productionBufferCount)
-      : consumptionBufferCount + productionBufferCount
-    const totalOccupiedVolume = totalOccupiedCount * unitVolume
 
     const modulesMap = input.modulesMap
     const contributions: DerivedFlowContribution[] = prodFlow.contributions.map(atom => ({

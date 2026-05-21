@@ -17,6 +17,7 @@ const props = defineProps<{
   priorityLevel?: number
   nonOperable?: boolean
   isPlanned?: boolean
+  hideActions?: boolean
   resourceBufferHours?: number
   primaryProductBufferHours?: number
   secondaryProductBufferHours?: number
@@ -109,7 +110,7 @@ function handleTogglePriority() {
         </div>
       </div>
 
-      <div class="flow-action-rail">
+      <div v-if="!hideActions" class="flow-action-rail">
         <FavoriteButton
           :level="priorityLevel ?? 0"
           :disabled="false"
@@ -154,17 +155,25 @@ function handleTogglePriority() {
           </button>
 
           <div v-if="section.key !== 'downstream' || downstreamOpen">
-            <div :class="['detail-head', section.includeCurrentColumn ? 'detail-head-with-current' : 'detail-head-no-current']">
+            <div :class="['detail-head',
+              section.includeCurrentColumn && section.includeTargetColumn ? 'detail-head-with-current' :
+              section.includeCurrentColumn && !section.includeTargetColumn ? 'detail-head-current-only' :
+              !section.includeCurrentColumn && section.includeTargetColumn ? 'detail-head-target-only' :
+              'detail-head-no-current']">
               <span class="detail-head-label">{{ t('wareflow.allocation_detail_metric') }}</span>
               <span class="detail-head-col">{{ t('wareflow.allocation_rate_column') }}</span>
               <span v-if="section.includeCurrentColumn" class="detail-head-col">{{ t('wareflow.allocation_current_column') }}</span>
-              <span class="detail-head-col">{{ t('wareflow.allocation_target_column') }}</span>
+              <span v-if="section.includeTargetColumn" class="detail-head-col">{{ t('wareflow.allocation_target_column') }}</span>
               <span class="detail-head-col">{{ t('wareflow.allocation_recommended_column') }}</span>
             </div>
             <div
               v-for="row in section.rows"
               :key="row.key"
-              :class="['list-item detail-row', section.includeCurrentColumn ? 'detail-row-with-current' : 'detail-row-no-current']"
+              :class="['list-item detail-row',
+                section.includeCurrentColumn && section.includeTargetColumn ? 'detail-row-with-current' :
+                section.includeCurrentColumn && !section.includeTargetColumn ? 'detail-row-current-only' :
+                !section.includeCurrentColumn && section.includeTargetColumn ? 'detail-row-target-only' :
+                'detail-row-no-current']"
             >
               <span class="detail-label">{{ row.label }}</span>
               <span class="detail-value">
@@ -173,7 +182,7 @@ function handleTogglePriority() {
               <span v-if="section.includeCurrentColumn" class="detail-value">
                 <template v-if="row.currentMinutes !== undefined">{{ formatMinutes(row.currentMinutes) }}</template>
               </span>
-              <span class="detail-value">
+              <span v-if="section.includeTargetColumn" class="detail-value">
                 <template v-if="row.targetMinutes !== undefined">{{ formatMinutes(row.targetMinutes) }}</template>
               </span>
               <span class="detail-value">
@@ -226,13 +235,17 @@ function handleTogglePriority() {
 .detail-section-toggle-arrow-open { @apply rotate-90 text-slate-300; }
 .detail-head { @apply grid gap-3 items-center pb-1.5 mb-1 border-b border-slate-700/30 text-slate-400 uppercase tracking-wide; }
 .detail-head-with-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
-.detail-head-no-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
+.detail-head-current-only { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
+.detail-head-target-only { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
+.detail-head-no-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem; }
 .detail-head-label { @apply text-left; }
 .detail-head-col { @apply text-right; }
 .list-item { @apply py-1.5 border-b border-slate-700/20 last:border-0; }
 .detail-row { @apply grid gap-3 items-center; }
 .detail-row-with-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
-.detail-row-no-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
+.detail-row-current-only { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
+.detail-row-target-only { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
+.detail-row-no-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem; }
 .detail-label { @apply text-slate-300 truncate; }
 .detail-value { @apply text-right text-slate-200 font-mono; }
 

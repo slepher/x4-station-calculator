@@ -1,6 +1,7 @@
 import type { SavedModule, X4Module } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import { findBestModuleWithReferenceQuota } from './bestModuleSelector'
+import { computeBufferOccupancy } from './calculateBufferOccupancy'
 
 export interface InfrastructureInput {
   productionFlows: WareProductionFlow[]
@@ -36,22 +37,11 @@ export function calculateInfrastructureModules(input: InfrastructureInput): Save
   const storageNeeds = { container: 0, solid: 0, liquid: 0 }
 
   for (const flow of productionFlows) {
-    const priorityLevel = warePriorityLevels[flow.wareId] ?? 2
-    const consumptionBufferCount = flow.consumption * settings.resourceBufferHours
-
-    let productBufferHours = 0
-    if (priorityLevel === 2) {
-      productBufferHours = settings.primaryProductBufferHours
-    } else if (priorityLevel === 1) {
-      productBufferHours = settings.secondaryProductBufferHours
-    }
-
-    const productionBufferCount = (flow.netRate > 0) && (priorityLevel > 0)
-      ? flow.netRate * productBufferHours
-      : 0
-
-    const totalOccupiedCount = consumptionBufferCount + productionBufferCount
-    const totalOccupiedVolume = totalOccupiedCount * flow.unitVolume
+    const { totalOccupiedVolume } = computeBufferOccupancy({
+      flow: { wareId: flow.wareId, consumption: flow.consumption, netRate: flow.netRate, unitVolume: flow.unitVolume },
+      settings,
+      warePriorityLevels
+    })
 
     if (totalOccupiedVolume > 0) {
       if (flow.transportType === 'solid') {

@@ -5,6 +5,7 @@ const props = defineProps<{
   name: string
   currentCount: number
   targetCount: number
+  hideActions?: boolean
 }>()
 
 function toPercent(value: number, max: number): number {
@@ -39,7 +40,7 @@ const currentWidth = computed(() => toPercent(props.currentCount, scaleMaxCount.
         </div>
         <div class="recommended-block"></div>
       </div>
-      <div class="flow-action-spacer"></div>
+      <div v-if="!hideActions" class="flow-action-spacer"></div>
     </div>
   </div>
 </template>

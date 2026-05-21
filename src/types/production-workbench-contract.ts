@@ -73,6 +73,7 @@ export interface LiveVolumeAllocationDetailSection {
   key: string
   title: string
   includeCurrentColumn: boolean
+  includeTargetColumn: boolean
   rows: LiveVolumeAllocationDetailRow[]
 }
 

@@ -9,6 +9,7 @@ import LiveStationCargoOnlyRow from './LiveStationCargoOnlyRow.vue'
 const props = defineProps<{
   groups: LiveVolumeAllocationGroup[]
   cargoOnlyItems: LiveCargoOnlyItem[]
+  hideActions?: boolean
   isWareLocked?: (wareId: string) => boolean
   getResolvedLevel?: (wareId: string) => number
   isWareOperable?: (wareId: string) => boolean
@@ -48,7 +49,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
             <span>{{ t('wareflow.allocation_tar') }} {{ formatVolume(group.targetTotalVolume) }} m3</span>
             <span>{{ t('wareflow.allocation_rec') }} {{ formatVolume(group.recommendedTotalVolume) }} m3</span>
           </div>
-          <div class="group-header-spacer"></div>
+          <div v-if="!hideActions" class="group-header-spacer"></div>
         </template>
       </CollapsibleDetailList>
 
@@ -62,6 +63,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
         :recommended-count="item.recommendedCount"
         :scale-max-count="item.scaleMaxCount"
         :detail-sections="item.detailSections"
+        :hide-actions="props.hideActions"
         :locked="props.isWareLocked?.(item.wareId) ?? false"
         :priority-level="props.getResolvedLevel?.(item.wareId) ?? 0"
         :non-operable="!(props.isWareOperable?.(item.wareId) ?? true)"
@@ -80,7 +82,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
           <h4 class="allocation-group-title" data-testid="wareflow-group-title">{{ t('wareflow.cargo_only_group') }}</h4>
         </template>
         <template #header>
-          <div class="group-header-spacer"></div>
+          <div v-if="!hideActions" class="group-header-spacer"></div>
         </template>
       </CollapsibleDetailList>
 
@@ -90,6 +92,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
         :name="item.name"
         :current-count="item.currentCount"
         :target-count="item.targetCount"
+        :hide-actions="props.hideActions"
       />
     </section>
   </div>

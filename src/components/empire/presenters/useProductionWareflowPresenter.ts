@@ -115,8 +115,7 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
   }
 
   const useAllocationVolumeView = computed(() => {
-    if (store.session.workbenchMode !== 'station') return false
-    return store.archiveStation != null
+    return store.session.workbenchMode === 'station' || store.session.workbenchMode === 'transit'
   })
 
   const props: WareflowPresenterProps = {

@@ -5,6 +5,7 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 
 import type { DerivedProductionFlow, DerivedFlowContribution } from '@/types/production-flow'
+import type { LiveCargoOnlyItem, LiveVolumeAllocationGroup } from '@/types/production-workbench-contract'
 import { computeGroupedFlows } from '@/components/empire/composables/useWareFlowGrouping'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
@@ -13,6 +14,7 @@ import TransitHubQuantityView from './TransitHubQuantityView.vue'
 import TransitHubEconomyView from './TransitHubEconomyView.vue'
 import TransitHubStorageView from './TransitHubStorageView.vue'
 import TransitHubTransportView from './TransitHubTransportView.vue'
+import LiveStationAllocationView from '../LiveStationAllocationView.vue'
 
 const gameData = useGameDataStore()
 const { t } = useI18n()
@@ -26,11 +28,17 @@ const props = withDefaults(defineProps<{
   buyMultiplier?: number
   sellMultiplier?: number
   productBufferHours?: number
+  useAllocationVolumeView?: boolean
+  liveVolumeAllocationGroups?: LiveVolumeAllocationGroup[]
+  liveCargoOnlyItems?: LiveCargoOnlyItem[]
 }>(), {
   viewMode: 'quantity',
   buyMultiplier: 0.5,
   sellMultiplier: 0.5,
-  productBufferHours: 12
+  productBufferHours: 12,
+  useAllocationVolumeView: false,
+  liveVolumeAllocationGroups: () => [],
+  liveCargoOnlyItems: () => []
 })
 
 const emit = defineEmits<{
@@ -203,6 +211,12 @@ const hasTransportData = computed(() =>
         v-else-if="viewMode === 'economy'"
         :groups="grouped.economy"
         :has-data="hasFlowData"
+      />
+      <LiveStationAllocationView
+        v-else-if="useAllocationVolumeView && viewMode === 'volume'"
+        :groups="liveVolumeAllocationGroups"
+        :cargoOnlyItems="liveCargoOnlyItems"
+        :hideActions="true"
       />
       <TransitHubStorageView
         v-else-if="viewMode === 'volume'"

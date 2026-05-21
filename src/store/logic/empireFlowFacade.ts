@@ -36,8 +36,7 @@ export interface EmpireFlowFacade {
   deriveFlows: (
     productionFlows: WareProductionFlow[],
     settings: CalculateWareFlowDerivedInput['settings'],
-    warePriorityLevels?: Record<string, number>,
-    volumeContributionMethod?: 'sum' | 'max'
+    warePriorityLevels?: Record<string, number>
   ) => DerivedProductionFlow[]
 }
 
@@ -232,8 +231,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
   function deriveFlows(
     flows: WareProductionFlow[],
     settings: CalculateWareFlowDerivedInput['settings'],
-    warePriorityLevels?: Record<string, number>,
-    volumeContributionMethod?: 'sum' | 'max'
+    warePriorityLevels?: Record<string, number>
   ): DerivedProductionFlow[] {
     return deriveProductionFlows({
       productionFlows: flows,
@@ -244,8 +242,7 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
       stationNameMap: Object.fromEntries(productionStations.value.map(s => [s.id, s.name])),
       sectorNameMap: Object.fromEntries(sectors.value.map(s => [s.id, s.name])),
       settings,
-      warePriorityLevels: warePriorityLevels || {},
-      volumeContributionMethod
+      warePriorityLevels: warePriorityLevels || {}
     })
   }
 

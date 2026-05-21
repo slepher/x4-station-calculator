@@ -100,10 +100,6 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
     for (const m of rawAutoInfrastructure.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
     return map
   })
-  const effectiveTargetModules = computed(() => store.stationState?.effectiveTargetModules || [])
-  const finalPlannedModules = computed(() => store.stationState?.finalPlannedModules || [])
-  const resolvedModules = computed(() => store.stationState?.resolvedModules || [])
-
   const plannedDisplayModules = computed(() => {
     const recommendedIds = new Set(recommendedModules.value.map((module) => module.id))
     const visibleExplicitModules = plannedModules.value.filter((module) => !recommendedIds.has(module.id))
@@ -127,31 +123,6 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
       ...maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation),
       isReferenceRecommended: true
     }))
-  })
-
-  const displaySource = computed(() => {
-    if (effectiveTargetModules.value.length > 0) {
-      return {
-        mode: 'target' as const,
-        modules: effectiveTargetModules.value
-      }
-    }
-    if (finalPlannedModules.value.length > 0) {
-      return {
-        mode: 'final' as const,
-        modules: finalPlannedModules.value
-      }
-    }
-    if (resolvedModules.value.length > 0) {
-      return {
-        mode: 'resolved' as const,
-        modules: resolvedModules.value
-      }
-    }
-    return {
-      mode: 'raw' as const,
-      modules: [] as SavedModule[]
-    }
   })
 
   function buildEffectiveAutoDisplayModules(
