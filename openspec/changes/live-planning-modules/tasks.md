@@ -1,92 +1,64 @@
-# live-planning-modules 实施任务
+# Live Planning Modules - Tasks
 
-## 1. 更新 planning 文案
+## Tasks
 
-- [x] 在 locale 中新增或调整建议区相关文案
-- [x] 明确“推荐模块种类数”与建议区标题的中英文文本
+### Phase 1: 语义与文案收口
 
-## 2. 修改 store 运行时 UI 状态
+- [x] T1. 统一 `recommendedModules` 的产品语义，明确其属于 planned 基线的一部分
+- [ ] T2. 更新 planning 区相关说明与 locale 文案，移除“建议纳入规划 / 点击加入规划”的误导性表达
+- [x] T3. 将 recommended 项交互定义收敛为普通 planned 项交互，并明确“点击转正到当前目标总量”
 
-- [x] 新增 `recommendedModulesExpanded` 之类的不持久运行时状态
-- [x] 状态落点明确放在 `useLiveProductionStore`
-- [x] 默认值为 `false`
-- [x] 状态在所有 station 之间共享
-- [x] 确认该状态不写入持久化存储
+### Phase 2: store / presenter 分层修正
 
-## 3. 修改 `useProductionPlanningPresenter`
+- [x] T4. 将 orphan 判定从 presenter 展示规则提升为 live planning baseline 构造规则
+- [x] T5. 在 store / planning 计算路径中输出 recommended subset 所需真源数据
+- [x] T5.1 提升 `effectivePlannedModules` 为正式 store 输出字段，并统一 planned 语义计算链入口
+- [x] T6. 调整 presenter，使其只负责在 planned 列表中为 recommended subset 组装来源标记
+- [x] T7. 确认虚线前置等来源标记仅影响展示，不影响任何计算
 
-- [x] 保留现有 `archiveTotalMap`
-- [x] 将 `effectiveAutoIndustryModules` / `effectiveAutoHabitationModules` / `effectiveAutoInfrastructureModules` 的显示语义改为“原始 auto 数量 + 名称后彩色 `+/-N`”
-- [x] 新增 orphan 判定逻辑：输入集合为 `built + building`，只看模块本身消费关系
-- [x] 新增 `orphanArchiveModuleIds: Set<string>`
-- [x] 新增 `recommendedModules: SavedModule[]`
-- [x] `recommendedModules` 的 `count` 使用差额 `archive_total - planned_count`
-- [x] 为 planned 模块组装完整 `+/-N` `diffAnnotation`
-- [x] 为 auto 模块组装 `diff = auto_count - archive_total` 与名称后 `diffAnnotation`
-- [x] `+N` 使用绿色，`-N` 使用红色
-- [x] 修复 planned 模块 diff 从 `+1` 回到 `0` 后标记未消失的 bug
+### Phase 3: industrial autoFill 边界修正
 
-## 4. 修改 `StationPlanningPanelWrapper`
+- [x] T8. 将通用 `calculateAutoIndustryModules` 恢复为 `develop` 语义，不再理解 `referenceModules`
+- [x] T9. 将通用 `calculateAutoFillModules` 恢复为不理解 `referenceModules` 的旧入口
+- [x] T10. 新增 live planning 专用 industrial floor 函数，用于处理 `archive_total` 基线
+- [x] T11. 将 live planning / reference-aware planning 路径切换到新 floor 函数
+- [x] T11.1 `calculateAutoIndustryModulesWithFloor` 内部以 `max(planned, floor)` 构建产能基线，调用通用 autoFill，再将 floor-beyond-planned 合并回 `autoIndustryModules`
+- [x] T11.2 `autoIndustryModules` 最终结果按 tier desc 统一排序（含 floor 模块）
+- [x] T12. 删除或停止依赖工业 producer 的 reference quota 状态机逻辑
 
-- [x] planning/live 互斥开关保持不变
-- [x] planning 分支向 `StationPlanningPanel` 传递 `recommendedModules`
-- [x] planning 分支向 `StationPlanningPanel` 传递建议区展开状态
-- [x] live 分支的 `ArchiveModuleList` 保持不变
+### Phase 4: priority 与 flow 展示语义修正
 
-## 5. 修改 `StationPlanningPanel`
+- [x] T13. 明确 recommended subset 产出的 ware 在 resolved priority 上等同 planned ware
+- [x] T14. 将 flow 列表顺序语义与 `warePriority` 等级语义拆开表达
+- [x] T15. 补充 presenter / UI 需要的显示顺序规则，确保“用户显式 planned -> recommended subset -> auto”可被实现
 
-- [x] 调整区块顺序为 `planned -> recommended -> auto -> <hr> -> archive`
-- [x] 新增 `recommendedModules` 建议区
-- [x] 建议区默认折叠，折叠态显示推荐模块种类数
-- [x] 展开态渲染推荐模块列表，显示差额 count
-- [x] `recommendedModules` 中的模块支持点击添加/提升到 `plannedModules`
-- [x] auto 区主数字继续显示 auto 原始计算数量
-- [x] auto 区在 `auto_count < archive_total` 时将 count 主数字显示为红色
-- [x] auto 区模块名称后显示彩色 `+/-N`
-- [x] 点击 auto 模块时，加入 planned 的数量改为 `max(auto_count, archive_total)`
-- [x] archive 区继续作为纯参考区保留
-- [x] archive 区继续沿用当前显示内容不变
-- [x] orphan 不在 archive 区显示 icon 或额外标签
+### Phase 5: planning 区展示修正
 
-## 6. 修改 `StationPlanningItem`
+- [x] T16. 移除 `recommendedModulesExpanded` 相关文档要求与实现依赖
+- [x] T17. 将 recommended 来源模块纳入 planning 区展示，并以 inline 子区块呈现
+- [x] T18. 为 recommended 项补充虚线前置等来源样式约束
 
-- [x] 新增或接入 `diffAnnotation?: string`
-- [x] 保留 `threshold?: number`
-- [x] planned / auto 模块名称后统一显示彩色 `+/-N`
-- [x] planned 的 `-N` 使用红色显示
-- [x] planned 的 `+N` 使用绿色显示
-- [x] count 红色告警仅用于 `planned < archive_total`
-- [x] 当 diff 回到 0 时，移除旧的 `diffAnnotation`
+### Phase 6: planned 区 count 交互与输入确认
 
-## 7. 保留现有联动能力
+- [x] T19. recommended 模块 count 不允许 `< archive`（X4NumberInput min + handleUpdateModuleCount clamp）
+- [x] T20. 非 recommend 模块允许 `< archive`，输入不标红
+- [x] T21. 已显式规划的模块不进入 `recommendedDisplayModules`
+- [x] T22. X4NumberInput 改为失焦确认（`handleBlur` emit），箭头按钮即时确认
+- [x] T23. planned diff 显示规则：`planned > archive` 或 `total < archive` 时显示，否则隐藏
+- [x] T24. auto 模块点击采纳：industry 用 `max(auto, archive)`，support 用 `auto`
 
-- [x] 搜索框新模块默认数量继续使用 archive 总量
-- [x] 自动模块区继续由 `effectiveAuto*` 供数，但其页面语义改为“原始 auto 数量 + 彩色 `+/-N` + 点击补到 max”
-- [x] `calculateAutoFillModules` 参考模块优先级与配额逻辑保持不变
+## 完成定义
 
-## 8. 扩展辅助模块 reference-aware priority
-
-- [x] 为 habitation 模块选择器增加 `referenceModules` 参考池能力
-- [x] habitation 候选比较明确使用 `workforce.capacity`
-- [x] 为 storage 模块选择器增加 `referenceModules` 参考池能力
-- [x] storage 候选比较明确使用 `cargo.capacity`
-- [x] 为 pier 模块选择器增加 `referenceModules` 参考池能力
-- [x] pier 候选比较明确使用 `dockingCount` / 泊位能力
-- [x] 统一辅助模块的候选来源顺序：reference -> existing/planned -> db
-- [x] 确认辅助模块只扩展候选优先级，不改变容量/工人/泊位缺口转 count 的现有换算逻辑
-
-## 9. 构建验证
-
-- [x] 完成代码修改后执行 `npm run build`
-
-## 10. 两阶段最终求值重构
-
-- [x] 明确 `autoIndustryModules` 的数量计算不依赖第二阶段最终 `actualWorkforce`
-- [x] 将第一阶段缓存职责收敛为工业自动补全优先
-- [x] 将 `autoHabitationModules` 挪到第二阶段统一计算
-- [x] 在第二阶段基于 `planned + autoIndustry + autoHabitation` 重算最终 flow
-- [x] 将 `autoInfrastructureModules` 固定为基于第二阶段最终 flow 计算
-- [x] 统一 live 与 blueprint 的最终结果语义
-- [x] 为两阶段最终求值补充针对 live / blueprint 的单测
-- [x] 修正第二阶段内部顺序：先确定 canonical 生产模块基准，再计算 `autoHabitationModules`
-- [x] 恢复缓存真源层的最终 canonical planning flow，避免 transit / sector / empire 聚合退回读取中间 flow
+- [ ] `recommendedModules` 在所有文档和实现中都不再被描述为“待采纳建议”
+- [ ] planning 区相关文案与交互与“已纳入 planning 的子集”语义一致
+- [x] orphan 判定作为 live planning baseline 规则进入 store / planning 路径
+- [x] `effectivePlannedModules` 成为 planned 语义计算链的统一入口，且 floor 模块不进入该字段
+- [x] 通用 industrial autoFill 回到 `develop` 语义，不再依赖 `referenceModules`
+- [x] live planning 的 floor 由新函数专门处理，floor 模块通过 `autoIndustryModules` 暴露
+- [x] 工业 autoFill 不再依赖复杂 reference quota 状态机
+- [x] `warePriority` 等级与 flow 列表顺序不再混淆
+- [x] recommended 模块显示在 planning 区中，并通过 inline 子区块与虚线前置等样式区分来源
+- [x] present 使用 `auto*Modules` 直接作为展示数据源，不再从 `effectiveTargetModules` filter delta
+- [x] recommended 模块 count 不允许 `< archive`，非 recommend 模块允许 `< archive`
+- [x] 已显式规划的模块不进入 `recommendedDisplayModules`
+- [x] X4NumberInput 失焦确认，中间输入不触发计算

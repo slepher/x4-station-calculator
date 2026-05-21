@@ -2,447 +2,204 @@
 
 ## Purpose
 
-在实况产能规划模式下，模组规划器 SHALL 同时提供 planned 与 archive 的差异表达、orphan 模块建议区、auto 模块的原始 auto 数量与彩色 `+/-N` 差异表达，以及保留既有 archive 参考区和 autoFill 参考模块优先级，使用户能够更快识别哪些模块已超出存档、哪些 orphan 模块仍需补齐。
+修正 live planning modules 方案中的语义冲突，明确 `recommendedModules` 已经属于 planned 基线的一部分，并直接显示在 planning 区中，仅通过视觉样式区分来源；同时将 industrial autoFill 的通用旧语义与 live planning 专用 floor 语义拆开，避免 reference / floor 规则继续污染通用 autoFill。
 
-## Terminology
+## ADDED Requirements
 
-- 本 spec 若提到“有效模块集合 / effective modules”，指 planning / flow 语义中的模块集合：
-  - `max(plannedModules + autoModules, archive.modules + archive.building.modules)`
-- `max` SHALL 表示按 `moduleId` 逐项比较 count 并取较大值。
-- 本术语 SHALL NOT 指向 `StationDashboard` 中 building scope 使用的 `effectiveModules` prop。
+### Requirement: Recommended Modules Are A Planned Subset
 
----
+在 live planning 场景下，`recommendedModules` SHALL 被视为 planned baseline 的一个子集，而不是“待用户采纳”的候选列表。
+
+#### Scenario: recommended modules participate in planning computation
+
+**前提** 某些 reference-aligned orphan modules 被归入 `recommendedModules`
+**当** 系统执行 live planning 计算
+**那么** 这些模块 MUST 参与 industrial autoFill baseline
+**并且** MUST 参与 flow 计算
+**并且** MUST 参与 planned ware 集合判定
+
+#### Scenario: effective planned baseline is emitted as a formal store field
+
+**前提** 系统同时存在显式 planned modules、recommended modules 与 reference production floor
+**当** store 输出 station planning state
+**那么** 系统 MUST 输出 `effectivePlannedModules`
+**并且** 该字段 MUST 表示所有需要按 planned 语义处理的模块集合
+**并且** 其顺序 MUST 保持“显式 planned -> recommended subset”
+**并且** reference production floor MUST NOT 因此自动进入 `effectivePlannedModules`
+
+#### Scenario: recommended modules render inside the planning area
+
+**前提** 规划面板存在 `recommendedModules`
+**当** 用户查看 planning 区中的模块列表
+**那么** recommended modules MUST 显示在 planning 区中
+**并且** MAY 作为 planning 区内部的 inline 子区块呈现
+**并且** MUST NOT 被拆成 planning 区之外的独立推荐区块
+**并且** MUST NOT 暗示这些模块尚未纳入 planning
+
+### Requirement: Recommended Section Copy Must Match Applied State
+
+planning 区中与 recommended modules 相关的标题、说明与交互文案 SHALL 与“已纳入 planning 的子集”语义一致。
+
+#### Scenario: UI copy must not imply deferred adoption
+
+**前提** 系统渲染 planning 区内与 recommended modules 相关的说明文案
+**当** 用户阅读这些文案
+**那么** 文案 MUST NOT 使用“建议纳入规划”“点击后加入规划”等暗示未生效状态的表达
+**并且** 文案 MUST 明确或至少不违背“这些模块已参与 planning”这一事实
+
+#### Scenario: visual source markers do not change planning result
+
+**前提** 系统对 recommended modules 显示虚线前置等来源标记
+**当** 用户查看当前 planning 面板
+**那么** 这些来源标记 MUST 只影响展示样式
+**并且** MUST NOT 修改任何 planned / auto / flow 计算结果
+
+### Requirement: Orphan Rule Must Be Part Of Planning Baseline Construction
+
+当 orphan 规则用于构造 `recommendedModules` 时，系统 SHALL 将其视为 live planning baseline 构造规则，而不只是 presenter 的 UI 推导规则。
+
+#### Scenario: orphan rule is evaluated before presenter grouping
+
+**前提** 系统存在 `referenceModules`
+**当** live planning 路径构造 effective planned baseline
+**那么** orphan 判定 MUST 在 store / planning 计算路径中完成
+**并且** presenter MUST 仅消费该结果进行分组展示
 
 ## MODIFIED Requirements
 
-### Requirement: Planning Panel Difference Visualization
+### Requirement: AutoFill Boundary For Live Planning
 
-`StationPlanningPanel` 在规划模式且存档数据存在时，SHALL 基于 `archive.modules + archive.building.modules` 计算每个 planned 模块与 archive 总量的差异，并按差异方向分别渲染。
+通用 industrial autoFill 与 live planning 专用 floor 语义 MUST 分离。
 
-#### Scenario: planned 数量高于 archive 总量
+#### Scenario: generic autoFill uses develop semantics
 
-- **前提** 存档总量 solar = 5，`plannedModules` 含 `{ id: "solar", count: 8 }`
-- **当** 规划器渲染 solar 项
-- **那么** solar 的模块名称后显示弱化的 `+3`
-- **并且** count 数字不显示红色
+**前提** 系统执行通用 industrial autoFill
+**当** 当前路径不是 live planning 专用 floor 路径
+**那么** 系统 MUST 使用 `develop` 版本的 industrial autoFill 语义
+**并且** MUST NOT 依赖 `referenceModules`
 
-#### Scenario: planned 数量等于 archive 总量
+#### Scenario: live planning floor uses a dedicated function
 
-- **前提** 存档总量 solar = 5，`plannedModules` 含 `{ id: "solar", count: 5 }`
-- **当** 规划器渲染 solar 项
-- **那么** 模块名称后不显示 `+N`
-- **并且** count 数字保持默认颜色
+**前提** 当前路径需要基于 `archive_total` 施加 industrial floor
+**当** 系统执行 live planning industrial planning
+**那么** 系统 MUST 通过独立函数处理 floor
+**并且** MUST NOT 将 floor / reference 逻辑混入通用 `calculateAutoIndustryModules`
 
-#### Scenario: planned 数量低于 archive 总量
+#### Scenario: floor production modules appear in autoIndustryModules
 
-- **前提** 存档总量 solar = 5，`plannedModules` 含 `{ id: "solar", count: 2 }`
-- **当** 规划器渲染 solar 项
-- **那么** solar 的 count 数字显示为红色
-- **并且** 模块名称后显示红色弱化的 `-3`
+**前提** archive 中存在未在显式 planned 中的 production 模块（如 microchips x33）
+**当** 系统执行 live planning 计算
+**那么** 这些模块 MUST 出现在 `autoIndustryModules` 中而不是被吸收进 `effectivePlannedModules`
+**并且** MUST 参与 autoFill 基线计算（其产能被计入以减少 deficit）
+**并且** MUST 按 tier desc 与其余 auto 模块统一排序
 
----
+#### Scenario: industrial producer selection no longer uses reference quota state machine
 
-### Requirement: Recommended Modules Section
+**前提** live planning 已通过 `archive_total` 构造 effective planned baseline
+**当** 系统继续补齐工业上游缺口
+**那么** 系统 MUST NOT 继续依赖工业 producer 的 reference quota 分摊状态机
+**并且** 缺口补齐 MUST 建立在 floor 后 baseline 之上
 
-`StationPlanningPanel` 在规划模式且存档数据存在时，SHALL 在 planned 区与 auto 区之间渲染 `recommendedModules` 建议区，用于提示需要补齐的 orphan 模块差额。
+### Requirement: Recommended Wares Use Planned Priority But Separate Flow Display Order
 
-#### Scenario: 建议区默认折叠
+recommended subset 产出的 ware 在 priority 语义上 SHALL 等同于 planned ware；若需要区分 flow 列表顺序，系统 MUST 将其视为独立的展示语义，而不是 `warePriority` 排序。
 
-- **前提** `recommendedModules` 非空
-- **当** 规划器首次渲染
-- **那么** 建议区默认折叠
-- **并且** 折叠态只显示推荐模块种类数
+#### Scenario: recommended ware resolves to planned priority
 
-#### Scenario: 无推荐模块时不显示建议区
+**前提** 某个 ware 仅由 recommended subset 中的模块产出
+**当** 系统计算该 ware 的 resolved priority
+**那么** 该 ware MUST 获得 planned 级 priority `2`
 
-- **前提** `recommendedModules` 为空
-- **当** 规划器渲染
-- **那么** 不渲染建议区
+#### Scenario: flow display order is derived from effective planned ordering
 
-#### Scenario: 展开后显示推荐差额
+**前提** flow 列表需要区分用户显式 planned、recommended subset 与 auto 产出
+**当** 系统构造用于 flow 排序的 planned 基线
+**那么** 系统 MUST 使用 `effectivePlannedModules` 的顺序
+**并且** recommended subset MUST 位于其他 auto 产出之前
 
-- **前提** `recommendedModules` 含 `{ id: "solar", count: 3 }`
-- **当** 用户展开建议区
-- **那么** 列表中显示 solar
-- **并且** 显示的数量为 3
-- **并且** 该数量表示 `archive_total - planned_count`
+#### Scenario: flow display order is not expressed by warePriority
 
-#### Scenario: 点击推荐模块添加到 planned
+**前提** flow 列表需要区分用户显式 planned、recommended subset 与 auto 产出
+**当** 系统定义显示顺序
+**那么** 该顺序 MUST 作为 presenter / UI 层展示规则表达
+**并且** 系统 MUST NOT 将此顺序描述成 `warePriority` 的内部排序
 
-- **前提** archive 总量 solar = 5，`plannedModules` 不含 solar
-- **并且** `recommendedModules` 含 `{ id: "solar", count: 5 }`
-- **当** 用户点击建议区中的 solar
-- **那么** `plannedModules` 新增 `{ id: "solar", count: 5 }`
+### Requirement: Recommended Item Interaction Matches Applied State
 
-#### Scenario: 点击推荐模块提升已有 planned 数量
+planning 区中 recommended items 的交互语义 MUST 与"recommended modules 已属于 planned baseline"一致。
 
-- **前提** archive 总量 solar = 5，`plannedModules` 含 `{ id: "solar", count: 2 }`
-- **并且** `recommendedModules` 含 `{ id: "solar", count: 3 }`
-- **当** 用户点击建议区中的 solar
-- **那么** `plannedModules` 中 solar 的 count 变为 5
+#### Scenario: clicking recommended module promotes it to explicit planned total
 
-#### Scenario: 折叠状态为共享运行时状态
+**前提** 某个模块已位于 `recommendedModules` 分组中
+**当** 用户点击该模块
+**那么** 系统 MUST 将显式 planned 数量提升到该模块当前目标总量
+**并且** MUST NOT 在该目标总量之上再次累加 recommended 数量
 
-- **前提** 某个 station 中用户将建议区展开
-- **当** 用户切换到另一个 station 的 planning 视图
-- **那么** 建议区保持展开
-- **并且** 刷新页面后恢复默认折叠
+#### Scenario: recommended modules use a visual source marker inside planning list
 
----
+**前提** 某个 planned module 同时属于 recommended subset
+**当** 系统渲染 planning 列表
+**那么** 该模块 MUST 使用虚线前置或等价弱视觉标记区分来源
+**并且** 该标记 MUST 出现在同一 planning 区中
 
-### Requirement: Orphan-based Recommendation Rule
+#### Scenario: recommended module count cannot go below archive
 
-系统 SHALL 仅将满足 orphan 判定且 `planned.count < archive_total` 的模块加入 `recommendedModules`。
+**前提** 某个 planned module 也存在于 `recommendedModules` 中
+**当** 用户修改该模块的 count
+**那么** 系统 MUST NOT 允许 `count < archiveTotal`
+**并且** 输入框 MUST 在 `count < archiveTotal` 时标红
+**并且** X4NumberInput MUST 将 `min` 设为 `archiveTotal`
 
-#### Scenario: archive-only orphan 进入建议区
+#### Scenario: non-recommended module can go below archive
 
-- **前提** archive 总量 chip = 2，`plannedModules` 不含 chip
-- **并且** chip 满足 orphan 判定
-- **当** presenter 计算 `recommendedModules`
-- **那么** `recommendedModules` 含 `{ id: "chip", count: 2 }`
+**前提** 某个 planned module 不存在于 `recommendedModules` 中
+**当** 用户修改该模块的 count
+**那么** 系统 MUST 允许 `count < archiveTotal`
+**并且** 输入框 MUST NOT 标红
+**并且** auto region MUST 通过 floor 机制补全缺口
 
-#### Scenario: planned 数量不足的 orphan 进入建议区
+#### Scenario: explicitly planned modules are not added to recommended display
 
-- **前提** archive 总量 solar = 5，`plannedModules` 含 `{ id: "solar", count: 2 }`
-- **并且** solar 满足 orphan 判定
-- **当** presenter 计算 `recommendedModules`
-- **那么** `recommendedModules` 含 `{ id: "solar", count: 3 }`
+**前提** 用户已在 `plannedModules` 中显式规划了某个 orphan 模块
+**当** 系统计算 `recommendedDisplayModules`
+**那么** 该模块 MUST NOT 出现在 `recommendedDisplayModules` 中
+**并且** 仍须计入 `recommendedGapModules` 供 autoFill 基线使用
+**并且** 该模块 MUST 在 `plannedDisplayModules` 中保持可见
 
-#### Scenario: 非 orphan 模块不进入建议区
+### Requirement: Auto Module Transfer Rules
 
-- **前提** archive 总量 ec = 10，`plannedModules` 含 `{ id: "ec", count: 0 }`
-- **并且** ec 不满足 orphan 判定
-- **当** presenter 计算 `recommendedModules`
-- **那么** `recommendedModules` 不含 ec
+点击 auto 区域模块将其纳入 planned 时，采纳值按模块类型区分。
 
----
+#### Scenario: industry transfer uses max(auto, archive)
 
-### Requirement: Orphan Determination
+**前提** 模块类型为 `production` 且 `method !== 'recycling'`
+**当** 用户点击该 industry auto 模块
+**那么** `target = Math.max(auto, archive)`
 
-系统 SHALL 基于 `built + building` 的 archive 模块集合判定 orphan。
+#### Scenario: support transfer uses auto suggestion
 
-#### Scenario: 任一产出无人消费则为 orphan
+**前提** 模块类型为 `storage`、`pier` 或 `habitation`
+**当** 用户点击该 support auto 模块
+**那么** `target = auto`
 
-- **前提** 某模块产出 ware A 与 ware B
-- **并且** archive 中其他模块对 ware A 存在模块本身消费关系
-- **并且** archive 中其他模块对 ware B 不存在模块本身消费关系
-- **当** presenter 判定该模块是否 orphan
-- **那么** 该模块被视为 orphan
+### Requirement: Planned Diff Display Rules
 
-#### Scenario: 仅工人消耗不构成消费关系
+planned 区域的 diff 标注 MUST 按统一条件显示，不区分模块类型。
 
-- **前提** 某模块的某个产出只被工人或其他非模块机制消耗
-- **当** presenter 判定该模块是否 orphan
-- **那么** 该模块被视为 orphan
+#### Scenario: planned diff shown when planned exceeds archive
 
-#### Scenario: 其他模块存在模块本身消费关系则该产出不命中 orphan 条件
+**前提** `planned > archive`
+**当** 系统显示 planned diff
+**那么** diff MUST 为 `+ (planned - archive)`
 
-- **前提** 某模块的产出 ware A 在 archive 其他模块中存在模块本身消费关系
-- **当** presenter 判定该产出是否无人消费
-- **那么** ware A 不应触发 orphan 条件
+#### Scenario: planned diff shown when total is below archive
 
----
+**前提** `planned + auto < archive`
+**当** 系统显示 planned diff
+**那么** diff MUST 为 `planned - archive`
 
-### Requirement: Archive Reference Area
+#### Scenario: planned diff hidden when total meets or exceeds archive
 
-在规划模式下，archive 区 SHALL 保留为纯参考区，不承担 orphan 推荐职责。
-
-#### Scenario: archive 区不显示 orphan icon
-
-- **前提** 某模块满足 orphan 判定
-- **当** 规划器渲染 archive 区
-- **那么** 该模块在 archive 区不显示 orphan icon
-- **并且** 不显示独立 orphan 标签
-
-#### Scenario: archive 区沿用当前展示结构
-
-- **前提** archive 区当前实现已存在 built/building 展示结构
-- **当** 本次变更落地
-- **那么** archive 区继续沿用当前显示内容
-- **并且** 本次变更不调整其结构与展示方式
-
----
-
-### Requirement: Auto Modules Must Display Raw Auto Count With Colored Diff Annotation
-
-Presenter 层 SHALL 为 `autoIndustryModules`、`autoHabitationModules`、`autoInfrastructureModules` 计算两层显示语义：
-- 主数字：`auto_count`
-- 名称后差异：`diff = auto_count - archive_built_count - archive_building_count`
-
-store 层的 `autoIndustryModules` 等保持原始完整数值不变。
-
-#### Scenario: auto count is lower than archive total
-
-- **前提** `autoIndustryModules` 含 `{ id: "module_hull_01", count: 3 }`
-- **并且** 存档中该模块已建 5、在建 0
-- **当** presenter 计算 auto 区显示数据
-- **那么** auto 区主数字显示为 `3`
-- **并且** count 数字显示为红色
-- **并且** 模块名称后显示红色弱化的 `-2`
-
-#### Scenario: auto count is higher than archive total
-
-- **前提** `autoIndustryModules` 含 `{ id: "module_hull_01", count: 5 }`
-- **并且** 存档中该模块已建 3、在建 1
-- **当** presenter 计算 auto 区显示数据
-- **那么** auto 区主数字显示为 `5`
-- **并且** 模块名称后显示绿色弱化的 `+1`
-
-#### Scenario: auto section uses the same colored name-side diff style as planned section
-
-- **前提** auto 区和 planned 区都存在差异展示
-- **当** 规划器渲染模块项
-- **那么** 两个区块都将差异值显示在模块名称后
-- **并且** `+N` 使用绿色
-- **并且** `-N` 使用红色
-
-### Requirement: Clicking Auto Module Must Add Max Of Auto Count And Archive Total To Planned
-
-系统 SHALL 使用 `max(auto_count, archive_total)` 作为 auto 模块点击加入 planned 时的目标数量，而不是使用 auto 当前显示数量。
-
-#### Scenario: click auto adds archive-preserving target count
-
-- **前提** `autoIndustryModules` 含 `{ id: "module_hull_01", count: 3 }`
-- **并且** archive 总量 `module_hull_01 = 5`
-- **当** 用户点击 auto 区中的该模块
-- **那么** 加入或提升到 `plannedModules` 的目标数量为 `5`
-
-### Requirement: Diff Annotation Must Disappear When Difference Returns To Zero
-
-当某模块的差异数量从非零回到零时，系统 SHALL 移除对应的 `diffAnnotation`，不得保留过期的 `+N` 或 `-N`。
-
-#### Scenario: planned diff annotation is removed when +1 returns to zero
-
-- **前提** 某个 planned 模块之前显示绿色弱化的 `+1`
-- **并且** 用户调整该模块数量后使其与 `archive_total` 相等
-- **当** 规划器重新渲染该模块项
-- **那么** 原先的 `+1` 必须消失
-- **并且** 模块名称后不再显示差异标记
-
----
-
-### Requirement: 搜索框添加默认数量
-
-从 `StationModulePicker` 搜索框添加模块时：
-- 若 `plannedModules` 不含该模块 → 默认 count = `archive.modules[moduleId] + archive.building.modules[moduleId]`
-- 若 `plannedModules` 已含该模块 → 每次增量 `count + 1`
-
-#### Scenario: 搜索添加新模块有存档数据
-
-- **前提** 存档中 module_hull_01 已建 3、在建 1，`plannedModules` 不含此模块
-- **当** 用户从搜索框选择 module_hull_01
-- **那么** `plannedModules` 新增 `{ id: "module_hull_01", count: 4 }`
-
-#### Scenario: 搜索添加已存在模块
-
-- **前提** `plannedModules` 含 `{ id: "solar", count: 3 }`
-- **当** 用户从搜索框选择 solar
-- **那么** `plannedModules` 中 solar 的 count 变为 4
-
----
-
-### Requirement: AutoFill Reference Priority
-
-在 live 模式下，`calculateAutoFillModules` SHALL 继续使用 `archive.modules + archive.building.modules` 作为参考模块集合，并保留既有 P1–P8 优先级和按产能计算的配额规则。
-
-#### Scenario: 参考模块优先级仍然生效
-
-- **前提** live 模式下存在 archive modules 与 building modules
-- **当** `calculateAutoFillModules` 选择补齐模块
-- **那么** 仍按既有 P1–P8 顺序匹配
-- **并且** P1 与 P2 共享同一份参考配额
-
----
-
-### Requirement: Auxiliary Auto Modules Must Also Use Archive-aware Reference Priority
-
-在 live 模式下，辅助 auto 模块的候选选择 SHALL 也参考 `archive.modules + archive.building.modules`，而不只是参考 planned/existing 或数据库默认候选。
-
-这条规则覆盖：
-
-- storage 模块
-- habitation 模块
-- pier 模块
-
-该 requirement 复用的是“参考模块优先”的候选来源语义，而不是工业模块的 ware 产出配额语义。
-
-#### Scenario: storage modules prefer archive/building reference candidates
-
-- **前提** 当前需要补 container storage 容量
-- **并且** archive/building 中存在某个 container storage 模块
-- **当** 系统选择 storage 候选模块
-- **那么** 应优先从 archive/building 中出现过的 container storage 候选中选择
-- **并且** 不应直接跳到数据库默认最大仓储模块
-
-#### Scenario: habitation modules prefer archive/building reference candidates
-
-- **前提** 当前需要补 habitation 容量
-- **并且** archive/building 中存在 habitation 模块
-- **当** 系统选择 habitation 候选模块
-- **那么** 应优先从 archive/building 中出现过的 habitation 候选中选择
-
-#### Scenario: pier modules prefer archive/building reference candidates
-
-- **前提** 当前需要补泊位
-- **并且** archive/building 中存在 pier 模块
-- **当** 系统选择 pier 候选模块
-- **那么** 应优先从 archive/building 中出现过的 pier 候选中选择
-
----
-
-### Requirement: Auxiliary Reference Selection Must Use Category-specific Capability Metrics
-
-系统在比较辅助模块候选优劣时 SHALL 按模块类别使用不同能力维度，而不是沿用工业模块的产出 ware 指标。
-
-#### Scenario: storage candidates are compared by cargo capacity
-
-- **前提** 存在多个 container storage 候选
-- **当** 系统比较这些 storage 候选
-- **那么** 应按 `cargo.capacity` 作为能力比较维度
-
-#### Scenario: habitation candidates are compared by workforce capacity
-
-- **前提** 存在多个 habitation 候选
-- **当** 系统比较这些 habitation 候选
-- **那么** 应按 `workforce.capacity` 作为能力比较维度
-
-#### Scenario: pier candidates are compared by berth capacity
-
-- **前提** 存在多个 pier 候选
-- **当** 系统比较这些 pier 候选
-- **那么** 应按 `dockingCount` / 泊位能力作为能力比较维度
-
----
-
-### Requirement: Auxiliary Reference Selection Must Preserve Existing Gap-to-count Semantics
-
-辅助模块的 reference-aware priority SHALL 只影响候选模块的选择顺序，不改变各类辅助模块原有的缺口换算方式。
-
-#### Scenario: storage gap still converts to count by storage capacity
-
-- **前提** 当前需要补齐 container storage 容量
-- **当** 系统完成 storage 自动选择
-- **那么** 仍按容量缺口换算 storage 模块数量
-- **并且** reference-aware priority 只影响“选哪种 storage”
-
-#### Scenario: habitation gap still converts to count by workforce capacity
-
-- **前提** 当前需要补齐 habitation 工人容量
-- **当** 系统完成 habitation 自动选择
-- **那么** 仍按工人容量缺口换算 habitation 模块数量
-- **并且** reference-aware priority 只影响“选哪种 habitation”
-
-#### Scenario: pier gap still converts to count by berth capacity
-
-- **前提** 当前需要补齐泊位
-- **当** 系统完成 pier 自动选择
-- **那么** 仍按泊位缺口换算 pier 模块数量
-- **并且** reference-aware priority 只影响“选哪种 pier”
-
----
-
-### Requirement: Auto Industry Count Must Not Depend On Final Workforce Result
-
-系统 SHALL 将 `autoIndustryModules` 的数量计算建模为“由 `considerWorkforceForAutoFill` 开关决定的理论效率估算”，而不是依赖第二阶段算出的最终实际工人数量。
-
-#### Scenario: workforce toggle on uses full-efficiency assumption for industry sizing
-
-- **前提** `considerWorkforceForAutoFill = true`
-- **当** 系统计算 `autoIndustryModules`
-- **那么** 应按带工人加成的理论效率估算工业模块数量
-- **并且** 不读取第二阶段最终 `actualWorkforce`
-
-#### Scenario: workforce toggle off uses empty-efficiency assumption for industry sizing
-
-- **前提** `considerWorkforceForAutoFill = false`
-- **当** 系统计算 `autoIndustryModules`
-- **那么** 应按无工人加成的理论效率估算工业模块数量
-- **并且** 不读取第二阶段最终 `actualWorkforce`
-
----
-
-### Requirement: Live Planning Final Result Must Use Two-stage Evaluation
-
-系统 SHALL 以二阶段顺序生成 live planning 的最终结果，而不是把 habitation / infrastructure 混入第一阶段工业自动补全。
-
-#### Scenario: stage one calculates only autoIndustryModules
-
-- **前提** planning 站点进入自动补全计算
-- **当** 系统执行第一阶段
-- **那么** 第一阶段只产生 `autoIndustryModules`
-- **并且** 不在此阶段产出最终 `autoHabitationModules`
-- **并且** 不在此阶段产出最终 `autoInfrastructureModules`
-
-#### Scenario: stage two recalculates final flow after habitation is added
-
-- **前提** 第一阶段已得到 `autoIndustryModules`
-- **当** 系统执行第二阶段
-- **那么** 系统先确定 `canonicalBaseModules = max(planned + autoIndustry, archive.modules + archive.building.modules)`
-- **并且** 基于这份 `canonicalBaseModules` 计算 `autoHabitationModules`
-- **并且** 再基于 `canonicalBaseModules + autoHabitation` 重算最终 `productionFlows`
-- **并且** 最终 `actualWorkforce` 与 `currentEfficiency` 来自这次重算后的结果
-
-#### Scenario: habitation sizing must follow canonical base instead of pre-canonical base
-
-- **前提** archive 中某生产模块数量大于当前 `planned + autoIndustry` 的数量
-- **当** 系统在第二阶段计算 `autoHabitationModules`
-- **那么** habitation 数量应按 canonical 的 `max(...)` 生产模块基准补齐
-- **并且** 不得继续按较小的 `planned + autoIndustry` 基准补齐
-
-#### Scenario: infrastructure uses final flow from stage two
-
-- **前提** 第二阶段已得到最终 `productionFlows`
-- **当** 系统计算 `autoInfrastructureModules`
-- **那么** 应基于这份最终 `productionFlows` 计算仓储与港口需求
-- **并且** 不得再回头修改 `autoIndustryModules`
-
----
-
-### Requirement: Two-stage Derivation Boundary Must Not Be Confused With Cache-layer Boundary
-
-系统 SHALL 区分“station 业务推导阶段”与“缓存真源层 / 当前站展示层”的边界；不得把前者误实现成后者。
-
-#### Scenario: aggregation must continue to read final canonical planning flow
-
-- **前提** planning + archive 场景下，station 已完成产业推导阶段与支撑推导阶段
-- **当** transit / sector / empire 聚合继续读取 planning flow
-- **那么** 聚合必须读取缓存真源层中的最终 canonical planning flow
-- **并且** 不得退回去读取只完成产业推导阶段的中间 flow
-
-#### Scenario: current station display layer must not own a second aggregation truth
-
-- **前提** 当前 active station 需要展示 `autoHabitationModules`、最终 `productionFlows` 与 `autoInfrastructureModules`
-- **当** 系统组装当前站展示态
-- **那么** 展示层可以复用或补充最终结果
-- **并且** 不得让展示层独占一套与缓存真源层不同的 flow 真相
-
----
-
-### Requirement: Blueprint Final Result Must Match Two-stage Semantics
-
-blueprint 视图的最终展示结果 SHALL 与 live planning 的二阶段求值语义一致，即使内部仍允许拆成两步计算。
-
-#### Scenario: blueprint exposes the same final habitation and infrastructure semantics
-
-- **前提** blueprint 与 live 使用同一站点配置和同一计算规则
-- **当** 系统生成 blueprint 侧最终展示数据
-- **那么** blueprint 侧最终 `autoHabitationModules`、最终 `productionFlows`、`autoInfrastructureModules` 的语义应与 live 相同
-- **并且** 不得因为内部拆成两步而改变最终结果
-
-#### Scenario: storage count is still derived from capacity deficit
-
-- **前提** 系统已经算出 container storage 容量缺口
-- **当** 系统使用 reference-aware priority 选中 storage 模块
-- **那么** 最终 `count` 仍按容量缺口换算
-
-#### Scenario: habitation count is still derived from workforce deficit
-
-- **前提** 系统已经算出 habitation 容量缺口
-- **当** 系统使用 reference-aware priority 选中 habitation 模块
-- **那么** 最终 `count` 仍按工人容量缺口换算
-
-#### Scenario: pier count is still derived from berth deficit
-
-- **前提** 系统已经算出泊位缺口
-- **当** 系统使用 reference-aware priority 选中 pier 模块
-- **那么** 最终 `count` 仍按泊位缺口换算
+**前提** `planned + auto ≥ archive 且 planned ≤ archive`
+**当** 系统显示 planned diff
+**那么** diff MUST NOT 显示
