@@ -334,7 +334,7 @@ const handleUpdateSearchQuery = (value: string) => {
               @update:count="(val: number) => handleUpdateModuleCount(index, val)" @remove="handleRemoveModule(index)" />
           </template>
         </draggable>
-        <div v-if="(props.recommendedModules?.length || 0) > 0" class="recommended-inline-list">
+        <div v-if="(props.recommendedModules?.length || 0) > 0" :class="['recommended-inline-list', { 'mt-2': props.plannedModules.length > 0 }]">
           <StationPlanningItem
             v-for="(element, index) in props.recommendedModules"
             :key="'recommended-inline-' + element.id + '-' + index"
@@ -447,7 +447,7 @@ const handleUpdateSearchQuery = (value: string) => {
 }
 
 .recommended-inline-list {
-  @apply mt-2 mb-2 space-y-2 border-l-2 border-dashed border-slate-600 pl-2;
+  @apply space-y-2 border-l-2 border-dashed border-slate-600 pl-2;
 }
 
 .search-panel {
