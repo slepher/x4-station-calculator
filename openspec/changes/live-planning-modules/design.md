@@ -200,6 +200,25 @@ calculateAutoIndustryModulesWithFloor(...)
 
 `computeRecommendedPlanningSubset` 中，只有 `plannedCount === 0` 的 orphan 模块才被加入 `recommendedDisplayModules`。用户已显式规划的模块（`plannedCount > 0`）不会进入推荐显示集，从而不被 `plannedDisplayModules` 的 `recommendedIds` 过滤掉，保持其在 planned 区的可见性。
 
+## 无 archiveStation 的 support 模块生成
+
+### 问题
+
+当前 `useLiveProductionStore` 的 `activeStationState` computed 中：
+
+1. `planState` 通过 `buildDerivedActiveStationState({ deferSupportModules: true })` 生成，直接跳过了 `deriveFinalSupportState`，导致 `autoHabitationModules` / `autoInfrastructureModules` 为空数组
+2. `canonicalPlanState` 只在 `archiveStation !== null` 时调用 `buildCanonicalPlanningStationState`，负责重新计算 habitation 和 infrastructure
+3. 当 `archiveStation === null` 时，两条路径都被阻断，support 模块始终为空
+
+### 方案
+
+无 archive 的站复用 blueprint 路径：
+
+- `deferSupportModules` 条件化：`archiveStation !== null` 时 `true`（走 canonical 重算），`archiveStation === null` 时 `false`（走 `deriveFinalSupportState` 直接计算）
+- `referenceModules` 在无 archive 时为空数组，`calculateAutoHabitationModules` 和 `deriveInfrastructureModules` 无 quota 约束时自动走数据库候选，与 blueprint 行为完全一致
+- `canonicalPlanState` 为 null 时 `finalPlannedModules` / `effectiveTargetModules` 回退为 `[]`，符合无 archive 的预期
+- 有 archive 时的行为完全不变
+
 ## planned diff 显示规则
 
 planned 区域的 diff 标注（`+N`/`-N`）按以下条件显示：

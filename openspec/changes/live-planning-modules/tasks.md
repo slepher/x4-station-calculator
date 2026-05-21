@@ -38,7 +38,12 @@
 - [x] T17. 将 recommended 来源模块纳入 planning 区展示，并以 inline 子区块呈现
 - [x] T18. 为 recommended 项补充虚线前置等来源样式约束
 
-### Phase 6: planned 区 count 交互与输入确认
+### Phase 6: 无 archiveStation 时的 support 模块生成
+
+- [ ] T25. 修正 `activeStationState` computed 中 `deferSupportModules` 的条件，无 archive 时不 defer，让 `deriveFinalSupportState` 直接计算 habitation 和 infrastructure
+- [ ] T26. 验证无 archive 时 `deriveFinalSupportState` 内的 `calculateAutoHabitationModules` 和 `deriveInfrastructureModules` 在无 reference quota 时正常工作（走数据库候选）
+
+### Phase 7: planned 区 count 交互与输入确认
 
 - [x] T19. recommended 模块 count 不允许 `< archive`（X4NumberInput min + handleUpdateModuleCount clamp）
 - [x] T20. 非 recommend 模块允许 `< archive`，输入不标红
@@ -62,3 +67,4 @@
 - [x] recommended 模块 count 不允许 `< archive`，非 recommend 模块允许 `< archive`
 - [x] 已显式规划的模块不进入 `recommendedDisplayModules`
 - [x] X4NumberInput 失焦确认，中间输入不触发计算
+- [ ] 无 archiveStation 时 support 模块（habitation/infrastructure）走蓝图路径直接计算，不依赖 canonical 重算链路

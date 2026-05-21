@@ -998,11 +998,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     }
 
     const planned = plannedModules.value
+    const hasArchive = archiveStation.value != null
     const planState = buildDerivedActiveStationState({
       stationId,
       plannedModules: planned,
       referenceModules: archiveCurrentTotalModulesFromArchive(archiveStation.value),
-      deferSupportModules: true,
+      deferSupportModules: hasArchive,
       settings: settings.value,
       cache,
       deps: getComputeDeps()
@@ -1013,7 +1014,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       ...(archiveStation.value?.building?.modules || [])
     ])
     const archiveProducedWareIds = getProducedWareIds(archiveCurrentTotalModules, gameData.modulesMap)
-    const canonicalPlanState = archiveStation.value === null
+    const canonicalPlanState = !hasArchive
       ? null
       : buildCanonicalPlanningStationState({
           planState,
@@ -1872,6 +1873,44 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       downstreamRows
     )
     if (downstreamSection) sections.push(downstreamSection)
+
+    const stationBreakdownRows: LiveVolumeAllocationDetailRow[] = []
+    flow.contributions.forEach((contribution, index) => {
+      if (contribution.class !== 'station') return
+
+      const isProduction = contribution.type === 'production'
+      const ratePerHour = Math.abs(contribution.amount)
+
+      const row: LiveVolumeAllocationDetailRow = isProduction
+        ? {
+            key: `station-${contribution.id}-${index}`,
+            label: (contribution as any).name || contribution.id,
+            ratePerHour,
+            currentMinutes: undefined,
+            targetMinutes: hasArchiveData ? computeDeltaFillMinutes(targetCount, 0, ratePerHour) : undefined,
+            recommendedMinutes: computeDeltaFillMinutes(recommendedCount, 0, ratePerHour)
+          }
+        : {
+            key: `station-${contribution.id}-${index}`,
+            label: (contribution as any).name || contribution.id,
+            ratePerHour,
+            currentMinutes: computeStockConsumeMinutes(currentCount, ratePerHour),
+            targetMinutes: hasArchiveData ? computeStockConsumeMinutes(targetCount, ratePerHour) : undefined,
+            recommendedMinutes: computeStockConsumeMinutes(recommendedCount, ratePerHour)
+          }
+
+      if (row.currentMinutes === undefined && row.targetMinutes === undefined && row.recommendedMinutes === undefined) return
+      stationBreakdownRows.push(row)
+    })
+
+    const stationBreakdownSection = buildAllocationDetailSection(
+      'station-breakdown',
+      i18n.global.t('wareflow.allocation_section_station_breakdown'),
+      true,
+      hasArchiveData,
+      stationBreakdownRows
+    )
+    if (stationBreakdownSection) sections.push(stationBreakdownSection)
 
     return sections
   }

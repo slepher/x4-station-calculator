@@ -88,6 +88,13 @@
 - 用户点击 recommended 项时，应将显式 planned 数量提升到该模块当前目标总量。
 - 若 UI 需要保留来源可见性，只通过虚线前置等样式表达，不再通过独立区块表达。
 
+### 无 archiveStation 时的 support 模块生成
+
+- 当前实现将 support 模块（habitation/infrastructure）的计算全部集中到了 `buildCanonicalPlanningStationState` 路径，该路径因 `archiveStation === null` 而被跳过。
+- 无 archive 的站应当走和 blueprint 相同的路径：`buildDerivedActiveStationState` 中不设 `deferSupportModules`，让 `deriveFinalSupportState` 直接计算 habitation 和 infrastructure。
+- `deriveFinalSupportState` 内部的 `calculateAutoHabitationModules` 和 `deriveInfrastructureModules` 不依赖 `referenceModules`，没有 quota 时自动走数据库候选，与 blueprint 行为一致。
+- 有 archive 的站保持现有行为不变：`deferSupportModules: true`，由 `buildCanonicalPlanningStationState` 使用 archive reference 做 quota-based 计算。
+
 ### auto 模块点击采纳规则
 
 - **industry 模块**（`type=production && method!==recycling`）：`target = max(auto, archive)` — 维持产能基线

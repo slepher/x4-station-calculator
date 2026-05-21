@@ -166,6 +166,27 @@ planning 区中 recommended items 的交互语义 MUST 与"recommended modules �
 **并且** 仍须计入 `recommendedGapModules` 供 autoFill 基线使用
 **并且** 该模块 MUST 在 `plannedDisplayModules` 中保持可见
 
+### Requirement: Support Modules Without ArchiveStation Use Blueprint Path
+
+当 live planning 站没有对应的 `archiveStation` 时，系统 MUST 通过 `deriveFinalSupportState`（blueprint 路径）直接计算 habitation 和 infrastructure，而不是依赖 canonical 重算链路。
+
+#### Scenario: no-archive station computes support modules via blueprint path
+
+**前提** 当前 live planning 站的 `archiveStation === null`
+**当** 系统计算 `activeStationState`
+**那么** `buildDerivedActiveStationState` MUST 以 `deferSupportModules = false` 被调用
+**并且** `deriveFinalSupportState` MUST 正常执行，计算 `autoHabitationModules` 和 `autoInfrastructureModules`
+**并且** 计算过程 MUST NOT 依赖 `archiveStation` 或 archive reference modules
+**并且** `calculateAutoHabitationModules` 和 `deriveInfrastructureModules` 在无 reference quota 时 MUST 走数据库候选
+
+#### Scenario: archive-present station behavior unchanged
+
+**前提** 当前 live planning 站的 `archiveStation !== null`
+**当** 系统计算 `activeStationState`
+**那么** `buildDerivedActiveStationState` MUST 以 `deferSupportModules = true` 被调用
+**并且** `buildCanonicalPlanningStationState` MUST 使用 archive reference modules 做 quota-based 重算
+**并且** 行为与变更前完全一致
+
 ### Requirement: Auto Module Transfer Rules
 
 点击 auto 区域模块将其纳入 planned 时，采纳值按模块类型区分。
