@@ -190,6 +190,15 @@ calculateAutoIndustryModulesWithFloor(...)
 
 这样既保留“已生效”的计算真相，也保留用户把推荐项转成显式规划的可控交互。
 
+## auto 模块点击采纳
+
+`handleTransferAutoModule` 根据模块类型决定采纳值：
+
+| 类型 | target 规则 | 理由 |
+|------|------------|------|
+| industry（`type=production && method!==recycling`） | `Math.max(auto, archive)` | floor 是产能基线，archive 数量表示已证明可行的生产规模 |
+| support（`storage/pier/habitation`） | `auto`（不补到 archive） | auto 计算的是 flow 需求的 optimal 值，archive 可能包含闲置产能 |
+
 ## planned 区 count 交互规则
 
 ### 推荐模块输入限制

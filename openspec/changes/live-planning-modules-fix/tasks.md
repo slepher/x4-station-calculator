@@ -45,6 +45,7 @@
 - [x] T21. 已显式规划的模块不进入 `recommendedDisplayModules`
 - [x] T22. X4NumberInput 改为失焦确认（`handleBlur` emit），箭头按钮即时确认
 - [x] T23. planned diff 显示规则：`planned > archive` 或 `total < archive` 时显示，否则隐藏
+- [x] T24. auto 模块点击采纳：industry 用 `max(auto, archive)`，support 用 `auto`
 
 ## 完成定义
 

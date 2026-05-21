@@ -165,6 +165,22 @@ planning 区中 recommended items 的交互语义 MUST 与"recommended modules �
 **并且** 仍须计入 `recommendedGapModules` 供 autoFill 基线使用
 **并且** 该模块 MUST 在 `plannedDisplayModules` 中保持可见
 
+### Requirement: Auto Module Transfer Rules
+
+点击 auto 区域模块将其纳入 planned 时，采纳值按模块类型区分。
+
+#### Scenario: industry transfer uses max(auto, archive)
+
+**前提** 模块类型为 `production` 且 `method !== 'recycling'`
+**当** 用户点击该 industry auto 模块
+**那么** `target = Math.max(auto, archive)`
+
+#### Scenario: support transfer uses auto suggestion
+
+**前提** 模块类型为 `storage`、`pier` 或 `habitation`
+**当** 用户点击该 support auto 模块
+**那么** `target = auto`
+
 ### Requirement: Planned Diff Display Rules
 
 planned 区域的 diff 标注 MUST 按统一条件显示，不区分模块类型。

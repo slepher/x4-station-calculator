@@ -88,6 +88,11 @@
 - 用户点击 recommended 项时，应将显式 planned 数量提升到该模块当前目标总量。
 - 若 UI 需要保留来源可见性，只通过虚线前置等样式表达，不再通过独立区块表达。
 
+### auto 模块点击采纳规则
+
+- **industry 模块**（`type=production && method!==recycling`）：`target = max(auto, archive)` — 维持产能基线
+- **support 模块**（`storage/pier/habitation`）：`target = auto` — 采纳系统建议值，不补到 archive
+
 ### planned 模块 count 输入规则
 
 - 已存在于 `recommendedModules` 的 planned 模块：不允许输入 `< archive`。X4NumberInput 的 `min = archiveTotal`，修改数量时 `handleUpdateModuleCount` 也 clamp 到 `>= archive`。× 按钮可以正常删除。
@@ -135,6 +140,7 @@
 11. planned 区中推荐模块的 count 不允许 `< archive`；非推荐模块允许 `< archive` 且有 auto 补全。
 12. 已显式规划的模块不进入 `recommendedDisplayModules`，避免被推荐区过滤隐藏。
 13. X4NumberInput 改为失焦确认，中间输入不触发计算。
+14. auto 模块点击采纳：industry 按 `max(auto, archive)`，support 按 `auto`。
 
 ## 未决项
 
