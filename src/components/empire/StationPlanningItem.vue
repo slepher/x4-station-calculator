@@ -64,6 +64,7 @@ const moduleInfoClass = computed(() => {
 const shouldShowDlcTag = computed(() => props.info.dlc_tag !== 'base')
 const dlcLabel = computed(() => gameData.getDlcDisplayName(props.info.dlc_tag))
 const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
+const localizedModuleName = computed(() => translateModule(props.info))
 const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.diffAnnotation)
 const moduleDiffClass = computed(() => {
   if (!moduleDiffAnnotation.value) return ''
@@ -85,8 +86,8 @@ const moduleDiffClass = computed(() => {
 
     <div class="module-info" :class="moduleInfoClass">
       <div class="module-title-row">
-        <div class="module-name" :title="info.name">
-          {{ translateModule(info) }}
+        <div class="module-name" :title="localizedModuleName">
+          <span class="module-name-text">{{ localizedModuleName }}</span>
           <span
             v-if="moduleDiffAnnotation"
             class="module-diff-annotation"
@@ -194,11 +195,15 @@ const moduleDiffClass = computed(() => {
 }
 
 .module-name {
-  @apply truncate font-medium text-slate-300 group-hover/row:text-white transition-colors text-xs sm:text-sm;
+  @apply flex items-center min-w-0 font-medium text-slate-300 group-hover/row:text-white transition-colors text-xs sm:text-sm;
+}
+
+.module-name-text {
+  @apply truncate min-w-0;
 }
 
 .module-diff-annotation {
-  @apply ml-1 text-[10px] font-normal;
+  @apply ml-1 shrink-0 text-[10px] font-normal;
 }
 
 .module-diff-annotation--positive {
