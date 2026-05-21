@@ -233,6 +233,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         warePriorityLevels: {},
         productionFlows: [],
         plannedModules: [],
+        effectivePlannedModules: [],
+        recommendedModules: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
@@ -266,6 +268,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
+  const effectivePriorityPlannedModules = computed(() =>
+    activeStationState.value.effectivePlannedModules || plannedModules.value
+  )
 
   function isModuleDlcActive(moduleId: string): boolean {
     return gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
@@ -295,7 +300,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const wareRuleActions = createProductionWareRuleActions<StationPlan>({
     getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
-    getPlannedModules: () => plannedModules.value,
+    getPlannedModules: () => effectivePriorityPlannedModules.value,
     getAutoIndustryModules: () => activeStationState.value.autoIndustryModules,
     getModulesMap: () => gameData.modulesMap,
     getWaresMap: () => gameData.waresMap,
@@ -913,6 +918,8 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
       count: station.count ?? 1,
       minerals: station.minerals || [],
       plannedModules: state.plannedModules,
+      effectivePlannedModules: state.effectivePlannedModules || state.plannedModules,
+      recommendedModules: state.recommendedModules || [],
       resolvedModules: state.resolvedModules,
       modules: state.resolvedModules,
       buildingModules: [],

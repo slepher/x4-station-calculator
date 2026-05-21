@@ -8,11 +8,12 @@ import type {
 import type { FlowContribution, WareProductionFlow } from '../../types/production-flow'
 import type { WorkforceEntry } from '../../types/saveArchive'
 import {
-  findBestProducerWithRef,
+  findBestProducer,
   findBestModuleWithReferenceQuota,
   getProductionEfficiency
 } from './bestModuleSelector'
 import { calculateWorkforceCensus } from './calculatorUtils'
+import { getReferenceProductionFloorModules, maxSavedModules } from './planningRecommendedModules'
 import {
   calculateWorkforceBreakdown,
   calculateActualWorkforce,
@@ -41,8 +42,7 @@ export function calculateAutoIndustryModules(
     settings,
     modulesMap,
     waresMap,
-    lockedWares,
-    referenceModules
+    lockedWares
   } = input
 
   const race = settings.racePreference
@@ -51,33 +51,6 @@ export function calculateAutoIndustryModules(
   plannedModules.forEach(m => {
     industryModules[m.id] = (industryModules[m.id] || 0) + m.count
   })
-
-  const refMods = referenceModules || []
-
-  const refQuota: Record<string, Record<string, number>> = {}
-  for (const ref of refMods) {
-    const mod = modulesMap[ref.id]
-    if (!mod) continue
-    for (const [wid, rate] of Object.entries(mod.outputs)) {
-      if (!refQuota[ref.id]) refQuota[ref.id] = {}
-      refQuota[ref.id]![wid] = (refQuota[ref.id]![wid] || 0) + rate * ref.count
-    }
-  }
-
-  const remainingQuota: Record<string, number> = {}
-
-  function getQuotaForWare(modId: string, wareId: string): number {
-    const key = `${modId}:${wareId}`
-    if (remainingQuota[key] === undefined) {
-      remainingQuota[key] = refQuota[modId]?.[wareId] || 0
-    }
-    return remainingQuota[key]!
-  }
-
-  function consumeQuota(modId: string, wareId: string, amount: number): void {
-    const key = `${modId}:${wareId}`
-    remainingQuota[key] = Math.max(0, (remainingQuota[key] || 0) - amount)
-  }
 
   let loopCount = 0
   let hasDeficit = true
@@ -104,20 +77,8 @@ export function calculateAutoIndustryModules(
 
       if (lockedWares.includes(wareId)) continue
 
-      const quotaForWare: Record<string, number> = {}
-      for (const ref of refMods) {
-        const mod = modulesMap[ref.id]
-        if (!mod) continue
-        quotaForWare[ref.id] = getQuotaForWare(ref.id, wareId)
-      }
-
-      const selection = findBestProducerWithRef(
-        wareId, race, currentModulesAsSaved, modulesMap, waresMap,
-        refMods, quotaForWare
-      )
-      if (!selection) continue
-
-      const producer = selection.module
+      const producer = findBestProducer(wareId, race, currentModulesAsSaved, modulesMap, waresMap)
+      if (!producer) continue
       const eff = getProductionEfficiency(producer, globalWorkforceBonus)
 
       let sunlightFactor = 1.0
@@ -128,19 +89,7 @@ export function calculateAutoIndustryModules(
       const singleOutput = (producer.outputs[wareId] || 0) * eff * sunlightFactor
       if (singleOutput <= 0) continue
 
-      let countNeeded = Math.ceil(deficit / singleOutput)
-
-      if (!selection.exhaustedQuota) {
-        const rawOutput = producer.outputs[wareId] || 0
-        const quota = quotaForWare[producer.id] || 0
-        if (quota <= 0) continue
-        const maxFromQuota = Math.floor(quota / rawOutput)
-        if (maxFromQuota > 0) {
-          const capped = Math.min(countNeeded, maxFromQuota)
-          consumeQuota(producer.id, wareId, capped * rawOutput)
-          countNeeded = capped
-        }
-      }
+      const countNeeded = Math.ceil(deficit / singleOutput)
 
       industryModules[producer.id] = (industryModules[producer.id] || 0) + countNeeded
       hasDeficit = true
@@ -156,6 +105,33 @@ export function calculateAutoIndustryModules(
     .sort((a, b) => (modulesMap[b.id]?.tier || 0) - (modulesMap[a.id]?.tier || 0))
 
   return autoIndustry
+}
+
+export interface CalculateAutoIndustryWithFloorOutput {
+  autoIndustryModules: SavedModule[]
+  effectivePlannedModules: SavedModule[]
+}
+
+export function calculateAutoIndustryModulesWithFloor(
+  input: CalculateAutoFillInput
+): CalculateAutoIndustryWithFloorOutput {
+  const referenceProductionFloorModules = getReferenceProductionFloorModules(
+    input.referenceModules || [],
+    input.modulesMap
+  )
+  const effectivePlannedModules = maxSavedModules(
+    input.plannedModules,
+    referenceProductionFloorModules
+  )
+  const autoIndustryModules = calculateAutoIndustryModules({
+    ...input,
+    plannedModules: effectivePlannedModules
+  })
+
+  return {
+    autoIndustryModules,
+    effectivePlannedModules
+  }
 }
 
 export interface CalculateAutoHabitationInput {
@@ -257,8 +233,7 @@ export function calculateAutoFillModules(
     plannedModules: input.plannedModules,
     autoIndustryModules: autoIndustry,
     settings: input.settings,
-    modulesMap: input.modulesMap,
-    referenceModules: input.referenceModules
+    modulesMap: input.modulesMap
   })
 
   return { 
@@ -361,8 +336,7 @@ export function calculateProductionFlows(
     settings,
     modulesMap,
     waresMap,
-    lockedWares,
-    referenceModules: input.referenceModules
+    lockedWares
   })
 
   const coreResult = calculateProductionFlowsCore({

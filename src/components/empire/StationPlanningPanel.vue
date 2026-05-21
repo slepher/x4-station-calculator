@@ -18,12 +18,10 @@ const props = defineProps<{
   archiveModules?: SavedModule[]
   buildingModules?: SavedModule[]
   archiveTotalMap?: Record<string, number>
-  recommendedModulesExpanded?: boolean
 }>()
 
 const emit = defineEmits<{
   updatePlannedModules: [modules: SavedModule[]]
-  updateRecommendedModulesExpanded: [expanded: boolean]
 }>()
 
 const { t } = useI18n()
@@ -123,7 +121,7 @@ const groupedArchiveModules = computed(() =>
 )
 
 const hasArchiveData = computed(() => groupedArchiveModules.value.length > 0)
-const hasRecommendedModules = computed(() => (props.recommendedModules?.length || 0) > 0)
+const recommendedModuleIds = computed(() => new Set((props.recommendedModules || []).map((module) => module.id)))
 
 const archiveTotal = (moduleId: string): number => {
   return props.archiveTotalMap?.[moduleId] ?? 0
@@ -215,6 +213,7 @@ const isModuleCountEditable = (moduleId: string) => {
 
 const handleAddModule = (moduleId: string) => {
   const existingIndex = props.plannedModules.findIndex(m => m.id === moduleId)
+  if (recommendedModuleIds.value.has(moduleId)) return
   let nextModules: SavedModule[]
   if (existingIndex >= 0) {
     nextModules = props.plannedModules.map((m, i) =>
@@ -258,6 +257,22 @@ const handleTransferAutoModule = (module: SavedModule) => {
   emit('updatePlannedModules', nextModules)
 }
 
+const handleTransferRecommendedModule = (module: SavedModule) => {
+  const targetCount = Math.max(module.count, archiveTotal(module.id))
+  const existingIndex = props.plannedModules.findIndex(m => m.id === module.id)
+  let nextModules: SavedModule[]
+
+  if (existingIndex >= 0) {
+    nextModules = props.plannedModules.map((item, index) =>
+      index === existingIndex ? { ...item, count: Math.max(item.count, targetCount) } : item
+    )
+  } else {
+    nextModules = [...props.plannedModules, { id: module.id, count: targetCount }]
+  }
+
+  emit('updatePlannedModules', nextModules)
+}
+
 const handleTransferArchiveModule = (moduleId: string) => {
   const total = archiveTotal(moduleId)
   if (total <= 0) return
@@ -279,9 +294,6 @@ const handleUpdateSearchQuery = (value: string) => {
   searchQuery.value = value
 }
 
-const handleToggleRecommendedModules = () => {
-  emit('updateRecommendedModulesExpanded', !(props.recommendedModulesExpanded ?? false))
-}
 </script>
 
 <template>
@@ -322,27 +334,14 @@ const handleToggleRecommendedModules = () => {
               @update:count="(val: number) => handleUpdateModuleCount(index, val)" @remove="handleRemoveModule(index)" />
           </template>
         </draggable>
-      </div>
-    </div>
-
-    <div v-if="hasRecommendedModules" class="tier-section tier-recommended">
-      <button type="button" class="tier-header tier-header--recommended" @click="handleToggleRecommendedModules">
-        <span class="tier-label">
-          {{ (props.recommendedModulesExpanded ? '▾' : '▸') + ' ' + t('planning.recommended_modules') }}
-        </span>
-        <span class="tier-meta">
-          {{ t('planning.recommended_module_kinds', { count: props.recommendedModules?.length || 0 }) }}
-        </span>
-      </button>
-      <div v-if="props.recommendedModulesExpanded" class="module-list-scroll">
-        <div class="auto-modules-container recommended-modules-container">
+        <div v-if="(props.recommendedModules?.length || 0) > 0" class="recommended-inline-list">
           <StationPlanningItem
             v-for="(element, index) in props.recommendedModules"
-            :key="'recommended-' + element.id + '-' + index"
+            :key="'recommended-inline-' + element.id + '-' + index"
             :item="element"
             :info="getModuleInfo(element.id)!"
             :readonly="true"
-            @transfer="handleTransferArchiveModule(element.id)"
+            @transfer="handleTransferRecommendedModule(element)"
           />
         </div>
       </div>
@@ -447,6 +446,10 @@ const handleToggleRecommendedModules = () => {
   @apply space-y-2;
 }
 
+.recommended-inline-list {
+  @apply mt-2 mb-2 space-y-2 border-l-2 border-dashed border-slate-600 pl-2;
+}
+
 .search-panel {
   @apply mb-4;
 }
@@ -465,18 +468,6 @@ const handleToggleRecommendedModules = () => {
 
 .tier-section.tier-auto {
   @apply opacity-90;
-}
-
-.tier-section.tier-recommended .module-list-scroll {
-  @apply border-l-2 border-dashed border-emerald-500/40 pl-2;
-}
-
-.tier-header--recommended {
-  @apply border-emerald-500/20 bg-emerald-950/20 hover:bg-emerald-900/20;
-}
-
-.tier-meta {
-  @apply ml-auto text-[11px] text-emerald-300/80;
 }
 
 .tier-section.tier-auto .module-list-scroll {
@@ -505,7 +496,7 @@ const handleToggleRecommendedModules = () => {
 }
 
 .tier-header {
-  @apply flex items-center justify-between px-3 h-8 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent w-full;
+  @apply flex items-center justify-between px-3 h-8 bg-slate-800/40 rounded hover:bg-slate-700/50 transition-colors border border-transparent w-full;
 }
 
 .tier-label {

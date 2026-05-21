@@ -53,13 +53,13 @@ describe('StationPlanningPanel', () => {
         enforceDlcActivation: false,
         archiveModules: [],
         buildingModules: [],
-        archiveTotalMap: { energy_mod: 5 },
-        recommendedModulesExpanded: false
+        archiveTotalMap: { energy_mod: 5 }
       },
       global: {
         stubs: {
           draggable: {
-            template: '<div><slot /></div>'
+            props: ['modelValue'],
+            template: '<div><slot v-for="(element, index) in modelValue" name="item" :element="element" :index="index" /></div>'
           },
           StationModulePicker: {
             template: '<div data-testid="module-picker-stub"></div>'
@@ -76,6 +76,84 @@ describe('StationPlanningPanel', () => {
 
     expect(wrapper.emitted('updatePlannedModules')).toEqual([
       [[{ id: 'energy_mod', count: 5 }]]
+    ])
+  })
+
+  it('renders recommended modules inside the planned tier with dashed group styling', () => {
+    const wrapper = mount(StationPlanningPanel, {
+      props: {
+        plannedModules: [
+          { id: 'energy_mod', count: 3 }
+        ],
+        recommendedModules: [{ id: 'orphan_mod', count: 4, isReferenceRecommended: true }],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [],
+        enforceDlcActivation: false,
+        archiveModules: [],
+        buildingModules: [],
+        archiveTotalMap: { orphan_mod: 4, energy_mod: 2 }
+      },
+      global: {
+        stubs: {
+          draggable: {
+            props: ['modelValue'],
+            template: '<div><slot v-for="(element, index) in modelValue" name="item" :element="element" :index="index" /></div>'
+          },
+          StationModulePicker: {
+            template: '<div data-testid="module-picker-stub"></div>'
+          },
+          StationPlanningItem: {
+            props: ['item', 'readonly'],
+            template: '<div class="planning-item-stub" :data-id="item.id" :data-readonly="readonly"></div>'
+          }
+        }
+      }
+    })
+
+    const items = wrapper.findAll('.planning-item-stub')
+    expect(items).toHaveLength(2)
+    expect(items[0]?.attributes('data-id')).toBe('energy_mod')
+    expect(items[1]?.attributes('data-id')).toBe('orphan_mod')
+    expect(items[1]?.attributes('data-readonly')).toBe('true')
+    expect(wrapper.find('.recommended-inline-list').exists()).toBe(true)
+    expect(wrapper.text()).not.toContain('planning.recommended_modules')
+  })
+
+  it('clicking recommended module promotes it to explicit planned total instead of adding on top', async () => {
+    const wrapper = mount(StationPlanningPanel, {
+      props: {
+        plannedModules: [{ id: 'energy_mod', count: 1 }],
+        recommendedModules: [{ id: 'energy_mod', count: 4, isReferenceRecommended: true }],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [],
+        enforceDlcActivation: false,
+        archiveModules: [],
+        buildingModules: [],
+        archiveTotalMap: { energy_mod: 3 }
+      },
+      global: {
+        stubs: {
+          draggable: {
+            props: ['modelValue'],
+            template: '<div><slot v-for="(element, index) in modelValue" name="item" :element="element" :index="index" /></div>'
+          },
+          StationModulePicker: {
+            template: '<div data-testid="module-picker-stub"></div>'
+          },
+          StationPlanningItem: {
+            props: ['item'],
+            template: '<button class="planning-item-stub" @click="$emit(\'transfer\', item)">{{ item.id }}</button>'
+          }
+        }
+      }
+    })
+
+    await wrapper.get('.recommended-inline-list .planning-item-stub').trigger('click')
+
+    expect(wrapper.emitted('updatePlannedModules')).toEqual([
+      [[{ id: 'energy_mod', count: 4 }]]
     ])
   })
 })

@@ -102,7 +102,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const buildPriceMultiplier = ref(0.5)
   const overviewBuyMultiplier = ref(0.5)
   const overviewSellMultiplier = ref(0.5)
-  const recommendedModulesExpanded = ref(false)
   const playerStationRecords = ref<PlayerStationRecord[]>([])
 
   const productionSource = computed<'save-binding'>(() => 'save-binding')
@@ -728,10 +727,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     mode.value = mode.value === 'live' ? 'planning' : 'live'
   }
 
-  function setRecommendedModulesExpanded(expanded: boolean) {
-    recommendedModulesExpanded.value = expanded
-  }
-
   const activeStation = computed<StationPlan | null>(() => {
     if (workbenchMode.value === 'station' && planningStationDraft.value) {
       return planningStationDraft.value
@@ -951,6 +946,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         warePriorityLevels: {},
         productionFlows: [],
         plannedModules: [],
+        effectivePlannedModules: [],
+        recommendedModules: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
@@ -981,6 +978,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         warePriorityLevels: {},
         productionFlows: flowMapToUse?.getProductionFlows(stationId) || [],
         plannedModules: archiveModules,
+        effectivePlannedModules: archiveCurrentTotalModules,
+        recommendedModules: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
@@ -1075,6 +1074,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const archiveOverride = mode.value === 'live' && archiveStation.value
     return {
       plannedModules: [] as SavedModule[],
+      effectivePlannedModules: [] as SavedModule[],
+      recommendedModules: [] as SavedModule[],
       resolvedModules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
       modules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
       buildingModules: archiveOverride ? (archiveStation.value!.building?.modules || []) : [],
@@ -1153,6 +1154,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
   }
 
+  const effectivePriorityPlannedModules = computed(() =>
+    activeStationState.value.effectivePlannedModules || plannedModules.value
+  )
+
   const moduleActions = createProductionModuleActions<StationPlan>({
     getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
@@ -1185,7 +1190,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const wareRuleActions = createProductionWareRuleActions<StationPlan>({
     getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
-    getPlannedModules: () => plannedModules.value,
+    getPlannedModules: () => effectivePriorityPlannedModules.value,
     getAutoIndustryModules: () => activeStationState.value.autoIndustryModules,
     getModulesMap: () => gameData.modulesMap,
     getWaresMap: () => gameData.waresMap,
@@ -1672,6 +1677,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       count: stationCount,
       minerals: stationMinerals,
       plannedModules: state.plannedModules,
+      effectivePlannedModules: state.effectivePlannedModules || state.plannedModules,
+      recommendedModules: state.recommendedModules || [],
       resolvedModules: state.resolvedModules,
       modules: state.modules,
       buildingModules: state.buildingModules,
@@ -2101,10 +2108,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     setExpandedSector: (sectorId: string | null) => { expandedSectorId.value = sectorId },
     getStationById,
     mode,
-    recommendedModulesExpanded,
     canToggle,
     toggleMode,
-    setRecommendedModulesExpanded,
     moduleScope,
     hasBuildingModules,
     cycleModuleScope,

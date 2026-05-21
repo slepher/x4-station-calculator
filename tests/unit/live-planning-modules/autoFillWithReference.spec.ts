@@ -1,6 +1,9 @@
 import { describe, it, expect } from 'vitest'
-import { findBestProducerWithRef } from '@/store/logic/bestModuleSelector'
-import { calculateAutoFillModules } from '@/store/logic/calculateProductionFlows'
+import {
+  calculateAutoHabitationModules,
+  calculateAutoIndustryModules,
+  calculateAutoIndustryModulesWithFloor
+} from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
 import type { WareProductionFlow } from '@/types/production-flow'
 import type { X4Module, X4Ware, SavedModule, StationSettings } from '@/types/x4'
@@ -61,95 +64,12 @@ const SETTINGS: StationSettings = {
   transportShipCapacity: 62000
 }
 
-describe('findBestProducerWithRef P1-P8 priority', () => {
+describe('industrial autoFill boundary', () => {
   const ecWares = makeWare({ id: 'energycells' })
   const waresMap = { energycells: ecWares } as Record<string, X4Ware>
 
   const argonSolar = makeModule({ id: 'sol_argon', race: 'argon', group: 'energy', outputs: { energycells: 1000 } })
   const terranSolar = makeModule({ id: 'sol_terran', race: 'terran', group: 'energy', outputs: { energycells: 1200 } })
-
-  const modulesMap = {
-    sol_argon: argonSolar,
-    sol_terran: terranSolar
-  } as Record<string, X4Module>
-
-  it('P1 selects race-matching ref module with quota', () => {
-    const result = findBestProducerWithRef(
-      'energycells', 'argon',
-      [], modulesMap, waresMap,
-      [{ id: 'sol_argon', count: 2 }],
-      { sol_argon: 2000 }
-    )
-    expect(result).toBeDefined()
-    expect(result!.module.id).toBe('sol_argon')
-    expect(result!.exhaustedQuota).toBe(false)
-  })
-
-  it('P2 selects non-race ref module when P1 has no race match', () => {
-    const result = findBestProducerWithRef(
-      'energycells', 'argon',
-      [], modulesMap, waresMap,
-      [{ id: 'sol_terran', count: 1 }],
-      { sol_terran: 1200 }
-    )
-    expect(result).toBeDefined()
-    expect(result!.module.id).toBe('sol_terran')
-    expect(result!.exhaustedQuota).toBe(false)
-  })
-
-  it('P5 selects race-matching ref when quota=0', () => {
-    const result = findBestProducerWithRef(
-      'energycells', 'argon',
-      [], modulesMap, waresMap,
-      [{ id: 'sol_argon', count: 2 }],
-      { sol_argon: 0 }
-    )
-    expect(result).toBeDefined()
-    expect(result!.module.id).toBe('sol_argon')
-    expect(result!.exhaustedQuota).toBe(true)
-  })
-
-  it('P6 non-race ref selected when quota=0', () => {
-    const result = findBestProducerWithRef(
-      'energycells', 'argon',
-      [], modulesMap, waresMap,
-      [{ id: 'sol_terran', count: 1 }],
-      { sol_terran: 0 }
-    )
-    expect(result).toBeDefined()
-    expect(result!.module.id).toBe('sol_terran')
-    expect(result!.exhaustedQuota).toBe(true)
-  })
-
-  it('falls to P7 (race+db) when no ref', () => {
-    const result = findBestProducerWithRef(
-      'energycells', 'argon',
-      [], modulesMap, waresMap,
-      [], {}
-    )
-    expect(result).toBeDefined()
-    expect(result!.module.race).toBe('argon')
-    expect(result!.exhaustedQuota).toBe(true)
-  })
-
-  it('P8 (any db) when no race match in db', () => {
-    const result = findBestProducerWithRef(
-      'energycells', 'split',
-      [], modulesMap, waresMap,
-      [], {}
-    )
-    expect(result).toBeDefined()
-    expect(result!.exhaustedQuota).toBe(true)
-  })
-})
-
-describe('calculateAutoFillModules with reference modules', () => {
-  const ecWares = makeWare({ id: 'energycells' })
-  const waresMap = { energycells: ecWares } as Record<string, X4Ware>
-
-  const argonSolar = makeModule({ id: 'sol_argon', race: 'argon', group: 'energy', outputs: { energycells: 1500 } })
-  const terranSolar = makeModule({ id: 'sol_terran', race: 'terran', group: 'energy', outputs: { energycells: 1500 } })
-
   const consumer = makeModule({ id: 'cons_argon', race: 'argon', group: 'hightech', outputs: { hullparts: 100 }, inputs: { energycells: 500 } })
 
   const modulesMap = {
@@ -158,73 +78,16 @@ describe('calculateAutoFillModules with reference modules', () => {
     cons_argon: consumer
   } as Record<string, X4Module>
 
-  it('generates auto modules to fill deficit (no reference)', () => {
-    const result = calculateAutoFillModules({
+  it('generic industrial autoFill ignores reference modules and keeps develop semantics', () => {
+    const withReference = calculateAutoIndustryModules({
       plannedModules: [{ id: 'cons_argon', count: 3 }],
       settings: { ...SETTINGS, racePreference: 'argon' },
       modulesMap,
       waresMap,
       lockedWares: [],
-      referenceModules: []
+      referenceModules: [{ id: 'sol_terran', count: 4 }]
     })
-    // 3 consumers each need 500 = 1500 EC deficit. 1 argon solar produces 1500. Expect 1 solar.
-    const solar = result.autoIndustryModules.find(m => m.id === 'sol_argon')
-    expect(solar).toBeDefined()
-    expect(solar!.count).toBeGreaterThanOrEqual(1)
-  })
-
-  it('with reference: race-matching ref gets priority', () => {
-    const result = calculateAutoFillModules({
-      plannedModules: [{ id: 'cons_argon', count: 3 }],
-      settings: { ...SETTINGS, racePreference: 'argon' },
-      modulesMap,
-      waresMap,
-      lockedWares: [],
-      referenceModules: [
-        { id: 'sol_argon', count: 1 },
-        { id: 'sol_terran', count: 10 }
-      ]
-    })
-
-    const argon = result.autoIndustryModules.find(m => m.id === 'sol_argon')
-    const terran = result.autoIndustryModules.find(m => m.id === 'sol_terran')
-    // P1 argon(ref,race) gets first pick from quota. Deficit is 1500, 1 module needed.
-    // argon ref has 1*1500 = 1500 quota, covers entire deficit.
-    expect(argon?.count ?? 0).toBe(1)
-    expect(terran?.count ?? 0).toBe(0)
-  })
-
-  it('with reference: non-race ref used after race ref exhausted', () => {
-    const result = calculateAutoFillModules({
-      plannedModules: [{ id: 'cons_argon', count: 3 }],
-      settings: { ...SETTINGS, racePreference: 'terran' },
-      modulesMap,
-      waresMap,
-      lockedWares: [],
-      referenceModules: [
-        { id: 'sol_terran', count: 1 },
-        { id: 'sol_argon', count: 3 }
-      ]
-    })
-
-    const terran = result.autoIndustryModules.find(m => m.id === 'sol_terran')
-    const argon = result.autoIndustryModules.find(m => m.id === 'sol_argon')
-    // race=terran, deficit 1500. P1 terran(ref) quota=1500, covers all. Just 1 terran solar.
-    expect(terran?.count ?? 0).toBe(1)
-    expect(argon?.count ?? 0).toBe(0)
-  })
-
-  it('no reference -> same as original behavior', () => {
-    const withRef = calculateAutoFillModules({
-      plannedModules: [{ id: 'cons_argon', count: 3 }],
-      settings: { ...SETTINGS, racePreference: 'argon' },
-      modulesMap,
-      waresMap,
-      lockedWares: [],
-      referenceModules: []
-    })
-
-    const withoutRef = calculateAutoFillModules({
+    const withoutReference = calculateAutoIndustryModules({
       plannedModules: [{ id: 'cons_argon', count: 3 }],
       settings: { ...SETTINGS, racePreference: 'argon' },
       modulesMap,
@@ -232,7 +95,22 @@ describe('calculateAutoFillModules with reference modules', () => {
       lockedWares: []
     })
 
-    expect(withRef.autoIndustryModules).toEqual(withoutRef.autoIndustryModules)
+    expect(withReference).toEqual(withoutReference)
+    expect(withReference).toContainEqual({ id: 'sol_argon', count: 2 })
+  })
+
+  it('floor-specific industrial autoFill uses archive_total modules as baseline', () => {
+    const result = calculateAutoIndustryModulesWithFloor({
+      plannedModules: [{ id: 'cons_argon', count: 3 }],
+      settings: { ...SETTINGS, racePreference: 'argon' },
+      modulesMap,
+      waresMap,
+      lockedWares: [],
+      referenceModules: [{ id: 'sol_terran', count: 2 }]
+    })
+
+    expect(result.effectivePlannedModules).toContainEqual({ id: 'sol_terran', count: 2 })
+    expect(result.autoIndustryModules).toEqual([])
   })
 })
 
@@ -264,20 +142,19 @@ describe('auxiliary module reference priority', () => {
       worker_consumer: workerConsumer
     } as Record<string, X4Module>
 
-    const result = calculateAutoFillModules({
+    const result = calculateAutoHabitationModules({
       plannedModules: [{ id: 'worker_consumer', count: 1 }],
+      autoIndustryModules: [],
       settings: { ...SETTINGS, considerWorkforceForAutoFill: true, racePreference: 'argon' },
       modulesMap,
-      waresMap: {} as Record<string, X4Ware>,
-      lockedWares: [],
       referenceModules: [
         { id: 'hab_argon', count: 2 },
         { id: 'hab_terran', count: 2 }
       ]
     })
 
-    expect(result.autoHabitationModules).toContainEqual({ id: 'hab_argon', count: 2 })
-    expect(result.autoHabitationModules).toContainEqual({ id: 'hab_terran', count: 2 })
+    expect(result).toContainEqual({ id: 'hab_argon', count: 2 })
+    expect(result).toContainEqual({ id: 'hab_terran', count: 2 })
   })
 
   it('infrastructure storage allocation consumes reference quota before collapsing to one type', () => {

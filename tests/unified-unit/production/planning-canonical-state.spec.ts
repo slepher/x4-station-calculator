@@ -24,6 +24,8 @@ function createPlanState(): ActiveStationState {
       }
     ],
     plannedModules: [{ id: 'planned-prod', count: 1 }],
+    effectivePlannedModules: [{ id: 'planned-prod', count: 1 }],
+    recommendedModules: [],
     autoIndustryModules: [{ id: 'auto-prod', count: 1 }],
     autoHabitationModules: [],
     autoInfrastructureModules: [{ id: 'stale-storage', count: 1 }],
@@ -194,6 +196,110 @@ describe('buildCanonicalPlanningStationState', () => {
       { id: 'planned-prod', count: 1 },
       { id: 'auto-prod', count: 1 },
       { id: 'habitat', count: 1 }
+    ])
+  })
+
+  it('preserves effective planned ordering when rebuilding canonical base', () => {
+    const deps: StationComputeDeps = {
+      modulesMap: {
+        explicit_prod: {
+          id: 'explicit_prod',
+          type: 'production',
+          race: 'argon',
+          outputs: { explicit_ware: 10 },
+          inputs: {},
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any,
+        recommended_prod: {
+          id: 'recommended_prod',
+          type: 'production',
+          race: 'argon',
+          outputs: { recommended_ware: 10 },
+          inputs: {},
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any,
+        support_floor: {
+          id: 'support_floor',
+          type: 'production',
+          race: 'argon',
+          outputs: { support_ware: 10 },
+          inputs: {},
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any
+      },
+      waresMap: {
+        explicit_ware: { id: 'explicit_ware', tier: 3, transport: 'container', volume: 1 } as any,
+        recommended_ware: { id: 'recommended_ware', tier: 2, transport: 'container', volume: 1 } as any,
+        support_ware: { id: 'support_ware', tier: 1, transport: 'container', volume: 1 } as any
+      },
+      workforceConsumptionMap: {},
+      enforceDlcActivation: false,
+      isModuleDlcActive: () => true
+    }
+
+    const state = buildCanonicalPlanningStationState({
+      planState: {
+        actualWorkforce: 0,
+        currentEfficiency: 1,
+        warePriorityLevels: {},
+        productionFlows: [],
+        plannedModules: [{ id: 'explicit_prod', count: 1 }],
+        effectivePlannedModules: [
+          { id: 'explicit_prod', count: 1 },
+          { id: 'recommended_prod', count: 1 }
+        ],
+        recommendedModules: [{ id: 'recommended_prod', count: 1 }],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [],
+        resolvedModules: [
+          { id: 'explicit_prod', count: 1 },
+          { id: 'recommended_prod', count: 1 }
+        ]
+      },
+      archiveBuiltModules: [{ id: 'support_floor', count: 1 }],
+      archiveBuildingModules: [],
+      settings: {
+        racePreference: 'argon',
+        sunlight: 100,
+        resourceBufferHours: 0,
+        primaryProductBufferHours: 0,
+        secondaryProductBufferHours: 0,
+        buyMultiplier: 0.5,
+        sellMultiplier: 0.5,
+        transportShipCapacity: 999999,
+        considerWorkforceForAutoFill: false,
+        workforceAuto: false,
+        manualWorkforce: 0,
+        useHQ: false,
+        showEmpireGaps: false
+      },
+      deps,
+      calculateInfrastructureModules: () => [],
+      calculateCanonicalFlows: (modules) => ({
+        productionFlows: modules.map((module, index) => {
+          const wareId = Object.keys(deps.modulesMap[module.id]!.outputs || {})[0]!
+          return {
+            wareId,
+            orderIndex: index,
+            tier: deps.waresMap[wareId]!.tier || 0,
+            transportType: 'container' as const,
+            unitVolume: 1,
+            production: 10,
+            consumption: 0,
+            netRate: 10,
+            contributions: []
+          }
+        }),
+        actualWorkforce: 0,
+        currentEfficiency: 1
+      })
+    })
+
+    expect(state.resolvedModules).toEqual([
+      { id: 'explicit_prod', count: 1 },
+      { id: 'recommended_prod', count: 1 },
+      { id: 'support_floor', count: 1 }
     ])
   })
 

@@ -9,6 +9,7 @@ import {
   calculateAutoHabitationModules,
   calculateProductionFlowsCore
 } from './calculateProductionFlows'
+import { buildEffectivePlannedModules, computeRecommendedPlanningSubset, mergeSavedModules, maxSavedModules } from './planningRecommendedModules'
 
 export interface ActiveStationState {
   actualWorkforce: number
@@ -16,6 +17,8 @@ export interface ActiveStationState {
   warePriorityLevels: Record<string, number>
   productionFlows: any[]
   plannedModules: SavedModule[]
+  effectivePlannedModules: SavedModule[]
+  recommendedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
@@ -54,6 +57,8 @@ export function buildActiveStationState(
       warePriorityLevels: {},
       productionFlows: [],
       plannedModules: [],
+      effectivePlannedModules: [],
+      recommendedModules: [],
       autoIndustryModules: [],
       autoHabitationModules: [],
       autoInfrastructureModules: [],
@@ -71,6 +76,8 @@ export function buildActiveStationState(
     warePriorityLevels: cache?.warePriorityLevels || {},
     productionFlows,
     plannedModules,
+    effectivePlannedModules: plannedModules,
+    recommendedModules: [],
     autoIndustryModules: autoIndustry,
     autoHabitationModules: autoHabitation,
     autoInfrastructureModules: [],
@@ -176,11 +183,23 @@ export function buildDerivedActiveStationState(
     return buildActiveStationState(stationId, plannedModules, cache)
   }
 
+  const recommendedSubset = input.referenceModules
+    ? computeRecommendedPlanningSubset(plannedModules, input.referenceModules, input.deps?.modulesMap || {})
+    : {
+        recommendedModuleIds: new Set<string>(),
+        recommendedGapModules: [],
+        recommendedDisplayModules: [],
+        effectivePlannedModules: plannedModules
+      }
+  const effectivePlannedModules = buildEffectivePlannedModules(
+    plannedModules,
+    recommendedSubset.recommendedDisplayModules
+  )
   const autoIndustry = cache?.autoIndustryModules || []
   const finalSupport = (!deps || deferSupportModules)
     ? null
     : deriveFinalSupportState({
-        plannedModules,
+        plannedModules: effectivePlannedModules,
         autoIndustryModules: autoIndustry,
         referenceModules,
         settings,
@@ -191,7 +210,12 @@ export function buildDerivedActiveStationState(
   const productionFlows = finalSupport?.productionFlows || cache.productionFlows || []
   const autoInfrastructure = finalSupport?.autoInfrastructureModules || []
 
-  const resolved = [...plannedModules, ...autoIndustry, ...autoHabitation, ...autoInfrastructure]
+  const resolved = [
+    ...effectivePlannedModules,
+    ...autoIndustry,
+    ...autoHabitation,
+    ...autoInfrastructure
+  ]
 
   return {
     actualWorkforce: finalSupport?.actualWorkforce || cache.actualWorkforce || 0,
@@ -199,6 +223,8 @@ export function buildDerivedActiveStationState(
     warePriorityLevels: cache.warePriorityLevels || {},
     productionFlows,
     plannedModules,
+    effectivePlannedModules,
+    recommendedModules: recommendedSubset.recommendedDisplayModules,
     autoIndustryModules: autoIndustry,
     autoHabitationModules: autoHabitation,
     autoInfrastructureModules: autoInfrastructure,
@@ -238,38 +264,6 @@ export function buildDerivedTransitState(
   }
 }
 
-function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
-  const counts = new Map<string, number>()
-  const order: string[] = []
-
-  for (const module of modules) {
-    if (!counts.has(module.id)) order.push(module.id)
-    counts.set(module.id, (counts.get(module.id) || 0) + module.count)
-  }
-
-  return order
-    .map((id) => ({ id, count: counts.get(id) || 0 }))
-    .filter((module) => module.count > 0)
-}
-
-function maxSavedModules(preferred: SavedModule[], fallback: SavedModule[]): SavedModule[] {
-  const preferredMerged = mergeSavedModules(preferred)
-  const fallbackMerged = mergeSavedModules(fallback)
-  const preferredCounts = new Map(preferredMerged.map((module) => [module.id, module.count]))
-  const fallbackCounts = new Map(fallbackMerged.map((module) => [module.id, module.count]))
-  const order = [
-    ...preferredMerged.map((module) => module.id),
-    ...fallbackMerged.map((module) => module.id).filter((id) => !preferredCounts.has(id))
-  ]
-
-  return order
-    .map((id) => ({
-      id,
-      count: Math.max(preferredCounts.get(id) || 0, fallbackCounts.get(id) || 0)
-    }))
-    .filter((module) => module.count > 0)
-}
-
 export interface CanonicalPlanningStationState extends ActiveStationState {
   finalPlannedModules: SavedModule[]
   effectiveTargetModules: SavedModule[]
@@ -299,7 +293,7 @@ export function buildCanonicalPlanningStationState(
   ])
   const canonicalBaseModules = maxSavedModules(
     [
-      ...input.planState.plannedModules,
+      ...input.planState.effectivePlannedModules,
       ...input.planState.autoIndustryModules
     ],
     archiveCurrentTotalModules

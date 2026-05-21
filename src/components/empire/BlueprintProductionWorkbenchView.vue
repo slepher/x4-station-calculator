@@ -105,10 +105,8 @@ const buildPlanPresenter = useBuildPlanPresenter({
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
         :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
         :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
-        :recommended-modules-expanded="planningPresenter.props.recommendedModulesExpanded.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
-        @update-recommended-modules-expanded="planningPresenter.emits.setRecommendedModulesExpanded"
       />
     </div>
 

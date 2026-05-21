@@ -136,4 +136,139 @@ describe('production phase boundary', () => {
       { id: 'habitat', count: 1 }
     ])
   })
+
+  it('uses effective planned ordering for flow and keeps recommended ahead of other floor modules', () => {
+    const flowMap = new StationDerivedMap({
+      modulesMap: {
+        explicit_prod: {
+          id: 'explicit_prod',
+          macroId: 'module_explicit_prod',
+          type: 'production',
+          method: 'default',
+          race: 'argon',
+          outputs: { explicit_ware: 10 },
+          inputs: {},
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any,
+        support_floor: {
+          id: 'support_floor',
+          macroId: 'module_support_floor',
+          type: 'production',
+          method: 'default',
+          race: 'argon',
+          outputs: { support_ware: 10 },
+          inputs: {},
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any,
+        recommended_prod: {
+          id: 'recommended_prod',
+          macroId: 'module_recommended_prod',
+          type: 'production',
+          method: 'default',
+          race: 'argon',
+          outputs: { recommended_ware: 10 },
+          inputs: { support_ware: 5 },
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any
+      },
+      waresMap: {
+        explicit_ware: { id: 'explicit_ware', transport: 'container', volume: 1, tier: 3 } as any,
+        recommended_ware: { id: 'recommended_ware', transport: 'container', volume: 1, tier: 2 } as any,
+        support_ware: { id: 'support_ware', transport: 'container', volume: 1, tier: 1 } as any
+      },
+      workforceConsumptionMap: {}
+    })
+
+    flowMap.upsertStation('station-ordered', {
+      modulesMode: 'plan',
+      modules: [{ id: 'explicit_prod', count: 1 }],
+      settings: {
+        ...DEFAULT_STATION_SETTINGS,
+        considerWorkforceForAutoFill: false,
+        workforceAuto: false,
+        racePreference: 'argon'
+      },
+      referenceModules: [
+        { id: 'support_floor', count: 1 },
+        { id: 'recommended_prod', count: 1 }
+      ]
+    })
+
+    const snapshot = flowMap.getSnapshot('station-ordered')
+    expect(snapshot?.fullModules).toEqual([
+      { id: 'explicit_prod', count: 1 },
+      { id: 'recommended_prod', count: 1 },
+      { id: 'support_floor', count: 1 }
+    ])
+
+    const cache = flowMap.getCache('station-ordered')
+    expect(cache?.productionFlows.map((flow) => flow.wareId)).toEqual([
+      'explicit_ware',
+      'recommended_ware',
+      'support_ware'
+    ])
+    expect(cache?.warePriorityLevels.recommended_ware).toBe(2)
+  })
+
+  it('does not treat reference floor energycells as planned ware by default', () => {
+    const flowMap = new StationDerivedMap({
+      modulesMap: {
+        planned_prod: {
+          id: 'planned_prod',
+          macroId: 'module_planned_prod',
+          type: 'production',
+          method: 'default',
+          race: 'argon',
+          outputs: { hullparts: 10 },
+          inputs: {},
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any,
+        reference_consumer: {
+          id: 'reference_consumer',
+          macroId: 'module_reference_consumer',
+          type: 'production',
+          method: 'default',
+          race: 'argon',
+          outputs: { intermediate_ware: 10 },
+          inputs: { energycells: 5 },
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any,
+        solar_floor: {
+          id: 'solar_floor',
+          macroId: 'module_solar_floor',
+          type: 'production',
+          method: 'default',
+          race: 'terran',
+          outputs: { energycells: 10 },
+          inputs: {},
+          workforce: { needed: 0, capacity: 0, maxBonus: 0 }
+        } as any
+      },
+      waresMap: {
+        hullparts: { id: 'hullparts', transport: 'container', volume: 1, tier: 2 } as any,
+        intermediate_ware: { id: 'intermediate_ware', transport: 'container', volume: 1, tier: 1 } as any,
+        energycells: { id: 'energycells', transport: 'container', volume: 1, tier: 1 } as any
+      },
+      workforceConsumptionMap: {}
+    })
+
+    flowMap.upsertStation('station-energy-floor', {
+      modulesMode: 'plan',
+      modules: [{ id: 'planned_prod', count: 1 }],
+      settings: {
+        ...DEFAULT_STATION_SETTINGS,
+        considerWorkforceForAutoFill: false,
+        workforceAuto: false,
+        racePreference: 'argon'
+      },
+      referenceModules: [
+        { id: 'solar_floor', count: 1 },
+        { id: 'reference_consumer', count: 1 }
+      ]
+    })
+
+    const cache = flowMap.getCache('station-energy-floor')
+    expect(cache?.warePriorityLevels.hullparts).toBe(2)
+    expect(cache?.warePriorityLevels.energycells).toBe(0)
+  })
 })

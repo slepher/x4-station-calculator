@@ -6,27 +6,19 @@ import type { SavedModule } from '@/types/x4'
 vi.mock('@/store/useGameDataStore', () => ({
   useGameDataStore: () => ({
     modulesMap: {
-      orphan_mod: {
-        id: 'orphan_mod',
-        inputs: {},
-        outputs: { chips: 100 }
-      },
-      support_mod: {
-        id: 'support_mod',
-        inputs: { energycells: 50 },
-        outputs: { hullparts: 100 }
-      },
-      energy_mod: {
-        id: 'energy_mod',
-        inputs: {},
-        outputs: { energycells: 200 }
-      }
+      orphan_mod: { id: 'orphan_mod', type: 'production', method: 'default' },
+      support_mod: { id: 'support_mod', type: 'production', method: 'default' },
+      energy_mod: { id: 'energy_mod', type: 'production', method: 'default' },
+      sol_terran: { id: 'sol_terran', type: 'production', method: 'default' },
+      habitat_mod: { id: 'habitat_mod', type: 'habitation', method: 'default' },
+      storage_mod: { id: 'storage_mod', type: 'storage', method: 'default' },
+      pier_mod: { id: 'pier_mod', type: 'pier', method: 'default' }
     }
   })
 }))
 
 describe('useProductionPlanningPresenter', () => {
-  it('computes archive diffs, orphan recommendations, and planned annotations', () => {
+  it('separates explicit planned modules from inline recommended display', () => {
     const plannedModules: SavedModule[] = [
       { id: 'orphan_mod', count: 1 },
       { id: 'energy_mod', count: 3 }
@@ -40,6 +32,10 @@ describe('useProductionPlanningPresenter', () => {
       context: {},
       stationState: {
         plannedModules,
+        recommendedModules: [
+          { id: 'orphan_mod', count: 4 },
+          { id: 'support_mod', count: 1 }
+        ],
         autoIndustryModules: [{ id: 'energy_mod', count: 5 }],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
@@ -54,11 +50,9 @@ describe('useProductionPlanningPresenter', () => {
           modules: [{ id: 'support_mod', count: 1 }]
         }
       },
-      recommendedModulesExpanded: false,
       moduleActions: {
         updatePlannedModules: vi.fn()
-      },
-      setRecommendedModulesExpanded: vi.fn()
+      }
     })
 
     const presenter = useProductionPlanningPresenter(store as any)
@@ -71,18 +65,13 @@ describe('useProductionPlanningPresenter', () => {
     expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
       { id: 'energy_mod', count: 5, diffAnnotation: '+3' }
     ])
-    expect(presenter.props.orphanArchiveModuleIds.value).toEqual(new Set(['orphan_mod', 'support_mod']))
     expect(presenter.props.recommendedModules.value).toEqual([
-      { id: 'orphan_mod', count: 3 },
-      { id: 'support_mod', count: 1 }
+      { id: 'orphan_mod', count: 4, isReferenceRecommended: true },
+      { id: 'support_mod', count: 1, isReferenceRecommended: true }
     ])
     expect(presenter.props.plannedModules.value).toEqual([
-      { id: 'orphan_mod', count: 1, diffAnnotation: '-3' },
       { id: 'energy_mod', count: 3, diffAnnotation: '+1' }
     ])
-
-    presenter.emits.setRecommendedModulesExpanded(true)
-    expect(store.setRecommendedModulesExpanded).toHaveBeenCalledWith(true)
   })
 
   it('removes stale diff annotation when planned count returns to archive total', () => {
@@ -94,6 +83,7 @@ describe('useProductionPlanningPresenter', () => {
       context: {},
       stationState: {
         plannedModules: [{ id: 'energy_mod', count: 2, diffAnnotation: '+1' }],
+        recommendedModules: [],
         autoIndustryModules: [{ id: 'energy_mod', count: 1 }],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
@@ -105,11 +95,9 @@ describe('useProductionPlanningPresenter', () => {
           modules: []
         }
       },
-      recommendedModulesExpanded: false,
       moduleActions: {
         updatePlannedModules: vi.fn()
-      },
-      setRecommendedModulesExpanded: vi.fn()
+      }
     })
 
     const presenter = useProductionPlanningPresenter(store as any)
@@ -119,6 +107,122 @@ describe('useProductionPlanningPresenter', () => {
     ])
     expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
       { id: 'energy_mod', count: 1, diffAnnotation: '-1' }
+    ])
+  })
+
+  it('shows floor production modules in auto industry as full set instead of delta only', () => {
+    const store = reactive({
+      session: {
+        workbenchMode: 'station',
+        visualMode: 'planning'
+      },
+      context: {},
+      stationState: {
+        plannedModules: [],
+        recommendedModules: [],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [],
+        finalPlannedModules: [{ id: 'sol_terran', count: 2 }],
+        resolvedModules: [{ id: 'sol_terran', count: 2 }],
+        enforceDlcActivation: false
+      },
+      archiveStation: {
+        modules: [{ id: 'sol_terran', count: 2 }],
+        building: {
+          modules: []
+        }
+      },
+      moduleActions: {
+        updatePlannedModules: vi.fn()
+      }
+    })
+
+    const presenter = useProductionPlanningPresenter(store as any)
+
+    expect(presenter.props.autoIndustryModules.value).toEqual([
+      { id: 'sol_terran', count: 2 }
+    ])
+    expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
+      { id: 'sol_terran', count: 2 }
+    ])
+  })
+
+  it('shows infrastructure modules as full target set instead of raw delta only', () => {
+    const store = reactive({
+      session: {
+        workbenchMode: 'station',
+        visualMode: 'planning'
+      },
+      context: {},
+      stationState: {
+        plannedModules: [],
+        recommendedModules: [],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [{ id: 'storage_mod', count: 1 }],
+        finalPlannedModules: [],
+        resolvedModules: [],
+        effectiveTargetModules: [{ id: 'storage_mod', count: 7 }],
+        enforceDlcActivation: false
+      },
+      archiveStation: {
+        modules: [{ id: 'storage_mod', count: 7 }],
+        building: {
+          modules: []
+        }
+      },
+      moduleActions: {
+        updatePlannedModules: vi.fn()
+      }
+    })
+
+    const presenter = useProductionPlanningPresenter(store as any)
+
+    expect(presenter.props.autoInfrastructureModules.value).toEqual([
+      { id: 'storage_mod', count: 7 }
+    ])
+    expect(presenter.props.effectiveAutoInfrastructureModules.value).toEqual([
+      { id: 'storage_mod', count: 7 }
+    ])
+  })
+
+  it('shows habitation modules as full target set instead of raw delta only', () => {
+    const store = reactive({
+      session: {
+        workbenchMode: 'station',
+        visualMode: 'planning'
+      },
+      context: {},
+      stationState: {
+        plannedModules: [],
+        recommendedModules: [],
+        autoIndustryModules: [],
+        autoHabitationModules: [{ id: 'habitat_mod', count: 1 }],
+        autoInfrastructureModules: [],
+        finalPlannedModules: [],
+        resolvedModules: [],
+        effectiveTargetModules: [{ id: 'habitat_mod', count: 4 }],
+        enforceDlcActivation: false
+      },
+      archiveStation: {
+        modules: [{ id: 'habitat_mod', count: 4 }],
+        building: {
+          modules: []
+        }
+      },
+      moduleActions: {
+        updatePlannedModules: vi.fn()
+      }
+    })
+
+    const presenter = useProductionPlanningPresenter(store as any)
+
+    expect(presenter.props.autoHabitationModules.value).toEqual([
+      { id: 'habitat_mod', count: 4 }
+    ])
+    expect(presenter.props.effectiveAutoHabitationModules.value).toEqual([
+      { id: 'habitat_mod', count: 4 }
     ])
   })
 })

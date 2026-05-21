@@ -6,10 +6,17 @@ import type { WorkforceEntry } from '@/types/saveArchive'
 import {
   calculateAutoHabitationModules,
   calculateAutoIndustryModules,
+  calculateAutoIndustryModulesWithFloor,
   calculateProductionFlowsCore,
   type CalculateProductionFlowsOutput
 } from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
+import {
+  buildEffectivePlannedModules,
+  computeRecommendedPlanningSubset,
+  mergeSavedModules,
+  maxSavedModules
+} from '@/store/logic/planningRecommendedModules'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import { solveMultiWareByLink } from '@/store/logic/sectorLinkFlow'
@@ -127,6 +134,7 @@ export interface StationDerivedSeed {
 
 interface PlanComputeResult extends CalculateProductionFlowsOutput {
   fullModules: SavedModule[]
+  effectivePlannedModules: SavedModule[]
 }
 
 const DEFAULT_DERIVED_SETTINGS: StationDerivedSettings = {
@@ -163,38 +171,6 @@ function normalizeLockedWares(lockedWares: string[] | undefined): string[] {
 
 function normalizeWarePriority(warePriority: Record<string, number> | undefined): Record<string, number> {
   return warePriority ? { ...warePriority } : {}
-}
-
-function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
-  const counts = new Map<string, number>()
-  const order: string[] = []
-
-  for (const module of modules) {
-    if (!counts.has(module.id)) order.push(module.id)
-    counts.set(module.id, (counts.get(module.id) || 0) + module.count)
-  }
-
-  return order
-    .map((id) => ({ id, count: counts.get(id) || 0 }))
-    .filter((module) => module.count > 0)
-}
-
-function maxSavedModules(preferred: SavedModule[], fallback: SavedModule[]): SavedModule[] {
-  const preferredMerged = mergeSavedModules(preferred)
-  const fallbackMerged = mergeSavedModules(fallback)
-  const preferredCounts = new Map(preferredMerged.map((module) => [module.id, module.count]))
-  const fallbackCounts = new Map(fallbackMerged.map((module) => [module.id, module.count]))
-  const order = [
-    ...preferredMerged.map((module) => module.id),
-    ...fallbackMerged.map((module) => module.id).filter((id) => !preferredCounts.has(id))
-  ]
-
-  return order
-    .map((id) => ({
-      id,
-      count: Math.max(preferredCounts.get(id) || 0, fallbackCounts.get(id) || 0)
-    }))
-    .filter((module) => module.count > 0)
 }
 
 function modulesEqual(a: SavedModule[], b: SavedModule[]): boolean {
@@ -564,17 +540,38 @@ export class StationDerivedMap {
     referenceModules?: SavedModule[]
   ): PlanComputeResult {
     const fullSettings = toFullSettingsForCompute(settings)
-    const autoIndustryModules = calculateAutoIndustryModules({
-      plannedModules: inputModules,
-      settings: fullSettings,
-      modulesMap: deps.modulesMap,
-      waresMap: deps.waresMap,
-      lockedWares,
-      referenceModules
-    })
+    const effectivePlannedInput = (referenceModules && referenceModules.length > 0)
+      ? buildEffectivePlannedModules(
+          inputModules,
+          computeRecommendedPlanningSubset(inputModules, referenceModules, deps.modulesMap).recommendedDisplayModules
+        )
+      : inputModules
+    const autoIndustryResult = (referenceModules && referenceModules.length > 0)
+      ? calculateAutoIndustryModulesWithFloor({
+          plannedModules: effectivePlannedInput,
+          settings: fullSettings,
+          modulesMap: deps.modulesMap,
+          waresMap: deps.waresMap,
+          lockedWares,
+          referenceModules
+        })
+      : {
+          autoIndustryModules: calculateAutoIndustryModules({
+            plannedModules: effectivePlannedInput,
+            settings: fullSettings,
+            modulesMap: deps.modulesMap,
+            waresMap: deps.waresMap,
+            lockedWares
+          }),
+          effectivePlannedModules: effectivePlannedInput
+        }
+    const autoIndustryModules = autoIndustryResult.autoIndustryModules
     const canonicalBaseModules = (referenceModules && referenceModules.length > 0)
       ? maxSavedModules(
-          [...inputModules, ...autoIndustryModules],
+          [
+            ...autoIndustryResult.effectivePlannedModules,
+            ...autoIndustryModules
+          ],
           referenceModules
         )
       : mergeSavedModules([
@@ -605,6 +602,7 @@ export class StationDerivedMap {
       productionFlows: coreResult.productionFlows,
       actualWorkforce: coreResult.actualWorkforce,
       currentEfficiency: coreResult.currentEfficiency,
+      effectivePlannedModules: effectivePlannedInput,
       fullModules: mergeSavedModules([
         ...canonicalBaseModules,
         ...autoHabitationModules
@@ -627,6 +625,7 @@ export class StationDerivedMap {
     let productionFlows: WareProductionFlow[]
     let actualWorkforce: number
     let currentEfficiency: number
+    let effectivePlannedModules = snapshot.inputModules
 
     if (snapshot.modulesMode === 'full') {
       const coreResult = calculateProductionFlowsCore({
@@ -657,11 +656,12 @@ export class StationDerivedMap {
       productionFlows = result.productionFlows
       actualWorkforce = result.actualWorkforce
       currentEfficiency = result.currentEfficiency
+      effectivePlannedModules = result.effectivePlannedModules
     }
 
     const allWareIds = productionFlows.map(f => f.wareId)
     const warePriorityLevels = buildResolvedWarePriority({
-      plannedModules: snapshot.inputModules,
+      plannedModules: effectivePlannedModules,
       autoIndustryModules,
       modulesMap: deps.modulesMap,
       userPriorityOverride: snapshot.warePriority || {}

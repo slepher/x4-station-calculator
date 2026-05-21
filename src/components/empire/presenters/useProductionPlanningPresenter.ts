@@ -1,9 +1,9 @@
 import { computed, type ComputedRef } from 'vue'
 import type { ProductionContextState, ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
-import type { SavedModule } from '@/types/x4'
+import type { SavedModule, X4Module } from '@/types/x4'
 import type { ArchiveStationData } from '@/types/saveArchive'
 import { useGameDataStore } from '@/store/useGameDataStore'
-
+import { mergeSavedModules } from '@/store/logic/planningRecommendedModules'
 function annotateDiff(module: SavedModule, totalMap: Record<string, number>): SavedModule {
   const archiveTotal = totalMap[module.id] || 0
   const diff = module.count - archiveTotal
@@ -33,9 +33,7 @@ export interface PlanningPresenterProps {
   effectiveAutoHabitationModules: ComputedRef<SavedModule[]>
   effectiveAutoInfrastructureModules: ComputedRef<SavedModule[]>
   archiveTotalMap: ComputedRef<Record<string, number>>
-  orphanArchiveModuleIds: ComputedRef<Set<string>>
   recommendedModules: ComputedRef<SavedModule[]>
-  recommendedModulesExpanded: ComputedRef<boolean>
   liveModules: ComputedRef<SavedModule[]>
   liveBuildingModules: ComputedRef<SavedModule[]>
   enforceDlcActivation: ComputedRef<boolean>
@@ -43,7 +41,6 @@ export interface PlanningPresenterProps {
 
 export interface PlanningPresenterEmits {
   updatePlannedModules: (modules: SavedModule[]) => void
-  setRecommendedModulesExpanded: (expanded: boolean) => void
 }
 
 export interface UseProductionPlanningPresenterReturn {
@@ -56,11 +53,9 @@ export interface PlanningPresenterStore {
   context: ProductionContextState
   stationState: ProductionStationState | null
   archiveStation?: ArchiveStationData | null
-  recommendedModulesExpanded?: boolean
   moduleActions: {
     updatePlannedModules(modules: SavedModule[]): void
   }
-  setRecommendedModulesExpanded?: (expanded: boolean) => void
 }
 
 export function useProductionPlanningPresenter(store: PlanningPresenterStore): UseProductionPlanningPresenterReturn {
@@ -83,80 +78,117 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const rawAutoHabitation = computed(() => store.stationState?.autoHabitationModules || [])
   const rawAutoInfrastructure = computed(() => store.stationState?.autoInfrastructureModules || [])
   const plannedModules = computed(() => store.stationState?.plannedModules || [])
+  const recommendedModules = computed(() => store.stationState?.recommendedModules || [])
+  const explicitPlannedCountMap = computed(() => {
+    return new Map(mergeSavedModules(plannedModules.value).map((module) => [module.id, module.count]))
+  })
+  const effectiveTargetModules = computed(() => store.stationState?.effectiveTargetModules || [])
+  const finalPlannedModules = computed(() => store.stationState?.finalPlannedModules || [])
+  const resolvedModules = computed(() => store.stationState?.resolvedModules || [])
 
-  const orphanArchiveModuleIds = computed<Set<string>>(() => {
-    const archiveModuleIds = Array.from(new Set([
-      ...liveModules.value.map(module => module.id),
-      ...liveBuildingModules.value.map(module => module.id)
-    ]))
-    if (archiveModuleIds.length === 0) return new Set()
+  const plannedDisplayModules = computed(() => {
+    const recommendedIds = new Set(recommendedModules.value.map((module) => module.id))
+    const visibleExplicitModules = plannedModules.value.filter((module) => !recommendedIds.has(module.id))
+    return visibleExplicitModules.map((module) => annotateDiff(module, archiveTotalMap.value))
+  })
 
-    const archiveDefinitions = archiveModuleIds
-      .map(moduleId => gameDataStore.modulesMap[moduleId])
-      .filter((module): module is NonNullable<typeof module> => Boolean(module))
+  const recommendedDisplayModules = computed(() => {
+    return recommendedModules.value.map((module) => ({
+      ...annotateDiff(module, archiveTotalMap.value),
+      isReferenceRecommended: true
+    }))
+  })
 
-    const orphanIds = new Set<string>()
-    archiveDefinitions.forEach((module) => {
-      const outputWareIds = Object.keys(module.outputs || {})
-      if (outputWareIds.length === 0) return
-
-      const isOrphan = outputWareIds.some((wareId) => {
-        return !archiveDefinitions.some((otherModule) => {
-          if (otherModule.id === module.id) return false
-          return (otherModule.inputs?.[wareId] || 0) > 0
-        })
-      })
-
-      if (isOrphan) {
-        orphanIds.add(module.id)
+  const displaySource = computed(() => {
+    if (effectiveTargetModules.value.length > 0) {
+      return {
+        mode: 'target' as const,
+        modules: effectiveTargetModules.value
       }
-    })
-
-    return orphanIds
+    }
+    if (finalPlannedModules.value.length > 0) {
+      return {
+        mode: 'final' as const,
+        modules: finalPlannedModules.value
+      }
+    }
+    if (resolvedModules.value.length > 0) {
+      return {
+        mode: 'resolved' as const,
+        modules: resolvedModules.value
+      }
+    }
+    return {
+      mode: 'raw' as const,
+      modules: [] as SavedModule[]
+    }
   })
 
-  const recommendedModules = computed<SavedModule[]>(() => {
-    if (orphanArchiveModuleIds.value.size === 0) return []
+  function buildEffectiveAutoDisplayModules(
+    rawModules: SavedModule[],
+    isTargetModule: (info: X4Module) => boolean,
+    options?: { excludeRecommended?: boolean }
+  ): SavedModule[] {
+    const sourceMode = displaySource.value.mode
+    const sourceModules = sourceMode === 'raw' ? rawModules : displaySource.value.modules
+    const recommendedIds = options?.excludeRecommended
+      ? new Set(recommendedModules.value.map((module) => module.id))
+      : null
 
-    const plannedCountMap = plannedModules.value.reduce<Record<string, number>>((map, module) => {
-      map[module.id] = (map[module.id] || 0) + module.count
-      return map
-    }, {})
-
-    return Object.entries(archiveTotalMap.value)
-      .filter(([moduleId, archiveTotal]) => {
-        if (!orphanArchiveModuleIds.value.has(moduleId)) return false
-        return (plannedCountMap[moduleId] || 0) < archiveTotal
+    return mergeSavedModules(
+      sourceModules.filter((module) => {
+        if (recommendedIds?.has(module.id)) return false
+        const info = gameDataStore.modulesMap[module.id] as X4Module | undefined
+        if (!info || !isTargetModule(info)) return false
+        if (sourceMode === 'raw') return true
+        const explicitPlannedCount = explicitPlannedCountMap.value.get(module.id) || 0
+        return module.count > explicitPlannedCount
       })
-      .map(([moduleId, archiveTotal]) => ({
-        id: moduleId,
-        count: archiveTotal - (plannedCountMap[moduleId] || 0)
-      }))
-  })
+    ).map((module) => annotateDiff(module, archiveTotalMap.value))
+  }
+
+  const effectiveAutoIndustryDisplayModules = computed(() =>
+    buildEffectiveAutoDisplayModules(
+      rawAutoIndustry.value,
+      (info) => info.type === 'production' && info.method !== 'recycling',
+      { excludeRecommended: true }
+    )
+  )
+
+  const effectiveAutoHabitationDisplayModules = computed(() =>
+    buildEffectiveAutoDisplayModules(
+      rawAutoHabitation.value,
+      (info) => info.type === 'habitation' || info.type.includes('habitat')
+    )
+  )
+
+  const effectiveAutoInfrastructureDisplayModules = computed(() =>
+    buildEffectiveAutoDisplayModules(
+      rawAutoInfrastructure.value,
+      (info) => info.type === 'storage' || info.type === 'pier'
+    )
+  )
 
   const props: PlanningPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
     hasArchive: computed(() => store.archiveStation != null),
-    plannedModules: computed(() => plannedModules.value.map(module => annotateDiff(module, archiveTotalMap.value))),
-    autoIndustryModules: computed(() => rawAutoIndustry.value),
-    autoHabitationModules: computed(() => rawAutoHabitation.value),
-    autoInfrastructureModules: computed(() => rawAutoInfrastructure.value),
-    effectiveAutoIndustryModules: computed(() => rawAutoIndustry.value.map(module => annotateDiff(module, archiveTotalMap.value))),
-    effectiveAutoHabitationModules: computed(() => rawAutoHabitation.value.map(module => annotateDiff(module, archiveTotalMap.value))),
-    effectiveAutoInfrastructureModules: computed(() => rawAutoInfrastructure.value.map(module => annotateDiff(module, archiveTotalMap.value))),
+    plannedModules: plannedDisplayModules,
+    autoIndustryModules: effectiveAutoIndustryDisplayModules,
+    autoHabitationModules: effectiveAutoHabitationDisplayModules,
+    autoInfrastructureModules: effectiveAutoInfrastructureDisplayModules,
+    effectiveAutoIndustryModules: effectiveAutoIndustryDisplayModules,
+    effectiveAutoHabitationModules: effectiveAutoHabitationDisplayModules,
+    effectiveAutoInfrastructureModules: effectiveAutoInfrastructureDisplayModules,
     archiveTotalMap,
-    orphanArchiveModuleIds,
-    recommendedModules,
-    recommendedModulesExpanded: computed(() => store.recommendedModulesExpanded ?? false),
+    recommendedModules: recommendedDisplayModules,
     liveModules,
     liveBuildingModules,
     enforceDlcActivation: computed(() => store.stationState?.enforceDlcActivation ?? false)
   }
 
   const emits: PlanningPresenterEmits = {
-    updatePlannedModules: (modules) => store.moduleActions.updatePlannedModules(modules),
-    setRecommendedModulesExpanded: (expanded) => store.setRecommendedModulesExpanded?.(expanded)
+    updatePlannedModules: (modules) => store.moduleActions.updatePlannedModules(modules)
   }
 
   return { props, emits }

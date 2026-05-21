@@ -92,6 +92,8 @@ export interface ProductionStationState {
   count?: number
   minerals?: string[]
   plannedModules: SavedModule[]
+  effectivePlannedModules?: SavedModule[]
+  recommendedModules: SavedModule[]
   resolvedModules: SavedModule[]
   modules: SavedModule[]
   buildingModules: SavedModule[]

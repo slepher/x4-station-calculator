@@ -219,13 +219,11 @@ const showArchiveModuleList = computed(() => {
         :effective-auto-habitation-modules="planningPresenter.props.effectiveAutoHabitationModules.value"
         :effective-auto-infrastructure-modules="planningPresenter.props.effectiveAutoInfrastructureModules.value"
         :archive-total-map="planningPresenter.props.archiveTotalMap.value"
-        :recommended-modules-expanded="planningPresenter.props.recommendedModulesExpanded.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         :show-archive="planningPresenter.props.visualMode.value === 'live'"
         :archive-modules="planningPresenter.props.liveModules.value"
         :building-modules="planningPresenter.props.liveBuildingModules.value"
         @update-planned-modules="planningPresenter.emits.updatePlannedModules"
-        @update-recommended-modules-expanded="planningPresenter.emits.setRecommendedModulesExpanded"
       />
     </div>
 
