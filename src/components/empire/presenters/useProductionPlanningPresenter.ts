@@ -100,14 +100,22 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const plannedDisplayModules = computed(() => {
     const recommendedIds = new Set(recommendedModules.value.map((module) => module.id))
     const visibleExplicitModules = plannedModules.value.filter((module) => !recommendedIds.has(module.id))
+    if (globalThis?.location?.href?.includes('localhost')) {
+      console.log('[planDisplay] visibleExplicitModules:', visibleExplicitModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    }
     return visibleExplicitModules
       .filter((module) => {
         if (!store.archiveStation) return true
         const archiveTotal = archiveTotalMap.value[module.id] || 0
-        const totalCount = module.count + (autoModulesCountMap.value.get(module.id) || 0)
+        const autoCount = autoModulesCountMap.value.get(module.id) || 0
+        const totalCount = module.count + autoCount
         const plannedCoversArchive = module.count > archiveTotal
         const totalExceedsArchive = totalCount > archiveTotal
-        return plannedCoversArchive || !totalExceedsArchive
+        const keep = plannedCoversArchive || !totalExceedsArchive
+        if (globalThis?.location?.href?.includes('localhost')) {
+          console.log(`[planDisplay] ${keep ? 'KEEP' : 'HIDE'} id=${module.id} planned=${module.count} archive=${archiveTotal} auto=${autoCount} total=${totalCount}`)
+        }
+        return keep
       })
       .map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
   })
