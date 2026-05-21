@@ -86,6 +86,13 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const explicitPlannedCountMap = computed(() => {
     return new Map(mergeSavedModules(plannedModules.value).map((module) => [module.id, module.count]))
   })
+  const autoModulesCountMap = computed(() => {
+    const map = new Map<string, number>()
+    for (const m of rawAutoIndustry.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
+    for (const m of rawAutoHabitation.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
+    for (const m of rawAutoInfrastructure.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
+    return map
+  })
   const effectiveTargetModules = computed(() => store.stationState?.effectiveTargetModules || [])
   const finalPlannedModules = computed(() => store.stationState?.finalPlannedModules || [])
   const resolvedModules = computed(() => store.stationState?.resolvedModules || [])
@@ -93,7 +100,16 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const plannedDisplayModules = computed(() => {
     const recommendedIds = new Set(recommendedModules.value.map((module) => module.id))
     const visibleExplicitModules = plannedModules.value.filter((module) => !recommendedIds.has(module.id))
-    return visibleExplicitModules.map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
+    return visibleExplicitModules
+      .filter((module) => {
+        if (!store.archiveStation) return true
+        const archiveTotal = archiveTotalMap.value[module.id] || 0
+        const totalCount = module.count + (autoModulesCountMap.value.get(module.id) || 0)
+        const plannedCoversArchive = module.count > archiveTotal
+        const totalExceedsArchive = totalCount > archiveTotal
+        return plannedCoversArchive || !totalExceedsArchive
+      })
+      .map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
   })
 
   const recommendedDisplayModules = computed(() => {
