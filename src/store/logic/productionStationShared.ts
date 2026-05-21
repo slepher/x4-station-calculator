@@ -301,13 +301,6 @@ export function buildCanonicalPlanningStationState(
       : []
   )
 
-  if (globalThis?.location?.href?.includes('localhost')) {
-    console.log('[canonical] effectivePlannedModules:', input.planState.effectivePlannedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-    console.log('[canonical] autoIndustryModules (planState):', input.planState.autoIndustryModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-    console.log('[canonical] archiveCurrentTotal:', archiveCurrentTotalModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-    console.log('[canonical] canonicalBaseModules:', canonicalBaseModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-  }
-
   const autoHabitationModules = !input.deps
     ? input.planState.autoHabitationModules
     : calculateAutoHabitationModules({
@@ -373,14 +366,6 @@ export function buildCanonicalPlanningStationState(
     ...autoHabitationModules,
     ...autoInfrastructureModules
   ]
-
-  if (globalThis?.location?.href?.includes('localhost')) {
-    console.log('[canonical] autoHabitationModules:', autoHabitationModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-    console.log('[canonical] autoInfrastructureModules:', autoInfrastructureModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-    console.log('[canonical] finalPlannedModules:', finalPlannedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-    console.log('[canonical] effectiveTargetModules:', effectiveTargetModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-    console.log('[canonical] resolvedModules:', resolvedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-  }
 
   return {
     ...input.planState,
