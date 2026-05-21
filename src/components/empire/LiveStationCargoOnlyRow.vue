@@ -23,29 +23,33 @@ const currentWidth = computed(() => toPercent(props.currentCount, scaleMaxCount.
 
 <template>
   <div class="item-container">
-    <div class="main-row">
-      <div class="label-group">
-        <span class="header-name" :title="name">{{ name }}</span>
-      </div>
-      <div class="bar-shell">
-        <div class="bar-target" :style="{ width: `${targetWidth}%` }"></div>
-        <div class="bar-current" :style="{ width: `${currentWidth}%` }"></div>
-        <div class="bar-text">
-          <span class="bar-current-text">{{ formatCount(currentCount) }}</span>
-          <span class="bar-separator">/</span>
-          <span class="bar-target-text">{{ formatCount(targetCount) }}</span>
+    <div class="flow-wrapper">
+      <div class="main-row">
+        <div class="label-group">
+          <span class="header-name" :title="name">{{ name }}</span>
         </div>
+        <div class="bar-shell">
+          <div class="bar-target" :style="{ width: `${targetWidth}%` }"></div>
+          <div class="bar-current" :style="{ width: `${currentWidth}%` }"></div>
+          <div class="bar-text">
+            <span class="bar-current-text">{{ formatCount(currentCount) }}</span>
+            <span class="bar-separator">/</span>
+            <span class="bar-target-text">{{ formatCount(targetCount) }}</span>
+          </div>
+        </div>
+        <div class="recommended-block"></div>
       </div>
-      <div class="recommended-block"></div>
+      <div class="flow-action-spacer"></div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .item-container { @apply mb-1 select-none; }
+.flow-wrapper { @apply flex items-start gap-1; }
 .main-row {
-  @apply grid items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded transition-colors border border-transparent gap-3;
-  grid-template-columns: minmax(0, 1fr) minmax(13rem, 22rem) 4.5rem;
+  @apply grid flex-1 min-w-0 items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded transition-colors border border-transparent gap-3;
+  grid-template-columns: minmax(calc(6.5em + 1.25rem), 1fr) minmax(12rem, 18rem) 5.75rem;
 }
 .label-group { @apply flex items-center gap-2 min-w-0; }
 .header-name { @apply text-sm text-slate-300 truncate; }
@@ -56,5 +60,6 @@ const currentWidth = computed(() => toPercent(props.currentCount, scaleMaxCount.
 .bar-current-text { @apply text-cyan-100; }
 .bar-target-text { @apply text-sky-100; }
 .bar-separator { @apply text-slate-300; }
-.recommended-block { @apply w-[4.5rem]; }
+.recommended-block { @apply w-[5.75rem]; }
+.flow-action-spacer { @apply w-20 h-8 flex-none; }
 </style>

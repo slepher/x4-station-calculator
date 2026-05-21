@@ -2,14 +2,26 @@
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import type { LiveVolumeAllocationDetailSection } from '@/types/production-workbench-contract'
+import FavoriteButton from '../common/FavoriteButton.vue'
+import LockButton from '../common/LockButton.vue'
 
 const props = defineProps<{
+  wareId: string
   name: string
   currentCount: number
   targetCount: number
   recommendedCount: number
   scaleMaxCount: number
   detailSections: LiveVolumeAllocationDetailSection[]
+  locked?: boolean
+  priorityLevel?: number
+  nonOperable?: boolean
+  isPlanned?: boolean
+  resourceBufferHours?: number
+  primaryProductBufferHours?: number
+  secondaryProductBufferHours?: number
+  onToggleWareLock?: (wareId: string) => void
+  onToggleWarePriority?: (wareId: string) => void
 }>()
 
 const { t } = useI18n()
@@ -45,45 +57,75 @@ const currentWidth = computed(() => toPercent(props.currentCount, props.scaleMax
 const recommendedLeft = computed(() => toPercent(props.recommendedCount, props.scaleMaxCount))
 const isExpandable = computed(() => props.detailSections.length > 0)
 const downstreamOpen = ref(false)
+const availableLevels = computed(() => props.isPlanned ? [1, 2] : [0, 1, 2])
+
+function handleToggleLock() {
+  props.onToggleWareLock?.(props.wareId)
+}
+
+function handleTogglePriority() {
+  props.onToggleWarePriority?.(props.wareId)
+}
 </script>
 
 <template>
   <div class="item-container">
-    <div
-      :class="[
-        'main-row',
-        isExpandable ? 'main-row-hover cursor-pointer' : 'cursor-default',
-        { 'is-active': isOpen && isExpandable }
-      ]"
-      @click="isExpandable && (isOpen = !isOpen)"
-    >
-      <div class="label-group">
-        <span class="arrow" :class="{ 'arrow-open': isOpen }" v-if="isExpandable" aria-hidden="true">
-          <svg viewBox="0 0 12 12" class="arrow-icon">
-            <path d="M3 2.5L9 6L3 9.5V2.5Z" fill="currentColor" />
-          </svg>
-        </span>
-        <span class="header-name" :title="name">{{ name }}</span>
-      </div>
+    <div class="flow-wrapper">
+      <div
+        :class="[
+          'main-row',
+          isExpandable ? 'main-row-hover cursor-pointer' : 'cursor-default',
+          { 'is-active': isOpen && isExpandable }
+        ]"
+        @click="isExpandable && (isOpen = !isOpen)"
+      >
+        <div class="label-group">
+          <span class="arrow" :class="{ 'arrow-open': isOpen }" v-if="isExpandable" aria-hidden="true">
+            <svg viewBox="0 0 12 12" class="arrow-icon">
+              <path d="M3 2.5L9 6L3 9.5V2.5Z" fill="currentColor" />
+            </svg>
+          </span>
+          <span class="header-name" :title="name">{{ name }}</span>
+        </div>
 
-      <div class="bar-shell">
-        <div class="bar-target" :style="{ width: `${targetWidth}%` }"></div>
-        <div class="bar-current" :style="{ width: `${currentWidth}%` }"></div>
-        <div class="bar-recommended" :style="{ left: `${recommendedLeft}%` }"></div>
-        <div class="bar-text">
-          <span class="bar-current-text">{{ formatCount(currentCount) }}</span>
-          <span class="bar-separator">/</span>
-          <span class="bar-target-text">{{ formatCount(targetCount) }}</span>
+        <div class="bar-shell">
+          <div class="bar-target" :style="{ width: `${targetWidth}%` }"></div>
+          <div class="bar-current" :style="{ width: `${currentWidth}%` }"></div>
+          <div class="bar-recommended" :style="{ left: `${recommendedLeft}%` }"></div>
+          <div class="bar-text">
+            <span class="bar-current-text">{{ formatCount(currentCount) }}</span>
+            <span class="bar-separator">/</span>
+            <span class="bar-target-text">{{ formatCount(targetCount) }}</span>
+          </div>
+        </div>
+
+        <div class="recommended-block" :title="t('wareflow.allocation_rec')">
+          <span class="recommended-count">{{ formatCount(recommendedCount) }}</span>
+          <svg class="recommended-icon" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
+            <path d="m3.3 7 8.7 5 8.7-5"/>
+            <path d="M12 22V12"/>
+          </svg>
         </div>
       </div>
 
-      <div class="recommended-block" :title="t('wareflow.allocation_rec')">
-        <span class="recommended-count">{{ formatCount(recommendedCount) }}</span>
-        <svg class="recommended-icon" viewBox="0 0 24 24" fill="none" stroke="#fbbf24" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"/>
-          <path d="m3.3 7 8.7 5 8.7-5"/>
-          <path d="M12 22V12"/>
-        </svg>
+      <div class="flow-action-rail">
+        <FavoriteButton
+          :level="priorityLevel ?? 0"
+          :disabled="false"
+          :has-consumption="true"
+          :has-production="true"
+          :resource-buffer-hours="resourceBufferHours ?? 1"
+          :primary-product-buffer-hours="primaryProductBufferHours ?? 12"
+          :secondary-product-buffer-hours="secondaryProductBufferHours ?? 2"
+          :available-levels="availableLevels"
+          @update:level="handleTogglePriority"
+        />
+        <LockButton
+          :locked="locked ?? false"
+          :disabled="nonOperable ?? false"
+          @update:locked="handleToggleLock"
+        />
       </div>
     </div>
 
@@ -147,9 +189,10 @@ const downstreamOpen = ref(false)
 
 <style scoped>
 .item-container { @apply mb-1 select-none; }
+.flow-wrapper { @apply flex items-start gap-1; }
 .main-row {
-  @apply grid items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded transition-colors border border-transparent gap-3;
-  grid-template-columns: minmax(0, 1fr) minmax(13rem, 22rem) 4.5rem;
+  @apply grid flex-1 min-w-0 items-center h-8 px-3 py-0.5 bg-slate-800/40 rounded transition-colors border border-transparent gap-3;
+  grid-template-columns: minmax(calc(6.5em + 1.25rem), 1fr) minmax(12rem, 18rem) 5.75rem;
 }
 .main-row-hover { @apply hover:bg-slate-700/50; }
 .is-active { @apply border-slate-600/50 bg-slate-700/40; }
@@ -173,6 +216,7 @@ const downstreamOpen = ref(false)
 .recommended-block { @apply flex items-center justify-end gap-1 text-amber-300 font-mono text-sm; }
 .recommended-count { @apply leading-none; }
 .recommended-icon { @apply w-3.5 h-3.5 shrink-0; }
+.flow-action-rail { @apply w-20 h-8 flex-none flex items-center justify-center gap-2 bg-slate-800/40 rounded; }
 
 .list-box { @apply bg-slate-900/60 mx-1 px-4 py-2 text-[11px] rounded-b border-x border-b border-slate-700/30 overflow-hidden; }
 .detail-section { @apply mb-3 last:mb-0; }

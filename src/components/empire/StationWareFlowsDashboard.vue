@@ -238,6 +238,15 @@ const hasLiveAllocationData = computed(() =>
         v-if="isAllocationVolumeMode"
         :groups="props.liveVolumeAllocationGroups || []"
         :cargo-only-items="props.liveCargoOnlyItems || []"
+        :is-ware-locked="props.isWareLocked"
+        :get-resolved-level="props.getResolvedLevel"
+        :is-ware-operable="props.isWareOperable"
+        :is-planned-ware="props.isPlannedWare"
+        :on-toggle-ware-lock="props.onToggleWareLock"
+        :on-toggle-ware-priority="props.onToggleWarePriority"
+        :resource-buffer-hours="props.settings.resourceBufferHours"
+        :primary-product-buffer-hours="props.settings.primaryProductBufferHours"
+        :secondary-product-buffer-hours="props.settings.secondaryProductBufferHours"
       />
 
       <div v-else-if="viewMode === 'volume'" class="volume-groups-container" data-testid="volume-groups">

@@ -9,6 +9,15 @@ import LiveStationCargoOnlyRow from './LiveStationCargoOnlyRow.vue'
 const props = defineProps<{
   groups: LiveVolumeAllocationGroup[]
   cargoOnlyItems: LiveCargoOnlyItem[]
+  isWareLocked?: (wareId: string) => boolean
+  getResolvedLevel?: (wareId: string) => number
+  isWareOperable?: (wareId: string) => boolean
+  isPlannedWare?: (wareId: string) => boolean
+  onToggleWareLock?: (wareId: string) => void
+  onToggleWarePriority?: (wareId: string) => void
+  resourceBufferHours?: number
+  primaryProductBufferHours?: number
+  secondaryProductBufferHours?: number
 }>()
 
 const { t } = useI18n()
@@ -46,12 +55,22 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
       <LiveStationAllocationRow
         v-for="item in group.items"
         :key="item.wareId"
+        :ware-id="item.wareId"
         :name="item.name"
         :current-count="item.currentCount"
         :target-count="item.targetCount"
         :recommended-count="item.recommendedCount"
         :scale-max-count="item.scaleMaxCount"
         :detail-sections="item.detailSections"
+        :locked="props.isWareLocked?.(item.wareId) ?? false"
+        :priority-level="props.getResolvedLevel?.(item.wareId) ?? 0"
+        :non-operable="!(props.isWareOperable?.(item.wareId) ?? true)"
+        :is-planned="props.isPlannedWare?.(item.wareId) ?? false"
+        :resource-buffer-hours="props.resourceBufferHours ?? 1"
+        :primary-product-buffer-hours="props.primaryProductBufferHours ?? 12"
+        :secondary-product-buffer-hours="props.secondaryProductBufferHours ?? 2"
+        :on-toggle-ware-lock="props.onToggleWareLock"
+        :on-toggle-ware-priority="props.onToggleWarePriority"
       />
     </section>
 
