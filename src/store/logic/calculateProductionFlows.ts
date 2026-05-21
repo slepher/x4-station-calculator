@@ -13,7 +13,7 @@ import {
   getProductionEfficiency
 } from './bestModuleSelector'
 import { calculateWorkforceCensus } from './calculatorUtils'
-import { getReferenceProductionFloorModules } from './planningRecommendedModules'
+import { getReferenceProductionFloorModules, maxSavedModules, mergeSavedModules } from './planningRecommendedModules'
 import {
   calculateWorkforceBreakdown,
   calculateActualWorkforce,
@@ -48,21 +48,12 @@ export function calculateAutoIndustryModules(
   const race = settings.racePreference
   const globalWorkforceBonus = settings.considerWorkforceForAutoFill
   const industryModules: Record<string, number> = {}
-  const productionFloorModules = input.referenceModules
-    ? getReferenceProductionFloorModules(input.referenceModules, modulesMap)
-    : []
   plannedModules.forEach(m => {
     industryModules[m.id] = (industryModules[m.id] || 0) + m.count
   })
-  for (const m of productionFloorModules) {
-    industryModules[m.id] = Math.max(industryModules[m.id] || 0, m.count)
-  }
 
   if (globalThis?.location?.href?.includes('localhost')) {
     console.log('[autoFill:calc] >>> START plannedModules:', plannedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
-    if (productionFloorModules.length > 0) {
-      console.log('[autoFill:calc] productionFloorModules:', productionFloorModules.map(m => `${m.id} x${m.count}`).join(', '))
-    }
     console.log('[autoFill:calc] sunlight:', settings.sunlight, 'workforceBonus:', globalWorkforceBonus)
   }
 
@@ -151,7 +142,16 @@ export function calculateAutoIndustryModulesWithFloor(
     console.log('[autoFill:floor] referenceProductionFloor:', referenceProductionFloorModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
   }
 
-  const autoIndustryModules = calculateAutoIndustryModules(input)
+  const effectivePlanned = maxSavedModules(input.plannedModules, referenceProductionFloorModules)
+  const baseAuto = calculateAutoIndustryModules({
+    ...input,
+    plannedModules: effectivePlanned
+  })
+  const floorBeyondPlanned = referenceProductionFloorModules.map(m => ({
+    id: m.id,
+    count: Math.max(0, m.count - (input.plannedModules.find(p => p.id === m.id)?.count || 0))
+  })).filter(m => m.count > 0)
+  const autoIndustryModules = mergeSavedModules([...baseAuto, ...floorBeyondPlanned])
 
   return {
     autoIndustryModules
