@@ -152,6 +152,7 @@ export function calculateAutoIndustryModulesWithFloor(
     count: Math.max(0, m.count - (input.plannedModules.find(p => p.id === m.id)?.count || 0))
   })).filter(m => m.count > 0)
   const autoIndustryModules = mergeSavedModules([...baseAuto, ...floorBeyondPlanned])
+    .sort((a, b) => (input.modulesMap[b.id]?.tier || 0) - (input.modulesMap[a.id]?.tier || 0))
 
   return {
     autoIndustryModules
