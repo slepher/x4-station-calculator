@@ -93,9 +93,8 @@ const moduleDiffClass = computed(() => {
             :class="moduleDiffClass"
           >{{ moduleDiffAnnotation }}</span>
         </div>
-        <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'">
-          {{ dlcLabel }}
-        </span>
+        <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'"
+          :title="dlcLabel">[DLC]</span>
       </div>
     </div>
 
@@ -215,7 +214,7 @@ const moduleDiffClass = computed(() => {
 }
 
 .dlc-tag {
-  @apply inline-flex max-w-[110px] flex-shrink-0 items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+  @apply inline-flex flex-shrink-0 items-center rounded-md border px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wide cursor-default;
 }
 
 .dlc-tag--active {
