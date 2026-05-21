@@ -98,10 +98,12 @@ export function computeRecommendedPlanningSubset(
       id: module.id,
       count: module.count - plannedCount
     })
-    recommendedDisplayModules.push({
-      id: module.id,
-      count: module.count
-    })
+    if (plannedCount === 0) {
+      recommendedDisplayModules.push({
+        id: module.id,
+        count: module.count
+      })
+    }
   })
 
   return {
