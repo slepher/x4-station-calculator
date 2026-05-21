@@ -125,7 +125,7 @@ recommended subset 产出的 ware 在 priority 语义上 SHALL 等同于 planned
 
 ### Requirement: Recommended Item Interaction Matches Applied State
 
-planning 区中 recommended items 的交互语义 MUST 与“recommended modules 已属于 planned baseline”一致。
+planning 区中 recommended items 的交互语义 MUST 与"recommended modules 已属于 planned baseline"一致。
 
 #### Scenario: clicking recommended module promotes it to explicit planned total
 
@@ -140,3 +140,27 @@ planning 区中 recommended items 的交互语义 MUST 与“recommended modules
 **当** 系统渲染 planning 列表
 **那么** 该模块 MUST 使用虚线前置或等价弱视觉标记区分来源
 **并且** 该标记 MUST 与普通 planned module 并列出现在同一 planning 列表中
+
+#### Scenario: recommended module count cannot go below archive
+
+**前提** 某个 planned module 也存在于 `recommendedModules` 中
+**当** 用户修改该模块的 count
+**那么** 系统 MUST NOT 允许 `count < archiveTotal`
+**并且** 输入框 MUST 在 `count < archiveTotal` 时标红
+**并且** X4NumberInput MUST 将 `min` 设为 `archiveTotal`
+
+#### Scenario: non-recommended module can go below archive
+
+**前提** 某个 planned module 不存在于 `recommendedModules` 中
+**当** 用户修改该模块的 count
+**那么** 系统 MUST 允许 `count < archiveTotal`
+**并且** 输入框 MUST NOT 标红
+**并且** auto region MUST 通过 floor 机制补全缺口
+
+#### Scenario: explicitly planned modules are not added to recommended display
+
+**前提** 用户已在 `plannedModules` 中显式规划了某个 orphan 模块
+**当** 系统计算 `recommendedDisplayModules`
+**那么** 该模块 MUST NOT 出现在 `recommendedDisplayModules` 中
+**并且** 仍须计入 `recommendedGapModules` 供 autoFill 基线使用
+**并且** 该模块 MUST 在 `plannedDisplayModules` 中保持可见

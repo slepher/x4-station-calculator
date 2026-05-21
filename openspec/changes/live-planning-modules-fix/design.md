@@ -190,6 +190,39 @@ calculateAutoIndustryModulesWithFloor(...)
 
 这样既保留“已生效”的计算真相，也保留用户把推荐项转成显式规划的可控交互。
 
+## planned 区 count 交互规则
+
+### 推荐模块输入限制
+
+对于已存在于 `recommendedModules` 的 planned 模块：
+
+- X4NumberInput `min = archiveTotal`，无法手动输入低于 archive 的值
+- `handleUpdateModuleCount` 也会 clamp 到 `>= archive`
+- `isBelowThreshold`（红色）仅在 `isRecommended` 为真且 `count < archive` 时生效
+- × 按钮正常删除
+
+### 非推荐模块
+
+对于不存在于 `recommendedModules` 的 planned 模块：
+
+- X4NumberInput `min = 1`
+- 允许输入 `< archive`，auto region 会通过 floor 机制补全缺口
+- 输入数量不标红（`isBelowThreshold` 不生效）
+
+### recommended display 过滤规则
+
+`computeRecommendedPlanningSubset` 中，只有 `plannedCount === 0` 的 orphan 模块才被加入 `recommendedDisplayModules`。用户已显式规划的模块（`plannedCount > 0`）不会进入推荐显示集，从而不被 `plannedDisplayModules` 的 `recommendedIds` 过滤掉，保持其在 planned 区的可见性。
+
+## X4NumberInput 交互
+
+通用数字输入组件 `X4NumberInput` 使用以下确认策略：
+
+- `handleInput`：仅更新本地 `rawValue`，不 `emit`
+- `handleBlur`：解析 `rawValue`，clamp 到 `[min, max]` 后 `emit('update:modelValue')`
+- `updateValue`（箭头按钮）：即时 `emit`
+
+这样避免用户在输入中间值时触发不必要的计算。
+
 ## 文档同步要求
 
 本次 fix 是一个新的 planning change，而不是旧 change 的零散补充。

@@ -88,6 +88,17 @@
 - 用户点击 recommended 项时，应将显式 planned 数量提升到该模块当前目标总量。
 - 若 UI 需要保留来源可见性，只通过虚线前置等样式表达，不再通过独立区块表达。
 
+### planned 模块 count 输入规则
+
+- 已存在于 `recommendedModules` 的 planned 模块：不允许输入 `< archive`。X4NumberInput 的 `min = archiveTotal`，修改数量时 `handleUpdateModuleCount` 也 clamp 到 `>= archive`。× 按钮可以正常删除。
+- 不存在于 `recommendedModules` 的 planned 模块：允许输入 `< archive`，auto region 会补全缺口。输入数量不标红。
+- `recommendedDisplayModules` 只包含 `plannedCount === 0` 的 orphan 模块。用户已显式规划（`plannedCount > 0`）的模块不进入 recommended 显示集，避免被 `plannedDisplayModules` 的 `recommendedIds` 过滤掉。
+
+### X4NumberInput 失焦确认
+
+- 通用数字输入组件改为失焦（`@blur`）时才 `emit('update:modelValue')`，中间输入只更新本地显示。
+- 箭头按钮（`updateValue`）仍即时确认。
+
 ## 边界
 
 ### In Scope
@@ -121,6 +132,9 @@
 8. 文档中不再把 flow 列表顺序误写为 `warePriority` 排序语义。
 9. recommended 项交互语义与“已纳入 planning”保持一致，并明确点击是转正到目标总量而不是再次累加。
 10. `request/spec/design/tasks` 四份文档对以上语义保持一致。
+11. planned 区中推荐模块的 count 不允许 `< archive`；非推荐模块允许 `< archive` 且有 auto 补全。
+12. 已显式规划的模块不进入 `recommendedDisplayModules`，避免被推荐区过滤隐藏。
+13. X4NumberInput 改为失焦确认，中间输入不触发计算。
 
 ## 未决项
 

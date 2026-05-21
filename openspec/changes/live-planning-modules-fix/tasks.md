@@ -38,6 +38,13 @@
 - [x] T17. 将 recommended 来源模块直接并入 planning 区展示
 - [x] T18. 为 recommended 项补充虚线前置等来源样式约束
 
+### Phase 6: planned 区 count 交互与输入确认
+
+- [x] T19. recommended 模块 count 不允许 `< archive`（X4NumberInput min + handleUpdateModuleCount clamp）
+- [x] T20. 非 recommend 模块允许 `< archive`，输入不标红
+- [x] T21. 已显式规划的模块不进入 `recommendedDisplayModules`
+- [x] T22. X4NumberInput 改为失焦确认（`handleBlur` emit），箭头按钮即时确认
+
 ## 完成定义
 
 - [ ] `recommendedModules` 在所有文档和实现中都不再被描述为“待采纳建议”
@@ -50,3 +57,6 @@
 - [x] `warePriority` 等级与 flow 列表顺序不再混淆
 - [x] recommended 模块直接显示在 planning 区中，并通过虚线前置等样式区分来源
 - [x] present 使用 `auto*Modules` 直接作为展示数据源，不再从 `effectiveTargetModules` filter delta
+- [x] recommended 模块 count 不允许 `< archive`，非 recommend 模块允许 `< archive`
+- [x] 已显式规划的模块不进入 `recommendedDisplayModules`
+- [x] X4NumberInput 失焦确认，中间输入不触发计算
