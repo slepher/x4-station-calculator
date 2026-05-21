@@ -18,10 +18,12 @@
 
 ### Phase 3: industrial autoFill 边界修正
 
-- [x] T8. 将通用 `calculateAutoIndustryModules` 恢复为 `develop` 语义
+- [x] T8. 将通用 `calculateAutoIndustryModules` 恢复为 `develop` 语义，不再理解 `referenceModules`
 - [x] T9. 将通用 `calculateAutoFillModules` 恢复为不理解 `referenceModules` 的旧入口
 - [x] T10. 新增 live planning 专用 industrial floor 函数，用于处理 `archive_total` 基线
 - [x] T11. 将 live planning / reference-aware planning 路径切换到新 floor 函数
+- [x] T11.1 `calculateAutoIndustryModulesWithFloor` 内部以 `max(planned, floor)` 构建产能基线，调用通用 autoFill，再将 floor-beyond-planned 合并回 `autoIndustryModules`
+- [x] T11.2 `autoIndustryModules` 最终结果按 tier desc 统一排序（含 floor 模块）
 - [x] T12. 删除或停止依赖工业 producer 的 reference quota 状态机逻辑
 
 ### Phase 4: priority 与 flow 展示语义修正
@@ -41,9 +43,10 @@
 - [ ] `recommendedModules` 在所有文档和实现中都不再被描述为“待采纳建议”
 - [ ] planning 区相关文案与交互与“已纳入 planning 的子集”语义一致
 - [x] orphan 判定作为 live planning baseline 规则进入 store / planning 路径
-- [x] `effectivePlannedModules` 成为 planned 语义计算链的统一入口
-- [x] 通用 industrial autoFill 回到 `develop` 语义
-- [x] live planning 的 floor 由新函数专门处理
+- [x] `effectivePlannedModules` 成为 planned 语义计算链的统一入口，且 floor 模块不进入该字段
+- [x] 通用 industrial autoFill 回到 `develop` 语义，不再依赖 `referenceModules`
+- [x] live planning 的 floor 由新函数专门处理，floor 模块通过 `autoIndustryModules` 暴露
 - [x] 工业 autoFill 不再依赖复杂 reference quota 状态机
 - [x] `warePriority` 等级与 flow 列表顺序不再混淆
 - [x] recommended 模块直接显示在 planning 区中，并通过虚线前置等样式区分来源
+- [x] present 使用 `auto*Modules` 直接作为展示数据源，不再从 `effectiveTargetModules` filter delta

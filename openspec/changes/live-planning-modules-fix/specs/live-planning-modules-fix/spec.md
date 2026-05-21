@@ -84,6 +84,14 @@ planning 区中与 recommended modules 相关的标题、说明与交互文案 S
 **那么** 系统 MUST 通过独立函数处理 floor
 **并且** MUST NOT 将 floor / reference 逻辑混入通用 `calculateAutoIndustryModules`
 
+#### Scenario: floor production modules appear in autoIndustryModules
+
+**前提** archive 中存在未在显式 planned 中的 production 模块（如 microchips x33）
+**当** 系统执行 live planning 计算
+**那么** 这些模块 MUST 出现在 `autoIndustryModules` 中而不是被吸收进 `effectivePlannedModules`
+**并且** MUST 参与 autoFill 基线计算（其产能被计入以减少 deficit）
+**并且** MUST 按 tier desc 与其余 auto 模块统一排序
+
 #### Scenario: industrial producer selection no longer uses reference quota state machine
 
 **前提** live planning 已通过 `archive_total` 构造 effective planned baseline

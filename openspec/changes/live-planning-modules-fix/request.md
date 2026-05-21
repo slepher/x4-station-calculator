@@ -56,8 +56,10 @@
 - live planning 的 floor 行为通过新函数处理，例如：
   - `calculateAutoIndustryModulesWithFloor`
 - 新函数职责：
-  - 基于 `archive_total` / `referenceModules` 构造 floor 后的 effective planned baseline
-  - 再调用旧 industrial autoFill 逻辑补上游缺口
+  - 基于 `archive_total` / `referenceModules` 提取 production floor
+  - 以 `max(plannedModules, floor)` 作为 autoFill 产能基线（floor 贡献的产能被计入但不视为 planned）
+  - 调用旧 industrial autoFill 逻辑补上游缺口
+  - 将 floor 中超出显式 planned 的部分合并回 `autoIndustryModules`（floor 模块出现在 auto 区域）
 - 不再保留“producer 级 reference quota + 填补缺口”的复杂工业 selector 流程。
 
 ### floor 作用范围

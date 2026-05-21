@@ -14,10 +14,11 @@
 - `store / logic`
   - 输出显式 `plannedModules` 与生效态 `effectivePlannedModules`
   - 计算 orphan-based recommended subset
-  - 执行 live planning 专用 floor 逻辑
+  - 执行 live planning 专用 floor 逻辑，floor 模块经 `autoIndustryModules` 暴露
 - `presenter`
   - 在 planned 列表中为 recommended subset 组装来源标记
-  - 消费 `effectivePlannedModules` 相关结果，不再自行拼 planned 语义基线
+  - 直接消费 `autoIndustryModules` / `autoHabitationModules` / `autoInfrastructureModules` 展示（不再从 `effectiveTargetModules` 中 filter delta）
+  - 无 `archiveStation` 时不显示 diff 标注
 - `vue`
   - 渲染单一 planning 列表
   - 对 recommended 项显示虚线前置等弱视觉标记
@@ -119,11 +120,14 @@ calculateAutoIndustryModulesWithFloor(...)
 建议流程：
 
 1. 基于 `archive_total` 计算 reference production floor
-2. 将 `plannedModules` 与 recommended subset 合成为 `effectivePlannedModules`
-3. 以 `effectivePlannedModules` 为 planned 语义入口，再叠加 reference floor 调用旧 `calculateAutoIndustryModules`
-4. 产出：
-   - `autoIndustryModules`
+2. 以 `effectivePlanned = max(plannedModules, floor)` 作为 autoFill 的产能基线（floor 模块的产能被计入以减少 deficit，但 floor 不在 plannedModules 条目内）
+3. 以 `effectivePlanned` 为 planned 语义入口调用旧 `calculateAutoIndustryModules`，得到仅超出 baseline 的增量补完
+4. 将 floor 中超出显式 planned 的部分合并回 `autoIndustryModules`
+5. 产出：
+   - `autoIndustryModules`（含 floor production 模块 + autoFill 补完的额外模块）
    - 可供后续 flow / habitation / infrastructure 使用的 planning 基准
+
+注意：floor 模块**不进入** `effectivePlannedModules`，而是通过 `autoIndustryModules` 暴露。`effectivePlannedModules` 仅包含显式 planned + recommended subset。
 
 ### 3. 不保留工业 producer quota 状态机
 
