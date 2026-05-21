@@ -70,6 +70,7 @@ export interface PlanningPresenterStore {
 
 export function useProductionPlanningPresenter(store: PlanningPresenterStore): UseProductionPlanningPresenterReturn {
   const gameDataStore = useGameDataStore()
+  const shouldLogPlanningDebug = globalThis?.location?.href?.includes('localhost')
   const liveModules = computed(() => store.archiveStation?.modules || [])
   const liveBuildingModules = computed(() => store.archiveStation?.building?.modules || [])
 
@@ -106,7 +107,7 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const plannedDisplayModules = computed(() => {
     const recommendedIds = new Set(recommendedModules.value.map((module) => module.id))
     const visibleExplicitModules = plannedModules.value.filter((module) => !recommendedIds.has(module.id))
-    if (globalThis?.location?.href?.includes('localhost')) {
+    if (shouldLogPlanningDebug) {
       console.log('[planDisplay] plannedModules:', plannedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
       console.log('[planDisplay] recommendedModules:', recommendedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
       console.log('[planDisplay] visibleExplicitModules:', visibleExplicitModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
@@ -175,6 +176,20 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
       const archiveTotal = archiveTotalMap.value[module.id] || 0
       const remainingArchive = Math.max(0, archiveTotal - explicitPlanned)
       const diff = module.count - remainingArchive
+      if (shouldLogPlanningDebug) {
+        const info = gameDataStore.modulesMap[module.id] as X4Module | undefined
+        console.log('[autoDisplayDiff]', {
+          moduleId: module.id,
+          moduleName: info?.name,
+          moduleType: info?.type,
+          rawAutoCount: module.count,
+          explicitPlanned,
+          archiveTotal,
+          remainingArchive,
+          diff,
+          filteredRecommended: recommendedIds?.has(module.id) ?? false
+        })
+      }
       if (diff === 0) return { id: module.id, count: module.count }
       return { id: module.id, count: module.count, diffAnnotation: `${diff > 0 ? '+' : ''}${diff}` }
     })

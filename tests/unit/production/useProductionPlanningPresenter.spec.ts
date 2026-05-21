@@ -182,6 +182,39 @@ describe('useProductionPlanningPresenter', () => {
     ])
   })
 
+  it('hides infrastructure negative diff when explicit planned already covers part of archive target', () => {
+    const store = reactive({
+      session: {
+        workbenchMode: 'station',
+        visualMode: 'planning'
+      },
+      context: {},
+      stationState: {
+        plannedModules: [{ id: 'pier_mod', count: 1 }],
+        recommendedModules: [],
+        autoIndustryModules: [],
+        autoHabitationModules: [],
+        autoInfrastructureModules: [{ id: 'pier_mod', count: 1 }],
+        enforceDlcActivation: false
+      },
+      archiveStation: {
+        modules: [{ id: 'pier_mod', count: 2 }],
+        building: {
+          modules: []
+        }
+      },
+      moduleActions: {
+        updatePlannedModules: vi.fn()
+      }
+    })
+
+    const presenter = useProductionPlanningPresenter(store as any)
+
+    expect(presenter.props.autoInfrastructureModules.value).toEqual([
+      { id: 'pier_mod', count: 1 }
+    ])
+  })
+
   it('shows habitation modules as full target set instead of raw delta only', () => {
     const store = reactive({
       session: {
