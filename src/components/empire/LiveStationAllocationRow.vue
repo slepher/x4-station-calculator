@@ -58,7 +58,25 @@ const currentWidth = computed(() => toPercent(props.currentCount, props.scaleMax
 const recommendedLeft = computed(() => toPercent(props.recommendedCount, props.scaleMaxCount))
 const isExpandable = computed(() => props.detailSections.length > 0)
 const downstreamOpen = ref(false)
+const stationBreakdownOpen = ref(false)
 const availableLevels = computed(() => props.isPlanned ? [1, 2] : [0, 1, 2])
+
+function isCollapsibleSection(key: string): boolean {
+  return key === 'downstream' || key === 'station-breakdown'
+}
+
+function sectionOpen(key: string): boolean {
+  if (key === 'station-breakdown') return stationBreakdownOpen.value
+  return downstreamOpen.value
+}
+
+function toggleSection(key: string) {
+  if (key === 'station-breakdown') {
+    stationBreakdownOpen.value = !stationBreakdownOpen.value
+  } else {
+    downstreamOpen.value = !downstreamOpen.value
+  }
+}
 
 function handleToggleLock() {
   props.onToggleWareLock?.(props.wareId)
@@ -138,7 +156,7 @@ function handleTogglePriority() {
           class="detail-section"
         >
           <div
-            v-if="section.key !== 'downstream'"
+            v-if="!isCollapsibleSection(section.key)"
             class="detail-section-title"
           >
             {{ section.title }}
@@ -148,13 +166,13 @@ function handleTogglePriority() {
             v-else
             type="button"
             class="detail-section-toggle"
-            @click.stop="downstreamOpen = !downstreamOpen"
+            @click.stop="toggleSection(section.key)"
           >
             <span>{{ section.title }}</span>
-            <span class="detail-section-toggle-arrow" :class="{ 'detail-section-toggle-arrow-open': downstreamOpen }">▸</span>
+            <span class="detail-section-toggle-arrow" :class="{ 'detail-section-toggle-arrow-open': sectionOpen(section.key) }">▸</span>
           </button>
 
-          <div v-if="section.key !== 'downstream' || downstreamOpen">
+          <div v-if="!isCollapsibleSection(section.key) || sectionOpen(section.key)">
             <div :class="['detail-head',
               section.includeCurrentColumn && section.includeTargetColumn ? 'detail-head-with-current' :
               section.includeCurrentColumn && !section.includeTargetColumn ? 'detail-head-current-only' :

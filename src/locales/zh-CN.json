@@ -772,6 +772,7 @@
     "allocation_section_fill_empty": "从空库存开始填满",
     "allocation_section_drain": "消耗",
     "allocation_section_downstream": "下游产线",
+    "allocation_section_station_breakdown": "参与空间站",
     "allocation_rate_column": "每小时量",
     "allocation_current_column": "当前",
     "allocation_target_column": "设定",

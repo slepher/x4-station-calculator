@@ -66,4 +66,24 @@
 
 ## Task 11: 构建验证
 
-- [x] 执行 `npm run build`（通过）
+- [x] 执行 `npm run build`
+
+## Task 12: Store — buildAllocationDetailSections 新增 Station Breakdown
+
+- [x] 文件：`src/store/useLiveProductionStore.ts`
+- [x] 从 `flow.contributions` 中取 `class === 'station'` 的条目
+- [x] 生产站：rate / target fill / recommended fill（从空库存），`currentMinutes = undefined`
+- [x] 消费站：rate / current drain / target drain / recommended drain
+- [x] section key = `'station-breakdown'`，默认折叠，`includeCurrentColumn = true`
+- [x] 与其他 section 一致的 `includeTargetColumn`（按 `hasArchiveData`）
+
+## Task 13: LiveStationAllocationRow — 支持 station-breakdown 可折叠
+
+- [x] 文件：`src/components/empire/LiveStationAllocationRow.vue`
+- [x] `isCollapsibleSection` 包含 `'station-breakdown'` 和 `'downstream'`
+- [x] `sectionOpen` / `toggleSection` 泛化处理两种折叠 section
+
+## Task 14: i18n
+
+- [x] 文件：`src/locales/zh-CN.json`, `src/locales/en.json`
+- [x] 新增 `allocation_section_station_breakdown`（通过）

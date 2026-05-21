@@ -74,6 +74,15 @@ const liveCargoOnlyItems = computed(() => {
 - 所有 section 中 `includeTargetColumn = false`
 - 所有行的 `targetMinutes` 设为 `undefined`
 
+新增 **Station Breakdown** section：
+
+- 仅在 `contributions` 包含 `class === 'station'` 的条目时产出
+- 生产站（`type === 'production'`）：rate / target fill / recommended fill（从空库存）
+- 消费站（`type === 'consumption'`）：rate / current drain / target drain / recommended drain
+- `includeCurrentColumn = true`（消费站需要），生产站行的 `currentMinutes = undefined`
+- 默认折叠（与 Downstream 同机制）
+- 与其他 section 一致：有 archive 时 `includeTargetColumn = true`，无 archive 时 `includeTargetColumn = false`
+
 ### buildAllocationDetailSection
 
 新增 `includeTargetColumn: boolean` 参数，写入 `LiveVolumeAllocationDetailSection`。

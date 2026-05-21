@@ -64,6 +64,36 @@
 **那么** 系统 MUST 继续渲染旧 `TransitHubStorageView`
 **并且** MUST NOT 渲染 `LiveStationAllocationView`
 
+### Requirement: Transit-Hub Station Breakdown Section
+
+系统 SHALL 在 transit-hub 的 allocation detail 展开区新增 Station Breakdown section，按参与站展示生产/消费时间维度。
+
+#### Scenario: Station Breakdown 包含生产站和消费站
+
+**前提** transit-hub 的 `derivedProductionFlow` 的 `contributions` 中包含 `class === 'station'` 的条目
+**当** 该 ware 的 detail 展开
+**那么** 系统 MUST 渲染 Station Breakdown section
+**并且** 该 section MUST 默认折叠
+**并且** 生产站行 MUST 展示 `rate / target fill / recommended fill`（从空库存开始）
+**并且** 生产站行 MUST NOT 显示 current 列
+**并且** 消费站行 MUST 展示 `rate / current drain / target drain / recommended drain`
+
+#### Scenario: Station Breakdown 无 archive 时去 target 列
+
+**前提** transit-hub 无 archive，且 Station Breakdown section 存在
+**当** section 被渲染
+**那么** `includeCurrentColumn` MUST 为 `true`（消费站需要 current 列）
+**并且** `includeTargetColumn` MUST 为 `false`
+**并且** 生产站行的 `targetMinutes` MUST 为 `undefined`
+**并且** 消费站行的 `targetMinutes` MUST 为 `undefined`
+
+#### Scenario: Station Breakdown 有 archive 时全列
+
+**前提** transit-hub 有 archive，且 Station Breakdown section 存在
+**当** section 被渲染
+**那么** `includeCurrentColumn` MUST 为 `true`
+**并且** `includeTargetColumn` MUST 为 `true`
+
 ## MODIFIED Requirements
 
 ### Requirement: Allocation View Entry Condition
