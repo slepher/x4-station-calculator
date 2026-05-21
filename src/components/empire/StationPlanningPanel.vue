@@ -336,6 +336,7 @@ const handleUpdateSearchQuery = (value: string) => {
               :class="{ 'module-row--highlight': highlightedModuleIds.has(element.id) }"
               :is-number-flashing="flashingNumberModuleIds.has(element.id)"
               :threshold="archiveTotal(element.id)"
+              :is-recommended="recommendedModuleIds.has(element.id)"
               @update:count="(val: number) => handleUpdateModuleCount(index, val)" @remove="handleRemoveModule(index)" />
           </template>
         </draggable>

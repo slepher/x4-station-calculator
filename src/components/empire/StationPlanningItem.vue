@@ -21,6 +21,7 @@ const props = defineProps<{
   threshold?: number
   diffAnnotation?: string
   colorByDiff?: boolean
+  isRecommended?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -30,7 +31,7 @@ const emit = defineEmits<{
 }>()
 
 const isBelowThreshold = computed(() => {
-  return props.threshold !== undefined && props.item.count < props.threshold
+  return props.isRecommended && props.threshold !== undefined && props.item.count < props.threshold
 })
 const isAboveThreshold = computed(() => {
   return props.colorByDiff && (moduleDiffAnnotation.value?.startsWith('+') ?? false)
@@ -105,7 +106,7 @@ const moduleDiffClass = computed(() => {
         'input-wrapper--positive': isAboveThreshold
       }">
         <X4NumberInput :modelValue="item.count" @update:modelValue="emit('update:count', $event)" width-class="w-14"
-          :min="1" :disabled="countDisabled" />
+          :min="props.isRecommended ? (props.threshold ?? 1) : 1" :disabled="countDisabled" />
       </div>
       <button @click="emit('remove')" class="remove-btn ignore-drag" :title="t('planning.remove')">×</button>
     </div>
