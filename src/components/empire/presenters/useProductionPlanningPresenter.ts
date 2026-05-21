@@ -24,6 +24,12 @@ function maybeAnnotateDiff(module: SavedModule, totalMap: Record<string, number>
   if (!hasArchive) return { id: module.id, count: module.count }
   return annotateDiff(module, totalMap)
 }
+function shouldShowPlannedDiff(module: SavedModule, totalMap: Record<string, number>, autoCount: number): boolean {
+  if (!totalMap[module.id]) return true
+  const archiveTotal = totalMap[module.id] || 0
+  const totalCount = module.count + autoCount
+  return module.count > archiveTotal || totalCount < archiveTotal
+}
 
 export interface PlanningPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
@@ -86,6 +92,13 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const explicitPlannedCountMap = computed(() => {
     return new Map(mergeSavedModules(plannedModules.value).map((module) => [module.id, module.count]))
   })
+  const autoModulesCountMap = computed(() => {
+    const map = new Map<string, number>()
+    for (const m of rawAutoIndustry.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
+    for (const m of rawAutoHabitation.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
+    for (const m of rawAutoInfrastructure.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
+    return map
+  })
   const effectiveTargetModules = computed(() => store.stationState?.effectiveTargetModules || [])
   const finalPlannedModules = computed(() => store.stationState?.finalPlannedModules || [])
   const resolvedModules = computed(() => store.stationState?.resolvedModules || [])
@@ -98,7 +111,14 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
       console.log('[planDisplay] recommendedModules:', recommendedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
       console.log('[planDisplay] visibleExplicitModules:', visibleExplicitModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
     }
-    return visibleExplicitModules.map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
+    return visibleExplicitModules.map((module) => {
+      if (!store.archiveStation) return { id: module.id, count: module.count }
+      const autoCount = autoModulesCountMap.value.get(module.id) || 0
+      if (!shouldShowPlannedDiff(module, archiveTotalMap.value, autoCount)) {
+        return { id: module.id, count: module.count }
+      }
+      return annotateDiff(module, archiveTotalMap.value)
+    })
   })
 
   const recommendedDisplayModules = computed(() => {

@@ -164,3 +164,25 @@ planning 区中 recommended items 的交互语义 MUST 与"recommended modules �
 **那么** 该模块 MUST NOT 出现在 `recommendedDisplayModules` 中
 **并且** 仍须计入 `recommendedGapModules` 供 autoFill 基线使用
 **并且** 该模块 MUST 在 `plannedDisplayModules` 中保持可见
+
+### Requirement: Planned Diff Display Rules
+
+planned 区域的 diff 标注 MUST 按统一条件显示，不区分模块类型。
+
+#### Scenario: planned diff shown when planned exceeds archive
+
+**前提** `planned > archive`
+**当** 系统显示 planned diff
+**那么** diff MUST 为 `+ (planned - archive)`
+
+#### Scenario: planned diff shown when total is below archive
+
+**前提** `planned + auto < archive`
+**当** 系统显示 planned diff
+**那么** diff MUST 为 `planned - archive`
+
+#### Scenario: planned diff hidden when total meets or exceeds archive
+
+**前提** `planned + auto ≥ archive 且 planned ≤ archive`
+**当** 系统显示 planned diff
+**那么** diff MUST NOT 显示

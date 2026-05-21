@@ -213,6 +213,22 @@ calculateAutoIndustryModulesWithFloor(...)
 
 `computeRecommendedPlanningSubset` 中，只有 `plannedCount === 0` 的 orphan 模块才被加入 `recommendedDisplayModules`。用户已显式规划的模块（`plannedCount > 0`）不会进入推荐显示集，从而不被 `plannedDisplayModules` 的 `recommendedIds` 过滤掉，保持其在 planned 区的可见性。
 
+## planned diff 显示规则
+
+planned 区域的 diff 标注（`+N`/`-N`）按以下条件显示：
+
+| 条件 | diff 显示 | 含义 |
+|------|----------|------|
+| `planned > archive` | `+ (planned - archive)` | 用户显式超出 archive（主动扩张） |
+| `total < archive` | `- (planned - archive)`¹ | 总体仍低于 archive（建议值不足） |
+| 其他（`total ≥ archive 且 planned ≤ archive`） | 不显示 | 已达标或超标，无需提示 |
+
+¹ `total = planned + auto`，`archive` 为 archive 中该模块总数。
+
+## auto diff 公式
+
+`auto - max(0, archive - planned)`，始终显示（diff ≠ 0 时）。
+
 ## X4NumberInput 交互
 
 通用数字输入组件 `X4NumberInput` 使用以下确认策略：
