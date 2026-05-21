@@ -120,11 +120,9 @@ describe('useProductionPlanningPresenter', () => {
       stationState: {
         plannedModules: [],
         recommendedModules: [],
-        autoIndustryModules: [],
+        autoIndustryModules: [{ id: 'sol_terran', count: 2 }],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
-        finalPlannedModules: [{ id: 'sol_terran', count: 2 }],
-        resolvedModules: [{ id: 'sol_terran', count: 2 }],
         enforceDlcActivation: false
       },
       archiveStation: {
@@ -160,10 +158,7 @@ describe('useProductionPlanningPresenter', () => {
         recommendedModules: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
-        autoInfrastructureModules: [{ id: 'storage_mod', count: 1 }],
-        finalPlannedModules: [],
-        resolvedModules: [],
-        effectiveTargetModules: [{ id: 'storage_mod', count: 7 }],
+        autoInfrastructureModules: [{ id: 'storage_mod', count: 7 }],
         enforceDlcActivation: false
       },
       archiveStation: {
@@ -198,11 +193,8 @@ describe('useProductionPlanningPresenter', () => {
         plannedModules: [],
         recommendedModules: [],
         autoIndustryModules: [],
-        autoHabitationModules: [{ id: 'habitat_mod', count: 1 }],
+        autoHabitationModules: [{ id: 'habitat_mod', count: 4 }],
         autoInfrastructureModules: [],
-        finalPlannedModules: [],
-        resolvedModules: [],
-        effectiveTargetModules: [{ id: 'habitat_mod', count: 4 }],
         enforceDlcActivation: false
       },
       archiveStation: {

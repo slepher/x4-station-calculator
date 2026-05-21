@@ -9,7 +9,7 @@ import {
   calculateAutoHabitationModules,
   calculateProductionFlowsCore
 } from './calculateProductionFlows'
-import { buildEffectivePlannedModules, computeRecommendedPlanningSubset, mergeSavedModules, maxSavedModules } from './planningRecommendedModules'
+import { buildEffectivePlannedModules, computeRecommendedPlanningSubset, getReferenceProductionFloorModules, mergeSavedModules, maxSavedModules } from './planningRecommendedModules'
 
 export interface ActiveStationState {
   actualWorkforce: number
@@ -292,12 +292,22 @@ export function buildCanonicalPlanningStationState(
     ...input.archiveBuildingModules
   ])
   const canonicalBaseModules = maxSavedModules(
-    [
+    mergeSavedModules([
       ...input.planState.effectivePlannedModules,
       ...input.planState.autoIndustryModules
-    ],
-    archiveCurrentTotalModules
+    ]),
+    input.deps
+      ? getReferenceProductionFloorModules(archiveCurrentTotalModules, input.deps.modulesMap)
+      : []
   )
+
+  if (globalThis?.location?.href?.includes('localhost')) {
+    console.log('[canonical] effectivePlannedModules:', input.planState.effectivePlannedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    console.log('[canonical] autoIndustryModules (planState):', input.planState.autoIndustryModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    console.log('[canonical] archiveCurrentTotal:', archiveCurrentTotalModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    console.log('[canonical] canonicalBaseModules:', canonicalBaseModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+  }
+
   const autoHabitationModules = !input.deps
     ? input.planState.autoHabitationModules
     : calculateAutoHabitationModules({
@@ -311,7 +321,7 @@ export function buildCanonicalPlanningStationState(
     ...canonicalBaseModules,
     ...autoHabitationModules
   ])
-  const provisionalEffectiveModules = maxSavedModules(planningBaseModules, archiveCurrentTotalModules)
+  const provisionalEffectiveModules = planningBaseModules
 
   const canonicalFlowResult = input.calculateCanonicalFlows
     ? input.calculateCanonicalFlows(provisionalEffectiveModules)
@@ -357,12 +367,20 @@ export function buildCanonicalPlanningStationState(
     ...planningBaseModules,
     ...autoInfrastructureModules
   ])
-  const effectiveTargetModules = maxSavedModules(finalPlannedModules, archiveCurrentTotalModules)
+  const effectiveTargetModules = finalPlannedModules
   const resolvedModules = [
     ...canonicalBaseModules,
     ...autoHabitationModules,
     ...autoInfrastructureModules
   ]
+
+  if (globalThis?.location?.href?.includes('localhost')) {
+    console.log('[canonical] autoHabitationModules:', autoHabitationModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    console.log('[canonical] autoInfrastructureModules:', autoInfrastructureModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    console.log('[canonical] finalPlannedModules:', finalPlannedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    console.log('[canonical] effectiveTargetModules:', effectiveTargetModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    console.log('[canonical] resolvedModules:', resolvedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+  }
 
   return {
     ...input.planState,

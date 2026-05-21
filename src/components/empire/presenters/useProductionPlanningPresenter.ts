@@ -20,6 +20,10 @@ function annotateDiff(module: SavedModule, totalMap: Record<string, number>): Sa
     diffAnnotation: `${diff > 0 ? '+' : ''}${diff}`
   }
 }
+function maybeAnnotateDiff(module: SavedModule, totalMap: Record<string, number>, hasArchive: boolean): SavedModule {
+  if (!hasArchive) return { id: module.id, count: module.count }
+  return annotateDiff(module, totalMap)
+}
 
 export interface PlanningPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
@@ -89,12 +93,12 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const plannedDisplayModules = computed(() => {
     const recommendedIds = new Set(recommendedModules.value.map((module) => module.id))
     const visibleExplicitModules = plannedModules.value.filter((module) => !recommendedIds.has(module.id))
-    return visibleExplicitModules.map((module) => annotateDiff(module, archiveTotalMap.value))
+    return visibleExplicitModules.map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
   })
 
   const recommendedDisplayModules = computed(() => {
     return recommendedModules.value.map((module) => ({
-      ...annotateDiff(module, archiveTotalMap.value),
+      ...maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation),
       isReferenceRecommended: true
     }))
   })
@@ -129,22 +133,18 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
     isTargetModule: (info: X4Module) => boolean,
     options?: { excludeRecommended?: boolean }
   ): SavedModule[] {
-    const sourceMode = displaySource.value.mode
-    const sourceModules = sourceMode === 'raw' ? rawModules : displaySource.value.modules
     const recommendedIds = options?.excludeRecommended
       ? new Set(recommendedModules.value.map((module) => module.id))
       : null
 
     return mergeSavedModules(
-      sourceModules.filter((module) => {
+      rawModules.filter((module) => {
         if (recommendedIds?.has(module.id)) return false
         const info = gameDataStore.modulesMap[module.id] as X4Module | undefined
         if (!info || !isTargetModule(info)) return false
-        if (sourceMode === 'raw') return true
-        const explicitPlannedCount = explicitPlannedCountMap.value.get(module.id) || 0
-        return module.count > explicitPlannedCount
+        return true
       })
-    ).map((module) => annotateDiff(module, archiveTotalMap.value))
+    ).map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
   }
 
   const effectiveAutoIndustryDisplayModules = computed(() =>

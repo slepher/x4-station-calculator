@@ -14,8 +14,7 @@ import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastru
 import {
   buildEffectivePlannedModules,
   computeRecommendedPlanningSubset,
-  mergeSavedModules,
-  maxSavedModules
+  mergeSavedModules
 } from '@/store/logic/planningRecommendedModules'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
@@ -562,22 +561,13 @@ export class StationDerivedMap {
             modulesMap: deps.modulesMap,
             waresMap: deps.waresMap,
             lockedWares
-          }),
-          effectivePlannedModules: effectivePlannedInput
+          })
         }
     const autoIndustryModules = autoIndustryResult.autoIndustryModules
-    const canonicalBaseModules = (referenceModules && referenceModules.length > 0)
-      ? maxSavedModules(
-          [
-            ...autoIndustryResult.effectivePlannedModules,
-            ...autoIndustryModules
-          ],
-          referenceModules
-        )
-      : mergeSavedModules([
-          ...inputModules,
-          ...autoIndustryModules
-        ])
+    const canonicalBaseModules = mergeSavedModules([
+      ...effectivePlannedInput,
+      ...autoIndustryModules
+    ])
     const autoHabitationModules = calculateAutoHabitationModules({
       plannedModules: canonicalBaseModules,
       autoIndustryModules: [],

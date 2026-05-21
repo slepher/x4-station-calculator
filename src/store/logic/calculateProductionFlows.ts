@@ -13,7 +13,7 @@ import {
   getProductionEfficiency
 } from './bestModuleSelector'
 import { calculateWorkforceCensus } from './calculatorUtils'
-import { getReferenceProductionFloorModules, maxSavedModules } from './planningRecommendedModules'
+import { getReferenceProductionFloorModules } from './planningRecommendedModules'
 import {
   calculateWorkforceBreakdown,
   calculateActualWorkforce,
@@ -48,9 +48,23 @@ export function calculateAutoIndustryModules(
   const race = settings.racePreference
   const globalWorkforceBonus = settings.considerWorkforceForAutoFill
   const industryModules: Record<string, number> = {}
+  const productionFloorModules = input.referenceModules
+    ? getReferenceProductionFloorModules(input.referenceModules, modulesMap)
+    : []
   plannedModules.forEach(m => {
     industryModules[m.id] = (industryModules[m.id] || 0) + m.count
   })
+  for (const m of productionFloorModules) {
+    industryModules[m.id] = Math.max(industryModules[m.id] || 0, m.count)
+  }
+
+  if (globalThis?.location?.href?.includes('localhost')) {
+    console.log('[autoFill:calc] >>> START plannedModules:', plannedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    if (productionFloorModules.length > 0) {
+      console.log('[autoFill:calc] productionFloorModules:', productionFloorModules.map(m => `${m.id} x${m.count}`).join(', '))
+    }
+    console.log('[autoFill:calc] sunlight:', settings.sunlight, 'workforceBonus:', globalWorkforceBonus)
+  }
 
   let loopCount = 0
   let hasDeficit = true
@@ -78,7 +92,12 @@ export function calculateAutoIndustryModules(
       if (lockedWares.includes(wareId)) continue
 
       const producer = findBestProducer(wareId, race, currentModulesAsSaved, modulesMap, waresMap)
-      if (!producer) continue
+      if (!producer) {
+        if (globalThis?.location?.href?.includes('localhost')) {
+          console.log(`[autoFill:calc] loop#${loopCount} ware=${wareId} deficit=${deficit.toFixed(2)} — NO PRODUCER found, skip`)
+        }
+        continue
+      }
       const eff = getProductionEfficiency(producer, globalWorkforceBonus)
 
       let sunlightFactor = 1.0
@@ -90,6 +109,10 @@ export function calculateAutoIndustryModules(
       if (singleOutput <= 0) continue
 
       const countNeeded = Math.ceil(deficit / singleOutput)
+
+      if (globalThis?.location?.href?.includes('localhost')) {
+        console.log(`[autoFill:calc] loop#${loopCount} ware=${wareId} deficit=${deficit.toFixed(2)} producer=${producer.id} singleOutput=${singleOutput.toFixed(2)} countNeeded=${countNeeded}`)
+      }
 
       industryModules[producer.id] = (industryModules[producer.id] || 0) + countNeeded
       hasDeficit = true
@@ -104,12 +127,15 @@ export function calculateAutoIndustryModules(
     .filter(m => m.count > 0)
     .sort((a, b) => (modulesMap[b.id]?.tier || 0) - (modulesMap[a.id]?.tier || 0))
 
+  if (globalThis?.location?.href?.includes('localhost')) {
+    console.log('[autoFill:calc] >>> RESULT autoIndustry order:', autoIndustry.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+  }
+
   return autoIndustry
 }
 
 export interface CalculateAutoIndustryWithFloorOutput {
   autoIndustryModules: SavedModule[]
-  effectivePlannedModules: SavedModule[]
 }
 
 export function calculateAutoIndustryModulesWithFloor(
@@ -119,18 +145,16 @@ export function calculateAutoIndustryModulesWithFloor(
     input.referenceModules || [],
     input.modulesMap
   )
-  const effectivePlannedModules = maxSavedModules(
-    input.plannedModules,
-    referenceProductionFloorModules
-  )
-  const autoIndustryModules = calculateAutoIndustryModules({
-    ...input,
-    plannedModules: effectivePlannedModules
-  })
+
+  if (globalThis?.location?.href?.includes('localhost')) {
+    console.log('[autoFill:floor] input.plannedModules:', input.plannedModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+    console.log('[autoFill:floor] referenceProductionFloor:', referenceProductionFloorModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+  }
+
+  const autoIndustryModules = calculateAutoIndustryModules(input)
 
   return {
-    autoIndustryModules,
-    effectivePlannedModules
+    autoIndustryModules
   }
 }
 
