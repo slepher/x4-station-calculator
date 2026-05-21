@@ -227,8 +227,13 @@ const handleAddModule = (moduleId: string) => {
 }
 
 const handleUpdateModuleCount = (index: number, count: number) => {
+  let clampedCount = count
+  const module = props.plannedModules[index]!
+  if (recommendedModuleIds.value.has(module.id)) {
+    clampedCount = Math.max(count, archiveTotal(module.id))
+  }
   const nextModules = props.plannedModules.map((m, i) =>
-    i === index ? { ...m, count } : m
+    i === index ? { ...m, count: clampedCount } : m
   )
   emit('updatePlannedModules', nextModules)
 }
