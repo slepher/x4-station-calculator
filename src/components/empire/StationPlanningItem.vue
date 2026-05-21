@@ -29,7 +29,10 @@ const emit = defineEmits<{
 }>()
 
 const isBelowThreshold = computed(() => {
-  return props.threshold !== undefined && props.item.count < props.threshold
+  return moduleDiffAnnotation.value?.startsWith('-') ?? false
+})
+const isAboveThreshold = computed(() => {
+  return moduleDiffAnnotation.value?.startsWith('+') ?? false
 })
 
 const colorBarStyle = computed(() => {
@@ -97,7 +100,8 @@ const moduleDiffClass = computed(() => {
     <div class="controls" v-if="!readonly">
       <div class="ignore-drag input-wrapper" :class="{
         'input-wrapper--flashing': isNumberFlashing,
-        'input-wrapper--warning': isBelowThreshold
+        'input-wrapper--warning': isBelowThreshold,
+        'input-wrapper--positive': isAboveThreshold
       }">
         <X4NumberInput :modelValue="item.count" @update:modelValue="emit('update:count', $event)" width-class="w-14"
           :min="1" :disabled="countDisabled" />
@@ -108,14 +112,16 @@ const moduleDiffClass = computed(() => {
       <div v-if="!props.noClick" class="count-display ignore-drag" @click="emit('transfer', item)">
         <span class="count-text count-text--clickable" :class="{
           'count-text--flashing': isNumberFlashing,
-          'count-text--warning': isBelowThreshold
+          'count-text--warning': isBelowThreshold,
+          'count-text--positive': isAboveThreshold
         }"
           :title="t('planning.transfer_to_planning')">{{ item.count }}</span>
       </div>
       <div v-else class="count-display">
         <span class="count-text count-text--static" :class="{
           'count-text--flashing': isNumberFlashing,
-          'count-text--warning': isBelowThreshold
+          'count-text--warning': isBelowThreshold,
+          'count-text--positive': isAboveThreshold
         }">{{ item.count
           }}</span>
       </div>
@@ -246,6 +252,10 @@ const moduleDiffClass = computed(() => {
   @apply text-red-400;
 }
 
+.count-text--positive {
+  @apply text-green-400;
+}
+
 .count-text--flashing {
   animation: number-flash 0.3s ease-in-out;
 }
@@ -260,6 +270,12 @@ const moduleDiffClass = computed(() => {
 
 .input-wrapper--warning :deep(.x4-num-input) {
   color: #f87171 !important;
+
+}
+
+.input-wrapper--positive :deep(.x4-num-input) {
+  color: #4ade80 !important;
+
 }
 
 @keyframes number-flash {
