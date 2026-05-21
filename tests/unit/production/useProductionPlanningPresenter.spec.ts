@@ -102,7 +102,9 @@ describe('useProductionPlanningPresenter', () => {
 
     const presenter = useProductionPlanningPresenter(store as any)
 
-    expect(presenter.props.plannedModules.value).toEqual([])
+    expect(presenter.props.plannedModules.value).toEqual([
+      { id: 'energy_mod', count: 2 }
+    ])
     expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
       { id: 'energy_mod', count: 1, diffAnnotation: '+1' }
     ])

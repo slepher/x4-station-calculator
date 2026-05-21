@@ -86,13 +86,6 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
   const explicitPlannedCountMap = computed(() => {
     return new Map(mergeSavedModules(plannedModules.value).map((module) => [module.id, module.count]))
   })
-  const autoModulesCountMap = computed(() => {
-    const map = new Map<string, number>()
-    for (const m of rawAutoIndustry.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
-    for (const m of rawAutoHabitation.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
-    for (const m of rawAutoInfrastructure.value) map.set(m.id, (map.get(m.id) || 0) + m.count)
-    return map
-  })
   const effectiveTargetModules = computed(() => store.stationState?.effectiveTargetModules || [])
   const finalPlannedModules = computed(() => store.stationState?.finalPlannedModules || [])
   const resolvedModules = computed(() => store.stationState?.resolvedModules || [])
@@ -101,23 +94,11 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
     const recommendedIds = new Set(recommendedModules.value.map((module) => module.id))
     const visibleExplicitModules = plannedModules.value.filter((module) => !recommendedIds.has(module.id))
     if (globalThis?.location?.href?.includes('localhost')) {
+      console.log('[planDisplay] plannedModules:', plannedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
+      console.log('[planDisplay] recommendedModules:', recommendedModules.value.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
       console.log('[planDisplay] visibleExplicitModules:', visibleExplicitModules.map(m => `${m.id} x${m.count}`).join(', ') || '(empty)')
     }
-    return visibleExplicitModules
-      .filter((module) => {
-        if (!store.archiveStation) return true
-        const archiveTotal = archiveTotalMap.value[module.id] || 0
-        const autoCount = autoModulesCountMap.value.get(module.id) || 0
-        const totalCount = module.count + autoCount
-        const plannedCoversArchive = module.count > archiveTotal
-        const totalExceedsArchive = totalCount > archiveTotal
-        const keep = plannedCoversArchive || !totalExceedsArchive
-        if (globalThis?.location?.href?.includes('localhost')) {
-          console.log(`[planDisplay] ${keep ? 'KEEP' : 'HIDE'} id=${module.id} planned=${module.count} archive=${archiveTotal} auto=${autoCount} total=${totalCount}`)
-        }
-        return keep
-      })
-      .map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
+    return visibleExplicitModules.map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
   })
 
   const recommendedDisplayModules = computed(() => {
