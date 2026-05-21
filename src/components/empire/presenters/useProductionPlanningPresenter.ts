@@ -144,7 +144,15 @@ export function useProductionPlanningPresenter(store: PlanningPresenterStore): U
         if (!info || !isTargetModule(info)) return false
         return true
       })
-    ).map((module) => maybeAnnotateDiff(module, archiveTotalMap.value, !!store.archiveStation))
+    ).map((module) => {
+      if (!store.archiveStation) return { id: module.id, count: module.count }
+      const explicitPlanned = explicitPlannedCountMap.value.get(module.id) || 0
+      const archiveTotal = archiveTotalMap.value[module.id] || 0
+      const remainingArchive = Math.max(0, archiveTotal - explicitPlanned)
+      const diff = module.count - remainingArchive
+      if (diff === 0) return { id: module.id, count: module.count }
+      return { id: module.id, count: module.count, diffAnnotation: `${diff > 0 ? '+' : ''}${diff}` }
+    })
   }
 
   const effectiveAutoIndustryDisplayModules = computed(() =>

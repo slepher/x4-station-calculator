@@ -63,7 +63,7 @@ describe('useProductionPlanningPresenter', () => {
       support_mod: 1
     })
     expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
-      { id: 'energy_mod', count: 5, diffAnnotation: '+3' }
+      { id: 'energy_mod', count: 5, diffAnnotation: '+5' }
     ])
     expect(presenter.props.recommendedModules.value).toEqual([
       { id: 'orphan_mod', count: 4, isReferenceRecommended: true },
@@ -106,7 +106,7 @@ describe('useProductionPlanningPresenter', () => {
       { id: 'energy_mod', count: 2 }
     ])
     expect(presenter.props.effectiveAutoIndustryModules.value).toEqual([
-      { id: 'energy_mod', count: 1, diffAnnotation: '-1' }
+      { id: 'energy_mod', count: 1, diffAnnotation: '+1' }
     ])
   })
 
