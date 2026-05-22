@@ -18,7 +18,6 @@ const emit = defineEmits<{
   selectOverview: []
   selectStation: [stationId: string]
   createStation: []
-  renameStation: [stationId: string]
   duplicateStation: [stationId: string]
   deleteStation: [stationId: string]
 }>()
@@ -126,11 +125,6 @@ onUnmounted(() => {
   document.removeEventListener('click', handleClickOutside)
   window.removeEventListener('resize', handleWindowResize)
 })
-
-const renameStation = () => {
-  if (menuStationId.value) emit('renameStation', menuStationId.value)
-  closeMenu()
-}
 
 const duplicateStation = () => {
   if (menuStationId.value) emit('duplicateStation', menuStationId.value)
