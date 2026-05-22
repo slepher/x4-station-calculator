@@ -121,8 +121,6 @@ export function createProductionWareRuleActions<TStation extends ProductionWareR
 
   function toggleWarePriority(wareId: string): ActionResult {
     const currentLevel = getResolvedLevel(wareId)
-    const planned = isPlannedWare(wareId)
-    const auto = isAutoWare(wareId)
 
     const station = deps.getActiveStation()
     if (!station) return { ok: false, reason: 'no-active-station' }
@@ -132,12 +130,10 @@ export function createProductionWareRuleActions<TStation extends ProductionWareR
 
     const nextPriority = deps.clonePriorityMap(station.warePriority || {})
 
-    if (planned) {
-      if (currentLevel === 2) nextPriority[wareId] = 1
-      else delete nextPriority[wareId]
-    } else if (auto) {
-      if (currentLevel === 0) nextPriority[wareId] = 1
-      else delete nextPriority[wareId]
+    if (currentLevel === 1) {
+      delete nextPriority[wareId]
+    } else {
+      nextPriority[wareId] = 1
     }
 
     station.warePriority = nextPriority
