@@ -2,7 +2,8 @@ use crate::model::{
     norm_ver, AbandonedShipEntry, AggregatedEquipment, AggregatedStationModule, ArchiveMeta,
     BuildProgress, BuildStorageEntry, DatavaultEntry, DatavaultWareEntry, FactionStationEntry,
     Meta, NpcStationEntry, ParserError, PlayerStationConstruction, PlayerStationEntry, SaveArchive,
-    SectorData, StationBaseEntry, StationEquipment, Vector3, WareAmount, WorkforceEntry,
+    SectorData, StationBaseEntry, StationEquipment, StationTradeOverrides, Vector3, WareAmount,
+    WorkforceEntry,
 };
 use std::collections::{HashMap, VecDeque};
 
@@ -23,6 +24,9 @@ struct ComponentCtx {
     ware_totals: HashMap<String, i64>,
     cargo_totals: HashMap<String, i64>,
     reservation_totals: HashMap<String, i64>,
+    override_max_totals: HashMap<String, i64>,
+    override_buy_totals: HashMap<String, i64>,
+    override_sell_totals: HashMap<String, i64>,
     build_target_station_component_id: Option<String>,
     build_constructions: Vec<PlayerStationConstruction>,
     build_progress: Option<BuildProgress>,
@@ -181,6 +185,9 @@ impl SaveParserCore {
                 ware_totals: HashMap::new(),
                 cargo_totals: HashMap::new(),
                 reservation_totals: HashMap::new(),
+                override_max_totals: HashMap::new(),
+                override_buy_totals: HashMap::new(),
+                override_sell_totals: HashMap::new(),
                 build_target_station_component_id: None,
                 build_constructions: Vec::new(),
                 build_progress: None,
@@ -349,6 +356,33 @@ impl SaveParserCore {
                 if let Some(ware) = a.get("ware").cloned() {
                     let amount = to_int(a.get("amount"), 1);
                     *vault.ware_totals.entry(ware).or_insert(0) += amount;
+                }
+            }
+
+            if at_tags(&self.path, &["component", "overrides", "max", "ware"]) {
+                if let Some(station) = self.current_station_ctx_mut() {
+                    if let Some(ware) = a.get("ware").cloned() {
+                        let amount = to_int(a.get("amount"), 1);
+                        *station.override_max_totals.entry(ware).or_insert(0) += amount;
+                    }
+                }
+            }
+
+            if at_tags(&self.path, &["component", "overrides", "buy", "ware"]) {
+                if let Some(station) = self.current_station_ctx_mut() {
+                    if let Some(ware) = a.get("ware").cloned() {
+                        let amount = to_int(a.get("amount"), 1);
+                        *station.override_buy_totals.entry(ware).or_insert(0) += amount;
+                    }
+                }
+            }
+
+            if at_tags(&self.path, &["component", "overrides", "sell", "ware"]) {
+                if let Some(station) = self.current_station_ctx_mut() {
+                    if let Some(ware) = a.get("ware").cloned() {
+                        let amount = to_int(a.get("amount"), 1);
+                        *station.override_sell_totals.entry(ware).or_insert(0) += amount;
+                    }
                 }
             }
 
@@ -623,6 +657,7 @@ impl SaveParserCore {
                                         constructions,
                                         cargo: ware_amounts(&ctx.cargo_totals),
                                         reservation: ware_amounts(&ctx.reservation_totals),
+                                        overrides: station_trade_overrides(&ctx),
                                         buildstorage_code: None,
                                         workforces,
                                     };
@@ -807,7 +842,7 @@ impl SaveParserCore {
                 player_name: self.meta.player_name.clone(),
                 version: self.meta.version.clone(),
                 filename: f,
-                parser_version: "v6".into(),
+                parser_version: "v7".into(),
                 post_processor_version: None,
                 source: "original".into(),
             },
@@ -904,4 +939,17 @@ fn ware_amounts(input: &HashMap<String, i64>) -> Vec<WareAmount> {
         .collect::<Vec<_>>();
     wares.sort_by(|a, b| a.ware.cmp(&b.ware));
     wares
+}
+
+fn station_trade_overrides(ctx: &ComponentCtx) -> Option<StationTradeOverrides> {
+    let overrides = StationTradeOverrides {
+        max: ware_amounts(&ctx.override_max_totals),
+        buy: ware_amounts(&ctx.override_buy_totals),
+        sell: ware_amounts(&ctx.override_sell_totals),
+    };
+    if overrides.is_empty() {
+        None
+    } else {
+        Some(overrides)
+    }
 }

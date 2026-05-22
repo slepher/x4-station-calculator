@@ -4,8 +4,11 @@ import type {
   ProductionWorkbenchCapabilities,
   ProductionSessionState,
   ProductionContextState,
-  ProductionStationState
+  ProductionStationState,
+  AllocationVolumeGroup,
+  AllocationCargoOnlyItem
 } from '@/types/production-workbench-contract'
+import { buildAllocationVolumeGroups, buildAllocationCargoOnlyItems } from './logic/buildAllocationVolumeGroups'
 import type { SectorInternalData } from '@/types/x4'
 import type { PlayerStationRecord, ArchiveStationData, BuildStorageEntry, PlayerStationEntry, WareAmount } from '@/types/saveArchive'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
@@ -13,7 +16,7 @@ import type { StationComponentGapFlows } from './logic/stationGapViewModel'
 import { buildStationComponentGapFlows } from './logic/stationGapViewModel'
 import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
 import { deriveProductionFlows } from './logic/calculateWareFlowDerived'
-import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding } from '@/types/x4'
+import type { SavedModule, StationSettings, StationPlan, StationType, BindingStationPlan, TradeStationBinding, X4Module } from '@/types/x4'
 
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
@@ -29,12 +32,58 @@ import {
   toTransitTabId
 } from './logic/empireSourceView'
 import { createEmpireFlowFacade } from './logic/empireFlowFacade'
-import { buildDerivedActiveStationState, buildDerivedTransitState } from './logic/productionStationShared'
+import {
+  buildCanonicalPlanningStationState,
+  buildDerivedActiveStationState,
+  buildDerivedTransitState
+} from './logic/productionStationShared'
 import { toProductionStation } from './logic/liveStationResolver'
 import { loadPlayerStationsFlatByArchiveId, createArchiveId } from '@/db/saveArchiveDB'
 import { createProductionModuleActions } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
+
+function mergeSavedModules(modules: SavedModule[]): SavedModule[] {
+  const counts = new Map<string, number>()
+  const order: string[] = []
+  for (const module of modules) {
+    if (!counts.has(module.id)) order.push(module.id)
+    counts.set(module.id, (counts.get(module.id) || 0) + module.count)
+  }
+  return order
+    .map((id) => ({ id, count: counts.get(id) || 0 }))
+    .filter((module) => module.count > 0)
+}
+
+function hasPendingSavedModules(target: SavedModule[], built: SavedModule[]): boolean {
+  const builtCounts = new Map(mergeSavedModules(built).map((module) => [module.id, module.count]))
+  for (const module of mergeSavedModules(target)) {
+    const builtCount = builtCounts.get(module.id) || 0
+    if (module.count > builtCount) return true
+  }
+  return false
+}
+
+function getProducedWareIds(modules: SavedModule[], modulesMap: Record<string, X4Module>): string[] {
+  const wareIds = new Set<string>()
+  for (const module of modules) {
+    if (module.count <= 0) continue
+    const moduleInfo = modulesMap[module.id]
+    if (!moduleInfo) continue
+    for (const wareId of Object.keys(moduleInfo.outputs || {})) {
+      wareIds.add(wareId)
+    }
+  }
+  return [...wareIds]
+}
+
+function archiveCurrentTotalModulesFromArchive(archive: ArchiveStationData | null | undefined): SavedModule[] {
+  if (!archive) return []
+  return mergeSavedModules([
+    ...(archive.modules || []),
+    ...(archive.building?.modules || [])
+  ])
+}
 
 export const useLiveProductionStore = defineStore('liveProduction', () => {
   type DirtyBindingState = 'all' | Set<string> | null
@@ -463,8 +512,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     return stationId || null
   })
 
-  const archiveStation = computed<ArchiveStationData | null>(() => {
-    const code = archiveStationCode.value
+  function getArchiveStationDataByCode(code: string | null): ArchiveStationData | null {
     if (!code || !activeBinding.value) return null
 
     const archive = selectedArchive.value
@@ -560,7 +608,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
             inProgressModule
           },
           cargo: stationEntry.cargo,
-          reservation: stationEntry.reservation
+          reservation: stationEntry.reservation,
+          overrides: stationEntry.overrides,
+          targetCounts: stationEntry.overrides?.max
         }
       }
     }
@@ -584,8 +634,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         inProgressModule: undefined
       },
       cargo: stationEntry.cargo,
-      reservation: stationEntry.reservation
+      reservation: stationEntry.reservation,
+      overrides: stationEntry.overrides,
+      targetCounts: stationEntry.overrides?.max
     }
+  }
+
+  function getArchiveStationDataByPlanId(planId: string): ArchiveStationData | null {
+    const bindingPlan = activeBinding.value?.stationPlans.find((plan) => plan.id === planId) || null
+    const archiveCode = bindingPlan?.saveStationCode || planId
+    return getArchiveStationDataByCode(archiveCode)
+  }
+
+  const archiveStation = computed<ArchiveStationData | null>(() => {
+    return getArchiveStationDataByCode(archiveStationCode.value)
   })
 
   const context = computed<ProductionContextState>(() => {
@@ -661,42 +723,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   function toggleMode() {
     mode.value = mode.value === 'live' ? 'planning' : 'live'
   }
-
-  const moduleScope = ref<'built' | 'building' | 'all'>('built')
-
-  const hasBuildingModules = computed(() => {
-    return (archiveStation.value?.building?.modules?.length ?? 0) > 0
-  })
-
-  const defaultModuleScope = computed<'built' | 'building'>(() => {
-    return hasBuildingModules.value ? 'building' : 'built'
-  })
-
-  function cycleModuleScope() {
-    const order: Array<'built' | 'building' | 'all'> = ['built', 'building', 'all']
-    const idx = order.indexOf(moduleScope.value)
-    const nextIdx = (idx + 1) % order.length
-    moduleScope.value = order[nextIdx]!
-  }
-
-  watch(activeStationId, () => {
-    if (activeStationId.value) {
-      mode.value = initialMode.value
-      moduleScope.value = defaultModuleScope.value
-    }
-  })
-
-  watch(mode, () => {
-    moduleScope.value = defaultModuleScope.value
-  })
-
-  watch(hasBuildingModules, (has) => {
-    if (has && moduleScope.value === 'built') {
-      moduleScope.value = 'building'
-    } else if (!has && moduleScope.value !== 'built') {
-      moduleScope.value = 'built'
-    }
-  })
 
   const activeStation = computed<StationPlan | null>(() => {
     if (workbenchMode.value === 'station' && planningStationDraft.value) {
@@ -779,13 +805,22 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       ...station.settings,
       sunlight: archiveSunlight ?? station.settings?.sunlight ?? DEFAULT_STATION_SETTINGS.sunlight
     }
+
+    const archive = getArchiveStationDataByPlanId(station.id)
+    const referenceModules: SavedModule[] = []
+    if (archive) {
+      referenceModules.push(...(archive.modules || []))
+      referenceModules.push(...(archive.building?.modules || []))
+    }
+
     return {
       modulesMode: 'plan' as const,
       sectorId: station.sectorId,
       modules: usesBindingPlan ? (station.modules || []) : [],
       settings,
       lockedWares: usesBindingPlan ? (station.lockedWares || []) : [],
-      warePriority: usesBindingPlan ? (station.warePriority || {}) : {}
+      warePriority: usesBindingPlan ? (station.warePriority || {}) : {},
+      referenceModules
     }
   }
 
@@ -908,12 +943,19 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         warePriorityLevels: {},
         productionFlows: [],
         plannedModules: [],
+        effectivePlannedModules: [],
+        recommendedModules: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
         resolvedModules: [],
         modules: [],
-        buildingModules: []
+        buildingModules: [],
+        archiveBuiltModules: [],
+        archiveCurrentTotalModules: [],
+        archiveProducedWareIds: [],
+        finalPlannedModules: [],
+        effectiveTargetModules: []
       }
     }
 
@@ -923,12 +965,18 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     if (currentMode === 'live') {
       const archiveModules: SavedModule[] = archiveStation.value?.modules || []
+      const archiveCurrentTotalModules = mergeSavedModules([
+        ...archiveModules,
+        ...(archiveStation.value?.building?.modules || [])
+      ])
       return {
         actualWorkforce: cache?.actualWorkforce || 0,
         currentEfficiency: cache?.currentEfficiency || 0,
         warePriorityLevels: {},
         productionFlows: flowMapToUse?.getProductionFlows(stationId) || [],
         plannedModules: archiveModules,
+        effectivePlannedModules: archiveCurrentTotalModules,
+        recommendedModules: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
@@ -937,24 +985,54 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         buildingModules: archiveStation.value?.building?.modules || [],
         buildingCargo: archiveStation.value?.building?.cargo || [],
         buildingReservation: archiveStation.value?.building?.reservation || [],
-        buildingInProgress: archiveStation.value?.building?.inProgressModule || undefined
+        buildingInProgress: archiveStation.value?.building?.inProgressModule || undefined,
+        archiveBuiltModules: archiveModules,
+        archiveCurrentTotalModules,
+        archiveProducedWareIds: getProducedWareIds(archiveCurrentTotalModules, gameData.modulesMap),
+        finalPlannedModules: archiveModules,
+        effectiveTargetModules: archiveCurrentTotalModules
       }
     }
 
     const planned = plannedModules.value
+    const hasArchive = archiveStation.value != null
     const planState = buildDerivedActiveStationState({
       stationId,
       plannedModules: planned,
+      referenceModules: archiveCurrentTotalModulesFromArchive(archiveStation.value),
+      deferSupportModules: hasArchive,
       settings: settings.value,
       cache,
       deps: getComputeDeps()
     })
+    const archiveBuiltModules = archiveStation.value?.modules || []
+    const archiveCurrentTotalModules = mergeSavedModules([
+      ...archiveBuiltModules,
+      ...(archiveStation.value?.building?.modules || [])
+    ])
+    const archiveProducedWareIds = getProducedWareIds(archiveCurrentTotalModules, gameData.modulesMap)
+    const canonicalPlanState = !hasArchive
+      ? null
+      : buildCanonicalPlanningStationState({
+          planState,
+          archiveBuiltModules,
+          archiveBuildingModules: archiveStation.value?.building?.modules || [],
+          referenceModules: archiveCurrentTotalModules,
+          settings: settings.value,
+          deps: getComputeDeps()
+        })
     return {
-      ...planState,
-      modules: planState.resolvedModules,
+      ...(canonicalPlanState ?? planState),
+      modules: (canonicalPlanState ?? planState).resolvedModules,
       buildingModules: [],
-      buildingCargo: [],
-      buildingReservation: []
+      buildingCargo: archiveStation.value?.building?.cargo || [],
+      buildingReservation: archiveStation.value?.building?.reservation || [],
+      buildingInProgress: archiveStation.value?.building?.inProgressModule || undefined,
+      archiveBuiltModules,
+      archiveCurrentTotalModules,
+      archiveProducedWareIds,
+      finalPlannedModules: canonicalPlanState?.finalPlannedModules || [],
+      effectiveTargetModules: canonicalPlanState?.effectiveTargetModules || []
     }
   })
 
@@ -974,7 +1052,12 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         productionFlows: [] as any[],
         warePriorityLevels: {} as Record<string, number>,
         actualWorkforce: 0,
-        currentEfficiency: 0
+        currentEfficiency: 0,
+        archiveBuiltModules: [] as SavedModule[],
+        archiveCurrentTotalModules: [] as SavedModule[],
+        archiveProducedWareIds: [] as string[],
+        finalPlannedModules: [] as SavedModule[],
+        effectiveTargetModules: [] as SavedModule[]
       }
     }
     const planningFlows = planningFlowFacade.getSectorFinalProductionFlows(sectorId)
@@ -989,6 +1072,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const archiveOverride = mode.value === 'live' && archiveStation.value
     return {
       plannedModules: [] as SavedModule[],
+      effectivePlannedModules: [] as SavedModule[],
+      recommendedModules: [] as SavedModule[],
       resolvedModules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
       modules: archiveOverride ? archiveStation.value!.modules : derived.resolvedModules,
       buildingModules: archiveOverride ? (archiveStation.value!.building?.modules || []) : [],
@@ -1001,7 +1086,59 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       productionFlows: flows,
       warePriorityLevels: {} as Record<string, number>,
       actualWorkforce: 0,
-      currentEfficiency: 0
+      currentEfficiency: 0,
+      archiveBuiltModules: [] as SavedModule[],
+      archiveCurrentTotalModules: [] as SavedModule[],
+      archiveProducedWareIds: [] as string[],
+      finalPlannedModules: [] as SavedModule[],
+      effectiveTargetModules: [] as SavedModule[]
+    }
+  })
+
+  const moduleScopeRef = ref<'built' | 'building' | 'all'>('built')
+
+  const hasBuildingModules = computed(() => {
+    if (mode.value === 'planning') {
+      return hasPendingSavedModules(
+        activeStationState.value.effectiveTargetModules || [],
+        activeStationState.value.archiveBuiltModules || []
+      )
+    }
+    return (archiveStation.value?.building?.modules?.length ?? 0) > 0
+  })
+
+  const canUseModuleScope = computed(() => hasBuildingModules.value)
+
+  const moduleScope = computed<'built' | 'building' | 'all'>(() => {
+    if (!canUseModuleScope.value) return 'built'
+    return moduleScopeRef.value
+  })
+
+  const defaultModuleScope = computed<'built' | 'building'>(() => {
+    return hasBuildingModules.value ? 'building' : 'built'
+  })
+
+  function cycleModuleScope() {
+    const order: Array<'built' | 'building' | 'all'> = ['built', 'building', 'all']
+    const idx = order.indexOf(moduleScopeRef.value)
+    const nextIdx = (idx + 1) % order.length
+    moduleScopeRef.value = order[nextIdx]!
+  }
+
+  watch(activeStationId, () => {
+    if (activeStationId.value) {
+      mode.value = initialMode.value
+      moduleScopeRef.value = defaultModuleScope.value
+    }
+  })
+
+  watch([canUseModuleScope, defaultModuleScope], ([enabled, nextDefault]) => {
+    if (!enabled && moduleScopeRef.value !== 'built') {
+      moduleScopeRef.value = 'built'
+      return
+    }
+    if (enabled && moduleScopeRef.value === 'built' && nextDefault === 'building') {
+      moduleScopeRef.value = 'building'
     }
   })
 
@@ -1014,6 +1151,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   function isModuleCountEditable(moduleId: string): boolean {
     return !enforceDlcActivation.value || isModuleDlcActive(moduleId)
   }
+
+  const effectivePriorityPlannedModules = computed(() =>
+    activeStationState.value.effectivePlannedModules || plannedModules.value
+  )
 
   const moduleActions = createProductionModuleActions<StationPlan>({
     getActiveStation: () => editableStationPlan.value,
@@ -1047,10 +1188,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   const wareRuleActions = createProductionWareRuleActions<StationPlan>({
     getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
-    getPlannedModules: () => plannedModules.value,
+    getPlannedModules: () => effectivePriorityPlannedModules.value,
     getAutoIndustryModules: () => activeStationState.value.autoIndustryModules,
     getModulesMap: () => gameData.modulesMap,
     getWaresMap: () => gameData.waresMap,
+    isLockForbidden: (wareId) => {
+      if (mode.value !== 'planning') return false
+      if (archiveStation.value === null) return false
+      const archiveProducedWareIds: string[] = activeStationState.value.archiveProducedWareIds || []
+      return archiveProducedWareIds.includes(wareId)
+    },
     getLockedWares: () => lockedWares.value,
     getWarePriority: () => warePriority.value,
     cloneStringList: (values) => deepClone(values),
@@ -1182,7 +1329,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       activeStationId.value = stationId
     }
     const station = toProductionStation(plan)
-    station.sectorId = plan.groupId || null
     syncBindingStationDerivedSnapshot(stationId)
     return station
   }
@@ -1191,12 +1337,17 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     const binding = activeBinding.value
     if (!binding) return
     const existingPlan = binding.stationPlans.find(plan => plan.id === stationId)
+    const stationSectorId = existingPlan?.groupId ?? orderedStationsBySector.value.find(s => s.id === stationId)?.sectorId ?? null
     if (existingPlan) {
       saveBindingStore.deleteStationPlan(binding.gameGuid, stationId)
       planningDerivedMap.value?.remove(stationId)
     }
     if (activeStationId.value === stationId) {
-      activeStationId.value = null
+      if (stationSectorId) {
+        activeStationId.value = `transit:${stationSectorId}`
+      } else {
+        activeStationId.value = null
+      }
     }
   }
 
@@ -1529,6 +1680,8 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       count: stationCount,
       minerals: stationMinerals,
       plannedModules: state.plannedModules,
+      effectivePlannedModules: state.effectivePlannedModules || state.plannedModules,
+      recommendedModules: state.recommendedModules || [],
       resolvedModules: state.resolvedModules,
       modules: state.modules,
       buildingModules: state.buildingModules,
@@ -1536,7 +1689,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       autoHabitationModules: state.autoHabitationModules,
       autoInfrastructureModules: state.autoInfrastructureModules,
       productionFlows: state.productionFlows,
-      derivedProductionFlows: planningFlowFacade.deriveFlows(state.productionFlows, isTransit ? { ...settings.value, resourceBufferHours: settings.value.primaryProductBufferHours } : settings.value, state.warePriorityLevels, isTransit ? 'max' : 'sum'),
+      derivedProductionFlows: planningFlowFacade.deriveFlows(state.productionFlows, isTransit ? { ...settings.value, resourceBufferHours: settings.value.primaryProductBufferHours } : settings.value, state.warePriorityLevels),
       warePriorityLevels: state.warePriorityLevels,
       settings: {
         ...settings.value,
@@ -1549,8 +1702,66 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       buildPriceMultiplier: buildPriceMultiplier.value,
       buildingCargo: state.buildingCargo || [],
       buildingReservation: state.buildingReservation || [],
-      buildingInProgress: state.buildingInProgress || undefined
+      buildingInProgress: state.buildingInProgress || undefined,
+      archiveBuiltModules: state.archiveBuiltModules || [],
+      archiveCurrentTotalModules: state.archiveCurrentTotalModules || [],
+      archiveProducedWareIds: state.archiveProducedWareIds || [],
+      finalPlannedModules: state.finalPlannedModules || [],
+      effectiveTargetModules: state.effectiveTargetModules || []
     }
+  })
+
+  const useAllocationVolumeView = computed(() => {
+    return workbenchMode.value === 'station' || workbenchMode.value === 'transit'
+  })
+
+  const allocationVolumeGroups = computed<AllocationVolumeGroup[]>(() => {
+    if (!useAllocationVolumeView.value) return []
+    if (session.value.wareflowViewMode !== 'volume') return []
+
+    const state = stationState.value
+    if (!state) return []
+
+    const archive = archiveStation.value
+    const hasArchive = archive !== null
+
+    const cargoMap = new Map<string, number>()
+    if (hasArchive) {
+      for (const item of archive!.cargo || []) {
+        cargoMap.set(item.ware, item.amount)
+      }
+    }
+
+    const targetMap = new Map<string, number>()
+    if (hasArchive) {
+      for (const item of archive!.targetCounts || []) {
+        targetMap.set(item.ware, item.amount)
+      }
+    }
+
+    return buildAllocationVolumeGroups({
+      derivedProductionFlows: state.derivedProductionFlows,
+      cargoMap,
+      targetMap,
+      hasArchiveStation: hasArchive,
+      gameData
+    })
+  })
+
+  const allocationCargoOnlyItems = computed<AllocationCargoOnlyItem[]>(() => {
+    if (!useAllocationVolumeView.value) return []
+    if (session.value.wareflowViewMode !== 'volume') return []
+
+    const archive = archiveStation.value
+    const state = stationState.value
+    if (!archive || !state) return []
+
+    return buildAllocationCargoOnlyItems({
+      cargo: archive.cargo || [],
+      targetCounts: archive.targetCounts || [],
+      derivedProductionFlows: state.derivedProductionFlows,
+      gameData
+    })
   })
 
   const tabSemanticsById = computed<Record<string, { tag?: string; factoryGroup?: string }>>(() => {
@@ -1626,13 +1837,20 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       }
       const map = ensurePlanningDerivedMap()
       if (!map) return
+      const archive = getArchiveStationDataByPlanId(station.id)
+      const refModules: SavedModule[] = []
+      if (archive) {
+        refModules.push(...(archive.modules || []))
+        refModules.push(...(archive.building?.modules || []))
+      }
       map.upsertStation(station.id, {
         modulesMode: 'plan',
         sectorId: station.sectorId,
         modules: station.modules || [],
         settings: station.settings || {},
         lockedWares: station.lockedWares || [],
-        warePriority: station.warePriority || {}
+        warePriority: station.warePriority || {},
+        referenceModules: refModules
       })
     },
     shouldRecompute: (station, patch) => {
@@ -1707,6 +1925,9 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     session,
     context,
     stationState,
+    useAllocationVolumeView,
+    allocationVolumeGroups,
+    allocationCargoOnlyItems,
     capabilities,
     settingActions,
     wareRuleActions,

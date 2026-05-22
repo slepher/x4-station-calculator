@@ -1,7 +1,13 @@
 import { computed, type ComputedRef } from 'vue'
-import type { ProductionSessionState, ProductionStationState } from '@/types/production-workbench-contract'
+import type {
+  ProductionSessionState,
+  ProductionStationState,
+  AllocationCargoOnlyItem,
+  AllocationVolumeGroup
+} from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { WareProductionFlow, DerivedProductionFlow } from '@/types/production-flow'
+import type { ArchiveStationData } from '@/types/saveArchive'
 
 const DEFAULT_WAREFLOW_SETTINGS = {
   resourceBufferHours: 1.0,
@@ -18,8 +24,11 @@ export interface WareflowPresenterProps {
   workbenchMode: ComputedRef<'overview' | 'station' | 'transit'>
   visualMode: ComputedRef<'planning' | 'live'>
   viewMode: ComputedRef<WareFlowViewMode>
+  useAllocationVolumeView: ComputedRef<boolean>
   productionFlows: ComputedRef<WareProductionFlow[]>
   derivedProductionFlows: ComputedRef<DerivedProductionFlow[]>
+  allocationVolumeGroups: ComputedRef<AllocationVolumeGroup[]>
+  allocationCargoOnlyItems: ComputedRef<AllocationCargoOnlyItem[]>
   warePriorityLevels: ComputedRef<Record<string, number>>
   settings: ComputedRef<{
     resourceBufferHours: number
@@ -59,6 +68,9 @@ export interface UseProductionWareflowPresenterReturn {
 export interface WareflowPresenterStore {
   session: ProductionSessionState
   stationState: ProductionStationState | null
+  archiveStation?: ArchiveStationData | null
+  allocationVolumeGroups?: AllocationVolumeGroup[] | ComputedRef<AllocationVolumeGroup[]>
+  allocationCargoOnlyItems?: AllocationCargoOnlyItem[] | ComputedRef<AllocationCargoOnlyItem[]>
   settingActions: {
     updateResourceBufferHours(value: number): void
     updatePrimaryProductBufferHours(value: number): void
@@ -82,12 +94,39 @@ export interface WareflowPresenterStore {
 }
 
 export function useProductionWareflowPresenter(store: WareflowPresenterStore): UseProductionWareflowPresenterReturn {
+  const readMaybeComputed = <T>(value: T | ComputedRef<T> | undefined, fallback: T): T => {
+    if (value === undefined) return fallback
+    if (typeof value === 'object' && value !== null && 'value' in value) {
+      return (value as ComputedRef<T>).value
+    }
+    return value as T
+  }
+
+  const isPlanningArchiveStation = computed(() => {
+    return store.session.workbenchMode === 'station'
+      && store.session.visualMode === 'planning'
+      && store.stationState?.entityType === 'station'
+      && (store.stationState?.archiveProducedWareIds?.length || 0) > 0
+  })
+
+  const isArchiveProducedWare = (wareId: string): boolean => {
+    if (!isPlanningArchiveStation.value) return false
+    return store.stationState?.archiveProducedWareIds?.includes(wareId) ?? false
+  }
+
+  const useAllocationVolumeView = computed(() => {
+    return store.session.workbenchMode === 'station' || store.session.workbenchMode === 'transit'
+  })
+
   const props: WareflowPresenterProps = {
     workbenchMode: computed(() => store.session.workbenchMode),
     visualMode: computed(() => store.session.visualMode),
     viewMode: computed(() => store.session.wareflowViewMode),
+    useAllocationVolumeView,
     productionFlows: computed(() => store.stationState?.productionFlows || []),
     derivedProductionFlows: computed(() => store.stationState?.derivedProductionFlows || []),
+    allocationVolumeGroups: computed(() => readMaybeComputed(store.allocationVolumeGroups, [])),
+    allocationCargoOnlyItems: computed(() => readMaybeComputed(store.allocationCargoOnlyItems, [])),
     warePriorityLevels: computed(() => store.stationState?.warePriorityLevels || {}),
     settings: computed(() => {
       const s = store.stationState?.settings
@@ -106,9 +145,15 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
     empireGaps: computed(() => store.stationState?.empireGaps || { operations: [], supply: [] }),
     isWareLocked: (wareId: string) => store.wareRuleActions.isWareLocked(wareId),
     getResolvedLevel: (wareId: string) => store.wareRuleActions.getResolvedLevel(wareId),
-    isWareOperable: (wareId: string) => store.wareRuleActions.isWareOperable(wareId),
+    isWareOperable: (wareId: string) => {
+      if (isArchiveProducedWare(wareId)) return false
+      return store.wareRuleActions.isWareOperable(wareId)
+    },
     isPlannedWare: (wareId: string) => store.wareRuleActions.isPlannedWare(wareId),
-    onToggleWareLock: (wareId: string) => store.wareRuleActions.toggleWareLock(wareId),
+    onToggleWareLock: (wareId: string) => {
+      if (isArchiveProducedWare(wareId)) return
+      store.wareRuleActions.toggleWareLock(wareId)
+    },
     onToggleWarePriority: (wareId: string) => store.wareRuleActions.toggleWarePriority(wareId)
   }
 

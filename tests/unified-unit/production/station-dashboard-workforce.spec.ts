@@ -15,7 +15,16 @@ vi.mock('vue-i18n', () => ({
 vi.mock('@/store/useGameDataStore', () => ({
   useGameDataStore: () => ({
     modulesMap: {
-      module_gen_prod_energycells_01: { id: 'module_gen_prod_energycells_01', name: 'Energy Cell Production' }
+      module_gen_prod_energycells_01: {
+        id: 'module_gen_prod_energycells_01',
+        name: 'Energy Cell Production',
+        buildCost: {},
+        buildTime: 60,
+        workforce: {
+          needed: 90,
+          capacity: 1000
+        }
+      }
     },
     waresMap: {}
   })
@@ -82,34 +91,8 @@ describe('StationDashboard workforce display', () => {
   it('uses local analysis when workforce auto is enabled even if incoming actualWorkforce is stale', async () => {
     const wrapper = mount(StationDashboard, {
       props: {
-        plannedModules: [{ id: 'module_gen_prod_energycells_01', count: 1 }],
-        stationAnalysis: {
-          totalCost: 1000,
-          totalVolume: 500,
-          totalNeeded: 90,
-          totalCapacity: 1000,
-          totalTime: 60,
-          playerHQNeeded: 0,
-          totalWorkerDiff: 910,
-          summaryItems: [],
-          moduleGroups: [
-            {
-              id: 'module_gen_prod_energycells_01',
-              count: 1,
-              value: 1000,
-              volume: 500,
-              unitTime: 60,
-              totalTime: 60,
-              unitCapacity: 0,
-              totalCapacity: 0,
-              unitNeeded: 90,
-              totalNeeded: 90,
-              unitWorkerDiff: -90,
-              totalWorkerDiff: -90,
-              items: []
-            }
-          ]
-        },
+        displayModules: [{ id: 'module_gen_prod_energycells_01', count: 1 }],
+        workerModules: [{ id: 'module_gen_prod_energycells_01', count: 1 }],
         settings: {
           transportShipCapacity: 62000,
           workforceAuto: true,

@@ -9,7 +9,7 @@ const __dirname = dirname(__filename)
 const FIXTURES_DIR = resolve(__dirname, '../../../fixtures')
 const SAVE_DIR = join(FIXTURES_DIR, 'save')
 const GAME_GUID = 'CB8837FE-98C1-42F8-9D6A-ED0ADC539111'
-const CURRENT_PARSER_VERSION = 'v6'
+const CURRENT_PARSER_VERSION = 'v7'
 
 interface SaveData {
   meta: {

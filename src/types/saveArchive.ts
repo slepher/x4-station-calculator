@@ -96,6 +96,12 @@ export interface WareAmount {
   amount: number
 }
 
+export interface StationTradeOverrides {
+  max?: WareAmount[]
+  buy?: WareAmount[]
+  sell?: WareAmount[]
+}
+
 export interface WorkforceEntry {
   race: string
   amount: number
@@ -159,6 +165,7 @@ export interface PlayerStationEntry extends StationBaseEntry {
   equipments?: AggregatedEquipment[]
   cargo?: WareAmount[]
   reservation?: WareAmount[]
+  overrides?: StationTradeOverrides
   buildstorage_code?: string
   workforces?: WorkforceEntry[]
   isShipyard?: boolean
@@ -432,6 +439,8 @@ export interface ArchiveStationData {
   building: ArchiveStationBuildingData
   cargo?: WareAmount[]
   reservation?: WareAmount[]
+  overrides?: StationTradeOverrides
+  targetCounts?: WareAmount[]
   workforces?: WorkforceEntry[]
   tag?: string
   factoryGroup?: string

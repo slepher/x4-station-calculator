@@ -18,6 +18,10 @@ const props = defineProps<{
   isNumberFlashing?: boolean
   inactiveByDlc?: boolean
   countDisabled?: boolean
+  threshold?: number
+  diffAnnotation?: string
+  colorByDiff?: boolean
+  isRecommended?: boolean
 }>()
 
 const emit = defineEmits<{
@@ -26,9 +30,14 @@ const emit = defineEmits<{
   (e: 'remove'): void
 }>()
 
-// 计算属性
+const isBelowThreshold = computed(() => {
+  return props.isRecommended && props.threshold !== undefined && props.item.count < props.threshold
+})
+const isAboveThreshold = computed(() => {
+  return props.colorByDiff && (moduleDiffAnnotation.value?.startsWith('+') ?? false)
+})
+
 const colorBarStyle = computed(() => {
-  // 优先使用模块的color_rgb，如果没有则根据type使用默认颜色
   const colorRgb = props.info.color_rgb;
   if (colorRgb) {
     return {
@@ -36,15 +45,14 @@ const colorBarStyle = computed(() => {
     };
   }
   
-  // 如果没有颜色信息，使用默认颜色
   const type = props.info.type;
   if (type === 'habitation' || type.includes('habitat')) {
     return {
-      backgroundColor: '#f97316' // orange-500
+      backgroundColor: '#f97316'
     };
   } else {
     return {
-      backgroundColor: '#0ea5e9' // sky-500
+      backgroundColor: '#0ea5e9'
     };
   }
 })
@@ -56,6 +64,12 @@ const moduleInfoClass = computed(() => {
 const shouldShowDlcTag = computed(() => props.info.dlc_tag !== 'base')
 const dlcLabel = computed(() => gameData.getDlcDisplayName(props.info.dlc_tag))
 const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
+const localizedModuleName = computed(() => translateModule(props.info))
+const moduleDiffAnnotation = computed(() => props.diffAnnotation ?? props.item.diffAnnotation)
+const moduleDiffClass = computed(() => {
+  if (!moduleDiffAnnotation.value) return ''
+  return moduleDiffAnnotation.value.startsWith('-') ? 'module-diff-annotation--negative' : 'module-diff-annotation--positive'
+})
 </script>
 
 <template>
@@ -72,29 +86,45 @@ const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
 
     <div class="module-info" :class="moduleInfoClass">
       <div class="module-title-row">
-        <div class="module-name" :title="info.name">
-          {{ translateModule(info) }}
+        <div class="module-name" :title="localizedModuleName">
+          <span class="module-name-text">{{ localizedModuleName }}</span>
+          <span
+            v-if="moduleDiffAnnotation"
+            class="module-diff-annotation"
+            :class="moduleDiffClass"
+          >{{ moduleDiffAnnotation }}</span>
         </div>
-        <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'">
-          {{ dlcLabel }}
-        </span>
+        <span v-if="shouldShowDlcTag" class="dlc-tag" :class="isDlcActive ? 'dlc-tag--active' : 'dlc-tag--inactive'"
+          :title="dlcLabel">DLC</span>
       </div>
     </div>
 
     <div class="controls" v-if="!readonly">
-      <div class="ignore-drag input-wrapper" :class="{ 'input-wrapper--flashing': isNumberFlashing }">
+      <div class="ignore-drag input-wrapper" :class="{
+        'input-wrapper--flashing': isNumberFlashing,
+        'input-wrapper--warning': isBelowThreshold,
+        'input-wrapper--positive': isAboveThreshold
+      }">
         <X4NumberInput :modelValue="item.count" @update:modelValue="emit('update:count', $event)" width-class="w-14"
-          :min="1" :disabled="countDisabled" />
+          :min="props.isRecommended ? (props.threshold ?? 1) : 1" :disabled="countDisabled" />
       </div>
       <button @click="emit('remove')" class="remove-btn ignore-drag" :title="t('planning.remove')">×</button>
     </div>
     <div class="controls" v-else>
       <div v-if="!props.noClick" class="count-display ignore-drag" @click="emit('transfer', item)">
-        <span class="count-text count-text--clickable" :class="{ 'count-text--flashing': isNumberFlashing }"
+        <span class="count-text count-text--clickable" :class="{
+          'count-text--flashing': isNumberFlashing,
+          'count-text--warning': isBelowThreshold,
+          'count-text--positive': isAboveThreshold
+        }"
           :title="t('planning.transfer_to_planning')">{{ item.count }}</span>
       </div>
       <div v-else class="count-display">
-        <span class="count-text count-text--static" :class="{ 'count-text--flashing': isNumberFlashing }">{{ item.count
+        <span class="count-text count-text--static" :class="{
+          'count-text--flashing': isNumberFlashing,
+          'count-text--warning': isBelowThreshold,
+          'count-text--positive': isAboveThreshold
+        }">{{ item.count
           }}</span>
       </div>
     </div>
@@ -165,7 +195,23 @@ const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
 }
 
 .module-name {
-  @apply truncate font-medium text-slate-300 group-hover/row:text-white transition-colors text-xs sm:text-sm;
+  @apply flex items-center min-w-0 font-medium text-slate-300 group-hover/row:text-white transition-colors text-xs sm:text-sm;
+}
+
+.module-name-text {
+  @apply truncate min-w-0;
+}
+
+.module-diff-annotation {
+  @apply ml-1 shrink-0 text-[10px] font-normal;
+}
+
+.module-diff-annotation--positive {
+  @apply text-emerald-300/75;
+}
+
+.module-diff-annotation--negative {
+  @apply text-red-300/75;
 }
 
 .module-title-row {
@@ -173,7 +219,7 @@ const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
 }
 
 .dlc-tag {
-  @apply inline-flex max-w-[110px] flex-shrink-0 items-center rounded-md border px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide;
+  @apply inline-flex flex-shrink-0 items-center rounded-md border px-1 py-0.5 text-[10px] font-semibold uppercase tracking-wide cursor-default;
 }
 
 .dlc-tag--active {
@@ -208,17 +254,34 @@ const isDlcActive = computed(() => gameData.isDlcActive(props.info.dlc_tag))
   @apply text-slate-500;
 }
 
+.count-text--warning {
+  @apply text-red-400;
+}
+
+.count-text--positive {
+  @apply text-green-400;
+}
+
 .count-text--flashing {
   animation: number-flash 0.3s ease-in-out;
 }
 
-/* 新增：输入框容器的闪烁样式 */
 .input-wrapper {
   @apply rounded transition-colors;
 }
 
 .input-wrapper--flashing {
   animation: number-flash 0.3s ease-in-out;
+}
+
+.input-wrapper--warning :deep(.x4-num-input) {
+  color: #f87171 !important;
+
+}
+
+.input-wrapper--positive :deep(.x4-num-input) {
+  color: #4ade80 !important;
+
 }
 
 @keyframes number-flash {

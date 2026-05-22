@@ -7,9 +7,14 @@ import type { SavedModule } from '@/types/x4'
 
 const props = defineProps<{
   plannedModules: SavedModule[]
+  recommendedModules?: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
+  effectiveAutoIndustryModules?: SavedModule[]
+  effectiveAutoHabitationModules?: SavedModule[]
+  effectiveAutoInfrastructureModules?: SavedModule[]
+  archiveTotalMap?: Record<string, number>
   enforceDlcActivation: boolean
   showArchive: boolean
   archiveModules?: SavedModule[]
@@ -23,6 +28,10 @@ const emit = defineEmits<{
 const { t } = useI18n()
 
 const showArchivePanel = computed(() => props.showArchive)
+
+const displayAutoIndustry = computed(() => props.effectiveAutoIndustryModules ?? props.autoIndustryModules)
+const displayAutoHabitation = computed(() => props.effectiveAutoHabitationModules ?? props.autoHabitationModules)
+const displayAutoInfrastructure = computed(() => props.effectiveAutoInfrastructureModules ?? props.autoInfrastructureModules)
 
 const handleUpdatePlannedModules = (modules: SavedModule[]) => {
   emit('updatePlannedModules', modules)
@@ -41,10 +50,14 @@ const handleUpdatePlannedModules = (modules: SavedModule[]) => {
       <StationPlanningPanel
         v-if="!showArchivePanel"
         :planned-modules="props.plannedModules"
-        :auto-industry-modules="props.autoIndustryModules"
-        :auto-habitation-modules="props.autoHabitationModules"
-        :auto-infrastructure-modules="props.autoInfrastructureModules"
+        :recommended-modules="props.recommendedModules || []"
+        :auto-industry-modules="displayAutoIndustry"
+        :auto-habitation-modules="displayAutoHabitation"
+        :auto-infrastructure-modules="displayAutoInfrastructure"
         :enforce-dlc-activation="props.enforceDlcActivation"
+        :archive-modules="props.archiveModules || []"
+        :building-modules="props.buildingModules || []"
+        :archive-total-map="props.archiveTotalMap || {}"
         @update-planned-modules="handleUpdatePlannedModules"
       />
       <ArchiveModuleList

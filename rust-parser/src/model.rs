@@ -105,6 +105,22 @@ pub(crate) struct WareAmount {
 }
 
 #[derive(Clone, Serialize, Deserialize)]
+pub(crate) struct StationTradeOverrides {
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) max: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) buy: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Vec::is_empty")]
+    pub(crate) sell: Vec<WareAmount>,
+}
+
+impl StationTradeOverrides {
+    pub(crate) fn is_empty(&self) -> bool {
+        self.max.is_empty() && self.buy.is_empty() && self.sell.is_empty()
+    }
+}
+
+#[derive(Clone, Serialize, Deserialize)]
 pub(crate) struct WorkforceEntry {
     pub(crate) race: String,
     pub(crate) amount: i64,
@@ -211,6 +227,8 @@ pub(crate) struct PlayerStationEntry {
     pub(crate) cargo: Vec<WareAmount>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
     pub(crate) reservation: Vec<WareAmount>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub(crate) overrides: Option<StationTradeOverrides>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub(crate) buildstorage_code: Option<String>,
     #[serde(skip_serializing_if = "Vec::is_empty")]

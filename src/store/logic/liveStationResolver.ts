@@ -39,19 +39,26 @@ export function toProductionStation(
 
 function toDerivedSaveStation(
   saveStation: PlayerStationEntry,
-  plan: BindingStationPlan | undefined
+  plan: BindingStationPlan | undefined,
+  sectorMacro: string,
+  sectorsMap?: SectorSunlightMap
 ): StationPlan {
   const id = plan ? plan.id : saveStation.code
   const archiveModules = (saveStation.modules || []).map((mod) => ({
     id: mod.module_id || '',
     count: mod.amount || 1
   })).filter((mod) => Boolean(mod.id))
+  const settings = ({ ...DEFAULT_STATION_SETTINGS, ...plan?.settings || {} })
+  const sector = sectorsMap?.[sectorMacro]
+  if (sector?.area?.sunlight !== undefined) {
+    settings.sunlight = Math.round(sector.area.sunlight * 100)
+  }
   return {
     id,
     name: plan?.name || saveStation.code || 'Save Station',
     type: plan?.type || 'industrial',
     modules: plan?.modules || archiveModules,
-    settings: ({ ...DEFAULT_STATION_SETTINGS, ...plan?.settings || {} }),
+    settings,
     lastUpdated: 0,
     lockedWares: plan?.lockedWares || [],
     warePriority: plan?.warePriority || {}
@@ -135,7 +142,7 @@ export function deriveBindingStationsFromRecords(
     if (!record) return
     const plan = stationPlansByCode.get(code)
     const groupId = plan?.groupId || findGroupBySectorMacro(groups, record.sectorMacro)?.id || null
-    const station = toDerivedSaveStation(record.data as PlayerStationEntry, plan)
+    const station = toDerivedSaveStation(record.data as PlayerStationEntry, plan, record.sectorMacro, sectorsMap)
     station.sectorId = groupId
     result.push({
       station,

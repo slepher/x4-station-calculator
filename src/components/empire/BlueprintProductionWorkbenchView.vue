@@ -101,6 +101,7 @@ const buildPlanPresenter = useBuildPlanPresenter({
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanel
         :planned-modules="planningPresenter.props.plannedModules.value"
+        :recommended-modules="planningPresenter.props.recommendedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
         :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
         :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
@@ -111,8 +112,12 @@ const buildPlanPresenter = useBuildPlanPresenter({
 
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
+        :visual-mode="wareflowPresenter.props.visualMode.value"
         :view-mode="wareflowPresenter.props.viewMode.value"
+        :use-allocation-volume-view="wareflowPresenter.props.useAllocationVolumeView.value"
         :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
+        :allocation-volume-groups="wareflowPresenter.props.allocationVolumeGroups.value"
+        :allocation-cargo-only-items="wareflowPresenter.props.allocationCargoOnlyItems.value"
         :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"
@@ -135,7 +140,8 @@ const buildPlanPresenter = useBuildPlanPresenter({
 
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
-        :modules="dashboardPresenter.props.modules.value"
+        :display-modules="dashboardPresenter.props.displayModules.value"
+        :worker-modules="dashboardPresenter.props.workerModules.value"
         :settings="dashboardPresenter.props.settings.value"
         :current-efficiency="dashboardPresenter.props.currentEfficiency.value"
         :actual-workforce="dashboardPresenter.props.actualWorkforce.value"

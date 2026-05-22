@@ -21,6 +21,7 @@ export interface ProductionWareRuleActionDeps<TStation extends ProductionWareRul
   getAutoIndustryModules(): SavedModule[]
   getModulesMap(): Record<string, X4Module>
   getWaresMap(): Record<string, X4Ware>
+  isLockForbidden?(wareId: string): boolean
   getLockedWares(): string[]
   getWarePriority(): Record<string, number>
   cloneStringList(values: string[]): string[]
@@ -44,13 +45,22 @@ export interface ProductionWareRuleActions {
 export function createProductionWareRuleActions<TStation extends ProductionWareRuleStation>(
   deps: ProductionWareRuleActionDeps<TStation>
 ): ProductionWareRuleActions {
-  function isWareOperable(wareId: string): boolean {
+  function isBaseWareOperable(wareId: string): boolean {
     const ware = deps.getWaresMap()[wareId]
     return ware?.transport === 'container'
   }
 
+  function isLockForbidden(wareId: string): boolean {
+    return deps.isLockForbidden?.(wareId) ?? false
+  }
+
+  function isWareOperable(wareId: string): boolean {
+    if (!isBaseWareOperable(wareId)) return false
+    return !isLockForbidden(wareId)
+  }
+
   function isWareLocked(wareId: string): boolean {
-    if (!isWareOperable(wareId)) return true
+    if (!isBaseWareOperable(wareId)) return true
     return deps.getLockedWares().includes(wareId)
   }
 
@@ -85,8 +95,11 @@ export function createProductionWareRuleActions<TStation extends ProductionWareR
   }
 
   function toggleWareLock(wareId: string): ActionResult {
-    if (!isWareOperable(wareId)) {
+    if (!isBaseWareOperable(wareId)) {
       return { ok: false, reason: 'ware-not-operable' }
+    }
+    if (isLockForbidden(wareId)) {
+      return { ok: false, reason: 'ware-lock-forbidden' }
     }
 
     const station = deps.getActiveStation()

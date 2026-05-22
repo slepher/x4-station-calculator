@@ -17,7 +17,7 @@ function groupProductionFlows(productionFlows: DerivedProductionFlow[]): Grouped
     volumeGroups: { solid: [], liquid: [], container: [] }
   }
   wareFlows.forEach(flow => {
-    if (flow.netRate > 0) groupedFlows.rateGroups.positive.push(flow)
+    if (flow.netRate >= 0) groupedFlows.rateGroups.positive.push(flow)
     else if (flow.contributions.some(c => c.class === 'workforce' || c.class === 'workforce_idle')) groupedFlows.rateGroups.supply.push(flow)
     else if (flow.transportType === 'container') groupedFlows.rateGroups.operations.push(flow)
     else groupedFlows.rateGroups.resources.push(flow)

@@ -5,6 +5,11 @@ import type { StationDerivedCache, StationDerivedSeed, StationDerivedStaticDeps 
 import { deriveInfrastructureModules, StationDerivedMap } from '../state/StationDerivedMap'
 import { DEFAULT_STATION_SETTINGS } from '../state/stationSettings'
 import { deepClone } from '@/utils/deepClone'
+import {
+  calculateAutoHabitationModules,
+  calculateProductionFlowsCore
+} from './calculateProductionFlows'
+import { buildEffectivePlannedModules, computeRecommendedPlanningSubset, getReferenceProductionFloorModules, mergeSavedModules, maxSavedModules } from './planningRecommendedModules'
 
 export interface ActiveStationState {
   actualWorkforce: number
@@ -12,6 +17,8 @@ export interface ActiveStationState {
   warePriorityLevels: Record<string, number>
   productionFlows: any[]
   plannedModules: SavedModule[]
+  effectivePlannedModules: SavedModule[]
+  recommendedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
@@ -50,6 +57,8 @@ export function buildActiveStationState(
       warePriorityLevels: {},
       productionFlows: [],
       plannedModules: [],
+      effectivePlannedModules: [],
+      recommendedModules: [],
       autoIndustryModules: [],
       autoHabitationModules: [],
       autoInfrastructureModules: [],
@@ -67,6 +76,8 @@ export function buildActiveStationState(
     warePriorityLevels: cache?.warePriorityLevels || {},
     productionFlows,
     plannedModules,
+    effectivePlannedModules: plannedModules,
+    recommendedModules: [],
     autoIndustryModules: autoIndustry,
     autoHabitationModules: autoHabitation,
     autoInfrastructureModules: [],
@@ -77,9 +88,78 @@ export function buildActiveStationState(
 export interface BuildDerivedActiveStationStateInput {
   stationId: string | undefined
   plannedModules: SavedModule[]
+  referenceModules?: SavedModule[]
+  deferSupportModules?: boolean
   settings: StationSettings
   cache: StationDerivedCache | null
   deps: StationComputeDeps | null
+}
+
+interface FinalSupportState {
+  autoHabitationModules: SavedModule[]
+  autoInfrastructureModules: SavedModule[]
+  productionFlows: WareProductionFlow[]
+  actualWorkforce: number
+  currentEfficiency: number
+}
+
+function deriveFinalSupportState(input: {
+  plannedModules: SavedModule[]
+  autoIndustryModules: SavedModule[]
+  referenceModules?: SavedModule[]
+  settings: StationSettings
+  warePriorityLevels: Record<string, number>
+  deps: StationComputeDeps
+}): FinalSupportState {
+  const autoHabitationModules = calculateAutoHabitationModules({
+    plannedModules: input.plannedModules,
+    autoIndustryModules: input.autoIndustryModules,
+    settings: input.settings,
+    modulesMap: input.deps.modulesMap,
+    referenceModules: input.referenceModules
+  })
+
+  const finalCoreResult = calculateProductionFlowsCore({
+    plannedModules: input.plannedModules,
+    autoIndustryModules: input.autoIndustryModules,
+    autoHabitationModules,
+    modulesMap: input.deps.modulesMap,
+    waresMap: input.deps.waresMap,
+    workforceConsumptionMap: input.deps.workforceConsumptionMap,
+    settings: input.settings,
+    warePriority: input.warePriorityLevels
+  })
+
+  const autoInfrastructureModules = deriveInfrastructureModules({
+    productionFlows: finalCoreResult.productionFlows,
+    plannedModules: mergeSavedModules([
+      ...input.plannedModules,
+      ...autoHabitationModules
+    ]),
+    autoIndustryModules: input.autoIndustryModules,
+    settings: {
+      racePreference: input.settings.racePreference,
+      resourceBufferHours: input.settings.resourceBufferHours,
+      primaryProductBufferHours: input.settings.primaryProductBufferHours,
+      secondaryProductBufferHours: input.settings.secondaryProductBufferHours,
+      transportShipCapacity: input.settings.transportShipCapacity
+    },
+    warePriorityLevels: input.warePriorityLevels,
+    referenceModules: input.referenceModules,
+    deps: {
+      modulesMap: input.deps.modulesMap,
+      waresMap: input.deps.waresMap,
+      workforceConsumptionMap: input.deps.workforceConsumptionMap
+    }
+  })
+
+  return {
+    autoHabitationModules,
+    autoInfrastructureModules,
+    productionFlows: finalCoreResult.productionFlows,
+    actualWorkforce: finalCoreResult.actualWorkforce,
+    currentEfficiency: finalCoreResult.currentEfficiency
+  }
 }
 
 export function buildDerivedActiveStationState(
@@ -88,6 +168,8 @@ export function buildDerivedActiveStationState(
   const {
     stationId,
     plannedModules,
+    referenceModules,
+    deferSupportModules,
     settings,
     cache,
     deps
@@ -97,33 +179,52 @@ export function buildDerivedActiveStationState(
     return buildActiveStationState(stationId, plannedModules, cache)
   }
 
+  if (!cache) {
+    return buildActiveStationState(stationId, plannedModules, cache)
+  }
+
+  const recommendedSubset = input.referenceModules
+    ? computeRecommendedPlanningSubset(plannedModules, input.referenceModules, input.deps?.modulesMap || {})
+    : {
+        recommendedModuleIds: new Set<string>(),
+        recommendedGapModules: [],
+        recommendedDisplayModules: [],
+        effectivePlannedModules: plannedModules
+      }
+  const effectivePlannedModules = buildEffectivePlannedModules(
+    plannedModules,
+    recommendedSubset.recommendedDisplayModules
+  )
   const autoIndustry = cache?.autoIndustryModules || []
-  const autoHabitation = cache?.autoHabitationModules || []
-  const productionFlows = cache?.productionFlows || []
-  const autoInfrastructure = (!deps || !cache)
-    ? []
-    : deriveInfrastructureModules({
-        productionFlows,
-        plannedModules,
+  const finalSupport = (!deps || deferSupportModules)
+    ? null
+    : deriveFinalSupportState({
+        plannedModules: effectivePlannedModules,
         autoIndustryModules: autoIndustry,
-        settings: {
-          racePreference: settings.racePreference,
-          resourceBufferHours: settings.resourceBufferHours,
-          primaryProductBufferHours: settings.primaryProductBufferHours,
-          secondaryProductBufferHours: settings.secondaryProductBufferHours,
-          transportShipCapacity: settings.transportShipCapacity
-        },
+        referenceModules,
+        settings,
         warePriorityLevels: cache.warePriorityLevels,
         deps
       })
-  const resolved = [...plannedModules, ...autoIndustry, ...autoHabitation, ...autoInfrastructure]
+  const autoHabitation = finalSupport?.autoHabitationModules || []
+  const productionFlows = finalSupport?.productionFlows || cache.productionFlows || []
+  const autoInfrastructure = finalSupport?.autoInfrastructureModules || []
+
+  const resolved = [
+    ...effectivePlannedModules,
+    ...autoIndustry,
+    ...autoHabitation,
+    ...autoInfrastructure
+  ]
 
   return {
-    actualWorkforce: cache?.actualWorkforce || 0,
-    currentEfficiency: cache?.currentEfficiency || 0,
-    warePriorityLevels: cache?.warePriorityLevels || {},
+    actualWorkforce: finalSupport?.actualWorkforce || cache.actualWorkforce || 0,
+    currentEfficiency: finalSupport?.currentEfficiency || cache.currentEfficiency || 0,
+    warePriorityLevels: cache.warePriorityLevels || {},
     productionFlows,
     plannedModules,
+    effectivePlannedModules,
+    recommendedModules: recommendedSubset.recommendedDisplayModules,
     autoIndustryModules: autoIndustry,
     autoHabitationModules: autoHabitation,
     autoInfrastructureModules: autoInfrastructure,
@@ -160,6 +261,122 @@ export function buildDerivedTransitState(
   return {
     autoInfrastructureModules: autoInfrastructure,
     resolvedModules: autoInfrastructure
+  }
+}
+
+export interface CanonicalPlanningStationState extends ActiveStationState {
+  finalPlannedModules: SavedModule[]
+  effectiveTargetModules: SavedModule[]
+}
+
+export interface BuildCanonicalPlanningStationStateInput {
+  planState: ActiveStationState
+  archiveBuiltModules: SavedModule[]
+  archiveBuildingModules: SavedModule[]
+  referenceModules?: SavedModule[]
+  settings: StationSettings
+  deps: StationComputeDeps | null
+  calculateInfrastructureModules?: typeof deriveInfrastructureModules
+  calculateCanonicalFlows?: (modules: SavedModule[]) => {
+    productionFlows: WareProductionFlow[]
+    actualWorkforce: number
+    currentEfficiency: number
+  }
+}
+
+export function buildCanonicalPlanningStationState(
+  input: BuildCanonicalPlanningStationStateInput
+): CanonicalPlanningStationState {
+  const archiveCurrentTotalModules = mergeSavedModules([
+    ...input.archiveBuiltModules,
+    ...input.archiveBuildingModules
+  ])
+  const canonicalBaseModules = maxSavedModules(
+    mergeSavedModules([
+      ...input.planState.effectivePlannedModules,
+      ...input.planState.autoIndustryModules
+    ]),
+    input.deps
+      ? getReferenceProductionFloorModules(archiveCurrentTotalModules, input.deps.modulesMap)
+      : []
+  )
+
+  const autoHabitationModules = !input.deps
+    ? input.planState.autoHabitationModules
+    : calculateAutoHabitationModules({
+        plannedModules: canonicalBaseModules,
+        autoIndustryModules: [],
+        settings: input.settings,
+        modulesMap: input.deps.modulesMap,
+        referenceModules: input.referenceModules
+      })
+  const planningBaseModules = mergeSavedModules([
+    ...canonicalBaseModules,
+    ...autoHabitationModules
+  ])
+  const provisionalEffectiveModules = planningBaseModules
+
+  const canonicalFlowResult = input.calculateCanonicalFlows
+    ? input.calculateCanonicalFlows(provisionalEffectiveModules)
+    : !input.deps
+      ? {
+          productionFlows: input.planState.productionFlows,
+          actualWorkforce: input.planState.actualWorkforce,
+          currentEfficiency: input.planState.currentEfficiency
+        }
+      : calculateProductionFlowsCore({
+          plannedModules: provisionalEffectiveModules,
+          autoIndustryModules: [],
+          autoHabitationModules: [],
+          modulesMap: input.deps.modulesMap,
+          waresMap: input.deps.waresMap,
+          workforceConsumptionMap: input.deps.workforceConsumptionMap,
+          settings: input.settings,
+          warePriority: input.planState.warePriorityLevels
+        })
+
+  const calculateInfrastructure = input.calculateInfrastructureModules || deriveInfrastructureModules
+  const autoInfrastructureModules = !input.deps
+    ? input.planState.autoInfrastructureModules
+    : calculateInfrastructure({
+        productionFlows: canonicalFlowResult.productionFlows,
+        plannedModules: mergeSavedModules([
+          ...canonicalBaseModules,
+          ...autoHabitationModules
+        ]),
+        autoIndustryModules: [],
+        settings: {
+          racePreference: input.settings.racePreference,
+          resourceBufferHours: input.settings.resourceBufferHours,
+          primaryProductBufferHours: input.settings.primaryProductBufferHours,
+          secondaryProductBufferHours: input.settings.secondaryProductBufferHours,
+          transportShipCapacity: input.settings.transportShipCapacity
+        },
+        warePriorityLevels: input.planState.warePriorityLevels,
+        referenceModules: input.referenceModules,
+        deps: input.deps
+      })
+  const finalPlannedModules = mergeSavedModules([
+    ...planningBaseModules,
+    ...autoInfrastructureModules
+  ])
+  const effectiveTargetModules = finalPlannedModules
+  const resolvedModules = [
+    ...canonicalBaseModules,
+    ...autoHabitationModules,
+    ...autoInfrastructureModules
+  ]
+
+  return {
+    ...input.planState,
+    actualWorkforce: canonicalFlowResult.actualWorkforce,
+    currentEfficiency: canonicalFlowResult.currentEfficiency,
+    productionFlows: canonicalFlowResult.productionFlows,
+    autoHabitationModules,
+    autoInfrastructureModules,
+    resolvedModules,
+    finalPlannedModules,
+    effectiveTargetModules
   }
 }
 

@@ -33,6 +33,111 @@ export function selectBestModule(
   return matches[0];
 }
 
+export function selectBestModuleWithReference(
+  referenceCandidates: X4Module[],
+  existingCandidates: X4Module[],
+  databaseCandidates: X4Module[],
+  targetRace: string,
+  sortFn: (a: X4Module, b: X4Module) => number
+): X4Module | undefined {
+  const pools: X4Module[][] = [
+    referenceCandidates,
+    existingCandidates,
+    databaseCandidates
+  ]
+
+  for (const pool of pools) {
+    if (pool.length === 0) continue
+    const sameRace = pool.filter((module) => module.race === targetRace)
+    if (sameRace.length > 0) {
+      sameRace.sort(sortFn)
+      return sameRace[0]
+    }
+    pool.sort(sortFn)
+    return pool[0]
+  }
+
+  return undefined
+}
+
+export function findBestModuleWithReferenceQuota(
+  race: string,
+  existingModules: SavedModule[],
+  modules: Record<string, X4Module>,
+  referenceModules: SavedModule[],
+  remainingQuota: Record<string, number>,
+  isValid: (module: X4Module) => boolean,
+  sortFn: (a: X4Module, b: X4Module) => number,
+  databaseCandidatesOverride?: X4Module[]
+): { module: X4Module; exhaustedQuota: boolean } | undefined {
+  const refCandidates = referenceModules.flatMap(item => {
+    const module = modules[item.id]
+    return (module && isValid(module)) ? [module] : []
+  })
+
+  const existingCandidates = existingModules.flatMap(item => {
+    const module = modules[item.id]
+    return (module && isValid(module)) ? [module] : []
+  })
+
+  const dbCandidates = databaseCandidatesOverride && databaseCandidatesOverride.length > 0
+    ? databaseCandidatesOverride
+    : Object.values(modules).filter(isValid)
+
+  function pickFrom(pool: X4Module[], matchRace: boolean): X4Module | undefined {
+    if (pool.length === 0) return undefined
+    let matches = matchRace ? pool.filter(m => m.race === race) : pool
+    if (matches.length === 0 && matchRace) matches = pool
+    matches.sort(sortFn)
+    return matches[0]
+  }
+
+  const p1Pool = refCandidates.filter(m => (remainingQuota[m.id] || 0) > 0 && m.race === race)
+  if (p1Pool.length > 0) {
+    p1Pool.sort(sortFn)
+    return { module: p1Pool[0]!, exhaustedQuota: false }
+  }
+
+  const p2Pool = refCandidates.filter(m => (remainingQuota[m.id] || 0) > 0)
+  if (p2Pool.length > 0) {
+    p2Pool.sort(sortFn)
+    return { module: p2Pool[0]!, exhaustedQuota: false }
+  }
+
+  const p3 = pickFrom(existingCandidates, true)
+  if (p3) {
+    return { module: p3, exhaustedQuota: true }
+  }
+
+  const p4 = pickFrom(existingCandidates, false)
+  if (p4) {
+    return { module: p4, exhaustedQuota: true }
+  }
+
+  const p5Pool = refCandidates.filter(m => m.race === race)
+  if (p5Pool.length > 0) {
+    p5Pool.sort(sortFn)
+    return { module: p5Pool[0]!, exhaustedQuota: true }
+  }
+
+  if (refCandidates.length > 0) {
+    refCandidates.sort(sortFn)
+    return { module: refCandidates[0]!, exhaustedQuota: true }
+  }
+
+  const p7 = pickFrom(dbCandidates, true)
+  if (p7) {
+    return { module: p7, exhaustedQuota: true }
+  }
+
+  const p8 = pickFrom(dbCandidates, false)
+  if (p8) {
+    return { module: p8, exhaustedQuota: true }
+  }
+
+  return undefined
+}
+
 // --- 业务封装函数 ---
 
 /**
@@ -46,28 +151,22 @@ export function findBestProducer(
   modules: Record<string, X4Module>,
   wares: Record<string, X4Ware>
 ): X4Module | undefined {
-  const ware = wares[wareId];
-  // 边界检查：矿物/气体跳过
-  if (!ware || ware.transport === 'solid' || ware.transport === 'liquid') return undefined;
+  const ware = wares[wareId]
+  if (!ware || ware.transport === 'solid' || ware.transport === 'liquid') return undefined
 
-  // 准备筛选器 lambda
-  const isValidProducer = (m: X4Module) => 
-    m.outputs[wareId] && (m.type === 'production') && (m.method != "recycling");
+  const isValidProducer = (m: X4Module) =>
+    m.outputs[wareId] && (m.type === 'production') && (m.method != "recycling")
 
-  // 准备 Pool A: 现有模块 (使用 flatMap 清洗类型)
   const existingCandidates = existingModules.flatMap(item => {
-    const m = modules[item.id];
-    return (m && isValidProducer(m)) ? [m] : [];
-  });
+    const m = modules[item.id]
+    return (m && isValidProducer(m)) ? [m] : []
+  })
 
-  // 准备 Pool B: 数据库模块
-  const dbCandidates = Object.values(modules).filter(isValidProducer);
+  const dbCandidates = Object.values(modules).filter(isValidProducer)
+  const sortByOutput = (a: X4Module, b: X4Module) =>
+    (b.outputs[wareId] || 0) - (a.outputs[wareId] || 0)
 
-  // 定义排序: 按该物资的产出量降序
-  const sortByOutput = (a: X4Module, b: X4Module) => 
-    (b.outputs[wareId] || 0) - (a.outputs[wareId] || 0);
-
-  return selectBestModule(existingCandidates, dbCandidates, race, sortByOutput);
+  return selectBestModule(existingCandidates, dbCandidates, race, sortByOutput)
 }
 
 export function findStandardPowerPlant(
@@ -86,7 +185,8 @@ export function findStandardPowerPlant(
 export function findBestHabitat(
   race: string,
   existingModules: SavedModule[],
-  modules: Record<string, X4Module>
+  modules: Record<string, X4Module>,
+  referenceModules: SavedModule[] = []
 ): X4Module | undefined {
   
   // 准备筛选器 lambda
@@ -98,6 +198,11 @@ export function findBestHabitat(
     return (m && isHabitat(m)) ? [m] : [];
   });
 
+  const referenceCandidates = referenceModules.flatMap(item => {
+    const m = modules[item.id];
+    return (m && isHabitat(m)) ? [m] : [];
+  });
+
   // 准备 Pool B: 数据库模块
   const dbCandidates = Object.values(modules).filter(isHabitat);
 
@@ -105,7 +210,7 @@ export function findBestHabitat(
   const sortByCapacity = (a: X4Module, b: X4Module) => 
     (b.workforce?.capacity || 0) - (a.workforce?.capacity || 0);
 
-  return selectBestModule(existingCandidates, dbCandidates, race, sortByCapacity);
+  return selectBestModuleWithReference(referenceCandidates, existingCandidates, dbCandidates, race, sortByCapacity);
 }
 
 /**

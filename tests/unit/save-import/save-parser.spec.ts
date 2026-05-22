@@ -843,4 +843,52 @@ describe('save parser rust worker enrichment', () => {
       buildstorage_code: 'FIX-154'
     })
   })
+
+  it('preserves player station overrides after post processing', () => {
+    const archive = postProcessRustSaveArchive({
+      meta: {
+        guid: 'g',
+        seed: 1,
+        time: 2,
+        playerName: 'p',
+        version: '800',
+        filename: 'f',
+        parser_version: 'v3',
+        source: 'original'
+      },
+      isCompatible: true,
+      isValid: true,
+      sectors: {
+        sec: {
+          name: 'sec',
+          is_known: true,
+          player_stations: {
+            AAA: {
+              code: 'AAA',
+              macro: 'station_macro',
+              owner: 'player',
+              relative_position: { x: 0, y: 0, z: 0 },
+              overrides: {
+                max: [
+                  { ware: 'energycells', amount: 800000 },
+                  { ware: 'ore', amount: 60000 }
+                ],
+                buy: [{ ware: 'energycells', amount: 200000 }],
+                sell: [{ ware: 'energycells', amount: 400000 }]
+              }
+            }
+          }
+        }
+      }
+    })
+
+    expect(archive.sectors.sec.player_stations?.AAA?.overrides).toEqual({
+      max: [
+        { ware: 'energycells', amount: 800000 },
+        { ware: 'ore', amount: 60000 }
+      ],
+      buy: [{ ware: 'energycells', amount: 200000 }],
+      sell: [{ ware: 'energycells', amount: 400000 }]
+    })
+  })
 })

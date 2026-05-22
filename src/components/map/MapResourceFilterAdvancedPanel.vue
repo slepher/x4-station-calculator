@@ -164,8 +164,8 @@ const loadableEmpires = computed(() => {
   return empires.filter(empire => {
     const stations = empire.stations || []
     return stations.some(station => {
-      const flows = blueprintStore.getSavedStationGroupedFlows(station)
-      return flows.rateGroups.resources.length > 0
+      const resources = blueprintStore.getSavedStationGroupedFlows(station).resources
+      return resources.length > 0
     })
   }).map(empire => ({
     id: empire.id,
@@ -206,14 +206,13 @@ const loadEmpireStations = (empireId: string) => {
   
   const newGroups: AdvancedResourceTagGroup[] = []
   for (const station of stations) {
-    const flows = blueprintStore.getSavedStationGroupedFlows(station)
-    const resourceWares = flows.rateGroups.resources.map((f: { wareId: string }) => f.wareId)
-    if (resourceWares.length === 0) continue
+    const resources = blueprintStore.getSavedStationGroupedFlows(station).resources
+    if (resources.length === 0) continue
     
     const group = buildDefaultGroup()
-    group.tagIds = resourceWares
+    group.tagIds = resources
     group.minYieldByWare = Object.fromEntries(
-      resourceWares.map((wareId: string) => [wareId, 'low'])
+      resources.map((wareId: string) => [wareId, 'low'])
     )
     newGroups.push(group)
   }

@@ -351,4 +351,39 @@ mod tests {
             Some(1)
         );
     }
+
+    #[test]
+    fn parses_player_station_trade_overrides() {
+        let xml = r#"<savegame><info><game guid="g" seed="1" time="2" version="8.0"/><player name="p"/></info><component class="sector" macro="sec_alpha" knownto="player"><component class="station" macro="station_macro" owner="player" code="AAA"><trade><offers /></trade><overrides><max><ware ware="energycells" amount="800000"/><ware ware="ore" amount="60000"/></max><buy><ware ware="energycells" amount="200000"/><ware ware="microchips" amount="3000"/></buy><sell><ware ware="energycells" amount="400000"/><ware ware="quantumtubes" amount="3000"/></sell></overrides></component></component></savegame>"#;
+
+        let mut parser = StreamingSaveParser::new(Some("8.0".to_string()));
+        parser.push_chunk(xml.as_bytes());
+        parser.finish_input();
+        while parser.pump(4096) {}
+
+        let archive = parser.finish_archive("overrides.xml").expect("archive");
+        let station = archive.sectors["sec_alpha"]
+            .player_stations
+            .get("AAA")
+            .expect("station");
+
+        let overrides = station.overrides.as_ref().expect("overrides");
+        assert_eq!(overrides.max.len(), 2);
+        assert_eq!(overrides.max[0].ware, "energycells");
+        assert_eq!(overrides.max[0].amount, 800000);
+        assert_eq!(overrides.max[1].ware, "ore");
+        assert_eq!(overrides.max[1].amount, 60000);
+
+        assert_eq!(overrides.buy.len(), 2);
+        assert_eq!(overrides.buy[0].ware, "energycells");
+        assert_eq!(overrides.buy[0].amount, 200000);
+        assert_eq!(overrides.buy[1].ware, "microchips");
+        assert_eq!(overrides.buy[1].amount, 3000);
+
+        assert_eq!(overrides.sell.len(), 2);
+        assert_eq!(overrides.sell[0].ware, "energycells");
+        assert_eq!(overrides.sell[0].amount, 400000);
+        assert_eq!(overrides.sell[1].ware, "quantumtubes");
+        assert_eq!(overrides.sell[1].amount, 3000);
+    }
 }
