@@ -1,14 +1,15 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { LiveCargoOnlyItem, LiveVolumeAllocationGroup } from '@/types/production-workbench-contract'
+import type { AllocationCargoOnlyItem, AllocationVolumeGroup } from '@/types/production-workbench-contract'
 import CollapsibleDetailList from '../common/CollapsibleDetailList.vue'
-import LiveStationAllocationRow from './LiveStationAllocationRow.vue'
-import LiveStationCargoOnlyRow from './LiveStationCargoOnlyRow.vue'
+import StationAllocationRow from './StationAllocationRow.vue'
+import StationCargoOnlyRow from './StationCargoOnlyRow.vue'
 
 const props = defineProps<{
-  groups: LiveVolumeAllocationGroup[]
-  cargoOnlyItems: LiveCargoOnlyItem[]
+  groups: AllocationVolumeGroup[]
+  cargoOnlyItems: AllocationCargoOnlyItem[]
+  hasArchiveStation?: boolean
   hideActions?: boolean
   isWareLocked?: (wareId: string) => boolean
   getResolvedLevel?: (wareId: string) => number
@@ -37,7 +38,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
 </script>
 
 <template>
-  <div class="live-allocation-view">
+  <div class="allocation-view">
     <section v-for="group in visibleGroups" :key="group.key" class="allocation-group" data-testid="wareflow-group">
       <CollapsibleDetailList :is-expandable="false">
         <template #title>
@@ -45,15 +46,20 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
         </template>
         <template #header>
           <div class="allocation-group-summary">
-            <span>{{ t('wareflow.allocation_cur') }} {{ formatVolume(group.currentTotalVolume) }} m3</span>
-            <span>{{ t('wareflow.allocation_tar') }} {{ formatVolume(group.targetTotalVolume) }} m3</span>
-            <span>{{ t('wareflow.allocation_rec') }} {{ formatVolume(group.recommendedTotalVolume) }} m3</span>
+            <template v-if="group.hasArchiveStation">
+              <span>{{ t('wareflow.allocation_cur') }} {{ formatVolume(group.currentTotalVolume) }} m3</span>
+              <span>{{ t('wareflow.allocation_tar') }} {{ formatVolume(group.targetTotalVolume) }} m3</span>
+              <span>{{ t('wareflow.allocation_rec') }} {{ formatVolume(group.recommendedTotalVolume) }} m3</span>
+            </template>
+            <template v-else>
+              <span>{{ t('wareflow.allocation_rec') }} {{ formatVolume(group.recommendedTotalVolume) }} m3</span>
+            </template>
           </div>
           <div v-if="!hideActions" class="group-header-spacer"></div>
         </template>
       </CollapsibleDetailList>
 
-      <LiveStationAllocationRow
+      <StationAllocationRow
         v-for="item in group.items"
         :key="item.wareId"
         :ware-id="item.wareId"
@@ -63,6 +69,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
         :recommended-count="item.recommendedCount"
         :scale-max-count="item.scaleMaxCount"
         :detail-sections="item.detailSections"
+        :has-archive-station="item.hasArchiveStation"
         :hide-actions="props.hideActions"
         :locked="props.isWareLocked?.(item.wareId) ?? false"
         :priority-level="props.getResolvedLevel?.(item.wareId) ?? 0"
@@ -86,7 +93,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
         </template>
       </CollapsibleDetailList>
 
-      <LiveStationCargoOnlyRow
+      <StationCargoOnlyRow
         v-for="item in cargoOnlyItems"
         :key="item.wareId"
         :name="item.name"
@@ -99,7 +106,7 @@ function getGroupTitle(key: 'container' | 'solid' | 'liquid'): string {
 </template>
 
 <style scoped>
-.live-allocation-view {
+.allocation-view {
   @apply space-y-1;
 }
 

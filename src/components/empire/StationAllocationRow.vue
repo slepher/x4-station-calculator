@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
-import type { LiveVolumeAllocationDetailSection } from '@/types/production-workbench-contract'
+import type { AllocationVolumeDetailSection } from '@/types/production-workbench-contract'
 import FavoriteButton from '../common/FavoriteButton.vue'
 import LockButton from '../common/LockButton.vue'
 
@@ -12,7 +12,8 @@ const props = defineProps<{
   targetCount: number
   recommendedCount: number
   scaleMaxCount: number
-  detailSections: LiveVolumeAllocationDetailSection[]
+  detailSections: AllocationVolumeDetailSection[]
+  hasArchiveStation?: boolean
   locked?: boolean
   priorityLevel?: number
   nonOperable?: boolean
@@ -107,7 +108,7 @@ function handleTogglePriority() {
           <span class="header-name" :title="name">{{ name }}</span>
         </div>
 
-        <div class="bar-shell">
+        <div v-if="hasArchiveStation" class="bar-shell">
           <div class="bar-target" :style="{ width: `${targetWidth}%` }"></div>
           <div class="bar-current" :style="{ width: `${currentWidth}%` }"></div>
           <div class="bar-recommended" :style="{ left: `${recommendedLeft}%` }"></div>
@@ -117,6 +118,7 @@ function handleTogglePriority() {
             <span class="bar-target-text">{{ formatCount(targetCount) }}</span>
           </div>
         </div>
+        <div v-else class="bar-spacer"></div>
 
         <div class="recommended-block" :title="t('wareflow.allocation_rec')">
           <span class="recommended-count">{{ formatCount(recommendedCount) }}</span>
@@ -173,25 +175,19 @@ function handleTogglePriority() {
           </button>
 
           <div v-if="!isCollapsibleSection(section.key) || sectionOpen(section.key)">
-            <div :class="['detail-head',
-              section.includeCurrentColumn && section.includeTargetColumn ? 'detail-head-with-current' :
-              section.includeCurrentColumn && !section.includeTargetColumn ? 'detail-head-current-only' :
-              !section.includeCurrentColumn && section.includeTargetColumn ? 'detail-head-target-only' :
-              'detail-head-no-current']">
+            <div class="detail-head">
               <span class="detail-head-label">{{ t('wareflow.allocation_detail_metric') }}</span>
               <span class="detail-head-col">{{ t('wareflow.allocation_rate_column') }}</span>
               <span v-if="section.includeCurrentColumn" class="detail-head-col">{{ t('wareflow.allocation_current_column') }}</span>
+              <span v-else class="detail-head-col"></span>
               <span v-if="section.includeTargetColumn" class="detail-head-col">{{ t('wareflow.allocation_target_column') }}</span>
+              <span v-else class="detail-head-col"></span>
               <span class="detail-head-col">{{ t('wareflow.allocation_recommended_column') }}</span>
             </div>
             <div
               v-for="row in section.rows"
               :key="row.key"
-              :class="['list-item detail-row',
-                section.includeCurrentColumn && section.includeTargetColumn ? 'detail-row-with-current' :
-                section.includeCurrentColumn && !section.includeTargetColumn ? 'detail-row-current-only' :
-                !section.includeCurrentColumn && section.includeTargetColumn ? 'detail-row-target-only' :
-                'detail-row-no-current']"
+              class="list-item detail-row"
             >
               <span class="detail-label">{{ row.label }}</span>
               <span class="detail-value">
@@ -200,9 +196,11 @@ function handleTogglePriority() {
               <span v-if="section.includeCurrentColumn" class="detail-value">
                 <template v-if="row.currentMinutes !== undefined">{{ formatMinutes(row.currentMinutes) }}</template>
               </span>
+              <span v-else class="detail-value"></span>
               <span v-if="section.includeTargetColumn" class="detail-value">
                 <template v-if="row.targetMinutes !== undefined">{{ formatMinutes(row.targetMinutes) }}</template>
               </span>
+              <span v-else class="detail-value"></span>
               <span class="detail-value">
                 <template v-if="row.recommendedMinutes !== undefined">{{ formatMinutes(row.recommendedMinutes) }}</template>
               </span>
@@ -239,6 +237,7 @@ function handleTogglePriority() {
 .bar-current-text { @apply text-cyan-100; }
 .bar-target-text { @apply text-sky-100; }
 .bar-separator { @apply text-slate-300; }
+.bar-spacer { @apply relative h-4; }
 
 .recommended-block { @apply flex items-center justify-end gap-1 text-amber-300 font-mono text-sm; }
 .recommended-count { @apply leading-none; }
@@ -252,18 +251,12 @@ function handleTogglePriority() {
 .detail-section-toggle-arrow { @apply text-slate-500 transition-transform duration-200; }
 .detail-section-toggle-arrow-open { @apply rotate-90 text-slate-300; }
 .detail-head { @apply grid gap-3 items-center pb-1.5 mb-1 border-b border-slate-700/30 text-slate-400 uppercase tracking-wide; }
-.detail-head-with-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
-.detail-head-current-only { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
-.detail-head-target-only { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
-.detail-head-no-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem; }
+.detail-head { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
 .detail-head-label { @apply text-left; }
 .detail-head-col { @apply text-right; }
 .list-item { @apply py-1.5 border-b border-slate-700/20 last:border-0; }
 .detail-row { @apply grid gap-3 items-center; }
-.detail-row-with-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
-.detail-row-current-only { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
-.detail-row-target-only { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem; }
-.detail-row-no-current { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem; }
+.detail-row { grid-template-columns: minmax(0, 1fr) 5.5rem 5.5rem 5.5rem 5.5rem; }
 .detail-label { @apply text-slate-300 truncate; }
 .detail-value { @apply text-right text-slate-200 font-mono; }
 
