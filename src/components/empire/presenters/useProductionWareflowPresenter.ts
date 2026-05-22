@@ -2,8 +2,8 @@ import { computed, type ComputedRef } from 'vue'
 import type {
   ProductionSessionState,
   ProductionStationState,
-  LiveCargoOnlyItem,
-  LiveVolumeAllocationGroup
+  AllocationCargoOnlyItem,
+  AllocationVolumeGroup
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { WareProductionFlow, DerivedProductionFlow } from '@/types/production-flow'
@@ -27,8 +27,8 @@ export interface WareflowPresenterProps {
   useAllocationVolumeView: ComputedRef<boolean>
   productionFlows: ComputedRef<WareProductionFlow[]>
   derivedProductionFlows: ComputedRef<DerivedProductionFlow[]>
-  liveVolumeAllocationGroups: ComputedRef<LiveVolumeAllocationGroup[]>
-  liveCargoOnlyItems: ComputedRef<LiveCargoOnlyItem[]>
+  allocationVolumeGroups: ComputedRef<AllocationVolumeGroup[]>
+  allocationCargoOnlyItems: ComputedRef<AllocationCargoOnlyItem[]>
   warePriorityLevels: ComputedRef<Record<string, number>>
   settings: ComputedRef<{
     resourceBufferHours: number
@@ -69,8 +69,8 @@ export interface WareflowPresenterStore {
   session: ProductionSessionState
   stationState: ProductionStationState | null
   archiveStation?: ArchiveStationData | null
-  liveVolumeAllocationGroups?: LiveVolumeAllocationGroup[] | ComputedRef<LiveVolumeAllocationGroup[]>
-  liveCargoOnlyItems?: LiveCargoOnlyItem[] | ComputedRef<LiveCargoOnlyItem[]>
+  allocationVolumeGroups?: AllocationVolumeGroup[] | ComputedRef<AllocationVolumeGroup[]>
+  allocationCargoOnlyItems?: AllocationCargoOnlyItem[] | ComputedRef<AllocationCargoOnlyItem[]>
   settingActions: {
     updateResourceBufferHours(value: number): void
     updatePrimaryProductBufferHours(value: number): void
@@ -125,8 +125,8 @@ export function useProductionWareflowPresenter(store: WareflowPresenterStore): U
     useAllocationVolumeView,
     productionFlows: computed(() => store.stationState?.productionFlows || []),
     derivedProductionFlows: computed(() => store.stationState?.derivedProductionFlows || []),
-    liveVolumeAllocationGroups: computed(() => readMaybeComputed(store.liveVolumeAllocationGroups, [])),
-    liveCargoOnlyItems: computed(() => readMaybeComputed(store.liveCargoOnlyItems, [])),
+    allocationVolumeGroups: computed(() => readMaybeComputed(store.allocationVolumeGroups, [])),
+    allocationCargoOnlyItems: computed(() => readMaybeComputed(store.allocationCargoOnlyItems, [])),
     warePriorityLevels: computed(() => store.stationState?.warePriorityLevels || {}),
     settings: computed(() => {
       const s = store.stationState?.settings

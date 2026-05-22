@@ -6,7 +6,7 @@ import { useGameDataStore } from '@/store/useGameDataStore'
 import { useWareFlowGrouping } from './composables/useWareFlowGrouping'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import type { DerivedProductionFlow } from '@/types/production-flow'
-import type { LiveCargoOnlyItem, LiveVolumeAllocationGroup } from '@/types/production-workbench-contract'
+import type { AllocationCargoOnlyItem, AllocationVolumeGroup } from '@/types/production-workbench-contract'
 
 import PriceSlider from '@/components/common/PriceSlider.vue'
 import VolumeControlSlider from '@/components/common/VolumeControlSlider.vue'
@@ -14,15 +14,15 @@ import StationWareFlowGroup from './StationWareFlowGroup.vue'
 import EmpireWareFlowGroup from './EmpireWareFlowGroup.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
-import LiveStationAllocationView from './LiveStationAllocationView.vue'
+import StationAllocationView from './StationAllocationView.vue'
 
 const props = defineProps<{
   visualMode?: 'planning' | 'live'
   viewMode: WareFlowViewMode
   useAllocationVolumeView?: boolean
   productionFlows: DerivedProductionFlow[]
-  liveVolumeAllocationGroups?: LiveVolumeAllocationGroup[]
-  liveCargoOnlyItems?: LiveCargoOnlyItem[]
+  allocationVolumeGroups?: AllocationVolumeGroup[]
+  allocationCargoOnlyItems?: AllocationCargoOnlyItem[]
   warePriorityLevels: Record<string, number>
   settings: {
     resourceBufferHours: number
@@ -215,9 +215,9 @@ const hasFlowData = computed(() => groupedFlows.value.flows.length > 0)
 const isAllocationVolumeMode = computed(() =>
   viewMode.value === 'volume' && (props.useAllocationVolumeView ?? props.visualMode === 'live')
 )
-const hasLiveAllocationData = computed(() =>
-  (props.liveVolumeAllocationGroups?.some((group) => group.items.length > 0) || false)
-  || (props.liveCargoOnlyItems?.length || 0) > 0
+const hasAllocationData = computed(() =>
+  (props.allocationVolumeGroups?.some((group) => group.items.length > 0) || false)
+  || (props.allocationCargoOnlyItems?.length || 0) > 0
 )
 </script>
 
@@ -234,10 +234,10 @@ const hasLiveAllocationData = computed(() =>
     </div>
 
     <div class="list-body custom-scrollbar">
-      <LiveStationAllocationView
-        v-if="isAllocationVolumeMode"
-        :groups="props.liveVolumeAllocationGroups || []"
-        :cargo-only-items="props.liveCargoOnlyItems || []"
+      <StationAllocationView
+        v-if="isAllocationVolumeMode && hasAllocationData"
+        :groups="props.allocationVolumeGroups || []"
+        :cargo-only-items="props.allocationCargoOnlyItems || []"
         :is-ware-locked="props.isWareLocked"
         :get-resolved-level="props.getResolvedLevel"
         :is-ware-operable="props.isWareOperable"
@@ -373,7 +373,7 @@ const hasLiveAllocationData = computed(() =>
       </div>
 
       <EmptyState v-if="groupedFlows.flows.length === 0 && viewMode !== 'economy' && !isAllocationVolumeMode" />
-      <EmptyState v-if="isAllocationVolumeMode && !hasLiveAllocationData" />
+      <EmptyState v-if="isAllocationVolumeMode && !hasAllocationData" />
     </div>
 
     <div class="volume-controls-section" v-if="hasFlowData && viewMode === 'volume'">
