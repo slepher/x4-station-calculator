@@ -35,7 +35,7 @@ describe('planning allocation boundary', () => {
         useAllocationVolumeView: true,
         viewMode: 'volume',
         productionFlows: [],
-        liveVolumeAllocationGroups: [
+        allocationVolumeGroups: [
           {
             key: 'container',
             items: [
@@ -49,17 +49,19 @@ describe('planning allocation boundary', () => {
                 targetCount: 200,
                 recommendedCount: 300,
                 scaleMaxCount: 300,
+                hasArchiveStation: true,
                 detailSections: []
               }
             ],
             currentTotalVolume: 100,
             targetTotalVolume: 200,
-            recommendedTotalVolume: 300
+            recommendedTotalVolume: 300,
+            hasArchiveStation: true
           },
-          { key: 'solid', items: [], currentTotalVolume: 0, targetTotalVolume: 0, recommendedTotalVolume: 0 },
-          { key: 'liquid', items: [], currentTotalVolume: 0, targetTotalVolume: 0, recommendedTotalVolume: 0 }
+          { key: 'solid', items: [], currentTotalVolume: 0, targetTotalVolume: 0, recommendedTotalVolume: 0, hasArchiveStation: true },
+          { key: 'liquid', items: [], currentTotalVolume: 0, targetTotalVolume: 0, recommendedTotalVolume: 0, hasArchiveStation: true }
         ],
-        liveCargoOnlyItems: [],
+        allocationCargoOnlyItems: [],
         warePriorityLevels: {},
         settings: {
           resourceBufferHours: 1,
@@ -75,7 +77,7 @@ describe('planning allocation boundary', () => {
       }
     })
 
-    expect(wrapper.findComponent({ name: 'LiveStationAllocationView' }).exists()).toBe(true)
+    expect(wrapper.findComponent({ name: 'StationAllocationView' }).exists()).toBe(true)
     expect(wrapper.find('[data-testid="volume-groups"]').exists()).toBe(false)
   })
 })

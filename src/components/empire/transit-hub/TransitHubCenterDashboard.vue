@@ -5,7 +5,7 @@ import { useX4I18n } from '@/utils/UseX4I18n'
 import { useI18n } from 'vue-i18n'
 
 import type { DerivedProductionFlow, DerivedFlowContribution } from '@/types/production-flow'
-import type { LiveCargoOnlyItem, LiveVolumeAllocationGroup } from '@/types/production-workbench-contract'
+import type { AllocationCargoOnlyItem, AllocationVolumeGroup } from '@/types/production-workbench-contract'
 import { computeGroupedFlows } from '@/components/empire/composables/useWareFlowGrouping'
 import ViewTabUi from '@/components/common/ViewTabUI.vue'
 import PriceSlider from '@/components/common/PriceSlider.vue'
@@ -14,7 +14,8 @@ import TransitHubQuantityView from './TransitHubQuantityView.vue'
 import TransitHubEconomyView from './TransitHubEconomyView.vue'
 import TransitHubStorageView from './TransitHubStorageView.vue'
 import TransitHubTransportView from './TransitHubTransportView.vue'
-import LiveStationAllocationView from '../LiveStationAllocationView.vue'
+import StationAllocationView from '../StationAllocationView.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 
 const gameData = useGameDataStore()
 const { t } = useI18n()
@@ -29,16 +30,16 @@ const props = withDefaults(defineProps<{
   sellMultiplier?: number
   productBufferHours?: number
   useAllocationVolumeView?: boolean
-  liveVolumeAllocationGroups?: LiveVolumeAllocationGroup[]
-  liveCargoOnlyItems?: LiveCargoOnlyItem[]
+  allocationVolumeGroups?: AllocationVolumeGroup[]
+  allocationCargoOnlyItems?: AllocationCargoOnlyItem[]
 }>(), {
   viewMode: 'quantity',
   buyMultiplier: 0.5,
   sellMultiplier: 0.5,
   productBufferHours: 12,
   useAllocationVolumeView: false,
-  liveVolumeAllocationGroups: () => [],
-  liveCargoOnlyItems: () => []
+  allocationVolumeGroups: () => [],
+  allocationCargoOnlyItems: () => []
 })
 
 const emit = defineEmits<{
@@ -190,6 +191,20 @@ const hasTransportData = computed(() =>
   transportItems.value.some((item) => item.totalTransportVolume > 0)
 )
 
+const hasAllocationData = computed(() =>
+  (props.allocationVolumeGroups?.some((g) => g.items.length > 0) || false)
+  || (props.allocationCargoOnlyItems?.length || 0) > 0
+)
+
+const isEmpty = computed(() => {
+  if (viewMode.value === 'quantity' || viewMode.value === 'economy') return !hasFlowData.value
+  if (viewMode.value === 'volume') {
+    if (props.useAllocationVolumeView) return !hasAllocationData.value
+    return !hasStorageData.value
+  }
+  return !hasTransportData.value
+})
+
 </script>
 
 <template>
@@ -203,35 +218,36 @@ const hasTransportData = computed(() =>
 
     <div class="list-body custom-scrollbar">
       <TransitHubQuantityView
-        v-if="viewMode === 'quantity'"
+        v-if="viewMode === 'quantity' && hasFlowData"
         :groups="grouped.quantity"
         :has-data="hasFlowData"
       />
       <TransitHubEconomyView
-        v-else-if="viewMode === 'economy'"
+        v-if="viewMode === 'economy' && hasFlowData"
         :groups="grouped.economy"
         :has-data="hasFlowData"
       />
-      <LiveStationAllocationView
-        v-else-if="useAllocationVolumeView && viewMode === 'volume'"
-        :groups="liveVolumeAllocationGroups"
-        :cargoOnlyItems="liveCargoOnlyItems"
+      <StationAllocationView
+        v-if="useAllocationVolumeView && viewMode === 'volume' && hasAllocationData"
+        :groups="allocationVolumeGroups"
+        :cargoOnlyItems="allocationCargoOnlyItems"
         :hideActions="true"
       />
       <TransitHubStorageView
-        v-else-if="viewMode === 'volume'"
+        v-if="!useAllocationVolumeView && viewMode === 'volume' && hasStorageData"
         :items="storageItems"
         :has-data="hasStorageData"
       />
       <TransitHubTransportView
-        v-else
+        v-if="viewMode === 'transport' && hasTransportData"
         :items="transportItems"
         :total-volume="transportTotalVolume"
         :has-data="hasTransportData"
       />
+      <EmptyState v-if="isEmpty" />
     </div>
 
-    <div class="controls-section" v-if="hasFlowData">
+    <div class="controls-section" v-if="hasFlowData"> 
       <div v-if="viewMode === 'economy'" class="simulation-controls flex flex-row gap-4">
         <PriceSlider v-model="localBuyMultiplier" :label="t('wareflow.buy_multiplier')" type="buy" />
         <PriceSlider v-model="localSellMultiplier" :label="t('wareflow.sell_multiplier')" type="sell" />
