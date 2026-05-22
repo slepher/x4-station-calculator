@@ -45,10 +45,6 @@ const updateValue = (delta: number) => {
 const handleInput = (e: Event) => {
   const target = e.target as HTMLInputElement
   rawValue.value = target.value
-  const val = parseInt(target.value)
-  if (!Number.isNaN(val)) {
-    emit('update:modelValue', val)
-  }
 }
 
 const handleBlur = () => {

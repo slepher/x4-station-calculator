@@ -3,17 +3,21 @@ import draggable from 'vuedraggable'
 import { useI18n } from 'vue-i18n'
 import { ref, watch, nextTick, computed } from 'vue'
 import { useGameDataStore } from '@/store/useGameDataStore'
-import { generateFilteredModulesGrouped } from '@/store/logic/searchModule'
+import { generateFilteredModulesGrouped, compareModulesByPickerOrder, compareModuleGroupsByPickerOrder } from '@/store/logic/searchModule'
 import StationPlanningItem from './StationPlanningItem.vue'
 import StationModulePicker from './StationModulePicker.vue'
-import type { SavedModule, ModuleGroupResult } from '@/types/x4'
+import type { SavedModule, ModuleGroupResult, X4Module } from '@/types/x4'
 
 const props = defineProps<{
   plannedModules: SavedModule[]
+  recommendedModules?: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoHabitationModules: SavedModule[]
   autoInfrastructureModules: SavedModule[]
   enforceDlcActivation: boolean
+  archiveModules?: SavedModule[]
+  buildingModules?: SavedModule[]
+  archiveTotalMap?: Record<string, number>
 }>()
 
 const emit = defineEmits<{
@@ -28,6 +32,100 @@ const searchQuery = ref('')
 const highlightedModuleIds = ref<Set<string>>(new Set())
 const flashingNumberModuleIds = ref<Set<string>>(new Set())
 const lastModuleCounts = ref<Record<string, number>>({})
+
+interface GroupedArchiveModuleItem {
+  moduleId: string
+  savedModule: SavedModule
+  x4Module: X4Module
+  isBuilding: boolean
+}
+
+interface GroupedArchiveGroup {
+  group: string
+  displayLabel: string
+  modules: GroupedArchiveModuleItem[]
+  hasBuilding: boolean
+}
+
+function groupArchiveModulesMixed(built: SavedModule[], building: SavedModule[]): GroupedArchiveGroup[] {
+  const modulesMap = gameDataStore.modulesMap
+  const moduleGroupsMap = gameDataStore.localizedModuleGroupsMap
+  const groups: Record<string, GroupedArchiveModuleItem[]> = {}
+
+  built.forEach((mod) => {
+    const x4Module = modulesMap[mod.id]
+    if (!x4Module) return
+    const group = x4Module.group || ''
+    if (!group) return
+    if (!groups[group]) groups[group] = []
+    groups[group]!.push({
+      moduleId: mod.id,
+      savedModule: mod,
+      x4Module,
+      isBuilding: false
+    })
+  })
+
+  building.forEach((mod) => {
+    const x4Module = modulesMap[mod.id]
+    if (!x4Module) return
+    const group = x4Module.group || ''
+    if (!group) return
+    if (!groups[group]) groups[group] = []
+    groups[group]!.push({
+      moduleId: mod.id,
+      savedModule: mod,
+      x4Module,
+      isBuilding: true
+    })
+  })
+
+  Object.keys(groups).forEach((groupKey) => {
+    const groupModules = groups[groupKey]
+    if (!groupModules) return
+
+    const builtModules = groupModules.filter(m => !m.isBuilding)
+    const buildingMods = groupModules.filter(m => m.isBuilding)
+
+    builtModules.sort((a, b) =>
+      compareModulesByPickerOrder(
+        { id: a.moduleId, group: groupKey },
+        { id: b.moduleId, group: groupKey },
+        moduleGroupsMap
+      )
+    )
+
+    buildingMods.sort((a, b) =>
+      compareModulesByPickerOrder(
+        { id: a.moduleId, group: groupKey },
+        { id: b.moduleId, group: groupKey },
+        moduleGroupsMap
+      )
+    )
+
+    groups[groupKey] = [...builtModules, ...buildingMods]
+  })
+
+  return Object.keys(groups)
+    .sort((a, b) => compareModuleGroupsByPickerOrder(a, b, moduleGroupsMap))
+    .map((groupKey) => ({
+      group: groupKey,
+      displayLabel: moduleGroupsMap[groupKey]?.localeName || groupKey,
+      modules: groups[groupKey] || [],
+      hasBuilding: (groups[groupKey] || []).some(m => m.isBuilding)
+    }))
+}
+
+const groupedArchiveModules = computed(() =>
+  groupArchiveModulesMixed(props.archiveModules || [], props.buildingModules || [])
+)
+
+const hasArchiveData = computed(() => groupedArchiveModules.value.length > 0)
+const recommendedModuleIds = computed(() => new Set((props.recommendedModules || []).map((module) => module.id)))
+
+const archiveTotal = (moduleId: string): number => {
+  return props.archiveTotalMap?.[moduleId] ?? 0
+}
 
 const filteredModulesGrouped = computed<ModuleGroupResult[]>(() => {
   return generateFilteredModulesGrouped(
@@ -115,20 +213,27 @@ const isModuleCountEditable = (moduleId: string) => {
 
 const handleAddModule = (moduleId: string) => {
   const existingIndex = props.plannedModules.findIndex(m => m.id === moduleId)
+  if (recommendedModuleIds.value.has(moduleId)) return
   let nextModules: SavedModule[]
   if (existingIndex >= 0) {
     nextModules = props.plannedModules.map((m, i) =>
       i === existingIndex ? { ...m, count: m.count + 1 } : m
     )
   } else {
-    nextModules = [...props.plannedModules, { id: moduleId, count: 1 }]
+    const defaultCount = archiveTotal(moduleId) || 1
+    nextModules = [...props.plannedModules, { id: moduleId, count: defaultCount }]
   }
   emit('updatePlannedModules', nextModules)
 }
 
 const handleUpdateModuleCount = (index: number, count: number) => {
+  let clampedCount = count
+  const module = props.plannedModules[index]!
+  if (recommendedModuleIds.value.has(module.id)) {
+    clampedCount = Math.max(count, archiveTotal(module.id))
+  }
   const nextModules = props.plannedModules.map((m, i) =>
-    i === index ? { ...m, count } : m
+    i === index ? { ...m, count: clampedCount } : m
   )
   emit('updatePlannedModules', nextModules)
 }
@@ -143,21 +248,59 @@ const handleReorderModules = (modules: SavedModule[]) => {
 }
 
 const handleTransferAutoModule = (module: SavedModule) => {
+  const info = getModuleInfo(module.id)
+  const isIndustry = info?.type === 'production' && info?.method !== 'recycling'
+  const targetCount = isIndustry ? Math.max(module.count, archiveTotal(module.id)) : module.count
   const existingIndex = props.plannedModules.findIndex(m => m.id === module.id)
   let nextModules: SavedModule[]
   if (existingIndex >= 0) {
+    const current = props.plannedModules[existingIndex]!
     nextModules = props.plannedModules.map((m, i) =>
-      i === existingIndex ? { ...m, count: m.count + module.count } : m
+      i === existingIndex ? { ...m, count: Math.max(current.count, targetCount) } : m
     )
   } else {
-    nextModules = [...props.plannedModules, { id: module.id, count: module.count }]
+    nextModules = [...props.plannedModules, { id: module.id, count: targetCount }]
   }
   emit('updatePlannedModules', nextModules)
+}
+
+const handleTransferRecommendedModule = (module: SavedModule) => {
+  const targetCount = Math.max(module.count, archiveTotal(module.id))
+  const existingIndex = props.plannedModules.findIndex(m => m.id === module.id)
+  let nextModules: SavedModule[]
+
+  if (existingIndex >= 0) {
+    nextModules = props.plannedModules.map((item, index) =>
+      index === existingIndex ? { ...item, count: Math.max(item.count, targetCount) } : item
+    )
+  } else {
+    nextModules = [...props.plannedModules, { id: module.id, count: targetCount }]
+  }
+
+  emit('updatePlannedModules', nextModules)
+}
+
+const handleTransferArchiveModule = (moduleId: string) => {
+  const total = archiveTotal(moduleId)
+  if (total <= 0) return
+  const existingIndex = props.plannedModules.findIndex(m => m.id === moduleId)
+  if (existingIndex >= 0) {
+    const current = props.plannedModules[existingIndex]!
+    if (current.count >= total) return
+    const nextModules = props.plannedModules.map((m, i) =>
+      i === existingIndex ? { ...m, count: total } : m
+    )
+    emit('updatePlannedModules', nextModules)
+  } else {
+    const nextModules = [...props.plannedModules, { id: moduleId, count: total }]
+    emit('updatePlannedModules', nextModules)
+  }
 }
 
 const handleUpdateSearchQuery = (value: string) => {
   searchQuery.value = value
 }
+
 </script>
 
 <template>
@@ -194,9 +337,21 @@ const handleUpdateSearchQuery = (value: string) => {
               :count-disabled="!isModuleCountEditable(element.id)"
               :class="{ 'module-row--highlight': highlightedModuleIds.has(element.id) }"
               :is-number-flashing="flashingNumberModuleIds.has(element.id)"
+              :threshold="archiveTotal(element.id)"
+              :is-recommended="recommendedModuleIds.has(element.id)"
               @update:count="(val: number) => handleUpdateModuleCount(index, val)" @remove="handleRemoveModule(index)" />
           </template>
         </draggable>
+        <div v-if="(props.recommendedModules?.length || 0) > 0" :class="['recommended-inline-list', { 'mt-2': props.plannedModules.length > 0 }]">
+          <StationPlanningItem
+            v-for="(element, index) in props.recommendedModules"
+            :key="'recommended-inline-' + element.id + '-' + index"
+            :item="element"
+            :info="getModuleInfo(element.id)!"
+            :readonly="true"
+            @transfer="handleTransferRecommendedModule(element)"
+          />
+        </div>
       </div>
     </div>
 
@@ -208,6 +363,7 @@ const handleUpdateSearchQuery = (value: string) => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoIndustryModules" :key="'industry-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
@@ -221,6 +377,7 @@ const handleUpdateSearchQuery = (value: string) => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoHabitationModules" :key="'habitation-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
@@ -234,10 +391,45 @@ const handleUpdateSearchQuery = (value: string) => {
         <div class="auto-modules-container">
           <StationPlanningItem v-for="(element, index) in props.autoInfrastructureModules" :key="'infrastructure-' + element.id + '-' + index"
             :item="element" :info="getModuleInfo(element.id)!" :readonly="true"
+            :threshold="archiveTotal(element.id)" :color-by-diff="true"
             @transfer="handleTransferAutoModule(element)" />
         </div>
       </div>
     </div>
+
+    <hr v-if="hasArchiveData" class="archive-separator" />
+
+    <template v-if="hasArchiveData">
+      <div v-for="group in groupedArchiveModules" :key="'archive-group-' + group.group" class="tier-section">
+        <div class="tier-header">
+          <span class="tier-label">{{ group.displayLabel }}</span>
+        </div>
+        <div class="module-list-scroll">
+          <div class="auto-modules-container">
+            <StationPlanningItem
+              v-for="item in group.modules.filter(m => !m.isBuilding)"
+              :key="'built-' + item.moduleId"
+              :item="item.savedModule"
+              :info="item.x4Module"
+              :readonly="true"
+              @transfer="handleTransferArchiveModule(item.moduleId)"
+            />
+            <template v-if="group.hasBuilding">
+              <div class="building-section">
+                <StationPlanningItem
+                  v-for="item in group.modules.filter(m => m.isBuilding)"
+                  :key="'building-' + item.moduleId"
+                  :item="item.savedModule"
+                  :info="item.x4Module"
+                  :readonly="true"
+                  @transfer="handleTransferArchiveModule(item.moduleId)"
+                />
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 </template>
 
@@ -260,6 +452,10 @@ const handleUpdateSearchQuery = (value: string) => {
 
 .auto-modules-container {
   @apply space-y-2;
+}
+
+.recommended-inline-list {
+  @apply space-y-2 border-l-2 border-dashed border-slate-600 pl-2;
 }
 
 .search-panel {
@@ -286,6 +482,14 @@ const handleUpdateSearchQuery = (value: string) => {
   @apply border-l-2 border-dashed border-slate-600 pl-2;
 }
 
+.archive-separator {
+  @apply border-0 border-b border-slate-700/50 my-1;
+}
+
+.building-section {
+  @apply border-l-2 border-dashed border-amber-600/40 pl-2 ml-1 space-y-2;
+}
+
 .scale-buttons {
   @apply flex gap-1 ml-auto;
 }
@@ -300,7 +504,7 @@ const handleUpdateSearchQuery = (value: string) => {
 }
 
 .tier-header {
-  @apply flex items-center justify-between px-3 h-8 bg-slate-800/40 rounded cursor-pointer hover:bg-slate-700/50 transition-colors border border-transparent w-full;
+  @apply flex items-center justify-between px-3 h-8 bg-slate-800/40 rounded hover:bg-slate-700/50 transition-colors border border-transparent w-full;
 }
 
 .tier-label {

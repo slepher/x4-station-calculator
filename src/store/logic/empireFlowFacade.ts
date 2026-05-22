@@ -2,7 +2,6 @@ import { computed, type Ref, type ComputedRef } from 'vue'
 import type {
   EmpirePlan,
   SaveBindingPlan,
-  GroupedFlows,
   EmpireGroupedFlows,
   EmpireWareFlow,
   SectorInternalData,
@@ -28,7 +27,6 @@ export interface EmpireFlowFacadeDeps {
 }
 
 export interface EmpireFlowFacade {
-  stationFlowCache: ComputedRef<Map<string, GroupedFlows>>
   empireGroupedFlows: ComputedRef<EmpireGroupedFlows>
   sectorInternalDataMap: ComputedRef<Map<string, SectorInternalData>>
   getSupplyPlanningInput: (sectorId: string) => SupplyPlanningInput
@@ -38,8 +36,7 @@ export interface EmpireFlowFacade {
   deriveFlows: (
     productionFlows: WareProductionFlow[],
     settings: CalculateWareFlowDerivedInput['settings'],
-    warePriorityLevels?: Record<string, number>,
-    volumeContributionMethod?: 'sum' | 'max'
+    warePriorityLevels?: Record<string, number>
   ) => DerivedProductionFlow[]
 }
 
@@ -115,29 +112,6 @@ export function createEmpireFlowFacade(deps: EmpireFlowFacadeDeps): EmpireFlowFa
   const sectors = sourceView.sectors
   const sectorLinks = sourceView.sectorLinks
   const orderedStationsBySector = sourceView.orderedStationsBySector
-
-const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
-    const cache = new Map<string, GroupedFlows>()
-    const flowMap = inputFlowMap.value
-    if (!flowMap) return cache
-    if (productionSource.value === 'save-binding') {
-      derivedBindingStations.value.forEach((item) => {
-        const flowCache = flowMap.getCache(item.station.id)
-        if (flowCache) {
-          cache.set(item.station.id, flowMap.getFilteredGrouped(item.station.id, flowCache.warePriorityLevels))
-        }
-      })
-      return cache
-    }
-    if (!activeEmpire.value) return cache
-    activeEmpire.value.stations.forEach(station => {
-      const flowCache = flowMap.getCache(station.id)
-      if (flowCache) {
-        cache.set(station.id, flowMap.getFilteredGrouped(station.id, flowCache.warePriorityLevels))
-      }
-    })
-    return cache
-  })
 
   const empireGroupedFlows = computed<EmpireGroupedFlows>(() => {
     const flowMap = inputFlowMap.value
@@ -257,8 +231,7 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
   function deriveFlows(
     flows: WareProductionFlow[],
     settings: CalculateWareFlowDerivedInput['settings'],
-    warePriorityLevels?: Record<string, number>,
-    volumeContributionMethod?: 'sum' | 'max'
+    warePriorityLevels?: Record<string, number>
   ): DerivedProductionFlow[] {
     return deriveProductionFlows({
       productionFlows: flows,
@@ -269,8 +242,7 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
       stationNameMap: Object.fromEntries(productionStations.value.map(s => [s.id, s.name])),
       sectorNameMap: Object.fromEntries(sectors.value.map(s => [s.id, s.name])),
       settings,
-      warePriorityLevels: warePriorityLevels || {},
-      volumeContributionMethod
+      warePriorityLevels: warePriorityLevels || {}
     })
   }
 
@@ -304,7 +276,6 @@ const stationFlowCache = computed<Map<string, GroupedFlows>>(() => {
   }
 
   return {
-    stationFlowCache,
     empireGroupedFlows,
     sectorInternalDataMap,
     getSupplyPlanningInput,

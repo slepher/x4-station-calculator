@@ -5,7 +5,6 @@ import type {
   StationPlan,
   StationType,
   SavedModule,
-  GroupedFlows,
   EmpireGroupedFlows,
   StationSettings,
   EntityLocation,
@@ -15,10 +14,13 @@ import type {
   ProductionWorkbenchCapabilities,
   ProductionSessionState,
   ProductionContextState,
-  ProductionStationState
+  ProductionStationState,
+  AllocationVolumeGroup,
+  AllocationCargoOnlyItem
 } from '@/types/production-workbench-contract'
 import type { WareFlowViewMode, EmpireGapItem } from '@/types/production-ui'
 import { calculateNetProduction } from '@/store/logic/calculateBuildPlan'
+import { findBestProducer } from '@/store/logic/bestModuleSelector'
 import i18n from '@/i18n'
 import { useGameDataStore } from './useGameDataStore'
 import { useEmpireDataStore } from './useEmpireDataStore'
@@ -34,6 +36,7 @@ import {
 } from './logic/empireSourceView'
 import { buildDerivedActiveStationState } from './logic/productionStationShared'
 import { classifyAndEnrichFlows } from './logic/empireFlowFacade'
+import { buildAllocationVolumeGroups } from './logic/buildAllocationVolumeGroups'
 import { createProductionModuleActions, type ProductionModuleStation } from './actions/productionModuleActions'
 import { createProductionWareRuleActions } from './actions/productionWareRuleActions'
 import { createProductionSettingActions, doesStationSettingsAffectFlowMap } from './actions/productionSettingActions'
@@ -233,6 +236,8 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
         warePriorityLevels: {},
         productionFlows: [],
         plannedModules: [],
+        effectivePlannedModules: [],
+        recommendedModules: [],
         autoIndustryModules: [],
         autoHabitationModules: [],
         autoInfrastructureModules: [],
@@ -266,6 +271,9 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const actualWorkforce = computed(() => activeStationState.value.actualWorkforce)
   const currentEfficiency = computed(() => activeStationState.value.currentEfficiency)
   const enforceDlcActivation = computed(() => gameData.enforceDlcActivation)
+  const effectivePriorityPlannedModules = computed(() =>
+    activeStationState.value.effectivePlannedModules || plannedModules.value
+  )
 
   function isModuleDlcActive(moduleId: string): boolean {
     return gameData.isDlcActive(gameData.modulesMap[moduleId]?.dlc_tag)
@@ -295,7 +303,7 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
   const wareRuleActions = createProductionWareRuleActions<StationPlan>({
     getActiveStation: () => editableStationPlan.value,
     getComputeDeps,
-    getPlannedModules: () => plannedModules.value,
+    getPlannedModules: () => effectivePriorityPlannedModules.value,
     getAutoIndustryModules: () => activeStationState.value.autoIndustryModules,
     getModulesMap: () => gameData.modulesMap,
     getWaresMap: () => gameData.waresMap,
@@ -350,14 +358,6 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     const map = ensurePlanningDerivedMap()
     if (!map) return
     map.updateSettings(stationId, station.settings || {})
-  }
-
-  function getStationFlowCache(stationId: string): GroupedFlows | null {
-    const map = planningDerivedMap.value
-    if (!map) return null
-    const cache = map?.getCache(stationId)
-    if (!cache) return null
-    return map.getFilteredGrouped(stationId, cache.warePriorityLevels)
   }
 
   function getEmpireGroupedFlows(): EmpireGroupedFlows {
@@ -430,27 +430,48 @@ export const useBlueprintProductionStore = defineStore('blueprintProduction', ()
     })
   })
 
-  function getSavedStationGroupedFlows(station: StationPlan): GroupedFlows {
-    const deps = getDerivedStaticDeps()
+  function getSavedStationGroupedFlows(station: StationPlan): { resources: string[] } {
+    const deps = getComputeDeps()
     if (!deps) {
-      return {
-        flows: [],
-        rateGroups: { positive: [], operations: [], supply: [], resources: [] },
-        volumeGroups: { solid: [], liquid: [], container: [] }
+      return { resources: [] }
+    }
+
+    const { modulesMap, waresMap } = deps
+    const lockedSet = new Set(station.lockedWares || [])
+    const resourceSet = new Set<string>()
+    const visited = new Set<string>()
+
+    function expandUpstream(wareId: string): void {
+      if (lockedSet.has(wareId)) return
+      if (visited.has(wareId)) return
+      visited.add(wareId)
+
+      const ware = waresMap[wareId]
+      if (!ware) return
+
+      const isResource = ware.transport === 'solid' || ware.transport === 'liquid'
+      if (isResource) {
+        resourceSet.add(wareId)
+        return
+      }
+
+      const producer = findBestProducer(wareId, 'argon', [], modulesMap, waresMap)
+      if (!producer?.inputs) return
+
+      for (const inputWareId of Object.keys(producer.inputs)) {
+        expandUpstream(inputWareId)
       }
     }
 
-    const tempMap = new StationDerivedMap(deps)
-    tempMap.upsertStation(station.id, {
-      modulesMode: 'plan',
-      sectorId: station.sectorId,
-      modules: station.modules || [],
-      settings: station.settings || {},
-      lockedWares: station.lockedWares || [],
-      warePriority: station.warePriority || {},
-      count: station.count
-    })
-    return tempMap.getGrouped(station.id)
+    for (const mod of station.modules || []) {
+      const moduleInfo = modulesMap[mod.id]
+      if (!moduleInfo?.inputs) continue
+      for (const inputWareId of Object.keys(moduleInfo.inputs)) {
+        expandUpstream(inputWareId)
+      }
+    }
+
+    return { resources: [...resourceSet] }
   }
 
   function initializeAllStationDerived() {
@@ -900,6 +921,8 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
       count: station.count ?? 1,
       minerals: station.minerals || [],
       plannedModules: state.plannedModules,
+      effectivePlannedModules: state.effectivePlannedModules || state.plannedModules,
+      recommendedModules: state.recommendedModules || [],
       resolvedModules: state.resolvedModules,
       modules: state.resolvedModules,
       buildingModules: [],
@@ -928,6 +951,23 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
       buildPriceMultiplier: buildPriceMultiplier.value
     }
   })
+
+  const allocationVolumeGroups = computed<AllocationVolumeGroup[]>(() => {
+    if (session.value.workbenchMode !== 'station') return []
+    if (session.value.wareflowViewMode !== 'volume') return []
+    const state = stationState.value
+    if (!state) return []
+
+    return buildAllocationVolumeGroups({
+      derivedProductionFlows: state.derivedProductionFlows,
+      cargoMap: new Map(),
+      targetMap: new Map(),
+      hasArchiveStation: false,
+      gameData
+    })
+  })
+
+  const allocationCargoOnlyItems = computed<AllocationCargoOnlyItem[]>(() => [])
 
   const settingActions = createProductionSettingActions<StationPlan>({
     getActiveStation: () => editableStationPlan.value,
@@ -990,7 +1030,6 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     titleValue,
     titlePlaceholder,
     savedEmpires,
-    getStationFlowCache,
     getEmpireGroupedFlows,
     getSavedStationGroupedFlows,
     initializeAllStationDerived,
@@ -1026,6 +1065,8 @@ function updateStationModules(stationId: string, modules: SavedModule[]) {
     session,
     context,
     stationState,
+    allocationVolumeGroups,
+    allocationCargoOnlyItems,
     capabilities,
     settingActions,
     wareRuleActions,

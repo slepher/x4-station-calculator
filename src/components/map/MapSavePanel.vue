@@ -1,8 +1,10 @@
 <script setup lang="ts">
 import { computed, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import { useSaveStore } from '@/store/useSaveStore'
 import { useSaveBindingStore } from '@/store/useSaveBindingStore'
+import { useActiveViewStore, type BindingStage } from '@/store/useActiveViewStore'
 import MapSaveBreadcrumb from './MapSaveBreadcrumb.vue'
 import MapSaveArchiveList from './MapSaveArchiveList.vue'
 import MapSaveCategoryMenu from './MapSaveCategoryMenu.vue'
@@ -11,9 +13,6 @@ import MapBindingSectorGroup from './MapBindingSectorGroup.vue'
 import MapBindingStation from './MapBindingStation.vue'
 import type { SaveArchive, SavePoiCategory, SavePoiOverlayItem } from '@/types/saveArchive'
 import type { StationPlan } from '@/types/x4'
-
-type BindingStage = 'select-binding' | 'select-sector' | 'select-station'
-type PanelLayer = 'list' | 'category' | 'coord' | 'binding-sector' | 'binding-station'
 
 const props = defineProps<{
   open: boolean
@@ -35,11 +34,10 @@ const emit = defineEmits<{
 const { t } = useI18n()
 const saveStore = useSaveStore()
 const saveBindingStore = useSaveBindingStore()
+const activeViewStore = useActiveViewStore()
 
-const layer = ref<PanelLayer>('list')
+const { mapSavePanelLayer: layer, mapBindingGameGuid: selectedBindingGameGuid, mapSavePanelSectorGroupId: selectedSectorGroupId } = storeToRefs(activeViewStore)
 const selectedCategory = ref<SavePoiCategory | null>(null)
-const selectedBindingGameGuid = ref<string | null>(null)
-const selectedSectorGroupId = ref<string | null>(null)
 
 interface BreadcrumbItem {
   key: string
@@ -194,13 +192,14 @@ function onClose() {
   emit('close')
 }
 
-watch(() => props.open, (open) => {
-  if (open) {
+watch(() => props.open, (open, prev) => {
+  if (open && !prev && !isBindingLayer.value) {
     resetToList()
     return
   }
-
-  resetToList()
+  if (!open) {
+    resetToList()
+  }
 })
 
 watch(() => props.archive, (archive) => {

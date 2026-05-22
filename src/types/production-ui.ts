@@ -68,6 +68,7 @@ export interface ContextToolbarEmits {
 
 export interface StationPlanningPanelProps {
   plannedModules: SavedModule[]
+  recommendedModules?: SavedModule[]
   autoIndustryModules: SavedModule[]
   autoInfrastructureModules?: SavedModule[]
   enforceDlcActivation: boolean

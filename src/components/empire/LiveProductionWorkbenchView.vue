@@ -58,6 +58,7 @@ const showArchiveModuleList = computed(() => {
     :expanded-sector-id="tabbarPresenter.props.expandedSectorId.value"
     :can-create-station="tabbarPresenter.props.canCreateStation"
     :can-open-context-menu="tabbarPresenter.props.canOpenContextMenu"
+    :context-menu-mode="tabbarPresenter.props.contextMenuMode"
     @select-overview="tabbarPresenter.emits.selectOverview"
     @select-transit="tabbarPresenter.emits.selectTransit"
     @select-station="tabbarPresenter.emits.selectStation"
@@ -160,6 +161,9 @@ const showArchiveModuleList = computed(() => {
           :buy-multiplier="wareflowPresenter.props.settings.value.buyMultiplier"
           :sell-multiplier="wareflowPresenter.props.settings.value.sellMultiplier"
           :product-buffer-hours="wareflowPresenter.props.settings.value.primaryProductBufferHours"
+          :use-allocation-volume-view="wareflowPresenter.props.useAllocationVolumeView.value"
+          :allocation-volume-groups="wareflowPresenter.props.allocationVolumeGroups.value"
+          :allocation-cargo-only-items="wareflowPresenter.props.allocationCargoOnlyItems.value"
           @update:view-mode="wareflowPresenter.emits.updateViewMode"
           @update:buy-multiplier="wareflowPresenter.emits.updateBuyMultiplier"
           @update:sell-multiplier="wareflowPresenter.emits.updateSellMultiplier"
@@ -169,7 +173,7 @@ const showArchiveModuleList = computed(() => {
 
       <div class="col-span-12 lg:col-span-4">
         <StationDashboard
-          :modules="[...dashboardPresenter.props.activeModules.value, ...dashboardPresenter.props.activeBuildingModules.value]"
+          :display-modules="[...dashboardPresenter.props.activeModules.value, ...dashboardPresenter.props.activeBuildingModules.value]"
           :hide-workers-view="true"
           :settings="dashboardPresenter.props.settings.value"
           :current-efficiency="1"
@@ -211,9 +215,14 @@ const showArchiveModuleList = computed(() => {
     <div class="col-span-12 lg:col-span-3">
       <StationPlanningPanelWrapper
         :planned-modules="planningPresenter.props.plannedModules.value"
+        :recommended-modules="planningPresenter.props.recommendedModules.value"
         :auto-industry-modules="planningPresenter.props.autoIndustryModules.value"
         :auto-habitation-modules="planningPresenter.props.autoHabitationModules.value"
         :auto-infrastructure-modules="planningPresenter.props.autoInfrastructureModules.value"
+        :effective-auto-industry-modules="planningPresenter.props.effectiveAutoIndustryModules.value"
+        :effective-auto-habitation-modules="planningPresenter.props.effectiveAutoHabitationModules.value"
+        :effective-auto-infrastructure-modules="planningPresenter.props.effectiveAutoInfrastructureModules.value"
+        :archive-total-map="planningPresenter.props.archiveTotalMap.value"
         :enforce-dlc-activation="planningPresenter.props.enforceDlcActivation.value"
         :show-archive="planningPresenter.props.visualMode.value === 'live'"
         :archive-modules="planningPresenter.props.liveModules.value"
@@ -224,8 +233,12 @@ const showArchiveModuleList = computed(() => {
 
     <div class="col-span-12 lg:col-span-5">
       <StationWareFlowsDashboard
+        :visual-mode="wareflowPresenter.props.visualMode.value"
         :view-mode="wareflowPresenter.props.viewMode.value"
+        :use-allocation-volume-view="wareflowPresenter.props.useAllocationVolumeView.value"
         :production-flows="wareflowPresenter.props.derivedProductionFlows.value"
+        :allocation-volume-groups="wareflowPresenter.props.allocationVolumeGroups.value"
+        :allocation-cargo-only-items="wareflowPresenter.props.allocationCargoOnlyItems.value"
         :ware-priority-levels="wareflowPresenter.props.warePriorityLevels.value"
         :settings="wareflowPresenter.props.settings.value"
         :empire-gaps="wareflowPresenter.props.empireGaps.value"
@@ -248,10 +261,11 @@ const showArchiveModuleList = computed(() => {
 
     <div class="col-span-12 lg:col-span-4 flex flex-col gap-4">
       <StationDashboard
-        :modules="dashboardPresenter.props.modules.value"
-        :effective-modules="dashboardPresenter.props.effectiveModules.value"
+        :display-modules="dashboardPresenter.props.displayModules.value"
+        :worker-modules="dashboardPresenter.props.workerModules.value"
         :building-cargo="dashboardPresenter.props.buildingCargo.value"
         :building-reservation="dashboardPresenter.props.buildingReservation.value"
+        :building-scope-modules="dashboardPresenter.props.buildingScopeModules.value"
         :is-building-scope="dashboardPresenter.props.isBuildingScope.value"
         :building-in-progress="dashboardPresenter.props.buildingInProgress.value"
         :settings="dashboardPresenter.props.settings.value"

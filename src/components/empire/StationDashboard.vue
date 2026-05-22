@@ -15,10 +15,11 @@ import { analyzeStation } from '@/store/logic/analyzeStation'
 import { getPriceByMultiplier } from '@/store/logic/calculatorUtils'
 
 const props = defineProps<{
-  modules: SavedModule[]
-  effectiveModules?: SavedModule[]
+  displayModules: SavedModule[]
+  workerModules?: SavedModule[]
   buildingCargo?: WareAmount[]
   buildingReservation?: WareAmount[]
+  buildingScopeModules?: SavedModule[]
   isBuildingScope?: boolean
   buildingInProgress?: SavedModule
   hideWorkersView?: boolean
@@ -76,7 +77,7 @@ const clampedManualWorkforce = computed(() => {
 
 const costAnalysis = computed(() => {
   return analyzeStation(
-    props.effectiveModules ?? props.modules,
+    props.displayModules,
     gameDataStore.modulesMap,
     gameDataStore.waresMap,
     buildPriceMultiplier.value,
@@ -86,13 +87,74 @@ const costAnalysis = computed(() => {
 
 const workersAnalysis = computed(() => {
   return analyzeStation(
-    props.modules,
+    props.workerModules ?? props.displayModules,
     gameDataStore.modulesMap,
     gameDataStore.waresMap,
     buildPriceMultiplier.value,
     props.settings.useHQ
   )
 })
+
+interface BuildingProgressItem {
+  id: string
+  displayName: string
+  required: number
+  cargo: number
+  reservation: number
+  hasReservation: boolean
+}
+
+const buildingProgressItems = computed(() => {
+  if (!props.buildingScopeModules?.length) return []
+  const buildingAnalysis = analyzeStation(
+    props.buildingScopeModules,
+    gameDataStore.modulesMap,
+    gameDataStore.waresMap,
+    buildPriceMultiplier.value,
+    props.settings.useHQ
+  )
+  const cargoMap = new Map((props.buildingCargo || []).map(c => [c.ware, c.amount]))
+  const reservationMap = new Map((props.buildingReservation || []).map(r => [r.ware, r.amount]))
+
+  const wareIds = new Set<string>()
+  for (const item of (buildingAnalysis.summaryItems || [])) wareIds.add(item.id)
+  for (const c of (props.buildingCargo || [])) wareIds.add(c.ware)
+  for (const r of (props.buildingReservation || [])) wareIds.add(r.ware)
+
+  const reqMap = new Map<string, number>()
+  for (const item of (buildingAnalysis.summaryItems || [])) reqMap.set(item.id, item.count)
+
+  return [...wareIds]
+    .map(id => {
+      const required = reqMap.get(id) || 0
+      const cargo = cargoMap.get(id) || 0
+      const reservation = reservationMap.get(id) || 0
+      if (required === 0 && cargo === 0 && reservation === 0) return null
+      const ware = gameDataStore.waresMap[id]
+      return {
+        id,
+        displayName: ware ? translateWare(ware) : id,
+        required,
+        cargo,
+        reservation,
+        hasReservation: reservation > 0,
+      }
+    })
+    .filter(Boolean) as BuildingProgressItem[]
+})
+
+function buildingCargoPercent(item: BuildingProgressItem): number {
+  const scale = item.required > 0 ? item.required : (item.cargo + item.reservation)
+  if (scale === 0) return 0
+  return Math.min((item.cargo / scale) * 100, 100)
+}
+
+function buildingTransitPercent(item: BuildingProgressItem): number {
+  const scale = item.required > 0 ? item.required : (item.cargo + item.reservation)
+  if (scale === 0) return 0
+  const cargoW = Math.min((item.cargo / scale) * 100, 100)
+  return Math.min((item.reservation / scale) * 100, 100 - cargoW)
+}
 
 const maxAllowedWorkforce = computed(() => {
   const currentAnalysis = workersAnalysis.value
@@ -534,6 +596,24 @@ const inProgressModuleEntry = computed(() => {
       </div>
     </div>
 
+    <div class="building-progress-panel" v-if="buildingProgressItems.length > 0">
+      <div v-for="item in buildingProgressItems" :key="item.id" class="building-progress-row">
+        <span class="building-ware-name" :title="item.displayName">{{ item.displayName }}</span>
+        <div class="bar-shell">
+          <div class="bar-fill-cargo" :style="{ width: `${buildingCargoPercent(item)}%` }"></div>
+          <div class="bar-fill-transit" :style="{ left: `${buildingCargoPercent(item)}%`, width: `${buildingTransitPercent(item)}%` }"></div>
+          <div class="bar-text">
+            <template v-if="item.hasReservation">
+              {{ formatNum(item.cargo) }}+{{ formatNum(item.reservation) }} / {{ formatNum(item.required) }}
+            </template>
+            <template v-else>
+              {{ formatNum(item.cargo) }} / {{ formatNum(item.required) }}
+            </template>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="dashboard-content custom-scrollbar">
       <div v-if="hasDashboardData">
         <template v-if="viewMode === 'materials' || viewMode === 'volume'">
@@ -778,5 +858,34 @@ const inProgressModuleEntry = computed(() => {
 }
 .custom-scrollbar::-webkit-scrollbar-thumb {
   @apply bg-slate-700/50 rounded-full hover:bg-slate-600;
+}
+
+.building-progress-panel {
+  @apply bg-slate-800/60 p-2 mx-2 mt-2 rounded border border-slate-700/50 backdrop-blur-md space-y-1.5;
+}
+
+.building-progress-row {
+  @apply flex items-center gap-3 px-2 h-7;
+}
+
+.building-ware-name {
+  @apply text-[11px] text-slate-300 truncate shrink-0 font-medium;
+  width: 7em;
+}
+
+.bar-shell {
+  @apply relative h-4 rounded bg-slate-950/80 border border-slate-700/40 overflow-hidden flex-1;
+}
+
+.bar-fill-cargo {
+  @apply absolute left-0 top-0 h-full bg-emerald-500/70;
+}
+
+.bar-fill-transit {
+  @apply absolute top-0 h-full bg-amber-500/60;
+}
+
+.bar-text {
+  @apply absolute inset-0 flex items-center justify-center text-[11px] font-mono leading-none text-slate-200 pointer-events-none;
 }
 </style>

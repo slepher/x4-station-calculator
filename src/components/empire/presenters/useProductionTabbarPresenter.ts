@@ -10,6 +10,7 @@ export interface TabbarPresenterProps {
   expandedSectorId: ComputedRef<string | null>
   canCreateStation: boolean
   canOpenContextMenu: boolean
+  contextMenuMode: 'full' | 'delete-only'
 }
 
 export interface TabbarPresenterEmits {
@@ -35,6 +36,7 @@ export interface TabbarPresenterStore {
     activeTransitSectorId: string | null
   }
   capabilities: ProductionWorkbenchCapabilities
+  archiveStation?: unknown | null
   orderedStations?: Array<{
     id: string
     name: string
@@ -154,7 +156,8 @@ export function useProductionTabbarPresenter(store: TabbarPresenterStore): UsePr
     }),
     expandedSectorId: computed(() => store.expandedSectorId ?? null),
     canCreateStation: !store.capabilities.uniqueStation,
-    canOpenContextMenu: !store.capabilities.uniqueStation
+    canOpenContextMenu: !store.capabilities.uniqueStation || (store.capabilities.uniqueStation && !store.archiveStation),
+    contextMenuMode: store.capabilities.uniqueStation ? 'delete-only' : 'full'
   }
 
   const emits: TabbarPresenterEmits = {

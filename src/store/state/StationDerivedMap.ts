@@ -1,10 +1,21 @@
 import { reactive, type Ref } from 'vue'
-import type { GroupedFlows, SavedModule, StationSettings, X4Module, WareFlow, WorkforceConsumptionMap } from '@/types/x4'
+import type { SavedModule, StationSettings, X4Module, WorkforceConsumptionMap } from '@/types/x4'
 import type { WareProductionFlow } from '@/types/production-flow'
 import { isWorkforceContributionClass } from '@/types/production-flow'
 import type { WorkforceEntry } from '@/types/saveArchive'
-import { calculateProductionFlows, calculateProductionFlowsCore } from '@/store/logic/calculateProductionFlows'
+import {
+  calculateAutoHabitationModules,
+  calculateAutoIndustryModules,
+  calculateAutoIndustryModulesWithFloor,
+  calculateProductionFlowsCore,
+  type CalculateProductionFlowsOutput
+} from '@/store/logic/calculateProductionFlows'
 import { calculateInfrastructureModules } from '@/store/logic/calculateInfrastructureModules'
+import {
+  buildEffectivePlannedModules,
+  computeRecommendedPlanningSubset,
+  mergeSavedModules
+} from '@/store/logic/planningRecommendedModules'
 import { buildResolvedWarePriority } from '@/store/logic/warePriorityResolver'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import { solveMultiWareByLink } from '@/store/logic/sectorLinkFlow'
@@ -20,6 +31,7 @@ export interface ComputeInfrastructureModulesInput {
   productionFlows: WareProductionFlow[]
   plannedModules: SavedModule[]
   autoIndustryModules: SavedModule[]
+  referenceModules?: SavedModule[]
   settings: Pick<
     StationSettings,
     | 'racePreference'
@@ -39,6 +51,7 @@ export function computeInfrastructureModulesFromFlows(input: ComputeInfrastructu
     productionFlows: input.productionFlows,
     plannedModules: input.plannedModules,
     autoIndustryModules: input.autoIndustryModules,
+    referenceModules: input.referenceModules,
     modulesMap: input.deps.modulesMap,
     settings: input.settings,
     warePriorityLevels: input.warePriorityLevels
@@ -93,6 +106,7 @@ export interface StationDerivedSnapshot {
   warePriority: Record<string, number>
   workforcesOverride?: WorkforceEntry[]
   archiveSemanticsSource?: StationSemanticDerivedSource
+  referenceModules?: SavedModule[]
 }
 
 export interface StationDerivedSettingsInput {
@@ -114,6 +128,12 @@ export interface StationDerivedSeed {
   workforces?: WorkforceEntry[]
   archiveSemanticsSource?: StationSemanticDerivedSource
   count?: number
+  referenceModules?: SavedModule[]
+}
+
+interface PlanComputeResult extends CalculateProductionFlowsOutput {
+  fullModules: SavedModule[]
+  effectivePlannedModules: SavedModule[]
 }
 
 const DEFAULT_DERIVED_SETTINGS: StationDerivedSettings = {
@@ -192,14 +212,6 @@ function warePriorityEqual(a: Record<string, number>, b: Record<string, number>)
   return true
 }
 
-function createEmptyGroupedFlows(): GroupedFlows {
-  return {
-    flows: [],
-    rateGroups: { positive: [], operations: [], supply: [], resources: [] },
-    volumeGroups: { solid: [], liquid: [], container: [] }
-  }
-}
-
 function filterProductionFlowsByPriority(
   flows: WareProductionFlow[],
   priorityLevels: Record<string, number>
@@ -208,56 +220,6 @@ function filterProductionFlowsByPriority(
     if (f.netRate <= 0) return true
     return (priorityLevels[f.wareId] ?? 0) > 0
   })
-}
-
-function convertProductionFlowToWareFlow(prod: WareProductionFlow): WareFlow {
-  const productionVolume = prod.production * prod.unitVolume
-  const consumptionVolume = prod.consumption * prod.unitVolume
-  const netVolume = prod.netRate * prod.unitVolume
-
-  return {
-    wareId: prod.wareId,
-    orderIndex: prod.orderIndex,
-    tier: prod.tier,
-    transportType: prod.transportType,
-    unitVolume: prod.unitVolume,
-    production: prod.production,
-    consumption: prod.consumption,
-    netRate: prod.netRate,
-    productionVolume,
-    consumptionVolume,
-    netVolume,
-    transportDemand: 0,
-    totalOccupiedCount: 0,
-    totalOccupiedConsumptionCount: 0,
-    totalOccupiedVolume: 0,
-    unitPrice: 0,
-    netValue: 0,
-    contributions: prod.contributions.map((atom) => ({ ...atom }))
-  }
-}
-
-function groupProductionFlows(flows: WareProductionFlow[]): GroupedFlows {
-  const wareFlows = flows.map(convertProductionFlowToWareFlow)
-
-  const result: GroupedFlows = {
-    flows: wareFlows,
-    rateGroups: { positive: [], operations: [], supply: [], resources: [] },
-    volumeGroups: { solid: [], liquid: [], container: [] }
-  }
-
-  wareFlows.forEach(flow => {
-    if (flow.netRate > 0) result.rateGroups.positive.push(flow)
-    else if (flow.contributions.some(c => isWorkforceContributionClass(c.class))) result.rateGroups.supply.push(flow)
-    else if (flow.transportType === 'container') result.rateGroups.operations.push(flow)
-    else result.rateGroups.resources.push(flow)
-
-    if (flow.transportType === 'solid') result.volumeGroups.solid.push(flow)
-    else if (flow.transportType === 'liquid') result.volumeGroups.liquid.push(flow)
-    else result.volumeGroups.container.push(flow)
-  })
-
-  return result
 }
 
 function mergeFlows(flowsArray: WareProductionFlow[][]): WareProductionFlow[] {
@@ -371,11 +333,20 @@ export class StationDerivedMap {
     const warePriority = normalizeWarePriority(seed.warePriority)
 
     let fullModules: SavedModule[]
+    let planResult: PlanComputeResult | undefined
     let workforcesOverride: WorkforceEntry[] | undefined
     let archiveSemanticsSource: StationSemanticDerivedSource | undefined
 
     if (seed.modulesMode === 'plan') {
-      fullModules = this.deriveFullModules(inputModules, settings, lockedWares, warePriority, deps)
+      planResult = this.computePlanResult(
+        inputModules,
+        settings,
+        lockedWares,
+        warePriority,
+        deps,
+        seed.referenceModules
+      )
+      fullModules = planResult.fullModules
       workforcesOverride = undefined
       archiveSemanticsSource = undefined
     } else {
@@ -394,11 +365,12 @@ export class StationDerivedMap {
       lockedWares,
       warePriority,
       workforcesOverride,
-      archiveSemanticsSource
+      archiveSemanticsSource,
+      referenceModules: seed.referenceModules
     }
 
     this.snapshotMap.set(stationId, snapshot)
-    this.computeInternal(stationId, snapshot, deps, true)
+    this.computeInternal(stationId, snapshot, deps, true, false, planResult)
   }
 
   updateModules(stationId: string, modules: SavedModule[]): void {
@@ -410,8 +382,17 @@ export class StationDerivedMap {
     if (modulesEqual(newInputModules, snapshot.inputModules)) return
 
     let newFullModules: SavedModule[]
+    let planResult: PlanComputeResult | undefined
     if (snapshot.modulesMode === 'plan') {
-      newFullModules = this.deriveFullModules(newInputModules, snapshot.settings, snapshot.lockedWares, snapshot.warePriority, deps)
+      planResult = this.computePlanResult(
+        newInputModules,
+        snapshot.settings,
+        snapshot.lockedWares,
+        snapshot.warePriority,
+        deps,
+        snapshot.referenceModules
+      )
+      newFullModules = planResult.fullModules
     } else {
       newFullModules = newInputModules
     }
@@ -423,7 +404,7 @@ export class StationDerivedMap {
     }
 
     this.snapshotMap.set(stationId, newSnapshot)
-    this.computeInternal(stationId, newSnapshot, deps, true)
+    this.computeInternal(stationId, newSnapshot, deps, true, false, planResult)
   }
 
   updateSettings(stationId: string, settings: StationDerivedSettingsInput): void {
@@ -434,16 +415,25 @@ export class StationDerivedMap {
     const newSettings = truncateSettings(settings)
     if (settingsEqual(newSettings, snapshot.settings)) return
 
+    const planResult = snapshot.modulesMode === 'plan'
+      ? this.computePlanResult(
+          snapshot.inputModules,
+          newSettings,
+          snapshot.lockedWares,
+          snapshot.warePriority,
+          deps,
+          snapshot.referenceModules
+        )
+      : undefined
+
     const newSnapshot: StationDerivedSnapshot = {
       ...snapshot,
       settings: newSettings,
-      fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, newSettings, snapshot.lockedWares, snapshot.warePriority, deps)
-        : snapshot.fullModules
+      fullModules: planResult?.fullModules ?? snapshot.fullModules
     }
 
     this.snapshotMap.set(stationId, newSnapshot)
-    this.computeInternal(stationId, newSnapshot, deps, false)
+    this.computeInternal(stationId, newSnapshot, deps, false, false, planResult)
   }
 
   updateLockedWares(stationId: string, lockedWares: string[]): void {
@@ -454,16 +444,25 @@ export class StationDerivedMap {
     const newLockedWares = normalizeLockedWares(lockedWares)
     if (lockedWaresEqual(newLockedWares, snapshot.lockedWares)) return
 
+    const planResult = snapshot.modulesMode === 'plan'
+      ? this.computePlanResult(
+          snapshot.inputModules,
+          snapshot.settings,
+          newLockedWares,
+          snapshot.warePriority,
+          deps,
+          snapshot.referenceModules
+        )
+      : undefined
+
     const newSnapshot: StationDerivedSnapshot = {
       ...snapshot,
       lockedWares: newLockedWares,
-      fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, newLockedWares, snapshot.warePriority, deps)
-        : snapshot.fullModules
+      fullModules: planResult?.fullModules ?? snapshot.fullModules
     }
 
     this.snapshotMap.set(stationId, newSnapshot)
-    this.computeInternal(stationId, newSnapshot, deps, false)
+    this.computeInternal(stationId, newSnapshot, deps, false, false, planResult)
   }
 
   updateWarePriority(stationId: string, warePriority: Record<string, number>): void {
@@ -474,16 +473,25 @@ export class StationDerivedMap {
     const newWarePriority = normalizeWarePriority(warePriority)
     if (warePriorityEqual(newWarePriority, snapshot.warePriority)) return
 
+    const planResult = snapshot.modulesMode === 'plan'
+      ? this.computePlanResult(
+          snapshot.inputModules,
+          snapshot.settings,
+          snapshot.lockedWares,
+          newWarePriority,
+          deps,
+          snapshot.referenceModules
+        )
+      : undefined
+
     const newSnapshot: StationDerivedSnapshot = {
       ...snapshot,
       warePriority: newWarePriority,
-      fullModules: snapshot.modulesMode === 'plan'
-        ? this.deriveFullModules(snapshot.inputModules, snapshot.settings, snapshot.lockedWares, newWarePriority, deps)
-        : snapshot.fullModules
+      fullModules: planResult?.fullModules ?? snapshot.fullModules
     }
 
     this.snapshotMap.set(stationId, newSnapshot)
-    this.computeInternal(stationId, newSnapshot, deps, false)
+    this.computeInternal(stationId, newSnapshot, deps, false, false, planResult)
   }
 
   refreshStation(stationId: string): void {
@@ -522,42 +530,74 @@ export class StationDerivedMap {
     this.sectorExternalCache.clear()
   }
 
-  private deriveFullModules(
+  private computePlanResult(
     inputModules: SavedModule[],
     settings: StationDerivedSettings,
     lockedWares: string[],
     warePriority: Record<string, number>,
-    deps: StationDerivedStaticDeps
-  ): SavedModule[] {
+    deps: StationDerivedStaticDeps,
+    referenceModules?: SavedModule[]
+  ): PlanComputeResult {
     const fullSettings = toFullSettingsForCompute(settings)
-    const result = calculateProductionFlows({
-      plannedModules: inputModules,
+    const effectivePlannedInput = (referenceModules && referenceModules.length > 0)
+      ? buildEffectivePlannedModules(
+          inputModules,
+          computeRecommendedPlanningSubset(inputModules, referenceModules, deps.modulesMap).recommendedDisplayModules
+        )
+      : inputModules
+    const autoIndustryResult = (referenceModules && referenceModules.length > 0)
+      ? calculateAutoIndustryModulesWithFloor({
+          plannedModules: effectivePlannedInput,
+          settings: fullSettings,
+          modulesMap: deps.modulesMap,
+          waresMap: deps.waresMap,
+          lockedWares,
+          referenceModules
+        })
+      : {
+          autoIndustryModules: calculateAutoIndustryModules({
+            plannedModules: effectivePlannedInput,
+            settings: fullSettings,
+            modulesMap: deps.modulesMap,
+            waresMap: deps.waresMap,
+            lockedWares
+          })
+        }
+    const autoIndustryModules = autoIndustryResult.autoIndustryModules
+    const canonicalBaseModules = mergeSavedModules([
+      ...effectivePlannedInput,
+      ...autoIndustryModules
+    ])
+    const autoHabitationModules = calculateAutoHabitationModules({
+      plannedModules: canonicalBaseModules,
+      autoIndustryModules: [],
       settings: fullSettings,
       modulesMap: deps.modulesMap,
+      referenceModules
+    })
+    const coreResult = calculateProductionFlowsCore({
+      plannedModules: canonicalBaseModules,
+      autoIndustryModules: [],
+      autoHabitationModules,
+      modulesMap: deps.modulesMap,
       waresMap: deps.waresMap,
-      lockedWares,
       workforceConsumptionMap: deps.workforceConsumptionMap,
+      settings: fullSettings,
       warePriority
     })
-    
-    const fullModules = [...inputModules]
-    for (const autoMod of result.autoIndustryModules) {
-      const existing = fullModules.find(m => m.id === autoMod.id)
-      if (existing) {
-        existing.count += autoMod.count
-      } else {
-        fullModules.push({ id: autoMod.id, count: autoMod.count })
-      }
+
+    return {
+      autoIndustryModules,
+      autoHabitationModules,
+      productionFlows: coreResult.productionFlows,
+      actualWorkforce: coreResult.actualWorkforce,
+      currentEfficiency: coreResult.currentEfficiency,
+      effectivePlannedModules: effectivePlannedInput,
+      fullModules: mergeSavedModules([
+        ...canonicalBaseModules,
+        ...autoHabitationModules
+      ])
     }
-    for (const autoMod of result.autoHabitationModules) {
-      const existing = fullModules.find(m => m.id === autoMod.id)
-      if (existing) {
-        existing.count += autoMod.count
-      } else {
-        fullModules.push({ id: autoMod.id, count: autoMod.count })
-      }
-    }
-    return fullModules
   }
 
   private computeInternal(
@@ -565,7 +605,8 @@ export class StationDerivedMap {
     snapshot: StationDerivedSnapshot,
     deps: StationDerivedStaticDeps,
     recomputeSemantics: boolean,
-    skipAggregation: boolean = false
+    skipAggregation: boolean = false,
+    planResult?: PlanComputeResult
   ): void {
     const fullSettings = toFullSettingsForCompute(snapshot.settings)
     
@@ -574,6 +615,7 @@ export class StationDerivedMap {
     let productionFlows: WareProductionFlow[]
     let actualWorkforce: number
     let currentEfficiency: number
+    let effectivePlannedModules = snapshot.inputModules
 
     if (snapshot.modulesMode === 'full') {
       const coreResult = calculateProductionFlowsCore({
@@ -591,25 +633,25 @@ export class StationDerivedMap {
       actualWorkforce = coreResult.actualWorkforce
       currentEfficiency = coreResult.currentEfficiency
     } else {
-      const result = calculateProductionFlows({
-        plannedModules: snapshot.inputModules,
-        settings: fullSettings,
-        modulesMap: deps.modulesMap,
-        waresMap: deps.waresMap,
-        lockedWares: snapshot.lockedWares,
-        workforceConsumptionMap: deps.workforceConsumptionMap,
-        warePriority: snapshot.warePriority
-      })
+      const result = planResult ?? this.computePlanResult(
+        snapshot.inputModules,
+        snapshot.settings,
+        snapshot.lockedWares,
+        snapshot.warePriority,
+        deps,
+        snapshot.referenceModules
+      )
       autoIndustryModules = result.autoIndustryModules
       autoHabitationModules = result.autoHabitationModules
       productionFlows = result.productionFlows
       actualWorkforce = result.actualWorkforce
       currentEfficiency = result.currentEfficiency
+      effectivePlannedModules = result.effectivePlannedModules
     }
 
     const allWareIds = productionFlows.map(f => f.wareId)
     const warePriorityLevels = buildResolvedWarePriority({
-      plannedModules: snapshot.inputModules,
+      plannedModules: effectivePlannedModules,
       autoIndustryModules,
       modulesMap: deps.modulesMap,
       userPriorityOverride: snapshot.warePriority || {}
@@ -831,19 +873,6 @@ export class StationDerivedMap {
 
   getEmpireFlows(): WareProductionFlow[] {
     return this.empireFlowsCache
-  }
-
-  getGrouped(stationId: string): GroupedFlows {
-    const flows = this.getProductionFlows(stationId)
-    if (flows.length === 0) return createEmptyGroupedFlows()
-    return groupProductionFlows(flows)
-  }
-
-  getFilteredGrouped(stationId: string, priorityLevels: Record<string, number>): GroupedFlows {
-    const flows = this.getProductionFlows(stationId)
-    const filtered = filterProductionFlowsByPriority(flows, priorityLevels)
-    if (filtered.length === 0) return createEmptyGroupedFlows()
-    return groupProductionFlows(filtered)
   }
 
   getModulesMode(stationId: string): 'plan' | 'full' | null {

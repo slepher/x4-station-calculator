@@ -39,6 +39,54 @@ export interface ProductionContextState {
   hasArchive: boolean
 }
 
+export interface AllocationVolumeItem {
+  wareId: string
+  name: string
+  transportType: 'container' | 'solid' | 'liquid'
+  orderIndex: number
+  tier: number
+  currentCount: number
+  targetCount: number
+  recommendedCount: number
+  scaleMaxCount: number
+  hasArchiveStation: boolean
+  detailSections: AllocationVolumeDetailSection[]
+}
+
+export interface AllocationVolumeGroup {
+  key: 'container' | 'solid' | 'liquid'
+  items: AllocationVolumeItem[]
+  currentTotalVolume: number
+  targetTotalVolume: number
+  recommendedTotalVolume: number
+  hasArchiveStation: boolean
+}
+
+export interface AllocationVolumeDetailRow {
+  key: string
+  label: string
+  ratePerHour?: number
+  currentMinutes?: number
+  targetMinutes?: number
+  recommendedMinutes?: number
+}
+
+export interface AllocationVolumeDetailSection {
+  key: string
+  title: string
+  includeCurrentColumn: boolean
+  includeTargetColumn: boolean
+  rows: AllocationVolumeDetailRow[]
+}
+
+export interface AllocationCargoOnlyItem {
+  wareId: string
+  name: string
+  tier: number
+  currentCount: number
+  targetCount: number
+}
+
 export interface ProductionStationState {
   entityType: 'station' | 'transit'
   id: string
@@ -47,6 +95,8 @@ export interface ProductionStationState {
   count?: number
   minerals?: string[]
   plannedModules: SavedModule[]
+  effectivePlannedModules?: SavedModule[]
+  recommendedModules: SavedModule[]
   resolvedModules: SavedModule[]
   modules: SavedModule[]
   buildingModules: SavedModule[]
@@ -65,6 +115,11 @@ export interface ProductionStationState {
   buildingCargo: WareAmount[]
   buildingReservation: WareAmount[]
   buildingInProgress?: SavedModule
+  archiveBuiltModules?: SavedModule[]
+  archiveCurrentTotalModules?: SavedModule[]
+  archiveProducedWareIds?: string[]
+  finalPlannedModules?: SavedModule[]
+  effectiveTargetModules?: SavedModule[]
 }
 
 export type ProductionWorkbenchSessionState = ProductionSessionState

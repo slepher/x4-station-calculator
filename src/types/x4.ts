@@ -411,6 +411,8 @@ export interface ModuleGroupResult {
 export interface SavedModule {
   id: string;
   count: number;
+  diffAnnotation?: string;
+  isReferenceRecommended?: boolean;
 }
 
 /**
