@@ -1287,13 +1287,7 @@
       <licence type="station_gen_basic" name="{20207,10051}" minrelation="-0.01" tags="basic"/>
       <licence type="station_gen_intermediate" name="{20207,10061}" minrelation="0.01" precursor="ceremonyfriend"/>
       <licence type="tradesubscription" name="{20207,4191}" description="{20207,4002}" minrelation="0.1" precursor="ceremonyally" price="10000000"/>
-      <licence type="capitalequipment" factions="argon"/>
-      <licence type="capitalship" factions="argon"/>
       <licence type="envoy_access" factions="argon ministry"/>
-      <licence type="generaluseequipment" factions="argon"/>
-      <licence type="generaluseship" factions="argon"/>
-      <licence type="militaryequipment" factions="argon"/>
-      <licence type="militaryship" factions="argon"/>
       <licence type="police" factions="argon"/>
     </licences>
     <relations>

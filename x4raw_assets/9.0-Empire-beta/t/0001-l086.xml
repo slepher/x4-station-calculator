@@ -2944,7 +2944,7 @@
     <t id="11153">替换指令队列</t>
     <t id="11154">停靠于展厅</t>
     <t id="11155">请求飞船停靠于此处</t>
-    <t id="11161">Repeat Last Order</t>
+    <t id="11161">重复上一个指令</t>
     <t id="11200">(map range 32xx and 83xx continued)职务</t>
     <t id="11201">你确定要解雇这个人？</t>
     <t id="11202">解雇%s($NPC_NAME$)</t>
@@ -3342,7 +3342,7 @@
     <t id="11696">可拆解残骸</t>
     <t id="11697">资源探测器覆盖范围</t>
     <t id="11698">{1001,11697}</t>
-    <t id="11699">(resource type)Solid</t>
+    <t id="11699">(resource type)固体</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">离线存档</t>
     <t id="11702">覆盖离线存档</t>
@@ -3756,6 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789"> 如果你是第一次游玩《X4：基石》，我们建议你应该在完成教程之后再开启X4的开放宇宙之旅。</t>
     <t id="12790">开始新的开放宇宙</t>
+    <t id="12791">Creator Credit for Uploads</t>
+    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
+    <t id="12793">Submit Anonymously</t>
+    <t id="12794">Credit My Forum Username</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">大使馆行动</t>
     <t id="12803">外交官</t>
@@ -3962,8 +3966,8 @@
     <t id="13327">队列中的优先指令</t>
     <t id="13328">收集速率(of resources; header item for table column)</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
-    <t id="13401">(resource type)Gas</t>
-    <t id="13402">(resource type)Scrap</t>
+    <t id="13401">(resource type)气体</t>
+    <t id="13402">(resource type)废料</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">再见</t>
@@ -9300,7 +9304,7 @@
     <t id="911">访问空间站</t>
     <t id="912">访问属于各派系的重要空间站。</t>
     <t id="921">资源探测</t>
-    <t id="922">找到资源产区并用资源探测器标记，回收再利用已经失效的资源探测器。</t>
+    <t id="922">找到资源产区并用资源探测器标记。</t>
     <t id="10000">中止路径</t>
     <t id="10001">即将结束</t>
     <t id="10002">主动巡逻</t>
@@ -57919,6 +57923,10 @@
     <t id="41602">轰炸对指挥官有威胁的大型舰船。</t>
     <t id="41603">轰炸</t>
     <t id="41604">为指挥官轰炸</t>
+    <t id="41701">Prospector</t>
+    <t id="41702">Prospect for resources needed by this ship's commander.</t>
+    <t id="41703">Prospect for</t>
+    <t id="41704">Prospect for commander</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">实习生</t>
     <t id="50201">熟练船员</t>
@@ -61999,14 +62007,14 @@
     <t id="5107">(objective.wait)乘客到达(female)</t>
     <t id="5200">(build station)</t>
     <t id="5201">(objective1)寻找合适的位置</t>
-    <t id="5202">(objective2)符合要求的建筑规划</t>
+    <t id="5202">(objective2)购买建筑规划</t>
     <t id="5203">(objective4)移交控制权</t>
     <t id="5210">(objective3)建造空间站</t>
     <t id="5211">(objective3)建造防御空间站</t>
     <t id="5212">(objective3)建造工厂</t>
-    <t id="5213">(objective)在指定位置接管空域</t>
+    <t id="5213">(objective)在指定位置购买建筑规划</t>
     <t id="5214">(objective Extend:)将建筑规划扩展至所需的尺寸。</t>
-    <t id="5215">(objective)Buy plot in specified sector</t>
+    <t id="5215">(objective)在指定星区内购买建筑规划</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">蓝图可向派系代表和外交官购买。</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62199,6 +62207,7 @@
     <t id="8">乘客$PASSENGER$离开了$SHIP$</t>
     <t id="11">{30232,101}</t>
     <t id="12">{30232,102}</t>
+    <t id="13">{1001,7310}</t>
     <t id="101">离开这里</t>
     <t id="102">我真的没有时间去解释原因，但我需要尽快离开这个空间站。有人在追我。去哪里并不重要，只要能离开这里就好。你愿意带我离开空间站吗？我会付钱给你的。如果你能帮助我，请在空间站降落，并在停靠区与我见面。谢谢你，陌生人。</t>
     <t id="103">{30101,1}(Please come aboard.)</t>

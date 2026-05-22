@@ -191,8 +191,10 @@
       <identification name="{20004,7300011}" description="{20004,7300012}" />
       <resourceareas>
         <resourcearea amount="2" ref="sphere_medium_methane_medium_veryslow" />
-        <resourcearea amount="2" ref="sphere_huge_ore_verylow_veryslow" />
-        <resourcearea amount="2" ref="sphere_huge_ice_verylow_veryslow" />
+        <resourcearea amount="2" ref="sphere_medium_ore_low_slow" />
+        <resourcearea amount="2" ref="sphere_small_ore_low_average" />
+        <resourcearea amount="1" ref="sphere_tiny_ice_medium_veryfast" />
+        <resourcearea amount="3" ref="sphere_medium_ice_low_veryslow" />
         <resourcearea amount="1" ref="sphere_small_nividium_verylow_veryslow" />
       </resourceareas>
       <area sunlight="1" economy="0.25" security="0.25" tags="noaggressivespawn" jobs="false"/>

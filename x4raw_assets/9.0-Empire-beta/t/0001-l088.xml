@@ -2719,7 +2719,7 @@
     <t id="9654">生產模組</t>
     <t id="9655">助推加速倍率</t>
     <t id="9656">打斷 L 及 XL 級護盾回充</t>
-    <t id="9657">Unknown production method</t>
+    <t id="9657">未知生產方式</t>
     <t id="9700">(User question)</t>
     <t id="9701">駭入中</t>
     <t id="9702">你即將開始駭入</t>
@@ -2944,7 +2944,7 @@
     <t id="11153">替換指令隊列</t>
     <t id="11154">停靠於展廳</t>
     <t id="11155">請求飛船停靠於此處</t>
-    <t id="11161">Repeat Last Order</t>
+    <t id="11161">重複上一個指令</t>
     <t id="11200">(map range 32xx and 83xx continued)職務</t>
     <t id="11201">您確定要解雇這個人？</t>
     <t id="11202">解雇%s($NPC_NAME$)</t>
@@ -3338,11 +3338,11 @@
     <t id="11692">現在你可以使用快速鍵，直接在地圖或互動選單中下達佇列指令（%s($INPUT_MODIFIER_ICON$)）與優先指令（%s($INPUT_MODIFIER_ICON$)）。預設情況下，未使用快速鍵下達的指令會覆蓋佇列中的指令。</t>
     <t id="11693">如果你更喜歡舊模式，可以在遊戲設定選單中將「預設指令行為」改為「佇列」，這樣在使用互動選單時按下%s($INPUT_MODIFIER_ICON$)就會覆蓋指令，而不是把它加入佇列中。</t>
     <t id="11694">按「是」以試用新的預設修飾鍵行為，按「否」保持舊行為，使用%s($INPUT_MODIFIER_ICON$)覆蓋指令。</t>
-    <t id="11695">Towable Wreck</t>
-    <t id="11696">Dismantlable Wreck</t>
-    <t id="11697">Resource Probe coverage</t>
+    <t id="11695">可拖曳殘骸</t>
+    <t id="11696">可拆解殘骸</t>
+    <t id="11697">資源探測器覆蓋範圍</t>
     <t id="11698">{1001,11697}</t>
-    <t id="11699">(resource type)Solid</t>
+    <t id="11699">(resource type)固體</t>
     <t id="11700">(Options menu range 26xx, 48xx, 72xx and 89xx continued)</t>
     <t id="11701">離線存檔</t>
     <t id="11702">覆蓋離線存檔</t>
@@ -3756,6 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">如果你是第一次遊玩《X4：基石》，我們建議你在完成教學後再開啟 X4 的開放宇宙之旅。</t>
     <t id="12790">開始新的開放宇宙</t>
+    <t id="12791">Creator Credit for Uploads</t>
+    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
+    <t id="12793">Submit Anonymously</t>
+    <t id="12794">Credit My Forum Username</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">大使館行動</t>
     <t id="12803">外交官</t>
@@ -3962,8 +3966,8 @@
     <t id="13327">隊列中的優先指令</t>
     <t id="13328">資源採集速率</t>
     <t id="13400">(map range 32xx, 83xx, 112xx and 116xx continued)</t>
-    <t id="13401">(resource type)Gas</t>
-    <t id="13402">(resource type)Scrap</t>
+    <t id="13401">(resource type)氣體</t>
+    <t id="13402">(resource type)廢料</t>
   </page>
   <page id="1002" title="Player Choices" descr="General Player Choices in Conversations - Remember to look for text from XRDB before adding new" voice="no">
     <t id="2">再見</t>
@@ -7695,7 +7699,7 @@
     <t id="1000">預設</t>
     <t id="1001">預設 - 鍵盤與滑鼠 / 控制器</t>
     <t id="1011">預設 - 操縱桿</t>
-    <t id="1021">預設 - 搖桿（備選1）</t>
+    <t id="1021">預設 - 搖桿\（備選\）</t>
     <t id="1031">預設 - 飛行搖桿（OSX/Linux）</t>
     <t id="1040">Thrustmaster HOTAS Warthog</t>
     <t id="1041">{1023,1000} - {1023,1040}</t>
@@ -7716,7 +7720,7 @@
     <t id="1120">VPC Constellation Alpha Prime</t>
     <t id="1121">{1023,1000} - {1023,1120} \(Single\)</t>
     <t id="1122">{1023,1000} - {1023,1120} \(Dual\)</t>
-    <t id="1131">Default - WASD Keyboard &amp; Mouse \(Alternative\)</t>
+    <t id="1131">預設 - WASD 鍵盤與滑鼠\（備選\）</t>
     <t id="2001">Sony DUALSHOCK3 無線控制器</t>
     <t id="2011">Sony DUALSHOCK4 無線控制器</t>
     <t id="2021">Sony DualSense 無線控制器</t>
@@ -9300,7 +9304,7 @@
     <t id="911">訪問太空站</t>
     <t id="912">訪問屬於各派系的重要太空站。</t>
     <t id="921">資源探測</t>
-    <t id="922">找到資源產區並用資源探測器標記，回收再利用已經失效的資源探測器。</t>
+    <t id="922">找到資源產區並用資源探測器標記。</t>
     <t id="10000">中止路徑</t>
     <t id="10001">即將結束</t>
     <t id="10002">主動巡邏</t>
@@ -57919,6 +57923,10 @@
     <t id="41602">轟炸威脅此船艦指揮官的主力艦。</t>
     <t id="41603">為……轟炸</t>
     <t id="41604">為指揮官轟炸</t>
+    <t id="41701">Prospector</t>
+    <t id="41702">Prospect for resources needed by this ship's commander.</t>
+    <t id="41703">Prospect for</t>
+    <t id="41704">Prospect for commander</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">實習生</t>
     <t id="50201">熟練船員</t>
@@ -61999,14 +62007,14 @@
     <t id="5107">(objective.wait)等待乘客到達(female)</t>
     <t id="5200">(build station)</t>
     <t id="5201">(objective1)尋找合適地點</t>
-    <t id="5202">(objective2)佔領地塊</t>
+    <t id="5202">(objective2)購買建築規劃</t>
     <t id="5203">(objective4)移交控制權</t>
     <t id="5210">(objective3)建造空間站</t>
     <t id="5211">(objective3)建造防禦空間站</t>
     <t id="5212">(objective3)建造工廠</t>
-    <t id="5213">(objective)在指定地點佔領地塊</t>
+    <t id="5213">(objective)在指定位置購買建築規劃</t>
     <t id="5214">(objective Extend:)將建築規劃擴展至所需尺寸。</t>
-    <t id="5215">(objective)Buy plot in specified sector</t>
+    <t id="5215">(objective)在指定星區內購買建築規劃</t>
     <t id="5220">(mission briefing text)</t>
     <t id="5221">藍圖可向派系代表和外交官購買。</t>
     <t id="5300">(build and deliver fleet)</t>
@@ -62199,6 +62207,7 @@
     <t id="8">$SHIP$ - 乘客離船：$PASSENGER$</t>
     <t id="11">{30232,101}</t>
     <t id="12">{30232,102}</t>
+    <t id="13">{1001,7310}</t>
     <t id="101">離開這裡</t>
     <t id="102">我不太有時間解釋原因，但我需要盡快離開這個空間站。有人在找我。去哪裡都無所謂，只要離開這裡。你願意載我離開空間站嗎？我會付你錢。如果你能幫我，請降落在空間站並在停泊區見我。謝謝你，陌生人。</t>
     <t id="103">{30101,1}(Please come aboard.)</t>

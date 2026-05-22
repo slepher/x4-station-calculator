@@ -22,7 +22,7 @@
       <ware id="ore" yield="5000" respawndelay="20"/>
       <ware id="silicon" yield="5000" respawndelay="20"/>
       <ware id="ice" yield="5000" respawndelay="20"/>
-      <ware id="nividium" yield="1000" respawndelay="60"/>
+      <ware id="nividium" yield="500" respawndelay="90"/>
       <ware id="hydrogen" yield="5000" respawndelay="20"/>
       <ware id="helium" yield="5000" respawndelay="20"/>
       <ware id="methane" yield="5000" respawndelay="20"/>
@@ -33,7 +33,7 @@
       <ware id="ore" yield="50000" respawndelay="40"/>
       <ware id="silicon" yield="50000" respawndelay="40"/>
       <ware id="ice" yield="50000" respawndelay="40"/>
-      <ware id="nividium" yield="5000" respawndelay="120"/>
+      <ware id="nividium" yield="1000" respawndelay="150"/>
       <ware id="hydrogen" yield="50000" respawndelay="40"/>
       <ware id="helium" yield="50000" respawndelay="40"/>
       <ware id="methane" yield="50000" respawndelay="40"/>
@@ -44,7 +44,7 @@
       <ware id="ore" yield="200000" respawndelay="60"/>
       <ware id="silicon" yield="200000" respawndelay="60"/>
       <ware id="ice" yield="200000" respawndelay="60"/>
-      <ware id="nividium" yield="20000" respawndelay="180"/>
+      <ware id="nividium" yield="5000" respawndelay="210"/>
       <ware id="hydrogen" yield="200000" respawndelay="60"/>
       <ware id="helium" yield="200000" respawndelay="60"/>
       <ware id="methane" yield="200000" respawndelay="60"/>
@@ -55,7 +55,7 @@
       <ware id="ore" yield="1000000" respawndelay="120"/>
       <ware id="silicon" yield="1000000" respawndelay="120"/>
       <ware id="ice" yield="1000000" respawndelay="120"/>
-      <ware id="nividium" yield="75000" respawndelay="360"/>
+      <ware id="nividium" yield="10000" respawndelay="360"/>
       <ware id="hydrogen" yield="1000000" respawndelay="120"/>
       <ware id="helium" yield="1000000" respawndelay="120"/>
       <ware id="methane" yield="1000000" respawndelay="120"/>
@@ -66,7 +66,7 @@
       <ware id="ore" yield="2000000" respawndelay="180"/>
       <ware id="silicon" yield="2000000" respawndelay="180"/>
       <ware id="ice" yield="2000000" respawndelay="180"/>
-      <ware id="nividium" yield="150000" respawndelay="480"/>
+      <ware id="nividium" yield="50000" respawndelay="480"/>
       <ware id="hydrogen" yield="2000000" respawndelay="180"/>
       <ware id="helium" yield="2000000" respawndelay="180"/>
       <ware id="methane" yield="2000000" respawndelay="180"/>

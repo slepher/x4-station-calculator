@@ -2944,7 +2944,7 @@
     <t id="11153">Zastąp kolejkę rozkazów</t>
     <t id="11154">Zadokuj na wystawie</t>
     <t id="11155">Poproś o dokowanie tutaj</t>
-    <t id="11161">Repeat Last Order</t>
+    <t id="11161">Powtórz Ostatni Rozkaz</t>
     <t id="11200">(map range 32xx and 83xx continued)Funkcja</t>
     <t id="11201">Jesteś pewien, że chcesz zwolnić tę osobę?</t>
     <t id="11202">Zwolnij %s($NPC_NAME$)</t>
@@ -3756,6 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">Jeśli po raz pierwszy zetkniesz się z X4, sugerujemy zapoznanie się z kilkoma samouczkami, zanim rozpoczniesz podróż do Otwartego Wszechświata X4.</t>
     <t id="12790">Rozpocznij nowy Otwarty Wszechświat</t>
+    <t id="12791">Creator Credit for Uploads</t>
+    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
+    <t id="12793">Submit Anonymously</t>
+    <t id="12794">Credit My Forum Username</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">Działania Ambasady</t>
     <t id="12803">Dyplomata</t>
@@ -11476,37 +11480,37 @@
     <t id="302950129">I tak w kółko, aż cię przekonam.</t>
   </page>
   <page id="10097" title="Demo Speaker" descr="Lines for the Demo Speaker" voice="yes">
-    <t id="100">Welcome to this demonstration of X4: Foundations - a large-scale space simulation game in which you can personally fly hundreds of different ships, from small vessels to huge capital ships.</t>
-    <t id="101">Here, you are standing on the bridge of a capital ship, but you do not yet own it. Instead, you will be asked to pilot a smaller ship which is being loaded onto an S-sized docking bay.</t>
+    <t id="100">Witamy w tej demonstracji X4: Foundations - zakrojonej na szeroką skalę kosmicznej gry symulacyjnej, w której możesz osobiście latać setkami różnych statków, od małych myśliwców po ogromne okręty dowodzenia.</t>
+    <t id="101">Tutaj stoisz na mostku statku dowodzenia, ale nie jesteś jeszcze jego właścicielem. Zamiast tego zostaniesz poproszony o pilotowanie mniejszego statku, który jest zadokowany do zatoki dokującej o rozmiarze S.</t>
     <t id="102">Please follow the orange line and walk to the elevator.</t>
-    <t id="103">Please turn towards the exit and click on the panel to the right, to select the dock.</t>
+    <t id="103">Odwróć się w stronę wyjścia i kliknij panel po prawej stronie, aby wybrać zatokę dokującą.</t>
     <t id="104">Follow the orange lines on the floor and climb into your ship.</t>
-    <t id="105">Walk to the pilot chair and select it, to take control of this ship.</t>
-    <t id="106">Select UNDOCK to start flying the ship.</t>
-    <t id="107">Your controls will be a bit different from those used for walking. Have a look at the control options. Accelerate your ship forward. All controls can be reconfigured, whether you play with keyboard and mouse, or with a gamepad or joystick.</t>
-    <t id="108">Your ship just exploded and you experienced an emergency evacuation. </t>
-    <t id="109">While we are mostly showcasing combat in this demo, X4: Foundations has so much more to offer. In X4 you can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe. </t>
-    <t id="110">We will now teleport you to another location in the universe, where your role becomes even more critical. An orbital installation, known as Antigone, lies at the heart of an intensifying conflict. A sudden enemy assault threatens the station's very existence. In this mission, you will take command of a defence vessel. Your objective is to repel waves of attackers and delay the station's destruction. Every second you buy could mean the difference between survival and total collapse for this region of space.</t>
-    <t id="111">Hold the line and prove your worth. Antigone's fate is in your hands!</t>
-    <t id="112">Thank you very much for playing this demo. After only a few hours playing, you can already start building your own stations, producing wares, and contributing to the enormous simulated economy of X4: Foundations.</t>
-    <t id="113">All the ships you see are manufactured from resources that are ultimately mined within the game universe.</t>
-    <t id="114">Starting as a lone pilot in this huge universe, you will take on an ever-expanding role, eventually managing an empire and influencing political factions.</t>
-    <t id="115">Or you can ignore all of this and simply follow one of the many fascinating plot lines, focus on exploration, or try the innumerable other activities that are available in the X Universe.</t>
-    <t id="116">You can adjust your forward speed using the X and Y keys, the mouse wheel, or the throttle stick.</t>
-    <t id="117">Once you've selected a target, the targeting system will try to lock on. When the lock is achieved, you can launch a missile with the R key or secondary fire button.</t>
+    <t id="105">Podejdź do fotela pilota i wybierz go, aby przejąć kontrolę nad statkiem.</t>
+    <t id="106">Wybierz ODDOKUJ, aby rozpocząć lot statkiem.</t>
+    <t id="107">Elementy sterujące będą się nieco różnić od tych używanych podczas chodzenia. Przyjrzyj się opcjom sterowania. Przyspiesz swój statek. Wszystkie elementy sterujące można zmienić, niezależnie od tego, czy grasz za pomocą klawiatury i myszy, czy za pomocą gamepada lub joysticka.</t>
+    <t id="108">Twój statek właśnie eksplodował i doświadczyłeś awaryjnej ewakuacji.</t>
+    <t id="109">Chociaż w tym demo prezentujemy głównie walkę, X4: Foundations ma o wiele więcej do zaoferowania. W X4 możesz szybko zarobić wystarczająco dużo pieniędzy, aby posiadać flotę statków. Możesz zatrudnić innych pilotów, aby pracowali dla ciebie i wykonywali twoje rozkazy. Pozwól im handlować lub wydobywać, aby zarabiać pieniądze, podczas gdy ty podążaj za jedną z wielu linii fabularnych lub wykonuj samodzielne misje, które można znaleźć w całym rozległym wszechświecie.</t>
+    <t id="110">Teraz teleportujemy cię do innego miejsca we wszechświecie, gdzie twoja rola stanie się jeszcze bardziej krytyczna. Instalacja orbitalna, znana jako Antigone, znajduje się w samym sercu nasilającego się konfliktu. Nagły atak wroga zagraża istnieniu stacji. W tej misji przejmiesz dowodzenie nad statkiem obronnym. Twoim celem jest odparcie fal napastników i opóźnienie zniszczenia stacji. Każda kupiona sekunda może oznaczać różnicę między przetrwaniem a całkowitym upadkiem tego regionu kosmosu.</t>
+    <t id="111">Utrzymaj linię i udowodnij swoją wartość. Los Antigone jest w twoich rękach!</t>
+    <t id="112">Bardzo dziękujemy za zagranie w to demo. Po zaledwie kilku godzinach gry możesz już zacząć budować własne stacje, produkować towary i przyczyniać się do ogromnej symulowanej ekonomii X4: Foundations.</t>
+    <t id="113">Zaczynając jako samotny pilot w tym ogromnym wszechświecie, będziesz odgrywał coraz większą rolę, ostatecznie zarządzając imperium i wpływając na frakcje polityczne.</t>
+    <t id="114">Zaczynając jako samotny pilot w tym ogromnym wszechświecie, będziesz odgrywał coraz większą rolę, ostatecznie zarządzając imperium i wpływając na frakcje polityczne.</t>
+    <t id="115">Możesz też zignorować to wszystko i po prostu podążać za jedną z wielu fascynujących linii fabularnych, skupić się na eksploracji lub wypróbować niezliczone inne aktywności dostępne w Uniwersum X.</t>
+    <t id="116">Prędkość można regulować za pomocą klawiszy X i Y, kółka myszy lub drążka przepustnicy.</t>
+    <t id="117">Po wybraniu celu system namierzania spróbuje go zablokować. Gdy blokada zostanie uzyskana, możesz wystrzelić rakietę za pomocą klawisza R lub drugiego przycisku ognia.</t>
     <t id="200">(Tradeshow Playground Scenario)</t>
-    <t id="201">Welcome to X4: Foundations, a living universe with hundreds of sectors connected by gates. These sectors can be explored, and contain thousands of ships and stations operating within a fully simulated economy. You can own and command everything, ranging from a single tiny fighter to a grand empire with merchant fleets and powerful capital ships, to shape your story.</t>
-    <t id="202">This scenario places you near one of the many hundreds of bustling space stations you'll find in our living universe, with traders delivering wares and miners gathering resources. \nRecently there have been skirmishes with the machine intelligence known as the Xenon pouring in from the nearby gate, disrupting the trade.</t>
-    <t id="211">(explore explanation)Leaving the station behind, you are free to explore the other sectors and factions. The full X-Universe contains hundreds of unique sectors inhabited by various factions and species, all with rich history.</t>
-    <t id="212">(fight explanation)The Gate network is not always safe. Between the machine intelligence known as the Xenon, pirates, warring factions and the occasional war profiteering opportunist, you will see clashes ranging from small skirmishes to giant fleet brawls.</t>
-    <t id="213">(mining explanation)Ships like these mine the raw resources that the majority of the economy is based on. Once delivered they are refined, moved to factories and eventually turned into the wares that can be used to build the ships and stations you see.</t>
-    <t id="214">(trading explanation)Traders, haulers and merchants transport wares between stations. They buy where goods are plentiful and sell them where they are scarce, keeping the gears of the economy turning.</t>
-    <t id="215">(shipyard construction)This ship is currently under construction using the wares created by other stations. It will soon defend this sector from any further incursions.</t>
-    <t id="216">(launch tube explanation)The station is launching fighters from its launch tubes to defend itself from incoming attackers.</t>
-    <t id="217">(station attack explanation)A hostile Xenon force is approaching. If they damage the station, the production of new ships could be severely limited.</t>
-    <t id="218">(criminal explanation)Criminals try to capitalise on transporting illicit wares for great profits by hiding in traffic around stations. These criminals can even run organised operations with their own stations and masked freighters.</t>
-    <t id="219">(explore suggestion)There are more sights to see and things to do. Try flying around and targeting different objects.</t>
-    <t id="220">X4: Foundations has so much more to offer. You can quickly earn enough money to own a fleet of ships. You can hire other pilots to work for you, and follow your orders. Let them trade or mine to earn you money, while you follow one of the many plot lines or carry out standalone missions that can be found throughout the vast universe.</t>
+    <t id="201">Witaj w X4: Foundations, żywym uniwersum z setkami sektorów połączonych bramami. Sektory te można eksplorować, a w ich obrębie działają tysiące statków i stacji funkcjonujących w pełni symulowanej ekonomii. Możesz posiadać i dowodzić wszystkim - od pojedynczego, niewielkiego myśliwca aż po rozległe imperium z flotami handlowymi i potężnymi okrętami kapitałowymi, kształtując własną historię.</t>
+    <t id="202">Ten scenariusz umieszcza cię w pobliżu jednej z setek tętniących życiem stacji kosmicznych, które znajdziesz w naszym żywym uniwersum, gdzie handlarze dostarczają towary, a górnicy pozyskują surowce. Ostatnio dochodziło tu do potyczek z maszynową inteligencją znaną jako Xenoni, która napływa przez pobliską bramę, zakłócając handel.</t>
+    <t id="211">(explore explanation)Opuszczając stację, możesz swobodnie eksplorować inne sektory i frakcje. Cały X-Uniwersum obejmuje setki unikalnych sektorów zamieszkanych przez różne frakcje i gatunki, z których każdy ma własną, bogatą historię.</t>
+    <t id="212">(fight explanation)Sieć bram nie zawsze jest bezpieczna. Pomiędzy maszynową inteligencją znaną jako Xenoni, piratami, walczącymi frakcjami oraz okazjonalnymi oportunistami żerującymi na wojnie, można tu zaobserwować starcia - od niewielkich potyczek aż po ogromne bitwy flot.</t>
+    <t id="213">(mining explanation)Statki takie jak ten wydobywają surowce, na których opiera się większość gospodarki. Po dostarczeniu są one rafinowane, transportowane do fabryk, a następnie przekształcane w towary wykorzystywane do budowy statków i stacji, które widzisz w całym uniwersum.</t>
+    <t id="214">(trading explanation)Handlarze, przewoźnicy i kupcy transportują towary pomiędzy stacjami. Kupują tam, gdzie dobra są w nadmiarze, i sprzedają je tam, gdzie ich brakuje, utrzymując w ruchu tryby ekonomii.</t>
+    <t id="215">(shipyard construction)Ten statek jest obecnie w budowie, wykorzystując towary produkowane przez inne stacje. Wkrótce będzie bronił tego sektora przed kolejnymi najazdami.</t>
+    <t id="216">(launch tube explanation)Stacja wypuszcza myśliwce z wyrzutni, aby bronić się przed nadlatującymi atakującymi.</t>
+    <t id="217">(station attack explanation)Wrogie siły Xenonów zbliżają się do stacji. Jeśli ją uszkodzą, produkcja nowych statków może zostać poważnie ograniczona.</t>
+    <t id="218">(criminal explanation)Przestępcy próbują wykorzystać transport nielegalnych towarów dla dużych zysków, ukrywając się w ruchu wokół stacji. Mogą oni nawet prowadzić zorganizowane operacje, posiadając własne stacje oraz zamaskowane frachtowce.</t>
+    <t id="219">(explore suggestion)Jest jeszcze wiele do zobaczenia i odkrycia. Spróbuj polatać po okolicy i namierzać różne obiekty.</t>
+    <t id="220">X4: Foundations ma znacznie więcej do zaoferowania. Możesz szybko zarobić wystarczająco dużo kredytów, aby posiadać własną flotę statków. Możesz zatrudniać innych pilotów, którzy będą pracować dla ciebie i wykonywać twoje rozkazy. Pozwól im handlować lub wydobywać surowce, aby zarabiali dla ciebie pieniądze, podczas gdy ty realizujesz jedną z wielu linii fabularnych lub podejmujesz samodzielne misje rozrzucone po całym rozległym wszechświecie.</t>
   </page>
   <page id="10098" title="Torus Computer" descr="0" voice="yes">
     <t id="30224000">(Pioneer Terraforming Mission)</t>
@@ -57919,6 +57923,10 @@
     <t id="41602">Bombarduje duże okręty zagrażające dowódcy tego statku.</t>
     <t id="41603">Bombarduje dla</t>
     <t id="41604">Bombarduje dla dowódcy</t>
+    <t id="41701">Prospector</t>
+    <t id="41702">Prospect for resources needed by this ship's commander.</t>
+    <t id="41703">Prospect for</t>
+    <t id="41704">Prospect for commander</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">Stażysta</t>
     <t id="50201">Zdolny załogant</t>
@@ -62185,8 +62193,8 @@
     <t id="14710">(Mail Content)Zdobyto przedmiot, który, wraz z niezbędnym zapleczem badawczym, może zostać wykorzystany do zbadania technologii kompresji czasu.</t>
   </page>
   <page id="30098" title="Demo Missions" descr="Mission texts for demo versions" voice="no">
-    <t id="100">Defend the Avarice System</t>
-    <t id="101">The radical Holy Order of the Pontifex has gained serious ground against the Argon Federation, to the point where their first fleets have invaded the Riptide Rakers 'Avarice' system.\n\nYour duty is to support the ongoing combined efforts of the Argon Federation and the Riptide Rakers, to defend our shared space and stop this fanatical menace!</t>
+    <t id="100">Broń Systemu Avarice</t>
+    <t id="101">Radykalny Święty Zakon Pontifexa zdobył ogromną przewagę nad Federacją Argońską, do tego stopnia, że ich pierwsze floty zaatakowały system Grabieżców Odpływów 'Avarice'. Twoim obowiązkiem jest wspieranie trwających połączonych wysiłków Federacji Argońskiej i Grabieżców Odpływów, aby bronić naszej wspólnej przestrzeni i powstrzymać to fanatyczne zagrożenie!</t>
   </page>
   <page id="30101" title="Transport Passenger" descr="0" voice="no">
     <t id="1">Proszę wejść na pokład.</t>
@@ -62199,6 +62207,7 @@
     <t id="8">$SHIP$ - Pasażer wyszedł: $PASSENGER$</t>
     <t id="11">{30232,101}</t>
     <t id="12">{30232,102}</t>
+    <t id="13">{1001,7310}</t>
     <t id="101">Daleko stąd</t>
     <t id="102">Naprawdę nie mam czasu na wyjaśnianie dlaczego, ale muszę jak najszybciej opuścić tę stację. Ludzie mnie szukają. Nie ma znaczenia, czym polecę, o ile zabierzesz mnie daleko stąd. Czy jesteś skłonny zapewnić mi transport poza stację? Zapłacę ci za to. Jeśli możesz mi pomóc, wyląduj na stacji i spotkaj się ze mną w doku. Dziękuję, nieznajomy.</t>
     <t id="103">{30101,1}(Please come aboard.)</t>

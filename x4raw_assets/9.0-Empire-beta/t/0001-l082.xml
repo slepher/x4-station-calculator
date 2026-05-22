@@ -3756,6 +3756,10 @@
     <t id="12788">AMD FSR</t>
     <t id="12789">X4를 처음 플레이하시는 분들께는 X4의 오픈 유니버스 여정을 시작하시기 전에 다양한 튜토리얼을 시도해보실 것을 추천드립니다.</t>
     <t id="12790">새 오픈 유니버스 시작</t>
+    <t id="12791">Creator Credit for Uploads</t>
+    <t id="12792">Choose whether to include your forum username when uploading data \(e.g. ships\).</t>
+    <t id="12793">Submit Anonymously</t>
+    <t id="12794">Credit My Forum Username</t>
     <t id="12800">(Diplomacy menu)</t>
     <t id="12801">대사관 행동</t>
     <t id="12803">외교관</t>
@@ -57919,6 +57923,10 @@
     <t id="41602">이 함선의 사령관을 위협하는 주력함 폭격</t>
     <t id="41603">다음을 위해 폭격:</t>
     <t id="41604">다음 사령관을 위해 폭격:</t>
+    <t id="41701">Prospector</t>
+    <t id="41702">Prospect for resources needed by this ship's commander.</t>
+    <t id="41703">Prospect for</t>
+    <t id="41704">Prospect for commander</t>
     <t id="50000">(***Tiers***)</t>
     <t id="50101">견습생</t>
     <t id="50201">정식 승무원</t>
@@ -62199,6 +62207,7 @@
     <t id="8">$SHIP$ - 승객 떠남: $PASSENGER$</t>
     <t id="11">{30232,101}</t>
     <t id="12">{30232,102}</t>
+    <t id="13">{1001,7310}</t>
     <t id="101">여기서 떨어진 곳에</t>
     <t id="102">이유를 말할 시간이 없지만, 저는 이 스테이션에서 빨리 떠나야 해요. 사람들이 저를 찾고 있어요. 어디로 가는는 상관 없습니다. 그냥 최대한 여기서 멀리 떨어진 곳에 데려다주세요. 당신은 저를 이 스테이션에서 떠나게 해주실 수 있나요? 감사비는 지급할꼐요. 저를 도와줄 수 있다면, 스테이션에 도킹해서 도킹 지역에서 저를 만나주세요. 감사해요, 낯선 분.</t>
     <t id="103">{30101,1}</t>
