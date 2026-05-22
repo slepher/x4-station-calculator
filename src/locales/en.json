@@ -1016,6 +1016,7 @@
     "version_mismatch_detail": "Save version {saveVersion} does not match current game version {expectedVersion}",
     "download_json": "Download JSON",
     "remove_archive": "Remove archive",
+    "confirm_remove": "Are you sure you want to delete archive \"{filename}\"? This action cannot be undone.",
     "select_archive_hint": "Select an archive to view details",
     "stations": "Stations",
     "datavaults": "Data Vaults",

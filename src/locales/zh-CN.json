@@ -1017,6 +1017,7 @@
     "version_mismatch_detail": "存档版本 {saveVersion} 与当前游戏版本 {expectedVersion} 不匹配",
     "download_json": "下载 JSON",
     "remove_archive": "删除存档",
+    "confirm_remove": "确定要删除存档 {filename} 吗？此操作不可撤销。",
     "select_archive_hint": "选择存档查看详情",
     "stations": "空间站",
     "datavaults": "日志数据仓库",

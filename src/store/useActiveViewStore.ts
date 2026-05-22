@@ -2,12 +2,21 @@ import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import type { StationActiveView } from './useShipBuildStore'
 
+export type BindingStage = 'select-binding' | 'select-sector' | 'select-station'
+export type MapSavePanelLayer = 'list' | 'category' | 'coord' | 'binding-sector' | 'binding-station'
+
 export interface ActiveViewState {
   activeEmpireId: string | null
   activeEmpireStation: string | null
   activeBinding: string | null
   activeBindingStation: string | null
   activeView: StationActiveView
+  isResourcePanelOpen: boolean
+  isSavePanelOpen: boolean
+  mapBindingGameGuid: string | null
+  mapBindingStage: BindingStage
+  mapSavePanelLayer: MapSavePanelLayer
+  mapSavePanelSectorGroupId: string | null
 }
 
 const STORAGE_KEY = 'x4_station_active_view'
@@ -16,7 +25,13 @@ const DEFAULT_STATE: ActiveViewState = {
   activeEmpireStation: null,
   activeBinding: null,
   activeBindingStation: null,
-  activeView: 'blueprint-production'
+  activeView: 'blueprint-production',
+  isResourcePanelOpen: false,
+  isSavePanelOpen: false,
+  mapBindingGameGuid: null,
+  mapBindingStage: 'select-binding',
+  mapSavePanelLayer: 'list',
+  mapSavePanelSectorGroupId: null
 }
 
 function loadFromStorage(): ActiveViewState {
@@ -24,8 +39,10 @@ function loadFromStorage(): ActiveViewState {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return { ...DEFAULT_STATE }
     const parsed = JSON.parse(raw)
+    const baseDefaults = { ...DEFAULT_STATE }
     if (parsed.activeEmpireId !== undefined || parsed.activeBinding !== undefined) {
       return {
+        ...baseDefaults,
         activeEmpireId: parsed.activeEmpireId || null,
         activeEmpireStation: parsed.activeEmpireStation || null,
         activeBinding: parsed.activeBinding || null,
@@ -34,6 +51,7 @@ function loadFromStorage(): ActiveViewState {
       }
     }
     return {
+      ...baseDefaults,
       activeEmpireId: parsed.productionSource === 'empire' ? parsed.activeId : null,
       activeEmpireStation: parsed.productionSource === 'empire' ? parsed.activeStationId : null,
       activeBinding: parsed.productionSource === 'save-binding' ? parsed.activeId : null,
@@ -141,6 +159,60 @@ export const useActiveViewStore = defineStore('activeView', () => {
     }
   })
 
+  const isResourcePanelOpen = computed({
+    get: () => state.value.isResourcePanelOpen,
+    set: (val: boolean) => {
+      state.value.isResourcePanelOpen = val
+      saveToStorage(state.value)
+    }
+  })
+
+  const isSavePanelOpen = computed({
+    get: () => state.value.isSavePanelOpen,
+    set: (val: boolean) => {
+      state.value.isSavePanelOpen = val
+      saveToStorage(state.value)
+    }
+  })
+
+  const mapBindingGameGuid = computed({
+    get: () => state.value.mapBindingGameGuid,
+    set: (val: string | null) => {
+      state.value.mapBindingGameGuid = val
+      saveToStorage(state.value)
+    }
+  })
+
+  const mapBindingStage = computed({
+    get: () => state.value.mapBindingStage,
+    set: (val: BindingStage) => {
+      state.value.mapBindingStage = val
+      saveToStorage(state.value)
+    }
+  })
+
+  const mapSavePanelLayer = computed({
+    get: () => state.value.mapSavePanelLayer,
+    set: (val: MapSavePanelLayer) => {
+      state.value.mapSavePanelLayer = val
+      saveToStorage(state.value)
+    }
+  })
+
+  const mapSavePanelSectorGroupId = computed({
+    get: () => state.value.mapSavePanelSectorGroupId,
+    set: (val: string | null) => {
+      state.value.mapSavePanelSectorGroupId = val
+      saveToStorage(state.value)
+    }
+  })
+
+  const isBindingPanelOpen = computed(() => state.value.mapBindingStage !== 'select-binding')
+
+  const mapDragBindingSectorGroupId = computed(() =>
+    state.value.mapBindingStage === 'select-station' ? state.value.mapSavePanelSectorGroupId : null
+  )
+
   function setActiveId(id: string | null) {
     activeId.value = id
   }
@@ -196,6 +268,14 @@ export const useActiveViewStore = defineStore('activeView', () => {
     activeBinding,
     activeBindingStation,
     activeView,
+    isResourcePanelOpen,
+    isSavePanelOpen,
+    isBindingPanelOpen,
+    mapBindingGameGuid,
+    mapBindingStage,
+    mapDragBindingSectorGroupId,
+    mapSavePanelLayer,
+    mapSavePanelSectorGroupId,
     setProductionSource,
     setActiveId,
     setActiveStationId,

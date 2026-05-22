@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import { computed, nextTick, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { storeToRefs } from 'pinia'
 import { useI18n } from 'vue-i18n'
 import MapSvgCanvas from '@/components/map/MapSvgCanvas.vue'
 import MapSectorTooltip from './MapSectorTooltip.vue'
@@ -20,6 +21,7 @@ import { useSaveBindingStore } from '@/store/useSaveBindingStore'
 import type { SectorResourceFill } from '@/store/logic/mapResourceFilter'
 import type { EntityLocation } from '@/types/x4'
 import { useSaveStore } from '@/store/useSaveStore'
+import { useActiveViewStore, type BindingStage } from '@/store/useActiveViewStore'
 import type { SaveArchive, SavePoiCategory, SavePoiVisibility, SavePoiOverlayItem, SectorData } from '@/types/saveArchive'
 import { buildAggregatedModulesFromStationPlan, classifyPlayerStationPoi } from '@/store/logic/stationPoiSemantics'
 import type { StationPlan } from '@/types/x4'
@@ -150,9 +152,16 @@ const selectedSectorId = ref<string | null>(null)
 const selectedSectorSource = ref<'search' | 'resource' | null>(null)
 const searchSectors = ref<SearchSectorLayout[]>([])
 const resourceHighlightedSectorIds = ref<string[]>([])
-const isResourcePanelOpen = ref(false)
-const isSavePanelOpen = ref(false)
-const isBindingPanelOpen = ref(false)
+
+const { t, te, locale } = useI18n()
+const gameDataStore = useGameDataStore()
+const mapStore = useMapStore()
+const saveStore = useSaveStore()
+const blueprintStore = useBlueprintProductionStore()
+const saveBindingStore = useSaveBindingStore()
+const activeViewStore = useActiveViewStore()
+
+const { isResourcePanelOpen, isSavePanelOpen, isBindingPanelOpen, mapBindingGameGuid: bindingContextGameGuid, mapBindingStage: bindingContextStage, mapDragBindingSectorGroupId: dragEnabledBindingSectorGroupId } = storeToRefs(activeViewStore)
 const activeSavePoiCategory = ref<SavePoiCategory | null>(null)
 const focusedSavePoiKey = ref<string | null>(null)
 const savePoiTooltipItem = ref<SavePoiOverlayItem | null>(null)
@@ -178,9 +187,6 @@ const draggingFreeSector = ref<{ sectorGroupId: string; name: string } | null>(n
 const draggingFreeStation = ref<{ stationId: string; sectorGroupId: string; name: string; icon: 'factory' | 'shipyard'; blueprintStation?: StationPlan } | null>(null)
 const draggingVirtualTradestation = ref<{ sectorGroupId: string; name: string } | null>(null)
 const draggingCoverageSectorMacros = ref<Set<string>>(new Set())
-const bindingContextGameGuid = ref<string | null>(null)
-const bindingContextStage = ref<'select-binding' | 'select-sector' | 'select-station'>('select-binding')
-const dragEnabledBindingSectorGroupId = ref<string | null>(null)
 const focusedPlacementKey = ref<string | null>(null)
 const placementPreview = ref<PlacementPreview | null>(null)
 const hoveredSectorSource = ref<SectorHoverPayload | null>(null)
@@ -195,12 +201,6 @@ const zoomRestoreTimer = ref<number | null>(null)
 const zoomSettleTimer = ref<number | null>(null)
 const lastMousePos = ref({ x: 0, y: 0 })
 
-const { t, te, locale } = useI18n()
-const gameDataStore = useGameDataStore()
-const mapStore = useMapStore()
-const saveStore = useSaveStore()
-const blueprintStore = useBlueprintProductionStore()
-const saveBindingStore = useSaveBindingStore()
 const sectorsById = computed<Record<string, MapSectorDataset>>(() => {
   const out: Record<string, MapSectorDataset> = {}
   const maps = gameDataStore.maps
@@ -1507,7 +1507,7 @@ const onResourcePrimaryColorChange = (color: string | null) => {
 
 const onResourcePanelOpen = () => {
   isSavePanelOpen.value = false
-  isBindingPanelOpen.value = false
+  bindingContextStage.value = 'select-binding'
   clearPlacementState()
   isResourcePanelOpen.value = true
 }
@@ -1522,33 +1522,27 @@ const onResourcePanelClose = () => {
 
 const onSavePanelOpen = () => {
   isResourcePanelOpen.value = false
-  isBindingPanelOpen.value = false
+  bindingContextStage.value = 'select-binding'
   clearPlacementState()
   isSavePanelOpen.value = true
 }
 
 const onSavePanelClose = () => {
   isSavePanelOpen.value = false
-  isBindingPanelOpen.value = false
   activeSavePoiCategory.value = null
   focusedSavePoiKey.value = null
   bindingContextGameGuid.value = null
   bindingContextStage.value = 'select-binding'
-  dragEnabledBindingSectorGroupId.value = null
   clearPlacementState()
 }
 
 const onBindingContextChange = (payload: {
-  stage: 'select-binding' | 'select-sector' | 'select-station'
+  stage: BindingStage
   gameGuid: string | null
   sectorGroupId: string | null
 }) => {
-  isBindingPanelOpen.value = payload.stage !== 'select-binding'
   bindingContextStage.value = payload.stage
   bindingContextGameGuid.value = payload.gameGuid
-  dragEnabledBindingSectorGroupId.value = payload.stage === 'select-station'
-    ? payload.sectorGroupId
-    : null
 }
 
 const onBindingFocusSector = (sectorMacro: string) => {
