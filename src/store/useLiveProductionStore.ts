@@ -224,13 +224,16 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
 
     const map = ensureLiveDerivedMap()
     if (!map) return
+    const liveLockedWares = station?.lockedWares || []
+    const liveWarePriority = buildLiveModeWarePriority(stationId)
+
     map.upsertStation(stationId, {
       modulesMode: 'full',
       sectorId: station?.sectorId,
       modules,
       settings: liveSettings,
-      lockedWares: [],
-      warePriority: {},
+      lockedWares: liveLockedWares,
+      warePriority: liveWarePriority,
       workforces: hasWorkforce ? workforces : undefined,
       archiveSemanticsSource: {
         tag: stationEntry.tag,
@@ -239,6 +242,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
         profileName: stationEntry.profileName
       }
     })
+  }
+
+  function buildLiveModeWarePriority(stationId: string): Record<string, number> {
+    return planningDerivedMap.value?.getCache(stationId)?.warePriorityLevels || {}
   }
 
   function syncAfterStationFlowChange(stationId: string, _deps: StationComputeDeps): void {
@@ -879,7 +886,10 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
   })
 
   const warePriority = computed<Record<string, number>>({
-    get: () => editableStationPlan.value?.warePriority || {},
+    get: () => {
+      const stationId = editableStationPlan.value?.id
+      return stationId ? buildLiveModeWarePriority(stationId) : {}
+    },
     set: (value) => {
       const station = editableStationPlan.value
       if (!station) return
@@ -972,7 +982,7 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
       return {
         actualWorkforce: cache?.actualWorkforce || 0,
         currentEfficiency: cache?.currentEfficiency || 0,
-        warePriorityLevels: {},
+        warePriorityLevels: buildLiveModeWarePriority(stationId),
         productionFlows: flowMapToUse?.getProductionFlows(stationId) || [],
         plannedModules: archiveModules,
         effectivePlannedModules: archiveCurrentTotalModules,
@@ -1193,7 +1203,6 @@ export const useLiveProductionStore = defineStore('liveProduction', () => {
     getModulesMap: () => gameData.modulesMap,
     getWaresMap: () => gameData.waresMap,
     isLockForbidden: (wareId) => {
-      if (mode.value !== 'planning') return false
       if (archiveStation.value === null) return false
       const archiveProducedWareIds: string[] = activeStationState.value.archiveProducedWareIds || []
       return archiveProducedWareIds.includes(wareId)

@@ -82,13 +82,11 @@ export function createProductionWareRuleActions<TStation extends ProductionWareR
   }
 
   function getResolvedLevel(wareId: string): number {
+    const override = deps.getWarePriority()[wareId]
+    if (override !== undefined) return override
+
     const planned = isPlannedWare(wareId)
     const auto = isAutoWare(wareId)
-    const override = deps.getWarePriority()[wareId]
-
-    if (planned && override === 0) return 1
-    if (auto && override === 2) return 1
-    if (override !== undefined) return override
     if (planned) return 2
     if (auto) return 0
     return 0
